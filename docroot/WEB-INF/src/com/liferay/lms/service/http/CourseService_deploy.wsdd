@@ -1,0 +1,92 @@
+<?xml version="1.0"?>
+
+<deployment xmlns="http://xml.apache.org/axis/wsdd/" xmlns:java="http://xml.apache.org/axis/wsdd/providers/java">
+	<service name="Plugin_Lms_CourseService" provider="java:RPC" style="rpc" use="encoded">
+		<arrayMapping xmlns:ns="urn:http.service.lms.liferay.com" xmlns:cmp-ns="http://model.lms.liferay.com" qname="ns:ArrayOf_tns2_CourseSoap" type="java:com.liferay.lms.model.CourseSoap[]" innerType="cmp-ns:CourseSoap" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"></arrayMapping>
+		<arrayMapping xmlns:ns="urn:http.service.lms.liferay.com" xmlns:cmp-ns="http://www.w3.org/2001/XMLSchema" qname="ns:ArrayOf_xsd_string" type="java:java.lang.String[]" innerType="cmp-ns:string" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"></arrayMapping>
+		<typeMapping xmlns:ns="http://model.lms.liferay.com" qname="ns:CourseSoap" type="java:com.liferay.lms.model.CourseSoap" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"></typeMapping>
+		<operation xmlns:operNS="urn:http.service.lms.liferay.com" name="addEditorToCourse" qname="operNS:addEditorToCourse" soapAction="">
+			<parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="courseId" type="tns:long"></parameter>
+			<parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="login" type="tns:string"></parameter>
+		</operation>
+		<operation xmlns:operNS="urn:http.service.lms.liferay.com" name="addStudentToCourse" qname="operNS:addStudentToCourse" soapAction="">
+			<parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="courseId" type="tns:long"></parameter>
+			<parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="login" type="tns:string"></parameter>
+		</operation>
+		<operation xmlns:operNS="urn:http.service.lms.liferay.com" name="addTeacherToCourse" qname="operNS:addTeacherToCourse" soapAction="">
+			<parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="courseId" type="tns:long"></parameter>
+			<parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="login" type="tns:string"></parameter>
+		</operation>
+		<operation xmlns:operNS="urn:http.service.lms.liferay.com" name="addUser" qname="operNS:addUser" soapAction="">
+			<parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="login" type="tns:string"></parameter>
+			<parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="firstName" type="tns:string"></parameter>
+			<parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="lastName" type="tns:string"></parameter>
+			<parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="email" type="tns:string"></parameter>
+		</operation>
+		<operation xmlns:operNS="urn:http.service.lms.liferay.com" xmlns:rtns="http://model.lms.liferay.com" name="createCourse" qname="operNS:createCourse" returnQName="createCourseReturn" returnType="rtns:CourseSoap" soapAction="">
+			<parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="title" type="tns:string"></parameter>
+			<parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="description" type="tns:string"></parameter>
+			<parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="published" type="tns:boolean"></parameter>
+			<parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="summary" type="tns:string"></parameter>
+			<parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="evaluationmethod" type="tns:int"></parameter>
+			<parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="calificationType" type="tns:int"></parameter>
+			<parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="template" type="tns:int"></parameter>
+			<parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="registermethod" type="tns:int"></parameter>
+			<parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="maxusers" type="tns:int"></parameter>
+			<parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="startregistrationdate" type="tns:dateTime"></parameter>
+			<parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="endregistrationdate" type="tns:dateTime"></parameter>
+		</operation>
+		<operation xmlns:operNS="urn:http.service.lms.liferay.com" xmlns:rtns="http://www.w3.org/2001/XMLSchema" name="existsCourseName" qname="operNS:existsCourseName" returnQName="existsCourseNameReturn" returnType="rtns:boolean" soapAction="">
+			<parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="companyId" type="tns:long"></parameter>
+			<parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="groupId" type="tns:long"></parameter>
+			<parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="groupName" type="tns:string"></parameter>
+		</operation>
+		<operation xmlns:operNS="urn:http.service.lms.liferay.com" xmlns:rtns="urn:http.service.lms.liferay.com" xmlns:tns2="http://www.w3.org/2001/XMLSchema" name="getCourseEditors" qname="operNS:getCourseEditors" returnQName="getCourseEditorsReturn" returnType="rtns:ArrayOf_xsd_string" returnItemType="tns2:string" soapAction="">
+			<parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="courseId" type="tns:long"></parameter>
+		</operation>
+		<operation xmlns:operNS="urn:http.service.lms.liferay.com" xmlns:rtns="urn:http.service.lms.liferay.com" xmlns:tns2="http://www.w3.org/2001/XMLSchema" name="getCourseStudents" qname="operNS:getCourseStudents" returnQName="getCourseStudentsReturn" returnType="rtns:ArrayOf_xsd_string" returnItemType="tns2:string" soapAction="">
+			<parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="courseId" type="tns:long"></parameter>
+		</operation>
+		<operation xmlns:operNS="urn:http.service.lms.liferay.com" xmlns:rtns="urn:http.service.lms.liferay.com" xmlns:tns2="http://www.w3.org/2001/XMLSchema" name="getCourseTeachers" qname="operNS:getCourseTeachers" returnQName="getCourseTeachersReturn" returnType="rtns:ArrayOf_xsd_string" returnItemType="tns2:string" soapAction="">
+			<parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="courseId" type="tns:long"></parameter>
+		</operation>
+		<operation xmlns:operNS="urn:http.service.lms.liferay.com" xmlns:rtns="urn:http.service.lms.liferay.com" xmlns:tns2="http://model.lms.liferay.com" name="getCoursesOfGroup" qname="operNS:getCoursesOfGroup" returnQName="getCoursesOfGroupReturn" returnType="rtns:ArrayOf_tns2_CourseSoap" returnItemType="tns2:CourseSoap" soapAction="">
+			<parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="groupId" type="tns:long"></parameter>
+		</operation>
+		<operation xmlns:operNS="urn:http.service.lms.liferay.com" xmlns:rtns="urn:http.service.lms.liferay.com" xmlns:tns2="http://model.lms.liferay.com" name="getCourses" qname="operNS:getCourses" returnQName="getCoursesReturn" returnType="rtns:ArrayOf_tns2_CourseSoap" returnItemType="tns2:CourseSoap" soapAction=""> </operation>
+		<operation xmlns:operNS="urn:http.service.lms.liferay.com" xmlns:rtns="http://www.w3.org/2001/XMLSchema" name="getLogoUrl" qname="operNS:getLogoUrl" returnQName="getLogoUrlReturn" returnType="rtns:string" soapAction="">
+			<parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="courseId" type="tns:long"></parameter>
+		</operation>
+		<operation xmlns:operNS="urn:http.service.lms.liferay.com" xmlns:rtns="http://www.w3.org/2001/XMLSchema" name="getUserResult" qname="operNS:getUserResult" returnQName="getUserResultReturn" returnType="rtns:long" soapAction="">
+			<parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="courseId" type="tns:long"></parameter>
+			<parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="login" type="tns:string"></parameter>
+		</operation>
+		<operation xmlns:operNS="urn:http.service.lms.liferay.com" xmlns:rtns="urn:http.service.lms.liferay.com" xmlns:tns2="http://model.lms.liferay.com" name="myCourses" qname="operNS:myCourses" returnQName="myCoursesReturn" returnType="rtns:ArrayOf_tns2_CourseSoap" returnItemType="tns2:CourseSoap" soapAction=""> </operation>
+		<operation xmlns:operNS="urn:http.service.lms.liferay.com" name="removeEditorFromCourse" qname="operNS:removeEditorFromCourse" soapAction="">
+			<parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="courseId" type="tns:long"></parameter>
+			<parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="login" type="tns:string"></parameter>
+		</operation>
+		<operation xmlns:operNS="urn:http.service.lms.liferay.com" name="removeStudentFromCourse" qname="operNS:removeStudentFromCourse" soapAction="">
+			<parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="courseId" type="tns:long"></parameter>
+			<parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="login" type="tns:string"></parameter>
+		</operation>
+		<operation xmlns:operNS="urn:http.service.lms.liferay.com" name="removeTeacherFromCourse" qname="operNS:removeTeacherFromCourse" soapAction="">
+			<parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="courseId" type="tns:long"></parameter>
+			<parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="login" type="tns:string"></parameter>
+		</operation>
+		<operation xmlns:operNS="urn:http.service.lms.liferay.com" name="updateUser" qname="operNS:updateUser" soapAction="">
+			<parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="login" type="tns:string"></parameter>
+			<parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="firstName" type="tns:string"></parameter>
+			<parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="lastName" type="tns:string"></parameter>
+			<parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="email" type="tns:string"></parameter>
+		</operation>
+		<parameter name="allowedMethods" value="addEditorToCourse addStudentToCourse addTeacherToCourse addUser createCourse existsCourseName getCourseEditors getCourseStudents getCourseTeachers getCourses getCoursesOfGroup getLogoUrl getUserResult myCourses removeEditorFromCourse removeStudentFromCourse removeTeacherFromCourse updateUser" />
+		<parameter name="className" value="com.liferay.lms.service.http.CourseServiceSoap" />
+		<parameter name="schemaUnqualified" value="http://model.lms.liferay.com,urn:http.service.lms.liferay.com" />
+		<parameter name="typeMappingVersion" value="1.2" />
+		<parameter name="wsdlPortType" value="CourseServiceSoap" />
+		<parameter name="wsdlServiceElement" value="CourseServiceSoapService" />
+		<parameter name="wsdlServicePort" value="Plugin_Lms_CourseService" />
+		<parameter name="wsdlTargetNamespace" value="urn:http.service.lms.liferay.com" />
+	</service>
+</deployment>

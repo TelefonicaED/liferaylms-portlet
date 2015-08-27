@@ -1,0 +1,71 @@
+<?xml version="1.0"?>
+
+<deployment xmlns="http://xml.apache.org/axis/wsdd/" xmlns:java="http://xml.apache.org/axis/wsdd/providers/java">
+	<service name="Plugin_Lms_LearningActivityService" provider="java:RPC" style="rpc" use="encoded">
+		<arrayMapping xmlns:ns="urn:http.service.lms.liferay.com" xmlns:cmp-ns="http://model.lms.liferay.com" qname="ns:ArrayOf_tns2_LearningActivitySoap" type="java:com.liferay.lms.model.LearningActivitySoap[]" innerType="cmp-ns:LearningActivitySoap" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"></arrayMapping>
+		<arrayMapping xmlns:ns="urn:http.service.lms.liferay.com" xmlns:cmp-ns="http://www.w3.org/2001/XMLSchema" qname="ns:ArrayOf_xsd_long" type="java:long[]" innerType="cmp-ns:long" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"></arrayMapping>
+		<arrayMapping xmlns:ns="urn:http.service.lms.liferay.com" xmlns:cmp-ns="http://www.w3.org/2001/XMLSchema" qname="ns:ArrayOf_xsd_string" type="java:java.lang.String[]" innerType="cmp-ns:string" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"></arrayMapping>
+		<typeMapping xmlns:ns="http://model.lms.liferay.com" qname="ns:LearningActivitySoap" type="java:com.liferay.lms.model.LearningActivitySoap" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"></typeMapping>
+		<typeMapping xmlns:ns="http://model.portal.liferay.com" qname="ns:PortletPreferencesIds" type="java:com.liferay.portal.model.PortletPreferencesIds" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"></typeMapping>
+		<typeMapping xmlns:ns="http://service.portal.liferay.com" qname="ns:ServiceContext" type="java:com.liferay.portal.service.ServiceContext" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"></typeMapping>
+		<typeMapping xmlns:ns="http://xml.apache.org/xml-soap" qname="ns:mapItem" type="java:org.apache.xml.xml_soap.MapItem" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"></typeMapping>
+		<operation xmlns:operNS="urn:http.service.lms.liferay.com" xmlns:rtns="http://model.lms.liferay.com" name="addLearningActivity" qname="operNS:addLearningActivity" returnQName="addLearningActivityReturn" returnType="rtns:LearningActivitySoap" soapAction="">
+			<parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="title" type="tns:string"></parameter>
+			<parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="description" type="tns:string"></parameter>
+			<parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="createDate" type="tns:dateTime"></parameter>
+			<parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="startDate" type="tns:dateTime"></parameter>
+			<parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="endDate" type="tns:dateTime"></parameter>
+			<parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="typeId" type="tns:int"></parameter>
+			<parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="tries" type="tns:long"></parameter>
+			<parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="passpuntuation" type="tns:int"></parameter>
+			<parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="moduleId" type="tns:long"></parameter>
+			<parameter xmlns:tns="http://service.portal.liferay.com" qname="serviceContext" type="tns:ServiceContext"></parameter>
+		</operation>
+		<operation xmlns:operNS="urn:http.service.lms.liferay.com" name="deleteLearningactivity" qname="operNS:deleteLearningactivity" soapAction="">
+			<parameter xmlns:tns="http://model.lms.liferay.com" qname="lernact" type="tns:LearningActivitySoap"></parameter>
+		</operation>
+		<operation xmlns:operNS="urn:http.service.lms.liferay.com" name="deleteLearningactivity" qname="operNS:deleteLearningactivity" soapAction="">
+			<parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="actId" type="tns:long"></parameter>
+		</operation>
+		<operation xmlns:operNS="urn:http.service.lms.liferay.com" xmlns:rtns="urn:http.service.lms.liferay.com" xmlns:tns2="http://model.lms.liferay.com" name="getLearningActivitiesOfGroup" qname="operNS:getLearningActivitiesOfGroup" returnQName="getLearningActivitiesOfGroupReturn" returnType="rtns:ArrayOf_tns2_LearningActivitySoap" returnItemType="tns2:LearningActivitySoap" soapAction="">
+			<parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="groupId" type="tns:long"></parameter>
+		</operation>
+		<operation xmlns:operNS="urn:http.service.lms.liferay.com" xmlns:rtns="urn:http.service.lms.liferay.com" xmlns:tns2="http://model.lms.liferay.com" name="getLearningActivitiesOfModule" qname="operNS:getLearningActivitiesOfModule" returnQName="getLearningActivitiesOfModuleReturn" returnType="rtns:ArrayOf_tns2_LearningActivitySoap" returnItemType="tns2:LearningActivitySoap" soapAction="">
+			<parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="moduleId" type="tns:long"></parameter>
+		</operation>
+		<operation xmlns:operNS="urn:http.service.lms.liferay.com" xmlns:rtns="http://model.lms.liferay.com" name="getLearningActivity" qname="operNS:getLearningActivity" returnQName="getLearningActivityReturn" returnType="rtns:LearningActivitySoap" soapAction="">
+			<parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="actId" type="tns:long"></parameter>
+		</operation>
+		<operation xmlns:operNS="urn:http.service.lms.liferay.com" xmlns:rtns="http://www.w3.org/2001/XMLSchema" name="isLocked" qname="operNS:isLocked" returnQName="isLockedReturn" returnType="rtns:boolean" soapAction="">
+			<parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="actId" type="tns:long"></parameter>
+		</operation>
+		<operation xmlns:operNS="urn:http.service.lms.liferay.com" xmlns:rtns="http://model.lms.liferay.com" name="modLearningActivity" qname="operNS:modLearningActivity" returnQName="modLearningActivityReturn" returnType="rtns:LearningActivitySoap" soapAction="">
+			<parameter xmlns:tns="http://model.lms.liferay.com" qname="lernact" type="tns:LearningActivitySoap"></parameter>
+		</operation>
+		<operation xmlns:operNS="urn:http.service.lms.liferay.com" xmlns:rtns="http://model.lms.liferay.com" name="modLearningActivity" qname="operNS:modLearningActivity" returnQName="modLearningActivityReturn" returnType="rtns:LearningActivitySoap" soapAction="">
+			<parameter xmlns:tns="http://model.lms.liferay.com" qname="lernact" type="tns:LearningActivitySoap"></parameter>
+			<parameter xmlns:tns="http://service.portal.liferay.com" qname="serviceContext" type="tns:ServiceContext"></parameter>
+		</operation>
+		<operation xmlns:operNS="urn:http.service.lms.liferay.com" xmlns:rtns="http://model.lms.liferay.com" name="modLearningActivity" qname="operNS:modLearningActivity" returnQName="modLearningActivityReturn" returnType="rtns:LearningActivitySoap" soapAction="">
+			<parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="actId" type="tns:long"></parameter>
+			<parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="title" type="tns:string"></parameter>
+			<parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="description" type="tns:string"></parameter>
+			<parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="createDate" type="tns:dateTime"></parameter>
+			<parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="startDate" type="tns:dateTime"></parameter>
+			<parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="endDate" type="tns:dateTime"></parameter>
+			<parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="typeId" type="tns:int"></parameter>
+			<parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="tries" type="tns:long"></parameter>
+			<parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="passpuntuation" type="tns:int"></parameter>
+			<parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="moduleId" type="tns:long"></parameter>
+			<parameter xmlns:tns="http://service.portal.liferay.com" qname="serviceContext" type="tns:ServiceContext"></parameter>
+		</operation>
+		<parameter name="allowedMethods" value="addLearningActivity deleteLearningactivity getLearningActivitiesOfGroup getLearningActivitiesOfModule getLearningActivity isLocked modLearningActivity" />
+		<parameter name="className" value="com.liferay.lms.service.http.LearningActivityServiceSoap" />
+		<parameter name="schemaUnqualified" value="http://model.lms.liferay.com,http://model.portal.liferay.com,http://service.portal.liferay.com,http://xml.apache.org/xml-soap,urn:http.service.lms.liferay.com" />
+		<parameter name="typeMappingVersion" value="1.2" />
+		<parameter name="wsdlPortType" value="LearningActivityServiceSoap" />
+		<parameter name="wsdlServiceElement" value="LearningActivityServiceSoapService" />
+		<parameter name="wsdlServicePort" value="Plugin_Lms_LearningActivityService" />
+		<parameter name="wsdlTargetNamespace" value="urn:http.service.lms.liferay.com" />
+	</service>
+</deployment>

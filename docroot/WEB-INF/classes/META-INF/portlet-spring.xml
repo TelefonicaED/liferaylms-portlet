@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" default-destroy-method="destroy" default-init-method="afterPropertiesSet" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+	<bean id="com.liferay.lms.service.AuditEntryLocalService" class="com.liferay.lms.service.impl.AuditEntryLocalServiceImpl" />
+	<bean id="com.liferay.lms.service.persistence.AuditEntryPersistence" class="com.liferay.lms.service.persistence.AuditEntryPersistenceImpl" parent="basePersistence" />
+	<bean id="com.liferay.lms.service.CheckP2pMailingLocalService" class="com.liferay.lms.service.impl.CheckP2pMailingLocalServiceImpl" />
+	<bean id="com.liferay.lms.service.persistence.CheckP2pMailingPersistence" class="com.liferay.lms.service.persistence.CheckP2pMailingPersistenceImpl" parent="basePersistence" />
+	<bean id="com.liferay.lms.service.CompetenceLocalService" class="com.liferay.lms.service.impl.CompetenceLocalServiceImpl" />
+	<bean id="com.liferay.lms.service.CompetenceService" class="com.liferay.lms.service.impl.CompetenceServiceImpl" />
+	<bean id="com.liferay.lms.service.persistence.CompetencePersistence" class="com.liferay.lms.service.persistence.CompetencePersistenceImpl" parent="basePersistence" />
+	<bean id="com.liferay.lms.service.CourseLocalService" class="com.liferay.lms.service.impl.CourseLocalServiceImpl" />
+	<bean id="com.liferay.lms.service.CourseService" class="com.liferay.lms.service.impl.CourseServiceImpl" />
+	<bean id="com.liferay.lms.service.persistence.CoursePersistence" class="com.liferay.lms.service.persistence.CoursePersistenceImpl" parent="basePersistence" />
+	<bean id="com.liferay.lms.service.CourseCompetenceLocalService" class="com.liferay.lms.service.impl.CourseCompetenceLocalServiceImpl" />
+	<bean id="com.liferay.lms.service.CourseCompetenceService" class="com.liferay.lms.service.impl.CourseCompetenceServiceImpl" />
+	<bean id="com.liferay.lms.service.persistence.CourseCompetencePersistence" class="com.liferay.lms.service.persistence.CourseCompetencePersistenceImpl" parent="basePersistence" />
+	<bean id="com.liferay.lms.service.CourseResultLocalService" class="com.liferay.lms.service.impl.CourseResultLocalServiceImpl" />
+	<bean id="com.liferay.lms.service.CourseResultService" class="com.liferay.lms.service.impl.CourseResultServiceImpl" />
+	<bean id="com.liferay.lms.service.persistence.CourseResultPersistence" class="com.liferay.lms.service.persistence.CourseResultPersistenceImpl" parent="basePersistence" />
+	<bean id="com.liferay.lms.service.LearningActivityLocalService" class="com.liferay.lms.service.impl.LearningActivityLocalServiceImpl" />
+	<bean id="com.liferay.lms.service.LearningActivityService" class="com.liferay.lms.service.impl.LearningActivityServiceImpl" />
+	<bean id="com.liferay.lms.service.persistence.LearningActivityPersistence" class="com.liferay.lms.service.persistence.LearningActivityCustomPersistenceImpl" parent="basePersistence" />
+	<bean id="com.liferay.lms.service.LearningActivityResultLocalService" class="com.liferay.lms.service.impl.LearningActivityResultLocalServiceImpl" />
+	<bean id="com.liferay.lms.service.LearningActivityResultService" class="com.liferay.lms.service.impl.LearningActivityResultServiceImpl" />
+	<bean id="com.liferay.lms.service.persistence.LearningActivityResultPersistence" class="com.liferay.lms.service.persistence.LearningActivityResultPersistenceImpl" parent="basePersistence" />
+	<bean id="com.liferay.lms.service.LearningActivityTryLocalService" class="com.liferay.lms.service.impl.LearningActivityTryLocalServiceImpl" />
+	<bean id="com.liferay.lms.service.LearningActivityTryService" class="com.liferay.lms.service.impl.LearningActivityTryServiceImpl" />
+	<bean id="com.liferay.lms.service.persistence.LearningActivityTryPersistence" class="com.liferay.lms.service.persistence.LearningActivityTryPersistenceImpl" parent="basePersistence" />
+	<bean id="com.liferay.lms.service.LmsPrefsLocalService" class="com.liferay.lms.service.impl.LmsPrefsLocalServiceImpl" />
+	<bean id="com.liferay.lms.service.persistence.LmsPrefsPersistence" class="com.liferay.lms.service.persistence.LmsPrefsPersistenceImpl" parent="basePersistence" />
+	<bean id="com.liferay.lms.service.ModuleLocalService" class="com.liferay.lms.service.impl.ModuleLocalServiceImpl" />
+	<bean id="com.liferay.lms.service.ModuleService" class="com.liferay.lms.service.impl.ModuleServiceImpl" />
+	<bean id="com.liferay.lms.service.persistence.ModulePersistence" class="com.liferay.lms.service.persistence.ModulePersistenceImpl" parent="basePersistence" />
+	<bean id="com.liferay.lms.service.ModuleResultLocalService" class="com.liferay.lms.service.impl.ModuleResultLocalServiceImpl" />
+	<bean id="com.liferay.lms.service.ModuleResultService" class="com.liferay.lms.service.impl.ModuleResultServiceImpl" />
+	<bean id="com.liferay.lms.service.persistence.ModuleResultPersistence" class="com.liferay.lms.service.persistence.ModuleResultPersistenceImpl" parent="basePersistence" />
+	<bean id="com.liferay.lms.service.P2pActivityLocalService" class="com.liferay.lms.service.impl.P2pActivityLocalServiceImpl" />
+	<bean id="com.liferay.lms.service.persistence.P2pActivityPersistence" class="com.liferay.lms.service.persistence.P2pActivityPersistenceImpl" parent="basePersistence" />
+	<bean id="com.liferay.lms.service.P2pActivityCorrectionsLocalService" class="com.liferay.lms.service.impl.P2pActivityCorrectionsLocalServiceImpl" />
+	<bean id="com.liferay.lms.service.persistence.P2pActivityCorrectionsPersistence" class="com.liferay.lms.service.persistence.P2pActivityCorrectionsPersistenceImpl" parent="basePersistence" />
+	<bean id="com.liferay.lms.service.SCORMContentLocalService" class="com.liferay.lms.service.impl.SCORMContentLocalServiceImpl" />
+	<bean id="com.liferay.lms.service.SCORMContentService" class="com.liferay.lms.service.impl.SCORMContentServiceImpl" />
+	<bean id="com.liferay.lms.service.persistence.SCORMContentPersistence" class="com.liferay.lms.service.persistence.SCORMContentPersistenceImpl" parent="basePersistence" />
+	<bean id="com.liferay.lms.service.SurveyResultLocalService" class="com.liferay.lms.service.impl.SurveyResultLocalServiceImpl" />
+	<bean id="com.liferay.lms.service.persistence.SurveyResultPersistence" class="com.liferay.lms.service.persistence.SurveyResultPersistenceImpl" parent="basePersistence" />
+	<bean id="com.liferay.lms.service.TestAnswerLocalService" class="com.liferay.lms.service.impl.TestAnswerLocalServiceImpl" />
+	<bean id="com.liferay.lms.service.TestAnswerService" class="com.liferay.lms.service.impl.TestAnswerServiceImpl" />
+	<bean id="com.liferay.lms.service.persistence.TestAnswerPersistence" class="com.liferay.lms.service.persistence.TestAnswerPersistenceImpl" parent="basePersistence" />
+	<bean id="com.liferay.lms.service.TestQuestionLocalService" class="com.liferay.lms.service.impl.TestQuestionLocalServiceImpl" />
+	<bean id="com.liferay.lms.service.TestQuestionService" class="com.liferay.lms.service.impl.TestQuestionServiceImpl" />
+	<bean id="com.liferay.lms.service.persistence.TestQuestionPersistence" class="com.liferay.lms.service.persistence.TestQuestionPersistenceImpl" parent="basePersistence" />
+	<bean id="com.liferay.lms.service.UserCompetenceLocalService" class="com.liferay.lms.service.impl.UserCompetenceLocalServiceImpl" />
+	<bean id="com.liferay.lms.service.UserCompetenceService" class="com.liferay.lms.service.impl.UserCompetenceServiceImpl" />
+	<bean id="com.liferay.lms.service.persistence.UserCompetencePersistence" class="com.liferay.lms.service.persistence.UserCompetencePersistenceImpl" parent="basePersistence" />
+</beans>

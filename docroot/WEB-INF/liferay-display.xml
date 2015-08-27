@@ -1,0 +1,67 @@
+<?xml version="1.0"?>
+<!DOCTYPE display PUBLIC "-//Liferay//DTD Display 6.1.0//EN" "http://www.liferay.com/dtd/liferay-display_6_1_0.dtd">
+
+<display>
+	<category name="LMS">
+		<portlet id="lmsactivitieslist"></portlet>
+		<portlet id="execactivity"></portlet>
+		<portlet id="gradebook"></portlet>
+		<portlet id="module-portlet"></portlet>
+		<portlet id="p2ptaskactivity"></portlet>
+		<portlet id="resourceExternalActivity"></portlet>
+		<portlet id="resourceInternalActivity"></portlet>
+		<portlet id="changeEditingMode"></portlet>
+		<portlet id="activityNavigator"></portlet>
+		<portlet id="activityDates"></portlet>
+		<portlet id="moduleDescription"></portlet>
+		<portlet id="moduleEditing"></portlet>
+		<portlet id="ModuleTitle"></portlet>
+		<portlet id="modulelist"></portlet>
+		<portlet id="inscriptioncommunity"></portlet>
+		<portlet id="mycourses"></portlet>
+		<portlet id="coursetoolsmanage"></portlet>
+		<portlet id="courseadmin"></portlet>
+		<portlet id="editactivity"></portlet>
+		<portlet id="coursestats"></portlet>
+		<portlet id="myuniversity"></portlet>
+		<portlet id="coursedescription"></portlet>
+		<portlet id="lmsconfig"></portlet>
+		<portlet id="courseextradata"></portlet>
+		<portlet id="courseteachers"></portlet>
+		<portlet id="courseexpandovalue"></portlet>
+		<portlet id="orgofcourse"></portlet>
+		<portlet id="coursesummary"></portlet>
+		<portlet id="coursecategories"></portlet>
+		<portlet id="coursesearch"></portlet>
+		<portlet id="studentsearch"></portlet>
+		<portlet id="CourseRatings"></portlet>
+		<portlet id="CourseComments"></portlet>
+		<portlet id="taskactivity"></portlet>
+		<portlet id="surveyactivity"></portlet>
+		<portlet id="onlinetaskactivity"></portlet>
+		<portlet id="offlinetaskactivity"></portlet>
+		<portlet id="evaluationtaskactivity"></portlet>
+		<portlet id="studentmanage"></portlet>
+		<portlet id="portaladmin"></portlet>
+		<portlet id="tutoring"></portlet>
+		<portlet id="userprogress"></portlet>
+		<portlet id="scormadmin"></portlet>
+		<portlet id="scormactivity"></portlet>
+		<portlet id="evaluation"></portlet>
+		<portlet id="evaluationAvg"></portlet>
+		<portlet id="announcementsdelivery"></portlet>
+		<portlet id="coursehistory"></portlet>
+		<portlet id="inscriptionadmin"></portlet>
+		<portlet id="generalstats"></portlet>
+		<portlet id="competencesadmin"></portlet>
+		<portlet id="usercompetence"></portlet>
+		<portlet id="about"></portlet>
+		<portlet id="courseinscriptiondates"></portlet>
+		<portlet id="modulenavigation"></portlet>
+		<portlet id="activityViewer"></portlet>
+		<portlet id="moduleselector"></portlet>
+		<portlet id="ponderatedevalconf"></portlet>
+		<portlet id="finalcourseresult"></portlet>
+		
+	</category>
+</display>

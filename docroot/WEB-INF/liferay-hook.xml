@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hook PUBLIC "-//Liferay//DTD Hook 6.1.0//EN" "http://www.liferay.com/dtd/liferay-hook_6_1_0.dtd">
+
+<hook>
+	<portal-properties>portal.properties</portal-properties>
+	<language-properties>
+		content/language-hook.properties
+	</language-properties>
+	<language-properties>
+		content/Language.properties
+	</language-properties>
+	<language-properties>
+		content/Language_es.properties
+	</language-properties>
+	<language-properties>
+		content/Language_en.properties
+	</language-properties>
+	<language-properties>
+		content/Language_pt.properties
+	</language-properties>
+	<language-properties>content/Language_eu.properties</language-properties>
+	<language-properties>content/Language_gl.properties</language-properties>
+	<language-properties>content/Language_ca.properties</language-properties>
+	<language-properties>content/Language_de.properties</language-properties>
+	<custom-jsp-dir>/custom_jsps</custom-jsp-dir>
+</hook>

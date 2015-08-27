@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<fontFamilies>
+
+	<fontFamily name="Nunito">
+		<normal>nunito/ttf/Nunito-Regular.ttf</normal>
+		<bold>nunito/ttf/Nunito-Bold.ttf</bold>
+		<italic>nunito/ttf/Nunito-Light.ttf</italic>
+		<pdfEncoding>Identity-H</pdfEncoding>
+		<pdfEmbedded>true</pdfEmbedded>
+		<exportFonts>
+			<export key="net.sf.jasperreports.html">Nunito, Arial, Helvetica, sans-serif</export>
+			<export key="net.sf.jasperreports.xhtml">Nunito, Arial, Helvetica, sans-serif</export>
+		</exportFonts>
+	</fontFamily>
+
+</fontFamilies>

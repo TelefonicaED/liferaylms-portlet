@@ -1,0 +1,560 @@
+<?xml version="1.0"?>
+
+<entity-mappings xmlns="http://java.sun.com/xml/ns/persistence/orm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.0" xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm http://java.sun.com/xml/ns/persistence/orm_1_0.xsd">
+	<persistence-unit-metadata>
+		<xml-mapping-metadata-complete/>
+		<persistence-unit-defaults>
+			<access>PROPERTY</access>
+		</persistence-unit-defaults>
+	</persistence-unit-metadata>
+	<mapped-superclass class="com.liferay.lms.model.impl.AuditEntryModelImpl">
+		<attributes>
+			<id name="auditId" />
+			<basic name="auditDate">
+				<temporal>TIMESTAMP</temporal>
+			</basic>
+			<basic name="companyId" />
+			<basic name="groupId" />
+			<basic name="userId" />
+			<basic name="classname" />
+			<basic name="action" />
+			<basic name="extradata" />
+			<basic name="classPK" />
+			<basic name="associationClassPK" />
+			<transient name="modelAttributes" />
+			<transient name="primaryKey" />
+			<transient name="primaryKeyObj" />
+			<transient name="userUuid" />
+		</attributes>
+	</mapped-superclass>
+	<mapped-superclass class="com.liferay.lms.model.impl.CheckP2pMailingModelImpl">
+		<attributes>
+			<id name="checkP2pId" />
+			<basic name="actId" />
+			<basic name="date">
+				<column name="DATE_" />
+				<temporal>TIMESTAMP</temporal>
+			</basic>
+			<transient name="modelAttributes" />
+			<transient name="primaryKey" />
+			<transient name="primaryKeyObj" />
+		</attributes>
+	</mapped-superclass>
+	<mapped-superclass class="com.liferay.lms.model.impl.CompetenceModelImpl">
+		<attributes>
+			<id name="competenceId" />
+			<basic name="uuid">
+				<column name="UUID_" />
+			</basic>
+			<basic name="companyId" />
+			<basic name="groupId" />
+			<basic name="userId" />
+			<basic name="status" />
+			<basic name="statusByUserId" />
+			<basic name="statusByUserName" />
+			<basic name="statusDate">
+				<temporal>TIMESTAMP</temporal>
+			</basic>
+			<basic name="title" />
+			<basic name="description" />
+			<basic name="page" />
+			<basic name="generateCertificate" />
+			<basic name="diplomaTemplate" />
+			<transient name="descriptionCurrentLanguageId" />
+			<transient name="descriptionMap" />
+			<transient name="diplomaTemplateCurrentLanguageId" />
+			<transient name="diplomaTemplateMap" />
+			<transient name="modelAttributes" />
+			<transient name="primaryKey" />
+			<transient name="primaryKeyObj" />
+			<transient name="statusByUserUuid" />
+			<transient name="titleCurrentLanguageId" />
+			<transient name="titleMap" />
+			<transient name="userUuid" />
+		</attributes>
+	</mapped-superclass>
+	<mapped-superclass class="com.liferay.lms.model.impl.CourseModelImpl">
+		<attributes>
+			<id name="courseId" />
+			<basic name="uuid">
+				<column name="UUID_" />
+			</basic>
+			<basic name="companyId" />
+			<basic name="groupId" />
+			<basic name="userId" />
+			<basic name="userName" />
+			<basic name="groupCreatedId" />
+			<basic name="createDate">
+				<temporal>TIMESTAMP</temporal>
+			</basic>
+			<basic name="modifiedDate">
+				<temporal>TIMESTAMP</temporal>
+			</basic>
+			<basic name="status" />
+			<basic name="statusByUserId" />
+			<basic name="statusByUserName" />
+			<basic name="statusDate">
+				<temporal>TIMESTAMP</temporal>
+			</basic>
+			<basic name="title" />
+			<basic name="description" />
+			<basic name="friendlyURL" />
+			<basic name="startDate">
+				<temporal>TIMESTAMP</temporal>
+			</basic>
+			<basic name="endDate">
+				<temporal>TIMESTAMP</temporal>
+			</basic>
+			<basic name="icon" />
+			<basic name="CourseEvalId" />
+			<basic name="CourseExtraData" />
+			<basic name="closed" />
+			<basic name="maxusers" />
+			<basic name="calificationType" />
+			<basic name="welcome" />
+			<basic name="welcomeMsg" />
+			<basic name="welcomeSubject" />
+			<transient name="descriptionCurrentLanguageId" />
+			<transient name="descriptionMap" />
+			<transient name="modelAttributes" />
+			<transient name="primaryKey" />
+			<transient name="primaryKeyObj" />
+			<transient name="statusByUserUuid" />
+			<transient name="titleCurrentLanguageId" />
+			<transient name="titleMap" />
+			<transient name="userUuid" />
+		</attributes>
+	</mapped-superclass>
+	<mapped-superclass class="com.liferay.lms.model.impl.CourseCompetenceModelImpl">
+		<attributes>
+			<id name="CourcompetenceId" />
+			<basic name="uuid">
+				<column name="UUID_" />
+			</basic>
+			<basic name="courseId" />
+			<basic name="competenceId" />
+			<basic name="condition">
+				<column name="CONDITION_" />
+			</basic>
+			<transient name="modelAttributes" />
+			<transient name="primaryKey" />
+			<transient name="primaryKeyObj" />
+		</attributes>
+	</mapped-superclass>
+	<mapped-superclass class="com.liferay.lms.model.impl.CourseResultModelImpl">
+		<attributes>
+			<id name="crId" />
+			<basic name="courseId" />
+			<basic name="result" />
+			<basic name="comments" />
+			<basic name="userId" />
+			<basic name="passed" />
+			<basic name="startDate">
+				<temporal>TIMESTAMP</temporal>
+			</basic>
+			<basic name="passedDate">
+				<temporal>TIMESTAMP</temporal>
+			</basic>
+			<basic name="allowStartDate">
+				<temporal>TIMESTAMP</temporal>
+			</basic>
+			<basic name="allowFinishDate">
+				<temporal>TIMESTAMP</temporal>
+			</basic>
+			<transient name="modelAttributes" />
+			<transient name="primaryKey" />
+			<transient name="primaryKeyObj" />
+			<transient name="userUuid" />
+		</attributes>
+	</mapped-superclass>
+	<mapped-superclass class="com.liferay.lms.model.impl.LearningActivityModelImpl">
+		<attributes>
+			<id name="actId" />
+			<basic name="uuid">
+				<column name="UUID_" />
+			</basic>
+			<basic name="companyId" />
+			<basic name="userId" />
+			<basic name="groupId" />
+			<basic name="userName" />
+			<basic name="createDate">
+				<temporal>TIMESTAMP</temporal>
+			</basic>
+			<basic name="modifiedDate">
+				<temporal>TIMESTAMP</temporal>
+			</basic>
+			<basic name="status" />
+			<basic name="statusByUserId" />
+			<basic name="statusByUserName" />
+			<basic name="statusDate">
+				<temporal>TIMESTAMP</temporal>
+			</basic>
+			<basic name="title" />
+			<basic name="description" />
+			<basic name="typeId" />
+			<basic name="startdate">
+				<temporal>TIMESTAMP</temporal>
+			</basic>
+			<basic name="enddate">
+				<temporal>TIMESTAMP</temporal>
+			</basic>
+			<basic name="precedence" />
+			<basic name="tries" />
+			<basic name="passpuntuation" />
+			<basic name="priority" />
+			<basic name="moduleId" />
+			<basic name="extracontent" />
+			<basic name="feedbackCorrect" />
+			<basic name="feedbackNoCorrect" />
+			<basic name="weightinmodule" />
+			<transient name="descriptionCurrentLanguageId" />
+			<transient name="descriptionMap" />
+			<transient name="modelAttributes" />
+			<transient name="primaryKey" />
+			<transient name="primaryKeyObj" />
+			<transient name="statusByUserUuid" />
+			<transient name="titleCurrentLanguageId" />
+			<transient name="titleMap" />
+			<transient name="userUuid" />
+		</attributes>
+	</mapped-superclass>
+	<mapped-superclass class="com.liferay.lms.model.impl.LearningActivityResultModelImpl">
+		<attributes>
+			<id name="larId" />
+			<basic name="uuid">
+				<column name="UUID_" />
+			</basic>
+			<basic name="actId" />
+			<basic name="userId" />
+			<basic name="result" />
+			<basic name="startDate">
+				<temporal>TIMESTAMP</temporal>
+			</basic>
+			<basic name="endDate">
+				<temporal>TIMESTAMP</temporal>
+			</basic>
+			<basic name="latId" />
+			<basic name="comments" />
+			<basic name="passed" />
+			<transient name="modelAttributes" />
+			<transient name="primaryKey" />
+			<transient name="primaryKeyObj" />
+			<transient name="userUuid" />
+		</attributes>
+	</mapped-superclass>
+	<mapped-superclass class="com.liferay.lms.model.impl.LearningActivityTryModelImpl">
+		<attributes>
+			<id name="latId" />
+			<basic name="uuid">
+				<column name="UUID_" />
+			</basic>
+			<basic name="actId" />
+			<basic name="userId" />
+			<basic name="startDate">
+				<temporal>TIMESTAMP</temporal>
+			</basic>
+			<basic name="result" />
+			<basic name="endDate">
+				<temporal>TIMESTAMP</temporal>
+			</basic>
+			<basic name="tryData" />
+			<basic name="tryResultData" />
+			<basic name="comments" />
+			<transient name="modelAttributes" />
+			<transient name="primaryKey" />
+			<transient name="primaryKeyObj" />
+			<transient name="userUuid" />
+		</attributes>
+	</mapped-superclass>
+	<mapped-superclass class="com.liferay.lms.model.impl.LmsPrefsModelImpl">
+		<attributes>
+			<id name="companyId" />
+			<basic name="teacherRole" />
+			<basic name="editorRole" />
+			<basic name="lmsTemplates" />
+			<basic name="activities" />
+			<basic name="courseevals" />
+			<basic name="scoretranslators" />
+			<basic name="usersResults" />
+			<transient name="modelAttributes" />
+			<transient name="primaryKey" />
+			<transient name="primaryKeyObj" />
+		</attributes>
+	</mapped-superclass>
+	<mapped-superclass class="com.liferay.lms.model.impl.ModuleModelImpl">
+		<attributes>
+			<id name="moduleId" />
+			<basic name="uuid">
+				<column name="UUID_" />
+			</basic>
+			<basic name="companyId" />
+			<basic name="groupId" />
+			<basic name="userId" />
+			<basic name="userName" />
+			<basic name="createDate">
+				<temporal>TIMESTAMP</temporal>
+			</basic>
+			<basic name="modifiedDate">
+				<temporal>TIMESTAMP</temporal>
+			</basic>
+			<basic name="title" />
+			<basic name="description" />
+			<basic name="ordern" />
+			<basic name="startDate">
+				<temporal>TIMESTAMP</temporal>
+			</basic>
+			<basic name="endDate">
+				<temporal>TIMESTAMP</temporal>
+			</basic>
+			<basic name="icon" />
+			<basic name="precedence" />
+			<transient name="descriptionCurrentLanguageId" />
+			<transient name="descriptionMap" />
+			<transient name="modelAttributes" />
+			<transient name="primaryKey" />
+			<transient name="primaryKeyObj" />
+			<transient name="titleCurrentLanguageId" />
+			<transient name="titleMap" />
+			<transient name="userUuid" />
+		</attributes>
+	</mapped-superclass>
+	<mapped-superclass class="com.liferay.lms.model.impl.ModuleResultModelImpl">
+		<attributes>
+			<id name="mrId" />
+			<basic name="moduleId" />
+			<basic name="result" />
+			<basic name="comments" />
+			<basic name="userId" />
+			<basic name="startDate">
+				<temporal>TIMESTAMP</temporal>
+			</basic>
+			<basic name="passed" />
+			<basic name="passedDate">
+				<temporal>TIMESTAMP</temporal>
+			</basic>
+			<transient name="modelAttributes" />
+			<transient name="primaryKey" />
+			<transient name="primaryKeyObj" />
+			<transient name="userUuid" />
+		</attributes>
+	</mapped-superclass>
+	<mapped-superclass class="com.liferay.lms.model.impl.P2pActivityModelImpl">
+		<attributes>
+			<id name="p2pActivityId" />
+			<basic name="uuid">
+				<column name="UUID_" />
+			</basic>
+			<basic name="actId" />
+			<basic name="userId" />
+			<basic name="fileEntryId" />
+			<basic name="countCorrections" />
+			<basic name="description" />
+			<basic name="date">
+				<column name="DATE_" />
+				<temporal>TIMESTAMP</temporal>
+			</basic>
+			<basic name="asignationsCompleted" />
+			<transient name="modelAttributes" />
+			<transient name="primaryKey" />
+			<transient name="primaryKeyObj" />
+			<transient name="userUuid" />
+		</attributes>
+	</mapped-superclass>
+	<mapped-superclass class="com.liferay.lms.model.impl.P2pActivityCorrectionsModelImpl">
+		<attributes>
+			<id name="p2pActivityCorrectionsId" />
+			<basic name="uuid">
+				<column name="UUID_" />
+			</basic>
+			<basic name="p2pActivityId" />
+			<basic name="userId" />
+			<basic name="actId" />
+			<basic name="description" />
+			<basic name="date">
+				<column name="DATE_" />
+				<temporal>TIMESTAMP</temporal>
+			</basic>
+			<basic name="fileEntryId" />
+			<basic name="result" />
+			<transient name="modelAttributes" />
+			<transient name="primaryKey" />
+			<transient name="primaryKeyObj" />
+			<transient name="userUuid" />
+		</attributes>
+	</mapped-superclass>
+	<mapped-superclass class="com.liferay.lms.model.impl.SCORMContentModelImpl">
+		<attributes>
+			<id name="scormId" />
+			<basic name="uuid">
+				<column name="UUID_" />
+			</basic>
+			<basic name="companyId" />
+			<basic name="groupId" />
+			<basic name="userId" />
+			<basic name="status" />
+			<basic name="statusByUserId" />
+			<basic name="statusByUserName" />
+			<basic name="statusDate">
+				<temporal>TIMESTAMP</temporal>
+			</basic>
+			<basic name="title" />
+			<basic name="description" />
+			<basic name="index">
+				<column name="INDEX_" />
+			</basic>
+			<basic name="ciphered" />
+			<transient name="modelAttributes" />
+			<transient name="primaryKey" />
+			<transient name="primaryKeyObj" />
+			<transient name="statusByUserUuid" />
+			<transient name="userUuid" />
+		</attributes>
+	</mapped-superclass>
+	<mapped-superclass class="com.liferay.lms.model.impl.SurveyResultModelImpl">
+		<attributes>
+			<id name="surveyResultId" />
+			<basic name="uuid">
+				<column name="UUID_" />
+			</basic>
+			<basic name="actId" />
+			<basic name="latId" />
+			<basic name="questionId" />
+			<basic name="answerId" />
+			<basic name="userId" />
+			<basic name="freeAnswer" />
+			<transient name="modelAttributes" />
+			<transient name="primaryKey" />
+			<transient name="primaryKeyObj" />
+			<transient name="userUuid" />
+		</attributes>
+	</mapped-superclass>
+	<mapped-superclass class="com.liferay.lms.model.impl.TestAnswerModelImpl">
+		<attributes>
+			<id name="answerId" />
+			<basic name="uuid">
+				<column name="UUID_" />
+			</basic>
+			<basic name="questionId" />
+			<basic name="actId" />
+			<basic name="precedence" />
+			<basic name="answer" />
+			<basic name="isCorrect" />
+			<basic name="feedbackCorrect" />
+			<basic name="feedbacknocorrect" />
+			<transient name="modelAttributes" />
+			<transient name="primaryKey" />
+			<transient name="primaryKeyObj" />
+		</attributes>
+	</mapped-superclass>
+	<mapped-superclass class="com.liferay.lms.model.impl.TestQuestionModelImpl">
+		<attributes>
+			<id name="questionId" />
+			<basic name="uuid">
+				<column name="UUID_" />
+			</basic>
+			<basic name="actId" />
+			<basic name="text">
+				<column name="TEXT_" />
+			</basic>
+			<basic name="questionType" />
+			<basic name="weight" />
+			<transient name="modelAttributes" />
+			<transient name="primaryKey" />
+			<transient name="primaryKeyObj" />
+		</attributes>
+	</mapped-superclass>
+	<mapped-superclass class="com.liferay.lms.model.impl.UserCompetenceModelImpl">
+		<attributes>
+			<id name="usercompId" />
+			<basic name="uuid">
+				<column name="UUID_" />
+			</basic>
+			<basic name="userId" />
+			<basic name="competenceId" />
+			<basic name="compDate">
+				<temporal>TIMESTAMP</temporal>
+			</basic>
+			<basic name="courseId" />
+			<transient name="modelAttributes" />
+			<transient name="primaryKey" />
+			<transient name="primaryKeyObj" />
+			<transient name="userUuid" />
+		</attributes>
+	</mapped-superclass>
+	<entity class="com.liferay.lms.model.impl.AuditEntryImpl" name="AuditEntry">
+		<table name="Lms_AuditEntry" />
+		<attributes />
+	</entity>
+	<entity class="com.liferay.lms.model.impl.CheckP2pMailingImpl" name="CheckP2pMailing">
+		<table name="Lms_CheckP2pMailing" />
+		<attributes />
+	</entity>
+	<entity class="com.liferay.lms.model.impl.CompetenceImpl" name="Competence">
+		<table name="Lms_Competence" />
+		<attributes />
+	</entity>
+	<entity class="com.liferay.lms.model.impl.CourseImpl" name="Course">
+		<table name="Lms_Course" />
+		<attributes />
+	</entity>
+	<entity class="com.liferay.lms.model.impl.CourseCompetenceImpl" name="CourseCompetence">
+		<table name="Lms_CourseCompetence" />
+		<attributes />
+	</entity>
+	<entity class="com.liferay.lms.model.impl.CourseResultImpl" name="CourseResult">
+		<table name="Lms_CourseResult" />
+		<attributes />
+	</entity>
+	<entity class="com.liferay.lms.model.impl.LearningActivityImpl" name="LearningActivity">
+		<table name="Lms_LearningActivity" />
+		<attributes />
+	</entity>
+	<entity class="com.liferay.lms.model.impl.LearningActivityResultImpl" name="LearningActivityResult">
+		<table name="Lms_LearningActivityResult" />
+		<attributes />
+	</entity>
+	<entity class="com.liferay.lms.model.impl.LearningActivityTryImpl" name="LearningActivityTry">
+		<table name="Lms_LearningActivityTry" />
+		<attributes />
+	</entity>
+	<entity class="com.liferay.lms.model.impl.LmsPrefsImpl" name="LmsPrefs">
+		<table name="Lms_LmsPrefs" />
+		<attributes />
+	</entity>
+	<entity class="com.liferay.lms.model.impl.ModuleImpl" name="Module">
+		<table name="Lms_Module" />
+		<attributes />
+	</entity>
+	<entity class="com.liferay.lms.model.impl.ModuleResultImpl" name="ModuleResult">
+		<table name="Lms_ModuleResult" />
+		<attributes />
+	</entity>
+	<entity class="com.liferay.lms.model.impl.P2pActivityImpl" name="P2pActivity">
+		<table name="Lms_P2pActivity" />
+		<attributes />
+	</entity>
+	<entity class="com.liferay.lms.model.impl.P2pActivityCorrectionsImpl" name="P2pActivityCorrections">
+		<table name="Lms_P2pActivityCorrections" />
+		<attributes />
+	</entity>
+	<entity class="com.liferay.lms.model.impl.SCORMContentImpl" name="SCORMContent">
+		<table name="Lms_SCORMContent" />
+		<attributes />
+	</entity>
+	<entity class="com.liferay.lms.model.impl.SurveyResultImpl" name="SurveyResult">
+		<table name="Lms_SurveyResult" />
+		<attributes />
+	</entity>
+	<entity class="com.liferay.lms.model.impl.TestAnswerImpl" name="TestAnswer">
+		<table name="Lms_TestAnswer" />
+		<attributes />
+	</entity>
+	<entity class="com.liferay.lms.model.impl.TestQuestionImpl" name="TestQuestion">
+		<table name="Lms_TestQuestion" />
+		<attributes />
+	</entity>
+	<entity class="com.liferay.lms.model.impl.UserCompetenceImpl" name="UserCompetence">
+		<table name="Lms_UserCompetence" />
+		<attributes />
+	</entity>
+</entity-mappings>

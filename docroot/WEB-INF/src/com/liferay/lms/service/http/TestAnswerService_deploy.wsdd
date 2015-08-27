@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+
+<deployment xmlns="http://xml.apache.org/axis/wsdd/" xmlns:java="http://xml.apache.org/axis/wsdd/providers/java">
+	<service name="Plugin_Lms_TestAnswerService" provider="java:RPC" style="rpc" use="encoded">
+		<arrayMapping xmlns:ns="urn:http.service.lms.liferay.com" xmlns:cmp-ns="http://model.lms.liferay.com" qname="ns:ArrayOf_tns2_TestAnswerSoap" type="java:com.liferay.lms.model.TestAnswerSoap[]" innerType="cmp-ns:TestAnswerSoap" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"></arrayMapping>
+		<typeMapping xmlns:ns="http://model.lms.liferay.com" qname="ns:TestAnswerSoap" type="java:com.liferay.lms.model.TestAnswerSoap" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"></typeMapping>
+		<operation xmlns:operNS="urn:http.service.lms.liferay.com" xmlns:rtns="http://model.lms.liferay.com" name="addTestAnswer" qname="operNS:addTestAnswer" returnQName="addTestAnswerReturn" returnType="rtns:TestAnswerSoap" soapAction="">
+			<parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="questionId" type="tns:long"></parameter>
+			<parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="answer" type="tns:string"></parameter>
+			<parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="feedbackCorrect" type="tns:string"></parameter>
+			<parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="feedbacknocorrect" type="tns:string"></parameter>
+			<parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="correct" type="tns:boolean"></parameter>
+		</operation>
+		<operation xmlns:operNS="urn:http.service.lms.liferay.com" xmlns:rtns="http://model.lms.liferay.com" name="getTestAnswer" qname="operNS:getTestAnswer" returnQName="getTestAnswerReturn" returnType="rtns:TestAnswerSoap" soapAction="">
+			<parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="answerId" type="tns:long"></parameter>
+		</operation>
+		<operation xmlns:operNS="urn:http.service.lms.liferay.com" xmlns:rtns="urn:http.service.lms.liferay.com" xmlns:tns2="http://model.lms.liferay.com" name="getTestAnswersByQuestionId" qname="operNS:getTestAnswersByQuestionId" returnQName="getTestAnswersByQuestionIdReturn" returnType="rtns:ArrayOf_tns2_TestAnswerSoap" returnItemType="tns2:TestAnswerSoap" soapAction="">
+			<parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="questionId" type="tns:long"></parameter>
+		</operation>
+		<operation xmlns:operNS="urn:http.service.lms.liferay.com" xmlns:rtns="http://model.lms.liferay.com" name="modTestAnswer" qname="operNS:modTestAnswer" returnQName="modTestAnswerReturn" returnType="rtns:TestAnswerSoap" soapAction="">
+			<parameter xmlns:tns="http://model.lms.liferay.com" qname="testAnswer" type="tns:TestAnswerSoap"></parameter>
+		</operation>
+		<parameter name="allowedMethods" value="addTestAnswer getTestAnswer getTestAnswersByQuestionId modTestAnswer" />
+		<parameter name="className" value="com.liferay.lms.service.http.TestAnswerServiceSoap" />
+		<parameter name="schemaUnqualified" value="http://model.lms.liferay.com,urn:http.service.lms.liferay.com" />
+		<parameter name="typeMappingVersion" value="1.2" />
+		<parameter name="wsdlPortType" value="TestAnswerServiceSoap" />
+		<parameter name="wsdlServiceElement" value="TestAnswerServiceSoapService" />
+		<parameter name="wsdlServicePort" value="Plugin_Lms_TestAnswerService" />
+		<parameter name="wsdlTargetNamespace" value="urn:http.service.lms.liferay.com" />
+	</service>
+</deployment>

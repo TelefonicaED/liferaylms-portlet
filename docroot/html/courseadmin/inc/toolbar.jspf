@@ -1,0 +1,118 @@
+<liferay-portlet:actionURL name="removeAll" var="removeAllURL">
+		<portlet:param name="jspPage" value="/html/courseadmin/rolememberstab.jsp" /> 
+		<liferay-portlet:param name="courseId" value="<%=Long.toString(courseId) %>"></liferay-portlet:param>
+		<liferay-portlet:param name="roleId" value="<%=Long.toString(roleId) %>"></liferay-portlet:param>
+		<liferay-portlet:param name="tabs1" value="<%=tab %>"></liferay-portlet:param>
+		<portlet:param name="backToEdit" value="<%=Boolean.toString(backToEdit) %>" />
+		<c:if test="<%=backToEdit %>">
+			<portlet:param name="redirectOfEdit" value='<%=redirectOfEdit %>'/>
+		</c:if>
+	</liferay-portlet:actionURL>
+<script type="text/javascript">
+	function areyousure(){
+		if(confirm('<liferay-ui:message key="are-you-sure-you-want-to-permanently-delete-the-selected-users" />')){
+			window.location.href="<%= removeAllURL %>";
+		}
+	}
+</script>
+<portlet:renderURL var="importUsersURL"  windowState="<%= LiferayWindowState.EXCLUSIVE.toString() %>">
+	<portlet:param name="courseId" value="<%=ParamUtil.getString(renderRequest, \"courseId\") %>" /> 
+	<portlet:param name="roleId" value="<%=Long.toString(roleId) %>" /> 
+	<portlet:param name="jspPage" value="/html/courseadmin/popups/importUsers.jsp" /> 
+</portlet:renderURL>
+
+<aui:fieldset>
+	<div class="bt_newuser">	
+		<portlet:renderURL var="adduserURL">
+			<portlet:param name="jspPage" value="/html/courseadmin/usersresults.jsp" />
+			<liferay-portlet:param name="courseId" value="<%=Long.toString(courseId) %>"></liferay-portlet:param>
+			<liferay-portlet:param name="roleId" value="<%=Long.toString(roleId) %>"></liferay-portlet:param>
+			<portlet:param name="backToEdit" value="<%=Boolean.toString(backToEdit) %>" />
+			<c:if test="<%=backToEdit %>">
+				<portlet:param name="redirectOfEdit" value='<%=redirectOfEdit %>'/>
+			</c:if>
+		</portlet:renderURL>		
+		<liferay-ui:icon
+			message="add-user"
+			label="true"
+			url="<%= adduserURL %>"
+		/>
+	</div>
+	<div class="bt_removeuser">
+		<liferay-ui:icon 
+			message="delete-all-users"
+			label="true"
+			url="javascript:areyousure()"
+		/>
+	</div>
+<liferay-ui:icon-menu cssClass='bt_importexport' direction="down" extended="<%= false %>"  message="export-import" showWhenSingleIcon="<%= false %>">
+	<div>
+		<liferay-portlet:resourceURL var="exportURL" >
+			<portlet:param name="action" value="export"/>
+			<portlet:param name="groupId" value="<%=Long.toString(createdGroupId) %>"/>
+			<portlet:param name="roleId" value="<%=Long.toString(roleId) %>"/>
+		</liferay-portlet:resourceURL>
+		<liferay-ui:icon 
+			image="export" 
+			label="<%= true %>" 
+			message="courseadmin.exportuser.csv"
+			method="get" 
+			url="<%=exportURL%>" />
+	</div>
+	<div>
+		<liferay-ui:icon
+			image="add"
+			label="<%= true %>"
+			message="courseadmin.importuserrole"
+			url='<%="javascript:"+renderResponse.getNamespace() + "showPopupImportUsers();" %>'
+		/>
+	</div>
+</liferay-ui:icon-menu>
+</aui:fieldset>
+
+<script type="text/javascript">
+<!--
+
+    function <portlet:namespace />doImportUsers()
+    {
+        var uploadMessages = document.getElementById('<portlet:namespace />uploadMessages');
+        if(uploadMessages){
+			var importUsersDIV=document.getElementById('<portlet:namespace />import_frame').
+								contentDocument.getElementById('<portlet:namespace />uploadMessages');
+		
+			if(importUsersDIV){
+				uploadMessages.innerHTML=importUsersDIV.innerHTML;
+			}
+			else {
+				uploadMessages.innerHTML='';
+			}
+        }
+    }
+    
+	function <portlet:namespace/>showPopupImportUsers()
+    {
+		AUI().use('node','aui-dialog', function(A){
+			new A.Dialog({
+				id:'<portlet:namespace />showPopupImportUsers',
+	            title: '<liferay-ui:message key="import" />',
+	            modal: true,
+	            centered: true,
+	            resizable: true,
+	            width: 700,
+	            height: 530,
+	            destroyOnClose: false,
+	            after: {   
+		          	close: function(event){
+		          		Liferay.Portlet.refresh(A.one('#p_p_id<portlet:namespace />'),{'p_t_lifecycle':0});
+	            	}
+	            }
+	        }).plug(A.Plugin.IO, {
+	            uri: '<%=importUsersURL %>',
+	            parseContent: true
+	        }).render().show();   
+		}); 
+
+    }
+    
+//-->
+</script>

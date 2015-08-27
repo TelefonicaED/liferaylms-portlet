@@ -1,0 +1,141 @@
+<%@page import="com.liferay.portal.kernel.util.JavaConstants"%>
+<%@page import="javax.portlet.PortletResponse"%>
+<%@page import="com.liferay.portal.kernel.util.Validator"%>
+<%@page import="com.liferay.portal.kernel.util.HtmlUtil"%>
+<%@page import="com.liferay.portal.kernel.util.StringBundler"%>
+<%@page import="com.liferay.portal.theme.ThemeDisplay"%>
+<%@page import="com.liferay.portal.security.permission.ResourceActionsUtil"%>
+<%@page import="com.liferay.portal.kernel.exception.SystemException"%>
+<%@page import="com.liferay.portal.kernel.exception.PortalException"%>
+<%@page import="com.liferay.portal.kernel.util.ListUtil"%>
+<%@page import="com.liferay.portal.kernel.util.ArrayUtil"%>
+<%@page import="com.liferay.portal.kernel.util.UnicodeProperties"%>
+<%@page import="com.liferay.lms.service.CourseLocalServiceUtil"%>
+<%@page import="com.liferay.lms.model.Course"%>
+<%@page import="com.liferay.portal.util.PortalUtil"%>
+<%@ page import="com.liferay.portlet.asset.model.AssetCategory" %><%@
+page import="com.liferay.portlet.asset.model.AssetCategoryConstants" %><%@
+page import="com.liferay.portlet.asset.model.AssetVocabulary" %><%@
+page import="com.liferay.portlet.asset.service.AssetCategoryLocalServiceUtil" %><%@
+page import="com.liferay.portlet.asset.service.AssetVocabularyLocalServiceUtil" %>
+
+<%
+PortletResponse portletResponse =
+(PortletResponse)request.getAttribute(
+	JavaConstants.JAVAX_PORTLET_RESPONSE);
+
+String namespace = portletResponse.getNamespace();
+themeDisplay.setIncludeServiceJs(true);
+String randomNamespace = PortalUtil.generateRandomKey(request, "taglib_ui_asset_categories_selector_page") + StringPool.UNDERLINE;
+String className="com.liferay.portlet.bookmarks.model.BookmarksEntry";
+long classPK = 0;
+String hiddenInput = "assetCategoryIds";
+String curCategoryIds = "";
+String curCategoryNames = StringPool.BLANK;
+List<AssetVocabulary> vocabularies = new ArrayList<AssetVocabulary>();
+
+
+vocabularies.addAll(AssetVocabularyLocalServiceUtil.getGroupVocabularies(searchGroupId));
+
+	String curCategoryIdsParam = request.getParameter(hiddenInput);
+
+	if (curCategoryIdsParam != null) {
+		curCategoryIds = curCategoryIdsParam;
+	}
+
+	String[] categoryIdsTitles = _getCategoryIdsTitles(curCategoryIds, curCategoryNames, 0, themeDisplay);
+%>
+
+	<div class="lfr-tags-selector-content" id="<%= namespace + randomNamespace %>assetCategoriesSelector">
+		<input id="<%= namespace+hiddenInput %>" name="<%= namespace+hiddenInput %>"  type="hidden" />
+	</div>
+
+	<aui:script use="liferay-asset-categories-selector,aui-dialog">
+
+		var body = A.one(document.body);
+		A.DialogManager.after(
+			['dialog:contentUpdate', 'dialog:visibleChange'],
+			function(event) {
+				var dialog = event.target;
+
+				dialog.setAttrs({
+					draggable:false,
+					resizable:false
+				});
+
+				if(dialog.get('visible')){
+					body.setStyle('min-height',dialog.get('contentBox').getComputedStyle('height'));
+				}
+				else{
+					body.setStyle('min-height','');
+				}
+			}
+		);
+
+		var categorySelector = new Liferay.AssetCategoriesSelector(
+			{
+				className: '<%= className %>',
+				contentBox: '#<%= namespace + randomNamespace %>assetCategoriesSelector',
+				curEntries: '<%= HtmlUtil.escapeJS(categoryIdsTitles[1]) %>',
+				curEntryIds: '<%= categoryIdsTitles[0] %>',
+				hiddenInput: '#<%=namespace+hiddenInput %>',
+				instanceVar: '<%= namespace + randomNamespace %>',
+				portalModelResource: <%= Validator.isNotNull(className) && (ResourceActionsUtil.isPortalModelResource(className) || className.equals(Group.class.getName())) %>,
+				vocabularyGroupIds: '<%= searchGroupId %>',
+				vocabularyIds: '<%= ListUtil.toString(vocabularies, "vocabularyId") %>'
+			}
+		).render();
+
+	</aui:script>
+
+<%!
+private long[] _filterCategoryIds(long vocabularyId, long[] categoryIds) throws PortalException, SystemException{
+	List<Long> filteredCategoryIds = new ArrayList<Long>();
+
+	for (long categoryId : categoryIds) {
+		AssetCategory category = AssetCategoryLocalServiceUtil.getCategory(categoryId);
+
+		if (category.getVocabularyId() == vocabularyId) {
+			filteredCategoryIds.add(category.getCategoryId());
+		}
+	}
+
+	return ArrayUtil.toArray(filteredCategoryIds.toArray(new Long[filteredCategoryIds.size()]));
+}
+
+private String[] _getCategoryIdsTitles(String categoryIds, String categoryNames, long vocabularyId, ThemeDisplay themeDisplay) throws PortalException, SystemException {
+	if (Validator.isNotNull(categoryIds)) {
+		long[] categoryIdsArray = GetterUtil.getLongValues(StringUtil.split(categoryIds));
+
+		if (vocabularyId > 0) {
+			categoryIdsArray = _filterCategoryIds(vocabularyId, categoryIdsArray);
+		}
+
+		if (categoryIdsArray.length == 0) {
+			categoryIds = StringPool.BLANK;
+			categoryNames = StringPool.BLANK;
+		}
+		else {
+			StringBundler sb = new StringBundler(categoryIdsArray.length * 2);
+
+			for (long categoryId : categoryIdsArray) {
+				AssetCategory category = AssetCategoryLocalServiceUtil.getCategory(categoryId);
+
+				category = category.toEscapedModel();
+
+				sb.append(category.getTitle(themeDisplay.getLocale()));
+				sb.append(_CATEGORY_SEPARATOR);
+			}
+
+			sb.setIndex(sb.index() - 1);
+
+			categoryIds = StringUtil.merge(categoryIdsArray);
+			categoryNames = sb.toString();
+		}
+	}
+
+	return new String[] {categoryIds, categoryNames};
+}
+
+private static final String _CATEGORY_SEPARATOR = "_CATEGORY_";
+%>

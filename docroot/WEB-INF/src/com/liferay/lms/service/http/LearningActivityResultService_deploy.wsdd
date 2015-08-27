@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+
+<deployment xmlns="http://xml.apache.org/axis/wsdd/" xmlns:java="http://xml.apache.org/axis/wsdd/providers/java">
+	<service name="Plugin_Lms_LearningActivityResultService" provider="java:RPC" style="rpc" use="encoded">
+		<typeMapping xmlns:ns="http://model.lms.liferay.com" qname="ns:LearningActivityResultSoap" type="java:com.liferay.lms.model.LearningActivityResultSoap" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"></typeMapping>
+		<operation xmlns:operNS="urn:http.service.lms.liferay.com" xmlns:rtns="http://model.lms.liferay.com" name="getByActIdAndUser" qname="operNS:getByActIdAndUser" returnQName="getByActIdAndUserReturn" returnType="rtns:LearningActivityResultSoap" soapAction="">
+			<parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="actId" type="tns:long"></parameter>
+			<parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="login" type="tns:string"></parameter>
+		</operation>
+		<operation xmlns:operNS="urn:http.service.lms.liferay.com" xmlns:rtns="http://model.lms.liferay.com" name="getByActId" qname="operNS:getByActId" returnQName="getByActIdReturn" returnType="rtns:LearningActivityResultSoap" soapAction="">
+			<parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="actId" type="tns:long"></parameter>
+		</operation>
+		<operation xmlns:operNS="urn:http.service.lms.liferay.com" xmlns:rtns="http://model.lms.liferay.com" name="updateFinishTry" qname="operNS:updateFinishTry" returnQName="updateFinishTryReturn" returnType="rtns:LearningActivityResultSoap" soapAction="">
+			<parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="latId" type="tns:long"></parameter>
+			<parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="tryResultData" type="tns:string"></parameter>
+			<parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="imsmanifest" type="tns:string"></parameter>
+		</operation>
+		<operation xmlns:operNS="urn:http.service.lms.liferay.com" xmlns:rtns="http://model.lms.liferay.com" name="update" qname="operNS:update" returnQName="updateReturn" returnType="rtns:LearningActivityResultSoap" soapAction="">
+			<parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="latId" type="tns:long"></parameter>
+			<parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="result" type="tns:long"></parameter>
+			<parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="tryResultData" type="tns:string"></parameter>
+		</operation>
+		<operation xmlns:operNS="urn:http.service.lms.liferay.com" xmlns:rtns="http://model.lms.liferay.com" name="update" qname="operNS:update" returnQName="updateReturn" returnType="rtns:LearningActivityResultSoap" soapAction="">
+			<parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="latId" type="tns:long"></parameter>
+			<parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="tryResultData" type="tns:string"></parameter>
+		</operation>
+		<operation xmlns:operNS="urn:http.service.lms.liferay.com" xmlns:rtns="http://model.lms.liferay.com" name="update" qname="operNS:update" returnQName="updateReturn" returnType="rtns:LearningActivityResultSoap" soapAction="">
+			<parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="latId" type="tns:long"></parameter>
+			<parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="tryResultData" type="tns:string"></parameter>
+			<parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="imsmanifest" type="tns:string"></parameter>
+		</operation>
+		<operation xmlns:operNS="urn:http.service.lms.liferay.com" xmlns:rtns="http://www.w3.org/2001/XMLSchema" name="userLoginPassed" qname="operNS:userLoginPassed" returnQName="userLoginPassedReturn" returnType="rtns:boolean" soapAction="">
+			<parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="actId" type="tns:long"></parameter>
+			<parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="login" type="tns:string"></parameter>
+		</operation>
+		<operation xmlns:operNS="urn:http.service.lms.liferay.com" xmlns:rtns="http://www.w3.org/2001/XMLSchema" name="userPassed" qname="operNS:userPassed" returnQName="userPassedReturn" returnType="rtns:boolean" soapAction="">
+			<parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="actId" type="tns:long"></parameter>
+		</operation>
+		<parameter name="allowedMethods" value="getByActId getByActIdAndUser update updateFinishTry userLoginPassed userPassed" />
+		<parameter name="className" value="com.liferay.lms.service.http.LearningActivityResultServiceSoap" />
+		<parameter name="schemaUnqualified" value="http://model.lms.liferay.com" />
+		<parameter name="typeMappingVersion" value="1.2" />
+		<parameter name="wsdlPortType" value="LearningActivityResultServiceSoap" />
+		<parameter name="wsdlServiceElement" value="LearningActivityResultServiceSoapService" />
+		<parameter name="wsdlServicePort" value="Plugin_Lms_LearningActivityResultService" />
+		<parameter name="wsdlTargetNamespace" value="urn:http.service.lms.liferay.com" />
+	</service>
+</deployment>

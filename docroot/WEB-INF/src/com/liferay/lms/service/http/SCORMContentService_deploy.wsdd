@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+
+<deployment xmlns="http://xml.apache.org/axis/wsdd/" xmlns:java="http://xml.apache.org/axis/wsdd/providers/java">
+	<service name="Plugin_Lms_SCORMContentService" provider="java:RPC" style="rpc" use="encoded">
+		<arrayMapping xmlns:ns="urn:http.service.lms.liferay.com" xmlns:cmp-ns="http://model.lms.liferay.com" qname="ns:ArrayOf_tns2_SCORMContentSoap" type="java:com.liferay.lms.model.SCORMContentSoap[]" innerType="cmp-ns:SCORMContentSoap" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"></arrayMapping>
+		<typeMapping xmlns:ns="http://model.lms.liferay.com" qname="ns:SCORMContentSoap" type="java:com.liferay.lms.model.SCORMContentSoap" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"></typeMapping>
+		<operation xmlns:operNS="urn:http.service.lms.liferay.com" xmlns:rtns="urn:http.service.lms.liferay.com" xmlns:tns2="http://model.lms.liferay.com" name="getSCORMContentOfGroup" qname="operNS:getSCORMContentOfGroup" returnQName="getSCORMContentOfGroupReturn" returnType="rtns:ArrayOf_tns2_SCORMContentSoap" returnItemType="tns2:SCORMContentSoap" soapAction="">
+			<parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="groupId" type="tns:long"></parameter>
+		</operation>
+		<parameter name="allowedMethods" value="getSCORMContentOfGroup" />
+		<parameter name="className" value="com.liferay.lms.service.http.SCORMContentServiceSoap" />
+		<parameter name="schemaUnqualified" value="http://model.lms.liferay.com,urn:http.service.lms.liferay.com" />
+		<parameter name="typeMappingVersion" value="1.2" />
+		<parameter name="wsdlPortType" value="SCORMContentServiceSoap" />
+		<parameter name="wsdlServiceElement" value="SCORMContentServiceSoapService" />
+		<parameter name="wsdlServicePort" value="Plugin_Lms_SCORMContentService" />
+		<parameter name="wsdlTargetNamespace" value="urn:http.service.lms.liferay.com" />
+	</service>
+</deployment>

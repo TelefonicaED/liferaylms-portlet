@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE liferay-social PUBLIC "-//Liferay//DTD Social 6.1.0//EN" "http://www.liferay.com/dtd/liferay-social_6_1_0.dtd">
+
+<liferay-social>
+<activity>
+		<model-name>com.liferay.lms.model.Course</model-name>
+		<activity-type>${com.liferay.portlet.social.model.SocialActivityConstants.TYPE_SUBSCRIBE}</activity-type>
+		<language-key>SUBSCRIBE</language-key>
+		<log-activity>true</log-activity>
+		<contribution-value>2</contribution-value>
+		<participation-value>2</participation-value>
+		<participation-limit period="lifetime">1</participation-limit>
+	
+		<counter>
+			<name>asset.subscriptions</name>
+			<owner-type>asset</owner-type>
+		</counter>
+		<counter>
+			<name>creator.subscriptions</name>
+			<owner-type>creator</owner-type>
+		</counter>
+		<counter>
+			<name>user.subscriptions</name>
+			<owner-type>actor</owner-type>
+		</counter>
+	</activity>
+	<activity>
+		<model-name>com.liferay.lms.model.Course</model-name>
+		<activity-type>${com.liferay.portlet.social.model.SocialActivityConstants.TYPE_UNSUBSCRIBE}</activity-type>
+		<language-key>UNSUBSCRIBE</language-key>
+		<log-activity>true</log-activity>
+		<contribution-limit enabled="false" />
+		<counter>
+			<name>asset.cancelled-subscriptions</name>
+			<owner-type>asset</owner-type>
+		</counter>
+		<counter>
+			<name>creator.cancelled-subscriptions</name>
+			<owner-type>creator</owner-type>
+		</counter>
+		<counter>
+			<name>user.cancelled-subscriptions</name>
+			<owner-type>actor</owner-type>
+		</counter>
+	</activity>
+	<activity>
+		<model-name>com.liferay.lms.model.Course</model-name>
+		<activity-type>${com.liferay.portlet.social.model.SocialActivityConstants.TYPE_ADD_COMMENT}</activity-type>
+		<language-key>ADD_COMMENT</language-key>
+		<log-activity>true</log-activity>
+		<contribution-value>2</contribution-value>
+		<participation-value>2</participation-value>
+		<participation-limit period="day">10</participation-limit>
+		<counter>
+			<name>asset.comments</name>
+			<owner-type>asset</owner-type>
+		</counter>
+		<counter>
+			<name>creator.comments</name>
+			<owner-type>creator</owner-type>
+		</counter>
+		<counter>
+			<name>user.comments</name>
+			<owner-type>actor</owner-type>
+		</counter>
+	</activity>
+	<activity>
+		<model-name>com.liferay.lms.model.Course</model-name>
+		<activity-type>${com.liferay.portlet.social.model.SocialActivityConstants.TYPE_ADD_VOTE}</activity-type>
+		<language-key>ADD_VOTE</language-key>
+		<log-activity>false</log-activity>
+		<contribution-value>5</contribution-value>
+		<contribution-limit enabled="false" />
+		<participation-value>1</participation-value>
+		<counter>
+			<name>asset.votes</name>
+			<owner-type>asset</owner-type>
+		</counter>
+		<counter>
+			<name>user.votes</name>
+			<owner-type>actor</owner-type>
+		</counter>
+	</activity>
+	<activity>
+		<model-name>com.liferay.lms.model.LearningActivity</model-name>
+		<activity-type>${com.liferay.lms.social.LearningActivityKeys.ADD_ENTRY}</activity-type>
+		<language-key>ADD</language-key>
+		<log-activity>true</log-activity>
+		<contribution-limit enabled="false" />
+		<participation-value>5</participation-value>
+		<participation-limit period="lifetime">1</participation-limit>
+		<counter>
+			<name>user.activity</name>
+			<owner-type>actor</owner-type>
+		</counter>
+	</activity>
+		<activity>
+		<model-name>com.liferay.lms.model.LearningActivity</model-name>
+		<activity-type>${com.liferay.lms.social.LearningActivityKeys.UPDATE_ENTRY}</activity-type>
+		<language-key>lmsactivitylist.activity.delete</language-key>
+		<log-activity>true</log-activity>
+		<contribution-limit period="lifetime">0</contribution-limit>
+		<participation-limit period="lifetime">0</participation-limit>
+	</activity>
+	<activity>
+		<model-name>com.liferay.lms.model.LearningActivity</model-name>
+		<activity-type>${com.liferay.lms.social.LearningActivityKeys.DELETE_ENTRY}</activity-type>
+		<language-key>lmsactivitylist.activity.edit</language-key>
+		<log-activity>true</log-activity>
+		<contribution-limit period="lifetime">0</contribution-limit>
+		<participation-limit period="lifetime">0</participation-limit>
+		</activity>
+	<activity>
+		<model-name>com.liferay.lms.model.LearningActivity</model-name>
+		<activity-type>${com.liferay.portlet.social.model.SocialActivityConstants.TYPE_VIEW}</activity-type>
+		<language-key>VIEW</language-key>
+		<log-activity>false</log-activity>
+		<participation-value>1</participation-value>
+		<participation-limit period="day">1</participation-limit>
+	</activity>
+	<activity>
+		<model-name>com.liferay.lms.model.LearningActivity</model-name>
+		<activity-type>${com.liferay.lms.social.LearningActivityKeys.CORRECT}</activity-type>
+		<language-key>action.CORRECT</language-key>
+		<log-activity>true</log-activity>
+		<contribution-value>2</contribution-value>
+		<participation-value>2</participation-value>
+		<counter>
+			<name>asset.corrections</name>
+			<owner-type>asset</owner-type>
+		</counter>
+		<counter>
+			<name>user.corrections</name>
+			<owner-type>actor</owner-type>
+		</counter>
+	</activity>
+	
+	<activity>
+		<model-name>com.liferay.lms.model.LearningActivity</model-name>
+		<activity-type>${com.liferay.portlet.social.model.SocialActivityConstants.TYPE_ADD_COMMENT}</activity-type>
+		<language-key>ADD_COMMENT</language-key>
+		<log-activity>true</log-activity>
+		<contribution-value>2</contribution-value>
+		<participation-value>2</participation-value>
+		<participation-limit period="day">10</participation-limit>
+		<counter>
+			<name>asset.comments</name>
+			<owner-type>asset</owner-type>
+		</counter>
+		<counter>
+			<name>creator.comments</name>
+			<owner-type>creator</owner-type>
+		</counter>
+		<counter>
+			<name>user.comments</name>
+			<owner-type>actor</owner-type>
+		</counter>
+	</activity>
+	<activity>
+		<model-name>com.liferay.lms.model.SCORMContent</model-name>
+		<activity-type>${com.liferay.portlet.social.model.SocialActivityConstants.TYPE_ADD_COMMENT}</activity-type>
+		<language-key>ADD_COMMENT</language-key>
+		<log-activity>true</log-activity>
+		<contribution-value>2</contribution-value>
+		<participation-value>2</participation-value>
+		<participation-limit period="day">10</participation-limit>
+		<counter>
+			<name>asset.comments</name>
+			<owner-type>asset</owner-type>
+		</counter>
+		<counter>
+			<name>creator.comments</name>
+			<owner-type>creator</owner-type>
+		</counter>
+		<counter>
+			<name>user.comments</name>
+			<owner-type>actor</owner-type>
+		</counter>
+	</activity>
+	<activity>
+		<model-name>com.liferay.lms.model.SCORMContent</model-name>
+		<activity-type>${com.liferay.portlet.social.model.SocialActivityConstants.TYPE_ADD_VOTE}</activity-type>
+		<language-key>ADD_VOTE</language-key>
+		<log-activity>false</log-activity>
+		<contribution-value>5</contribution-value>
+		<contribution-limit enabled="false" />
+		<participation-value>1</participation-value>
+		<counter>
+			<name>asset.votes</name>
+			<owner-type>asset</owner-type>
+		</counter>
+		<counter>
+			<name>user.votes</name>
+			<owner-type>actor</owner-type>
+		</counter>
+	</activity>
+	</liferay-social>
