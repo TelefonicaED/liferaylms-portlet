@@ -360,6 +360,11 @@
 		<column name="welcome" type="boolean"/>
 		<column name="welcomeMsg" type="String"/>
 		<column name="welcomeSubject" type="String"/>
+		
+		<column name="goodbye" type="boolean"/>
+		<column name="goodbyeMsg" type="String"/>
+		<column name="goodbyeSubject" type="String"/>
+		
  		<order by="asc">
 			<order-column name="courseId" />
 		</order>
