@@ -180,10 +180,13 @@ boolean showGo 		= preferences.getValue("showGo", 	 "true").equals("true");
 boolean showRegistrationType = preferences.getValue("showRegistrationType",  "true").equals("true");
 boolean showMaxUsers = preferences.getValue("showMaxUsers", "true").equals("true");
 boolean showWelcomeMsg = preferences.getValue("showWelcomeMsg", "true").equals("true");
+boolean showGoodbyeMsg = preferences.getValue("showGoodbyeMsg", "true").equals("true");
+
 
 boolean showPermission = preferences.getValue("showPermission", "true").equals("true");
 
 String welcomeSubject= new String();
+String goodbyeSubject = new String();
 if(course!=null)
 {
 	groupCreated = GroupLocalServiceUtil.getGroup(course.getGroupCreatedId());
@@ -206,6 +209,7 @@ if(course!=null)
 	endMin=Integer.parseInt(formatMin.format(course.getEndDate()));
 	type=course.getStatus(); //TODO
 	welcomeSubject = course.getWelcomeSubject();
+	goodbyeSubject = course.getGoodbyeSubject();
 	maxUsers=course.getMaxusers();
 	courseTitle = (String)course.getModelAttributes().get("title");
 	%>
@@ -708,6 +712,94 @@ else
 			</liferay-ui:panel>
 		</c:if>
 		
+		<%
+			boolean activeGoodbye =(course!=null&&course.getGoodbye()?true:false);  
+			String goodbyeMsg = (course!=null&&course.getGoodbyeMsg()!=null?course.getGoodbyeMsg():"");
+		%>
+		
+		
+		<c:if test="<%=showGoodbyeMsg %>">
+			<liferay-ui:panel title="goodbye-msg" collapsible="true" defaultState='<%=activeGoodbye?"open":"closed" %>'>
+				<aui:input type="checkbox" name="goodbye" label="enabled" value='<%=activeGoodbye %>' onChange='<%= renderResponse.getNamespace()+"changeGoodbye()" %>'/>
+				
+				<div id="containerGoodbyeMsg" style='display:<%=activeGoodbye?"block":"none"%>'>
+				
+					<aui:input name="goodbyeSubject" size="100"  type="text" label="goodbye-subject" value="<%=goodbyeSubject%>">
+						<aui:validator name="maxLength">75</aui:validator>
+					</aui:input>
+				
+					<aui:field-wrapper label="goodbye-msg" name="goodbye-msg">
+					
+					
+					
+						<script type="text/javascript">
+							function <portlet:namespace />onChangeGoodbyeMsg(val) {
+					        	var A = AUI();
+								A.one('#<portlet:namespace />goodbyeMsg').set('value',val);
+					        }
+						</script>
+						<liferay-ui:input-editor toolbarSet="slimmer" name="goodbyeMsg" width="100%" onChangeMethod="onChangeGoodbyeMsg" initMethod="initEditorGoodbyeMsg" />
+						<script type="text/javascript">
+		    		    	function <portlet:namespace />initEditorGoodbyeMsg() { return "<%= UnicodeFormatter.toString(goodbyeMsg) %>"; }
+		    			</script>
+		    			
+		    			
+		    			
+		    			
+					</aui:field-wrapper>
+					<div class="definition-of-terms">
+						<h4><liferay-ui:message key="definition-of-terms" /></h4>
+		
+						<dl>
+							<dt>
+								[$PAGE_URL$]
+							</dt>
+							<dd>
+								<%= themeDisplay.getURLPortal()+"/web"+((course!=null&&course.getFriendlyURL()!=null)?course.getFriendlyURL():StringPool.BLANK) %>
+							</dd>
+							<dt>
+								[$FROM_ADDRESS$]
+							</dt>
+							<dd>
+								<%= HtmlUtil.escape(PrefsPropsUtil.getString(themeDisplay.getCompanyId(),PropsKeys.ADMIN_EMAIL_FROM_ADDRESS)) %>
+							</dd>
+							<dt>
+								[$FROM_NAME$]
+							</dt>
+							<dd>
+								<%= HtmlUtil.escape(PrefsPropsUtil.getString(themeDisplay.getCompanyId(),PropsKeys.ADMIN_EMAIL_FROM_NAME)) %>
+							</dd>
+							<dt>
+								[$PORTAL_URL$]
+							</dt>
+							<dd>
+								<%= company.getVirtualHostname() %>
+							</dd>
+							<dt>
+								[$TO_ADDRESS$]
+							</dt>
+							<dd>
+								<liferay-ui:message key="the-address-of-the-email-recipient" />
+							</dd>
+							<dt>
+								[$TO_NAME$]
+							</dt>
+							<dd>
+								<liferay-ui:message key="the-name-of-the-email-recipient" />
+							</dd>
+						</dl>
+					</div>
+				</div>
+				
+			</liferay-ui:panel>
+		</c:if>
+		
+		
+		
+		
+		
+		
+		
 </liferay-ui:panel-container>
 	<aui:button-row>
 		<aui:button type="submit"></aui:button>							
@@ -727,6 +819,15 @@ function <portlet:namespace />changeWelcome(){
 		div.style.display='none';
 	}
 }
+function <portlet:namespace />changeGoodbye(){
+	var div = document.getElementById("containerGoodbyeMsg");
+	if(div.style.display&&div.style.display=='none'){
+		div.style.display='block';
+	}else{
+		div.style.display='none';
+	}
+}
+
  function <portlet:namespace />checkduplicate(val, field)
 {
 	var courseId = document.getElementById('<portlet:namespace />courseId').value;

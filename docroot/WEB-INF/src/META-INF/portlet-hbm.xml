@@ -94,6 +94,9 @@
 		<property name="welcome" type="com.liferay.portal.dao.orm.hibernate.BooleanType" />
 		<property name="welcomeMsg" type="com.liferay.portal.dao.orm.hibernate.StringType" />
 		<property name="welcomeSubject" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="goodbye" type="com.liferay.portal.dao.orm.hibernate.BooleanType" />
+		<property name="goodbyeMsg" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="goodbyeSubject" type="com.liferay.portal.dao.orm.hibernate.StringType" />
 	</class>
 	<class name="com.liferay.lms.model.impl.CourseCompetenceImpl" table="Lms_CourseCompetence">
 		<cache usage="read-write" />

@@ -254,7 +254,10 @@ public class CourseAdmin extends MVCPortlet {
 		boolean welcome = ParamUtil.getBoolean(uploadRequest, "welcome", false);
 		String welcomeSubject = ParamUtil.getString(uploadRequest, "welcomeSubject",StringPool.BLANK);
 		String welcomeMsg = ParamUtil.getString(uploadRequest, "welcomeMsg",StringPool.BLANK);
-		
+		boolean goodbye = ParamUtil.getBoolean(uploadRequest, "goodbye", false);
+		String goodbyeSubject = ParamUtil.getString(uploadRequest, "goodbyeSubject",StringPool.BLANK);
+		String goodbyeMsg = ParamUtil.getString(uploadRequest, "goodbyeMsg",StringPool.BLANK);
+
 		int type = ParamUtil.getInteger(uploadRequest, "type", GroupConstants.TYPE_SITE_OPEN);
 		int maxusers = ParamUtil.getInteger(uploadRequest, "maxUsers");
 		
@@ -548,6 +551,9 @@ public class CourseAdmin extends MVCPortlet {
 			course.setWelcome(welcome);
 			course.setWelcomeSubject(welcomeSubject);
 			course.setWelcomeMsg(welcomeMsg);
+			course.setGoodbye(goodbye);
+			course.setGoodbyeSubject(goodbyeSubject);
+			course.setGoodbyeMsg(goodbyeMsg);
 		
 			try {
 				try{

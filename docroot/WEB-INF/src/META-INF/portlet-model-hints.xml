@@ -81,6 +81,12 @@
 			<hint name="max-length">500000</hint>
 		</field>
 		<field name="welcomeSubject" type="String" />
+		<field name="goodbye" type="boolean" />
+		<field name="goodbyeMsg" type="String">
+			<hint name="display-width">1024</hint>
+			<hint name="max-length">500000</hint>
+		</field>
+		<field name="goodbyeSubject" type="String" />
 	</model>
 	<model name="com.liferay.lms.model.CourseCompetence">
 		<field name="uuid" type="String" />

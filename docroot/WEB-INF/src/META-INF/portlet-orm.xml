@@ -114,6 +114,9 @@
 			<basic name="welcome" />
 			<basic name="welcomeMsg" />
 			<basic name="welcomeSubject" />
+			<basic name="goodbye" />
+			<basic name="goodbyeMsg" />
+			<basic name="goodbyeSubject" />
 			<transient name="descriptionCurrentLanguageId" />
 			<transient name="descriptionMap" />
 			<transient name="modelAttributes" />
