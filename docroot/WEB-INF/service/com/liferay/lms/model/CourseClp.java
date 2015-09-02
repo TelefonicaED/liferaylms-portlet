@@ -101,6 +101,9 @@ public class CourseClp extends BaseModelImpl<Course> implements Course {
 		attributes.put("welcome", getWelcome());
 		attributes.put("welcomeMsg", getWelcomeMsg());
 		attributes.put("welcomeSubject", getWelcomeSubject());
+		attributes.put("goodbye", getGoodbye());
+		attributes.put("goodbyeMsg", getGoodbyeMsg());
+		attributes.put("goodbyeSubject", getGoodbyeSubject());
 
 		return attributes;
 	}
@@ -267,6 +270,24 @@ public class CourseClp extends BaseModelImpl<Course> implements Course {
 
 		if (welcomeSubject != null) {
 			setWelcomeSubject(welcomeSubject);
+		}
+
+		Boolean goodbye = (Boolean)attributes.get("goodbye");
+
+		if (goodbye != null) {
+			setGoodbye(goodbye);
+		}
+
+		String goodbyeMsg = (String)attributes.get("goodbyeMsg");
+
+		if (goodbyeMsg != null) {
+			setGoodbyeMsg(goodbyeMsg);
+		}
+
+		String goodbyeSubject = (String)attributes.get("goodbyeSubject");
+
+		if (goodbyeSubject != null) {
+			setGoodbyeSubject(goodbyeSubject);
 		}
 	}
 
@@ -698,6 +719,34 @@ public class CourseClp extends BaseModelImpl<Course> implements Course {
 		_welcomeSubject = welcomeSubject;
 	}
 
+	public boolean getGoodbye() {
+		return _goodbye;
+	}
+
+	public boolean isGoodbye() {
+		return _goodbye;
+	}
+
+	public void setGoodbye(boolean goodbye) {
+		_goodbye = goodbye;
+	}
+
+	public String getGoodbyeMsg() {
+		return _goodbyeMsg;
+	}
+
+	public void setGoodbyeMsg(String goodbyeMsg) {
+		_goodbyeMsg = goodbyeMsg;
+	}
+
+	public String getGoodbyeSubject() {
+		return _goodbyeSubject;
+	}
+
+	public void setGoodbyeSubject(String goodbyeSubject) {
+		_goodbyeSubject = goodbyeSubject;
+	}
+
 	/**
 	 * @deprecated {@link #isApproved}
 	 */
@@ -840,6 +889,9 @@ public class CourseClp extends BaseModelImpl<Course> implements Course {
 		clone.setWelcome(getWelcome());
 		clone.setWelcomeMsg(getWelcomeMsg());
 		clone.setWelcomeSubject(getWelcomeSubject());
+		clone.setGoodbye(getGoodbye());
+		clone.setGoodbyeMsg(getGoodbyeMsg());
+		clone.setGoodbyeSubject(getGoodbyeSubject());
 
 		return clone;
 	}
@@ -896,7 +948,7 @@ public class CourseClp extends BaseModelImpl<Course> implements Course {
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(55);
+		StringBundler sb = new StringBundler(61);
 
 		sb.append("{uuid=");
 		sb.append(getUuid());
@@ -952,13 +1004,19 @@ public class CourseClp extends BaseModelImpl<Course> implements Course {
 		sb.append(getWelcomeMsg());
 		sb.append(", welcomeSubject=");
 		sb.append(getWelcomeSubject());
+		sb.append(", goodbye=");
+		sb.append(getGoodbye());
+		sb.append(", goodbyeMsg=");
+		sb.append(getGoodbyeMsg());
+		sb.append(", goodbyeSubject=");
+		sb.append(getGoodbyeSubject());
 		sb.append("}");
 
 		return sb.toString();
 	}
 
 	public String toXmlString() {
-		StringBundler sb = new StringBundler(85);
+		StringBundler sb = new StringBundler(94);
 
 		sb.append("<model><model-name>");
 		sb.append("com.liferay.lms.model.Course");
@@ -1072,6 +1130,18 @@ public class CourseClp extends BaseModelImpl<Course> implements Course {
 			"<column><column-name>welcomeSubject</column-name><column-value><![CDATA[");
 		sb.append(getWelcomeSubject());
 		sb.append("]]></column-value></column>");
+		sb.append(
+			"<column><column-name>goodbye</column-name><column-value><![CDATA[");
+		sb.append(getGoodbye());
+		sb.append("]]></column-value></column>");
+		sb.append(
+			"<column><column-name>goodbyeMsg</column-name><column-value><![CDATA[");
+		sb.append(getGoodbyeMsg());
+		sb.append("]]></column-value></column>");
+		sb.append(
+			"<column><column-name>goodbyeSubject</column-name><column-value><![CDATA[");
+		sb.append(getGoodbyeSubject());
+		sb.append("]]></column-value></column>");
 
 		sb.append("</model>");
 
@@ -1109,5 +1179,8 @@ public class CourseClp extends BaseModelImpl<Course> implements Course {
 	private boolean _welcome;
 	private String _welcomeMsg;
 	private String _welcomeSubject;
+	private boolean _goodbye;
+	private String _goodbyeMsg;
+	private String _goodbyeSubject;
 	private BaseModel<?> _courseRemoteModel;
 }

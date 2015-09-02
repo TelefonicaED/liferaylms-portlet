@@ -341,7 +341,7 @@ Player.ContentPlayer.prototype = {
 				if (this.$9.isSingleItem()) {
 					$0.style.display = 'none';
 				}
-			}		
+			}
 			var $1 = new ControlsCollection.TreeView(this.$5,
 					PlayerConfiguration.TreeMinusIcon,
 					PlayerConfiguration.TreePlusIcon);

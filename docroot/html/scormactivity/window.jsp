@@ -1,3 +1,7 @@
+<%@page import="com.liferay.lms.learningactivity.scormcontent.ScormContenRegistry"%>
+<%@page import="com.liferay.portal.kernel.util.PropsUtil"%>
+<%@page import="javax.portlet.MimeResponse"%>
+<%@page import="com.liferay.lms.learningactivity.scormcontent.ScormContentAsset"%>
 <%@page import="com.liferay.lms.service.LearningActivityTryLocalServiceUtil"%>
 <%@page import="com.liferay.lms.model.LearningActivityTry"%>
 <%@page import="com.liferay.portlet.asset.model.AssetRenderer"%>
@@ -21,14 +25,8 @@ long entryId = GetterUtil.getLong(LearningActivityLocalServiceUtil.getExtraConte
 			
 if(entryId != 0)
 {
-	AssetEntry entry=AssetEntryLocalServiceUtil.getEntry(entryId);
-	AssetRendererFactory assetRendererFactory=AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(entry.getClassName());			
-	AssetRenderer assetRenderer= AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(entry.getClassName()).getAssetRenderer(entry.getClassPK());
-	String path = assetRenderer.render(renderRequest, renderResponse, AssetRenderer.TEMPLATE_FULL_CONTENT); 
-	themeDisplay.setIncludeServiceJs(true); 
-
 	%>
-<script src="/liferaylms-portlet/js/service.js" type="text/javascript"></script>
+	<script src="/liferaylms-portlet/js/service.js" type="text/javascript"></script>
 <script type="text/javascript">
 	localStorage.removeItem('scormpool');
 	var tryResultDataOld = '<%= HtmlUtil.escapeJS(learningTry.getTryResultData()) %>';
@@ -38,10 +36,182 @@ if(entryId != 0)
 	}
 	var showscorm=true;
 </script>
+	<%
+	AssetEntry entry=AssetEntryLocalServiceUtil.getEntry(entryId);
+	AssetRendererFactory assetRendererFactory=AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(entry.getClassName());			
+	AssetRenderer assetRenderer= AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(entry.getClassName()).getAssetRenderer(entry.getClassPK());
+	ScormContentAsset scormContentAsset=ScormContenRegistry.getScormContentAsset(entry.getClassName());
+	
+	if(scormContentAsset!=null)
+	{
+    	String manifestURL="";
+		if("".equals(scoshow))
+		{
+			manifestURL=scormContentAsset.getManifestURL(renderRequest,entry);
+		}
+		else
+		{
+			manifestURL=scormContentAsset.getManifestURL(scoshow,renderRequest,entry);
+		}
+		%>
+		<!-- init -->
+		
+	<%
+String [] jss = {
+								"/liferaylms-portlet/js/scorm/sscompat.js",
+								"/liferaylms-portlet/js/scorm/sscorlib.js",
+								"/liferaylms-portlet/js/scorm/ssfx.Core.js",
+							 
+								"/liferaylms-portlet/js/scorm/API_BASE.js",
+							    "/liferaylms-portlet/js/scorm/API.js",
+							    "/liferaylms-portlet/js/scorm/API_1484_11.js",
+
+							    "/liferaylms-portlet/js/scorm/Controls.js",
+								"/liferaylms-portlet/js/scorm/LocalStorage.js",
+								"/liferaylms-portlet/js/scorm/Player.js",
+								"/liferaylms-portlet/js/scorm/PersistenceStoragePatched.js"
+						};
+						for (int i = 0; i < jss.length; i++) {
+							org.w3c.dom.Element jsLink = renderResponse.createElement("script");
+							jsLink.setAttribute("type", "text/javascript");
+							jsLink.setAttribute("src", jss[i]);
+							jsLink.setTextContent(" "); // important
+							renderResponse.addProperty(MimeResponse.MARKUP_HEAD_ELEMENT, jsLink);
+						}
+						%>
+<%
+String urlIndex=manifestURL;
+if (request.getAttribute("learningTry") == null) { %>
+<script type="text/javascript">
+	localStorage.removeItem('scormpool');
+</script>
+<% }
+
+String iconsDir = "/liferaylms-portlet";
+String conTema = PropsUtil.get("scorm.icons.theme");
+try {
+	if (conTema != null && Boolean.valueOf(conTema)) {
+		iconsDir = themeDisplay.getPathThemeImages()+"/custom";
+	}
+} catch(Exception e) {
+	
+}
+
+%>
+   <script type="text/javascript">
+     function InitPlayer() {
+       PlayerConfiguration.Debug = false;
+       PlayerConfiguration.StorageSupport = true;
+
+       PlayerConfiguration.TreeMinusIcon = "<%= iconsDir %>/icons/scorm/minus.gif";
+       PlayerConfiguration.TreePlusIcon = "<%= iconsDir %>/icons/scorm/plus.gif";
+       PlayerConfiguration.TreeLeafIcon = "<%= iconsDir %>/icons/scorm/leaf.gif";
+       PlayerConfiguration.TreeActiveIcon = "<%= iconsDir %>/icons/scorm/select.gif";
+
+       PlayerConfiguration.BtnPreviousLabel = "<liferay-ui:message key="scorm.previous" />";
+       PlayerConfiguration.BtnContinueLabel = "<liferay-ui:message key="scorm.next" />";
+       PlayerConfiguration.BtnExitLabel = "<liferay-ui:message key="scorm.exit" />";
+     
+       PlayerConfiguration.BtnExitAllLabel = "<liferay-ui:message key="activity.try.exit" />";
+       
+           PlayerConfiguration.BtnAbandonLabel = "<liferay-ui:message key="scorm.abandon" />";
+       PlayerConfiguration.BtnAbandonAllLabel = "<liferay-ui:message key="scorm.abandonall" />";
+       PlayerConfiguration.BtnSuspendAllLabel = "<liferay-ui:message key="scorm.suspendall" />";
+
+       //manifest by URL   
+       Run.ManifestByURL("<%=urlIndex%>", false);
+     }
+     
+     AUI().ready(function() {
+    	 InitPlayer();
+   	 });
+     
+  </script>
+  	<%
+	if(renderRequest.getWindowState().toString().equals("normal"))
+	{
+	%>
+	<div class="placeholder_normal">
+  	<div id="placeholder_clicker" style="display: none"></div>
+	<div class="placeholder_menu" style="width: 99%;">
+ 		<div id="placeholder_navigationContainer"></div>
+ 		<div id="placeholder_treeContainer"></div>
+ 	<%}else{%>
+ 	<div class="placeholder_popup">
+  	<div id="placeholder_clicker" style="display: none"></div>
+ 		<div id="placeholder_treeContainer" class="scorm-treeContainer-popup">	
+ 	<%}%>
+ 	
+	</div>
+
+	<div id="placeholder_treecontentContainer">
+		
+		<%
+		if(renderRequest.getWindowState().toString().equals("normal"))
+		{
+			
+		%>
+	    	<div id="placeholder_contentIFrame" style="height: 680px; width: 100%;">
+	          <iframe id="contentIFrame" style="height:680px; width:100%" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" ></iframe>
+	    </div>
+		
+	    <%
+		}
+	    else
+	    {
+	    	%>
+	    	<script>
+	 
+	    	window.onresize=function(event)
+	    	{
+	    	    var html = document.documentElement;
+	            height=html.clientHeight;
+	    		var nav1=document.getElementById("placeholder_navigationContainer").clientHeight;
+	    		var nav2=document.getElementById("placeholder_navigationContainer2").clientHeight;
+	    		var iframeHeight=height-nav1-nav2-20;
+	    		iframeHeight=iframeHeight+"px";
+	    		document.getElementById("placeholder_contentIFrame").style.height=iframeHeight;
+	    		document.getElementById("contentIFrame").style.height=iframeHeight;
+	    	}
+	    	</script>
+	    	<div id="placeholder_contentIFrame" style="width:100%" >
+	          <iframe id="contentIFrame" style="height:688px;width:100%" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" ></iframe>
+	    </div>
+	    
+	    	<%
+	    	} 
+	    	%>
+	</div>
+</div>
+	<div id="placeholder_navigationContainer2"></div>
+
+
+
+<!-- end -->
+		<%
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	}
+	else
+	{
+	String path = assetRenderer.render(renderRequest, renderResponse, AssetRenderer.TEMPLATE_FULL_CONTENT); 
+	themeDisplay.setIncludeServiceJs(true); 
+
+	%>
+
 <liferay-util:include page="<%= path %>" portletId="<%= assetRendererFactory.getPortletId() %>">
 <liferay-util:param name="scoshow" value="<%=scoshow%>" />
 </liferay-util:include>
-
+	<%
+	}
+	%>
 <script type="text/javascript">
 if(typeof scormembededmode == 'undefined')
 {

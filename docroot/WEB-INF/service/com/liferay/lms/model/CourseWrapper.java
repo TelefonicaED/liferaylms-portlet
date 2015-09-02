@@ -72,6 +72,9 @@ public class CourseWrapper implements Course, ModelWrapper<Course> {
 		attributes.put("welcome", getWelcome());
 		attributes.put("welcomeMsg", getWelcomeMsg());
 		attributes.put("welcomeSubject", getWelcomeSubject());
+		attributes.put("goodbye", getGoodbye());
+		attributes.put("goodbyeMsg", getGoodbyeMsg());
+		attributes.put("goodbyeSubject", getGoodbyeSubject());
 
 		return attributes;
 	}
@@ -237,6 +240,24 @@ public class CourseWrapper implements Course, ModelWrapper<Course> {
 
 		if (welcomeSubject != null) {
 			setWelcomeSubject(welcomeSubject);
+		}
+
+		Boolean goodbye = (Boolean)attributes.get("goodbye");
+
+		if (goodbye != null) {
+			setGoodbye(goodbye);
+		}
+
+		String goodbyeMsg = (String)attributes.get("goodbyeMsg");
+
+		if (goodbyeMsg != null) {
+			setGoodbyeMsg(goodbyeMsg);
+		}
+
+		String goodbyeSubject = (String)attributes.get("goodbyeSubject");
+
+		if (goodbyeSubject != null) {
+			setGoodbyeSubject(goodbyeSubject);
 		}
 	}
 
@@ -1021,6 +1042,69 @@ public class CourseWrapper implements Course, ModelWrapper<Course> {
 	}
 
 	/**
+	* Returns the goodbye of this course.
+	*
+	* @return the goodbye of this course
+	*/
+	public boolean getGoodbye() {
+		return _course.getGoodbye();
+	}
+
+	/**
+	* Returns <code>true</code> if this course is goodbye.
+	*
+	* @return <code>true</code> if this course is goodbye; <code>false</code> otherwise
+	*/
+	public boolean isGoodbye() {
+		return _course.isGoodbye();
+	}
+
+	/**
+	* Sets whether this course is goodbye.
+	*
+	* @param goodbye the goodbye of this course
+	*/
+	public void setGoodbye(boolean goodbye) {
+		_course.setGoodbye(goodbye);
+	}
+
+	/**
+	* Returns the goodbye msg of this course.
+	*
+	* @return the goodbye msg of this course
+	*/
+	public java.lang.String getGoodbyeMsg() {
+		return _course.getGoodbyeMsg();
+	}
+
+	/**
+	* Sets the goodbye msg of this course.
+	*
+	* @param goodbyeMsg the goodbye msg of this course
+	*/
+	public void setGoodbyeMsg(java.lang.String goodbyeMsg) {
+		_course.setGoodbyeMsg(goodbyeMsg);
+	}
+
+	/**
+	* Returns the goodbye subject of this course.
+	*
+	* @return the goodbye subject of this course
+	*/
+	public java.lang.String getGoodbyeSubject() {
+		return _course.getGoodbyeSubject();
+	}
+
+	/**
+	* Sets the goodbye subject of this course.
+	*
+	* @param goodbyeSubject the goodbye subject of this course
+	*/
+	public void setGoodbyeSubject(java.lang.String goodbyeSubject) {
+		_course.setGoodbyeSubject(goodbyeSubject);
+	}
+
+	/**
 	* @deprecated Renamed to {@link #isApproved()}
 	*/
 	public boolean getApproved() {
@@ -1147,7 +1231,7 @@ public class CourseWrapper implements Course, ModelWrapper<Course> {
 		return new CourseWrapper((Course)_course.clone());
 	}
 
-	public int compareTo(Course course) {
+	public int compareTo(com.liferay.lms.model.Course course) {
 		return _course.compareTo(course);
 	}
 
@@ -1156,11 +1240,11 @@ public class CourseWrapper implements Course, ModelWrapper<Course> {
 		return _course.hashCode();
 	}
 
-	public com.liferay.portal.model.CacheModel<Course> toCacheModel() {
+	public com.liferay.portal.model.CacheModel<com.liferay.lms.model.Course> toCacheModel() {
 		return _course.toCacheModel();
 	}
 
-	public Course toEscapedModel() {
+	public com.liferay.lms.model.Course toEscapedModel() {
 		return new CourseWrapper(_course.toEscapedModel());
 	}
 

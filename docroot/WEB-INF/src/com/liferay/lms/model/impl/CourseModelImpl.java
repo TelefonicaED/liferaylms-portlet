@@ -98,9 +98,12 @@ public class CourseModelImpl extends BaseModelImpl<Course>
 			{ "calificationType", Types.BIGINT },
 			{ "welcome", Types.BOOLEAN },
 			{ "welcomeMsg", Types.VARCHAR },
-			{ "welcomeSubject", Types.VARCHAR }
+			{ "welcomeSubject", Types.VARCHAR },
+			{ "goodbye", Types.BOOLEAN },
+			{ "goodbyeMsg", Types.VARCHAR },
+			{ "goodbyeSubject", Types.VARCHAR }
 		};
-	public static final String TABLE_SQL_CREATE = "create table Lms_Course (uuid_ VARCHAR(75) null,courseId LONG not null primary key,companyId LONG,groupId LONG,userId LONG,userName VARCHAR(75) null,groupCreatedId LONG,createDate DATE null,modifiedDate DATE null,status INTEGER,statusByUserId LONG,statusByUserName VARCHAR(75) null,statusDate DATE null,title STRING null,description STRING null,friendlyURL VARCHAR(100) null,startDate DATE null,endDate DATE null,icon LONG,CourseEvalId LONG,CourseExtraData TEXT null,closed BOOLEAN,maxusers LONG,calificationType LONG,welcome BOOLEAN,welcomeMsg TEXT null,welcomeSubject VARCHAR(75) null)";
+	public static final String TABLE_SQL_CREATE = "create table Lms_Course (uuid_ VARCHAR(75) null,courseId LONG not null primary key,companyId LONG,groupId LONG,userId LONG,userName VARCHAR(75) null,groupCreatedId LONG,createDate DATE null,modifiedDate DATE null,status INTEGER,statusByUserId LONG,statusByUserName VARCHAR(75) null,statusDate DATE null,title STRING null,description STRING null,friendlyURL VARCHAR(100) null,startDate DATE null,endDate DATE null,icon LONG,CourseEvalId LONG,CourseExtraData TEXT null,closed BOOLEAN,maxusers LONG,calificationType LONG,welcome BOOLEAN,welcomeMsg TEXT null,welcomeSubject VARCHAR(75) null,goodbye BOOLEAN,goodbyeMsg TEXT null,goodbyeSubject VARCHAR(75) null)";
 	public static final String TABLE_SQL_DROP = "drop table Lms_Course";
 	public static final String ORDER_BY_JPQL = " ORDER BY course.courseId ASC";
 	public static final String ORDER_BY_SQL = " ORDER BY Lms_Course.courseId ASC";
@@ -164,6 +167,9 @@ public class CourseModelImpl extends BaseModelImpl<Course>
 		model.setWelcome(soapModel.getWelcome());
 		model.setWelcomeMsg(soapModel.getWelcomeMsg());
 		model.setWelcomeSubject(soapModel.getWelcomeSubject());
+		model.setGoodbye(soapModel.getGoodbye());
+		model.setGoodbyeMsg(soapModel.getGoodbyeMsg());
+		model.setGoodbyeSubject(soapModel.getGoodbyeSubject());
 
 		return model;
 	}
@@ -249,6 +255,9 @@ public class CourseModelImpl extends BaseModelImpl<Course>
 		attributes.put("welcome", getWelcome());
 		attributes.put("welcomeMsg", getWelcomeMsg());
 		attributes.put("welcomeSubject", getWelcomeSubject());
+		attributes.put("goodbye", getGoodbye());
+		attributes.put("goodbyeMsg", getGoodbyeMsg());
+		attributes.put("goodbyeSubject", getGoodbyeSubject());
 
 		return attributes;
 	}
@@ -415,6 +424,24 @@ public class CourseModelImpl extends BaseModelImpl<Course>
 
 		if (welcomeSubject != null) {
 			setWelcomeSubject(welcomeSubject);
+		}
+
+		Boolean goodbye = (Boolean)attributes.get("goodbye");
+
+		if (goodbye != null) {
+			setGoodbye(goodbye);
+		}
+
+		String goodbyeMsg = (String)attributes.get("goodbyeMsg");
+
+		if (goodbyeMsg != null) {
+			setGoodbyeMsg(goodbyeMsg);
+		}
+
+		String goodbyeSubject = (String)attributes.get("goodbyeSubject");
+
+		if (goodbyeSubject != null) {
+			setGoodbyeSubject(goodbyeSubject);
 		}
 	}
 
@@ -939,6 +966,44 @@ public class CourseModelImpl extends BaseModelImpl<Course>
 		_welcomeSubject = welcomeSubject;
 	}
 
+	public boolean getGoodbye() {
+		return _goodbye;
+	}
+
+	public boolean isGoodbye() {
+		return _goodbye;
+	}
+
+	public void setGoodbye(boolean goodbye) {
+		_goodbye = goodbye;
+	}
+
+	public String getGoodbyeMsg() {
+		if (_goodbyeMsg == null) {
+			return StringPool.BLANK;
+		}
+		else {
+			return _goodbyeMsg;
+		}
+	}
+
+	public void setGoodbyeMsg(String goodbyeMsg) {
+		_goodbyeMsg = goodbyeMsg;
+	}
+
+	public String getGoodbyeSubject() {
+		if (_goodbyeSubject == null) {
+			return StringPool.BLANK;
+		}
+		else {
+			return _goodbyeSubject;
+		}
+	}
+
+	public void setGoodbyeSubject(String goodbyeSubject) {
+		_goodbyeSubject = goodbyeSubject;
+	}
+
 	/**
 	 * @deprecated {@link #isApproved}
 	 */
@@ -1087,6 +1152,9 @@ public class CourseModelImpl extends BaseModelImpl<Course>
 		courseImpl.setWelcome(getWelcome());
 		courseImpl.setWelcomeMsg(getWelcomeMsg());
 		courseImpl.setWelcomeSubject(getWelcomeSubject());
+		courseImpl.setGoodbye(getGoodbye());
+		courseImpl.setGoodbyeMsg(getGoodbyeMsg());
+		courseImpl.setGoodbyeSubject(getGoodbyeSubject());
 
 		courseImpl.resetOriginalValues();
 
@@ -1321,12 +1389,30 @@ public class CourseModelImpl extends BaseModelImpl<Course>
 			courseCacheModel.welcomeSubject = null;
 		}
 
+		courseCacheModel.goodbye = getGoodbye();
+
+		courseCacheModel.goodbyeMsg = getGoodbyeMsg();
+
+		String goodbyeMsg = courseCacheModel.goodbyeMsg;
+
+		if ((goodbyeMsg != null) && (goodbyeMsg.length() == 0)) {
+			courseCacheModel.goodbyeMsg = null;
+		}
+
+		courseCacheModel.goodbyeSubject = getGoodbyeSubject();
+
+		String goodbyeSubject = courseCacheModel.goodbyeSubject;
+
+		if ((goodbyeSubject != null) && (goodbyeSubject.length() == 0)) {
+			courseCacheModel.goodbyeSubject = null;
+		}
+
 		return courseCacheModel;
 	}
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(55);
+		StringBundler sb = new StringBundler(61);
 
 		sb.append("{uuid=");
 		sb.append(getUuid());
@@ -1382,13 +1468,19 @@ public class CourseModelImpl extends BaseModelImpl<Course>
 		sb.append(getWelcomeMsg());
 		sb.append(", welcomeSubject=");
 		sb.append(getWelcomeSubject());
+		sb.append(", goodbye=");
+		sb.append(getGoodbye());
+		sb.append(", goodbyeMsg=");
+		sb.append(getGoodbyeMsg());
+		sb.append(", goodbyeSubject=");
+		sb.append(getGoodbyeSubject());
 		sb.append("}");
 
 		return sb.toString();
 	}
 
 	public String toXmlString() {
-		StringBundler sb = new StringBundler(85);
+		StringBundler sb = new StringBundler(94);
 
 		sb.append("<model><model-name>");
 		sb.append("com.liferay.lms.model.Course");
@@ -1502,6 +1594,18 @@ public class CourseModelImpl extends BaseModelImpl<Course>
 			"<column><column-name>welcomeSubject</column-name><column-value><![CDATA[");
 		sb.append(getWelcomeSubject());
 		sb.append("]]></column-value></column>");
+		sb.append(
+			"<column><column-name>goodbye</column-name><column-value><![CDATA[");
+		sb.append(getGoodbye());
+		sb.append("]]></column-value></column>");
+		sb.append(
+			"<column><column-name>goodbyeMsg</column-name><column-value><![CDATA[");
+		sb.append(getGoodbyeMsg());
+		sb.append("]]></column-value></column>");
+		sb.append(
+			"<column><column-name>goodbyeSubject</column-name><column-value><![CDATA[");
+		sb.append(getGoodbyeSubject());
+		sb.append("]]></column-value></column>");
 
 		sb.append("</model>");
 
@@ -1555,6 +1659,9 @@ public class CourseModelImpl extends BaseModelImpl<Course>
 	private boolean _welcome;
 	private String _welcomeMsg;
 	private String _welcomeSubject;
+	private boolean _goodbye;
+	private String _goodbyeMsg;
+	private String _goodbyeSubject;
 	private long _columnBitmask;
 	private Course _escapedModelProxy;
 }

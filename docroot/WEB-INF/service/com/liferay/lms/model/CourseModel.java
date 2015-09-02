@@ -668,6 +668,57 @@ public interface CourseModel extends BaseModel<Course>, GroupedModel,
 	public void setWelcomeSubject(String welcomeSubject);
 
 	/**
+	 * Returns the goodbye of this course.
+	 *
+	 * @return the goodbye of this course
+	 */
+	public boolean getGoodbye();
+
+	/**
+	 * Returns <code>true</code> if this course is goodbye.
+	 *
+	 * @return <code>true</code> if this course is goodbye; <code>false</code> otherwise
+	 */
+	public boolean isGoodbye();
+
+	/**
+	 * Sets whether this course is goodbye.
+	 *
+	 * @param goodbye the goodbye of this course
+	 */
+	public void setGoodbye(boolean goodbye);
+
+	/**
+	 * Returns the goodbye msg of this course.
+	 *
+	 * @return the goodbye msg of this course
+	 */
+	@AutoEscape
+	public String getGoodbyeMsg();
+
+	/**
+	 * Sets the goodbye msg of this course.
+	 *
+	 * @param goodbyeMsg the goodbye msg of this course
+	 */
+	public void setGoodbyeMsg(String goodbyeMsg);
+
+	/**
+	 * Returns the goodbye subject of this course.
+	 *
+	 * @return the goodbye subject of this course
+	 */
+	@AutoEscape
+	public String getGoodbyeSubject();
+
+	/**
+	 * Sets the goodbye subject of this course.
+	 *
+	 * @param goodbyeSubject the goodbye subject of this course
+	 */
+	public void setGoodbyeSubject(String goodbyeSubject);
+
+	/**
 	 * @deprecated Renamed to {@link #isApproved()}
 	 */
 	public boolean getApproved();

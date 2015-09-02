@@ -61,7 +61,10 @@ create table Lms_Course (
 	calificationType LONG,
 	welcome BOOLEAN,
 	welcomeMsg TEXT null,
-	welcomeSubject VARCHAR(75) null
+	welcomeSubject VARCHAR(75) null,
+	goodbye BOOLEAN,
+	goodbyeMsg TEXT null,
+	goodbyeSubject VARCHAR(75) null
 );
 
 create table Lms_CourseCompetence (

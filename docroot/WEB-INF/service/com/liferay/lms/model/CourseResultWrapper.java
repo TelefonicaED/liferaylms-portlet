@@ -391,7 +391,7 @@ public class CourseResultWrapper implements CourseResult,
 		return new CourseResultWrapper((CourseResult)_courseResult.clone());
 	}
 
-	public int compareTo(CourseResult courseResult) {
+	public int compareTo(com.liferay.lms.model.CourseResult courseResult) {
 		return _courseResult.compareTo(courseResult);
 	}
 
@@ -400,11 +400,11 @@ public class CourseResultWrapper implements CourseResult,
 		return _courseResult.hashCode();
 	}
 
-	public com.liferay.portal.model.CacheModel<CourseResult> toCacheModel() {
+	public com.liferay.portal.model.CacheModel<com.liferay.lms.model.CourseResult> toCacheModel() {
 		return _courseResult.toCacheModel();
 	}
 
-	public CourseResult toEscapedModel() {
+	public com.liferay.lms.model.CourseResult toEscapedModel() {
 		return new CourseResultWrapper(_courseResult.toEscapedModel());
 	}
 

@@ -1,8 +1,5 @@
 package com.liferay.lms.asset;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.Locale;
 
 import javax.portlet.MimeResponse;
@@ -14,8 +11,6 @@ import javax.script.Invocable;
 import javax.script.ScriptException;
 import javax.servlet.http.HttpServletRequest;
 
-import com.liferay.lms.learningactivity.scormcontent.BaseScormAssetRenderer;
-import com.liferay.lms.learningactivity.scormcontent.ScormContentAsset;
 import com.liferay.lms.model.SCORMContent;
 import com.liferay.lms.service.ClpSerializer;
 import com.liferay.lms.service.SCORMContentLocalServiceUtil;
@@ -25,9 +20,6 @@ import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.WebKeys;
-import com.liferay.portal.kernel.xml.Document;
-import com.liferay.portal.kernel.xml.DocumentException;
-import com.liferay.portal.kernel.xml.SAXReaderUtil;
 import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.service.ServiceContext;

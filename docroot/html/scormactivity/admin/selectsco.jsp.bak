@@ -1,5 +1,3 @@
-<%@page import="com.liferay.lms.learningactivity.scormcontent.ScormContenRegistry"%>
-<%@page import="com.liferay.lms.learningactivity.scormcontent.ScormContentAsset"%>
 <%@page import="javax.portlet.RenderResponse"%>
 <%@page import="javax.portlet.RenderRequest"%>
 <%@page import="javax.portlet.PortletRequest"%>
@@ -69,11 +67,15 @@ public void printItems(Element itemi,JspWriter out,long assetId,String assetTitl
 	{
 		
 		AssetEntry entry=AssetEntryLocalServiceUtil.getEntry(assetId);
-		ScormContentAsset scormContentAsset=ScormContenRegistry.getScormContentAsset(entry.getClassName());
-		
-		if(scormContentAsset!=null)
+		if(entry.getClassName().equals(SCORMContent.class.getName()))
 		{
-			Document manifest=scormContentAsset.getManifest(renderRequest, entry);
+			
+			SCORMContent scorm=SCORMContentLocalServiceUtil.getSCORMContent(entry.getClassPK())	;
+			String rutaDatos = SCORMContentLocalServiceUtil.getBaseDir();
+		
+			String urlIndex=rutaDatos+"/"+Long.toString(scorm.getCompanyId())+"/"+Long.toString(scorm.getGroupId())+"/"+scorm.getUuid()+"/imsmanifest.xml";
+			FileInputStream fis = new FileInputStream(urlIndex);
+			Document manifest=SAXReaderUtil.read(fis);
 			Element organizatEl=manifest.getRootElement().element("organizations").element("organization");
 			printItems(organizatEl,out,assetId,assetTitle,assertEditable,assertWindowable,renderRequest,renderResponse, portletName, themeDisplay.getPlid());
 		}

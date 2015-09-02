@@ -58,6 +58,9 @@ public class CourseSoap implements Serializable {
 		soapModel.setWelcome(model.getWelcome());
 		soapModel.setWelcomeMsg(model.getWelcomeMsg());
 		soapModel.setWelcomeSubject(model.getWelcomeSubject());
+		soapModel.setGoodbye(model.getGoodbye());
+		soapModel.setGoodbyeMsg(model.getGoodbyeMsg());
+		soapModel.setGoodbyeSubject(model.getGoodbyeSubject());
 
 		return soapModel;
 	}
@@ -334,6 +337,34 @@ public class CourseSoap implements Serializable {
 		_welcomeSubject = welcomeSubject;
 	}
 
+	public boolean getGoodbye() {
+		return _goodbye;
+	}
+
+	public boolean isGoodbye() {
+		return _goodbye;
+	}
+
+	public void setGoodbye(boolean goodbye) {
+		_goodbye = goodbye;
+	}
+
+	public String getGoodbyeMsg() {
+		return _goodbyeMsg;
+	}
+
+	public void setGoodbyeMsg(String goodbyeMsg) {
+		_goodbyeMsg = goodbyeMsg;
+	}
+
+	public String getGoodbyeSubject() {
+		return _goodbyeSubject;
+	}
+
+	public void setGoodbyeSubject(String goodbyeSubject) {
+		_goodbyeSubject = goodbyeSubject;
+	}
+
 	private String _uuid;
 	private long _courseId;
 	private long _companyId;
@@ -361,4 +392,7 @@ public class CourseSoap implements Serializable {
 	private boolean _welcome;
 	private String _welcomeMsg;
 	private String _welcomeSubject;
+	private boolean _goodbye;
+	private String _goodbyeMsg;
+	private String _goodbyeSubject;
 }
