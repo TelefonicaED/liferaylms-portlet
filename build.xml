@@ -1,0 +1,116 @@
+<?xml version="1.0"?>
+<!DOCTYPE project>
+
+<project name="liferaylms-portlet" basedir="." default="deploy" xmlns:antelope="antlib:ise.antelope.tasks">
+ <import file="../build-common-portlet.xml" />
+
+ <property name="native.lang.dir" value="docroot/WEB-INF/src/content/" />
+ <!--property name="lang.dir" value="docroot/WEB-INF/classes/content/" /-->
+ <property name="lang.dir" value="docroot/WEB-INF/src/content/" />
+        
+ <target name="compile" depends="clean">
+  <antcall target="build-common-plugin.compile" />
+  <!--antcall target="build-portlet-language-files" /-->
+ </target>
+
+ <target name="build-portlet-language-files">
+
+    <for param="lang.native.file">
+        <path>
+                <fileset dir="${native.lang.dir}" includes="**/Language*.properties" />
+        </path>
+        <sequential>
+                <basename property="lang.native.file.basename" file="@{lang.native.file}"/>
+                <loadfile property="native.file.contents" srcfile="@{lang.native.file}"/>  
+                <antelope:grep in="${native.file.contents}" regex="javax\.portlet\.title\.(.*)=(.*)" group="1" property="portlet.names" allmatches="yes"
+                separator="${line.separator}"/>
+                
+                <if>
+                 <isset property="portlet.names"/>
+                 <then>
+                <for list="${portlet.names}" param="portlet.name" delimiter="${line.separator}" >
+                  <sequential>
+                        
+                        <antelope:stringutil property="portlet.name.lower" string="@{portlet.name}">
+                            <antelope:lowercase/>
+                                <antelope:trim/>
+                        </antelope:stringutil>
+                        
+                        <mkdir dir="${lang.dir}${portlet.name.lower}"/>
+
+                        <copy tofile="${lang.dir}${portlet.name.lower}/${lang.native.file.basename}" file="@{lang.native.file}" >
+                                <filterchain>
+                                        <striplinecomments>
+                                          <comment value="#"/>
+                                        </striplinecomments>
+                            <linecontainsregexp negate="true">
+                                <regexp pattern="javax\.portlet\.title\.(.*)=(.*)"/>
+                            </linecontainsregexp>
+                            <linecontainsregexp negate="true">
+                                <regexp pattern="javax\.portlet\.long-title\.(.*)=(.*)"/>
+                            </linecontainsregexp>
+                            <linecontainsregexp negate="true">
+                                <regexp pattern="javax\.portlet\.description\.(.*)=(.*)"/>
+                            </linecontainsregexp>
+                        </filterchain>
+                        </copy>
+                        
+                        <antelope:grep in="${native.file.contents}" regex="javax\.portlet\.title\.@{portlet.name}=(.*)" group="1" property="portlet.title" />
+                        <antelope:grep in="${native.file.contents}" regex="javax\.portlet\.long-title\.@{portlet.name}=(.*)" group="1" property="portlet.long-title" />
+                        <antelope:grep in="${native.file.contents}" regex="javax\.portlet\.description\.@{portlet.name}=(.*)" group="1" property="portlet.description" />
+                        
+                        <antelope:stringutil property="portlet.title.trim" string="${portlet.title}">
+                                <antelope:trim/>
+                        </antelope:stringutil>
+                        
+                        <if>
+                         <isset property="portlet.long-title"/>
+                         <then>
+                                <antelope:stringutil property="portlet.long-title.trim" string="${portlet.long-title}">
+                                        <antelope:trim/>
+                                </antelope:stringutil>
+                         </then>
+                         <else>
+                                <var name="portlet.long-title.trim" value="${portlet.title.trim}" />
+                         </else>
+                         </if>
+                        
+                        <if>
+                         <isset property="portlet.description"/>
+                         <then>
+                                <antelope:stringutil property="portlet.description.trim" string="${portlet.description}">
+                                        <antelope:trim/>
+                                </antelope:stringutil>
+                         </then>
+                         <else>
+                                <var name="portlet.description.trim" value="${portlet.title.trim}" />
+                         </else>
+                         </if>
+                        
+                    <propertyfile file="${lang.dir}${portlet.name.lower}/${lang.native.file.basename}"
+                       comment="Generated from ${lang.native.file.basename}">
+                        <entry key="javax.portlet.title" value="${portlet.title.trim}" />
+                                <entry key="javax.portlet.long-title" value="${portlet.long-title.trim}" />
+                        <entry key="javax.portlet.description" value="${portlet.description.trim}" />
+                    </propertyfile>
+                        
+                        <var name="portlet.name.lower" unset="true"/> 
+                        <var name="portlet.title" unset="true"/>  
+                        <var name="portlet.long-title" unset="true"/>   
+                        <var name="portlet.description" unset="true"/>   
+                        <var name="portlet.title.trim" unset="true"/>  
+                        <var name="portlet.long-title.trim" unset="true"/>   
+                        <var name="portlet.description.trim" unset="true"/>   
+                  </sequential>
+                </for>
+                 </then>
+                </if>
+                
+                <var name="lang.native.file.basename" unset="true"/> 
+                <var name="lang.code" unset="true"/>  
+                <var name="native.file.contents" unset="true"/>   
+                <var name="portlet.names" unset="true"/>    
+        </sequential>
+    </for>
+ </target>
+</project>
