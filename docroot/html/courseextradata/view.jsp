@@ -22,5 +22,7 @@ if(course!=null && permissionChecker.hasPermission(course.getGroupId(),  Course.
 else
 {
 	renderRequest.setAttribute(WebKeys.PORTLET_CONFIGURATOR_VISIBILITY, Boolean.FALSE);
+	
+	
 }
 %>
