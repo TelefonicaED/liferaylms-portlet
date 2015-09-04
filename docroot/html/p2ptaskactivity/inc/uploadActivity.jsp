@@ -119,15 +119,6 @@ Liferay.provide(
 				fileName = fileName.substring(pos+1);
 			}
 			
-			alert(descrip);
-			
-			//A.one("#contentFile").html("");
-			//A.one("#contentDescription").html("");
-			
-			//A.one("#contentFile").html(fileName);
-			//A.one("#contentDescription").html(descrip);
-			
-			
 			
 			//Start opening popUp			
 			if(A.one('#<portlet:namespace />p2pconfirmation')) {
@@ -182,8 +173,6 @@ Liferay.provide(
 	        '<portlet:namespace />closeConfirmation',
 	        function() {
 				var A = AUI();
-				//var dialog = Liferay.Util.getWindow(popupIdToClose);
-				//dialog.destroy(); // You can try toggle/hide whatever You want
 				A.DialogManager.closeByChild('#<portlet:namespace />showp2pconfirmation');
 				A.one('#<portlet:namespace />showp2pconfirmation').remove();
 
