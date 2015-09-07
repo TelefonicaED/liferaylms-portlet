@@ -38,4 +38,10 @@ public interface LearningActivity extends LearningActivityModel, PersistedModel 
 	public java.util.Date getEnddate();
 
 	public boolean isNullEndDate();
+
+	public java.lang.String getDescriptionFiltered(java.util.Locale locale,
+		boolean useDefault);
+
+	public java.lang.String getDescriptionFiltered(
+		java.lang.String languageId, boolean useDefault);
 }

@@ -60,6 +60,7 @@ public class ModuleWrapper implements Module, ModelWrapper<Module> {
 		attributes.put("endDate", getEndDate());
 		attributes.put("icon", getIcon());
 		attributes.put("precedence", getPrecedence());
+		attributes.put("allowedTime", getAllowedTime());
 
 		return attributes;
 	}
@@ -153,6 +154,12 @@ public class ModuleWrapper implements Module, ModelWrapper<Module> {
 
 		if (precedence != null) {
 			setPrecedence(precedence);
+		}
+
+		Long allowedTime = (Long)attributes.get("allowedTime");
+
+		if (allowedTime != null) {
+			setAllowedTime(allowedTime);
 		}
 	}
 
@@ -680,6 +687,24 @@ public class ModuleWrapper implements Module, ModelWrapper<Module> {
 	*/
 	public void setPrecedence(long precedence) {
 		_module.setPrecedence(precedence);
+	}
+
+	/**
+	* Returns the allowed time of this module.
+	*
+	* @return the allowed time of this module
+	*/
+	public long getAllowedTime() {
+		return _module.getAllowedTime();
+	}
+
+	/**
+	* Sets the allowed time of this module.
+	*
+	* @param allowedTime the allowed time of this module
+	*/
+	public void setAllowedTime(long allowedTime) {
+		_module.setAllowedTime(allowedTime);
 	}
 
 	public boolean isNew() {

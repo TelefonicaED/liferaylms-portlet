@@ -463,6 +463,20 @@ public interface ModuleModel extends BaseModel<Module>, GroupedModel {
 	 */
 	public void setPrecedence(long precedence);
 
+	/**
+	 * Returns the allowed time of this module.
+	 *
+	 * @return the allowed time of this module
+	 */
+	public long getAllowedTime();
+
+	/**
+	 * Sets the allowed time of this module.
+	 *
+	 * @param allowedTime the allowed time of this module
+	 */
+	public void setAllowedTime(long allowedTime);
+
 	public boolean isNew();
 
 	public void setNew(boolean n);

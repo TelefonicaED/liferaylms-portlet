@@ -43,6 +43,7 @@
 		<column name="feedbackCorrect" type="String"></column>
 		<column name="feedbackNoCorrect" type="String"></column>
 		<column name="weightinmodule" type="long"></column>
+		<column name="commentsActivated" type="boolean"></column>
 		<order by="asc">
 			<order-column name="moduleId" />
 			<order-column name="priority" />
@@ -236,6 +237,7 @@
         <column name="endDate" type="Date"></column>
         <column name="icon" type="long"></column>
         <column name="precedence" type="long" />
+        <column name="allowedTime" type="long" />
         
 		<order by="asc">
 			<order-column name="ordern" />

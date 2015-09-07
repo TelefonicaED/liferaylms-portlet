@@ -146,6 +146,7 @@
 			<hint name="max-length">75</hint>
 		</field>
 		<field name="weightinmodule" type="long" />
+		<field name="commentsActivated" type="boolean" />
 	</model>
 	<model name="com.liferay.lms.model.LearningActivityResult">
 		<field name="uuid" type="String" />
@@ -206,6 +207,7 @@
 		<field name="endDate" type="Date" />
 		<field name="icon" type="long" />
 		<field name="precedence" type="long" />
+		<field name="allowedTime" type="long" />
 	</model>
 	<model name="com.liferay.lms.model.ModuleResult">
 		<field name="moduleId" type="long" />

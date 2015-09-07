@@ -101,6 +101,7 @@ public class LearningActivityClp extends BaseModelImpl<LearningActivity>
 		attributes.put("feedbackCorrect", getFeedbackCorrect());
 		attributes.put("feedbackNoCorrect", getFeedbackNoCorrect());
 		attributes.put("weightinmodule", getWeightinmodule());
+		attributes.put("commentsActivated", getCommentsActivated());
 
 		return attributes;
 	}
@@ -261,6 +262,12 @@ public class LearningActivityClp extends BaseModelImpl<LearningActivity>
 
 		if (weightinmodule != null) {
 			setWeightinmodule(weightinmodule);
+		}
+
+		Boolean commentsActivated = (Boolean)attributes.get("commentsActivated");
+
+		if (commentsActivated != null) {
+			setCommentsActivated(commentsActivated);
 		}
 	}
 
@@ -676,11 +683,33 @@ public class LearningActivityClp extends BaseModelImpl<LearningActivity>
 		_weightinmodule = weightinmodule;
 	}
 
+	public boolean getCommentsActivated() {
+		return _commentsActivated;
+	}
+
+	public boolean isCommentsActivated() {
+		return _commentsActivated;
+	}
+
+	public void setCommentsActivated(boolean commentsActivated) {
+		_commentsActivated = commentsActivated;
+	}
+
 	public boolean isNullStartDate() {
 		throw new UnsupportedOperationException();
 	}
 
+	public java.lang.String getDescriptionFiltered(java.util.Locale locale,
+		boolean useDefault) {
+		throw new UnsupportedOperationException();
+	}
+
 	public boolean isNullEndDate() {
+		throw new UnsupportedOperationException();
+	}
+
+	public java.lang.String getDescriptionFiltered(
+		java.lang.String languageId, boolean useDefault) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -827,6 +856,7 @@ public class LearningActivityClp extends BaseModelImpl<LearningActivity>
 		clone.setFeedbackCorrect(getFeedbackCorrect());
 		clone.setFeedbackNoCorrect(getFeedbackNoCorrect());
 		clone.setWeightinmodule(getWeightinmodule());
+		clone.setCommentsActivated(getCommentsActivated());
 
 		return clone;
 	}
@@ -897,7 +927,7 @@ public class LearningActivityClp extends BaseModelImpl<LearningActivity>
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(53);
+		StringBundler sb = new StringBundler(55);
 
 		sb.append("{uuid=");
 		sb.append(getUuid());
@@ -951,13 +981,15 @@ public class LearningActivityClp extends BaseModelImpl<LearningActivity>
 		sb.append(getFeedbackNoCorrect());
 		sb.append(", weightinmodule=");
 		sb.append(getWeightinmodule());
+		sb.append(", commentsActivated=");
+		sb.append(getCommentsActivated());
 		sb.append("}");
 
 		return sb.toString();
 	}
 
 	public String toXmlString() {
-		StringBundler sb = new StringBundler(82);
+		StringBundler sb = new StringBundler(85);
 
 		sb.append("<model><model-name>");
 		sb.append("com.liferay.lms.model.LearningActivity");
@@ -1067,6 +1099,10 @@ public class LearningActivityClp extends BaseModelImpl<LearningActivity>
 			"<column><column-name>weightinmodule</column-name><column-value><![CDATA[");
 		sb.append(getWeightinmodule());
 		sb.append("]]></column-value></column>");
+		sb.append(
+			"<column><column-name>commentsActivated</column-name><column-value><![CDATA[");
+		sb.append(getCommentsActivated());
+		sb.append("]]></column-value></column>");
 
 		sb.append("</model>");
 
@@ -1103,5 +1139,6 @@ public class LearningActivityClp extends BaseModelImpl<LearningActivity>
 	private String _feedbackCorrect;
 	private String _feedbackNoCorrect;
 	private long _weightinmodule;
+	private boolean _commentsActivated;
 	private BaseModel<?> _learningActivityRemoteModel;
 }

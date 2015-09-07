@@ -207,7 +207,7 @@
 				
 				<% } %>
 				<%--<h3 class="description-h3"><liferay-ui:message key="description" /></h3> --%>
-				<div class="description"><%=activity.getDescription(themeDisplay.getLocale()) %></div>
+				<div class="description"><%=activity.getDescriptionFiltered(themeDisplay.getLocale(),true) %></div>
 				
 				
 				<% if((PermissionCheckerFactoryUtil.create(themeDisplay.getUser())).hasPermission(themeDisplay.getScopeGroupId(), "com.liferay.lms.model", themeDisplay.getScopeGroupId(), "VIEW_RESULTS")){ 

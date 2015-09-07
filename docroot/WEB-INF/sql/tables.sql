@@ -114,7 +114,8 @@ create table Lms_LearningActivity (
 	extracontent TEXT null,
 	feedbackCorrect VARCHAR(75) null,
 	feedbackNoCorrect VARCHAR(75) null,
-	weightinmodule LONG
+	weightinmodule LONG,
+	commentsActivated BOOLEAN
 );
 
 create table Lms_LearningActivityResult (
@@ -169,7 +170,8 @@ create table Lms_Module (
 	startDate DATE null,
 	endDate DATE null,
 	icon LONG,
-	precedence LONG
+	precedence LONG,
+	allowedTime LONG
 );
 
 create table Lms_ModuleResult (

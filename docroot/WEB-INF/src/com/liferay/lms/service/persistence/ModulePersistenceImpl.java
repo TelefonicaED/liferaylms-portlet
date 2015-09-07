@@ -529,6 +529,7 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 		moduleImpl.setEndDate(module.getEndDate());
 		moduleImpl.setIcon(module.getIcon());
 		moduleImpl.setPrecedence(module.getPrecedence());
+		moduleImpl.setAllowedTime(module.getAllowedTime());
 
 		return moduleImpl;
 	}

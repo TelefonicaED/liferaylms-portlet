@@ -72,6 +72,7 @@ public class LearningActivityWrapper implements LearningActivity,
 		attributes.put("feedbackCorrect", getFeedbackCorrect());
 		attributes.put("feedbackNoCorrect", getFeedbackNoCorrect());
 		attributes.put("weightinmodule", getWeightinmodule());
+		attributes.put("commentsActivated", getCommentsActivated());
 
 		return attributes;
 	}
@@ -231,6 +232,12 @@ public class LearningActivityWrapper implements LearningActivity,
 
 		if (weightinmodule != null) {
 			setWeightinmodule(weightinmodule);
+		}
+
+		Boolean commentsActivated = (Boolean)attributes.get("commentsActivated");
+
+		if (commentsActivated != null) {
+			setCommentsActivated(commentsActivated);
 		}
 	}
 
@@ -979,6 +986,33 @@ public class LearningActivityWrapper implements LearningActivity,
 	}
 
 	/**
+	* Returns the comments activated of this learning activity.
+	*
+	* @return the comments activated of this learning activity
+	*/
+	public boolean getCommentsActivated() {
+		return _learningActivity.getCommentsActivated();
+	}
+
+	/**
+	* Returns <code>true</code> if this learning activity is comments activated.
+	*
+	* @return <code>true</code> if this learning activity is comments activated; <code>false</code> otherwise
+	*/
+	public boolean isCommentsActivated() {
+		return _learningActivity.isCommentsActivated();
+	}
+
+	/**
+	* Sets whether this learning activity is comments activated.
+	*
+	* @param commentsActivated the comments activated of this learning activity
+	*/
+	public void setCommentsActivated(boolean commentsActivated) {
+		_learningActivity.setCommentsActivated(commentsActivated);
+	}
+
+	/**
 	* @deprecated Renamed to {@link #isApproved()}
 	*/
 	public boolean getApproved() {
@@ -1143,6 +1177,16 @@ public class LearningActivityWrapper implements LearningActivity,
 
 	public boolean isNullEndDate() {
 		return _learningActivity.isNullEndDate();
+	}
+
+	public java.lang.String getDescriptionFiltered(java.util.Locale locale,
+		boolean useDefault) {
+		return _learningActivity.getDescriptionFiltered(locale, useDefault);
+	}
+
+	public java.lang.String getDescriptionFiltered(
+		java.lang.String languageId, boolean useDefault) {
+		return _learningActivity.getDescriptionFiltered(languageId, useDefault);
 	}
 
 	/**

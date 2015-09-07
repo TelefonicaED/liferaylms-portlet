@@ -88,6 +88,7 @@ public class ModuleClp extends BaseModelImpl<Module> implements Module {
 		attributes.put("endDate", getEndDate());
 		attributes.put("icon", getIcon());
 		attributes.put("precedence", getPrecedence());
+		attributes.put("allowedTime", getAllowedTime());
 
 		return attributes;
 	}
@@ -182,6 +183,12 @@ public class ModuleClp extends BaseModelImpl<Module> implements Module {
 
 		if (precedence != null) {
 			setPrecedence(precedence);
+		}
+
+		Long allowedTime = (Long)attributes.get("allowedTime");
+
+		if (allowedTime != null) {
+			setAllowedTime(allowedTime);
 		}
 	}
 
@@ -500,6 +507,14 @@ public class ModuleClp extends BaseModelImpl<Module> implements Module {
 		_precedence = precedence;
 	}
 
+	public long getAllowedTime() {
+		return _allowedTime;
+	}
+
+	public void setAllowedTime(long allowedTime) {
+		_allowedTime = allowedTime;
+	}
+
 	public BaseModel<?> getModuleRemoteModel() {
 		return _moduleRemoteModel;
 	}
@@ -551,6 +566,7 @@ public class ModuleClp extends BaseModelImpl<Module> implements Module {
 		clone.setEndDate(getEndDate());
 		clone.setIcon(getIcon());
 		clone.setPrecedence(getPrecedence());
+		clone.setAllowedTime(getAllowedTime());
 
 		return clone;
 	}
@@ -607,7 +623,7 @@ public class ModuleClp extends BaseModelImpl<Module> implements Module {
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(31);
+		StringBundler sb = new StringBundler(33);
 
 		sb.append("{uuid=");
 		sb.append(getUuid());
@@ -639,13 +655,15 @@ public class ModuleClp extends BaseModelImpl<Module> implements Module {
 		sb.append(getIcon());
 		sb.append(", precedence=");
 		sb.append(getPrecedence());
+		sb.append(", allowedTime=");
+		sb.append(getAllowedTime());
 		sb.append("}");
 
 		return sb.toString();
 	}
 
 	public String toXmlString() {
-		StringBundler sb = new StringBundler(49);
+		StringBundler sb = new StringBundler(52);
 
 		sb.append("<model><model-name>");
 		sb.append("com.liferay.lms.model.Module");
@@ -711,6 +729,10 @@ public class ModuleClp extends BaseModelImpl<Module> implements Module {
 			"<column><column-name>precedence</column-name><column-value><![CDATA[");
 		sb.append(getPrecedence());
 		sb.append("]]></column-value></column>");
+		sb.append(
+			"<column><column-name>allowedTime</column-name><column-value><![CDATA[");
+		sb.append(getAllowedTime());
+		sb.append("]]></column-value></column>");
 
 		sb.append("</model>");
 
@@ -735,5 +757,6 @@ public class ModuleClp extends BaseModelImpl<Module> implements Module {
 	private Date _endDate;
 	private long _icon;
 	private long _precedence;
+	private long _allowedTime;
 	private BaseModel<?> _moduleRemoteModel;
 }

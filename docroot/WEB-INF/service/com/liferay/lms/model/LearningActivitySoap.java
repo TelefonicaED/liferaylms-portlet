@@ -57,6 +57,7 @@ public class LearningActivitySoap implements Serializable {
 		soapModel.setFeedbackCorrect(model.getFeedbackCorrect());
 		soapModel.setFeedbackNoCorrect(model.getFeedbackNoCorrect());
 		soapModel.setWeightinmodule(model.getWeightinmodule());
+		soapModel.setCommentsActivated(model.getCommentsActivated());
 
 		return soapModel;
 	}
@@ -319,6 +320,18 @@ public class LearningActivitySoap implements Serializable {
 		_weightinmodule = weightinmodule;
 	}
 
+	public boolean getCommentsActivated() {
+		return _commentsActivated;
+	}
+
+	public boolean isCommentsActivated() {
+		return _commentsActivated;
+	}
+
+	public void setCommentsActivated(boolean commentsActivated) {
+		_commentsActivated = commentsActivated;
+	}
+
 	private String _uuid;
 	private long _actId;
 	private long _companyId;
@@ -345,4 +358,5 @@ public class LearningActivitySoap implements Serializable {
 	private String _feedbackCorrect;
 	private String _feedbackNoCorrect;
 	private long _weightinmodule;
+	private boolean _commentsActivated;
 }

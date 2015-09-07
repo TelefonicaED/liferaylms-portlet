@@ -615,6 +615,7 @@ public class LearningActivityPersistenceImpl extends BasePersistenceImpl<Learnin
 		learningActivityImpl.setFeedbackCorrect(learningActivity.getFeedbackCorrect());
 		learningActivityImpl.setFeedbackNoCorrect(learningActivity.getFeedbackNoCorrect());
 		learningActivityImpl.setWeightinmodule(learningActivity.getWeightinmodule());
+		learningActivityImpl.setCommentsActivated(learningActivity.isCommentsActivated());
 
 		return learningActivityImpl;
 	}

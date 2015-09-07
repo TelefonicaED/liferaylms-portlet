@@ -639,6 +639,27 @@ public interface LearningActivityModel extends BaseModel<LearningActivity>,
 	public void setWeightinmodule(long weightinmodule);
 
 	/**
+	 * Returns the comments activated of this learning activity.
+	 *
+	 * @return the comments activated of this learning activity
+	 */
+	public boolean getCommentsActivated();
+
+	/**
+	 * Returns <code>true</code> if this learning activity is comments activated.
+	 *
+	 * @return <code>true</code> if this learning activity is comments activated; <code>false</code> otherwise
+	 */
+	public boolean isCommentsActivated();
+
+	/**
+	 * Sets whether this learning activity is comments activated.
+	 *
+	 * @param commentsActivated the comments activated of this learning activity
+	 */
+	public void setCommentsActivated(boolean commentsActivated);
+
+	/**
 	 * @deprecated Renamed to {@link #isApproved()}
 	 */
 	public boolean getApproved();

@@ -53,7 +53,7 @@ else
 	%>
 		<h2 class="description-title"><%=learnact.getTitle(themeDisplay.getLocale())%></h2>
 		<%--<h3 class="description-h3"><liferay-ui:message key="description" /></h3> --%>
-		<div class="description"><%=learnact.getDescription(themeDisplay.getLocale()) %></div>
+		<div class="description"><%=learnact.getDescriptionFiltered(themeDisplay.getLocale(),true) %></div>
 		
 	<%
 	

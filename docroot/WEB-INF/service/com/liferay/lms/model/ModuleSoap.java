@@ -46,6 +46,7 @@ public class ModuleSoap implements Serializable {
 		soapModel.setEndDate(model.getEndDate());
 		soapModel.setIcon(model.getIcon());
 		soapModel.setPrecedence(model.getPrecedence());
+		soapModel.setAllowedTime(model.getAllowedTime());
 
 		return soapModel;
 	}
@@ -218,6 +219,14 @@ public class ModuleSoap implements Serializable {
 		_precedence = precedence;
 	}
 
+	public long getAllowedTime() {
+		return _allowedTime;
+	}
+
+	public void setAllowedTime(long allowedTime) {
+		_allowedTime = allowedTime;
+	}
+
 	private String _uuid;
 	private long _moduleId;
 	private long _companyId;
@@ -233,4 +242,5 @@ public class ModuleSoap implements Serializable {
 	private Date _endDate;
 	private long _icon;
 	private long _precedence;
+	private long _allowedTime;
 }

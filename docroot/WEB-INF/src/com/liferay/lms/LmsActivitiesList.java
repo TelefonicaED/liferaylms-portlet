@@ -208,6 +208,7 @@ public class LmsActivitiesList extends MVCPortlet {
 		long actId = ParamUtil.getLong(uploadRequest, "resId", 0);
 		long moduleId = ParamUtil.getLong(uploadRequest, "resModuleId", 0);
 		long weightinmodule=ParamUtil.getLong(uploadRequest, "weightinmodule", 0);
+		boolean commentsActivated=ParamUtil.getBoolean(uploadRequest, "commentsActivated", false);
 		long precedence=ParamUtil.getLong(uploadRequest, "precedence", 0);
 		//String title = actionRequest.getParameter("title");
 		
@@ -403,6 +404,7 @@ public class LmsActivitiesList extends MVCPortlet {
 		
 		larn.setDescription( description,themeDisplay.getLocale());
 		larn.setWeightinmodule(weightinmodule);
+		larn.setCommentsActivated(commentsActivated);
 		larn.setPrecedence(precedence);
 		Enumeration<String> parNames= uploadRequest.getParameterNames();
 		

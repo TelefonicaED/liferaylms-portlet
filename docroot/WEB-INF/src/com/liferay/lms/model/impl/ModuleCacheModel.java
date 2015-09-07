@@ -34,7 +34,7 @@ import java.util.Date;
 public class ModuleCacheModel implements CacheModel<Module>, Serializable {
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(31);
+		StringBundler sb = new StringBundler(33);
 
 		sb.append("{uuid=");
 		sb.append(uuid);
@@ -66,6 +66,8 @@ public class ModuleCacheModel implements CacheModel<Module>, Serializable {
 		sb.append(icon);
 		sb.append(", precedence=");
 		sb.append(precedence);
+		sb.append(", allowedTime=");
+		sb.append(allowedTime);
 		sb.append("}");
 
 		return sb.toString();
@@ -139,6 +141,7 @@ public class ModuleCacheModel implements CacheModel<Module>, Serializable {
 
 		moduleImpl.setIcon(icon);
 		moduleImpl.setPrecedence(precedence);
+		moduleImpl.setAllowedTime(allowedTime);
 
 		moduleImpl.resetOriginalValues();
 
@@ -160,4 +163,5 @@ public class ModuleCacheModel implements CacheModel<Module>, Serializable {
 	public long endDate;
 	public long icon;
 	public long precedence;
+	public long allowedTime;
 }

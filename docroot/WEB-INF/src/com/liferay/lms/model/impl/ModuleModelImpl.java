@@ -85,9 +85,10 @@ public class ModuleModelImpl extends BaseModelImpl<Module>
 			{ "startDate", Types.TIMESTAMP },
 			{ "endDate", Types.TIMESTAMP },
 			{ "icon", Types.BIGINT },
-			{ "precedence", Types.BIGINT }
+			{ "precedence", Types.BIGINT },
+			{ "allowedTime", Types.BIGINT }
 		};
-	public static final String TABLE_SQL_CREATE = "create table Lms_Module (uuid_ VARCHAR(75) null,moduleId LONG not null primary key,companyId LONG,groupId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,title STRING null,description STRING null,ordern LONG,startDate DATE null,endDate DATE null,icon LONG,precedence LONG)";
+	public static final String TABLE_SQL_CREATE = "create table Lms_Module (uuid_ VARCHAR(75) null,moduleId LONG not null primary key,companyId LONG,groupId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,title STRING null,description STRING null,ordern LONG,startDate DATE null,endDate DATE null,icon LONG,precedence LONG,allowedTime LONG)";
 	public static final String TABLE_SQL_DROP = "drop table Lms_Module";
 	public static final String ORDER_BY_JPQL = " ORDER BY module.ordern ASC";
 	public static final String ORDER_BY_SQL = " ORDER BY Lms_Module.ordern ASC";
@@ -135,6 +136,7 @@ public class ModuleModelImpl extends BaseModelImpl<Module>
 		model.setEndDate(soapModel.getEndDate());
 		model.setIcon(soapModel.getIcon());
 		model.setPrecedence(soapModel.getPrecedence());
+		model.setAllowedTime(soapModel.getAllowedTime());
 
 		return model;
 	}
@@ -208,6 +210,7 @@ public class ModuleModelImpl extends BaseModelImpl<Module>
 		attributes.put("endDate", getEndDate());
 		attributes.put("icon", getIcon());
 		attributes.put("precedence", getPrecedence());
+		attributes.put("allowedTime", getAllowedTime());
 
 		return attributes;
 	}
@@ -302,6 +305,12 @@ public class ModuleModelImpl extends BaseModelImpl<Module>
 
 		if (precedence != null) {
 			setPrecedence(precedence);
+		}
+
+		Long allowedTime = (Long)attributes.get("allowedTime");
+
+		if (allowedTime != null) {
+			setAllowedTime(allowedTime);
 		}
 	}
 
@@ -642,6 +651,14 @@ public class ModuleModelImpl extends BaseModelImpl<Module>
 		_precedence = precedence;
 	}
 
+	public long getAllowedTime() {
+		return _allowedTime;
+	}
+
+	public void setAllowedTime(long allowedTime) {
+		_allowedTime = allowedTime;
+	}
+
 	public long getColumnBitmask() {
 		return _columnBitmask;
 	}
@@ -698,6 +715,7 @@ public class ModuleModelImpl extends BaseModelImpl<Module>
 		moduleImpl.setEndDate(getEndDate());
 		moduleImpl.setIcon(getIcon());
 		moduleImpl.setPrecedence(getPrecedence());
+		moduleImpl.setAllowedTime(getAllowedTime());
 
 		moduleImpl.resetOriginalValues();
 
@@ -857,12 +875,14 @@ public class ModuleModelImpl extends BaseModelImpl<Module>
 
 		moduleCacheModel.precedence = getPrecedence();
 
+		moduleCacheModel.allowedTime = getAllowedTime();
+
 		return moduleCacheModel;
 	}
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(31);
+		StringBundler sb = new StringBundler(33);
 
 		sb.append("{uuid=");
 		sb.append(getUuid());
@@ -894,13 +914,15 @@ public class ModuleModelImpl extends BaseModelImpl<Module>
 		sb.append(getIcon());
 		sb.append(", precedence=");
 		sb.append(getPrecedence());
+		sb.append(", allowedTime=");
+		sb.append(getAllowedTime());
 		sb.append("}");
 
 		return sb.toString();
 	}
 
 	public String toXmlString() {
-		StringBundler sb = new StringBundler(49);
+		StringBundler sb = new StringBundler(52);
 
 		sb.append("<model><model-name>");
 		sb.append("com.liferay.lms.model.Module");
@@ -966,6 +988,10 @@ public class ModuleModelImpl extends BaseModelImpl<Module>
 			"<column><column-name>precedence</column-name><column-value><![CDATA[");
 		sb.append(getPrecedence());
 		sb.append("]]></column-value></column>");
+		sb.append(
+			"<column><column-name>allowedTime</column-name><column-value><![CDATA[");
+		sb.append(getAllowedTime());
+		sb.append("]]></column-value></column>");
 
 		sb.append("</model>");
 
@@ -999,6 +1025,7 @@ public class ModuleModelImpl extends BaseModelImpl<Module>
 	private Date _endDate;
 	private long _icon;
 	private long _precedence;
+	private long _allowedTime;
 	private long _columnBitmask;
 	private Module _escapedModelProxy;
 }

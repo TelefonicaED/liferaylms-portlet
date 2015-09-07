@@ -152,6 +152,7 @@
 		<property name="feedbackCorrect" type="com.liferay.portal.dao.orm.hibernate.StringType" />
 		<property name="feedbackNoCorrect" type="com.liferay.portal.dao.orm.hibernate.StringType" />
 		<property name="weightinmodule" type="com.liferay.portal.dao.orm.hibernate.LongType" />
+		<property name="commentsActivated" type="com.liferay.portal.dao.orm.hibernate.BooleanType" />
 	</class>
 	<class name="com.liferay.lms.model.impl.LearningActivityResultImpl" table="Lms_LearningActivityResult">
 		<id name="larId" type="long">
@@ -213,6 +214,7 @@
 		<property name="endDate" type="org.hibernate.type.TimestampType" />
 		<property name="icon" type="com.liferay.portal.dao.orm.hibernate.LongType" />
 		<property name="precedence" type="com.liferay.portal.dao.orm.hibernate.LongType" />
+		<property name="allowedTime" type="com.liferay.portal.dao.orm.hibernate.LongType" />
 	</class>
 	<class name="com.liferay.lms.model.impl.ModuleResultImpl" table="Lms_ModuleResult">
 		<id name="mrId" type="long">

@@ -210,6 +210,7 @@
 			<basic name="feedbackCorrect" />
 			<basic name="feedbackNoCorrect" />
 			<basic name="weightinmodule" />
+			<basic name="commentsActivated" />
 			<transient name="descriptionCurrentLanguageId" />
 			<transient name="descriptionMap" />
 			<transient name="modelAttributes" />
@@ -311,6 +312,7 @@
 			</basic>
 			<basic name="icon" />
 			<basic name="precedence" />
+			<basic name="allowedTime" />
 			<transient name="descriptionCurrentLanguageId" />
 			<transient name="descriptionMap" />
 			<transient name="modelAttributes" />

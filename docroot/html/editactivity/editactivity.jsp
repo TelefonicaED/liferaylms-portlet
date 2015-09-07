@@ -608,18 +608,25 @@ Liferay.provide(
 	    <%
 			boolean optional=false;
 			boolean mandatory = true;
+			boolean activateComments=false;
 			if(learnact!=null)
 			{
 				request.setAttribute("activity", learnact);
 				request.setAttribute("activityId", learnact.getActId());
 				optional=(learnact.getWeightinmodule()==0);
 				mandatory = (learnact.getWeightinmodule() != 0);
+				activateComments=learnact.getCommentsActivated();
 			}
 		%>
 		<aui:field-wrapper label="editactivity.mandatory" cssClass="editactivity-mandatory-field" name="mandatorylabel">
 			<aui:input label="editactivity.mandatory.yes" type="radio" name="weightinmodule" value="1" checked="<%= mandatory %>" inlineField="true" />
 			<aui:input label="editactivity.mandatory.no" type="radio" name="weightinmodule" value="0" checked="<%= !mandatory %>" inlineField="true" />
 			<aui:input type="hidden" name="mandatorylabel" />
+		</aui:field-wrapper>
+		<aui:field-wrapper label="editactivity.comments" cssClass="editactivity-comments-field" name="commentslabel">
+			<aui:input label="editactivity.comments.yes" type="radio" name="commentsActivated" value="true" checked="<%= activateComments %>" inlineField="true" />
+			<aui:input label="editactivity.comments.no" type="radio" name="commentsActivated" value="false" checked="<%= !activateComments %>" inlineField="true" />
+			<aui:input type="hidden" name="commentslabel" />
 		</aui:field-wrapper>
 	 <liferay-ui:panel-container extended="false" persistState="false">
 	 <%

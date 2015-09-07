@@ -15,7 +15,9 @@
 package com.liferay.lms.model.impl;
 
 import java.util.Date;
+import java.util.Locale;
 
+import com.liferay.lms.learningactivity.descriptionfilter.DescriptionFilterRegistry;
 import com.liferay.lms.model.Module;
 import com.liferay.lms.service.ModuleLocalServiceUtil;
 import com.liferay.portal.kernel.exception.SystemException;
@@ -112,5 +114,13 @@ public class LearningActivityImpl extends LearningActivityBaseImpl {
 			return true;
 		}
 	}
-
+	public String getDescriptionFiltered(Locale locale, boolean useDefault)
+    {
+		return DescriptionFilterRegistry.filter(this.getDescription(locale, useDefault));
+    }
+    public String getDescriptionFiltered(String languageId, boolean useDefault)
+    {
+    	return DescriptionFilterRegistry.filter(this.getDescription(languageId, useDefault));
+    		  
+    }
 }
