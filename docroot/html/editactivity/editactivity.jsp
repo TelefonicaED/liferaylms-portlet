@@ -50,6 +50,8 @@
 <liferay-ui:error/>
 <liferay-ui:error key="learningactivity.connect.error.timepassg" message="learningactivity.connect.error.timepassg"></liferay-ui:error>
 <liferay-ui:error key="learningactivity.connect.error.timepass.nan" message="learningactivity.connect.error.timepass.nan"></liferay-ui:error>
+<liferay-ui:error key="learningactivity.connect.error.time" message="learningactivity.connect.error.time"></liferay-ui:error>
+<liferay-ui:error key="learningactivity.connect.error.time.nan" message="learningactivity.connect.error.time.nan"></liferay-ui:error>
 <liferay-ui:error key="execactivity.editActivity.questionsPerPage.number" message="execActivity.options.error.questionsPerPage"></liferay-ui:error>
 <liferay-ui:error key="execactivity.editActivity.random.number" message="execActivity.options.error.random"></liferay-ui:error>
 
@@ -308,12 +310,23 @@ AUI().ready('node-base' ,'aui-form-validator', 'aui-overlay-context-panel', 'wid
         		number: '<%=UnicodeFormatter.toString(LanguageUtil.get(pageContext, "editActivity.passpuntuation.number")) %>',
         		range: '<%=UnicodeFormatter.toString(LanguageUtil.get(pageContext, "editActivity.passpuntuation.range")) %>',       		
             }
-			<% } %> 
+			<% } %>
+			
+			<% if(larntype.getTypeId() == 120) { %>
+        	,<portlet:namespace />time: {
+        		required: '<%=UnicodeFormatter.toString(LanguageUtil.get(pageContext, "learningactivity.connect.error.time")) %>',
+        		number: '<%=UnicodeFormatter.toString(LanguageUtil.get(pageContext, "learningactivity.connect.error.time.nan")) %>',
+            }
+        	,<portlet:namespace />timepass: {
+        		required: '<%=UnicodeFormatter.toString(LanguageUtil.get(pageContext, "learningactivity.connect.error.timepass")) %>',
+        		number: '<%=UnicodeFormatter.toString(LanguageUtil.get(pageContext, "learningactivity.connect.error.timepass.nan")) %>',
+            }
+        	<% } %>
 		};
 	
 	A.each(A.Object.keys(window), function(fieldName){
 		var field=window[fieldName];
-	    if((fieldName.indexOf('<portlet:namespace />validate_')==0)&&
+	    if((fieldName.indexOf('<portlet:namespace />validate_')==0) &&
 	       (A.Lang.isObject(field))&&
 	       (A.Object.hasKey(field,'rules'))&&
 	       (A.Object.hasKey(field,'fieldStrings'))) {
@@ -608,25 +621,18 @@ Liferay.provide(
 	    <%
 			boolean optional=false;
 			boolean mandatory = true;
-			boolean activateComments=false;
 			if(learnact!=null)
 			{
 				request.setAttribute("activity", learnact);
 				request.setAttribute("activityId", learnact.getActId());
 				optional=(learnact.getWeightinmodule()==0);
 				mandatory = (learnact.getWeightinmodule() != 0);
-				activateComments=learnact.getCommentsActivated();
 			}
 		%>
 		<aui:field-wrapper label="editactivity.mandatory" cssClass="editactivity-mandatory-field" name="mandatorylabel">
 			<aui:input label="editactivity.mandatory.yes" type="radio" name="weightinmodule" value="1" checked="<%= mandatory %>" inlineField="true" />
 			<aui:input label="editactivity.mandatory.no" type="radio" name="weightinmodule" value="0" checked="<%= !mandatory %>" inlineField="true" />
 			<aui:input type="hidden" name="mandatorylabel" />
-		</aui:field-wrapper>
-		<aui:field-wrapper label="editactivity.comments" cssClass="editactivity-comments-field" name="commentslabel">
-			<aui:input label="editactivity.comments.yes" type="radio" name="commentsActivated" value="true" checked="<%= activateComments %>" inlineField="true" />
-			<aui:input label="editactivity.comments.no" type="radio" name="commentsActivated" value="false" checked="<%= !activateComments %>" inlineField="true" />
-			<aui:input type="hidden" name="commentslabel" />
 		</aui:field-wrapper>
 	 <liferay-ui:panel-container extended="false" persistState="false">
 	 <%
