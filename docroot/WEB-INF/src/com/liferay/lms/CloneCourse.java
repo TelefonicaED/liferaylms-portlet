@@ -160,7 +160,14 @@ public class CloneCourse implements MessageListener {
 		
 		Date today=new Date(System.currentTimeMillis());
 
-		long layoutSetPrototypeId= Long.parseLong(this.serviceContext.getRequest().getParameter("courseTemplate").split("&")[1]);
+		String courseTemplate = this.serviceContext.getRequest().getParameter("courseTemplate");
+		long layoutSetPrototypeId = 0;
+		if(courseTemplate.indexOf("&")>-1){
+			layoutSetPrototypeId = Long.parseLong(courseTemplate.split("&")[1]);
+		}else{
+			layoutSetPrototypeId = Long.parseLong(courseTemplate);
+		}
+
 		/*LmsPrefs lmsPrefs=LmsPrefsLocalServiceUtil.getLmsPrefsIni(serviceContext.getCompanyId());
 		
 		System.out.println("  + getLmsTemplates: "+lmsPrefs.getLmsTemplates());
