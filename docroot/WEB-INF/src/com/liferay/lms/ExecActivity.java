@@ -19,14 +19,13 @@ import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
+import javax.portlet.WindowState;
 
 import org.apache.commons.beanutils.BeanComparator;
 import org.jsoup.Jsoup;
 
 import au.com.bytecode.opencsv.CSVWriter;
 
-import com.liferay.lms.auditing.AuditConstants;
-import com.liferay.lms.auditing.AuditingLogFactory;
 import com.liferay.lms.learningactivity.questiontype.QuestionType;
 import com.liferay.lms.learningactivity.questiontype.QuestionTypeRegistry;
 import com.liferay.lms.model.LearningActivity;
@@ -45,6 +44,7 @@ import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
+import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.servlet.HttpHeaders;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.SessionMessages;
@@ -56,6 +56,7 @@ import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.xml.Document;
@@ -71,7 +72,10 @@ import com.liferay.portal.util.PortalUtil;
 import com.liferay.portlet.asset.AssetRendererFactoryRegistryUtil;
 import com.liferay.portlet.asset.model.AssetRenderer;
 import com.liferay.portlet.asset.model.AssetRendererFactory;
+import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
+import com.liferay.portlet.asset.service.persistence.AssetEntryQuery;
 import com.liferay.util.bridges.mvc.MVCPortlet;
+import com.liferay.util.portlet.PortletProps;
 
 /**
  * Portlet implementation class ExecActivity
@@ -116,8 +120,7 @@ public class ExecActivity extends MVCPortlet
 			}
 
 			long random = GetterUtil.getLong(LearningActivityLocalServiceUtil.getExtraContentValue(actId,"random"));
-			List<TestQuestion> questions=TestQuestionLocalServiceUtil.getQuestions(actId);
-			long score=isPartial ? 0 : correctanswers*100/((random!=0 && random<questions.size())?random:questions.size());
+			long score=isPartial ? 0 : correctanswers*100/((random!=0 && random<questionIds.length)?random:questionIds.length);
 
 			LearningActivityResult learningActivityResult = LearningActivityResultLocalServiceUtil.getByActIdAndUserId(actId, PortalUtil.getUserId(actionRequest));
 			long oldResult=-1;
@@ -165,7 +168,11 @@ public class ExecActivity extends MVCPortlet
 		String improve=ParamUtil.getString(actionRequest, "improve", "false");
 
 		long questionsPerPage = ParamUtil.getInteger(actionRequest, "questionsPerPage", 1);
-
+		
+		String isMultiple = ParamUtil.getString(actionRequest, "banks-multipleselections", "false");
+		String isBank = ParamUtil.getString(actionRequest, "is-bank", "false"); 
+		String assetCategoryIds = ParamUtil.getString(actionRequest, "assetCategoryIds", StringPool.BLANK);
+		
 		if(randomString==0) {
 			LearningActivityLocalServiceUtil.setExtraContentValue(actId, "random", StringPool.BLANK);
 		}
@@ -206,7 +213,25 @@ public class ExecActivity extends MVCPortlet
 		else {
 			LearningActivityLocalServiceUtil.setExtraContentValue(actId, "questionsPerPage", Long.toString(questionsPerPage));
 		}
-
+		
+		if(isBank.equals("true")){
+			LearningActivityLocalServiceUtil.setExtraContentValue(actId,"isBank", "true");
+		}else if(isBank.equals("false")) {
+			LearningActivityLocalServiceUtil.setExtraContentValue(actId, "isBank", "false");
+		}
+		
+		if(isMultiple.equals("true")){
+			LearningActivityLocalServiceUtil.setExtraContentValue(actId,"isMultiple", "true");
+		}else if(isMultiple.equals("false")) {
+			LearningActivityLocalServiceUtil.setExtraContentValue(actId, "isMultiple", "false");
+		}
+		
+		if(!StringPool.BLANK.equals(assetCategoryIds)){
+			LearningActivityLocalServiceUtil.setExtraContentValue(actId,"categoriesId", assetCategoryIds);
+		}else{
+			LearningActivityLocalServiceUtil.setExtraContentValue(actId,"categoriesId", StringPool.BLANK);
+		}
+		
 		SessionMessages.add(actionRequest, "activity-saved-successfully");
 		actionResponse.setRenderParameter("jspPage", "/html/execactivity/test/admin/edit.jsp");
 
@@ -266,17 +291,65 @@ public class ExecActivity extends MVCPortlet
 		long questionType = ParamUtil.getLong(actionRequest, "typeId", -1);
 		String questionText = ParamUtil.get(actionRequest, "text", "");
 		String backUrl = ParamUtil.get(actionRequest, "backUrl", "");
+		String formatType = ParamUtil.getString(actionRequest, "formattype", PortletProps.get("lms.question.formattype.normal")); 
+		Document document = null;
+		Element rootElement = null;
+		
+		LearningActivityLocalServiceUtil.setExtraContentValue(actid, "isBank", "false");
+		
 		ThemeDisplay themeDisplay = (ThemeDisplay) actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
 		if(Validator.isNotNull(questionText)){//porque no se permite vacio ya que eliminar pregunta va por otro lado
 			TestQuestion question = null;
 			if(questionId == 0){//Nueva pregunta
-				question = TestQuestionLocalServiceUtil.addQuestion(actid, questionText, questionType);
+				document = SAXReaderUtil.createDocument();
+				rootElement = document.addElement("question");
+				Element elem = SAXReaderUtil.createElement("formattype");
+				elem.setText(formatType);		
+				rootElement.add(elem);
+				question = TestQuestionLocalServiceUtil.addQuestion(actid, questionText, questionType, document.formattedString());
 			}else{//Pregunta existente
 				question = TestQuestionLocalServiceUtil.getTestQuestion(questionId);
-				if(!questionText.equals(question.getText())){//Edicion de pregunta
-					question.setText(questionText);
-					TestQuestionLocalServiceUtil.updateTestQuestion(question);
+				String typeOrderBefore = "false";
+				try{
+					Document xml = SAXReaderUtil.read(question.getExtracontent());
+					Element ele = xml.getRootElement();
+					typeOrderBefore = (String) ele.element("formattype").getData();
+				}catch (DocumentException e){
+					document = SAXReaderUtil.createDocument();
+					rootElement = document.addElement("question");
+					Element ele = SAXReaderUtil.createElement("formattype");
+					ele.setText(formatType);		
+					rootElement.add(ele);
+				}catch (NullPointerException e){
+					document = SAXReaderUtil.createDocument();
+					rootElement = document.addElement("question");
+					Element ele = SAXReaderUtil.createElement("formattype");
+					ele.setText(formatType);		
+					rootElement.add(ele);
 				}
+				Element elemQuestion = null;
+				if(!questionText.equals(question.getText())||!formatType.equals(typeOrderBefore)){//Edicion de pregunta o alineacion
+					question.setText(questionText);
+					if((question.getExtracontent()==null)||(question.getExtracontent().trim().length()==0)){
+						document = SAXReaderUtil.createDocument();
+						rootElement = document.addElement("question");
+					}else{
+						document=SAXReaderUtil.read(question.getExtracontent());
+						rootElement =document.getRootElement();
+						elemQuestion = rootElement.element("formattype");
+						if(elemQuestion!=null)
+						{
+							elemQuestion.detach();
+							rootElement.remove(elemQuestion);
+						}
+					}
+					elemQuestion = SAXReaderUtil.createElement("formattype");
+					elemQuestion.setText(formatType);		
+					rootElement.add(elemQuestion);
+					question.setExtracontent(document.formattedString());
+					TestQuestionLocalServiceUtil.updateTestQuestion(question);
+				}					
+				
 			}
 			if(question!=null){
 				questionId = question.getQuestionId();
@@ -608,6 +681,10 @@ public class ExecActivity extends MVCPortlet
 
 		TestQuestion question = TestQuestionLocalServiceUtil.getTestQuestion(ParamUtil.getLong(actionRequest, "questionId"));
 		LearningActivity learnact = LearningActivityLocalServiceUtil.getLearningActivity(question.getActId());
+		List<TestAnswer> lTestAnswer = TestAnswerLocalServiceUtil.getTestAnswersByQuestionId(question.getQuestionId());
+		for ( TestAnswer testAnswer :  lTestAnswer ){
+			TestAnswerLocalServiceUtil.deleteTestAnswer(testAnswer);
+		}
 		TestQuestionLocalServiceUtil.deleteTestQuestion(question.getQuestionId());
 		SessionMessages.add(actionRequest, "question-deleted-successfully");
 
@@ -746,6 +823,46 @@ public class ExecActivity extends MVCPortlet
 				SessionErrors.add(renderRequest, "offlinetaskactivity.grades.bad-updating");
 			}
 		}
+	}
+	
+	public void setBankTest(ActionRequest actionRequest, ActionResponse actionResponse) throws Exception{
+		
+		long actId = ParamUtil.getLong(actionRequest, "actId", 0);
+		String redirect = actionRequest.getParameter("redirect");
+		String isMultiple = ParamUtil.getString(actionRequest, "banks-multipleselections", "false");
+		String isBank = ParamUtil.getString(actionRequest, "is-bank", "false"); 
+		String assetCategoryIds = ParamUtil.getString(actionRequest, "assetCategoryIds", StringPool.BLANK);
+		long[] longCategoryIds = GetterUtil.getLongValues(StringUtil.split(assetCategoryIds));
+		
+		AssetEntryQuery entryQuery = new AssetEntryQuery();
+		entryQuery.setAllCategoryIds(longCategoryIds);
+		
+		if(!Validator.equals(AssetEntryLocalServiceUtil.getEntries(entryQuery).size(), 0)){
+			LearningActivityLocalServiceUtil.setExtraContentValue(actId,"isBank", isBank);
+			LearningActivityLocalServiceUtil.setExtraContentValue(actId,"isMultiple", isMultiple);
+			if(!StringPool.BLANK.equals(assetCategoryIds)){
+				LearningActivityLocalServiceUtil.setExtraContentValue(actId,"categoriesId", assetCategoryIds);
+				SessionMessages.add(actionRequest,"data-exist-for-these-categories");
+			}else{
+				SessionErrors.add(actionRequest, "error-selector-categories-empty");
+			}
+		}else{
+			SessionErrors.add(actionRequest, "error-not-results");
+		}
+		
+		WindowState windowState = actionRequest.getWindowState();
+		if (Validator.isNotNull(redirect)) {
+			if (!windowState.equals(LiferayWindowState.POP_UP)) {
+				actionResponse.sendRedirect(redirect);
+			}
+			else {
+				redirect = PortalUtil.escapeRedirect(redirect);
+				if (Validator.isNotNull(redirect)) {
+					actionResponse.sendRedirect(redirect);
+				}
+			}
+		}
+		
 	}
 	
 	private void updateLearningActivityTryAndResult(
