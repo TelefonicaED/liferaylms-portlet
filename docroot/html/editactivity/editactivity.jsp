@@ -561,7 +561,7 @@ Liferay.provide(
 				boolean selected=false;
 				if(learnact!=null && learnact.getModuleId()==theModule.getModuleId())
 				{
-					selected=true;
+					selected=true; 
 				}
 				else
 				{
