@@ -318,7 +318,6 @@ public class TestQuestionLocalServiceImpl
 		boolean isMultiple = StringPool.TRUE.equals(LearningActivityLocalServiceUtil.getExtraContentValue(actId,"isMultiple"));
 		long[] assetCategoryIds = GetterUtil.getLongValues(StringUtil.split(LearningActivityLocalServiceUtil.getExtraContentValue(actId,"categoriesId")));
 		long[] classTypeIds = new long[]{typeId};
-		//int maxQuestions = Integer.parseInt(LearningActivityLocalServiceUtil.getExtraContentValue(actId,"random"));
 		int maxQuestions = GetterUtil.getInteger(LearningActivityLocalServiceUtil.getExtraContentValue(actId,"random"), 0);
 		Random r = new Random();
 		
@@ -346,13 +345,10 @@ public class TestQuestionLocalServiceImpl
 				
 				List<TestQuestion> questionsCopy = new ArrayList<TestQuestion>(questions);
 				while ( ( maxQuestions > sortQuestions.size() && questionsCopy.size() > 0) || ( maxQuestions == 0 && questionsCopy.size() > 0 ) ) {
-					//TODO para el caso de se decida usar bancos aleatorios y las preguntas no sean aleatorias sino en orden se usa el codigo comentado
-//					int index = 0;
-//					if(isMultiple){
-//						int index = r.nextInt(questionsCopy.size());
-//					}
-					
-					int index = r.nextInt(questionsCopy.size());
+					int index = 0;
+					if(isMultiple){
+						index = r.nextInt(questionsCopy.size());
+					}
 					sortQuestions.add(questionsCopy.get(index));
 					questionsCopy.remove(index);
 				}
