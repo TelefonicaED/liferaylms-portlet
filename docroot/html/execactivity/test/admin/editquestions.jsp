@@ -78,6 +78,8 @@ Liferay.provide(
 	
 </script>
 <div class="container-toolbar">
+	<liferay-ui:icon-menu  align="left" direction="down" extended="false" showWhenSingleIcon="false" message="execativity.editquestions.newquestion" cssClass="bt_new" showArrow="true" >
+	</liferay-ui:icon-menu>
 	<script type="text/javascript">
 		function modifyIsBank(value) {
 			var A = AUI();
@@ -92,7 +94,6 @@ Liferay.provide(
 			}
 		}
 	</script>
-	<liferay-ui:icon-menu align="left" direction="down" extended="false" showWhenSingleIcon="false" message="execativity.editquestions.newquestion" cssClass="bt_new" showArrow="true" />
 	<%
 		Course course = CourseLocalServiceUtil.fetchByGroupCreatedId(themeDisplay.getScopeGroupId());
 		boolean isCourse = true;
