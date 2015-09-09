@@ -632,7 +632,21 @@ public class LearningActivityTypeClp implements LearningActivityType {
 
 	@Override
 	public boolean allowsBank() {
-		return false;
+		
+		Object returnObj = null;
+		try {
+			returnObj = clp.invoke("allowsBank", new Object[] {});
+		}catch (Throwable t) {
+			t = ClpSerializer.translateThrowable(t);
+			if (t instanceof RuntimeException) {
+				throw (RuntimeException)t;
+			}
+			else {
+				throw new RuntimeException(t.getClass().getName() + " is not a valid exception");
+			}
+		}
+		
+		return ((Boolean)returnObj);
 	}
 
 }

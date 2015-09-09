@@ -35,5 +35,6 @@ public interface QuestionType
 	public void importXML(long questionId, Element question, TestAnswerLocalService testAnswerLocalService)throws SystemException, PortalException;
 	public int getMaxAnswers();
 	public int getDefaultAnswersNo();
-
+	public boolean isInline();
+		
 }

@@ -1,6 +1,11 @@
 <%@page import="com.liferay.portal.kernel.util.ListUtil"%>
 <%@page import="com.liferay.portal.kernel.util.PropsUtil"%>
 <%@page import="com.liferay.portal.kernel.servlet.SessionErrors"%>
+<%@page import="com.liferay.portal.kernel.xml.Document"%>
+<%@page import="com.liferay.portal.kernel.xml.DocumentException"%>
+<%@page import="com.liferay.portal.kernel.xml.Element"%>
+<%@page import="com.liferay.portal.kernel.xml.SAXReaderUtil"%>
+<%@page import="com.liferay.util.portlet.PortletProps"%>
 <%@page import="com.liferay.util.JavaScriptUtil"%>
 <%@page import="com.liferay.portal.kernel.util.ParamUtil"%>
 <%@page import="com.liferay.portal.kernel.util.StringPool"%>
@@ -19,6 +24,7 @@
 	long typeId = ParamUtil.getLong(request,"typeId", -1);
 	long actId = ParamUtil.getLong(request,"resId", 0);
 	String backUrl = ParamUtil.getString(request, "backUrl", currentURL);
+	String formatType = PortletProps.get("lms.question.formattype.normal");
 	
 	LearningActivity learningActivity = LearningActivityLocalServiceUtil.getLearningActivity(actId);
 	request.setAttribute("activity", learningActivity);
@@ -49,11 +55,11 @@
 		}
 	}
 	
-%>
-<liferay-util:include page="/html/execactivity/test/admin/editHeader.jsp" servletContext="<%=this.getServletContext() %>" />
-
-<portlet:actionURL var="editQuestionURL" name="editQuestion" />
-<aui:form name="qfm" action="<%=editQuestionURL %>" method="post" onSubmit="javascript:return false;">
+	%>
+	<liferay-util:include page="/html/execactivity/test/admin/editHeader.jsp" servletContext="<%=this.getServletContext() %>" />
+	
+	<portlet:actionURL var="editQuestionURL" name="editQuestion" />
+	<aui:form name="qfm" action="<%=editQuestionURL %>" method="post" onSubmit="javascript:return false;">
 
 	<%
 		QuestionType qt = 	new QuestionTypeRegistry().getQuestionType(typeId);
@@ -76,6 +82,40 @@
         }
 	</script>
     
+	<%	
+    	boolean enableOrder = StringPool.TRUE.equals(LearningActivityLocalServiceUtil.getExtraContentValue(learningActivity.getActId(),"enableorder"));
+		if(qt.isInline()){
+			try{
+				Document document = SAXReaderUtil.read(question.getExtracontent());
+				Element rootElement = document.getRootElement();
+				formatType = (String) rootElement.element("formattype").getData();
+			}catch(NullPointerException e){
+				formatType = PortletProps.get("lms.question.formattype.normal");
+			}catch(DocumentException e){
+				formatType = PortletProps.get("lms.question.formattype.normal");
+			}
+	%>
+			<c:choose>
+				<c:when test="<%=enableOrder%>">
+					<aui:select name="formattype" label="exectactivity.editquestions.formattype" helpMessage="exectactivity.editquestions.formattype.helpMessage"> 
+						<aui:option selected="<%=formatType.equals(PortletProps.get(\"lms.question.formattype.normal\")) %>" value="<%=PortletProps.get(\"lms.question.formattype.normal\")%>">
+							<liferay-ui:message key="exectactivity.editquestions.formattype.vertical" />
+						</aui:option>
+						<aui:option selected="<%=formatType.equals(PortletProps.get(\"lms.question.formattype.horizontal\")) %>" value="<%=PortletProps.get(\"lms.question.formattype.horizontal\") %>">
+							<liferay-ui:message key="exectactivity.editquestions.formattype.horizontal" />
+						</aui:option>
+						<aui:option selected="<%=formatType.equals(PortletProps.get(\"lms.question.formattype.combo\")) %>" value="<%=PortletProps.get(\"lms.question.formattype.combo\") %>">
+							<liferay-ui:message key="exectactivity.editquestions.formattype.combo" />
+						</aui:option>
+					</aui:select>
+				</c:when>
+				<c:otherwise>
+					<aui:input type="hidden" name="formattype" value="<%=formatType %>" ignoreRequestValue="true"></aui:input>
+				</c:otherwise>
+			</c:choose>
+	<%
+		}
+	%>
 	<aui:field-wrapper label="">
 		<div id="<portlet:namespace />questionError" class="aui-helper-hidden portlet-msg-error">
 			<liferay-ui:message key="execactivity.editquestions.newquestion.error.text.required"/>
@@ -313,11 +353,11 @@
 	</script>
 
 	<%
-	if(learningActivity.getTypeId()!=4){ %>
-		%>
+	if(learningActivity.getTypeId()!=4){
+	%>
 		<aui:field-wrapper label="answers" helpMessage="<%=qt.getDescription(themeDisplay.getLocale()) %>" /><%
-
-	 } %>
+	 } 
+	%>
 	<liferay-ui:error key="answer-test-required" message="answer-test-required"/>
 	<jsp:include page="<%=(qt!=null)?qt.getURLEdit():\"\" %>"/>
     <aui:button-row>
