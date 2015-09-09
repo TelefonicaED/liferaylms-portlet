@@ -3,6 +3,8 @@
 <%@page import="com.liferay.lms.learningactivity.LearningActivityType"%>
 <%@page import="com.liferay.portal.kernel.util.PropsUtil"%>
 <%@page import="com.liferay.lms.learningactivity.LearningActivityTypeRegistry"%>
+<%@page import="com.liferay.lms.service.CourseLocalServiceUtil"%>
+<%@page import="com.liferay.lms.model.Course"%>
 <%@ include file="/init.jsp"%>
 
 <script type="text/javascript">
@@ -22,21 +24,22 @@ AUI().ready(
 
 <ul class="activity-list">
 <%
+	Course course=CourseLocalServiceUtil.fetchByGroupCreatedId(themeDisplay.getScopeGroupId());
 	LearningActivityTypeRegistry learningActivityTypeRegistry = new LearningActivityTypeRegistry();
 	long[] invisibleTypes = StringUtil.split(PropsUtil.get("lms.learningactivity.invisibles"), StringPool.COMMA,-1L);
 	long[] orderedIds = StringUtil.split(LmsPrefsLocalServiceUtil.getLmsPrefsIni(themeDisplay.getCompanyId()).getActivities(), StringPool.COMMA, -1L);
 	int currentLearningActivityType=0;
 	for(LearningActivityType learningActivityType:learningActivityTypeRegistry.getLearningActivityTypesForCreating())
 	{
-		if(learningActivityType != null && !ArrayUtil.contains(invisibleTypes, learningActivityType.getTypeId())) {
-%>	
+		if(learningActivityType != null && !ArrayUtil.contains(invisibleTypes, learningActivityType.getTypeId()) && 
+				(course==null && learningActivityType.allowsBank() || course!=null ) ){
+%>
 	<liferay-portlet:renderURL var="newactivityURL">
 		<liferay-portlet:param name="editing" value="<%=StringPool.TRUE %>" />
 		<liferay-portlet:param name="resId" value="0" />
 		<liferay-portlet:param name="resModuleId" value="<%=ParamUtil.getString(renderRequest, \"resModuleId\") %>" />
 		<liferay-portlet:param name="type" value="<%=Long.toString(learningActivityType.getTypeId()) %>" />
 	</liferay-portlet:renderURL>
-	
 	<liferay-util:buffer var="activityMessage">
 	    <%=LanguageUtil.get(themeDisplay.getLocale(), learningActivityType.getName()) %>
 	    <span class="activity-help">
