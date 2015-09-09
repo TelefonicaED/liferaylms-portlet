@@ -44,6 +44,8 @@
 <%@page import="java.text.SimpleDateFormat"%>
 <%@page import="com.liferay.lms.service.LearningActivityLocalServiceUtil"%>
 <%@page import="com.liferay.lms.service.LearningActivityServiceUtil"%>
+<%@page import="com.liferay.lms.model.Course"%>
+<%@page import="com.liferay.lms.service.CourseLocalServiceUtil"%>
 <%@page import="com.liferay.lms.model.LearningActivity"%>
 <%@ include file="/init.jsp" %>
 <liferay-ui:success key="activity-saved-successfully" message="activity-saved-successfully" />
@@ -124,6 +126,13 @@ int endMonth=Integer.parseInt(formatMonth.format(today))-1;
 int endYear=Integer.parseInt(formatYear.format(today))+1;
 int endHour=Integer.parseInt(formatHour.format(today));
 int endMin=Integer.parseInt(formatMin.format(today));
+
+Course course = CourseLocalServiceUtil.fetchByGroupCreatedId(themeDisplay.getScopeGroupId());
+boolean isCourse = false;
+if (course!=null){
+	isCourse = true;
+}
+
 %>
 
 <%
@@ -366,7 +375,9 @@ AUI().ready('node-base' ,'aui-form-validator', 'aui-overlay-context-panel', 'wid
             }
 		}
 	});
-	A.one('#<portlet:namespace/>resModuleId').scrollIntoView();
+	if(A.one('#<portlet:namespace/>resModuleId')){
+		A.one('#<portlet:namespace/>resModuleId').scrollIntoView();
+	};
 });
 
 
@@ -629,11 +640,13 @@ Liferay.provide(
 				mandatory = (learnact.getWeightinmodule() != 0);
 			}
 		%>
-		<aui:field-wrapper label="editactivity.mandatory" cssClass="editactivity-mandatory-field" name="mandatorylabel">
-			<aui:input label="editactivity.mandatory.yes" type="radio" name="weightinmodule" value="1" checked="<%= mandatory %>" inlineField="true" />
-			<aui:input label="editactivity.mandatory.no" type="radio" name="weightinmodule" value="0" checked="<%= !mandatory %>" inlineField="true" />
-			<aui:input type="hidden" name="mandatorylabel" />
-		</aui:field-wrapper>
+		<div id="<portlet:namespace />mandatorylabel" style="display:none">
+			<aui:field-wrapper label="editactivity.mandatory" cssClass="editactivity-mandatory-field" name="mandatorylabel">
+				<aui:input label="editactivity.mandatory.yes" type="radio" name="weightinmodule" value="1" checked="<%= mandatory %>" inlineField="true" />
+				<aui:input label="editactivity.mandatory.no" type="radio" name="weightinmodule" value="0" checked="<%= !mandatory %>" inlineField="true" />
+				<aui:input type="hidden" name="mandatorylabel" />
+			</aui:field-wrapper>
+		</div>
 	 <liferay-ui:panel-container extended="false" persistState="false">
 	 <%
 	 boolean showSpecificPanel = larntype.isTriesConfigurable() || larntype.isScoreConfigurable() || larntype.isFeedbackCorrectConfigurable() || 
@@ -646,7 +659,8 @@ Liferay.provide(
 			 defaultState="closed";
 		 }
 	 	%>
-	 		<liferay-ui:panel title="activity-specifics" collapsible="true" defaultState="<%=defaultState %>">
+			<div id="<portlet:namespace />activity" style="display:none">
+	 			<liferay-ui:panel title="activity-specifics" collapsible="true" defaultState="<%=defaultState %>">
 	  
 		<%
 		if(larntype.isTriesConfigurable())
@@ -764,6 +778,7 @@ Liferay.provide(
 			</liferay-util:include>	
 		<% } %>
 	</liferay-ui:panel>
+	</div>
 <%}
 	String actCondefaultState="closed";
 	if(larntype.hasMandatoryDates())
@@ -772,44 +787,44 @@ Liferay.provide(
 	}
 	%>
 	 
-	 <liferay-ui:panel title="activity-constraints" collapsible="true" defaultState="<%=actCondefaultState %>">
-	   
-	    <script type="text/javascript">
-
-
-		    
-		    function setStarDateState(){
-		    	AUI().use('node',function(A) {
-			    	var enabled = document.getElementById('<%=renderResponse.getNamespace() %>startdate-enabledCheckbox').checked; 
-		    		var selector = 'form[name="<%=renderResponse.getNamespace() %>fm"]';
-		    		
-		    		if(enabled) {
-		    			A.all("#startDate").one(".aui-datepicker-button-wrapper").show();
-		    			A.all("#startDate").one("#startDateSpan").removeClass('aui-helper-hidden');
-		    		}else {
-		    			A.all("#startDate").one(".aui-datepicker-button-wrapper").hide();
-		    			A.all("#startDate").one("#startDateSpan").addClass('aui-helper-hidden');
-		    		}
-		    	});
-		    }
-		    
-		    function setStopDateState(){
-		    	AUI().use('node',function(A) {
-			    	var enabled = document.getElementById('<%=renderResponse.getNamespace() %>stopdate-enabledCheckbox').checked; 
-
-		    		var selector = 'form[name="<%=renderResponse.getNamespace() %>fm"]';
-		    		
-		    		if(enabled) {
-		    			A.all("#endDate").one(".aui-datepicker-button-wrapper").show();
-		    			A.all("#endDate").one("#endDateSpan").removeClass('aui-helper-hidden');
-		    		}else {
-		    			A.all("#endDate").one(".aui-datepicker-button-wrapper").hide();
-		    			A.all("#endDate").one("#endDateSpan").addClass('aui-helper-hidden');
-		    		}
-		    	});
-		    }
-
-	    </script>
+	<div id="<portlet:namespace />restrictions" style="display:none">
+		<liferay-ui:panel title="activity-constraints" collapsible="true" defaultState="<%=actCondefaultState %>">
+		    <script type="text/javascript">
+	
+	
+			    
+			    function setStarDateState(){
+			    	AUI().use('node',function(A) {
+				    	var enabled = document.getElementById('<%=renderResponse.getNamespace() %>startdate-enabledCheckbox').checked; 
+			    		var selector = 'form[name="<%=renderResponse.getNamespace() %>fm"]';
+			    		
+			    		if(enabled) {
+			    			A.all("#startDate").one(".aui-datepicker-button-wrapper").show();
+			    			A.all("#startDate").one("#startDateSpan").removeClass('aui-helper-hidden');
+			    		}else {
+			    			A.all("#startDate").one(".aui-datepicker-button-wrapper").hide();
+			    			A.all("#startDate").one("#startDateSpan").addClass('aui-helper-hidden');
+			    		}
+			    	});
+			    }
+			    
+			    function setStopDateState(){
+			    	AUI().use('node',function(A) {
+				    	var enabled = document.getElementById('<%=renderResponse.getNamespace() %>stopdate-enabledCheckbox').checked; 
+	
+			    		var selector = 'form[name="<%=renderResponse.getNamespace() %>fm"]';
+			    		
+			    		if(enabled) {
+			    			A.all("#endDate").one(".aui-datepicker-button-wrapper").show();
+			    			A.all("#endDate").one("#endDateSpan").removeClass('aui-helper-hidden');
+			    		}else {
+			    			A.all("#endDate").one(".aui-datepicker-button-wrapper").hide();
+			    			A.all("#endDate").one("#endDateSpan").addClass('aui-helper-hidden');
+			    		}
+			    	});
+			    }
+	
+		    </script>
 		<div id="startDate">
 			<aui:field-wrapper label="start-date">
 				<% if (!larntype.hasMandatoryDates()) { %>
@@ -914,12 +929,22 @@ Liferay.provide(
 		<%}
 		%>
 		</liferay-ui:panel>
-	
+	</div>
 		<c:if test="${showcategorization}">
-			<liferay-ui:panel title="categorization" collapsible="true" defaultState="closed">
-				<aui:input name="tags" type="assetTags" />
-				<aui:input name="categories" type="assetCategories" />
-				</liferay-ui:panel>
+			<c:choose>
+				<c:when test="<%=isCourse %>">
+					<liferay-ui:panel title="categorization" collapsible="true" defaultState="closed">
+						<aui:input name="tags" type="assetTags" />
+						<aui:input name="categories" type="assetCategories" />
+					</liferay-ui:panel>
+				</c:when>
+				<c:otherwise>
+					<liferay-ui:panel title="categorization" collapsible="true" defaultState="open">
+						<aui:input name="tags" type="assetTags" />
+						<aui:input name="categories" type="assetCategories" />
+					</liferay-ui:panel>
+				</c:otherwise>
+			</c:choose>
 		</c:if>
 	</liferay-ui:panel-container>
 	</aui:fieldset>
@@ -930,3 +955,25 @@ Liferay.provide(
 	</aui:button-row>
 </aui:form>
  <liferay-ui:success key="activity-saved-successfully" message="activity-saved-successfully" />
+<%
+	if (isCourse){
+	%>
+		<script type="text/javascript">
+			AUI().ready(function(A) {
+				if(A.one('#<portlet:namespace/>mandatorylabel')){
+					A.one('#<portlet:namespace/>mandatorylabel').setStyle('display', 'block');
+				}
+				if(A.one('#<portlet:namespace/>resModuleId')){
+					A.one('#<portlet:namespace/>resModuleId').show();
+				}
+				if(A.one('#<portlet:namespace/>restrictions')){
+					A.one('#<portlet:namespace/>restrictions').setStyle('display', 'block');
+				}
+				if(A.one('#<portlet:namespace/>activity')){
+					A.one('#<portlet:namespace/>activity').setStyle('display', 'block');
+				}
+			});
+		</script>
+	<%
+	}
+%>
