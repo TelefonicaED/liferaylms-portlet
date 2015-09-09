@@ -145,9 +145,9 @@ public class OptionsQuestionType extends BaseQuestionType {
 			int correctAnswers=0, correctAnswered=0, incorrectAnswered=0;
 			if(feedback) feedMessage = LanguageUtil.get(themeDisplay.getLocale(),"answer-in-blank") ;
 			int i=0;
-			String disabled ="";
+			String disabled = "";
 			for(TestAnswer answer:testAnswers){
-				String correct="", checked="", showCorrectAnswer="false",
+				String correct="", checked="", showCorrectAnswer="false";
 				disabled = "";
 				if(feedback) {
 					showCorrectAnswer = LearningActivityLocalServiceUtil.getExtraContentValue(question.getActId(), "showCorrectAnswer");
