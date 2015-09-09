@@ -260,6 +260,10 @@ public interface TestQuestionLocalService extends BaseLocalService,
 		java.lang.String text, long questionType)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
+	public com.liferay.lms.model.TestQuestion addQuestion(long actId,
+		java.lang.String text, long questionType, java.lang.String extraContent)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.util.List<com.liferay.lms.model.TestQuestion> getQuestions(
 		long actid) throws com.liferay.portal.kernel.exception.SystemException;
@@ -304,4 +308,8 @@ public interface TestQuestionLocalService extends BaseLocalService,
 	public void checkWeights(long actId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
+
+	public java.util.List<com.liferay.lms.model.TestQuestion> generateAleatoryQuestions(
+		long actId, long typeId)
+		throws com.liferay.portal.kernel.exception.SystemException;
 }
