@@ -552,7 +552,7 @@ Liferay.provide(
 //-->
 </script>
 
-	<c:if test="<%=!ParamUtil.getBoolean(renderRequest,\"noModule\",false) %>">
+	<c:if test="<%=!ParamUtil.getBoolean(renderRequest,\"noModule\",false) && isCourse %>">
 		<aui:select id="resModuleId" label="module" name="resModuleId" onChange="<%=renderResponse.getNamespace()+\"reloadComboActivities(this.options[this.selectedIndex].value);\" %>">
 		<%
 			java.util.List<Module> modules=ModuleLocalServiceUtil.findAllInGroup(themeDisplay.getScopeGroupId());
@@ -954,7 +954,7 @@ Liferay.provide(
 		<aui:button  type="cancel" value="canceledition" />
 	</aui:button-row>
 </aui:form>
- <liferay-ui:success key="activity-saved-successfully" message="activity-saved-successfully" />
+<liferay-ui:success key="activity-saved-successfully" message="activity-saved-successfully" />
 <%
 	if (isCourse){
 	%>
