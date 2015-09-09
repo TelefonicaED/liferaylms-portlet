@@ -14,13 +14,16 @@ import com.liferay.lms.service.LearningActivityTryLocalServiceUtil;
 import com.liferay.lms.service.TestAnswerLocalService;
 import com.liferay.lms.service.TestAnswerLocalServiceUtil;
 import com.liferay.lms.service.TestQuestionLocalServiceUtil;
+import com.liferay.util.portlet.PortletProps;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PropsUtil;
+import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.xml.Document;
+import com.liferay.portal.kernel.xml.DocumentException;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
 import com.liferay.portal.theme.ThemeDisplay;
@@ -37,6 +40,11 @@ public class OptionsQuestionType extends BaseQuestionType {
 
 	public String getName() {
 		return "options";
+	}
+
+	@Override
+	public boolean isInline() {
+		return true;
 	}
 
 	public String getTitle(Locale locale) {
@@ -114,17 +122,33 @@ public class OptionsQuestionType extends BaseQuestionType {
 	}
 
 	private String getHtml(Document document, long questionId, boolean feedback, ThemeDisplay themeDisplay){
-		String html = "", answersFeedBack="", feedMessage = "", cssclass="";
+		String html = "", answersFeedBack="", feedMessage = "", cssclass="", selected="";
 		String namespace = themeDisplay != null ? themeDisplay.getPortletDisplay().getNamespace() : "";
+		boolean isCombo = false;
 		try {
 			TestQuestion question = TestQuestionLocalServiceUtil.fetchTestQuestion(questionId);
+			try{
+				Document xml = SAXReaderUtil.read(question.getExtracontent());
+				Element ele = xml.getRootElement();
+				String formatType = (String) ele.element("formattype").getData();
+				boolean enableorder = StringPool.TRUE.equals(LearningActivityLocalServiceUtil.getExtraContentValue(question.getActId(),"enableorder"));
+				if ( enableorder && formatType.equals(PortletProps.get("lms.question.formattype.horizontal")) ){
+					cssclass="in-line ";
+				}else if ( enableorder && formatType.equals(PortletProps.get("lms.question.formattype.combo")) ){
+					isCombo=true;
+				}
+			}catch(DocumentException e){
+				e.printStackTrace();
+			}
 			List<TestAnswer> answersSelected=getAnswersSelected(document, questionId);
 			List<TestAnswer> testAnswers= TestAnswerLocalServiceUtil.getTestAnswersByQuestionId(question.getQuestionId());
 			int correctAnswers=0, correctAnswered=0, incorrectAnswered=0;
 			if(feedback) feedMessage = LanguageUtil.get(themeDisplay.getLocale(),"answer-in-blank") ;
 			int i=0;
+			String disabled ="";
 			for(TestAnswer answer:testAnswers){
-				String correct="", checked="", showCorrectAnswer="false", disabled ="";
+				String correct="", checked="", showCorrectAnswer="false",
+				disabled = "";
 				if(feedback) {
 					showCorrectAnswer = LearningActivityLocalServiceUtil.getExtraContentValue(question.getActId(), "showCorrectAnswer");
 					String showCorrectAnswerOnlyOnFinalTryString = LearningActivityLocalServiceUtil.getExtraContentValue(question.getActId(), "showCorrectAnswerOnlyOnFinalTry");
@@ -146,31 +170,52 @@ public class OptionsQuestionType extends BaseQuestionType {
 				}else if(answersSelected.contains(answer)){
 					incorrectAnswered++;
 					checked="checked='checked'";
+					selected="selected";
 					feedMessage=(!LanguageUtil.get(themeDisplay.getLocale(),"answer-in-blank").equals(feedMessage))?feedMessage+"<br/>"+answer.getFeedbacknocorrect():answer.getFeedbacknocorrect();
 				}
 
-				answersFeedBack += "<div class=\"answer " + correct + "\">" +
-										"<label for=\""+namespace+"question_"+question.getQuestionId()+"_"+i+"\" />"+
-										"<input id=\""+namespace+"question_"+question.getQuestionId()+"_"+i+"\" type=\"" + inputType + "\" name=\""+namespace+"question_" + question.getQuestionId() + "\" " + checked + " value=\"" + answer.getAnswerId() +"\" " + disabled + "><div class=\"answer-options\">" + answer.getAnswer() + "</div>" + 
-									"</div>";
+				if (isCombo){
+					answersFeedBack += 	"<option " + selected + " value= \"" + answer.getAnswerId() + "\" >" +
+											answer.getAnswer() +			
+										"</option>";
+				}else{
+					answersFeedBack += "<div class=\"answer " + cssclass + correct + "\">" +
+							"<label for=\""+namespace+"question_"+question.getQuestionId()+"_"+i+"\" />"+
+							"<input id=\""+namespace+"question_"+question.getQuestionId()+"_"+i+"\" type=\"" + inputType + "\" name=\""+namespace+"question_" + question.getQuestionId() + "\" " + checked + " value=\"" + answer.getAnswerId() +"\" " + disabled + "><div class=\"answer-options\">" + answer.getAnswer() + "</div>" + 
+							"</div>";
+				}
+				
 				i++;
 			}
 
 			if(feedback){
-				if(isQuestionCorrect(correctAnswers, correctAnswered, incorrectAnswered))	cssclass=" correct";
-				else cssclass=" incorrect";
+				if(isQuestionCorrect(correctAnswers, correctAnswered, incorrectAnswered))	cssclass="correct ";
+				else cssclass="incorrect ";
 				
 				answersFeedBack = "<div class=\"content_answer\">" + answersFeedBack + "</div>";
 				if (!"".equals(feedMessage)) {
 					answersFeedBack += "<div class=\"questionFeedback\">" + feedMessage + "</div>";
 				}
 			}
-
-			html += "<div class=\"question" + cssclass + " questiontype_" + getName() + " questiontype_" + getTypeId() + "\">" +
+			
+			if (isCombo){
+				html += "<div class=\"question " + cssclass + "questiontype_" + getName() + "_select questiontype_" + getTypeId() + "\">" +
+							"<input type=\"hidden\" name=\""+namespace+"question\" value=\"" + question.getQuestionId() + "\"/>"+
+							"<div class=\"questiontext select\">" + question.getText() + "</div>" +
+							"<div class=\"answer select\">" +
+								"<select "+ disabled + "class=\"answer select\" id=\""+namespace+"question_"+question.getQuestionId()+"_"+i+"\" name=\""+namespace+"question_"+question.getQuestionId()+"\" />"+
+									answersFeedBack +
+								"</select>" +
+							"</div>" +
+						"</div>";
+			}else{
+				html += "<div class=\"question " + cssclass + "questiontype_" + getName() + " questiontype_" + getTypeId() + "\">" +
 						"<input type=\"hidden\" name=\""+namespace+"question\" value=\"" + question.getQuestionId() + "\"/>"+
-						"<div class=\"questiontext\">" + question.getText() + "</div>" +
-						answersFeedBack +
-					"</div>";	
+						"<div class=\"questiontext " + cssclass + "\">" + question.getText() + "</div>" +
+							answersFeedBack +
+						"</div>";	
+			}
+			
 			
 		} catch (SystemException e) {
 			e.printStackTrace();

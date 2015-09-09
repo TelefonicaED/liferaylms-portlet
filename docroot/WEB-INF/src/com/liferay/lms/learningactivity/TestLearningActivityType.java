@@ -209,7 +209,17 @@ public class TestLearningActivityType extends BaseLearningActivityType
 			}
 			improve = SAXReaderUtil.createElement("improve");
 			improve.setText(Boolean.toString(ParamUtil.get(uploadRequest,"improve",false)));		
-			rootElement.add(improve);	
+			rootElement.add(improve);
+			
+			Element enableorder=rootElement.element("enableorder");
+			if(enableorder!=null)
+			{
+				enableorder.detach();
+				rootElement.remove(enableorder);
+			}
+			enableorder = SAXReaderUtil.createElement("enableorder");
+			enableorder.setText(Boolean.toString(ParamUtil.get(uploadRequest,"enableorder",false)));		
+			rootElement.add(enableorder);	
 			
 			Element questionsPerPage=rootElement.element("questionsPerPage");
 			if(questionsPerPage!=null)
@@ -253,4 +263,10 @@ public class TestLearningActivityType extends BaseLearningActivityType
 	public String getPortletId() {
 		return PORTLET_ID;
 	}
+	
+	@Override
+	public boolean allowsBank() {
+		return true;
+	}
+	
 }
