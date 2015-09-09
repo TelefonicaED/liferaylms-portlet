@@ -43,6 +43,7 @@
 		<column name="feedbackCorrect" type="String"></column>
 		<column name="feedbackNoCorrect" type="String"></column>
 		<column name="weightinmodule" type="long"></column>
+		<column name="commentsActivated" type="boolean"></column>
 		<order by="asc">
 			<order-column name="moduleId" />
 			<order-column name="priority" />
@@ -237,7 +238,8 @@
         <column name="endDate" type="Date"></column>
         <column name="icon" type="long"></column>
         <column name="precedence" type="long" />
-        
+        <column name="allowedTime" type="long" />
+		
 		<order by="asc">
 			<order-column name="ordern" />
 		</order>
@@ -361,6 +363,11 @@
 		<column name="welcome" type="boolean"/>
 		<column name="welcomeMsg" type="String"/>
 		<column name="welcomeSubject" type="String"/>
+		
+		<column name="goodbye" type="boolean"/>
+		<column name="goodbyeMsg" type="String"/>
+		<column name="goodbyeSubject" type="String"/>
+		
  		<order by="asc">
 			<order-column name="courseId" />
 		</order>
