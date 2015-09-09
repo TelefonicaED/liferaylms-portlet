@@ -206,5 +206,8 @@ public abstract class BaseQuestionType implements QuestionType, Serializable {
 	public int getDefaultAnswersNo(){
 		return -1;
 	}
+	public boolean isInline(){
+		return false;
+	}
 	
 }

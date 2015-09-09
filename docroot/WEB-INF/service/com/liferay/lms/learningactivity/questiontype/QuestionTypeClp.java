@@ -411,4 +411,10 @@ public class QuestionTypeClp implements QuestionType {
 		return null;
 	}
 
+	@Override
+	public boolean isInline() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 }

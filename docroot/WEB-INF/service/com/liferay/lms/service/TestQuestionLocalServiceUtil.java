@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -294,6 +294,12 @@ public class TestQuestionLocalServiceUtil {
 		return getService().addQuestion(actId, text, questionType);
 	}
 
+	public static com.liferay.lms.model.TestQuestion addQuestion(long actId,
+		java.lang.String text, long questionType, java.lang.String extraContent)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().addQuestion(actId, text, questionType, extraContent);
+	}
+
 	public static java.util.List<com.liferay.lms.model.TestQuestion> getQuestions(
 		long actid) throws com.liferay.portal.kernel.exception.SystemException {
 		return getService().getQuestions(actid);
@@ -354,6 +360,12 @@ public class TestQuestionLocalServiceUtil {
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		getService().checkWeights(actId);
+	}
+
+	public static java.util.List<com.liferay.lms.model.TestQuestion> generateAleatoryQuestions(
+		long actId, long typeId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().generateAleatoryQuestions(actId, typeId);
 	}
 
 	public static void clearService() {

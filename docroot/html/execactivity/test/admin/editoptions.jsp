@@ -27,6 +27,7 @@
 	boolean showCorrectAnswerOnlyOnFinalTry= false;
 	boolean improve=false;
 	boolean disabled = false;
+	boolean enableorder = true;
 	long tries = 0;
 	
 	LearningActivity learningActivity=(LearningActivity)request.getAttribute("activity");
@@ -148,6 +149,7 @@ window.<portlet:namespace />validate_execactivity={
 						A.one('#<portlet:namespace />showCorrectAnswerCheckbox').set('disabled',notEditable);
 						A.one('#<portlet:namespace />showCorrectAnswerOnlyOnFinalTryCheckbox').set('disabled',notEditable);
 						A.one('#<portlet:namespace />improveCheckbox').set('disabled',notEditable);
+						A.one('#<portlet:namespace />enableorderCheckbox').set('disabled',notEditable);
 	
 		      			if(notEditable) {
 			      			A.one('#<portlet:namespace />random').set('value','<%=(random>0)?Long.toString(random):StringPool.BLANK%>');		
@@ -161,6 +163,8 @@ window.<portlet:namespace />validate_execactivity={
 							A.one('#<portlet:namespace />showCorrectAnswerOnlyOnFinalTryCheckbox').set('checked',<%=Boolean.toString(showCorrectAnswerOnlyOnFinalTry)%>);
 							A.one('#<portlet:namespace />improve').set('value','<%=Boolean.toString(improve)%>');
 							A.one('#<portlet:namespace />improveCheckbox').set('checked',<%=Boolean.toString(improve)%>);
+							A.one('#<portlet:namespace />enableorder').set('value','<%=Boolean.toString(enableorder)%>');
+							A.one('#<portlet:namespace />enableorderCheckbox').set('checked',<%=Boolean.toString(enableorder)%>);
 			      		}
 			        } 
 			   } 
@@ -196,7 +200,6 @@ window.<portlet:namespace />validate_execactivity={
 
 //-->
 </script>
-
 
 	<aui:input type="text" size="3" name="random" label="execActivity.options.random" value="<%=(random>0)?Long.toString(random):StringPool.BLANK %>" disabled="<%=!edit %>" 
 		ignoreRequestValue="true" helpMessage="execActivity.options.random.helpMessage"></aui:input>
@@ -262,4 +265,5 @@ window.<portlet:namespace />validate_execactivity={
 	<aui:input type="checkbox" name="improve" label="exectactivity.edit.improve" checked="<%=improve %>" disabled="<%=!edit %>" 
 		ignoreRequestValue="true" helpMessage="exectactivity.edit.improve.helpMessage"></aui:input>
 
-
+	<aui:input type="checkbox" name="enableorder" label="exectactivity.edit.enableorder" checked="<%=enableorder %>" disabled="<%=!edit %>" 
+		ignoreRequestValue="true" helpMessage="exectactivity.edit.enableorder.helpMessage"></aui:input>

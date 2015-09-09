@@ -80,7 +80,8 @@
 		<column name="actId" type="long" />
 		<column name="text" type="String" />
 		<column name="questionType" type="long" />
-		<column name="weight" type="long" />		
+		<column name="weight" type="long" />
+        <column name="extracontent" type="String"></column>		
 		<order by="asc">
 			<order-column name="questionId"  />
 		</order>
@@ -238,7 +239,7 @@
         <column name="icon" type="long"></column>
         <column name="precedence" type="long" />
         <column name="allowedTime" type="long" />
-        
+		
 		<order by="asc">
 			<order-column name="ordern" />
 		</order>

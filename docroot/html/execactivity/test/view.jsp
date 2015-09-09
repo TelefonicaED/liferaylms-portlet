@@ -85,10 +85,10 @@
 					String popupcorrection="javascript:"+renderResponse.getNamespace() + "showPopupGetReport();";
 				%>
 					<portlet:renderURL var="goToCorrection" >
-	<portlet:param name="jspPage" value="/html/execactivity/test/correction.jsp" />
-	<portlet:param name="actId" value="<%=Long.toString(activity.getActId() )%>" />
-	<portlet:param name="courseId" value="<%=Long.toString(course.getCourseId() )%>" />
-</portlet:renderURL>
+						<portlet:param name="jspPage" value="/html/execactivity/test/correction.jsp" />
+						<portlet:param name="actId" value="<%=Long.toString(activity.getActId() )%>" />
+						<portlet:param name="courseId" value="<%=Long.toString(course.getCourseId() )%>" />
+					</portlet:renderURL>
 					<aui:button name="importButton" type="button" value="action.CORRECT"  last="true" href="<%= goToCorrection.toString() %>" ></aui:button>
 					
 				<%}
@@ -141,11 +141,15 @@
   									<liferay-util:param value="<%=Long.toString(activity.getActId()) %>" name="actId"/>
   								</liferay-util:include>  	
 <%
-							}else{	
-								List<TestQuestion> questiones=TestQuestionLocalServiceUtil.getQuestions(actId);
-								List<TestQuestion> questions = ListUtil.copy(questiones);
-								BeanComparator beanComparator = new BeanComparator("weight");
-								Collections.sort(questions, beanComparator);
+							}else{		
+								List<TestQuestion> questions = TestQuestionLocalServiceUtil.getQuestions(actId);
+								boolean isBank = StringPool.TRUE.equals(LearningActivityLocalServiceUtil.getExtraContentValue(actId, "isBank"));
+								if (isBank){
+									questions = TestQuestionLocalServiceUtil.generateAleatoryQuestions(actId, 0L);
+								}else{
+									BeanComparator beanComparator = new BeanComparator("weight");
+									Collections.sort(questions, beanComparator);
+								}
 								Object  [] arg =  new Object[]{activity.getPasspuntuation()};
 			
 								if (activity.getPasspuntuation()>0){ 
@@ -265,6 +269,9 @@
 							var questionValidators = {
 								questiontype_options : function(question) {
 									return (question.all('div.answer input[type="radio"]:checked').size() > 0);
+								},
+								questiontype_options_select : function(question) {
+									return (question.all('select.answer').value != 0);
 								},
 								questiontype_multioptions : function(question) {
 									return (question.all('div.answer input[type="checkbox"]:checked').size() > 0);

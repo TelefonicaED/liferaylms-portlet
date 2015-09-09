@@ -14,7 +14,9 @@
 
 package com.liferay.lms.service.impl;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import com.liferay.lms.auditing.AuditConstants;
 import com.liferay.lms.auditing.AuditingLogFactory;
@@ -23,6 +25,8 @@ import com.liferay.lms.learningactivity.questiontype.QuestionTypeRegistry;
 import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.model.TestQuestion;
 import com.liferay.lms.service.ClpSerializer;
+import com.liferay.lms.service.LearningActivityLocalServiceUtil;
+import com.liferay.lms.service.TestQuestionLocalServiceUtil;
 import com.liferay.lms.service.base.TestQuestionLocalServiceBaseImpl;
 import com.liferay.portal.kernel.bean.PortletBeanLocatorUtil;
 import com.liferay.portal.kernel.dao.orm.Criterion;
@@ -33,9 +37,16 @@ import com.liferay.portal.kernel.dao.orm.OrderFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.DocumentException;
 import com.liferay.portal.kernel.xml.Element;
+import com.liferay.portlet.asset.model.AssetEntry;
+import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
+import com.liferay.portlet.asset.service.persistence.AssetEntryQuery;
 
 /**
  * The implementation of the test question local service.
@@ -93,6 +104,19 @@ public class TestQuestionLocalServiceImpl
 		tq.setQuestionType(questionType);
 		tq.setActId(actId);
 		tq.setWeight(tq.getQuestionId());
+		testQuestionPersistence.update(tq, false);
+		return tq;
+	}
+	public TestQuestion addQuestion(long actId,String text,long questionType,String extraContent) throws SystemException
+	{
+		TestQuestion tq =
+			testQuestionPersistence.create(counterLocalService.increment(
+					TestQuestion.class.getName()));
+		tq.setText(text);
+		tq.setQuestionType(questionType);
+		tq.setActId(actId);
+		tq.setWeight(tq.getQuestionId());
+		tq.setExtracontent(extraContent);
 		testQuestionPersistence.update(tq, false);
 		return tq;
 	}
@@ -287,5 +311,52 @@ public class TestQuestionLocalServiceImpl
 				testQuestionPersistence.update(tq, true);
 			}
 		}
+	}
+	public List<TestQuestion> generateAleatoryQuestions(long actId, long typeId)
+			throws SystemException {
+		
+		boolean isMultiple = StringPool.TRUE.equals(LearningActivityLocalServiceUtil.getExtraContentValue(actId,"isMultiple"));
+		long[] assetCategoryIds = GetterUtil.getLongValues(StringUtil.split(LearningActivityLocalServiceUtil.getExtraContentValue(actId,"categoriesId")));
+		long[] classTypeIds = new long[]{typeId};
+		int maxQuestions = GetterUtil.getInteger(LearningActivityLocalServiceUtil.getExtraContentValue(actId,"random"), 0);
+		Random r = new Random();
+		
+		AssetEntryQuery entryQuery = new AssetEntryQuery();
+		entryQuery.getAllCategoryIds();
+		List<AssetEntry> banks= new ArrayList<AssetEntry>();
+		List<TestQuestion> questions = new ArrayList<TestQuestion>();
+		List<TestQuestion> sortQuestions = new ArrayList<TestQuestion>();
+		
+		if(!Validator.equals(assetCategoryIds.length, 0)){
+			
+			entryQuery.setAllCategoryIds(assetCategoryIds);
+			entryQuery.setClassTypeIds(classTypeIds);
+			banks.addAll(AssetEntryLocalServiceUtil.getEntries(entryQuery));
+			
+			if(!Validator.equals(banks.size(), 0)){
+				if (isMultiple){
+					for (AssetEntry bank : banks){
+						questions.addAll(TestQuestionLocalServiceUtil.getQuestions(bank.getClassPK()));
+					}
+				}else{
+					int numBank = r.nextInt(banks.size());
+					questions = TestQuestionLocalServiceUtil.getQuestions(banks.get(numBank).getClassPK());
+				}
+				
+				List<TestQuestion> questionsCopy = new ArrayList<TestQuestion>(questions);
+				while ( ( maxQuestions > sortQuestions.size() && questionsCopy.size() > 0) || ( maxQuestions == 0 && questionsCopy.size() > 0 ) ) {
+					int index = 0;
+					if(isMultiple){
+						index = r.nextInt(questionsCopy.size());
+					}
+					sortQuestions.add(questionsCopy.get(index));
+					questionsCopy.remove(index);
+				}
+				
+				return sortQuestions;
+			}
+		}
+		
+		return sortQuestions;
 	}
 }
