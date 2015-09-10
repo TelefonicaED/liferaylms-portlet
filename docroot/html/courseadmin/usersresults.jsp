@@ -272,13 +272,7 @@ if(backToEdit) {
 		                                                " (SELECT UserGroupRole.userId "+
 		                                                "  FROM UserGroupRole "+
 		                                                "  WHERE  (UserGroupRole.groupId = ?) AND (UserGroupRole.roleId = ?))",new Long[]{course.getGroupCreatedId(),roleId}));
-		/*
-			if (new Long(roleId).equals(prefs.getTeacherRole()) || new Long(roleId).equals(prefs.getEditorRole())) {
-				params.put("inRole", new CustomSQLParam("WHERE User_.userId IN (SELECT UserGroupRole.userId "+
-		            "  FROM UserGroupRole "+
-		            "  WHERE UserGroupRole.roleId = ?)", new Long[]{roleId}));
-			}
-		*/
+		
 		boolean showOnlyOrganizationUsers = preferences.getValue("showOnlyOrganizationUsers", "false").equals("true");
 		List <User> userListPage = new LinkedList<User>();
 		long usersLimit = LmsPrefsLocalServiceUtil.getLmsPrefs(themeDisplay.getCompanyId()).getUsersResults();
@@ -286,11 +280,7 @@ if(backToEdit) {
 		if (showOnlyOrganizationUsers) {
 			
 			if (organization != null) {
-				//System.out.println("Muestro los usuarios de la organización");
-				//System.out.println(organization.getOrganizationId());
-				//System.out.println(organization.getName());
 				userListPage = UserLocalServiceUtil.getOrganizationUsers(organization.getOrganizationId());
-				/* pageContext.setAttribute("results", userListPage); */
 				pageContext.setAttribute("results", ListUtil.subList(userListPage, searchContainer.getStart(), searchContainer.getEnd()));
 		    	pageContext.setAttribute("total", userListPage.size());
 			} else {
