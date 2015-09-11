@@ -62,7 +62,7 @@ else
 				break;
 			}
 		}
-		if(!remove){
+		if(!remove && usert.isActive()){
 			users.add(usert);
 		}
 	}
