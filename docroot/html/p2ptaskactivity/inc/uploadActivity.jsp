@@ -119,8 +119,6 @@ Liferay.provide(
 				fileName = fileName.substring(pos+1);
 			}
 			
-			A.one("#contentFile").html(fileName);
-			A.one("#contentDescription").html(descrip);
 			
 			//Start opening popUp			
 			if(A.one('#<portlet:namespace />p2pconfirmation')) {
@@ -128,7 +126,6 @@ Liferay.provide(
 				window.<portlet:namespace />p2pconfirmationBody = A.one('#<portlet:namespace />p2pconfirmation').html();
 				A.one('#<portlet:namespace />p2pconfirmation').remove();
 			}
-			
 			window.<portlet:namespace />p2pconfirmation = new A.Dialog({
 				id:'<portlet:namespace />showp2pconfirmation',
 				title: window.<portlet:namespace />p2pconfirmationTitle,
@@ -136,8 +133,11 @@ Liferay.provide(
 	            centered: true,
 	            modal: true,
 	            width: "auto",
+	            destroyOnClose: true,
 	            height: "auto"
 	        }).render().show();
+			A.one("#contentFile").html(fileName);
+			A.one("#contentDescription").html(descrip);
         },
         ['aui-dialog']
     );
@@ -151,7 +151,6 @@ Liferay.provide(
 				if(A.one('#<portlet:namespace />p2puploaded')) {
 					window.<portlet:namespace />p2puploadedTitle = A.one('#<portlet:namespace />p2puploaded h1').html();
 					window.<portlet:namespace />p2puploadedBody = A.one('#<portlet:namespace />p2puploaded').html();
-					A.one('#<portlet:namespace />p2puploaded').remove();
 				}
 				
 				window.<portlet:namespace />p2puploaded = new A.Dialog({
@@ -174,8 +173,9 @@ Liferay.provide(
 	        '<portlet:namespace />closeConfirmation',
 	        function() {
 				var A = AUI();
-				
 				A.DialogManager.closeByChild('#<portlet:namespace />showp2pconfirmation');
+				A.one('#<portlet:namespace />showp2pconfirmation').remove();
+
 	        },
 	        ['aui-dialog']
 	    );
