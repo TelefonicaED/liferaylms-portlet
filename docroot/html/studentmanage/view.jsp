@@ -1,3 +1,5 @@
+<%@page import="com.liferay.portal.kernel.dao.orm.CustomSQLParam"%>
+<%@page import="com.liferay.portal.model.RoleConstants"%>
 <%@page import="com.liferay.portal.service.UserGroupRoleLocalServiceUtil"%>
 <%@page import="com.liferay.portal.service.UserGroupRoleService"%>
 <%@page import="com.liferay.portal.service.UserGroupRoleServiceUtil"%>
@@ -71,7 +73,9 @@
 
 	long teacherRoleId=RoleLocalServiceUtil.getRole(prefs.getTeacherRole()).getRoleId();
 	long editorRoleId=RoleLocalServiceUtil.getRole(prefs.getEditorRole()).getRoleId();
-	
+
+	Role commmanager=RoleLocalServiceUtil.getRole(themeDisplay.getCompanyId(), RoleConstants.SITE_MEMBER) ;
+
 	
 %>
 
@@ -164,10 +168,29 @@ else
 			String middleName = null;
 			LinkedHashMap userParams = new LinkedHashMap();
 
+			userParams.put("notInCourseRoleTeach", new CustomSQLParam("WHERE User_.userId NOT IN "
+		              + " (SELECT UserGroupRole.userId " + "  FROM UserGroupRole "
+		              + "  WHERE  (UserGroupRole.groupId = ?) AND (UserGroupRole.roleId = ?))", new Long[] {
+		              course.getGroupCreatedId(),
+		              RoleLocalServiceUtil.getRole(prefs.getTeacherRole()).getRoleId() }));
+		           
+
+
+		       	userParams.put("notInCourseRoleEdit", new CustomSQLParam("WHERE User_.userId NOT IN "
+		              + " (SELECT UserGroupRole.userId " + "  FROM UserGroupRole "
+		              + "  WHERE  (UserGroupRole.groupId = ?) AND (UserGroupRole.roleId = ?))", new Long[] {
+		              course.getGroupCreatedId(),
+		              RoleLocalServiceUtil.getRole(prefs.getEditorRole()).getRoleId() }));
+		           
+			
+			
 			if(theTeam==null){
 				if(criteria.trim().length()==0){
+					OrderByComparator obc = null;
 					userParams.put("usersGroups", new Long(themeDisplay.getScopeGroupId()));
-					userListPage = UserLocalServiceUtil.getGroupUsers(themeDisplay.getScopeGroupId());
+
+					userListPage  = UserLocalServiceUtil.search(themeDisplay.getCompanyId(), criteria, 0, userParams, searchContainer.getStart(), searchContainer.getEnd(), obc);
+					System.out.println("HERE "+userListPage.size());
 				}else{
 					userParams.put("usersGroups", new Long(themeDisplay.getScopeGroupId()));
 					OrderByComparator obc = null;
@@ -180,28 +203,11 @@ else
 				userListPage  = UserLocalServiceUtil.search(themeDisplay.getCompanyId(), criteria, 0, userParams, searchContainer.getStart(), searchContainer.getEnd(), obc);
 			}
 			
-				List<User> finalUserList = new LinkedList<User>();
+			
+
+				int userCount = UserLocalServiceUtil.searchCount(themeDisplay.getCompanyId(), criteria, 0, userParams);
 				
-				Iterator<User> ituserlistpage = userListPage.iterator();
-				
-				while(ituserlistpage.hasNext()){
-					User u = ituserlistpage.next();
-					
-					boolean isStudent = (!(PermissionCheckerFactoryUtil.create(u).hasPermission(themeDisplay.getScopeGroupId(), "com.liferay.lms.model", themeDisplay.getScopeGroupId(), "VIEW_RESULTS"))
-								&&
-								!UserGroupRoleLocalServiceUtil.hasUserGroupRole(u.getUserId(), themeDisplay.getScopeGroupId(), teacherRoleId)
-								&&
-								!UserGroupRoleLocalServiceUtil.hasUserGroupRole(u.getUserId(), themeDisplay.getScopeGroupId(), editorRoleId));
-							//System.out.println("User "+u.getFullName()+" isStudent "+ isStudent);
-					
-					if(isStudent)finalUserList.add(u);
-				}
-				
-				//int userCount = UserLocalServiceUtil.searchCount(themeDisplay.getCompanyId(), criteria, 0, params);
-				int userCount = finalUserList.size();
-						
-				//pageContext.setAttribute("results", userListPage);
-				pageContext.setAttribute("results", finalUserList);
+				pageContext.setAttribute("results", userListPage);
 			    	pageContext.setAttribute("total", userCount);
 			
 			
