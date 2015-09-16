@@ -97,6 +97,13 @@ Liferay.provide(
 		);
 //-->
 </script>
+	<script>
+function ignoreEnter(e) {
+     if (event.keyCode == 10 || event.keyCode == 13) {
+            event.preventDefault();
+    }
+}
+</script>
 	
 <aui:form name="exportForm" action="<%=exportURL%>" method="post" >
 
@@ -104,7 +111,7 @@ Liferay.provide(
 	<liferay-ui:success key="courseadmin.delete.exported.confirmation.success" message="courseadmin.delete.exported.confirmation.success"></liferay-ui:success>
 	<liferay-ui:success key="courseadmin.export.confirmation.success" message="courseadmin.export.confirmation.success"></liferay-ui:success>
 	
-	<aui:input label="export-the-selected-data-to-the-given-lar-file-name" name="exportFileName" size="50" value='<%= HtmlUtil.escape(StringUtil.replace( StringUtil.replace(name, " ", "_"),"/",""   )) + "-" + Time.getShortTimestamp() + ".lar" %>' />
+    	<aui:input label="export-the-selected-data-to-the-given-lar-file-name" name="exportFileName" onkeypress="return ignoreEnter(event)" size="50" value='<%= HtmlUtil.escape(StringUtil.replace( StringUtil.replace(name, " ", "_"),"/",""   )) + "-" + Time.getShortTimestamp() + ".lar" %>' />
 	
 	<aui:input type="hidden" name="key" value=""/>
 	
