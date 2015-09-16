@@ -557,7 +557,10 @@ else
 
 	%>
 <liferay-ui:panel-container extended="false"  persistState="false" >
-	<liferay-ui:panel title="lms-inscription-configuration" collapsible="true" defaultState="closed" cssClass="<%=(showInscriptionDate)?StringPool.BLANK:\"aui-helper-hidden\" %>">
+
+<%System.out.println(showInscriptionDate);
+System.out.println(showMaxUsers);%>
+	<liferay-ui:panel title="lms-inscription-configuration" collapsible="true" defaultState="closed" cssClass="<%=(showInscriptionDate||showMaxUsers)?StringPool.BLANK:\"aui-helper-hidden\" %>">
 		<aui:field-wrapper name="inscriptionDate" label="start-inscription-date" cssClass="<%=(showInscriptionDate)?StringPool.BLANK:\"aui-helper-hidden\" %>">
 			<aui:input type="hidden" name="inscriptionDate"/>
 			<liferay-ui:input-date yearRangeEnd="<%=LiferaylmsUtil.defaultEndYear %>" yearRangeStart="<%=LiferaylmsUtil.defaultStartYear %>"  dayParam="startDay" monthParam="startMon"
@@ -611,6 +614,10 @@ else
 			</aui:input>
 		</c:if>
 	</liferay-ui:panel>
+	
+	
+	
+	
 	<liferay-ui:panel title="categorization" collapsible="true" defaultState="closed">
 	<liferay-ui:custom-attributes-available className="<%= Course.class.getName() %>">
 	<liferay-ui:custom-attribute-list 
