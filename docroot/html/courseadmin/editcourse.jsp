@@ -705,6 +705,12 @@ else
 							<dd>
 								<liferay-ui:message key="the-name-of-the-email-recipient" />
 							</dd>
+							<dt>
+								[$USER_SCREENNAME$]
+							</dt>
+							<dd>
+								<liferay-ui:message key="the-user-screen-name" />
+							</dd>
 						</dl>
 					</div>
 				</div>
@@ -786,6 +792,12 @@ else
 							</dt>
 							<dd>
 								<liferay-ui:message key="the-name-of-the-email-recipient" />
+							</dd>
+							<dt>
+								[$USER_SCREENNAME$]
+							</dt>
+							<dd>
+								<liferay-ui:message key="the-user-screen-name" />
 							</dd>
 						</dl>
 					</div>
