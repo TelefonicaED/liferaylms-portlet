@@ -511,12 +511,13 @@ public static String SEPARATOR = "_";
 	throws Exception {
 
 	ThemeDisplay themeDisplay = (ThemeDisplay) actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
+	long userIdAction = themeDisplay.getUserId();
 	String portletId = PortalUtil.getPortletId(actionRequest);
 	long moduleId = ParamUtil.getLong(actionRequest, "resourcePrimKey",0);
 	
 	if(moduleId>0)
 	{
-		com.liferay.lms.service.ModuleLocalServiceUtil.goUpModule(moduleId);
+		com.liferay.lms.service.ModuleLocalServiceUtil.goUpModule(moduleId,userIdAction);
 	}
 	
 }
@@ -525,11 +526,12 @@ public static String SEPARATOR = "_";
 
 	ThemeDisplay themeDisplay = (ThemeDisplay) actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
 	String portletId = PortalUtil.getPortletId(actionRequest);
+	long userIdAction = themeDisplay.getUserId();
 	long moduleId = ParamUtil.getLong(actionRequest, "resourcePrimKey",0);
 	
 	if(moduleId>0)
 	{
-		com.liferay.lms.service.ModuleLocalServiceUtil.goDownModule(moduleId);
+		com.liferay.lms.service.ModuleLocalServiceUtil.goDownModule(moduleId,userIdAction);
 	}
 	
 }

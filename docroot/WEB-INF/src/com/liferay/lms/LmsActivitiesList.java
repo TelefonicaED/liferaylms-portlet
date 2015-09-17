@@ -534,7 +534,7 @@ public class LmsActivitiesList extends MVCPortlet {
 		long moduleId = ParamUtil.getLong(actionRequest, "resId",0);
 		ThemeDisplay themeDisplay = (ThemeDisplay) actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
 		PermissionChecker permissionChecker=themeDisplay.getPermissionChecker();
-	
+		long userIdAction = themeDisplay.getUserId();
 		if(moduleId>0)
 		{
 			if(permissionChecker.hasPermission(
@@ -543,7 +543,7 @@ public class LmsActivitiesList extends MVCPortlet {
 				Module.class.getName(), moduleId,
 				ActionKeys.UPDATE))
 			{
-				ModuleLocalServiceUtil.goUpModule(moduleId);
+				ModuleLocalServiceUtil.goUpModule(moduleId, userIdAction);
 			}
 		}
 		
@@ -553,9 +553,9 @@ public class LmsActivitiesList extends MVCPortlet {
 	throws Exception {
 		ThemeDisplay themeDisplay = (ThemeDisplay) actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
 		PermissionChecker permissionChecker=themeDisplay.getPermissionChecker();
-	
-		long moduleId = ParamUtil.getLong(actionRequest, "resId",0);
 		
+		long moduleId = ParamUtil.getLong(actionRequest, "resId",0);
+		long userIdAction = themeDisplay.getUserId();
 		if(moduleId>0)
 		{
 			if(permissionChecker.hasPermission(
@@ -563,7 +563,7 @@ public class LmsActivitiesList extends MVCPortlet {
 				Module.class.getName(), moduleId,
 				ActionKeys.UPDATE))
 			{
-			ModuleLocalServiceUtil.goDownModule(moduleId);
+			ModuleLocalServiceUtil.goDownModule(moduleId,userIdAction);
 			}
 		}
 		
@@ -573,14 +573,14 @@ public class LmsActivitiesList extends MVCPortlet {
 		
 		ThemeDisplay themeDisplay = (ThemeDisplay) actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
 		PermissionChecker permissionChecker=themeDisplay.getPermissionChecker();
-		
+		long userIdAction = themeDisplay.getUserId();
 		long moduleId = ParamUtil.getLong(actionRequest, "pageId"),
 		     prevModId = ParamUtil.getLong(actionRequest, "prevPageId"),
 		     nextModId = ParamUtil.getLong(actionRequest, "nextPageId");
 		
 		if(moduleId>0){
 			if(permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), Module.class.getName(), moduleId, ActionKeys.UPDATE)){
-				ModuleLocalServiceUtil.moveModule(moduleId, prevModId, nextModId);
+				ModuleLocalServiceUtil.moveModule(moduleId, prevModId, nextModId,userIdAction);
 			}
 		}
 		
@@ -641,7 +641,7 @@ public class LmsActivitiesList extends MVCPortlet {
 					ActionKeys.UPDATE)|| permissionChecker.hasOwnerPermission(larn.getCompanyId(), LearningActivity.class.getName(), larn.getActId(),larn.getUserId(),
 							ActionKeys.UPDATE))
 			{
-			LearningActivityLocalServiceUtil.goUpLearningActivity(actId);
+			LearningActivityLocalServiceUtil.goUpLearningActivity(actId, themeDisplay.getUserId());
 			}
 		}
 	}
@@ -662,7 +662,7 @@ public class LmsActivitiesList extends MVCPortlet {
 					ActionKeys.UPDATE)|| permissionChecker.hasOwnerPermission(larn.getCompanyId(), LearningActivity.class.getName(), larn.getActId(),larn.getUserId(),
 							ActionKeys.UPDATE))
 			{
-				LearningActivityLocalServiceUtil.goDownLearningActivity(actId);
+				LearningActivityLocalServiceUtil.goDownLearningActivity(actId, themeDisplay.getUserId());
 			}
 		}
 	}
@@ -681,7 +681,7 @@ public class LmsActivitiesList extends MVCPortlet {
 			
 			if(permissionChecker.hasPermission(larn.getGroupId(), LearningActivity.class.getName(), larn.getActId(), ActionKeys.UPDATE)|| 
 					permissionChecker.hasOwnerPermission(larn.getCompanyId(), LearningActivity.class.getName(), larn.getActId(),larn.getUserId(), ActionKeys.UPDATE)){
-				LearningActivityLocalServiceUtil.moveActivity(actId, prevActId, nextActId);
+				LearningActivityLocalServiceUtil.moveActivity(actId, prevActId, nextActId, themeDisplay.getUserId());
 			}
 		}
 		
