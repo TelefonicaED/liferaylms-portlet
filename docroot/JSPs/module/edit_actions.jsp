@@ -6,6 +6,8 @@
 <%@ page import="com.liferay.lms.service.ModuleLocalServiceUtil"%>
 
 <%
+
+
 ResultRow row = (ResultRow)request.getAttribute(WebKeys.SEARCH_CONTAINER_RESULT_ROW);
 Module module=null;
 if(row==null)

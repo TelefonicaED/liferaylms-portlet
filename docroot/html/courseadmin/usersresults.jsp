@@ -268,6 +268,32 @@ if(backToEdit) {
 	
 		OrderByComparator obc = new UserFirstNameComparator(true);
 		
+		if (!tab.equals(LanguageUtil.get(pageContext, "courseadmin.adminactions.students"))) {
+
+            params.put("notInCourseRoleStu", new CustomSQLParam("WHERE User_.userId NOT IN "
+              + " (SELECT UserGroupRole.userId " + "  FROM UserGroupRole "
+              + "  WHERE  (UserGroupRole.groupId = ?) AND (UserGroupRole.roleId = ?))", new Long[] {
+              course.getGroupCreatedId(), commmanager.getRoleId() }));
+           }
+
+           if (!tab.equals(teacherName)) {
+
+            params.put("notInCourseRoleTeach", new CustomSQLParam("WHERE User_.userId NOT IN "
+              + " (SELECT UserGroupRole.userId " + "  FROM UserGroupRole "
+              + "  WHERE  (UserGroupRole.groupId = ?) AND (UserGroupRole.roleId = ?))", new Long[] {
+              course.getGroupCreatedId(),
+              RoleLocalServiceUtil.getRole(prefs.getTeacherRole()).getRoleId() }));
+           }
+
+           if (!tab.equals(editorName)) {
+
+            params.put("notInCourseRoleEdit", new CustomSQLParam("WHERE User_.userId NOT IN "
+              + " (SELECT UserGroupRole.userId " + "  FROM UserGroupRole "
+              + "  WHERE  (UserGroupRole.groupId = ?) AND (UserGroupRole.roleId = ?))", new Long[] {
+              course.getGroupCreatedId(),
+              RoleLocalServiceUtil.getRole(prefs.getEditorRole()).getRoleId() }));
+           }
+		
 		params.put("notInCourseRole",new CustomSQLParam("WHERE User_.userId NOT IN "+
 		                                                " (SELECT UserGroupRole.userId "+
 		                                                "  FROM UserGroupRole "+
@@ -282,6 +308,8 @@ if(backToEdit) {
 		boolean showOnlyOrganizationUsers = preferences.getValue("showOnlyOrganizationUsers", "false").equals("true");
 		List <User> userListPage = new LinkedList<User>();
 		long usersLimit = LmsPrefsLocalServiceUtil.getLmsPrefs(themeDisplay.getCompanyId()).getUsersResults();
+		if(usersLimit < 1)
+			   usersLimit = 5000;
 		
 		if (showOnlyOrganizationUsers) {
 			
