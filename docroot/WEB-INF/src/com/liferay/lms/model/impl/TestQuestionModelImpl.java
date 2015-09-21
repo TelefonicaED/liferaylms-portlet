@@ -66,9 +66,10 @@ public class TestQuestionModelImpl extends BaseModelImpl<TestQuestion>
 			{ "actId", Types.BIGINT },
 			{ "text_", Types.VARCHAR },
 			{ "questionType", Types.BIGINT },
-			{ "weight", Types.BIGINT }
+			{ "weight", Types.BIGINT },
+			{ "extracontent", Types.VARCHAR }
 		};
-	public static final String TABLE_SQL_CREATE = "create table Lms_TestQuestion (uuid_ VARCHAR(75) null,questionId LONG not null primary key,actId LONG,text_ TEXT null,questionType LONG,weight LONG)";
+	public static final String TABLE_SQL_CREATE = "create table Lms_TestQuestion (uuid_ VARCHAR(75) null,questionId LONG not null primary key,actId LONG,text_ TEXT null,questionType LONG,weight LONG,extracontent TEXT null)";
 	public static final String TABLE_SQL_DROP = "drop table Lms_TestQuestion";
 	public static final String ORDER_BY_JPQL = " ORDER BY testQuestion.questionId ASC";
 	public static final String ORDER_BY_SQL = " ORDER BY Lms_TestQuestion.questionId ASC";
@@ -106,6 +107,7 @@ public class TestQuestionModelImpl extends BaseModelImpl<TestQuestion>
 		model.setText(soapModel.getText());
 		model.setQuestionType(soapModel.getQuestionType());
 		model.setWeight(soapModel.getWeight());
+		model.setExtracontent(soapModel.getExtracontent());
 
 		return model;
 	}
@@ -170,6 +172,7 @@ public class TestQuestionModelImpl extends BaseModelImpl<TestQuestion>
 		attributes.put("text", getText());
 		attributes.put("questionType", getQuestionType());
 		attributes.put("weight", getWeight());
+		attributes.put("extracontent", getExtracontent());
 
 		return attributes;
 	}
@@ -210,6 +213,12 @@ public class TestQuestionModelImpl extends BaseModelImpl<TestQuestion>
 
 		if (weight != null) {
 			setWeight(weight);
+		}
+
+		String extracontent = (String)attributes.get("extracontent");
+
+		if (extracontent != null) {
+			setExtracontent(extracontent);
 		}
 	}
 
@@ -293,6 +302,19 @@ public class TestQuestionModelImpl extends BaseModelImpl<TestQuestion>
 		_weight = weight;
 	}
 
+	public String getExtracontent() {
+		if (_extracontent == null) {
+			return StringPool.BLANK;
+		}
+		else {
+			return _extracontent;
+		}
+	}
+
+	public void setExtracontent(String extracontent) {
+		_extracontent = extracontent;
+	}
+
 	public long getColumnBitmask() {
 		return _columnBitmask;
 	}
@@ -331,6 +353,7 @@ public class TestQuestionModelImpl extends BaseModelImpl<TestQuestion>
 		testQuestionImpl.setText(getText());
 		testQuestionImpl.setQuestionType(getQuestionType());
 		testQuestionImpl.setWeight(getWeight());
+		testQuestionImpl.setExtracontent(getExtracontent());
 
 		testQuestionImpl.resetOriginalValues();
 
@@ -428,12 +451,20 @@ public class TestQuestionModelImpl extends BaseModelImpl<TestQuestion>
 
 		testQuestionCacheModel.weight = getWeight();
 
+		testQuestionCacheModel.extracontent = getExtracontent();
+
+		String extracontent = testQuestionCacheModel.extracontent;
+
+		if ((extracontent != null) && (extracontent.length() == 0)) {
+			testQuestionCacheModel.extracontent = null;
+		}
+
 		return testQuestionCacheModel;
 	}
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(13);
+		StringBundler sb = new StringBundler(15);
 
 		sb.append("{uuid=");
 		sb.append(getUuid());
@@ -447,13 +478,15 @@ public class TestQuestionModelImpl extends BaseModelImpl<TestQuestion>
 		sb.append(getQuestionType());
 		sb.append(", weight=");
 		sb.append(getWeight());
+		sb.append(", extracontent=");
+		sb.append(getExtracontent());
 		sb.append("}");
 
 		return sb.toString();
 	}
 
 	public String toXmlString() {
-		StringBundler sb = new StringBundler(22);
+		StringBundler sb = new StringBundler(25);
 
 		sb.append("<model><model-name>");
 		sb.append("com.liferay.lms.model.TestQuestion");
@@ -483,6 +516,10 @@ public class TestQuestionModelImpl extends BaseModelImpl<TestQuestion>
 			"<column><column-name>weight</column-name><column-value><![CDATA[");
 		sb.append(getWeight());
 		sb.append("]]></column-value></column>");
+		sb.append(
+			"<column><column-name>extracontent</column-name><column-value><![CDATA[");
+		sb.append(getExtracontent());
+		sb.append("]]></column-value></column>");
 
 		sb.append("</model>");
 
@@ -502,6 +539,7 @@ public class TestQuestionModelImpl extends BaseModelImpl<TestQuestion>
 	private String _text;
 	private long _questionType;
 	private long _weight;
+	private String _extracontent;
 	private long _columnBitmask;
 	private TestQuestion _escapedModelProxy;
 }

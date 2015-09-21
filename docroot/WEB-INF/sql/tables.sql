@@ -254,7 +254,8 @@ create table Lms_TestQuestion (
 	actId LONG,
 	text_ TEXT null,
 	questionType LONG,
-	weight LONG
+	weight LONG,
+	extracontent TEXT null
 );
 
 create table Lms_UserCompetence (

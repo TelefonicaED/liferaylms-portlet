@@ -287,6 +287,12 @@ public class LearningActivityLocalServiceWrapper
 			arguments);
 	}
 
+	public boolean isDone(long actId, long userId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _learningActivityLocalService.isDone(actId, userId);
+	}
+
 	public boolean islocked(long actId, long userId) throws java.lang.Exception {
 		return _learningActivityLocalService.islocked(actId, userId);
 	}

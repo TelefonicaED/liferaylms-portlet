@@ -51,6 +51,7 @@ public class TestQuestionWrapper implements TestQuestion,
 		attributes.put("text", getText());
 		attributes.put("questionType", getQuestionType());
 		attributes.put("weight", getWeight());
+		attributes.put("extracontent", getExtracontent());
 
 		return attributes;
 	}
@@ -90,6 +91,12 @@ public class TestQuestionWrapper implements TestQuestion,
 
 		if (weight != null) {
 			setWeight(weight);
+		}
+
+		String extracontent = (String)attributes.get("extracontent");
+
+		if (extracontent != null) {
+			setExtracontent(extracontent);
 		}
 	}
 
@@ -217,6 +224,24 @@ public class TestQuestionWrapper implements TestQuestion,
 	*/
 	public void setWeight(long weight) {
 		_testQuestion.setWeight(weight);
+	}
+
+	/**
+	* Returns the extracontent of this test question.
+	*
+	* @return the extracontent of this test question
+	*/
+	public java.lang.String getExtracontent() {
+		return _testQuestion.getExtracontent();
+	}
+
+	/**
+	* Sets the extracontent of this test question.
+	*
+	* @param extracontent the extracontent of this test question
+	*/
+	public void setExtracontent(java.lang.String extracontent) {
+		_testQuestion.setExtracontent(extracontent);
 	}
 
 	public boolean isNew() {

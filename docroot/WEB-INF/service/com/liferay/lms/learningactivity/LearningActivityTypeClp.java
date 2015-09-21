@@ -649,4 +649,39 @@ public class LearningActivityTypeClp implements LearningActivityType {
 		return ((Boolean)returnObj);
 	}
 
+	@Override
+	public boolean isDone(LearningActivity learningActivity, long userId)
+			throws SystemException, PortalException {
+		Object returnObj = null;
+		try {
+			ClassLoader classLoader = clp.getClassLoader();
+			Class learningActivityClass = Class.forName(LearningActivity.class.getName(),true, classLoader);
+			MethodKey isDoneMethod = new MethodKey(clp.getClassName(), "isDone", learningActivityClass,Long.class);    
+			Object learningActivityObj = translateLearningActivity(learningActivity);
+			returnObj = clp.invoke(new MethodHandler(isDoneMethod, learningActivityObj,userId));
+			ClassLoaderProxy classLoaderProxy = new ClassLoaderProxy(learningActivityObj, clp.getClassLoader());
+			learningActivity.setModelAttributes((Map<String, Object>) classLoaderProxy.invoke("getModelAttributes", new Object[]{}));
+		}
+		catch (Throwable t) {
+			t = ClpSerializer.translateThrowable(t);
+			
+			if (t instanceof com.liferay.portal.kernel.exception.PortalException) {
+				throw (com.liferay.portal.kernel.exception.PortalException)t;
+			}
+			
+			if (t instanceof com.liferay.portal.kernel.exception.SystemException) {
+				throw (com.liferay.portal.kernel.exception.SystemException)t;
+			}
+
+			if (t instanceof RuntimeException) {
+				throw (RuntimeException)t;
+			}
+			else {
+				throw new RuntimeException(t.getClass().getName() +
+					" is not a valid exception");
+			}
+		}
+		return ((Boolean)returnObj);
+	}
+
 }

@@ -9,6 +9,8 @@ import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
 
 import com.liferay.lms.model.LearningActivity;
+import com.liferay.lms.model.LearningActivityResult;
+import com.liferay.lms.service.LearningActivityResultLocalServiceUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.upload.UploadRequest;
@@ -25,6 +27,19 @@ public abstract class BaseLearningActivityType implements LearningActivityType, 
 	@Override
 	public boolean allowsBank() {
 		return false;
+	}
+
+	@Override
+	public boolean isDone(LearningActivity learningActivity, long userId)throws SystemException, PortalException {
+		LearningActivityResult lar=LearningActivityResultLocalServiceUtil.getByActIdAndUserId(learningActivity.getActId(), userId);
+		if(lar==null)
+		{
+			return false;
+		}
+		else
+		{
+			return lar.getEndDate()!=null;
+		}
 	}
 
 	@Override

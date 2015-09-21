@@ -262,6 +262,11 @@ public interface LearningActivityLocalService extends BaseLocalService,
 		throws java.lang.Throwable;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public boolean isDone(long actId, long userId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public boolean islocked(long actId, long userId) throws java.lang.Exception;
 
 	public com.liferay.lms.model.LearningActivity addLearningActivity(

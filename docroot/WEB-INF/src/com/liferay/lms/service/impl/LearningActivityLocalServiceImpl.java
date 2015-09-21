@@ -25,6 +25,7 @@ import java.util.Map;
 
 import com.liferay.lms.auditing.AuditConstants;
 import com.liferay.lms.auditing.AuditingLogFactory;
+import com.liferay.lms.learningactivity.LearningActivityType;
 import com.liferay.lms.learningactivity.LearningActivityTypeRegistry;
 import com.liferay.lms.model.Course;
 import com.liferay.lms.model.LearningActivity;
@@ -101,7 +102,12 @@ import com.liferay.util.LmsLocaleUtil;
 public class LearningActivityLocalServiceImpl extends LearningActivityLocalServiceBaseImpl {
 	Log log = LogFactoryUtil.getLog(LearningActivityLocalServiceImpl.class);
 
-
+    public boolean isDone(long actId, long userId) throws SystemException, PortalException
+    {
+    	   LearningActivity larn = learningActivityPersistence.fetchByPrimaryKey(actId);
+		   LearningActivityType lat=new LearningActivityTypeRegistry().getLearningActivityType(larn.getTypeId());
+		   return lat.isDone(larn, userId);
+    }
 	public boolean islocked(long actId, long userId) throws Exception
 	{
 		LearningActivity larn =

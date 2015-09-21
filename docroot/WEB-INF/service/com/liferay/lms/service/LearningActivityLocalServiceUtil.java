@@ -288,6 +288,12 @@ public class LearningActivityLocalServiceUtil {
 		return getService().invokeMethod(name, parameterTypes, arguments);
 	}
 
+	public static boolean isDone(long actId, long userId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getService().isDone(actId, userId);
+	}
+
 	public static boolean islocked(long actId, long userId)
 		throws java.lang.Exception {
 		return getService().islocked(actId, userId);

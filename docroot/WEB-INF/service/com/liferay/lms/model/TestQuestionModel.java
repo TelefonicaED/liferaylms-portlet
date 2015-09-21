@@ -143,6 +143,21 @@ public interface TestQuestionModel extends BaseModel<TestQuestion> {
 	 */
 	public void setWeight(long weight);
 
+	/**
+	 * Returns the extracontent of this test question.
+	 *
+	 * @return the extracontent of this test question
+	 */
+	@AutoEscape
+	public String getExtracontent();
+
+	/**
+	 * Sets the extracontent of this test question.
+	 *
+	 * @param extracontent the extracontent of this test question
+	 */
+	public void setExtracontent(String extracontent);
+
 	public boolean isNew();
 
 	public void setNew(boolean n);

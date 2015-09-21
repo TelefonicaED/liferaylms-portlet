@@ -35,6 +35,7 @@ public interface LearningActivityType extends InvokableService
 	public boolean hasEditDetails();
 	public boolean hasDeleteTries();
 	public boolean hasMandatoryDates();
+	public boolean isDone(LearningActivity learningActivity,long userId) throws SystemException, PortalException;
 	public boolean allowsBank();
 	public String getExpecificContentPage();
 	public void setExtraContent(UploadRequest uploadRequest,PortletResponse portletResponse,LearningActivity learningActivity) throws PortalException,SystemException,DocumentException,IOException, NumberFormatException, Exception;
