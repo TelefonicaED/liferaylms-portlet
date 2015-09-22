@@ -29,11 +29,12 @@
 function actionDiv(element){
 	var ua = navigator.userAgent;
 	var re  = new RegExp("MSIE ([0-9]{1,}[\.0-9]{0,})");
+	var rv;
 	    if (re.exec(ua) != null){
 	      rv = parseFloat( RegExp.$1 );
 	  }
 	 var childs;
-	if ( ver == 8.0 ) {
+	if ( rv == 8.0 ) {
 		childs = document.querySelectorAll('.collapsable2');
 	}else{
 		childs = element.parentNode.getElementsByClassName("collapsable2");
