@@ -28,6 +28,7 @@
 	boolean improve=false;
 	boolean disabled = false;
 	boolean enableorder = true;
+	boolean hideFeedback=false;
 	long tries = 0;
 	
 	LearningActivity learningActivity=(LearningActivity)request.getAttribute("activity");
@@ -49,6 +50,7 @@
 		showCorrectAnswer = StringPool.TRUE.equals(LearningActivityLocalServiceUtil.getExtraContentValue(learningActivity.getActId(),"showCorrectAnswer"));
 		showCorrectAnswerOnlyOnFinalTry = StringPool.TRUE.equals(LearningActivityLocalServiceUtil.getExtraContentValue(learningActivity.getActId(),"showCorrectAnswerOnlyOnFinalTry"));
 		improve = StringPool.TRUE.equals(LearningActivityLocalServiceUtil.getExtraContentValue(learningActivity.getActId(),"improve"));	
+		hideFeedback = StringPool.TRUE.equals(LearningActivityLocalServiceUtil.getExtraContentValue(learningActivity.getActId(),"hideFeedback"));
 		
 		moduleId=learningActivity.getModuleId();
 		Course course=CourseLocalServiceUtil.fetchByGroupCreatedId(themeDisplay.getScopeGroupId());
@@ -147,6 +149,7 @@ window.<portlet:namespace />validate_execactivity={
 						A.one('#<portlet:namespace />fm * select[name=<portlet:namespace />minuteDuration]').set('disabled',notEditable);
 						A.one('#<portlet:namespace />fm * select[name=<portlet:namespace />secondDuration]').set('disabled',notEditable);
 						A.one('#<portlet:namespace />showCorrectAnswerCheckbox').set('disabled',notEditable);
+						A.one('#<portlet:namespace />hideFeedbackCheckbox').set('disabled',notEditable);
 						A.one('#<portlet:namespace />showCorrectAnswerOnlyOnFinalTryCheckbox').set('disabled',notEditable);
 						A.one('#<portlet:namespace />improveCheckbox').set('disabled',notEditable);
 						A.one('#<portlet:namespace />enableorderCheckbox').set('disabled',notEditable);
@@ -157,6 +160,8 @@ window.<portlet:namespace />validate_execactivity={
 							A.one('#<portlet:namespace />fm * select[name=<portlet:namespace />hourDuration]').set('value',<%=Long.toString(hourDuration)%>);
 							A.one('#<portlet:namespace />fm * select[name=<portlet:namespace />minuteDuration]').set('value',<%=Long.toString(minuteDuration)%>);
 							A.one('#<portlet:namespace />fm * select[name=<portlet:namespace />secondDuration]').set('value',<%=Long.toString(secondDuration)%>);
+							A.one('#<portlet:namespace />hideFeedback').set('value','<%=Boolean.toString(hideFeedback)%>');
+							A.one('#<portlet:namespace />hideFeedbackCheckbox').set('checked',<%=Boolean.toString(hideFeedback)%>);
 							A.one('#<portlet:namespace />showCorrectAnswer').set('value','<%=Boolean.toString(showCorrectAnswer)%>');
 							A.one('#<portlet:namespace />showCorrectAnswerCheckbox').set('checked',<%=Boolean.toString(showCorrectAnswer)%>);
 							A.one('#<portlet:namespace />showCorrectAnswerOnlyOnFinalTry').set('value','<%=Boolean.toString(showCorrectAnswerOnlyOnFinalTry)%>');
@@ -252,6 +257,8 @@ window.<portlet:namespace />validate_execactivity={
 			%>
 		</select>			
 	</aui:field-wrapper>
+		<aui:input type="checkbox" name="hideFeedback" label="exectactivity.edit.hidefeedback" checked="<%=hideFeedback %>"
+		ignoreRequestValue="true" helpMessage="exectactivity.edit.hidefeedback.helpMessage" ></aui:input>
 	
 	<aui:input type="checkbox" name="showCorrectAnswer" label="exectactivity.edit.showcorrect" checked="<%=showCorrectAnswer %>"
 		ignoreRequestValue="true" helpMessage="exectactivity.edit.showcorrect.helpMessage" onClick='<%= renderResponse.getNamespace() + "showAnswer2(event)" %>'></aui:input>

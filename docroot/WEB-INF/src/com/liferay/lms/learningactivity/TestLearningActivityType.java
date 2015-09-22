@@ -189,7 +189,15 @@ public class TestLearningActivityType extends BaseLearningActivityType
 			showCorrectAnswer = SAXReaderUtil.createElement("showCorrectAnswer");
 			showCorrectAnswer.setText(Boolean.toString(ParamUtil.get(uploadRequest,"showCorrectAnswer",false)));		
 			rootElement.add(showCorrectAnswer);	
-			
+			Element hideFeedback=rootElement.element("hideFeedback");
+			if(hideFeedback!=null)
+			{
+				hideFeedback.detach();
+				rootElement.remove(hideFeedback);
+			}
+			hideFeedback = SAXReaderUtil.createElement("hideFeedback");
+			hideFeedback.setText(Boolean.toString(ParamUtil.get(uploadRequest,"hideFeedback",false)));		
+			rootElement.add(hideFeedback);	
 			Element showCorrectAnswerOnlyOnFinalTry=rootElement.element("showCorrectAnswerOnlyOnFinalTry");
 			if(showCorrectAnswerOnlyOnFinalTry!=null)
 			{

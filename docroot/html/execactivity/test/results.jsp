@@ -77,20 +77,22 @@
 		Long userTries = Long.valueOf(LearningActivityTryLocalServiceUtil.getTriesCountByActivityAndUser(learningActivity.getActId(),themeDisplay.getUserId()));
 	
 		LearningActivityResult result = LearningActivityResultLocalServiceUtil.getByActIdAndUserId(learningActivity.getActId(), themeDisplay.getUserId());
-	
+		boolean hideFeedback=false;
 		boolean userPassed=false;
+		hideFeedback = StringPool.TRUE.equals(LearningActivityLocalServiceUtil.getExtraContentValue(learningActivity.getActId(),"hideFeedback"));
+		
 		boolean comesFromCorrection = ParamUtil.get(request, "correction", false);
 		long oldResult= ParamUtil.get(request, "oldResult", -1);
 		if(!comesFromCorrection) {
 			userPassed=LearningActivityResultLocalServiceUtil.userPassed(learningActivity.getActId(),themeDisplay.getUserId());
 		}else {
 			userPassed=learningActivity.getPasspuntuation()<=larntry.getResult();
-			//Cuando estamos mejorando la nota no mostramos el popup.
-			//if(oldResult <= 0){
+			if(!hideFeedback)
+			{
 %>
 <jsp:include page="/html/shared/popResult.jsp" />
 <%
-			//}
+			}
 %>
 			<h2><%=learningActivity.getTitle(themeDisplay.getLocale()) %></h2>
 <% 
@@ -142,27 +144,29 @@
 			<p class="color_tercero"><liferay-ui:message key="your-result-no-more-tries" /></p>
 <%
 		}
-%>
-		<p class="negrita"><liferay-ui:message key="your-answers" /></p>
-<%
-		List<TestQuestion> questions=null;
-		if (GetterUtil.getLong(LearningActivityLocalServiceUtil.getExtraContentValue(learningActivity.getActId(),"random"))==0)
-			questions=TestQuestionLocalServiceUtil.getQuestions(learningActivity.getActId());
-		else{
-			questions= new ArrayList<TestQuestion>();
-			Iterator<Element> nodeItr = SAXReaderUtil.read(larntry.getTryResultData()).getRootElement().elementIterator();
-			while(nodeItr.hasNext()) {
-				Element element = nodeItr.next();
-		         if("question".equals(element.getName())) questions.add(TestQuestionLocalServiceUtil.getTestQuestion(Long.valueOf(element.attributeValue("id"))));
-		    }	
+		if(!hideFeedback)
+		{
+	%>
+			<p class="negrita"><liferay-ui:message key="your-answers" /></p>
+	<%
+			List<TestQuestion> questions=null;
+			if (GetterUtil.getLong(LearningActivityLocalServiceUtil.getExtraContentValue(learningActivity.getActId(),"random"))==0)
+				questions=TestQuestionLocalServiceUtil.getQuestions(learningActivity.getActId());
+			else{
+				questions= new ArrayList<TestQuestion>();
+				Iterator<Element> nodeItr = SAXReaderUtil.read(larntry.getTryResultData()).getRootElement().elementIterator();
+				while(nodeItr.hasNext()) {
+					Element element = nodeItr.next();
+			         if("question".equals(element.getName())) questions.add(TestQuestionLocalServiceUtil.getTestQuestion(Long.valueOf(element.attributeValue("id"))));
+			    }	
+			}
+			
+			for(TestQuestion question:questions){
+				QuestionType qt = new QuestionTypeRegistry().getQuestionType(question.getQuestionType());
+				qt.setLocale(themeDisplay.getLocale());
+				%><%=qt.getHtmlFeedback(SAXReaderUtil.read(larntry.getTryResultData()), question.getQuestionId(), themeDisplay)%><%
+			}
 		}
-		
-		for(TestQuestion question:questions){
-			QuestionType qt = new QuestionTypeRegistry().getQuestionType(question.getQuestionType());
-			qt.setLocale(themeDisplay.getLocale());
-			%><%=qt.getHtmlFeedback(SAXReaderUtil.read(larntry.getTryResultData()), question.getQuestionId(), themeDisplay)%><%
-		}
-	
 		if(tries==0 || userTries < tries ||permissionChecker.hasPermission(learningActivity.getGroupId(),LearningActivity.class.getName(),learningActivity.getActId(), ActionKeys.UPDATE)) {
 			if(!LearningActivityResultLocalServiceUtil.userPassed(learningActivity.getActId(),themeDisplay.getUserId())){
 				if(tries>0){	
