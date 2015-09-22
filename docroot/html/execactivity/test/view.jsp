@@ -108,10 +108,15 @@
 					} else if (LearningActivityTryLocalServiceUtil.canUserDoANewTry(actId, userId) 
 						|| permissionChecker.hasPermission(activity.getGroupId(), LearningActivity.class.getName(),actId, ActionKeys.UPDATE)
 						|| permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), "com.liferay.lms.model",themeDisplay.getScopeGroupId(),"ACCESSLOCK")
-			    		|| improving ){%>
+			    		|| improving ){
+							boolean isBank = StringPool.TRUE.equals(LearningActivityLocalServiceUtil.getExtraContentValue(actId, "isBank"));
+%>
+			    	
 			    		<h2 class="description-title"><%=activity.getTitle(themeDisplay.getLocale()) %></h2>
 				<%--<h3 class="description-h3"><liferay-ui:message key="description" /></h3> --%>
-				<div class="description"><%=activity.getDescriptionFiltered(themeDisplay.getLocale(),true) %></div>
+				<div class="description">
+					<%=activity.getDescriptionFiltered(themeDisplay.getLocale(),true) %>
+				</div>
 				<%
 						
 						
@@ -143,9 +148,14 @@
 <%
 							}else{		
 								List<TestQuestion> questions = TestQuestionLocalServiceUtil.getQuestions(actId);
-								boolean isBank = StringPool.TRUE.equals(LearningActivityLocalServiceUtil.getExtraContentValue(actId, "isBank"));
 								if (isBank){
 									questions = TestQuestionLocalServiceUtil.generateAleatoryQuestions(actId, 0L);
+									LearningActivity bankActivity = LearningActivityLocalServiceUtil.getLearningActivity(questions.get(0).getActId());
+%>
+									<div class="description-bank">
+										<%=bankActivity.getDescriptionFiltered(themeDisplay.getLocale(),true) %>
+									</div>
+<%									
 								}else{
 									BeanComparator beanComparator = new BeanComparator("weight");
 									Collections.sort(questions, beanComparator);

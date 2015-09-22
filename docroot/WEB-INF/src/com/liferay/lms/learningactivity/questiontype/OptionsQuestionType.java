@@ -146,6 +146,9 @@ public class OptionsQuestionType extends BaseQuestionType {
 			if(feedback) feedMessage = LanguageUtil.get(themeDisplay.getLocale(),"answer-in-blank") ;
 			int i=0;
 			String disabled = "";
+			if (isCombo){
+				answersFeedBack+="<option value=\"\">"+LanguageUtil.get(themeDisplay.getLocale(),"learningactivity.embeddedtest.select")+"</option>";
+			}
 			for(TestAnswer answer:testAnswers){
 				String correct="", checked="", showCorrectAnswer="false";
 				disabled = "";
