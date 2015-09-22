@@ -124,7 +124,7 @@ public class OptionsQuestionType extends BaseQuestionType {
 		return questionXML;
 	}
 
-	private String getHtml(Document document, long questionId, boolean feedback, ThemeDisplay themeDisplay){
+	private String getHtml(Document document, long questionId,boolean feedback, ThemeDisplay themeDisplay){
 		String html = "", answersFeedBack="", feedMessage = "", cssclass="", selected="";
 		String namespace = themeDisplay != null ? themeDisplay.getPortletDisplay().getNamespace() : "";
 		boolean isCombo = false;
@@ -132,18 +132,20 @@ public class OptionsQuestionType extends BaseQuestionType {
 			TestQuestion question = TestQuestionLocalServiceUtil.fetchTestQuestion(questionId);
 			String formatType = "0";
 			boolean enableorder = false;
-			try{
-				Document xml = SAXReaderUtil.read(question.getExtracontent());
-				Element ele = xml.getRootElement();
-				formatType = (String) ele.element("formattype").getData();
-				enableorder = StringPool.TRUE.equals(LearningActivityLocalServiceUtil.getExtraContentValue(question.getActId(),"enableorder"));
-				if ( enableorder && formatType.equals(PortletProps.get("lms.question.formattype.horizontal")) ){
-					cssclass="in-line ";
-				}else if ( enableorder && formatType.equals(PortletProps.get("lms.question.formattype.combo")) ){
-					isCombo=true;
+			if(question.getExtracontent()!=null && !question.getExtracontent().trim().isEmpty()){
+				try{
+					Document xml = SAXReaderUtil.read(question.getExtracontent());
+					Element ele = xml.getRootElement();
+					formatType = (String) ele.element("formattype").getData();
+					enableorder = StringPool.TRUE.equals(LearningActivityLocalServiceUtil.getExtraContentValue(question.getActId(),"enableorder"));
+					if ( enableorder && formatType.equals(PortletProps.get("lms.question.formattype.horizontal")) ){
+						cssclass="in-line ";
+					}else if ( enableorder && formatType.equals(PortletProps.get("lms.question.formattype.combo")) ){
+						isCombo=true;
+					}
+				}catch(DocumentException e){
+					e.printStackTrace();
 				}
-			}catch(DocumentException e){
-				log.info(e);
 			}
 			List<TestAnswer> answersSelected=getAnswersSelected(document, questionId);
 			List<TestAnswer> testAnswers= TestAnswerLocalServiceUtil.getTestAnswersByQuestionId(question.getQuestionId());
