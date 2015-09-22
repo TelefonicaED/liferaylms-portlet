@@ -35,7 +35,7 @@ function actionDiv(element){
 	  }
 	 var childs;
 	if ( rv == 8.0 ) {
-		childs = document.querySelectorAll('.collapsable2');
+		childs = element.parentNode.querySelectorAll('.collapsable2');
 	}else{
 		childs = element.parentNode.getElementsByClassName("collapsable2");
 	}
