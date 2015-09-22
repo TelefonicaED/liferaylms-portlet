@@ -18,6 +18,8 @@ import com.liferay.util.portlet.PortletProps;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PropsUtil;
@@ -31,6 +33,7 @@ import com.liferay.portal.theme.ThemeDisplay;
 public class OptionsQuestionType extends BaseQuestionType {
 
 	private static final long serialVersionUID = 1L;
+	private static Log log = LogFactoryUtil.getLog(OptionsQuestionType.class);
 	protected String inputType = "radio";
 	protected String XMLSingle = "true";
 
@@ -127,18 +130,20 @@ public class OptionsQuestionType extends BaseQuestionType {
 		boolean isCombo = false;
 		try {
 			TestQuestion question = TestQuestionLocalServiceUtil.fetchTestQuestion(questionId);
+			String formatType = "0";
+			boolean enableorder = false;
 			try{
 				Document xml = SAXReaderUtil.read(question.getExtracontent());
 				Element ele = xml.getRootElement();
-				String formatType = (String) ele.element("formattype").getData();
-				boolean enableorder = StringPool.TRUE.equals(LearningActivityLocalServiceUtil.getExtraContentValue(question.getActId(),"enableorder"));
+				formatType = (String) ele.element("formattype").getData();
+				enableorder = StringPool.TRUE.equals(LearningActivityLocalServiceUtil.getExtraContentValue(question.getActId(),"enableorder"));
 				if ( enableorder && formatType.equals(PortletProps.get("lms.question.formattype.horizontal")) ){
 					cssclass="in-line ";
 				}else if ( enableorder && formatType.equals(PortletProps.get("lms.question.formattype.combo")) ){
 					isCombo=true;
 				}
 			}catch(DocumentException e){
-				e.printStackTrace();
+				log.info(e);
 			}
 			List<TestAnswer> answersSelected=getAnswersSelected(document, questionId);
 			List<TestAnswer> testAnswers= TestAnswerLocalServiceUtil.getTestAnswersByQuestionId(question.getQuestionId());
