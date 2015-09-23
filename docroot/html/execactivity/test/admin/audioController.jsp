@@ -12,33 +12,37 @@
 <script type="text/javascript">
 	var intentos=0;
 	
-	document.getElementById("enunciado").ontimeupdate = function() {
-    	var tiempo_reproducido="<liferay-ui:message key='learningactivity.embeddedtest.playinprogress'/>" + <portlet:namespace />pintarTiempo(document.getElementById("enunciado").currentTime);
-   		document.getElementById("reproducir").innerHTML =  tiempo_reproducido;
-      	document.getElementById('barra_proceso').setAttribute("value", document.getElementById("enunciado").currentTime / document.getElementById("enunciado").duration);
+	if(!document.getElementById("enunciado")){
+		document.getElementById("reproducir").style.display = "none";
+	}else{
+		document.getElementById("enunciado").ontimeupdate = function() {
+	    	var tiempo_reproducido="<liferay-ui:message key='learningactivity.embeddedtest.playinprogress'/>" + <portlet:namespace />pintarTiempo(document.getElementById("enunciado").currentTime);
+	   		document.getElementById("reproducir").innerHTML =  tiempo_reproducido;
+	      	document.getElementById('barra_proceso').setAttribute("value", document.getElementById("enunciado").currentTime / document.getElementById("enunciado").duration);
+		}
+		document.getElementById("enunciado").onplay  = function() {
+			if (intentos < <%=attempts %> ){
+				document.getElementById("barra_proceso").style.display = "inline";
+	        	document.getElementById("enunciado").play(); 
+	   		}else{
+	        	document.getElementById("enunciado").pause(); 
+	        	document.getElementById("enunciado").currentTime = 0;
+	        	document.getElementById("enunciado").src = '';
+	   		}    
+	  	}
+	   	document.getElementById("enunciado").onended = function() {
+	    	document.getElementById("enunciado").pause();
+	    	document.getElementById('barra_proceso').setAttribute("value", 0);
+	    	document.getElementById("barra_proceso").style.display = "none";
+	    	document.getElementById("reproducir").innerHTML ="Reproducir";
+	    	intentos=intentos+1;
+	    	if (intentos >= <%=attempts %> ){
+	      		document.getElementById("enunciado").currentTime = 0;
+	         	document.getElementById("enunciado").src = '';
+	         	document.getElementById('reproducir').setAttribute("class", "reproduccion_bloqueado");
+	     	}
+	  	}
 	}
-	document.getElementById("enunciado").onplay  = function() {
-		if (intentos < <%=attempts %> ){
-			document.getElementById("barra_proceso").style.display = "inline";
-        	document.getElementById("enunciado").play(); 
-   		}else{
-        	document.getElementById("enunciado").pause(); 
-        	document.getElementById("enunciado").currentTime = 0;
-        	document.getElementById("enunciado").src = '';
-   		}    
-  	}
-   	document.getElementById("enunciado").onended = function() {
-    	document.getElementById("enunciado").pause();
-    	document.getElementById('barra_proceso').setAttribute("value", 0);
-    	document.getElementById("barra_proceso").style.display = "none";
-    	document.getElementById("reproducir").innerHTML ="Reproducir";
-    	intentos=intentos+1;
-    	if (intentos >= <%=attempts %> ){
-      		document.getElementById("enunciado").currentTime = 0;
-         	document.getElementById("enunciado").src = '';
-         	document.getElementById('reproducir').setAttribute("class", "reproduccion_bloqueado");
-     	}
-  	}
   	function <portlet:namespace />reproducir(){
    		document.getElementById("enunciado").play();
   	}
