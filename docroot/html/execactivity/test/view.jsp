@@ -156,7 +156,7 @@
 										<%=bankActivity.getDescriptionFiltered(themeDisplay.getLocale(),true) %>
 									</div>
 									<div id="audio-embebido">
-										<a id="reproducir" onclick="<portlet:namespace />reproducir();" href="#"><liferay-ui:message key="learningactivity.embeddedtest.play"/></a>
+										<a class="reproduccion" id="reproducir" onclick="<portlet:namespace />reproducir();" href="#"><liferay-ui:message key="learningactivity.embeddedtest.play"/></a>
 										<progress style="display:none" id="barra_proceso" value="0" max="1" style="width:300px"></progress>
 									</div>
 <%									
