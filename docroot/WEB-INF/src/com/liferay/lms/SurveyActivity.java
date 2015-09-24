@@ -5,12 +5,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
@@ -77,6 +80,7 @@ import com.tls.lms.util.LiferaylmsUtil;
 public class SurveyActivity extends MVCPortlet {
 	
 	HashMap<Long, TestAnswer> answersMap = new HashMap<Long, TestAnswer>(); 
+	static final Pattern DOCUMENT_EXCEPTION_MATCHER = Pattern.compile("Error on line (\\d+) of document ([^ ]+) : (.*)");
  
 	public void saveSurvey(ActionRequest actionRequest, ActionResponse actionResponse) throws Exception {
 		
@@ -482,6 +486,49 @@ public class SurveyActivity extends MVCPortlet {
 		actionResponse.setRenderParameter("actionEditingDetails", StringPool.TRUE);
 		actionResponse.setRenderParameter("resId", Long.toString(actId));
 	}
+	
+	public void importQuestionsXml(ActionRequest actionRequest, ActionResponse actionResponse)
+			throws Exception {
+
+		UploadPortletRequest request = PortalUtil.getUploadPortletRequest(actionRequest);
+
+		long actId = ParamUtil.getLong(actionRequest, "resId");
+		String fileName = request.getFileName("fileName");
+		if(fileName==null || StringPool.BLANK.equals(fileName)){
+			SessionErrors.add(actionRequest, "surveyactivity.editquestions.importquestions.xml.fileRequired");
+			actionResponse.setRenderParameter("jspPage", "/html/surveyactivity/admin/importquestionsXml.jsp");
+		}
+		else{ 
+			String contentType = request.getContentType("fileName");	
+			if (!ContentTypes.TEXT_XML.equals(contentType) && !ContentTypes.TEXT_XML_UTF8.equals(contentType) ) {
+				SessionErrors.add(actionRequest, "surveyactivity.editquestions.importquestions.xml.badFormat");	
+				actionResponse.setRenderParameter("jspPage", "/html/surveyactivity/admin/importquestionsXml.jsp");
+			}
+			else {
+				try {
+					Document document = SAXReaderUtil.read(request.getFile("fileName"));
+					TestQuestionLocalServiceUtil.importXML(actId, document);
+					SessionMessages.add(actionRequest, "questions-added-successfully");
+					actionResponse.setRenderParameter("jspPage", "/html/surveyactivity/admin/editquestions.jsp");
+				} catch (DocumentException e) {
+					Matcher matcher = DOCUMENT_EXCEPTION_MATCHER.matcher(e.getMessage());
+
+					if(matcher.matches()) {
+						SessionErrors.add(actionRequest, "surveyactivity.editquestions.importquestions.xml.parseXMLLine", matcher.group(1));
+					}
+					else{
+						SessionErrors.add(actionRequest, "surveyactivity.editquestions.importquestions.xml.parseXML");					
+					}
+					actionResponse.setRenderParameter("jspPage", "/html/surveyactivity/admin/importquestionsXml.jsp");
+				} catch (Exception e) {
+					SessionErrors.add(actionRequest, "surveyactivity.editquestions.importquestions.xml.generic");
+					actionResponse.setRenderParameter("jspPage", "/html/surveyactivity/admin/importquestionsXml.jsp");
+				}
+			}
+		}
+		actionResponse.setRenderParameter("actionEditingDetails", StringPool.TRUE);
+		actionResponse.setRenderParameter("resId", Long.toString(actId));	
+	}
 		
 	public void editanswer(ActionRequest actionRequest, ActionResponse actionResponse)
 			throws Exception {
@@ -761,6 +808,35 @@ public class SurveyActivity extends MVCPortlet {
 
 			} catch (SystemException e) {
 			}finally{
+				response.getPortletOutputStream().flush();
+				response.getPortletOutputStream().close();
+			}
+		}else if(action.equals("exportXml")){
+			try {
+				response.addProperty(HttpHeaders.CONTENT_DISPOSITION,"attachment; fileName=data.xml");
+				response.setContentType(ContentTypes.TEXT_XML_UTF8);
+				PrintWriter printWriter = new PrintWriter(new OutputStreamWriter(response.getPortletOutputStream(),StringPool.UTF8));
+				Element quizXML=SAXReaderUtil.createElement("quiz");
+				Document quizXMLDoc=SAXReaderUtil.createDocument(quizXML);
+				
+				List<TestQuestion> questiones=TestQuestionLocalServiceUtil.getQuestions(actId);
+				List<TestQuestion> questions = ListUtil.copy(questiones);
+				BeanComparator beanComparator = new BeanComparator("weight");
+				Collections.sort(questions, beanComparator);
+				
+				if(questions!=null &&questions.size()>0){
+					for(TestQuestion question:questions){
+						QuestionType qt =new QuestionTypeRegistry().getQuestionType(question.getQuestionType());
+						quizXML.add(qt.exportXML(question.getQuestionId()));
+					}
+				}
+				
+				printWriter.write(quizXMLDoc.formattedString());
+				printWriter.flush();
+				printWriter.close();
+			
+			}catch (SystemException e) {}
+			finally{
 				response.getPortletOutputStream().flush();
 				response.getPortletOutputStream().close();
 			}
