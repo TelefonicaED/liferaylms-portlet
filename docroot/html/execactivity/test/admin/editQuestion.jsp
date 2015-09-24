@@ -314,7 +314,7 @@
 
 	<%
 	if(learningActivity.getTypeId()!=4){ %>
-		%>
+	
 		<aui:field-wrapper label="answers" helpMessage="<%=qt.getDescription(themeDisplay.getLocale()) %>" /><%
 
 	 } %>
