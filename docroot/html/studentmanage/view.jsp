@@ -190,7 +190,6 @@ else
 					userParams.put("usersGroups", new Long(themeDisplay.getScopeGroupId()));
 
 					userListPage  = UserLocalServiceUtil.search(themeDisplay.getCompanyId(), criteria, 0, userParams, searchContainer.getStart(), searchContainer.getEnd(), obc);
-					System.out.println("HERE "+userListPage.size());
 				}else{
 					userParams.put("usersGroups", new Long(themeDisplay.getScopeGroupId()));
 					OrderByComparator obc = null;
