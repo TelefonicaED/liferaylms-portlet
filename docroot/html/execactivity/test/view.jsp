@@ -33,6 +33,7 @@
 <%@page import="com.liferay.portal.kernel.xml.Element"%>
 <%@page import="com.liferay.portal.kernel.xml.SAXReaderUtil"%>
 <%@page import="com.liferay.util.JavaScriptUtil"%>
+<%@page import="com.liferay.portal.kernel.util.PropsUtil" %>
 
 <%@ include file="/init.jsp" %>
 
@@ -288,6 +289,7 @@
 									return (question.all('select.answer').value != 0);
 								},
 								questiontype_multioptions : function(question) {
+									alert('ENTROOOOOOO');
 									return (question.all('div.answer input[type="checkbox"]:checked').size() > 0);
 								},
 								questiontype_freetext : function(question) {
@@ -439,6 +441,9 @@
 			</script>			
 
 			<aui:form name="formulario" action="<%=correctURL %>" method="post" onSubmit="javascript:return false;">
+<%
+			String maxNumberOfCheck = PropsUtil.get("lms.question.multiple.maxnumbercheck");
+%>
 <!-- De momento se comenta la numeración -->
 <!-- 			<script type="text/javascript"> -->
 <!--  				AUI().ready(function(A) { -->
@@ -452,6 +457,27 @@
 <!--  					}); -->
 <!--  				}); -->
 <!-- 			</script> -->
+			<script type="text/javascript">
+				var numberOfChecks = 0;
+		    	function <portlet:namespace />checkMaxNumberOfChecks(idQ,idA){
+		    		var A = AUI();
+		    		if(A.one('#<portlet:namespace />question_'+idQ+'_'+idA+':checked')){
+		    			numberOfChecks++;
+		    			if(numberOfChecks==<%=maxNumberOfCheck%>){
+		    				A.all('div.answer input[type="checkbox"]').setAttribute('disabled','disabled');
+		    				var inputs = A.all('div.answer input[type="checkbox"]:checked');
+		    				inputs.each(function(input){
+		    					input.removeAttribute('disabled');
+		  					});
+		    			}
+		    		}else{
+		    			if(numberOfChecks==<%=maxNumberOfCheck%>){
+		    				A.all('div.answer input[type="checkbox"]').removeAttribute('disabled');
+		    			}
+		    			numberOfChecks--;
+		    		}
+		    	}
+			</script>
 			
 			<%
 			long random = GetterUtil.getLong(LearningActivityLocalServiceUtil.getExtraContentValue(activity.getActId(),"random"));
