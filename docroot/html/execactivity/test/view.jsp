@@ -508,7 +508,7 @@
 				}
 				random = questions.size();
 			} else {
-				if (random != 0){
+				if (random != 0 && !isBank){
 					questions = new ArrayList<TestQuestion>(questions);
 					Collections.shuffle(questions);	
 					if (random > questions.size()){
