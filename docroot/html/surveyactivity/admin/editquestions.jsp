@@ -101,6 +101,17 @@ Liferay.provide(
 		message="surveyactivity.editquestions.importquestions"
 		url='<%= importquestionsURL %>'
 		/>
+		<portlet:renderURL var="importquestionsXmlURL">
+			<portlet:param name="resId" value="<%=String.valueOf(learningActivity.getActId()) %>" />
+			<portlet:param name="actionEditingDetails" value="<%=StringPool.TRUE %>"></portlet:param>	
+			<portlet:param name="jspPage" value="/html/surveyactivity/admin/importquestionsXml.jsp"></portlet:param>
+		</portlet:renderURL>
+		<liferay-ui:icon
+		image="add"
+		label="<%= true %>"
+		message="surveyactivity.editquestions.importquestions.xml"
+		url='<%= importquestionsXmlURL %>'
+		/>
 		
 		<liferay-portlet:resourceURL var="exportResultsCsvURL" >
 			<portlet:param name="action" value="export"/>
@@ -113,6 +124,12 @@ Liferay.provide(
 			<portlet:param name="resId" value="<%=Long.toString(learningActivity.getActId()) %>"/>
 		</liferay-portlet:resourceURL>
 		<liferay-ui:icon image="export" label="<%= true %>" message="surveyactivity.editquestions.exportcsv" method="get" url="<%=exportURL%>" />
+		
+		<liferay-portlet:resourceURL var="exportXmlURL" >
+			<portlet:param name="action" value="exportXml"/>
+			<portlet:param name="resId" value="<%=Long.toString(learningActivity.getActId()) %>"/>
+		</liferay-portlet:resourceURL>
+		<liferay-ui:icon image="export" label="<%= true %>" message="surveyactivity.editquestions.exportXml" method="get" url="<%=exportXmlURL%>" />
 		
 	</liferay-ui:icon-menu>
 </div>

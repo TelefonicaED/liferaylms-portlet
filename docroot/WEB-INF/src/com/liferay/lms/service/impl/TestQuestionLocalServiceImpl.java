@@ -76,8 +76,11 @@ public class TestQuestionLocalServiceImpl
 	}
 	private long getQuestionType(Element question) {
 		long type = -1;
-		if("multichoice".equals(question.attributeValue("type")) && "true".equals(question.element("single").getText())) type = 0;
+		boolean isSurveyHorizontal = "surveyoptionshorizontal".equals(question.element("name").element("text").getText());
+
+		if("multichoice".equals(question.attributeValue("type")) && "true".equals(question.element("single").getText()) && !isSurveyHorizontal) type = 0;
 		else if("multichoice".equals(question.attributeValue("type")) && "false".equals(question.element("single").getText())) type = 1;
+		else if("multichoice".equals(question.attributeValue("type")) && "true".equals(question.element("single").getText()) && isSurveyHorizontal) type = 7;
 		else if("essay".equals(question.attributeValue("type")) || "numerical".equals(question.attributeValue("type")) || "shortanswer".equals(question.attributeValue("type"))) type = 2;
 		else if("cloze".equals(question.attributeValue("type"))) type = 3;
 		else if("draganddrop".equals(question.attributeValue("type"))) type = 4;

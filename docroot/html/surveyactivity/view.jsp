@@ -45,6 +45,10 @@
   height: 20px;
 }
 
+textarea {
+    resize: none;
+}
+
 </style>
 <div class="container-activity">
 <%
@@ -259,9 +263,9 @@
 								</div>
 							<% } else { // En este caso es texto libre %>
 								<div>
-									<div class="questiontext"><%=question.getText() %></div>
-									<%--<div class="answer"><aui:input type="textarea" name='<%="question_"+question.getQuestionId()%>'></aui:input></div>--%>
-									<div class="answer"><input type="text" name='<%="question_"+question.getQuestionId()%>'></input></div>
+ 									<div class="questiontext"><%=question.getText() %></div> 
+									<div class="answer"><textarea rows="10" cols="100" maxlength="2000" name='<%="question_"+question.getQuestionId()%>'></textarea></div>
+ 									<%--<div class="answer"><input type="text" name='<%="question_"+question.getQuestionId()%>'></input></div> --%>
 								</div>
 							<% }
 							
