@@ -54,4 +54,7 @@
     	
      	return  minutes + ":" + seconds;
    	}
+    AUI().ready(function(A) {
+   		<portlet:namespace />reproducir();
+   	});
 </script>
