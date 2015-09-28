@@ -35,7 +35,7 @@ public class LearningActivityTryCacheModel implements CacheModel<LearningActivit
 	Serializable {
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(21);
+		StringBundler sb = new StringBundler(23);
 
 		sb.append("{uuid=");
 		sb.append(uuid);
@@ -51,6 +51,8 @@ public class LearningActivityTryCacheModel implements CacheModel<LearningActivit
 		sb.append(result);
 		sb.append(", endDate=");
 		sb.append(endDate);
+		sb.append(", endUserDate=");
+		sb.append(endUserDate);
 		sb.append(", tryData=");
 		sb.append(tryData);
 		sb.append(", tryResultData=");
@@ -92,6 +94,13 @@ public class LearningActivityTryCacheModel implements CacheModel<LearningActivit
 			learningActivityTryImpl.setEndDate(new Date(endDate));
 		}
 
+		if (endUserDate == Long.MIN_VALUE) {
+			learningActivityTryImpl.setEndUserDate(null);
+		}
+		else {
+			learningActivityTryImpl.setEndUserDate(new Date(endUserDate));
+		}
+
 		if (tryData == null) {
 			learningActivityTryImpl.setTryData(StringPool.BLANK);
 		}
@@ -125,6 +134,7 @@ public class LearningActivityTryCacheModel implements CacheModel<LearningActivit
 	public long startDate;
 	public long result;
 	public long endDate;
+	public long endUserDate;
 	public String tryData;
 	public String tryResultData;
 	public String comments;

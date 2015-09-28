@@ -261,6 +261,9 @@
 			<basic name="endDate">
 				<temporal>TIMESTAMP</temporal>
 			</basic>
+			<basic name="endUserDate">
+				<temporal>TIMESTAMP</temporal>
+			</basic>
 			<basic name="tryData" />
 			<basic name="tryResultData" />
 			<basic name="comments" />

@@ -74,6 +74,7 @@ public class LearningActivityTryClp extends BaseModelImpl<LearningActivityTry>
 		attributes.put("startDate", getStartDate());
 		attributes.put("result", getResult());
 		attributes.put("endDate", getEndDate());
+		attributes.put("endUserDate", getEndUserDate());
 		attributes.put("tryData", getTryData());
 		attributes.put("tryResultData", getTryResultData());
 		attributes.put("comments", getComments());
@@ -123,6 +124,12 @@ public class LearningActivityTryClp extends BaseModelImpl<LearningActivityTry>
 
 		if (endDate != null) {
 			setEndDate(endDate);
+		}
+
+		Date endUserDate = (Date)attributes.get("endUserDate");
+
+		if (endUserDate != null) {
+			setEndUserDate(endUserDate);
 		}
 
 		String tryData = (String)attributes.get("tryData");
@@ -208,6 +215,14 @@ public class LearningActivityTryClp extends BaseModelImpl<LearningActivityTry>
 		_endDate = endDate;
 	}
 
+	public Date getEndUserDate() {
+		return _endUserDate;
+	}
+
+	public void setEndUserDate(Date endUserDate) {
+		_endUserDate = endUserDate;
+	}
+
 	public String getTryData() {
 		return _tryData;
 	}
@@ -268,6 +283,7 @@ public class LearningActivityTryClp extends BaseModelImpl<LearningActivityTry>
 		clone.setStartDate(getStartDate());
 		clone.setResult(getResult());
 		clone.setEndDate(getEndDate());
+		clone.setEndUserDate(getEndUserDate());
 		clone.setTryData(getTryData());
 		clone.setTryResultData(getTryResultData());
 		clone.setComments(getComments());
@@ -327,7 +343,7 @@ public class LearningActivityTryClp extends BaseModelImpl<LearningActivityTry>
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(21);
+		StringBundler sb = new StringBundler(23);
 
 		sb.append("{uuid=");
 		sb.append(getUuid());
@@ -343,6 +359,8 @@ public class LearningActivityTryClp extends BaseModelImpl<LearningActivityTry>
 		sb.append(getResult());
 		sb.append(", endDate=");
 		sb.append(getEndDate());
+		sb.append(", endUserDate=");
+		sb.append(getEndUserDate());
 		sb.append(", tryData=");
 		sb.append(getTryData());
 		sb.append(", tryResultData=");
@@ -355,7 +373,7 @@ public class LearningActivityTryClp extends BaseModelImpl<LearningActivityTry>
 	}
 
 	public String toXmlString() {
-		StringBundler sb = new StringBundler(34);
+		StringBundler sb = new StringBundler(37);
 
 		sb.append("<model><model-name>");
 		sb.append("com.liferay.lms.model.LearningActivityTry");
@@ -390,6 +408,10 @@ public class LearningActivityTryClp extends BaseModelImpl<LearningActivityTry>
 		sb.append(getEndDate());
 		sb.append("]]></column-value></column>");
 		sb.append(
+			"<column><column-name>endUserDate</column-name><column-value><![CDATA[");
+		sb.append(getEndUserDate());
+		sb.append("]]></column-value></column>");
+		sb.append(
 			"<column><column-name>tryData</column-name><column-value><![CDATA[");
 		sb.append(getTryData());
 		sb.append("]]></column-value></column>");
@@ -415,6 +437,7 @@ public class LearningActivityTryClp extends BaseModelImpl<LearningActivityTry>
 	private Date _startDate;
 	private long _result;
 	private Date _endDate;
+	private Date _endUserDate;
 	private String _tryData;
 	private String _tryResultData;
 	private String _comments;

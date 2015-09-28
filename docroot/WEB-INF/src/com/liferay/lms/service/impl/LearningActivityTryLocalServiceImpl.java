@@ -133,6 +133,10 @@ public class LearningActivityTryLocalServiceImpl
 		{
 		if(learningActivityTry.getEndDate()!=null)
 		{
+			if(learningActivityTry.getEndUserDate()==null)
+			{
+				learningActivityTry.setEndUserDate(learningActivityTry.getEndDate());
+			}
 			LearningActivityResultLocalServiceUtil.update(learningActivityTry)	;
 		}
 		return super.updateLearningActivityTry(learningActivityTry, merge);

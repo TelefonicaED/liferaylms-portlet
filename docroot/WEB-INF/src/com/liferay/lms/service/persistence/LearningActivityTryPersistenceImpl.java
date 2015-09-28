@@ -451,6 +451,7 @@ public class LearningActivityTryPersistenceImpl extends BasePersistenceImpl<Lear
 		learningActivityTryImpl.setStartDate(learningActivityTry.getStartDate());
 		learningActivityTryImpl.setResult(learningActivityTry.getResult());
 		learningActivityTryImpl.setEndDate(learningActivityTry.getEndDate());
+		learningActivityTryImpl.setEndUserDate(learningActivityTry.getEndUserDate());
 		learningActivityTryImpl.setTryData(learningActivityTry.getTryData());
 		learningActivityTryImpl.setTryResultData(learningActivityTry.getTryResultData());
 		learningActivityTryImpl.setComments(learningActivityTry.getComments());

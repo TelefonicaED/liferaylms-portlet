@@ -165,6 +165,7 @@
 		<column name="startDate" type="Date" />
 		<column name="result" type="long" />
 		<column name="endDate" type="Date" />
+		<column name="endUserDate" type="Date" /><!-- Date of last user interaction -->
 		<column name="tryData" type="String" />
 		<column name="tryResultData" type="String" />
 		<column name="comments" type="String" />

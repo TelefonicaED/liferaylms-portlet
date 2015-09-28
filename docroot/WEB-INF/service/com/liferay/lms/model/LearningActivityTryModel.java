@@ -175,6 +175,20 @@ public interface LearningActivityTryModel extends BaseModel<LearningActivityTry>
 	public void setEndDate(Date endDate);
 
 	/**
+	 * Returns the end user date of this learning activity try.
+	 *
+	 * @return the end user date of this learning activity try
+	 */
+	public Date getEndUserDate();
+
+	/**
+	 * Sets the end user date of this learning activity try.
+	 *
+	 * @param endUserDate the end user date of this learning activity try
+	 */
+	public void setEndUserDate(Date endUserDate);
+
+	/**
 	 * Returns the try data of this learning activity try.
 	 *
 	 * @return the try data of this learning activity try

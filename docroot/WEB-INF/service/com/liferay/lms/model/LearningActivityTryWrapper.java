@@ -53,6 +53,7 @@ public class LearningActivityTryWrapper implements LearningActivityTry,
 		attributes.put("startDate", getStartDate());
 		attributes.put("result", getResult());
 		attributes.put("endDate", getEndDate());
+		attributes.put("endUserDate", getEndUserDate());
 		attributes.put("tryData", getTryData());
 		attributes.put("tryResultData", getTryResultData());
 		attributes.put("comments", getComments());
@@ -101,6 +102,12 @@ public class LearningActivityTryWrapper implements LearningActivityTry,
 
 		if (endDate != null) {
 			setEndDate(endDate);
+		}
+
+		Date endUserDate = (Date)attributes.get("endUserDate");
+
+		if (endUserDate != null) {
+			setEndUserDate(endUserDate);
 		}
 
 		String tryData = (String)attributes.get("tryData");
@@ -284,6 +291,24 @@ public class LearningActivityTryWrapper implements LearningActivityTry,
 	*/
 	public void setEndDate(java.util.Date endDate) {
 		_learningActivityTry.setEndDate(endDate);
+	}
+
+	/**
+	* Returns the end user date of this learning activity try.
+	*
+	* @return the end user date of this learning activity try
+	*/
+	public java.util.Date getEndUserDate() {
+		return _learningActivityTry.getEndUserDate();
+	}
+
+	/**
+	* Sets the end user date of this learning activity try.
+	*
+	* @param endUserDate the end user date of this learning activity try
+	*/
+	public void setEndUserDate(java.util.Date endUserDate) {
+		_learningActivityTry.setEndUserDate(endUserDate);
 	}
 
 	/**

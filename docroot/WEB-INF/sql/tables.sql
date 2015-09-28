@@ -139,6 +139,7 @@ create table Lms_LearningActivityTry (
 	startDate DATE null,
 	result LONG,
 	endDate DATE null,
+	endUserDate DATE null,
 	tryData VARCHAR(75) null,
 	tryResultData TEXT null,
 	comments TEXT null

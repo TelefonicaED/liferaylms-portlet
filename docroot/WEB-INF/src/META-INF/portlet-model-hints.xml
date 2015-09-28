@@ -171,6 +171,7 @@
 		<field name="startDate" type="Date" />
 		<field name="result" type="long" />
 		<field name="endDate" type="Date" />
+		<field name="endUserDate" type="Date" />
 		<field name="tryData" type="String" />
 		<field name="tryResultData" type="String">
 			<hint name="display-width">200</hint>

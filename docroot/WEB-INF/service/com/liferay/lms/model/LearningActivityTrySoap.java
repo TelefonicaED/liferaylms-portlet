@@ -38,6 +38,7 @@ public class LearningActivityTrySoap implements Serializable {
 		soapModel.setStartDate(model.getStartDate());
 		soapModel.setResult(model.getResult());
 		soapModel.setEndDate(model.getEndDate());
+		soapModel.setEndUserDate(model.getEndUserDate());
 		soapModel.setTryData(model.getTryData());
 		soapModel.setTryResultData(model.getTryResultData());
 		soapModel.setComments(model.getComments());
@@ -152,6 +153,14 @@ public class LearningActivityTrySoap implements Serializable {
 		_endDate = endDate;
 	}
 
+	public Date getEndUserDate() {
+		return _endUserDate;
+	}
+
+	public void setEndUserDate(Date endUserDate) {
+		_endUserDate = endUserDate;
+	}
+
 	public String getTryData() {
 		return _tryData;
 	}
@@ -183,6 +192,7 @@ public class LearningActivityTrySoap implements Serializable {
 	private Date _startDate;
 	private long _result;
 	private Date _endDate;
+	private Date _endUserDate;
 	private String _tryData;
 	private String _tryResultData;
 	private String _comments;

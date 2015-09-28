@@ -178,6 +178,7 @@
 		<property name="startDate" type="org.hibernate.type.TimestampType" />
 		<property name="result" type="com.liferay.portal.dao.orm.hibernate.LongType" />
 		<property name="endDate" type="org.hibernate.type.TimestampType" />
+		<property name="endUserDate" type="org.hibernate.type.TimestampType" />
 		<property name="tryData" type="com.liferay.portal.dao.orm.hibernate.StringType" />
 		<property name="tryResultData" type="com.liferay.portal.dao.orm.hibernate.StringType" />
 		<property name="comments" type="com.liferay.portal.dao.orm.hibernate.StringType" />
