@@ -44,7 +44,9 @@
 	  	}
 	}
   	function <portlet:namespace />reproducir(){
-   		document.getElementById("enunciado").play();
+  		if(document.getElementById("enunciado")){
+	   		<portlet:namespace />reproducir();
+   		}
   	}
     function <portlet:namespace />pintarTiempo(seconds) {
     	minutes = Math.floor(seconds / 60);
