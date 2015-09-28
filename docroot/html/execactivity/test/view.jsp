@@ -289,7 +289,6 @@
 									return (question.all('select.answer').value != 0);
 								},
 								questiontype_multioptions : function(question) {
-									alert('ENTROOOOOOO');
 									return (question.all('div.answer input[type="checkbox"]:checked').size() > 0);
 								},
 								questiontype_freetext : function(question) {
@@ -443,6 +442,9 @@
 			<aui:form name="formulario" action="<%=correctURL %>" method="post" onSubmit="javascript:return false;">
 <%
 			String maxNumberOfCheck = PropsUtil.get("lms.question.multiple.maxnumbercheck");
+			if(StringPool.NULL.equals(maxNumberOfCheck)){
+				maxNumberOfCheck = "0";
+			}
 %>
 <!-- De momento se comenta la numeración -->
 <!-- 			<script type="text/javascript"> -->
