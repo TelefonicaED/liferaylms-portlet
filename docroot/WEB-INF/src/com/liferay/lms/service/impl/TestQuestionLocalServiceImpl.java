@@ -15,8 +15,8 @@
 package com.liferay.lms.service.impl;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.Random;
 
 import com.liferay.lms.auditing.AuditConstants;
 import com.liferay.lms.auditing.AuditingLogFactory;
@@ -319,7 +319,6 @@ public class TestQuestionLocalServiceImpl
 		long[] assetCategoryIds = GetterUtil.getLongValues(StringUtil.split(LearningActivityLocalServiceUtil.getExtraContentValue(actId,"categoriesId")));
 		long[] classTypeIds = new long[]{typeId};
 		int maxQuestions = GetterUtil.getInteger(LearningActivityLocalServiceUtil.getExtraContentValue(actId,"random"), 0);
-		Random r = new Random();
 		
 		AssetEntryQuery entryQuery = new AssetEntryQuery();
 		entryQuery.getAllCategoryIds();
@@ -337,20 +336,17 @@ public class TestQuestionLocalServiceImpl
 				if (isMultiple){
 					for (AssetEntry bank : banks){
 						questions.addAll(TestQuestionLocalServiceUtil.getQuestions(bank.getClassPK()));
+						Collections.shuffle(questions);
 					}
 				}else{
-					int numBank = r.nextInt(banks.size());
-					questions = TestQuestionLocalServiceUtil.getQuestions(banks.get(numBank).getClassPK());
+					Collections.shuffle(banks);
+					questions = TestQuestionLocalServiceUtil.getQuestions(banks.get(0).getClassPK());
 				}
 				
 				List<TestQuestion> questionsCopy = new ArrayList<TestQuestion>(questions);
 				while ( ( maxQuestions > sortQuestions.size() && questionsCopy.size() > 0) || ( maxQuestions == 0 && questionsCopy.size() > 0 ) ) {
-					int index = 0;
-					if(isMultiple){
-						index = r.nextInt(questionsCopy.size());
-					}
-					sortQuestions.add(questionsCopy.get(index));
-					questionsCopy.remove(index);
+					sortQuestions.add(questionsCopy.get(0));
+					questionsCopy.remove(0);
 				}
 				
 				return sortQuestions;

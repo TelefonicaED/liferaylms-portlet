@@ -18,6 +18,8 @@ import com.liferay.util.portlet.PortletProps;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PropsUtil;
@@ -31,6 +33,7 @@ import com.liferay.portal.theme.ThemeDisplay;
 public class OptionsQuestionType extends BaseQuestionType {
 
 	private static final long serialVersionUID = 1L;
+	private static Log log = LogFactoryUtil.getLog(OptionsQuestionType.class);
 	protected String inputType = "radio";
 	protected String XMLSingle = "true";
 
@@ -121,35 +124,43 @@ public class OptionsQuestionType extends BaseQuestionType {
 		return questionXML;
 	}
 
-	private String getHtml(Document document, long questionId, boolean feedback, ThemeDisplay themeDisplay){
+	private String getHtml(Document document, long questionId,boolean feedback, ThemeDisplay themeDisplay){
 		String html = "", answersFeedBack="", feedMessage = "", cssclass="", selected="";
 		String namespace = themeDisplay != null ? themeDisplay.getPortletDisplay().getNamespace() : "";
 		boolean isCombo = false;
+		String onclick = "";
 		try {
 			TestQuestion question = TestQuestionLocalServiceUtil.fetchTestQuestion(questionId);
-			try{
-				Document xml = SAXReaderUtil.read(question.getExtracontent());
-				Element ele = xml.getRootElement();
-				String formatType = (String) ele.element("formattype").getData();
-				boolean enableorder = StringPool.TRUE.equals(LearningActivityLocalServiceUtil.getExtraContentValue(question.getActId(),"enableorder"));
-				if ( enableorder && formatType.equals(PortletProps.get("lms.question.formattype.horizontal")) ){
-					cssclass="in-line ";
-				}else if ( enableorder && formatType.equals(PortletProps.get("lms.question.formattype.combo")) ){
-					isCombo=true;
+			String formatType = "0";
+			boolean enableorder = false;
+			if(question.getExtracontent()!=null && !question.getExtracontent().trim().isEmpty()){
+				try{
+					Document xml = SAXReaderUtil.read(question.getExtracontent());
+					Element ele = xml.getRootElement();
+					formatType = (String) ele.element("formattype").getData();
+					enableorder = StringPool.TRUE.equals(LearningActivityLocalServiceUtil.getExtraContentValue(question.getActId(),"enableorder"));
+					if ( enableorder && formatType.equals(PortletProps.get("lms.question.formattype.horizontal")) ){
+						cssclass="in-line ";
+					}else if ( enableorder && formatType.equals(PortletProps.get("lms.question.formattype.combo")) ){
+						isCombo=true;
+					}
+				}catch(DocumentException e){
+					e.printStackTrace();
 				}
-			}catch(DocumentException e){
-				e.printStackTrace();
 			}
 			List<TestAnswer> answersSelected=getAnswersSelected(document, questionId);
 			List<TestAnswer> testAnswers= TestAnswerLocalServiceUtil.getTestAnswersByQuestionId(question.getQuestionId());
 			int correctAnswers=0, correctAnswered=0, incorrectAnswered=0;
 			if(feedback) feedMessage = LanguageUtil.get(themeDisplay.getLocale(),"answer-in-blank") ;
-			int i=0;
+			int numAnswer=0;
 			String disabled = "";
 			if (isCombo){
 				answersFeedBack+="<option value=\"\">"+LanguageUtil.get(themeDisplay.getLocale(),"learningactivity.embeddedtest.select")+"</option>";
 			}
 			for(TestAnswer answer:testAnswers){
+				if(inputType.equals("checkbox")){
+					onclick = "onclick=\""+namespace+"checkMaxNumberOfChecks('"+question.getQuestionId()+"','"+numAnswer+"')\"";
+				}
 				String correct="", checked="", showCorrectAnswer="false";
 				disabled = "";
 				if(feedback) {
@@ -183,12 +194,16 @@ public class OptionsQuestionType extends BaseQuestionType {
 										"</option>";
 				}else{
 					answersFeedBack += "<div class=\"answer " + cssclass + correct + "\">" +
-							"<label for=\""+namespace+"question_"+question.getQuestionId()+"_"+i+"\" />"+
-							"<input id=\""+namespace+"question_"+question.getQuestionId()+"_"+i+"\" type=\"" + inputType + "\" name=\""+namespace+"question_" + question.getQuestionId() + "\" " + checked + " value=\"" + answer.getAnswerId() +"\" " + disabled + "><div class=\"answer-options\">" + answer.getAnswer() + "</div>" + 
-							"</div>";
+											"<label for=\""+namespace+"question_"+question.getQuestionId()+"_"+numAnswer+"\" />"+
+											"<input "+onclick+" id=\""+namespace+"question_"+question.getQuestionId()+"_"+numAnswer+"\" type=\"" + inputType 
+												+ "\" name=\""+namespace+"question_" + question.getQuestionId() + "\" " + checked + " value=\"" 
+													+ answer.getAnswerId() +"\" " + disabled + ">" +
+											"<div class=\"answer-options\">" + answer.getAnswer() + 
+											"</div>" + 
+										"</div>";
 				}
 				
-				i++;
+				numAnswer++;
 			}
 
 			if(feedback){
@@ -206,7 +221,7 @@ public class OptionsQuestionType extends BaseQuestionType {
 							"<input type=\"hidden\" name=\""+namespace+"question\" value=\"" + question.getQuestionId() + "\"/>"+
 							"<div class=\"questiontext select\">" + question.getText() + "</div>" +
 							"<div class=\"answer select\">" +
-								"<select "+ disabled + "class=\"answer select\" id=\""+namespace+"question_"+question.getQuestionId()+"_"+i+"\" name=\""+namespace+"question_"+question.getQuestionId()+"\" />"+
+								"<select "+ disabled + "class=\"answer select\" id=\""+namespace+"question_"+question.getQuestionId()+"_"+numAnswer+"\" name=\""+namespace+"question_"+question.getQuestionId()+"\" />"+
 									answersFeedBack +
 								"</select>" +
 							"</div>" +
