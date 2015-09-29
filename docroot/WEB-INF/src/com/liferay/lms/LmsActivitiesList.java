@@ -930,6 +930,7 @@ public class LmsActivitiesList extends MVCPortlet {
 	
 	public void deleteURL(ActionRequest actionRequest, ActionResponse actionResponse) throws Exception {
 
+		
 		long actId = ParamUtil.getInteger(actionRequest, "resId");
 		long userId = ParamUtil.getInteger(actionRequest, "userId");
 		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(WebKeys.THEME_DISPLAY);    
@@ -947,12 +948,18 @@ public class LmsActivitiesList extends MVCPortlet {
 			message.put("learningActivity",la);
 			message.put("user",user);
 			message.put("userc",themeDisplay.getUser());
-			MessageBusUtil.sendMessage("liferay/lms/cleanTriesUser", message);
+			message.setResponseId("1111");
+			//message.setResponseDestinationName("liferay/lms/cleanTriesUser");
+			//MessageBusUtil.sendMessage("liferay/lms/cleanTriesUser", message);
+			String resultado = (String)MessageBusUtil.sendSynchronousMessage("liferay/lms/cleanTriesUser", message);
 		}
+		
+		
 		
 		actionResponse.setRenderParameter("resId", String.valueOf(actId));
 		actionResponse.setRenderParameter("userId", String.valueOf(userId));
 		actionResponse.setRenderParameter("califications", String.valueOf(true));
+		
 	}
 
 	public void modactivity(ActionRequest actionRequest, ActionResponse actionResponse)
