@@ -27,7 +27,6 @@ public class ModuleTitleConfigurationAction implements ConfigurationAction {
 		} else {
 			prefs = renderRequest.getPreferences();
 		}
-		System.out.println("NumerateModules: "+prefs.getValue("numerateModules", "false"));
 		return JSP; 
 	}
 	
