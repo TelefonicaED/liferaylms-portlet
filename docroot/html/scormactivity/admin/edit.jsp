@@ -126,6 +126,8 @@ if(learningActivity!=null){  %>
 	});
 <% } %>
 
+
+
 function <portlet:namespace />search() {
 	AUI().use('node',function(A) {
 		var backbutton = A.one('#<portlet:namespace/>backButton').one('span').clone();
@@ -144,7 +146,6 @@ function <portlet:namespace />search() {
 }
 	
 function <portlet:namespace />load(source) {
-
 	AUI().use('node','querystring-parse',function(A) {
 		
 		var params=A.QueryString.parse(source.contentWindow.location.search.replace('?',''));
@@ -198,12 +199,23 @@ function <portlet:namespace />load(source) {
 			window.messageHandler=null;
 		}
 		else {
-		    if (source.Document && source.Document.body.scrollHeight) 
-		        source.height = source.contentWindow.document.body.scrollHeight;
-		    else if (source.contentDocument && source.contentDocument.body.scrollHeight) 
-		        source.height = source.contentDocument.body.scrollHeight + 35;
-		    else if (source.contentDocument && source.contentDocument.body.offsetHeight) 
-		        source.height = source.contentDocument.body.offsetHeight + 35;
+			
+			if(navigator.userAgent.indexOf("MSIE")!=-1 || navigator.userAgent.indexOf("Trident")!=-1){
+				if (source.Document && source.Document.body.scrollHeight) 
+			        source.height = source.contentWindow.document.body.scrollHeight;
+			    else if (source.contentDocument && source.contentDocument.body.scrollHeight) 
+			        source.height = source.contentDocument.body.scrollHeight + 75;
+			    else if (source.contentDocument && source.contentDocument.body.offsetHeight) 
+			        source.height = source.contentDocument.body.offsetHeight + 75;
+			}else{
+				  if (source.Document && source.Document.body.scrollHeight) 
+				        source.height = source.contentWindow.document.body.scrollHeight;
+				    else if (source.contentDocument && source.contentDocument.body.scrollHeight) 
+				        source.height = source.contentDocument.body.scrollHeight + 35;
+				    else if (source.contentDocument && source.contentDocument.body.offsetHeight) 
+				        source.height = source.contentDocument.body.offsetHeight + 35;
+			}
+
 		}
 	
 	});
@@ -222,7 +234,11 @@ function <portlet:namespace />back() {
 }
 
 //-->
+
+
+
 </script>
+
 
 <%
 	boolean disabled = true;
