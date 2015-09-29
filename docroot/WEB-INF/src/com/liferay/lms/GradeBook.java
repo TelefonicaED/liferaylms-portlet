@@ -26,6 +26,7 @@ import com.liferay.lms.service.ModuleLocalServiceUtil;
 import com.liferay.portal.kernel.exception.NestableException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.servlet.HttpHeaders;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.SessionMessages;
@@ -85,11 +86,14 @@ public class GradeBook extends MVCPortlet {
 		        //M�dulo
 		        writer.writeNext(new String[]{module.getTitle(themeDisplay.getLocale())});
 		        
-		        String[] cabeceras = new String[learningActivities.size()+2];
+		        String[] cabeceras = new String[learningActivities.size()+4];
 		        
-		        int column=2;
-		        cabeceras[0]="User";
-		        cabeceras[1]="Email";
+		        int column=4;
+		        cabeceras[0]=LanguageUtil.get(themeDisplay.getLocale(),"user-name");
+		        cabeceras[1]=LanguageUtil.get(themeDisplay.getLocale(),"last-name");
+		        cabeceras[2]=LanguageUtil.get(themeDisplay.getLocale(),"user-id");
+		        cabeceras[3]=LanguageUtil.get(themeDisplay.getLocale(),"email");
+		        
 		        for(LearningActivity learningActivity:learningActivities){
 		        	cabeceras[column++]=learningActivity.getTitle(themeDisplay.getLocale());
 		        }
@@ -109,11 +113,14 @@ public class GradeBook extends MVCPortlet {
 					usus  = UserLocalServiceUtil.search(themeDisplay.getCompanyId(), "", 0, userParams, 0, 1000, obc);	
 				}
 		        for(User usuario:usus){
-		        	String[] resultados = new String[learningActivities.size()+2];
+		        	String[] resultados = new String[learningActivities.size()+4];
 		        	
-		        	column=2;
-		        	resultados[0]=usuario.getFullName()+"("+usuario.getUserId()+")";
-		        	resultados[1]=usuario.getEmailAddress();
+		        	column=4;
+		        	resultados[0]=usuario.getFirstName();
+		        	resultados[1]=usuario.getLastName();
+		        	
+		        	resultados[2]=String.valueOf(usuario.getUserId());
+		        	resultados[3]=usuario.getEmailAddress();
 		        	
 
 			        for(LearningActivity learningActivity:learningActivities){
