@@ -180,7 +180,6 @@ AUI().ready('node-base' ,'aui-form-validator', 'aui-overlay-context-panel', func
 	
 	<portlet:renderURL var="viewAnswerURL" windowState="<%= LiferayWindowState.EXCLUSIVE.toString() %>">   
 		<portlet:param name="<%=WebKeys.PORTLET_CONFIGURATOR_VISIBILITY %>" value="<%=StringPool.TRUE %>"/>     
-	   <%System.out.println(qt.getURLNew()); %>
 	    <portlet:param name="jspPage" value="<%=qt.getURLNew() %>" />    
 	    <portlet:param name="actionEditingDetails" value="true"/>
 	    <portlet:param name="resId" value="<%=ParamUtil.getString(request,\"resId\", \"0\") %>"/>

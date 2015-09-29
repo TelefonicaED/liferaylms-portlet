@@ -81,7 +81,6 @@ Liferay.provide(
 		}
 		for(QuestionType qt:qtypes){
 			if (allowedTypesList.contains(String.valueOf(qt.getTypeId()))) {
-				System.out.println(qt.getTitle(themeDisplay.getLocale())+" "+qt.getTypeId());
 	%>
 		<liferay-ui:icon message="<%=qt.getTitle(themeDisplay.getLocale()) %>" url="#" onClick="<%=renderResponse.getNamespace()+\"newQuestion(\"+qt.getTypeId()+\");\" %>"/>
 	<%	
