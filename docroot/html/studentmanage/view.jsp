@@ -1,3 +1,5 @@
+<%@page import="com.liferay.portal.util.comparator.UserLastNameComparator"%>
+<%@page import="com.liferay.portal.util.comparator.UserFirstNameComparator"%>
 <%@page import="com.liferay.portal.kernel.dao.orm.CustomSQLParam"%>
 <%@page import="com.liferay.portal.model.RoleConstants"%>
 <%@page import="com.liferay.portal.service.UserGroupRoleLocalServiceUtil"%>
@@ -166,6 +168,8 @@ else
 			<%
 			List<User> userListPage  = null;
 			String middleName = null;
+			OrderByComparator obc = new   UserLastNameComparator(true);
+			
 			LinkedHashMap userParams = new LinkedHashMap();
 
 			userParams.put("notInCourseRoleTeach", new CustomSQLParam("WHERE User_.userId NOT IN "
@@ -186,19 +190,16 @@ else
 			
 			if(theTeam==null){
 				if(criteria.trim().length()==0){
-					OrderByComparator obc = null;
 					userParams.put("usersGroups", new Long(themeDisplay.getScopeGroupId()));
-
+					
 					userListPage  = UserLocalServiceUtil.search(themeDisplay.getCompanyId(), criteria, 0, userParams, searchContainer.getStart(), searchContainer.getEnd(), obc);
 				}else{
 					userParams.put("usersGroups", new Long(themeDisplay.getScopeGroupId()));
-					OrderByComparator obc = null;
 					userListPage  = UserLocalServiceUtil.search(themeDisplay.getCompanyId(), criteria, 0, userParams, searchContainer.getStart(), searchContainer.getEnd(), obc);
 				}
 			}else{
 				userParams.put("usersGroups", theTeam.getGroupId());
 				userParams.put("usersTeams", theTeam.getTeamId());
-				OrderByComparator obc = null;
 				userListPage  = UserLocalServiceUtil.search(themeDisplay.getCompanyId(), criteria, 0, userParams, searchContainer.getStart(), searchContainer.getEnd(), obc);
 			}
 			
