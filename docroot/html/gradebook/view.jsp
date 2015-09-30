@@ -1,3 +1,10 @@
+<%@page import="com.liferay.portal.util.comparator.UserLastNameComparator"%>
+<%@page import="com.liferay.lms.service.LmsPrefsLocalServiceUtil"%>
+<%@page import="com.liferay.lms.model.LmsPrefs"%>
+<%@page import="com.liferay.portal.util.comparator.UserFirstNameComparator"%>
+<%@page import="com.liferay.portal.kernel.dao.orm.CustomSQLParam"%>
+<%@page import="com.liferay.lms.service.CourseLocalServiceUtil"%>
+<%@page import="com.liferay.lms.model.Course"%>
 <%@page import="com.liferay.portal.model.UserGroupRole"%>
 <%@page import="com.liferay.portal.service.UserGroupRoleLocalServiceUtil"%>
 <%@page import="com.liferay.portal.kernel.util.OrderByComparator"%>
@@ -31,6 +38,7 @@ long teamId=ParamUtil.getLong(request, "teamId",0);
 PortletURL portletURL = renderResponse.createRenderURL();
 portletURL.setParameter("jspPage","/html/gradebook/view.jsp");
 portletURL.setParameter("teamId", Long.toString(teamId)); 
+LmsPrefs prefs=LmsPrefsLocalServiceUtil.getLmsPrefs(themeDisplay.getCompanyId());
 
 java.util.List<Team> userTeams=TeamLocalServiceUtil.getUserTeams(themeDisplay.getUserId(), themeDisplay.getScopeGroupId());
 
@@ -130,58 +138,44 @@ if(theTeam!=null)
 			<liferay-portlet:renderURL var="returnurl">
 			<liferay-portlet:param name="jspPage" value="/html/gradebook/view.jsp" />
 			</liferay-portlet:renderURL>
-			<liferay-ui:search-container  emptyResultsMessage="there-are-no-results" delta="40" deltaConfigurable="true">
+			<liferay-ui:search-container  emptyResultsMessage="there-are-no-results" delta="10" deltaConfigurable="true">
 				<liferay-ui:search-container-results>
 					<%
-						List<User> onlyStudents=new ArrayList<User>();
-						if((PermissionCheckerFactoryUtil.create(themeDisplay.getUser())).hasPermission(themeDisplay.getScopeGroupId(), "com.liferay.lms.model", themeDisplay.getScopeGroupId(), "VIEW_RESULTS")){
-							List<User> usus=null;
-							if(theTeam==null) {
-								usus = UserLocalServiceUtil.getGroupUsers(themeDisplay.getScopeGroupId());
-							}
-							else {
-								LinkedHashMap userParams = new LinkedHashMap();
-								userParams.put("usersGroups", theTeam.getGroupId());
-								userParams.put("usersTeams", theTeam.getTeamId());
-								OrderByComparator obc = null;
-								usus  = UserLocalServiceUtil.search(themeDisplay.getCompanyId(), "", 0, userParams, searchContainer.getStart(), searchContainer.getEnd(), obc);	
-							}
-							
-							for(User usu:usus){
-								boolean shouldPass = true;
-								List<UserGroupRole> listRolesOfUser = UserGroupRoleLocalServiceUtil.getUserGroupRoles(usu.getUserId(), themeDisplay.getScopeGroupId());
+					List<User> onlyStudents = null;
+					LinkedHashMap userParams = new LinkedHashMap();
 
-								//System.out.println("Usuario "+usu.getFullName());
-								for(int i=0; i<listRolesOfUser.size();i++){
-									//System.out.println("    -->ROL: "+listRolesOfUser.get(i).getRole().getName());
-									if(listRolesOfUser.get(i).getRole().getName().equals("courseTeacher")){
-										shouldPass=false;
-										break;
-									}
-								}
-								
-								if(!(PermissionCheckerFactoryUtil.create(usu)).hasPermission(themeDisplay.getScopeGroupId(), "com.liferay.lms.model", themeDisplay.getScopeGroupId(), "VIEW_RESULTS") 
-										&& shouldPass){
-									onlyStudents.add(usu);
-								}
-							}
-								
-						}else{
-							onlyStudents.add(themeDisplay.getUser());	
-						}
-							
-						
-						List<User> orderedUsers = new ArrayList<User>();
-				        orderedUsers.addAll(onlyStudents);
-				        Collections.sort(orderedUsers, new Comparator<User>() {
-				            @Override
-				            public int compare(final User object1, final User object2) {
-				                return object1.getFullName().toLowerCase().compareTo(object2.getFullName().toLowerCase());
-				            }
-				        } );
+					Course course = CourseLocalServiceUtil.getCourseByGroupCreatedId(theModule.getGroupId());
 					
-						pageContext.setAttribute("results", ListUtil.subList(orderedUsers, searchContainer.getStart(), searchContainer.getEnd()));
-					    pageContext.setAttribute("total", onlyStudents.size());
+					if(theTeam!=null)
+					{
+						userParams.put("usersTeams", theTeam.getTeamId());
+						userParams.put("usersGroups", theTeam.getGroupId());
+
+					}
+					
+					userParams.put("usersGroups", course.getGroupCreatedId());
+
+
+						
+					userParams.put("notInCourseRoleTeach", new CustomSQLParam("WHERE User_.userId NOT IN "
+					              + " (SELECT UserGroupRole.userId " + "  FROM UserGroupRole "
+					              + "  WHERE  (UserGroupRole.groupId = ?) AND (UserGroupRole.roleId = ?))", new Long[] {
+					            		  course.getGroupCreatedId(),
+					              RoleLocalServiceUtil.getRole(prefs.getTeacherRole()).getRoleId() }));
+					           
+
+
+					userParams.put("notInCourseRoleEdit", new CustomSQLParam("WHERE User_.userId NOT IN "
+					              + " (SELECT UserGroupRole.userId " + "  FROM UserGroupRole "
+					              + "  WHERE  (UserGroupRole.groupId = ?) AND (UserGroupRole.roleId = ?))", new Long[] {
+					              course.getGroupCreatedId(),
+					              RoleLocalServiceUtil.getRole(prefs.getEditorRole()).getRoleId() }));
+
+					OrderByComparator obc = new UserLastNameComparator(true);
+					onlyStudents  = UserLocalServiceUtil.search(themeDisplay.getCompanyId(), "", 0, userParams, searchContainer.getStart(), searchContainer.getEnd(), obc);	
+					int userCount = UserLocalServiceUtil.searchCount(themeDisplay.getCompanyId(), "", 0, userParams);
+					pageContext.setAttribute("results",onlyStudents );
+					pageContext.setAttribute("total", userCount);
 					%>
 				</liferay-ui:search-container-results>
 				<liferay-ui:search-container-row className="com.liferay.portal.model.User" keyProperty="userId" modelVar="usuario">
