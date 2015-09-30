@@ -96,6 +96,20 @@ public interface CourseModel extends BaseModel<Course>, GroupedModel,
 	public void setCourseId(long courseId);
 
 	/**
+	 * Returns the parent course ID of this course.
+	 *
+	 * @return the parent course ID of this course
+	 */
+	public long getParentCourseId();
+
+	/**
+	 * Sets the parent course ID of this course.
+	 *
+	 * @param parentCourseId the parent course ID of this course
+	 */
+	public void setParentCourseId(long parentCourseId);
+
+	/**
 	 * Returns the company ID of this course.
 	 *
 	 * @return the company ID of this course

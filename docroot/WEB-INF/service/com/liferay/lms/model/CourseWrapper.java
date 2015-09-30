@@ -47,6 +47,7 @@ public class CourseWrapper implements Course, ModelWrapper<Course> {
 
 		attributes.put("uuid", getUuid());
 		attributes.put("courseId", getCourseId());
+		attributes.put("parentCourseId", getParentCourseId());
 		attributes.put("companyId", getCompanyId());
 		attributes.put("groupId", getGroupId());
 		attributes.put("userId", getUserId());
@@ -90,6 +91,12 @@ public class CourseWrapper implements Course, ModelWrapper<Course> {
 
 		if (courseId != null) {
 			setCourseId(courseId);
+		}
+
+		Long parentCourseId = (Long)attributes.get("parentCourseId");
+
+		if (parentCourseId != null) {
+			setParentCourseId(parentCourseId);
 		}
 
 		Long companyId = (Long)attributes.get("companyId");
@@ -313,6 +320,24 @@ public class CourseWrapper implements Course, ModelWrapper<Course> {
 	*/
 	public void setCourseId(long courseId) {
 		_course.setCourseId(courseId);
+	}
+
+	/**
+	* Returns the parent course ID of this course.
+	*
+	* @return the parent course ID of this course
+	*/
+	public long getParentCourseId() {
+		return _course.getParentCourseId();
+	}
+
+	/**
+	* Sets the parent course ID of this course.
+	*
+	* @param parentCourseId the parent course ID of this course
+	*/
+	public void setParentCourseId(long parentCourseId) {
+		_course.setParentCourseId(parentCourseId);
 	}
 
 	/**

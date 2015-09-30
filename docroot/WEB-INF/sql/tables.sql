@@ -37,6 +37,7 @@ create table Lms_Competence (
 create table Lms_Course (
 	uuid_ VARCHAR(75) null,
 	courseId LONG not null primary key,
+	parentCourseId LONG,
 	companyId LONG,
 	groupId LONG,
 	userId LONG,

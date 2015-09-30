@@ -34,12 +34,14 @@ import java.util.Date;
 public class CourseCacheModel implements CacheModel<Course>, Serializable {
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(61);
+		StringBundler sb = new StringBundler(63);
 
 		sb.append("{uuid=");
 		sb.append(uuid);
 		sb.append(", courseId=");
 		sb.append(courseId);
+		sb.append(", parentCourseId=");
+		sb.append(parentCourseId);
 		sb.append(", companyId=");
 		sb.append(companyId);
 		sb.append(", groupId=");
@@ -112,6 +114,7 @@ public class CourseCacheModel implements CacheModel<Course>, Serializable {
 		}
 
 		courseImpl.setCourseId(courseId);
+		courseImpl.setParentCourseId(parentCourseId);
 		courseImpl.setCompanyId(companyId);
 		courseImpl.setGroupId(groupId);
 		courseImpl.setUserId(userId);
@@ -243,6 +246,7 @@ public class CourseCacheModel implements CacheModel<Course>, Serializable {
 
 	public String uuid;
 	public long courseId;
+	public long parentCourseId;
 	public long companyId;
 	public long groupId;
 	public long userId;

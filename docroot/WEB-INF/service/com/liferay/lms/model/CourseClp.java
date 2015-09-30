@@ -76,6 +76,7 @@ public class CourseClp extends BaseModelImpl<Course> implements Course {
 
 		attributes.put("uuid", getUuid());
 		attributes.put("courseId", getCourseId());
+		attributes.put("parentCourseId", getParentCourseId());
 		attributes.put("companyId", getCompanyId());
 		attributes.put("groupId", getGroupId());
 		attributes.put("userId", getUserId());
@@ -120,6 +121,12 @@ public class CourseClp extends BaseModelImpl<Course> implements Course {
 
 		if (courseId != null) {
 			setCourseId(courseId);
+		}
+
+		Long parentCourseId = (Long)attributes.get("parentCourseId");
+
+		if (parentCourseId != null) {
+			setParentCourseId(parentCourseId);
 		}
 
 		Long companyId = (Long)attributes.get("companyId");
@@ -305,6 +312,14 @@ public class CourseClp extends BaseModelImpl<Course> implements Course {
 
 	public void setCourseId(long courseId) {
 		_courseId = courseId;
+	}
+
+	public long getParentCourseId() {
+		return _parentCourseId;
+	}
+
+	public void setParentCourseId(long parentCourseId) {
+		_parentCourseId = parentCourseId;
 	}
 
 	public long getCompanyId() {
@@ -864,6 +879,7 @@ public class CourseClp extends BaseModelImpl<Course> implements Course {
 
 		clone.setUuid(getUuid());
 		clone.setCourseId(getCourseId());
+		clone.setParentCourseId(getParentCourseId());
 		clone.setCompanyId(getCompanyId());
 		clone.setGroupId(getGroupId());
 		clone.setUserId(getUserId());
@@ -948,12 +964,14 @@ public class CourseClp extends BaseModelImpl<Course> implements Course {
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(61);
+		StringBundler sb = new StringBundler(63);
 
 		sb.append("{uuid=");
 		sb.append(getUuid());
 		sb.append(", courseId=");
 		sb.append(getCourseId());
+		sb.append(", parentCourseId=");
+		sb.append(getParentCourseId());
 		sb.append(", companyId=");
 		sb.append(getCompanyId());
 		sb.append(", groupId=");
@@ -1016,7 +1034,7 @@ public class CourseClp extends BaseModelImpl<Course> implements Course {
 	}
 
 	public String toXmlString() {
-		StringBundler sb = new StringBundler(94);
+		StringBundler sb = new StringBundler(97);
 
 		sb.append("<model><model-name>");
 		sb.append("com.liferay.lms.model.Course");
@@ -1029,6 +1047,10 @@ public class CourseClp extends BaseModelImpl<Course> implements Course {
 		sb.append(
 			"<column><column-name>courseId</column-name><column-value><![CDATA[");
 		sb.append(getCourseId());
+		sb.append("]]></column-value></column>");
+		sb.append(
+			"<column><column-name>parentCourseId</column-name><column-value><![CDATA[");
+		sb.append(getParentCourseId());
 		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>companyId</column-name><column-value><![CDATA[");
@@ -1150,6 +1172,7 @@ public class CourseClp extends BaseModelImpl<Course> implements Course {
 
 	private String _uuid;
 	private long _courseId;
+	private long _parentCourseId;
 	private long _companyId;
 	private long _groupId;
 	private long _userId;

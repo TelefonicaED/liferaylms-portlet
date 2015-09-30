@@ -44,6 +44,7 @@
 	<model name="com.liferay.lms.model.Course">
 		<field name="uuid" type="String" />
 		<field name="courseId" type="long" />
+		<field name="parentCourseId" type="long" />
 		<field name="companyId" type="long" />
 		<field name="groupId" type="long" />
 		<field name="userId" type="long" />

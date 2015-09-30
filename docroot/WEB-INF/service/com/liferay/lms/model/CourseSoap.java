@@ -33,6 +33,7 @@ public class CourseSoap implements Serializable {
 
 		soapModel.setUuid(model.getUuid());
 		soapModel.setCourseId(model.getCourseId());
+		soapModel.setParentCourseId(model.getParentCourseId());
 		soapModel.setCompanyId(model.getCompanyId());
 		soapModel.setGroupId(model.getGroupId());
 		soapModel.setUserId(model.getUserId());
@@ -127,6 +128,14 @@ public class CourseSoap implements Serializable {
 
 	public void setCourseId(long courseId) {
 		_courseId = courseId;
+	}
+
+	public long getParentCourseId() {
+		return _parentCourseId;
+	}
+
+	public void setParentCourseId(long parentCourseId) {
+		_parentCourseId = parentCourseId;
 	}
 
 	public long getCompanyId() {
@@ -367,6 +376,7 @@ public class CourseSoap implements Serializable {
 
 	private String _uuid;
 	private long _courseId;
+	private long _parentCourseId;
 	private long _companyId;
 	private long _groupId;
 	private long _userId;

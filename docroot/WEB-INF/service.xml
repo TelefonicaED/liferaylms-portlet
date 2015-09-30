@@ -336,6 +336,7 @@
 	<entity name="Course" local-service="true" remote-service="true" uuid="true" json-enabled="false">
 		<!-- Primary key column -->
 		<column name="courseId" type="long" primary="true" />
+		<column name="parentCourseId" type="long" />
 		<!-- Foreign key columns -->
 		<column name="companyId" type="long" />
 		<column name="groupId" type="long" />
@@ -375,6 +376,9 @@
 		<!-- Finder Methods Standard -->
 		<finder name="GroupId" return-type="Collection">
 			<finder-column name="groupId" />
+		</finder>
+		<finder name="parentCourseId" return-type="Collection">
+			<finder-column name="parentCourseId" />
 		</finder>
 		<finder name="GroupIdClosed" return-type="Collection">
 			<finder-column name="groupId" />

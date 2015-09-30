@@ -74,6 +74,7 @@ public class CourseModelImpl extends BaseModelImpl<Course>
 	public static final Object[][] TABLE_COLUMNS = {
 			{ "uuid_", Types.VARCHAR },
 			{ "courseId", Types.BIGINT },
+			{ "parentCourseId", Types.BIGINT },
 			{ "companyId", Types.BIGINT },
 			{ "groupId", Types.BIGINT },
 			{ "userId", Types.BIGINT },
@@ -103,7 +104,7 @@ public class CourseModelImpl extends BaseModelImpl<Course>
 			{ "goodbyeMsg", Types.VARCHAR },
 			{ "goodbyeSubject", Types.VARCHAR }
 		};
-	public static final String TABLE_SQL_CREATE = "create table Lms_Course (uuid_ VARCHAR(75) null,courseId LONG not null primary key,companyId LONG,groupId LONG,userId LONG,userName VARCHAR(75) null,groupCreatedId LONG,createDate DATE null,modifiedDate DATE null,status INTEGER,statusByUserId LONG,statusByUserName VARCHAR(75) null,statusDate DATE null,title STRING null,description STRING null,friendlyURL VARCHAR(100) null,startDate DATE null,endDate DATE null,icon LONG,CourseEvalId LONG,CourseExtraData TEXT null,closed BOOLEAN,maxusers LONG,calificationType LONG,welcome BOOLEAN,welcomeMsg TEXT null,welcomeSubject VARCHAR(75) null,goodbye BOOLEAN,goodbyeMsg TEXT null,goodbyeSubject VARCHAR(75) null)";
+	public static final String TABLE_SQL_CREATE = "create table Lms_Course (uuid_ VARCHAR(75) null,courseId LONG not null primary key,parentCourseId LONG,companyId LONG,groupId LONG,userId LONG,userName VARCHAR(75) null,groupCreatedId LONG,createDate DATE null,modifiedDate DATE null,status INTEGER,statusByUserId LONG,statusByUserName VARCHAR(75) null,statusDate DATE null,title STRING null,description STRING null,friendlyURL VARCHAR(100) null,startDate DATE null,endDate DATE null,icon LONG,CourseEvalId LONG,CourseExtraData TEXT null,closed BOOLEAN,maxusers LONG,calificationType LONG,welcome BOOLEAN,welcomeMsg TEXT null,welcomeSubject VARCHAR(75) null,goodbye BOOLEAN,goodbyeMsg TEXT null,goodbyeSubject VARCHAR(75) null)";
 	public static final String TABLE_SQL_DROP = "drop table Lms_Course";
 	public static final String ORDER_BY_JPQL = " ORDER BY course.courseId ASC";
 	public static final String ORDER_BY_SQL = " ORDER BY Lms_Course.courseId ASC";
@@ -124,8 +125,9 @@ public class CourseModelImpl extends BaseModelImpl<Course>
 	public static long FRIENDLYURL_COLUMN_BITMASK = 4L;
 	public static long GROUPCREATEDID_COLUMN_BITMASK = 8L;
 	public static long GROUPID_COLUMN_BITMASK = 16L;
-	public static long USERID_COLUMN_BITMASK = 32L;
-	public static long UUID_COLUMN_BITMASK = 64L;
+	public static long PARENTCOURSEID_COLUMN_BITMASK = 32L;
+	public static long USERID_COLUMN_BITMASK = 64L;
+	public static long UUID_COLUMN_BITMASK = 128L;
 
 	/**
 	 * Converts the soap model instance into a normal model instance.
@@ -142,6 +144,7 @@ public class CourseModelImpl extends BaseModelImpl<Course>
 
 		model.setUuid(soapModel.getUuid());
 		model.setCourseId(soapModel.getCourseId());
+		model.setParentCourseId(soapModel.getParentCourseId());
 		model.setCompanyId(soapModel.getCompanyId());
 		model.setGroupId(soapModel.getGroupId());
 		model.setUserId(soapModel.getUserId());
@@ -230,6 +233,7 @@ public class CourseModelImpl extends BaseModelImpl<Course>
 
 		attributes.put("uuid", getUuid());
 		attributes.put("courseId", getCourseId());
+		attributes.put("parentCourseId", getParentCourseId());
 		attributes.put("companyId", getCompanyId());
 		attributes.put("groupId", getGroupId());
 		attributes.put("userId", getUserId());
@@ -274,6 +278,12 @@ public class CourseModelImpl extends BaseModelImpl<Course>
 
 		if (courseId != null) {
 			setCourseId(courseId);
+		}
+
+		Long parentCourseId = (Long)attributes.get("parentCourseId");
+
+		if (parentCourseId != null) {
+			setParentCourseId(parentCourseId);
 		}
 
 		Long companyId = (Long)attributes.get("companyId");
@@ -474,6 +484,26 @@ public class CourseModelImpl extends BaseModelImpl<Course>
 		_columnBitmask = -1L;
 
 		_courseId = courseId;
+	}
+
+	public long getParentCourseId() {
+		return _parentCourseId;
+	}
+
+	public void setParentCourseId(long parentCourseId) {
+		_columnBitmask |= PARENTCOURSEID_COLUMN_BITMASK;
+
+		if (!_setOriginalParentCourseId) {
+			_setOriginalParentCourseId = true;
+
+			_originalParentCourseId = _parentCourseId;
+		}
+
+		_parentCourseId = parentCourseId;
+	}
+
+	public long getOriginalParentCourseId() {
+		return _originalParentCourseId;
 	}
 
 	public long getCompanyId() {
@@ -1127,6 +1157,7 @@ public class CourseModelImpl extends BaseModelImpl<Course>
 
 		courseImpl.setUuid(getUuid());
 		courseImpl.setCourseId(getCourseId());
+		courseImpl.setParentCourseId(getParentCourseId());
 		courseImpl.setCompanyId(getCompanyId());
 		courseImpl.setGroupId(getGroupId());
 		courseImpl.setUserId(getUserId());
@@ -1217,6 +1248,10 @@ public class CourseModelImpl extends BaseModelImpl<Course>
 
 		courseModelImpl._originalUuid = courseModelImpl._uuid;
 
+		courseModelImpl._originalParentCourseId = courseModelImpl._parentCourseId;
+
+		courseModelImpl._setOriginalParentCourseId = false;
+
 		courseModelImpl._originalCompanyId = courseModelImpl._companyId;
 
 		courseModelImpl._setOriginalCompanyId = false;
@@ -1255,6 +1290,8 @@ public class CourseModelImpl extends BaseModelImpl<Course>
 		}
 
 		courseCacheModel.courseId = getCourseId();
+
+		courseCacheModel.parentCourseId = getParentCourseId();
 
 		courseCacheModel.companyId = getCompanyId();
 
@@ -1412,12 +1449,14 @@ public class CourseModelImpl extends BaseModelImpl<Course>
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(61);
+		StringBundler sb = new StringBundler(63);
 
 		sb.append("{uuid=");
 		sb.append(getUuid());
 		sb.append(", courseId=");
 		sb.append(getCourseId());
+		sb.append(", parentCourseId=");
+		sb.append(getParentCourseId());
 		sb.append(", companyId=");
 		sb.append(getCompanyId());
 		sb.append(", groupId=");
@@ -1480,7 +1519,7 @@ public class CourseModelImpl extends BaseModelImpl<Course>
 	}
 
 	public String toXmlString() {
-		StringBundler sb = new StringBundler(94);
+		StringBundler sb = new StringBundler(97);
 
 		sb.append("<model><model-name>");
 		sb.append("com.liferay.lms.model.Course");
@@ -1493,6 +1532,10 @@ public class CourseModelImpl extends BaseModelImpl<Course>
 		sb.append(
 			"<column><column-name>courseId</column-name><column-value><![CDATA[");
 		sb.append(getCourseId());
+		sb.append("]]></column-value></column>");
+		sb.append(
+			"<column><column-name>parentCourseId</column-name><column-value><![CDATA[");
+		sb.append(getParentCourseId());
 		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>companyId</column-name><column-value><![CDATA[");
@@ -1619,6 +1662,9 @@ public class CourseModelImpl extends BaseModelImpl<Course>
 	private String _uuid;
 	private String _originalUuid;
 	private long _courseId;
+	private long _parentCourseId;
+	private long _originalParentCourseId;
+	private boolean _setOriginalParentCourseId;
 	private long _companyId;
 	private long _originalCompanyId;
 	private boolean _setOriginalCompanyId;

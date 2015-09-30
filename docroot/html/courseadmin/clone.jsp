@@ -56,7 +56,7 @@
 	<aui:input type="text" name="newCourseName" value="<%=groupObj.getName()+\"_\"+Time.getShortTimestamp() %>" label="courseadmin.clone.newcoursename" size="50" helpMessage="courseadmin.clone.newcoursename.help">
 		<aui:validator name="required" errorMessage="field.required"></aui:validator>
 	</aui:input>
-
+    <aui:input type="checkbox"  name="childCourse" label="courseadmin.clone.childcourse" helpMessage="courseadmin.clone.childcourse.help" />
 <div id="datesbox" style="visibility: visible">				
 	<aui:field-wrapper label="start-course-date">
 		<liferay-ui:input-date yearRangeEnd="<%=LiferaylmsUtil.defaultEndYear %>" yearRangeStart="<%=LiferaylmsUtil.defaultStartYear %>"  dayParam="startDay" monthParam="startMon"
