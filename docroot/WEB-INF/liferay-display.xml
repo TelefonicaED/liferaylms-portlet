@@ -64,5 +64,6 @@
 		<portlet id="finalcourseresult"></portlet>
 
 		<portlet id="ActivityComments"></portlet>
+		<portlet id="moduletimer"></portlet>
 	</category>
 </display>

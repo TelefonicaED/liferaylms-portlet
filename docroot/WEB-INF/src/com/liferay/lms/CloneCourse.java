@@ -280,6 +280,7 @@ public class CloneCourse implements MessageListener {
 				newModule.setGroupId(newCourse.getGroupCreatedId());
 				newModule.setUserId(newCourse.getUserId());
 				newModule.setOrdern(newModule.getModuleId());
+				newModule.setAllowedTime(module.getAllowedTime());
 				
 				//Icono
 				newModule.setIcon(module.getIcon());
@@ -328,6 +329,7 @@ public class CloneCourse implements MessageListener {
 					newLearnActivity.setTries(activity.getTries());
 					newLearnActivity.setPasspuntuation(activity.getPasspuntuation());
 					newLearnActivity.setPriority(newLearnActivity.getActId());
+					
 					
 					boolean actPending = false;
 					if(activity.getPrecedence()>0){

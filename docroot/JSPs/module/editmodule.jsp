@@ -32,6 +32,8 @@
 <jsp:useBean id="endDateAno" class="java.lang.String" scope="request" />
 <jsp:useBean id="endDateHora" class="java.lang.String" scope="request" />
 <jsp:useBean id="endDateMinuto" class="java.lang.String" scope="request" />
+<jsp:useBean id="allowedDateHora" class="java.lang.String" scope="request" />
+<jsp:useBean id="allowedDateMinuto" class="java.lang.String" scope="request" />
 
 <portlet:defineObjects />
 <script type="text/javascript">
@@ -96,6 +98,7 @@ function validate(){
 	var endDateAno = document.getElementById('<portlet:namespace />endDateAno').value;
 	var endDateHora = document.querySelectorAll('[name="<portlet:namespace />endDateHora"]')[0].value;
 	var endDateMinuto = document.querySelectorAll('[name="<portlet:namespace />endDateMinuto"]')[0].value;
+	
 	
 	var start = new Date(startDateAno,startDateMes,startDateDia,startDateHora,startDateMinuto);
 	var end = new Date(endDateAno,endDateMes,endDateDia,endDateHora,endDateMinuto);
@@ -220,6 +223,9 @@ function validate(){
 				 dayNullable="false" monthNullable="false" ></liferay-ui:input-date>
 		<liferay-ui:input-time minuteParam="endDateMinuto" amPmParam="startAMPM" 
 			hourParam="endDateHora" hourValue="<%=Integer.valueOf(endDateHora) %>" minuteValue="<%=Integer.valueOf(endDateMinuto) %>"></liferay-ui:input-time>
+	</aui:field-wrapper>
+	<aui:field-wrapper label="allowed-time">
+		<liferay-ui:input-time minuteParam="allowedDateMinuto" amPmParam="allowedDateAMPM"	hourParam="allowedDateHora" hourValue="<%=Integer.valueOf(allowedDateHora) %>" minuteValue="<%=Integer.valueOf(allowedDateMinuto) %>"></liferay-ui:input-time>
 	</aui:field-wrapper>
 	<liferay-ui:error key="module-endDate-required" message="module-endDate-required" />
 	<liferay-ui:error key="module-startDate-before-endDate" message="module-startDate-before-endDate" />

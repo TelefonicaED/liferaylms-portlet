@@ -277,6 +277,10 @@ public static String SEPARATOR = "_";
 			Module module = ModuleLocalServiceUtil.getModule(moduleId);
 			//System.out.println("Paso por aqui: "+moduleId);
 			String title = module.getTitle();
+			long allowedTime = module.getAllowedTime();	
+				long	hourDuration = allowedTime / 3600;
+			long	minuteDuration = (allowedTime % 3600) / 60;
+			long	secondDuration = allowedTime % 60;
 			//renderRequest.setAttribute(arg0, arg1);
 			renderRequest.setAttribute("title", title);
 			String description = module.getDescription(themeDisplay.getLocale())+"";
@@ -305,6 +309,9 @@ public static String SEPARATOR = "_";
 			renderRequest.setAttribute("endDateAno", formatAno.format(module.getEndDate()));
 			renderRequest.setAttribute("endDateHora", formatHora.format(module.getEndDate()));
 			renderRequest.setAttribute("endDateMinuto", formatMinuto.format(module.getEndDate()));
+			renderRequest.setAttribute("allowedDateHora",Long.toString(hourDuration));
+			renderRequest.setAttribute("allowedDateMinuto",Long.toString(minuteDuration) );
+			
 			String endDate = dateToJsp(renderRequest, module.getEndDate());
 			renderRequest.setAttribute("endDate", endDate);
             renderRequest.setAttribute("module", module);
@@ -320,6 +327,10 @@ public static String SEPARATOR = "_";
 				if (editType.equalsIgnoreCase("update")) {
 					editmoduleURL.setParameter("javax.portlet.action", "updatemodule");
                 }
+				long allowedTime = errormodule.getAllowedTime();	
+				long	hourDuration = allowedTime / 3600;
+			long	minuteDuration = (allowedTime % 3600) / 60;
+			long	secondDuration = allowedTime % 60;
 				renderRequest.setAttribute("module", errormodule);
 				 renderRequest.setAttribute("startDateDia", formatDia.format(errormodule.getStartDate()));
 	                renderRequest.setAttribute("startDateMes", formatMes.format(errormodule.getStartDate()));
@@ -333,6 +344,8 @@ public static String SEPARATOR = "_";
 	                renderRequest.setAttribute("endDateAno", formatAno.format(errormodule.getEndDate()));
 	    			renderRequest.setAttribute("endDateHora", formatHora.format(errormodule.getEndDate()));
 	    			renderRequest.setAttribute("endDateMinuto", formatMinuto.format(errormodule.getEndDate()));
+	    			renderRequest.setAttribute("allowedDateHora",Long.toString(hourDuration));
+	    			renderRequest.setAttribute("allowedDateMinuto",Long.toString(minuteDuration) );
 					String endDate = dateToJsp(renderRequest,errormodule.getEndDate());
 					renderRequest.setAttribute("endDate", endDate);
 			} else {
@@ -347,6 +360,10 @@ public static String SEPARATOR = "_";
 				calendar.set(Calendar.HOUR_OF_DAY, 0);
 				calendar.set(Calendar.MINUTE, 0);
 				blankmodule.setStartDate(calendar.getTime());
+				long allowedTime = blankmodule.getAllowedTime();	
+				long	hourDuration = allowedTime / 3600;
+			long	minuteDuration = (allowedTime % 3600) / 60;
+			long	secondDuration = allowedTime % 60;
 				renderRequest.setAttribute("startDateDia", formatDia.format(blankmodule.getStartDate()));
 				renderRequest.setAttribute("startDateMes", formatMes.format(blankmodule.getStartDate()));
 				renderRequest.setAttribute("startDateAno", formatAno.format(blankmodule.getStartDate()));
@@ -364,6 +381,8 @@ public static String SEPARATOR = "_";
 				renderRequest.setAttribute("endDateAno", formatAno.format(blankmodule.getEndDate()));
     			renderRequest.setAttribute("endDateHora", formatHora.format(blankmodule.getEndDate()));
     			renderRequest.setAttribute("endDateMinuto", formatMinuto.format(blankmodule.getEndDate()));
+    			renderRequest.setAttribute("allowedDateHora",Long.toString(hourDuration));
+    			renderRequest.setAttribute("allowedDateMinuto",Long.toString(minuteDuration) );
 				String endDate = dateToJsp(renderRequest, blankmodule.getEndDate());
 				renderRequest.setAttribute("endDate", endDate);
 				renderRequest.setAttribute("module", blankmodule);
@@ -716,14 +735,16 @@ public static String SEPARATOR = "_";
             module.setIcon(ParamUtil.getLong(request, "icon"));
         } catch (Exception nfe) {
         }
-
+        
         int startDateAno = ParamUtil.getInteger(request, "startDateAno");
         int startDateMes = ParamUtil.getInteger(request, "startDateMes");
         int startDateDia = ParamUtil.getInteger(request, "startDateDia");
         int startDateHora = ParamUtil.getInteger(request, "startDateHora");
         int startDateMinuto = ParamUtil.getInteger(request, "startDateMinuto");
+        long allowedDateHora = ParamUtil.getLong(request, "allowedDateHora",0);
+        long allowedDateMinuto = ParamUtil.getLong(request, "allowedDateMinuto",0);
         long precedence=ParamUtil.getLong(request, "precedence");
-        
+        module.setAllowedTime(allowedDateHora*3600+allowedDateMinuto*60);
         Calendar calendar = Calendar.getInstance(themeDisplay.getTimeZone());
         calendar.set(startDateAno, startDateMes, startDateDia);
         calendar.set(Calendar.HOUR_OF_DAY,startDateHora);
