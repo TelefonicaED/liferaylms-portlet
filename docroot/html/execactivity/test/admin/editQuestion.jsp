@@ -24,7 +24,7 @@
 	long typeId = ParamUtil.getLong(request,"typeId", -1);
 	long actId = ParamUtil.getLong(request,"resId", 0);
 	String backUrl = ParamUtil.getString(request, "backUrl", currentURL);
-	String formatType = PortletProps.get("lms.question.formattype.normal");
+	String formatType = PropsUtil.get("lms.question.formattype.normal");
 	
 	LearningActivity learningActivity = LearningActivityLocalServiceUtil.getLearningActivity(actId);
 	request.setAttribute("activity", learningActivity);
@@ -83,28 +83,28 @@
 	</script>
     
 	<%	
-    	boolean enableOrder = StringPool.TRUE.equals(LearningActivityLocalServiceUtil.getExtraContentValue(learningActivity.getActId(),"enableorder"));
+		boolean enableOrder = StringPool.TRUE.equals(PropsUtil.get("lms.learningactivity.testoption.editformat"));
 		if(qt.isInline()){
 			try{
 				Document document = SAXReaderUtil.read(question.getExtracontent());
 				Element rootElement = document.getRootElement();
 				formatType = (String) rootElement.element("formattype").getData();
 			}catch(NullPointerException e){
-				formatType = PortletProps.get("lms.question.formattype.normal");
+				formatType = PropsUtil.get("lms.question.formattype.normal");
 			}catch(DocumentException e){
-				formatType = PortletProps.get("lms.question.formattype.normal");
+				formatType = PropsUtil.get("lms.question.formattype.normal");
 			}
 	%>
 			<c:choose>
 				<c:when test="<%=enableOrder%>">
 					<aui:select name="formattype" label="exectactivity.editquestions.formattype" helpMessage="exectactivity.editquestions.formattype.helpMessage"> 
-						<aui:option selected="<%=formatType.equals(PortletProps.get(\"lms.question.formattype.normal\")) %>" value="<%=PortletProps.get(\"lms.question.formattype.normal\")%>">
+						<aui:option selected="<%=formatType.equals(PropsUtil.get(\"lms.question.formattype.normal\")) %>" value="<%=PropsUtil.get(\"lms.question.formattype.normal\")%>">
 							<liferay-ui:message key="exectactivity.editquestions.formattype.vertical" />
 						</aui:option>
-						<aui:option selected="<%=formatType.equals(PortletProps.get(\"lms.question.formattype.horizontal\")) %>" value="<%=PortletProps.get(\"lms.question.formattype.horizontal\") %>">
+						<aui:option selected="<%=formatType.equals(PropsUtil.get(\"lms.question.formattype.horizontal\")) %>" value="<%=PropsUtil.get(\"lms.question.formattype.horizontal\") %>">
 							<liferay-ui:message key="exectactivity.editquestions.formattype.horizontal" />
 						</aui:option>
-						<aui:option selected="<%=formatType.equals(PortletProps.get(\"lms.question.formattype.combo\")) %>" value="<%=PortletProps.get(\"lms.question.formattype.combo\") %>">
+						<aui:option selected="<%=formatType.equals(PropsUtil.get(\"lms.question.formattype.combo\")) %>" value="<%=PropsUtil.get(\"lms.question.formattype.combo\") %>">
 							<liferay-ui:message key="exectactivity.editquestions.formattype.combo" />
 						</aui:option>
 					</aui:select>

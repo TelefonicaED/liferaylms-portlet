@@ -110,7 +110,7 @@
 						|| permissionChecker.hasPermission(activity.getGroupId(), LearningActivity.class.getName(),actId, ActionKeys.UPDATE)
 						|| permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), "com.liferay.lms.model",themeDisplay.getScopeGroupId(),"ACCESSLOCK")
 			    		|| improving ){
-							boolean isBank = StringPool.TRUE.equals(LearningActivityLocalServiceUtil.getExtraContentValue(actId, "isBank"));
+							boolean useBank = StringPool.TRUE.equals(LearningActivityLocalServiceUtil.getExtraContentValue(actId, "isBank"));
 %>
 			    	
 			    		<h2 class="description-title"><%=activity.getTitle(themeDisplay.getLocale()) %></h2>
@@ -149,7 +149,7 @@
 <%
 							}else{		
 								List<TestQuestion> questions = TestQuestionLocalServiceUtil.getQuestions(actId);
-								if (isBank){
+								if (useBank){
 									questions = TestQuestionLocalServiceUtil.generateAleatoryQuestions(actId, 0L);
 									LearningActivity bankActivity = LearningActivityLocalServiceUtil.getLearningActivity(questions.get(0).getActId());
 %>
@@ -506,7 +506,7 @@
 				}
 				random = questions.size();
 			} else {
-				if (random != 0 && !isBank){
+				if (random != 0 && !useBank){
 					questions = new ArrayList<TestQuestion>(questions);
 					Collections.shuffle(questions);	
 					if (random > questions.size()){
