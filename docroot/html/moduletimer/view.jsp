@@ -37,7 +37,7 @@ if(theModule!=null)
     if(mr!=null && !mr.getPassed())
     {
     	long usedTime = System.currentTimeMillis() - mr.getStartDate().getTime();
-    	leftTime = theModule.getAllowedTime()*1000 - usedTime;
+    	leftTime = theModule.getAllowedTime() - usedTime;
     	if(theModule.getAllowedTime()!=0){
     	%>
     		<script type="text/javascript">
