@@ -15,7 +15,7 @@ LmsPrefs lmsprefs=LmsPrefsLocalServiceUtil.getLmsPrefs(themeDisplay.getCompanyId
 long teacherRoleId=lmsprefs.getTeacherRole();
 long tutorRoleId=lmsprefs.getEditorRole();
 java.util.List<UserGroupRole> ugrs=UserGroupRoleLocalServiceUtil.getUserGroupRolesByGroupAndRole(themeDisplay.getScopeGroupId(),teacherRoleId);
-ugrs.addAll(UserGroupRoleLocalServiceUtil.getUserGroupRolesByGroupAndRole(themeDisplay.getScopeGroupId(),tutorRoleId));
+//ugrs.addAll(UserGroupRoleLocalServiceUtil.getUserGroupRolesByGroupAndRole(themeDisplay.getScopeGroupId(),tutorRoleId));
 if(course!=null && permissionChecker.hasPermission(course.getGroupId(),  Course.class.getName(),course.getCourseId(),ActionKeys.VIEW))
 {
 for(UserGroupRole ugr:ugrs)
