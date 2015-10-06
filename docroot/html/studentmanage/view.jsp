@@ -24,14 +24,26 @@
 <%@include file="/init.jsp" %>
 
 <%
-	String criteria = request.getParameter("criteria");
-	long teamId=ParamUtil.getLong(request, "teamId",0);
+	String criteria 	= request.getParameter("criteria");
+	String firstName 	= request.getParameter("firstName");
+	String lastName 	= request.getParameter("lastName");
+	String screenName 	= request.getParameter("screenName");
+	String emailAddress = request.getParameter("emailAddress");
+	long   teamId		= ParamUtil.getLong	  (request, "teamId",0);
 
-	if (criteria == null) criteria = "";	
+	if (criteria == null) criteria = "";
+	if (firstName == null) firstName = "";
+	if (lastName == null) lastName = "";
+	if (screenName == null) screenName = "";
+	if (emailAddress == null) emailAddress = "";
 	
 	PortletURL portletURL = renderResponse.createRenderURL();
 	portletURL.setParameter("jspPage","/html/studentmanage/view.jsp");
 	portletURL.setParameter("criteria", criteria); 
+	portletURL.setParameter("firstName", firstName);
+	portletURL.setParameter("lastName", lastName);
+	portletURL.setParameter("screenName", screenName);
+	portletURL.setParameter("emailAddress", emailAddress);
 	portletURL.setParameter("teamId", Long.toString(teamId)); 
 	
 	Course course=CourseLocalServiceUtil.getCourseByGroupCreatedId(themeDisplay.getScopeGroupId());
@@ -97,12 +109,20 @@
 		<aui:fieldset>
 			<aui:column>
 				<aui:input label="studentsearch.criteria" name="criteria" size="20" value="<%=criteria %>" />	
-			</aui:column>	
-			<aui:column cssClass="search_lms_button">
+			</aui:column>
+		</aui:fieldset>
+		<aui:fieldset>
+			<aui:column>
+				<aui:input label="first-name" name="firstName" size="20" value="<%=firstName %>" />
+				<aui:input label="screen-name" name="screenName" size="20" value="<%=screenName %>" />
 				<aui:button-row>
 					<aui:button name="searchUsers" value="search" type="submit" />
 				</aui:button-row>
-			</aui:column>	
+			</aui:column>
+			<aui:column>
+				<aui:input label="last-name" name="lastName" size="20" value="<%=lastName %>" />
+				<aui:input label="usermanagement.email-address" name="emailAddress" size="20" value="<%=emailAddress %>" />
+			</aui:column>
 		</aui:fieldset>
 	</aui:form>
 	<%
@@ -148,10 +168,20 @@ else
 				}
 				%>
 				</aui:select>
-			</aui:column>	
-			<aui:button-row>
-				<aui:button name="searchUsers" value="select" type="submit" />
-			</aui:button-row>
+			</aui:column>
+		</aui:fieldset>
+		<aui:fieldset>
+			<aui:column>
+				<aui:input label="first-name" name="firstName" size="20" value="<%=firstName %>" />
+				<aui:input label="screen-name" name="screenName" size="20" value="<%=screenName %>" />
+				<aui:button-row>
+					<aui:button name="searchUsers" value="search" type="submit" />
+				</aui:button-row>
+			</aui:column>
+			<aui:column>
+				<aui:input label="last-name" name="lastName" size="20" value="<%=lastName %>" />
+				<aui:input label="usermanagement.email-address" name="emailAddress" size="20" value="<%=emailAddress %>" />
+			</aui:column>
 		</aui:fieldset>
 	</aui:form>
 	<%if(theTeam!=null)
@@ -168,9 +198,9 @@ else
 			<%
 			List<User> userListPage  = null;
 			String middleName = null;
-			OrderByComparator obc = new   UserLastNameComparator(true);
-			
+			OrderByComparator obc = new   UserLastNameComparator(true);			
 			LinkedHashMap userParams = new LinkedHashMap();
+			int userCount = 0;
 
 			userParams.put("notInCourseRoleTeach", new CustomSQLParam("WHERE User_.userId NOT IN "
 		              + " (SELECT UserGroupRole.userId " + "  FROM UserGroupRole "
@@ -180,38 +210,36 @@ else
 		           
 
 
-		       	userParams.put("notInCourseRoleEdit", new CustomSQLParam("WHERE User_.userId NOT IN "
+		   userParams.put("notInCourseRoleEdit", new CustomSQLParam("WHERE User_.userId NOT IN "
 		              + " (SELECT UserGroupRole.userId " + "  FROM UserGroupRole "
 		              + "  WHERE  (UserGroupRole.groupId = ?) AND (UserGroupRole.roleId = ?))", new Long[] {
 		              course.getGroupCreatedId(),
 		              RoleLocalServiceUtil.getRole(prefs.getEditorRole()).getRoleId() }));
 		           
 			
+		    userParams.put("usersGroups", new Long(themeDisplay.getScopeGroupId()));
+		    
+			if(theTeam!=null) userParams.put("usersTeams", theTeam.getTeamId());
 			
-			if(theTeam==null){
-				if(criteria.trim().length()==0){
-					userParams.put("usersGroups", new Long(themeDisplay.getScopeGroupId()));
-					
-					userListPage  = UserLocalServiceUtil.search(themeDisplay.getCompanyId(), criteria, 0, userParams, searchContainer.getStart(), searchContainer.getEnd(), obc);
-				}else{
-					userParams.put("usersGroups", new Long(themeDisplay.getScopeGroupId()));
-					userListPage  = UserLocalServiceUtil.search(themeDisplay.getCompanyId(), criteria, 0, userParams, searchContainer.getStart(), searchContainer.getEnd(), obc);
-				}
-			}else{
-				userParams.put("usersGroups", theTeam.getGroupId());
-				userParams.put("usersTeams", theTeam.getTeamId());
-				userListPage  = UserLocalServiceUtil.search(themeDisplay.getCompanyId(), criteria, 0, userParams, searchContainer.getStart(), searchContainer.getEnd(), obc);
-			}
-			
-			
-
-				int userCount = UserLocalServiceUtil.searchCount(themeDisplay.getCompanyId(), criteria, 0, userParams);
+			if ((firstName.trim().length()==0) || (lastName.trim().length()==0) ||
+				(screenName.trim().length()==0)|| (emailAddress.trim().length()==0)){
 				
-				pageContext.setAttribute("results", userListPage);
-			    	pageContext.setAttribute("total", userCount);
-			
-			
-			    	
+				userListPage  = UserLocalServiceUtil.search(themeDisplay.getCompanyId(), firstName, StringPool.BLANK, 
+															lastName, screenName, emailAddress, 0, userParams, true, 
+															searchContainer.getStart(), searchContainer.getEnd(), obc);
+				
+				userCount	  = UserLocalServiceUtil.searchCount(themeDisplay.getCompanyId(), firstName, StringPool.BLANK,
+																 lastName, screenName, emailAddress, 0, userParams, true);
+				
+			}else{
+				userListPage  = UserLocalServiceUtil.search(themeDisplay.getCompanyId(), criteria, 0, userParams, 
+															searchContainer.getStart(), searchContainer.getEnd(), obc);
+				userCount 	  = UserLocalServiceUtil.searchCount(themeDisplay.getCompanyId(), criteria, 0, userParams);
+			}
+				
+			pageContext.setAttribute("results", userListPage);
+			pageContext.setAttribute("total", userCount);
+	
 			%>
 		</liferay-ui:search-container-results>
 		
