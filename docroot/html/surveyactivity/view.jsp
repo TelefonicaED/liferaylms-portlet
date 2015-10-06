@@ -64,7 +64,8 @@ textarea {
 		LearningActivity activity=LearningActivityLocalServiceUtil.getLearningActivity(actId);
 		long typeId=activity.getTypeId();
 		boolean isSurvey = activity.getTypeId() == 4;
-		
+		boolean isEvaluationSurvey = activity.getTitle(themeDisplay.getLocale())
+					.equalsIgnoreCase(LanguageUtil.get(pageContext, "surveyactivity.evaluation.title"));
 		
 		if(typeId==4&&(!LearningActivityLocalServiceUtil.islocked(actId,themeDisplay.getUserId())||
 				permissionChecker.hasPermission(activity.getGroupId(), LearningActivity.class.getName(), actId, ActionKeys.UPDATE)||
@@ -159,7 +160,8 @@ textarea {
 									                	  label: '<liferay-ui:message key="ok"/>',
 									                	  handler: function() {
 									                		  A.one('#<portlet:namespace/>formulario').detach('submit');
-									                		  document.getElementById('<portlet:namespace/>formulario').submit();
+									                		  if (!<%=isEvaluationSurvey%>)
+									                			 document.getElementById('<portlet:namespace/>formulario').submit();
 									                		  <portlet:namespace />confirmDialog.close();
 									                	  }
 									                  },
