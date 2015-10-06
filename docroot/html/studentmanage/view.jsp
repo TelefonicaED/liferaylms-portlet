@@ -115,14 +115,14 @@
 			<aui:column>
 				<aui:input label="first-name" name="firstName" size="20" value="<%=firstName %>" />
 				<aui:input label="screen-name" name="screenName" size="20" value="<%=screenName %>" />
-				<aui:button-row>
-					<aui:button name="searchUsers" value="search" type="submit" />
-				</aui:button-row>
 			</aui:column>
 			<aui:column>
 				<aui:input label="last-name" name="lastName" size="20" value="<%=lastName %>" />
 				<aui:input label="usermanagement.email-address" name="emailAddress" size="20" value="<%=emailAddress %>" />
 			</aui:column>
+			<aui:button-row>
+				<aui:button name="searchUsers" value="search" type="submit" />
+			</aui:button-row>
 		</aui:fieldset>
 	</aui:form>
 	<%
@@ -174,14 +174,14 @@ else
 			<aui:column>
 				<aui:input label="first-name" name="firstName" size="20" value="<%=firstName %>" />
 				<aui:input label="screen-name" name="screenName" size="20" value="<%=screenName %>" />
-				<aui:button-row>
-					<aui:button name="searchUsers" value="search" type="submit" />
-				</aui:button-row>
 			</aui:column>
 			<aui:column>
 				<aui:input label="last-name" name="lastName" size="20" value="<%=lastName %>" />
 				<aui:input label="usermanagement.email-address" name="emailAddress" size="20" value="<%=emailAddress %>" />
 			</aui:column>
+			<aui:button-row>
+				<aui:button name="searchUsers" value="search" type="submit" />
+			</aui:button-row>
 		</aui:fieldset>
 	</aui:form>
 	<%if(theTeam!=null)
