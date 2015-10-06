@@ -282,7 +282,14 @@
 									return (question.all('div.answer input[type="radio"]:checked').size() > 0);
 								},
 								questiontype_options_select : function(question) {
-									return (question.all('select.answer').value != 0);
+									var selectAnswers = question.all('select.answer');
+									var validSelects = true;
+									selectAnswers.each(function (selectAnswer){
+										if (selectAnswer.val()==""||selectAnswer.val()==0){
+											validSelects = false;
+										}
+									});
+									return validSelects;
 								},
 								questiontype_multioptions : function(question) {
 									return (question.all('div.answer input[type="checkbox"]:checked').size() > 0);
