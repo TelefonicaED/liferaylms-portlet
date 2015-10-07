@@ -265,18 +265,34 @@ if(backToEdit) {
 		
 		LinkedHashMap<String,Object> params=new LinkedHashMap<String,Object>();			
 		
+	OrderByComparator obc = new UserFirstNameComparator(true);
 	
-OrderByComparator obc = new UserFirstNameComparator(true);
+	
 		
-		if (!tab.equals(LanguageUtil.get(pageContext, "courseadmin.adminactions.students"))) {
-
+	if (!tab.equals(LanguageUtil.get(pageContext, "courseadmin.adminactions.students"))) {
             params.put("notInCourseRoleStu", new CustomSQLParam("WHERE User_.userId NOT IN "
               + " (SELECT UserGroupRole.userId " + "  FROM UserGroupRole "
               + "  WHERE  (UserGroupRole.groupId = ?) AND (UserGroupRole.roleId = ?))", new Long[] {
               course.getGroupCreatedId(), commmanager.getRoleId() }));
            }
+	
+	if(tab.equals(LanguageUtil.get(pageContext, "courseadmin.adminactions.students"))){
+		 params.put("notInCourseRoleTeach", new CustomSQLParam("WHERE User_.userId NOT IN "
+	              + " (SELECT UserGroupRole.userId " + "  FROM UserGroupRole "
+	              + "  WHERE  (UserGroupRole.groupId = ?) AND (UserGroupRole.roleId = ?))", new Long[] {
+	              course.getGroupCreatedId(),
+	              RoleLocalServiceUtil.getRole(prefs.getTeacherRole()).getRoleId() }));
+		 
+		 params.put("notInCourseRoleEdit", new CustomSQLParam("WHERE User_.userId NOT IN "
+	              + " (SELECT UserGroupRole.userId " + "  FROM UserGroupRole "
+	              + "  WHERE  (UserGroupRole.groupId = ?) AND (UserGroupRole.roleId = ?))", new Long[] {
+	              course.getGroupCreatedId(),
+	              RoleLocalServiceUtil.getRole(prefs.getEditorRole()).getRoleId() }));
+		 
+		 
+	}
 
-           if (!tab.equals(teacherName)) {
+           /*if (!tab.equals(teacherName)) {
 
             params.put("notInCourseRoleTeach", new CustomSQLParam("WHERE User_.userId NOT IN "
               + " (SELECT UserGroupRole.userId " + "  FROM UserGroupRole "
@@ -292,9 +308,9 @@ OrderByComparator obc = new UserFirstNameComparator(true);
               + "  WHERE  (UserGroupRole.groupId = ?) AND (UserGroupRole.roleId = ?))", new Long[] {
               course.getGroupCreatedId(),
               RoleLocalServiceUtil.getRole(prefs.getEditorRole()).getRoleId() }));
-           }
+           }*/
 		
-		params.put("notInCourseRole",new CustomSQLParam("WHERE User_.userId NOT IN "+
+	params.put("notInCourseRole",new CustomSQLParam("WHERE User_.userId NOT IN "+
 		                                                " (SELECT UserGroupRole.userId "+
 		                                                "  FROM UserGroupRole "+
 		                                                "  WHERE  (UserGroupRole.groupId = ?) AND (UserGroupRole.roleId = ?))",new Long[]{course.getGroupCreatedId(),roleId}));
