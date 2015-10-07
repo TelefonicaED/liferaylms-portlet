@@ -744,7 +744,7 @@ public static String SEPARATOR = "_";
         long allowedDateHora = ParamUtil.getLong(request, "allowedDateHora",0);
         long allowedDateMinuto = ParamUtil.getLong(request, "allowedDateMinuto",0);
         long precedence=ParamUtil.getLong(request, "precedence");
-        module.setAllowedTime((allowedDateHora*3600+allowedDateMinuto*60)*1000);
+        module.setAllowedTime((allowedDateHora*3600+allowedDateMinuto*60));
         Calendar calendar = Calendar.getInstance(themeDisplay.getTimeZone());
         calendar.set(startDateAno, startDateMes, startDateDia);
         calendar.set(Calendar.HOUR_OF_DAY,startDateHora);
