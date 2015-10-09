@@ -440,6 +440,10 @@
 				);
 				
 			//-->
+				function finishTry(){
+					document.<portlet:namespace />formulario.action='<%=correctURL%>';
+				    document.<portlet:namespace />formulario.submit();
+				}	
 			</script>			
 
 			<aui:form name="formulario" action="<%=correctURL %>" method="post" onSubmit="javascript:return false;">
