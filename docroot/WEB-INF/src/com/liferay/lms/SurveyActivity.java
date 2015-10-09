@@ -24,6 +24,7 @@ import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
 
 import org.apache.commons.beanutils.BeanComparator;
+import org.jfree.util.Log;
 import org.jsoup.Jsoup;
 
 import au.com.bytecode.opencsv.CSVReader;
@@ -358,11 +359,6 @@ public class SurveyActivity extends MVCPortlet {
 	
 	public void importSurveyQuestions(ActionRequest actionRequest, ActionResponse actionResponse) throws PortletException, IOException {
 		
-		String[] typeIds = PropsUtil.getArray("lms.questions.allowed.for.4");
-		long typeId = 0;
-		if (typeIds != null && typeIds.length > 0) {
-			typeId = Long.valueOf(typeIds[0]);
-		}
 		UploadPortletRequest uploadRequest = PortalUtil.getUploadPortletRequest(actionRequest);
 		long actId = ParamUtil.getLong(actionRequest, "resId",0);
 		
@@ -371,6 +367,7 @@ public class SurveyActivity extends MVCPortlet {
 		ThemeDisplay themeDisplay = (ThemeDisplay) actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
 		Locale locale = themeDisplay.getLocale();
 		InputStream csvFile = uploadRequest.getFileAsStream("fileName");
+		
 		if(fileName==null || StringPool.BLANK.equals(fileName)){
 			SessionErrors.add(actionRequest, "surveyactivity.csverror.fileRequired");
 			actionResponse.setRenderParameter("jspPage", "/html/surveyactivity/admin/importquestions.jsp");
@@ -386,30 +383,27 @@ public class SurveyActivity extends MVCPortlet {
 				CSVReader reader = null;
 				try {
 					boolean allCorrect=true;
-					
-					
 					int line = 0;
 					String questionText="";
 					String[] currLine; 
 					
 					/*Cosas de Miguel*/
-					
 					byte[] buf = new byte[16384];
 					String type = LiferaylmsUtil.getEncodingTypeOfFile(buf, 0, csvFile.read(buf));
 					csvFile.reset();
 					/*Cosas de Miguel*/		
 					
-					if(type.equals(LiferaylmsUtil.CHARSET_UTF_8 ) || type.equals(LiferaylmsUtil.CHARSET_UTF_16LE )|| type.equals(LiferaylmsUtil.CHARSET_UTF_32BE )
-							|| type.equals(LiferaylmsUtil.CHARSET_UTF_32LE )){
+					if (type.equals(LiferaylmsUtil.CHARSET_UTF_8) ||
+						type.equals(LiferaylmsUtil.CHARSET_UTF_16LE)|| 
+						type.equals(LiferaylmsUtil.CHARSET_UTF_32BE)|| 
+						type.equals(LiferaylmsUtil.CHARSET_UTF_32LE)) {
 						//System.out.println("UTF-8");
 						reader = new CSVReader(new InputStreamReader(csvFile, StringPool.UTF8),CharPool.SEMICOLON);
 
 					}else{
 						//System.out.println("ISO");
 						reader = new CSVReader(new InputStreamReader(csvFile, StringPool.ISO_8859_1),CharPool.SEMICOLON);
-
 					}
-					
 
 					while ((currLine = reader.readNext()) != null) {
 						if (line == 0) {
@@ -419,19 +413,30 @@ public class SurveyActivity extends MVCPortlet {
 						
 						boolean correct = true;
 						line++;
-						if (currLine.length == 2) {
+						
+						if (currLine.length == 3) {
 						try{
-							if(currLine[0].trim().equalsIgnoreCase("")){
+							
+							//Recogemos pregunta y tipo
+							Long typeId = new Long(2);
+							
+							if( currLine[0].trim().equalsIgnoreCase("") || 
+								currLine[1].trim().equalsIgnoreCase("")) {
 								SessionErrors.add(actionRequest, "surveyactivity.csvError.bad-question",line);
 								correct=false;
 								allCorrect=false;
 							}else{
 								questionText= currLine[0].trim();
+								typeId= Long.parseLong(currLine[1].trim());
 							}
-							String allAnswers = currLine[1].trim();
+							
+							//Recogemos respuestas
+							String allAnswers = currLine[2].trim();
 							String[] answers = allAnswers.split("\\|");
+							
 							for(String a:answers){
-								if(a.equalsIgnoreCase("")){
+								//Si no es de tipo "freeText" (typeId=2), no puede ir vacía
+								if(a.equalsIgnoreCase("") && typeId != 2){
 									SessionErrors.add(actionRequest, "surveyactivity.csvError.bad-answer",line);
 									correct=false;
 									allCorrect=false;
@@ -464,7 +469,8 @@ public class SurveyActivity extends MVCPortlet {
 								allCorrect=false;
 						}
 					}//while
-					System.out.println("Se acabo");
+					Log.info("Se acabo");
+					
 					if(allCorrect){
 						actionResponse.setRenderParameter("jspPage", "/html/surveyactivity/admin/editquestions.jsp");
 						SessionMessages.add(actionRequest, "questions-added-successfully");
@@ -481,7 +487,7 @@ public class SurveyActivity extends MVCPortlet {
 						actionResponse.setRenderParameter("jspPage", "/html/surveyactivity/admin/importquestions.jsp");
 					}
 				}
-				}
+			}
 		}
 		actionResponse.setRenderParameter("actionEditingDetails", StringPool.TRUE);
 		actionResponse.setRenderParameter("resId", Long.toString(actId));
@@ -652,7 +658,6 @@ public class SurveyActivity extends MVCPortlet {
 
 				CSVWriter writer = new CSVWriter(new OutputStreamWriter(response.getPortletOutputStream(),StringPool.UTF8),CharPool.SEMICOLON);
 
-
 				//Crear la cabecera con las preguntas.
 				List<TestQuestion> questionsTitle = TestQuestionLocalServiceUtil.getQuestions(actId);
 				List<TestQuestion> listaTotal = ListUtil.copy(questionsTitle);
@@ -701,7 +706,8 @@ public class SurveyActivity extends MVCPortlet {
 
 								for(Element answerElement:question.elements("answer")){
 									//Guardamos el id de la respuesta para posteriormente obtener su texto.
-									answersIds.add(Long.valueOf(answerElement.attributeValue("id")));
+									if (answerElement.attributeValue("id") != null)
+										answersIds.add(Long.valueOf(answerElement.attributeValue("id")));
 								}
 
 							}
@@ -759,11 +765,12 @@ public class SurveyActivity extends MVCPortlet {
 
 				CSVWriter writer = new CSVWriter(new OutputStreamWriter(response.getPortletOutputStream(),StringPool.UTF8),CharPool.SEMICOLON);
 				
-				String[] cabeceras = new String[2];
+				String[] cabeceras = new String[3];
 				
 				//En las columnas extra ponemos la cabecera
 				cabeceras[0]="Pregunta";
-				cabeceras[1]="Respuestas";
+				cabeceras[1]="Tipo";
+				cabeceras[2]="Respuestas";
 				
 				writer.writeNext(cabeceras);
 
@@ -776,26 +783,27 @@ public class SurveyActivity extends MVCPortlet {
 
 				for(TestQuestion question : questions){
 					
-					String[] resultados = new String[2];
+					String[] resultados = new String[3];
 					
 					List<TestAnswer> answers = TestAnswerLocalServiceUtil.getTestAnswersByQuestionId(question.getQuestionId());
-					//String[] answerTitles = new String[answers.size()];
+//					String[] answerTitles = new String[answers.size()];
 					
 					resultados[0] = question.getText();
+					resultados[1] = String.valueOf(question.getQuestionType());
 					
 					StringBuilder strbld = new StringBuilder();
 
 					for(int i = 0; i < answers.size()-1; i++) {
 						strbld.append(answers.get(i).getAnswer() + separator);
-						//answerTitles[i] = answers.get(i).getAnswer();
-						//System.out.println(answerTitles[i]);
+//						answerTitles[i] = answers.get(i).getAnswer();
+//						System.out.println(answerTitles[i]);
 					}
 					
-					strbld.append(answers.get(answers.size()-1).getAnswer());
-					
+					if (answers.size() > 0)	
+						strbld.append(answers.get(answers.size()-1).getAnswer());
 					
 					//resultados[1] = StringUtil.merge(answerTitles);
-					resultados[1] = strbld.toString();
+					resultados[2] = strbld.toString();
 					
 					//Escribimos las respuestas obtenidas para el intento en el csv.
 					writer.writeNext(resultados);
