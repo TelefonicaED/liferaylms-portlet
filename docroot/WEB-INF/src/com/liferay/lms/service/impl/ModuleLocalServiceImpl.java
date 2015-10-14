@@ -23,6 +23,7 @@ import com.liferay.lms.auditing.AuditConstants;
 import com.liferay.lms.auditing.AuditingLogFactory;
 import com.liferay.lms.model.Course;
 import com.liferay.lms.model.CourseResult;
+import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.model.LearningActivityTry;
 import com.liferay.lms.model.Module;
 import com.liferay.lms.model.ModuleResult;
@@ -31,6 +32,7 @@ import com.liferay.lms.service.CourseResultLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityTryLocalServiceUtil;
 import com.liferay.lms.service.ModuleLocalServiceUtil;
+import com.liferay.lms.service.ModuleResultLocalServiceUtil;
 import com.liferay.lms.service.base.ModuleLocalServiceBaseImpl;
 import com.liferay.portal.kernel.bean.PortletBeanLocatorUtil;
 import com.liferay.portal.kernel.dao.orm.Criterion;
@@ -45,7 +47,9 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.model.ResourceConstants;
 import com.liferay.portal.model.User;
 import com.liferay.portal.security.permission.ActionKeys;
@@ -421,10 +425,62 @@ public class ModuleLocalServiceImpl extends ModuleLocalServiceBaseImpl {
 		{
 			return false;
 		}
-		else
+		return true;
+	}
+	public boolean isUserFinished(long moduleId,long userId) throws SystemException, PortalException
+	{
+		if(isUserPassed(moduleId, userId))
 		{
 			return true;
 		}
+		if(userTimeFinished(moduleId, userId))
+		{
+			return true;
+		}
+		List<LearningActivity> activities = LearningActivityLocalServiceUtil.getLearningActivitiesOfModule(moduleId);
+		boolean finished = false;
+		for(LearningActivity activity : activities)
+		{
+			LearningActivityTry activityTry = LearningActivityTryLocalServiceUtil.getLastLearningActivityTryByActivityAndUser(activity.getActId(), userId);
+			if(activityTry!=null)
+			{
+				if(activityTry.getEndUserDate()!=null)
+				{
+					finished = true;
+				}
+				else
+				{
+					return false;
+				}
+			}
+			else
+			{
+				finished = false;
+			}
+		}
+		if(finished)
+		{
+			return true;
+		}
+		return false;
+	}
+	public boolean userTimeFinished(long moduleId,long userId) throws SystemException, PortalException
+	{
+		Module theModule=ModuleLocalServiceUtil.getModule(moduleId);
+		ModuleResult mr=ModuleResultLocalServiceUtil.getByModuleAndUser(theModule.getModuleId(), userId);
+		if(mr!=null && !mr.getPassed())
+		{
+			long courtesyTime=GetterUtil.getLong(PropsUtil.get("lms.module.courtesytime.miliseconds"),0);
+			long usedTime=System.currentTimeMillis()-mr.getStartDate().getTime();
+			if(theModule.getAllowedTime()!=0)
+			{
+				if ( theModule.getAllowedTime()*1000 + courtesyTime - usedTime < 0)
+				{
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 	public boolean isLocked(long moduleId,long userId) throws Exception
 	{
@@ -458,6 +514,9 @@ public class ModuleLocalServiceImpl extends ModuleLocalServiceBaseImpl {
 			{
 				return true;
 			}
+        }
+        if(userTimeFinished(moduleId,userId)){
+        	return true;
         }
 		return false;
 	}
