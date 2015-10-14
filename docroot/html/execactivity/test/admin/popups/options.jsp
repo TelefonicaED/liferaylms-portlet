@@ -2,6 +2,7 @@
 <%@ include file="/init.jsp" %>
 <%
 Long iterator = ParamUtil.getLong(request, "iterator", -1);
+long typeId = ParamUtil.getLong(request,"typeId", -1);
 %>
 	<div id="<portlet:namespace />answerError_new<%=iterator%>" class="aui-helper-hidden portlet-msg-error">
 		<liferay-ui:message key="answer-test-required"/>
@@ -10,7 +11,18 @@ Long iterator = ParamUtil.getLong(request, "iterator", -1);
 		<div class="leftSideAnswer">
 			<aui:input  type="hidden" name="answerId" value="<%=\"new\"+iterator %>"></aui:input>
 			<aui:input  type="hidden" name="iterator" value="<%=iterator%>"></aui:input>
-			<aui:input type="checkbox" name="<%=\"correct_new\"+iterator %>" label="correct" checked="false"></aui:input>			
+			
+			<%
+						if(typeId==1){
+							%>	
+											
+						<aui:input type="checkbox" name="<%=\"correct_\"+iterator%>" label="correct" checked="false"></aui:input>
+						<%}else{
+							
+						%>
+							<aui:input type="radio" name="correct_new" label="correct" value="<%=iterator%>"></aui:input>			
+						<%}%>
+			
 			<script type="text/javascript">
 				function <portlet:namespace />onChangeTextAnswer_new<%=iterator %>(val) {
 		        	var A = AUI();

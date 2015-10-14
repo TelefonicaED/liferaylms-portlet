@@ -24,7 +24,10 @@
 <span class="solution">
 <% 
 	long questionId = ParamUtil.getLong(request,"questionId", 0);
+	long typeId = ParamUtil.getLong(request,"typeId", -1);
+
 	TestQuestion question = null;
+	System.out.println(questionId);
 	if(questionId != 0){
 		question = TestQuestionLocalServiceUtil.getTestQuestion(ParamUtil.getLong(request,"questionId"));
 	}
@@ -33,6 +36,7 @@
 		if(question!=null){
 			res = TestAnswerLocalServiceUtil.getTestAnswersByQuestionId(question.getQuestionId());
 		}
+		int index = 0;
 		for(TestAnswer testanswer:res){
 			String titleAnswer = HtmlUtil.extractText(testanswer.getAnswer());
 			if(titleAnswer.length() > 50) titleAnswer = titleAnswer.substring(0, 50) + " ...";
@@ -48,12 +52,25 @@
 					<div class="leftSideAnswer">
 						<aui:input  type="hidden" name="answerId" value="<%=testanswer.getAnswerId() %>"></aui:input>
 						<aui:input  type="hidden" name="iterator" value="<%=i%>"></aui:input>
+						
+						<%
+						if(typeId==1){
+							%>
 						<aui:input type="checkbox" name="<%=\"correct_\"+testanswer.getAnswerId() %>" label="correct" checked="<%=testanswer.getIsCorrect() %>"></aui:input>
+						<%}else{
+							index = index +1;
+						%>
+						<aui:input type="radio" name="correct_new" label="correct" value="<%=index%>"></aui:input>
+						<%}%>
+						
+						
+						
 						<script type="text/javascript">
 							function <portlet:namespace />onChangeTextAnswer_<%=testanswer.getAnswerId() %>(val) {
 					        	var A = AUI();
 								A.one('#<portlet:namespace />answer_<%=testanswer.getAnswerId() %>').set('value',val);
-					        }
+		
+							}
 						</script>
 						<aui:field-wrapper label="">
 							<liferay-ui:input-editor toolbarSet="actslimmer" height="15"  name="<%=\"answer_\"+testanswer.getAnswerId() %>" width="80%" onChangeMethod="<%=\"onChangeTextAnswer_\"+testanswer.getAnswerId() %>" initMethod="<%=\"initEditorAnswer_\"+testanswer.getAnswerId() %>" />
