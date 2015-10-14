@@ -38,7 +38,7 @@ if(theModule!=null)
     {
     	long usedTime = System.currentTimeMillis() - mr.getStartDate().getTime();
     	leftTime = theModule.getAllowedTime()*1000 - usedTime;
-    	if(theModule.getAllowedTime()!=0){
+    	if(theModule.getAllowedTime()!=0 && !ModuleLocalServiceUtil.isUserFinished(theModule.getModuleId(), themeDisplay.getUserId())){
     	%>
     		<script type="text/javascript">
 				AUI().ready('liferay-notice', 'collection', function(A) {
