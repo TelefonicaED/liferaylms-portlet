@@ -154,7 +154,7 @@ public class OptionsQuestionType extends BaseQuestionType {
 			int numAnswer=0;
 			String disabled = "";
 			if (isCombo){
-				answersFeedBack+="<option value=\"\">"+LanguageUtil.get(themeDisplay.getLocale(),"select")+"</option>";
+				answersFeedBack+="<option class=\"selected\" value=\"\">"+LanguageUtil.get(themeDisplay.getLocale(),"select")+"</option>";
 			}
 			for(TestAnswer answer:testAnswers){
 				if(inputType.equals("checkbox")){
