@@ -21,6 +21,7 @@ import javax.portlet.ProcessEvent;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 import javax.portlet.WindowState;
+import javax.portlet.WindowStateException;
 import javax.xml.namespace.QName;
 
 import org.apache.commons.lang.StringUtils;
@@ -87,8 +88,11 @@ import com.liferay.portal.util.PortalUtil;
 import com.liferay.portlet.PortletQNameUtil;
 import com.liferay.portlet.announcements.EntryDisplayDateException;
 import com.liferay.portlet.asset.AssetRendererFactoryRegistryUtil;
+import com.liferay.portlet.asset.model.AssetEntry;
 import com.liferay.portlet.asset.model.AssetRenderer;
 import com.liferay.portlet.asset.model.AssetRendererFactory;
+import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
+import com.liferay.portlet.asset.service.persistence.AssetEntryQuery;
 import com.liferay.util.bridges.mvc.MVCPortlet;
 
 /**
@@ -112,7 +116,15 @@ public class LmsActivitiesList extends MVCPortlet {
      	   }
         }
     }
-
+    public void deleteActivityBank(ActionRequest actionRequest, ActionResponse actionResponse) 
+    		throws PortalException, SystemException, IOException, WindowStateException{
+    	
+    	long actId = ParamUtil.getLong(actionRequest, "resId", 0);
+		
+		AssetEntry assetEntry = AssetEntryLocalServiceUtil.getEntry("com.liferay.lms.model.LearningActivity", actId);
+		assetEntry.setVisible(false);
+		AssetEntryLocalServiceUtil.updateAssetEntry(assetEntry);
+    }
 	public void deleteMyTries(ActionRequest actionRequest, ActionResponse actionResponse)
 	throws Exception {
 		long actId = ParamUtil.getLong(actionRequest, "resId", 0);
