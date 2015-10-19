@@ -31,8 +31,12 @@ public class LmsConfig extends MVCPortlet {
 		ThemeDisplay themeDisplay  =(ThemeDisplay)request.getAttribute(WebKeys.THEME_DISPLAY);
 		Long usersResults = (ParamUtil.getLong(request, "usersResults", DEFAULT_USERS_RESULTS));
 		
+		boolean isDebugScorm = ParamUtil.getBoolean(request, "debugScorm");
+				
+		
 		LmsPrefs prefs=LmsPrefsLocalServiceUtil.getLmsPrefsIni(themeDisplay.getCompanyId());
 		prefs.setLmsTemplates(sitetemplates);
+		prefs.setDebugScorm(isDebugScorm);
 		prefs.setActivities(activitytypes);
 		prefs.setCourseevals(courseEvalsTypes);
 		prefs.setScoretranslators(calificationTypes);

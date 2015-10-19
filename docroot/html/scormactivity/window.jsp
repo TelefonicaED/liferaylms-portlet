@@ -17,11 +17,12 @@ LearningActivityTry learningTry = (LearningActivityTry) request.getAttribute("le
 if (learningTry == null) {
 	long latId = ParamUtil.getLong(request, "latId", 0L);
 	learningTry = LearningActivityTryLocalServiceUtil.getLearningActivityTry(latId);
+	
 }
 request.setAttribute("learningTry", learningTry);
 String scoshow= GetterUtil.getString(LearningActivityLocalServiceUtil.getExtraContentValue(actId, "sco"), "");
-
 long entryId = GetterUtil.getLong(LearningActivityLocalServiceUtil.getExtraContentValue(actId, "assetEntry"), 0);
+boolean isDebugActive = Boolean.parseBoolean(LearningActivityLocalServiceUtil.getExtraContentValue(actId, "scormDebug"));
 			
 if(entryId != 0)
 {
@@ -98,9 +99,11 @@ try {
 }
 
 %>
+
    <script type="text/javascript">
      function InitPlayer() {
-       PlayerConfiguration.Debug = false;
+    	
+       PlayerConfiguration.Debug = <%=isDebugActive%>;
        PlayerConfiguration.StorageSupport = true;
 
        PlayerConfiguration.TreeMinusIcon = "<%= iconsDir %>/icons/scorm/minus.gif";
@@ -185,19 +188,47 @@ try {
 </div>
 	<div id="placeholder_navigationContainer2"></div>
 
+<%
+
+if(isDebugActive){
+
+%>
+
+	<div style="overflow: scroll; height: 150px">
+		
+<portlet:resourceURL var="exportDebugToFile"/>
+<script type="text/javascript">
+function callServeResource(){
+
+ 	var debugContentValue = document.getElementById('placeholder_Debugger').innerHTML
+	 var element = document.createElement('a');
+	  element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(debugContentValue));
+	  element.setAttribute('download', '<%= LearningActivityLocalServiceUtil.getLearningActivity(actId).getTitle(locale) %>_debug.html');
+
+	  element.style.display = 'none';
+	  document.body.appendChild(element);
+	  element.click();
+	  document.body.removeChild(element);
+ 	
+ 
+}
+</script>
+<form name="fm" id="fm">
+<input type="button" value="<liferay-ui:message key="debugScorm.download" />"  onclick="callServeResource()">
+</form>
+		<div id="placeholder_Debugger" style="width: 30%"></div>
+		
+	</div>
+	
+	<%} %>
+
+
+
 
 
 <!-- end -->
 		<%
-		
-		
-		
-		
-		
-		
-		
-		
-		
+
 	}
 	else
 	{

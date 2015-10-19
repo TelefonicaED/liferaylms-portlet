@@ -1,3 +1,5 @@
+<%@page import="com.liferay.lms.service.LmsPrefsLocalServiceUtil"%>
+<%@page import="com.liferay.lms.model.LmsPrefs"%>
 <%@page import="com.tls.lms.util.LiferaylmsUtil"%>
 <%@page import="com.liferay.lms.model.LearningActivityTry"%>
 <%@page import="com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil"%>
@@ -23,7 +25,6 @@
 	String sco=ParamUtil.getString(request, "sco","");
 	long typeId=ParamUtil.getLong(request, "type");
 	boolean completedAsPassed =ParamUtil.getBoolean(request, "completedAsPassed",false);
-
  LearningActivity learningActivity=null;
 	if(assetId!=0){
 		try{
@@ -278,6 +279,19 @@ function <portlet:namespace />back() {
 		ignoreRequestValue="true" helpMessage="scormactivity.edit.improve.helpMessage"></aui:input>
 <aui:input type="checkbox" name="completedAsPassed" label="scormactivity.edit.completedAsPassed" checked="<%=completedAsPassed %>" disabled="<%=!edit %>" 
 		 helpMessage="scormactivity.edit.completedAsPassed.helpMessage"></aui:input>
+	<%
+		LmsPrefs lmsPrefs = LmsPrefsLocalServiceUtil.getLmsPrefs(themeDisplay.getCompanyId());
+		boolean isVisibleOptionDebug = lmsPrefs.getDebugScorm();
+		if(isVisibleOptionDebug){
+			
+			//boolean isDebugEnable =ParamUtil.getBoolean(request, "debugScorm",false);
+			boolean isDebugEnable = Boolean.parseBoolean(LearningActivityLocalServiceUtil.getExtraContentValue(learningActivity.getActId(), "scormDebug"));
+
+		%>
+			<aui:input type="checkbox" name="debugScorm" label="debugScorm" checked="<%=isDebugEnable %>"
+					 helpMessage="debugScorm"></aui:input>
+		<%}%> 
+		 
 		
 <div id="<portlet:namespace/>backButton" style="display:none;">
 	<liferay-ui:icon image="back" message="back" url="<%=\"javascript:\"+renderResponse.getNamespace()+\"back();\" %>" label="true"  />

@@ -158,6 +158,20 @@ for(CalificationType calificationType :calificationTypeRegistry.getCalificationT
 	<aui:input type="number" name="usersResults" label="max-users-search" value="<%=usersResults%>" />
 </aui:field-wrapper>
 
+<liferay-ui:header title="debugScorm" />
+<aui:field-wrapper>
+<%
+
+	boolean checked=prefs.getDebugScorm();	
+	%>
+	
+	<aui:input type="checkbox" name="debugScorm"
+	label="debugScorm" checked="<%=checked%>" value="<%=checked%>" />
+	<%
+
+%>
+</aui:field-wrapper>
+
 <aui:field-wrapper>
 	<aui:button type="submit" value="save" />
 	<button name="check" value="check" onclick="javascrip:checkGroups();" type="button">

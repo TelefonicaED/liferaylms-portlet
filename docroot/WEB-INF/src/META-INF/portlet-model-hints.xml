@@ -189,6 +189,7 @@
 		<field name="courseevals" type="String" />
 		<field name="scoretranslators" type="String" />
 		<field name="usersResults" type="long" />
+		<field name="debugScorm" type="boolean" />
 	</model>
 	<model name="com.liferay.lms.model.Module">
 		<field name="uuid" type="String" />

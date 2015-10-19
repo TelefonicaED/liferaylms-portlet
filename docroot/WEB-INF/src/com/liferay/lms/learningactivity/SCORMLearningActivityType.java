@@ -205,6 +205,15 @@ public class SCORMLearningActivityType extends BaseLearningActivityType {
 			rootElement.add(teamElement);
 		}
 		
+		Element scormDebug = rootElement.element("scormDebug");
+		if (scormDebug != null) {
+			scormDebug.detach();
+			rootElement.remove(scormDebug);
+		}
+		scormDebug = SAXReaderUtil.createElement("scormDebug");
+		scormDebug.setText(String.valueOf(ParamUtil.getBoolean(uploadRequest, "debugScorm")));
+		rootElement.add(scormDebug);
+		
 		learningActivity.setExtracontent(document.formattedString());
 	}
 	

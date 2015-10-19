@@ -65,9 +65,10 @@ public class LmsPrefsModelImpl extends BaseModelImpl<LmsPrefs>
 			{ "activities", Types.VARCHAR },
 			{ "courseevals", Types.VARCHAR },
 			{ "scoretranslators", Types.VARCHAR },
-			{ "usersResults", Types.BIGINT }
+			{ "usersResults", Types.BIGINT },
+			{ "debugScorm", Types.BOOLEAN }
 		};
-	public static final String TABLE_SQL_CREATE = "create table Lms_LmsPrefs (companyId LONG not null primary key,teacherRole LONG,editorRole LONG,lmsTemplates VARCHAR(75) null,activities VARCHAR(75) null,courseevals VARCHAR(75) null,scoretranslators VARCHAR(75) null,usersResults LONG)";
+	public static final String TABLE_SQL_CREATE = "create table Lms_LmsPrefs (companyId LONG not null primary key,teacherRole LONG,editorRole LONG,lmsTemplates VARCHAR(75) null,activities VARCHAR(75) null,courseevals VARCHAR(75) null,scoretranslators VARCHAR(75) null,usersResults LONG,debugScorm BOOLEAN)";
 	public static final String TABLE_SQL_DROP = "drop table Lms_LmsPrefs";
 	public static final String DATA_SOURCE = "liferayDataSource";
 	public static final String SESSION_FACTORY = "liferaySessionFactory";
@@ -121,6 +122,7 @@ public class LmsPrefsModelImpl extends BaseModelImpl<LmsPrefs>
 		attributes.put("courseevals", getCourseevals());
 		attributes.put("scoretranslators", getScoretranslators());
 		attributes.put("usersResults", getUsersResults());
+		attributes.put("debugScorm", getDebugScorm());
 
 		return attributes;
 	}
@@ -173,6 +175,12 @@ public class LmsPrefsModelImpl extends BaseModelImpl<LmsPrefs>
 
 		if (usersResults != null) {
 			setUsersResults(usersResults);
+		}
+
+		Boolean debugScorm = (Boolean)attributes.get("debugScorm");
+
+		if (debugScorm != null) {
+			setDebugScorm(debugScorm);
 		}
 	}
 
@@ -260,6 +268,18 @@ public class LmsPrefsModelImpl extends BaseModelImpl<LmsPrefs>
 		_usersResults = usersResults;
 	}
 
+	public boolean getDebugScorm() {
+		return _debugScorm;
+	}
+
+	public boolean isDebugScorm() {
+		return _debugScorm;
+	}
+
+	public void setDebugScorm(boolean debugScorm) {
+		_debugScorm = debugScorm;
+	}
+
 	@Override
 	public ExpandoBridge getExpandoBridge() {
 		return ExpandoBridgeFactoryUtil.getExpandoBridge(getCompanyId(),
@@ -296,6 +316,7 @@ public class LmsPrefsModelImpl extends BaseModelImpl<LmsPrefs>
 		lmsPrefsImpl.setCourseevals(getCourseevals());
 		lmsPrefsImpl.setScoretranslators(getScoretranslators());
 		lmsPrefsImpl.setUsersResults(getUsersResults());
+		lmsPrefsImpl.setDebugScorm(getDebugScorm());
 
 		lmsPrefsImpl.resetOriginalValues();
 
@@ -394,12 +415,14 @@ public class LmsPrefsModelImpl extends BaseModelImpl<LmsPrefs>
 
 		lmsPrefsCacheModel.usersResults = getUsersResults();
 
+		lmsPrefsCacheModel.debugScorm = getDebugScorm();
+
 		return lmsPrefsCacheModel;
 	}
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(17);
+		StringBundler sb = new StringBundler(19);
 
 		sb.append("{companyId=");
 		sb.append(getCompanyId());
@@ -417,13 +440,15 @@ public class LmsPrefsModelImpl extends BaseModelImpl<LmsPrefs>
 		sb.append(getScoretranslators());
 		sb.append(", usersResults=");
 		sb.append(getUsersResults());
+		sb.append(", debugScorm=");
+		sb.append(getDebugScorm());
 		sb.append("}");
 
 		return sb.toString();
 	}
 
 	public String toXmlString() {
-		StringBundler sb = new StringBundler(28);
+		StringBundler sb = new StringBundler(31);
 
 		sb.append("<model><model-name>");
 		sb.append("com.liferay.lms.model.LmsPrefs");
@@ -461,6 +486,10 @@ public class LmsPrefsModelImpl extends BaseModelImpl<LmsPrefs>
 			"<column><column-name>usersResults</column-name><column-value><![CDATA[");
 		sb.append(getUsersResults());
 		sb.append("]]></column-value></column>");
+		sb.append(
+			"<column><column-name>debugScorm</column-name><column-value><![CDATA[");
+		sb.append(getDebugScorm());
+		sb.append("]]></column-value></column>");
 
 		sb.append("</model>");
 
@@ -479,5 +508,6 @@ public class LmsPrefsModelImpl extends BaseModelImpl<LmsPrefs>
 	private String _courseevals;
 	private String _scoretranslators;
 	private long _usersResults;
+	private boolean _debugScorm;
 	private LmsPrefs _escapedModelProxy;
 }

@@ -210,15 +210,15 @@ public class LearningActivityLocalServiceClpInvoker {
 
 		_methodName189 = "goUpLearningActivity";
 
-		_methodParameterTypes189 = new String[] { "long" };
+		_methodParameterTypes189 = new String[] { "long", "long" };
 
 		_methodName190 = "goDownLearningActivity";
 
-		_methodParameterTypes190 = new String[] { "long" };
+		_methodParameterTypes190 = new String[] { "long", "long" };
 
 		_methodName191 = "moveActivity";
 
-		_methodParameterTypes191 = new String[] { "long", "long", "long" };
+		_methodParameterTypes191 = new String[] { "long", "long", "long", "long" };
 
 		_methodName192 = "getNextLearningActivity";
 
@@ -531,14 +531,16 @@ public class LearningActivityLocalServiceClpInvoker {
 
 		if (_methodName189.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes189, parameterTypes)) {
-			LearningActivityLocalServiceUtil.goUpLearningActivity(((Long)arguments[0]).longValue());
+			LearningActivityLocalServiceUtil.goUpLearningActivity(((Long)arguments[0]).longValue(),
+				((Long)arguments[1]).longValue());
 
 			return null;
 		}
 
 		if (_methodName190.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes190, parameterTypes)) {
-			LearningActivityLocalServiceUtil.goDownLearningActivity(((Long)arguments[0]).longValue());
+			LearningActivityLocalServiceUtil.goDownLearningActivity(((Long)arguments[0]).longValue(),
+				((Long)arguments[1]).longValue());
 
 			return null;
 		}
@@ -547,7 +549,8 @@ public class LearningActivityLocalServiceClpInvoker {
 				Arrays.deepEquals(_methodParameterTypes191, parameterTypes)) {
 			LearningActivityLocalServiceUtil.moveActivity(((Long)arguments[0]).longValue(),
 				((Long)arguments[1]).longValue(),
-				((Long)arguments[2]).longValue());
+				((Long)arguments[2]).longValue(),
+				((Long)arguments[3]).longValue());
 
 			return null;
 		}
