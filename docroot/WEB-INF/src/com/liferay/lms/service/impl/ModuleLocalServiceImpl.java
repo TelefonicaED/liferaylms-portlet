@@ -474,7 +474,7 @@ public class ModuleLocalServiceImpl extends ModuleLocalServiceBaseImpl {
 			long usedTime=System.currentTimeMillis()-mr.getStartDate().getTime();
 			if(theModule.getAllowedTime()!=0)
 			{
-				if ( theModule.getAllowedTime()*1000 + courtesyTime - usedTime < 0)
+				if ( theModule.getAllowedTime() + courtesyTime - usedTime < 0)
 				{
 					return true;
 				}
