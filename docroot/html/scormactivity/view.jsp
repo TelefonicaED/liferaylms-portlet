@@ -170,10 +170,17 @@
 	Object [] arg =  new Object [] { activity.getPasspuntuation() };
 %>
 
+
+
+
 <% if ("true".equals(openWindow)) { 
 	String windowWith=LearningActivityLocalServiceUtil.getExtraContentValue(activity.getActId(),"windowWith","1024");
 	String height=LearningActivityLocalServiceUtil.getExtraContentValue(activity.getActId(),"height","768");
+	
 %>
+
+
+
 				<liferay-portlet:renderURL var="scormwindow" windowState="<%= LiferayWindowState.POP_UP.toString() %>">
 					<liferay-portlet:param name="jspPage" value="/html/scormactivity/window.jsp"/>
 					<liferay-portlet:param name="latId" value="<%= String.valueOf(learningTry.getLatId()) %>"/>
