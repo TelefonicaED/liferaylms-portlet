@@ -279,6 +279,7 @@
 			<basic name="courseevals" />
 			<basic name="scoretranslators" />
 			<basic name="usersResults" />
+			<basic name="debugScorm" />
 			<transient name="modelAttributes" />
 			<transient name="primaryKey" />
 			<transient name="primaryKeyObj" />
