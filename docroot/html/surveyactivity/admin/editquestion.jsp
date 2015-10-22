@@ -1,3 +1,4 @@
+<%@page import="com.liferay.lms.learningactivity.questiontype.SurveyHorizontalOptionsQuestionType"%>
 <%@page import="com.liferay.lms.learningactivity.questiontype.QuestionTypeRegistry"%>
 <%@page import="com.liferay.lms.learningactivity.questiontype.QuestionType"%>
 <%@page import="com.liferay.lms.SurveyActivity"%>
@@ -24,15 +25,18 @@
 	TestQuestion question = null;
 	LearningActivity learningActivity = null;
 	boolean isNewQuestion = false;
+	boolean isHorizontal = false;
+	long horizontalQuestionType = new SurveyHorizontalOptionsQuestionType().getTypeId();
+	
 	if (questionId != 0){
-		question = TestQuestionLocalServiceUtil.getTestQuestion(ParamUtil.getLong(request,"questionId"));
+		question 		 = TestQuestionLocalServiceUtil.getTestQuestion(ParamUtil.getLong(request,"questionId"));
 		learningActivity = LearningActivityLocalServiceUtil.getLearningActivity(question.getActId());
-		
+		isHorizontal 	 = question.getQuestionType() == horizontalQuestionType;
 	}else{
 		isNewQuestion = true;
 		learningActivity = LearningActivityLocalServiceUtil.getLearningActivity(ParamUtil.getLong(request,"resId"));
-
 	}
+	
 	request.setAttribute("activity", learningActivity);
 	PortletURL backUrl = renderResponse.createRenderURL();
 	backUrl.setParameter("resId", String.valueOf(learningActivity.getActId()));
@@ -132,7 +136,9 @@ AUI().ready('node-base' ,'aui-form-validator', 'aui-overlay-context-panel', func
 <portlet:actionURL var="editquestionURL" name="editquestion" />
 <aui:form name="qfm" action="<%=editquestionURL %>" method="post">
 	<aui:input name="resId" type="hidden" value="<%=learningActivity.getActId() %>"></aui:input>
-			<aui:input name="isHorizontal" label="learningactivity.survey.horizontal" type="checkbox" value="false" checked="false"></aui:input>
+	<c:if test="<%=typeId != 2 %>">
+		<aui:input name="isHorizontal" label="learningactivity.survey.horizontal" type="checkbox" value="<%=isHorizontal %>" checked="<%=isHorizontal %>"></aui:input>
+	</c:if>
 	<aui:input name="qtype" type="hidden" value="<%=typeId %>"></aui:input>
 	
 	<%

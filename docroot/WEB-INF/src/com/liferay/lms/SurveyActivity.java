@@ -34,6 +34,7 @@ import com.liferay.counter.service.CounterLocalServiceUtil;
 import com.liferay.lms.learningactivity.questiontype.QuestionType;
 import com.liferay.lms.learningactivity.questiontype.QuestionTypeRegistry;
 import com.liferay.lms.learningactivity.questiontype.SurveyHorizontalOptionsQuestionType;
+import com.liferay.lms.learningactivity.questiontype.SurveyOptionsQuestionType;
 import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.model.LearningActivityTry;
 import com.liferay.lms.model.SurveyResult;
@@ -234,11 +235,13 @@ public class SurveyActivity extends MVCPortlet {
 		long questionType = ParamUtil.getLong(actionRequest, "qtype",0);
 		long questionId = ParamUtil.getLong(actionRequest, "questionId",0);
 		
-
 		if(isHorizontal){
 			SurveyHorizontalOptionsQuestionType horizontalType = new SurveyHorizontalOptionsQuestionType();
 			questionType = horizontalType.getTypeId();
-		}  
+		}else if (questionType != 2){ //Sólo para las de tipo "option"
+			SurveyOptionsQuestionType verticalType = new SurveyOptionsQuestionType();
+			questionType = verticalType.getTypeId();
+		}
 		
 		TestQuestion question;
 		if(questionId == 0){//Nueva pregunta
@@ -250,7 +253,6 @@ public class SurveyActivity extends MVCPortlet {
 		
 		question.setQuestionType(questionType);
 		question.setText(text);
-		
 		
 		if(question!=null){
 			questionId = question.getQuestionId();
