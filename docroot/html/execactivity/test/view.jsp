@@ -374,6 +374,7 @@
 								        resizable: false,
 								        draggable: false,
 								        close: true,
+								        cssClass: 'dialog-principal',
 								        destroyOnClose: true,
 								        centered: true,
 								        modal: true
