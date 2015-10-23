@@ -584,15 +584,14 @@ public class LearningActivityLocalServiceImpl extends LearningActivityLocalServi
 			learningActivityPersistence.update(larn, true);
 			learningActivityPersistence.update(previusActivity, true);
 
+			//auditing
+			System.out.println("Actividad con id: "+actId+" ha sido movido hacia arriba por el usuario: "+userIdAction);
+
+			AuditingLogFactory.audit(previusActivity.getCompanyId(), previusActivity.getGroupId(), LearningActivity.class.getName(), 
+					actId,userIdAction, AuditConstants.UPDATE, "ACTIVITY_UP");
 		}
-		
-		//auditing
-		System.out.println("Actividad con id: "+actId+" ha sido movido hacia arriba por el usuario: "+userIdAction);
-
-		AuditingLogFactory.audit(previusActivity.getCompanyId(), previusActivity.getGroupId(), LearningActivity.class.getName(), 
-				actId,userIdAction, AuditConstants.UPDATE, "ACTIVITY_UP");
-
 	}
+	
 	public void goDownLearningActivity(long actId, long userIdAction ) throws SystemException
 	{
 		LearningActivity previusActivity=getNextLearningActivity(actId);
@@ -605,13 +604,13 @@ public class LearningActivityLocalServiceImpl extends LearningActivityLocalServi
 			previusActivity.setPriority(priority);
 			learningActivityPersistence.update(larn, true);
 			learningActivityPersistence.update(previusActivity, true);
-		}
-		
-		//auditing
-				System.out.println("Actividad con id: "+actId+" ha sido movido hacia arriba por el usuario: "+userIdAction);
+			
+			//auditing
+			System.out.println("Actividad con id: "+actId+" ha sido movido hacia arriba por el usuario: "+userIdAction);
 
-				AuditingLogFactory.audit(previusActivity.getCompanyId(), previusActivity.getGroupId(), LearningActivity.class.getName(), 
-						actId,userIdAction, AuditConstants.UPDATE, "ACTIVITY_DOWN");
+			AuditingLogFactory.audit(previusActivity.getCompanyId(), previusActivity.getGroupId(), LearningActivity.class.getName(), 
+					actId,userIdAction, AuditConstants.UPDATE, "ACTIVITY_DOWN");
+		}
 
 	}
 
