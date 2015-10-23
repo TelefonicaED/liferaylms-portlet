@@ -21,7 +21,6 @@
 <style type="text/css">
 .horizontalquestion {
   overflow: auto;
-  width: 1000px;
 }
 
 .horizontalquestion>div {
@@ -47,6 +46,8 @@
 
 textarea {
     resize: none;
+    width : 75%;
+    min-width: 75%;
 }
 
 </style>
