@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;
@@ -67,6 +68,8 @@ import com.liferay.portal.kernel.xml.DocumentException;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
 import com.liferay.portal.model.User;
+import com.liferay.portal.security.permission.ActionKeys;
+import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portlet.asset.AssetRendererFactoryRegistryUtil;
@@ -598,7 +601,96 @@ public class SurveyActivity extends MVCPortlet {
 		SessionMessages.add(actionRequest, "asset-renderer-not-defined");
 	}
 	
-
+	@SuppressWarnings("unchecked")
+	public void moveQuestion(ActionRequest actionRequest, ActionResponse actionResponse) throws Exception {
+		
+		ThemeDisplay themeDisplay = (ThemeDisplay) actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
+		PermissionChecker permissionChecker=themeDisplay.getPermissionChecker();
+		
+		long questionId = ParamUtil.getLong(actionRequest, "pageId"),
+		     prevQuestionId = ParamUtil.getLong(actionRequest, "prevPageId"),
+		     nextQuestionId = ParamUtil.getLong(actionRequest, "nextPageId");
+		TestQuestion question = TestQuestionLocalServiceUtil.getTestQuestion(questionId);
+		if(questionId>0){
+			if(permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), LearningActivity.class.getName(), questionId, ActionKeys.UPDATE)){
+				TestQuestionLocalServiceUtil.moveQuestion(questionId, prevQuestionId, nextQuestionId);
+			}
+		}
+		
+		String orderByCol = ParamUtil.getString(actionRequest, "orderByCol");
+        if(orderByCol==null || orderByCol=="")
+            orderByCol = "weight";
+        actionRequest.setAttribute("orderByCol", orderByCol);
+        //Create an instance of BeanComparator telling it wich is the order column
+        //Get the type of ordering, asc or desc
+        String orderByType = ParamUtil.getString(actionRequest, "orderByType");
+        	if(orderByType==null || orderByType=="")
+        		orderByType = "asc";
+        	actionRequest.setAttribute("orderByType", orderByType);
+        	TestQuestion questions = TestQuestionLocalServiceUtil.getTestQuestion(questionId);
+        	List<TestQuestion> listaAux = TestQuestionLocalServiceUtil.getQuestions(questions.getActId());
+        	List<TestQuestion> listaTotal = new LinkedList<TestQuestion>();
+        	listaTotal = ListUtil.copy(listaAux);
+        	//Sort
+            BeanComparator beanComparator = new BeanComparator(orderByCol);
+        	if(orderByType.equals("asc")){
+        		Collections.sort(listaTotal, beanComparator);
+			 } 
+        	else {
+        		Collections.sort(listaTotal, Collections.reverseOrder(beanComparator));
+			 }
+		//Return the orderer list
+		actionRequest.setAttribute("total", listaTotal.size());
+		actionRequest.setAttribute("listaAux", listaTotal);
+		actionResponse.setRenderParameter("actionEditingDetails", StringPool.TRUE);
+		actionResponse.setRenderParameter("resId", Long.toString(question.getActId()));
+		actionResponse.setRenderParameter("jsp", "/html/surveyactivity/admin/orderQuestions.jsp");
+	}
+	
+	public void upquestion(ActionRequest actionRequest, ActionResponse actionResponse)
+			throws Exception {
+			ThemeDisplay themeDisplay = (ThemeDisplay) actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
+				
+				PermissionChecker permissionChecker=themeDisplay.getPermissionChecker();
+				
+				long actId = ParamUtil.getLong(actionRequest, "actId",0);
+				long testQuestionId = ParamUtil.getLong(actionRequest, "questionId");
+				
+				if(actId>0)
+				{	
+					LearningActivity larn = LearningActivityLocalServiceUtil.getLearningActivity(actId);
+				
+					if(permissionChecker.hasPermission(larn.getGroupId(), LearningActivity.class.getName(), larn.getActId(),
+							ActionKeys.UPDATE)|| permissionChecker.hasOwnerPermission(larn.getCompanyId(), LearningActivity.class.getName(), larn.getActId(),larn.getUserId(),
+									ActionKeys.UPDATE))
+					{
+					TestQuestionLocalServiceUtil.goUpTestQuestion(testQuestionId);
+					}
+				}
+			}
+			
+			public void downquestion(ActionRequest actionRequest, ActionResponse actionResponse)
+			throws Exception {
+			ThemeDisplay themeDisplay = (ThemeDisplay) actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
+				
+				PermissionChecker permissionChecker=themeDisplay.getPermissionChecker();
+				
+				long actId = ParamUtil.getLong(actionRequest, "actId",0);
+				long testQuestionId = ParamUtil.getLong(actionRequest, "questionId");
+			
+				if(actId>0)
+				{
+					LearningActivity larn = LearningActivityLocalServiceUtil.getLearningActivity(actId);
+					
+					if(permissionChecker.hasPermission(larn.getGroupId(), LearningActivity.class.getName(), larn.getActId(),
+							ActionKeys.UPDATE)|| permissionChecker.hasOwnerPermission(larn.getCompanyId(), LearningActivity.class.getName(), larn.getActId(),larn.getUserId(),
+									ActionKeys.UPDATE))
+					{
+						TestQuestionLocalServiceUtil.goDownTestQuestion(testQuestionId);
+					}
+				}
+			}
+	
 	@Override
 	public void render(RenderRequest renderRequest, RenderResponse renderResponse)
 			throws PortletException, IOException {
