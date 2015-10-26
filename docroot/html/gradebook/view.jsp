@@ -122,6 +122,7 @@ if(theTeam!=null)
 <%
 }
 	java.util.List<Module> modules = ModuleLocalServiceUtil.findAllInGroup(themeDisplay.getScopeGroupId());
+	long calificationType =    CourseLocalServiceUtil.getCourseByGroupCreatedId(themeDisplay.getScopeGroupId()).getCalificationType();
 	if(modules != null){
 		int fila = 0;
 	for(Module theModule:modules){
@@ -312,7 +313,23 @@ if(theTeam!=null)
 					    }
 						</script>
 						<liferay-ui:search-container-column-text cssClass="number-column" name = "<%=learningActivity.getTitle(themeDisplay.getLocale()) %>" align="center">
-							<%=(result.trim().equalsIgnoreCase("-")) ? result:  result + "/100" %>
+							<%
+							String resultValue = new String();
+							if(result.trim().equalsIgnoreCase("-")){
+								resultValue = result;
+							}else{
+								
+								if(calificationType == 1){
+									resultValue = result + "/10" ;
+								}else{
+									resultValue = result + "/100" ;
+								}
+								
+							} 
+							
+							%>
+							<%=resultValue%>
+							
 							<% if(status.equals("passed")){%>
 							 	<liferay-ui:icon image="checked" message="passed"></liferay-ui:icon>
 							<%} else if(status.equals("not-passed")){%>

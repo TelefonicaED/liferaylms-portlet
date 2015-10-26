@@ -402,11 +402,15 @@ AUI().ready('node-base' ,'aui-form-validator', 'aui-overlay-context-panel', func
 	<jsp:include page="<%=(qt!=null)?qt.getURLEdit():\"\" %>"/>
     <aui:button-row>
 
+	<%	
+	if(typeId!=2){%>
+
     	<div id="addAnswerButton">
     		<span class="newitem2">
 				<a href="#" class="newitem2" onclick="<portlet:namespace />addNode();"><liferay-ui:message key="add-answer"/></a>
 		</span>
 	</div>
+	<%}%>
 	<div class="buttons_content">
 		<aui:button type="submit" onClick='<%= "return validateFields(event);" %>'/>
 		<liferay-util:include page="/html/surveyactivity/admin/editFooter.jsp" servletContext="<%=this.getServletContext() %>" />
