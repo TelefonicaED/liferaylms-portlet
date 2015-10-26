@@ -192,17 +192,20 @@ if(!ismobile){
 %>
 						<td class="icon">
 <% 
-							long entryId=theModule.getIcon();
-							if(entryId!=0){
-								FileEntry image=DLAppLocalServiceUtil.getFileEntry(entryId);
-								if(image!=null){
+                            long entryId=theModule.getIcon();
+                            if(entryId!=0){
+                                try{
+                                    FileEntry image=DLAppLocalServiceUtil.getFileEntry(entryId);
+                                    if(image!=null){
+    %>
+                                        <img src="<%= DLUtil.getPreviewURL(image, image.getFileVersion(), themeDisplay, "&imageThumbnail=1") %>" />
+    <%
+                                    }    
+                                }catch(Exception e){
+                                    }
+                            }
 %>
-									<img src="<%= DLUtil.getPreviewURL(image, image.getFileVersion(), themeDisplay, "&imageThumbnail=1") %>" />
-<%
-								}	
-							}
-%>
-						</td>
+                        </td>
 					
 <%
 					}

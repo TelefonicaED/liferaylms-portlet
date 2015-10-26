@@ -237,19 +237,15 @@ function validate(){
 	<c:if test="${showicon}">
 		<aui:field-wrapper label="icon">
 			<%if(module.getIcon()>0){
-				FileEntry fileEntry = DLAppLocalServiceUtil.getFileEntry(module.getIcon());
-				 %>
-				<aui:column>	
-					<liferay-ui:message key="actual-image"  /><br/>
-					<img class="courselogo" src="<%= DLUtil.getPreviewURL(fileEntry, fileEntry.getFileVersion(), themeDisplay, "&imageThumbnail=1") %>">
-				</aui:column>	
-			<%} %>
-			<aui:column>
-				<aui:input inlineLabel="left" inlineField="true" name="fileName" label="" id="fileName" type="file" value="" />
-				<c:if test="<%=module.getIcon()>0 %>">
-					<aui:input type="checkbox" label="delete" name="deleteAdditionalFile" value="false" inlineLabel="left"/>
-				</c:if>
-			</aui:column>
+				try {
+					FileEntry fileEntry = DLAppLocalServiceUtil.getFileEntry(module.getIcon());
+	        %>
+			<aui:column>    
+	        	<liferay-ui:message key="actual-image"  /><br/>
+	            	<img class="courselogo" src="<%= DLUtil.getPreviewURL(fileEntry, fileEntry.getFileVersion(), themeDisplay, "&imageThumbnail=1") %>">
+	        </aui:column>    
+				<%}catch(Exception e){}
+	        }%>
 		</aui:field-wrapper>	
 	</c:if>
 	
