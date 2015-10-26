@@ -54,7 +54,7 @@
 						<aui:input  type="hidden" name="iterator" value="<%=i%>"></aui:input>
 						
 						<%
-						if(typeId==1){
+						if(typeId==1 || typeId==4){
 							%>
 						<aui:input type="checkbox" name="<%=\"correct_\"+testanswer.getAnswerId() %>" label="correct" checked="<%=testanswer.getIsCorrect() %>"></aui:input>
 						<%}else{

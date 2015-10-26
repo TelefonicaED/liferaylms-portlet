@@ -13,7 +13,7 @@ long typeId = ParamUtil.getLong(request,"typeId", -1);
 			<aui:input  type="hidden" name="iterator" value="<%=iterator%>"></aui:input>
 			
 			<%
-						if(typeId==1){
+						if(typeId==1 || typeId==4){
 							%>	
 											
 						<aui:input type="checkbox" name="<%=\"correct_\"+iterator%>" label="correct" checked="false"></aui:input>

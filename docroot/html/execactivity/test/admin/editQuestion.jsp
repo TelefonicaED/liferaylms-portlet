@@ -253,37 +253,84 @@
 			    		list.each(function() {
 			    			var id = this.get('id');
 			    			id=id.replace('testAnswer_','');
-			    			if(typeId==1)id=id.replace('new','');
-		
+			    			if(typeId==1 || typeId==4)id=id.replace('new','');
 
 			    			feedbackCorrect = A.one('input[name=<portlet:namespace />feedbackCorrect_'+id+']');
 			    			feedbackNoCorrect = A.one('input[name=<portlet:namespace />feedbackNoCorrect_'+id+']');
 			    			
+			    			//console.log(typeId);
 			    			
-			    			if(typeId==1){
-				    			correct = A.one('input[name=<portlet:namespace />correct_'+id+'Checkbox]');
-				    			correctVal = (correct != null && correct._node.checked);
-				    			if(correctVal==='true')trueCounter++;
-				    			if (correct == null) {
-				    				correct =document.getElementById('input[name=<portlet:namespace />correct_'+id+']');
-				    				correctVal = (correct != null && correct.val() === 'true');
-				    			}
-			    			}else{
+			    			switch(typeId){
+			    				
+			    			case 0:
 			    				var radioChecked = (A.one('input[name=<portlet:namespace/>correct_new]:checked'));
-			    				if(radioChecked==null){
-			    					valid = false;
-			    					correctVal = false;
-			    				}	else{
-			    					trueCounter++;
-			    					correctVal = true;
-			    				}		    				
+	    						if(radioChecked==null){
+	    							valid = false;
+	    							correctVal = false;
+	    						}	else{
+	    							trueCounter++;
+	    							correctVal = true;
+	    						}
+			    			break;
+			    			
+			    				case 1:
+			    				
+			    					correct = A.one('input[name=<portlet:namespace />correct_'+id+'Checkbox]');
+				    				correctVal = (correct != null && correct._node.checked);
+				    				if(correctVal==='true')trueCounter++;
+				    				if (correct == null) {
+				    					correct =document.getElementById('input[name=<portlet:namespace />correct_'+id+']');
+				    					correctVal = (correct != null && correct.val() === 'true');
+				    				}
+			    				break;
+			    				
+			    				case 2:
+			    					valid = true;
+		    						correctVal = false;
+		    						trueCounter++;
+			    				break;
+			    				
+			    				case 3:
+			    					valid = true;
+		    						correctVal = true;
+		    						trueCounter++;
+			    				
+			    				
+			    				break;
+			    				
+			    				
+			    				
+			    				
+			    				case 5:
+			    					valid = true;
+		    						correctVal = false;
+		    						trueCounter++;
+			    				break;
+			    			
+			    				default:
+			    					console.log(id);
+			    					correct = A.one('input[name=<portlet:namespace />correct_'+id+'Checkbox]');
+			    				console.log(correct)
+			    				correctVal = (correct != null && correct._node.checked);
+			    				console.log(correctVal);
+			    				if(correctVal==true)trueCounter++;
+			    				if (correct == null) {
+			    					correct =document.getElementById('input[name=<portlet:namespace />correct_'+id+']');
+			    					correctVal = (correct != null && correct.val() === 'true');
+			    				}
+		    				
+		    					break;
+			    			
 			    			}
+			    			
+			    			
 			    			
 			    			
 			    			
 			    			var otherFieldsWithValue = (feedbackCorrect != null && feedbackCorrect.val() !="") || 
 			    										(feedbackNoCorrect != null && feedbackNoCorrect.val() != "") || 
 			    										(correctVal);
+			    			
 			    			if(otherFieldsWithValue){
 			    				answer = A.one('textarea[name=<portlet:namespace />answer_'+id+']');
 				    			if (answer != null && answer.val() == "") {
@@ -296,11 +343,12 @@
 			    			}
 			    			
 			    		});
+			    		console.log("trueCounter "+trueCounter)
 		    			if(trueCounter==0)valid = false;
 			    		
 			    		
 			    		//Ningun feedback > 300 caracteres
-			    		if(valid){
+			    		if(valid && typeId!=5){
 				    		list.each(function() {
 				    			var id = this.get('id');
 				    			id=id.replace('testAnswer_','');
@@ -323,6 +371,8 @@
 			    		if (!valid && e.preventDefault) {
 							e.preventDefault();
 						}
+			    		
+			    		alert(valid);
 				    	return valid;
 		    		}
 		    	);

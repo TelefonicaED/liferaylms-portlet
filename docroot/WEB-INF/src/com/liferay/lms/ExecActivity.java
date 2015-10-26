@@ -293,24 +293,45 @@ public class ExecActivity extends MVCPortlet
 				if(newAnswersIds != null){
 					int counter = 1;
 					int trueCounter = 0;
+					if(question.getQuestionType()==2){
+						trueCounter=1;
+					}
 					for(String newAnswerId:newAnswersIds){
 						String answer = ParamUtil.get(actionRequest, "answer_"+newAnswerId, "");
 						if(Validator.isNotNull(answer)){
 							boolean correct = false;
-							if(question.getQuestionType()==1){
+							if(question.getQuestionType()==1 || question.getQuestionType()==4){
 								if(newAnswerId.startsWith("new")){
 									correct = ParamUtil.getBoolean(actionRequest, "correct_"+newAnswerId.substring(newAnswerId.indexOf("new")+3));
 								}else{
 									correct = ParamUtil.getBoolean(actionRequest, "correct_"+newAnswerId);
-								} 
+								}
+								
+								
 
 							}else{
-								correct = ParamUtil.getBoolean(actionRequest, "correct_new");
-								if(ParamUtil.getInteger(actionRequest, "correct_new") == counter){
+								if(question.getQuestionType()==5 ){
 									correct = true;
 								}else{
-									correct = false;
+									
+									if(question.getQuestionType()==3){
+										correct = true;
+									}else{
+										correct = ParamUtil.getBoolean(actionRequest, "correct_new");
+										if(ParamUtil.getInteger(actionRequest, "correct_new") == counter){
+											correct = true;
+										}else{
+											correct = false;
+										}
+									
+									}
+								
+									
+										
+									
+									
 								}
+								
 
 							}
 							counter++;
@@ -338,7 +359,6 @@ public class ExecActivity extends MVCPortlet
 								ParamUtil.getBoolean(actionRequest, "correct_"+newAnswerId)==true)
 							SessionErrors.add(actionRequest, "answer-test-required");
 					}
-					
 					if(trueCounter==0){
 						SessionErrors.add(actionRequest, "execativity.test.error");
 						actionResponse.setRenderParameter("message", LanguageUtil.get(themeDisplay.getLocale(), "execactivity.editquestions.newquestion"));
