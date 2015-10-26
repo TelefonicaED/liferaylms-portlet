@@ -258,7 +258,6 @@
 			    			feedbackCorrect = A.one('input[name=<portlet:namespace />feedbackCorrect_'+id+']');
 			    			feedbackNoCorrect = A.one('input[name=<portlet:namespace />feedbackNoCorrect_'+id+']');
 			    			
-			    			//console.log(typeId);
 			    			
 			    			switch(typeId){
 			    				
@@ -343,7 +342,6 @@
 			    			}
 			    			
 			    		});
-			    		console.log("trueCounter "+trueCounter)
 		    			if(trueCounter==0)valid = false;
 			    		
 			    		
@@ -372,7 +370,6 @@
 							e.preventDefault();
 						}
 			    		
-			    		alert(valid);
 				    	return valid;
 		    		}
 		    	);
