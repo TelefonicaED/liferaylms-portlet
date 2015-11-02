@@ -1,2 +1,3 @@
 *.class
 docroot/WEB-INF/classes
+/bin/
