@@ -69,7 +69,7 @@ public class SurveyResultModelImpl extends BaseModelImpl<SurveyResult>
 			{ "userId", Types.BIGINT },
 			{ "freeAnswer", Types.VARCHAR }
 		};
-	public static final String TABLE_SQL_CREATE = "create table Lms_SurveyResult (uuid_ VARCHAR(75) null,surveyResultId LONG not null primary key,actId LONG,latId LONG,questionId LONG,answerId LONG,userId LONG,freeAnswer VARCHAR(75) null)";
+	public static final String TABLE_SQL_CREATE = "create table Lms_SurveyResult (uuid_ VARCHAR(75) null,surveyResultId LONG not null primary key,actId LONG,latId LONG,questionId LONG,answerId LONG,userId LONG,freeAnswer TEXT null)";
 	public static final String TABLE_SQL_DROP = "drop table Lms_SurveyResult";
 	public static final String DATA_SOURCE = "liferayDataSource";
 	public static final String SESSION_FACTORY = "liferaySessionFactory";

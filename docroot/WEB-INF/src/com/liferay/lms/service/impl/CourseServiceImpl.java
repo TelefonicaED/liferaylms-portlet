@@ -525,7 +525,7 @@ public class CourseServiceImpl extends CourseServiceBaseImpl {
 		return "";
 	}
 	
-	private void sendEmail(User user, Course course){
+	/*private void sendEmail(User user, Course course){
 		if(course.isWelcome()&&user!=null&&course!=null){
 			if(course.getWelcomeMsg()!=null&&course.getWelcomeMsg()!=null&&!StringPool.BLANK.equals(course.getWelcomeMsg())){
 				
@@ -533,7 +533,7 @@ public class CourseServiceImpl extends CourseServiceBaseImpl {
 					String emailTo = user.getEmailAddress();
 					String nameTo = user.getFullName();
 					InternetAddress to = new InternetAddress(emailTo, nameTo);
-
+					String screenName = user.getScreenName();
 					String fromName = PrefsPropsUtil.getString(course.getCompanyId(),
 						PropsKeys.ADMIN_EMAIL_FROM_NAME);
 					String fromAddress = PrefsPropsUtil.getString(course.getCompanyId(),
@@ -555,8 +555,8 @@ public class CourseServiceImpl extends CourseServiceBaseImpl {
 						String subject = LanguageUtil.format(user.getLocale(),"welcome-subject", new String[]{course.getTitle(user.getLocale())});
 				    	String body = StringUtil.replace(
 				    			course.getWelcomeMsg(),
-				    			new String[] {"[$FROM_ADDRESS$]", "[$FROM_NAME$]", "[$PAGE_URL$]","[$PORTAL_URL$]","[$TO_ADDRESS$]","[$TO_NAME$]"},
-				    			new String[] {fromAddress, fromName, urlcourse, url, emailTo, nameTo});
+				    			new String[] {"[$FROM_ADDRESS$]", "[$FROM_NAME$]", "[$PAGE_URL$]","[$PORTAL_URL$]","[$TO_ADDRESS$]","[$TO_NAME$]","[$SCREEN_NAME$]"},
+				    			new String[] {fromAddress, fromName, urlcourse, url, emailTo, nameTo,screenName});
 				    	
 						MailMessage mailm = new MailMessage(from, to, subject, body, true);
 						MailServiceUtil.sendEmail(mailm);
@@ -571,5 +571,5 @@ public class CourseServiceImpl extends CourseServiceBaseImpl {
 				}
 			}
 		}
-	}
+	}*/
 }

@@ -120,11 +120,11 @@ public class GeneralStats extends MVCPortlet {
 			//CourseResultLocalServiceUtil.c
 			long todosLosFinalizados=CourseResultLocalServiceUtil.countByCourseId(course.getCourseId(), true);
 			long finalizados = todosLosFinalizados-teachersFinished;
-			long iniciados = (CourseResultLocalServiceUtil.countByCourseId(course.getCourseId(), false) + todosLosFinalizados)-numTeachers;
+			long iniciados = CourseResultLocalServiceUtil.countStudentsByCourseId(course);
 			double avgResult=0;
 			if(finalizados>0)
 			{
-				avgResult=CourseResultLocalServiceUtil.avgResult(course.getCourseId());
+				avgResult=CourseResultLocalServiceUtil.avgStudentsResult(course, true);
 			}
 			long activitiesCount=LearningActivityLocalServiceUtil.countLearningActivitiesOfGroup(course.getGroupCreatedId());
 			long modulesCount=ModuleLocalServiceUtil.countByGroupId(course.getGroupCreatedId());

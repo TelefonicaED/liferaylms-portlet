@@ -21,7 +21,6 @@
 <style type="text/css">
 .horizontalquestion {
   overflow: auto;
-  width: 1000px;
 }
 
 .horizontalquestion>div {
@@ -45,6 +44,12 @@
   height: 20px;
 }
 
+textarea {
+    resize: none;
+    width : 75%;
+    min-width: 75%;
+}
+
 </style>
 <div class="container-activity">
 <%
@@ -60,7 +65,8 @@
 		LearningActivity activity=LearningActivityLocalServiceUtil.getLearningActivity(actId);
 		long typeId=activity.getTypeId();
 		boolean isSurvey = activity.getTypeId() == 4;
-		
+		boolean isEvaluationSurvey = activity.getTitle(themeDisplay.getLocale())
+					.equalsIgnoreCase(LanguageUtil.get(pageContext, "surveyactivity.evaluation.title"));
 		
 		if(typeId==4&&(!LearningActivityLocalServiceUtil.islocked(actId,themeDisplay.getUserId())||
 				permissionChecker.hasPermission(activity.getGroupId(), LearningActivity.class.getName(), actId, ActionKeys.UPDATE)||
@@ -69,8 +75,11 @@
 
 	
 		%>
-          
-			<div class="surveyactivity view">
+          	<%if(isEvaluationSurvey){ %>
+				<div class="tripartita surveyactivity view">
+			<%}else{ %>
+				<div class="surveyactivity view">
+			<%}%>
 				<h2><%=activity.getTitle(themeDisplay.getLocale()) %></h2>
 				<%--<h3 class="description-h3"><liferay-ui:message key="description" /></h3> --%>
 				<div class="description"><%=activity.getDescription(themeDisplay.getLocale()) %></div>
@@ -155,7 +164,8 @@
 									                	  label: '<liferay-ui:message key="ok"/>',
 									                	  handler: function() {
 									                		  A.one('#<portlet:namespace/>formulario').detach('submit');
-									                		  document.getElementById('<portlet:namespace/>formulario').submit();
+									                		  if (!<%=isEvaluationSurvey%>)
+									                			 document.getElementById('<portlet:namespace/>formulario').submit();
 									                		  <portlet:namespace />confirmDialog.close();
 									                	  }
 									                  },
@@ -259,9 +269,9 @@
 								</div>
 							<% } else { // En este caso es texto libre %>
 								<div>
-									<div class="questiontext"><%=question.getText() %></div>
-									<%--<div class="answer"><aui:input type="textarea" name='<%="question_"+question.getQuestionId()%>'></aui:input></div>--%>
-									<div class="answer"><input type="text" name='<%="question_"+question.getQuestionId()%>'></input></div>
+ 									<div class="questiontext"><%=question.getText() %></div> 
+									<div class="answer"><textarea rows="10" cols="100" maxlength="2000" name='<%="question_"+question.getQuestionId()%>'></textarea></div>
+ 									<%--<div class="answer"><input type="text" name='<%="question_"+question.getQuestionId()%>'></input></div> --%>
 								</div>
 							<% }
 							

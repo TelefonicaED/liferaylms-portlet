@@ -187,7 +187,7 @@ public class ModuleLocalServiceImpl extends ModuleLocalServiceBaseImpl {
 		}
 	}
 
-	public void goUpModule(long moduleId ) throws SystemException
+	public void goUpModule(long moduleId, long userIdAction ) throws SystemException
 	{
 		Module previusModule=getPreviusModule(moduleId);
 		if(previusModule!=null)
@@ -206,11 +206,11 @@ public class ModuleLocalServiceImpl extends ModuleLocalServiceBaseImpl {
 			System.out.println("Módulo con id: "+theModule.getModuleId()+" ha sido movido hacia arriba por el usuario: "+theModule.getUserId());
 
 			AuditingLogFactory.audit(theModule.getCompanyId(), theModule.getGroupId(), Module.class.getName(), 
-					moduleId, theModule.getUserId(), AuditConstants.UPDATE, "MODULE_UP");
+					moduleId,userIdAction, AuditConstants.UPDATE, "MODULE_UP");
 		}
 		
 	}
-	public void goDownModule(long moduleId ) throws SystemException
+	public void goDownModule(long moduleId , long userIdAction) throws SystemException
 	{
 		Module nextModule=getNextModule(moduleId);
 		if(nextModule!=null)
@@ -229,12 +229,12 @@ public class ModuleLocalServiceImpl extends ModuleLocalServiceBaseImpl {
 			System.out.println("Módulo con id: "+theModule.getModuleId()+" ha sido movido hacia abajo por el usuario: "+theModule.getUserId());
 
 			AuditingLogFactory.audit(theModule.getCompanyId(), theModule.getGroupId(), Module.class.getName(), 
-					moduleId, theModule.getUserId(), AuditConstants.UPDATE, "MODULE_DOWN");
+					moduleId, userIdAction, AuditConstants.UPDATE, "MODULE_DOWN");
 		}
 		
 	}
 	
-	public void moveModule(long modId, long previusMod, long nextMod) throws SystemException {
+	public void moveModule(long modId, long previusMod, long nextMod, long userIdAction) throws SystemException {
 		Module actualMod = (modId>0)?modulePersistence.fetchByPrimaryKey(modId):null;
 		Module finalPrevMod = (previusMod>0)?modulePersistence.fetchByPrimaryKey(previusMod):null;
 		Module finalNextMod = (nextMod>0)?modulePersistence.fetchByPrimaryKey(nextMod):null;
@@ -242,19 +242,19 @@ public class ModuleLocalServiceImpl extends ModuleLocalServiceBaseImpl {
 		if(finalNextMod!=null && actualMod.getOrdern() > finalNextMod.getOrdern()){
 			Module prevAct = getPreviusModule(actualMod);
 			while(prevAct != null && actualMod.getOrdern() > finalNextMod.getOrdern()){
-				goUpModule(modId);
+				goUpModule(modId,userIdAction);
 				actualMod = modulePersistence.fetchByPrimaryKey(modId);
 				prevAct = getPreviusModule(actualMod);
 			}
 			//auditing
 			System.out.println("Módulo con id: "+actualMod.getModuleId()+" ha sido movido hacia arriba por el usuario: "+actualMod.getUserId());
 			AuditingLogFactory.audit(actualMod.getCompanyId(), actualMod.getGroupId(), Module.class.getName(), 
-					modId, actualMod.getUserId(), AuditConstants.UPDATE, "MODULE_UP");
+					modId, userIdAction, AuditConstants.UPDATE, "MODULE_UP");
 		//Elemento bajado
 		}else if(finalPrevMod!=null && actualMod.getOrdern() < finalPrevMod.getOrdern()){
 			Module nexMod = getNextModule(actualMod);
 			while (nexMod != null && actualMod.getOrdern() < finalPrevMod.getOrdern()){
-				goDownModule(modId);
+				goDownModule(modId,userIdAction);
 				actualMod = modulePersistence.fetchByPrimaryKey(modId);
 				nexMod = getNextModule(actualMod);
 			}
@@ -262,7 +262,7 @@ public class ModuleLocalServiceImpl extends ModuleLocalServiceBaseImpl {
 
 			//auditing
 			AuditingLogFactory.audit(actualMod.getCompanyId(), actualMod.getGroupId(), Module.class.getName(), 
-					modId, actualMod.getUserId(), AuditConstants.UPDATE, "MODULE_DOWN");
+					modId, userIdAction, AuditConstants.UPDATE, "MODULE_DOWN");
 		}
 
 	}
@@ -357,7 +357,7 @@ public class ModuleLocalServiceImpl extends ModuleLocalServiceBaseImpl {
 		return module;
 	}
 
-	public void remove(Module fileobj) throws SystemException {
+	public void remove(Module fileobj, long userIdAction) throws SystemException {
 
 //		modulePersistence.remove(fileobj);
 		try {
@@ -373,11 +373,11 @@ public class ModuleLocalServiceImpl extends ModuleLocalServiceBaseImpl {
 
 		//auditing
 		AuditingLogFactory.audit(fileobj.getCompanyId(), fileobj.getGroupId(), Module.class.getName(), 
-				fileobj.getModuleId(), fileobj.getUserId(), AuditConstants.DELETE, null);
+				fileobj.getModuleId(), userIdAction, AuditConstants.DELETE, null);
 	}
 
 	@Override
-	public Module updateModule(Module module) throws SystemException {
+	public Module updateModule(Module module, long userIdAction) throws SystemException {
 		
 		module = LmsLocaleUtil.checkDefaultLocale(Module.class, module, "title");
 		module = LmsLocaleUtil.checkDefaultLocale(Module.class, module, "description");
@@ -399,7 +399,7 @@ public class ModuleLocalServiceImpl extends ModuleLocalServiceBaseImpl {
 		
 		//auditing
 		AuditingLogFactory.audit(module.getCompanyId(), module.getGroupId(), Module.class.getName(), 
-				module.getModuleId(), module.getUserId(), AuditConstants.UPDATE, null);
+				module.getModuleId(), userIdAction, AuditConstants.UPDATE, null);
 		
 		return module;
 	}

@@ -235,7 +235,7 @@ create table Lms_SurveyResult (
 	questionId LONG,
 	answerId LONG,
 	userId LONG,
-	freeAnswer VARCHAR(75) null
+	freeAnswer TEXT null
 );
 
 create table Lms_TestAnswer (

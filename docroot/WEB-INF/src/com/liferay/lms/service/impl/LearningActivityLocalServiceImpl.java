@@ -160,7 +160,7 @@ public class LearningActivityLocalServiceImpl extends LearningActivityLocalServi
 							&& !(PermissionCheckerFactoryUtil.create(u)).hasPermission(retorno.getGroupId(), "com.liferay.lms.model", retorno.getGroupId(), "VIEW_RESULTS")
 							&& !retorno.isInactive()
 							&& !retorno.isExpired()
-							&& !moduleService.isLocked(retorno.getModuleId())
+							&& !moduleLocalService.isLocked(retorno.getModuleId(),u.getUserId())
 							&& !courseLocalService.getCourseByGroupCreatedId(retorno.getGroupId()).isInactive()
 							&& !courseLocalService.getCourseByGroupCreatedId(retorno.getGroupId()).isExpired()
 							&& !courseLocalService.getCourseByGroupCreatedId(retorno.getGroupId()).isClosed()){
@@ -246,7 +246,7 @@ public class LearningActivityLocalServiceImpl extends LearningActivityLocalServi
 							&& !(PermissionCheckerFactoryUtil.create(u)).hasPermission(larn.getGroupId(), "com.liferay.lms.model", larn.getGroupId(), "VIEW_RESULTS")
 							&& !larn.isInactive()
 							&& !larn.isExpired()
-							&& !moduleService.isLocked(larn.getModuleId())
+							&& !moduleLocalService.isLocked(larn.getModuleId(),userId)
 							&& !courseLocalService.getCourseByGroupCreatedId(larn.getGroupId()).isInactive()
 							&& !courseLocalService.getCourseByGroupCreatedId(larn.getGroupId()).isExpired()
 							&& !courseLocalService.getCourseByGroupCreatedId(larn.getGroupId()).isClosed()){
@@ -357,12 +357,11 @@ public class LearningActivityLocalServiceImpl extends LearningActivityLocalServi
 			while(it.hasNext()){
 				User u = it.next();
 				try {
-					
 					if(u.isActive() 
 							&& !(PermissionCheckerFactoryUtil.create(u)).hasPermission(learningActivity.getGroupId(), "com.liferay.lms.model", learningActivity.getGroupId(), "VIEW_RESULTS")
 							&& !learningActivity.isInactive()
 							&& !learningActivity.isExpired()
-							&& !moduleService.isLocked(learningActivity.getModuleId())
+							&& !moduleLocalService.isLocked(learningActivity.getModuleId(),userId)
 							&& !courseLocalService.getCourseByGroupCreatedId(learningActivity.getGroupId()).isInactive()
 							&& !courseLocalService.getCourseByGroupCreatedId(learningActivity.getGroupId()).isExpired()
 							&& !courseLocalService.getCourseByGroupCreatedId(learningActivity.getGroupId()).isClosed()){
@@ -449,7 +448,7 @@ public class LearningActivityLocalServiceImpl extends LearningActivityLocalServi
 							&& !(PermissionCheckerFactoryUtil.create(u)).hasPermission(larn.getGroupId(), "com.liferay.lms.model", larn.getGroupId(), "VIEW_RESULTS")
 							&& !larn.isInactive()
 							&& !larn.isExpired()
-							&& !moduleService.isLocked(larn.getModuleId())
+							&& !moduleLocalService.isLocked(larn.getModuleId(),u.getUserId())
 							&& !courseLocalService.getCourseByGroupCreatedId(larn.getGroupId()).isInactive()
 							&& !courseLocalService.getCourseByGroupCreatedId(larn.getGroupId()).isExpired()
 							&& !courseLocalService.getCourseByGroupCreatedId(larn.getGroupId()).isClosed()){
@@ -578,7 +577,7 @@ public class LearningActivityLocalServiceImpl extends LearningActivityLocalServi
 			return null;
 		}
 	}
-	public void goUpLearningActivity(long actId ) throws SystemException
+	public void goUpLearningActivity(long actId, long userIdAction ) throws SystemException
 	{
 		LearningActivity previusActivity=getPreviusLearningActivity(actId);
 		if(previusActivity!=null)
@@ -591,10 +590,15 @@ public class LearningActivityLocalServiceImpl extends LearningActivityLocalServi
 			learningActivityPersistence.update(larn, true);
 			learningActivityPersistence.update(previusActivity, true);
 
-		}
+			//auditing
+			System.out.println("Actividad con id: "+actId+" ha sido movido hacia arriba por el usuario: "+userIdAction);
 
+			AuditingLogFactory.audit(previusActivity.getCompanyId(), previusActivity.getGroupId(), LearningActivity.class.getName(), 
+					actId,userIdAction, AuditConstants.UPDATE, "ACTIVITY_UP");
+		}
 	}
-	public void goDownLearningActivity(long actId ) throws SystemException
+	
+	public void goDownLearningActivity(long actId, long userIdAction ) throws SystemException
 	{
 		LearningActivity previusActivity=getNextLearningActivity(actId);
 		if(previusActivity!=null)
@@ -606,11 +610,17 @@ public class LearningActivityLocalServiceImpl extends LearningActivityLocalServi
 			previusActivity.setPriority(priority);
 			learningActivityPersistence.update(larn, true);
 			learningActivityPersistence.update(previusActivity, true);
+			
+			//auditing
+			System.out.println("Actividad con id: "+actId+" ha sido movido hacia arriba por el usuario: "+userIdAction);
+
+			AuditingLogFactory.audit(previusActivity.getCompanyId(), previusActivity.getGroupId(), LearningActivity.class.getName(), 
+					actId,userIdAction, AuditConstants.UPDATE, "ACTIVITY_DOWN");
 		}
 
 	}
 
-	public void moveActivity(long actId, long previusAct, long nextAct) throws SystemException {
+	public void moveActivity(long actId, long previusAct, long nextAct, long userIdAction) throws SystemException {
 		LearningActivity actualAct = (actId>0)?learningActivityPersistence.fetchByPrimaryKey(actId):null;
 		LearningActivity finalPrevAct = (previusAct>0)?learningActivityPersistence.fetchByPrimaryKey(previusAct):null;
 		LearningActivity finalNextAct = (nextAct>0)?learningActivityPersistence.fetchByPrimaryKey(nextAct):null;
@@ -619,7 +629,7 @@ public class LearningActivityLocalServiceImpl extends LearningActivityLocalServi
 		if(finalNextAct!=null && actualAct.getPriority() > finalNextAct.getPriority()){
 			LearningActivity prevAct = getPreviusLearningActivity(actualAct);
 			while(prevAct != null && actualAct.getPriority() > finalNextAct.getPriority()){
-				goUpLearningActivity(actId);
+				goUpLearningActivity(actId,userIdAction);
 				actualAct = learningActivityPersistence.fetchByPrimaryKey(actId);
 				prevAct = getPreviusLearningActivity(actualAct);
 			}
@@ -627,10 +637,11 @@ public class LearningActivityLocalServiceImpl extends LearningActivityLocalServi
 		}else if(finalPrevAct!=null && actualAct.getPriority() < finalPrevAct.getPriority()){
 			LearningActivity nexAct = getNextLearningActivity(actualAct);
 			while (nexAct != null && actualAct.getPriority() < finalPrevAct.getPriority()){
-				goDownLearningActivity(actId);
+				goDownLearningActivity(actId, userIdAction);
 				actualAct = learningActivityPersistence.fetchByPrimaryKey(actId);
 				nexAct = getNextLearningActivity(actualAct);
 			}
+			
 		}
 
 	}

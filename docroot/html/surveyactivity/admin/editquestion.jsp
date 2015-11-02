@@ -1,3 +1,4 @@
+<%@page import="com.liferay.lms.learningactivity.questiontype.SurveyHorizontalOptionsQuestionType"%>
 <%@page import="com.liferay.lms.learningactivity.questiontype.QuestionTypeRegistry"%>
 <%@page import="com.liferay.lms.learningactivity.questiontype.QuestionType"%>
 <%@page import="com.liferay.lms.SurveyActivity"%>
@@ -24,15 +25,18 @@
 	TestQuestion question = null;
 	LearningActivity learningActivity = null;
 	boolean isNewQuestion = false;
+	boolean isHorizontal = false;
+	long horizontalQuestionType = new SurveyHorizontalOptionsQuestionType().getTypeId();
+	
 	if (questionId != 0){
-		question = TestQuestionLocalServiceUtil.getTestQuestion(ParamUtil.getLong(request,"questionId"));
+		question 		 = TestQuestionLocalServiceUtil.getTestQuestion(ParamUtil.getLong(request,"questionId"));
 		learningActivity = LearningActivityLocalServiceUtil.getLearningActivity(question.getActId());
-		
+		isHorizontal 	 = question.getQuestionType() == horizontalQuestionType;
 	}else{
 		isNewQuestion = true;
 		learningActivity = LearningActivityLocalServiceUtil.getLearningActivity(ParamUtil.getLong(request,"resId"));
-
 	}
+	
 	request.setAttribute("activity", learningActivity);
 	PortletURL backUrl = renderResponse.createRenderURL();
 	backUrl.setParameter("resId", String.valueOf(learningActivity.getActId()));
@@ -132,7 +136,9 @@ AUI().ready('node-base' ,'aui-form-validator', 'aui-overlay-context-panel', func
 <portlet:actionURL var="editquestionURL" name="editquestion" />
 <aui:form name="qfm" action="<%=editquestionURL %>" method="post">
 	<aui:input name="resId" type="hidden" value="<%=learningActivity.getActId() %>"></aui:input>
-			<aui:input name="isHorizontal" label="respuestas en horizontal" type="checkbox" value="false" checked="false"></aui:input>
+	<c:if test="<%=typeId != 2 %>">
+		<aui:input name="isHorizontal" label="learningactivity.survey.horizontal" type="checkbox" value="<%=isHorizontal %>" checked="<%=isHorizontal %>"></aui:input>
+	</c:if>
 	<aui:input name="qtype" type="hidden" value="<%=typeId %>"></aui:input>
 	
 	<%
@@ -180,7 +186,6 @@ AUI().ready('node-base' ,'aui-form-validator', 'aui-overlay-context-panel', func
 	
 	<portlet:renderURL var="viewAnswerURL" windowState="<%= LiferayWindowState.EXCLUSIVE.toString() %>">   
 		<portlet:param name="<%=WebKeys.PORTLET_CONFIGURATOR_VISIBILITY %>" value="<%=StringPool.TRUE %>"/>     
-	   <%System.out.println(qt.getURLNew()); %>
 	    <portlet:param name="jspPage" value="<%=qt.getURLNew() %>" />    
 	    <portlet:param name="actionEditingDetails" value="true"/>
 	    <portlet:param name="resId" value="<%=ParamUtil.getString(request,\"resId\", \"0\") %>"/>
@@ -397,11 +402,15 @@ AUI().ready('node-base' ,'aui-form-validator', 'aui-overlay-context-panel', func
 	<jsp:include page="<%=(qt!=null)?qt.getURLEdit():\"\" %>"/>
     <aui:button-row>
 
+	<%	
+	if(typeId!=2){%>
+
     	<div id="addAnswerButton">
     		<span class="newitem2">
 				<a href="#" class="newitem2" onclick="<portlet:namespace />addNode();"><liferay-ui:message key="add-answer"/></a>
 		</span>
 	</div>
+	<%}%>
 	<div class="buttons_content">
 		<aui:button type="submit" onClick='<%= "return validateFields(event);" %>'/>
 		<liferay-util:include page="/html/surveyactivity/admin/editFooter.jsp" servletContext="<%=this.getServletContext() %>" />

@@ -194,6 +194,66 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 		
 		return null;
 	}
+	
+public List<Course> getPublicCoursesByCompanyId(Long companyId, int limit){
+		
+		Long classNameId = ClassNameLocalServiceUtil.getClassNameId(Course.class.getName());
+		
+		if(classNameId!=null){
+			try {
+				DynamicQuery dq = DynamicQueryFactoryUtil.forClass(AssetEntry.class);
+				dq.add(PropertyFactoryUtil.forName("companyId").eq(companyId));
+				dq.add(PropertyFactoryUtil.forName("classNameId").eq(classNameId));
+				dq.add(PropertyFactoryUtil.forName("visible").eq(true));
+				dq.setProjection(ProjectionFactoryUtil.distinct(ProjectionFactoryUtil.property("classPK")));
+				List<Long> results = (List<Long>)assetEntryLocalService.dynamicQuery(dq,0,limit);
+
+				List<Course> courses = new ArrayList<Course>();
+				for(Long courseId : results){
+					Course course = coursePersistence.fetchByPrimaryKey(courseId);
+					if(course!=null)
+						courses.add(course);
+				}
+				
+				return courses;
+				
+			} catch (SystemException e) {
+				if(log.isDebugEnabled())e.printStackTrace();
+			}
+		}
+		
+		return null;
+	}
+
+public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int end){
+	
+	Long classNameId = ClassNameLocalServiceUtil.getClassNameId(Course.class.getName());
+	
+	if(classNameId!=null){
+		try {
+			DynamicQuery dq = DynamicQueryFactoryUtil.forClass(AssetEntry.class);
+			dq.add(PropertyFactoryUtil.forName("companyId").eq(companyId));
+			dq.add(PropertyFactoryUtil.forName("classNameId").eq(classNameId));
+			dq.add(PropertyFactoryUtil.forName("visible").eq(true));
+			dq.setProjection(ProjectionFactoryUtil.distinct(ProjectionFactoryUtil.property("classPK")));
+			List<Long> results = (List<Long>)assetEntryLocalService.dynamicQuery(dq,start, end);
+
+			List<Course> courses = new ArrayList<Course>();
+			for(Long courseId : results){
+				Course course = coursePersistence.fetchByPrimaryKey(courseId);
+				if(course!=null)
+					courses.add(course);
+			}
+			
+			return courses;
+			
+		} catch (SystemException e) {
+			if(log.isDebugEnabled())e.printStackTrace();
+		}
+	}
+	
+	return null;
+}
 
 	public Course addCourse (String title, String description,String summary,String friendlyURL, Locale locale,
 			java.util.Date createDate,java.util.Date startDate,java.util.Date endDate,long layoutSetPrototypeId,int typesite, long CourseEvalId, long calificationType, int maxUsers,ServiceContext serviceContext,boolean isfromClone)

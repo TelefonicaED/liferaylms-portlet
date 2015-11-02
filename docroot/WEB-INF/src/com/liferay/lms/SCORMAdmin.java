@@ -131,8 +131,10 @@ public class SCORMAdmin extends MVCPortlet
 						}
 					} catch (ZipException e) {
 						e.printStackTrace();
+						SessionErrors.add(actRequest, "scormadmin.error.nozip.corrupt");
 					} catch (IOException e) {
 						e.printStackTrace();
+						SessionErrors.add(actRequest, "scormadmin.error.nozip.corrupt");
 					}
 					catch (DocumentException e) {
 						e.printStackTrace();

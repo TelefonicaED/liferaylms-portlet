@@ -167,7 +167,6 @@ public class CloneCourse implements MessageListener {
 		}else{
 			layoutSetPrototypeId = Long.parseLong(courseTemplate);
 		}
-
 		/*LmsPrefs lmsPrefs=LmsPrefsLocalServiceUtil.getLmsPrefsIni(serviceContext.getCompanyId());
 		
 		System.out.println("  + getLmsTemplates: "+lmsPrefs.getLmsTemplates());

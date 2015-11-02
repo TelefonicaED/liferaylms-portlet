@@ -80,9 +80,10 @@ public class GroupListener extends BaseModelListener<Group> {
 					    	}
 					    	String body = StringUtil.replace(
 				    			course.getWelcomeMsg(),
-				    			new String[] {"[$FROM_ADDRESS$]", "[$FROM_NAME$]", "[$PAGE_URL$]","[$PORTAL_URL$]","[$TO_ADDRESS$]","[$TO_NAME$]"},
-				    			new String[] {fromAddress, fromName, urlcourse, url, user.getEmailAddress(), user.getFullName()});
+				    			new String[] {"[$FROM_ADDRESS$]", "[$FROM_NAME$]", "[$PAGE_URL$]","[$PORTAL_URL$]","[$TO_ADDRESS$]","[$TO_NAME$]","[$USER_SCREENNAME$]"},
+				    			new String[] {fromAddress, fromName, urlcourse, url, user.getEmailAddress(), user.getFullName(),user.getScreenName()});
 				    	
+					    	System.out.println(body);
 							if(log.isDebugEnabled()){
 								log.debug(from);
 								log.debug(to);
@@ -157,8 +158,8 @@ public class GroupListener extends BaseModelListener<Group> {
 					    	}
 					    	String body = StringUtil.replace(
 				    			course.getGoodbyeMsg(),
-				    			new String[] {"[$FROM_ADDRESS$]", "[$FROM_NAME$]", "[$PAGE_URL$]","[$PORTAL_URL$]","[$TO_ADDRESS$]","[$TO_NAME$]"},
-				    			new String[] {fromAddress, fromName, urlcourse, url, user.getEmailAddress(), user.getFullName()});
+				    			new String[] {"[$FROM_ADDRESS$]", "[$FROM_NAME$]", "[$PAGE_URL$]","[$PORTAL_URL$]","[$TO_ADDRESS$]","[$TO_NAME$]","[$USER_SCREENNAME$]"},
+				    			new String[] {fromAddress, fromName, urlcourse, url, user.getEmailAddress(), user.getFullName(),user.getScreenName()});
 				    	
 					    	
 							if(log.isDebugEnabled()){
