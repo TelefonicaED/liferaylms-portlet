@@ -459,6 +459,7 @@
         <column name="courseevals" type="String"></column>
         <column name="scoretranslators" type="String"></column>
         <column name="usersResults" type="long"></column>
+         <column name="debugScorm" type="boolean"></column>
     </entity>
         
 	<entity name="SurveyResult" uuid="true" local-service="true" remote-service="false" json-enabled="false">

@@ -23,6 +23,7 @@ import com.liferay.lms.auditing.AuditConstants;
 import com.liferay.lms.auditing.AuditingLogFactory;
 import com.liferay.lms.model.Course;
 import com.liferay.lms.model.CourseResult;
+import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.model.LearningActivityTry;
 import com.liferay.lms.model.Module;
 import com.liferay.lms.model.ModuleResult;
@@ -31,6 +32,7 @@ import com.liferay.lms.service.CourseResultLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityTryLocalServiceUtil;
 import com.liferay.lms.service.ModuleLocalServiceUtil;
+import com.liferay.lms.service.ModuleResultLocalServiceUtil;
 import com.liferay.lms.service.base.ModuleLocalServiceBaseImpl;
 import com.liferay.portal.kernel.bean.PortletBeanLocatorUtil;
 import com.liferay.portal.kernel.dao.orm.Criterion;
@@ -45,7 +47,9 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.model.ResourceConstants;
 import com.liferay.portal.model.User;
 import com.liferay.portal.security.permission.ActionKeys;
@@ -183,7 +187,7 @@ public class ModuleLocalServiceImpl extends ModuleLocalServiceBaseImpl {
 		}
 	}
 
-	public void goUpModule(long moduleId ) throws SystemException
+	public void goUpModule(long moduleId, long userIdAction ) throws SystemException
 	{
 		Module previusModule=getPreviusModule(moduleId);
 		if(previusModule!=null)
@@ -202,11 +206,11 @@ public class ModuleLocalServiceImpl extends ModuleLocalServiceBaseImpl {
 			System.out.println("Módulo con id: "+theModule.getModuleId()+" ha sido movido hacia arriba por el usuario: "+theModule.getUserId());
 
 			AuditingLogFactory.audit(theModule.getCompanyId(), theModule.getGroupId(), Module.class.getName(), 
-					moduleId, theModule.getUserId(), AuditConstants.UPDATE, "MODULE_UP");
+					moduleId,userIdAction, AuditConstants.UPDATE, "MODULE_UP");
 		}
 		
 	}
-	public void goDownModule(long moduleId ) throws SystemException
+	public void goDownModule(long moduleId , long userIdAction) throws SystemException
 	{
 		Module nextModule=getNextModule(moduleId);
 		if(nextModule!=null)
@@ -225,12 +229,12 @@ public class ModuleLocalServiceImpl extends ModuleLocalServiceBaseImpl {
 			System.out.println("Módulo con id: "+theModule.getModuleId()+" ha sido movido hacia abajo por el usuario: "+theModule.getUserId());
 
 			AuditingLogFactory.audit(theModule.getCompanyId(), theModule.getGroupId(), Module.class.getName(), 
-					moduleId, theModule.getUserId(), AuditConstants.UPDATE, "MODULE_DOWN");
+					moduleId, userIdAction, AuditConstants.UPDATE, "MODULE_DOWN");
 		}
 		
 	}
 	
-	public void moveModule(long modId, long previusMod, long nextMod) throws SystemException {
+	public void moveModule(long modId, long previusMod, long nextMod, long userIdAction) throws SystemException {
 		Module actualMod = (modId>0)?modulePersistence.fetchByPrimaryKey(modId):null;
 		Module finalPrevMod = (previusMod>0)?modulePersistence.fetchByPrimaryKey(previusMod):null;
 		Module finalNextMod = (nextMod>0)?modulePersistence.fetchByPrimaryKey(nextMod):null;
@@ -238,19 +242,19 @@ public class ModuleLocalServiceImpl extends ModuleLocalServiceBaseImpl {
 		if(finalNextMod!=null && actualMod.getOrdern() > finalNextMod.getOrdern()){
 			Module prevAct = getPreviusModule(actualMod);
 			while(prevAct != null && actualMod.getOrdern() > finalNextMod.getOrdern()){
-				goUpModule(modId);
+				goUpModule(modId,userIdAction);
 				actualMod = modulePersistence.fetchByPrimaryKey(modId);
 				prevAct = getPreviusModule(actualMod);
 			}
 			//auditing
 			System.out.println("Módulo con id: "+actualMod.getModuleId()+" ha sido movido hacia arriba por el usuario: "+actualMod.getUserId());
 			AuditingLogFactory.audit(actualMod.getCompanyId(), actualMod.getGroupId(), Module.class.getName(), 
-					modId, actualMod.getUserId(), AuditConstants.UPDATE, "MODULE_UP");
+					modId, userIdAction, AuditConstants.UPDATE, "MODULE_UP");
 		//Elemento bajado
 		}else if(finalPrevMod!=null && actualMod.getOrdern() < finalPrevMod.getOrdern()){
 			Module nexMod = getNextModule(actualMod);
 			while (nexMod != null && actualMod.getOrdern() < finalPrevMod.getOrdern()){
-				goDownModule(modId);
+				goDownModule(modId,userIdAction);
 				actualMod = modulePersistence.fetchByPrimaryKey(modId);
 				nexMod = getNextModule(actualMod);
 			}
@@ -258,7 +262,7 @@ public class ModuleLocalServiceImpl extends ModuleLocalServiceBaseImpl {
 
 			//auditing
 			AuditingLogFactory.audit(actualMod.getCompanyId(), actualMod.getGroupId(), Module.class.getName(), 
-					modId, actualMod.getUserId(), AuditConstants.UPDATE, "MODULE_DOWN");
+					modId, userIdAction, AuditConstants.UPDATE, "MODULE_DOWN");
 		}
 
 	}
@@ -353,7 +357,7 @@ public class ModuleLocalServiceImpl extends ModuleLocalServiceBaseImpl {
 		return module;
 	}
 
-	public void remove(Module fileobj) throws SystemException {
+	public void remove(Module fileobj, long userIdAction) throws SystemException {
 
 //		modulePersistence.remove(fileobj);
 		try {
@@ -369,11 +373,11 @@ public class ModuleLocalServiceImpl extends ModuleLocalServiceBaseImpl {
 
 		//auditing
 		AuditingLogFactory.audit(fileobj.getCompanyId(), fileobj.getGroupId(), Module.class.getName(), 
-				fileobj.getModuleId(), fileobj.getUserId(), AuditConstants.DELETE, null);
+				fileobj.getModuleId(), userIdAction, AuditConstants.DELETE, null);
 	}
 
 	@Override
-	public Module updateModule(Module module) throws SystemException {
+	public Module updateModule(Module module, long userIdAction) throws SystemException {
 		
 		module = LmsLocaleUtil.checkDefaultLocale(Module.class, module, "title");
 		module = LmsLocaleUtil.checkDefaultLocale(Module.class, module, "description");
@@ -395,7 +399,7 @@ public class ModuleLocalServiceImpl extends ModuleLocalServiceBaseImpl {
 		
 		//auditing
 		AuditingLogFactory.audit(module.getCompanyId(), module.getGroupId(), Module.class.getName(), 
-				module.getModuleId(), module.getUserId(), AuditConstants.UPDATE, null);
+				module.getModuleId(), userIdAction, AuditConstants.UPDATE, null);
 		
 		return module;
 	}
@@ -421,10 +425,62 @@ public class ModuleLocalServiceImpl extends ModuleLocalServiceBaseImpl {
 		{
 			return false;
 		}
-		else
+		return true;
+	}
+	public boolean isUserFinished(long moduleId,long userId) throws SystemException, PortalException
+	{
+		if(isUserPassed(moduleId, userId))
 		{
 			return true;
 		}
+		if(userTimeFinished(moduleId, userId))
+		{
+			return true;
+		}
+		List<LearningActivity> activities = LearningActivityLocalServiceUtil.getLearningActivitiesOfModule(moduleId);
+		boolean finished = false;
+		for(LearningActivity activity : activities)
+		{
+			LearningActivityTry activityTry = LearningActivityTryLocalServiceUtil.getLastLearningActivityTryByActivityAndUser(activity.getActId(), userId);
+			if(activityTry!=null)
+			{
+				if(activityTry.getEndUserDate()!=null)
+				{
+					finished = true;
+				}
+				else
+				{
+					return false;
+				}
+			}
+			else
+			{
+				finished = false;
+			}
+		}
+		if(finished)
+		{
+			return true;
+		}
+		return false;
+	}
+	public boolean userTimeFinished(long moduleId,long userId) throws SystemException, PortalException
+	{
+		Module theModule=ModuleLocalServiceUtil.getModule(moduleId);
+		ModuleResult mr=ModuleResultLocalServiceUtil.getByModuleAndUser(theModule.getModuleId(), userId);
+		if(mr!=null && !mr.getPassed())
+		{
+			long courtesyTime=GetterUtil.getLong(PropsUtil.get("lms.module.courtesytime.miliseconds"),0);
+			long usedTime=System.currentTimeMillis()-mr.getStartDate().getTime();
+			if(theModule.getAllowedTime()!=0)
+			{
+				if ( theModule.getAllowedTime() + courtesyTime - usedTime < 0)
+				{
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 	public boolean isLocked(long moduleId,long userId) throws Exception
 	{
@@ -458,6 +514,9 @@ public class ModuleLocalServiceImpl extends ModuleLocalServiceBaseImpl {
 			{
 				return true;
 			}
+        }
+        if(userTimeFinished(moduleId,userId)){
+        	return true;
         }
 		return false;
 	}

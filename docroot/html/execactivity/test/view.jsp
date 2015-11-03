@@ -110,7 +110,7 @@
 						|| permissionChecker.hasPermission(activity.getGroupId(), LearningActivity.class.getName(),actId, ActionKeys.UPDATE)
 						|| permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), "com.liferay.lms.model",themeDisplay.getScopeGroupId(),"ACCESSLOCK")
 			    		|| improving ){
-							boolean isBank = StringPool.TRUE.equals(LearningActivityLocalServiceUtil.getExtraContentValue(actId, "isBank"));
+							boolean useBank = StringPool.TRUE.equals(LearningActivityLocalServiceUtil.getExtraContentValue(actId, "isBank"));
 %>
 			    	
 			    		<h2 class="description-title"><%=activity.getTitle(themeDisplay.getLocale()) %></h2>
@@ -149,7 +149,7 @@
 <%
 							}else{		
 								List<TestQuestion> questions = TestQuestionLocalServiceUtil.getQuestions(actId);
-								if (isBank){
+								if (useBank){
 									questions = TestQuestionLocalServiceUtil.generateAleatoryQuestions(actId, 0L);
 									LearningActivity bankActivity = LearningActivityLocalServiceUtil.getLearningActivity(questions.get(0).getActId());
 %>
@@ -282,7 +282,14 @@
 									return (question.all('div.answer input[type="radio"]:checked').size() > 0);
 								},
 								questiontype_options_select : function(question) {
-									return (question.all('select.answer').value != 0);
+									var selectAnswers = question.all('select.answer');
+									var validSelects = true;
+									selectAnswers.each(function (selectAnswer){
+										if (selectAnswer.val()==""||selectAnswer.val()==0){
+											validSelects = false;
+										}
+									});
+									return validSelects;
 								},
 								questiontype_multioptions : function(question) {
 									return (question.all('div.answer input[type="checkbox"]:checked').size() > 0);
@@ -367,6 +374,7 @@
 								        resizable: false,
 								        draggable: false,
 								        close: true,
+								        cssClass: 'dialog-principal',
 								        destroyOnClose: true,
 								        centered: true,
 								        modal: true
@@ -433,6 +441,10 @@
 				);
 				
 			//-->
+				function finishTry(){
+					document.<portlet:namespace />formulario.action='<%=correctURL%>';
+				    document.<portlet:namespace />formulario.submit();
+				}	
 			</script>			
 
 			<aui:form name="formulario" action="<%=correctURL %>" method="post" onSubmit="javascript:return false;">
@@ -506,7 +518,7 @@
 				}
 				random = questions.size();
 			} else {
-				if (random != 0 && !isBank){
+				if (random != 0 && !useBank){
 					questions = new ArrayList<TestQuestion>(questions);
 					Collections.shuffle(questions);	
 					if (random > questions.size()){

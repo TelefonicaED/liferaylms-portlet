@@ -27,7 +27,19 @@
 
 <script type="text/javascript">
 function actionDiv(element){
-	childs = element.parentNode.getElementsByClassName("collapsable2");
+	var ua = navigator.userAgent;
+	var re  = new RegExp("MSIE ([0-9]{1,}[\.0-9]{0,})");
+	var rv;
+	    if (re.exec(ua) != null){
+	      rv = parseFloat( RegExp.$1 );
+	  }
+	 var childs;
+	if ( rv == 8.0 ) {
+		childs = element.parentNode.querySelectorAll('.collapsable2');
+	}else{
+		childs = element.parentNode.getElementsByClassName("collapsable2");
+	}
+	
 	if(childs.length>0){
 		for (var i = 0; i < childs.length; i++) {
 			if (childs[i].style.display == 'none') {

@@ -21,6 +21,7 @@ import javax.portlet.ProcessEvent;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 import javax.portlet.WindowState;
+import javax.portlet.WindowStateException;
 import javax.xml.namespace.QName;
 
 import org.apache.commons.lang.StringUtils;
@@ -87,8 +88,11 @@ import com.liferay.portal.util.PortalUtil;
 import com.liferay.portlet.PortletQNameUtil;
 import com.liferay.portlet.announcements.EntryDisplayDateException;
 import com.liferay.portlet.asset.AssetRendererFactoryRegistryUtil;
+import com.liferay.portlet.asset.model.AssetEntry;
 import com.liferay.portlet.asset.model.AssetRenderer;
 import com.liferay.portlet.asset.model.AssetRendererFactory;
+import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
+import com.liferay.portlet.asset.service.persistence.AssetEntryQuery;
 import com.liferay.util.bridges.mvc.MVCPortlet;
 
 /**
@@ -112,7 +116,15 @@ public class LmsActivitiesList extends MVCPortlet {
      	   }
         }
     }
-
+    public void deleteActivityBank(ActionRequest actionRequest, ActionResponse actionResponse) 
+    		throws PortalException, SystemException, IOException, WindowStateException{
+    	
+    	long actId = ParamUtil.getLong(actionRequest, "resId", 0);
+		
+		AssetEntry assetEntry = AssetEntryLocalServiceUtil.getEntry("com.liferay.lms.model.LearningActivity", actId);
+		assetEntry.setVisible(false);
+		AssetEntryLocalServiceUtil.updateAssetEntry(assetEntry);
+    }
 	public void deleteMyTries(ActionRequest actionRequest, ActionResponse actionResponse)
 	throws Exception {
 		long actId = ParamUtil.getLong(actionRequest, "resId", 0);
@@ -159,10 +171,10 @@ public class LmsActivitiesList extends MVCPortlet {
 		UploadRequest uploadRequest = PortalUtil.getUploadPortletRequest(actionRequest);
 
 		if(log.isDebugEnabled()){
-			Enumeration<String> parNames= uploadRequest.getParameterNames();
-			while(parNames.hasMoreElements()){
-				String paramName=parNames.nextElement();
-				log.debug(paramName+"::"+uploadRequest.getParameter(paramName));
+			Enumeration<String> parNames2= uploadRequest.getParameterNames();
+			while(parNames2.hasMoreElements()){
+				String paramName=parNames2.nextElement();
+				System.out.println(paramName+"::"+uploadRequest.getParameter(paramName));
 			}
 		}
 		
@@ -210,7 +222,10 @@ public class LmsActivitiesList extends MVCPortlet {
 		long weightinmodule=ParamUtil.getLong(uploadRequest, "weightinmodule", 0);
 		boolean commentsActivated=ParamUtil.getBoolean(uploadRequest, "commentsActivated", false);
 		long precedence=ParamUtil.getLong(uploadRequest, "precedence", 0);
+		
+		
 		//String title = actionRequest.getParameter("title");
+		
 		
 		String description = uploadRequest.getParameter("description");
 		int type = ParamUtil.getInteger(uploadRequest, "type", -1);
@@ -374,10 +389,9 @@ public class LmsActivitiesList extends MVCPortlet {
 							ActionKeys.UPDATE))
 			{
 				
-			String extraContentTmp = "";	
-			
-			
-			extraContentTmp = tmp.getExtracontent();
+			String extraContentTmp =  tmp.getExtracontent();	
+
+		
 			String teamIdStr = StringUtils.substringAfter(extraContentTmp, "<team>");
 			teamIdStr = StringUtils.substringBefore(teamIdStr, "</team>");
 			if(StringPool.BLANK.equals(teamIdStr)){
@@ -395,6 +409,8 @@ public class LmsActivitiesList extends MVCPortlet {
 				ResourcePermissionLocalServiceUtil.removeResourcePermission(t.getCompanyId(), LearningActivity.class.getName(), 
 				ResourceConstants.SCOPE_INDIVIDUAL,	Long.toString(tmp.getActId()),teamMemberRole.getRoleId(), ActionKeys.VIEW);	
 			}
+			
+			
 				
 			larn=LearningActivityLocalServiceUtil.modLearningActivity(
 				actId, "", "", ahora, startDate, stopDate, type, tries, passpuntuation, moduleId,  extraContentTmp, feedbackCorrect, feedbackNoCorrect, serviceContext);
@@ -536,7 +552,7 @@ public class LmsActivitiesList extends MVCPortlet {
 		long moduleId = ParamUtil.getLong(actionRequest, "resId",0);
 		ThemeDisplay themeDisplay = (ThemeDisplay) actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
 		PermissionChecker permissionChecker=themeDisplay.getPermissionChecker();
-	
+		long userIdAction = themeDisplay.getUserId();
 		if(moduleId>0)
 		{
 			if(permissionChecker.hasPermission(
@@ -545,7 +561,7 @@ public class LmsActivitiesList extends MVCPortlet {
 				Module.class.getName(), moduleId,
 				ActionKeys.UPDATE))
 			{
-				ModuleLocalServiceUtil.goUpModule(moduleId);
+				ModuleLocalServiceUtil.goUpModule(moduleId, userIdAction);
 			}
 		}
 		
@@ -555,9 +571,9 @@ public class LmsActivitiesList extends MVCPortlet {
 	throws Exception {
 		ThemeDisplay themeDisplay = (ThemeDisplay) actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
 		PermissionChecker permissionChecker=themeDisplay.getPermissionChecker();
-	
-		long moduleId = ParamUtil.getLong(actionRequest, "resId",0);
 		
+		long moduleId = ParamUtil.getLong(actionRequest, "resId",0);
+		long userIdAction = themeDisplay.getUserId();
 		if(moduleId>0)
 		{
 			if(permissionChecker.hasPermission(
@@ -565,7 +581,7 @@ public class LmsActivitiesList extends MVCPortlet {
 				Module.class.getName(), moduleId,
 				ActionKeys.UPDATE))
 			{
-			ModuleLocalServiceUtil.goDownModule(moduleId);
+			ModuleLocalServiceUtil.goDownModule(moduleId,userIdAction);
 			}
 		}
 		
@@ -575,14 +591,14 @@ public class LmsActivitiesList extends MVCPortlet {
 		
 		ThemeDisplay themeDisplay = (ThemeDisplay) actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
 		PermissionChecker permissionChecker=themeDisplay.getPermissionChecker();
-		
+		long userIdAction = themeDisplay.getUserId();
 		long moduleId = ParamUtil.getLong(actionRequest, "pageId"),
 		     prevModId = ParamUtil.getLong(actionRequest, "prevPageId"),
 		     nextModId = ParamUtil.getLong(actionRequest, "nextPageId");
 		
 		if(moduleId>0){
 			if(permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), Module.class.getName(), moduleId, ActionKeys.UPDATE)){
-				ModuleLocalServiceUtil.moveModule(moduleId, prevModId, nextModId);
+				ModuleLocalServiceUtil.moveModule(moduleId, prevModId, nextModId,userIdAction);
 			}
 		}
 		
@@ -643,7 +659,7 @@ public class LmsActivitiesList extends MVCPortlet {
 					ActionKeys.UPDATE)|| permissionChecker.hasOwnerPermission(larn.getCompanyId(), LearningActivity.class.getName(), larn.getActId(),larn.getUserId(),
 							ActionKeys.UPDATE))
 			{
-			LearningActivityLocalServiceUtil.goUpLearningActivity(actId);
+			LearningActivityLocalServiceUtil.goUpLearningActivity(actId, themeDisplay.getUserId());
 			}
 		}
 	}
@@ -664,7 +680,7 @@ public class LmsActivitiesList extends MVCPortlet {
 					ActionKeys.UPDATE)|| permissionChecker.hasOwnerPermission(larn.getCompanyId(), LearningActivity.class.getName(), larn.getActId(),larn.getUserId(),
 							ActionKeys.UPDATE))
 			{
-				LearningActivityLocalServiceUtil.goDownLearningActivity(actId);
+				LearningActivityLocalServiceUtil.goDownLearningActivity(actId, themeDisplay.getUserId());
 			}
 		}
 	}
@@ -683,7 +699,7 @@ public class LmsActivitiesList extends MVCPortlet {
 			
 			if(permissionChecker.hasPermission(larn.getGroupId(), LearningActivity.class.getName(), larn.getActId(), ActionKeys.UPDATE)|| 
 					permissionChecker.hasOwnerPermission(larn.getCompanyId(), LearningActivity.class.getName(), larn.getActId(),larn.getUserId(), ActionKeys.UPDATE)){
-				LearningActivityLocalServiceUtil.moveActivity(actId, prevActId, nextActId);
+				LearningActivityLocalServiceUtil.moveActivity(actId, prevActId, nextActId, themeDisplay.getUserId());
 			}
 		}
 		
@@ -932,6 +948,7 @@ public class LmsActivitiesList extends MVCPortlet {
 	
 	public void deleteURL(ActionRequest actionRequest, ActionResponse actionResponse) throws Exception {
 
+		
 		long actId = ParamUtil.getInteger(actionRequest, "resId");
 		long userId = ParamUtil.getInteger(actionRequest, "userId");
 		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(WebKeys.THEME_DISPLAY);    
@@ -949,12 +966,18 @@ public class LmsActivitiesList extends MVCPortlet {
 			message.put("learningActivity",la);
 			message.put("user",user);
 			message.put("userc",themeDisplay.getUser());
-			MessageBusUtil.sendMessage("liferay/lms/cleanTriesUser", message);
+			message.setResponseId("1111");
+			//message.setResponseDestinationName("liferay/lms/cleanTriesUser");
+			//MessageBusUtil.sendMessage("liferay/lms/cleanTriesUser", message);
+			String resultado = (String)MessageBusUtil.sendSynchronousMessage("liferay/lms/cleanTriesUser", message);
 		}
+		
+		
 		
 		actionResponse.setRenderParameter("resId", String.valueOf(actId));
 		actionResponse.setRenderParameter("userId", String.valueOf(userId));
 		actionResponse.setRenderParameter("califications", String.valueOf(true));
+		
 	}
 
 	public void modactivity(ActionRequest actionRequest, ActionResponse actionResponse)

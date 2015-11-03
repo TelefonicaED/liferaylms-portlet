@@ -16,6 +16,7 @@ import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.messaging.Message;
+import com.liferay.portal.kernel.messaging.MessageBusUtil;
 import com.liferay.portal.kernel.messaging.MessageListener;
 import com.liferay.portal.kernel.messaging.MessageListenerException;
 import com.liferay.portal.model.User;
@@ -40,7 +41,6 @@ public class CleanLearningActivityTriesUser extends CleanLearningActivity implem
 
 		//List<LearningActivityResult> results = LearningActivityResultUtil.findWithDynamicQuery(dq);
 		List<LearningActivityResult> results = LearningActivityResultLocalServiceUtil.dynamicQuery(dq);
-		
 		for(LearningActivityResult result:results){
 			if(log.isDebugEnabled())log.debug(" result : " + result.getActId()+", result: "+result.getUserId() +", passed: "+result.getPassed() );
 
@@ -52,13 +52,15 @@ public class CleanLearningActivityTriesUser extends CleanLearningActivity implem
 			}
 			
 			LearningActivityResultLocalServiceUtil.deleteLearningActivityResult(result);
-			
 		}
 	}
 
 	@Override
 	public void receive(Message message) throws MessageListenerException {
-		
+		Message responseMessage = MessageBusUtil.createResponseMessage(message);
+
+		responseMessage.setPayload("RECEIVED");
+
 		try{
 			this.la = (LearningActivity)message.get("learningActivity");
 			this.user = (User)message.get("user");
@@ -69,6 +71,8 @@ public class CleanLearningActivityTriesUser extends CleanLearningActivity implem
 			if(log.isDebugEnabled())log.debug(" LearningActivity: " + la.getTitle(Locale.getDefault()) + " - " + la.getActId() + " - " +user.getFullName());
 			
 			process();
+			MessageBusUtil.sendMessage(responseMessage.getDestinationName(), responseMessage);
+
 		}catch(Exception e){
 			if(log.isInfoEnabled())log.info(e.getMessage());
 			if(log.isDebugEnabled())e.printStackTrace();

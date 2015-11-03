@@ -110,7 +110,7 @@ Locale loc = response.getLocale();
 		<c:choose>
 		
 			<c:when test="<%= !course.isClosed()  && permissionChecker.hasPermission(course.getGroupCreatedId(),  Course.class.getName(),course.getCourseId(),ActionKeys.VIEW) %>">
-				<a href='<%=themeDisplay.getPortalURL() +"/"+ loc.getLanguage() +"/web/"+ groupsel.getFriendlyURL()%>'><%=course.getTitle(themeDisplay.getLocale()) %></a>
+				<a href='<%=themeDisplay.getPortalURL() +"/"+ loc.getLanguage() +"/web"+ groupsel.getFriendlyURL()%>'><%=course.getTitle(themeDisplay.getLocale()) %></a>
 			</c:when>
 			<c:otherwise>
 				<span class="cclosed"><%=course.getTitle(themeDisplay.getLocale()) %></span>

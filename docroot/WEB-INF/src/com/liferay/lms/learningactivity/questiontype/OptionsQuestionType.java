@@ -132,16 +132,15 @@ public class OptionsQuestionType extends BaseQuestionType {
 		try {
 			TestQuestion question = TestQuestionLocalServiceUtil.fetchTestQuestion(questionId);
 			String formatType = "0";
-			boolean enableorder = false;
+			boolean enableOrder = StringPool.TRUE.equals(PropsUtil.get("lms.learningactivity.testoption.editformat"));
 			if(question.getExtracontent()!=null && !question.getExtracontent().trim().isEmpty()){
 				try{
 					Document xml = SAXReaderUtil.read(question.getExtracontent());
 					Element ele = xml.getRootElement();
 					formatType = (String) ele.element("formattype").getData();
-					enableorder = StringPool.TRUE.equals(LearningActivityLocalServiceUtil.getExtraContentValue(question.getActId(),"enableorder"));
-					if ( enableorder && formatType.equals(PortletProps.get("lms.question.formattype.horizontal")) ){
+					if ( enableOrder && formatType.equals(PropsUtil.get("lms.question.formattype.horizontal")) ){
 						cssclass="in-line ";
-					}else if ( enableorder && formatType.equals(PortletProps.get("lms.question.formattype.combo")) ){
+					}else if ( enableOrder && formatType.equals(PropsUtil.get("lms.question.formattype.combo")) ){
 						isCombo=true;
 					}
 				}catch(DocumentException e){
@@ -155,7 +154,7 @@ public class OptionsQuestionType extends BaseQuestionType {
 			int numAnswer=0;
 			String disabled = "";
 			if (isCombo){
-				answersFeedBack+="<option value=\"\">"+LanguageUtil.get(themeDisplay.getLocale(),"learningactivity.embeddedtest.select")+"</option>";
+				answersFeedBack+="<option class=\"selected\" value=\"\">"+LanguageUtil.get(themeDisplay.getLocale(),"select")+"</option>";
 			}
 			for(TestAnswer answer:testAnswers){
 				if(inputType.equals("checkbox")){

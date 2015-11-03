@@ -1,3 +1,5 @@
+<%@page import="com.liferay.lms.service.LmsPrefsLocalServiceUtil"%>
+<%@page import="com.liferay.lms.model.LmsPrefs"%>
 <%@page import="com.tls.lms.util.LiferaylmsUtil"%>
 <%@page import="com.liferay.lms.model.LearningActivityTry"%>
 <%@page import="com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil"%>
@@ -23,7 +25,6 @@
 	String sco=ParamUtil.getString(request, "sco","");
 	long typeId=ParamUtil.getLong(request, "type");
 	boolean completedAsPassed =ParamUtil.getBoolean(request, "completedAsPassed",false);
-
  LearningActivity learningActivity=null;
 	if(assetId!=0){
 		try{
@@ -126,6 +127,8 @@ if(learningActivity!=null){  %>
 	});
 <% } %>
 
+
+
 function <portlet:namespace />search() {
 	AUI().use('node',function(A) {
 		var backbutton = A.one('#<portlet:namespace/>backButton').one('span').clone();
@@ -144,7 +147,6 @@ function <portlet:namespace />search() {
 }
 	
 function <portlet:namespace />load(source) {
-
 	AUI().use('node','querystring-parse',function(A) {
 		
 		var params=A.QueryString.parse(source.contentWindow.location.search.replace('?',''));
@@ -198,12 +200,23 @@ function <portlet:namespace />load(source) {
 			window.messageHandler=null;
 		}
 		else {
-		    if (source.Document && source.Document.body.scrollHeight) 
-		        source.height = source.contentWindow.document.body.scrollHeight;
-		    else if (source.contentDocument && source.contentDocument.body.scrollHeight) 
-		        source.height = source.contentDocument.body.scrollHeight + 35;
-		    else if (source.contentDocument && source.contentDocument.body.offsetHeight) 
-		        source.height = source.contentDocument.body.offsetHeight + 35;
+			
+			if(navigator.userAgent.indexOf("MSIE")!=-1 || navigator.userAgent.indexOf("Trident")!=-1){
+				if (source.Document && source.Document.body.scrollHeight) 
+			        source.height = source.contentWindow.document.body.scrollHeight;
+			    else if (source.contentDocument && source.contentDocument.body.scrollHeight) 
+			        source.height = source.contentDocument.body.scrollHeight + 75;
+			    else if (source.contentDocument && source.contentDocument.body.offsetHeight) 
+			        source.height = source.contentDocument.body.offsetHeight + 75;
+			}else{
+				  if (source.Document && source.Document.body.scrollHeight) 
+				        source.height = source.contentWindow.document.body.scrollHeight;
+				    else if (source.contentDocument && source.contentDocument.body.scrollHeight) 
+				        source.height = source.contentDocument.body.scrollHeight + 35;
+				    else if (source.contentDocument && source.contentDocument.body.offsetHeight) 
+				        source.height = source.contentDocument.body.offsetHeight + 35;
+			}
+
 		}
 	
 	});
@@ -222,7 +235,11 @@ function <portlet:namespace />back() {
 }
 
 //-->
+
+
+
 </script>
+
 
 <%
 	boolean disabled = true;
@@ -262,6 +279,19 @@ function <portlet:namespace />back() {
 		ignoreRequestValue="true" helpMessage="scormactivity.edit.improve.helpMessage"></aui:input>
 <aui:input type="checkbox" name="completedAsPassed" label="scormactivity.edit.completedAsPassed" checked="<%=completedAsPassed %>" disabled="<%=!edit %>" 
 		 helpMessage="scormactivity.edit.completedAsPassed.helpMessage"></aui:input>
+	<%
+		LmsPrefs lmsPrefs = LmsPrefsLocalServiceUtil.getLmsPrefs(themeDisplay.getCompanyId());
+		boolean isVisibleOptionDebug = lmsPrefs.getDebugScorm();
+		if(isVisibleOptionDebug){
+			
+			//boolean isDebugEnable =ParamUtil.getBoolean(request, "debugScorm",false);
+			boolean isDebugEnable = Boolean.parseBoolean(LearningActivityLocalServiceUtil.getExtraContentValue(learningActivity.getActId(), "scormDebug"));
+
+		%>
+			<aui:input type="checkbox" name="debugScorm" label="debugScorm" checked="<%=isDebugEnable %>"
+					 helpMessage="debugScorm"></aui:input>
+		<%}%> 
+		 
 		
 <div id="<portlet:namespace/>backButton" style="display:none;">
 	<liferay-ui:icon image="back" message="back" url="<%=\"javascript:\"+renderResponse.getNamespace()+\"back();\" %>" label="true"  />

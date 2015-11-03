@@ -556,11 +556,8 @@ else
 	boolean showInscriptionDate = GetterUtil.getBoolean(renderRequest.getPreferences().getValues("showInscriptionDate", new String[]{StringPool.TRUE})[0],true);
 
 	%>
-<liferay-ui:panel-container extended="false"  persistState="false" >
-
-<%System.out.println(showInscriptionDate);
-System.out.println(showMaxUsers);%>
-	<liferay-ui:panel title="lms-inscription-configuration" collapsible="true" defaultState="closed" cssClass="<%=(showInscriptionDate||showMaxUsers)?StringPool.BLANK:\"aui-helper-hidden\" %>">
+<liferay-ui:panel-container extended="false"  persistState="false">
+    <liferay-ui:panel title="lms-inscription-configuration" collapsible="true" defaultState="closed" cssClass="<%=(showInscriptionDate||showMaxUsers)?StringPool.BLANK:\"aui-helper-hidden\" %>">
 		<aui:field-wrapper name="inscriptionDate" label="start-inscription-date" cssClass="<%=(showInscriptionDate)?StringPool.BLANK:\"aui-helper-hidden\" %>">
 			<aui:input type="hidden" name="inscriptionDate"/>
 			<liferay-ui:input-date yearRangeEnd="<%=LiferaylmsUtil.defaultEndYear %>" yearRangeStart="<%=LiferaylmsUtil.defaultStartYear %>"  dayParam="startDay" monthParam="startMon"
@@ -712,6 +709,12 @@ System.out.println(showMaxUsers);%>
 							<dd>
 								<liferay-ui:message key="the-name-of-the-email-recipient" />
 							</dd>
+							<dt>
+								[$USER_SCREENNAME$]
+							</dt>
+							<dd>
+								<liferay-ui:message key="the-user-screen-name" />
+							</dd>
 						</dl>
 					</div>
 				</div>
@@ -793,6 +796,12 @@ System.out.println(showMaxUsers);%>
 							</dt>
 							<dd>
 								<liferay-ui:message key="the-name-of-the-email-recipient" />
+							</dd>
+							<dt>
+								[$USER_SCREENNAME$]
+							</dt>
+							<dd>
+								<liferay-ui:message key="the-user-screen-name" />
 							</dd>
 						</dl>
 					</div>

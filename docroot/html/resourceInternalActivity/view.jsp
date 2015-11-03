@@ -1,3 +1,4 @@
+<%@page import="com.liferay.portal.kernel.portlet.LiferayPortlet"%>
 <%@page import="com.liferay.lms.auditing.AuditConstants"%>
 <%@page import="com.liferay.lms.learningactivity.ResourceInternalLearningActivityType"%>
 <%@page import="com.liferay.lms.auditing.AuditingLogFactory"%>
@@ -75,6 +76,17 @@ else
 				learningTry.setEndDate(new java.util.Date(System.currentTimeMillis()));
 				learningTry.setResult(100);
 				LearningActivityTryLocalServiceUtil.updateLearningActivityTry(learningTry);
+				
+				%>
+				<script type="text/javascript">
+				document.addEventListener( "DOMContentLoaded", function(){
+					Liferay.Portlet.refresh('#p_p_id_activityNavigator_WAR_liferaylmsportlet_');
+				}, false );
+
+				
+				
+				</script>
+				<%
 			}
 		}
 		if(learnact.getExtracontent()!=null &&!learnact.getExtracontent().trim().equals("") )

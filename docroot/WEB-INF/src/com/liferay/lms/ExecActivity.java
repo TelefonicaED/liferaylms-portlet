@@ -55,6 +55,7 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -75,7 +76,6 @@ import com.liferay.portlet.asset.model.AssetRendererFactory;
 import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
 import com.liferay.portlet.asset.service.persistence.AssetEntryQuery;
 import com.liferay.util.bridges.mvc.MVCPortlet;
-import com.liferay.util.portlet.PortletProps;
 
 /**
  * Portlet implementation class ExecActivity
@@ -286,12 +286,13 @@ public class ExecActivity extends MVCPortlet
 	public void editQuestion(ActionRequest actionRequest, ActionResponse actionResponse)
 			throws Exception {
 
+		
 		long questionId = ParamUtil.getLong(actionRequest, "questionId", 0);
 		long actid = ParamUtil.getLong(actionRequest, "resId");
 		long questionType = ParamUtil.getLong(actionRequest, "typeId", -1);
 		String questionText = ParamUtil.get(actionRequest, "text", "");
 		String backUrl = ParamUtil.get(actionRequest, "backUrl", "");
-		String formatType = ParamUtil.getString(actionRequest, "formattype", PortletProps.get("lms.question.formattype.normal")); 
+		String formatType = ParamUtil.getString(actionRequest, "formattype", PropsUtil.get("lms.question.formattype.normal")); 
 		Document document = null;
 		Element rootElement = null;
 		
@@ -363,10 +364,51 @@ public class ExecActivity extends MVCPortlet
 				String[] newAnswersIds = ParamUtil.getParameterValues(actionRequest, "answerId", null);
 				List<Long> editingAnswersIds = new ArrayList<Long>();
 				if(newAnswersIds != null){
+					int counter = 1;
+					int trueCounter = 0;
+					if(question.getQuestionType()==2){
+						trueCounter=1;
+					}
 					for(String newAnswerId:newAnswersIds){
 						String answer = ParamUtil.get(actionRequest, "answer_"+newAnswerId, "");
 						if(Validator.isNotNull(answer)){
-							boolean correct = ParamUtil.getBoolean(actionRequest, "correct_"+newAnswerId);
+							boolean correct = false;
+							if(question.getQuestionType()==1 || question.getQuestionType()==4){
+								if(newAnswerId.startsWith("new")){
+									correct = ParamUtil.getBoolean(actionRequest, "correct_"+newAnswerId.substring(newAnswerId.indexOf("new")+3));
+								}else{
+									correct = ParamUtil.getBoolean(actionRequest, "correct_"+newAnswerId);
+								}
+								
+								
+
+							}else{
+								if(question.getQuestionType()==5 ){
+									correct = true;
+								}else{
+									
+									if(question.getQuestionType()==3){
+										correct = true;
+									}else{
+										correct = ParamUtil.getBoolean(actionRequest, "correct_new");
+										if(ParamUtil.getInteger(actionRequest, "correct_new") == counter){
+											correct = true;
+										}else{
+											correct = false;
+										}
+									
+									}
+								
+									
+										
+									
+									
+								}
+								
+
+							}
+							counter++;
+							if(correct)trueCounter++;
 							String feedbackCorrect = ParamUtil.getString(actionRequest, "feedbackCorrect_"+newAnswerId, "");
 							if(feedbackCorrect.length()>600) feedbackCorrect = feedbackCorrect.substring(0, 600);
 							String feedbackNoCorrect = ParamUtil.getString(actionRequest, "feedbackNoCorrect_"+newAnswerId, "");
@@ -389,6 +431,10 @@ public class ExecActivity extends MVCPortlet
 								Validator.isNotNull(ParamUtil.getString(actionRequest, "feedbackNoCorrect_"+newAnswerId, "")) ||
 								ParamUtil.getBoolean(actionRequest, "correct_"+newAnswerId)==true)
 							SessionErrors.add(actionRequest, "answer-test-required");
+					}
+					if(trueCounter==0){
+						SessionErrors.add(actionRequest, "execativity.test.error");
+						actionResponse.setRenderParameter("message", LanguageUtil.get(themeDisplay.getLocale(), "execactivity.editquestions.newquestion"));
 					}
 				}
 
@@ -497,7 +543,6 @@ public class ExecActivity extends MVCPortlet
 
 		String action = ParamUtil.getString(request, "action");
 		long actId = ParamUtil.getLong(request, "resId",0);
-		System.out.println(action);
 		response.setCharacterEncoding(StringPool.UTF8);
 		try {
 			if(action.equals("exportResultsCsv")){

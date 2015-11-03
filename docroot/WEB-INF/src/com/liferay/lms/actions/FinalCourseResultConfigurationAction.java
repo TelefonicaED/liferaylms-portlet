@@ -34,7 +34,6 @@ public class FinalCourseResultConfigurationAction  implements ConfigurationActio
 	boolean showOnlyWhenFinishDate = 	preferences.getValue("showOnlyWhenFinishDate", "true").equals("true");
 		 */
 		
-		System.out.println("-->"+ParamUtil.getString(actionRequest, "showCalificationMode"));
 
 		
 		portletPreferences.setValue("showCalificationMode",ParamUtil.getString(actionRequest, "showCalificationMode"));

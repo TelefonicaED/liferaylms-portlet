@@ -61,15 +61,35 @@ Liferay.provide(
         '<portlet:namespace />clearText',
         function() {
 			var A = AUI();
-
-			var idDesc = CKEDITOR.instances['<portlet:namespace />description'].document.getBody().getText();
+			
+			if (window.CKEDITOR)
+				var idDesc = CKEDITOR.instances['<portlet:namespace />description'].document.getBody().getText();
+			else
+				var idDesc = A.one("#<portlet:namespace/>description").val();
+			
 			var textReplace = "<%=StringEscapeUtils.unescapeHtml(textCorrection)%>";
 
 			if (idDesc == textReplace) {
-				CKEDITOR.instances.<portlet:namespace />description.setData("");
-				CKEDITOR.instances.<portlet:namespace />description.focus();
+				if (window.CKEDITOR){
+					CKEDITOR.instances.<portlet:namespace />description.setData("");
+					CKEDITOR.instances.<portlet:namespace />description.focus();
+				}else{
+					A.one("#<portlet:namespace />description").set('value',"");
+					A.one("#<portlet:namespace />description").focus();
+				}
+				
 			}
         }
+    );
+    
+Liferay.provide(
+        window,
+        '<portlet:namespace />onChangeDescription',
+        function(val) {
+        	var A = AUI();
+			A.one('#<portlet:namespace />description').set('value',val);
+        },
+        ['node']
     );
     
 Liferay.provide(
@@ -89,8 +109,12 @@ Liferay.provide(
         '<portlet:namespace />checkDataform',
         function() {
 			var A = AUI();
-
-			var descrip = CKEDITOR.instances.<portlet:namespace />description.getData();
+			
+			if(window.CKEDITOR)
+				var descrip = CKEDITOR.instances.<portlet:namespace />description.getData();
+			else
+				var descrip = A.one("#<portlet:namespace/>description").val();
+			
 			var idFile = "#<portlet:namespace />fileName";
 			
 			if(descrip == "" || descrip == "<%=StringEscapeUtils.unescapeHtml(textCorrection)%>"){
@@ -112,7 +136,11 @@ Liferay.provide(
 			var A = AUI();
 			
 			var fileName = A.one("#<portlet:namespace />fileName").val();
-			var descrip = CKEDITOR.instances['<portlet:namespace />description'].document.getBody().getText();
+			
+			if(window.CKEDITOR)
+				var descrip = CKEDITOR.instances['<portlet:namespace />description'].document.getBody().getText();
+			else
+				var descrip = A.one("#<portlet:namespace />description").val();
 			
 			var pos = fileName.lastIndexOf("\\");
 			if (pos > 0) {
@@ -301,13 +329,16 @@ Liferay.provide(
 			</c:if>
 			
 			<aui:field-wrapper label="description" name="description">
-				<liferay-ui:input-editor name="description" width="100%" />
+				<liferay-ui:input-editor name="description" width="100%" onChangeMethod="onChangeDescription"/>
 				<aui:input name="description" type="hidden"/>
 				<script type="text/javascript">
 	    		    function <portlet:namespace />initEditor() {
 		    		    return "<%= UnicodeFormatter.toString(textCorrection) %>"; 
 		    		};
-	    		    AUI().on('domready', function(){CKEDITOR.instances.<portlet:namespace />description.on('focus',<portlet:namespace />clearText);});
+		    		AUI().on('domready', function(){
+	    		    	if(window.CKEDITOR)CKEDITOR.instances.<portlet:namespace />description.on('focus',<portlet:namespace />clearText);
+	    		    	else AUI().one("#<portlet:namespace />description").on('focus',<portlet:namespace />clearText);
+	    		    });
 	    		</script>
 			</aui:field-wrapper>
 			

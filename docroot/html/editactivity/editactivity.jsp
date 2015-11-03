@@ -166,8 +166,11 @@ if(learnact!=null)
 		<portlet:param name="redirect" value="<%=redirect %>" />
 		<portlet:param name="backURL" value="<%=backURL%>" />
 	</portlet:actionURL>
-
 	
+	<portlet:actionURL name="deleteActivityBank" var="deleteActivityBankURL">
+		<portlet:param name="resId" value="<%=Long.toString(learnact.getActId()) %>" />
+		<portlet:param name="redirect" value="<%=redirect %>" />
+	</portlet:actionURL>
 	
 <div class="acticons">
 	<%
@@ -196,7 +199,7 @@ if(learnact!=null)
 					%>
 					<liferay-ui:icon image="edit" message="<%=larntype.getMesageEditDetails()%>" label="true" 
 									 url="<%=urlEdit%>" />
-					<% 
+					<%
 				}
 			}
 		}
@@ -207,10 +210,15 @@ if(learnact!=null)
 			<% 
 			}
 		}
-		if(larntype.hasDeleteTries()) {
+		if(larntype.hasDeleteTries() && isCourse) {
 			%>
 			<liferay-ui:icon-delete label="true" url="<%=deleteMyTriesURL.toString()%>" message="delete-mi-tries" />	
 			<%		
+		}
+		if(larntype.allowsDeleteBank() && !isCourse){
+			%>
+			<liferay-ui:icon-delete label="true" url="<%=deleteActivityBankURL.toString()%>" message="delete" />	
+			<%
 		}
 	%>
 </div>

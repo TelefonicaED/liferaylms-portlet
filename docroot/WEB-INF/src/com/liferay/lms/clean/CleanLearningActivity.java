@@ -54,12 +54,12 @@ public class CleanLearningActivity {
 			if(log.isDebugEnabled())e.printStackTrace();
 		}*/
 		
+		
 		LearningActivityResult res= null;
 		try {
 			res = LearningActivityResultLocalServiceUtil.getByActIdAndUserId(lat.getActId(), lat.getUserId());
 		} catch (SystemException e) {
-			if(log.isInfoEnabled())log.info(e.getMessage());
-			if(log.isDebugEnabled())e.printStackTrace();
+			System.out.println(e.getMessage());
 		}
 		
 
@@ -67,11 +67,10 @@ public class CleanLearningActivity {
 		try {
 			larn = LearningActivityLocalServiceUtil.getLearningActivity(lat.getActId());
 		} catch (PortalException e) {
-			if(log.isInfoEnabled())log.info(e.getMessage());
-			if(log.isDebugEnabled())e.printStackTrace();
+			
+			System.out.println(e.getMessage());
 		} catch (SystemException e) {
-			if(log.isInfoEnabled())log.info(e.getMessage());
-			if(log.isDebugEnabled())e.printStackTrace();
+			System.out.println(e.getMessage());
 		}
 		
 		try {
@@ -92,8 +91,7 @@ public class CleanLearningActivity {
 			try {
 				LearningActivityResultLocalServiceUtil.updateLearningActivityResult(res);
 			} catch (SystemException e) {
-				if(log.isInfoEnabled())log.info(e.getMessage());
-				if(log.isDebugEnabled())e.printStackTrace();
+				System.out.println(e.getMessage());
 			}
 		}
 		

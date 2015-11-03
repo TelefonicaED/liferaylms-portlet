@@ -13,6 +13,7 @@
 <%@ include file="/init.jsp"%>
 
 <%
+	System.out.println("AQUI");
 	long actId = ParamUtil.getLong(request, "resId", 0);
 	LearningActivity learnActivity = LearningActivityLocalServiceUtil.getLearningActivity(actId);
 	

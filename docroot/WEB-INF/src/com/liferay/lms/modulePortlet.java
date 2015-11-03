@@ -278,9 +278,8 @@ public static String SEPARATOR = "_";
 			//System.out.println("Paso por aqui: "+moduleId);
 			String title = module.getTitle();
 			long allowedTime = module.getAllowedTime();	
-				long	hourDuration = allowedTime / 3600;
-			long	minuteDuration = (allowedTime % 3600) / 60;
-			long	secondDuration = allowedTime % 60;
+			long hourDuration = allowedTime / 3600000;
+			long minuteDuration = (allowedTime % 3600000) / 60000;
 			//renderRequest.setAttribute(arg0, arg1);
 			renderRequest.setAttribute("title", title);
 			String description = module.getDescription(themeDisplay.getLocale())+"";
@@ -328,9 +327,8 @@ public static String SEPARATOR = "_";
 					editmoduleURL.setParameter("javax.portlet.action", "updatemodule");
                 }
 				long allowedTime = errormodule.getAllowedTime();	
-				long	hourDuration = allowedTime / 3600;
-			long	minuteDuration = (allowedTime % 3600) / 60;
-			long	secondDuration = allowedTime % 60;
+				long hourDuration = allowedTime / 3600000;
+				long minuteDuration = (allowedTime % 3600000) / 60000;
 				renderRequest.setAttribute("module", errormodule);
 				 renderRequest.setAttribute("startDateDia", formatDia.format(errormodule.getStartDate()));
 	                renderRequest.setAttribute("startDateMes", formatMes.format(errormodule.getStartDate()));
@@ -361,9 +359,8 @@ public static String SEPARATOR = "_";
 				calendar.set(Calendar.MINUTE, 0);
 				blankmodule.setStartDate(calendar.getTime());
 				long allowedTime = blankmodule.getAllowedTime();	
-				long	hourDuration = allowedTime / 3600;
-			long	minuteDuration = (allowedTime % 3600) / 60;
-			long	secondDuration = allowedTime % 60;
+				long hourDuration = allowedTime / 3600000;
+				long minuteDuration = (allowedTime % 3600000) / 60000;
 				renderRequest.setAttribute("startDateDia", formatDia.format(blankmodule.getStartDate()));
 				renderRequest.setAttribute("startDateMes", formatMes.format(blankmodule.getStartDate()));
 				renderRequest.setAttribute("startDateAno", formatAno.format(blankmodule.getStartDate()));
@@ -530,12 +527,13 @@ public static String SEPARATOR = "_";
 	throws Exception {
 
 	ThemeDisplay themeDisplay = (ThemeDisplay) actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
+	long userIdAction = themeDisplay.getUserId();
 	String portletId = PortalUtil.getPortletId(actionRequest);
 	long moduleId = ParamUtil.getLong(actionRequest, "resourcePrimKey",0);
 	
 	if(moduleId>0)
 	{
-		com.liferay.lms.service.ModuleLocalServiceUtil.goUpModule(moduleId);
+		com.liferay.lms.service.ModuleLocalServiceUtil.goUpModule(moduleId,userIdAction);
 	}
 	
 }
@@ -544,11 +542,12 @@ public static String SEPARATOR = "_";
 
 	ThemeDisplay themeDisplay = (ThemeDisplay) actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
 	String portletId = PortalUtil.getPortletId(actionRequest);
+	long userIdAction = themeDisplay.getUserId();
 	long moduleId = ParamUtil.getLong(actionRequest, "resourcePrimKey",0);
 	
 	if(moduleId>0)
 	{
-		com.liferay.lms.service.ModuleLocalServiceUtil.goDownModule(moduleId);
+		com.liferay.lms.service.ModuleLocalServiceUtil.goDownModule(moduleId,userIdAction);
 	}
 	
 }
@@ -741,10 +740,10 @@ public static String SEPARATOR = "_";
         int startDateDia = ParamUtil.getInteger(request, "startDateDia");
         int startDateHora = ParamUtil.getInteger(request, "startDateHora");
         int startDateMinuto = ParamUtil.getInteger(request, "startDateMinuto");
+        long precedence=ParamUtil.getLong(request, "precedence");
         long allowedDateHora = ParamUtil.getLong(request, "allowedDateHora",0);
         long allowedDateMinuto = ParamUtil.getLong(request, "allowedDateMinuto",0);
-        long precedence=ParamUtil.getLong(request, "precedence");
-        module.setAllowedTime(allowedDateHora*3600+allowedDateMinuto*60);
+        module.setAllowedTime((allowedDateHora*3600000+allowedDateMinuto*60000));
         Calendar calendar = Calendar.getInstance(themeDisplay.getTimeZone());
         calendar.set(startDateAno, startDateMes, startDateDia);
         calendar.set(Calendar.HOUR_OF_DAY,startDateHora);

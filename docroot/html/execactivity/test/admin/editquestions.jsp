@@ -100,7 +100,7 @@ Liferay.provide(
 		if (course==null){
 			isCourse = false;
 		}
-		boolean isBank = StringPool.TRUE.equals(LearningActivityLocalServiceUtil.getExtraContentValue(learningActivity.getActId(),"isBank"));
+		boolean useBank = StringPool.TRUE.equals(LearningActivityLocalServiceUtil.getExtraContentValue(learningActivity.getActId(),"isBank"));
 		boolean isMultiple = StringPool.TRUE.equals(LearningActivityLocalServiceUtil.getExtraContentValue(learningActivity.getActId(),"isMultiple"));
 		String CategoryIds = LearningActivityLocalServiceUtil.getExtraContentValue(learningActivity.getActId(),"categoriesId");
 		long searchGroupId = themeDisplay.getCompanyGroupId();
@@ -110,10 +110,10 @@ Liferay.provide(
 	%>
 	<c:if test="<%=isCourse%>">
 		<aui:select id="banks-support" name="banks-support" label="execativity.editquestions.banksquestions" onChange="modifyIsBank(this.value)">
-			<aui:option value="false" selected="<%=!isBank %>"><liferay-ui:message key='editactivity.mandatory.no'/></aui:option>
-			<aui:option value="true" selected="<%=isBank %>"><liferay-ui:message key='editactivity.mandatory.yes'/></aui:option>
+			<aui:option value="false" selected="<%=!useBank %>"><liferay-ui:message key='editactivity.mandatory.no'/></aui:option>
+			<aui:option value="true" selected="<%=useBank %>"><liferay-ui:message key='editactivity.mandatory.yes'/></aui:option>
 		</aui:select>
-		<c:if test="<%=isBank%>">
+		<c:if test="<%=useBank%>">
 			<script>
 				AUI().ready(function(A) {
 					A.all('#<portlet:namespace />normal-questions').hide();

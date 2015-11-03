@@ -28,6 +28,10 @@ public abstract class BaseLearningActivityType implements LearningActivityType, 
 	public boolean allowsBank() {
 		return false;
 	}
+	@Override
+	public boolean allowsDeleteBank(){
+		return true;
+	}
 
 	@Override
 	public boolean isDone(LearningActivity learningActivity, long userId)throws SystemException, PortalException {

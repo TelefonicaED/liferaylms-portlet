@@ -24,7 +24,7 @@
 	long typeId = ParamUtil.getLong(request,"typeId", -1);
 	long actId = ParamUtil.getLong(request,"resId", 0);
 	String backUrl = ParamUtil.getString(request, "backUrl", currentURL);
-	String formatType = PortletProps.get("lms.question.formattype.normal");
+	String formatType = PropsUtil.get("lms.question.formattype.normal");
 	
 	LearningActivity learningActivity = LearningActivityLocalServiceUtil.getLearningActivity(actId);
 	request.setAttribute("activity", learningActivity);
@@ -83,28 +83,28 @@
 	</script>
     
 	<%	
-    	boolean enableOrder = StringPool.TRUE.equals(LearningActivityLocalServiceUtil.getExtraContentValue(learningActivity.getActId(),"enableorder"));
+		boolean enableOrder = StringPool.TRUE.equals(PropsUtil.get("lms.learningactivity.testoption.editformat"));
 		if(qt.isInline()){
 			try{
 				Document document = SAXReaderUtil.read(question.getExtracontent());
 				Element rootElement = document.getRootElement();
 				formatType = (String) rootElement.element("formattype").getData();
 			}catch(NullPointerException e){
-				formatType = PortletProps.get("lms.question.formattype.normal");
+				formatType = PropsUtil.get("lms.question.formattype.normal");
 			}catch(DocumentException e){
-				formatType = PortletProps.get("lms.question.formattype.normal");
+				formatType = PropsUtil.get("lms.question.formattype.normal");
 			}
 	%>
 			<c:choose>
 				<c:when test="<%=enableOrder%>">
 					<aui:select name="formattype" label="exectactivity.editquestions.formattype" helpMessage="exectactivity.editquestions.formattype.helpMessage"> 
-						<aui:option selected="<%=formatType.equals(PortletProps.get(\"lms.question.formattype.normal\")) %>" value="<%=PortletProps.get(\"lms.question.formattype.normal\")%>">
+						<aui:option selected="<%=formatType.equals(PropsUtil.get(\"lms.question.formattype.normal\")) %>" value="<%=PropsUtil.get(\"lms.question.formattype.normal\")%>">
 							<liferay-ui:message key="exectactivity.editquestions.formattype.vertical" />
 						</aui:option>
-						<aui:option selected="<%=formatType.equals(PortletProps.get(\"lms.question.formattype.horizontal\")) %>" value="<%=PortletProps.get(\"lms.question.formattype.horizontal\") %>">
+						<aui:option selected="<%=formatType.equals(PropsUtil.get(\"lms.question.formattype.horizontal\")) %>" value="<%=PropsUtil.get(\"lms.question.formattype.horizontal\") %>">
 							<liferay-ui:message key="exectactivity.editquestions.formattype.horizontal" />
 						</aui:option>
-						<aui:option selected="<%=formatType.equals(PortletProps.get(\"lms.question.formattype.combo\")) %>" value="<%=PortletProps.get(\"lms.question.formattype.combo\") %>">
+						<aui:option selected="<%=formatType.equals(PropsUtil.get(\"lms.question.formattype.combo\")) %>" value="<%=PropsUtil.get(\"lms.question.formattype.combo\") %>">
 							<liferay-ui:message key="exectactivity.editquestions.formattype.combo" />
 						</aui:option>
 					</aui:select>
@@ -168,7 +168,7 @@
 	 				if(parent!=null) parent.append(A.Node.create('<div id="testAnswer_new'+iter+'"></div>').plug(A.Plugin.IO,{
 	 					uri:'<%=viewAnswerURL%>',
 	 					parseContent:true,
-	 					data:{iterator:iter}
+	 					data:{iterator:iter,typeId:<%=typeId%>}
 	 				}));
 	  			}
 	 		);
@@ -183,7 +183,7 @@
 	 					if(parent!=null) parent.append(A.Node.create(itemList[0]).plug(A.Plugin.IO,{
 		 					uri:'<%=viewAnswerURL%>',
 		 					parseContent:true,
-		 					data:{iterator:iter},
+		 					data:{iterator:iter,typeId:<%=typeId%>},
 		 					on: {
 		 						success: function() {
 		 							<portlet:namespace />addNodes(itemList, iter+1);
@@ -240,7 +240,7 @@
 	 				var numNodes = list.size();
 	 				var defaultNodesNo = parseInt(<%=defaultAnswersNo%>);
 	 				if(numNodes < defaultNodesNo){
-	 					
+	 				
 		 				var list = A.all('.solution > div'),lastNode=null;
 		 				var iter = 1;
 		 				
@@ -269,6 +269,7 @@
 		 function validateFields(e){
 		    	AUI().use('node',
 		    		function(A) {
+		    		var typeId=<%=typeId%>;
 			    		var valid = true;
 			    		//todas las respuestas plegadas
 			    		var panels = A.all('[id^=panel_]');
@@ -287,22 +288,88 @@
 			    		
 			    		//Ninguna respuesta vacía
 			    		var list = A.all('.solution > div');
+			    		var trueCounter = 0;
+			    		var index = 1;
 			    		list.each(function() {
 			    			var id = this.get('id');
 			    			id=id.replace('testAnswer_','');
-			    			
+			    			if(typeId==1 || typeId==4)id=id.replace('new','');
+
 			    			feedbackCorrect = A.one('input[name=<portlet:namespace />feedbackCorrect_'+id+']');
 			    			feedbackNoCorrect = A.one('input[name=<portlet:namespace />feedbackNoCorrect_'+id+']');
-			    			correct = A.one('input[name=<portlet:namespace />correct_'+id+'Checkbox]');
-			    			correctVal = (correct != null && correct._node.checked);
-			    			if (correct == null) {
-			    				correct = A.one('input[name=<portlet:namespace />correct_'+id+']');
-			    				correctVal = (correct != null && correct.val() === 'true');
+			    			
+			    			
+			    			switch(typeId){
+			    				
+			    			case 0:
+			    				var radioChecked = (A.one('input[name=<portlet:namespace/>correct_new]:checked'));
+	    						if(radioChecked==null){
+	    							valid = false;
+	    							correctVal = false;
+	    						}	else{
+	    							trueCounter++;
+	    							correctVal = true;
+	    						}
+			    			break;
+			    			
+			    				case 1:
+			    				
+			    					correct = A.one('input[name=<portlet:namespace />correct_'+id+'Checkbox]');
+				    				correctVal = (correct != null && correct._node.checked);
+				    				if(correctVal==='true')trueCounter++;
+				    				if (correct == null) {
+				    					correct =document.getElementById('input[name=<portlet:namespace />correct_'+id+']');
+				    					correctVal = (correct != null && correct.val() === 'true');
+				    				}
+			    				break;
+			    				
+			    				case 2:
+			    					valid = true;
+		    						correctVal = false;
+		    						trueCounter++;
+			    				break;
+			    				
+			    				case 3:
+			    					valid = true;
+		    						correctVal = true;
+		    						trueCounter++;
+			    				
+			    				
+			    				break;
+			    				
+			    				
+			    				
+			    				
+			    				case 5:
+			    					valid = true;
+		    						correctVal = false;
+		    						trueCounter++;
+			    				break;
+			    			
+			    				default:
+			    					console.log(id);
+			    					correct = A.one('input[name=<portlet:namespace />correct_'+id+'Checkbox]');
+			    				console.log(correct)
+			    				correctVal = (correct != null && correct._node.checked);
+			    				console.log(correctVal);
+			    				if(correctVal==true)trueCounter++;
+			    				if (correct == null) {
+			    					correct =document.getElementById('input[name=<portlet:namespace />correct_'+id+']');
+			    					correctVal = (correct != null && correct.val() === 'true');
+			    				}
+		    				
+		    					break;
+			    			
 			    			}
-
+			    			
+			    			
+			    			
+			    			
+			    			
 			    			var otherFieldsWithValue = (feedbackCorrect != null && feedbackCorrect.val() !="") || 
 			    										(feedbackNoCorrect != null && feedbackNoCorrect.val() != "") || 
 			    										(correctVal);
+			    			
 			    			if(otherFieldsWithValue){
 			    				answer = A.one('textarea[name=<portlet:namespace />answer_'+id+']');
 				    			if (answer != null && answer.val() == "") {
@@ -313,10 +380,13 @@
 									A.one('#<portlet:namespace />answerError_'+id).addClass('aui-helper-hidden');
 								}
 			    			}
+			    			
 			    		});
+		    			if(trueCounter==0)valid = false;
+			    		
 			    		
 			    		//Ningun feedback > 300 caracteres
-			    		if(valid){
+			    		if(valid && typeId!=5){
 				    		list.each(function() {
 				    			var id = this.get('id');
 				    			id=id.replace('testAnswer_','');
@@ -339,6 +409,7 @@
 			    		if (!valid && e.preventDefault) {
 							e.preventDefault();
 						}
+			    		
 				    	return valid;
 		    		}
 		    	);
@@ -353,8 +424,9 @@
 	</script>
 
 	<%
-	if(learningActivity.getTypeId()!=4){
-	%>
+	if(learningActivity.getTypeId()!=4){ %>
+	
+
 		<aui:field-wrapper label="answers" helpMessage="<%=qt.getDescription(themeDisplay.getLocale()) %>" /><%
 	 } 
 	%>

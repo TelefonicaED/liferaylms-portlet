@@ -14,18 +14,25 @@ import javax.portlet.ResourceResponse;
 
 import au.com.bytecode.opencsv.CSVWriter;
 
+import com.liferay.lms.model.Course;
 import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.model.LearningActivityResult;
 import com.liferay.lms.model.LearningActivityTry;
+import com.liferay.lms.model.LmsPrefs;
 import com.liferay.lms.model.Module;
+import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityResultLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityServiceUtil;
 import com.liferay.lms.service.LearningActivityTryLocalServiceUtil;
+import com.liferay.lms.service.LmsPrefsLocalServiceUtil;
 import com.liferay.lms.service.ModuleLocalServiceUtil;
+import com.liferay.lms.service.impl.CourseServiceImpl;
+import com.liferay.portal.kernel.dao.orm.CustomSQLParam;
 import com.liferay.portal.kernel.exception.NestableException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.servlet.HttpHeaders;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.SessionMessages;
@@ -37,10 +44,13 @@ import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.model.Team;
 import com.liferay.portal.model.User;
+import com.liferay.portal.service.RoleLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.TeamLocalServiceUtil;
 import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.theme.ThemeDisplay;
+import com.liferay.portal.util.comparator.UserFirstNameComparator;
+import com.liferay.portal.util.comparator.UserLastNameComparator;
 import com.liferay.util.bridges.mvc.MVCPortlet;
 
 /**
@@ -85,35 +95,61 @@ public class GradeBook extends MVCPortlet {
 		        //M�dulo
 		        writer.writeNext(new String[]{module.getTitle(themeDisplay.getLocale())});
 		        
-		        String[] cabeceras = new String[learningActivities.size()+2];
+		        String[] cabeceras = new String[learningActivities.size()+4];
 		        
-		        int column=2;
-		        cabeceras[0]="User";
-		        cabeceras[1]="Email";
+		        int column=4;
+		        cabeceras[0]=LanguageUtil.get(themeDisplay.getLocale(),"user-name");
+		        cabeceras[1]=LanguageUtil.get(themeDisplay.getLocale(),"last-name");
+		        cabeceras[2]=LanguageUtil.get(themeDisplay.getLocale(),"user-id");
+		        cabeceras[3]=LanguageUtil.get(themeDisplay.getLocale(),"email");
+		        
 		        for(LearningActivity learningActivity:learningActivities){
 		        	cabeceras[column++]=learningActivity.getTitle(themeDisplay.getLocale());
 		        }
 		        		    
 		        writer.writeNext(cabeceras);
 		        List<User> usus=null;
-				if(theTeam==null)
+				LmsPrefs prefs=LmsPrefsLocalServiceUtil.getLmsPrefs(themeDisplay.getCompanyId());
+
+				LinkedHashMap userParams = new LinkedHashMap();
+
+				
+				Course course = CourseLocalServiceUtil.getCourseByGroupCreatedId(module.getGroupId());
+				
+				if(theTeam!=null)
 				{
-					usus = UserLocalServiceUtil.getGroupUsers(themeDisplay.getScopeGroupId());
-				}
-				else
-				{
-					LinkedHashMap userParams = new LinkedHashMap();
 					userParams.put("usersGroups", theTeam.getGroupId());
 					userParams.put("usersTeams", theTeam.getTeamId());
-					OrderByComparator obc = null;
-					usus  = UserLocalServiceUtil.search(themeDisplay.getCompanyId(), "", 0, userParams, 0, 1000, obc);	
 				}
+				
+				userParams.put("usersGroups", course.getGroupCreatedId());
+					
+					userParams.put("notInCourseRoleTeach", new CustomSQLParam("WHERE User_.userId NOT IN "
+				              + " (SELECT UserGroupRole.userId " + "  FROM UserGroupRole "
+				              + "  WHERE  (UserGroupRole.groupId = ?) AND (UserGroupRole.roleId = ?))", new Long[] {
+				            		  course.getGroupCreatedId(),
+				              RoleLocalServiceUtil.getRole(prefs.getTeacherRole()).getRoleId() }));
+				           
+
+
+				       	userParams.put("notInCourseRoleEdit", new CustomSQLParam("WHERE User_.userId NOT IN "
+				              + " (SELECT UserGroupRole.userId " + "  FROM UserGroupRole "
+				              + "  WHERE  (UserGroupRole.groupId = ?) AND (UserGroupRole.roleId = ?))", new Long[] {
+				              course.getGroupCreatedId(),
+				              RoleLocalServiceUtil.getRole(prefs.getEditorRole()).getRoleId() }));
+
+					OrderByComparator obc = new UserFirstNameComparator(true);
+					usus  = UserLocalServiceUtil.search(themeDisplay.getCompanyId(), "", 0, userParams, 0, 5000, obc);	
+				
 		        for(User usuario:usus){
-		        	String[] resultados = new String[learningActivities.size()+2];
+		        	String[] resultados = new String[learningActivities.size()+4];
 		        	
-		        	column=2;
-		        	resultados[0]=usuario.getFullName()+"("+usuario.getUserId()+")";
-		        	resultados[1]=usuario.getEmailAddress();
+		        	column=4;
+		        	resultados[0]=usuario.getFirstName();
+		        	resultados[1]=usuario.getLastName();
+		        	
+		        	resultados[2]=String.valueOf(usuario.getUserId());
+		        	resultados[3]=usuario.getEmailAddress();
 		        	
 
 			        for(LearningActivity learningActivity:learningActivities){
