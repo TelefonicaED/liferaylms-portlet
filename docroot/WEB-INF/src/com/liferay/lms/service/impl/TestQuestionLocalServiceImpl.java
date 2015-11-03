@@ -333,8 +333,9 @@ public class TestQuestionLocalServiceImpl
 			
 			entryQuery.setAllCategoryIds(assetCategoryIds);
 			entryQuery.setClassTypeIds(classTypeIds);
+			entryQuery.setVisible(true);
 			banks.addAll(AssetEntryLocalServiceUtil.getEntries(entryQuery));
-			
+
 			if(!Validator.equals(banks.size(), 0)){
 				if (isMultiple){
 					for (AssetEntry bank : banks){
