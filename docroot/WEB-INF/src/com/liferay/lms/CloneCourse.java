@@ -99,6 +99,8 @@ public class CloneCourse implements MessageListener {
 	Date endDate;
 	
 	private String cloneTraceStr = "--------------- Clone course trace ----------------"; 
+
+	private Boolean childCourse; 
 		
 	public CloneCourse(long groupId, String newCourseName, ThemeDisplay themeDisplay, Date startDate, Date endDate, ServiceContext serviceContext) {
 		super();
@@ -129,7 +131,8 @@ public class CloneCourse implements MessageListener {
 			
 			this.serviceContext = (ServiceContext)message.get("serviceContext");
 			this.themeDisplay = (ThemeDisplay)message.get("themeDisplay");
-		
+		    this.childCourse =(Boolean)message.get("childCourse");
+		   
 			Role adminRole = RoleLocalServiceUtil.getRole(themeDisplay.getCompanyId(),"Administrator");
 			List<User> adminUsers = UserLocalServiceUtil.getRoleUsers(adminRole.getRoleId());
 			 
@@ -223,7 +226,12 @@ public class CloneCourse implements MessageListener {
 		
 		Group newGroup = GroupLocalServiceUtil.getGroup(newCourse.getGroupCreatedId());
 		serviceContext.setScopeGroupId(newCourse.getGroupCreatedId());
-		
+		if(this.childCourse)
+		{
+			System.out.println("hijo de:"+Long.toString(course.getCourseId()));
+			newCourse.setParentCourseId(course.getCourseId());
+			CourseLocalServiceUtil.setVisible(newCourse.getCourseId(), false);
+		}
 		Role siteMemberRole = RoleLocalServiceUtil.getRole(themeDisplay.getCompanyId(), RoleConstants.SITE_MEMBER);
 		
 		newCourse.setIcon(course.getIcon());

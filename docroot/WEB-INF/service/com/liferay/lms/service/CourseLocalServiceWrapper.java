@@ -332,6 +332,17 @@ public class CourseLocalServiceWrapper implements CourseLocalService,
 		return _courseLocalService.getPublicCoursesByCompanyId(companyId);
 	}
 
+	public java.util.List<com.liferay.lms.model.Course> getPublicCoursesByCompanyId(
+		java.lang.Long companyId, int limit) {
+		return _courseLocalService.getPublicCoursesByCompanyId(companyId, limit);
+	}
+
+	public java.util.List<com.liferay.lms.model.Course> getPublicCoursesByCompanyId(
+		java.lang.Long companyId, int start, int end) {
+		return _courseLocalService.getPublicCoursesByCompanyId(companyId,
+			start, end);
+	}
+
 	public com.liferay.lms.model.Course addCourse(java.lang.String title,
 		java.lang.String description, java.lang.String summary,
 		java.lang.String friendlyURL, java.util.Locale locale,

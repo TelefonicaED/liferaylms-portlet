@@ -145,6 +145,10 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 		return addCourse(title, description, summary, friendlyURL, locale, createDate, startDate, endDate, layoutSetPrototypeId, typesite, 0, calificationType, maxUsers, serviceContext,isFromClone);
 	}
 	
+	public java.util.List<Course> getChildCourses(long courseId) throws SystemException
+	{
+		return coursePersistence.findByParentCourseId(courseId);
+	}
 	public java.util.List<Course> getUserCourses(long userId) throws PortalException, SystemException
 	{
 		User usuario= userLocalService.getUser(userId);
@@ -629,11 +633,11 @@ public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int e
 			if(courseEval!=null) {
 				courseEval.setExtraContent(course, Constants.UPDATE, serviceContext);
 			}
-
+            AssetEntry previousEntry=assetEntryLocalService.getEntry(Course.class.getName(), course.getCourseId());
 			AssetEntry assetEntry=assetEntryLocalService.updateEntry(
 					userId, course.getGroupId(), Course.class.getName(),
 					course.getCourseId(), course.getUuid(),0, serviceContext.getAssetCategoryIds(),
-					serviceContext.getAssetTagNames(), true, null, null,
+					serviceContext.getAssetTagNames(), previousEntry.getVisible(), null, null,
 					new java.util.Date(System.currentTimeMillis()), null,
 					ContentTypes.TEXT_HTML, course.getTitle(), course.getDescription(locale), summary, null, null, 0, 0,
 					null, false);

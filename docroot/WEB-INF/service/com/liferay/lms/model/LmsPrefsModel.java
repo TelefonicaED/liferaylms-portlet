@@ -173,6 +173,27 @@ public interface LmsPrefsModel extends BaseModel<LmsPrefs> {
 	 */
 	public void setUsersResults(long usersResults);
 
+	/**
+	 * Returns the debug scorm of this lms prefs.
+	 *
+	 * @return the debug scorm of this lms prefs
+	 */
+	public boolean getDebugScorm();
+
+	/**
+	 * Returns <code>true</code> if this lms prefs is debug scorm.
+	 *
+	 * @return <code>true</code> if this lms prefs is debug scorm; <code>false</code> otherwise
+	 */
+	public boolean isDebugScorm();
+
+	/**
+	 * Sets whether this lms prefs is debug scorm.
+	 *
+	 * @param debugScorm the debug scorm of this lms prefs
+	 */
+	public void setDebugScorm(boolean debugScorm);
+
 	public boolean isNew();
 
 	public void setNew(boolean n);

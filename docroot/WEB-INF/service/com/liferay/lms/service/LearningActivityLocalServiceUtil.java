@@ -423,19 +423,20 @@ public class LearningActivityLocalServiceUtil {
 		return getService().getPreviusLearningActivity(larn);
 	}
 
-	public static void goUpLearningActivity(long actId)
+	public static void goUpLearningActivity(long actId, long userIdAction)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		getService().goUpLearningActivity(actId);
+		getService().goUpLearningActivity(actId, userIdAction);
 	}
 
-	public static void goDownLearningActivity(long actId)
+	public static void goDownLearningActivity(long actId, long userIdAction)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		getService().goDownLearningActivity(actId);
+		getService().goDownLearningActivity(actId, userIdAction);
 	}
 
-	public static void moveActivity(long actId, long previusAct, long nextAct)
+	public static void moveActivity(long actId, long previusAct, long nextAct,
+		long userIdAction)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		getService().moveActivity(actId, previusAct, nextAct);
+		getService().moveActivity(actId, previusAct, nextAct, userIdAction);
 	}
 
 	public static com.liferay.lms.model.LearningActivity getNextLearningActivity(

@@ -217,21 +217,29 @@ public class ModuleLocalServiceClpInvoker {
 
 		_methodParameterTypes162 = new String[] { "long", "long" };
 
-		_methodName163 = "isLocked";
+		_methodName163 = "isUserFinished";
 
 		_methodParameterTypes163 = new String[] { "long", "long" };
 
-		_methodName164 = "countByGroupId";
+		_methodName164 = "userTimeFinished";
 
-		_methodParameterTypes164 = new String[] { "long" };
+		_methodParameterTypes164 = new String[] { "long", "long" };
 
-		_methodName165 = "usersStarted";
+		_methodName165 = "isLocked";
 
-		_methodParameterTypes165 = new String[] { "long" };
+		_methodParameterTypes165 = new String[] { "long", "long" };
 
-		_methodName166 = "modulesUserPassed";
+		_methodName166 = "countByGroupId";
 
-		_methodParameterTypes166 = new String[] { "long", "long" };
+		_methodParameterTypes166 = new String[] { "long" };
+
+		_methodName167 = "usersStarted";
+
+		_methodParameterTypes167 = new String[] { "long" };
+
+		_methodName168 = "modulesUserPassed";
+
+		_methodParameterTypes168 = new String[] { "long", "long" };
 	}
 
 	public Object invokeMethod(String name, String[] parameterTypes,
@@ -480,22 +488,34 @@ public class ModuleLocalServiceClpInvoker {
 
 		if (_methodName163.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes163, parameterTypes)) {
-			return ModuleLocalServiceUtil.isLocked(((Long)arguments[0]).longValue(),
+			return ModuleLocalServiceUtil.isUserFinished(((Long)arguments[0]).longValue(),
 				((Long)arguments[1]).longValue());
 		}
 
 		if (_methodName164.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes164, parameterTypes)) {
-			return ModuleLocalServiceUtil.countByGroupId(((Long)arguments[0]).longValue());
+			return ModuleLocalServiceUtil.userTimeFinished(((Long)arguments[0]).longValue(),
+				((Long)arguments[1]).longValue());
 		}
 
 		if (_methodName165.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes165, parameterTypes)) {
-			return ModuleLocalServiceUtil.usersStarted(((Long)arguments[0]).longValue());
+			return ModuleLocalServiceUtil.isLocked(((Long)arguments[0]).longValue(),
+				((Long)arguments[1]).longValue());
 		}
 
 		if (_methodName166.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes166, parameterTypes)) {
+			return ModuleLocalServiceUtil.countByGroupId(((Long)arguments[0]).longValue());
+		}
+
+		if (_methodName167.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes167, parameterTypes)) {
+			return ModuleLocalServiceUtil.usersStarted(((Long)arguments[0]).longValue());
+		}
+
+		if (_methodName168.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes168, parameterTypes)) {
 			return ModuleLocalServiceUtil.modulesUserPassed(((Long)arguments[0]).longValue(),
 				((Long)arguments[1]).longValue());
 		}
@@ -593,4 +613,8 @@ public class ModuleLocalServiceClpInvoker {
 	private String[] _methodParameterTypes165;
 	private String _methodName166;
 	private String[] _methodParameterTypes166;
+	private String _methodName167;
+	private String[] _methodParameterTypes167;
+	private String _methodName168;
+	private String[] _methodParameterTypes168;
 }

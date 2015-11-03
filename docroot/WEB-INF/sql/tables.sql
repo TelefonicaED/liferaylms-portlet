@@ -113,8 +113,8 @@ create table Lms_LearningActivity (
 	priority LONG,
 	moduleId LONG,
 	extracontent TEXT null,
-	feedbackCorrect VARCHAR(75) null,
-	feedbackNoCorrect VARCHAR(75) null,
+	feedbackCorrect VARCHAR(1000) null,
+	feedbackNoCorrect VARCHAR(1000) null,
 	weightinmodule LONG,
 	commentsActivated BOOLEAN
 );
@@ -154,7 +154,8 @@ create table Lms_LmsPrefs (
 	activities VARCHAR(75) null,
 	courseevals VARCHAR(75) null,
 	scoretranslators VARCHAR(75) null,
-	usersResults LONG
+	usersResults LONG,
+	debugScorm BOOLEAN
 );
 
 create table Lms_Module (

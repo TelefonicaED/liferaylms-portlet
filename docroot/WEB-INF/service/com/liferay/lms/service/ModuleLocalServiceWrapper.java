@@ -354,19 +354,20 @@ public class ModuleLocalServiceWrapper implements ModuleLocalService,
 		return _moduleLocalService.getNextModule(theModule);
 	}
 
-	public void goUpModule(long moduleId)
+	public void goUpModule(long moduleId, long userIdAction)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		_moduleLocalService.goUpModule(moduleId);
+		_moduleLocalService.goUpModule(moduleId, userIdAction);
 	}
 
-	public void goDownModule(long moduleId)
+	public void goDownModule(long moduleId, long userIdAction)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		_moduleLocalService.goDownModule(moduleId);
+		_moduleLocalService.goDownModule(moduleId, userIdAction);
 	}
 
-	public void moveModule(long modId, long previusMod, long nextMod)
+	public void moveModule(long modId, long previusMod, long nextMod,
+		long userIdAction)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		_moduleLocalService.moveModule(modId, previusMod, nextMod);
+		_moduleLocalService.moveModule(modId, previusMod, nextMod, userIdAction);
 	}
 
 	public com.liferay.lms.model.Module addmodule(
@@ -384,14 +385,32 @@ public class ModuleLocalServiceWrapper implements ModuleLocalService,
 			title, description, startDate, endDate, ordern);
 	}
 
-	public void remove(com.liferay.lms.model.Module fileobj)
+	public void remove(com.liferay.lms.model.Module fileobj, long userIdAction)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		_moduleLocalService.remove(fileobj);
+		_moduleLocalService.remove(fileobj, userIdAction);
+	}
+
+	public com.liferay.lms.model.Module updateModule(
+		com.liferay.lms.model.Module module, long userIdAction)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _moduleLocalService.updateModule(module, userIdAction);
 	}
 
 	public boolean isUserPassed(long moduleId, long userId)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _moduleLocalService.isUserPassed(moduleId, userId);
+	}
+
+	public boolean isUserFinished(long moduleId, long userId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _moduleLocalService.isUserFinished(moduleId, userId);
+	}
+
+	public boolean userTimeFinished(long moduleId, long userId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _moduleLocalService.userTimeFinished(moduleId, userId);
 	}
 
 	public boolean isLocked(long moduleId, long userId)

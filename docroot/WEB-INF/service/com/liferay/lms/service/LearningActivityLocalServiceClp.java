@@ -216,15 +216,15 @@ public class LearningActivityLocalServiceClp
 
 		_methodName37 = "goUpLearningActivity";
 
-		_methodParameterTypes37 = new String[] { "long" };
+		_methodParameterTypes37 = new String[] { "long", "long" };
 
 		_methodName38 = "goDownLearningActivity";
 
-		_methodParameterTypes38 = new String[] { "long" };
+		_methodParameterTypes38 = new String[] { "long", "long" };
 
 		_methodName39 = "moveActivity";
 
-		_methodParameterTypes39 = new String[] { "long", "long", "long" };
+		_methodParameterTypes39 = new String[] { "long", "long", "long", "long" };
 
 		_methodName40 = "getNextLearningActivity";
 
@@ -1497,11 +1497,11 @@ public class LearningActivityLocalServiceClp
 		return (com.liferay.lms.model.LearningActivity)ClpSerializer.translateOutput(returnObj);
 	}
 
-	public void goUpLearningActivity(long actId)
+	public void goUpLearningActivity(long actId, long userIdAction)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		try {
 			_invokableLocalService.invokeMethod(_methodName37,
-				_methodParameterTypes37, new Object[] { actId });
+				_methodParameterTypes37, new Object[] { actId, userIdAction });
 		}
 		catch (Throwable t) {
 			t = ClpSerializer.translateThrowable(t);
@@ -1520,11 +1520,11 @@ public class LearningActivityLocalServiceClp
 		}
 	}
 
-	public void goDownLearningActivity(long actId)
+	public void goDownLearningActivity(long actId, long userIdAction)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		try {
 			_invokableLocalService.invokeMethod(_methodName38,
-				_methodParameterTypes38, new Object[] { actId });
+				_methodParameterTypes38, new Object[] { actId, userIdAction });
 		}
 		catch (Throwable t) {
 			t = ClpSerializer.translateThrowable(t);
@@ -1543,12 +1543,13 @@ public class LearningActivityLocalServiceClp
 		}
 	}
 
-	public void moveActivity(long actId, long previusAct, long nextAct)
+	public void moveActivity(long actId, long previusAct, long nextAct,
+		long userIdAction)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		try {
 			_invokableLocalService.invokeMethod(_methodName39,
 				_methodParameterTypes39,
-				new Object[] { actId, previusAct, nextAct });
+				new Object[] { actId, previusAct, nextAct, userIdAction });
 		}
 		catch (Throwable t) {
 			t = ClpSerializer.translateThrowable(t);

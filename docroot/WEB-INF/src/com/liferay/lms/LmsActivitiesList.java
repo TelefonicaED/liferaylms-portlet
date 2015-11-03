@@ -174,7 +174,7 @@ public class LmsActivitiesList extends MVCPortlet {
 			Enumeration<String> parNames2= uploadRequest.getParameterNames();
 			while(parNames2.hasMoreElements()){
 				String paramName=parNames2.nextElement();
-				System.out.println(paramName+"::"+uploadRequest.getParameter(paramName));
+				log.debug(paramName+"::"+uploadRequest.getParameter(paramName));
 			}
 		}
 		

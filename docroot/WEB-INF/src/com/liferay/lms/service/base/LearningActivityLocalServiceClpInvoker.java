@@ -212,21 +212,17 @@ public class LearningActivityLocalServiceClpInvoker {
 				"com.liferay.lms.model.LearningActivity"
 			};
 
-		_methodName189 = "goUpLearningActivity";
-
-		_methodParameterTypes189 = new String[] { "long", "long" };
-
-		_methodName190 = "goDownLearningActivity";
+		_methodName190 = "goUpLearningActivity";
 
 		_methodParameterTypes190 = new String[] { "long", "long" };
 
 		_methodName191 = "goDownLearningActivity";
 
-		_methodParameterTypes191 = new String[] { "long", "long", "long", "long" };
+		_methodParameterTypes191 = new String[] { "long", "long" };
 
 		_methodName192 = "moveActivity";
 
-		_methodParameterTypes192 = new String[] { "long", "long", "long" };
+		_methodParameterTypes192 = new String[] { "long", "long", "long", "long" };
 
 		_methodName193 = "getNextLearningActivity";
 
@@ -540,26 +536,21 @@ public class LearningActivityLocalServiceClpInvoker {
 
 		if (_methodName189.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes189, parameterTypes)) {
+			return LearningActivityLocalServiceUtil.getPreviusLearningActivity((com.liferay.lms.model.LearningActivity)arguments[0]);
+		}
 
+		if (_methodName190.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes190, parameterTypes)) {
 			LearningActivityLocalServiceUtil.goUpLearningActivity(((Long)arguments[0]).longValue(),
 				((Long)arguments[1]).longValue());
 
 			return null;
 		}
 
-		if (_methodName190.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes190, parameterTypes)) {
-
-			LearningActivityLocalServiceUtil.goDownLearningActivity(((Long)arguments[0]).longValue(),
-				((Long)arguments[1]).longValue());
-
-
-			return null;
-		}
-
 		if (_methodName191.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes191, parameterTypes)) {
-			LearningActivityLocalServiceUtil.goDownLearningActivity(((Long)arguments[0]).longValue());
+			LearningActivityLocalServiceUtil.goDownLearningActivity(((Long)arguments[0]).longValue(),
+				((Long)arguments[1]).longValue());
 
 			return null;
 		}

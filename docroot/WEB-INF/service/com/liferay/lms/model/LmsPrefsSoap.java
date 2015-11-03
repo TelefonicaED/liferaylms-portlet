@@ -37,6 +37,7 @@ public class LmsPrefsSoap implements Serializable {
 		soapModel.setCourseevals(model.getCourseevals());
 		soapModel.setScoretranslators(model.getScoretranslators());
 		soapModel.setUsersResults(model.getUsersResults());
+		soapModel.setDebugScorm(model.getDebugScorm());
 
 		return soapModel;
 	}
@@ -153,6 +154,18 @@ public class LmsPrefsSoap implements Serializable {
 		_usersResults = usersResults;
 	}
 
+	public boolean getDebugScorm() {
+		return _debugScorm;
+	}
+
+	public boolean isDebugScorm() {
+		return _debugScorm;
+	}
+
+	public void setDebugScorm(boolean debugScorm) {
+		_debugScorm = debugScorm;
+	}
+
 	private long _companyId;
 	private long _teacherRole;
 	private long _editorRole;
@@ -161,4 +174,5 @@ public class LmsPrefsSoap implements Serializable {
 	private String _courseevals;
 	private String _scoretranslators;
 	private long _usersResults;
+	private boolean _debugScorm;
 }

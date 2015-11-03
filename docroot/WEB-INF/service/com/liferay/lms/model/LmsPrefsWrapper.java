@@ -52,6 +52,7 @@ public class LmsPrefsWrapper implements LmsPrefs, ModelWrapper<LmsPrefs> {
 		attributes.put("courseevals", getCourseevals());
 		attributes.put("scoretranslators", getScoretranslators());
 		attributes.put("usersResults", getUsersResults());
+		attributes.put("debugScorm", getDebugScorm());
 
 		return attributes;
 	}
@@ -103,6 +104,12 @@ public class LmsPrefsWrapper implements LmsPrefs, ModelWrapper<LmsPrefs> {
 
 		if (usersResults != null) {
 			setUsersResults(usersResults);
+		}
+
+		Boolean debugScorm = (Boolean)attributes.get("debugScorm");
+
+		if (debugScorm != null) {
+			setDebugScorm(debugScorm);
 		}
 	}
 
@@ -266,6 +273,33 @@ public class LmsPrefsWrapper implements LmsPrefs, ModelWrapper<LmsPrefs> {
 	*/
 	public void setUsersResults(long usersResults) {
 		_lmsPrefs.setUsersResults(usersResults);
+	}
+
+	/**
+	* Returns the debug scorm of this lms prefs.
+	*
+	* @return the debug scorm of this lms prefs
+	*/
+	public boolean getDebugScorm() {
+		return _lmsPrefs.getDebugScorm();
+	}
+
+	/**
+	* Returns <code>true</code> if this lms prefs is debug scorm.
+	*
+	* @return <code>true</code> if this lms prefs is debug scorm; <code>false</code> otherwise
+	*/
+	public boolean isDebugScorm() {
+		return _lmsPrefs.isDebugScorm();
+	}
+
+	/**
+	* Sets whether this lms prefs is debug scorm.
+	*
+	* @param debugScorm the debug scorm of this lms prefs
+	*/
+	public void setDebugScorm(boolean debugScorm) {
+		_lmsPrefs.setDebugScorm(debugScorm);
 	}
 
 	public boolean isNew() {

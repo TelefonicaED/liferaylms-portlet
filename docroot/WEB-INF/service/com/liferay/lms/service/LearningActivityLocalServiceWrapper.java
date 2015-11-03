@@ -424,19 +424,21 @@ public class LearningActivityLocalServiceWrapper
 		return _learningActivityLocalService.getPreviusLearningActivity(larn);
 	}
 
-	public void goUpLearningActivity(long actId)
+	public void goUpLearningActivity(long actId, long userIdAction)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		_learningActivityLocalService.goUpLearningActivity(actId);
+		_learningActivityLocalService.goUpLearningActivity(actId, userIdAction);
 	}
 
-	public void goDownLearningActivity(long actId)
+	public void goDownLearningActivity(long actId, long userIdAction)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		_learningActivityLocalService.goDownLearningActivity(actId);
+		_learningActivityLocalService.goDownLearningActivity(actId, userIdAction);
 	}
 
-	public void moveActivity(long actId, long previusAct, long nextAct)
+	public void moveActivity(long actId, long previusAct, long nextAct,
+		long userIdAction)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		_learningActivityLocalService.moveActivity(actId, previusAct, nextAct);
+		_learningActivityLocalService.moveActivity(actId, previusAct, nextAct,
+			userIdAction);
 	}
 
 	public com.liferay.lms.model.LearningActivity getNextLearningActivity(

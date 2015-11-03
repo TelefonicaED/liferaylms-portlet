@@ -524,8 +524,19 @@ public class CourseServiceImpl extends CourseServiceBaseImpl {
 		}
 		return "";
 	}
-	
-	/*private void sendEmail(User user, Course course){
+	@JSONWebService
+	public java.util.List<Course> getChildCourses(long courseId) throws SystemException, PortalException
+	{
+		ServiceContext serviceContext = ServiceContextThreadLocal.getServiceContext();
+		Course course=courseLocalService.getCourse(courseId);
+		if(getPermissionChecker().hasPermission(course.getGroupId(),  Course.class.getName(),courseId,ActionKeys.VIEW))
+		{	
+			return coursePersistence.findByParentCourseId(courseId);
+		
+		}
+		return null;
+	}
+	private void sendEmail(User user, Course course){
 		if(course.isWelcome()&&user!=null&&course!=null){
 			if(course.getWelcomeMsg()!=null&&course.getWelcomeMsg()!=null&&!StringPool.BLANK.equals(course.getWelcomeMsg())){
 				

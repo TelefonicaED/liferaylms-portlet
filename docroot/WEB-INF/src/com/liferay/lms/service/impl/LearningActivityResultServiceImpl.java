@@ -24,6 +24,8 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.jsonwebservice.JSONWebService;
 import com.liferay.portal.kernel.jsonwebservice.JSONWebServiceMode;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.model.User;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceContextThreadLocal;
@@ -51,6 +53,7 @@ import com.liferay.portal.service.ServiceContextThreadLocal;
 public class LearningActivityResultServiceImpl
 	extends LearningActivityResultServiceBaseImpl 
 	{
+	Log log = LogFactoryUtil.getLog(LearningActivityResultServiceImpl.class);
 	@JSONWebService
 	public LearningActivityResult getByActId(long actId) throws PortalException, SystemException
 	{
@@ -126,7 +129,9 @@ public class LearningActivityResultServiceImpl
 	{
 		User user=this.getUser();
 		LearningActivityResult lar = learningActivityResultLocalService.update(latId, tryResultData, imsmanifest, user.getUserId());
-
+		if(log.isDebugEnabled()){
+			log.debug("Updating SCORM Status(LMSCommit): "+user.getFullName()+" actId:"+lar.getActId()+" \n manifest:\n"+imsmanifest+"tryResultData(JSON): \n"+tryResultData);
+		}
 		//auditing
 		ServiceContext serviceContext = ServiceContextThreadLocal.getServiceContext();
 		if(serviceContext!=null){
@@ -147,7 +152,11 @@ public class LearningActivityResultServiceImpl
 	public LearningActivityResult updateFinishTry(long latId, String tryResultData, String imsmanifest) throws PortalException, SystemException
 	{
 		LearningActivityTry learningActivityTry = learningActivityTryLocalService.getLearningActivityTry(latId);
+		User user=this.getUser();
 		learningActivityTry.setEndDate(new java.util.Date(System.currentTimeMillis()));
+		if(log.isDebugEnabled()){
+			log.debug("Updating an finish SCORM Status(LMSFinish): "+user.getFullName()+" actId:"+learningActivityTry.getActId()+" manifest:\n"+imsmanifest+"\n tryResultData(JSON): \n"+tryResultData);
+		}
 		learningActivityTryLocalService.updateLearningActivityTry(learningActivityTry);
 		
 		return update( latId,  tryResultData,  imsmanifest);
