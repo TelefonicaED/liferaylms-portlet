@@ -75,14 +75,15 @@
 					if(listaResultadosEncuesta!=null && listaResultadosEncuesta.size()!=0){
 						for(SurveyResult answer:listaResultadosEncuesta)
 						{
-							String textoAux = answer.getFreeAnswer();
-							textoAux = HtmlUtil.extractText(answer.getFreeAnswer());
-							String texto = textoAux.length() > 50 ? textoAux.substring(0,50)+"..." : textoAux;
-							%>
-							<div class="answer">
-								<p><%=texto %></p>
-							</div>
-						<%
+							if(answer.getQuestionId() == question.getQuestionId()){
+								String textoAux = answer.getFreeAnswer();
+								textoAux = HtmlUtil.extractText(answer.getFreeAnswer());
+								String texto = textoAux.length() > 50 ? textoAux.substring(0,50)+"..." : textoAux;
+								%>
+								<div class="answer">
+									<p><%=texto %></p>
+								</div>
+						<%	}
 						}
 					}
 				}

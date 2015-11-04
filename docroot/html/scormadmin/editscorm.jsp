@@ -68,6 +68,7 @@ else
 <liferay-ui:error key="scormadmin.error.notitle" message="scormadmin.error.notitle" />
 <liferay-ui:error key="scormadmin.error.nodescription" message="scormadmin.error.nodescription"/>
 <liferay-ui:error key="scormadmin.error.nozip" message="scormadmin.error.nozip"/>
+<liferay-ui:error key="scormadmin.error.nozip.corrupt" message="scormadmin.error.nozip.corrupt"/>
 <liferay-ui:error key="scormadmin.error.nomanifest" message="scormadmin.error.nomanifest"/>
 <liferay-ui:error key="scormadmin.error.nomanifestincorrect" message="scormadmin.error.nomanifestincorrect"/>
 <liferay-ui:error key="scormadmin.error.requiredcategories" message="scormadmin.error.requiredcategories"/>
