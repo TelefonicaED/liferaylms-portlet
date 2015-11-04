@@ -377,7 +377,7 @@
 		<finder name="GroupId" return-type="Collection">
 			<finder-column name="groupId" />
 		</finder>
-		<finder name="parentCourseId" return-type="Collection">
+		<finder name="ParentCourseId" return-type="Collection">
 			<finder-column name="parentCourseId" />
 		</finder>
 		<finder name="CompanyParentCourseId" return-type="Collection">
@@ -553,6 +553,8 @@
 			<finder-column name="classPK" />
 		</finder>
     </entity>   
+    <entity name="AuditLogger" local-service="true" remote-service="true">
+    </entity>
 	<exceptions>
 		<exception>NoSuchModule</exception>
 	</exceptions>
