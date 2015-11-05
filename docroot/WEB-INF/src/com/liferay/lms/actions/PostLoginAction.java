@@ -41,9 +41,11 @@ public class PostLoginAction extends Action{
 		try {
 			User u = PortalUtil.getUser(servletRequest);
 			AuditingLogFactory.audit(u.getCompanyId(),0, User.class.getName(), 0, u.getUserId(), AuditConstants.ACCESS, extraData);
-		} catch (PortalException | SystemException e1) {
+		} catch (PortalException e1){
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
+		}catch( SystemException e2){
+			e2.printStackTrace();
 		}
 
 	}
