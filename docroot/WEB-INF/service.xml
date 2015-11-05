@@ -380,6 +380,10 @@
 		<finder name="ParentCourseId" return-type="Collection">
 			<finder-column name="parentCourseId" />
 		</finder>
+		<finder name="GroupIdParentCourseId" return-type="Collection">
+			<finder-column name="groupId" />
+			<finder-column name="parentCourseId" />
+		</finder>
 		<finder name="CompanyParentCourseId" return-type="Collection">
 			<finder-column name="companyId" />
 			<finder-column name="parentCourseId"  />

@@ -525,6 +525,12 @@ public class CourseServiceImpl extends CourseServiceBaseImpl {
 		return "";
 	}
 	@JSONWebService
+	public java.util.List<Course> getCoursesParents(long groupId) 
+			throws SystemException, PortalException
+	{
+		return coursePersistence.filterFindByGroupIdParentCourseId(groupId, 0);
+	}
+	@JSONWebService
 	public java.util.List<Course> getChildCourses(long courseId) throws SystemException, PortalException
 	{
 		ServiceContext serviceContext = ServiceContextThreadLocal.getServiceContext();
@@ -582,5 +588,5 @@ public class CourseServiceImpl extends CourseServiceBaseImpl {
 				}
 			}
 		}
-	}*/
+	}
 }
