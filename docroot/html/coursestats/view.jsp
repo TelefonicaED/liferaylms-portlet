@@ -11,10 +11,10 @@
 <%@page import="com.liferay.lms.service.LearningActivityLocalServiceUtil"%>
 <%@ include file="/init.jsp" %>
 <%
-long registered=UserLocalServiceUtil.getGroupUsersCount(themeDisplay.getScopeGroupId(),0);
+long registered=CourseLocalServiceUtil.getStudentsFromCourse(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId()).size();
 Course curso = CourseLocalServiceUtil.fetchByGroupCreatedId(themeDisplay.getScopeGroupId());
-long finalizados = CourseResultLocalServiceUtil.countByCourseId(curso.getCourseId(), true);
-long iniciados = CourseResultLocalServiceUtil.countByCourseId(curso.getCourseId(), false) + finalizados;
+long finalizados = CourseResultLocalServiceUtil.countStudentsByCourseId(curso, true);
+long iniciados = CourseResultLocalServiceUtil.countStudentsByCourseId(curso, false) + finalizados;
 %>
 
 <liferay-portlet:resourceURL var="exportURL" >
