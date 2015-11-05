@@ -1,3 +1,4 @@
+<%@page import="com.liferay.lms.service.CourseLocalServiceUtil"%>
 <%@page import="java.text.DecimalFormat"%>
 <%@page import="java.math.RoundingMode"%>
 <%@page import="com.liferay.portlet.asset.AssetRendererFactoryRegistryUtil"%>
@@ -14,7 +15,7 @@
 <%@page import="com.liferay.lms.model.Module"%>
 <%@ include file="/init.jsp" %>
 <%
-long registered=UserLocalServiceUtil.getGroupUsersCount(themeDisplay.getScopeGroupId(),0);
+long registered=CourseLocalServiceUtil.getStudentsFromCourse(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId()).size();
 long moduleId=ParamUtil.getLong(request,"moduleId",0);
 Module theModule=ModuleLocalServiceUtil.getModule(moduleId);
 %>
@@ -30,9 +31,9 @@ Module theModule=ModuleLocalServiceUtil.getModule(moduleId);
 	
 <div class="registered"><liferay-ui:message key="coursestats.modulestats.inscritos" arguments="<%=new Object[]{registered} %>"></liferay-ui:message></div>
 <% 
-long started=ModuleResultLocalServiceUtil.countByModule(theModule.getModuleId());
-	long finished=ModuleResultLocalServiceUtil.countByModulePassed(theModule.getModuleId(),true);
-		%>
+long started=ModuleResultLocalServiceUtil.countByModuleOnlyStudents(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(), theModule.getModuleId());
+long finished=ModuleResultLocalServiceUtil.countByModulePassedOnlyStudents(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(),theModule.getModuleId(),true);
+	%>
 	<p><liferay-ui:message key="coursestats.modulestats.iniciaron" arguments="<%=new Object[]{started} %>">></liferay-ui:message><br />
 	<%if(theModule.getStartDate()!=null)
 			{

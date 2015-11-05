@@ -60,8 +60,8 @@ long iniciados = CourseResultLocalServiceUtil.countStudentsByCourseId(curso, fal
 		modelVar="module"
 	>
 	<%
-	long started=ModuleResultLocalServiceUtil.countByModule(module.getModuleId());
-	long finished=ModuleResultLocalServiceUtil.countByModulePassed(module.getModuleId(),true);
+	long started=ModuleResultLocalServiceUtil.countByModuleOnlyStudents(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(), module.getModuleId());
+	long finished=ModuleResultLocalServiceUtil.countByModulePassedOnlyStudents(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(),module.getModuleId(),true);
 	
 		%>
 	<liferay-portlet:renderURL var="viewModuleURL">
