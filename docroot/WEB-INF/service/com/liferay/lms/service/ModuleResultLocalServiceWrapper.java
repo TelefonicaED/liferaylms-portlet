@@ -328,6 +328,14 @@ public class ModuleResultLocalServiceWrapper implements ModuleResultLocalService
 		_moduleResultLocalService.updateAllCoursesAllModulesAllUsers();
 	}
 
+	public java.util.Date calculateModuleResultStartDate(long moduleId,
+		long userId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _moduleResultLocalService.calculateModuleResultStartDate(moduleId,
+			userId);
+	}
+
 	public boolean update(long moduleId, long userId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {

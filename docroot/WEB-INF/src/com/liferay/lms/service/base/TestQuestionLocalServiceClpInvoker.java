@@ -104,89 +104,89 @@ public class TestQuestionLocalServiceClpInvoker {
 				"com.liferay.lms.model.TestQuestion", "boolean"
 			};
 
-		_methodName134 = "getBeanIdentifier";
+		_methodName138 = "getBeanIdentifier";
 
-		_methodParameterTypes134 = new String[] {  };
+		_methodParameterTypes138 = new String[] {  };
 
-		_methodName135 = "setBeanIdentifier";
+		_methodName139 = "setBeanIdentifier";
 
-		_methodParameterTypes135 = new String[] { "java.lang.String" };
+		_methodParameterTypes139 = new String[] { "java.lang.String" };
 
-		_methodName140 = "importXML";
+		_methodName144 = "importXML";
 
-		_methodParameterTypes140 = new String[] {
+		_methodParameterTypes144 = new String[] {
 				"long", "com.liferay.portal.kernel.xml.Document"
 			};
 
-		_methodName141 = "importXMLQuestion";
+		_methodName145 = "importXMLQuestion";
 
-		_methodParameterTypes141 = new String[] {
+		_methodParameterTypes145 = new String[] {
 				"long", "com.liferay.portal.kernel.xml.Element"
 			};
 
-		_methodName143 = "addQuestion";
+		_methodName147 = "addQuestion";
 
-		_methodParameterTypes143 = new String[] {
+		_methodParameterTypes147 = new String[] {
 				"long", "java.lang.String", "long"
 			};
 
-		_methodName144 = "addQuestion";
+		_methodName148 = "addQuestion";
 
-		_methodParameterTypes144 = new String[] {
+		_methodParameterTypes148 = new String[] {
 				"long", "java.lang.String", "long", "java.lang.String"
 			};
 
-		_methodName145 = "getQuestions";
+		_methodName149 = "getQuestions";
 
-		_methodParameterTypes145 = new String[] { "long" };
+		_methodParameterTypes149 = new String[] { "long" };
 
-		_methodName146 = "initializeQuestionType";
-
-		_methodParameterTypes146 = new String[] { "long" };
-
-		_methodName147 = "updateQuestionWithoutWeight";
-
-		_methodParameterTypes147 = new String[] { "long" };
-
-		_methodName148 = "getPreviusTestQuestion";
-
-		_methodParameterTypes148 = new String[] { "long" };
-
-		_methodName149 = "getPreviusTestQuestion";
-
-		_methodParameterTypes149 = new String[] {
-				"com.liferay.lms.model.TestQuestion"
-			};
-
-		_methodName150 = "getNextTestQuestion";
+		_methodName150 = "initializeQuestionType";
 
 		_methodParameterTypes150 = new String[] { "long" };
 
-		_methodName151 = "getNextTestQuestion";
+		_methodName151 = "updateQuestionWithoutWeight";
 
-		_methodParameterTypes151 = new String[] {
-				"com.liferay.lms.model.TestQuestion"
-			};
+		_methodParameterTypes151 = new String[] { "long" };
 
-		_methodName152 = "goUpTestQuestion";
+		_methodName152 = "getPreviusTestQuestion";
 
 		_methodParameterTypes152 = new String[] { "long" };
 
-		_methodName153 = "goDownTestQuestion";
+		_methodName153 = "getPreviusTestQuestion";
 
-		_methodParameterTypes153 = new String[] { "long" };
+		_methodParameterTypes153 = new String[] {
+				"com.liferay.lms.model.TestQuestion"
+			};
 
-		_methodName154 = "moveQuestion";
+		_methodName154 = "getNextTestQuestion";
 
-		_methodParameterTypes154 = new String[] { "long", "long", "long" };
+		_methodParameterTypes154 = new String[] { "long" };
 
-		_methodName155 = "checkWeights";
+		_methodName155 = "getNextTestQuestion";
 
-		_methodParameterTypes155 = new String[] { "long" };
+		_methodParameterTypes155 = new String[] {
+				"com.liferay.lms.model.TestQuestion"
+			};
 
-		_methodName156 = "generateAleatoryQuestions";
+		_methodName156 = "goUpTestQuestion";
 
-		_methodParameterTypes156 = new String[] { "long", "long" };
+		_methodParameterTypes156 = new String[] { "long" };
+
+		_methodName157 = "goDownTestQuestion";
+
+		_methodParameterTypes157 = new String[] { "long" };
+
+		_methodName158 = "moveQuestion";
+
+		_methodParameterTypes158 = new String[] { "long", "long", "long" };
+
+		_methodName159 = "checkWeights";
+
+		_methodParameterTypes159 = new String[] { "long" };
+
+		_methodName160 = "generateAleatoryQuestions";
+
+		_methodParameterTypes160 = new String[] { "long", "long" };
 	}
 
 	public Object invokeMethod(String name, String[] parameterTypes,
@@ -278,98 +278,98 @@ public class TestQuestionLocalServiceClpInvoker {
 				((Boolean)arguments[1]).booleanValue());
 		}
 
-		if (_methodName134.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes134, parameterTypes)) {
+		if (_methodName138.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes138, parameterTypes)) {
 			return TestQuestionLocalServiceUtil.getBeanIdentifier();
 		}
 
-		if (_methodName135.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes135, parameterTypes)) {
+		if (_methodName139.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes139, parameterTypes)) {
 			TestQuestionLocalServiceUtil.setBeanIdentifier((java.lang.String)arguments[0]);
 
 			return null;
 		}
 
-		if (_methodName140.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes140, parameterTypes)) {
+		if (_methodName144.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes144, parameterTypes)) {
 			TestQuestionLocalServiceUtil.importXML(((Long)arguments[0]).longValue(),
 				(com.liferay.portal.kernel.xml.Document)arguments[1]);
 
 			return null;
 		}
 
-		if (_methodName141.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes141, parameterTypes)) {
+		if (_methodName145.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes145, parameterTypes)) {
 			TestQuestionLocalServiceUtil.importXMLQuestion(((Long)arguments[0]).longValue(),
 				(com.liferay.portal.kernel.xml.Element)arguments[1]);
 
 			return null;
 		}
 
-		if (_methodName143.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes143, parameterTypes)) {
+		if (_methodName147.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes147, parameterTypes)) {
 			return TestQuestionLocalServiceUtil.addQuestion(((Long)arguments[0]).longValue(),
 				(java.lang.String)arguments[1], ((Long)arguments[2]).longValue());
 		}
 
-		if (_methodName144.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes144, parameterTypes)) {
+		if (_methodName148.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes148, parameterTypes)) {
 			return TestQuestionLocalServiceUtil.addQuestion(((Long)arguments[0]).longValue(),
 				(java.lang.String)arguments[1],
 				((Long)arguments[2]).longValue(), (java.lang.String)arguments[3]);
 		}
 
-		if (_methodName145.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes145, parameterTypes)) {
-			return TestQuestionLocalServiceUtil.getQuestions(((Long)arguments[0]).longValue());
-		}
-
-		if (_methodName146.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes146, parameterTypes)) {
-			return TestQuestionLocalServiceUtil.initializeQuestionType(((Long)arguments[0]).longValue());
-		}
-
-		if (_methodName147.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes147, parameterTypes)) {
-			return TestQuestionLocalServiceUtil.updateQuestionWithoutWeight(((Long)arguments[0]).longValue());
-		}
-
-		if (_methodName148.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes148, parameterTypes)) {
-			return TestQuestionLocalServiceUtil.getPreviusTestQuestion(((Long)arguments[0]).longValue());
-		}
-
 		if (_methodName149.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes149, parameterTypes)) {
-			return TestQuestionLocalServiceUtil.getPreviusTestQuestion((com.liferay.lms.model.TestQuestion)arguments[0]);
+			return TestQuestionLocalServiceUtil.getQuestions(((Long)arguments[0]).longValue());
 		}
 
 		if (_methodName150.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes150, parameterTypes)) {
-			return TestQuestionLocalServiceUtil.getNextTestQuestion(((Long)arguments[0]).longValue());
+			return TestQuestionLocalServiceUtil.initializeQuestionType(((Long)arguments[0]).longValue());
 		}
 
 		if (_methodName151.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes151, parameterTypes)) {
-			return TestQuestionLocalServiceUtil.getNextTestQuestion((com.liferay.lms.model.TestQuestion)arguments[0]);
+			return TestQuestionLocalServiceUtil.updateQuestionWithoutWeight(((Long)arguments[0]).longValue());
 		}
 
 		if (_methodName152.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes152, parameterTypes)) {
+			return TestQuestionLocalServiceUtil.getPreviusTestQuestion(((Long)arguments[0]).longValue());
+		}
+
+		if (_methodName153.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes153, parameterTypes)) {
+			return TestQuestionLocalServiceUtil.getPreviusTestQuestion((com.liferay.lms.model.TestQuestion)arguments[0]);
+		}
+
+		if (_methodName154.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes154, parameterTypes)) {
+			return TestQuestionLocalServiceUtil.getNextTestQuestion(((Long)arguments[0]).longValue());
+		}
+
+		if (_methodName155.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes155, parameterTypes)) {
+			return TestQuestionLocalServiceUtil.getNextTestQuestion((com.liferay.lms.model.TestQuestion)arguments[0]);
+		}
+
+		if (_methodName156.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes156, parameterTypes)) {
 			TestQuestionLocalServiceUtil.goUpTestQuestion(((Long)arguments[0]).longValue());
 
 			return null;
 		}
 
-		if (_methodName153.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes153, parameterTypes)) {
+		if (_methodName157.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes157, parameterTypes)) {
 			TestQuestionLocalServiceUtil.goDownTestQuestion(((Long)arguments[0]).longValue());
 
 			return null;
 		}
 
-		if (_methodName154.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes154, parameterTypes)) {
+		if (_methodName158.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes158, parameterTypes)) {
 			TestQuestionLocalServiceUtil.moveQuestion(((Long)arguments[0]).longValue(),
 				((Long)arguments[1]).longValue(),
 				((Long)arguments[2]).longValue());
@@ -377,15 +377,15 @@ public class TestQuestionLocalServiceClpInvoker {
 			return null;
 		}
 
-		if (_methodName155.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes155, parameterTypes)) {
+		if (_methodName159.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes159, parameterTypes)) {
 			TestQuestionLocalServiceUtil.checkWeights(((Long)arguments[0]).longValue());
 
 			return null;
 		}
 
-		if (_methodName156.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes156, parameterTypes)) {
+		if (_methodName160.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes160, parameterTypes)) {
 			return TestQuestionLocalServiceUtil.generateAleatoryQuestions(((Long)arguments[0]).longValue(),
 				((Long)arguments[1]).longValue());
 		}
@@ -425,22 +425,14 @@ public class TestQuestionLocalServiceClpInvoker {
 	private String[] _methodParameterTypes14;
 	private String _methodName15;
 	private String[] _methodParameterTypes15;
-	private String _methodName134;
-	private String[] _methodParameterTypes134;
-	private String _methodName135;
-	private String[] _methodParameterTypes135;
-	private String _methodName140;
-	private String[] _methodParameterTypes140;
-	private String _methodName141;
-	private String[] _methodParameterTypes141;
-	private String _methodName143;
-	private String[] _methodParameterTypes143;
+	private String _methodName138;
+	private String[] _methodParameterTypes138;
+	private String _methodName139;
+	private String[] _methodParameterTypes139;
 	private String _methodName144;
 	private String[] _methodParameterTypes144;
 	private String _methodName145;
 	private String[] _methodParameterTypes145;
-	private String _methodName146;
-	private String[] _methodParameterTypes146;
 	private String _methodName147;
 	private String[] _methodParameterTypes147;
 	private String _methodName148;
@@ -461,4 +453,12 @@ public class TestQuestionLocalServiceClpInvoker {
 	private String[] _methodParameterTypes155;
 	private String _methodName156;
 	private String[] _methodParameterTypes156;
+	private String _methodName157;
+	private String[] _methodParameterTypes157;
+	private String _methodName158;
+	private String[] _methodParameterTypes158;
+	private String _methodName159;
+	private String[] _methodParameterTypes159;
+	private String _methodName160;
+	private String[] _methodParameterTypes160;
 }

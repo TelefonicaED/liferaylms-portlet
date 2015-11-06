@@ -330,6 +330,12 @@ public class CourseLocalServiceUtil {
 			serviceContext, calificationType, maxUsers, isFromClone);
 	}
 
+	public static java.util.List<com.liferay.lms.model.Course> getChildCourses(
+		long courseId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().getChildCourses(courseId);
+	}
+
 	public static java.util.List<com.liferay.lms.model.Course> getUserCourses(
 		long userId)
 		throws com.liferay.portal.kernel.exception.PortalException,

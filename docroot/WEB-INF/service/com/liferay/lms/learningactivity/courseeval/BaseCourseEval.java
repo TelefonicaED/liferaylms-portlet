@@ -33,7 +33,14 @@ public abstract class BaseCourseEval implements CourseEval {
 			PortletResponse portletResponse) {
 		return true;
 	}
-
+	public long calculateModuleResult(long moduleId,long userId) throws SystemException, PortalException
+	{
+		return 0;
+	}
+	public boolean hasModuleResultCalculator()
+	{
+		return false;
+	}
 	@Override
 	public String getPortletId(){
 		return PORTLET_ID;

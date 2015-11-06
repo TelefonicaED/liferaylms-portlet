@@ -320,6 +320,12 @@ public class CourseLocalServiceWrapper implements CourseLocalService,
 			maxUsers, isFromClone);
 	}
 
+	public java.util.List<com.liferay.lms.model.Course> getChildCourses(
+		long courseId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _courseLocalService.getChildCourses(courseId);
+	}
+
 	public java.util.List<com.liferay.lms.model.Course> getUserCourses(
 		long userId)
 		throws com.liferay.portal.kernel.exception.PortalException,

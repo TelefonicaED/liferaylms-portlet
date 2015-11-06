@@ -18,6 +18,8 @@ import com.liferay.counter.service.CounterLocalService;
 
 import com.liferay.lms.model.Module;
 import com.liferay.lms.service.AuditEntryLocalService;
+import com.liferay.lms.service.AuditLoggerLocalService;
+import com.liferay.lms.service.AuditLoggerService;
 import com.liferay.lms.service.CheckP2pMailingLocalService;
 import com.liferay.lms.service.CompetenceLocalService;
 import com.liferay.lms.service.CompetenceService;
@@ -140,6 +142,43 @@ public abstract class ModuleServiceBaseImpl extends BaseServiceImpl
 	public void setAuditEntryPersistence(
 		AuditEntryPersistence auditEntryPersistence) {
 		this.auditEntryPersistence = auditEntryPersistence;
+	}
+
+	/**
+	 * Returns the audit logger local service.
+	 *
+	 * @return the audit logger local service
+	 */
+	public AuditLoggerLocalService getAuditLoggerLocalService() {
+		return auditLoggerLocalService;
+	}
+
+	/**
+	 * Sets the audit logger local service.
+	 *
+	 * @param auditLoggerLocalService the audit logger local service
+	 */
+	public void setAuditLoggerLocalService(
+		AuditLoggerLocalService auditLoggerLocalService) {
+		this.auditLoggerLocalService = auditLoggerLocalService;
+	}
+
+	/**
+	 * Returns the audit logger remote service.
+	 *
+	 * @return the audit logger remote service
+	 */
+	public AuditLoggerService getAuditLoggerService() {
+		return auditLoggerService;
+	}
+
+	/**
+	 * Sets the audit logger remote service.
+	 *
+	 * @param auditLoggerService the audit logger remote service
+	 */
+	public void setAuditLoggerService(AuditLoggerService auditLoggerService) {
+		this.auditLoggerService = auditLoggerService;
 	}
 
 	/**
@@ -1247,6 +1286,10 @@ public abstract class ModuleServiceBaseImpl extends BaseServiceImpl
 	protected AuditEntryLocalService auditEntryLocalService;
 	@BeanReference(type = AuditEntryPersistence.class)
 	protected AuditEntryPersistence auditEntryPersistence;
+	@BeanReference(type = AuditLoggerLocalService.class)
+	protected AuditLoggerLocalService auditLoggerLocalService;
+	@BeanReference(type = AuditLoggerService.class)
+	protected AuditLoggerService auditLoggerService;
 	@BeanReference(type = CheckP2pMailingLocalService.class)
 	protected CheckP2pMailingLocalService checkP2pMailingLocalService;
 	@BeanReference(type = CheckP2pMailingPersistence.class)

@@ -584,10 +584,10 @@ public class CourseUtil {
 	* @return the matching courses
 	* @throws SystemException if a system exception occurred
 	*/
-	public static java.util.List<com.liferay.lms.model.Course> findByparentCourseId(
+	public static java.util.List<com.liferay.lms.model.Course> findByParentCourseId(
 		long parentCourseId)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		return getPersistence().findByparentCourseId(parentCourseId);
+		return getPersistence().findByParentCourseId(parentCourseId);
 	}
 
 	/**
@@ -603,10 +603,10 @@ public class CourseUtil {
 	* @return the range of matching courses
 	* @throws SystemException if a system exception occurred
 	*/
-	public static java.util.List<com.liferay.lms.model.Course> findByparentCourseId(
+	public static java.util.List<com.liferay.lms.model.Course> findByParentCourseId(
 		long parentCourseId, int start, int end)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		return getPersistence().findByparentCourseId(parentCourseId, start, end);
+		return getPersistence().findByParentCourseId(parentCourseId, start, end);
 	}
 
 	/**
@@ -623,12 +623,12 @@ public class CourseUtil {
 	* @return the ordered range of matching courses
 	* @throws SystemException if a system exception occurred
 	*/
-	public static java.util.List<com.liferay.lms.model.Course> findByparentCourseId(
+	public static java.util.List<com.liferay.lms.model.Course> findByParentCourseId(
 		long parentCourseId, int start, int end,
 		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getPersistence()
-				   .findByparentCourseId(parentCourseId, start, end,
+				   .findByParentCourseId(parentCourseId, start, end,
 			orderByComparator);
 	}
 
@@ -641,13 +641,13 @@ public class CourseUtil {
 	* @throws com.liferay.lms.NoSuchCourseException if a matching course could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public static com.liferay.lms.model.Course findByparentCourseId_First(
+	public static com.liferay.lms.model.Course findByParentCourseId_First(
 		long parentCourseId,
 		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
 		throws com.liferay.lms.NoSuchCourseException,
 			com.liferay.portal.kernel.exception.SystemException {
 		return getPersistence()
-				   .findByparentCourseId_First(parentCourseId, orderByComparator);
+				   .findByParentCourseId_First(parentCourseId, orderByComparator);
 	}
 
 	/**
@@ -658,12 +658,12 @@ public class CourseUtil {
 	* @return the first matching course, or <code>null</code> if a matching course could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public static com.liferay.lms.model.Course fetchByparentCourseId_First(
+	public static com.liferay.lms.model.Course fetchByParentCourseId_First(
 		long parentCourseId,
 		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getPersistence()
-				   .fetchByparentCourseId_First(parentCourseId,
+				   .fetchByParentCourseId_First(parentCourseId,
 			orderByComparator);
 	}
 
@@ -676,13 +676,13 @@ public class CourseUtil {
 	* @throws com.liferay.lms.NoSuchCourseException if a matching course could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public static com.liferay.lms.model.Course findByparentCourseId_Last(
+	public static com.liferay.lms.model.Course findByParentCourseId_Last(
 		long parentCourseId,
 		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
 		throws com.liferay.lms.NoSuchCourseException,
 			com.liferay.portal.kernel.exception.SystemException {
 		return getPersistence()
-				   .findByparentCourseId_Last(parentCourseId, orderByComparator);
+				   .findByParentCourseId_Last(parentCourseId, orderByComparator);
 	}
 
 	/**
@@ -693,12 +693,12 @@ public class CourseUtil {
 	* @return the last matching course, or <code>null</code> if a matching course could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public static com.liferay.lms.model.Course fetchByparentCourseId_Last(
+	public static com.liferay.lms.model.Course fetchByParentCourseId_Last(
 		long parentCourseId,
 		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getPersistence()
-				   .fetchByparentCourseId_Last(parentCourseId, orderByComparator);
+				   .fetchByParentCourseId_Last(parentCourseId, orderByComparator);
 	}
 
 	/**
@@ -711,14 +711,172 @@ public class CourseUtil {
 	* @throws com.liferay.lms.NoSuchCourseException if a course with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public static com.liferay.lms.model.Course[] findByparentCourseId_PrevAndNext(
+	public static com.liferay.lms.model.Course[] findByParentCourseId_PrevAndNext(
 		long courseId, long parentCourseId,
 		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
 		throws com.liferay.lms.NoSuchCourseException,
 			com.liferay.portal.kernel.exception.SystemException {
 		return getPersistence()
-				   .findByparentCourseId_PrevAndNext(courseId, parentCourseId,
+				   .findByParentCourseId_PrevAndNext(courseId, parentCourseId,
 			orderByComparator);
+	}
+
+	/**
+	* Returns all the courses where companyId = &#63; and parentCourseId = &#63;.
+	*
+	* @param companyId the company ID
+	* @param parentCourseId the parent course ID
+	* @return the matching courses
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.lms.model.Course> findByCompanyParentCourseId(
+		long companyId, long parentCourseId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByCompanyParentCourseId(companyId, parentCourseId);
+	}
+
+	/**
+	* Returns a range of all the courses where companyId = &#63; and parentCourseId = &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param companyId the company ID
+	* @param parentCourseId the parent course ID
+	* @param start the lower bound of the range of courses
+	* @param end the upper bound of the range of courses (not inclusive)
+	* @return the range of matching courses
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.lms.model.Course> findByCompanyParentCourseId(
+		long companyId, long parentCourseId, int start, int end)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByCompanyParentCourseId(companyId, parentCourseId,
+			start, end);
+	}
+
+	/**
+	* Returns an ordered range of all the courses where companyId = &#63; and parentCourseId = &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param companyId the company ID
+	* @param parentCourseId the parent course ID
+	* @param start the lower bound of the range of courses
+	* @param end the upper bound of the range of courses (not inclusive)
+	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	* @return the ordered range of matching courses
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.lms.model.Course> findByCompanyParentCourseId(
+		long companyId, long parentCourseId, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByCompanyParentCourseId(companyId, parentCourseId,
+			start, end, orderByComparator);
+	}
+
+	/**
+	* Returns the first course in the ordered set where companyId = &#63; and parentCourseId = &#63;.
+	*
+	* @param companyId the company ID
+	* @param parentCourseId the parent course ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the first matching course
+	* @throws com.liferay.lms.NoSuchCourseException if a matching course could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.lms.model.Course findByCompanyParentCourseId_First(
+		long companyId, long parentCourseId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchCourseException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByCompanyParentCourseId_First(companyId,
+			parentCourseId, orderByComparator);
+	}
+
+	/**
+	* Returns the first course in the ordered set where companyId = &#63; and parentCourseId = &#63;.
+	*
+	* @param companyId the company ID
+	* @param parentCourseId the parent course ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the first matching course, or <code>null</code> if a matching course could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.lms.model.Course fetchByCompanyParentCourseId_First(
+		long companyId, long parentCourseId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .fetchByCompanyParentCourseId_First(companyId,
+			parentCourseId, orderByComparator);
+	}
+
+	/**
+	* Returns the last course in the ordered set where companyId = &#63; and parentCourseId = &#63;.
+	*
+	* @param companyId the company ID
+	* @param parentCourseId the parent course ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the last matching course
+	* @throws com.liferay.lms.NoSuchCourseException if a matching course could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.lms.model.Course findByCompanyParentCourseId_Last(
+		long companyId, long parentCourseId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchCourseException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByCompanyParentCourseId_Last(companyId, parentCourseId,
+			orderByComparator);
+	}
+
+	/**
+	* Returns the last course in the ordered set where companyId = &#63; and parentCourseId = &#63;.
+	*
+	* @param companyId the company ID
+	* @param parentCourseId the parent course ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the last matching course, or <code>null</code> if a matching course could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.lms.model.Course fetchByCompanyParentCourseId_Last(
+		long companyId, long parentCourseId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .fetchByCompanyParentCourseId_Last(companyId,
+			parentCourseId, orderByComparator);
+	}
+
+	/**
+	* Returns the courses before and after the current course in the ordered set where companyId = &#63; and parentCourseId = &#63;.
+	*
+	* @param courseId the primary key of the current course
+	* @param companyId the company ID
+	* @param parentCourseId the parent course ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the previous, current, and next course
+	* @throws com.liferay.lms.NoSuchCourseException if a course with the primary key could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.lms.model.Course[] findByCompanyParentCourseId_PrevAndNext(
+		long courseId, long companyId, long parentCourseId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchCourseException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByCompanyParentCourseId_PrevAndNext(courseId,
+			companyId, parentCourseId, orderByComparator);
 	}
 
 	/**
@@ -1797,9 +1955,22 @@ public class CourseUtil {
 	* @param parentCourseId the parent course ID
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void removeByparentCourseId(long parentCourseId)
+	public static void removeByParentCourseId(long parentCourseId)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		getPersistence().removeByparentCourseId(parentCourseId);
+		getPersistence().removeByParentCourseId(parentCourseId);
+	}
+
+	/**
+	* Removes all the courses where companyId = &#63; and parentCourseId = &#63; from the database.
+	*
+	* @param companyId the company ID
+	* @param parentCourseId the parent course ID
+	* @throws SystemException if a system exception occurred
+	*/
+	public static void removeByCompanyParentCourseId(long companyId,
+		long parentCourseId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		getPersistence().removeByCompanyParentCourseId(companyId, parentCourseId);
 	}
 
 	/**
@@ -1955,9 +2126,24 @@ public class CourseUtil {
 	* @return the number of matching courses
 	* @throws SystemException if a system exception occurred
 	*/
-	public static int countByparentCourseId(long parentCourseId)
+	public static int countByParentCourseId(long parentCourseId)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		return getPersistence().countByparentCourseId(parentCourseId);
+		return getPersistence().countByParentCourseId(parentCourseId);
+	}
+
+	/**
+	* Returns the number of courses where companyId = &#63; and parentCourseId = &#63;.
+	*
+	* @param companyId the company ID
+	* @param parentCourseId the parent course ID
+	* @return the number of matching courses
+	* @throws SystemException if a system exception occurred
+	*/
+	public static int countByCompanyParentCourseId(long companyId,
+		long parentCourseId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .countByCompanyParentCourseId(companyId, parentCourseId);
 	}
 
 	/**

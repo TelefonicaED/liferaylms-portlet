@@ -19,6 +19,8 @@ public interface CourseEval
 	public void updateCourse(Course course, ModuleResult moduleResult) throws SystemException;
 	public boolean updateCourse(Course course, long userId) throws SystemException;
 	public boolean updateCourse(Course course) throws SystemException;
+	public boolean hasModuleResultCalculator();
+	public long calculateModuleResult(long moduleId,long userId) throws SystemException,PortalException;
 	public String getName();
 	public String getName(Locale locale);
 	public long getTypeId();

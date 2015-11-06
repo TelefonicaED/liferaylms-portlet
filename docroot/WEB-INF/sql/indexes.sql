@@ -15,6 +15,7 @@ create unique index IX_7E6C7712 on Lms_Competence (uuid_, groupId);
 create index IX_AABFFF7A on Lms_Course (companyId);
 create index IX_C9B5BF5A on Lms_Course (companyId, closed);
 create unique index IX_243A72BA on Lms_Course (companyId, friendlyURL);
+create index IX_F944A64E on Lms_Course (companyId, parentCourseId);
 create index IX_B852F6C6 on Lms_Course (groupCreatedId);
 create index IX_E1561C7C on Lms_Course (groupId);
 create index IX_F367BA5C on Lms_Course (groupId, closed);

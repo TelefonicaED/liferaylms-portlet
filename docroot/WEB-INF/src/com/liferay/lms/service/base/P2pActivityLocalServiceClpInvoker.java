@@ -104,61 +104,61 @@ public class P2pActivityLocalServiceClpInvoker {
 				"com.liferay.lms.model.P2pActivity", "boolean"
 			};
 
-		_methodName134 = "getBeanIdentifier";
+		_methodName138 = "getBeanIdentifier";
 
-		_methodParameterTypes134 = new String[] {  };
+		_methodParameterTypes138 = new String[] {  };
 
-		_methodName135 = "setBeanIdentifier";
+		_methodName139 = "setBeanIdentifier";
 
-		_methodParameterTypes135 = new String[] { "java.lang.String" };
+		_methodParameterTypes139 = new String[] { "java.lang.String" };
 
-		_methodName140 = "findByActIdAndUserId";
+		_methodName144 = "findByActIdAndUserId";
 
-		_methodParameterTypes140 = new String[] { "long", "long" };
+		_methodParameterTypes144 = new String[] { "long", "long" };
 
-		_methodName141 = "existP2pAct";
+		_methodName145 = "existP2pAct";
 
-		_methodParameterTypes141 = new String[] { "long", "long" };
+		_methodParameterTypes145 = new String[] { "long", "long" };
 
-		_methodName142 = "findByActId";
+		_methodName146 = "findByActId";
 
-		_methodParameterTypes142 = new String[] { "long" };
+		_methodParameterTypes146 = new String[] { "long" };
 
-		_methodName143 = "findByActId";
+		_methodName147 = "findByActId";
 
-		_methodParameterTypes143 = new String[] { "long", "int", "int" };
+		_methodParameterTypes147 = new String[] { "long", "int", "int" };
 
-		_methodName144 = "findByActIdOrderByP2pId";
+		_methodName148 = "findByActIdOrderByP2pId";
 
-		_methodParameterTypes144 = new String[] { "long" };
+		_methodParameterTypes148 = new String[] { "long" };
 
-		_methodName145 = "getUsersToCorrectP2P";
+		_methodName149 = "getUsersToCorrectP2P";
 
-		_methodParameterTypes145 = new String[] {
+		_methodParameterTypes149 = new String[] {
 				"long", "long", "int", "java.util.Calendar"
 			};
 
-		_methodName146 = "getP2pActivitiesToCorrect";
+		_methodName150 = "getP2pActivitiesToCorrect";
 
-		_methodParameterTypes146 = new String[] { "long", "long", "int" };
+		_methodParameterTypes150 = new String[] { "long", "long", "int" };
 
-		_methodName147 = "getP2PActivitiesInDay";
+		_methodName151 = "getP2PActivitiesInDay";
 
-		_methodParameterTypes147 = new String[] { "java.util.Calendar" };
+		_methodParameterTypes151 = new String[] { "java.util.Calendar" };
 
-		_methodName148 = "getNumCorrectsByDayP2P";
+		_methodName152 = "getNumCorrectsByDayP2P";
 
-		_methodParameterTypes148 = new String[] { "long", "java.util.Calendar" };
+		_methodParameterTypes152 = new String[] { "long", "java.util.Calendar" };
 
-		_methodName149 = "addP2pActivity";
+		_methodName153 = "addP2pActivity";
 
-		_methodParameterTypes149 = new String[] {
+		_methodParameterTypes153 = new String[] {
 				"com.liferay.lms.model.P2pActivity"
 			};
 
-		_methodName150 = "updateP2pActivity";
+		_methodName154 = "updateP2pActivity";
 
-		_methodParameterTypes150 = new String[] {
+		_methodParameterTypes154 = new String[] {
 				"com.liferay.lms.model.P2pActivity"
 			};
 	}
@@ -252,80 +252,80 @@ public class P2pActivityLocalServiceClpInvoker {
 				((Boolean)arguments[1]).booleanValue());
 		}
 
-		if (_methodName134.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes134, parameterTypes)) {
+		if (_methodName138.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes138, parameterTypes)) {
 			return P2pActivityLocalServiceUtil.getBeanIdentifier();
 		}
 
-		if (_methodName135.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes135, parameterTypes)) {
+		if (_methodName139.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes139, parameterTypes)) {
 			P2pActivityLocalServiceUtil.setBeanIdentifier((java.lang.String)arguments[0]);
 
 			return null;
 		}
 
-		if (_methodName140.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes140, parameterTypes)) {
+		if (_methodName144.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes144, parameterTypes)) {
 			return P2pActivityLocalServiceUtil.findByActIdAndUserId(((Long)arguments[0]).longValue(),
 				((Long)arguments[1]).longValue());
 		}
 
-		if (_methodName141.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes141, parameterTypes)) {
+		if (_methodName145.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes145, parameterTypes)) {
 			return P2pActivityLocalServiceUtil.existP2pAct(((Long)arguments[0]).longValue(),
 				((Long)arguments[1]).longValue());
 		}
 
-		if (_methodName142.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes142, parameterTypes)) {
+		if (_methodName146.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes146, parameterTypes)) {
 			return P2pActivityLocalServiceUtil.findByActId(((Long)arguments[0]).longValue());
 		}
 
-		if (_methodName143.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes143, parameterTypes)) {
+		if (_methodName147.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes147, parameterTypes)) {
 			return P2pActivityLocalServiceUtil.findByActId(((Long)arguments[0]).longValue(),
 				((Integer)arguments[1]).intValue(),
 				((Integer)arguments[2]).intValue());
 		}
 
-		if (_methodName144.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes144, parameterTypes)) {
+		if (_methodName148.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes148, parameterTypes)) {
 			return P2pActivityLocalServiceUtil.findByActIdOrderByP2pId(((Long)arguments[0]).longValue());
 		}
 
-		if (_methodName145.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes145, parameterTypes)) {
+		if (_methodName149.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes149, parameterTypes)) {
 			return P2pActivityLocalServiceUtil.getUsersToCorrectP2P(((Long)arguments[0]).longValue(),
 				((Long)arguments[1]).longValue(),
 				((Integer)arguments[2]).intValue(),
 				(java.util.Calendar)arguments[3]);
 		}
 
-		if (_methodName146.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes146, parameterTypes)) {
+		if (_methodName150.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes150, parameterTypes)) {
 			return P2pActivityLocalServiceUtil.getP2pActivitiesToCorrect(((Long)arguments[0]).longValue(),
 				((Long)arguments[1]).longValue(),
 				((Integer)arguments[2]).intValue());
 		}
 
-		if (_methodName147.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes147, parameterTypes)) {
+		if (_methodName151.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes151, parameterTypes)) {
 			return P2pActivityLocalServiceUtil.getP2PActivitiesInDay((java.util.Calendar)arguments[0]);
 		}
 
-		if (_methodName148.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes148, parameterTypes)) {
+		if (_methodName152.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes152, parameterTypes)) {
 			return P2pActivityLocalServiceUtil.getNumCorrectsByDayP2P(((Long)arguments[0]).longValue(),
 				(java.util.Calendar)arguments[1]);
 		}
 
-		if (_methodName149.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes149, parameterTypes)) {
+		if (_methodName153.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes153, parameterTypes)) {
 			return P2pActivityLocalServiceUtil.addP2pActivity((com.liferay.lms.model.P2pActivity)arguments[0]);
 		}
 
-		if (_methodName150.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes150, parameterTypes)) {
+		if (_methodName154.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes154, parameterTypes)) {
 			return P2pActivityLocalServiceUtil.updateP2pActivity((com.liferay.lms.model.P2pActivity)arguments[0]);
 		}
 
@@ -364,18 +364,10 @@ public class P2pActivityLocalServiceClpInvoker {
 	private String[] _methodParameterTypes14;
 	private String _methodName15;
 	private String[] _methodParameterTypes15;
-	private String _methodName134;
-	private String[] _methodParameterTypes134;
-	private String _methodName135;
-	private String[] _methodParameterTypes135;
-	private String _methodName140;
-	private String[] _methodParameterTypes140;
-	private String _methodName141;
-	private String[] _methodParameterTypes141;
-	private String _methodName142;
-	private String[] _methodParameterTypes142;
-	private String _methodName143;
-	private String[] _methodParameterTypes143;
+	private String _methodName138;
+	private String[] _methodParameterTypes138;
+	private String _methodName139;
+	private String[] _methodParameterTypes139;
 	private String _methodName144;
 	private String[] _methodParameterTypes144;
 	private String _methodName145;
@@ -390,4 +382,12 @@ public class P2pActivityLocalServiceClpInvoker {
 	private String[] _methodParameterTypes149;
 	private String _methodName150;
 	private String[] _methodParameterTypes150;
+	private String _methodName151;
+	private String[] _methodParameterTypes151;
+	private String _methodName152;
+	private String[] _methodParameterTypes152;
+	private String _methodName153;
+	private String[] _methodParameterTypes153;
+	private String _methodName154;
+	private String[] _methodParameterTypes154;
 }

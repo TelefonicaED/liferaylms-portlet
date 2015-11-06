@@ -104,57 +104,61 @@ public class ModuleResultLocalServiceClpInvoker {
 				"com.liferay.lms.model.ModuleResult", "boolean"
 			};
 
-		_methodName134 = "getBeanIdentifier";
+		_methodName138 = "getBeanIdentifier";
 
-		_methodParameterTypes134 = new String[] {  };
+		_methodParameterTypes138 = new String[] {  };
 
-		_methodName135 = "setBeanIdentifier";
+		_methodName139 = "setBeanIdentifier";
 
-		_methodParameterTypes135 = new String[] { "java.lang.String" };
+		_methodParameterTypes139 = new String[] { "java.lang.String" };
 
-		_methodName140 = "getByModuleAndUser";
+		_methodName144 = "getByModuleAndUser";
 
-		_methodParameterTypes140 = new String[] { "long", "long" };
+		_methodParameterTypes144 = new String[] { "long", "long" };
 
-		_methodName141 = "getListModuleResultByModuleAndUser";
+		_methodName145 = "getListModuleResultByModuleAndUser";
 
-		_methodParameterTypes141 = new String[] { "long", "long" };
+		_methodParameterTypes145 = new String[] { "long", "long" };
 
-		_methodName142 = "countByModule";
+		_methodName146 = "countByModule";
 
-		_methodParameterTypes142 = new String[] { "long" };
+		_methodParameterTypes146 = new String[] { "long" };
 
-		_methodName143 = "countByModuleOnlyStudents";
+		_methodName147 = "countByModuleOnlyStudents";
 
-		_methodParameterTypes143 = new String[] { "long", "long", "long" };
+		_methodParameterTypes147 = new String[] { "long", "long", "long" };
 
-		_methodName144 = "countByModulePassed";
+		_methodName148 = "countByModulePassed";
 
-		_methodParameterTypes144 = new String[] { "long", "boolean" };
+		_methodParameterTypes148 = new String[] { "long", "boolean" };
 
-		_methodName145 = "countByModulePassedOnlyStudents";
+		_methodName149 = "countByModulePassedOnlyStudents";
 
-		_methodParameterTypes145 = new String[] {
+		_methodParameterTypes149 = new String[] {
 				"long", "long", "long", "boolean"
 			};
 
-		_methodName146 = "update";
+		_methodName151 = "update";
 
-		_methodParameterTypes146 = new String[] {
+		_methodParameterTypes151 = new String[] {
 				"com.liferay.lms.model.LearningActivityResult"
 			};
 
-		_methodName147 = "updateAllUsers";
+		_methodName152 = "updateAllUsers";
 
-		_methodParameterTypes147 = new String[] { "long", "long" };
+		_methodParameterTypes152 = new String[] { "long", "long" };
 
-		_methodName148 = "updateAllCoursesAllModulesAllUsers";
+		_methodName153 = "updateAllCoursesAllModulesAllUsers";
 
-		_methodParameterTypes148 = new String[] {  };
+		_methodParameterTypes153 = new String[] {  };
 
-		_methodName149 = "update";
+		_methodName155 = "calculateModuleResultStartDate";
 
-		_methodParameterTypes149 = new String[] { "long", "long" };
+		_methodParameterTypes155 = new String[] { "long", "long" };
+
+		_methodName156 = "update";
+
+		_methodParameterTypes156 = new String[] { "long", "long" };
 	}
 
 	public Object invokeMethod(String name, String[] parameterTypes,
@@ -246,78 +250,84 @@ public class ModuleResultLocalServiceClpInvoker {
 				((Boolean)arguments[1]).booleanValue());
 		}
 
-		if (_methodName134.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes134, parameterTypes)) {
+		if (_methodName138.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes138, parameterTypes)) {
 			return ModuleResultLocalServiceUtil.getBeanIdentifier();
 		}
 
-		if (_methodName135.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes135, parameterTypes)) {
+		if (_methodName139.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes139, parameterTypes)) {
 			ModuleResultLocalServiceUtil.setBeanIdentifier((java.lang.String)arguments[0]);
 
 			return null;
 		}
 
-		if (_methodName140.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes140, parameterTypes)) {
+		if (_methodName144.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes144, parameterTypes)) {
 			return ModuleResultLocalServiceUtil.getByModuleAndUser(((Long)arguments[0]).longValue(),
 				((Long)arguments[1]).longValue());
 		}
 
-		if (_methodName141.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes141, parameterTypes)) {
+		if (_methodName145.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes145, parameterTypes)) {
 			return ModuleResultLocalServiceUtil.getListModuleResultByModuleAndUser(((Long)arguments[0]).longValue(),
 				((Long)arguments[1]).longValue());
 		}
 
-		if (_methodName142.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes142, parameterTypes)) {
+		if (_methodName146.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes146, parameterTypes)) {
 			return ModuleResultLocalServiceUtil.countByModule(((Long)arguments[0]).longValue());
 		}
 
-		if (_methodName143.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes143, parameterTypes)) {
+		if (_methodName147.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes147, parameterTypes)) {
 			return ModuleResultLocalServiceUtil.countByModuleOnlyStudents(((Long)arguments[0]).longValue(),
 				((Long)arguments[1]).longValue(),
 				((Long)arguments[2]).longValue());
 		}
 
-		if (_methodName144.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes144, parameterTypes)) {
+		if (_methodName148.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes148, parameterTypes)) {
 			return ModuleResultLocalServiceUtil.countByModulePassed(((Long)arguments[0]).longValue(),
 				((Boolean)arguments[1]).booleanValue());
 		}
 
-		if (_methodName145.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes145, parameterTypes)) {
+		if (_methodName149.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes149, parameterTypes)) {
 			return ModuleResultLocalServiceUtil.countByModulePassedOnlyStudents(((Long)arguments[0]).longValue(),
 				((Long)arguments[1]).longValue(),
 				((Long)arguments[2]).longValue(),
 				((Boolean)arguments[3]).booleanValue());
 		}
 
-		if (_methodName146.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes146, parameterTypes)) {
+		if (_methodName151.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes151, parameterTypes)) {
 			ModuleResultLocalServiceUtil.update((com.liferay.lms.model.LearningActivityResult)arguments[0]);
 
 			return null;
 		}
 
-		if (_methodName147.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes147, parameterTypes)) {
+		if (_methodName152.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes152, parameterTypes)) {
 			return ModuleResultLocalServiceUtil.updateAllUsers(((Long)arguments[0]).longValue(),
 				((Long)arguments[1]).longValue());
 		}
 
-		if (_methodName148.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes148, parameterTypes)) {
+		if (_methodName153.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes153, parameterTypes)) {
 			ModuleResultLocalServiceUtil.updateAllCoursesAllModulesAllUsers();
 
 			return null;
 		}
 
-		if (_methodName149.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes149, parameterTypes)) {
+		if (_methodName155.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes155, parameterTypes)) {
+			return ModuleResultLocalServiceUtil.calculateModuleResultStartDate(((Long)arguments[0]).longValue(),
+				((Long)arguments[1]).longValue());
+		}
+
+		if (_methodName156.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes156, parameterTypes)) {
 			return ModuleResultLocalServiceUtil.update(((Long)arguments[0]).longValue(),
 				((Long)arguments[1]).longValue());
 		}
@@ -357,18 +367,10 @@ public class ModuleResultLocalServiceClpInvoker {
 	private String[] _methodParameterTypes14;
 	private String _methodName15;
 	private String[] _methodParameterTypes15;
-	private String _methodName134;
-	private String[] _methodParameterTypes134;
-	private String _methodName135;
-	private String[] _methodParameterTypes135;
-	private String _methodName140;
-	private String[] _methodParameterTypes140;
-	private String _methodName141;
-	private String[] _methodParameterTypes141;
-	private String _methodName142;
-	private String[] _methodParameterTypes142;
-	private String _methodName143;
-	private String[] _methodParameterTypes143;
+	private String _methodName138;
+	private String[] _methodParameterTypes138;
+	private String _methodName139;
+	private String[] _methodParameterTypes139;
 	private String _methodName144;
 	private String[] _methodParameterTypes144;
 	private String _methodName145;
@@ -381,4 +383,14 @@ public class ModuleResultLocalServiceClpInvoker {
 	private String[] _methodParameterTypes148;
 	private String _methodName149;
 	private String[] _methodParameterTypes149;
+	private String _methodName151;
+	private String[] _methodParameterTypes151;
+	private String _methodName152;
+	private String[] _methodParameterTypes152;
+	private String _methodName153;
+	private String[] _methodParameterTypes153;
+	private String _methodName155;
+	private String[] _methodParameterTypes155;
+	private String _methodName156;
+	private String[] _methodParameterTypes156;
 }

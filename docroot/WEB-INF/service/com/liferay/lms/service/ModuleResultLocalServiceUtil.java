@@ -337,6 +337,13 @@ public class ModuleResultLocalServiceUtil {
 		getService().updateAllCoursesAllModulesAllUsers();
 	}
 
+	public static java.util.Date calculateModuleResultStartDate(long moduleId,
+		long userId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getService().calculateModuleResultStartDate(moduleId, userId);
+	}
+
 	public static boolean update(long moduleId, long userId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {

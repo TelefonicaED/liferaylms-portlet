@@ -227,6 +227,13 @@ public class CourseServiceUtil {
 		return getService().getLogoUrl(courseId);
 	}
 
+	public static java.util.List<com.liferay.lms.model.Course> getChildCourses(
+		long courseId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getService().getChildCourses(courseId);
+	}
+
 	public static void clearService() {
 		_service = null;
 	}

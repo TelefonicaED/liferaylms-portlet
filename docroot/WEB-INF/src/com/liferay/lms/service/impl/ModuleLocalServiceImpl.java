@@ -468,7 +468,7 @@ public class ModuleLocalServiceImpl extends ModuleLocalServiceBaseImpl {
 	{
 		Module theModule=ModuleLocalServiceUtil.getModule(moduleId);
 		ModuleResult mr=ModuleResultLocalServiceUtil.getByModuleAndUser(theModule.getModuleId(), userId);
-		if(mr!=null && !mr.getPassed())
+		if(mr!=null && !mr.getPassed()&&mr.getStartDate()!=null)
 		{
 			long courtesyTime=GetterUtil.getLong(PropsUtil.get("lms.module.courtesytime.miliseconds"),0);
 			long usedTime=System.currentTimeMillis()-mr.getStartDate().getTime();

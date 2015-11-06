@@ -151,9 +151,13 @@ public class ModuleResultLocalServiceClp implements ModuleResultLocalService {
 
 		_methodParameterTypes27 = new String[] {  };
 
-		_methodName28 = "update";
+		_methodName28 = "calculateModuleResultStartDate";
 
 		_methodParameterTypes28 = new String[] { "long", "long" };
+
+		_methodName29 = "update";
+
+		_methodParameterTypes29 = new String[] { "long", "long" };
 	}
 
 	public com.liferay.lms.model.ModuleResult addModuleResult(
@@ -947,7 +951,8 @@ public class ModuleResultLocalServiceClp implements ModuleResultLocalService {
 		}
 	}
 
-	public boolean update(long moduleId, long userId)
+	public java.util.Date calculateModuleResultStartDate(long moduleId,
+		long userId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		Object returnObj = null;
@@ -955,6 +960,38 @@ public class ModuleResultLocalServiceClp implements ModuleResultLocalService {
 		try {
 			returnObj = _invokableLocalService.invokeMethod(_methodName28,
 					_methodParameterTypes28, new Object[] { moduleId, userId });
+		}
+		catch (Throwable t) {
+			t = ClpSerializer.translateThrowable(t);
+
+			if (t instanceof com.liferay.portal.kernel.exception.PortalException) {
+				throw (com.liferay.portal.kernel.exception.PortalException)t;
+			}
+
+			if (t instanceof com.liferay.portal.kernel.exception.SystemException) {
+				throw (com.liferay.portal.kernel.exception.SystemException)t;
+			}
+
+			if (t instanceof RuntimeException) {
+				throw (RuntimeException)t;
+			}
+			else {
+				throw new RuntimeException(t.getClass().getName() +
+					" is not a valid exception");
+			}
+		}
+
+		return (java.util.Date)ClpSerializer.translateOutput(returnObj);
+	}
+
+	public boolean update(long moduleId, long userId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		Object returnObj = null;
+
+		try {
+			returnObj = _invokableLocalService.invokeMethod(_methodName29,
+					_methodParameterTypes29, new Object[] { moduleId, userId });
 		}
 		catch (Throwable t) {
 			t = ClpSerializer.translateThrowable(t);
@@ -1036,4 +1073,6 @@ public class ModuleResultLocalServiceClp implements ModuleResultLocalService {
 	private String[] _methodParameterTypes27;
 	private String _methodName28;
 	private String[] _methodParameterTypes28;
+	private String _methodName29;
+	private String[] _methodParameterTypes29;
 }

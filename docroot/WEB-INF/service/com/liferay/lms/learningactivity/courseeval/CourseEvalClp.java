@@ -606,4 +606,49 @@ public class CourseEvalClp implements CourseEval {
 
 	}
 
+	@Override
+	public long calculateModuleResult(long moduleId, long userId)
+			throws SystemException {
+		Object returnObj = null;
+
+		try {
+			MethodKey especificValidationsMethod = new MethodKey(clp.getClassName(), "calculateModuleResult", long.class, long.class);		    
+			returnObj = clp.invoke(new MethodHandler(especificValidationsMethod, moduleId, userId));
+		}
+		catch (Throwable t) {
+			t = ClpSerializer.translateThrowable(t);
+
+			if (t instanceof RuntimeException) {
+				throw (RuntimeException)t;
+			}
+			else {
+				t.printStackTrace();
+				throw new RuntimeException(t.getClass().getName() +
+					" is not a valid exception");
+			}
+		}
+		return ((Long)returnObj).longValue();	
+	}
+	@Override
+	public boolean hasModuleResultCalculator() {
+		Object returnObj = null;
+
+		try {
+			returnObj = clp.invoke("hasModuleResultCalculator",	new Object[] {});
+		}
+		catch (Throwable t) {
+			t = ClpSerializer.translateThrowable(t);
+
+			if (t instanceof RuntimeException) {
+				throw (RuntimeException)t;
+			}
+			else {
+				throw new RuntimeException(t.getClass().getName() +
+					" is not a valid exception");
+			}
+		}
+
+		return ((Boolean)returnObj).booleanValue();
+	}
+
 }

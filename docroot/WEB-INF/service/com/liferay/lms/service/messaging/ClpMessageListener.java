@@ -15,6 +15,8 @@
 package com.liferay.lms.service.messaging;
 
 import com.liferay.lms.service.AuditEntryLocalServiceUtil;
+import com.liferay.lms.service.AuditLoggerLocalServiceUtil;
+import com.liferay.lms.service.AuditLoggerServiceUtil;
 import com.liferay.lms.service.CheckP2pMailingLocalServiceUtil;
 import com.liferay.lms.service.ClpSerializer;
 import com.liferay.lms.service.CompetenceLocalServiceUtil;
@@ -68,6 +70,9 @@ public class ClpMessageListener extends BaseMessageListener {
 				servletContextName.equals(getServletContextName())) {
 			AuditEntryLocalServiceUtil.clearService();
 
+			AuditLoggerLocalServiceUtil.clearService();
+
+			AuditLoggerServiceUtil.clearService();
 			CheckP2pMailingLocalServiceUtil.clearService();
 
 			CompetenceLocalServiceUtil.clearService();

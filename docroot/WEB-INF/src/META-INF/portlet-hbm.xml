@@ -3,6 +3,7 @@
 
 <hibernate-mapping default-lazy="false" auto-import="false">
 	<import class="com.liferay.lms.model.AuditEntry" />
+	<import class="com.liferay.lms.model.AuditLogger" />
 	<import class="com.liferay.lms.model.CheckP2pMailing" />
 	<import class="com.liferay.lms.model.Competence" />
 	<import class="com.liferay.lms.model.Course" />

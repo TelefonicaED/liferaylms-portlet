@@ -140,7 +140,7 @@ public class CoursePersistenceImpl extends BasePersistenceImpl<Course>
 	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_BY_PARENTCOURSEID =
 		new FinderPath(CourseModelImpl.ENTITY_CACHE_ENABLED,
 			CourseModelImpl.FINDER_CACHE_ENABLED, CourseImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByparentCourseId",
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByParentCourseId",
 			new String[] {
 				Long.class.getName(),
 				
@@ -150,13 +150,37 @@ public class CoursePersistenceImpl extends BasePersistenceImpl<Course>
 	public static final FinderPath FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_PARENTCOURSEID =
 		new FinderPath(CourseModelImpl.ENTITY_CACHE_ENABLED,
 			CourseModelImpl.FINDER_CACHE_ENABLED, CourseImpl.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByparentCourseId",
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByParentCourseId",
 			new String[] { Long.class.getName() },
 			CourseModelImpl.PARENTCOURSEID_COLUMN_BITMASK);
 	public static final FinderPath FINDER_PATH_COUNT_BY_PARENTCOURSEID = new FinderPath(CourseModelImpl.ENTITY_CACHE_ENABLED,
 			CourseModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByparentCourseId",
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByParentCourseId",
 			new String[] { Long.class.getName() });
+	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_BY_COMPANYPARENTCOURSEID =
+		new FinderPath(CourseModelImpl.ENTITY_CACHE_ENABLED,
+			CourseModelImpl.FINDER_CACHE_ENABLED, CourseImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION,
+			"findByCompanyParentCourseId",
+			new String[] {
+				Long.class.getName(), Long.class.getName(),
+				
+			"java.lang.Integer", "java.lang.Integer",
+				"com.liferay.portal.kernel.util.OrderByComparator"
+			});
+	public static final FinderPath FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_COMPANYPARENTCOURSEID =
+		new FinderPath(CourseModelImpl.ENTITY_CACHE_ENABLED,
+			CourseModelImpl.FINDER_CACHE_ENABLED, CourseImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION,
+			"findByCompanyParentCourseId",
+			new String[] { Long.class.getName(), Long.class.getName() },
+			CourseModelImpl.COMPANYID_COLUMN_BITMASK |
+			CourseModelImpl.PARENTCOURSEID_COLUMN_BITMASK);
+	public static final FinderPath FINDER_PATH_COUNT_BY_COMPANYPARENTCOURSEID = new FinderPath(CourseModelImpl.ENTITY_CACHE_ENABLED,
+			CourseModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION,
+			"countByCompanyParentCourseId",
+			new String[] { Long.class.getName(), Long.class.getName() });
 	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_BY_GROUPIDCLOSED =
 		new FinderPath(CourseModelImpl.ENTITY_CACHE_ENABLED,
 			CourseModelImpl.FINDER_CACHE_ENABLED, CourseImpl.class,
@@ -582,6 +606,29 @@ public class CoursePersistenceImpl extends BasePersistenceImpl<Course>
 				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_PARENTCOURSEID,
 					args);
 				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_PARENTCOURSEID,
+					args);
+			}
+
+			if ((courseModelImpl.getColumnBitmask() &
+					FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_COMPANYPARENTCOURSEID.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] {
+						Long.valueOf(courseModelImpl.getOriginalCompanyId()),
+						Long.valueOf(courseModelImpl.getOriginalParentCourseId())
+					};
+
+				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_COMPANYPARENTCOURSEID,
+					args);
+				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_COMPANYPARENTCOURSEID,
+					args);
+
+				args = new Object[] {
+						Long.valueOf(courseModelImpl.getCompanyId()),
+						Long.valueOf(courseModelImpl.getParentCourseId())
+					};
+
+				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_COMPANYPARENTCOURSEID,
+					args);
+				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_COMPANYPARENTCOURSEID,
 					args);
 			}
 
@@ -2171,9 +2218,9 @@ public class CoursePersistenceImpl extends BasePersistenceImpl<Course>
 	 * @return the matching courses
 	 * @throws SystemException if a system exception occurred
 	 */
-	public List<Course> findByparentCourseId(long parentCourseId)
+	public List<Course> findByParentCourseId(long parentCourseId)
 		throws SystemException {
-		return findByparentCourseId(parentCourseId, QueryUtil.ALL_POS,
+		return findByParentCourseId(parentCourseId, QueryUtil.ALL_POS,
 			QueryUtil.ALL_POS, null);
 	}
 
@@ -2190,9 +2237,9 @@ public class CoursePersistenceImpl extends BasePersistenceImpl<Course>
 	 * @return the range of matching courses
 	 * @throws SystemException if a system exception occurred
 	 */
-	public List<Course> findByparentCourseId(long parentCourseId, int start,
+	public List<Course> findByParentCourseId(long parentCourseId, int start,
 		int end) throws SystemException {
-		return findByparentCourseId(parentCourseId, start, end, null);
+		return findByParentCourseId(parentCourseId, start, end, null);
 	}
 
 	/**
@@ -2209,7 +2256,7 @@ public class CoursePersistenceImpl extends BasePersistenceImpl<Course>
 	 * @return the ordered range of matching courses
 	 * @throws SystemException if a system exception occurred
 	 */
-	public List<Course> findByparentCourseId(long parentCourseId, int start,
+	public List<Course> findByParentCourseId(long parentCourseId, int start,
 		int end, OrderByComparator orderByComparator) throws SystemException {
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
@@ -2309,10 +2356,10 @@ public class CoursePersistenceImpl extends BasePersistenceImpl<Course>
 	 * @throws com.liferay.lms.NoSuchCourseException if a matching course could not be found
 	 * @throws SystemException if a system exception occurred
 	 */
-	public Course findByparentCourseId_First(long parentCourseId,
+	public Course findByParentCourseId_First(long parentCourseId,
 		OrderByComparator orderByComparator)
 		throws NoSuchCourseException, SystemException {
-		Course course = fetchByparentCourseId_First(parentCourseId,
+		Course course = fetchByParentCourseId_First(parentCourseId,
 				orderByComparator);
 
 		if (course != null) {
@@ -2339,9 +2386,9 @@ public class CoursePersistenceImpl extends BasePersistenceImpl<Course>
 	 * @return the first matching course, or <code>null</code> if a matching course could not be found
 	 * @throws SystemException if a system exception occurred
 	 */
-	public Course fetchByparentCourseId_First(long parentCourseId,
+	public Course fetchByParentCourseId_First(long parentCourseId,
 		OrderByComparator orderByComparator) throws SystemException {
-		List<Course> list = findByparentCourseId(parentCourseId, 0, 1,
+		List<Course> list = findByParentCourseId(parentCourseId, 0, 1,
 				orderByComparator);
 
 		if (!list.isEmpty()) {
@@ -2360,10 +2407,10 @@ public class CoursePersistenceImpl extends BasePersistenceImpl<Course>
 	 * @throws com.liferay.lms.NoSuchCourseException if a matching course could not be found
 	 * @throws SystemException if a system exception occurred
 	 */
-	public Course findByparentCourseId_Last(long parentCourseId,
+	public Course findByParentCourseId_Last(long parentCourseId,
 		OrderByComparator orderByComparator)
 		throws NoSuchCourseException, SystemException {
-		Course course = fetchByparentCourseId_Last(parentCourseId,
+		Course course = fetchByParentCourseId_Last(parentCourseId,
 				orderByComparator);
 
 		if (course != null) {
@@ -2390,11 +2437,11 @@ public class CoursePersistenceImpl extends BasePersistenceImpl<Course>
 	 * @return the last matching course, or <code>null</code> if a matching course could not be found
 	 * @throws SystemException if a system exception occurred
 	 */
-	public Course fetchByparentCourseId_Last(long parentCourseId,
+	public Course fetchByParentCourseId_Last(long parentCourseId,
 		OrderByComparator orderByComparator) throws SystemException {
-		int count = countByparentCourseId(parentCourseId);
+		int count = countByParentCourseId(parentCourseId);
 
-		List<Course> list = findByparentCourseId(parentCourseId, count - 1,
+		List<Course> list = findByParentCourseId(parentCourseId, count - 1,
 				count, orderByComparator);
 
 		if (!list.isEmpty()) {
@@ -2414,7 +2461,7 @@ public class CoursePersistenceImpl extends BasePersistenceImpl<Course>
 	 * @throws com.liferay.lms.NoSuchCourseException if a course with the primary key could not be found
 	 * @throws SystemException if a system exception occurred
 	 */
-	public Course[] findByparentCourseId_PrevAndNext(long courseId,
+	public Course[] findByParentCourseId_PrevAndNext(long courseId,
 		long parentCourseId, OrderByComparator orderByComparator)
 		throws NoSuchCourseException, SystemException {
 		Course course = findByPrimaryKey(courseId);
@@ -2426,12 +2473,12 @@ public class CoursePersistenceImpl extends BasePersistenceImpl<Course>
 
 			Course[] array = new CourseImpl[3];
 
-			array[0] = getByparentCourseId_PrevAndNext(session, course,
+			array[0] = getByParentCourseId_PrevAndNext(session, course,
 					parentCourseId, orderByComparator, true);
 
 			array[1] = course;
 
-			array[2] = getByparentCourseId_PrevAndNext(session, course,
+			array[2] = getByParentCourseId_PrevAndNext(session, course,
 					parentCourseId, orderByComparator, false);
 
 			return array;
@@ -2444,7 +2491,7 @@ public class CoursePersistenceImpl extends BasePersistenceImpl<Course>
 		}
 	}
 
-	protected Course getByparentCourseId_PrevAndNext(Session session,
+	protected Course getByParentCourseId_PrevAndNext(Session session,
 		Course course, long parentCourseId,
 		OrderByComparator orderByComparator, boolean previous) {
 		StringBundler query = null;
@@ -2529,6 +2576,419 @@ public class CoursePersistenceImpl extends BasePersistenceImpl<Course>
 		q.setMaxResults(2);
 
 		QueryPos qPos = QueryPos.getInstance(q);
+
+		qPos.add(parentCourseId);
+
+		if (orderByComparator != null) {
+			Object[] values = orderByComparator.getOrderByConditionValues(course);
+
+			for (Object value : values) {
+				qPos.add(value);
+			}
+		}
+
+		List<Course> list = q.list();
+
+		if (list.size() == 2) {
+			return list.get(1);
+		}
+		else {
+			return null;
+		}
+	}
+
+	/**
+	 * Returns all the courses where companyId = &#63; and parentCourseId = &#63;.
+	 *
+	 * @param companyId the company ID
+	 * @param parentCourseId the parent course ID
+	 * @return the matching courses
+	 * @throws SystemException if a system exception occurred
+	 */
+	public List<Course> findByCompanyParentCourseId(long companyId,
+		long parentCourseId) throws SystemException {
+		return findByCompanyParentCourseId(companyId, parentCourseId,
+			QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+	}
+
+	/**
+	 * Returns a range of all the courses where companyId = &#63; and parentCourseId = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	 * </p>
+	 *
+	 * @param companyId the company ID
+	 * @param parentCourseId the parent course ID
+	 * @param start the lower bound of the range of courses
+	 * @param end the upper bound of the range of courses (not inclusive)
+	 * @return the range of matching courses
+	 * @throws SystemException if a system exception occurred
+	 */
+	public List<Course> findByCompanyParentCourseId(long companyId,
+		long parentCourseId, int start, int end) throws SystemException {
+		return findByCompanyParentCourseId(companyId, parentCourseId, start,
+			end, null);
+	}
+
+	/**
+	 * Returns an ordered range of all the courses where companyId = &#63; and parentCourseId = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	 * </p>
+	 *
+	 * @param companyId the company ID
+	 * @param parentCourseId the parent course ID
+	 * @param start the lower bound of the range of courses
+	 * @param end the upper bound of the range of courses (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @return the ordered range of matching courses
+	 * @throws SystemException if a system exception occurred
+	 */
+	public List<Course> findByCompanyParentCourseId(long companyId,
+		long parentCourseId, int start, int end,
+		OrderByComparator orderByComparator) throws SystemException {
+		FinderPath finderPath = null;
+		Object[] finderArgs = null;
+
+		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
+				(orderByComparator == null)) {
+			finderPath = FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_COMPANYPARENTCOURSEID;
+			finderArgs = new Object[] { companyId, parentCourseId };
+		}
+		else {
+			finderPath = FINDER_PATH_WITH_PAGINATION_FIND_BY_COMPANYPARENTCOURSEID;
+			finderArgs = new Object[] {
+					companyId, parentCourseId,
+					
+					start, end, orderByComparator
+				};
+		}
+
+		List<Course> list = (List<Course>)FinderCacheUtil.getResult(finderPath,
+				finderArgs, this);
+
+		if ((list != null) && !list.isEmpty()) {
+			for (Course course : list) {
+				if ((companyId != course.getCompanyId()) ||
+						(parentCourseId != course.getParentCourseId())) {
+					list = null;
+
+					break;
+				}
+			}
+		}
+
+		if (list == null) {
+			StringBundler query = null;
+
+			if (orderByComparator != null) {
+				query = new StringBundler(4 +
+						(orderByComparator.getOrderByFields().length * 3));
+			}
+			else {
+				query = new StringBundler(4);
+			}
+
+			query.append(_SQL_SELECT_COURSE_WHERE);
+
+			query.append(_FINDER_COLUMN_COMPANYPARENTCOURSEID_COMPANYID_2);
+
+			query.append(_FINDER_COLUMN_COMPANYPARENTCOURSEID_PARENTCOURSEID_2);
+
+			if (orderByComparator != null) {
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
+			}
+
+			else {
+				query.append(CourseModelImpl.ORDER_BY_JPQL);
+			}
+
+			String sql = query.toString();
+
+			Session session = null;
+
+			try {
+				session = openSession();
+
+				Query q = session.createQuery(sql);
+
+				QueryPos qPos = QueryPos.getInstance(q);
+
+				qPos.add(companyId);
+
+				qPos.add(parentCourseId);
+
+				list = (List<Course>)QueryUtil.list(q, getDialect(), start, end);
+			}
+			catch (Exception e) {
+				throw processException(e);
+			}
+			finally {
+				if (list == null) {
+					FinderCacheUtil.removeResult(finderPath, finderArgs);
+				}
+				else {
+					cacheResult(list);
+
+					FinderCacheUtil.putResult(finderPath, finderArgs, list);
+				}
+
+				closeSession(session);
+			}
+		}
+
+		return list;
+	}
+
+	/**
+	 * Returns the first course in the ordered set where companyId = &#63; and parentCourseId = &#63;.
+	 *
+	 * @param companyId the company ID
+	 * @param parentCourseId the parent course ID
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the first matching course
+	 * @throws com.liferay.lms.NoSuchCourseException if a matching course could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	public Course findByCompanyParentCourseId_First(long companyId,
+		long parentCourseId, OrderByComparator orderByComparator)
+		throws NoSuchCourseException, SystemException {
+		Course course = fetchByCompanyParentCourseId_First(companyId,
+				parentCourseId, orderByComparator);
+
+		if (course != null) {
+			return course;
+		}
+
+		StringBundler msg = new StringBundler(6);
+
+		msg.append(_NO_SUCH_ENTITY_WITH_KEY);
+
+		msg.append("companyId=");
+		msg.append(companyId);
+
+		msg.append(", parentCourseId=");
+		msg.append(parentCourseId);
+
+		msg.append(StringPool.CLOSE_CURLY_BRACE);
+
+		throw new NoSuchCourseException(msg.toString());
+	}
+
+	/**
+	 * Returns the first course in the ordered set where companyId = &#63; and parentCourseId = &#63;.
+	 *
+	 * @param companyId the company ID
+	 * @param parentCourseId the parent course ID
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the first matching course, or <code>null</code> if a matching course could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	public Course fetchByCompanyParentCourseId_First(long companyId,
+		long parentCourseId, OrderByComparator orderByComparator)
+		throws SystemException {
+		List<Course> list = findByCompanyParentCourseId(companyId,
+				parentCourseId, 0, 1, orderByComparator);
+
+		if (!list.isEmpty()) {
+			return list.get(0);
+		}
+
+		return null;
+	}
+
+	/**
+	 * Returns the last course in the ordered set where companyId = &#63; and parentCourseId = &#63;.
+	 *
+	 * @param companyId the company ID
+	 * @param parentCourseId the parent course ID
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the last matching course
+	 * @throws com.liferay.lms.NoSuchCourseException if a matching course could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	public Course findByCompanyParentCourseId_Last(long companyId,
+		long parentCourseId, OrderByComparator orderByComparator)
+		throws NoSuchCourseException, SystemException {
+		Course course = fetchByCompanyParentCourseId_Last(companyId,
+				parentCourseId, orderByComparator);
+
+		if (course != null) {
+			return course;
+		}
+
+		StringBundler msg = new StringBundler(6);
+
+		msg.append(_NO_SUCH_ENTITY_WITH_KEY);
+
+		msg.append("companyId=");
+		msg.append(companyId);
+
+		msg.append(", parentCourseId=");
+		msg.append(parentCourseId);
+
+		msg.append(StringPool.CLOSE_CURLY_BRACE);
+
+		throw new NoSuchCourseException(msg.toString());
+	}
+
+	/**
+	 * Returns the last course in the ordered set where companyId = &#63; and parentCourseId = &#63;.
+	 *
+	 * @param companyId the company ID
+	 * @param parentCourseId the parent course ID
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the last matching course, or <code>null</code> if a matching course could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	public Course fetchByCompanyParentCourseId_Last(long companyId,
+		long parentCourseId, OrderByComparator orderByComparator)
+		throws SystemException {
+		int count = countByCompanyParentCourseId(companyId, parentCourseId);
+
+		List<Course> list = findByCompanyParentCourseId(companyId,
+				parentCourseId, count - 1, count, orderByComparator);
+
+		if (!list.isEmpty()) {
+			return list.get(0);
+		}
+
+		return null;
+	}
+
+	/**
+	 * Returns the courses before and after the current course in the ordered set where companyId = &#63; and parentCourseId = &#63;.
+	 *
+	 * @param courseId the primary key of the current course
+	 * @param companyId the company ID
+	 * @param parentCourseId the parent course ID
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the previous, current, and next course
+	 * @throws com.liferay.lms.NoSuchCourseException if a course with the primary key could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	public Course[] findByCompanyParentCourseId_PrevAndNext(long courseId,
+		long companyId, long parentCourseId, OrderByComparator orderByComparator)
+		throws NoSuchCourseException, SystemException {
+		Course course = findByPrimaryKey(courseId);
+
+		Session session = null;
+
+		try {
+			session = openSession();
+
+			Course[] array = new CourseImpl[3];
+
+			array[0] = getByCompanyParentCourseId_PrevAndNext(session, course,
+					companyId, parentCourseId, orderByComparator, true);
+
+			array[1] = course;
+
+			array[2] = getByCompanyParentCourseId_PrevAndNext(session, course,
+					companyId, parentCourseId, orderByComparator, false);
+
+			return array;
+		}
+		catch (Exception e) {
+			throw processException(e);
+		}
+		finally {
+			closeSession(session);
+		}
+	}
+
+	protected Course getByCompanyParentCourseId_PrevAndNext(Session session,
+		Course course, long companyId, long parentCourseId,
+		OrderByComparator orderByComparator, boolean previous) {
+		StringBundler query = null;
+
+		if (orderByComparator != null) {
+			query = new StringBundler(6 +
+					(orderByComparator.getOrderByFields().length * 6));
+		}
+		else {
+			query = new StringBundler(3);
+		}
+
+		query.append(_SQL_SELECT_COURSE_WHERE);
+
+		query.append(_FINDER_COLUMN_COMPANYPARENTCOURSEID_COMPANYID_2);
+
+		query.append(_FINDER_COLUMN_COMPANYPARENTCOURSEID_PARENTCOURSEID_2);
+
+		if (orderByComparator != null) {
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+
+			if (orderByConditionFields.length > 0) {
+				query.append(WHERE_AND);
+			}
+
+			for (int i = 0; i < orderByConditionFields.length; i++) {
+				query.append(_ORDER_BY_ENTITY_ALIAS);
+				query.append(orderByConditionFields[i]);
+
+				if ((i + 1) < orderByConditionFields.length) {
+					if (orderByComparator.isAscending() ^ previous) {
+						query.append(WHERE_GREATER_THAN_HAS_NEXT);
+					}
+					else {
+						query.append(WHERE_LESSER_THAN_HAS_NEXT);
+					}
+				}
+				else {
+					if (orderByComparator.isAscending() ^ previous) {
+						query.append(WHERE_GREATER_THAN);
+					}
+					else {
+						query.append(WHERE_LESSER_THAN);
+					}
+				}
+			}
+
+			query.append(ORDER_BY_CLAUSE);
+
+			String[] orderByFields = orderByComparator.getOrderByFields();
+
+			for (int i = 0; i < orderByFields.length; i++) {
+				query.append(_ORDER_BY_ENTITY_ALIAS);
+				query.append(orderByFields[i]);
+
+				if ((i + 1) < orderByFields.length) {
+					if (orderByComparator.isAscending() ^ previous) {
+						query.append(ORDER_BY_ASC_HAS_NEXT);
+					}
+					else {
+						query.append(ORDER_BY_DESC_HAS_NEXT);
+					}
+				}
+				else {
+					if (orderByComparator.isAscending() ^ previous) {
+						query.append(ORDER_BY_ASC);
+					}
+					else {
+						query.append(ORDER_BY_DESC);
+					}
+				}
+			}
+		}
+
+		else {
+			query.append(CourseModelImpl.ORDER_BY_JPQL);
+		}
+
+		String sql = query.toString();
+
+		Query q = session.createQuery(sql);
+
+		q.setFirstResult(0);
+		q.setMaxResults(2);
+
+		QueryPos qPos = QueryPos.getInstance(q);
+
+		qPos.add(companyId);
 
 		qPos.add(parentCourseId);
 
@@ -5646,9 +6106,24 @@ public class CoursePersistenceImpl extends BasePersistenceImpl<Course>
 	 * @param parentCourseId the parent course ID
 	 * @throws SystemException if a system exception occurred
 	 */
-	public void removeByparentCourseId(long parentCourseId)
+	public void removeByParentCourseId(long parentCourseId)
 		throws SystemException {
-		for (Course course : findByparentCourseId(parentCourseId)) {
+		for (Course course : findByParentCourseId(parentCourseId)) {
+			remove(course);
+		}
+	}
+
+	/**
+	 * Removes all the courses where companyId = &#63; and parentCourseId = &#63; from the database.
+	 *
+	 * @param companyId the company ID
+	 * @param parentCourseId the parent course ID
+	 * @throws SystemException if a system exception occurred
+	 */
+	public void removeByCompanyParentCourseId(long companyId,
+		long parentCourseId) throws SystemException {
+		for (Course course : findByCompanyParentCourseId(companyId,
+				parentCourseId)) {
 			remove(course);
 		}
 	}
@@ -6003,7 +6478,7 @@ public class CoursePersistenceImpl extends BasePersistenceImpl<Course>
 	 * @return the number of matching courses
 	 * @throws SystemException if a system exception occurred
 	 */
-	public int countByparentCourseId(long parentCourseId)
+	public int countByParentCourseId(long parentCourseId)
 		throws SystemException {
 		Object[] finderArgs = new Object[] { parentCourseId };
 
@@ -6041,6 +6516,65 @@ public class CoursePersistenceImpl extends BasePersistenceImpl<Course>
 				}
 
 				FinderCacheUtil.putResult(FINDER_PATH_COUNT_BY_PARENTCOURSEID,
+					finderArgs, count);
+
+				closeSession(session);
+			}
+		}
+
+		return count.intValue();
+	}
+
+	/**
+	 * Returns the number of courses where companyId = &#63; and parentCourseId = &#63;.
+	 *
+	 * @param companyId the company ID
+	 * @param parentCourseId the parent course ID
+	 * @return the number of matching courses
+	 * @throws SystemException if a system exception occurred
+	 */
+	public int countByCompanyParentCourseId(long companyId, long parentCourseId)
+		throws SystemException {
+		Object[] finderArgs = new Object[] { companyId, parentCourseId };
+
+		Long count = (Long)FinderCacheUtil.getResult(FINDER_PATH_COUNT_BY_COMPANYPARENTCOURSEID,
+				finderArgs, this);
+
+		if (count == null) {
+			StringBundler query = new StringBundler(3);
+
+			query.append(_SQL_COUNT_COURSE_WHERE);
+
+			query.append(_FINDER_COLUMN_COMPANYPARENTCOURSEID_COMPANYID_2);
+
+			query.append(_FINDER_COLUMN_COMPANYPARENTCOURSEID_PARENTCOURSEID_2);
+
+			String sql = query.toString();
+
+			Session session = null;
+
+			try {
+				session = openSession();
+
+				Query q = session.createQuery(sql);
+
+				QueryPos qPos = QueryPos.getInstance(q);
+
+				qPos.add(companyId);
+
+				qPos.add(parentCourseId);
+
+				count = (Long)q.uniqueResult();
+			}
+			catch (Exception e) {
+				throw processException(e);
+			}
+			finally {
+				if (count == null) {
+					count = Long.valueOf(0);
+				}
+
+				FinderCacheUtil.putResult(FINDER_PATH_COUNT_BY_COMPANYPARENTCOURSEID,
 					finderArgs, count);
 
 				closeSession(session);
@@ -6706,6 +7240,10 @@ public class CoursePersistenceImpl extends BasePersistenceImpl<Course>
 	private static final String _FINDER_COLUMN_UUID_G_GROUPID_2 = "course.groupId = ?";
 	private static final String _FINDER_COLUMN_GROUPID_GROUPID_2 = "course.groupId = ?";
 	private static final String _FINDER_COLUMN_PARENTCOURSEID_PARENTCOURSEID_2 = "course.parentCourseId = ?";
+	private static final String _FINDER_COLUMN_COMPANYPARENTCOURSEID_COMPANYID_2 =
+		"course.companyId = ? AND ";
+	private static final String _FINDER_COLUMN_COMPANYPARENTCOURSEID_PARENTCOURSEID_2 =
+		"course.parentCourseId = ?";
 	private static final String _FINDER_COLUMN_GROUPIDCLOSED_GROUPID_2 = "course.groupId = ? AND ";
 	private static final String _FINDER_COLUMN_GROUPIDCLOSED_CLOSED_2 = "course.closed = ?";
 	private static final String _FINDER_COLUMN_COMPANYID_COMPANYID_2 = "course.companyId = ?";

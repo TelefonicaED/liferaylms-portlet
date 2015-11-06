@@ -582,5 +582,5 @@ public class CourseServiceImpl extends CourseServiceBaseImpl {
 				}
 			}
 		}
-	}*/
+	}
 }
