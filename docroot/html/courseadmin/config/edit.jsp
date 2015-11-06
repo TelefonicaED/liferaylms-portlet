@@ -40,6 +40,7 @@
 	boolean showSearchTags = preferences.getValue("showSearchTags", "false").equals("true");
 	boolean showWelcomeMsg = preferences.getValue("showWelcomeMsg", "true").equals("true");
 	boolean showOnlyOrganizationUsers = preferences.getValue("showOnlyOrganizationUsers", "false").equals("true");
+	boolean showCalendar 	= preferences.getValue("showCalendar",  "false").equals("true");
 %>
 
 <liferay-portlet:actionURL var="saveConfigurationURL"  portletConfiguration="true"/>
@@ -68,6 +69,10 @@
 		<aui:input type="checkbox" name="showGo" label="courseadmin.config.showGo" 			value="<%=showGo %>" checked="<%=showGo %>"/>
 		<aui:input type="checkbox" name="showPermission" label="courseadmin.config.showPermission" 			value="<%=showPermission %>" checked="<%=showPermission %>"/>
 		<aui:input type="checkbox" name="showWelcomeMsg" label="courseadmin.config.showWelcomeMsg" 			value="<%=showWelcomeMsg %>" checked="<%=showWelcomeMsg %>"/>
+	</aui:field-wrapper>
+	
+	<aui:field-wrapper label="calendar" >
+		<aui:input type="checkbox" name="showCalendar" label="calendar" value="<%=showCalendar %>" checked="<%=showCalendar %>"/>
 	</aui:field-wrapper>
 
 <%
