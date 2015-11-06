@@ -868,4 +868,8 @@ public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int e
 		
 		return students;
 	}
+	public java.util.List<Course> getCoursesParents(long groupId) throws SystemException
+	{
+		return coursePersistence.filterFindByGroupIdParentCourseId(groupId, 0);
+	}
 }
