@@ -31,6 +31,7 @@ renderRequest.setAttribute(WebKeys.PORTLET_CONFIGURATOR_VISIBILITY,Boolean.FALSE
 }
 else
 {
+	renderRequest.setAttribute(WebKeys.PORTLET_DECORATE, Boolean.FALSE);
 	renderRequest.setAttribute(WebKeys.PORTLET_CONFIGURATOR_VISIBILITY, Boolean.FALSE);
 	
 	
