@@ -6,8 +6,10 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -47,7 +49,6 @@ import com.liferay.lms.learningactivity.questiontype.QuestionType;
 import com.liferay.lms.learningactivity.questiontype.QuestionTypeRegistry;
 import com.liferay.lms.learningactivity.questiontype.SurveyHorizontalOptionsQuestionType;
 import com.liferay.lms.learningactivity.questiontype.SurveyOptionsQuestionType;
-import com.liferay.lms.model.Course;
 import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.model.LearningActivityTry;
 import com.liferay.lms.model.SurveyResult;
@@ -56,6 +57,7 @@ import com.liferay.lms.model.TestQuestion;
 import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityTryLocalServiceUtil;
+import com.liferay.lms.service.ModuleLocalServiceUtil;
 import com.liferay.lms.service.SurveyResultLocalServiceUtil;
 import com.liferay.lms.service.TestAnswerLocalServiceUtil;
 import com.liferay.lms.service.TestQuestionLocalServiceUtil;
@@ -959,12 +961,8 @@ public class SurveyActivity extends MVCPortlet {
 		}else if (action.equals("stadisticsReport")){
 			
 			try{
-				//Rellenamos cabecera respuesta
-				response.setCharacterEncoding(StringPool.UTF8);
-				response.setContentType(ContentTypes.APPLICATION_VND_MS_EXCEL);
-				response.addProperty(HttpHeaders.CONTENT_DISPOSITION, "attachment; fileName=data.xls");
 				
-				//Creamos fichero
+				//Creamos fichero excel
 				WorkbookSettings wbSettings = new WorkbookSettings();
 				WritableWorkbook workbook = Workbook.createWorkbook(response.getPortletOutputStream(), wbSettings);
 				workbook.createSheet("Report", 0);
@@ -983,22 +981,35 @@ public class SurveyActivity extends MVCPortlet {
 				Collections.sort(listaTotal, beanComparator);
 				questionsTitle = listaTotal;
 				
-				//Anadimos x columnas para mostrar id y curso
-				int numExtraCols = 2;
+				//Anadimos x columnas para mostrar id, curso...
+				int numExtraCols = 4;
 				String[] cabeceras = new String[questionsTitle.size()+numExtraCols];
-	
-				//Guardamos el orden en que obtenemos las preguntas de la base de datos para poner las preguntas en el mismo orden.
-				Long []questionOrder = new Long[questionsTitle.size()];
-	
+
 				//En las columnas extra ponemos la cabecera
 				cabeceras[0]="Id";
 				cabeceras[1]="Curso";
+				cabeceras[2]="M\u00f3dulo";
+				cabeceras[3]="Actividad";
+				
+				// - Guardamos el orden en que obtenemos las preguntas de la base
+				//   de datos para poner las respuestas en el mismo orden.
+				// - Generamos cabecera completa.
+				Long []questionOrder = new Long[questionsTitle.size()];
 	
 				for(int i=numExtraCols; i<questionsTitle.size()+numExtraCols; i++){
-					cabeceras[i]=HtmlUtil.extractText(questionsTitle.get(i-numExtraCols).getText());
-					//Guardamos los id ordenados para pintar luego las respuestas
-					questionOrder[i-numExtraCols]=questionsTitle.get(i-numExtraCols).getQuestionId();
+					cabeceras[i] = HtmlUtil.extractText(questionsTitle.get(i-numExtraCols).getText());
+					questionOrder[i-numExtraCols] = questionsTitle.get(i-numExtraCols).getQuestionId();
 				}
+				
+				//Consultamos los nombres de curso, módulo y actividad
+				LearningActivity activity = LearningActivityLocalServiceUtil
+												.getLearningActivity(actId);
+				
+				String curso = CourseLocalServiceUtil.fetchByGroupCreatedId(
+									activity.getGroupId()).getTitle();
+				String modulo = ModuleLocalServiceUtil.fetchModule(
+									activity.getModuleId()).getTitle();
+				String actividad = activity.getTitle();
 				
 				int numeroFila = 0;
 				int numeroColumna = 0;
@@ -1013,12 +1024,6 @@ public class SurveyActivity extends MVCPortlet {
 				numeroColumna = 0;
 				
 				for(Long questionId: questionOrder){
-					//Consultamos el nombre del curso
-					String curso = CourseLocalServiceUtil
-									.fetchByGroupCreatedId(
-											LearningActivityLocalServiceUtil
-													.getLearningActivity(actId)
-													.getGroupId()).getTitle();
 					
 					//Por cada pregunta, traemos sus respuestas
 					List<SurveyResult> listaRespuestas = SurveyResultLocalServiceUtil
@@ -1031,11 +1036,14 @@ public class SurveyActivity extends MVCPortlet {
 						for(SurveyResult answer:listaRespuestas)
 						{
 							if(answer.getQuestionId() == questionId){
-								//La primera vez pintamos los valores "Id" y "Curso"
+								// La primera vez pintamos los valores 
+								// "Id", "Curso", "Módulo" y "Actividad"
 								if(numeroColumna == 0){
 									addLabel(excelSheet, contenido, 0, numeroFila, String.valueOf(numeroFila));
 									addLabel(excelSheet, contenido, 1, numeroFila, HtmlUtil.extractText(curso));
-									addLabel(excelSheet, contenido, 2, numeroFila, HtmlUtil.extractText(answer.getFreeAnswer()));
+									addLabel(excelSheet, contenido, 2, numeroFila, HtmlUtil.extractText(modulo));
+									addLabel(excelSheet, contenido, 3, numeroFila, HtmlUtil.extractText(actividad));
+									addLabel(excelSheet, contenido, 4, numeroFila, HtmlUtil.extractText(answer.getFreeAnswer()));
 								}
 								else {
 									addLabel(excelSheet, contenido, numeroColumna+numExtraCols, numeroFila, HtmlUtil.extractText(answer.getFreeAnswer()));
@@ -1046,6 +1054,17 @@ public class SurveyActivity extends MVCPortlet {
 						numeroColumna++;//Columna nueva
 					}
 				}
+				
+				String nombreArchivo = "Respuestas";
+				nombreArchivo += (StringPool.UNDERLINE);
+				nombreArchivo += (HtmlUtil.extractText(actividad));
+				nombreArchivo += (StringPool.UNDERLINE);
+				nombreArchivo += new SimpleDateFormat("yyyyMMdd").format(new Date());
+				
+				//Rellenamos cabecera respuesta
+				response.setCharacterEncoding(StringPool.UTF8);
+				response.setContentType(ContentTypes.APPLICATION_VND_MS_EXCEL);
+				response.addProperty(HttpHeaders.CONTENT_DISPOSITION, "attachment; fileName="+nombreArchivo+".xls");
 				
 				workbook.write();
 				workbook.close();
@@ -1059,7 +1078,6 @@ public class SurveyActivity extends MVCPortlet {
 			} catch (PortalException e) {
 				e.printStackTrace();
 			} finally{
-				
 				response.getPortletOutputStream().flush();
 				response.getPortletOutputStream().close();
 			}
