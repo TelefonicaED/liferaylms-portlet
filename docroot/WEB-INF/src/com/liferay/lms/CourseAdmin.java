@@ -1032,6 +1032,9 @@ public class CourseAdmin extends MVCPortlet {
 			errors = true;
 		}
 		
+		boolean visible = ParamUtil.getBoolean(actionRequest, "visible", false);
+
+		
 		Group group = null;
 		try{
 			group = GroupLocalServiceUtil.getGroup(themeDisplay.getCompanyId(), newCourseName);
@@ -1051,6 +1054,7 @@ public class CourseAdmin extends MVCPortlet {
 			message.put("startDate",startDate);
 			message.put("endDate",endDate);
 			message.put("serviceContext",serviceContext);
+			message.put("visible",visible);
 			MessageBusUtil.sendMessage("liferay/lms/courseClone", message);
 			SessionMessages.add(actionRequest, "courseadmin.clone.confirmation.success");
 		}

@@ -163,7 +163,7 @@ for(Group groupCourse:groups)
 		%>
 		<div class="course option-more">
 		<%
-		String url = themeDisplay.getPortalURL() +"/"+ loc.getLanguage() +"/web/"+ groupsel.getFriendlyURL();
+		String url = themeDisplay.getPortalURL() +"/"+ loc.getLanguage() +"/web"+ groupsel.getFriendlyURL();
 		String usuarioSuplantado = themeDisplay.getDoAsUserId(); //Si estamos suplantando a un usuario
 	    	String doAsUserId = "";
 	     

@@ -40,8 +40,11 @@ import com.liferay.portal.kernel.messaging.MessageListener;
 import com.liferay.portal.kernel.messaging.MessageListenerException;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.Folder;
+import com.liferay.portal.kernel.search.Indexer;
+import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.SessionMessages;
+import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.DocumentException;
@@ -98,6 +101,8 @@ public class CloneCourse implements MessageListener {
 	Date startDate;
 	Date endDate;
 	
+	boolean visible;
+	
 	private String cloneTraceStr = "--------------- Clone course trace ----------------"; 
 		
 	public CloneCourse(long groupId, String newCourseName, ThemeDisplay themeDisplay, Date startDate, Date endDate, ServiceContext serviceContext) {
@@ -129,7 +134,8 @@ public class CloneCourse implements MessageListener {
 			
 			this.serviceContext = (ServiceContext)message.get("serviceContext");
 			this.themeDisplay = (ThemeDisplay)message.get("themeDisplay");
-		
+			
+			this.visible = message.getBoolean("visible");
 			Role adminRole = RoleLocalServiceUtil.getRole(themeDisplay.getCompanyId(),"Administrator");
 			List<User> adminUsers = UserLocalServiceUtil.getRoleUsers(adminRole.getRoleId());
 			 
@@ -153,7 +159,7 @@ public class CloneCourse implements MessageListener {
 		
 		Group group = GroupLocalServiceUtil.getGroup(groupId);
 		Course course = CourseLocalServiceUtil.getCourseByGroupCreatedId(groupId);
-		
+				
 		System.out.println("  + course: "+course.getTitle(themeDisplay.getLocale()));
 		cloneTraceStr += " course:" + course.getTitle(themeDisplay.getLocale()); 
 		cloneTraceStr += " groupId:" + groupId;
@@ -209,28 +215,47 @@ public class CloneCourse implements MessageListener {
 		
 		int typeSite = GroupLocalServiceUtil.getGroup(course.getGroupCreatedId()).getType();
 		Course newCourse = null;  
-		try{	
-			newCourse = CourseLocalServiceUtil.addCourse(newCourseName, course.getDescription(), "", "", themeDisplay.getLocale(), today, startDate, endDate, layoutSetPrototypeId, typeSite, serviceContext, course.getCalificationType(), 0,true);
+		String summary = new String();
+		try{
+			summary = AssetEntryLocalServiceUtil.getEntry(Course.class.getName(),course.getCourseId()).getSummary(themeDisplay.getLocale());
+			newCourse = CourseLocalServiceUtil.addCourse(newCourseName, course.getDescription(themeDisplay.getLocale()),summary
+					, "", themeDisplay.getLocale(), today, startDate, endDate, layoutSetPrototypeId, typeSite, serviceContext, course.getCalificationType(), (int)course.getMaxusers(),true);
+			
+			newCourse.setWelcome(course.getWelcome());
+			newCourse.setWelcomeMsg(course.getWelcomeMsg());
+			newCourse.setWelcomeSubject(course.getWelcomeSubject());
+			newCourse.setGoodbye(course.getGoodbye());
+			newCourse.setGoodbyeMsg(course.getGoodbyeMsg());
+			newCourse.setGoodbyeSubject(course.getGoodbyeSubject());
+			
 		} catch(DuplicateGroupException e){
 			if(log.isDebugEnabled())e.printStackTrace();
 			throw new DuplicateGroupException();
 		}
-		
+	
 		newCourse.setExpandoBridgeAttributes(serviceContext);
 		
 		newCourse.getExpandoBridge().setAttributes(course.getExpandoBridge().getAttributes());
 		//Course newCourse = CourseLocalServiceUtil.addCourse(newCourseName, course.getDescription(), "", "", themeDisplay.getLocale(), today, today, today, layoutSetPrototypeId, serviceContext);
-	
-		
 		Group newGroup = GroupLocalServiceUtil.getGroup(newCourse.getGroupCreatedId());
 		serviceContext.setScopeGroupId(newCourse.getGroupCreatedId());
 		
 		Role siteMemberRole = RoleLocalServiceUtil.getRole(themeDisplay.getCompanyId(), RoleConstants.SITE_MEMBER);
 		
+		
 		newCourse.setIcon(course.getIcon());
 		
 		try{
 			newCourse = CourseLocalServiceUtil.modCourse(newCourse, serviceContext);
+			
+			AssetEntry entry = AssetEntryLocalServiceUtil.getEntry(Course.class.getName(),newCourse.getCourseId());
+			entry.setVisible(visible);
+			entry.setSummary(summary);
+			AssetEntryLocalServiceUtil.updateAssetEntry(entry);
+			newGroup.setName(newCourse.getTitle(themeDisplay.getLocale(), true));
+			newGroup.setDescription(summary);
+			GroupLocalServiceUtil.updateGroup(newGroup);
+			
 		}catch(Exception e){
 			if(log.isDebugEnabled())e.printStackTrace();
 		}
@@ -817,7 +842,6 @@ public class CloneCourse implements MessageListener {
 	private void sendNotification(String title, String content, String url, String type, int priority){
 		
 		//ThemeDisplay themeDisplay = (ThemeDisplay) actionRequest.getAttribute(WebKeys.THEME_DISPLAY);	
-		
 		SimpleDateFormat formatDay = new SimpleDateFormat("dd");
 		formatDay.setTimeZone(themeDisplay.getTimeZone());
 		SimpleDateFormat formatMonth = new SimpleDateFormat("MM");

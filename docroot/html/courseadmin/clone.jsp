@@ -128,7 +128,9 @@
 	}
 </script>
 	
-					
+	<aui:field-wrapper label="published-in-catalog">
+		<aui:input type="checkbox" name="visible" label="published-in-catalog" value="false" />	
+	</aui:field-wrapper>			
 				
 	<aui:button-row>
 		<aui:button type="submit" value="clone" />
