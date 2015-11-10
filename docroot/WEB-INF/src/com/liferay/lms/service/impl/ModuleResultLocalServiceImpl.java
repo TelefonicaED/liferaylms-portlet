@@ -108,11 +108,22 @@ public class ModuleResultLocalServiceImpl extends ModuleResultLocalServiceBaseIm
 		return moduleResultPersistence.countBym(moduleId);
 	}
 
-	public long countByModuleOnlyStudents(long companyId, long courseGropupCreatedId, long moduleId)
+	
+	public long countByModuleOnlyStudents(long companyId, long courseGropupCreatedId, long moduleId) throws SystemException{
+		return countByModuleOnlyStudents(companyId, courseGropupCreatedId, moduleId, null);
+	}
+	
+	public long countByModuleOnlyStudents(long companyId, long courseGropupCreatedId, long moduleId ,List<User> _students)
 			throws SystemException {
 		
 		long res = 0;
-		List<User> students = CourseLocalServiceUtil.getStudentsFromCourse(companyId, courseGropupCreatedId);
+		
+		List<User> students = null;
+		// Se prepara el metodo para recibir un Listado de estudiantes especificos,, por ejemplo que pertenezcan a alguna organizacion. Sino, se trabaja con todos los estudiantes del curso.
+		if(Validator.isNotNull(_students) && _students.size() > 0)
+			students = _students;
+		else
+			students = CourseLocalServiceUtil.getStudentsFromCourse(companyId, courseGropupCreatedId);
 		
 		ClassLoader classLoader = (ClassLoader) PortletBeanLocatorUtil.locate(ClpSerializer.getServletContextName(), "portletClassLoader");
 		DynamicQuery consulta = DynamicQueryFactoryUtil.forClass(ModuleResult.class, classLoader)
@@ -147,12 +158,23 @@ public class ModuleResultLocalServiceImpl extends ModuleResultLocalServiceBaseIm
 		return moduleResultPersistence.countBymp(moduleId, passed);
 	}
 	
-	
 	public long countByModulePassedOnlyStudents(long companyId, long courseGropupCreatedId, long moduleId, boolean passed)
+			throws SystemException {
+		return countByModulePassedOnlyStudents(companyId, courseGropupCreatedId, moduleId, passed, null);
+	}
+	
+	
+	public long countByModulePassedOnlyStudents(long companyId, long courseGropupCreatedId, long moduleId, boolean passed, List<User> _students)
 			throws SystemException {
 
 		long res = 0;
-		List<User> students = CourseLocalServiceUtil.getStudentsFromCourse(companyId, courseGropupCreatedId);
+		
+		List<User> students = null;
+		// Se prepara el metodo para recibir un Listado de estudiantes especificos,, por ejemplo que pertenezcan a alguna organizacion. Sino, se trabaja con todos los estudiantes del curso.
+		if(Validator.isNotNull(_students) && _students.size() > 0)
+			students = _students;
+		else
+			students = CourseLocalServiceUtil.getStudentsFromCourse(companyId, courseGropupCreatedId);
 		
 		ClassLoader classLoader = (ClassLoader) PortletBeanLocatorUtil.locate(ClpSerializer.getServletContextName(), "portletClassLoader");
 		DynamicQuery consulta = DynamicQueryFactoryUtil.forClass(ModuleResult.class, classLoader)
@@ -378,7 +400,7 @@ public class ModuleResultLocalServiceImpl extends ModuleResultLocalServiceBaseIm
 				result = activitiesPassed * 100 / totalActivities;
 			}
 			
-			//S�lo actualizamos si cambia el resultado.
+			//Solo actualizamos si cambia el resultado.
 			if(moduleResult.getResult() < result){
 				
 				//Traza
