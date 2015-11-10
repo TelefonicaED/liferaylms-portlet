@@ -11,10 +11,10 @@
 <%@page import="com.liferay.lms.service.LearningActivityLocalServiceUtil"%>
 <%@ include file="/init.jsp" %>
 <%
-long registered=UserLocalServiceUtil.getGroupUsersCount(themeDisplay.getScopeGroupId(),0);
+long registered=CourseLocalServiceUtil.getStudentsFromCourse(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId()).size();
 Course curso = CourseLocalServiceUtil.fetchByGroupCreatedId(themeDisplay.getScopeGroupId());
-long finalizados = CourseResultLocalServiceUtil.countByCourseId(curso.getCourseId(), true);
-long iniciados = CourseResultLocalServiceUtil.countByCourseId(curso.getCourseId(), false) + finalizados;
+long finalizados = CourseResultLocalServiceUtil.countStudentsByCourseId(curso, true);
+long iniciados = CourseResultLocalServiceUtil.countStudentsByCourseId(curso, false) + finalizados;
 %>
 
 <liferay-portlet:resourceURL var="exportURL" >
@@ -60,8 +60,8 @@ long iniciados = CourseResultLocalServiceUtil.countByCourseId(curso.getCourseId(
 		modelVar="module"
 	>
 	<%
-	long started=ModuleResultLocalServiceUtil.countByModule(module.getModuleId());
-	long finished=ModuleResultLocalServiceUtil.countByModulePassed(module.getModuleId(),true);
+	long started=ModuleResultLocalServiceUtil.countByModuleOnlyStudents(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(), module.getModuleId());
+	long finished=ModuleResultLocalServiceUtil.countByModulePassedOnlyStudents(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(),module.getModuleId(),true);
 	
 		%>
 	<liferay-portlet:renderURL var="viewModuleURL">

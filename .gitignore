@@ -1,2 +1,5 @@
 *.class
 docroot/WEB-INF/classes
+/bin/
+/.classpath
+/.project

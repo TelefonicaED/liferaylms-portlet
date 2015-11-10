@@ -77,10 +77,10 @@ public class CourseStats extends MVCPortlet {
 		try {			
 			Course course = CourseLocalServiceUtil.getCourse(courseId);
 			Group group = GroupLocalServiceUtil.getGroup(course.getGroupCreatedId());
-			long registered=UserLocalServiceUtil.getGroupUsersCount(group.getGroupId(),0);
-			long finalizados = CourseResultLocalServiceUtil.countByCourseId(course.getCourseId(), true);
-			long iniciados = CourseResultLocalServiceUtil.countByCourseId(course.getCourseId(), false) + finalizados;
-			
+			long registered=CourseLocalServiceUtil.getStudentsFromCourse(themeDisplay.getCompanyId(), course.getGroupCreatedId()).size();
+			long finalizados = CourseResultLocalServiceUtil.countStudentsByCourseId(course, true);
+			long iniciados = CourseResultLocalServiceUtil.countStudentsByCourseId(course, false) + finalizados;
+
 			List<Module> tempResults = ModuleLocalServiceUtil.findAllInGroup(group.getGroupId());
 			CSVWriter writer = initCsv(resourceResponse);
 		    ResourceBundle rb =  ResourceBundle.getBundle("content.Language");
@@ -113,8 +113,8 @@ public class CourseStats extends MVCPortlet {
 		    
 		    for(Module modulo:tempResults){
 		    	String[] resultados = new String[numCols];
-		    	long started=ModuleResultLocalServiceUtil.countByModule(modulo.getModuleId());
-		    	long finished=ModuleResultLocalServiceUtil.countByModulePassed(modulo.getModuleId(),true);
+		    	long started=ModuleResultLocalServiceUtil.countByModuleOnlyStudents(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(), modulo.getModuleId());
+		    	long finished=ModuleResultLocalServiceUtil.countByModulePassedOnlyStudents(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(),modulo.getModuleId(),true);
 		    	String moduloBloqueo = "";
 		    	if(modulo.getPrecedence() != 0) {
 		    		Module modulePredence = ModuleLocalServiceUtil.getModule(modulo.getPrecedence());
@@ -148,9 +148,13 @@ public class CourseStats extends MVCPortlet {
 			
 			Module module = ModuleLocalServiceUtil.getModule(moduleId);
 			Group group = GroupLocalServiceUtil.getGroup(module.getGroupId());
-			long registered=UserLocalServiceUtil.getGroupUsersCount(group.getGroupId(),0);
-			long finalizados = ModuleResultLocalServiceUtil.countByModulePassed(module.getModuleId(),true);
-			long iniciados = ModuleResultLocalServiceUtil.countByModule(module.getModuleId());
+			long registered=CourseLocalServiceUtil.getStudentsFromCourse(themeDisplay.getCompanyId(), module.getGroupId()).size();
+			//long registered=UserLocalServiceUtil.getGroupUsersCount(group.getGroupId(),0);
+			long iniciados=ModuleResultLocalServiceUtil.countByModuleOnlyStudents(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(), module.getModuleId());
+	    	long finalizados=ModuleResultLocalServiceUtil.countByModulePassedOnlyStudents(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(),module.getModuleId(),true);
+	    	
+			
+			
 			String mStartDate = module.getStartDate() == null? "":sdf.format(module.getStartDate());
 			String mEndDate = module.getEndDate() == null? "":sdf.format(module.getEndDate());
 			

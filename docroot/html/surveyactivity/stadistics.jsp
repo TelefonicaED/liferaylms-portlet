@@ -31,12 +31,20 @@
 		long actId = ParamUtil.getLong(request, "actId",0);
 		LearningActivity learningActivity = LearningActivityLocalServiceUtil.getLearningActivity(actId);
 	%>
+		<liferay-portlet:resourceURL var="stadisticsReportURL" >
+			<portlet:param name="action" value="stadisticsReport"/>
+			<portlet:param name="resId" value="<%=Long.toString(learningActivity.getActId()) %>"/>
+		</liferay-portlet:resourceURL>
+		<liferay-ui:icon image="export" label="<%= true %>" message="download-content" method="get" url="<%=stadisticsReportURL%>" />
+		
 		<div class="surveyactivity stadistics">
 		
 			<h2><%=LearningActivityLocalServiceUtil.getLearningActivity(actId).getTitle(themeDisplay.getLocale()) %></h2>
 			<%--<h3 class="description-h3"><liferay-ui:message key="description" /></h3> --%>
 			<div class="description"><%=LearningActivityLocalServiceUtil.getLearningActivity(actId).getDescription(themeDisplay.getLocale()) %></div>
 		
+			
+			
 			<portlet:renderURL var="backToQuestionsURL">
 				<portlet:param name="jspPage" value="/html/surveyactivity/view.jsp"></portlet:param>
 			</portlet:renderURL>
@@ -75,14 +83,15 @@
 					if(listaResultadosEncuesta!=null && listaResultadosEncuesta.size()!=0){
 						for(SurveyResult answer:listaResultadosEncuesta)
 						{
-							String textoAux = answer.getFreeAnswer();
-							textoAux = HtmlUtil.extractText(answer.getFreeAnswer());
-							String texto = textoAux.length() > 50 ? textoAux.substring(0,50)+"..." : textoAux;
-							%>
-							<div class="answer">
-								<p><%=texto %></p>
-							</div>
-						<%
+							if(answer.getQuestionId() == question.getQuestionId()){
+								String textoAux = answer.getFreeAnswer();
+								textoAux = HtmlUtil.extractText(answer.getFreeAnswer());
+								String texto = textoAux.length() > 50 ? textoAux.substring(0,50)+"..." : textoAux;
+								%>
+								<div class="answer">
+									<p><%=texto %></p>
+								</div>
+						<%	}
 						}
 					}
 				}
@@ -94,7 +103,7 @@
 			</div>
 			<%
 			} 
-			%>		
+			%>
 			<a href="<%=backToQuestionsURL.toString() %>" ><liferay-ui:message key="back" /></a>
 		</div>
 		

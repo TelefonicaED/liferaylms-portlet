@@ -24,6 +24,17 @@ import javax.portlet.RenderResponse;
 import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
 
+import jxl.CellView;
+import jxl.Workbook;
+import jxl.WorkbookSettings;
+import jxl.write.Label;
+import jxl.write.WritableCellFormat;
+import jxl.write.WritableFont;
+import jxl.write.WritableSheet;
+import jxl.write.WritableWorkbook;
+import jxl.write.WriteException;
+import jxl.write.biff.RowsExceededException;
+
 import org.apache.commons.beanutils.BeanComparator;
 import org.jfree.util.Log;
 import org.jsoup.Jsoup;
@@ -36,11 +47,13 @@ import com.liferay.lms.learningactivity.questiontype.QuestionType;
 import com.liferay.lms.learningactivity.questiontype.QuestionTypeRegistry;
 import com.liferay.lms.learningactivity.questiontype.SurveyHorizontalOptionsQuestionType;
 import com.liferay.lms.learningactivity.questiontype.SurveyOptionsQuestionType;
+import com.liferay.lms.model.Course;
 import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.model.LearningActivityTry;
 import com.liferay.lms.model.SurveyResult;
 import com.liferay.lms.model.TestAnswer;
 import com.liferay.lms.model.TestQuestion;
+import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityTryLocalServiceUtil;
 import com.liferay.lms.service.SurveyResultLocalServiceUtil;
@@ -57,9 +70,9 @@ import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.upload.UploadPortletRequest;
 import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.ContentTypes;
+import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
-import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -734,10 +747,11 @@ public class SurveyActivity extends MVCPortlet {
 		}
 	}
 	
+	@SuppressWarnings("unchecked")
 	public void  serveResource(ResourceRequest request, ResourceResponse response)throws PortletException, IOException {
 
 		String action = ParamUtil.getString(request, "action");
-		long actId = ParamUtil.getLong(request, "resId",0);
+		long actId = ParamUtil.getLong(request, "resId",0); 
 		if(action.equals("export")){
 
 			try {
@@ -942,6 +956,113 @@ public class SurveyActivity extends MVCPortlet {
 				response.getPortletOutputStream().flush();
 				response.getPortletOutputStream().close();
 			}
+		}else if (action.equals("stadisticsReport")){
+			
+			try{
+				//Rellenamos cabecera respuesta
+				response.setCharacterEncoding(StringPool.UTF8);
+				response.setContentType(ContentTypes.APPLICATION_VND_MS_EXCEL);
+				response.addProperty(HttpHeaders.CONTENT_DISPOSITION, "attachment; fileName=data.xls");
+				
+				//Creamos fichero
+				WorkbookSettings wbSettings = new WorkbookSettings();
+				WritableWorkbook workbook = Workbook.createWorkbook(response.getPortletOutputStream(), wbSettings);
+				workbook.createSheet("Report", 0);
+				WritableSheet excelSheet = workbook.getSheet(0);
+				
+				//Creamos formatos
+				WritableCellFormat cabecera = new WritableCellFormat();
+				WritableCellFormat contenido = new WritableCellFormat();
+				cabecera.setFont(new WritableFont(WritableFont.ARIAL, 11, WritableFont.BOLD));
+				contenido.setFont(new WritableFont(WritableFont.ARIAL, 11));
+	
+				//Creamos la cabecera con las preguntas.
+				List<TestQuestion> questionsTitle = TestQuestionLocalServiceUtil.getQuestions(actId);
+				List<TestQuestion> listaTotal = ListUtil.copy(questionsTitle);
+				BeanComparator beanComparator = new BeanComparator("weight");
+				Collections.sort(listaTotal, beanComparator);
+				questionsTitle = listaTotal;
+				
+				//Anadimos x columnas para mostrar id y curso
+				int numExtraCols = 2;
+				String[] cabeceras = new String[questionsTitle.size()+numExtraCols];
+	
+				//Guardamos el orden en que obtenemos las preguntas de la base de datos para poner las preguntas en el mismo orden.
+				Long []questionOrder = new Long[questionsTitle.size()];
+	
+				//En las columnas extra ponemos la cabecera
+				cabeceras[0]="Id";
+				cabeceras[1]="Curso";
+	
+				for(int i=numExtraCols; i<questionsTitle.size()+numExtraCols; i++){
+					cabeceras[i]=HtmlUtil.extractText(questionsTitle.get(i-numExtraCols).getText());
+					//Guardamos los id ordenados para pintar luego las respuestas
+					questionOrder[i-numExtraCols]=questionsTitle.get(i-numExtraCols).getQuestionId();
+				}
+				
+				int numeroFila = 0;
+				int numeroColumna = 0;
+				
+				//Pintamos cabecera
+				for (String valor:cabeceras){
+					addLabel(excelSheet, cabecera, numeroColumna, numeroFila, valor);
+					numeroColumna++;
+				}
+				
+				//Reiniciamos columnas
+				numeroColumna = 0;
+				
+				for(Long questionId: questionOrder){
+					//Consultamos el nombre del curso
+					String curso = CourseLocalServiceUtil
+									.fetchByGroupCreatedId(
+											LearningActivityLocalServiceUtil
+													.getLearningActivity(actId)
+													.getGroupId()).getTitle();
+					
+					//Por cada pregunta, traemos sus respuestas
+					List<SurveyResult> listaRespuestas = SurveyResultLocalServiceUtil
+															.getSurveyResultByActId(actId);
+					
+					//Empezamos por la fila 1
+					numeroFila = 1;
+
+					if(listaRespuestas!=null && listaRespuestas.size()!=0){
+						for(SurveyResult answer:listaRespuestas)
+						{
+							if(answer.getQuestionId() == questionId){
+								//La primera vez pintamos los valores "Id" y "Curso"
+								if(numeroColumna == 0){
+									addLabel(excelSheet, contenido, 0, numeroFila, String.valueOf(numeroFila));
+									addLabel(excelSheet, contenido, 1, numeroFila, HtmlUtil.extractText(curso));
+									addLabel(excelSheet, contenido, 2, numeroFila, HtmlUtil.extractText(answer.getFreeAnswer()));
+								}
+								else {
+									addLabel(excelSheet, contenido, numeroColumna+numExtraCols, numeroFila, HtmlUtil.extractText(answer.getFreeAnswer()));
+								}
+								numeroFila++;//Fila nueva
+							}
+						}
+						numeroColumna++;//Columna nueva
+					}
+				}
+				
+				workbook.write();
+				workbook.close();
+				
+			} catch (SystemException e) {
+				e.printStackTrace();
+			} catch (RowsExceededException e) {
+				e.printStackTrace();
+			} catch (WriteException e) {
+				e.printStackTrace();
+			} catch (PortalException e) {
+				e.printStackTrace();
+			} finally{
+				
+				response.getPortletOutputStream().flush();
+				response.getPortletOutputStream().close();
+			}
 		}
 	}
 
@@ -980,5 +1101,16 @@ public class SurveyActivity extends MVCPortlet {
 		}
 
 		return formatString(answersMap.get(answerId).getAnswer())+" ("+answersMap.get(answerId).getAnswerId()+")";
+	}
+	
+	private void addLabel(WritableSheet sheet, WritableCellFormat cellFormat,
+						 int column, int row, String value) 
+								 throws WriteException, RowsExceededException {
+
+		Label label = new Label(column, row, value, cellFormat);
+		CellView cv = new CellView();
+		cv.setAutosize(true);
+		sheet.setColumnView(column, cv);
+		sheet.addCell(label);
 	}
 }
