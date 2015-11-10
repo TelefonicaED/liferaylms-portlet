@@ -76,6 +76,8 @@ if(backToEdit) {
 
 <script type="text/javascript">
 
+
+
 	YUI.add('<portlet:namespace />user-model', function(A) {
 	    A.<portlet:namespace />UserModel = A.Base.create('<portlet:namespace />UserModel', A.Model, [], {
 	    }, {
@@ -115,7 +117,7 @@ if(backToEdit) {
 			}
 			
 			A.one('#<portlet:namespace />to').val(window.<portlet:namespace />selectedUsers.get('id').toString());
-			A.all('#<portlet:namespace />addUser_'+userId).each(function(addUserDiv){ addUserDiv.hide(); });  
+			A.all('#<portlet:namespace />addUser_'+userId).each(function(addUserDiv){addUserDiv.hide(); });  
 			A.all('#<portlet:namespace />deleteUser_'+userId).each(function(deleteUserDiv){ deleteUserDiv.show(); });		
 			
 			var addUserElement = A.one('#_courseadmin_WAR_liferaylmsportlet_addUser_'+userId);
@@ -148,7 +150,7 @@ if(backToEdit) {
 			A.one('#<portlet:namespace />selected_users').setContent(selectedUsers);
 			A.one('#<portlet:namespace />to').val(window.<portlet:namespace />selectedUsers.get('id').toString());
 			A.all('#<portlet:namespace />addUser_'+userId).each(function(addUserDiv){ addUserDiv.show(); });  
-			A.all('#<portlet:namespace />deleteUser_'+userId).each(function(deleteUserDiv){ deleteUserDiv.hide(); });
+			A.all('#<portlet:namespace />deleteUser_'+userId).each(function(deleteUserDiv){deleteUserDiv.hide(); });
 			
 			var addUserElement = A.one('#_courseadmin_WAR_liferaylmsportlet_addUser_'+userId);
 			if (addUserElement != null) {
@@ -165,6 +167,7 @@ if(backToEdit) {
 	}
 	
 	function <portlet:namespace />changeSelection(){
+		
 		AUI().use('node-base','<portlet:namespace />user-model', function(A) {
 			if (A.one('input:radio[name=<portlet:namespace />radio_to]:checked').get('value')=='all') {
 				window.<portlet:namespace />selectedUsers.each(
@@ -191,8 +194,8 @@ if(backToEdit) {
 
 	AUI().ready('node-base','<portlet:namespace />user-model', function(A) {
 		// Escondamos por defecto el formulario
-		A.one('.assign-form').hide();
-		
+		var form = document.getElementsByClassName("assign-form");
+		form[0].style.display = 'none';
 		window.<portlet:namespace />selectedUsers = new A.<portlet:namespace />UserModelList();
 		
 		var searchContainer = A.one('#<%=renderResponse.getNamespace() %>usersSearchContainerSearchContainer').ancestor('.lfr-search-container');
@@ -207,6 +210,9 @@ if(backToEdit) {
 		});
 		
 	});
+	  
+
+	
 
 </script>
 
@@ -276,7 +282,7 @@ if(backToEdit) {
               course.getGroupCreatedId(), commmanager.getRoleId() }));
            }
 	
-	if(tab.equals(LanguageUtil.get(pageContext, "courseadmin.adminactions.students"))){
+	if(tab.equals(LanguageUtil.get(pageContext, "courseadmin.adminactions.students"))) {
 		 params.put("notInCourseRoleTeach", new CustomSQLParam("WHERE User_.userId NOT IN "
 	              + " (SELECT UserGroupRole.userId " + "  FROM UserGroupRole "
 	              + "  WHERE  (UserGroupRole.groupId = ?) AND (UserGroupRole.roleId = ?))", new Long[] {
@@ -405,7 +411,8 @@ if(backToEdit) {
 	 	<script type="text/javascript">
 			<!--
 				function <portlet:namespace />ajaxMode<%= searchContainer.getId(request, renderResponse.getNamespace()) %>SearchContainer(A) {
-	
+					
+					
 					var searchContainer = A.one('#<%=renderResponse.getNamespace() %><%= searchContainer.getId(request, renderResponse.getNamespace()) %>SearchContainer').ancestor('.lfr-search-container');
 					
 					function <portlet:namespace />reload<%= searchContainer.getId(request, renderResponse.getNamespace()) %>SearchContainer(url){
@@ -474,6 +481,7 @@ if(backToEdit) {
 			//-->
 	
 		function setAllStudents(){
+			
 			var allUsers = document.getElementsByName("studentIdNameHidden");
 			var allSelected =new String(document.getElementById("allSelected").value);
 			var todos = true;
