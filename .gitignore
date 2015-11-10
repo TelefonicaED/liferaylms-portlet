@@ -1,5 +1,9 @@
 *.class
 docroot/WEB-INF/classes
+docroot/WEB-INF/service
+/.settings/
 /bin/
 /.classpath
 /.project
+/.tern-project
+docroot/css/.sass-cache/
