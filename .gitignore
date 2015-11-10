@@ -7,3 +7,4 @@ docroot/WEB-INF/service
 /.project
 /.tern-project
 docroot/css/.sass-cache/
+docroot/WEB-INF/src/com/liferay/lms/service/base/
