@@ -56,6 +56,7 @@ public class CourseAdminConfigurationAction implements ConfigurationAction {
 		
 		
 		portletPreferences.setValue("showOnlyOrganizationUsers",Boolean.toString(ParamUtil.getBoolean(actionRequest, "showOnlyOrganizationUsers",	true)));
+		portletPreferences.setValue("showCalendar",	Boolean.toString(ParamUtil.getBoolean(actionRequest, "showCalendar",	false)));
 
 		
 		

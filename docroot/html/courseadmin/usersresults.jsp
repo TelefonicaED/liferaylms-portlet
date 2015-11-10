@@ -282,7 +282,7 @@ if(backToEdit) {
               course.getGroupCreatedId(), commmanager.getRoleId() }));
            }
 	
-	if(tab.equals(LanguageUtil.get(pageContext, "courseadmin.adminactions.students"))){
+	if(tab.equals(LanguageUtil.get(pageContext, "courseadmin.adminactions.students"))) {
 		 params.put("notInCourseRoleTeach", new CustomSQLParam("WHERE User_.userId NOT IN "
 	              + " (SELECT UserGroupRole.userId " + "  FROM UserGroupRole "
 	              + "  WHERE  (UserGroupRole.groupId = ?) AND (UserGroupRole.roleId = ?))", new Long[] {

@@ -1,3 +1,5 @@
+<%@page import="com.liferay.portlet.PortletPreferencesFactoryUtil"%>
+<%@page import="javax.portlet.PortletPreferences"%>
 <%@page import="com.liferay.lms.service.LmsPrefsLocalServiceUtil"%>
 <%@page import="com.liferay.lms.model.LmsPrefs"%>
 <%@page import="com.liferay.portal.util.comparator.UserFirstNameComparator"%>
@@ -153,10 +155,20 @@ modelVar="user">
 <%
 String inscrURL="javascript:changedates('" + editInscriptionDatesURL + "')";
 
-%>
+	PortletPreferences preferences = null;
+	String portletResource = ParamUtil.getString(request, "portletResource");
 
-<liferay-ui:icon image="calendar" url='<%=inscrURL %>' label="dates"></liferay-ui:icon>
-<%
+	if (Validator.isNotNull(portletResource)) {
+		preferences = PortletPreferencesFactoryUtil.getPortletSetup(request, portletResource);
+	}else{
+		preferences = renderRequest.getPreferences();
+	}
+	
+	boolean showCalendar 	= preferences.getValue("showCalendar",  "false").equals("true");
+	if(showCalendar){%>
+		<liferay-ui:icon image="calendar" url='<%=inscrURL %>' label="dates"></liferay-ui:icon>
+	<%}
+
 }
 %>
 <liferay-portlet:actionURL name="removeUserRole" var="removeUserRoleURL">
