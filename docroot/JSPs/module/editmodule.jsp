@@ -246,14 +246,19 @@ function validate(){
 	        </aui:column>    
 				<%}catch(Exception e){}
 	        }%>
-		</aui:field-wrapper>	
+	        <aui:column>
+				<aui:input inlineLabel="left" inlineField="true" name="fileName" label="" id="fileName" type="file" value="" />
+				<c:if test="<%=module.getIcon()>0 %>">
+					<aui:input type="checkbox" label="delete" name="deleteAdditionalFile" value="false" inlineLabel="left"/>
+				</c:if>
+			</aui:column>
+		</aui:field-wrapper>
 	</c:if>
 	
 	<liferay-ui:error key="module-icon-required" message="module-icon-required" />
 	<liferay-ui:error key="error_number_format" message="error_number_format" />
 	<br />
 
-	
 	<aui:select label="modulo-predecesor" name="precedence">
 <%
 	java.util.List<Module> modules=ModuleLocalServiceUtil.findAllInGroup(themeDisplay.getScopeGroupId());
