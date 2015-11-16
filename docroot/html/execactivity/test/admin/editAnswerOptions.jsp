@@ -27,7 +27,6 @@
 	long typeId = ParamUtil.getLong(request,"typeId", -1);
 
 	TestQuestion question = null;
-	System.out.println(questionId);
 	if(questionId != 0){
 		question = TestQuestionLocalServiceUtil.getTestQuestion(ParamUtil.getLong(request,"questionId"));
 	}
@@ -55,12 +54,13 @@
 						
 						<%
 						if(typeId==1 || typeId==4){
+							System.out.println("MULTUPLE");
 							%>
 						<aui:input type="checkbox" name="<%=\"correct_\"+testanswer.getAnswerId() %>" label="correct" checked="<%=testanswer.getIsCorrect() %>"></aui:input>
 						<%}else{
 							index = index +1;
 						%>
-						<aui:input type="radio" name="correct_new" label="correct" value="<%=index%>"></aui:input>
+						<aui:input type="radio" name="correct_new" label="correct" value="<%=index%>" checked="<%=testanswer.getIsCorrect() %>"></aui:input>
 						<%}%>
 						
 						
