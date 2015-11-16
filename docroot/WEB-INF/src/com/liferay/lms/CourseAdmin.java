@@ -539,16 +539,14 @@ public class CourseAdmin extends MVCPortlet {
 			//Miramos si hay imagen en WelcomeMsg y GoobyeMsg con dominio correcto
 			String dominio = themeDisplay.getURLPortal();
 			
-			if (welcomeMsg.contains("img"))
-				welcomeMsg = welcomeMsg.contains(dominio) ? 
-							 welcomeMsg : 
-							 welcomeMsg.replace("src=\"", "src=\"" + dominio);
-			
-			if (goodbyeMsg.contains("img"))
-				goodbyeMsg = goodbyeMsg.contains(dominio) ? 
-							 goodbyeMsg : 
-							 goodbyeMsg.replace("src=\"", "src=\"" + dominio);
-			
+			welcomeMsg = welcomeMsg.contains("img") ? 
+						 welcomeMsg.replace("src=\"/", "src=\"" + dominio + StringPool.SLASH) :  
+						 welcomeMsg;
+
+			goodbyeMsg = goodbyeMsg.contains("img") ? 
+						 goodbyeMsg.replace("src=\"/", "src=\"" + dominio + StringPool.SLASH) :  
+						 goodbyeMsg;
+
 			course.setCourseEvalId(courseEvalId);
 			course.setWelcome(welcome);
 			course.setWelcomeSubject(welcomeSubject);
