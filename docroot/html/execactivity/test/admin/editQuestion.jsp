@@ -258,7 +258,6 @@
 			    			feedbackCorrect = A.one('input[name=<portlet:namespace />feedbackCorrect_'+id+']');
 			    			feedbackNoCorrect = A.one('input[name=<portlet:namespace />feedbackNoCorrect_'+id+']');
 			    			
-			    			
 			    			switch(typeId){
 			    				
 			    			case 0:
@@ -275,8 +274,10 @@
 			    				case 1:
 			    				
 			    					correct = A.one('input[name=<portlet:namespace />correct_'+id+'Checkbox]');
+			    					console.log(correct);
 				    				correctVal = (correct != null && correct._node.checked);
-				    				if(correctVal==='true')trueCounter++;
+				    				console.log(correctVal);
+				    				if(correctVal==true)trueCounter++;
 				    				if (correct == null) {
 				    					correct =document.getElementById('input[name=<portlet:namespace />correct_'+id+']');
 				    					correctVal = (correct != null && correct.val() === 'true');
@@ -309,9 +310,7 @@
 			    				default:
 			    					console.log(id);
 			    					correct = A.one('input[name=<portlet:namespace />correct_'+id+'Checkbox]');
-			    				console.log(correct)
 			    				correctVal = (correct != null && correct._node.checked);
-			    				console.log(correctVal);
 			    				if(correctVal==true)trueCounter++;
 			    				if (correct == null) {
 			    					correct =document.getElementById('input[name=<portlet:namespace />correct_'+id+']');
@@ -344,7 +343,6 @@
 			    		});
 		    			if(trueCounter==0)valid = false;
 			    		
-			    		
 			    		//Ningun feedback > 300 caracteres
 			    		if(valid && typeId!=5){
 				    		list.each(function() {
@@ -369,7 +367,6 @@
 			    		if (!valid && e.preventDefault) {
 							e.preventDefault();
 						}
-			    		
 				    	return valid;
 		    		}
 		    	);

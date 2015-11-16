@@ -18,8 +18,8 @@ long typeId = ParamUtil.getLong(request,"typeId", -1);
 											
 						<aui:input type="checkbox" name="<%=\"correct_\"+iterator%>" label="correct" checked="false"></aui:input>
 						<%}else{
-							
 						%>
+						
 							<aui:input type="radio" name="correct_new" label="correct" value="<%=iterator%>"></aui:input>			
 						<%}%>
 			
