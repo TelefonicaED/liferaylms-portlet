@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -17,10 +16,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import javax.mail.internet.InternetAddress;
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
-import javax.portlet.MimeResponse;
 import javax.portlet.PortletException;
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
@@ -45,11 +42,8 @@ import com.liferay.lms.model.LmsPrefs;
 import com.liferay.lms.service.CourseCompetenceLocalServiceUtil;
 import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.lms.service.CourseResultLocalServiceUtil;
-import com.liferay.lms.service.CourseService;
 import com.liferay.lms.service.CourseServiceUtil;
 import com.liferay.lms.service.LmsPrefsLocalServiceUtil;
-import com.liferay.lms.service.base.CourseServiceBaseImpl;
-import com.liferay.mail.service.MailServiceUtil;
 import com.liferay.portal.DuplicateGroupException;
 import com.liferay.portal.LARFileException;
 import com.liferay.portal.LARTypeException;
@@ -69,10 +63,8 @@ import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.mail.MailMessage;
 import com.liferay.portal.kernel.messaging.Message;
 import com.liferay.portal.kernel.messaging.MessageBusUtil;
-import com.liferay.portal.kernel.messaging.MessageListenerException;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.search.Indexer;
@@ -92,10 +84,8 @@ import com.liferay.portal.kernel.util.PrefsPropsUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
-import com.liferay.portal.model.Company;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.GroupConstants;
 import com.liferay.portal.model.Role;
@@ -105,7 +95,6 @@ import com.liferay.portal.model.UserGroupRole;
 import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.security.permission.PermissionCheckerFactoryUtil;
-import com.liferay.portal.service.CompanyLocalServiceUtil;
 import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.LayoutServiceUtil;
 import com.liferay.portal.service.RoleLocalServiceUtil;
@@ -547,6 +536,19 @@ public class CourseAdmin extends MVCPortlet {
 						"/html/courseadmin/editcourse.jsp");
 				return;
 			}
+			//Miramos si hay imagen en WelcomeMsg y GoobyeMsg con dominio correcto
+			String dominio = themeDisplay.getURLPortal();
+			
+			if (welcomeMsg.contains("img"))
+				welcomeMsg = welcomeMsg.contains(dominio) ? 
+							 welcomeMsg : 
+							 welcomeMsg.replace("src=\"", "src=\"" + dominio);
+			
+			if (goodbyeMsg.contains("img"))
+				goodbyeMsg = goodbyeMsg.contains(dominio) ? 
+							 goodbyeMsg : 
+							 goodbyeMsg.replace("src=\"", "src=\"" + dominio);
+			
 			course.setCourseEvalId(courseEvalId);
 			course.setWelcome(welcome);
 			course.setWelcomeSubject(welcomeSubject);
