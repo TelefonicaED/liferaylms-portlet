@@ -80,7 +80,9 @@ if(actId!=0) {
 
 <script type="text/javascript">
 <!--
+var ismobile=navigator.userAgent.match(/(iPad)|(iPhone)|(iPod)|(android)|(webOS)/i);
 
+if(!ismobile){
 AUI().ready('node','aui-io-request','aui-parse-content','aui-sortable',function(A) {
 
 	new A.Sortable(
@@ -123,6 +125,7 @@ AUI().ready('node','aui-io-request','aui-parse-content','aui-sortable',function(
 		}
 	);
   });
+}
 
 //-->
 </script>
