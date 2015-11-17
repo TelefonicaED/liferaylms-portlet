@@ -60,7 +60,7 @@ String urlExample = "<a href=\"/"+ ClpSerializer.getServletContextName()+"/html/
 		<liferay-ui:error key="courseadmin.importuserrole.csv.fileRequired" message="courseadmin.importuserrole.csv.fileRequired" />
 		<liferay-ui:error key="courseadmin.importuserrole.csv.badFormat" message="courseadmin.importuserrole.csv.badFormat" />
 		<liferay-ui:error key="courseadmin.importuserrole.csv.badFormat.size" message="courseadmin.importuserrole.csv.badFormat.size" />
-		<% if(SessionErrors.contains(renderRequest, "courseadmin.importuserrole.csvErrors")) { %>
+		<% if(SessionErrors.contains(renderRequest, "courseadmin.importuserrole.csvErrors")) {%>
 		<div class="portlet-msg-error">
 			<% List<String> errors = (List<String>)SessionErrors.get(renderRequest, "courseadmin.importuserrole.csvErrors");
 			   if(errors.size()==1) {

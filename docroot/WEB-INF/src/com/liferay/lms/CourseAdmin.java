@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -478,7 +479,7 @@ public class CourseAdmin extends MVCPortlet {
 					long fileMaxSize = 5 * 1024 * 1024;
 					try {
 						fileMaxSize = Long.parseLong(PrefsPropsUtil.getString(PropsKeys.DL_FILE_MAX_SIZE));
-						//System.out.println("---\n fileMaxSize 0 : " + fileMaxSize+", "+ file.length());
+						//log.debug("---\n fileMaxSize 0 : " + fileMaxSize+", "+ file.length());
 					} catch (NumberFormatException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -819,8 +820,8 @@ public class CourseAdmin extends MVCPortlet {
 		}
 		else{ 
 			String contentType = request.getContentType("fileName");	
-			System.out.println(" contentType : " + contentType );
-			System.out.println(" fileName : " + fileName );
+			log.debug(" contentType : " + contentType );
+			log.debug(" fileName : " + fileName );
 			if (!fileName.endsWith(".csv")) { 
 				SessionErrors.add(portletRequest, "courseadmin.importuserrole.csv.badFormat");	
 			}
@@ -828,25 +829,29 @@ public class CourseAdmin extends MVCPortlet {
 				CSVReader reader = null; 
 				try {
 					File file = request.getFile("fileName");
-					System.out.println("----------------------------\n  Import users ::"+roleId);
+					log.debug(" Import users ::"+roleId);
 					reader = new CSVReader(new InputStreamReader(new FileInputStream(file), StringPool.UTF8), CharPool.SEMICOLON);
 
 					String[] currLine;
 					int line = 0;
 					SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+					SimpleDateFormat sdf2 = new SimpleDateFormat("dd/MM/yyyy");
 					Calendar cal = Calendar.getInstance();
 					Date allowStartDate;
 					Date allowFinishDate;
 
 					while ((currLine = reader.readNext()) != null) {
 
-						if(currLine.length > 0 && (line++ > 0 || (Validator.isNotNull(currLine[0]) && Validator.isNumber(currLine[0])))) {
+						if( currLine.length > 0 && 
+						   (line++ > 0 || 
+								   (Validator.isNotNull(currLine[0]) && 
+									Validator.isNumber(currLine[0])))) {
 							String userIdStr = currLine[0];
 						
 							if (!userIdStr.equals(StringPool.BLANK)){
 	
 								long userId=0;
-								System.out.println("    userId : " + userIdStr.trim() );
+								log.debug("userId:: " + userIdStr.trim() );
 								try {
 									
 									userId = Long.parseLong(userIdStr.trim());
@@ -854,7 +859,7 @@ public class CourseAdmin extends MVCPortlet {
 									User user = UserLocalServiceUtil.getUser(userId);
 									
 									if(user != null){
-										System.out.println("      User Name : " + user.getFullName() );
+										log.debug("User Name:: " + user.getFullName() );
 										if(!GroupLocalServiceUtil.hasUserGroup(userId, course.getGroupCreatedId())){
 											GroupLocalServiceUtil.addUserGroups(userId, new long[] { course.getGroupCreatedId() });
 											//sendEmail(user, course);
@@ -866,11 +871,15 @@ public class CourseAdmin extends MVCPortlet {
 										UserGroupRoleLocalServiceUtil.addUserGroupRoles(new long[] { userId }, course.getGroupCreatedId(), roleId);
 										String allowStartDateStr = currLine[2];
 										String allowEndDateStr = currLine[3];
-										//System.out.println(allowStartDateStr);
-										//System.out.println(allowEndDateStr);
+										//log.debug(allowStartDateStr);
+										//log.debug(allowEndDateStr);
 										
 										if(allowStartDateStr.trim().length() >0){
-											cal.setTime(sdf.parse(allowStartDateStr));
+											try{
+												cal.setTime(sdf.parse(allowStartDateStr));
+											}catch(ParseException e){
+												cal.setTime(sdf2.parse(allowStartDateStr));
+											}
 											int startMonth = cal.get(Calendar.MONTH);
 											int startYear = cal.get(Calendar.YEAR);
 											int startDay = cal.get(Calendar.DATE);
@@ -879,7 +888,11 @@ public class CourseAdmin extends MVCPortlet {
 											allowStartDate=null;
 										}
 										if(allowEndDateStr.trim().length() >0){
-											cal.setTime(sdf.parse(allowEndDateStr));
+											try{
+												cal.setTime(sdf.parse(allowEndDateStr));
+											}catch(ParseException e){
+												cal.setTime(sdf2.parse(allowEndDateStr));
+											}
 											int stopMonth = cal.get(Calendar.MONTH);
 											int stopYear = cal.get(Calendar.YEAR);
 											int stopDay = cal.get(Calendar.DATE);
@@ -894,12 +907,13 @@ public class CourseAdmin extends MVCPortlet {
 
 										
 									}else{
-										System.out.println("      User not exits (userId:"+userId+").");
+										log.info("User not exits (userId:"+userId+").");
 									}
 									
 									
 								} catch (NumberFormatException e) {
-									errors.add(LanguageUtil.format(getPortletConfig(),themeDisplay.getLocale(),"courseadmin.importuserrole.csvError.user-id-bad-format", new Object[] { userId }, false));
+									if (line > 1)
+										errors.add(LanguageUtil.format(getPortletConfig(),themeDisplay.getLocale(),"courseadmin.importuserrole.csvError.user-id-bad-format", new Object[] { userId }, false));
 								} catch (PortalException e) {
 									errors.add(LanguageUtil.format(getPortletConfig(),themeDisplay.getLocale(),"courseadmin.importuserrole.csvError.user-id-not-found",	new Object[] { userId,userId }, false));
 								} catch (Exception e){
@@ -912,7 +926,7 @@ public class CourseAdmin extends MVCPortlet {
 
 							}
 							
-							if(!Validator.isNumber(currLine[0])){
+							if(!Validator.isNumber(currLine[0]) && line > 1){
 								errors.add(LanguageUtil.format(getPortletConfig(),themeDisplay.getLocale(),"courseadmin.importuserrole.csvError.user-id-bad-format", new Object[] { currLine[0] }, false));
 
 							}
@@ -953,7 +967,7 @@ public class CourseAdmin extends MVCPortlet {
 			long groupId = ParamUtil.getLong(uploadRequest, "groupId");
 			File file = uploadRequest.getFile("importFileName");
 			if (!file.exists()) {
-				//	System.out.println("Import file does not exist");
+				//	log.debug("Import file does not exist");
 				throw new LARFileException("Import file does not exist");
 			}
 			String portletId = (String) actionRequest.getAttribute(WebKeys.PORTLET_ID);
@@ -962,7 +976,7 @@ public class CourseAdmin extends MVCPortlet {
 
 		}
 		catch (Exception e) {
-			//System.out.println("Error importando lar.");
+			//log.debug("Error importando lar.");
 
 			if ((e instanceof LARFileException) || (e instanceof LARTypeException)) {
 
@@ -1158,7 +1172,7 @@ public class CourseAdmin extends MVCPortlet {
 					jsonObject.put("error", "bad-permission");
 				}
 			}catch(Exception e){
-				//System.out.println(" Error: "+e.getMessage());
+				//log.debug(" Error: "+e.getMessage());
 				e.printStackTrace();
 				jsonObject.put("error", e.getMessage());
 			} finally {
