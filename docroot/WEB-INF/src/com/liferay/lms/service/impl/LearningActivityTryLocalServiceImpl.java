@@ -250,7 +250,7 @@ public class LearningActivityTryLocalServiceImpl extends LearningActivityTryLoca
 		//Cassandra
 		if(PropsUtil.get("persistencemethod").equals(String.valueOf("Cassandra"))){
 			
-			
+		 	
 			
 			
 			
