@@ -54,7 +54,7 @@ public class FillblankQuestionType extends BaseQuestionType {
 		return "/html/execactivity/test/admin/popups/fillblank.jsp";
 	}
 	
-	public boolean correct(ActionRequest actionRequest, long questionId){
+	public long correct(ActionRequest actionRequest, long questionId){
 		List<TestAnswer> testAnswers = new ArrayList<TestAnswer>();
 		try {
 			testAnswers = TestAnswerLocalServiceUtil.getTestAnswersByQuestionId(questionId);
@@ -79,11 +79,14 @@ public class FillblankQuestionType extends BaseQuestionType {
 				i++;
 			}
 			
-			if(correctAnswers==sols.size())	return true;
-			else return false;
+			if(correctAnswers==sols.size()){
+				return CORRECT;
+			}else{
+				return INCORRECT;
+			}
 		}
 	
-		return false;
+		return INCORRECT;
 	}
 
 	private List<String> getQuestionSols(String textAnswer) {
@@ -438,5 +441,5 @@ public class FillblankQuestionType extends BaseQuestionType {
 	public int getDefaultAnswersNo(){
 		return 1;
 	}
-	
+
 }

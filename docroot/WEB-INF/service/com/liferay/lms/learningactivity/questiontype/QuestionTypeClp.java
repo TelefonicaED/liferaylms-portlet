@@ -202,7 +202,7 @@ public class QuestionTypeClp implements QuestionType {
 		}
 	}
 	
-	public boolean correct(ActionRequest actionRequest, long questionId){
+	public long correct(ActionRequest actionRequest, long questionId){
 		Object returnObj = null;
 
 		try {
@@ -221,7 +221,7 @@ public class QuestionTypeClp implements QuestionType {
 			}
 		}
 
-		return ((Boolean)returnObj);
+		return ((Long)returnObj);
 	}
 	
 	public String getHtmlView(long questionId, ThemeDisplay themeDisplay, Document document){
@@ -413,6 +413,12 @@ public class QuestionTypeClp implements QuestionType {
 
 	@Override
 	public boolean isInline() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+	
+	@Override
+	public boolean isPartialCorrectAvailable() {
 		// TODO Auto-generated method stub
 		return false;
 	}

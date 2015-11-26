@@ -55,11 +55,11 @@
 		}
 	}
 	
-	%>
-	<liferay-util:include page="/html/execactivity/test/admin/editHeader.jsp" servletContext="<%=this.getServletContext() %>" />
-	
-	<portlet:actionURL var="editQuestionURL" name="editQuestion" />
-	<aui:form name="qfm" action="<%=editQuestionURL %>" method="post" onSubmit="javascript:return false;">
+%>
+<liferay-util:include page="/html/execactivity/test/admin/editHeader.jsp" servletContext="<%=this.getServletContext() %>" />
+
+<portlet:actionURL var="editQuestionURL" name="editQuestion" />
+<aui:form name="qfm" action="<%=editQuestionURL %>" method="post" onSubmit="javascript:return false;">
 
 	<%
 		QuestionType qt = 	new QuestionTypeRegistry().getQuestionType(typeId);
@@ -82,7 +82,7 @@
         }
 	</script>
     
-	<%	
+    <%	
 		boolean enableOrder = StringPool.TRUE.equals(PropsUtil.get("lms.learningactivity.testoption.editformat"));
 		if(qt.isInline()){
 			try{
@@ -94,25 +94,40 @@
 			}catch(DocumentException e){
 				formatType = PropsUtil.get("lms.question.formattype.normal");
 			}
+			if (enableOrder){
 	%>
-			<c:choose>
-				<c:when test="<%=enableOrder%>">
-					<aui:select name="formattype" label="exectactivity.editquestions.formattype" helpMessage="exectactivity.editquestions.formattype.helpMessage"> 
-						<aui:option selected="<%=formatType.equals(PropsUtil.get(\"lms.question.formattype.normal\")) %>" value="<%=PropsUtil.get(\"lms.question.formattype.normal\")%>">
-							<liferay-ui:message key="exectactivity.editquestions.formattype.vertical" />
-						</aui:option>
-						<aui:option selected="<%=formatType.equals(PropsUtil.get(\"lms.question.formattype.horizontal\")) %>" value="<%=PropsUtil.get(\"lms.question.formattype.horizontal\") %>">
-							<liferay-ui:message key="exectactivity.editquestions.formattype.horizontal" />
-						</aui:option>
-						<aui:option selected="<%=formatType.equals(PropsUtil.get(\"lms.question.formattype.combo\")) %>" value="<%=PropsUtil.get(\"lms.question.formattype.combo\") %>">
-							<liferay-ui:message key="exectactivity.editquestions.formattype.combo" />
-						</aui:option>
-					</aui:select>
-				</c:when>
-				<c:otherwise>
-					<aui:input type="hidden" name="formattype" value="<%=formatType %>" ignoreRequestValue="true"></aui:input>
-				</c:otherwise>
-			</c:choose>
+				<aui:select name="formattype" label="exectactivity.editquestions.formattype" helpMessage="exectactivity.editquestions.formattype.helpMessage" inlineLabel="true" > 
+					<aui:option selected="<%=formatType.equals(PropsUtil.get(\"lms.question.formattype.normal\")) %>" value="<%=PropsUtil.get(\"lms.question.formattype.normal\")%>">
+						<liferay-ui:message key="exectactivity.editquestions.formattype.vertical" />
+					</aui:option>
+					<aui:option selected="<%=formatType.equals(PropsUtil.get(\"lms.question.formattype.horizontal\")) %>" value="<%=PropsUtil.get(\"lms.question.formattype.horizontal\") %>">
+						<liferay-ui:message key="exectactivity.editquestions.formattype.horizontal" />
+					</aui:option>
+					<aui:option selected="<%=formatType.equals(PropsUtil.get(\"lms.question.formattype.combo\")) %>" value="<%=PropsUtil.get(\"lms.question.formattype.combo\") %>">
+						<liferay-ui:message key="exectactivity.editquestions.formattype.combo" />
+					</aui:option>
+				</aui:select>
+	<%
+			}else{
+	%>
+				<aui:input type="hidden" name="formattype" value="<%=formatType %>" ignoreRequestValue="true" />
+	<%
+			}
+		}
+		if(qt.isPartialCorrectAvailable()){
+			boolean partialCorrection = false;
+			try{
+				Document document = SAXReaderUtil.read(question.getExtracontent());
+				Element rootElement = document.getRootElement();
+				partialCorrection = StringPool.TRUE.equals(rootElement.element("partialcorrection").getData());
+			}catch(NullPointerException e){
+				partialCorrection = false;
+			}catch(DocumentException e){
+				partialCorrection = false;
+			}
+	%>
+			<aui:input type="checkbox" label="execactivity.editquestions.partialcorrection" helpMessage="execactivity.editquestions.partialcorrection.helpmessage" name="partialcorrection" 
+					checked="<%=partialCorrection %>" last="true" inlineLabel="true" inlineField="true"/>
 	<%
 		}
 	%>
@@ -294,10 +309,8 @@
 			    			var id = this.get('id');
 			    			id=id.replace('testAnswer_','');
 			    			if(typeId==1 || typeId==4)id=id.replace('new','');
-
 			    			feedbackCorrect = A.one('input[name=<portlet:namespace />feedbackCorrect_'+id+']');
 			    			feedbackNoCorrect = A.one('input[name=<portlet:namespace />feedbackNoCorrect_'+id+']');
-			    			
 			    			
 			    			switch(typeId){
 			    				
@@ -315,8 +328,10 @@
 			    				case 1:
 			    				
 			    					correct = A.one('input[name=<portlet:namespace />correct_'+id+'Checkbox]');
+			    					console.log(correct);
 				    				correctVal = (correct != null && correct._node.checked);
-				    				if(correctVal==='true')trueCounter++;
+				    				console.log(correctVal);
+				    				if(correctVal==true)trueCounter++;
 				    				if (correct == null) {
 				    					correct =document.getElementById('input[name=<portlet:namespace />correct_'+id+']');
 				    					correctVal = (correct != null && correct.val() === 'true');
@@ -349,9 +364,7 @@
 			    				default:
 			    					console.log(id);
 			    					correct = A.one('input[name=<portlet:namespace />correct_'+id+'Checkbox]');
-			    				console.log(correct)
 			    				correctVal = (correct != null && correct._node.checked);
-			    				console.log(correctVal);
 			    				if(correctVal==true)trueCounter++;
 			    				if (correct == null) {
 			    					correct =document.getElementById('input[name=<portlet:namespace />correct_'+id+']');
@@ -384,7 +397,6 @@
 			    		});
 		    			if(trueCounter==0)valid = false;
 			    		
-			    		
 			    		//Ningun feedback > 300 caracteres
 			    		if(valid && typeId!=5){
 				    		list.each(function() {
@@ -396,7 +408,6 @@
 								
 				    			if((feedbackCorrect != null && feedbackCorrect.val().length > 600) || 
 										(feedbackNoCorrect != null && feedbackNoCorrect.val().length > 600)){
-
 										A.one('#<portlet:namespace />feedBackError_'+id).removeClass('aui-helper-hidden');
 					    				valid=false;
 					    				A.one('#panel_'+id).removeClass('lfr-collapsed');
@@ -409,7 +420,6 @@
 			    		if (!valid && e.preventDefault) {
 							e.preventDefault();
 						}
-			    		
 				    	return valid;
 		    		}
 		    	);
@@ -422,14 +432,11 @@
 		   	}
 		);
 	</script>
-
 	<%
 	if(learningActivity.getTypeId()!=4){ %>
 	
-
 		<aui:field-wrapper label="answers" helpMessage="<%=qt.getDescription(themeDisplay.getLocale()) %>" /><%
-	 } 
-	%>
+	 } %>
 	<liferay-ui:error key="answer-test-required" message="answer-test-required"/>
 	<jsp:include page="<%=(qt!=null)?qt.getURLEdit():\"\" %>"/>
     <aui:button-row>

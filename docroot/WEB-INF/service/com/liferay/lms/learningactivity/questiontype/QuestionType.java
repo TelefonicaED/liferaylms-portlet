@@ -25,7 +25,7 @@ public interface QuestionType
 	public String getURLNew();
 	public String getURLBack();
 	public void delete(long questionId) throws PortalException, SystemException;
-	public boolean correct(ActionRequest actionRequest, long questionId);
+	public long correct(ActionRequest actionRequest, long questionId);
 	public String getHtmlView(long questionId, ThemeDisplay themeDisplay, Document document);
 	public Element getResults(ActionRequest actionRequest, long questionId);
 	public String getHtmlFeedback(Document document,long questionId, ThemeDisplay themeDisplay);
@@ -36,5 +36,6 @@ public interface QuestionType
 	public int getMaxAnswers();
 	public int getDefaultAnswersNo();
 	public boolean isInline();
+	public boolean isPartialCorrectAvailable();
 		
 }
