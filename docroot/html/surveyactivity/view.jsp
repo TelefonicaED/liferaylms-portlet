@@ -161,7 +161,7 @@ textarea {
 									        bodyContent: content,
 									        buttons: [
 									                  {
-									                	  label: '<liferay-ui:message key="ok"/>',
+									                	  label: '<liferay-ui:message key="lms.dialog.ok"/>',
 									                	  handler: function() {
 									                		  A.one('#<portlet:namespace/>formulario').detach('submit');
 									                		  if (!<%=isEvaluationSurvey%>)
@@ -170,7 +170,7 @@ textarea {
 									                	  }
 									                  },
 									                  {
-									                	  label: '<liferay-ui:message key="cancel"/>',
+									                	  label: '<liferay-ui:message key="lms.dialog.cancel"/>',
 									                	  handler: function() {
 									                		  <portlet:namespace />confirmDialog.close();
 									                	  }
