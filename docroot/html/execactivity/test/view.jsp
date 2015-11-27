@@ -413,7 +413,17 @@
 						    	} else if (e.srcElement) {
 						    		targ = e.srcElement.blur();
 						    	}
-						    	<%= renderResponse.getNamespace() %>popConfirm('<%=JavaScriptUtil.markupToStringLiteral(LanguageUtil.get(pageContext, "execativity.test.questions.without.response")) %>', e.srcElement);
+					    	<%
+						    	if(GetterUtil.getLong(LearningActivityLocalServiceUtil.getExtraContentValue(activity.getActId(), "questionsPerPage"))!=0){
+					    	%>
+						    		<%= renderResponse.getNamespace() %>popConfirm('<%=JavaScriptUtil.markupToStringLiteral(LanguageUtil.get(pageContext, "execativity.test.questions.without.responsepagination")) %>', e.srcElement);
+					    	<%
+						    	}else{
+				    		%>
+							    	<%= renderResponse.getNamespace() %>popConfirm('<%=JavaScriptUtil.markupToStringLiteral(LanguageUtil.get(pageContext, "execativity.test.questions.without.response")) %>', e.srcElement);
+					    	<%	
+						    	}
+					    	%>
 				    		}
 					    }
 						
