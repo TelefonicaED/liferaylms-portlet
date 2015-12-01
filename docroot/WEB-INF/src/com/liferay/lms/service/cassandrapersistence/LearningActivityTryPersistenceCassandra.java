@@ -13,6 +13,9 @@ import javax.sql.DataSource;
 */
 
 import java.io.Serializable;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import com.liferay.counter.service.CounterLocalServiceUtil;
@@ -619,7 +622,7 @@ public class LearningActivityTryPersistenceCassandra extends LearningActivityTry
 	@Override
 	public List<LearningActivityTry> findByact_u(long actId, long userId)
 		throws SystemException {
-		return findByact_u(actId, userId, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+		return findByact_u(actId, userId, 0, QueryUtil.ALL_POS,
 			null);
 	}
 	
@@ -644,12 +647,14 @@ public class LearningActivityTryPersistenceCassandra extends LearningActivityTry
 	public List<LearningActivityTry> findByact_u(long actId, long userId,
 		int start, int end, OrderByComparator orderByComparator)
 		throws SystemException {
-		FinderPath finderPath = null;
-		Object[] finderArgs = null;
+
+		
 
    		List<LearningActivityTry> groupActivityTries=new java.util.ArrayList<LearningActivityTry>();
    		BoundStatement boundStatement = new BoundStatement(ExtConexionCassandra.findByact_uStatement);
-		boundStatement.setFetchSize(end);		
+   		if (!(end==-1)){
+   			boundStatement.setFetchSize(end);
+   		}
 		ResultSet results = null;
 		results = session.execute(boundStatement.bind(actId,userId));
    				List<Row> rows=results.all();
@@ -664,6 +669,7 @@ public class LearningActivityTryPersistenceCassandra extends LearningActivityTry
    		return groupActivityTries;		
 	}
 
+	/*
 	public List<LearningActivityTry> getLearningActivityTryNotFinishedByActUser(long actId, long userId)
 			throws SystemException {
 			FinderPath finderPath = null;
@@ -685,7 +691,7 @@ public class LearningActivityTryPersistenceCassandra extends LearningActivityTry
 	   		
 	   		return groupActivityTries;		
 		}
-	
+	*/
 	
 	
 
@@ -814,8 +820,24 @@ public class LearningActivityTryPersistenceCassandra extends LearningActivityTry
 		learningActivityTry.setUuid(row.getString("uuid_"));
 		learningActivityTry.setLatId(row.getLong("latid"));
 		learningActivityTry.setComments(row.getString("comments"));
-		learningActivityTry.setEndDate(row.getDate("enddDate"));
-		learningActivityTry.setResult(row.getLong("setResult"));     
+		
+		
+			Date date = null;
+			SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-yyyy");
+			if ( !row.getString("endDate").equals("")){
+				
+			try {
+				date = formatter.parse( row.getString("endDate"));
+			} catch (ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+						learningActivityTry.setEndDate( date);
+			}		
+		
+
+		
+		learningActivityTry.setResult(row.getLong("Result"));     
 		learningActivityTry.setStartDate(row.getDate("startDate"));
 		learningActivityTry. setTryData(row.getString("trydata"));
 		learningActivityTry. setTryData(row.getString("tryresultdata"));
