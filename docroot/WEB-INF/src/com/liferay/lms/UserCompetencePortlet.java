@@ -24,12 +24,14 @@ import com.liferay.lms.model.Course;
 import com.liferay.lms.model.CourseResult;
 import com.liferay.lms.model.LmsPrefs;
 import com.liferay.lms.model.Module;
+import com.liferay.lms.model.ModuleResult;
 import com.liferay.lms.model.UserCompetence;
 import com.liferay.lms.service.CompetenceLocalServiceUtil;
 import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.lms.service.CourseResultLocalServiceUtil;
 import com.liferay.lms.service.LmsPrefsLocalServiceUtil;
 import com.liferay.lms.service.ModuleLocalServiceUtil;
+import com.liferay.lms.service.ModuleResultLocalServiceUtil;
 import com.liferay.lms.service.UserCompetenceLocalServiceUtil;
 import com.liferay.lms.views.CompetenceView;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -173,6 +175,7 @@ public class UserCompetencePortlet extends MVCPortlet {
 
 						StringBuffer modulesNames = new StringBuffer(StringPool.BLANK);
 						List<Module> modules= ModuleLocalServiceUtil.findAllInGroup(course.getGroupCreatedId());
+						Map<Long,ModuleResult> moduleResults=new java.util.HashMap<Long,ModuleResult>();
 						if(modules!=null){
 							modulesNames.append("<ul>");
 							if(log.isDebugEnabled())log.debug(modules.size());
@@ -180,11 +183,15 @@ public class UserCompetencePortlet extends MVCPortlet {
 								modulesNames.append("<li>");
 								modulesNames.append(module.getTitle(user.getLocale()));
 								modulesNames.append("</li>");
+								ModuleResult mResult=ModuleResultLocalServiceUtil.getByModuleAndUser(module.getModuleId(), user.getUserId());
+								moduleResults.put(module.getModuleId(), mResult);
+								
 							} 
 							modulesNames.append("</ul>");
 						}
-
+						
 						variables.put("modules", modules); 
+						variables.put("moduleResults",moduleResults);
 						variables.put("modulesNames", modulesNames);
 						variables.put("teachers", teachers);
 						variables.put("teachersNames", teachersNames);
