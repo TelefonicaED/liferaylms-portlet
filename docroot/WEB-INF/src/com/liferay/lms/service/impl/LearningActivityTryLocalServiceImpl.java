@@ -14,7 +14,10 @@
 
 package com.liferay.lms.service.impl;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -80,7 +83,7 @@ import com.liferay.portal.service.UserLocalServiceUtil;
 public class LearningActivityTryLocalServiceImpl extends LearningActivityTryLocalServiceBaseImpl {
 	
 	
-	public com.liferay.lms.service.persistence.LearningActivityTryPersistence persistence=null;
+	//public com.liferay.lms.service.persistence.LearningActivityTryPersistence persistence=null;
 	
 	
 	
@@ -160,17 +163,17 @@ public class LearningActivityTryLocalServiceImpl extends LearningActivityTryLoca
 			throws SystemException{
 		try
 		{
-		if(learningActivityTry.getEndDate()!=null)
-		{
-			LearningActivityResultLocalServiceUtil.update(learningActivityTry)	;
-		}
+			if(learningActivityTry.getEndDate()!=null)
+			{
+				LearningActivityResultLocalServiceUtil.update(learningActivityTry)	;
+			}
 
 		//return super.updateLearningActivityTry(learningActivityTry, merge);
 		
 		learningActivityTry.setNew(false);
 		return  getPersistence().update(learningActivityTry, merge);
 		
-	}
+	   }
 		catch(PortalException e)
 		{
 			throw new SystemException(e);
@@ -246,14 +249,16 @@ public class LearningActivityTryLocalServiceImpl extends LearningActivityTryLoca
 	public LearningActivityTry getLastLearningActivityTryByActivityAndUser(long actId,long userId) throws SystemException, PortalException
 	{ 	
 	
+// Falta : ORDENN DESC en Cassandra del campo endDate		
 		
 		//Cassandra
 		if(PropsUtil.get("persistencemethod").equals(String.valueOf("Cassandra"))){
-			
-		 	
-			
-			
-			
+			java.util.List<LearningActivityTry> activities= getPersistence().findByact_u(actId, userId);
+			for(LearningActivityTry activity:activities){
+				//Necesitamos la primera, que est� ordenada por la �ltima realizada.
+				return activity;
+			}
+		//Liferay	
 		}else{
 			DynamicQuery consulta = DynamicQueryFactoryUtil.forClass(LearningActivityTry.class, (ClassLoader)PortletBeanLocatorUtil.locate(ClpSerializer.getServletContextName(),
 					"portletClassLoader"))
@@ -276,50 +281,114 @@ public class LearningActivityTryLocalServiceImpl extends LearningActivityTryLoca
 	}
 	@SuppressWarnings("unchecked")	
 	public LearningActivityTry createOrDuplicateLast(long actId,ServiceContext serviceContext) throws SystemException, PortalException
-	{ 	
-		DynamicQuery consulta = DynamicQueryFactoryUtil.forClass(LearningActivityTry.class, (ClassLoader)PortletBeanLocatorUtil.locate(ClpSerializer.getServletContextName(),
-				"portletClassLoader"))
-					.add(PropertyFactoryUtil.forName("actId").eq(new Long(actId)))
-					.add(PropertyFactoryUtil.forName("userId").eq(new Long(serviceContext.getUserId())))
-					.addOrder(PropertyFactoryUtil.forName("startDate").desc());
-					
-		List<LearningActivityTry> activities = (List<LearningActivityTry>)learningActivityTryPersistence.findWithDynamicQuery(consulta);
-		LearningActivityTry  lastTry=null;
-		if(activities!=null && activities.size()>0)
-		{
-		   lastTry=activities.get(0);
-		}
-		if(lastTry==null)
-		{
-			return createLearningActivityTry(actId, serviceContext);
-		}
-		else
-		{
-			LearningActivityTry newTry=createLearningActivityTry(actId, serviceContext);
-			newTry.setResult(lastTry.getResult());
-			newTry.setTryData(lastTry.getTryData());
-			newTry.setTryResultData(lastTry.getTryResultData());
-			updateLearningActivityTry(newTry);
-			return newTry;
-		}
+	{ 
+		
+		
+		java.util.List<LearningActivityTry> activities =null;
+		
+		// Falta : ORDENN DESC en Cassandra del campo startDate			
+		//Cassandra
+		if(PropsUtil.get("persistencemethod").equals(String.valueOf("Cassandra"))){
+			  activities= getPersistence().findByact_u(actId, serviceContext.getUserId());
+		//Liferay	
+		}else{
+		
+				DynamicQuery consulta = DynamicQueryFactoryUtil.forClass(LearningActivityTry.class, (ClassLoader)PortletBeanLocatorUtil.locate(ClpSerializer.getServletContextName(),
+						"portletClassLoader"))
+							.add(PropertyFactoryUtil.forName("actId").eq(new Long(actId)))
+							.add(PropertyFactoryUtil.forName("userId").eq(new Long(serviceContext.getUserId())))
+							.addOrder(PropertyFactoryUtil.forName("startDate").desc());
+							
+				activities = (List<LearningActivityTry>)learningActivityTryPersistence.findWithDynamicQuery(consulta);
+		}		
+				LearningActivityTry  lastTry=null;
+				if(activities!=null && activities.size()>0)
+				{
+				   lastTry=activities.get(0);
+				}
+				if(lastTry==null)
+				{
+					return createLearningActivityTry(actId, serviceContext);
+				}
+				else
+				{
+					LearningActivityTry newTry=createLearningActivityTry(actId, serviceContext);
+					newTry.setResult(lastTry.getResult());
+					newTry.setTryData(lastTry.getTryData());
+					newTry.setTryResultData(lastTry.getTryResultData());
+					updateLearningActivityTry(newTry);
+					return newTry;
+				}
+			
 		
 	}
 	@SuppressWarnings("unchecked")
 	public LearningActivityTry getLearningActivityTryNotFinishedByActUser(long actId,long userId) throws SystemException, PortalException
-	{ 			
-		DynamicQuery consulta = DynamicQueryFactoryUtil.forClass(LearningActivityTry.class, (ClassLoader)PortletBeanLocatorUtil.locate(ClpSerializer.getServletContextName(),
-				"portletClassLoader"))
-					.add(PropertyFactoryUtil.forName("actId").eq(new Long(actId)))
-					.add(PropertyFactoryUtil.forName("userId").eq(new Long(userId)))
-					.add(PropertyFactoryUtil.forName("endDate").isNull())
-					.addOrder(PropertyFactoryUtil.forName("startDate").desc());
-					
-		List<LearningActivityTry> activities = (List<LearningActivityTry>)learningActivityTryPersistence.findWithDynamicQuery(consulta);
+	{ 	
+		
+		java.util.List<LearningActivityTry> activities =null;
+		
+		// Falta : ORDENN DESC en Cassandra del campo startDate			
+		//Cassandra
+		if(PropsUtil.get("persistencemethod").equals(String.valueOf("Cassandra"))){
+	   		List<LearningActivityTry> groupActivityTries=new java.util.ArrayList<LearningActivityTry>();
+	   		
+	   		BoundStatement boundStatement = new BoundStatement(ExtConexionCassandra.findByactByUserByEnDate_uStatement);
+			ResultSet results = null;
+ 			results = ExtConexionCassandra.session.execute(boundStatement.bind(actId,userId));
+	   				List<Row> rows=results.all();
+	   				if(rows.size()>0){
+	   					for(int j=0;j<rows.size();j++){
+	   						Row row=rows.get(j);
+	   						LearningActivityTry learningActivityTry = getPersistence().create(row.getLong("latId"));
+	   						learningActivityTry.setUuid(row.getString("uuid_"));
+	   						learningActivityTry.setLatId(row.getLong("latid"));
+	   						learningActivityTry.setComments(row.getString("comments"));
+	   						
+	   						Date date = null;
+	   						SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-yyyy");
+	   						if ( !row.getString("endDate").equals("")){
+	   							
+								try {
+									date = formatter.parse( row.getString("endDate"));
+								} catch (ParseException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
+	   									learningActivityTry.setEndDate( date);
+	   						}
+	   						
+	   						
+	   						
+	   						learningActivityTry.setResult(row.getLong("result"));     
+	   						learningActivityTry.setStartDate(row.getDate("startDate"));
+	   						learningActivityTry. setTryData(row.getString("trydata"));
+	   						learningActivityTry. setTryData(row.getString("tryresultdata"));
+	   						
+	   						return learningActivityTry;
+	   					}
+	   		     }	
+			
+		
 
-		for(LearningActivityTry activity:activities){
-			//Necesitamos la primera, que est� ordenada por la �ltima realizada.
-			return activity;
-		}
+		//Liferay	
+		}else{		
+		
+			
+			DynamicQuery consulta = DynamicQueryFactoryUtil.forClass(LearningActivityTry.class, (ClassLoader)PortletBeanLocatorUtil.locate(ClpSerializer.getServletContextName(),
+					"portletClassLoader"))
+						.add(PropertyFactoryUtil.forName("actId").eq(new Long(actId)))
+						.add(PropertyFactoryUtil.forName("userId").eq(new Long(userId)))
+						.add(PropertyFactoryUtil.forName("endDate").isNull())
+						.addOrder(PropertyFactoryUtil.forName("startDate").desc());
+						
+			activities = (List<LearningActivityTry>)learningActivityTryPersistence.findWithDynamicQuery(consulta);
+	
+			for(LearningActivityTry activity:activities){
+				//Necesitamos la primera, que est� ordenada por la �ltima realizada.
+				return activity;
+			}
+		}	
 		return null;		
 	}
 	
@@ -383,17 +452,39 @@ public class LearningActivityTryLocalServiceImpl extends LearningActivityTryLoca
 			return true;
 		}
 		
-		//Mirar que alguno de sus intentos no se terminase.
-		ClassLoader classLoader = (ClassLoader) PortletBeanLocatorUtil.locate(ClpSerializer.getServletContextName(), "portletClassLoader");
-		DynamicQuery consulta = DynamicQueryFactoryUtil.forClass(LearningActivityTry.class, classLoader)
-				.add(PropertyFactoryUtil.forName("actId").eq(new Long(actId)))
-				.add(PropertyFactoryUtil.forName("userId").eq(new Long(userId)))
-				.add(PropertyFactoryUtil.forName("endDate").isNull());
+		long opened =0;
 				
-		long opened = learningActivityTryPersistence.countWithDynamicQuery(consulta);
-			
-		//Si tiene menos intentos de los que se puede hacer.
-		return Long.valueOf(userTries-opened) < activityTries;
+//Cassandra
+		if(PropsUtil.get("persistencemethod").equals(String.valueOf("Cassandra"))){
+	   		List<LearningActivityTry> groupActivityTries=new java.util.ArrayList<LearningActivityTry>();
+	   		
+	   		BoundStatement boundStatement = new BoundStatement(ExtConexionCassandra.findByactByUserByEnDate_uStatement);
+			ResultSet results = null;
+			results = ExtConexionCassandra.session.execute(boundStatement.bind(actId,userId));
+	   				List<Row> rows=results.all();
+	   				if (rows.isEmpty()){
+	   					return true;
+	   				}else{
+	   					
+		   				opened = (long) rows.size();
+		   				//Si tiene menos intentos de los que se puede hacer.
+		   				return Long.valueOf(userTries-opened) < activityTries;	
+	   					
+	   				}
+//Liferay	
+		}else{		
+			//Mirar que alguno de sus intentos no se terminase.
+			ClassLoader classLoader = (ClassLoader) PortletBeanLocatorUtil.locate(ClpSerializer.getServletContextName(), "portletClassLoader");
+			DynamicQuery consulta = DynamicQueryFactoryUtil.forClass(LearningActivityTry.class, classLoader)
+					.add(PropertyFactoryUtil.forName("actId").eq(new Long(actId)))
+					.add(PropertyFactoryUtil.forName("userId").eq(new Long(userId)))
+					.add(PropertyFactoryUtil.forName("endDate").isNull());
+					
+			opened = learningActivityTryPersistence.countWithDynamicQuery(consulta);
+			//Si tiene menos intentos de los que se puede hacer.
+					return Long.valueOf(userTries-opened) < activityTries;		
+		}	
+
 	}
 	
 	@SuppressWarnings("unchecked")
