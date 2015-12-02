@@ -39,6 +39,8 @@ import com.liferay.lms.service.LearningActivityLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityTryLocalServiceUtil;
 import com.liferay.lms.service.ModuleResultLocalServiceUtil;
 import com.liferay.lms.service.base.LearningActivityResultLocalServiceBaseImpl;
+import com.liferay.lms.service.cassandrapersistence.LearningActivityResultPersistenceCassandra;
+import com.liferay.lms.service.cassandrapersistence.LearningActivityTryPersistenceCassandra;
 import com.liferay.portal.kernel.bean.PortletBeanLocatorUtil;
 import com.liferay.portal.kernel.dao.orm.Criterion;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
@@ -52,6 +54,7 @@ import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.DocumentException;
@@ -85,6 +88,16 @@ import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
  */
 public class LearningActivityResultLocalServiceImpl
 	extends LearningActivityResultLocalServiceBaseImpl {
+	
+	
+	
+	public com.liferay.lms.service.persistence.LearningActivityResultPersistence getPersistence(){
+		if(PropsUtil.get("persistencemethod").equals(String.valueOf("Cassandra")))
+			return new LearningActivityResultPersistenceCassandra();
+		else
+			return learningActivityResultPersistence;
+	}	
+	
 	public LearningActivityResult update(LearningActivityTry learningActivityTry) throws SystemException, PortalException
 	{
 		LearningActivityResult learningActivityResult=null;
@@ -94,7 +107,7 @@ public class LearningActivityResultLocalServiceImpl
 		if(!existsLearningActivityResult(actId, userId))
 		{	
 			learningActivityResult=
-				learningActivityResultPersistence.create(counterLocalService.increment(
+					getPersistence().create(counterLocalService.increment(
 						LearningActivityResult.class.getName()));
 			learningActivityResult.setStartDate(learningActivityTry.getStartDate());
 			learningActivityResult.setActId(actId);
@@ -103,7 +116,7 @@ public class LearningActivityResultLocalServiceImpl
 		}
 		else
 		{
-			learningActivityResult=learningActivityResultPersistence.fetchByact_user(actId, userId);
+			learningActivityResult= getPersistence().fetchByact_user(actId, userId);
 		}
 		if(learningActivityTry.getEndDate()!=null)
 		{
@@ -760,7 +773,7 @@ public class LearningActivityResultLocalServiceImpl
 	}
 	public boolean existsLearningActivityResult(long actId,long userId) throws SystemException
 	{
-		if(learningActivityResultPersistence.countByact_user(actId, userId)>0)
+		if(getPersistence().countByact_user(actId, userId)>0)
 		{
 			return true;
 		}
