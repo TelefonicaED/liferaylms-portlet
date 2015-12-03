@@ -15,6 +15,13 @@
 package com.liferay.lms.service.impl;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.ArrayList;
@@ -23,6 +30,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+
+import org.xml.sax.InputSource;
 
 import com.liferay.lms.auditing.AuditConstants;
 import com.liferay.lms.auditing.AuditingLogFactory;
@@ -33,11 +42,13 @@ import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.model.LearningActivityResult;
 import com.liferay.lms.model.LearningActivityTry;
 import com.liferay.lms.model.ModuleResult;
+import com.liferay.lms.model.SCORMContent;
 import com.liferay.lms.service.ClpSerializer;
 import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityTryLocalServiceUtil;
 import com.liferay.lms.service.ModuleResultLocalServiceUtil;
+import com.liferay.lms.service.SCORMContentLocalServiceUtil;
 import com.liferay.lms.service.base.LearningActivityResultLocalServiceBaseImpl;
 import com.liferay.portal.kernel.bean.PortletBeanLocatorUtil;
 import com.liferay.portal.kernel.dao.orm.Criterion;
@@ -49,8 +60,10 @@ import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.json.JSONArray;
+import com.liferay.portal.kernel.json.JSONDeserializer;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.json.JSONSerializer;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.xml.Document;
@@ -165,11 +178,11 @@ public class LearningActivityResultLocalServiceImpl
 		return update(learningActivityTry);
 	}
 	public LearningActivityResult update(long latId, String tryResultData, long userId) throws SystemException, PortalException {
-		System.out.println("update");
 		LearningActivityTry learningActivityTry = learningActivityTryLocalService.getLearningActivityTry(latId);
 		if (userId != learningActivityTry.getUserId()) {
 			throw new PortalException();
 		}
+		
 		
 		LearningActivity learningActivity = learningActivityLocalService.getLearningActivity(learningActivityTry.getActId());
 		String assetEntryId = learningActivityLocalService.getExtraContentValue(learningActivityTry.getActId(), "assetEntry");
@@ -179,14 +192,24 @@ public class LearningActivityResultLocalServiceImpl
 		Map<String, String> recursos = new HashMap<String, String>();
 		
 		Map<String, String> manifestResources = new HashMap<String, String>();
-		
 		try {
 			String urlString = assetEntry.getUrl();
 			if (Validator.isNotNull(urlString)) {
 				Document imsdocument = null;
 				URL url = new URL(urlString);
 				if (urlString.startsWith("http://") || urlString.startsWith("https://")) {
-					imsdocument = SAXReaderUtil.read(new URL(urlString).openStream());
+					SCORMContent _scorm =  SCORMContentLocalServiceUtil.getSCORMContent(assetEntry.getClassPK());
+					String rutaDatos = SCORMContentLocalServiceUtil.getBaseDir();
+					
+					String urlIndex=rutaDatos+"/"+Long.toString(_scorm.getCompanyId())+"/"+Long.toString(_scorm.getGroupId())+"/"+_scorm.getUuid()+"/imsmanifest.xml";
+					
+					InputStream inputStream= new FileInputStream(urlIndex);
+					Reader reader = new InputStreamReader(inputStream,"UTF-8");
+					 
+					InputSource is = new InputSource(reader);
+					is.setEncoding("UTF-8");
+
+					imsdocument = SAXReaderUtil.read(reader);
 				}
 				if (urlString.startsWith("file://")) {
 					imsdocument = SAXReaderUtil.read(new File( URLDecoder.decode( url.getFile(), "UTF-8" ) ));
@@ -212,22 +235,30 @@ public class LearningActivityResultLocalServiceImpl
 				}
 			}
 		} catch (DocumentException e) {
-		} catch (Exception e) {
+			
+			System.out.println("3");
 			e.printStackTrace();
-		}
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (MalformedURLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
+		
 		
 		Long master_score = new Integer(learningActivity.getPasspuntuation()).longValue();
-		
 		JSONObject scorm = JSONFactoryUtil.createJSONObject();
 		scorm = JSONFactoryUtil.createJSONObject(tryResultData);
-		
 		JSONObject organizations = scorm.getJSONObject("organizations");
 		JSONArray organizationNames = organizations.names();
 		JSONObject organization = organizations.getJSONObject(organizationNames.getString(0));
 		
 		JSONObject cmis = organization.getJSONObject("cmi");
 		JSONArray cmiNames = cmis.names();
-		
 		List<String> completion_statuses = new ArrayList<String>();
 		List<String> success_statuses = new ArrayList<String>();
 		List<Long> scores = new ArrayList<Long>();
@@ -379,12 +410,12 @@ public class LearningActivityResultLocalServiceImpl
 				}
 			}
 		}
-		
+		//System.out.println("total_completion_status "+total_completion_status);
 		for (int i = 0; i < scores.size(); i++) {
 			total_score += scores.get(i);
 		}
 		total_score = total_score / (manifestItems.size() > 0 ? manifestItems.size() : 1);
-		
+		//System.out.println("BEFORE incomplete");
 		if ("incomplete".equals(total_completion_status) || "completed".equals(total_completion_status)) {
 			learningActivityTry.setTryResultData(tryResultData);
 			learningActivityTry.setResult(Math.round(total_score));
@@ -393,7 +424,7 @@ public class LearningActivityResultLocalServiceImpl
 				Date endDate = new Date(System.currentTimeMillis());
 				learningActivityTry.setEndDate(endDate);
 			}
-			
+			//System.out.println("learningActivityTry "+learningActivityTry);
 			learningActivityTryLocalService.updateLearningActivityTry(learningActivityTry);
 			
 			// If SCO says that the activity has been passed, then the learning activity result has to be marked as passed
