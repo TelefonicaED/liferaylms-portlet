@@ -390,4 +390,19 @@ public interface CourseLocalService extends BaseLocalService,
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.util.List<com.liferay.portal.model.User> getStudentsFromCourse(
 		long companyId, long courseGropupCreatedId);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.util.List<com.liferay.lms.model.Course> getCoursesParents(
+		long groupId)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	public void addStudentToCourseWithDates(long courseId, long userId,
+		java.util.Date allowStartDate, java.util.Date allowFinishDate)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	public void editUserInscriptionDates(long courseId, long userId,
+		java.util.Date allowStartDate, java.util.Date allowFinishDate)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException;
 }

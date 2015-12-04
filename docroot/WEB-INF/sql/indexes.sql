@@ -19,6 +19,7 @@ create index IX_F944A64E on Lms_Course (companyId, parentCourseId);
 create index IX_B852F6C6 on Lms_Course (groupCreatedId);
 create index IX_E1561C7C on Lms_Course (groupId);
 create index IX_F367BA5C on Lms_Course (groupId, closed);
+create index IX_23547F50 on Lms_Course (groupId, parentCourseId);
 create index IX_999B22C2 on Lms_Course (parentCourseId);
 create index IX_D92F6E28 on Lms_Course (userId);
 create index IX_684B7382 on Lms_Course (userId, groupId);

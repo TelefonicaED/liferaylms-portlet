@@ -241,6 +241,22 @@ public class CourseLocalServiceClp implements CourseLocalService {
 		_methodName44 = "getStudentsFromCourse";
 
 		_methodParameterTypes44 = new String[] { "long", "long" };
+
+		_methodName45 = "getCoursesParents";
+
+		_methodParameterTypes45 = new String[] { "long" };
+
+		_methodName46 = "addStudentToCourseWithDates";
+
+		_methodParameterTypes46 = new String[] {
+				"long", "long", "java.util.Date", "java.util.Date"
+			};
+
+		_methodName47 = "editUserInscriptionDates";
+
+		_methodParameterTypes47 = new String[] {
+				"long", "long", "java.util.Date", "java.util.Date"
+			};
 	}
 
 	public com.liferay.lms.model.Course addCourse(
@@ -1676,6 +1692,110 @@ public class CourseLocalServiceClp implements CourseLocalService {
 		return (java.util.List<com.liferay.portal.model.User>)ClpSerializer.translateOutput(returnObj);
 	}
 
+	public java.util.List<com.liferay.lms.model.Course> getCoursesParents(
+		long groupId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		Object returnObj = null;
+
+		try {
+			returnObj = _invokableLocalService.invokeMethod(_methodName45,
+					_methodParameterTypes45, new Object[] { groupId });
+		}
+		catch (Throwable t) {
+			t = ClpSerializer.translateThrowable(t);
+
+			if (t instanceof com.liferay.portal.kernel.exception.SystemException) {
+				throw (com.liferay.portal.kernel.exception.SystemException)t;
+			}
+
+			if (t instanceof RuntimeException) {
+				throw (RuntimeException)t;
+			}
+			else {
+				throw new RuntimeException(t.getClass().getName() +
+					" is not a valid exception");
+			}
+		}
+
+		return (java.util.List<com.liferay.lms.model.Course>)ClpSerializer.translateOutput(returnObj);
+	}
+
+	public void addStudentToCourseWithDates(long courseId, long userId,
+		java.util.Date allowStartDate, java.util.Date allowFinishDate)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		try {
+			_invokableLocalService.invokeMethod(_methodName46,
+				_methodParameterTypes46,
+				new Object[] {
+					courseId,
+					
+				userId,
+					
+				ClpSerializer.translateInput(allowStartDate),
+					
+				ClpSerializer.translateInput(allowFinishDate)
+				});
+		}
+		catch (Throwable t) {
+			t = ClpSerializer.translateThrowable(t);
+
+			if (t instanceof com.liferay.portal.kernel.exception.PortalException) {
+				throw (com.liferay.portal.kernel.exception.PortalException)t;
+			}
+
+			if (t instanceof com.liferay.portal.kernel.exception.SystemException) {
+				throw (com.liferay.portal.kernel.exception.SystemException)t;
+			}
+
+			if (t instanceof RuntimeException) {
+				throw (RuntimeException)t;
+			}
+			else {
+				throw new RuntimeException(t.getClass().getName() +
+					" is not a valid exception");
+			}
+		}
+	}
+
+	public void editUserInscriptionDates(long courseId, long userId,
+		java.util.Date allowStartDate, java.util.Date allowFinishDate)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		try {
+			_invokableLocalService.invokeMethod(_methodName47,
+				_methodParameterTypes47,
+				new Object[] {
+					courseId,
+					
+				userId,
+					
+				ClpSerializer.translateInput(allowStartDate),
+					
+				ClpSerializer.translateInput(allowFinishDate)
+				});
+		}
+		catch (Throwable t) {
+			t = ClpSerializer.translateThrowable(t);
+
+			if (t instanceof com.liferay.portal.kernel.exception.PortalException) {
+				throw (com.liferay.portal.kernel.exception.PortalException)t;
+			}
+
+			if (t instanceof com.liferay.portal.kernel.exception.SystemException) {
+				throw (com.liferay.portal.kernel.exception.SystemException)t;
+			}
+
+			if (t instanceof RuntimeException) {
+				throw (RuntimeException)t;
+			}
+			else {
+				throw new RuntimeException(t.getClass().getName() +
+					" is not a valid exception");
+			}
+		}
+	}
+
 	private InvokableLocalService _invokableLocalService;
 	private String _methodName0;
 	private String[] _methodParameterTypes0;
@@ -1765,4 +1885,10 @@ public class CourseLocalServiceClp implements CourseLocalService {
 	private String[] _methodParameterTypes43;
 	private String _methodName44;
 	private String[] _methodParameterTypes44;
+	private String _methodName45;
+	private String[] _methodParameterTypes45;
+	private String _methodName46;
+	private String[] _methodParameterTypes46;
+	private String _methodName47;
+	private String[] _methodParameterTypes47;
 }

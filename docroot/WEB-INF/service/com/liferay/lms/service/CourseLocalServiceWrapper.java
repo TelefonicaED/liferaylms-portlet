@@ -463,6 +463,28 @@ public class CourseLocalServiceWrapper implements CourseLocalService,
 			courseGropupCreatedId);
 	}
 
+	public java.util.List<com.liferay.lms.model.Course> getCoursesParents(
+		long groupId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _courseLocalService.getCoursesParents(groupId);
+	}
+
+	public void addStudentToCourseWithDates(long courseId, long userId,
+		java.util.Date allowStartDate, java.util.Date allowFinishDate)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		_courseLocalService.addStudentToCourseWithDates(courseId, userId,
+			allowStartDate, allowFinishDate);
+	}
+
+	public void editUserInscriptionDates(long courseId, long userId,
+		java.util.Date allowStartDate, java.util.Date allowFinishDate)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		_courseLocalService.editUserInscriptionDates(courseId, userId,
+			allowStartDate, allowFinishDate);
+	}
+
 	/**
 	 * @deprecated Renamed to {@link #getWrappedService}
 	 */

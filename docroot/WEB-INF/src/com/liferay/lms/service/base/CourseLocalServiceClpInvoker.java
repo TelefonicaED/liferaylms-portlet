@@ -249,6 +249,22 @@ public class CourseLocalServiceClpInvoker {
 		_methodName219 = "getStudentsFromCourse";
 
 		_methodParameterTypes219 = new String[] { "long", "long" };
+
+		_methodName220 = "getCoursesParents";
+
+		_methodParameterTypes220 = new String[] { "long" };
+
+		_methodName221 = "addStudentToCourseWithDates";
+
+		_methodParameterTypes221 = new String[] {
+				"long", "long", "java.util.Date", "java.util.Date"
+			};
+
+		_methodName222 = "editUserInscriptionDates";
+
+		_methodParameterTypes222 = new String[] {
+				"long", "long", "java.util.Date", "java.util.Date"
+			};
 	}
 
 	public Object invokeMethod(String name, String[] parameterTypes,
@@ -536,6 +552,29 @@ public class CourseLocalServiceClpInvoker {
 				((Long)arguments[1]).longValue());
 		}
 
+		if (_methodName220.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes220, parameterTypes)) {
+			return CourseLocalServiceUtil.getCoursesParents(((Long)arguments[0]).longValue());
+		}
+
+		if (_methodName221.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes221, parameterTypes)) {
+			CourseLocalServiceUtil.addStudentToCourseWithDates(((Long)arguments[0]).longValue(),
+				((Long)arguments[1]).longValue(), (java.util.Date)arguments[2],
+				(java.util.Date)arguments[3]);
+
+			return null;
+		}
+
+		if (_methodName222.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes222, parameterTypes)) {
+			CourseLocalServiceUtil.editUserInscriptionDates(((Long)arguments[0]).longValue(),
+				((Long)arguments[1]).longValue(), (java.util.Date)arguments[2],
+				(java.util.Date)arguments[3]);
+
+			return null;
+		}
+
 		throw new UnsupportedOperationException();
 	}
 
@@ -631,4 +670,10 @@ public class CourseLocalServiceClpInvoker {
 	private String[] _methodParameterTypes218;
 	private String _methodName219;
 	private String[] _methodParameterTypes219;
+	private String _methodName220;
+	private String[] _methodParameterTypes220;
+	private String _methodName221;
+	private String[] _methodParameterTypes221;
+	private String _methodName222;
+	private String[] _methodParameterTypes222;
 }

@@ -250,6 +250,14 @@ public interface UserCompetenceLocalService extends BaseLocalService,
 	public com.liferay.lms.model.UserCompetence findByUserIdCompetenceId(
 		long userId, long competenceId);
 
+	public com.liferay.lms.model.UserCompetence findByUuid(
+		java.lang.String uuid);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.lang.String getCertificateURL(
+		com.liferay.portal.kernel.portlet.LiferayPortletResponse liferayPortletResponse,
+		java.lang.String uuid);
+
 	public java.util.List<com.liferay.lms.model.UserCompetence> findBuUserId(
 		long userId);
 

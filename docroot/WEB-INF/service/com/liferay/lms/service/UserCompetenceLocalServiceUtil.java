@@ -278,6 +278,17 @@ public class UserCompetenceLocalServiceUtil {
 		return getService().findByUserIdCompetenceId(userId, competenceId);
 	}
 
+	public static com.liferay.lms.model.UserCompetence findByUuid(
+		java.lang.String uuid) {
+		return getService().findByUuid(uuid);
+	}
+
+	public static java.lang.String getCertificateURL(
+		com.liferay.portal.kernel.portlet.LiferayPortletResponse liferayPortletResponse,
+		java.lang.String uuid) {
+		return getService().getCertificateURL(liferayPortletResponse, uuid);
+	}
+
 	public static java.util.List<com.liferay.lms.model.UserCompetence> findBuUserId(
 		long userId) {
 		return getService().findBuUserId(userId);

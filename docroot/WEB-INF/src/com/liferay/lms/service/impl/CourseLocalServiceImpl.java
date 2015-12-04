@@ -28,6 +28,7 @@ import com.liferay.lms.auditing.AuditingLogFactory;
 import com.liferay.lms.learningactivity.courseeval.CourseEval;
 import com.liferay.lms.learningactivity.courseeval.CourseEvalRegistry;
 import com.liferay.lms.model.Course;
+import com.liferay.lms.model.CourseResult;
 import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.model.LmsPrefs;
 import com.liferay.lms.model.Module;
@@ -43,6 +44,7 @@ import com.liferay.portal.kernel.dao.orm.ProjectionFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.jsonwebservice.JSONWebService;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.lar.PortletDataHandlerKeys;
 import com.liferay.portal.kernel.lar.UserIdStrategy;
@@ -69,6 +71,7 @@ import com.liferay.portal.model.LayoutSetPrototype;
 import com.liferay.portal.model.ModelHintsConstants;
 import com.liferay.portal.model.ModelHintsUtil;
 import com.liferay.portal.model.ResourceConstants;
+import com.liferay.portal.model.RoleConstants;
 import com.liferay.portal.model.User;
 import com.liferay.portal.model.UserGroupRole;
 import com.liferay.portal.security.auth.PrincipalThreadLocal;
@@ -77,6 +80,7 @@ import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.LayoutSetPrototypeLocalServiceUtil;
 import com.liferay.portal.service.RoleLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
+import com.liferay.portal.service.ServiceContextThreadLocal;
 import com.liferay.portal.service.UserGroupRoleLocalServiceUtil;
 import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portlet.asset.model.AssetEntry;
@@ -871,5 +875,57 @@ public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int e
 	public java.util.List<Course> getCoursesParents(long groupId) throws SystemException
 	{
 		return coursePersistence.filterFindByGroupIdParentCourseId(groupId, 0);
+	}
+	public void addStudentToCourseWithDates(long courseId,long userId,Date allowStartDate,Date allowFinishDate) throws PortalException, SystemException
+	{
+		Course course=courseLocalService.getCourse(courseId);
+		;
+			User user = userLocalService.fetchUser(userId);
+			if (!GroupLocalServiceUtil.hasUserGroup(user.getUserId(), course.getGroupCreatedId())) {
+				GroupLocalServiceUtil.addUserGroups(user.getUserId(), new long[] { course.getGroupCreatedId() });
+				//sendEmail(user,course);
+			}
+			
+			UserGroupRoleLocalServiceUtil.addUserGroupRoles(new long[] { user.getUserId() },
+					course.getGroupCreatedId(), RoleLocalServiceUtil.getRole(user.getCompanyId(), RoleConstants.SITE_MEMBER).getRoleId());
+			CourseResult courseResult=courseResultLocalService.getCourseResultByCourseAndUser(courseId, user.getUserId());
+			if(courseResult==null)
+			{
+				courseResultLocalService.create(courseId, user.getUserId(), allowStartDate, allowFinishDate);
+			}
+			else
+			{
+				courseResult.setAllowStartDate(allowStartDate);
+				courseResult.setAllowFinishDate(allowFinishDate);
+				courseResultLocalService.updateCourseResult(courseResult);
+			}
+			//auditing
+			AuditingLogFactory.audit(course.getCompanyId(), course.getGroupId(), Course.class.getName(), course.getCourseId(), userId, AuditConstants.REGISTER, null);		 
+		
+	}
+
+	public void editUserInscriptionDates(long courseId,long userId,Date allowStartDate,Date allowFinishDate) throws PortalException, SystemException
+	{
+		ServiceContext serviceContext = ServiceContextThreadLocal.getServiceContext();
+		Course course=courseLocalService.getCourse(courseId);
+		
+			User user = userLocalService.getUser(userId);
+			if (!GroupLocalServiceUtil.hasUserGroup(user.getUserId(), course.getGroupCreatedId())) {
+				return;
+			}		
+			CourseResult courseResult=courseResultLocalService.getCourseResultByCourseAndUser(courseId, user.getUserId());
+			if(courseResult==null)
+			{
+				courseResultLocalService.create(courseId, user.getUserId(), allowStartDate, allowFinishDate);
+			}
+			else
+			{
+				courseResult.setAllowStartDate(allowStartDate);
+				courseResult.setAllowFinishDate(allowFinishDate);
+				courseResultLocalService.updateCourseResult(courseResult);
+			}
+			//auditing
+			AuditingLogFactory.audit(course.getCompanyId(), course.getGroupId(), Course.class.getName(), course.getCourseId(), serviceContext.getUserId(), AuditConstants.UPDATE, null);		 
+		
 	}
 }

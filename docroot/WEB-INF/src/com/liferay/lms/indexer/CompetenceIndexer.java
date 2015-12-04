@@ -135,7 +135,7 @@ public class CompetenceIndexer extends BaseIndexer {
 
 	@Override
 	protected void doReindex(String className, long classPK) throws Exception {
-		Course entry = CourseLocalServiceUtil.getCourse(classPK);
+		Competence entry =  CompetenceLocalServiceUtil.getCompetence(classPK);
 		doReindex(entry);
 	}
 

@@ -32,6 +32,7 @@ Liferay.Service.registerClass(
 		updateUser: true,
 		existsCourseName: true,
 		getLogoUrl: true,
+		getCoursesParents: true,
 		getChildCourses: true
 	}
 );

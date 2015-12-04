@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.portlet.PortletException;
+import javax.portlet.PortletRequest;
 import javax.portlet.PortletRequestDispatcher;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
@@ -114,148 +115,164 @@ public class UserCompetencePortlet extends MVCPortlet {
 		renderRequest.setAttribute("delta", String.valueOf(delta));
 		include(viewJSP, renderRequest, renderResponse);
 	}
+    private void printCertificate(OutputStream out,String uuid,PortletRequest request) throws SystemException, PortalException, IOException
+    {
+    	UserCompetence userCompetence=UserCompetenceLocalServiceUtil.findByUuid(uuid);
+    	User user=UserLocalServiceUtil.getUser(userCompetence.getUserId());
+    	Competence competence = CompetenceLocalServiceUtil.getCompetence(userCompetence.getCompetenceId());
+		Course course=CourseLocalServiceUtil.getCourse(userCompetence.getCourseId());
+		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(WebKeys.THEME_DISPLAY);
+		
+		if(user!=null&&competence!=null&&course!=null){
+			if(log.isDebugEnabled())log.debug("Enter:"+user.getLocale());
+			
+			CourseResult courseResult = CourseResultLocalServiceUtil.getCourseResultByCourseAndUser(course.getCourseId(), user.getUserId());
 
+			ITextRenderer renderer = new ITextRenderer();
+			Map<String, Object> variables = new HashMap<String, Object>();
+			variables.put("user", user);
+			variables.put("competence", competence);
+			variables.put("course", course);
+			variables.put("uuid", userCompetence.getUuid());
+			variables.put("userCompetence", userCompetence);
+			
+			if(courseResult!=null)
+				variables.put("courseResult", courseResult);
+			
+			variables.put("courseName", course.getTitle(user.getLocale()));
+			variables.put("competenceName", competence.getTitle(user.getLocale()));
+			variables.put("userName", user.getFullName());
+			variables.put("themeDisplay", themeDisplay);
+			
+			LmsPrefs lmsprefs=LmsPrefsLocalServiceUtil.getLmsPrefs(themeDisplay.getCompanyId());
+			long teacherRoleId=lmsprefs.getTeacherRole();
+			List<UserGroupRole> teachersGroups=UserGroupRoleLocalServiceUtil.getUserGroupRolesByGroupAndRole(course.getGroupCreatedId(),teacherRoleId);
+			
+			StringBuffer teachersNames = new StringBuffer(StringPool.BLANK);
+			List<User> teachers = new ArrayList<User>();
+			if(teachersGroups!=null){
+				if(log.isDebugEnabled())log.debug(teachersGroups.size());
+				teachersNames.append("<ul>");
+				for(UserGroupRole userGroupRole : teachersGroups){
+					User teacher = UserLocalServiceUtil.getUser(userGroupRole.getUserId());
+					if(teacher!=null){
+						teachersNames.append("<li>");
+						teachersNames.append(teacher.getFullName());
+						teachers.add(teacher);
+						teachersNames.append("</li>");
+					}
+				}
+				teachersNames.append("</ul>");
+			}
+
+			StringBuffer modulesNames = new StringBuffer(StringPool.BLANK);
+			List<Module> modules= ModuleLocalServiceUtil.findAllInGroup(course.getGroupCreatedId());
+			Map<Long,ModuleResult> moduleResults=new java.util.HashMap<Long,ModuleResult>();
+			if(modules!=null){
+				modulesNames.append("<ul>");
+				if(log.isDebugEnabled())log.debug(modules.size());
+				for(Module module : modules){
+					modulesNames.append("<li>");
+					modulesNames.append(module.getTitle(user.getLocale()));
+					modulesNames.append("</li>");
+					ModuleResult mResult=ModuleResultLocalServiceUtil.getByModuleAndUser(module.getModuleId(), user.getUserId());
+					moduleResults.put(module.getModuleId(), mResult);
+					
+				} 
+				modulesNames.append("</ul>");
+			}
+			
+			variables.put("modules", modules); 
+			variables.put("moduleResults",moduleResults);
+			variables.put("modulesNames", modulesNames);
+			variables.put("teachers", teachers);
+			variables.put("teachersNames", teachersNames);
+			
+			String template = StringPool.BLANK;
+			
+			try {
+				template = VelocityUtil.evaluate(competence.getDiplomaTemplate(user.getLocale()).replaceAll("&nbsp;", StringPool.BLANK), variables);
+			} catch (Exception e) {
+				if(log.isDebugEnabled())e.printStackTrace();
+			}
+			
+			String imageurl =CompetenceLocalServiceUtil.getBGImageURL( competence, PortalUtil.getHttpServletRequest(request));
+									
+			StringBuffer html = new StringBuffer("<html xmlns=\"http://www.w3.org/1999/xhtml\"><head><style type=\"text/css\">@page { size: ");
+			html.append(competence.getPage()); 
+			html.append(" ; background: url('");
+			html.append(imageurl);
+			html.append("') repeat-y top center");
+			html.append("}</style></head><body>");
+			html.append(template); 
+			html.append("</body></html>");
+				
+			if(log.isDebugEnabled())log.debug(html);
+
+			renderer.setDocumentFromString(html.toString());
+
+			renderer.layout(); 
+			
+			try {
+				renderer.createPDF(out, false);
+			} catch (DocumentException e) {
+				if(log.isDebugEnabled())e.printStackTrace();
+			}
+			
+			
+			renderer.layout(); 
+			
+			renderer.finishPDF();
+			
+			
+		}else{
+			if(log.isDebugEnabled())log.debug("Nodata!");
+
+			ITextRenderer renderer = new ITextRenderer();
+
+			renderer.setDocumentFromString(StringPool.BLANK);
+
+			renderer.layout(); 
+			
+			renderer.finishPDF();
+			
+		}
+    	
+    }
 	public void serveResource(ResourceRequest request, ResourceResponse response) throws PortletException,IOException{
 		
 		Long competenceId = ParamUtil.getLong(request, "competenceId", 0);
+		String uuid=ParamUtil.getString(request, "uuid", "");
+		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(WebKeys.THEME_DISPLAY);
+		UserCompetence userCompetence=null;
+		if("".equals(uuid))
+		{
+			userCompetence= UserCompetenceLocalServiceUtil.findByUserIdCompetenceId(themeDisplay.getUserId(), competenceId);
+		}
+		else
+		{
+			userCompetence= UserCompetenceLocalServiceUtil.findByUuid(uuid);
+		}
 		
 		response.setContentType("application/pdf");
-
-		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(WebKeys.THEME_DISPLAY);
-		if(themeDisplay.isSignedIn()&&competenceId>0){
-			try {
-				UserCompetence userCompetence = UserCompetenceLocalServiceUtil.findByUserIdCompetenceId(themeDisplay.getUserId(), competenceId);
-				
-				if(userCompetence!=null&&userCompetence.getUserId()==themeDisplay.getUserId()){
-					Competence competence = CompetenceLocalServiceUtil.getCompetence(userCompetence.getCompetenceId());
-					User user = themeDisplay.getUser();
-					Course course=CourseLocalServiceUtil.getCourse(userCompetence.getCourseId());
+		if(themeDisplay.isSignedIn())
+		 {
+			if(userCompetence!=null)
+			{
+			 
+				try {
 					
-					if(user!=null&&competence!=null&&course!=null){
-						if(log.isDebugEnabled())log.debug("Enter:"+user.getLocale());
-						
-						CourseResult courseResult = CourseResultLocalServiceUtil.getCourseResultByCourseAndUser(course.getCourseId(), user.getUserId());
-
-						ITextRenderer renderer = new ITextRenderer();
-						Map<String, Object> variables = new HashMap<String, Object>();
-						variables.put("user", user);
-						variables.put("competence", competence);
-						variables.put("course", course);
-						variables.put("uuid", userCompetence.getUuid());
-						variables.put("userCompetence", userCompetence);
-						
-						if(courseResult!=null)
-							variables.put("courseResult", courseResult);
-						
-						variables.put("courseName", course.getTitle(user.getLocale()));
-						variables.put("competenceName", competence.getTitle(user.getLocale()));
-						variables.put("userName", user.getFullName());
-						variables.put("themeDisplay", themeDisplay);
-						
-						LmsPrefs lmsprefs=LmsPrefsLocalServiceUtil.getLmsPrefs(themeDisplay.getCompanyId());
-						long teacherRoleId=lmsprefs.getTeacherRole();
-						List<UserGroupRole> teachersGroups=UserGroupRoleLocalServiceUtil.getUserGroupRolesByGroupAndRole(course.getGroupCreatedId(),teacherRoleId);
-						
-						StringBuffer teachersNames = new StringBuffer(StringPool.BLANK);
-						List<User> teachers = new ArrayList<User>();
-						if(teachersGroups!=null){
-							if(log.isDebugEnabled())log.debug(teachersGroups.size());
-							teachersNames.append("<ul>");
-							for(UserGroupRole userGroupRole : teachersGroups){
-								User teacher = UserLocalServiceUtil.getUser(userGroupRole.getUserId());
-								if(teacher!=null){
-									teachersNames.append("<li>");
-									teachersNames.append(teacher.getFullName());
-									teachers.add(teacher);
-									teachersNames.append("</li>");
-								}
-							}
-							teachersNames.append("</ul>");
-						}
-
-						StringBuffer modulesNames = new StringBuffer(StringPool.BLANK);
-						List<Module> modules= ModuleLocalServiceUtil.findAllInGroup(course.getGroupCreatedId());
-						Map<Long,ModuleResult> moduleResults=new java.util.HashMap<Long,ModuleResult>();
-						if(modules!=null){
-							modulesNames.append("<ul>");
-							if(log.isDebugEnabled())log.debug(modules.size());
-							for(Module module : modules){
-								modulesNames.append("<li>");
-								modulesNames.append(module.getTitle(user.getLocale()));
-								modulesNames.append("</li>");
-								ModuleResult mResult=ModuleResultLocalServiceUtil.getByModuleAndUser(module.getModuleId(), user.getUserId());
-								moduleResults.put(module.getModuleId(), mResult);
-								
-							} 
-							modulesNames.append("</ul>");
-						}
-						
-						variables.put("modules", modules); 
-						variables.put("moduleResults",moduleResults);
-						variables.put("modulesNames", modulesNames);
-						variables.put("teachers", teachers);
-						variables.put("teachersNames", teachersNames);
-						
-						String template = StringPool.BLANK;
-						
-						try {
-							template = VelocityUtil.evaluate(competence.getDiplomaTemplate(user.getLocale()).replaceAll("&nbsp;", StringPool.BLANK), variables);
-						} catch (Exception e) {
-							if(log.isDebugEnabled())e.printStackTrace();
-						}
-						
-						String imageurl =CompetenceLocalServiceUtil.getBGImageURL( competence, PortalUtil.getHttpServletRequest(request));
-												
-						StringBuffer html = new StringBuffer("<html xmlns=\"http://www.w3.org/1999/xhtml\"><head><style type=\"text/css\">@page { size: ");
-						html.append(competence.getPage()); 
-						html.append(" ; background: url('");
-						html.append(imageurl);
-						html.append("') repeat-y top center");
-						html.append("}</style></head><body>");
-						html.append(template); 
-						html.append("</body></html>");
-						
+					
 						OutputStream out = response.getPortletOutputStream();
-						
-						if(log.isDebugEnabled())log.debug(html);
-
-						renderer.setDocumentFromString(html.toString());
-
-						renderer.layout(); 
-						
-						try {
-							renderer.createPDF(out, false);
-						} catch (DocumentException e) {
-							if(log.isDebugEnabled())e.printStackTrace();
-						}
-						
-						
-						renderer.layout(); 
-						
-						renderer.finishPDF();
-						
+						printCertificate(out, userCompetence.getUuid(), request);
 						out.close();
-						
-					}else{
-						if(log.isDebugEnabled())log.debug("Nodata!");
-
-						ITextRenderer renderer = new ITextRenderer();
-						OutputStream out = response.getPortletOutputStream();
-
-						renderer.setDocumentFromString(StringPool.BLANK);
-
-						renderer.layout(); 
-						
-						renderer.finishPDF();
-						
-						out.close();
-					}
+					
+					
+				} catch (PortalException e) {
+					if(log.isDebugEnabled())e.printStackTrace();
+				} catch (SystemException e) {
+					if(log.isDebugEnabled())e.printStackTrace();
 				}
-				
-			} catch (PortalException e) {
-				if(log.isDebugEnabled())e.printStackTrace();
-			} catch (SystemException e) {
-				if(log.isDebugEnabled())e.printStackTrace();
 			}
 		}
 	}

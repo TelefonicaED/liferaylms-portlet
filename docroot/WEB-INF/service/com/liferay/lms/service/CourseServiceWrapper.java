@@ -206,6 +206,13 @@ public class CourseServiceWrapper implements CourseService,
 		return _courseService.getLogoUrl(courseId);
 	}
 
+	public java.util.List<com.liferay.lms.model.Course> getCoursesParents(
+		long groupId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _courseService.getCoursesParents(groupId);
+	}
+
 	public java.util.List<com.liferay.lms.model.Course> getChildCourses(
 		long courseId)
 		throws com.liferay.portal.kernel.exception.PortalException,

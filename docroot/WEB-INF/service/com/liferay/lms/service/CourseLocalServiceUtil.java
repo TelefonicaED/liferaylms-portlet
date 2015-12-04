@@ -474,6 +474,30 @@ public class CourseLocalServiceUtil {
 				   .getStudentsFromCourse(companyId, courseGropupCreatedId);
 	}
 
+	public static java.util.List<com.liferay.lms.model.Course> getCoursesParents(
+		long groupId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().getCoursesParents(groupId);
+	}
+
+	public static void addStudentToCourseWithDates(long courseId, long userId,
+		java.util.Date allowStartDate, java.util.Date allowFinishDate)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		getService()
+			.addStudentToCourseWithDates(courseId, userId, allowStartDate,
+			allowFinishDate);
+	}
+
+	public static void editUserInscriptionDates(long courseId, long userId,
+		java.util.Date allowStartDate, java.util.Date allowFinishDate)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		getService()
+			.editUserInscriptionDates(courseId, userId, allowStartDate,
+			allowFinishDate);
+	}
+
 	public static void clearService() {
 		_service = null;
 	}

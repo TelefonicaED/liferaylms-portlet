@@ -16,10 +16,14 @@ package com.liferay.lms.service.impl;
 
 import java.util.List;
 
+import javax.portlet.PortletURL;
+
 import com.liferay.lms.NoSuchUserCompetenceException;
 import com.liferay.lms.model.UserCompetence;
 import com.liferay.lms.service.base.UserCompetenceLocalServiceBaseImpl;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
+import com.liferay.portlet.PortletURLFactoryUtil;
 
 /**
  * The implementation of the user competence local service.
@@ -46,7 +50,31 @@ public class UserCompetenceLocalServiceImpl	extends UserCompetenceLocalServiceBa
 			return null;
 		}
 	}
-	
+	public UserCompetence findByUuid(String uuid) 
+	{
+		try {
+			return userCompetencePersistence.fetchByUuid_First(uuid, null);
+		} catch (SystemException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}
+		
+	}
+	public String getCertificateURL(LiferayPortletResponse liferayPortletResponse,String uuid)
+	{
+		UserCompetence uc=findByUuid(uuid);
+		if(uc!=null)
+		{
+			PortletURL resourcePortletURL=liferayPortletResponse.createResourceURL("usercompetence_WAR_liferaylmsportlet");
+			resourcePortletURL.setParameter("uuid",uuid);
+			return resourcePortletURL.toString();
+		}
+		else
+		{
+			return "";
+		}
+	}
 	public List<UserCompetence> findBuUserId(long userId){
 		try {
 			return userCompetencePersistence.findByUserId(userId);

@@ -141,9 +141,13 @@ public class CourseServiceClpInvoker {
 
 		_methodParameterTypes194 = new String[] { "java.lang.Long" };
 
-		_methodName195 = "getChildCourses";
+		_methodName195 = "getCoursesParents";
 
 		_methodParameterTypes195 = new String[] { "long" };
+
+		_methodName196 = "getChildCourses";
+
+		_methodParameterTypes196 = new String[] { "long" };
 	}
 
 	public Object invokeMethod(String name, String[] parameterTypes,
@@ -330,6 +334,11 @@ public class CourseServiceClpInvoker {
 
 		if (_methodName195.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes195, parameterTypes)) {
+			return CourseServiceUtil.getCoursesParents(((Long)arguments[0]).longValue());
+		}
+
+		if (_methodName196.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes196, parameterTypes)) {
 			return CourseServiceUtil.getChildCourses(((Long)arguments[0]).longValue());
 		}
 
@@ -386,4 +395,6 @@ public class CourseServiceClpInvoker {
 	private String[] _methodParameterTypes194;
 	private String _methodName195;
 	private String[] _methodParameterTypes195;
+	private String _methodName196;
+	private String[] _methodParameterTypes196;
 }

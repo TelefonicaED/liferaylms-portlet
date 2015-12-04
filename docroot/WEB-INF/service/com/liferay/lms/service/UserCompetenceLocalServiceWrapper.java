@@ -276,6 +276,18 @@ public class UserCompetenceLocalServiceWrapper
 			competenceId);
 	}
 
+	public com.liferay.lms.model.UserCompetence findByUuid(
+		java.lang.String uuid) {
+		return _userCompetenceLocalService.findByUuid(uuid);
+	}
+
+	public java.lang.String getCertificateURL(
+		com.liferay.portal.kernel.portlet.LiferayPortletResponse liferayPortletResponse,
+		java.lang.String uuid) {
+		return _userCompetenceLocalService.getCertificateURL(liferayPortletResponse,
+			uuid);
+	}
+
 	public java.util.List<com.liferay.lms.model.UserCompetence> findBuUserId(
 		long userId) {
 		return _userCompetenceLocalService.findBuUserId(userId);
