@@ -40,6 +40,8 @@ public abstract class BaseQuestionType implements QuestionType, Serializable {
 	private static final long serialVersionUID = 1L;
 	protected static Locale locale=null;
 	protected String XMLType = "";
+	public static final long CORRECT = 100;
+	public static final long INCORRECT = 0;
 
 	public void setXMLType(String xMLType) {
 		XMLType = xMLType;
@@ -94,8 +96,8 @@ public abstract class BaseQuestionType implements QuestionType, Serializable {
 	}
 	
 	@Override
-	public boolean correct(ActionRequest actionRequest, long questionId){
-		return false;
+	public long correct(ActionRequest actionRequest, long questionId){
+		return -1;
 	}
 	
 	@Override
@@ -207,6 +209,10 @@ public abstract class BaseQuestionType implements QuestionType, Serializable {
 		return -1;
 	}
 	public boolean isInline(){
+		return false;
+	}
+
+	public boolean isPartialCorrectAvailable() {
 		return false;
 	}
 	

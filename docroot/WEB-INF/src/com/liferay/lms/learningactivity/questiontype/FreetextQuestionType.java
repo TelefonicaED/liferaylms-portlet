@@ -56,7 +56,7 @@ public class FreetextQuestionType extends BaseQuestionType {
 		return "/html/execactivity/test/admin/popups/freetext.jsp";
 	}
 
-	public boolean correct(ActionRequest actionRequest, long questionId){
+	public long correct(ActionRequest actionRequest, long questionId){
 		String answer= ParamUtil.getString(actionRequest, "question_"+questionId, "");
 		List<TestAnswer> testAnswers = new ArrayList<TestAnswer>();
 		try {
@@ -67,16 +67,23 @@ public class FreetextQuestionType extends BaseQuestionType {
 
 		if(testAnswers!=null && testAnswers.size()>0){
 			TestAnswer solution = testAnswers.get(0);
-			return isCorrect(solution, answer);
+			if (isCorrect(solution, answer)){
+				return CORRECT;
+			}else{
+				return INCORRECT;
+			}
 		}
-		return false;
+		return INCORRECT;
 	}
 
 	protected boolean isCorrect(TestAnswer solution, String answer){
 		Collator c = Collator.getInstance();
 		c.setStrength(Collator.PRIMARY);
-		if(c.compare(solution.getAnswer(), answer) == 0) return true;
-		return false;
+		if(c.compare(solution.getAnswer(), answer) == 0){
+			return true;
+		}else{
+			return false;
+		}
 	}
 
 	public String getHtmlView(long questionId, ThemeDisplay themeDisplay, Document document){

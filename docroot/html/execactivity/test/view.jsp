@@ -355,7 +355,7 @@
 								        bodyContent: content,
 								        buttons: [
 								                  {
-								                	  label: '<liferay-ui:message key="ok"/>',
+								                	  label: '<liferay-ui:message key="lms.dialog.ok"/>',
 								                	  handler: function() {
 								                		  A.one('#<portlet:namespace/>formulario').detach('submit');
 								                		  document.getElementById('<portlet:namespace/>formulario').submit();
@@ -363,7 +363,7 @@
 								                	  }
 								                  },
 								                  {
-								                	  label: '<liferay-ui:message key="cancel"/>',
+								                	  label: '<liferay-ui:message key="lms.dialog.cancel"/>',
 								                	  handler: function() {
 								                		  <portlet:namespace />confirmDialog.close();
 								                	  }
@@ -413,7 +413,17 @@
 						    	} else if (e.srcElement) {
 						    		targ = e.srcElement.blur();
 						    	}
-						    	<%= renderResponse.getNamespace() %>popConfirm('<%=JavaScriptUtil.markupToStringLiteral(LanguageUtil.get(pageContext, "execativity.test.questions.without.response")) %>', e.srcElement);
+					    	<%
+						    	if(GetterUtil.getLong(LearningActivityLocalServiceUtil.getExtraContentValue(activity.getActId(), "questionsPerPage"))!=0){
+					    	%>
+						    		<%= renderResponse.getNamespace() %>popConfirm('<%=JavaScriptUtil.markupToStringLiteral(LanguageUtil.get(pageContext, "execativity.test.questions.without.responsepagination")) %>', e.srcElement);
+					    	<%
+						    	}else{
+				    		%>
+							    	<%= renderResponse.getNamespace() %>popConfirm('<%=JavaScriptUtil.markupToStringLiteral(LanguageUtil.get(pageContext, "execativity.test.questions.without.response")) %>', e.srcElement);
+					    	<%	
+						    	}
+					    	%>
 				    		}
 					    }
 						

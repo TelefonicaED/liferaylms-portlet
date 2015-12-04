@@ -66,4 +66,7 @@ public class MultioptionsQuestionType extends OptionsQuestionType {
 		return GetterUtil.getInteger(PropsUtil.get("lms.defaultAnswersNo.multioptions"), 2);
 	}
 	
+	public boolean isPartialCorrectAvailable() {
+		return true;
+	}
 }

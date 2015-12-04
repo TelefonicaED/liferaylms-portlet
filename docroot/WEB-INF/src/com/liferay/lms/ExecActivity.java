@@ -109,18 +109,17 @@ public class ExecActivity extends MVCPortlet
 
 			long[] questionIds = ParamUtil.getLongValues(actionRequest, "question");
 
-
 			for (long questionId : questionIds) {
 				TestQuestion question = TestQuestionLocalServiceUtil.fetchTestQuestion(questionId);
 				QuestionType qt = new QuestionTypeRegistry().getQuestionType(question.getQuestionType());
-				if(!isPartial && qt.correct(actionRequest, questionId)) {
-					correctanswers++;
+				if(!isPartial) {
+					correctanswers += qt.correct(actionRequest, questionId) ;
 				}
 				resultadosXML.add(qt.getResults(actionRequest, questionId));								
 			}
 
 			long random = GetterUtil.getLong(LearningActivityLocalServiceUtil.getExtraContentValue(actId,"random"));
-			long score=isPartial ? 0 : correctanswers*100/((random!=0 && random<questionIds.length)?random:questionIds.length);
+			long score=isPartial ? 0 : correctanswers/((random!=0 && random<questionIds.length)?random:questionIds.length);
 
 			LearningActivityResult learningActivityResult = LearningActivityResultLocalServiceUtil.getByActIdAndUserId(actId, PortalUtil.getUserId(actionRequest));
 			long oldResult=-1;
@@ -292,7 +291,8 @@ public class ExecActivity extends MVCPortlet
 		long questionType = ParamUtil.getLong(actionRequest, "typeId", -1);
 		String questionText = ParamUtil.get(actionRequest, "text", "");
 		String backUrl = ParamUtil.get(actionRequest, "backUrl", "");
-		String formatType = ParamUtil.getString(actionRequest, "formattype", PropsUtil.get("lms.question.formattype.normal")); 
+		String formatType = ParamUtil.getString(actionRequest, "formattype", PropsUtil.get("lms.question.formattype.normal"));
+		String partialCorrection = ParamUtil.getString(actionRequest, "partialcorrection", "false");
 		Document document = null;
 		Element rootElement = null;
 		
@@ -307,19 +307,26 @@ public class ExecActivity extends MVCPortlet
 				Element elem = SAXReaderUtil.createElement("formattype");
 				elem.setText(formatType);		
 				rootElement.add(elem);
+				elem = SAXReaderUtil.createElement("partialcorrection");
+				elem.setText(partialCorrection);
 				question = TestQuestionLocalServiceUtil.addQuestion(actid, questionText, questionType, document.formattedString());
 			}else{//Pregunta existente
 				question = TestQuestionLocalServiceUtil.getTestQuestion(questionId);
 				String typeOrderBefore = "false";
+				String partialCorrectionBefore = "false";
 				try{
 					Document xml = SAXReaderUtil.read(question.getExtracontent());
 					Element ele = xml.getRootElement();
 					typeOrderBefore = (String) ele.element("formattype").getData();
+					partialCorrectionBefore = (String) ele.element("partialcorrection").getData();
 				}catch (DocumentException e){
 					document = SAXReaderUtil.createDocument();
 					rootElement = document.addElement("question");
 					Element ele = SAXReaderUtil.createElement("formattype");
 					ele.setText(formatType);		
+					rootElement.add(ele);
+					ele = SAXReaderUtil.createElement("correctiontype");
+					ele.setText(partialCorrection);		
 					rootElement.add(ele);
 				}catch (NullPointerException e){
 					document = SAXReaderUtil.createDocument();
@@ -327,9 +334,13 @@ public class ExecActivity extends MVCPortlet
 					Element ele = SAXReaderUtil.createElement("formattype");
 					ele.setText(formatType);		
 					rootElement.add(ele);
+					ele = SAXReaderUtil.createElement("partialcorrection");
+					ele.setText(partialCorrection);		
+					rootElement.add(ele);
 				}
 				Element elemQuestion = null;
-				if(!questionText.equals(question.getText())||!formatType.equals(typeOrderBefore)){//Edicion de pregunta o alineacion
+				//Edicion de pregunta o alineacion o correción
+				if(!questionText.equals(question.getText())||!formatType.equals(typeOrderBefore)||!partialCorrection.equals(partialCorrectionBefore)){
 					question.setText(questionText);
 					if((question.getExtracontent()==null)||(question.getExtracontent().trim().length()==0)){
 						document = SAXReaderUtil.createDocument();
@@ -343,9 +354,18 @@ public class ExecActivity extends MVCPortlet
 							elemQuestion.detach();
 							rootElement.remove(elemQuestion);
 						}
+						elemQuestion = rootElement.element("partialcorrection");
+						if(elemQuestion!=null)
+						{
+							elemQuestion.detach();
+							rootElement.remove(elemQuestion);
+						}
 					}
 					elemQuestion = SAXReaderUtil.createElement("formattype");
 					elemQuestion.setText(formatType);		
+					rootElement.add(elemQuestion);
+					elemQuestion = SAXReaderUtil.createElement("partialcorrection");
+					elemQuestion.setText(partialCorrection);		
 					rootElement.add(elemQuestion);
 					question.setExtracontent(document.formattedString());
 					TestQuestionLocalServiceUtil.updateTestQuestion(question);

@@ -54,7 +54,7 @@ public class DraganddropQuestionType extends BaseQuestionType {
 		return "/html/execactivity/test/admin/popups/options.jsp";
 	}
 
-	public boolean correct(ActionRequest actionRequest, long questionId){
+	public long correct(ActionRequest actionRequest, long questionId){
 		List<TestAnswer> testAnswers = new ArrayList<TestAnswer>();
 		try {
 			testAnswers.addAll(TestAnswerLocalServiceUtil.getTestAnswersByQuestionId(questionId));
@@ -73,8 +73,11 @@ public class DraganddropQuestionType extends BaseQuestionType {
 			answersId.add(ParamUtil.getLong(actionRequest, "question_"+questionId+"_"+i+"hidden"));
 		}
 
-		if(!isCorrect(answersId, testAnswers)) return false;
-		return true;
+		if(!isCorrect(answersId, testAnswers)){
+			return INCORRECT;
+		}else{
+			return CORRECT;
+		}
 	}
 
 	protected boolean isCorrect(List<Long> answersId, List<TestAnswer> testAnswers){
@@ -328,4 +331,5 @@ public class DraganddropQuestionType extends BaseQuestionType {
 	public int getDefaultAnswersNo(){
 		return GetterUtil.getInteger(PropsUtil.get("lms.defaultAnswersNo.dragAndDrop"), 2);
 	}
+
 }

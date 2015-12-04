@@ -142,4 +142,9 @@ public class AuditEntryLocalServiceImpl extends AuditEntryLocalServiceBaseImpl {
 		}
 		return auditEntryLocalService.dynamicQueryCount(dq);
 	}
+	
+	public List<AuditEntry> findByclassName_classPK(String className, long classPK) throws SystemException
+	{
+		return auditEntryPersistence.findByCN_CP(className, classPK);
+	}
 }

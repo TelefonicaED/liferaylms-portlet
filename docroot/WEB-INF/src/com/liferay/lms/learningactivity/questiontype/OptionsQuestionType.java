@@ -14,7 +14,6 @@ import com.liferay.lms.service.LearningActivityTryLocalServiceUtil;
 import com.liferay.lms.service.TestAnswerLocalService;
 import com.liferay.lms.service.TestAnswerLocalServiceUtil;
 import com.liferay.lms.service.TestQuestionLocalServiceUtil;
-import com.liferay.util.portlet.PortletProps;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.language.LanguageUtil;
@@ -66,7 +65,7 @@ public class OptionsQuestionType extends BaseQuestionType {
 		return "/html/execactivity/test/admin/popups/options.jsp";
 	}
 
-	public boolean correct(ActionRequest actionRequest, long questionId){
+	public long correct(ActionRequest actionRequest, long questionId){
 		long[] answersId= ParamUtil.getLongValues(actionRequest, "question_"+questionId);
 		List<Long> arrayAnswersId = new ArrayList<Long>();
 		for(long answerId:answersId) arrayAnswersId.add(answerId);
@@ -83,9 +82,29 @@ public class OptionsQuestionType extends BaseQuestionType {
 				if(arrayAnswersId.contains(answer.getAnswerId())) correctAnswered++;
 			}else if(arrayAnswersId.contains(answer.getAnswerId())) incorrectAnswered++;
 		}
-
-		if(isQuestionCorrect(correctAnswers, correctAnswered, incorrectAnswered))return true;
-		else return false;
+		boolean partialCorrection = false;
+		try{
+			Document document = SAXReaderUtil.read(TestQuestionLocalServiceUtil.fetchTestQuestion(questionId).getExtracontent());
+			Element rootElement = document.getRootElement();
+			partialCorrection = StringPool.TRUE.equals(rootElement.element("partialcorrection").getData());
+		}catch(NullPointerException e){
+			partialCorrection = false;
+		}catch(DocumentException e){
+			partialCorrection = false;
+		} catch (SystemException e) {
+			partialCorrection = false;
+		}
+		if(partialCorrection){
+			return correctAnswered*100/correctAnswers;
+		}else{
+			if(isQuestionCorrect(correctAnswers, correctAnswered, incorrectAnswered)){
+				return CORRECT;
+			}
+			else{
+				return INCORRECT;
+			}
+		}
+		
 	}
 	
 	protected boolean isQuestionCorrect(int correctAnswers, int correctAnswered, int incorrectAnswered){
@@ -321,5 +340,5 @@ public class OptionsQuestionType extends BaseQuestionType {
 	public int getDefaultAnswersNo(){
 		return GetterUtil.getInteger(PropsUtil.get("lms.defaultAnswersNo.options"), 2);
 	}
-	
+
 }
