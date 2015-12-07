@@ -47,7 +47,6 @@
 <%@page import="com.liferay.lms.model.LearningActivity"%>
 <%@ include file="/init.jsp" %>
 <liferay-ui:success key="activity-saved-successfully" message="activity-saved-successfully" />
-<liferay-ui:error/>
 <liferay-ui:error key="learningactivity.connect.error.timepassg" message="learningactivity.connect.error.timepassg"></liferay-ui:error>
 <liferay-ui:error key="learningactivity.connect.error.timepass.nan" message="learningactivity.connect.error.timepass.nan"></liferay-ui:error>
 <liferay-ui:error key="execactivity.editActivity.questionsPerPage.number" message="execActivity.options.error.questionsPerPage"></liferay-ui:error>
