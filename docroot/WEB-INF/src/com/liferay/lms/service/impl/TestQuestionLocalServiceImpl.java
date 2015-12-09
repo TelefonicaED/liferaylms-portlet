@@ -74,7 +74,7 @@ public class TestQuestionLocalServiceImpl
 			qt.importXML(actId, question, testAnswerLocalService);
 		}
 	}
-	private long getQuestionType(Element question) {
+	public long getQuestionType(Element question) {
 		long type = -1;
 		boolean isSurveyHorizontal = "surveyoptionshorizontal".equals(question.element("name").element("text").getText());
 
