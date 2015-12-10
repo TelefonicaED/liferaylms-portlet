@@ -898,7 +898,9 @@ public class SurveyActivity extends MVCPortlet {
 					List<TestAnswer> answers = TestAnswerLocalServiceUtil.getTestAnswersByQuestionId(question.getQuestionId());
 //					String[] answerTitles = new String[answers.size()];
 					
-					resultados[0] = question.getText();
+					resultados[0] = question.getText()
+										.replaceAll("&lt;", StringPool.LESS_THAN)
+										.replaceAll("&nbsp;", StringPool.SPACE);
 					resultados[1] = String.valueOf(question.getQuestionType());
 					
 					StringBuilder strbld = new StringBuilder();
@@ -913,7 +915,9 @@ public class SurveyActivity extends MVCPortlet {
 						strbld.append(answers.get(answers.size()-1).getAnswer());
 					
 					//resultados[1] = StringUtil.merge(answerTitles);
-					resultados[2] = strbld.toString();
+					resultados[2] = strbld.toString()
+										.replaceAll("&lt;", StringPool.LESS_THAN)
+										.replaceAll("&nbsp;", StringPool.SPACE);
 					
 					//Escribimos las respuestas obtenidas para el intento en el csv.
 					writer.writeNext(resultados);
