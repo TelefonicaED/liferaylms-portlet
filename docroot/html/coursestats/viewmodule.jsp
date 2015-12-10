@@ -97,17 +97,17 @@ portletURL.setParameter("moduleId", String.valueOf(moduleId));
 	<%
 	
 	DecimalFormat df = new DecimalFormat("#.#");
-	long astarted=LearningActivityResultLocalServiceUtil.countStarted(activity.getActId());
+	long astarted=LearningActivityResultLocalServiceUtil.countStartedOnlyStudents(activity.getActId(), activity.getCompanyId(), activity.getGroupId());
 	
 	
-	long afinished=LearningActivityResultLocalServiceUtil.countPassed(activity.getActId());
-	long notpassed=LearningActivityResultLocalServiceUtil.countNotPassed(activity.getActId());
+	long afinished=LearningActivityResultLocalServiceUtil.countPassedOnlyStudents(activity.getActId(), activity.getCompanyId(), activity.getGroupId(),true);
+	long notpassed=LearningActivityResultLocalServiceUtil.countNotPassedOnlyStudents(activity.getActId(), activity.getCompanyId(), activity.getGroupId());
 	double avgResult=0;
 	if(afinished+notpassed>0)
 	{
-		avgResult=LearningActivityResultLocalServiceUtil.avgResult(activity.getActId());
+		avgResult=LearningActivityResultLocalServiceUtil.avgResultOnlyStudents(activity.getActId(), activity.getCompanyId(), activity.getGroupId());
 	}
-	double triesPerUser=LearningActivityResultLocalServiceUtil.triesPerUser(activity.getActId());
+	double triesPerUser=LearningActivityResultLocalServiceUtil.triesPerUserOnlyStudents(activity.getActId(), activity.getCompanyId(), activity.getGroupId());
 	
 	String title=activity.getTitle(themeDisplay.getLocale());
 	int maxNameLength=GetterUtil.getInteger(LanguageUtil.get(pageContext, "coursestats.modulestats.large.name.length"),20);

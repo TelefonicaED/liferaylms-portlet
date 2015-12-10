@@ -94,7 +94,7 @@ public class CourseStats extends MVCPortlet {
 		    writer.writeNext(new String[]{LanguageUtil.format(themeDisplay.getLocale(), "coursestats.modulestats.inscritos", args)});
 		    
 		    //Iniciaron/finalizaron
-		    writer.writeNext(new String[]{LanguageUtil.get(themeDisplay.getLocale(), "coursestats.start.course") + iniciados + LanguageUtil.get(themeDisplay.getLocale(),"coursestats.end.course") + finalizados});
+		    writer.writeNext(new String[]{LanguageUtil.get(themeDisplay.getLocale(), "coursestats.start.course") +" "+ iniciados + LanguageUtil.get(themeDisplay.getLocale(),"coursestats.end.course") +" "+ finalizados});
 		    
 		    int numCols = 6;
 		    String[] cabeceras = new String[numCols];
@@ -201,13 +201,13 @@ public class CourseStats extends MVCPortlet {
 		   
 		    for(LearningActivity activity:tempResults){
 		    	String[] resultados = new String[numCols];
-		    	long started=LearningActivityResultLocalServiceUtil.countStarted(activity.getActId());
-		    	long finished=LearningActivityResultLocalServiceUtil.countPassed(activity.getActId());
-		    	long notpassed=LearningActivityResultLocalServiceUtil.countNotPassed(activity.getActId());
+		    	long started=LearningActivityResultLocalServiceUtil.countStartedOnlyStudents(activity.getActId(), activity.getCompanyId(), activity.getGroupId());
+		    	long finished=LearningActivityResultLocalServiceUtil.countPassedOnlyStudents(activity.getActId(), activity.getCompanyId(), activity.getGroupId(),true);
+		    	long notpassed=LearningActivityResultLocalServiceUtil.countNotPassedOnlyStudents(activity.getActId(), activity.getCompanyId(), activity.getGroupId());
 		    	double avgResult=0;
 		    	if(finished+notpassed>0)
-		    		avgResult=LearningActivityResultLocalServiceUtil.avgResult(activity.getActId());
-		    	double triesPerUser=LearningActivityResultLocalServiceUtil.triesPerUser(activity.getActId());
+		    		avgResult=LearningActivityResultLocalServiceUtil.avgResultOnlyStudents(activity.getActId(), activity.getCompanyId(), activity.getGroupId());
+		    	double triesPerUser=LearningActivityResultLocalServiceUtil.triesPerUserOnlyStudents(activity.getActId(), activity.getCompanyId(), activity.getGroupId());
 		    	boolean hasPrecedence = false;
 		    	if(activity.getPrecedence() > 0)
 		    		hasPrecedence = true;
