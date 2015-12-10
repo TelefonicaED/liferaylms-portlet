@@ -125,6 +125,46 @@ public class LearningActivityResultPersistenceCassandra extends LearningActivity
 
 			learningActivityResult.resetOriginalValues();
 		}
+		
+		/**
+		 * Returns the learning activity result with the primary key or returns <code>null</code> if it could not be found.
+		 *
+		 * @param primaryKey the primary key of the learning activity result
+		 * @return the learning activity result, or <code>null</code> if a learning activity result with the primary key could not be found
+		 * @throws SystemException if a system exception occurred
+		 */
+		@Override
+		public LearningActivityResult fetchByPrimaryKey(Serializable primaryKey)
+			throws SystemException {
+			return fetchByPrimaryKey(((Long)primaryKey).longValue());
+		}	
+		
+		
+		
+
+		
+		
+		public LearningActivityResult update(LearningActivityResult learningActivityResult, Boolean merge) throws SystemException{
+			
+			
+		    BoundStatement boundStatement = new BoundStatement(ExtConexionCassandra.updateLearningActivityResult_Statement);
+				ResultSet results=session.execute(boundStatement.bind(
+						learningActivityResult.getUuid(),
+						learningActivityResult.getLarId(),
+						learningActivityResult.getActId(),
+						learningActivityResult.getUserId(),
+						learningActivityResult.getResult(),
+						learningActivityResult.getStartDate(),						
+						learningActivityResult.getEndDate(),
+						learningActivityResult.getLatId(),
+						learningActivityResult.getComments(),
+						learningActivityResult.getPassed())
+						);
+				
+
+				return learningActivityResult; 		
+			
+		}		
 
 		/**
 		 * Caches the learning activity results in the entity cache if it is enabled.
@@ -544,18 +584,7 @@ public class LearningActivityResultPersistenceCassandra extends LearningActivity
 			return learningActivityResult;
 		}
 
-		/**
-		 * Returns the learning activity result with the primary key or returns <code>null</code> if it could not be found.
-		 *
-		 * @param primaryKey the primary key of the learning activity result
-		 * @return the learning activity result, or <code>null</code> if a learning activity result with the primary key could not be found
-		 * @throws SystemException if a system exception occurred
-		 */
-		@Override
-		public LearningActivityResult fetchByPrimaryKey(Serializable primaryKey)
-			throws SystemException {
-			return fetchByPrimaryKey(((Long)primaryKey).longValue());
-		}
+
 
 		/**
 		 * Returns the learning activity result with the primary key or returns <code>null</code> if it could not be found.
@@ -566,6 +595,8 @@ public class LearningActivityResultPersistenceCassandra extends LearningActivity
 		 */
 		public LearningActivityResult fetchByPrimaryKey(long larId)
 			throws SystemException {
+			
+/*			
 			LearningActivityResult learningActivityResult = (LearningActivityResult)EntityCacheUtil.getResult(LearningActivityResultModelImpl.ENTITY_CACHE_ENABLED,
 					LearningActivityResultImpl.class, larId);
 
@@ -604,6 +635,29 @@ public class LearningActivityResultPersistenceCassandra extends LearningActivity
 			}
 
 			return learningActivityResult;
+*/
+			
+			//Search LearningActivityResult
+			LearningActivityResult learningActivityResult = null;
+			BoundStatement boundStatement = new BoundStatement( ExtConexionCassandra.searchBylar_Statement);
+			ResultSet results=session.execute(boundStatement.bind(larId));
+			if(results!=null )		
+			{
+				List<Row> rowlist=results.all();
+				System.out.println(rowlist.size());
+				if(rowlist.size()>0){
+					Row row=rowlist.get(0);
+					learningActivityResult =getLearningActivityResultFromRow(row);
+
+				}
+			}
+			
+			if (learningActivityResult == null) {
+				return null;
+			}else{
+				return learningActivityResult;
+			}			
+			
 		}
 
 		/**
@@ -1073,6 +1127,8 @@ public class LearningActivityResultPersistenceCassandra extends LearningActivity
 		 */
 		public LearningActivityResult fetchByact_user(long actId, long userId,
 			boolean retrieveFromCache) throws SystemException {
+
+		/*
 			Object[] finderArgs = new Object[] { actId, userId };
 
 			Object result = null;
@@ -1162,26 +1218,26 @@ public class LearningActivityResultPersistenceCassandra extends LearningActivity
 				}
 			}
 			
-
-			//Search LearningActivityTry
-			LearningActivityTry learningActivityTry = null;
-			BoundStatement boundStatement = new BoundStatement( ExtConexionCassandra.searchBylat_Statement);
-			ResultSet results=session.execute(boundStatement.bind(latId));
+*/
+			//Search LearningActivityResul
+			LearningActivityResult learningActivityResult = null;
+			BoundStatement boundStatement = new BoundStatement( ExtConexionCassandra.fetchByact_user );
+			ResultSet results=session.execute(boundStatement.bind(actId,userId));
 			if(results!=null )		
 			{
 				List<Row> rowlist=results.all();
 				System.out.println(rowlist.size());
 				if(rowlist.size()>0){
 					Row row=rowlist.get(0);
-					learningActivityTry =getLearningActivityTryFromRow(row);
+					learningActivityResult =getLearningActivityResultFromRow(row);
 
 				}
 			}
 			
-			if (learningActivityTry == null) {
+			if (learningActivityResult == null) {
 				return null;
 			}else{
-				return learningActivityTry;
+				return learningActivityResult;
 			}			
 			
 			
@@ -3169,7 +3225,7 @@ public class LearningActivityResultPersistenceCassandra extends LearningActivity
 		 */
 		public int countByap(long actId, boolean passed) throws SystemException {
 			Object[] finderArgs = new Object[] { actId, passed };
-
+/*
 			Long count = (Long)FinderCacheUtil.getResult(FINDER_PATH_COUNT_BY_AP,
 					finderArgs, this);
 
@@ -3215,6 +3271,13 @@ public class LearningActivityResultPersistenceCassandra extends LearningActivity
 			}
 
 			return count.intValue();
+*/
+			BoundStatement boundStatement = new BoundStatement(ExtConexionCassandra.countByap);
+			ResultSet results=session.execute(boundStatement.bind(actId,passed));
+			List<Row> rows=results.all();
+			int cont =0;
+			cont = (int) rows.get(0).getLong(0);
+			return cont;   
 		}
 
 		/**
@@ -3549,5 +3612,34 @@ public class LearningActivityResultPersistenceCassandra extends LearningActivity
 				}
 			};
 
+		private LearningActivityResult getLearningActivityResultFromRow(Row row)
+				throws SystemException {
+			
+			LearningActivityResult learningActivityResult= this.create(row.getLong("larId"));
+			learningActivityResult.setUuid(row.getString("uuid_"));
+			learningActivityResult.setLatId(row.getLong("actId"));
+			learningActivityResult.setComments(row.getString("comments"));
+			
+			
+				Date date = null;
+				SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-yyyy");
+				if ( !row.getString("endDate").equals("")){
+					
+				try {
+					date = formatter.parse( row.getString("endDate"));
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				learningActivityResult.setEndDate( date);
+				}		
+				learningActivityResult.setUserId(row.getLong("userId"));
+                learningActivityResult.setResult(row.getLong("Result"));     
+                learningActivityResult.setStartDate(row.getDate("startDate"));
+                learningActivityResult. setComments(row.getString("comments"));
+                learningActivityResult. setPassed(row.getBool("pased"));
+                
+			return learningActivityResult;
+		}				
 
 }
