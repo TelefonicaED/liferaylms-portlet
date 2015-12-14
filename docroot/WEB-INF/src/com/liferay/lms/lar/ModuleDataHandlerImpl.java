@@ -1,7 +1,9 @@
 package com.liferay.lms.lar;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLEncoder;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -11,7 +13,9 @@ import javax.portlet.PortletPreferences;
 
 import org.apache.commons.io.IOUtils;
 
+import com.liferay.lms.ResourceExternalActivity;
 import com.liferay.lms.learningactivity.LearningActivityTypeRegistry;
+import com.liferay.lms.learningactivity.ResourceExternalLearningActivityType;
 import com.liferay.lms.learningactivity.questiontype.QuestionType;
 import com.liferay.lms.learningactivity.questiontype.QuestionTypeRegistry;
 import com.liferay.lms.model.LearningActivity;
@@ -34,20 +38,29 @@ import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.xml.Document;
+import com.liferay.portal.kernel.xml.DocumentException;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.Image;
 import com.liferay.portal.model.LayoutSetPrototype;
+import com.liferay.portal.model.ResourceConstants;
+import com.liferay.portal.model.Role;
+import com.liferay.portal.model.RoleConstants;
+import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.LayoutSetPrototypeLocalServiceUtil;
+import com.liferay.portal.service.ResourcePermissionLocalServiceUtil;
+import com.liferay.portal.service.RoleLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
+import com.liferay.portal.service.ServiceContextFactory;
 import com.liferay.portlet.asset.model.AssetEntry;
 import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.DuplicateFileException;
 import com.liferay.portlet.documentlibrary.FileExtensionException;
 import com.liferay.portlet.documentlibrary.FileSizeException;
 import com.liferay.portlet.documentlibrary.model.DLFileEntry;
+import com.liferay.portlet.documentlibrary.model.DLFileVersion;
 import com.liferay.portlet.documentlibrary.model.DLFolder;
 import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
 import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
@@ -257,44 +270,48 @@ private void exportEntry(PortletDataContext context, Element root, Module entry)
 					System.out.println("actividad.getTypeId() "+actividad.getTypeId());
 
 					for(int i=0;i<img.size();i++){
-						AssetEntry docAsset= AssetEntryLocalServiceUtil.getAssetEntry(Long.valueOf(img.get(i)));
-						DLFileEntry docfile=DLFileEntryLocalServiceUtil.getDLFileEntry(docAsset.getClassPK());
-						
+						System.out.println("img "+img);
+						if(!img.get(i).startsWith("<")){
+							AssetEntry docAsset= AssetEntryLocalServiceUtil.getAssetEntry(Long.valueOf(img.get(i)));
+							DLFileEntry docfile=DLFileEntryLocalServiceUtil.getDLFileEntry(docAsset.getClassPK());
 							
-						String extension = "";
-						if(!docfile.getTitle().contains(".") && docfile.getExtension().equals("")){
-							if(docfile.getMimeType().equals("image/jpeg")){
-								extension= ".jpg";
-							}else if(docfile.getMimeType().equals("image/png")){
-								extension= ".png";
-							}else if(docfile.getMimeType().equals("video/mpeg")){
-								extension= ".mpeg";
-							}else if(docfile.getMimeType().equals("application/pdf")){
-								extension= ".pdf";
-							}else{
-								String ext[] = extension.split("/");
-								if(ext.length>1){
-									extension = ext[1];
+								
+							String extension = "";
+							if(!docfile.getTitle().contains(".") && docfile.getExtension().equals("")){
+								if(docfile.getMimeType().equals("image/jpeg")){
+									extension= ".jpg";
+								}else if(docfile.getMimeType().equals("image/png")){
+									extension= ".png";
+								}else if(docfile.getMimeType().equals("video/mpeg")){
+									extension= ".mpeg";
+								}else if(docfile.getMimeType().equals("application/pdf")){
+									extension= ".pdf";
+								}else{
+									String ext[] = extension.split("/");
+									if(ext.length>1){
+										extension = ext[1];
+									}
 								}
+							}else if(!docfile.getTitle().contains(".") && !docfile.getExtension().equals("")){
+								extension="."+docfile.getExtension();
 							}
-						}else if(!docfile.getTitle().contains(".") && !docfile.getExtension().equals("")){
-							extension="."+docfile.getExtension();
+
+							String pathqu = getEntryPath(context, docfile);
+							String pathFile = getFilePath(context, docfile,actividad.getActId());
+							Element entryElementfe= entryElementLoc.addElement("dlfileentry");
+							entryElementfe.addAttribute("path", pathqu);
+							entryElementfe.addAttribute("file", pathFile+containsCharUpper(docfile.getTitle()+extension));
+							context.addZipEntry(pathqu, docfile);
+
+							//Guardar el fichero en el zip.
+							InputStream input = DLFileEntryLocalServiceUtil.getFileAsStream(docfile.getUserId(), docfile.getFileEntryId(), docfile.getVersion());
+
+							context.addZipEntry(getFilePath(context, docfile,actividad.getActId())+containsCharUpper(docfile.getTitle()+extension), input);
+							
+							String txt = (actividad.getTypeId() == 2) ? "external":"internal";
+							System.out.println("    - Resource "+ txt + ": " + containsCharUpper(docfile.getTitle()+extension));
 						}
-
-						String pathqu = getEntryPath(context, docfile);
-						String pathFile = getFilePath(context, docfile,actividad.getActId());
-						Element entryElementfe= entryElementLoc.addElement("dlfileentry");
-						entryElementfe.addAttribute("path", pathqu);
-						entryElementfe.addAttribute("file", pathFile+containsCharUpper(docfile.getTitle()+extension));
-						context.addZipEntry(pathqu, docfile);
-
-						//Guardar el fichero en el zip.
-						InputStream input = DLFileEntryLocalServiceUtil.getFileAsStream(docfile.getUserId(), docfile.getFileEntryId(), docfile.getVersion());
-
-						context.addZipEntry(getFilePath(context, docfile,actividad.getActId())+containsCharUpper(docfile.getTitle()+extension), input);
 						
-						String txt = (actividad.getTypeId() == 2) ? "external":"internal";
-						System.out.println("    - Resource "+ txt + ": " + containsCharUpper(docfile.getTitle()+extension));
 					}
 					
 
@@ -657,11 +674,117 @@ private void importEntry(PortletDataContext context, Element entryElement, Modul
 		serviceContext.setCompanyId(context.getCompanyId());
 		serviceContext.setScopeGroupId(context.getScopeGroupId());
 		
-		larn.setGroupId(context.getScopeGroupId());
+		larn.setGroupId(theModule.getGroupId());
 		larn.setModuleId(theModule.getModuleId());
+		
+	
 
 		LearningActivity nuevaLarn=LearningActivityLocalServiceUtil.addLearningActivity(larn,serviceContext);
+		serviceContext.setScopeGroupId(nuevaLarn.getGroupId());
+		System.out.println("EXTRACONTENT: "+nuevaLarn.getExtracontent());
+		//Cambios Miguel para importar bien los ficheros asociados a recursos externos.
+		HashMap<String, String> map = LearningActivityLocalServiceUtil.convertXMLExtraContentToHashMap(nuevaLarn.getActId());
+		Iterator <String> keysString =  map.keySet().iterator();
+		int index = 0;
+		while (keysString.hasNext()){
+			String key = keysString.next();
+			System.out.println("KEY: "+key);
+			
+			if(!key.equals("video") && key.indexOf("document")!=-1){
+				
+				System.out.println("PASADO POR AQUI "+index);
+				index++;
+				long assetEntryIdOld =  Long.parseLong(map.get(key));
+				
+				AssetEntry docAssetOLD= AssetEntryLocalServiceUtil.getAssetEntry(assetEntryIdOld);
+				DLFileEntry oldFile=DLFileEntryLocalServiceUtil.getDLFileEntry(docAssetOLD.getClassPK());
+				
+				InputStream inputStream = DLFileEntryLocalServiceUtil.getFileAsStream(userId, oldFile.getFileVersion().getFileEntryId(), oldFile.getFileVersion().getVersion());
+				byte[] byteArray = null;
+				try {
+					byteArray = IOUtils.toByteArray(inputStream);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+				
+				
+					long repositoryId = DLFolderConstants.getDataRepositoryId(theModule.getGroupId(), DLFolderConstants.DEFAULT_PARENT_FOLDER_ID);
+					
+					long dlMainFolderId = 0;
+					 boolean dlMainFolderFound = false;
+				        //Get main folder
+				        try {
+				        	//Get main folder
+				        	Folder dlFolderMain = DLAppLocalServiceUtil.getFolder(repositoryId,DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,DOCUMENTLIBRARY_MAINFOLDER+nuevaLarn.getActId());
+				        	dlMainFolderId = dlFolderMain.getFolderId();
+				        	dlMainFolderFound = true;
+				        	//Get portlet folder
+				        } catch (Exception ex){
+				        }
+				        
+						//Damos permisos al archivo para usuarios de comunidad.
+						serviceContext.setAddGroupPermissions(true);
+				        
+				        //Create main folder if not exist
+				        if(!dlMainFolderFound){
+				        	Folder newDocumentMainFolder = DLAppLocalServiceUtil.addFolder(userId, repositoryId,DLFolderConstants.DEFAULT_PARENT_FOLDER_ID, DOCUMENTLIBRARY_MAINFOLDER+nuevaLarn.getActId(), DOCUMENTLIBRARY_MAINFOLDER+nuevaLarn.getActId(), serviceContext);
+				        	dlMainFolderFound = true;
+				        	dlMainFolderId = newDocumentMainFolder.getFolderId();
+				        }
+					
+
+
+					
+					String ficheroExtStr = "";
+					String extension[] = oldFile.getTitle().split("\\.");
+					if(extension.length > 0){
+						ficheroExtStr = "."+extension[extension.length-1];
+					}
+				
+					FileEntry newFile = DLAppLocalServiceUtil.addFileEntry(
+							userId, repositoryId , dlMainFolderId , oldFile.getTitle()+ficheroExtStr, oldFile.getMimeType(), 
+						oldFile.getTitle(), StringPool.BLANK, StringPool.BLANK, byteArray , serviceContext ) ;
+
+				
+					//AssetEntry asset  = AssetEntryLocalServiceUtil.getEntry(DLFileEntry.class.getName(), newFile.getPrimaryKey());
+					//System.out.println("      DLFileEntry newFile: "+newFile.getTitle()+", newFile PrimaryKey: "+newFile.getPrimaryKey()+", EntryId: "+asset.getEntryId());
+					
+					map.put(key, String.valueOf(AssetEntryLocalServiceUtil.getEntry(DLFileEntry.class.getName(), newFile.getPrimaryKey()).getEntryId()));
+					
+				
+					
+					Role siteMemberRole = RoleLocalServiceUtil.getRole(context.getCompanyId(), RoleConstants.SITE_MEMBER);
+					ResourcePermissionLocalServiceUtil.setResourcePermissions(context.getCompanyId(), LearningActivity.class.getName(), 
+							ResourceConstants.SCOPE_INDIVIDUAL,	Long.toString(nuevaLarn.getActId()),siteMemberRole.getRoleId(), new String[] {ActionKeys.VIEW});
+				
+				
+			
+			}
+					
+				
+					//Ponemos a la actividad el fichero que hemos recuperado.
+					
+					if(larn.getTypeId() == 2){
+					
+					LearningActivityLocalServiceUtil.saveHashMapToXMLExtraContent(nuevaLarn.getActId(), map);
+					//LearningActivityLocalServiceUtil.updateLearningActivity(nuevaLarn);
+					
+					
+					
+					//System.out.println("AL FINAL QUEDA ASI: "+nuevaLarn.getExtracontent());
+				
+					}else if(larn.getTypeId() == 7){
+						//LearningActivityLocalServiceUtil.setExtraContentValue(nuevaLarn.getActId(), "assetEntry", String.valueOf(asset.getEntryId()));
+					}
+				
+					
+				
+				
+			}
 		
+		// FIN CAMBIO MIGUEL
 		//Importar las imagenes de los resources.
 		
 		Iterator<Element> it = actElement.elementIterator("dlfileentry");
@@ -692,7 +815,7 @@ private void importEntry(PortletDataContext context, Element entryElement, Modul
 					
 				//Obtener los datos del dlfileentry del .lar para poner sus campos igual. 
 				oldFile = (DLFileEntry) context.getZipEntryAsObject(theElement.element("dlfileentry").attributeValue("path"));
-				//System.out.println("    DLFileEntry file: "+oldFile.getTitle()+",getFileEntryId "+oldFile.getFileEntryId()+",getFolderId "+oldFile.getFolderId()+",getGroupId "+oldFile.getGroupId());
+				System.out.println("    DLFileEntry file: "+oldFile.getTitle()+",getFileEntryId "+oldFile.getFileEntryId()+",getFolderId "+oldFile.getFolderId()+",getGroupId "+oldFile.getGroupId());
 				
 				messageException = "\n      - oldFile title: "+oldFile.getTitle()+ ", extension: "+oldFile.getExtension()+ ", mimetype: "+oldFile.getMimeType()+ ", size: "+oldFile.getSize()+" - ";		
 
@@ -715,8 +838,9 @@ private void importEntry(PortletDataContext context, Element entryElement, Modul
 				
 				
 				//Ponemos a la actividad el fichero que hemos recuperado.
-				//System.out.println("    Extracontent : \n"+nuevaLarn.getExtracontent());
+				System.out.println("    Extracontent : \n"+nuevaLarn.getExtracontent());
 				if(larn.getTypeId() == 2){
+					System.out.println("TIPO EXTERNO");
 					LearningActivityLocalServiceUtil.setExtraContentValue(nuevaLarn.getActId(), "document", String.valueOf(asset.getEntryId()));
 				}else if(larn.getTypeId() == 7){
 					LearningActivityLocalServiceUtil.setExtraContentValue(nuevaLarn.getActId(), "assetEntry", String.valueOf(asset.getEntryId()));

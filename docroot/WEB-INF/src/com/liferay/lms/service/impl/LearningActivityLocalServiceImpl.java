@@ -819,13 +819,14 @@ public class LearningActivityLocalServiceImpl extends LearningActivityLocalServi
 				while (it.hasNext()) {
 					Map.Entry e = (Map.Entry)it.next();
 					Element eleXML=SAXReaderUtil.createElement(String.valueOf(e.getKey()));
-					if(e.getKey().equals("document")){
+					if(e.getKey().toString().contains("document")){
 						eleXML.addAttribute("id", String.valueOf(e.getValue()));
 					}else{
 						eleXML.addText(String.valueOf(e.getValue()));
 					}
 					resultadosXML.add(eleXML);
 				}
+				System.out.println(resultadosXMLDoc.formattedString());
 				activity.setExtracontent(resultadosXMLDoc.formattedString());
 				learningActivityPersistence.update(activity, true);
 			}
