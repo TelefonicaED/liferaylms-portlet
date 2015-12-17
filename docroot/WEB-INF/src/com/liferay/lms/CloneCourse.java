@@ -1,11 +1,13 @@
 package com.liferay.lms;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
@@ -16,6 +18,7 @@ import org.apache.commons.io.IOUtils;
 
 import com.liferay.counter.service.CounterLocalServiceUtil;
 import com.liferay.lms.learningactivity.LearningActivityTypeRegistry;
+import com.liferay.lms.learningactivity.ResourceExternalLearningActivityType;
 import com.liferay.lms.model.Course;
 import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.model.LmsPrefs;
@@ -388,9 +391,9 @@ public class CloneCourse implements MessageListener {
 					*/
 
 					newLearnActivity.setDescription(descriptionFilesClone(activity.getDescription(),newModule.getGroupId(), newLearnActivity.getActId(),themeDisplay.getUserId()));
-					
+		
 					nuevaLarn=LearningActivityLocalServiceUtil.addLearningActivity(newLearnActivity,serviceContext);
-					
+
 					System.out.println("      Learning Activity : " + activity.getTitle(Locale.getDefault())+ " ("+activity.getActId()+", " + LanguageUtil.get(Locale.getDefault(),learningActivityTypeRegistry.getLearningActivityType(activity.getTypeId()).getName())+")");
 					System.out.println("      + Learning Activity : " + nuevaLarn.getTitle(Locale.getDefault())+ " ("+nuevaLarn.getActId()+", " + LanguageUtil.get(Locale.getDefault(),learningActivityTypeRegistry.getLearningActivityType(nuevaLarn.getTypeId()).getName())+")");
 					cloneTraceStr += "   Learning Activity: " + nuevaLarn.getTitle(Locale.getDefault())+ " ("+nuevaLarn.getActId()+", " + LanguageUtil.get(Locale.getDefault(),learningActivityTypeRegistry.getLearningActivityType(nuevaLarn.getTypeId()).getName())+")";
@@ -647,7 +650,7 @@ public class CloneCourse implements MessageListener {
 	private void cloneActivityFile(LearningActivity actOld, LearningActivity actNew, long userId, ServiceContext serviceContext){
 					
 		try {
-			
+			System.out.println("cloneActivityFile");
 			String entryIdStr = "";
 			if(actOld.getTypeId() == 2){
 				entryIdStr = LearningActivityLocalServiceUtil.getExtraContentValue(actOld.getActId(), "document");
@@ -659,15 +662,112 @@ public class CloneCourse implements MessageListener {
 				
 				AssetEntry docAsset = AssetEntryLocalServiceUtil.getAssetEntry(Long.valueOf(entryIdStr));
 				long entryId = 0;
-				if(docAsset.getUrl()!=null||docAsset.getUrl().trim().length()>0){
+				if(docAsset.getUrl()!=null && docAsset.getUrl().trim().length()>0){
 					entryId = Long.valueOf(entryIdStr);
 				}else{
-					entryId = cloneFile(Long.valueOf(entryIdStr), actNew, userId, serviceContext);
+					
+					if(actNew.getTypeId() == 2){
+						try{
+							
+							HashMap<String, String> map = LearningActivityLocalServiceUtil.convertXMLExtraContentToHashMap(actNew.getActId());
+							Iterator <String> keysString =  map.keySet().iterator();
+							int index = 0;
+							while (keysString.hasNext()){
+								String key = keysString.next();
+								
+								if(!key.equals("video") && key.indexOf("document")!=-1){
+									
+									index++;
+									long assetEntryIdOld =  Long.parseLong(map.get(key));
+									
+									AssetEntry docAssetOLD= AssetEntryLocalServiceUtil.getAssetEntry(assetEntryIdOld);
+									DLFileEntry oldFile=DLFileEntryLocalServiceUtil.getDLFileEntry(docAssetOLD.getClassPK());
+									
+									InputStream inputStream = DLFileEntryLocalServiceUtil.getFileAsStream(userId, oldFile.getFileVersion().getFileEntryId(), oldFile.getFileVersion().getVersion());
+									byte[] byteArray = null;
+									try {
+										byteArray = IOUtils.toByteArray(inputStream);
+									} catch (IOException e) {
+										// TODO Auto-generated catch block
+										e.printStackTrace();
+									}
+									
+									
+									
+										long repositoryId = DLFolderConstants.getDataRepositoryId(actNew.getGroupId(), DLFolderConstants.DEFAULT_PARENT_FOLDER_ID);
+										
+										long dlMainFolderId = 0;
+										 boolean dlMainFolderFound = false;
+									        //Get main folder
+									        try {
+									        	//Get main folder
+									        	Folder dlFolderMain = DLAppLocalServiceUtil.getFolder(repositoryId,DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,DOCUMENTLIBRARY_MAINFOLDER+actNew.getActId());
+									        	dlMainFolderId = dlFolderMain.getFolderId();
+									        	dlMainFolderFound = true;
+									        	//Get portlet folder
+									        } catch (Exception ex){
+									        }
+									        
+											//Damos permisos al archivo para usuarios de comunidad.
+											serviceContext.setAddGroupPermissions(true);
+									        
+									        //Create main folder if not exist
+									        if(!dlMainFolderFound){
+									        	Folder newDocumentMainFolder = DLAppLocalServiceUtil.addFolder(userId, repositoryId,DLFolderConstants.DEFAULT_PARENT_FOLDER_ID, DOCUMENTLIBRARY_MAINFOLDER+actNew.getActId(), DOCUMENTLIBRARY_MAINFOLDER+actNew.getActId(), serviceContext);
+									        	dlMainFolderFound = true;
+									        	dlMainFolderId = newDocumentMainFolder.getFolderId();
+									        }
+										
+
+
+										
+										String ficheroExtStr = "";
+										String extension[] = oldFile.getTitle().split("\\.");
+										if(extension.length > 0){
+											ficheroExtStr = "."+extension[extension.length-1];
+										}
+									
+										FileEntry newFile = DLAppLocalServiceUtil.addFileEntry(
+												userId, repositoryId , dlMainFolderId , oldFile.getTitle()+ficheroExtStr, oldFile.getMimeType(), 
+											oldFile.getTitle(), StringPool.BLANK, StringPool.BLANK, byteArray , serviceContext ) ;
+
+									
+										//AssetEntry asset  = AssetEntryLocalServiceUtil.getEntry(DLFileEntry.class.getName(), newFile.getPrimaryKey());
+										//System.out.println("      DLFileEntry newFile: "+newFile.getTitle()+", newFile PrimaryKey: "+newFile.getPrimaryKey()+", EntryId: "+asset.getEntryId());
+										
+										map.put(key, String.valueOf(AssetEntryLocalServiceUtil.getEntry(DLFileEntry.class.getName(), newFile.getPrimaryKey()).getEntryId()));
+										
+									
+										
+										Role siteMemberRole = RoleLocalServiceUtil.getRole(serviceContext.getCompanyId(), RoleConstants.SITE_MEMBER);
+										ResourcePermissionLocalServiceUtil.setResourcePermissions(serviceContext.getCompanyId(), LearningActivity.class.getName(), 
+												ResourceConstants.SCOPE_INDIVIDUAL,	Long.toString(actNew.getActId()),siteMemberRole.getRoleId(), new String[] {ActionKeys.VIEW});
+
+								}
+
+										LearningActivityLocalServiceUtil.saveHashMapToXMLExtraContent(actNew.getActId(), map);
+							
+						}
+						
+						
+					} catch (NoSuchEntryException nsee) {
+						System.out.println(" asset not exits ");
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} finally {
+						serviceContext.setAddGroupPermissions(serviceContext.isAddGroupPermissions());
+					}
+					}else{
+						entryId = cloneFile(Long.valueOf(entryIdStr), actNew, userId, serviceContext);
+					}
+					
+					
 
 				}
 				
 				if(actNew.getTypeId() == 2){
-					LearningActivityLocalServiceUtil.setExtraContentValue(actNew.getActId(), "document", String.valueOf(entryId));
+					//LearningActivityLocalServiceUtil.setExtraContentValue(actNew.getActId(), "document", String.valueOf(entryId));
 				}else if(actNew.getTypeId() == 7){
 					LearningActivityLocalServiceUtil.setExtraContentValue(actNew.getActId(), "assetEntry", String.valueOf(entryId));
 				}

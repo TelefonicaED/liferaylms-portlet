@@ -681,7 +681,6 @@ private void importEntry(PortletDataContext context, Element entryElement, Modul
 
 		LearningActivity nuevaLarn=LearningActivityLocalServiceUtil.addLearningActivity(larn,serviceContext);
 		serviceContext.setScopeGroupId(nuevaLarn.getGroupId());
-		System.out.println("EXTRACONTENT: "+nuevaLarn.getExtracontent());
 		//Cambios Miguel para importar bien los ficheros asociados a recursos externos.
 		HashMap<String, String> map = LearningActivityLocalServiceUtil.convertXMLExtraContentToHashMap(nuevaLarn.getActId());
 		Iterator <String> keysString =  map.keySet().iterator();
