@@ -437,7 +437,7 @@
 		<column name="passedDate" type="Date"></column>
 		<column name="allowStartDate" type="Date"></column>
 		<column name="allowFinishDate" type="Date"></column>
-
+        <column name="extraData" type="String"></column>
 		<finder name="uc" return-type="CourseResult" unique="true">
 			<finder-column name="userId" />
 			<finder-column name="courseId" />
