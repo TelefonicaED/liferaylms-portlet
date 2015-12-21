@@ -42,6 +42,8 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.portal.kernel.xml.Document;
+import com.liferay.portal.kernel.xml.SAXReaderUtil;
 import com.liferay.portal.model.User;
 import com.liferay.portal.model.UserGroupRole;
 import com.liferay.portal.service.UserGroupRoleLocalServiceUtil;
@@ -137,8 +139,20 @@ public class UserCompetencePortlet extends MVCPortlet {
 			variables.put("userCompetence", userCompetence);
 			
 			if(courseResult!=null)
+			{
 				variables.put("courseResult", courseResult);
-			
+				String extraData=courseResult.getExtraData();
+				if(extraData!=null&&!extraData.trim().equals(""))
+				{
+					try {
+						Document eldoc= SAXReaderUtil.read(extraData);
+						variables.put("extraData", eldoc);
+					} catch (com.liferay.portal.kernel.xml.DocumentException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			}
 			variables.put("courseName", course.getTitle(user.getLocale()));
 			variables.put("competenceName", competence.getTitle(user.getLocale()));
 			variables.put("userName", user.getFullName());
