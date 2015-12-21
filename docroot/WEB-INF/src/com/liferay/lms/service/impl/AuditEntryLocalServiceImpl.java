@@ -23,6 +23,7 @@ import com.liferay.portal.kernel.dao.orm.Criterion;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.OrderFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
+import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.util.GetterUtil;
 
@@ -146,5 +147,29 @@ public class AuditEntryLocalServiceImpl extends AuditEntryLocalServiceBaseImpl {
 	public List<AuditEntry> findByclassName_classPK(String className, long classPK) throws SystemException
 	{
 		return auditEntryPersistence.findByCN_CP(className, classPK);
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<AuditEntry> findByclassName_classPK_filterByActions(String className, long classPK, List<String> actions) 
+			throws SystemException
+	{
+		DynamicQuery dq = auditEntryLocalService.dynamicQuery();
+		Criterion criterion=PropertyFactoryUtil.forName("classname").eq(className);
+		if(classPK>0)
+		{
+			criterion=RestrictionsFactoryUtil.and(criterion, PropertyFactoryUtil.forName("classPK").eq(classPK));
+		}
+		Criterion criterionAux = criterion;
+		for (int i=0; i<actions.size(); i++) {
+			if(i==0){
+				criterion = RestrictionsFactoryUtil.and(criterion, PropertyFactoryUtil.forName("action").eq(actions.get(i))); 
+			}else{
+				Criterion criterionAnd =  RestrictionsFactoryUtil.and(criterionAux , PropertyFactoryUtil.forName("action").eq(actions.get(i)));
+				criterion = RestrictionsFactoryUtil.or(criterion, criterionAnd);
+			}
+		}
+		dq.add(criterion);
+
+		return auditEntryLocalService.dynamicQuery(dq);
 	}
 }
