@@ -181,6 +181,9 @@ boolean showRegistrationType = preferences.getValue("showRegistrationType",  "tr
 boolean showMaxUsers = preferences.getValue("showMaxUsers", "true").equals("true");
 boolean showWelcomeMsg = preferences.getValue("showWelcomeMsg", "true").equals("true");
 boolean showGoodbyeMsg = preferences.getValue("showGoodbyeMsg", "true").equals("true");
+boolean showResume = preferences.getValue("showResume", "true").equals("true");
+boolean showDescription = preferences.getValue("showDescription", "true").equals("true");
+boolean showIconCourse = preferences.getValue("showIconCourse", "true").equals("true");
 
 
 boolean showPermission = preferences.getValue("showPermission", "true").equals("true");
@@ -322,6 +325,9 @@ else
 	</span>
 	<aui:input name="friendlyURL" label="FriendlyURL" type="hidden" > <%=groupCreated!=null?groupCreated.getFriendlyURL():"" %> </aui:input>
 	
+	<%if(showDescription){ %>
+	
+	
 	<aui:field-wrapper label="description" name="description">
 			<script type="text/javascript">
 				function <portlet:namespace />onChangeDescription(val) {
@@ -334,6 +340,8 @@ else
     		    function <portlet:namespace />initEditorDescription() { return "<%= UnicodeFormatter.toString(description) %>"; }
     		</script>
 	</aui:field-wrapper>
+	
+	<%} %>
 	
 	<c:if test="<%= permissionChecker.hasPermission(themeDisplay.getScopeGroupId(),  Course.class.getName(),0,publishPermission) && 
 			GetterUtil.getBoolean(renderRequest.getPreferences().getValues(\"showcatalog\", new String[]{StringPool.TRUE})[0],true) %>">
@@ -368,6 +376,8 @@ else
 		['node']
 	);
 	</script>
+	
+	<%if(showIconCourse){ %>
 	<aui:field-wrapper cssClass="wrapper-icon-course">
 		<% if (course != null && course.getIcon() != 0 && !requiredCourseIcon) { %>
 				<aui:input type="checkbox" name="discardLogo" label="discard-course-icon" onClick='<%= renderResponse.getNamespace()+"toggleInputLogo()" %>'/>
@@ -388,8 +398,12 @@ else
 	</aui:field-wrapper>
 	<liferay-ui:error key="course-icon-required" message="course-icon-required" />
 	<liferay-ui:error key="error_number_format" message="error_number_format" />
+	<%} %>
 	
+	<%if(showResume){ %>
 	<aui:input type="textarea" cols="100" rows="4" name="summary" label="summary" value="<%=summary %>"/>
+	<%} %>
+	
 	<%
 	List<Long> courseEvalIds = ListUtil.toList(StringUtil.split(LmsPrefsLocalServiceUtil.getLmsPrefsIni(themeDisplay.getCompanyId()).getCourseevals(),",",0L));
 	CourseEvalRegistry cer=new CourseEvalRegistry();

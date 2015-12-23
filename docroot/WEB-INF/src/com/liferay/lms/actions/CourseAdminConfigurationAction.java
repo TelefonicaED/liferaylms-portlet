@@ -51,14 +51,19 @@ public class CourseAdminConfigurationAction implements ConfigurationAction {
 		portletPreferences.setValue("showRegistrationType", Boolean.toString(ParamUtil.getBoolean(actionRequest, "showRegistrationType",	true)));
 		portletPreferences.setValue("showMaxUsers", Boolean.toString(ParamUtil.getBoolean(actionRequest, "showMaxUsers",	true)));
 		
+		portletPreferences.setValue("showResume",Boolean.toString(ParamUtil.getBoolean(actionRequest, "showResume",	false)));
+		portletPreferences.setValue("showDescription",Boolean.toString(ParamUtil.getBoolean(actionRequest, "showDescription",	false)));
+
 		portletPreferences.setValue("showSearchTags",Boolean.toString(ParamUtil.getBoolean(actionRequest, "showSearchTags",	false)));
 		portletPreferences.setValue("showWelcomeMsg",Boolean.toString(ParamUtil.getBoolean(actionRequest, "showWelcomeMsg",	true)));
-		
+		portletPreferences.setValue("showGoodbyeMsg",Boolean.toString(ParamUtil.getBoolean(actionRequest, "showGoodbyeMsg",	true)));
+
 		
 		portletPreferences.setValue("showOnlyOrganizationUsers",Boolean.toString(ParamUtil.getBoolean(actionRequest, "showOnlyOrganizationUsers",	true)));
 		portletPreferences.setValue("showCalendar",	Boolean.toString(ParamUtil.getBoolean(actionRequest, "showCalendar",	false)));
 
-		
+		portletPreferences.setValue("showIconCourse",Boolean.toString(ParamUtil.getBoolean(actionRequest, "showIconCourse",	true)));
+
 		
 		portletPreferences.store();
 		SessionMessages.add( 
