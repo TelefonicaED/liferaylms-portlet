@@ -32,11 +32,13 @@ import com.liferay.lms.model.Course;
 import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.model.LearningActivityResult;
 import com.liferay.lms.model.LearningActivityTry;
+import com.liferay.lms.model.Module;
 import com.liferay.lms.model.ModuleResult;
 import com.liferay.lms.service.ClpSerializer;
 import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityTryLocalServiceUtil;
+import com.liferay.lms.service.ModuleLocalServiceUtil;
 import com.liferay.lms.service.ModuleResultLocalServiceUtil;
 import com.liferay.lms.service.base.LearningActivityResultLocalServiceBaseImpl;
 import com.liferay.portal.kernel.bean.PortletBeanLocatorUtil;
@@ -1017,14 +1019,28 @@ public class LearningActivityResultLocalServiceImpl
 	public Date getLastEndDateByUserIdCourseId(long userId, long courseId) throws SystemException
 	{
 		ClassLoader classLoader = (ClassLoader) PortletBeanLocatorUtil.locate(ClpSerializer.getServletContextName(), "portletClassLoader"); 
+		
+		DynamicQuery dqCourse=DynamicQueryFactoryUtil.forClass(Course.class, classLoader);
+		Criterion criterion=PropertyFactoryUtil.forName("courseId").eq(courseId);
+		dqCourse.add(criterion);
+		dqCourse.setProjection(ProjectionFactoryUtil.property("groupCreatedId"));
+		
+		DynamicQuery dqModule=DynamicQueryFactoryUtil.forClass(Module.class, classLoader);
+		dqModule.add(PropertyFactoryUtil.forName("groupId").in(dqCourse));
+		dqModule.setProjection(ProjectionFactoryUtil.property("moduleId"));
+				
+		DynamicQuery dqActivity=DynamicQueryFactoryUtil.forClass(LearningActivity.class, classLoader);
+		dqActivity.add(PropertyFactoryUtil.forName("moduleId").in(dqModule));
+		dqActivity.setProjection(ProjectionFactoryUtil.property("actId"));
+		
 		DynamicQuery dq=DynamicQueryFactoryUtil.forClass(LearningActivityResult.class, classLoader);
-		Criterion criterion=PropertyFactoryUtil.forName("userId").eq(userId);
+		criterion=PropertyFactoryUtil.forName("userId").eq(userId);
 		dq.add(criterion);
-		criterion=PropertyFactoryUtil.forName("courseId").eq(courseId);
-		dq.add(criterion);
+		dq.add(PropertyFactoryUtil.forName("actId").in(dqActivity));
 		criterion=PropertyFactoryUtil.forName("endDate").isNotNull();
 		dq.add(criterion);
 		dq.setProjection(ProjectionFactoryUtil.max("endDate"));
+		
 		return (Date)(learningActivityResultPersistence.findWithDynamicQuery(dq).get(0));
 	}
 	public List<LearningActivityResult> getByActId(long actId) throws SystemException
