@@ -14,6 +14,11 @@
 
 package com.liferay.lms.model.impl;
 
+import com.liferay.lms.model.Course;
+import com.liferay.lms.service.CourseLocalServiceUtil;
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.exception.SystemException;
+
 /**
  * The extended model implementation for the Course service. Represents a row in the &quot;Lms_Course&quot; database table, with each column mapped to a property of this class.
  *
@@ -30,5 +35,16 @@ public class CourseImpl extends CourseBaseImpl {
 	 * Never reference this class directly. All methods that expect a course model instance should use the {@link com.liferay.lms.model.Course} interface instead.
 	 */
 	public CourseImpl() {
+	}
+	public Course getParentCourse() throws PortalException, SystemException
+	{
+	    if(this.getParentCourseId()!=0)
+	    {
+	    	return CourseLocalServiceUtil.getCourse(this.getParentCourseId());
+	    }
+	    else
+	    {
+	    	return null;
+	    }
 	}
 }

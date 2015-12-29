@@ -4,6 +4,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.text.Format;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -39,6 +40,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -124,6 +126,7 @@ public class UserCompetencePortlet extends MVCPortlet {
     	Competence competence = CompetenceLocalServiceUtil.getCompetence(userCompetence.getCompetenceId());
 		Course course=CourseLocalServiceUtil.getCourse(userCompetence.getCourseId());
 		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(WebKeys.THEME_DISPLAY);
+		Format dateFormatDate = FastDateFormatFactoryUtil.getDate(user.getLocale(), user.getTimeZone());
 		
 		if(user!=null&&competence!=null&&course!=null){
 			if(log.isDebugEnabled())log.debug("Enter:"+user.getLocale());
@@ -132,6 +135,7 @@ public class UserCompetencePortlet extends MVCPortlet {
 
 			ITextRenderer renderer = new ITextRenderer();
 			Map<String, Object> variables = new HashMap<String, Object>();
+			variables.put("dateFormatDate", dateFormatDate);
 			variables.put("user", user);
 			variables.put("competence", competence);
 			variables.put("course", course);

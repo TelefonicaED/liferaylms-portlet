@@ -278,7 +278,10 @@ public class CloneCourse implements MessageListener {
 			Module newModule;
 			try {
 				newModule = ModuleLocalServiceUtil.createModule(CounterLocalServiceUtil.increment(Module.class.getName()));
-				
+				if(this.childCourse)
+				{
+					newModule.setUuid(module.getUuid());
+				}
 				newModule.setTitle(module.getTitle());
 				newModule.setDescription(module.getDescription());
 				newModule.setGroupId(newCourse.getGroupId());
@@ -328,7 +331,10 @@ public class CloneCourse implements MessageListener {
 				LearningActivity nuevaLarn = null;
 				try {
 					newLearnActivity = LearningActivityLocalServiceUtil.createLearningActivity(CounterLocalServiceUtil.increment(LearningActivity.class.getName()));
-					
+					if(this.childCourse)
+					{
+						newLearnActivity.setUuid(activity.getUuid());
+					}
 					newLearnActivity.setTitle(activity.getTitle());
 					newLearnActivity.setDescription(activity.getDescription());
 					newLearnActivity.setExtracontent(activity.getExtracontent());
