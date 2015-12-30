@@ -1,3 +1,11 @@
+<%@page import="com.liferay.lms.model.Course"%>
+<%@page import="com.liferay.portal.service.RoleLocalServiceUtil"%>
+<%@page import="com.liferay.portal.kernel.dao.orm.QueryUtil"%>
+<%@page import="com.liferay.lms.service.LmsPrefsLocalServiceUtil"%>
+<%@page import="com.liferay.lms.model.LmsPrefs"%>
+<%@page import="com.liferay.portal.kernel.dao.orm.CustomSQLParam"%>
+<%@page import="com.liferay.portal.kernel.util.OrderByComparator"%>
+<%@page import="com.liferay.portal.util.comparator.UserLastNameComparator"%>
 <%@page import="com.liferay.lms.service.CourseLocalServiceUtil"%>
 <%@page import="java.text.DecimalFormat"%>
 <%@page import="java.math.RoundingMode"%>
@@ -18,11 +26,52 @@
 long registered=CourseLocalServiceUtil.getStudentsFromCourse(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId()).size();
 long moduleId=ParamUtil.getLong(request,"moduleId",0);
 Module theModule=ModuleLocalServiceUtil.getModule(moduleId);
+
+long   teamId		  	 = ParamUtil.getLong (request, "teamId", 0);
+OrderByComparator obc	 = new UserLastNameComparator(true);
+LinkedHashMap userParams = new LinkedHashMap();
+List<User> usersList	 = new ArrayList<User>();
+LmsPrefs prefs			 = LmsPrefsLocalServiceUtil
+								.getLmsPrefs(themeDisplay.getCompanyId());
+
+Course curso 	 = CourseLocalServiceUtil.fetchByGroupCreatedId(themeDisplay.getScopeGroupId());
+
+if(teamId != 0) {
+	userParams.put("notInCourseRoleTeach", new CustomSQLParam("WHERE User_.userId NOT IN "
+	        + " (SELECT UserGroupRole.userId " + "  FROM UserGroupRole "
+	        + "  WHERE  (UserGroupRole.groupId = ?) AND (UserGroupRole.roleId = ?))", new Long[] {
+	        curso.getGroupCreatedId(),
+	        RoleLocalServiceUtil.getRole(prefs.getTeacherRole()).getRoleId() }));
+
+	userParams.put("notInCourseRoleEdit", new CustomSQLParam("WHERE User_.userId NOT IN "
+	        + " (SELECT UserGroupRole.userId " + "  FROM UserGroupRole "
+	        + "  WHERE  (UserGroupRole.groupId = ?) AND (UserGroupRole.roleId = ?))", new Long[] {
+	        curso.getGroupCreatedId(),
+	        RoleLocalServiceUtil.getRole(prefs.getEditorRole()).getRoleId() }));
+	     
+	userParams.put("usersGroups", new Long(themeDisplay.getScopeGroupId()));	
+	userParams.put("usersTeams", teamId);
+
+	//Usuarios del equipo
+	usersList = UserLocalServiceUtil.search(themeDisplay.getCompanyId(), StringPool.BLANK, 0, 
+											userParams, QueryUtil.ALL_POS, QueryUtil.ALL_POS, obc);
+	//Usuarios registrados en el curso
+	List<User> registeredUsers = CourseLocalServiceUtil
+									.getStudentsFromCourse(	themeDisplay.getCompanyId(), 
+															themeDisplay.getScopeGroupId());
+	registered = 0;
+	for (User usuario: usersList){	
+		//Comprobamos si está registrado en el curso
+		if (registeredUsers.contains(usuario))
+			registered += 1;
+	}
+}
 %>
 
 <liferay-portlet:resourceURL var="exportURL" >
 	<portlet:param name="action" value="exportModule"/>
 	<portlet:param name="moduleId" value="<%=Long.toString(moduleId) %>"/>
+	<portlet:param name="teamId" value="<%=Long.toString(teamId) %>"/>
 </liferay-portlet:resourceURL>
 <liferay-ui:icon cssClass='bt_importexport' label="<%= true %>" message="coursestats.csv.export" method="get" url="<%=exportURL%>" />
 <portlet:renderURL var="cancelURL" />
@@ -31,8 +80,16 @@ Module theModule=ModuleLocalServiceUtil.getModule(moduleId);
 	
 <div class="registered"><liferay-ui:message key="coursestats.modulestats.inscritos" arguments="<%=new Object[]{registered} %>"></liferay-ui:message></div>
 <% 
-long started=ModuleResultLocalServiceUtil.countByModuleOnlyStudents(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(), theModule.getModuleId());
-long finished=ModuleResultLocalServiceUtil.countByModulePassedOnlyStudents(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(),theModule.getModuleId(),true);
+long started = 0;
+long finished = 0;
+
+if (teamId == 0) {
+	started = ModuleResultLocalServiceUtil.countByModuleOnlyStudents(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(), theModule.getModuleId());
+	finished = ModuleResultLocalServiceUtil.countByModulePassedOnlyStudents(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(),theModule.getModuleId(),true);
+}else{
+	started = ModuleResultLocalServiceUtil.countByModuleOnlyStudents(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(), theModule.getModuleId(), usersList);
+	finished = ModuleResultLocalServiceUtil.countByModulePassedOnlyStudents(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(),theModule.getModuleId(),true, usersList);
+}
 	%>
 	<p><liferay-ui:message key="coursestats.modulestats.iniciaron" arguments="<%=new Object[]{started} %>">></liferay-ui:message><br />
 	<%if(theModule.getStartDate()!=null)
@@ -97,17 +154,37 @@ portletURL.setParameter("moduleId", String.valueOf(moduleId));
 	<%
 	
 	DecimalFormat df = new DecimalFormat("#.#");
-	long astarted=LearningActivityResultLocalServiceUtil.countStartedOnlyStudents(activity.getActId(), activity.getCompanyId(), activity.getGroupId());
 	
+	long astarted = 0;
+	long afinished = 0;
+	long notpassed = 0;
 	
-	long afinished=LearningActivityResultLocalServiceUtil.countPassedOnlyStudents(activity.getActId(), activity.getCompanyId(), activity.getGroupId(),true);
-	long notpassed=LearningActivityResultLocalServiceUtil.countNotPassedOnlyStudents(activity.getActId(), activity.getCompanyId(), activity.getGroupId());
+	if (teamId == 0) {
+		astarted=LearningActivityResultLocalServiceUtil.countStartedOnlyStudents(activity.getActId(), activity.getCompanyId(), activity.getGroupId());
+		afinished=LearningActivityResultLocalServiceUtil.countPassedOnlyStudents(activity.getActId(), activity.getCompanyId(), activity.getGroupId(),true);
+		notpassed=LearningActivityResultLocalServiceUtil.countNotPassedOnlyStudents(activity.getActId(), activity.getCompanyId(), activity.getGroupId());
+	}else{
+		astarted=LearningActivityResultLocalServiceUtil.countStartedOnlyStudents(activity.getActId(), activity.getCompanyId(), activity.getGroupId(), usersList);
+		afinished=LearningActivityResultLocalServiceUtil.countPassedOnlyStudents(activity.getActId(), activity.getCompanyId(), activity.getGroupId(),true, usersList);
+		notpassed=LearningActivityResultLocalServiceUtil.countNotPassedOnlyStudents(activity.getActId(), activity.getCompanyId(), activity.getGroupId(), usersList);
+	}
+	
 	double avgResult=0;
 	if(afinished+notpassed>0)
 	{
-		avgResult=LearningActivityResultLocalServiceUtil.avgResultOnlyStudents(activity.getActId(), activity.getCompanyId(), activity.getGroupId());
+		if (teamId == 0) {
+			avgResult=LearningActivityResultLocalServiceUtil.avgResultOnlyStudents(activity.getActId(), activity.getCompanyId(), activity.getGroupId());	
+		}else{
+			avgResult=LearningActivityResultLocalServiceUtil.avgResultOnlyStudents(activity.getActId(), activity.getCompanyId(), activity.getGroupId(), usersList);
+		}
+		
 	}
-	double triesPerUser=LearningActivityResultLocalServiceUtil.triesPerUserOnlyStudents(activity.getActId(), activity.getCompanyId(), activity.getGroupId());
+	double triesPerUser = 0;
+	if (teamId == 0) {
+		triesPerUser=LearningActivityResultLocalServiceUtil.triesPerUserOnlyStudents(activity.getActId(), activity.getCompanyId(), activity.getGroupId());
+	}else{
+		triesPerUser=LearningActivityResultLocalServiceUtil.triesPerUserOnlyStudents(activity.getActId(), activity.getCompanyId(), activity.getGroupId(), usersList);
+	}
 	
 	String title=activity.getTitle(themeDisplay.getLocale());
 	int maxNameLength=GetterUtil.getInteger(LanguageUtil.get(pageContext, "coursestats.modulestats.large.name.length"),20);
@@ -117,7 +194,6 @@ portletURL.setParameter("moduleId", String.valueOf(moduleId));
 	}
 	
 	boolean hasPrecedence = false;
-	//System.out.println("number of precedence: " + activity.getPrecedence());
 	if(activity.getPrecedence() > 0)
 		hasPrecedence = true;
 		%>

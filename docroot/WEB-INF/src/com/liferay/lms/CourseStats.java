@@ -5,9 +5,11 @@ import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.text.MessageFormat;
 import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 
@@ -19,21 +21,32 @@ import javax.portlet.ResourceResponse;
 import au.com.bytecode.opencsv.CSVWriter;
 
 import com.liferay.lms.model.Course;
+import com.liferay.lms.model.CourseResult;
 import com.liferay.lms.model.LearningActivity;
+import com.liferay.lms.model.LmsPrefs;
 import com.liferay.lms.model.Module;
 import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.lms.service.CourseResultLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityResultLocalServiceUtil;
+import com.liferay.lms.service.LmsPrefsLocalServiceUtil;
 import com.liferay.lms.service.ModuleLocalServiceUtil;
 import com.liferay.lms.service.ModuleResultLocalServiceUtil;
+import com.liferay.portal.kernel.dao.orm.CustomSQLParam;
+import com.liferay.portal.kernel.dao.orm.DynamicQuery;
+import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
+import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
+import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.NestableException;
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.servlet.HttpHeaders;
 import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.JavaConstants;
+import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -41,9 +54,12 @@ import com.liferay.portal.kernel.xml.DocumentException;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
 import com.liferay.portal.model.Group;
+import com.liferay.portal.model.User;
 import com.liferay.portal.service.GroupLocalServiceUtil;
+import com.liferay.portal.service.RoleLocalServiceUtil;
 import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.theme.ThemeDisplay;
+import com.liferay.portal.util.comparator.UserLastNameComparator;
 import com.liferay.portlet.asset.AssetRendererFactoryRegistryUtil;
 import com.liferay.portlet.asset.model.AssetRendererFactory;
 import com.liferay.util.bridges.mvc.MVCPortlet;
@@ -55,32 +71,74 @@ public class CourseStats extends MVCPortlet {
  
 	@Override
 	public void serveResource(ResourceRequest resourceRequest,
-			ResourceResponse resourceResponse) throws IOException,
-			PortletException {
+							  ResourceResponse resourceResponse) 
+					throws IOException, PortletException {
 		String action = ParamUtil.getString(resourceRequest, "action");
 		ThemeDisplay themeDisplay  =(ThemeDisplay)resourceRequest.getAttribute(WebKeys.THEME_DISPLAY);
 		
+		long teamId   = ParamUtil.getLong(resourceRequest, "teamId", 0);
 		
 		if("export".equals(action)){
 			long courseId = ParamUtil.getLong(resourceRequest, "courseId",0);
-			exportCourse(resourceResponse, courseId, themeDisplay);
+			exportCourse(resourceResponse, courseId, teamId, themeDisplay);
 		} else if("exportModule".equals(action)){
 			long moduleId = ParamUtil.getLong(resourceRequest, "moduleId",0);
-			exportModule(resourceResponse, moduleId, themeDisplay, resourceRequest);
-			
+			exportModule(resourceResponse, moduleId, teamId, themeDisplay, resourceRequest);
 		}
 	}
-
 	private void exportCourse(ResourceResponse resourceResponse, long courseId,
-			ThemeDisplay themeDisplay) throws IOException,
-			UnsupportedEncodingException {
-		try {			
+							  long teamId, ThemeDisplay themeDisplay) 
+									  throws IOException, UnsupportedEncodingException {
+		try {
 			Course course = CourseLocalServiceUtil.getCourse(courseId);
 			Group group = GroupLocalServiceUtil.getGroup(course.getGroupCreatedId());
-			long registered=CourseLocalServiceUtil.getStudentsFromCourse(themeDisplay.getCompanyId(), course.getGroupCreatedId()).size();
-			long finalizados = CourseResultLocalServiceUtil.countStudentsByCourseId(course, true);
-			long iniciados = CourseResultLocalServiceUtil.countStudentsByCourseId(course, false) + finalizados;
+			List<User> usersList = new ArrayList<User>();
+			
+			long registered	 = 0;
+			long finalizados = 0;
+			long iniciados	 = 0;
+			
+			if (teamId != 0){
+				
+				//Usuarios del equipo
+				usersList = getUsersOfTeam(courseId, teamId, themeDisplay);
+				
+				//Colección con los id's de Usuario
+				Collection<Object> usersCollection = new ArrayList<Object>(usersList.size());
+				
+				//Usuarios registrados en el curso
+				List<User> registeredUsers = CourseLocalServiceUtil
+												.getStudentsFromCourse (course);
+				
+				for (User usuario: usersList){
+					//Añadimos el id a la colección de usuarios
+					usersCollection.add(usuario.getUserId());
+					
+					//Comprobamos si está registrado en el curso
+					if (registeredUsers.contains(usuario))
+						registered += 1;
+				}
+				DynamicQuery courseResultsQueryF = DynamicQueryFactoryUtil.forClass(CourseResult.class)
+													.add(PropertyFactoryUtil.forName("courseId").eq(new Long(course.getCourseId())))
+													.add(PropertyFactoryUtil.forName("passed").eq(new Boolean(true)))
+													.add(PropertyFactoryUtil.forName("userId")
+														.in(usersCollection));
 
+				DynamicQuery courseResultsQueryI = DynamicQueryFactoryUtil.forClass(CourseResult.class)
+													.add(PropertyFactoryUtil.forName("courseId").eq(new Long(course.getCourseId())))
+													.add(PropertyFactoryUtil.forName("passed").eq(new Boolean(false)))
+													.add(PropertyFactoryUtil.forName("userId")
+														.in(usersCollection));
+
+				finalizados  = CourseResultLocalServiceUtil.dynamicQuery(courseResultsQueryF).size();
+				iniciados 	 = CourseResultLocalServiceUtil.dynamicQuery(courseResultsQueryI).size() + finalizados;
+	
+			}else{
+				registered=CourseLocalServiceUtil.getStudentsFromCourse(themeDisplay.getCompanyId(), course.getGroupCreatedId()).size();
+				finalizados = CourseResultLocalServiceUtil.countStudentsByCourseId(course, true);
+				iniciados = CourseResultLocalServiceUtil.countStudentsByCourseId(course, false) + finalizados;
+			}
+			
 			List<Module> tempResults = ModuleLocalServiceUtil.findAllInGroup(group.getGroupId());
 			CSVWriter writer = initCsv(resourceResponse);
 		    ResourceBundle rb =  ResourceBundle.getBundle("content.Language");
@@ -113,8 +171,16 @@ public class CourseStats extends MVCPortlet {
 		    
 		    for(Module modulo:tempResults){
 		    	String[] resultados = new String[numCols];
-		    	long started=ModuleResultLocalServiceUtil.countByModuleOnlyStudents(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(), modulo.getModuleId());
-		    	long finished=ModuleResultLocalServiceUtil.countByModulePassedOnlyStudents(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(),modulo.getModuleId(),true);
+		    	long started = 0;
+		    	long finished = 0;
+		    	
+		    	if (teamId == 0) {
+		    		started=ModuleResultLocalServiceUtil.countByModuleOnlyStudents(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(), modulo.getModuleId());
+		    		finished=ModuleResultLocalServiceUtil.countByModulePassedOnlyStudents(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(),modulo.getModuleId(),true);
+		    	}else{
+		    		started=ModuleResultLocalServiceUtil.countByModuleOnlyStudents(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(), modulo.getModuleId(), usersList);
+		    		finished=ModuleResultLocalServiceUtil.countByModulePassedOnlyStudents(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(),modulo.getModuleId(),true, usersList);
+		    	}
 		    	String moduloBloqueo = "";
 		    	if(modulo.getPrecedence() != 0) {
 		    		Module modulePredence = ModuleLocalServiceUtil.getModule(modulo.getPrecedence());
@@ -138,22 +204,71 @@ public class CourseStats extends MVCPortlet {
 		}
 	}
 	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	private List<User> getUsersOfTeam (	long courseId, 
+										long teamId, 
+										ThemeDisplay themeDisplay) 
+			throws PortalException, SystemException {
+		
+		OrderByComparator obc	 = new UserLastNameComparator(true);
+		LinkedHashMap userParams = new LinkedHashMap();
+		LmsPrefs prefs			 = LmsPrefsLocalServiceUtil.getLmsPrefs(themeDisplay.getCompanyId());
+		
+		Course curso = CourseLocalServiceUtil.getCourse(courseId);
+		
+		userParams.put( "notInCourseRoleTeach", new CustomSQLParam("WHERE User_.userId NOT IN "
+				        + " (SELECT UserGroupRole.userId " + "  FROM UserGroupRole "
+				        + "  WHERE  (UserGroupRole.groupId = ?) AND (UserGroupRole.roleId = ?))", new Long[] {
+				        curso.getGroupCreatedId(),
+				        RoleLocalServiceUtil.getRole(prefs.getTeacherRole()).getRoleId() }));
+
+		userParams.put( "notInCourseRoleEdit", new CustomSQLParam("WHERE User_.userId NOT IN "
+				        + " (SELECT UserGroupRole.userId " + "  FROM UserGroupRole "
+				        + "  WHERE  (UserGroupRole.groupId = ?) AND (UserGroupRole.roleId = ?))", new Long[] {
+				        curso.getGroupCreatedId(),
+				        RoleLocalServiceUtil.getRole(prefs.getEditorRole()).getRoleId() }));
+		
+		userParams.put("usersGroups", new Long(themeDisplay.getScopeGroupId()));
+		userParams.put("usersTeams", teamId);
+		
+		return UserLocalServiceUtil.search(themeDisplay.getCompanyId(), StringPool.BLANK, 0, 
+										   userParams, QueryUtil.ALL_POS, QueryUtil.ALL_POS, obc);
+	}
+
 	private void exportModule(ResourceResponse resourceResponse, long moduleId,
-			ThemeDisplay themeDisplay, ResourceRequest resourceRequest) throws IOException,
-			UnsupportedEncodingException {
+							  long teamId, ThemeDisplay themeDisplay, ResourceRequest resourceRequest) 
+									  throws IOException, UnsupportedEncodingException {
 		try {
 			
 			java.text.SimpleDateFormat sdf=new java.text.SimpleDateFormat("dd/MM/yyyy");
-			
-			
+			List<User> usersList = new ArrayList<User>();
+			Course curso = CourseLocalServiceUtil.fetchByGroupCreatedId(themeDisplay.getScopeGroupId());
+
 			Module module = ModuleLocalServiceUtil.getModule(moduleId);
 			Group group = GroupLocalServiceUtil.getGroup(module.getGroupId());
 			long registered=CourseLocalServiceUtil.getStudentsFromCourse(themeDisplay.getCompanyId(), module.getGroupId()).size();
 			//long registered=UserLocalServiceUtil.getGroupUsersCount(group.getGroupId(),0);
-			long iniciados=ModuleResultLocalServiceUtil.countByModuleOnlyStudents(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(), module.getModuleId());
-	    	long finalizados=ModuleResultLocalServiceUtil.countByModulePassedOnlyStudents(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(),module.getModuleId(),true);
+			long iniciados = 0;
+	    	long finalizados = 0;
 	    	
-			
+			if (teamId != 0){
+				//Usuarios registrados en el curso
+				List<User> registeredUsers = CourseLocalServiceUtil.getStudentsFromCourse(	themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId());
+				
+				usersList = getUsersOfTeam(curso.getCourseId(), teamId, themeDisplay);
+				iniciados=ModuleResultLocalServiceUtil.countByModuleOnlyStudents(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(), module.getModuleId(), usersList);
+		    	finalizados=ModuleResultLocalServiceUtil.countByModulePassedOnlyStudents(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(),module.getModuleId(),true, usersList);
+		    	
+		    	registered = 0;
+		    	for (User usuario: usersList){	
+					//Comprobamos si está registrado en el curso
+		    		if (registeredUsers.contains(usuario))
+		    			registered += 1;
+		    	}
+			}else{
+				iniciados=ModuleResultLocalServiceUtil.countByModuleOnlyStudents(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(), module.getModuleId());
+		    	finalizados=ModuleResultLocalServiceUtil.countByModulePassedOnlyStudents(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(),module.getModuleId(),true);
+			}
 			
 			String mStartDate = module.getStartDate() == null? "":sdf.format(module.getStartDate());
 			String mEndDate = module.getEndDate() == null? "":sdf.format(module.getEndDate());
@@ -201,17 +316,36 @@ public class CourseStats extends MVCPortlet {
 		   
 		    for(LearningActivity activity:tempResults){
 		    	String[] resultados = new String[numCols];
-		    	long started=LearningActivityResultLocalServiceUtil.countStartedOnlyStudents(activity.getActId(), activity.getCompanyId(), activity.getGroupId());
-		    	long finished=LearningActivityResultLocalServiceUtil.countPassedOnlyStudents(activity.getActId(), activity.getCompanyId(), activity.getGroupId(),true);
-		    	long notpassed=LearningActivityResultLocalServiceUtil.countNotPassedOnlyStudents(activity.getActId(), activity.getCompanyId(), activity.getGroupId());
-		    	double avgResult=0;
-		    	if(finished+notpassed>0)
-		    		avgResult=LearningActivityResultLocalServiceUtil.avgResultOnlyStudents(activity.getActId(), activity.getCompanyId(), activity.getGroupId());
-		    	double triesPerUser=LearningActivityResultLocalServiceUtil.triesPerUserOnlyStudents(activity.getActId(), activity.getCompanyId(), activity.getGroupId());
-		    	boolean hasPrecedence = false;
-		    	if(activity.getPrecedence() > 0)
-		    		hasPrecedence = true;
 		    	
+		    	long started = 0;
+		    	long finished = 0;
+		    	long notpassed = 0;
+		    	double avgResult = 0;
+		    	double triesPerUser = 0;
+		    	boolean hasPrecedence = false;
+		    	if (teamId != 0){
+			    	started=LearningActivityResultLocalServiceUtil.countStartedOnlyStudents(activity.getActId(), activity.getCompanyId(), activity.getGroupId(), usersList);
+			    	finished=LearningActivityResultLocalServiceUtil.countPassedOnlyStudents(activity.getActId(), activity.getCompanyId(), activity.getGroupId(),true, usersList);
+			    	notpassed=LearningActivityResultLocalServiceUtil.countNotPassedOnlyStudents(activity.getActId(), activity.getCompanyId(), activity.getGroupId(), usersList);
+		    	
+			    	if(finished+notpassed>0)
+			    		avgResult=LearningActivityResultLocalServiceUtil.avgResultOnlyStudents(activity.getActId(), activity.getCompanyId(), activity.getGroupId(), usersList);
+			    	triesPerUser=LearningActivityResultLocalServiceUtil.triesPerUserOnlyStudents(activity.getActId(), activity.getCompanyId(), activity.getGroupId(), usersList);
+			    	
+			    	if(activity.getPrecedence() > 0)
+			    		hasPrecedence = true;
+		    	}else{
+		    		started=LearningActivityResultLocalServiceUtil.countStartedOnlyStudents(activity.getActId(), activity.getCompanyId(), activity.getGroupId());
+			    	finished=LearningActivityResultLocalServiceUtil.countPassedOnlyStudents(activity.getActId(), activity.getCompanyId(), activity.getGroupId(),true);
+			    	notpassed=LearningActivityResultLocalServiceUtil.countNotPassedOnlyStudents(activity.getActId(), activity.getCompanyId(), activity.getGroupId());
+		    	
+			    	if(finished+notpassed>0)
+			    		avgResult=LearningActivityResultLocalServiceUtil.avgResultOnlyStudents(activity.getActId(), activity.getCompanyId(), activity.getGroupId());
+			    	triesPerUser=LearningActivityResultLocalServiceUtil.triesPerUserOnlyStudents(activity.getActId(), activity.getCompanyId(), activity.getGroupId());
+			   
+			    	if(activity.getPrecedence() > 0)
+			    		hasPrecedence = true;
+		    	}
 		    	NumberFormat numberFormat = NumberFormat.getNumberInstance(themeDisplay.getLocale());
 		    	
 		    	resultados[0]=activity.getTitle(themeDisplay.getLocale());
