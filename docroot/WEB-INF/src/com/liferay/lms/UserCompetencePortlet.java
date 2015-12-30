@@ -4,7 +4,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.text.DateFormat;
 import java.text.Format;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -40,6 +42,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.util.DateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringPool;
@@ -126,8 +129,16 @@ public class UserCompetencePortlet extends MVCPortlet {
     	Competence competence = CompetenceLocalServiceUtil.getCompetence(userCompetence.getCompetenceId());
 		Course course=CourseLocalServiceUtil.getCourse(userCompetence.getCourseId());
 		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(WebKeys.THEME_DISPLAY);
-		Format dateFormatDate = FastDateFormatFactoryUtil.getDate(user.getLocale(), user.getTimeZone());
-		
+		DateFormat dateFormatDate = DateFormat.getDateInstance(DateFormat.SHORT,user.getLocale());
+		dateFormatDate.setTimeZone(user.getTimeZone());
+		 if (dateFormatDate instanceof SimpleDateFormat)
+	      {
+	            SimpleDateFormat sdf = (SimpleDateFormat) dateFormatDate;
+	            // To show Locale specific short date expression with full year
+	            String pattern = sdf.toPattern().replaceAll("y+","yyyy");
+	            sdf.applyPattern(pattern); 
+	            dateFormatDate=sdf;
+	      }
 		if(user!=null&&competence!=null&&course!=null){
 			if(log.isDebugEnabled())log.debug("Enter:"+user.getLocale());
 			
