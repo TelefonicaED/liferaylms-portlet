@@ -58,7 +58,7 @@ import com.lowagie.text.DocumentException;
 
 
 public class UserCompetencePortlet extends MVCPortlet {
-	private static Log log = LogFactoryUtil.getLog(InscriptionAdminPortlet.class);
+	private static Log log = LogFactoryUtil.getLog(UserCompetencePortlet.class);
  
 	private String viewJSP; 
 	
