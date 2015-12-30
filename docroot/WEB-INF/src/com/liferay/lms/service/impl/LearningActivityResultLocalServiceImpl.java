@@ -935,7 +935,7 @@ public class LearningActivityResultLocalServiceImpl
 	}
 	
 	public Double avgResultOnlyStudents(long actId, long companyId, long courseGropupCreatedId) throws SystemException {
-		return avgResultOnlyStudents(actId, companyId, courseGropupCreatedId);
+		return avgResultOnlyStudents(actId, companyId, courseGropupCreatedId, null);
 	}
 	
 	public Double avgResultOnlyStudents(long actId, long companyId, long courseGropupCreatedId, List<User> _students) throws SystemException
