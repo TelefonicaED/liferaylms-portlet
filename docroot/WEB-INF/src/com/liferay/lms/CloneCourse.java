@@ -71,6 +71,7 @@ import com.liferay.portal.service.ResourcePermissionLocalServiceUtil;
 import com.liferay.portal.service.RoleLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceContextFactory;
+import com.liferay.portal.service.UserGroupRoleLocalServiceUtil;
 import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
@@ -105,6 +106,7 @@ public class CloneCourse implements MessageListener {
 	Date endDate;
 	
 	boolean visible;
+	boolean includeTeacher;
 	
 	private String cloneTraceStr = "--------------- Clone course trace ----------------"; 
 		
@@ -139,6 +141,7 @@ public class CloneCourse implements MessageListener {
 			this.themeDisplay = (ThemeDisplay)message.get("themeDisplay");
 			
 			this.visible = message.getBoolean("visible");
+			this.includeTeacher = message.getBoolean("includeTeacher");
 			Role adminRole = RoleLocalServiceUtil.getRole(themeDisplay.getCompanyId(),"Administrator");
 			List<User> adminUsers = UserLocalServiceUtil.getRoleUsers(adminRole.getRoleId());
 			 
@@ -155,7 +158,6 @@ public class CloneCourse implements MessageListener {
 	
 	@SuppressWarnings("unchecked")
 	public void doCloneCourse() throws Exception {
-		
 		cloneTraceStr += " Course to clone\n........................." + groupId;
 		
 		System.out.println("  + groupId: "+groupId);
@@ -198,7 +200,6 @@ public class CloneCourse implements MessageListener {
 		}else{
 			layoutSetPrototypeId = LayoutSetLocalServiceUtil.getLayoutSet(groupId, true).getLayoutSetPrototypeId();
 		}*/
-		
 		System.out.println("  + layoutSetPrototypeId: "+layoutSetPrototypeId);
 		cloneTraceStr += " layoutSetPrototypeId:" + layoutSetPrototypeId;
 		
@@ -270,6 +271,29 @@ public class CloneCourse implements MessageListener {
 		cloneTraceStr += "\n New course\n........................." + groupId;
 		cloneTraceStr += " Course: "+  newCourse.getTitle(Locale.getDefault()) +"\n GroupCreatedId: "+newCourse.getGroupCreatedId()+"\n GroupId: "+newCourse.getGroupId();
 		cloneTraceStr += "\n.........................";
+		
+		/**
+		 * METO AL USUARIO CREADOR DEL CURSO COMO PROFESOR
+		 */
+		if(includeTeacher){
+			System.out.println(includeTeacher);
+			if (!GroupLocalServiceUtil.hasUserGroup(themeDisplay.getUserId(), newCourse.getGroupCreatedId())) {
+					GroupLocalServiceUtil.addUserGroups(themeDisplay.getUserId(),	new long[] { newCourse.getGroupCreatedId() });
+				//The application only send one mail at listener
+				//User user = UserLocalServiceUtil.getUser(userId);
+				//sendEmail(user, course);
+				}
+			LmsPrefs lmsPrefs=LmsPrefsLocalServiceUtil.getLmsPrefs(themeDisplay.getCompanyId());
+
+			long teacherRoleId=RoleLocalServiceUtil.getRole(lmsPrefs.getEditorRole()).getRoleId();
+				UserGroupRoleLocalServiceUtil.addUserGroupRoles(new long[] { themeDisplay.getUserId() }, newCourse.getGroupCreatedId(), teacherRoleId);
+				
+		}
+		
+		
+		
+		/*********************************************************/
+		
 		
 		long days = 0;
 		boolean isFirstModule = true;
