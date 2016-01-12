@@ -17,11 +17,13 @@ import org.apache.commons.io.IOUtils;
 import com.liferay.counter.service.CounterLocalServiceUtil;
 import com.liferay.lms.learningactivity.LearningActivityTypeRegistry;
 import com.liferay.lms.model.Course;
+import com.liferay.lms.model.CourseCompetence;
 import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.model.LmsPrefs;
 import com.liferay.lms.model.Module;
 import com.liferay.lms.model.TestAnswer;
 import com.liferay.lms.model.TestQuestion;
+import com.liferay.lms.service.CourseCompetenceLocalServiceUtil;
 import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityLocalServiceUtil;
 import com.liferay.lms.service.LmsPrefsLocalServiceUtil;
@@ -222,8 +224,31 @@ public class CloneCourse implements MessageListener {
 		
 		newCourse.getExpandoBridge().setAttributes(course.getExpandoBridge().getAttributes());
 		//Course newCourse = CourseLocalServiceUtil.addCourse(newCourseName, course.getDescription(), "", "", themeDisplay.getLocale(), today, today, today, layoutSetPrototypeId, serviceContext);
-	
-		
+		if(this.childCourse)
+		{
+			List<CourseCompetence> courseCompetences= CourseCompetenceLocalServiceUtil.findBycourseId(course.getCourseId(), false);
+			for(CourseCompetence courseCompetence:courseCompetences)
+			{
+				long courseCompetenceId = CounterLocalServiceUtil.increment(CourseCompetence.class.getName());
+				CourseCompetence cc = CourseCompetenceLocalServiceUtil.createCourseCompetence(courseCompetenceId);
+				cc.setCourseId(newCourse.getCourseId());
+				cc.setCompetenceId(courseCompetence.getCompetenceId());
+				cc.setCachedModel(courseCompetence.getCondition());
+				cc.setCondition(courseCompetence.getCondition());
+				CourseCompetenceLocalServiceUtil.updateCourseCompetence(cc, true);
+			}
+			courseCompetences= CourseCompetenceLocalServiceUtil.findBycourseId(course.getCourseId(), true);
+			for(CourseCompetence courseCompetence:courseCompetences)
+			{
+				long courseCompetenceId = CounterLocalServiceUtil.increment(CourseCompetence.class.getName());
+				CourseCompetence cc = CourseCompetenceLocalServiceUtil.createCourseCompetence(courseCompetenceId);
+				cc.setCourseId(newCourse.getCourseId());
+				cc.setCompetenceId(courseCompetence.getCompetenceId());
+				cc.setCachedModel(courseCompetence.getCondition());
+				cc.setCondition(courseCompetence.getCondition());
+				CourseCompetenceLocalServiceUtil.updateCourseCompetence(cc, true);
+			}
+		}
 		Group newGroup = GroupLocalServiceUtil.getGroup(newCourse.getGroupCreatedId());
 		serviceContext.setScopeGroupId(newCourse.getGroupCreatedId());
 		if(this.childCourse)
@@ -278,7 +303,10 @@ public class CloneCourse implements MessageListener {
 			Module newModule;
 			try {
 				newModule = ModuleLocalServiceUtil.createModule(CounterLocalServiceUtil.increment(Module.class.getName()));
-				
+				if(this.childCourse)
+				{
+					newModule.setUuid(module.getUuid());
+				}
 				newModule.setTitle(module.getTitle());
 				newModule.setDescription(module.getDescription());
 				newModule.setGroupId(newCourse.getGroupId());
@@ -328,7 +356,10 @@ public class CloneCourse implements MessageListener {
 				LearningActivity nuevaLarn = null;
 				try {
 					newLearnActivity = LearningActivityLocalServiceUtil.createLearningActivity(CounterLocalServiceUtil.increment(LearningActivity.class.getName()));
-					
+					if(this.childCourse)
+					{
+						newLearnActivity.setUuid(activity.getUuid());
+					}
 					newLearnActivity.setTitle(activity.getTitle());
 					newLearnActivity.setDescription(activity.getDescription());
 					newLearnActivity.setExtracontent(activity.getExtracontent());
