@@ -19,9 +19,9 @@
 <liferay-portlet:renderURL var="searchUUID" />
 
 <aui:form name="searchForm" action="<%=searchUUID %>" method="POST">
-	<aui:input name="uuid" label="checkcertificate.view.title" inlineLabel="false">
-		<span class="checkcertificate-text"><liferay-ui:message key="checkcertificate.view.text" /></span>
-	</aui:input>
+	<label><liferay-ui:message key="checkcertificate.view.title" /></label>
+	<span class="checkcertificate-text"><liferay-ui:message key="checkcertificate.view.text" /></span>
+	<input name="uuid" />
 	<aui:button-row>
 		<aui:button type="submit" value="checkcertificate.view.button"></aui:button>
 	</aui:button-row>
