@@ -150,8 +150,20 @@
 							}else{		
 								List<TestQuestion> questions = TestQuestionLocalServiceUtil.getQuestions(actId);
 								if (useBank){
-									questions = TestQuestionLocalServiceUtil.generateAleatoryQuestions(actId, 0L);
-									LearningActivity bankActivity = LearningActivityLocalServiceUtil.getLearningActivity(questions.get(0).getActId());
+									LearningActivity bankActivity;
+									if( learningTry != null && Validator.isXml(learningTry.getTryResultData()) ){
+										String tryResultData = learningTry.getTryResultData();
+										Document docQuestions = SAXReaderUtil.read(tryResultData);
+										List<Element> xmlQuestions = docQuestions.getRootElement().elements("question");
+										String questionIdString = xmlQuestions.get(0).attributeValue("id");
+										Long questionId = Long.valueOf(questionIdString);
+										TestQuestion testQuestion = TestQuestionLocalServiceUtil.getTestQuestion(questionId);
+										bankActivity = LearningActivityLocalServiceUtil.getLearningActivity(testQuestion.getActId());
+										questions = TestQuestionLocalServiceUtil.getQuestions(bankActivity.getActId());
+									}else{
+										questions = TestQuestionLocalServiceUtil.generateAleatoryQuestions(actId, 0L);
+										bankActivity = LearningActivityLocalServiceUtil.getLearningActivity(questions.get(0).getActId());
+									}
 %>
 									<div class="description-bank">
 										<%=bankActivity.getDescriptionFiltered(themeDisplay.getLocale(),true) %>
