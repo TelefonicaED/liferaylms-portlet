@@ -33,6 +33,9 @@ List<User> usersList	 = new ArrayList<User>();
 List<Team> userTeams  	 = TeamLocalServiceUtil
 								.getUserTeams(	themeDisplay.getUserId(), 
 												themeDisplay.getScopeGroupId());
+//Colección con los id's de Usuario
+Collection<Object> usersCollection = new ArrayList<Object>();
+
 LmsPrefs prefs			 = LmsPrefsLocalServiceUtil
 								.getLmsPrefs(themeDisplay.getCompanyId());
 
@@ -84,9 +87,6 @@ if(theTeam != null) {
 	usersList = UserLocalServiceUtil.search(themeDisplay.getCompanyId(), StringPool.BLANK, 0, 
 											userParams, QueryUtil.ALL_POS, QueryUtil.ALL_POS, obc);
 	
-	//Colección con los id's de Usuario
-	Collection<Object> usersCollection = new ArrayList<Object>(usersList.size());
-	
 	//Usuarios registrados en el curso
 	List<User> registeredUsers = CourseLocalServiceUtil
 									.getStudentsFromCourse(	themeDisplay.getCompanyId(), 
@@ -112,10 +112,14 @@ if(theTeam != null) {
 										.add(PropertyFactoryUtil.forName("passed").eq(new Boolean(false)))
 										.add(PropertyFactoryUtil.forName("userId")
 											.in(usersCollection));
-	
-	finalizados  = CourseResultLocalServiceUtil.dynamicQuery(courseResultsQueryF).size();
-	iniciados 	 = CourseResultLocalServiceUtil.dynamicQuery(courseResultsQueryI).size() + finalizados;
-	
+	if (usersCollection.size() > 0){
+		finalizados  = CourseResultLocalServiceUtil.dynamicQuery(courseResultsQueryF).size();
+		iniciados 	 = CourseResultLocalServiceUtil.dynamicQuery(courseResultsQueryI).size() + finalizados;
+	}else{
+		registered	 = 0;
+		finalizados  = 0;
+		iniciados 	 = 0;
+	}
 }
 
 %>
@@ -129,7 +133,9 @@ if(theTeam != null) {
 	<liferay-portlet:param name="jspPage" value="/html/coursestats/view.jsp" />
 </liferay-portlet:renderURL>
 
-<liferay-ui:icon cssClass='bt_importexport' label="<%= true %>" message="coursestats.csv.export" method="get" url="<%=exportURL%>" />
+<%if (usersCollection.size() > 0 || teamId == 0){ %>
+	<liferay-ui:icon cssClass='bt_importexport' label="<%= true %>" message="coursestats.csv.export" method="get" url="<%=exportURL%>" />
+<%}%>
 
 <aui:form name="recargarTeam" action="<%=recargarTeam%>" method="post">
 	<aui:fieldset>
@@ -168,96 +174,99 @@ if(theTeam != null) {
 <div class="coursestart"><liferay-ui:message key="coursestats.start.course" /> <%= iniciados %> <liferay-ui:message key="coursestats.end.course" /> <%= finalizados %>.</div>
 
 <liferay-ui:search-container  deltaConfigurable="true" emptyResultsMessage="module-empty-results-message" delta="20" >
-	<liferay-ui:search-container-results>
-	<%
-	int containerStart;
-	int containerEnd;
-	try {
-		containerStart = ParamUtil.getInteger(request, "containerStart");
-		containerEnd = ParamUtil.getInteger(request, "containerEnd");
-	} catch (Exception e) {
-		containerStart = searchContainer.getStart();
-		containerEnd = searchContainer.getEnd();
-	}
-	if (containerStart <=0) {
-		containerStart = searchContainer.getStart();
-		containerEnd = searchContainer.getEnd();
-	}
-	
-	List<Module> tempResults = ModuleLocalServiceUtil.findAllInGroup(themeDisplay.getScopeGroupId());
-	results = ListUtil.subList(tempResults, containerStart, containerEnd);
-	total = tempResults.size();
-
-	pageContext.setAttribute("results", results);
-	pageContext.setAttribute("total", total);
-
-	request.setAttribute("containerStart",String.valueOf(containerStart));
-	request.setAttribute("containerEnd",String.valueOf(containerEnd));
-	%>
-
-	</liferay-ui:search-container-results>
-	<liferay-ui:search-container-row className="com.liferay.lms.model.Module"
-		keyProperty="moduleId"
-		modelVar="module"
-	>
-	<%
-	long started = 0;
-	long finished = 0;
-	
-	if (teamId == 0) {
-		started = ModuleResultLocalServiceUtil.countByModuleOnlyStudents(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(), module.getModuleId());
-		finished = ModuleResultLocalServiceUtil.countByModulePassedOnlyStudents(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(),module.getModuleId(),true);
-	}else{
-		started = ModuleResultLocalServiceUtil.countByModuleOnlyStudents(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(), module.getModuleId(), usersList);
-		finished = ModuleResultLocalServiceUtil.countByModulePassedOnlyStudents(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(),module.getModuleId(),true, usersList);
-	}
-	%>
-	<liferay-portlet:renderURL var="viewModuleURL">
-	<liferay-portlet:param name="jspPage" value="/html/coursestats/viewmodule.jsp"></liferay-portlet:param>
-	<liferay-portlet:param name="moduleId" value="<%= Long.toString(module.getModuleId())%>"></liferay-portlet:param>
-	<liferay-portlet:param name="teamId" value="<%= Long.toString(teamId)%>"></liferay-portlet:param>
-	</liferay-portlet:renderURL>
-	<liferay-ui:search-container-column-text name="module"><a href="<%=viewModuleURL%>"><%=module.getTitle(themeDisplay.getLocale()) %></a></liferay-ui:search-container-column-text>
-		<liferay-ui:search-container-column-text  cssClass="date-column" name="coursestats.start.date">
-		<%if(module.getStartDate()!=null)
-			{
-			%>
-		<%=dateFormatDate.format(module.getStartDate()) %>
-		<%
-		}
-		%>
-		</liferay-ui:search-container-column-text>
-			<liferay-ui:search-container-column-text cssClass="date-column" name="coursestats.end.date">
-			<%if(module.getEndDate()!=null)
-			{
-			%>
-			<%=dateFormatDate.format(module.getEndDate()) %>
+	<%if (usersCollection.size() > 0 || teamId == 0){ %>
+		<liferay-ui:search-container-results>
 			<%
+			int containerStart;
+			int containerEnd;
+			try {
+				containerStart = ParamUtil.getInteger(request, "containerStart");
+				containerEnd = ParamUtil.getInteger(request, "containerEnd");
+			} catch (Exception e) {
+				containerStart = searchContainer.getStart();
+				containerEnd = searchContainer.getEnd();
+			}
+			if (containerStart <=0) {
+				containerStart = searchContainer.getStart();
+				containerEnd = searchContainer.getEnd();
+			}
+			
+			List<Module> tempResults = ModuleLocalServiceUtil.findAllInGroup(themeDisplay.getScopeGroupId());
+			results = ListUtil.subList(tempResults, containerStart, containerEnd);
+			total = tempResults.size();
+		
+			pageContext.setAttribute("results", results);
+			pageContext.setAttribute("total", total);
+		
+			request.setAttribute("containerStart",String.valueOf(containerStart));
+			request.setAttribute("containerEnd",String.valueOf(containerEnd));
+			%>
+		</liferay-ui:search-container-results>
+		
+		<liferay-ui:search-container-row className="com.liferay.lms.model.Module"
+			keyProperty="moduleId"
+			modelVar="module"
+		>
+			<%
+			long started = 0;
+			long finished = 0;
+
+			if (teamId == 0) {
+				started = ModuleResultLocalServiceUtil.countByModuleOnlyStudents(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(), module.getModuleId());
+				finished = ModuleResultLocalServiceUtil.countByModulePassedOnlyStudents(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(),module.getModuleId(),true);
+			}else{
+				started = ModuleResultLocalServiceUtil.countByModuleOnlyStudents(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(), module.getModuleId(), usersList);
+				finished = ModuleResultLocalServiceUtil.countByModulePassedOnlyStudents(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(),module.getModuleId(),true, usersList);
 			}
 			%>
-			</liferay-ui:search-container-column-text>
-	
-	<liferay-ui:search-container-column-text cssClass="number-column" name="coursestats.start.student"><%=started %></liferay-ui:search-container-column-text>
-	<liferay-ui:search-container-column-text cssClass="number-column" name="coursestats.end.student"><%=finished %></liferay-ui:search-container-column-text>
-		<%  
-	
-	int totalActivity=0;
-	List<LearningActivity> tempResults = LearningActivityLocalServiceUtil.getLearningActivitiesOfModule(module.getModuleId());
-	totalActivity = tempResults.size();
-	%>
-	<liferay-ui:search-container-column-text cssClass="number-column" name="total.activity"><%=totalActivity %></liferay-ui:search-container-column-text>
-	
-		
-	<% if(module.getPrecedence() != 0) {
-		
-		Module modulePredence = ModuleLocalServiceUtil.getModule(module.getPrecedence());
-	%>
-	<liferay-ui:search-container-column-text name="coursestats.modulestats.dependencies"><%=modulePredence.getTitle(themeDisplay.getLocale()) %></liferay-ui:search-container-column-text>
-	<%}else{ %>
-	<liferay-ui:search-container-column-text name="coursestats.modulestats.dependencies"><%=LanguageUtil.get(locale, "no")%></liferay-ui:search-container-column-text>
+			<liferay-portlet:renderURL var="viewModuleURL">
+			<liferay-portlet:param name="jspPage" value="/html/coursestats/viewmodule.jsp"></liferay-portlet:param>
+			<liferay-portlet:param name="moduleId" value="<%= Long.toString(module.getModuleId())%>"></liferay-portlet:param>
+			<liferay-portlet:param name="teamId" value="<%= Long.toString(teamId)%>"></liferay-portlet:param>
+			</liferay-portlet:renderURL>
+			<liferay-ui:search-container-column-text name="module"><a href="<%=viewModuleURL%>"><%=module.getTitle(themeDisplay.getLocale()) %></a></liferay-ui:search-container-column-text>
+				<liferay-ui:search-container-column-text  cssClass="date-column" name="coursestats.start.date">
+				<%if(module.getStartDate()!=null)
+					{
+					%>
+				<%=dateFormatDate.format(module.getStartDate()) %>
+				<%
+				}
+				%>
+				</liferay-ui:search-container-column-text>
+					<liferay-ui:search-container-column-text cssClass="date-column" name="coursestats.end.date">
+					<%if(module.getEndDate()!=null)
+					{
+					%>
+					<%=dateFormatDate.format(module.getEndDate()) %>
+					<%
+					}
+					%>
+					</liferay-ui:search-container-column-text>
+			
+			<liferay-ui:search-container-column-text cssClass="number-column" name="coursestats.start.student"><%=started %></liferay-ui:search-container-column-text>
+			<liferay-ui:search-container-column-text cssClass="number-column" name="coursestats.end.student"><%=finished %></liferay-ui:search-container-column-text>
+				<%  
+			
+			int totalActivity=0;
+			
+			List<LearningActivity> tempResults = LearningActivityLocalServiceUtil.getLearningActivitiesOfModule(module.getModuleId());
+			totalActivity = tempResults.size();
+			
+			%>
+			<liferay-ui:search-container-column-text cssClass="number-column" name="total.activity"><%=totalActivity %></liferay-ui:search-container-column-text>
+			
+				
+			<% if(module.getPrecedence() != 0) {
+				
+				Module modulePredence = ModuleLocalServiceUtil.getModule(module.getPrecedence());
+			%>
+			<liferay-ui:search-container-column-text name="coursestats.modulestats.dependencies"><%=modulePredence.getTitle(themeDisplay.getLocale()) %></liferay-ui:search-container-column-text>
+			<%}else{ %>
+			<liferay-ui:search-container-column-text name="coursestats.modulestats.dependencies"><%=LanguageUtil.get(locale, "no")%></liferay-ui:search-container-column-text>
+			<%} %>
+		</liferay-ui:search-container-row>
 	<%} %>
 	
-	</liferay-ui:search-container-row>
-	
 	<liferay-ui:search-iterator />
-	</liferay-ui:search-container>
+</liferay-ui:search-container>

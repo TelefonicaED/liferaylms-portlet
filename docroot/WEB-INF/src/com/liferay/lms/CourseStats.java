@@ -154,7 +154,7 @@ public class CourseStats extends MVCPortlet {
 		    //Iniciaron/finalizaron
 		    writer.writeNext(new String[]{LanguageUtil.get(themeDisplay.getLocale(), "coursestats.start.course") +" "+ iniciados + LanguageUtil.get(themeDisplay.getLocale(),"coursestats.end.course") +" "+ finalizados});
 		    
-		    int numCols = 6;
+		    int numCols = 7;
 		    String[] cabeceras = new String[numCols];
 		    
 		    cabeceras[0]=LanguageUtil.get(themeDisplay.getLocale(),"coursestats.module");
@@ -162,7 +162,8 @@ public class CourseStats extends MVCPortlet {
 		    cabeceras[2]=LanguageUtil.get(themeDisplay.getLocale(),"coursestats.modulestats.enddate");
 		    cabeceras[3]=LanguageUtil.get(themeDisplay.getLocale(),"coursestats.start.student");
 		    cabeceras[4]=LanguageUtil.get(themeDisplay.getLocale(),"coursestats.end.student");
-		    cabeceras[5]=LanguageUtil.get(themeDisplay.getLocale(),"coursestats.modulestats.dependencies");
+		    cabeceras[5]=LanguageUtil.get(themeDisplay.getLocale(),"total.activity");
+		    cabeceras[6]=LanguageUtil.get(themeDisplay.getLocale(),"coursestats.modulestats.dependencies");
 		    
 		    writer.writeNext(cabeceras);
 
@@ -173,6 +174,11 @@ public class CourseStats extends MVCPortlet {
 		    	String[] resultados = new String[numCols];
 		    	long started = 0;
 		    	long finished = 0;
+		    	
+		    	int totalActivity=0;
+				
+				List<LearningActivity> actividades = LearningActivityLocalServiceUtil.getLearningActivitiesOfModule(modulo.getModuleId());
+				totalActivity = actividades.size();
 		    	
 		    	if (teamId == 0) {
 		    		started=ModuleResultLocalServiceUtil.countByModuleOnlyStudents(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(), modulo.getModuleId());
@@ -193,7 +199,8 @@ public class CourseStats extends MVCPortlet {
 		    	resultados[2]=sdf.format(modulo.getEndDate());
 		    	resultados[3]=Long.toString(started);
 		    	resultados[4]=Long.toString(finished);
-		    	resultados[5]=moduloBloqueo;
+		    	resultados[5]=Long.toString(totalActivity);
+		    	resultados[6]=moduloBloqueo;
 		        writer.writeNext(resultados);
 		    }
 		    endCsv(resourceResponse, writer);

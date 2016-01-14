@@ -55,6 +55,7 @@ if(teamId != 0) {
 	//Usuarios del equipo
 	usersList = UserLocalServiceUtil.search(themeDisplay.getCompanyId(), StringPool.BLANK, 0, 
 											userParams, QueryUtil.ALL_POS, QueryUtil.ALL_POS, obc);
+	
 	//Usuarios registrados en el curso
 	List<User> registeredUsers = CourseLocalServiceUtil
 									.getStudentsFromCourse(	themeDisplay.getCompanyId(), 
@@ -86,10 +87,11 @@ long finished = 0;
 if (teamId == 0) {
 	started = ModuleResultLocalServiceUtil.countByModuleOnlyStudents(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(), theModule.getModuleId());
 	finished = ModuleResultLocalServiceUtil.countByModulePassedOnlyStudents(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(),theModule.getModuleId(),true);
-}else{
+}else if (usersList.size() > 0){
 	started = ModuleResultLocalServiceUtil.countByModuleOnlyStudents(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(), theModule.getModuleId(), usersList);
 	finished = ModuleResultLocalServiceUtil.countByModulePassedOnlyStudents(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(),theModule.getModuleId(),true, usersList);
 }
+
 	%>
 	<p><liferay-ui:message key="coursestats.modulestats.iniciaron" arguments="<%=new Object[]{started} %>">></liferay-ui:message><br />
 	<%if(theModule.getStartDate()!=null)
@@ -119,117 +121,118 @@ portletURL.setParameter("jspPage","/html/coursestats/viewmodule.jsp");
 portletURL.setParameter("moduleId", String.valueOf(moduleId)); 
 %>			
 <liferay-ui:search-container iteratorURL="<%=portletURL%>" deltaConfigurable="true" emptyResultsMessage="activities-empty-results-message" >
-	<liferay-ui:search-container-results>
-	<%
-	int containerStart;
-	int containerEnd;
-	try {
-		containerStart = ParamUtil.getInteger(request, "containerStart");
-		containerEnd = ParamUtil.getInteger(request, "containerEnd");
-	} catch (Exception e) {
-		containerStart = searchContainer.getStart();
-		containerEnd = searchContainer.getEnd();
-	}
-	if (containerStart <=0) {
-		containerStart = searchContainer.getStart();
-		containerEnd = searchContainer.getEnd();
-	}
-	
-	List<LearningActivity> tempResults = LearningActivityLocalServiceUtil.getLearningActivitiesOfModule(moduleId);
-	results = ListUtil.subList(tempResults, containerStart, containerEnd);
-	total = tempResults.size();
-
-	pageContext.setAttribute("results", results);
-	pageContext.setAttribute("total", total);
-
-	request.setAttribute("containerStart",String.valueOf(containerStart));
-	request.setAttribute("containerEnd",String.valueOf(containerEnd));
-	%>
-
-	</liferay-ui:search-container-results>
-	<liferay-ui:search-container-row className="com.liferay.lms.model.LearningActivity"
-		keyProperty="actId"
-		modelVar="activity"
-	>
-	<%
-	
-	DecimalFormat df = new DecimalFormat("#.#");
-	
-	long astarted = 0;
-	long afinished = 0;
-	long notpassed = 0;
-	
-	if (teamId == 0) {
-		astarted=LearningActivityResultLocalServiceUtil.countStartedOnlyStudents(activity.getActId(), activity.getCompanyId(), activity.getGroupId());
-		afinished=LearningActivityResultLocalServiceUtil.countPassedOnlyStudents(activity.getActId(), activity.getCompanyId(), activity.getGroupId(),true);
-		notpassed=LearningActivityResultLocalServiceUtil.countNotPassedOnlyStudents(activity.getActId(), activity.getCompanyId(), activity.getGroupId());
-	}else{
-		astarted=LearningActivityResultLocalServiceUtil.countStartedOnlyStudents(activity.getActId(), activity.getCompanyId(), activity.getGroupId(), usersList);
-		afinished=LearningActivityResultLocalServiceUtil.countPassedOnlyStudents(activity.getActId(), activity.getCompanyId(), activity.getGroupId(),true, usersList);
-		notpassed=LearningActivityResultLocalServiceUtil.countNotPassedOnlyStudents(activity.getActId(), activity.getCompanyId(), activity.getGroupId(), usersList);
-	}
-	
-	double avgResult=0;
-	if(afinished+notpassed>0)
-	{
-		if (teamId == 0) {
-			avgResult=LearningActivityResultLocalServiceUtil.avgResultOnlyStudents(activity.getActId(), activity.getCompanyId(), activity.getGroupId());	
-		}else{
-			avgResult=LearningActivityResultLocalServiceUtil.avgResultOnlyStudents(activity.getActId(), activity.getCompanyId(), activity.getGroupId(), usersList);
+	<%if (usersList.size() > 0 || teamId == 0){ %>
+		<liferay-ui:search-container-results>
+		<%
+		int containerStart;
+		int containerEnd;
+		try {
+			containerStart = ParamUtil.getInteger(request, "containerStart");
+			containerEnd = ParamUtil.getInteger(request, "containerEnd");
+		} catch (Exception e) {
+			containerStart = searchContainer.getStart();
+			containerEnd = searchContainer.getEnd();
+		}
+		if (containerStart <=0) {
+			containerStart = searchContainer.getStart();
+			containerEnd = searchContainer.getEnd();
 		}
 		
-	}
-	double triesPerUser = 0;
-	if (teamId == 0) {
-		triesPerUser=LearningActivityResultLocalServiceUtil.triesPerUserOnlyStudents(activity.getActId(), activity.getCompanyId(), activity.getGroupId());
-	}else{
-		triesPerUser=LearningActivityResultLocalServiceUtil.triesPerUserOnlyStudents(activity.getActId(), activity.getCompanyId(), activity.getGroupId(), usersList);
-	}
+		List<LearningActivity> tempResults = LearningActivityLocalServiceUtil.getLearningActivitiesOfModule(moduleId);
+		results = ListUtil.subList(tempResults, containerStart, containerEnd);
+		total = tempResults.size();
 	
-	String title=activity.getTitle(themeDisplay.getLocale());
-	int maxNameLength=GetterUtil.getInteger(LanguageUtil.get(pageContext, "coursestats.modulestats.large.name.length"),20);
+		pageContext.setAttribute("results", results);
+		pageContext.setAttribute("total", total);
 	
-	if(title.length()>maxNameLength) {
-		title="<span title='"+title+"'>"+LanguageUtil.format(pageContext, "coursestats.modulestats.large.name", new Object[]{title.subSequence(0, maxNameLength+1)},false)+"</span>";
-	}
-	
-	boolean hasPrecedence = false;
-	if(activity.getPrecedence() > 0)
-		hasPrecedence = true;
+		request.setAttribute("containerStart",String.valueOf(containerStart));
+		request.setAttribute("containerEnd",String.valueOf(containerEnd));
 		%>
-	<liferay-ui:search-container-column-text name="coursestats.modulestats.activity"><%=title %></liferay-ui:search-container-column-text>
-	<% if (activity.getStartdate()==null) { %>
-		<liferay-ui:search-container-column-text cssClass="date-column" name="coursestats.modulestats.activity.start">-</liferay-ui:search-container-column-text>
-	<% } else { %>
-		<liferay-ui:search-container-column-text cssClass="date-column" name="coursestats.modulestats.activity.start"><%=dateFormatDateTime.format(activity.getStartdate()) %></liferay-ui:search-container-column-text>
+	
+		</liferay-ui:search-container-results>
+		<liferay-ui:search-container-row className="com.liferay.lms.model.LearningActivity"
+			keyProperty="actId"
+			modelVar="activity"
+		>
+		<%
+		
+		DecimalFormat df = new DecimalFormat("#.#");
+		
+		long astarted = 0;
+		long afinished = 0;
+		long notpassed = 0;
+		
+		if (teamId == 0) {
+			astarted=LearningActivityResultLocalServiceUtil.countStartedOnlyStudents(activity.getActId(), activity.getCompanyId(), activity.getGroupId());
+			afinished=LearningActivityResultLocalServiceUtil.countPassedOnlyStudents(activity.getActId(), activity.getCompanyId(), activity.getGroupId(),true);
+			notpassed=LearningActivityResultLocalServiceUtil.countNotPassedOnlyStudents(activity.getActId(), activity.getCompanyId(), activity.getGroupId());
+		}else if (usersList.size() > 0){
+			astarted=LearningActivityResultLocalServiceUtil.countStartedOnlyStudents(activity.getActId(), activity.getCompanyId(), activity.getGroupId(), usersList);
+			afinished=LearningActivityResultLocalServiceUtil.countPassedOnlyStudents(activity.getActId(), activity.getCompanyId(), activity.getGroupId(),true, usersList);
+			notpassed=LearningActivityResultLocalServiceUtil.countNotPassedOnlyStudents(activity.getActId(), activity.getCompanyId(), activity.getGroupId(), usersList);
+		}
+		
+		double avgResult=0;
+		if(afinished+notpassed>0)
+		{
+			if (teamId == 0) {
+				avgResult=LearningActivityResultLocalServiceUtil.avgResultOnlyStudents(activity.getActId(), activity.getCompanyId(), activity.getGroupId());	
+			}else if (usersList.size() > 0){
+				avgResult=LearningActivityResultLocalServiceUtil.avgResultOnlyStudents(activity.getActId(), activity.getCompanyId(), activity.getGroupId(), usersList);
+			}
+			
+		}
+		double triesPerUser = 0;
+		if (teamId == 0) {
+			triesPerUser=LearningActivityResultLocalServiceUtil.triesPerUserOnlyStudents(activity.getActId(), activity.getCompanyId(), activity.getGroupId());
+		}else if (usersList.size() > 0){
+			triesPerUser=LearningActivityResultLocalServiceUtil.triesPerUserOnlyStudents(activity.getActId(), activity.getCompanyId(), activity.getGroupId(), usersList);
+		}
+		
+		String title=activity.getTitle(themeDisplay.getLocale());
+		int maxNameLength=GetterUtil.getInteger(LanguageUtil.get(pageContext, "coursestats.modulestats.large.name.length"),20);
+		
+		if(title.length()>maxNameLength) {
+			title="<span title='"+title+"'>"+LanguageUtil.format(pageContext, "coursestats.modulestats.large.name", new Object[]{title.subSequence(0, maxNameLength+1)},false)+"</span>";
+		}
+		
+		boolean hasPrecedence = false;
+		if(activity.getPrecedence() > 0)
+			hasPrecedence = true;
+			%>
+		<liferay-ui:search-container-column-text name="coursestats.modulestats.activity"><%=title %></liferay-ui:search-container-column-text>
+		<% if (activity.getStartdate()==null) { %>
+			<liferay-ui:search-container-column-text cssClass="date-column" name="coursestats.modulestats.activity.start">-</liferay-ui:search-container-column-text>
+		<% } else { %>
+			<liferay-ui:search-container-column-text cssClass="date-column" name="coursestats.modulestats.activity.start"><%=dateFormatDateTime.format(activity.getStartdate()) %></liferay-ui:search-container-column-text>
+		<% } %>
+		
+		
+		<% if (activity.getEnddate()==null) { %>
+			<liferay-ui:search-container-column-text cssClass="date-column" name="coursestats.modulestats.activity.end">-</liferay-ui:search-container-column-text>
+		<% } else { %>
+			<liferay-ui:search-container-column-text cssClass="date-column" name="coursestats.modulestats.activity.end"><%=dateFormatDateTime.format(activity.getEnddate()) %></liferay-ui:search-container-column-text>
+		<% } %>
+		
+		
+		<liferay-ui:search-container-column-text cssClass="number-column" name="coursestats.modulestats.init"><%=astarted %></liferay-ui:search-container-column-text>
+		<liferay-ui:search-container-column-text cssClass="number-column" name="coursestats.modulestats.passed"><%=afinished %></liferay-ui:search-container-column-text>
+		<liferay-ui:search-container-column-text cssClass="number-column" name="coursestats.modulestats.failed"><%=notpassed %></liferay-ui:search-container-column-text>
+		
+		<liferay-ui:search-container-column-text cssClass="number-column" name="coursestats.modulestats.trials.average"><%=df.format(triesPerUser) %></liferay-ui:search-container-column-text>
+		<liferay-ui:search-container-column-text cssClass="number-column" name="coursestats.modulestats.marks.average"><%=df.format(avgResult) %></liferay-ui:search-container-column-text>
+		<liferay-ui:search-container-column-text cssClass="number-column" name="coursestats.modulestats.pass.mark"><%=df.format(activity.getPasspuntuation()) %></liferay-ui:search-container-column-text>	
+		<liferay-ui:search-container-column-text cssClass="number-column"  name="coursestats.modulestats.trials.numbers"><%=numberFormat.format(activity.getTries()) %></liferay-ui:search-container-column-text>
+		<liferay-ui:search-container-column-text name="coursestats.modulestats.dependencies"><%=LanguageUtil.get(pageContext, "dependencies."+String.valueOf(hasPrecedence)) %></liferay-ui:search-container-column-text>
+		<liferay-ui:search-container-column-text name="coursestats.modulestats.type"><%=LanguageUtil.get(pageContext,classTypes.get((long)activity.getTypeId())) %></liferay-ui:search-container-column-text>
+		<liferay-ui:search-container-column-text name="coursestats.modulestats.obligatory"><%=activity.getWeightinmodule() == 1 ? LanguageUtil.get(locale, "yes"):LanguageUtil.get(locale, "no") %></liferay-ui:search-container-column-text>
+		<% //if (activity.getTypeId()!=8 && activity.getTypeId()!=9 && activity.getTypeId()!=7){ %>
+		<%// liferay-ui:search-container-column-jsp name=" " align="right" path="/html/coursestats/viewextras.jsp" /%>
+		<% //} else {%>
+		<% //liferay-ui:search-container-column-text>&nbsp</liferay-ui:search-container-column-text%>
+		
+		<% //} %>
+		</liferay-ui:search-container-row>
 	<% } %>
-	
-	
-	<% if (activity.getEnddate()==null) { %>
-		<liferay-ui:search-container-column-text cssClass="date-column" name="coursestats.modulestats.activity.end">-</liferay-ui:search-container-column-text>
-	<% } else { %>
-		<liferay-ui:search-container-column-text cssClass="date-column" name="coursestats.modulestats.activity.end"><%=dateFormatDateTime.format(activity.getEnddate()) %></liferay-ui:search-container-column-text>
-	<% } %>
-	
-	
-	<liferay-ui:search-container-column-text cssClass="number-column" name="coursestats.modulestats.init"><%=astarted %></liferay-ui:search-container-column-text>
-	<liferay-ui:search-container-column-text cssClass="number-column" name="coursestats.modulestats.passed"><%=afinished %></liferay-ui:search-container-column-text>
-	<liferay-ui:search-container-column-text cssClass="number-column" name="coursestats.modulestats.failed"><%=notpassed %></liferay-ui:search-container-column-text>
-	
-	<liferay-ui:search-container-column-text cssClass="number-column" name="coursestats.modulestats.trials.average"><%=df.format(triesPerUser) %></liferay-ui:search-container-column-text>
-	<liferay-ui:search-container-column-text cssClass="number-column" name="coursestats.modulestats.marks.average"><%=df.format(avgResult) %></liferay-ui:search-container-column-text>
-	<liferay-ui:search-container-column-text cssClass="number-column" name="coursestats.modulestats.pass.mark"><%=df.format(activity.getPasspuntuation()) %></liferay-ui:search-container-column-text>	
-	<liferay-ui:search-container-column-text cssClass="number-column"  name="coursestats.modulestats.trials.numbers"><%=numberFormat.format(activity.getTries()) %></liferay-ui:search-container-column-text>
-	<liferay-ui:search-container-column-text name="coursestats.modulestats.dependencies"><%=LanguageUtil.get(pageContext, "dependencies."+String.valueOf(hasPrecedence)) %></liferay-ui:search-container-column-text>
-	<liferay-ui:search-container-column-text name="coursestats.modulestats.type"><%=LanguageUtil.get(pageContext,classTypes.get((long)activity.getTypeId())) %></liferay-ui:search-container-column-text>
-	<liferay-ui:search-container-column-text name="coursestats.modulestats.obligatory"><%=activity.getWeightinmodule() == 1 ? LanguageUtil.get(locale, "yes"):LanguageUtil.get(locale, "no") %></liferay-ui:search-container-column-text>
-	<% //if (activity.getTypeId()!=8 && activity.getTypeId()!=9 && activity.getTypeId()!=7){ %>
-	<%// liferay-ui:search-container-column-jsp name=" " align="right" path="/html/coursestats/viewextras.jsp" /%>
-	<% //} else {%>
-	<% //liferay-ui:search-container-column-text>&nbsp</liferay-ui:search-container-column-text%>
-	
-	<% //} %>
-	</liferay-ui:search-container-row>
-	
 	<liferay-ui:search-iterator />
-	</liferay-ui:search-container>
+</liferay-ui:search-container>
