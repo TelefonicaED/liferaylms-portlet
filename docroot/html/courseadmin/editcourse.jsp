@@ -188,6 +188,8 @@ boolean showIconCourse = preferences.getValue("showIconCourse", "true").equals("
 
 boolean showPermission = preferences.getValue("showPermission", "true").equals("true");
 
+boolean showCoursePermission = preferences.getValue("showCoursePermission", "true").equals("true");
+
 String welcomeSubject= new String();
 String goodbyeSubject = new String();
 if(course!=null)
@@ -638,7 +640,11 @@ else
 					classPK="<%= courseId %>" assetEntryId="<%=assetEntryId %>" 	/>
 	</aui:fieldset>
 	</liferay-ui:panel>
-	<c:if test="<%=courseId==0%>">
+	
+	<c:if test="<%=courseId==0 && showCoursePermission%>">
+	
+		
+	
 		<liferay-ui:panel title="permissions" collapsible="true" defaultState="closed">
 		
 			<liferay-ui:input-permissions modelName="<%= com.liferay.lms.model.Course.class.getName() %>">

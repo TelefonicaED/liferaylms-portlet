@@ -63,6 +63,7 @@ public class CourseAdminConfigurationAction implements ConfigurationAction {
 		portletPreferences.setValue("showCalendar",	Boolean.toString(ParamUtil.getBoolean(actionRequest, "showCalendar",	false)));
 
 		portletPreferences.setValue("showIconCourse",Boolean.toString(ParamUtil.getBoolean(actionRequest, "showIconCourse",	true)));
+		portletPreferences.setValue("showCoursePermission",Boolean.toString(ParamUtil.getBoolean(actionRequest, "showCoursePermission",	true)));
 
 		
 		portletPreferences.store();

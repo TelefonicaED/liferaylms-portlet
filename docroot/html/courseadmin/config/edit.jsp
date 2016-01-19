@@ -44,6 +44,7 @@
 	boolean showOnlyOrganizationUsers = preferences.getValue("showOnlyOrganizationUsers", "false").equals("true");
 	boolean showCalendar 	= preferences.getValue("showCalendar",  "false").equals("true");
 	boolean showIconCourse 	= preferences.getValue("showIconCourse",  "true").equals("true");
+	boolean showCoursePermission = preferences.getValue("showCoursePermission", "true").equals("true");
 
 %>
 
@@ -61,6 +62,7 @@
 		<aui:input type="checkbox" label="num-of-users" name="showMaxUsers" value="<%=preferences.getValue(\"showMaxUsers\", StringPool.TRUE) %>" ignoreRequestValue="true"/>
 		<aui:input type="checkbox" helpMessage="help-inscription-date" label="inscription-date" name="inscriptionDate" value="<%=preferences.getValue(\"showInscriptionDate\", StringPool.TRUE) %>" ignoreRequestValue="true"/>
 		<aui:input type="checkbox" helpMessage="help-published-in-catalog" label="published-in-catalog" name="showcatalog" value="<%=preferences.getValue(\"showcatalog\", StringPool.TRUE) %>" ignoreRequestValue="true"/>
+		<aui:input type="checkbox" name="showCoursePermission" label="courseadmin.config.showCoursePermission" 	value="<%=showCoursePermission %>" checked="<%=showCoursePermission %>"/>	
 	</aui:field-wrapper>
 	
 	<aui:field-wrapper label="courseadmin.config.courseactions" >
