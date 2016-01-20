@@ -61,6 +61,7 @@ if(competence!=null)
 {
 	description=competence.getDescription(themeDisplay.getLocale(),true);
 	template=competence.getDiplomaTemplate(themeDisplay.getLocale(),true);
+	
 	%>
 	<aui:model-context bean="<%= competence %>" model="<%= Competence.class %>" />
 	<%
@@ -76,6 +77,7 @@ else
 <script type="text/javascript">
 	function generateCertificate(){
 		var divTemplate = document.getElementById("<portlet:namespace />templateContainer");
+		
 		if(divTemplate.style.display==='none'){
 			divTemplate.style.display='block';
 		}else{
@@ -110,7 +112,7 @@ else
 		</aui:select>
 		<aui:field-wrapper label="competence.diplomaTemplate">
 				<liferay-ui:input-editor name="template" width="100%" initMethod="initEditorTemplate" />
-				<aui:input name=">template" type="hidden" />
+				<aui:input name="/>template" type="hidden" />
 					<script type="text/javascript">
 	        			function <portlet:namespace />initEditorTemplate() { return "<%= UnicodeFormatter.toString(template) %>"; }
 	   				</script>
@@ -130,7 +132,7 @@ else
 	</liferay-ui:panel>
 	</liferay-ui:panel-container>
 	<aui:button-row>
-		<aui:button type="submit" ></aui:button>	
+		<aui:button type="submit"></aui:button>	
 		<aui:button onClick="<%=cancel %>" type="cancel" />
 	</aui:button-row>
 </aui:form>
