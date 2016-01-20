@@ -300,6 +300,7 @@ public class CloneCourse implements MessageListener {
 		
 		LearningActivityTypeRegistry learningActivityTypeRegistry = new LearningActivityTypeRegistry();
 		List<Module> modules = ModuleLocalServiceUtil.findAllInGroup(groupId);
+		HashMap<Long,Long> correlationActivities = new HashMap<Long, Long>();
 
 		for(Module module:modules){
 			
@@ -321,6 +322,7 @@ public class CloneCourse implements MessageListener {
 			*/
 			
 			Module newModule;
+
 			try {
 				newModule = ModuleLocalServiceUtil.createModule(CounterLocalServiceUtil.increment(Module.class.getName()));
 				
@@ -363,7 +365,6 @@ public class CloneCourse implements MessageListener {
 			}
 			
 			List<LearningActivity> activities = LearningActivityLocalServiceUtil.getLearningActivitiesOfModule(module.getModuleId());
-			HashMap<Long,Long> correlationActivities = new HashMap<Long, Long>();
 			HashMap<Long, Long> pending = new HashMap<Long, Long>();
 			
 			for(LearningActivity activity:activities){
@@ -426,7 +427,6 @@ public class CloneCourse implements MessageListener {
 					
 					
 					long actId = nuevaLarn.getActId();
-					
 					correlationActivities.put(activity.getActId(), actId);
 					
 					boolean visible = ResourcePermissionLocalServiceUtil.hasResourcePermission(siteMemberRole.getCompanyId(), LearningActivity.class.getName(), 
