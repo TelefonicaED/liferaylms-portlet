@@ -57,14 +57,10 @@ else
 }	
 String description="";
 String template="";
-//TODO MODIFICAR AKI
-String css="";
 if(competence!=null)
 {
 	description=competence.getDescription(themeDisplay.getLocale(),true);
 	template=competence.getDiplomaTemplate(themeDisplay.getLocale(),true);
-	//TODO AÑADIR AKI LA RECOGIDA DE DATOS
-	css=competence.getCss();
 	%>
 	<aui:model-context bean="<%= competence %>" model="<%= Competence.class %>" />
 	<%
@@ -78,21 +74,12 @@ else
 %>
 
 <script type="text/javascript">
-<%
-	//TODO AÑADIDO CODIGO PARA OCULTAR
-%>
 	function generateCertificate(){
 		var divTemplate = document.getElementById("<portlet:namespace />templateContainer");
-		var divCss = document.getElementById("<portlet:namespace />cssContainer");
 		if(divTemplate.style.display==='none'){
 			divTemplate.style.display='block';
 		}else{
 			divTemplate.style.display='none';
-		}
-		if(divCss.style.display=='none'){
-			divCss.style.display='block';
-		}else{
-			divCss.style.display='none';
 		}
 	}
 </script>
@@ -142,21 +129,6 @@ else
 	<aui:input name="categories" type="assetCategories" />
 	</liferay-ui:panel>
 	</liferay-ui:panel-container>
-<%	
-	//TODO AÑADIDO
- %>
-	<div id="<portlet:namespace />cssContainer" <c:if test="<%= competence!=null?!competence.getGenerateCertificate():true %>">style="display:none"</c:if> >
-		<aui:field-wrapper label="CSS">
-				<liferay-ui:input-editor name="css" width="100%" initMethod="initEditorCSS" />
-				<aui:input name="css" type="hidden" />
-					<script type="text/javascript">
-	        			function <portlet:namespace />initEditorCSS() { return "<%= UnicodeFormatter.toString(css) %>"; }
-	   				</script>
-		</aui:field-wrapper>
-	</div>
-<%
-	//TODO HASTA AQUI
-%>
 	<aui:button-row>
 		<aui:button type="submit" ></aui:button>	
 		<aui:button onClick="<%=cancel %>" type="cancel" />

@@ -297,7 +297,6 @@
 		<column name="page" type="String" />
         <column name="generateCertificate" type="boolean"></column>
 		<column name="diplomaTemplate" type="String" localized="true"/>
-		<column name="css" type="String" />
 		<finder name="GroupId" return-type="Collection">
 			<finder-column name="groupId" />
 		</finder>

@@ -196,7 +196,6 @@ public class CompetencesAdmin extends MVCPortlet{
 			competence.setDescription(description);
 			competence.setGenerateCertificate(generateCertificate);
 			competence.setDiplomaTemplate(template);
-			competence.setCss(css);
 			competence.setPage(page);
 			try {
 				CompetenceLocalServiceUtil.updateCompetence(competence, serviceContext);
