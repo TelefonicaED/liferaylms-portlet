@@ -57,6 +57,7 @@ import com.liferay.portal.util.PortalUtil;
 import com.liferay.util.VelocityUtil;
 import com.liferay.util.bridges.mvc.MVCPortlet;
 import com.lowagie.text.DocumentException;
+import com.lowagie.text.pdf.BaseFont;
 
 
 public class UserCompetencePortlet extends MVCPortlet {
@@ -121,7 +122,7 @@ public class UserCompetencePortlet extends MVCPortlet {
 		renderRequest.setAttribute("delta", String.valueOf(delta));
 		include(viewJSP, renderRequest, renderResponse);
 	}
-    private void printCertificate(OutputStream out,String uuid,PortletRequest request) throws SystemException, PortalException, IOException
+    private void printCertificate(OutputStream out,String uuid,PortletRequest request) throws SystemException, PortalException, IOException, DocumentException
     {
     	UserCompetence userCompetence=UserCompetenceLocalServiceUtil.findByUuid(uuid);
     	User user=UserLocalServiceUtil.getUser(userCompetence.getUserId());
@@ -223,7 +224,7 @@ public class UserCompetencePortlet extends MVCPortlet {
 				if(log.isDebugEnabled())e.printStackTrace();
 			}
 			
-			String cssurl = GetterUtil.get(PropsUtil.get("com.ted.siele.diploma.file"), StringPool.BLANK);
+			String cssurl = GetterUtil.get(PropsUtil.get("com.ted.siele.diploma.css"), StringPool.BLANK);
 			String imageurl =CompetenceLocalServiceUtil.getBGImageURL( competence, PortalUtil.getHttpServletRequest(request));
 									
 			StringBuffer html = new StringBuffer("<html xmlns=\"http://www.w3.org/1999/xhtml\"><head><style type=\"text/css\">");
@@ -233,7 +234,7 @@ public class UserCompetencePortlet extends MVCPortlet {
 			html.append(imageurl);
 			html.append("') repeat-y top center}");
 			if(!StringPool.BLANK.equals(cssurl)){
-				String css = getFile(cssurl);
+				String css = getFileContent(cssurl);
 				if(css!=null){
 					html.append(css);
 				}
@@ -243,7 +244,12 @@ public class UserCompetencePortlet extends MVCPortlet {
 			html.append("</body></html>");
 				
 			if(log.isDebugEnabled())log.debug(html);
-
+			
+			String listafuentes = GetterUtil.get(PropsUtil.get("com.ted.siele.diploma.fonts"), StringPool.BLANK);
+			String[] fonts = listafuentes.split(",");
+			for (int i = 0; i<fonts.length; i++){
+				renderer.getFontResolver().addFont(getAbsolutePath(fonts[i]),BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
+			}
 			renderer.setDocumentFromString(html.toString());
 
 			renderer.layout(); 
@@ -307,6 +313,8 @@ public class UserCompetencePortlet extends MVCPortlet {
 					if(log.isDebugEnabled())e.printStackTrace();
 				} catch (SystemException e) {
 					if(log.isDebugEnabled())e.printStackTrace();
+				} catch (DocumentException e) {
+					if(log.isDebugEnabled())e.printStackTrace();
 				}
 			}
 		}
@@ -325,7 +333,7 @@ public class UserCompetencePortlet extends MVCPortlet {
 		}
 	}
 	
-	protected String getFile(String filepath) {
+	protected String getFileContent(String filepath) {
 		
 		String absolutePath = System.getProperty("catalina.base")+filepath;
 		StringBuilder sb = new StringBuilder();
@@ -352,5 +360,9 @@ public class UserCompetencePortlet extends MVCPortlet {
 			}
 			return null;
 		}
+	}
+	protected String getAbsolutePath(String filepath) {
+		
+		return System.getProperty("catalina.base")+filepath;
 	}
 }
