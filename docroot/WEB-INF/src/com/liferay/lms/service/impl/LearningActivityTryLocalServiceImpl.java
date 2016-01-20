@@ -361,7 +361,7 @@ public class LearningActivityTryLocalServiceImpl extends LearningActivityTryLoca
 	   						
 	   						
 	   						learningActivityTry.setResult(row.getLong("result"));     
-	   						learningActivityTry.setStartDate(row.getDate("startDate"));
+	   						learningActivityTry.setStartDate(row.getTimestamp("startDate"));
 	   						learningActivityTry. setTryData(row.getString("trydata"));
 	   						learningActivityTry. setTryData(row.getString("tryresultdata"));
 	   						
