@@ -13,6 +13,8 @@ public class AuditingLogFactory
 	static AuditingLog auditLog;
 	public static AuditingLog getAuditLog() throws ClassNotFoundException, InstantiationException, IllegalAccessException
 	{
+		System.out.println("0,5");
+		
 		if(auditLog==null)
 		{
 			Class<?> clase= null;
@@ -23,19 +25,30 @@ public class AuditingLogFactory
 			}
 			auditLog=(AuditingLog)clase.newInstance();
 		}
+
 		return auditLog;
 	}
 	
 	public static void audit(long companyId, long groupId, String className,long classPK,
 			long userId, String action, String extraData)
 			throws SystemException {
+		System.out.println("1");
+		
+		
+		
+		
+		
+
 		audit(companyId, groupId, className, classPK, GetterUtil.DEFAULT_LONG, 
 				userId, action, extraData);
+				
 	}
 	
 	public static void audit(long companyId, long groupId, String className,long classPK,long associationClassPK, 
 			long userId, String action, String extraData)
 			throws SystemException {
+		System.out.println("1,5");	
+		
 		try{
 			if(log.isDebugEnabled())log.debug("audit:"+className+"::"+classPK);
 			getAuditLog().audit(companyId, groupId, className, classPK, associationClassPK, userId, action, extraData);
@@ -46,5 +59,6 @@ public class AuditingLogFactory
 		}catch(InstantiationException ie){
 			if(log.isDebugEnabled())ie.printStackTrace();
 		}
+		
 	}
 }
