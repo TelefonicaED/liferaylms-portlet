@@ -1,3 +1,4 @@
+<%@page import="java.text.DecimalFormat"%>
 <%@page import="com.liferay.portal.kernel.util.PropsKeys"%>
 <%@page import="com.liferay.portal.kernel.util.PrefsPropsUtil"%>
 <%@page import="com.liferay.portal.kernel.util.PropsUtil"%>
@@ -84,9 +85,10 @@ if (fileMaxSize == 0) {
 long MegaBytes = 1024 * 1024;
 
 fileMaxSize /= MegaBytes;
+DecimalFormat milesFormat = new DecimalFormat("###,###");
 %>
 
-<div class="portlet-msg-error"><%= LanguageUtil.format (themeDisplay.getLocale(), "upload-documents-no-larger-than-x-mb", String.valueOf(fileMaxSize)) %></div>
+<div class="portlet-msg-error"><%= LanguageUtil.format (themeDisplay.getLocale(), "upload-documents-no-larger-than-x-mb", milesFormat.format(fileMaxSize)) %></div>
 <aui:form name="fm" action="<%=savescormURL%>"  method="post" enctype="multipart/form-data" >
 
 	<aui:input type="hidden" name="scormId" value="<%=scormId %>" />
