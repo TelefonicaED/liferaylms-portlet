@@ -206,20 +206,14 @@ public class LearningActivityTryPersistenceCassandra extends LearningActivityTry
 		boolean merge) throws SystemException {
 		
 		
-        String endDate ="";
-		if (learningActivityTry.getEndDate() != null) {
-			endDate= learningActivityTry.getEndDate().toString();
-		}
+
 		
 	    BoundStatement boundStatement = new BoundStatement(ExtConexionCassandra.updateLearningActivityTry_Statement);
 			ResultSet results=session.execute(boundStatement.bind(
 					learningActivityTry.getLatId(),
 					learningActivityTry.getActId(),
 					learningActivityTry.getComments(),
-					
-
-					endDate,
-					
+					learningActivityTry.getEndDate(),
 					learningActivityTry.getResult(),     
 					learningActivityTry.getStartDate(),
 					learningActivityTry.getTryData(),
@@ -363,7 +357,7 @@ public class LearningActivityTryPersistenceCassandra extends LearningActivityTry
 	 * @throws SystemException if a system exception occurred
 	 */
 	public int countByact(long actId) throws SystemException {
-		Object[] finderArgs = new Object[] { actId };
+	//	Object[] finderArgs = new Object[] { actId };
 
 		
 	    BoundStatement boundStatement = new BoundStatement(ExtConexionCassandra.countByact_Statement);
@@ -820,25 +814,9 @@ public class LearningActivityTryPersistenceCassandra extends LearningActivityTry
 		learningActivityTry.setUuid(row.getString("uuid_"));
 		learningActivityTry.setLatId(row.getLong("latid"));
 		learningActivityTry.setComments(row.getString("comments"));
-		
-		
-			Date date = null;
-			SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-yyyy");
-			if ( !row.getString("endDate").equals("")){
-				
-			try {
-				date = formatter.parse( row.getString("endDate"));
-			} catch (ParseException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-						learningActivityTry.setEndDate( date);
-			}		
-		
-
-		
+	    learningActivityTry.setEndDate( row.getTimestamp("endDate"));
 		learningActivityTry.setResult(row.getLong("Result"));     
-		learningActivityTry.setStartDate(row.getDate("startDate"));
+		learningActivityTry.setStartDate(row.getTimestamp("startDate"));
 		learningActivityTry. setTryData(row.getString("trydata"));
 		learningActivityTry. setTryData(row.getString("tryresultdata"));
 		return learningActivityTry;

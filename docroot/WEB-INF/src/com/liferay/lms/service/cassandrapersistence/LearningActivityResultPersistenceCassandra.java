@@ -91,17 +91,27 @@ import com.liferay.portlet.social.model.SocialActivity;
 import com.liferay.portlet.social.model.SocialRelation;
 import com.liferay.lms.cassandra.ExtConexionCassandra;
 import com.datastax.driver.core.BoundStatement;
+import com.datastax.driver.core.LocalDate;
 import com.datastax.driver.core.PreparedStatement;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
 
+
+import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
+import com.liferay.portal.kernel.dao.orm.FinderCacheUtil;
+import com.liferay.portal.kernel.dao.orm.FinderPath;
+import com.liferay.portal.kernel.dao.orm.Query;
+import com.liferay.portal.kernel.dao.orm.QueryPos;
+import com.liferay.portal.kernel.dao.orm.QueryUtil;
+
+
 public class LearningActivityResultPersistenceCassandra extends LearningActivityResultPersistenceImpl {
 	
 	
-	Session  session =  ExtConexionCassandra.session;
+	Session  sessionCassandra =  ExtConexionCassandra.session;
     // INSERT  
-	  PreparedStatement insertStatement = session.prepare(
+	  PreparedStatement insertStatement = sessionCassandra.prepare(
 		      "INSERT INTO liferay.auditentry " +
 		      "(auditid, auditdate, companyid, groupid, classname, userid, action, extradata, classpk, association) " +
 		      "VALUES (?, ?, ?, ?, ?,?, ?, ?, ?, ?);");			
@@ -148,7 +158,7 @@ public class LearningActivityResultPersistenceCassandra extends LearningActivity
 			
 			
 		    BoundStatement boundStatement = new BoundStatement(ExtConexionCassandra.updateLearningActivityResult_Statement);
-				ResultSet results=session.execute(boundStatement.bind(
+				ResultSet results=sessionCassandra.execute(boundStatement.bind(
 						learningActivityResult.getUuid(),
 						learningActivityResult.getLarId(),
 						learningActivityResult.getActId(),
@@ -291,6 +301,29 @@ public class LearningActivityResultPersistenceCassandra extends LearningActivity
 		@Override
 		public LearningActivityResult remove(Serializable primaryKey)
 			throws NoSuchLearningActivityResultException, SystemException {
+			
+			
+			//Find LearningActivityResult
+			
+			LearningActivityResult learningActivityResult = null;
+		    BoundStatement boundStatement = new BoundStatement(ExtConexionCassandra.searchBylar_Statement);
+				ResultSet results=sessionCassandra.execute(boundStatement.bind(primaryKey));
+				List<Row> rows=results.all();
+				if(rows.size()>0){
+					for(int i=0;i<rows.size();i++){
+						Row row=rows.get(i);
+						learningActivityResult = getLearningActivityResultFromRow(row);
+					}
+				}
+			
+			
+			 boundStatement = new BoundStatement(ExtConexionCassandra.remove_Statement);
+			 results=sessionCassandra.execute(boundStatement.bind(primaryKey));
+				
+
+				return learningActivityResult; 				
+			
+/*
 			Session session = null;
 
 			try {
@@ -319,12 +352,15 @@ public class LearningActivityResultPersistenceCassandra extends LearningActivity
 			finally {
 				closeSession(session);
 			}
+*/			
 		}
 
 		@Override
 		protected LearningActivityResult removeImpl(
 			LearningActivityResult learningActivityResult)
 			throws SystemException {
+			
+			
 			learningActivityResult = toUnwrappedModel(learningActivityResult);
 
 			Session session = null;
@@ -344,6 +380,7 @@ public class LearningActivityResultPersistenceCassandra extends LearningActivity
 			clearCache(learningActivityResult);
 
 			return learningActivityResult;
+*/			
 		}
 
 		@Override
@@ -354,7 +391,7 @@ public class LearningActivityResultPersistenceCassandra extends LearningActivity
 
 			boolean isNew = learningActivityResult.isNew();
 
-			LearningActivityResultModelImpl learningActivityResultModelImpl = (LearningActivityResultModelImpl)learningActivityResult;
+//			LearningActivityResultModelImpl learningActivityResultModelImpl = (LearningActivityResultModelImpl)learningActivityResult;
 
 			if (Validator.isNull(learningActivityResult.getUuid())) {
 				String uuid = PortalUUIDUtil.generate();
@@ -362,6 +399,22 @@ public class LearningActivityResultPersistenceCassandra extends LearningActivity
 				learningActivityResult.setUuid(uuid);
 			}
 
+
+		    BoundStatement boundStatement = new BoundStatement(ExtConexionCassandra.updateLearningActivityResult_Statement);
+				ResultSet results=sessionCassandra.execute(boundStatement.bind(
+						learningActivityResult.getUuid(),
+						learningActivityResult.getLarId(),
+						learningActivityResult.getActId(),
+						learningActivityResult.getUserId(),
+						learningActivityResult.getResult(),
+						learningActivityResult.getStartDate(),						
+						learningActivityResult.getEndDate(),
+						learningActivityResult.getLatId(),
+						learningActivityResult.getComments(),
+						learningActivityResult.getPassed())
+						);
+			
+/*
 			Session session = null;
 
 			try {
@@ -517,6 +570,7 @@ public class LearningActivityResultPersistenceCassandra extends LearningActivity
 						}, learningActivityResult);
 				}
 			}
+*/
 
 			return learningActivityResult;
 		}
@@ -640,7 +694,7 @@ public class LearningActivityResultPersistenceCassandra extends LearningActivity
 			//Search LearningActivityResult
 			LearningActivityResult learningActivityResult = null;
 			BoundStatement boundStatement = new BoundStatement( ExtConexionCassandra.searchBylar_Statement);
-			ResultSet results=session.execute(boundStatement.bind(larId));
+			ResultSet results=sessionCassandra.execute(boundStatement.bind(larId));
 			if(results!=null )		
 			{
 				List<Row> rowlist=results.all();
@@ -1222,7 +1276,7 @@ public class LearningActivityResultPersistenceCassandra extends LearningActivity
 			//Search LearningActivityResul
 			LearningActivityResult learningActivityResult = null;
 			BoundStatement boundStatement = new BoundStatement( ExtConexionCassandra.fetchByact_user );
-			ResultSet results=session.execute(boundStatement.bind(actId,userId));
+			ResultSet results=sessionCassandra.execute(boundStatement.bind(actId,userId));
 			if(results!=null )		
 			{
 				List<Row> rowlist=results.all();
@@ -3091,6 +3145,8 @@ public class LearningActivityResultPersistenceCassandra extends LearningActivity
 		 */
 		public int countByUuid(String uuid) throws SystemException {
 			Object[] finderArgs = new Object[] { uuid };
+			
+/*			
 
 			Long count = (Long)FinderCacheUtil.getResult(FINDER_PATH_COUNT_BY_UUID,
 					finderArgs, this);
@@ -3145,6 +3201,16 @@ public class LearningActivityResultPersistenceCassandra extends LearningActivity
 			}
 
 			return count.intValue();
+*/
+			BoundStatement boundStatement = new BoundStatement(ExtConexionCassandra.countByUuid);
+			ResultSet results=sessionCassandra.execute(boundStatement.bind(uuid));
+			List<Row> rows=results.all();
+			int cont =0;
+			cont = (int) rows.get(0).getLong(0);
+			return cont; 
+			
+			
+			
 		}
 
 		/**
@@ -3205,7 +3271,7 @@ public class LearningActivityResultPersistenceCassandra extends LearningActivity
 			}
 */			
 			BoundStatement boundStatement = new BoundStatement(ExtConexionCassandra.countByact_user);
-			ResultSet results=session.execute(boundStatement.bind(actId,userId));
+			ResultSet results=sessionCassandra.execute(boundStatement.bind(actId,userId));
 			List<Row> rows=results.all();
 			int cont =0;
 			cont = (int) rows.get(0).getLong(0);
@@ -3273,7 +3339,7 @@ public class LearningActivityResultPersistenceCassandra extends LearningActivity
 			return count.intValue();
 */
 			BoundStatement boundStatement = new BoundStatement(ExtConexionCassandra.countByap);
-			ResultSet results=session.execute(boundStatement.bind(actId,passed));
+			ResultSet results=sessionCassandra.execute(boundStatement.bind(actId,passed));
 			List<Row> rows=results.all();
 			int cont =0;
 			cont = (int) rows.get(0).getLong(0);
@@ -3291,6 +3357,7 @@ public class LearningActivityResultPersistenceCassandra extends LearningActivity
 		 */
 		public int countByapd(long actId, boolean passed, Date endDate)
 			throws SystemException {
+/*			
 			Object[] finderArgs = new Object[] { actId, passed, endDate };
 
 			Long count = (Long)FinderCacheUtil.getResult(FINDER_PATH_COUNT_BY_APD,
@@ -3349,6 +3416,15 @@ public class LearningActivityResultPersistenceCassandra extends LearningActivity
 			}
 
 			return count.intValue();
+*/			
+			
+			BoundStatement boundStatement = new BoundStatement(ExtConexionCassandra.countByap_endDate);
+			ResultSet results=sessionCassandra.execute(boundStatement.bind(actId,passed,endDate));
+			List<Row> rows=results.all();
+			int cont =0;
+			cont = (int) rows.get(0).getLong(0);
+			return cont; 
+			
 		}
 
 		/**
@@ -3359,6 +3435,8 @@ public class LearningActivityResultPersistenceCassandra extends LearningActivity
 		 * @throws SystemException if a system exception occurred
 		 */
 		public int countByac(long actId) throws SystemException {
+			
+/*			
 			Object[] finderArgs = new Object[] { actId };
 
 			Long count = (Long)FinderCacheUtil.getResult(FINDER_PATH_COUNT_BY_AC,
@@ -3402,6 +3480,13 @@ public class LearningActivityResultPersistenceCassandra extends LearningActivity
 			}
 
 			return count.intValue();
+*/		
+			BoundStatement boundStatement = new BoundStatement(ExtConexionCassandra.countByac);
+			ResultSet results=sessionCassandra.execute(boundStatement.bind(actId));
+			List<Row> rows=results.all();
+			int cont =0;
+			cont = (int) rows.get(0).getLong(0);
+			return cont;			
 		}
 
 		/**
@@ -3412,6 +3497,7 @@ public class LearningActivityResultPersistenceCassandra extends LearningActivity
 		 * @throws SystemException if a system exception occurred
 		 */
 		public int countByuser(long userId) throws SystemException {
+/*			
 			Object[] finderArgs = new Object[] { userId };
 
 			Long count = (Long)FinderCacheUtil.getResult(FINDER_PATH_COUNT_BY_USER,
@@ -3455,6 +3541,13 @@ public class LearningActivityResultPersistenceCassandra extends LearningActivity
 			}
 
 			return count.intValue();
+*/
+			BoundStatement boundStatement = new BoundStatement(ExtConexionCassandra.countByuser);
+			ResultSet results=sessionCassandra.execute(boundStatement.bind(userId));
+			List<Row> rows=results.all();
+			int cont =0;
+			cont = (int) rows.get(0).getLong(0);
+			return cont; 			
 		}
 
 		/**
@@ -3467,6 +3560,7 @@ public class LearningActivityResultPersistenceCassandra extends LearningActivity
 			Long count = (Long)FinderCacheUtil.getResult(FINDER_PATH_COUNT_ALL,
 					FINDER_ARGS_EMPTY, this);
 
+			/*
 			if (count == null) {
 				Session session = null;
 
@@ -3493,6 +3587,13 @@ public class LearningActivityResultPersistenceCassandra extends LearningActivity
 			}
 
 			return count.intValue();
+*/
+			BoundStatement boundStatement = new BoundStatement(ExtConexionCassandra.countAll);
+			ResultSet results=sessionCassandra.execute("");
+			List<Row> rows=results.all();
+			int cont =0;
+			cont = (int) rows.get(0).getLong(0);
+			return cont; 
 		}
 
 		/**
@@ -3620,25 +3721,14 @@ public class LearningActivityResultPersistenceCassandra extends LearningActivity
 			learningActivityResult.setLatId(row.getLong("actId"));
 			learningActivityResult.setComments(row.getString("comments"));
 			
-			
-				Date date = null;
-				SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-yyyy");
-				if ( !row.getString("endDate").equals("")){
-					
-				try {
-					date = formatter.parse( row.getString("endDate"));
-				} catch (ParseException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				learningActivityResult.setEndDate( date);
-				}		
-				learningActivityResult.setUserId(row.getLong("userId"));
-                learningActivityResult.setResult(row.getLong("Result"));     
-                learningActivityResult.setStartDate(row.getDate("startDate"));
-                learningActivityResult. setComments(row.getString("comments"));
-                learningActivityResult. setPassed(row.getBool("pased"));
-                
+     		learningActivityResult.setEndDate( row.getTimestamp("endDate"));
+     		
+			learningActivityResult.setUserId(row.getLong("userId"));
+            learningActivityResult.setResult(row.getLong("Result"));     
+            learningActivityResult.setStartDate(row.getTimestamp("startDate"));
+            learningActivityResult. setComments(row.getString("comments"));
+            learningActivityResult. setPassed(row.getBool("passed"));
+            
 			return learningActivityResult;
 		}				
 
