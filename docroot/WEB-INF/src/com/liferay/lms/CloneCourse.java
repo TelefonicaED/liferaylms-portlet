@@ -8,6 +8,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
@@ -301,9 +302,9 @@ public class CloneCourse implements MessageListener {
 		LearningActivityTypeRegistry learningActivityTypeRegistry = new LearningActivityTypeRegistry();
 		List<Module> modules = ModuleLocalServiceUtil.findAllInGroup(groupId);
 		HashMap<Long,Long> correlationActivities = new HashMap<Long, Long>();
-
+		HashMap<Long,Long> correlationModules = new HashMap<Long, Long>();
+		HashMap<Long,Long> modulesDependencesList = new  HashMap<Long, Long>();
 		for(Module module:modules){
-			
 			/*
 			if(isFirstModule){
 				Calendar c = Calendar.getInstance();
@@ -320,12 +321,17 @@ public class CloneCourse implements MessageListener {
 				cloneTraceStr += "\n\n";
 			}
 			*/
-			
+			System.out.println("module.getPrecedence() "+module.getPrecedence());
 			Module newModule;
 
 			try {
 				newModule = ModuleLocalServiceUtil.createModule(CounterLocalServiceUtil.increment(Module.class.getName()));
+				correlationModules.put(module.getModuleId(), newModule.getModuleId());
 				
+				if(module.getPrecedence()!=0){
+					modulesDependencesList.put(module.getModuleId(),module.getPrecedence());
+				}
+
 				newModule.setTitle(module.getTitle());
 				newModule.setDescription(module.getDescription());
 				newModule.setGroupId(newCourse.getGroupId());
@@ -513,6 +519,19 @@ public class CloneCourse implements MessageListener {
 			}
 			
 		}
+		//Dependencias de modulos
+		System.out.println("modulesDependencesList "+modulesDependencesList.keySet());
+		for(Long id : modulesDependencesList.keySet()){
+			//id del modulo actual
+			Long moduleToBePrecededNew = correlationModules.get(id);
+			Long modulePredecesorIdOld =  modulesDependencesList.get(id);
+			Long modulePredecesorIdNew = correlationModules.get(modulePredecesorIdOld);
+			Module moduleNew = ModuleLocalServiceUtil.getModule(moduleToBePrecededNew);
+			moduleNew.setPrecedence(modulePredecesorIdNew);
+			ModuleLocalServiceUtil.updateModule(moduleNew);
+		}
+		
+		
 		System.out.println(" ENDS!");
 		
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd kk:mm:ss");
