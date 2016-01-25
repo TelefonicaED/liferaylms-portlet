@@ -6,9 +6,16 @@ import java.util.Locale;
 import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.model.LearningActivityResult;
 import com.liferay.lms.model.LearningActivityTry;
+import com.liferay.lms.model.Module;
+import com.liferay.lms.model.ModuleResult;
 import com.liferay.lms.service.ClpSerializer;
+import com.liferay.lms.service.CourseResultLocalServiceUtil;
+import com.liferay.lms.service.LearningActivityLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityResultLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityTryLocalServiceUtil;
+import com.liferay.lms.service.ModuleLocalServiceUtil;
+import com.liferay.lms.service.ModuleResultLocalServiceUtil;
+import com.liferay.lms.service.impl.CourseResultLocalServiceImpl;
 import com.liferay.portal.kernel.bean.PortletBeanLocatorUtil;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
@@ -32,7 +39,6 @@ public class CleanLearningActivityTriesUser extends CleanLearningActivity implem
 
 	@SuppressWarnings("unchecked")
 	public void process() throws Exception{
-
 		ClassLoader classLoader = (ClassLoader) PortletBeanLocatorUtil.locate(ClpSerializer.getServletContextName(),"portletClassLoader");
 		
 		DynamicQuery dq = DynamicQueryFactoryUtil.forClass(LearningActivityResult.class,classLoader)
@@ -53,6 +59,16 @@ public class CleanLearningActivityTriesUser extends CleanLearningActivity implem
 			
 			LearningActivityResultLocalServiceUtil.deleteLearningActivityResult(result);
 		}
+		
+		ModuleResultLocalServiceUtil.update(la.getModuleId(),user.getUserId());
+		
+		ModuleResult mr = ModuleResultLocalServiceUtil.getByModuleAndUser(la.getModuleId(), user.getUserId());
+		
+		CourseResultLocalServiceUtil.update(mr);
+		
+
+		
+		
 	}
 
 	@Override
