@@ -43,7 +43,7 @@ if(actId == 0){
 	
 	List<LearningActivityTry> triesList = LearningActivityTryLocalServiceUtil.getLearningActivityTryByActUser(actId, userId);
 	for(LearningActivityTry larntry:triesList){
-		java.text.SimpleDateFormat sdf=new java.text.SimpleDateFormat("dd/MM/yyyy");
+		java.text.SimpleDateFormat sdf=new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm");
 		sdf.setTimeZone(timeZone);
 		String fecha ="";
 		if(larntry.getEndDate()!=null){

@@ -1,3 +1,4 @@
+<%@page import="java.text.SimpleDateFormat"%>
 <%@page import="com.liferay.lms.service.LearningActivityLocalServiceUtil"%>
 <%@page import="com.liferay.lms.model.LearningActivity"%>
 <%@page import="com.liferay.lms.service.LearningActivityResultLocalServiceUtil"%>
@@ -18,7 +19,7 @@
 
 <%@ include file="/init.jsp" %>
 <%
-
+System.out.println("ASDASDGASUDVASD");
 LearningActivityTry lATry = null;
 LearningActivityResult result = null;
 boolean ownGrade=false;
@@ -73,8 +74,11 @@ if(lATry!=null){
 	catch(DocumentException de)
 	{}
 }
-if(renderRequest.getParameter("studentId")!=null){%>
- <aui:a href="" label="<%=UserLocalServiceUtil.getUserById(ParamUtil.getLong(renderRequest, \"studentId\")).getFullName() %>"></aui:a>
+if(renderRequest.getParameter("studentId")!=null){
+	
+	SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+%>
+ <aui:a href="" label="<%= UserLocalServiceUtil.getUserById(ParamUtil.getLong(renderRequest, \"studentId\")).getFullName()+ \" ( \"+ dateFormat.format(result.getEndDate()) +\" )\"   %>"></aui:a>
 <%
 }
  if(richtext!=null) { %>

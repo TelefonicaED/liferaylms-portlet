@@ -262,8 +262,8 @@ AUI().ready('node','aui-io-request','aui-parse-content','aui-sortable',function(
 				}
 				
 				LearningActivityType learningActivityType = learningActivityTypeRegistry.getLearningActivityType(activity.getTypeId());
-				
 				if (permissionChecker.hasPermission(activity.getGroupId(),LearningActivity.class.getName(),	activity.getActId(), ActionKeys.VIEW)){
+					
 					
 					if((Validator.isNotNull(learningActivityType))&&
 						(!LearningActivityLocalServiceUtil.islocked(activity.getActId(),themeDisplay.getUserId())
