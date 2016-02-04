@@ -1,4 +1,3 @@
-
 <%@page import="com.liferay.portlet.expando.model.ExpandoTableConstants"%>
 <%@page import="com.liferay.portlet.PortletPreferencesFactoryUtil"%>
 <%@page import="javax.portlet.PortletPreferences"%>
@@ -17,13 +16,16 @@ if (Validator.isNotNull(portletResource)) {
 }
     String expandoColumn=prefs.getValue("expandoColumn","");
     String columnValue=ExpandoValueLocalServiceUtil.getData(themeDisplay.getCompanyId(),Course.class.getName(),ExpandoTableConstants.DEFAULT_TABLE_NAME,expandoColumn,course.getCourseId(),"");
-    %>
-   	<%=columnValue %>
+     if(columnValue != null && !"".equals(columnValue)){%>
+   	<%= columnValue %>
     <%
+     }else{
+    	 renderRequest.setAttribute(WebKeys.PORTLET_CONFIGURATOR_VISIBILITY, Boolean.FALSE);
+    	 }
+     
 	
-}
-else
-{
+}else{
 	renderRequest.setAttribute(WebKeys.PORTLET_CONFIGURATOR_VISIBILITY, Boolean.FALSE);
 }
-    %>
+
+%>
