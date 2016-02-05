@@ -326,7 +326,7 @@ public class CourseResultLocalServiceImpl
 	
 	public void resetUser(long userId, long groupCreatedId) throws SystemException, PortalException {
 		Course course = courseLocalService.getCourseByGroupCreatedId(groupCreatedId);
-		CourseResult courseResult = courseResultPersistence.fetchByPrimaryKey(course.getCourseId());
+		CourseResult courseResult = courseResultPersistence.fetchByuc(userId, course.getCourseId());
 		if(courseResult!=null){
 			courseResult.setResult(0);
 			courseResult.setPassed(false);
