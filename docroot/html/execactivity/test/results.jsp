@@ -72,7 +72,7 @@
 			larntry=LearningActivityTryLocalServiceUtil.getLastLearningActivityTryByActivityAndUser(ParamUtil.getLong(request,"actId",0 ), learningActivity.getUserId());
 			request.setAttribute("larntry",larntry);
 		}
-				
+			request.setAttribute("hasFreeQuestion", hasFreeQuestion);	
 		Long tries = learningActivity.getTries();
 		Long userTries = Long.valueOf(LearningActivityTryLocalServiceUtil.getTriesCountByActivityAndUser(learningActivity.getActId(),themeDisplay.getUserId()));
 	

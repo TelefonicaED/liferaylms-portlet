@@ -1,4 +1,7 @@
 
+<%@page import="com.liferay.lms.service.TestQuestionLocalServiceUtil"%>
+<%@page import="com.liferay.lms.service.impl.TestQuestionLocalServiceImpl"%>
+<%@page import="com.liferay.lms.learningactivity.questiontype.FreetextQuestionType"%>
 <%@ include file="/init.jsp" %>
 
 <%@page import="com.liferay.lms.model.LearningActivityTry"%>
@@ -11,7 +14,7 @@
 Long actId = (Long)request.getAttribute("actId");
 LearningActivity learningActivity = (LearningActivity)request.getAttribute("learningActivity");
 LearningActivityTry learnTry = (LearningActivityTry)request.getAttribute("larntry");
-
+boolean hasFreeQuestion = (Boolean) request.getAttribute("hasFreeQuestion");
 LearningActivityResult learnResult = 
 	LearningActivityResultLocalServiceUtil.getByActIdAndUserId(actId,themeDisplay.getUserId());
 String actFeedback=learningActivity.getFeedbackNoCorrect();
@@ -61,16 +64,30 @@ else
 	actFeedback=learningActivity.getFeedbackNoCorrect();
 	if(learningActivity.getTypeId()==3){
 		title = LanguageUtil.get(pageContext,"p2ptask-nosuperada");
-	}else{
-		title = LanguageUtil.get(pageContext,"test-nosuperado");
+	}else{		
+		if(hasFreeQuestion){
+			title = LanguageUtil.get(pageContext,"freetext.result.title");
+		}else{
+			title = LanguageUtil.get(pageContext,"test-nosuperado");
+
+		}
 	}
 
 %>
 <div id="activityResult" style="display:none">
 <h1><%=title %></h1>
-<div id="actfeedback"><%=actFeedback %></div>
-<div id="score" style='<%=(learningActivity.getTypeId()!=0)? "display:none":""%>'>
+
+<%
+		if(hasFreeQuestion){%>
+			<b><liferay-ui:message key="freetext.result.body" /></b>
+			<%}else{%>
+			
+	<div id="actfeedback"><%=actFeedback %></div>
+	<div id="score" style='<%=(learningActivity.getTypeId()!=0)? "display:none":""%>'>
 	<b><liferay-ui:message key="shared-you-guess" /> <%=learnResult.getResult()%>% <liferay-ui:message key="shared-in-tarea" /></b>
+		<%}%>
+
+	
 </div>
 <!--  <a class="button">Ver revisi&oacute;n</a>-->
 <div style='<%=(true)? "display:none":""%>'>
