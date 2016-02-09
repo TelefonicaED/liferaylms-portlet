@@ -20,6 +20,7 @@ import javax.portlet.RenderResponse;
 import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
 
+import org.apache.velocity.tools.generic.DateTool;
 import org.xhtmlrenderer.pdf.ITextRenderer;
 
 import com.liferay.lms.model.Competence;
@@ -46,7 +47,9 @@ import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.portal.kernel.xml.Attribute;
 import com.liferay.portal.kernel.xml.Document;
+import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
 import com.liferay.portal.model.User;
 import com.liferay.portal.model.UserGroupRole;
@@ -147,6 +150,7 @@ public class UserCompetencePortlet extends MVCPortlet {
 			ITextRenderer renderer = new ITextRenderer();
 			Map<String, Object> variables = new HashMap<String, Object>();
 			variables.put("dateFormatDate", dateFormatDate);
+			variables.put("dateTool", new DateTool());
 			variables.put("user", user);
 			variables.put("competence", competence);
 			variables.put("course", course);
@@ -161,7 +165,11 @@ public class UserCompetencePortlet extends MVCPortlet {
 				{
 					try {
 						Document eldoc= SAXReaderUtil.read(extraData);
-						variables.put("extraData", eldoc);
+						Element root = eldoc.getRootElement();
+						List<Element> elements = root.elements();
+						for (Element element : elements) {
+							processElement(element, variables);
+						}
 					} catch (com.liferay.portal.kernel.xml.DocumentException e) {
 						e.printStackTrace();
 					}
@@ -209,7 +217,6 @@ public class UserCompetencePortlet extends MVCPortlet {
 				} 
 				modulesNames.append("</ul>");
 			}
-			
 			variables.put("modules", modules); 
 			variables.put("moduleResults",moduleResults);
 			variables.put("modulesNames", modulesNames);
@@ -364,5 +371,18 @@ public class UserCompetencePortlet extends MVCPortlet {
 	protected String getAbsolutePath(String filepath) {
 		
 		return System.getProperty("catalina.base")+filepath;
+	}
+	protected void processElement(Element element, Map<String, Object> variables){
+		if(element.hasContent()){
+			variables.put(element.getName(), element.getData());
+		}
+		List<Attribute> attributes = element.attributes();
+		for (Attribute attribute : attributes) {
+			variables.put(attribute.getName(), attribute.getValue());
+		}
+		List<Element> elements = element.elements();
+		for (Element ele : elements) {
+			processElement(ele, variables);
+		}
 	}
 }
