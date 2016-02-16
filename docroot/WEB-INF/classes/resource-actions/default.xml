@@ -102,6 +102,33 @@
 	</portlet-resource>
 	
 	<model-resource>
+		<model-name>com.liferay.lms.model.Course</model-name>		
+		<portlet-ref>
+			<portlet-name>CourseComments</portlet-name>
+		</portlet-ref>
+		<permissions>
+			<supports>
+				<action-key>ADD_DISCUSSION</action-key>
+				<action-key>DELETE_DISCUSSION</action-key>
+				<action-key>UPDATE_DISCUSSION</action-key>
+				<action-key>VIEW</action-key>
+			</supports>
+			<site-member-defaults>
+				<action-key>ADD_DISCUSSION</action-key>
+				<action-key>VIEW</action-key>
+			</site-member-defaults>
+			<guest-defaults>
+				<action-key>ADD_DISCUSSION</action-key>
+				<action-key>VIEW</action-key>
+			</guest-defaults>
+			<guest-unsupported>
+				<action-key>DELETE_DISCUSSION</action-key>
+				<action-key>UPDATE_DISCUSSION</action-key>
+			</guest-unsupported>
+		</permissions>
+	</model-resource>
+	
+	<model-resource>
 		<model-name>execactivity</model-name>
 		<portlet-ref>
 			<portlet-name>execactivity</portlet-name>
