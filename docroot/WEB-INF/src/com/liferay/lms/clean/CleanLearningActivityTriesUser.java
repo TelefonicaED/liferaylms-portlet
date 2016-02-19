@@ -74,9 +74,8 @@ public class CleanLearningActivityTriesUser extends CleanLearningActivity implem
 	@Override
 	public void receive(Message message) throws MessageListenerException {
 		Message responseMessage = MessageBusUtil.createResponseMessage(message);
-
 		responseMessage.setPayload("RECEIVED");
-
+		//System.out.println("Received in ClearningActivityTryUsersLMS");
 		try{
 			this.la = (LearningActivity)message.get("learningActivity");
 			this.user = (User)message.get("user");

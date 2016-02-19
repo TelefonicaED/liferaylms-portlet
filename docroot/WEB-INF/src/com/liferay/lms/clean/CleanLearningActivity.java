@@ -53,8 +53,7 @@ public class CleanLearningActivity {
 			if(log.isInfoEnabled())log.info(e.getMessage());
 			if(log.isDebugEnabled())e.printStackTrace();
 		}*/
-		
-		
+		System.out.println("PROCESSTRY "+lat.getActId()+" "+lat.getUserId());
 		LearningActivityResult res= null;
 		try {
 			res = LearningActivityResultLocalServiceUtil.getByActIdAndUserId(lat.getActId(), lat.getUserId());

@@ -208,6 +208,8 @@ public class LmsActivitiesList extends MVCPortlet {
 		long actId = ParamUtil.getLong(uploadRequest, "resId", 0);
 		long moduleId = ParamUtil.getLong(uploadRequest, "resModuleId", 0);
 		long weightinmodule=ParamUtil.getLong(uploadRequest, "weightinmodule", 0);
+		long visibility=ParamUtil.getLong(uploadRequest, "visibility", 0);
+
 		long precedence=ParamUtil.getLong(uploadRequest, "precedence", 0);
 		
 		
@@ -913,20 +915,25 @@ public class LmsActivitiesList extends MVCPortlet {
 	}
 	
 	public void deleteAllURL(ActionRequest actionRequest, ActionResponse actionResponse) throws Exception {
-
+		System.out.println("DENTRO DEL DELETE ALL");
 		long actId = ParamUtil.getInteger(actionRequest, "resId");
 		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(WebKeys.THEME_DISPLAY);    
 		
 		if(log.isDebugEnabled())log.debug(actId); 
 
 		LearningActivity la = LearningActivityLocalServiceUtil.getLearningActivity(actId);
-		
+		System.out.println(la);
 		if(la!=null){
+			System.out.println("ENTRO EN IF");
 			Message message=new Message();
 			message.put("learningActivity",la);
 			message.put("userc",themeDisplay.getUser());
-			MessageBusUtil.sendMessage("liferay/lms/cleanTriesNotPassed", message);
+			message.setResponseId("2222");
+
+			MessageBusUtil.sendSynchronousMessage("liferay/lms/cleanTriesNotPassed", message);
 		}
+		
+		System.out.println("FUERA IF");
 
 		actionResponse.setRenderParameter("resId", String.valueOf(actId));
 		actionResponse.setRenderParameter("califications", String.valueOf(true));

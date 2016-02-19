@@ -16,6 +16,7 @@ import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.messaging.Message;
+import com.liferay.portal.kernel.messaging.MessageBusUtil;
 import com.liferay.portal.kernel.messaging.MessageListener;
 import com.liferay.portal.kernel.messaging.MessageListenerException;
 import com.liferay.portal.model.User;
@@ -33,6 +34,7 @@ public class CleanLearningActivityTriesNotPassed extends CleanLearningActivity i
 	@SuppressWarnings("unchecked")
 	public void process() throws Exception{
 		
+		//System.out.println("DENTRO DEL PROCESS");
 		ClassLoader classLoader = (ClassLoader) PortletBeanLocatorUtil.locate(ClpSerializer.getServletContextName(),"portletClassLoader");
 		
 		//Los resultados que tengan fecha y no est�n aprobados. 
@@ -43,14 +45,16 @@ public class CleanLearningActivityTriesNotPassed extends CleanLearningActivity i
 
 		//List<LearningActivityResult> results = LearningActivityResultUtil.findWithDynamicQuery(dq);
 		List<LearningActivityResult> results = LearningActivityResultLocalServiceUtil.dynamicQuery(dq);
-		
+		//System.out.println("results.size "+results.size());
 		for(LearningActivityResult result:results){
 			if(log.isDebugEnabled())log.debug(" result : " + result.getActId()+", result: "+result.getUserId() +", passed: "+result.getPassed() );
-
+			//System.out.println(" result : " + result.getActId()+", result: "+result.getUserId() +", passed: "+result.getPassed() );
 			List<LearningActivityTry> tries = LearningActivityTryLocalServiceUtil.getLearningActivityTryByActUser(result.getActId(), result.getUserId());
 			
 			for(LearningActivityTry ltry:tries){
 				if(log.isDebugEnabled())log.debug("   try : " + ltry.getLatId()+" - "+ltry.getResult());
+				//System.out.println("   try : " + ltry.getLatId()+" - "+ltry.getResult() );
+
 				processTry(ltry);
 			}
 			
@@ -58,13 +62,16 @@ public class CleanLearningActivityTriesNotPassed extends CleanLearningActivity i
 			
 		}
 		
+		//System.out.println("FINALIZO EL PROECESS");
 		
 	}
 
 	@Override
 	public void receive(Message message) throws MessageListenerException {
-		
+		Message responseMessage = MessageBusUtil.createResponseMessage(message);
+		responseMessage.setPayload("RECEIVED");
 		try{
+			//System.out.println("receive de ClieanNOTPASSED LMS");
 			this.la = (LearningActivity)message.get("learningActivity");
 			this.user = (User)message.get("user");
 			User user = (User)message.get("userc");
@@ -74,6 +81,7 @@ public class CleanLearningActivityTriesNotPassed extends CleanLearningActivity i
 			if(log.isDebugEnabled())log.debug(" LearningActivity: " + la.getTitle(Locale.getDefault()) + " - " + la.getActId() + " - " +user.getFullName());
 			
 			process();
+			MessageBusUtil.sendMessage(responseMessage.getDestinationName(), responseMessage);
 		}catch(Exception e){
 			if(log.isInfoEnabled())log.info(e.getMessage());
 			if(log.isDebugEnabled())e.printStackTrace();
