@@ -851,7 +851,7 @@ public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int e
 			}
 			if(Validator.isNotNull(usersExcluded)) {
 				for(User user: users) {
-					if( !(usersExcluded.contains(user)) && !(students.contains(user)))
+					if( !(usersExcluded.contains(user)) && !(students.contains(user)) && user.isActive())
 						students.add(user);
 				}
 			}
