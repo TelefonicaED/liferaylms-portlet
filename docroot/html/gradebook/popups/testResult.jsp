@@ -102,19 +102,14 @@ if(actId == 0){
 	
 		<% List<TestQuestion> questions=null;
 		
-		if (GetterUtil.getLong(LearningActivityLocalServiceUtil.getExtraContentValue(learningActivity.getActId(),"random"))==0){
-			questions=TestQuestionLocalServiceUtil.getQuestions(learningActivity.getActId());
-		}
-		else{
-			questions= new ArrayList<TestQuestion>();
-			Iterator<Element> nodeItr = SAXReaderUtil.read(larntry.getTryResultData()).getRootElement().elementIterator();
-			while(nodeItr.hasNext()) {
-				Element element = nodeItr.next();
-		         if("question".equals(element.getName())) {
-						questions.add(TestQuestionLocalServiceUtil.getTestQuestion(Long.valueOf(element.attributeValue("id"))));
-		         }
-		    }	
-		}
+		questions= new ArrayList<TestQuestion>();
+		Iterator<Element> nodeItr = SAXReaderUtil.read(larntry.getTryResultData()).getRootElement().elementIterator();
+		while(nodeItr.hasNext()) {
+			Element element = nodeItr.next();
+	         if("question".equals(element.getName())) {
+					questions.add(TestQuestionLocalServiceUtil.getTestQuestion(Long.valueOf(element.attributeValue("id"))));
+	         }
+	    }	
 		
 		for(TestQuestion question:questions){
 			QuestionType qt = new QuestionTypeRegistry().getQuestionType(question.getQuestionType());

@@ -701,4 +701,22 @@ public class LearningActivityTypeClp implements LearningActivityType {
 		return ((Boolean)returnObj);
 	}
 
+	@Override
+	public boolean isAutoCorrect() {
+		Object returnObj = null;
+		try {
+			returnObj = clp.invoke("isAutoCorrect", new Object[] {});
+		}catch (Throwable t) {
+			t = ClpSerializer.translateThrowable(t);
+			if (t instanceof RuntimeException) {
+				throw (RuntimeException)t;
+			}
+			else {
+				throw new RuntimeException(t.getClass().getName() + " is not a valid exception");
+			}
+		}
+		
+		return ((Boolean)returnObj);
+	}
+
 }

@@ -44,4 +44,5 @@ public interface LearningActivityType extends InvokableService
 	public void afterInsertOrUpdate(UploadRequest uploadRequest,PortletResponse portletResponse,LearningActivity learningActivity) throws PortalException,SystemException;
 	public String getPortletId();
 	public void deleteResources(ActionRequest actionRequest,ActionResponse actionResponse,LearningActivity larn) throws PortalException,SystemException,DocumentException,IOException;
+	public boolean isAutoCorrect();
 }
