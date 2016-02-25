@@ -941,11 +941,11 @@ public class LmsActivitiesList extends MVCPortlet {
 	
 	public void deleteURL(ActionRequest actionRequest, ActionResponse actionResponse) throws Exception {
 
-		
 		long actId = ParamUtil.getInteger(actionRequest, "resId");
 		long userId = ParamUtil.getInteger(actionRequest, "userId");
 		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(WebKeys.THEME_DISPLAY);    
-		
+		System.out.println("deleteURLLMS "+actId+" "+userId);
+
 		if(log.isDebugEnabled()){
 			log.debug(actId);
 			log.debug(userId);

@@ -26,9 +26,11 @@ import javax.portlet.RenderResponse;
 import javax.portlet.WindowStateException;
 
 import com.liferay.lms.model.Course;
+import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.model.Module;
 import com.liferay.lms.model.impl.ModuleImpl;
 import com.liferay.lms.service.CourseLocalServiceUtil;
+import com.liferay.lms.service.LearningActivityLocalServiceUtil;
 import com.liferay.lms.service.ModuleLocalServiceUtil;
 import com.liferay.portal.kernel.cache.MultiVMPoolUtil;
 import com.liferay.portal.kernel.exception.NestableException;
@@ -411,7 +413,7 @@ public static String SEPARATOR = "_";
 
 	@ProcessAction(name = "addmodule")
 	public void addmodule(ActionRequest request, ActionResponse response) throws Exception {
-		System.out.println("addmodule");
+		//System.out.println("addmodule");
             Module module = moduleFromRequest(request);
             ArrayList<String> errors = moduleValidator.validatemodule(module, request);
             ThemeDisplay themeDisplay = (ThemeDisplay) request
@@ -454,7 +456,7 @@ public static String SEPARATOR = "_";
 	}
 	
 	private void addmodulePopUp(RenderRequest request, RenderResponse response) throws IOException, PortalException, SystemException  {
-        //System.out.println("addmodulePopUp");
+       // System.out.println("addmodulePopUp");
         //ServiceContext serviceContext = ServiceContextFactory.getInstance( Module.class.getName(), request);
 
 		Module module = moduleFromRequest(request);
@@ -553,6 +555,7 @@ public static String SEPARATOR = "_";
 	}
 	
 	private void editmodulePopUp(RenderRequest request, RenderResponse renderResponse) {
+		//System.out.println("editmodulePopUp");
 		long key = ParamUtil.getLong(request, "resourcePrimKey");
 		if (Validator.isNotNull(key)) {
 			request.setAttribute("moduleId",key);
@@ -618,7 +621,7 @@ public static String SEPARATOR = "_";
         }
 	
 	private void updatemodulePopUp(RenderRequest request, RenderResponse response) throws PortalException, SystemException, IOException {
-        //System.out.println("Dentro de updatemodulePopUp");
+       // System.out.println("Dentro de updatemodulePopUp");
 		Module module = moduleFromRequest(request);
 		request.setAttribute("moduleId",module.getModuleId());
 		request.setAttribute("view", "editmodule");
@@ -680,7 +683,7 @@ public static String SEPARATOR = "_";
 	private Module moduleFromRequest(PortletRequest actRequest) throws PortalException, SystemException {
 		ThemeDisplay themeDisplay = (ThemeDisplay) actRequest.getAttribute(WebKeys.THEME_DISPLAY);
 		UploadPortletRequest request = PortalUtil.getUploadPortletRequest(actRequest);
-
+		//System.out.println("MODULE FROM REQUEST");
 		Module module = null;
         long moduleId=ParamUtil.getLong(request, "resourcePrimKey",0);
         ServiceContext  serviceContext = ServiceContextFactory.getInstance( Module.class.getName(), request);
@@ -807,8 +810,36 @@ public static String SEPARATOR = "_";
 			}
 			module.setIcon(0);
 		}
-
+		
+		updateActivitiesDates( module);
 		return module;
+	}
+	
+	private void updateActivitiesDates(Module module){
+		try {
+			List<LearningActivity> activities = LearningActivityLocalServiceUtil.getLearningActivitiesOfModule(module.getModuleId());
+			
+			for(LearningActivity act: activities){
+				boolean isModifiend = false;
+				if(act.isNullStartDate()){
+					isModifiend = true;
+					act.setStartdate(module.getStartDate());
+				}
+				
+				if(act.isNullEndDate()){
+					isModifiend = true;
+					act.setEnddate(module.getEndDate());
+				}
+				
+				
+				if(isModifiend)LearningActivityLocalServiceUtil.updateLearningActivity(act);
+			}
+			
+		} catch (SystemException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 	}
 
 	public static Object invoke(
