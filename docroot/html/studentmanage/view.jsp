@@ -1,3 +1,4 @@
+<%@page import="com.liferay.lms.service.impl.CourseResultLocalServiceImpl"%>
 <%@page import="com.liferay.portal.util.comparator.UserLastNameComparator"%>
 <%@page import="com.liferay.portal.util.comparator.UserFirstNameComparator"%>
 <%@page import="com.liferay.portal.kernel.dao.orm.CustomSQLParam"%>
@@ -255,7 +256,7 @@ else
 			if(courseResult!=null)
 			{
 				status="started";
-				result=Long.toString(courseResult.getResult());
+				result=CourseResultLocalServiceUtil.translateResult(themeDisplay.getLocale(), courseResult.getResult(), themeDisplay.getScopeGroupId());
 				if(courseResult.getPassedDate()!=null){
 					status="not-passed"	;
 				}
