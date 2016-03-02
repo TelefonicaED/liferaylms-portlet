@@ -22,7 +22,7 @@ import com.liferay.portal.kernel.messaging.MessageListenerException;
 import com.liferay.portal.model.User;
 
 public class CleanLearningActivityTriesNotPassed extends CleanLearningActivity implements MessageListener{
-	Log log = LogFactoryUtil.getLog(CleanLearningActivityTriesUser.class);
+	Log log = LogFactoryUtil.getLog(CleanLearningActivityTriesNotPassed.class);
 	private LearningActivity la = null;
 	private User user = null;
 	private User userc = null;
@@ -33,28 +33,26 @@ public class CleanLearningActivityTriesNotPassed extends CleanLearningActivity i
 
 	@SuppressWarnings("unchecked")
 	public void process() throws Exception{
-		
-		//System.out.println("DENTRO DEL PROCESS");
+		if(log.isDebugEnabled())log.debug("CleanLearningActivityTriesNotPassed process");
+
 		ClassLoader classLoader = (ClassLoader) PortletBeanLocatorUtil.locate(ClpSerializer.getServletContextName(),"portletClassLoader");
 		
 		//Los resultados que tengan fecha y no est�n aprobados. 
 		DynamicQuery dq = DynamicQueryFactoryUtil.forClass(LearningActivityResult.class,classLoader)
 				.add(PropertyFactoryUtil.forName("actId").eq(la.getActId()))
-				.add(PropertyFactoryUtil.forName("passed").ne(true))
-				.add(PropertyFactoryUtil.forName("endDate").isNotNull());
+				.add(PropertyFactoryUtil.forName("passed").ne(true));
+				//.add(PropertyFactoryUtil.forName("endDate").isNotNull());
 
+		if(log.isDebugEnabled())log.debug(dq.toString());
 		//List<LearningActivityResult> results = LearningActivityResultUtil.findWithDynamicQuery(dq);
 		List<LearningActivityResult> results = LearningActivityResultLocalServiceUtil.dynamicQuery(dq);
-		//System.out.println("results.size "+results.size());
+		if(log.isDebugEnabled())log.debug("results LearningActivityResultLocalServiceUtil.dynamicQuery "+results.size());
 		for(LearningActivityResult result:results){
 			if(log.isDebugEnabled())log.debug(" result : " + result.getActId()+", result: "+result.getUserId() +", passed: "+result.getPassed() );
-			//System.out.println(" result : " + result.getActId()+", result: "+result.getUserId() +", passed: "+result.getPassed() );
 			List<LearningActivityTry> tries = LearningActivityTryLocalServiceUtil.getLearningActivityTryByActUser(result.getActId(), result.getUserId());
 			
 			for(LearningActivityTry ltry:tries){
 				if(log.isDebugEnabled())log.debug("   try : " + ltry.getLatId()+" - "+ltry.getResult());
-				//System.out.println("   try : " + ltry.getLatId()+" - "+ltry.getResult() );
-
 				processTry(ltry);
 			}
 			
@@ -68,6 +66,7 @@ public class CleanLearningActivityTriesNotPassed extends CleanLearningActivity i
 
 	@Override
 	public void receive(Message message) throws MessageListenerException {
+		if(log.isDebugEnabled())log.debug("CleanLearningActivityTriesNotPassed receive");
 		Message responseMessage = MessageBusUtil.createResponseMessage(message);
 		responseMessage.setPayload("RECEIVED");
 		try{
