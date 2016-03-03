@@ -149,10 +149,10 @@ public class UserProgress extends MVCPortlet {
 		
 		PdfPTable tbHeader = new PdfPTable(1);
 		tbHeader.setWidthPercentage(100);
-	    PdfPCell cellHeaderImg = new PdfPCell(getLogoImg(request, themeDisplay));
-	    cellHeaderImg.setBorder(PdfCell.NO_BORDER);
-	    cellHeaderImg.setHorizontalAlignment(Element.ALIGN_LEFT);
-	    tbHeader.addCell(cellHeaderImg);
+//	    PdfPCell cellHeaderImg = new PdfPCell(getLogoImg(request, themeDisplay));
+//	    cellHeaderImg.setBorder(PdfCell.NO_BORDER);
+//	    cellHeaderImg.setHorizontalAlignment(Element.ALIGN_LEFT);
+//	    tbHeader.addCell(cellHeaderImg);
 	    PdfPCell cellHeaderTxt = new PdfPCell(paragraph);
 	    cellHeaderTxt.setBorder(PdfCell.NO_BORDER);
 	    cellHeaderTxt.setHorizontalAlignment(Element.ALIGN_LEFT);
@@ -400,22 +400,22 @@ public class UserProgress extends MVCPortlet {
 	}
 
 	
-	private Image getLogoImg(HttpServletRequest request, ThemeDisplay themeDisplay){
-		// Imagen corporativa
-        Image image = null;
-		try { 
-			image = Image.getInstance( request.getRequestURL().toString().replace(request.getRequestURI(),"") + themeDisplay.getCompanyLogo());
-			image.setAlignment(Image.LEFT);
-			image.scaleToFit(800,34);
-			//image.scalePercent(100);
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (BadElementException e) {
-			e.printStackTrace();
-		}
-		
-		return image;
-	}
+//	private Image getLogoImg(HttpServletRequest request, ThemeDisplay themeDisplay){
+//		// Imagen corporativa
+//        Image image = null;
+//		try { 
+//			image = Image.getInstance( request.getRequestURL().toString().replace(request.getRequestURI(),"") + themeDisplay.getCompanyLogo());
+//			image.setAlignment(Image.LEFT);
+//			image.scaleToFit(800,34);
+//			//image.scalePercent(100);
+//		} catch (MalformedURLException e) {
+//			e.printStackTrace();
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		} catch (BadElementException e) {
+//			e.printStackTrace();
+//		}
+//		
+//		return image;
+//	}
 }
