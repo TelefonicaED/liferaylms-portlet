@@ -127,8 +127,13 @@ if(activity.getEnddate() == null){
 	        window,
 	        '<portlet:namespace />checkDataformC',
 	        function (thisForm, thisEditor) {
+				var A = AUI();
+				if(window.CKEDITOR)
+					var descriptionVal = CKEDITOR.instances[thisEditor].getData();
+				else
+					var descriptionVal = A.one('#'+thisEditor).val();
 				
-				var descriptionVal = CKEDITOR.instances[thisEditor].getData();
+				
 				if (descriptionVal == "" || descriptionVal == "<%= StringEscapeUtils.unescapeHtml(textoCorrecion) %>") {
 					alert('<liferay-ui:message key="p2ptask-no-empty-answer" />');
 				}
@@ -143,13 +148,23 @@ if(activity.getEnddate() == null){
 	        window,
 	        '<portlet:namespace />clearText',
 	        function (id) {
-				var desc = CKEDITOR.instances[id].document.getBody().getText();
+				var A = AUI();
+				if (window.CKEDITOR)
+					var idDesc = CKEDITOR.instances[id].document.getBody().getText();
+				else
+					var idDesc = A.one('#'+id).val();
 				
 				var textReplace = "<%= StringEscapeUtils.unescapeHtml(textoCorrecion)  %>";
 				if (desc == textReplace) {
-					CKEDITOR.instances[id].setData("");
-					CKEDITOR.instances[id].focus();
+					if (window.CKEDITOR){
+						CKEDITOR.instances[id].setData("");
+						CKEDITOR.instances[id].focus();
+					}else{
+						A.one('#'+id).set('value',"");
+						A.one('#'+id).focus();
+					}
 				}
+				
 	        },
 	        ['node']
 	);
@@ -161,12 +176,18 @@ if(activity.getEnddate() == null){
 				var A = AUI();
 				var selector = 'form[name="'+formName+'"]';
 				var fileName = A.one(selector).one('input[name="<portlet:namespace />fileName"]').val();
-				var textDesc = CKEDITOR.instances[thisEditor].getData();
+				if(window.CKEDITOR)
+					var textDesc = CKEDITOR.instances[thisEditor].getData();
+				else
+					var textDesc = A.one('#'+thisEditor).val();
 				var textResult = ''; 
 
 				//Se copia el atributo para no modificar el servicio
 				AUI().one(selector).get('<portlet:namespace />description').set('value',textDesc);
-				textDesc = CKEDITOR.instances[thisEditor].document.getBody().getText();
+				if(window.CKEDITOR)
+					textDesc = CKEDITOR.instances[thisEditor].document.getBody().getText();
+				else
+					textDesc = A.one('#'+thisEditor).val();
 				
 				if(	A.one('select[name="<portlet:namespace />resultuser"]') != null){
 					textResult = A.one('select[name="<portlet:namespace />resultuser"]').val();
