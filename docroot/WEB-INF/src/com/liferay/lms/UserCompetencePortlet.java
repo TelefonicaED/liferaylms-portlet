@@ -1,6 +1,7 @@
 package com.liferay.lms;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
@@ -146,7 +147,6 @@ public class UserCompetencePortlet extends MVCPortlet {
 			if(log.isDebugEnabled())log.debug("Enter:"+user.getLocale());
 			
 			CourseResult courseResult = CourseResultLocalServiceUtil.getCourseResultByCourseAndUser(course.getCourseId(), user.getUserId());
-
 			ITextRenderer renderer = new ITextRenderer();
 			Map<String, Object> variables = new HashMap<String, Object>();
 			variables.put("dateFormatDate", dateFormatDate);
@@ -156,7 +156,6 @@ public class UserCompetencePortlet extends MVCPortlet {
 			variables.put("course", course);
 			variables.put("uuid", userCompetence.getUuid());
 			variables.put("userCompetence", userCompetence);
-			
 			if(courseResult!=null)
 			{
 				variables.put("courseResult", courseResult);
@@ -183,7 +182,6 @@ public class UserCompetencePortlet extends MVCPortlet {
 			LmsPrefs lmsprefs=LmsPrefsLocalServiceUtil.getLmsPrefs(themeDisplay.getCompanyId());
 			long teacherRoleId=lmsprefs.getTeacherRole();
 			List<UserGroupRole> teachersGroups=UserGroupRoleLocalServiceUtil.getUserGroupRolesByGroupAndRole(course.getGroupCreatedId(),teacherRoleId);
-			
 			StringBuffer teachersNames = new StringBuffer(StringPool.BLANK);
 			List<User> teachers = new ArrayList<User>();
 			if(teachersGroups!=null){
@@ -200,7 +198,6 @@ public class UserCompetencePortlet extends MVCPortlet {
 				}
 				teachersNames.append("</ul>");
 			}
-
 			StringBuffer modulesNames = new StringBuffer(StringPool.BLANK);
 			List<Module> modules= ModuleLocalServiceUtil.findAllInGroup(course.getGroupCreatedId());
 			Map<Long,ModuleResult> moduleResults=new java.util.HashMap<Long,ModuleResult>();
@@ -233,12 +230,14 @@ public class UserCompetencePortlet extends MVCPortlet {
 			
 			String cssurl = GetterUtil.get(PropsUtil.get("com.ted.siele.diploma.css"), StringPool.BLANK);
 			String imageurl =CompetenceLocalServiceUtil.getBGImageURL( competence, PortalUtil.getHttpServletRequest(request));
-									
 			StringBuffer html = new StringBuffer("<html xmlns=\"http://www.w3.org/1999/xhtml\"><head><style type=\"text/css\">");
 			html.append("@page { size: ");
 			html.append(competence.getPage()); 
 			html.append(" ; background: url('");
-			html.append(imageurl);
+			File file = new File(imageurl);
+			if(file.exists() && !file.isDirectory()){
+				html.append(imageurl);
+			}
 			html.append("') repeat-y top center}");
 			if(!StringPool.BLANK.equals(cssurl)){
 				String css = getFileContent(cssurl);
@@ -258,35 +257,28 @@ public class UserCompetencePortlet extends MVCPortlet {
 				renderer.getFontResolver().addFont(getAbsolutePath(fonts[i]),BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
 			}
 			renderer.setDocumentFromString(html.toString());
-
-			renderer.layout(); 
-			
+			renderer.layout();
 			try {
 				renderer.createPDF(out, false);
 			} catch (DocumentException e) {
 				if(log.isDebugEnabled())e.printStackTrace();
 			}
 			
-			
 			renderer.layout(); 
 			
 			renderer.finishPDF();
-			
 			
 		}else{
 			if(log.isDebugEnabled())log.debug("Nodata!");
 
 			ITextRenderer renderer = new ITextRenderer();
-
 			renderer.setDocumentFromString(StringPool.BLANK);
-
 			renderer.layout(); 
-			
 			renderer.finishPDF();
-			
 		}
-    	
     }
+    
+    
 	public void serveResource(ResourceRequest request, ResourceResponse response) throws PortletException,IOException{
 		
 		Long competenceId = ParamUtil.getLong(request, "competenceId", 0);
@@ -309,7 +301,6 @@ public class UserCompetencePortlet extends MVCPortlet {
 			{
 			 
 				try {
-					
 					
 						OutputStream out = response.getPortletOutputStream();
 						printCertificate(out, userCompetence.getUuid(), request);
