@@ -64,7 +64,9 @@ public class CleanLearningActivityTriesUser extends CleanLearningActivity implem
 		
 		ModuleResult mr = ModuleResultLocalServiceUtil.getByModuleAndUser(la.getModuleId(), user.getUserId());
 		
-		CourseResultLocalServiceUtil.update(mr);
+		//System.out.println("ModuleResult: "+mr);
+		if(mr!=null)CourseResultLocalServiceUtil.update(mr);
+		
 		
 
 		
@@ -74,7 +76,7 @@ public class CleanLearningActivityTriesUser extends CleanLearningActivity implem
 	@Override
 	public void receive(Message message) throws MessageListenerException {
 		Message responseMessage = MessageBusUtil.createResponseMessage(message);
-		responseMessage.setPayload("RECEIVED");
+		responseMessage.setPayload("RECEIVED_CLEAN_TRIES_USER");
 		//System.out.println("Received in ClearningActivityTryUsersLMS");
 		try{
 			this.la = (LearningActivity)message.get("learningActivity");
@@ -86,11 +88,13 @@ public class CleanLearningActivityTriesUser extends CleanLearningActivity implem
 			if(log.isDebugEnabled())log.debug(" LearningActivity: " + la.getTitle(Locale.getDefault()) + " - " + la.getActId() + " - " +user.getFullName());
 			
 			process();
+			
 			MessageBusUtil.sendMessage(responseMessage.getDestinationName(), responseMessage);
 
 		}catch(Exception e){
 			if(log.isInfoEnabled())log.info(e.getMessage());
 			if(log.isDebugEnabled())e.printStackTrace();
+			e.printStackTrace();
 		} finally {
 			endInstance();
 		}

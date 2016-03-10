@@ -19,7 +19,6 @@
 
 <%@ include file="/init.jsp" %>
 <%
-System.out.println("ASDASDGASUDVASD");
 LearningActivityTry lATry = null;
 LearningActivityResult result = null;
 boolean ownGrade=false;
@@ -77,8 +76,9 @@ if(lATry!=null){
 if(renderRequest.getParameter("studentId")!=null){
 	
 	SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+	String dateFormated = (result.getEndDate()!=null)? " ( "+dateFormat.format(result.getEndDate())+" )":"";
 %>
- <aui:a href="" label="<%= UserLocalServiceUtil.getUserById(ParamUtil.getLong(renderRequest, \"studentId\")).getFullName()+ \" ( \"+ dateFormat.format(result.getEndDate()) +\" )\"   %>"></aui:a>
+ <aui:a href="" label="<%= UserLocalServiceUtil.getUserById(ParamUtil.getLong(renderRequest, \"studentId\")).getFullName() + dateFormated   %>"></aui:a>
 <%
 }
  if(richtext!=null) { %>

@@ -37,10 +37,12 @@ import com.liferay.lms.service.LmsPrefsLocalServiceUtil;
 import com.liferay.lms.service.ModuleLocalServiceUtil;
 import com.liferay.lms.service.base.CourseLocalServiceBaseImpl;
 import com.liferay.portal.kernel.bean.PortletBeanLocatorUtil;
+import com.liferay.portal.kernel.dao.orm.CustomSQLParam;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.ProjectionFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
+import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.language.LanguageUtil;
@@ -79,6 +81,8 @@ import com.liferay.portal.service.RoleLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.UserGroupRoleLocalServiceUtil;
 import com.liferay.portal.service.UserLocalServiceUtil;
+import com.liferay.portal.util.comparator.UserFirstNameComparator;
+import com.liferay.portal.util.comparator.UserLastNameComparator;
 import com.liferay.portlet.asset.model.AssetEntry;
 import com.liferay.portlet.asset.model.AssetLinkConstants;
 import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
@@ -830,7 +834,7 @@ public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int e
 	
 	public List<User> getStudentsFromCourse(long companyId, long courseGropupCreatedId) {
 		List<User> students = new ArrayList<User>();
-		List<User> usersExcluded = new ArrayList<User>();
+		//List<User> usersExcluded = new ArrayList<User>();
 		
 		LmsPrefs prefs;
 		try {
@@ -839,7 +843,7 @@ public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int e
 			long teacherRoleId=RoleLocalServiceUtil.getRole(prefs.getTeacherRole()).getRoleId();
 			long editorRoleId=RoleLocalServiceUtil.getRole(prefs.getEditorRole()).getRoleId();
 			
-			List<User> users = UserLocalServiceUtil.getGroupUsers(courseGropupCreatedId);
+			/*List<User> users = UserLocalServiceUtil.getGroupUsers(courseGropupCreatedId);
 			
 			List<UserGroupRole> teachers=UserGroupRoleLocalServiceUtil.getUserGroupRolesByGroupAndRole(courseGropupCreatedId, teacherRoleId);
 			for(UserGroupRole teacher: teachers) {
@@ -849,12 +853,37 @@ public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int e
 			for(UserGroupRole editor: editors) {
 				usersExcluded.add(editor.getUser());
 			}
+			
+			
+			
 			if(Validator.isNotNull(usersExcluded)) {
 				for(User user: users) {
 					if( !(usersExcluded.contains(user)) && !(students.contains(user)) && user.isActive())
 						students.add(user);
 				}
-			}
+			}*/
+			
+			LinkedHashMap<String,Object> params=new LinkedHashMap<String,Object>();			
+
+			params.put("notInCourseRoleTeacherRoleId", new CustomSQLParam("WHERE User_.userId NOT IN "
+		              + " (SELECT UserGroupRole.userId " + "  FROM UserGroupRole "
+		              + "  WHERE  (UserGroupRole.groupId = ?) AND (UserGroupRole.roleId = ?))", new Long[] {
+		            		  courseGropupCreatedId, teacherRoleId }));
+			
+			params.put("notInCourseRoleEditorRoleId", new CustomSQLParam("WHERE User_.userId NOT IN "
+		              + " (SELECT UserGroupRole.userId " + "  FROM UserGroupRole "
+		              + "  WHERE  (UserGroupRole.groupId = ?) AND (UserGroupRole.roleId = ?))", new Long[] {
+		            		  courseGropupCreatedId, editorRoleId }));
+			
+			 params.put("InCourseRoleStu", new CustomSQLParam("WHERE User_.userId  IN "
+		              + " (SELECT Users_Groups.userId " + "  FROM Users_Groups "
+		              + "  WHERE  (Users_Groups.groupId = ?))", new Long[] {
+		            		  courseGropupCreatedId }));
+			 
+			 params.put("isActive", new CustomSQLParam("WHERE User_.status =0",null));
+			
+			students = UserLocalServiceUtil.search(prefs.getCompanyId(), null, null, 
+					null, null, null, 0, params, true, QueryUtil.ALL_POS, QueryUtil.ALL_POS,  new UserLastNameComparator(true));
 			
 		} catch (PortalException e) {
 			e.printStackTrace();

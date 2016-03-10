@@ -103,7 +103,7 @@ if(actId!=0){
 		String urlFile = themeDisplay.getPortalURL()+"/documents/"+dlfile.getGroupId()+"/"+dlfile.getUuid();
 		%>
 		<div class="container-textarea">
-			<textarea rows="6" cols="90" readonly="readonly" ><%=myp2pActivity.getDescription() %></textarea>
+			<textarea rows="6" cols="90" readonly="readonly" ><%= StringEscapeUtils.unescapeHtml(myp2pActivity.getDescription()) %></textarea>
 		</div>
 		<% 
 			int size = Integer.parseInt(String.valueOf(dlfile.getSize()));

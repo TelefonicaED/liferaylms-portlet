@@ -40,6 +40,7 @@ import com.liferay.lms.model.Course;
 import com.liferay.lms.model.CourseCompetence;
 import com.liferay.lms.model.CourseResult;
 import com.liferay.lms.model.LmsPrefs;
+import com.liferay.lms.model.Module;
 import com.liferay.lms.service.CourseCompetenceLocalServiceUtil;
 import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.lms.service.CourseResultLocalServiceUtil;
@@ -682,6 +683,18 @@ public class CourseAdmin extends MVCPortlet {
 			GroupLocalServiceUtil.unsetUserGroups(userId,
 					new long[] { course.getGroupCreatedId() });
 		}
+		LmsPrefs prefs=LmsPrefsLocalServiceUtil.getLmsPrefs(course.getCompanyId());
+		Long teacherRoleId=RoleLocalServiceUtil.getRole(prefs.getTeacherRole()).getRoleId();
+		Long editorRoleId=RoleLocalServiceUtil.getRole(prefs.getEditorRole()).getRoleId();
+		
+		if(roleId == teacherRoleId){
+			AuditingLogFactory.audit(course.getCompanyId(), course.getGroupCreatedId(), Course.class.getName(), 
+					course.getCourseId(),userId, AuditConstants.UNREGISTER, "COURSE_TUTOR_REMOVE");
+		}
+		if(roleId == editorRoleId){
+			AuditingLogFactory.audit(course.getCompanyId(), course.getGroupCreatedId(), Course.class.getName(), 
+					course.getCourseId(),userId, AuditConstants.UNREGISTER, "COURSE_EDITOR_REMOVE");
+		}
 		actionResponse.setRenderParameters(actionRequest.getParameterMap());
 	}
 
@@ -695,6 +708,11 @@ public class CourseAdmin extends MVCPortlet {
 //		long[] userIds=new long[1];
 //		userIds[0]=ParamUtil.getLong(actionRequest, "userId");
 		Course course = CourseLocalServiceUtil.getCourse(courseId);
+		
+		LmsPrefs prefs=LmsPrefsLocalServiceUtil.getLmsPrefs(course.getCompanyId());
+		Long teacherRoleId=RoleLocalServiceUtil.getRole(prefs.getTeacherRole()).getRoleId();
+		Long editorRoleId=RoleLocalServiceUtil.getRole(prefs.getEditorRole()).getRoleId();
+		
 		for (long userId : to) {
 			if (!GroupLocalServiceUtil.hasUserGroup(userId, course.getGroupCreatedId())) {
 				GroupLocalServiceUtil.addUserGroups(userId,	new long[] { course.getGroupCreatedId() });
@@ -703,7 +721,16 @@ public class CourseAdmin extends MVCPortlet {
 			//sendEmail(user, course);
 			}
 			UserGroupRoleLocalServiceUtil.addUserGroupRoles(new long[] { userId }, course.getGroupCreatedId(), roleId);
-		}		
+			
+			if(roleId == teacherRoleId){
+				AuditingLogFactory.audit(course.getCompanyId(), course.getGroupCreatedId(), Course.class.getName(), 
+						course.getCourseId(),userId, AuditConstants.REGISTER, "COURSE_TUTOR_ADD");
+			}
+			if(roleId == editorRoleId){
+				AuditingLogFactory.audit(course.getCompanyId(), course.getGroupCreatedId(), Course.class.getName(), 
+						course.getCourseId(),userId, AuditConstants.REGISTER, "COURSE_EDITOR_ADD");
+			}
+		}	
 		
 		actionResponse.setRenderParameters(actionRequest.getParameterMap());
 	}
@@ -752,6 +779,10 @@ public class CourseAdmin extends MVCPortlet {
 
 		Course course = CourseLocalServiceUtil.getCourse(courseId);
 		
+		LmsPrefs prefs=LmsPrefsLocalServiceUtil.getLmsPrefs(course.getCompanyId());
+		Long teacherRoleId=RoleLocalServiceUtil.getRole(prefs.getTeacherRole()).getRoleId();
+		Long editorRoleId=RoleLocalServiceUtil.getRole(prefs.getEditorRole()).getRoleId();
+		
 		UserLocalServiceUtil.getRoleUserIds(roleId);
 		ThemeDisplay themeDisplay = (ThemeDisplay) actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
 		Role commmanager = RoleLocalServiceUtil.getRole(themeDisplay.getCompanyId(), RoleConstants.SITE_MEMBER);
@@ -771,6 +802,17 @@ public class CourseAdmin extends MVCPortlet {
 
 				UserGroupRoleLocalServiceUtil.deleteUserGroupRoles(
 						new long[] { userGroupRole.getUserId() }, course.getGroupCreatedId(), roleId);
+				
+				
+				if(roleId == teacherRoleId){
+					AuditingLogFactory.audit(course.getCompanyId(), course.getGroupCreatedId(), Course.class.getName(), 
+							course.getCourseId(),userGroupRole.getUserId(), AuditConstants.UNREGISTER, "COURSE_EDITOR_REMOVE");
+				}
+				if(roleId == editorRoleId){
+					AuditingLogFactory.audit(course.getCompanyId(), course.getGroupCreatedId(), Course.class.getName(), 
+							course.getCourseId(),userGroupRole.getUserId(), AuditConstants.UNREGISTER, "COURSE_TUTOR_REMOVE");
+				}
+				
 			}
 			
 			actionResponse.setRenderParameters(actionRequest.getParameterMap());
@@ -789,6 +831,15 @@ public class CourseAdmin extends MVCPortlet {
 				/*for(UserGroupRole userGroupRole:userGroupRoles){
 					if(log.isDebugEnabled())log.debug("Role::"+userGroupRole.getRoleId());
 				}*/
+				
+				if(roleId == teacherRoleId){
+					AuditingLogFactory.audit(course.getCompanyId(), course.getGroupCreatedId(), Course.class.getName(), 
+							course.getCourseId(),user, AuditConstants.UNREGISTER, "COURSE_EDITOR_REMOVE");
+				}
+				if(roleId == editorRoleId){
+					AuditingLogFactory.audit(course.getCompanyId(), course.getGroupCreatedId(), Course.class.getName(), 
+							course.getCourseId(),user, AuditConstants.UNREGISTER, "COURSE_TUTOR_REMOVE");
+				}
 			}
 			//GroupLocalServiceUtil.unsetUserGroups(userGroupRole.getUserId(), new long[] { course.getGroupCreatedId() });
 		}

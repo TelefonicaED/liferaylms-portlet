@@ -36,6 +36,20 @@
 
 <%@ include file="/init.jsp" %>
 
+<% 
+Boolean isTablet = ParamUtil.getBoolean(renderRequest, "isTablet", false);
+
+if(isTablet){%>
+
+	<script src="//code.jquery.com/jquery-1.7.2.min.js" type="text/javascript"></script> 
+	<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js" type="text/javascript"></script>
+		<script src="/liferaylms-portlet/js/jquery.ui.touch-punch.min.js" type="text/javascript"></script> 
+		<script src="/liferaylms-portlet/js/mouse.js" type="text/javascript"></script> 
+
+<%}
+%>
+
+
 	<div class="container-activity">
 <%
 

@@ -321,7 +321,6 @@ public class CloneCourse implements MessageListener {
 				cloneTraceStr += "\n\n";
 			}
 			*/
-			System.out.println("module.getPrecedence() "+module.getPrecedence());
 			Module newModule;
 
 			try {

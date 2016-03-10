@@ -1,3 +1,5 @@
+<%@page import="com.liferay.lms.service.ModuleLocalServiceUtil"%>
+<%@page import="com.liferay.lms.service.CourseLocalServiceUtil"%>
 <%@page import="com.liferay.portal.kernel.util.PrefsPropsUtil"%>
 <%@page import="com.liferay.lms.learningactivity.LearningActivityType"%>
 <%@page import="com.liferay.lms.learningactivity.LearningActivityTypeRegistry"%>
@@ -49,7 +51,8 @@
 </c:if>
 
 <%
-int num = UserLocalServiceUtil.getGroupUsersCount(learnActivity.getGroupId());
+
+int num = CourseLocalServiceUtil.getStudentsFromCourse(CourseLocalServiceUtil.getCourseByGroupCreatedId(learnActivity.getGroupId())).size();
 
 if(num<=100){
 %>
@@ -57,7 +60,7 @@ if(num<=100){
 	
 	   	<liferay-ui:search-container-results>
 			<%
-				List<User> users = UserLocalServiceUtil.getGroupUsers(learnActivity.getGroupId());
+				List<User> users = CourseLocalServiceUtil.getStudentsFromCourse(CourseLocalServiceUtil.getCourseByGroupCreatedId(learnActivity.getGroupId()));
 	
 				pageContext.setAttribute("results", users.subList(searchContainer.getStart(),users.size()<searchContainer.getEnd()?users.size():searchContainer.getEnd()));
 			    pageContext.setAttribute("total", num);
