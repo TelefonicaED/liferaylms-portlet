@@ -827,6 +827,49 @@ public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int e
 		return coursePersistence.findByCompanyId(companyId);
 	}
 	
+	public int getStudentsFromCourseCount(long courseId) throws SystemException, PortalException{
+		Course course = CourseLocalServiceUtil.getCourse(courseId);		
+		int value = 0;
+		LmsPrefs prefs;
+		try {
+			prefs = LmsPrefsLocalServiceUtil.getLmsPrefs(course.getCompanyId());
+			
+			long teacherRoleId=RoleLocalServiceUtil.getRole(prefs.getTeacherRole()).getRoleId();
+			long editorRoleId=RoleLocalServiceUtil.getRole(prefs.getEditorRole()).getRoleId();
+			
+			LinkedHashMap<String,Object> params=new LinkedHashMap<String,Object>();			
+
+			params.put("notInCourseRoleTeacherRoleId", new CustomSQLParam("WHERE User_.userId NOT IN "
+		              + " (SELECT UserGroupRole.userId " + "  FROM UserGroupRole "
+		              + "  WHERE  (UserGroupRole.groupId = ?) AND (UserGroupRole.roleId = ?))", new Long[] {
+		            		  course.getGroupCreatedId(), teacherRoleId }));
+			
+			params.put("notInCourseRoleEditorRoleId", new CustomSQLParam("WHERE User_.userId NOT IN "
+		              + " (SELECT UserGroupRole.userId " + "  FROM UserGroupRole "
+		              + "  WHERE  (UserGroupRole.groupId = ?) AND (UserGroupRole.roleId = ?))", new Long[] {
+		            		  course.getGroupCreatedId(), editorRoleId }));
+			
+			 params.put("InCourseRoleStu", new CustomSQLParam("WHERE User_.userId  IN "
+		              + " (SELECT Users_Groups.userId " + "  FROM Users_Groups "
+		              + "  WHERE  (Users_Groups.groupId = ?))", new Long[] {
+		            		  course.getGroupCreatedId() }));
+			 
+			 params.put("isActive", new CustomSQLParam("WHERE User_.status =0",null));
+			
+			 
+			value =  UserLocalServiceUtil.searchCount(prefs.getCompanyId(), null, null, 
+					null, null, null, 0, params, true);
+			
+		} catch (PortalException e) {
+			e.printStackTrace();
+		} catch (SystemException e) {
+			e.printStackTrace();
+		}
+		
+		
+		return value;
+	}
+	
 	
 	public List<User> getStudentsFromCourse(Course course) {		
 		return getStudentsFromCourse(course.getCompanyId(), course.getGroupCreatedId());
