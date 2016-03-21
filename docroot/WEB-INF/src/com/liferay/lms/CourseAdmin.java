@@ -20,6 +20,7 @@ import java.util.Map;
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
 import javax.portlet.PortletException;
+import javax.portlet.PortletPreferences;
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
 import javax.portlet.ProcessAction;
@@ -855,12 +856,18 @@ public class CourseAdmin extends MVCPortlet {
 
 		UploadPortletRequest request = PortalUtil.getUploadPortletRequest(portletRequest);
 		long courseId = ParamUtil.getLong(portletRequest, "courseId", 0);
+		long companyId= themeDisplay.getCompanyId();
 		long roleId = ParamUtil.getLong(portletRequest, "roleId", 0);
 		String fileName = request.getFileName("fileName");
 		Course course = CourseLocalServiceUtil.getCourse(courseId);
 
 		List<String> errors = new ArrayList<String>();
 		List<Long> users = new ArrayList<Long>();
+		
+		//Comprobamos el tipo de importación
+		PortletPreferences prefs = portletRequest.getPreferences();
+		int tipoImport = Integer.parseInt(prefs.getValue("tipoImport", "1"));
+		boolean hasImportById = (tipoImport != 2);
 
 		if(fileName==null || StringPool.BLANK.equals(fileName)){
 			SessionErrors.add(portletRequest, "courseadmin.importuserrole.csv.fileRequired");
@@ -893,95 +900,104 @@ public class CourseAdmin extends MVCPortlet {
 
 					while ((currLine = reader.readNext()) != null) {
 
-						if( currLine.length > 0 && 
-						   (line++ > 0 || 
-								   (Validator.isNotNull(currLine[0]) && 
-									Validator.isNumber(currLine[0])))) {
-							String userIdStr = currLine[0];
-						
-							if (!userIdStr.equals(StringPool.BLANK)){
-	
-								long userId=0;
-								log.debug("userId:: " + userIdStr.trim() );
-								try {
+						if(currLine.length > 0 && (line++ > 0)) {
+							//Comprobamos errores
+							if(Validator.isNull(currLine[0])){
+								errors.add(LanguageUtil.format(
+											getPortletConfig(),
+											themeDisplay.getLocale(),
+											hasImportById ? 
+													"courseadmin.importuserrole.csvError.user-id-bad-format" :	//Importación por userId
+													"courseadmin.importuserrole.csvError.user-name-bad-format", //Importación por screenName
+											new Object[] { line }, false));
+							}
+							//Importación por userId debe ser un número
+							else if(hasImportById && !Validator.isNumber(currLine[0])){
+								errors.add( LanguageUtil.format(getPortletConfig(),
+											themeDisplay.getLocale(),
+											"courseadmin.importuserrole.csvError.user-id-bad-format", 
+											new Object[] { line }, false));
+							}else{
+								
+								String userIdStr = currLine[0];
+								
+								if (!userIdStr.equals(StringPool.BLANK)){
+		
+									long userId=0;
+									String screenName = "";
 									
-									userId = Long.parseLong(userIdStr.trim());
-									
-									User user = UserLocalServiceUtil.getUser(userId);
-									
-									if(user != null){
-										log.debug("User Name:: " + user.getFullName() );
-										if(!GroupLocalServiceUtil.hasUserGroup(userId, course.getGroupCreatedId())){
-											GroupLocalServiceUtil.addUserGroups(userId, new long[] { course.getGroupCreatedId() });
-											//sendEmail(user, course);
+									try {
+										User user = null;
+										
+										//Importacion por userId
+										if (hasImportById){
+											userId = Long.parseLong(userIdStr.trim());
+											user = UserLocalServiceUtil.getUser(userId);
 										}
-	
-										users.add(userId);
-										/**MIGUEL**/
+										//Importación por screenName
+										else{
+											screenName = userIdStr.trim();
+											user = UserLocalServiceUtil.getUserByScreenName(companyId, screenName);
+										}
 										
-										UserGroupRoleLocalServiceUtil.addUserGroupRoles(new long[] { userId }, course.getGroupCreatedId(), roleId);
-										String allowStartDateStr = currLine[2];
-										String allowEndDateStr = currLine[3];
-										//log.debug(allowStartDateStr);
-										//log.debug(allowEndDateStr);
-										
-										if(allowStartDateStr.trim().length() >0){
-											try{
-												cal.setTime(sdf.parse(allowStartDateStr));
-											}catch(ParseException e){
-												cal.setTime(sdf2.parse(allowStartDateStr));
+										if(user != null){
+											log.debug("User Name:: " + user.getFullName() );
+											if(!GroupLocalServiceUtil.hasUserGroup(user.getUserId(), course.getGroupCreatedId())){
+												GroupLocalServiceUtil.addUserGroups(user.getUserId(), new long[] { course.getGroupCreatedId() });
 											}
-											int startMonth = cal.get(Calendar.MONTH);
-											int startYear = cal.get(Calendar.YEAR);
-											int startDay = cal.get(Calendar.DATE);
-											allowStartDate = PortalUtil.getDate(startMonth, startDay, startYear,0, 0, user.getTimeZone(),new EntryDisplayDateException());
-										}else{
-											allowStartDate=null;
-										}
-										if(allowEndDateStr.trim().length() >0){
-											try{
-												cal.setTime(sdf.parse(allowEndDateStr));
-											}catch(ParseException e){
-												cal.setTime(sdf2.parse(allowEndDateStr));
+		
+											users.add(user.getUserId());
+											
+											UserGroupRoleLocalServiceUtil.addUserGroupRoles(new long[] { user.getUserId() }, course.getGroupCreatedId(), roleId);
+											String allowStartDateStr = currLine[2];
+											String allowEndDateStr = currLine[3];
+											
+											if(allowStartDateStr.trim().length() >0){
+												try{
+													cal.setTime(sdf.parse(allowStartDateStr));
+												}catch(ParseException e){
+													cal.setTime(sdf2.parse(allowStartDateStr));
+												}
+												int startMonth = cal.get(Calendar.MONTH);
+												int startYear = cal.get(Calendar.YEAR);
+												int startDay = cal.get(Calendar.DATE);
+												allowStartDate = PortalUtil.getDate(startMonth, startDay, startYear,0, 0, user.getTimeZone(),new EntryDisplayDateException());
+											}else{
+												allowStartDate=null;
 											}
-											int stopMonth = cal.get(Calendar.MONTH);
-											int stopYear = cal.get(Calendar.YEAR);
-											int stopDay = cal.get(Calendar.DATE);
-											 allowFinishDate = PortalUtil.getDate(stopMonth, stopDay, stopYear,0, 0, user.getTimeZone(),new EntryDisplayDateException());
-										
+											if(allowEndDateStr.trim().length() >0){
+												try{
+													cal.setTime(sdf.parse(allowEndDateStr));
+												}catch(ParseException e){
+													cal.setTime(sdf2.parse(allowEndDateStr));
+												}
+												int stopMonth = cal.get(Calendar.MONTH);
+												int stopYear = cal.get(Calendar.YEAR);
+												int stopDay = cal.get(Calendar.DATE);
+												 allowFinishDate = PortalUtil.getDate(stopMonth, stopDay, stopYear,0, 0, user.getTimeZone(),new EntryDisplayDateException());
+											
+											}else{
+												allowFinishDate=null;
+											}
+											CourseServiceUtil.editUserInscriptionDates(courseId,user.getUserId(),allowStartDate,allowFinishDate);
+											
 										}else{
-											allowFinishDate=null;
+											errors.add(LanguageUtil.format
+															(getPortletConfig(),
+															 themeDisplay.getLocale(),
+															 "courseadmin.importuserrole.csvError.user-id-not-found", 
+															 new Object[] { hasImportById ? userId : screenName }, 
+															 false));
 										}
-										CourseServiceUtil.editUserInscriptionDates(courseId,userId,allowStartDate,allowFinishDate);
-										/**************/
-										
-
-										
-									}else{
-										log.info("User not exits (userId:"+userId+").");
+									} catch (NumberFormatException e) {
+										errors.add(LanguageUtil.format(getPortletConfig(),themeDisplay.getLocale(),"courseadmin.importuserrole.csvError.user-id-bad-format", new Object[] { line }, false));
+									} catch (PortalException e) {
+										errors.add(LanguageUtil.format(getPortletConfig(),themeDisplay.getLocale(),"courseadmin.importuserrole.csvError.user-id-not-found",	new Object[] { hasImportById ? userId : screenName }, false));
+									} catch (Exception e){
+										errors.add(LanguageUtil.get(getPortletConfig(), themeDisplay.getLocale(),"courseadmin.importuserrole.csvError"));
 									}
-									
-									
-								} catch (NumberFormatException e) {
-									if (line > 1)
-										errors.add(LanguageUtil.format(getPortletConfig(),themeDisplay.getLocale(),"courseadmin.importuserrole.csvError.user-id-bad-format", new Object[] { userId }, false));
-								} catch (PortalException e) {
-									errors.add(LanguageUtil.format(getPortletConfig(),themeDisplay.getLocale(),"courseadmin.importuserrole.csvError.user-id-not-found",	new Object[] { userId,userId }, false));
-								} catch (Exception e){
-									errors.add(LanguageUtil.get(getPortletConfig(), themeDisplay.getLocale(),"courseadmin.importuserrole.csvError"));
 								}
 							}
-						}else{
-							if((!Validator.isNotNull(currLine[0]))){
-								errors.add(LanguageUtil.format(getPortletConfig(),themeDisplay.getLocale(),"courseadmin.importuserrole.csvError.user-id-bad-format", new Object[] { currLine[0] }, false));
-
-							}
-							
-							if(!Validator.isNumber(currLine[0]) && line > 1){
-								errors.add(LanguageUtil.format(getPortletConfig(),themeDisplay.getLocale(),"courseadmin.importuserrole.csvError.user-id-bad-format", new Object[] { currLine[0] }, false));
-
-							}
-									
 						}
 					}
 
@@ -1236,6 +1252,11 @@ public class CourseAdmin extends MVCPortlet {
 
 		} 
 		else if(action.equals("export")){
+			// Comprobamos el tipo de importación
+			PortletPreferences preferences = request.getPreferences();
+			int tipoImport = Integer.parseInt(preferences.getValue("tipoImport", "1"));
+			boolean hasImportById = (tipoImport != 2);
+						
 			Role commmanager = null;
 			LmsPrefs prefs = null;
 			try {
@@ -1329,12 +1350,12 @@ public class CourseAdmin extends MVCPortlet {
 			byte b[] = { (byte) 0xEF, (byte) 0xBB, (byte) 0xBF };
 
 			response.getPortletOutputStream().write(b);
-
 			
 			CSVWriter writer = new CSVWriter(new OutputStreamWriter(
 					response.getPortletOutputStream(), StringPool.UTF8),CharPool.SEMICOLON);
 			
-			String[] cabecera = {"Id.Usuario","Nombre de usuario","Fecha Inicio" ,"Fecha Fin"};
+			String[] cabecera = {hasImportById ? "Id.Usuario" : "Nombre Usuario",
+								"Nombre","Fecha Inicio" ,"Fecha Fin"};
 			writer.writeNext(cabecera);
 			
 		    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -1352,7 +1373,12 @@ public class CourseAdmin extends MVCPortlet {
 				fechaIni = (courseResult!=null&&courseResult.getAllowStartDate() != null)?sdf.format(courseResult.getAllowStartDate()):StringPool.BLANK;
 				fechaFin = (courseResult!=null&&courseResult.getAllowFinishDate() != null)?sdf.format(courseResult.getAllowFinishDate()):StringPool.BLANK;
 	
-				String[] resultados = {String.valueOf(user.getUserId()),user.getFullName(),fechaIni ,fechaFin};
+				String[] resultados = { hasImportById ?
+											String.valueOf(user.getUserId()) : 	// Exportación por userId
+											user.getScreenName(), 				// Exportación por screenName
+										user.getFullName(),
+										fechaIni, fechaFin
+				  };
 				writer.writeNext(resultados);
 			}
 

@@ -1,3 +1,5 @@
+<%@page import="com.liferay.portlet.PortletPreferencesFactoryUtil"%>
+<%@page import="javax.portlet.PortletPreferences"%>
 <%@page import="com.liferay.lms.service.ClpSerializer"%>
 <%@page import="com.liferay.portal.kernel.servlet.SessionMessages"%>
 <%@page import="com.liferay.portal.kernel.servlet.SessionErrors"%>
@@ -10,6 +12,16 @@
 
 <%
 String urlExample = "<a href=\"/"+ ClpSerializer.getServletContextName()+"/html/courseadmin/examples/document.csv\">"+LanguageUtil.get(themeDisplay.getLocale(),"example")+"</a>";
+
+PortletPreferences preferences = null;
+String portletResource = ParamUtil.getString(request, "portletResource");
+
+if (Validator.isNotNull(portletResource)) {
+	preferences = PortletPreferencesFactoryUtil.getPortletSetup(request, portletResource);
+}
+else{
+	preferences = renderRequest.getPreferences();
+}
 %>
 
 <portlet:renderURL var="importUsersURL"  windowState="<%= LiferayWindowState.EXCLUSIVE.toString() %>">
@@ -22,7 +34,11 @@ String urlExample = "<a href=\"/"+ ClpSerializer.getServletContextName()+"/html/
 <liferay-ui:header title="courseadmin.importuserrole"></liferay-ui:header>
 
 <liferay-ui:panel id="importuserrole_help" title="help" extended="closed">
-	<%=LanguageUtil.get(themeDisplay.getLocale(),"courseadmin.importuserrole.help") %>
+	<%if(Integer.parseInt(preferences.getValue("tipoImport", "1")) == 1){ %>
+		<%=LanguageUtil.get(themeDisplay.getLocale(),"courseadmin.importuserrole.help") %>
+	<%}else{ %>
+		<%=LanguageUtil.get(themeDisplay.getLocale(),"courseadmin.importuserrole.help.name") %>
+	<%}%>
 </liferay-ui:panel>
 
 <span>
