@@ -154,7 +154,25 @@ try {
 		{
 			
 		%>
-	    	<div id="placeholder_contentIFrame" style="height: 680px; width: 100%;">
+		<script>
+			window.onload = function() {
+				document.getElementById('contentIFrame').onload = function() {
+					setTimeout(function() {
+						var browser = navigator.userAgent.toLowerCase();
+						if (browser.indexOf('firefox') > -1) {
+							var iframeHeight = 680; 
+							iframeHeight = iframeHeight + "px";
+							document.getElementById("placeholder_contentIFrame").style.height = iframeHeight;
+							document.getElementById("contentIFrame").style.height = iframeHeight;
+							
+						}
+					}, 0);
+
+				}
+			};
+				</script>
+
+		<div id="placeholder_contentIFrame" style="height: 680px; width: 100%;">
 	          <iframe id="contentIFrame" style="height:680px; width:100%" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" ></iframe>
 	    </div>
 		
@@ -167,8 +185,9 @@ try {
 	 
 	    	window.onresize=function(event)
 	    	{
+	    		
 	    	    var html = document.documentElement;
-	            height=html.clientHeight;
+	            height= html.clientHeight || html.offsetHeight;
 	    		var nav1=document.getElementById("placeholder_navigationContainer").clientHeight;
 	    		var nav2=document.getElementById("placeholder_navigationContainer2").clientHeight;
 	    		var iframeHeight=height-nav1-nav2-20;
@@ -280,8 +299,7 @@ if(typeof scormembededmode == 'undefined')
 	
 	var finishedscorm=false;
 	var finish_scorm = function(e) 
-	{
-		
+	{		
 		if(!finishedscorm)
 	   	{
 			
@@ -305,6 +323,7 @@ if(typeof scormembededmode == 'undefined')
 		            
 			if (!exception) {
 				// Process Success - A LearningActivityResult returned
+				console.log(message);
 				if (message.passed) {
 					if(window.opener)
 					{
@@ -328,11 +347,12 @@ if(typeof scormembededmode == 'undefined')
 						window.updateScormStatus(message); 
 					}
 				}
+				finishedscorm=true;
 			} else 
 			{
 				// Process Exception
 			}
-			finishedscorm=true;
+			//finishedscorm=true;
 			if(scormembededmode==false)
 			{
 				window.close();

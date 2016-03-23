@@ -1,3 +1,4 @@
+<%@page import="java.util.LinkedList"%>
 <%@page import="com.liferay.lms.service.ModuleResultLocalServiceUtil"%>
 <%@page import="com.liferay.lms.model.ModuleResult"%>
 <%@page import="com.liferay.lms.service.ModuleLocalServiceUtil"%>
@@ -44,8 +45,14 @@
 	<liferay-ui:search-container-results>
 	<% 
 	List<LearningActivity> activities=LearningActivityServiceUtil.getLearningActivitiesOfModule(theModule.getModuleId());
-	pageContext.setAttribute("results", activities);
-    pageContext.setAttribute("total", activities.size());
+	List<LearningActivity> activitiesFiltered = new LinkedList<LearningActivity>();
+	for(LearningActivity act : activities){
+		if (permissionChecker.hasPermission(act.getGroupId(),LearningActivity.class.getName(),	act.getActId(), ActionKeys.VIEW))
+			activitiesFiltered.add(act);
+	}
+	
+		pageContext.setAttribute("results", activitiesFiltered);
+    		pageContext.setAttribute("total", activitiesFiltered.size());
 	%>
 	</liferay-ui:search-container-results>
 	<liferay-ui:search-container-row className="com.liferay.lms.model.LearningActivity" keyProperty="actId" modelVar="learningActivity">

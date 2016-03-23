@@ -136,7 +136,6 @@
 			<script>
 			function updateScormStatus(lar)
 			{
-				
 				gradetext='<p><liferay-ui:message key="activity.your-result" arguments="<%=argumentsfake%>" /></p>';
 				gradetext=gradetext.replace(" __SCORE__ ",lar.result);
 				document.getElementById("scormstatus").innerHTML='<p><liferay-ui:message key="activity-done" /></p>'+gradetext+

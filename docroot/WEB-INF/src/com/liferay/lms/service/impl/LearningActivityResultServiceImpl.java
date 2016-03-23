@@ -124,8 +124,14 @@ public class LearningActivityResultServiceImpl
 	
 	public LearningActivityResult update(long latId, String tryResultData, String imsmanifest) throws PortalException, SystemException
 	{
+		
+		System.out.println("latId "+latId);
+		System.out.println("tryResultData "+tryResultData);
+		System.out.println("imsmanifest "+imsmanifest);
 		User user=this.getUser();
+		System.out.println("user "+user);
 		LearningActivityResult lar = learningActivityResultLocalService.update(latId, tryResultData, imsmanifest, user.getUserId());
+		System.out.println("lar "+lar);
 
 		//auditing
 		ServiceContext serviceContext = ServiceContextThreadLocal.getServiceContext();
@@ -146,10 +152,11 @@ public class LearningActivityResultServiceImpl
 	}
 	public LearningActivityResult updateFinishTry(long latId, String tryResultData, String imsmanifest) throws PortalException, SystemException
 	{
+		System.out.println("updateFinishTry "+latId);
 		LearningActivityTry learningActivityTry = learningActivityTryLocalService.getLearningActivityTry(latId);
+		System.out.println("learningActivityTry "+learningActivityTry);
 		learningActivityTry.setEndDate(new java.util.Date(System.currentTimeMillis()));
 		learningActivityTryLocalService.updateLearningActivityTry(learningActivityTry);
-		
 		return update( latId,  tryResultData,  imsmanifest);
 	}
 }
