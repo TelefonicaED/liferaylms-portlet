@@ -440,22 +440,25 @@ public class ModuleLocalServiceImpl extends ModuleLocalServiceBaseImpl {
 		List<LearningActivity> activities = LearningActivityLocalServiceUtil.getLearningActivitiesOfModule(moduleId);
 		boolean finished = false;
 		for(LearningActivity activity : activities)
-		{
-			LearningActivityTry activityTry = LearningActivityTryLocalServiceUtil.getLastLearningActivityTryByActivityAndUser(activity.getActId(), userId);
-			if(activityTry!=null)
+		{	
+			if(activity.getWeightinmodule()!=0)
 			{
-				if(activityTry.getEndUserDate()!=null)
+				LearningActivityTry activityTry = LearningActivityTryLocalServiceUtil.getLastLearningActivityTryByActivityAndUser(activity.getActId(), userId);
+				if(activityTry!=null)
 				{
-					finished = true;
+					if(activityTry.getEndUserDate()!=null)
+					{
+						finished = true;
+					}
+					else
+					{
+						return false;
+					}
 				}
 				else
 				{
-					return false;
+					finished = false;
 				}
-			}
-			else
-			{
-				finished = false;
 			}
 		}
 		if(finished)

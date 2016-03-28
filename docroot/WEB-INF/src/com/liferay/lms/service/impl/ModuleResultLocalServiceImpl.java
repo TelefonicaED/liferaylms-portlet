@@ -18,7 +18,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 import com.liferay.lms.auditing.AuditConstants;
 import com.liferay.lms.auditing.AuditingLogFactory;
@@ -48,7 +47,6 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.User;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceContextThreadLocal;
-import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.service.persistence.GroupUtil;
 
 /**
@@ -363,7 +361,7 @@ private ModuleResult getAndCreateIfNotExists(long userId, long moduleId,Date sta
 		}
 		
 		//S�lo actualizamos si cambia el resultado.
-		if(moduleResult.getResult() < result)
+		if(moduleResult.getResult() < result || (passedModule&&!moduleResult.getPassed()))
 		{	
 			moduleResult.setResult(result);
 			if(moduleResult.getPassed()==false)
