@@ -533,9 +533,14 @@ public class SurveyActivity extends MVCPortlet {
 			else {
 				try {
 					Document document = SAXReaderUtil.read(request.getFile("fileName"));
-					TestQuestionLocalServiceUtil.importXML(actId, document);
-					SessionMessages.add(actionRequest, "questions-added-successfully");
-					actionResponse.setRenderParameter("jspPage", "/html/surveyactivity/admin/editquestions.jsp");
+					if (TestQuestionLocalServiceUtil.isTypeAllowed(actId, document)){
+						TestQuestionLocalServiceUtil.importXML(actId, document);
+						SessionMessages.add(actionRequest, "questions-added-successfully");
+						actionResponse.setRenderParameter("jspPage", "/html/surveyactivity/admin/editquestions.jsp");
+					}else{
+						SessionErrors.add(actionRequest, "surveyactivity.editquestions.importquestions.xml.not.allowed");
+						actionResponse.setRenderParameter("jspPage", "/html/surveyactivity/admin/importquestionsXml.jsp");
+					}
 				} catch (DocumentException e) {
 					Matcher matcher = DOCUMENT_EXCEPTION_MATCHER.matcher(e.getMessage());
 

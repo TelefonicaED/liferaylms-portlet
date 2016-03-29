@@ -23,6 +23,8 @@ import com.liferay.lms.learningactivity.questiontype.QuestionTypeRegistry;
 import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.model.TestQuestion;
 import com.liferay.lms.service.ClpSerializer;
+import com.liferay.lms.service.LearningActivityLocalServiceUtil;
+import com.liferay.lms.service.TestQuestionLocalServiceUtil;
 import com.liferay.lms.service.base.TestQuestionLocalServiceBaseImpl;
 import com.liferay.portal.kernel.bean.PortletBeanLocatorUtil;
 import com.liferay.portal.kernel.dao.orm.Criterion;
@@ -33,6 +35,8 @@ import com.liferay.portal.kernel.dao.orm.OrderFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.util.ListUtil;
+import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.DocumentException;
 import com.liferay.portal.kernel.xml.Element;
@@ -87,6 +91,35 @@ public class TestQuestionLocalServiceImpl
 		else if("sort".equals(question.attributeValue("type"))) type = 5;
 		return type;
 	}
+	
+	public boolean isTypeAllowed(long actId, Document document){
+		try {
+			LearningActivity learningActivity = LearningActivityLocalServiceUtil
+													.getLearningActivity(actId);
+			List<String> allowedTypes = ListUtil.fromArray(PropsUtil.getArray(
+															"lms.questions.allowed.for."
+															+ learningActivity.getTypeId()));
+			//Añadimos el tipo SurveyHorizontalOptionsQuestionType si es de tipo encuesta 
+			if (learningActivity.getTypeId() == 4)
+				allowedTypes.add("7");
+			
+			Element rootElement = document.getRootElement();
+			for(Element question:rootElement.elements("question"))
+			{
+				long type = TestQuestionLocalServiceUtil.getQuestionType(question);
+				if (!allowedTypes.contains(String.valueOf(type)))
+					return false;
+			}
+		} catch (PortalException e) {
+			e.printStackTrace();
+			return false;
+		} catch (SystemException e) {
+			e.printStackTrace();
+			return false;
+		}
+		return true;
+	}
+
 	public TestQuestion addQuestion(long actId,String text,long questionType) throws SystemException
 	{
 		TestQuestion tq =

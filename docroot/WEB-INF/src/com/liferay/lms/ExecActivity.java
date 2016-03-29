@@ -25,8 +25,6 @@ import org.jsoup.Jsoup;
 
 import au.com.bytecode.opencsv.CSVWriter;
 
-import com.liferay.lms.auditing.AuditConstants;
-import com.liferay.lms.auditing.AuditingLogFactory;
 import com.liferay.lms.learningactivity.questiontype.QuestionType;
 import com.liferay.lms.learningactivity.questiontype.QuestionTypeRegistry;
 import com.liferay.lms.model.LearningActivity;
@@ -232,9 +230,14 @@ public class ExecActivity extends MVCPortlet
 			else {
 				try {
 					Document document = SAXReaderUtil.read(request.getFile("fileName"));
-					TestQuestionLocalServiceUtil.importXML(actId, document);
-					SessionMessages.add(actionRequest, "questions-added-successfully");
-					actionResponse.setRenderParameter("jspPage", "/html/execactivity/test/admin/editquestions.jsp");
+					if (TestQuestionLocalServiceUtil.isTypeAllowed(actId, document)){
+						TestQuestionLocalServiceUtil.importXML(actId, document);
+						SessionMessages.add(actionRequest, "questions-added-successfully");
+						actionResponse.setRenderParameter("jspPage", "/html/execactivity/test/admin/editquestions.jsp");
+					}else{
+						SessionErrors.add(actionRequest, "execativity.editquestions.importquestions.xml.not.allowed");
+						actionResponse.setRenderParameter("jspPage", "/html/execactivity/test/admin/importquestions.jsp");
+					}
 				} catch (DocumentException e) {
 					Matcher matcher = DOCUMENT_EXCEPTION_MATCHER.matcher(e.getMessage());
 
@@ -249,7 +252,6 @@ public class ExecActivity extends MVCPortlet
 					SessionErrors.add(actionRequest, "execativity.editquestions.importquestions.xml.generic");
 					actionResponse.setRenderParameter("jspPage", "/html/execactivity/test/admin/importquestions.jsp");
 				}
-
 			}
 
 		}
@@ -260,7 +262,6 @@ public class ExecActivity extends MVCPortlet
 
 	public void editQuestion(ActionRequest actionRequest, ActionResponse actionResponse)
 			throws Exception {
-
 		
 		long questionId = ParamUtil.getLong(actionRequest, "questionId", 0);
 		long actid = ParamUtil.getLong(actionRequest, "resId");
@@ -306,9 +307,6 @@ public class ExecActivity extends MVCPortlet
 								}else{
 									correct = ParamUtil.getBoolean(actionRequest, "correct_"+newAnswerId);
 								}
-								
-								
-
 							}else{
 								if(question.getQuestionType()==5 ){
 									correct = true;
@@ -323,16 +321,8 @@ public class ExecActivity extends MVCPortlet
 										}else{
 											correct = false;
 										}
-									
 									}
-								
-									
-										
-									
-									
 								}
-								
-
 							}
 							counter++;
 							if(correct)trueCounter++;
@@ -373,7 +363,6 @@ public class ExecActivity extends MVCPortlet
 						}
 					}else TestAnswerLocalServiceUtil.deleteTestAnswer(existingAnswerId);
 				}
-				
 				actionResponse.setRenderParameter("message", LanguageUtil.get(themeDisplay.getLocale(), "execativity.editquestions.editquestion"));
 			}else {
 				SessionErrors.add(actionRequest, "execativity.test.error");
