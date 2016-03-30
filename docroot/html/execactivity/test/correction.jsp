@@ -208,7 +208,7 @@ while(ituserlistpage.hasNext()){
 		<%if(hasFreeQuestion){
 			if(status.equals("not-started")){
 		%>
-			<liferay-ui:message key = "editactivity.mandatory.yes"/><liferay-ui:message key = "not-started"/>
+			<liferay-ui:message key = "editactivity.mandatory.yes"/> / <liferay-ui:message key = "not-started"/>
 			
 			<%}else{%>
 			<liferay-ui:message key = "editactivity.mandatory.yes"/>
@@ -218,7 +218,7 @@ while(ituserlistpage.hasNext()){
 		
 		<%}else{
 			if(status.equals("not-started")){%>
-				<liferay-ui:message key = "editactivity.mandatory.no"/><liferay-ui:message key = "not-started"/>
+				<liferay-ui:message key = "editactivity.mandatory.no"/> / <liferay-ui:message key = "not-started"/>
 				<%}else{%>
 			<liferay-ui:message key = "editactivity.mandatory.no"/>
 			<%}%>
