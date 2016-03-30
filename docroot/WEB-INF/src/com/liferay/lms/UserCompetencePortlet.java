@@ -233,12 +233,14 @@ public class UserCompetencePortlet extends MVCPortlet {
 			StringBuffer html = new StringBuffer("<html xmlns=\"http://www.w3.org/1999/xhtml\"><head><style type=\"text/css\">");
 			html.append("@page { size: ");
 			html.append(competence.getPage()); 
-			html.append(" ; background: url('");
-			File file = new File(imageurl);
-			if(file.exists() && !file.isDirectory()){
+			File file = new File(imageurl.replace("file:", ""));
+			if(file.exists()){
+				html.append(" ; background: url('");
 				html.append(imageurl);
+				html.append("') repeat-y top center}");
+			}else{
+				html.append("}");
 			}
-			html.append("') repeat-y top center}");
 			if(!StringPool.BLANK.equals(cssurl)){
 				String css = getFileContent(cssurl);
 				if(css!=null){
