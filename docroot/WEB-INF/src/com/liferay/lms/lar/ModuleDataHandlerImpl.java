@@ -1,5 +1,7 @@
 package com.liferay.lms.lar;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLEncoder;
@@ -18,6 +20,8 @@ import com.liferay.lms.learningactivity.LearningActivityTypeRegistry;
 import com.liferay.lms.learningactivity.ResourceExternalLearningActivityType;
 import com.liferay.lms.learningactivity.questiontype.QuestionType;
 import com.liferay.lms.learningactivity.questiontype.QuestionTypeRegistry;
+import com.liferay.lms.learningactivity.scormcontent.ScormContenRegistry;
+import com.liferay.lms.learningactivity.scormcontent.ScormContentAsset;
 import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.model.Module;
 import com.liferay.lms.model.TestQuestion;
@@ -34,6 +38,8 @@ import com.liferay.portal.kernel.lar.PortletDataHandlerBoolean;
 import com.liferay.portal.kernel.lar.PortletDataHandlerControl;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.Folder;
+import com.liferay.portal.kernel.util.MimeTypesUtil;
+import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
@@ -54,7 +60,10 @@ import com.liferay.portal.service.ResourcePermissionLocalServiceUtil;
 import com.liferay.portal.service.RoleLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceContextFactory;
+import com.liferay.portlet.asset.AssetRendererFactoryRegistryUtil;
 import com.liferay.portlet.asset.model.AssetEntry;
+import com.liferay.portlet.asset.model.AssetRenderer;
+import com.liferay.portlet.asset.model.AssetRendererFactory;
 import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.DuplicateFileException;
 import com.liferay.portlet.documentlibrary.FileExtensionException;
@@ -255,16 +264,22 @@ private void exportEntry(PortletDataContext context, Element root, Module entry)
 
 	
 		//Exportar las imagenes de los resources.
-		if(actividad.getTypeId() == 2 || actividad.getTypeId() == 7 ){
-			
+		if(actividad.getTypeId() == 2 || actividad.getTypeId() == 7|| actividad.getTypeId() == 9 ){
 			List<String> img = new LinkedList<String>();
 			if(actividad.getTypeId() == 2){
 				//LearningActivityLocalServiceUtil.
 				//List<String> documents = LearningActivityLocalServiceUtil.getExtraContentValues(actividad.getActId(), "document");
 				img = LearningActivityLocalServiceUtil.getExtraContentValues(actividad.getActId(), "document");
-			}else if(actividad.getTypeId() == 7){
+			}else if(actividad.getTypeId() == 7 || actividad.getTypeId() == 9){
+				System.out.println("ENTRO CON "+actividad.getTypeId());
 				img.add(LearningActivityLocalServiceUtil.getExtraContentValue(actividad.getActId(), "assetEntry"));
 			}
+			
+			
+			/*else if(actividad.getTypeId() == 9){
+				img.add(LearningActivityLocalServiceUtil.getExtraContentValue(actividad.getActId(), "assetEntry"));
+			}*/
+			
 			
 				try {
 					System.out.println("actividad.getTypeId() "+actividad.getTypeId());
@@ -273,6 +288,8 @@ private void exportEntry(PortletDataContext context, Element root, Module entry)
 						System.out.println("img "+img);
 						if(!img.get(i).startsWith("<")){
 							AssetEntry docAsset= AssetEntryLocalServiceUtil.getAssetEntry(Long.valueOf(img.get(i)));
+							if(!docAsset.getMimeType().equals("text/plain") && actividad.getTypeId() != 9){
+								
 							DLFileEntry docfile=DLFileEntryLocalServiceUtil.getDLFileEntry(docAsset.getClassPK());
 							
 								
@@ -310,8 +327,33 @@ private void exportEntry(PortletDataContext context, Element root, Module entry)
 							
 							String txt = (actividad.getTypeId() == 2) ? "external":"internal";
 							System.out.println("    - Resource "+ txt + ": " + containsCharUpper(docfile.getTitle()+extension));
-						}
 						
+							
+							
+							}else{
+								if(actividad.getTypeId() == 9){
+									
+								
+									
+									System.out.println("PASO POR AQUI PARA "+actividad.getTitle());
+									
+									String portalBaseDir = PropsUtil.get("liferay.home")+"/data/scormszip";
+									
+									String zipFileName = StringPool.SLASH+docAsset.getClassUuid()+".zip";
+									
+									 String scormZipFilePath = portalBaseDir+StringPool.SLASH+docAsset.getCompanyId()+StringPool.SLASH+
+											 docAsset.getGroupId()+StringPool.SLASH+docAsset.getClassUuid()+zipFileName;
+									
+											 System.out.println("RUTA DEL ZIP DE SCORM "+scormZipFilePath);
+											 
+									InputStream input = new FileInputStream(new File(scormZipFilePath));
+									
+									context.addZipEntry(getFilePath(context, null ,actividad.getActId())+containsCharUpper(zipFileName), input);
+
+								}
+								
+							}
+						}
 					}
 					
 
