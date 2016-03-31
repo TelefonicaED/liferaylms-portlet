@@ -232,6 +232,7 @@ public class CloneCourse implements MessageListener {
 			newCourse.setGoodbye(course.getGoodbye());
 			newCourse.setGoodbyeMsg(course.getGoodbyeMsg());
 			newCourse.setGoodbyeSubject(course.getGoodbyeSubject());
+			newCourse.setCourseEvalId(course.getCourseEvalId());
 			
 		} catch(DuplicateGroupException e){
 			if(log.isDebugEnabled())e.printStackTrace();
