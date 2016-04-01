@@ -319,11 +319,8 @@ if(theTeam!=null)
 								resultValue = result;
 							}else{
 								
-								//if(calificationType == 1){
-								//	resultValue = result + "/10" ;
-								//}else{
 									resultValue = result + "/100" ;
-								//}
+								
 								
 							} 
 							
