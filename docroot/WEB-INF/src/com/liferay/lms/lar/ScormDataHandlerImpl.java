@@ -158,7 +158,7 @@ public class ScormDataHandlerImpl extends BasePortletDataHandler {
 		return document.formattedString();
 	}
 
-	private void exportEntry(PortletDataContext context, Element root,
+	protected void exportEntry(PortletDataContext context, Element root,
 			SCORMContent entry) throws PortalException, SystemException {
 
 		AssetEntry assetEntry = AssetEntryLocalServiceUtil.getEntry(SCORMContent.class.getName(), entry.getScormId());
@@ -280,7 +280,7 @@ public class ScormDataHandlerImpl extends BasePortletDataHandler {
 		return null;
 	}
 
-	private void importEntry(PortletDataContext context, Element entryElement,
+	protected void importEntry(PortletDataContext context, Element entryElement,
 			SCORMContent entry) throws SystemException, PortalException {
 		
 		long userId = context.getUserId(entry.getUserUuid());
@@ -357,6 +357,9 @@ public class ScormDataHandlerImpl extends BasePortletDataHandler {
 					
 				}
 			} else {
+				
+				System.out.println("POR EL ELSE!! RECOGE EL FICHERO");
+				
 				InputStream is = context.getZipEntryAsInputStream(entryElement
 						.attributeValue("file"));
 				try {
