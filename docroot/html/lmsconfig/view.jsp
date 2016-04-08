@@ -172,6 +172,18 @@ for(CalificationType calificationType :calificationTypeRegistry.getCalificationT
 %>
 </aui:field-wrapper>
 
+
+<liferay-ui:header title="API REST WS" />
+<aui:field-wrapper>
+
+	
+	<aui:input type="checkbox" name="hasAPILicence"
+	label="hasAPILicence" checked="<%=prefs.getHasAPILicence()%>" value="<%=prefs.getHasAPILicence()%>" />
+	<%
+
+%>
+</aui:field-wrapper>
+
 <aui:field-wrapper>
 	<aui:button type="submit" value="save" />
 	<button name="check" value="check" onclick="javascrip:checkGroups();" type="button">

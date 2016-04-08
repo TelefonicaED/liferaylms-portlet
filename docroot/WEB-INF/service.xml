@@ -178,9 +178,11 @@
 			<finder-column name="userId" />
 		</finder>
 	</entity>
+
+
 	
 	<entity name="LearningActivityResult" uuid="true" local-service="true"
-		remote-service="true" json-enabled="false" cache-enabled="false">
+		remote-service="true" json-enabled="false" cache-enabled="false" persistence-class="com.liferay.lms.service.persistence.LearningActivityResultPersistenceImpl">
 
 		<column name="larId" type="long" primary="true" />
 		<column name="actId" type="long" />
@@ -452,6 +454,7 @@
         <column name="scoretranslators" type="String"></column>
         <column name="usersResults" type="long"></column>
          <column name="debugScorm" type="boolean"></column>
+         <column name="hasAPILicence" type="boolean"></column>
     </entity>
         
 	<entity name="SurveyResult" uuid="true" local-service="true" remote-service="false" json-enabled="false">

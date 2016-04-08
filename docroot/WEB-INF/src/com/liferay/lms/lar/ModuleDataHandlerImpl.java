@@ -2,31 +2,44 @@ package com.liferay.lms.lar;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipException;
+import java.util.zip.ZipFile;
 
 import javax.portlet.PortletPreferences;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 
+import com.liferay.counter.model.Counter;
+import com.liferay.counter.service.CounterLocalServiceUtil;
+import com.liferay.counter.service.persistence.CounterUtil;
+import com.liferay.lms.NoSuchSCORMContentException;
 import com.liferay.lms.ResourceExternalActivity;
 import com.liferay.lms.learningactivity.LearningActivityTypeRegistry;
 import com.liferay.lms.learningactivity.ResourceExternalLearningActivityType;
+import com.liferay.lms.learningactivity.SCORMLearningActivityType;
 import com.liferay.lms.learningactivity.questiontype.QuestionType;
 import com.liferay.lms.learningactivity.questiontype.QuestionTypeRegistry;
 import com.liferay.lms.learningactivity.scormcontent.ScormContenRegistry;
 import com.liferay.lms.learningactivity.scormcontent.ScormContentAsset;
 import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.model.Module;
+import com.liferay.lms.model.SCORMContent;
 import com.liferay.lms.model.TestQuestion;
 import com.liferay.lms.service.LearningActivityLocalServiceUtil;
 import com.liferay.lms.service.ModuleLocalServiceUtil;
+import com.liferay.lms.service.SCORMContentLocalServiceUtil;
 import com.liferay.lms.service.TestQuestionLocalServiceUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
@@ -38,6 +51,7 @@ import com.liferay.portal.kernel.lar.PortletDataHandlerBoolean;
 import com.liferay.portal.kernel.lar.PortletDataHandlerControl;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.Folder;
+import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.util.MimeTypesUtil;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.StringBundler;
@@ -61,10 +75,12 @@ import com.liferay.portal.service.RoleLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceContextFactory;
 import com.liferay.portlet.asset.AssetRendererFactoryRegistryUtil;
+import com.liferay.portlet.asset.NoSuchEntryException;
 import com.liferay.portlet.asset.model.AssetEntry;
 import com.liferay.portlet.asset.model.AssetRenderer;
 import com.liferay.portlet.asset.model.AssetRendererFactory;
 import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
+import com.liferay.portlet.asset.service.persistence.AssetEntryUtil;
 import com.liferay.portlet.documentlibrary.DuplicateFileException;
 import com.liferay.portlet.documentlibrary.FileExtensionException;
 import com.liferay.portlet.documentlibrary.FileSizeException;
@@ -75,6 +91,7 @@ import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
 import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.service.DLFileEntryLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.service.DLFolderLocalServiceUtil;
+import com.sun.org.apache.xerces.internal.parsers.XMLDocumentParser;
 
 
 public class ModuleDataHandlerImpl extends BasePortletDataHandler {
@@ -333,25 +350,29 @@ private void exportEntry(PortletDataContext context, Element root, Module entry)
 							}else{
 								if(actividad.getTypeId() == 9){
 									
-								
+									System.out.println("***************************************************************************************");
 									
 									System.out.println("PASO POR AQUI PARA "+actividad.getTitle());
 									
-									String portalBaseDir = PropsUtil.get("liferay.home")+"/data/scormszip";
+//									String portalBaseDir = PropsUtil.get("liferay.home")+"/data/scormszip";
+//									
+//									String zipFileName = StringPool.SLASH+docAsset.getClassUuid()+".zip";
+//									
+//									String scormZipFilePath = portalBaseDir+StringPool.SLASH+docAsset.getCompanyId()+StringPool.SLASH+
+//											 				   docAsset.getGroupId()+StringPool.SLASH+docAsset.getClassUuid()+zipFileName;
+//									
+//									System.out.println("RUTA DEL ZIP DE SCORM "+scormZipFilePath);
+//									
+//									System.out.println("***************************************************************************************");
+//											 
+//									InputStream input = new FileInputStream(new File(scormZipFilePath));
+//									
+//									context.addZipEntry(getFilePath(context, null ,actividad.getActId())+containsCharUpper(zipFileName), input);
 									
-									String zipFileName = StringPool.SLASH+docAsset.getClassUuid()+".zip";
-									
-									 String scormZipFilePath = portalBaseDir+StringPool.SLASH+docAsset.getCompanyId()+StringPool.SLASH+
-											 docAsset.getGroupId()+StringPool.SLASH+docAsset.getClassUuid()+zipFileName;
-									
-											 System.out.println("RUTA DEL ZIP DE SCORM "+scormZipFilePath);
-											 
-									InputStream input = new FileInputStream(new File(scormZipFilePath));
-									
-									context.addZipEntry(getFilePath(context, null ,actividad.getActId())+containsCharUpper(zipFileName), input);
-
+									ScormDataHandlerImpl scormHandler = new ScormDataHandlerImpl();
+									SCORMContent scocontent = SCORMContentLocalServiceUtil.getSCORMContent(docAsset.getClassPK());
+									scormHandler.exportEntry(context, entryElementLoc, scocontent);
 								}
-								
 							}
 						}
 					}
@@ -521,28 +542,18 @@ protected PortletPreferences doImportData(PortletDataContext context, String por
 		String path = entryElement.attributeValue("path");
 		Group group = GroupLocalServiceUtil.getGroup(context.getScopeGroupId());
 		
-
 		if (!context.isPathNotProcessed(path)) {
 			continue;
 		}
 		Module entry = (Module)context.getZipEntryAsObject(path);
-
-		System.out.println("\n  Module: " + entry.getTitle(Locale.getDefault()) );
-		System.out.println("\n  getModuleId: " + entry.getModuleId() );
-		
 		
 		if(!entryOld.equalsIgnoreCase(String.valueOf(entry.getModuleId())))
-		{
-		
-			System.out.println("entraaaaa el modulo "+entry.getModuleId());
-			System.out.println("entraaaaa el entryOld "+entryOld);
+		{ 
 			entryOld=String.valueOf(entry.getModuleId());
 			importEntry(context,entryElement, entry);
 		} else{
 			System.out.println("repetidooooo el modulo "+entry.getModuleId());
-
-		}
-		
+		}	
 	}
 	
 	System.out.println("doImportData ENDS" + "\n-----------------------------\n"  );
@@ -550,7 +561,7 @@ protected PortletPreferences doImportData(PortletDataContext context, String por
 	return null;
 }
 
-private void importEntry(PortletDataContext context, Element entryElement, Module entry) throws SystemException, PortalException {
+private void importEntry(PortletDataContext context, Element entryElement, Module entry) throws SystemException, PortalException, DocumentException {
 	
 	long userId = context.getUserId(entry.getUserUuid());
 	
@@ -567,16 +578,21 @@ private void importEntry(PortletDataContext context, Element entryElement, Modul
 	entry.setDescription(entry.getDescription().replace("&amp;lt;", "&lt;"));
 	//entry.setDescription(parseFilesFromDescription(entry.getDescription().replace("&amp;lt;", "&lt;"), entryElement.elements("descriptionfile"), userId, context, serviceContext));
 	
-	System.out.println("entry.setGroupId" +entry.getGroupId()  );
-	System.out.println("entry.setGroupId" +entry.getUserId()  );
-	System.out.println("entry.setGroupId" +entry.getModuleId()  );
-	System.out.println("entry.setGroupId" +entry.getTitle()  );
+//	System.out.println("entry.setGroupId" +entry.getGroupId()  );
+//	System.out.println("entry.setGroupId" +entry.getUserId()  );
+//	System.out.println("entry.setGroupId" +entry.getModuleId()  );
+//	System.out.println("entry.setGroupId" +entry.getTitle()  );
+	
+	
+	System.out.println("ENTRY ELEMENT-->"+entryElement);
 	
 	
 	Module theModule=ModuleLocalServiceUtil.addmodule(entry);
 	
 	//Importar imagenes del modulo.
 	if(entryElement.attributeValue("file") != null){
+		
+		System.out.println("entryElement value file-->"+entryElement.attributeValue("file"));
 	
 		String name[] = entryElement.attributeValue("file").split("/");
 		String imageName = "module.jpg";
@@ -595,6 +611,8 @@ private void importEntry(PortletDataContext context, Element entryElement, Modul
 			}
 			
 			InputStream input = context.getZipEntryAsInputStream(entryElement.attributeValue("file"));
+			
+			System.out.println("FILE!!!!!!!!!!!-->"+entryElement.attributeValue("file"));
 			
 			if(input != null){
 			
@@ -626,9 +644,6 @@ private void importEntry(PortletDataContext context, Element entryElement, Modul
 	for (Element actElement : entryElement.elements("descriptionfile")) {
 		
 		FileEntry oldFile = (FileEntry)context.getZipEntryAsObject(actElement.attributeValue("path"));
-		
-		
-								
 		FileEntry newFile;
 		long folderId=0;
 		String description = "";
@@ -639,8 +654,7 @@ private void importEntry(PortletDataContext context, Element entryElement, Modul
 			if(!oldFile.getTitle().endsWith(oldFile.getExtension())){
 				titleFile=oldFile.getTitle()+"."+oldFile.getExtension();
 			}
-		
-			
+
 			InputStream input = context.getZipEntryAsInputStream(actElement.attributeValue("file"));
 			
 			long repositoryId = DLFolderConstants.getDataRepositoryId(context.getScopeGroupId(), DLFolderConstants.DEFAULT_PARENT_FOLDER_ID);
@@ -656,7 +670,7 @@ private void importEntry(PortletDataContext context, Element entryElement, Modul
 			if(!ficheroExtStr.endsWith(oldFile.getExtension())){
 				ficheroExtStr="."+oldFile.getExtension();
 				ficheroStr=ficheroStr+"."+oldFile.getExtension();
-				}
+			}
 						
 			newFile = DLAppLocalServiceUtil.addFileEntry(userId, repositoryId , folderId , ficheroExtStr, oldFile.getMimeType(), titleFile, StringPool.BLANK, StringPool.BLANK, IOUtils.toByteArray(input), serviceContext );
 				
@@ -682,33 +696,25 @@ private void importEntry(PortletDataContext context, Element entryElement, Modul
 			
 			
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 		//	e.printStackTrace();
 			System.out.println("*2 ERROR! descriptionfile: " + e.getMessage());
 		}
 
 		theModule.setDescription(description);
-		
 		ModuleLocalServiceUtil.updateModule(theModule);
-
 	}
 	
 	LearningActivityTypeRegistry learningActivityTypeRegistry = new LearningActivityTypeRegistry();
 	
 	for (Element actElement : entryElement.elements("learningactivity")) {
 		
-		//System.out.println("  Element : " + actElement.getPath() );
-		
 		String path = actElement.attributeValue("path");
-
 		LearningActivity larn=(LearningActivity)context.getZipEntryAsObject(path);
 		
 		if(larn == null){
 			System.out.println("    ERROR! LearningActivity, path: " + path);
 			continue;
 		}
-		
-		System.out.println("    Learning Activity: " + larn.getTitle(Locale.getDefault()) + " (" + LanguageUtil.get(Locale.getDefault(),learningActivityTypeRegistry.getLearningActivityType(larn.getTypeId()).getName())+")" );
 		
 		serviceContext.setAssetCategoryIds(context.getAssetCategoryIds(LearningActivity.class, larn.getActId()));
 		serviceContext.setAssetTagNames(context.getAssetTagNames(LearningActivity.class, larn.getActId()));
@@ -718,11 +724,10 @@ private void importEntry(PortletDataContext context, Element entryElement, Modul
 		
 		larn.setGroupId(theModule.getGroupId());
 		larn.setModuleId(theModule.getModuleId());
-		
-	
 
 		LearningActivity nuevaLarn=LearningActivityLocalServiceUtil.addLearningActivity(larn,serviceContext);
 		serviceContext.setScopeGroupId(nuevaLarn.getGroupId());
+		
 		//Cambios Miguel para importar bien los ficheros asociados a recursos externos.
 		HashMap<String, String> map = LearningActivityLocalServiceUtil.convertXMLExtraContentToHashMap(nuevaLarn.getActId());
 		Iterator <String> keysString =  map.keySet().iterator();
@@ -749,81 +754,263 @@ private void importEntry(PortletDataContext context, Element entryElement, Modul
 					e.printStackTrace();
 				}
 				
-				
-				
-					long repositoryId = DLFolderConstants.getDataRepositoryId(theModule.getGroupId(), DLFolderConstants.DEFAULT_PARENT_FOLDER_ID);
+				long repositoryId = DLFolderConstants.getDataRepositoryId(theModule.getGroupId(), DLFolderConstants.DEFAULT_PARENT_FOLDER_ID);
 					
-					long dlMainFolderId = 0;
-					 boolean dlMainFolderFound = false;
-				        //Get main folder
-				        try {
-				        	//Get main folder
-				        	Folder dlFolderMain = DLAppLocalServiceUtil.getFolder(repositoryId,DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,DOCUMENTLIBRARY_MAINFOLDER+nuevaLarn.getActId());
-				        	dlMainFolderId = dlFolderMain.getFolderId();
-				        	dlMainFolderFound = true;
-				        	//Get portlet folder
-				        } catch (Exception ex){
-				        }
+				long dlMainFolderId = 0;
+				boolean dlMainFolderFound = false;
+				
+				//Get main folder
+				try {
+					//Get main folder
+				    Folder dlFolderMain = DLAppLocalServiceUtil.getFolder(repositoryId,DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,DOCUMENTLIBRARY_MAINFOLDER+nuevaLarn.getActId());
+				    dlMainFolderId = dlFolderMain.getFolderId();
+				    dlMainFolderFound = true;
+
+				//Get portlet folder
+				} catch (Exception ex){}
 				        
-						//Damos permisos al archivo para usuarios de comunidad.
-						serviceContext.setAddGroupPermissions(true);
-				        
-				        //Create main folder if not exist
-				        if(!dlMainFolderFound){
-				        	Folder newDocumentMainFolder = DLAppLocalServiceUtil.addFolder(userId, repositoryId,DLFolderConstants.DEFAULT_PARENT_FOLDER_ID, DOCUMENTLIBRARY_MAINFOLDER+nuevaLarn.getActId(), DOCUMENTLIBRARY_MAINFOLDER+nuevaLarn.getActId(), serviceContext);
-				        	dlMainFolderFound = true;
-				        	dlMainFolderId = newDocumentMainFolder.getFolderId();
-				        }
+				//Damos permisos al archivo para usuarios de comunidad.
+				serviceContext.setAddGroupPermissions(true);
+				      
+				//Create main folder if not exist
+				if(!dlMainFolderFound){
+					Folder newDocumentMainFolder = DLAppLocalServiceUtil.addFolder(userId, repositoryId,DLFolderConstants.DEFAULT_PARENT_FOLDER_ID, DOCUMENTLIBRARY_MAINFOLDER+nuevaLarn.getActId(), DOCUMENTLIBRARY_MAINFOLDER+nuevaLarn.getActId(), serviceContext);
+				    dlMainFolderFound = true;
+				    dlMainFolderId = newDocumentMainFolder.getFolderId();
+				}
 					
-
-
+				String ficheroExtStr = "";
+				String extension[] = oldFile.getTitle().split("\\.");
+				if(extension.length > 0){
+					ficheroExtStr = "."+extension[extension.length-1];
+				}
+				
+				FileEntry newFile = DLAppLocalServiceUtil.addFileEntry( userId, repositoryId, dlMainFolderId,
+																		oldFile.getTitle() + ficheroExtStr,
+																		oldFile.getMimeType(), oldFile.getTitle(),
+																		StringPool.BLANK, StringPool.BLANK, byteArray,
+																		serviceContext);
+				
+				//AssetEntry asset  = AssetEntryLocalServiceUtil.getEntry(DLFileEntry.class.getName(), newFile.getPrimaryKey());
+				//System.out.println("      DLFileEntry newFile: "+newFile.getTitle()+", newFile PrimaryKey: "+newFile.getPrimaryKey()+", EntryId: "+asset.getEntryId());
 					
-					String ficheroExtStr = "";
-					String extension[] = oldFile.getTitle().split("\\.");
-					if(extension.length > 0){
-						ficheroExtStr = "."+extension[extension.length-1];
-					}
-				
-					FileEntry newFile = DLAppLocalServiceUtil.addFileEntry(
-							userId, repositoryId , dlMainFolderId , oldFile.getTitle()+ficheroExtStr, oldFile.getMimeType(), 
-						oldFile.getTitle(), StringPool.BLANK, StringPool.BLANK, byteArray , serviceContext ) ;
-
-				
-					//AssetEntry asset  = AssetEntryLocalServiceUtil.getEntry(DLFileEntry.class.getName(), newFile.getPrimaryKey());
-					//System.out.println("      DLFileEntry newFile: "+newFile.getTitle()+", newFile PrimaryKey: "+newFile.getPrimaryKey()+", EntryId: "+asset.getEntryId());
+				map.put(key,
+						String.valueOf(AssetEntryLocalServiceUtil.getEntry(
+									DLFileEntry.class.getName(),
+									newFile.getPrimaryKey()).getEntryId()));
 					
-					map.put(key, String.valueOf(AssetEntryLocalServiceUtil.getEntry(DLFileEntry.class.getName(), newFile.getPrimaryKey()).getEntryId()));
+				Role siteMemberRole = RoleLocalServiceUtil.getRole(context.getCompanyId(), RoleConstants.SITE_MEMBER);
+				ResourcePermissionLocalServiceUtil.setResourcePermissions (	context.getCompanyId(),
+																			LearningActivity.class.getName(),
+																			ResourceConstants.SCOPE_INDIVIDUAL,
+																			Long.toString(nuevaLarn.getActId()),
+																			siteMemberRole.getRoleId(),
+																			new String[] { ActionKeys.VIEW });
+			}
+				
+			//Ponemos a la actividad el fichero que hemos recuperado.
 					
-				
+			if(larn.getTypeId() == 2){
 					
-					Role siteMemberRole = RoleLocalServiceUtil.getRole(context.getCompanyId(), RoleConstants.SITE_MEMBER);
-					ResourcePermissionLocalServiceUtil.setResourcePermissions(context.getCompanyId(), LearningActivity.class.getName(), 
-							ResourceConstants.SCOPE_INDIVIDUAL,	Long.toString(nuevaLarn.getActId()),siteMemberRole.getRoleId(), new String[] {ActionKeys.VIEW});
+			LearningActivityLocalServiceUtil.saveHashMapToXMLExtraContent(nuevaLarn.getActId(), map);
+			//LearningActivityLocalServiceUtil.updateLearningActivity(nuevaLarn);
+			//System.out.println("AL FINAL QUEDA ASI: "+nuevaLarn.getExtracontent());
 				
-				
+			}else if(larn.getTypeId() == 7){
+				//LearningActivityLocalServiceUtil.setExtraContentValue(nuevaLarn.getActId(), "assetEntry", String.valueOf(asset.getEntryId()));
+			}
+		}
+		//Comprobamos si es un Recurso SCORM (Type=9) para guardarlo
+		if(larn.getTypeId() == 9){
 			
-			}
-					
-				
-					//Ponemos a la actividad el fichero que hemos recuperado.
-					
-					if(larn.getTypeId() == 2){
-					
-					LearningActivityLocalServiceUtil.saveHashMapToXMLExtraContent(nuevaLarn.getActId(), map);
-					//LearningActivityLocalServiceUtil.updateLearningActivity(nuevaLarn);
-					
-					
-					
-					//System.out.println("AL FINAL QUEDA ASI: "+nuevaLarn.getExtracontent());
-				
-					}else if(larn.getTypeId() == 7){
-						//LearningActivityLocalServiceUtil.setExtraContentValue(nuevaLarn.getActId(), "assetEntry", String.valueOf(asset.getEntryId()));
-					}
-				
-					
-				
-				
-			}
+			context.importPermissions("com.liferay.lms.model.SCORMContent",
+									  context.getSourceGroupId(), 
+									  context.getScopeGroupId());
+			
+			ScormDataHandlerImpl scormHandler = new ScormDataHandlerImpl();
+			Element scormEntry = actElement.element("scormentry");
+			String scormPath = scormEntry.attributeValue("path");
+			SCORMContent scocontent = (SCORMContent) context
+										.getZipEntryAsObject(scormPath);
+			
+//			scocontent.setUserId(userId);
+//			scocontent.setUserUuid(entry.getUserUuid());
+//			
+//			System.out.println("userId!!_------>"+userId);
+//			
+			scormHandler.importEntry(context, scormEntry, scocontent);
+			
+			String a = serviceContext.getUuid();
+			//AssetEntry asset = AssetEntryLocalServiceUtil.fetchEntry(context.getClass().getName(), context.)
+			
+		}
+		//Comprobamos si es un Recurso SCORM (Type=9) para guardarlo
+//		if(larn.getTypeId() == 9){
+////			entry.setGroupId(context.getScopeGroupId());
+////			entry.setUserId(userId);
+////			
+//			System.out.println("getScopeGroupId-->"+serviceContext.getScopeGroupId());
+//			
+//			Element extraContent =  SAXReaderUtil.read(larn.getExtracontent()).getRootElement();
+//			String assetEntryId = extraContent.element("assetEntry").getText();
+//			String uuid = extraContent.element("uuid").getText();
+//			
+//			context.importPermissions("com.liferay.lms.model.SCORMContent",
+//									  context.getSourceGroupId(),
+//									  context.getScopeGroupId());
+//			
+//			System.out.println("assetEntryId-->"+assetEntryId);
+//			System.out.println("uuid-->"+uuid);
+//			
+//			//El recurso esta en el path sin ".xml"
+//			String scormPath = path.split(".xml")[0] + "/" + uuid +".zip";
+//			
+//			SCORMContent oldScormContent = null;
+//			SCORMContent importedScocontent = null;
+//			
+//			try {
+//				oldScormContent = SCORMContentLocalServiceUtil
+//									.getSCORMContentByUuidAndGroupId(uuid,context.getScopeGroupId());
+//			} catch (NoSuchSCORMContentException e) {}
+//			
+//			
+//			if (Validator.isNotNull(oldScormContent)) {
+//				
+//				AssetEntry asset = null;
+//				try{
+//					asset = AssetEntryLocalServiceUtil.getEntry(Long.valueOf(assetEntryId));
+//				}catch(NoSuchEntryException e){
+//					System.out.println("catch!!!");
+//					asset = AssetEntryLocalServiceUtil.createAssetEntry(Long.valueOf(assetEntryId));
+//					
+//					asset.setClassName(SCORMContent.class.getName());
+//					asset.setGroupId(context.getScopeGroupId());
+//					asset.setCompanyId(context.getCompanyId());
+//					asset.setUserId(userId);
+//					
+//					AssetEntryLocalServiceUtil.addAssetEntry(asset);
+//				}
+//				
+//				ServiceContext serviceContext2 = new ServiceContext();
+//				serviceContext2.setAssetTagNames(serviceContext.getAssetTagNames());
+//				serviceContext2.setAssetCategoryIds(serviceContext.getAssetCategoryIds());
+//				serviceContext2.setUserId(userId);
+//				serviceContext2.setCompanyId(context.getCompanyId());
+//				serviceContext2.setScopeGroupId(context.getScopeGroupId());
+//				serviceContext2.setUuid(uuid);
+//				
+//				LearningActivityLocalServiceUtil.setExtraContentValue(nuevaLarn.getActId(), "assetEntry", String.valueOf(asset.getEntryId()));
+//				
+//				System.out.println("not null!!!!!");
+//				if ((oldScormContent.getGroupId() == context.getSourceGroupId()) && 
+//					context.isDataStrategyMirrorWithOverwriting()) {
+//					
+//					System.out.println("if!!!!!");
+//					
+//					SCORMContentLocalServiceUtil.delete(oldScormContent.getScormId());
+//					InputStream is = context.getZipEntryAsInputStream(scormPath);
+//					
+//					try {
+//						byte[] dataFileScorm = IOUtils.toByteArray(is);
+//						File scormfile = new File(System.getProperty("java.io.tmpdir")
+//												  + "/scorms/" + uuid + ".zip");
+//						FileUtils.writeByteArrayToFile(scormfile, dataFileScorm);
+//						importedScocontent = SCORMContentLocalServiceUtil
+//												.addSCORMContent(oldScormContent.getTitle(), 
+//																 oldScormContent.getDescription(),
+//																 scormfile, 
+//																 oldScormContent.getCiphered(), 
+//																 serviceContext2);
+//					} catch (IOException e) {
+//						e.printStackTrace();
+//					} finally {
+//						try {
+//							if (is != null) 
+//								is.close();
+//						} catch (IOException e1) {
+//							e1.printStackTrace();
+//						}
+//					}
+//				} else {
+//					System.out.println("else!!!!!");
+//					importedScocontent = SCORMContentLocalServiceUtil
+//											.updateSCORMContent(oldScormContent, 
+//																serviceContext2);
+//				}
+//			} else {
+//				AssetEntry asset = AssetEntryLocalServiceUtil
+//									.createAssetEntry(CounterLocalServiceUtil
+//														.increment(AssetEntry.class.getName()));
+//				asset.setClassName(SCORMContent.class.getName());
+//				asset.setGroupId(context.getScopeGroupId());
+//				asset.setCompanyId(context.getCompanyId());
+//				asset.setUserId(userId);
+//				AssetEntryLocalServiceUtil.addAssetEntry(asset);
+//				
+//				ServiceContext serviceContext2 = new ServiceContext();
+//				serviceContext2.setAssetTagNames(serviceContext.getAssetTagNames());
+//				serviceContext2.setAssetCategoryIds(serviceContext.getAssetCategoryIds());
+//				serviceContext2.setUserId(userId);
+//				serviceContext2.setCompanyId(context.getCompanyId());
+//				serviceContext2.setScopeGroupId(context.getScopeGroupId());
+//				serviceContext2.setUuid(uuid);
+//				
+//				LearningActivityLocalServiceUtil.setExtraContentValue(nuevaLarn.getActId(), "assetEntry", String.valueOf(asset.getEntryId()));
+//				
+//				InputStream is = context.getZipEntryAsInputStream(scormPath);
+//				
+//				try {
+//					byte[] dataFileScorm = IOUtils.toByteArray(is);
+//					File scormfile = new File(System.getProperty("java.io.tmpdir")
+//												+ "/scorms/" + uuid + ".zip");
+//					
+//					ZipFile zipFile= new ZipFile(scormfile);
+//					if (zipFile.getEntry("imsmanifest.xml") != null) {
+//						
+//						ZipEntry manifest=zipFile.getEntry("imsmanifest.xml");
+//						InputStream manfiestStream=zipFile.getInputStream(manifest);
+//						Document imsdocument = SAXReaderUtil.read(manfiestStream);
+//						Element org = imsdocument.getRootElement().element("organizations").element("organization");
+//						String titulo = org.element("title").getText();
+//						
+//						FileUtils.writeByteArrayToFile(scormfile, dataFileScorm);
+//						
+//						importedScocontent = SCORMContentLocalServiceUtil
+//												.addSCORMContent(titulo, titulo, scormfile, 
+//																 false, serviceContext2);
+//					}					
+//				} catch (IOException e) {
+//					e.printStackTrace();
+//				} catch (DocumentException e) {
+//					e.printStackTrace();
+//				
+//				} finally {
+//					try {
+//						if (is != null)
+//							is.close();
+//					} catch (IOException e1) {
+//						e1.printStackTrace();
+//					}
+//				}			
+//			}
+//			
+//			System.out.println("extraContent antes-->"+nuevaLarn.getExtracontent());
+//			
+//			//context.importClassedModel(scocontent, importedScocontent, _NAMESPACE);
+////			nuevaLarn.setExtracontent(extraContent.getText());
+////			
+////			System.out.println("extraContent despues set-->"+nuevaLarn.getExtracontent());
+////			
+////			LearningActivityLocalServiceUtil.setExtraContentValue(nuevaLarn.getActId(), "assetEntry", assetEntryId);
+////			
+////			System.out.println("extraContent despues asset-->"+nuevaLarn.getExtracontent());
+////			
+//			LearningActivityLocalServiceUtil.updateLearningActivity(nuevaLarn);
+//			
+//			System.out.println("extraContent despues update-->"+nuevaLarn.getExtracontent());
+//			
+////			LearningActivityLocalServiceUtil.setExtraContentValue(nuevaLarn.getActId(), name, val);
+//		}
 		
 		// FIN CAMBIO MIGUEL
 		//Importar las imagenes de los resources.
