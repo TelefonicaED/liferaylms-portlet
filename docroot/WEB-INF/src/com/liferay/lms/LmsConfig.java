@@ -32,6 +32,8 @@ public class LmsConfig extends MVCPortlet {
 		Long usersResults = (ParamUtil.getLong(request, "usersResults", DEFAULT_USERS_RESULTS));
 		
 		boolean isDebugScorm = ParamUtil.getBoolean(request, "debugScorm");
+		
+		boolean hasAPILicence = ParamUtil.getBoolean(request, "hasAPILicence");
 				
 		
 		LmsPrefs prefs=LmsPrefsLocalServiceUtil.getLmsPrefsIni(themeDisplay.getCompanyId());
@@ -41,6 +43,7 @@ public class LmsConfig extends MVCPortlet {
 		prefs.setCourseevals(courseEvalsTypes);
 		prefs.setScoretranslators(calificationTypes);
 		prefs.setUsersResults(usersResults > 0 ? usersResults : DEFAULT_USERS_RESULTS);
+		prefs.setHasAPILicence(hasAPILicence);
 		LmsPrefsLocalServiceUtil.updateLmsPrefs(prefs);
 		
 		if (Validator.isNotNull(redirect)) {
