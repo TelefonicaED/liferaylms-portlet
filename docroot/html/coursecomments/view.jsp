@@ -32,7 +32,8 @@ if(themeDisplay.isSignedIn() &&   course!=null && permissionChecker.hasPermissio
 	ratingsEnabled="false" 
 	redirect="<%= currentURL %>"
 	subject="<%= course.getTitle() %>" 
-	userId="<%= themeDisplay.getUserId() %>" /> 
+	userId="<%= themeDisplay.getUserId() %>"
+	permissionClassName="com.liferay.lms.model.CourseComments" /> 
 
 
 
