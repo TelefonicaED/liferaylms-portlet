@@ -238,13 +238,17 @@ public class CourseLocalServiceClpInvoker {
 
 		_methodParameterTypes212 = new String[] { "java.lang.Long" };
 
-		_methodName213 = "getStudentsFromCourse";
+		_methodName213 = "getStudentsFromCourseCount";
 
-		_methodParameterTypes213 = new String[] { "com.liferay.lms.model.Course" };
+		_methodParameterTypes213 = new String[] { "long" };
 
 		_methodName214 = "getStudentsFromCourse";
 
-		_methodParameterTypes214 = new String[] { "long", "long" };
+		_methodParameterTypes214 = new String[] { "com.liferay.lms.model.Course" };
+
+		_methodName215 = "getStudentsFromCourse";
+
+		_methodParameterTypes215 = new String[] { "long", "long" };
 	}
 
 	public Object invokeMethod(String name, String[] parameterTypes,
@@ -518,11 +522,16 @@ public class CourseLocalServiceClpInvoker {
 
 		if (_methodName213.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes213, parameterTypes)) {
-			return CourseLocalServiceUtil.getStudentsFromCourse((com.liferay.lms.model.Course)arguments[0]);
+			return CourseLocalServiceUtil.getStudentsFromCourseCount(((Long)arguments[0]).longValue());
 		}
 
 		if (_methodName214.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes214, parameterTypes)) {
+			return CourseLocalServiceUtil.getStudentsFromCourse((com.liferay.lms.model.Course)arguments[0]);
+		}
+
+		if (_methodName215.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes215, parameterTypes)) {
 			return CourseLocalServiceUtil.getStudentsFromCourse(((Long)arguments[0]).longValue(),
 				((Long)arguments[1]).longValue());
 		}
@@ -620,4 +629,6 @@ public class CourseLocalServiceClpInvoker {
 	private String[] _methodParameterTypes213;
 	private String _methodName214;
 	private String[] _methodParameterTypes214;
+	private String _methodName215;
+	private String[] _methodParameterTypes215;
 }

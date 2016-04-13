@@ -26,6 +26,7 @@ import com.liferay.counter.service.CounterLocalServiceUtil;
 import com.liferay.counter.service.persistence.CounterUtil;
 import com.liferay.lms.NoSuchSCORMContentException;
 import com.liferay.lms.ResourceExternalActivity;
+import com.liferay.lms.asset.SCORMAssetRenderer;
 import com.liferay.lms.learningactivity.LearningActivityTypeRegistry;
 import com.liferay.lms.learningactivity.ResourceExternalLearningActivityType;
 import com.liferay.lms.learningactivity.SCORMLearningActivityType;
@@ -41,6 +42,7 @@ import com.liferay.lms.service.LearningActivityLocalServiceUtil;
 import com.liferay.lms.service.ModuleLocalServiceUtil;
 import com.liferay.lms.service.SCORMContentLocalServiceUtil;
 import com.liferay.lms.service.TestQuestionLocalServiceUtil;
+import com.liferay.lms.service.persistence.SCORMContentUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.language.LanguageUtil;
@@ -52,6 +54,7 @@ import com.liferay.portal.kernel.lar.PortletDataHandlerControl;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.servlet.SessionErrors;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.MimeTypesUtil;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.StringBundler;
@@ -77,21 +80,17 @@ import com.liferay.portal.service.ServiceContextFactory;
 import com.liferay.portlet.asset.AssetRendererFactoryRegistryUtil;
 import com.liferay.portlet.asset.NoSuchEntryException;
 import com.liferay.portlet.asset.model.AssetEntry;
-import com.liferay.portlet.asset.model.AssetRenderer;
-import com.liferay.portlet.asset.model.AssetRendererFactory;
+
 import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
-import com.liferay.portlet.asset.service.persistence.AssetEntryUtil;
 import com.liferay.portlet.documentlibrary.DuplicateFileException;
 import com.liferay.portlet.documentlibrary.FileExtensionException;
 import com.liferay.portlet.documentlibrary.FileSizeException;
 import com.liferay.portlet.documentlibrary.model.DLFileEntry;
-import com.liferay.portlet.documentlibrary.model.DLFileVersion;
 import com.liferay.portlet.documentlibrary.model.DLFolder;
 import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
 import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.service.DLFileEntryLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.service.DLFolderLocalServiceUtil;
-import com.sun.org.apache.xerces.internal.parsers.XMLDocumentParser;
 
 
 public class ModuleDataHandlerImpl extends BasePortletDataHandler {
@@ -183,7 +182,7 @@ protected PortletPreferences doDeleteData(PortletDataContext context,
 
 @Override
 protected String doExportData(PortletDataContext context, String portletId, PortletPreferences preferences) throws Exception {
-
+	
 	System.out.println("\n-----------------------------\ndoExportData STARTS, groupId : " + context.getScopeGroupId() );
 	
 	Group group = GroupLocalServiceUtil.getGroup(context.getScopeGroupId());
@@ -790,9 +789,6 @@ private void importEntry(PortletDataContext context, Element entryElement, Modul
 																		oldFile.getMimeType(), oldFile.getTitle(),
 																		StringPool.BLANK, StringPool.BLANK, byteArray,
 																		serviceContext);
-				
-				//AssetEntry asset  = AssetEntryLocalServiceUtil.getEntry(DLFileEntry.class.getName(), newFile.getPrimaryKey());
-				//System.out.println("      DLFileEntry newFile: "+newFile.getTitle()+", newFile PrimaryKey: "+newFile.getPrimaryKey()+", EntryId: "+asset.getEntryId());
 					
 				map.put(key,
 						String.valueOf(AssetEntryLocalServiceUtil.getEntry(
@@ -819,10 +815,12 @@ private void importEntry(PortletDataContext context, Element entryElement, Modul
 			}else if(larn.getTypeId() == 7){
 				//LearningActivityLocalServiceUtil.setExtraContentValue(nuevaLarn.getActId(), "assetEntry", String.valueOf(asset.getEntryId()));
 			}
+			
+			
 		}
+		
 		//Comprobamos si es un Recurso SCORM (Type=9) para guardarlo
 		if(larn.getTypeId() == 9){
-			
 			context.importPermissions("com.liferay.lms.model.SCORMContent",
 									  context.getSourceGroupId(), 
 									  context.getScopeGroupId());
@@ -830,187 +828,24 @@ private void importEntry(PortletDataContext context, Element entryElement, Modul
 			ScormDataHandlerImpl scormHandler = new ScormDataHandlerImpl();
 			Element scormEntry = actElement.element("scormentry");
 			String scormPath = scormEntry.attributeValue("path");
-			SCORMContent scocontent = (SCORMContent) context
-										.getZipEntryAsObject(scormPath);
 			
-//			scocontent.setUserId(userId);
-//			scocontent.setUserUuid(entry.getUserUuid());
-//			
-//			System.out.println("userId!!_------>"+userId);
-//			
+			SCORMContent scocontent = (SCORMContent) context.getZipEntryAsObject(scormPath);
+			
 			scormHandler.importEntry(context, scormEntry, scocontent);
 			
-			String a = serviceContext.getUuid();
-			//AssetEntry asset = AssetEntryLocalServiceUtil.fetchEntry(context.getClass().getName(), context.)
 			
+			AssetEntry newEntry = AssetEntryLocalServiceUtil.getEntry(nuevaLarn.getGroupId(), nuevaLarn.getUuid());
+			newEntry.setClassName(SCORMContent.class.getName());
+			//newEntry.setClassPK(scocontent.getScormId());
+			AssetEntryLocalServiceUtil.updateAssetEntry(newEntry);
+			
+			map.put("assetEntry", newEntry.getEntryId()+"");
+			
+			LearningActivityLocalServiceUtil.saveHashMapToXMLExtraContent(nuevaLarn.getActId(), map);			
+			//sSystem.out.println("TE ESTOY SACANDO ESTO "+newEntry.getEntryId());
+		
 		}
-		//Comprobamos si es un Recurso SCORM (Type=9) para guardarlo
-//		if(larn.getTypeId() == 9){
-////			entry.setGroupId(context.getScopeGroupId());
-////			entry.setUserId(userId);
-////			
-//			System.out.println("getScopeGroupId-->"+serviceContext.getScopeGroupId());
-//			
-//			Element extraContent =  SAXReaderUtil.read(larn.getExtracontent()).getRootElement();
-//			String assetEntryId = extraContent.element("assetEntry").getText();
-//			String uuid = extraContent.element("uuid").getText();
-//			
-//			context.importPermissions("com.liferay.lms.model.SCORMContent",
-//									  context.getSourceGroupId(),
-//									  context.getScopeGroupId());
-//			
-//			System.out.println("assetEntryId-->"+assetEntryId);
-//			System.out.println("uuid-->"+uuid);
-//			
-//			//El recurso esta en el path sin ".xml"
-//			String scormPath = path.split(".xml")[0] + "/" + uuid +".zip";
-//			
-//			SCORMContent oldScormContent = null;
-//			SCORMContent importedScocontent = null;
-//			
-//			try {
-//				oldScormContent = SCORMContentLocalServiceUtil
-//									.getSCORMContentByUuidAndGroupId(uuid,context.getScopeGroupId());
-//			} catch (NoSuchSCORMContentException e) {}
-//			
-//			
-//			if (Validator.isNotNull(oldScormContent)) {
-//				
-//				AssetEntry asset = null;
-//				try{
-//					asset = AssetEntryLocalServiceUtil.getEntry(Long.valueOf(assetEntryId));
-//				}catch(NoSuchEntryException e){
-//					System.out.println("catch!!!");
-//					asset = AssetEntryLocalServiceUtil.createAssetEntry(Long.valueOf(assetEntryId));
-//					
-//					asset.setClassName(SCORMContent.class.getName());
-//					asset.setGroupId(context.getScopeGroupId());
-//					asset.setCompanyId(context.getCompanyId());
-//					asset.setUserId(userId);
-//					
-//					AssetEntryLocalServiceUtil.addAssetEntry(asset);
-//				}
-//				
-//				ServiceContext serviceContext2 = new ServiceContext();
-//				serviceContext2.setAssetTagNames(serviceContext.getAssetTagNames());
-//				serviceContext2.setAssetCategoryIds(serviceContext.getAssetCategoryIds());
-//				serviceContext2.setUserId(userId);
-//				serviceContext2.setCompanyId(context.getCompanyId());
-//				serviceContext2.setScopeGroupId(context.getScopeGroupId());
-//				serviceContext2.setUuid(uuid);
-//				
-//				LearningActivityLocalServiceUtil.setExtraContentValue(nuevaLarn.getActId(), "assetEntry", String.valueOf(asset.getEntryId()));
-//				
-//				System.out.println("not null!!!!!");
-//				if ((oldScormContent.getGroupId() == context.getSourceGroupId()) && 
-//					context.isDataStrategyMirrorWithOverwriting()) {
-//					
-//					System.out.println("if!!!!!");
-//					
-//					SCORMContentLocalServiceUtil.delete(oldScormContent.getScormId());
-//					InputStream is = context.getZipEntryAsInputStream(scormPath);
-//					
-//					try {
-//						byte[] dataFileScorm = IOUtils.toByteArray(is);
-//						File scormfile = new File(System.getProperty("java.io.tmpdir")
-//												  + "/scorms/" + uuid + ".zip");
-//						FileUtils.writeByteArrayToFile(scormfile, dataFileScorm);
-//						importedScocontent = SCORMContentLocalServiceUtil
-//												.addSCORMContent(oldScormContent.getTitle(), 
-//																 oldScormContent.getDescription(),
-//																 scormfile, 
-//																 oldScormContent.getCiphered(), 
-//																 serviceContext2);
-//					} catch (IOException e) {
-//						e.printStackTrace();
-//					} finally {
-//						try {
-//							if (is != null) 
-//								is.close();
-//						} catch (IOException e1) {
-//							e1.printStackTrace();
-//						}
-//					}
-//				} else {
-//					System.out.println("else!!!!!");
-//					importedScocontent = SCORMContentLocalServiceUtil
-//											.updateSCORMContent(oldScormContent, 
-//																serviceContext2);
-//				}
-//			} else {
-//				AssetEntry asset = AssetEntryLocalServiceUtil
-//									.createAssetEntry(CounterLocalServiceUtil
-//														.increment(AssetEntry.class.getName()));
-//				asset.setClassName(SCORMContent.class.getName());
-//				asset.setGroupId(context.getScopeGroupId());
-//				asset.setCompanyId(context.getCompanyId());
-//				asset.setUserId(userId);
-//				AssetEntryLocalServiceUtil.addAssetEntry(asset);
-//				
-//				ServiceContext serviceContext2 = new ServiceContext();
-//				serviceContext2.setAssetTagNames(serviceContext.getAssetTagNames());
-//				serviceContext2.setAssetCategoryIds(serviceContext.getAssetCategoryIds());
-//				serviceContext2.setUserId(userId);
-//				serviceContext2.setCompanyId(context.getCompanyId());
-//				serviceContext2.setScopeGroupId(context.getScopeGroupId());
-//				serviceContext2.setUuid(uuid);
-//				
-//				LearningActivityLocalServiceUtil.setExtraContentValue(nuevaLarn.getActId(), "assetEntry", String.valueOf(asset.getEntryId()));
-//				
-//				InputStream is = context.getZipEntryAsInputStream(scormPath);
-//				
-//				try {
-//					byte[] dataFileScorm = IOUtils.toByteArray(is);
-//					File scormfile = new File(System.getProperty("java.io.tmpdir")
-//												+ "/scorms/" + uuid + ".zip");
-//					
-//					ZipFile zipFile= new ZipFile(scormfile);
-//					if (zipFile.getEntry("imsmanifest.xml") != null) {
-//						
-//						ZipEntry manifest=zipFile.getEntry("imsmanifest.xml");
-//						InputStream manfiestStream=zipFile.getInputStream(manifest);
-//						Document imsdocument = SAXReaderUtil.read(manfiestStream);
-//						Element org = imsdocument.getRootElement().element("organizations").element("organization");
-//						String titulo = org.element("title").getText();
-//						
-//						FileUtils.writeByteArrayToFile(scormfile, dataFileScorm);
-//						
-//						importedScocontent = SCORMContentLocalServiceUtil
-//												.addSCORMContent(titulo, titulo, scormfile, 
-//																 false, serviceContext2);
-//					}					
-//				} catch (IOException e) {
-//					e.printStackTrace();
-//				} catch (DocumentException e) {
-//					e.printStackTrace();
-//				
-//				} finally {
-//					try {
-//						if (is != null)
-//							is.close();
-//					} catch (IOException e1) {
-//						e1.printStackTrace();
-//					}
-//				}			
-//			}
-//			
-//			System.out.println("extraContent antes-->"+nuevaLarn.getExtracontent());
-//			
-//			//context.importClassedModel(scocontent, importedScocontent, _NAMESPACE);
-////			nuevaLarn.setExtracontent(extraContent.getText());
-////			
-////			System.out.println("extraContent despues set-->"+nuevaLarn.getExtracontent());
-////			
-////			LearningActivityLocalServiceUtil.setExtraContentValue(nuevaLarn.getActId(), "assetEntry", assetEntryId);
-////			
-////			System.out.println("extraContent despues asset-->"+nuevaLarn.getExtracontent());
-////			
-//			LearningActivityLocalServiceUtil.updateLearningActivity(nuevaLarn);
-//			
-//			System.out.println("extraContent despues update-->"+nuevaLarn.getExtracontent());
-//			
-////			LearningActivityLocalServiceUtil.setExtraContentValue(nuevaLarn.getActId(), name, val);
-//		}
+		
 		
 		// FIN CAMBIO MIGUEL
 		//Importar las imagenes de los resources.

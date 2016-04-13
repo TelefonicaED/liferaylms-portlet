@@ -194,6 +194,7 @@
 		<property name="scoretranslators" type="com.liferay.portal.dao.orm.hibernate.StringType" />
 		<property name="usersResults" type="com.liferay.portal.dao.orm.hibernate.LongType" />
 		<property name="debugScorm" type="com.liferay.portal.dao.orm.hibernate.BooleanType" />
+		<property name="hasAPILicence" type="com.liferay.portal.dao.orm.hibernate.BooleanType" />
 	</class>
 	<class name="com.liferay.lms.model.impl.ModuleImpl" table="Lms_Module">
 		<cache usage="read-write" />

@@ -84,6 +84,7 @@ public class ExecActivity extends MVCPortlet
 
 		long actId=ParamUtil.getLong(actionRequest, "actId");
 		long latId=ParamUtil.getLong(actionRequest,"latId" );
+		boolean isTablet = ParamUtil.getBoolean(actionRequest,"isTablet" );
 		String navigate = ParamUtil.getString(actionRequest, "navigate");
 		boolean isPartial = false;
 		if (Validator.isNotNull(navigate)) {
@@ -133,10 +134,12 @@ public class ExecActivity extends MVCPortlet
 
 			if (isPartial) {
 				actionResponse.setRenderParameter("improve", ParamUtil.getString(actionRequest, "improve", Boolean.FALSE.toString()));
+				if(isTablet)actionResponse.setRenderParameter("isTablet", Boolean.toString(true));
 				actionResponse.setRenderParameter("jspPage", "/html/execactivity/test/view.jsp");
 			} else {
 				actionResponse.setRenderParameter("oldResult", Long.toString(oldResult));
 				actionResponse.setRenderParameter("correction", Boolean.toString(true));
+				if(isTablet)actionResponse.setRenderParameter("isTablet", Boolean.toString(true));
 				actionResponse.setRenderParameter("jspPage", "/html/execactivity/test/results.jsp");
 			}
 		}else{

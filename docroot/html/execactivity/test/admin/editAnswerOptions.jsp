@@ -54,7 +54,6 @@
 						
 						<%
 						if(typeId==1 || typeId==4){
-							System.out.println("MULTUPLE");
 							%>
 						<aui:input type="checkbox" name="<%=\"correct_\"+testanswer.getAnswerId() %>" label="correct" checked="<%=testanswer.getIsCorrect() %>"></aui:input>
 						<%}else{

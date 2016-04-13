@@ -173,7 +173,7 @@ for(CalificationType calificationType :calificationTypeRegistry.getCalificationT
 </aui:field-wrapper>
 
 
-<liferay-ui:header title="API REST WS" />
+<liferay-ui:header title="API_REST_WS" />
 <aui:field-wrapper>
 
 	

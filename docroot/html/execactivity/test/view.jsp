@@ -38,16 +38,42 @@
 
 <% 
 Boolean isTablet = ParamUtil.getBoolean(renderRequest, "isTablet", false);
-
 if(isTablet){%>
 
 	<script src="//code.jquery.com/jquery-1.7.2.min.js" type="text/javascript"></script> 
 	<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js" type="text/javascript"></script>
-		<script src="/liferaylms-portlet/js/jquery.ui.touch-punch.min.js" type="text/javascript"></script> 
-		<script src="/liferaylms-portlet/js/mouse.js" type="text/javascript"></script> 
+	<script src="/liferaylms-portlet/js/jquery.ui.touch-punch.min.js" type="text/javascript"></script> 
+	<script src="/liferaylms-portlet/js/mouse.js" type="text/javascript"></script> 
+		
+		<script>
 
-<%}
-%>
+		setTimeout(function(){
+			
+			var hasTestJsCharged = false;
+			var arrayScripts = document.getElementsByTagName("script");
+
+			for(var i=0;i<arrayScripts.length;i++){
+				if(arrayScripts[i].src.indexOf("test.js")!=-1){
+					hasTestJsCharged=true;
+					break;
+				}
+			}
+			
+			if(!hasTestJsCharged){
+				var newScript = document.createElement('script');
+				newScript.type = 'text/javascript';
+				newScript.src = "/liferaylms-portlet/js/test.js";
+				document.getElementsByTagName("head")[0].appendChild(newScript);
+			}
+		
+		
+		
+		}, 1000);
+		
+			
+		</script>
+		
+<%}%>
 
 
 	<div class="container-activity">
@@ -569,6 +595,11 @@ if(isTablet){%>
 				</div>
 				
 				<% } %>
+				
+				<%if(isTablet){%>
+					<aui:input type="hidden" name="isTablet" value="<%= true %>"/>
+				<%} %>
+				
 				<aui:input type="hidden" name="currentQuestionId" value="<%= currentQuestionId %>"/>
 				<aui:input type="hidden" name="navigate" value=""/>
 				<aui:input type="hidden" name="improve" value="<%= new Boolean(improve).toString() %>" />

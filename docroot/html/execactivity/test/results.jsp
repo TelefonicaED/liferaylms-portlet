@@ -22,6 +22,7 @@
 <%@ include file="/init.jsp" %>
 
 <%
+Boolean isTablet = ParamUtil.getBoolean(renderRequest, "isTablet", false);
 	if(ParamUtil.getLong(request,"actId",0 )==0) renderRequest.setAttribute(WebKeys.PORTLET_CONFIGURATOR_VISIBILITY, Boolean.FALSE);
 	else{
 		
@@ -180,10 +181,15 @@
 %>
 					<liferay-portlet:renderURL var="realizardir">
 						<liferay-portlet:param name="actId" value="<%=Long.toString(learningActivity.getActId()) %>"></liferay-portlet:param>
+						<%if(isTablet){%>
+							<liferay-portlet:param name="isTablet" value="<%=Boolean.toString(isTablet) %>"></liferay-portlet:param>
+
+						<%} %>
 						<liferay-portlet:param name="jspPage" value="/html/execactivity/test/view.jsp" />
 					</liferay-portlet:renderURL>
-<%
-					String enlace="self.location='"+realizardir.toString()+"'"; %>
+<%	
+					String enlace = "self.location='"+realizardir.toString()+"'"; 
+					%>
 					<aui:button name="repetir" value="<%=LanguageUtil.get(pageContext,\"execativity.test.try.again\")%>" onClick="<%=enlace %>"></aui:button>
 <%
 				}
