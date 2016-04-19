@@ -215,11 +215,12 @@ public class FillblankQuestionType extends BaseQuestionType {
 			//Cogemos el TestAnswer de la pregunta en formato Moodle para rellenar las respuestas dadas por el alumno
 			List<TestAnswer> testAnswers= TestAnswerLocalServiceUtil.getTestAnswersByQuestionId(question.getQuestionId());
 			if(testAnswers!=null && testAnswers.size()>0){
-				
 				//Comprobamos si todos los blancos son acertados para ver si la pregunta resulta correcta o no
 				TestAnswer solution = testAnswers.get(0);
 				List<String> sols = getQuestionSols(solution.getAnswer());
-				String[] answers = answer.split(",");
+				//System.out.println(answer);
+
+				//String[] answers = answer.split(",");
 				if (feedback){
 					feedMessage = LanguageUtil.get(themeDisplay.getLocale(),"answer-in-blank") ;
 					showCorrectAnswer = LearningActivityLocalServiceUtil.getExtraContentValue(question.getActId(), "showCorrectAnswer");
@@ -231,7 +232,8 @@ public class FillblankQuestionType extends BaseQuestionType {
 					} catch (Exception e) {}
 					int i=0, correctAnswers=0;
 					for(String sol:sols){
-						String ans= (answers.length>i)?answers[i]:"";
+						//String ans= (answers.length>i)?answers[i]:"";
+						String ans= answer;
 						if(isCorrect(sol, ans)){
 							correctAnswers++;
 						}
@@ -252,7 +254,8 @@ public class FillblankQuestionType extends BaseQuestionType {
 				
 				int i=0;
 				for(String sol:sols){
-					String ans = (answers.length>i)?answers[i]:"";
+					//String ans = (answers.length>i)?answers[i]:"";
+					String ans= answer;
 					String auxans = "";
 					List<String> blankSols = getBlankSols(sol, true);
 					
