@@ -1,11 +1,8 @@
 package com.liferay.lms.lar;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -21,19 +18,10 @@ import javax.portlet.PortletPreferences;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 
-import com.liferay.counter.model.Counter;
 import com.liferay.counter.service.CounterLocalServiceUtil;
-import com.liferay.counter.service.persistence.CounterUtil;
-import com.liferay.lms.NoSuchSCORMContentException;
-import com.liferay.lms.ResourceExternalActivity;
-import com.liferay.lms.asset.SCORMAssetRenderer;
 import com.liferay.lms.learningactivity.LearningActivityTypeRegistry;
-import com.liferay.lms.learningactivity.ResourceExternalLearningActivityType;
-import com.liferay.lms.learningactivity.SCORMLearningActivityType;
 import com.liferay.lms.learningactivity.questiontype.QuestionType;
 import com.liferay.lms.learningactivity.questiontype.QuestionTypeRegistry;
-import com.liferay.lms.learningactivity.scormcontent.ScormContenRegistry;
-import com.liferay.lms.learningactivity.scormcontent.ScormContentAsset;
 import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.model.Module;
 import com.liferay.lms.model.SCORMContent;
@@ -44,11 +32,7 @@ import com.liferay.lms.service.ModuleLocalServiceUtil;
 import com.liferay.lms.service.SCORMContentLocalServiceUtil;
 import com.liferay.lms.service.TestQuestionLocalServiceUtil;
 import com.liferay.lms.service.persistence.SCORMContentPersistence;
-import com.liferay.lms.service.persistence.SCORMContentPersistenceImpl;
-import com.liferay.lms.service.persistence.SCORMContentUtil;
-import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.bean.PortletBeanLocatorUtil;
-import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.language.LanguageUtil;
@@ -61,11 +45,8 @@ import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
-import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.util.ContentTypes;
-import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
-import com.liferay.portal.kernel.util.MimeTypesUtil;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
@@ -77,22 +58,17 @@ import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.Image;
-import com.liferay.portal.model.LayoutSetPrototype;
 import com.liferay.portal.model.ResourceConstants;
 import com.liferay.portal.model.Role;
 import com.liferay.portal.model.RoleConstants;
 import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.service.GroupLocalServiceUtil;
-import com.liferay.portal.service.LayoutSetPrototypeLocalServiceUtil;
 import com.liferay.portal.service.ResourceLocalServiceUtil;
 import com.liferay.portal.service.ResourcePermissionLocalServiceUtil;
 import com.liferay.portal.service.RoleLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
-import com.liferay.portal.service.ServiceContextFactory;
 import com.liferay.portal.service.ServiceContextThreadLocal;
 import com.liferay.portal.util.PortalUtil;
-import com.liferay.portlet.asset.AssetRendererFactoryRegistryUtil;
-import com.liferay.portlet.asset.NoSuchEntryException;
 import com.liferay.portlet.asset.model.AssetEntry;
 import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.DuplicateFileException;
@@ -290,7 +266,10 @@ private void exportEntry(PortletDataContext context, Element root, Module entry)
 		
 		//Exportar los ficheros que tenga la descripci�n de la actividad.
 		descriptionFileParserDescriptionToLar(actividad.getDescription(), actividad.getGroupId(), actividad.getModuleId(), context, entryElementLoc);		
-
+		//Si es una actividad de tipo evaluación no tiene sentido guardar el extracontent
+		if(actividad.getTypeId() == 8){
+			actividad.setExtracontent("");
+		}
 	
 		//Exportar las imagenes de los resources.
 		if(actividad.getTypeId() == 2 || actividad.getTypeId() == 7|| actividad.getTypeId() == 9 ){
@@ -315,7 +294,7 @@ private void exportEntry(PortletDataContext context, Element root, Module entry)
 
 					for(int i=0;i<img.size();i++){
 						System.out.println("img "+img);
-						if(!img.get(i).startsWith("<")){
+						if(!img.get(i).startsWith("<") && !img.get(i).startsWith("http")){
 							AssetEntry docAsset= AssetEntryLocalServiceUtil.getAssetEntry(Long.valueOf(img.get(i)));
 							if(!docAsset.getMimeType().equals("text/plain") && actividad.getTypeId() != 9){
 								
@@ -541,8 +520,8 @@ protected String getEntryPath(PortletDataContext context, Module entry) {
 @Override
 protected PortletPreferences doImportData(PortletDataContext context, String portletId, PortletPreferences preferences, String data) throws Exception {
 	
-	context.importPermissions("com.liferay.lms.model.module", context.getSourceGroupId(),context.getScopeGroupId());
 	
+	context.importPermissions("com.liferay.lms.model.module", context.getSourceGroupId(),context.getScopeGroupId());
 	System.out.println("\n-----------------------------\ndoImport1Data STARTS12");
 	
 	
@@ -624,7 +603,7 @@ private void importEntry(PortletDataContext context, Element entryElement, Modul
 			
 			InputStream input = context.getZipEntryAsInputStream(entryElement.attributeValue("file"));
 			
-			System.out.println("FILE!!!!!!!!!!!-->"+entryElement.attributeValue("file"));
+			//System.out.println("FILE!!!!!!!!!!!-->"+entryElement.attributeValue("file"));
 			
 			if(input != null){
 			

@@ -89,6 +89,7 @@ import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.portal.kernel.lar.PortletDataHandlerKeys;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.GroupConstants;
 import com.liferay.portal.model.Role;
@@ -138,8 +139,7 @@ public class CourseAdmin extends MVCPortlet {
 		ServiceContext serviceContext = ServiceContextFactory.getInstance(
 				Course.class.getName(), actionRequest);
 
-		ThemeDisplay themeDisplay = (ThemeDisplay) actionRequest
-				.getAttribute(WebKeys.THEME_DISPLAY);
+		ThemeDisplay themeDisplay = (ThemeDisplay) actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
 		String redirect = ParamUtil.getString(actionRequest, "redirect");
 
 		User user = themeDisplay.getUser();
@@ -864,7 +864,7 @@ public class CourseAdmin extends MVCPortlet {
 		List<String> errors = new ArrayList<String>();
 		List<Long> users = new ArrayList<Long>();
 		
-		//Comprobamos el tipo de importación
+		//Comprobamos el tipo de importaciï¿½n
 		PortletPreferences prefs = portletRequest.getPreferences();
 		int tipoImport = Integer.parseInt(prefs.getValue("tipoImport", "1"));
 		boolean hasImportById = (tipoImport != 2);
@@ -907,11 +907,11 @@ public class CourseAdmin extends MVCPortlet {
 											getPortletConfig(),
 											themeDisplay.getLocale(),
 											hasImportById ? 
-													"courseadmin.importuserrole.csvError.user-id-bad-format" :	//Importación por userId
-													"courseadmin.importuserrole.csvError.user-name-bad-format", //Importación por screenName
+													"courseadmin.importuserrole.csvError.user-id-bad-format" :	//Importaciï¿½n por userId
+													"courseadmin.importuserrole.csvError.user-name-bad-format", //Importaciï¿½n por screenName
 											new Object[] { line }, false));
 							}
-							//Importación por userId debe ser un número
+							//Importaciï¿½n por userId debe ser un nï¿½mero
 							else if(hasImportById && !Validator.isNumber(currLine[0])){
 								errors.add( LanguageUtil.format(getPortletConfig(),
 											themeDisplay.getLocale(),
@@ -934,7 +934,7 @@ public class CourseAdmin extends MVCPortlet {
 											userId = Long.parseLong(userIdStr.trim());
 											user = UserLocalServiceUtil.getUser(userId);
 										}
-										//Importación por screenName
+										//Importaciï¿½n por screenName
 										else{
 											screenName = userIdStr.trim();
 											user = UserLocalServiceUtil.getUserByScreenName(companyId, screenName);
@@ -1040,6 +1040,14 @@ public class CourseAdmin extends MVCPortlet {
 			String portletId = (String) actionRequest.getAttribute(WebKeys.PORTLET_ID);
 			LayoutServiceUtil.importPortletInfo(themeDisplay.getLayout().getPlid(), groupId,portletId, uploadRequest.getParameterMap(), file);
 			addSuccessMessage(actionRequest, actionResponse);
+			
+			/* Si esta seleccionado el modo de borrar tenemos que progpagar borrado de icono de la clase*/
+			
+			if(uploadRequest.getParameter(PortletDataHandlerKeys.DELETE_PORTLET_DATA).equals("true")){
+				Course c = CourseLocalServiceUtil.getCourseByGroupCreatedId(groupId);
+				c.setIcon(0);
+				CourseLocalServiceUtil.updateCourse(c);
+			}
 
 		}
 		catch (Exception e) {
@@ -1252,7 +1260,7 @@ public class CourseAdmin extends MVCPortlet {
 
 		} 
 		else if(action.equals("export")){
-			// Comprobamos el tipo de importación
+			// Comprobamos el tipo de importaciï¿½n
 			PortletPreferences preferences = request.getPreferences();
 			int tipoImport = Integer.parseInt(preferences.getValue("tipoImport", "1"));
 			boolean hasImportById = (tipoImport != 2);
@@ -1374,8 +1382,8 @@ public class CourseAdmin extends MVCPortlet {
 				fechaFin = (courseResult!=null&&courseResult.getAllowFinishDate() != null)?sdf.format(courseResult.getAllowFinishDate()):StringPool.BLANK;
 	
 				String[] resultados = { hasImportById ?
-											String.valueOf(user.getUserId()) : 	// Exportación por userId
-											user.getScreenName(), 				// Exportación por screenName
+											String.valueOf(user.getUserId()) : 	// Exportaciï¿½n por userId
+											user.getScreenName(), 				// Exportaciï¿½n por screenName
 										user.getFullName(),
 										fechaIni, fechaFin
 				  };

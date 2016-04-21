@@ -32,6 +32,7 @@ import com.liferay.lms.service.LmsPrefsLocalServiceUtil;
 import com.liferay.lms.service.ModuleLocalServiceUtil;
 import com.liferay.lms.service.TestAnswerLocalServiceUtil;
 import com.liferay.lms.service.TestQuestionLocalServiceUtil;
+import com.liferay.lms.service.impl.TestQuestionLocalServiceImpl;
 import com.liferay.portal.DuplicateGroupException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
@@ -382,8 +383,14 @@ public class CloneCourse implements MessageListener {
 					
 					newLearnActivity.setTitle(activity.getTitle());
 					newLearnActivity.setDescription(activity.getDescription());
-					newLearnActivity.setExtracontent(activity.getExtracontent());
 					newLearnActivity.setTypeId(activity.getTypeId());
+					//Cuando es tipo Evaluación no hay que llevarse el extracontent
+					if(newLearnActivity.getTypeId() != 8){
+						newLearnActivity.setExtracontent(activity.getExtracontent());
+					}else{
+						newLearnActivity.setExtracontent("");
+					}
+					
 					newLearnActivity.setTries(activity.getTries());
 					newLearnActivity.setPasspuntuation(activity.getPasspuntuation());
 					newLearnActivity.setPriority(newLearnActivity.getActId());
@@ -458,12 +465,14 @@ public class CloneCourse implements MessageListener {
 					try {
 						newTestQuestion = TestQuestionLocalServiceUtil.addQuestion(nuevaLarn.getActId(), question.getText(), question.getQuestionType());
 						
-						newTestQuestion.setText(descriptionFilesClone(question.getText(),newModule.getGroupId(), newTestQuestion.getActId(),themeDisplay.getUserId()));
+						String newTestDescription = descriptionFilesClone(question.getText(),newModule.getGroupId(), newTestQuestion.getActId(),themeDisplay.getUserId());
 						
+						newTestQuestion.setText(newTestDescription);
 						TestQuestionLocalServiceUtil.updateTestQuestion(newTestQuestion, true);
 						
 						System.out.println("      Test question : " + question.getQuestionId() );
 						System.out.println("      + Test question : " + newTestQuestion.getQuestionId() );
+						System.out.println("      + Test question TEXT : " + newTestDescription );
 						cloneTraceStr += "\n   Test question: " + newTestQuestion.getQuestionId();
 						
 					} catch (Exception e) {
@@ -553,11 +562,106 @@ public class CloneCourse implements MessageListener {
 			
 			Element rootElement = document.getRootElement();
 			
-			for (Element entryElement : rootElement.elements("Description")) {
-				for (Element entryElementP : entryElement.elements("p")) {
+			if(rootElement.elements("Description").size()!=0){
+				for (Element entryElement : rootElement.elements("Description")) {
+					for (Element entryElementP : entryElement.elements("p")) {
+						
+						//Para las imagenes
+						for (Element entryElementImg : entryElementP.elements("img")) {
+							
+							String src = entryElementImg.attributeValue("src");
+							
+							String []srcInfo = src.split("/");
+							String fileUuid = "", fileGroupId ="";
+							
+							if(srcInfo.length >= 6  && srcInfo[1].compareTo("documents") == 0){
+								fileUuid = srcInfo[srcInfo.length-1];
+								fileGroupId = srcInfo[2];
+								
+								String []uuidInfo = fileUuid.split("\\?");
+								String uuid="";
+								if(srcInfo.length > 0){
+									uuid=uuidInfo[0];
+								}
+								
+								FileEntry file;
+								try {
+									file = DLAppLocalServiceUtil.getFileEntryByUuidAndGroupId(uuid, Long.parseLong(fileGroupId));
+									
+									ServiceContext serviceContext = new ServiceContext();
+									serviceContext.setScopeGroupId(groupId);
+									serviceContext.setUserId(userId);
+									serviceContext.setCompanyId(file.getCompanyId());
+									serviceContext.setAddGroupPermissions(true);
+									
+									FileEntry newFile = cloneFileDescription(file, actId, file.getUserId(), serviceContext);
+									
+									newDescription = descriptionCloneFile(newDescription, file, newFile);
+									
+									System.out.println("     + Description file image : " + file.getTitle() +" ("+file.getMimeType()+")");
+									
+								} catch (Exception e) {
+									// TODO Auto-generated catch block
+									//e.printStackTrace();
+									System.out.println("* ERROR! Description file image : " + e.getMessage());
+								}
+							}
+						}
+						
+						//Para los enlaces
+						for (Element entryElementLink : entryElementP.elements("a")) {
+							
+							String href = entryElementLink.attributeValue("href");
+							
+							String []hrefInfo = href.split("/");
+							String fileUuid = "", fileGroupId ="";
+							
+							if(hrefInfo.length >= 6 && hrefInfo[1].compareTo("documents") == 0){
+								fileUuid = hrefInfo[hrefInfo.length-1];
+								fileGroupId = hrefInfo[2];
+								
+								String []uuidInfo = fileUuid.split("\\?");
+								String uuid="";
+								if(hrefInfo.length > 0){
+									uuid=uuidInfo[0];
+								}
+								
+								FileEntry file;
+								try {
+									file = DLAppLocalServiceUtil.getFileEntryByUuidAndGroupId(uuid, Long.parseLong(fileGroupId));
+																			
+									ServiceContext serviceContext = new ServiceContext();
+									serviceContext.setScopeGroupId(groupId);
+									serviceContext.setUserId(userId);
+									serviceContext.setCompanyId(file.getCompanyId());
+									serviceContext.setAddGroupPermissions(true);
+									
+									FileEntry newFile = cloneFileDescription(file, actId, file.getUserId(), serviceContext);
+									
+									newDescription = descriptionCloneFile(newDescription, file, newFile);
+									
+									System.out.println("   + Description file pdf : " + file.getTitle() +" "+file.getFileEntryId() );
+									
+								} catch (Exception e) {
+									// TODO Auto-generated catch block
+									//e.printStackTrace();
+									System.out.println("* ERROR! Description file pdf : " + e.getMessage());
+								}
+							}
+							
+							//Si en los enlaces tienen una imagen para hacer click.
+							for (Element entryElementLinkImage : entryElementLink.elements("img")) {
+								;//parseImage(entryElementLinkImage, element, context, moduleId);
+							}
+							
+						}
+					}
+				}
+			}else{
+				if (rootElement.getQName().getName().equals("p")) {
 					
 					//Para las imagenes
-					for (Element entryElementImg : entryElementP.elements("img")) {
+					for (Element entryElementImg : rootElement.elements("img")) {
 						
 						String src = entryElementImg.attributeValue("src");
 						
@@ -599,7 +703,7 @@ public class CloneCourse implements MessageListener {
 					}
 					
 					//Para los enlaces
-					for (Element entryElementLink : entryElementP.elements("a")) {
+					for (Element entryElementLink : rootElement.elements("a")) {
 						
 						String href = entryElementLink.attributeValue("href");
 						
@@ -647,6 +751,8 @@ public class CloneCourse implements MessageListener {
 					}
 				}
 			}
+			
+			
 			
 		} catch (DocumentException de) {
 			
