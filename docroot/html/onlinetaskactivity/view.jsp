@@ -379,9 +379,8 @@ if((PermissionCheckerFactoryUtil.create(themeDisplay.getUser())).hasPermission(t
 	<portlet:actionURL name="setActivity" var="setActivity">
 		<portlet:param name="actId" value="<%=Long.toString(activity.getActId()) %>" />
 	</portlet:actionURL>
-	
 	<% 
-	if((activity.getTries()==0)||(activity.getTries()>LearningActivityTryLocalServiceUtil.getTriesCountByActivityAndUser(actId, user.getUserId()))){ 
+	if((activity.getTries()==0)||(activity.getTries()>LearningActivityTryLocalServiceUtil.getTriesCountByActivityAndUser(actId, user.getUserId()))){
 	if(isSetTextoEnr){ %>
 
 	<% } 
@@ -451,18 +450,13 @@ if((PermissionCheckerFactoryUtil.create(themeDisplay.getUser())).hasPermission(t
 			</aui:button-row>
 		</aui:form>
 	<%} %>
-	<% } if(!isTeacher && isTablet) { 
-	%>
-		<liferay-ui:message key="onlinetaskactivity.updating"/>
-	<%}
-	//if(isTeacher){
-
-	%>
+	<% }%>
 <div class="nota"> 
 
-<%if (result!=null && !isTablet){ %>
+<%if (result!=null){ 
+	if(!isTablet){%>
 	<p class="doc_descarga"><a class="verMas" href="javascript:<portlet:namespace />showPopupGradesStudent(<%=Long.toString(user.getUserId()) %>,true);"><liferay-ui:message key="onlineActivity.view.last" /></a></p>
-	<%
+	<%}
 	if(result.getEndDate()!= null){
 		%><p><liferay-ui:message key="your-result-activity" /><%=arguments[0] %></p><%
 		if(LearningActivityResultLocalServiceUtil.userPassed(actId,themeDisplay.getUserId())){
@@ -475,14 +469,18 @@ if((PermissionCheckerFactoryUtil.create(themeDisplay.getUser())).hasPermission(t
 			<h3><liferay-ui:message key="comment-teacher" /></h3>
 			<p><span class="destacado"><%=result.getComments() %></span></p>
 		<%}
+	}else{
+		%>
+		<h2><liferay-ui:message key="onlinetaskactivity.not.qualificated.activity" /></h2>
+		<%
 	}
 }else {
-	
 	if(activity.getTries()!=0 && !isTablet && !isTeacher) {
 %>
 	<p class="doc_descarga"><span><liferay-ui:message key="onlinetaskactivity.not.qualificated.activity" /></span> <a class="verMas" href="javascript:<portlet:namespace />showPopupGradesStudent(<%=Long.toString(user.getUserId()) %>,true);"><liferay-ui:message key="onlineActivity.view.last" /></a></p>
-<% 
-	}
+<% }else if(activity.getTries()!=0 && isTablet && !isTeacher){%>
+		<h2><liferay-ui:message key="onlinetaskactivity.not.qualificated.activity" /></h2>
+		<% }
 }%>
 
 </div>
