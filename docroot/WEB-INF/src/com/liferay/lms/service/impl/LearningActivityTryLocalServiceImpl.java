@@ -122,28 +122,39 @@ public class LearningActivityTryLocalServiceImpl
 		
 	}
 	
-	public java.util.List<LearningActivityTry> getLearningActivityTryByActUser(long actId,long userId) throws SystemException
-	{
+	public java.util.List<LearningActivityTry> getLearningActivityTryByActUser(long actId,long userId) throws SystemException{
 		return learningActivityTryPersistence.findByact_u(actId, userId);
 	}
+	
 	@Override
-	public LearningActivityTry updateLearningActivityTry(
-			LearningActivityTry learningActivityTry, boolean merge)
-			throws SystemException{
-		try
-		{
-		if(learningActivityTry.getEndDate()!=null)
-		{
-			LearningActivityResultLocalServiceUtil.update(learningActivityTry)	;
-		}
-		return super.updateLearningActivityTry(learningActivityTry, merge);
-	}
-		catch(PortalException e)
-		{
+	public LearningActivityTry updateLearningActivityTry(LearningActivityTry learningActivityTry, boolean merge)throws SystemException{
+		try{
+			if(learningActivityTry.getEndDate()!=null){
+				LearningActivityResultLocalServiceUtil.update(learningActivityTry)	;
+			}
+			return super.updateLearningActivityTry(learningActivityTry, merge);
+		}catch(PortalException e){
 			throw new SystemException(e);
 		}
 	}
 
+
+	public LearningActivityResult updateLearningActivityTry(LearningActivityTry learningActivityTry, String tryResultData, String imsmanifest)throws SystemException, PortalException{
+		
+		super.updateLearningActivityTry(learningActivityTry, true);		
+		
+		LearningActivityResult lar = learningActivityResultLocalService.update(learningActivityTry.getLatId(), tryResultData, imsmanifest, learningActivityTry.getUserId());
+
+		//auditing
+		ServiceContext serviceContext = ServiceContextThreadLocal.getServiceContext();
+		if(serviceContext!=null){
+			AuditingLogFactory.audit(serviceContext.getCompanyId(), serviceContext.getScopeGroupId(), LearningActivityResult.class.getName(), 
+					learningActivityTry.getLatId(), serviceContext.getUserId(), AuditConstants.UPDATE, null);
+		}	
+		
+		return lar;
+	}
+	
 	public LearningActivityTry createLearningActivityTry(long actId,ServiceContext serviceContext) throws SystemException, PortalException
 	{
 		LearningActivity learningActivity = learningActivityPersistence.fetchByPrimaryKey(actId);

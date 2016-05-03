@@ -14,6 +14,8 @@
 
 package com.liferay.lms.service.impl;
 
+import java.util.Date;
+
 import com.liferay.lms.auditing.AuditConstants;
 import com.liferay.lms.auditing.AuditingLogFactory;
 import com.liferay.lms.model.LearningActivity;
@@ -117,14 +119,6 @@ public class LearningActivityResultServiceImpl	extends LearningActivityResultSer
 		if(serviceContext!=null){
 			AuditingLogFactory.audit(serviceContext.getCompanyId(), serviceContext.getScopeGroupId(), LearningActivityResult.class.getName(), 
 				latId, serviceContext.getUserId(), AuditConstants.UPDATE, null);
-		}else{
-			if(lar!=null){
-				LearningActivity la = learningActivityPersistence.fetchByPrimaryKey(lar.getActId());
-				if(la!=null){
-					AuditingLogFactory.audit(serviceContext.getCompanyId(), serviceContext.getScopeGroupId(), LearningActivityResult.class.getName(), 
-							latId, serviceContext.getUserId(), AuditConstants.UPDATE, null);
-				}
-			}
 		}
 		
 		return lar;
@@ -133,8 +127,7 @@ public class LearningActivityResultServiceImpl	extends LearningActivityResultSer
 		log.debug("updateFinishTry "+latId);
 		LearningActivityTry learningActivityTry = learningActivityTryLocalService.getLearningActivityTry(latId);
 		log.debug("learningActivityTry "+learningActivityTry);
-		learningActivityTry.setEndDate(new java.util.Date(System.currentTimeMillis()));
-		learningActivityTryLocalService.updateLearningActivityTry(learningActivityTry);
-		return update( latId,  tryResultData,  imsmanifest);
+		learningActivityTry.setEndDate(new Date());
+		return learningActivityTryLocalService.updateLearningActivityTry(learningActivityTry, tryResultData, imsmanifest);
 	}
 }

@@ -136,49 +136,56 @@ public class LearningActivityTryLocalServiceClpInvoker {
 				"com.liferay.lms.model.LearningActivityTry", "boolean"
 			};
 
-		_methodName145 = "createLearningActivityTry";
+		_methodName145 = "updateLearningActivityTry";
 
 		_methodParameterTypes145 = new String[] {
+				"com.liferay.lms.model.LearningActivityTry", "java.lang.String",
+				"java.lang.String"
+			};
+
+		_methodName146 = "createLearningActivityTry";
+
+		_methodParameterTypes146 = new String[] {
 				"long", "com.liferay.portal.service.ServiceContext"
 			};
 
-		_methodName146 = "getUsersByLearningActivity";
+		_methodName147 = "getUsersByLearningActivity";
 
-		_methodParameterTypes146 = new String[] { "long" };
+		_methodParameterTypes147 = new String[] { "long" };
 
-		_methodName147 = "getLastLearningActivityTryByActivityAndUser";
+		_methodName148 = "getLastLearningActivityTryByActivityAndUser";
 
-		_methodParameterTypes147 = new String[] { "long", "long" };
+		_methodParameterTypes148 = new String[] { "long", "long" };
 
-		_methodName148 = "createOrDuplicateLast";
+		_methodName149 = "createOrDuplicateLast";
 
-		_methodParameterTypes148 = new String[] {
+		_methodParameterTypes149 = new String[] {
 				"long", "com.liferay.portal.service.ServiceContext"
 			};
 
-		_methodName149 = "getLearningActivityTryNotFinishedByActUser";
-
-		_methodParameterTypes149 = new String[] { "long", "long" };
-
-		_methodName150 = "getTriesCountByActivityAndUser";
+		_methodName150 = "getLearningActivityTryNotFinishedByActUser";
 
 		_methodParameterTypes150 = new String[] { "long", "long" };
 
-		_methodName151 = "getTriesCountByActivity";
+		_methodName151 = "getTriesCountByActivityAndUser";
 
-		_methodParameterTypes151 = new String[] { "long" };
+		_methodParameterTypes151 = new String[] { "long", "long" };
 
-		_methodName152 = "getMapTryResultData";
+		_methodName152 = "getTriesCountByActivity";
 
-		_methodParameterTypes152 = new String[] { "long", "long" };
+		_methodParameterTypes152 = new String[] { "long" };
 
-		_methodName153 = "canUserDoANewTry";
+		_methodName153 = "getMapTryResultData";
 
 		_methodParameterTypes153 = new String[] { "long", "long" };
 
-		_methodName154 = "areThereTriesNotFromEditors";
+		_methodName154 = "canUserDoANewTry";
 
-		_methodParameterTypes154 = new String[] {
+		_methodParameterTypes154 = new String[] { "long", "long" };
+
+		_methodName155 = "areThereTriesNotFromEditors";
+
+		_methodParameterTypes155 = new String[] {
 				"com.liferay.lms.model.LearningActivity"
 			};
 	}
@@ -313,58 +320,64 @@ public class LearningActivityTryLocalServiceClpInvoker {
 
 		if (_methodName145.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes145, parameterTypes)) {
-			return LearningActivityTryLocalServiceUtil.createLearningActivityTry(((Long)arguments[0]).longValue(),
-				(com.liferay.portal.service.ServiceContext)arguments[1]);
+			return LearningActivityTryLocalServiceUtil.updateLearningActivityTry((com.liferay.lms.model.LearningActivityTry)arguments[0],
+				(java.lang.String)arguments[1], (java.lang.String)arguments[2]);
 		}
 
 		if (_methodName146.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes146, parameterTypes)) {
-			return LearningActivityTryLocalServiceUtil.getUsersByLearningActivity(((Long)arguments[0]).longValue());
+			return LearningActivityTryLocalServiceUtil.createLearningActivityTry(((Long)arguments[0]).longValue(),
+				(com.liferay.portal.service.ServiceContext)arguments[1]);
 		}
 
 		if (_methodName147.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes147, parameterTypes)) {
-			return LearningActivityTryLocalServiceUtil.getLastLearningActivityTryByActivityAndUser(((Long)arguments[0]).longValue(),
-				((Long)arguments[1]).longValue());
+			return LearningActivityTryLocalServiceUtil.getUsersByLearningActivity(((Long)arguments[0]).longValue());
 		}
 
 		if (_methodName148.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes148, parameterTypes)) {
-			return LearningActivityTryLocalServiceUtil.createOrDuplicateLast(((Long)arguments[0]).longValue(),
-				(com.liferay.portal.service.ServiceContext)arguments[1]);
+			return LearningActivityTryLocalServiceUtil.getLastLearningActivityTryByActivityAndUser(((Long)arguments[0]).longValue(),
+				((Long)arguments[1]).longValue());
 		}
 
 		if (_methodName149.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes149, parameterTypes)) {
-			return LearningActivityTryLocalServiceUtil.getLearningActivityTryNotFinishedByActUser(((Long)arguments[0]).longValue(),
-				((Long)arguments[1]).longValue());
+			return LearningActivityTryLocalServiceUtil.createOrDuplicateLast(((Long)arguments[0]).longValue(),
+				(com.liferay.portal.service.ServiceContext)arguments[1]);
 		}
 
 		if (_methodName150.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes150, parameterTypes)) {
-			return LearningActivityTryLocalServiceUtil.getTriesCountByActivityAndUser(((Long)arguments[0]).longValue(),
+			return LearningActivityTryLocalServiceUtil.getLearningActivityTryNotFinishedByActUser(((Long)arguments[0]).longValue(),
 				((Long)arguments[1]).longValue());
 		}
 
 		if (_methodName151.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes151, parameterTypes)) {
-			return LearningActivityTryLocalServiceUtil.getTriesCountByActivity(((Long)arguments[0]).longValue());
+			return LearningActivityTryLocalServiceUtil.getTriesCountByActivityAndUser(((Long)arguments[0]).longValue(),
+				((Long)arguments[1]).longValue());
 		}
 
 		if (_methodName152.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes152, parameterTypes)) {
-			return LearningActivityTryLocalServiceUtil.getMapTryResultData(((Long)arguments[0]).longValue(),
-				((Long)arguments[1]).longValue());
+			return LearningActivityTryLocalServiceUtil.getTriesCountByActivity(((Long)arguments[0]).longValue());
 		}
 
 		if (_methodName153.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes153, parameterTypes)) {
-			return LearningActivityTryLocalServiceUtil.canUserDoANewTry(((Long)arguments[0]).longValue(),
+			return LearningActivityTryLocalServiceUtil.getMapTryResultData(((Long)arguments[0]).longValue(),
 				((Long)arguments[1]).longValue());
 		}
 
 		if (_methodName154.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes154, parameterTypes)) {
+			return LearningActivityTryLocalServiceUtil.canUserDoANewTry(((Long)arguments[0]).longValue(),
+				((Long)arguments[1]).longValue());
+		}
+
+		if (_methodName155.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes155, parameterTypes)) {
 			return LearningActivityTryLocalServiceUtil.areThereTriesNotFromEditors((com.liferay.lms.model.LearningActivity)arguments[0]);
 		}
 
@@ -437,4 +450,6 @@ public class LearningActivityTryLocalServiceClpInvoker {
 	private String[] _methodParameterTypes153;
 	private String _methodName154;
 	private String[] _methodParameterTypes154;
+	private String _methodName155;
+	private String[] _methodParameterTypes155;
 }
