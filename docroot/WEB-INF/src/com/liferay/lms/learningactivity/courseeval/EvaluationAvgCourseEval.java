@@ -122,12 +122,7 @@ public class EvaluationAvgCourseEval extends BaseCourseEval {
 			if(result!=null){
 				values[i]=result.getResult();
 			}
-			/*
-			 * else{
-			 * 	values[i]=0;
-			 * }
-			 * 
-			 */
+
 			weights[i++]=evaluation.getValue();
 		}
 		
@@ -135,6 +130,7 @@ public class EvaluationAvgCourseEval extends BaseCourseEval {
 		if(courseResult==null)
 		{
 			courseResult=CourseResultLocalServiceUtil.create(course.getCourseId(), userId);
+			courseResult.setStartDate(new Date());
 		}
 		
 		courseResult.setResult((long) calculateMean(values,weights));

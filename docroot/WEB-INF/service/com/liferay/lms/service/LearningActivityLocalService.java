@@ -355,13 +355,14 @@ public interface LearningActivityLocalService extends BaseLocalService,
 		com.liferay.lms.model.LearningActivity larn)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
-	public void goUpLearningActivity(long actId)
+	public void goUpLearningActivity(long actId, long userIdAction)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
-	public void goDownLearningActivity(long actId)
+	public void goDownLearningActivity(long actId, long userIdAction)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
-	public void moveActivity(long actId, long previusAct, long nextAct)
+	public void moveActivity(long actId, long previusAct, long nextAct,
+		long userIdAction)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
@@ -424,4 +425,8 @@ public interface LearningActivityLocalService extends BaseLocalService,
 		com.liferay.lms.model.LearningActivity activity,
 		com.liferay.portal.security.permission.PermissionChecker permissionChecker)
 		throws java.lang.Exception;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.util.List<com.liferay.lms.model.LearningActivity> getMandatoryActivities(
+		long moduleId);
 }

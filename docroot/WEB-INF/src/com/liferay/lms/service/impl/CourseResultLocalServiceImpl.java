@@ -68,18 +68,15 @@ import com.liferay.portal.model.User;
 public class CourseResultLocalServiceImpl
 	extends CourseResultLocalServiceBaseImpl {
 	
-	public CourseResult getByUserAndCourse(long courseId,long userId) throws SystemException
-	{
+	public CourseResult getByUserAndCourse(long courseId,long userId) throws SystemException{
 		return courseResultPersistence.fetchByuc(userId, courseId);
 	}
 	
-	public long countByCourseId(long courseId, boolean passed) throws SystemException
-	{
+	public long countByCourseId(long courseId, boolean passed) throws SystemException{
 		return courseResultPersistence.countByc(courseId, passed);
 	}
 	
-	public long countStudentsByCourseId(Course course, boolean passed) throws SystemException
-	{
+	public long countStudentsByCourseId(Course course, boolean passed) throws SystemException{
 		
 		long res = 0;
 		List<User> students = CourseLocalServiceUtil.getStudentsFromCourse(course.getCompanyId(), course.getGroupCreatedId());
@@ -203,6 +200,7 @@ public class CourseResultLocalServiceImpl
 		courseResult.setResult(0);
 		courseResult.setPassed(false);
 		courseResult.setPassedDate(null);
+		courseResult.setStartDate(new Date());
 		courseResultPersistence.update(courseResult, false);
 
 		return courseResult;
@@ -218,23 +216,19 @@ public class CourseResultLocalServiceImpl
 		courseResult.setPassedDate(null);
 		courseResult.setAllowStartDate(allowStartDate);
 		courseResult.setAllowFinishDate(allowFinishDate);
+		courseResult.setStartDate(new Date());
 		courseResultPersistence.update(courseResult, false);
 
 		return courseResult;
 	}
-	public void update(CourseResult cresult) throws SystemException
-	{
+	
+	public void update(CourseResult cresult) throws SystemException{
 		if(cresult.getPassed()){
 			List<CourseCompetence> competences = courseCompetencePersistence.findBycourseId(cresult.getCourseId(), false);
 		
 			for(CourseCompetence cc: competences){
-				UserCompetence uc = null;
-				try {
-					uc = userCompetencePersistence.findByUserIdCompetenceId(cresult.getUserId(), cc.getCompetenceId());
-				} catch (NoSuchUserCompetenceException e) {
-					uc = null;
-				}
-				
+				UserCompetence uc = userCompetencePersistence.fetchByUserIdCompetenceId(cresult.getUserId(), cc.getCompetenceId());
+								
 				if(uc==null){
 					UserCompetence userCompetence=userCompetencePersistence.create(counterLocalService.increment(UserCompetence.class.getName()));
 					userCompetence.setUserId(cresult.getUserId());
@@ -244,59 +238,34 @@ public class CourseResultLocalServiceImpl
 					userCompetencePersistence.update(userCompetence, false);
 				}
 			}	
-		}
-		
+		}		
 		courseResultPersistence.update(cresult, false);
 	}
 	
-	public void update(ModuleResult mresult) throws PortalException, SystemException
-	{
+	public void update(ModuleResult mresult) throws PortalException, SystemException{
 		Module theModule=moduleLocalService.getModule(mresult.getModuleId());
 		Course course=coursePersistence.fetchByGroupCreatedId(theModule.getGroupId());
-		if(course!=null)
-		{
+		if(course!=null){
 			CourseEvalRegistry cer=new CourseEvalRegistry();
 			long courseEvalTypeId=course.getCourseEvalId();
 			CourseEval ceval=cer.getCourseEval(courseEvalTypeId);
 			CourseResult courseResult=CourseResultLocalServiceUtil.getByUserAndCourse(course.getCourseId(), mresult.getUserId());
-			//.fetchByuc(mresult.getUserId(), course.getCourseId());
-			if(courseResult==null)
-			{
+						
+			if(courseResult==null){
 				courseResult=CourseResultLocalServiceUtil.create(course.getCourseId(),  mresult.getUserId());
+			}
+			
+			if(courseResult.getStartDate()==null){
 				courseResult.setStartDate(mresult.getStartDate());
-				CourseResultLocalServiceUtil.update(courseResult);
 			}
-			else
-			{
-				courseResult=CourseResultLocalServiceUtil.getByUserAndCourse( course.getCourseId(),  mresult.getUserId());
-				if(courseResult.getStartDate()==null)
-				{
-					courseResult.setStartDate(mresult.getStartDate());
-					CourseResultLocalServiceUtil.update(courseResult);
-				}
-			}
+			CourseResultLocalServiceUtil.update(courseResult);
 			ceval.updateCourse(course, mresult);
 		}
 	}
 	
 	public CourseResult getCourseResultByCourseAndUser(long courseId,long userId) throws SystemException{
 
-		ClassLoader classLoader = (ClassLoader) PortletBeanLocatorUtil.locate(ClpSerializer.getServletContextName(), "portletClassLoader"); 
-		DynamicQuery consulta = DynamicQueryFactoryUtil.forClass(CourseResult.class, classLoader)
-				.add(PropertyFactoryUtil.forName("courseId").eq(courseId))
-				.add(PropertyFactoryUtil.forName("userId").eq(userId));
-	
-		List<CourseResult> list = (List<CourseResult>)courseResultPersistence.findWithDynamicQuery(consulta);
-		
-		if(list!=null){
-			if(list.size() > 0){
-				return list.get(0);
-			}
-		}
-		
-		return null;
-		
-		//return courseResultPersistence.fetchByuc(userId, courseId);
+		return courseResultPersistence.fetchByuc(userId, courseId);
 	}
 	
 	public String translateResult(Locale locale, double result, long groupId){

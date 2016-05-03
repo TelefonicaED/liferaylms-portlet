@@ -288,6 +288,16 @@ public class TestQuestionLocalServiceUtil {
 		getService().importXMLQuestion(actId, question);
 	}
 
+	public static long getQuestionType(
+		com.liferay.portal.kernel.xml.Element question) {
+		return getService().getQuestionType(question);
+	}
+
+	public static boolean isTypeAllowed(long actId,
+		com.liferay.portal.kernel.xml.Document document) {
+		return getService().isTypeAllowed(actId, document);
+	}
+
 	public static com.liferay.lms.model.TestQuestion addQuestion(long actId,
 		java.lang.String text, long questionType)
 		throws com.liferay.portal.kernel.exception.SystemException {

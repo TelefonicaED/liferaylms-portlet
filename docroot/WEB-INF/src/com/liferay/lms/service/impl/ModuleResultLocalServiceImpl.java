@@ -16,6 +16,7 @@ package com.liferay.lms.service.impl;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -41,6 +42,8 @@ import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.User;
 import com.liferay.portal.service.ServiceContext;
@@ -69,11 +72,11 @@ import com.liferay.portal.service.persistence.GroupUtil;
  */
 public class ModuleResultLocalServiceImpl extends ModuleResultLocalServiceBaseImpl {
 
-	public ModuleResult getByModuleAndUser(long moduleId, long userId)
-		throws SystemException {
-
-		ModuleResult moduleResult = moduleResultPersistence.fetchBymu(userId, moduleId);
-		return moduleResult;	
+	private static Log log = LogFactoryUtil.getLog(ModuleResultLocalServiceImpl.class);
+	
+	public ModuleResult getByModuleAndUser(long moduleId, long userId)throws SystemException {
+			ModuleResult moduleResult = moduleResultPersistence.fetchBymu(userId, moduleId);
+			return moduleResult;	
 	}
 
 	/**
@@ -206,24 +209,21 @@ public class ModuleResultLocalServiceImpl extends ModuleResultLocalServiceBaseIm
 	}
 
 
-	public void update(LearningActivityResult lactr)
-		throws PortalException, SystemException {
-
-		ModuleResult moduleResult = null;
+	public void update(LearningActivityResult lactr) throws PortalException, SystemException {
+		
 		long actId = lactr.getActId();
 		long userId = lactr.getUserId();
-		LearningActivity learningActivity = learningActivityLocalService.getLearningActivity(actId);
+		LearningActivity learningActivity = LearningActivityLocalServiceUtil.getLearningActivity(actId);
+		long moduleId = learningActivity.getModuleId();		
+		
+		ModuleResult moduleResult = getByModuleAndUser(moduleId, userId);
+		
 		// Si el Weight es mayor que cero (obligatoria) entonces calcula, sino
 		// no.
 		// Se elimina la restricci�n de calcular solo en las obligatorias, se
 		// calcula ent todas las que se terminen.
-		long moduleId = learningActivity.getModuleId();
-		if (moduleResultPersistence.countBymu(userId, moduleId) > 0) 
-		{
-			moduleResult = moduleResultPersistence.fetchBymu(userId, moduleId, false);
-		}
-		else 
-		{
+		
+		if (moduleResult == null){
 			moduleResult = moduleResultPersistence.create(counterLocalService.increment(ModuleResult.class.getName()));
 			moduleResult.setModuleId(moduleId);
 			moduleResult.setPassed(false);
@@ -231,31 +231,13 @@ public class ModuleResultLocalServiceImpl extends ModuleResultLocalServiceBaseIm
 			moduleResult.setStartDate(lactr.getStartDate());
 			moduleResult.setResult(0);
 			moduleResultPersistence.update(moduleResult, true);
-
 		}
-		if (learningActivity.getModuleId() > 0 && /*
-												 * learningActivity.
-												 * getWeightinmodule()>0 &&
-												 */lactr.getEndDate()!=null) 
-		{
+		
+		if (lactr.getEndDate()!=null){			
+			List<LearningActivity> activities = LearningActivityLocalServiceUtil.getMandatoryActivities(moduleId);
+			int passedNumber = LearningActivityResultLocalServiceUtil.countMandatoryByModuleIdUserIdPassed(moduleId, userId);
+			log.debug("Mandatory activities passed for moduleId["+moduleId+"]:"+passedNumber);			
 			
-			DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(LearningActivity.class, (ClassLoader)PortletBeanLocatorUtil.locate(ClpSerializer.getServletContextName(),
-					"portletClassLoader"));
-			Criterion crit;
-			crit = PropertyFactoryUtil.forName("weightinmodule").gt(new Long(0));
-			dynamicQuery.add(crit);
-			Criterion crit2;
-			crit2 = PropertyFactoryUtil.forName("moduleId").eq(moduleId);
-			dynamicQuery.add(crit2);
-			java.util.List<LearningActivity> activities = learningActivityLocalService.dynamicQuery(dynamicQuery);
-			long passedNumber = 0;
-			for (LearningActivity activity : activities) {
-				if (learningActivityResultLocalService.existsLearningActivityResult(activity.getActId(), userId)) {
-					if (learningActivityResultLocalService.getByActIdAndUserId(activity.getActId(), userId).getPassed()) {
-						passedNumber++;
-					}
-				}
-			}
 			if (activities.size() > 0) {
 				moduleResult.setResult(100 * passedNumber / activities.size());
 			}
@@ -272,20 +254,17 @@ public class ModuleResultLocalServiceImpl extends ModuleResultLocalServiceBaseIm
 				AuditingLogFactory.audit(serviceContext.getCompanyId(), serviceContext.getScopeGroupId(), ModuleResult.class.getName(), 
 					moduleResult.getPrimaryKey(), serviceContext.getUserId(), AuditConstants.UPDATE, null);
 			}else{
-				if(moduleResult!=null){
-					Module module = modulePersistence.fetchByPrimaryKey(moduleResult.getModuleId());
-					if(module!=null){
-						AuditingLogFactory.audit(module.getCompanyId(), module.getGroupId(), ModuleResult.class.getName(), 
-								moduleResult.getPrimaryKey(), module.getUserId(), AuditConstants.UPDATE, null);
-					}
+				Module module = modulePersistence.fetchByPrimaryKey(moduleResult.getModuleId());
+				if(module!=null){
+					AuditingLogFactory.audit(module.getCompanyId(), module.getGroupId(), ModuleResult.class.getName(), 
+							moduleResult.getPrimaryKey(), module.getUserId(), AuditConstants.UPDATE, null);					
 				}
 				
-			}
-			
-			
+			}			
 		}
 		
 	}
+	
 	public int updateAllUsers(long groupId, long moduleId) throws PortalException, SystemException {
 		
 		//Obtenemos la lista de users del curso.
@@ -294,16 +273,16 @@ public class ModuleResultLocalServiceImpl extends ModuleResultLocalServiceBaseIm
 				
 		int changes = 0;
 		
-		System.out.println("groupId: "+groupId+", moduleId: "+moduleId+", alumnos en el curso: "+usersList.size());
+		log.debug("groupId: "+groupId+", moduleId: "+moduleId+", alumnos en el curso: "+usersList.size());
 		
-		System.out.println("........ START ............");
+		log.debug("........ START ............");
 		for(User user : usersList){
 			if(update(moduleId, user.getUserId())){
 				changes++;
 			}
 		}
-		System.out.println("Cambiaron "+ changes +" de "+usersList.size()+" alumnos.");
-		System.out.println("........ END ............");
+		log.debug("Cambiaron "+ changes +" de "+usersList.size()+" alumnos.");
+		log.debug("........ END ............");
 		
 		return changes;
 	}
@@ -316,27 +295,27 @@ public class ModuleResultLocalServiceImpl extends ModuleResultLocalServiceBaseIm
 		
 		Calendar start = Calendar.getInstance();
 		Calendar end = Calendar.getInstance();
-		System.out.println("........ START ............");
+		log.debug("........ START ............");
 		
 		int restantes = moduleResultList.size();
 		
 		for(ModuleResult mo : moduleResultList){
 						
-			System.out.println("   :: "+mo.getModuleId()+" :: Restantes: "+ (restantes--));
+			log.debug("   :: "+mo.getModuleId()+" :: Restantes: "+ (restantes--));
 			
 			if(update(mo.getModuleId(), mo.getUserId())){
 				changes++;
 			}
 			
-			System.out.println("-----------------------------------------------------------------------");
+			log.debug("-----------------------------------------------------------------------");
 			
 		}
-		System.out.println("  Cambiaron "+ changes +" alumnos.");
+		log.debug("  Cambiaron "+ changes +" alumnos.");
 		
 		end = Calendar.getInstance();
-		System.out.println(" ## Time start ## "+start.getTime());
-		System.out.println(" ## Time end   ## "+end.getTime());
-		System.out.println("........ END ............");
+		log.debug(" ## Time start ## "+start.getTime());
+		log.debug(" ## Time end   ## "+end.getTime());
+		log.debug("........ END ............");
 	}
 	
 	public boolean update(long moduleId, long userId) throws PortalException, SystemException {
@@ -349,7 +328,7 @@ public class ModuleResultLocalServiceImpl extends ModuleResultLocalServiceBaseIm
 		
 		//Actualizar el resultado del modulo en bd.
 		
-		System.out.println("User::"+userId+"::moduleId"+moduleId);
+		log.debug("User::"+userId+"::moduleId"+moduleId);
 		//Obtenemos el moduleResult que tiene el usuario.Si no lo tiene, no lo creamos.
 		if (moduleResultPersistence.countBymu(userId, moduleId) > 0) {
 			moduleResult = moduleResultPersistence.findBymu(userId, moduleId);
@@ -359,10 +338,11 @@ public class ModuleResultLocalServiceImpl extends ModuleResultLocalServiceBaseIm
 			moduleResult.setPassed(false);
 			moduleResult.setUserId(userId);
 			moduleResult.setResult(0);
+			moduleResult.setStartDate(new Date());
 		}
 
 		if(moduleResult!=null){
-			System.out.println("Update!");
+			log.debug("Update!");
 			
 			List<LearningActivity> learnActList = LearningActivityLocalServiceUtil.getLearningActivitiesOfModule(moduleId);
 
@@ -405,14 +385,14 @@ public class ModuleResultLocalServiceImpl extends ModuleResultLocalServiceBaseIm
 				
 				//Traza
 				User user = UserLocalServiceUtil.getUser(userId);
-				//System.out.println("    *** USER: "+ user.getFullName() +" ("+ userId +")  ***\n           resultOLD: "+moduleResult.getResult()+", passedOLD: "+moduleResult.getPassed()+"\n           resultNEW: "+result+", passedNEW: "+passedModule);
+				//log.debug("    *** USER: "+ user.getFullName() +" ("+ userId +")  ***\n           resultOLD: "+moduleResult.getResult()+", passedOLD: "+moduleResult.getPassed()+"\n           resultNEW: "+result+", passedNEW: "+passedModule);
 				Module m = ModuleLocalServiceUtil.getModule(moduleId);
 				Course c = CourseLocalServiceUtil.getCourseByGroupCreatedId(m.getGroupId());
 				
 				String text = (moduleResult.getResult()<result)?"Sube":"Baja";
 				try{
-					System.out.println(c.getTitle(Locale.getDefault()) +" ("+ c.getCourseId() +")|"+m.getTitle(Locale.getDefault())+" ("+m.getModuleId()+")|"+moduleResult.getMrId()+"|"+user.getFullName() +" ("+ userId +")|"+moduleResult.getPassed()+"|"+passedModule+"|"+moduleResult.getResult() +"|"+result+"|"+text);
-				}catch (Exception e){System.out.println("ERROR: moduleID: "+moduleId+", userID: "+userId);}
+					log.debug(c.getTitle(Locale.getDefault()) +" ("+ c.getCourseId() +")|"+m.getTitle(Locale.getDefault())+" ("+m.getModuleId()+")|"+moduleResult.getMrId()+"|"+user.getFullName() +" ("+ userId +")|"+moduleResult.getPassed()+"|"+passedModule+"|"+moduleResult.getResult() +"|"+result+"|"+text);
+				}catch (Exception e){log.debug("ERROR: moduleID: "+moduleId+", userID: "+userId);}
 				
 				moduleResult.setResult(result);
 				moduleResult.setPassed(passedModule);
@@ -441,7 +421,7 @@ public class ModuleResultLocalServiceImpl extends ModuleResultLocalServiceBaseIm
 				Module m = ModuleLocalServiceUtil.getModule(moduleId);
 				Course c = CourseLocalServiceUtil.getCourseByGroupCreatedId(m.getGroupId());
 				
-				System.out.println(c.getTitle(Locale.getDefault()) +" ("+ c.getCourseId() +")|"+m.getTitle(Locale.getDefault())+" ("+m.getModuleId()+")|"+moduleResult.getMrId()+"|"+user.getFullName() +" ("+ userId +")|"+moduleResult.getPassed()+"|"+passedModule+"|"+moduleResult.getResult() +"|"+result+"|Baja");
+				log.debug(c.getTitle(Locale.getDefault()) +" ("+ c.getCourseId() +")|"+m.getTitle(Locale.getDefault())+" ("+m.getModuleId()+")|"+moduleResult.getMrId()+"|"+user.getFullName() +" ("+ userId +")|"+moduleResult.getPassed()+"|"+passedModule+"|"+moduleResult.getResult() +"|"+result+"|Baja");
 			}
 		}
 

@@ -27,39 +27,15 @@ public class CleanLearningActivity {
 	}
 	
 	public boolean processTry(LearningActivityTry lat){
-	
-		//Audit
-	
-		/*LearningActivityTryDeleted latd = new LearningActivityTryDeletedImpl();
-		
-		latd.setActId(lat.getActId());
-		latd.setActManAuditId(actManAudit.getActManAuditId());
-		latd.setEndDate(lat.getEndDate());
-		latd.setLatId(lat.getLatId());
-		latd.setUserId(lat.getUserId());
-		latd.setStartDate(lat.getStartDate());
-		latd.setResult(lat.getResult());
-		latd.setTryData(lat.getTryData());
-		latd.setTryResultData(lat.getTryResultData());
-		latd.setComments(lat.getComments());
-		
-		try {
-			latd = LearningActivityTryDeletedLocalServiceUtil.addLearningActivityTryDeleted(latd);
-			LearningActivityTryLocalServiceUtil.deleteLearningActivityTry(lat);
-			actManAudit.setNumber(actManAudit.getNumber()+1);
-			actManAudit = ActManAuditLocalServiceUtil.updateActManAudit(actManAudit);
-			
-		} catch (SystemException e) {
-			if(log.isInfoEnabled())log.info(e.getMessage());
-			if(log.isDebugEnabled())e.printStackTrace();
-		}*/
-		System.out.println("PROCESSTRY "+lat.getActId()+" "+lat.getUserId());
-		LearningActivityResult res= null;
+
+		log.debug("PROCESSTRY "+lat.getActId()+" "+lat.getUserId());
+		LearningActivityResult res=null;
 		try {
 			res = LearningActivityResultLocalServiceUtil.getByActIdAndUserId(lat.getActId(), lat.getUserId());
-		} catch (SystemException e) {
-			System.out.println(e.getMessage());
+		} catch (SystemException e2) {
+			e2.printStackTrace();
 		}
+		
 		
 
 		LearningActivity larn = null;
@@ -67,9 +43,9 @@ public class CleanLearningActivity {
 			larn = LearningActivityLocalServiceUtil.getLearningActivity(lat.getActId());
 		} catch (PortalException e) {
 			
-			System.out.println(e.getMessage());
+			e.printStackTrace();
 		} catch (SystemException e) {
-			System.out.println(e.getMessage());
+			e.printStackTrace();
 		}
 		
 		try {
@@ -90,18 +66,18 @@ public class CleanLearningActivity {
 			try {
 				LearningActivityResultLocalServiceUtil.updateLearningActivityResult(res);
 			} catch (SystemException e) {
-				System.out.println(e.getMessage());
+				e.printStackTrace();
 			}
 		}
 		
 		if(larn!=null&&larn.getWeightinmodule()>0){
-			ModuleResult mr = null;
+			ModuleResult mr=null;
 			try {
 				mr = ModuleResultLocalServiceUtil.getByModuleAndUser(larn.getModuleId(), lat.getUserId());
-			} catch (SystemException e) {
-				if(log.isInfoEnabled())log.info(e.getMessage());
-				if(log.isDebugEnabled())e.printStackTrace();
+			} catch (SystemException e1) {
+				e1.printStackTrace();
 			}
+			
 			if(mr!=null){
 				mr.setPassed(false);
 				try {

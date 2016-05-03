@@ -256,6 +256,13 @@ public interface TestQuestionLocalService extends BaseLocalService,
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public long getQuestionType(com.liferay.portal.kernel.xml.Element question);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public boolean isTypeAllowed(long actId,
+		com.liferay.portal.kernel.xml.Document document);
+
 	public com.liferay.lms.model.TestQuestion addQuestion(long actId,
 		java.lang.String text, long questionType)
 		throws com.liferay.portal.kernel.exception.SystemException;

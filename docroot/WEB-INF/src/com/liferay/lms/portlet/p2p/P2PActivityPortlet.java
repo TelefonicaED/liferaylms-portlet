@@ -230,7 +230,7 @@ public class P2PActivityPortlet extends MVCPortlet {
 					
 					//Creamos el LearningActivityTry
 					LearningActivityTry learningTry =LearningActivityTryLocalServiceUtil.createLearningActivityTry(actId,serviceContext);
-					learningTry.setStartDate(new java.util.Date(System.currentTimeMillis()));
+					learningTry.setStartDate(new Date());
 					learningTry.setUserId(user.getUserId());
 					learningTry.setResult(0);
 					LearningActivityTryLocalServiceUtil.updateLearningActivityTry(learningTry);

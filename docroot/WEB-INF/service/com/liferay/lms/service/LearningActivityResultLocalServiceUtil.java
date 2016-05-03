@@ -326,6 +326,15 @@ public class LearningActivityResultLocalServiceUtil {
 			courseGropupCreatedId, passed);
 	}
 
+	public static long countPassedOnlyStudents(long actId, long companyId,
+		long courseGropupCreatedId, boolean passed,
+		java.util.List<com.liferay.portal.model.User> _students)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService()
+				   .countPassedOnlyStudents(actId, companyId,
+			courseGropupCreatedId, passed, _students);
+	}
+
 	public static long countNotPassed(long actId)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService().countNotPassed(actId);
@@ -337,6 +346,15 @@ public class LearningActivityResultLocalServiceUtil {
 		return getService()
 				   .countNotPassedOnlyStudents(actId, companyId,
 			courseGropupCreatedId);
+	}
+
+	public static long countNotPassedOnlyStudents(long actId, long companyId,
+		long courseGropupCreatedId,
+		java.util.List<com.liferay.portal.model.User> _students)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService()
+				   .countNotPassedOnlyStudents(actId, companyId,
+			courseGropupCreatedId, _students);
 	}
 
 	public static java.lang.Double avgResult(long actId)
@@ -352,6 +370,15 @@ public class LearningActivityResultLocalServiceUtil {
 			courseGropupCreatedId);
 	}
 
+	public static java.lang.Double avgResultOnlyStudents(long actId,
+		long companyId, long courseGropupCreatedId,
+		java.util.List<com.liferay.portal.model.User> _students)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService()
+				   .avgResultOnlyStudents(actId, companyId,
+			courseGropupCreatedId, _students);
+	}
+
 	public static long countStarted(long actId)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService().countStarted(actId);
@@ -363,6 +390,15 @@ public class LearningActivityResultLocalServiceUtil {
 		return getService()
 				   .countStartedOnlyStudents(actId, companyId,
 			courseGropupCreatedId);
+	}
+
+	public static long countStartedOnlyStudents(long actId, long companyId,
+		long courseGropupCreatedId,
+		java.util.List<com.liferay.portal.model.User> _students)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService()
+				   .countStartedOnlyStudents(actId, companyId,
+			courseGropupCreatedId, _students);
 	}
 
 	public static double triesPerUser(long actId)
@@ -378,6 +414,15 @@ public class LearningActivityResultLocalServiceUtil {
 			courseGropupCreatedId);
 	}
 
+	public static double triesPerUserOnlyStudents(long actId, long companyId,
+		long courseGropupCreatedId,
+		java.util.List<com.liferay.portal.model.User> _students)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService()
+				   .triesPerUserOnlyStudents(actId, companyId,
+			courseGropupCreatedId, _students);
+	}
+
 	public static com.liferay.lms.model.LearningActivityResult getByActIdAndUserId(
 		long actId, long userId)
 		throws com.liferay.portal.kernel.exception.SystemException {
@@ -390,8 +435,39 @@ public class LearningActivityResultLocalServiceUtil {
 	}
 
 	public static java.util.List<com.liferay.lms.model.LearningActivityResult> getByActId(
-		long actId) throws com.liferay.portal.kernel.exception.SystemException {
+		long actId) {
 		return getService().getByActId(actId);
+	}
+
+	public static java.util.List<com.liferay.lms.model.LearningActivityResult> getByGroupIdUserId(
+		long groupId, long userId) {
+		return getService().getByGroupIdUserId(groupId, userId);
+	}
+
+	public static java.util.List<com.liferay.lms.model.LearningActivityResult> getMandatoryByGroupIdUserId(
+		long groupId, long userId) {
+		return getService().getMandatoryByGroupIdUserId(groupId, userId);
+	}
+
+	public static java.util.List<com.liferay.lms.model.LearningActivityResult> getByModuleIdUserId(
+		long moduleId, long userId) {
+		return getService().getByModuleIdUserId(moduleId, userId);
+	}
+
+	public static java.util.List<com.liferay.lms.model.LearningActivityResult> getByModuleIdUserIdPassed(
+		long moduleId, long userId) {
+		return getService().getByModuleIdUserIdPassed(moduleId, userId);
+	}
+
+	public static java.util.List<com.liferay.lms.model.LearningActivityResult> getMandatoryByModuleIdUserIdPassed(
+		long moduleId, long userId) {
+		return getService().getMandatoryByModuleIdUserIdPassed(moduleId, userId);
+	}
+
+	public static int countMandatoryByModuleIdUserIdPassed(long moduleId,
+		long userId) {
+		return getService()
+				   .countMandatoryByModuleIdUserIdPassed(moduleId, userId);
 	}
 
 	public static java.lang.String translateResult(java.util.Locale locale,

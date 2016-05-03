@@ -80,8 +80,6 @@ public class LearningActivityResultServiceClpInvoker {
 		if (_methodName119.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes119, parameterTypes)) {
 			LearningActivityResultServiceUtil.setBeanIdentifier((java.lang.String)arguments[0]);
-
-			return null;
 		}
 
 		if (_methodName124.equals(name) &&

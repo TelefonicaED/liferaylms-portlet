@@ -41,15 +41,16 @@ import com.liferay.lms.model.Course;
 import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.model.LearningActivityResult;
 import com.liferay.lms.model.LearningActivityTry;
-import com.liferay.lms.model.ModuleResult;
 import com.liferay.lms.model.SCORMContent;
 import com.liferay.lms.service.ClpSerializer;
 import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityLocalServiceUtil;
+import com.liferay.lms.service.LearningActivityResultLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityTryLocalServiceUtil;
 import com.liferay.lms.service.ModuleResultLocalServiceUtil;
 import com.liferay.lms.service.SCORMContentLocalServiceUtil;
 import com.liferay.lms.service.base.LearningActivityResultLocalServiceBaseImpl;
+import com.liferay.lms.service.persistence.LearningActivityResultUtil;
 import com.liferay.portal.kernel.bean.PortletBeanLocatorUtil;
 import com.liferay.portal.kernel.dao.orm.Criterion;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
@@ -60,14 +61,11 @@ import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.json.JSONArray;
-import com.liferay.portal.kernel.json.JSONDeserializer;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
-import com.liferay.portal.kernel.json.JSONSerializer;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.DocumentException;
@@ -80,39 +78,18 @@ import com.liferay.portlet.asset.model.AssetEntry;
 import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
 
 
-/**
- * The implementation of the learning activity result local service.
- *
- * <p>
- * All custom service methods should be put in this class. Whenever methods are added, rerun ServiceBuilder to copy their definitions into the {@link com.liferay.lms.service.LearningActivityResultLocalService} interface.
- * </p>
- *
- * <p>
- * Never reference this interface directly. Always use {@link com.liferay.lms.service.LearningActivityResultLocalServiceUtil} to access the learning activity result local service.
- * </p>
- *
- * <p>
- * This is a local service. Methods of this service will not have security checks based on the propagated JAAS credentials because this service can only be accessed from within the same VM.
- * </p>
- *
- * @author cvicente
- * @see com.liferay.lms.service.base.LearningActivityResultLocalServiceBaseImpl
- * @see com.liferay.lms.service.LearningActivityResultLocalServiceUtil
- */
-public class LearningActivityResultLocalServiceImpl
-	extends LearningActivityResultLocalServiceBaseImpl {
+public class LearningActivityResultLocalServiceImpl	extends LearningActivityResultLocalServiceBaseImpl {
 	
-	Log log = LogFactoryUtil.getLog(LearningActivityResultLocalServiceImpl.class);
+	private Log log = LogFactoryUtil.getLog(LearningActivityResultLocalServiceImpl.class);
 
 	
-	public LearningActivityResult update(LearningActivityTry learningActivityTry) throws SystemException, PortalException
-	{
-		LearningActivityResult learningActivityResult=null;
+	public LearningActivityResult update(LearningActivityTry learningActivityTry) throws SystemException, PortalException{
+
 		long actId=learningActivityTry.getActId();
 		long userId=learningActivityTry.getUserId();
+		LearningActivityResult learningActivityResult=getByActIdAndUserId(actId, userId);
 		LearningActivity learningActivity=LearningActivityLocalServiceUtil.getLearningActivity(actId);
-		if(!existsLearningActivityResult(actId, userId))
-		{	
+		if(learningActivityResult==null){	
 			learningActivityResult=
 				learningActivityResultPersistence.create(counterLocalService.increment(
 						LearningActivityResult.class.getName()));
@@ -120,34 +97,30 @@ public class LearningActivityResultLocalServiceImpl
 			learningActivityResult.setActId(actId);
 			learningActivityResult.setUserId(userId);
 			learningActivityResult.setPassed(false);
-		}
-		else
-		{
+		}else{
 			learningActivityResult=learningActivityResultPersistence.fetchByact_user(actId, userId);
 		}
-		if(learningActivityTry.getEndDate()!=null)
-		{
+		
+		if(learningActivityTry.getEndDate()!=null){
 			long cuantosTryLlevo=LearningActivityTryLocalServiceUtil.getTriesCountByActivityAndUser(actId, userId);
-			if(learningActivity.getTries()>0&&cuantosTryLlevo>=learningActivity.getTries())
-			{
+			if(learningActivity.getTries()>0&&cuantosTryLlevo>=learningActivity.getTries()){
 				learningActivityResult.setEndDate(learningActivityTry.getEndDate());
 			}
-			if(learningActivityTry.getResult()>learningActivityResult.getResult())
-			{			
+			
+			if(learningActivityTry.getResult()>learningActivityResult.getResult()){			
 				learningActivityResult.setResult(learningActivityTry.getResult());
 			}
-			if(!learningActivityResult.getPassed())
-			{
-				if(learningActivityTry.getResult()>=learningActivity.getPasspuntuation())
-				{
+			
+			if(!learningActivityResult.getPassed()){
+				if(learningActivityTry.getResult()>=learningActivity.getPasspuntuation()){
 					learningActivityResult.setEndDate(learningActivityTry.getEndDate());
-					learningActivityResult.setPassed(true);
-				  
+					learningActivityResult.setPassed(true);				  
 				}
-			}
+			}	
 			
 			learningActivityResult.setComments(learningActivityTry.getComments());
 		}
+		
 		learningActivityResultPersistence.update(learningActivityResult, true);
 		ModuleResultLocalServiceUtil.update(learningActivityResult);
 		
@@ -173,7 +146,7 @@ public class LearningActivityResultLocalServiceImpl
 		if (userId != learningActivityTry.getUserId()) {
 			throw new PortalException();
 		}
-		if (result >= 0L) {
+		if (result >= 0) {
 			learningActivityTry.setResult(result);
 			
 			Date endDate = new Date(System.currentTimeMillis());
@@ -248,8 +221,6 @@ public class LearningActivityResultLocalServiceImpl
 				}
 			}
 		} catch (DocumentException e) {
-			
-			System.out.println("3");
 			e.printStackTrace();
 		} catch (UnsupportedEncodingException e) {
 			// TODO Auto-generated catch block
@@ -723,8 +694,7 @@ public class LearningActivityResultLocalServiceImpl
 			}
 		}
 		
-		if (!isPureAsset) 
-		{
+		if (!isPureAsset){
 			if (manifestItems.size() <= 1) {
 				if (completion_statuses.size() == 1) {
 					total_completion_status = completion_statuses.get(0);
@@ -732,13 +702,10 @@ public class LearningActivityResultLocalServiceImpl
 				if (success_statuses.size() == 1) {
 					total_lesson_status = success_statuses.get(0);
 				}
-			} 
-			else 
-			{
-				if (success_statuses.size() < manifestItems.size()) 
-				{
+			}else{
+				if (success_statuses.size() < manifestItems.size()){
 					total_lesson_status = "unknown";
-				} else if (success_statuses.size() == manifestItems.size()) {
+				}else if (success_statuses.size() == manifestItems.size()) {
 					for (int i = 0; i < success_statuses.size(); i++) {
 						if ("unknown".equals(success_statuses.get(i))) {
 							total_lesson_status = "unknown";
@@ -764,14 +731,13 @@ public class LearningActivityResultLocalServiceImpl
 						}
 					}
 				}
-				if (completion_statuses.size() < manifestItems.size()) 
-				{
+				if (completion_statuses.size() < manifestItems.size()) {
 					if (completion_statuses.size() <= 1) {
 						total_completion_status = completion_statuses.get(0).equals("completed") ? "incomplete" : completion_statuses.get(0);
 					} else {
 						total_completion_status = "incomplete";
 					}
-				} else if (completion_statuses.size() == manifestItems.size()) {
+				}else if (completion_statuses.size() == manifestItems.size()) {
 					for (int i = 0; i < completion_statuses.size(); i++) {
 						//total_score += scores.get(i);
 						if ("incomplete".equals(completion_statuses.get(i))) {
@@ -816,20 +782,18 @@ public class LearningActivityResultLocalServiceImpl
 				log.debug("total_score "+total_score);
 			}
 		}
-		if(scos>0)
-		{
+		if(scos>0){
 			total_score = total_score / (scos);	
 			if(log.isDebugEnabled()){
 				log.debug("total_score / (scos); "+total_score);
 			}
-		}
-		else
-		{
+		}else{
 			total_score = total_score / ((scos+assets) > 0 ? (scos+assets) : 1);
 			if(log.isDebugEnabled()){
 				log.debug("total_score / ((scos+assets) > 0 ? (scos+assets) : 1) "+total_score);
 			}
 		}
+		
 		if ("incomplete".equals(total_completion_status) || "completed".equals(total_completion_status)) {
 			if(log.isDebugEnabled()){
 				log.debug("total_completion_status "+total_completion_status);
@@ -861,10 +825,12 @@ public class LearningActivityResultLocalServiceImpl
 			// If SCO says that the activity has been failed, then the learning activity result has to be marked as failed
 			
 			if ("failed".equals(total_lesson_status)) {
-				LearningActivityResult laresult = learningActivityResultLocalService.getByActIdAndUserId(learningActivityTry.getActId(), userId);
-				if (laresult.getEndDate()==null) {
+				LearningActivityResult laresult = learningActivityResultLocalService.getByActIdAndUserId(learningActivity.getActId(), userId);
+				long  userTries = LearningActivityTryLocalServiceUtil.getLearningActivityTryByActUserCount(laresult.getActId(), userId);
+				
+				if (laresult.getEndDate()==null && learningActivity.getTries() <= userTries) {
 					laresult.setPassed(false);
-					laresult.setEndDate(new Date(System.currentTimeMillis()));
+					laresult.setEndDate(new Date());
 					learningActivityResultLocalService.updateLearningActivityResult(laresult);
 					moduleResultLocalService.update(laresult);
 					
@@ -881,31 +847,18 @@ public class LearningActivityResultLocalServiceImpl
 		
 		return this.getByActIdAndUserId(learningActivityTry.getActId(), userId);
 	}
-	public boolean existsLearningActivityResult(long actId,long userId) throws SystemException
-	{
-		if(learningActivityResultPersistence.countByact_user(actId, userId)>0)
-		{
-			return true;
-		}
-		else
-		{
-		 
-			return false;
-		}
+	public boolean existsLearningActivityResult(long actId,long userId) throws SystemException{
+		return learningActivityResultPersistence.countByact_user(actId, userId)>0;
 	}
-	public boolean userPassed(long actId,long userId) throws SystemException
-	{
-		if(!existsLearningActivityResult(actId, userId))
-		{
+	
+	public boolean userPassed(long actId,long userId) throws SystemException{
+		if(!existsLearningActivityResult(actId, userId)){
 			return false;
-		}
-		else
-		{
+		}else{
 			return getByActIdAndUserId(actId, userId).isPassed();
 		}
 	}
-	public long countPassed(long actId) throws SystemException
-	{
+	public long countPassed(long actId) throws SystemException{
 		return learningActivityResultPersistence.countByap(actId, true);
 	}
 	
@@ -913,8 +866,7 @@ public class LearningActivityResultLocalServiceImpl
 		return countPassedOnlyStudents(actId, companyId, courseGropupCreatedId, passed, null);
 	}
 	
-	public long countPassedOnlyStudents(long actId, long companyId, long courseGropupCreatedId, boolean passed, List<User> _students) throws SystemException
-	{
+	public long countPassedOnlyStudents(long actId, long companyId, long courseGropupCreatedId, boolean passed, List<User> _students) throws SystemException{
 		long res = 0;
 		List<User> students = null;
 		// Se prepara el metodo para recibir un Listado de estudiantes especificos,, por ejemplo que pertenezcan a alguna organizacion. Sino, se trabaja con todos los estudiantes del curso.
@@ -1170,12 +1122,11 @@ public class LearningActivityResultLocalServiceImpl
 		return ((double) tries)/((double) started);
 	}
 	
-	public LearningActivityResult getByActIdAndUserId(long actId,long userId) throws SystemException
-	{
+	public LearningActivityResult getByActIdAndUserId(long actId,long userId) throws SystemException{
 		return learningActivityResultPersistence.fetchByact_user(actId, userId);
 	}
-	public Date getLastEndDateByUserId(long userId) throws SystemException
-	{
+	
+	public Date getLastEndDateByUserId(long userId) throws SystemException{
 		ClassLoader classLoader = (ClassLoader) PortletBeanLocatorUtil.locate(ClpSerializer.getServletContextName(), "portletClassLoader"); 
 		DynamicQuery dq=DynamicQueryFactoryUtil.forClass(LearningActivityResult.class, classLoader);
 		Criterion criterion=PropertyFactoryUtil.forName("userId").eq(userId);
@@ -1185,18 +1136,153 @@ public class LearningActivityResultLocalServiceImpl
 		dq.setProjection(ProjectionFactoryUtil.max("endDate"));
 		return (Date)(learningActivityResultPersistence.findWithDynamicQuery(dq).get(0));
 	}
-	public List<LearningActivityResult> getByActId(long actId) throws SystemException
-	{
-		List<LearningActivityResult> results;
+	
+	public List<LearningActivityResult> getByActId(long actId){
+		List<LearningActivityResult> results = new ArrayList<LearningActivityResult>();
+		try {
+			results = learningActivityResultPersistence.findByac(actId);
+		} catch (SystemException e) {
+			e.printStackTrace();
+		}
+		return results;			
+	}
+	
+	public List<LearningActivityResult> getByGroupIdUserId(long groupId,long userId){
+		List<LearningActivityResult> results = new ArrayList<LearningActivityResult>();
 		
 		ClassLoader classLoader = (ClassLoader) PortletBeanLocatorUtil.locate(ClpSerializer.getServletContextName(), "portletClassLoader"); 
-		DynamicQuery consulta = DynamicQueryFactoryUtil.forClass(LearningActivityResult.class, classLoader)
-					.add(PropertyFactoryUtil.forName("actId").eq(new Long(actId)));
-					
-		results = (List<LearningActivityResult>)learningActivityResultPersistence.findWithDynamicQuery(consulta);
-
-		return results;	
+		DynamicQuery dq2 = DynamicQueryFactoryUtil.forClass(LearningActivity.class, classLoader)
+				.add(PropertyFactoryUtil.forName("groupId").eq(groupId))
+				.setProjection(ProjectionFactoryUtil.property("actId"));
 		
+		DynamicQuery dq = DynamicQueryFactoryUtil.forClass(LearningActivityResult.class, classLoader)
+				.add(PropertyFactoryUtil.forName("userId").eq(userId))
+				.add(PropertyFactoryUtil.forName("actId").in(dq2));		
+		
+		try {
+			results = (List<LearningActivityResult>)learningActivityResultPersistence.findWithDynamicQuery(dq);
+		} catch (SystemException e) {
+			e.printStackTrace();
+		}
+
+		log.debug("::getByModuleId:"+results.size());
+		return results;			
+	}
+	
+	public List<LearningActivityResult> getMandatoryByGroupIdUserId(long groupId,long userId){
+		List<LearningActivityResult> results = new ArrayList<LearningActivityResult>();
+		
+		ClassLoader classLoader = (ClassLoader) PortletBeanLocatorUtil.locate(ClpSerializer.getServletContextName(), "portletClassLoader"); 
+		DynamicQuery dq2 = DynamicQueryFactoryUtil.forClass(LearningActivity.class, classLoader)
+				.add(PropertyFactoryUtil.forName("groupId").eq(groupId))
+				.add(PropertyFactoryUtil.forName("weightinmodule").gt(0L))
+				.setProjection(ProjectionFactoryUtil.property("actId"));
+		
+		DynamicQuery dq = DynamicQueryFactoryUtil.forClass(LearningActivityResult.class, classLoader)
+				.add(PropertyFactoryUtil.forName("userId").eq(userId))
+				.add(PropertyFactoryUtil.forName("actId").in(dq2));
+		
+		try {
+			results = (List<LearningActivityResult>)learningActivityResultPersistence.findWithDynamicQuery(dq);
+		} catch (SystemException e) {
+			e.printStackTrace();
+		}
+
+		log.debug("::getByModuleIdPassed:"+results.size());
+		return results;			
+	}
+	
+	public List<LearningActivityResult> getByModuleIdUserId(long moduleId,long userId){
+		List<LearningActivityResult> results = new ArrayList<LearningActivityResult>();
+		
+		ClassLoader classLoader = (ClassLoader) PortletBeanLocatorUtil.locate(ClpSerializer.getServletContextName(), "portletClassLoader"); 
+		DynamicQuery dq2 = DynamicQueryFactoryUtil.forClass(LearningActivity.class, classLoader)
+				.add(PropertyFactoryUtil.forName("moduleId").eq(moduleId))
+				.setProjection(ProjectionFactoryUtil.property("actId"));
+		
+		DynamicQuery dq = DynamicQueryFactoryUtil.forClass(LearningActivityResult.class, classLoader)
+				.add(PropertyFactoryUtil.forName("userId").eq(userId))
+				.add(PropertyFactoryUtil.forName("actId").in(dq2));		
+		
+		try {
+			results = (List<LearningActivityResult>)learningActivityResultPersistence.findWithDynamicQuery(dq);
+		} catch (SystemException e) {
+			e.printStackTrace();
+		}
+
+		log.debug("::getByModuleId:"+results.size());
+		return results;			
+	}
+	
+	public List<LearningActivityResult> getByModuleIdUserIdPassed(long moduleId,long userId){
+		List<LearningActivityResult> results = new ArrayList<LearningActivityResult>();
+		
+		ClassLoader classLoader = (ClassLoader) PortletBeanLocatorUtil.locate(ClpSerializer.getServletContextName(), "portletClassLoader"); 
+		DynamicQuery dq2 = DynamicQueryFactoryUtil.forClass(LearningActivity.class, classLoader)
+				.add(PropertyFactoryUtil.forName("moduleId").eq(moduleId))
+				.setProjection(ProjectionFactoryUtil.property("actId"));
+		
+		DynamicQuery dq = DynamicQueryFactoryUtil.forClass(LearningActivityResult.class, classLoader)
+				.add(PropertyFactoryUtil.forName("userId").eq(userId))
+				.add(PropertyFactoryUtil.forName("passed").eq(true))
+				.add(PropertyFactoryUtil.forName("actId").in(dq2));
+
+		
+		try {
+			results = (List<LearningActivityResult>)learningActivityResultPersistence.findWithDynamicQuery(dq);
+		} catch (SystemException e) {
+			e.printStackTrace();
+		}
+
+		log.debug("::getByModuleIdPassed:"+results.size());
+		return results;			
+	}
+	
+	public List<LearningActivityResult> getMandatoryByModuleIdUserIdPassed(long moduleId,long userId){
+		List<LearningActivityResult> results = new ArrayList<LearningActivityResult>();
+		
+		ClassLoader classLoader = (ClassLoader) PortletBeanLocatorUtil.locate(ClpSerializer.getServletContextName(), "portletClassLoader"); 
+		DynamicQuery dq2 = DynamicQueryFactoryUtil.forClass(LearningActivity.class, classLoader)
+				.add(PropertyFactoryUtil.forName("moduleId").eq(moduleId))
+				.add(PropertyFactoryUtil.forName("weightinmodule").gt(0L))
+				.setProjection(ProjectionFactoryUtil.property("actId"));
+		
+		DynamicQuery dq = DynamicQueryFactoryUtil.forClass(LearningActivityResult.class, classLoader)
+				.add(PropertyFactoryUtil.forName("userId").eq(userId))
+				.add(PropertyFactoryUtil.forName("passed").eq(true))
+				.add(PropertyFactoryUtil.forName("actId").in(dq2));
+
+		
+		try {
+			results = (List<LearningActivityResult>)learningActivityResultPersistence.findWithDynamicQuery(dq);
+		} catch (SystemException e) {
+			e.printStackTrace();
+		}
+
+		log.debug("::getByModuleIdPassed:"+results.size());
+		return results;			
+	}
+	
+	public int countMandatoryByModuleIdUserIdPassed(long moduleId,long userId){
+		
+		ClassLoader classLoader = (ClassLoader) PortletBeanLocatorUtil.locate(ClpSerializer.getServletContextName(), "portletClassLoader"); 
+		DynamicQuery dq2 = DynamicQueryFactoryUtil.forClass(LearningActivity.class, classLoader)
+				.add(PropertyFactoryUtil.forName("moduleId").eq(moduleId))
+				.add(PropertyFactoryUtil.forName("weightinmodule").gt(0L))
+				.setProjection(ProjectionFactoryUtil.property("actId"));
+		
+		DynamicQuery dq = DynamicQueryFactoryUtil.forClass(LearningActivityResult.class, classLoader)
+				.add(PropertyFactoryUtil.forName("userId").eq(userId))
+				.add(PropertyFactoryUtil.forName("passed").eq(true))
+				.add(PropertyFactoryUtil.forName("actId").in(dq2));
+
+		
+		try {
+			return (int) LearningActivityResultLocalServiceUtil.dynamicQueryCount(dq);
+		} catch (SystemException e) {
+			e.printStackTrace();
+		}
+		return 0;			
 	}
 	
 	public String translateResult(Locale locale, double result, long groupId){

@@ -15,6 +15,7 @@
 package com.liferay.lms.service.impl;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -35,6 +36,7 @@ import com.liferay.lms.service.LearningActivityResultLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityTryLocalServiceUtil;
 import com.liferay.lms.service.ModuleLocalServiceUtil;
 import com.liferay.lms.service.base.LearningActivityLocalServiceBaseImpl;
+import com.liferay.lms.service.persistence.LearningActivityUtil;
 import com.liferay.portal.kernel.bean.PortletBeanLocatorUtil;
 import com.liferay.portal.kernel.dao.orm.Criterion;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
@@ -996,6 +998,17 @@ public class LearningActivityLocalServiceImpl extends LearningActivityLocalServi
 		return super.updateLearningActivity(learningActivity);
 	}
 	
+	
+	public List<LearningActivity> getMandatoryActivities(long moduleId){
+		List<LearningActivity> activities = new ArrayList<LearningActivity>();
+		try {
+			activities = LearningActivityUtil.findByModuleId_Weightinmodule(moduleId, 0);
+		} catch (SystemException e) {
+			e.printStackTrace();
+		}
+		return activities;
+	}
+	
 private void sendNotification(String title, String content, String url, String type, int priority,ServiceContext serviceContext, java.util.Date startDate,java.util.Date endDate, Long userId){
 		
 		//ThemeDisplay themeDisplay = (ThemeDisplay) serviceContext.getAttribute(WebKeys.THEME_DISPLAY);	
@@ -1047,6 +1060,7 @@ private void sendNotification(String title, String content, String url, String t
 		}
 		                            
 	}
+
 
 	
 }

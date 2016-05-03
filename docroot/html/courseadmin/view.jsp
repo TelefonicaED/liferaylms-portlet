@@ -1,3 +1,4 @@
+<%@page import="com.liferay.lms.service.LearningActivityResultLocalServiceUtil"%>
 <%@page import="java.util.Locale"%>
 <%@page import="com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil"%>
 <%@page import="com.liferay.portal.kernel.dao.orm.ProjectionFactoryUtil"%>
@@ -75,6 +76,7 @@ for(String param : tparams){
 }
 portletURL.setParameter("search","search");
 Locale loc = response.getLocale();
+boolean showRegistrationType = preferences.getValue("showRegistrationType",  "false").equals("true");
 %>
 <liferay-ui:success key="courseadmin.clone.confirmation.success" message="courseadmin.clone.confirmation.success" />
 <liferay-ui:error></liferay-ui:error>
@@ -105,7 +107,7 @@ Locale loc = response.getLocale();
 		Group groupsel= GroupLocalServiceUtil.getGroup(course.getGroupCreatedId());
 		Layout initCourseLayout = LayoutLocalServiceUtil.fetchFirstLayout(course.getGroupCreatedId(), false, 0);
 	%>
-		<liferay-ui:search-container-column-text>
+		<liferay-ui:search-container-column-text name="course">
 
 		<c:choose>
 		
@@ -119,6 +121,19 @@ Locale loc = response.getLocale();
 		
 		</liferay-ui:search-container-column-text>
 		
+		<c:if test="<%=showRegistrationType%>">		
+			<liferay-ui:search-container-column-text name="registration-type">
+			    <c:if test="<%=groupsel.getType() == GroupConstants.TYPE_SITE_OPEN  %>">
+					<liferay-ui:message key="public" />
+				</c:if>
+			    <c:if test="<%=groupsel.getType() == GroupConstants.TYPE_SITE_PRIVATE  %>">
+					<liferay-ui:message key="private" />
+				</c:if>
+			    <c:if test="<%=groupsel.getType() == GroupConstants.TYPE_SITE_RESTRICTED  %>">
+					<liferay-ui:message key="restricted" />
+				</c:if>     			
+			</liferay-ui:search-container-column-text>
+		</c:if>
 	<%
 	if( permissionChecker.hasPermission(course.getGroupId(), Course.class.getName(), course.getCourseId(), ActionKeys.UPDATE)
 		||permissionChecker.hasPermission(course.getGroupId(), Course.class.getName(), course.getCourseId(), ActionKeys.DELETE)

@@ -266,8 +266,6 @@ public class ModuleResultLocalServiceClpInvoker {
 		if (_methodName135.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes135, parameterTypes)) {
 			ModuleResultLocalServiceUtil.setBeanIdentifier((java.lang.String)arguments[0]);
-
-			return null;
 		}
 
 		if (_methodName140.equals(name) &&
@@ -328,8 +326,6 @@ public class ModuleResultLocalServiceClpInvoker {
 		if (_methodName148.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes148, parameterTypes)) {
 			ModuleResultLocalServiceUtil.update((com.liferay.lms.model.LearningActivityResult)arguments[0]);
-
-			return null;
 		}
 
 		if (_methodName149.equals(name) &&
@@ -341,8 +337,6 @@ public class ModuleResultLocalServiceClpInvoker {
 		if (_methodName150.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes150, parameterTypes)) {
 			ModuleResultLocalServiceUtil.updateAllCoursesAllModulesAllUsers();
-
-			return null;
 		}
 
 		if (_methodName151.equals(name) &&

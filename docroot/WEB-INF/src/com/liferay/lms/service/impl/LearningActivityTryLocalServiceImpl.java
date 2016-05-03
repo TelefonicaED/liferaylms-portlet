@@ -15,6 +15,7 @@
 package com.liferay.lms.service.impl;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -156,7 +157,7 @@ public class LearningActivityTryLocalServiceImpl
 					LearningActivityTry.class.getName()));
 		larnt.setUserId(serviceContext.getUserId());
 		larnt.setActId(actId);
-		larnt.setStartDate(serviceContext.getCreateDate(null));
+		larnt.setStartDate(new Date());
 		learningActivityTryPersistence.update(larnt, true);
 		learningActivityResultLocalService.update(larnt);
 		

@@ -280,8 +280,6 @@ public class LearningActivityTryLocalServiceClpInvoker {
 		if (_methodName135.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes135, parameterTypes)) {
 			LearningActivityTryLocalServiceUtil.setBeanIdentifier((java.lang.String)arguments[0]);
-
-			return null;
 		}
 
 		if (_methodName140.equals(name) &&
@@ -299,8 +297,6 @@ public class LearningActivityTryLocalServiceClpInvoker {
 				Arrays.deepEquals(_methodParameterTypes142, parameterTypes)) {
 			LearningActivityTryLocalServiceUtil.deleteUserTries(((Long)arguments[0]).longValue(),
 				((Long)arguments[1]).longValue());
-
-			return null;
 		}
 
 		if (_methodName143.equals(name) &&

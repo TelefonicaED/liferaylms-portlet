@@ -24,33 +24,18 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.jsonwebservice.JSONWebService;
 import com.liferay.portal.kernel.jsonwebservice.JSONWebServiceMode;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.model.User;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceContextThreadLocal;
 
-/**
- * The implementation of the learning activity result remote service.
- *
- * <p>
- * All custom service methods should be put in this class. Whenever methods are added, rerun ServiceBuilder to copy their definitions into the {@link com.liferay.lms.service.LearningActivityResultService} interface.
- * </p>
- *
- * <p>
- * Never reference this interface directly. Always use {@link com.liferay.lms.service.LearningActivityResultServiceUtil} to access the learning activity result remote service.
- * </p>
- *
- * <p>
- * This is a remote service. Methods of this service are expected to have security checks based on the propagated JAAS credentials because this service can be accessed remotely.
- * </p>
- *
- * @author cvicente
- * @see com.liferay.lms.service.base.LearningActivityResultServiceBaseImpl
- * @see com.liferay.lms.service.LearningActivityResultServiceUtil
- */
+
 @JSONWebService(mode = JSONWebServiceMode.MANUAL)
-public class LearningActivityResultServiceImpl
-	extends LearningActivityResultServiceBaseImpl 
-	{
+public class LearningActivityResultServiceImpl	extends LearningActivityResultServiceBaseImpl{
+	
+	private Log log = LogFactoryUtil.getLog(LearningActivityResultServiceImpl.class);
+	
 	@JSONWebService
 	public LearningActivityResult getByActId(long actId) throws PortalException, SystemException
 	{
@@ -122,16 +107,10 @@ public class LearningActivityResultServiceImpl
 		return lar;
 	}
 	
-	public LearningActivityResult update(long latId, String tryResultData, String imsmanifest) throws PortalException, SystemException
-	{
+	public LearningActivityResult update(long latId, String tryResultData, String imsmanifest) throws PortalException, SystemException{
 		
-		//System.out.println("latId "+latId);
-		//System.out.println("tryResultData "+tryResultData);
-		//System.out.println("imsmanifest "+imsmanifest);
 		User user=this.getUser();
-		//System.out.println("user "+user);
 		LearningActivityResult lar = learningActivityResultLocalService.update(latId, tryResultData, imsmanifest, user.getUserId());
-		//System.out.println("lar "+lar);
 
 		//auditing
 		ServiceContext serviceContext = ServiceContextThreadLocal.getServiceContext();
@@ -150,11 +129,10 @@ public class LearningActivityResultServiceImpl
 		
 		return lar;
 	}
-	public LearningActivityResult updateFinishTry(long latId, String tryResultData, String imsmanifest) throws PortalException, SystemException
-	{
-		System.out.println("updateFinishTry "+latId);
+	public LearningActivityResult updateFinishTry(long latId, String tryResultData, String imsmanifest) throws PortalException, SystemException	{
+		log.debug("updateFinishTry "+latId);
 		LearningActivityTry learningActivityTry = learningActivityTryLocalService.getLearningActivityTry(latId);
-		System.out.println("learningActivityTry "+learningActivityTry);
+		log.debug("learningActivityTry "+learningActivityTry);
 		learningActivityTry.setEndDate(new java.util.Date(System.currentTimeMillis()));
 		learningActivityTryLocalService.updateLearningActivityTry(learningActivityTry);
 		return update( latId,  tryResultData,  imsmanifest);

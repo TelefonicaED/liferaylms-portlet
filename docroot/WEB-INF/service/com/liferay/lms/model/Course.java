@@ -31,4 +31,10 @@ public interface Course extends CourseModel, PersistedModel {
 	 *
 	 * Never modify this interface directly. Add methods to {@link com.liferay.lms.model.impl.CourseImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
+	public void setTitle(java.lang.String title);
+
+	public void setTitle(java.lang.String title, java.util.Locale locale);
+
+	public void setTitle(java.lang.String title, java.util.Locale locale,
+		java.util.Locale defaultLocale);
 }

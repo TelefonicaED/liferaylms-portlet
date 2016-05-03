@@ -228,9 +228,33 @@ public class LearningActivityResultLocalServiceClpInvoker {
 
 		_methodParameterTypes163 = new String[] { "long" };
 
-		_methodName164 = "translateResult";
+		_methodName164 = "getByGroupIdUserId";
 
-		_methodParameterTypes164 = new String[] {
+		_methodParameterTypes164 = new String[] { "long", "long" };
+
+		_methodName165 = "getMandatoryByGroupIdUserId";
+
+		_methodParameterTypes165 = new String[] { "long", "long" };
+
+		_methodName166 = "getByModuleIdUserId";
+
+		_methodParameterTypes166 = new String[] { "long", "long" };
+
+		_methodName167 = "getByModuleIdUserIdPassed";
+
+		_methodParameterTypes167 = new String[] { "long", "long" };
+
+		_methodName168 = "getMandatoryByModuleIdUserIdPassed";
+
+		_methodParameterTypes168 = new String[] { "long", "long" };
+
+		_methodName169 = "countMandatoryByModuleIdUserIdPassed";
+
+		_methodParameterTypes169 = new String[] { "long", "long" };
+
+		_methodName170 = "translateResult";
+
+		_methodParameterTypes170 = new String[] {
 				"java.util.Locale", "double", "long"
 			};
 	}
@@ -332,8 +356,6 @@ public class LearningActivityResultLocalServiceClpInvoker {
 		if (_methodName135.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes135, parameterTypes)) {
 			LearningActivityResultLocalServiceUtil.setBeanIdentifier((java.lang.String)arguments[0]);
-
-			return null;
 		}
 
 		if (_methodName140.equals(name) &&
@@ -493,6 +515,42 @@ public class LearningActivityResultLocalServiceClpInvoker {
 
 		if (_methodName164.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes164, parameterTypes)) {
+			return LearningActivityResultLocalServiceUtil.getByGroupIdUserId(((Long)arguments[0]).longValue(),
+				((Long)arguments[1]).longValue());
+		}
+
+		if (_methodName165.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes165, parameterTypes)) {
+			return LearningActivityResultLocalServiceUtil.getMandatoryByGroupIdUserId(((Long)arguments[0]).longValue(),
+				((Long)arguments[1]).longValue());
+		}
+
+		if (_methodName166.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes166, parameterTypes)) {
+			return LearningActivityResultLocalServiceUtil.getByModuleIdUserId(((Long)arguments[0]).longValue(),
+				((Long)arguments[1]).longValue());
+		}
+
+		if (_methodName167.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes167, parameterTypes)) {
+			return LearningActivityResultLocalServiceUtil.getByModuleIdUserIdPassed(((Long)arguments[0]).longValue(),
+				((Long)arguments[1]).longValue());
+		}
+
+		if (_methodName168.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes168, parameterTypes)) {
+			return LearningActivityResultLocalServiceUtil.getMandatoryByModuleIdUserIdPassed(((Long)arguments[0]).longValue(),
+				((Long)arguments[1]).longValue());
+		}
+
+		if (_methodName169.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes169, parameterTypes)) {
+			return LearningActivityResultLocalServiceUtil.countMandatoryByModuleIdUserIdPassed(((Long)arguments[0]).longValue(),
+				((Long)arguments[1]).longValue());
+		}
+
+		if (_methodName170.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes170, parameterTypes)) {
 			return LearningActivityResultLocalServiceUtil.translateResult((java.util.Locale)arguments[0],
 				((Double)arguments[1]).doubleValue(),
 				((Long)arguments[2]).longValue());
@@ -587,4 +645,16 @@ public class LearningActivityResultLocalServiceClpInvoker {
 	private String[] _methodParameterTypes163;
 	private String _methodName164;
 	private String[] _methodParameterTypes164;
+	private String _methodName165;
+	private String[] _methodParameterTypes165;
+	private String _methodName166;
+	private String[] _methodParameterTypes166;
+	private String _methodName167;
+	private String[] _methodParameterTypes167;
+	private String _methodName168;
+	private String[] _methodParameterTypes168;
+	private String _methodName169;
+	private String[] _methodParameterTypes169;
+	private String _methodName170;
+	private String[] _methodParameterTypes170;
 }

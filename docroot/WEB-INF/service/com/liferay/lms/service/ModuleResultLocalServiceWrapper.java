@@ -298,6 +298,14 @@ public class ModuleResultLocalServiceWrapper implements ModuleResultLocalService
 			courseGropupCreatedId, moduleId);
 	}
 
+	public long countByModuleOnlyStudents(long companyId,
+		long courseGropupCreatedId, long moduleId,
+		java.util.List<com.liferay.portal.model.User> _students)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _moduleResultLocalService.countByModuleOnlyStudents(companyId,
+			courseGropupCreatedId, moduleId, _students);
+	}
+
 	public long countByModulePassed(long moduleId, boolean passed)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _moduleResultLocalService.countByModulePassed(moduleId, passed);
@@ -308,6 +316,14 @@ public class ModuleResultLocalServiceWrapper implements ModuleResultLocalService
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _moduleResultLocalService.countByModulePassedOnlyStudents(companyId,
 			courseGropupCreatedId, moduleId, passed);
+	}
+
+	public long countByModulePassedOnlyStudents(long companyId,
+		long courseGropupCreatedId, long moduleId, boolean passed,
+		java.util.List<com.liferay.portal.model.User> _students)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _moduleResultLocalService.countByModulePassedOnlyStudents(companyId,
+			courseGropupCreatedId, moduleId, passed, _students);
 	}
 
 	public void update(com.liferay.lms.model.LearningActivityResult lactr)
