@@ -332,6 +332,17 @@ public class CourseLocalServiceWrapper implements CourseLocalService,
 		return _courseLocalService.getPublicCoursesByCompanyId(companyId);
 	}
 
+	public java.util.List<com.liferay.lms.model.Course> getPublicCoursesByCompanyId(
+		java.lang.Long companyId, int limit) {
+		return _courseLocalService.getPublicCoursesByCompanyId(companyId, limit);
+	}
+
+	public java.util.List<com.liferay.lms.model.Course> getPublicCoursesByCompanyId(
+		java.lang.Long companyId, int start, int end) {
+		return _courseLocalService.getPublicCoursesByCompanyId(companyId,
+			start, end);
+	}
+
 	public com.liferay.lms.model.Course addCourse(java.lang.String title,
 		java.lang.String description, java.lang.String summary,
 		java.lang.String friendlyURL, java.util.Locale locale,
@@ -433,6 +444,12 @@ public class CourseLocalServiceWrapper implements CourseLocalService,
 		java.lang.Long companyId)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _courseLocalService.findByCompanyId(companyId);
+	}
+
+	public int getStudentsFromCourseCount(long courseId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _courseLocalService.getStudentsFromCourseCount(courseId);
 	}
 
 	public java.util.List<com.liferay.portal.model.User> getStudentsFromCourse(

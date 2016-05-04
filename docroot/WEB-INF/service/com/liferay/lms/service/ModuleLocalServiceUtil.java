@@ -362,19 +362,20 @@ public class ModuleLocalServiceUtil {
 		return getService().getNextModule(theModule);
 	}
 
-	public static void goUpModule(long moduleId)
+	public static void goUpModule(long moduleId, long userIdAction)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		getService().goUpModule(moduleId);
+		getService().goUpModule(moduleId, userIdAction);
 	}
 
-	public static void goDownModule(long moduleId)
+	public static void goDownModule(long moduleId, long userIdAction)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		getService().goDownModule(moduleId);
+		getService().goDownModule(moduleId, userIdAction);
 	}
 
-	public static void moveModule(long modId, long previusMod, long nextMod)
+	public static void moveModule(long modId, long previusMod, long nextMod,
+		long userIdAction)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		getService().moveModule(modId, previusMod, nextMod);
+		getService().moveModule(modId, previusMod, nextMod, userIdAction);
 	}
 
 	public static com.liferay.lms.model.Module addmodule(
@@ -394,9 +395,16 @@ public class ModuleLocalServiceUtil {
 			startDate, endDate, ordern);
 	}
 
-	public static void remove(com.liferay.lms.model.Module fileobj)
+	public static void remove(com.liferay.lms.model.Module fileobj,
+		long userIdAction)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		getService().remove(fileobj);
+		getService().remove(fileobj, userIdAction);
+	}
+
+	public static com.liferay.lms.model.Module updateModule(
+		com.liferay.lms.model.Module module, long userIdAction)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().updateModule(module, userIdAction);
 	}
 
 	public static boolean isUserPassed(long moduleId, long userId)

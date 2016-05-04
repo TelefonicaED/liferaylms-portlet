@@ -311,13 +311,14 @@ public interface ModuleLocalService extends BaseLocalService,
 		com.liferay.lms.model.Module theModule)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
-	public void goUpModule(long moduleId)
+	public void goUpModule(long moduleId, long userIdAction)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
-	public void goDownModule(long moduleId)
+	public void goDownModule(long moduleId, long userIdAction)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
-	public void moveModule(long modId, long previusMod, long nextMod)
+	public void moveModule(long modId, long previusMod, long nextMod,
+		long userIdAction)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	public com.liferay.lms.model.Module addmodule(
@@ -330,7 +331,11 @@ public interface ModuleLocalService extends BaseLocalService,
 		java.util.Date endDate, java.lang.Long ordern)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
-	public void remove(com.liferay.lms.model.Module fileobj)
+	public void remove(com.liferay.lms.model.Module fileobj, long userIdAction)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	public com.liferay.lms.model.Module updateModule(
+		com.liferay.lms.model.Module module, long userIdAction)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)

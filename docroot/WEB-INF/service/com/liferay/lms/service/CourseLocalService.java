@@ -299,6 +299,14 @@ public interface CourseLocalService extends BaseLocalService,
 	public java.util.List<com.liferay.lms.model.Course> getPublicCoursesByCompanyId(
 		java.lang.Long companyId);
 
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.util.List<com.liferay.lms.model.Course> getPublicCoursesByCompanyId(
+		java.lang.Long companyId, int limit);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.util.List<com.liferay.lms.model.Course> getPublicCoursesByCompanyId(
+		java.lang.Long companyId, int start, int end);
+
 	public com.liferay.lms.model.Course addCourse(java.lang.String title,
 		java.lang.String description, java.lang.String summary,
 		java.lang.String friendlyURL, java.util.Locale locale,
@@ -369,6 +377,11 @@ public interface CourseLocalService extends BaseLocalService,
 	public java.util.List<com.liferay.lms.model.Course> findByCompanyId(
 		java.lang.Long companyId)
 		throws com.liferay.portal.kernel.exception.SystemException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public int getStudentsFromCourseCount(long courseId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.util.List<com.liferay.portal.model.User> getStudentsFromCourse(

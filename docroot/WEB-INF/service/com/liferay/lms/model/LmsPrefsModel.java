@@ -173,6 +173,48 @@ public interface LmsPrefsModel extends BaseModel<LmsPrefs> {
 	 */
 	public void setUsersResults(long usersResults);
 
+	/**
+	 * Returns the debug scorm of this lms prefs.
+	 *
+	 * @return the debug scorm of this lms prefs
+	 */
+	public boolean getDebugScorm();
+
+	/**
+	 * Returns <code>true</code> if this lms prefs is debug scorm.
+	 *
+	 * @return <code>true</code> if this lms prefs is debug scorm; <code>false</code> otherwise
+	 */
+	public boolean isDebugScorm();
+
+	/**
+	 * Sets whether this lms prefs is debug scorm.
+	 *
+	 * @param debugScorm the debug scorm of this lms prefs
+	 */
+	public void setDebugScorm(boolean debugScorm);
+
+	/**
+	 * Returns the has a p i licence of this lms prefs.
+	 *
+	 * @return the has a p i licence of this lms prefs
+	 */
+	public boolean getHasAPILicence();
+
+	/**
+	 * Returns <code>true</code> if this lms prefs is has a p i licence.
+	 *
+	 * @return <code>true</code> if this lms prefs is has a p i licence; <code>false</code> otherwise
+	 */
+	public boolean isHasAPILicence();
+
+	/**
+	 * Sets whether this lms prefs is has a p i licence.
+	 *
+	 * @param hasAPILicence the has a p i licence of this lms prefs
+	 */
+	public void setHasAPILicence(boolean hasAPILicence);
+
 	public boolean isNew();
 
 	public void setNew(boolean n);

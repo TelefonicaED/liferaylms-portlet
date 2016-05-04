@@ -280,8 +280,6 @@ public class SCORMContentLocalServiceClpInvoker {
 		if (_methodName146.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes146, parameterTypes)) {
 			SCORMContentLocalServiceUtil.setBeanIdentifier((java.lang.String)arguments[0]);
-
-			return null;
 		}
 
 		if (_methodName151.equals(name) &&
@@ -322,8 +320,6 @@ public class SCORMContentLocalServiceClpInvoker {
 		if (_methodName158.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes158, parameterTypes)) {
 			SCORMContentLocalServiceUtil.delete(((Long)arguments[0]).longValue());
-
-			return null;
 		}
 
 		if (_methodName159.equals(name) &&

@@ -288,8 +288,6 @@ public class P2pActivityCorrectionsLocalServiceClpInvoker {
 		if (_methodName135.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes135, parameterTypes)) {
 			P2pActivityCorrectionsLocalServiceUtil.setBeanIdentifier((java.lang.String)arguments[0]);
-
-			return null;
 		}
 
 		if (_methodName140.equals(name) &&
@@ -337,8 +335,6 @@ public class P2pActivityCorrectionsLocalServiceClpInvoker {
 			P2pActivityCorrectionsLocalServiceUtil.asignP2PCorrectionsToUsers(((Long)arguments[0]).longValue(),
 				((Long)arguments[1]).longValue(),
 				(java.util.List<com.liferay.portal.model.User>)arguments[2]);
-
-			return null;
 		}
 
 		if (_methodName148.equals(name) &&
@@ -348,8 +344,6 @@ public class P2pActivityCorrectionsLocalServiceClpInvoker {
 				((Integer)arguments[2]).intValue(),
 				(java.util.List<com.liferay.lms.model.P2pActivity>)arguments[3],
 				((Long)arguments[4]).longValue());
-
-			return null;
 		}
 
 		if (_methodName149.equals(name) &&

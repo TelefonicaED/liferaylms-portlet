@@ -52,6 +52,8 @@ public class LmsPrefsWrapper implements LmsPrefs, ModelWrapper<LmsPrefs> {
 		attributes.put("courseevals", getCourseevals());
 		attributes.put("scoretranslators", getScoretranslators());
 		attributes.put("usersResults", getUsersResults());
+		attributes.put("debugScorm", getDebugScorm());
+		attributes.put("hasAPILicence", getHasAPILicence());
 
 		return attributes;
 	}
@@ -103,6 +105,18 @@ public class LmsPrefsWrapper implements LmsPrefs, ModelWrapper<LmsPrefs> {
 
 		if (usersResults != null) {
 			setUsersResults(usersResults);
+		}
+
+		Boolean debugScorm = (Boolean)attributes.get("debugScorm");
+
+		if (debugScorm != null) {
+			setDebugScorm(debugScorm);
+		}
+
+		Boolean hasAPILicence = (Boolean)attributes.get("hasAPILicence");
+
+		if (hasAPILicence != null) {
+			setHasAPILicence(hasAPILicence);
 		}
 	}
 
@@ -266,6 +280,60 @@ public class LmsPrefsWrapper implements LmsPrefs, ModelWrapper<LmsPrefs> {
 	*/
 	public void setUsersResults(long usersResults) {
 		_lmsPrefs.setUsersResults(usersResults);
+	}
+
+	/**
+	* Returns the debug scorm of this lms prefs.
+	*
+	* @return the debug scorm of this lms prefs
+	*/
+	public boolean getDebugScorm() {
+		return _lmsPrefs.getDebugScorm();
+	}
+
+	/**
+	* Returns <code>true</code> if this lms prefs is debug scorm.
+	*
+	* @return <code>true</code> if this lms prefs is debug scorm; <code>false</code> otherwise
+	*/
+	public boolean isDebugScorm() {
+		return _lmsPrefs.isDebugScorm();
+	}
+
+	/**
+	* Sets whether this lms prefs is debug scorm.
+	*
+	* @param debugScorm the debug scorm of this lms prefs
+	*/
+	public void setDebugScorm(boolean debugScorm) {
+		_lmsPrefs.setDebugScorm(debugScorm);
+	}
+
+	/**
+	* Returns the has a p i licence of this lms prefs.
+	*
+	* @return the has a p i licence of this lms prefs
+	*/
+	public boolean getHasAPILicence() {
+		return _lmsPrefs.getHasAPILicence();
+	}
+
+	/**
+	* Returns <code>true</code> if this lms prefs is has a p i licence.
+	*
+	* @return <code>true</code> if this lms prefs is has a p i licence; <code>false</code> otherwise
+	*/
+	public boolean isHasAPILicence() {
+		return _lmsPrefs.isHasAPILicence();
+	}
+
+	/**
+	* Sets whether this lms prefs is has a p i licence.
+	*
+	* @param hasAPILicence the has a p i licence of this lms prefs
+	*/
+	public void setHasAPILicence(boolean hasAPILicence) {
+		_lmsPrefs.setHasAPILicence(hasAPILicence);
 	}
 
 	public boolean isNew() {

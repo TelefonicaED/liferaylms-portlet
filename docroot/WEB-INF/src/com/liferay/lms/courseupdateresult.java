@@ -100,6 +100,7 @@ public class courseupdateresult extends MVCPortlet {
 							//Si no exist�a el resultado del curso.
 							if(courseResult==null){
 								courseResult = CourseResultLocalServiceUtil.createCourseResult(CounterLocalServiceUtil.increment(CourseResult.class.getName()));
+								courseResult.setStartDate(new Date());
 								courseResult.setUserId(user.getUserId());
 								courseResult.setCourseId(course.getCourseId());
 								

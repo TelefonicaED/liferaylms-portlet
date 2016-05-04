@@ -41,15 +41,16 @@ import com.liferay.lms.model.Course;
 import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.model.LearningActivityResult;
 import com.liferay.lms.model.LearningActivityTry;
-import com.liferay.lms.model.ModuleResult;
 import com.liferay.lms.model.SCORMContent;
 import com.liferay.lms.service.ClpSerializer;
 import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityLocalServiceUtil;
+import com.liferay.lms.service.LearningActivityResultLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityTryLocalServiceUtil;
 import com.liferay.lms.service.ModuleResultLocalServiceUtil;
 import com.liferay.lms.service.SCORMContentLocalServiceUtil;
 import com.liferay.lms.service.base.LearningActivityResultLocalServiceBaseImpl;
+import com.liferay.lms.service.persistence.LearningActivityResultUtil;
 import com.liferay.portal.kernel.bean.PortletBeanLocatorUtil;
 import com.liferay.portal.kernel.dao.orm.Criterion;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
@@ -60,14 +61,11 @@ import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.json.JSONArray;
-import com.liferay.portal.kernel.json.JSONDeserializer;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
-import com.liferay.portal.kernel.json.JSONSerializer;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.DocumentException;
@@ -80,83 +78,58 @@ import com.liferay.portlet.asset.model.AssetEntry;
 import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
 
 
-/**
- * The implementation of the learning activity result local service.
- *
- * <p>
- * All custom service methods should be put in this class. Whenever methods are added, rerun ServiceBuilder to copy their definitions into the {@link com.liferay.lms.service.LearningActivityResultLocalService} interface.
- * </p>
- *
- * <p>
- * Never reference this interface directly. Always use {@link com.liferay.lms.service.LearningActivityResultLocalServiceUtil} to access the learning activity result local service.
- * </p>
- *
- * <p>
- * This is a local service. Methods of this service will not have security checks based on the propagated JAAS credentials because this service can only be accessed from within the same VM.
- * </p>
- *
- * @author cvicente
- * @see com.liferay.lms.service.base.LearningActivityResultLocalServiceBaseImpl
- * @see com.liferay.lms.service.LearningActivityResultLocalServiceUtil
- */
-public class LearningActivityResultLocalServiceImpl
-	extends LearningActivityResultLocalServiceBaseImpl {
-	
-	Log log = LogFactoryUtil.getLog(LearningActivityResultLocalServiceImpl.class);
+public class LearningActivityResultLocalServiceImpl	extends LearningActivityResultLocalServiceBaseImpl {
 
-	
-	public LearningActivityResult update(LearningActivityTry learningActivityTry) throws SystemException, PortalException
-	{
-		LearningActivityResult learningActivityResult=null;
+	private Log log = LogFactoryUtil.getLog(LearningActivityResultLocalServiceImpl.class);
+
+
+	public LearningActivityResult update(LearningActivityTry learningActivityTry) throws SystemException, PortalException{
+
 		long actId=learningActivityTry.getActId();
 		long userId=learningActivityTry.getUserId();
+		LearningActivityResult learningActivityResult=getByActIdAndUserId(actId, userId);
 		LearningActivity learningActivity=LearningActivityLocalServiceUtil.getLearningActivity(actId);
-		if(!existsLearningActivityResult(actId, userId))
-		{	
+		if(learningActivityResult==null){	
 			learningActivityResult=
-				learningActivityResultPersistence.create(counterLocalService.increment(
-						LearningActivityResult.class.getName()));
+					learningActivityResultPersistence.create(counterLocalService.increment(
+							LearningActivityResult.class.getName()));
 			learningActivityResult.setStartDate(learningActivityTry.getStartDate());
 			learningActivityResult.setActId(actId);
 			learningActivityResult.setUserId(userId);
 			learningActivityResult.setPassed(false);
-		}
-		else
-		{
+		}else{
 			learningActivityResult=learningActivityResultPersistence.fetchByact_user(actId, userId);
 		}
-		if(learningActivityTry.getEndDate()!=null)
-		{
+
+		if(learningActivityTry.getEndDate()!=null){
 			long cuantosTryLlevo=LearningActivityTryLocalServiceUtil.getTriesCountByActivityAndUser(actId, userId);
-			if(learningActivity.getTries()>0&&cuantosTryLlevo>=learningActivity.getTries())
-			{
+			if(learningActivity.getTries()>0&&cuantosTryLlevo>=learningActivity.getTries()){
 				learningActivityResult.setEndDate(learningActivityTry.getEndDate());
 			}
-			if(learningActivityTry.getResult()>learningActivityResult.getResult())
-			{			
+
+			if(learningActivityTry.getResult()>learningActivityResult.getResult()){			
 				learningActivityResult.setResult(learningActivityTry.getResult());
 			}
-			if(!learningActivityResult.getPassed())
-			{
-				if(learningActivityTry.getResult()>=learningActivity.getPasspuntuation())
-				{
+
+			if(!learningActivityResult.getPassed()){
+				if(learningActivityTry.getResult()>=learningActivity.getPasspuntuation()){
 					learningActivityResult.setEndDate(learningActivityTry.getEndDate());
-					learningActivityResult.setPassed(true);
-				  
+					learningActivityResult.setPassed(true);				  
 				}
-			}
-			
+			}	
+
 			learningActivityResult.setComments(learningActivityTry.getComments());
 		}
+
 		learningActivityResultPersistence.update(learningActivityResult, true);
 		ModuleResultLocalServiceUtil.update(learningActivityResult);
-		
+
 
 		//auditing
 		ServiceContext serviceContext = ServiceContextThreadLocal.getServiceContext();
 		if(serviceContext!=null){
 			AuditingLogFactory.audit(serviceContext.getCompanyId(), serviceContext.getScopeGroupId(), LearningActivityResult.class.getName(), 
-				learningActivityResult.getPrimaryKey(), learningActivityTry.getUserId(), AuditConstants.UPDATE, null);
+					learningActivityResult.getPrimaryKey(), learningActivityTry.getUserId(), AuditConstants.UPDATE, null);
 		}else{
 			LearningActivity la = learningActivityPersistence.fetchByPrimaryKey(actId);
 			if(la!=null){
@@ -164,24 +137,24 @@ public class LearningActivityResultLocalServiceImpl
 						learningActivityResult.getPrimaryKey(), learningActivityTry.getUserId(), AuditConstants.UPDATE, null);
 			}
 		}
-		
+
 		return learningActivityResult;
-		
+
 	}
 	public LearningActivityResult update(long latId, long result, String tryResultData, long userId) throws SystemException, PortalException {
 		LearningActivityTry learningActivityTry = LearningActivityTryLocalServiceUtil.getLearningActivityTry(latId);
 		if (userId != learningActivityTry.getUserId()) {
 			throw new PortalException();
 		}
-		if (result >= 0L) {
+		if (result >= 0) {
 			learningActivityTry.setResult(result);
-			
+
 			Date endDate = new Date(System.currentTimeMillis());
 			learningActivityTry.setEndDate(endDate);
 		}
 		learningActivityTry.setTryResultData(tryResultData);
 		LearningActivityTryLocalServiceUtil.updateLearningActivityTry(learningActivityTry);
-		
+
 		return update(learningActivityTry);
 	}
 	public LearningActivityResult update(long latId, String tryResultData, long userId) throws SystemException, PortalException {
@@ -189,21 +162,21 @@ public class LearningActivityResultLocalServiceImpl
 		if (userId != learningActivityTry.getUserId()) {
 			throw new PortalException();
 		}
-		
+
 		/************************************************************************************
 		boolean isMaxScoreByPassed = GetterUtil.getBoolean(PropsUtil.get("scorm.max.score.by.passed"),false);
 		/************************************************************************************/
-		
-		
-		
-		
+
+
+
+
 		LearningActivity learningActivity = learningActivityLocalService.getLearningActivity(learningActivityTry.getActId());
 		String assetEntryId = learningActivityLocalService.getExtraContentValue(learningActivityTry.getActId(), "assetEntry");
 		AssetEntry assetEntry = AssetEntryLocalServiceUtil.getAssetEntry(Long.valueOf(assetEntryId));
-		
+
 		List<String> manifestItems = new ArrayList<String>();
 		Map<String, String> recursos = new HashMap<String, String>();
-		
+
 		Map<String, String> manifestResources = new HashMap<String, String>();
 		try {
 			String urlString = assetEntry.getUrl();
@@ -213,12 +186,12 @@ public class LearningActivityResultLocalServiceImpl
 				if (urlString.startsWith("http://") || urlString.startsWith("https://")) {
 					SCORMContent _scorm =  SCORMContentLocalServiceUtil.getSCORMContent(assetEntry.getClassPK());
 					String rutaDatos = SCORMContentLocalServiceUtil.getBaseDir();
-					
+
 					String urlIndex=rutaDatos+"/"+Long.toString(_scorm.getCompanyId())+"/"+Long.toString(_scorm.getGroupId())+"/"+_scorm.getUuid()+"/imsmanifest.xml";
-					
+
 					InputStream inputStream= new FileInputStream(urlIndex);
 					Reader reader = new InputStreamReader(inputStream,"UTF-8");
-					 
+
 					InputSource is = new InputSource(reader);
 					is.setEncoding("UTF-8");
 
@@ -235,7 +208,7 @@ public class LearningActivityResultLocalServiceImpl
 					String type2 = resource.attributeValue("scormtype");
 					manifestResources.put(identifier, type != null ? type : type2);
 				}
-				
+
 				List<Element> items = new ArrayList<Element>();
 				items.addAll(imsdocument.getRootElement().element("organizations").elements("organization").get(0).elements("item"));
 				for (int i = 0; i < items.size(); i++) {
@@ -248,8 +221,6 @@ public class LearningActivityResultLocalServiceImpl
 				}
 			}
 		} catch (DocumentException e) {
-			
-			System.out.println("3");
 			e.printStackTrace();
 		} catch (UnsupportedEncodingException e) {
 			// TODO Auto-generated catch block
@@ -261,29 +232,29 @@ public class LearningActivityResultLocalServiceImpl
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} 
-		
-		
+
+
 		Long master_score = new Integer(learningActivity.getPasspuntuation()).longValue();
 		JSONObject scorm = JSONFactoryUtil.createJSONObject();
 		scorm = JSONFactoryUtil.createJSONObject(tryResultData);
 		JSONObject organizations = scorm.getJSONObject("organizations");
 		JSONArray organizationNames = organizations.names();
 		JSONObject organization = organizations.getJSONObject(organizationNames.getString(0));
-		
+
 		JSONObject cmis = organization.getJSONObject("cmi");
 		JSONArray cmiNames = cmis.names();
 		List<String> completion_statuses = new ArrayList<String>();
 		List<String> success_statuses = new ArrayList<String>();
 		List<Long> scores = new ArrayList<Long>();
-		
+
 		String total_completion_status = "not attempted";
 		String total_lesson_status = "unknown";
 		Double total_score = 0.0;
-		
+
 		for (int i = 0; i < cmiNames.length(); i++) {
 			JSONObject cmi = cmis.getJSONObject(cmiNames.getString(0));
 			String typeCmi = manifestResources.get(recursos.get(cmiNames.getString(i)));
-			
+
 			String completion_status = null;
 			String success_status = null;
 			Double max_score = null;
@@ -292,7 +263,7 @@ public class LearningActivityResultLocalServiceImpl
 			Double scaled_score = null;
 			Long scaled_score_long = null;
 			String suspend_data = cmi.getJSONObject("cmi.suspend_data").getString("value");
-			
+
 			if (cmi.getJSONObject("cmi.core.lesson_status") != null) { // 1.2
 				if(log.isDebugEnabled())log.debug("VERSION 1.2");
 				String lesson_status = cmi.getJSONObject("cmi.core.lesson_status").getString("value");
@@ -326,17 +297,17 @@ public class LearningActivityResultLocalServiceImpl
 				max_score = cmi.getJSONObject("cmi.core.score.max").getDouble("value", 100);
 				min_score = cmi.getJSONObject("cmi.core.score.min").getDouble("value", 0);
 				raw_score = cmi.getJSONObject("cmi.core.score.raw").getDouble("value", "asset".equals(typeCmi) ? 100 : 0);
-				
+
 				/**********************************************************************************************************************
 				if(log.isDebugEnabled())log.debug("ConvertPassedToMaxSCORE?  "+isMaxScoreByPassed);
 				if( ("passed".equalsIgnoreCase(lesson_status)||"completed".equalsIgnoreCase(lesson_status)) &&  isMaxScoreByPassed){
-					
+
 					raw_score = 69.0;
-					
+
 				}
 				/***********************************************************************************************************************/
 
-				
+
 				scaled_score = new Double(Math.round((raw_score * 100) / (max_score - min_score)));
 				scaled_score_long = Math.round(scaled_score);
 			} else { // 1.3
@@ -348,16 +319,16 @@ public class LearningActivityResultLocalServiceImpl
 				max_score = cmi.getJSONObject("cmi.score.max").getDouble("value", 100);
 				min_score = cmi.getJSONObject("cmi.score.min").getDouble("value", 0);
 				raw_score = cmi.getJSONObject("cmi.score.raw").getDouble("value", "asset".equals(typeCmi) ? 100 : 0);
-				
+
 				/***********************************************************************************************************************
 				if(log.isDebugEnabled())log.debug("ConvertPassedToMaxSCORE?  "+isMaxScoreByPassed);
 				if( ("passed".equalsIgnoreCase(success_status)||"completed".equalsIgnoreCase(completion_status)) &&  isMaxScoreByPassed){
-					
+
 					raw_score = 69.0;
 					if(log.isDebugEnabled())log.debug("HE PASADO Y PONGO EL RAW_SCORE "+raw_score);
 				}
 				/***********************************************************************************************************************/
-				
+
 				scaled_score = new Double(Math.round((raw_score * 100) / (max_score - min_score)));
 				scaled_score = cmi.getJSONObject("cmi.score.scaled").getDouble("value", -1) != -1 ? (cmi.getJSONObject("cmi.score.scaled").getDouble("value") * (max_score - min_score) + min_score) : scaled_score;
 				scaled_score_long = Math.round(scaled_score);
@@ -368,7 +339,7 @@ public class LearningActivityResultLocalServiceImpl
 			success_statuses.add(success_status);
 			scores.add(scaled_score_long);
 		}
-		
+
 		if (manifestItems.size() <= 1) {
 			if (completion_statuses.size() == 1) {
 				total_completion_status = completion_statuses.get(0);
@@ -457,43 +428,43 @@ public class LearningActivityResultLocalServiceImpl
 		if ("incomplete".equals(total_completion_status) || "completed".equals(total_completion_status)) {
 			learningActivityTry.setTryResultData(tryResultData);
 			learningActivityTry.setResult(Math.round(total_score));
-			
+
 			if (Math.round(total_score) >= master_score || "passed".equals(total_lesson_status)) {
-				Date endDate = new Date(System.currentTimeMillis());
+				Date endDate = new Date();
 				learningActivityTry.setEndDate(endDate);
 			}
-			//System.out.println("learningActivityTry "+learningActivityTry);
+
 			learningActivityTryLocalService.updateLearningActivityTry(learningActivityTry);
-			
+
 			// If SCO says that the activity has been passed, then the learning activity result has to be marked as passed
-						if ("passed".equals(total_lesson_status)) {
-							LearningActivityResult laresult = learningActivityResultLocalService.getByActIdAndUserId(learningActivityTry.getActId(), userId);
-							if (!laresult.getPassed()) {
-								laresult.setPassed(true);
-								laresult.setResult(Math.round(total_score));
-								laresult.setEndDate(new Date(System.currentTimeMillis()));
-								learningActivityResultLocalService.updateLearningActivityResult(laresult);
-								if(laresult.getPassed())
-								{
-									moduleResultLocalService.update(laresult);
-								}
-							}
-						}
-						// If SCO says that the activity has been failed, then the learning activity result has to be marked as failed
-						
-						if ("failed".equals(total_lesson_status)) {
-							LearningActivityResult laresult = learningActivityResultLocalService.getByActIdAndUserId(learningActivityTry.getActId(), userId);
-							if (!laresult.getPassed()) {
-								laresult.setPassed(false);
-								laresult.setEndDate(new Date(System.currentTimeMillis()));
-								learningActivityResultLocalService.updateLearningActivityResult(laresult);
-								moduleResultLocalService.update(laresult);
-								
-							}
-						}
-			
+			if ("passed".equals(total_lesson_status)) {
+				LearningActivityResult laresult = learningActivityResultLocalService.getByActIdAndUserId(learningActivityTry.getActId(), userId);
+				if (!laresult.getPassed()) {
+					laresult.setPassed(true);
+					laresult.setResult(Math.round(total_score));
+					laresult.setEndDate(new Date(System.currentTimeMillis()));
+					learningActivityResultLocalService.updateLearningActivityResult(laresult);
+					if(laresult.getPassed())
+					{
+						moduleResultLocalService.update(laresult);
+					}
+				}
+			}
+			// If SCO says that the activity has been failed, then the learning activity result has to be marked as failed
+
+			if ("failed".equals(total_lesson_status)) {
+				LearningActivityResult laresult = learningActivityResultLocalService.getByActIdAndUserId(learningActivityTry.getActId(), userId);
+				if (!laresult.getPassed()) {
+					laresult.setPassed(false);
+					laresult.setEndDate(new Date(System.currentTimeMillis()));
+					learningActivityResultLocalService.updateLearningActivityResult(laresult);
+					moduleResultLocalService.update(laresult);
+
+				}
+			}
+
 		}
-		
+
 		return this.getByActIdAndUserId(learningActivityTry.getActId(), userId);
 	}
 	public LearningActivityResult update(long latId, String tryResultData, String imsmanifest, long userId) throws SystemException, PortalException {
@@ -501,22 +472,22 @@ public class LearningActivityResultLocalServiceImpl
 		if (userId != learningActivityTry.getUserId()) {
 			throw new PortalException();
 		}
-		
+
 		/***********************************************************************************
 		boolean isMaxScoreByPassed = GetterUtil.getBoolean(PropsUtil.get("scorm.max.score.by.passed"),false);
 		/************************************************************************************/
-		
+
 		LearningActivity learningActivity = learningActivityLocalService.getLearningActivity(learningActivityTry.getActId());
 		boolean completedAsPassed = GetterUtil.getBoolean(LearningActivityLocalServiceUtil.getExtraContentValue(learningActivityTry.getActId(), "completedAsPassed"), false);
 		long passPuntuation=learningActivity.getPasspuntuation();
 		List<String> manifestItems = new ArrayList<String>();
 		Map<String, String> recursos = new HashMap<String, String>();
-		
+
 		Map<String, String> manifestResources = new HashMap<String, String>();
 		boolean isPureAsset = false;
 		long scos=0;
 		long assets=0;
-		
+
 		try {
 			if (Validator.isNotNull(imsmanifest)) {
 				Document imsdocument = SAXReaderUtil.read(imsmanifest);
@@ -527,10 +498,9 @@ public class LearningActivityResultLocalServiceImpl
 					String identifier = resource.attributeValue("identifier");
 					String type = resource.attributeValue("scormType");
 					String type2 = resource.attributeValue("scormtype");
-					
+
 					String type3 = type != null ? type : type2 != null ? type2 : "asset";
 
-					System.out.println("type3 "+type3);
 					if (!"asset".equalsIgnoreCase(type3)) {
 						isPureAsset = false;
 						scos++;
@@ -549,8 +519,8 @@ public class LearningActivityResultLocalServiceImpl
 					String identifierref = item.attributeValue("identifierref");
 					if(identifier!=null && !"".equals(identifier)&&identifierref!=null && !"".equals(identifierref))
 					{
-							manifestItems.add(identifier);
-							recursos.put(identifier, identifierref);
+						manifestItems.add(identifier);
+						recursos.put(identifier, identifierref);
 					}
 					items.addAll(item.elements("item"));
 				}
@@ -559,29 +529,29 @@ public class LearningActivityResultLocalServiceImpl
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
+
 		Long master_score = new Integer(learningActivity.getPasspuntuation()).longValue();
-		
+
 		JSONObject scorm = JSONFactoryUtil.createJSONObject();
 		scorm = JSONFactoryUtil.createJSONObject(tryResultData);
-		
+
 		JSONObject organizations = scorm.getJSONObject("organizations");
 		JSONArray organizationNames = organizations.names();
 		JSONObject organization = organizations.getJSONObject(organizationNames.getString(0));
-		
+
 		JSONObject cmis = organization.getJSONObject("cmi");
 		JSONArray cmiNames = cmis.names();
-		
+
 		List<String> completion_statuses = new ArrayList<String>();
 		List<String> success_statuses = new ArrayList<String>();
 		List<Long> scores = new ArrayList<Long>();
-		
+
 		String total_completion_status = "not attempted";
 		String total_lesson_status = "";
 		Double total_score = 0.0;
-		
+
 		if (cmis.length() == 0) { // Asset
-			System.out.println("isPureAsset? "+isPureAsset);
+			log.debug("isPureAsset? "+isPureAsset);
 			if (isPureAsset) {
 				for (int i = 0; i < manifestItems.size(); i++) {
 					completion_statuses.add("completed");
@@ -602,7 +572,7 @@ public class LearningActivityResultLocalServiceImpl
 			for (int i = 0; i < cmiNames.length(); i++) {
 				JSONObject cmi = cmis.getJSONObject(cmiNames.getString(i));
 				String typeCmi = manifestResources.get(recursos.get(cmiNames.getString(i)));
-				
+
 				String completion_status = null;
 				String success_status = null;
 				Double max_score = null;
@@ -611,7 +581,7 @@ public class LearningActivityResultLocalServiceImpl
 				Double scaled_score = null;
 				Long scaled_score_long = null;
 				String suspend_data = cmi.getJSONObject("cmi.suspend_data").getString("value");
-				
+
 				if (cmi.getJSONObject("cmi.core.lesson_status") != null) { // 1.2
 					if(log.isDebugEnabled())log.debug("VERSION 1.2");
 					String lesson_status = cmi.getJSONObject("cmi.core.lesson_status").getString("value");
@@ -652,22 +622,22 @@ public class LearningActivityResultLocalServiceImpl
 					max_score = cmi.getJSONObject("cmi.core.score.max").getDouble("value", 100);
 					min_score = cmi.getJSONObject("cmi.core.score.min").getDouble("value", 0);
 					raw_score = cmi.getJSONObject("cmi.core.score.raw").getDouble("value", "asset".equals(typeCmi) ? max_score : 0);
-					
+
 					if("passed".equals(success_status) && raw_score==0 && completedAsPassed)
 					{
 						raw_score=(double) passPuntuation;
 					}
-					
+
 					/*********************************************************************************************************************
 					if(log.isDebugEnabled())log.debug("ConvertPassedToMaxSCORE?  "+isMaxScoreByPassed);
 					if( ("passed".equalsIgnoreCase(lesson_status)||"completed".equalsIgnoreCase(lesson_status)) &&  isMaxScoreByPassed){
-						
+
 						raw_score = 69.0;
-						
+
 					}
 					/***********************************************************************************************************************/
 
-					
+
 					scaled_score = new Double(Math.round((raw_score * 100) / (max_score - min_score)));
 					scaled_score_long = Math.round(scaled_score);
 				} else { // 1.3
@@ -689,7 +659,7 @@ public class LearningActivityResultLocalServiceImpl
 						success_status = cmi.getJSONObject("cmi.success_status").getString("value");
 					}
 					//"passed", "failed", "unknown"
-					
+
 					max_score = cmi.getJSONObject("cmi.score.max").getDouble("value", 100);
 					min_score = cmi.getJSONObject("cmi.score.min").getDouble("value", 0);
 					raw_score = cmi.getJSONObject("cmi.score.raw").getDouble("value", "asset".equals(typeCmi) ? 100 : 0);
@@ -697,13 +667,13 @@ public class LearningActivityResultLocalServiceImpl
 					{
 						raw_score=(double) passPuntuation;
 					}
-					
+
 					/*********************************************************************************************************************
 					if(log.isDebugEnabled())log.debug("ConvertPassedToMaxSCORE?  "+isMaxScoreByPassed);
 					if( ("passed".equalsIgnoreCase(success_status)||"completed".equalsIgnoreCase(completion_status)) &&  isMaxScoreByPassed){
-						
+
 						raw_score = 69.0;
-						
+
 					}
 					/***********************************************************************************************************************/
 					scaled_score = new Double(Math.round((raw_score * 100) / (max_score - min_score)));
@@ -722,9 +692,8 @@ public class LearningActivityResultLocalServiceImpl
 				scores.add(scaled_score_long);
 			}
 		}
-		
-		if (!isPureAsset) 
-		{
+
+		if (!isPureAsset){
 			if (manifestItems.size() <= 1) {
 				if (completion_statuses.size() == 1) {
 					total_completion_status = completion_statuses.get(0);
@@ -732,13 +701,10 @@ public class LearningActivityResultLocalServiceImpl
 				if (success_statuses.size() == 1) {
 					total_lesson_status = success_statuses.get(0);
 				}
-			} 
-			else 
-			{
-				if (success_statuses.size() < manifestItems.size()) 
-				{
+			}else{
+				if (success_statuses.size() < manifestItems.size()){
 					total_lesson_status = "unknown";
-				} else if (success_statuses.size() == manifestItems.size()) {
+				}else if (success_statuses.size() == manifestItems.size()) {
 					for (int i = 0; i < success_statuses.size(); i++) {
 						if ("unknown".equals(success_statuses.get(i))) {
 							total_lesson_status = "unknown";
@@ -764,14 +730,13 @@ public class LearningActivityResultLocalServiceImpl
 						}
 					}
 				}
-				if (completion_statuses.size() < manifestItems.size()) 
-				{
+				if (completion_statuses.size() < manifestItems.size()) {
 					if (completion_statuses.size() <= 1) {
 						total_completion_status = completion_statuses.get(0).equals("completed") ? "incomplete" : completion_statuses.get(0);
 					} else {
 						total_completion_status = "incomplete";
 					}
-				} else if (completion_statuses.size() == manifestItems.size()) {
+				}else if (completion_statuses.size() == manifestItems.size()) {
 					for (int i = 0; i < completion_statuses.size(); i++) {
 						//total_score += scores.get(i);
 						if ("incomplete".equals(completion_statuses.get(i))) {
@@ -809,27 +774,25 @@ public class LearningActivityResultLocalServiceImpl
 				}
 			}
 		}
-		
+
 		for (int i = 0; i < scores.size(); i++) {
 			total_score += scores.get(i);
 			if(log.isDebugEnabled()){
 				log.debug("total_score "+total_score);
 			}
 		}
-		if(scos>0)
-		{
+		if(scos>0){
 			total_score = total_score / (scos);	
 			if(log.isDebugEnabled()){
 				log.debug("total_score / (scos); "+total_score);
 			}
-		}
-		else
-		{
+		}else{
 			total_score = total_score / ((scos+assets) > 0 ? (scos+assets) : 1);
 			if(log.isDebugEnabled()){
 				log.debug("total_score / ((scos+assets) > 0 ? (scos+assets) : 1) "+total_score);
 			}
 		}
+
 		if ("incomplete".equals(total_completion_status) || "completed".equals(total_completion_status)) {
 			if(log.isDebugEnabled()){
 				log.debug("total_completion_status "+total_completion_status);
@@ -841,36 +804,34 @@ public class LearningActivityResultLocalServiceImpl
 				total_lesson_status="passed";
 			}
 			learningActivityTryLocalService.updateLearningActivityTry(learningActivityTry);
-			
+
 			// If SCO says that the activity has been passed, then the learning activity result has to be marked as passed
 			if ("passed".equals(total_lesson_status)) {
 				LearningActivityResult laresult = learningActivityResultLocalService.getByActIdAndUserId(learningActivityTry.getActId(), userId);
 				if (!laresult.getPassed()) {
 					laresult.setPassed(true);
-					laresult.setEndDate(new Date(System.currentTimeMillis()));
-					
+					laresult.setEndDate(new Date());
 					laresult.setResult(Math.round(total_score));
-					
+
 					learningActivityResultLocalService.updateLearningActivityResult(laresult);
-					if(laresult.getPassed())
-					{
-						moduleResultLocalService.update(laresult);
-					}
+					moduleResultLocalService.update(laresult);
 				}
 			}
 			// If SCO says that the activity has been failed, then the learning activity result has to be marked as failed
-			
+
 			if ("failed".equals(total_lesson_status)) {
-				LearningActivityResult laresult = learningActivityResultLocalService.getByActIdAndUserId(learningActivityTry.getActId(), userId);
-				if (laresult.getEndDate()==null) {
+				LearningActivityResult laresult = learningActivityResultLocalService.getByActIdAndUserId(learningActivity.getActId(), userId);
+				long  userTries = LearningActivityTryLocalServiceUtil.getLearningActivityTryByActUserCount(laresult.getActId(), userId);
+
+				if (laresult.getEndDate()==null && learningActivity.getTries() <= userTries && learningActivity.getTries() != 0) {
 					laresult.setPassed(false);
-					laresult.setEndDate(new Date(System.currentTimeMillis()));
+					laresult.setEndDate(new Date());
 					learningActivityResultLocalService.updateLearningActivityResult(laresult);
 					moduleResultLocalService.update(laresult);
-					
+
 				}
 			}
-			
+
 		}
 
 		//auditing
@@ -878,43 +839,31 @@ public class LearningActivityResultLocalServiceImpl
 			AuditingLogFactory.audit(learningActivity.getCompanyId(), learningActivity.getGroupId(), LearningActivityResult.class.getName(), 
 					learningActivity.getPrimaryKey(), learningActivity.getUserId(), AuditConstants.UPDATE, null);
 		}
-		
 		return this.getByActIdAndUserId(learningActivityTry.getActId(), userId);
 	}
-	public boolean existsLearningActivityResult(long actId,long userId) throws SystemException
-	{
-		if(learningActivityResultPersistence.countByact_user(actId, userId)>0)
-		{
-			return true;
-		}
-		else
-		{
-		 
-			return false;
-		}
+	
+	
+	
+	public boolean existsLearningActivityResult(long actId,long userId) throws SystemException{
+		return learningActivityResultPersistence.countByact_user(actId, userId)>0;
 	}
-	public boolean userPassed(long actId,long userId) throws SystemException
-	{
-		if(!existsLearningActivityResult(actId, userId))
-		{
+
+	public boolean userPassed(long actId,long userId) throws SystemException{
+		if(!existsLearningActivityResult(actId, userId)){
 			return false;
-		}
-		else
-		{
+		}else{
 			return getByActIdAndUserId(actId, userId).isPassed();
 		}
 	}
-	public long countPassed(long actId) throws SystemException
-	{
+	public long countPassed(long actId) throws SystemException{
 		return learningActivityResultPersistence.countByap(actId, true);
 	}
-	
+
 	public long countPassedOnlyStudents(long actId, long companyId, long courseGropupCreatedId, boolean passed) throws SystemException{
 		return countPassedOnlyStudents(actId, companyId, courseGropupCreatedId, passed, null);
 	}
-	
-	public long countPassedOnlyStudents(long actId, long companyId, long courseGropupCreatedId, boolean passed, List<User> _students) throws SystemException
-	{
+
+	public long countPassedOnlyStudents(long actId, long companyId, long courseGropupCreatedId, boolean passed, List<User> _students) throws SystemException{
 		long res = 0;
 		List<User> students = null;
 		// Se prepara el metodo para recibir un Listado de estudiantes especificos,, por ejemplo que pertenezcan a alguna organizacion. Sino, se trabaja con todos los estudiantes del curso.
@@ -922,11 +871,11 @@ public class LearningActivityResultLocalServiceImpl
 			students = _students;
 		else
 			students = CourseLocalServiceUtil.getStudentsFromCourse(companyId, courseGropupCreatedId);
-		
+
 		ClassLoader classLoader = (ClassLoader) PortletBeanLocatorUtil.locate(ClpSerializer.getServletContextName(), "portletClassLoader");
 		DynamicQuery consulta = DynamicQueryFactoryUtil.forClass(LearningActivityResult.class, classLoader)
 				.add(PropertyFactoryUtil.forName("actId").eq(actId));
-		
+
 		if(Validator.isNotNull(students) && students.size() > 0) {
 			Criterion criterion = null;
 			for (int i = 0; i < students.size(); i++) {
@@ -939,20 +888,20 @@ public class LearningActivityResultLocalServiceImpl
 			if(Validator.isNotNull(criterion)) {
 				criterion=RestrictionsFactoryUtil.and(criterion,
 						RestrictionsFactoryUtil.eq("passed",new Boolean (true)));
-				
+
 				consulta.add(criterion);
-				
+
 				List<LearningActivityResult> results = learningActivityResultPersistence.findWithDynamicQuery(consulta);
 				if(results!=null && !results.isEmpty()) {
 					res = results.size();
 				}
 			}
 		}
-		
+
 		return res;
-		
+
 	}
-	
+
 	public long countNotPassed(long actId) throws SystemException
 	{
 		ClassLoader classLoader = (ClassLoader) PortletBeanLocatorUtil.locate(ClpSerializer.getServletContextName(), "portletClassLoader"); 
@@ -965,13 +914,13 @@ public class LearningActivityResultLocalServiceImpl
 		dq.add(criterion);
 		return learningActivityResultPersistence.countWithDynamicQuery(dq);
 	}
-	
-	
+
+
 	public long countNotPassedOnlyStudents(long actId, long companyId, long courseGropupCreatedId) throws SystemException{
 		return countNotPassedOnlyStudents(actId, companyId, courseGropupCreatedId, null); 
 	}
-	
-	
+
+
 	public long countNotPassedOnlyStudents(long actId, long companyId, long courseGropupCreatedId, List<User> _students) throws SystemException
 	{
 		long res = 0;
@@ -981,11 +930,11 @@ public class LearningActivityResultLocalServiceImpl
 			students = _students;
 		else
 			students = CourseLocalServiceUtil.getStudentsFromCourse(companyId, courseGropupCreatedId);
-		
+
 		ClassLoader classLoader = (ClassLoader) PortletBeanLocatorUtil.locate(ClpSerializer.getServletContextName(), "portletClassLoader");
 		DynamicQuery consulta = DynamicQueryFactoryUtil.forClass(LearningActivityResult.class, classLoader)
 				.add(PropertyFactoryUtil.forName("actId").eq(actId));
-		
+
 		if(Validator.isNotNull(students) && students.size() > 0) {
 			Criterion criterion = null;
 			for (int i = 0; i < students.size(); i++) {
@@ -998,22 +947,22 @@ public class LearningActivityResultLocalServiceImpl
 			if(Validator.isNotNull(criterion)) {
 				criterion=RestrictionsFactoryUtil.and(criterion,
 						RestrictionsFactoryUtil.eq("passed",new Boolean (false)));
-				
+
 				consulta.add(criterion);
-				
+
 				criterion=PropertyFactoryUtil.forName("endDate").isNotNull();
 				consulta.add(criterion);
-				
+
 				List<LearningActivityResult> results = learningActivityResultPersistence.findWithDynamicQuery(consulta);
 				if(results!=null && !results.isEmpty()) {
 					res = results.size();
 				}
 			}
 		}
-		
+
 		return res;
 	}
-	
+
 	public Double avgResult(long actId) throws SystemException
 	{
 		ClassLoader classLoader = (ClassLoader) PortletBeanLocatorUtil.locate(ClpSerializer.getServletContextName(), "portletClassLoader"); 
@@ -1025,11 +974,11 @@ public class LearningActivityResultLocalServiceImpl
 		dq.setProjection(ProjectionFactoryUtil.avg("result"));
 		return (Double)(learningActivityResultPersistence.findWithDynamicQuery(dq).get(0));
 	}
-	
+
 	public Double avgResultOnlyStudents(long actId, long companyId, long courseGropupCreatedId) throws SystemException {
 		return avgResultOnlyStudents(actId, companyId, courseGropupCreatedId, null);
 	}
-	
+
 	public Double avgResultOnlyStudents(long actId, long companyId, long courseGropupCreatedId, List<User> _students) throws SystemException
 	{
 		ClassLoader classLoader = (ClassLoader) PortletBeanLocatorUtil.locate(ClpSerializer.getServletContextName(), "portletClassLoader"); 
@@ -1038,14 +987,14 @@ public class LearningActivityResultLocalServiceImpl
 		dq.add(criterion);
 		criterion=PropertyFactoryUtil.forName("endDate").isNotNull();
 		dq.add(criterion);
-		
+
 		List<User> students = null;
 		// Se prepara el metodo para recibir un Listado de estudiantes especificos,, por ejemplo que pertenezcan a alguna organizacion. Sino, se trabaja con todos los estudiantes del curso.
 		if(Validator.isNotNull(_students) && _students.size() > 0)
 			students = _students;
 		else
 			students = CourseLocalServiceUtil.getStudentsFromCourse(companyId, courseGropupCreatedId);
-		
+
 		if(Validator.isNotNull(students) && students.size() > 0) {
 			for (int i = 0; i < students.size(); i++) {
 				if(i==0) {
@@ -1056,24 +1005,24 @@ public class LearningActivityResultLocalServiceImpl
 			}
 		}
 		dq.add(criterion);
-		
+
 		dq.setProjection(ProjectionFactoryUtil.avg("result"));
 		return (Double)(learningActivityResultPersistence.findWithDynamicQuery(dq).get(0));
 	}
-	
+
 	public long countStarted(long actId) throws SystemException
 	{
 		return learningActivityResultPersistence.countByac(actId);
 	}
-	
+
 	public long countStartedOnlyStudents(long actId, long companyId, long courseGropupCreatedId) throws SystemException{
 		return countStartedOnlyStudents(actId, companyId, courseGropupCreatedId, null);
 	}
-	
+
 	public long countStartedOnlyStudents(long actId, long companyId, long courseGropupCreatedId, List<User> _students) throws SystemException
 	{
 		long res = 0;
-		
+
 		try {
 			List<User> students = null;
 			// Se prepara el metodo para recibir un Listado de estudiantes especificos,, por ejemplo que pertenezcan a alguna organizacion. Sino, se trabaja con todos los estudiantes del curso.
@@ -1081,11 +1030,11 @@ public class LearningActivityResultLocalServiceImpl
 				students = _students;
 			else
 				students = CourseLocalServiceUtil.getStudentsFromCourse(companyId, courseGropupCreatedId);
-			
+
 			ClassLoader classLoader = (ClassLoader) PortletBeanLocatorUtil.locate(ClpSerializer.getServletContextName(), "portletClassLoader");
 			DynamicQuery consulta = DynamicQueryFactoryUtil.forClass(LearningActivityResult.class, classLoader)
 					.add(PropertyFactoryUtil.forName("actId").eq(actId));
-			
+
 			if(Validator.isNotNull(students) && students.size() > 0) {
 				Criterion criterion = null;
 				for (int i = 0; i < students.size(); i++) {
@@ -1097,7 +1046,7 @@ public class LearningActivityResultLocalServiceImpl
 				}
 				if(Validator.isNotNull(criterion)) {
 					consulta.add(criterion);
-					
+
 					List<LearningActivityResult> results = learningActivityResultPersistence.findWithDynamicQuery(consulta);
 					if(results!=null && !results.isEmpty()) {
 						res = results.size();
@@ -1108,11 +1057,11 @@ public class LearningActivityResultLocalServiceImpl
 			e.printStackTrace();
 		}
 		return res;
-		
-		
+
+
 		//return learningActivityResultPersistence.countByac(actId);
 	}
-	
+
 	public double triesPerUser(long actId) throws SystemException
 	{
 		long tries=learningActivityTryPersistence.countByact(actId);
@@ -1123,12 +1072,12 @@ public class LearningActivityResultLocalServiceImpl
 		}
 		return ((double) tries)/((double) started);
 	}
-	
+
 	public double triesPerUserOnlyStudents(long actId, long companyId, long courseGropupCreatedId) throws SystemException {
 		return triesPerUserOnlyStudents(actId, companyId, courseGropupCreatedId, null);
 	}
-	
-	
+
+
 	public double triesPerUserOnlyStudents(long actId, long companyId, long courseGropupCreatedId, List<User> _students) throws SystemException
 	{
 		long tries=0;
@@ -1138,11 +1087,11 @@ public class LearningActivityResultLocalServiceImpl
 			students = _students;
 		else
 			students = CourseLocalServiceUtil.getStudentsFromCourse(companyId, courseGropupCreatedId);
-		
+
 		ClassLoader classLoader = (ClassLoader) PortletBeanLocatorUtil.locate(ClpSerializer.getServletContextName(), "portletClassLoader");
 		DynamicQuery consulta = DynamicQueryFactoryUtil.forClass(LearningActivityTry.class, classLoader)
 				.add(PropertyFactoryUtil.forName("actId").eq(actId));
-		
+
 		if(Validator.isNotNull(students) && students.size() > 0) {
 			Criterion criterion = null;
 			for (int i = 0; i < students.size(); i++) {
@@ -1154,7 +1103,7 @@ public class LearningActivityResultLocalServiceImpl
 			}
 			if(Validator.isNotNull(criterion)) {
 				consulta.add(criterion);
-				
+
 				List<LearningActivityTry> results = learningActivityTryPersistence.findWithDynamicQuery(consulta);
 				if(results!=null && !results.isEmpty()) {
 					tries = results.size();
@@ -1169,13 +1118,12 @@ public class LearningActivityResultLocalServiceImpl
 		}
 		return ((double) tries)/((double) started);
 	}
-	
-	public LearningActivityResult getByActIdAndUserId(long actId,long userId) throws SystemException
-	{
+
+	public LearningActivityResult getByActIdAndUserId(long actId,long userId) throws SystemException{
 		return learningActivityResultPersistence.fetchByact_user(actId, userId);
 	}
-	public Date getLastEndDateByUserId(long userId) throws SystemException
-	{
+
+	public Date getLastEndDateByUserId(long userId) throws SystemException{
 		ClassLoader classLoader = (ClassLoader) PortletBeanLocatorUtil.locate(ClpSerializer.getServletContextName(), "portletClassLoader"); 
 		DynamicQuery dq=DynamicQueryFactoryUtil.forClass(LearningActivityResult.class, classLoader);
 		Criterion criterion=PropertyFactoryUtil.forName("userId").eq(userId);
@@ -1185,20 +1133,155 @@ public class LearningActivityResultLocalServiceImpl
 		dq.setProjection(ProjectionFactoryUtil.max("endDate"));
 		return (Date)(learningActivityResultPersistence.findWithDynamicQuery(dq).get(0));
 	}
-	public List<LearningActivityResult> getByActId(long actId) throws SystemException
-	{
-		List<LearningActivityResult> results;
-		
-		ClassLoader classLoader = (ClassLoader) PortletBeanLocatorUtil.locate(ClpSerializer.getServletContextName(), "portletClassLoader"); 
-		DynamicQuery consulta = DynamicQueryFactoryUtil.forClass(LearningActivityResult.class, classLoader)
-					.add(PropertyFactoryUtil.forName("actId").eq(new Long(actId)));
-					
-		results = (List<LearningActivityResult>)learningActivityResultPersistence.findWithDynamicQuery(consulta);
 
-		return results;	
-		
+	public List<LearningActivityResult> getByActId(long actId){
+		List<LearningActivityResult> results = new ArrayList<LearningActivityResult>();
+		try {
+			results = learningActivityResultPersistence.findByac(actId);
+		} catch (SystemException e) {
+			e.printStackTrace();
+		}
+		return results;			
 	}
-	
+
+	public List<LearningActivityResult> getByGroupIdUserId(long groupId,long userId){
+		List<LearningActivityResult> results = new ArrayList<LearningActivityResult>();
+
+		ClassLoader classLoader = (ClassLoader) PortletBeanLocatorUtil.locate(ClpSerializer.getServletContextName(), "portletClassLoader"); 
+		DynamicQuery dq2 = DynamicQueryFactoryUtil.forClass(LearningActivity.class, classLoader)
+				.add(PropertyFactoryUtil.forName("groupId").eq(groupId))
+				.setProjection(ProjectionFactoryUtil.property("actId"));
+
+		DynamicQuery dq = DynamicQueryFactoryUtil.forClass(LearningActivityResult.class, classLoader)
+				.add(PropertyFactoryUtil.forName("userId").eq(userId))
+				.add(PropertyFactoryUtil.forName("actId").in(dq2));		
+
+		try {
+			results = (List<LearningActivityResult>)learningActivityResultPersistence.findWithDynamicQuery(dq);
+		} catch (SystemException e) {
+			e.printStackTrace();
+		}
+
+		log.debug("::getByModuleId:"+results.size());
+		return results;			
+	}
+
+	public List<LearningActivityResult> getMandatoryByGroupIdUserId(long groupId,long userId){
+		List<LearningActivityResult> results = new ArrayList<LearningActivityResult>();
+
+		ClassLoader classLoader = (ClassLoader) PortletBeanLocatorUtil.locate(ClpSerializer.getServletContextName(), "portletClassLoader"); 
+		DynamicQuery dq2 = DynamicQueryFactoryUtil.forClass(LearningActivity.class, classLoader)
+				.add(PropertyFactoryUtil.forName("groupId").eq(groupId))
+				.add(PropertyFactoryUtil.forName("weightinmodule").gt(0L))
+				.setProjection(ProjectionFactoryUtil.property("actId"));
+
+		DynamicQuery dq = DynamicQueryFactoryUtil.forClass(LearningActivityResult.class, classLoader)
+				.add(PropertyFactoryUtil.forName("userId").eq(userId))
+				.add(PropertyFactoryUtil.forName("actId").in(dq2));
+
+		try {
+			results = (List<LearningActivityResult>)learningActivityResultPersistence.findWithDynamicQuery(dq);
+		} catch (SystemException e) {
+			e.printStackTrace();
+		}
+
+		log.debug("::getByModuleIdPassed:"+results.size());
+		return results;			
+	}
+
+	public List<LearningActivityResult> getByModuleIdUserId(long moduleId,long userId){
+		List<LearningActivityResult> results = new ArrayList<LearningActivityResult>();
+
+		ClassLoader classLoader = (ClassLoader) PortletBeanLocatorUtil.locate(ClpSerializer.getServletContextName(), "portletClassLoader"); 
+		DynamicQuery dq2 = DynamicQueryFactoryUtil.forClass(LearningActivity.class, classLoader)
+				.add(PropertyFactoryUtil.forName("moduleId").eq(moduleId))
+				.setProjection(ProjectionFactoryUtil.property("actId"));
+
+		DynamicQuery dq = DynamicQueryFactoryUtil.forClass(LearningActivityResult.class, classLoader)
+				.add(PropertyFactoryUtil.forName("userId").eq(userId))
+				.add(PropertyFactoryUtil.forName("actId").in(dq2));		
+
+		try {
+			results = (List<LearningActivityResult>)learningActivityResultPersistence.findWithDynamicQuery(dq);
+		} catch (SystemException e) {
+			e.printStackTrace();
+		}
+
+		log.debug("::getByModuleId:"+results.size());
+		return results;			
+	}
+
+	public List<LearningActivityResult> getByModuleIdUserIdPassed(long moduleId,long userId){
+		List<LearningActivityResult> results = new ArrayList<LearningActivityResult>();
+
+		ClassLoader classLoader = (ClassLoader) PortletBeanLocatorUtil.locate(ClpSerializer.getServletContextName(), "portletClassLoader"); 
+		DynamicQuery dq2 = DynamicQueryFactoryUtil.forClass(LearningActivity.class, classLoader)
+				.add(PropertyFactoryUtil.forName("moduleId").eq(moduleId))
+				.setProjection(ProjectionFactoryUtil.property("actId"));
+
+		DynamicQuery dq = DynamicQueryFactoryUtil.forClass(LearningActivityResult.class, classLoader)
+				.add(PropertyFactoryUtil.forName("userId").eq(userId))
+				.add(PropertyFactoryUtil.forName("passed").eq(true))
+				.add(PropertyFactoryUtil.forName("actId").in(dq2));
+
+
+		try {
+			results = (List<LearningActivityResult>)learningActivityResultPersistence.findWithDynamicQuery(dq);
+		} catch (SystemException e) {
+			e.printStackTrace();
+		}
+
+		log.debug("::getByModuleIdPassed:"+results.size());
+		return results;			
+	}
+
+	public List<LearningActivityResult> getMandatoryByModuleIdUserIdPassed(long moduleId,long userId){
+		List<LearningActivityResult> results = new ArrayList<LearningActivityResult>();
+
+		ClassLoader classLoader = (ClassLoader) PortletBeanLocatorUtil.locate(ClpSerializer.getServletContextName(), "portletClassLoader"); 
+		DynamicQuery dq2 = DynamicQueryFactoryUtil.forClass(LearningActivity.class, classLoader)
+				.add(PropertyFactoryUtil.forName("moduleId").eq(moduleId))
+				.add(PropertyFactoryUtil.forName("weightinmodule").gt(0L))
+				.setProjection(ProjectionFactoryUtil.property("actId"));
+
+		DynamicQuery dq = DynamicQueryFactoryUtil.forClass(LearningActivityResult.class, classLoader)
+				.add(PropertyFactoryUtil.forName("userId").eq(userId))
+				.add(PropertyFactoryUtil.forName("passed").eq(true))
+				.add(PropertyFactoryUtil.forName("actId").in(dq2));
+
+
+		try {
+			results = (List<LearningActivityResult>)learningActivityResultPersistence.findWithDynamicQuery(dq);
+		} catch (SystemException e) {
+			e.printStackTrace();
+		}
+
+		log.debug("::getByModuleIdPassed:"+results.size());
+		return results;			
+	}
+
+	public int countMandatoryByModuleIdUserIdPassed(long moduleId,long userId){
+
+		ClassLoader classLoader = (ClassLoader) PortletBeanLocatorUtil.locate(ClpSerializer.getServletContextName(), "portletClassLoader"); 
+		DynamicQuery dq2 = DynamicQueryFactoryUtil.forClass(LearningActivity.class, classLoader)
+				.add(PropertyFactoryUtil.forName("moduleId").eq(moduleId))
+				.add(PropertyFactoryUtil.forName("weightinmodule").gt(0L))
+				.setProjection(ProjectionFactoryUtil.property("actId"));
+
+		DynamicQuery dq = DynamicQueryFactoryUtil.forClass(LearningActivityResult.class, classLoader)
+				.add(PropertyFactoryUtil.forName("userId").eq(userId))
+				.add(PropertyFactoryUtil.forName("passed").eq(true))
+				.add(PropertyFactoryUtil.forName("actId").in(dq2));
+
+
+		try {
+			return (int) LearningActivityResultLocalServiceUtil.dynamicQueryCount(dq);
+		} catch (SystemException e) {
+			e.printStackTrace();
+		}
+		return 0;			
+	}
+
 	public String translateResult(Locale locale, double result, long groupId){
 		String translatedResult = "";
 		try {

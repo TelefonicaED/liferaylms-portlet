@@ -281,8 +281,6 @@ public class CompetenceLocalServiceClpInvoker {
 		if (_methodName136.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes136, parameterTypes)) {
 			CompetenceLocalServiceUtil.setBeanIdentifier((java.lang.String)arguments[0]);
-
-			return null;
 		}
 
 		if (_methodName141.equals(name) &&
@@ -338,8 +336,6 @@ public class CompetenceLocalServiceClpInvoker {
 				Arrays.deepEquals(_methodParameterTypes149, parameterTypes)) {
 			CompetenceLocalServiceUtil.setBGImage((byte[])arguments[0],
 				((Long)arguments[1]).longValue(), (java.lang.String)arguments[2]);
-
-			return null;
 		}
 
 		if (_methodName150.equals(name) &&

@@ -327,6 +327,14 @@ public class LearningActivityResultLocalServiceWrapper
 			companyId, courseGropupCreatedId, passed);
 	}
 
+	public long countPassedOnlyStudents(long actId, long companyId,
+		long courseGropupCreatedId, boolean passed,
+		java.util.List<com.liferay.portal.model.User> _students)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _learningActivityResultLocalService.countPassedOnlyStudents(actId,
+			companyId, courseGropupCreatedId, passed, _students);
+	}
+
 	public long countNotPassed(long actId)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _learningActivityResultLocalService.countNotPassed(actId);
@@ -337,6 +345,14 @@ public class LearningActivityResultLocalServiceWrapper
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _learningActivityResultLocalService.countNotPassedOnlyStudents(actId,
 			companyId, courseGropupCreatedId);
+	}
+
+	public long countNotPassedOnlyStudents(long actId, long companyId,
+		long courseGropupCreatedId,
+		java.util.List<com.liferay.portal.model.User> _students)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _learningActivityResultLocalService.countNotPassedOnlyStudents(actId,
+			companyId, courseGropupCreatedId, _students);
 	}
 
 	public java.lang.Double avgResult(long actId)
@@ -351,6 +367,14 @@ public class LearningActivityResultLocalServiceWrapper
 			companyId, courseGropupCreatedId);
 	}
 
+	public java.lang.Double avgResultOnlyStudents(long actId, long companyId,
+		long courseGropupCreatedId,
+		java.util.List<com.liferay.portal.model.User> _students)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _learningActivityResultLocalService.avgResultOnlyStudents(actId,
+			companyId, courseGropupCreatedId, _students);
+	}
+
 	public long countStarted(long actId)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _learningActivityResultLocalService.countStarted(actId);
@@ -363,6 +387,14 @@ public class LearningActivityResultLocalServiceWrapper
 			companyId, courseGropupCreatedId);
 	}
 
+	public long countStartedOnlyStudents(long actId, long companyId,
+		long courseGropupCreatedId,
+		java.util.List<com.liferay.portal.model.User> _students)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _learningActivityResultLocalService.countStartedOnlyStudents(actId,
+			companyId, courseGropupCreatedId, _students);
+	}
+
 	public double triesPerUser(long actId)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _learningActivityResultLocalService.triesPerUser(actId);
@@ -373,6 +405,14 @@ public class LearningActivityResultLocalServiceWrapper
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _learningActivityResultLocalService.triesPerUserOnlyStudents(actId,
 			companyId, courseGropupCreatedId);
+	}
+
+	public double triesPerUserOnlyStudents(long actId, long companyId,
+		long courseGropupCreatedId,
+		java.util.List<com.liferay.portal.model.User> _students)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _learningActivityResultLocalService.triesPerUserOnlyStudents(actId,
+			companyId, courseGropupCreatedId, _students);
 	}
 
 	public com.liferay.lms.model.LearningActivityResult getByActIdAndUserId(
@@ -388,8 +428,43 @@ public class LearningActivityResultLocalServiceWrapper
 	}
 
 	public java.util.List<com.liferay.lms.model.LearningActivityResult> getByActId(
-		long actId) throws com.liferay.portal.kernel.exception.SystemException {
+		long actId) {
 		return _learningActivityResultLocalService.getByActId(actId);
+	}
+
+	public java.util.List<com.liferay.lms.model.LearningActivityResult> getByGroupIdUserId(
+		long groupId, long userId) {
+		return _learningActivityResultLocalService.getByGroupIdUserId(groupId,
+			userId);
+	}
+
+	public java.util.List<com.liferay.lms.model.LearningActivityResult> getMandatoryByGroupIdUserId(
+		long groupId, long userId) {
+		return _learningActivityResultLocalService.getMandatoryByGroupIdUserId(groupId,
+			userId);
+	}
+
+	public java.util.List<com.liferay.lms.model.LearningActivityResult> getByModuleIdUserId(
+		long moduleId, long userId) {
+		return _learningActivityResultLocalService.getByModuleIdUserId(moduleId,
+			userId);
+	}
+
+	public java.util.List<com.liferay.lms.model.LearningActivityResult> getByModuleIdUserIdPassed(
+		long moduleId, long userId) {
+		return _learningActivityResultLocalService.getByModuleIdUserIdPassed(moduleId,
+			userId);
+	}
+
+	public java.util.List<com.liferay.lms.model.LearningActivityResult> getMandatoryByModuleIdUserIdPassed(
+		long moduleId, long userId) {
+		return _learningActivityResultLocalService.getMandatoryByModuleIdUserIdPassed(moduleId,
+			userId);
+	}
+
+	public int countMandatoryByModuleIdUserIdPassed(long moduleId, long userId) {
+		return _learningActivityResultLocalService.countMandatoryByModuleIdUserIdPassed(moduleId,
+			userId);
 	}
 
 	public java.lang.String translateResult(java.util.Locale locale,

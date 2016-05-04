@@ -97,8 +97,6 @@ public class LearningActivityServiceClpInvoker {
 		if (_methodName151.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes151, parameterTypes)) {
 			LearningActivityServiceUtil.setBeanIdentifier((java.lang.String)arguments[0]);
-
-			return null;
 		}
 
 		if (_methodName156.equals(name) &&
@@ -114,15 +112,11 @@ public class LearningActivityServiceClpInvoker {
 		if (_methodName158.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes158, parameterTypes)) {
 			LearningActivityServiceUtil.deleteLearningactivity((com.liferay.lms.model.LearningActivity)arguments[0]);
-
-			return null;
 		}
 
 		if (_methodName159.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes159, parameterTypes)) {
 			LearningActivityServiceUtil.deleteLearningactivity(((Long)arguments[0]).longValue());
-
-			return null;
 		}
 
 		if (_methodName160.equals(name) &&

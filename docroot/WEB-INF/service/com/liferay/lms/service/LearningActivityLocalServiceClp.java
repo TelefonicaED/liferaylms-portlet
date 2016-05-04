@@ -212,15 +212,15 @@ public class LearningActivityLocalServiceClp
 
 		_methodName36 = "goUpLearningActivity";
 
-		_methodParameterTypes36 = new String[] { "long" };
+		_methodParameterTypes36 = new String[] { "long", "long" };
 
 		_methodName37 = "goDownLearningActivity";
 
-		_methodParameterTypes37 = new String[] { "long" };
+		_methodParameterTypes37 = new String[] { "long", "long" };
 
 		_methodName38 = "moveActivity";
 
-		_methodParameterTypes38 = new String[] { "long", "long", "long" };
+		_methodParameterTypes38 = new String[] { "long", "long", "long", "long" };
 
 		_methodName39 = "getNextLearningActivity";
 
@@ -293,6 +293,10 @@ public class LearningActivityLocalServiceClp
 				"com.liferay.lms.model.LearningActivity",
 				"com.liferay.portal.security.permission.PermissionChecker"
 			};
+
+		_methodName53 = "getMandatoryActivities";
+
+		_methodParameterTypes53 = new String[] { "long" };
 	}
 
 	public com.liferay.lms.model.LearningActivity addLearningActivity(
@@ -1461,11 +1465,11 @@ public class LearningActivityLocalServiceClp
 		return (com.liferay.lms.model.LearningActivity)ClpSerializer.translateOutput(returnObj);
 	}
 
-	public void goUpLearningActivity(long actId)
+	public void goUpLearningActivity(long actId, long userIdAction)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		try {
 			_invokableLocalService.invokeMethod(_methodName36,
-				_methodParameterTypes36, new Object[] { actId });
+				_methodParameterTypes36, new Object[] { actId, userIdAction });
 		}
 		catch (Throwable t) {
 			t = ClpSerializer.translateThrowable(t);
@@ -1484,11 +1488,11 @@ public class LearningActivityLocalServiceClp
 		}
 	}
 
-	public void goDownLearningActivity(long actId)
+	public void goDownLearningActivity(long actId, long userIdAction)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		try {
 			_invokableLocalService.invokeMethod(_methodName37,
-				_methodParameterTypes37, new Object[] { actId });
+				_methodParameterTypes37, new Object[] { actId, userIdAction });
 		}
 		catch (Throwable t) {
 			t = ClpSerializer.translateThrowable(t);
@@ -1507,12 +1511,13 @@ public class LearningActivityLocalServiceClp
 		}
 	}
 
-	public void moveActivity(long actId, long previusAct, long nextAct)
+	public void moveActivity(long actId, long previusAct, long nextAct,
+		long userIdAction)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		try {
 			_invokableLocalService.invokeMethod(_methodName38,
 				_methodParameterTypes38,
-				new Object[] { actId, previusAct, nextAct });
+				new Object[] { actId, previusAct, nextAct, userIdAction });
 		}
 		catch (Throwable t) {
 			t = ClpSerializer.translateThrowable(t);
@@ -1948,6 +1953,29 @@ public class LearningActivityLocalServiceClp
 		return ((Boolean)returnObj).booleanValue();
 	}
 
+	public java.util.List<com.liferay.lms.model.LearningActivity> getMandatoryActivities(
+		long moduleId) {
+		Object returnObj = null;
+
+		try {
+			returnObj = _invokableLocalService.invokeMethod(_methodName53,
+					_methodParameterTypes53, new Object[] { moduleId });
+		}
+		catch (Throwable t) {
+			t = ClpSerializer.translateThrowable(t);
+
+			if (t instanceof RuntimeException) {
+				throw (RuntimeException)t;
+			}
+			else {
+				throw new RuntimeException(t.getClass().getName() +
+					" is not a valid exception");
+			}
+		}
+
+		return (java.util.List<com.liferay.lms.model.LearningActivity>)ClpSerializer.translateOutput(returnObj);
+	}
+
 	private InvokableLocalService _invokableLocalService;
 	private String _methodName0;
 	private String[] _methodParameterTypes0;
@@ -2053,4 +2081,6 @@ public class LearningActivityLocalServiceClp
 	private String[] _methodParameterTypes51;
 	private String _methodName52;
 	private String[] _methodParameterTypes52;
+	private String _methodName53;
+	private String[] _methodParameterTypes53;
 }
