@@ -14,6 +14,7 @@
 
 package com.liferay.lms.service.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.liferay.lms.model.SurveyResult;
@@ -50,14 +51,19 @@ import com.liferay.portal.kernel.exception.SystemException;
 public class SurveyResultLocalServiceImpl
 	extends SurveyResultLocalServiceBaseImpl {
 	
-	@SuppressWarnings("unchecked")
-	public java.util.List<SurveyResult> getSurveyResultByActId(long actId) throws SystemException
-	{ 
-		ClassLoader classLoader = (ClassLoader) PortletBeanLocatorUtil.locate(ClpSerializer.getServletContextName(), "portletClassLoader");
-		DynamicQuery query = DynamicQueryFactoryUtil.forClass(SurveyResult.class, classLoader)
-				.add(PropertyFactoryUtil.forName("actId").eq(actId));
+	public List<SurveyResult> getByUserId(long userId){ 
+		List<SurveyResult> results = new ArrayList<SurveyResult>();
+		try {
+			results = surveyResultPersistence.findByUserId(userId);
+		} catch (SystemException e) {
+			e.printStackTrace();
+		}
+		return results;
+	}
+	
+	public List<SurveyResult> getSurveyResultByActId(long actId) throws SystemException{ 
 		
-		return surveyResultPersistence.findWithDynamicQuery(query);
+		return surveyResultPersistence.findByActId(actId);
 	}
 	
 	public double getPercentageByQuestionIdAndAnswerId(long questionId, long answerId) throws SystemException

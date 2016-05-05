@@ -309,6 +309,11 @@ public class P2pActivityLocalServiceWrapper implements P2pActivityLocalService,
 			p2pActivityId, numValidaciones);
 	}
 
+	public java.util.List<com.liferay.lms.model.P2pActivity> findByUserId(
+		long userId) {
+		return _p2pActivityLocalService.findByUserId(userId);
+	}
+
 	public java.util.List<com.liferay.lms.model.P2pActivity> getP2PActivitiesInDay(
 		java.util.Calendar calendar)
 		throws com.liferay.portal.kernel.exception.PortalException,

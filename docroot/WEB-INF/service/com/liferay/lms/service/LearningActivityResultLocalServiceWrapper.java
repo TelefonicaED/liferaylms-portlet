@@ -462,6 +462,11 @@ public class LearningActivityResultLocalServiceWrapper
 			userId);
 	}
 
+	public java.util.List<com.liferay.lms.model.LearningActivityResult> getByUserId(
+		long userId) {
+		return _learningActivityResultLocalService.getByUserId(userId);
+	}
+
 	public int countMandatoryByModuleIdUserIdPassed(long moduleId, long userId) {
 		return _learningActivityResultLocalService.countMandatoryByModuleIdUserIdPassed(moduleId,
 			userId);

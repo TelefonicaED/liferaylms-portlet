@@ -464,6 +464,11 @@ public class LearningActivityResultLocalServiceUtil {
 		return getService().getMandatoryByModuleIdUserIdPassed(moduleId, userId);
 	}
 
+	public static java.util.List<com.liferay.lms.model.LearningActivityResult> getByUserId(
+		long userId) {
+		return getService().getByUserId(userId);
+	}
+
 	public static int countMandatoryByModuleIdUserIdPassed(long moduleId,
 		long userId) {
 		return getService()

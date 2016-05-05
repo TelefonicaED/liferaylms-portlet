@@ -176,21 +176,25 @@ public class P2pActivityCorrectionsLocalServiceClp
 
 		_methodParameterTypes30 = new String[] { "long", "long" };
 
-		_methodName31 = "areAllCorrectionsDoneByUserInP2PActivity";
+		_methodName31 = "getByUserId";
 
-		_methodParameterTypes31 = new String[] { "long", "long" };
+		_methodParameterTypes31 = new String[] { "long" };
 
-		_methodName32 = "getCorrectionByP2PActivity";
+		_methodName32 = "areAllCorrectionsDoneByUserInP2PActivity";
 
-		_methodParameterTypes32 = new String[] { "long" };
+		_methodParameterTypes32 = new String[] { "long", "long" };
 
-		_methodName33 = "getAVGCorrectionsResults";
+		_methodName33 = "getCorrectionByP2PActivity";
 
 		_methodParameterTypes33 = new String[] { "long" };
 
-		_methodName34 = "isP2PAsignationDone";
+		_methodName34 = "getAVGCorrectionsResults";
 
-		_methodParameterTypes34 = new String[] { "long", "long" };
+		_methodParameterTypes34 = new String[] { "long" };
+
+		_methodName35 = "isP2PAsignationDone";
+
+		_methodParameterTypes35 = new String[] { "long", "long" };
 	}
 
 	public com.liferay.lms.model.P2pActivityCorrections addP2pActivityCorrections(
@@ -1081,13 +1085,36 @@ public class P2pActivityCorrectionsLocalServiceClp
 		return (java.util.List<com.liferay.lms.model.P2pActivityCorrections>)ClpSerializer.translateOutput(returnObj);
 	}
 
+	public java.util.List<com.liferay.lms.model.P2pActivityCorrections> getByUserId(
+		long userId) {
+		Object returnObj = null;
+
+		try {
+			returnObj = _invokableLocalService.invokeMethod(_methodName31,
+					_methodParameterTypes31, new Object[] { userId });
+		}
+		catch (Throwable t) {
+			t = ClpSerializer.translateThrowable(t);
+
+			if (t instanceof RuntimeException) {
+				throw (RuntimeException)t;
+			}
+			else {
+				throw new RuntimeException(t.getClass().getName() +
+					" is not a valid exception");
+			}
+		}
+
+		return (java.util.List<com.liferay.lms.model.P2pActivityCorrections>)ClpSerializer.translateOutput(returnObj);
+	}
+
 	public boolean areAllCorrectionsDoneByUserInP2PActivity(long actId,
 		long userId) throws com.liferay.portal.kernel.exception.SystemException {
 		Object returnObj = null;
 
 		try {
-			returnObj = _invokableLocalService.invokeMethod(_methodName31,
-					_methodParameterTypes31, new Object[] { actId, userId });
+			returnObj = _invokableLocalService.invokeMethod(_methodName32,
+					_methodParameterTypes32, new Object[] { actId, userId });
 		}
 		catch (Throwable t) {
 			t = ClpSerializer.translateThrowable(t);
@@ -1114,8 +1141,8 @@ public class P2pActivityCorrectionsLocalServiceClp
 		Object returnObj = null;
 
 		try {
-			returnObj = _invokableLocalService.invokeMethod(_methodName32,
-					_methodParameterTypes32, new Object[] { p2pActivityId });
+			returnObj = _invokableLocalService.invokeMethod(_methodName33,
+					_methodParameterTypes33, new Object[] { p2pActivityId });
 		}
 		catch (Throwable t) {
 			t = ClpSerializer.translateThrowable(t);
@@ -1140,8 +1167,8 @@ public class P2pActivityCorrectionsLocalServiceClp
 		Object returnObj = null;
 
 		try {
-			returnObj = _invokableLocalService.invokeMethod(_methodName33,
-					_methodParameterTypes33, new Object[] { p2pActivityId });
+			returnObj = _invokableLocalService.invokeMethod(_methodName34,
+					_methodParameterTypes34, new Object[] { p2pActivityId });
 		}
 		catch (Throwable t) {
 			t = ClpSerializer.translateThrowable(t);
@@ -1163,8 +1190,8 @@ public class P2pActivityCorrectionsLocalServiceClp
 		Object returnObj = null;
 
 		try {
-			returnObj = _invokableLocalService.invokeMethod(_methodName34,
-					_methodParameterTypes34,
+			returnObj = _invokableLocalService.invokeMethod(_methodName35,
+					_methodParameterTypes35,
 					new Object[] { p2pActivityId, userId });
 		}
 		catch (Throwable t) {
@@ -1255,4 +1282,6 @@ public class P2pActivityCorrectionsLocalServiceClp
 	private String[] _methodParameterTypes33;
 	private String _methodName34;
 	private String[] _methodParameterTypes34;
+	private String _methodName35;
+	private String[] _methodParameterTypes35;
 }

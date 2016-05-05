@@ -1260,6 +1260,16 @@ public class LearningActivityResultLocalServiceImpl	extends LearningActivityResu
 		return results;			
 	}
 
+	public List<LearningActivityResult> getByUserId(long userId){
+		List<LearningActivityResult> results = new ArrayList<LearningActivityResult>();
+		try {
+			results = learningActivityResultPersistence.findByuser(userId);
+		} catch (SystemException e) {
+			e.printStackTrace();
+		}
+		return results;			
+	}
+	
 	public int countMandatoryByModuleIdUserIdPassed(long moduleId,long userId){
 
 		ClassLoader classLoader = (ClassLoader) PortletBeanLocatorUtil.locate(ClpSerializer.getServletContextName(), "portletClassLoader"); 

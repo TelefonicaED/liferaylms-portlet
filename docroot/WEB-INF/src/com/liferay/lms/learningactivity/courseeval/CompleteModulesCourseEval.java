@@ -56,6 +56,10 @@ public class CompleteModulesCourseEval extends BaseCourseEval {
 			courseResult = CourseResultLocalServiceUtil.create(courseId, userId);
 		}
 
+		if(courseResult.getStartDate() == null){
+			courseResult.setStartDate(new Date());
+		}
+		
 		// Se obtienen todos los módulos del curso.
 		List<Module> modules = ModuleLocalServiceUtil.findAllInGroup(groupCreatedId);
 		long numModules = modules.size();
@@ -108,7 +112,7 @@ public class CompleteModulesCourseEval extends BaseCourseEval {
 				passed = false;
 			}
 		}
-
+		
 		// Si el usuario se ha marcado como isFailed es porque lo tiene suspenso. Se le asigna un passed a false y se marca la fecha de finalización del curso (passedDate).
 		courseResult.setPassed(passed && !isFailed);
 		// Se almacena el result del resultado del usuario en el curso.

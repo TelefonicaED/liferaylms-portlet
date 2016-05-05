@@ -278,7 +278,7 @@ public class ModuleResultLocalServiceUtil {
 	}
 
 	/**
-	* No deberÃ¯Â¿Â½a haber nunca mÃ¯Â¿Â½s de un result para el mismo usuario y modulo.
+	* No deberÃƒÂ­a haber nunca mÃƒÂ¡s de un result para el mismo usuario y modulo.
 	* Se hace para eliminar los duplicados.
 	*
 	* @param moduleId
@@ -290,6 +290,11 @@ public class ModuleResultLocalServiceUtil {
 		long moduleId, long userId)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService().getListModuleResultByModuleAndUser(moduleId, userId);
+	}
+
+	public static java.util.List<com.liferay.lms.model.ModuleResult> getByUserId(
+		long userId) {
+		return getService().getByUserId(userId);
 	}
 
 	public static long countByModule(long moduleId)

@@ -248,13 +248,17 @@ public class LearningActivityResultLocalServiceClp
 
 		_methodParameterTypes47 = new String[] { "long", "long" };
 
-		_methodName48 = "countMandatoryByModuleIdUserIdPassed";
+		_methodName48 = "getByUserId";
 
-		_methodParameterTypes48 = new String[] { "long", "long" };
+		_methodParameterTypes48 = new String[] { "long" };
 
-		_methodName49 = "translateResult";
+		_methodName49 = "countMandatoryByModuleIdUserIdPassed";
 
-		_methodParameterTypes49 = new String[] {
+		_methodParameterTypes49 = new String[] { "long", "long" };
+
+		_methodName50 = "translateResult";
+
+		_methodParameterTypes50 = new String[] {
 				"java.util.Locale", "double", "long"
 			};
 	}
@@ -1675,12 +1679,35 @@ public class LearningActivityResultLocalServiceClp
 		return (java.util.List<com.liferay.lms.model.LearningActivityResult>)ClpSerializer.translateOutput(returnObj);
 	}
 
-	public int countMandatoryByModuleIdUserIdPassed(long moduleId, long userId) {
+	public java.util.List<com.liferay.lms.model.LearningActivityResult> getByUserId(
+		long userId) {
 		Object returnObj = null;
 
 		try {
 			returnObj = _invokableLocalService.invokeMethod(_methodName48,
-					_methodParameterTypes48, new Object[] { moduleId, userId });
+					_methodParameterTypes48, new Object[] { userId });
+		}
+		catch (Throwable t) {
+			t = ClpSerializer.translateThrowable(t);
+
+			if (t instanceof RuntimeException) {
+				throw (RuntimeException)t;
+			}
+			else {
+				throw new RuntimeException(t.getClass().getName() +
+					" is not a valid exception");
+			}
+		}
+
+		return (java.util.List<com.liferay.lms.model.LearningActivityResult>)ClpSerializer.translateOutput(returnObj);
+	}
+
+	public int countMandatoryByModuleIdUserIdPassed(long moduleId, long userId) {
+		Object returnObj = null;
+
+		try {
+			returnObj = _invokableLocalService.invokeMethod(_methodName49,
+					_methodParameterTypes49, new Object[] { moduleId, userId });
 		}
 		catch (Throwable t) {
 			t = ClpSerializer.translateThrowable(t);
@@ -1702,8 +1729,8 @@ public class LearningActivityResultLocalServiceClp
 		Object returnObj = null;
 
 		try {
-			returnObj = _invokableLocalService.invokeMethod(_methodName49,
-					_methodParameterTypes49,
+			returnObj = _invokableLocalService.invokeMethod(_methodName50,
+					_methodParameterTypes50,
 					new Object[] {
 						ClpSerializer.translateInput(locale),
 						
@@ -1826,4 +1853,6 @@ public class LearningActivityResultLocalServiceClp
 	private String[] _methodParameterTypes48;
 	private String _methodName49;
 	private String[] _methodParameterTypes49;
+	private String _methodName50;
+	private String[] _methodParameterTypes50;
 }

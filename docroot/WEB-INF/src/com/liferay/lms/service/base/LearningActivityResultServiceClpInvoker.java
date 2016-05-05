@@ -63,9 +63,13 @@ public class LearningActivityResultServiceClpInvoker {
 				"long", "java.lang.String", "java.lang.String"
 			};
 
-		_methodName131 = "updateFinishTry";
+		_methodName131 = "forceFinishTry";
 
-		_methodParameterTypes131 = new String[] {
+		_methodParameterTypes131 = new String[] { "long" };
+
+		_methodName132 = "updateFinishTry";
+
+		_methodParameterTypes132 = new String[] {
 				"long", "java.lang.String", "java.lang.String"
 			};
 	}
@@ -124,6 +128,11 @@ public class LearningActivityResultServiceClpInvoker {
 
 		if (_methodName131.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes131, parameterTypes)) {
+			LearningActivityResultServiceUtil.forceFinishTry(((Long)arguments[0]).longValue());
+		}
+
+		if (_methodName132.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes132, parameterTypes)) {
 			return LearningActivityResultServiceUtil.updateFinishTry(((Long)arguments[0]).longValue(),
 				(java.lang.String)arguments[1], (java.lang.String)arguments[2]);
 		}
@@ -151,4 +160,6 @@ public class LearningActivityResultServiceClpInvoker {
 	private String[] _methodParameterTypes130;
 	private String _methodName131;
 	private String[] _methodParameterTypes131;
+	private String _methodName132;
+	private String[] _methodParameterTypes132;
 }

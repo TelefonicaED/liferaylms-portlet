@@ -107,10 +107,12 @@ public class PonderatedCourseEval extends BaseCourseEval {
 		//.fetchByuc(mresult.getUserId(), course.getCourseId());
 		if(courseResult==null){
 			courseResult=CourseResultLocalServiceUtil.create(course.getCourseId(), userId);
-			courseResult.setStartDate(new Date());
-			//auditing
 		}
 
+		if(courseResult.getStartDate() == null){
+			courseResult.setStartDate(new Date());
+		}
+		
 		try {
 			java.util.Map<Long,Long> weights=PonderatedCourseEval.getActivitiesWeight(course);
 			long score=PonderatedCourseEval.getScore(course);

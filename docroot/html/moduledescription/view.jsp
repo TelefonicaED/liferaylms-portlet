@@ -34,13 +34,11 @@ if(actId==0)
 			theModule=modules.get(0);
 		}
 	}
-	if(theModule!=null)
-	{
+	if(theModule!=null){
 		long groupId = theModule.getGroupId();
 		String name = Module.class.getName();
 		String primKey = String.valueOf(theModule.getPrimaryKey());
-		if(permissionChecker.hasPermission(groupId, name, primKey, ActionKeys.UPDATE)||!ModuleLocalServiceUtil.isLocked(theModule.getPrimaryKey(),themeDisplay.getUserId()))
-		{
+
 			AuditingLogFactory.audit(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(),
 					Module.class.getName(),theModule.getModuleId(), themeDisplay.getUserId(), AuditConstants.VIEW,"");
 			
@@ -49,24 +47,11 @@ if(actId==0)
 		<div id="moduleDescription">
 		<%=theModule.getDescription(themeDisplay.getLocale()) %>
 		</div>
-		
-		
-	
-		<%
-		}
-		else
-		{
-			renderRequest.setAttribute(WebKeys.PORTLET_CONFIGURATOR_VISIBILITY, Boolean.FALSE);
-		}
-	}
-	else
-	{
+
+<%	}else{
 		renderRequest.setAttribute(WebKeys.PORTLET_CONFIGURATOR_VISIBILITY, Boolean.FALSE);
 	}
-}
-else
-{
+}else{
 	renderRequest.setAttribute(WebKeys.PORTLET_CONFIGURATOR_VISIBILITY, Boolean.FALSE);
-
 }
 %>

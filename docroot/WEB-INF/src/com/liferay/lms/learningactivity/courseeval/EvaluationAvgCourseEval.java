@@ -130,6 +130,9 @@ public class EvaluationAvgCourseEval extends BaseCourseEval {
 		if(courseResult==null)
 		{
 			courseResult=CourseResultLocalServiceUtil.create(course.getCourseId(), userId);
+		}
+		
+		if(courseResult.getStartDate() == null){
 			courseResult.setStartDate(new Date());
 		}
 		

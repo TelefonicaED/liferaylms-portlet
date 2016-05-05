@@ -34,6 +34,7 @@ import com.liferay.lms.service.LearningActivityResultLocalServiceUtil;
 import com.liferay.lms.service.ModuleLocalServiceUtil;
 import com.liferay.lms.service.ModuleResultLocalServiceUtil;
 import com.liferay.lms.service.base.ModuleResultLocalServiceBaseImpl;
+import com.liferay.lms.service.persistence.ModuleResultUtil;
 import com.liferay.portal.kernel.bean.PortletBeanLocatorUtil;
 import com.liferay.portal.kernel.dao.orm.Criterion;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
@@ -80,7 +81,7 @@ public class ModuleResultLocalServiceImpl extends ModuleResultLocalServiceBaseIm
 	}
 
 	/**
-	 * No deber�a haber nunca m�s de un result para el mismo usuario y modulo.
+	 * No debería haber nunca más de un result para el mismo usuario y modulo.
 	 * Se hace para eliminar los duplicados.
 	 * @param moduleId
 	 * @param userId
@@ -102,6 +103,16 @@ public class ModuleResultLocalServiceImpl extends ModuleResultLocalServiceBaseIm
 			res = results;
 		}
 				
+		return res;
+	}
+	
+	public List<ModuleResult> getByUserId(long userId){
+		List<ModuleResult> res = new ArrayList<ModuleResult>();		
+		try {
+			res = ModuleResultUtil.findByUserId(userId);
+		} catch (SystemException e) {
+			e.printStackTrace();
+		}				
 		return res;
 	}
 	
@@ -214,7 +225,8 @@ public class ModuleResultLocalServiceImpl extends ModuleResultLocalServiceBaseIm
 		long actId = lactr.getActId();
 		long userId = lactr.getUserId();
 		LearningActivity learningActivity = LearningActivityLocalServiceUtil.getLearningActivity(actId);
-		long moduleId = learningActivity.getModuleId();		
+		long moduleId = learningActivity.getModuleId();
+		boolean recalcularModulo = false;
 		
 		ModuleResult moduleResult = getByModuleAndUser(moduleId, userId);
 		
@@ -230,10 +242,11 @@ public class ModuleResultLocalServiceImpl extends ModuleResultLocalServiceBaseIm
 			moduleResult.setUserId(userId);
 			moduleResult.setStartDate(lactr.getStartDate());
 			moduleResult.setResult(0);
-			moduleResultPersistence.update(moduleResult, true);
+			recalcularModulo = true;
 		}
 		
-		if (lactr.getEndDate()!=null){			
+		if (lactr.getEndDate() != null) {
+			recalcularModulo = true;
 			List<LearningActivity> activities = LearningActivityLocalServiceUtil.getMandatoryActivities(moduleId);
 			int passedNumber = LearningActivityResultLocalServiceUtil.countMandatoryByModuleIdUserIdPassed(moduleId, userId);
 			log.debug("Mandatory activities passed for moduleId["+moduleId+"]:"+passedNumber);			
@@ -246,14 +259,13 @@ public class ModuleResultLocalServiceImpl extends ModuleResultLocalServiceBaseIm
 				moduleResult.setPassed(true);
 				moduleResult.setPassedDate(lactr.getEndDate());
 			}
-			moduleResultPersistence.update(moduleResult, true);
-			courseResultLocalService.update(moduleResult);
+			
 			//auditing
 			ServiceContext serviceContext = ServiceContextThreadLocal.getServiceContext();
 			if(serviceContext!=null){
 				AuditingLogFactory.audit(serviceContext.getCompanyId(), serviceContext.getScopeGroupId(), ModuleResult.class.getName(), 
 					moduleResult.getPrimaryKey(), serviceContext.getUserId(), AuditConstants.UPDATE, null);
-			}else{
+			} else {
 				Module module = modulePersistence.fetchByPrimaryKey(moduleResult.getModuleId());
 				if(module!=null){
 					AuditingLogFactory.audit(module.getCompanyId(), module.getGroupId(), ModuleResult.class.getName(), 
@@ -261,6 +273,11 @@ public class ModuleResultLocalServiceImpl extends ModuleResultLocalServiceBaseIm
 				}
 				
 			}			
+		}
+		
+		if(recalcularModulo) {
+			moduleResultPersistence.update(moduleResult, true);			
+			courseResultLocalService.update(moduleResult);			
 		}
 		
 	}

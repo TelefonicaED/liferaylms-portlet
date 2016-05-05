@@ -315,6 +315,15 @@ public class P2pActivityLocalServiceImpl extends P2pActivityLocalServiceBaseImpl
 		return res;
 	}
 	
+	public List<P2pActivity> findByUserId(long userId) {
+		 List<P2pActivity> activities = new ArrayList<P2pActivity>();
+		try{
+			return p2pActivityPersistence.findByUserId(userId);
+		}catch(Exception e){			
+		}
+		return activities;
+	}
+	
 	@SuppressWarnings("unchecked")
 	public List<P2pActivity> getP2PActivitiesInDay(Calendar calendar) throws SystemException, PortalException{
 		List<P2pActivity> activities = new ArrayList<P2pActivity>();

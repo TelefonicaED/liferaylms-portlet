@@ -274,6 +274,9 @@ public interface P2pActivityLocalService extends BaseLocalService,
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
+	public java.util.List<com.liferay.lms.model.P2pActivity> findByUserId(
+		long userId);
+
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.util.List<com.liferay.lms.model.P2pActivity> getP2PActivitiesInDay(
 		java.util.Calendar calendar)

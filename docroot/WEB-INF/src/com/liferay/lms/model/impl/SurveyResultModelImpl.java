@@ -83,7 +83,9 @@ public class SurveyResultModelImpl extends BaseModelImpl<SurveyResult>
 	public static final boolean COLUMN_BITMASK_ENABLED = GetterUtil.getBoolean(com.liferay.util.service.ServiceProps.get(
 				"value.object.column.bitmask.enabled.com.liferay.lms.model.SurveyResult"),
 			true);
-	public static long UUID_COLUMN_BITMASK = 1L;
+	public static long ACTID_COLUMN_BITMASK = 1L;
+	public static long USERID_COLUMN_BITMASK = 2L;
+	public static long UUID_COLUMN_BITMASK = 4L;
 	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(com.liferay.util.service.ServiceProps.get(
 				"lock.expiration.time.com.liferay.lms.model.SurveyResult"));
 
@@ -215,7 +217,19 @@ public class SurveyResultModelImpl extends BaseModelImpl<SurveyResult>
 	}
 
 	public void setActId(long actId) {
+		_columnBitmask |= ACTID_COLUMN_BITMASK;
+
+		if (!_setOriginalActId) {
+			_setOriginalActId = true;
+
+			_originalActId = _actId;
+		}
+
 		_actId = actId;
+	}
+
+	public long getOriginalActId() {
+		return _originalActId;
 	}
 
 	public long getLatId() {
@@ -247,6 +261,14 @@ public class SurveyResultModelImpl extends BaseModelImpl<SurveyResult>
 	}
 
 	public void setUserId(long userId) {
+		_columnBitmask |= USERID_COLUMN_BITMASK;
+
+		if (!_setOriginalUserId) {
+			_setOriginalUserId = true;
+
+			_originalUserId = _userId;
+		}
+
 		_userId = userId;
 	}
 
@@ -256,6 +278,10 @@ public class SurveyResultModelImpl extends BaseModelImpl<SurveyResult>
 
 	public void setUserUuid(String userUuid) {
 		_userUuid = userUuid;
+	}
+
+	public long getOriginalUserId() {
+		return _originalUserId;
 	}
 
 	public String getFreeAnswer() {
@@ -366,6 +392,14 @@ public class SurveyResultModelImpl extends BaseModelImpl<SurveyResult>
 		SurveyResultModelImpl surveyResultModelImpl = this;
 
 		surveyResultModelImpl._originalUuid = surveyResultModelImpl._uuid;
+
+		surveyResultModelImpl._originalActId = surveyResultModelImpl._actId;
+
+		surveyResultModelImpl._setOriginalActId = false;
+
+		surveyResultModelImpl._originalUserId = surveyResultModelImpl._userId;
+
+		surveyResultModelImpl._setOriginalUserId = false;
 
 		surveyResultModelImpl._columnBitmask = 0;
 	}
@@ -483,11 +517,15 @@ public class SurveyResultModelImpl extends BaseModelImpl<SurveyResult>
 	private String _originalUuid;
 	private long _surveyResultId;
 	private long _actId;
+	private long _originalActId;
+	private boolean _setOriginalActId;
 	private long _latId;
 	private long _questionId;
 	private long _answerId;
 	private long _userId;
 	private String _userUuid;
+	private long _originalUserId;
+	private boolean _setOriginalUserId;
 	private String _freeAnswer;
 	private long _columnBitmask;
 	private SurveyResult _escapedModelProxy;

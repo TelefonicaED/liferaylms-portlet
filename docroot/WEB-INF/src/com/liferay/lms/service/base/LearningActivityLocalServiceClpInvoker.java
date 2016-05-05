@@ -301,6 +301,10 @@ public class LearningActivityLocalServiceClpInvoker {
 		_methodName208 = "getMandatoryActivities";
 
 		_methodParameterTypes208 = new String[] { "long" };
+
+		_methodName209 = "getByPrecedence";
+
+		_methodParameterTypes209 = new String[] { "long" };
 	}
 
 	public Object invokeMethod(String name, String[] parameterTypes,
@@ -638,6 +642,11 @@ public class LearningActivityLocalServiceClpInvoker {
 			return LearningActivityLocalServiceUtil.getMandatoryActivities(((Long)arguments[0]).longValue());
 		}
 
+		if (_methodName209.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes209, parameterTypes)) {
+			return LearningActivityLocalServiceUtil.getByPrecedence(((Long)arguments[0]).longValue());
+		}
+
 		throw new UnsupportedOperationException();
 	}
 
@@ -749,4 +758,6 @@ public class LearningActivityLocalServiceClpInvoker {
 	private String[] _methodParameterTypes207;
 	private String _methodName208;
 	private String[] _methodParameterTypes208;
+	private String _methodName209;
+	private String[] _methodParameterTypes209;
 }

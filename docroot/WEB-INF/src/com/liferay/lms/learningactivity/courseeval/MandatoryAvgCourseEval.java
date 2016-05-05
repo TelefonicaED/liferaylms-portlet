@@ -48,11 +48,14 @@ public class MandatoryAvgCourseEval extends BaseCourseEval {
 
 		if(courseResult==null){
 			courseResult=CourseResultLocalServiceUtil.create(course.getCourseId(), userId);
-			courseResult.setStartDate(new Date());
 			//auditing
 			AuditingLogFactory.audit(course.getCompanyId(), course.getGroupId(), CourseResult.class.getName(), courseResult.getPrimaryKey(), userId, AuditConstants.CREATE, null);
 		}
 
+		if(courseResult.getStartDate() == null){
+			courseResult.setStartDate(new Date());
+		}
+		
 		boolean passed=true;
 		long result=0;
 		List<LearningActivity> learningActivities=LearningActivityLocalServiceUtil.getMandatoryLearningActivitiesOfGroup(course.getGroupCreatedId());

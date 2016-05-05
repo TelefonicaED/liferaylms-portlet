@@ -317,6 +317,11 @@ public class P2pActivityLocalServiceUtil {
 			numValidaciones);
 	}
 
+	public static java.util.List<com.liferay.lms.model.P2pActivity> findByUserId(
+		long userId) {
+		return getService().findByUserId(userId);
+	}
+
 	public static java.util.List<com.liferay.lms.model.P2pActivity> getP2PActivitiesInDay(
 		java.util.Calendar calendar)
 		throws com.liferay.portal.kernel.exception.PortalException,

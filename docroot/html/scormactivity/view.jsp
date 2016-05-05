@@ -1,3 +1,8 @@
+<%@page import="com.liferay.portal.kernel.util.PropsUtil"%>
+<%@page import="com.liferay.portal.kernel.util.CookieKeys"%>
+<%@page import="com.liferay.portal.kernel.util.Time"%>
+<%@page import="com.liferay.portal.kernel.util.PrefsPropsUtil"%>
+<%@page import="com.liferay.portal.kernel.util.PropsKeys"%>
 <%@page import="com.liferay.portlet.asset.model.AssetRenderer"%>
 <%@page import="com.liferay.portlet.asset.AssetRendererFactoryRegistryUtil"%>
 <%@page import="com.liferay.portlet.asset.model.AssetRendererFactory"%>
@@ -37,6 +42,7 @@
 
 <%@ include file="/init.jsp"%>
 <div class="container-activity">
+
 <%
 	long actId=ParamUtil.getLong(request,"actId",0);
 	long userId = themeDisplay.getUserId();
@@ -49,15 +55,7 @@
 	//Obtener si puede hacer un intento de mejorar el resultado.
 	boolean improving = true;
 	LearningActivityResult result = LearningActivityResultLocalServiceUtil.getByActIdAndUserId(actId, userId);
-	/*
-	if(result != null){
-		LearningActivity act=LearningActivityLocalServiceUtil.getLearningActivity(actId);
-		
-		if(result.getResult() < 100 && !LearningActivityLocalServiceUtil.islocked(actId, userId) && LearningActivityResultLocalServiceUtil.userPassed(actId, userId)){
-			improving = true;
-		}
-	}
-	*/
+
 
 	if (actId==0) {
 		renderRequest.setAttribute(WebKeys.PORTLET_CONFIGURATOR_VISIBILITY, Boolean.FALSE);
@@ -146,7 +144,7 @@
 	ServiceContext serviceContext = ServiceContextFactory.getInstance(LearningActivityTry.class.getName(), renderRequest);
 	long activityTimestamp=0;
 	long timestamp=0;
-	
+		
 	LearningActivityTry learningTry = LearningActivityTryLocalServiceUtil.createOrDuplicateLast(actId, serviceContext);
 
 	activityTimestamp = GetterUtil.getLong(LearningActivityLocalServiceUtil.getExtraContentValue(activity.getActId(),"timeStamp"));
@@ -168,6 +166,8 @@
 	else {
 	Object [] arg =  new Object [] { activity.getPasspuntuation() };
 %>
+
+<!-- PARA QUE NO CADUQUE LA SESION CUANDO ESTAS HACIENDO EL SCORM AÑADIMOS EXTENDER LA SESION -->
 
 
 
@@ -287,8 +287,15 @@
 	}
 }
 
-			}
-		}
+			}%>
+
+		<%@ include file="/html/scormactivity/session_timeout.jspf" %>
+		
+		<script>			
+			window.setInterval("${renderResponse.getNamespace()}waitForFinishScorm()", '${sessionIntervale}');	
+			
+		</script>
+		<%}
 	}
 %>
 </div>

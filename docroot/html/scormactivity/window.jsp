@@ -278,7 +278,8 @@ if(typeof scormembededmode == 'undefined')
 	    	'java.lang.String',
 	    	'java.lang.String'
 	    ];
-					 		
+		
+		console.log("::LearningActivityResult.update::");
 	    var message = Liferay.Service.Lms.LearningActivityResult.update(
 	    	{
 	   			latId: <%= learningTry.getLatId() %>,
@@ -292,14 +293,18 @@ if(typeof scormembededmode == 'undefined')
 	            
 		if (!exception) {
 			// Process Success - A LearningActivityResult returned
+			console.log("Process Success");
 		} else {
 			// Process Exception
+			console.log("Process Exception");
 		}
 	};
 	
 	var finishedscorm=false;
 	var finish_scorm = function(e) 
 	{		
+		
+		console.log("finished_scorm");
 		if(!finishedscorm)
 	   	{
 			
@@ -310,6 +315,7 @@ if(typeof scormembededmode == 'undefined')
 		    	'java.lang.String'
 		    ];
 			
+			console.log("::LearningActivityResult.updateFinishTry::");
 		    var message = Liferay.Service.Lms.LearningActivityResult.updateFinishTry(
 		    	{
 		   			latId: <%= learningTry.getLatId() %>,
@@ -348,13 +354,18 @@ if(typeof scormembededmode == 'undefined')
 					}
 				}
 				finishedscorm=true;
-			} else 
-			{
-				// Process Exception
+			}else {
+				console.log("::forceFinishTry::");
+				Liferay.Service.Lms.LearningActivityResult.forceFinishTry(
+				    	{
+				   			latId: <%= learningTry.getLatId() %>
+				    	}
+				    );
 			}
 			//finishedscorm=true;
 			if(scormembededmode==false)
 			{
+				
 				window.close();
 			}
 	  	}

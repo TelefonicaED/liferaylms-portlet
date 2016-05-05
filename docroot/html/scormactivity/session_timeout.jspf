@@ -1,0 +1,27 @@
+<%@page import="com.liferay.portal.kernel.util.CookieKeys"%>
+<%@page import="java.util.Calendar"%>
+<%@page import="com.liferay.portal.kernel.util.CalendarFactoryUtil"%>
+<%@page import="com.liferay.portal.kernel.util.PrefsPropsUtil"%>
+<%@page import="com.liferay.portal.kernel.util.GetterUtil"%>
+<%@page import="com.liferay.portal.kernel.util.PropsKeys"%>
+<%@page import="com.liferay.portal.kernel.util.PropsUtil"%>
+<%@page import="com.liferay.portal.kernel.util.Validator"%>
+
+<script>
+	function <portlet:namespace />waitForFinishScorm() {
+		console.log("renovamos sesión");
+		AUI().use("liferay-session", function(A){
+			Liferay.Session = new Liferay.SessionBase(
+				{
+					autoExtend: '${autoExtend}',
+					sessionLength: '${sessionTimeout }',
+					redirectOnExpire: '${sessionRedirectOnExpire}',
+					redirectUrl: '${sessionRedirectUrl}',
+					warningLength: '${sessionTimeoutWarning }'
+				}
+			);
+	
+			Liferay.Session.plug(Liferay.SessionDisplay);
+		});
+	}
+</script>

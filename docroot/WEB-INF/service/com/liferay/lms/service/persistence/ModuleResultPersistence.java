@@ -380,6 +380,120 @@ public interface ModuleResultPersistence extends BasePersistence<ModuleResult> {
 			com.liferay.portal.kernel.exception.SystemException;
 
 	/**
+	* Returns all the module results where userId = &#63;.
+	*
+	* @param userId the user ID
+	* @return the matching module results
+	* @throws SystemException if a system exception occurred
+	*/
+	public java.util.List<com.liferay.lms.model.ModuleResult> findByUserId(
+		long userId) throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns a range of all the module results where userId = &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param userId the user ID
+	* @param start the lower bound of the range of module results
+	* @param end the upper bound of the range of module results (not inclusive)
+	* @return the range of matching module results
+	* @throws SystemException if a system exception occurred
+	*/
+	public java.util.List<com.liferay.lms.model.ModuleResult> findByUserId(
+		long userId, int start, int end)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns an ordered range of all the module results where userId = &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param userId the user ID
+	* @param start the lower bound of the range of module results
+	* @param end the upper bound of the range of module results (not inclusive)
+	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	* @return the ordered range of matching module results
+	* @throws SystemException if a system exception occurred
+	*/
+	public java.util.List<com.liferay.lms.model.ModuleResult> findByUserId(
+		long userId, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the first module result in the ordered set where userId = &#63;.
+	*
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the first matching module result
+	* @throws com.liferay.lms.NoSuchModuleResultException if a matching module result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.ModuleResult findByUserId_First(long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchModuleResultException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the first module result in the ordered set where userId = &#63;.
+	*
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the first matching module result, or <code>null</code> if a matching module result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.ModuleResult fetchByUserId_First(long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the last module result in the ordered set where userId = &#63;.
+	*
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the last matching module result
+	* @throws com.liferay.lms.NoSuchModuleResultException if a matching module result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.ModuleResult findByUserId_Last(long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchModuleResultException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the last module result in the ordered set where userId = &#63;.
+	*
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the last matching module result, or <code>null</code> if a matching module result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.ModuleResult fetchByUserId_Last(long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the module results before and after the current module result in the ordered set where userId = &#63;.
+	*
+	* @param mrId the primary key of the current module result
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the previous, current, and next module result
+	* @throws com.liferay.lms.NoSuchModuleResultException if a module result with the primary key could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.ModuleResult[] findByUserId_PrevAndNext(
+		long mrId, long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchModuleResultException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	/**
 	* Returns all the module results.
 	*
 	* @return the module results
@@ -455,6 +569,15 @@ public interface ModuleResultPersistence extends BasePersistence<ModuleResult> {
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	/**
+	* Removes all the module results where userId = &#63; from the database.
+	*
+	* @param userId the user ID
+	* @throws SystemException if a system exception occurred
+	*/
+	public void removeByUserId(long userId)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
 	* Removes all the module results from the database.
 	*
 	* @throws SystemException if a system exception occurred
@@ -492,6 +615,16 @@ public interface ModuleResultPersistence extends BasePersistence<ModuleResult> {
 	* @throws SystemException if a system exception occurred
 	*/
 	public int countBymp(long moduleId, boolean passed)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the number of module results where userId = &#63;.
+	*
+	* @param userId the user ID
+	* @return the number of matching module results
+	* @throws SystemException if a system exception occurred
+	*/
+	public int countByUserId(long userId)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	/**

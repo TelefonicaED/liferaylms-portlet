@@ -123,6 +123,19 @@ public class LearningActivityResultServiceImpl	extends LearningActivityResultSer
 		
 		return lar;
 	}
+	
+	public void forceFinishTry(long latId){
+		try{
+			LearningActivityTry lat = learningActivityTryLocalService.fetchLearningActivityTry(latId);
+			if(lat != null){
+				lat.setEndDate(new Date());
+				learningActivityTryLocalService.updateLearningActivityTry(lat);
+			}
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+	}
+	
 	public LearningActivityResult updateFinishTry(long latId, String tryResultData, String imsmanifest) throws PortalException, SystemException	{
 		log.debug("updateFinishTry "+latId);
 		LearningActivityTry learningActivityTry = learningActivityTryLocalService.getLearningActivityTry(latId);

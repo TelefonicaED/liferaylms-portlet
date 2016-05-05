@@ -272,6 +272,12 @@ public class LearningActivityTryLocalServiceWrapper
 			parameterTypes, arguments);
 	}
 
+	public com.liferay.lms.model.LearningActivityTry softUpdateLearningActivityTry(
+		com.liferay.lms.model.LearningActivityTry learningActivityTry)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _learningActivityTryLocalService.softUpdateLearningActivityTry(learningActivityTry);
+	}
+
 	public long getLearningActivityTryByActUserCount(long actId, long userId)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _learningActivityTryLocalService.getLearningActivityTryByActUserCount(actId,
@@ -369,6 +375,11 @@ public class LearningActivityTryLocalServiceWrapper
 		com.liferay.lms.model.LearningActivity activity)
 		throws java.lang.Exception {
 		return _learningActivityTryLocalService.areThereTriesNotFromEditors(activity);
+	}
+
+	public java.util.List<com.liferay.lms.model.LearningActivityTry> getByUserId(
+		long userId) {
+		return _learningActivityTryLocalService.getByUserId(userId);
 	}
 
 	/**

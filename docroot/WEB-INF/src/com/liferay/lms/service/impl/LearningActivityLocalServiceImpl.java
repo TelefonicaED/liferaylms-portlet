@@ -1009,6 +1009,16 @@ public class LearningActivityLocalServiceImpl extends LearningActivityLocalServi
 		return activities;
 	}
 	
+	public List<LearningActivity> getByPrecedence(long precedence){
+		List<LearningActivity> activities = new ArrayList<LearningActivity>();
+		try {
+			activities = LearningActivityUtil.findByPrecedence(precedence);
+		} catch (SystemException e) {
+			e.printStackTrace();
+		}
+		return activities;
+	}
+	
 private void sendNotification(String title, String content, String url, String type, int priority,ServiceContext serviceContext, java.util.Date startDate,java.util.Date endDate, Long userId){
 		
 		//ThemeDisplay themeDisplay = (ThemeDisplay) serviceContext.getAttribute(WebKeys.THEME_DISPLAY);	

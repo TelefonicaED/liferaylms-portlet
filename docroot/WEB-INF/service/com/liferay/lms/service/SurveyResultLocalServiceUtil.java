@@ -273,6 +273,11 @@ public class SurveyResultLocalServiceUtil {
 		return getService().invokeMethod(name, parameterTypes, arguments);
 	}
 
+	public static java.util.List<com.liferay.lms.model.SurveyResult> getByUserId(
+		long userId) {
+		return getService().getByUserId(userId);
+	}
+
 	public static java.util.List<com.liferay.lms.model.SurveyResult> getSurveyResultByActId(
 		long actId) throws com.liferay.portal.kernel.exception.SystemException {
 		return getService().getSurveyResultByActId(actId);

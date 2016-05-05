@@ -429,4 +429,8 @@ public interface LearningActivityLocalService extends BaseLocalService,
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.util.List<com.liferay.lms.model.LearningActivity> getMandatoryActivities(
 		long moduleId);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.util.List<com.liferay.lms.model.LearningActivity> getByPrecedence(
+		long precedence);
 }

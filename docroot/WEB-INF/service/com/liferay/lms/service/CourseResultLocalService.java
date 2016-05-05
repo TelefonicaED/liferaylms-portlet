@@ -244,6 +244,10 @@ public interface CourseResultLocalService extends BaseLocalService,
 		throws java.lang.Throwable;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.util.List<com.liferay.lms.model.CourseResult> getByUserId(
+		long userId);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.lms.model.CourseResult getByUserAndCourse(
 		long courseId, long userId)
 		throws com.liferay.portal.kernel.exception.SystemException;

@@ -247,6 +247,10 @@ public interface LearningActivityTryLocalService extends BaseLocalService,
 		java.lang.String[] parameterTypes, java.lang.Object[] arguments)
 		throws java.lang.Throwable;
 
+	public com.liferay.lms.model.LearningActivityTry softUpdateLearningActivityTry(
+		com.liferay.lms.model.LearningActivityTry learningActivityTry)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public long getLearningActivityTryByActUserCount(long actId, long userId)
 		throws com.liferay.portal.kernel.exception.SystemException;
@@ -316,4 +320,8 @@ public interface LearningActivityTryLocalService extends BaseLocalService,
 	public boolean areThereTriesNotFromEditors(
 		com.liferay.lms.model.LearningActivity activity)
 		throws java.lang.Exception;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.util.List<com.liferay.lms.model.LearningActivityTry> getByUserId(
+		long userId);
 }

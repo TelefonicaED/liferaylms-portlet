@@ -271,7 +271,7 @@ public class ModuleResultLocalServiceWrapper implements ModuleResultLocalService
 	}
 
 	/**
-	* No deberÃ¯Â¿Â½a haber nunca mÃ¯Â¿Â½s de un result para el mismo usuario y modulo.
+	* No deberÃƒÂ­a haber nunca mÃƒÂ¡s de un result para el mismo usuario y modulo.
 	* Se hace para eliminar los duplicados.
 	*
 	* @param moduleId
@@ -284,6 +284,11 @@ public class ModuleResultLocalServiceWrapper implements ModuleResultLocalService
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _moduleResultLocalService.getListModuleResultByModuleAndUser(moduleId,
 			userId);
+	}
+
+	public java.util.List<com.liferay.lms.model.ModuleResult> getByUserId(
+		long userId) {
+		return _moduleResultLocalService.getByUserId(userId);
 	}
 
 	public long countByModule(long moduleId)

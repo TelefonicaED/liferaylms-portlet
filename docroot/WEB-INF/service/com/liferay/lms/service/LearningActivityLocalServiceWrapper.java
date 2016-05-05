@@ -526,6 +526,11 @@ public class LearningActivityLocalServiceWrapper
 		return _learningActivityLocalService.getMandatoryActivities(moduleId);
 	}
 
+	public java.util.List<com.liferay.lms.model.LearningActivity> getByPrecedence(
+		long precedence) {
+		return _learningActivityLocalService.getByPrecedence(precedence);
+	}
+
 	/**
 	 * @deprecated Renamed to {@link #getWrappedService}
 	 */

@@ -113,17 +113,21 @@ public class SurveyResultLocalServiceClp implements SurveyResultLocalService {
 
 		_methodParameterTypes17 = new String[] { "java.lang.String" };
 
-		_methodName19 = "getSurveyResultByActId";
+		_methodName19 = "getByUserId";
 
 		_methodParameterTypes19 = new String[] { "long" };
 
-		_methodName20 = "getPercentageByQuestionIdAndAnswerId";
+		_methodName20 = "getSurveyResultByActId";
 
-		_methodParameterTypes20 = new String[] { "long", "long" };
+		_methodParameterTypes20 = new String[] { "long" };
 
-		_methodName21 = "getTotalAnswersByQuestionId";
+		_methodName21 = "getPercentageByQuestionIdAndAnswerId";
 
-		_methodParameterTypes21 = new String[] { "long" };
+		_methodParameterTypes21 = new String[] { "long", "long" };
+
+		_methodName22 = "getTotalAnswersByQuestionId";
+
+		_methodParameterTypes22 = new String[] { "long" };
 	}
 
 	public com.liferay.lms.model.SurveyResult addSurveyResult(
@@ -656,13 +660,36 @@ public class SurveyResultLocalServiceClp implements SurveyResultLocalService {
 		throw new UnsupportedOperationException();
 	}
 
+	public java.util.List<com.liferay.lms.model.SurveyResult> getByUserId(
+		long userId) {
+		Object returnObj = null;
+
+		try {
+			returnObj = _invokableLocalService.invokeMethod(_methodName19,
+					_methodParameterTypes19, new Object[] { userId });
+		}
+		catch (Throwable t) {
+			t = ClpSerializer.translateThrowable(t);
+
+			if (t instanceof RuntimeException) {
+				throw (RuntimeException)t;
+			}
+			else {
+				throw new RuntimeException(t.getClass().getName() +
+					" is not a valid exception");
+			}
+		}
+
+		return (java.util.List<com.liferay.lms.model.SurveyResult>)ClpSerializer.translateOutput(returnObj);
+	}
+
 	public java.util.List<com.liferay.lms.model.SurveyResult> getSurveyResultByActId(
 		long actId) throws com.liferay.portal.kernel.exception.SystemException {
 		Object returnObj = null;
 
 		try {
-			returnObj = _invokableLocalService.invokeMethod(_methodName19,
-					_methodParameterTypes19, new Object[] { actId });
+			returnObj = _invokableLocalService.invokeMethod(_methodName20,
+					_methodParameterTypes20, new Object[] { actId });
 		}
 		catch (Throwable t) {
 			t = ClpSerializer.translateThrowable(t);
@@ -689,8 +716,8 @@ public class SurveyResultLocalServiceClp implements SurveyResultLocalService {
 		Object returnObj = null;
 
 		try {
-			returnObj = _invokableLocalService.invokeMethod(_methodName20,
-					_methodParameterTypes20,
+			returnObj = _invokableLocalService.invokeMethod(_methodName21,
+					_methodParameterTypes21,
 					new Object[] { questionId, answerId });
 		}
 		catch (Throwable t) {
@@ -717,8 +744,8 @@ public class SurveyResultLocalServiceClp implements SurveyResultLocalService {
 		Object returnObj = null;
 
 		try {
-			returnObj = _invokableLocalService.invokeMethod(_methodName21,
-					_methodParameterTypes21, new Object[] { questionId });
+			returnObj = _invokableLocalService.invokeMethod(_methodName22,
+					_methodParameterTypes22, new Object[] { questionId });
 		}
 		catch (Throwable t) {
 			t = ClpSerializer.translateThrowable(t);
@@ -782,4 +809,6 @@ public class SurveyResultLocalServiceClp implements SurveyResultLocalService {
 	private String[] _methodParameterTypes20;
 	private String _methodName21;
 	private String[] _methodParameterTypes21;
+	private String _methodName22;
+	private String[] _methodParameterTypes22;
 }

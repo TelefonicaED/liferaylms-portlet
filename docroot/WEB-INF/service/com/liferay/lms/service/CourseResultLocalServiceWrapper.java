@@ -264,6 +264,11 @@ public class CourseResultLocalServiceWrapper implements CourseResultLocalService
 			arguments);
 	}
 
+	public java.util.List<com.liferay.lms.model.CourseResult> getByUserId(
+		long userId) {
+		return _courseResultLocalService.getByUserId(userId);
+	}
+
 	public com.liferay.lms.model.CourseResult getByUserAndCourse(
 		long courseId, long userId)
 		throws com.liferay.portal.kernel.exception.SystemException {

@@ -466,6 +466,124 @@ public interface LearningActivityTryPersistence extends BasePersistence<Learning
 			com.liferay.portal.kernel.exception.SystemException;
 
 	/**
+	* Returns all the learning activity tries where userId = &#63;.
+	*
+	* @param userId the user ID
+	* @return the matching learning activity tries
+	* @throws SystemException if a system exception occurred
+	*/
+	public java.util.List<com.liferay.lms.model.LearningActivityTry> findByUserId(
+		long userId) throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns a range of all the learning activity tries where userId = &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param userId the user ID
+	* @param start the lower bound of the range of learning activity tries
+	* @param end the upper bound of the range of learning activity tries (not inclusive)
+	* @return the range of matching learning activity tries
+	* @throws SystemException if a system exception occurred
+	*/
+	public java.util.List<com.liferay.lms.model.LearningActivityTry> findByUserId(
+		long userId, int start, int end)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns an ordered range of all the learning activity tries where userId = &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param userId the user ID
+	* @param start the lower bound of the range of learning activity tries
+	* @param end the upper bound of the range of learning activity tries (not inclusive)
+	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	* @return the ordered range of matching learning activity tries
+	* @throws SystemException if a system exception occurred
+	*/
+	public java.util.List<com.liferay.lms.model.LearningActivityTry> findByUserId(
+		long userId, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the first learning activity try in the ordered set where userId = &#63;.
+	*
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the first matching learning activity try
+	* @throws com.liferay.lms.NoSuchLearningActivityTryException if a matching learning activity try could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.LearningActivityTry findByUserId_First(
+		long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchLearningActivityTryException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the first learning activity try in the ordered set where userId = &#63;.
+	*
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the first matching learning activity try, or <code>null</code> if a matching learning activity try could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.LearningActivityTry fetchByUserId_First(
+		long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the last learning activity try in the ordered set where userId = &#63;.
+	*
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the last matching learning activity try
+	* @throws com.liferay.lms.NoSuchLearningActivityTryException if a matching learning activity try could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.LearningActivityTry findByUserId_Last(
+		long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchLearningActivityTryException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the last learning activity try in the ordered set where userId = &#63;.
+	*
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the last matching learning activity try, or <code>null</code> if a matching learning activity try could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.LearningActivityTry fetchByUserId_Last(
+		long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the learning activity tries before and after the current learning activity try in the ordered set where userId = &#63;.
+	*
+	* @param latId the primary key of the current learning activity try
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the previous, current, and next learning activity try
+	* @throws com.liferay.lms.NoSuchLearningActivityTryException if a learning activity try with the primary key could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.LearningActivityTry[] findByUserId_PrevAndNext(
+		long latId, long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchLearningActivityTryException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	/**
 	* Returns all the learning activity tries.
 	*
 	* @return the learning activity tries
@@ -537,6 +655,15 @@ public interface LearningActivityTryPersistence extends BasePersistence<Learning
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	/**
+	* Removes all the learning activity tries where userId = &#63; from the database.
+	*
+	* @param userId the user ID
+	* @throws SystemException if a system exception occurred
+	*/
+	public void removeByUserId(long userId)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
 	* Removes all the learning activity tries from the database.
 	*
 	* @throws SystemException if a system exception occurred
@@ -573,6 +700,16 @@ public interface LearningActivityTryPersistence extends BasePersistence<Learning
 	* @throws SystemException if a system exception occurred
 	*/
 	public int countByact_u(long actId, long userId)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the number of learning activity tries where userId = &#63;.
+	*
+	* @param userId the user ID
+	* @return the number of matching learning activity tries
+	* @throws SystemException if a system exception occurred
+	*/
+	public int countByUserId(long userId)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	/**

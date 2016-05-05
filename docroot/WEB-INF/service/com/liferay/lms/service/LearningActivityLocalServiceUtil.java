@@ -523,6 +523,11 @@ public class LearningActivityLocalServiceUtil {
 		return getService().getMandatoryActivities(moduleId);
 	}
 
+	public static java.util.List<com.liferay.lms.model.LearningActivity> getByPrecedence(
+		long precedence) {
+		return getService().getByPrecedence(precedence);
+	}
+
 	public static void clearService() {
 		_service = null;
 	}

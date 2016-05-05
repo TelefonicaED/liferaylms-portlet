@@ -273,6 +273,12 @@ public class LearningActivityTryLocalServiceUtil {
 		return getService().invokeMethod(name, parameterTypes, arguments);
 	}
 
+	public static com.liferay.lms.model.LearningActivityTry softUpdateLearningActivityTry(
+		com.liferay.lms.model.LearningActivityTry learningActivityTry)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().softUpdateLearningActivityTry(learningActivityTry);
+	}
+
 	public static long getLearningActivityTryByActUserCount(long actId,
 		long userId) throws com.liferay.portal.kernel.exception.SystemException {
 		return getService().getLearningActivityTryByActUserCount(actId, userId);
@@ -365,6 +371,11 @@ public class LearningActivityTryLocalServiceUtil {
 		com.liferay.lms.model.LearningActivity activity)
 		throws java.lang.Exception {
 		return getService().areThereTriesNotFromEditors(activity);
+	}
+
+	public static java.util.List<com.liferay.lms.model.LearningActivityTry> getByUserId(
+		long userId) {
+		return getService().getByUserId(userId);
 	}
 
 	public static void clearService() {
