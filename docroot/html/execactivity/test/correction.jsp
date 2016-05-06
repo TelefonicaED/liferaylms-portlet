@@ -1,3 +1,4 @@
+<%@page import="com.liferay.portal.kernel.util.ListUtil"%>
 <%@page import="com.liferay.lms.model.LearningActivityTry"%>
 <%@page import="com.liferay.lms.service.LearningActivityTryLocalServiceUtil"%>
 <%@page import="com.liferay.lms.model.LearningActivityResult"%>
@@ -123,98 +124,99 @@ while(ituserlistpage.hasNext()){
 	if(isStudent)finalUserList.add(u);
 }
 
+PortletURL portletURL = renderResponse.createRenderURL();
+portletURL.setParameter("jspPage","/html/execactivity/test/correction.jsp");
+portletURL.setParameter("actId",Long.toString(actId));
+portletURL.setParameter("courseId",Long.toString(courseId));
 %>
 
-<table class="taglib-search-iterator mycourses-table" border="0">
-<thead>
-<tr class="results-header">
-<th>
-<liferay-ui:message key = "misc.user.firstName"/>
-</th>
-<th>
-<liferay-ui:message key = "Corrección Manual"/>
-</th>
-<th>
-<liferay-ui:message key = "Notas"/>
-</th>
-</tr>
-</thead>
 
-<% Iterator<User> studentIterator = finalUserList.iterator();
-	int index = 1;
-	while(studentIterator.hasNext()){
-		User u = studentIterator.next();
-		if(index %2 ==0){%>
-			<tr class="results-row  portlet-section-body">
-		<%}else{%>
-			<tr class="results-row portlet-section-alternate">
-		<%}index++; %>
-		<td> <%= u.getFullName() %></td>
-		<% 
-		boolean hasFreeQuestion = false;
+<liferay-ui:search-container iteratorURL="<%=portletURL %>" emptyResultsMessage="there-are-no-users" delta="10">
+	<liferay-ui:search-container-results>
+	<%
 		
-		List<TestQuestion> questionList = null;
-		LearningActivityTry larntry = LearningActivityTryLocalServiceUtil.getLastLearningActivityTryByActivityAndUser(actId, u.getUserId());
-		if (GetterUtil.getLong(LearningActivityLocalServiceUtil.getExtraContentValue(actId,"random"))==0){
-			questionList=TestQuestionLocalServiceUtil.getQuestions(actId);
-		}
-		else{
-			questionList= new ArrayList<TestQuestion>();
+		results = ListUtil.subList(finalUserList, searchContainer.getStart(), searchContainer.getEnd());
+		total = finalUserList.size();
+		pageContext.setAttribute("results", results);
+		pageContext.setAttribute("total", total);
+		
+	%>
+	</liferay-ui:search-container-results>
+
+	<liferay-ui:search-container-row className="com.liferay.portal.model.User" keyProperty="userId" modelVar="u">
+		<%
+			boolean hasFreeQuestion = false;
 			
-			Iterator<Element> nodeItr = SAXReaderUtil.read(larntry.getTryResultData()).getRootElement().elementIterator();
-			while(nodeItr.hasNext()) {
-				Element element = nodeItr.next();
-		         if("question".equals(element.getName())) {
-		        	 questionList.add(TestQuestionLocalServiceUtil.getTestQuestion(Long.valueOf(element.attributeValue("id"))));
-		         }
-		    }	
-		}
-		
-		
-		Iterator<TestQuestion> questionListIt = questionList.iterator();
-		while(questionListIt.hasNext()){
-			TestQuestion q = questionListIt.next();
-			if(q.getQuestionType() == 2){
-				hasFreeQuestion = true;
-				break;
+			List<TestQuestion> questionList = null;
+			LearningActivityTry larntry = LearningActivityTryLocalServiceUtil.getLastLearningActivityTryByActivityAndUser(actId, u.getUserId());
+			if (GetterUtil.getLong(LearningActivityLocalServiceUtil.getExtraContentValue(actId,"random"))==0){
+				questionList=TestQuestionLocalServiceUtil.getQuestions(actId);
 			}
-		}
-		
-		
-		
-		LearningActivityResult laResult =  LearningActivityResultLocalServiceUtil.getByActIdAndUserId(actId, u.getUserId());
-		String result= "-";
-		String status="not-started";
-		if(LearningActivityResultLocalServiceUtil.existsLearningActivityResult(actId, u.getUserId())){
-			status="started";
-			LearningActivityResult learningActivityResult = LearningActivityResultLocalServiceUtil.getByActIdAndUserId(actId, u.getUserId());
-			if(activity.getTypeId() == 8){
-				result= (learningActivityResult!=null)?LearningActivityResultLocalServiceUtil.translateResult(themeDisplay.getLocale(), learningActivityResult.getResult(), activity.getGroupId()):"";
-			}else{
-				result = ""+laResult.getResult();
+			else{
+				questionList= new ArrayList<TestQuestion>();
+				
+				if(larntry != null && Validator.isNotNull(larntry.getTryResultData())){
+					try{
+						Iterator<Element> nodeItr = SAXReaderUtil.read(larntry.getTryResultData()).getRootElement().elementIterator();
+						while(nodeItr.hasNext()) {
+							Element element = nodeItr.next();
+					         if("question".equals(element.getName())) {
+					        	 questionList.add(TestQuestionLocalServiceUtil.getTestQuestion(Long.valueOf(element.attributeValue("id"))));
+					         }
+					    }
+					}catch(Exception e){
+						e.printStackTrace();
+					}
+				}	
 			}
-			if(learningActivityResult.getEndDate()!=null){
-				status="not-passed"	;
+			
+			
+			Iterator<TestQuestion> questionListIt = questionList.iterator();
+			while(questionListIt.hasNext()){
+				TestQuestion q = questionListIt.next();
+				if(q.getQuestionType() == 2){
+					hasFreeQuestion = true;
+					break;
+				}
 			}
-			if(learningActivityResult.isPassed()){
-				status="passed"	;
-			}
-		}
-		
-		
-		
+			
+			
+			
+			LearningActivityResult laResult =  LearningActivityResultLocalServiceUtil.getByActIdAndUserId(actId, u.getUserId());
+			String result= "-";
+			String status="not-started";
+			if(LearningActivityResultLocalServiceUtil.existsLearningActivityResult(actId, u.getUserId())){
+				status="started";
+				LearningActivityResult learningActivityResult = LearningActivityResultLocalServiceUtil.getByActIdAndUserId(actId, u.getUserId());
+				if(activity.getTypeId() == 8){
+					result= (learningActivityResult!=null)?LearningActivityResultLocalServiceUtil.translateResult(themeDisplay.getLocale(), learningActivityResult.getResult(), activity.getGroupId()):"";
+				}else{
+					result = ""+laResult.getResult();
+				}
+				if(learningActivityResult.getEndDate()!=null){
+					status="not-passed"	;
+				}
+				if(learningActivityResult.isPassed()){
+					status="passed"	;
+				}
+			}			
 		%>
-		<td>
+	
+	
+		<liferay-ui:search-container-column-text name="first-name">
+			${u.getFullName()}		
+		</liferay-ui:search-container-column-text>
+
+		<liferay-ui:search-container-column-text name="execactivity.manualCorrect">
+			
 		<%if(hasFreeQuestion){
 			if(status.equals("not-started")){
-		%>
-			<liferay-ui:message key = "editactivity.mandatory.yes"/> / <liferay-ui:message key = "not-started"/>
-			
-			<%}else{%>
-			<liferay-ui:message key = "editactivity.mandatory.yes"/>
-		<%}%>
-		
-		
+			%>
+				<liferay-ui:message key = "editactivity.mandatory.yes"/> / <liferay-ui:message key = "not-started"/>
+				
+				<%}else{%>
+				<liferay-ui:message key = "editactivity.mandatory.yes"/>
+			<%}%>		
 		
 		<%}else{
 			if(status.equals("not-started")){%>
@@ -224,47 +226,47 @@ while(ituserlistpage.hasNext()){
 			<%}%>
 		
 		<%}%>
-		
-		 </td>
+			
+		</liferay-ui:search-container-column-text>
 
-		<td> 
+		<liferay-ui:search-container-column-text name="execactivity.notes">
 			<%=result %>
-							<%
-							if(status.equals("passed")){%>
-							 	<liferay-ui:icon image="checked" message="passed"></liferay-ui:icon>
-							<%} else if(status.equals("not-passed")){%>
-							 	<liferay-ui:icon image="close" message="not-passed"></liferay-ui:icon>
-							<%} else if(status.equals("started")){%>
-						 		<liferay-ui:icon image="unchecked" message="unchecked"></liferay-ui:icon>
-						 	<%}
-							
-				 			if(status.equals("passed") || status.equals("not-passed")){
-				 				if((PermissionCheckerFactoryUtil.create(themeDisplay.getUser())).hasPermission(themeDisplay.getScopeGroupId(), "com.liferay.lms.model", themeDisplay.getScopeGroupId(), "VIEW_RESULTS")){%>
-						 			<liferay-ui:icon image="edit" url='<%="javascript:"+renderResponse.getNamespace() + "showPopupGrades("+Long.toString(u.getUserId())+","+String.valueOf(activity.getActId())+");" %>' />
-							 		<% String typesThatCanBeSeen = "0,3,6";
-							 		if(typesThatCanBeSeen.contains(String.valueOf(activity.getTypeId()))){
-							 			%>
-							 			<liferay-ui:icon image="view" url='<%="javascript:"+renderResponse.getNamespace() + "showPopupActivity("+Long.toString(u.getUserId())+","+String.valueOf(activity.getActId())+","+String.valueOf(activity.getTypeId())+");" %>'/>
-							 		<%}
-						  		}
-				 			}else 
-				 			//Caso de las que tienen freetext
-				 			if(hasFreeQuestion && !status.equals("not-started")){
-				 				if((PermissionCheckerFactoryUtil.create(themeDisplay.getUser())).hasPermission(themeDisplay.getScopeGroupId(), "com.liferay.lms.model", themeDisplay.getScopeGroupId(), "VIEW_RESULTS")){%>
-					 			<liferay-ui:icon image="edit" url='<%="javascript:"+renderResponse.getNamespace() + "showPopupGrades("+Long.toString(u.getUserId())+","+String.valueOf(activity.getActId())+");" %>' />
-						 		<% String typesThatCanBeSeen = "0,3,6";
-						 		if(typesThatCanBeSeen.contains(String.valueOf(activity.getTypeId()))){
-						 			%>
-						 			<liferay-ui:icon image="view" url='<%="javascript:"+renderResponse.getNamespace() + "showPopupActivity("+Long.toString(u.getUserId())+","+String.valueOf(activity.getActId())+","+String.valueOf(activity.getTypeId())+");" %>'/>
-						 		<%}
-					  		}
-				 			}	
-				 			%>
+			<%
+			if(status.equals("passed")){%>
+			 	<liferay-ui:icon image="checked" message="passed"></liferay-ui:icon>
+			<%} else if(status.equals("not-passed")){%>
+			 	<liferay-ui:icon image="close" message="not-passed"></liferay-ui:icon>
+			<%} else if(status.equals("started")){%>
+		 		<liferay-ui:icon image="unchecked" message="unchecked"></liferay-ui:icon>
+		 	<%}
+			
+ 			if(status.equals("passed") || status.equals("not-passed")){
+ 				if((PermissionCheckerFactoryUtil.create(themeDisplay.getUser())).hasPermission(themeDisplay.getScopeGroupId(), "com.liferay.lms.model", themeDisplay.getScopeGroupId(), "VIEW_RESULTS")){%>
+		 			<liferay-ui:icon image="edit" url='<%="javascript:"+renderResponse.getNamespace() + "showPopupGrades("+Long.toString(u.getUserId())+","+String.valueOf(activity.getActId())+");" %>' />
+			 		<% String typesThatCanBeSeen = "0,3,6";
+			 		if(typesThatCanBeSeen.contains(String.valueOf(activity.getTypeId()))){
+			 			%>
+			 			<liferay-ui:icon image="view" url='<%="javascript:"+renderResponse.getNamespace() + "showPopupActivity("+Long.toString(u.getUserId())+","+String.valueOf(activity.getActId())+","+String.valueOf(activity.getTypeId())+");" %>'/>
+			 		<%}
+		  		}
+ 			}else 
+ 			//Caso de las que tienen freetext
+ 			if(hasFreeQuestion && !status.equals("not-started")){
+ 				if((PermissionCheckerFactoryUtil.create(themeDisplay.getUser())).hasPermission(themeDisplay.getScopeGroupId(), "com.liferay.lms.model", themeDisplay.getScopeGroupId(), "VIEW_RESULTS")){%>
+		 			<liferay-ui:icon image="edit" url='<%="javascript:"+renderResponse.getNamespace() + "showPopupGrades("+Long.toString(u.getUserId())+","+String.valueOf(activity.getActId())+");" %>' />
+			 		<% String typesThatCanBeSeen = "0,3,6";
+			 		if(typesThatCanBeSeen.contains(String.valueOf(activity.getTypeId()))){
+			 			%>
+			 			<liferay-ui:icon image="view" url='<%="javascript:"+renderResponse.getNamespace() + "showPopupActivity("+Long.toString(u.getUserId())+","+String.valueOf(activity.getActId())+","+String.valueOf(activity.getTypeId())+");" %>'/>
+			 		<%}
+	  			}
+ 			}	
+ 			%>
 		
-		
-		</td>
-		
-<%} %>
-</tr>
+		</liferay-ui:search-container-column-text>
 
-</table>
+	</liferay-ui:search-container-row>
+	
+	<liferay-ui:search-iterator />
+
+</liferay-ui:search-container>
