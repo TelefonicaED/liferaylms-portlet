@@ -162,7 +162,7 @@ public class LmsActivitiesList extends MVCPortlet {
 			Enumeration<String> parNames2= uploadRequest.getParameterNames();
 			while(parNames2.hasMoreElements()){
 				String paramName=parNames2.nextElement();
-				System.out.println(paramName+"::"+uploadRequest.getParameter(paramName));
+				log.debug(paramName+"::"+uploadRequest.getParameter(paramName));
 			}
 		}
 		
@@ -613,6 +613,15 @@ public class LmsActivitiesList extends MVCPortlet {
 						getLearningActivityType(larn.getTypeId());
 				learningActivityType.deleteResources(actionRequest, actionResponse, larn);
 				
+				List<LearningActivity> precedences = LearningActivityLocalServiceUtil.getByPrecedence(actId);
+				
+				if(precedences!=null && precedences.size()>0){
+					for(LearningActivity precedence : precedences){
+						precedence.setPrecedence(0);
+						LearningActivityLocalServiceUtil.updateLearningActivity(precedence);
+					}
+				}
+				log.error("DELETING ACTIVITY ");
 				LearningActivityServiceUtil.deleteLearningactivity(actId);
 	
 				//auditing
@@ -921,7 +930,6 @@ public class LmsActivitiesList extends MVCPortlet {
 		if(log.isDebugEnabled())log.debug(actId); 
 
 		LearningActivity la = LearningActivityLocalServiceUtil.getLearningActivity(actId);
-		System.out.println(la);
 		if(la!=null){
 			Message message=new Message();
 			message.put("learningActivity",la);
