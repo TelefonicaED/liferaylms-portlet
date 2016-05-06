@@ -617,7 +617,6 @@ public class LmsActivitiesList extends MVCPortlet {
 				
 				if(precedences!=null && precedences.size()>0){
 					for(LearningActivity precedence : precedences){
-						log.error("PRECEDENCE SET TO 0:  "+precedence.getActId());
 						precedence.setPrecedence(0);
 						LearningActivityLocalServiceUtil.updateLearningActivity(precedence);
 					}
