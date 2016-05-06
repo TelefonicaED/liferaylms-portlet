@@ -132,15 +132,15 @@ ActionKeys.DELETE)||permissionChecker.hasOwnerPermission(myActivity.getCompanyId
 				List<LearningActivity> precedences = LearningActivityLocalServiceUtil.getByPrecedence(myActivity.getActId());
 				String message = LanguageUtil.get(pageContext, "are-you-sure-you-want-to-delete-this");
 				if(precedences!=null && precedences.size()>0){
-					String precedenceNames="\n";
+					String precedenceNames="\\n";
 					for(LearningActivity precedence : precedences){
-						precedenceNames+= precedence.getTitle(locale) +"\n";
+						precedenceNames+= precedence.getTitle(locale) +"\\n";
 					}
 					String[] parameters = {precedenceNames};
-					message =LanguageUtil.get(pageContext, "activity.delete-activity-precedence");
+					message =LanguageUtil.format(pageContext, "activity.delete-activity-precedence", parameters);
 				}
 			   StringBuilder deleteURLJavascript = new StringBuilder(
-				"javascript:if (confirm('<liferay-ui:message key=\""+message+"\" arguments=\""+parameters+\"" />')) {"+
+				"javascript:if (confirm('"+message+"')) {"+
 						 "		AUI().use('node','aui-io-request','aui-parse-content', function(A){  "+ 
 						 "          var activitiesListPortlet=A.one('#p_p_id"+renderResponse.getNamespace() +"'); "+ 
 						 "          var activitiesListPortletId = activitiesListPortlet.attr('portlet'); "+
