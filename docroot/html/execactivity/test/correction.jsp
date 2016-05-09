@@ -1,3 +1,5 @@
+<%@page import="com.liferay.portal.kernel.util.OrderByComparator"%>
+<%@page import="com.liferay.portal.kernel.workflow.WorkflowConstants"%>
 <%@page import="com.liferay.portal.kernel.util.ListUtil"%>
 <%@page import="com.liferay.lms.model.LearningActivityTry"%>
 <%@page import="com.liferay.lms.service.LearningActivityTryLocalServiceUtil"%>
@@ -113,35 +115,80 @@ long actId=ParamUtil.getLong(request, "actId",0);
 long courseId=ParamUtil.getLong(request, "courseId",0);
 Course course = CourseLocalServiceUtil.getCourse(courseId);
 LearningActivity activity = LearningActivityLocalServiceUtil.getLearningActivity(actId);
-List<User> listaUsuarioTotal = UserLocalServiceUtil.getGroupUsers(course.getGroupCreatedId());
-List<User> finalUserList = new LinkedList<User>();
 
-Iterator<User> ituserlistpage = listaUsuarioTotal.iterator();
+String firstName = ParamUtil.getString(request, "first-name","");
+String lastName = ParamUtil.getString(request, "last-name","");
+String screenName = ParamUtil.getString(request, "screen-name","");
+String emailAddress = ParamUtil.getString(request, "email-address","");
+boolean searchUsers = ParamUtil.getBoolean(request, "searchUsers");
 
-while(ituserlistpage.hasNext()){
-	User u = ituserlistpage.next();
-	boolean isStudent = !(PermissionCheckerFactoryUtil.create(u).hasPermission(themeDisplay.getScopeGroupId(), "com.liferay.lms.model", themeDisplay.getScopeGroupId(), "VIEW_RESULTS"));
-	if(isStudent)finalUserList.add(u);
+
+//List<User> listaUsuarioTotal = UserLocalServiceUtil.getGroupUsers(course.getGroupCreatedId());
+LinkedHashMap<String, Object> params = new LinkedHashMap<String, Object>();
+params.put("usersGroups", new Long(course.getGroupCreatedId())); 
+OrderByComparator comparator = null;
+boolean andOperator = true;
+
+if(Validator.isNotNull(firstName) || Validator.isNotNull(lastName) || Validator.isNotNull(screenName) || Validator.isNotNull(emailAddress)){
+	andOperator = false;
 }
 
 PortletURL portletURL = renderResponse.createRenderURL();
 portletURL.setParameter("jspPage","/html/execactivity/test/correction.jsp");
 portletURL.setParameter("actId",Long.toString(actId));
 portletURL.setParameter("courseId",Long.toString(courseId));
+portletURL.setParameter("first-name",firstName);
+portletURL.setParameter("last-name",lastName);
+portletURL.setParameter("screen-name",screenName);
+portletURL.setParameter("email-address",emailAddress);
+
+SearchContainer<User> userSearchContainer = new SearchContainer<User>(renderRequest, null, null, SearchContainer.DEFAULT_CUR_PARAM, 
+		ParamUtil.getInteger(renderRequest, SearchContainer.DEFAULT_DELTA_PARAM,SearchContainer.DEFAULT_DELTA), portletURL, 
+		null, "no-results");
+
+List<User> users = UserLocalServiceUtil.search(themeDisplay.getCompanyId(), firstName,"", lastName,screenName, emailAddress, 
+		-1, params, andOperator, userSearchContainer.getStart(),userSearchContainer.getEnd(), comparator);
+
+int totalUsers = UserLocalServiceUtil.searchCount(themeDisplay.getCompanyId(), firstName,"", lastName,screenName, emailAddress, 
+		-1, params, andOperator);
+userSearchContainer.setResults(users);
+userSearchContainer.setTotal(totalUsers);
+
+
 %>
 
+	<aui:form name="searchFm" action="<%=renderResponse.createRenderURL() %>" method="POST">
+		<div class="taglib-search-toggle">
+			<div class="taglib-search-toggle-advanced">
+				<aui:input type="hidden" name="actId" value="<%=actId %>"/>
+				<aui:input type="hidden" name="courseId" value="<%=courseId %>"/>
+				<aui:input type="hidden" name="jspPage" value="/html/execactivity/test/correction.jsp"/>
+				<aui:input type="hidden" name="searchUsers" value="true"/>
+				
+				<aui:fieldset>
+					<aui:input type="text" name="first-name" value="<%=firstName %>" inlineField="true"  />
+					<aui:input type="text" name="last-name" value="<%=lastName %>" inlineField="true"  />
+					<aui:input type="text" name="screen-name" value="<%=screenName %>" inlineField="true"  />
+					<aui:input type="text" name="email-address" value="<%=lastName %>" inlineField="true"  />
+				</aui:fieldset>
+				
+				<aui:button type="submit" value="search"/>
+			</div>
+		</div>
+	</aui:form>
 
-<liferay-ui:search-container iteratorURL="<%=portletURL %>" emptyResultsMessage="there-are-no-users" delta="10">
-	<liferay-ui:search-container-results>
-	<%
-		
-		results = ListUtil.subList(finalUserList, searchContainer.getStart(), searchContainer.getEnd());
-		total = finalUserList.size();
-		pageContext.setAttribute("results", results);
-		pageContext.setAttribute("total", total);
-		
-	%>
-	</liferay-ui:search-container-results>
+	<liferay-ui:search-container 
+		searchContainer="<%=userSearchContainer %>" 
+		iteratorURL="<%=userSearchContainer.getIteratorURL() %>"
+		delta="<%=userSearchContainer.getDelta()%>"
+		>
+					
+				<liferay-ui:search-container-results 
+					total="<%=userSearchContainer.getTotal() %>" 
+					results="<%=userSearchContainer.getResults() %>"
+				/>
+
+
 
 	<liferay-ui:search-container-row className="com.liferay.portal.model.User" keyProperty="userId" modelVar="u">
 		<%
@@ -203,7 +250,7 @@ portletURL.setParameter("courseId",Long.toString(courseId));
 		%>
 	
 	
-		<liferay-ui:search-container-column-text name="first-name">
+		<liferay-ui:search-container-column-text name="name">
 			${u.getFullName()}		
 		</liferay-ui:search-container-column-text>
 
@@ -214,7 +261,7 @@ portletURL.setParameter("courseId",Long.toString(courseId));
 			%>
 				<liferay-ui:message key = "editactivity.mandatory.yes"/> / <liferay-ui:message key = "not-started"/>
 				
-				<%}else{%>
+			<%}else{%>
 				<liferay-ui:message key = "editactivity.mandatory.yes"/>
 			<%}%>		
 		
@@ -267,6 +314,6 @@ portletURL.setParameter("courseId",Long.toString(courseId));
 
 	</liferay-ui:search-container-row>
 	
-	<liferay-ui:search-iterator />
+	<liferay-ui:search-iterator searchContainer="<%=userSearchContainer %>"/>
 
 </liferay-ui:search-container>

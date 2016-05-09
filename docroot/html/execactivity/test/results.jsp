@@ -152,9 +152,15 @@ Boolean isTablet = ParamUtil.getBoolean(renderRequest, "isTablet", false);
 		else{
 			questions= new ArrayList<TestQuestion>();
 			Iterator<Element> nodeItr = SAXReaderUtil.read(larntry.getTryResultData()).getRootElement().elementIterator();
+			TestQuestion question=null;
 			while(nodeItr.hasNext()) {
-				Element element = nodeItr.next();
-		         if("question".equals(element.getName())) questions.add(TestQuestionLocalServiceUtil.getTestQuestion(Long.valueOf(element.attributeValue("id"))));
+				Element element = nodeItr.next();				
+		         if("question".equals(element.getName())) {
+		        	 question=TestQuestionLocalServiceUtil.fetchTestQuestion(Long.valueOf(element.attributeValue("id")));
+		        	 if(question != null){
+		        		 questions.add(question); 
+		        	 }		        	 
+		         }
 		    }	
 		}
 		
