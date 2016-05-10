@@ -189,6 +189,14 @@ public class LmsActivitiesList extends MVCPortlet {
 	
 		String assetTagNames = uploadRequest.getParameter("assetTagNames");
 
+		
+		long maxSize = ParamUtil.getLong(uploadRequest, "maxSize", -1);
+		
+		if(maxSize<0){
+			SessionErrors.add(actionRequest, "activity-title-required");
+			return;
+		}
+		
 		if (assetTagNames != null) {
 			serviceContext.setAssetTagNames(StringUtil.split(assetTagNames));
 		}
