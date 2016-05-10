@@ -129,10 +129,6 @@ params.put("usersGroups", new Long(course.getGroupCreatedId()));
 OrderByComparator comparator = null;
 boolean andOperator = true;
 
-if(Validator.isNotNull(firstName) || Validator.isNotNull(lastName) || Validator.isNotNull(screenName) || Validator.isNotNull(emailAddress)){
-	andOperator = false;
-}
-
 PortletURL portletURL = renderResponse.createRenderURL();
 portletURL.setParameter("jspPage","/html/execactivity/test/correction.jsp");
 portletURL.setParameter("actId",Long.toString(actId));
