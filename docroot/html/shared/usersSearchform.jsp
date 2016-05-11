@@ -16,12 +16,10 @@
 
 		<aui:input name="${searchContainer.displayTerms.getEMAIL_ADDRESS()}" size="20" value="${searchContainer.displayTerms.getEmailAddress() }" />
 
-		<c:if test="${not empty theTeam or not empty userTeams}">
+		<c:if test="${not empty teams}">
 			<aui:select name="${searchContainer.displayTerms.getTEAM()}" label="team">
-				<c:if test="${hasNullTeam}">
-					<aui:option label="--" value="0"/>
-				</c:if>				
-				<c:forEach items="${userTeams}" var="team">
+				<aui:option label="--" value="0"/>
+				<c:forEach items="${teams}" var="team">
 					<aui:option label="${team.name}" value="${team.teamId}"  selected="${searchContainer.displayTerms.getTeamId() == team.teamId}"/>
 				</c:forEach>
 			</aui:select>

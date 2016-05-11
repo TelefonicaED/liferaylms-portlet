@@ -41,10 +41,6 @@
 %>
 
 <div class="student_search"> 
-
-	<c:if test="${not empty theTeam}">
-		<liferay-ui:header title="${theTeam.name}" showBackURL="false"/>
-	</c:if>
 	
 	<aui:form name="fm" action="${searchURL }" method="POST">
 		<liferay-ui:search-container

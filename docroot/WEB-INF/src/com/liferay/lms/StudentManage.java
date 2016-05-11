@@ -87,27 +87,8 @@ public class StudentManage extends MVCPortlet {
 		Course course=CourseLocalServiceUtil.getCourseByGroupCreatedId(themeDisplay.getScopeGroupId());
 		renderRequest.setAttribute("course", course);
 		
-		List<Team> userTeams=TeamLocalServiceUtil.getUserTeams(themeDisplay.getUserId(), themeDisplay.getScopeGroupId());
-		
-		Team theTeam=null;
-		boolean hasNullTeam=false;
-		if(teamId>0 && (TeamLocalServiceUtil.hasUserTeam(themeDisplay.getUserId(), teamId)||userTeams.size()==0)){		
-			theTeam=TeamLocalServiceUtil.fetchTeam(teamId);	
-		}else{
-			if(userTeams!=null&& userTeams.size()>0){
-				theTeam=userTeams.get(0);	
-				teamId=theTeam.getTeamId();
-			}
-		}
-		
-		if(userTeams.size()==0){
-			userTeams=TeamLocalServiceUtil.getGroupTeams(themeDisplay.getScopeGroupId());
-			hasNullTeam=true;
-		}
-		
-		renderRequest.setAttribute("hasNullTeam", hasNullTeam);
-		renderRequest.setAttribute("theTeam", theTeam);
-		renderRequest.setAttribute("userTeams", userTeams);	
+		List<Team> teams=TeamLocalServiceUtil.getGroupTeams(themeDisplay.getScopeGroupId());
+		renderRequest.setAttribute("teams", teams);	
 		
 		LmsPrefs prefs=LmsPrefsLocalServiceUtil.getLmsPrefs(themeDisplay.getCompanyId());		
 		
@@ -131,7 +112,9 @@ public class StudentManage extends MVCPortlet {
 		
 	    userParams.put("usersGroups", new Long(themeDisplay.getScopeGroupId()));
 	    
-		if(theTeam!=null) userParams.put("usersTeams", theTeam.getTeamId());
+		if(teamId > 0){
+			userParams.put("usersTeams", teamId);
+		}
 		
 				
 		List<User> users = null; 
@@ -162,17 +145,14 @@ public class StudentManage extends MVCPortlet {
 		searchContainer.setTotal(total);
 		
 		searchContainer.getIteratorURL().setParameter("view", "");
-		searchContainer.getIteratorURL().setParameter("teamId", Long.toString(teamId));
 		renderRequest.setAttribute("searchContainer", searchContainer);
 		
 		PortletURL searchURL = renderResponse.createRenderURL();
 		searchURL.setParameter("view", "");
-		searchURL.setParameter("teamId", Long.toString(teamId));
 		renderRequest.setAttribute("searchURL", searchURL.toString());
 		
 		PortletURL returnURL = renderResponse.createRenderURL();
 		searchURL.setParameter("view", "");
-		searchURL.setParameter("teamId", Long.toString(teamId));
 		renderRequest.setAttribute("returnURL", returnURL.toString());
 		
 		log.debug("Total:"+searchContainer.getTotal());
