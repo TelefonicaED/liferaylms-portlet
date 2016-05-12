@@ -257,7 +257,7 @@ public interface SurveyResultLocalService extends BaseLocalService,
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public double getPercentageByQuestionIdAndAnswerId(long questionId,
-		long answerId)
+		long answerId, long total)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)

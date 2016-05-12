@@ -390,10 +390,15 @@ AUI().ready('node-base' ,'aui-form-validator', 'aui-overlay-context-panel', 'wid
 		var file_inputs =getElementByNameStart("<portlet:namespace />additionalFile");
 		for(i=0; i<file_inputs.length; i++){
 			if(file_inputs[i].files!=null){
-				if(maxSize<file_inputs[i].files[0].size){
-					alert("<%=UnicodeFormatter.toString(LanguageUtil.get(pageContext, "server-file-size-upload-exceeded")) %>");	
-					return;
-				}	
+				if(file_inputs[i].files[0]!=null){
+					if (typeof file_inputs[i].files[0] != 'undefined'){
+						if(maxSize<file_inputs[i].files[0].size){
+							alert("<%=UnicodeFormatter.toString(LanguageUtil.get(pageContext, "server-file-size-upload-exceeded")) %>");	
+							return;
+						}	
+					}				
+				}
+				
 			}
 		}
 		
