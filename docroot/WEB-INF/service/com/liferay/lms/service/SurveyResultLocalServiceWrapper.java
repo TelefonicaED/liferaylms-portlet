@@ -279,10 +279,10 @@ public class SurveyResultLocalServiceWrapper implements SurveyResultLocalService
 	}
 
 	public double getPercentageByQuestionIdAndAnswerId(long questionId,
-		long answerId)
+		long answerId, long total)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _surveyResultLocalService.getPercentageByQuestionIdAndAnswerId(questionId,
-			answerId);
+			answerId, total);
 	}
 
 	public long getTotalAnswersByQuestionId(long questionId)

@@ -50,7 +50,13 @@
 			</portlet:renderURL>
 		
 			<%
-			java.util.List<TestQuestion> questions=TestQuestionLocalServiceUtil.getQuestions(learningActivity.getActId());
+			List<TestQuestion> questions=TestQuestionLocalServiceUtil.getQuestions(learningActivity.getActId());
+			List<SurveyResult> listaResultadosEncuesta = SurveyResultLocalServiceUtil.getSurveyResultByActId(actId);
+			long total;
+			String textoAux;
+			String percent;
+			DecimalFormat df;
+			String texto;
 			for(TestQuestion question:questions)
 			{
 			%>
@@ -61,17 +67,17 @@
 				<span class="total color_tercero"><liferay-ui:message key="surveyactivity.stadistics.total" />: <%=SurveyResultLocalServiceUtil.getTotalAnswersByQuestionId(question.getQuestionId()) %></span>		
 				<%
 				
-				List<SurveyResult> listaResultadosEncuesta = SurveyResultLocalServiceUtil.getSurveyResultByActId(actId);
+				
 				List<TestAnswer> testAnswers= TestAnswerLocalServiceUtil.getTestAnswersByQuestionId(question.getQuestionId());
 				
-				if(testAnswers!=null && testAnswers.size()!=0){
+				if(testAnswers!=null && testAnswers.size()>0){
+					total = SurveyResultLocalServiceUtil.getTotalAnswersByQuestionId(question.getQuestionId());
 					for(TestAnswer answer:testAnswers)
 					{
-						String textoAux = answer.getAnswer();
 						textoAux = HtmlUtil.extractText(answer.getAnswer());
-						String texto = textoAux.length() > 50 ? textoAux.substring(0,50)+"..." : textoAux;
-						DecimalFormat df = new DecimalFormat("###.##");
-						String percent = df.format(SurveyResultLocalServiceUtil.getPercentageByQuestionIdAndAnswerId(question.getQuestionId(), answer.getAnswerId()));
+						texto = textoAux.length() > 50 ? textoAux.substring(0,50)+"..." : textoAux;
+						df = new DecimalFormat("###.##");
+						percent = df.format(SurveyResultLocalServiceUtil.getPercentageByQuestionIdAndAnswerId(question.getQuestionId(), answer.getAnswerId(), total));
 					%>
 						<div class="answer">
 							<%=texto %>
@@ -80,13 +86,12 @@
 					<%
 					}
 				}else{
-					if(listaResultadosEncuesta!=null && listaResultadosEncuesta.size()!=0){
+					if(listaResultadosEncuesta!=null && listaResultadosEncuesta.size()>0){
 						for(SurveyResult answer:listaResultadosEncuesta)
 						{
 							if(answer.getQuestionId() == question.getQuestionId()){
-								String textoAux = answer.getFreeAnswer();
 								textoAux = HtmlUtil.extractText(answer.getFreeAnswer());
-								String texto = textoAux.length() > 50 ? textoAux.substring(0,50)+"..." : textoAux;
+								texto = textoAux.length() > 50 ? textoAux.substring(0,50)+"..." : textoAux;
 								%>
 								<div class="answer">
 									<p><%=texto %></p>

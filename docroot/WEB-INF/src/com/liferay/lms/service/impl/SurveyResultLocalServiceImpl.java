@@ -66,7 +66,7 @@ public class SurveyResultLocalServiceImpl
 		return surveyResultPersistence.findByActId(actId);
 	}
 	
-	public double getPercentageByQuestionIdAndAnswerId(long questionId, long answerId) throws SystemException
+	public double getPercentageByQuestionIdAndAnswerId(long questionId, long answerId, long total) throws SystemException
 	{ 
 		double res = 0;
 		
@@ -78,9 +78,7 @@ public class SurveyResultLocalServiceImpl
 
 		@SuppressWarnings("unchecked")
 		List<Long> results = SurveyResultLocalServiceUtil.dynamicQuery(query);
-		
-		long total = getTotalAnswersByQuestionId(questionId);
-		
+				
 		if(total > 0 && results.size()>0){
 			res = results.get(0) / (double)total * 100;
 		}

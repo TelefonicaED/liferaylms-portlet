@@ -284,10 +284,11 @@ public class SurveyResultLocalServiceUtil {
 	}
 
 	public static double getPercentageByQuestionIdAndAnswerId(long questionId,
-		long answerId)
+		long answerId, long total)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService()
-				   .getPercentageByQuestionIdAndAnswerId(questionId, answerId);
+				   .getPercentageByQuestionIdAndAnswerId(questionId, answerId,
+			total);
 	}
 
 	public static long getTotalAnswersByQuestionId(long questionId)

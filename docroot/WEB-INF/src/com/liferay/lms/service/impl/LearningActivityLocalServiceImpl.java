@@ -517,11 +517,11 @@ public class LearningActivityLocalServiceImpl extends LearningActivityLocalServi
 	}
 	public java.util.List<LearningActivity> getLearningActivitiesOfModule(long moduleId) throws SystemException
 	{
-		return learningActivityPersistence.findBym(moduleId, 0, 1000);
+		return learningActivityPersistence.findBym(moduleId, -1, -1);
 	}
 	public java.util.List<Long> getLearningActivityIdsOfModule(long moduleId) throws SystemException
 	{
-		java.util.List<LearningActivity>larnacts= learningActivityPersistence.findBym(moduleId, 0, 1000);
+		java.util.List<LearningActivity>larnacts= learningActivityPersistence.findBym(moduleId, -1, -1);
 		java.util.List<Long> result=new java.util.ArrayList<Long>();
 		for(LearningActivity larn:larnacts)
 		{

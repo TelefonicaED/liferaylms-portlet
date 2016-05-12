@@ -123,7 +123,7 @@ public class SurveyResultLocalServiceClp implements SurveyResultLocalService {
 
 		_methodName21 = "getPercentageByQuestionIdAndAnswerId";
 
-		_methodParameterTypes21 = new String[] { "long", "long" };
+		_methodParameterTypes21 = new String[] { "long", "long", "long" };
 
 		_methodName22 = "getTotalAnswersByQuestionId";
 
@@ -711,14 +711,14 @@ public class SurveyResultLocalServiceClp implements SurveyResultLocalService {
 	}
 
 	public double getPercentageByQuestionIdAndAnswerId(long questionId,
-		long answerId)
+		long answerId, long total)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		Object returnObj = null;
 
 		try {
 			returnObj = _invokableLocalService.invokeMethod(_methodName21,
 					_methodParameterTypes21,
-					new Object[] { questionId, answerId });
+					new Object[] { questionId, answerId, total });
 		}
 		catch (Throwable t) {
 			t = ClpSerializer.translateThrowable(t);

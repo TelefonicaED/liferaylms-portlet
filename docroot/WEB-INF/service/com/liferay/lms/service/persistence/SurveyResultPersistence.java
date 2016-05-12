@@ -448,6 +448,248 @@ public interface SurveyResultPersistence extends BasePersistence<SurveyResult> {
 			com.liferay.portal.kernel.exception.SystemException;
 
 	/**
+	* Returns all the survey results where questionId = &#63;.
+	*
+	* @param questionId the question ID
+	* @return the matching survey results
+	* @throws SystemException if a system exception occurred
+	*/
+	public java.util.List<com.liferay.lms.model.SurveyResult> findBy(
+		long questionId)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns a range of all the survey results where questionId = &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param questionId the question ID
+	* @param start the lower bound of the range of survey results
+	* @param end the upper bound of the range of survey results (not inclusive)
+	* @return the range of matching survey results
+	* @throws SystemException if a system exception occurred
+	*/
+	public java.util.List<com.liferay.lms.model.SurveyResult> findBy(
+		long questionId, int start, int end)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns an ordered range of all the survey results where questionId = &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param questionId the question ID
+	* @param start the lower bound of the range of survey results
+	* @param end the upper bound of the range of survey results (not inclusive)
+	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	* @return the ordered range of matching survey results
+	* @throws SystemException if a system exception occurred
+	*/
+	public java.util.List<com.liferay.lms.model.SurveyResult> findBy(
+		long questionId, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the first survey result in the ordered set where questionId = &#63;.
+	*
+	* @param questionId the question ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the first matching survey result
+	* @throws com.liferay.lms.NoSuchSurveyResultException if a matching survey result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.SurveyResult findBy_First(long questionId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchSurveyResultException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the first survey result in the ordered set where questionId = &#63;.
+	*
+	* @param questionId the question ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the first matching survey result, or <code>null</code> if a matching survey result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.SurveyResult fetchBy_First(long questionId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the last survey result in the ordered set where questionId = &#63;.
+	*
+	* @param questionId the question ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the last matching survey result
+	* @throws com.liferay.lms.NoSuchSurveyResultException if a matching survey result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.SurveyResult findBy_Last(long questionId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchSurveyResultException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the last survey result in the ordered set where questionId = &#63;.
+	*
+	* @param questionId the question ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the last matching survey result, or <code>null</code> if a matching survey result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.SurveyResult fetchBy_Last(long questionId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the survey results before and after the current survey result in the ordered set where questionId = &#63;.
+	*
+	* @param surveyResultId the primary key of the current survey result
+	* @param questionId the question ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the previous, current, and next survey result
+	* @throws com.liferay.lms.NoSuchSurveyResultException if a survey result with the primary key could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.SurveyResult[] findBy_PrevAndNext(
+		long surveyResultId, long questionId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchSurveyResultException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns all the survey results where answerId = &#63; and questionId = &#63;.
+	*
+	* @param answerId the answer ID
+	* @param questionId the question ID
+	* @return the matching survey results
+	* @throws SystemException if a system exception occurred
+	*/
+	public java.util.List<com.liferay.lms.model.SurveyResult> findByAnswerIdQuestionId(
+		long answerId, long questionId)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns a range of all the survey results where answerId = &#63; and questionId = &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param answerId the answer ID
+	* @param questionId the question ID
+	* @param start the lower bound of the range of survey results
+	* @param end the upper bound of the range of survey results (not inclusive)
+	* @return the range of matching survey results
+	* @throws SystemException if a system exception occurred
+	*/
+	public java.util.List<com.liferay.lms.model.SurveyResult> findByAnswerIdQuestionId(
+		long answerId, long questionId, int start, int end)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns an ordered range of all the survey results where answerId = &#63; and questionId = &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param answerId the answer ID
+	* @param questionId the question ID
+	* @param start the lower bound of the range of survey results
+	* @param end the upper bound of the range of survey results (not inclusive)
+	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	* @return the ordered range of matching survey results
+	* @throws SystemException if a system exception occurred
+	*/
+	public java.util.List<com.liferay.lms.model.SurveyResult> findByAnswerIdQuestionId(
+		long answerId, long questionId, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the first survey result in the ordered set where answerId = &#63; and questionId = &#63;.
+	*
+	* @param answerId the answer ID
+	* @param questionId the question ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the first matching survey result
+	* @throws com.liferay.lms.NoSuchSurveyResultException if a matching survey result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.SurveyResult findByAnswerIdQuestionId_First(
+		long answerId, long questionId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchSurveyResultException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the first survey result in the ordered set where answerId = &#63; and questionId = &#63;.
+	*
+	* @param answerId the answer ID
+	* @param questionId the question ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the first matching survey result, or <code>null</code> if a matching survey result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.SurveyResult fetchByAnswerIdQuestionId_First(
+		long answerId, long questionId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the last survey result in the ordered set where answerId = &#63; and questionId = &#63;.
+	*
+	* @param answerId the answer ID
+	* @param questionId the question ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the last matching survey result
+	* @throws com.liferay.lms.NoSuchSurveyResultException if a matching survey result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.SurveyResult findByAnswerIdQuestionId_Last(
+		long answerId, long questionId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchSurveyResultException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the last survey result in the ordered set where answerId = &#63; and questionId = &#63;.
+	*
+	* @param answerId the answer ID
+	* @param questionId the question ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the last matching survey result, or <code>null</code> if a matching survey result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.SurveyResult fetchByAnswerIdQuestionId_Last(
+		long answerId, long questionId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the survey results before and after the current survey result in the ordered set where answerId = &#63; and questionId = &#63;.
+	*
+	* @param surveyResultId the primary key of the current survey result
+	* @param answerId the answer ID
+	* @param questionId the question ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the previous, current, and next survey result
+	* @throws com.liferay.lms.NoSuchSurveyResultException if a survey result with the primary key could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.SurveyResult[] findByAnswerIdQuestionId_PrevAndNext(
+		long surveyResultId, long answerId, long questionId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchSurveyResultException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	/**
 	* Returns all the survey results.
 	*
 	* @return the survey results
@@ -518,6 +760,25 @@ public interface SurveyResultPersistence extends BasePersistence<SurveyResult> {
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	/**
+	* Removes all the survey results where questionId = &#63; from the database.
+	*
+	* @param questionId the question ID
+	* @throws SystemException if a system exception occurred
+	*/
+	public void removeBy(long questionId)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Removes all the survey results where answerId = &#63; and questionId = &#63; from the database.
+	*
+	* @param answerId the answer ID
+	* @param questionId the question ID
+	* @throws SystemException if a system exception occurred
+	*/
+	public void removeByAnswerIdQuestionId(long answerId, long questionId)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
 	* Removes all the survey results from the database.
 	*
 	* @throws SystemException if a system exception occurred
@@ -553,6 +814,27 @@ public interface SurveyResultPersistence extends BasePersistence<SurveyResult> {
 	* @throws SystemException if a system exception occurred
 	*/
 	public int countByActId(long actId)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the number of survey results where questionId = &#63;.
+	*
+	* @param questionId the question ID
+	* @return the number of matching survey results
+	* @throws SystemException if a system exception occurred
+	*/
+	public int countBy(long questionId)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the number of survey results where answerId = &#63; and questionId = &#63;.
+	*
+	* @param answerId the answer ID
+	* @param questionId the question ID
+	* @return the number of matching survey results
+	* @throws SystemException if a system exception occurred
+	*/
+	public int countByAnswerIdQuestionId(long answerId, long questionId)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	/**

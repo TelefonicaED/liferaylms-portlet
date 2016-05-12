@@ -84,8 +84,10 @@ public class SurveyResultModelImpl extends BaseModelImpl<SurveyResult>
 				"value.object.column.bitmask.enabled.com.liferay.lms.model.SurveyResult"),
 			true);
 	public static long ACTID_COLUMN_BITMASK = 1L;
-	public static long USERID_COLUMN_BITMASK = 2L;
-	public static long UUID_COLUMN_BITMASK = 4L;
+	public static long ANSWERID_COLUMN_BITMASK = 2L;
+	public static long QUESTIONID_COLUMN_BITMASK = 4L;
+	public static long USERID_COLUMN_BITMASK = 8L;
+	public static long UUID_COLUMN_BITMASK = 16L;
 	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(com.liferay.util.service.ServiceProps.get(
 				"lock.expiration.time.com.liferay.lms.model.SurveyResult"));
 
@@ -245,7 +247,19 @@ public class SurveyResultModelImpl extends BaseModelImpl<SurveyResult>
 	}
 
 	public void setQuestionId(long questionId) {
+		_columnBitmask |= QUESTIONID_COLUMN_BITMASK;
+
+		if (!_setOriginalQuestionId) {
+			_setOriginalQuestionId = true;
+
+			_originalQuestionId = _questionId;
+		}
+
 		_questionId = questionId;
+	}
+
+	public long getOriginalQuestionId() {
+		return _originalQuestionId;
 	}
 
 	public long getAnswerId() {
@@ -253,7 +267,19 @@ public class SurveyResultModelImpl extends BaseModelImpl<SurveyResult>
 	}
 
 	public void setAnswerId(long answerId) {
+		_columnBitmask |= ANSWERID_COLUMN_BITMASK;
+
+		if (!_setOriginalAnswerId) {
+			_setOriginalAnswerId = true;
+
+			_originalAnswerId = _answerId;
+		}
+
 		_answerId = answerId;
+	}
+
+	public long getOriginalAnswerId() {
+		return _originalAnswerId;
 	}
 
 	public long getUserId() {
@@ -397,6 +423,14 @@ public class SurveyResultModelImpl extends BaseModelImpl<SurveyResult>
 
 		surveyResultModelImpl._setOriginalActId = false;
 
+		surveyResultModelImpl._originalQuestionId = surveyResultModelImpl._questionId;
+
+		surveyResultModelImpl._setOriginalQuestionId = false;
+
+		surveyResultModelImpl._originalAnswerId = surveyResultModelImpl._answerId;
+
+		surveyResultModelImpl._setOriginalAnswerId = false;
+
 		surveyResultModelImpl._originalUserId = surveyResultModelImpl._userId;
 
 		surveyResultModelImpl._setOriginalUserId = false;
@@ -521,7 +555,11 @@ public class SurveyResultModelImpl extends BaseModelImpl<SurveyResult>
 	private boolean _setOriginalActId;
 	private long _latId;
 	private long _questionId;
+	private long _originalQuestionId;
+	private boolean _setOriginalQuestionId;
 	private long _answerId;
+	private long _originalAnswerId;
+	private boolean _setOriginalAnswerId;
 	private long _userId;
 	private String _userUuid;
 	private long _originalUserId;
