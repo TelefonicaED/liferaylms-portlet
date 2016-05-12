@@ -468,25 +468,37 @@ public class LearningActivityResultLocalServiceImpl	extends LearningActivityResu
 		return this.getByActIdAndUserId(learningActivityTry.getActId(), userId);
 	}
 	public LearningActivityResult update(long latId, String tryResultData, String imsmanifest, long userId) throws SystemException, PortalException {
+			
+		if (log.isDebugEnabled())
+			log.debug("LearningActivityResult:: update");
+		
+		//Variables de la actividad
 		LearningActivityTry learningActivityTry = learningActivityTryLocalService.getLearningActivityTry(latId);
-		if (userId != learningActivityTry.getUserId()) {
-			throw new PortalException();
-		}
+		LearningActivityResult laresult 		= learningActivityResultLocalService.getByActIdAndUserId(learningActivityTry.getActId(), userId);
+		LearningActivity learningActivity	 	= learningActivityLocalService.getLearningActivity(learningActivityTry.getActId());
+		
+		boolean completedAsPassed = GetterUtil.getBoolean(
+										learningActivityLocalService
+											.getExtraContentValue(learningActivityTry.getActId(), "completedAsPassed")
+										, false);
+		long 	passPuntuation	  = learningActivity.getPasspuntuation();
+		//-------------------------
 
+		if (userId != learningActivityTry.getUserId()) 
+			throw new PortalException();
+		
+		//Variables del SCORM
+		List<String> 		manifestItems 	  = new ArrayList<String>();
+		Map<String, String> recursos 		  = new HashMap<String, String>();
+		Map<String, String> manifestResources = new HashMap<String, String>();
+		
+		boolean isPureAsset = false;
+		long 	scos		= 0;
+		long 	assets		= 0;
+		//--------------------
 		/***********************************************************************************
 		boolean isMaxScoreByPassed = GetterUtil.getBoolean(PropsUtil.get("scorm.max.score.by.passed"),false);
 		/************************************************************************************/
-
-		LearningActivity learningActivity = learningActivityLocalService.getLearningActivity(learningActivityTry.getActId());
-		boolean completedAsPassed = GetterUtil.getBoolean(LearningActivityLocalServiceUtil.getExtraContentValue(learningActivityTry.getActId(), "completedAsPassed"), false);
-		long passPuntuation=learningActivity.getPasspuntuation();
-		List<String> manifestItems = new ArrayList<String>();
-		Map<String, String> recursos = new HashMap<String, String>();
-
-		Map<String, String> manifestResources = new HashMap<String, String>();
-		boolean isPureAsset = false;
-		long scos=0;
-		long assets=0;
 
 		try {
 			if (Validator.isNotNull(imsmanifest)) {
@@ -623,8 +635,7 @@ public class LearningActivityResultLocalServiceImpl	extends LearningActivityResu
 					min_score = cmi.getJSONObject("cmi.core.score.min").getDouble("value", 0);
 					raw_score = cmi.getJSONObject("cmi.core.score.raw").getDouble("value", "asset".equals(typeCmi) ? max_score : 0);
 
-					if("passed".equals(success_status) && raw_score==0 && completedAsPassed)
-					{
+					if("passed".equals(success_status) && raw_score==0 && completedAsPassed){
 						raw_score=(double) passPuntuation;
 					}
 
@@ -637,25 +648,20 @@ public class LearningActivityResultLocalServiceImpl	extends LearningActivityResu
 					}
 					/***********************************************************************************************************************/
 
-
 					scaled_score = new Double(Math.round((raw_score * 100) / (max_score - min_score)));
 					scaled_score_long = Math.round(scaled_score);
+					
 				} else { // 1.3
 					//"completed", "incomplete", "not attempted", "unknown"
 					if(log.isDebugEnabled())log.debug("VERSION 1.3");
 					completion_status = cmi.getJSONObject("cmi.completion_status").getString("value");
 					if ("completed".equals(completion_status)) { 
-						if(completedAsPassed)
-						{
+						if(completedAsPassed){
 							success_status = "passed"; // or passed
-						}
-						else
-						{
+						}else {
 							success_status = cmi.getJSONObject("cmi.success_status").getString("value");
 						}
-					}
-					else
-					{
+					}else {
 						success_status = cmi.getJSONObject("cmi.success_status").getString("value");
 					}
 					//"passed", "failed", "unknown"
@@ -663,8 +669,7 @@ public class LearningActivityResultLocalServiceImpl	extends LearningActivityResu
 					max_score = cmi.getJSONObject("cmi.score.max").getDouble("value", 100);
 					min_score = cmi.getJSONObject("cmi.score.min").getDouble("value", 0);
 					raw_score = cmi.getJSONObject("cmi.score.raw").getDouble("value", "asset".equals(typeCmi) ? 100 : 0);
-					if("passed".equals(success_status) && raw_score==0 && completedAsPassed)
-					{
+					if("passed".equals(success_status) && raw_score==0 && completedAsPassed) {
 						raw_score=(double) passPuntuation;
 					}
 
@@ -797,52 +802,51 @@ public class LearningActivityResultLocalServiceImpl	extends LearningActivityResu
 			if(log.isDebugEnabled()){
 				log.debug("total_completion_status "+total_completion_status);
 			}
+			
 			learningActivityTry.setTryResultData(tryResultData);
 			learningActivityTry.setResult(Math.round(total_score));
+			learningActivityTry.setEndDate(new Date());
+			
 			if (Math.round(total_score) >= master_score)
-			{
 				total_lesson_status="passed";
-			}
-			learningActivityTryLocalService.updateLearningActivityTry(learningActivityTry);
-
+			
+			// Only updated the Try
+			learningActivityTryLocalService
+				.softUpdateLearningActivityTry(learningActivityTry);
+			
 			// If SCO says that the activity has been passed, then the learning activity result has to be marked as passed
 			if ("passed".equals(total_lesson_status)) {
-				LearningActivityResult laresult = learningActivityResultLocalService.getByActIdAndUserId(learningActivityTry.getActId(), userId);
 				if (!laresult.getPassed()) {
 					laresult.setPassed(true);
 					laresult.setEndDate(new Date());
 					laresult.setResult(Math.round(total_score));
 
-					learningActivityResultLocalService.updateLearningActivityResult(laresult);
+					laresult = learningActivityResultLocalService.updateLearningActivityResult(laresult);
 					moduleResultLocalService.update(laresult);
 				}
 			}
 			// If SCO says that the activity has been failed, then the learning activity result has to be marked as failed
-
-			if ("failed".equals(total_lesson_status)) {
-				LearningActivityResult laresult = learningActivityResultLocalService.getByActIdAndUserId(learningActivity.getActId(), userId);
+			else if ("failed".equals(total_lesson_status)) {
 				long  userTries = LearningActivityTryLocalServiceUtil.getLearningActivityTryByActUserCount(laresult.getActId(), userId);
 
 				if (laresult.getEndDate()==null && learningActivity.getTries() <= userTries && learningActivity.getTries() != 0) {
 					laresult.setPassed(false);
 					laresult.setEndDate(new Date());
-					learningActivityResultLocalService.updateLearningActivityResult(laresult);
+					
+					laresult = learningActivityResultLocalService.updateLearningActivityResult(laresult);
 					moduleResultLocalService.update(laresult);
-
 				}
 			}
-
 		}
 
 		//auditing
 		if(learningActivity!=null){
 			AuditingLogFactory.audit(learningActivity.getCompanyId(), learningActivity.getGroupId(), LearningActivityResult.class.getName(), 
-					learningActivity.getPrimaryKey(), learningActivity.getUserId(), AuditConstants.UPDATE, null);
+									 learningActivity.getPrimaryKey(), learningActivity.getUserId(), AuditConstants.UPDATE, null);
 		}
-		return this.getByActIdAndUserId(learningActivityTry.getActId(), userId);
+		
+		return laresult;
 	}
-	
-	
 	
 	public boolean existsLearningActivityResult(long actId,long userId) throws SystemException{
 		return learningActivityResultPersistence.countByact_user(actId, userId)>0;
