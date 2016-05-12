@@ -78,6 +78,33 @@ public class SurveyResultLocalServiceImpl
 		return res;
 	}
 	
+	/**
+	 * Metodo depreciado, se utiliza una combinación de los dos anteriores, para evitar consultas a base de datos innecesarias dentro de bucles.
+	 * @deprecated
+	 * @param questionId
+	 * @param answerId
+	 * @return
+	 * @throws SystemException
+	 */
+	public double getPercentageByQuestionIdAndAnswerId(long questionId, long answerId) throws SystemException
+	{ 
+		double res = 0;
+		long count = 0;
+		long total = getTotalAnswersByQuestionId(questionId);
+		
+		try {
+			count = SurveyResultUtil.countByAnswerIdQuestionId(answerId, questionId);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+				
+		if(total > 0 && count>0){
+			res = count / (double)total * 100;
+		}
+				
+		return res;
+	}
+	
 	public long getTotalAnswersByQuestionId(long questionId)
 			throws SystemException {
 		long res = new Long(0);

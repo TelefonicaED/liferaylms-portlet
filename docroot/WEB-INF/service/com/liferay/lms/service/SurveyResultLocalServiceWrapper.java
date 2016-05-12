@@ -285,6 +285,22 @@ public class SurveyResultLocalServiceWrapper implements SurveyResultLocalService
 			answerId, total);
 	}
 
+	/**
+	* Metodo depreciado, se utiliza una combinaciÃ¯Â¿Â½n de los dos anteriores, para evitar consultas a base de datos innecesarias dentro de bucles.
+	*
+	* @deprecated
+	* @param questionId
+	* @param answerId
+	* @return
+	* @throws SystemException
+	*/
+	public double getPercentageByQuestionIdAndAnswerId(long questionId,
+		long answerId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _surveyResultLocalService.getPercentageByQuestionIdAndAnswerId(questionId,
+			answerId);
+	}
+
 	public long getTotalAnswersByQuestionId(long questionId)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _surveyResultLocalService.getTotalAnswersByQuestionId(questionId);

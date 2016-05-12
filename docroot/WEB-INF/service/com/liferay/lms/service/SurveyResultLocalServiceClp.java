@@ -125,9 +125,13 @@ public class SurveyResultLocalServiceClp implements SurveyResultLocalService {
 
 		_methodParameterTypes21 = new String[] { "long", "long", "long" };
 
-		_methodName22 = "getTotalAnswersByQuestionId";
+		_methodName22 = "getPercentageByQuestionIdAndAnswerId";
 
-		_methodParameterTypes22 = new String[] { "long" };
+		_methodParameterTypes22 = new String[] { "long", "long" };
+
+		_methodName23 = "getTotalAnswersByQuestionId";
+
+		_methodParameterTypes23 = new String[] { "long" };
 	}
 
 	public com.liferay.lms.model.SurveyResult addSurveyResult(
@@ -739,13 +743,42 @@ public class SurveyResultLocalServiceClp implements SurveyResultLocalService {
 		return ((Double)returnObj).doubleValue();
 	}
 
-	public long getTotalAnswersByQuestionId(long questionId)
+	public double getPercentageByQuestionIdAndAnswerId(long questionId,
+		long answerId)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		Object returnObj = null;
 
 		try {
 			returnObj = _invokableLocalService.invokeMethod(_methodName22,
-					_methodParameterTypes22, new Object[] { questionId });
+					_methodParameterTypes22,
+					new Object[] { questionId, answerId });
+		}
+		catch (Throwable t) {
+			t = ClpSerializer.translateThrowable(t);
+
+			if (t instanceof com.liferay.portal.kernel.exception.SystemException) {
+				throw (com.liferay.portal.kernel.exception.SystemException)t;
+			}
+
+			if (t instanceof RuntimeException) {
+				throw (RuntimeException)t;
+			}
+			else {
+				throw new RuntimeException(t.getClass().getName() +
+					" is not a valid exception");
+			}
+		}
+
+		return ((Double)returnObj).doubleValue();
+	}
+
+	public long getTotalAnswersByQuestionId(long questionId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		Object returnObj = null;
+
+		try {
+			returnObj = _invokableLocalService.invokeMethod(_methodName23,
+					_methodParameterTypes23, new Object[] { questionId });
 		}
 		catch (Throwable t) {
 			t = ClpSerializer.translateThrowable(t);
@@ -811,4 +844,6 @@ public class SurveyResultLocalServiceClp implements SurveyResultLocalService {
 	private String[] _methodParameterTypes21;
 	private String _methodName22;
 	private String[] _methodParameterTypes22;
+	private String _methodName23;
+	private String[] _methodParameterTypes23;
 }

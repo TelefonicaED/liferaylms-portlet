@@ -124,9 +124,13 @@ public class SurveyResultLocalServiceClpInvoker {
 
 		_methodParameterTypes142 = new String[] { "long", "long", "long" };
 
-		_methodName143 = "getTotalAnswersByQuestionId";
+		_methodName143 = "getPercentageByQuestionIdAndAnswerId";
 
-		_methodParameterTypes143 = new String[] { "long" };
+		_methodParameterTypes143 = new String[] { "long", "long" };
+
+		_methodName144 = "getTotalAnswersByQuestionId";
+
+		_methodParameterTypes144 = new String[] { "long" };
 	}
 
 	public Object invokeMethod(String name, String[] parameterTypes,
@@ -247,6 +251,12 @@ public class SurveyResultLocalServiceClpInvoker {
 
 		if (_methodName143.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes143, parameterTypes)) {
+			return SurveyResultLocalServiceUtil.getPercentageByQuestionIdAndAnswerId(((Long)arguments[0]).longValue(),
+				((Long)arguments[1]).longValue());
+		}
+
+		if (_methodName144.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes144, parameterTypes)) {
 			return SurveyResultLocalServiceUtil.getTotalAnswersByQuestionId(((Long)arguments[0]).longValue());
 		}
 
@@ -297,4 +307,6 @@ public class SurveyResultLocalServiceClpInvoker {
 	private String[] _methodParameterTypes142;
 	private String _methodName143;
 	private String[] _methodParameterTypes143;
+	private String _methodName144;
+	private String[] _methodParameterTypes144;
 }

@@ -222,7 +222,6 @@ public class LmsActivitiesList extends MVCPortlet {
 		long actId = ParamUtil.getLong(uploadRequest, "resId", 0);
 		long moduleId = ParamUtil.getLong(uploadRequest, "resModuleId", 0);
 		long weightinmodule=ParamUtil.getLong(uploadRequest, "weightinmodule", 0);
-		long visibility=ParamUtil.getLong(uploadRequest, "visibility", 0);
 
 		long precedence=ParamUtil.getLong(uploadRequest, "precedence", 0);
 		

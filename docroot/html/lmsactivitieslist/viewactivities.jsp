@@ -308,14 +308,12 @@ function <portlet:namespace />upActivity(actId){
 					if(learningActivityResult.getEndDate()!=null){
 						status="started";
 					}else{
-						if(!actionEditing){
-							if (learningActivityResult.isPassed()) {
-								status = "passed";
-							}
-							else if ((userTried >= tries && tries > 0) && (!learningActivityResult.isPassed())) {
-								status = "failed";
-							}
-						}						
+						if (learningActivityResult.isPassed()) {
+							status = "passed";
+						}
+						else if ((userTried >= tries && tries > 0) && (!learningActivityResult.isPassed())) {
+							status = "failed";
+						}							
 					}
 				}				
 				

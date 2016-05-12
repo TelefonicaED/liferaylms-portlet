@@ -260,6 +260,20 @@ public interface SurveyResultLocalService extends BaseLocalService,
 		long answerId, long total)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
+	/**
+	* Metodo depreciado, se utiliza una combinaciï¿½n de los dos anteriores, para evitar consultas a base de datos innecesarias dentro de bucles.
+	*
+	* @deprecated
+	* @param questionId
+	* @param answerId
+	* @return
+	* @throws SystemException
+	*/
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public double getPercentageByQuestionIdAndAnswerId(long questionId,
+		long answerId)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public long getTotalAnswersByQuestionId(long questionId)
 		throws com.liferay.portal.kernel.exception.SystemException;
