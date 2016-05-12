@@ -807,12 +807,18 @@ public class LearningActivityResultLocalServiceImpl	extends LearningActivityResu
 			learningActivityTry.setResult(Math.round(total_score));
 			learningActivityTry.setEndDate(new Date());
 			
+			
+			
 			if (Math.round(total_score) >= master_score)
 				total_lesson_status="passed";
+			
+			log.debug("total_lesson_status "+total_lesson_status);
 			
 			// Only updated the Try
 			learningActivityTryLocalService
 				.softUpdateLearningActivityTry(learningActivityTry);
+			
+			boolean modifiedResult = false;
 			
 			// If SCO says that the activity has been passed, then the learning activity result has to be marked as passed
 			if ("passed".equals(total_lesson_status)) {
@@ -820,9 +826,8 @@ public class LearningActivityResultLocalServiceImpl	extends LearningActivityResu
 					laresult.setPassed(true);
 					laresult.setEndDate(new Date());
 					laresult.setResult(Math.round(total_score));
-
-					laresult = learningActivityResultLocalService.updateLearningActivityResult(laresult);
-					moduleResultLocalService.update(laresult);
+					
+					modifiedResult = true;
 				}
 			}
 			// If SCO says that the activity has been failed, then the learning activity result has to be marked as failed
@@ -833,9 +838,20 @@ public class LearningActivityResultLocalServiceImpl	extends LearningActivityResu
 					laresult.setPassed(false);
 					laresult.setEndDate(new Date());
 					
-					laresult = learningActivityResultLocalService.updateLearningActivityResult(laresult);
-					moduleResultLocalService.update(laresult);
+					modifiedResult = true;
 				}
+			}
+			
+			// If the result of the Try is higher than the result, then the learning activity result has to be updated
+			if (learningActivityTry.getResult() > laresult.getResult()){
+				laresult.setResult(learningActivityTry.getResult());
+				modifiedResult = true;
+			}
+			
+			// Updated the Learning Activity Result
+			if (modifiedResult){
+				laresult = learningActivityResultLocalService.updateLearningActivityResult(laresult);
+				moduleResultLocalService.update(laresult);
 			}
 		}
 
