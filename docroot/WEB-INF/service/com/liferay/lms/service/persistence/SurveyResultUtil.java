@@ -605,10 +605,10 @@ public class SurveyResultUtil {
 	* @return the matching survey results
 	* @throws SystemException if a system exception occurred
 	*/
-	public static java.util.List<com.liferay.lms.model.SurveyResult> findBy(
+	public static java.util.List<com.liferay.lms.model.SurveyResult> findByQuestionId(
 		long questionId)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		return getPersistence().findBy(questionId);
+		return getPersistence().findByQuestionId(questionId);
 	}
 
 	/**
@@ -624,10 +624,10 @@ public class SurveyResultUtil {
 	* @return the range of matching survey results
 	* @throws SystemException if a system exception occurred
 	*/
-	public static java.util.List<com.liferay.lms.model.SurveyResult> findBy(
+	public static java.util.List<com.liferay.lms.model.SurveyResult> findByQuestionId(
 		long questionId, int start, int end)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		return getPersistence().findBy(questionId, start, end);
+		return getPersistence().findByQuestionId(questionId, start, end);
 	}
 
 	/**
@@ -644,11 +644,12 @@ public class SurveyResultUtil {
 	* @return the ordered range of matching survey results
 	* @throws SystemException if a system exception occurred
 	*/
-	public static java.util.List<com.liferay.lms.model.SurveyResult> findBy(
+	public static java.util.List<com.liferay.lms.model.SurveyResult> findByQuestionId(
 		long questionId, int start, int end,
 		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		return getPersistence().findBy(questionId, start, end, orderByComparator);
+		return getPersistence()
+				   .findByQuestionId(questionId, start, end, orderByComparator);
 	}
 
 	/**
@@ -660,12 +661,13 @@ public class SurveyResultUtil {
 	* @throws com.liferay.lms.NoSuchSurveyResultException if a matching survey result could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public static com.liferay.lms.model.SurveyResult findBy_First(
+	public static com.liferay.lms.model.SurveyResult findByQuestionId_First(
 		long questionId,
 		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
 		throws com.liferay.lms.NoSuchSurveyResultException,
 			com.liferay.portal.kernel.exception.SystemException {
-		return getPersistence().findBy_First(questionId, orderByComparator);
+		return getPersistence()
+				   .findByQuestionId_First(questionId, orderByComparator);
 	}
 
 	/**
@@ -676,11 +678,12 @@ public class SurveyResultUtil {
 	* @return the first matching survey result, or <code>null</code> if a matching survey result could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public static com.liferay.lms.model.SurveyResult fetchBy_First(
+	public static com.liferay.lms.model.SurveyResult fetchByQuestionId_First(
 		long questionId,
 		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		return getPersistence().fetchBy_First(questionId, orderByComparator);
+		return getPersistence()
+				   .fetchByQuestionId_First(questionId, orderByComparator);
 	}
 
 	/**
@@ -692,12 +695,13 @@ public class SurveyResultUtil {
 	* @throws com.liferay.lms.NoSuchSurveyResultException if a matching survey result could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public static com.liferay.lms.model.SurveyResult findBy_Last(
+	public static com.liferay.lms.model.SurveyResult findByQuestionId_Last(
 		long questionId,
 		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
 		throws com.liferay.lms.NoSuchSurveyResultException,
 			com.liferay.portal.kernel.exception.SystemException {
-		return getPersistence().findBy_Last(questionId, orderByComparator);
+		return getPersistence()
+				   .findByQuestionId_Last(questionId, orderByComparator);
 	}
 
 	/**
@@ -708,11 +712,12 @@ public class SurveyResultUtil {
 	* @return the last matching survey result, or <code>null</code> if a matching survey result could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public static com.liferay.lms.model.SurveyResult fetchBy_Last(
+	public static com.liferay.lms.model.SurveyResult fetchByQuestionId_Last(
 		long questionId,
 		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		return getPersistence().fetchBy_Last(questionId, orderByComparator);
+		return getPersistence()
+				   .fetchByQuestionId_Last(questionId, orderByComparator);
 	}
 
 	/**
@@ -725,13 +730,13 @@ public class SurveyResultUtil {
 	* @throws com.liferay.lms.NoSuchSurveyResultException if a survey result with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public static com.liferay.lms.model.SurveyResult[] findBy_PrevAndNext(
+	public static com.liferay.lms.model.SurveyResult[] findByQuestionId_PrevAndNext(
 		long surveyResultId, long questionId,
 		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
 		throws com.liferay.lms.NoSuchSurveyResultException,
 			com.liferay.portal.kernel.exception.SystemException {
 		return getPersistence()
-				   .findBy_PrevAndNext(surveyResultId, questionId,
+				   .findByQuestionId_PrevAndNext(surveyResultId, questionId,
 			orderByComparator);
 	}
 
@@ -979,9 +984,9 @@ public class SurveyResultUtil {
 	* @param questionId the question ID
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void removeBy(long questionId)
+	public static void removeByQuestionId(long questionId)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		getPersistence().removeBy(questionId);
+		getPersistence().removeByQuestionId(questionId);
 	}
 
 	/**
@@ -1049,9 +1054,9 @@ public class SurveyResultUtil {
 	* @return the number of matching survey results
 	* @throws SystemException if a system exception occurred
 	*/
-	public static int countBy(long questionId)
+	public static int countByQuestionId(long questionId)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		return getPersistence().countBy(questionId);
+		return getPersistence().countByQuestionId(questionId);
 	}
 
 	/**

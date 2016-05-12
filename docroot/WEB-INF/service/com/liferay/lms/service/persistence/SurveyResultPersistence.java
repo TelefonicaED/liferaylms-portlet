@@ -454,7 +454,7 @@ public interface SurveyResultPersistence extends BasePersistence<SurveyResult> {
 	* @return the matching survey results
 	* @throws SystemException if a system exception occurred
 	*/
-	public java.util.List<com.liferay.lms.model.SurveyResult> findBy(
+	public java.util.List<com.liferay.lms.model.SurveyResult> findByQuestionId(
 		long questionId)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
@@ -471,7 +471,7 @@ public interface SurveyResultPersistence extends BasePersistence<SurveyResult> {
 	* @return the range of matching survey results
 	* @throws SystemException if a system exception occurred
 	*/
-	public java.util.List<com.liferay.lms.model.SurveyResult> findBy(
+	public java.util.List<com.liferay.lms.model.SurveyResult> findByQuestionId(
 		long questionId, int start, int end)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
@@ -489,7 +489,7 @@ public interface SurveyResultPersistence extends BasePersistence<SurveyResult> {
 	* @return the ordered range of matching survey results
 	* @throws SystemException if a system exception occurred
 	*/
-	public java.util.List<com.liferay.lms.model.SurveyResult> findBy(
+	public java.util.List<com.liferay.lms.model.SurveyResult> findByQuestionId(
 		long questionId, int start, int end,
 		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
 		throws com.liferay.portal.kernel.exception.SystemException;
@@ -503,7 +503,8 @@ public interface SurveyResultPersistence extends BasePersistence<SurveyResult> {
 	* @throws com.liferay.lms.NoSuchSurveyResultException if a matching survey result could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public com.liferay.lms.model.SurveyResult findBy_First(long questionId,
+	public com.liferay.lms.model.SurveyResult findByQuestionId_First(
+		long questionId,
 		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
 		throws com.liferay.lms.NoSuchSurveyResultException,
 			com.liferay.portal.kernel.exception.SystemException;
@@ -516,7 +517,8 @@ public interface SurveyResultPersistence extends BasePersistence<SurveyResult> {
 	* @return the first matching survey result, or <code>null</code> if a matching survey result could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public com.liferay.lms.model.SurveyResult fetchBy_First(long questionId,
+	public com.liferay.lms.model.SurveyResult fetchByQuestionId_First(
+		long questionId,
 		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
@@ -529,7 +531,8 @@ public interface SurveyResultPersistence extends BasePersistence<SurveyResult> {
 	* @throws com.liferay.lms.NoSuchSurveyResultException if a matching survey result could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public com.liferay.lms.model.SurveyResult findBy_Last(long questionId,
+	public com.liferay.lms.model.SurveyResult findByQuestionId_Last(
+		long questionId,
 		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
 		throws com.liferay.lms.NoSuchSurveyResultException,
 			com.liferay.portal.kernel.exception.SystemException;
@@ -542,7 +545,8 @@ public interface SurveyResultPersistence extends BasePersistence<SurveyResult> {
 	* @return the last matching survey result, or <code>null</code> if a matching survey result could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public com.liferay.lms.model.SurveyResult fetchBy_Last(long questionId,
+	public com.liferay.lms.model.SurveyResult fetchByQuestionId_Last(
+		long questionId,
 		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
@@ -556,7 +560,7 @@ public interface SurveyResultPersistence extends BasePersistence<SurveyResult> {
 	* @throws com.liferay.lms.NoSuchSurveyResultException if a survey result with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public com.liferay.lms.model.SurveyResult[] findBy_PrevAndNext(
+	public com.liferay.lms.model.SurveyResult[] findByQuestionId_PrevAndNext(
 		long surveyResultId, long questionId,
 		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
 		throws com.liferay.lms.NoSuchSurveyResultException,
@@ -765,7 +769,7 @@ public interface SurveyResultPersistence extends BasePersistence<SurveyResult> {
 	* @param questionId the question ID
 	* @throws SystemException if a system exception occurred
 	*/
-	public void removeBy(long questionId)
+	public void removeByQuestionId(long questionId)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	/**
@@ -823,7 +827,7 @@ public interface SurveyResultPersistence extends BasePersistence<SurveyResult> {
 	* @return the number of matching survey results
 	* @throws SystemException if a system exception occurred
 	*/
-	public int countBy(long questionId)
+	public int countByQuestionId(long questionId)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	/**

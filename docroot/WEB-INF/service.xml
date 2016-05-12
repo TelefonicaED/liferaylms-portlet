@@ -496,7 +496,7 @@
 		<finder name="ActId" return-type="Collection">
 			<finder-column name="actId" />
 		</finder>
-		<finder name=""	return-type="Collection">
+		<finder name="QuestionId"	return-type="Collection">
 			<finder-column name="questionId" />
 		</finder>
 		<finder name="AnswerIdQuestionId"	return-type="Collection">

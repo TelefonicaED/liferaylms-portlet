@@ -134,23 +134,25 @@ public class SurveyResultPersistenceImpl extends BasePersistenceImpl<SurveyResul
 			SurveyResultModelImpl.FINDER_CACHE_ENABLED, Long.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByActId",
 			new String[] { Long.class.getName() });
-	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_BY_ = new FinderPath(SurveyResultModelImpl.ENTITY_CACHE_ENABLED,
+	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_BY_QUESTIONID =
+		new FinderPath(SurveyResultModelImpl.ENTITY_CACHE_ENABLED,
 			SurveyResultModelImpl.FINDER_CACHE_ENABLED, SurveyResultImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findBy",
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByQuestionId",
 			new String[] {
 				Long.class.getName(),
 				
 			"java.lang.Integer", "java.lang.Integer",
 				"com.liferay.portal.kernel.util.OrderByComparator"
 			});
-	public static final FinderPath FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_ = new FinderPath(SurveyResultModelImpl.ENTITY_CACHE_ENABLED,
+	public static final FinderPath FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_QUESTIONID =
+		new FinderPath(SurveyResultModelImpl.ENTITY_CACHE_ENABLED,
 			SurveyResultModelImpl.FINDER_CACHE_ENABLED, SurveyResultImpl.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findBy",
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByQuestionId",
 			new String[] { Long.class.getName() },
 			SurveyResultModelImpl.QUESTIONID_COLUMN_BITMASK);
-	public static final FinderPath FINDER_PATH_COUNT_BY_ = new FinderPath(SurveyResultModelImpl.ENTITY_CACHE_ENABLED,
+	public static final FinderPath FINDER_PATH_COUNT_BY_QUESTIONID = new FinderPath(SurveyResultModelImpl.ENTITY_CACHE_ENABLED,
 			SurveyResultModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countBy",
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByQuestionId",
 			new String[] { Long.class.getName() });
 	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_BY_ANSWERIDQUESTIONID =
 		new FinderPath(SurveyResultModelImpl.ENTITY_CACHE_ENABLED,
@@ -454,21 +456,23 @@ public class SurveyResultPersistenceImpl extends BasePersistenceImpl<SurveyResul
 			}
 
 			if ((surveyResultModelImpl.getColumnBitmask() &
-					FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_.getColumnBitmask()) != 0) {
+					FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_QUESTIONID.getColumnBitmask()) != 0) {
 				Object[] args = new Object[] {
 						Long.valueOf(surveyResultModelImpl.getOriginalQuestionId())
 					};
 
-				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_, args);
-				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_,
+				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_QUESTIONID,
+					args);
+				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_QUESTIONID,
 					args);
 
 				args = new Object[] {
 						Long.valueOf(surveyResultModelImpl.getQuestionId())
 					};
 
-				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_, args);
-				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_,
+				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_QUESTIONID,
+					args);
+				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_QUESTIONID,
 					args);
 			}
 
@@ -1767,8 +1771,10 @@ public class SurveyResultPersistenceImpl extends BasePersistenceImpl<SurveyResul
 	 * @return the matching survey results
 	 * @throws SystemException if a system exception occurred
 	 */
-	public List<SurveyResult> findBy(long questionId) throws SystemException {
-		return findBy(questionId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+	public List<SurveyResult> findByQuestionId(long questionId)
+		throws SystemException {
+		return findByQuestionId(questionId, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, null);
 	}
 
 	/**
@@ -1784,9 +1790,9 @@ public class SurveyResultPersistenceImpl extends BasePersistenceImpl<SurveyResul
 	 * @return the range of matching survey results
 	 * @throws SystemException if a system exception occurred
 	 */
-	public List<SurveyResult> findBy(long questionId, int start, int end)
-		throws SystemException {
-		return findBy(questionId, start, end, null);
+	public List<SurveyResult> findByQuestionId(long questionId, int start,
+		int end) throws SystemException {
+		return findByQuestionId(questionId, start, end, null);
 	}
 
 	/**
@@ -1803,18 +1809,18 @@ public class SurveyResultPersistenceImpl extends BasePersistenceImpl<SurveyResul
 	 * @return the ordered range of matching survey results
 	 * @throws SystemException if a system exception occurred
 	 */
-	public List<SurveyResult> findBy(long questionId, int start, int end,
-		OrderByComparator orderByComparator) throws SystemException {
+	public List<SurveyResult> findByQuestionId(long questionId, int start,
+		int end, OrderByComparator orderByComparator) throws SystemException {
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 				(orderByComparator == null)) {
-			finderPath = FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_;
+			finderPath = FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_QUESTIONID;
 			finderArgs = new Object[] { questionId };
 		}
 		else {
-			finderPath = FINDER_PATH_WITH_PAGINATION_FIND_BY_;
+			finderPath = FINDER_PATH_WITH_PAGINATION_FIND_BY_QUESTIONID;
 			finderArgs = new Object[] { questionId, start, end, orderByComparator };
 		}
 
@@ -1844,7 +1850,7 @@ public class SurveyResultPersistenceImpl extends BasePersistenceImpl<SurveyResul
 
 			query.append(_SQL_SELECT_SURVEYRESULT_WHERE);
 
-			query.append(_FINDER_COLUMN__QUESTIONID_2);
+			query.append(_FINDER_COLUMN_QUESTIONID_QUESTIONID_2);
 
 			if (orderByComparator != null) {
 				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
@@ -1896,10 +1902,11 @@ public class SurveyResultPersistenceImpl extends BasePersistenceImpl<SurveyResul
 	 * @throws com.liferay.lms.NoSuchSurveyResultException if a matching survey result could not be found
 	 * @throws SystemException if a system exception occurred
 	 */
-	public SurveyResult findBy_First(long questionId,
+	public SurveyResult findByQuestionId_First(long questionId,
 		OrderByComparator orderByComparator)
 		throws NoSuchSurveyResultException, SystemException {
-		SurveyResult surveyResult = fetchBy_First(questionId, orderByComparator);
+		SurveyResult surveyResult = fetchByQuestionId_First(questionId,
+				orderByComparator);
 
 		if (surveyResult != null) {
 			return surveyResult;
@@ -1925,9 +1932,10 @@ public class SurveyResultPersistenceImpl extends BasePersistenceImpl<SurveyResul
 	 * @return the first matching survey result, or <code>null</code> if a matching survey result could not be found
 	 * @throws SystemException if a system exception occurred
 	 */
-	public SurveyResult fetchBy_First(long questionId,
+	public SurveyResult fetchByQuestionId_First(long questionId,
 		OrderByComparator orderByComparator) throws SystemException {
-		List<SurveyResult> list = findBy(questionId, 0, 1, orderByComparator);
+		List<SurveyResult> list = findByQuestionId(questionId, 0, 1,
+				orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -1945,10 +1953,11 @@ public class SurveyResultPersistenceImpl extends BasePersistenceImpl<SurveyResul
 	 * @throws com.liferay.lms.NoSuchSurveyResultException if a matching survey result could not be found
 	 * @throws SystemException if a system exception occurred
 	 */
-	public SurveyResult findBy_Last(long questionId,
+	public SurveyResult findByQuestionId_Last(long questionId,
 		OrderByComparator orderByComparator)
 		throws NoSuchSurveyResultException, SystemException {
-		SurveyResult surveyResult = fetchBy_Last(questionId, orderByComparator);
+		SurveyResult surveyResult = fetchByQuestionId_Last(questionId,
+				orderByComparator);
 
 		if (surveyResult != null) {
 			return surveyResult;
@@ -1974,12 +1983,12 @@ public class SurveyResultPersistenceImpl extends BasePersistenceImpl<SurveyResul
 	 * @return the last matching survey result, or <code>null</code> if a matching survey result could not be found
 	 * @throws SystemException if a system exception occurred
 	 */
-	public SurveyResult fetchBy_Last(long questionId,
+	public SurveyResult fetchByQuestionId_Last(long questionId,
 		OrderByComparator orderByComparator) throws SystemException {
-		int count = countBy(questionId);
+		int count = countByQuestionId(questionId);
 
-		List<SurveyResult> list = findBy(questionId, count - 1, count,
-				orderByComparator);
+		List<SurveyResult> list = findByQuestionId(questionId, count - 1,
+				count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -1998,7 +2007,7 @@ public class SurveyResultPersistenceImpl extends BasePersistenceImpl<SurveyResul
 	 * @throws com.liferay.lms.NoSuchSurveyResultException if a survey result with the primary key could not be found
 	 * @throws SystemException if a system exception occurred
 	 */
-	public SurveyResult[] findBy_PrevAndNext(long surveyResultId,
+	public SurveyResult[] findByQuestionId_PrevAndNext(long surveyResultId,
 		long questionId, OrderByComparator orderByComparator)
 		throws NoSuchSurveyResultException, SystemException {
 		SurveyResult surveyResult = findByPrimaryKey(surveyResultId);
@@ -2010,13 +2019,13 @@ public class SurveyResultPersistenceImpl extends BasePersistenceImpl<SurveyResul
 
 			SurveyResult[] array = new SurveyResultImpl[3];
 
-			array[0] = getBy_PrevAndNext(session, surveyResult, questionId,
-					orderByComparator, true);
+			array[0] = getByQuestionId_PrevAndNext(session, surveyResult,
+					questionId, orderByComparator, true);
 
 			array[1] = surveyResult;
 
-			array[2] = getBy_PrevAndNext(session, surveyResult, questionId,
-					orderByComparator, false);
+			array[2] = getByQuestionId_PrevAndNext(session, surveyResult,
+					questionId, orderByComparator, false);
 
 			return array;
 		}
@@ -2028,7 +2037,7 @@ public class SurveyResultPersistenceImpl extends BasePersistenceImpl<SurveyResul
 		}
 	}
 
-	protected SurveyResult getBy_PrevAndNext(Session session,
+	protected SurveyResult getByQuestionId_PrevAndNext(Session session,
 		SurveyResult surveyResult, long questionId,
 		OrderByComparator orderByComparator, boolean previous) {
 		StringBundler query = null;
@@ -2043,7 +2052,7 @@ public class SurveyResultPersistenceImpl extends BasePersistenceImpl<SurveyResul
 
 		query.append(_SQL_SELECT_SURVEYRESULT_WHERE);
 
-		query.append(_FINDER_COLUMN__QUESTIONID_2);
+		query.append(_FINDER_COLUMN_QUESTIONID_QUESTIONID_2);
 
 		if (orderByComparator != null) {
 			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
@@ -2693,8 +2702,8 @@ public class SurveyResultPersistenceImpl extends BasePersistenceImpl<SurveyResul
 	 * @param questionId the question ID
 	 * @throws SystemException if a system exception occurred
 	 */
-	public void removeBy(long questionId) throws SystemException {
-		for (SurveyResult surveyResult : findBy(questionId)) {
+	public void removeByQuestionId(long questionId) throws SystemException {
+		for (SurveyResult surveyResult : findByQuestionId(questionId)) {
 			remove(surveyResult);
 		}
 	}
@@ -2903,10 +2912,10 @@ public class SurveyResultPersistenceImpl extends BasePersistenceImpl<SurveyResul
 	 * @return the number of matching survey results
 	 * @throws SystemException if a system exception occurred
 	 */
-	public int countBy(long questionId) throws SystemException {
+	public int countByQuestionId(long questionId) throws SystemException {
 		Object[] finderArgs = new Object[] { questionId };
 
-		Long count = (Long)FinderCacheUtil.getResult(FINDER_PATH_COUNT_BY_,
+		Long count = (Long)FinderCacheUtil.getResult(FINDER_PATH_COUNT_BY_QUESTIONID,
 				finderArgs, this);
 
 		if (count == null) {
@@ -2914,7 +2923,7 @@ public class SurveyResultPersistenceImpl extends BasePersistenceImpl<SurveyResul
 
 			query.append(_SQL_COUNT_SURVEYRESULT_WHERE);
 
-			query.append(_FINDER_COLUMN__QUESTIONID_2);
+			query.append(_FINDER_COLUMN_QUESTIONID_QUESTIONID_2);
 
 			String sql = query.toString();
 
@@ -2939,8 +2948,8 @@ public class SurveyResultPersistenceImpl extends BasePersistenceImpl<SurveyResul
 					count = Long.valueOf(0);
 				}
 
-				FinderCacheUtil.putResult(FINDER_PATH_COUNT_BY_, finderArgs,
-					count);
+				FinderCacheUtil.putResult(FINDER_PATH_COUNT_BY_QUESTIONID,
+					finderArgs, count);
 
 				closeSession(session);
 			}
@@ -3128,7 +3137,7 @@ public class SurveyResultPersistenceImpl extends BasePersistenceImpl<SurveyResul
 	private static final String _FINDER_COLUMN_UUID_UUID_3 = "(surveyResult.uuid IS NULL OR surveyResult.uuid = ?)";
 	private static final String _FINDER_COLUMN_USERID_USERID_2 = "surveyResult.userId = ?";
 	private static final String _FINDER_COLUMN_ACTID_ACTID_2 = "surveyResult.actId = ?";
-	private static final String _FINDER_COLUMN__QUESTIONID_2 = "surveyResult.questionId = ?";
+	private static final String _FINDER_COLUMN_QUESTIONID_QUESTIONID_2 = "surveyResult.questionId = ?";
 	private static final String _FINDER_COLUMN_ANSWERIDQUESTIONID_ANSWERID_2 = "surveyResult.answerId = ? AND ";
 	private static final String _FINDER_COLUMN_ANSWERIDQUESTIONID_QUESTIONID_2 = "surveyResult.questionId = ?";
 	private static final String _ORDER_BY_ENTITY_ALIAS = "surveyResult.";
