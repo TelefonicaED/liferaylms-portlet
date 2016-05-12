@@ -62,7 +62,7 @@
 		LearningActivity activity=LearningActivityLocalServiceUtil.getLearningActivity(actId);
 		long typeId=activity.getTypeId();
 		
-		boolean userPassed		 = result.isPassed();
+		boolean userPassed		 = Validator.isNotNull(result) ? result.isPassed() : false;
 		boolean userLocked 		 = LearningActivityLocalServiceUtil.islocked(actId,userId);
 		boolean permissionUpdate = permissionChecker.hasPermission(activity.getGroupId(),LearningActivity.class.getName(), actId, ActionKeys.UPDATE);
 		boolean permissionAcLock = permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), "com.liferay.lms.model",themeDisplay.getScopeGroupId(),"ACCESSLOCK");
