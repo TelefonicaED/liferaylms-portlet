@@ -75,7 +75,17 @@ public class LearningActivityTryLocalServiceImpl
 	extends LearningActivityTryLocalServiceBaseImpl {
 	
 	public LearningActivityTry softUpdateLearningActivityTry(LearningActivityTry learningActivityTry) throws SystemException {		
-		return super.updateLearningActivityTry(learningActivityTry, true);
+		
+		LearningActivityTry lar = super.updateLearningActivityTry(learningActivityTry, true);
+		
+		//auditing
+		ServiceContext serviceContext = ServiceContextThreadLocal.getServiceContext();
+		if(serviceContext!=null){
+			AuditingLogFactory.audit(serviceContext.getCompanyId(), serviceContext.getScopeGroupId(), LearningActivityTry.class.getName(), 
+									 learningActivityTry.getLatId(), serviceContext.getUserId(), AuditConstants.UPDATE, null);
+		}
+		
+		return lar;
 	}
 	
 	@Override
@@ -155,7 +165,7 @@ public class LearningActivityTryLocalServiceImpl
 		//auditing
 		ServiceContext serviceContext = ServiceContextThreadLocal.getServiceContext();
 		if(serviceContext!=null){
-			AuditingLogFactory.audit(serviceContext.getCompanyId(), serviceContext.getScopeGroupId(), LearningActivityResult.class.getName(), 
+			AuditingLogFactory.audit(serviceContext.getCompanyId(), serviceContext.getScopeGroupId(), LearningActivityTry.class.getName(), 
 					learningActivityTry.getLatId(), serviceContext.getUserId(), AuditConstants.UPDATE, null);
 		}	
 		
