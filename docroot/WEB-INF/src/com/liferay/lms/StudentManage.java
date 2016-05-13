@@ -119,7 +119,7 @@ public class StudentManage extends MVCPortlet {
 				
 		List<User> users = null; 
 		int total = 0;		
-
+		
 		if(searchTerms.isAdvancedSearch()){			
 			log.debug("firstName:"+searchTerms.getFirstName());
 			log.debug("lastName:"+searchTerms.getLastName());

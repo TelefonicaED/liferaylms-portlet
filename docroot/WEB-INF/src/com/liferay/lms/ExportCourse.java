@@ -4,6 +4,8 @@ import java.io.File;
 import java.util.List;
 
 import com.liferay.portal.kernel.cache.MultiVMPoolUtil;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.messaging.Message;
 import com.liferay.portal.kernel.messaging.MessageListener;
 import com.liferay.portal.kernel.messaging.MessageListenerException;
@@ -24,6 +26,7 @@ import com.liferay.portal.theme.ThemeDisplay;
 
 public class ExportCourse implements MessageListener {
 
+	private static Log log = LogFactoryUtil.getLog(ExportCourse.class);
 	long groupId;
 	String fileName;
 	String key;
@@ -49,7 +52,6 @@ public class ExportCourse implements MessageListener {
 	public void receive(Message message) throws MessageListenerException {
 		
 		try {
-			
 			this.groupId	= message.getLong("groupId");
 			this.fileName = message.getString("fileName");
 			this.key = message.getString(key);
@@ -78,6 +80,9 @@ public class ExportCourse implements MessageListener {
 	
 	@SuppressWarnings("unchecked")
 	public void doExportCourse() throws Exception {
+		log.debug("::EXPORT COURSE::");
+		log.debug("fileName:"+fileName);
+		
 		File source = LayoutLocalServiceUtil.exportPortletInfoAsFile(themeDisplay.getLayout().getPlid(), groupId, themeDisplay.getPortletDisplay().getId(), serviceContext.getRequest().getParameterMap(), null, null);
 		
 		File parentDestination = new File(SystemProperties.get("liferay.home")+"/data/lms_exports/courses/"+themeDisplay.getCompanyId()+"/"+groupId);

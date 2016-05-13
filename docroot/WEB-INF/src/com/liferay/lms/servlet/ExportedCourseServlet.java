@@ -21,6 +21,8 @@ import com.liferay.lms.model.Course;
 import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.servlet.HttpHeaders;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.PropsUtil;
@@ -40,6 +42,8 @@ import com.liferay.util.Encryptor;
  */
 
 public class ExportedCourseServlet extends HttpServlet {
+	private static Log log = LogFactoryUtil.getLog(ExportedCourseServlet.class);
+	
 	private static final long serialVersionUID = 1L;
 	private String hexStringToStringByAscii(String hexString) {
 		byte[] bytes = new byte[hexString.length() / 2];
@@ -119,11 +123,15 @@ public class ExportedCourseServlet extends HttpServlet {
 			response.sendError(HttpServletResponse.SC_FORBIDDEN);
 		}
 		String uri = URLDecoder.decode(request.getRequestURI(), "UTF-8");
-		uri = uri.substring(uri.indexOf("exports/courses/") + "exports/courses/".length());
-
+		log.debug("uri:"+uri);
+		uri = uri.substring(uri.indexOf("exports/courses/") + "exports/courses/".length());		
 		String[] params = uri.split("/");
 		long groupId = GetterUtil.getLong(params[1]);
 		String name = GetterUtil.getString(params[2]);
+		
+		log.debug("groupId:"+groupId);
+		log.debug("name:"+name);
+		
 		Course course = CourseLocalServiceUtil.getCourseByGroupCreatedId(groupId);
 		
 		if (course == null || !permissionChecker.hasPermission(groupId, Course.class.getName(), course.getPrimaryKey(), ActionKeys.UPDATE)) {
