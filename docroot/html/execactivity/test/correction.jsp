@@ -264,8 +264,8 @@ userSearchContainer.setTotal(totalUsers);
 		<%}else{
 			if(status.equals("not-started")){%>
 				<liferay-ui:message key = "editactivity.mandatory.no"/> / <liferay-ui:message key = "not-started"/>
-				<%}else{%>
-			<liferay-ui:message key = "editactivity.mandatory.no"/>
+			<%}else{%>
+				<liferay-ui:message key = "editactivity.mandatory.no"/>
 			<%}%>
 		
 		<%}%>

@@ -41,6 +41,8 @@ import com.liferay.portal.kernel.lar.PortletDataContext;
 import com.liferay.portal.kernel.lar.PortletDataException;
 import com.liferay.portal.kernel.lar.PortletDataHandlerBoolean;
 import com.liferay.portal.kernel.lar.PortletDataHandlerControl;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.search.Indexer;
@@ -83,6 +85,8 @@ import com.liferay.portlet.documentlibrary.service.DLFolderLocalServiceUtil;
 
 
 public class ModuleDataHandlerImpl extends BasePortletDataHandler {
+	
+	private static Log log = LogFactoryUtil.getLog(ModuleDataHandlerImpl.class);
 
 	public static String DOCUMENTLIBRARY_MAINFOLDER = "ResourceUploads";
 	
@@ -120,7 +124,7 @@ private static PortletDataHandlerBoolean _tags =
 protected PortletPreferences doDeleteData(PortletDataContext context,
 		String portletId, PortletPreferences preferences) throws Exception {
 	
-	System.out.println("\n-----------------------------\ndoDeleteData STARTS");
+	log.info("\n-----------------------------\ndoDeleteData STARTS");
 	
 	try {
 		String groupIdStr = String.valueOf(context.getScopeGroupId());
@@ -134,20 +138,20 @@ protected PortletPreferences doDeleteData(PortletDataContext context,
 		}
 		long repositoryId = DLFolderConstants.getDataRepositoryId(group.getGroupId(), DLFolderConstants.DEFAULT_PARENT_FOLDER_ID);
 		
-		System.out.println("  Course: "+ group.getName()+ ", groupId: " + repositoryId);
+		log.info("  Course: "+ group.getName()+ ", groupId: " + repositoryId);
 		
 		LearningActivityTypeRegistry learningActivityTypeRegistry = new LearningActivityTypeRegistry();
 		List<Module> modules = ModuleLocalServiceUtil.findAllInGroup(groupId);
 
 		for(Module module:modules){
 			
-			System.out.println("    Module : " + module.getTitle(Locale.getDefault()) );
+			log.info("    Module : " + module.getTitle(Locale.getDefault()) );
 			
 			List<LearningActivity> activities = LearningActivityLocalServiceUtil.getLearningActivitiesOfModule(module.getModuleId());
 			
 			for(LearningActivity activity:activities){
 				
-				System.out.println("      Learning Activity : " + activity.getTitle(Locale.getDefault())+ " (" + LanguageUtil.get(Locale.getDefault(),learningActivityTypeRegistry.getLearningActivityType(activity.getTypeId()).getName())+")");
+				log.info("      Learning Activity : " + activity.getTitle(Locale.getDefault())+ " (" + LanguageUtil.get(Locale.getDefault(),learningActivityTypeRegistry.getLearningActivityType(activity.getTypeId()).getName())+")");
 				
 				LearningActivityLocalServiceUtil.deleteLearningactivity(activity);
 				
@@ -164,7 +168,7 @@ protected PortletPreferences doDeleteData(PortletDataContext context,
 		e.printStackTrace();
 	}
 
-	System.out.println("doDeleteData ENDS\n-----------------------------\n");
+	log.info("doDeleteData ENDS\n-----------------------------\n");
 	
 	return super.doDeleteData(context, portletId, preferences);
 }
@@ -172,10 +176,10 @@ protected PortletPreferences doDeleteData(PortletDataContext context,
 @Override
 protected String doExportData(PortletDataContext context, String portletId, PortletPreferences preferences) throws Exception {
 	
-	System.out.println("\n-----------------------------\ndoExportData STARTS, groupId : " + context.getScopeGroupId() );
+	log.info("\n-----------------------------\ndoExportData STARTS, groupId : " + context.getScopeGroupId() );
 	
 	Group group = GroupLocalServiceUtil.getGroup(context.getScopeGroupId());
-	System.out.println(" Course: "+ group.getName());
+	log.info(" Course: "+ group.getName());
 	
 	
 	context.addPermissions("com.liferay.lms.model.module", context.getScopeGroupId());
@@ -189,19 +193,19 @@ protected String doExportData(PortletDataContext context, String portletId, Port
 	List<Module> entries = ModuleLocalServiceUtil.findAllInGroup(context.getScopeGroupId());
 	long entryOld=0L;
 	for (Module entry : entries) {
-		System.out.println("Moduleeeeeeeeeeeeeeeeeeeeeeeeeeeeee "+entry.getModuleId());
-		System.out.println("Moduleeeeeeeeeeeeeeeeeeeeeeeeeeeeee entryOld "+entryOld);
+		log.info("Moduleeeeeeeeeeeeeeeeeeeeeeeeeeeeee "+entry.getModuleId());
+		log.info("Moduleeeeeeeeeeeeeeeeeeeeeeeeeeeeee entryOld "+entryOld);
 		if(entryOld!=entry.getModuleId())
 		{
 			entryOld=entry.getModuleId();
 			exportEntry(context, rootElement, entry);
 		} else{
-			System.out.println("repetidooooo el modulo "+entry.getModuleId());
+			log.info("repetidooooo el modulo "+entry.getModuleId());
 
 		}
 	}
 
-	System.out.println("doExportData ENDS, modules:" + entries.size() + "\n-----------------------------\n"  );
+	log.info("doExportData ENDS, modules:" + entries.size() + "\n-----------------------------\n"  );
 	
 	return document.formattedString();
 }
@@ -210,7 +214,7 @@ private void exportEntry(PortletDataContext context, Element root, Module entry)
 	
 	String path = getEntryPath(context, entry);
 	
-	System.out.println("\n  Module: " + entry.getModuleId() +" "+ entry.getTitle(Locale.getDefault()) );
+	log.info("\n  Module: " + entry.getModuleId() +" "+ entry.getTitle(Locale.getDefault()) );
 	
 	
 	if (!context.isPathNotProcessed(path)) {
@@ -240,7 +244,7 @@ private void exportEntry(PortletDataContext context, Element root, Module entry)
 	for(LearningActivity actividad:actividades)
 	{
 		
-		System.out.println("    Learning Activity: " + actividad.getTitle(Locale.getDefault()) + " (" + LanguageUtil.get(Locale.getDefault(),learningActivityTypeRegistry.getLearningActivityType(actividad.getTypeId()).getName())+")" );
+		log.info("    Learning Activity: " + actividad.getTitle(Locale.getDefault()) + " (" + LanguageUtil.get(Locale.getDefault(),learningActivityTypeRegistry.getLearningActivityType(actividad.getTypeId()).getName())+")" );
 		
 		String pathlo = getEntryPath(context, actividad);
 		Element entryElementLoc= entryElement.addElement("learningactivity");
@@ -279,7 +283,7 @@ private void exportEntry(PortletDataContext context, Element root, Module entry)
 				//List<String> documents = LearningActivityLocalServiceUtil.getExtraContentValues(actividad.getActId(), "document");
 				img = LearningActivityLocalServiceUtil.getExtraContentValues(actividad.getActId(), "document");
 			}else if(actividad.getTypeId() == 7 || actividad.getTypeId() == 9){
-				System.out.println("ENTRO CON "+actividad.getTypeId());
+				log.info("ENTRO CON "+actividad.getTypeId());
 				img.add(LearningActivityLocalServiceUtil.getExtraContentValue(actividad.getActId(), "assetEntry"));
 			}
 			
@@ -290,10 +294,10 @@ private void exportEntry(PortletDataContext context, Element root, Module entry)
 			
 			
 				try {
-					System.out.println("actividad.getTypeId() "+actividad.getTypeId());
+					log.info("actividad.getTypeId() "+actividad.getTypeId());
 
 					for(int i=0;i<img.size();i++){
-						System.out.println("img "+img);
+						log.info("img "+img);
 						if(!img.get(i).startsWith("<") && !img.get(i).startsWith("http")){
 							AssetEntry docAsset= AssetEntryLocalServiceUtil.getAssetEntry(Long.valueOf(img.get(i)));
 							if(!docAsset.getMimeType().equals("text/plain") && actividad.getTypeId() != 9){
@@ -334,16 +338,16 @@ private void exportEntry(PortletDataContext context, Element root, Module entry)
 							context.addZipEntry(getFilePath(context, docfile,actividad.getActId())+containsCharUpper(docfile.getTitle()+extension), input);
 							
 							String txt = (actividad.getTypeId() == 2) ? "external":"internal";
-							System.out.println("    - Resource "+ txt + ": " + containsCharUpper(docfile.getTitle()+extension));
+							log.info("    - Resource "+ txt + ": " + containsCharUpper(docfile.getTitle()+extension));
 						
 							
 							
 							}else{
 								if(actividad.getTypeId() == 9){
 									
-									System.out.println("***************************************************************************************");
+									log.info("***************************************************************************************");
 									
-									System.out.println("PASO POR AQUI PARA "+actividad.getTitle());
+									log.info("PASO POR AQUI PARA "+actividad.getTitle());
 									
 //									String portalBaseDir = PropsUtil.get("liferay.home")+"/data/scormszip";
 //									
@@ -352,9 +356,9 @@ private void exportEntry(PortletDataContext context, Element root, Module entry)
 //									String scormZipFilePath = portalBaseDir+StringPool.SLASH+docAsset.getCompanyId()+StringPool.SLASH+
 //											 				   docAsset.getGroupId()+StringPool.SLASH+docAsset.getClassUuid()+zipFileName;
 //									
-//									System.out.println("RUTA DEL ZIP DE SCORM "+scormZipFilePath);
+//									log.info("RUTA DEL ZIP DE SCORM "+scormZipFilePath);
 //									
-//									System.out.println("***************************************************************************************");
+//									log.info("***************************************************************************************");
 //											 
 //									InputStream input = new FileInputStream(new File(scormZipFilePath));
 //									
@@ -372,7 +376,7 @@ private void exportEntry(PortletDataContext context, Element root, Module entry)
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
-					System.out.println("* ERROR! resource file: " + e.getMessage());
+					log.info("* ERROR! resource file: " + e.getMessage());
 				}
 			
 		}
@@ -389,9 +393,9 @@ private void exportEntry(PortletDataContext context, Element root, Module entry)
 			entryElementq.addAttribute("path", pathqu);
 			context.addZipEntry(pathqu, question);
 			
-			System.out.println("      Test Question: " + question.getQuestionId() /*Jsoup.parse(nuevaQuestion.getText()).text()*/);
+			log.info("      Test Question: " + question.getQuestionId() /*Jsoup.parse(nuevaQuestion.getText()).text()*/);
 			
-			System.out.println("question.getText():\n" + question.getText());
+			log.info("question.getText():\n" + question.getText());
 			//Exportar los ficheros que tiene la descripcion de la pregunta
 			descriptionFileParserDescriptionToLar("<root><Description>"+question.getText()+"</Description></root>", actividad.getGroupId(), actividad.getModuleId(), context, entryElementq);	
 			
@@ -422,7 +426,7 @@ private String getFileToIS(PortletDataContext context, long entryId, long module
 	} catch (Exception e) {
 		// TODO Auto-generated catch block
 		//e.printStackTrace();
-		System.out.println("* ERROR! getFileToIS: " + e.getMessage());
+		log.info("* ERROR! getFileToIS: " + e.getMessage());
 	}	
 	
 	return "";
@@ -522,7 +526,7 @@ protected PortletPreferences doImportData(PortletDataContext context, String por
 	
 	
 	context.importPermissions("com.liferay.lms.model.module", context.getSourceGroupId(),context.getScopeGroupId());
-	System.out.println("\n-----------------------------\ndoImport1Data STARTS12");
+	log.info("\n-----------------------------\ndoImport1Data STARTS12");
 	
 	
 	Document document = SAXReaderUtil.read(data);
@@ -543,11 +547,11 @@ protected PortletPreferences doImportData(PortletDataContext context, String por
 			entryOld=String.valueOf(entry.getModuleId());
 			importEntry(context,entryElement, entry);
 		} else{
-			System.out.println("repetidooooo el modulo "+entry.getModuleId());
+			log.info("repetidooooo el modulo "+entry.getModuleId());
 		}	
 	}
 	
-	System.out.println("doImportData ENDS" + "\n-----------------------------\n"  );
+	log.info("doImportData ENDS" + "\n-----------------------------\n"  );
 	
 	return null;
 }
@@ -569,13 +573,13 @@ private void importEntry(PortletDataContext context, Element entryElement, Modul
 	entry.setDescription(entry.getDescription().replace("&amp;lt;", "&lt;"));
 	//entry.setDescription(parseFilesFromDescription(entry.getDescription().replace("&amp;lt;", "&lt;"), entryElement.elements("descriptionfile"), userId, context, serviceContext));
 	
-//	System.out.println("entry.setGroupId" +entry.getGroupId()  );
-//	System.out.println("entry.setGroupId" +entry.getUserId()  );
-//	System.out.println("entry.setGroupId" +entry.getModuleId()  );
-//	System.out.println("entry.setGroupId" +entry.getTitle()  );
+//	log.info("entry.setGroupId" +entry.getGroupId()  );
+//	log.info("entry.setGroupId" +entry.getUserId()  );
+//	log.info("entry.setGroupId" +entry.getModuleId()  );
+//	log.info("entry.setGroupId" +entry.getTitle()  );
 	
 	
-	System.out.println("ENTRY ELEMENT-->"+entryElement);
+	log.info("ENTRY ELEMENT-->"+entryElement);
 	
 	
 	Module theModule=ModuleLocalServiceUtil.addmodule(entry);
@@ -583,7 +587,7 @@ private void importEntry(PortletDataContext context, Element entryElement, Modul
 	//Importar imagenes del modulo.
 	if(entryElement.attributeValue("file") != null){
 		
-		System.out.println("entryElement value file-->"+entryElement.attributeValue("file"));
+		log.info("entryElement value file-->"+entryElement.attributeValue("file"));
 	
 		String name[] = entryElement.attributeValue("file").split("/");
 		String imageName = "module.jpg";
@@ -603,7 +607,7 @@ private void importEntry(PortletDataContext context, Element entryElement, Modul
 			
 			InputStream input = context.getZipEntryAsInputStream(entryElement.attributeValue("file"));
 			
-			//System.out.println("FILE!!!!!!!!!!!-->"+entryElement.attributeValue("file"));
+			//log.info("FILE!!!!!!!!!!!-->"+entryElement.attributeValue("file"));
 			
 			if(input != null){
 			
@@ -627,7 +631,7 @@ private void importEntry(PortletDataContext context, Element entryElement, Modul
 			
 		} catch (Exception e) {
 			e.printStackTrace();
-			System.out.println("* ERROR! module file: " + e.getCause().toString());
+			log.info("* ERROR! module file: " + e.getCause().toString());
 		}
 		
 	}
@@ -688,7 +692,7 @@ private void importEntry(PortletDataContext context, Element entryElement, Modul
 			
 		} catch (Exception e) {
 		//	e.printStackTrace();
-			System.out.println("*2 ERROR! descriptionfile: " + e.getMessage());
+			log.info("*2 ERROR! descriptionfile: " + e.getMessage());
 		}
 
 		theModule.setDescription(description);
@@ -703,7 +707,7 @@ private void importEntry(PortletDataContext context, Element entryElement, Modul
 		LearningActivity larn=(LearningActivity)context.getZipEntryAsObject(path);
 		
 		if(larn == null){
-			System.out.println("    ERROR! LearningActivity, path: " + path);
+			log.info("    ERROR! LearningActivity, path: " + path);
 			continue;
 		}
 		
@@ -725,11 +729,11 @@ private void importEntry(PortletDataContext context, Element entryElement, Modul
 		int index = 0;
 		while (keysString.hasNext()){
 			String key = keysString.next();
-			System.out.println("KEY: "+key);
+			log.info("KEY: "+key);
 			
 			if(!key.equals("video") && key.indexOf("document")!=-1){
 				
-				System.out.println("PASADO POR AQUI "+index);
+				log.info("PASADO POR AQUI "+index);
 				index++;
 				long assetEntryIdOld =  Long.parseLong(map.get(key));
 				
@@ -802,7 +806,7 @@ private void importEntry(PortletDataContext context, Element entryElement, Modul
 					
 			LearningActivityLocalServiceUtil.saveHashMapToXMLExtraContent(nuevaLarn.getActId(), map);
 			//LearningActivityLocalServiceUtil.updateLearningActivity(nuevaLarn);
-			//System.out.println("AL FINAL QUEDA ASI: "+nuevaLarn.getExtracontent());
+			//log.info("AL FINAL QUEDA ASI: "+nuevaLarn.getExtracontent());
 				
 			}else if(larn.getTypeId() == 7){
 				//LearningActivityLocalServiceUtil.setExtraContentValue(nuevaLarn.getActId(), "assetEntry", String.valueOf(asset.getEntryId()));
@@ -830,7 +834,7 @@ private void importEntry(PortletDataContext context, Element entryElement, Modul
 				File scormfile = new File(System.getProperty("java.io.tmpdir")+ "/scorms/" + scocontentOld.getUuid() + ".zip");
 				FileUtils.writeByteArrayToFile(scormfile, dataFileScorm);
 				
-				System.out.println("AQUI");
+				log.info("AQUI");
 				
 				//SCORMContentPersistenceImpl scormContentPersistence = new SCORMContentPersistenceImpl();
 				SCORMContentPersistence _persistence = (SCORMContentPersistence)PortletBeanLocatorUtil.locate(com.liferay.lms.service.ClpSerializer.getServletContextName(),
@@ -914,7 +918,7 @@ private void importEntry(PortletDataContext context, Element entryElement, Modul
 							null, 0, 0, null, false);
 					
 					
-					System.out.println("Assentry "+assentry);
+					log.info("Assentry "+assentry);
 							
 					Indexer indexer = IndexerRegistryUtil.nullSafeGetIndexer(SCORMContent.class);
 
@@ -969,7 +973,7 @@ private void importEntry(PortletDataContext context, Element entryElement, Modul
 					
 				//Obtener los datos del dlfileentry del .lar para poner sus campos igual. 
 				oldFile = (DLFileEntry) context.getZipEntryAsObject(theElement.element("dlfileentry").attributeValue("path"));
-				System.out.println("    DLFileEntry file: "+oldFile.getTitle()+",getFileEntryId "+oldFile.getFileEntryId()+",getFolderId "+oldFile.getFolderId()+",getGroupId "+oldFile.getGroupId());
+				log.info("    DLFileEntry file: "+oldFile.getTitle()+",getFileEntryId "+oldFile.getFileEntryId()+",getFolderId "+oldFile.getFolderId()+",getGroupId "+oldFile.getGroupId());
 				
 				messageException = "\n      - oldFile title: "+oldFile.getTitle()+ ", extension: "+oldFile.getExtension()+ ", mimetype: "+oldFile.getMimeType()+ ", size: "+oldFile.getSize()+" - ";		
 
@@ -988,13 +992,13 @@ private void importEntry(PortletDataContext context, Element entryElement, Modul
 				messageException += "\n      - newFile title: "+newFile.getTitle()+ ", extension: "+newFile.getExtension()+ ", extension: "+newFile.getFolderId()+ ", size: "+newFile.getSize()+" - ";
 				
 				asset = AssetEntryLocalServiceUtil.getEntry(DLFileEntry.class.getName(), newFile.getPrimaryKey());
-				System.out.println("      DLFileEntry newFile: "+newFile.getTitle()+", newFile PrimaryKey: "+newFile.getPrimaryKey()+", EntryId: "+asset.getEntryId());
+				log.info("      DLFileEntry newFile: "+newFile.getTitle()+", newFile PrimaryKey: "+newFile.getPrimaryKey()+", EntryId: "+asset.getEntryId());
 				
 				
 				//Ponemos a la actividad el fichero que hemos recuperado.
-				System.out.println("    Extracontent : \n"+nuevaLarn.getExtracontent());
+				log.info("    Extracontent : \n"+nuevaLarn.getExtracontent());
 				if(larn.getTypeId() == 2){
-					System.out.println("TIPO EXTERNO");
+					log.info("TIPO EXTERNO");
 					LearningActivityLocalServiceUtil.setExtraContentValue(nuevaLarn.getActId(), "document", String.valueOf(asset.getEntryId()));
 				}else if(larn.getTypeId() == 7){
 					LearningActivityLocalServiceUtil.setExtraContentValue(nuevaLarn.getActId(), "assetEntry", String.valueOf(asset.getEntryId()));
@@ -1005,16 +1009,16 @@ private void importEntry(PortletDataContext context, Element entryElement, Modul
 				
 			}catch(FileExtensionException fee){
 				fee.printStackTrace();
-				System.out.println("*ERROR! dlfileentry path FileExtensionException:" + actElement.element("dlfileentry").attributeValue("path")+", "+messageException +", message: "+fee.getMessage());
+				log.info("*ERROR! dlfileentry path FileExtensionException:" + actElement.element("dlfileentry").attributeValue("path")+", "+messageException +", message: "+fee.getMessage());
 			}catch(FileSizeException fse){
-				System.out.println("*ERROR! dlfileentry path FileSizeException:" + actElement.element("dlfileentry").attributeValue("path")+messageException +", message: "+ fse.getMessage());
+				log.info("*ERROR! dlfileentry path FileSizeException:" + actElement.element("dlfileentry").attributeValue("path")+messageException +", message: "+ fse.getMessage());
 			} catch(DuplicateFileException dfl){
 				newFile = DLAppLocalServiceUtil.getFileEntry(context.getScopeGroupId(), dlFolder.getFolderId(), oldFile.getTitle());
-				System.out.println("*ERROR! dlfileentry path DuplicateFileException:" + actElement.element("dlfileentry").attributeValue("path")+messageException +", message: "+ dfl.getMessage());
+				log.info("*ERROR! dlfileentry path DuplicateFileException:" + actElement.element("dlfileentry").attributeValue("path")+messageException +", message: "+ dfl.getMessage());
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-				System.out.println("*ERROR! dlfileentry path: " + actElement.element("dlfileentry").attributeValue("path")+messageException +", message: "+e.getMessage());
+				log.info("*ERROR! dlfileentry path: " + actElement.element("dlfileentry").attributeValue("path")+messageException +", message: "+e.getMessage());
 			}
 
 		}
@@ -1025,7 +1029,7 @@ private void importEntry(PortletDataContext context, Element entryElement, Modul
 			
 			FileEntry oldFile = (FileEntry)context.getZipEntryAsObject(actElementFile.attributeValue("path"));
 			
-			System.out.println("*  Description File: " + oldFile.getTitle()); 
+			log.info("*  Description File: " + oldFile.getTitle()); 
 									
 			FileEntry newFile;
 			long folderId=0;
@@ -1045,8 +1049,8 @@ private void importEntry(PortletDataContext context, Element entryElement, Modul
 					ficheroExtStr = "."+extension[extension.length-1];
 				}
 				
-				System.out.println("*   getMimeType getMimeType: " + oldFile.getMimeType()); 
-				System.out.println("*   getExtension getExtension: " + oldFile.getExtension()); 
+				log.info("*   getMimeType getMimeType: " + oldFile.getMimeType()); 
+				log.info("*   getExtension getExtension: " + oldFile.getExtension()); 
 				
 			
 				
@@ -1055,7 +1059,7 @@ private void importEntry(PortletDataContext context, Element entryElement, Modul
 					titleFile=oldFile.getTitle()+"."+oldFile.getExtension();
 				} 
 				
-				System.out.println("*   titleFile titleFile: " + titleFile); 
+				log.info("*   titleFile titleFile: " + titleFile); 
 				newFile = DLAppLocalServiceUtil.addFileEntry(userId, repositoryId , folderId , titleFile, oldFile.getMimeType(), oldFile.getTitle(), StringPool.BLANK, StringPool.BLANK, IOUtils.toByteArray(input), serviceContext );
 									
 				description = descriptionFileParserLarToDescription(nuevaLarn.getDescription(), oldFile, newFile);
@@ -1068,17 +1072,17 @@ private void importEntry(PortletDataContext context, Element entryElement, Modul
 					FileEntry existingFile = DLAppLocalServiceUtil.getFileEntry(context.getScopeGroupId(), folderId, oldFile.getTitle());
 					description = descriptionFileParserLarToDescription(nuevaLarn.getDescription(), oldFile, existingFile);
 				}catch(Exception e){
-					System.out.println("ERROR! descriptionfile descriptionFileParserLarToDescription : " +e.getMessage());
+					log.info("ERROR! descriptionfile descriptionFileParserLarToDescription : " +e.getMessage());
 					description = nuevaLarn.getDescription();
 				}
 			} catch (PortletDataException e1){
-				System.out.println("ERROR! descriptionfile: ");
+				log.info("ERROR! descriptionfile: ");
 				
 			} catch (Exception e) {
 
 				// TODO Auto-generated catch block
 				//e.printStackTrace();
-				System.out.println("ERROR! descriptionfile: " + actElementFile.attributeValue("file") +"\n        "+e.getMessage());
+				log.info("ERROR! descriptionfile: " + actElementFile.attributeValue("file") +"\n        "+e.getMessage());
 			}
 
 			nuevaLarn.setDescription(description);
@@ -1094,7 +1098,7 @@ private void importEntry(PortletDataContext context, Element entryElement, Modul
 			question.setActId(nuevaLarn.getActId());
 			TestQuestion nuevaQuestion=TestQuestionLocalServiceUtil.addQuestion(question.getActId(), question.getText(), question.getQuestionType());
 			
-			System.out.println("      Test Question: " + nuevaQuestion.getQuestionId() /*Jsoup.parse(nuevaQuestion.getText()).text()*/);
+			log.info("      Test Question: " + nuevaQuestion.getQuestionId() /*Jsoup.parse(nuevaQuestion.getText()).text()*/);
 			
 			//Si tenemos ficheros en las descripciones de las preguntas.
 			for (Element actElementFile : qElement.elements("descriptionfile")) {
@@ -1132,9 +1136,9 @@ private void importEntry(PortletDataContext context, Element entryElement, Modul
 
 					// TODO Auto-generated catch block
 					//e.printStackTrace();
-					System.out.println("* ERROR! Question descriptionfile: " + e.getMessage());
+					log.info("* ERROR! Question descriptionfile: " + e.getMessage());
 				}
-				//System.out.println("   description : " + description );
+				//log.info("   description : " + description );
 				nuevaQuestion.setText(description);
 				TestQuestionLocalServiceUtil.updateTestQuestion(nuevaQuestion);
 				
@@ -1182,7 +1186,7 @@ private void importEntry(PortletDataContext context, Element entryElement, Modul
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			//e.printStackTrace();
-			System.out.println("* ERROR! createDLFoldersForLearningActivity: " + e.getMessage());
+			log.info("* ERROR! createDLFoldersForLearningActivity: " + e.getMessage());
 		}
 		
     	return newDLFolder;
@@ -1264,12 +1268,12 @@ private void importEntry(PortletDataContext context, Element entryElement, Modul
 								entryElementLoc.addAttribute("path", pathqu);
 								entryElementLoc.addAttribute("file", pathFile + file.getTitle());
 								
-								System.out.println("   + Description file image : " + file.getTitle() +" ("+file.getMimeType()+")");
+								log.info("   + Description file image : " + file.getTitle() +" ("+file.getMimeType()+")");
 								
 							} catch (Exception e) {
 								// TODO Auto-generated catch block
 								//e.printStackTrace();
-								System.out.println("* ERROR! Description file image : " + e.getMessage());
+								log.info("* ERROR! Description file image : " + e.getMessage());
 							}
 						}
 					}
@@ -1322,7 +1326,7 @@ private void importEntry(PortletDataContext context, Element entryElement, Modul
 							} catch (Exception e) {
 								// TODO Auto-generated catch block
 								//e.printStackTrace();
-								System.out.println("* ERROR! Description file pdf : " + e.getMessage());
+								log.info("* ERROR! Description file pdf : " + e.getMessage());
 							}
 						}
 						
@@ -1338,7 +1342,7 @@ private void importEntry(PortletDataContext context, Element entryElement, Modul
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			//e.printStackTrace();
-			System.out.println("* ERROR! Document Exception : " + e.getMessage());
+			log.info("* ERROR! Document Exception : " + e.getMessage());
 		}
 
 	}
@@ -1374,12 +1378,12 @@ private void importEntry(PortletDataContext context, Element entryElement, Modul
 				entryElementLoc.addAttribute("path", pathqu);
 				entryElementLoc.addAttribute("file", pathFile + file.getTitle());
 				
-				System.out.println("   + Description file image : " + file.getTitle() +" ("+file.getMimeType()+")");
+				log.info("   + Description file image : " + file.getTitle() +" ("+file.getMimeType()+")");
 				
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-				System.out.println("* ERROR! Description file image : " + e.getMessage());
+				log.info("* ERROR! Description file image : " + e.getMessage());
 			}
 		}
 		
@@ -1404,14 +1408,14 @@ private void importEntry(PortletDataContext context, Element entryElement, Modul
 		
 		//System.out.println("   res         : " + res );
 		if(res.equals(description)){
-			System.out.println("   :: description         : " + description );
-			//System.out.println("   :: target      : " + target );	
-			//System.out.println("   :: replacement : " + replacement );
+			log.info("   :: description         : " + description );
+			//log.info("   :: target      : " + target );	
+			//log.info("   :: replacement : " + replacement );
 		}
 				
 		String changed = (!res.equals(description))?" changed":" not changed";
 		
-		System.out.println("   + Description file : " + newFile.getTitle() +" (" + newFile.getMimeType() + ")" + changed);
+		log.info("   + Description file : " + newFile.getTitle() +" (" + newFile.getMimeType() + ")" + changed);
 		
 		return res;
 	}

@@ -1159,9 +1159,12 @@ public class CourseAdmin extends MVCPortlet {
 		ServiceContext serviceContext = ServiceContextFactory.getInstance(Course.class.getName(), actionRequest);
 		
 		long groupId  = ParamUtil.getLong(actionRequest, "groupId", 0);
-	
 		String fileName  = ParamUtil.getString(actionRequest, "exportFileName", "New course exported");
 
+		log.debug("groupId:"+groupId);
+		log.debug("fileName:"+fileName);
+		
+		
 		Message message = new Message();
 		message.put("groupId", groupId);
 		message.put("fileName", fileName);
@@ -1199,9 +1202,10 @@ public class CourseAdmin extends MVCPortlet {
 			JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
 			try {	
 				
-				ServiceContext serviceContext = ServiceContextFactory.getInstance(Course.class.getName(), request);
-				
+				ServiceContext serviceContext = ServiceContextFactory.getInstance(Course.class.getName(), request);				
 				long groupId  = ParamUtil.getLong(request, "groupId", 0);
+				
+				
 				if (themeDisplay.getPermissionChecker().hasPermission(groupId, Course.class.getName(), groupId, ActionKeys.UPDATE)) {
 					String fileName  = ParamUtil.getString(request, "exportFileName", "New course exported");
 					if(fileName.contains("/")){
