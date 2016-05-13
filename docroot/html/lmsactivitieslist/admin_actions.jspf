@@ -130,6 +130,9 @@ ActionKeys.DELETE)||permissionChecker.hasOwnerPermission(myActivity.getCompanyId
 				</portlet:actionURL>
 				
 				<% 	
+				
+				List<LearningActivityResult> actResults =  LearningActivityResultLocalServiceUtil.getByActId(myActivity.getActId());
+				
 				List<LearningActivity> precedences = LearningActivityLocalServiceUtil.getByPrecedence(myActivity.getActId());
 				String message = LanguageUtil.get(pageContext, "are-you-sure-you-want-to-delete-this");
 				if(precedences!=null && precedences.size()>0){
@@ -389,7 +392,7 @@ boolean visibleCalifications = Boolean.parseBoolean(visibleStr);
 		    "			modal:true, "+
 		    "			x:50, "+
 		    "			y:50, "+
-		    "			on: { close: function(evt){ console.log('hola'); Liferay.Portlet.refresh(A.one('#p_p_id");
+		    "			on: { close: function(evt){ Liferay.Portlet.refresh(A.one('#p_p_id");
 		    showCalificationsPopup.append(renderResponse.getNamespace());
 		    showCalificationsPopup.append(">'),{'p_t_lifecycle':0}); }},"+	
 			"		} "+

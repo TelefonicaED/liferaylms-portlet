@@ -988,7 +988,11 @@ public class LmsActivitiesList extends MVCPortlet {
 			message.setResponseId("1111");
 			//message.setResponseDestinationName("liferay/lms/cleanTriesUser");
 			//MessageBusUtil.sendMessage("liferay/lms/cleanTriesUser", message);
+			
+			log.debug("Learning Activity: "+la.getTitle(themeDisplay.getLocale()));
+			log.debug("User "+user.getScreenName());
 			String resultado = (String)MessageBusUtil.sendSynchronousMessage("liferay/lms/cleanTriesUser", message);
+			log.debug("Result "+resultado);
 		}
 		
 		
@@ -1002,14 +1006,9 @@ public class LmsActivitiesList extends MVCPortlet {
 	public void modactivity(ActionRequest actionRequest, ActionResponse actionResponse)
 		throws Exception {
 
-		ThemeDisplay themeDisplay = (ThemeDisplay) actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
-
-		String portletId = PortalUtil.getPortletId(actionRequest);
-
 		String title = actionRequest.getParameter("title");
 		String description = actionRequest.getParameter("description");
 		int typeId = ParamUtil.getInteger(actionRequest, "type", 0);
-		java.util.Date ahora = new java.util.Date(System.currentTimeMillis());
 		LearningActivity learningActivity = LearningActivityServiceUtil.getLearningActivity(ParamUtil.getLong(actionRequest, "actId"));
 		learningActivity.setTitle(title);
 		learningActivity.setDescription(description);
