@@ -284,6 +284,23 @@ public class SurveyResultLocalServiceUtil {
 	}
 
 	public static double getPercentageByQuestionIdAndAnswerId(long questionId,
+		long answerId, long total)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService()
+				   .getPercentageByQuestionIdAndAnswerId(questionId, answerId,
+			total);
+	}
+
+	/**
+	* Metodo depreciado, se utiliza una combinaciÃ¯Â¿Â½n de los dos anteriores, para evitar consultas a base de datos innecesarias dentro de bucles.
+	*
+	* @deprecated
+	* @param questionId
+	* @param answerId
+	* @return
+	* @throws SystemException
+	*/
+	public static double getPercentageByQuestionIdAndAnswerId(long questionId,
 		long answerId)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService()

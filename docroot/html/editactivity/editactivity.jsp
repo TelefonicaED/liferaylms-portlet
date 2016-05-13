@@ -379,7 +379,7 @@ AUI().ready('node-base' ,'aui-form-validator', 'aui-overlay-context-panel', 'wid
 		return a;
 	}
 
-	function validate(){
+	function <portlet:namespace/>validate(){
 		
 		var startInput = document.getElementById('<portlet:namespace />startdate-enabledCheckbox');
 		var start = startInput != null ? startInput.checked : true;
@@ -390,10 +390,15 @@ AUI().ready('node-base' ,'aui-form-validator', 'aui-overlay-context-panel', 'wid
 		var file_inputs =getElementByNameStart("<portlet:namespace />additionalFile");
 		for(i=0; i<file_inputs.length; i++){
 			if(file_inputs[i].files!=null){
-				if(maxSize<file_inputs[i].files[0].size){
-					alert("<%=UnicodeFormatter.toString(LanguageUtil.get(pageContext, "server-file-size-upload-exceeded")) %>");	
-					return;
-				}	
+				if(file_inputs[i].files[0]!=null){
+					if (typeof file_inputs[i].files[0] != 'undefined'){
+						if(maxSize<file_inputs[i].files[0].size){
+							alert("<%=UnicodeFormatter.toString(LanguageUtil.get(pageContext, "server-file-size-upload-exceeded")) %>");	
+							return false;
+						}	
+					}				
+				}
+				
 			}
 		}
 		
@@ -406,7 +411,7 @@ AUI().ready('node-base' ,'aui-form-validator', 'aui-overlay-context-panel', 'wid
 					
 			if(start.getTime()>=end.getTime()){
 				alert("<%=UnicodeFormatter.toString(LanguageUtil.get(pageContext, "please-enter-a-start-date-that-comes-before-the-end-date")) %>");
-				return;
+				return false;
 			}
 // 			else{
 // 				if(document.getElementById('<portlet:namespace />uploadDay')!=null){
@@ -470,7 +475,7 @@ AUI().ready('node-base' ,'aui-form-validator', 'aui-overlay-context-panel', 'wid
 				}
 			}
 		}
-		
+
 		document.getElementById('<portlet:namespace />fm').submit();
 	}
 
@@ -519,7 +524,7 @@ AUI().ready('node-base' ,'aui-form-validator', 'aui-overlay-context-panel', 'wid
 	);
 //-->
 </script>
-<aui:form name="fm" action="<%=saveactivityURL%>"  method="post"  enctype="multipart/form-data">
+<aui:form name="fm" action="<%=saveactivityURL%>"  method="post"   onSubmit='<%= "event.preventDefault(); " + renderResponse.getNamespace() + "validate();" %>' enctype="multipart/form-data">
 	<aui:fieldset>
 		<aui:input name="redirect" type="hidden" value="<%= redirect %>" />
 		<aui:input name="maxSize" type="hidden" value="<%= fileMaxSize %>" />
@@ -672,7 +677,7 @@ Liferay.provide(
 			}
 		%>
 		
-		<aui:input size="5" name="tries" label="tries" value="<%=Long.toString(tries) %>" type="number" disabled="<%=disabled%>">
+		<aui:input size="5" name="tries" label="tries" value="<%=Long.toString(tries) %>" type="number"  disabled="<%=disabled%>">
 		</aui:input><%--liferay-ui:icon-help message="number-of-tries"></liferay-ui:icon-help--%>
   		<div id="<portlet:namespace />triesError" class="<%=((SessionErrors.contains(renderRequest, "editActivity.tries.required"))||
 														      (SessionErrors.contains(renderRequest, "editActivity.tries.number"))||
@@ -939,8 +944,8 @@ Liferay.provide(
 	</aui:fieldset>
 	
 	<aui:button-row>
-		<input type="button" value="<liferay-ui:message key="savechanges" />" onclick="javascript:validate()" >
-		<aui:button  type="cancel" value="canceledition" />
+		<aui:button type="submit" value="savechanges"/>
+		<aui:button type="cancel" value="canceledition" />
 	</aui:button-row>
 </aui:form>
  <liferay-ui:success key="activity-saved-successfully" message="activity-saved-successfully" />

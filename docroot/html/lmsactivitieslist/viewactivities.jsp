@@ -162,6 +162,63 @@ AUI().ready('node','aui-io-request','aui-parse-content','aui-sortable',function(
 }
 </script>
 
+<liferay-portlet:resourceURL var="baseChangeURL"/>
+
+<script>
+
+	
+function <portlet:namespace />downActivity(actId){
+	$.ajax({
+		dataType: 'json',
+		url:'${baseChangeURL}',
+	    cache:false,
+		data: {
+			actId: actId,
+			action: 'down'
+		},
+		success: function(data){
+			if(data){	
+				$item =  $("#<portlet:namespace />" + actId);
+				$after = $item.next();
+				if($after.prop("tagName").toUpperCase()=="LI"){
+					$item.hide().insertAfter($after).fadeIn("slow");
+				}			    
+			}
+		},
+		error: function(){
+
+		}
+	});  
+ }
+
+
+function <portlet:namespace />upActivity(actId){
+	$.ajax({
+		dataType: 'json',
+		url:'${baseChangeURL}',
+	    cache:false,
+		data: {
+			actId: actId,
+			action: 'up'
+		},
+		success: function(data){
+			if(data){	
+				$item =  $("#<portlet:namespace />" + actId);
+				$before = $item.prev();
+				if($before.prop("tagName").toUpperCase()=="LI"){
+					$item.hide().insertBefore($before).fadeIn("slow");
+				}			    
+			}
+		},
+		error: function(){
+
+		}
+	});  
+ }
+
+
+</script>
+
 <liferay-portlet:renderURL var="newactivityURL" windowState="<%= LiferayWindowState.POP_UP.toString() %>">
 	<liferay-portlet:param name="jspPage" value="/html/lmsactivitieslist/newactivity.jsp"/>
 	<liferay-portlet:param name="resModuleId" value="<%=Long.toString(moduleId) %>" />
@@ -220,36 +277,46 @@ AUI().ready('node','aui-io-request','aui-parse-content','aui-sortable',function(
 <liferay-ui:error></liferay-ui:error>
 <ul id="myActivities">
 			<%
+			String status;
+			long result;
+			long tries;
+			long userTried;
+			String type;
+			String moduletitle;
+			String title;
 			for (LearningActivity activity : activities) {
-				String title = activity.getTitle(themeDisplay.getLocale());				
-				String moduletitle = "";
+				title = activity.getTitle(themeDisplay.getLocale());				
+				moduletitle = "";
+				type= String.valueOf(activity.getTypeId());
+				
 				if (activity.getModuleId() != 0) {
 					Module theModule = ModuleLocalServiceUtil
 							.getModule(activity.getModuleId());
 					moduletitle = theModule.getTitle();
 				}
-				long result = 0;
-				String status = "not-started";
-				if (LearningActivityResultLocalServiceUtil
-						.existsLearningActivityResult(activity.getActId(),
-								themeDisplay.getUserId())) {
-					status = "started";
-
-					LearningActivityResult learningActivityResult = LearningActivityResultLocalServiceUtil
-							.getByActIdAndUserId(activity.getActId(),
+				result = 0;
+				status = "not-started";
+				
+				LearningActivityResult learningActivityResult = LearningActivityResultLocalServiceUtil
+						.getByActIdAndUserId(activity.getActId(),
 									themeDisplay.getUserId());
+				
+				if(learningActivityResult!=null){
 					result = learningActivityResult.getResult();
-					long tries = activity.getTries();
-					long userTried = Long.valueOf(LearningActivityTryLocalServiceUtil.getTriesCountByActivityAndUser(activity.getActId(),themeDisplay.getUserId()));
-					if (!actionEditing) {
+					tries = activity.getTries();
+					userTried = Long.valueOf(LearningActivityTryLocalServiceUtil.getTriesCountByActivityAndUser(activity.getActId(),themeDisplay.getUserId()));
+					if(learningActivityResult.getEndDate()!=null){
+						status="started";
+					}else{
 						if (learningActivityResult.isPassed()) {
 							status = "passed";
 						}
 						else if ((userTried >= tries && tries > 0) && (!learningActivityResult.isPassed())) {
 							status = "failed";
-						}
+						}							
 					}
-				}
+				}				
+				
 				if (actId == activity.getActId()) {
 						activityEnd = "activado";
 				} else {
@@ -275,8 +342,9 @@ AUI().ready('node','aui-io-request','aui-parse-content','aui-sortable',function(
 							<portlet:param name="actId" value="<%=Long.toString(activity.getActId()) %>" />
 						</portlet:actionURL>
 
-						<li class="learningActivity <%=activityEnd%> <%=editing %> <%=status%>"  <%=(status=="passed")?"title =\""+LanguageUtil.format(pageContext, "activity.result",new Object[]{resultNumberFormat.format(result)})+"\"":(status=="failed")?"title =\""+LanguageUtil.format(pageContext, "activity.result",new Object[]{resultNumberFormat.format(result)})+"\"":StringPool.BLANK %> 
+						<li class="learningActivity <%=activityEnd%> <%=editing %> <%=status%>"  <%=(status=="passed" || status=="failed")?"title =\""+LanguageUtil.format(pageContext, "activity.result",new Object[]{resultNumberFormat.format(result)})+"\"":StringPool.BLANK %> 
 							id="<portlet:namespace/><%=activity.getActId()%>">
+							<span class="type_<%=type%>"></span>
 							<a href="<%=assetRendererFactory.getAssetRenderer(activity.getActId()).
 									getURLView(liferayPortletResponse, WindowState.NORMAL) %>"  ><%=title%></a>
 							
@@ -285,10 +353,22 @@ AUI().ready('node','aui-io-request','aui-parse-content','aui-sortable',function(
 					else
 					{
 					%>
-						<li class="learningActivity <%=activityEnd%> <%=editing %> <%=status%> locked"  <%=(status=="passed")?"title =\""+LanguageUtil.format(pageContext, "activity.result",new Object[]{resultNumberFormat.format(result)})+"\"":(status=="failed")?"title =\""+LanguageUtil.format(pageContext, "activity.result",new Object[]{resultNumberFormat.format(result)})+"\"":StringPool.BLANK %> 
+						<li class="learningActivity <%=activityEnd%> <%=editing %> <%=status%> locked"  <%=(status=="passed"||status=="failed" )?"title =\""+LanguageUtil.format(pageContext, "activity.result",new Object[]{resultNumberFormat.format(result)})+"\"":StringPool.BLANK %> 
 							id="<portlet:namespace/><%=activity.getActId()%>">
+							<span class="type_<%=type%>"></span>
 							<span><%=title%></span>
 					<%
+					}
+					if(!actionEditing)
+					{
+					%>
+					<span class="status"> <%=LanguageUtil.format(pageContext, status,new Object[]{})%></span>
+					<%
+					if(status=="passed"||status=="failed" ){
+					%>	
+						<span class="result"> <%=result%> %</span>
+					<% 
+					}
 					}
 				if ((actionEditing)&&(Validator.isNotNull(learningActivityType))
 					&& (permissionChecker.hasPermission(activity.getGroupId(),LearningActivity.class.getName(),activity.getActId(), ActionKeys.UPDATE)
@@ -302,6 +382,7 @@ AUI().ready('node','aui-io-request','aui-parse-content','aui-sortable',function(
 				
 				<%
 				}
+				
 				%>
 				</li>
 			<%

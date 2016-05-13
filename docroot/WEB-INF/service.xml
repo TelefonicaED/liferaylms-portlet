@@ -489,15 +489,22 @@
 		<column name="questionId" type="long" />
 		<column name="answerId" type="long" />
 		<column name="userId" type="long" />
-		<column name="freeAnswer" type="String"/>
-		
+		<column name="freeAnswer" type="String"/>		
 		<finder name="UserId" return-type="Collection">
 			<finder-column name="userId" />
 		</finder>
 		<finder name="ActId" return-type="Collection">
 			<finder-column name="actId" />
-		</finder>			
-	</entity>        
+		</finder>
+		<finder name="QuestionId"	return-type="Collection">
+			<finder-column name="questionId" />
+		</finder>
+		<finder name="AnswerIdQuestionId"	return-type="Collection">
+			<finder-column name="answerId" />
+			<finder-column name="questionId" />
+		</finder>		
+	</entity>  
+	      
      <entity name="SCORMContent" local-service="true" remote-service="true" uuid="true" json-enabled="false">
 		<!-- Primary key column -->
 		<column name="scormId" type="long" primary="true" />

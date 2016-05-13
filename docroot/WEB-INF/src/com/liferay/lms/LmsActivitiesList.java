@@ -2,10 +2,12 @@
 package com.liferay.lms;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -20,6 +22,8 @@ import javax.portlet.PortletException;
 import javax.portlet.ProcessEvent;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
+import javax.portlet.ResourceRequest;
+import javax.portlet.ResourceResponse;
 import javax.portlet.WindowState;
 import javax.xml.namespace.QName;
 
@@ -46,6 +50,8 @@ import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
+import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.messaging.Message;
@@ -216,7 +222,6 @@ public class LmsActivitiesList extends MVCPortlet {
 		long actId = ParamUtil.getLong(uploadRequest, "resId", 0);
 		long moduleId = ParamUtil.getLong(uploadRequest, "resModuleId", 0);
 		long weightinmodule=ParamUtil.getLong(uploadRequest, "weightinmodule", 0);
-		long visibility=ParamUtil.getLong(uploadRequest, "visibility", 0);
 
 		long precedence=ParamUtil.getLong(uploadRequest, "precedence", 0);
 		
@@ -605,11 +610,13 @@ public class LmsActivitiesList extends MVCPortlet {
 		throws Exception {
 
 		long actId = ParamUtil.getLong(actionRequest, "resId");
-		long renderActId = ParamUtil.getLong(actionRequest, "actId",0); 
+		long renderActId = ParamUtil.getLong(actionRequest, "actId",0);
+		long moduleId = ParamUtil.getLong(actionRequest, "moduleId", 0);
+
 		ThemeDisplay themeDisplay = (ThemeDisplay) actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
-		
+
 		PermissionChecker permissionChecker=themeDisplay.getPermissionChecker();
-		
+
 		if(actId>0)
 		{
 			LearningActivity larn = LearningActivityLocalServiceUtil.getLearningActivity(actId);
@@ -620,7 +627,6 @@ public class LmsActivitiesList extends MVCPortlet {
 				LearningActivityType learningActivityType=new LearningActivityTypeRegistry().
 						getLearningActivityType(larn.getTypeId());
 				learningActivityType.deleteResources(actionRequest, actionResponse, larn);
-				
 				List<LearningActivity> precedences = LearningActivityLocalServiceUtil.getByPrecedence(actId);
 				
 				if(precedences!=null && precedences.size()>0){
@@ -629,14 +635,18 @@ public class LmsActivitiesList extends MVCPortlet {
 						LearningActivityLocalServiceUtil.updateLearningActivity(precedence);
 					}
 				}
-				log.error("DELETING ACTIVITY ");
 				LearningActivityServiceUtil.deleteLearningactivity(actId);
-	
 				//auditing
 				AuditingLogFactory.audit(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(), LearningActivity.class.getName(), actId, themeDisplay.getUserId(), AuditConstants.DELETE, null);
 				
 				if(actId==renderActId) {
-					actionResponse.removePublicRenderParameter("actId");				
+					List<LearningActivity> activities = LearningActivityLocalServiceUtil.getLearningActivitiesOfModule(moduleId);
+					actionResponse.removePublicRenderParameter("actId");		
+					if(activities!=null && activities.size()>0){
+						actionResponse.setRenderParameter("actId", String.valueOf(activities.get(0).getActId()));
+					}else{
+						actionResponse.setRenderParameter("actId", "0");
+					}
 				}
 				
 				if(!LiferayWindowState.EXCLUSIVE.equals(actionRequest.getWindowState())){
@@ -646,49 +656,53 @@ public class LmsActivitiesList extends MVCPortlet {
 				}
 			}
 		}
-	}
 	
-	public void upactivity(ActionRequest actionRequest, ActionResponse actionResponse)
-	throws Exception {
-	ThemeDisplay themeDisplay = (ThemeDisplay) actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
+	}
 		
+	public void serveResource(ResourceRequest request, ResourceResponse response) throws PortletException,IOException{
+		
+		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(WebKeys.THEME_DISPLAY);
+		
+		long actId = ParamUtil.getLong(request, "actId");
+		String action = ParamUtil.getString(request, "action");
+		
+		log.error("Act ID "+actId);
 		PermissionChecker permissionChecker=themeDisplay.getPermissionChecker();
-		
-		long actId = ParamUtil.getLong(actionRequest, "resId",0);
-		
+		JSONObject oreturned = JSONFactoryUtil.createJSONObject();	
+		boolean changed=false;
 		if(actId>0)
 		{	
-			LearningActivity larn = LearningActivityLocalServiceUtil.getLearningActivity(actId);
-		
-			if(permissionChecker.hasPermission(larn.getGroupId(), LearningActivity.class.getName(), larn.getActId(),
-					ActionKeys.UPDATE)|| permissionChecker.hasOwnerPermission(larn.getCompanyId(), LearningActivity.class.getName(), larn.getActId(),larn.getUserId(),
-							ActionKeys.UPDATE))
-			{
-			LearningActivityLocalServiceUtil.goUpLearningActivity(actId, themeDisplay.getUserId());
+			try{
+				LearningActivity larn = LearningActivityLocalServiceUtil.getLearningActivity(actId);
+				if(permissionChecker.hasPermission(larn.getGroupId(), LearningActivity.class.getName(), larn.getActId(),
+						ActionKeys.UPDATE)|| permissionChecker.hasOwnerPermission(larn.getCompanyId(), LearningActivity.class.getName(), larn.getActId(),larn.getUserId(),
+								ActionKeys.UPDATE))
+				{
+					if(action.equals("down")){
+						LearningActivityLocalServiceUtil.goDownLearningActivity(actId, themeDisplay.getUserId());
+						changed=true;	
+					}else if(action.equals("up")){
+						LearningActivityLocalServiceUtil.goUpLearningActivity(actId, themeDisplay.getUserId());
+						changed=true;
+					}
+					
+				}								
+			}catch(Exception e){
+				e.printStackTrace();
+				throw new PortletException(e.getMessage());
 			}
 		}
-	}
-	
-	public void downactivity(ActionRequest actionRequest, ActionResponse actionResponse)
-	throws Exception {
-	ThemeDisplay themeDisplay = (ThemeDisplay) actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
-		
-		PermissionChecker permissionChecker=themeDisplay.getPermissionChecker();
-		
-		long actId = ParamUtil.getLong(actionRequest, "resId",0);
-	
-		if(actId>0)
-		{
-			LearningActivity larn = LearningActivityLocalServiceUtil.getLearningActivity(actId);
-			
-			if(permissionChecker.hasPermission(larn.getGroupId(), LearningActivity.class.getName(), larn.getActId(),
-					ActionKeys.UPDATE)|| permissionChecker.hasOwnerPermission(larn.getCompanyId(), LearningActivity.class.getName(), larn.getActId(),larn.getUserId(),
-							ActionKeys.UPDATE))
-			{
-				LearningActivityLocalServiceUtil.goDownLearningActivity(actId, themeDisplay.getUserId());
-			}
+		if(changed){
+			oreturned.put("success", "OK");
+			PrintWriter out = response.getWriter();
+			out.print(oreturned.toString());
+			out.flush();
+			out.close();
 		}
+		
 	}
+	
+	
 	
 	public void moveActivity(ActionRequest actionRequest, ActionResponse actionResponse) throws Exception {
 		
