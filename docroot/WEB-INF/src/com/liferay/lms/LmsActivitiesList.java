@@ -604,8 +604,7 @@ public class LmsActivitiesList extends MVCPortlet {
 
 		PermissionChecker permissionChecker=themeDisplay.getPermissionChecker();
 
-		if(actId>0)
-		{
+		if(actId>0){
 			LearningActivity larn = LearningActivityLocalServiceUtil.getLearningActivity(actId);
 			if(permissionChecker.hasPermission(larn.getGroupId(), LearningActivity.class.getName(), larn.getActId(),
 					ActionKeys.DELETE)|| permissionChecker.hasOwnerPermission(larn.getCompanyId(), LearningActivity.class.getName(), larn.getActId(),larn.getUserId(),
@@ -623,6 +622,7 @@ public class LmsActivitiesList extends MVCPortlet {
 					}
 				}
 				LearningActivityServiceUtil.deleteLearningactivity(actId);
+				SessionMessages.add(actionRequest, "ok-deleteActivity");
 				//auditing
 				AuditingLogFactory.audit(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(), LearningActivity.class.getName(), actId, themeDisplay.getUserId(), AuditConstants.DELETE, null);
 				
