@@ -463,6 +463,33 @@ public class CourseLocalServiceWrapper implements CourseLocalService,
 			courseGropupCreatedId);
 	}
 
+	public java.util.List<com.liferay.lms.model.Course> getByTitleStatusCategoriesTags(
+		java.lang.String title, int status, long[] categories, long[] tags,
+		long companyId, long groupId, long userId, java.lang.String language,
+		boolean isAdmin, boolean andOperator, int start, int end) {
+		return _courseLocalService.getByTitleStatusCategoriesTags(title,
+			status, categories, tags, companyId, groupId, userId, language,
+			isAdmin, andOperator, start, end);
+	}
+
+	public int countByTitleStatusCategoriesTags(java.lang.String title,
+		int status, long[] categories, long[] tags, long companyId,
+		long groupId, long userId, java.lang.String language, boolean isAdmin,
+		boolean andOperator) {
+		return _courseLocalService.countByTitleStatusCategoriesTags(title,
+			status, categories, tags, companyId, groupId, userId, language,
+			isAdmin, andOperator);
+	}
+
+	public java.util.List<com.liferay.portal.model.User> getStudents(
+		long courseId, long companyId, int start, int end) {
+		return _courseLocalService.getStudents(courseId, companyId, start, end);
+	}
+
+	public int countStudents(long courseId, long companyId) {
+		return _courseLocalService.countStudents(courseId, companyId);
+	}
+
 	/**
 	 * @deprecated Renamed to {@link #getWrappedService}
 	 */

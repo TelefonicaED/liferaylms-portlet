@@ -40,13 +40,13 @@
 	*/
 	
 	PortletURL portletURL = renderResponse.createRenderURL();
-	portletURL.setParameter("jspPage","/html/courseadmin/competencetab.jsp");
+	portletURL.setParameter("view","competence-tab");
 	portletURL.setParameter("courseId",Long.toString(primKey));
 	portletURL.setParameter("tabs1",tab);
 %>
 
 <portlet:renderURL var="adduserURL">
-	<portlet:param name="jspPage" value="/html/courseadmin/competenceresults.jsp" />
+	<portlet:param name="view" value="competence-results" />
 	<liferay-portlet:param name="courseId" value="<%=sPrimKey %>"></liferay-portlet:param>
 	<liferay-portlet:param name="tabs1" value="<%=tab %>"></liferay-portlet:param>
 	<liferay-portlet:param name="condition" value="<%=condition %>"></liferay-portlet:param>

@@ -52,7 +52,7 @@ DecimalFormat df = new DecimalFormat("#.#");
 Locale loc = response.getLocale();
  %>
 <div class="portlet-toolbar search-form">
-<%@ include file="/html/courseadmin/coursesearchform.jsp" %>
+<%@ include file="/html/generalstats/coursesearchform.jsp" %>
 <liferay-ui:success key="courseadmin.clone.confirmation.success" message="courseadmin.clone.confirmation.success" />
 <liferay-ui:error ></liferay-ui:error>
 <%

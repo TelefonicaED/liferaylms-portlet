@@ -5,7 +5,7 @@ long roleId=ParamUtil.getLong(request, "roleId",0);
 %>
 
 <liferay-portlet:renderURL var="buscarURL">
- <liferay-portlet:param name="jspPage" value="/html/courseadmin/usersresults.jsp" />
+ <liferay-portlet:param name="view" value="users-results" />
 <portlet:param name="courseId" value="<%=Long.toString(courseId) %>" />
 <portlet:param name="roleId" value="<%=Long.toString(roleId) %>" />
 </liferay-portlet:renderURL>

@@ -18,7 +18,7 @@ menu.append(assigned);
 
 <portlet:renderURL var="memebersURL">
 	<portlet:param name="courseId" value="<%=String.valueOf(primKey) %>" />
-	<portlet:param name="jspPage" value="/html/courseadmin/competencetab.jsp" />
+	<portlet:param name="view" value="competence-tab" />
 </portlet:renderURL>
 
 <liferay-portlet:renderURL var="backURL"></liferay-portlet:renderURL>

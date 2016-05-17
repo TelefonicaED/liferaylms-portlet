@@ -53,6 +53,7 @@ import com.liferay.lms.service.persistence.AuditEntryPersistence;
 import com.liferay.lms.service.persistence.CheckP2pMailingPersistence;
 import com.liferay.lms.service.persistence.CompetencePersistence;
 import com.liferay.lms.service.persistence.CourseCompetencePersistence;
+import com.liferay.lms.service.persistence.CourseFinder;
 import com.liferay.lms.service.persistence.CoursePersistence;
 import com.liferay.lms.service.persistence.CourseResultPersistence;
 import com.liferay.lms.service.persistence.LearningActivityPersistence;
@@ -504,6 +505,24 @@ public abstract class AuditEntryLocalServiceBaseImpl
 	 */
 	public void setCoursePersistence(CoursePersistence coursePersistence) {
 		this.coursePersistence = coursePersistence;
+	}
+
+	/**
+	 * Returns the course finder.
+	 *
+	 * @return the course finder
+	 */
+	public CourseFinder getCourseFinder() {
+		return courseFinder;
+	}
+
+	/**
+	 * Sets the course finder.
+	 *
+	 * @param courseFinder the course finder
+	 */
+	public void setCourseFinder(CourseFinder courseFinder) {
+		this.courseFinder = courseFinder;
 	}
 
 	/**
@@ -1483,6 +1502,8 @@ public abstract class AuditEntryLocalServiceBaseImpl
 	protected CourseService courseService;
 	@BeanReference(type = CoursePersistence.class)
 	protected CoursePersistence coursePersistence;
+	@BeanReference(type = CourseFinder.class)
+	protected CourseFinder courseFinder;
 	@BeanReference(type = CourseCompetenceLocalService.class)
 	protected CourseCompetenceLocalService courseCompetenceLocalService;
 	@BeanReference(type = CourseCompetenceService.class)

@@ -11,6 +11,7 @@
 	<bean id="com.liferay.lms.service.CourseLocalService" class="com.liferay.lms.service.impl.CourseLocalServiceImpl" />
 	<bean id="com.liferay.lms.service.CourseService" class="com.liferay.lms.service.impl.CourseServiceImpl" />
 	<bean id="com.liferay.lms.service.persistence.CoursePersistence" class="com.liferay.lms.service.persistence.CoursePersistenceImpl" parent="basePersistence" />
+	<bean id="com.liferay.lms.service.persistence.CourseFinder" class="com.liferay.lms.service.persistence.CourseFinderImpl" parent="basePersistence" />
 	<bean id="com.liferay.lms.service.CourseCompetenceLocalService" class="com.liferay.lms.service.impl.CourseCompetenceLocalServiceImpl" />
 	<bean id="com.liferay.lms.service.CourseCompetenceService" class="com.liferay.lms.service.impl.CourseCompetenceServiceImpl" />
 	<bean id="com.liferay.lms.service.persistence.CourseCompetencePersistence" class="com.liferay.lms.service.persistence.CourseCompetencePersistenceImpl" parent="basePersistence" />

@@ -390,4 +390,21 @@ public interface CourseLocalService extends BaseLocalService,
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.util.List<com.liferay.portal.model.User> getStudentsFromCourse(
 		long companyId, long courseGropupCreatedId);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.util.List<com.liferay.lms.model.Course> getByTitleStatusCategoriesTags(
+		java.lang.String title, int status, long[] categories, long[] tags,
+		long companyId, long groupId, long userId, java.lang.String language,
+		boolean isAdmin, boolean andOperator, int start, int end);
+
+	public int countByTitleStatusCategoriesTags(java.lang.String title,
+		int status, long[] categories, long[] tags, long companyId,
+		long groupId, long userId, java.lang.String language, boolean isAdmin,
+		boolean andOperator);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.util.List<com.liferay.portal.model.User> getStudents(
+		long courseId, long companyId, int start, int end);
+
+	public int countStudents(long courseId, long companyId);
 }

@@ -1,0 +1,219 @@
+<custom-sql>
+<!-- Query para la administración de cursos cuando eres administrador-->
+
+	<sql id="com.liferay.lms.service.persistence.CourseFinder.findAdministratorByT_S">
+		<![CDATA[   			
+			SELECT 
+				DISTINCT c.*
+			FROM 
+				lms_course c
+			[$JOINASSET$] 
+			[$JOINASSETCATEGORIES$] 
+			[$JOINASSETTAGS$]
+			[$JOINRESOURCEPERMISSION$]
+			WHERE 
+			( 
+				c.companyId = ? OR ? = 0 
+			) 
+			AND 
+			( 
+				c.groupId = ? OR ? = 0 
+			)
+			AND
+			(
+				((? = '') AND (? = -1) )
+				OR 
+				(? = true AND  
+						(? = '' OR ExtractValue(c.title, '//Title[@language-id=\"[$LANGUAGE$]\"]' ) LIKE ? OR ExtractValue(c.description, '//Description[@language-id=\"[$LANGUAGE$]\"]' ) LIKE ?) AND 
+						(? = -1 OR ? = c.closed) 
+						[$WHEREANDASSETCATEGORY$]
+						[$WHEREANDASSETTAG$]
+				) 
+				OR 
+				(? = false AND 
+					(ExtractValue(c.title, '//Title[@language-id=\"[$LANGUAGE$]\"]' ) LIKE ? OR ExtractValue(c.description, '//Description[@language-id=\"[$LANGUAGE$]\"]' ) LIKE ? OR ? = c.closed [$WHEREORASSETCATEGORY$] [$WHEREORASSETTAG$]) 
+				) 
+			) 
+			[$WHERERESOURCEPERMISSION$] 
+			ORDER BY EXTRACTVALUE(c.title, '//Title[@language-id=\"[$LANGUAGE$]\"]')
+			LIMIT [$START$], [$END$]
+		]]>
+	</sql>
+	
+		<sql id="com.liferay.lms.service.persistence.CourseFinder.countAdministratorByT_S">
+		<![CDATA[   			
+			SELECT 
+				COUNT(DISTINCT c.courseId) AS COUNT_VALUE
+			FROM 
+				lms_course c
+			[$JOINASSET$] 
+			[$JOINASSETCATEGORIES$] 
+			[$JOINASSETTAGS$]
+			[$JOINRESOURCEPERMISSION$]
+			WHERE 
+			( 
+				c.companyId = ? OR ? = 0 
+			) 
+			AND 
+			( 
+				c.groupId = ? OR ? = 0 
+			)
+			AND
+			(
+				((? = '') AND (? = -1) )
+				OR 
+				(? = true AND  
+						(? = '' OR ExtractValue(c.title, '//Title[@language-id=\"[$LANGUAGE$]\"]' ) LIKE ? OR ExtractValue(c.description, '//Description[@language-id=\"[$LANGUAGE$]\"]' ) LIKE ?) AND 
+						(? = -1 OR ? = c.closed) 
+						[$WHEREANDASSETCATEGORY$]
+						[$WHEREANDASSETTAG$]
+				) 
+				OR 
+				(? = false AND 
+					(ExtractValue(c.title, '//Title[@language-id=\"[$LANGUAGE$]\"]' ) LIKE ? OR ExtractValue(c.description, '//Description[@language-id=\"[$LANGUAGE$]\"]' ) LIKE ? OR ? = c.closed [$WHEREORASSETCATEGORY$] [$WHEREORASSETTAG$]) 
+				) 
+			) 
+			[$WHERERESOURCEPERMISSION$]
+		]]>
+	</sql>
+	
+	<sql id="com.liferay.lms.service.persistence.CourseFinder.joinC_ByAssetEntry">
+		<![CDATA[
+			INNER JOIN 
+				assetentry ae 
+					ON ae.classNameId = [$CLASSNAMECOURSEID$] 
+						AND ae.classPK = c.courseId
+		]]>
+	</sql>
+	<sql id="com.liferay.lms.service.persistence.CourseFinder.joinC_ByAssetCategory">
+		<![CDATA[
+			INNER JOIN 
+				assetentries_assetcategories aac 
+					ON aac.entryId = ae.entryId
+		]]>
+	</sql>
+	<sql id="com.liferay.lms.service.persistence.CourseFinder.joinC_ByAssetTag">
+		<![CDATA[
+			INNER JOIN 
+				assetentries_assettags aat 
+					ON aat.entryId = ae.entryId 
+		]]>
+	</sql>
+	<sql id="com.liferay.lms.service.persistence.CourseFinder.joinC_ByResourcePermission">
+		<![CDATA[
+			INNER JOIN 
+				resourcepermission rp 
+					ON rp.name = 'com.liferay.lms.model.Course' 
+						AND rp.companyId = [$COMPANYID$] 
+						AND ((primKey = c.courseId AND scope = 4) OR (primKey = [$COMPANYID$] AND scope = 1)) 
+						AND (actionIds & [$ACTIONPUBLISH$] || actionIds & [$ACTIONCOURSEEDITOR$] || actionIds & [$ACTIONASSIGN_MEMBERS$] || actionIds & [$ACTIONDELETE$]
+							|| actionIds & [$ACTIONPERMISSION$] || actionIds & [$ACTIONUPDATE$])
+			LEFT JOIN 
+				users_roles ur 
+					ON rp.roleId = ur.roleId 
+						AND ur.roleId 
+						AND ur.userId = [$USERID$]
+			LEFT JOIN 
+				usergrouprole ug 
+					ON ug.groupId = c.groupCreatedId 
+						AND ug.roleId = rp.roleId 
+						AND ug.userId = [$USERID$]
+			LEFT JOIN 
+				groups_roles gr 
+					ON gr.roleId = rp.roleId
+			LEFT JOIN 
+				group_ g 
+					ON gr.groupId = g.groupId
+			LEFT JOIN 
+				users_usergroups uug 
+					ON uug.userGroupId 
+						AND g.classPK AND g.classNameId = [$CLASSNAMEIDUSERGROUP$]
+						AND uug.userId = [$USERID$]
+			LEFT JOIN 
+				users_orgs uo 
+					ON uo.organizationId = g.classPK 
+						AND g.classNameId = [$CLASSNAMEIDORGANIZATION$] 
+						AND uo.userId = [$USERID$]
+			LEFT JOIN 
+				users_groups ug2 
+					ON ug2.groupId = g.classPK 
+						AND g.classNameId = [$CLASSNAMEIDGROUP$] 
+						AND ug2.userId = [$USERID$]
+		]]>
+	</sql>
+	<sql id="com.liferay.lms.service.persistence.CourseFinder.whereC_ByResourcePermission">
+		<![CDATA[
+			AND 
+			( 
+				ur.userId IS NOT NULL OR ug.userId IS NOT NULL OR uug.userGroupId IS NOT NULL OR uo.userId IS NOT NULL OR ug2.userId IS NOT NULL
+			)
+		]]>
+	</sql>
+	<sql id="com.liferay.lms.service.persistence.CourseFinder.whereC_ByAndAssetCategory">
+		<![CDATA[
+			AND aac.categoryId IN ([$CATEGORYIDS$])
+		]]>
+	</sql>
+	<sql id="com.liferay.lms.service.persistence.CourseFinder.whereC_ByAndAssetTag">
+		<![CDATA[
+			AND aat.tagId IN ([$TAGIDS$])
+		]]>
+	</sql>
+	<sql id="com.liferay.lms.service.persistence.CourseFinder.whereC_ByOrAssetCategory">
+		<![CDATA[
+			OR aac.categoryId IN ([$CATEGORYIDS$])
+		]]>
+	</sql>
+	<sql id="com.liferay.lms.service.persistence.CourseFinder.whereC_ByOrAssetTag">
+		<![CDATA[
+			OR aat.tagId IN ([$TAGIDS$])
+		]]>
+	</sql>
+	
+	<sql id="com.liferay.lms.service.persistence.CourseFinder.findStudents">
+		<![CDATA[   			
+			SELECT 
+				DISTINCT u.*
+			FROM 
+				lms_course co 
+			INNER JOIN 
+				users_groups ug 
+					ON co.groupCreatedId = ug.groupId
+			INNER JOIN 
+				user_ u 
+					ON u.userId = ug.userId
+			LEFT JOIN 
+				usergrouprole ur 
+					ON ug.userId = ur.userId AND ur.roleId= ?
+			LEFT JOIN 
+				usergrouprole urE 
+					ON ug.userId = urE.userId AND urE.roleId = ?
+			WHERE 
+				ur.userId IS NULL AND urE.userId IS NULL AND co.courseId = ? AND u.status = ?
+			ORDER BY u.firstName, u.middleName, u.lastName
+			LIMIT ?, ?
+		]]>
+	</sql>
+	<sql id="com.liferay.lms.service.persistence.CourseFinder.countStudents">
+		<![CDATA[   			
+			SELECT 
+				COUNT(DISTINCT u.userId) AS COUNT_VALUE
+			FROM 
+				lms_course co 
+			INNER JOIN 
+				users_groups ug 
+					ON co.groupCreatedId = ug.groupId
+			INNER JOIN 
+				user_ u 
+					ON u.userId = ug.userId
+			LEFT JOIN 
+				usergrouprole ur 
+					ON ug.userId = ur.userId AND ur.roleId= ?
+			LEFT JOIN 
+				usergrouprole urE 
+					ON ug.userId = urE.userId AND urE.roleId = ?
+			WHERE 
+				ur.userId IS NULL AND urE.userId IS NULL AND co.courseId = ? AND u.status = ?
+		]]>
+	</sql>
+</custom-sql>

@@ -23,68 +23,68 @@ import java.util.Arrays;
  */
 public class TestQuestionServiceClpInvoker {
 	public TestQuestionServiceClpInvoker() {
-		_methodName118 = "getBeanIdentifier";
+		_methodName120 = "getBeanIdentifier";
 
-		_methodParameterTypes118 = new String[] {  };
+		_methodParameterTypes120 = new String[] {  };
 
-		_methodName119 = "setBeanIdentifier";
+		_methodName121 = "setBeanIdentifier";
 
-		_methodParameterTypes119 = new String[] { "java.lang.String" };
+		_methodParameterTypes121 = new String[] { "java.lang.String" };
 
-		_methodName124 = "addQuestion";
+		_methodName126 = "addQuestion";
 
-		_methodParameterTypes124 = new String[] {
+		_methodParameterTypes126 = new String[] {
 				"long", "java.lang.String", "long"
 			};
 
-		_methodName125 = "getQuestions";
+		_methodName127 = "getQuestions";
 
-		_methodParameterTypes125 = new String[] { "long" };
+		_methodParameterTypes127 = new String[] { "long" };
 
-		_methodName126 = "getQuestion";
+		_methodName128 = "getQuestion";
 
-		_methodParameterTypes126 = new String[] { "long" };
+		_methodParameterTypes128 = new String[] { "long" };
 	}
 
 	public Object invokeMethod(String name, String[] parameterTypes,
 		Object[] arguments) throws Throwable {
-		if (_methodName118.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes118, parameterTypes)) {
+		if (_methodName120.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes120, parameterTypes)) {
 			return TestQuestionServiceUtil.getBeanIdentifier();
 		}
 
-		if (_methodName119.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes119, parameterTypes)) {
+		if (_methodName121.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes121, parameterTypes)) {
 			TestQuestionServiceUtil.setBeanIdentifier((java.lang.String)arguments[0]);
-		}
-
-		if (_methodName124.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes124, parameterTypes)) {
-			return TestQuestionServiceUtil.addQuestion(((Long)arguments[0]).longValue(),
-				(java.lang.String)arguments[1], ((Long)arguments[2]).longValue());
-		}
-
-		if (_methodName125.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes125, parameterTypes)) {
-			return TestQuestionServiceUtil.getQuestions(((Long)arguments[0]).longValue());
 		}
 
 		if (_methodName126.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes126, parameterTypes)) {
+			return TestQuestionServiceUtil.addQuestion(((Long)arguments[0]).longValue(),
+				(java.lang.String)arguments[1], ((Long)arguments[2]).longValue());
+		}
+
+		if (_methodName127.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes127, parameterTypes)) {
+			return TestQuestionServiceUtil.getQuestions(((Long)arguments[0]).longValue());
+		}
+
+		if (_methodName128.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes128, parameterTypes)) {
 			return TestQuestionServiceUtil.getQuestion(((Long)arguments[0]).longValue());
 		}
 
 		throw new UnsupportedOperationException();
 	}
 
-	private String _methodName118;
-	private String[] _methodParameterTypes118;
-	private String _methodName119;
-	private String[] _methodParameterTypes119;
-	private String _methodName124;
-	private String[] _methodParameterTypes124;
-	private String _methodName125;
-	private String[] _methodParameterTypes125;
+	private String _methodName120;
+	private String[] _methodParameterTypes120;
+	private String _methodName121;
+	private String[] _methodParameterTypes121;
 	private String _methodName126;
 	private String[] _methodParameterTypes126;
+	private String _methodName127;
+	private String[] _methodParameterTypes127;
+	private String _methodName128;
+	private String[] _methodParameterTypes128;
 }

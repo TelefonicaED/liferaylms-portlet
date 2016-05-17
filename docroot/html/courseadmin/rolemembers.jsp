@@ -1,3 +1,6 @@
+<%@page import="com.liferay.portlet.usersadmin.util.UsersAdminUtil"%>
+<%@page import="com.liferay.portal.kernel.util.OrderByComparator"%>
+<%@page import="com.liferay.portal.kernel.workflow.WorkflowConstants"%>
 <%@page import="com.liferay.portlet.PortletPreferencesFactoryUtil"%>
 <%@page import="javax.portlet.PortletPreferences"%>
 <%@page import="com.liferay.lms.service.LmsPrefsLocalServiceUtil"%>
@@ -38,37 +41,6 @@ if(roleId==commmanager.getRoleId()){
 }else{
 	tab = teacherName;
 }
-java.util.List<User> users=new java.util.ArrayList<User>();
-
-if(roleId!=commmanager.getRoleId())
-{
-List<UserGroupRole> ugrs=UserGroupRoleLocalServiceUtil.getUserGroupRolesByGroupAndRole(createdGroupId, roleId);
-
-users=new java.util.ArrayList<User>();
-for(UserGroupRole ugr:ugrs)
-{
-	users.add(ugr.getUser());
-}
-}
-else
-{
-	java.util.List<User> userst=UserLocalServiceUtil.getGroupUsers(createdGroupId);
-	
-	for(User usert:userst)
-	{
-		List<UserGroupRole> userGroupRoles = UserGroupRoleLocalServiceUtil.getUserGroupRoles(usert.getUserId(),createdGroupId);
-		boolean remove =false;
-		for(UserGroupRole ugr:userGroupRoles){
-			if(ugr.getRoleId()==prefs.getEditorRole()||ugr.getRoleId()==prefs.getTeacherRole()){
-				remove = true;
-				break;
-			}
-		}
-		if(!remove && user.isActive()){
-			users.add(usert);
-		}
-	}
-}
 
 %>
 <div class="container-toolbar" >
@@ -99,7 +71,7 @@ AUI().use(function(A)
 --></script>
 <%
 PortletURL portletURL = renderResponse.createRenderURL();
-portletURL.setParameter("jspPage","/html/courseadmin/rolememberstab.jsp");
+portletURL.setParameter("view","role-members-tab");
 portletURL.setParameter("courseId",Long.toString(courseId));
 portletURL.setParameter("backToEdit",Boolean.toString(backToEdit));
 if(backToEdit){
@@ -111,82 +83,95 @@ portletURL.setParameter("tabs1",tab);
 
 <liferay-ui:search-container emptyResultsMessage="there-are-no-users"
  delta="10" deltaConfigurable="true" iteratorURL="<%=portletURL%>">
-<liferay-ui:search-container-results>
-<%
-
-List<User> orderedUsers = new ArrayList<User>();
-orderedUsers.addAll(users);
-Collections.sort(orderedUsers, new Comparator<User>() {
-    @Override
-    public int compare(final User object1, final User object2) {
-        return object1.getFullName().toLowerCase().compareTo(object2.getFullName().toLowerCase());
-    }
-} );
-
-results = ListUtil.subList(orderedUsers, searchContainer.getStart(),
-searchContainer.getEnd());
-if(results.size()<=0){
-	results = ListUtil.subList(orderedUsers,0,searchContainer.getDelta());
-}
-total = users.size();
-pageContext.setAttribute("results", results);
-pageContext.setAttribute("total", total);
-%>
-</liferay-ui:search-container-results>
-<liferay-ui:search-container-row
-className="com.liferay.portal.model.User"
-keyProperty="userId"
-modelVar="user">
-<liferay-ui:search-container-column-text>
-<liferay-ui:user-display userId="<%=user.getUserId() %>"></liferay-ui:user-display>
-</liferay-ui:search-container-column-text>
-<liferay-ui:search-container-column-text>
-
-<liferay-ui:icon-menu>
-<%if(roleId==commmanager.getRoleId())
-{
-%>
-<liferay-portlet:renderURL  var="editInscriptionDatesURL"  windowState="<%= LiferayWindowState.POP_UP.toString() %>">
-	<liferay-portlet:param name="jspPage" value="/html/courseadmin/editinscriptiondates.jsp"/>
-	<liferay-portlet:param name="courseId" value="<%=Long.toString(courseId) %>"/>
-	<liferay-portlet:param name="userId" value="<%=Long.toString(user.getUserId()) %>"/>
-</liferay-portlet:renderURL>
-
-<%
-String inscrURL="javascript:changedates('" + editInscriptionDatesURL + "')";
-
-	PortletPreferences preferences = null;
-	String portletResource = ParamUtil.getString(request, "portletResource");
-
-	if (Validator.isNotNull(portletResource)) {
-		preferences = PortletPreferencesFactoryUtil.getPortletSetup(request, portletResource);
-	}else{
-		preferences = renderRequest.getPreferences();
+	<liferay-ui:search-container-results>
+	<%
+	
+	if(roleId!=commmanager.getRoleId()){
+		LinkedHashMap userParams = new LinkedHashMap();
+		
+		userParams.put("usersGroups", createdGroupId);
+		userParams.put("userGroupRole", new Long[]{createdGroupId, roleId});
+		
+		OrderByComparator orderByComparator =
+			UsersAdminUtil.getUserOrderByComparator(
+					"first-name,middle-name,last-name", "asc");
+		
+		results = UserLocalServiceUtil.search(themeDisplay.getCompanyId(), null, WorkflowConstants.STATUS_APPROVED, userParams, searchContainer.getStart(), searchContainer.getEnd(),orderByComparator);
+		total = UserLocalServiceUtil.searchCount(themeDisplay.getCompanyId(), null, WorkflowConstants.STATUS_APPROVED, userParams);
+	}
+	else
+	{
+		results = CourseLocalServiceUtil.getStudents(courseId, themeDisplay.getCompanyId(), searchContainer.getStart(), searchContainer.getEnd());
+		total = CourseLocalServiceUtil.countStudents(courseId, themeDisplay.getCompanyId());	
 	}
 	
-	boolean showCalendar 	= preferences.getValue("showCalendar",  "false").equals("true");
-	if(showCalendar){%>
-		<liferay-ui:icon image="calendar" url='<%=inscrURL %>' label="dates"></liferay-ui:icon>
-	<%}
-
-}
-%>
-<liferay-portlet:actionURL name="removeUserRole" var="removeUserRoleURL">
-	<liferay-portlet:param name="jspPage" value="/html/courseadmin/rolememberstab.jsp"/>
-	<liferay-portlet:param name="courseId" value="<%=Long.toString(courseId) %>"/>
-	<portlet:param name="backToEdit" value="<%=Boolean.toString(backToEdit) %>" />
-	<c:if test="<%=backToEdit %>">
-		<portlet:param name="redirectOfEdit" value='<%=redirectOfEdit %>'/>
-	</c:if>
-	<liferay-portlet:param name="userId" value="<%=Long.toString(user.getUserId()) %>"/>
-	<liferay-portlet:param name="roleId" value="<%=Long.toString(roleId) %>"/>
-	<liferay-portlet:param name="tabs1" value="<%=tab %>"/>
-</liferay-portlet:actionURL>
-<liferay-ui:icon-delete url="<%=removeUserRoleURL+\"&cur=\"+searchContainer.getCur() %>" label="delete"></liferay-ui:icon-delete>
-</liferay-ui:icon-menu>
-</liferay-ui:search-container-column-text>
-</liferay-ui:search-container-row>
-<liferay-ui:search-iterator />
+	pageContext.setAttribute("results", results);
+	pageContext.setAttribute("total", total);
+	%>
+	</liferay-ui:search-container-results>
+	<liferay-ui:search-container-row
+	className="com.liferay.portal.model.User"
+	keyProperty="userId"
+	modelVar="user">
+		<liferay-ui:search-container-column-text>
+			<liferay-ui:user-display userId="<%=user.getUserId() %>"></liferay-ui:user-display>
+		</liferay-ui:search-container-column-text>
+		<liferay-ui:search-container-column-text
+			name="screen-name"
+			property="screenName">
+		</liferay-ui:search-container-column-text>
+		
+		<liferay-ui:search-container-column-text
+			name="email-address"
+			property="emailAddress"
+		/>
+		<liferay-ui:search-container-column-text>
+			
+			<liferay-ui:icon-menu>
+			<%if(roleId==commmanager.getRoleId())
+			{
+			%>
+			<liferay-portlet:renderURL  var="editInscriptionDatesURL"  windowState="<%= LiferayWindowState.POP_UP.toString() %>">
+				<liferay-portlet:param name="jspPage" value="/html/courseadmin/editinscriptiondates.jsp"/>
+				<liferay-portlet:param name="courseId" value="<%=Long.toString(courseId) %>"/>
+				<liferay-portlet:param name="userId" value="<%=Long.toString(user.getUserId()) %>"/>
+			</liferay-portlet:renderURL>
+			
+			<%
+			String inscrURL="javascript:changedates('" + editInscriptionDatesURL + "')";
+			
+				PortletPreferences preferences = null;
+				String portletResource = ParamUtil.getString(request, "portletResource");
+			
+				if (Validator.isNotNull(portletResource)) {
+					preferences = PortletPreferencesFactoryUtil.getPortletSetup(request, portletResource);
+				}else{
+					preferences = renderRequest.getPreferences();
+				}
+				
+				boolean showCalendar 	= preferences.getValue("showCalendar",  "false").equals("true");
+				if(showCalendar){%>
+					<liferay-ui:icon image="calendar" url='<%=inscrURL %>' label="dates"></liferay-ui:icon>
+				<%}
+			
+			}
+			%>
+			<liferay-portlet:actionURL name="removeUserRole" var="removeUserRoleURL">
+				<liferay-portlet:param name="jspPage" value="/html/courseadmin/rolememberstab.jsp"/>
+				<liferay-portlet:param name="courseId" value="<%=Long.toString(courseId) %>"/>
+				<portlet:param name="backToEdit" value="<%=Boolean.toString(backToEdit) %>" />
+				<c:if test="<%=backToEdit %>">
+					<portlet:param name="redirectOfEdit" value='<%=redirectOfEdit %>'/>
+				</c:if>
+				<liferay-portlet:param name="userId" value="<%=Long.toString(user.getUserId()) %>"/>
+				<liferay-portlet:param name="roleId" value="<%=Long.toString(roleId) %>"/>
+				<liferay-portlet:param name="tabs1" value="<%=tab %>"/>
+			</liferay-portlet:actionURL>
+			<liferay-ui:icon-delete url="<%=removeUserRoleURL+\"&cur=\"+searchContainer.getCur() %>" label="delete"></liferay-ui:icon-delete>
+			</liferay-ui:icon-menu>
+		</liferay-ui:search-container-column-text>
+	</liferay-ui:search-container-row>
+	<liferay-ui:search-iterator />
 
 </liferay-ui:search-container>
 

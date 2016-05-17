@@ -43,13 +43,13 @@ if(tabs1.equals("1")){
 <liferay-portlet:renderURL var="backURL" >
 	<portlet:param name="courseId" value="<%=Long.toString(courseId) %>" />
 	<portlet:param name="tabs1" value="<%=tabs1 %>" />
-	<portlet:param name="jspPage" value="/html/courseadmin/competencetab.jsp" />
+	<portlet:param name="view" value="competence-tab" />
 </liferay-portlet:renderURL>
 
 <liferay-ui:header title="<%=course.getTitle(themeDisplay.getLocale()) %>" backURL="<%=backURL %>"></liferay-ui:header>
 
 <liferay-portlet:renderURL var="buscarURL">
-	<liferay-portlet:param name="jspPage" value="/html/courseadmin/competenceresults.jsp" />
+	<liferay-portlet:param name="view" value="competence-results" />
 	<portlet:param name="courseId" value="<%=Long.toString(courseId) %>" />
 	<portlet:param name="tabs1" value="<%=tabs1 %>" />
 </liferay-portlet:renderURL>
@@ -73,7 +73,7 @@ if(tabs1.equals("1")){
 
 <%
 PortletURL portletURL = renderResponse.createRenderURL();
-portletURL.setParameter("jspPage","/html/courseadmin/competenceresults.jsp");
+portletURL.setParameter("view","competence-results");
 portletURL.setParameter("courseId",Long.toString(courseId));
 portletURL.setParameter("condition",String.valueOf(condition));
 portletURL.setParameter("tabs1",tabs1);

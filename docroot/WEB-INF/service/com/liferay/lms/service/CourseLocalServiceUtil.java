@@ -474,6 +474,34 @@ public class CourseLocalServiceUtil {
 				   .getStudentsFromCourse(companyId, courseGropupCreatedId);
 	}
 
+	public static java.util.List<com.liferay.lms.model.Course> getByTitleStatusCategoriesTags(
+		java.lang.String title, int status, long[] categories, long[] tags,
+		long companyId, long groupId, long userId, java.lang.String language,
+		boolean isAdmin, boolean andOperator, int start, int end) {
+		return getService()
+				   .getByTitleStatusCategoriesTags(title, status, categories,
+			tags, companyId, groupId, userId, language, isAdmin, andOperator,
+			start, end);
+	}
+
+	public static int countByTitleStatusCategoriesTags(java.lang.String title,
+		int status, long[] categories, long[] tags, long companyId,
+		long groupId, long userId, java.lang.String language, boolean isAdmin,
+		boolean andOperator) {
+		return getService()
+				   .countByTitleStatusCategoriesTags(title, status, categories,
+			tags, companyId, groupId, userId, language, isAdmin, andOperator);
+	}
+
+	public static java.util.List<com.liferay.portal.model.User> getStudents(
+		long courseId, long companyId, int start, int end) {
+		return getService().getStudents(courseId, companyId, start, end);
+	}
+
+	public static int countStudents(long courseId, long companyId) {
+		return getService().countStudents(courseId, companyId);
+	}
+
 	public static void clearService() {
 		_service = null;
 	}

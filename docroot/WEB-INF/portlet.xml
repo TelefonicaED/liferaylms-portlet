@@ -832,8 +832,44 @@
 		<display-name>CourseAdmin</display-name>
 		<portlet-class>com.liferay.lms.CourseAdmin</portlet-class>
 		<init-param>
-			<name>view-jsp</name>
+			<name>view-template</name>
 			<value>/html/courseadmin/view.jsp</value>
+		</init-param>
+		<init-param>
+			<name>edit-course-template</name>
+			<value>/html/courseadmin/editcourse.jsp</value>
+		</init-param>
+		<init-param>
+			<name>role-members-tab-template</name>
+			<value>/html/courseadmin/rolememberstab.jsp</value>
+		</init-param>
+		<init-param>
+			<name>export-template</name>
+			<value>/html/courseadmin/export.jsp</value>
+		</init-param>
+		<init-param>
+			<name>import-template</name>
+			<value>/html/courseadmin/import.jsp</value>
+		</init-param>
+		<init-param>
+			<name>clone-template</name>
+			<value>/html/courseadmin/clone.jsp</value>
+		</init-param>
+		<init-param>
+			<name>competence-tab-template</name>
+			<value>/html/courseadmin/competencetab.jsp</value>
+		</init-param>
+		<init-param>
+			<name>import-users-template</name>
+			<value>/html/courseadmin/popups/importUsers.jsp</value>
+		</init-param>
+		<init-param>
+			<name>users-results-template</name>
+			<value>/html/courseadmin/usersresults.jsp</value>
+		</init-param>
+		<init-param>
+			<name>competence-results-template</name>
+			<value>/html/courseadmin/competenceresults.jsp</value>
 		</init-param>
 		<expiration-cache>0</expiration-cache>
 		<supports>

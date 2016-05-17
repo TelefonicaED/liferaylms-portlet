@@ -18,13 +18,13 @@
 <portlet:renderURL var="importUsersURL"  windowState="<%= LiferayWindowState.EXCLUSIVE.toString() %>">
 	<portlet:param name="courseId" value="<%=ParamUtil.getString(renderRequest, \"courseId\") %>" /> 
 	<portlet:param name="roleId" value="<%=Long.toString(roleId) %>" /> 
-	<portlet:param name="jspPage" value="/html/courseadmin/popups/importUsers.jsp" /> 
+	<portlet:param name="view" value="import-users" /> 
 </portlet:renderURL>
 
 <aui:fieldset>
 	<div class="bt_newuser">	
 		<portlet:renderURL var="adduserURL">
-			<portlet:param name="jspPage" value="/html/courseadmin/usersresults.jsp" />
+			<portlet:param name="view" value="users-results" />
 			<liferay-portlet:param name="courseId" value="<%=Long.toString(courseId) %>"></liferay-portlet:param>
 			<liferay-portlet:param name="roleId" value="<%=Long.toString(roleId) %>"></liferay-portlet:param>
 			<portlet:param name="backToEdit" value="<%=Boolean.toString(backToEdit) %>" />

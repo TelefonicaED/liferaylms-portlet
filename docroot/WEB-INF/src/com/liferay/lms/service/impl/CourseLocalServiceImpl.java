@@ -36,6 +36,8 @@ import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.lms.service.LmsPrefsLocalServiceUtil;
 import com.liferay.lms.service.ModuleLocalServiceUtil;
 import com.liferay.lms.service.base.CourseLocalServiceBaseImpl;
+import com.liferay.lms.service.persistence.CourseFinderUtil;
+import com.liferay.lms.service.persistence.CourseUtil;
 import com.liferay.portal.kernel.bean.PortletBeanLocatorUtil;
 import com.liferay.portal.kernel.dao.orm.CustomSQLParam;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
@@ -936,4 +938,25 @@ public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int e
 		
 		return students;
 	}
+	
+	public List<Course> getByTitleStatusCategoriesTags(String title, int status, long[] categories, long[] tags, long companyId, long groupId, long userId, String language, boolean isAdmin, boolean andOperator, int start, int end){
+		return CourseFinderUtil.findByT_S_C_T(title, status, categories, tags, companyId, groupId, userId, language, isAdmin, andOperator, start, end);
+	}
+	
+	public int countByTitleStatusCategoriesTags(String title, int status, long[] categories, long[] tags, long companyId, long groupId, long userId, String language, boolean isAdmin, boolean andOperator){
+		return CourseFinderUtil.countByT_S_C_T(title, status, categories, tags, companyId, groupId, userId, language, isAdmin, andOperator);
+	}
+	
+	public List<User> getStudents(long courseId, long companyId, int start, int end){
+		return CourseFinderUtil.findStudents(courseId, companyId, start, end);
+	}
+	
+	public int countStudents(long courseId, long companyId){
+		return CourseFinderUtil.countStudents(courseId, companyId);
+	}
 }
+
+
+
+
+

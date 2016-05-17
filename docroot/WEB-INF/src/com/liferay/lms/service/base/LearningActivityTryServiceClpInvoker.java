@@ -23,43 +23,43 @@ import java.util.Arrays;
  */
 public class LearningActivityTryServiceClpInvoker {
 	public LearningActivityTryServiceClpInvoker() {
-		_methodName118 = "getBeanIdentifier";
+		_methodName120 = "getBeanIdentifier";
 
-		_methodParameterTypes118 = new String[] {  };
+		_methodParameterTypes120 = new String[] {  };
 
-		_methodName119 = "setBeanIdentifier";
+		_methodName121 = "setBeanIdentifier";
 
-		_methodParameterTypes119 = new String[] { "java.lang.String" };
+		_methodParameterTypes121 = new String[] { "java.lang.String" };
 
-		_methodName124 = "createLearningActivityTry";
+		_methodName126 = "createLearningActivityTry";
 
-		_methodParameterTypes124 = new String[] { "long", "long" };
+		_methodParameterTypes126 = new String[] { "long", "long" };
 
-		_methodName125 = "getLearningActivityTries";
+		_methodName127 = "getLearningActivityTries";
 
-		_methodParameterTypes125 = new String[] { "long", "java.lang.String" };
+		_methodParameterTypes127 = new String[] { "long", "java.lang.String" };
 	}
 
 	public Object invokeMethod(String name, String[] parameterTypes,
 		Object[] arguments) throws Throwable {
-		if (_methodName118.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes118, parameterTypes)) {
+		if (_methodName120.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes120, parameterTypes)) {
 			return LearningActivityTryServiceUtil.getBeanIdentifier();
 		}
 
-		if (_methodName119.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes119, parameterTypes)) {
+		if (_methodName121.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes121, parameterTypes)) {
 			LearningActivityTryServiceUtil.setBeanIdentifier((java.lang.String)arguments[0]);
 		}
 
-		if (_methodName124.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes124, parameterTypes)) {
+		if (_methodName126.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes126, parameterTypes)) {
 			return LearningActivityTryServiceUtil.createLearningActivityTry(((Long)arguments[0]).longValue(),
 				((Long)arguments[1]).longValue());
 		}
 
-		if (_methodName125.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes125, parameterTypes)) {
+		if (_methodName127.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes127, parameterTypes)) {
 			return LearningActivityTryServiceUtil.getLearningActivityTries(((Long)arguments[0]).longValue(),
 				(java.lang.String)arguments[1]);
 		}
@@ -67,12 +67,12 @@ public class LearningActivityTryServiceClpInvoker {
 		throw new UnsupportedOperationException();
 	}
 
-	private String _methodName118;
-	private String[] _methodParameterTypes118;
-	private String _methodName119;
-	private String[] _methodParameterTypes119;
-	private String _methodName124;
-	private String[] _methodParameterTypes124;
-	private String _methodName125;
-	private String[] _methodParameterTypes125;
+	private String _methodName120;
+	private String[] _methodParameterTypes120;
+	private String _methodName121;
+	private String[] _methodParameterTypes121;
+	private String _methodName126;
+	private String[] _methodParameterTypes126;
+	private String _methodName127;
+	private String[] _methodParameterTypes127;
 }

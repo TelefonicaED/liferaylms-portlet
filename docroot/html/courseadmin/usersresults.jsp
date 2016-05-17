@@ -57,7 +57,7 @@ if(roleId==commmanager.getRoleId()){
 }
 
 PortletURL portletURL = renderResponse.createRenderURL();
-portletURL.setParameter("jspPage","/html/courseadmin/usersresults.jsp");
+portletURL.setParameter("view","users-results");
 //portletURL.setParameter("paginator","true");	
 portletURL.setParameter("firstName", firstName); 
 portletURL.setParameter("lastName", lastName);
@@ -210,15 +210,11 @@ if(backToEdit) {
 		});
 		
 	});
-	  
-
-	
-
 </script>
 
 
 <liferay-portlet:renderURL var="backURL" >
-	<portlet:param name="jspPage" value="/html/courseadmin/rolememberstab.jsp" />
+	<portlet:param name="view" value="role-members-tab" />
 	<portlet:param name="courseId" value="<%=Long.toString(courseId) %>" />
 	<portlet:param name="roleId" value="<%=Long.toString(roleId) %>" />
 	<portlet:param name="tabs1" value="<%=tab %>" />
@@ -269,7 +265,7 @@ if(backToEdit) {
 			emailAddress = addWildcards(emailAddress);
 		}
 		
-		LinkedHashMap<String,Object> params=new LinkedHashMap<String,Object>();			
+	LinkedHashMap<String,Object> params=new LinkedHashMap<String,Object>();			
 		
 	OrderByComparator obc = new UserFirstNameComparator(true);
 	
@@ -297,115 +293,118 @@ if(backToEdit) {
 		 
 		 
 	}
-
-           /*if (!tab.equals(teacherName)) {
-
-            params.put("notInCourseRoleTeach", new CustomSQLParam("WHERE User_.userId NOT IN "
-              + " (SELECT UserGroupRole.userId " + "  FROM UserGroupRole "
-              + "  WHERE  (UserGroupRole.groupId = ?) AND (UserGroupRole.roleId = ?))", new Long[] {
-              course.getGroupCreatedId(),
-              RoleLocalServiceUtil.getRole(prefs.getTeacherRole()).getRoleId() }));
-           }
-
-           if (!tab.equals(editorName)) {
-
-            params.put("notInCourseRoleEdit", new CustomSQLParam("WHERE User_.userId NOT IN "
-              + " (SELECT UserGroupRole.userId " + "  FROM UserGroupRole "
-              + "  WHERE  (UserGroupRole.groupId = ?) AND (UserGroupRole.roleId = ?))", new Long[] {
-              course.getGroupCreatedId(),
-              RoleLocalServiceUtil.getRole(prefs.getEditorRole()).getRoleId() }));
-           }*/
 		
 	params.put("notInCourseRole",new CustomSQLParam("WHERE User_.userId NOT IN "+
 		                                                " (SELECT UserGroupRole.userId "+
 		                                                "  FROM UserGroupRole "+
 		                                                "  WHERE  (UserGroupRole.groupId = ?) AND (UserGroupRole.roleId = ?))",new Long[]{course.getGroupCreatedId(),roleId}));
-		/*
-			if (new Long(roleId).equals(prefs.getTeacherRole()) || new Long(roleId).equals(prefs.getEditorRole())) {
-				params.put("inRole", new CustomSQLParam("WHERE User_.userId IN (SELECT UserGroupRole.userId "+
-		            "  FROM UserGroupRole "+
-		            "  WHERE UserGroupRole.roleId = ?)", new Long[]{roleId}));
-			}
-		*/
+
 		boolean showOnlyOrganizationUsers = preferences.getValue("showOnlyOrganizationUsers", "false").equals("true");
 		List <User> userListPage = new LinkedList<User>();
-		long usersLimit = LmsPrefsLocalServiceUtil.getLmsPrefs(themeDisplay.getCompanyId()).getUsersResults();
-		if(usersLimit < 1)
-			   usersLimit = 5000;
 		
 		if (showOnlyOrganizationUsers) {
-			
 			if (organization != null) {
-				//System.out.println("Muestro los usuarios de la organización");
-				//System.out.println(organization.getOrganizationId());
-				//System.out.println(organization.getName());
-				userListPage = UserLocalServiceUtil.getOrganizationUsers(organization.getOrganizationId());
-				/* pageContext.setAttribute("results", userListPage); */
-				pageContext.setAttribute("results", ListUtil.subList(userListPage, searchContainer.getStart(), searchContainer.getEnd()));
-		    	pageContext.setAttribute("total", userListPage.size());
+				params.put("usersOrgs", organization.getOrganizationId());
 			} else {
-				List<Organization> organizationsOfUerList = themeDisplay.getUser().getOrganizations();
-				Iterator<Organization> it = organizationsOfUerList.iterator();
-				List<User> listaUsuariosEnOrganizacion = null;
-				while (it.hasNext()) {
-					Organization org = it.next();
-					listaUsuariosEnOrganizacion = UserLocalServiceUtil.getOrganizationUsers(org.getOrganizationId());
-					Iterator<User> it2 = listaUsuariosEnOrganizacion.iterator();
-					while (it2.hasNext()) {
-						
-						userListPage.add(it2.next());
-					}
+				
+				long[] organizationsOfUserList = themeDisplay.getUser().getOrganizationIds();
+				String organizationIds = "";
+				for(long organizationId: organizationsOfUserList){
+					organizationIds += organizationId + ",";
 				}
-				/* pageContext.setAttribute("results", userListPage); */
-				pageContext.setAttribute("results", ListUtil.subList(userListPage, searchContainer.getStart(), searchContainer.getEnd()));
-	    		pageContext.setAttribute("total", userListPage.size());
+				if(organizationIds.length() > 0) organizationIds = organizationIds.substring(0, organizationIds.length()-1);
+				if(organizationIds.length() == 0)
+					organizationIds = "-1";
+					
+				params.put("multipleOrgs",new CustomSQLParam("WHERE User_.userId IN (SELECT users_orgs.userId FROM users_orgs WHERE users_orgs.organizationId IN (?)) ",organizationIds));
 			}
 
-			//OrganizationLocalServiceUtil.getOrganization(companyId, name);
-		} else {
-			/* userListPage = UserLocalServiceUtil.search(themeDisplay.getCompanyId(), firstName, middleName, lastName, screenName, emailAddress, 0, params, andSearch, searchContainer.getStart(), searchContainer.getEnd(), obc); */
-			userListPage = UserLocalServiceUtil.search(themeDisplay.getCompanyId(), firstName, middleName, lastName, screenName, emailAddress, 0, params, andSearch, QueryUtil.ALL_POS, QueryUtil.ALL_POS, obc);
-			int userCount =  UserLocalServiceUtil.searchCount(themeDisplay.getCompanyId(), firstName, middleName, lastName, screenName, emailAddress, 0, params, andSearch);
-			
-			/* pageContext.setAttribute("results", userListPage);  */
-			pageContext.setAttribute("results", ListUtil.subList(userListPage, searchContainer.getStart(), searchContainer.getEnd()));
-		    pageContext.setAttribute("total", userCount);
-
 		}
+		userListPage = UserLocalServiceUtil.search(themeDisplay.getCompanyId(), firstName, middleName, lastName, screenName, emailAddress, 0, params, andSearch, searchContainer.getStart(), searchContainer.getEnd(), obc);
+		int userCount =  UserLocalServiceUtil.searchCount(themeDisplay.getCompanyId(), firstName, middleName, lastName, screenName, emailAddress, 0, params, andSearch);
 		
-		if (userListPage.size() > usersLimit){
-			pageContext.setAttribute("results", null);
-		    pageContext.setAttribute("total", 0);
-		   	searchContainer.setEmptyResultsMessage(LanguageUtil.format(pageContext,"there-are-many-results", new Object[]{usersLimit}));
-		}
-		else{
-			for(User us:userListPage){
+		pageContext.setAttribute("results", userListPage);
+	    pageContext.setAttribute("total", userCount);
+
+		for(User us:userListPage){
+			
+			%> <input type="hidden" name="studentIdNameHidden" value='<%= us.getUserId() + "," + us.getFullName() %>' /> <%
 				
-				%> <input type="hidden" name="studentIdNameHidden" value='<%= us.getUserId() + "," + us.getFullName() %>' /> <%
-					
-			} 
-		}
+		} 
 	
 	%>
 		<input type="hidden" id="allSelected" value="false" />
 		</liferay-ui:search-container-results>
 		
 		<div class="container-buttons">
-			<aui:input type="checkbox" name="all" label="misc.search.all" checked="<%=false %>" onClick="setAllStudents()" style="Cursor:pointer;"/>
-		</div>
+			<aui:button name="buttonAddAll" value="courseadmin.add-all-users" onClick="${renderResponse.getNamespace()}addAllUsers();"/>
+		</div> 
+		<script type="text/javascript">
+			AUI().ready(
+			  'aui-tooltip',
+			  function(A) {
+			    new A.Tooltip(
+			      {
+			        bodyContent: '<liferay-ui:message key="courseadmin.tooltip.add-all-users" />',
+			        trigger: '#<portlet:namespace />buttonAddAll'
+			      }
+			    ).render();
+			  }
+			);
+			
+			function <portlet:namespace />addAllUsers(){
+				document.<portlet:namespace />addAllUserFm.<portlet:namespace />firstName.value = document.<portlet:namespace />busqusu.<portlet:namespace />firstName.value;
+				document.<portlet:namespace />addAllUserFm.<portlet:namespace />lastName.value = document.<portlet:namespace />busqusu.<portlet:namespace />lastName.value;
+				document.<portlet:namespace />addAllUserFm.<portlet:namespace />screenName.value = document.<portlet:namespace />busqusu.<portlet:namespace />screenName.value;
+				document.<portlet:namespace />addAllUserFm.<portlet:namespace />emailAddress.value = document.<portlet:namespace />busqusu.<portlet:namespace />emailAddress.value;
+				document.<portlet:namespace />addAllUserFm.<portlet:namespace />andSearch.value = document.<portlet:namespace />busqusu.<portlet:namespace />andSearch.value;
+				document.<portlet:namespace />addAllUserFm.submit();
+			}
+		</script>
+		
+		<liferay-portlet:actionURL name="addAllUsers" var="addAllUsersURL">
+			<liferay-portlet:param name="view" value="role-members-tab"/>
+			<liferay-portlet:param name="courseId" value="<%=Long.toString(courseId) %>"/>
+			<liferay-portlet:param name="roleId" value="<%=Long.toString(roleId) %>"/>
+			<liferay-portlet:param name="tabs1" value="<%=tab %>"/>
+			<liferay-portlet:param name="backToEdit" value="<%=Boolean.toString(backToEdit) %>" />
+			<c:if test="<%=backToEdit %>">
+				<liferay-portlet:param name="redirectOfEdit" value='<%=redirectOfEdit %>'/>
+			</c:if>
+		</liferay-portlet:actionURL>
+		
+		<aui:form action="${addAllUsersURL}" name="addAllUserFm" method="POST">
+			<aui:input type="hidden" name="firstName" value="" />
+			<aui:input type="hidden" name="lastName" value="" />
+			<aui:input type="hidden" name="screenName" value="" />
+			<aui:input type="hidden" name="emailAddress" value="" />
+			<aui:input type="hidden" name="andSearch" value="" />
+		</aui:form>
 		
 		<liferay-ui:search-container-row className="com.liferay.portal.model.User"
 	     		keyProperty="userId"
 	     		modelVar="user">
-	<liferay-ui:search-container-column-text name="user">
-	<liferay-ui:user-display userId="<%=user.getUserId() %>"></liferay-ui:user-display>
-	</liferay-ui:search-container-column-text> 
-	<liferay-ui:search-container-column-text>
-		<a id="<portlet:namespace />addUser_<%=user.getUserId() %>" onClick="<portlet:namespace />addUser(<%=user.getUserId() %>, '<%=user.getFullName() %>', false)" style="Cursor:pointer;" >
-		<liferay-ui:message key="select" /></a>
-		<a id="<portlet:namespace />deleteUser_<%=user.getUserId() %>" class="aui-helper-hidden" onClick="<portlet:namespace />deleteUser(<%=user.getUserId() %>, false)" style="Cursor:pointer;" >
-		<liferay-ui:message key="groupmailing.deselect" /></a>	
-	</liferay-ui:search-container-column-text>
+	     		
+			<liferay-ui:search-container-column-text name="user">
+				<liferay-ui:user-display userId="<%=user.getUserId() %>"></liferay-ui:user-display>
+			</liferay-ui:search-container-column-text> 
+			
+			<liferay-ui:search-container-column-text
+				name="screen-name"
+				property="screenName">
+			</liferay-ui:search-container-column-text>
+			
+			<liferay-ui:search-container-column-text
+				name="email-address"
+				property="emailAddress"
+			/>
+			<liferay-ui:search-container-column-text>
+				<a id="<portlet:namespace />addUser_<%=user.getUserId() %>" onClick="<portlet:namespace />addUser(<%=user.getUserId() %>, '<%=user.getFullName() %>', false)" style="Cursor:pointer;" >
+				<liferay-ui:message key="select" /></a>
+				<a id="<portlet:namespace />deleteUser_<%=user.getUserId() %>" class="aui-helper-hidden" onClick="<portlet:namespace />deleteUser(<%=user.getUserId() %>, false)" style="Cursor:pointer;" >
+				<liferay-ui:message key="groupmailing.deselect" /></a>	
+			</liferay-ui:search-container-column-text>
+			
 		</liferay-ui:search-container-row>
 	 	<liferay-ui:search-iterator />	 	
 	 	<script type="text/javascript">
@@ -479,40 +478,11 @@ if(backToEdit) {
 	
 				AUI().ready('aui-io-request','querystring-parse','aui-parse-content',<portlet:namespace />ajaxMode<%= searchContainer.getId(request, renderResponse.getNamespace()) %>SearchContainer);
 			//-->
-	
-		function setAllStudents(){
-			
-			var allUsers = document.getElementsByName("studentIdNameHidden");
-			var allSelected =new String(document.getElementById("allSelected").value);
-			var todos = true;
-			if(allSelected=="false"){				
-				for(var i = 0; i < allUsers.length; i++) {
-				    var userData = allUsers[i].value.split(",");
-				    var userId = userData[0];
-				    var userName = userData[1];
-				    /* <portlet:namespace />addUser(userId,userName); */
-					<portlet:namespace />addUser(userId,userName,todos);
-				};
-				document.getElementById("allSelected").value='true';
-			}
-			else
-			{
-				for(var i = 0; i < allUsers.length; i++) {
-				    var userData = allUsers[i].value.split(",");
-				    var userId = userData[0];
-				    var userName = userData[1];
-				    /* <portlet:namespace />deleteUser(userId,userName); */
-					<portlet:namespace />deleteUser(userId,todos);
-				};
-				document.getElementById("allSelected").value='false';			
-			}
-		};
-	
 			</script>
 	</liferay-ui:search-container>
 	
 	<liferay-portlet:actionURL name="addUserRole" var="addUserRoleURL">
-		<liferay-portlet:param name="jspPage" value="/html/courseadmin/rolememberstab.jsp"/>
+		<liferay-portlet:param name="view" value="role-members-tab"/>
 		<liferay-portlet:param name="courseId" value="<%=Long.toString(courseId) %>"/>
 		<liferay-portlet:param name="userId" value="<%=Long.toString(user.getUserId()) %>"/>
 		<liferay-portlet:param name="roleId" value="<%=Long.toString(roleId) %>"/>
