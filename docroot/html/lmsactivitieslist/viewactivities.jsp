@@ -305,9 +305,9 @@ function <portlet:namespace />upActivity(actId){
 					result = learningActivityResult.getResult();
 					tries = activity.getTries();
 					userTried = Long.valueOf(LearningActivityTryLocalServiceUtil.getTriesCountByActivityAndUser(activity.getActId(),themeDisplay.getUserId()));
+					
+					status="started";
 					if(learningActivityResult.getEndDate()!=null){
-						status="started";
-					}else{
 						if (learningActivityResult.isPassed()) {
 							status = "passed";
 						}

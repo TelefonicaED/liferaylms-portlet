@@ -79,6 +79,7 @@ import com.liferay.portlet.announcements.model.AnnouncementsEntry;
 import com.liferay.portlet.announcements.model.AnnouncementsFlagConstants;
 import com.liferay.portlet.announcements.service.AnnouncementsEntryServiceUtil;
 import com.liferay.portlet.announcements.service.AnnouncementsFlagLocalServiceUtil;
+import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
 import com.liferay.portlet.social.service.SocialActivityLocalServiceUtil;
 import com.liferay.util.LmsLocaleUtil;
 
@@ -538,7 +539,8 @@ public class LearningActivityLocalServiceImpl extends LearningActivityLocalServi
 				ResourceConstants.SCOPE_INDIVIDUAL, lernact.getPrimaryKey());
 		assetEntryLocalService.deleteEntry(
 				LearningActivity.class.getName(), lernact.getActId());
-		learningActivityPersistence.remove(lernact);
+		
+		LearningActivityUtil.remove(lernact.getActId());
 		SocialActivityLocalServiceUtil.addActivity(
 				lernact.getUserId(), lernact.getGroupId(),
 				LearningActivity.class.getName(), lernact.getActId(),
