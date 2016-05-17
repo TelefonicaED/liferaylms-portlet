@@ -19,6 +19,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
+import org.jfree.util.Log;
+
 import com.liferay.lms.NoSuchLearningActivityException;
 import com.liferay.lms.auditing.AuditConstants;
 import com.liferay.lms.auditing.AuditingLogFactory;
@@ -71,6 +73,21 @@ import com.liferay.portal.service.UserLocalServiceUtil;
  */
 public class LearningActivityTryLocalServiceImpl
 	extends LearningActivityTryLocalServiceBaseImpl {
+	
+	public LearningActivityTry softUpdateLearningActivityTry(LearningActivityTry learningActivityTry) throws SystemException {		
+		
+		LearningActivityTry lar = super.updateLearningActivityTry(learningActivityTry, true);
+		
+		//auditing
+		ServiceContext serviceContext = ServiceContextThreadLocal.getServiceContext();
+		if(serviceContext!=null){
+			AuditingLogFactory.audit(serviceContext.getCompanyId(), serviceContext.getScopeGroupId(), LearningActivityTry.class.getName(), 
+									 learningActivityTry.getLatId(), serviceContext.getUserId(), AuditConstants.UPDATE, null);
+		}
+		
+		return lar;
+	}
+	
 	@Override
 	public LearningActivityTry updateLearningActivityTry(
 			LearningActivityTry learningActivityTry) throws SystemException {
@@ -148,7 +165,7 @@ public class LearningActivityTryLocalServiceImpl
 		//auditing
 		ServiceContext serviceContext = ServiceContextThreadLocal.getServiceContext();
 		if(serviceContext!=null){
-			AuditingLogFactory.audit(serviceContext.getCompanyId(), serviceContext.getScopeGroupId(), LearningActivityResult.class.getName(), 
+			AuditingLogFactory.audit(serviceContext.getCompanyId(), serviceContext.getScopeGroupId(), LearningActivityTry.class.getName(), 
 					learningActivityTry.getLatId(), serviceContext.getUserId(), AuditConstants.UPDATE, null);
 		}	
 		
@@ -228,17 +245,22 @@ public class LearningActivityTryLocalServiceImpl
 					.addOrder(PropertyFactoryUtil.forName("startDate").desc());
 					
 		List<LearningActivityTry> activities = (List<LearningActivityTry>)learningActivityTryPersistence.findWithDynamicQuery(consulta);
+				
 		LearningActivityTry  lastTry=null;
-		if(activities!=null && activities.size()>0)
-		{
+		if(activities!=null && activities.size()>0){
 		   lastTry=activities.get(0);
+			for(LearningActivityTry lat:activities){
+				if(lat.getEndDate() == null){
+					Log.debug("::CERRANDO EL LearningActivityTry:"+lat.getLatId());
+					lat.setEndDate(lat.getStartDate());
+					super.updateLearningActivityTry(lat, true);
+				}
+			}
 		}
-		if(lastTry==null)
-		{
+		
+		if(lastTry==null){
 			return createLearningActivityTry(actId, serviceContext);
-		}
-		else
-		{
+		}else{
 			LearningActivityTry newTry=createLearningActivityTry(actId, serviceContext);
 			newTry.setResult(lastTry.getResult());
 			newTry.setTryData(lastTry.getTryData());
@@ -352,5 +374,15 @@ public class LearningActivityTryLocalServiceImpl
 			}
 		}
 		return resp;		
+	}
+	
+	public List<LearningActivityTry> getByUserId(long userId){
+		try {
+			return learningActivityTryPersistence.findByUserId(userId);
+		} catch (SystemException e) {
+			e.printStackTrace();
+		}
+		
+		return new ArrayList<LearningActivityTry>();
 	}
 }

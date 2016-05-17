@@ -55,7 +55,7 @@ public class SurveyLearningActivityType extends BaseLearningActivityType {
 	}
 	
 	@Override
-	public void setExtraContent(UploadRequest uploadRequest,
+	public String setExtraContent(UploadRequest uploadRequest,
 			PortletResponse portletResponse, LearningActivity learningActivity)
 			throws NumberFormatException, Exception {
 		
@@ -91,6 +91,8 @@ public class SurveyLearningActivityType extends BaseLearningActivityType {
 				rootElement.add(teamElement);
 			}
 			learningActivity.setExtracontent(document.formattedString());
+			
+			return null;
 	}
 	
 	@Override

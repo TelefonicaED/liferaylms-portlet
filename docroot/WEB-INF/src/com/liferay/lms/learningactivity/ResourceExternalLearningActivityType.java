@@ -97,7 +97,7 @@ public class ResourceExternalLearningActivityType extends BaseLearningActivityTy
 
 	
 	@Override
-	public void setExtraContent(UploadRequest uploadRequest, PortletResponse portletResponse, LearningActivity learningActivity) {
+	public String setExtraContent(UploadRequest uploadRequest, PortletResponse portletResponse, LearningActivity learningActivity) {
 		/**
 		 * 	Todo esto te viene a continuación te puede resultar un poco confuso, pero el desarrollo siguiente debe ser compatible 
 		 *  con otras configuraciones de esta actividad.
@@ -183,11 +183,11 @@ public class ResourceExternalLearningActivityType extends BaseLearningActivityTy
 					} catch (PortalException e) {
 						if(log.isDebugEnabled())e.printStackTrace();
 						if(log.isErrorEnabled())log.error(e.getMessage());
-						return;
+						return null;
 					} catch (SystemException e) {
 						if(log.isDebugEnabled())e.printStackTrace();
 						if(log.isErrorEnabled())log.error(e.getMessage());
-						return;
+						return null;
 					}
 					
 					
@@ -385,6 +385,8 @@ public class ResourceExternalLearningActivityType extends BaseLearningActivityTy
 					if(log.isErrorEnabled())log.error(e.getMessage());
 				}	
 			}
+			
+			return null;
 	}
 	
 	private long createDLFolders(Long userId,Long repositoryId,PortletRequest portletRequest,long actId) throws PortalException, SystemException{

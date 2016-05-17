@@ -2,10 +2,12 @@
 package com.liferay.lms;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -20,6 +22,8 @@ import javax.portlet.PortletException;
 import javax.portlet.ProcessEvent;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
+import javax.portlet.ResourceRequest;
+import javax.portlet.ResourceResponse;
 import javax.portlet.WindowState;
 import javax.xml.namespace.QName;
 
@@ -46,6 +50,8 @@ import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
+import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.messaging.Message;
@@ -162,7 +168,7 @@ public class LmsActivitiesList extends MVCPortlet {
 			Enumeration<String> parNames2= uploadRequest.getParameterNames();
 			while(parNames2.hasMoreElements()){
 				String paramName=parNames2.nextElement();
-				System.out.println(paramName+"::"+uploadRequest.getParameter(paramName));
+				log.debug(paramName+"::"+uploadRequest.getParameter(paramName));
 			}
 		}
 		
@@ -189,6 +195,14 @@ public class LmsActivitiesList extends MVCPortlet {
 	
 		String assetTagNames = uploadRequest.getParameter("assetTagNames");
 
+		
+		long maxSize = ParamUtil.getLong(uploadRequest, "maxSize", -1);
+		
+		if(maxSize<0){
+			SessionErrors.add(actionRequest, "activity-title-required");
+			return;
+		}
+		
 		if (assetTagNames != null) {
 			serviceContext.setAssetTagNames(StringUtil.split(assetTagNames));
 		}
@@ -208,7 +222,6 @@ public class LmsActivitiesList extends MVCPortlet {
 		long actId = ParamUtil.getLong(uploadRequest, "resId", 0);
 		long moduleId = ParamUtil.getLong(uploadRequest, "resModuleId", 0);
 		long weightinmodule=ParamUtil.getLong(uploadRequest, "weightinmodule", 0);
-		long visibility=ParamUtil.getLong(uploadRequest, "visibility", 0);
 
 		long precedence=ParamUtil.getLong(uploadRequest, "precedence", 0);
 		
@@ -313,9 +326,7 @@ public class LmsActivitiesList extends MVCPortlet {
 			}
 						
 			learningActivityType=new LearningActivityTypeRegistry().getLearningActivityType(type);
-		}
-		else
-		{		
+		}else{		
 			learningActivityType=new LearningActivityTypeRegistry().
 					getLearningActivityType(LearningActivityLocalServiceUtil.getLearningActivity(actId).getTypeId());
 		}
@@ -327,17 +338,13 @@ public class LmsActivitiesList extends MVCPortlet {
 		}
 		
 		
-		if (actId == 0) 
-		{
+		if (actId == 0){
 
-			if(permissionChecker.hasPermission(
-					themeDisplay.getScopeGroupId(),
-					Module.class.getName(), moduleId,
-					"ADD_LACT"))
-			{
-			larn =LearningActivityLocalServiceUtil.addLearningActivity(
-				"", "", ahora, startDate, stopDate, type, tries, passpuntuation, moduleId, "", feedbackCorrect, feedbackNoCorrect, serviceContext);
+			if(permissionChecker.hasPermission(themeDisplay.getScopeGroupId(),Module.class.getName(), moduleId,"ADD_LACT")){
+				larn =LearningActivityLocalServiceUtil.addLearningActivity(
+						"", "", ahora, startDate, stopDate, type, tries, passpuntuation, moduleId, "", feedbackCorrect, feedbackNoCorrect, serviceContext);
 			}
+			
 			long teamId =ParamUtil.get(uploadRequest, "team", 0);
 			//Leemos del portal.properties el estado del permiso VIEW por defecto para siteMember en las actividades nuevas (si no existe, por defecto ser�n visibles)
 			boolean hideStr = Boolean.parseBoolean(PrefsPropsUtil.getString("learningactivity.default.hidenewactivity", "false"));
@@ -365,9 +372,7 @@ public class LmsActivitiesList extends MVCPortlet {
 				}
 			}
 				
-		}
-		else 
-		{
+		}else{
 			LearningActivity tmp =	LearningActivityLocalServiceUtil.getLearningActivity(actId);
 			if(permissionChecker.hasPermission(
 					themeDisplay.getScopeGroupId(),
@@ -412,15 +417,13 @@ public class LmsActivitiesList extends MVCPortlet {
 		larn.setPrecedence(precedence);
 		Enumeration<String> parNames= uploadRequest.getParameterNames();
 		
-		while(parNames.hasMoreElements())
-		{
-		  String paramName=parNames.nextElement();
-		  if(paramName.startsWith("title_")&&paramName.length()>6)
-		  { 
-			  String language=paramName.substring(6);
-			  Locale locale=LocaleUtil.fromLanguageId(language);
-			  larn.setTitle( uploadRequest.getParameter(paramName),locale);
-		  }
+		while(parNames.hasMoreElements()){
+			String paramName=parNames.nextElement();
+			if(paramName.startsWith("title_")&&paramName.length()>6) { 
+				String language=paramName.substring(6);
+				Locale locale=LocaleUtil.fromLanguageId(language);
+				larn.setTitle( uploadRequest.getParameter(paramName),locale);
+			}
 		}
 		
 		//descomentar si se permiten llamadas por webservice, ademas a�adir booleano editionBlocked en los metodos setExtraContent de las actividades
@@ -428,43 +431,42 @@ public class LmsActivitiesList extends MVCPortlet {
 		/*boolean setExtraContent = false;
 		if(actId == 0) setExtraContent = true;
 		else setExtraContent = LearningActivityLocalServiceUtil.canBeEdited(larn, user.getUserId());
-		if(setExtraContent)*/
-		learningActivityType.setExtraContent(uploadRequest,actionResponse,larn);
+		if(setExtraContent)*/		
+		
+		String extraContentError = learningActivityType.setExtraContent(uploadRequest,actionResponse,larn);
+		
+		if(Validator.isNotNull(extraContentError)){
+			SessionErrors.add(actionRequest, extraContentError);
+		}
+		
 		//Seteamos permiso de view a quien corresponda.
 		long teamId =ParamUtil.get(uploadRequest, "team", 0);
 		//Leemos del portal.properties el estado del permiso VIEW por defecto para siteMember en las actividades nuevas (si no existe, por defecto ser�n visibles)
 		boolean hideStr = Boolean.parseBoolean(PrefsPropsUtil.getString("learningactivity.default.hidenewactivity", "false"));
 		Role siteMemberRole = RoleLocalServiceUtil.getRole(themeDisplay.getCompanyId(), RoleConstants.SITE_MEMBER);
 		if(teamId==0){
-			if(hideStr)
-			{
+			if(hideStr){
 					ResourcePermissionLocalServiceUtil.removeResourcePermission(siteMemberRole.getCompanyId(), LearningActivity.class.getName(), 
 					ResourceConstants.SCOPE_INDIVIDUAL,	Long.toString(larn.getActId()),siteMemberRole.getRoleId(), ActionKeys.VIEW);	
-			}
-			else ResourcePermissionLocalServiceUtil.setResourcePermissions(siteMemberRole.getCompanyId(), LearningActivity.class.getName(), 
+			}else{ResourcePermissionLocalServiceUtil.setResourcePermissions(siteMemberRole.getCompanyId(), LearningActivity.class.getName(), 
 						ResourceConstants.SCOPE_INDIVIDUAL,	Long.toString(larn.getActId()),siteMemberRole.getRoleId(), new String[] {ActionKeys.VIEW});
-		}
-		else{
+			}
+		}else{
 			Team t = TeamLocalServiceUtil.getTeam(teamId);
 			Role teamMemberRole = RoleLocalServiceUtil.getTeamRole(t.getCompanyId(), t.getTeamId());
-			if(hideStr)
-			{
+			if(hideStr){
 				ResourcePermissionLocalServiceUtil.removeResourcePermission(t.getCompanyId(), LearningActivity.class.getName(), 
 						ResourceConstants.SCOPE_INDIVIDUAL,	Long.toString(actId),teamMemberRole.getRoleId(), ActionKeys.VIEW);	
-			}else {
+			}else{
 				String[] actIds = {ActionKeys.VIEW};
 				ResourcePermissionLocalServiceUtil.setResourcePermissions(t.getCompanyId(), LearningActivity.class.getName(), 
 						ResourceConstants.SCOPE_INDIVIDUAL,	Long.toString(actId),teamMemberRole.getRoleId(), actIds);
 			}
 		}
-		if(permissionChecker.hasPermission(
-				themeDisplay.getScopeGroupId(),
-				LearningActivity.class.getName(), larn.getActId(),
-				ActionKeys.UPDATE)||permissionChecker.hasOwnerPermission(
-						themeDisplay.getCompanyId(),
-						LearningActivity.class.getName(), larn.getActId(),larn.getUserId(),
-						ActionKeys.UPDATE)||isnew)
-		{
+		
+		if(permissionChecker.hasPermission(themeDisplay.getScopeGroupId(),LearningActivity.class.getName(), larn.getActId(),ActionKeys.UPDATE)
+				||permissionChecker.hasOwnerPermission(themeDisplay.getCompanyId(),LearningActivity.class.getName(), larn.getActId(),larn.getUserId(),ActionKeys.UPDATE)
+				||isnew){
 			LearningActivityLocalServiceUtil.updateLearningActivity(larn);
 			learningActivityType.afterInsertOrUpdate(uploadRequest,actionResponse,larn);
 		}
@@ -479,10 +481,8 @@ public class LmsActivitiesList extends MVCPortlet {
 		if (Validator.isNotNull(redirect)) {
 			if (!windowState.equals(LiferayWindowState.POP_UP)) {
 				actionResponse.sendRedirect(redirect);
-			}
-			else {
+			}else {
 				redirect = PortalUtil.escapeRedirect(redirect);
-
 				if (Validator.isNotNull(redirect)) {
 					actionResponse.sendRedirect(redirect);
 				}
@@ -597,13 +597,14 @@ public class LmsActivitiesList extends MVCPortlet {
 		throws Exception {
 
 		long actId = ParamUtil.getLong(actionRequest, "resId");
-		long renderActId = ParamUtil.getLong(actionRequest, "actId",0); 
+		long renderActId = ParamUtil.getLong(actionRequest, "actId",0);
+		long moduleId = ParamUtil.getLong(actionRequest, "moduleId", 0);
+
 		ThemeDisplay themeDisplay = (ThemeDisplay) actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
-		
+
 		PermissionChecker permissionChecker=themeDisplay.getPermissionChecker();
-		
-		if(actId>0)
-		{
+
+		if(actId>0){
 			LearningActivity larn = LearningActivityLocalServiceUtil.getLearningActivity(actId);
 			if(permissionChecker.hasPermission(larn.getGroupId(), LearningActivity.class.getName(), larn.getActId(),
 					ActionKeys.DELETE)|| permissionChecker.hasOwnerPermission(larn.getCompanyId(), LearningActivity.class.getName(), larn.getActId(),larn.getUserId(),
@@ -612,14 +613,27 @@ public class LmsActivitiesList extends MVCPortlet {
 				LearningActivityType learningActivityType=new LearningActivityTypeRegistry().
 						getLearningActivityType(larn.getTypeId());
 				learningActivityType.deleteResources(actionRequest, actionResponse, larn);
+				List<LearningActivity> precedences = LearningActivityLocalServiceUtil.getByPrecedence(actId);
 				
+				if(precedences!=null && precedences.size()>0){
+					for(LearningActivity precedence : precedences){
+						precedence.setPrecedence(0);
+						LearningActivityLocalServiceUtil.updateLearningActivity(precedence);
+					}
+				}
 				LearningActivityServiceUtil.deleteLearningactivity(actId);
-	
+				SessionMessages.add(actionRequest, "ok-deleteActivity");
 				//auditing
 				AuditingLogFactory.audit(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(), LearningActivity.class.getName(), actId, themeDisplay.getUserId(), AuditConstants.DELETE, null);
 				
 				if(actId==renderActId) {
-					actionResponse.removePublicRenderParameter("actId");				
+					List<LearningActivity> activities = LearningActivityLocalServiceUtil.getLearningActivitiesOfModule(moduleId);
+					actionResponse.removePublicRenderParameter("actId");		
+					if(activities!=null && activities.size()>0){
+						actionResponse.setRenderParameter("actId", String.valueOf(activities.get(0).getActId()));
+					}else{
+						actionResponse.setRenderParameter("actId", "0");
+					}
 				}
 				
 				if(!LiferayWindowState.EXCLUSIVE.equals(actionRequest.getWindowState())){
@@ -629,49 +643,53 @@ public class LmsActivitiesList extends MVCPortlet {
 				}
 			}
 		}
-	}
 	
-	public void upactivity(ActionRequest actionRequest, ActionResponse actionResponse)
-	throws Exception {
-	ThemeDisplay themeDisplay = (ThemeDisplay) actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
+	}
 		
+	public void serveResource(ResourceRequest request, ResourceResponse response) throws PortletException,IOException{
+		
+		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(WebKeys.THEME_DISPLAY);
+		
+		long actId = ParamUtil.getLong(request, "actId");
+		String action = ParamUtil.getString(request, "action");
+		
+		log.error("Act ID "+actId);
 		PermissionChecker permissionChecker=themeDisplay.getPermissionChecker();
-		
-		long actId = ParamUtil.getLong(actionRequest, "resId",0);
-		
+		JSONObject oreturned = JSONFactoryUtil.createJSONObject();	
+		boolean changed=false;
 		if(actId>0)
 		{	
-			LearningActivity larn = LearningActivityLocalServiceUtil.getLearningActivity(actId);
-		
-			if(permissionChecker.hasPermission(larn.getGroupId(), LearningActivity.class.getName(), larn.getActId(),
-					ActionKeys.UPDATE)|| permissionChecker.hasOwnerPermission(larn.getCompanyId(), LearningActivity.class.getName(), larn.getActId(),larn.getUserId(),
-							ActionKeys.UPDATE))
-			{
-			LearningActivityLocalServiceUtil.goUpLearningActivity(actId, themeDisplay.getUserId());
+			try{
+				LearningActivity larn = LearningActivityLocalServiceUtil.getLearningActivity(actId);
+				if(permissionChecker.hasPermission(larn.getGroupId(), LearningActivity.class.getName(), larn.getActId(),
+						ActionKeys.UPDATE)|| permissionChecker.hasOwnerPermission(larn.getCompanyId(), LearningActivity.class.getName(), larn.getActId(),larn.getUserId(),
+								ActionKeys.UPDATE))
+				{
+					if(action.equals("down")){
+						LearningActivityLocalServiceUtil.goDownLearningActivity(actId, themeDisplay.getUserId());
+						changed=true;	
+					}else if(action.equals("up")){
+						LearningActivityLocalServiceUtil.goUpLearningActivity(actId, themeDisplay.getUserId());
+						changed=true;
+					}
+					
+				}								
+			}catch(Exception e){
+				e.printStackTrace();
+				throw new PortletException(e.getMessage());
 			}
 		}
-	}
-	
-	public void downactivity(ActionRequest actionRequest, ActionResponse actionResponse)
-	throws Exception {
-	ThemeDisplay themeDisplay = (ThemeDisplay) actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
-		
-		PermissionChecker permissionChecker=themeDisplay.getPermissionChecker();
-		
-		long actId = ParamUtil.getLong(actionRequest, "resId",0);
-	
-		if(actId>0)
-		{
-			LearningActivity larn = LearningActivityLocalServiceUtil.getLearningActivity(actId);
-			
-			if(permissionChecker.hasPermission(larn.getGroupId(), LearningActivity.class.getName(), larn.getActId(),
-					ActionKeys.UPDATE)|| permissionChecker.hasOwnerPermission(larn.getCompanyId(), LearningActivity.class.getName(), larn.getActId(),larn.getUserId(),
-							ActionKeys.UPDATE))
-			{
-				LearningActivityLocalServiceUtil.goDownLearningActivity(actId, themeDisplay.getUserId());
-			}
+		if(changed){
+			oreturned.put("success", "OK");
+			PrintWriter out = response.getWriter();
+			out.print(oreturned.toString());
+			out.flush();
+			out.close();
 		}
+		
 	}
+	
+	
 	
 	public void moveActivity(ActionRequest actionRequest, ActionResponse actionResponse) throws Exception {
 		
@@ -921,7 +939,6 @@ public class LmsActivitiesList extends MVCPortlet {
 		if(log.isDebugEnabled())log.debug(actId); 
 
 		LearningActivity la = LearningActivityLocalServiceUtil.getLearningActivity(actId);
-		System.out.println(la);
 		if(la!=null){
 			Message message=new Message();
 			message.put("learningActivity",la);
@@ -958,7 +975,11 @@ public class LmsActivitiesList extends MVCPortlet {
 			message.setResponseId("1111");
 			//message.setResponseDestinationName("liferay/lms/cleanTriesUser");
 			//MessageBusUtil.sendMessage("liferay/lms/cleanTriesUser", message);
+			
+			log.debug("Learning Activity: "+la.getTitle(themeDisplay.getLocale()));
+			log.debug("User "+user.getScreenName());
 			String resultado = (String)MessageBusUtil.sendSynchronousMessage("liferay/lms/cleanTriesUser", message);
+			log.debug("Result "+resultado);
 		}
 		
 		
@@ -972,14 +993,9 @@ public class LmsActivitiesList extends MVCPortlet {
 	public void modactivity(ActionRequest actionRequest, ActionResponse actionResponse)
 		throws Exception {
 
-		ThemeDisplay themeDisplay = (ThemeDisplay) actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
-
-		String portletId = PortalUtil.getPortletId(actionRequest);
-
 		String title = actionRequest.getParameter("title");
 		String description = actionRequest.getParameter("description");
 		int typeId = ParamUtil.getInteger(actionRequest, "type", 0);
-		java.util.Date ahora = new java.util.Date(System.currentTimeMillis());
 		LearningActivity learningActivity = LearningActivityServiceUtil.getLearningActivity(ParamUtil.getLong(actionRequest, "actId"));
 		learningActivity.setTitle(title);
 		learningActivity.setDescription(description);

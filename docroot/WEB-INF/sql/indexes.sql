@@ -28,6 +28,7 @@ create index IX_17104179 on Lms_CourseCompetence (courseId, condition_);
 create index IX_F3F3D23D on Lms_CourseCompetence (uuid_);
 
 create index IX_E5606419 on Lms_CourseResult (courseId, passed);
+create index IX_583EFC25 on Lms_CourseResult (userId);
 create unique index IX_3F29EDEF on Lms_CourseResult (userId, courseId);
 
 create index IX_A674914A on Lms_LearningActivity (groupId);
@@ -35,6 +36,7 @@ create index IX_A26B5373 on Lms_LearningActivity (groupId, typeId);
 create index IX_D6755EC7 on Lms_LearningActivity (groupId, weightinmodule);
 create index IX_A907C93B on Lms_LearningActivity (moduleId);
 create index IX_C1A494B8 on Lms_LearningActivity (moduleId, weightinmodule);
+create index IX_7D8395E on Lms_LearningActivity (precedence);
 create index IX_A331EE54 on Lms_LearningActivity (uuid_);
 create unique index IX_75B864D6 on Lms_LearningActivity (uuid_, groupId);
 
@@ -47,6 +49,7 @@ create index IX_8B143A37 on Lms_LearningActivityResult (uuid_);
 
 create index IX_6C40B616 on Lms_LearningActivityTry (actId);
 create index IX_BAC99850 on Lms_LearningActivityTry (actId, userId);
+create index IX_706EEA01 on Lms_LearningActivityTry (userId);
 create index IX_AC65C30D on Lms_LearningActivityTry (uuid_);
 
 create index IX_306AE98B on Lms_Module (groupId);
@@ -57,15 +60,18 @@ create unique index IX_B29B7175 on Lms_Module (uuid_, groupId);
 
 create index IX_7D47DB17 on Lms_ModuleResult (moduleId);
 create index IX_A588CBFB on Lms_ModuleResult (moduleId, passed);
+create index IX_40BB0076 on Lms_ModuleResult (userId);
 create unique index IX_A378B6D1 on Lms_ModuleResult (userId, moduleId);
 
 create index IX_A70D5A07 on Lms_P2pActivity (actId);
 create index IX_90AFBB41 on Lms_P2pActivity (actId, userId);
+create index IX_8F36C430 on Lms_P2pActivity (userId);
 create index IX_E73266FE on Lms_P2pActivity (uuid_);
 
 create index IX_70AAED8C on Lms_P2pActivityCorrections (actId, userId);
 create index IX_599E425D on Lms_P2pActivityCorrections (p2pActivityId);
 create index IX_86D5ED97 on Lms_P2pActivityCorrections (p2pActivityId, userId);
+create index IX_C0C0C045 on Lms_P2pActivityCorrections (userId);
 create index IX_331E1449 on Lms_P2pActivityCorrections (uuid_);
 
 create index IX_7B067356 on Lms_SCORMContent (companyId);
@@ -75,6 +81,10 @@ create index IX_4E8A925E on Lms_SCORMContent (userId, groupId);
 create index IX_C4735FE2 on Lms_SCORMContent (uuid_);
 create unique index IX_1942D308 on Lms_SCORMContent (uuid_, groupId);
 
+create index IX_ED91C253 on Lms_SurveyResult (actId);
+create index IX_2F35042C on Lms_SurveyResult (answerId, questionId);
+create index IX_8B8399FF on Lms_SurveyResult (questionId);
+create index IX_193F6564 on Lms_SurveyResult (userId);
 create index IX_2DB6CF4A on Lms_SurveyResult (uuid_);
 
 create index IX_31C145A on Lms_TestAnswer (actId);

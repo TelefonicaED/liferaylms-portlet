@@ -268,11 +268,32 @@ public class SurveyResultLocalServiceWrapper implements SurveyResultLocalService
 			arguments);
 	}
 
+	public java.util.List<com.liferay.lms.model.SurveyResult> getByUserId(
+		long userId) {
+		return _surveyResultLocalService.getByUserId(userId);
+	}
+
 	public java.util.List<com.liferay.lms.model.SurveyResult> getSurveyResultByActId(
 		long actId) throws com.liferay.portal.kernel.exception.SystemException {
 		return _surveyResultLocalService.getSurveyResultByActId(actId);
 	}
 
+	public double getPercentageByQuestionIdAndAnswerId(long questionId,
+		long answerId, long total)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _surveyResultLocalService.getPercentageByQuestionIdAndAnswerId(questionId,
+			answerId, total);
+	}
+
+	/**
+	* Metodo depreciado, se utiliza una combinaciÃ¯Â¿Â½n de los dos anteriores, para evitar consultas a base de datos innecesarias dentro de bucles.
+	*
+	* @deprecated
+	* @param questionId
+	* @param answerId
+	* @return
+	* @throws SystemException
+	*/
 	public double getPercentageByQuestionIdAndAnswerId(long questionId,
 		long answerId)
 		throws com.liferay.portal.kernel.exception.SystemException {

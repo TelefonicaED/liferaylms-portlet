@@ -93,7 +93,7 @@ public class ResourceInternalLearningActivityType extends BaseLearningActivityTy
 
 	
 	@Override
-	public void setExtraContent(UploadRequest uploadRequest,
+	public String setExtraContent(UploadRequest uploadRequest,
 			PortletResponse portletResponse, LearningActivity learningActivity)
 			throws PortalException, SystemException, DocumentException,IOException {
 		
@@ -202,7 +202,9 @@ public class ResourceInternalLearningActivityType extends BaseLearningActivityTy
 			}
 		}
 		
-		learningActivity.setExtracontent(document.formattedString());	
+		learningActivity.setExtracontent(document.formattedString());
+		
+		return null;
 	}
 		
 

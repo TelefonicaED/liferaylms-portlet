@@ -169,6 +169,17 @@ public class LearningActivityResultServiceSoap {
 		}
 	}
 
+	public static void forceFinishTry(long latId) throws RemoteException {
+		try {
+			LearningActivityResultServiceUtil.forceFinishTry(latId);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
 	public static com.liferay.lms.model.LearningActivityResultSoap updateFinishTry(
 		long latId, java.lang.String tryResultData, java.lang.String imsmanifest)
 		throws RemoteException {

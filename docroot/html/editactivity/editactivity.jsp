@@ -1,3 +1,5 @@
+<%@page import="com.liferay.portal.kernel.util.PropsKeys"%>
+<%@page import="com.liferay.portal.kernel.util.PrefsPropsUtil"%>
 <%@page import="com.liferay.portal.model.ModelHintsUtil"%>
 <%@page import="java.util.Locale"%>
 <%@page import="com.liferay.portal.kernel.util.LocaleUtil"%>
@@ -51,10 +53,8 @@
 <liferay-ui:error key="learningactivity.connect.error.timepass.nan" message="learningactivity.connect.error.timepass.nan"></liferay-ui:error>
 <liferay-ui:error key="execactivity.editActivity.questionsPerPage.number" message="execActivity.options.error.questionsPerPage"></liferay-ui:error>
 <liferay-ui:error key="execactivity.editActivity.random.number" message="execActivity.options.error.random"></liferay-ui:error>
-
-<portlet:actionURL var="saveactivityURL" name="saveActivity" >
-	<portlet:param name="editing" value="<%=StringPool.TRUE %>"/>
-</portlet:actionURL>
+<liferay-ui:error key="general.error" message="edit.activity.general.error"></liferay-ui:error>
+<liferay-ui:error key="error-p2pActivity-inProgress" message="p2ptaskactivity.error.extraContentInProgress" />
 <%
 renderResponse.setProperty(
 		"clear-request-parameters", Boolean.TRUE.toString());
@@ -65,7 +65,7 @@ String backURL = ParamUtil.getString(request, "backURL");
 long typeId=ParamUtil.getLong(request, "type");
 AssetRendererFactory arf=AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(LearningActivity.class.getName());
 Map<Long,String> classTypes=arf.getClassTypes(new long[]{themeDisplay.getScopeGroupId()}, themeDisplay.getLocale());
-
+long fileMaxSize = GetterUtil.getLong(PrefsPropsUtil.getString(PropsKeys.UPLOAD_SERVLET_REQUEST_IMPL_MAX_SIZE));
 String referringPortletResource = ParamUtil.getString(request, "referringPortletResource");
 long actId=ParamUtil.getLong(request, "resId",0);
 LearningActivity learnact=null;
@@ -80,6 +80,17 @@ if(request.getAttribute("activity")!=null){
 		moduleId=learnact.getModuleId();
 	}
 }
+
+
+%>
+<portlet:actionURL var="saveactivityURL" name="saveActivity" >
+	<portlet:param name="editing" value="<%=StringPool.TRUE %>"/>
+	<portlet:param name="type" value="<%=String.valueOf(typeId) %>"/>
+	<portlet:param name="resId" value="<%=String.valueOf(actId) %>"/>
+</portlet:actionURL>
+
+
+<% 
 
 //Reload LearningActivity
 if(learnact!=null&&learnact.getActId()>0&&learnact.isNullStartDate()){
@@ -357,12 +368,41 @@ AUI().ready('node-base' ,'aui-form-validator', 'aui-overlay-context-panel', 'wid
 
 
 
-	function validate(){
+	function getElementByNameStart(str){
+		var x=document.getElementsByTagName('input');
+		var a=[];
+		for(var i=0;i<x.length;i++){
+	  		if(x[i].id.indexOf(str)==0){
+	   			a.push(x[i]);
+	  		}
+		}
+		return a;
+	}
+
+	function <portlet:namespace/>validate(){
 		
 		var startInput = document.getElementById('<portlet:namespace />startdate-enabledCheckbox');
 		var start = startInput != null ? startInput.checked : true;
 		var stopInput = document.getElementById('<portlet:namespace />stopdate-enabledCheckbox');
 		var stop = stopInput != null ? stopInput.checked : true;
+		var i = 0;
+		var maxSize = document.getElementById('<portlet:namespace />maxSize').value;
+		var file_inputs =getElementByNameStart("<portlet:namespace />additionalFile");
+		for(i=0; i<file_inputs.length; i++){
+			if(file_inputs[i].files!=null){
+				if(file_inputs[i].files[0]!=null){
+					if (typeof file_inputs[i].files[0] != 'undefined'){
+						if(maxSize<file_inputs[i].files[0].size){
+							alert("<%=UnicodeFormatter.toString(LanguageUtil.get(pageContext, "server-file-size-upload-exceeded")) %>");	
+							return false;
+						}	
+					}				
+				}
+				
+			}
+		}
+		
+		
 		
 		if(start&&stop){	
 					
@@ -371,7 +411,7 @@ AUI().ready('node-base' ,'aui-form-validator', 'aui-overlay-context-panel', 'wid
 					
 			if(start.getTime()>=end.getTime()){
 				alert("<%=UnicodeFormatter.toString(LanguageUtil.get(pageContext, "please-enter-a-start-date-that-comes-before-the-end-date")) %>");
-				return;
+				return false;
 			}
 // 			else{
 // 				if(document.getElementById('<portlet:namespace />uploadDay')!=null){
@@ -435,7 +475,7 @@ AUI().ready('node-base' ,'aui-form-validator', 'aui-overlay-context-panel', 'wid
 				}
 			}
 		}
-		
+
 		document.getElementById('<portlet:namespace />fm').submit();
 	}
 
@@ -484,13 +524,13 @@ AUI().ready('node-base' ,'aui-form-validator', 'aui-overlay-context-panel', 'wid
 	);
 //-->
 </script>
-<aui:form name="fm" action="<%=saveactivityURL%>"  method="post"  enctype="multipart/form-data">
+<aui:form name="fm" action="<%=saveactivityURL%>"  method="post"   onSubmit='<%= "event.preventDefault(); " + renderResponse.getNamespace() + "validate();" %>' enctype="multipart/form-data">
 	<aui:fieldset>
 		<aui:input name="redirect" type="hidden" value="<%= redirect %>" />
+		<aui:input name="maxSize" type="hidden" value="<%= fileMaxSize %>" />
 		<aui:input name="backURL" type="hidden" value="<%= backURL %>" />
 		<aui:input name="referringPortletResource" type="hidden" value="<%= referringPortletResource %>" />
-		<aui:input name="resId" type="hidden" value="<%=actId %>"/>
-
+	
 <script type="text/javascript">
 <!--
 
@@ -554,14 +594,7 @@ Liferay.provide(
 		</aui:select>
 	</c:if>
 
-<%
-	if(actId==0)
-	{
-	%>
-	<aui:input type="hidden" name="type" value="<%=typeId %>"></aui:input>
-	<% 
-	}
-	%>
+
 		<aui:input name="title" label="title" defaultLanguageId="<%=renderRequest.getLocale().toString()%>" id="title">
 		</aui:input>
 		
@@ -586,7 +619,7 @@ Liferay.provide(
 		        ['node']
 		    );
 		    
-		//-->
+		-->
 		</script>
 	    
 		<aui:field-wrapper label="description" name="description">
@@ -644,7 +677,7 @@ Liferay.provide(
 			}
 		%>
 		
-		<aui:input size="5" name="tries" label="tries" value="<%=Long.toString(tries) %>" type="number" disabled="<%=disabled%>">
+		<aui:input size="5" name="tries" label="tries" value="<%=Long.toString(tries) %>" type="number"  disabled="<%=disabled%>">
 		</aui:input><%--liferay-ui:icon-help message="number-of-tries"></liferay-ui:icon-help--%>
   		<div id="<portlet:namespace />triesError" class="<%=((SessionErrors.contains(renderRequest, "editActivity.tries.required"))||
 														      (SessionErrors.contains(renderRequest, "editActivity.tries.number"))||
@@ -911,8 +944,7 @@ Liferay.provide(
 	</aui:fieldset>
 	
 	<aui:button-row>
-		<input type="button" value="<liferay-ui:message key="savechanges" />" onclick="javascript:validate()" >
-		<aui:button  type="cancel" value="canceledition" />
+		<aui:button type="submit" value="savechanges"/>
+		<aui:button type="cancel" value="canceledition" />
 	</aui:button-row>
 </aui:form>
- <liferay-ui:success key="activity-saved-successfully" message="activity-saved-successfully" />

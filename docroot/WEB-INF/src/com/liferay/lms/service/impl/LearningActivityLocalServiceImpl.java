@@ -79,6 +79,7 @@ import com.liferay.portlet.announcements.model.AnnouncementsEntry;
 import com.liferay.portlet.announcements.model.AnnouncementsFlagConstants;
 import com.liferay.portlet.announcements.service.AnnouncementsEntryServiceUtil;
 import com.liferay.portlet.announcements.service.AnnouncementsFlagLocalServiceUtil;
+import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
 import com.liferay.portlet.social.service.SocialActivityLocalServiceUtil;
 import com.liferay.util.LmsLocaleUtil;
 
@@ -517,11 +518,11 @@ public class LearningActivityLocalServiceImpl extends LearningActivityLocalServi
 	}
 	public java.util.List<LearningActivity> getLearningActivitiesOfModule(long moduleId) throws SystemException
 	{
-		return learningActivityPersistence.findBym(moduleId, 0, 1000);
+		return learningActivityPersistence.findBym(moduleId, -1, -1);
 	}
 	public java.util.List<Long> getLearningActivityIdsOfModule(long moduleId) throws SystemException
 	{
-		java.util.List<LearningActivity>larnacts= learningActivityPersistence.findBym(moduleId, 0, 1000);
+		java.util.List<LearningActivity>larnacts= learningActivityPersistence.findBym(moduleId, -1, -1);
 		java.util.List<Long> result=new java.util.ArrayList<Long>();
 		for(LearningActivity larn:larnacts)
 		{
@@ -538,7 +539,8 @@ public class LearningActivityLocalServiceImpl extends LearningActivityLocalServi
 				ResourceConstants.SCOPE_INDIVIDUAL, lernact.getPrimaryKey());
 		assetEntryLocalService.deleteEntry(
 				LearningActivity.class.getName(), lernact.getActId());
-		learningActivityPersistence.remove(lernact);
+		
+		LearningActivityUtil.remove(lernact.getActId());
 		SocialActivityLocalServiceUtil.addActivity(
 				lernact.getUserId(), lernact.getGroupId(),
 				LearningActivity.class.getName(), lernact.getActId(),
@@ -1003,6 +1005,16 @@ public class LearningActivityLocalServiceImpl extends LearningActivityLocalServi
 		List<LearningActivity> activities = new ArrayList<LearningActivity>();
 		try {
 			activities = LearningActivityUtil.findByModuleId_Weightinmodule(moduleId, 0);
+		} catch (SystemException e) {
+			e.printStackTrace();
+		}
+		return activities;
+	}
+	
+	public List<LearningActivity> getByPrecedence(long precedence){
+		List<LearningActivity> activities = new ArrayList<LearningActivity>();
+		try {
+			activities = LearningActivityUtil.findByPrecedence(precedence);
 		} catch (SystemException e) {
 			e.printStackTrace();
 		}

@@ -249,7 +249,7 @@ public interface ModuleResultLocalService extends BaseLocalService,
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	/**
-	* No deberï¿½a haber nunca mï¿½s de un result para el mismo usuario y modulo.
+	* No deberÃ­a haber nunca mÃ¡s de un result para el mismo usuario y modulo.
 	* Se hace para eliminar los duplicados.
 	*
 	* @param moduleId
@@ -261,6 +261,10 @@ public interface ModuleResultLocalService extends BaseLocalService,
 	public java.util.List<com.liferay.lms.model.ModuleResult> getListModuleResultByModuleAndUser(
 		long moduleId, long userId)
 		throws com.liferay.portal.kernel.exception.SystemException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.util.List<com.liferay.lms.model.ModuleResult> getByUserId(
+		long userId);
 
 	public long countByModule(long moduleId)
 		throws com.liferay.portal.kernel.exception.SystemException;

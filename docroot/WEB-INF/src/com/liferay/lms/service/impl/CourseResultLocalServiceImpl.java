@@ -14,6 +14,7 @@
 
 package com.liferay.lms.service.impl;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -67,6 +68,16 @@ import com.liferay.portal.model.User;
  */
 public class CourseResultLocalServiceImpl
 	extends CourseResultLocalServiceBaseImpl {
+	
+	public List<CourseResult> getByUserId(long userId){
+		List<CourseResult> results = new ArrayList<CourseResult>();
+		try {
+			results = courseResultPersistence.findByUserId(userId);
+		} catch (SystemException e) {
+			e.printStackTrace();
+		}
+		return results;
+	}
 	
 	public CourseResult getByUserAndCourse(long courseId,long userId) throws SystemException{
 		return courseResultPersistence.fetchByuc(userId, courseId);
@@ -249,16 +260,6 @@ public class CourseResultLocalServiceImpl
 			CourseEvalRegistry cer=new CourseEvalRegistry();
 			long courseEvalTypeId=course.getCourseEvalId();
 			CourseEval ceval=cer.getCourseEval(courseEvalTypeId);
-			CourseResult courseResult=CourseResultLocalServiceUtil.getByUserAndCourse(course.getCourseId(), mresult.getUserId());
-						
-			if(courseResult==null){
-				courseResult=CourseResultLocalServiceUtil.create(course.getCourseId(),  mresult.getUserId());
-			}
-			
-			if(courseResult.getStartDate()==null){
-				courseResult.setStartDate(mresult.getStartDate());
-			}
-			CourseResultLocalServiceUtil.update(courseResult);
 			ceval.updateCourse(course, mresult);
 		}
 	}

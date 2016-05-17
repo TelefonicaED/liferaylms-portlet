@@ -293,6 +293,10 @@ public interface P2pActivityCorrectionsLocalService extends BaseLocalService,
 		long actId, long userId)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.util.List<com.liferay.lms.model.P2pActivityCorrections> getByUserId(
+		long userId);
+
 	/**
 	* Para saber si el usuario ya ha realizado todas las correcciones que se indica en el extracontent.
 	*/

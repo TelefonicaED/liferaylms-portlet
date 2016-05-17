@@ -248,9 +248,27 @@ public interface SurveyResultLocalService extends BaseLocalService,
 		throws java.lang.Throwable;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.util.List<com.liferay.lms.model.SurveyResult> getByUserId(
+		long userId);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.util.List<com.liferay.lms.model.SurveyResult> getSurveyResultByActId(
 		long actId) throws com.liferay.portal.kernel.exception.SystemException;
 
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public double getPercentageByQuestionIdAndAnswerId(long questionId,
+		long answerId, long total)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Metodo depreciado, se utiliza una combinaciï¿½n de los dos anteriores, para evitar consultas a base de datos innecesarias dentro de bucles.
+	*
+	* @deprecated
+	* @param questionId
+	* @param answerId
+	* @return
+	* @throws SystemException
+	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public double getPercentageByQuestionIdAndAnswerId(long questionId,
 		long answerId)

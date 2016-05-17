@@ -56,6 +56,7 @@ Liferay.Service.registerClass(
 		userPassed: true,
 		userLoginPassed: true,
 		update: true,
+		forceFinishTry: true,
 		updateFinishTry: true
 	}
 );

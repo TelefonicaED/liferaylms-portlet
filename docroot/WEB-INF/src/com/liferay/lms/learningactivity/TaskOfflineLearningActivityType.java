@@ -68,7 +68,7 @@ public class TaskOfflineLearningActivityType extends BaseLearningActivityType {
 	}
 	
 	@Override
-	public void setExtraContent(UploadRequest uploadRequest,
+	public String setExtraContent(UploadRequest uploadRequest,
 			PortletResponse portletResponse, LearningActivity learningActivity)
 			throws NumberFormatException, Exception {
 		
@@ -105,7 +105,7 @@ public class TaskOfflineLearningActivityType extends BaseLearningActivityType {
 			}
 			learningActivity.setExtracontent(document.formattedString());
 		
-			
+			return null;
 	}
 	
 	@Override

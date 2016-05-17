@@ -99,6 +99,8 @@ public interface LearningActivityResultService extends BaseService,
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
+	public void forceFinishTry(long latId);
+
 	public com.liferay.lms.model.LearningActivityResult updateFinishTry(
 		long latId, java.lang.String tryResultData, java.lang.String imsmanifest)
 		throws com.liferay.portal.kernel.exception.PortalException,

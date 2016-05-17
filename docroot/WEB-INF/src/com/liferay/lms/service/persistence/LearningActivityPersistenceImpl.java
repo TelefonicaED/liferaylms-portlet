@@ -218,6 +218,28 @@ public class LearningActivityPersistenceImpl extends BasePersistenceImpl<Learnin
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION,
 			"countByModuleId_Weightinmodule",
 			new String[] { Long.class.getName(), Long.class.getName() });
+	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_BY_PRECEDENCE =
+		new FinderPath(LearningActivityModelImpl.ENTITY_CACHE_ENABLED,
+			LearningActivityModelImpl.FINDER_CACHE_ENABLED,
+			LearningActivityImpl.class, FINDER_CLASS_NAME_LIST_WITH_PAGINATION,
+			"findByPrecedence",
+			new String[] {
+				Long.class.getName(),
+				
+			"java.lang.Integer", "java.lang.Integer",
+				"com.liferay.portal.kernel.util.OrderByComparator"
+			});
+	public static final FinderPath FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_PRECEDENCE =
+		new FinderPath(LearningActivityModelImpl.ENTITY_CACHE_ENABLED,
+			LearningActivityModelImpl.FINDER_CACHE_ENABLED,
+			LearningActivityImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByPrecedence",
+			new String[] { Long.class.getName() },
+			LearningActivityModelImpl.PRECEDENCE_COLUMN_BITMASK);
+	public static final FinderPath FINDER_PATH_COUNT_BY_PRECEDENCE = new FinderPath(LearningActivityModelImpl.ENTITY_CACHE_ENABLED,
+			LearningActivityModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByPrecedence",
+			new String[] { Long.class.getName() });
 	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_ALL = new FinderPath(LearningActivityModelImpl.ENTITY_CACHE_ENABLED,
 			LearningActivityModelImpl.FINDER_CACHE_ENABLED,
 			LearningActivityImpl.class, FINDER_CLASS_NAME_LIST_WITH_PAGINATION,
@@ -557,6 +579,27 @@ public class LearningActivityPersistenceImpl extends BasePersistenceImpl<Learnin
 
 				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_M, args);
 				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_M,
+					args);
+			}
+
+			if ((learningActivityModelImpl.getColumnBitmask() &
+					FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_PRECEDENCE.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] {
+						Long.valueOf(learningActivityModelImpl.getOriginalPrecedence())
+					};
+
+				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_PRECEDENCE,
+					args);
+				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_PRECEDENCE,
+					args);
+
+				args = new Object[] {
+						Long.valueOf(learningActivityModelImpl.getPrecedence())
+					};
+
+				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_PRECEDENCE,
+					args);
+				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_PRECEDENCE,
 					args);
 			}
 		}
@@ -4263,6 +4306,389 @@ public class LearningActivityPersistenceImpl extends BasePersistenceImpl<Learnin
 	}
 
 	/**
+	 * Returns all the learning activities where precedence = &#63;.
+	 *
+	 * @param precedence the precedence
+	 * @return the matching learning activities
+	 * @throws SystemException if a system exception occurred
+	 */
+	public List<LearningActivity> findByPrecedence(long precedence)
+		throws SystemException {
+		return findByPrecedence(precedence, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, null);
+	}
+
+	/**
+	 * Returns a range of all the learning activities where precedence = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	 * </p>
+	 *
+	 * @param precedence the precedence
+	 * @param start the lower bound of the range of learning activities
+	 * @param end the upper bound of the range of learning activities (not inclusive)
+	 * @return the range of matching learning activities
+	 * @throws SystemException if a system exception occurred
+	 */
+	public List<LearningActivity> findByPrecedence(long precedence, int start,
+		int end) throws SystemException {
+		return findByPrecedence(precedence, start, end, null);
+	}
+
+	/**
+	 * Returns an ordered range of all the learning activities where precedence = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	 * </p>
+	 *
+	 * @param precedence the precedence
+	 * @param start the lower bound of the range of learning activities
+	 * @param end the upper bound of the range of learning activities (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @return the ordered range of matching learning activities
+	 * @throws SystemException if a system exception occurred
+	 */
+	public List<LearningActivity> findByPrecedence(long precedence, int start,
+		int end, OrderByComparator orderByComparator) throws SystemException {
+		FinderPath finderPath = null;
+		Object[] finderArgs = null;
+
+		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
+				(orderByComparator == null)) {
+			finderPath = FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_PRECEDENCE;
+			finderArgs = new Object[] { precedence };
+		}
+		else {
+			finderPath = FINDER_PATH_WITH_PAGINATION_FIND_BY_PRECEDENCE;
+			finderArgs = new Object[] { precedence, start, end, orderByComparator };
+		}
+
+		List<LearningActivity> list = (List<LearningActivity>)FinderCacheUtil.getResult(finderPath,
+				finderArgs, this);
+
+		if ((list != null) && !list.isEmpty()) {
+			for (LearningActivity learningActivity : list) {
+				if ((precedence != learningActivity.getPrecedence())) {
+					list = null;
+
+					break;
+				}
+			}
+		}
+
+		if (list == null) {
+			StringBundler query = null;
+
+			if (orderByComparator != null) {
+				query = new StringBundler(3 +
+						(orderByComparator.getOrderByFields().length * 3));
+			}
+			else {
+				query = new StringBundler(3);
+			}
+
+			query.append(_SQL_SELECT_LEARNINGACTIVITY_WHERE);
+
+			query.append(_FINDER_COLUMN_PRECEDENCE_PRECEDENCE_2);
+
+			if (orderByComparator != null) {
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
+			}
+
+			else {
+				query.append(LearningActivityModelImpl.ORDER_BY_JPQL);
+			}
+
+			String sql = query.toString();
+
+			Session session = null;
+
+			try {
+				session = openSession();
+
+				Query q = session.createQuery(sql);
+
+				QueryPos qPos = QueryPos.getInstance(q);
+
+				qPos.add(precedence);
+
+				list = (List<LearningActivity>)QueryUtil.list(q, getDialect(),
+						start, end);
+			}
+			catch (Exception e) {
+				throw processException(e);
+			}
+			finally {
+				if (list == null) {
+					FinderCacheUtil.removeResult(finderPath, finderArgs);
+				}
+				else {
+					cacheResult(list);
+
+					FinderCacheUtil.putResult(finderPath, finderArgs, list);
+				}
+
+				closeSession(session);
+			}
+		}
+
+		return list;
+	}
+
+	/**
+	 * Returns the first learning activity in the ordered set where precedence = &#63;.
+	 *
+	 * @param precedence the precedence
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the first matching learning activity
+	 * @throws com.liferay.lms.NoSuchLearningActivityException if a matching learning activity could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	public LearningActivity findByPrecedence_First(long precedence,
+		OrderByComparator orderByComparator)
+		throws NoSuchLearningActivityException, SystemException {
+		LearningActivity learningActivity = fetchByPrecedence_First(precedence,
+				orderByComparator);
+
+		if (learningActivity != null) {
+			return learningActivity;
+		}
+
+		StringBundler msg = new StringBundler(4);
+
+		msg.append(_NO_SUCH_ENTITY_WITH_KEY);
+
+		msg.append("precedence=");
+		msg.append(precedence);
+
+		msg.append(StringPool.CLOSE_CURLY_BRACE);
+
+		throw new NoSuchLearningActivityException(msg.toString());
+	}
+
+	/**
+	 * Returns the first learning activity in the ordered set where precedence = &#63;.
+	 *
+	 * @param precedence the precedence
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the first matching learning activity, or <code>null</code> if a matching learning activity could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	public LearningActivity fetchByPrecedence_First(long precedence,
+		OrderByComparator orderByComparator) throws SystemException {
+		List<LearningActivity> list = findByPrecedence(precedence, 0, 1,
+				orderByComparator);
+
+		if (!list.isEmpty()) {
+			return list.get(0);
+		}
+
+		return null;
+	}
+
+	/**
+	 * Returns the last learning activity in the ordered set where precedence = &#63;.
+	 *
+	 * @param precedence the precedence
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the last matching learning activity
+	 * @throws com.liferay.lms.NoSuchLearningActivityException if a matching learning activity could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	public LearningActivity findByPrecedence_Last(long precedence,
+		OrderByComparator orderByComparator)
+		throws NoSuchLearningActivityException, SystemException {
+		LearningActivity learningActivity = fetchByPrecedence_Last(precedence,
+				orderByComparator);
+
+		if (learningActivity != null) {
+			return learningActivity;
+		}
+
+		StringBundler msg = new StringBundler(4);
+
+		msg.append(_NO_SUCH_ENTITY_WITH_KEY);
+
+		msg.append("precedence=");
+		msg.append(precedence);
+
+		msg.append(StringPool.CLOSE_CURLY_BRACE);
+
+		throw new NoSuchLearningActivityException(msg.toString());
+	}
+
+	/**
+	 * Returns the last learning activity in the ordered set where precedence = &#63;.
+	 *
+	 * @param precedence the precedence
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the last matching learning activity, or <code>null</code> if a matching learning activity could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	public LearningActivity fetchByPrecedence_Last(long precedence,
+		OrderByComparator orderByComparator) throws SystemException {
+		int count = countByPrecedence(precedence);
+
+		List<LearningActivity> list = findByPrecedence(precedence, count - 1,
+				count, orderByComparator);
+
+		if (!list.isEmpty()) {
+			return list.get(0);
+		}
+
+		return null;
+	}
+
+	/**
+	 * Returns the learning activities before and after the current learning activity in the ordered set where precedence = &#63;.
+	 *
+	 * @param actId the primary key of the current learning activity
+	 * @param precedence the precedence
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the previous, current, and next learning activity
+	 * @throws com.liferay.lms.NoSuchLearningActivityException if a learning activity with the primary key could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	public LearningActivity[] findByPrecedence_PrevAndNext(long actId,
+		long precedence, OrderByComparator orderByComparator)
+		throws NoSuchLearningActivityException, SystemException {
+		LearningActivity learningActivity = findByPrimaryKey(actId);
+
+		Session session = null;
+
+		try {
+			session = openSession();
+
+			LearningActivity[] array = new LearningActivityImpl[3];
+
+			array[0] = getByPrecedence_PrevAndNext(session, learningActivity,
+					precedence, orderByComparator, true);
+
+			array[1] = learningActivity;
+
+			array[2] = getByPrecedence_PrevAndNext(session, learningActivity,
+					precedence, orderByComparator, false);
+
+			return array;
+		}
+		catch (Exception e) {
+			throw processException(e);
+		}
+		finally {
+			closeSession(session);
+		}
+	}
+
+	protected LearningActivity getByPrecedence_PrevAndNext(Session session,
+		LearningActivity learningActivity, long precedence,
+		OrderByComparator orderByComparator, boolean previous) {
+		StringBundler query = null;
+
+		if (orderByComparator != null) {
+			query = new StringBundler(6 +
+					(orderByComparator.getOrderByFields().length * 6));
+		}
+		else {
+			query = new StringBundler(3);
+		}
+
+		query.append(_SQL_SELECT_LEARNINGACTIVITY_WHERE);
+
+		query.append(_FINDER_COLUMN_PRECEDENCE_PRECEDENCE_2);
+
+		if (orderByComparator != null) {
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+
+			if (orderByConditionFields.length > 0) {
+				query.append(WHERE_AND);
+			}
+
+			for (int i = 0; i < orderByConditionFields.length; i++) {
+				query.append(_ORDER_BY_ENTITY_ALIAS);
+				query.append(orderByConditionFields[i]);
+
+				if ((i + 1) < orderByConditionFields.length) {
+					if (orderByComparator.isAscending() ^ previous) {
+						query.append(WHERE_GREATER_THAN_HAS_NEXT);
+					}
+					else {
+						query.append(WHERE_LESSER_THAN_HAS_NEXT);
+					}
+				}
+				else {
+					if (orderByComparator.isAscending() ^ previous) {
+						query.append(WHERE_GREATER_THAN);
+					}
+					else {
+						query.append(WHERE_LESSER_THAN);
+					}
+				}
+			}
+
+			query.append(ORDER_BY_CLAUSE);
+
+			String[] orderByFields = orderByComparator.getOrderByFields();
+
+			for (int i = 0; i < orderByFields.length; i++) {
+				query.append(_ORDER_BY_ENTITY_ALIAS);
+				query.append(orderByFields[i]);
+
+				if ((i + 1) < orderByFields.length) {
+					if (orderByComparator.isAscending() ^ previous) {
+						query.append(ORDER_BY_ASC_HAS_NEXT);
+					}
+					else {
+						query.append(ORDER_BY_DESC_HAS_NEXT);
+					}
+				}
+				else {
+					if (orderByComparator.isAscending() ^ previous) {
+						query.append(ORDER_BY_ASC);
+					}
+					else {
+						query.append(ORDER_BY_DESC);
+					}
+				}
+			}
+		}
+
+		else {
+			query.append(LearningActivityModelImpl.ORDER_BY_JPQL);
+		}
+
+		String sql = query.toString();
+
+		Query q = session.createQuery(sql);
+
+		q.setFirstResult(0);
+		q.setMaxResults(2);
+
+		QueryPos qPos = QueryPos.getInstance(q);
+
+		qPos.add(precedence);
+
+		if (orderByComparator != null) {
+			Object[] values = orderByComparator.getOrderByConditionValues(learningActivity);
+
+			for (Object value : values) {
+				qPos.add(value);
+			}
+		}
+
+		List<LearningActivity> list = q.list();
+
+		if (list.size() == 2) {
+			return list.get(1);
+		}
+		else {
+			return null;
+		}
+	}
+
+	/**
 	 * Returns all the learning activities.
 	 *
 	 * @return the learning activities
@@ -4467,6 +4893,18 @@ public class LearningActivityPersistenceImpl extends BasePersistenceImpl<Learnin
 		long weightinmodule) throws SystemException {
 		for (LearningActivity learningActivity : findByModuleId_Weightinmodule(
 				moduleId, weightinmodule)) {
+			remove(learningActivity);
+		}
+	}
+
+	/**
+	 * Removes all the learning activities where precedence = &#63; from the database.
+	 *
+	 * @param precedence the precedence
+	 * @throws SystemException if a system exception occurred
+	 */
+	public void removeByPrecedence(long precedence) throws SystemException {
+		for (LearningActivity learningActivity : findByPrecedence(precedence)) {
 			remove(learningActivity);
 		}
 	}
@@ -5057,6 +5495,59 @@ public class LearningActivityPersistenceImpl extends BasePersistenceImpl<Learnin
 	}
 
 	/**
+	 * Returns the number of learning activities where precedence = &#63;.
+	 *
+	 * @param precedence the precedence
+	 * @return the number of matching learning activities
+	 * @throws SystemException if a system exception occurred
+	 */
+	public int countByPrecedence(long precedence) throws SystemException {
+		Object[] finderArgs = new Object[] { precedence };
+
+		Long count = (Long)FinderCacheUtil.getResult(FINDER_PATH_COUNT_BY_PRECEDENCE,
+				finderArgs, this);
+
+		if (count == null) {
+			StringBundler query = new StringBundler(2);
+
+			query.append(_SQL_COUNT_LEARNINGACTIVITY_WHERE);
+
+			query.append(_FINDER_COLUMN_PRECEDENCE_PRECEDENCE_2);
+
+			String sql = query.toString();
+
+			Session session = null;
+
+			try {
+				session = openSession();
+
+				Query q = session.createQuery(sql);
+
+				QueryPos qPos = QueryPos.getInstance(q);
+
+				qPos.add(precedence);
+
+				count = (Long)q.uniqueResult();
+			}
+			catch (Exception e) {
+				throw processException(e);
+			}
+			finally {
+				if (count == null) {
+					count = Long.valueOf(0);
+				}
+
+				FinderCacheUtil.putResult(FINDER_PATH_COUNT_BY_PRECEDENCE,
+					finderArgs, count);
+
+				closeSession(session);
+			}
+		}
+
+		return count.intValue();
+	}
+
+	/**
 	 * Returns the number of learning activities.
 	 *
 	 * @return the number of learning activities
@@ -5200,6 +5691,7 @@ public class LearningActivityPersistenceImpl extends BasePersistenceImpl<Learnin
 		"learningActivity.moduleId = ? AND ";
 	private static final String _FINDER_COLUMN_MODULEID_WEIGHTINMODULE_WEIGHTINMODULE_2 =
 		"learningActivity.weightinmodule > ?";
+	private static final String _FINDER_COLUMN_PRECEDENCE_PRECEDENCE_2 = "learningActivity.precedence = ?";
 	private static final String _FILTER_ENTITY_TABLE_FILTER_PK_COLUMN = "learningActivity.actId";
 	private static final String _FILTER_SQL_SELECT_LEARNINGACTIVITY_WHERE = "SELECT DISTINCT {learningActivity.*} FROM Lms_LearningActivity learningActivity WHERE ";
 	private static final String _FILTER_SQL_SELECT_LEARNINGACTIVITY_NO_INLINE_DISTINCT_WHERE_1 =

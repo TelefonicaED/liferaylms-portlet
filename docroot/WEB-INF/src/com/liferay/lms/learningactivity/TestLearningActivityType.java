@@ -129,7 +129,7 @@ public class TestLearningActivityType extends BaseLearningActivityType
 	}
 	
 	@Override
-	public void setExtraContent(UploadRequest uploadRequest,
+	public String setExtraContent(UploadRequest uploadRequest,
 			PortletResponse portletResponse, LearningActivity learningActivity)
 			throws NumberFormatException, Exception {
 		
@@ -241,6 +241,8 @@ public class TestLearningActivityType extends BaseLearningActivityType
 			}
 			
 			learningActivity.setExtracontent(document.formattedString());
+			
+			return null;
 	}
 	
 	@Override

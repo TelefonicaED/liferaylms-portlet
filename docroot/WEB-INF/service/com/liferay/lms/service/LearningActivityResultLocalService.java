@@ -367,6 +367,10 @@ public interface LearningActivityResultLocalService extends BaseLocalService,
 	public java.util.List<com.liferay.lms.model.LearningActivityResult> getMandatoryByModuleIdUserIdPassed(
 		long moduleId, long userId);
 
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.util.List<com.liferay.lms.model.LearningActivityResult> getByUserId(
+		long userId);
+
 	public int countMandatoryByModuleIdUserIdPassed(long moduleId, long userId);
 
 	public java.lang.String translateResult(java.util.Locale locale,

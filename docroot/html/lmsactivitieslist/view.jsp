@@ -6,6 +6,9 @@
 <%@page import="javax.portlet.PortletPreferences"%>
 <%@ include file="/init.jsp"%>
 
+<liferay-ui:success key="ok-deleteActivity" message="activity-deleted-successfully" />
+
+
 <%
 	long moduleId = ParamUtil.getLong(request, "moduleId", 0);
 

@@ -67,6 +67,10 @@
 			<finder-column name="weightinmodule" comparator="&gt;" />
 		</finder>
 		
+		<finder name="Precedence" return-type="Collection">
+			<finder-column name="precedence" />
+		</finder>
+		
 		<reference package-path="com.liferay.portal" entity="User" />
 		<reference package-path="com.liferay.portal" entity="Role" />
 		<reference package-path="com.liferay.portal" entity="Team" />
@@ -115,6 +119,9 @@
 		<finder name="ActId" return-type="Collection">
 			<finder-column name="actId" />
 		</finder>
+		<finder name="UserId" return-type="Collection">
+			<finder-column name="userId" />
+		</finder>			
 	</entity>
 	
 	<entity name="P2pActivityCorrections" uuid="true" local-service="true" remote-service="false" json-enabled="false">
@@ -138,6 +145,9 @@
 			<finder-column name="p2pActivityId" />
 			<finder-column name="userId" />
 		</finder>
+		<finder name="UserId" return-type="Collection">
+			<finder-column name="userId" />
+		</finder>			
 	</entity>
 	
 	<entity name="TestAnswer" uuid="true" local-service="true"
@@ -183,6 +193,9 @@
 			<finder-column name="actId" />
 			<finder-column name="userId" />
 		</finder>
+		<finder name="UserId" return-type="Collection">
+			<finder-column name="userId" />
+		</finder>		
 	</entity>
 
 
@@ -284,6 +297,9 @@
 			<finder-column name="moduleId" />
 			<finder-column name="passed" />
 		</finder>
+		<finder name="UserId" return-type="Collection">
+			<finder-column name="userId" />
+		</finder>			
 	</entity>
 		<entity name="Competence" local-service="true" remote-service="true" uuid="true" json-enabled="false">
 		<!-- Primary key column -->
@@ -438,6 +454,9 @@
 			<finder-column name="courseId" />
 			<finder-column name="passed" />
 		</finder>
+		<finder name="UserId" return-type="Collection">
+			<finder-column name="userId" />
+		</finder>	
 	</entity>
 	
 	<entity name="CheckP2pMailing" local-service="true" json-enabled="false" remote-service="false">
@@ -470,8 +489,22 @@
 		<column name="questionId" type="long" />
 		<column name="answerId" type="long" />
 		<column name="userId" type="long" />
-		<column name="freeAnswer" type="String"/>
-	</entity>        
+		<column name="freeAnswer" type="String"/>		
+		<finder name="UserId" return-type="Collection">
+			<finder-column name="userId" />
+		</finder>
+		<finder name="ActId" return-type="Collection">
+			<finder-column name="actId" />
+		</finder>
+		<finder name="QuestionId"	return-type="Collection">
+			<finder-column name="questionId" />
+		</finder>
+		<finder name="AnswerIdQuestionId"	return-type="Collection">
+			<finder-column name="answerId" />
+			<finder-column name="questionId" />
+		</finder>		
+	</entity>  
+	      
      <entity name="SCORMContent" local-service="true" remote-service="true" uuid="true" json-enabled="false">
 		<!-- Primary key column -->
 		<column name="scormId" type="long" primary="true" />

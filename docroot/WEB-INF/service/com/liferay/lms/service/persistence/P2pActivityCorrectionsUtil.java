@@ -784,6 +784,143 @@ public class P2pActivityCorrectionsUtil {
 	}
 
 	/**
+	* Returns all the p2p activity correctionses where userId = &#63;.
+	*
+	* @param userId the user ID
+	* @return the matching p2p activity correctionses
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.lms.model.P2pActivityCorrections> findByUserId(
+		long userId) throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence().findByUserId(userId);
+	}
+
+	/**
+	* Returns a range of all the p2p activity correctionses where userId = &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param userId the user ID
+	* @param start the lower bound of the range of p2p activity correctionses
+	* @param end the upper bound of the range of p2p activity correctionses (not inclusive)
+	* @return the range of matching p2p activity correctionses
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.lms.model.P2pActivityCorrections> findByUserId(
+		long userId, int start, int end)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence().findByUserId(userId, start, end);
+	}
+
+	/**
+	* Returns an ordered range of all the p2p activity correctionses where userId = &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param userId the user ID
+	* @param start the lower bound of the range of p2p activity correctionses
+	* @param end the upper bound of the range of p2p activity correctionses (not inclusive)
+	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	* @return the ordered range of matching p2p activity correctionses
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.lms.model.P2pActivityCorrections> findByUserId(
+		long userId, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByUserId(userId, start, end, orderByComparator);
+	}
+
+	/**
+	* Returns the first p2p activity corrections in the ordered set where userId = &#63;.
+	*
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the first matching p2p activity corrections
+	* @throws com.liferay.lms.NoSuchP2pActivityCorrectionsException if a matching p2p activity corrections could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.lms.model.P2pActivityCorrections findByUserId_First(
+		long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchP2pActivityCorrectionsException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence().findByUserId_First(userId, orderByComparator);
+	}
+
+	/**
+	* Returns the first p2p activity corrections in the ordered set where userId = &#63;.
+	*
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the first matching p2p activity corrections, or <code>null</code> if a matching p2p activity corrections could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.lms.model.P2pActivityCorrections fetchByUserId_First(
+		long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence().fetchByUserId_First(userId, orderByComparator);
+	}
+
+	/**
+	* Returns the last p2p activity corrections in the ordered set where userId = &#63;.
+	*
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the last matching p2p activity corrections
+	* @throws com.liferay.lms.NoSuchP2pActivityCorrectionsException if a matching p2p activity corrections could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.lms.model.P2pActivityCorrections findByUserId_Last(
+		long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchP2pActivityCorrectionsException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence().findByUserId_Last(userId, orderByComparator);
+	}
+
+	/**
+	* Returns the last p2p activity corrections in the ordered set where userId = &#63;.
+	*
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the last matching p2p activity corrections, or <code>null</code> if a matching p2p activity corrections could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.lms.model.P2pActivityCorrections fetchByUserId_Last(
+		long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence().fetchByUserId_Last(userId, orderByComparator);
+	}
+
+	/**
+	* Returns the p2p activity correctionses before and after the current p2p activity corrections in the ordered set where userId = &#63;.
+	*
+	* @param p2pActivityCorrectionsId the primary key of the current p2p activity corrections
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the previous, current, and next p2p activity corrections
+	* @throws com.liferay.lms.NoSuchP2pActivityCorrectionsException if a p2p activity corrections with the primary key could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.lms.model.P2pActivityCorrections[] findByUserId_PrevAndNext(
+		long p2pActivityCorrectionsId, long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchP2pActivityCorrectionsException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByUserId_PrevAndNext(p2pActivityCorrectionsId, userId,
+			orderByComparator);
+	}
+
+	/**
 	* Returns all the p2p activity correctionses.
 	*
 	* @return the p2p activity correctionses
@@ -879,6 +1016,17 @@ public class P2pActivityCorrectionsUtil {
 	}
 
 	/**
+	* Removes all the p2p activity correctionses where userId = &#63; from the database.
+	*
+	* @param userId the user ID
+	* @throws SystemException if a system exception occurred
+	*/
+	public static void removeByUserId(long userId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		getPersistence().removeByUserId(userId);
+	}
+
+	/**
 	* Removes all the p2p activity correctionses from the database.
 	*
 	* @throws SystemException if a system exception occurred
@@ -937,6 +1085,18 @@ public class P2pActivityCorrectionsUtil {
 		long userId) throws com.liferay.portal.kernel.exception.SystemException {
 		return getPersistence()
 				   .countByP2pActivityIdAndUserId(p2pActivityId, userId);
+	}
+
+	/**
+	* Returns the number of p2p activity correctionses where userId = &#63;.
+	*
+	* @param userId the user ID
+	* @return the number of matching p2p activity correctionses
+	* @throws SystemException if a system exception occurred
+	*/
+	public static int countByUserId(long userId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence().countByUserId(userId);
 	}
 
 	/**

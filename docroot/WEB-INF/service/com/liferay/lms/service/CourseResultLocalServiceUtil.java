@@ -271,6 +271,11 @@ public class CourseResultLocalServiceUtil {
 		return getService().invokeMethod(name, parameterTypes, arguments);
 	}
 
+	public static java.util.List<com.liferay.lms.model.CourseResult> getByUserId(
+		long userId) {
+		return getService().getByUserId(userId);
+	}
+
 	public static com.liferay.lms.model.CourseResult getByUserAndCourse(
 		long courseId, long userId)
 		throws com.liferay.portal.kernel.exception.SystemException {

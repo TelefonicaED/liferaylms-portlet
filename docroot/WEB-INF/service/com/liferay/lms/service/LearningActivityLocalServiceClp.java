@@ -297,6 +297,10 @@ public class LearningActivityLocalServiceClp
 		_methodName53 = "getMandatoryActivities";
 
 		_methodParameterTypes53 = new String[] { "long" };
+
+		_methodName54 = "getByPrecedence";
+
+		_methodParameterTypes54 = new String[] { "long" };
 	}
 
 	public com.liferay.lms.model.LearningActivity addLearningActivity(
@@ -1976,6 +1980,29 @@ public class LearningActivityLocalServiceClp
 		return (java.util.List<com.liferay.lms.model.LearningActivity>)ClpSerializer.translateOutput(returnObj);
 	}
 
+	public java.util.List<com.liferay.lms.model.LearningActivity> getByPrecedence(
+		long precedence) {
+		Object returnObj = null;
+
+		try {
+			returnObj = _invokableLocalService.invokeMethod(_methodName54,
+					_methodParameterTypes54, new Object[] { precedence });
+		}
+		catch (Throwable t) {
+			t = ClpSerializer.translateThrowable(t);
+
+			if (t instanceof RuntimeException) {
+				throw (RuntimeException)t;
+			}
+			else {
+				throw new RuntimeException(t.getClass().getName() +
+					" is not a valid exception");
+			}
+		}
+
+		return (java.util.List<com.liferay.lms.model.LearningActivity>)ClpSerializer.translateOutput(returnObj);
+	}
+
 	private InvokableLocalService _invokableLocalService;
 	private String _methodName0;
 	private String[] _methodParameterTypes0;
@@ -2083,4 +2110,6 @@ public class LearningActivityLocalServiceClp
 	private String[] _methodParameterTypes52;
 	private String _methodName53;
 	private String[] _methodParameterTypes53;
+	private String _methodName54;
+	private String[] _methodParameterTypes54;
 }

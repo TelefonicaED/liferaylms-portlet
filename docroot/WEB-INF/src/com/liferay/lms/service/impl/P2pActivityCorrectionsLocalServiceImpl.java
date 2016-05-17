@@ -31,6 +31,7 @@ import com.liferay.lms.service.ModuleLocalServiceUtil;
 import com.liferay.lms.service.P2pActivityCorrectionsLocalServiceUtil;
 import com.liferay.lms.service.P2pActivityLocalServiceUtil;
 import com.liferay.lms.service.base.P2pActivityCorrectionsLocalServiceBaseImpl;
+import com.liferay.lms.service.persistence.P2pActivityCorrectionsUtil;
 import com.liferay.portal.kernel.bean.PortletBeanLocatorUtil;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
@@ -403,6 +404,18 @@ public void asignCorrectionsToP2PActivities(long actId, long p2pActivityId,int n
 		}
 		return res;
 	}
+	
+	public List<P2pActivityCorrections> getByUserId(long userId){
+		List<P2pActivityCorrections> corrections = new ArrayList<P2pActivityCorrections>();		
+		try {
+			corrections = P2pActivityCorrectionsUtil.findByUserId(userId);
+		} catch (SystemException e) {
+			e.printStackTrace();
+		}
+		
+		return corrections;
+	}
+	
 	
 	/**
 	 * Para saber si el usuario ya ha realizado todas las correcciones que se indica en el extracontent.
