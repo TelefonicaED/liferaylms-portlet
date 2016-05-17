@@ -86,7 +86,7 @@ public class SCORMLearningActivityType extends BaseLearningActivityType {
 	}
 
 	@Override
-	public void setExtraContent(UploadRequest uploadRequest,
+	public String setExtraContent(UploadRequest uploadRequest,
 			PortletResponse portletResponse, LearningActivity learningActivity)
 			throws PortalException, SystemException, DocumentException,
 			IOException {
@@ -215,6 +215,8 @@ public class SCORMLearningActivityType extends BaseLearningActivityType {
 		rootElement.add(scormDebug);
 		
 		learningActivity.setExtracontent(document.formattedString());
+		
+		return null;
 	}
 	
 	@Override

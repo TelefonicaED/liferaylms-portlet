@@ -30,6 +30,7 @@ import com.liferay.lms.service.LearningActivityLocalServiceUtil;
 import com.liferay.lms.service.P2pActivityCorrectionsLocalServiceUtil;
 import com.liferay.lms.service.P2pActivityLocalServiceUtil;
 import com.liferay.lms.service.base.P2pActivityLocalServiceBaseImpl;
+import com.liferay.lms.service.persistence.P2pActivityUtil;
 import com.liferay.portal.kernel.bean.PortletBeanLocatorUtil;
 import com.liferay.portal.kernel.dao.orm.Criterion;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
@@ -161,6 +162,17 @@ public class P2pActivityLocalServiceImpl extends P2pActivityLocalServiceBaseImpl
 			return null;
 		}
 	}
+	
+	public int countByActId(long actId){
+		try {
+			return P2pActivityUtil.countByActId(actId);
+		} catch (SystemException e) {
+			e.printStackTrace();
+		}
+		return 0;
+
+	}
+	
 	@SuppressWarnings("unchecked")
 	public List<P2pActivity> findByActIdOrderByP2pId(long actId)
 			throws SystemException {

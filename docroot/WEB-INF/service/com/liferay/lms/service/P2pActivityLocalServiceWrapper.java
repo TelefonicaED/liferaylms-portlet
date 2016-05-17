@@ -288,6 +288,10 @@ public class P2pActivityLocalServiceWrapper implements P2pActivityLocalService,
 		return _p2pActivityLocalService.findByActId(actId, start, end);
 	}
 
+	public int countByActId(long actId) {
+		return _p2pActivityLocalService.countByActId(actId);
+	}
+
 	public java.util.List<com.liferay.lms.model.P2pActivity> findByActIdOrderByP2pId(
 		long actId) throws com.liferay.portal.kernel.exception.SystemException {
 		return _p2pActivityLocalService.findByActIdOrderByP2pId(actId);

@@ -129,31 +129,35 @@ public class P2pActivityLocalServiceClp implements P2pActivityLocalService {
 
 		_methodParameterTypes22 = new String[] { "long", "int", "int" };
 
-		_methodName23 = "findByActIdOrderByP2pId";
+		_methodName23 = "countByActId";
 
 		_methodParameterTypes23 = new String[] { "long" };
 
-		_methodName24 = "getUsersToCorrectP2P";
+		_methodName24 = "findByActIdOrderByP2pId";
 
-		_methodParameterTypes24 = new String[] {
+		_methodParameterTypes24 = new String[] { "long" };
+
+		_methodName25 = "getUsersToCorrectP2P";
+
+		_methodParameterTypes25 = new String[] {
 				"long", "long", "int", "java.util.Calendar"
 			};
 
-		_methodName25 = "getP2pActivitiesToCorrect";
+		_methodName26 = "getP2pActivitiesToCorrect";
 
-		_methodParameterTypes25 = new String[] { "long", "long", "int" };
+		_methodParameterTypes26 = new String[] { "long", "long", "int" };
 
-		_methodName26 = "findByUserId";
+		_methodName27 = "findByUserId";
 
-		_methodParameterTypes26 = new String[] { "long" };
+		_methodParameterTypes27 = new String[] { "long" };
 
-		_methodName27 = "getP2PActivitiesInDay";
+		_methodName28 = "getP2PActivitiesInDay";
 
-		_methodParameterTypes27 = new String[] { "java.util.Calendar" };
+		_methodParameterTypes28 = new String[] { "java.util.Calendar" };
 
-		_methodName28 = "getNumCorrectsByDayP2P";
+		_methodName29 = "getNumCorrectsByDayP2P";
 
-		_methodParameterTypes28 = new String[] { "long", "java.util.Calendar" };
+		_methodParameterTypes29 = new String[] { "long", "java.util.Calendar" };
 	}
 
 	public com.liferay.lms.model.P2pActivity addP2pActivity(
@@ -794,13 +798,35 @@ public class P2pActivityLocalServiceClp implements P2pActivityLocalService {
 		return (java.util.List<com.liferay.lms.model.P2pActivity>)ClpSerializer.translateOutput(returnObj);
 	}
 
-	public java.util.List<com.liferay.lms.model.P2pActivity> findByActIdOrderByP2pId(
-		long actId) throws com.liferay.portal.kernel.exception.SystemException {
+	public int countByActId(long actId) {
 		Object returnObj = null;
 
 		try {
 			returnObj = _invokableLocalService.invokeMethod(_methodName23,
 					_methodParameterTypes23, new Object[] { actId });
+		}
+		catch (Throwable t) {
+			t = ClpSerializer.translateThrowable(t);
+
+			if (t instanceof RuntimeException) {
+				throw (RuntimeException)t;
+			}
+			else {
+				throw new RuntimeException(t.getClass().getName() +
+					" is not a valid exception");
+			}
+		}
+
+		return ((Integer)returnObj).intValue();
+	}
+
+	public java.util.List<com.liferay.lms.model.P2pActivity> findByActIdOrderByP2pId(
+		long actId) throws com.liferay.portal.kernel.exception.SystemException {
+		Object returnObj = null;
+
+		try {
+			returnObj = _invokableLocalService.invokeMethod(_methodName24,
+					_methodParameterTypes24, new Object[] { actId });
 		}
 		catch (Throwable t) {
 			t = ClpSerializer.translateThrowable(t);
@@ -828,8 +854,8 @@ public class P2pActivityLocalServiceClp implements P2pActivityLocalService {
 		Object returnObj = null;
 
 		try {
-			returnObj = _invokableLocalService.invokeMethod(_methodName24,
-					_methodParameterTypes24,
+			returnObj = _invokableLocalService.invokeMethod(_methodName25,
+					_methodParameterTypes25,
 					new Object[] {
 						actId,
 						
@@ -870,8 +896,8 @@ public class P2pActivityLocalServiceClp implements P2pActivityLocalService {
 		Object returnObj = null;
 
 		try {
-			returnObj = _invokableLocalService.invokeMethod(_methodName25,
-					_methodParameterTypes25,
+			returnObj = _invokableLocalService.invokeMethod(_methodName26,
+					_methodParameterTypes26,
 					new Object[] { actId, p2pActivityId, numValidaciones });
 		}
 		catch (Throwable t) {
@@ -902,8 +928,8 @@ public class P2pActivityLocalServiceClp implements P2pActivityLocalService {
 		Object returnObj = null;
 
 		try {
-			returnObj = _invokableLocalService.invokeMethod(_methodName26,
-					_methodParameterTypes26, new Object[] { userId });
+			returnObj = _invokableLocalService.invokeMethod(_methodName27,
+					_methodParameterTypes27, new Object[] { userId });
 		}
 		catch (Throwable t) {
 			t = ClpSerializer.translateThrowable(t);
@@ -927,8 +953,8 @@ public class P2pActivityLocalServiceClp implements P2pActivityLocalService {
 		Object returnObj = null;
 
 		try {
-			returnObj = _invokableLocalService.invokeMethod(_methodName27,
-					_methodParameterTypes27,
+			returnObj = _invokableLocalService.invokeMethod(_methodName28,
+					_methodParameterTypes28,
 					new Object[] { ClpSerializer.translateInput(calendar) });
 		}
 		catch (Throwable t) {
@@ -960,8 +986,8 @@ public class P2pActivityLocalServiceClp implements P2pActivityLocalService {
 		Object returnObj = null;
 
 		try {
-			returnObj = _invokableLocalService.invokeMethod(_methodName28,
-					_methodParameterTypes28,
+			returnObj = _invokableLocalService.invokeMethod(_methodName29,
+					_methodParameterTypes29,
 					new Object[] { actId, ClpSerializer.translateInput(calendar) });
 		}
 		catch (Throwable t) {
@@ -1044,4 +1070,6 @@ public class P2pActivityLocalServiceClp implements P2pActivityLocalService {
 	private String[] _methodParameterTypes27;
 	private String _methodName28;
 	private String[] _methodParameterTypes28;
+	private String _methodName29;
+	private String[] _methodParameterTypes29;
 }

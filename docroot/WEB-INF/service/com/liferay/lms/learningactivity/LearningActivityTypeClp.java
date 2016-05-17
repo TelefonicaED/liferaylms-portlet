@@ -447,7 +447,7 @@ public class LearningActivityTypeClp implements LearningActivityType {
 		return ((String)returnObj);
 	}
 	
-	public void setExtraContent(UploadRequest uploadRequest, 
+	public String setExtraContent(UploadRequest uploadRequest, 
 			PortletResponse portletResponse,LearningActivity learningActivity) 
 			throws PortalException,SystemException,DocumentException,IOException {
 		try {
@@ -486,6 +486,7 @@ public class LearningActivityTypeClp implements LearningActivityType {
 					" is not a valid exception");
 			}
 		}
+		return null;
 
 	}
 	

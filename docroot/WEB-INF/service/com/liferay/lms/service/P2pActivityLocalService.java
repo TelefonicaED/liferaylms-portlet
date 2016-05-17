@@ -259,6 +259,8 @@ public interface P2pActivityLocalService extends BaseLocalService,
 		long actId, int start, int end)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
+	public int countByActId(long actId);
+
 	public java.util.List<com.liferay.lms.model.P2pActivity> findByActIdOrderByP2pId(
 		long actId) throws com.liferay.portal.kernel.exception.SystemException;
 

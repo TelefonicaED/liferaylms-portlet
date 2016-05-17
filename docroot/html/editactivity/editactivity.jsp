@@ -54,7 +54,7 @@
 <liferay-ui:error key="execactivity.editActivity.questionsPerPage.number" message="execActivity.options.error.questionsPerPage"></liferay-ui:error>
 <liferay-ui:error key="execactivity.editActivity.random.number" message="execActivity.options.error.random"></liferay-ui:error>
 <liferay-ui:error key="general.error" message="edit.activity.general.error"></liferay-ui:error>
-
+<liferay-ui:error key="error-p2pActivity-inProgress" message="p2ptaskactivity.error.extraContentInProgress" />
 <%
 renderResponse.setProperty(
 		"clear-request-parameters", Boolean.TRUE.toString());
@@ -948,4 +948,3 @@ Liferay.provide(
 		<aui:button type="cancel" value="canceledition" />
 	</aui:button-row>
 </aui:form>
- <liferay-ui:success key="activity-saved-successfully" message="activity-saved-successfully" />

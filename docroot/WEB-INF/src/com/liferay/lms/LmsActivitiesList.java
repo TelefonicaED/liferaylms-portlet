@@ -326,9 +326,7 @@ public class LmsActivitiesList extends MVCPortlet {
 			}
 						
 			learningActivityType=new LearningActivityTypeRegistry().getLearningActivityType(type);
-		}
-		else
-		{		
+		}else{		
 			learningActivityType=new LearningActivityTypeRegistry().
 					getLearningActivityType(LearningActivityLocalServiceUtil.getLearningActivity(actId).getTypeId());
 		}
@@ -340,17 +338,13 @@ public class LmsActivitiesList extends MVCPortlet {
 		}
 		
 		
-		if (actId == 0) 
-		{
+		if (actId == 0){
 
-			if(permissionChecker.hasPermission(
-					themeDisplay.getScopeGroupId(),
-					Module.class.getName(), moduleId,
-					"ADD_LACT"))
-			{
-			larn =LearningActivityLocalServiceUtil.addLearningActivity(
-				"", "", ahora, startDate, stopDate, type, tries, passpuntuation, moduleId, "", feedbackCorrect, feedbackNoCorrect, serviceContext);
+			if(permissionChecker.hasPermission(themeDisplay.getScopeGroupId(),Module.class.getName(), moduleId,"ADD_LACT")){
+				larn =LearningActivityLocalServiceUtil.addLearningActivity(
+						"", "", ahora, startDate, stopDate, type, tries, passpuntuation, moduleId, "", feedbackCorrect, feedbackNoCorrect, serviceContext);
 			}
+			
 			long teamId =ParamUtil.get(uploadRequest, "team", 0);
 			//Leemos del portal.properties el estado del permiso VIEW por defecto para siteMember en las actividades nuevas (si no existe, por defecto ser�n visibles)
 			boolean hideStr = Boolean.parseBoolean(PrefsPropsUtil.getString("learningactivity.default.hidenewactivity", "false"));
@@ -378,9 +372,7 @@ public class LmsActivitiesList extends MVCPortlet {
 				}
 			}
 				
-		}
-		else 
-		{
+		}else{
 			LearningActivity tmp =	LearningActivityLocalServiceUtil.getLearningActivity(actId);
 			if(permissionChecker.hasPermission(
 					themeDisplay.getScopeGroupId(),
@@ -425,15 +417,13 @@ public class LmsActivitiesList extends MVCPortlet {
 		larn.setPrecedence(precedence);
 		Enumeration<String> parNames= uploadRequest.getParameterNames();
 		
-		while(parNames.hasMoreElements())
-		{
-		  String paramName=parNames.nextElement();
-		  if(paramName.startsWith("title_")&&paramName.length()>6)
-		  { 
-			  String language=paramName.substring(6);
-			  Locale locale=LocaleUtil.fromLanguageId(language);
-			  larn.setTitle( uploadRequest.getParameter(paramName),locale);
-		  }
+		while(parNames.hasMoreElements()){
+			String paramName=parNames.nextElement();
+			if(paramName.startsWith("title_")&&paramName.length()>6) { 
+				String language=paramName.substring(6);
+				Locale locale=LocaleUtil.fromLanguageId(language);
+				larn.setTitle( uploadRequest.getParameter(paramName),locale);
+			}
 		}
 		
 		//descomentar si se permiten llamadas por webservice, ademas a�adir booleano editionBlocked en los metodos setExtraContent de las actividades
@@ -441,43 +431,42 @@ public class LmsActivitiesList extends MVCPortlet {
 		/*boolean setExtraContent = false;
 		if(actId == 0) setExtraContent = true;
 		else setExtraContent = LearningActivityLocalServiceUtil.canBeEdited(larn, user.getUserId());
-		if(setExtraContent)*/
-		learningActivityType.setExtraContent(uploadRequest,actionResponse,larn);
+		if(setExtraContent)*/		
+		
+		String extraContentError = learningActivityType.setExtraContent(uploadRequest,actionResponse,larn);
+		
+		if(Validator.isNotNull(extraContentError)){
+			SessionErrors.add(actionRequest, extraContentError);
+		}
+		
 		//Seteamos permiso de view a quien corresponda.
 		long teamId =ParamUtil.get(uploadRequest, "team", 0);
 		//Leemos del portal.properties el estado del permiso VIEW por defecto para siteMember en las actividades nuevas (si no existe, por defecto ser�n visibles)
 		boolean hideStr = Boolean.parseBoolean(PrefsPropsUtil.getString("learningactivity.default.hidenewactivity", "false"));
 		Role siteMemberRole = RoleLocalServiceUtil.getRole(themeDisplay.getCompanyId(), RoleConstants.SITE_MEMBER);
 		if(teamId==0){
-			if(hideStr)
-			{
+			if(hideStr){
 					ResourcePermissionLocalServiceUtil.removeResourcePermission(siteMemberRole.getCompanyId(), LearningActivity.class.getName(), 
 					ResourceConstants.SCOPE_INDIVIDUAL,	Long.toString(larn.getActId()),siteMemberRole.getRoleId(), ActionKeys.VIEW);	
-			}
-			else ResourcePermissionLocalServiceUtil.setResourcePermissions(siteMemberRole.getCompanyId(), LearningActivity.class.getName(), 
+			}else{ResourcePermissionLocalServiceUtil.setResourcePermissions(siteMemberRole.getCompanyId(), LearningActivity.class.getName(), 
 						ResourceConstants.SCOPE_INDIVIDUAL,	Long.toString(larn.getActId()),siteMemberRole.getRoleId(), new String[] {ActionKeys.VIEW});
-		}
-		else{
+			}
+		}else{
 			Team t = TeamLocalServiceUtil.getTeam(teamId);
 			Role teamMemberRole = RoleLocalServiceUtil.getTeamRole(t.getCompanyId(), t.getTeamId());
-			if(hideStr)
-			{
+			if(hideStr){
 				ResourcePermissionLocalServiceUtil.removeResourcePermission(t.getCompanyId(), LearningActivity.class.getName(), 
 						ResourceConstants.SCOPE_INDIVIDUAL,	Long.toString(actId),teamMemberRole.getRoleId(), ActionKeys.VIEW);	
-			}else {
+			}else{
 				String[] actIds = {ActionKeys.VIEW};
 				ResourcePermissionLocalServiceUtil.setResourcePermissions(t.getCompanyId(), LearningActivity.class.getName(), 
 						ResourceConstants.SCOPE_INDIVIDUAL,	Long.toString(actId),teamMemberRole.getRoleId(), actIds);
 			}
 		}
-		if(permissionChecker.hasPermission(
-				themeDisplay.getScopeGroupId(),
-				LearningActivity.class.getName(), larn.getActId(),
-				ActionKeys.UPDATE)||permissionChecker.hasOwnerPermission(
-						themeDisplay.getCompanyId(),
-						LearningActivity.class.getName(), larn.getActId(),larn.getUserId(),
-						ActionKeys.UPDATE)||isnew)
-		{
+		
+		if(permissionChecker.hasPermission(themeDisplay.getScopeGroupId(),LearningActivity.class.getName(), larn.getActId(),ActionKeys.UPDATE)
+				||permissionChecker.hasOwnerPermission(themeDisplay.getCompanyId(),LearningActivity.class.getName(), larn.getActId(),larn.getUserId(),ActionKeys.UPDATE)
+				||isnew){
 			LearningActivityLocalServiceUtil.updateLearningActivity(larn);
 			learningActivityType.afterInsertOrUpdate(uploadRequest,actionResponse,larn);
 		}
@@ -492,10 +481,8 @@ public class LmsActivitiesList extends MVCPortlet {
 		if (Validator.isNotNull(redirect)) {
 			if (!windowState.equals(LiferayWindowState.POP_UP)) {
 				actionResponse.sendRedirect(redirect);
-			}
-			else {
+			}else {
 				redirect = PortalUtil.escapeRedirect(redirect);
-
 				if (Validator.isNotNull(redirect)) {
 					actionResponse.sendRedirect(redirect);
 				}

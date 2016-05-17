@@ -605,6 +605,7 @@ public class P2PActivityPortlet extends MVCPortlet {
 		LearningActivityLocalServiceUtil.setExtraContentValue(actId, "anonimous", anonimous);
 		LearningActivityLocalServiceUtil.setExtraContentValue(actId, "result", result);
 	
+		_log.debug(":::numValidaciones:::");
 		SessionMessages.add(actionRequest, "activity-saved-successfully");
 	}
 
