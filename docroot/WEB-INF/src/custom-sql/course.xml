@@ -184,10 +184,10 @@
 					ON u.userId = ug.userId
 			LEFT JOIN 
 				usergrouprole ur 
-					ON ug.userId = ur.userId AND ur.roleId= ?
+					ON ug.userId = ur.userId AND ur.groupId = ug.groupId AND ur.roleId= ?
 			LEFT JOIN 
 				usergrouprole urE 
-					ON ug.userId = urE.userId AND urE.roleId = ?
+					ON ug.userId = urE.userId AND ur.groupId = ug.groupId AND urE.roleId = ?
 			WHERE 
 				ur.userId IS NULL AND urE.userId IS NULL AND co.courseId = ? AND u.status = ?
 				AND ((? = '') OR (u.screenName LIKE ?) ) AND ((? = '') OR (u.firstName LIKE ?) ) 
@@ -210,10 +210,10 @@
 					ON u.userId = ug.userId
 			LEFT JOIN 
 				usergrouprole ur 
-					ON ug.userId = ur.userId AND ur.roleId= ?
+					ON ug.userId = ur.userId AND ur.groupId = ug.groupId AND ur.roleId= ?
 			LEFT JOIN 
 				usergrouprole urE 
-					ON ug.userId = urE.userId AND urE.roleId = ?
+					ON ug.userId = urE.userId AND ur.groupId = ug.groupId AND urE.roleId = ?
 			WHERE 
 				ur.userId IS NULL AND urE.userId IS NULL AND co.courseId = ? AND u.status = ?
 				AND ((? = '') OR (u.screenName LIKE ?) ) AND ((? = '') OR (u.firstName LIKE ?) ) 
