@@ -475,8 +475,7 @@ AUI().ready('node-base' ,'aui-form-validator', 'aui-overlay-context-panel', 'wid
 				}
 			}
 		}
-
-		document.getElementById('<portlet:namespace />fm').submit();
+		return true;
 	}
 
 	function getStartDate(){
@@ -524,12 +523,26 @@ AUI().ready('node-base' ,'aui-form-validator', 'aui-overlay-context-panel', 'wid
 	);
 //-->
 </script>
-<aui:form name="fm" action="<%=saveactivityURL%>"  method="post"   onSubmit='<%= "event.preventDefault(); " + renderResponse.getNamespace() + "validate();" %>' enctype="multipart/form-data">
+<aui:form name="fm" action="<%=saveactivityURL%>"  method="post"   onSubmit="event.preventDefault();${renderResponse.getNamespace()}validateForm();" enctype="multipart/form-data">
 	<aui:fieldset>
 		<aui:input name="redirect" type="hidden" value="<%= redirect %>" />
 		<aui:input name="maxSize" type="hidden" value="<%= fileMaxSize %>" />
 		<aui:input name="backURL" type="hidden" value="<%= backURL %>" />
 		<aui:input name="referringPortletResource" type="hidden" value="<%= referringPortletResource %>" />
+	
+<aui:script>
+	Liferay.provide(
+		window,
+		'<portlet:namespace />validateForm',
+		function() {
+			if(<portlet:namespace />validate()){
+				submitForm(document.<portlet:namespace />fm);
+			}
+			
+		},
+		['liferay-util-list-fields']
+	);
+</aui:script>	
 	
 <script type="text/javascript">
 <!--
@@ -678,6 +691,7 @@ Liferay.provide(
 		%>
 		
 		<aui:input size="5" name="tries" label="tries" value="<%=Long.toString(tries) %>" type="number"  disabled="<%=disabled%>">
+			<aui:validator name="min" errorMessage="editActivity.tries.range">-1</aui:validator>
 		</aui:input><%--liferay-ui:icon-help message="number-of-tries"></liferay-ui:icon-help--%>
   		<div id="<portlet:namespace />triesError" class="<%=((SessionErrors.contains(renderRequest, "editActivity.tries.required"))||
 														      (SessionErrors.contains(renderRequest, "editActivity.tries.number"))||
@@ -708,7 +722,9 @@ Liferay.provide(
 			}
 			
 		%>
-		<aui:input size="5" name="passpuntuation" label="passpuntuation" type="text" value="<%=Long.toString(score) %>" disabled="<%=disabled %>" helpMessage="<%=LanguageUtil.get(pageContext,\"editActivity.passpuntuation.help\")%>">
+		<aui:input size="5" name="passpuntuation" label="passpuntuation" type="number" value="<%=Long.toString(score) %>" disabled="<%=disabled %>" helpMessage="<%=LanguageUtil.get(pageContext,\"editActivity.passpuntuation.help\")%>">
+			<aui:validator name="min" errorMessage="editActivity.passpuntuation.range">-1</aui:validator>
+			<aui:validator name="max" errorMessage="editActivity.passpuntuation.range">101</aui:validator>
 		</aui:input>
 		<% if (disabled) { %>
 		<input name="<portlet:namespace />passpuntuation" type="hidden" value="<%=Long.toString(score) %>" />
