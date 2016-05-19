@@ -61,6 +61,7 @@ import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.FriendlyURLNormalizerUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.StringPool;
@@ -947,12 +948,12 @@ public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int e
 		return CourseFinderUtil.countByT_S_C_T(title, status, categories, tags, companyId, groupId, userId, language, isAdmin, andOperator);
 	}
 	
-	public List<User> getStudents(long courseId, long companyId, int start, int end){
-		return CourseFinderUtil.findStudents(courseId, companyId, start, end);
+	public List<User> getStudents(long courseId, long companyId, String screenName, String firstName, String lastName, String emailAddress, boolean andOperator, int start, int end,OrderByComparator comparator){
+		return CourseFinderUtil.findStudents(courseId, companyId, screenName,firstName, lastName, emailAddress, andOperator, start, end, comparator);
 	}
 	
-	public int countStudents(long courseId, long companyId){
-		return CourseFinderUtil.countStudents(courseId, companyId);
+	public int countStudents(long courseId, long companyId, String screenName, String firstName, String lastName, String emailAddress,boolean andOperator){
+		return CourseFinderUtil.countStudents(courseId, companyId, screenName,firstName, lastName, emailAddress,andOperator);
 	}
 }
 

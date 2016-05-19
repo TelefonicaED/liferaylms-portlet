@@ -120,7 +120,7 @@ String firstName = ParamUtil.getString(request, "first-name","");
 String lastName = ParamUtil.getString(request, "last-name","");
 String screenName = ParamUtil.getString(request, "screen-name","");
 String emailAddress = ParamUtil.getString(request, "email-address","");
-boolean searchUsers = ParamUtil.getBoolean(request, "searchUsers");
+
 
 
 //List<User> listaUsuarioTotal = UserLocalServiceUtil.getGroupUsers(course.getGroupCreatedId());
@@ -159,7 +159,6 @@ userSearchContainer.setTotal(totalUsers);
 				<aui:input type="hidden" name="actId" value="<%=actId %>"/>
 				<aui:input type="hidden" name="courseId" value="<%=courseId %>"/>
 				<aui:input type="hidden" name="jspPage" value="/html/execactivity/test/correction.jsp"/>
-				<aui:input type="hidden" name="searchUsers" value="true"/>
 				
 				<aui:fieldset>
 					<aui:input type="text" name="first-name" value="<%=firstName %>" inlineField="true"  />

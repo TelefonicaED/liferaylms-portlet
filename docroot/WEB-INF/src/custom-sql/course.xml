@@ -190,6 +190,8 @@
 					ON ug.userId = urE.userId AND urE.roleId = ?
 			WHERE 
 				ur.userId IS NULL AND urE.userId IS NULL AND co.courseId = ? AND u.status = ?
+				AND ((? = '') OR (u.screenName LIKE ?) ) AND ((? = '') OR (u.firstName LIKE ?) ) 
+				AND ((? = '') OR (u.lastName LIKE ?) ) AND ((? = '') OR (u.emailAddress LIKE ?) )
 			ORDER BY u.firstName, u.middleName, u.lastName
 			LIMIT ?, ?
 		]]>
@@ -214,6 +216,8 @@
 					ON ug.userId = urE.userId AND urE.roleId = ?
 			WHERE 
 				ur.userId IS NULL AND urE.userId IS NULL AND co.courseId = ? AND u.status = ?
+				AND ((? = '') OR (u.screenName LIKE ?) ) AND ((? = '') OR (u.firstName LIKE ?) ) 
+				AND ((? = '') OR (u.lastName LIKE ?) ) AND ((? = '') OR (u.emailAddress LIKE ?) )
 		]]>
 	</sql>
 </custom-sql>
