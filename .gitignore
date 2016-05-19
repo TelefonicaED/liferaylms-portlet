@@ -2,6 +2,7 @@
 docroot/WEB-INF/classes
 docroot/WEB-INF/service
 /bin/
+.settings
 /.classpath
 /.project
 /.tern-project
