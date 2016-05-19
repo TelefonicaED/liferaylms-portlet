@@ -19,7 +19,9 @@ import com.liferay.portal.kernel.dao.orm.Type;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.Organization;
@@ -302,10 +304,36 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 	    return 0;
 	}
 	
-	public List<User> findStudents(long courseId, long companyId, int start, int end){
+	public List<User> findStudents(long courseId, long companyId, String screenName, String firstName, String lastName, String emailAddress,boolean andOperator, int start, int end,OrderByComparator comparator){
 		Session session = null;
 		
 		try{
+			
+			if(Validator.isNotNull(screenName)){
+				screenName = "%" + screenName + "%";
+			}else{
+				screenName = "";
+			}
+			if(Validator.isNotNull(firstName)){
+				firstName = "%" + firstName + "%";
+			}else{
+				firstName = "";
+			}
+			if(Validator.isNotNull(lastName)){
+				lastName = "%" + lastName + "%";
+			}else{
+				lastName = "";
+			}
+			if(Validator.isNotNull(emailAddress)){
+				emailAddress = "%" + emailAddress + "%";
+			}else{
+				emailAddress = "";
+			}
+			
+			log.debug("ScreenName:"+screenName);
+			log.debug("firstName:"+firstName);
+			log.debug("lastName:"+lastName);
+			log.debug("emailAddress:"+emailAddress);
 			
 			session = openSessionLiferay();
 			
@@ -324,9 +352,18 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			qPos.add(editorRoleId);
 			qPos.add(courseId);
 			qPos.add(WorkflowConstants.STATUS_APPROVED);
+			
+			qPos.add(screenName);
+			qPos.add(screenName);
+			qPos.add(firstName);
+			qPos.add(firstName);
+			qPos.add(lastName);
+			qPos.add(lastName);
+			qPos.add(emailAddress);
+			qPos.add(emailAddress);
+			
 			qPos.add(start);
 			qPos.add((start+end));
-
 			
 			List<User> listUsers = (List<User>) q.list();
 			
@@ -343,10 +380,36 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 	    return new ArrayList<User>();
 	}
 	
-	public int countStudents(long courseId, long companyId){
+	public int countStudents(long courseId, long companyId, String screenName, String firstName, String lastName, String emailAddress,boolean andOperator){
 		Session session = null;
 		
 		try{
+			
+			if(Validator.isNotNull(screenName)){
+				screenName = "%" + screenName + "%";
+			}else{
+				screenName = "";
+			}
+			if(Validator.isNotNull(firstName)){
+				firstName = "%" + firstName + "%";
+			}else{
+				firstName = "";
+			}
+			if(Validator.isNotNull(lastName)){
+				lastName = "%" + lastName + "%";
+			}else{
+				lastName = "";
+			}
+			if(Validator.isNotNull(emailAddress)){
+				emailAddress = "%" + emailAddress + "%";
+			}else{
+				emailAddress = "";
+			}	
+			
+			log.debug("ScreenName:"+screenName);
+			log.debug("firstName:"+firstName);
+			log.debug("lastName:"+lastName);
+			log.debug("emailAddress:"+emailAddress);
 			
 			session = openSessionLiferay();
 			
@@ -366,6 +429,15 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			qPos.add(courseId);
 			qPos.add(WorkflowConstants.STATUS_APPROVED);
 
+			qPos.add(screenName);
+			qPos.add(screenName);
+			qPos.add(firstName);
+			qPos.add(firstName);
+			qPos.add(lastName);
+			qPos.add(lastName);
+			qPos.add(emailAddress);
+			qPos.add(emailAddress);
+			
 			Iterator<Long> itr = q.iterate();
 
 			if (itr.hasNext()) {

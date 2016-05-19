@@ -259,11 +259,18 @@ public class CourseLocalServiceClp implements CourseLocalService {
 
 		_methodName47 = "getStudents";
 
-		_methodParameterTypes47 = new String[] { "long", "long", "int", "int" };
+		_methodParameterTypes47 = new String[] {
+				"long", "long", "java.lang.String", "java.lang.String",
+				"java.lang.String", "java.lang.String", "boolean", "int", "int",
+				"com.liferay.portal.kernel.util.OrderByComparator"
+			};
 
 		_methodName48 = "countStudents";
 
-		_methodParameterTypes48 = new String[] { "long", "long" };
+		_methodParameterTypes48 = new String[] {
+				"long", "long", "java.lang.String", "java.lang.String",
+				"java.lang.String", "java.lang.String", "boolean"
+			};
 	}
 
 	public com.liferay.lms.model.Course addCourse(
@@ -1800,13 +1807,36 @@ public class CourseLocalServiceClp implements CourseLocalService {
 	}
 
 	public java.util.List<com.liferay.portal.model.User> getStudents(
-		long courseId, long companyId, int start, int end) {
+		long courseId, long companyId, java.lang.String screenName,
+		java.lang.String firstName, java.lang.String lastName,
+		java.lang.String emailAddress, boolean andOperator, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator comparator) {
 		Object returnObj = null;
 
 		try {
 			returnObj = _invokableLocalService.invokeMethod(_methodName47,
 					_methodParameterTypes47,
-					new Object[] { courseId, companyId, start, end });
+					new Object[] {
+						courseId,
+						
+					companyId,
+						
+					ClpSerializer.translateInput(screenName),
+						
+					ClpSerializer.translateInput(firstName),
+						
+					ClpSerializer.translateInput(lastName),
+						
+					ClpSerializer.translateInput(emailAddress),
+						
+					andOperator,
+						
+					start,
+						
+					end,
+						
+					ClpSerializer.translateInput(comparator)
+					});
 		}
 		catch (Throwable t) {
 			t = ClpSerializer.translateThrowable(t);
@@ -1823,13 +1853,30 @@ public class CourseLocalServiceClp implements CourseLocalService {
 		return (java.util.List<com.liferay.portal.model.User>)ClpSerializer.translateOutput(returnObj);
 	}
 
-	public int countStudents(long courseId, long companyId) {
+	public int countStudents(long courseId, long companyId,
+		java.lang.String screenName, java.lang.String firstName,
+		java.lang.String lastName, java.lang.String emailAddress,
+		boolean andOperator) {
 		Object returnObj = null;
 
 		try {
 			returnObj = _invokableLocalService.invokeMethod(_methodName48,
 					_methodParameterTypes48,
-					new Object[] { courseId, companyId });
+					new Object[] {
+						courseId,
+						
+					companyId,
+						
+					ClpSerializer.translateInput(screenName),
+						
+					ClpSerializer.translateInput(firstName),
+						
+					ClpSerializer.translateInput(lastName),
+						
+					ClpSerializer.translateInput(emailAddress),
+						
+					andOperator
+					});
 		}
 		catch (Throwable t) {
 			t = ClpSerializer.translateThrowable(t);

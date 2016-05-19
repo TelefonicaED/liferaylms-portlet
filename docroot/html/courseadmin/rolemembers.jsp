@@ -101,8 +101,8 @@ portletURL.setParameter("tabs1",tab);
 	}
 	else
 	{
-		results = CourseLocalServiceUtil.getStudents(courseId, themeDisplay.getCompanyId(), searchContainer.getStart(), searchContainer.getEnd());
-		total = CourseLocalServiceUtil.countStudents(courseId, themeDisplay.getCompanyId());	
+		results = CourseLocalServiceUtil.getStudents(courseId, themeDisplay.getCompanyId(), null,null,null,null,true,searchContainer.getStart(), searchContainer.getEnd(),null);
+		total = CourseLocalServiceUtil.countStudents(courseId, themeDisplay.getCompanyId(), null,null,null,null,true);	
 	}
 	
 	pageContext.setAttribute("results", results);

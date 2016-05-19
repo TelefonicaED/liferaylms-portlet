@@ -267,11 +267,18 @@ public class CourseLocalServiceClpInvoker {
 
 		_methodName220 = "getStudents";
 
-		_methodParameterTypes220 = new String[] { "long", "long", "int", "int" };
+		_methodParameterTypes220 = new String[] {
+				"long", "long", "java.lang.String", "java.lang.String",
+				"java.lang.String", "java.lang.String", "boolean", "int", "int",
+				"com.liferay.portal.kernel.util.OrderByComparator"
+			};
 
 		_methodName221 = "countStudents";
 
-		_methodParameterTypes221 = new String[] { "long", "long" };
+		_methodParameterTypes221 = new String[] {
+				"long", "long", "java.lang.String", "java.lang.String",
+				"java.lang.String", "java.lang.String", "boolean"
+			};
 	}
 
 	public Object invokeMethod(String name, String[] parameterTypes,
@@ -585,14 +592,21 @@ public class CourseLocalServiceClpInvoker {
 				Arrays.deepEquals(_methodParameterTypes220, parameterTypes)) {
 			return CourseLocalServiceUtil.getStudents(((Long)arguments[0]).longValue(),
 				((Long)arguments[1]).longValue(),
-				((Integer)arguments[2]).intValue(),
-				((Integer)arguments[3]).intValue());
+				(java.lang.String)arguments[2], (java.lang.String)arguments[3],
+				(java.lang.String)arguments[4], (java.lang.String)arguments[5],
+				((Boolean)arguments[6]).booleanValue(),
+				((Integer)arguments[7]).intValue(),
+				((Integer)arguments[8]).intValue(),
+				(com.liferay.portal.kernel.util.OrderByComparator)arguments[9]);
 		}
 
 		if (_methodName221.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes221, parameterTypes)) {
 			return CourseLocalServiceUtil.countStudents(((Long)arguments[0]).longValue(),
-				((Long)arguments[1]).longValue());
+				((Long)arguments[1]).longValue(),
+				(java.lang.String)arguments[2], (java.lang.String)arguments[3],
+				(java.lang.String)arguments[4], (java.lang.String)arguments[5],
+				((Boolean)arguments[6]).booleanValue());
 		}
 
 		throw new UnsupportedOperationException();
