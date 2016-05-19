@@ -494,12 +494,22 @@ public class CourseLocalServiceUtil {
 	}
 
 	public static java.util.List<com.liferay.portal.model.User> getStudents(
-		long courseId, long companyId, int start, int end) {
-		return getService().getStudents(courseId, companyId, start, end);
+		long courseId, long companyId, java.lang.String screenName,
+		java.lang.String firstName, java.lang.String lastName,
+		java.lang.String emailAddress, boolean andOperator, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator comparator) {
+		return getService()
+				   .getStudents(courseId, companyId, screenName, firstName,
+			lastName, emailAddress, andOperator, start, end, comparator);
 	}
 
-	public static int countStudents(long courseId, long companyId) {
-		return getService().countStudents(courseId, companyId);
+	public static int countStudents(long courseId, long companyId,
+		java.lang.String screenName, java.lang.String firstName,
+		java.lang.String lastName, java.lang.String emailAddress,
+		boolean andOperator) {
+		return getService()
+				   .countStudents(courseId, companyId, screenName, firstName,
+			lastName, emailAddress, andOperator);
 	}
 
 	public static void clearService() {

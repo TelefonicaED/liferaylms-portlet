@@ -120,6 +120,7 @@ public class SurveyResultLocalServiceClpInvoker {
 
 		_methodParameterTypes143 = new String[] { "long" };
 
+<<<<<<< HEAD
 		_methodName144 = "getSurveyResultsByQuestionIdActId";
 
 		_methodParameterTypes144 = new String[] { "long", "long" };
@@ -139,6 +140,19 @@ public class SurveyResultLocalServiceClpInvoker {
 		_methodName148 = "getTotalAnswersByQuestionId";
 
 		_methodParameterTypes148 = new String[] { "long" };
+=======
+		_methodName144 = "getPercentageByQuestionIdAndAnswerId";
+
+		_methodParameterTypes144 = new String[] { "long", "long", "long" };
+
+		_methodName145 = "getPercentageByQuestionIdAndAnswerId";
+
+		_methodParameterTypes145 = new String[] { "long", "long" };
+
+		_methodName146 = "getTotalAnswersByQuestionId";
+
+		_methodParameterTypes146 = new String[] { "long" };
+>>>>>>> 6e2ce4c1051fb85801cbd9af45be56d5d9fbf75f
 	}
 
 	public Object invokeMethod(String name, String[] parameterTypes,
@@ -252,17 +266,21 @@ public class SurveyResultLocalServiceClpInvoker {
 
 		if (_methodName144.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes144, parameterTypes)) {
+<<<<<<< HEAD
 			return SurveyResultLocalServiceUtil.getSurveyResultsByQuestionIdActId(((Long)arguments[0]).longValue(),
 				((Long)arguments[1]).longValue());
 		}
 
 		if (_methodName145.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes145, parameterTypes)) {
+=======
+>>>>>>> 6e2ce4c1051fb85801cbd9af45be56d5d9fbf75f
 			return SurveyResultLocalServiceUtil.getPercentageByQuestionIdAndAnswerId(((Long)arguments[0]).longValue(),
 				((Long)arguments[1]).longValue(),
 				((Long)arguments[2]).longValue());
 		}
 
+<<<<<<< HEAD
 		if (_methodName146.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes146, parameterTypes)) {
 			return SurveyResultLocalServiceUtil.getCountByQuestionIdAndAnswerId(((Long)arguments[0]).longValue(),
@@ -271,12 +289,21 @@ public class SurveyResultLocalServiceClpInvoker {
 
 		if (_methodName147.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes147, parameterTypes)) {
+=======
+		if (_methodName145.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes145, parameterTypes)) {
+>>>>>>> 6e2ce4c1051fb85801cbd9af45be56d5d9fbf75f
 			return SurveyResultLocalServiceUtil.getPercentageByQuestionIdAndAnswerId(((Long)arguments[0]).longValue(),
 				((Long)arguments[1]).longValue());
 		}
 
+<<<<<<< HEAD
 		if (_methodName148.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes148, parameterTypes)) {
+=======
+		if (_methodName146.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes146, parameterTypes)) {
+>>>>>>> 6e2ce4c1051fb85801cbd9af45be56d5d9fbf75f
 			return SurveyResultLocalServiceUtil.getTotalAnswersByQuestionId(((Long)arguments[0]).longValue());
 		}
 
@@ -329,8 +356,11 @@ public class SurveyResultLocalServiceClpInvoker {
 	private String[] _methodParameterTypes145;
 	private String _methodName146;
 	private String[] _methodParameterTypes146;
+<<<<<<< HEAD
 	private String _methodName147;
 	private String[] _methodParameterTypes147;
 	private String _methodName148;
 	private String[] _methodParameterTypes148;
+=======
+>>>>>>> 6e2ce4c1051fb85801cbd9af45be56d5d9fbf75f
 }

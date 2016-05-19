@@ -7,6 +7,8 @@
 				DISTINCT c.*
 			FROM 
 				lms_course c
+			INNER JOIN group_ g
+				ON c.groupCreatedId = g.groupId 
 			[$JOINASSET$] 
 			[$JOINASSETCATEGORIES$] 
 			[$JOINASSETTAGS$]
@@ -46,6 +48,8 @@
 				COUNT(DISTINCT c.courseId) AS COUNT_VALUE
 			FROM 
 				lms_course c
+			INNER JOIN group_ g
+				ON c.groupCreatedId = g.groupId 
 			[$JOINASSET$] 
 			[$JOINASSETCATEGORIES$] 
 			[$JOINASSETTAGS$]
@@ -184,12 +188,14 @@
 					ON u.userId = ug.userId
 			LEFT JOIN 
 				usergrouprole ur 
-					ON ug.userId = ur.userId AND ur.roleId= ?
+					ON ug.userId = ur.userId AND ur.groupId = ug.groupId AND ur.roleId= ?
 			LEFT JOIN 
 				usergrouprole urE 
-					ON ug.userId = urE.userId AND urE.roleId = ?
+					ON ug.userId = urE.userId AND ur.groupId = ug.groupId AND urE.roleId = ?
 			WHERE 
 				ur.userId IS NULL AND urE.userId IS NULL AND co.courseId = ? AND u.status = ?
+				AND ((? = '') OR (u.screenName LIKE ?) ) AND ((? = '') OR (u.firstName LIKE ?) ) 
+				AND ((? = '') OR (u.lastName LIKE ?) ) AND ((? = '') OR (u.emailAddress LIKE ?) )
 			ORDER BY u.firstName, u.middleName, u.lastName
 			LIMIT ?, ?
 		]]>
@@ -208,12 +214,14 @@
 					ON u.userId = ug.userId
 			LEFT JOIN 
 				usergrouprole ur 
-					ON ug.userId = ur.userId AND ur.roleId= ?
+					ON ug.userId = ur.userId AND ur.groupId = ug.groupId AND ur.roleId= ?
 			LEFT JOIN 
 				usergrouprole urE 
-					ON ug.userId = urE.userId AND urE.roleId = ?
+					ON ug.userId = urE.userId AND ur.groupId = ug.groupId AND urE.roleId = ?
 			WHERE 
 				ur.userId IS NULL AND urE.userId IS NULL AND co.courseId = ? AND u.status = ?
+				AND ((? = '') OR (u.screenName LIKE ?) ) AND ((? = '') OR (u.firstName LIKE ?) ) 
+				AND ((? = '') OR (u.lastName LIKE ?) ) AND ((? = '') OR (u.emailAddress LIKE ?) )
 		]]>
 	</sql>
 </custom-sql>
