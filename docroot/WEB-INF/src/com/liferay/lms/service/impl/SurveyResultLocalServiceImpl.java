@@ -60,6 +60,20 @@ public class SurveyResultLocalServiceImpl
 		return SurveyResultUtil.findByActId(actId);
 	}
 	
+	public List<SurveyResult> getSurveyResultsByQuestionIdActId(long questionId, long actId) { 
+		List<SurveyResult> results = new ArrayList<SurveyResult>();
+		try{
+			results = SurveyResultUtil.findByQuestionIdActId(questionId, actId);
+		}catch(SystemException e){
+			e.printStackTrace();
+			results=null;
+		}
+		return results;
+	}
+	
+	
+	
+	
 	public double getPercentageByQuestionIdAndAnswerId(long questionId, long answerId, long total) throws SystemException
 	{ 
 		double res = 0;
@@ -76,6 +90,20 @@ public class SurveyResultLocalServiceImpl
 		}
 				
 		return res;
+	}
+	
+	
+	public long getCountByQuestionIdAndAnswerId(long questionId, long answerId) throws SystemException
+	{ 
+		long count = 0;
+		
+		try {
+			count = SurveyResultUtil.countByAnswerIdQuestionId(answerId, questionId);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+								
+		return count;
 	}
 	
 	/**

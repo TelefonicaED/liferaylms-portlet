@@ -53,6 +53,7 @@
 			List<TestQuestion> questions=TestQuestionLocalServiceUtil.getQuestions(learningActivity.getActId());
 			List<SurveyResult> listaResultadosEncuesta = SurveyResultLocalServiceUtil.getSurveyResultByActId(actId);
 			long total;
+			long totalAnswer;
 			String textoAux;
 			String percent;
 			DecimalFormat df;
@@ -78,27 +79,21 @@
 						texto = textoAux.length() > 50 ? textoAux.substring(0,50)+"..." : textoAux;
 						df = new DecimalFormat("###.##");
 						percent = df.format(SurveyResultLocalServiceUtil.getPercentageByQuestionIdAndAnswerId(question.getQuestionId(), answer.getAnswerId(), total));
+						totalAnswer = SurveyResultLocalServiceUtil.getCountByQuestionIdAndAnswerId(question.getQuestionId(), answer.getAnswerId()); 
 					%>
 						<div class="answer">
 							<%=texto %>
-							<span class="porcentaje negrita"><liferay-ui:message key="surveyactivity.stadistics.percent" />: <%=percent %></span>
+							<span class="porcentaje negrita"><liferay-ui:message key="surveyactivity.stadistics.percent" /> <%=totalAnswer %> (<%=percent %>%)</span>
 						</div>
 					<%
 					}
 				}else{
 					if(listaResultadosEncuesta!=null && listaResultadosEncuesta.size()>0){
-						for(SurveyResult answer:listaResultadosEncuesta)
-						{
-							if(answer.getQuestionId() == question.getQuestionId()){
-								textoAux = HtmlUtil.extractText(answer.getFreeAnswer());
-								texto = textoAux.length() > 50 ? textoAux.substring(0,50)+"..." : textoAux;
-								%>
-								<div class="answer">
-									<p><%=texto %></p>
+					%>
+						<div class="answer">
+									<p><liferay-ui:message key="surveyactivity.stadistics.freeanswer" /></p>
 								</div>
-						<%	}
-						}
-					}
+					<% }
 				}
 				
 				
