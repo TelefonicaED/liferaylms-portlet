@@ -7,6 +7,8 @@
 				DISTINCT c.*
 			FROM 
 				lms_course c
+			INNER JOIN group_ g
+				ON c.groupCreatedId = g.groupId 
 			[$JOINASSET$] 
 			[$JOINASSETCATEGORIES$] 
 			[$JOINASSETTAGS$]
@@ -46,6 +48,8 @@
 				COUNT(DISTINCT c.courseId) AS COUNT_VALUE
 			FROM 
 				lms_course c
+			INNER JOIN group_ g
+				ON c.groupCreatedId = g.groupId 
 			[$JOINASSET$] 
 			[$JOINASSETCATEGORIES$] 
 			[$JOINASSETTAGS$]

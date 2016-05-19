@@ -3,6 +3,7 @@ docroot/WEB-INF/lib/liferaylms-portlet-service.jar
 docroot/WEB-INF/classes
 docroot/WEB-INF/service
 /bin/
+.settings
 /.classpath
 /.project
 /.tern-project

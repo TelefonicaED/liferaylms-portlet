@@ -2,7 +2,9 @@ package com.liferay.lms.indexer;
 
 import java.text.Normalizer;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.Locale;
+import java.util.Map;
 
 import javax.portlet.PortletURL;
 
@@ -165,6 +167,11 @@ public class CourseIndexer extends BaseIndexer {
 
 		document.addKeyword("assetCategoryTitles", assetCategoryTitles);
 		ExpandoBridgeIndexerUtil.addAttributes(document, expandoBridge);
+		
+		Map<String, Field> values = document.getFields();
+		for (Map.Entry<String, Field> entri : values.entrySet()) {
+			log.debug("Key = " + entri.getKey() + ", Value = " + entri.getValue());
+		}
 
 		if(log.isDebugEnabled())log.debug("return Document");
 		return document;
