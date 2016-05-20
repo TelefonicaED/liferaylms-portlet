@@ -191,12 +191,17 @@
 					ON ug.userId = ur.userId AND ur.groupId = ug.groupId AND ur.roleId= ?
 			LEFT JOIN 
 				usergrouprole urE 
-					ON ug.userId = urE.userId AND ur.groupId = ug.groupId AND urE.roleId = ?
+					ON ug.userId = urE.userId AND urE.groupId = ug.groupId AND urE.roleId = ?
 			WHERE 
 				ur.userId IS NULL AND urE.userId IS NULL AND co.courseId = ? AND u.status = ?
-				AND ((? = '') OR (u.screenName LIKE ?) ) AND ((? = '') OR (u.firstName LIKE ?) ) 
-				AND ((? = '') OR (u.lastName LIKE ?) ) AND ((? = '') OR (u.emailAddress LIKE ?) )
-			ORDER BY u.firstName, u.middleName, u.lastName
+				AND 
+				(
+					(u.firstName LIKE ? [$AND_OR_NULL_CHECK$]) [$AND_OR_CONNECTOR$]
+					(u.lastName LIKE ? [$AND_OR_NULL_CHECK$]) [$AND_OR_CONNECTOR$]
+					(u.screenName LIKE ? [$AND_OR_NULL_CHECK$]) [$AND_OR_CONNECTOR$]
+					(u.emailAddress LIKE ? [$AND_OR_NULL_CHECK$])
+				)
+			ORDER BY [$ORDERBY$]
 			LIMIT ?, ?
 		]]>
 	</sql>
@@ -217,11 +222,16 @@
 					ON ug.userId = ur.userId AND ur.groupId = ug.groupId AND ur.roleId= ?
 			LEFT JOIN 
 				usergrouprole urE 
-					ON ug.userId = urE.userId AND ur.groupId = ug.groupId AND urE.roleId = ?
+					ON ug.userId = urE.userId AND urE.groupId = ug.groupId AND urE.roleId = ?
 			WHERE 
 				ur.userId IS NULL AND urE.userId IS NULL AND co.courseId = ? AND u.status = ?
-				AND ((? = '') OR (u.screenName LIKE ?) ) AND ((? = '') OR (u.firstName LIKE ?) ) 
-				AND ((? = '') OR (u.lastName LIKE ?) ) AND ((? = '') OR (u.emailAddress LIKE ?) )
+				AND 
+				(
+					(u.firstName LIKE ? [$AND_OR_NULL_CHECK$]) [$AND_OR_CONNECTOR$]
+					(u.lastName LIKE ? [$AND_OR_NULL_CHECK$]) [$AND_OR_CONNECTOR$]
+					(u.screenName LIKE ? [$AND_OR_NULL_CHECK$]) [$AND_OR_CONNECTOR$]
+					(u.emailAddress LIKE ? [$AND_OR_NULL_CHECK$])
+				)
 		]]>
 	</sql>
 </custom-sql>
