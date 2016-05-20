@@ -278,11 +278,23 @@ public class SurveyResultLocalServiceWrapper implements SurveyResultLocalService
 		return _surveyResultLocalService.getSurveyResultByActId(actId);
 	}
 
+	public java.util.List<com.liferay.lms.model.SurveyResult> getSurveyResultsByQuestionIdActId(
+		long questionId, long actId) {
+		return _surveyResultLocalService.getSurveyResultsByQuestionIdActId(questionId,
+			actId);
+	}
+
 	public double getPercentageByQuestionIdAndAnswerId(long questionId,
 		long answerId, long total)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _surveyResultLocalService.getPercentageByQuestionIdAndAnswerId(questionId,
 			answerId, total);
+	}
+
+	public long getCountByQuestionIdAndAnswerId(long questionId, long answerId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _surveyResultLocalService.getCountByQuestionIdAndAnswerId(questionId,
+			answerId);
 	}
 
 	/**

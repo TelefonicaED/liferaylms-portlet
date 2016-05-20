@@ -283,12 +283,23 @@ public class SurveyResultLocalServiceUtil {
 		return getService().getSurveyResultByActId(actId);
 	}
 
+	public static java.util.List<com.liferay.lms.model.SurveyResult> getSurveyResultsByQuestionIdActId(
+		long questionId, long actId) {
+		return getService().getSurveyResultsByQuestionIdActId(questionId, actId);
+	}
+
 	public static double getPercentageByQuestionIdAndAnswerId(long questionId,
 		long answerId, long total)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService()
 				   .getPercentageByQuestionIdAndAnswerId(questionId, answerId,
 			total);
+	}
+
+	public static long getCountByQuestionIdAndAnswerId(long questionId,
+		long answerId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().getCountByQuestionIdAndAnswerId(questionId, answerId);
 	}
 
 	/**

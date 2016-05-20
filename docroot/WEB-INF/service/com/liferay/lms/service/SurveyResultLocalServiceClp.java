@@ -121,17 +121,25 @@ public class SurveyResultLocalServiceClp implements SurveyResultLocalService {
 
 		_methodParameterTypes20 = new String[] { "long" };
 
-		_methodName21 = "getPercentageByQuestionIdAndAnswerId";
+		_methodName21 = "getSurveyResultsByQuestionIdActId";
 
-		_methodParameterTypes21 = new String[] { "long", "long", "long" };
+		_methodParameterTypes21 = new String[] { "long", "long" };
 
 		_methodName22 = "getPercentageByQuestionIdAndAnswerId";
 
-		_methodParameterTypes22 = new String[] { "long", "long" };
+		_methodParameterTypes22 = new String[] { "long", "long", "long" };
 
-		_methodName23 = "getTotalAnswersByQuestionId";
+		_methodName23 = "getCountByQuestionIdAndAnswerId";
 
-		_methodParameterTypes23 = new String[] { "long" };
+		_methodParameterTypes23 = new String[] { "long", "long" };
+
+		_methodName24 = "getPercentageByQuestionIdAndAnswerId";
+
+		_methodParameterTypes24 = new String[] { "long", "long" };
+
+		_methodName25 = "getTotalAnswersByQuestionId";
+
+		_methodParameterTypes25 = new String[] { "long" };
 	}
 
 	public com.liferay.lms.model.SurveyResult addSurveyResult(
@@ -714,14 +722,37 @@ public class SurveyResultLocalServiceClp implements SurveyResultLocalService {
 		return (java.util.List<com.liferay.lms.model.SurveyResult>)ClpSerializer.translateOutput(returnObj);
 	}
 
+	public java.util.List<com.liferay.lms.model.SurveyResult> getSurveyResultsByQuestionIdActId(
+		long questionId, long actId) {
+		Object returnObj = null;
+
+		try {
+			returnObj = _invokableLocalService.invokeMethod(_methodName21,
+					_methodParameterTypes21, new Object[] { questionId, actId });
+		}
+		catch (Throwable t) {
+			t = ClpSerializer.translateThrowable(t);
+
+			if (t instanceof RuntimeException) {
+				throw (RuntimeException)t;
+			}
+			else {
+				throw new RuntimeException(t.getClass().getName() +
+					" is not a valid exception");
+			}
+		}
+
+		return (java.util.List<com.liferay.lms.model.SurveyResult>)ClpSerializer.translateOutput(returnObj);
+	}
+
 	public double getPercentageByQuestionIdAndAnswerId(long questionId,
 		long answerId, long total)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		Object returnObj = null;
 
 		try {
-			returnObj = _invokableLocalService.invokeMethod(_methodName21,
-					_methodParameterTypes21,
+			returnObj = _invokableLocalService.invokeMethod(_methodName22,
+					_methodParameterTypes22,
 					new Object[] { questionId, answerId, total });
 		}
 		catch (Throwable t) {
@@ -743,14 +774,42 @@ public class SurveyResultLocalServiceClp implements SurveyResultLocalService {
 		return ((Double)returnObj).doubleValue();
 	}
 
+	public long getCountByQuestionIdAndAnswerId(long questionId, long answerId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		Object returnObj = null;
+
+		try {
+			returnObj = _invokableLocalService.invokeMethod(_methodName23,
+					_methodParameterTypes23,
+					new Object[] { questionId, answerId });
+		}
+		catch (Throwable t) {
+			t = ClpSerializer.translateThrowable(t);
+
+			if (t instanceof com.liferay.portal.kernel.exception.SystemException) {
+				throw (com.liferay.portal.kernel.exception.SystemException)t;
+			}
+
+			if (t instanceof RuntimeException) {
+				throw (RuntimeException)t;
+			}
+			else {
+				throw new RuntimeException(t.getClass().getName() +
+					" is not a valid exception");
+			}
+		}
+
+		return ((Long)returnObj).longValue();
+	}
+
 	public double getPercentageByQuestionIdAndAnswerId(long questionId,
 		long answerId)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		Object returnObj = null;
 
 		try {
-			returnObj = _invokableLocalService.invokeMethod(_methodName22,
-					_methodParameterTypes22,
+			returnObj = _invokableLocalService.invokeMethod(_methodName24,
+					_methodParameterTypes24,
 					new Object[] { questionId, answerId });
 		}
 		catch (Throwable t) {
@@ -777,8 +836,8 @@ public class SurveyResultLocalServiceClp implements SurveyResultLocalService {
 		Object returnObj = null;
 
 		try {
-			returnObj = _invokableLocalService.invokeMethod(_methodName23,
-					_methodParameterTypes23, new Object[] { questionId });
+			returnObj = _invokableLocalService.invokeMethod(_methodName25,
+					_methodParameterTypes25, new Object[] { questionId });
 		}
 		catch (Throwable t) {
 			t = ClpSerializer.translateThrowable(t);
@@ -846,4 +905,8 @@ public class SurveyResultLocalServiceClp implements SurveyResultLocalService {
 	private String[] _methodParameterTypes22;
 	private String _methodName23;
 	private String[] _methodParameterTypes23;
+	private String _methodName24;
+	private String[] _methodParameterTypes24;
+	private String _methodName25;
+	private String[] _methodParameterTypes25;
 }

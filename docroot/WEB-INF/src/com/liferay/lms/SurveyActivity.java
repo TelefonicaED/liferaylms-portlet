@@ -14,7 +14,6 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -138,7 +137,6 @@ public class SurveyActivity extends MVCPortlet {
 					
 					// Preparamos para guardar respuesta del usuario
 					SurveyResult surveyResult = SurveyResultLocalServiceUtil.createSurveyResult(CounterLocalServiceUtil.increment(SurveyResult.class.getName()));
-					TestAnswer testAnswer = null;
 					String respuesta = actionRequest.getParameter(param);
 					List<TestAnswer> testAnswerList = TestAnswerLocalServiceUtil.getTestAnswersByQuestionId(questionId); 
 					if(testAnswerList != null && testAnswerList.size() > 0 ){
@@ -366,7 +364,7 @@ public class SurveyActivity extends MVCPortlet {
 			SessionErrors.add(actionRequest, "answer-test-required");
 		}
 		else{
-			TestAnswer answer = TestAnswerLocalServiceUtil.addTestAnswer(questionId, answers, feedbackCorrect, feedbackNoCorrect, correct);
+			TestAnswerLocalServiceUtil.addTestAnswer(questionId, answers, feedbackCorrect, feedbackNoCorrect, correct);
 			SessionMessages.add(actionRequest, "answer-added-successfully");
 		}
 		
@@ -384,8 +382,6 @@ public class SurveyActivity extends MVCPortlet {
 		
 		String fileName = uploadRequest.getFileName("fileName");
 		
-		ThemeDisplay themeDisplay = (ThemeDisplay) actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
-		Locale locale = themeDisplay.getLocale();
 		InputStream csvFile = uploadRequest.getFileAsStream("fileName");
 		
 		if(fileName==null || StringPool.BLANK.equals(fileName)){
@@ -602,7 +598,6 @@ public class SurveyActivity extends MVCPortlet {
 		if (Validator.isNotNull(backUrl)) {
 			actionResponse.sendRedirect(backUrl);
 		} else {
-			QuestionType qt =new QuestionTypeRegistry().getQuestionType(question.getQuestionType());
 			actionResponse.setRenderParameter("actionEditingDetails", StringPool.TRUE);
 			actionResponse.setRenderParameter("resId", Long.toString(question.getActId()));
 			actionResponse.setRenderParameter("jspPage", "/html/surveyactivity/admin/edit.jsp");
@@ -735,9 +730,7 @@ public class SurveyActivity extends MVCPortlet {
 				try {
 					activity = LearningActivityLocalServiceUtil.getLearningActivity(actId);
 
-					//auditing
-					ThemeDisplay themeDisplay = (ThemeDisplay) renderRequest.getAttribute(WebKeys.THEME_DISPLAY);
-					
+				
 					long typeId=activity.getTypeId();
 					
 					if(typeId==4)
@@ -1031,34 +1024,31 @@ public class SurveyActivity extends MVCPortlet {
 				
 				//Reiniciamos columnas
 				numeroColumna = 0;
+				//Por cada pregunta, traemos sus respuestas
+				List<SurveyResult> listaRespuestas;
 				
-				for(Long questionId: questionOrder){
-					
-					//Por cada pregunta, traemos sus respuestas
-					List<SurveyResult> listaRespuestas = SurveyResultLocalServiceUtil
-															.getSurveyResultByActId(actId);
-					
+				for(Long questionId: questionOrder)
+				{									
 					//Empezamos por la fila 1
 					numeroFila = 1;
-
-					if(listaRespuestas!=null && listaRespuestas.size()!=0){
+					listaRespuestas = SurveyResultLocalServiceUtil.getSurveyResultsByQuestionIdActId(questionId, actId);
+					if(listaRespuestas!=null && listaRespuestas.size()!=0)
+					{
 						for(SurveyResult answer:listaRespuestas)
 						{
-							if(answer.getQuestionId() == questionId){
-								// La primera vez pintamos los valores 
-								// "Id", "Curso", "Módulo" y "Actividad"
-								if(numeroColumna == 0){
-									addLabel(excelSheet, contenido, 0, numeroFila, String.valueOf(numeroFila));
-									addLabel(excelSheet, contenido, 1, numeroFila, HtmlUtil.extractText(curso));
-									addLabel(excelSheet, contenido, 2, numeroFila, HtmlUtil.extractText(modulo));
-									addLabel(excelSheet, contenido, 3, numeroFila, HtmlUtil.extractText(actividad));
-									addLabel(excelSheet, contenido, 4, numeroFila, HtmlUtil.extractText(answer.getFreeAnswer()));
-								}
-								else {
-									addLabel(excelSheet, contenido, numeroColumna+numExtraCols, numeroFila, HtmlUtil.extractText(answer.getFreeAnswer()));
-								}
-								numeroFila++;//Fila nueva
+							// La primera vez pintamos los valores 
+							// "Id", "Curso", "Módulo" y "Actividad"
+							if(numeroColumna == 0){
+								addLabel(excelSheet, contenido, 0, numeroFila, String.valueOf(numeroFila));
+								addLabel(excelSheet, contenido, 1, numeroFila, HtmlUtil.extractText(curso));
+								addLabel(excelSheet, contenido, 2, numeroFila, HtmlUtil.extractText(modulo));
+								addLabel(excelSheet, contenido, 3, numeroFila, HtmlUtil.extractText(actividad));
+								addLabel(excelSheet, contenido, 4, numeroFila, HtmlUtil.extractText(answer.getFreeAnswer()));
 							}
+							else {
+								addLabel(excelSheet, contenido, numeroColumna+numExtraCols, numeroFila, HtmlUtil.extractText(answer.getFreeAnswer()));
+							}
+							numeroFila++;//Fila nueva
 						}
 						numeroColumna++;//Columna nueva
 					}
