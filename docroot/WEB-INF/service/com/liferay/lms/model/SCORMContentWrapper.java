@@ -565,7 +565,7 @@ public class SCORMContentWrapper implements SCORMContent,
 		return new SCORMContentWrapper((SCORMContent)_scormContent.clone());
 	}
 
-	public int compareTo(SCORMContent scormContent) {
+	public int compareTo(com.liferay.lms.model.SCORMContent scormContent) {
 		return _scormContent.compareTo(scormContent);
 	}
 
@@ -574,11 +574,11 @@ public class SCORMContentWrapper implements SCORMContent,
 		return _scormContent.hashCode();
 	}
 
-	public com.liferay.portal.model.CacheModel<SCORMContent> toCacheModel() {
+	public com.liferay.portal.model.CacheModel<com.liferay.lms.model.SCORMContent> toCacheModel() {
 		return _scormContent.toCacheModel();
 	}
 
-	public SCORMContent toEscapedModel() {
+	public com.liferay.lms.model.SCORMContent toEscapedModel() {
 		return new SCORMContentWrapper(_scormContent.toEscapedModel());
 	}
 

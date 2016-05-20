@@ -344,7 +344,7 @@ public class TestAnswerWrapper implements TestAnswer, ModelWrapper<TestAnswer> {
 		return new TestAnswerWrapper((TestAnswer)_testAnswer.clone());
 	}
 
-	public int compareTo(TestAnswer testAnswer) {
+	public int compareTo(com.liferay.lms.model.TestAnswer testAnswer) {
 		return _testAnswer.compareTo(testAnswer);
 	}
 
@@ -353,11 +353,11 @@ public class TestAnswerWrapper implements TestAnswer, ModelWrapper<TestAnswer> {
 		return _testAnswer.hashCode();
 	}
 
-	public com.liferay.portal.model.CacheModel<TestAnswer> toCacheModel() {
+	public com.liferay.portal.model.CacheModel<com.liferay.lms.model.TestAnswer> toCacheModel() {
 		return _testAnswer.toCacheModel();
 	}
 
-	public TestAnswer toEscapedModel() {
+	public com.liferay.lms.model.TestAnswer toEscapedModel() {
 		return new TestAnswerWrapper(_testAnswer.toEscapedModel());
 	}
 

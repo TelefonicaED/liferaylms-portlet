@@ -277,6 +277,8 @@ public interface LearningActivityResultLocalService extends BaseLocalService,
 	public long countPassed(long actId)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
+	public long countByActId(long actId);
+
 	public long countPassedOnlyStudents(long actId, long companyId,
 		long courseGropupCreatedId, boolean passed)
 		throws com.liferay.portal.kernel.exception.SystemException;

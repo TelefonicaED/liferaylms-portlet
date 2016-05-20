@@ -1,3 +1,6 @@
+<%@page import="com.liferay.lms.service.CourseLocalServiceUtil"%>
+<%@page import="com.liferay.lms.service.ModuleLocalServiceUtil"%>
+<%@page import="com.liferay.lms.model.Module"%>
 <%@page import="com.liferay.lms.learningactivity.SurveyLearningActivityType"%>
 <%@page import="org.apache.commons.lang.StringEscapeUtils"%>
 <%@page import="java.text.DecimalFormat"%>
@@ -14,6 +17,7 @@
 <%@page import="com.liferay.lms.service.TestQuestionLocalServiceUtil"%>
 <%@page import="com.liferay.lms.service.TestAnswerLocalServiceUtil"%>
 <%@page import="com.liferay.lms.model.TestAnswer"%>
+<%@page import="com.liferay.lms.model.Course"%>
 <%@page import="com.liferay.lms.model.TestQuestion"%>
 <%@page import="com.liferay.lms.service.LearningActivityTryLocalServiceUtil"%>
 <%@page import="com.liferay.lms.model.LearningActivityTry"%>
@@ -39,16 +43,6 @@
 		
 		<div class="surveyactivity stadistics">
 		
-			<h2><%=LearningActivityLocalServiceUtil.getLearningActivity(actId).getTitle(themeDisplay.getLocale()) %></h2>
-			<%--<h3 class="description-h3"><liferay-ui:message key="description" /></h3> --%>
-			<div class="description"><%=LearningActivityLocalServiceUtil.getLearningActivity(actId).getDescription(themeDisplay.getLocale()) %></div>
-		
-			
-			
-			<portlet:renderURL var="backToQuestionsURL">
-				<portlet:param name="jspPage" value="/html/surveyactivity/view.jsp"></portlet:param>
-			</portlet:renderURL>
-		
 			<%
 			List<TestQuestion> questions=TestQuestionLocalServiceUtil.getQuestions(learningActivity.getActId());
 			List<SurveyResult> listaResultadosEncuesta = SurveyResultLocalServiceUtil.getSurveyResultByActId(actId);
@@ -56,10 +50,29 @@
 			long totalAnswer;
 			String textoAux;
 			String percent;
-			DecimalFormat df;
+			DecimalFormat df = new DecimalFormat("###.##");;
 			String texto;
-			for(TestQuestion question:questions)
-			{
+			long participants = LearningActivityResultLocalServiceUtil.countByActId(actId);
+			Course course = CourseLocalServiceUtil.getCourseByGroupCreatedId(learningActivity.getGroupId());
+			long courseUsers = CourseLocalServiceUtil.getStudentsFromCourseCount(course.getCourseId());
+			double passPercent =  (participants/courseUsers)*100;
+			percent  = df.format(passPercent);
+			%>
+		
+			<h2><%=LearningActivityLocalServiceUtil.getLearningActivity(actId).getTitle(themeDisplay.getLocale()) %></h2>
+			<%--<h3 class="description-h3"><liferay-ui:message key="description" /></h3> --%>
+			<div class="description"><%=LearningActivityLocalServiceUtil.getLearningActivity(actId).getDescription(themeDisplay.getLocale()) %></div>
+		
+			<div  class="questiontext"><span class="participation color_tercero"><liferay-ui:message key="surveyactivity.stadistics.participants" /><%= participants %></span></div>	
+			<div  class="questiontext"><span class="participation color_tercero"><liferay-ui:message key="surveyactivity.stadistics.participation-rate" /><%= percent %>%</span></div>	
+			
+			
+			<portlet:renderURL var="backToQuestionsURL">
+				<portlet:param name="jspPage" value="/html/surveyactivity/view.jsp"></portlet:param>
+			</portlet:renderURL>
+		
+			<% 
+			for(TestQuestion question:questions){
 			%>
 			<div class="question">
 				<div  class="questiontext">
@@ -75,7 +88,6 @@
 					{
 						textoAux = HtmlUtil.extractText(answer.getAnswer());
 						texto = textoAux.length() > 50 ? textoAux.substring(0,50)+"..." : textoAux;
-						df = new DecimalFormat("###.##");
 						percent = df.format(SurveyResultLocalServiceUtil.getPercentageByQuestionIdAndAnswerId(question.getQuestionId(), answer.getAnswerId(), total));
 						totalAnswer = SurveyResultLocalServiceUtil.getCountByQuestionIdAndAnswerId(question.getQuestionId(), answer.getAnswerId()); 
 					%>

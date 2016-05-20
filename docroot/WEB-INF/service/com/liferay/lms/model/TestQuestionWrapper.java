@@ -261,7 +261,7 @@ public class TestQuestionWrapper implements TestQuestion,
 		return new TestQuestionWrapper((TestQuestion)_testQuestion.clone());
 	}
 
-	public int compareTo(TestQuestion testQuestion) {
+	public int compareTo(com.liferay.lms.model.TestQuestion testQuestion) {
 		return _testQuestion.compareTo(testQuestion);
 	}
 
@@ -270,11 +270,11 @@ public class TestQuestionWrapper implements TestQuestion,
 		return _testQuestion.hashCode();
 	}
 
-	public com.liferay.portal.model.CacheModel<TestQuestion> toCacheModel() {
+	public com.liferay.portal.model.CacheModel<com.liferay.lms.model.TestQuestion> toCacheModel() {
 		return _testQuestion.toCacheModel();
 	}
 
-	public TestQuestion toEscapedModel() {
+	public com.liferay.lms.model.TestQuestion toEscapedModel() {
 		return new TestQuestionWrapper(_testQuestion.toEscapedModel());
 	}
 

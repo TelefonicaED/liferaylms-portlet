@@ -318,6 +318,10 @@ public class LearningActivityResultLocalServiceUtil {
 		return getService().countPassed(actId);
 	}
 
+	public static long countByActId(long actId) {
+		return getService().countByActId(actId);
+	}
+
 	public static long countPassedOnlyStudents(long actId, long companyId,
 		long courseGropupCreatedId, boolean passed)
 		throws com.liferay.portal.kernel.exception.SystemException {
