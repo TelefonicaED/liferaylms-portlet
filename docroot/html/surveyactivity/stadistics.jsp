@@ -68,9 +68,7 @@
 				<span class="total color_tercero"><liferay-ui:message key="surveyactivity.stadistics.total" />: <%=SurveyResultLocalServiceUtil.getTotalAnswersByQuestionId(question.getQuestionId()) %></span>		
 				<%
 				
-				
 				List<TestAnswer> testAnswers= TestAnswerLocalServiceUtil.getTestAnswersByQuestionId(question.getQuestionId());
-				
 				if(testAnswers!=null && testAnswers.size()>0){
 					total = SurveyResultLocalServiceUtil.getTotalAnswersByQuestionId(question.getQuestionId());
 					for(TestAnswer answer:testAnswers)
@@ -83,7 +81,7 @@
 					%>
 						<div class="answer">
 							<%=texto %>
-							<span class="porcentaje negrita"><liferay-ui:message key="surveyactivity.stadistics.percent" /> <%=totalAnswer %> (<%=percent %>%)</span>
+							<span class="porcentaje negrita"><liferay-ui:message key="surveyactivity.stadistics.answers" /> <%=totalAnswer %> (<%=percent %>%)</span>
 						</div>
 					<%
 					}
@@ -91,14 +89,10 @@
 					if(listaResultadosEncuesta!=null && listaResultadosEncuesta.size()>0){
 					%>
 						<div class="answer">
-									<p><liferay-ui:message key="surveyactivity.stadistics.freeanswer" /></p>
-								</div>
+								<p><liferay-ui:message key="surveyactivity.stadistics.freeanswer" /></p>
+						</div>
 					<% }
 				}
-				
-				
-				
-				
 				%>
 			</div>
 			<%

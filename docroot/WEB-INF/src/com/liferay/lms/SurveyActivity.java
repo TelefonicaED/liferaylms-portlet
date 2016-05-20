@@ -55,6 +55,7 @@ import com.liferay.lms.model.TestAnswer;
 import com.liferay.lms.model.TestQuestion;
 import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityLocalServiceUtil;
+import com.liferay.lms.service.LearningActivityResultLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityTryLocalServiceUtil;
 import com.liferay.lms.service.ModuleLocalServiceUtil;
 import com.liferay.lms.service.SurveyResultLocalServiceUtil;
@@ -963,7 +964,7 @@ public class SurveyActivity extends MVCPortlet {
 		}else if (action.equals("stadisticsReport")){
 			
 			try{
-				
+			
 				//Creamos fichero excel
 				WorkbookSettings wbSettings = new WorkbookSettings();
 				WritableWorkbook workbook = Workbook.createWorkbook(response.getPortletOutputStream(), wbSettings);
