@@ -381,7 +381,7 @@ public class AuditEntryWrapper implements AuditEntry, ModelWrapper<AuditEntry> {
 		return new AuditEntryWrapper((AuditEntry)_auditEntry.clone());
 	}
 
-	public int compareTo(com.liferay.lms.model.AuditEntry auditEntry) {
+	public int compareTo(AuditEntry auditEntry) {
 		return _auditEntry.compareTo(auditEntry);
 	}
 
@@ -390,11 +390,11 @@ public class AuditEntryWrapper implements AuditEntry, ModelWrapper<AuditEntry> {
 		return _auditEntry.hashCode();
 	}
 
-	public com.liferay.portal.model.CacheModel<com.liferay.lms.model.AuditEntry> toCacheModel() {
+	public com.liferay.portal.model.CacheModel<AuditEntry> toCacheModel() {
 		return _auditEntry.toCacheModel();
 	}
 
-	public com.liferay.lms.model.AuditEntry toEscapedModel() {
+	public AuditEntry toEscapedModel() {
 		return new AuditEntryWrapper(_auditEntry.toEscapedModel());
 	}
 

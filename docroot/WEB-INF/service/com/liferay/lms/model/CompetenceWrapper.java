@@ -924,7 +924,7 @@ public class CompetenceWrapper implements Competence, ModelWrapper<Competence> {
 		return new CompetenceWrapper((Competence)_competence.clone());
 	}
 
-	public int compareTo(com.liferay.lms.model.Competence competence) {
+	public int compareTo(Competence competence) {
 		return _competence.compareTo(competence);
 	}
 
@@ -933,11 +933,11 @@ public class CompetenceWrapper implements Competence, ModelWrapper<Competence> {
 		return _competence.hashCode();
 	}
 
-	public com.liferay.portal.model.CacheModel<com.liferay.lms.model.Competence> toCacheModel() {
+	public com.liferay.portal.model.CacheModel<Competence> toCacheModel() {
 		return _competence.toCacheModel();
 	}
 
-	public com.liferay.lms.model.Competence toEscapedModel() {
+	public Competence toEscapedModel() {
 		return new CompetenceWrapper(_competence.toEscapedModel());
 	}
 

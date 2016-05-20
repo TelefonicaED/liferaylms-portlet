@@ -433,12 +433,6 @@ public class ModuleResultLocalServiceImpl extends ModuleResultLocalServiceBaseIm
 				}
 				
 				return true;
-			}else if(moduleResult.getResult() > result){
-				User user = UserLocalServiceUtil.getUser(userId);
-				Module m = ModuleLocalServiceUtil.getModule(moduleId);
-				Course c = CourseLocalServiceUtil.getCourseByGroupCreatedId(m.getGroupId());
-				
-				log.debug(c.getTitle(Locale.getDefault()) +" ("+ c.getCourseId() +")|"+m.getTitle(Locale.getDefault())+" ("+m.getModuleId()+")|"+moduleResult.getMrId()+"|"+user.getFullName() +" ("+ userId +")|"+moduleResult.getPassed()+"|"+passedModule+"|"+moduleResult.getResult() +"|"+result+"|Baja");
 			}
 		}
 
