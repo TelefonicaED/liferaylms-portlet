@@ -304,30 +304,32 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 	    return 0;
 	}
 	
-	public List<User> findStudents(long courseId, long companyId, String screenName, String firstName, String lastName, String emailAddress,boolean andOperator, int start, int end,OrderByComparator comparator){
+	public List<User> findStudents(long courseId, long companyId, String screenName, String firstName, String lastName, String emailAddress,boolean andOperator, int start, int end,OrderByComparator obc){
 		Session session = null;
 		
 		try{
 			
+			/** Para la query es necesario si no es null o vacío que añade los porcentajes, y si es vacío ponerlo a null*/
+			
 			if(Validator.isNotNull(screenName)){
 				screenName = "%" + screenName + "%";
 			}else{
-				screenName = "";
+				screenName = null;
 			}
 			if(Validator.isNotNull(firstName)){
 				firstName = "%" + firstName + "%";
 			}else{
-				firstName = "";
+				firstName = null;
 			}
 			if(Validator.isNotNull(lastName)){
 				lastName = "%" + lastName + "%";
 			}else{
-				lastName = "";
+				lastName = null;
 			}
 			if(Validator.isNotNull(emailAddress)){
 				emailAddress = "%" + emailAddress + "%";
 			}else{
-				emailAddress = "";
+				emailAddress = null;
 			}
 			
 			log.debug("ScreenName:"+screenName);
@@ -339,6 +341,16 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			
 			String sql = CustomSQLUtil.get(FIND_STUDENTS);
 			
+			sql = CustomSQLUtil.replaceAndOperator(sql, andOperator);
+			
+			if (obc != null && obc.getOrderBy() != null && !obc.getOrderBy().equals("")) {
+				sql = sql.replace("[$ORDERBY$]", obc.toString());
+			}else{
+				sql = sql.replace("[$ORDERBY$]", "u.lastName, u.firstName, u.middleName ");
+			}
+			
+			log.debug("sql: " + sql);
+			
 			SQLQuery q = session.createSQLQuery(sql);
 			q.addEntity("User_",PortalClassLoaderUtil.getClassLoader().loadClass("com.liferay.portal.model.impl.UserImpl"));
 			
@@ -349,17 +361,25 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			
 			QueryPos qPos = QueryPos.getInstance(q);
 			qPos.add(teacherRoleId);
+			log.debug("teacherRoleId: " + teacherRoleId);
 			qPos.add(editorRoleId);
+			log.debug("editorRoleId: " + editorRoleId);
 			qPos.add(courseId);
+			log.debug("courseId: " + courseId);
 			qPos.add(WorkflowConstants.STATUS_APPROVED);
+			log.debug("WorkflowConstants.STATUS_APPROVED: " + WorkflowConstants.STATUS_APPROVED);
 			
-			qPos.add(screenName);
-			qPos.add(screenName);
 			qPos.add(firstName);
+			log.debug("firstName: " + firstName);
 			qPos.add(firstName);
 			qPos.add(lastName);
+			log.debug("lastName: " + lastName);
 			qPos.add(lastName);
+			qPos.add(screenName);
+			log.debug("screenName: " + screenName);
+			qPos.add(screenName);
 			qPos.add(emailAddress);
+			log.debug("emailAddress: " + emailAddress);
 			qPos.add(emailAddress);
 			
 			qPos.add(start);
@@ -388,22 +408,22 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			if(Validator.isNotNull(screenName)){
 				screenName = "%" + screenName + "%";
 			}else{
-				screenName = "";
+				screenName = null;
 			}
 			if(Validator.isNotNull(firstName)){
 				firstName = "%" + firstName + "%";
 			}else{
-				firstName = "";
+				firstName = null;
 			}
 			if(Validator.isNotNull(lastName)){
 				lastName = "%" + lastName + "%";
 			}else{
-				lastName = "";
+				lastName = null;
 			}
 			if(Validator.isNotNull(emailAddress)){
 				emailAddress = "%" + emailAddress + "%";
 			}else{
-				emailAddress = "";
+				emailAddress = null;
 			}	
 			
 			log.debug("ScreenName:"+screenName);
@@ -414,6 +434,8 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			session = openSessionLiferay();
 			
 			String sql = CustomSQLUtil.get(COUNT_STUDENTS);
+			
+			sql = CustomSQLUtil.replaceAndOperator(sql, andOperator);
 			
 			SQLQuery q = session.createSQLQuery(sql);
 			q.addScalar(COUNT_COLUMN_NAME, Type.LONG);
@@ -429,12 +451,12 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			qPos.add(courseId);
 			qPos.add(WorkflowConstants.STATUS_APPROVED);
 
-			qPos.add(screenName);
-			qPos.add(screenName);
 			qPos.add(firstName);
 			qPos.add(firstName);
 			qPos.add(lastName);
 			qPos.add(lastName);
+			qPos.add(screenName);
+			qPos.add(screenName);
 			qPos.add(emailAddress);
 			qPos.add(emailAddress);
 			

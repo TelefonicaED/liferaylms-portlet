@@ -21,11 +21,9 @@ import com.liferay.portal.kernel.messaging.MessageListener;
 import com.liferay.portal.kernel.messaging.MessageListenerException;
 import com.liferay.portal.model.User;
 
-public class CleanLearningActivityTriesNotPassed extends CleanLearningActivity implements MessageListener{
+public class CleanLearningActivityTriesNotPassed implements MessageListener{
 	Log log = LogFactoryUtil.getLog(CleanLearningActivityTriesNotPassed.class);
 	private LearningActivity la = null;
-	private User user = null;
-	private User userc = null;
 	
 	public CleanLearningActivityTriesNotPassed(){
 		super();
@@ -33,7 +31,7 @@ public class CleanLearningActivityTriesNotPassed extends CleanLearningActivity i
 
 	@SuppressWarnings("unchecked")
 	public void process() throws Exception{
-		if(log.isDebugEnabled())log.debug("CleanLearningActivityTriesNotPassed process");
+		if(log.isDebugEnabled())log.debug("CleanLearningActivityTriesNotPassed process. ActId:"+la.getActId());
 
 		ClassLoader classLoader = (ClassLoader) PortletBeanLocatorUtil.locate(ClpSerializer.getServletContextName(),"portletClassLoader");
 		
@@ -51,16 +49,14 @@ public class CleanLearningActivityTriesNotPassed extends CleanLearningActivity i
 			if(log.isDebugEnabled())log.debug(" result : " + result.getActId()+", result: "+result.getUserId() +", passed: "+result.getPassed() );
 			List<LearningActivityTry> tries = LearningActivityTryLocalServiceUtil.getLearningActivityTryByActUser(result.getActId(), result.getUserId());
 			
-			for(LearningActivityTry ltry:tries){
-				if(log.isDebugEnabled())log.debug("   try : " + ltry.getLatId()+" - "+ltry.getResult());
-				processTry(ltry);
+			for(LearningActivityTry trie:tries){
+				if(log.isDebugEnabled())log.debug("Delete try : " + trie.getLatId()+" - "+trie.getResult());
+				LearningActivityTryLocalServiceUtil.deleteLearningActivityTry(trie);
 			}
 			
 			LearningActivityResultLocalServiceUtil.deleteLearningActivityResult(result);
 			
 		}
-		
-		//System.out.println("FINALIZO EL PROECESS");
 		
 	}
 
@@ -71,14 +67,7 @@ public class CleanLearningActivityTriesNotPassed extends CleanLearningActivity i
 		responseMessage.setPayload("RECEIVED");
 		try{
 			//System.out.println("receive de ClieanNOTPASSED LMS");
-			this.la = (LearningActivity)message.get("learningActivity");
-			this.user = (User)message.get("user");
-			User user = (User)message.get("userc");
-
-			createInstance(la.getCompanyId(),la.getGroupId(),user.getUserId(), la.getModuleId(), la.getActId());
-			
-			if(log.isDebugEnabled())log.debug(" LearningActivity: " + la.getTitle(Locale.getDefault()) + " - " + la.getActId() + " - " +user.getFullName());
-			
+			this.la = (LearningActivity)message.get("learningActivity");			
 			process();
 			MessageBusUtil.sendMessage(responseMessage.getDestinationName(), responseMessage);
 		}catch(Exception e){
@@ -86,8 +75,6 @@ public class CleanLearningActivityTriesNotPassed extends CleanLearningActivity i
 			if(log.isDebugEnabled())e.printStackTrace();
 			
 			e.printStackTrace();
-		} finally {
-			endInstance();
 		}
 		
 		

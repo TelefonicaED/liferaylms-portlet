@@ -28,7 +28,7 @@ import com.liferay.portal.kernel.messaging.MessageListener;
 import com.liferay.portal.kernel.messaging.MessageListenerException;
 import com.liferay.portal.model.User;
 
-public class CleanLearningActivityTriesUser extends CleanLearningActivity implements MessageListener{
+public class CleanLearningActivityTriesUser implements MessageListener{
 	Log log = LogFactoryUtil.getLog(CleanLearningActivityTriesUser.class);
 	private LearningActivity la = null;
 	private User user = null;
@@ -37,40 +37,28 @@ public class CleanLearningActivityTriesUser extends CleanLearningActivity implem
 		super();
 	}
 
-	@SuppressWarnings("unchecked")
 	public void process() throws Exception{
-		ClassLoader classLoader = (ClassLoader) PortletBeanLocatorUtil.locate(ClpSerializer.getServletContextName(),"portletClassLoader");
-		
-		DynamicQuery dq = DynamicQueryFactoryUtil.forClass(LearningActivityResult.class,classLoader)
-				.add(PropertyFactoryUtil.forName("actId").eq(la.getActId()))
-				.add(PropertyFactoryUtil.forName("userId").eq(user.getUserId()));
 
-		//List<LearningActivityResult> results = LearningActivityResultUtil.findWithDynamicQuery(dq);
-		List<LearningActivityResult> results = LearningActivityResultLocalServiceUtil.dynamicQuery(dq);
-		for(LearningActivityResult result:results){
+		LearningActivityResult result = LearningActivityResultLocalServiceUtil.getByActIdAndUserId(la.getActId(), user.getUserId());
+		
+		if(result != null){
 			if(log.isDebugEnabled())log.debug(" result : " + result.getActId()+", result: "+result.getUserId() +", passed: "+result.getPassed() );
 
 			List<LearningActivityTry> tries = LearningActivityTryLocalServiceUtil.getLearningActivityTryByActUser(result.getActId(), result.getUserId());
 			
-			for(LearningActivityTry ltry:tries){
-				if(log.isDebugEnabled())log.debug("   try : " + ltry.getLatId()+" - "+ltry.getResult());
-				processTry(ltry);
+			for(LearningActivityTry trie:tries){
+				if(log.isDebugEnabled())log.debug("Delete try : " + trie.getLatId()+" - "+trie.getResult());
+				LearningActivityTryLocalServiceUtil.deleteLearningActivityTry(trie);
 			}
 			
 			LearningActivityResultLocalServiceUtil.deleteLearningActivityResult(result);
 		}
 		
-		ModuleResultLocalServiceUtil.update(la.getModuleId(),user.getUserId());
-		
-		ModuleResult mr = ModuleResultLocalServiceUtil.getByModuleAndUser(la.getModuleId(), user.getUserId());
-		
-		//System.out.println("ModuleResult: "+mr);
-		if(mr!=null)CourseResultLocalServiceUtil.update(mr);
-		
-		
-
-		
-		
+		if(result.getEndDate() != null){//Solo actualizo el moduleResult y el courseResult si el usuario había terminado la actividad
+			ModuleResultLocalServiceUtil.update(la.getModuleId(),user.getUserId());		
+			ModuleResult mr = ModuleResultLocalServiceUtil.getByModuleAndUser(la.getModuleId(), user.getUserId());
+			if(mr!=null)CourseResultLocalServiceUtil.update(mr);		
+		}
 	}
 
 	@Override
@@ -81,9 +69,6 @@ public class CleanLearningActivityTriesUser extends CleanLearningActivity implem
 		try{
 			this.la = (LearningActivity)message.get("learningActivity");
 			this.user = (User)message.get("user");
-			User userc = (User)message.get("userc");
-
-			createInstance(la.getCompanyId(),la.getGroupId(),userc.getUserId(), la.getModuleId(), la.getActId());
 			
 			if(log.isDebugEnabled())log.debug(" LearningActivity: " + la.getTitle(Locale.getDefault()) + " - " + la.getActId() + " - " +user.getFullName());
 			
@@ -95,9 +80,7 @@ public class CleanLearningActivityTriesUser extends CleanLearningActivity implem
 			if(log.isInfoEnabled())log.info(e.getMessage());
 			if(log.isDebugEnabled())e.printStackTrace();
 			e.printStackTrace();
-		} finally {
-			endInstance();
-		}
+		} 
 		
 		
 	}

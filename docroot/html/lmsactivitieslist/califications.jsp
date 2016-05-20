@@ -132,8 +132,8 @@ userSearchContainer.setTotal(totalUsers);
 					//Si es de tipo test y no se ha entregado
 					if(learnActivity.getTypeId() == 0 && lar.getEndDate() == null){
 						puntuation = LanguageUtil.get(themeDisplay.getLocale(),"activity.showcalifications.notsubmitted");
-						res = LanguageUtil.get(themeDisplay.getLocale(),"activity.showcalifications.notsubmitted");
-						startdate = LanguageUtil.get(themeDisplay.getLocale(),"activity.showcalifications.notsubmitted");
+						res = puntuation;
+						startdate = puntuation;
 					}
 			%>
 				<liferay-ui:search-container-column-text name="user"><%=usuario.getFullName() %> </liferay-ui:search-container-column-text>
