@@ -143,6 +143,27 @@ public interface TestQuestionModel extends BaseModel<TestQuestion> {
 	 */
 	public void setWeight(long weight);
 
+	/**
+	 * Returns the penalize of this test question.
+	 *
+	 * @return the penalize of this test question
+	 */
+	public boolean getPenalize();
+
+	/**
+	 * Returns <code>true</code> if this test question is penalize.
+	 *
+	 * @return <code>true</code> if this test question is penalize; <code>false</code> otherwise
+	 */
+	public boolean isPenalize();
+
+	/**
+	 * Sets whether this test question is penalize.
+	 *
+	 * @param penalize the penalize of this test question
+	 */
+	public void setPenalize(boolean penalize);
+
 	public boolean isNew();
 
 	public void setNew(boolean n);

@@ -300,6 +300,7 @@
 		</field>
 		<field name="questionType" type="long" />
 		<field name="weight" type="long" />
+		<field name="penalize" type="boolean" />
 	</model>
 	<model name="com.liferay.lms.model.UserCompetence">
 		<field name="uuid" type="String" />

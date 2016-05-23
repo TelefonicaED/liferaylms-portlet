@@ -71,6 +71,7 @@ public class TestQuestionClp extends BaseModelImpl<TestQuestion>
 		attributes.put("text", getText());
 		attributes.put("questionType", getQuestionType());
 		attributes.put("weight", getWeight());
+		attributes.put("penalize", getPenalize());
 
 		return attributes;
 	}
@@ -111,6 +112,12 @@ public class TestQuestionClp extends BaseModelImpl<TestQuestion>
 
 		if (weight != null) {
 			setWeight(weight);
+		}
+
+		Boolean penalize = (Boolean)attributes.get("penalize");
+
+		if (penalize != null) {
+			setPenalize(penalize);
 		}
 	}
 
@@ -162,6 +169,18 @@ public class TestQuestionClp extends BaseModelImpl<TestQuestion>
 		_weight = weight;
 	}
 
+	public boolean getPenalize() {
+		return _penalize;
+	}
+
+	public boolean isPenalize() {
+		return _penalize;
+	}
+
+	public void setPenalize(boolean penalize) {
+		_penalize = penalize;
+	}
+
 	public BaseModel<?> getTestQuestionRemoteModel() {
 		return _testQuestionRemoteModel;
 	}
@@ -195,6 +214,7 @@ public class TestQuestionClp extends BaseModelImpl<TestQuestion>
 		clone.setText(getText());
 		clone.setQuestionType(getQuestionType());
 		clone.setWeight(getWeight());
+		clone.setPenalize(getPenalize());
 
 		return clone;
 	}
@@ -251,7 +271,7 @@ public class TestQuestionClp extends BaseModelImpl<TestQuestion>
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(13);
+		StringBundler sb = new StringBundler(15);
 
 		sb.append("{uuid=");
 		sb.append(getUuid());
@@ -265,13 +285,15 @@ public class TestQuestionClp extends BaseModelImpl<TestQuestion>
 		sb.append(getQuestionType());
 		sb.append(", weight=");
 		sb.append(getWeight());
+		sb.append(", penalize=");
+		sb.append(getPenalize());
 		sb.append("}");
 
 		return sb.toString();
 	}
 
 	public String toXmlString() {
-		StringBundler sb = new StringBundler(22);
+		StringBundler sb = new StringBundler(25);
 
 		sb.append("<model><model-name>");
 		sb.append("com.liferay.lms.model.TestQuestion");
@@ -301,6 +323,10 @@ public class TestQuestionClp extends BaseModelImpl<TestQuestion>
 			"<column><column-name>weight</column-name><column-value><![CDATA[");
 		sb.append(getWeight());
 		sb.append("]]></column-value></column>");
+		sb.append(
+			"<column><column-name>penalize</column-name><column-value><![CDATA[");
+		sb.append(getPenalize());
+		sb.append("]]></column-value></column>");
 
 		sb.append("</model>");
 
@@ -313,5 +339,6 @@ public class TestQuestionClp extends BaseModelImpl<TestQuestion>
 	private String _text;
 	private long _questionType;
 	private long _weight;
+	private boolean _penalize;
 	private BaseModel<?> _testQuestionRemoteModel;
 }

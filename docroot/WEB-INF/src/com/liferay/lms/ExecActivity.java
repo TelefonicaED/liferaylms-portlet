@@ -25,6 +25,7 @@ import org.jsoup.Jsoup;
 
 import au.com.bytecode.opencsv.CSVWriter;
 
+import com.liferay.counter.service.CounterLocalServiceUtil;
 import com.liferay.lms.learningactivity.questiontype.QuestionType;
 import com.liferay.lms.learningactivity.questiontype.QuestionTypeRegistry;
 import com.liferay.lms.model.LearningActivity;
@@ -41,6 +42,8 @@ import com.liferay.portal.kernel.exception.NestableException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.servlet.HttpHeaders;
@@ -74,8 +77,10 @@ import com.liferay.util.bridges.mvc.MVCPortlet;
 /**
  * Portlet implementation class ExecActivity
  */
-public class ExecActivity extends MVCPortlet 
-{
+public class ExecActivity extends MVCPortlet{
+	
+	private static Log log = LogFactoryUtil.getLog(ExecActivity.class);
+	
 	static final Pattern DOCUMENT_EXCEPTION_MATCHER = Pattern.compile("Error on line (\\d+) of document ([^ ]+) : (.*)");
 
 	HashMap<Long, TestAnswer> answersMap = new HashMap<Long, TestAnswer>(); 
@@ -98,7 +103,7 @@ public class ExecActivity extends MVCPortlet
 		//Comprobar que el usuario tenga intentos posibles.
 		if (larntry.getEndDate() == null){
 
-			long correctanswers=0;
+			long correctanswers=0,penalizedAnswers=0;
 			Element resultadosXML=SAXReaderUtil.createElement("results");
 			Document resultadosXMLDoc=SAXReaderUtil.createDocument(resultadosXML);
 
@@ -108,16 +113,21 @@ public class ExecActivity extends MVCPortlet
 			for (long questionId : questionIds) {
 				TestQuestion question = TestQuestionLocalServiceUtil.fetchTestQuestion(questionId);
 				QuestionType qt = new QuestionTypeRegistry().getQuestionType(question.getQuestionType());
-				if(!isPartial && qt.correct(actionRequest, questionId)) {
-					correctanswers++;
+				if(!isPartial){
+					if(qt.correct(actionRequest, questionId)) {
+						correctanswers++;
+					}else if(question.isPenalize()){
+						penalizedAnswers++;
+					}
 				}
 				resultadosXML.add(qt.getResults(actionRequest, questionId));								
 			}
 
 			long random = GetterUtil.getLong(LearningActivityLocalServiceUtil.getExtraContentValue(actId,"random"));
 			List<TestQuestion> questions=TestQuestionLocalServiceUtil.getQuestions(actId);
-			long score=isPartial ? 0 : correctanswers*100/((random!=0 && random<questions.size())?random:questions.size());
-
+			long score=isPartial ? 0 : (correctanswers-penalizedAnswers)*100/((random!=0 && random<questions.size())?random:questions.size());
+			if(score < 0)score = 0;
+			
 			LearningActivityResult learningActivityResult = LearningActivityResultLocalServiceUtil.getByActIdAndUserId(actId, PortalUtil.getUserId(actionRequest));
 			long oldResult=-1;
 			if(learningActivityResult!=null) oldResult=learningActivityResult.getResult();
@@ -270,16 +280,29 @@ public class ExecActivity extends MVCPortlet
 		long actid = ParamUtil.getLong(actionRequest, "resId");
 		long questionType = ParamUtil.getLong(actionRequest, "typeId", -1);
 		String questionText = ParamUtil.get(actionRequest, "text", "");
+		boolean penalize = ParamUtil.getBoolean(actionRequest, "penalize");
+		
+		log.debug("***questionId:"+questionId);
+		log.debug("***penalize:"+penalize);
+		
 		String backUrl = ParamUtil.get(actionRequest, "backUrl", "");
 		ThemeDisplay themeDisplay = (ThemeDisplay) actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
 		if(Validator.isNotNull(questionText)){//porque no se permite vacio ya que eliminar pregunta va por otro lado
 			TestQuestion question = null;
 			if(questionId == 0){//Nueva pregunta
-				question = TestQuestionLocalServiceUtil.addQuestion(actid, questionText, questionType);
+				question = TestQuestionLocalServiceUtil.createTestQuestion(CounterLocalServiceUtil.increment(TestQuestion.class.getName()));
+				question.setText(questionText);
+				question.setPenalize(penalize);
+				question.setQuestionType(questionType);
+				question.setActId(actid);
+				question.setWeight(question.getQuestionId());
+				TestQuestionLocalServiceUtil.addTestQuestion(question);
+				
 			}else{//Pregunta existente
 				question = TestQuestionLocalServiceUtil.getTestQuestion(questionId);
-				if(!questionText.equals(question.getText())){//Edicion de pregunta
+				if(!questionText.equals(question.getText()) || penalize != question.getPenalize()){//Edicion de pregunta
 					question.setText(questionText);
+					question.setPenalize(penalize);
 					TestQuestionLocalServiceUtil.updateTestQuestion(question);
 				}
 			}

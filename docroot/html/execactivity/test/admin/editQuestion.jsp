@@ -102,6 +102,9 @@
 			        }
 			    </script>
 	    </aui:field-wrapper>
+	    
+	    <aui:input name="penalize" label="question.penalize" type="checkbox" checked="<%=question.isPenalize()%>"/>
+	    
 	</aui:field-wrapper>
 	
 	<portlet:renderURL var="viewAnswerURL" windowState="<%= LiferayWindowState.EXCLUSIVE.toString() %>">   
