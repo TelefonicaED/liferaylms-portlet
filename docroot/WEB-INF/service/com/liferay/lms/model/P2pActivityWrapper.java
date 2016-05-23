@@ -367,7 +367,7 @@ public class P2pActivityWrapper implements P2pActivity,
 		return new P2pActivityWrapper((P2pActivity)_p2pActivity.clone());
 	}
 
-	public int compareTo(P2pActivity p2pActivity) {
+	public int compareTo(com.liferay.lms.model.P2pActivity p2pActivity) {
 		return _p2pActivity.compareTo(p2pActivity);
 	}
 
@@ -376,11 +376,11 @@ public class P2pActivityWrapper implements P2pActivity,
 		return _p2pActivity.hashCode();
 	}
 
-	public com.liferay.portal.model.CacheModel<P2pActivity> toCacheModel() {
+	public com.liferay.portal.model.CacheModel<com.liferay.lms.model.P2pActivity> toCacheModel() {
 		return _p2pActivity.toCacheModel();
 	}
 
-	public P2pActivity toEscapedModel() {
+	public com.liferay.lms.model.P2pActivity toEscapedModel() {
 		return new P2pActivityWrapper(_p2pActivity.toEscapedModel());
 	}
 

@@ -36,6 +36,7 @@ public class TestQuestionSoap implements Serializable {
 		soapModel.setText(model.getText());
 		soapModel.setQuestionType(model.getQuestionType());
 		soapModel.setWeight(model.getWeight());
+		soapModel.setPenalize(model.getPenalize());
 
 		return soapModel;
 	}
@@ -136,10 +137,23 @@ public class TestQuestionSoap implements Serializable {
 		_weight = weight;
 	}
 
+	public boolean getPenalize() {
+		return _penalize;
+	}
+
+	public boolean isPenalize() {
+		return _penalize;
+	}
+
+	public void setPenalize(boolean penalize) {
+		_penalize = penalize;
+	}
+
 	private String _uuid;
 	private long _questionId;
 	private long _actId;
 	private String _text;
 	private long _questionType;
 	private long _weight;
+	private boolean _penalize;
 }
