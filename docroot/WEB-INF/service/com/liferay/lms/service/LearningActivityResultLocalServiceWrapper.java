@@ -320,6 +320,10 @@ public class LearningActivityResultLocalServiceWrapper
 		return _learningActivityResultLocalService.countPassed(actId);
 	}
 
+	public long countByActId(long actId) {
+		return _learningActivityResultLocalService.countByActId(actId);
+	}
+
 	public long countPassedOnlyStudents(long actId, long companyId,
 		long courseGropupCreatedId, boolean passed)
 		throws com.liferay.portal.kernel.exception.SystemException {

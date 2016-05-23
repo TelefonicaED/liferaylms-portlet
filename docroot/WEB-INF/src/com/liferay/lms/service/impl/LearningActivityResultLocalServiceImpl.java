@@ -876,9 +876,22 @@ public class LearningActivityResultLocalServiceImpl	extends LearningActivityResu
 		}
 	}
 	public long countPassed(long actId) throws SystemException{
-		return learningActivityResultPersistence.countByap(actId, true);
+		return LearningActivityResultUtil.countByap(actId, true);
 	}
 
+	
+	public long countByActId(long actId){
+		long result = 0;
+		try {
+			result = LearningActivityResultUtil.countByac(actId);
+		} catch (SystemException e) {
+			e.printStackTrace();
+		}
+		return result;	
+		
+	}
+	
+	
 	public long countPassedOnlyStudents(long actId, long companyId, long courseGropupCreatedId, boolean passed) throws SystemException{
 		return countPassedOnlyStudents(actId, companyId, courseGropupCreatedId, passed, null);
 	}

@@ -963,7 +963,6 @@ public class SurveyActivity extends MVCPortlet {
 		}else if (action.equals("stadisticsReport")){
 			
 			try{
-				
 				//Creamos fichero excel
 				WorkbookSettings wbSettings = new WorkbookSettings();
 				WritableWorkbook workbook = Workbook.createWorkbook(response.getPortletOutputStream(), wbSettings);
