@@ -103,7 +103,7 @@
 			    </script>
 	    </aui:field-wrapper>
 	    
-	    <aui:input name="penalize" label="question.penalize" type="checkbox" checked="<%=question.isPenalize()%>"/>
+	    <aui:input name="penalize" label="question.penalize" type="checkbox" checked="<%=question!=null?question.isPenalize():false%>"/>
 	    
 	</aui:field-wrapper>
 	
