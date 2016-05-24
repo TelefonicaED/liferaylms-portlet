@@ -32,6 +32,9 @@
 	} 
 	else
 	{
+		
+		String uuid = ParamUtil.getString(renderRequest, "UUID",null);
+		
 		long actId = ParamUtil.getLong(request, "actId",0);
 		LearningActivity learningActivity = LearningActivityLocalServiceUtil.getLearningActivity(actId);
 	%>
@@ -39,7 +42,20 @@
 			<portlet:param name="action" value="stadisticsReport"/>
 			<portlet:param name="resId" value="<%=Long.toString(learningActivity.getActId()) %>"/>
 		</liferay-portlet:resourceURL>
-		<liferay-ui:icon image="export" label="<%= true %>" message="download-content" method="get" url="<%=stadisticsReportURL%>" />
+		
+		<liferay-portlet:renderURL var="renderURL">
+			<portlet:param name="actId" value="<%=Long.toString(learningActivity.getActId()) %>"/>
+			<portlet:param name="jspPage" value="/html/surveyactivity/stadistics.jsp"></portlet:param>
+		</liferay-portlet:renderURL>
+		
+		<div id="${renderResponse.getNamespace()}generate_report">
+			<liferay-ui:icon image="export" label="<%= true %>" message="download-content" method="get" url="javascript:${renderResponse.getNamespace()}exportReport();" />
+		</div>
+		<div id="${renderResponse.getNamespace()}generating_report" class="aui-helper-hidden">
+			<div class="message_generating_report"><liferay-ui:message key="generatingreport"/></div>
+		</div>
+		<div id="${renderResponse.getNamespace()}download_report" class="aui-helper-hidden"></div>
+		
 		
 		<div class="surveyactivity stadistics">
 		
@@ -113,7 +129,102 @@
 			<a href="<%=backToQuestionsURL.toString() %>" ><liferay-ui:message key="back" /></a>
 		</div>
 		
+	
+	
+	
+	<script>
+	
+	
+		function <portlet:namespace/>exportReport(){
+	
+			$('#<portlet:namespace />generating_report').removeClass("aui-helper-hidden");
+			$('#<portlet:namespace />generate_report').addClass("aui-helper-hidden");
+			var exportResourceURL = "${renderURL}";
+			var action ="stadisticsReport";
+	
+			$.ajax({
+				dataType: 'json',
+				url:'${stadisticsReportURL}',
+			    cache:false,
+				data: {
+					status : status,
+					creatingThread : true,
+					action : action
+				},
+				success: function(data){
+					if(data){
+						location.href=exportResourceURL+'&UUID='+data.UUID+'&action='+action;
+					}else{
+						alert("Error generando el archivo");
+						$('#<portlet:namespace />generating_report').addClass("aui-helper-hidden");
+						$('#<portlet:namespace />generate_report').removeClass("aui-helper-hidden");
+					}
+				},
+				error: function(){
+					alert("Error al generar el archivo");
+					$('#<portlet:namespace />generating_report').addClass("aui-helper-hidden");
+					$('#<portlet:namespace />generate_report').removeClass("aui-helper-hidden");
+				}
+			});
+	
+}
+
+function <portlet:namespace />downloadReport(url){
+	location.href = url;
+	$('#<portlet:namespace />download_report').addClass("aui-helper-hidden");
+	$('#<portlet:namespace />generate_report').removeClass("aui-helper-hidden");
+	//location.href='${renderURL}&UUID=null';
+}
+
+
+
+</script>
+
+<% if(uuid!=null && uuid.trim()!="") {
+	%>
+	<script>	
+		$('#<portlet:namespace />download_report').addClass("aui-helper-hidden");
+		$('#<portlet:namespace />generate_report').addClass("aui-helper-hidden");
+		$('#<portlet:namespace />generating_report').removeClass("aui-helper-hidden");
+		$(document).ready(function(){
+			<portlet:namespace />readThreadState();
+		});
+		
+		function <portlet:namespace />readThreadState(){
+			$.ajax({
+				dataType: 'json',
+				url: '${stadisticsReportURL}',
+				action :  "${action}",
+			    cache:false,
+				data: {
+					UUID : '<%=uuid%>'
+				},
+				success: function(data){
+					if(data){						
+				    	if(!data.threadF){		
+				    		$('#<portlet:namespace />generating_report').removeClass("aui-helper-hidden");
+				    		$('#<portlet:namespace />download_report').addClass("aui-helper-hidden");
+				    		setTimeout(<portlet:namespace />readThreadState,2000);
+				    		
+				    	}else{	
+				    		//location.href='${exportResourceURL}&file=' + data.file + '&contentType=' + data.contentType + '&UUID=' + data.UUID + '&action='+data.action;
+				    		$('#<portlet:namespace />download_report').empty();
+							$('#<portlet:namespace />generating_report').addClass("aui-helper-hidden");
+							$('#<portlet:namespace />download_report').append('<button type="button" id="link_download" onClick="javascript:<portlet:namespace />downloadReport(\'${stadisticsReportURL}&file=' + data.file +'&fileName=' + data.fileName + '&contentType=' + data.contentType + '&UUID=' + data.UUID + '&action='+data.action+'\'); " ><liferay-ui:message key="download-report"/></button>');
+							$('#<portlet:namespace />download_report').removeClass("aui-helper-hidden");
+				    	}
+					}else{
+						alert("Error en el readThreadState");
+					}
+				},
+				error: function(){
+					alert("ERROR::");
+				}
+			});		
+		}	
+	</script>
 	<%	
+		} 
 	} 
 	%>
 	
