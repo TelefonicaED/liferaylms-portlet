@@ -7,8 +7,8 @@
 				DISTINCT c.*
 			FROM 
 				lms_course c
-			INNER JOIN group_ g
-				ON c.groupCreatedId = g.groupId 
+			INNER JOIN group_ 
+				ON c.groupCreatedId = group_.groupId 
 			[$JOINASSET$] 
 			[$JOINASSETCATEGORIES$] 
 			[$JOINASSETTAGS$]
@@ -48,8 +48,8 @@
 				COUNT(DISTINCT c.courseId) AS COUNT_VALUE
 			FROM 
 				lms_course c
-			INNER JOIN group_ g
-				ON c.groupCreatedId = g.groupId 
+			INNER JOIN group_
+				ON c.groupCreatedId = group_.groupId 
 			[$JOINASSET$] 
 			[$JOINASSETCATEGORIES$] 
 			[$JOINASSETTAGS$]
@@ -92,15 +92,15 @@
 	<sql id="com.liferay.lms.service.persistence.CourseFinder.joinC_ByAssetCategory">
 		<![CDATA[
 			INNER JOIN 
-				assetentries_assetcategories aac 
-					ON aac.entryId = ae.entryId
+				assetentries_assetcategories aac[$i$] 
+					ON aac[$i$].entryId = ae.entryId
 		]]>
 	</sql>
 	<sql id="com.liferay.lms.service.persistence.CourseFinder.joinC_ByAssetTag">
 		<![CDATA[
 			INNER JOIN 
-				assetentries_assettags aat 
-					ON aat.entryId = ae.entryId 
+				assetentries_assettags aat[$i$] 
+					ON aat[$i$].entryId = ae.entryId 
 		]]>
 	</sql>
 	<sql id="com.liferay.lms.service.persistence.CourseFinder.joinC_ByResourcePermission">
@@ -145,6 +145,51 @@
 						AND ug2.userId = [$USERID$]
 		]]>
 	</sql>
+	<sql id="com.liferay.lms.service.persistence.CourseFinder.joinC_ByResourcePermissionView">
+		<![CDATA[
+			INNER JOIN 
+				resourcepermission rp 
+					ON rp.name = 'com.liferay.lms.model.Course' 
+						AND rp.companyId = [$COMPANYID$] 
+						AND ((primKey = c.courseId AND scope = 4) OR (primKey = [$COMPANYID$] AND scope = 1)) 
+						AND (actionIds & [$ACTIONVIEW$] )
+			LEFT JOIN 
+				users_roles ur 
+					ON rp.roleId = ur.roleId 
+						AND ur.roleId 
+						AND ur.userId = [$USERID$]
+			LEFT JOIN 
+				usergrouprole ug 
+					ON ug.groupId = c.groupId 
+						AND ug.roleId = rp.roleId 
+						AND ug.userId = [$USERID$]
+			LEFT JOIN 
+				groups_roles gr 
+					ON gr.roleId = rp.roleId
+			LEFT JOIN 
+				group_ g 
+					ON gr.groupId = g.groupId
+			LEFT JOIN 
+				users_usergroups uug 
+					ON uug.userGroupId 
+						AND g.classPK AND g.classNameId = [$CLASSNAMEIDUSERGROUP$]
+						AND uug.userId = [$USERID$]
+			LEFT JOIN 
+				users_orgs uo 
+					ON uo.organizationId = g.classPK 
+						AND g.classNameId = [$CLASSNAMEIDORGANIZATION$] 
+						AND uo.userId = [$USERID$]
+			LEFT JOIN 
+				users_groups ug2 
+					ON ug2.groupId = g.classPK 
+						AND g.classNameId = [$CLASSNAMEIDGROUP$] 
+						AND ug2.userId = [$USERID$]
+			LEFT JOIN 
+				users_groups ugroup 
+					ON ugroup.groupId = c.groupId 
+						AND ugroup.userId = [$USERID$]
+		]]>
+	</sql>
 	<sql id="com.liferay.lms.service.persistence.CourseFinder.whereC_ByResourcePermission">
 		<![CDATA[
 			AND 
@@ -153,24 +198,37 @@
 			)
 		]]>
 	</sql>
+	<sql id="com.liferay.lms.service.persistence.CourseFinder.whereC_ByResourcePermissionView">
+		<![CDATA[
+			AND 
+			( 
+				ur.userId IS NOT NULL OR ug.userId IS NOT NULL OR uug.userGroupId IS NOT NULL OR uo.userId IS NOT NULL OR ug2.userId IS NOT NULL OR (rp.roleId = [$ROLEMEMBER$] AND ugroup.userId IS NOT NULL) OR rp.roleId = [$ROLEGUEST$]
+			)
+		]]>
+	</sql>
 	<sql id="com.liferay.lms.service.persistence.CourseFinder.whereC_ByAndAssetCategory">
 		<![CDATA[
-			AND aac.categoryId IN ([$CATEGORYIDS$])
+			AND aac[$i$].categoryId = ([$CATEGORYIDS$])
 		]]>
 	</sql>
 	<sql id="com.liferay.lms.service.persistence.CourseFinder.whereC_ByAndAssetTag">
 		<![CDATA[
-			AND aat.tagId IN ([$TAGIDS$])
+			AND aat[$i$].tagId = ([$TAGIDS$])
 		]]>
 	</sql>
 	<sql id="com.liferay.lms.service.persistence.CourseFinder.whereC_ByOrAssetCategory">
 		<![CDATA[
-			OR aac.categoryId IN ([$CATEGORYIDS$])
+			OR aac0.categoryId IN ([$CATEGORYIDS$])
 		]]>
 	</sql>
 	<sql id="com.liferay.lms.service.persistence.CourseFinder.whereC_ByOrAssetTag">
 		<![CDATA[
-			OR aat.tagId IN ([$TAGIDS$])
+			OR aat0.tagId IN ([$TAGIDS$])
+		]]>
+	</sql>
+	<sql id="com.liferay.lms.service.persistence.CourseFinder.whereC_Catalog">
+		<![CDATA[
+			AND ae.visible = 1
 		]]>
 	</sql>
 	

@@ -663,6 +663,17 @@
 		</footer-portlet-javascript>
 		<css-class-wrapper>finalcourseresult-portlet</css-class-wrapper>
 	</portlet>
+	<portlet>
+		<portlet-name>catalogcourses</portlet-name>
+		<icon>/icon.png</icon>
+		<configuration-action-class>com.liferay.portal.kernel.portlet.DefaultConfigurationAction</configuration-action-class>
+		<instanceable>false</instanceable>
+		<header-portlet-css>/css/main.css</header-portlet-css>
+		<footer-portlet-javascript>
+			/js/main.js
+		</footer-portlet-javascript>
+		<css-class-wrapper>catalogcourses-portlet</css-class-wrapper>
+	</portlet>
 	<role-mapper>
 		<role-name>administrator</role-name>
 		<role-link>Administrator</role-link>

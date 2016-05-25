@@ -464,19 +464,19 @@ public class CourseLocalServiceWrapper implements CourseLocalService,
 	}
 
 	public java.util.List<com.liferay.lms.model.Course> getByTitleStatusCategoriesTags(
-		java.lang.String title, int status, long[] categories, long[] tags,
+		java.lang.String freeText, int status, long[] categories, long[] tags,
 		long companyId, long groupId, long userId, java.lang.String language,
 		boolean isAdmin, boolean andOperator, int start, int end) {
-		return _courseLocalService.getByTitleStatusCategoriesTags(title,
+		return _courseLocalService.getByTitleStatusCategoriesTags(freeText,
 			status, categories, tags, companyId, groupId, userId, language,
 			isAdmin, andOperator, start, end);
 	}
 
-	public int countByTitleStatusCategoriesTags(java.lang.String title,
+	public int countByTitleStatusCategoriesTags(java.lang.String freeText,
 		int status, long[] categories, long[] tags, long companyId,
 		long groupId, long userId, java.lang.String language, boolean isAdmin,
 		boolean andOperator) {
-		return _courseLocalService.countByTitleStatusCategoriesTags(title,
+		return _courseLocalService.countByTitleStatusCategoriesTags(freeText,
 			status, categories, tags, companyId, groupId, userId, language,
 			isAdmin, andOperator);
 	}
@@ -497,6 +497,21 @@ public class CourseLocalServiceWrapper implements CourseLocalService,
 		boolean andOperator) {
 		return _courseLocalService.countStudents(courseId, companyId,
 			screenName, firstName, lastName, emailAddress, andOperator);
+	}
+
+	public java.util.List<com.liferay.lms.model.Course> getCoursesCatalogByTitleCategoriesTags(
+		java.lang.String freeText, long[] categories, long[] tags,
+		long companyId, long groupId, long userId, java.lang.String language,
+		int start, int end) {
+		return _courseLocalService.getCoursesCatalogByTitleCategoriesTags(freeText,
+			categories, tags, companyId, groupId, userId, language, start, end);
+	}
+
+	public int countCoursesCatalogByTitleCategoriesTags(
+		java.lang.String freeText, long[] categories, long[] tags,
+		long companyId, long groupId, long userId, java.lang.String language) {
+		return _courseLocalService.countCoursesCatalogByTitleCategoriesTags(freeText,
+			categories, tags, companyId, groupId, userId, language);
 	}
 
 	/**

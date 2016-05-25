@@ -940,12 +940,12 @@ public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int e
 		return students;
 	}
 	
-	public List<Course> getByTitleStatusCategoriesTags(String title, int status, long[] categories, long[] tags, long companyId, long groupId, long userId, String language, boolean isAdmin, boolean andOperator, int start, int end){
-		return CourseFinderUtil.findByT_S_C_T(title, status, categories, tags, companyId, groupId, userId, language, isAdmin, andOperator, start, end);
+	public List<Course> getByTitleStatusCategoriesTags(String freeText, int status, long[] categories, long[] tags, long companyId, long groupId, long userId, String language, boolean isAdmin, boolean andOperator, int start, int end){
+		return CourseFinderUtil.findByT_S_C_T(freeText, status, categories, tags, companyId, groupId, userId, language, isAdmin, andOperator, start, end);
 	}
 	
-	public int countByTitleStatusCategoriesTags(String title, int status, long[] categories, long[] tags, long companyId, long groupId, long userId, String language, boolean isAdmin, boolean andOperator){
-		return CourseFinderUtil.countByT_S_C_T(title, status, categories, tags, companyId, groupId, userId, language, isAdmin, andOperator);
+	public int countByTitleStatusCategoriesTags(String freeText, int status, long[] categories, long[] tags, long companyId, long groupId, long userId, String language, boolean isAdmin, boolean andOperator){
+		return CourseFinderUtil.countByT_S_C_T(freeText, status, categories, tags, companyId, groupId, userId, language, isAdmin, andOperator);
 	}
 	
 	public List<User> getStudents(long courseId, long companyId, String screenName, String firstName, String lastName, String emailAddress, boolean andOperator, int start, int end,OrderByComparator comparator){
@@ -954,6 +954,14 @@ public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int e
 	
 	public int countStudents(long courseId, long companyId, String screenName, String firstName, String lastName, String emailAddress,boolean andOperator){
 		return CourseFinderUtil.countStudents(courseId, companyId, screenName,firstName, lastName, emailAddress,andOperator);
+	}
+	
+	public List<Course> getCoursesCatalogByTitleCategoriesTags(String freeText, long[] categories, long[] tags, long companyId, long groupId, long userId, String language, int start, int end){
+		return CourseFinderUtil.findByCatalog(freeText, categories, tags, companyId, groupId, userId, language, start, end);
+	}
+	
+	public int countCoursesCatalogByTitleCategoriesTags(String freeText, long[] categories, long[] tags, long companyId, long groupId, long userId, String language){
+		return CourseFinderUtil.countByCatalog(freeText, categories, tags, companyId, groupId, userId, language);
 	}
 }
 
