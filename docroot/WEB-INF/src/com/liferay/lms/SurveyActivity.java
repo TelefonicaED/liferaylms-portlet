@@ -1,19 +1,22 @@
 package com.liferay.lms;
 
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -25,19 +28,7 @@ import javax.portlet.RenderResponse;
 import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
 
-import jxl.CellView;
-import jxl.Workbook;
-import jxl.WorkbookSettings;
-import jxl.write.Label;
-import jxl.write.WritableCellFormat;
-import jxl.write.WritableFont;
-import jxl.write.WritableSheet;
-import jxl.write.WritableWorkbook;
-import jxl.write.WriteException;
-import jxl.write.biff.RowsExceededException;
-
 import org.apache.commons.beanutils.BeanComparator;
-import org.jfree.util.Log;
 import org.jsoup.Jsoup;
 
 import au.com.bytecode.opencsv.CSVReader;
@@ -53,16 +44,20 @@ import com.liferay.lms.model.LearningActivityTry;
 import com.liferay.lms.model.SurveyResult;
 import com.liferay.lms.model.TestAnswer;
 import com.liferay.lms.model.TestQuestion;
-import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityTryLocalServiceUtil;
-import com.liferay.lms.service.ModuleLocalServiceUtil;
 import com.liferay.lms.service.SurveyResultLocalServiceUtil;
 import com.liferay.lms.service.TestAnswerLocalServiceUtil;
 import com.liferay.lms.service.TestQuestionLocalServiceUtil;
+import com.liferay.lms.threads.ExportSurveyStatisticsContentThread;
+import com.liferay.lms.threads.ExportSurveyStatisticsThreadMapper;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
+import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.servlet.HttpHeaders;
@@ -71,7 +66,6 @@ import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.upload.UploadPortletRequest;
 import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.ContentTypes;
-import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringPool;
@@ -100,7 +94,8 @@ public class SurveyActivity extends MVCPortlet {
 	
 	HashMap<Long, TestAnswer> answersMap = new HashMap<Long, TestAnswer>(); 
 	static final Pattern DOCUMENT_EXCEPTION_MATCHER = Pattern.compile("Error on line (\\d+) of document ([^ ]+) : (.*)");
- 
+	private static Log log = LogFactoryUtil.getLog(SurveyActivity.class);
+	
 	public void saveSurvey(ActionRequest actionRequest, ActionResponse actionResponse) throws Exception {
 		
 		//com.liferay.lms.model.SurveyActivity surveyActivity = null;
@@ -485,7 +480,6 @@ public class SurveyActivity extends MVCPortlet {
 								allCorrect=false;
 						}
 					}//while
-					Log.info("Se acabo");
 					
 					if(allCorrect){
 						actionResponse.setRenderParameter("jspPage", "/html/surveyactivity/admin/editquestions.jsp");
@@ -752,6 +746,7 @@ public class SurveyActivity extends MVCPortlet {
 
 		String action = ParamUtil.getString(request, "action");
 		long actId = ParamUtil.getLong(request, "resId",0); 
+		
 		if(action.equals("export")){
 
 			try {
@@ -961,124 +956,70 @@ public class SurveyActivity extends MVCPortlet {
 				response.getPortletOutputStream().close();
 			}
 		}else if (action.equals("stadisticsReport")){
-			
-			try{
+			String filePath = ParamUtil.getString(request, "file", null);
+			String fileName =  ParamUtil.getString(request, "fileName");
+			ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(WebKeys.THEME_DISPLAY);
+			String uuid = ParamUtil.getString(request, "UUID");
+			log.debug("Entra en serve Resource: Action "+action);
+			boolean creatingThread = ParamUtil.getBoolean(request, "creatingThread");
+			if(creatingThread){
+				uuid=null;
+			}
 				
-				//Creamos fichero excel
-				WorkbookSettings wbSettings = new WorkbookSettings();
-				WritableWorkbook workbook = Workbook.createWorkbook(response.getPortletOutputStream(), wbSettings);
-				workbook.createSheet("Report", 0);
-				WritableSheet excelSheet = workbook.getSheet(0);
+			if(filePath!=null){
+				File file = new File(filePath);
+				int length   = 0;			 
+				response.setContentType(ParamUtil.getString(request, "contentType"));
+				response.setContentLength((int)file.length());
 				
-				//Creamos formatos
-				WritableCellFormat cabecera = new WritableCellFormat();
-				WritableCellFormat contenido = new WritableCellFormat();
-				cabecera.setFont(new WritableFont(WritableFont.ARIAL, 11, WritableFont.BOLD));
-				contenido.setFont(new WritableFont(WritableFont.ARIAL, 11));
-	
-				//Creamos la cabecera con las preguntas.
-				List<TestQuestion> questionsTitle = TestQuestionLocalServiceUtil.getQuestions(actId);
-				List<TestQuestion> listaTotal = ListUtil.copy(questionsTitle);
-				BeanComparator beanComparator = new BeanComparator("weight");
-				Collections.sort(listaTotal, beanComparator);
-				questionsTitle = listaTotal;
+				response.addProperty(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + fileName);
 				
-				//Anadimos x columnas para mostrar id, curso...
-				int numExtraCols = 4;
-				String[] cabeceras = new String[questionsTitle.size()+numExtraCols];
-
-				//En las columnas extra ponemos la cabecera
-				cabeceras[0]="Id";
-				cabeceras[1]="Curso";
-				cabeceras[2]="M\u00f3dulo";
-				cabeceras[3]="Actividad";
+				OutputStream out = response.getPortletOutputStream();
 				
-				// - Guardamos el orden en que obtenemos las preguntas de la base
-				//   de datos para poner las respuestas en el mismo orden.
-				// - Generamos cabecera completa.
-				Long []questionOrder = new Long[questionsTitle.size()];
-	
-				for(int i=numExtraCols; i<questionsTitle.size()+numExtraCols; i++){
-					cabeceras[i] = HtmlUtil.extractText(questionsTitle.get(i-numExtraCols).getText());
-					questionOrder[i-numExtraCols] = questionsTitle.get(i-numExtraCols).getQuestionId();
-				}
+				byte[] byteBuffer = new byte[4096];
+		        DataInputStream in = new DataInputStream(new FileInputStream(file));
+		        
+		        // reads the file's bytes and writes them to the response stream
+		        while ((in != null) && ((length = in.read(byteBuffer)) != -1)){
+		        	out.write(byteBuffer,0,length);
+		        }		
 				
-				//Consultamos los nombres de curso, módulo y actividad
-				LearningActivity activity = LearningActivityLocalServiceUtil
-												.getLearningActivity(actId);
+				out.flush();
+				out.close();
+				in.close();
 				
-				String curso = CourseLocalServiceUtil.fetchByGroupCreatedId(
-									activity.getGroupId()).getTitle();
-				String modulo = ModuleLocalServiceUtil.fetchModule(
-									activity.getModuleId()).getTitle();
-				String actividad = activity.getTitle();
+			}else{
+				JSONObject oreturned = JSONFactoryUtil.createJSONObject();
+				response.setContentType("application/json");
 				
-				int numeroFila = 0;
-				int numeroColumna = 0;
-				
-				//Pintamos cabecera
-				for (String valor:cabeceras){
-					addLabel(excelSheet, cabecera, numeroColumna, numeroFila, valor);
-					numeroColumna++;
-				}
-				
-				//Reiniciamos columnas
-				numeroColumna = 0;
-				//Por cada pregunta, traemos sus respuestas
-				List<SurveyResult> listaRespuestas;
-				
-				for(Long questionId: questionOrder)
-				{									
-					//Empezamos por la fila 1
-					numeroFila = 1;
-					listaRespuestas = SurveyResultLocalServiceUtil.getSurveyResultsByQuestionIdActId(questionId, actId);
-					if(listaRespuestas!=null && listaRespuestas.size()!=0)
-					{
-						for(SurveyResult answer:listaRespuestas)
-						{
-							// La primera vez pintamos los valores 
-							// "Id", "Curso", "Módulo" y "Actividad"
-							if(numeroColumna == 0){
-								addLabel(excelSheet, contenido, 0, numeroFila, String.valueOf(numeroFila));
-								addLabel(excelSheet, contenido, 1, numeroFila, HtmlUtil.extractText(curso));
-								addLabel(excelSheet, contenido, 2, numeroFila, HtmlUtil.extractText(modulo));
-								addLabel(excelSheet, contenido, 3, numeroFila, HtmlUtil.extractText(actividad));
-								addLabel(excelSheet, contenido, 4, numeroFila, HtmlUtil.extractText(answer.getFreeAnswer()));
-							}
-							else {
-								addLabel(excelSheet, contenido, numeroColumna+numExtraCols, numeroFila, HtmlUtil.extractText(answer.getFreeAnswer()));
-							}
-							numeroFila++;//Fila nueva
-						}
-						numeroColumna++;//Columna nueva
+				if(Validator.isNotNull(uuid)){
+						
+					boolean finished = ExportSurveyStatisticsThreadMapper.hiloFinished(uuid);
+					oreturned.put("threadF", finished);
+					log.debug("- not finished");
+					if(finished){
+						log.debug("+++FINISHED["+uuid+"]+++");
+						oreturned.put("file", ExportSurveyStatisticsThreadMapper.getFileUrl(uuid));		
+						oreturned.put("fileName", ExportSurveyStatisticsThreadMapper.getFileName(uuid));	
+						oreturned.put("contentType", "application/vnd.ms-excel");
+						ExportSurveyStatisticsThreadMapper.unlinkHiloExcel(uuid);
+						uuid=null;
 					}
-				}
-				
-				String nombreArchivo = "Respuestas";
-				nombreArchivo += (StringPool.UNDERLINE);
-				nombreArchivo += (HtmlUtil.extractText(actividad));
-				nombreArchivo += (StringPool.UNDERLINE);
-				nombreArchivo += new SimpleDateFormat("yyyyMMdd").format(new Date());
-				
-				//Rellenamos cabecera respuesta
-				response.setCharacterEncoding(StringPool.UTF8);
-				response.setContentType(ContentTypes.APPLICATION_VND_MS_EXCEL);
-				response.addProperty(HttpHeaders.CONTENT_DISPOSITION, "attachment; fileName="+nombreArchivo+".xls");
-				
-				workbook.write();
-				workbook.close();
-				
-			} catch (SystemException e) {
-				e.printStackTrace();
-			} catch (RowsExceededException e) {
-				e.printStackTrace();
-			} catch (WriteException e) {
-				e.printStackTrace();
-			} catch (PortalException e) {
-				e.printStackTrace();
-			} finally{
-				response.getPortletOutputStream().flush();
-				response.getPortletOutputStream().close();
+					oreturned.put("UUID", uuid);
+				}else{
+					String idHilo = UUID.randomUUID().toString();
+					log.debug("idHilo: " + idHilo);				
+							
+					ExportSurveyStatisticsContentThread hilo = new ExportSurveyStatisticsContentThread(actId, idHilo,  getPortletConfig(), themeDisplay.getLocale());
+					ExportSurveyStatisticsThreadMapper.addHilo(idHilo, hilo);
+					oreturned.put("UUID", idHilo);
+					
+				}	
+				oreturned.put("action", action);
+				PrintWriter out = response.getWriter();
+				out.print(oreturned.toString());
+				out.flush();
+				out.close();
 			}
 		}
 	}
@@ -1097,7 +1038,7 @@ public class SurveyActivity extends MVCPortlet {
 
 		return res;
 	}
-
+	
 	private Long getQuestionIdByAnswerId(Long answerId) throws PortalException, SystemException{
 		//Buscamos la respuesta en el hashmap, si no lo tenemos, lo obtenemos y lo guardamos.
 		if(!answersMap.containsKey(answerId))
@@ -1120,14 +1061,5 @@ public class SurveyActivity extends MVCPortlet {
 		return formatString(answersMap.get(answerId).getAnswer())+" ("+answersMap.get(answerId).getAnswerId()+")";
 	}
 	
-	private void addLabel(WritableSheet sheet, WritableCellFormat cellFormat,
-						 int column, int row, String value) 
-								 throws WriteException, RowsExceededException {
 
-		Label label = new Label(column, row, value, cellFormat);
-		CellView cv = new CellView();
-		cv.setAutosize(true);
-		sheet.setColumnView(column, cv);
-		sheet.addCell(label);
-	}
 }
