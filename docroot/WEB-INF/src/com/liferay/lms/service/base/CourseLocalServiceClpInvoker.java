@@ -279,6 +279,20 @@ public class CourseLocalServiceClpInvoker {
 				"long", "long", "java.lang.String", "java.lang.String",
 				"java.lang.String", "java.lang.String", "boolean"
 			};
+
+		_methodName222 = "getCoursesCatalogByTitleCategoriesTags";
+
+		_methodParameterTypes222 = new String[] {
+				"java.lang.String", "long[][]", "long[][]", "long", "long",
+				"long", "java.lang.String", "int", "int"
+			};
+
+		_methodName223 = "countCoursesCatalogByTitleCategoriesTags";
+
+		_methodParameterTypes223 = new String[] {
+				"java.lang.String", "long[][]", "long[][]", "long", "long",
+				"long", "java.lang.String"
+			};
 	}
 
 	public Object invokeMethod(String name, String[] parameterTypes,
@@ -609,6 +623,27 @@ public class CourseLocalServiceClpInvoker {
 				((Boolean)arguments[6]).booleanValue());
 		}
 
+		if (_methodName222.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes222, parameterTypes)) {
+			return CourseLocalServiceUtil.getCoursesCatalogByTitleCategoriesTags((java.lang.String)arguments[0],
+				(long[])arguments[1], (long[])arguments[2],
+				((Long)arguments[3]).longValue(),
+				((Long)arguments[4]).longValue(),
+				((Long)arguments[5]).longValue(),
+				(java.lang.String)arguments[6],
+				((Integer)arguments[7]).intValue(),
+				((Integer)arguments[8]).intValue());
+		}
+
+		if (_methodName223.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes223, parameterTypes)) {
+			return CourseLocalServiceUtil.countCoursesCatalogByTitleCategoriesTags((java.lang.String)arguments[0],
+				(long[])arguments[1], (long[])arguments[2],
+				((Long)arguments[3]).longValue(),
+				((Long)arguments[4]).longValue(),
+				((Long)arguments[5]).longValue(), (java.lang.String)arguments[6]);
+		}
+
 		throw new UnsupportedOperationException();
 	}
 
@@ -712,4 +747,8 @@ public class CourseLocalServiceClpInvoker {
 	private String[] _methodParameterTypes220;
 	private String _methodName221;
 	private String[] _methodParameterTypes221;
+	private String _methodName222;
+	private String[] _methodParameterTypes222;
+	private String _methodName223;
+	private String[] _methodParameterTypes223;
 }

@@ -37,4 +37,15 @@ public interface Course extends CourseModel, PersistedModel {
 
 	public void setTitle(java.lang.String title, java.util.Locale locale,
 		java.util.Locale defaultLocale);
+
+	public java.lang.String getImageURL(
+		com.liferay.portal.theme.ThemeDisplay themeDisplay);
+
+	public double getAverageScore();
+
+	public java.util.List<com.liferay.portlet.asset.model.AssetCategory> getAssetCategoryIds();
+
+	public java.util.List<com.liferay.portlet.asset.model.AssetTag> getAssetTagIds();
+
+	public com.liferay.portal.model.Group getGroup();
 }

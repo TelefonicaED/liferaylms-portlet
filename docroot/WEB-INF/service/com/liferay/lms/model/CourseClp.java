@@ -747,6 +747,27 @@ public class CourseClp extends BaseModelImpl<Course> implements Course {
 		_goodbyeSubject = goodbyeSubject;
 	}
 
+	public java.util.List<com.liferay.portlet.asset.model.AssetCategory> getAssetCategoryIds() {
+		throw new UnsupportedOperationException();
+	}
+
+	public com.liferay.portal.model.Group getGroup() {
+		throw new UnsupportedOperationException();
+	}
+
+	public java.util.List<com.liferay.portlet.asset.model.AssetTag> getAssetTagIds() {
+		throw new UnsupportedOperationException();
+	}
+
+	public double getAverageScore() {
+		throw new UnsupportedOperationException();
+	}
+
+	public java.lang.String getImageURL(
+		com.liferay.portal.theme.ThemeDisplay themeDisplay) {
+		throw new UnsupportedOperationException();
+	}
+
 	/**
 	 * @deprecated {@link #isApproved}
 	 */

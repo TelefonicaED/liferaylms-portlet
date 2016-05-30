@@ -125,6 +125,9 @@ public class GroupListener extends BaseModelListener<Group> {
 				
 				
 				if(course!=null&&course.isGoodbye()&&course.getGoodbyeMsg()!=null&&!StringPool.BLANK.equals(course.getGoodbyeMsg())){
+					if(log.isDebugEnabled())log.debug("course.courseId: " + course.getCourseId());
+					if(log.isDebugEnabled())log.debug("course.isGoodbye(): " + course.isGoodbye());
+					if(log.isDebugEnabled())log.debug("course.getGoodbyeMsg(): " + course.getGoodbyeMsg());
 					User user = null;
 					Company company = null;
 					try {

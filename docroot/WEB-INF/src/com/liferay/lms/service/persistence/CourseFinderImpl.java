@@ -17,6 +17,7 @@ import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.dao.orm.SessionFactory;
 import com.liferay.portal.kernel.dao.orm.Type;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -25,11 +26,13 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.Organization;
+import com.liferay.portal.model.RoleConstants;
 import com.liferay.portal.model.User;
 import com.liferay.portal.model.UserGroup;
 import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.service.ClassNameLocalServiceUtil;
 import com.liferay.portal.service.ResourceActionLocalServiceUtil;
+import com.liferay.portal.service.RoleLocalServiceUtil;
 import com.liferay.portal.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.util.dao.orm.CustomSQLUtil;
 
@@ -76,6 +79,16 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 	public static final String COUNT_STUDENTS = 
 			CourseFinder.class.getName() +
 				".countStudents";
+	public static final String JOIN_BY_RESOURCE_PERMISSION_VIEW = 
+			CourseFinder.class.getName() + 
+				".joinC_ByResourcePermissionView";
+	public static final String WHERE_C_CATALOG = 
+			CourseFinder.class.getName() + 
+				".whereC_Catalog";
+	public static final String WHERE_BY_RESOURCE_PERMISSION_VIEW =
+		    CourseFinder.class.getName() +
+		        ".whereC_ByResourcePermissionView";
+	
 	
 	@SuppressWarnings("unchecked")
 	public List<Course> findByT_S_C_T(String freeText, int status, long[] categories, long[] tags, long companyId, long groupId, long userId, String language, boolean isAdmin, boolean andOperator, int start, int end){
@@ -178,14 +191,26 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 	private String replaceTag(String sql, long[] tags) {
 		/** Sustituimos los tags si buscamos por ellos **/
 		if(tags != null && tags.length > 0){
-			sql = sql.replace("[$JOINASSETTAGS$]", CustomSQLUtil.get(JOIN_BY_ASSET_TAG));
 			String tagIds = "";
-			for(long tagId: tags){
-				tagIds += tagId + ",";
+			String joins = "";
+			String wheres = "";
+			
+			for(int i = 0; i < tags.length; i++){
+				joins += CustomSQLUtil.get(JOIN_BY_ASSET_TAG);
+				wheres += CustomSQLUtil.get(WHERE_BY_AND_ASSET_TAG);
+
+				wheres = wheres.replace("[$TAGIDS$]", String.valueOf(tags[i]));	
+				
+				joins = joins.replace("[$i$]", String.valueOf(i));
+				wheres = wheres.replace("[$i$]", String.valueOf(i));
+				
+				tagIds += tags[i] + ",";
 			}
 			tagIds = tagIds.substring(0, tagIds.length()-1);
-			log.debug("tags: " + tagIds);
-			sql = sql.replace("[$WHEREANDASSETTAG$]", CustomSQLUtil.get(WHERE_BY_AND_ASSET_TAG));
+			
+			sql = sql.replace("[$JOINASSETTAGS$]", joins);
+			
+			sql = sql.replace("[$WHEREANDASSETTAG$]", wheres);
 			sql = sql.replace("[$WHEREORASSETTAG$]", CustomSQLUtil.get(WHERE_BY_OR_ASSET_TAG));
 				
 			sql = sql.replace("[$TAGIDS$]", tagIds);
@@ -200,17 +225,29 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 	private String replaceCategory(String sql, long[] categories) {
 		/**Ahora sustituimos las categorias si se busca por ellas**/
 		if(categories != null && categories.length > 0){
-			sql = sql.replace("[$JOINASSETCATEGORIES$]", CustomSQLUtil.get(JOIN_BY_ASSET_CATEGORY));
 			String categoryIds = "";
-			for(long categoryId: categories){
-				categoryIds += categoryId + ",";
+			String joins = "";
+			String wheres = "";
+			for(int i = 0; i < categories.length; i++){
+				joins += CustomSQLUtil.get(JOIN_BY_ASSET_CATEGORY);
+
+				wheres += CustomSQLUtil.get(WHERE_BY_AND_ASSET_CATEGORY);
+				
+				wheres = wheres.replace("[$CATEGORYIDS$]", String.valueOf(categories[i]));	
+				
+				joins = joins.replace("[$i$]", String.valueOf(i));
+				wheres = wheres.replace("[$i$]", String.valueOf(i));
+				categoryIds += categories[i] + ",";
 			}
-			categoryIds = categoryIds.substring(0, categoryIds.length()-1);
-			log.debug("categoryIds: " + categoryIds);
-			sql = sql.replace("[$WHEREANDASSETCATEGORY$]", CustomSQLUtil.get(WHERE_BY_AND_ASSET_CATEGORY));
-			sql = sql.replace("[$WHEREORASSETCATEGORY$]", CustomSQLUtil.get(WHERE_BY_OR_ASSET_CATEGORY));
 			
-			sql = sql.replace("[$CATEGORYIDS$]", categoryIds);
+			categoryIds = categoryIds.substring(0, categoryIds.length()-1);
+			
+			sql = sql.replace("[$JOINASSETCATEGORIES$]", joins);
+			sql = sql.replace("[$WHEREANDASSETCATEGORY$]", wheres);
+			
+			sql = sql.replace("[$WHEREORASSETCATEGORY$]", CustomSQLUtil.get(WHERE_BY_OR_ASSET_CATEGORY));
+			sql = sql.replace("[$CATEGORYIDS$]", categoryIds);	
+
 		}else{
 			sql = sql.replace("[$JOINASSETCATEGORIES$]", "");
 			sql = sql.replace("[$WHEREANDASSETCATEGORY$]", "");
@@ -477,6 +514,171 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 	    }
 	
 	    return 0;
+	}
+	
+	public List<Course> findByCatalog(String freeText, long[] categories, long[] tags, long companyId, long groupId, long userId, String language, int start, int end){
+		Session session = null;
+		
+		try{
+			
+			if(freeText != null && freeText.length() > 0)
+				freeText = "%" + freeText + "%";
+			
+			session = openSession();
+			
+			String sql = CustomSQLUtil.get(FIND_BY_TITLE_STATUS);
+			
+			sql = replaceLanguage(sql, language);
+			
+			sql = sql.replace("[$JOINASSET$]", CustomSQLUtil.get(JOIN_BY_ASSET_ENTRY));
+			sql = sql.replace("[$CLASSNAMECOURSEID$]", String.valueOf(ClassNameLocalServiceUtil.fetchClassNameId(Course.class)));
+
+			sql = replaceCategory(sql, categories);
+
+			sql = replaceTag(sql, tags);
+			
+			sql = replaceResourcePermissionView(sql, companyId, userId);
+
+			if(start < 0 && end < 0){
+				sql = sql.replace("LIMIT [$START$], [$END$]", "");
+			}else{
+				sql = sql.replace("[$START$]", String.valueOf(start));
+				sql = sql.replace("[$END$]", String.valueOf(start+end));
+			}
+			
+			log.debug("sql: " + sql);
+			
+			SQLQuery q = session.createSQLQuery(sql);
+			q.addEntity("Lms_Course", CourseImpl.class);
+			
+			QueryPos qPos = QueryPos.getInstance(q);
+			log.debug("companyId: " + companyId);
+			qPos.add(companyId);
+			qPos.add(companyId);
+			log.debug("groupId: " + groupId);
+			qPos.add(groupId);
+			qPos.add(groupId);
+			log.debug("freeText: " + freeText);
+			qPos.add(freeText);
+			qPos.add(WorkflowConstants.STATUS_APPROVED);
+			qPos.add(true);
+			qPos.add(freeText);
+			qPos.add(freeText);
+			qPos.add(freeText);
+			qPos.add(WorkflowConstants.STATUS_APPROVED);
+			qPos.add(WorkflowConstants.STATUS_APPROVED);
+			qPos.add(true);
+			qPos.add(freeText);
+			qPos.add(freeText);
+			qPos.add(WorkflowConstants.STATUS_APPROVED);
+			
+			List<Course> listCourse = (List<Course>) q.list();
+			
+			log.debug("listCourse: " + listCourse.size());
+					
+			return listCourse;
+			
+		} catch (Exception e) {
+	       e.printStackTrace();
+	    } finally {
+	        closeSession(session);
+	    }
+	
+	    return new ArrayList<Course>();
+	}
+	
+	public int countByCatalog(String freeText, long[] categories, long[] tags, long companyId, long groupId, long userId, String language){
+		Session session = null;
+		
+		try{
+			session = openSession();
+			
+			if(freeText != null && freeText.length() > 0)
+				freeText = "%" + freeText + "%";
+			
+			String sql = CustomSQLUtil.get(COUNT_BY_TITLE_STATUS);
+
+			sql = replaceLanguage(sql, language);
+			
+			sql = sql.replace("[$JOINASSET$]", CustomSQLUtil.get(JOIN_BY_ASSET_ENTRY));
+			sql = sql.replace("[$CLASSNAMECOURSEID$]", String.valueOf(ClassNameLocalServiceUtil.fetchClassNameId(Course.class)));
+			
+			sql = replaceCategory(sql, categories);
+			
+			sql = replaceTag(sql, tags);
+			
+			sql = replaceResourcePermissionView(sql, companyId, userId);
+			
+			log.debug("sql: " + sql);
+			
+			SQLQuery q = session.createSQLQuery(sql);
+			q.addScalar(COUNT_COLUMN_NAME, Type.LONG);
+			
+			QueryPos qPos = QueryPos.getInstance(q);
+			log.debug("companyId: " + companyId);
+			qPos.add(companyId);
+			qPos.add(companyId);
+			log.debug("groupId: " + groupId);
+			qPos.add(groupId);
+			qPos.add(groupId);
+			log.debug("freeText: " + freeText);
+			qPos.add(freeText);
+			qPos.add(WorkflowConstants.STATUS_APPROVED);
+			qPos.add(true);
+			qPos.add(freeText);
+			qPos.add(freeText);
+			qPos.add(freeText);
+			qPos.add(WorkflowConstants.STATUS_APPROVED);
+			qPos.add(WorkflowConstants.STATUS_APPROVED);
+			qPos.add(true);
+			qPos.add(freeText);
+			qPos.add(freeText);
+			qPos.add(WorkflowConstants.STATUS_APPROVED);
+			
+			Iterator<Long> itr = q.iterate();
+
+			if (itr.hasNext()) {
+				Long count = itr.next();
+
+				if (count != null) {
+					return count.intValue();
+				}
+			}
+			
+		} catch (Exception e) {
+	       e.printStackTrace();
+	    } finally {
+	        closeSession(session);
+	    }
+	
+	    return 0;
+	}
+	
+	private String replaceResourcePermissionView(String sql,long companyId, long userId) throws PortalException {
+
+		sql = sql.replace("[$JOINRESOURCEPERMISSION$]", CustomSQLUtil.get(JOIN_BY_RESOURCE_PERMISSION_VIEW));
+		sql = sql.replace("[$COMPANYID$]", String.valueOf(companyId));
+		sql = sql.replace("[$ACTIONVIEW$]", String.valueOf(ResourceActionLocalServiceUtil.getResourceAction(Course.class.getName(), "VIEW").getBitwiseValue()));
+		sql = sql.replace("[$USERID$]", String.valueOf(userId));
+		sql = sql.replace("[$CLASSNAMEIDUSERGROUP$]", String.valueOf(ClassNameLocalServiceUtil.getClassNameId(UserGroup.class)));
+		sql = sql.replace("[$CLASSNAMEIDORGANIZATION$]", String.valueOf(ClassNameLocalServiceUtil.getClassNameId(Organization.class)));
+		sql = sql.replace("[$CLASSNAMEIDGROUP$]", String.valueOf(ClassNameLocalServiceUtil.getClassNameId(Group.class)));
+		
+		sql = sql.replace("[$WHERERESOURCEPERMISSION$]", CustomSQLUtil.get(WHERE_BY_RESOURCE_PERMISSION_VIEW) + " " + CustomSQLUtil.get(WHERE_C_CATALOG));
+		try {
+			sql = sql.replace("[$ROLEMEMBER$]", String.valueOf(RoleLocalServiceUtil.getRole(companyId, RoleConstants.SITE_MEMBER).getRoleId()));
+		} catch (SystemException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
+			sql = sql.replace("[$ROLEGUEST$]", String.valueOf(RoleLocalServiceUtil.getRole(companyId, RoleConstants.GUEST).getRoleId()));
+		} catch (SystemException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return sql;
 	}
 	
 	private final Class<?> getPortalClass(String className) {

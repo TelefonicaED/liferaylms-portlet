@@ -1262,6 +1262,27 @@ public class CourseWrapper implements Course, ModelWrapper<Course> {
 		_course.persist();
 	}
 
+	public java.lang.String getImageURL(
+		com.liferay.portal.theme.ThemeDisplay themeDisplay) {
+		return _course.getImageURL(themeDisplay);
+	}
+
+	public double getAverageScore() {
+		return _course.getAverageScore();
+	}
+
+	public java.util.List<com.liferay.portlet.asset.model.AssetCategory> getAssetCategoryIds() {
+		return _course.getAssetCategoryIds();
+	}
+
+	public java.util.List<com.liferay.portlet.asset.model.AssetTag> getAssetTagIds() {
+		return _course.getAssetTagIds();
+	}
+
+	public com.liferay.portal.model.Group getGroup() {
+		return _course.getGroup();
+	}
+
 	/**
 	 * @deprecated Renamed to {@link #getWrappedModel}
 	 */
