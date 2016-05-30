@@ -89,7 +89,8 @@
 		<column name="actId" type="long" />
 		<column name="text" type="String" />
 		<column name="questionType" type="long" />
-		<column name="weight" type="long" />		
+		<column name="weight" type="long" />	
+		<column name="penalize" type="boolean" />	
 		<order by="asc">
 			<order-column name="questionId"  />
 		</order>
@@ -494,6 +495,10 @@
 			<finder-column name="userId" />
 		</finder>
 		<finder name="ActId" return-type="Collection">
+			<finder-column name="actId" />
+		</finder>
+		<finder name="QuestionIdActId"	return-type="Collection">
+			<finder-column name="questionId" />
 			<finder-column name="actId" />
 		</finder>
 		<finder name="QuestionId"	return-type="Collection">

@@ -475,31 +475,59 @@ public class CourseLocalServiceUtil {
 	}
 
 	public static java.util.List<com.liferay.lms.model.Course> getByTitleStatusCategoriesTags(
-		java.lang.String title, int status, long[] categories, long[] tags,
+		java.lang.String freeText, int status, long[] categories, long[] tags,
 		long companyId, long groupId, long userId, java.lang.String language,
 		boolean isAdmin, boolean andOperator, int start, int end) {
 		return getService()
-				   .getByTitleStatusCategoriesTags(title, status, categories,
-			tags, companyId, groupId, userId, language, isAdmin, andOperator,
-			start, end);
+				   .getByTitleStatusCategoriesTags(freeText, status,
+			categories, tags, companyId, groupId, userId, language, isAdmin,
+			andOperator, start, end);
 	}
 
-	public static int countByTitleStatusCategoriesTags(java.lang.String title,
-		int status, long[] categories, long[] tags, long companyId,
-		long groupId, long userId, java.lang.String language, boolean isAdmin,
-		boolean andOperator) {
+	public static int countByTitleStatusCategoriesTags(
+		java.lang.String freeText, int status, long[] categories, long[] tags,
+		long companyId, long groupId, long userId, java.lang.String language,
+		boolean isAdmin, boolean andOperator) {
 		return getService()
-				   .countByTitleStatusCategoriesTags(title, status, categories,
-			tags, companyId, groupId, userId, language, isAdmin, andOperator);
+				   .countByTitleStatusCategoriesTags(freeText, status,
+			categories, tags, companyId, groupId, userId, language, isAdmin,
+			andOperator);
 	}
 
 	public static java.util.List<com.liferay.portal.model.User> getStudents(
-		long courseId, long companyId, int start, int end) {
-		return getService().getStudents(courseId, companyId, start, end);
+		long courseId, long companyId, java.lang.String screenName,
+		java.lang.String firstName, java.lang.String lastName,
+		java.lang.String emailAddress, boolean andOperator, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator comparator) {
+		return getService()
+				   .getStudents(courseId, companyId, screenName, firstName,
+			lastName, emailAddress, andOperator, start, end, comparator);
 	}
 
-	public static int countStudents(long courseId, long companyId) {
-		return getService().countStudents(courseId, companyId);
+	public static int countStudents(long courseId, long companyId,
+		java.lang.String screenName, java.lang.String firstName,
+		java.lang.String lastName, java.lang.String emailAddress,
+		boolean andOperator) {
+		return getService()
+				   .countStudents(courseId, companyId, screenName, firstName,
+			lastName, emailAddress, andOperator);
+	}
+
+	public static java.util.List<com.liferay.lms.model.Course> getCoursesCatalogByTitleCategoriesTags(
+		java.lang.String freeText, long[] categories, long[] tags,
+		long companyId, long groupId, long userId, java.lang.String language,
+		int start, int end) {
+		return getService()
+				   .getCoursesCatalogByTitleCategoriesTags(freeText,
+			categories, tags, companyId, groupId, userId, language, start, end);
+	}
+
+	public static int countCoursesCatalogByTitleCategoriesTags(
+		java.lang.String freeText, long[] categories, long[] tags,
+		long companyId, long groupId, long userId, java.lang.String language) {
+		return getService()
+				   .countCoursesCatalogByTitleCategoriesTags(freeText,
+			categories, tags, companyId, groupId, userId, language);
 	}
 
 	public static void clearService() {

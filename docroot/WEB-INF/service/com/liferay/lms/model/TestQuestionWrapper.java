@@ -51,6 +51,7 @@ public class TestQuestionWrapper implements TestQuestion,
 		attributes.put("text", getText());
 		attributes.put("questionType", getQuestionType());
 		attributes.put("weight", getWeight());
+		attributes.put("penalize", getPenalize());
 
 		return attributes;
 	}
@@ -90,6 +91,12 @@ public class TestQuestionWrapper implements TestQuestion,
 
 		if (weight != null) {
 			setWeight(weight);
+		}
+
+		Boolean penalize = (Boolean)attributes.get("penalize");
+
+		if (penalize != null) {
+			setPenalize(penalize);
 		}
 	}
 
@@ -217,6 +224,33 @@ public class TestQuestionWrapper implements TestQuestion,
 	*/
 	public void setWeight(long weight) {
 		_testQuestion.setWeight(weight);
+	}
+
+	/**
+	* Returns the penalize of this test question.
+	*
+	* @return the penalize of this test question
+	*/
+	public boolean getPenalize() {
+		return _testQuestion.getPenalize();
+	}
+
+	/**
+	* Returns <code>true</code> if this test question is penalize.
+	*
+	* @return <code>true</code> if this test question is penalize; <code>false</code> otherwise
+	*/
+	public boolean isPenalize() {
+		return _testQuestion.isPenalize();
+	}
+
+	/**
+	* Sets whether this test question is penalize.
+	*
+	* @param penalize the penalize of this test question
+	*/
+	public void setPenalize(boolean penalize) {
+		_testQuestion.setPenalize(penalize);
 	}
 
 	public boolean isNew() {

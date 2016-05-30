@@ -2335,6 +2335,46 @@
 			<role-name>user</role-name>
 		</security-role-ref>
 	</portlet>
+	<portlet>
+		<portlet-name>catalogcourses</portlet-name>
+		<display-name>Catalog Courses</display-name>
+		<portlet-class>
+			com.liferay.lms.portlet.CatalogCourses
+		</portlet-class>
+		<init-param>
+			<name>view-template</name>
+			<value>/html/catalogcourses/view.jsp</value>
+		</init-param>
+		<init-param>
+			<name>config-template</name>
+			<value>/html/catalogcourses/configuration.jsp</value>
+		</init-param>
+		<expiration-cache>0</expiration-cache>
+		<supports>
+			<mime-type>text/html</mime-type>
+			<portlet-mode>view</portlet-mode>
+		</supports>
+		<resource-bundle>
+			content/catalogcourses/Language
+		</resource-bundle>
+		<portlet-info>
+			<title>Catalog Courses</title>
+			<short-title>Catalog Courses</short-title>
+			<keywords></keywords>
+		</portlet-info>
+		<security-role-ref>
+			<role-name>administrator</role-name>
+		</security-role-ref>
+		<security-role-ref>
+			<role-name>guest</role-name>
+		</security-role-ref>
+		<security-role-ref>
+			<role-name>power-user</role-name>
+		</security-role-ref>
+		<security-role-ref>
+			<role-name>user</role-name>
+		</security-role-ref>
+	</portlet>
 	<event-definition>
         <qname xmlns:x="http://www.wemooc.com/">x:themeId</qname>
     </event-definition>
@@ -2358,13 +2398,5 @@
 		<identifier>categoryId</identifier>
 		<qname xmlns:x="http://www.liferay.com/public-render-parameters">x:categoryId</qname>
 	</public-render-parameter>
-
-
-
-
-
-
-
-
 
 </portlet-app>

@@ -63,50 +63,55 @@ public class LearningActivityIndexer extends BaseIndexer {
 			entry.getCompanyId(), document.get(Field.UID));
 	}
 
-	protected Document doGetDocument(Object obj) throws Exception {
-		LearningActivity entry = (LearningActivity)obj;
-
-		long companyId = entry.getCompanyId();
-		long groupId = getParentGroupId(entry.getGroupId());
-		long scopeGroupId = entry.getGroupId();
-		long userId = entry.getUserId();
-		String userName = PortalUtil.getUserName(userId, entry.getUserName());
-		long entryId = entry.getActId();
-		String title = entry.getTitle();
-		String content = HtmlUtil.extractText(entry.getDescription());
-		Date displayDate = entry.getCreateDate();
-
-		long[] assetCategoryIds = new long[0];
-			//AssetCategoryLocalServiceUtil.getCategoryIds(				LearningActivity.class.getName(), entryId);
-		String[] assetTagNames =new String[0];
-			//AssetTagLocalServiceUtil.getTagNames(			BlogsEntry.class.getName(), entryId);
-
-		ExpandoBridge expandoBridge = entry.getExpandoBridge();
-
-		Document document = new DocumentImpl();
-
-		document.addUID(PORTLET_ID, entryId);
-
-		document.addModifiedDate(displayDate);
-
-		document.addKeyword(Field.COMPANY_ID, companyId);
-		document.addKeyword(Field.PORTLET_ID, PORTLET_ID);
-		document.addKeyword(Field.GROUP_ID, groupId);
-		document.addKeyword(Field.SCOPE_GROUP_ID, scopeGroupId);
-		document.addKeyword(Field.USER_ID, userId);
-		document.addText(Field.USER_NAME, userName);
-
-		document.addText(Field.TITLE, title);
-		document.addText(Field.CONTENT, content);
-		document.addKeyword(Field.ASSET_CATEGORY_IDS, assetCategoryIds);
-		document.addKeyword(Field.ASSET_TAG_NAMES, assetTagNames);
-
-		document.addKeyword(Field.ENTRY_CLASS_NAME, LearningActivity.class.getName());
-		document.addKeyword(Field.ENTRY_CLASS_PK, entryId);
-
-		ExpandoBridgeIndexerUtil.addAttributes(document, expandoBridge);
-
-		return document;
+	protected Document doGetDocument(Object obj) {
+		try{
+			LearningActivity entry = (LearningActivity)obj;
+	
+			long companyId = entry.getCompanyId();
+			long groupId = getParentGroupId(entry.getGroupId());
+			long scopeGroupId = entry.getGroupId();
+			long userId = entry.getUserId();
+			String userName = PortalUtil.getUserName(userId, entry.getUserName());
+			long entryId = entry.getActId();
+			String title = entry.getTitle();
+			String content = HtmlUtil.extractText(entry.getDescription());
+			Date displayDate = entry.getCreateDate();
+	
+			long[] assetCategoryIds = new long[0];
+				//AssetCategoryLocalServiceUtil.getCategoryIds(				LearningActivity.class.getName(), entryId);
+			String[] assetTagNames =new String[0];
+				//AssetTagLocalServiceUtil.getTagNames(			BlogsEntry.class.getName(), entryId);
+	
+			ExpandoBridge expandoBridge = entry.getExpandoBridge();
+	
+			Document document = new DocumentImpl();
+	
+			document.addUID(PORTLET_ID, entryId);
+	
+			document.addModifiedDate(displayDate);
+	
+			document.addKeyword(Field.COMPANY_ID, companyId);
+			document.addKeyword(Field.PORTLET_ID, PORTLET_ID);
+			document.addKeyword(Field.GROUP_ID, groupId);
+			document.addKeyword(Field.SCOPE_GROUP_ID, scopeGroupId);
+			document.addKeyword(Field.USER_ID, userId);
+			document.addText(Field.USER_NAME, userName);
+	
+			document.addText(Field.TITLE, title);
+			document.addText(Field.CONTENT, content);
+			document.addKeyword(Field.ASSET_CATEGORY_IDS, assetCategoryIds);
+			document.addKeyword(Field.ASSET_TAG_NAMES, assetTagNames);
+	
+			document.addKeyword(Field.ENTRY_CLASS_NAME, LearningActivity.class.getName());
+			document.addKeyword(Field.ENTRY_CLASS_PK, entryId);
+	
+			ExpandoBridgeIndexerUtil.addAttributes(document, expandoBridge);
+	
+			return document;
+		}catch(Exception e){
+			e.printStackTrace();
+			return null;
+		}
 	}
 
 	protected void doReindex(Object obj) throws Exception {
@@ -154,8 +159,12 @@ public class LearningActivityIndexer extends BaseIndexer {
 		Collection<Document> documents = new ArrayList<Document>();
 
 		for (LearningActivity entry : entries) {
-			Document document = getDocument(entry);
-			documents.add(document);
+			try{
+				Document document = getDocument(entry);
+				documents.add(document);
+			}catch(Exception e){
+				e.printStackTrace();
+			}
 		}
 
 		SearchEngineUtil.updateDocuments(companyId, documents);

@@ -463,6 +463,7 @@
 			</basic>
 			<basic name="questionType" />
 			<basic name="weight" />
+			<basic name="penalize" />
 			<transient name="modelAttributes" />
 			<transient name="primaryKey" />
 			<transient name="primaryKeyObj" />

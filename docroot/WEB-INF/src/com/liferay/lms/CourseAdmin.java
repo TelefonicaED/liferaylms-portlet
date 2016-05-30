@@ -50,6 +50,8 @@ import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.lms.service.CourseResultLocalServiceUtil;
 import com.liferay.lms.service.CourseServiceUtil;
 import com.liferay.lms.service.LmsPrefsLocalServiceUtil;
+import com.liferay.lms.util.searchcontainer.UserSearchContainer;
+import com.liferay.lms.util.searchterms.UserSearchTerms;
 import com.liferay.portal.DuplicateGroupException;
 import com.liferay.portal.LARFileException;
 import com.liferay.portal.LARTypeException;
@@ -104,6 +106,7 @@ import com.liferay.portal.model.GroupConstants;
 import com.liferay.portal.model.Organization;
 import com.liferay.portal.model.Role;
 import com.liferay.portal.model.RoleConstants;
+import com.liferay.portal.model.Team;
 import com.liferay.portal.model.User;
 import com.liferay.portal.model.UserGroupRole;
 import com.liferay.portal.security.permission.ActionKeys;
@@ -115,10 +118,12 @@ import com.liferay.portal.service.OrganizationLocalServiceUtil;
 import com.liferay.portal.service.RoleLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceContextFactory;
+import com.liferay.portal.service.TeamLocalServiceUtil;
 import com.liferay.portal.service.UserGroupRoleLocalServiceUtil;
 import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
+import com.liferay.portal.util.comparator.UserLastNameComparator;
 import com.liferay.portlet.announcements.EntryDisplayDateException;
 import com.liferay.portlet.asset.AssetCategoryException;
 import com.liferay.portlet.asset.model.AssetCategory;
@@ -129,6 +134,7 @@ import com.liferay.portlet.documentlibrary.model.DLFolder;
 import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
 import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.service.DLFolderLocalServiceUtil;
+import com.liferay.portlet.usersadmin.util.UsersAdminUtil;
 import com.liferay.util.bridges.mvc.MVCPortlet;
 
 /**
@@ -172,7 +178,7 @@ public class CourseAdmin extends MVCPortlet {
 	public void doView(RenderRequest renderRequest, RenderResponse renderResponse) throws IOException, PortletException {
 		
 		String jsp = renderRequest.getParameter("view");
-		
+		log.debug("VIEW "+jsp);
 		try {
 			if(jsp == null || "".equals(jsp)){
 				showViewDefault(renderRequest, renderResponse);
@@ -388,6 +394,148 @@ public class CourseAdmin extends MVCPortlet {
 	private void showViewRoleMembersTab(RenderRequest renderRequest,RenderResponse renderResponse) throws IOException, PortletException{
 		
 		ThemeDisplay themeDisplay = (ThemeDisplay)renderRequest.getAttribute(WebKeys.THEME_DISPLAY);
+		long roleId=ParamUtil.getLong(renderRequest, "roleId",0);
+		
+		String students = LanguageUtil.get(themeDisplay.getLocale(),"courseadmin.adminactions.students");
+		String tabs1 = ParamUtil.getString(renderRequest, "tabs1", students);
+		
+	
+		
+		long courseId=ParamUtil.getLong(renderRequest, "courseId",0);
+		UserSearchContainer searchContainer = new UserSearchContainer(renderRequest, renderResponse.createRenderURL());		
+		UserSearchTerms searchTerms = (UserSearchTerms) searchContainer.getSearchTerms();
+		String redirectOfEdit = ParamUtil.getString(renderRequest, "redirectOfEdit");
+		try{		
+			List<User> users = null; 
+			int total = 0;		
+			OrderByComparator obc =  UsersAdminUtil.getUserOrderByComparator(
+					"first-name,middle-name,last-name", "asc");		
+			LmsPrefs prefs=LmsPrefsLocalServiceUtil.getLmsPrefs(themeDisplay.getCompanyId());
+			String teacherName=RoleLocalServiceUtil.getRole(prefs.getTeacherRole()).getTitle(themeDisplay.getLocale());
+			String editorName=RoleLocalServiceUtil.getRole(prefs.getEditorRole()).getTitle(themeDisplay.getLocale());
+			String tab=StringPool.BLANK;
+			
+			LinkedHashMap<String, Object> userParams = new LinkedHashMap<String, Object>();
+			Role commmanager=RoleLocalServiceUtil.getRole(themeDisplay.getCompanyId(), RoleConstants.SITE_MEMBER);
+			Course course=CourseLocalServiceUtil.getCourse(courseId);
+			
+			if(roleId!=0){
+				if(roleId==commmanager.getRoleId()){
+					tabs1 = LanguageUtil.get(themeDisplay.getLocale(),"courseadmin.adminactions.students");
+				}else if(roleId==prefs.getEditorRole()){
+					tabs1 = editorName;
+				}else{
+					tabs1 = teacherName;
+				}
+			}
+			log.debug("tabs1");
+			if(tabs1.equals(students)){
+				roleId=commmanager.getRoleId();
+			}else if(tabs1.equals(editorName)){
+				roleId=prefs.getEditorRole();
+			}else if(tabs1.equals(teacherName)){
+				roleId=prefs.getTeacherRole();
+			}
+			
+			log.debug("START "+searchContainer.getStart());
+			log.debug("END "+searchContainer.getEnd());
+			
+			long createdGroupId=course.getGroupCreatedId();
+			if(roleId!=commmanager.getRoleId()){
+				log.debug("createdGroupId "+createdGroupId);
+				log.debug("roleId "+roleId);
+				userParams.put("usersGroups", createdGroupId);
+				userParams.put("userGroupRole", new Long[]{createdGroupId, roleId});
+				log.debug("IS ADVANCED SEARCH "+searchTerms.isAdvancedSearch());
+				if(searchTerms.isAdvancedSearch()){	
+					log.debug("firstName 1:"+searchTerms.getFirstName());
+					log.debug("lastName 1:"+searchTerms.getLastName());
+					log.debug("screenName 1:"+searchTerms.getScreenName());
+					log.debug("emailAddress 1:"+searchTerms.getEmailAddress());
+					users = UserLocalServiceUtil.search(themeDisplay.getCompanyId(), searchTerms.getFirstName(), StringPool.BLANK, 
+							searchTerms.getLastName(), searchTerms.getScreenName(), searchTerms.getEmailAddress(), WorkflowConstants.STATUS_APPROVED, userParams, searchTerms.isAndOperator(), 
+							searchContainer.getStart(), searchContainer.getEnd(), obc);
+					total = UserLocalServiceUtil.searchCount(themeDisplay.getCompanyId(), searchTerms.getFirstName(), StringPool.BLANK,
+							searchTerms.getLastName(), searchTerms.getScreenName(), searchTerms.getEmailAddress(), WorkflowConstants.STATUS_APPROVED, userParams, searchTerms.isAndOperator());
+				}else{
+					log.debug("Keywords 1:"+searchTerms.getKeywords());
+					log.debug("userParams length "+userParams.keySet().size());
+					log.debug("COMPANY ID "+themeDisplay.getCompanyId());
+					users = UserLocalServiceUtil.search(themeDisplay.getCompanyId(), searchTerms.getKeywords(), WorkflowConstants.STATUS_APPROVED, userParams, searchContainer.getStart(), searchContainer.getEnd(),obc);
+					log.debug("Users "+users.size() );
+					total = UserLocalServiceUtil.searchCount(themeDisplay.getCompanyId(), searchTerms.getKeywords(), WorkflowConstants.STATUS_APPROVED, userParams);
+				}
+				
+				
+				
+			}else{
+				if(searchTerms.isAdvancedSearch()){	
+					log.debug("firstName:"+searchTerms.getFirstName());
+					log.debug("lastName:"+searchTerms.getLastName());
+					log.debug("screenName:"+searchTerms.getScreenName());
+					log.debug("emailAddress:"+searchTerms.getEmailAddress());
+					users = CourseLocalServiceUtil.getStudents(courseId, themeDisplay.getCompanyId(),  searchTerms.getScreenName(), searchTerms.getFirstName(),searchTerms.getLastName(),searchTerms.getEmailAddress(),searchTerms.isAndOperator(),searchContainer.getStart(), searchContainer.getEnd(),obc);
+					total = CourseLocalServiceUtil.countStudents(courseId, themeDisplay.getCompanyId(), searchTerms.getScreenName(), searchTerms.getFirstName(),searchTerms.getLastName(),searchTerms.getEmailAddress(),searchTerms.isAndOperator());	
+				}else{
+					log.debug("Keywords:"+searchTerms.getKeywords());
+					users = CourseLocalServiceUtil.getStudents(courseId, themeDisplay.getCompanyId(), searchTerms.getKeywords(), searchTerms.getKeywords(),searchTerms.getKeywords(),searchTerms.getKeywords(),true,searchContainer.getStart(), searchContainer.getEnd(),obc);
+					total = CourseLocalServiceUtil.countStudents(courseId, themeDisplay.getCompanyId(), searchTerms.getKeywords(), searchTerms.getKeywords(),searchTerms.getKeywords(),searchTerms.getKeywords(),true);	
+				}	
+				
+			}
+			
+			log.debug("Users "+users.size() );
+			log.debug("TOTAL "+total);
+			
+			searchContainer.setResults(users);
+			searchContainer.setTotal(total);
+			boolean commManagerRole = false;
+			if(roleId==commmanager.getRoleId()){
+				tab =  LanguageUtil.get(themeDisplay.getLocale(),"courseadmin.adminactions.students");
+				commManagerRole=true;
+			}else if(roleId==prefs.getEditorRole()){
+				tab = editorName;
+			}else{
+				tab = teacherName;
+			}
+			PortletPreferences preferences = renderRequest.getPreferences();
+			boolean showCalendar = GetterUtil.getBoolean(preferences.getValue("showCalendar", StringPool.FALSE));
+			boolean backToEdit = ParamUtil.getBoolean(renderRequest, "backToEdit");
+			searchContainer.getIteratorURL().setParameter("view", "role-members-tab");
+			searchContainer.getIteratorURL().setParameter("courseId", String.valueOf(courseId));
+			searchContainer.getIteratorURL().setParameter("tabs1", tabs1);
+			
+			renderRequest.setAttribute("searchContainer", searchContainer);
+			renderRequest.setAttribute("roleId", roleId);
+			renderRequest.setAttribute("courseId", courseId);
+			renderRequest.setAttribute("commmanager", commmanager);
+			renderRequest.setAttribute("course", course);
+			renderRequest.setAttribute("tab", tab);
+			renderRequest.setAttribute("commManagerRole", commManagerRole);
+			renderRequest.setAttribute("showCalendar", showCalendar);
+			renderRequest.setAttribute("backToEdit", backToEdit);
+			renderRequest.setAttribute("redirectOfEdit", redirectOfEdit);
+			renderRequest.setAttribute("createdGroupId", createdGroupId);
+			
+			
+			PortletURL searchURL = renderResponse.createRenderURL();
+			searchURL.setParameter("view", "role-members-tab");
+			searchURL.setParameter("courseId", String.valueOf(courseId));
+			searchURL.setParameter("tab", tab);
+			searchURL.setParameter("tabs1", tabs1);
+			renderRequest.setAttribute("searchURL", searchURL.toString());
+			
+			PortletURL returnURL = renderResponse.createRenderURL();
+			returnURL.setParameter("view", "");
+			renderRequest.setAttribute("returnURL", returnURL.toString());
+			
+			log.debug("Total:"+searchContainer.getTotal());
+			log.debug("usersInPage:"+users.size());
+		}catch(SystemException e){
+			e.printStackTrace();
+		}catch(PortalException e){
+			e.printStackTrace();
+		}
 		
 		include(this.roleMembersTabJSP, renderRequest, renderResponse);
 	}

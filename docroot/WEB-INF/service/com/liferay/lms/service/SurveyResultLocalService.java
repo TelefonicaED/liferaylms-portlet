@@ -256,8 +256,16 @@ public interface SurveyResultLocalService extends BaseLocalService,
 		long actId) throws com.liferay.portal.kernel.exception.SystemException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.util.List<com.liferay.lms.model.SurveyResult> getSurveyResultsByQuestionIdActId(
+		long questionId, long actId);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public double getPercentageByQuestionIdAndAnswerId(long questionId,
 		long answerId, long total)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public long getCountByQuestionIdAndAnswerId(long questionId, long answerId)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	/**

@@ -63,6 +63,6 @@
 		<portlet id="moduleselector"></portlet>
 		<portlet id="ponderatedevalconf"></portlet>
 		<portlet id="finalcourseresult"></portlet>
-		
+		<portlet id="catalogcourses"></portlet>
 	</category>
 </display>
