@@ -11,17 +11,24 @@
 <%@ include file="/init.jsp" %>
 
 <%
-String urlExample = "<a href=\"/"+ ClpSerializer.getServletContextName()+"/html/courseadmin/examples/document.csv\">"+LanguageUtil.get(themeDisplay.getLocale(),"example")+"</a>";
+	PortletPreferences preferences = null;
+	String portletResource = ParamUtil.getString(request, "portletResource");
+	
+	if (Validator.isNotNull(portletResource)) {
+		preferences = PortletPreferencesFactoryUtil.getPortletSetup(request, portletResource);
+	}
+	else{
+		preferences = renderRequest.getPreferences();
+	}
 
-PortletPreferences preferences = null;
-String portletResource = ParamUtil.getString(request, "portletResource");
+	String urlExample = "<a href=\"/"+ ClpSerializer.getServletContextName();
+	
+	if(Integer.parseInt(preferences.getValue("tipoImport", "1")) == 1){
+		urlExample += "/html/courseadmin/examples/document.csv\">"+LanguageUtil.get(themeDisplay.getLocale(),"example")+"</a>";
+	}else{
+		urlExample += "/html/courseadmin/examples/documentName.csv\">"+LanguageUtil.get(themeDisplay.getLocale(),"example")+"</a>";
+	}
 
-if (Validator.isNotNull(portletResource)) {
-	preferences = PortletPreferencesFactoryUtil.getPortletSetup(request, portletResource);
-}
-else{
-	preferences = renderRequest.getPreferences();
-}
 %>
 
 <portlet:renderURL var="importUsersURL"  windowState="<%= LiferayWindowState.EXCLUSIVE.toString() %>">
