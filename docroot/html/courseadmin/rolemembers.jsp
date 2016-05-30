@@ -21,32 +21,14 @@
 <%@page import="com.liferay.portal.service.UserGroupRoleLocalServiceUtil"%>
 <%@page import="com.liferay.portal.service.RoleLocalServiceUtil"%>
 <%@page import="com.liferay.portal.model.RoleConstants"%>
-<%
-LmsPrefs prefs=LmsPrefsLocalServiceUtil.getLmsPrefs(themeDisplay.getCompanyId());
-long courseId=ParamUtil.getLong(request, "courseId",0);
-long roleId=ParamUtil.getLong(request, "roleId",0);
-boolean backToEdit = ParamUtil.getBoolean(request, "backToEdit");
-String redirectOfEdit = ParamUtil.getString(request, "redirectOfEdit");
-Course course=CourseLocalServiceUtil.getCourse(courseId);
-long createdGroupId=course.getGroupCreatedId();
-Role role=RoleLocalServiceUtil.getRole(roleId);
-Role commmanager=RoleLocalServiceUtil.getRole(themeDisplay.getCompanyId(), RoleConstants.SITE_MEMBER) ;
-String teacherName=RoleLocalServiceUtil.getRole(prefs.getTeacherRole()).getTitle(locale);
-String editorName=RoleLocalServiceUtil.getRole(prefs.getEditorRole()).getTitle(locale);
-String tab=StringPool.BLANK;
-if(roleId==commmanager.getRoleId()){
-	tab =  LanguageUtil.get(pageContext,"courseadmin.adminactions.students");
-}else if(roleId==prefs.getEditorRole()){
-	tab = editorName;
-}else{
-	tab = teacherName;
-}
 
-%>
 <div class="container-toolbar" >
 	<%@ include file="inc/toolbar.jspf" %>
 </div>
-
+<% 
+long roleId=ParamUtil.getLong(request, "roleId",0);
+System.out.println("---ROLEID  "+roleId);
+%>
 <script>
 function changedates(theURI)
 {
@@ -69,109 +51,68 @@ AUI().use(function(A)
 		});
 }
 --></script>
-<%
-PortletURL portletURL = renderResponse.createRenderURL();
-portletURL.setParameter("view","role-members-tab");
-portletURL.setParameter("courseId",Long.toString(courseId));
-portletURL.setParameter("backToEdit",Boolean.toString(backToEdit));
-if(backToEdit){
-	portletURL.setParameter("redirectOfEdit",redirectOfEdit);
-}
-portletURL.setParameter("roleId",Long.toString(roleId));
-portletURL.setParameter("tabs1",tab);
-%>
 
-<liferay-ui:search-container emptyResultsMessage="there-are-no-users"
- delta="10" deltaConfigurable="true" iteratorURL="<%=portletURL%>">
-	<liferay-ui:search-container-results>
-	<%
-	
-	if(roleId!=commmanager.getRoleId()){
-		LinkedHashMap userParams = new LinkedHashMap();
-		
-		userParams.put("usersGroups", createdGroupId);
-		userParams.put("userGroupRole", new Long[]{createdGroupId, roleId});
-		
-		OrderByComparator orderByComparator =
-			UsersAdminUtil.getUserOrderByComparator(
-					"first-name,middle-name,last-name", "asc");
-		
-		results = UserLocalServiceUtil.search(themeDisplay.getCompanyId(), null, WorkflowConstants.STATUS_APPROVED, userParams, searchContainer.getStart(), searchContainer.getEnd(),orderByComparator);
-		total = UserLocalServiceUtil.searchCount(themeDisplay.getCompanyId(), null, WorkflowConstants.STATUS_APPROVED, userParams);
-	}
-	else
-	{
-		results = CourseLocalServiceUtil.getStudents(courseId, themeDisplay.getCompanyId(), null,null,null,null,true,searchContainer.getStart(), searchContainer.getEnd(),null);
-		total = CourseLocalServiceUtil.countStudents(courseId, themeDisplay.getCompanyId(), null,null,null,null,true);	
-	}
-	
-	pageContext.setAttribute("results", results);
-	pageContext.setAttribute("total", total);
-	%>
-	</liferay-ui:search-container-results>
-	<liferay-ui:search-container-row
-	className="com.liferay.portal.model.User"
-	keyProperty="userId"
-	modelVar="user">
+
+
+
+
+
+
+<aui:form name="fm" action="${searchURL }" method="POST">
+	<liferay-ui:search-container searchContainer="${searchContainer}"
+		iteratorURL="${searchContainer.iteratorURL}" emptyResultsMessage="there-are-no-users"
+ 		delta="10" deltaConfigurable="true">
+
+
+		<liferay-ui:search-form page="/html/shared/usersSearchform.jsp"
+			searchContainer="${searchContainer}"
+			servletContext="<%= this.getServletConfig().getServletContext() %>" />
+
+		<liferay-ui:search-container-results total="${searchContainer.total }"
+			results="${searchContainer.results }" />
+			
+			
+		<liferay-ui:search-container-row className="com.liferay.portal.model.User" 	keyProperty="userId" 	modelVar="courseUser">
 		<liferay-ui:search-container-column-text>
-			<liferay-ui:user-display userId="<%=user.getUserId() %>"></liferay-ui:user-display>
+			<liferay-ui:user-display userId="${courseUser.userId}"></liferay-ui:user-display>
 		</liferay-ui:search-container-column-text>
-		<liferay-ui:search-container-column-text
-			name="screen-name"
-			property="screenName">
+		<liferay-ui:search-container-column-text name="screen-name"	property="screenName">
 		</liferay-ui:search-container-column-text>
 		
 		<liferay-ui:search-container-column-text
-			name="email-address"
-			property="emailAddress"
-		/>
+			name="email-address"	property="emailAddress"	/>
 		<liferay-ui:search-container-column-text>
 			
 			<liferay-ui:icon-menu>
-			<%if(roleId==commmanager.getRoleId())
-			{
-			%>
+			<c:if test="${commManagerRole}">
+			
 			<liferay-portlet:renderURL  var="editInscriptionDatesURL"  windowState="<%= LiferayWindowState.POP_UP.toString() %>">
 				<liferay-portlet:param name="jspPage" value="/html/courseadmin/editinscriptiondates.jsp"/>
-				<liferay-portlet:param name="courseId" value="<%=Long.toString(courseId) %>"/>
-				<liferay-portlet:param name="userId" value="<%=Long.toString(user.getUserId()) %>"/>
+				<liferay-portlet:param name="courseId" value="${courseId}"/>
+				<liferay-portlet:param name="userId" value="${courseUser.userId }"/>
 			</liferay-portlet:renderURL>
 			
-			<%
-			String inscrURL="javascript:changedates('" + editInscriptionDatesURL + "')";
+			<c:if test="${showCalendar}">
+					<liferay-ui:icon image="calendar" url="javascript:changedates('${editInscriptionDatesURL}')" label="dates"></liferay-ui:icon>
+			</c:if>
 			
-				PortletPreferences preferences = null;
-				String portletResource = ParamUtil.getString(request, "portletResource");
-			
-				if (Validator.isNotNull(portletResource)) {
-					preferences = PortletPreferencesFactoryUtil.getPortletSetup(request, portletResource);
-				}else{
-					preferences = renderRequest.getPreferences();
-				}
-				
-				boolean showCalendar 	= preferences.getValue("showCalendar",  "false").equals("true");
-				if(showCalendar){%>
-					<liferay-ui:icon image="calendar" url='<%=inscrURL %>' label="dates"></liferay-ui:icon>
-				<%}
-			
-			}
-			%>
+			</c:if>
 			<liferay-portlet:actionURL name="removeUserRole" var="removeUserRoleURL">
 				<liferay-portlet:param name="jspPage" value="/html/courseadmin/rolememberstab.jsp"/>
-				<liferay-portlet:param name="courseId" value="<%=Long.toString(courseId) %>"/>
-				<portlet:param name="backToEdit" value="<%=Boolean.toString(backToEdit) %>" />
-				<c:if test="<%=backToEdit %>">
-					<portlet:param name="redirectOfEdit" value='<%=redirectOfEdit %>'/>
+				<liferay-portlet:param name="courseId" value="${courseId}"/>
+				<portlet:param name="backToEdit" value="${backToEdit}" />
+				<c:if test="${backToEdit}">
+					<portlet:param name="redirectOfEdit" value='${redirectOfEdit}'/>
 				</c:if>
-				<liferay-portlet:param name="userId" value="<%=Long.toString(user.getUserId()) %>"/>
-				<liferay-portlet:param name="roleId" value="<%=Long.toString(roleId) %>"/>
-				<liferay-portlet:param name="tabs1" value="<%=tab %>"/>
+				<liferay-portlet:param name="userId" value="${courseUser.userId }"/>
+				<liferay-portlet:param name="roleId" value="${roleId}"/>
+				<liferay-portlet:param name="tabs1" value="${tab}"/>
 			</liferay-portlet:actionURL>
-			<liferay-ui:icon-delete url="<%=removeUserRoleURL+\"&cur=\"+searchContainer.getCur() %>" label="delete"></liferay-ui:icon-delete>
+			<liferay-ui:icon-delete url="${removeUserRoleURL}&cur=${searchContainer.cur}" label="delete"></liferay-ui:icon-delete>
 			</liferay-ui:icon-menu>
 		</liferay-ui:search-container-column-text>
 	</liferay-ui:search-container-row>
 	<liferay-ui:search-iterator />
-
-</liferay-ui:search-container>
+	</liferay-ui:search-container>
+</aui:form>
 

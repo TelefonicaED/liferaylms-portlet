@@ -104,7 +104,7 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 				sql = sql.replace("LIMIT [$START$], [$END$]", "");
 			}else{
 				sql = sql.replace("[$START$]", String.valueOf(start));
-				sql = sql.replace("[$END$]", String.valueOf(start+end));
+				sql = sql.replace("[$END$]", String.valueOf(end-start));
 			}
 			
 			log.debug("sql: " + sql);
@@ -383,7 +383,7 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			qPos.add(emailAddress);
 			
 			qPos.add(start);
-			qPos.add((start+end));
+			qPos.add((end-start));
 			
 			List<User> listUsers = (List<User>) q.list();
 			
