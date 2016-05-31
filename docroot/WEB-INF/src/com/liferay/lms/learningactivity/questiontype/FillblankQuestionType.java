@@ -72,7 +72,7 @@ public class FillblankQuestionType extends BaseQuestionType {
 			List<String> sols = getQuestionSols(solution.getAnswer());
 			int i=0;
 			for(String sol:sols){
-				String answer= ParamUtil.getString(actionRequest, "question_"+questionId+"_"+i, "");
+				String answer= ParamUtil.getString(actionRequest, "question_"+questionId+"_"+i, "").replace(",", "");
 				if(isCorrect(sol, answer)){
 					correctAnswers++;
 				}
@@ -188,7 +188,7 @@ public class FillblankQuestionType extends BaseQuestionType {
 			int i = getQuestionSols(solution.getAnswer()).size();
 			for(int k=0; k<i; k++){
 				if(answer!="") answer+=",";
-				answer+= ParamUtil.getString(actionRequest, "question_"+questionId+"_"+k, "");
+				answer+= ParamUtil.getString(actionRequest, "question_"+questionId+"_"+k, "").replace(",", ""); //Quito la , de la respuesta del usaurio
 			}
 		}
     	
@@ -202,6 +202,7 @@ public class FillblankQuestionType extends BaseQuestionType {
 		
 		Element answerXML=SAXReaderUtil.createElement("answer");
 		answerXML.addText(answer);
+		
 		questionXML.add(answerXML);
 		
 		return questionXML;
