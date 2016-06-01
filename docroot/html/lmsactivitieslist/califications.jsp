@@ -1,3 +1,4 @@
+<%@page import="com.liferay.portal.kernel.util.PropsUtil"%>
 <%@page import="com.liferay.lms.model.Course"%>
 <%@page import="com.liferay.lms.service.ModuleLocalServiceUtil"%>
 <%@page import="com.liferay.lms.service.CourseLocalServiceUtil"%>
@@ -73,7 +74,27 @@ int totalUsers = CourseLocalServiceUtil.countStudents(course.getCourseId(), them
 userSearchContainer.setResults(users);
 userSearchContainer.setTotal(totalUsers);
 
+long tripartitaOfertaIdTypeId = GetterUtil.getLong(PropsUtil.get("tripartita.typeId"), 140);
+long tripartitaDemandaTypeId = GetterUtil.getLong(PropsUtil.get("tripartita.demanda.typeId"), 145);
 %>
+
+
+
+<c:if test="<%= learningActivityType.getTypeId() ==  tripartitaOfertaIdTypeId || learningActivityType.getTypeId() ==  tripartitaDemandaTypeId %>">
+	
+	<liferay-portlet:resourceURL var="exportTripartitaResults">
+		<liferay-portlet:param name="action" value="exportTripartitaResults"/>
+		<liferay-portlet:param name="actId" value="<%=String.valueOf(actId)%>"/>
+	</liferay-portlet:resourceURL>
+	
+	<aui:fieldset>
+		
+		<liferay-ui:icon message="tripartita.download.results" image="download" url="<%=exportTripartitaResults%>"/>
+		<liferay-ui:message key="tripartita.download.results"/>
+		
+	</aui:fieldset>
+	
+</c:if>
 
 	<aui:form name="searchFm" action="<%=renderResponse.createRenderURL() %>" method="POST">
 		<div class="taglib-search-toggle">
