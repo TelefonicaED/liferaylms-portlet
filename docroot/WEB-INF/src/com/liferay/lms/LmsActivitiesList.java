@@ -653,46 +653,41 @@ public class LmsActivitiesList extends MVCPortlet {
 		
 		long actId = ParamUtil.getLong(request, "actId");
 		String action = ParamUtil.getString(request, "action");
-		
-		if("exportTripartitaResults".equalsIgnoreCase(action)) {
-			
-			LearningActivityUtils.getExcelTripartitaResults(response, actId);
-			
-		}else{
-			log.error("Act ID "+actId);
-			PermissionChecker permissionChecker=themeDisplay.getPermissionChecker();
-			JSONObject oreturned = JSONFactoryUtil.createJSONObject();	
-			boolean changed=false;
-			if(actId>0)
-			{	
-				try{
-					LearningActivity larn = LearningActivityLocalServiceUtil.getLearningActivity(actId);
-					if(permissionChecker.hasPermission(larn.getGroupId(), LearningActivity.class.getName(), larn.getActId(),
-							ActionKeys.UPDATE)|| permissionChecker.hasOwnerPermission(larn.getCompanyId(), LearningActivity.class.getName(), larn.getActId(),larn.getUserId(),
-									ActionKeys.UPDATE))
-					{
-						if(action.equals("down")){
-							LearningActivityLocalServiceUtil.goDownLearningActivity(actId, themeDisplay.getUserId());
-							changed=true;	
-						}else if(action.equals("up")){
-							LearningActivityLocalServiceUtil.goUpLearningActivity(actId, themeDisplay.getUserId());
-							changed=true;
-						}
-						
-					}								
-				}catch(Exception e){
-					e.printStackTrace();
-					throw new PortletException(e.getMessage());
-				}
-			}
-			if(changed){
-				oreturned.put("success", "OK");
-				PrintWriter out = response.getWriter();
-				out.print(oreturned.toString());
-				out.flush();
-				out.close();
+
+		log.error("Act ID "+actId);
+		PermissionChecker permissionChecker=themeDisplay.getPermissionChecker();
+		JSONObject oreturned = JSONFactoryUtil.createJSONObject();	
+		boolean changed=false;
+		if(actId>0)
+		{	
+			try{
+				LearningActivity larn = LearningActivityLocalServiceUtil.getLearningActivity(actId);
+				if(permissionChecker.hasPermission(larn.getGroupId(), LearningActivity.class.getName(), larn.getActId(),
+						ActionKeys.UPDATE)|| permissionChecker.hasOwnerPermission(larn.getCompanyId(), LearningActivity.class.getName(), larn.getActId(),larn.getUserId(),
+								ActionKeys.UPDATE))
+				{
+					if(action.equals("down")){
+						LearningActivityLocalServiceUtil.goDownLearningActivity(actId, themeDisplay.getUserId());
+						changed=true;	
+					}else if(action.equals("up")){
+						LearningActivityLocalServiceUtil.goUpLearningActivity(actId, themeDisplay.getUserId());
+						changed=true;
+					}
+					
+				}								
+			}catch(Exception e){
+				e.printStackTrace();
+				throw new PortletException(e.getMessage());
 			}
 		}
+		if(changed){
+			oreturned.put("success", "OK");
+			PrintWriter out = response.getWriter();
+			out.print(oreturned.toString());
+			out.flush();
+			out.close();
+		}
+		
 	}
 	
 	

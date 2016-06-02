@@ -77,25 +77,6 @@ userSearchContainer.setTotal(totalUsers);
 long tripartitaOfertaIdTypeId = GetterUtil.getLong(PropsUtil.get("tripartita.typeId"), 140);
 long tripartitaDemandaTypeId = GetterUtil.getLong(PropsUtil.get("tripartita.demanda.typeId"), 145);
 %>
-
-
-
-<c:if test="<%= learningActivityType.getTypeId() ==  tripartitaOfertaIdTypeId || learningActivityType.getTypeId() ==  tripartitaDemandaTypeId %>">
-	
-	<liferay-portlet:resourceURL var="exportTripartitaResults">
-		<liferay-portlet:param name="action" value="exportTripartitaResults"/>
-		<liferay-portlet:param name="actId" value="<%=String.valueOf(actId)%>"/>
-	</liferay-portlet:resourceURL>
-	
-	<aui:fieldset>
-		
-		<liferay-ui:icon message="tripartita.download.results" image="download" url="<%=exportTripartitaResults%>"/>
-		<liferay-ui:message key="tripartita.download.results"/>
-		
-	</aui:fieldset>
-	
-</c:if>
-
 	<aui:form name="searchFm" action="<%=renderResponse.createRenderURL() %>" method="POST">
 		<div class="taglib-search-toggle">
 			<div class="taglib-search-toggle-advanced">
@@ -113,7 +94,6 @@ long tripartitaDemandaTypeId = GetterUtil.getLong(PropsUtil.get("tripartita.dema
 			</div>
 		</div>
 	</aui:form>
-
 
 	<liferay-ui:search-container 
 		searchContainer="<%=userSearchContainer %>" 
