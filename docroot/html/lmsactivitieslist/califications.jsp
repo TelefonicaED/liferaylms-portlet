@@ -74,8 +74,6 @@ int totalUsers = CourseLocalServiceUtil.countStudents(course.getCourseId(), them
 userSearchContainer.setResults(users);
 userSearchContainer.setTotal(totalUsers);
 
-long tripartitaOfertaIdTypeId = GetterUtil.getLong(PropsUtil.get("tripartita.typeId"), 140);
-long tripartitaDemandaTypeId = GetterUtil.getLong(PropsUtil.get("tripartita.demanda.typeId"), 145);
 %>
 	<aui:form name="searchFm" action="<%=renderResponse.createRenderURL() %>" method="POST">
 		<div class="taglib-search-toggle">
