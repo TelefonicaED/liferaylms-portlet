@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Enumeration;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -652,7 +651,7 @@ public class LmsActivitiesList extends MVCPortlet {
 		
 		long actId = ParamUtil.getLong(request, "actId");
 		String action = ParamUtil.getString(request, "action");
-		
+
 		log.error("Act ID "+actId);
 		PermissionChecker permissionChecker=themeDisplay.getPermissionChecker();
 		JSONObject oreturned = JSONFactoryUtil.createJSONObject();	

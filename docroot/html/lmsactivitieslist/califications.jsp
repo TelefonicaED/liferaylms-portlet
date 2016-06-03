@@ -1,3 +1,4 @@
+<%@page import="com.liferay.portal.kernel.util.PropsUtil"%>
 <%@page import="com.liferay.lms.model.Course"%>
 <%@page import="com.liferay.lms.service.ModuleLocalServiceUtil"%>
 <%@page import="com.liferay.lms.service.CourseLocalServiceUtil"%>
@@ -74,7 +75,6 @@ userSearchContainer.setResults(users);
 userSearchContainer.setTotal(totalUsers);
 
 %>
-
 	<aui:form name="searchFm" action="<%=renderResponse.createRenderURL() %>" method="POST">
 		<div class="taglib-search-toggle">
 			<div class="taglib-search-toggle-advanced">
@@ -92,7 +92,6 @@ userSearchContainer.setTotal(totalUsers);
 			</div>
 		</div>
 	</aui:form>
-
 
 	<liferay-ui:search-container 
 		searchContainer="<%=userSearchContainer %>" 
