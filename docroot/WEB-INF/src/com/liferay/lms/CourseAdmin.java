@@ -1420,7 +1420,7 @@ public class CourseAdmin extends MVCPortlet {
 												allowFinishDate=null;
 											}
 											
-											if(Validator.isNotNull(allowStartDate) || Validator.isNotNull(allowFinishDate) ){												
+											if(Validator.isNotNull(allowStartDate) && Validator.isNotNull(allowFinishDate) ){												
 												
 												CourseResult courseResult=CourseResultLocalServiceUtil.getCourseResultByCourseAndUser(courseId, user.getUserId());
 												if(courseResult==null){
@@ -1431,11 +1431,15 @@ public class CourseAdmin extends MVCPortlet {
 													courseResult.setPassed(false);
 													courseResult.setPassedDate(null);
 													courseResult.setAllowStartDate(allowStartDate);
-													courseResult.setAllowFinishDate(allowFinishDate);	
+													courseResult.setAllowFinishDate(allowFinishDate);
+													courseResult.setStartDate(allowStartDate);
 													CourseResultLocalServiceUtil.addCourseResult(courseResult);
 												}else{
 													courseResult.setAllowStartDate(allowStartDate);
 													courseResult.setAllowFinishDate(allowFinishDate);
+													if(courseResult.getStartDate()==null){
+														courseResult.setStartDate(allowStartDate);
+													}
 													CourseResultLocalServiceUtil.updateCourseResult(courseResult);
 												}
 																								
