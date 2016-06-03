@@ -2,6 +2,7 @@ package com.liferay.lms.service.persistence;
 
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
@@ -18,6 +19,8 @@ import com.liferay.portal.kernel.dao.orm.SessionFactory;
 import com.liferay.portal.kernel.dao.orm.Type;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.json.JSONArray;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -67,6 +70,9 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 	public static final String WHERE_BY_AND_ASSET_TAG =
 		    CourseFinder.class.getName() +
 		        ".whereC_ByAndAssetTag";
+	public static final String WHERE_BY_AND_ASSET_TAG_IN =
+			CourseFinder.class.getName() +
+			".whereC_ByAndAssetTagIn";
 	public static final String WHERE_BY_OR_ASSET_CATEGORY =
 		    CourseFinder.class.getName() +
 		        ".whereC_ByOrAssetCategory";
@@ -88,6 +94,15 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 	public static final String WHERE_BY_RESOURCE_PERMISSION_VIEW =
 		    CourseFinder.class.getName() +
 		        ".whereC_ByResourcePermissionView";
+	public static final String FIND_COURSE_ASSET_TAGS =
+			 CourseFinder.class.getName() +
+				".findCoursesAssetTagsByT_S";
+	public static final String COUNT_CATEGORY_COURSES =
+			 CourseFinder.class.getName() +
+				".countAssetCategoryCourses";
+	public static final String COUNT_TAG_COURSES =
+			 CourseFinder.class.getName() +
+				".countAssetTagCourses";
 	
 	
 	@SuppressWarnings("unchecked")
@@ -120,24 +135,24 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 				sql = sql.replace("[$END$]", String.valueOf(end-start));
 			}
 			
-			log.debug("sql: " + sql);
+			if(log.isDebugEnabled()){
+				log.debug("sql: " + sql);
+				log.debug("companyId: " + companyId);
+				log.debug("groupId: " + groupId);
+				log.debug("freeText: " + freeText);
+				log.debug("andOperator: " + andOperator);
+			}
 			
 			SQLQuery q = session.createSQLQuery(sql);
 			q.addEntity("Lms_Course", CourseImpl.class);
-			
 			QueryPos qPos = QueryPos.getInstance(q);
-			log.debug("companyId: " + companyId);
 			qPos.add(companyId);
 			qPos.add(companyId);
-			log.debug("groupId: " + groupId);
 			qPos.add(groupId);
 			qPos.add(groupId);
-			log.debug("freeText: " + freeText);
 			qPos.add(freeText);
 			qPos.add(status);
-			log.debug("status: " + status);
 			qPos.add(andOperator);
-			log.debug("andOperator: " + andOperator);
 			qPos.add(freeText);
 			qPos.add(freeText);
 			qPos.add(freeText);
@@ -147,11 +162,10 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			qPos.add(freeText);
 			qPos.add(freeText);
 			qPos.add(status);
+			
 			
 			List<Course> listCourse = (List<Course>) q.list();
 			
-			log.debug("listCourse: " + listCourse.size());
-					
 			return listCourse;
 			
 		} catch (Exception e) {
@@ -162,6 +176,9 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 	
 	    return new ArrayList<Course>();
 	}
+	
+	
+	
 	
 	private String replaceResourcePermission(String sql, boolean isAdmin,long companyId, long userId) throws PortalException {
 		/**Si no es administrador filtramos por permisos **/
@@ -189,9 +206,21 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 	}
 
 	private String replaceTag(String sql, long[] tags) {
-		/** Sustituimos los tags si buscamos por ellos **/
+		/** Sustituimos los tags si buscamos por ellos queda preparado para buscar por = en vez de por IN**/
 		if(tags != null && tags.length > 0){
 			String tagIds = "";
+			String joins = CustomSQLUtil.get(JOIN_BY_ASSET_TAG);
+			String wheres = CustomSQLUtil.get(WHERE_BY_AND_ASSET_TAG_IN);			
+			joins = joins.replace("[$i$]", String.valueOf(0));
+			wheres = wheres.replace("[$i$]", String.valueOf(0));
+			for(int i = 0; i < tags.length; i++){
+				tagIds += tags[i] + ",";
+			}
+			tagIds = tagIds.substring(0, tagIds.length()-1);
+			
+			/*
+			 * PARA LA REALIZACIÓN POR = EN VEZ DE POR IN
+			 * 
 			String joins = "";
 			String wheres = "";
 			
@@ -206,11 +235,12 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 				
 				tagIds += tags[i] + ",";
 			}
-			tagIds = tagIds.substring(0, tagIds.length()-1);
+			  
+			 */
 			
 			sql = sql.replace("[$JOINASSETTAGS$]", joins);
 			
-			sql = sql.replace("[$WHEREANDASSETTAG$]", wheres);
+			sql = sql.replace("[$WHEREANDASSETTAG$]",  wheres);
 			sql = sql.replace("[$WHEREORASSETTAG$]", CustomSQLUtil.get(WHERE_BY_OR_ASSET_TAG));
 				
 			sql = sql.replace("[$TAGIDS$]", tagIds);
@@ -241,7 +271,6 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			}
 			
 			categoryIds = categoryIds.substring(0, categoryIds.length()-1);
-			
 			sql = sql.replace("[$JOINASSETCATEGORIES$]", joins);
 			sql = sql.replace("[$WHEREANDASSETCATEGORY$]", wheres);
 			
@@ -273,6 +302,8 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 		return sql.replace("[$LANGUAGE$]", language);
 	}
 
+	
+	
 	public int countByT_S_C_T(String freeText, int status, long[] categories, long[] tags, long companyId, long groupId, long userId, String language, boolean isAdmin, boolean andOperator){
 		Session session = null;
 		
@@ -294,24 +325,25 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			
 			sql = replaceResourcePermission(sql, isAdmin, companyId, userId);
 			
-			log.debug("sql: " + sql);
+			if(log.isDebugEnabled()){
+				log.debug("sql: " + sql);
+				log.debug("companyId: " + companyId);
+				log.debug("groupId: " + groupId);
+				log.debug("freeText: " + freeText);
+				log.debug("andOperator: " + andOperator);
+			}
 			
 			SQLQuery q = session.createSQLQuery(sql);
 			q.addScalar(COUNT_COLUMN_NAME, Type.LONG);
 			
 			QueryPos qPos = QueryPos.getInstance(q);
-			log.debug("companyId: " + companyId);
 			qPos.add(companyId);
 			qPos.add(companyId);
-			log.debug("groupId: " + groupId);
 			qPos.add(groupId);
 			qPos.add(groupId);
-			log.debug("freeText: " + freeText);
 			qPos.add(freeText);
 			qPos.add(status);
-			log.debug("status: " + status);
 			qPos.add(andOperator);
-			log.debug("andOperator: " + andOperator);
 			qPos.add(freeText);
 			qPos.add(freeText);
 			qPos.add(freeText);
@@ -369,10 +401,13 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 				emailAddress = null;
 			}
 			
-			log.debug("ScreenName:"+screenName);
-			log.debug("firstName:"+firstName);
-			log.debug("lastName:"+lastName);
-			log.debug("emailAddress:"+emailAddress);
+			if(log.isDebugEnabled()){
+				log.debug("ScreenName:"+screenName);
+				log.debug("firstName:"+firstName);
+				log.debug("lastName:"+lastName);
+				log.debug("emailAddress:"+emailAddress);
+			}
+			
 			
 			session = openSessionLiferay();
 			
@@ -386,7 +421,7 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 				sql = sql.replace("[$ORDERBY$]", "u.lastName, u.firstName, u.middleName ");
 			}
 			
-			log.debug("sql: " + sql);
+			if(log.isDebugEnabled()) log.debug("sql: " + sql);
 			
 			SQLQuery q = session.createSQLQuery(sql);
 			q.addEntity("User_",PortalClassLoaderUtil.getClassLoader().loadClass("com.liferay.portal.model.impl.UserImpl"));
@@ -398,34 +433,32 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			
 			QueryPos qPos = QueryPos.getInstance(q);
 			qPos.add(teacherRoleId);
-			log.debug("teacherRoleId: " + teacherRoleId);
 			qPos.add(editorRoleId);
-			log.debug("editorRoleId: " + editorRoleId);
 			qPos.add(courseId);
-			log.debug("courseId: " + courseId);
 			qPos.add(WorkflowConstants.STATUS_APPROVED);
-			log.debug("WorkflowConstants.STATUS_APPROVED: " + WorkflowConstants.STATUS_APPROVED);
 			
 			qPos.add(firstName);
-			log.debug("firstName: " + firstName);
 			qPos.add(firstName);
 			qPos.add(lastName);
-			log.debug("lastName: " + lastName);
 			qPos.add(lastName);
 			qPos.add(screenName);
-			log.debug("screenName: " + screenName);
 			qPos.add(screenName);
 			qPos.add(emailAddress);
-			log.debug("emailAddress: " + emailAddress);
 			qPos.add(emailAddress);
+			
+			if(log.isDebugEnabled()){
+				log.debug("editorRoleId: " + editorRoleId);
+				log.debug("courseId: " + courseId);
+				log.debug("firstName: " + firstName);
+				log.debug("lastName: " + lastName);
+				log.debug("screenName: " + screenName);
+				log.debug("emailAddress: " + emailAddress);	
+			}
 			
 			qPos.add(start);
 			qPos.add((end-start));
 			
 			List<User> listUsers = (List<User>) q.list();
-			
-			log.debug("listUsers: " + listUsers.size());
-					
 			return listUsers;
 			
 		} catch (Exception e) {
@@ -462,11 +495,13 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			}else{
 				emailAddress = null;
 			}	
+			if(log.isDebugEnabled()){
+				log.debug("ScreenName:"+screenName);
+				log.debug("firstName:"+firstName);
+				log.debug("lastName:"+lastName);
+				log.debug("emailAddress:"+emailAddress);
+			}
 			
-			log.debug("ScreenName:"+screenName);
-			log.debug("firstName:"+firstName);
-			log.debug("lastName:"+lastName);
-			log.debug("emailAddress:"+emailAddress);
 			
 			session = openSessionLiferay();
 			
@@ -545,20 +580,22 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 				sql = sql.replace("[$START$]", String.valueOf(start));
 				sql = sql.replace("[$END$]", String.valueOf(start+end));
 			}
-			
-			log.debug("sql: " + sql);
+		
+			if(log.isDebugEnabled()){
+				log.debug("sql: " + sql);
+				log.debug("companyId: " + companyId);
+				log.debug("groupId: " + groupId);
+				log.debug("freeText: " + freeText);
+			}
 			
 			SQLQuery q = session.createSQLQuery(sql);
 			q.addEntity("Lms_Course", CourseImpl.class);
 			
 			QueryPos qPos = QueryPos.getInstance(q);
-			log.debug("companyId: " + companyId);
 			qPos.add(companyId);
 			qPos.add(companyId);
-			log.debug("groupId: " + groupId);
 			qPos.add(groupId);
 			qPos.add(groupId);
-			log.debug("freeText: " + freeText);
 			qPos.add(freeText);
 			qPos.add(WorkflowConstants.STATUS_APPROVED);
 			qPos.add(true);
@@ -574,7 +611,7 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			
 			List<Course> listCourse = (List<Course>) q.list();
 			
-			log.debug("listCourse: " + listCourse.size());
+			if(log.isDebugEnabled())log.debug("listCourse: " + listCourse.size());
 					
 			return listCourse;
 			
@@ -585,6 +622,224 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 	    }
 	
 	    return new ArrayList<Course>();
+	}
+	
+	
+	public List<Long> findCourseTags(String freeText, long[] categories, long companyId, long groupId, long userId, String language){
+		Session session = null;
+		
+		try{
+			
+			if(freeText != null && freeText.length() > 0)
+				freeText = "%" + freeText + "%";
+			
+			session = openSession();
+			
+			String sql = CustomSQLUtil.get(FIND_COURSE_ASSET_TAGS);
+			
+			
+			sql = replaceLanguage(sql, language);
+			
+			sql = sql.replace("[$JOINASSET$]", CustomSQLUtil.get(JOIN_BY_ASSET_ENTRY));
+			sql = sql.replace("[$CLASSNAMECOURSEID$]", String.valueOf(ClassNameLocalServiceUtil.fetchClassNameId(Course.class)));
+
+			sql = replaceCategory(sql, categories);
+			
+			sql = replaceResourcePermissionView(sql, companyId, userId);
+
+			
+			if(log.isDebugEnabled()){
+				log.debug("sql: " + sql);
+				log.debug("companyId: " + companyId);
+				log.debug("groupId: " + groupId);
+				log.debug("freeText: " + freeText);
+			}
+			
+			SQLQuery q = session.createSQLQuery(sql);
+			q.addScalar("tagId", Type.LONG);
+			
+			QueryPos qPos = QueryPos.getInstance(q);
+			qPos.add(companyId);
+			qPos.add(companyId);
+			qPos.add(groupId);
+			qPos.add(groupId);
+			qPos.add(freeText);
+			qPos.add(WorkflowConstants.STATUS_APPROVED);
+			qPos.add(true);
+			qPos.add(freeText);
+			qPos.add(freeText);
+			qPos.add(freeText);
+			qPos.add(WorkflowConstants.STATUS_APPROVED);
+			qPos.add(WorkflowConstants.STATUS_APPROVED);
+			qPos.add(true);
+			qPos.add(freeText);
+			qPos.add(freeText);
+			qPos.add(WorkflowConstants.STATUS_APPROVED);
+			
+			List<Long> listAssetTags = (List<Long>) q.list();
+								
+			if(log.isDebugEnabled())log.debug("listCourse: " + listAssetTags.size());
+					
+			return listAssetTags;
+			
+		} catch (Exception e) {
+	       e.printStackTrace();
+	    } finally {
+	        closeSession(session);
+	    }
+	
+	    return new ArrayList<Long>();
+	}
+	
+	
+	public HashMap<Long,Long> countCategoryCourses(String freeText, long[] categories, long[] tags, long companyId, long groupId, long userId, String language){
+		Session session = null;
+		
+		try{
+			
+			
+			session = openSession();
+			
+			String sql = CustomSQLUtil.get(COUNT_CATEGORY_COURSES);
+			
+						
+			sql = replaceLanguage(sql, language);
+			
+			sql = sql.replace("[$JOINASSET$]", CustomSQLUtil.get(JOIN_BY_ASSET_ENTRY));
+			sql = sql.replace("[$CLASSNAMECOURSEID$]", String.valueOf(ClassNameLocalServiceUtil.fetchClassNameId(Course.class)));
+
+			sql = replaceCategory(sql, categories);
+			
+			sql = replaceTag(sql, tags);			
+			
+			sql = replaceResourcePermissionView(sql, companyId, userId);
+			
+			if(log.isDebugEnabled()){
+				log.debug("sql: " + sql);
+				log.debug("companyId: " + companyId);
+				log.debug("groupId: " + groupId);
+				log.debug("freeText: " + freeText);
+			}
+			
+			SQLQuery q = session.createSQLQuery(sql);
+			q.addScalar("categoryId", Type.LONG);
+			q.addScalar("COUNT_VALUE", Type.LONG);
+			QueryPos qPos = QueryPos.getInstance(q);
+			qPos.add(companyId);
+			qPos.add(companyId);
+			qPos.add(groupId);
+			qPos.add(groupId);
+			qPos.add(freeText);
+			qPos.add(WorkflowConstants.STATUS_APPROVED);
+			qPos.add(true);
+			qPos.add(freeText);
+			qPos.add(freeText);
+			qPos.add(freeText);
+			qPos.add(WorkflowConstants.STATUS_APPROVED);
+			qPos.add(WorkflowConstants.STATUS_APPROVED);
+			qPos.add(true);
+			qPos.add(freeText);
+			qPos.add(freeText);
+			qPos.add(WorkflowConstants.STATUS_APPROVED);
+			
+		
+			
+			
+			List categoryCourses = q.list();
+			if(log.isDebugEnabled())log.debug("categories: " + categoryCourses.size());
+			HashMap<Long, Long> courses = new HashMap<Long, Long>();
+
+			String serilizeString=null;
+			JSONArray empoyeeJsonArray=null;
+			for(Object elemnetObject:categoryCourses){
+				serilizeString=JSONFactoryUtil.serialize(elemnetObject);
+				empoyeeJsonArray=JSONFactoryUtil.createJSONArray(serilizeString);
+				courses.put(empoyeeJsonArray.getLong(0), empoyeeJsonArray.getLong(1));
+			}
+			
+					
+			return courses;
+			
+		} catch (Exception e) {
+	       e.printStackTrace();
+	    } finally {
+	        closeSession(session);
+	    }
+	
+	    return new HashMap<Long, Long>();
+	}
+	
+	public HashMap<Long,Long> countTagCourses(String freeText, long[] categories, long[] tags, long companyId, long groupId, long userId, String language){
+		Session session = null;
+		
+		try{
+			
+			
+			session = openSession();
+			
+			String sql = CustomSQLUtil.get(COUNT_TAG_COURSES);
+			
+						
+			sql = replaceLanguage(sql, language);
+			
+			sql = sql.replace("[$JOINASSET$]", CustomSQLUtil.get(JOIN_BY_ASSET_ENTRY));
+			sql = sql.replace("[$CLASSNAMECOURSEID$]", String.valueOf(ClassNameLocalServiceUtil.fetchClassNameId(Course.class)));
+
+			sql = replaceCategory(sql, categories);
+			
+			sql = replaceTag(sql, tags);
+				
+			sql = replaceResourcePermissionView(sql, companyId, userId);
+			if(log.isDebugEnabled()){
+				log.debug("sql: " + sql);
+				log.debug("companyId: " + companyId);
+				log.debug("groupId: " + groupId);
+				log.debug("freeText: " + freeText);
+			}
+			
+			
+			SQLQuery q = session.createSQLQuery(sql);
+			q.addScalar("tagId", Type.LONG);
+			q.addScalar("COUNT_VALUE", Type.LONG);
+			QueryPos qPos = QueryPos.getInstance(q);
+			qPos.add(companyId);
+			qPos.add(companyId);
+			qPos.add(groupId);
+			qPos.add(groupId);
+			qPos.add(freeText);
+			qPos.add(WorkflowConstants.STATUS_APPROVED);
+			qPos.add(true);
+			qPos.add(freeText);
+			qPos.add(freeText);
+			qPos.add(freeText);
+			qPos.add(WorkflowConstants.STATUS_APPROVED);
+			qPos.add(WorkflowConstants.STATUS_APPROVED);
+			qPos.add(true);
+			qPos.add(freeText);
+			qPos.add(freeText);
+			qPos.add(WorkflowConstants.STATUS_APPROVED);
+			
+			List tagCourses = q.list();
+			HashMap<Long, Long> courses = new HashMap<Long, Long>();
+
+			String serilizeString=null;
+			JSONArray empoyeeJsonArray=null;
+			for(Object elemnetObject:tagCourses){
+				serilizeString=JSONFactoryUtil.serialize(elemnetObject);
+				empoyeeJsonArray=JSONFactoryUtil.createJSONArray(serilizeString);
+				courses.put(empoyeeJsonArray.getLong(0), empoyeeJsonArray.getLong(1));
+			}
+			
+					
+			return courses;
+			
+		} catch (Exception e) {
+	       e.printStackTrace();
+	    } finally {
+	        closeSession(session);
+	    }
+	
+	    return new HashMap<Long, Long>();
 	}
 	
 	public int countByCatalog(String freeText, long[] categories, long[] tags, long companyId, long groupId, long userId, String language){
@@ -609,19 +864,21 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			
 			sql = replaceResourcePermissionView(sql, companyId, userId);
 			
-			log.debug("sql: " + sql);
+			if(log.isDebugEnabled()){
+				log.debug("sql: " + sql);
+				log.debug("companyId: " + companyId);
+				log.debug("groupId: " + groupId);
+				log.debug("freeText: " + freeText);
+			}
 			
 			SQLQuery q = session.createSQLQuery(sql);
 			q.addScalar(COUNT_COLUMN_NAME, Type.LONG);
 			
 			QueryPos qPos = QueryPos.getInstance(q);
-			log.debug("companyId: " + companyId);
 			qPos.add(companyId);
 			qPos.add(companyId);
-			log.debug("groupId: " + groupId);
 			qPos.add(groupId);
 			qPos.add(groupId);
-			log.debug("freeText: " + freeText);
 			qPos.add(freeText);
 			qPos.add(WorkflowConstants.STATUS_APPROVED);
 			qPos.add(true);

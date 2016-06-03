@@ -3,6 +3,7 @@ package com.liferay.lms.portlet;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.portlet.PortletException;
@@ -21,8 +22,6 @@ import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringPool;
@@ -35,14 +34,9 @@ import com.liferay.portlet.asset.model.AssetCategory;
 import com.liferay.portlet.asset.model.AssetTag;
 import com.liferay.portlet.asset.model.AssetVocabulary;
 import com.liferay.portlet.asset.service.AssetCategoryLocalServiceUtil;
-import com.liferay.portlet.asset.service.AssetCategoryServiceUtil;
 import com.liferay.portlet.asset.service.AssetTagLocalServiceUtil;
-import com.liferay.portlet.asset.service.AssetTagServiceUtil;
 import com.liferay.portlet.asset.service.AssetVocabularyLocalServiceUtil;
 import com.liferay.portlet.asset.service.AssetVocabularyServiceUtil;
-import com.liferay.portlet.asset.service.persistence.AssetVocabularyFinder;
-import com.liferay.portlet.asset.service.persistence.AssetVocabularyFinderUtil;
-import com.liferay.portlet.asset.service.persistence.AssetVocabularyUtil;
 import com.liferay.util.bridges.mvc.MVCPortlet;
 
 /**
@@ -51,7 +45,6 @@ import com.liferay.util.bridges.mvc.MVCPortlet;
 public class CatalogCourses extends MVCPortlet {
  
 	private String viewJSP = null;
-	private static Log log = LogFactoryUtil.getLog(CatalogCourses.class);
 	
 	public void init() throws PortletException {	
 		viewJSP = getInitParameter("view-template");
@@ -107,6 +100,7 @@ public class CatalogCourses extends MVCPortlet {
 			}else{
 				categoryAuxIds = categoryIds;
 			}
+			
 			
 			renderRequest.setAttribute("categoryIds", StringUtil.merge(categoryAuxIds,","));
 			
@@ -178,8 +172,18 @@ public class CatalogCourses extends MVCPortlet {
 			renderRequest.setAttribute("tagIds", StringUtil.merge(tagAuxIds,","));
 			
 			try {
-				List<AssetTag> listAssetTag = AssetTagServiceUtil.getGroupTags(themeDisplay.getScopeGroupId());
-				renderRequest.setAttribute("listAssetTag", listAssetTag);AssetTag t;
+				List<AssetTag> listAssetTag = new ArrayList<AssetTag>();
+				List<Long> tags = CourseLocalServiceUtil.getCatalogCoursesAssetTags(freeText, categoryAuxIds, themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(), themeDisplay.getUserId(), themeDisplay.getLanguageId());
+				
+				HashMap<Long, Long> tagCourses =  CourseLocalServiceUtil.countTagCourses(freeText, categoryAuxIds, tagAuxIds, themeDisplay.getCompanyId(),themeDisplay.getScopeGroupId(), themeDisplay.getUserId(), themeDisplay.getLanguageId());
+				
+				renderRequest.setAttribute("tagCourses", tagCourses);
+				
+				for(Long tag : tags){
+					listAssetTag.add(AssetTagLocalServiceUtil.fetchAssetTag(tag));
+				}
+								
+				renderRequest.setAttribute("listAssetTag", listAssetTag);
 			} catch (SystemException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -205,6 +209,12 @@ public class CatalogCourses extends MVCPortlet {
 		
 		searchContainer.setResults(listCourse);
 		searchContainer.setTotal(total);
+			
+		if(showVocabularies){
+			HashMap<Long, Long> categoryCourses =  CourseLocalServiceUtil.countCategoryCourses(freeText, categoryAuxIds, tagAuxIds, themeDisplay.getCompanyId(),themeDisplay.getScopeGroupId(), themeDisplay.getUserId(), themeDisplay.getLanguageId());
+			renderRequest.setAttribute("categoryCourses", categoryCourses);
+		}
+		
 		
 		renderRequest.setAttribute("searchContainer", searchContainer);
 		

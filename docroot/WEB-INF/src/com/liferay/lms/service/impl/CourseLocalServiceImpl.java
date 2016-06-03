@@ -17,6 +17,7 @@ package com.liferay.lms.service.impl;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -88,6 +89,7 @@ import com.liferay.portal.util.comparator.UserFirstNameComparator;
 import com.liferay.portal.util.comparator.UserLastNameComparator;
 import com.liferay.portlet.asset.model.AssetEntry;
 import com.liferay.portlet.asset.model.AssetLinkConstants;
+import com.liferay.portlet.asset.model.AssetTag;
 import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
 import com.liferay.portlet.social.model.SocialActivityCounterDefinition;
 import com.liferay.portlet.social.model.SocialActivityDefinition;
@@ -962,6 +964,17 @@ public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int e
 	
 	public int countCoursesCatalogByTitleCategoriesTags(String freeText, long[] categories, long[] tags, long companyId, long groupId, long userId, String language){
 		return CourseFinderUtil.countByCatalog(freeText, categories, tags, companyId, groupId, userId, language);
+	}
+	
+	public List<Long> getCatalogCoursesAssetTags(String freeText, long[] categories, long companyId, long groupId, long userId, String language){
+		return CourseFinderUtil.findCourseTags(freeText, categories, companyId, groupId, userId, language);
+	}
+	public HashMap<Long, Long> countCategoryCourses(String freeText, long[] categories, long[] tags, long companyId, long groupId, long userId, String language){
+		return CourseFinderUtil.countCategoryCourses(freeText, categories, tags, companyId, groupId, userId, language);
+	}
+	
+	public HashMap<Long, Long> countTagCourses(String freeText, long[] categories, long[] tags, long companyId, long groupId, long userId, String language){
+		return CourseFinderUtil.countTagCourses(freeText, categories, tags, companyId, groupId, userId, language);
 	}
 }
 

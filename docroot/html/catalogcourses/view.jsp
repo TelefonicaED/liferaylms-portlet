@@ -63,9 +63,16 @@
 														<c:set var="urlFacet" value="#" />
 													</c:if>
 													<li class="${classFacet }">
-														<a href="${urlFacet }" data-value="${category.categoryId }">
-															${category.getTitle(locale) }
-														</a>
+														<c:choose>
+															<c:when test="${empty categoryCourses.get(category.categoryId)}">
+																${category.getTitle(locale) } (0)
+															</c:when>
+															<c:otherwise>
+																<a href="${urlFacet }" data-value="${category.categoryId }">
+																${category.getTitle(locale) } (${categoryCourses.get(category.categoryId)}) 
+																</a>
+															</c:otherwise>
+														</c:choose>																													
 														<span class="frequency"></span>	
 													</li>
 												</c:forEach>										
@@ -94,9 +101,16 @@
 								<c:set var="urlFacet" value="#" />
 							</c:if>
 							<li class="${classFacet } ">
-								<a href="${urlFacet }" data-value="${tag.name }">
-									${tag.name }
-								</a>
+									<c:choose>
+										<c:when test="${empty tagCourses.get(tag.tagId)}">
+											${tag.name } (0)
+										</c:when>
+										<c:otherwise>
+											<a href="${urlFacet }" data-value="${tag.name }">
+												${tag.name } (${tagCourses.get(tag.tagId)}) 
+											</a>
+										</c:otherwise>
+									</c:choose>
 								<span class="frequency"></span>	
 							</li>
 						</c:forEach>	

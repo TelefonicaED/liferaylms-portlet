@@ -514,6 +514,27 @@ public class CourseLocalServiceWrapper implements CourseLocalService,
 			categories, tags, companyId, groupId, userId, language);
 	}
 
+	public java.util.List<java.lang.Long> getCatalogCoursesAssetTags(
+		java.lang.String freeText, long[] categories, long companyId,
+		long groupId, long userId, java.lang.String language) {
+		return _courseLocalService.getCatalogCoursesAssetTags(freeText,
+			categories, companyId, groupId, userId, language);
+	}
+
+	public java.util.HashMap<java.lang.Long, java.lang.Long> countCategoryCourses(
+		java.lang.String freeText, long[] categories, long[] tags,
+		long companyId, long groupId, long userId, java.lang.String language) {
+		return _courseLocalService.countCategoryCourses(freeText, categories,
+			tags, companyId, groupId, userId, language);
+	}
+
+	public java.util.HashMap<java.lang.Long, java.lang.Long> countTagCourses(
+		java.lang.String freeText, long[] categories, long[] tags,
+		long companyId, long groupId, long userId, java.lang.String language) {
+		return _courseLocalService.countTagCourses(freeText, categories, tags,
+			companyId, groupId, userId, language);
+	}
+
 	/**
 	 * @deprecated Renamed to {@link #getWrappedService}
 	 */

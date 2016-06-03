@@ -1,6 +1,145 @@
 <custom-sql>
 <!-- Query para la administración de cursos cuando eres administrador-->
 
+	<sql id="com.liferay.lms.service.persistence.CourseFinder.countAssetCategoryCourses">
+		<![CDATA[   			
+			SELECT 
+				act.categoryId as categoryId, COUNT(DISTINCT c.courseId) AS COUNT_VALUE
+			FROM 
+				lms_course c
+			INNER JOIN group_ 
+				ON c.groupCreatedId = group_.groupId 
+			[$JOINASSET$] 
+			INNER JOIN 
+				assetentries_assetcategories aac 
+					ON aac.entryId = ae.entryId
+			INNER JOIN assetcategory act 
+				ON aac.categoryId =  act.categoryId   		
+			[$JOINASSETCATEGORIES$] 
+			[$JOINASSETTAGS$]			
+			[$JOINRESOURCEPERMISSION$]
+			WHERE 
+			( 
+				c.companyId = ? OR ? = 0 
+			) 
+			AND 
+			( 
+				c.groupId = ? OR ? = 0 
+			)
+			AND
+			(
+				((? = '') AND (? = -1) )
+				OR 
+				(? = true AND  
+						(? = '' OR IF (ExtractValue(c.title, '//Title[@language-id=\"[$LANGUAGE$]\"]' )='', ExtractValue(c.title, '//root[@default-locale]//Title'), ExtractValue(c.title, '//Title[@language-id=\"[$LANGUAGE$]\"]' )) LIKE ? OR
+						 IF (ExtractValue(c.description, '//Description[@language-id=\"[$LANGUAGE$]\"]' )='', ExtractValue(c.description, '//root[@default-locale]//Description' ), ExtractValue(c.description, '//Description[@language-id=\"[$LANGUAGE$]\"]' )) LIKE ?) AND 
+						(? = -1 OR ? = c.closed) 
+						[$WHEREANDASSETCATEGORY$]
+						[$WHEREANDASSETTAG$]
+				) 
+				OR 
+				(? = false AND 
+					(IF (ExtractValue(c.title, '//Title[@language-id=\"[$LANGUAGE$]\"]' )='', ExtractValue(c.title,  '//root[@default-locale]//Title' ), ExtractValue(c.title, '//Title[@language-id=\"[$LANGUAGE$]\"]' )) LIKE ? OR 
+					IF (ExtractValue(c.description, '//Description[@language-id=\"[$LANGUAGE$]\"]' )='', ExtractValue(c.description, '//root[@default-locale]//Description' ), ExtractValue(c.description, '//Description[@language-id=\"[$LANGUAGE$]\"]' )) LIKE ? 
+					OR ? = c.closed [$WHEREORASSETCATEGORY$] [$WHEREORASSETTAG$]) 
+				) 
+			) 
+			[$WHERERESOURCEPERMISSION$] 
+			GROUP BY act.categoryId
+		]]>
+	</sql>
+	<sql id="com.liferay.lms.service.persistence.CourseFinder.countAssetTagCourses">
+		<![CDATA[   			
+			SELECT 
+				att.tagId as tagId, COUNT(DISTINCT c.courseId) AS COUNT_VALUE
+			FROM 
+				lms_course c
+			INNER JOIN group_ 
+				ON c.groupCreatedId = group_.groupId 
+			[$JOINASSET$] 
+			[$JOINASSETCATEGORIES$] 
+			INNER JOIN 
+				assetentries_assettags aat 
+					ON aat.entryId = ae.entryId 
+			[$JOINASSETTAGS$]
+			INNER JOIN assettag att 
+				ON aat.tagId =  att.tagId 
+			[$JOINRESOURCEPERMISSION$]
+			WHERE 
+			( 
+				c.companyId = ? OR ? = 0 
+			) 
+			AND 
+			( 
+				c.groupId = ? OR ? = 0 
+			)
+			AND
+			(
+				((? = '') AND (? = -1) )
+				OR 
+				(? = true AND  
+						(? = '' OR IF (ExtractValue(c.title, '//Title[@language-id=\"[$LANGUAGE$]\"]' )='', ExtractValue(c.title, '//root[@default-locale]//Title'), ExtractValue(c.title, '//Title[@language-id=\"[$LANGUAGE$]\"]' )) LIKE ? OR
+						 IF (ExtractValue(c.description, '//Description[@language-id=\"[$LANGUAGE$]\"]' )='', ExtractValue(c.description, '//root[@default-locale]//Description' ), ExtractValue(c.description, '//Description[@language-id=\"[$LANGUAGE$]\"]' )) LIKE ?) AND 
+						(? = -1 OR ? = c.closed) 
+						[$WHEREANDASSETCATEGORY$]
+						[$WHEREANDASSETTAG$]
+				) 
+				OR 
+				(? = false AND 
+					(IF (ExtractValue(c.title, '//Title[@language-id=\"[$LANGUAGE$]\"]' )='', ExtractValue(c.title,  '//root[@default-locale]//Title' ), ExtractValue(c.title, '//Title[@language-id=\"[$LANGUAGE$]\"]' )) LIKE ? OR 
+					IF (ExtractValue(c.description, '//Description[@language-id=\"[$LANGUAGE$]\"]' )='', ExtractValue(c.description, '//root[@default-locale]//Description' ), ExtractValue(c.description, '//Description[@language-id=\"[$LANGUAGE$]\"]' )) LIKE ? 
+					OR ? = c.closed [$WHEREORASSETCATEGORY$] [$WHEREORASSETTAG$]) 
+				) 
+			) 
+			[$WHERERESOURCEPERMISSION$] 
+			GROUP BY att.tagId
+		]]>
+	</sql>
+	<sql id="com.liferay.lms.service.persistence.CourseFinder.findCoursesAssetTagsByT_S">
+		<![CDATA[   			
+			SELECT 
+				DISTINCT att.tagId as tagId
+			FROM 
+				lms_course c
+			INNER JOIN group_ 
+				ON c.groupCreatedId = group_.groupId 
+			[$JOINASSET$] 
+			INNER JOIN assetentries_assettags ast 
+				ON ae.entryId = ast.entryId     
+			INNER JOIN assettag att 
+				ON ast.tagId =  att.tagId 
+			[$JOINASSETCATEGORIES$] 
+			[$JOINRESOURCEPERMISSION$]
+			WHERE 
+			( 
+				c.companyId = ? OR ? = 0 
+			) 
+			AND 
+			( 
+				c.groupId = ? OR ? = 0 
+			)
+			AND
+			(
+				((? = '') AND (? = -1) )
+				OR 
+				(? = true AND  
+						(? = '' OR IF (ExtractValue(c.title, '//Title[@language-id=\"[$LANGUAGE$]\"]' )='', ExtractValue(c.title, '//root[@default-locale]//Title'), ExtractValue(c.title, '//Title[@language-id=\"[$LANGUAGE$]\"]' )) LIKE ? OR 
+						IF (ExtractValue(c.description, '//Description[@language-id=\"[$LANGUAGE$]\"]' )='', ExtractValue(c.description,  '//root[@default-locale]//Description'  ), ExtractValue(c.description, '//Description[@language-id=\"[$LANGUAGE$]\"]' ))  LIKE ?) AND 
+						(? = -1 OR ? = c.closed) 
+						[$WHEREANDASSETCATEGORY$]
+				) 
+				OR 
+				(? = false AND 
+					(IF (ExtractValue(c.title, '//Title[@language-id=\"[$LANGUAGE$]\"]' )='', ExtractValue(c.title,  '//root[@default-locale]//Title' ), ExtractValue(c.title, '//Title[@language-id=\"[$LANGUAGE$]\"]' )) LIKE ? OR 
+					IF (ExtractValue(c.description, '//Description[@language-id=\"[$LANGUAGE$]\"]' )='', ExtractValue(c.description, '//root[@default-locale]//Description' ), ExtractValue(c.description, '//Description[@language-id=\"[$LANGUAGE$]\"]' )) LIKE ? OR
+					 ? = c.closed [$WHEREORASSETCATEGORY$]) 
+				) 
+			) 
+			[$WHERERESOURCEPERMISSION$] 
+			ORDER BY IF (ExtractValue(c.title, '//Title[@language-id=\"[$LANGUAGE$]\"]' )='', ExtractValue(c.title,  '//root[@default-locale]//Title' ), ExtractValue(c.title, '//Title[@language-id=\"[$LANGUAGE$]\"]' ))
+		]]>
+	</sql>
+	
 	<sql id="com.liferay.lms.service.persistence.CourseFinder.findAdministratorByT_S">
 		<![CDATA[   			
 			SELECT 
@@ -26,18 +165,21 @@
 				((? = '') AND (? = -1) )
 				OR 
 				(? = true AND  
-						(? = '' OR ExtractValue(c.title, '//Title[@language-id=\"[$LANGUAGE$]\"]' ) LIKE ? OR ExtractValue(c.description, '//Description[@language-id=\"[$LANGUAGE$]\"]' ) LIKE ?) AND 
+						(? = '' OR IF (ExtractValue(c.title, '//Title[@language-id=\"[$LANGUAGE$]\"]' )='', ExtractValue(c.title, '//root[@default-locale]//Title'), ExtractValue(c.title, '//Title[@language-id=\"[$LANGUAGE$]\"]' )) LIKE ? OR
+						 IF (ExtractValue(c.description, '//Description[@language-id=\"[$LANGUAGE$]\"]' )='', ExtractValue(c.description, '//root[@default-locale]//Description' ), ExtractValue(c.description, '//Description[@language-id=\"[$LANGUAGE$]\"]' )) LIKE ?) AND 
 						(? = -1 OR ? = c.closed) 
 						[$WHEREANDASSETCATEGORY$]
 						[$WHEREANDASSETTAG$]
 				) 
 				OR 
 				(? = false AND 
-					(ExtractValue(c.title, '//Title[@language-id=\"[$LANGUAGE$]\"]' ) LIKE ? OR ExtractValue(c.description, '//Description[@language-id=\"[$LANGUAGE$]\"]' ) LIKE ? OR ? = c.closed [$WHEREORASSETCATEGORY$] [$WHEREORASSETTAG$]) 
+					(IF (ExtractValue(c.title, '//Title[@language-id=\"[$LANGUAGE$]\"]' )='', ExtractValue(c.title,  '//root[@default-locale]//Title' ), ExtractValue(c.title, '//Title[@language-id=\"[$LANGUAGE$]\"]' )) LIKE ? OR 
+					IF (ExtractValue(c.description, '//Description[@language-id=\"[$LANGUAGE$]\"]' )='', ExtractValue(c.description, '//root[@default-locale]//Description' ), ExtractValue(c.description, '//Description[@language-id=\"[$LANGUAGE$]\"]' )) LIKE ? 
+					OR ? = c.closed [$WHEREORASSETCATEGORY$] [$WHEREORASSETTAG$]) 
 				) 
 			) 
 			[$WHERERESOURCEPERMISSION$] 
-			ORDER BY EXTRACTVALUE(c.title, '//Title[@language-id=\"[$LANGUAGE$]\"]')
+			ORDER BY IF (ExtractValue(c.title, '//Title[@language-id=\"[$LANGUAGE$]\"]' )='', ExtractValue(c.title,  '//root[@default-locale]//Title' ), ExtractValue(c.title, '//Title[@language-id=\"[$LANGUAGE$]\"]' ))
 			LIMIT [$START$], [$END$]
 		]]>
 	</sql>
@@ -67,14 +209,16 @@
 				((? = '') AND (? = -1) )
 				OR 
 				(? = true AND  
-						(? = '' OR ExtractValue(c.title, '//Title[@language-id=\"[$LANGUAGE$]\"]' ) LIKE ? OR ExtractValue(c.description, '//Description[@language-id=\"[$LANGUAGE$]\"]' ) LIKE ?) AND 
+						(? = '' OR IF (ExtractValue(c.title, '//Title[@language-id=\"[$LANGUAGE$]\"]' )='', ExtractValue(c.title, '//root[@default-locale]//Title'), ExtractValue(c.title, '//Title[@language-id=\"[$LANGUAGE$]\"]' )) LIKE ? OR
+						 IF (ExtractValue(c.description, '//Description[@language-id=\"[$LANGUAGE$]\"]' )='', ExtractValue(c.description, '//root[@default-locale]//Description' ), ExtractValue(c.description, '//Description[@language-id=\"[$LANGUAGE$]\"]' )) LIKE ?) AND 
 						(? = -1 OR ? = c.closed) 
 						[$WHEREANDASSETCATEGORY$]
 						[$WHEREANDASSETTAG$]
 				) 
 				OR 
 				(? = false AND 
-					(ExtractValue(c.title, '//Title[@language-id=\"[$LANGUAGE$]\"]' ) LIKE ? OR ExtractValue(c.description, '//Description[@language-id=\"[$LANGUAGE$]\"]' ) LIKE ? OR ? = c.closed [$WHEREORASSETCATEGORY$] [$WHEREORASSETTAG$]) 
+					(IF (ExtractValue(c.title, '//Title[@language-id=\"[$LANGUAGE$]\"]' )='', ExtractValue(c.title, '//root[@default-locale]//Title'), ExtractValue(c.title, '//Title[@language-id=\"[$LANGUAGE$]\"]' )) LIKE ? OR 
+					IF (ExtractValue(c.description, '//Description[@language-id=\"[$LANGUAGE$]\"]' )='', ExtractValue(c.description, '//root[@default-locale]//Description' ), ExtractValue(c.description, '//Description[@language-id=\"[$LANGUAGE$]\"]' )) LIKE ? OR ? = c.closed [$WHEREORASSETCATEGORY$] [$WHEREORASSETTAG$]) 
 				) 
 			) 
 			[$WHERERESOURCEPERMISSION$]
@@ -214,6 +358,11 @@
 	<sql id="com.liferay.lms.service.persistence.CourseFinder.whereC_ByAndAssetTag">
 		<![CDATA[
 			AND aat[$i$].tagId = ([$TAGIDS$])
+		]]>
+	</sql>
+	<sql id="com.liferay.lms.service.persistence.CourseFinder.whereC_ByAndAssetTagIn">
+		<![CDATA[
+			AND aat[$i$].tagId IN ([$TAGIDS$])
 		]]>
 	</sql>
 	<sql id="com.liferay.lms.service.persistence.CourseFinder.whereC_ByOrAssetCategory">
