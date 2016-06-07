@@ -48,7 +48,7 @@
 			<portlet:param name="jspPage" value="/html/surveyactivity/stadistics.jsp"></portlet:param>
 		</liferay-portlet:renderURL>
 		
-		<div id="${renderResponse.getNamespace()}generate_report">
+		<div id="${renderResponse.getNamespace()}generate_report" class="rightButton">
 			<liferay-ui:icon image="export" label="<%= true %>" message="download-content" method="get" url="javascript:${renderResponse.getNamespace()}exportReport();" />
 		</div>
 		<div id="${renderResponse.getNamespace()}generating_report" class="aui-helper-hidden">

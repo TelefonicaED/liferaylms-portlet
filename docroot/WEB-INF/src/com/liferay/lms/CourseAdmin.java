@@ -1419,7 +1419,31 @@ public class CourseAdmin extends MVCPortlet {
 											}else{
 												allowFinishDate=null;
 											}
-											CourseServiceUtil.editUserInscriptionDates(courseId,user.getUserId(),allowStartDate,allowFinishDate);
+											
+											if(Validator.isNotNull(allowStartDate) && Validator.isNotNull(allowFinishDate) ){												
+												
+												CourseResult courseResult=CourseResultLocalServiceUtil.getCourseResultByCourseAndUser(courseId, user.getUserId());
+												if(courseResult==null){
+													courseResult=CourseResultLocalServiceUtil.createCourseResult(CounterLocalServiceUtil.increment(CourseResult.class.getName()));
+													courseResult.setUserId(user.getUserId());
+													courseResult.setCourseId(courseId);
+													courseResult.setResult(0);
+													courseResult.setPassed(false);
+													courseResult.setPassedDate(null);
+													courseResult.setAllowStartDate(allowStartDate);
+													courseResult.setAllowFinishDate(allowFinishDate);
+													courseResult.setStartDate(allowStartDate);
+													CourseResultLocalServiceUtil.addCourseResult(courseResult);
+												}else{
+													courseResult.setAllowStartDate(allowStartDate);
+													courseResult.setAllowFinishDate(allowFinishDate);
+													if(courseResult.getStartDate()==null){
+														courseResult.setStartDate(allowStartDate);
+													}
+													CourseResultLocalServiceUtil.updateCourseResult(courseResult);
+												}
+																								
+											}
 											
 										}else{
 											errors.add(LanguageUtil.format
