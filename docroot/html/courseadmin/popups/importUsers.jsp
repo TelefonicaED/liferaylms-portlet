@@ -24,9 +24,9 @@
 	String urlExample = "<a href=\"/"+ ClpSerializer.getServletContextName();
 	
 	if(Integer.parseInt(preferences.getValue("tipoImport", "1")) == 1){
-		urlExample += "/html/courseadmin/examples/document.csv\">"+LanguageUtil.get(themeDisplay.getLocale(),"example")+"</a>";
+		urlExample += "/html/courseadmin/examples/ImportCourseUsersByUserId.csv\">"+LanguageUtil.get(themeDisplay.getLocale(),"example")+"</a>";
 	}else{
-		urlExample += "/html/courseadmin/examples/documentName.csv\">"+LanguageUtil.get(themeDisplay.getLocale(),"example")+"</a>";
+		urlExample += "/html/courseadmin/examples/ImportCourseUsersByName.csv\">"+LanguageUtil.get(themeDisplay.getLocale(),"example")+"</a>";
 	}
 
 %>

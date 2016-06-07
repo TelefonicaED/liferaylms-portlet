@@ -21,7 +21,7 @@ else
 	learnact=LearningActivityLocalServiceUtil.getLearningActivity(ParamUtil.getLong(request,"actId"));
 }
 
-String urlExample = "<a href=\"/"+ ClpSerializer.getServletContextName()+"/html/offlinetaskactivity/examples/document.csv\">"+LanguageUtil.get(themeDisplay.getLocale(),"example")+"</a>";
+String urlExample = "<a href=\"/"+ ClpSerializer.getServletContextName()+"/html/offlinetaskactivity/examples/ImportGrades.csv\">"+LanguageUtil.get(themeDisplay.getLocale(),"example")+"</a>";
 
 %>
 

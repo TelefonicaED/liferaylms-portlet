@@ -14,7 +14,7 @@
 	backUrl.setParameter("jspPage", "/html/surveyactivity/admin/editquestions.jsp");
 	backUrl.setParameter("actionEditingDetails",StringPool.TRUE);
 	request.setAttribute("backUrl", backUrl.toString());
-	String urlExample = "<a href=\"/"+ClpSerializer.getServletContextName()+"/html/surveyactivity/examples/document.csv\">"+LanguageUtil.get(themeDisplay.getLocale(),"example")+"</a>";
+	String urlExample = "<a href=\"/"+ClpSerializer.getServletContextName()+"/html/surveyactivity/examples/ImportSurveyQuestions.csv\">"+LanguageUtil.get(themeDisplay.getLocale(),"example")+"</a>";
 
 %>
 <liferay-util:include page="/html/surveyactivity/admin/editHeader.jsp" servletContext="<%=this.getServletContext() %>" />
