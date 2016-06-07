@@ -280,6 +280,11 @@ public class CourseResultLocalServiceWrapper implements CourseResultLocalService
 		return _courseResultLocalService.countByCourseId(courseId, passed);
 	}
 
+	public long countByUserId(long userId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _courseResultLocalService.countByUserId(userId);
+	}
+
 	public long countStudentsByCourseId(com.liferay.lms.model.Course course,
 		boolean passed)
 		throws com.liferay.portal.kernel.exception.SystemException {

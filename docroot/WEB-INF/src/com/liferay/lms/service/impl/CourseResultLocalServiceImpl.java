@@ -35,6 +35,7 @@ import com.liferay.lms.service.ClpSerializer;
 import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.lms.service.CourseResultLocalServiceUtil;
 import com.liferay.lms.service.base.CourseResultLocalServiceBaseImpl;
+import com.liferay.lms.service.persistence.CourseResultUtil;
 import com.liferay.portal.kernel.bean.PortletBeanLocatorUtil;
 import com.liferay.portal.kernel.dao.orm.Criterion;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
@@ -85,6 +86,10 @@ public class CourseResultLocalServiceImpl
 	
 	public long countByCourseId(long courseId, boolean passed) throws SystemException{
 		return courseResultPersistence.countByc(courseId, passed);
+	}
+	
+	public long countByUserId(long userId) throws SystemException{
+		return CourseResultUtil.countByUserId(userId);
 	}
 	
 	public long countStudentsByCourseId(Course course, boolean passed) throws SystemException{

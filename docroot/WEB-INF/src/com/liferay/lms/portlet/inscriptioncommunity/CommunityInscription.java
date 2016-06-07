@@ -177,16 +177,19 @@ public class CommunityInscription extends MVCPortlet {
 		//		course.getCourseId(), themeDisplay.getUserId(), AuditConstants.REGISTER, null);
 		SocialActivityLocalServiceUtil.addActivity(userId, course.getGroupId(), Course.class.getName(), course.getCourseId(), com.liferay.portlet.social.model.SocialActivityConstants.TYPE_SUBSCRIBE, "", course.getUserId());
 		// Informamos que se ha inscrito.
-		Date hoy = new Date();
-		String userName = ""+userId;
-		String groupName = ""+groupId[0];
-		try {
-			userName = userId + "[" + UserLocalServiceUtil.getUser(userId).getFullName() + "]";
-			groupName = groupId[0] + "[" + GroupLocalServiceUtil.getGroup(groupId[0]).getName() + "]";
+		if(log.isDebugEnabled()){
+			Date hoy = new Date();
+			String userName = ""+userId;
+			String groupName = ""+groupId[0];
+			try {
+				userName = userId + "[" + UserLocalServiceUtil.getUser(userId).getFullName() + "]";
+				groupName = groupId[0] + "[" + GroupLocalServiceUtil.getGroup(groupId[0]).getName() + "]";
+			}
+			catch (Exception e) {}
+	    	log.debug("INSCRIBIR: "+userName +" se ha incrito de la comunidad "+groupName+" el "+hoy.toString());
+	    	
 		}
-		catch (Exception e) {}
-    	if(log.isDebugEnabled())log.debug("INSCRIBIR: "+userName +" se ha incrito de la comunidad "+groupName+" el "+hoy.toString());
-    	
+		
 	}
 	
 	public void desinscribir(ActionRequest request, ActionResponse response) throws Exception{

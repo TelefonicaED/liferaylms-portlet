@@ -255,6 +255,9 @@ public interface CourseResultLocalService extends BaseLocalService,
 	public long countByCourseId(long courseId, boolean passed)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
+	public long countByUserId(long userId)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
 	public long countStudentsByCourseId(com.liferay.lms.model.Course course,
 		boolean passed)
 		throws com.liferay.portal.kernel.exception.SystemException;

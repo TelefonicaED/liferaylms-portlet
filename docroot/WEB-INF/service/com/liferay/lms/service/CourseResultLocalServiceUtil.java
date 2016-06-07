@@ -287,6 +287,11 @@ public class CourseResultLocalServiceUtil {
 		return getService().countByCourseId(courseId, passed);
 	}
 
+	public static long countByUserId(long userId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().countByUserId(userId);
+	}
+
 	public static long countStudentsByCourseId(
 		com.liferay.lms.model.Course course, boolean passed)
 		throws com.liferay.portal.kernel.exception.SystemException {
