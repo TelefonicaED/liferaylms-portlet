@@ -91,36 +91,36 @@ import com.tls.lms.util.LiferaylmsUtil;
  * Portlet implementation class SurveyActivity
  */
 public class SurveyActivity extends MVCPortlet {
-	
+
 	HashMap<Long, TestAnswer> answersMap = new HashMap<Long, TestAnswer>(); 
 	static final Pattern DOCUMENT_EXCEPTION_MATCHER = Pattern.compile("Error on line (\\d+) of document ([^ ]+) : (.*)");
 	private static Log log = LogFactoryUtil.getLog(SurveyActivity.class);
-	
+
 	public void saveSurvey(ActionRequest actionRequest, ActionResponse actionResponse) throws Exception {
-		
+
 		//com.liferay.lms.model.SurveyActivity surveyActivity = null;
-		
+
 		//SurveyActivityLocalServiceUtil.addSurveyActivity(surveyActivity);
 	}
-		
+
 	public void correct(ActionRequest actionRequest,ActionResponse actionResponse)throws Exception {		
 
 		int score = 100;
 		long latId=ParamUtil.getLong(actionRequest,"latId" );
 		long actId=ParamUtil.getLong(actionRequest,"actId",0 );
-		
+
 		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
-		
+
 		Enumeration<String> params=actionRequest.getParameterNames();
 		java.util.Hashtable<TestQuestion, TestAnswer> resultados=new java.util.Hashtable<TestQuestion, TestAnswer>();
 		java.util.Hashtable<TestQuestion, String> respuestaLibre = new java.util.Hashtable<TestQuestion, String>();
-		
+
 		LearningActivityTry larntry=LearningActivityTryLocalServiceUtil.getLearningActivityTry(latId);
 
 		//Comprobar si el usuario se dejo alguna encuesta abierta
 		if (larntry.getEndDate() == null )
 		{
-		    while(params.hasMoreElements())
+			while(params.hasMoreElements())
 			{
 				String param=params.nextElement();
 				if(param.startsWith("question_"))
@@ -129,7 +129,7 @@ public class SurveyActivity extends MVCPortlet {
 					long questionId=Long.parseLong(squestionId);
 					new TestQuestionLocalServiceUtil();
 					TestQuestion question=TestQuestionLocalServiceUtil.getTestQuestion(questionId);
-					
+
 					// Preparamos para guardar respuesta del usuario
 					SurveyResult surveyResult = SurveyResultLocalServiceUtil.createSurveyResult(CounterLocalServiceUtil.increment(SurveyResult.class.getName()));
 					String respuesta = actionRequest.getParameter(param);
@@ -137,8 +137,13 @@ public class SurveyActivity extends MVCPortlet {
 					if(testAnswerList != null && testAnswerList.size() > 0 ){
 						for( TestAnswer t : testAnswerList){
 							if( respuesta.equalsIgnoreCase(String.valueOf(t.getAnswerId()))){
-								String textoRespuesta = t.getAnswer();
-								respuesta = textoRespuesta.substring(textoRespuesta.indexOf(">") + 1, textoRespuesta.indexOf("</"));
+								String textoRespuesta = t.getAnswer();								
+								try{
+									respuesta = textoRespuesta.substring(textoRespuesta.indexOf(">") + 1, textoRespuesta.indexOf("</"));
+								}catch(Exception e){
+									log.error(e.getMessage());
+									respuesta = textoRespuesta;
+								}
 								resultados.put(question, t);						
 								//Guardar la encuesta para las estadisticas.
 								surveyResult.setActId(actId);
@@ -149,9 +154,9 @@ public class SurveyActivity extends MVCPortlet {
 								surveyResult.setFreeAnswer(respuesta);
 								SurveyResultLocalServiceUtil.updateSurveyResult(surveyResult, true);
 								break;
-								}
 							}
-						} else {
+						}
+					} else {
 						surveyResult.setActId(actId);
 						surveyResult.setLatId(latId);
 						surveyResult.setQuestionId(questionId);
@@ -163,7 +168,7 @@ public class SurveyActivity extends MVCPortlet {
 					}
 				}
 			}
-			
+
 			//Crear xml para guardar las respuestas
 			Element resultadosXML=SAXReaderUtil.createElement("results");
 			Document resultadosXMLDoc=SAXReaderUtil.createDocument(resultadosXML);
@@ -192,7 +197,7 @@ public class SurveyActivity extends MVCPortlet {
 			}
 			//Guardar los resultados
 			//LearningActivityTry larntry=LearningActivityTryLocalServiceUtil.getLearningActivityTry(latId);
-			
+
 			larntry.setResult(score);
 			larntry.setTryResultData(resultadosXMLDoc.formattedString());
 			larntry.setEndDate(new java.util.Date(System.currentTimeMillis()));
@@ -200,11 +205,11 @@ public class SurveyActivity extends MVCPortlet {
 		}
 		actionResponse.setRenderParameters(actionRequest.getParameterMap());
 		actionRequest.setAttribute("resultados", resultados);
-		
+
 		actionResponse.setRenderParameter("jspPage", "/html/surveyactivity/view.jsp");
-		
+
 	}
-	
+
 	public void edit(ActionRequest actionRequest,ActionResponse actionResponse)throws Exception {
 
 		actionResponse.setRenderParameters(actionRequest.getParameterMap());
@@ -213,29 +218,29 @@ public class SurveyActivity extends MVCPortlet {
 			actionResponse.setRenderParameter("jspPage", "/html/surveyactivity/view.jsp");
 		}
 	}
-	
+
 	public void addquestion(ActionRequest actionRequest, ActionResponse actionResponse)
 			throws Exception {
 		System.out.println("addquestion");
 		long actid = ParamUtil.getLong(actionRequest, "resId");
-	
+
 		String text = ParamUtil.getString(actionRequest, "text");
 		long questionType = ParamUtil.getLong(actionRequest, "qtype");
-		
+
 		TestQuestion question = TestQuestionLocalServiceUtil.addQuestion(actid, text, questionType);
 		LearningActivity learnact = LearningActivityLocalServiceUtil.getLearningActivity(actid);
-		
+
 		actionResponse.setRenderParameter("questionId", Long.toString(question.getQuestionId()));
 		actionResponse.setRenderParameter("actionEditingDetails", StringPool.TRUE);
 		actionResponse.setRenderParameter("resId", Long.toString(actid));
 		actionResponse.setRenderParameter("jspPage", "/html/surveyactivity/admin/editquestion.jsp");
-		
+
 		actionRequest.setAttribute("activity", learnact);
 		actionRequest.setAttribute("questionId", question.getQuestionId());
-		
+
 		actionRequest.setAttribute("primKey", question.getQuestionId());
 	}
-	
+
 	public void editquestion(ActionRequest actionRequest, ActionResponse actionResponse) throws Exception {
 		ThemeDisplay themeDisplay = (ThemeDisplay) actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
 
@@ -245,15 +250,15 @@ public class SurveyActivity extends MVCPortlet {
 		String text = ParamUtil.getString(actionRequest, "text","");
 		long questionType = ParamUtil.getLong(actionRequest, "qtype",0);
 		long questionId = ParamUtil.getLong(actionRequest, "questionId",0);
-		
+
 		if(isHorizontal){
 			SurveyHorizontalOptionsQuestionType horizontalType = new SurveyHorizontalOptionsQuestionType();
 			questionType = horizontalType.getTypeId();
-		}else if (questionType != 2){ //Sólo para las de tipo "option"
+		}else if (questionType != 2){ //Sï¿½lo para las de tipo "option"
 			SurveyOptionsQuestionType verticalType = new SurveyOptionsQuestionType();
 			questionType = verticalType.getTypeId();
 		}
-		
+
 		TestQuestion question;
 		if(questionId == 0){//Nueva pregunta
 			question = TestQuestionLocalServiceUtil.addQuestion(actId, text, questionType);
@@ -261,10 +266,10 @@ public class SurveyActivity extends MVCPortlet {
 		}else{
 			question= TestQuestionLocalServiceUtil.getTestQuestion(questionId);
 		}
-		
+
 		question.setQuestionType(questionType);
 		question.setText(text);
-		
+
 		if(question!=null){
 			questionId = question.getQuestionId();
 			//Obtengo un array con los ids de las respuestas que ya contenia la pregunta
@@ -314,34 +319,34 @@ public class SurveyActivity extends MVCPortlet {
 					}
 				}else TestAnswerLocalServiceUtil.deleteTestAnswer(existingAnswerId);
 			}
-			
+
 			actionResponse.setRenderParameter("message", LanguageUtil.get(themeDisplay.getLocale(), "execativity.editquestions.editquestion"));
 		}
 
-		
+
 		question = TestQuestionLocalServiceUtil.updateTestQuestion(question);
 		SessionMessages.add(actionRequest, "question-modified-successfully");
-		
+
 
 		actionResponse.setRenderParameter("questionId", Long.toString(questionId));
 		actionResponse.setRenderParameter("actionEditingDetails", StringPool.TRUE);
 		actionResponse.setRenderParameter("resId", Long.toString(question.getActId()));
 		actionResponse.setRenderParameter("typeId", Long.toString(questionType));
 
-		
+
 		actionResponse.setRenderParameter("jspPage", "/html/surveyactivity/admin/editquestion.jsp");
 	}
-	
+
 	public void deleteanswer(ActionRequest actionRequest, ActionResponse actionResponse)
 			throws Exception {
-		
+
 		TestAnswer answer = TestAnswerLocalServiceUtil.getTestAnswer(ParamUtil.getLong(actionRequest, "answerId"));
 		TestAnswerLocalServiceUtil.deleteTestAnswer(ParamUtil.getLong(actionRequest, "answerId"));
 		SessionMessages.add(actionRequest, "answer-deleted-successfully");
 		actionResponse.setRenderParameter("questionId", Long.toString(answer.getQuestionId()));
 		actionResponse.setRenderParameter("actionEditingDetails", StringPool.TRUE);
 		actionResponse.setRenderParameter("resId", Long.toString(TestQuestionLocalServiceUtil.getTestQuestion(answer.getQuestionId()).getActId()));
-	
+
 		actionResponse.setRenderParameter("jspPage", "/html/surveyactivity/admin/editquestion.jsp");
 	}
 
@@ -354,7 +359,7 @@ public class SurveyActivity extends MVCPortlet {
 		boolean correct = ParamUtil.getBoolean(actionRequest, "correct");
 		String feedbackCorrect = ParamUtil.getString(actionRequest, "feedbackCorrect", "");
 		String feedbackNoCorrect = ParamUtil.getString(actionRequest, "feedbackCorrect", "");
-	
+
 		if(Validator.isNull(answers)) {
 			SessionErrors.add(actionRequest, "answer-test-required");
 		}
@@ -362,23 +367,23 @@ public class SurveyActivity extends MVCPortlet {
 			TestAnswerLocalServiceUtil.addTestAnswer(questionId, answers, feedbackCorrect, feedbackNoCorrect, correct);
 			SessionMessages.add(actionRequest, "answer-added-successfully");
 		}
-		
+
 		actionResponse.setRenderParameter("questionId", Long.toString(questionId));
 		actionResponse.setRenderParameter("actionEditingDetails", StringPool.TRUE);
 		actionResponse.setRenderParameter("resId", Long.toString(TestQuestionLocalServiceUtil.getTestQuestion(questionId).getActId()));
 
 		actionResponse.setRenderParameter("jspPage", "/html/surveyactivity/admin/editquestion.jsp");
 	}
-	
+
 	public void importSurveyQuestions(ActionRequest actionRequest, ActionResponse actionResponse) throws PortletException, IOException {
-		
+
 		UploadPortletRequest uploadRequest = PortalUtil.getUploadPortletRequest(actionRequest);
 		long actId = ParamUtil.getLong(actionRequest, "resId",0);
-		
+
 		String fileName = uploadRequest.getFileName("fileName");
-		
+
 		InputStream csvFile = uploadRequest.getFileAsStream("fileName");
-		
+
 		if(fileName==null || StringPool.BLANK.equals(fileName)){
 			SessionErrors.add(actionRequest, "surveyactivity.csverror.fileRequired");
 			actionResponse.setRenderParameter("jspPage", "/html/surveyactivity/admin/importquestions.jsp");
@@ -397,17 +402,17 @@ public class SurveyActivity extends MVCPortlet {
 					int line = 0;
 					String questionText="";
 					String[] currLine; 
-					
+
 					/*Cosas de Miguel*/
 					byte[] buf = new byte[16384];
 					String type = LiferaylmsUtil.getEncodingTypeOfFile(buf, 0, csvFile.read(buf));
 					csvFile.reset();
 					/*Cosas de Miguel*/		
-					
+
 					if (type.equals(LiferaylmsUtil.CHARSET_UTF_8) ||
-						type.equals(LiferaylmsUtil.CHARSET_UTF_16LE)|| 
-						type.equals(LiferaylmsUtil.CHARSET_UTF_32BE)|| 
-						type.equals(LiferaylmsUtil.CHARSET_UTF_32LE)) {
+							type.equals(LiferaylmsUtil.CHARSET_UTF_16LE)|| 
+							type.equals(LiferaylmsUtil.CHARSET_UTF_32BE)|| 
+							type.equals(LiferaylmsUtil.CHARSET_UTF_32LE)) {
 						//System.out.println("UTF-8");
 						reader = new CSVReader(new InputStreamReader(csvFile, StringPool.UTF8),CharPool.SEMICOLON);
 
@@ -421,71 +426,71 @@ public class SurveyActivity extends MVCPortlet {
 							line++; 
 							continue; 
 						}
-						
+
 						boolean correct = true;
 						line++;
-						
+
 						if (currLine.length == 3) {
-						try{
-							
-							//Recogemos pregunta y tipo
-							Long typeId = new Long(2);
-							
-							if( currLine[0].trim().equalsIgnoreCase("") || 
-								currLine[1].trim().equalsIgnoreCase("")) {
-								SessionErrors.add(actionRequest, "surveyactivity.csvError.bad-question",line);
-								correct=false;
-								allCorrect=false;
-							}else{
-								questionText= currLine[0].trim();
-								typeId= Long.parseLong(currLine[1].trim());
-							}
-							
-							//Recogemos respuestas
-							String allAnswers = currLine[2].trim();
-							String[] answers = allAnswers.split("\\|");
-							
-							for(String a:answers){
-								//Si no es de tipo "freeText" (typeId=2), no puede ir vacía
-								if(a.equalsIgnoreCase("") && typeId != 2){
-									SessionErrors.add(actionRequest, "surveyactivity.csvError.bad-answer",line);
+							try{
+
+								//Recogemos pregunta y tipo
+								Long typeId = new Long(2);
+
+								if( currLine[0].trim().equalsIgnoreCase("") || 
+										currLine[1].trim().equalsIgnoreCase("")) {
+									SessionErrors.add(actionRequest, "surveyactivity.csvError.bad-question",line);
 									correct=false;
 									allCorrect=false;
-									break;
+								}else{
+									questionText= currLine[0].trim();
+									typeId= Long.parseLong(currLine[1].trim());
 								}
-							}
-							
-							if(correct){
-								TestQuestion q= TestQuestionLocalServiceUtil.addQuestion(actId, questionText, typeId);
+
+								//Recogemos respuestas
+								String allAnswers = currLine[2].trim();
+								String[] answers = allAnswers.split("\\|");
+
 								for(String a:answers){
-									if(!a.equalsIgnoreCase("")){
-										TestAnswerLocalServiceUtil.addTestAnswer(q.getQuestionId(), a, "", "",false);
+									//Si no es de tipo "freeText" (typeId=2), no puede ir vacï¿½a
+									if(a.equalsIgnoreCase("") && typeId != 2){
+										SessionErrors.add(actionRequest, "surveyactivity.csvError.bad-answer",line);
+										correct=false;
+										allCorrect=false;
+										break;
 									}
 								}
-							}
-							} catch (PortalException e1) {
-									e1.printStackTrace();
-									SessionErrors.add(actionRequest, "surveyactivity.csvError.bad-answer",line);
-									actionResponse.setRenderParameter("jspPage", "/html/surveyactivity/admin/importquestions.jsp");
-									allCorrect=false;
-								} catch (SystemException e1) {
-									SessionErrors.add(actionRequest, "surveyactivity.csvError.bad-question",line);
-									actionResponse.setRenderParameter("jspPage", "/html/surveyactivity/admin/importquestions.jsp");
-									allCorrect=false;
+
+								if(correct){
+									TestQuestion q= TestQuestionLocalServiceUtil.addQuestion(actId, questionText, typeId);
+									for(String a:answers){
+										if(!a.equalsIgnoreCase("")){
+											TestAnswerLocalServiceUtil.addTestAnswer(q.getQuestionId(), a, "", "",false);
+										}
+									}
 								}
-						questionText = "";
-						} else {
-								SessionErrors.add(actionRequest, "surveyactivity.csvError.bad-format-line",line);
+							} catch (PortalException e1) {
+								e1.printStackTrace();
+								SessionErrors.add(actionRequest, "surveyactivity.csvError.bad-answer",line);
 								actionResponse.setRenderParameter("jspPage", "/html/surveyactivity/admin/importquestions.jsp");
 								allCorrect=false;
+							} catch (SystemException e1) {
+								SessionErrors.add(actionRequest, "surveyactivity.csvError.bad-question",line);
+								actionResponse.setRenderParameter("jspPage", "/html/surveyactivity/admin/importquestions.jsp");
+								allCorrect=false;
+							}
+							questionText = "";
+						} else {
+							SessionErrors.add(actionRequest, "surveyactivity.csvError.bad-format-line",line);
+							actionResponse.setRenderParameter("jspPage", "/html/surveyactivity/admin/importquestions.jsp");
+							allCorrect=false;
 						}
 					}//while
-					
+
 					if(allCorrect){
 						actionResponse.setRenderParameter("jspPage", "/html/surveyactivity/admin/editquestions.jsp");
 						SessionMessages.add(actionRequest, "questions-added-successfully");
 					}
-	
+
 				} catch (FileNotFoundException e) {
 					SessionErrors.add(actionRequest, "surveyactivity.csvError.empty-file");
 					actionResponse.setRenderParameter("jspPage", "/html/surveyactivity/admin/importquestions.jsp");
@@ -502,7 +507,7 @@ public class SurveyActivity extends MVCPortlet {
 		actionResponse.setRenderParameter("actionEditingDetails", StringPool.TRUE);
 		actionResponse.setRenderParameter("resId", Long.toString(actId));
 	}
-	
+
 	public void importQuestionsXml(ActionRequest actionRequest, ActionResponse actionResponse)
 			throws Exception {
 
@@ -550,7 +555,7 @@ public class SurveyActivity extends MVCPortlet {
 		actionResponse.setRenderParameter("actionEditingDetails", StringPool.TRUE);
 		actionResponse.setRenderParameter("resId", Long.toString(actId));	
 	}
-		
+
 	public void editanswer(ActionRequest actionRequest, ActionResponse actionResponse)
 			throws Exception {
 		System.out.println("editanswer");
@@ -559,9 +564,9 @@ public class SurveyActivity extends MVCPortlet {
 		boolean correct = ParamUtil.getBoolean(actionRequest, "correct");
 		String feedbackCorrect = ParamUtil.getString(actionRequest, "feedbackCorrect", "");
 		String feedbackNoCorrect = ParamUtil.getString(actionRequest, "feedbackCorrect", "");
-	
+
 		TestAnswer testanswer = TestAnswerLocalServiceUtil.getTestAnswer(answerId);
-		
+
 		if(Validator.isNull(answer)) {
 			SessionErrors.add(actionRequest, "answer-test-required_"+answerId);
 		}
@@ -570,23 +575,23 @@ public class SurveyActivity extends MVCPortlet {
 			testanswer.setIsCorrect(correct);
 			testanswer.setFeedbackCorrect(feedbackCorrect);
 			testanswer.setFeedbacknocorrect(feedbackNoCorrect);
-			
+
 			TestAnswerLocalServiceUtil.updateTestAnswer(testanswer);
 			SessionMessages.add(actionRequest, "answer-added-successfully");
 		}
-		
+
 		actionResponse.setRenderParameter("questionId", Long.toString(testanswer.getQuestionId()));
 		actionResponse.setRenderParameter("actionEditingDetails", StringPool.TRUE);
 		actionResponse.setRenderParameter("resId", Long.toString(TestQuestionLocalServiceUtil.getTestQuestion(testanswer.getQuestionId()).getActId()));
 		actionResponse.setRenderParameter("jspPage", "/html/surveyactivity/admin/editquestion.jsp");
 	}
-	
+
 	public void deletequestion(ActionRequest actionRequest, ActionResponse actionResponse)
-		throws Exception {
-	
+			throws Exception {
+
 		TestQuestion question = TestQuestionLocalServiceUtil.getTestQuestion(ParamUtil.getLong(actionRequest, "questionId"));
 		TestQuestionLocalServiceUtil.deleteTestQuestion(ParamUtil.getLong(actionRequest, "questionId"));
-	
+
 		SessionMessages.add(actionRequest, "question-deleted-successfully");
 		String backUrl = ParamUtil.get(actionRequest, "backUrl", "");
 		if (Validator.isNotNull(backUrl)) {
@@ -597,7 +602,7 @@ public class SurveyActivity extends MVCPortlet {
 			actionResponse.setRenderParameter("jspPage", "/html/surveyactivity/admin/edit.jsp");
 		}
 	}
-	
+
 	public void editactivity(ActionRequest actionRequest, ActionResponse actionResponse) throws PortalException, SystemException, Exception {
 		long actId = ParamUtil.getInteger(actionRequest, "resId");
 		AssetRendererFactory laf = AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(LearningActivity.class.getName());
@@ -609,45 +614,45 @@ public class SurveyActivity extends MVCPortlet {
 		}
 		SessionMessages.add(actionRequest, "asset-renderer-not-defined");
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public void moveQuestion(ActionRequest actionRequest, ActionResponse actionResponse) throws Exception {
-		
+
 		ThemeDisplay themeDisplay = (ThemeDisplay) actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
 		PermissionChecker permissionChecker=themeDisplay.getPermissionChecker();
-		
+
 		long questionId = ParamUtil.getLong(actionRequest, "pageId"),
-		     prevQuestionId = ParamUtil.getLong(actionRequest, "prevPageId"),
-		     nextQuestionId = ParamUtil.getLong(actionRequest, "nextPageId");
+				prevQuestionId = ParamUtil.getLong(actionRequest, "prevPageId"),
+				nextQuestionId = ParamUtil.getLong(actionRequest, "nextPageId");
 		TestQuestion question = TestQuestionLocalServiceUtil.getTestQuestion(questionId);
 		if(questionId>0){
 			if(permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), LearningActivity.class.getName(), questionId, ActionKeys.UPDATE)){
 				TestQuestionLocalServiceUtil.moveQuestion(questionId, prevQuestionId, nextQuestionId);
 			}
 		}
-		
+
 		String orderByCol = ParamUtil.getString(actionRequest, "orderByCol");
-        if(orderByCol==null || orderByCol=="")
-            orderByCol = "weight";
-        actionRequest.setAttribute("orderByCol", orderByCol);
-        //Create an instance of BeanComparator telling it wich is the order column
-        //Get the type of ordering, asc or desc
-        String orderByType = ParamUtil.getString(actionRequest, "orderByType");
-        	if(orderByType==null || orderByType=="")
-        		orderByType = "asc";
-        	actionRequest.setAttribute("orderByType", orderByType);
-        	TestQuestion questions = TestQuestionLocalServiceUtil.getTestQuestion(questionId);
-        	List<TestQuestion> listaAux = TestQuestionLocalServiceUtil.getQuestions(questions.getActId());
-        	List<TestQuestion> listaTotal = new LinkedList<TestQuestion>();
-        	listaTotal = ListUtil.copy(listaAux);
-        	//Sort
-            BeanComparator beanComparator = new BeanComparator(orderByCol);
-        	if(orderByType.equals("asc")){
-        		Collections.sort(listaTotal, beanComparator);
-			 } 
-        	else {
-        		Collections.sort(listaTotal, Collections.reverseOrder(beanComparator));
-			 }
+		if(orderByCol==null || orderByCol=="")
+			orderByCol = "weight";
+		actionRequest.setAttribute("orderByCol", orderByCol);
+		//Create an instance of BeanComparator telling it wich is the order column
+		//Get the type of ordering, asc or desc
+		String orderByType = ParamUtil.getString(actionRequest, "orderByType");
+		if(orderByType==null || orderByType=="")
+			orderByType = "asc";
+		actionRequest.setAttribute("orderByType", orderByType);
+		TestQuestion questions = TestQuestionLocalServiceUtil.getTestQuestion(questionId);
+		List<TestQuestion> listaAux = TestQuestionLocalServiceUtil.getQuestions(questions.getActId());
+		List<TestQuestion> listaTotal = new LinkedList<TestQuestion>();
+		listaTotal = ListUtil.copy(listaAux);
+		//Sort
+		BeanComparator beanComparator = new BeanComparator(orderByCol);
+		if(orderByType.equals("asc")){
+			Collections.sort(listaTotal, beanComparator);
+		} 
+		else {
+			Collections.sort(listaTotal, Collections.reverseOrder(beanComparator));
+		}
 		//Return the orderer list
 		actionRequest.setAttribute("total", listaTotal.size());
 		actionRequest.setAttribute("listaAux", listaTotal);
@@ -655,98 +660,98 @@ public class SurveyActivity extends MVCPortlet {
 		actionResponse.setRenderParameter("resId", Long.toString(question.getActId()));
 		actionResponse.setRenderParameter("jsp", "/html/surveyactivity/admin/orderQuestions.jsp");
 	}
-	
+
 	public void upquestion(ActionRequest actionRequest, ActionResponse actionResponse)
 			throws Exception {
-			ThemeDisplay themeDisplay = (ThemeDisplay) actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
-				
-				PermissionChecker permissionChecker=themeDisplay.getPermissionChecker();
-				
-				long actId = ParamUtil.getLong(actionRequest, "actId",0);
-				long testQuestionId = ParamUtil.getLong(actionRequest, "questionId");
-				
-				if(actId>0)
-				{	
-					LearningActivity larn = LearningActivityLocalServiceUtil.getLearningActivity(actId);
-				
-					if(permissionChecker.hasPermission(larn.getGroupId(), LearningActivity.class.getName(), larn.getActId(),
-							ActionKeys.UPDATE)|| permissionChecker.hasOwnerPermission(larn.getCompanyId(), LearningActivity.class.getName(), larn.getActId(),larn.getUserId(),
-									ActionKeys.UPDATE))
-					{
-					TestQuestionLocalServiceUtil.goUpTestQuestion(testQuestionId);
-					}
-				}
+		ThemeDisplay themeDisplay = (ThemeDisplay) actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
+
+		PermissionChecker permissionChecker=themeDisplay.getPermissionChecker();
+
+		long actId = ParamUtil.getLong(actionRequest, "actId",0);
+		long testQuestionId = ParamUtil.getLong(actionRequest, "questionId");
+
+		if(actId>0)
+		{	
+			LearningActivity larn = LearningActivityLocalServiceUtil.getLearningActivity(actId);
+
+			if(permissionChecker.hasPermission(larn.getGroupId(), LearningActivity.class.getName(), larn.getActId(),
+					ActionKeys.UPDATE)|| permissionChecker.hasOwnerPermission(larn.getCompanyId(), LearningActivity.class.getName(), larn.getActId(),larn.getUserId(),
+							ActionKeys.UPDATE))
+			{
+				TestQuestionLocalServiceUtil.goUpTestQuestion(testQuestionId);
 			}
-			
-			public void downquestion(ActionRequest actionRequest, ActionResponse actionResponse)
+		}
+	}
+
+	public void downquestion(ActionRequest actionRequest, ActionResponse actionResponse)
 			throws Exception {
-			ThemeDisplay themeDisplay = (ThemeDisplay) actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
-				
-				PermissionChecker permissionChecker=themeDisplay.getPermissionChecker();
-				
-				long actId = ParamUtil.getLong(actionRequest, "actId",0);
-				long testQuestionId = ParamUtil.getLong(actionRequest, "questionId");
-			
-				if(actId>0)
-				{
-					LearningActivity larn = LearningActivityLocalServiceUtil.getLearningActivity(actId);
-					
-					if(permissionChecker.hasPermission(larn.getGroupId(), LearningActivity.class.getName(), larn.getActId(),
-							ActionKeys.UPDATE)|| permissionChecker.hasOwnerPermission(larn.getCompanyId(), LearningActivity.class.getName(), larn.getActId(),larn.getUserId(),
-									ActionKeys.UPDATE))
-					{
-						TestQuestionLocalServiceUtil.goDownTestQuestion(testQuestionId);
-					}
-				}
+		ThemeDisplay themeDisplay = (ThemeDisplay) actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
+
+		PermissionChecker permissionChecker=themeDisplay.getPermissionChecker();
+
+		long actId = ParamUtil.getLong(actionRequest, "actId",0);
+		long testQuestionId = ParamUtil.getLong(actionRequest, "questionId");
+
+		if(actId>0)
+		{
+			LearningActivity larn = LearningActivityLocalServiceUtil.getLearningActivity(actId);
+
+			if(permissionChecker.hasPermission(larn.getGroupId(), LearningActivity.class.getName(), larn.getActId(),
+					ActionKeys.UPDATE)|| permissionChecker.hasOwnerPermission(larn.getCompanyId(), LearningActivity.class.getName(), larn.getActId(),larn.getUserId(),
+							ActionKeys.UPDATE))
+			{
+				TestQuestionLocalServiceUtil.goDownTestQuestion(testQuestionId);
 			}
-	
+		}
+	}
+
 	@Override
 	public void render(RenderRequest renderRequest, RenderResponse renderResponse)
 			throws PortletException, IOException {
 		long actId=0;
-		
+
 		if(ParamUtil.getBoolean(renderRequest, "actionEditingDetails", false)){
-			
+
 			actId=ParamUtil.getLong(renderRequest, "resId", 0);
 			renderResponse.setProperty("clear-request-parameters",Boolean.TRUE.toString());
 		}
 		else{
 			actId=ParamUtil.getLong(renderRequest, "actId", 0);
 		}
-					
+
 		if(actId==0)// TODO Auto-generated method stub
 		{
 			renderRequest.setAttribute(WebKeys.PORTLET_CONFIGURATOR_VISIBILITY, Boolean.FALSE);
 		}
 		else
 		{
-				LearningActivity activity;
-				try {
-					activity = LearningActivityLocalServiceUtil.getLearningActivity(actId);
+			LearningActivity activity;
+			try {
+				activity = LearningActivityLocalServiceUtil.getLearningActivity(actId);
 
-				
-					long typeId=activity.getTypeId();
-					
-					if(typeId==4)
-					{
-						super.render(renderRequest, renderResponse);
-					}
-					else
-					{
-						renderRequest.setAttribute(WebKeys.PORTLET_CONFIGURATOR_VISIBILITY, Boolean.FALSE);
-					}
-				} catch (PortalException e) {
-				} catch (SystemException e) {
-				}			
+
+				long typeId=activity.getTypeId();
+
+				if(typeId==4)
+				{
+					super.render(renderRequest, renderResponse);
+				}
+				else
+				{
+					renderRequest.setAttribute(WebKeys.PORTLET_CONFIGURATOR_VISIBILITY, Boolean.FALSE);
+				}
+			} catch (PortalException e) {
+			} catch (SystemException e) {
+			}			
 		}
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public void  serveResource(ResourceRequest request, ResourceResponse response)throws PortletException, IOException {
 
 		String action = ParamUtil.getString(request, "action");
 		long actId = ParamUtil.getLong(request, "resId",0); 
-		
+
 		if(action.equals("export")){
 
 			try {
@@ -867,14 +872,14 @@ public class SurveyActivity extends MVCPortlet {
 				response.getPortletOutputStream().write(b);
 
 				CSVWriter writer = new CSVWriter(new OutputStreamWriter(response.getPortletOutputStream(),StringPool.UTF8),CharPool.SEMICOLON);
-				
+
 				String[] cabeceras = new String[3];
-				
+
 				//En las columnas extra ponemos la cabecera
 				cabeceras[0]="Pregunta";
 				cabeceras[1]="Tipo";
 				cabeceras[2]="Respuestas";
-				
+
 				writer.writeNext(cabeceras);
 
 				//Crear la cabecera con las preguntas.
@@ -885,33 +890,33 @@ public class SurveyActivity extends MVCPortlet {
 				questions = listaTotal;
 
 				for(TestQuestion question : questions){
-					
+
 					String[] resultados = new String[3];
-					
+
 					List<TestAnswer> answers = TestAnswerLocalServiceUtil.getTestAnswersByQuestionId(question.getQuestionId());
-//					String[] answerTitles = new String[answers.size()];
-					
+					//					String[] answerTitles = new String[answers.size()];
+
 					resultados[0] = question.getText()
-										.replaceAll("&lt;", StringPool.LESS_THAN)
-										.replaceAll("&nbsp;", StringPool.SPACE);
+							.replaceAll("&lt;", StringPool.LESS_THAN)
+							.replaceAll("&nbsp;", StringPool.SPACE);
 					resultados[1] = String.valueOf(question.getQuestionType());
-					
+
 					StringBuilder strbld = new StringBuilder();
 
 					for(int i = 0; i < answers.size()-1; i++) {
 						strbld.append(answers.get(i).getAnswer() + separator);
-//						answerTitles[i] = answers.get(i).getAnswer();
-//						System.out.println(answerTitles[i]);
+						//						answerTitles[i] = answers.get(i).getAnswer();
+						//						System.out.println(answerTitles[i]);
 					}
-					
+
 					if (answers.size() > 0)	
 						strbld.append(answers.get(answers.size()-1).getAnswer());
-					
+
 					//resultados[1] = StringUtil.merge(answerTitles);
 					resultados[2] = strbld.toString()
-										.replaceAll("&lt;", StringPool.LESS_THAN)
-										.replaceAll("&nbsp;", StringPool.SPACE);
-					
+							.replaceAll("&lt;", StringPool.LESS_THAN)
+							.replaceAll("&nbsp;", StringPool.SPACE);
+
 					//Escribimos las respuestas obtenidas para el intento en el csv.
 					writer.writeNext(resultados);
 				}
@@ -933,23 +938,23 @@ public class SurveyActivity extends MVCPortlet {
 				PrintWriter printWriter = new PrintWriter(new OutputStreamWriter(response.getPortletOutputStream(),StringPool.UTF8));
 				Element quizXML=SAXReaderUtil.createElement("quiz");
 				Document quizXMLDoc=SAXReaderUtil.createDocument(quizXML);
-				
+
 				List<TestQuestion> questiones=TestQuestionLocalServiceUtil.getQuestions(actId);
 				List<TestQuestion> questions = ListUtil.copy(questiones);
 				BeanComparator beanComparator = new BeanComparator("weight");
 				Collections.sort(questions, beanComparator);
-				
+
 				if(questions!=null &&questions.size()>0){
 					for(TestQuestion question:questions){
 						QuestionType qt =new QuestionTypeRegistry().getQuestionType(question.getQuestionType());
 						quizXML.add(qt.exportXML(question.getQuestionId()));
 					}
 				}
-				
+
 				printWriter.write(quizXMLDoc.formattedString());
 				printWriter.flush();
 				printWriter.close();
-			
+
 			}catch (SystemException e) {}
 			finally{
 				response.getPortletOutputStream().flush();
@@ -965,35 +970,35 @@ public class SurveyActivity extends MVCPortlet {
 			if(creatingThread){
 				uuid=null;
 			}
-				
+
 			if(filePath!=null){
 				File file = new File(filePath);
 				int length   = 0;			 
 				response.setContentType(ParamUtil.getString(request, "contentType"));
 				response.setContentLength((int)file.length());
-				
+
 				response.addProperty(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + fileName);
-				
+
 				OutputStream out = response.getPortletOutputStream();
-				
+
 				byte[] byteBuffer = new byte[4096];
-		        DataInputStream in = new DataInputStream(new FileInputStream(file));
-		        
-		        // reads the file's bytes and writes them to the response stream
-		        while ((in != null) && ((length = in.read(byteBuffer)) != -1)){
-		        	out.write(byteBuffer,0,length);
-		        }		
-				
+				DataInputStream in = new DataInputStream(new FileInputStream(file));
+
+				// reads the file's bytes and writes them to the response stream
+				while ((in != null) && ((length = in.read(byteBuffer)) != -1)){
+					out.write(byteBuffer,0,length);
+				}		
+
 				out.flush();
 				out.close();
 				in.close();
-				
+
 			}else{
 				JSONObject oreturned = JSONFactoryUtil.createJSONObject();
 				response.setContentType("application/json");
-				
+
 				if(Validator.isNotNull(uuid)){
-						
+
 					boolean finished = ExportSurveyStatisticsThreadMapper.hiloFinished(uuid);
 					oreturned.put("threadF", finished);
 					log.debug("- not finished");
@@ -1009,11 +1014,11 @@ public class SurveyActivity extends MVCPortlet {
 				}else{
 					String idHilo = UUID.randomUUID().toString();
 					log.debug("idHilo: " + idHilo);				
-							
+
 					ExportSurveyStatisticsContentThread hilo = new ExportSurveyStatisticsContentThread(actId, idHilo,  getPortletConfig(), themeDisplay.getLocale());
 					ExportSurveyStatisticsThreadMapper.addHilo(idHilo, hilo);
 					oreturned.put("UUID", idHilo);
-					
+
 				}	
 				oreturned.put("action", action);
 				PrintWriter out = response.getWriter();
@@ -1038,7 +1043,7 @@ public class SurveyActivity extends MVCPortlet {
 
 		return res;
 	}
-	
+
 	private Long getQuestionIdByAnswerId(Long answerId) throws PortalException, SystemException{
 		//Buscamos la respuesta en el hashmap, si no lo tenemos, lo obtenemos y lo guardamos.
 		if(!answersMap.containsKey(answerId))
@@ -1060,6 +1065,6 @@ public class SurveyActivity extends MVCPortlet {
 
 		return formatString(answersMap.get(answerId).getAnswer())+" ("+answersMap.get(answerId).getAnswerId()+")";
 	}
-	
+
 
 }

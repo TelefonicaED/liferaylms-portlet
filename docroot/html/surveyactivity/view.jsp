@@ -93,201 +93,199 @@ textarea {
 				<%
 				}
 				
+				boolean userPassed = LearningActivityResultLocalServiceUtil.userPassed(actId,themeDisplay.getUserId());
 				
-					if(LearningActivityResultLocalServiceUtil.userPassed(actId,themeDisplay.getUserId()))
-					{
-					%>
-						<h2 class="description-title"><liferay-ui:message key="surveyactivity.survey.done" /></h2>
-					<%
-					}
-					else
-					{
-						ServiceContext serviceContext = ServiceContextFactory.getInstance(LearningActivityTry.class.getName(), renderRequest);
-						
-						LearningActivityTry learningTry =LearningActivityTryLocalServiceUtil.createLearningActivityTry(actId,serviceContext);
-						List<TestQuestion> questiones=TestQuestionLocalServiceUtil.getQuestions(actId);
-						List<TestQuestion> questions = ListUtil.copy(questiones);
-						BeanComparator beanComparator = new BeanComparator("weight");
-						Collections.sort(questions, beanComparator);
-						
-					%>
-						<portlet:actionURL name="correct" var="correctURL">
-							<portlet:param name="actId" value="<%=Long.toString(actId) %>"></portlet:param>
-							<portlet:param name="latId" value="<%=Long.toString(learningTry.getLatId()) %>"></portlet:param>
-						</portlet:actionURL>
-																	
-						<script type="text/javascript">
-						<!--
-						Liferay.provide(
-						        window,
-						        '<portlet:namespace />questionValidation',
-						        function(question) {
-									var A = AUI();
-									var questionValidators = {
-										questiontype_options : function(question) {
-											return (question.all('div.answer input[type="radio"]:checked').size() > 0);
-										}
-									};
-									
-									var clases = question.getAttribute('class').split(" ");
-									var questiontypevalidator = '';
-									for ( var i = 0; i < clases.length; i++) {
-										var clase = clases[i];
-										if (clase.indexOf('questiontype_') == 0) {
-											questiontypevalidator = clase;
-											break;
-										}
+				if(userPassed){
+				%>
+					<h2 class="description-title"><liferay-ui:message key="surveyactivity.survey.done" /></h2>
+				<%}
+				
+				if(!userPassed || permissionChecker.hasPermission(activity.getGroupId(),LearningActivity.class.getName(), activity.getActId(), ActionKeys.UPDATE)){
+					ServiceContext serviceContext = ServiceContextFactory.getInstance(LearningActivityTry.class.getName(), renderRequest);
+					
+					LearningActivityTry learningTry =LearningActivityTryLocalServiceUtil.createLearningActivityTry(actId,serviceContext);
+					List<TestQuestion> questiones=TestQuestionLocalServiceUtil.getQuestions(actId);
+					List<TestQuestion> questions = ListUtil.copy(questiones);
+					BeanComparator beanComparator = new BeanComparator("weight");
+					Collections.sort(questions, beanComparator);
+					
+				%>
+					<portlet:actionURL name="correct" var="correctURL">
+						<portlet:param name="actId" value="<%=Long.toString(actId) %>"></portlet:param>
+						<portlet:param name="latId" value="<%=Long.toString(learningTry.getLatId()) %>"></portlet:param>
+					</portlet:actionURL>
+																
+					<script type="text/javascript">
+					<!--
+					Liferay.provide(
+					        window,
+					        '<portlet:namespace />questionValidation',
+					        function(question) {
+								var A = AUI();
+								var questionValidators = {
+									questiontype_options : function(question) {
+										return (question.all('div.answer input[type="radio"]:checked').size() > 0);
 									}
-									if (questionValidators[questiontypevalidator] != null) {
-										var resultado = questionValidators[questiontypevalidator](question);
-										return resultado;
-									} else {
-										return true;
-									}
-									
-						        },
-						        ['node', 'aui-dialog', 'event', 'node-event-simulate']
-						        );
-						
-						Liferay.provide(
-						        window,
-						        '<portlet:namespace />popConfirm',
-						        function(content, boton) {
-									var A = AUI();
+								};
 								
-									window.<portlet:namespace />confirmDialog = new A.Dialog(
-									    {
-									        title: '<liferay-ui:message key="execativity.test.questions.without.response"/>',
-									        bodyContent: content,
-									        buttons: [
-									                  {
-									                	  label: '<liferay-ui:message key="ok"/>',
-									                	  handler: function() {
-									                		  A.one('#<portlet:namespace/>formulario').detach('submit');
-									                		  if (!<%=isEvaluationSurvey%>)
-									                			 document.getElementById('<portlet:namespace/>formulario').submit();
-									                		  <portlet:namespace />confirmDialog.close();
-									                	  }
-									                  },
-									                  {
-									                	  label: '<liferay-ui:message key="cancel"/>',
-									                	  handler: function() {
-									                		  <portlet:namespace />confirmDialog.close();
-									                	  }
-									                  }
-									                  ],
-									        width: 'auto',
-									        height: 'auto',
-									        resizable: false,
-									        draggable: false,
-									        close: true,
-									        destroyOnClose: true,
-									        centered: true,
-									        modal: true
-									    }
-									).render();
-									
-						        },
-						        ['node', 'aui-dialog', 'event', 'node-event-simulate']
-						    );
-						
-						Liferay.provide(
-						        window,
-						        '<portlet:namespace/>formValidation',
-						function(e) {
-							var returnValue = true;
-							
-							var A = AUI();
-						    var questions = A.all('#<portlet:namespace/>formulario div.question');
-						    for (var i = 0; i < questions.size(); i++) {
-						    	var question = questions.item(i);
-						    	var validQuestion = <portlet:namespace />questionValidation(question);
-						    	if (typeof validQuestion == 'undefined') {
-						    		validQuestion = <portlet:namespace />questionValidation(question);
-						    	}
-						    	if (!validQuestion) {
-						    		returnValue = false;
-						    		break;
-						    	}
-							}
-							
-						    if (!returnValue) {
-						    	if (e.target) {
-						    		targ = e.target.blur();
-						    	} else if (e.srcElement) {
-						    		targ = e.srcElement.blur();
-						    	}
-						    	<%= renderResponse.getNamespace() %>popConfirm('<%=JavaScriptUtil.markupToStringLiteral(LanguageUtil.get(pageContext, "surveyactivity.survey.without.response.text")) %>', e.srcElement);
-				    		}
-						    
-							if (!returnValue && e.preventDefault) {
-								e.preventDefault();
-							}
-							return returnValue;
-						},
-						['node', 'aui-dialog', 'event', 'node-event-simulate']
-					);
-						//-->
-						</script>
-						
-						<aui:form name="formulario" action="<%=correctURL %>" method="POST">
-						<%
-						for(TestQuestion question:questions)
-						{
-							if( question.getQuestionType() != 7 && question.getQuestionType() != 2 ){
-						%>
-								<div class="question questiontype_options">
-								<div class="questiontext"><%=question.getText() %></div>
-								<%
-								List<TestAnswer> testAnswers= TestAnswerLocalServiceUtil.getTestAnswersByQuestionId(question.getQuestionId());
-								for(TestAnswer answer:testAnswers)
-								{
-								%>
-									<div class="answer"><aui:input id='<%="question_"+question.getQuestionId()%>' type="radio" name='<%="question_"+question.getQuestionId()%>' value="<%=answer.getAnswerId() %>" label="<%=answer.getAnswer() %>"/>
-									</div>
-								<%
+								var clases = question.getAttribute('class').split(" ");
+								var questiontypevalidator = '';
+								for ( var i = 0; i < clases.length; i++) {
+									var clase = clases[i];
+									if (clase.indexOf('questiontype_') == 0) {
+										questiontypevalidator = clase;
+										break;
+									}
 								}
-								%>
-								</div>
-								<%
-							} else if( question.getQuestionType() == 7) { %>
-								<div class="horizontalquestion">
-									<div class="question questiontype_options">
-										<div class="questiontext"><%=question.getText() %>
-											<%
-											List<TestAnswer> testAnswers= TestAnswerLocalServiceUtil.getTestAnswersByQuestionId(question.getQuestionId());
-											for(TestAnswer answer:testAnswers)
-											{
-											%>
-											<div class="answer"><aui:input id='<%="question_"+question.getQuestionId()%>' type="radio" name='<%="question_"+question.getQuestionId()%>'  value='<%=answer.getAnswerId() %>'  label="<%=answer.getAnswer() %>"/>
-											</div>
-											<%
-											}
-										%>
-										</div>
-									</div>
-								</div>
-							<% } else { // En este caso es texto libre %>
-								<div>
- 									<div class="questiontext"><%=question.getText() %></div> 
-									<div class="answer"><textarea rows="10" cols="100" maxlength="2000" name='<%="question_"+question.getQuestionId()%>'></textarea></div>
- 									<%--<div class="answer"><input type="text" name='<%="question_"+question.getQuestionId()%>'></input></div> --%>
-								</div>
-							<% }
+								if (questionValidators[questiontypevalidator] != null) {
+									var resultado = questionValidators[questiontypevalidator](question);
+									return resultado;
+								} else {
+									return true;
+								}
+								
+					        },
+					        ['node', 'aui-dialog', 'event', 'node-event-simulate']
+					        );
+					
+					Liferay.provide(
+					        window,
+					        '<portlet:namespace />popConfirm',
+					        function(content, boton) {
+								var A = AUI();
 							
+								window.<portlet:namespace />confirmDialog = new A.Dialog(
+								    {
+								        title: '<liferay-ui:message key="execativity.test.questions.without.response"/>',
+								        bodyContent: content,
+								        buttons: [
+								                  {
+								                	  label: '<liferay-ui:message key="ok"/>',
+								                	  handler: function() {
+								                		  A.one('#<portlet:namespace/>formulario').detach('submit');
+								                		  if (!<%=isEvaluationSurvey%>)
+								                			 document.getElementById('<portlet:namespace/>formulario').submit();
+								                		  <portlet:namespace />confirmDialog.close();
+								                	  }
+								                  },
+								                  {
+								                	  label: '<liferay-ui:message key="cancel"/>',
+								                	  handler: function() {
+								                		  <portlet:namespace />confirmDialog.close();
+								                	  }
+								                  }
+								                  ],
+								        width: 'auto',
+								        height: 'auto',
+								        resizable: false,
+								        draggable: false,
+								        close: true,
+								        destroyOnClose: true,
+								        centered: true,
+								        modal: true
+								    }
+								).render();
+								
+					        },
+					        ['node', 'aui-dialog', 'event', 'node-event-simulate']
+					    );
+					
+					Liferay.provide(
+					        window,
+					        '<portlet:namespace/>formValidation',
+					function(e) {
+						var returnValue = true;
+						
+						var A = AUI();
+					    var questions = A.all('#<portlet:namespace/>formulario div.question');
+					    for (var i = 0; i < questions.size(); i++) {
+					    	var question = questions.item(i);
+					    	var validQuestion = <portlet:namespace />questionValidation(question);
+					    	if (typeof validQuestion == 'undefined') {
+					    		validQuestion = <portlet:namespace />questionValidation(question);
+					    	}
+					    	if (!validQuestion) {
+					    		returnValue = false;
+					    		break;
+					    	}
 						}
 						
-						if(questions.size() > 0)
-						{
-						%>
+					    if (!returnValue) {
+					    	if (e.target) {
+					    		targ = e.target.blur();
+					    	} else if (e.srcElement) {
+					    		targ = e.srcElement.blur();
+					    	}
+					    	<%= renderResponse.getNamespace() %>popConfirm('<%=JavaScriptUtil.markupToStringLiteral(LanguageUtil.get(pageContext, "surveyactivity.survey.without.response.text")) %>', e.srcElement);
+			    		}
+					    
+						if (!returnValue && e.preventDefault) {
+							e.preventDefault();
+						}
+						return returnValue;
+					},
+					['node', 'aui-dialog', 'event', 'node-event-simulate']
+				);
+					//-->
+					</script>
+					
+					<aui:form name="formulario" action="<%=correctURL %>" method="POST">
+					<%
+					for(TestQuestion question:questions)
+					{
+						if( question.getQuestionType() != 7 && question.getQuestionType() != 2 ){
+					%>
+							<div class="question questiontype_options">
+							<div class="questiontext"><%=question.getText() %></div>
+							<%
+							List<TestAnswer> testAnswers= TestAnswerLocalServiceUtil.getTestAnswersByQuestionId(question.getQuestionId());
+							for(TestAnswer answer:testAnswers)
+							{
+							%>
+								<div class="answer"><aui:input id='<%="question_"+question.getQuestionId()%>' type="radio" name='<%="question_"+question.getQuestionId()%>' value="<%=answer.getAnswerId() %>" label="<%=answer.getAnswer() %>"/>
+								</div>
+							<%
+							}
+							%>
+							</div>
+							<%
+						} else if( question.getQuestionType() == 7) { %>
+							<div class="horizontalquestion">
+								<div class="question questiontype_options">
+									<div class="questiontext"><%=question.getText() %>
+										<%
+										List<TestAnswer> testAnswers= TestAnswerLocalServiceUtil.getTestAnswersByQuestionId(question.getQuestionId());
+										for(TestAnswer answer:testAnswers)
+										{
+										%>
+										<div class="answer"><aui:input id='<%="question_"+question.getQuestionId()%>' type="radio" name='<%="question_"+question.getQuestionId()%>'  value='<%=answer.getAnswerId() %>'  label="<%=answer.getAnswer() %>"/>
+										</div>
+										<%
+										}
+									%>
+									</div>
+								</div>
+							</div>
+						<% } else { // En este caso es texto libre %>
+							<div>
+									<div class="questiontext"><%=question.getText() %></div> 
+								<div class="answer"><textarea rows="10" cols="100" maxlength="2000" name='<%="question_"+question.getQuestionId()%>'></textarea></div>
+									<%--<div class="answer"><input type="text" name='<%="question_"+question.getQuestionId()%>'></input></div> --%>
+							</div>
+						<% }
+						
+					}
+					
+					if(questions.size() > 0 && !userPassed){
+					%>
 						<aui:button-row>
 						<aui:button type="submit"  onClick='<%= "return  "+renderResponse.getNamespace() + "formValidation(event);" %>' ></aui:button>
 						</aui:button-row>
-						<%}%>
-						</aui:form>
-						<%
-						}
-					%></div> <%
+					<%}%>
+					</aui:form>
+					<%
+					}
+				%></div> <%
 					}	
 				}
 			%>
