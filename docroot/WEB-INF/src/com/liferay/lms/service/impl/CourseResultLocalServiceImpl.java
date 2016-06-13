@@ -93,9 +93,14 @@ public class CourseResultLocalServiceImpl
 	}
 	
 	public long countStudentsByCourseId(Course course, boolean passed) throws SystemException{
+		return countStudentsByCourseId(course, null, passed);
+	}
+	
+	public long countStudentsByCourseId(Course course, List<User> students, boolean passed) throws SystemException {
 		
 		long res = 0;
-		List<User> students = CourseLocalServiceUtil.getStudentsFromCourse(course.getCompanyId(), course.getGroupCreatedId());
+		if(Validator.isNull(students) || !(students.size()>0))
+			students = CourseLocalServiceUtil.getStudentsFromCourse(course.getCompanyId(), course.getGroupCreatedId());
 		
 		ClassLoader classLoader = (ClassLoader) PortletBeanLocatorUtil.locate(ClpSerializer.getServletContextName(), "portletClassLoader");
 		DynamicQuery consulta = DynamicQueryFactoryUtil.forClass(CourseResult.class, classLoader)
@@ -128,9 +133,15 @@ public class CourseResultLocalServiceImpl
 	
 	public long countStudentsByCourseId(Course course) throws SystemException
 	{
+		return countStudentsByCourseId(course, null);
+	}
+	
+	public long countStudentsByCourseId(Course course, List<User> students) throws SystemException
+	{
 		
 		long res = 0;
-		List<User> students = CourseLocalServiceUtil.getStudentsFromCourse(course.getCompanyId(), course.getGroupCreatedId());
+		if(Validator.isNull(students) || !(students.size()>0))
+			students = CourseLocalServiceUtil.getStudentsFromCourse(course.getCompanyId(), course.getGroupCreatedId());
 		
 		ClassLoader classLoader = (ClassLoader) PortletBeanLocatorUtil.locate(ClpSerializer.getServletContextName(), "portletClassLoader");
 		DynamicQuery consulta = DynamicQueryFactoryUtil.forClass(CourseResult.class, classLoader)
@@ -182,7 +193,13 @@ public class CourseResultLocalServiceImpl
 	
 	public Double avgStudentsResult(Course course, boolean passed) throws SystemException
 	{
-		List<User> students = CourseLocalServiceUtil.getStudentsFromCourse(course.getCompanyId(), course.getGroupCreatedId());
+		return avgStudentsResult(course, null, passed);
+	}
+	
+	public Double avgStudentsResult(Course course, List<User> students, boolean passed) throws SystemException
+	{
+		if(Validator.isNull(students) || !(students.size()>0))
+			students = CourseLocalServiceUtil.getStudentsFromCourse(course.getCompanyId(), course.getGroupCreatedId());
 		
 		ClassLoader classLoader = (ClassLoader) PortletBeanLocatorUtil.locate(ClpSerializer.getServletContextName(), "portletClassLoader"); 
 		DynamicQuery consulta=DynamicQueryFactoryUtil.forClass(CourseResult.class, classLoader)

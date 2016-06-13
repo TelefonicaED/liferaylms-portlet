@@ -92,19 +92,19 @@ String scourseIds=ListUtil.toString(courses,"courseId");
 	</liferay-ui:search-container-results>
 
 	<liferay-ui:search-container-row className="com.liferay.lms.model.Course" keyProperty="courseId" modelVar="course">
-	<%
+	<%			
 		Group groupsel= GroupLocalServiceUtil.getGroup(course.getGroupCreatedId());
-		long registered=CourseLocalServiceUtil.getStudentsFromCourse(course.getCompanyId(), course.getGroupCreatedId()).size();
-		long iniciados =  CourseResultLocalServiceUtil.countStudentsByCourseId(course);
-		long finalizados = CourseResultLocalServiceUtil.countStudentsByCourseId(course, true);
+		List<User> students = CourseLocalServiceUtil.getStudentsFromCourse(course.getCompanyId(), course.getGroupCreatedId());	
+		long registered=(Validator.isNotNull(students) && students.size() > 0) ? students.size() : 0;
+		long iniciados = (registered > 0) ? CourseResultLocalServiceUtil.countStudentsByCourseId(course, students) : 0;
+		long finalizados = (registered > 0) ? CourseResultLocalServiceUtil.countStudentsByCourseId(course, students, true) : 0;
 		double avgResult=0;
 		if(finalizados>0){
-			avgResult=CourseResultLocalServiceUtil.avgStudentsResult(course, true);
+			avgResult=CourseResultLocalServiceUtil.avgStudentsResult(course, students, true);
 		}
 		long activitiesCount=LearningActivityLocalServiceUtil.countLearningActivitiesOfGroup(course.getGroupCreatedId());
 		long modulesCount=ModuleLocalServiceUtil.countByGroupId(course.getGroupCreatedId());
 	%>
-
 		<liferay-ui:search-container-column-text name="coursestats.name">
 		<c:choose>
 			<c:when test="<%= !course.isClosed() && UserLocalServiceUtil.hasGroupUser(course.getGroupCreatedId(), themeDisplay.getUserId()) %>">
@@ -144,3 +144,15 @@ String scourseIds=ListUtil.toString(courses,"courseId");
 </liferay-ui:search-container>
 
 </div>
+
+<%!
+private String getHorasMinutosFromMiliseconds(long milisegundos) {
+		long horas = Math.abs(milisegundos / 3600000);
+		long restoHoras = milisegundos % 3600000;
+		long minutos = Math.abs(restoHoras / 60000);
+		long restoMinutos = restoHoras % 60000;
+		long segundos = Math.abs(restoMinutos / 1000);
+		return ((horas < 10) ? "0" : "") + horas + ":" + ((minutos < 10) ? "0" : "") + minutos + ":"
+				+ ((segundos < 10) ? "0" : "") + segundos;
+	}
+ %>
