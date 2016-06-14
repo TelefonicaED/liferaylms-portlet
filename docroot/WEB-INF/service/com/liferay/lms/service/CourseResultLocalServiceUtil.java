@@ -299,9 +299,23 @@ public class CourseResultLocalServiceUtil {
 	}
 
 	public static long countStudentsByCourseId(
+		com.liferay.lms.model.Course course,
+		java.util.List<com.liferay.portal.model.User> students, boolean passed)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().countStudentsByCourseId(course, students, passed);
+	}
+
+	public static long countStudentsByCourseId(
 		com.liferay.lms.model.Course course)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService().countStudentsByCourseId(course);
+	}
+
+	public static long countStudentsByCourseId(
+		com.liferay.lms.model.Course course,
+		java.util.List<com.liferay.portal.model.User> students)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().countStudentsByCourseId(course, students);
 	}
 
 	public static java.lang.Double avgResult(long courseId, boolean passed)
@@ -318,6 +332,13 @@ public class CourseResultLocalServiceUtil {
 		com.liferay.lms.model.Course course, boolean passed)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService().avgStudentsResult(course, passed);
+	}
+
+	public static java.lang.Double avgStudentsResult(
+		com.liferay.lms.model.Course course,
+		java.util.List<com.liferay.portal.model.User> students, boolean passed)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().avgStudentsResult(course, students, passed);
 	}
 
 	public static com.liferay.lms.model.CourseResult create(long courseId,

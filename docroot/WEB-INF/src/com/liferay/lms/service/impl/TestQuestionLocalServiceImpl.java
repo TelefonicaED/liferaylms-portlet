@@ -24,7 +24,6 @@ import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.model.TestQuestion;
 import com.liferay.lms.service.ClpSerializer;
 import com.liferay.lms.service.LearningActivityLocalServiceUtil;
-import com.liferay.lms.service.TestQuestionLocalServiceUtil;
 import com.liferay.lms.service.base.TestQuestionLocalServiceBaseImpl;
 import com.liferay.portal.kernel.bean.PortletBeanLocatorUtil;
 import com.liferay.portal.kernel.dao.orm.Criterion;
@@ -35,6 +34,8 @@ import com.liferay.portal.kernel.dao.orm.OrderFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.xml.Document;
@@ -81,8 +82,9 @@ public class TestQuestionLocalServiceImpl
 	public long getQuestionType(Element question) {
 		long type = -1;
 		boolean isSurveyHorizontal = "surveyoptionshorizontal".equals(question.element("name").element("text").getText());
-
-		if("multichoice".equals(question.attributeValue("type")) && "true".equals(question.element("single").getText()) && !isSurveyHorizontal) type = 0;
+		boolean isSurvey = "surveyoptions".equals(question.element("name").element("text").getText());
+		if("multichoice".equals(question.attributeValue("type")) && "true".equals(question.element("single").getText()) && !isSurveyHorizontal && !isSurvey) type = 0;
+		else if("multichoice".equals(question.attributeValue("type")) && "true".equals(question.element("single").getText()) && !isSurveyHorizontal && isSurvey) type = 6;
 		else if("multichoice".equals(question.attributeValue("type")) && "false".equals(question.element("single").getText())) type = 1;
 		else if("multichoice".equals(question.attributeValue("type")) && "true".equals(question.element("single").getText()) && isSurveyHorizontal) type = 7;
 		else if("essay".equals(question.attributeValue("type")) || "numerical".equals(question.attributeValue("type")) || "shortanswer".equals(question.attributeValue("type"))) type = 2;
@@ -106,7 +108,7 @@ public class TestQuestionLocalServiceImpl
 			Element rootElement = document.getRootElement();
 			for(Element question:rootElement.elements("question"))
 			{
-				long type = TestQuestionLocalServiceUtil.getQuestionType(question);
+				long type = getQuestionType(question);
 				if (!allowedTypes.contains(String.valueOf(type)))
 					return false;
 			}

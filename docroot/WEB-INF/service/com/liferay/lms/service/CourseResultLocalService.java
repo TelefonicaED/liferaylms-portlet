@@ -262,7 +262,15 @@ public interface CourseResultLocalService extends BaseLocalService,
 		boolean passed)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
+	public long countStudentsByCourseId(com.liferay.lms.model.Course course,
+		java.util.List<com.liferay.portal.model.User> students, boolean passed)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
 	public long countStudentsByCourseId(com.liferay.lms.model.Course course)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	public long countStudentsByCourseId(com.liferay.lms.model.Course course,
+		java.util.List<com.liferay.portal.model.User> students)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	public java.lang.Double avgResult(long courseId, boolean passed)
@@ -273,6 +281,11 @@ public interface CourseResultLocalService extends BaseLocalService,
 
 	public java.lang.Double avgStudentsResult(
 		com.liferay.lms.model.Course course, boolean passed)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	public java.lang.Double avgStudentsResult(
+		com.liferay.lms.model.Course course,
+		java.util.List<com.liferay.portal.model.User> students, boolean passed)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	public com.liferay.lms.model.CourseResult create(long courseId, long userId)
