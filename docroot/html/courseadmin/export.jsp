@@ -112,7 +112,7 @@ function ignoreEnter(e) {
 	<liferay-ui:success key="courseadmin.delete.exported.confirmation.success" message="courseadmin.delete.exported.confirmation.success"></liferay-ui:success>
 	<liferay-ui:success key="courseadmin.export.confirmation.success" message="courseadmin.export.confirmation.success"></liferay-ui:success>
 	
-    	<aui:input label="export-the-selected-data-to-the-given-lar-file-name" name="exportFileName" onkeypress="return ignoreEnter(event)" size="50" value='<%= "course_" + courseId + "-" + Time.getShortTimestamp() + ".lar" %>' />
+    	<aui:input readonly="true" label="export-the-selected-data-to-the-given-lar-file-name" name="exportFileName" onkeypress="return ignoreEnter(event)" size="50" value='<%= "course_" + courseId + "-" + Time.getShortTimestamp() + ".lar" %>' />
 	
 	<aui:input type="hidden" name="key" value=""/>
 	
