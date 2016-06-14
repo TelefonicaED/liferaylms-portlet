@@ -27,7 +27,7 @@
 </div>
 <% 
 long roleId=ParamUtil.getLong(request, "roleId",0);
-System.out.println("---ROLEID  "+roleId);
+
 %>
 <script>
 function changedates(theURI)

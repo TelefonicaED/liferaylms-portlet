@@ -25,7 +25,6 @@
 String students = LanguageUtil.get(pageContext,"courseadmin.adminactions.students");
 String tabs1 = ParamUtil.getString(request, "tabs1", students);
 Long roleId = ParamUtil.getLong(request, "roleId",0);
-System.out.println("---TABS ROLE ID "+roleId);
 boolean backToEdit = ParamUtil.getBoolean(request, "backToEdit");
 String redirectOfEdit = ParamUtil.getString(request, "redirectOfEdit");
 LmsPrefs prefs=LmsPrefsLocalServiceUtil.getLmsPrefs(themeDisplay.getCompanyId());

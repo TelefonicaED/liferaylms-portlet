@@ -83,7 +83,7 @@ public class GroupListener extends BaseModelListener<Group> {
 				    			new String[] {"[$FROM_ADDRESS$]", "[$FROM_NAME$]", "[$PAGE_URL$]","[$PORTAL_URL$]","[$TO_ADDRESS$]","[$TO_NAME$]","[$USER_SCREENNAME$]"},
 				    			new String[] {fromAddress, fromName, urlcourse, url, user.getEmailAddress(), user.getFullName(),user.getScreenName()});
 				    	
-					    	System.out.println(body);
+					    	//System.out.println(body);
 							if(log.isDebugEnabled()){
 								log.debug(from);
 								log.debug(to);
