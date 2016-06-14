@@ -17,6 +17,7 @@ import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.mail.MailMessage;
+import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.util.PrefsPropsUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -112,8 +113,7 @@ public class CommunityInscription extends MVCPortlet {
 				    			LanguageUtil.get(userTmp.getLocale(), "reply-membership-body"),
 				    			new String[] {"[$FROM_ADDRESS$]", "[$FROM_NAME$]", "[$PAGE_URL$]","[$PORTAL_URL$]","[$TO_ADDRESS$]","[$TO_NAME$]","[$COURSE_NAME$]"},
 				    			new String[] {fromAddress, fromName, urlcourse, url, emailTo, nameTo,course.getTitle(userTmp.getLocale())});
-				    	
-						try{
+				    	try{
 							if(log.isDebugEnabled()){
 								log.debug(from);
 								log.debug(to);
@@ -158,39 +158,41 @@ public class CommunityInscription extends MVCPortlet {
     	
     	Group group = GroupLocalServiceUtil.getGroup(groupId[0]);
     	Course course = CourseLocalServiceUtil.getCourseByGroupCreatedId(groupId[0]);
+    	
+    	log.debug("COURSE GROUP ID "+course.getGroupCreatedId());
+    	log.debug("THEME DISPLAY GROUP "+groupId[0]);
     	int numberUsers = UserLocalServiceUtil.getGroupUsersCount(groupId[0]);
     	if(course.getMaxusers()>0&&numberUsers>=course.getMaxusers()){
-    		throw new SystemException("Maxusers!");
+    		SessionErrors.add(request, "inscription-error-max-users");
+    	}else{
+    		if(group.getType()==GroupConstants.TYPE_SITE_PRIVATE){
+        		SessionErrors.add(request, "inscription-error-syte-restricted");
+        	}else{
+        		long userId = themeDisplay.getUserId();
+            	if (!GroupLocalServiceUtil.hasUserGroup(userId, course.getGroupCreatedId())) {
+        	    	GroupLocalServiceUtil.addUserGroups(userId, groupId);
+        			SocialActivityLocalServiceUtil.addActivity(userId, course.getGroupId(), Course.class.getName(), course.getCourseId(), com.liferay.portlet.social.model.SocialActivityConstants.TYPE_SUBSCRIBE, "", course.getUserId());
+        			// Informamos que se ha inscrito.
+        		
+        			if(log.isDebugEnabled()){
+            			Date hoy = new Date();
+            			String userName = ""+userId;
+            			String groupName = ""+groupId[0];
+            			try {
+            				userName = userId + "[" + UserLocalServiceUtil.getUser(userId).getFullName() + "]";
+            				groupName = groupId[0] + "[" + GroupLocalServiceUtil.getGroup(groupId[0]).getName() + "]";
+            			}
+            			catch (Exception e) {}
+            	    	log.debug("INSCRIBIR: "+userName +" se ha incrito de la comunidad "+groupName+" el "+hoy.toString());
+            	    	
+            		}
+            	
+            	}else{
+            		SessionErrors.add(request, "inscription-error-already-enrolled");
+            	}        		
+        	}
     	}
-    	
-    	if(group.getType()==GroupConstants.TYPE_SITE_PRIVATE){
-    		throw new SystemException("Site restricted!");
-    	}
-    	
-    	
-    	
-    	long userId = themeDisplay.getUserId();
-		GroupLocalServiceUtil.addUserGroups(userId, groupId);
-
-		//auditing -> GroupListener
-		//AuditingLogFactory.audit(themeDisplay.getCompanyId(), course.getGroupCreatedId(), Course.class.getName(), 
-		//		course.getCourseId(), themeDisplay.getUserId(), AuditConstants.REGISTER, null);
-		SocialActivityLocalServiceUtil.addActivity(userId, course.getGroupId(), Course.class.getName(), course.getCourseId(), com.liferay.portlet.social.model.SocialActivityConstants.TYPE_SUBSCRIBE, "", course.getUserId());
-		// Informamos que se ha inscrito.
-		if(log.isDebugEnabled()){
-			Date hoy = new Date();
-			String userName = ""+userId;
-			String groupName = ""+groupId[0];
-			try {
-				userName = userId + "[" + UserLocalServiceUtil.getUser(userId).getFullName() + "]";
-				groupName = groupId[0] + "[" + GroupLocalServiceUtil.getGroup(groupId[0]).getName() + "]";
-			}
-			catch (Exception e) {}
-	    	log.debug("INSCRIBIR: "+userName +" se ha incrito de la comunidad "+groupName+" el "+hoy.toString());
-	    	
-		}
-		
-	}
+    }
 	
 	public void desinscribir(ActionRequest request, ActionResponse response) throws Exception{
 
@@ -200,26 +202,36 @@ public class CommunityInscription extends MVCPortlet {
 		long[] groupId = new long[1];
     	groupId[0] = themeDisplay.getScopeGroupId();						
 		long userId = themeDisplay.getUserId();
-		GroupLocalServiceUtil.unsetUserGroups(userId, groupId);
+		Course course = CourseLocalServiceUtil.getCourseByGroupCreatedId(groupId[0]);
 
-		//auditing -> GroupListener
-    	Course course = CourseLocalServiceUtil.getCourseByGroupCreatedId(groupId[0]);
-		//AuditingLogFactory.audit(themeDisplay.getCompanyId(), course.getGroupCreatedId(), Course.class.getName(), 
-		//		course.getCourseId(), themeDisplay.getUserId(), AuditConstants.UNREGISTER, null);
-		SocialActivityLocalServiceUtil.addActivity(userId, course.getGroupId(), Course.class.getName(), course.getCourseId(), com.liferay.portlet.social.model.SocialActivityConstants.TYPE_UNSUBSCRIBE, "", course.getUserId());
-		
-		// Informamos de que lo ha dejado.
-		Date hoy = new Date();
-		String userName = ""+userId;
-		String groupName = ""+groupId[0];
-		try {
-			userName = userId + "[" + UserLocalServiceUtil.getUser(userId).getFullName() + "]";
-			groupName = groupId[0] + "[" + GroupLocalServiceUtil.getGroup(groupId[0]).getName() + "]";
-		}
-		catch (Exception e) {}
-		
-		if(log.isDebugEnabled())log.debug("DESINSCRIBIR: "+userName +" se ha desincrito de la comunidad "+groupName+" el "+hoy.toString());
+    	log.debug("COURSE GROUP ID "+course.getGroupCreatedId());
+    	log.debug("THEME DISPLAY GROUP "+groupId[0]);
+		if (GroupLocalServiceUtil.hasUserGroup(userId, course.getGroupCreatedId())) {
+			GroupLocalServiceUtil.unsetUserGroups(userId, groupId);
+
+			//auditing -> GroupListener
+	    	
+			//AuditingLogFactory.audit(themeDisplay.getCompanyId(), course.getGroupCreatedId(), Course.class.getName(), 
+			//		course.getCourseId(), themeDisplay.getUserId(), AuditConstants.UNREGISTER, null);
+			SocialActivityLocalServiceUtil.addActivity(userId, course.getGroupId(), Course.class.getName(), course.getCourseId(), com.liferay.portlet.social.model.SocialActivityConstants.TYPE_UNSUBSCRIBE, "", course.getUserId());
+			
+			if(log.isDebugEnabled()){
+				// Informamos de que lo ha dejado.
+				Date hoy = new Date();
+				String userName = ""+userId;
+				String groupName = ""+groupId[0];
+				try {
+					userName = userId + "[" + UserLocalServiceUtil.getUser(userId).getFullName() + "]";
+					groupName = groupId[0] + "[" + GroupLocalServiceUtil.getGroup(groupId[0]).getName() + "]";
+				}
+				catch (Exception e) {}
 				
+				log.debug("DESINSCRIBIR: "+userName +" se ha desincrito de la comunidad "+groupName+" el "+hoy.toString());
+			}
+			
+		}else{			
+			SessionErrors.add(request, "inscription-error-already-disenrolled");
+		}
 	}
 
 }

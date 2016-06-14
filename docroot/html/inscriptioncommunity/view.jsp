@@ -27,9 +27,17 @@ if(course!=null && permissionChecker.hasPermission(course.getGroupId(),  Course.
 	
 	if(themeDisplay.isSignedIn())
 	{	
+	%>
+	<liferay-ui:error message="inscription-error-syte-restricted" key="inscription-error-syte-restricted"></liferay-ui:error>
+	<liferay-ui:error message="inscription-error-max-users" key="inscription-error-max-users"></liferay-ui:error>
+	<liferay-ui:error message="inscription-error-already-enrolled" key="inscription-error-already-enrolled"></liferay-ui:error>
+	<liferay-ui:error message="inscription-error-already-disenrolled" key="inscription-error-already-disenrolled"></liferay-ui:error>
+	<% 	
+	
 		if(GroupLocalServiceUtil.hasUserGroup(themeDisplay.getUserId(),themeDisplay.getScopeGroupId()))
 		{
 		%>
+			
 			<portlet:actionURL name="desinscribir"  var="desinscribirURL" windowState="NORMAL"/>
 			<script type="text/javascript">
 				function <portlet:namespace />enviar() {
