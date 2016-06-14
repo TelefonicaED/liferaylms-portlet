@@ -77,68 +77,31 @@ public class GeneralStats extends MVCPortlet {
 	        for(long courseId:courseIds)
 	        {
 	        	Course course=CourseLocalServiceUtil.getCourse(courseId);
-	        linea=new String[8];
-	        linea[0]=course.getTitle(themeDisplay.getLocale());
-	        Group groupsel= GroupLocalServiceUtil.getGroup(course.getGroupCreatedId());
-			//long registered=UserLocalServiceUtil.getGroupUsersCount(course.getGroupCreatedId(),0);
-	        
-	        LmsPrefs prefs=LmsPrefsLocalServiceUtil.getLmsPrefs(themeDisplay.getCompanyId());
-			java.util.List<User> users=new java.util.ArrayList<User>();
-
-			java.util.List<User> userst = UserLocalServiceUtil.getGroupUsers(course.getGroupCreatedId());
-			int numTeachers = 0;
-			int teachersFinished=0;
-			for (User usert : userst) {
-				List<UserGroupRole> userGroupRoles = UserGroupRoleLocalServiceUtil.getUserGroupRoles(
-						usert.getUserId(), course.getGroupCreatedId());
-				boolean remove = false;
+		        linea=new String[8];
+		        linea[0]=course.getTitle(themeDisplay.getLocale());
+		        
+				List<User> students = CourseLocalServiceUtil.getStudentsFromCourse(course.getCompanyId(), course.getGroupCreatedId());	
+				long registered=(Validator.isNotNull(students) && students.size() > 0) ? students.size() : 0;
+				long iniciados = (registered > 0) ? CourseResultLocalServiceUtil.countStudentsByCourseId(course, students) : 0;
+				long finalizados = (registered > 0) ? CourseResultLocalServiceUtil.countStudentsByCourseId(course, students, true) : 0;
+				double avgResult=0;
+				if(finalizados>0){
+					avgResult=CourseResultLocalServiceUtil.avgStudentsResult(course, students, true);
+				}
+				long activitiesCount=LearningActivityLocalServiceUtil.countLearningActivitiesOfGroup(course.getGroupCreatedId());
+				long modulesCount=ModuleLocalServiceUtil.countByGroupId(course.getGroupCreatedId());
+				String closed=course.getClosed()?LanguageUtil.get(themeDisplay.getLocale(),"yes"):LanguageUtil.get(themeDisplay.getLocale(),"no");
 				
-				for (UserGroupRole ugr : userGroupRoles) {
-					if (ugr.getRoleId() == prefs.getEditorRole() || ugr.getRoleId() == prefs.getTeacherRole()) {
-						remove = true;
-						CourseResult teacherResult = CourseResultLocalServiceUtil.getCourseResultByCourseAndUser(course.getCourseId(), usert.getUserId());
-						if(teacherResult!=null){
-							numTeachers++;
-							if(teacherResult.getPassedDate()!=null)
-							{
-								teachersFinished++;
-							}
-							//System.out.println(teacherResult.getResult());
-							//System.out.println(teacherResult.getCourseId());
-
-						}
-						break;
-					}
-				}
-				if (!remove) {
-					users.add(usert);
-				}
-			}
-			//System.out.println("NumTeachers: "+numTeachers);
-			long registered=users.size();
-			
-			//CourseResultLocalServiceUtil.c
-			long todosLosFinalizados=CourseResultLocalServiceUtil.countByCourseId(course.getCourseId(), true);
-			long finalizados = todosLosFinalizados-teachersFinished;
-			long iniciados = CourseResultLocalServiceUtil.countStudentsByCourseId(course);
-			double avgResult=0;
-			if(finalizados>0)
-			{
-				avgResult=CourseResultLocalServiceUtil.avgStudentsResult(course, true);
-			}
-			long activitiesCount=LearningActivityLocalServiceUtil.countLearningActivitiesOfGroup(course.getGroupCreatedId());
-			long modulesCount=ModuleLocalServiceUtil.countByGroupId(course.getGroupCreatedId());
-			String closed=course.getClosed()?LanguageUtil.get(themeDisplay.getLocale(),"yes"):LanguageUtil.get(themeDisplay.getLocale(),"no");
-			linea[1]=Long.toString(registered);
-			linea[2]=Long.toString(iniciados);
-			linea[3]=Long.toString(finalizados);
-			DecimalFormat df = new DecimalFormat("#.#");
-			linea[4]=closed;
-			linea[5]=df.format(avgResult);
-			linea[6]=Long.toString(modulesCount);
-			linea[7]=Long.toString(activitiesCount);
-	        writer.writeNext(linea);
-	        //resourceResponse.getPortletOutputStream().write(b);
+				linea[1]=Long.toString(registered);
+				linea[2]=Long.toString(iniciados);
+				linea[3]=Long.toString(finalizados);
+				DecimalFormat df = new DecimalFormat("#.#");
+				linea[4]=closed;
+				linea[5]=df.format(avgResult);
+				linea[6]=Long.toString(modulesCount);
+				linea[7]=Long.toString(activitiesCount);
+		        writer.writeNext(linea);
+		        //resourceResponse.getPortletOutputStream().write(b);
 	        }
 	        writer.flush();
 			writer.close();
