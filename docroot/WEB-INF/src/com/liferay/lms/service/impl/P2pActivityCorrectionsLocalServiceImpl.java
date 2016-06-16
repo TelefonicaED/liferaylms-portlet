@@ -342,8 +342,12 @@ public void asignCorrectionsToP2PActivities(long actId, long p2pActivityId,int n
 					if(course != null){
 						courseFriendlyUrl = portalUrl + pathPublic + course.getFriendlyURL();
 						courseTitle = course.getTitle(user.getLocale());
+						courseFriendlyUrl += "/reto?p_p_id=p2ptaskactivity_WAR_liferaylmsportlet";
+						courseFriendlyUrl += "&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&actId="+learn.getActId();
+						courseFriendlyUrl += "&moduleId="+learn.getModuleId();
+					
 					}
-						
+					
 					String[] params={activityTitle, moduleTitle, courseTitle, courseFriendlyUrl};
 					
 					//Enviar los emails.

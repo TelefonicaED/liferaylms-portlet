@@ -788,17 +788,25 @@ public class P2PActivityPortlet extends MVCPortlet {
 			//Componer el body seg�n la actividad.
 			String body = title;
 			
-			body += "<br /><br />" + message;
+			if(message!=null){
+				body += "<br /><br />" + message;	
+			}
 			
 			if(!anonimous){
-				body += "<br /><br />" + usercorrection;
+				if(usercorrection!=null){
+					body += "<br /><br />" + usercorrection;
+				}
 			}
 			
 			//Comentarios realizados por el usuario que ha corregido la actividad.
-			body += "<br /><br />" + p2pActiCor.getDescription();
+			if(p2pActiCor!= null && p2pActiCor.getDescription()!=null){
+				body += "<br /><br />" + p2pActiCor.getDescription();	
+			}
 			
 			if(result){
-				body += "<br /><br />" + resultcorrection;
+				if(resultcorrection!=null){
+					body += "<br /><br />" + resultcorrection;	
+				}
 			}
 			
 			String fileId = String.valueOf(p2pActiCor.getFileEntryId());
@@ -808,7 +816,8 @@ public class P2PActivityPortlet extends MVCPortlet {
 				body += "<br /><br />" + LanguageUtil.get(themeDisplay.getLocale(), 	"p2ptaskactivity.mail.valoration.recieved.body.file.yes");
 			}
 			
-			body += "<br /><br />" + end;
+			body += "<br /><br />" + end;	
+			
 			
 			if(_log.isDebugEnabled()){_log.debug("P2PActivityPortlet::sendMailCorrection::subject:"+subject);}
 			if(_log.isDebugEnabled()){_log.debug("P2PActivityPortlet::sendMailCorrection::body:"+body);}
