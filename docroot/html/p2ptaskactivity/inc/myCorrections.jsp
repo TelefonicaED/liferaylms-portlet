@@ -99,14 +99,20 @@ if(anonimousString.equals("true")){
 </c:if>
 
 <%
-
+String fullName = "";
 if(!p2pActCorList.isEmpty()){
 	for (P2pActivityCorrections myP2PActCor : p2pActCorList){
 		
 		cont++;
 		// Lo reseteamos en cada iteracción.
 		dlfile = null;
-		User propietary = UserLocalServiceUtil.getUser(myP2PActCor.getUserId());
+		User propietary = UserLocalServiceUtil.fetchUser(myP2PActCor.getUserId());
+		if(propietary != null){
+			fullName = propietary.getFullName();
+		}else{
+			fullName = "";
+		}
+		
 		String correctionText = myP2PActCor.getDescription();
 		if(myP2PActCor.getFileEntryId()!=0)
 		{
@@ -130,7 +136,7 @@ if(!p2pActCorList.isEmpty()){
 					<c:if test="<%=!anonimous %>">
 					 	<span class="name">
 					 		<liferay-ui:message key="by" />
-					 		<%=propietary.getFullName() %>
+					 		<%=fullName %>
 					 	</span>
 				 	</c:if>
 				 	<c:if test="<%=anonimous %>">
