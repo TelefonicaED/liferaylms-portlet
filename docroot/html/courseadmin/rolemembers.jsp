@@ -97,22 +97,53 @@ AUI().use(function(A)
 			</c:if>
 			
 			</c:if>
-			<liferay-portlet:actionURL name="removeUserRole" var="removeUserRoleURL">
-				<liferay-portlet:param name="jspPage" value="/html/courseadmin/rolememberstab.jsp"/>
-				<liferay-portlet:param name="courseId" value="${courseId}"/>
-				<portlet:param name="backToEdit" value="${backToEdit}" />
-				<c:if test="${backToEdit}">
-					<portlet:param name="redirectOfEdit" value='${redirectOfEdit}'/>
-				</c:if>
-				<liferay-portlet:param name="userId" value="${courseUser.userId }"/>
-				<liferay-portlet:param name="roleId" value="${roleId}"/>
-				<liferay-portlet:param name="tabs1" value="${tab}"/>
-			</liferay-portlet:actionURL>
-			<liferay-ui:icon-delete url="${removeUserRoleURL}&cur=${searchContainer.cur}" label="delete"></liferay-ui:icon-delete>
+			<liferay-ui:icon-delete url="javascript:${renderResponse.getNamespace()}deleteUser('${searchContainer.cur}','${courseUser.userId}','${searchContainer.displayTerms.getScreenName() }','${searchContainer.displayTerms.getFirstName() }','${searchContainer.displayTerms.getLastName() }', '${searchContainer.displayTerms.getEmailAddress() }', '${searchContainer.displayTerms.isAdvancedSearch() }','${searchContainer.displayTerms.isAndOperator() }','${searchContainer.displayTerms.getKeywords()}');" label="delete"></liferay-ui:icon-delete>
 			</liferay-ui:icon-menu>
 		</liferay-ui:search-container-column-text>
 	</liferay-ui:search-container-row>
 	<liferay-ui:search-iterator />
 	</liferay-ui:search-container>
 </aui:form>
+
+<liferay-portlet:actionURL name="removeUserRole" var="removeUserRoleURL">
+				<liferay-portlet:param name="courseId" value="${courseId}"/>
+				<portlet:param name="backToEdit" value="${backToEdit}" />
+				<c:if test="${backToEdit}">
+					<portlet:param name="redirectOfEdit" value='${redirectOfEdit}'/>
+				</c:if>
+				<liferay-portlet:param name="roleId" value="${roleId}"/>
+				<liferay-portlet:param name="tabs1" value="${tab}"/>
+</liferay-portlet:actionURL>
+
+<aui:form name="deleteUserFm" action="${removeUserRoleURL }" method="POST">
+	<aui:input name="userId" value="" type="hidden"/>
+	<aui:input name="screenName1" value="" type="hidden"/>
+	<aui:input name="firstName1" value="" type="hidden"/>
+	<aui:input name="lastName1" value="" type="hidden"/>
+	<aui:input name="emailAddress1" value="" type="hidden"/>
+	<aui:input name="advancedSearch1" value="" type="hidden"/>
+	<aui:input name="andOperator1" value="" type="hidden"/>
+	<aui:input name="keywords1" value="" type="hidden"/>
+	<aui:input name="cur" value="" type="hidden"/>
+</aui:form>
+
+
+<script>
+function <portlet:namespace />deleteUser(cur,userId,screenName,firstName,lastName,emailAddress,advancedSearch,andOperator,keywords){
+		$('#<portlet:namespace />userId').val(userId);
+		$('#<portlet:namespace />cur').val(cur);
+		$('#<portlet:namespace />screenName1').val(screenName);
+		$('#<portlet:namespace />firstName1').val(firstName);
+		$('#<portlet:namespace />lastName1').val(lastName);
+		$('#<portlet:namespace />advancedSearch1').val(advancedSearch);
+	    $('#<portlet:namespace />emailAddress1').val(emailAddress);
+	    $('#<portlet:namespace />andOperator1').val(andOperator);
+	    $('#<portlet:namespace />keywords1').val(keywords);
+		$('#<portlet:namespace />deleteUserFm').submit();	
+}
+</script>
+
+
+
+
 

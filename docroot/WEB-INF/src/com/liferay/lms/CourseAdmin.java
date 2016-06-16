@@ -178,7 +178,7 @@ public class CourseAdmin extends MVCPortlet {
 	public void doView(RenderRequest renderRequest, RenderResponse renderResponse) throws IOException, PortletException {
 		
 		String jsp = renderRequest.getParameter("view");
-		log.debug("VIEW "+jsp);
+		if(log.isDebugEnabled())log.debug("VIEW "+jsp);
 		try {
 			if(jsp == null || "".equals(jsp)){
 				showViewDefault(renderRequest, renderResponse);
@@ -399,10 +399,15 @@ public class CourseAdmin extends MVCPortlet {
 		String students = LanguageUtil.get(themeDisplay.getLocale(),"courseadmin.adminactions.students");
 		String tabs1 = ParamUtil.getString(renderRequest, "tabs1", students);
 		
-	
+		String lastName =  ParamUtil.getString(renderRequest, "lastName");
+		String emailAddress = ParamUtil.getString(renderRequest, "emailAddress");
+		String firstName = ParamUtil.getString(renderRequest, "firstName");
+		String screenName = ParamUtil.getString(renderRequest, "screenName");
 		
 		long courseId=ParamUtil.getLong(renderRequest, "courseId",0);
-		UserSearchContainer searchContainer = new UserSearchContainer(renderRequest, renderResponse.createRenderURL());		
+		UserSearchContainer searchContainer = new UserSearchContainer(renderRequest, renderResponse.createRenderURL());	
+		
+		
 		UserSearchTerms searchTerms = (UserSearchTerms) searchContainer.getSearchTerms();
 		String redirectOfEdit = ParamUtil.getString(renderRequest, "redirectOfEdit");
 		try{		
@@ -428,7 +433,6 @@ public class CourseAdmin extends MVCPortlet {
 					tabs1 = teacherName;
 				}
 			}
-			log.debug("tabs1");
 			if(tabs1.equals(students)){
 				roleId=commmanager.getRoleId();
 			}else if(tabs1.equals(editorName)){
@@ -436,33 +440,40 @@ public class CourseAdmin extends MVCPortlet {
 			}else if(tabs1.equals(teacherName)){
 				roleId=prefs.getTeacherRole();
 			}
-			
-			log.debug("START "+searchContainer.getStart());
-			log.debug("END "+searchContainer.getEnd());
-			
 			long createdGroupId=course.getGroupCreatedId();
-			if(roleId!=commmanager.getRoleId()){
+			if(log.isDebugEnabled()){
+				log.debug("START "+searchContainer.getStart());
+				log.debug("END "+searchContainer.getEnd());
 				log.debug("createdGroupId "+createdGroupId);
 				log.debug("roleId "+roleId);
+				log.debug("IS ADVANCED SEARCH "+searchTerms.isAdvancedSearch());
+			}
+			
+			if(roleId!=commmanager.getRoleId()){
+				
 				userParams.put("usersGroups", createdGroupId);
 				userParams.put("userGroupRole", new Long[]{createdGroupId, roleId});
-				log.debug("IS ADVANCED SEARCH "+searchTerms.isAdvancedSearch());
+				
+				
 				if(searchTerms.isAdvancedSearch()){	
-					log.debug("firstName 1:"+searchTerms.getFirstName());
-					log.debug("lastName 1:"+searchTerms.getLastName());
-					log.debug("screenName 1:"+searchTerms.getScreenName());
-					log.debug("emailAddress 1:"+searchTerms.getEmailAddress());
-					users = UserLocalServiceUtil.search(themeDisplay.getCompanyId(), searchTerms.getFirstName(), StringPool.BLANK, 
-							searchTerms.getLastName(), searchTerms.getScreenName(), searchTerms.getEmailAddress(), WorkflowConstants.STATUS_APPROVED, userParams, searchTerms.isAndOperator(), 
+					if(log.isDebugEnabled()){
+						log.debug("firstName 1:"+searchTerms.getFirstName());
+						log.debug("lastName 1:"+searchTerms.getLastName());
+						log.debug("screenName 1:"+searchTerms.getScreenName());
+						log.debug("emailAddress 1:"+searchTerms.getEmailAddress());
+					}
+					users = UserLocalServiceUtil.search(themeDisplay.getCompanyId(), firstName, StringPool.BLANK, 
+							lastName, screenName, emailAddress, WorkflowConstants.STATUS_APPROVED, userParams, searchTerms.isAndOperator(), 
 							searchContainer.getStart(), searchContainer.getEnd(), obc);
-					total = UserLocalServiceUtil.searchCount(themeDisplay.getCompanyId(), searchTerms.getFirstName(), StringPool.BLANK,
-							searchTerms.getLastName(), searchTerms.getScreenName(), searchTerms.getEmailAddress(), WorkflowConstants.STATUS_APPROVED, userParams, searchTerms.isAndOperator());
+					total = UserLocalServiceUtil.searchCount(themeDisplay.getCompanyId(), firstName, StringPool.BLANK,
+							lastName, screenName, emailAddress, WorkflowConstants.STATUS_APPROVED, userParams, searchTerms.isAndOperator());
 				}else{
-					log.debug("Keywords 1:"+searchTerms.getKeywords());
-					log.debug("userParams length "+userParams.keySet().size());
-					log.debug("COMPANY ID "+themeDisplay.getCompanyId());
+					if(log.isDebugEnabled()){
+						log.debug("Keywords 1:"+searchTerms.getKeywords());
+						log.debug("userParams length "+userParams.keySet().size());
+						log.debug("COMPANY ID "+themeDisplay.getCompanyId());
+					}
 					users = UserLocalServiceUtil.search(themeDisplay.getCompanyId(), searchTerms.getKeywords(), WorkflowConstants.STATUS_APPROVED, userParams, searchContainer.getStart(), searchContainer.getEnd(),obc);
-					log.debug("Users "+users.size() );
 					total = UserLocalServiceUtil.searchCount(themeDisplay.getCompanyId(), searchTerms.getKeywords(), WorkflowConstants.STATUS_APPROVED, userParams);
 				}
 				
@@ -470,23 +481,25 @@ public class CourseAdmin extends MVCPortlet {
 				
 			}else{
 				if(searchTerms.isAdvancedSearch()){	
-					log.debug("firstName:"+searchTerms.getFirstName());
-					log.debug("lastName:"+searchTerms.getLastName());
-					log.debug("screenName:"+searchTerms.getScreenName());
-					log.debug("emailAddress:"+searchTerms.getEmailAddress());
-					users = CourseLocalServiceUtil.getStudents(courseId, themeDisplay.getCompanyId(),  searchTerms.getScreenName(), searchTerms.getFirstName(),searchTerms.getLastName(),searchTerms.getEmailAddress(),searchTerms.isAndOperator(),searchContainer.getStart(), searchContainer.getEnd(),obc);
-					total = CourseLocalServiceUtil.countStudents(courseId, themeDisplay.getCompanyId(), searchTerms.getScreenName(), searchTerms.getFirstName(),searchTerms.getLastName(),searchTerms.getEmailAddress(),searchTerms.isAndOperator());	
+					if(log.isDebugEnabled()){
+						log.debug("firstName:"+searchTerms.getFirstName());
+						log.debug("lastName:"+searchTerms.getLastName());
+						log.debug("screenName:"+searchTerms.getScreenName());
+						log.debug("emailAddress:"+searchTerms.getEmailAddress());
+					}
+					users = CourseLocalServiceUtil.getStudents(courseId, themeDisplay.getCompanyId(),  screenName, firstName, lastName, emailAddress, searchTerms.isAndOperator(),searchContainer.getStart(), searchContainer.getEnd(),obc);
+					total = CourseLocalServiceUtil.countStudents(courseId, themeDisplay.getCompanyId(), screenName, firstName, lastName, emailAddress,searchTerms.isAndOperator());	
 				}else{
-					log.debug("Keywords:"+searchTerms.getKeywords());
-					users = CourseLocalServiceUtil.getStudents(courseId, themeDisplay.getCompanyId(), searchTerms.getKeywords(), searchTerms.getKeywords(),searchTerms.getKeywords(),searchTerms.getKeywords(),true,searchContainer.getStart(), searchContainer.getEnd(),obc);
-					total = CourseLocalServiceUtil.countStudents(courseId, themeDisplay.getCompanyId(), searchTerms.getKeywords(), searchTerms.getKeywords(),searchTerms.getKeywords(),searchTerms.getKeywords(),true);	
+					if(log.isDebugEnabled())log.debug("Keywords:"+searchTerms.getKeywords());
+					users = CourseLocalServiceUtil.getStudents(courseId, themeDisplay.getCompanyId(), searchTerms.getKeywords(), searchTerms.getKeywords(),searchTerms.getKeywords(),searchTerms.getKeywords(),false,searchContainer.getStart(), searchContainer.getEnd(),obc);
+					total = CourseLocalServiceUtil.countStudents(courseId, themeDisplay.getCompanyId(), searchTerms.getKeywords(), searchTerms.getKeywords(),searchTerms.getKeywords(),searchTerms.getKeywords(),false);	
 				}	
 				
 			}
-			
-			log.debug("Users "+users.size() );
-			log.debug("TOTAL "+total);
-			
+			if(log.isDebugEnabled()){
+				log.debug("Users "+users.size() );
+				log.debug("TOTAL "+total);
+			}
 			searchContainer.setResults(users);
 			searchContainer.setTotal(total);
 			boolean commManagerRole = false;
@@ -528,9 +541,7 @@ public class CourseAdmin extends MVCPortlet {
 			PortletURL returnURL = renderResponse.createRenderURL();
 			returnURL.setParameter("view", "");
 			renderRequest.setAttribute("returnURL", returnURL.toString());
-			
-			log.debug("Total:"+searchContainer.getTotal());
-			log.debug("usersInPage:"+users.size());
+		
 		}catch(SystemException e){
 			e.printStackTrace();
 		}catch(PortalException e){
@@ -1091,12 +1102,12 @@ public class CourseAdmin extends MVCPortlet {
 		
 		return valid;
 	}
-	
+	@ProcessAction(name="removeUserRole")
 	public void removeUserRole(ActionRequest actionRequest,
 			ActionResponse actionResponse) throws Exception {
-		ServiceContext serviceContext = ServiceContextFactory.getInstance(
-				Course.class.getName(), actionRequest);
-
+		
+	
+		if(log.isDebugEnabled())log.debug("DELETING USER ROLE....");
 		ThemeDisplay themeDisplay = (ThemeDisplay) actionRequest
 				.getAttribute(WebKeys.THEME_DISPLAY);
 		Role siteMember = RoleLocalServiceUtil.getRole(
@@ -1107,6 +1118,7 @@ public class CourseAdmin extends MVCPortlet {
 		long courseId = ParamUtil.getLong(actionRequest, "courseId", 0);
 		long roleId = ParamUtil.getLong(actionRequest, "roleId", 0);
 		long userId = ParamUtil.getLong(actionRequest, "userId", 0);
+		
 		Course course = CourseLocalServiceUtil.getCourse(courseId);
 		if (roleId != siteMember.getRoleId()) {
 			UserGroupRoleLocalServiceUtil.deleteUserGroupRoles(
@@ -1136,7 +1148,31 @@ public class CourseAdmin extends MVCPortlet {
 			AuditingLogFactory.audit(course.getCompanyId(), course.getGroupCreatedId(), Course.class.getName(), 
 					course.getCourseId(),userId, AuditConstants.UNREGISTER, "COURSE_EDITOR_REMOVE");
 		}
-		actionResponse.setRenderParameters(actionRequest.getParameterMap());
+		
+	
+		actionResponse.setRenderParameter("screenName", ParamUtil.getString(actionRequest, "screenName1"));
+		actionResponse.setRenderParameter("firstName", ParamUtil.getString(actionRequest, "firstName1"));
+		actionResponse.setRenderParameter("lastName", ParamUtil.getString(actionRequest, "lastName1"));
+		actionResponse.setRenderParameter("emailAddress", ParamUtil.getString(actionRequest, "emailAddress1"));
+		actionResponse.setRenderParameter("advancedSearch", ParamUtil.getString(actionRequest, "advancedSearch1"));
+		actionResponse.setRenderParameter("keywords", ParamUtil.getString(actionRequest, "keywords1"));
+		actionResponse.setRenderParameter("andOperator", ParamUtil.getString(actionRequest, "andOperator1"));
+		actionResponse.setRenderParameter("courseId", String.valueOf(courseId));
+		actionResponse.setRenderParameter("userId", String.valueOf(userId));
+		actionResponse.setRenderParameter("roleId", String.valueOf(roleId));
+		
+		actionResponse.setRenderParameter("tabs1", ParamUtil.getString(actionRequest, "tabs1"));
+		
+		boolean backToEdit = ParamUtil.getBoolean(actionRequest, "backToEdit", false);
+		if(backToEdit){
+			actionResponse.setRenderParameter("redirectOfEdit", ParamUtil.getString(actionRequest, "redirectOfEdit",""));
+		}
+		actionResponse.setRenderParameter("backToEdit", String.valueOf(backToEdit));
+		
+		actionResponse.setRenderParameter("view", "role-members-tab");
+		//actionResponse.setRenderParameters(actionRequest.getParameterMap());
+		
+		
 	}
 
 	public void addUserRole(ActionRequest actionRequest, ActionResponse actionResponse) throws Exception{
@@ -1318,8 +1354,11 @@ public class CourseAdmin extends MVCPortlet {
 		}
 		else{ 
 			String contentType = request.getContentType("fileName");	
-			log.debug(" contentType : " + contentType );
-			log.debug(" fileName : " + fileName );
+			if(log.isDebugEnabled()){
+				log.debug(" contentType : " + contentType );
+				log.debug(" fileName : " + fileName );
+				log.debug(" Import users ::"+roleId);
+			}
 			if (!fileName.endsWith(".csv")) { 
 				SessionErrors.add(portletRequest, "courseadmin.importuserrole.csv.badFormat");	
 			}
@@ -1327,7 +1366,7 @@ public class CourseAdmin extends MVCPortlet {
 				CSVReader reader = null; 
 				try {
 					File file = request.getFile("fileName");
-					log.debug(" Import users ::"+roleId);
+					
 					reader = new CSVReader(new InputStreamReader(new FileInputStream(file), StringPool.UTF8), CharPool.SEMICOLON);
 
 					String[] currLine;
@@ -1381,7 +1420,7 @@ public class CourseAdmin extends MVCPortlet {
 										}
 										
 										if(user != null){
-											log.debug("User Name:: " + user.getFullName() );
+											if(log.isDebugEnabled())log.debug("User Name:: " + user.getFullName() );
 											if(!GroupLocalServiceUtil.hasUserGroup(user.getUserId(), course.getGroupCreatedId())){
 												GroupLocalServiceUtil.addUserGroups(user.getUserId(), new long[] { course.getGroupCreatedId() });
 											}
@@ -1624,10 +1663,10 @@ public class CourseAdmin extends MVCPortlet {
 		
 		long groupId  = ParamUtil.getLong(actionRequest, "groupId", 0);
 		String fileName  = ParamUtil.getString(actionRequest, "exportFileName", "New course exported");
-
-		log.debug("groupId:"+groupId);
-		log.debug("fileName:"+fileName);
-		
+		if(log.isDebugEnabled()){
+			log.debug("groupId:"+groupId);
+			log.debug("fileName:"+fileName);
+		}
 		
 		Message message = new Message();
 		message.put("groupId", groupId);

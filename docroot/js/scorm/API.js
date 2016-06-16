@@ -1195,6 +1195,12 @@ SCORM_1_2.API_LIB.prototype = {
 		}
 		if (param === '') {
 			if (!this.$21) {
+				this.$1F.setDataTreeValue('cmi.core.student_id',
+						(typeof themeDisplay != 'undefined' ? themeDisplay.getUserId() : ''),false);
+				this.$1F.setDataTreeValue('cmi.core.student_name',
+						(typeof themeDisplay != 'undefined' ? themeDisplay.getUserName() : ''), false);
+                this.$1F.setDataTreeValue('cmi.student_id', 
+                		(typeof themeDisplay != 'undefined' ? themeDisplay.getUserId() : ''), false);
 				this.$21 = true;
 				this.$23 = '0';
 				this.$1F.setDataTreeValue('cmi.core.session_time',
