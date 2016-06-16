@@ -16,6 +16,38 @@
 <%@page import="com.liferay.lms.model.LearningActivity"%>
 
 <%@include file="/init.jsp" %>
+
+
+<script type="text/javascript">
+function hideDiv(element){
+	var ua = navigator.userAgent;
+	
+	var re  = new RegExp("MSIE ([0-9]{1,}[\.0-9]{0,})");
+	var rv;
+	 if (re.exec(ua) != null){
+	      rv = parseFloat( RegExp.$1 );
+	  }
+	 var childs;
+	if ( rv == 8.0 ) {
+		childs = element.parentNode.querySelectorAll('.collapsable');
+	}else{
+		childs = element.parentNode.getElementsByClassName("collapsable");
+	}
+	
+	if(childs.length>0){
+		var height;
+		if(element.parentNode.className == 'option-more'){
+			element.parentNode.removeClass("option-more");
+			element.parentNode.addClass("option-less");
+		}else{
+			element.parentNode.removeClass("option-less");
+			element.parentNode.addClass("option-more");			
+		}
+	}
+}
+</script>
+
+
 <%
 long actId=ParamUtil.getLong(request,"actId",0);
 long userId = themeDisplay.getUserId();
@@ -54,6 +86,10 @@ if(anonimousString.equals("true")){
 }	
 
 %>
+
+
+
+
 <c:if test="<%=result %>">
 <% if(resultTotal >= 0 && result) { %>
 		<div class="color_tercero font_14"><liferay-ui:message key="p2ptask.correction.result.total" />: <%= resultTotal %></div>
@@ -88,7 +124,7 @@ if(!p2pActCorList.isEmpty()){
 		<c:if test="<%=myP2PActCor.getDate() != null %>">
 			<%correctionsDone=true; %>
 			<div class="option-more">
-				<span class="label-col"><liferay-ui:message key="p2ptask-correction-title" />
+				<span class="label-col" onclick="hideDiv(this);"><liferay-ui:message key="p2ptask-correction-title" />
 			
 				
 					<c:if test="<%=!anonimous %>">
@@ -108,7 +144,7 @@ if(!p2pActCorList.isEmpty()){
 				 	</c:if>
 			 	</span>
 	
-				<div class="collapsable" style="padding-left:10px">
+				<div class="collapsable" style="padding-left:10px;">
 					<c:if test="<%=myP2PActCor.getDate() != null %>">
 						<c:if test="<%=result %>">
 							<div class="container-result">
