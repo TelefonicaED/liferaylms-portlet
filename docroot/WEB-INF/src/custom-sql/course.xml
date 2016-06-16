@@ -403,10 +403,12 @@
 				ur.userId IS NULL AND urE.userId IS NULL AND co.courseId = ? AND u.status = ?
 				AND 
 				(
-					(u.firstName LIKE ? [$AND_OR_NULL_CHECK$]) [$AND_OR_CONNECTOR$]
-					(u.lastName LIKE ? [$AND_OR_NULL_CHECK$]) [$AND_OR_CONNECTOR$]
-					(u.screenName LIKE ? [$AND_OR_NULL_CHECK$]) [$AND_OR_CONNECTOR$]
-					(u.emailAddress LIKE ? [$AND_OR_NULL_CHECK$])
+					[$WHEREFIRSTNAME$]
+					[$WHERELASTNAME$]
+					[$WHERESCREENNAME$]
+					[$WHEREEMAILADDRESS$]
+					[$DEFAULT$]
+					
 				)
 			ORDER BY [$ORDERBY$]
 			LIMIT ?, ?
@@ -434,11 +436,32 @@
 				ur.userId IS NULL AND urE.userId IS NULL AND co.courseId = ? AND u.status = ?
 				AND 
 				(
-					(u.firstName LIKE ? [$AND_OR_NULL_CHECK$]) [$AND_OR_CONNECTOR$]
-					(u.lastName LIKE ? [$AND_OR_NULL_CHECK$]) [$AND_OR_CONNECTOR$]
-					(u.screenName LIKE ? [$AND_OR_NULL_CHECK$]) [$AND_OR_CONNECTOR$]
-					(u.emailAddress LIKE ? [$AND_OR_NULL_CHECK$])
+					[$WHEREFIRSTNAME$]
+					[$WHERELASTNAME$]
+					[$WHERESCREENNAME$]
+					[$WHEREEMAILADDRESS$]
+					[$DEFAULT$]
 				)
+		]]>
+	</sql>
+	<sql id="com.liferay.lms.service.persistence.CourseFinder.whereFistName">
+		<![CDATA[
+			(u.firstName LIKE ?) [$AND_OR_CONNECTOR$]
+		]]>
+	</sql>
+	<sql id="com.liferay.lms.service.persistence.CourseFinder.whereLastName">
+		<![CDATA[
+			(u.lastName LIKE ?) [$AND_OR_CONNECTOR$]
+		]]>
+	</sql>
+	<sql id="com.liferay.lms.service.persistence.CourseFinder.whereScreenName">
+		<![CDATA[
+			(u.screenName LIKE ?) [$AND_OR_CONNECTOR$]
+		]]>
+	</sql>
+	<sql id="com.liferay.lms.service.persistence.CourseFinder.whereEmailAddress">
+		<![CDATA[
+			(u.emailAddress LIKE ?) [$AND_OR_CONNECTOR$]
 		]]>
 	</sql>
 </custom-sql>

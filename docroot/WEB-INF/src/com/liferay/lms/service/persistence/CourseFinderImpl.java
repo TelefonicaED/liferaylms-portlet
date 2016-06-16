@@ -103,6 +103,18 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 	public static final String COUNT_TAG_COURSES =
 			 CourseFinder.class.getName() +
 				".countAssetTagCourses";
+	public static final String WHERE_SCREEN_NAME =
+		    CourseFinder.class.getName() +
+		        ".whereScreenName";
+	public static final String WHERE_FIRST_NAME =
+		    CourseFinder.class.getName() +
+		        ".whereFistName";
+	public static final String WHERE_LAST_NAME =
+		    CourseFinder.class.getName() +
+		        ".whereLastName";
+	public static final String WHERE_EMAIL_ADDRESS =
+		    CourseFinder.class.getName() +
+		        ".whereEmailAddress";
 	
 	
 	@SuppressWarnings("unchecked")
@@ -375,32 +387,10 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 	
 	public List<User> findStudents(long courseId, long companyId, String screenName, String firstName, String lastName, String emailAddress,boolean andOperator, int start, int end,OrderByComparator obc){
 		Session session = null;
-		
+		boolean whereClause = false;
 		try{
 			
 			/** Para la query es necesario si no es null o vacío que añade los porcentajes, y si es vacío ponerlo a null*/
-			
-			if(Validator.isNotNull(screenName)){
-				screenName = "%" + screenName + "%";
-			}else{
-				screenName = null;
-			}
-			if(Validator.isNotNull(firstName)){
-				firstName = "%" + firstName + "%";
-			}else{
-				firstName = null;
-			}
-			if(Validator.isNotNull(lastName)){
-				lastName = "%" + lastName + "%";
-			}else{
-				lastName = null;
-			}
-			if(Validator.isNotNull(emailAddress)){
-				emailAddress = "%" + emailAddress + "%";
-			}else{
-				emailAddress = null;
-			}
-			
 			if(log.isDebugEnabled()){
 				log.debug("ScreenName:"+screenName);
 				log.debug("firstName:"+firstName);
@@ -410,8 +400,47 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			
 			
 			session = openSessionLiferay();
-			
 			String sql = CustomSQLUtil.get(FIND_STUDENTS);
+			
+			if(Validator.isNotNull(screenName)){
+				sql = sql.replace("[$WHERESCREENNAME$]", CustomSQLUtil.get(WHERE_SCREEN_NAME));
+				screenName = "%"+screenName+"%";
+				whereClause=true;
+			}else{
+				sql = sql.replace("[$WHERESCREENNAME$]", "");
+			}
+			if(Validator.isNotNull(firstName)){
+				sql = sql.replace("[$WHEREFIRSTNAME$]", CustomSQLUtil.get(WHERE_FIRST_NAME));
+				firstName = "%"+firstName+"%";
+				whereClause=true;
+			}else{
+				sql = sql.replace("[$WHEREFIRSTNAME$]", "");
+			}
+			if(Validator.isNotNull(lastName)){
+				sql = sql.replace("[$WHERELASTNAME$]", CustomSQLUtil.get(WHERE_LAST_NAME));
+				lastName = "%"+lastName+"%";
+				whereClause=true;
+			}else{
+				sql = sql.replace("[$WHERELASTNAME$]", "");
+			}
+			if(Validator.isNotNull(emailAddress)){
+				sql = sql.replace("[$WHEREEMAILADDRESS$]", CustomSQLUtil.get(WHERE_EMAIL_ADDRESS));
+				emailAddress = "%"+emailAddress+"%";
+				whereClause=true;
+			}else{
+				sql = sql.replace("[$WHEREEMAILADDRESS$]", "");
+			}
+			
+			if(andOperator){
+				sql = sql.replace("[$DEFAULT$]", " 1 = 1 ");
+			}else{
+				if(whereClause){
+					sql = sql.replace("[$DEFAULT$]", " 1 = 0 ");	
+				}else{
+					sql = sql.replace("[$DEFAULT$]", " 1 = 1 ");
+				}
+			}
+			
 			
 			sql = CustomSQLUtil.replaceAndOperator(sql, andOperator);
 			
@@ -437,14 +466,21 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			qPos.add(courseId);
 			qPos.add(WorkflowConstants.STATUS_APPROVED);
 			
-			qPos.add(firstName);
-			qPos.add(firstName);
-			qPos.add(lastName);
-			qPos.add(lastName);
-			qPos.add(screenName);
-			qPos.add(screenName);
-			qPos.add(emailAddress);
-			qPos.add(emailAddress);
+			if(Validator.isNotNull(screenName)){
+				qPos.add(screenName);
+			}
+			
+			if(Validator.isNotNull(firstName)){
+				qPos.add(firstName);
+			}
+			if(Validator.isNotNull(lastName)){
+				qPos.add(lastName);
+			}
+			
+			if(Validator.isNotNull(emailAddress)){
+				qPos.add(emailAddress);
+			}
+					
 			
 			if(log.isDebugEnabled()){
 				log.debug("editorRoleId: " + editorRoleId);
@@ -472,40 +508,59 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 	
 	public int countStudents(long courseId, long companyId, String screenName, String firstName, String lastName, String emailAddress,boolean andOperator){
 		Session session = null;
-		
+		boolean whereClause = false;
 		try{
 			
-			if(Validator.isNotNull(screenName)){
-				screenName = "%" + screenName + "%";
-			}else{
-				screenName = null;
-			}
-			if(Validator.isNotNull(firstName)){
-				firstName = "%" + firstName + "%";
-			}else{
-				firstName = null;
-			}
-			if(Validator.isNotNull(lastName)){
-				lastName = "%" + lastName + "%";
-			}else{
-				lastName = null;
-			}
-			if(Validator.isNotNull(emailAddress)){
-				emailAddress = "%" + emailAddress + "%";
-			}else{
-				emailAddress = null;
-			}	
 			if(log.isDebugEnabled()){
 				log.debug("ScreenName:"+screenName);
 				log.debug("firstName:"+firstName);
 				log.debug("lastName:"+lastName);
 				log.debug("emailAddress:"+emailAddress);
 			}
-			
-			
+						
 			session = openSessionLiferay();
 			
 			String sql = CustomSQLUtil.get(COUNT_STUDENTS);
+			
+
+			if(Validator.isNotNull(screenName)){
+				sql = sql.replace("[$WHERESCREENNAME$]", CustomSQLUtil.get(WHERE_SCREEN_NAME));
+				screenName = "%"+screenName+"%";
+				whereClause=true;
+			}else{
+				sql = sql.replace("[$WHERESCREENNAME$]", "");
+			}
+			if(Validator.isNotNull(firstName)){
+				sql = sql.replace("[$WHEREFIRSTNAME$]", CustomSQLUtil.get(WHERE_FIRST_NAME));
+				firstName = "%"+firstName+"%";
+				whereClause=true;
+			}else{
+				sql = sql.replace("[$WHEREFIRSTNAME$]", "");
+			}
+			if(Validator.isNotNull(lastName)){
+				sql = sql.replace("[$WHERELASTNAME$]", CustomSQLUtil.get(WHERE_LAST_NAME));
+				lastName = "%"+lastName+"%";
+				whereClause=true;
+			}else{
+				sql = sql.replace("[$WHERELASTNAME$]", "");
+			}
+			if(Validator.isNotNull(emailAddress)){
+				sql = sql.replace("[$WHEREEMAILADDRESS$]", CustomSQLUtil.get(WHERE_EMAIL_ADDRESS));
+				emailAddress = "%"+emailAddress+"%";
+				whereClause=true;
+			}else{
+				sql = sql.replace("[$WHEREEMAILADDRESS$]", "");
+			}
+			
+			if(andOperator){
+				sql = sql.replace("[$DEFAULT$]", " 1 = 1 ");
+			}else{
+				if(whereClause){
+					sql = sql.replace("[$DEFAULT$]", " 1 = 0 ");	
+				}else{
+					sql = sql.replace("[$DEFAULT$]", " 1 = 1 ");
+				}
+			}
 			
 			sql = CustomSQLUtil.replaceAndOperator(sql, andOperator);
 			
@@ -522,15 +577,19 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			qPos.add(editorRoleId);
 			qPos.add(courseId);
 			qPos.add(WorkflowConstants.STATUS_APPROVED);
-
-			qPos.add(firstName);
-			qPos.add(firstName);
-			qPos.add(lastName);
-			qPos.add(lastName);
-			qPos.add(screenName);
-			qPos.add(screenName);
-			qPos.add(emailAddress);
-			qPos.add(emailAddress);
+			
+			if(Validator.isNotNull(screenName)){
+				qPos.add(screenName);
+			}
+			if(Validator.isNotNull(firstName)){
+				qPos.add(firstName);
+			}
+			if(Validator.isNotNull(lastName)){
+				qPos.add(lastName);
+			}			
+			if(Validator.isNotNull(emailAddress)){
+				qPos.add(emailAddress);
+			}
 			
 			Iterator<Long> itr = q.iterate();
 
