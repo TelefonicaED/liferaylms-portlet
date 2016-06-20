@@ -18,6 +18,8 @@
 <%@page import="com.liferay.lms.model.LearningActivity"%>
 <%@page import="com.liferay.portal.kernel.xml.Element"%>
 <%@page import="com.liferay.portal.kernel.xml.SAXReaderUtil"%>
+
+<%@page import="com.liferay.portal.kernel.util.PropsUtil"%>
 <%@include file="/init.jsp" %>
 
 <liferay-portlet:renderURL var="setGrades" windowState="<%= LiferayWindowState.EXCLUSIVE.toString() %>">   
@@ -140,7 +142,7 @@ portletURL.setParameter("email-address",emailAddress);
 
 SearchContainer<User> userSearchContainer = new SearchContainer<User>(renderRequest, null, null, SearchContainer.DEFAULT_CUR_PARAM, 
 		ParamUtil.getInteger(renderRequest, SearchContainer.DEFAULT_DELTA_PARAM,SearchContainer.DEFAULT_DELTA), portletURL, 
-		null, "no-results");
+		null,  LanguageUtil.get(pageContext, "no-results"));
 
 List<User> users = UserLocalServiceUtil.search(themeDisplay.getCompanyId(), firstName,"", lastName,screenName, emailAddress, 
 		-1, params, andOperator, userSearchContainer.getStart(),userSearchContainer.getEnd(), comparator);
