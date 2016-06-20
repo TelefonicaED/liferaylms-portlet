@@ -35,9 +35,15 @@ public class LearningActivityTryServiceClp implements LearningActivityTryService
 
 		_methodParameterTypes3 = new String[] { "long", "long" };
 
-		_methodName4 = "getLearningActivityTries";
+		_methodName4 = "createLearningActivityTry";
 
-		_methodParameterTypes4 = new String[] { "long", "java.lang.String" };
+		_methodParameterTypes4 = new String[] {
+				"long", "long", "int", "double", "int"
+			};
+
+		_methodName5 = "getLearningActivityTries";
+
+		_methodParameterTypes5 = new String[] { "long", "java.lang.String" };
 	}
 
 	public java.lang.String getBeanIdentifier() {
@@ -120,8 +126,8 @@ public class LearningActivityTryServiceClp implements LearningActivityTryService
 		return (com.liferay.lms.model.LearningActivityTry)ClpSerializer.translateOutput(returnObj);
 	}
 
-	public java.util.List<com.liferay.lms.model.LearningActivityTry> getLearningActivityTries(
-		long actId, java.lang.String login)
+	public com.liferay.lms.model.LearningActivityTry createLearningActivityTry(
+		long actId, long userId, int score, double position, int plays)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		Object returnObj = null;
@@ -129,6 +135,40 @@ public class LearningActivityTryServiceClp implements LearningActivityTryService
 		try {
 			returnObj = _invokableService.invokeMethod(_methodName4,
 					_methodParameterTypes4,
+					new Object[] { actId, userId, score, position, plays });
+		}
+		catch (Throwable t) {
+			t = ClpSerializer.translateThrowable(t);
+
+			if (t instanceof com.liferay.portal.kernel.exception.PortalException) {
+				throw (com.liferay.portal.kernel.exception.PortalException)t;
+			}
+
+			if (t instanceof com.liferay.portal.kernel.exception.SystemException) {
+				throw (com.liferay.portal.kernel.exception.SystemException)t;
+			}
+
+			if (t instanceof RuntimeException) {
+				throw (RuntimeException)t;
+			}
+			else {
+				throw new RuntimeException(t.getClass().getName() +
+					" is not a valid exception");
+			}
+		}
+
+		return (com.liferay.lms.model.LearningActivityTry)ClpSerializer.translateOutput(returnObj);
+	}
+
+	public java.util.List<com.liferay.lms.model.LearningActivityTry> getLearningActivityTries(
+		long actId, java.lang.String login)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		Object returnObj = null;
+
+		try {
+			returnObj = _invokableService.invokeMethod(_methodName5,
+					_methodParameterTypes5,
 					new Object[] { actId, ClpSerializer.translateInput(login) });
 		}
 		catch (Throwable t) {
@@ -163,4 +203,6 @@ public class LearningActivityTryServiceClp implements LearningActivityTryService
 	private String[] _methodParameterTypes3;
 	private String _methodName4;
 	private String[] _methodParameterTypes4;
+	private String _methodName5;
+	private String[] _methodParameterTypes5;
 }

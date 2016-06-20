@@ -64,7 +64,11 @@ public class ResourceExternalLearningActivityType extends BaseLearningActivityTy
 	public long getDefaultScore() {
 		return 0;
 	}
-
+	
+	@Override
+	public boolean isScoreConfigurable() {
+		return true;
+	}
 
 	@Override
 	public String getName() {
@@ -107,6 +111,7 @@ public class ResourceExternalLearningActivityType extends BaseLearningActivityTy
 			//PortletRequest actionRequest = (PortletRequest)uploadRequest.getAttribute(JavaConstants.JAVAX_PORTLET_REQUEST);
 			
 			String youtubecode=ParamUtil.getString(uploadRequest,"youtubecode");
+			boolean videoControlEnabled=ParamUtil.getBoolean(uploadRequest,"videoControl");
 			//String additionalFile = uploadRequest.getFileName("additionalFile");
 			//boolean deleteVideo=ParamUtil.getBoolean(uploadRequest, "deleteAdditionalFile",false);
 			String team = ParamUtil.getString(uploadRequest, "team","0");
@@ -168,6 +173,17 @@ public class ResourceExternalLearningActivityType extends BaseLearningActivityTy
 					video.setText(youtubecode);		
 					rootElement.add(video);
 				}
+				
+				Element videoControl=rootElement.element("video-control");
+				if(videoControl!=null)
+				{
+					videoControl.detach();
+					rootElement.remove(videoControl);
+				}
+				
+				videoControl = SAXReaderUtil.createElement("video-control");
+				videoControl.setText(String.valueOf(videoControlEnabled));		
+				rootElement.add(videoControl);				
 				
 				if(files.size()>0){
 					boolean changes = false;

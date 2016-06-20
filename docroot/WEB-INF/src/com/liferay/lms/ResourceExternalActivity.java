@@ -64,6 +64,7 @@ public class ResourceExternalActivity extends MVCPortlet {
 		long actId = ParamUtil.getLong(actionRequest, "resId", 0);
 		String description = request.getParameter("description");
 		String youtubecode=ParamUtil.getString(request,"youtubecode","");
+		boolean videoControlEnabled=ParamUtil.getBoolean(request,"videoControl");
 		LearningActivity larn = LearningActivityServiceUtil.getLearningActivity(actId);
 		String extraContent=larn.getExtracontent();
 		Document document = SAXReaderUtil.createDocument();
@@ -86,6 +87,18 @@ public class ResourceExternalActivity extends MVCPortlet {
 			video.setText(youtubecode);		
 			rootElement.add(video);
 		}
+		
+		Element videoControl=rootElement.element("video-control");
+		if(videoControl!=null)
+		{
+			videoControl.detach();
+			rootElement.remove(videoControl);
+		}
+		
+		videoControl = SAXReaderUtil.createElement("video-control");
+		videoControl.setText(String.valueOf(videoControlEnabled));		
+		rootElement.add(videoControl);
+		
 		larn.setExtracontent(document.formattedString());
 		larn.setDescription( description,themeDisplay.getLocale());
 		//LearningActivityServiceUtil.modLearningActivity(larn, serviceContext);
