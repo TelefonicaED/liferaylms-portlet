@@ -73,7 +73,7 @@ import com.liferay.portal.util.PortalUtil;
  */
 public class P2pActivityCorrectionsLocalServiceImpl
 	extends P2pActivityCorrectionsLocalServiceBaseImpl{
-	
+	private static Log log = LogFactoryUtil.getLog(P2pActivityCorrectionsLocalServiceImpl.class);
 	public P2pActivityCorrections findByP2pActivityIdAndUserId(Long p2pActivityId,
 			Long userId){
 		
@@ -280,6 +280,7 @@ public void asignCorrectionsToP2PActivities(long actId, long p2pActivityId,int n
 		
 		//Precondicion: Solo asignamos las tareas cuando tengamos todas las que necesitamos.	
 		if(activityList == null || activityList.isEmpty() || activityList.size() < numValidaciones){
+			log.info("Solo asignamos las tareas cuando tengamos todas las que necesitamos. ");
 			return;
 		}
 	
@@ -307,19 +308,19 @@ public void asignCorrectionsToP2PActivities(long actId, long p2pActivityId,int n
 				}
 			}
 
-			//Incrementamos el contador de correcciones que se ha asignado para corregir.
+			log.debug("Incrementamos el contador de correcciones que se ha asignado para corregir.");
 			activity.setCountCorrections(activity.getCountCorrections()+1);
 			P2pActivityLocalServiceUtil.updateP2pActivity(activity);
 			
 		}
-		
+		log.debug("Ponemos que ya estan realizadas las asignaciones para no tener que calcular de nuevo las asignaciones.");
 		//Ponemos que ya estan realizadas las asignaciones para no tener que calcular de nuevo las asignaciones.
 		try {
 			P2pActivity p2pActivity = P2pActivityLocalServiceUtil.getP2pActivity(p2pActivityId);
 			p2pActivity.setAsignationsCompleted(true);
 			P2pActivityLocalServiceUtil.updateP2pActivity(p2pActivity);
 			
-			//Mandar email al usuario avisando de que ya puede corregir sus actividades.
+			log.debug("Mandar email al usuario avisando de que ya puede corregir sus actividades.");
 			if(!LearningActivityLocalServiceUtil.islocked(actId, p2pActivity.getUserId())){
 
 				try {
@@ -350,10 +351,12 @@ public void asignCorrectionsToP2PActivities(long actId, long p2pActivityId,int n
 					
 					String[] params={activityTitle, moduleTitle, courseTitle, courseFriendlyUrl};
 					
-					//Enviar los emails.
+					log.debug("Enviar los emails.");
 					P2PSendMailAsignation.sendMail(user.getEmailAddress(), user.getFullName(), params, user.getCompanyId(), user.getLocale());
 		
-				} catch (Exception e) {}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 				
 			} 			
 			

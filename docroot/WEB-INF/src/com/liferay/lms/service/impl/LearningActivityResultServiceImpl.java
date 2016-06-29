@@ -137,7 +137,16 @@ public class LearningActivityResultServiceImpl	extends LearningActivityResultSer
 	}
 	
 	public LearningActivityResult updateFinishTry(long latId, String tryResultData, String imsmanifest) throws PortalException, SystemException	{
-		log.debug("updateFinishTry "+latId);
-		return learningActivityResultLocalService.update(latId, tryResultData, imsmanifest, this.getUserId());
+		/*log.debug("updateFinishTry "+latId);
+		return learningActivityResultLocalService.update(latId, tryResultData, imsmanifest, this.getUserId());*/
+		
+        log.debug("updateFinishTry "+latId);
+        LearningActivityTry learningActivityTry = learningActivityTryLocalService.getLearningActivityTry(latId);
+        log.debug("learningActivityTry "+learningActivityTry);
+        learningActivityTry.setEndDate(new Date());
+        return learningActivityTryLocalService.updateLearningActivityTry(learningActivityTry, tryResultData, imsmanifest);
+
+        
+		
 	}
 }
