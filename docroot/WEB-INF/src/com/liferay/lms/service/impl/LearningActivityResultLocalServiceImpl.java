@@ -798,70 +798,115 @@ public class LearningActivityResultLocalServiceImpl	extends LearningActivityResu
 			}
 		}
 
-		if ("incomplete".equals(total_completion_status) || "completed".equals(total_completion_status)) {
-			if(log.isDebugEnabled()){
-				log.debug("total_completion_status "+total_completion_status);
-			}
-			
-			learningActivityTry.setTryResultData(tryResultData);
-			learningActivityTry.setResult(Math.round(total_score));
-			learningActivityTry.setEndDate(new Date());
-			
-			
-			
-			if (Math.round(total_score) >= master_score)
-				total_lesson_status="passed";
-			
-			log.debug("total_lesson_status "+total_lesson_status);
-			
-			// Only updated the Try
-			learningActivityTryLocalService
-				.softUpdateLearningActivityTry(learningActivityTry);
-			
-			boolean modifiedResult = false;
-			
-			// If SCO says that the activity has been passed, then the learning activity result has to be marked as passed
-			if ("passed".equals(total_lesson_status)) {
-				if (!laresult.getPassed()) {
-					laresult.setPassed(true);
-					laresult.setEndDate(new Date());
-					laresult.setResult(Math.round(total_score));
-					
-					modifiedResult = true;
-				}
-			}
-			// If SCO says that the activity has been failed, then the learning activity result has to be marked as failed
-			else if ("failed".equals(total_lesson_status)) {
-				long  userTries = LearningActivityTryLocalServiceUtil.getLearningActivityTryByActUserCount(laresult.getActId(), userId);
-
-				if (laresult.getEndDate()==null && learningActivity.getTries() <= userTries && learningActivity.getTries() != 0) {
-					laresult.setPassed(false);
-					laresult.setEndDate(new Date());
-					
-					modifiedResult = true;
-				}
-			}
-			
-			// If the result of the Try is higher than the result, then the learning activity result has to be updated
-			if (learningActivityTry.getResult() > laresult.getResult()){
-				laresult.setResult(learningActivityTry.getResult());
-				modifiedResult = true;
-			}
-			
-			// Updated the Learning Activity Result
-			if (modifiedResult){
-				laresult = learningActivityResultLocalService.updateLearningActivityResult(laresult);
-				moduleResultLocalService.update(laresult);
-			}
-		}
-
-		//auditing
-		if(learningActivity!=null){
-			AuditingLogFactory.audit(learningActivity.getCompanyId(), learningActivity.getGroupId(), LearningActivityResult.class.getName(), 
-									 learningActivity.getPrimaryKey(), learningActivity.getUserId(), AuditConstants.UPDATE, null);
-		}
 		
-		return laresult;
+		
+		
+		//CAMBIOS
+		
+		// Se guarda el tryResultData.
+		learningActivityTry.setTryResultData(tryResultData);
+		// Se obtiene el result.
+		long scoreTry = Math.round(total_score);
+		learningActivityTry.setResult(scoreTry);
+		// Se indica el final del try.
+		learningActivityTry.setEndDate(new Date());
+		if (log.isDebugEnabled()) {
+			log.debug("Se llama a la actualización del try " + latId);
+		}
+		learningActivityTryLocalService
+				.updateLearningActivityTry(learningActivityTry);
+		// Se comprueba el nuevo estado del result para realizar la modificación
+		// del mismo si es necesario.
+		LearningActivityResult laResult = learningActivityResultLocalService
+				.getByActIdAndUserId(learningActivityTry.getActId(), userId);
+		// Este booleano se utiliza para saber si se tiene que actualizar el
+		// result o no.
+		boolean saveResult = false;
+		// Si el resultado obtenido es mayor que el mastery score de la
+		// actividad se da como aprobada o la actividad tiene marcada la opción
+		// de "Completado como Aprobado" y
+		// se ha obtenido un Completado, se cambia a Aprobado.
+		if (scoreTry > master_score || (completedAsPassed
+				&& "completed".equals(total_completion_status))) {
+			total_lesson_status = "passed";
+		}
+		// Se comprueba en primer lugar si el resultado del result es menor que
+		// el del try, con lo que se ha mejorado nota.
+		long scoreResult = laResult.getResult();
+		if (scoreTry > scoreResult) {
+			saveResult = true;
+			laResult.setResult(scoreTry);
+			if (log.isDebugEnabled()) {
+				log.debug("Se ha mejorado la nota " + scoreTry
+						+ " la nota anterior era " + scoreResult);
+			}
+		}
+		// Se comprueban las distintas casuísticas dependiendo del estado
+		// obtenido.
+		// En el caso de que se haya obtenido un Iniciado se debería actualizar
+		// el LearningActivityResult cuando se haya obtenido mejor resultado y/o
+		// se haya superado el mastery score (passed).
+		// Ambos casos están contemplados previamente, con lo que no se realiza
+		// nada.
+		/*
+		 * if ("incomplete".equals(total_completion_status)) { }
+		 */
+		// En el caso de que se haya obtenido un Completado se debería
+		// actualizar el LearningActivityResult cuando se haya obtenido mejor
+		// resultado, mastery score (passed) o se tenga un "completed"
+		// cuando está establecido un "Completado como pasado" en la actividad.
+		// Todos los casos están contemplados previamente con lo que no se debe
+		// hacer nada.
+		/*
+		 * if ("completed".equals(total_completion_status)) { }
+		 */
+		// En el caso de que se haya obtenido un Aprobado, se comprueba si no
+		// estaba Aprobado previamente, si no estaba aprobado se actualiza.
+		if ("passed".equals(total_lesson_status)) {
+			if (!laResult.getPassed()) {
+				laResult.setPassed(true);
+				laResult.setEndDate(new Date());
+				// No debería ser necesario, pero por si acaso se vuelve a
+				// establecer el resultado.
+				laResult.setResult(scoreTry);
+				if (log.isDebugEnabled()) {
+					log.debug("Se llama a la actualización del LearningActivityResult (estado Aprobado) "
+							+ laResult.getLarId());
+				}
+				saveResult = true;
+			}
+		}
+		// If SCO says that the activity has been failed, then the learning
+		// activity result has to be marked as failed
+		if ("failed".equals(total_lesson_status)) {
+			if (laResult.getEndDate() == null) {
+				laResult.setPassed(false);
+				laResult.setEndDate(new Date());
+				if (log.isDebugEnabled()) {
+					log.debug("Se llama a la actualización del LearningActivityResult (estado Suspenso) "
+							+ laResult.getLarId());
+				}
+				saveResult = true;
+			}
+		}
+		// Si se ha marcado como que se tiene que modificar el
+		// LearningActivityResult se actualiza.
+		if (saveResult) {
+			learningActivityResultLocalService
+					.updateLearningActivityResult(laResult);
+			moduleResultLocalService.update(laResult);
+		}
+
+		// auditing
+		if (learningActivity != null) {
+			AuditingLogFactory.audit(learningActivity.getCompanyId(),
+					learningActivity.getGroupId(),
+					LearningActivityResult.class.getName(),
+					learningActivity.getPrimaryKey(),
+					learningActivity.getUserId(), AuditConstants.UPDATE, null);
+		}
+		return laResult;
+					
 	}
 	
 	public boolean existsLearningActivityResult(long actId,long userId) throws SystemException{
