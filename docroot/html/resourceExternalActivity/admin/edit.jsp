@@ -28,6 +28,7 @@
 <%@ include file="/init.jsp" %>
 
 <% 
+	boolean defaultValueCheckBox=false;
 	Integer maxfile = ResourceExternalLearningActivityType.DEFAULT_FILENUMBER;
 	PortletSession psession= renderRequest.getPortletSession();
 
@@ -77,6 +78,9 @@
 			Element video=root.element("video");
 			
 			if(video!=null) youtubecode=video.getText();
+			
+			Element videoControlEnabled = root.element("video-control");
+			if(videoControlEnabled!=null) defaultValueCheckBox= Boolean.parseBoolean(videoControlEnabled.getText());
 
 			Element documento=null;
 			int i = 0;
@@ -102,6 +106,7 @@
 %>
 <aui:field-wrapper label="video" >
   	<aui:input disabled="<%=readonly %>" name="youtubecode" type="textarea" rows="6" cols="45" label="youtube-code" value="<%=youtubecode %>" ignoreRequestValue="true" helpMessage="<%=LanguageUtil.get(pageContext,\"youtube-code-help\")%>"></aui:input>
+  	<aui:input label="resourceexternalactivity.videocontrol.disabled" name="videoControl" type="checkbox" value="<%= defaultValueCheckBox %>" />
 </aui:field-wrapper>
 <script type="text/javascript">
 	function deleteFile(id){

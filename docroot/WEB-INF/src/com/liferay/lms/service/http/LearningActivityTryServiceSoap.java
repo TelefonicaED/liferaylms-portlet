@@ -80,6 +80,22 @@ public class LearningActivityTryServiceSoap {
 		}
 	}
 
+	public static com.liferay.lms.model.LearningActivityTrySoap createLearningActivityTry(
+		long actId, long userId, int score, double position, int plays)
+		throws RemoteException {
+		try {
+			com.liferay.lms.model.LearningActivityTry returnValue = LearningActivityTryServiceUtil.createLearningActivityTry(actId,
+					userId, score, position, plays);
+
+			return com.liferay.lms.model.LearningActivityTrySoap.toSoapModel(returnValue);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
 	public static com.liferay.lms.model.LearningActivityTrySoap[] getLearningActivityTries(
 		long actId, java.lang.String login) throws RemoteException {
 		try {

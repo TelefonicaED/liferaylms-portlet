@@ -14,6 +14,7 @@
 
 package com.liferay.lms.service.impl;
 
+import java.io.IOException;
 import java.util.List;
 
 import com.liferay.lms.auditing.AuditConstants;
@@ -26,6 +27,9 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.jsonwebservice.JSONWebService;
 import com.liferay.portal.kernel.jsonwebservice.JSONWebServiceMode;
+import com.liferay.portal.kernel.xml.Document;
+import com.liferay.portal.kernel.xml.Element;
+import com.liferay.portal.kernel.xml.SAXReaderUtil;
 import com.liferay.portal.model.User;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceContextThreadLocal;
@@ -90,6 +94,66 @@ public class LearningActivityTryServiceImpl
 		}
 		return null;
 	}
+	
+	@JSONWebService
+	public LearningActivityTry createLearningActivityTry(long actId,long userId, int score, double position, int plays) throws SystemException, PortalException
+	{
+		User user=this.getUser();
+		if(user.getUserId()==userId)
+		{
+		LearningActivityTry lat=learningActivityTryPersistence.create(counterLocalService.increment(
+				LearningActivityTry.class.getName()));
+		lat.setActId(actId);
+		lat.setUserId(userId);
+		java.util.Date today=new java.util.Date(System.currentTimeMillis());
+		lat.setStartDate(today);
+		lat.setResult(score);
+		
+		try {			
+			Element resultadoXML=SAXReaderUtil.createElement("result");
+			Document resultadoXMLDoc=SAXReaderUtil.createDocument(resultadoXML);
+			Element positionXML=SAXReaderUtil.createElement("position");
+			positionXML.setText(String.valueOf(position));		
+			resultadoXML.add(positionXML);
+			Element scoreXML=SAXReaderUtil.createElement("score");
+			scoreXML.setText(String.valueOf(score));		
+			resultadoXML.add(scoreXML);
+			Element playsXML=SAXReaderUtil.createElement("plays");
+			playsXML.setText(String.valueOf(plays));		
+			resultadoXML.add(playsXML);		
+			lat.setTryResultData(resultadoXMLDoc.formattedString());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		lat.setEndDate(new java.util.Date(System.currentTimeMillis()));
+		
+//		learningActivityTryPersistence.update(lat, true);
+		learningActivityTryLocalService.updateLearningActivityTry(lat);
+		
+		ServiceContext serviceContext = ServiceContextThreadLocal.getServiceContext();
+		
+		if(serviceContext!=null){
+			courseResultLocalService.softInitializeByGroupIdAndUserId(serviceContext.getScopeGroupId(), serviceContext.getUserId());
+		}
+		
+		//auditing
+		if(serviceContext!=null){
+			AuditingLogFactory.audit(serviceContext.getCompanyId(), serviceContext.getScopeGroupId(), LearningActivityTry.class.getName(), 
+				actId, serviceContext.getUserId(), AuditConstants.ADD, null);
+		}else{
+			LearningActivity la = learningActivityPersistence.fetchByPrimaryKey(actId);
+			if(la!=null){
+				AuditingLogFactory.audit(la.getCompanyId(), la.getGroupId(), LearningActivityTry.class.getName(), 
+						actId, la.getUserId(), AuditConstants.ADD, null);
+			}
+		}
+		
+		return lat;
+		}
+		return null;
+	}	
+	
 	@JSONWebService
 	public List<LearningActivityTry> getLearningActivityTries(long actId,String login) throws SystemException, PortalException
 	{

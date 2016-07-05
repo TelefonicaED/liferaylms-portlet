@@ -69,6 +69,11 @@ public interface LearningActivityTryService extends BaseService, InvokableServic
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
+	public com.liferay.lms.model.LearningActivityTry createLearningActivityTry(
+		long actId, long userId, int score, double position, int plays)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException;
+
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.util.List<com.liferay.lms.model.LearningActivityTry> getLearningActivityTries(
 		long actId, java.lang.String login)
