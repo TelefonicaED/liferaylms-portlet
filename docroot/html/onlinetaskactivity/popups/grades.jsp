@@ -35,6 +35,7 @@ if(renderRequest.getParameter("actId")!=null)
 	else {
 		ownGrade=true;	
 		lATry = LearningActivityTryLocalServiceUtil.getLastLearningActivityTryByActivityAndUser(ParamUtil.getLong(renderRequest,"actId"), themeDisplay.getUserId());
+		result = LearningActivityResultLocalServiceUtil.getByActIdAndUserId(ParamUtil.getLong(renderRequest,"actId"), themeDisplay.getUserId());
 	}
 	
 }
@@ -80,6 +81,14 @@ if(renderRequest.getParameter("studentId")!=null){
 %>
  <aui:a href="" label="<%= UserLocalServiceUtil.getUserById(ParamUtil.getLong(renderRequest, \"studentId\")).getFullName() + dateFormated   %>"></aui:a>
 <%
+}else{
+	if (result != null){
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+		String dateFormated = (result.getEndDate()!=null)? " ( "+dateFormat.format(result.getEndDate())+" )":"";
+%>
+	<p class="label"><liferay-ui:message key="onlinetaskactivity.export.date"/>: <%=dateFormated %> </p>
+<%
+	}	
 }
  if(richtext!=null) { %>
 	<aui:field-wrapper label="onlinetaskactivity.text" name="panelLabel" >
@@ -90,15 +99,6 @@ if(renderRequest.getParameter("studentId")!=null){
 			</liferay-ui:panel>
 		</liferay-ui:panel-container >
 	</aui:field-wrapper>
-<%
-	if (lATry != null){
-		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-		String dateFormated = (lATry.getStartDate()!=null)? " ( "+dateFormat.format(lATry.getStartDate())+" )":"";
-%>
-	<p class="label"><liferay-ui:message key="p2ptaskactivity.edit.dateUpload "/>: <%=dateFormated %> </p>
-<%
-	}
-%>
 <% } 
  if(text!=null) {
 %>
