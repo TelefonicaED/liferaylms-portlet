@@ -1,3 +1,4 @@
+<%@page import="com.liferay.portal.model.PortalPreferences"%>
 <%@page import="java.util.Locale"%>
 <%@page import="com.liferay.portal.kernel.util.LocalizationUtil"%>
 <%@page import="com.liferay.portal.kernel.util.LocaleUtil"%>
@@ -40,6 +41,8 @@
 long moduleId = ParamUtil.getLong(request, "moduleId", 0);
 boolean actionEditing = ParamUtil.getBoolean(request, "actionEditing", false);
 long actId = ParamUtil.getLong(request, "actId", 0);
+String activityStatusStr = PrefsPropsUtil.getString("learningactivity.show.status", StringPool.FALSE);
+boolean activityStatus = Boolean.parseBoolean(activityStatusStr);
 
 NumberFormat resultNumberFormat = NumberFormat.getInstance(locale);
 resultNumberFormat.setMinimumIntegerDigits(1);
@@ -359,17 +362,20 @@ function <portlet:namespace />upActivity(actId){
 							<span><%=title%></span>
 					<%
 					}
-					if(!actionEditing)
+					
+				
+					if(!actionEditing && activityStatus)
 					{
 					%>
 					<span class="status"> <%=LanguageUtil.format(pageContext, status,new Object[]{})%></span>
 					<%
-					if(status=="passed"||status=="failed" ){
-					%>	
-						<span class="result"> <%=result%> %</span>
-					<% 
+						if(status=="passed"||status=="failed" ){
+						%>	
+							<span class="result"> <%=result%> %</span>
+						<% 
+						}
 					}
-					}
+					
 				if ((actionEditing)&&(Validator.isNotNull(learningActivityType))
 					&& (permissionChecker.hasPermission(activity.getGroupId(),LearningActivity.class.getName(),activity.getActId(), ActionKeys.UPDATE)
 						|| permissionChecker.hasPermission(activity.getGroupId(),LearningActivity.class.getName(),activity.getActId(), ActionKeys.DELETE) 
