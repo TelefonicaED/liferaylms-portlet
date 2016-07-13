@@ -90,6 +90,15 @@ if(renderRequest.getParameter("studentId")!=null){
 			</liferay-ui:panel>
 		</liferay-ui:panel-container >
 	</aui:field-wrapper>
+<%
+	if (lATry != null){
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+		String dateFormated = (lATry.getStartDate()!=null)? " ( "+dateFormat.format(lATry.getStartDate())+" )":"";
+%>
+	<p class="label"><liferay-ui:message key="p2ptaskactivity.edit.dateUpload "/>: <%=dateFormated %> </p>
+<%
+	}
+%>
 <% } 
  if(text!=null) {
 %>
