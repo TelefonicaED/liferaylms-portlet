@@ -475,7 +475,8 @@ if((PermissionCheckerFactoryUtil.create(themeDisplay.getUser())).hasPermission(t
 		<%
 	}
 }else {
-	if(activity.getTries()!=0 && !isTablet && !isTeacher) {
+	long numeroIntentos = LearningActivityTryLocalServiceUtil.getTriesCountByActivityAndUser(actId, user.getUserId());
+	if(numeroIntentos!=0 && !isTablet && !isTeacher) {
 %>
 	<p class="doc_descarga"><span><liferay-ui:message key="onlinetaskactivity.not.qualificated.activity" /></span> <a class="verMas" href="javascript:<portlet:namespace />showPopupGradesStudent(<%=Long.toString(user.getUserId()) %>,true);"><liferay-ui:message key="onlineActivity.view.last" /></a></p>
 <% }else if(activity.getTries()!=0 && isTablet && !isTeacher){%>
