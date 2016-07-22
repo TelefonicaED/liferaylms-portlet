@@ -410,6 +410,8 @@ public class LearningActivityLocalServiceClpInvoker {
 		if (_methodName170.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes170, parameterTypes)) {
 			LearningActivityLocalServiceUtil.setBeanIdentifier((java.lang.String)arguments[0]);
+
+			return null;
 		}
 
 		if (_methodName175.equals(name) &&
@@ -521,6 +523,8 @@ public class LearningActivityLocalServiceClpInvoker {
 		if (_methodName188.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes188, parameterTypes)) {
 			LearningActivityLocalServiceUtil.deleteLearningactivity((com.liferay.lms.model.LearningActivity)arguments[0]);
+
+			return null;
 		}
 
 		if (_methodName189.equals(name) &&
@@ -537,12 +541,16 @@ public class LearningActivityLocalServiceClpInvoker {
 				Arrays.deepEquals(_methodParameterTypes191, parameterTypes)) {
 			LearningActivityLocalServiceUtil.goUpLearningActivity(((Long)arguments[0]).longValue(),
 				((Long)arguments[1]).longValue());
+
+			return null;
 		}
 
 		if (_methodName192.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes192, parameterTypes)) {
 			LearningActivityLocalServiceUtil.goDownLearningActivity(((Long)arguments[0]).longValue(),
 				((Long)arguments[1]).longValue());
+
+			return null;
 		}
 
 		if (_methodName193.equals(name) &&
@@ -551,6 +559,8 @@ public class LearningActivityLocalServiceClpInvoker {
 				((Long)arguments[1]).longValue(),
 				((Long)arguments[2]).longValue(),
 				((Long)arguments[3]).longValue());
+
+			return null;
 		}
 
 		if (_methodName194.equals(name) &&
@@ -566,6 +576,8 @@ public class LearningActivityLocalServiceClpInvoker {
 		if (_methodName196.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes196, parameterTypes)) {
 			LearningActivityLocalServiceUtil.deleteLearningactivity(((Long)arguments[0]).longValue());
+
+			return null;
 		}
 
 		if (_methodName197.equals(name) &&
@@ -590,6 +602,8 @@ public class LearningActivityLocalServiceClpInvoker {
 				Arrays.deepEquals(_methodParameterTypes200, parameterTypes)) {
 			LearningActivityLocalServiceUtil.setExtraContentValue(((Long)arguments[0]).longValue(),
 				(java.lang.String)arguments[1], (java.lang.String)arguments[2]);
+
+			return null;
 		}
 
 		if (_methodName201.equals(name) &&
@@ -601,6 +615,8 @@ public class LearningActivityLocalServiceClpInvoker {
 				Arrays.deepEquals(_methodParameterTypes202, parameterTypes)) {
 			LearningActivityLocalServiceUtil.saveHashMapToXMLExtraContent(((Long)arguments[0]).longValue(),
 				(java.util.HashMap<java.lang.String, java.lang.String>)arguments[1]);
+
+			return null;
 		}
 
 		if (_methodName203.equals(name) &&

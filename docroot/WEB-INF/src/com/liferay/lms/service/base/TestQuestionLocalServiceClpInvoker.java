@@ -288,18 +288,24 @@ public class TestQuestionLocalServiceClpInvoker {
 		if (_methodName137.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes137, parameterTypes)) {
 			TestQuestionLocalServiceUtil.setBeanIdentifier((java.lang.String)arguments[0]);
+
+			return null;
 		}
 
 		if (_methodName142.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes142, parameterTypes)) {
 			TestQuestionLocalServiceUtil.importXML(((Long)arguments[0]).longValue(),
 				(com.liferay.portal.kernel.xml.Document)arguments[1]);
+
+			return null;
 		}
 
 		if (_methodName143.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes143, parameterTypes)) {
 			TestQuestionLocalServiceUtil.importXMLQuestion(((Long)arguments[0]).longValue(),
 				(com.liferay.portal.kernel.xml.Element)arguments[1]);
+
+			return null;
 		}
 
 		if (_methodName144.equals(name) &&
@@ -357,11 +363,15 @@ public class TestQuestionLocalServiceClpInvoker {
 		if (_methodName154.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes154, parameterTypes)) {
 			TestQuestionLocalServiceUtil.goUpTestQuestion(((Long)arguments[0]).longValue());
+
+			return null;
 		}
 
 		if (_methodName155.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes155, parameterTypes)) {
 			TestQuestionLocalServiceUtil.goDownTestQuestion(((Long)arguments[0]).longValue());
+
+			return null;
 		}
 
 		if (_methodName156.equals(name) &&
@@ -369,11 +379,15 @@ public class TestQuestionLocalServiceClpInvoker {
 			TestQuestionLocalServiceUtil.moveQuestion(((Long)arguments[0]).longValue(),
 				((Long)arguments[1]).longValue(),
 				((Long)arguments[2]).longValue());
+
+			return null;
 		}
 
 		if (_methodName157.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes157, parameterTypes)) {
 			TestQuestionLocalServiceUtil.checkWeights(((Long)arguments[0]).longValue());
+
+			return null;
 		}
 
 		throw new UnsupportedOperationException();
