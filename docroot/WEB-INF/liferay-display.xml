@@ -65,4 +65,7 @@
 		<portlet id="finalcourseresult"></portlet>
 		<portlet id="catalogcourses"></portlet>
 	</category>
+	<category name="Lms">
+		<portlet id="dateeditor"></portlet>
+	</category>
 </display>
