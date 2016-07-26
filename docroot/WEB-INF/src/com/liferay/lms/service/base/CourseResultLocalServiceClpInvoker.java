@@ -304,6 +304,8 @@ public class CourseResultLocalServiceClpInvoker {
 		if (_methodName137.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes137, parameterTypes)) {
 			CourseResultLocalServiceUtil.setBeanIdentifier((java.lang.String)arguments[0]);
+
+			return null;
 		}
 
 		if (_methodName142.equals(name) &&
@@ -392,11 +394,15 @@ public class CourseResultLocalServiceClpInvoker {
 		if (_methodName156.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes156, parameterTypes)) {
 			CourseResultLocalServiceUtil.update((com.liferay.lms.model.CourseResult)arguments[0]);
+
+			return null;
 		}
 
 		if (_methodName157.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes157, parameterTypes)) {
 			CourseResultLocalServiceUtil.update((com.liferay.lms.model.ModuleResult)arguments[0]);
+
+			return null;
 		}
 
 		if (_methodName158.equals(name) &&
@@ -416,6 +422,8 @@ public class CourseResultLocalServiceClpInvoker {
 				Arrays.deepEquals(_methodParameterTypes160, parameterTypes)) {
 			CourseResultLocalServiceUtil.softInitializeByGroupIdAndUserId(((Long)arguments[0]).longValue(),
 				((Long)arguments[1]).longValue());
+
+			return null;
 		}
 
 		throw new UnsupportedOperationException();

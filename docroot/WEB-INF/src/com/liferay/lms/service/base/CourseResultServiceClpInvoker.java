@@ -42,6 +42,8 @@ public class CourseResultServiceClpInvoker {
 		if (_methodName121.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes121, parameterTypes)) {
 			CourseResultServiceUtil.setBeanIdentifier((java.lang.String)arguments[0]);
+
+			return null;
 		}
 
 		throw new UnsupportedOperationException();

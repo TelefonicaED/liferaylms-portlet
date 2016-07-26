@@ -337,6 +337,8 @@ public class ModuleLocalServiceClpInvoker {
 		if (_methodName138.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes138, parameterTypes)) {
 			ModuleLocalServiceUtil.setBeanIdentifier((java.lang.String)arguments[0]);
+
+			return null;
 		}
 
 		if (_methodName143.equals(name) &&
@@ -414,12 +416,16 @@ public class ModuleLocalServiceClpInvoker {
 				Arrays.deepEquals(_methodParameterTypes156, parameterTypes)) {
 			ModuleLocalServiceUtil.goUpModule(((Long)arguments[0]).longValue(),
 				((Long)arguments[1]).longValue());
+
+			return null;
 		}
 
 		if (_methodName157.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes157, parameterTypes)) {
 			ModuleLocalServiceUtil.goDownModule(((Long)arguments[0]).longValue(),
 				((Long)arguments[1]).longValue());
+
+			return null;
 		}
 
 		if (_methodName158.equals(name) &&
@@ -428,6 +434,8 @@ public class ModuleLocalServiceClpInvoker {
 				((Long)arguments[1]).longValue(),
 				((Long)arguments[2]).longValue(),
 				((Long)arguments[3]).longValue());
+
+			return null;
 		}
 
 		if (_methodName159.equals(name) &&
@@ -448,6 +456,8 @@ public class ModuleLocalServiceClpInvoker {
 				Arrays.deepEquals(_methodParameterTypes161, parameterTypes)) {
 			ModuleLocalServiceUtil.remove((com.liferay.lms.model.Module)arguments[0],
 				((Long)arguments[1]).longValue());
+
+			return null;
 		}
 
 		if (_methodName162.equals(name) &&

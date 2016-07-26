@@ -82,9 +82,9 @@ if(renderRequest.getParameter("studentId")!=null){
  <aui:a href="" label="<%= UserLocalServiceUtil.getUserById(ParamUtil.getLong(renderRequest, \"studentId\")).getFullName() + dateFormated   %>"></aui:a>
 <%
 }else{
-	if (result != null){
+	if (lATry != null){
 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-		String dateFormated = (result.getEndDate()!=null)? " ( "+dateFormat.format(result.getEndDate())+" )":"";
+		String dateFormated = (lATry.getStartDate()!=null)? " ( "+dateFormat.format(lATry.getStartDate())+" )":"";
 %>
 	<p class="label"><liferay-ui:message key="onlinetaskactivity.export.date"/>: <%=dateFormated %> </p>
 <%
