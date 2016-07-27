@@ -12,7 +12,6 @@ import com.liferay.lms.model.Module;
 public class ModuleView {
 	private Module module;
 	private Locale locale;
-	private TimeZone timeZone;
 	private List<LearningActivityView> activities;
 	
 	//Start Date
@@ -37,10 +36,11 @@ public class ModuleView {
 			this.activities.add(new LearningActivityView(la,locale,timeZone));
 		}
 		this.locale = locale;
-		this.timeZone = timeZone;
 		
 		Calendar startDate = Calendar.getInstance();
 		startDate.setTime(module.getStartDate());
+		startDate.setTimeZone(timeZone);
+		
 		this.startYear = startDate.get(Calendar.YEAR);
 		this.startMonth = startDate.get(Calendar.MONTH);
 		this.startDay = startDate.get(Calendar.DAY_OF_MONTH);
@@ -49,6 +49,7 @@ public class ModuleView {
 		
 		Calendar endDate = Calendar.getInstance();
 		endDate.setTime(module.getEndDate());
+		endDate.setTimeZone(timeZone);
 		this.endYear = endDate.get(Calendar.YEAR);
 		this.endMonth = endDate.get(Calendar.MONTH);
 		this.endDay = endDate.get(Calendar.DAY_OF_MONTH);

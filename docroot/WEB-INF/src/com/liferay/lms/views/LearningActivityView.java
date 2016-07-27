@@ -49,6 +49,7 @@ public class LearningActivityView {
 		
 		Calendar startDate = Calendar.getInstance();
 		startDate.setTime(la.getStartdate());
+		startDate.setTimeZone(timeZone);
 		this.startYear = startDate.get(Calendar.YEAR);
 		this.startMonth = startDate.get(Calendar.MONTH);
 		this.startDay = startDate.get(Calendar.DAY_OF_MONTH);
@@ -57,6 +58,7 @@ public class LearningActivityView {
 		
 		Calendar endDate = Calendar.getInstance();
 		endDate.setTime(la.getEnddate());
+		endDate.setTimeZone(timeZone);
 		this.endYear = endDate.get(Calendar.YEAR);
 		this.endMonth = endDate.get(Calendar.MONTH);
 		this.endDay = endDate.get(Calendar.DAY_OF_MONTH);

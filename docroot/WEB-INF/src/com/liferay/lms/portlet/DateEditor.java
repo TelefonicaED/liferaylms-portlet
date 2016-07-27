@@ -59,7 +59,7 @@ private static Log log = LogFactoryUtil.getLog(DateEditor.class);
 		long groupId = themeDisplay.getScopeGroupId();
 		List<ModuleView> listModules = new ArrayList<ModuleView>();
 		
-		log.debug("DO VIEW "+themeDisplay.getScopeGroupId());
+		if (log.isDebugEnabled())log.debug("DO VIEW "+themeDisplay.getScopeGroupId());
 		
 		try {
 			List<Module> modules = ModuleLocalServiceUtil.findAllInGroup(groupId);
@@ -83,7 +83,7 @@ private static Log log = LogFactoryUtil.getLog(DateEditor.class);
 				}
 			}
 			
-			log.debug("List modules size "+listModules.size());
+			if (log.isDebugEnabled())log.debug("List modules size "+listModules.size());
 		} catch (SystemException e) {
 			e.printStackTrace();
 		}
@@ -100,6 +100,10 @@ private static Log log = LogFactoryUtil.getLog(DateEditor.class);
 		ThemeDisplay themeDisplay = (ThemeDisplay) request.getAttribute(WebKeys.THEME_DISPLAY);
 		long groupId = themeDisplay.getScopeGroupId();
 		boolean isCorrect = true;
+		Calendar moduleStartDate = Calendar.getInstance(themeDisplay.getTimeZone());
+		Calendar moduleEndDate = Calendar.getInstance(themeDisplay.getTimeZone());
+		moduleStartDate.set(Calendar.SECOND, 0);
+		moduleEndDate.set(Calendar.MILLISECOND, 0);
 		try{		
 			List<Module> modules = ModuleLocalServiceUtil.findAllInGroup(groupId);
 			List<LearningActivity> activities;
@@ -114,9 +118,10 @@ private static Log log = LogFactoryUtil.getLog(DateEditor.class);
 						isCorrect=false;
 					}
 					activities = LearningActivityLocalServiceUtil.getLearningActivitiesOfModule(module.getModuleId());
-					
+					moduleStartDate.setTime(module.getStartDate());
+					moduleEndDate.setTime(module.getEndDate());
 					for(LearningActivity activity : activities){
-						if(checkActivityDates(activity.getActId(), request)){
+						if(checkActivityDates(activity.getActId(), request, moduleStartDate, moduleEndDate)){
 							activity = updateActivityDates(activity, request, 0);
 							activity = updateActivityDates(activity, request, 1);
 							LearningActivityLocalServiceUtil.updateLearningActivity(activity);
@@ -124,7 +129,7 @@ private static Log log = LogFactoryUtil.getLog(DateEditor.class);
 							isCorrect = false;
 						}						
 						if(activity.getTypeId() == 3){
-							if(checkUpdateActivityDates(activity.getActId(), request)){
+							if(checkUpdateActivityDates(activity.getActId(), request, moduleStartDate, moduleEndDate)){
 								updateActivityDates(activity, request, 2);
 							}else{
 								isCorrect = false;
@@ -153,9 +158,11 @@ private static Log log = LogFactoryUtil.getLog(DateEditor.class);
 			paramValue="modInit";
 		}else{
 			paramValue="modEnd";
-		}		
+		}	
+		ThemeDisplay themeDisplay = (ThemeDisplay) request.getAttribute(WebKeys.THEME_DISPLAY);
+		
 		Calendar date = getDateFromRequest(request, paramValue, module.getModuleId());
-					
+	    date.setTimeZone(themeDisplay.getTimeZone());
 		if(startDate){
 			module.setStartDate(date.getTime());
 		}else{
@@ -178,9 +185,9 @@ private static Log log = LogFactoryUtil.getLog(DateEditor.class);
 		}else{
 			return activity;
 		}		
-		
+		ThemeDisplay themeDisplay = (ThemeDisplay) request.getAttribute(WebKeys.THEME_DISPLAY);
 		Calendar date = getDateFromRequest(request, paramValue, activity.getActId());
-		
+		date.setTimeZone(themeDisplay.getTimeZone());
 		if(dateType == 0){
 			activity.setStartdate(date.getTime());
 		}else if(dateType == 1){
@@ -198,53 +205,95 @@ private static Log log = LogFactoryUtil.getLog(DateEditor.class);
 			
 		Calendar startDate = getDateFromRequest(request, "modInit", moduleId);
 		Calendar endDate = getDateFromRequest(request, "modEnd", moduleId);
-		if(endDate.after(startDate)){
+		if(log.isDebugEnabled()){
+			log.debug("--------------------------------------");
+			try {
+				log.debug("Module " + ModuleLocalServiceUtil.fetchModule(moduleId).getTitle("es_ES"));
+			} catch (SystemException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			SimpleDateFormat sdfP2p = new SimpleDateFormat("yyyy-MM-dd kk:mm:ss");
+			log.debug(" Fecha Inicio: " + sdfP2p.format(startDate.getTime()));
+			log.debug(" Fecha Fin: "+sdfP2p.format(endDate.getTime()));
+			log.debug("--------------------------------------");
+		}
+		
+		
+		if(endDate.compareTo(startDate)>=0){
 			return true;
-		}else{
-			return false;
-		}		
+		}
+		if(log.isDebugEnabled())log.debug("**********FECHA MAL PUESTA************ ");
+		return false;
+				
 	}
 	
-	private boolean checkActivityDates(long moduleId, ActionRequest request){
+	private boolean checkActivityDates(long moduleId, ActionRequest request, Calendar moduleStartDate, Calendar moduleEndDate){
 		
 		Calendar startDate = getDateFromRequest(request, "actInit", moduleId);
 		Calendar endDate = getDateFromRequest(request, "actEnd", moduleId);
-		if(endDate.after(startDate)){
-			return true;
-		}else{
-			return false;
-		}	
+		if(log.isDebugEnabled()){
+			log.debug("--------------------------------------");
+			try {
+				log.debug("Activity " + LearningActivityLocalServiceUtil.fetchLearningActivity(moduleId).getTitle("es_ES"));
+			} catch (SystemException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			SimpleDateFormat sdfP2p = new SimpleDateFormat("yyyy-MM-dd kk:mm:ss");
+			log.debug(" Fecha Inicio: " + sdfP2p.format(startDate.getTime()));
+			log.debug(" Fecha Module Inicio: " +sdfP2p.format(moduleStartDate.getTime()));
+			log.debug(" Fecha Fin: "+sdfP2p.format(endDate.getTime().getTime()));			
+			log.debug(" Fecha Module Fin: "+sdfP2p.format(moduleEndDate.getTime()));
+			log.debug("--------------------------------------");
+	
+		}
+		
+		
+		if(endDate.compareTo(startDate)>=0){
+			if(endDate.compareTo(moduleEndDate)<=0 && startDate.compareTo(moduleStartDate)>=0){
+				return true;
+			}	
+		}
+		if(log.isDebugEnabled())log.debug("**********FECHA MAL PUESTA************ ");
+		return false;
+		
 	}
 	
-	private boolean checkUpdateActivityDates(long moduleId, ActionRequest request){
+	private boolean checkUpdateActivityDates(long moduleId, ActionRequest request, Calendar moduleStartDate, Calendar moduleEndDate){
 		
 		Calendar startDate = getDateFromRequest(request, "actInit", moduleId);
 		Calendar updateDate = getDateFromRequest(request, "actUpdate", moduleId);
 		Calendar endDate = getDateFromRequest(request, "actUpdate", moduleId);
-		if(updateDate.after(startDate)){
-			if(endDate.after(updateDate))
-			return true;
+		if(updateDate.compareTo(startDate)>=0){
+			if(endDate.compareTo(updateDate)>=0){
+				if(endDate.compareTo(moduleEndDate)<=0 && startDate.compareTo(moduleStartDate)>=0){
+					return true;	
+				}				
+			}
 		}
+		if(log.isDebugEnabled())log.debug("**********FECHA MAL PUESTA************ ");
 		return false;
 	}
 	
 	
 	private Calendar getDateFromRequest(ActionRequest request, String paramValue, long id){
 		int year,month,day,hour,minute;
-		
+		ThemeDisplay themeDisplay = (ThemeDisplay) request.getAttribute(WebKeys.THEME_DISPLAY);
 		year=ParamUtil.getInteger(request, paramValue+"Year_"+id);
 		month=ParamUtil.getInteger(request, paramValue+"Month_"+id);
 		day=ParamUtil.getInteger(request, paramValue+"Day_"+id);
 		hour=ParamUtil.getInteger(request, paramValue+"Hour_"+id);
 		minute=ParamUtil.getInteger(request, paramValue+"Minute_"+id);
 		
-		Calendar date = Calendar.getInstance();
+		Calendar date = Calendar.getInstance(themeDisplay.getTimeZone());
 		date.set(Calendar.YEAR, year);
 		date.set(Calendar.MONTH, month);
 		date.set(Calendar.DAY_OF_MONTH, day);
 		date.set(Calendar.HOUR, hour);
 		date.set(Calendar.MINUTE, minute);
-		
+		date.set(Calendar.SECOND, 0);
+		date.set(Calendar.MILLISECOND,0);
 		return date;
 	}
 
