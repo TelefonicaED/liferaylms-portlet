@@ -246,7 +246,7 @@ if(course!=null){
 				<liferay-ui:icon image="group" message="assign-member" url="<%=memebersURL.toString() %>" />
 			<%}%>
 			<%if(permissionChecker.hasPermission(course.getGroupId(), Course.class.getName(), course.getCourseId(), ActionKeys.PERMISSIONS) && ! course.isClosed()){%>
-				<c:if test="${renderRequest.preferences.getValue('showPermission', 'false') }">
+				<c:if test="${renderRequest.preferences.getValue('showPermission', 'true') }">
 					<liferay-security:permissionsURL modelResource="<%=Course.class.getName() %>" modelResourceDescription="<%=course.getTitle(themeDisplay.getLocale()) %>"
 						resourcePrimKey="<%= String.valueOf(course.getCourseId()) %>" var="permissionsURL" />
 					<liferay-ui:icon image="permissions" message="courseadmin.adminactions.permissions" url="<%=permissionsURL %>" />
@@ -311,7 +311,7 @@ if(course!=null){
 	</span>
 	<aui:input name="friendlyURL" label="FriendlyURL" type="hidden" > <%=groupCreated!=null?groupCreated.getFriendlyURL():"" %> </aui:input>
 	
-	<c:if test="${renderRequest.preferences.getValue('showDescription', 'false') }">		
+	<c:if test="${renderRequest.preferences.getValue('showDescription', 'true') }">		
 		<aui:field-wrapper label="description" name="description">
 				<script type="text/javascript">
 					function <portlet:namespace />onChangeDescription(val) {
@@ -360,7 +360,7 @@ if(course!=null){
 		);
 	</script>
 	
-	<c:if test="${renderRequest.preferences.getValue('showIconCourse', 'false') }">
+	<c:if test="${renderRequest.preferences.getValue('showIconCourse', 'true') }">
 		<aui:field-wrapper cssClass="wrapper-icon-course">
 			<% if (course != null && course.getIcon() != 0 && !requiredCourseIcon) { %>
 					<aui:input type="checkbox" name="discardLogo" label="discard-course-icon" onClick='<%= renderResponse.getNamespace()+"toggleInputLogo()" %>'/>
@@ -382,7 +382,7 @@ if(course!=null){
 		<liferay-ui:error key="course-icon-required" message="course-icon-required" />
 		<liferay-ui:error key="error_number_format" message="error_number_format" />
 	</c:if>
-	<c:if test="${renderRequest.preferences.getValue('showResume', 'false') }">
+	<c:if test="${renderRequest.preferences.getValue('showResume', 'true') }">
 		<aui:input type="textarea" cols="100" rows="4" name="summary" label="summary" value="<%=summary %>"/>
 	</c:if>
 	
@@ -631,7 +631,7 @@ if(course!=null){
 			boolean active =(course!=null&&course.getWelcome()?true:false);  
 			String welcomeMsg = (course!=null&&course.getWelcomeMsg()!=null?course.getWelcomeMsg():"");
 		%>
-		<c:if test="${renderRequest.preferences.getValue('showWelcomeMsg', 'false') }">
+		<c:if test="${renderRequest.preferences.getValue('showWelcomeMsg', 'true') }">
 			<liferay-ui:panel title="welcome-msg" collapsible="true" defaultState='<%=active?"open":"closed" %>'>
 				<aui:input type="checkbox" name="welcome" label="enabled" value='<%=active %>' onChange='<%= renderResponse.getNamespace()+"changeWelcome()" %>'/>
 				
@@ -718,7 +718,7 @@ if(course!=null){
 			String goodbyeMsg = (course!=null&&course.getGoodbyeMsg()!=null?course.getGoodbyeMsg():"");
 		%>
 		
-		<c:if test="${renderRequest.preferences.getValue('showGoodbyeMsg', 'false') }">
+		<c:if test="${renderRequest.preferences.getValue('showGoodbyeMsg', 'true') }">
 			<liferay-ui:panel title="goodbye-msg" collapsible="true" defaultState='<%=activeGoodbye?"open":"closed" %>'>
 				<aui:input type="checkbox" name="goodbye" label="enabled" value='<%=activeGoodbye %>' onChange='<%= renderResponse.getNamespace()+"changeGoodbye()" %>'/>
 				
