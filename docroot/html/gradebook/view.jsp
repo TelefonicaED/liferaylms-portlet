@@ -196,11 +196,8 @@ if(theTeam!=null)
 						if(LearningActivityResultLocalServiceUtil.existsLearningActivityResult(learningActivity.getActId(), usuario.getUserId())){
 							status="started";
 							LearningActivityResult learningActivityResult = LearningActivityResultLocalServiceUtil.getByActIdAndUserId(learningActivity.getActId(), usuario.getUserId());
-							if(learningActivity.getTypeId() == 8){
-								result= (learningActivityResult!=null)?LearningActivityResultLocalServiceUtil.translateResult(themeDisplay.getLocale(), learningActivityResult.getResult(), learningActivity.getGroupId()):"";
-							}else{
-								result = ""+learningActivityResult.getResult();
-							}
+							result = ""+learningActivityResult.getResult();
+							
 							if(learningActivityResult.getEndDate()!=null){
 								status="not-passed"	;
 							}
@@ -318,8 +315,7 @@ if(theTeam!=null)
 							if(result.trim().equalsIgnoreCase("-")){
 								resultValue = result;
 							}else{
-								
-									resultValue = result + "/100" ;
+								resultValue = result + "/100" ;
 								
 								
 							} 
