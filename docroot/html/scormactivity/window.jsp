@@ -169,10 +169,10 @@
 				    	    var html 	= document.documentElement;
 				            var height	= html.clientHeight || html.offsetHeight;
 				            
-				    		var nav1 = document.getElementById("placeholder_navigationContainer").clientHeight;
-				    		var nav2 = document.getElementById("placeholder_navigationContainer2").clientHeight;
+				    		//var nav1 = document.getElementById("placeholder_navigationContainer").clientHeight;
+				    		var nav = document.getElementById("placeholder_navigationContainer2").clientHeight;
 				    		
-				    		var iframeHeight = height-nav1-nav2-20;
+				    		var iframeHeight = height-nav-20;
 				    		iframeHeight = iframeHeight+"px";
 				    			
 				    		document.getElementById("placeholder_contentIFrame").style.height=iframeHeight;
