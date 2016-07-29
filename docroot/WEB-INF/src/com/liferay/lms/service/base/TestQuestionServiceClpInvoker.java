@@ -56,8 +56,6 @@ public class TestQuestionServiceClpInvoker {
 		if (_methodName121.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes121, parameterTypes)) {
 			TestQuestionServiceUtil.setBeanIdentifier((java.lang.String)arguments[0]);
-
-			return null;
 		}
 
 		if (_methodName126.equals(name) &&

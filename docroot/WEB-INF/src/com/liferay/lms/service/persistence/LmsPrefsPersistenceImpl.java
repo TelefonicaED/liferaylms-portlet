@@ -309,6 +309,7 @@ public class LmsPrefsPersistenceImpl extends BasePersistenceImpl<LmsPrefs>
 		lmsPrefsImpl.setUsersResults(lmsPrefs.getUsersResults());
 		lmsPrefsImpl.setDebugScorm(lmsPrefs.isDebugScorm());
 		lmsPrefsImpl.setHasAPILicence(lmsPrefs.isHasAPILicence());
+		lmsPrefsImpl.setShowHideActivity(lmsPrefs.isShowHideActivity());
 
 		return lmsPrefsImpl;
 	}

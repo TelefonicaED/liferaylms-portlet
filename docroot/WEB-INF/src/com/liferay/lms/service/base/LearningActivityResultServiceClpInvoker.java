@@ -84,8 +84,6 @@ public class LearningActivityResultServiceClpInvoker {
 		if (_methodName121.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes121, parameterTypes)) {
 			LearningActivityResultServiceUtil.setBeanIdentifier((java.lang.String)arguments[0]);
-
-			return null;
 		}
 
 		if (_methodName126.equals(name) &&
@@ -131,8 +129,6 @@ public class LearningActivityResultServiceClpInvoker {
 		if (_methodName133.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes133, parameterTypes)) {
 			LearningActivityResultServiceUtil.forceFinishTry(((Long)arguments[0]).longValue());
-
-			return null;
 		}
 
 		if (_methodName134.equals(name) &&

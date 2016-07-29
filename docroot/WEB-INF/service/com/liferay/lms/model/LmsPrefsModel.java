@@ -215,6 +215,27 @@ public interface LmsPrefsModel extends BaseModel<LmsPrefs> {
 	 */
 	public void setHasAPILicence(boolean hasAPILicence);
 
+	/**
+	 * Returns the show hide activity of this lms prefs.
+	 *
+	 * @return the show hide activity of this lms prefs
+	 */
+	public boolean getShowHideActivity();
+
+	/**
+	 * Returns <code>true</code> if this lms prefs is show hide activity.
+	 *
+	 * @return <code>true</code> if this lms prefs is show hide activity; <code>false</code> otherwise
+	 */
+	public boolean isShowHideActivity();
+
+	/**
+	 * Sets whether this lms prefs is show hide activity.
+	 *
+	 * @param showHideActivity the show hide activity of this lms prefs
+	 */
+	public void setShowHideActivity(boolean showHideActivity);
+
 	public boolean isNew();
 
 	public void setNew(boolean n);

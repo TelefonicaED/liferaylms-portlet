@@ -34,6 +34,7 @@ import com.liferay.lms.service.ClpSerializer;
 import com.liferay.lms.service.LearningActivityLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityResultLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityTryLocalServiceUtil;
+import com.liferay.lms.service.LmsPrefsLocalServiceUtil;
 import com.liferay.lms.service.ModuleLocalServiceUtil;
 import com.liferay.lms.service.base.LearningActivityLocalServiceBaseImpl;
 import com.liferay.lms.service.persistence.LearningActivityUtil;
@@ -913,8 +914,7 @@ public class LearningActivityLocalServiceImpl extends LearningActivityLocalServi
 					((activity.getEnddate()==null && (today.compareTo(module.getEndDate())<=0))||
 					(activity.getEnddate()!=null && (today.compareTo(activity.getEnddate())<=0)))
 				){
-					if(PropsUtil.getProperties().getProperty("learningactivity.show.hideactivity")!=null &&
-							Boolean.valueOf(PropsUtil.getProperties().getProperty("learningactivity.show.hideactivity"))){
+					if(LmsPrefsLocalServiceUtil.getLmsPrefs(activity.getCompanyId()).getShowHideActivity()){
 						Role siteMemberRole = RoleLocalServiceUtil.getRole(activity.getCompanyId(), RoleConstants.SITE_MEMBER);
 						if(!ResourcePermissionLocalServiceUtil.hasResourcePermission(activity.getCompanyId(), LearningActivity.class.getName(), 
 								ResourceConstants.SCOPE_INDIVIDUAL,	Long.toString(activity.getActId()),siteMemberRole.getRoleId(), ActionKeys.VIEW)){
@@ -973,8 +973,7 @@ public class LearningActivityLocalServiceImpl extends LearningActivityLocalServi
 							((activity.getEnddate()==null && (today.compareTo(module.getEndDate())<=0))||
 							(activity.getEnddate()!=null && (today.compareTo(activity.getEnddate())<=0)))
 					){
-						if(PropsUtil.getProperties().getProperty("learningactivity.show.hideactivity")!=null &&
-								Boolean.valueOf(PropsUtil.getProperties().getProperty("learningactivity.show.hideactivity"))){
+						if(LmsPrefsLocalServiceUtil.getLmsPrefs(activity.getCompanyId()).getShowHideActivity()){
 							Role siteMemberRole = RoleLocalServiceUtil.getRole(activity.getCompanyId(), RoleConstants.SITE_MEMBER);
 							if(!ResourcePermissionLocalServiceUtil.hasResourcePermission(activity.getCompanyId(), LearningActivity.class.getName(), 
 									ResourceConstants.SCOPE_INDIVIDUAL,	Long.toString(activity.getActId()),siteMemberRole.getRoleId(), ActionKeys.VIEW)){

@@ -173,16 +173,18 @@ for(CalificationType calificationType :calificationTypeRegistry.getCalificationT
 </aui:field-wrapper>
 
 
-<liferay-ui:header title="API_REST_WS" />
+<liferay-ui:header title="show-hide-activity" />
 <aui:field-wrapper>
 
 	
-	<aui:input type="checkbox" name="hasAPILicence"
-	label="hasAPILicence" checked="<%=prefs.getHasAPILicence()%>" value="<%=prefs.getHasAPILicence()%>" />
+	<aui:input type="checkbox" name="showHideActivity"
+	label="show-hide-activity" checked="<%=prefs.getShowHideActivity()%>" value="<%=prefs.getShowHideActivity()%>" />
 	<%
 
 %>
 </aui:field-wrapper>
+
+
 
 <aui:field-wrapper>
 	<aui:button type="submit" value="save" />

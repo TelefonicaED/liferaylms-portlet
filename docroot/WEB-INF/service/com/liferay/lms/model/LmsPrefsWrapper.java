@@ -54,6 +54,7 @@ public class LmsPrefsWrapper implements LmsPrefs, ModelWrapper<LmsPrefs> {
 		attributes.put("usersResults", getUsersResults());
 		attributes.put("debugScorm", getDebugScorm());
 		attributes.put("hasAPILicence", getHasAPILicence());
+		attributes.put("showHideActivity", getShowHideActivity());
 
 		return attributes;
 	}
@@ -117,6 +118,12 @@ public class LmsPrefsWrapper implements LmsPrefs, ModelWrapper<LmsPrefs> {
 
 		if (hasAPILicence != null) {
 			setHasAPILicence(hasAPILicence);
+		}
+
+		Boolean showHideActivity = (Boolean)attributes.get("showHideActivity");
+
+		if (showHideActivity != null) {
+			setShowHideActivity(showHideActivity);
 		}
 	}
 
@@ -334,6 +341,33 @@ public class LmsPrefsWrapper implements LmsPrefs, ModelWrapper<LmsPrefs> {
 	*/
 	public void setHasAPILicence(boolean hasAPILicence) {
 		_lmsPrefs.setHasAPILicence(hasAPILicence);
+	}
+
+	/**
+	* Returns the show hide activity of this lms prefs.
+	*
+	* @return the show hide activity of this lms prefs
+	*/
+	public boolean getShowHideActivity() {
+		return _lmsPrefs.getShowHideActivity();
+	}
+
+	/**
+	* Returns <code>true</code> if this lms prefs is show hide activity.
+	*
+	* @return <code>true</code> if this lms prefs is show hide activity; <code>false</code> otherwise
+	*/
+	public boolean isShowHideActivity() {
+		return _lmsPrefs.isShowHideActivity();
+	}
+
+	/**
+	* Sets whether this lms prefs is show hide activity.
+	*
+	* @param showHideActivity the show hide activity of this lms prefs
+	*/
+	public void setShowHideActivity(boolean showHideActivity) {
+		_lmsPrefs.setShowHideActivity(showHideActivity);
 	}
 
 	public boolean isNew() {

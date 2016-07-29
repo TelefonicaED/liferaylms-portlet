@@ -1,4 +1,5 @@
 
+<%@page import="com.liferay.lms.service.LmsPrefsLocalServiceUtil"%>
 <%@page import="com.liferay.lms.service.ModuleLocalServiceUtil"%>
 <%@page import="com.liferay.lms.service.CourseLocalServiceUtil"%>
 <%@page import="com.liferay.lms.model.Course"%>
@@ -252,7 +253,7 @@ ActionKeys.UPDATE) %>">
 
 <% 
 String hide = "false";
-String hideStr = PrefsPropsUtil.getString("learningactivity.show.hideactivity", hide);
+String hideStr = String.valueOf(LmsPrefsLocalServiceUtil.getLmsPrefs(themeDisplay.getCompanyId()).getShowHideActivity()); //PrefsPropsUtil.getString("learningactivity.show.hideactivity", hide);
 boolean showChangeVisibility = Boolean.parseBoolean(hideStr);
 %>
 

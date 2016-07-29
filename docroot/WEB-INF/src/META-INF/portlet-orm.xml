@@ -281,6 +281,7 @@
 			<basic name="usersResults" />
 			<basic name="debugScorm" />
 			<basic name="hasAPILicence" />
+			<basic name="showHideActivity" />
 			<transient name="modelAttributes" />
 			<transient name="primaryKey" />
 			<transient name="primaryKeyObj" />

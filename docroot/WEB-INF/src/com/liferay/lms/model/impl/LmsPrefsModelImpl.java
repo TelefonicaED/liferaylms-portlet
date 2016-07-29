@@ -67,9 +67,10 @@ public class LmsPrefsModelImpl extends BaseModelImpl<LmsPrefs>
 			{ "scoretranslators", Types.VARCHAR },
 			{ "usersResults", Types.BIGINT },
 			{ "debugScorm", Types.BOOLEAN },
-			{ "hasAPILicence", Types.BOOLEAN }
+			{ "hasAPILicence", Types.BOOLEAN },
+			{ "showHideActivity", Types.BOOLEAN }
 		};
-	public static final String TABLE_SQL_CREATE = "create table Lms_LmsPrefs (companyId LONG not null primary key,teacherRole LONG,editorRole LONG,lmsTemplates VARCHAR(75) null,activities VARCHAR(75) null,courseevals VARCHAR(75) null,scoretranslators VARCHAR(75) null,usersResults LONG,debugScorm BOOLEAN,hasAPILicence BOOLEAN)";
+	public static final String TABLE_SQL_CREATE = "create table Lms_LmsPrefs (companyId LONG not null primary key,teacherRole LONG,editorRole LONG,lmsTemplates VARCHAR(75) null,activities VARCHAR(75) null,courseevals VARCHAR(75) null,scoretranslators VARCHAR(75) null,usersResults LONG,debugScorm BOOLEAN,hasAPILicence BOOLEAN,showHideActivity BOOLEAN)";
 	public static final String TABLE_SQL_DROP = "drop table Lms_LmsPrefs";
 	public static final String DATA_SOURCE = "liferayDataSource";
 	public static final String SESSION_FACTORY = "liferaySessionFactory";
@@ -125,6 +126,7 @@ public class LmsPrefsModelImpl extends BaseModelImpl<LmsPrefs>
 		attributes.put("usersResults", getUsersResults());
 		attributes.put("debugScorm", getDebugScorm());
 		attributes.put("hasAPILicence", getHasAPILicence());
+		attributes.put("showHideActivity", getShowHideActivity());
 
 		return attributes;
 	}
@@ -189,6 +191,12 @@ public class LmsPrefsModelImpl extends BaseModelImpl<LmsPrefs>
 
 		if (hasAPILicence != null) {
 			setHasAPILicence(hasAPILicence);
+		}
+
+		Boolean showHideActivity = (Boolean)attributes.get("showHideActivity");
+
+		if (showHideActivity != null) {
+			setShowHideActivity(showHideActivity);
 		}
 	}
 
@@ -300,6 +308,18 @@ public class LmsPrefsModelImpl extends BaseModelImpl<LmsPrefs>
 		_hasAPILicence = hasAPILicence;
 	}
 
+	public boolean getShowHideActivity() {
+		return _showHideActivity;
+	}
+
+	public boolean isShowHideActivity() {
+		return _showHideActivity;
+	}
+
+	public void setShowHideActivity(boolean showHideActivity) {
+		_showHideActivity = showHideActivity;
+	}
+
 	@Override
 	public ExpandoBridge getExpandoBridge() {
 		return ExpandoBridgeFactoryUtil.getExpandoBridge(getCompanyId(),
@@ -338,6 +358,7 @@ public class LmsPrefsModelImpl extends BaseModelImpl<LmsPrefs>
 		lmsPrefsImpl.setUsersResults(getUsersResults());
 		lmsPrefsImpl.setDebugScorm(getDebugScorm());
 		lmsPrefsImpl.setHasAPILicence(getHasAPILicence());
+		lmsPrefsImpl.setShowHideActivity(getShowHideActivity());
 
 		lmsPrefsImpl.resetOriginalValues();
 
@@ -440,12 +461,14 @@ public class LmsPrefsModelImpl extends BaseModelImpl<LmsPrefs>
 
 		lmsPrefsCacheModel.hasAPILicence = getHasAPILicence();
 
+		lmsPrefsCacheModel.showHideActivity = getShowHideActivity();
+
 		return lmsPrefsCacheModel;
 	}
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(21);
+		StringBundler sb = new StringBundler(23);
 
 		sb.append("{companyId=");
 		sb.append(getCompanyId());
@@ -467,13 +490,15 @@ public class LmsPrefsModelImpl extends BaseModelImpl<LmsPrefs>
 		sb.append(getDebugScorm());
 		sb.append(", hasAPILicence=");
 		sb.append(getHasAPILicence());
+		sb.append(", showHideActivity=");
+		sb.append(getShowHideActivity());
 		sb.append("}");
 
 		return sb.toString();
 	}
 
 	public String toXmlString() {
-		StringBundler sb = new StringBundler(34);
+		StringBundler sb = new StringBundler(37);
 
 		sb.append("<model><model-name>");
 		sb.append("com.liferay.lms.model.LmsPrefs");
@@ -519,6 +544,10 @@ public class LmsPrefsModelImpl extends BaseModelImpl<LmsPrefs>
 			"<column><column-name>hasAPILicence</column-name><column-value><![CDATA[");
 		sb.append(getHasAPILicence());
 		sb.append("]]></column-value></column>");
+		sb.append(
+			"<column><column-name>showHideActivity</column-name><column-value><![CDATA[");
+		sb.append(getShowHideActivity());
+		sb.append("]]></column-value></column>");
 
 		sb.append("</model>");
 
@@ -539,5 +568,6 @@ public class LmsPrefsModelImpl extends BaseModelImpl<LmsPrefs>
 	private long _usersResults;
 	private boolean _debugScorm;
 	private boolean _hasAPILicence;
+	private boolean _showHideActivity;
 	private LmsPrefs _escapedModelProxy;
 }

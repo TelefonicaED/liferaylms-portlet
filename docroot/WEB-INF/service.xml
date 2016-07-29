@@ -481,6 +481,7 @@
         <column name="usersResults" type="long"></column>
          <column name="debugScorm" type="boolean"></column>
          <column name="hasAPILicence" type="boolean"></column>
+         <column name="showHideActivity" type="boolean"></column>
     </entity>
         
 	<entity name="SurveyResult" uuid="true" local-service="true" remote-service="false" json-enabled="false">

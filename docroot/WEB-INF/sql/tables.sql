@@ -153,7 +153,8 @@ create table Lms_LmsPrefs (
 	scoretranslators VARCHAR(75) null,
 	usersResults LONG,
 	debugScorm BOOLEAN,
-	hasAPILicence BOOLEAN
+	hasAPILicence BOOLEAN,
+	showHideActivity BOOLEAN
 );
 
 create table Lms_Module (
