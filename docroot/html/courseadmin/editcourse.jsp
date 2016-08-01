@@ -423,7 +423,7 @@ if(course!=null){
 							\"					var courseEvalDetailsDiv = A.one('#\"+
 														renderResponse.getNamespace()+\"courseEvalDetails'); \"+
 							\"					courseEvalDetailsDiv.plug(A.Plugin.ParseContent); \"+ 
-							\"					courseEvalDetailsDiv.html(this.get('responseData')); \"+ 
+							\"					if(this.get('responseData')!=null){courseEvalDetailsDiv.html(this.get('responseData')); }else{ courseEvalDetailsDiv.html(''); } \"+ 
 							\"				} \"+
 							\"			} \"+
 							\"		} \"+
