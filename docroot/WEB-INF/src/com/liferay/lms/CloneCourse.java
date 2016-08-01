@@ -486,7 +486,7 @@ public class CloneCourse implements MessageListener {
 						
 						try {
 							TestAnswer newTestAnswer = TestAnswerLocalServiceUtil.addTestAnswer(question.getQuestionId(), answer.getAnswer(), answer.getFeedbackCorrect(), answer.getFeedbacknocorrect(), answer.isIsCorrect());
-							
+							newTestAnswer.setActId(nuevaLarn.getActId());
 							newTestAnswer.setQuestionId(newTestQuestion.getQuestionId());
 							newTestAnswer.setAnswer(descriptionFilesClone(answer.getAnswer(),newModule.getGroupId(), newTestAnswer.getActId(),themeDisplay.getUserId()));
 							
