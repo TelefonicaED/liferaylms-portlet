@@ -4,22 +4,16 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
-import java.util.concurrent.TimeUnit;
-
-import javax.portlet.PortletRequest;
 
 import org.apache.commons.io.IOUtils;
 
 import com.liferay.counter.service.CounterLocalServiceUtil;
 import com.liferay.lms.learningactivity.LearningActivityTypeRegistry;
-import com.liferay.lms.learningactivity.ResourceExternalLearningActivityType;
 import com.liferay.lms.model.Course;
 import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.model.LmsPrefs;
@@ -32,7 +26,6 @@ import com.liferay.lms.service.LmsPrefsLocalServiceUtil;
 import com.liferay.lms.service.ModuleLocalServiceUtil;
 import com.liferay.lms.service.TestAnswerLocalServiceUtil;
 import com.liferay.lms.service.TestQuestionLocalServiceUtil;
-import com.liferay.lms.service.impl.TestQuestionLocalServiceImpl;
 import com.liferay.portal.DuplicateGroupException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
@@ -40,23 +33,16 @@ import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.messaging.Message;
-import com.liferay.portal.kernel.messaging.MessageBusUtil;
 import com.liferay.portal.kernel.messaging.MessageListener;
 import com.liferay.portal.kernel.messaging.MessageListenerException;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.Folder;
-import com.liferay.portal.kernel.search.Indexer;
-import com.liferay.portal.kernel.search.IndexerRegistryUtil;
-import com.liferay.portal.kernel.servlet.SessionErrors;
-import com.liferay.portal.kernel.servlet.SessionMessages;
-import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.DocumentException;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
 import com.liferay.portal.model.Group;
-import com.liferay.portal.model.LayoutSetPrototype;
 import com.liferay.portal.model.ResourceConstants;
 import com.liferay.portal.model.Role;
 import com.liferay.portal.model.RoleConstants;
@@ -67,12 +53,9 @@ import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.security.permission.PermissionCheckerFactoryUtil;
 import com.liferay.portal.security.permission.PermissionThreadLocal;
 import com.liferay.portal.service.GroupLocalServiceUtil;
-import com.liferay.portal.service.LayoutSetLocalServiceUtil;
-import com.liferay.portal.service.LayoutSetPrototypeLocalServiceUtil;
 import com.liferay.portal.service.ResourcePermissionLocalServiceUtil;
 import com.liferay.portal.service.RoleLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
-import com.liferay.portal.service.ServiceContextFactory;
 import com.liferay.portal.service.UserGroupRoleLocalServiceUtil;
 import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.theme.ThemeDisplay;
@@ -153,6 +136,8 @@ public class CloneCourse implements MessageListener {
 		
 			doCloneCourse();
 			
+			log.debug("Clone Stack Trace: "+cloneTraceStr);
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -162,12 +147,12 @@ public class CloneCourse implements MessageListener {
 	public void doCloneCourse() throws Exception {
 		cloneTraceStr += " Course to clone\n........................." + groupId;
 		
-		System.out.println("  + groupId: "+groupId);
+		log.debug("  + groupId: "+groupId);
 		
 		Group group = GroupLocalServiceUtil.getGroup(groupId);
 		Course course = CourseLocalServiceUtil.getCourseByGroupCreatedId(groupId);
 				
-		System.out.println("  + course: "+course.getTitle(themeDisplay.getLocale()));
+		log.debug("  + course: "+course.getTitle(themeDisplay.getLocale()));
 		cloneTraceStr += " course:" + course.getTitle(themeDisplay.getLocale()); 
 		cloneTraceStr += " groupId:" + groupId;
 		
@@ -202,13 +187,13 @@ public class CloneCourse implements MessageListener {
 		}else{
 			layoutSetPrototypeId = LayoutSetLocalServiceUtil.getLayoutSet(groupId, true).getLayoutSetPrototypeId();
 		}*/
-		System.out.println("  + layoutSetPrototypeId: "+layoutSetPrototypeId);
+		log.debug("  + layoutSetPrototypeId: "+layoutSetPrototypeId);
 		cloneTraceStr += " layoutSetPrototypeId:" + layoutSetPrototypeId;
 		
 		try{
 			AssetEntryLocalServiceUtil.validate(course.getGroupCreatedId(), Course.class.getName(), serviceContext.getAssetCategoryIds(), serviceContext.getAssetTagNames());
 			serviceContext.setAssetCategoryIds(AssetEntryLocalServiceUtil.getEntry(Course.class.getName(), course.getCourseId()).getCategoryIds());
-			System.out.println("  + AssetCategoryIds: "+AssetEntryLocalServiceUtil.getEntry(Course.class.getName(), course.getCourseId()).getCategoryIds().toString());
+			log.debug("  + AssetCategoryIds: "+AssetEntryLocalServiceUtil.getEntry(Course.class.getName(), course.getCourseId()).getCategoryIds().toString());
 		}catch(Exception e){
 			serviceContext.setAssetCategoryIds(new long[]{});
 			//serviceContext.setAssetTagNames(AssetEntryLocalServiceUtil.getEntry(Course.class.getName(), course.getCourseId()).getTags());
@@ -269,8 +254,8 @@ public class CloneCourse implements MessageListener {
 		
 		newCourse.setUserId(themeDisplay.getUserId());
 
-		System.out.println("-----------------------\n  From course: "+  group.getName());
-		System.out.println("  + to course: "+  newCourse.getTitle(Locale.getDefault()) +", GroupCreatedId: "+newCourse.getGroupCreatedId()+", GroupId: "+newCourse.getGroupId());
+		log.debug("-----------------------\n  From course: "+  group.getName());
+		log.debug("  + to course: "+  newCourse.getTitle(Locale.getDefault()) +", GroupCreatedId: "+newCourse.getGroupCreatedId()+", GroupId: "+newCourse.getGroupId());
 		cloneTraceStr += "\n New course\n........................." + groupId;
 		cloneTraceStr += " Course: "+  newCourse.getTitle(Locale.getDefault()) +"\n GroupCreatedId: "+newCourse.getGroupCreatedId()+"\n GroupId: "+newCourse.getGroupId();
 		cloneTraceStr += "\n.........................";
@@ -279,7 +264,7 @@ public class CloneCourse implements MessageListener {
 		 * METO AL USUARIO CREADOR DEL CURSO COMO PROFESOR
 		 */
 		if(includeTeacher){
-			System.out.println(includeTeacher);
+			log.debug(includeTeacher);
 			if (!GroupLocalServiceUtil.hasUserGroup(themeDisplay.getUserId(), newCourse.getGroupCreatedId())) {
 					GroupLocalServiceUtil.addUserGroups(themeDisplay.getUserId(),	new long[] { newCourse.getGroupCreatedId() });
 				//The application only send one mail at listener
@@ -298,8 +283,8 @@ public class CloneCourse implements MessageListener {
 		/*********************************************************/
 		
 		
-		long days = 0;
-		boolean isFirstModule = true;
+		/*long days = 0;
+		boolean isFirstModule = true;*/
 		
 		LearningActivityTypeRegistry learningActivityTypeRegistry = new LearningActivityTypeRegistry();
 		List<Module> modules = ModuleLocalServiceUtil.findAllInGroup(groupId);
@@ -362,8 +347,8 @@ public class CloneCourse implements MessageListener {
 				
 				ModuleLocalServiceUtil.addModule(newModule);
 				
-				System.out.println("\n    Module : " + module.getTitle(Locale.getDefault()) +"("+module.getModuleId()+")");
-				System.out.println("    + Module : " + newModule.getTitle(Locale.getDefault()) +"("+newModule.getModuleId()+")" );
+				log.debug("\n    Module : " + module.getTitle(Locale.getDefault()) +"("+module.getModuleId()+")");
+				log.debug("    + Module : " + newModule.getTitle(Locale.getDefault()) +"("+newModule.getModuleId()+")" );
 				cloneTraceStr += "  Module: " + newModule.getTitle(Locale.getDefault()) +"("+newModule.getModuleId()+")";
 				
 			} catch (Exception e) {
@@ -432,8 +417,8 @@ public class CloneCourse implements MessageListener {
 		
 					nuevaLarn=LearningActivityLocalServiceUtil.addLearningActivity(newLearnActivity,serviceContext);
 
-					System.out.println("      Learning Activity : " + activity.getTitle(Locale.getDefault())+ " ("+activity.getActId()+", " + LanguageUtil.get(Locale.getDefault(),learningActivityTypeRegistry.getLearningActivityType(activity.getTypeId()).getName())+")");
-					System.out.println("      + Learning Activity : " + nuevaLarn.getTitle(Locale.getDefault())+ " ("+nuevaLarn.getActId()+", " + LanguageUtil.get(Locale.getDefault(),learningActivityTypeRegistry.getLearningActivityType(nuevaLarn.getTypeId()).getName())+")");
+					log.debug("      Learning Activity : " + activity.getTitle(Locale.getDefault())+ " ("+activity.getActId()+", " + LanguageUtil.get(Locale.getDefault(),learningActivityTypeRegistry.getLearningActivityType(activity.getTypeId()).getName())+")");
+					log.debug("      + Learning Activity : " + nuevaLarn.getTitle(Locale.getDefault())+ " ("+nuevaLarn.getActId()+", " + LanguageUtil.get(Locale.getDefault(),learningActivityTypeRegistry.getLearningActivityType(nuevaLarn.getTypeId()).getName())+")");
 					cloneTraceStr += "   Learning Activity: " + nuevaLarn.getTitle(Locale.getDefault())+ " ("+nuevaLarn.getActId()+", " + LanguageUtil.get(Locale.getDefault(),learningActivityTypeRegistry.getLearningActivityType(nuevaLarn.getTypeId()).getName())+")";
 					
 					cloneActivityFile(activity, nuevaLarn, themeDisplay.getUserId(), serviceContext);
@@ -470,9 +455,9 @@ public class CloneCourse implements MessageListener {
 						newTestQuestion.setText(newTestDescription);
 						TestQuestionLocalServiceUtil.updateTestQuestion(newTestQuestion, true);
 						
-						System.out.println("      Test question : " + question.getQuestionId() );
-						System.out.println("      + Test question : " + newTestQuestion.getQuestionId() );
-						System.out.println("      + Test question TEXT : " + newTestDescription );
+						log.debug("      Test question : " + question.getQuestionId() );
+						log.debug("      + Test question : " + newTestQuestion.getQuestionId() );
+						log.debug("      + Test question TEXT : " + newTestDescription );
 						cloneTraceStr += "\n   Test question: " + newTestQuestion.getQuestionId();
 						
 					} catch (Exception e) {
@@ -492,8 +477,8 @@ public class CloneCourse implements MessageListener {
 							
 							TestAnswerLocalServiceUtil.updateTestAnswer(newTestAnswer, true);
 							
-							System.out.println("        Test answer : " + answer.getAnswerId());
-							System.out.println("        + Test answer : " + newTestAnswer.getAnswerId());
+							log.debug("        Test answer : " + answer.getAnswerId());
+							log.debug("        + Test answer : " + newTestAnswer.getAnswerId());
 							cloneTraceStr += "\n     Test answer: " + newTestAnswer.getAnswerId();
 							
 						} catch (Exception e) {
@@ -529,7 +514,7 @@ public class CloneCourse implements MessageListener {
 			
 		}
 		//Dependencias de modulos
-		System.out.println("modulesDependencesList "+modulesDependencesList.keySet());
+		log.debug("modulesDependencesList "+modulesDependencesList.keySet());
 		for(Long id : modulesDependencesList.keySet()){
 			//id del modulo actual
 			Long moduleToBePrecededNew = correlationModules.get(id);
@@ -541,7 +526,7 @@ public class CloneCourse implements MessageListener {
 		}
 		
 		
-		System.out.println(" ENDS!");
+		log.debug(" ENDS!");
 		
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd kk:mm:ss");
 		dateFormat.setTimeZone(themeDisplay.getTimeZone());
@@ -598,12 +583,12 @@ public class CloneCourse implements MessageListener {
 									
 									newDescription = descriptionCloneFile(newDescription, file, newFile);
 									
-									System.out.println("     + Description file image : " + file.getTitle() +" ("+file.getMimeType()+")");
+									log.debug("     + Description file image : " + file.getTitle() +" ("+file.getMimeType()+")");
 									
 								} catch (Exception e) {
 									// TODO Auto-generated catch block
 									//e.printStackTrace();
-									System.out.println("* ERROR! Description file image : " + e.getMessage());
+									log.error("* ERROR! Description file image : " + e.getMessage());
 								}
 							}
 						}
@@ -640,12 +625,12 @@ public class CloneCourse implements MessageListener {
 									
 									newDescription = descriptionCloneFile(newDescription, file, newFile);
 									
-									System.out.println("   + Description file pdf : " + file.getTitle() +" "+file.getFileEntryId() );
+									log.debug("   + Description file pdf : " + file.getTitle() +" "+file.getFileEntryId() );
 									
 								} catch (Exception e) {
 									// TODO Auto-generated catch block
 									//e.printStackTrace();
-									System.out.println("* ERROR! Description file pdf : " + e.getMessage());
+									log.error("* ERROR! Description file pdf : " + e.getMessage());
 								}
 							}
 							
@@ -692,12 +677,12 @@ public class CloneCourse implements MessageListener {
 								
 								newDescription = descriptionCloneFile(newDescription, file, newFile);
 								
-								System.out.println("     + Description file image : " + file.getTitle() +" ("+file.getMimeType()+")");
+								log.debug("     + Description file image : " + file.getTitle() +" ("+file.getMimeType()+")");
 								
 							} catch (Exception e) {
 								// TODO Auto-generated catch block
 								//e.printStackTrace();
-								System.out.println("* ERROR! Description file image : " + e.getMessage());
+								log.error("* ERROR! Description file image : " + e.getMessage());
 							}
 						}
 					}
@@ -734,12 +719,12 @@ public class CloneCourse implements MessageListener {
 								
 								newDescription = descriptionCloneFile(newDescription, file, newFile);
 								
-								System.out.println("   + Description file pdf : " + file.getTitle() +" "+file.getFileEntryId() );
+								log.debug("   + Description file pdf : " + file.getTitle() +" "+file.getFileEntryId() );
 								
 							} catch (Exception e) {
 								// TODO Auto-generated catch block
 								//e.printStackTrace();
-								System.out.println("* ERROR! Description file pdf : " + e.getMessage());
+								log.error("* ERROR! Description file pdf : " + e.getMessage());
 							}
 						}
 						
@@ -759,7 +744,7 @@ public class CloneCourse implements MessageListener {
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			//e.printStackTrace();
-			System.out.println("* ERROR! Document Exception : " + e.getMessage());
+			log.error("* ERROR! Document Exception : " + e.getMessage());
 		}
 
 		return newDescription;
@@ -783,15 +768,18 @@ public class CloneCourse implements MessageListener {
 		res = description.replace(target, replacement);
 		
 		//System.out.println("   res         : " + res );
-		if(res.equals(description)){
-			System.out.println("   :: description         : " + description );
-			System.out.println("   :: target      : " + target );	
-			System.out.println("   :: replacement : " + replacement );
+		if(log.isDebugEnabled()){
+			if(res.equals(description)){
+				log.debug("   :: description         : " + description );
+				log.debug("   :: target      : " + target );	
+				log.debug("   :: replacement : " + replacement );
+			}
 		}
+		
 				
 		String changed = (!res.equals(description))?" changed":" not changed";
 		
-		System.out.println("   + Description file : " + newFile.getTitle() +" (" + newFile.getMimeType() + ")" + changed);
+		log.debug("   + Description file : " + newFile.getTitle() +" (" + newFile.getMimeType() + ")" + changed);
 		
 		return res;
 	}
@@ -799,7 +787,7 @@ public class CloneCourse implements MessageListener {
 	private void cloneActivityFile(LearningActivity actOld, LearningActivity actNew, long userId, ServiceContext serviceContext){
 					
 		try {
-			System.out.println("cloneActivityFile");
+			log.debug("cloneActivityFile");
 			String entryIdStr = "";
 			if(actOld.getTypeId() == 2){
 				entryIdStr = LearningActivityLocalServiceUtil.getExtraContentValue(actOld.getActId(), "document");
@@ -820,13 +808,13 @@ public class CloneCourse implements MessageListener {
 							
 							HashMap<String, String> map = LearningActivityLocalServiceUtil.convertXMLExtraContentToHashMap(actNew.getActId());
 							Iterator <String> keysString =  map.keySet().iterator();
-							int index = 0;
+							//int index = 0;
 							while (keysString.hasNext()){
 								String key = keysString.next();
 								
 								if(!key.equals("video") && key.indexOf("document")!=-1){
 									
-									index++;
+									//index++;
 									long assetEntryIdOld =  Long.parseLong(map.get(key));
 									
 									AssetEntry docAssetOLD= AssetEntryLocalServiceUtil.getAssetEntry(assetEntryIdOld);
@@ -900,7 +888,7 @@ public class CloneCourse implements MessageListener {
 						
 						
 					} catch (NoSuchEntryException nsee) {
-						System.out.println(" asset not exits ");
+						log.error(" asset not exits ");
 					} catch (Exception e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -936,7 +924,7 @@ public class CloneCourse implements MessageListener {
 		boolean addGroupPermissions = serviceContext.isAddGroupPermissions();
 		
 		try {
-			System.out.println("EntryId: "+entryId);
+			log.debug("EntryId: "+entryId);
 			AssetEntry docAsset = AssetEntryLocalServiceUtil.getAssetEntry(entryId);
 			//docAsset.getUrl()!=""
 			//DLFileEntryLocalServiceUtil.getDLFileEntry(fileEntryId)
@@ -961,12 +949,12 @@ public class CloneCourse implements MessageListener {
 			
 			AssetEntry asset = AssetEntryLocalServiceUtil.getEntry(DLFileEntry.class.getName(), newFile.getPrimaryKey());
 			
-			System.out.println(" asset : " + asset.getEntryId());
+			log.debug(" asset : " + asset.getEntryId());
 			
 			assetEntryId = asset.getEntryId();
 			
 		} catch (NoSuchEntryException nsee) {
-			System.out.println(" asset not exits ");
+			log.error(" asset not exits ");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -1019,7 +1007,7 @@ public class CloneCourse implements MessageListener {
 		return null;
 	}
 	
-	private long createDLFolders(Long userId,Long repositoryId,PortletRequest portletRequest) throws PortalException, SystemException{
+	/*private long createDLFolders(Long userId,Long repositoryId,PortletRequest portletRequest) throws PortalException, SystemException{
 		//Variables for folder ids
 		Long dlMainFolderId = 0L;
 		//Search for folder in Document Library
@@ -1045,7 +1033,7 @@ public class CloneCourse implements MessageListener {
         }//Create portlet folder if not exist
      
         return dlMainFolderId;
-	}
+	}*/
 	
 	private DLFolder getMainDLFolder(Long userId, Long groupId, ServiceContext serviceContext) throws PortalException, SystemException{
 
