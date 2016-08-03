@@ -1,5 +1,6 @@
 package com.liferay.lms.learningactivity.questiontype;
 
+import java.util.Date;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -117,6 +118,7 @@ public class OptionsQuestionType extends BaseQuestionType {
 	private String getHtml(Document document, long questionId, boolean feedback, ThemeDisplay themeDisplay){
 		String html = "", answersFeedBack="", feedMessage = "", cssclass="";
 		String namespace = themeDisplay != null ? themeDisplay.getPortletDisplay().getNamespace() : "";
+		String timestamp="";
 		try {
 			TestQuestion question = TestQuestionLocalServiceUtil.fetchTestQuestion(questionId);
 			List<TestAnswer> answersSelected=getAnswersSelected(document, questionId);
@@ -140,6 +142,8 @@ public class OptionsQuestionType extends BaseQuestionType {
 						}
 					} catch (Exception e) {}
 					disabled = "disabled='disabled'";
+					Date now = new Date();
+					timestamp = String.valueOf(now.getTime());
 				}
 				if(isCorrect(answer)){
 					correctAnswers++;
@@ -160,10 +164,10 @@ public class OptionsQuestionType extends BaseQuestionType {
 						feedMessage=(!LanguageUtil.get(themeDisplay.getLocale(),"answer-in-blank").equals(feedMessage))?feedMessage+"<br/>"+answer.getFeedbacknocorrect():answer.getFeedbacknocorrect();
 					}
 				}
-
+				
 				answersFeedBack += "<div class=\"answer " + correct + "\">" +
 										"<label for=\""+namespace+"question_"+question.getQuestionId()+"_"+i+"\" />"+
-										"<input id=\""+namespace+"question_"+question.getQuestionId()+"_"+i+"\" type=\"" + inputType + "\" name=\""+namespace+"question_" + question.getQuestionId() + "\" " + checked + " value=\"" + answer.getAnswerId() +"\" " + disabled + "><div class=\"answer-options\">" + answer.getAnswer() + "</div>" + 
+										"<input id=\""+namespace+"question_"+question.getQuestionId()+"_"+i+"\" type=\"" + inputType + "\" name=\""+namespace+"question_" + question.getQuestionId() +timestamp+ "\" " + checked + " value=\"" + answer.getAnswerId() +"\" " + disabled + "/><div class=\"answer-options\">" + answer.getAnswer() + "</div>" + 
 									"</div>";
 				i++;
 			}
@@ -183,6 +187,7 @@ public class OptionsQuestionType extends BaseQuestionType {
 				}
 			}
 
+			
 			html += "<div class=\"question" + cssclass + " questiontype_" + getName() + " questiontype_" + getTypeId() + "\">" +
 						"<input type=\"hidden\" name=\""+namespace+"question\" value=\"" + question.getQuestionId() + "\"/>"+
 						"<div class=\"questiontext\">" + question.getText() + "</div>" +
