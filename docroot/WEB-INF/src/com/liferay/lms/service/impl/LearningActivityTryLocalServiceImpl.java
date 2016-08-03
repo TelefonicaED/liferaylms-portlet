@@ -330,7 +330,9 @@ public class LearningActivityTryLocalServiceImpl
 		//Si ya ha pasado el test, no puede hacer m�s intentos.
 		if(LearningActivityResultLocalServiceUtil.userPassed(actId, userId))
 		{
-			return false;
+			if(!"true".equals(LearningActivityLocalServiceUtil.getExtraContentValue(actId, "improve"))){
+				return false;	
+			}
 		}
 		if(LearningActivityLocalServiceUtil.islocked(actId, userId))
 		{

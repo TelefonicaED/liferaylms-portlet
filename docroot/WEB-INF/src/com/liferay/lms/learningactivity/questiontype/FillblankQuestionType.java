@@ -230,8 +230,12 @@ public class FillblankQuestionType extends BaseQuestionType {
 					showCorrectAnswer = LearningActivityLocalServiceUtil.getExtraContentValue(question.getActId(), "showCorrectAnswer");
 					String showCorrectAnswerOnlyOnFinalTryString = LearningActivityLocalServiceUtil.getExtraContentValue(question.getActId(), "showCorrectAnswerOnlyOnFinalTry");
 					try {
-						if ("true".equals(showCorrectAnswerOnlyOnFinalTryString) && LearningActivityTryLocalServiceUtil.canUserDoANewTry(question.getActId(), themeDisplay.getUserId())) {
-							showCorrectAnswer = "false";
+						if ("true".equals(showCorrectAnswerOnlyOnFinalTryString)) {
+							if(LearningActivityTryLocalServiceUtil.canUserDoANewTry(question.getActId(), themeDisplay.getUserId())){
+								showCorrectAnswer = "false";
+							}else{
+								showCorrectAnswer = "true";
+							}
 						}
 					} catch (Exception e) {}
 					int correctAnswers=0,i=0;

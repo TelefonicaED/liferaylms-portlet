@@ -162,8 +162,12 @@ public class DraganddropQuestionType extends BaseQuestionType {
 				showCorrectAnswer = LearningActivityLocalServiceUtil.getExtraContentValue(question.getActId(), "showCorrectAnswer");
 				String showCorrectAnswerOnlyOnFinalTryString = LearningActivityLocalServiceUtil.getExtraContentValue(question.getActId(), "showCorrectAnswerOnlyOnFinalTry");
 				try {
-					if ("true".equals(showCorrectAnswerOnlyOnFinalTryString) && LearningActivityTryLocalServiceUtil.canUserDoANewTry(question.getActId(), themeDisplay.getUserId())) {
-						showCorrectAnswer = "false";
+					if ("true".equals(showCorrectAnswerOnlyOnFinalTryString)) {
+						if(LearningActivityTryLocalServiceUtil.canUserDoANewTry(question.getActId(), themeDisplay.getUserId())){
+							showCorrectAnswer = "false";
+						}else{
+							showCorrectAnswer = "true";
+						}
 					}
 				} catch (Exception e) {}
 				if(isCorrect(answersSelectedIds, sols)) correctionClass = " correct";
