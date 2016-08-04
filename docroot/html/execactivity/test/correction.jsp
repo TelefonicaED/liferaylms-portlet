@@ -284,28 +284,20 @@ userSearchContainer.setTotal(totalUsers);
 		 		<liferay-ui:icon image="unchecked" message="unchecked"></liferay-ui:icon>
 		 	<%}
 			
- 			if(status.equals("passed") || status.equals("not-passed")){
- 				if((PermissionCheckerFactoryUtil.create(themeDisplay.getUser())).hasPermission(themeDisplay.getScopeGroupId(), "com.liferay.lms.model", themeDisplay.getScopeGroupId(), "VIEW_RESULTS")){%>
-		 			<liferay-ui:icon image="edit" url='<%="javascript:"+renderResponse.getNamespace() + "showPopupGrades("+Long.toString(u.getUserId())+","+String.valueOf(activity.getActId())+");" %>' />
-			 		<% String typesThatCanBeSeen = "0,3,6";
+ 			if(!status.equals("not-started")){
+ 				if((PermissionCheckerFactoryUtil.create(themeDisplay.getUser())).hasPermission(themeDisplay.getScopeGroupId(), "com.liferay.lms.model", themeDisplay.getScopeGroupId(), "VIEW_RESULTS")){
+ 					if(status.equals("passed") || status.equals("not-passed") || hasFreeQuestion){
+ 					%>
+		 				<liferay-ui:icon image="edit" url='<%="javascript:"+renderResponse.getNamespace() + "showPopupGrades("+Long.toString(u.getUserId())+","+String.valueOf(activity.getActId())+");" %>' />
+			 		<% 
+ 					}
+			 		String typesThatCanBeSeen = "0,3,6";
 			 		if(typesThatCanBeSeen.contains(String.valueOf(activity.getTypeId()))){
 			 			%>
 			 			<liferay-ui:icon image="view" url='<%="javascript:"+renderResponse.getNamespace() + "showPopupActivity("+Long.toString(u.getUserId())+","+String.valueOf(activity.getActId())+","+String.valueOf(activity.getTypeId())+");" %>'/>
 			 		<%}
 		  		}
- 			}else 
- 			//Caso de las que tienen freetext
- 			if(hasFreeQuestion && !status.equals("not-started")){
- 				if((PermissionCheckerFactoryUtil.create(themeDisplay.getUser())).hasPermission(themeDisplay.getScopeGroupId(), "com.liferay.lms.model", themeDisplay.getScopeGroupId(), "VIEW_RESULTS")){%>
-		 			<liferay-ui:icon image="edit" url='<%="javascript:"+renderResponse.getNamespace() + "showPopupGrades("+Long.toString(u.getUserId())+","+String.valueOf(activity.getActId())+");" %>' />
-			 		<% String typesThatCanBeSeen = "0,3,6";
-			 		if(typesThatCanBeSeen.contains(String.valueOf(activity.getTypeId()))){
-			 			%>
-			 			<liferay-ui:icon image="view" url='<%="javascript:"+renderResponse.getNamespace() + "showPopupActivity("+Long.toString(u.getUserId())+","+String.valueOf(activity.getActId())+","+String.valueOf(activity.getTypeId())+");" %>'/>
-			 		<%}
-	  			}
- 			}	
- 			%>
+ 			}%>
 		
 		</liferay-ui:search-container-column-text>
 

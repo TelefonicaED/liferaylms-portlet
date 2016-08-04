@@ -330,15 +330,16 @@ if(theTeam!=null)
 							<%} else if(status.equals("started")){%>
 						 		<liferay-ui:icon image="unchecked" message="unchecked"></liferay-ui:icon>
 						 	<%}
-							
-				 			if(status.equals("passed") || status.equals("not-passed")){
-				 				if((PermissionCheckerFactoryUtil.create(themeDisplay.getUser())).hasPermission(themeDisplay.getScopeGroupId(), "com.liferay.lms.model", themeDisplay.getScopeGroupId(), "VIEW_RESULTS")){%>
-						 			<liferay-ui:icon image="edit" url='<%="javascript:"+renderResponse.getNamespace() + "showPopupGrades("+Long.toString(usuario.getUserId())+","+String.valueOf(learningActivity.getActId())+");" %>' />
-							 		<% String typesThatCanBeSeen = "0,3,6";
-							 		if(typesThatCanBeSeen.contains(String.valueOf(learningActivity.getTypeId()))){
-							 			%>
-							 			<liferay-ui:icon image="view" url='<%="javascript:"+renderResponse.getNamespace() + "showPopupActivity("+Long.toString(usuario.getUserId())+","+String.valueOf(learningActivity.getActId())+","+String.valueOf(learningActivity.getTypeId())+");" %>'/>
-							 		<%}
+							if(!status.equals("not-started")){ 
+								if((PermissionCheckerFactoryUtil.create(themeDisplay.getUser())).hasPermission(themeDisplay.getScopeGroupId(), "com.liferay.lms.model", themeDisplay.getScopeGroupId(), "VIEW_RESULTS")){
+						 			if(status.equals("passed") || status.equals("not-passed")){%>
+						 				<liferay-ui:icon image="edit" url='<%="javascript:"+renderResponse.getNamespace() + "showPopupGrades("+Long.toString(usuario.getUserId())+","+String.valueOf(learningActivity.getActId())+");" %>' />
+							 		<% 
+						 			}
+							 		String typesThatCanBeSeen = "0,3,6";
+							 		if(typesThatCanBeSeen.contains(String.valueOf(learningActivity.getTypeId()))){%>
+								 		<liferay-ui:icon image="view" url='<%="javascript:"+renderResponse.getNamespace() + "showPopupActivity("+Long.toString(usuario.getUserId())+","+String.valueOf(learningActivity.getActId())+","+String.valueOf(learningActivity.getTypeId())+");" %>'/>
+								 	<%}
 						  		}
 				 			}%>
 						</liferay-ui:search-container-column-text>
