@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -358,7 +359,7 @@ public class CloneCourse implements MessageListener {
 			
 			List<LearningActivity> activities = LearningActivityLocalServiceUtil.getLearningActivitiesOfModule(module.getModuleId());
 			HashMap<Long, Long> pending = new HashMap<Long, Long>();
-			
+			List<Long> evaluations = new ArrayList<Long>(); 
 			for(LearningActivity activity:activities){
 				
 				LearningActivity newLearnActivity;
@@ -370,11 +371,8 @@ public class CloneCourse implements MessageListener {
 					newLearnActivity.setDescription(activity.getDescription());
 					newLearnActivity.setTypeId(activity.getTypeId());
 					//Cuando es tipo Evaluación no hay que llevarse el extracontent
-					if(newLearnActivity.getTypeId() != 8){
-						newLearnActivity.setExtracontent(activity.getExtracontent());
-					}else{
-						newLearnActivity.setExtracontent("");
-					}
+					newLearnActivity.setExtracontent(activity.getExtracontent());
+					
 					
 					newLearnActivity.setTries(activity.getTries());
 					newLearnActivity.setPasspuntuation(activity.getPasspuntuation());
@@ -435,6 +433,11 @@ public class CloneCourse implements MessageListener {
 								ResourceConstants.SCOPE_INDIVIDUAL,	Long.toString(actId),siteMemberRole.getRoleId(), new String[] {ActionKeys.VIEW});
 					}
 					
+					if(nuevaLarn.getTypeId() == 8){
+						evaluations.add(nuevaLarn.getActId());
+					}
+					
+					
 					if(actPending){
 						pending.put(actId, activity.getPrecedence());
 					}
@@ -489,7 +492,6 @@ public class CloneCourse implements MessageListener {
 					}
 
 				}
-
 			}
 			
 			if(pending.size()>0){
@@ -512,7 +514,57 @@ public class CloneCourse implements MessageListener {
 				}
 			}
 			
-		}
+			
+			//Extra Content de las evaluaciones
+			LearningActivity evaluationActivity;
+			for(Long evaluation : evaluations){
+				evaluationActivity = LearningActivityLocalServiceUtil.getLearningActivity(evaluation);
+				try{
+				if((evaluationActivity.getExtracontent()!=null)&&(evaluationActivity.getExtracontent().length()!=0)) {	
+					//Element activitiesElement = SAXReaderUtil.read(evaluationActivity.getExtracontent()).getRootElement().element("activities");
+					Document document =SAXReaderUtil.read(evaluationActivity.getExtracontent());
+					if(log.isDebugEnabled())log.debug(" --- OLD EXTRA CONTENT "+document.formattedString());
+					
+					Element evaluationXML = document.getRootElement();
+									
+					if(log.isDebugEnabled())log.debug("--- OLD Evaluation Element "+evaluationXML.asXML());
+					Element activitiesElement = evaluationXML.element("activities");
+					if(log.isDebugEnabled())log.debug("--- OLD Activities Element "+activitiesElement.asXML());
+					if(activitiesElement!=null){
+						Iterator<Element> activitiesElementItr = activitiesElement.elementIterator();
+						while(activitiesElementItr.hasNext()) {
+							Element activity =activitiesElementItr.next();
+							if(log.isDebugEnabled())log.debug("-- Activity "+ activity);
+							if(("activity".equals(activity.getName()))&&(activity.attribute("id")!=null)&&(activity.attribute("id").getValue().length()!=0)){
+								try{
+									if(log.isDebugEnabled())log.debug("Old Value "+Long.parseLong(activity.attribute("id").getValue()));
+									Long newValue = correlationActivities.get(Long.parseLong(activity.attribute("id").getValue()));
+									if(log.isDebugEnabled())log.debug("New Value "+ newValue);
+									activity.attribute("id").setValue(String.valueOf(newValue));
+								}
+								catch(NumberFormatException e){}
+							}
+							
+							if(log.isDebugEnabled())log.debug("-- Activity Changed "+ activity.asXML());
+						}		
+						
+						if(log.isDebugEnabled())log.debug("--- NEW Activities Element "+activitiesElement.asXML());
+					}
+
+					if(log.isDebugEnabled()){
+						log.debug("--- NEW Evaluation Element "+evaluationXML.asXML());
+						log.debug(" --- NEW EXTRA CONTENT "+document.formattedString());
+					}
+					evaluationActivity.setExtracontent(document.formattedString());
+					LearningActivityLocalServiceUtil.updateLearningActivity(evaluationActivity);
+				}
+				}catch(Exception e){e.printStackTrace();}
+			
+			}
+			
+		}	
+		
+		
 		//Dependencias de modulos
 		log.debug("modulesDependencesList "+modulesDependencesList.keySet());
 		for(Long id : modulesDependencesList.keySet()){
@@ -928,7 +980,7 @@ public class CloneCourse implements MessageListener {
 			AssetEntry docAsset = AssetEntryLocalServiceUtil.getAssetEntry(entryId);
 			//docAsset.getUrl()!=""
 			//DLFileEntryLocalServiceUtil.getDLFileEntry(fileEntryId)
-			System.out.println(docAsset.getClassPK());
+			log.debug(docAsset.getClassPK());
 			DLFileEntry docfile = DLFileEntryLocalServiceUtil.getDLFileEntry(docAsset.getClassPK());
 			InputStream is = DLFileEntryLocalServiceUtil.getFileAsStream(userId, docfile.getFileEntryId(), docfile.getVersion());
 			
@@ -1070,7 +1122,7 @@ public class CloneCourse implements MessageListener {
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			//e.printStackTrace();
-			System.out.println("* ERROR! createDLFoldersForLearningActivity: " + e.getMessage());
+			log.error("* ERROR! createDLFoldersForLearningActivity: " + e.getMessage());
 		}
 		
     	return newDLFolder;
