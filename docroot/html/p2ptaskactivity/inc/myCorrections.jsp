@@ -141,7 +141,7 @@ if(!p2pActCorList.isEmpty()){
 				 	</c:if>
 				 	<c:if test="<%=anonimous %>">
 					 	<span class="number">
-					 		<liferay-ui:message key="number" /> 
+					 		<liferay-ui:message key="p2ptaskactivity.number" /> 
 					 		<%=cont%>
 					 	</span> 
 				 	</c:if>

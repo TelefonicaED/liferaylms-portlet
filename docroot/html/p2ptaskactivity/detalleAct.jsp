@@ -194,7 +194,19 @@ if(actId!=0)
 					
 					%>
 					<div class="option-more">
-						<span class="label-col"><liferay-ui:message key="p2ptask-exercise" /> <span class="name"><liferay-ui:message key="of" /> <%=propietary.getFullName() %></span><span class="number"><liferay-ui:message key="number" /> <%=cont%></span></span>
+						<span class="label-col">
+							<liferay-ui:message key="p2ptask-exercise" /> 
+							<span class="name">
+								<liferay-ui:message key="of" /> 
+								<%=propietary.getFullName() %>
+							</span>
+							<c:if test="<%=anonimous %>">
+								<span class="number">
+									<liferay-ui:message key="p2ptaskactivity.number" /> 
+									<%=cont%>
+								</span>
+							</c:if>
+						</span>
 						<div class="collapsable">
 							<%
 							String descriptionFile = "";
@@ -298,7 +310,7 @@ if(actId!=0)
 					</c:if>
 					<c:if test="<%=anonimous %>">
 						<span class="number">
-							<liferay-ui:message key="number" /> 
+							<liferay-ui:message key="p2ptaskactivity.number" /> 
 							<%=cont%>
 						</span>
 					</c:if>
