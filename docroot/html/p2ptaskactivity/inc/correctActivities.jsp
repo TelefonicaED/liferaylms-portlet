@@ -608,10 +608,12 @@ if(!p2pActList.isEmpty()){
 								<%=propietary.getFullName() %>
 							</span>
 						</c:if>
-						<span class="number">
-							<liferay-ui:message key="number" /> 
-							<%=cont%>
-						</span>
+						<c:if test="<%=anonimous %>">
+							<span class="number">
+								<liferay-ui:message key="number" /> 
+								<%=cont%>
+							</span>
+						</c:if>
 					</span>
 					<div class="collapsable2" style="display:none">
 
