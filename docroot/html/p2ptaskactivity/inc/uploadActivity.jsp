@@ -225,7 +225,6 @@ Liferay.provide(
 <!-- Start PopUp confirmation -->
 <div id="<%= renderResponse.getNamespace() %>p2pconfirmation" style="display:none">
 	<h1><liferay-ui:message key="p2ptask-upload-confirmation" /></h1>
-	<div class="desc color_tercero"><liferay-ui:message key="p2ptask-upload-description" /></div>
 	<br />
 	<p><span class="label"><liferay-ui:message key="p2ptask-file-name" />:</span> <span id="contentFile"></span></p>
 	<div class="contDesc">

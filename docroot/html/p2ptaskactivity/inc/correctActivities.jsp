@@ -249,7 +249,7 @@ if(activity.getEnddate() == null){
 	        function () {
 	        	var A = AUI();
 	        	A.DialogManager.closeByChild('#<portlet:namespace />showp2pSaved');
-				window.setTimeout(function() {<portlet:namespace />openCompleted();}, 300);
+				//window.setTimeout(function() {<portlet:namespace />openCompleted();}, 300);
 	        },
 	        ['aui-dialog']
 	);
@@ -502,7 +502,7 @@ if(!p2pActList.isEmpty()){
 						</c:if>
 						<c:if test="<%=anonimous %>">
 						<span class="number">
-							<liferay-ui:message key="p2ptaskactivity.number" /> 
+							<liferay-ui:message key="number" /> 
 							<%=cont%>
 						</span>
 						</c:if>
@@ -608,12 +608,10 @@ if(!p2pActList.isEmpty()){
 								<%=propietary.getFullName() %>
 							</span>
 						</c:if>
-						<c:if test="<%=anonimous %>">
-							<span class="number">
-								<liferay-ui:message key="p2ptaskactivity.number" /> 
-								<%=cont%>
-							</span>
-						</c:if>
+						<span class="number">
+							<liferay-ui:message key="number" /> 
+							<%=cont%>
+						</span>
 					</span>
 					<div class="collapsable2" style="display:none">
 
