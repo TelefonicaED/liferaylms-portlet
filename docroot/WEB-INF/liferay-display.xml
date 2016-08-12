@@ -64,8 +64,7 @@
 		<portlet id="ponderatedevalconf"></portlet>
 		<portlet id="finalcourseresult"></portlet>
 		<portlet id="catalogcourses"></portlet>
-	</category>
-	<category name="Lms">
 		<portlet id="dateeditor"></portlet>
+		<portlet id="deregisteracademymail"></portlet>
 	</category>
 </display>

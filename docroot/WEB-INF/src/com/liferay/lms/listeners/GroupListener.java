@@ -28,6 +28,7 @@ import com.liferay.portal.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.service.CompanyLocalServiceUtil;
 import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.util.PortalUtil;
+import com.tls.lms.util.LiferaylmsUtil;
 
 public class GroupListener extends BaseModelListener<Group> {
 	Log log = LogFactoryUtil.getLog(GroupListener.class);
@@ -56,47 +57,54 @@ public class GroupListener extends BaseModelListener<Group> {
 					}
 					
 					if(user!=null&&company!=null){
-
-				    	String fromName = PrefsPropsUtil.getString(course.getCompanyId(),
-								PropsKeys.ADMIN_EMAIL_FROM_NAME);
-						String fromAddress = PrefsPropsUtil.getString(course.getCompanyId(),
-								PropsKeys.ADMIN_EMAIL_FROM_ADDRESS);
-				    	String emailTo = user.getEmailAddress();
-				    	String nameTo = user.getFullName();
-
-						try{
-							InternetAddress to = new InternetAddress(emailTo, nameTo);
-							InternetAddress from = new InternetAddress(fromAddress, fromName);
-							
-					    	String url = PortalUtil.getPortalURL(company.getVirtualHostname(), 80, false);
-					    	String urlcourse = url+"/web"+course.getFriendlyURL();
-					    	String subject = new String();
-					    	
-					    	if(course.getWelcomeSubject()!=null&&!StringPool.BLANK.equals(course.getWelcomeSubject())){
-						    	subject = course.getWelcomeSubject();
-					    	}else{
-						    	subject = LanguageUtil.format(user.getLocale(),"welcome-subject", new String[]{course.getTitle(user.getLocale())});
-
-					    	}
-					    	String body = StringUtil.replace(
-				    			course.getWelcomeMsg(),
-				    			new String[] {"[$FROM_ADDRESS$]", "[$FROM_NAME$]", "[$PAGE_URL$]","[$PORTAL_URL$]","[$TO_ADDRESS$]","[$TO_NAME$]","[$USER_SCREENNAME$]"},
-				    			new String[] {fromAddress, fromName, urlcourse, url, user.getEmailAddress(), user.getFullName(),user.getScreenName()});
-				    	
-					    	//System.out.println(body);
-							if(log.isDebugEnabled()){
-								log.debug(from);
-								log.debug(to);
-								log.debug(subject);
-								log.debug(body);
-							}
-							MailMessage mailm = new MailMessage(from, to, subject, body, true);
-							MailServiceUtil.sendEmail(mailm);
+						boolean deregisterMail = false;
+						if(user.getExpandoBridge().getAttribute(LiferaylmsUtil.DEREGISTER_USER_EXPANDO)!=null){
+							deregisterMail = (Boolean)user.getExpandoBridge().getAttribute(LiferaylmsUtil.DEREGISTER_USER_EXPANDO);
 						}
-						catch(Exception ex)
-						{
-							if(log.isDebugEnabled())ex.printStackTrace();
-						}		
+						
+						if(!deregisterMail){
+							String fromName = PrefsPropsUtil.getString(course.getCompanyId(),
+									PropsKeys.ADMIN_EMAIL_FROM_NAME);
+							String fromAddress = PrefsPropsUtil.getString(course.getCompanyId(),
+									PropsKeys.ADMIN_EMAIL_FROM_ADDRESS);
+					    	String emailTo = user.getEmailAddress();
+					    	String nameTo = user.getFullName();
+
+							try{
+								InternetAddress to = new InternetAddress(emailTo, nameTo);
+								InternetAddress from = new InternetAddress(fromAddress, fromName);
+								
+						    	String url = PortalUtil.getPortalURL(company.getVirtualHostname(), 80, false);
+						    	String urlcourse = url+"/web"+course.getFriendlyURL();
+						    	String subject = new String();
+						    	
+						    	if(course.getWelcomeSubject()!=null&&!StringPool.BLANK.equals(course.getWelcomeSubject())){
+							    	subject = course.getWelcomeSubject();
+						    	}else{
+							    	subject = LanguageUtil.format(user.getLocale(),"welcome-subject", new String[]{course.getTitle(user.getLocale())});
+
+						    	}
+						    	String body = StringUtil.replace(
+					    			course.getWelcomeMsg(),
+					    			new String[] {"[$FROM_ADDRESS$]", "[$FROM_NAME$]", "[$PAGE_URL$]","[$PORTAL_URL$]","[$TO_ADDRESS$]","[$TO_NAME$]","[$USER_SCREENNAME$]"},
+					    			new String[] {fromAddress, fromName, urlcourse, url, user.getEmailAddress(), user.getFullName(),user.getScreenName()});
+					    	
+						    	//System.out.println(body);
+								if(log.isDebugEnabled()){
+									log.debug(from);
+									log.debug(to);
+									log.debug(subject);
+									log.debug(body);
+								}
+								MailMessage mailm = new MailMessage(from, to, subject, body, true);
+								MailServiceUtil.sendEmail(mailm);
+							}
+							catch(Exception ex)
+							{
+								if(log.isDebugEnabled())ex.printStackTrace();
+							}		
+						}					
+				    	
 					}
 				}
 			}
@@ -137,47 +145,54 @@ public class GroupListener extends BaseModelListener<Group> {
 					}
 					
 					if(user!=null&&company!=null){
-
-				    	String fromName = PrefsPropsUtil.getString(course.getCompanyId(),
-								PropsKeys.ADMIN_EMAIL_FROM_NAME);
-						String fromAddress = PrefsPropsUtil.getString(course.getCompanyId(),
-								PropsKeys.ADMIN_EMAIL_FROM_ADDRESS);
-				    	String emailTo = user.getEmailAddress();
-				    	String nameTo = user.getFullName();
-
-						try{
-							InternetAddress to = new InternetAddress(emailTo, nameTo);
-							InternetAddress from = new InternetAddress(fromAddress, fromName);
-							
-					    	String url = PortalUtil.getPortalURL(company.getVirtualHostname(), 80, false);
-					    	String urlcourse = url+"/web"+course.getFriendlyURL();
-					    	String subject = new String();
-					    	
-					    	if(course.getGoodbyeSubject()!=null&&!StringPool.BLANK.equals(course.getGoodbyeSubject())){
-						    	subject = course.getGoodbyeSubject();
-					    	}else{
-						    	subject = LanguageUtil.format(user.getLocale(),"goodbye-subject", new String[]{course.getTitle(user.getLocale())});
-
-					    	}
-					    	String body = StringUtil.replace(
-				    			course.getGoodbyeMsg(),
-				    			new String[] {"[$FROM_ADDRESS$]", "[$FROM_NAME$]", "[$PAGE_URL$]","[$PORTAL_URL$]","[$TO_ADDRESS$]","[$TO_NAME$]","[$USER_SCREENNAME$]"},
-				    			new String[] {fromAddress, fromName, urlcourse, url, user.getEmailAddress(), user.getFullName(),user.getScreenName()});
-				    	
-					    	
-							if(log.isDebugEnabled()){
-								log.debug(from);
-								log.debug(to);
-								log.debug(subject);
-								log.debug(body);
-							}
-							MailMessage mailm = new MailMessage(from, to, subject, body, true);
-							MailServiceUtil.sendEmail(mailm);
+						boolean deregisterMail = false;
+						if(user.getExpandoBridge().getAttribute(LiferaylmsUtil.DEREGISTER_USER_EXPANDO)!=null){
+							deregisterMail = (Boolean)user.getExpandoBridge().getAttribute(LiferaylmsUtil.DEREGISTER_USER_EXPANDO);
 						}
-						catch(Exception ex)
-						{
-							if(log.isDebugEnabled())ex.printStackTrace();
-						}		
+						
+						if(!deregisterMail){
+							String fromName = PrefsPropsUtil.getString(course.getCompanyId(),
+									PropsKeys.ADMIN_EMAIL_FROM_NAME);
+							String fromAddress = PrefsPropsUtil.getString(course.getCompanyId(),
+									PropsKeys.ADMIN_EMAIL_FROM_ADDRESS);
+					    	String emailTo = user.getEmailAddress();
+					    	String nameTo = user.getFullName();
+
+							try{
+								InternetAddress to = new InternetAddress(emailTo, nameTo);
+								InternetAddress from = new InternetAddress(fromAddress, fromName);
+								
+						    	String url = PortalUtil.getPortalURL(company.getVirtualHostname(), 80, false);
+						    	String urlcourse = url+"/web"+course.getFriendlyURL();
+						    	String subject = new String();
+						    	
+						    	if(course.getGoodbyeSubject()!=null&&!StringPool.BLANK.equals(course.getGoodbyeSubject())){
+							    	subject = course.getGoodbyeSubject();
+						    	}else{
+							    	subject = LanguageUtil.format(user.getLocale(),"goodbye-subject", new String[]{course.getTitle(user.getLocale())});
+
+						    	}
+						    	String body = StringUtil.replace(
+					    			course.getGoodbyeMsg(),
+					    			new String[] {"[$FROM_ADDRESS$]", "[$FROM_NAME$]", "[$PAGE_URL$]","[$PORTAL_URL$]","[$TO_ADDRESS$]","[$TO_NAME$]","[$USER_SCREENNAME$]"},
+					    			new String[] {fromAddress, fromName, urlcourse, url, user.getEmailAddress(), user.getFullName(),user.getScreenName()});
+					    	
+						    	
+								if(log.isDebugEnabled()){
+									log.debug(from);
+									log.debug(to);
+									log.debug(subject);
+									log.debug(body);
+								}
+								MailMessage mailm = new MailMessage(from, to, subject, body, true);
+								MailServiceUtil.sendEmail(mailm);
+							}
+							catch(Exception ex)
+							{
+								if(log.isDebugEnabled())ex.printStackTrace();
+							}		
+						}
+				    	
 					}
 				}
 				

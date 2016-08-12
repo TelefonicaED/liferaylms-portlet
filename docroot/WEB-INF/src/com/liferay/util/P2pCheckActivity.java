@@ -44,6 +44,7 @@ import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portlet.PortletQName;
 import com.liferay.util.mail.MailEngine;
 import com.liferay.util.mail.MailEngineException;
+import com.tls.lms.util.LiferaylmsUtil;
 
 
 public class P2pCheckActivity implements MessageListener
@@ -76,6 +77,7 @@ public class P2pCheckActivity implements MessageListener
 						//Se le suma 1 puesto que tiene que debe haber el numero de actividades 
 						//mas la del usuario puesto que el no se corrige a si mismo.
 						List<P2pActivity> ListP2PinAct = P2pActivityLocalServiceUtil.findByActIdOrderByP2pId(lAct.getActId());
+						boolean deregisterMail;
 						if(ListP2PinAct.size() > NumFilesToPass){
 							int cont = 0;
 							for(P2pActivity myp2p:ListP2PinAct){
@@ -84,8 +86,14 @@ public class P2pCheckActivity implements MessageListener
 								//Comprobamos que la actividad no esta bloqueada para el usuario.
 								if(!LearningActivityLocalServiceUtil.islocked(lAct.getActId(), userId)){
 									cont++;
-									sendMail(user, lAct.getActId());
+									deregisterMail = false;
+									if(user.getExpandoBridge().getAttribute(LiferaylmsUtil.DEREGISTER_USER_EXPANDO)!=null){
+										deregisterMail = (Boolean)user.getExpandoBridge().getAttribute(LiferaylmsUtil.DEREGISTER_USER_EXPANDO);
+									}
 									
+									if(!deregisterMail){
+										sendMail(user, lAct.getActId());
+									}
 									if(cont>NumFilesToPass){
 										CheckP2pMailing cP2pM = new CheckP2pMailingImpl();
 										cP2pM.setActId(lAct.getActId());
@@ -166,6 +174,7 @@ public class P2pCheckActivity implements MessageListener
 			
 			if(log.isDebugEnabled()){log.debug("P2pCheckActivity::sendMail::body:"+body);}
 			
+		
 			//String body=new String(LanguageUtil.format(user.getLocale(), "you-can-pass-activity-p2p-body", new Object[]{user.getFullName(),url}).getBytes(), Charset.forName("UTF-8"));
 			
 			//String fromUser=PrefsPropsUtil.getString(user.getCompanyId(),PropsKeys.ADMIN_EMAIL_FROM_ADDRESS);
@@ -183,6 +192,7 @@ public class P2pCheckActivity implements MessageListener
 			/*String from=PrefsPropsUtil.getString(user.getCompanyId(),PropsKeys.ADMIN_EMAIL_FROM_ADDRESS);
 			//MailEngine.send( from,user.getEmailAddress(),subject,body);*/
 			if(log.isDebugEnabled()){log.debug("P2pCheckActivity::sendMail::Enviado email a :"+user.getEmailAddress());}
+	
 		}
 		/*catch(MailEngineException ex) {
 			if(log.isDebugEnabled()){log.debug("P2pCheckActivity::sendMail::MailEngineException:"+ex);}

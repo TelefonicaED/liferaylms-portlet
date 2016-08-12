@@ -839,13 +839,15 @@ public class CloneCourse implements MessageListener {
 	private void cloneActivityFile(LearningActivity actOld, LearningActivity actNew, long userId, ServiceContext serviceContext){
 					
 		try {
-			log.debug("cloneActivityFile");
+			log.error("cloneActivityFile");
 			String entryIdStr = "";
 			if(actOld.getTypeId() == 2){
 				entryIdStr = LearningActivityLocalServiceUtil.getExtraContentValue(actOld.getActId(), "document");
-			}else if(actOld.getTypeId() == 7){
+			}else if(actOld.getTypeId() == 7 || actOld.getTypeId() == 9){
 				entryIdStr = LearningActivityLocalServiceUtil.getExtraContentValue(actOld.getActId(), "assetEntry");
 			}
+			
+			
 			
 			if(!entryIdStr.equals("")){
 				
@@ -947,18 +949,27 @@ public class CloneCourse implements MessageListener {
 					} finally {
 						serviceContext.setAddGroupPermissions(serviceContext.isAddGroupPermissions());
 					}
-					}else{
-						entryId = cloneFile(Long.valueOf(entryIdStr), actNew, userId, serviceContext);
-					}
+				}else{
+					entryId = cloneFile(Long.valueOf(entryIdStr), actNew, userId, serviceContext);
+				}
 					
 					
 
 				}
 				
-				if(actNew.getTypeId() == 2){
-					//LearningActivityLocalServiceUtil.setExtraContentValue(actNew.getActId(), "document", String.valueOf(entryId));
-				}else if(actNew.getTypeId() == 7){
+				if(actNew.getTypeId() == 7){
 					LearningActivityLocalServiceUtil.setExtraContentValue(actNew.getActId(), "assetEntry", String.valueOf(entryId));
+				}else if(actNew.getTypeId() == 9){
+					AssetEntry entry =  AssetEntryLocalServiceUtil.getAssetEntry(entryId);
+					AssetEntry newEntry = AssetEntryLocalServiceUtil.createAssetEntry(CounterLocalServiceUtil.increment(AssetEntry.class.getName()));
+					long newEntryId = newEntry.getEntryId();
+					newEntry = (AssetEntry)entry.clone();
+					newEntry.setEntryId(newEntryId);
+					newEntry.setGroupId(actNew.getGroupId());
+					AssetEntryLocalServiceUtil.updateAssetEntry(newEntry);
+					log.error("NEW ENTRY ID "+ newEntryId);
+					LearningActivityLocalServiceUtil.setExtraContentValue(actNew.getActId(), "assetEntry", String.valueOf(newEntryId));
+					
 				}
 				
 			}
@@ -998,6 +1009,7 @@ public class CloneCourse implements MessageListener {
 			FileEntry newFile = DLAppLocalServiceUtil.addFileEntry(
 					serviceContext.getUserId(), repositoryId , dlFolder.getFolderId() , ficheroStr, docfile.getMimeType(), 
 					docfile.getTitle(), StringPool.BLANK, StringPool.BLANK, is, docfile.getSize() , serviceContext ) ;
+			
 			
 			AssetEntry asset = AssetEntryLocalServiceUtil.getEntry(DLFileEntry.class.getName(), newFile.getPrimaryKey());
 			

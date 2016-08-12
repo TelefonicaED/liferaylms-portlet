@@ -25,6 +25,7 @@ import com.liferay.portal.theme.ThemeDisplay;
 
 public class LiferaylmsUtil {
 	
+	public static final String DEREGISTER_USER_EXPANDO = "deregister-mail";
 	public static final int defaultStartYear = 2012; //porque es necesario mantener los valores antiguos para los cursos antiguos
 	public static final int defaultEndYear = Calendar.getInstance().get(Calendar.YEAR) + 8;
     public static final String CHARSET_UTF_8        = "UTF-8".intern();

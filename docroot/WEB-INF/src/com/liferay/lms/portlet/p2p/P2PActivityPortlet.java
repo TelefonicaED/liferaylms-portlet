@@ -62,11 +62,9 @@ import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
-import com.liferay.portal.model.Company;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.Layout;
 import com.liferay.portal.model.User;
-import com.liferay.portal.service.CompanyLocalServiceUtil;
 import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.LayoutLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
@@ -83,9 +81,7 @@ import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
 import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.service.DLFileEntryLocalServiceUtil;
 import com.liferay.util.bridges.mvc.MVCPortlet;
-import com.liferay.util.mail.MailEngine;
-import com.liferay.util.mail.MailEngineException;
-import com.liferay.util.mail.MailServerException;
+import com.tls.lms.util.LiferaylmsUtil;
 
 
 
@@ -234,10 +230,15 @@ public class P2PActivityPortlet extends MVCPortlet {
 					learningTry.setUserId(user.getUserId());
 					learningTry.setResult(0);
 					LearningActivityTryLocalServiceUtil.updateLearningActivityTry(learningTry);
+					boolean deregisterMail = false;
+					if(user.getExpandoBridge().getAttribute(LiferaylmsUtil.DEREGISTER_USER_EXPANDO)!=null){
+						deregisterMail = (Boolean)user.getExpandoBridge().getAttribute(LiferaylmsUtil.DEREGISTER_USER_EXPANDO);
+					}
 					
-					//Enviar por email que se ha entregado una tarea p2p.
-					P2PActivityPortlet.sendMailP2pDone(user, actId, themeDisplay);
-					
+					if(!deregisterMail){
+						//Enviar por email que se ha entregado una tarea p2p.
+						P2PActivityPortlet.sendMailP2pDone(user, actId, themeDisplay);
+					}
 					request.setAttribute("latId", learningTry.getLatId());
 					
 				}
@@ -383,7 +384,6 @@ public class P2PActivityPortlet extends MVCPortlet {
 				
 		//Obtenemos los campos necesarios.
 		User user = UserLocalServiceUtil.getUser(themeDisplay.getUserId());
-		Long groupId = themeDisplay.getScopeGroupId();
 		long resultuser=0;
 		
 		String description = uploadRequest.getParameter("description");
@@ -398,7 +398,6 @@ public class P2PActivityPortlet extends MVCPortlet {
 		}
 		 		
 		String fileName = uploadRequest.getFileName("fileName");
-		String title = fileName;
 		File file = uploadRequest.getFile("fileName");
 		String mimeType = uploadRequest.getContentType("fileName");
 		
@@ -509,8 +508,14 @@ public class P2PActivityPortlet extends MVCPortlet {
 					
 					P2pActivity p2pActivity = P2pActivityLocalServiceUtil.getP2pActivity(p2pActivityId);
 					User userPropietaryP2pAct = UserLocalServiceUtil.getUser(p2pActivity.getUserId());
+					boolean deregisterMail = false;
+					if(user.getExpandoBridge().getAttribute(LiferaylmsUtil.DEREGISTER_USER_EXPANDO)!=null){
+						deregisterMail = (Boolean)userPropietaryP2pAct.getExpandoBridge().getAttribute(LiferaylmsUtil.DEREGISTER_USER_EXPANDO);
+					}
 					
-					sendMailCorrection(userPropietaryP2pAct, actId, p2pActCor, themeDisplay, portletConfig, url);
+					if(!deregisterMail){
+						sendMailCorrection(userPropietaryP2pAct, actId, p2pActCor, themeDisplay, portletConfig, url);
+					}
 					request.setAttribute("actId", actId);
 					request.setAttribute("latId", latId);
 		
@@ -751,7 +756,6 @@ public class P2PActivityPortlet extends MVCPortlet {
 			}
 			
 			Group group = GroupLocalServiceUtil.getGroup(activity.getGroupId());
-			Company company = CompanyLocalServiceUtil.getCompany(group.getCompanyId());
 			
 			Course course= CourseLocalServiceUtil.getCourseByGroupCreatedId(activity.getGroupId());
 			
@@ -853,7 +857,6 @@ public class P2PActivityPortlet extends MVCPortlet {
 			LearningActivity activity = LearningActivityLocalServiceUtil.getLearningActivity(actId);
 			
 			Group group = GroupLocalServiceUtil.getGroup(activity.getGroupId());
-			Company company = CompanyLocalServiceUtil.getCompany(group.getCompanyId());
 			
 			Course course= CourseLocalServiceUtil.getCourseByGroupCreatedId(activity.getGroupId());
 			

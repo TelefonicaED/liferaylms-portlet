@@ -64,6 +64,7 @@ import com.liferay.portal.model.ResourceConstants;
 import com.liferay.portal.model.Role;
 import com.liferay.portal.model.RoleConstants;
 import com.liferay.portal.security.permission.ActionKeys;
+import com.liferay.portal.service.ClassNameLocalServiceUtil;
 import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.ResourceLocalServiceUtil;
 import com.liferay.portal.service.ResourcePermissionLocalServiceUtil;
@@ -364,9 +365,20 @@ private void exportEntry(PortletDataContext context, Element root, Module entry)
 //									
 //									context.addZipEntry(getFilePath(context, null ,actividad.getActId())+containsCharUpper(zipFileName), input);
 									
-									ScormDataHandlerImpl scormHandler = new ScormDataHandlerImpl();
-									SCORMContent scocontent = SCORMContentLocalServiceUtil.getSCORMContent(docAsset.getClassPK());
-									scormHandler.exportEntry(context, entryElementLoc, scocontent);
+									if(docAsset.getClassName().equals(SCORMContent.class.getName())){
+										try{
+											ScormDataHandlerImpl scormHandler = new ScormDataHandlerImpl();
+											SCORMContent scocontent = SCORMContentLocalServiceUtil.getSCORMContent(docAsset.getClassPK());
+											scormHandler.exportEntry(context, entryElementLoc, scocontent);
+										}catch(Exception e){
+											e.printStackTrace();
+											actividad.setExtracontent("");
+										}
+									} else{
+										log.info("MPC CONTENT");
+										actividad.setExtracontent("");
+									}
+									
 								}
 							}
 						}
@@ -820,120 +832,125 @@ private void importEntry(PortletDataContext context, Element entryElement, Modul
 			
 			ScormDataHandlerImpl scormHandler = new ScormDataHandlerImpl();
 			Element scormEntry = actElement.element("scormentry");
-			String scormPath = scormEntry.attributeValue("path");
 			
-			SCORMContent scocontentOld = (SCORMContent) context.getZipEntryAsObject(scormPath);
-			
-			
-			InputStream is = context.getZipEntryAsInputStream(scormEntry.attributeValue("file"));
-			try {
+			if(scormEntry!=null){
+				String scormPath = scormEntry.attributeValue("path");
+				
+				SCORMContent scocontentOld = (SCORMContent) context.getZipEntryAsObject(scormPath);
 				
 				
-				
-				byte[] dataFileScorm = IOUtils.toByteArray(is);
-				File scormfile = new File(System.getProperty("java.io.tmpdir")+ "/scorms/" + scocontentOld.getUuid() + ".zip");
-				FileUtils.writeByteArrayToFile(scormfile, dataFileScorm);
-				
-				log.info("AQUI");
-				
-				//SCORMContentPersistenceImpl scormContentPersistence = new SCORMContentPersistenceImpl();
-				SCORMContentPersistence _persistence = (SCORMContentPersistence)PortletBeanLocatorUtil.locate(com.liferay.lms.service.ClpSerializer.getServletContextName(),
-						SCORMContentPersistence.class.getName());
-				
-				SCORMContent scocontent = _persistence.create(CounterLocalServiceUtil.increment( SCORMContent.class.getName()));
-					scocontent.setCompanyId(serviceContext.getCompanyId());
-					String uuid = serviceContext.getUuid();
-					if (Validator.isNotNull(uuid)) {
-						scocontent.setUuid(uuid);
-					}
-					scocontent.setGroupId(serviceContext.getScopeGroupId());
-					scocontent.setUserId(userId);
-					scocontent.setDescription(scocontentOld.getDescription());
-					scocontent.setTitle(scocontentOld.getTitle());
-					scocontent.setCiphered(scocontentOld.getCiphered());
-					scocontent.setStatus(WorkflowConstants.STATUS_APPROVED);
-					scocontent.setExpandoBridgeAttributes(serviceContext);
-					_persistence.update(scocontent, true);
-					String dirScorm=getDirScormPath(scocontent);
-					File dir=new File(dirScorm);
-					String dirScormZip=getDirScormzipPath(scocontent);
-					File dirZip=new File(dirScormZip);
+				InputStream is = context.getZipEntryAsInputStream(scormEntry.attributeValue("file"));
+				try {
 					
-					FileUtils.forceMkdir(dir);
-					FileUtils.forceMkdir(dirZip);
-					File scormFileZip=new File(dirZip.getAbsolutePath()+"/"+scocontent.getUuid()+".zip");
-					FileUtils.copyFile(scormfile, scormFileZip);
-					try {
-						ZipFile zipFile= new ZipFile(scormfile);
-						zipFile.extractAll(dir.getCanonicalPath());
-						File manifestfile=new File(dir.getCanonicalPath()+"/imsmanifest.xml");
-						try {
-							Document imsdocument=SAXReaderUtil.read(manifestfile);
-							Element item=imsdocument.getRootElement().element("organizations").elements("organization").get(0).elements("item").get(0);
-							String resourceid=item.attributeValue("identifierref");
-							java.util.List<Element> resources=imsdocument.getRootElement().element("resources").elements("resource");
-							for(Element resource:resources)
-							{
-								if(resource.attributeValue("identifier").equals(resourceid))
-								{
-									scocontent.setIndex(resource.attributeValue("href"));
-									_persistence.update(scocontent, true);
-								}
-							}
-						} catch (DocumentException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
+					
+					
+					byte[] dataFileScorm = IOUtils.toByteArray(is);
+					File scormfile = new File(System.getProperty("java.io.tmpdir")+ "/scorms/" + scocontentOld.getUuid() + ".zip");
+					FileUtils.writeByteArrayToFile(scormfile, dataFileScorm);
+					
+					log.info("AQUI");
+					
+					//SCORMContentPersistenceImpl scormContentPersistence = new SCORMContentPersistenceImpl();
+					SCORMContentPersistence _persistence = (SCORMContentPersistence)PortletBeanLocatorUtil.locate(com.liferay.lms.service.ClpSerializer.getServletContextName(),
+							SCORMContentPersistence.class.getName());
+					
+					SCORMContent scocontent = _persistence.create(CounterLocalServiceUtil.increment( SCORMContent.class.getName()));
+						scocontent.setCompanyId(serviceContext.getCompanyId());
+						String uuid = serviceContext.getUuid();
+						if (Validator.isNotNull(uuid)) {
+							scocontent.setUuid(uuid);
 						}
-					} catch (ZipException e1) {
-						// TODO Auto-generated catch block
+						scocontent.setGroupId(serviceContext.getScopeGroupId());
+						scocontent.setUserId(userId);
+						scocontent.setDescription(scocontentOld.getDescription());
+						scocontent.setTitle(scocontentOld.getTitle());
+						scocontent.setCiphered(scocontentOld.getCiphered());
+						scocontent.setStatus(WorkflowConstants.STATUS_APPROVED);
+						scocontent.setExpandoBridgeAttributes(serviceContext);
+						_persistence.update(scocontent, true);
+						String dirScorm=getDirScormPath(scocontent);
+						File dir=new File(dirScorm);
+						String dirScormZip=getDirScormzipPath(scocontent);
+						File dirZip=new File(dirScormZip);
+						
+						FileUtils.forceMkdir(dir);
+						FileUtils.forceMkdir(dirZip);
+						File scormFileZip=new File(dirZip.getAbsolutePath()+"/"+scocontent.getUuid()+".zip");
+						FileUtils.copyFile(scormfile, scormFileZip);
+						try {
+							ZipFile zipFile= new ZipFile(scormfile);
+							zipFile.extractAll(dir.getCanonicalPath());
+							File manifestfile=new File(dir.getCanonicalPath()+"/imsmanifest.xml");
+							try {
+								Document imsdocument=SAXReaderUtil.read(manifestfile);
+								Element item=imsdocument.getRootElement().element("organizations").elements("organization").get(0).elements("item").get(0);
+								String resourceid=item.attributeValue("identifierref");
+								java.util.List<Element> resources=imsdocument.getRootElement().element("resources").elements("resource");
+								for(Element resource:resources)
+								{
+									if(resource.attributeValue("identifier").equals(resourceid))
+									{
+										scocontent.setIndex(resource.attributeValue("href"));
+										_persistence.update(scocontent, true);
+									}
+								}
+							} catch (DocumentException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+						} catch (ZipException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
+					
+							if (serviceContext.isAddGroupPermissions() ||
+									serviceContext.isAddGuestPermissions()) {
+								ResourceLocalServiceUtil.addResources(
+										serviceContext.getCompanyId(), serviceContext.getScopeGroupId(), userId,
+										SCORMContent.class.getName(), scocontent.getPrimaryKey(), false,
+									serviceContext.isAddGroupPermissions(),
+									serviceContext.isAddGuestPermissions());			
+								}
+								else {
+									
+									ResourceLocalServiceUtil.addModelResources(
+											serviceContext.getCompanyId(), serviceContext.getScopeGroupId(), userId,
+											SCORMContent.class.getName(), scocontent.getPrimaryKey(),
+									serviceContext.getGroupPermissions(),
+									serviceContext.getGuestPermissions());
+									
+									
+								}
+						
+						AssetEntry assentry = AssetEntryLocalServiceUtil.updateEntry(
+								userId, scocontent.getGroupId(), SCORMContent.class.getName(),
+								scocontent.getScormId(), scocontent.getUuid(),0, serviceContext.getAssetCategoryIds(),
+								serviceContext.getAssetTagNames(), true, null, null,
+								new java.util.Date(System.currentTimeMillis()), null,
+								ContentTypes.TEXT_HTML, scocontent.getTitle(),null,  HtmlUtil.extractText(scocontent.getDescription()), 
+								getUrlManifest(scocontent), 
+								null, 0, 0, null, false);
+						
+						
+						log.info("Assentry "+assentry);
+								
+						Indexer indexer = IndexerRegistryUtil.nullSafeGetIndexer(SCORMContent.class);
+
+						indexer.reindex(scocontent);
+						LearningActivityLocalServiceUtil.setExtraContentValue(nuevaLarn.getActId(), "assetEntry", assentry.getEntryId()+"");
+						
+				} catch (IOException e) {
+					e.printStackTrace();
+				} catch(Exception e){
+					e.printStackTrace();
+				}finally {
+					try {
+						if (is != null) {
+							is.close();
+						}
+					} catch (IOException e1) {
 						e1.printStackTrace();
 					}
-				
-						if (serviceContext.isAddGroupPermissions() ||
-								serviceContext.isAddGuestPermissions()) {
-							ResourceLocalServiceUtil.addResources(
-									serviceContext.getCompanyId(), serviceContext.getScopeGroupId(), userId,
-									SCORMContent.class.getName(), scocontent.getPrimaryKey(), false,
-								serviceContext.isAddGroupPermissions(),
-								serviceContext.isAddGuestPermissions());			
-							}
-							else {
-								
-								ResourceLocalServiceUtil.addModelResources(
-										serviceContext.getCompanyId(), serviceContext.getScopeGroupId(), userId,
-										SCORMContent.class.getName(), scocontent.getPrimaryKey(),
-								serviceContext.getGroupPermissions(),
-								serviceContext.getGuestPermissions());
-								
-								
-							}
-					
-					AssetEntry assentry = AssetEntryLocalServiceUtil.updateEntry(
-							userId, scocontent.getGroupId(), SCORMContent.class.getName(),
-							scocontent.getScormId(), scocontent.getUuid(),0, serviceContext.getAssetCategoryIds(),
-							serviceContext.getAssetTagNames(), true, null, null,
-							new java.util.Date(System.currentTimeMillis()), null,
-							ContentTypes.TEXT_HTML, scocontent.getTitle(),null,  HtmlUtil.extractText(scocontent.getDescription()), 
-							getUrlManifest(scocontent), 
-							null, 0, 0, null, false);
-					
-					
-					log.info("Assentry "+assentry);
-							
-					Indexer indexer = IndexerRegistryUtil.nullSafeGetIndexer(SCORMContent.class);
-
-					indexer.reindex(scocontent);
-					LearningActivityLocalServiceUtil.setExtraContentValue(nuevaLarn.getActId(), "assetEntry", assentry.getEntryId()+"");
-				
-			} catch (IOException e) {
-				e.printStackTrace();
-			} finally {
-				try {
-					if (is != null) {
-						is.close();
-					}
-				} catch (IOException e1) {
-					e1.printStackTrace();
 				}
 			}
 				

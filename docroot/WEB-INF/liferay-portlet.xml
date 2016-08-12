@@ -684,6 +684,18 @@
 		</footer-portlet-javascript>
 		<css-class-wrapper>dateeditor-portlet</css-class-wrapper>
 	</portlet>
+	<portlet>
+		<portlet-name>deregisteracademymail</portlet-name>
+		<icon>/icon.png</icon>
+		<instanceable>false</instanceable>
+		<header-portlet-css>/css/main.css</header-portlet-css>
+		<footer-portlet-javascript>
+			/js/main.js
+		</footer-portlet-javascript>
+		<css-class-wrapper>
+			deregisteracademymail-portlet
+		</css-class-wrapper>
+	</portlet>
 	<role-mapper>
 		<role-name>administrator</role-name>
 		<role-link>Administrator</role-link>

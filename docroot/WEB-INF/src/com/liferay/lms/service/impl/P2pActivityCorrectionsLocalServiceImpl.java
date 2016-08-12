@@ -50,6 +50,7 @@ import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceContextThreadLocal;
 import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.util.PortalUtil;
+import com.tls.lms.util.LiferaylmsUtil;
 
 
 /**
@@ -350,9 +351,15 @@ public void asignCorrectionsToP2PActivities(long actId, long p2pActivityId,int n
 					}
 					
 					String[] params={activityTitle, moduleTitle, courseTitle, courseFriendlyUrl};
+					boolean deregisterMail = false;
+					if(user.getExpandoBridge().getAttribute(LiferaylmsUtil.DEREGISTER_USER_EXPANDO)!=null){
+						deregisterMail = (Boolean)user.getExpandoBridge().getAttribute(LiferaylmsUtil.DEREGISTER_USER_EXPANDO);
+					}
 					
-					log.debug("Enviar los emails.");
-					P2PSendMailAsignation.sendMail(user.getEmailAddress(), user.getFullName(), params, user.getCompanyId(), user.getLocale());
+					if(!deregisterMail){
+						log.debug("Enviar los emails.");
+						P2PSendMailAsignation.sendMail(user.getEmailAddress(), user.getFullName(), params, user.getCompanyId(), user.getLocale());
+					}
 		
 				} catch (Exception e) {
 					e.printStackTrace();
