@@ -388,6 +388,21 @@
 			<transient name="userUuid" />
 		</attributes>
 	</mapped-superclass>
+	<mapped-superclass class="com.liferay.lms.model.impl.ScheduleModelImpl">
+		<attributes>
+			<id name="secheduleId" />
+			<basic name="teamId" />
+			<basic name="startDate">
+				<temporal>TIMESTAMP</temporal>
+			</basic>
+			<basic name="endDate">
+				<temporal>TIMESTAMP</temporal>
+			</basic>
+			<transient name="modelAttributes" />
+			<transient name="primaryKey" />
+			<transient name="primaryKeyObj" />
+		</attributes>
+	</mapped-superclass>
 	<mapped-superclass class="com.liferay.lms.model.impl.SCORMContentModelImpl">
 		<attributes>
 			<id name="scormId" />
@@ -542,6 +557,10 @@
 	</entity>
 	<entity class="com.liferay.lms.model.impl.P2pActivityCorrectionsImpl" name="P2pActivityCorrections">
 		<table name="Lms_P2pActivityCorrections" />
+		<attributes />
+	</entity>
+	<entity class="com.liferay.lms.model.impl.ScheduleImpl" name="Schedule">
+		<table name="Lms_Schedule" />
 		<attributes />
 	</entity>
 	<entity class="com.liferay.lms.model.impl.SCORMContentImpl" name="SCORMContent">

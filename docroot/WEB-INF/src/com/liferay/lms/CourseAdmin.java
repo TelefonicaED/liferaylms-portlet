@@ -597,7 +597,7 @@ public class CourseAdmin extends MVCPortlet {
 		
 		ThemeDisplay themeDisplay = (ThemeDisplay)renderRequest.getAttribute(WebKeys.THEME_DISPLAY);
 		
-		include(this.usersResultsJSP, renderRequest, renderResponse);
+		include(this.competenceResultsJSP, renderRequest, renderResponse);
 	}
 	
 	public void deleteCourse(ActionRequest actionRequest,

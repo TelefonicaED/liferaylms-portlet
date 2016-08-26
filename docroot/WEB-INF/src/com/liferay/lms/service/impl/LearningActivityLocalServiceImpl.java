@@ -30,12 +30,14 @@ import com.liferay.lms.learningactivity.LearningActivityTypeRegistry;
 import com.liferay.lms.model.Course;
 import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.model.Module;
+import com.liferay.lms.model.Schedule;
 import com.liferay.lms.service.ClpSerializer;
 import com.liferay.lms.service.LearningActivityLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityResultLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityTryLocalServiceUtil;
 import com.liferay.lms.service.LmsPrefsLocalServiceUtil;
 import com.liferay.lms.service.ModuleLocalServiceUtil;
+import com.liferay.lms.service.ScheduleLocalServiceUtil;
 import com.liferay.lms.service.base.LearningActivityLocalServiceBaseImpl;
 import com.liferay.lms.service.persistence.LearningActivityUtil;
 import com.liferay.portal.kernel.bean.PortletBeanLocatorUtil;
@@ -74,6 +76,7 @@ import com.liferay.portal.security.permission.PermissionCheckerFactoryUtil;
 import com.liferay.portal.service.ResourcePermissionLocalServiceUtil;
 import com.liferay.portal.service.RoleLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
+import com.liferay.portal.service.TeamLocalServiceUtil;
 import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portlet.announcements.model.AnnouncementsEntry;
@@ -120,7 +123,24 @@ public class LearningActivityLocalServiceImpl extends LearningActivityLocalServi
 		{
 			return true;
 		}
-		if((larn.getEnddate()!=null&&larn.getEnddate().before(now)) ||(larn.getStartdate()!=null&&larn.getStartdate().after(now)))
+		
+		Date startDate = larn.getEnddate();
+		Date endDate = larn.getStartdate();
+		
+		List<Team> teams = TeamLocalServiceUtil.getUserTeams(userId, course.getGroupCreatedId());
+		if(teams!=null && teams.size()>0){
+			for(Team team : teams){
+				Schedule schedule = ScheduleLocalServiceUtil.getScheduleByTeamId(team.getTeamId());
+				if(schedule!=null){
+					startDate=schedule.getStartDate();
+					endDate = schedule.getEndDate();
+					break;
+				}
+			}			
+		}
+		
+		
+		if((endDate!=null&&endDate.before(now)) ||(startDate!=null&&startDate.after(now)))
 		{
 			return true;
 		}

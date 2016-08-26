@@ -16,6 +16,7 @@
 	<import class="com.liferay.lms.model.ModuleResult" />
 	<import class="com.liferay.lms.model.P2pActivity" />
 	<import class="com.liferay.lms.model.P2pActivityCorrections" />
+	<import class="com.liferay.lms.model.Schedule" />
 	<import class="com.liferay.lms.model.SCORMContent" />
 	<import class="com.liferay.lms.model.SurveyResult" />
 	<import class="com.liferay.lms.model.TestAnswer" />
@@ -256,6 +257,15 @@
 		<property name="date" type="org.hibernate.type.TimestampType" column="date_" />
 		<property name="fileEntryId" type="com.liferay.portal.dao.orm.hibernate.LongType" />
 		<property name="result" type="com.liferay.portal.dao.orm.hibernate.LongType" />
+	</class>
+	<class name="com.liferay.lms.model.impl.ScheduleImpl" table="Lms_Schedule">
+		<cache usage="read-write" />
+		<id name="secheduleId" type="long">
+			<generator class="assigned" />
+		</id>
+		<property name="teamId" type="com.liferay.portal.dao.orm.hibernate.LongType" />
+		<property name="startDate" type="org.hibernate.type.TimestampType" />
+		<property name="endDate" type="org.hibernate.type.TimestampType" />
 	</class>
 	<class name="com.liferay.lms.model.impl.SCORMContentImpl" table="Lms_SCORMContent">
 		<cache usage="read-write" />

@@ -29,6 +29,7 @@ import com.liferay.lms.model.ModuleResultClp;
 import com.liferay.lms.model.P2pActivityClp;
 import com.liferay.lms.model.P2pActivityCorrectionsClp;
 import com.liferay.lms.model.SCORMContentClp;
+import com.liferay.lms.model.ScheduleClp;
 import com.liferay.lms.model.SurveyResultClp;
 import com.liferay.lms.model.TestAnswerClp;
 import com.liferay.lms.model.TestQuestionClp;
@@ -174,6 +175,10 @@ public class ClpSerializer {
 
 		if (oldModelClassName.equals(P2pActivityCorrectionsClp.class.getName())) {
 			return translateInputP2pActivityCorrections(oldModel);
+		}
+
+		if (oldModelClassName.equals(ScheduleClp.class.getName())) {
+			return translateInputSchedule(oldModel);
 		}
 
 		if (oldModelClassName.equals(SCORMContentClp.class.getName())) {
@@ -354,6 +359,16 @@ public class ClpSerializer {
 		return newModel;
 	}
 
+	public static Object translateInputSchedule(BaseModel<?> oldModel) {
+		ScheduleClp oldClpModel = (ScheduleClp)oldModel;
+
+		BaseModel<?> newModel = oldClpModel.getScheduleRemoteModel();
+
+		newModel.setModelAttributes(oldClpModel.getModelAttributes());
+
+		return newModel;
+	}
+
 	public static Object translateInputSCORMContent(BaseModel<?> oldModel) {
 		SCORMContentClp oldClpModel = (SCORMContentClp)oldModel;
 
@@ -486,6 +501,10 @@ public class ClpSerializer {
 		if (oldModelClassName.equals(
 					"com.liferay.lms.model.impl.P2pActivityCorrectionsImpl")) {
 			return translateOutputP2pActivityCorrections(oldModel);
+		}
+
+		if (oldModelClassName.equals("com.liferay.lms.model.impl.ScheduleImpl")) {
+			return translateOutputSchedule(oldModel);
 		}
 
 		if (oldModelClassName.equals(
@@ -656,6 +675,10 @@ public class ClpSerializer {
 			return new com.liferay.lms.NoSuchP2pActivityCorrectionsException();
 		}
 
+		if (className.equals("com.liferay.lms.NoSuchScheduleException")) {
+			return new com.liferay.lms.NoSuchScheduleException();
+		}
+
 		if (className.equals("com.liferay.lms.NoSuchSCORMContentException")) {
 			return new com.liferay.lms.NoSuchSCORMContentException();
 		}
@@ -818,6 +841,16 @@ public class ClpSerializer {
 		newModel.setModelAttributes(oldModel.getModelAttributes());
 
 		newModel.setP2pActivityCorrectionsRemoteModel(oldModel);
+
+		return newModel;
+	}
+
+	public static Object translateOutputSchedule(BaseModel<?> oldModel) {
+		ScheduleClp newModel = new ScheduleClp();
+
+		newModel.setModelAttributes(oldModel.getModelAttributes());
+
+		newModel.setScheduleRemoteModel(oldModel);
 
 		return newModel;
 	}

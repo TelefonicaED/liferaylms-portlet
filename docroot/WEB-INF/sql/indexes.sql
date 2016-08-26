@@ -81,6 +81,8 @@ create index IX_4E8A925E on Lms_SCORMContent (userId, groupId);
 create index IX_C4735FE2 on Lms_SCORMContent (uuid_);
 create unique index IX_1942D308 on Lms_SCORMContent (uuid_, groupId);
 
+create index IX_3AA8B3F6 on Lms_Schedule (teamId);
+
 create index IX_ED91C253 on Lms_SurveyResult (actId);
 create index IX_2F35042C on Lms_SurveyResult (answerId, questionId);
 create index IX_8B8399FF on Lms_SurveyResult (questionId);

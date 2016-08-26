@@ -589,6 +589,15 @@
 			<finder-column name="classPK" />
 		</finder>
     </entity>   
+    <entity name="Schedule" local-service="true" remote-service="false" json-enabled="false">
+        <column name="secheduleId" type="long" primary="true"></column>
+        <column name="teamId" type="long"></column>
+    	<column name="startDate" type="Date"></column>     
+        <column name="endDate" type="Date"></column>
+        <finder name="TeamId" return-type="Sechedule">
+			<finder-column name="teamId" />
+		</finder>
+    </entity>
 	<exceptions>
 		<exception>NoSuchModule</exception>
 	</exceptions>

@@ -26,11 +26,13 @@ import com.liferay.lms.model.CourseResult;
 import com.liferay.lms.model.LearningActivityTry;
 import com.liferay.lms.model.Module;
 import com.liferay.lms.model.ModuleResult;
+import com.liferay.lms.model.Schedule;
 import com.liferay.lms.service.ClpSerializer;
 import com.liferay.lms.service.CourseResultLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityTryLocalServiceUtil;
 import com.liferay.lms.service.ModuleLocalServiceUtil;
+import com.liferay.lms.service.ScheduleLocalServiceUtil;
 import com.liferay.lms.service.base.ModuleLocalServiceBaseImpl;
 import com.liferay.portal.kernel.bean.PortletBeanLocatorUtil;
 import com.liferay.portal.kernel.dao.orm.Criterion;
@@ -47,10 +49,12 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.model.ResourceConstants;
+import com.liferay.portal.model.Team;
 import com.liferay.portal.model.User;
 import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.security.permission.PermissionCheckerFactoryUtil;
+import com.liferay.portal.service.TeamLocalServiceUtil;
 import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.util.LmsLocaleUtil;
@@ -442,8 +446,23 @@ public class ModuleLocalServiceImpl extends ModuleLocalServiceBaseImpl {
 		{
 			return true;
 		}
-       
-		if(!((theModule.getEndDate()!=null&&theModule.getEndDate().after(now)) &&(theModule.getStartDate()!=null&&theModule.getStartDate().before(now))))
+		
+		Date startDate = theModule.getStartDate();
+		Date endDate = theModule.getEndDate();
+		
+		List<Team> teams = TeamLocalServiceUtil.getUserTeams(userId, course.getGroupCreatedId());
+		if(teams!=null && teams.size()>0){
+			for(Team team : teams){
+				Schedule schedule = ScheduleLocalServiceUtil.getScheduleByTeamId(team.getTeamId());
+				if(schedule!=null){
+					startDate=schedule.getStartDate();
+					endDate = schedule.getEndDate();
+					break;
+				}
+			}			
+		}
+		
+		if(!((endDate!=null&&endDate.after(now)) &&(startDate!=null&&startDate.before(now))))
 		{
 			return true;
 		}

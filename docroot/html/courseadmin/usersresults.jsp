@@ -33,7 +33,8 @@ preferences = renderRequest.getPreferences();
 }
 long courseId=ParamUtil.getLong(request, "courseId",0);
 long roleId=ParamUtil.getLong(request, "roleId",0);
-Role role=RoleLocalServiceUtil.getRole(roleId);
+Role role=RoleLocalServiceUtil.fetchRole(roleId);
+
 Course course=CourseLocalServiceUtil.getCourse(courseId);
 boolean backToEdit = ParamUtil.getBoolean(request, "backToEdit");
 String redirectOfEdit = ParamUtil.getString(request, "redirectOfEdit");
@@ -224,7 +225,15 @@ if(backToEdit) {
 	</c:if>
 </liferay-portlet:renderURL>
 <liferay-ui:header title="<%=course.getTitle(themeDisplay.getLocale()) %>" backURL="<%=backURL %>"></liferay-ui:header>
+<% 
+	if(role!=null){
+%>
+
 <h2><%=role.getTitle(themeDisplay.getLocale()) %></h2>
+
+<% 
+	}
+%>
 <jsp:include page="/html/courseadmin/search_form.jsp" />
 
 <div id="<portlet:namespace />student_search">

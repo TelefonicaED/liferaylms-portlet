@@ -886,6 +886,8 @@ public class CheckP2pMailingPersistenceImpl extends BasePersistenceImpl<CheckP2p
 	protected P2pActivityPersistence p2pActivityPersistence;
 	@BeanReference(type = P2pActivityCorrectionsPersistence.class)
 	protected P2pActivityCorrectionsPersistence p2pActivityCorrectionsPersistence;
+	@BeanReference(type = SchedulePersistence.class)
+	protected SchedulePersistence schedulePersistence;
 	@BeanReference(type = SCORMContentPersistence.class)
 	protected SCORMContentPersistence scormContentPersistence;
 	@BeanReference(type = SurveyResultPersistence.class)

@@ -246,6 +246,12 @@
 		<field name="fileEntryId" type="long" />
 		<field name="result" type="long" />
 	</model>
+	<model name="com.liferay.lms.model.Schedule">
+		<field name="secheduleId" type="long" />
+		<field name="teamId" type="long" />
+		<field name="startDate" type="Date" />
+		<field name="endDate" type="Date" />
+	</model>
 	<model name="com.liferay.lms.model.SCORMContent">
 		<field name="uuid" type="String" />
 		<field name="scormId" type="long" />

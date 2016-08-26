@@ -226,6 +226,13 @@ create table Lms_SCORMContent (
 	ciphered BOOLEAN
 );
 
+create table Lms_Schedule (
+	secheduleId LONG not null primary key,
+	teamId LONG,
+	startDate DATE null,
+	endDate DATE null
+);
+
 create table Lms_SurveyResult (
 	uuid_ VARCHAR(75) null,
 	surveyResultId LONG not null primary key,

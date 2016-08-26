@@ -42,6 +42,7 @@ import com.liferay.lms.service.P2pActivityCorrectionsLocalService;
 import com.liferay.lms.service.P2pActivityLocalService;
 import com.liferay.lms.service.SCORMContentLocalService;
 import com.liferay.lms.service.SCORMContentService;
+import com.liferay.lms.service.ScheduleLocalService;
 import com.liferay.lms.service.SurveyResultLocalService;
 import com.liferay.lms.service.TestAnswerLocalService;
 import com.liferay.lms.service.TestAnswerService;
@@ -65,6 +66,7 @@ import com.liferay.lms.service.persistence.ModuleResultPersistence;
 import com.liferay.lms.service.persistence.P2pActivityCorrectionsPersistence;
 import com.liferay.lms.service.persistence.P2pActivityPersistence;
 import com.liferay.lms.service.persistence.SCORMContentPersistence;
+import com.liferay.lms.service.persistence.SchedulePersistence;
 import com.liferay.lms.service.persistence.SurveyResultPersistence;
 import com.liferay.lms.service.persistence.TestAnswerPersistence;
 import com.liferay.lms.service.persistence.TestQuestionPersistence;
@@ -1028,6 +1030,43 @@ public abstract class LmsPrefsLocalServiceBaseImpl extends BaseLocalServiceImpl
 	}
 
 	/**
+	 * Returns the schedule local service.
+	 *
+	 * @return the schedule local service
+	 */
+	public ScheduleLocalService getScheduleLocalService() {
+		return scheduleLocalService;
+	}
+
+	/**
+	 * Sets the schedule local service.
+	 *
+	 * @param scheduleLocalService the schedule local service
+	 */
+	public void setScheduleLocalService(
+		ScheduleLocalService scheduleLocalService) {
+		this.scheduleLocalService = scheduleLocalService;
+	}
+
+	/**
+	 * Returns the schedule persistence.
+	 *
+	 * @return the schedule persistence
+	 */
+	public SchedulePersistence getSchedulePersistence() {
+		return schedulePersistence;
+	}
+
+	/**
+	 * Sets the schedule persistence.
+	 *
+	 * @param schedulePersistence the schedule persistence
+	 */
+	public void setSchedulePersistence(SchedulePersistence schedulePersistence) {
+		this.schedulePersistence = schedulePersistence;
+	}
+
+	/**
 	 * Returns the s c o r m content local service.
 	 *
 	 * @return the s c o r m content local service
@@ -1553,6 +1592,10 @@ public abstract class LmsPrefsLocalServiceBaseImpl extends BaseLocalServiceImpl
 	protected P2pActivityCorrectionsLocalService p2pActivityCorrectionsLocalService;
 	@BeanReference(type = P2pActivityCorrectionsPersistence.class)
 	protected P2pActivityCorrectionsPersistence p2pActivityCorrectionsPersistence;
+	@BeanReference(type = ScheduleLocalService.class)
+	protected ScheduleLocalService scheduleLocalService;
+	@BeanReference(type = SchedulePersistence.class)
+	protected SchedulePersistence schedulePersistence;
 	@BeanReference(type = SCORMContentLocalService.class)
 	protected SCORMContentLocalService scormContentLocalService;
 	@BeanReference(type = SCORMContentService.class)

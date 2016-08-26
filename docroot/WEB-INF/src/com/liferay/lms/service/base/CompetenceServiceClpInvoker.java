@@ -23,78 +23,78 @@ import java.util.Arrays;
  */
 public class CompetenceServiceClpInvoker {
 	public CompetenceServiceClpInvoker() {
-		_methodName120 = "getBeanIdentifier";
+		_methodName124 = "getBeanIdentifier";
 
-		_methodParameterTypes120 = new String[] {  };
+		_methodParameterTypes124 = new String[] {  };
 
-		_methodName121 = "setBeanIdentifier";
+		_methodName125 = "setBeanIdentifier";
 
-		_methodParameterTypes121 = new String[] { "java.lang.String" };
+		_methodParameterTypes125 = new String[] { "java.lang.String" };
 
-		_methodName126 = "getCompetencesOfGroup";
+		_methodName130 = "getCompetencesOfGroup";
 
-		_methodParameterTypes126 = new String[] { "long" };
+		_methodParameterTypes130 = new String[] { "long" };
 
-		_methodName127 = "getCompetencesOfGroup";
+		_methodName131 = "getCompetencesOfGroup";
 
-		_methodParameterTypes127 = new String[] { "long", "int", "int" };
+		_methodParameterTypes131 = new String[] { "long", "int", "int" };
 
-		_methodName128 = "getCountCompetencesOfGroup";
+		_methodName132 = "getCountCompetencesOfGroup";
 
-		_methodParameterTypes128 = new String[] { "long" };
+		_methodParameterTypes132 = new String[] { "long" };
 
-		_methodName129 = "getCompetencesOfGroups";
+		_methodName133 = "getCompetencesOfGroups";
 
-		_methodParameterTypes129 = new String[] { "long[][]" };
+		_methodParameterTypes133 = new String[] { "long[][]" };
 	}
 
 	public Object invokeMethod(String name, String[] parameterTypes,
 		Object[] arguments) throws Throwable {
-		if (_methodName120.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes120, parameterTypes)) {
+		if (_methodName124.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes124, parameterTypes)) {
 			return CompetenceServiceUtil.getBeanIdentifier();
 		}
 
-		if (_methodName121.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes121, parameterTypes)) {
+		if (_methodName125.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes125, parameterTypes)) {
 			CompetenceServiceUtil.setBeanIdentifier((java.lang.String)arguments[0]);
 		}
 
-		if (_methodName126.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes126, parameterTypes)) {
+		if (_methodName130.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes130, parameterTypes)) {
 			return CompetenceServiceUtil.getCompetencesOfGroup(((Long)arguments[0]).longValue());
 		}
 
-		if (_methodName127.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes127, parameterTypes)) {
+		if (_methodName131.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes131, parameterTypes)) {
 			return CompetenceServiceUtil.getCompetencesOfGroup(((Long)arguments[0]).longValue(),
 				((Integer)arguments[1]).intValue(),
 				((Integer)arguments[2]).intValue());
 		}
 
-		if (_methodName128.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes128, parameterTypes)) {
+		if (_methodName132.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes132, parameterTypes)) {
 			return CompetenceServiceUtil.getCountCompetencesOfGroup(((Long)arguments[0]).longValue());
 		}
 
-		if (_methodName129.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes129, parameterTypes)) {
+		if (_methodName133.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes133, parameterTypes)) {
 			return CompetenceServiceUtil.getCompetencesOfGroups((long[])arguments[0]);
 		}
 
 		throw new UnsupportedOperationException();
 	}
 
-	private String _methodName120;
-	private String[] _methodParameterTypes120;
-	private String _methodName121;
-	private String[] _methodParameterTypes121;
-	private String _methodName126;
-	private String[] _methodParameterTypes126;
-	private String _methodName127;
-	private String[] _methodParameterTypes127;
-	private String _methodName128;
-	private String[] _methodParameterTypes128;
-	private String _methodName129;
-	private String[] _methodParameterTypes129;
+	private String _methodName124;
+	private String[] _methodParameterTypes124;
+	private String _methodName125;
+	private String[] _methodParameterTypes125;
+	private String _methodName130;
+	private String[] _methodParameterTypes130;
+	private String _methodName131;
+	private String[] _methodParameterTypes131;
+	private String _methodName132;
+	private String[] _methodParameterTypes132;
+	private String _methodName133;
+	private String[] _methodParameterTypes133;
 }
