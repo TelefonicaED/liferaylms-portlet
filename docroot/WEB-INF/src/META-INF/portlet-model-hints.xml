@@ -192,6 +192,7 @@
 		<field name="debugScorm" type="boolean" />
 		<field name="hasAPILicence" type="boolean" />
 		<field name="showHideActivity" type="boolean" />
+		<field name="viewCoursesFinished" type="boolean" />
 	</model>
 	<model name="com.liferay.lms.model.Module">
 		<field name="uuid" type="String" />

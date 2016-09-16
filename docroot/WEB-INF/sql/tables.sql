@@ -154,7 +154,8 @@ create table Lms_LmsPrefs (
 	usersResults LONG,
 	debugScorm BOOLEAN,
 	hasAPILicence BOOLEAN,
-	showHideActivity BOOLEAN
+	showHideActivity BOOLEAN,
+	viewCoursesFinished BOOLEAN
 );
 
 create table Lms_Module (

@@ -245,8 +245,7 @@ public class CourseCompetenceWrapper implements CourseCompetence,
 		return new CourseCompetenceWrapper((CourseCompetence)_courseCompetence.clone());
 	}
 
-	public int compareTo(
-		com.liferay.lms.model.CourseCompetence courseCompetence) {
+	public int compareTo(CourseCompetence courseCompetence) {
 		return _courseCompetence.compareTo(courseCompetence);
 	}
 
@@ -255,11 +254,11 @@ public class CourseCompetenceWrapper implements CourseCompetence,
 		return _courseCompetence.hashCode();
 	}
 
-	public com.liferay.portal.model.CacheModel<com.liferay.lms.model.CourseCompetence> toCacheModel() {
+	public com.liferay.portal.model.CacheModel<CourseCompetence> toCacheModel() {
 		return _courseCompetence.toCacheModel();
 	}
 
-	public com.liferay.lms.model.CourseCompetence toEscapedModel() {
+	public CourseCompetence toEscapedModel() {
 		return new CourseCompetenceWrapper(_courseCompetence.toEscapedModel());
 	}
 

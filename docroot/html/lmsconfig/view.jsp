@@ -167,9 +167,7 @@ for(CalificationType calificationType :calificationTypeRegistry.getCalificationT
 	
 	<aui:input type="checkbox" name="debugScorm"
 	label="debugScorm" checked="<%=checked%>" value="<%=checked%>" />
-	<%
 
-%>
 </aui:field-wrapper>
 
 
@@ -179,11 +177,16 @@ for(CalificationType calificationType :calificationTypeRegistry.getCalificationT
 	
 	<aui:input type="checkbox" name="showHideActivity"
 	label="show-hide-activity" checked="<%=prefs.getShowHideActivity()%>" value="<%=prefs.getShowHideActivity()%>" />
-	<%
 
-%>
 </aui:field-wrapper>
 
+<liferay-ui:header title="configuration-courses" />
+<aui:field-wrapper>
+
+	<aui:input type="checkbox" name="viewCoursesFinished"
+	label="view-courses-finished" checked="<%=prefs.getViewCoursesFinished()%>" value="<%=prefs.getViewCoursesFinished()%>" />
+
+</aui:field-wrapper>
 
 
 <aui:field-wrapper>

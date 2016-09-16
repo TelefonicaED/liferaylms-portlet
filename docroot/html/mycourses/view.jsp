@@ -1,3 +1,5 @@
+<%@page import="com.liferay.lms.service.CourseResultLocalServiceUtil"%>
+<%@page import="com.liferay.lms.model.CourseResult"%>
 <%@page import="java.net.URLEncoder"%>
 <%@page import="com.liferay.portlet.PortletPreferencesFactoryUtil"%>
 <%@page import="javax.portlet.PortletPreferences"%>
@@ -148,122 +150,153 @@ if (courseOrder == 0){
 
 Locale loc = response.getLocale();
 int courses = 0;
+CourseResult courseResult = null;
+Date finishDate = null;
+Date lastModuleDate = null;
 for(Group groupCourse:groups)
 {
-	
-	
 	Course course=CourseLocalServiceUtil.fetchByGroupCreatedId(groupCourse.getGroupId());
+	
 	if(course!=null&&!course.isClosed())
 	{
-	long passed=ModuleLocalServiceUtil.modulesUserPassed(groupCourse.getGroupId(),themeDisplay.getUserId());
-	long modulescount=ModuleLocalServiceUtil.countByGroupId(groupCourse.getGroupId());
-	Group groupsel= GroupLocalServiceUtil.getGroup(course.getGroupCreatedId());
-	if(modulescount>0 ||permissionChecker.hasPermission(groupCourse.getGroupId(), "com.liferay.lms.model",themeDisplay.getScopeGroupId(),"ADD_MODULE"))
-	{
-		%>
-		<div class="course option-more">
-		<%
-		String url = themeDisplay.getPortalURL() +"/"+ loc.getLanguage() +"/web"+ groupsel.getFriendlyURL();
-		String usuarioSuplantado = themeDisplay.getDoAsUserId(); //Si estamos suplantando a un usuario
-	    	String doAsUserId = "";
-	     
-	     if(usuarioSuplantado.length() > 0){
-	    	 doAsUserId = "?doAsUserId=".concat(URLEncoder.encode(usuarioSuplantado,"UTF-8"));
-	     }
-	     
-	  
-	     url+=doAsUserId;  
+		//Comprobamos que las fechas de fin de modulo sean mayores y que no tenga fecha de fin en courseresult
 		
+		courseResult=CourseResultLocalServiceUtil.getByUserAndCourse(course.getCourseId(), themeDisplay.getUserId());
+
+		finishDate=null;
+		if(courseResult!=null && courseResult.getAllowFinishDate()!=null){
+			finishDate=courseResult.getAllowFinishDate();
+		}
 		
-		if (Validator.isNotNull(course.getIcon())) {
-			long logoId = course.getIcon();
-			FileEntry fileEntry = DLAppLocalServiceUtil.getFileEntry(logoId);
-			%>
-			<a href='<%=url%>' class="course-title">
-				<img src="<%= DLUtil.getPreviewURL(fileEntry, fileEntry.getFileVersion(), themeDisplay, StringPool.BLANK) %>">
-				<%=course.getTitle(themeDisplay.getLocale()) %>
-			</a>
-			<%
-		} else if(groupCourse.getPublicLayoutSet().getLogo())
-		{
-			long logoId = groupCourse.getPublicLayoutSet().getLogoId();
-			%>
-			
-			<a href='<%=url%>' class="course-title">
-				<img src="/image/layout_set_logo?img_id=<%=logoId%>">
-				<%=course.getTitle(themeDisplay.getLocale()) %>
-			</a>
-			<%
+		lastModuleDate=null;
+		for(Module module:ModuleLocalServiceUtil.findAllInGroup(groupCourse.getGroupId())){
+			if(lastModuleDate==null){
+				lastModuleDate=module.getEndDate();
+			} else if(module.getEndDate()!=null && lastModuleDate.before(module.getEndDate())){
+				lastModuleDate=module.getEndDate();
+			}
+		}
+		if(finishDate==null){
+			finishDate=lastModuleDate;
 		} else {
-			%>
-			<a class="course-no-image" href='<%=url%>'><%=course.getTitle(themeDisplay.getLocale()) %></a>
-		<% }
-				
-		%>
-			 <span class="challenges"><%=passed %>/<%= modulescount%><span class="ch-text"><liferay-ui:message key="finished.modules" /></span></span><span class="ico-desplegable"></span>
-			<div class="collapsable"  style="display:none;">
-				<table class="moduleList">
-		<%
-			java.util.List<Module> theModules=ModuleLocalServiceUtil.findAllInGroup(groupCourse.getGroupId());
+			if(lastModuleDate!=null && lastModuleDate.before(finishDate)){
+				finishDate=lastModuleDate;
+			}
+		}
+		
+		if(finishDate==null || !finishDate.before(new Date())){				
 			
-				for(Module theModule:theModules)
-				{
-					ModuleResult moduleResult=ModuleResultLocalServiceUtil.getByModuleAndUser(theModule.getModuleId(),themeDisplay.getUserId());
-					long done=0;
-					if(moduleResult!=null)
+		
+		long passed=ModuleLocalServiceUtil.modulesUserPassed(groupCourse.getGroupId(),themeDisplay.getUserId());
+		long modulescount=ModuleLocalServiceUtil.countByGroupId(groupCourse.getGroupId());
+		Group groupsel= GroupLocalServiceUtil.getGroup(course.getGroupCreatedId());
+		if(modulescount>0 ||permissionChecker.hasPermission(groupCourse.getGroupId(), "com.liferay.lms.model",themeDisplay.getScopeGroupId(),"ADD_MODULE"))
+		{
+			%>
+			<div class="course option-more">
+			<%
+			String url = themeDisplay.getPortalURL() +"/"+ loc.getLanguage() +"/web"+ groupsel.getFriendlyURL();
+			String usuarioSuplantado = themeDisplay.getDoAsUserId(); //Si estamos suplantando a un usuario
+		    	String doAsUserId = "";
+		     
+		     if(usuarioSuplantado.length() > 0){
+		    	 doAsUserId = "?doAsUserId=".concat(URLEncoder.encode(usuarioSuplantado,"UTF-8"));
+		     }
+		     
+		  
+		     url+=doAsUserId;  
+			
+			
+			if (Validator.isNotNull(course.getIcon())) {
+				long logoId = course.getIcon();
+				FileEntry fileEntry = DLAppLocalServiceUtil.getFileEntry(logoId);
+				%>
+				<a href='<%=url%>' class="course-title">
+					<img src="<%= DLUtil.getPreviewURL(fileEntry, fileEntry.getFileVersion(), themeDisplay, StringPool.BLANK) %>">
+					<%=course.getTitle(themeDisplay.getLocale()) %>
+				</a>
+				<%
+			} else if(groupCourse.getPublicLayoutSet().getLogo())
+			{
+				long logoId = groupCourse.getPublicLayoutSet().getLogoId();
+				%>
+				
+				<a href='<%=url%>' class="course-title">
+					<img src="/image/layout_set_logo?img_id=<%=logoId%>">
+					<%=course.getTitle(themeDisplay.getLocale()) %>
+				</a>
+				<%
+			} else {
+				%>
+				<a class="course-no-image" href='<%=url%>'><%=course.getTitle(themeDisplay.getLocale()) %></a>
+			<% }
+					
+			%>
+				 <span class="challenges"><%=passed %>/<%= modulescount%><span class="ch-text"><liferay-ui:message key="finished.modules" /></span></span><span class="ico-desplegable"></span>
+				<div class="collapsable"  style="display:none;">
+					<table class="moduleList">
+			<%
+				java.util.List<Module> theModules=ModuleLocalServiceUtil.findAllInGroup(groupCourse.getGroupId());
+				
+					for(Module theModule:theModules)
 					{
-						done=moduleResult.getResult();
+						ModuleResult moduleResult=ModuleResultLocalServiceUtil.getByModuleAndUser(theModule.getModuleId(),themeDisplay.getUserId());
+						long done=0;
+						if(moduleResult!=null)
+						{
+							done=moduleResult.getResult();
+						}
+						%>
+	
+						<tr>
+				
+						<td class="title">
+						<%
+							long retoplid=themeDisplay.getPlid();
+							for(Layout theLayout:LayoutLocalServiceUtil.getLayouts(groupCourse.getGroupId(),false))
+							{
+						
+								if(theLayout.getFriendlyURL().equals("/reto"))
+								{
+									retoplid=theLayout.getPlid();
+									
+								}
+							}
+							
+							%>
+							<liferay-portlet:renderURL plid="<%=retoplid %>" portletName="lmsactivitieslist_WAR_liferaylmsportlet" var="gotoModuleURL">
+							<liferay-portlet:param name="moduleId" value="<%=Long.toString(theModule.getModuleId()) %>"></liferay-portlet:param>
+							</liferay-portlet:renderURL>
+							<%if(!ModuleLocalServiceUtil.isLocked(theModule.getModuleId(),themeDisplay.getUserId()))
+								{
+								%>
+						<a href="<%=gotoModuleURL.toString()%>"><%=theModule.getTitle(themeDisplay.getLocale()) %></a>
+						<%
+								}
+							else
+							{
+								%>
+								<a><%=theModule.getTitle(themeDisplay.getLocale()) %></a>
+								<%
+							}
+						%>
+						</td>
+					<td class="result">
+						
+						<%=done %>% <liferay-ui:message key="test.done" />
+						</td>
+				
+						</tr>
+						
+					<%
 					}
 					%>
-
-					<tr>
-			
-					<td class="title">
-					<%
-						long retoplid=themeDisplay.getPlid();
-						for(Layout theLayout:LayoutLocalServiceUtil.getLayouts(groupCourse.getGroupId(),false))
-						{
-					
-							if(theLayout.getFriendlyURL().equals("/reto"))
-							{
-								retoplid=theLayout.getPlid();
-								
-							}
-						}
-						
-						%>
-						<liferay-portlet:renderURL plid="<%=retoplid %>" portletName="lmsactivitieslist_WAR_liferaylmsportlet" var="gotoModuleURL">
-						<liferay-portlet:param name="moduleId" value="<%=Long.toString(theModule.getModuleId()) %>"></liferay-portlet:param>
-						</liferay-portlet:renderURL>
-						<%if(!ModuleLocalServiceUtil.isLocked(theModule.getModuleId(),themeDisplay.getUserId()))
-							{
-							%>
-					<a href="<%=gotoModuleURL.toString()%>"><%=theModule.getTitle(themeDisplay.getLocale()) %></a>
-					<%
-							}
-						else
-						{
-							%>
-							<a><%=theModule.getTitle(themeDisplay.getLocale()) %></a>
-							<%
-						}
-					%>
-					</td>
-				<td class="result">
-					
-					<%=done %>% <liferay-ui:message key="test.done" />
-					</td>
-			
-					</tr>
-					
-				<%
-				}
-				%>
-				</table>
+					</table>
+				</div>
 			</div>
-		</div>
-<%
-		courses++;
+	<%
+			courses++;
+			}
 		}
 	}
 }

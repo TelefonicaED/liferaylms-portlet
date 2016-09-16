@@ -1910,6 +1910,7 @@
 			<mime-type>text/html</mime-type>
 			<portlet-mode>view</portlet-mode>
 		</supports>
+		<resource-bundle>content/coursehistory/Language</resource-bundle>
 		<portlet-info>
 			<title>Course History</title>
 			<short-title>Course History</short-title>

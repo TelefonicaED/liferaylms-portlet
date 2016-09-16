@@ -282,6 +282,7 @@
 			<basic name="debugScorm" />
 			<basic name="hasAPILicence" />
 			<basic name="showHideActivity" />
+			<basic name="viewCoursesFinished" />
 			<transient name="modelAttributes" />
 			<transient name="primaryKey" />
 			<transient name="primaryKeyObj" />

@@ -40,6 +40,7 @@ public class LmsPrefsSoap implements Serializable {
 		soapModel.setDebugScorm(model.getDebugScorm());
 		soapModel.setHasAPILicence(model.getHasAPILicence());
 		soapModel.setShowHideActivity(model.getShowHideActivity());
+		soapModel.setViewCoursesFinished(model.getViewCoursesFinished());
 
 		return soapModel;
 	}
@@ -192,6 +193,18 @@ public class LmsPrefsSoap implements Serializable {
 		_showHideActivity = showHideActivity;
 	}
 
+	public boolean getViewCoursesFinished() {
+		return _viewCoursesFinished;
+	}
+
+	public boolean isViewCoursesFinished() {
+		return _viewCoursesFinished;
+	}
+
+	public void setViewCoursesFinished(boolean viewCoursesFinished) {
+		_viewCoursesFinished = viewCoursesFinished;
+	}
+
 	private long _companyId;
 	private long _teacherRole;
 	private long _editorRole;
@@ -203,4 +216,5 @@ public class LmsPrefsSoap implements Serializable {
 	private boolean _debugScorm;
 	private boolean _hasAPILicence;
 	private boolean _showHideActivity;
+	private boolean _viewCoursesFinished;
 }

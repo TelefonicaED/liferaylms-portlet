@@ -187,7 +187,7 @@ public class CheckP2pMailingWrapper implements CheckP2pMailing,
 		return new CheckP2pMailingWrapper((CheckP2pMailing)_checkP2pMailing.clone());
 	}
 
-	public int compareTo(com.liferay.lms.model.CheckP2pMailing checkP2pMailing) {
+	public int compareTo(CheckP2pMailing checkP2pMailing) {
 		return _checkP2pMailing.compareTo(checkP2pMailing);
 	}
 
@@ -196,11 +196,11 @@ public class CheckP2pMailingWrapper implements CheckP2pMailing,
 		return _checkP2pMailing.hashCode();
 	}
 
-	public com.liferay.portal.model.CacheModel<com.liferay.lms.model.CheckP2pMailing> toCacheModel() {
+	public com.liferay.portal.model.CacheModel<CheckP2pMailing> toCacheModel() {
 		return _checkP2pMailing.toCacheModel();
 	}
 
-	public com.liferay.lms.model.CheckP2pMailing toEscapedModel() {
+	public CheckP2pMailing toEscapedModel() {
 		return new CheckP2pMailingWrapper(_checkP2pMailing.toEscapedModel());
 	}
 

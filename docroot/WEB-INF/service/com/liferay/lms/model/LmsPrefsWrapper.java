@@ -55,6 +55,7 @@ public class LmsPrefsWrapper implements LmsPrefs, ModelWrapper<LmsPrefs> {
 		attributes.put("debugScorm", getDebugScorm());
 		attributes.put("hasAPILicence", getHasAPILicence());
 		attributes.put("showHideActivity", getShowHideActivity());
+		attributes.put("viewCoursesFinished", getViewCoursesFinished());
 
 		return attributes;
 	}
@@ -124,6 +125,13 @@ public class LmsPrefsWrapper implements LmsPrefs, ModelWrapper<LmsPrefs> {
 
 		if (showHideActivity != null) {
 			setShowHideActivity(showHideActivity);
+		}
+
+		Boolean viewCoursesFinished = (Boolean)attributes.get(
+				"viewCoursesFinished");
+
+		if (viewCoursesFinished != null) {
+			setViewCoursesFinished(viewCoursesFinished);
 		}
 	}
 
@@ -370,6 +378,33 @@ public class LmsPrefsWrapper implements LmsPrefs, ModelWrapper<LmsPrefs> {
 		_lmsPrefs.setShowHideActivity(showHideActivity);
 	}
 
+	/**
+	* Returns the view courses finished of this lms prefs.
+	*
+	* @return the view courses finished of this lms prefs
+	*/
+	public boolean getViewCoursesFinished() {
+		return _lmsPrefs.getViewCoursesFinished();
+	}
+
+	/**
+	* Returns <code>true</code> if this lms prefs is view courses finished.
+	*
+	* @return <code>true</code> if this lms prefs is view courses finished; <code>false</code> otherwise
+	*/
+	public boolean isViewCoursesFinished() {
+		return _lmsPrefs.isViewCoursesFinished();
+	}
+
+	/**
+	* Sets whether this lms prefs is view courses finished.
+	*
+	* @param viewCoursesFinished the view courses finished of this lms prefs
+	*/
+	public void setViewCoursesFinished(boolean viewCoursesFinished) {
+		_lmsPrefs.setViewCoursesFinished(viewCoursesFinished);
+	}
+
 	public boolean isNew() {
 		return _lmsPrefs.isNew();
 	}
@@ -412,7 +447,7 @@ public class LmsPrefsWrapper implements LmsPrefs, ModelWrapper<LmsPrefs> {
 		return new LmsPrefsWrapper((LmsPrefs)_lmsPrefs.clone());
 	}
 
-	public int compareTo(com.liferay.lms.model.LmsPrefs lmsPrefs) {
+	public int compareTo(LmsPrefs lmsPrefs) {
 		return _lmsPrefs.compareTo(lmsPrefs);
 	}
 
@@ -421,11 +456,11 @@ public class LmsPrefsWrapper implements LmsPrefs, ModelWrapper<LmsPrefs> {
 		return _lmsPrefs.hashCode();
 	}
 
-	public com.liferay.portal.model.CacheModel<com.liferay.lms.model.LmsPrefs> toCacheModel() {
+	public com.liferay.portal.model.CacheModel<LmsPrefs> toCacheModel() {
 		return _lmsPrefs.toCacheModel();
 	}
 
-	public com.liferay.lms.model.LmsPrefs toEscapedModel() {
+	public LmsPrefs toEscapedModel() {
 		return new LmsPrefsWrapper(_lmsPrefs.toEscapedModel());
 	}
 

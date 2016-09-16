@@ -730,7 +730,7 @@ public class ModuleWrapper implements Module, ModelWrapper<Module> {
 		return new ModuleWrapper((Module)_module.clone());
 	}
 
-	public int compareTo(com.liferay.lms.model.Module module) {
+	public int compareTo(Module module) {
 		return _module.compareTo(module);
 	}
 
@@ -739,11 +739,11 @@ public class ModuleWrapper implements Module, ModelWrapper<Module> {
 		return _module.hashCode();
 	}
 
-	public com.liferay.portal.model.CacheModel<com.liferay.lms.model.Module> toCacheModel() {
+	public com.liferay.portal.model.CacheModel<Module> toCacheModel() {
 		return _module.toCacheModel();
 	}
 
-	public com.liferay.lms.model.Module toEscapedModel() {
+	public Module toEscapedModel() {
 		return new ModuleWrapper(_module.toEscapedModel());
 	}
 

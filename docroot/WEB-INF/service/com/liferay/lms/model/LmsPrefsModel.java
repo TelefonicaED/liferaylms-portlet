@@ -236,6 +236,27 @@ public interface LmsPrefsModel extends BaseModel<LmsPrefs> {
 	 */
 	public void setShowHideActivity(boolean showHideActivity);
 
+	/**
+	 * Returns the view courses finished of this lms prefs.
+	 *
+	 * @return the view courses finished of this lms prefs
+	 */
+	public boolean getViewCoursesFinished();
+
+	/**
+	 * Returns <code>true</code> if this lms prefs is view courses finished.
+	 *
+	 * @return <code>true</code> if this lms prefs is view courses finished; <code>false</code> otherwise
+	 */
+	public boolean isViewCoursesFinished();
+
+	/**
+	 * Sets whether this lms prefs is view courses finished.
+	 *
+	 * @param viewCoursesFinished the view courses finished of this lms prefs
+	 */
+	public void setViewCoursesFinished(boolean viewCoursesFinished);
+
 	public boolean isNew();
 
 	public void setNew(boolean n);
