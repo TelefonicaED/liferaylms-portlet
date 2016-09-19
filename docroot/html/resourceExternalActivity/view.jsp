@@ -1,3 +1,6 @@
+<%@page import="com.liferay.lms.model.Course"%>
+<%@page import="com.liferay.lms.service.CourseLocalServiceUtil"%>
+<%@page import="com.tls.lms.util.LiferaylmsUtil"%>
 <%@page import="com.liferay.portal.kernel.exception.SystemException"%>
 <%@page import="com.liferay.portal.kernel.exception.PortalException"%>
 <%@page import="com.liferay.portlet.asset.NoSuchEntryException"%>
@@ -35,7 +38,7 @@
 <%@page import="com.liferay.lms.model.LearningActivity"%>
 <%@page import="com.liferay.portal.kernel.util.ListUtil"%>
 <%@page import="com.liferay.lms.service.LearningActivityLocalServiceUtil"%>
-<%@page import="org.apache.commons.lang.StringEscapeUtils"%>
+<%@page import="org.apache.commons.lang.StringEscapeUtils"%> 
 <%@page import="java.text.DecimalFormat"%>
 
 <%@ include file="/init.jsp" %>
@@ -61,7 +64,7 @@ else
 
 	LearningActivity learnact=LearningActivityLocalServiceUtil.getLearningActivity(ParamUtil.getLong(request,"actId"));
 	
-	%>
+	%> 
 		<h2 class="description-title"><%=learnact.getTitle(themeDisplay.getLocale())%></h2>
 		<%--<h3 class="description-h3"><liferay-ui:message key="description" /></h3> --%>
 		<div class="description"><%=learnact.getDescription(themeDisplay.getLocale()) %></div>
@@ -93,12 +96,13 @@ else
 			}
 		}	
 		
-		//System.out.println(" ** isDefaultScore :: " + isDefaultScore);
-		//System.out.println(" ** isYoutubeIframe :: " + isYoutubeIframe);
-		//System.out.println(" ** isVimeoIframe :: " + isVimeoIframe);
+		Course course = CourseLocalServiceUtil.getCourseByGroupCreatedId(learnact.getGroupId());
+		boolean hasPermissionAccessCourseFinished = LiferaylmsUtil.hasPermissionAccessCourseFinished(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(), course.getCourseId(), themeDisplay.getUserId());
 		
 		if ((isYoutubeIframe || isVimeoIframe) && !isDefaultScore){
-			learningTry =LearningActivityTryLocalServiceUtil.getLastLearningActivityTryByActivityAndUser(actId,themeDisplay.getUserId());
+			if(!hasPermissionAccessCourseFinished){
+				learningTry =LearningActivityTryLocalServiceUtil.getLastLearningActivityTryByActivityAndUser(actId,themeDisplay.getUserId());
+			}
 			//System.out.println(" :: learningTry:: " + learningTry);
 			if (learningTry != null){
 				//Poner posición del video.
@@ -127,9 +131,9 @@ else
 				}	
 				
 			}
-		}			
-		
-		if(!LearningActivityResultLocalServiceUtil.userPassed(actId,themeDisplay.getUserId()))
+		}	
+				
+		if(!hasPermissionAccessCourseFinished && !LearningActivityResultLocalServiceUtil.userPassed(actId,themeDisplay.getUserId()))
 		{
 			if(!permissionChecker.hasPermission(learnact.getGroupId(), LearningActivity.class.getName(), actId, ActionKeys.UPDATE) ||
 					!permissionChecker.hasOwnerPermission(learnact.getCompanyId(), LearningActivity.class.getName(), actId, learnact.getUserId(), ActionKeys.UPDATE)){

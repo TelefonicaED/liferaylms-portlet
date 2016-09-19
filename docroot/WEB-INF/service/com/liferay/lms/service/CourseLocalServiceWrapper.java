@@ -535,6 +535,24 @@ public class CourseLocalServiceWrapper implements CourseLocalService,
 			companyId, groupId, userId, language);
 	}
 
+	public java.util.List<com.liferay.lms.views.CourseResultView> getMyCourses(
+		long groupId, long userId,
+		com.liferay.portal.theme.ThemeDisplay themeDisplay,
+		java.lang.String orderByColumn, java.lang.String orderByType,
+		int start, int end) {
+		return _courseLocalService.getMyCourses(groupId, userId, themeDisplay,
+			orderByColumn, orderByType, start, end);
+	}
+
+	public int countMyCourses(long groupId, long userId,
+		com.liferay.portal.theme.ThemeDisplay themeDisplay) {
+		return _courseLocalService.countMyCourses(groupId, userId, themeDisplay);
+	}
+
+	public boolean hasUserTries(long courseId, long userId) {
+		return _courseLocalService.hasUserTries(courseId, userId);
+	}
+
 	/**
 	 * @deprecated Renamed to {@link #getWrappedService}
 	 */

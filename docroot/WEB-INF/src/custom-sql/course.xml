@@ -464,4 +464,77 @@
 			(u.emailAddress LIKE ?) [$AND_OR_CONNECTOR$]
 		]]>
 	</sql>
+	<sql id="com.liferay.lms.service.persistence.CourseFinder.hasUserTries">
+		<![CDATA[   			
+			SELECT 
+				COUNT(1) > 0 AS hasActWithTries
+			FROM (
+				SELECT 
+					IF(lar.latId IS NOT NULL, COUNT(1), 0) AS numTriesUser, la.actId, la.tries
+				FROM 
+					lms_course c
+				INNER JOIN 
+					lms_learningactivity la 
+						ON c.groupCreatedId = la.groupId
+				LEFT JOIN 
+					lms_learningactivitytry lar 
+						ON la.actId = lar.actId AND lar.userId = ?
+				WHERE 
+					c.courseId =  ?
+				GROUP BY 
+					la.actId
+			) AS TABLA
+			WHERE 
+				tries = 0 OR numTriesUser < tries
+		]]>
+	</sql>
+	<sql id="com.liferay.lms.service.persistence.CourseFinder.myCourses">
+		<![CDATA[   		
+			SELECT 
+				c.courseId, 
+				u.userId, 
+				IF(EXTRACTVALUE(c.title, '//Title[@language-id=\"[$LANGUAGE$]\"]') != '', EXTRACTVALUE(c.title, '//Title[@language-id=\"[$LANGUAGE$]\"]'), EXTRACTVALUE(c.title, '//root[@default-locale]//Title')) AS courseTitle, 
+				CASE WHEN r.crId IS NULL THEN 0 WHEN r.passedDate IS NULL THEN 1 WHEN r.passedDate IS NOT NULL AND r.passed = 0 THEN 2 WHEN r.passed = 1 AND r.passedDate IS NOT NULL THEN 3 ELSE 0 END AS statusUser,
+				CASE WHEN r.crId IS NULL THEN 0 ELSE r.result END AS result, c.icon, c.groupCreatedId, c.friendlyURL
+			FROM 
+				lms_course c
+			INNER JOIN 
+				users_groups u 
+					ON c.groupCreatedId = u.groupId AND u.userId = ?
+			LEFT OUTER JOIN 
+				lms_courseresult r 
+					ON c.courseId = r.courseId AND r.userId = ?
+			WHERE 
+				c.closed = 0 
+				AND (SELECT MAX(mo.endDate) FROM lms_module mo WHERE mo.groupId = c.groupCreatedId) > '[$DATENOW$]' 
+				AND r.passedDate IS NULL	
+				AND (r.crId IS NULL OR r.allowFinishDate IS NULL OR r.allowFinishDate > '[$DATENOW$]')
+				AND c.groupId = ?
+			GROUP By 
+				c.courseId
+		]]>
+	</sql>
+	<sql id="com.liferay.lms.service.persistence.CourseFinder.countMyCourses">
+		<![CDATA[   		
+			SELECT 
+				COUNT(1) AS total
+			FROM 
+				lms_course c
+			INNER JOIN 
+				users_groups u 
+					ON c.groupCreatedId = u.groupId AND u.userId = ?
+			LEFT OUTER JOIN 
+				lms_courseresult r 
+					ON c.courseId = r.courseId AND r.userId = ?
+			WHERE 
+				c.closed = 0 
+				AND (SELECT MAX(mo.endDate) FROM lms_module mo WHERE mo.groupId = c.groupCreatedId) > '[$DATENOW$]' 
+				AND r.passedDate IS NULL	
+				AND (r.crId IS NULL OR r.allowFinishDate IS NULL OR r.allowFinishDate > '[$DATENOW$]')
+				AND c.groupId = ?
+			GROUP By 
+				c.courseId
+		]]>
+	</sql>
+	
 </custom-sql>

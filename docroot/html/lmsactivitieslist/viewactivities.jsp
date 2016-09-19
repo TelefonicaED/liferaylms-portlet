@@ -1,3 +1,5 @@
+<%@page import="com.liferay.lms.CourseTeachers"%>
+<%@page import="com.tls.lms.util.LiferaylmsUtil"%>
 <%@page import="com.liferay.portal.model.PortalPreferences"%>
 <%@page import="java.util.Locale"%>
 <%@page import="com.liferay.portal.kernel.util.LocalizationUtil"%>
@@ -32,12 +34,12 @@
 <%@page import="com.liferay.lms.service.LearningActivityTryLocalServiceUtil"%>
 <%@page import="com.liferay.lms.service.LearningActivityServiceUtil"%>
 <%@page import="com.liferay.lms.model.LearningActivity"%>
-<%@page import="com.liferay.lms.learningactivity.LearningActivityTypeRegistry"%>
+<%@page import="com.liferay.lms.learningactivity.LearningActivityTypeRegistry"%> 
 
 <%@ include file="/init.jsp"%>
 
 
-<%
+<% 
 long moduleId = ParamUtil.getLong(request, "moduleId", 0);
 boolean actionEditing = ParamUtil.getBoolean(request, "actionEditing", false);
 long actId = ParamUtil.getLong(request, "actId", 0);
@@ -65,15 +67,17 @@ if (moduleId == 0) {
 		moduleId = theModule.getModuleId();
 	}
 }
+boolean hasPermissionAccessCourseFinished = LiferaylmsUtil.hasPermissionAccessCourseFinished(themeDisplay.getCompanyId(), coursetmp.getGroupCreatedId(), coursetmp.getCourseId(), themeDisplay.getUserId());
+
+
 if (moduleId == 0) {
 	activities = LearningActivityServiceUtil.getLearningActivitiesOfGroup(scopeGroupId);
 } else {
 	Module theModule =ModuleLocalServiceUtil.getModule(moduleId);
-	if(!permissionChecker.hasPermission(
-			themeDisplay.getScopeGroupId(),
-			Module.class.getName(), moduleId,
-			"ADD_LACT")&& ModuleLocalServiceUtil.isLocked(theModule.getPrimaryKey(),themeDisplay.getUserId()) &&
-			!permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), "com.liferay.lms.model", themeDisplay.getScopeGroupId() , "ACCESSLOCK")){
+	if(!permissionChecker.hasPermission( themeDisplay.getScopeGroupId(), Module.class.getName(), moduleId,"ADD_LACT")
+			&& ModuleLocalServiceUtil.isLocked(theModule.getPrimaryKey(),themeDisplay.getUserId()) 
+			&& !permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), "com.liferay.lms.model", themeDisplay.getScopeGroupId() , "ACCESSLOCK")
+			&& !hasPermissionAccessCourseFinished){
 		//renderRequest.setAttribute(WebKeys.PORTLET_CONFIGURATOR_VISIBILITY, Boolean.FALSE);
 		activities=new ArrayList<LearningActivity>(); 
 	}else{
@@ -160,7 +164,7 @@ AUI().ready('node','aui-io-request','aui-parse-content','aui-sortable',function(
             	}              
             }
 		}
-	);
+	); 
   });
 }
 </script>
@@ -287,6 +291,7 @@ function <portlet:namespace />upActivity(actId){
 			String type;
 			String moduletitle;
 			String title;
+			
 			for (LearningActivity activity : activities) {
 				title = activity.getTitle(themeDisplay.getLocale());				
 				moduletitle = "";
@@ -333,12 +338,12 @@ function <portlet:namespace />upActivity(actId){
 				
 				LearningActivityType learningActivityType = learningActivityTypeRegistry.getLearningActivityType(activity.getTypeId());
 				if (permissionChecker.hasPermission(activity.getGroupId(),LearningActivity.class.getName(),	activity.getActId(), ActionKeys.VIEW)){
-					
-					
+	
 					if((Validator.isNotNull(learningActivityType))&&
 						(!LearningActivityLocalServiceUtil.islocked(activity.getActId(),themeDisplay.getUserId())
 							|| permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), "com.liferay.lms.model", themeDisplay.getScopeGroupId() , "ACCESSLOCK") 
-							||(permissionChecker.hasPermission(activity.getGroupId(), LearningActivity.class.getName(), activity.getActId(), ActionKeys.UPDATE) && actionEditing)))
+							||(permissionChecker.hasPermission(activity.getGroupId(), LearningActivity.class.getName(), activity.getActId(), ActionKeys.UPDATE) && actionEditing))
+							||hasPermissionAccessCourseFinished)
 					{
 						%>
 						<portlet:actionURL var="goToActivity" windowState="<%= WindowState.NORMAL.toString()%>" >

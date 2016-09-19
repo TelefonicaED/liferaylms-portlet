@@ -2,13 +2,24 @@ package com.tls.lms.util;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.liferay.lms.model.Course;
+import com.liferay.lms.model.CourseResult;
 import com.liferay.lms.model.LearningActivity;
+import com.liferay.lms.model.LmsPrefs;
+import com.liferay.lms.model.Module;
+import com.liferay.lms.service.CourseLocalServiceUtil;
+import com.liferay.lms.service.CourseResultLocalServiceUtil;
+import com.liferay.lms.service.LmsPrefsLocalServiceUtil;
+import com.liferay.lms.service.ModuleLocalServiceUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.model.Resource;
 import com.liferay.portal.model.ResourceConstants;
 import com.liferay.portal.model.Role;
@@ -24,6 +35,8 @@ import com.liferay.portal.service.RoleLocalServiceUtil;
 import com.liferay.portal.theme.ThemeDisplay;
 
 public class LiferaylmsUtil {
+	
+	private static Log log = LogFactoryUtil.getLog(LiferaylmsUtil.class); 
 	
 	public static final String DEREGISTER_USER_EXPANDO = "deregister-mail";
 	public static final int defaultStartYear = 2012; //porque es necesario mantener los valores antiguos para los cursos antiguos
@@ -116,6 +129,92 @@ public class LiferaylmsUtil {
 			} // swich end
 		}
 		return detectedCharset;
+	}
+	
+	/**
+	 * Devuelve true en caso de que estés accediendo al curso porque puedas verlo después de cerrado
+	 * Se tienen que cumplir las siguientes condiciones:
+	 * 	Check del lmsprefs a true
+	 *  &&
+	 *  (
+	 *  	fechas de los módulos cerradas (si están abiertas se está haciendo de forma normal)
+	 *  	||
+	 *  	allowFinishDate < ahora (la fecha de fin permitida tiene que haber pasado para entrar sólo en modo observador)
+	 *  	||
+	 *  	passedDate != null && no queden intentos (hayas finalizado el curso y no te queden intentos)
+	 *  ) 
+	 * @param companyId
+	 * @param course
+	 * @param userId
+	 * @return true si está en modo observador, false en caso contrario
+	 */
+	
+	public static boolean hasPermissionAccessCourseFinished(long companyId, long groupId, long courseId, long userId){
+		log.debug(":::hasPermissionAccessCourseFinished:::companyId: " + companyId + " - groupId: "+ groupId + " - userId: " + userId);
+		LmsPrefs lmsPrefs = null;
+		try {
+			lmsPrefs = LmsPrefsLocalServiceUtil.getLmsPrefs(companyId);
+		} catch (PortalException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (SystemException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		if(lmsPrefs == null || !lmsPrefs.getViewCoursesFinished()){
+			return false;
+		}
+		
+		log.debug(":::hasPermissionAccessCourseFinished:::lmsPrefs viewCoursesFinished: " + lmsPrefs.getViewCoursesFinished());
+		
+		Date now = new Date();
+		Date lastModuleDate = null;
+		//Ahora comprobamos si se cumple alguna de las otras tres condiciones
+		try {
+			for(Module module:ModuleLocalServiceUtil.findAllInGroup(groupId)){
+				if(lastModuleDate==null){
+					lastModuleDate=module.getEndDate();
+				} else if(module.getEndDate()!=null && lastModuleDate.before(module.getEndDate())){
+					lastModuleDate=module.getEndDate();
+				}
+			}
+		} catch (SystemException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		log.debug(":::hasPermissionAccessCourseFinished:::lastModuleDate: " + lastModuleDate);
+		
+		if(lastModuleDate != null && lastModuleDate.before(now)){
+			log.debug(":::hasPermissionAccessCourseFinished:::lastModuleDateBefore: " + lastModuleDate != null && lastModuleDate.before(now));
+			return true;
+		}
+		
+		//Ahora comprobamos la condición de allowFinishDate
+		CourseResult courseResult = null;
+		try {
+			courseResult = CourseResultLocalServiceUtil.getByUserAndCourse(courseId, userId);
+		} catch (SystemException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		if(courseResult != null){
+			log.debug(":::hasPermissionAccessCourseFinished:::courseResult allowFinishDate: " + courseResult.getAllowFinishDate());
+		}
+		
+		if(courseResult != null && courseResult.getAllowFinishDate() != null && courseResult.getAllowFinishDate().before(now)){
+			log.debug(":::hasPermissionAccessCourseFinished:::courseResult allowFinishDate pasada ");
+			return true;
+		}
+		
+		//Ahora comprobamos que lo haya finalizado y que no tenga intentos
+		if(courseResult == null || courseResult.getPassedDate() == null){
+			return false;
+		}
+		
+		log.debug(":::hasPermissionAccessCourseFinished:::courseResult passedDate: " + courseResult.getPassedDate());
+		
+		return !CourseLocalServiceUtil.hasUserTries(courseId, userId);
 	}
 	 
 }

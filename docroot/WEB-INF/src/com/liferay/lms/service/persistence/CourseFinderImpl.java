@@ -1,7 +1,10 @@
 package com.liferay.lms.service.persistence;
 
 
+import java.math.BigInteger;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -10,6 +13,8 @@ import com.liferay.lms.model.Course;
 import com.liferay.lms.model.LmsPrefs;
 import com.liferay.lms.model.impl.CourseImpl;
 import com.liferay.lms.service.LmsPrefsLocalServiceUtil;
+import com.liferay.lms.views.CourseResultView;
+import com.liferay.lms.views.CourseView;
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
 import com.liferay.portal.kernel.dao.orm.ORMException;
 import com.liferay.portal.kernel.dao.orm.QueryPos;
@@ -23,8 +28,10 @@ import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
+import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.model.Group;
@@ -34,9 +41,13 @@ import com.liferay.portal.model.User;
 import com.liferay.portal.model.UserGroup;
 import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.service.ClassNameLocalServiceUtil;
+import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.ResourceActionLocalServiceUtil;
 import com.liferay.portal.service.RoleLocalServiceUtil;
 import com.liferay.portal.service.persistence.impl.BasePersistenceImpl;
+import com.liferay.portal.theme.ThemeDisplay;
+import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
+import com.liferay.portlet.documentlibrary.util.DLUtil;
 import com.liferay.util.dao.orm.CustomSQLUtil;
 
 public class CourseFinderImpl extends BasePersistenceImpl<Course> implements CourseFinder{
@@ -114,7 +125,16 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 		        ".whereLastName";
 	public static final String WHERE_EMAIL_ADDRESS =
 		    CourseFinder.class.getName() +
-		        ".whereEmailAddress";
+		        ".whereEmailAddress";	
+	public static final String HAS_USER_TRIES =
+			 CourseFinder.class.getName() +
+				".hasUserTries";	
+	public static final String MY_COURSES =
+			 CourseFinder.class.getName() +
+				".myCourses";
+	public static final String COUNT_MY_COURSES =
+			 CourseFinder.class.getName() +
+				".countMyCourses";
 	
 	
 	@SuppressWarnings("unchecked")
@@ -231,7 +251,7 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			tagIds = tagIds.substring(0, tagIds.length()-1);
 			
 			/*
-			 * PARA LA REALIZACIÓN POR = EN VEZ DE POR IN
+			 * PARA LA REALIZACIï¿½N POR = EN VEZ DE POR IN
 			 * 
 			String joins = "";
 			String wheres = "";
@@ -995,6 +1015,173 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 		}
 		
 		return sql;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public boolean hasUserTries(long courseId, long userId){
+		Session session = null;
+		
+		try{
+			
+			session = openSession();
+			
+			String sql = CustomSQLUtil.get(HAS_USER_TRIES);
+		
+			if(log.isDebugEnabled()){
+				log.debug("sql: " + sql);
+				log.debug("courseId: " + courseId);
+				log.debug("userId: " + userId);
+			}
+			
+			SQLQuery q = session.createSQLQuery(sql);
+			
+			QueryPos qPos = QueryPos.getInstance(q);
+			qPos.add(userId);
+			qPos.add(courseId);
+			
+			Iterator<Boolean> itr =  q.iterate();
+								
+			if (itr.hasNext()) {
+				Boolean hasUserTries = itr.next();
+
+				return hasUserTries;
+			}
+			
+			
+			
+		} catch (Exception e) {
+	       e.printStackTrace();
+	    } finally {
+	        closeSession(session);
+	    }
+	
+		return false;
+	}
+	
+	public List<CourseResultView> getMyCourses(long groupId, long userId, ThemeDisplay themeDisplay, String orderByColumn, String orderByType, int start, int end){
+		Session session = null;
+		List<CourseResultView> listMyCourses = new ArrayList<CourseResultView>();
+		
+		try{
+			
+			session = openSession();
+			
+			String sql = CustomSQLUtil.get(MY_COURSES);
+			
+			sql = replaceLanguage(sql, themeDisplay.getLanguageId());
+					
+			SimpleDateFormat parseDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			String date = parseDate.format(new Date());
+			
+			sql = sql.replace("[$DATENOW$]", date);
+			
+			if(Validator.isNull(orderByColumn)){
+				orderByColumn = "c.courseId";
+			}
+			
+			sql += " ORDER BY " + orderByColumn + " " + orderByType;
+			
+			if(start >= 0 && end >= 0){
+				sql += " LIMIT " + start + "," + end;
+			}
+		
+			if(log.isDebugEnabled()){
+				log.debug("sql: " + sql);
+				log.debug("groupId: " + groupId);
+				log.debug("userId: " + userId);
+			}
+			
+			SQLQuery q = session.createSQLQuery(sql);
+			
+			QueryPos qPos = QueryPos.getInstance(q);
+			qPos.add(userId);
+			qPos.add(userId);
+			qPos.add(groupId);
+			
+			Iterator<Object[]> itr =  q.iterate();
+							
+			Object[] myCourse = null;
+			CourseResultView courseResultView = null;
+			CourseView courseView = null;
+			
+			while (itr.hasNext()) {
+				myCourse = itr.next();
+
+				courseView = new CourseView(((BigInteger)myCourse[0]).longValue(), (String)myCourse[2], ((BigInteger)myCourse[6]).longValue());
+				if(Validator.isNotNull(myCourse[5])){
+					FileEntry fileEntry = DLAppLocalServiceUtil.getFileEntry(((BigInteger)myCourse[5]).longValue());
+					log.debug("url del logo: " + DLUtil.getPreviewURL(fileEntry, fileEntry.getFileVersion(), themeDisplay, StringPool.BLANK));
+					courseView.setLogoURL(DLUtil.getPreviewURL(fileEntry, fileEntry.getFileVersion(), themeDisplay, StringPool.BLANK) );
+				}else{
+					Group groupCourse= GroupLocalServiceUtil.getGroup(((BigInteger)myCourse[6]).longValue());
+					if(groupCourse.getPublicLayoutSet().getLogo()){
+						log.debug("Lo tiene el group");
+						courseView.setLogoURL("/image/layout_set_logo?img_id=" + groupCourse.getPublicLayoutSet().getLogoId());
+					}	
+				}
+				courseView.setUrl(themeDisplay.getPortalURL()+"/"+themeDisplay.getLocale().getLanguage()+"/web" + (String)myCourse[7]);
+				courseResultView = new CourseResultView(courseView, ((BigInteger)myCourse[4]).longValue(), (Integer)myCourse[3]);
+				
+				listMyCourses.add(courseResultView);
+			}
+			
+			
+			
+		} catch (Exception e) {
+	       e.printStackTrace();
+	    } finally {
+	        closeSession(session);
+	    }
+	
+		return listMyCourses;
+	}
+	
+	public int countMyCourses(long groupId, long userId, ThemeDisplay themeDisplay){
+		Session session = null;
+
+		try{
+			
+			session = openSession();
+			
+			String sql = CustomSQLUtil.get(COUNT_MY_COURSES);
+			
+			SimpleDateFormat parseDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			String date = parseDate.format(new Date());
+			
+			sql = sql.replace("[$DATENOW$]", date);
+		
+			if(log.isDebugEnabled()){
+				log.debug("sql: " + sql);
+				log.debug("groupId: " + groupId);
+				log.debug("userId: " + userId);
+			}
+			
+			SQLQuery q = session.createSQLQuery(sql);
+			
+			QueryPos qPos = QueryPos.getInstance(q);
+			qPos.add(userId);
+			qPos.add(userId);
+			qPos.add(groupId);
+			
+			Iterator<Long> itr = q.iterate();
+
+			if (itr.hasNext()) {
+				Long count = itr.next();
+
+				if (count != null) {
+					return count.intValue();
+				}
+			}
+			
+			
+			
+		} catch (Exception e) {
+	       e.printStackTrace();
+	    } finally {
+	        closeSession(session);
+	    }
+	
+		return 0;
 	}
 	
 	private final Class<?> getPortalClass(String className) {

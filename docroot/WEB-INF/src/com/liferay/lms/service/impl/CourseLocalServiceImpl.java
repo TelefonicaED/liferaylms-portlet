@@ -38,7 +38,7 @@ import com.liferay.lms.service.LmsPrefsLocalServiceUtil;
 import com.liferay.lms.service.ModuleLocalServiceUtil;
 import com.liferay.lms.service.base.CourseLocalServiceBaseImpl;
 import com.liferay.lms.service.persistence.CourseFinderUtil;
-import com.liferay.lms.service.persistence.CourseUtil;
+import com.liferay.lms.views.CourseResultView;
 import com.liferay.portal.kernel.bean.PortletBeanLocatorUtil;
 import com.liferay.portal.kernel.dao.orm.CustomSQLParam;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
@@ -76,20 +76,17 @@ import com.liferay.portal.model.ModelHintsConstants;
 import com.liferay.portal.model.ModelHintsUtil;
 import com.liferay.portal.model.ResourceConstants;
 import com.liferay.portal.model.User;
-import com.liferay.portal.model.UserGroupRole;
 import com.liferay.portal.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.service.ClassNameLocalServiceUtil;
 import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.LayoutSetPrototypeLocalServiceUtil;
 import com.liferay.portal.service.RoleLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
-import com.liferay.portal.service.UserGroupRoleLocalServiceUtil;
 import com.liferay.portal.service.UserLocalServiceUtil;
-import com.liferay.portal.util.comparator.UserFirstNameComparator;
+import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.comparator.UserLastNameComparator;
 import com.liferay.portlet.asset.model.AssetEntry;
 import com.liferay.portlet.asset.model.AssetLinkConstants;
-import com.liferay.portlet.asset.model.AssetTag;
 import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
 import com.liferay.portlet.social.model.SocialActivityCounterDefinition;
 import com.liferay.portlet.social.model.SocialActivityDefinition;
@@ -975,6 +972,18 @@ public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int e
 	
 	public HashMap<Long, Long> countTagCourses(String freeText, long[] categories, long[] tags, long companyId, long groupId, long userId, String language){
 		return CourseFinderUtil.countTagCourses(freeText, categories, tags, companyId, groupId, userId, language);
+	}
+	
+	public List<CourseResultView> getMyCourses(long groupId, long userId, ThemeDisplay themeDisplay, String orderByColumn, String orderByType, int start, int end){
+		return CourseFinderUtil.getMyCourses(groupId, userId, themeDisplay, orderByColumn, orderByType, start, end);
+	}
+	
+	public int countMyCourses(long groupId, long userId, ThemeDisplay themeDisplay){
+		return CourseFinderUtil.countMyCourses(groupId, userId, themeDisplay);
+	}
+	
+	public boolean hasUserTries(long courseId, long userId){
+		return CourseFinderUtil.hasUserTries(courseId, userId);
 	}
 }
 

@@ -1,3 +1,6 @@
+<%@page import="com.liferay.lms.service.CourseLocalServiceUtil"%>
+<%@page import="com.liferay.lms.model.Course"%>
+<%@page import="com.tls.lms.util.LiferaylmsUtil"%>
 <%@page import="com.liferay.lms.service.ModuleLocalServiceUtil"%>
 <%@page import="com.liferay.portal.model.PortletConstants"%>
 <%@page import="com.liferay.portlet.PortletPreferencesFactoryUtil"%>
@@ -27,7 +30,7 @@
 		if(moduleId==0) {
 			moduleId = ModuleLocalServiceUtil.findFirstInGroup(themeDisplay.getScopeGroupId()).getModuleId();
 		}
-%>
+%>	
 		<div class="lms-desplegable" style="overflow: hidden;" >
 			<jsp:include page="/html/lmsactivitieslist/viewactivities.jsp"></jsp:include>
 		</div>

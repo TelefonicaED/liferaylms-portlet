@@ -314,6 +314,23 @@ public class CourseLocalServiceClpInvoker {
 				"java.lang.String", "long[][]", "long[][]", "long", "long",
 				"long", "java.lang.String"
 			};
+
+		_methodName231 = "getMyCourses";
+
+		_methodParameterTypes231 = new String[] {
+				"long", "long", "com.liferay.portal.theme.ThemeDisplay",
+				"java.lang.String", "java.lang.String", "int", "int"
+			};
+
+		_methodName232 = "countMyCourses";
+
+		_methodParameterTypes232 = new String[] {
+				"long", "long", "com.liferay.portal.theme.ThemeDisplay"
+			};
+
+		_methodName233 = "hasUserTries";
+
+		_methodParameterTypes233 = new String[] { "long", "long" };
 	}
 
 	public Object invokeMethod(String name, String[] parameterTypes,
@@ -691,6 +708,29 @@ public class CourseLocalServiceClpInvoker {
 				((Long)arguments[5]).longValue(), (java.lang.String)arguments[6]);
 		}
 
+		if (_methodName231.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes231, parameterTypes)) {
+			return CourseLocalServiceUtil.getMyCourses(((Long)arguments[0]).longValue(),
+				((Long)arguments[1]).longValue(),
+				(com.liferay.portal.theme.ThemeDisplay)arguments[2],
+				(java.lang.String)arguments[3], (java.lang.String)arguments[4],
+				((Integer)arguments[5]).intValue(),
+				((Integer)arguments[6]).intValue());
+		}
+
+		if (_methodName232.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes232, parameterTypes)) {
+			return CourseLocalServiceUtil.countMyCourses(((Long)arguments[0]).longValue(),
+				((Long)arguments[1]).longValue(),
+				(com.liferay.portal.theme.ThemeDisplay)arguments[2]);
+		}
+
+		if (_methodName233.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes233, parameterTypes)) {
+			return CourseLocalServiceUtil.hasUserTries(((Long)arguments[0]).longValue(),
+				((Long)arguments[1]).longValue());
+		}
+
 		throw new UnsupportedOperationException();
 	}
 
@@ -804,4 +844,10 @@ public class CourseLocalServiceClpInvoker {
 	private String[] _methodParameterTypes229;
 	private String _methodName230;
 	private String[] _methodParameterTypes230;
+	private String _methodName231;
+	private String[] _methodParameterTypes231;
+	private String _methodName232;
+	private String[] _methodParameterTypes232;
+	private String _methodName233;
+	private String[] _methodParameterTypes233;
 }

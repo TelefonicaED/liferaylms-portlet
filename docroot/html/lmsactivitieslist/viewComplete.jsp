@@ -1,3 +1,4 @@
+<%@page import="com.tls.lms.util.LiferaylmsUtil"%>
 <%@page import="com.liferay.lms.learningactivity.LearningActivityType"%>
 <%@page import="com.liferay.portal.kernel.util.PropsUtil"%>
 <%@page import="com.liferay.portlet.PortletPreferencesFactoryUtil"%>
@@ -37,7 +38,7 @@ String portletResource = ParamUtil.getString(request, "portletResource");
 if (Validator.isNotNull(portletResource)) 
 	preferences = PortletPreferencesFactoryUtil.getPortletSetup(request, portletResource);
 else
-	preferences = renderRequest.getPreferences();
+	preferences = renderRequest.getPreferences(); 
 
 boolean numerateModules = (preferences.getValue("numerateModules", "false")).compareTo("true") == 0;
 %>
@@ -79,7 +80,7 @@ if(actId!=0) {
 <liferay-portlet:actionURL name="moveModule" var="moveModuleURL" windowState="<%= LiferayWindowState.EXCLUSIVE.toString()%>" />
 
 <script type="text/javascript">
-<!--
+<!-- 
 var ismobile=navigator.userAgent.match(/(iPad)|(iPhone)|(iPod)|(android)|(webOS)/i);
 
 if(!ismobile){
@@ -145,6 +146,8 @@ AUI().ready('node','aui-io-request','aui-parse-content','aui-sortable',function(
 					break;
 			}
 			
+			boolean hasPermissionAccessCourseFinished = LiferaylmsUtil.hasPermissionAccessCourseFinished(themeDisplay.getCompanyId(), course.getGroupCreatedId(), course.getCourseId(), themeDisplay.getUserId());
+			
 			long modulesCount=theModules.size();
 			long themeId=0;
 			for(Module theModule:theModules){
@@ -170,7 +173,8 @@ AUI().ready('node','aui-io-request','aui-parse-content','aui-sortable',function(
 					}
 					java.util.Date now=new java.util.Date(System.currentTimeMillis());
 					if(!ModuleLocalServiceUtil.isLocked(theModule.getModuleId(),themeDisplay.getUserId())||actionEditing||
-							permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), "com.liferay.lms.model", themeDisplay.getScopeGroupId() , "ACCESSLOCK")){
+							permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), "com.liferay.lms.model", themeDisplay.getScopeGroupId() , "ACCESSLOCK") ||
+							hasPermissionAccessCourseFinished){
 						LiferayPortletURL  gotoModuleURL = (LiferayPortletURL)renderResponse.createActionURL();	
 						gotoModuleURL.setParameter(ActionRequest.ACTION_NAME, "goToModule");
 					    gotoModuleURL.removePublicRenderParameter("actId");
@@ -184,7 +188,7 @@ AUI().ready('node','aui-io-request','aui-parse-content','aui-sortable',function(
 						<%
 					if(theModule.getModuleId() != moduleId)
 					{
-						if(ModuleLocalServiceUtil.isLocked(theModule.getModuleId(),themeDisplay.getUserId()))
+						if(!hasPermissionAccessCourseFinished && ModuleLocalServiceUtil.isLocked(theModule.getModuleId(),themeDisplay.getUserId()))
 						{
 							%>
 							<span class="locked"></span>

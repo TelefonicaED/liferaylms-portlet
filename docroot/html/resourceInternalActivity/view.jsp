@@ -1,3 +1,6 @@
+<%@page import="com.tls.lms.util.LiferaylmsUtil"%>
+<%@page import="com.liferay.lms.service.CourseLocalServiceUtil"%>
+<%@page import="com.liferay.lms.model.Course"%>
 <%@page import="com.liferay.portal.kernel.portlet.LiferayPortlet"%>
 <%@page import="com.liferay.lms.auditing.AuditConstants"%>
 <%@page import="com.liferay.lms.learningactivity.ResourceInternalLearningActivityType"%>
@@ -66,7 +69,10 @@ else
 	}
 	else
 	{
-		if(!LearningActivityResultLocalServiceUtil.userPassed(actId,themeDisplay.getUserId()))
+		Course course = CourseLocalServiceUtil.getCourseByGroupCreatedId(learnact.getGroupId());
+		boolean hasPermissionAccessCourseFinished = LiferaylmsUtil.hasPermissionAccessCourseFinished(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(), course.getCourseId(), themeDisplay.getUserId());
+
+		if(!hasPermissionAccessCourseFinished && !LearningActivityResultLocalServiceUtil.userPassed(actId,themeDisplay.getUserId()))
 		{
 			if(!permissionChecker.hasPermission(learnact.getGroupId(), LearningActivity.class.getName(), actId, ActionKeys.UPDATE) ||
 					!permissionChecker.hasOwnerPermission(learnact.getCompanyId(), LearningActivity.class.getName(), actId, learnact.getUserId(), ActionKeys.UPDATE)){

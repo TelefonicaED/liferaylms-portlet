@@ -554,6 +554,25 @@ public class CourseLocalServiceUtil {
 			groupId, userId, language);
 	}
 
+	public static java.util.List<com.liferay.lms.views.CourseResultView> getMyCourses(
+		long groupId, long userId,
+		com.liferay.portal.theme.ThemeDisplay themeDisplay,
+		java.lang.String orderByColumn, java.lang.String orderByType,
+		int start, int end) {
+		return getService()
+				   .getMyCourses(groupId, userId, themeDisplay, orderByColumn,
+			orderByType, start, end);
+	}
+
+	public static int countMyCourses(long groupId, long userId,
+		com.liferay.portal.theme.ThemeDisplay themeDisplay) {
+		return getService().countMyCourses(groupId, userId, themeDisplay);
+	}
+
+	public static boolean hasUserTries(long courseId, long userId) {
+		return getService().hasUserTries(courseId, userId);
+	}
+
 	public static void clearService() {
 		_service = null;
 	}

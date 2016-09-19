@@ -306,6 +306,23 @@ public class CourseLocalServiceClp implements CourseLocalService {
 				"java.lang.String", "long[][]", "long[][]", "long", "long",
 				"long", "java.lang.String"
 			};
+
+		_methodName54 = "getMyCourses";
+
+		_methodParameterTypes54 = new String[] {
+				"long", "long", "com.liferay.portal.theme.ThemeDisplay",
+				"java.lang.String", "java.lang.String", "int", "int"
+			};
+
+		_methodName55 = "countMyCourses";
+
+		_methodParameterTypes55 = new String[] {
+				"long", "long", "com.liferay.portal.theme.ThemeDisplay"
+			};
+
+		_methodName56 = "hasUserTries";
+
+		_methodParameterTypes56 = new String[] { "long", "long" };
 	}
 
 	public com.liferay.lms.model.Course addCourse(
@@ -2126,6 +2143,99 @@ public class CourseLocalServiceClp implements CourseLocalService {
 		return (java.util.HashMap<java.lang.Long, java.lang.Long>)ClpSerializer.translateOutput(returnObj);
 	}
 
+	public java.util.List<com.liferay.lms.views.CourseResultView> getMyCourses(
+		long groupId, long userId,
+		com.liferay.portal.theme.ThemeDisplay themeDisplay,
+		java.lang.String orderByColumn, java.lang.String orderByType,
+		int start, int end) {
+		Object returnObj = null;
+
+		try {
+			returnObj = _invokableLocalService.invokeMethod(_methodName54,
+					_methodParameterTypes54,
+					new Object[] {
+						groupId,
+						
+					userId,
+						
+					ClpSerializer.translateInput(themeDisplay),
+						
+					ClpSerializer.translateInput(orderByColumn),
+						
+					ClpSerializer.translateInput(orderByType),
+						
+					start,
+						
+					end
+					});
+		}
+		catch (Throwable t) {
+			t = ClpSerializer.translateThrowable(t);
+
+			if (t instanceof RuntimeException) {
+				throw (RuntimeException)t;
+			}
+			else {
+				throw new RuntimeException(t.getClass().getName() +
+					" is not a valid exception");
+			}
+		}
+
+		return (java.util.List<com.liferay.lms.views.CourseResultView>)ClpSerializer.translateOutput(returnObj);
+	}
+
+	public int countMyCourses(long groupId, long userId,
+		com.liferay.portal.theme.ThemeDisplay themeDisplay) {
+		Object returnObj = null;
+
+		try {
+			returnObj = _invokableLocalService.invokeMethod(_methodName55,
+					_methodParameterTypes55,
+					new Object[] {
+						groupId,
+						
+					userId,
+						
+					ClpSerializer.translateInput(themeDisplay)
+					});
+		}
+		catch (Throwable t) {
+			t = ClpSerializer.translateThrowable(t);
+
+			if (t instanceof RuntimeException) {
+				throw (RuntimeException)t;
+			}
+			else {
+				throw new RuntimeException(t.getClass().getName() +
+					" is not a valid exception");
+			}
+		}
+
+		return ((Integer)returnObj).intValue();
+	}
+
+	public boolean hasUserTries(long courseId, long userId) {
+		Object returnObj = null;
+
+		try {
+			returnObj = _invokableLocalService.invokeMethod(_methodName56,
+					_methodParameterTypes56, new Object[] { courseId, userId });
+		}
+		catch (Throwable t) {
+			t = ClpSerializer.translateThrowable(t);
+
+			if (t instanceof RuntimeException) {
+				throw (RuntimeException)t;
+			}
+			else {
+				throw new RuntimeException(t.getClass().getName() +
+					" is not a valid exception");
+			}
+		}
+
+		return ((Boolean)returnObj).booleanValue();
+	}
+
 	private InvokableLocalService _invokableLocalService;
 	private String _methodName0;
 	private String[] _methodParameterTypes0;
@@ -2233,4 +2343,10 @@ public class CourseLocalServiceClp implements CourseLocalService {
 	private String[] _methodParameterTypes52;
 	private String _methodName53;
 	private String[] _methodParameterTypes53;
+	private String _methodName54;
+	private String[] _methodParameterTypes54;
+	private String _methodName55;
+	private String[] _methodParameterTypes55;
+	private String _methodName56;
+	private String[] _methodParameterTypes56;
 }
