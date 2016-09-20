@@ -5,7 +5,6 @@ import java.io.Serializable;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
-import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
 
 import com.liferay.lms.model.LearningActivity;
@@ -15,6 +14,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.upload.UploadRequest;
 import com.liferay.portal.kernel.xml.DocumentException;
+import com.liferay.portlet.asset.model.AssetRenderer;
 
 
 public abstract class BaseLearningActivityType implements LearningActivityType, Serializable {
@@ -148,4 +148,23 @@ public abstract class BaseLearningActivityType implements LearningActivityType, 
 	public void deleteResources(ActionRequest actionRequest,ActionResponse actionResponse,LearningActivity larn) throws PortalException,SystemException,DocumentException,IOException{
 	}
 
+	@Override
+	public String getName() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public AssetRenderer getAssetRenderer(LearningActivity larn)
+			throws SystemException, PortalException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public boolean isAutoCorrect() {
+		return true;
+	}
+
+	
 }

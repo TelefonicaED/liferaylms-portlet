@@ -145,4 +145,9 @@ public class TaskOnlineLearningActivityType extends BaseLearningActivityType {
 	public boolean hasDeleteTries() {
 		return true;
 	}
+	
+	@Override
+	public boolean isAutoCorrect() {
+		return false;
+	}
 }

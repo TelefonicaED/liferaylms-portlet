@@ -249,5 +249,10 @@ public class TaskP2PLearningActivityType extends BaseLearningActivityType {
 	public String getPortletId() {
 		return PORTLET_ID;
 	}
+	
+	@Override
+	public boolean isAutoCorrect() {
+		return false;
+	}
 }
 

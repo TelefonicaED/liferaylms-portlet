@@ -26,7 +26,9 @@ import com.liferay.lms.learningactivity.courseeval.CourseEvalRegistry;
 import com.liferay.lms.model.Course;
 import com.liferay.lms.model.CourseCompetence;
 import com.liferay.lms.model.CourseResult;
+import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.model.LearningActivityResult;
+import com.liferay.lms.model.LearningActivityTry;
 import com.liferay.lms.model.Module;
 import com.liferay.lms.model.ModuleResult;
 import com.liferay.lms.model.UserCompetence;
@@ -45,6 +47,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.User;
+import com.liferay.portal.security.permission.ActionKeys;
 
 /**
  * The implementation of the course result local service.
@@ -318,6 +321,38 @@ public class CourseResultLocalServiceImpl
 		Course course = courseLocalService.getCourseByGroupCreatedId(groupId);
 		if (course != null && courseResultLocalService.getByUserAndCourse(course.getCourseId(), userId) == null) {
 			courseResultLocalService.create(course.getCourseId(), userId);
+		}
+	}
+	
+	public void resetUser(long userId, long groupCreatedId) throws SystemException, PortalException {
+		Course course = courseLocalService.getCourseByGroupCreatedId(groupCreatedId);
+		CourseResult courseResult = courseResultPersistence.fetchByuc(userId, course.getCourseId());
+		if(courseResult!=null){
+			courseResult.setResult(0);
+			courseResult.setPassed(false);
+			courseResult.setStartDate(null);
+			courseResult.setPassedDate(null);
+			courseResultPersistence.update(courseResult, true);
+			auditEntryLocalService.addAuditEntry(course.getCompanyId(), groupCreatedId, Course.class.getName(), course.getPrimaryKey(), userId, "RESET", null);
+			List<Module> modules = moduleLocalService.findAllInGroup(course.getGroupCreatedId());
+			for (Module module : modules) {
+				List<ModuleResult> moduleResults = moduleResultLocalService.getListModuleResultByModuleAndUser(module.getModuleId(), userId);
+				for (ModuleResult moduleResult : moduleResults) {
+					moduleResultLocalService.deleteModuleResult(moduleResult.getMrId());
+					auditEntryLocalService.addAuditEntry(module.getCompanyId(), module.getGroupId(), ModuleResult.class.getName(), moduleResult.getPrimaryKey(), userId, ActionKeys.DELETE, null);
+				}
+				List<LearningActivity> learnAct = learningActivityLocalService.getLearningActivitiesOfModule(module.getModuleId());
+				for (LearningActivity learningActivity : learnAct) {
+					long actId = learningActivity.getActId();
+					learningActivityTryLocalService.deleteUserTries(actId, userId);
+					auditEntryLocalService.addAuditEntry(learningActivity.getCompanyId(), learningActivity.getGroupId(), LearningActivityTry.class.getName(), learningActivity.getPrimaryKey(), userId, ActionKeys.DELETE, null);
+					LearningActivityResult learActResult = learningActivityResultLocalService.getByActIdAndUserId(actId, userId);
+					if(learActResult!=null){
+						learningActivityResultLocalService.deleteLearningActivityResult(learActResult.getLarId());
+						auditEntryLocalService.addAuditEntry(learningActivity.getCompanyId(), learningActivity.getGroupId(), LearningActivityResult.class.getName(), learActResult.getPrimaryKey(), userId, ActionKeys.DELETE, null);
+					}
+				}
+			}
 		}
 	}
 }

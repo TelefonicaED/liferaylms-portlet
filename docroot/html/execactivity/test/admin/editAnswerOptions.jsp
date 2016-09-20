@@ -27,7 +27,6 @@
 	long typeId = ParamUtil.getLong(request,"typeId", -1);
 
 	TestQuestion question = null;
-	System.out.println(questionId);
 	if(questionId != 0){
 		question = TestQuestionLocalServiceUtil.getTestQuestion(ParamUtil.getLong(request,"questionId"));
 	}
@@ -60,7 +59,7 @@
 						<%}else{
 							index = index +1;
 						%>
-						<aui:input type="radio" name="correct_new" label="correct" value="<%=index%>"></aui:input>
+						<aui:input type="radio" name="correct_new" label="correct" value="<%=index%>" checked="<%=testanswer.getIsCorrect() %>"></aui:input>
 						<%}%>
 						
 						
