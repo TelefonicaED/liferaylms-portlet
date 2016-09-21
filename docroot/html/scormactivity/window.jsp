@@ -21,8 +21,10 @@
 	boolean isDebugActive = Boolean.parseBoolean(LearningActivityLocalServiceUtil.getExtraContentValue(actId, "scormDebug"));
 	
 	LearningActivityTry learningTry = (LearningActivityTry) request.getAttribute("learningTry");
+	boolean hasPermissionAccessCourseFinished = ParamUtil.getBoolean(request, "hasPermissionAccessCourseFinished", false);
+
 	
-	if (learningTry == null)
+	if (learningTry == null && !hasPermissionAccessCourseFinished)
 		learningTry = LearningActivityTryLocalServiceUtil.getLearningActivityTry(latId);	
 
 	request.setAttribute("learningTry", learningTry);
@@ -34,7 +36,7 @@
 		<script type="text/javascript">
 			localStorage.removeItem('scormpool');
 			
-			var tryResultDataOld = '<%= HtmlUtil.escapeJS(learningTry.getTryResultData()) %>';
+			var tryResultDataOld = '<%= learningTry != null ? HtmlUtil.escapeJS(learningTry.getTryResultData()) : ""%>';
 			var showscorm=true;
 			
 			if (tryResultDataOld != '') 
@@ -248,47 +250,51 @@
 				    ];
 					
 					console.log("::LearningActivityResult.updateFinishTry::");
-				    var message = Liferay.Service.Lms.LearningActivityResult.updateFinishTry(
-				    	{
-				   			latId: <%= learningTry.getLatId() %>,
-				   			tryResultData: scormpool,
-				   			imsmanifest: Run.$1.xml,
-				   			serviceParameterTypes: JSON.stringify(serviceParameterTypes)
-				    	}
-				    );
-				      	
-				    var exception = message.exception;
-				            
-					if (!exception) {
-						// Process Success - A LearningActivityResult returned
-						console.log(message);
+					console.log("hasPermissionAccessCourseFinished: " + <%=hasPermissionAccessCourseFinished%>);
+					if(<%=!hasPermissionAccessCourseFinished%>){
 						
-						if (message.passed) {
-							if(window.opener)
-							{
-						    	if (typeof window.opener.updateActivityNavigation == 'function')
-									window.opener.updateActivityNavigation(); 
-								if (typeof window.opener.updateActivityList == 'function') 
-									window.opener.updateActivityList(); 
-								if (typeof window.opener.updateScormStatus == 'function')
-									window.opener.updateScormStatus(message); 
+					    var message = Liferay.Service.Lms.LearningActivityResult.updateFinishTry(
+					    	{
+					   			latId: <%= learningTry != null ? learningTry.getLatId() : 0 %>,
+					   			tryResultData: scormpool,
+					   			imsmanifest: Run.$1.xml,
+					   			serviceParameterTypes: JSON.stringify(serviceParameterTypes)
+					    	}
+					    );
+					      	
+					    var exception = message.exception;
+					            
+						if (!exception) {
+							// Process Success - A LearningActivityResult returned
+							console.log(message);
+							
+							if (message.passed) {
+								if(window.opener)
+								{
+							    	if (typeof window.opener.updateActivityNavigation == 'function')
+										window.opener.updateActivityNavigation(); 
+									if (typeof window.opener.updateActivityList == 'function') 
+										window.opener.updateActivityList(); 
+									if (typeof window.opener.updateScormStatus == 'function')
+										window.opener.updateScormStatus(message); 
+								}
+								
+								if (typeof window.updateActivityNavigation == 'function')
+									window.updateActivityNavigation(); 
+								if (typeof window.updateActivityList == 'function') 
+									window.updateActivityList(); 
+								if (typeof window.updateScormStatus == 'function') 
+									window.updateScormStatus(message); 
 							}
 							
-							if (typeof window.updateActivityNavigation == 'function')
-								window.updateActivityNavigation(); 
-							if (typeof window.updateActivityList == 'function') 
-								window.updateActivityList(); 
-							if (typeof window.updateScormStatus == 'function') 
-								window.updateScormStatus(message); 
+							finishedscorm=true;
+							
+						}else {
+							console.log("::forceFinishTry::");
+							Liferay.Service.Lms.LearningActivityResult.forceFinishTry(
+								{ latId: <%= learningTry != null ? learningTry.getLatId() : 0 %> }
+							 );
 						}
-						
-						finishedscorm=true;
-						
-					}else {
-						console.log("::forceFinishTry::");
-						Liferay.Service.Lms.LearningActivityResult.forceFinishTry(
-							{ latId: <%= learningTry.getLatId() %> }
-						 );
 					}
 					
 					if(scormembededmode==false)

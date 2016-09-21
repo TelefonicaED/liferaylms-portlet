@@ -1109,9 +1109,10 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 
 				courseView = new CourseView(((BigInteger)myCourse[0]).longValue(), (String)myCourse[2], ((BigInteger)myCourse[6]).longValue());
 				if(Validator.isNotNull(myCourse[5])){
-					FileEntry fileEntry = DLAppLocalServiceUtil.getFileEntry(((BigInteger)myCourse[5]).longValue());
-					log.debug("url del logo: " + DLUtil.getPreviewURL(fileEntry, fileEntry.getFileVersion(), themeDisplay, StringPool.BLANK));
-					courseView.setLogoURL(DLUtil.getPreviewURL(fileEntry, fileEntry.getFileVersion(), themeDisplay, StringPool.BLANK) );
+					try{
+						FileEntry fileEntry = DLAppLocalServiceUtil.getFileEntry(((BigInteger)myCourse[5]).longValue());
+						courseView.setLogoURL(DLUtil.getPreviewURL(fileEntry, fileEntry.getFileVersion(), themeDisplay, StringPool.BLANK) );
+					}catch(Exception e){}
 				}else{
 					Group groupCourse= GroupLocalServiceUtil.getGroup(((BigInteger)myCourse[6]).longValue());
 					if(groupCourse.getPublicLayoutSet().getLogo()){

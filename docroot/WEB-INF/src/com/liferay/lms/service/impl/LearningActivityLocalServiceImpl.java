@@ -124,8 +124,8 @@ public class LearningActivityLocalServiceImpl extends LearningActivityLocalServi
 			return true;
 		}
 		
-		Date startDate = larn.getEnddate();
-		Date endDate = larn.getStartdate();
+		Date startDate = larn.getStartdate();
+		Date endDate = larn.getEnddate();
 		
 		List<Team> teams = TeamLocalServiceUtil.getUserTeams(userId, course.getGroupCreatedId());
 		if(teams!=null && teams.size()>0){

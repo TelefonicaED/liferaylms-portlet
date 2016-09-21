@@ -159,6 +159,61 @@ public class ExecActivity extends MVCPortlet{
 		}						
 
 	}
+	
+	/**
+	 * Corrección para cuando estamos en modo observador ya que no se tiene que guardar nada en learningactivitytry
+	 * @param actionRequest
+	 * @param actionResponse
+	 * @throws SystemException 
+	 * @throws Exception
+	 */
+	
+	public void correctAccessFinished	(ActionRequest actionRequest,ActionResponse actionResponse) throws SystemException{
+
+		long actId=ParamUtil.getLong(actionRequest, "actId");
+
+		boolean isTablet = ParamUtil.getBoolean(actionRequest,"isTablet" );
+
+		long correctanswers=0,penalizedAnswers=0;
+		Element resultadosXML=SAXReaderUtil.createElement("results");
+		Document resultadosXMLDoc=SAXReaderUtil.createDocument(resultadosXML);
+
+		long[] questionIds = ParamUtil.getLongValues(actionRequest, "question");
+
+
+		for (long questionId : questionIds) {
+			TestQuestion question = TestQuestionLocalServiceUtil.fetchTestQuestion(questionId);
+			QuestionType qt = new QuestionTypeRegistry().getQuestionType(question.getQuestionType());
+			if(qt.correct(actionRequest, questionId)) {
+				correctanswers++;
+			}else if(question.isPenalize()){
+				penalizedAnswers++;
+			}
+			resultadosXML.add(qt.getResults(actionRequest, questionId));								
+		}
+
+
+		List<TestQuestion> questions=TestQuestionLocalServiceUtil.getQuestions(actId);
+		long score = (correctanswers-penalizedAnswers)*100/questions.size();
+		if(score < 0)score = 0;
+		
+		
+		actionResponse.setRenderParameters(actionRequest.getParameterMap());
+
+		actionResponse.setRenderParameter("correction", Boolean.toString(true));
+		if(isTablet)actionResponse.setRenderParameter("isTablet", Boolean.toString(true));
+		try {
+			//actionResponse.setRenderParameter("tryResultData", resultadosXMLDoc.formattedString());
+			actionResponse.setRenderParameter("tryResultData", resultadosXMLDoc.formattedString());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		actionResponse.setRenderParameter("score", String.valueOf(score));
+		actionResponse.setRenderParameter("jspPage", "/html/execactivity/test/results.jsp");					
+
+	}
 
 	public void camposExtra(ActionRequest actionRequest, ActionResponse actionResponse)
 			throws Exception {
