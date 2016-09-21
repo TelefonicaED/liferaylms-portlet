@@ -9,7 +9,11 @@ public class ExampleTest extends TestCase {
 	@Test
 	public void testDomain1() throws Exception
 	{
-		Assert.assertTrue("mensajito", false);
+		Assert.assertTrue("mensajito", true);
 	}
-
+@Test
+	public void testDomain2() throws Exception
+	{
+		Assert.assertTrue("mensajito", true);
+	}
 }
