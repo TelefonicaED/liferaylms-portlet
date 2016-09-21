@@ -104,7 +104,7 @@ public class GroupListener extends BaseModelListener<Group> {
 							messageAudit.setResponseId("1111");
 							
 							try {
-								MessageBusUtil.sendSynchronousMessage("lms/mailing", messageAudit);
+								MessageBusUtil.sendSynchronousMessage("lms/mailing", messageAudit, 1000);
 							} catch (MessageBusException e) {
 								if (log.isDebugEnabled())
 									log.debug(e.getMessage());
