@@ -255,9 +255,11 @@ public class ModuleResultLocalServiceImpl extends ModuleResultLocalServiceBaseIm
 				moduleResult.setResult(100 * passedNumber / activities.size());
 			}
 			if (passedNumber == activities.size()) {
-				moduleResult.setResult(100);
 				moduleResult.setPassed(true);
 				moduleResult.setPassedDate(lactr.getEndDate());
+			}else{
+				moduleResult.setPassed(false);
+				log.debug("**Passed a false");
 			}
 			
 			//auditing
