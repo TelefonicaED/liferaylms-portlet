@@ -1039,12 +1039,12 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			qPos.add(userId);
 			qPos.add(courseId);
 			
-			Iterator<Boolean> itr =  q.iterate();
+			Iterator<BigInteger> itr =  q.iterate();
 								
 			if (itr.hasNext()) {
-				Boolean hasUserTries = itr.next();
+				BigInteger hasUserTries = itr.next();
 
-				return hasUserTries;
+				return hasUserTries.longValue() > 0;
 			}
 			
 			

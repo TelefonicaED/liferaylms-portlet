@@ -858,6 +858,8 @@ public class CheckP2pMailingPersistenceImpl extends BasePersistenceImpl<CheckP2p
 		FinderCacheUtil.removeCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 	}
 
+	@BeanReference(type = ActivityTriesDeletedPersistence.class)
+	protected ActivityTriesDeletedPersistence activityTriesDeletedPersistence;
 	@BeanReference(type = AuditEntryPersistence.class)
 	protected AuditEntryPersistence auditEntryPersistence;
 	@BeanReference(type = CheckP2pMailingPersistence.class)

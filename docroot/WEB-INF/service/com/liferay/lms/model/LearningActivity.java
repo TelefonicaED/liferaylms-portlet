@@ -38,4 +38,6 @@ public interface LearningActivity extends LearningActivityModel, PersistedModel 
 	public java.util.Date getEnddate();
 
 	public boolean isNullEndDate();
+
+	public com.liferay.lms.model.Module getModule();
 }

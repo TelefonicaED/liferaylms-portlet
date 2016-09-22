@@ -17,6 +17,7 @@ package com.liferay.lms.service.base;
 import com.liferay.counter.service.CounterLocalService;
 
 import com.liferay.lms.model.TestAnswer;
+import com.liferay.lms.service.ActivityTriesDeletedLocalService;
 import com.liferay.lms.service.AuditEntryLocalService;
 import com.liferay.lms.service.CheckP2pMailingLocalService;
 import com.liferay.lms.service.CompetenceLocalService;
@@ -50,6 +51,7 @@ import com.liferay.lms.service.TestQuestionLocalService;
 import com.liferay.lms.service.TestQuestionService;
 import com.liferay.lms.service.UserCompetenceLocalService;
 import com.liferay.lms.service.UserCompetenceService;
+import com.liferay.lms.service.persistence.ActivityTriesDeletedPersistence;
 import com.liferay.lms.service.persistence.AuditEntryPersistence;
 import com.liferay.lms.service.persistence.CheckP2pMailingPersistence;
 import com.liferay.lms.service.persistence.CompetencePersistence;
@@ -321,6 +323,44 @@ public abstract class TestAnswerLocalServiceBaseImpl
 		testAnswer.setNew(false);
 
 		return testAnswerPersistence.update(testAnswer, merge);
+	}
+
+	/**
+	 * Returns the activity tries deleted local service.
+	 *
+	 * @return the activity tries deleted local service
+	 */
+	public ActivityTriesDeletedLocalService getActivityTriesDeletedLocalService() {
+		return activityTriesDeletedLocalService;
+	}
+
+	/**
+	 * Sets the activity tries deleted local service.
+	 *
+	 * @param activityTriesDeletedLocalService the activity tries deleted local service
+	 */
+	public void setActivityTriesDeletedLocalService(
+		ActivityTriesDeletedLocalService activityTriesDeletedLocalService) {
+		this.activityTriesDeletedLocalService = activityTriesDeletedLocalService;
+	}
+
+	/**
+	 * Returns the activity tries deleted persistence.
+	 *
+	 * @return the activity tries deleted persistence
+	 */
+	public ActivityTriesDeletedPersistence getActivityTriesDeletedPersistence() {
+		return activityTriesDeletedPersistence;
+	}
+
+	/**
+	 * Sets the activity tries deleted persistence.
+	 *
+	 * @param activityTriesDeletedPersistence the activity tries deleted persistence
+	 */
+	public void setActivityTriesDeletedPersistence(
+		ActivityTriesDeletedPersistence activityTriesDeletedPersistence) {
+		this.activityTriesDeletedPersistence = activityTriesDeletedPersistence;
 	}
 
 	/**
@@ -1521,6 +1561,10 @@ public abstract class TestAnswerLocalServiceBaseImpl
 		}
 	}
 
+	@BeanReference(type = ActivityTriesDeletedLocalService.class)
+	protected ActivityTriesDeletedLocalService activityTriesDeletedLocalService;
+	@BeanReference(type = ActivityTriesDeletedPersistence.class)
+	protected ActivityTriesDeletedPersistence activityTriesDeletedPersistence;
 	@BeanReference(type = AuditEntryLocalService.class)
 	protected AuditEntryLocalService auditEntryLocalService;
 	@BeanReference(type = AuditEntryPersistence.class)

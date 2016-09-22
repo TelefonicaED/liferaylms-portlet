@@ -104,21 +104,21 @@ public class CourseCompetenceLocalServiceClpInvoker {
 				"com.liferay.lms.model.CourseCompetence", "boolean"
 			};
 
-		_methodName140 = "getBeanIdentifier";
+		_methodName144 = "getBeanIdentifier";
 
-		_methodParameterTypes140 = new String[] {  };
+		_methodParameterTypes144 = new String[] {  };
 
-		_methodName141 = "setBeanIdentifier";
+		_methodName145 = "setBeanIdentifier";
 
-		_methodParameterTypes141 = new String[] { "java.lang.String" };
+		_methodParameterTypes145 = new String[] { "java.lang.String" };
 
-		_methodName146 = "findBycourseId";
+		_methodName150 = "findBycourseId";
 
-		_methodParameterTypes146 = new String[] { "long", "boolean" };
+		_methodParameterTypes150 = new String[] { "long", "boolean" };
 
-		_methodName147 = "fetchByCourseCompetenceCondition";
+		_methodName151 = "fetchByCourseCompetenceCondition";
 
-		_methodParameterTypes147 = new String[] { "long", "long", "boolean" };
+		_methodParameterTypes151 = new String[] { "long", "long", "boolean" };
 	}
 
 	public Object invokeMethod(String name, String[] parameterTypes,
@@ -210,24 +210,24 @@ public class CourseCompetenceLocalServiceClpInvoker {
 				((Boolean)arguments[1]).booleanValue());
 		}
 
-		if (_methodName140.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes140, parameterTypes)) {
+		if (_methodName144.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes144, parameterTypes)) {
 			return CourseCompetenceLocalServiceUtil.getBeanIdentifier();
 		}
 
-		if (_methodName141.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes141, parameterTypes)) {
+		if (_methodName145.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes145, parameterTypes)) {
 			CourseCompetenceLocalServiceUtil.setBeanIdentifier((java.lang.String)arguments[0]);
 		}
 
-		if (_methodName146.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes146, parameterTypes)) {
+		if (_methodName150.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes150, parameterTypes)) {
 			return CourseCompetenceLocalServiceUtil.findBycourseId(((Long)arguments[0]).longValue(),
 				((Boolean)arguments[1]).booleanValue());
 		}
 
-		if (_methodName147.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes147, parameterTypes)) {
+		if (_methodName151.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes151, parameterTypes)) {
 			return CourseCompetenceLocalServiceUtil.fetchByCourseCompetenceCondition(((Long)arguments[0]).longValue(),
 				((Long)arguments[1]).longValue(),
 				((Boolean)arguments[2]).booleanValue());
@@ -268,12 +268,12 @@ public class CourseCompetenceLocalServiceClpInvoker {
 	private String[] _methodParameterTypes14;
 	private String _methodName15;
 	private String[] _methodParameterTypes15;
-	private String _methodName140;
-	private String[] _methodParameterTypes140;
-	private String _methodName141;
-	private String[] _methodParameterTypes141;
-	private String _methodName146;
-	private String[] _methodParameterTypes146;
-	private String _methodName147;
-	private String[] _methodParameterTypes147;
+	private String _methodName144;
+	private String[] _methodParameterTypes144;
+	private String _methodName145;
+	private String[] _methodParameterTypes145;
+	private String _methodName150;
+	private String[] _methodParameterTypes150;
+	private String _methodName151;
+	private String[] _methodParameterTypes151;
 }

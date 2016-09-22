@@ -33,6 +33,7 @@ import java.util.Map;
 
 import org.xml.sax.InputSource;
 
+import com.liferay.lms.NoSuchLearningActivityResultException;
 import com.liferay.lms.auditing.AuditConstants;
 import com.liferay.lms.auditing.AuditingLogFactory;
 import com.liferay.lms.learningactivity.calificationtype.CalificationType;
@@ -51,6 +52,7 @@ import com.liferay.lms.service.ModuleResultLocalServiceUtil;
 import com.liferay.lms.service.SCORMContentLocalServiceUtil;
 import com.liferay.lms.service.base.LearningActivityResultLocalServiceBaseImpl;
 import com.liferay.lms.service.persistence.LearningActivityResultUtil;
+import com.liferay.lms.service.persistence.LearningActivityUtil;
 import com.liferay.portal.kernel.bean.PortletBeanLocatorUtil;
 import com.liferay.portal.kernel.dao.orm.Criterion;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
@@ -811,11 +813,11 @@ public class LearningActivityResultLocalServiceImpl	extends LearningActivityResu
 		// Se indica el final del try.
 		learningActivityTry.setEndDate(new Date());
 		if (log.isDebugEnabled()) {
-			log.debug("Se llama a la actualización del try " + latId);
+			log.debug("Se llama a la actualizaciï¿½n del try " + latId);
 		}
 		learningActivityTryLocalService
 				.updateLearningActivityTry(learningActivityTry);
-		// Se comprueba el nuevo estado del result para realizar la modificación
+		// Se comprueba el nuevo estado del result para realizar la modificaciï¿½n
 		// del mismo si es necesario.
 		LearningActivityResult laResult = learningActivityResultLocalService
 				.getByActIdAndUserId(learningActivityTry.getActId(), userId);
@@ -823,7 +825,7 @@ public class LearningActivityResultLocalServiceImpl	extends LearningActivityResu
 		// result o no.
 		boolean saveResult = false;
 		// Si el resultado obtenido es mayor que el mastery score de la
-		// actividad se da como aprobada o la actividad tiene marcada la opción
+		// actividad se da como aprobada o la actividad tiene marcada la opciï¿½n
 		// de "Completado como Aprobado" y
 		// se ha obtenido un Completado, se cambia a Aprobado.
 		if (scoreTry > master_score || (completedAsPassed
@@ -841,21 +843,21 @@ public class LearningActivityResultLocalServiceImpl	extends LearningActivityResu
 						+ " la nota anterior era " + scoreResult);
 			}
 		}
-		// Se comprueban las distintas casuísticas dependiendo del estado
+		// Se comprueban las distintas casuï¿½sticas dependiendo del estado
 		// obtenido.
-		// En el caso de que se haya obtenido un Iniciado se debería actualizar
+		// En el caso de que se haya obtenido un Iniciado se deberï¿½a actualizar
 		// el LearningActivityResult cuando se haya obtenido mejor resultado y/o
 		// se haya superado el mastery score (passed).
-		// Ambos casos están contemplados previamente, con lo que no se realiza
+		// Ambos casos estï¿½n contemplados previamente, con lo que no se realiza
 		// nada.
 		/*
 		 * if ("incomplete".equals(total_completion_status)) { }
 		 */
-		// En el caso de que se haya obtenido un Completado se debería
+		// En el caso de que se haya obtenido un Completado se deberï¿½a
 		// actualizar el LearningActivityResult cuando se haya obtenido mejor
 		// resultado, mastery score (passed) o se tenga un "completed"
-		// cuando está establecido un "Completado como pasado" en la actividad.
-		// Todos los casos están contemplados previamente con lo que no se debe
+		// cuando estï¿½ establecido un "Completado como pasado" en la actividad.
+		// Todos los casos estï¿½n contemplados previamente con lo que no se debe
 		// hacer nada.
 		/*
 		 * if ("completed".equals(total_completion_status)) { }
@@ -866,11 +868,11 @@ public class LearningActivityResultLocalServiceImpl	extends LearningActivityResu
 			if (!laResult.getPassed()) {
 				laResult.setPassed(true);
 				laResult.setEndDate(new Date());
-				// No debería ser necesario, pero por si acaso se vuelve a
+				// No deberï¿½a ser necesario, pero por si acaso se vuelve a
 				// establecer el resultado.
 				laResult.setResult(scoreTry);
 				if (log.isDebugEnabled()) {
-					log.debug("Se llama a la actualización del LearningActivityResult (estado Aprobado) "
+					log.debug("Se llama a la actualizaciï¿½n del LearningActivityResult (estado Aprobado) "
 							+ laResult.getLarId());
 				}
 				saveResult = true;
@@ -883,7 +885,7 @@ public class LearningActivityResultLocalServiceImpl	extends LearningActivityResu
 				laResult.setPassed(false);
 				laResult.setEndDate(new Date());
 				if (log.isDebugEnabled()) {
-					log.debug("Se llama a la actualización del LearningActivityResult (estado Suspenso) "
+					log.debug("Se llama a la actualizaciï¿½n del LearningActivityResult (estado Suspenso) "
 							+ laResult.getLarId());
 				}
 				saveResult = true;
@@ -1383,5 +1385,23 @@ public class LearningActivityResultLocalServiceImpl	extends LearningActivityResu
 			e.printStackTrace();
 		}
 		return translatedResult;
+	}
+	
+	@Override
+	public LearningActivityResult deleteLearningActivityResult(LearningActivityResult lar) throws SystemException{
+		try {
+			LearningActivityResultUtil.remove(lar.getLarId());
+			
+			//Si se ha borrado correctamente llamamos al update de moduleresult para qeu recalcule
+			ModuleResultLocalServiceUtil.update(lar);
+			return lar;
+		} catch (NoSuchLearningActivityResultException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}catch (PortalException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
 	}
 }

@@ -14,6 +14,7 @@
 
 package com.liferay.lms.service;
 
+import com.liferay.lms.model.ActivityTriesDeletedClp;
 import com.liferay.lms.model.AuditEntryClp;
 import com.liferay.lms.model.CheckP2pMailingClp;
 import com.liferay.lms.model.CompetenceClp;
@@ -121,6 +122,10 @@ public class ClpSerializer {
 
 		String oldModelClassName = oldModelClass.getName();
 
+		if (oldModelClassName.equals(ActivityTriesDeletedClp.class.getName())) {
+			return translateInputActivityTriesDeleted(oldModel);
+		}
+
 		if (oldModelClassName.equals(AuditEntryClp.class.getName())) {
 			return translateInputAuditEntry(oldModel);
 		}
@@ -214,6 +219,17 @@ public class ClpSerializer {
 		}
 
 		return newList;
+	}
+
+	public static Object translateInputActivityTriesDeleted(
+		BaseModel<?> oldModel) {
+		ActivityTriesDeletedClp oldClpModel = (ActivityTriesDeletedClp)oldModel;
+
+		BaseModel<?> newModel = oldClpModel.getActivityTriesDeletedRemoteModel();
+
+		newModel.setModelAttributes(oldClpModel.getModelAttributes());
+
+		return newModel;
 	}
 
 	public static Object translateInputAuditEntry(BaseModel<?> oldModel) {
@@ -437,6 +453,11 @@ public class ClpSerializer {
 		String oldModelClassName = oldModelClass.getName();
 
 		if (oldModelClassName.equals(
+					"com.liferay.lms.model.impl.ActivityTriesDeletedImpl")) {
+			return translateOutputActivityTriesDeleted(oldModel);
+		}
+
+		if (oldModelClassName.equals(
 					"com.liferay.lms.model.impl.AuditEntryImpl")) {
 			return translateOutputAuditEntry(oldModel);
 		}
@@ -616,6 +637,11 @@ public class ClpSerializer {
 			return new com.liferay.lms.NoSuchModuleException();
 		}
 
+		if (className.equals(
+					"com.liferay.lms.NoSuchActivityTriesDeletedException")) {
+			return new com.liferay.lms.NoSuchActivityTriesDeletedException();
+		}
+
 		if (className.equals("com.liferay.lms.NoSuchAuditEntryException")) {
 			return new com.liferay.lms.NoSuchAuditEntryException();
 		}
@@ -700,6 +726,17 @@ public class ClpSerializer {
 		}
 
 		return throwable;
+	}
+
+	public static Object translateOutputActivityTriesDeleted(
+		BaseModel<?> oldModel) {
+		ActivityTriesDeletedClp newModel = new ActivityTriesDeletedClp();
+
+		newModel.setModelAttributes(oldModel.getModelAttributes());
+
+		newModel.setActivityTriesDeletedRemoteModel(oldModel);
+
+		return newModel;
 	}
 
 	public static Object translateOutputAuditEntry(BaseModel<?> oldModel) {

@@ -98,21 +98,21 @@ public class LmsPrefsLocalServiceClpInvoker {
 				"com.liferay.lms.model.LmsPrefs", "boolean"
 			};
 
-		_methodName140 = "getBeanIdentifier";
+		_methodName144 = "getBeanIdentifier";
 
-		_methodParameterTypes140 = new String[] {  };
+		_methodParameterTypes144 = new String[] {  };
 
-		_methodName141 = "setBeanIdentifier";
+		_methodName145 = "setBeanIdentifier";
 
-		_methodParameterTypes141 = new String[] { "java.lang.String" };
+		_methodParameterTypes145 = new String[] { "java.lang.String" };
 
-		_methodName146 = "getLmsPrefsIni";
+		_methodName150 = "getLmsPrefsIni";
 
-		_methodParameterTypes146 = new String[] { "long" };
+		_methodParameterTypes150 = new String[] { "long" };
 
-		_methodName147 = "getStrictLmsPrefsIni";
+		_methodName151 = "getStrictLmsPrefsIni";
 
-		_methodParameterTypes147 = new String[] { "long" };
+		_methodParameterTypes151 = new String[] { "long" };
 	}
 
 	public Object invokeMethod(String name, String[] parameterTypes,
@@ -204,23 +204,23 @@ public class LmsPrefsLocalServiceClpInvoker {
 				((Boolean)arguments[1]).booleanValue());
 		}
 
-		if (_methodName140.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes140, parameterTypes)) {
+		if (_methodName144.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes144, parameterTypes)) {
 			return LmsPrefsLocalServiceUtil.getBeanIdentifier();
 		}
 
-		if (_methodName141.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes141, parameterTypes)) {
+		if (_methodName145.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes145, parameterTypes)) {
 			LmsPrefsLocalServiceUtil.setBeanIdentifier((java.lang.String)arguments[0]);
 		}
 
-		if (_methodName146.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes146, parameterTypes)) {
+		if (_methodName150.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes150, parameterTypes)) {
 			return LmsPrefsLocalServiceUtil.getLmsPrefsIni(((Long)arguments[0]).longValue());
 		}
 
-		if (_methodName147.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes147, parameterTypes)) {
+		if (_methodName151.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes151, parameterTypes)) {
 			return LmsPrefsLocalServiceUtil.getStrictLmsPrefsIni(((Long)arguments[0]).longValue());
 		}
 
@@ -259,12 +259,12 @@ public class LmsPrefsLocalServiceClpInvoker {
 	private String[] _methodParameterTypes14;
 	private String _methodName15;
 	private String[] _methodParameterTypes15;
-	private String _methodName140;
-	private String[] _methodParameterTypes140;
-	private String _methodName141;
-	private String[] _methodParameterTypes141;
-	private String _methodName146;
-	private String[] _methodParameterTypes146;
-	private String _methodName147;
-	private String[] _methodParameterTypes147;
+	private String _methodName144;
+	private String[] _methodParameterTypes144;
+	private String _methodName145;
+	private String[] _methodParameterTypes145;
+	private String _methodName150;
+	private String[] _methodParameterTypes150;
+	private String _methodName151;
+	private String[] _methodParameterTypes151;
 }

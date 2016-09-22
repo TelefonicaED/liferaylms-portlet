@@ -1,3 +1,6 @@
+<%@page import="com.liferay.lms.model.impl.ActivityTriesDeletedImpl"%>
+<%@page import="com.liferay.lms.model.ActivityTriesDeleted"%>
+<%@page import="com.liferay.lms.service.ActivityTriesDeletedLocalServiceUtil"%>
 <%@page import="com.liferay.portal.kernel.util.PropsUtil"%>
 <%@page import="com.liferay.lms.model.Course"%>
 <%@page import="com.liferay.lms.service.ModuleLocalServiceUtil"%>
@@ -28,6 +31,7 @@
 		
 
 	boolean delete = PrefsPropsUtil.getBoolean("learningactivity.show.califications.delete");
+	List<ActivityTriesDeleted> listActivityTriesDeleteds = ActivityTriesDeletedLocalServiceUtil.getByActIdStatus(actId, ActivityTriesDeletedImpl.STATUS_NOT_STARTED);
 %>
 
 <h2 class="table_title"><%=learnActivity.getTitle(themeDisplay.getLocale()) %></h2>
@@ -40,13 +44,38 @@
 	<portlet:param name="resId" value="<%=String.valueOf(actId)%>"/>
 </portlet:actionURL>
 
+<portlet:actionURL name="deleteAllTries" var="deleteAllTriesURL">
+	<portlet:param name="resId" value="<%=String.valueOf(actId)%>"/>
+</portlet:actionURL>
+
 <portlet:actionURL name="deleteURL" var="deleteURL">
 	<portlet:param name="resId" value="<%=String.valueOf(actId)%>"/>
 </portlet:actionURL>
 
-<c:if test="<%=delete&&learningActivityType.hasDeleteTries() %>">
-	<liferay-ui:icon image="close" label="true" message="com.liferay.manager.CleanLearningActivityTriesNotPassed" url="<%= deleteAllURL %>"  />
+<c:if test="<%=delete&&learningActivityType.hasDeleteTries() && (listActivityTriesDeleteds == null || listActivityTriesDeleteds.size() == 0)%>">
+	<aui:form name="deleteAllFm" action="<%=deleteAllURL %>" method="POST">
+		<liferay-ui:icon image="close" label="true" message="com.liferay.manager.CleanLearningActivityTriesNotPassed" url="javascript:${renderResponse.getNamespace()}deleteAll();"  />
+	</aui:form>
+	<aui:form name="deleteAllTriesFm" action="<%=deleteAllTriesURL %>" method="POST">
+		<liferay-ui:icon image="close" label="true" message="com.liferay.manager.CleanLearningActivityTries" url="javascript:${renderResponse.getNamespace()}deleteAllTries();"  />
+	</aui:form>
 </c:if>
+<c:if test="<%=listActivityTriesDeleteds != null && listActivityTriesDeleteds.size() > 0 %>">
+	<span class="portlet-msg-warning"><liferay-ui:message key="lms-activity-list.warning-activity-tries-deleted" /></span>
+</c:if>
+
+<script>
+	function <portlet:namespace />deleteAll(){
+		if(confirm(Liferay.Language.get("confirm.warning-delete-all-tries"))){
+			document.<portlet:namespace />deleteAllFm.submit();
+		}
+	}
+	function <portlet:namespace />deleteAllTries(){
+		if(confirm(Liferay.Language.get("confirm.warning-delete-all-tries"))){
+			document.<portlet:namespace />deleteAllTriesFm.submit();
+		}
+	}
+</script>
 
 <%
 
@@ -140,7 +169,7 @@ userSearchContainer.setTotal(totalUsers);
 				<liferay-ui:search-container-column-text name="activity.showcalifications.result">		<%=res %> </liferay-ui:search-container-column-text>
 				<liferay-ui:search-container-column-text name="activity.showcalifications.startdate">	<%=startdate %> </liferay-ui:search-container-column-text>
 			
-				<c:if test="<%=delete&&learningActivityType.hasDeleteTries() %>">
+				<c:if test="<%=delete&&learningActivityType.hasDeleteTries()&& (listActivityTriesDeleteds == null || listActivityTriesDeleteds.size() == 0) %>">
 					<liferay-ui:search-container-column-text name="actions"><liferay-ui:icon image="close" label="true" message="com.liferay.manager.CleanLearningActivityTries" url='<%= deleteURL+"&userId="+usuario.getUserId() %>'  /></liferay-ui:search-container-column-text>
 				</c:if>
 			<%

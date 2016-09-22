@@ -599,7 +599,25 @@
 			<finder-column name="teamId" />
 		</finder>
     </entity>
-	<exceptions>
+    <entity name="ActivityTriesDeleted" local-service="true" remote-service="false">
+    	<column name="activityTriesDeletedId" type="long" primary="true"></column>
+    	<column name="groupId" type="long"></column>
+    	<column name="actId" type="long"></column>
+    	<column name="userId" type="long"></column>
+    	<column name="startDate" type="Date"></column> 
+    	<column name="endDate" type="Date"></column>
+    	<column name="status" type="int" />
+    	<finder name="GroupId" return-type="Collection">
+			<finder-column name="groupId" />
+		</finder>
+		<finder name="ActIdStatus" return-type="Collection">
+			<finder-column name="actId" />
+			<finder-column name="status" />
+		</finder>
+    </entity>
+    
+    <exceptions>
 		<exception>NoSuchModule</exception>
 	</exceptions>
+
 </service-builder>

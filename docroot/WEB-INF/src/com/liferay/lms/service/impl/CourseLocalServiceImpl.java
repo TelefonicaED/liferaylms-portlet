@@ -739,7 +739,7 @@ public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int e
 			// Cambia el titulo y la friendlyurl y desactiva el grupo
 			Group theGroup = GroupLocalServiceUtil.getGroup(course.getGroupCreatedId());
 			theGroup.setName("desactivado(" + course.getGroupCreatedId() + ")");
-			theGroup.setFriendlyURL(course.getFriendlyURL() + "_desac");
+			theGroup.setFriendlyURL(course.getFriendlyURL() + "_desac_"+ + course.getCourseId());
 			theGroup.setActive(false);
 
 			GroupLocalServiceUtil.updateGroup(theGroup);

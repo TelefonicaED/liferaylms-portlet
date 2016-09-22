@@ -23,43 +23,43 @@ import java.util.Arrays;
  */
 public class SCORMContentServiceClpInvoker {
 	public SCORMContentServiceClpInvoker() {
-		_methodName134 = "getBeanIdentifier";
+		_methodName138 = "getBeanIdentifier";
 
-		_methodParameterTypes134 = new String[] {  };
+		_methodParameterTypes138 = new String[] {  };
 
-		_methodName135 = "setBeanIdentifier";
+		_methodName139 = "setBeanIdentifier";
 
-		_methodParameterTypes135 = new String[] { "java.lang.String" };
+		_methodParameterTypes139 = new String[] { "java.lang.String" };
 
-		_methodName140 = "getSCORMContentOfGroup";
+		_methodName144 = "getSCORMContentOfGroup";
 
-		_methodParameterTypes140 = new String[] { "long" };
+		_methodParameterTypes144 = new String[] { "long" };
 	}
 
 	public Object invokeMethod(String name, String[] parameterTypes,
 		Object[] arguments) throws Throwable {
-		if (_methodName134.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes134, parameterTypes)) {
+		if (_methodName138.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes138, parameterTypes)) {
 			return SCORMContentServiceUtil.getBeanIdentifier();
 		}
 
-		if (_methodName135.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes135, parameterTypes)) {
+		if (_methodName139.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes139, parameterTypes)) {
 			SCORMContentServiceUtil.setBeanIdentifier((java.lang.String)arguments[0]);
 		}
 
-		if (_methodName140.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes140, parameterTypes)) {
+		if (_methodName144.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes144, parameterTypes)) {
 			return SCORMContentServiceUtil.getSCORMContentOfGroup(((Long)arguments[0]).longValue());
 		}
 
 		throw new UnsupportedOperationException();
 	}
 
-	private String _methodName134;
-	private String[] _methodParameterTypes134;
-	private String _methodName135;
-	private String[] _methodParameterTypes135;
-	private String _methodName140;
-	private String[] _methodParameterTypes140;
+	private String _methodName138;
+	private String[] _methodParameterTypes138;
+	private String _methodName139;
+	private String[] _methodParameterTypes139;
+	private String _methodName144;
+	private String[] _methodParameterTypes144;
 }

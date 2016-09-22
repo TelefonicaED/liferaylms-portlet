@@ -66,5 +66,6 @@
 		<portlet id="catalogcourses"></portlet>
 		<portlet id="dateeditor"></portlet>
 		<portlet id="deregisteracademymail"></portlet>
+		<portlet id="viewactivitytriesdeleted"></portlet>
 	</category>
 </display>

@@ -1,3 +1,22 @@
+create table Lms_ActitityTriesDeleted (
+	activityTriesDeletedId LONG not null primary key,
+	actId LONG,
+	userId LONG,
+	startDate DATE null,
+	endDate DATE null,
+	status INTEGER
+);
+
+create table Lms_ActivityTriesDeleted (
+	activityTriesDeletedId LONG not null primary key,
+	groupId LONG,
+	actId LONG,
+	userId LONG,
+	startDate DATE null,
+	endDate DATE null,
+	status INTEGER
+);
+
 create table Lms_AuditEntry (
 	auditId LONG not null primary key,
 	auditDate DATE null,

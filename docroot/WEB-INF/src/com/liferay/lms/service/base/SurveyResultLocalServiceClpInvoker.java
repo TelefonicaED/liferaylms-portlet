@@ -104,41 +104,41 @@ public class SurveyResultLocalServiceClpInvoker {
 				"com.liferay.lms.model.SurveyResult", "boolean"
 			};
 
-		_methodName140 = "getBeanIdentifier";
+		_methodName144 = "getBeanIdentifier";
 
-		_methodParameterTypes140 = new String[] {  };
+		_methodParameterTypes144 = new String[] {  };
 
-		_methodName141 = "setBeanIdentifier";
+		_methodName145 = "setBeanIdentifier";
 
-		_methodParameterTypes141 = new String[] { "java.lang.String" };
+		_methodParameterTypes145 = new String[] { "java.lang.String" };
 
-		_methodName146 = "getByUserId";
+		_methodName150 = "getByUserId";
 
-		_methodParameterTypes146 = new String[] { "long" };
+		_methodParameterTypes150 = new String[] { "long" };
 
-		_methodName147 = "getSurveyResultByActId";
+		_methodName151 = "getSurveyResultByActId";
 
-		_methodParameterTypes147 = new String[] { "long" };
+		_methodParameterTypes151 = new String[] { "long" };
 
-		_methodName148 = "getSurveyResultsByQuestionIdActId";
+		_methodName152 = "getSurveyResultsByQuestionIdActId";
 
-		_methodParameterTypes148 = new String[] { "long", "long" };
+		_methodParameterTypes152 = new String[] { "long", "long" };
 
-		_methodName149 = "getPercentageByQuestionIdAndAnswerId";
+		_methodName153 = "getPercentageByQuestionIdAndAnswerId";
 
-		_methodParameterTypes149 = new String[] { "long", "long", "long" };
+		_methodParameterTypes153 = new String[] { "long", "long", "long" };
 
-		_methodName150 = "getCountByQuestionIdAndAnswerId";
+		_methodName154 = "getCountByQuestionIdAndAnswerId";
 
-		_methodParameterTypes150 = new String[] { "long", "long" };
+		_methodParameterTypes154 = new String[] { "long", "long" };
 
-		_methodName151 = "getPercentageByQuestionIdAndAnswerId";
+		_methodName155 = "getPercentageByQuestionIdAndAnswerId";
 
-		_methodParameterTypes151 = new String[] { "long", "long" };
+		_methodParameterTypes155 = new String[] { "long", "long" };
 
-		_methodName152 = "getTotalAnswersByQuestionId";
+		_methodName156 = "getTotalAnswersByQuestionId";
 
-		_methodParameterTypes152 = new String[] { "long" };
+		_methodParameterTypes156 = new String[] { "long" };
 	}
 
 	public Object invokeMethod(String name, String[] parameterTypes,
@@ -230,53 +230,53 @@ public class SurveyResultLocalServiceClpInvoker {
 				((Boolean)arguments[1]).booleanValue());
 		}
 
-		if (_methodName140.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes140, parameterTypes)) {
+		if (_methodName144.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes144, parameterTypes)) {
 			return SurveyResultLocalServiceUtil.getBeanIdentifier();
 		}
 
-		if (_methodName141.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes141, parameterTypes)) {
+		if (_methodName145.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes145, parameterTypes)) {
 			SurveyResultLocalServiceUtil.setBeanIdentifier((java.lang.String)arguments[0]);
 		}
 
-		if (_methodName146.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes146, parameterTypes)) {
+		if (_methodName150.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes150, parameterTypes)) {
 			return SurveyResultLocalServiceUtil.getByUserId(((Long)arguments[0]).longValue());
 		}
 
-		if (_methodName147.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes147, parameterTypes)) {
+		if (_methodName151.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes151, parameterTypes)) {
 			return SurveyResultLocalServiceUtil.getSurveyResultByActId(((Long)arguments[0]).longValue());
 		}
 
-		if (_methodName148.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes148, parameterTypes)) {
+		if (_methodName152.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes152, parameterTypes)) {
 			return SurveyResultLocalServiceUtil.getSurveyResultsByQuestionIdActId(((Long)arguments[0]).longValue(),
 				((Long)arguments[1]).longValue());
 		}
 
-		if (_methodName149.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes149, parameterTypes)) {
+		if (_methodName153.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes153, parameterTypes)) {
 			return SurveyResultLocalServiceUtil.getPercentageByQuestionIdAndAnswerId(((Long)arguments[0]).longValue(),
 				((Long)arguments[1]).longValue(),
 				((Long)arguments[2]).longValue());
 		}
 
-		if (_methodName150.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes150, parameterTypes)) {
+		if (_methodName154.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes154, parameterTypes)) {
 			return SurveyResultLocalServiceUtil.getCountByQuestionIdAndAnswerId(((Long)arguments[0]).longValue(),
 				((Long)arguments[1]).longValue());
 		}
 
-		if (_methodName151.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes151, parameterTypes)) {
+		if (_methodName155.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes155, parameterTypes)) {
 			return SurveyResultLocalServiceUtil.getPercentageByQuestionIdAndAnswerId(((Long)arguments[0]).longValue(),
 				((Long)arguments[1]).longValue());
 		}
 
-		if (_methodName152.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes152, parameterTypes)) {
+		if (_methodName156.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes156, parameterTypes)) {
 			return SurveyResultLocalServiceUtil.getTotalAnswersByQuestionId(((Long)arguments[0]).longValue());
 		}
 
@@ -315,22 +315,22 @@ public class SurveyResultLocalServiceClpInvoker {
 	private String[] _methodParameterTypes14;
 	private String _methodName15;
 	private String[] _methodParameterTypes15;
-	private String _methodName140;
-	private String[] _methodParameterTypes140;
-	private String _methodName141;
-	private String[] _methodParameterTypes141;
-	private String _methodName146;
-	private String[] _methodParameterTypes146;
-	private String _methodName147;
-	private String[] _methodParameterTypes147;
-	private String _methodName148;
-	private String[] _methodParameterTypes148;
-	private String _methodName149;
-	private String[] _methodParameterTypes149;
+	private String _methodName144;
+	private String[] _methodParameterTypes144;
+	private String _methodName145;
+	private String[] _methodParameterTypes145;
 	private String _methodName150;
 	private String[] _methodParameterTypes150;
 	private String _methodName151;
 	private String[] _methodParameterTypes151;
 	private String _methodName152;
 	private String[] _methodParameterTypes152;
+	private String _methodName153;
+	private String[] _methodParameterTypes153;
+	private String _methodName154;
+	private String[] _methodParameterTypes154;
+	private String _methodName155;
+	private String[] _methodParameterTypes155;
+	private String _methodName156;
+	private String[] _methodParameterTypes156;
 }

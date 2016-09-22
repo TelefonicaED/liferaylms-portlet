@@ -23,144 +23,144 @@ import java.util.Arrays;
  */
 public class CourseServiceClpInvoker {
 	public CourseServiceClpInvoker() {
-		_methodName168 = "getBeanIdentifier";
+		_methodName172 = "getBeanIdentifier";
 
-		_methodParameterTypes168 = new String[] {  };
+		_methodParameterTypes172 = new String[] {  };
 
-		_methodName169 = "setBeanIdentifier";
+		_methodName173 = "setBeanIdentifier";
 
-		_methodParameterTypes169 = new String[] { "java.lang.String" };
+		_methodParameterTypes173 = new String[] { "java.lang.String" };
 
-		_methodName174 = "getCoursesOfGroup";
+		_methodName178 = "getCoursesOfGroup";
 
-		_methodParameterTypes174 = new String[] { "long" };
+		_methodParameterTypes178 = new String[] { "long" };
 
-		_methodName175 = "createCourse";
+		_methodName179 = "createCourse";
 
-		_methodParameterTypes175 = new String[] {
+		_methodParameterTypes179 = new String[] {
 				"long", "java.lang.String", "java.lang.String", "boolean",
 				"java.lang.String", "int", "int", "int", "int", "int",
 				"java.util.Date", "java.util.Date"
 			};
 
-		_methodName176 = "createCourse";
+		_methodName180 = "createCourse";
 
-		_methodParameterTypes176 = new String[] {
+		_methodParameterTypes180 = new String[] {
 				"java.lang.String", "java.lang.String", "boolean",
 				"java.lang.String", "int", "int", "int", "int", "int",
 				"java.util.Date", "java.util.Date"
 			};
 
-		_methodName177 = "getCourses";
+		_methodName181 = "getCourses";
 
-		_methodParameterTypes177 = new String[] {  };
+		_methodParameterTypes181 = new String[] {  };
 
-		_methodName178 = "getCourseStudents";
+		_methodName182 = "getCourseStudents";
 
-		_methodParameterTypes178 = new String[] { "long" };
+		_methodParameterTypes182 = new String[] { "long" };
 
-		_methodName179 = "getCourseTeachers";
+		_methodName183 = "getCourseTeachers";
 
-		_methodParameterTypes179 = new String[] { "long" };
+		_methodParameterTypes183 = new String[] { "long" };
 
-		_methodName180 = "getCourseEditors";
+		_methodName184 = "getCourseEditors";
 
-		_methodParameterTypes180 = new String[] { "long" };
+		_methodParameterTypes184 = new String[] { "long" };
 
-		_methodName181 = "addStudentToCourse";
-
-		_methodParameterTypes181 = new String[] { "long", "java.lang.String" };
-
-		_methodName182 = "addStudentToCourseWithDates";
-
-		_methodParameterTypes182 = new String[] {
-				"long", "java.lang.String", "java.util.Date", "java.util.Date"
-			};
-
-		_methodName183 = "editUserInscriptionDates";
-
-		_methodParameterTypes183 = new String[] {
-				"long", "java.lang.String", "java.util.Date", "java.util.Date"
-			};
-
-		_methodName184 = "editUserInscriptionDates";
-
-		_methodParameterTypes184 = new String[] {
-				"long", "long", "java.util.Date", "java.util.Date"
-			};
-
-		_methodName185 = "addTeacherToCourse";
+		_methodName185 = "addStudentToCourse";
 
 		_methodParameterTypes185 = new String[] { "long", "java.lang.String" };
 
-		_methodName186 = "addEditorToCourse";
+		_methodName186 = "addStudentToCourseWithDates";
 
-		_methodParameterTypes186 = new String[] { "long", "java.lang.String" };
+		_methodParameterTypes186 = new String[] {
+				"long", "java.lang.String", "java.util.Date", "java.util.Date"
+			};
 
-		_methodName187 = "removeStudentFromCourse";
+		_methodName187 = "editUserInscriptionDates";
 
-		_methodParameterTypes187 = new String[] { "long", "java.lang.String" };
+		_methodParameterTypes187 = new String[] {
+				"long", "java.lang.String", "java.util.Date", "java.util.Date"
+			};
 
-		_methodName188 = "removeTeacherFromCourse";
+		_methodName188 = "editUserInscriptionDates";
 
-		_methodParameterTypes188 = new String[] { "long", "java.lang.String" };
+		_methodParameterTypes188 = new String[] {
+				"long", "long", "java.util.Date", "java.util.Date"
+			};
 
-		_methodName189 = "removeEditorFromCourse";
+		_methodName189 = "addTeacherToCourse";
 
 		_methodParameterTypes189 = new String[] { "long", "java.lang.String" };
 
-		_methodName190 = "getUserResult";
+		_methodName190 = "addEditorToCourse";
 
 		_methodParameterTypes190 = new String[] { "long", "java.lang.String" };
 
-		_methodName191 = "myCourses";
+		_methodName191 = "removeStudentFromCourse";
 
-		_methodParameterTypes191 = new String[] {  };
+		_methodParameterTypes191 = new String[] { "long", "java.lang.String" };
 
-		_methodName193 = "addUser";
+		_methodName192 = "removeTeacherFromCourse";
 
-		_methodParameterTypes193 = new String[] {
+		_methodParameterTypes192 = new String[] { "long", "java.lang.String" };
+
+		_methodName193 = "removeEditorFromCourse";
+
+		_methodParameterTypes193 = new String[] { "long", "java.lang.String" };
+
+		_methodName194 = "getUserResult";
+
+		_methodParameterTypes194 = new String[] { "long", "java.lang.String" };
+
+		_methodName195 = "myCourses";
+
+		_methodParameterTypes195 = new String[] {  };
+
+		_methodName197 = "addUser";
+
+		_methodParameterTypes197 = new String[] {
 				"java.lang.String", "java.lang.String", "java.lang.String",
 				"java.lang.String"
 			};
 
-		_methodName194 = "updateUser";
+		_methodName198 = "updateUser";
 
-		_methodParameterTypes194 = new String[] {
+		_methodParameterTypes198 = new String[] {
 				"java.lang.String", "java.lang.String", "java.lang.String",
 				"java.lang.String"
 			};
 
-		_methodName195 = "existsCourseName";
+		_methodName199 = "existsCourseName";
 
-		_methodParameterTypes195 = new String[] {
+		_methodParameterTypes199 = new String[] {
 				"java.lang.Long", "java.lang.Long", "java.lang.String"
 			};
 
-		_methodName196 = "getLogoUrl";
+		_methodName200 = "getLogoUrl";
 
-		_methodParameterTypes196 = new String[] { "java.lang.Long" };
+		_methodParameterTypes200 = new String[] { "java.lang.Long" };
 	}
 
 	public Object invokeMethod(String name, String[] parameterTypes,
 		Object[] arguments) throws Throwable {
-		if (_methodName168.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes168, parameterTypes)) {
+		if (_methodName172.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes172, parameterTypes)) {
 			return CourseServiceUtil.getBeanIdentifier();
 		}
 
-		if (_methodName169.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes169, parameterTypes)) {
+		if (_methodName173.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes173, parameterTypes)) {
 			CourseServiceUtil.setBeanIdentifier((java.lang.String)arguments[0]);
 		}
 
-		if (_methodName174.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes174, parameterTypes)) {
+		if (_methodName178.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes178, parameterTypes)) {
 			return CourseServiceUtil.getCoursesOfGroup(((Long)arguments[0]).longValue());
 		}
 
-		if (_methodName175.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes175, parameterTypes)) {
+		if (_methodName179.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes179, parameterTypes)) {
 			return CourseServiceUtil.createCourse(((Long)arguments[0]).longValue(),
 				(java.lang.String)arguments[1], (java.lang.String)arguments[2],
 				((Boolean)arguments[3]).booleanValue(),
@@ -173,8 +173,8 @@ public class CourseServiceClpInvoker {
 				(java.util.Date)arguments[10], (java.util.Date)arguments[11]);
 		}
 
-		if (_methodName176.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes176, parameterTypes)) {
+		if (_methodName180.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes180, parameterTypes)) {
 			return CourseServiceUtil.createCourse((java.lang.String)arguments[0],
 				(java.lang.String)arguments[1],
 				((Boolean)arguments[2]).booleanValue(),
@@ -187,134 +187,126 @@ public class CourseServiceClpInvoker {
 				(java.util.Date)arguments[9], (java.util.Date)arguments[10]);
 		}
 
-		if (_methodName177.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes177, parameterTypes)) {
-			return CourseServiceUtil.getCourses();
-		}
-
-		if (_methodName178.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes178, parameterTypes)) {
-			return CourseServiceUtil.getCourseStudents(((Long)arguments[0]).longValue());
-		}
-
-		if (_methodName179.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes179, parameterTypes)) {
-			return CourseServiceUtil.getCourseTeachers(((Long)arguments[0]).longValue());
-		}
-
-		if (_methodName180.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes180, parameterTypes)) {
-			return CourseServiceUtil.getCourseEditors(((Long)arguments[0]).longValue());
-		}
-
 		if (_methodName181.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes181, parameterTypes)) {
-			CourseServiceUtil.addStudentToCourse(((Long)arguments[0]).longValue(),
-				(java.lang.String)arguments[1]);
+			return CourseServiceUtil.getCourses();
 		}
 
 		if (_methodName182.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes182, parameterTypes)) {
-			CourseServiceUtil.addStudentToCourseWithDates(((Long)arguments[0]).longValue(),
-				(java.lang.String)arguments[1], (java.util.Date)arguments[2],
-				(java.util.Date)arguments[3]);
+			return CourseServiceUtil.getCourseStudents(((Long)arguments[0]).longValue());
 		}
 
 		if (_methodName183.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes183, parameterTypes)) {
-			CourseServiceUtil.editUserInscriptionDates(((Long)arguments[0]).longValue(),
-				(java.lang.String)arguments[1], (java.util.Date)arguments[2],
-				(java.util.Date)arguments[3]);
+			return CourseServiceUtil.getCourseTeachers(((Long)arguments[0]).longValue());
 		}
 
 		if (_methodName184.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes184, parameterTypes)) {
-			CourseServiceUtil.editUserInscriptionDates(((Long)arguments[0]).longValue(),
-				((Long)arguments[1]).longValue(), (java.util.Date)arguments[2],
-				(java.util.Date)arguments[3]);
+			return CourseServiceUtil.getCourseEditors(((Long)arguments[0]).longValue());
 		}
 
 		if (_methodName185.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes185, parameterTypes)) {
-			CourseServiceUtil.addTeacherToCourse(((Long)arguments[0]).longValue(),
+			CourseServiceUtil.addStudentToCourse(((Long)arguments[0]).longValue(),
 				(java.lang.String)arguments[1]);
 		}
 
 		if (_methodName186.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes186, parameterTypes)) {
-			CourseServiceUtil.addEditorToCourse(((Long)arguments[0]).longValue(),
-				(java.lang.String)arguments[1]);
+			CourseServiceUtil.addStudentToCourseWithDates(((Long)arguments[0]).longValue(),
+				(java.lang.String)arguments[1], (java.util.Date)arguments[2],
+				(java.util.Date)arguments[3]);
 		}
 
 		if (_methodName187.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes187, parameterTypes)) {
-			CourseServiceUtil.removeStudentFromCourse(((Long)arguments[0]).longValue(),
-				(java.lang.String)arguments[1]);
+			CourseServiceUtil.editUserInscriptionDates(((Long)arguments[0]).longValue(),
+				(java.lang.String)arguments[1], (java.util.Date)arguments[2],
+				(java.util.Date)arguments[3]);
 		}
 
 		if (_methodName188.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes188, parameterTypes)) {
-			CourseServiceUtil.removeTeacherFromCourse(((Long)arguments[0]).longValue(),
-				(java.lang.String)arguments[1]);
+			CourseServiceUtil.editUserInscriptionDates(((Long)arguments[0]).longValue(),
+				((Long)arguments[1]).longValue(), (java.util.Date)arguments[2],
+				(java.util.Date)arguments[3]);
 		}
 
 		if (_methodName189.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes189, parameterTypes)) {
-			CourseServiceUtil.removeEditorFromCourse(((Long)arguments[0]).longValue(),
+			CourseServiceUtil.addTeacherToCourse(((Long)arguments[0]).longValue(),
 				(java.lang.String)arguments[1]);
 		}
 
 		if (_methodName190.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes190, parameterTypes)) {
-			return CourseServiceUtil.getUserResult(((Long)arguments[0]).longValue(),
+			CourseServiceUtil.addEditorToCourse(((Long)arguments[0]).longValue(),
 				(java.lang.String)arguments[1]);
 		}
 
 		if (_methodName191.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes191, parameterTypes)) {
-			return CourseServiceUtil.myCourses();
+			CourseServiceUtil.removeStudentFromCourse(((Long)arguments[0]).longValue(),
+				(java.lang.String)arguments[1]);
+		}
+
+		if (_methodName192.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes192, parameterTypes)) {
+			CourseServiceUtil.removeTeacherFromCourse(((Long)arguments[0]).longValue(),
+				(java.lang.String)arguments[1]);
 		}
 
 		if (_methodName193.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes193, parameterTypes)) {
+			CourseServiceUtil.removeEditorFromCourse(((Long)arguments[0]).longValue(),
+				(java.lang.String)arguments[1]);
+		}
+
+		if (_methodName194.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes194, parameterTypes)) {
+			return CourseServiceUtil.getUserResult(((Long)arguments[0]).longValue(),
+				(java.lang.String)arguments[1]);
+		}
+
+		if (_methodName195.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes195, parameterTypes)) {
+			return CourseServiceUtil.myCourses();
+		}
+
+		if (_methodName197.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes197, parameterTypes)) {
 			CourseServiceUtil.addUser((java.lang.String)arguments[0],
 				(java.lang.String)arguments[1], (java.lang.String)arguments[2],
 				(java.lang.String)arguments[3]);
 		}
 
-		if (_methodName194.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes194, parameterTypes)) {
+		if (_methodName198.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes198, parameterTypes)) {
 			CourseServiceUtil.updateUser((java.lang.String)arguments[0],
 				(java.lang.String)arguments[1], (java.lang.String)arguments[2],
 				(java.lang.String)arguments[3]);
 		}
 
-		if (_methodName195.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes195, parameterTypes)) {
+		if (_methodName199.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes199, parameterTypes)) {
 			return CourseServiceUtil.existsCourseName((java.lang.Long)arguments[0],
 				(java.lang.Long)arguments[1], (java.lang.String)arguments[2]);
 		}
 
-		if (_methodName196.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes196, parameterTypes)) {
+		if (_methodName200.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes200, parameterTypes)) {
 			return CourseServiceUtil.getLogoUrl((java.lang.Long)arguments[0]);
 		}
 
 		throw new UnsupportedOperationException();
 	}
 
-	private String _methodName168;
-	private String[] _methodParameterTypes168;
-	private String _methodName169;
-	private String[] _methodParameterTypes169;
-	private String _methodName174;
-	private String[] _methodParameterTypes174;
-	private String _methodName175;
-	private String[] _methodParameterTypes175;
-	private String _methodName176;
-	private String[] _methodParameterTypes176;
-	private String _methodName177;
-	private String[] _methodParameterTypes177;
+	private String _methodName172;
+	private String[] _methodParameterTypes172;
+	private String _methodName173;
+	private String[] _methodParameterTypes173;
 	private String _methodName178;
 	private String[] _methodParameterTypes178;
 	private String _methodName179;
@@ -343,12 +335,20 @@ public class CourseServiceClpInvoker {
 	private String[] _methodParameterTypes190;
 	private String _methodName191;
 	private String[] _methodParameterTypes191;
+	private String _methodName192;
+	private String[] _methodParameterTypes192;
 	private String _methodName193;
 	private String[] _methodParameterTypes193;
 	private String _methodName194;
 	private String[] _methodParameterTypes194;
 	private String _methodName195;
 	private String[] _methodParameterTypes195;
-	private String _methodName196;
-	private String[] _methodParameterTypes196;
+	private String _methodName197;
+	private String[] _methodParameterTypes197;
+	private String _methodName198;
+	private String[] _methodParameterTypes198;
+	private String _methodName199;
+	private String[] _methodParameterTypes199;
+	private String _methodName200;
+	private String[] _methodParameterTypes200;
 }

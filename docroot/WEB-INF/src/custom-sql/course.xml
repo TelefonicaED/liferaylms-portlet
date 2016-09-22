@@ -467,7 +467,7 @@
 	<sql id="com.liferay.lms.service.persistence.CourseFinder.hasUserTries">
 		<![CDATA[   			
 			SELECT 
-				COUNT(1) > 0 AS hasActWithTries
+				IF(COUNT(1) > 0,true,false) AS hasActWithTries
 			FROM (
 				SELECT 
 					IF(lar.latId IS NOT NULL, COUNT(1), 0) AS numTriesUser, la.actId, la.tries

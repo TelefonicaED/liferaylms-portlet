@@ -23,69 +23,69 @@ import java.util.Arrays;
  */
 public class ModuleServiceClpInvoker {
 	public ModuleServiceClpInvoker() {
-		_methodName124 = "getBeanIdentifier";
+		_methodName128 = "getBeanIdentifier";
 
-		_methodParameterTypes124 = new String[] {  };
+		_methodParameterTypes128 = new String[] {  };
 
-		_methodName125 = "setBeanIdentifier";
+		_methodName129 = "setBeanIdentifier";
 
-		_methodParameterTypes125 = new String[] { "java.lang.String" };
+		_methodParameterTypes129 = new String[] { "java.lang.String" };
 
-		_methodName130 = "findAllInGroup";
+		_methodName134 = "findAllInGroup";
 
-		_methodParameterTypes130 = new String[] { "long" };
+		_methodParameterTypes134 = new String[] { "long" };
 
-		_methodName131 = "findAllInCourse";
+		_methodName135 = "findAllInCourse";
 
-		_methodParameterTypes131 = new String[] { "long" };
+		_methodParameterTypes135 = new String[] { "long" };
 
-		_methodName132 = "isLocked";
+		_methodName136 = "isLocked";
 
-		_methodParameterTypes132 = new String[] { "long" };
+		_methodParameterTypes136 = new String[] { "long" };
 
-		_methodName133 = "PassedByMe";
+		_methodName137 = "PassedByMe";
 
-		_methodParameterTypes133 = new String[] { "long" };
+		_methodParameterTypes137 = new String[] { "long" };
 
-		_methodName134 = "isUserPassed";
+		_methodName138 = "isUserPassed";
 
-		_methodParameterTypes134 = new String[] { "long", "java.lang.String" };
+		_methodParameterTypes138 = new String[] { "long", "java.lang.String" };
 	}
 
 	public Object invokeMethod(String name, String[] parameterTypes,
 		Object[] arguments) throws Throwable {
-		if (_methodName124.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes124, parameterTypes)) {
+		if (_methodName128.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes128, parameterTypes)) {
 			return ModuleServiceUtil.getBeanIdentifier();
 		}
 
-		if (_methodName125.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes125, parameterTypes)) {
+		if (_methodName129.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes129, parameterTypes)) {
 			ModuleServiceUtil.setBeanIdentifier((java.lang.String)arguments[0]);
-		}
-
-		if (_methodName130.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes130, parameterTypes)) {
-			return ModuleServiceUtil.findAllInGroup(((Long)arguments[0]).longValue());
-		}
-
-		if (_methodName131.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes131, parameterTypes)) {
-			return ModuleServiceUtil.findAllInCourse(((Long)arguments[0]).longValue());
-		}
-
-		if (_methodName132.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes132, parameterTypes)) {
-			return ModuleServiceUtil.isLocked(((Long)arguments[0]).longValue());
-		}
-
-		if (_methodName133.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes133, parameterTypes)) {
-			return ModuleServiceUtil.PassedByMe(((Long)arguments[0]).longValue());
 		}
 
 		if (_methodName134.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes134, parameterTypes)) {
+			return ModuleServiceUtil.findAllInGroup(((Long)arguments[0]).longValue());
+		}
+
+		if (_methodName135.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes135, parameterTypes)) {
+			return ModuleServiceUtil.findAllInCourse(((Long)arguments[0]).longValue());
+		}
+
+		if (_methodName136.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes136, parameterTypes)) {
+			return ModuleServiceUtil.isLocked(((Long)arguments[0]).longValue());
+		}
+
+		if (_methodName137.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes137, parameterTypes)) {
+			return ModuleServiceUtil.PassedByMe(((Long)arguments[0]).longValue());
+		}
+
+		if (_methodName138.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes138, parameterTypes)) {
 			return ModuleServiceUtil.isUserPassed(((Long)arguments[0]).longValue(),
 				(java.lang.String)arguments[1]);
 		}
@@ -93,18 +93,18 @@ public class ModuleServiceClpInvoker {
 		throw new UnsupportedOperationException();
 	}
 
-	private String _methodName124;
-	private String[] _methodParameterTypes124;
-	private String _methodName125;
-	private String[] _methodParameterTypes125;
-	private String _methodName130;
-	private String[] _methodParameterTypes130;
-	private String _methodName131;
-	private String[] _methodParameterTypes131;
-	private String _methodName132;
-	private String[] _methodParameterTypes132;
-	private String _methodName133;
-	private String[] _methodParameterTypes133;
+	private String _methodName128;
+	private String[] _methodParameterTypes128;
+	private String _methodName129;
+	private String[] _methodParameterTypes129;
 	private String _methodName134;
 	private String[] _methodParameterTypes134;
+	private String _methodName135;
+	private String[] _methodParameterTypes135;
+	private String _methodName136;
+	private String[] _methodParameterTypes136;
+	private String _methodName137;
+	private String[] _methodParameterTypes137;
+	private String _methodName138;
+	private String[] _methodParameterTypes138;
 }

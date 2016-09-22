@@ -42,7 +42,7 @@ public class CleanLearningActivityTriesNotPassed implements MessageListener{
 				//.add(PropertyFactoryUtil.forName("endDate").isNotNull());
 
 		if(log.isDebugEnabled())log.debug(dq.toString());
-		//List<LearningActivityResult> results = LearningActivityResultUtil.findWithDynamicQuery(dq);
+
 		List<LearningActivityResult> results = LearningActivityResultLocalServiceUtil.dynamicQuery(dq);
 		if(log.isDebugEnabled())log.debug("results LearningActivityResultLocalServiceUtil.dynamicQuery "+results.size());
 		for(LearningActivityResult result:results){
@@ -76,8 +76,6 @@ public class CleanLearningActivityTriesNotPassed implements MessageListener{
 			
 			e.printStackTrace();
 		}
-		
-		
 	}
 
 }

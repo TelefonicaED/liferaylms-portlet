@@ -1,3 +1,6 @@
+create index IX_BD5C2361 on Lms_ActivityTriesDeleted (actId, status);
+create index IX_9BB02FE8 on Lms_ActivityTriesDeleted (groupId);
+
 create index IX_6E7EC4FA on Lms_AuditEntry (classname, classPK);
 create index IX_A9ACD23E on Lms_AuditEntry (companyId);
 create index IX_6820D040 on Lms_AuditEntry (groupId);

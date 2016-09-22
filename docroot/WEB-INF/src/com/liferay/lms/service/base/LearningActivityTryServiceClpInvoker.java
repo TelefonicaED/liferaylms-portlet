@@ -23,49 +23,49 @@ import java.util.Arrays;
  */
 public class LearningActivityTryServiceClpInvoker {
 	public LearningActivityTryServiceClpInvoker() {
-		_methodName124 = "getBeanIdentifier";
+		_methodName128 = "getBeanIdentifier";
 
-		_methodParameterTypes124 = new String[] {  };
+		_methodParameterTypes128 = new String[] {  };
 
-		_methodName125 = "setBeanIdentifier";
+		_methodName129 = "setBeanIdentifier";
 
-		_methodParameterTypes125 = new String[] { "java.lang.String" };
+		_methodParameterTypes129 = new String[] { "java.lang.String" };
 
-		_methodName130 = "createLearningActivityTry";
+		_methodName134 = "createLearningActivityTry";
 
-		_methodParameterTypes130 = new String[] { "long", "long" };
+		_methodParameterTypes134 = new String[] { "long", "long" };
 
-		_methodName131 = "createLearningActivityTry";
+		_methodName135 = "createLearningActivityTry";
 
-		_methodParameterTypes131 = new String[] {
+		_methodParameterTypes135 = new String[] {
 				"long", "long", "int", "double", "int"
 			};
 
-		_methodName132 = "getLearningActivityTries";
+		_methodName136 = "getLearningActivityTries";
 
-		_methodParameterTypes132 = new String[] { "long", "java.lang.String" };
+		_methodParameterTypes136 = new String[] { "long", "java.lang.String" };
 	}
 
 	public Object invokeMethod(String name, String[] parameterTypes,
 		Object[] arguments) throws Throwable {
-		if (_methodName124.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes124, parameterTypes)) {
+		if (_methodName128.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes128, parameterTypes)) {
 			return LearningActivityTryServiceUtil.getBeanIdentifier();
 		}
 
-		if (_methodName125.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes125, parameterTypes)) {
+		if (_methodName129.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes129, parameterTypes)) {
 			LearningActivityTryServiceUtil.setBeanIdentifier((java.lang.String)arguments[0]);
 		}
 
-		if (_methodName130.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes130, parameterTypes)) {
+		if (_methodName134.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes134, parameterTypes)) {
 			return LearningActivityTryServiceUtil.createLearningActivityTry(((Long)arguments[0]).longValue(),
 				((Long)arguments[1]).longValue());
 		}
 
-		if (_methodName131.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes131, parameterTypes)) {
+		if (_methodName135.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes135, parameterTypes)) {
 			return LearningActivityTryServiceUtil.createLearningActivityTry(((Long)arguments[0]).longValue(),
 				((Long)arguments[1]).longValue(),
 				((Integer)arguments[2]).intValue(),
@@ -73,8 +73,8 @@ public class LearningActivityTryServiceClpInvoker {
 				((Integer)arguments[4]).intValue());
 		}
 
-		if (_methodName132.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes132, parameterTypes)) {
+		if (_methodName136.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes136, parameterTypes)) {
 			return LearningActivityTryServiceUtil.getLearningActivityTries(((Long)arguments[0]).longValue(),
 				(java.lang.String)arguments[1]);
 		}
@@ -82,14 +82,14 @@ public class LearningActivityTryServiceClpInvoker {
 		throw new UnsupportedOperationException();
 	}
 
-	private String _methodName124;
-	private String[] _methodParameterTypes124;
-	private String _methodName125;
-	private String[] _methodParameterTypes125;
-	private String _methodName130;
-	private String[] _methodParameterTypes130;
-	private String _methodName131;
-	private String[] _methodParameterTypes131;
-	private String _methodName132;
-	private String[] _methodParameterTypes132;
+	private String _methodName128;
+	private String[] _methodParameterTypes128;
+	private String _methodName129;
+	private String[] _methodParameterTypes129;
+	private String _methodName134;
+	private String[] _methodParameterTypes134;
+	private String _methodName135;
+	private String[] _methodParameterTypes135;
+	private String _methodName136;
+	private String[] _methodParameterTypes136;
 }
