@@ -210,7 +210,8 @@ function <portlet:namespace />downloadReport(url){
 				    		//location.href='${exportResourceURL}&file=' + data.file + '&contentType=' + data.contentType + '&UUID=' + data.UUID + '&action='+data.action;
 				    		$('#<portlet:namespace />download_report').empty();
 							$('#<portlet:namespace />generating_report').addClass("aui-helper-hidden");
-							$('#<portlet:namespace />download_report').append('<button type="button" id="link_download" onClick="javascript:<portlet:namespace />downloadReport(\'${stadisticsReportURL}&file=' + data.file +'&fileName=' + data.fileName + '&contentType=' + data.contentType + '&UUID=' + data.UUID + '&action='+data.action+'\'); " ><liferay-ui:message key="download-report"/></button>');
+							var downloadReport = Liferay.Language.get('download-report');
+							$('#<portlet:namespace />download_report').append('<button type="button" id="link_download" onClick="javascript:<portlet:namespace />downloadReport(\'${stadisticsReportURL}&file=' + data.file +'&fileName=' + data.fileName + '&contentType=' + data.contentType + '&UUID=' + data.UUID + '&action='+data.action+'\'); " >'+downloadReport+'</button>');
 							$('#<portlet:namespace />download_report').removeClass("aui-helper-hidden");
 				    	}
 					}else{
