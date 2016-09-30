@@ -288,6 +288,7 @@ public class ModuleLocalServiceImpl extends ModuleLocalServiceBaseImpl {
 	    fileobj.setDescription(validmodule.getDescription());
 	    fileobj.setOrdern(fileobj.getModuleId());
 	    fileobj.setIcon(validmodule.getIcon());
+	    fileobj.setPrecedence(validmodule.getPrecedence());
 	    try {
 			resourceLocalService.addResources(
 					validmodule.getCompanyId(), validmodule.getGroupId(), validmodule.getUserId(),
