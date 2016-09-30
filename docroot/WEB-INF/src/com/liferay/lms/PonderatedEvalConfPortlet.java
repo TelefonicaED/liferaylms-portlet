@@ -55,7 +55,7 @@ public class PonderatedEvalConfPortlet extends MVCPortlet
 					requi.addAttribute("actId", actIds);
 				}
 			}
-			if(param.startsWith("weigth_"))
+			if(param.startsWith("weight_"))
 			{
 				String actIds=param.substring(7);
 				long score=ParamUtil.getLong(actionRequest, param,0);
