@@ -26,7 +26,7 @@
 	boolean completeMode = viewMode.compareTo("0") == 0;
 	boolean actualModuleMode = viewMode.compareTo("1") == 0;
 	
-	if(actualModuleMode && (moduleId>0 || ModuleLocalServiceUtil.countInGroup(themeDisplay.getScopeGroupId())!=0)){
+	if(actualModuleMode && (moduleId>0 || ModuleLocalServiceUtil.countByGroupId(themeDisplay.getScopeGroupId())!=0)){
 		if(moduleId==0) {
 			moduleId = ModuleLocalServiceUtil.findFirstInGroup(themeDisplay.getScopeGroupId()).getModuleId();
 		}
