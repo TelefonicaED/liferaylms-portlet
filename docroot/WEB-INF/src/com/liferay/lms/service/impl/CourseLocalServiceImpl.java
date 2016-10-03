@@ -409,22 +409,11 @@ public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int e
 				newModule = ModuleLocalServiceUtil.createModule(CounterLocalServiceUtil.increment(Module.class.getName()));
 				newModule.setTitle(LanguageUtil.get(locale,"com.liferay.lms.model.module"), locale);
 				newModule.setDescription(LanguageUtil.get(locale,"description"), locale);
-				
+				newModule.setCreateDate(createDate);
 				newModule.setCompanyId(course.getCompanyId());
 				newModule.setGroupId(course.getGroupCreatedId());
 				newModule.setUserId(course.getUserId());
-				newModule.setOrdern(newModule.getModuleId());
-				
-				/*
-				Calendar start = Calendar.getInstance();
-				start.setTimeInMillis(module.getStartDate().getTime() + TimeUnit.MILLISECONDS.convert(days, TimeUnit.DAYS));
-				Calendar stop = Calendar.getInstance();
-				stop.setTimeInMillis(module.getEndDate().getTime() + TimeUnit.MILLISECONDS.convert(days, TimeUnit.DAYS));
-				*/
-				
-				//System.out.println(" startDate: "+ start.getTime() +"   -> "+module.getStartDate());
-				//System.out.println(" stopDate : "+ stop.getTime()  +"   -> "+module.getEndDate());
-				
+				newModule.setOrdern(newModule.getModuleId());				
 				newModule.setStartDate(startDate);
 				newModule.setEndDate(endDate);
 				
