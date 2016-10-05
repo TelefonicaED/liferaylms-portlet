@@ -140,6 +140,14 @@ public class SurveyResultLocalServiceClp implements SurveyResultLocalService {
 		_methodName25 = "getTotalAnswersByQuestionId";
 
 		_methodParameterTypes25 = new String[] { "long" };
+
+		_methodName26 = "countStudentsByQuestionId";
+
+		_methodParameterTypes26 = new String[] { "long", "long", "long" };
+
+		_methodName27 = "countStudentsByQuestionIdAndAnswerId";
+
+		_methodParameterTypes27 = new String[] { "long", "long", "long", "long" };
 	}
 
 	public com.liferay.lms.model.SurveyResult addSurveyResult(
@@ -858,6 +866,62 @@ public class SurveyResultLocalServiceClp implements SurveyResultLocalService {
 		return ((Long)returnObj).longValue();
 	}
 
+	public long countStudentsByQuestionId(long questionId, long companyId,
+		long courseGropupCreatedId) {
+		Object returnObj = null;
+
+		try {
+			returnObj = _invokableLocalService.invokeMethod(_methodName26,
+					_methodParameterTypes26,
+					new Object[] { questionId, companyId, courseGropupCreatedId });
+		}
+		catch (Throwable t) {
+			t = ClpSerializer.translateThrowable(t);
+
+			if (t instanceof RuntimeException) {
+				throw (RuntimeException)t;
+			}
+			else {
+				throw new RuntimeException(t.getClass().getName() +
+					" is not a valid exception");
+			}
+		}
+
+		return ((Long)returnObj).longValue();
+	}
+
+	public long countStudentsByQuestionIdAndAnswerId(long questionId,
+		long answerId, long companyId, long courseGropupCreatedId) {
+		Object returnObj = null;
+
+		try {
+			returnObj = _invokableLocalService.invokeMethod(_methodName27,
+					_methodParameterTypes27,
+					new Object[] {
+						questionId,
+						
+					answerId,
+						
+					companyId,
+						
+					courseGropupCreatedId
+					});
+		}
+		catch (Throwable t) {
+			t = ClpSerializer.translateThrowable(t);
+
+			if (t instanceof RuntimeException) {
+				throw (RuntimeException)t;
+			}
+			else {
+				throw new RuntimeException(t.getClass().getName() +
+					" is not a valid exception");
+			}
+		}
+
+		return ((Long)returnObj).longValue();
+	}
+
 	private InvokableLocalService _invokableLocalService;
 	private String _methodName0;
 	private String[] _methodParameterTypes0;
@@ -909,4 +973,8 @@ public class SurveyResultLocalServiceClp implements SurveyResultLocalService {
 	private String[] _methodParameterTypes24;
 	private String _methodName25;
 	private String[] _methodParameterTypes25;
+	private String _methodName26;
+	private String[] _methodParameterTypes26;
+	private String _methodName27;
+	private String[] _methodParameterTypes27;
 }

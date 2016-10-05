@@ -318,6 +318,18 @@ public class SurveyResultLocalServiceWrapper implements SurveyResultLocalService
 		return _surveyResultLocalService.getTotalAnswersByQuestionId(questionId);
 	}
 
+	public long countStudentsByQuestionId(long questionId, long companyId,
+		long courseGropupCreatedId) {
+		return _surveyResultLocalService.countStudentsByQuestionId(questionId,
+			companyId, courseGropupCreatedId);
+	}
+
+	public long countStudentsByQuestionIdAndAnswerId(long questionId,
+		long answerId, long companyId, long courseGropupCreatedId) {
+		return _surveyResultLocalService.countStudentsByQuestionIdAndAnswerId(questionId,
+			answerId, companyId, courseGropupCreatedId);
+	}
+
 	/**
 	 * @deprecated Renamed to {@link #getWrappedService}
 	 */

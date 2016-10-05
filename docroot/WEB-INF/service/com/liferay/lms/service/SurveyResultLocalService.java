@@ -285,4 +285,10 @@ public interface SurveyResultLocalService extends BaseLocalService,
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public long getTotalAnswersByQuestionId(long questionId)
 		throws com.liferay.portal.kernel.exception.SystemException;
+
+	public long countStudentsByQuestionId(long questionId, long companyId,
+		long courseGropupCreatedId);
+
+	public long countStudentsByQuestionIdAndAnswerId(long questionId,
+		long answerId, long companyId, long courseGropupCreatedId);
 }

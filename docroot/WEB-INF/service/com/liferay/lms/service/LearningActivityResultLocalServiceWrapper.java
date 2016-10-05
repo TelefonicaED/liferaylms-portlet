@@ -399,6 +399,19 @@ public class LearningActivityResultLocalServiceWrapper
 			companyId, courseGropupCreatedId, _students);
 	}
 
+	public long countFinishedOnlyStudents(long actId, long companyId,
+		long courseGropupCreatedId) {
+		return _learningActivityResultLocalService.countFinishedOnlyStudents(actId,
+			companyId, courseGropupCreatedId);
+	}
+
+	public long countFinishedOnlyStudents(long actId, long companyId,
+		long courseGropupCreatedId,
+		java.util.List<com.liferay.portal.model.User> _students) {
+		return _learningActivityResultLocalService.countFinishedOnlyStudents(actId,
+			companyId, courseGropupCreatedId, _students);
+	}
+
 	public double triesPerUser(long actId)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _learningActivityResultLocalService.triesPerUser(actId);

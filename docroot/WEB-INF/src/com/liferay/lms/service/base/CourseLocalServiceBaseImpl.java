@@ -60,6 +60,7 @@ import com.liferay.lms.service.persistence.CourseFinder;
 import com.liferay.lms.service.persistence.CoursePersistence;
 import com.liferay.lms.service.persistence.CourseResultPersistence;
 import com.liferay.lms.service.persistence.LearningActivityPersistence;
+import com.liferay.lms.service.persistence.LearningActivityResultFinder;
 import com.liferay.lms.service.persistence.LearningActivityResultPersistence;
 import com.liferay.lms.service.persistence.LearningActivityTryPersistence;
 import com.liferay.lms.service.persistence.LmsPrefsPersistence;
@@ -69,6 +70,7 @@ import com.liferay.lms.service.persistence.P2pActivityCorrectionsPersistence;
 import com.liferay.lms.service.persistence.P2pActivityPersistence;
 import com.liferay.lms.service.persistence.SCORMContentPersistence;
 import com.liferay.lms.service.persistence.SchedulePersistence;
+import com.liferay.lms.service.persistence.SurveyResultFinder;
 import com.liferay.lms.service.persistence.SurveyResultPersistence;
 import com.liferay.lms.service.persistence.TestAnswerPersistence;
 import com.liferay.lms.service.persistence.TestQuestionPersistence;
@@ -827,6 +829,25 @@ public abstract class CourseLocalServiceBaseImpl extends BaseLocalServiceImpl
 	}
 
 	/**
+	 * Returns the learning activity result finder.
+	 *
+	 * @return the learning activity result finder
+	 */
+	public LearningActivityResultFinder getLearningActivityResultFinder() {
+		return learningActivityResultFinder;
+	}
+
+	/**
+	 * Sets the learning activity result finder.
+	 *
+	 * @param learningActivityResultFinder the learning activity result finder
+	 */
+	public void setLearningActivityResultFinder(
+		LearningActivityResultFinder learningActivityResultFinder) {
+		this.learningActivityResultFinder = learningActivityResultFinder;
+	}
+
+	/**
 	 * Returns the learning activity try local service.
 	 *
 	 * @return the learning activity try local service
@@ -1235,6 +1256,24 @@ public abstract class CourseLocalServiceBaseImpl extends BaseLocalServiceImpl
 	public void setSurveyResultPersistence(
 		SurveyResultPersistence surveyResultPersistence) {
 		this.surveyResultPersistence = surveyResultPersistence;
+	}
+
+	/**
+	 * Returns the survey result finder.
+	 *
+	 * @return the survey result finder
+	 */
+	public SurveyResultFinder getSurveyResultFinder() {
+		return surveyResultFinder;
+	}
+
+	/**
+	 * Sets the survey result finder.
+	 *
+	 * @param surveyResultFinder the survey result finder
+	 */
+	public void setSurveyResultFinder(SurveyResultFinder surveyResultFinder) {
+		this.surveyResultFinder = surveyResultFinder;
 	}
 
 	/**
@@ -2053,6 +2092,8 @@ public abstract class CourseLocalServiceBaseImpl extends BaseLocalServiceImpl
 	protected LearningActivityResultService learningActivityResultService;
 	@BeanReference(type = LearningActivityResultPersistence.class)
 	protected LearningActivityResultPersistence learningActivityResultPersistence;
+	@BeanReference(type = LearningActivityResultFinder.class)
+	protected LearningActivityResultFinder learningActivityResultFinder;
 	@BeanReference(type = LearningActivityTryLocalService.class)
 	protected LearningActivityTryLocalService learningActivityTryLocalService;
 	@BeanReference(type = LearningActivityTryService.class)
@@ -2097,6 +2138,8 @@ public abstract class CourseLocalServiceBaseImpl extends BaseLocalServiceImpl
 	protected SurveyResultLocalService surveyResultLocalService;
 	@BeanReference(type = SurveyResultPersistence.class)
 	protected SurveyResultPersistence surveyResultPersistence;
+	@BeanReference(type = SurveyResultFinder.class)
+	protected SurveyResultFinder surveyResultFinder;
 	@BeanReference(type = TestAnswerLocalService.class)
 	protected TestAnswerLocalService testAnswerLocalService;
 	@BeanReference(type = TestAnswerService.class)

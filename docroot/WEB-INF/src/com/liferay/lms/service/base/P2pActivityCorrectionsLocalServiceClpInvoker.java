@@ -104,95 +104,95 @@ public class P2pActivityCorrectionsLocalServiceClpInvoker {
 				"com.liferay.lms.model.P2pActivityCorrections", "boolean"
 			};
 
-		_methodName144 = "getBeanIdentifier";
+		_methodName148 = "getBeanIdentifier";
 
-		_methodParameterTypes144 = new String[] {  };
+		_methodParameterTypes148 = new String[] {  };
 
-		_methodName145 = "setBeanIdentifier";
+		_methodName149 = "setBeanIdentifier";
 
-		_methodParameterTypes145 = new String[] { "java.lang.String" };
+		_methodParameterTypes149 = new String[] { "java.lang.String" };
 
-		_methodName150 = "findByP2pActivityIdAndUserId";
-
-		_methodParameterTypes150 = new String[] {
-				"java.lang.Long", "java.lang.Long"
-			};
-
-		_methodName151 = "exitsCorP2p";
-
-		_methodParameterTypes151 = new String[] {
-				"java.lang.Long", "java.lang.Long"
-			};
-
-		_methodName152 = "findByP2pActivityId";
-
-		_methodParameterTypes152 = new String[] { "java.lang.Long" };
-
-		_methodName153 = "findByActIdIdAndUserId";
-
-		_methodParameterTypes153 = new String[] {
-				"java.lang.Long", "java.lang.Long"
-			};
-
-		_methodName154 = "findByActIdAndUserIdOrderByDate";
+		_methodName154 = "findByP2pActivityIdAndUserId";
 
 		_methodParameterTypes154 = new String[] {
 				"java.lang.Long", "java.lang.Long"
 			};
 
-		_methodName155 = "findByActIdAndUserIdOrderById";
+		_methodName155 = "exitsCorP2p";
 
 		_methodParameterTypes155 = new String[] {
 				"java.lang.Long", "java.lang.Long"
 			};
 
-		_methodName156 = "addorUpdateP2pActivityCorrections";
+		_methodName156 = "findByP2pActivityId";
 
-		_methodParameterTypes156 = new String[] {
+		_methodParameterTypes156 = new String[] { "java.lang.Long" };
+
+		_methodName157 = "findByActIdIdAndUserId";
+
+		_methodParameterTypes157 = new String[] {
+				"java.lang.Long", "java.lang.Long"
+			};
+
+		_methodName158 = "findByActIdAndUserIdOrderByDate";
+
+		_methodParameterTypes158 = new String[] {
+				"java.lang.Long", "java.lang.Long"
+			};
+
+		_methodName159 = "findByActIdAndUserIdOrderById";
+
+		_methodParameterTypes159 = new String[] {
+				"java.lang.Long", "java.lang.Long"
+			};
+
+		_methodName160 = "addorUpdateP2pActivityCorrections";
+
+		_methodParameterTypes160 = new String[] {
 				"com.liferay.lms.model.P2pActivityCorrections"
 			};
 
-		_methodName157 = "asignP2PCorrectionsToUsers";
+		_methodName161 = "asignP2PCorrectionsToUsers";
 
-		_methodParameterTypes157 = new String[] { "long", "long", "java.util.List" };
+		_methodParameterTypes161 = new String[] { "long", "long", "java.util.List" };
 
-		_methodName158 = "asignCorrectionsToP2PActivities";
+		_methodName162 = "asignCorrectionsToP2PActivities";
 
-		_methodParameterTypes158 = new String[] {
+		_methodParameterTypes162 = new String[] {
 				"long", "long", "int", "java.util.List", "long"
 			};
 
-		_methodName159 = "getNumCorrectionsAsignToP2P";
+		_methodName163 = "getNumCorrectionsAsignToP2P";
 
-		_methodParameterTypes159 = new String[] { "long" };
+		_methodParameterTypes163 = new String[] { "long" };
 
-		_methodName160 = "getNumCorrectionsAsignToUser";
+		_methodName164 = "getNumCorrectionsAsignToUser";
 
-		_methodParameterTypes160 = new String[] { "long", "long" };
+		_methodParameterTypes164 = new String[] { "long", "long" };
 
-		_methodName161 = "getCorrectionsDoneByUserInP2PActivity";
+		_methodName165 = "getCorrectionsDoneByUserInP2PActivity";
 
-		_methodParameterTypes161 = new String[] { "long", "long" };
+		_methodParameterTypes165 = new String[] { "long", "long" };
 
-		_methodName162 = "getByUserId";
+		_methodName166 = "getByUserId";
 
-		_methodParameterTypes162 = new String[] { "long" };
+		_methodParameterTypes166 = new String[] { "long" };
 
-		_methodName163 = "areAllCorrectionsDoneByUserInP2PActivity";
+		_methodName167 = "areAllCorrectionsDoneByUserInP2PActivity";
 
-		_methodParameterTypes163 = new String[] { "long", "long" };
+		_methodParameterTypes167 = new String[] { "long", "long" };
 
-		_methodName164 = "getCorrectionByP2PActivity";
+		_methodName168 = "getCorrectionByP2PActivity";
 
-		_methodParameterTypes164 = new String[] { "long" };
+		_methodParameterTypes168 = new String[] { "long" };
 
-		_methodName165 = "getAVGCorrectionsResults";
+		_methodName169 = "getAVGCorrectionsResults";
 
-		_methodParameterTypes165 = new String[] { "long" };
+		_methodParameterTypes169 = new String[] { "long" };
 
-		_methodName166 = "isP2PAsignationDone";
+		_methodName170 = "isP2PAsignationDone";
 
-		_methodParameterTypes166 = new String[] { "long", "long" };
+		_methodParameterTypes170 = new String[] { "long", "long" };
 	}
 
 	public Object invokeMethod(String name, String[] parameterTypes,
@@ -284,65 +284,65 @@ public class P2pActivityCorrectionsLocalServiceClpInvoker {
 				((Boolean)arguments[1]).booleanValue());
 		}
 
-		if (_methodName144.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes144, parameterTypes)) {
+		if (_methodName148.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes148, parameterTypes)) {
 			return P2pActivityCorrectionsLocalServiceUtil.getBeanIdentifier();
 		}
 
-		if (_methodName145.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes145, parameterTypes)) {
+		if (_methodName149.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes149, parameterTypes)) {
 			P2pActivityCorrectionsLocalServiceUtil.setBeanIdentifier((java.lang.String)arguments[0]);
-		}
-
-		if (_methodName150.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes150, parameterTypes)) {
-			return P2pActivityCorrectionsLocalServiceUtil.findByP2pActivityIdAndUserId((java.lang.Long)arguments[0],
-				(java.lang.Long)arguments[1]);
-		}
-
-		if (_methodName151.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes151, parameterTypes)) {
-			return P2pActivityCorrectionsLocalServiceUtil.exitsCorP2p((java.lang.Long)arguments[0],
-				(java.lang.Long)arguments[1]);
-		}
-
-		if (_methodName152.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes152, parameterTypes)) {
-			return P2pActivityCorrectionsLocalServiceUtil.findByP2pActivityId((java.lang.Long)arguments[0]);
-		}
-
-		if (_methodName153.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes153, parameterTypes)) {
-			return P2pActivityCorrectionsLocalServiceUtil.findByActIdIdAndUserId((java.lang.Long)arguments[0],
-				(java.lang.Long)arguments[1]);
 		}
 
 		if (_methodName154.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes154, parameterTypes)) {
-			return P2pActivityCorrectionsLocalServiceUtil.findByActIdAndUserIdOrderByDate((java.lang.Long)arguments[0],
+			return P2pActivityCorrectionsLocalServiceUtil.findByP2pActivityIdAndUserId((java.lang.Long)arguments[0],
 				(java.lang.Long)arguments[1]);
 		}
 
 		if (_methodName155.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes155, parameterTypes)) {
-			return P2pActivityCorrectionsLocalServiceUtil.findByActIdAndUserIdOrderById((java.lang.Long)arguments[0],
+			return P2pActivityCorrectionsLocalServiceUtil.exitsCorP2p((java.lang.Long)arguments[0],
 				(java.lang.Long)arguments[1]);
 		}
 
 		if (_methodName156.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes156, parameterTypes)) {
-			return P2pActivityCorrectionsLocalServiceUtil.addorUpdateP2pActivityCorrections((com.liferay.lms.model.P2pActivityCorrections)arguments[0]);
+			return P2pActivityCorrectionsLocalServiceUtil.findByP2pActivityId((java.lang.Long)arguments[0]);
 		}
 
 		if (_methodName157.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes157, parameterTypes)) {
+			return P2pActivityCorrectionsLocalServiceUtil.findByActIdIdAndUserId((java.lang.Long)arguments[0],
+				(java.lang.Long)arguments[1]);
+		}
+
+		if (_methodName158.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes158, parameterTypes)) {
+			return P2pActivityCorrectionsLocalServiceUtil.findByActIdAndUserIdOrderByDate((java.lang.Long)arguments[0],
+				(java.lang.Long)arguments[1]);
+		}
+
+		if (_methodName159.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes159, parameterTypes)) {
+			return P2pActivityCorrectionsLocalServiceUtil.findByActIdAndUserIdOrderById((java.lang.Long)arguments[0],
+				(java.lang.Long)arguments[1]);
+		}
+
+		if (_methodName160.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes160, parameterTypes)) {
+			return P2pActivityCorrectionsLocalServiceUtil.addorUpdateP2pActivityCorrections((com.liferay.lms.model.P2pActivityCorrections)arguments[0]);
+		}
+
+		if (_methodName161.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes161, parameterTypes)) {
 			P2pActivityCorrectionsLocalServiceUtil.asignP2PCorrectionsToUsers(((Long)arguments[0]).longValue(),
 				((Long)arguments[1]).longValue(),
 				(java.util.List<com.liferay.portal.model.User>)arguments[2]);
 		}
 
-		if (_methodName158.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes158, parameterTypes)) {
+		if (_methodName162.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes162, parameterTypes)) {
 			P2pActivityCorrectionsLocalServiceUtil.asignCorrectionsToP2PActivities(((Long)arguments[0]).longValue(),
 				((Long)arguments[1]).longValue(),
 				((Integer)arguments[2]).intValue(),
@@ -350,46 +350,46 @@ public class P2pActivityCorrectionsLocalServiceClpInvoker {
 				((Long)arguments[4]).longValue());
 		}
 
-		if (_methodName159.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes159, parameterTypes)) {
-			return P2pActivityCorrectionsLocalServiceUtil.getNumCorrectionsAsignToP2P(((Long)arguments[0]).longValue());
-		}
-
-		if (_methodName160.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes160, parameterTypes)) {
-			return P2pActivityCorrectionsLocalServiceUtil.getNumCorrectionsAsignToUser(((Long)arguments[0]).longValue(),
-				((Long)arguments[1]).longValue());
-		}
-
-		if (_methodName161.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes161, parameterTypes)) {
-			return P2pActivityCorrectionsLocalServiceUtil.getCorrectionsDoneByUserInP2PActivity(((Long)arguments[0]).longValue(),
-				((Long)arguments[1]).longValue());
-		}
-
-		if (_methodName162.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes162, parameterTypes)) {
-			return P2pActivityCorrectionsLocalServiceUtil.getByUserId(((Long)arguments[0]).longValue());
-		}
-
 		if (_methodName163.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes163, parameterTypes)) {
-			return P2pActivityCorrectionsLocalServiceUtil.areAllCorrectionsDoneByUserInP2PActivity(((Long)arguments[0]).longValue(),
-				((Long)arguments[1]).longValue());
+			return P2pActivityCorrectionsLocalServiceUtil.getNumCorrectionsAsignToP2P(((Long)arguments[0]).longValue());
 		}
 
 		if (_methodName164.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes164, parameterTypes)) {
-			return P2pActivityCorrectionsLocalServiceUtil.getCorrectionByP2PActivity(((Long)arguments[0]).longValue());
+			return P2pActivityCorrectionsLocalServiceUtil.getNumCorrectionsAsignToUser(((Long)arguments[0]).longValue(),
+				((Long)arguments[1]).longValue());
 		}
 
 		if (_methodName165.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes165, parameterTypes)) {
-			return P2pActivityCorrectionsLocalServiceUtil.getAVGCorrectionsResults(((Long)arguments[0]).longValue());
+			return P2pActivityCorrectionsLocalServiceUtil.getCorrectionsDoneByUserInP2PActivity(((Long)arguments[0]).longValue(),
+				((Long)arguments[1]).longValue());
 		}
 
 		if (_methodName166.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes166, parameterTypes)) {
+			return P2pActivityCorrectionsLocalServiceUtil.getByUserId(((Long)arguments[0]).longValue());
+		}
+
+		if (_methodName167.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes167, parameterTypes)) {
+			return P2pActivityCorrectionsLocalServiceUtil.areAllCorrectionsDoneByUserInP2PActivity(((Long)arguments[0]).longValue(),
+				((Long)arguments[1]).longValue());
+		}
+
+		if (_methodName168.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes168, parameterTypes)) {
+			return P2pActivityCorrectionsLocalServiceUtil.getCorrectionByP2PActivity(((Long)arguments[0]).longValue());
+		}
+
+		if (_methodName169.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes169, parameterTypes)) {
+			return P2pActivityCorrectionsLocalServiceUtil.getAVGCorrectionsResults(((Long)arguments[0]).longValue());
+		}
+
+		if (_methodName170.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes170, parameterTypes)) {
 			return P2pActivityCorrectionsLocalServiceUtil.isP2PAsignationDone(((Long)arguments[0]).longValue(),
 				((Long)arguments[1]).longValue());
 		}
@@ -429,18 +429,10 @@ public class P2pActivityCorrectionsLocalServiceClpInvoker {
 	private String[] _methodParameterTypes14;
 	private String _methodName15;
 	private String[] _methodParameterTypes15;
-	private String _methodName144;
-	private String[] _methodParameterTypes144;
-	private String _methodName145;
-	private String[] _methodParameterTypes145;
-	private String _methodName150;
-	private String[] _methodParameterTypes150;
-	private String _methodName151;
-	private String[] _methodParameterTypes151;
-	private String _methodName152;
-	private String[] _methodParameterTypes152;
-	private String _methodName153;
-	private String[] _methodParameterTypes153;
+	private String _methodName148;
+	private String[] _methodParameterTypes148;
+	private String _methodName149;
+	private String[] _methodParameterTypes149;
 	private String _methodName154;
 	private String[] _methodParameterTypes154;
 	private String _methodName155;
@@ -467,4 +459,12 @@ public class P2pActivityCorrectionsLocalServiceClpInvoker {
 	private String[] _methodParameterTypes165;
 	private String _methodName166;
 	private String[] _methodParameterTypes166;
+	private String _methodName167;
+	private String[] _methodParameterTypes167;
+	private String _methodName168;
+	private String[] _methodParameterTypes168;
+	private String _methodName169;
+	private String[] _methodParameterTypes169;
+	private String _methodName170;
+	private String[] _methodParameterTypes170;
 }
