@@ -377,4 +377,8 @@ public interface LearningActivityResultLocalService extends BaseLocalService,
 
 	public java.lang.String translateResult(java.util.Locale locale,
 		double result, long groupId);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.lang.String getCalificationTypeSuffix(java.util.Locale locale,
+		double result, long groupId);
 }

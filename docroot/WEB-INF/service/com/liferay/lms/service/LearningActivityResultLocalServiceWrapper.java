@@ -482,6 +482,12 @@ public class LearningActivityResultLocalServiceWrapper
 			result, groupId);
 	}
 
+	public java.lang.String getCalificationTypeSuffix(java.util.Locale locale,
+		double result, long groupId) {
+		return _learningActivityResultLocalService.getCalificationTypeSuffix(locale,
+			result, groupId);
+	}
+
 	/**
 	 * @deprecated Renamed to {@link #getWrappedService}
 	 */

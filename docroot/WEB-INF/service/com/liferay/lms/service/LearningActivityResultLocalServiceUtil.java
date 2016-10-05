@@ -484,6 +484,11 @@ public class LearningActivityResultLocalServiceUtil {
 		return getService().translateResult(locale, result, groupId);
 	}
 
+	public static java.lang.String getCalificationTypeSuffix(
+		java.util.Locale locale, double result, long groupId) {
+		return getService().getCalificationTypeSuffix(locale, result, groupId);
+	}
+
 	public static void clearService() {
 		_service = null;
 	}

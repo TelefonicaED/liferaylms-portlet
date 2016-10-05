@@ -265,6 +265,12 @@ public class LearningActivityResultLocalServiceClp
 		_methodParameterTypes51 = new String[] {
 				"java.util.Locale", "double", "long"
 			};
+
+		_methodName52 = "getCalificationTypeSuffix";
+
+		_methodParameterTypes52 = new String[] {
+				"java.util.Locale", "double", "long"
+			};
 	}
 
 	public com.liferay.lms.model.LearningActivityResult addLearningActivityResult(
@@ -1780,6 +1786,36 @@ public class LearningActivityResultLocalServiceClp
 		return (java.lang.String)ClpSerializer.translateOutput(returnObj);
 	}
 
+	public java.lang.String getCalificationTypeSuffix(java.util.Locale locale,
+		double result, long groupId) {
+		Object returnObj = null;
+
+		try {
+			returnObj = _invokableLocalService.invokeMethod(_methodName52,
+					_methodParameterTypes52,
+					new Object[] {
+						ClpSerializer.translateInput(locale),
+						
+					result,
+						
+					groupId
+					});
+		}
+		catch (Throwable t) {
+			t = ClpSerializer.translateThrowable(t);
+
+			if (t instanceof RuntimeException) {
+				throw (RuntimeException)t;
+			}
+			else {
+				throw new RuntimeException(t.getClass().getName() +
+					" is not a valid exception");
+			}
+		}
+
+		return (java.lang.String)ClpSerializer.translateOutput(returnObj);
+	}
+
 	private InvokableLocalService _invokableLocalService;
 	private String _methodName0;
 	private String[] _methodParameterTypes0;
@@ -1883,4 +1919,6 @@ public class LearningActivityResultLocalServiceClp
 	private String[] _methodParameterTypes50;
 	private String _methodName51;
 	private String[] _methodParameterTypes51;
+	private String _methodName52;
+	private String[] _methodParameterTypes52;
 }

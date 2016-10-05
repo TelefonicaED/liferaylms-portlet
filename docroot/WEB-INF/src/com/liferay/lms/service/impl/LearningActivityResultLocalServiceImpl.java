@@ -1387,6 +1387,23 @@ public class LearningActivityResultLocalServiceImpl	extends LearningActivityResu
 		return translatedResult;
 	}
 	
+	
+	public String getCalificationTypeSuffix(Locale locale, double result, long groupId){
+		String suffix = "";
+		try {
+			Course curso = courseLocalService.getCourseByGroupCreatedId(groupId);
+			if(curso != null){
+				CalificationType ct = new CalificationTypeRegistry().getCalificationType(curso.getCalificationType());
+				suffix = ct.getSuffix();
+			}
+		} catch (SystemException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return suffix;
+	}
+	
+	
 	@Override
 	public LearningActivityResult deleteLearningActivityResult(LearningActivityResult lar) throws SystemException{
 		try {

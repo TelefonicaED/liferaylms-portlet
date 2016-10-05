@@ -266,9 +266,15 @@ public class LearningActivityResultLocalServiceClpInvoker {
 				"java.util.Locale", "double", "long"
 			};
 
-		_methodName183 = "deleteLearningActivityResult";
+		_methodName183 = "getCalificationTypeSuffix";
 
 		_methodParameterTypes183 = new String[] {
+				"java.util.Locale", "double", "long"
+			};
+
+		_methodName184 = "deleteLearningActivityResult";
+
+		_methodParameterTypes184 = new String[] {
 				"com.liferay.lms.model.LearningActivityResult"
 			};
 	}
@@ -582,6 +588,13 @@ public class LearningActivityResultLocalServiceClpInvoker {
 
 		if (_methodName183.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes183, parameterTypes)) {
+			return LearningActivityResultLocalServiceUtil.getCalificationTypeSuffix((java.util.Locale)arguments[0],
+				((Double)arguments[1]).doubleValue(),
+				((Long)arguments[2]).longValue());
+		}
+
+		if (_methodName184.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes184, parameterTypes)) {
 			return LearningActivityResultLocalServiceUtil.deleteLearningActivityResult((com.liferay.lms.model.LearningActivityResult)arguments[0]);
 		}
 
@@ -692,4 +705,6 @@ public class LearningActivityResultLocalServiceClpInvoker {
 	private String[] _methodParameterTypes182;
 	private String _methodName183;
 	private String[] _methodParameterTypes183;
+	private String _methodName184;
+	private String[] _methodParameterTypes184;
 }
