@@ -38,7 +38,7 @@ public class PercentCalificationType extends BaseCalificationType {
 	}
 	
 	@Override
-	public String translate(Locale locale, double result) {
+	public String translate(double result) {
 		DecimalFormat df = new DecimalFormat("##.#");
 		return df.format(result);
 	}

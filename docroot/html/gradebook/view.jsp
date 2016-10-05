@@ -197,7 +197,8 @@ if(theTeam!=null)
 						if(LearningActivityResultLocalServiceUtil.existsLearningActivityResult(learningActivity.getActId(), usuario.getUserId())){
 							status="started";
 							LearningActivityResult learningActivityResult = LearningActivityResultLocalServiceUtil.getByActIdAndUserId(learningActivity.getActId(), usuario.getUserId());
-							result = ""+learningActivityResult.getResult();
+							//result = ""+LearningActivityResultLocalServiceUtil.translateResult(themeDisplay.getLocale(), learningActivityResult.getResult(), learningActivity.getGroupId());
+							result = ""+learningActivityResult.getResult(learningActivity.getGroupId());
 							divisor = LearningActivityResultLocalServiceUtil.getCalificationTypeSuffix(themeDisplay.getLocale(), learningActivityResult.getResult(), learningActivity.getGroupId());
 							
 							if(learningActivityResult.getEndDate()!=null){

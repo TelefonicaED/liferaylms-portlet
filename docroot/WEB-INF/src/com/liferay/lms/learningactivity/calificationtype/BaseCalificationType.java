@@ -38,7 +38,7 @@ public abstract class BaseCalificationType implements CalificationType, Serializ
 	}
 	
 	@Override
-	public String translate(Locale locale, double result) {
+	public String translate(double result) {
 		return "";
 	}
 	
