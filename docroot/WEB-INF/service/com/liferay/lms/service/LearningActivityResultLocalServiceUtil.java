@@ -405,6 +405,21 @@ public class LearningActivityResultLocalServiceUtil {
 			courseGropupCreatedId, _students);
 	}
 
+	public static long countFinishedOnlyStudents(long actId, long companyId,
+		long courseGropupCreatedId) {
+		return getService()
+				   .countFinishedOnlyStudents(actId, companyId,
+			courseGropupCreatedId);
+	}
+
+	public static long countFinishedOnlyStudents(long actId, long companyId,
+		long courseGropupCreatedId,
+		java.util.List<com.liferay.portal.model.User> _students) {
+		return getService()
+				   .countFinishedOnlyStudents(actId, companyId,
+			courseGropupCreatedId, _students);
+	}
+
 	public static double triesPerUser(long actId)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService().triesPerUser(actId);

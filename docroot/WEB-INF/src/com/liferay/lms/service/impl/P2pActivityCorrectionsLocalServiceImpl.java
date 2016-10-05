@@ -285,8 +285,10 @@ public void asignCorrectionsToP2PActivities(long actId, long p2pActivityId,int n
 			return;
 		}
 	
-		for(P2pActivity activity : activityList){		
-	
+		//auditing
+		ServiceContext serviceContext = ServiceContextThreadLocal.getServiceContext();
+		
+		for(P2pActivity activity : activityList){	
 			long p2pActivityCorrectionsId = counterLocalService.increment(P2pActivityCorrections.class.getName());
 			P2pActivityCorrections p2p = p2pActivityCorrectionsPersistence.create(p2pActivityCorrectionsId);
 			p2p.setActId(actId);
@@ -296,8 +298,7 @@ public void asignCorrectionsToP2PActivities(long actId, long p2pActivityId,int n
 			p2p.setP2pActivityId(activity.getP2pActivityId());
 			p2pActivityCorrectionsPersistence.update(p2p, true);
 
-			//auditing
-			ServiceContext serviceContext = ServiceContextThreadLocal.getServiceContext();
+
 			if(serviceContext!=null){
 				AuditingLogFactory.audit(serviceContext.getCompanyId(), serviceContext.getScopeGroupId(), P2pActivityCorrections.class.getName(), 
 					p2pActivityCorrectionsId, serviceContext.getUserId(), AuditConstants.UPDATE, null);
@@ -338,7 +339,18 @@ public void asignCorrectionsToP2PActivities(long actId, long p2pActivityId,int n
 					String courseTitle = "";
 					String activityTitle = learn.getTitle(user.getLocale());
 					String moduleTitle =  module.getTitle(user.getLocale());
-					String portalUrl = PortalUtil.getPortalURL(company.getVirtualHostname(), PortalUtil.getPortalPort(), false);
+					
+					
+					// QUITAR EL PUERTO
+					String portalUrl = serviceContext.getPortalURL();
+					String[] urls = portalUrl.split(":");
+					portalUrl = urls[0];					
+					if(urls.length > 2){ // http:prueba.es:8080
+						portalUrl += urls[1];
+					}
+					log.debug("***portalUrl:"+portalUrl);
+					
+					//String portalUrl = PortalUtil.getPortalURL(company.getVirtualHostname(), PortalUtil.getPortalPort(), false);
 					String pathPublic = PortalUtil.getPathFriendlyURLPublic();
 					
 					if(course != null){

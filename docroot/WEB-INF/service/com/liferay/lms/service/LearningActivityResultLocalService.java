@@ -324,6 +324,13 @@ public interface LearningActivityResultLocalService extends BaseLocalService,
 		java.util.List<com.liferay.portal.model.User> _students)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
+	public long countFinishedOnlyStudents(long actId, long companyId,
+		long courseGropupCreatedId);
+
+	public long countFinishedOnlyStudents(long actId, long companyId,
+		long courseGropupCreatedId,
+		java.util.List<com.liferay.portal.model.User> _students);
+
 	public double triesPerUser(long actId)
 		throws com.liferay.portal.kernel.exception.SystemException;
 

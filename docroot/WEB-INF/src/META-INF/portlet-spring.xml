@@ -26,6 +26,7 @@
 	<bean id="com.liferay.lms.service.LearningActivityResultLocalService" class="com.liferay.lms.service.impl.LearningActivityResultLocalServiceImpl" />
 	<bean id="com.liferay.lms.service.LearningActivityResultService" class="com.liferay.lms.service.impl.LearningActivityResultServiceImpl" />
 	<bean id="com.liferay.lms.service.persistence.LearningActivityResultPersistence" class="com.liferay.lms.service.persistence.LearningActivityResultPersistenceImpl" parent="basePersistence" />
+	<bean id="com.liferay.lms.service.persistence.LearningActivityResultFinder" class="com.liferay.lms.service.persistence.LearningActivityResultFinderImpl" parent="basePersistence" />
 	<bean id="com.liferay.lms.service.LearningActivityTryLocalService" class="com.liferay.lms.service.impl.LearningActivityTryLocalServiceImpl" />
 	<bean id="com.liferay.lms.service.LearningActivityTryService" class="com.liferay.lms.service.impl.LearningActivityTryServiceImpl" />
 	<bean id="com.liferay.lms.service.persistence.LearningActivityTryPersistence" class="com.liferay.lms.service.persistence.LearningActivityTryPersistenceImpl" parent="basePersistence" />
@@ -48,6 +49,7 @@
 	<bean id="com.liferay.lms.service.persistence.SCORMContentPersistence" class="com.liferay.lms.service.persistence.SCORMContentPersistenceImpl" parent="basePersistence" />
 	<bean id="com.liferay.lms.service.SurveyResultLocalService" class="com.liferay.lms.service.impl.SurveyResultLocalServiceImpl" />
 	<bean id="com.liferay.lms.service.persistence.SurveyResultPersistence" class="com.liferay.lms.service.persistence.SurveyResultPersistenceImpl" parent="basePersistence" />
+	<bean id="com.liferay.lms.service.persistence.SurveyResultFinder" class="com.liferay.lms.service.persistence.SurveyResultFinderImpl" parent="basePersistence" />
 	<bean id="com.liferay.lms.service.TestAnswerLocalService" class="com.liferay.lms.service.impl.TestAnswerLocalServiceImpl" />
 	<bean id="com.liferay.lms.service.TestAnswerService" class="com.liferay.lms.service.impl.TestAnswerServiceImpl" />
 	<bean id="com.liferay.lms.service.persistence.TestAnswerPersistence" class="com.liferay.lms.service.persistence.TestAnswerPersistenceImpl" parent="basePersistence" />

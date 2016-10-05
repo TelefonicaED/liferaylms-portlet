@@ -68,10 +68,15 @@
 			String percent;
 			DecimalFormat df = new DecimalFormat("###.##");;
 			String texto;
-			long participants = LearningActivityResultLocalServiceUtil.countByActId(actId);
+			long participants = LearningActivityResultLocalServiceUtil.countFinishedOnlyStudents(actId, themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId()); //LearningActivityResultLocalServiceUtil.countByActId(actId);
 			Course course = CourseLocalServiceUtil.getCourseByGroupCreatedId(learningActivity.getGroupId());
 			long courseUsers = CourseLocalServiceUtil.getStudentsFromCourseCount(course.getCourseId());
-			double passPercent =  (participants/courseUsers)*100;
+			
+			System.out.println("PARTICIPANTES:"+participants);
+			System.out.println("COURSEUSERS:"+courseUsers);
+			
+			double passPercent =  ((double)participants/(double)courseUsers)*100;
+			System.out.println("passPercent:"+passPercent);
 			percent  = df.format(passPercent);
 			%>
 		
@@ -89,23 +94,23 @@
 		
 			<% 
 			for(TestQuestion question:questions){
+				total = SurveyResultLocalServiceUtil.countStudentsByQuestionId(question.getQuestionId(), themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId());
 			%>
 			<div class="question">
 				<div  class="questiontext">
 					<p><%=question.getText() %></p>
 				</div>
-				<span class="total color_tercero"><liferay-ui:message key="surveyactivity.stadistics.total" />: <%=SurveyResultLocalServiceUtil.getTotalAnswersByQuestionId(question.getQuestionId()) %></span>		
+				<span class="total color_tercero"><liferay-ui:message key="surveyactivity.stadistics.total" />: <%= total %></span>		
 				<%
 				
 				List<TestAnswer> testAnswers= TestAnswerLocalServiceUtil.getTestAnswersByQuestionId(question.getQuestionId());
 				if(testAnswers!=null && testAnswers.size()>0){
-					total = SurveyResultLocalServiceUtil.getTotalAnswersByQuestionId(question.getQuestionId());
-					for(TestAnswer answer:testAnswers)
-					{
+					for(TestAnswer answer:testAnswers){
 						textoAux = HtmlUtil.extractText(answer.getAnswer());
 						texto = textoAux.length() > 50 ? textoAux.substring(0,50)+"..." : textoAux;
-						percent = df.format(SurveyResultLocalServiceUtil.getPercentageByQuestionIdAndAnswerId(question.getQuestionId(), answer.getAnswerId(), total));
-						totalAnswer = SurveyResultLocalServiceUtil.getCountByQuestionIdAndAnswerId(question.getQuestionId(), answer.getAnswerId()); 
+						totalAnswer = SurveyResultLocalServiceUtil.countStudentsByQuestionIdAndAnswerId(question.getQuestionId(), answer.getAnswerId(), themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId());
+						//percent = df.format(SurveyResultLocalServiceUtil.getPercentageByQuestionIdAndAnswerId(question.getQuestionId(), answer.getAnswerId(), total));
+						percent = df.format(100*(double)totalAnswer/(double)total);
 					%>
 						<div class="answer">
 							<%=texto %>
@@ -218,8 +223,7 @@ function <portlet:namespace />downloadReport(url){
 						alert("Error en el readThreadState");
 					}
 				},
-				error: function(){
-					alert("ERROR::");
+				error: function(){					
 				}
 			});		
 		}	

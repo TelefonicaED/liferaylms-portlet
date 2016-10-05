@@ -19,6 +19,7 @@ import java.util.List;
 
 import com.liferay.lms.model.SurveyResult;
 import com.liferay.lms.service.base.SurveyResultLocalServiceBaseImpl;
+import com.liferay.lms.service.persistence.SurveyResultFinderUtil;
 import com.liferay.lms.service.persistence.SurveyResultUtil;
 import com.liferay.portal.kernel.exception.SystemException;
 
@@ -107,7 +108,7 @@ public class SurveyResultLocalServiceImpl
 	}
 	
 	/**
-	 * Metodo depreciado, se utiliza una combinación de los dos anteriores, para evitar consultas a base de datos innecesarias dentro de bucles.
+	 * Metodo depreciado, se utiliza una combinaciï¿½n de los dos anteriores, para evitar consultas a base de datos innecesarias dentro de bucles.
 	 * @deprecated
 	 * @param questionId
 	 * @param answerId
@@ -144,5 +145,13 @@ public class SurveyResultLocalServiceImpl
 		}
 
 		return res;
+	}
+	
+	public long countStudentsByQuestionId(long questionId, long companyId, long courseGropupCreatedId){
+		return SurveyResultFinderUtil.countStudentsByQuestionId(questionId, companyId, courseGropupCreatedId);
+	}
+	
+	public long countStudentsByQuestionIdAndAnswerId(long questionId, long answerId, long companyId, long courseGropupCreatedId){
+		return SurveyResultFinderUtil.countStudentsByQuestionIdAndAnswerId(questionId, answerId, companyId, courseGropupCreatedId);
 	}
 }

@@ -323,6 +323,20 @@ public class SurveyResultLocalServiceUtil {
 		return getService().getTotalAnswersByQuestionId(questionId);
 	}
 
+	public static long countStudentsByQuestionId(long questionId,
+		long companyId, long courseGropupCreatedId) {
+		return getService()
+				   .countStudentsByQuestionId(questionId, companyId,
+			courseGropupCreatedId);
+	}
+
+	public static long countStudentsByQuestionIdAndAnswerId(long questionId,
+		long answerId, long companyId, long courseGropupCreatedId) {
+		return getService()
+				   .countStudentsByQuestionIdAndAnswerId(questionId, answerId,
+			companyId, courseGropupCreatedId);
+	}
+
 	public static void clearService() {
 		_service = null;
 	}
