@@ -55,7 +55,7 @@ else
 	<liferay-ui:search-container-row className="com.liferay.lms.model.LearningActivity" keyProperty="actId" modelVar="learningActivity">
 	<%
 		String requiredname="required_"+learningActivity.getActId();
-		String weigthname="weight_"+learningActivity.getActId();
+		String weightname="weight_"+learningActivity.getActId();
 		String weight="";
 		boolean requiredChecked=false;
 		if(weights.containsKey(learningActivity.getActId()))
@@ -71,7 +71,7 @@ else
 				<%=learningActivity.getTitle(themeDisplay.getLocale()) %>
 				</liferay-ui:search-container-column-text>
 				<liferay-ui:search-container-column-text cssClass="number-column" name = "ponderated.weight">
-				<aui:input size="5" name="<%=weigthname %>" value="<%=weight %>" label="">
+				<aui:input size="5" name="<%=weightname %>" value="<%=weight %>" label="">
 				 <aui:validator name="digits"></aui:validator>
 				</aui:input>
 				</liferay-ui:search-container-column-text>

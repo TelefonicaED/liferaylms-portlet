@@ -33,7 +33,7 @@
 	request.setAttribute("backUrl", backUrl.toString());
 	String orderByCol =  (String)request.getAttribute("orderByCol");
 	if(orderByCol==null)
-		orderByCol="weigth";
+		orderByCol="weight";
 	String orderByType = (String)request.getAttribute("orderByType");
 	if(orderByType==null)
 		orderByType="asc";
