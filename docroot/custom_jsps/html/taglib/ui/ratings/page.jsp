@@ -143,9 +143,7 @@ if (ratingsEntry != null) {
 			</c:when>
 		</c:choose>
 	</div>
-	<%
-		
-		System.out.println("FORMATTED AVERAGE SCORE "+df.format(ratingsStats.getAverageScore()));	
+	<%	
 		double formattedAverageScore = Double.parseDouble(df.format(ratingsStats.getAverageScore()).replaceAll(",", "."));
 	
 		
