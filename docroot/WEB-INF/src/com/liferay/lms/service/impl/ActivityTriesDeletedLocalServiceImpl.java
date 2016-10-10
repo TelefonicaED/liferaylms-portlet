@@ -20,10 +20,10 @@ import java.util.List;
 
 import com.liferay.counter.service.CounterLocalServiceUtil;
 import com.liferay.lms.model.ActivityTriesDeleted;
-import com.liferay.lms.model.impl.ActivityTriesDeletedImpl;
 import com.liferay.lms.service.ActivityTriesDeletedLocalServiceUtil;
 import com.liferay.lms.service.base.ActivityTriesDeletedLocalServiceBaseImpl;
 import com.liferay.lms.service.persistence.ActivityTriesDeletedUtil;
+import com.liferay.lms.util.LmsConstant;
 import com.liferay.portal.kernel.exception.SystemException;
 
 /**
@@ -64,7 +64,7 @@ public class ActivityTriesDeletedLocalServiceImpl
 	
 	public int countByGroupId(long groupId){
 		try {
-			return ActivityTriesDeletedUtil.countAll();
+			return ActivityTriesDeletedUtil.countByGroupId(groupId);
 		} catch (SystemException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -89,7 +89,7 @@ public class ActivityTriesDeletedLocalServiceImpl
 			activityTriesDeleted = ActivityTriesDeletedUtil.create(CounterLocalServiceUtil.increment(ActivityTriesDeleted.class.getName()));
 			activityTriesDeleted.setActId(actId);
 			activityTriesDeleted.setGroupId(groupId);
-			activityTriesDeleted.setStatus(ActivityTriesDeletedImpl.STATUS_NOT_STARTED);
+			activityTriesDeleted.setStatus(LmsConstant.STATUS_NOT_STARTED);
 			activityTriesDeleted.setStartDate(new Date());
 			activityTriesDeleted.setUserId(userId);
 			ActivityTriesDeletedLocalServiceUtil.addActivityTriesDeleted(activityTriesDeleted);
@@ -99,5 +99,17 @@ public class ActivityTriesDeletedLocalServiceImpl
 		}
 		
 		return activityTriesDeleted;
+	}
+	
+	public ActivityTriesDeleted updateFinish(ActivityTriesDeleted activityTriesDeleted){
+		activityTriesDeleted.setStatus(LmsConstant.STATUS_FINISH);
+		activityTriesDeleted.setEndDate(new Date());
+		try {
+			return ActivityTriesDeletedLocalServiceUtil.updateActivityTriesDeleted(activityTriesDeleted);
+		} catch (SystemException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}
 	}
 }

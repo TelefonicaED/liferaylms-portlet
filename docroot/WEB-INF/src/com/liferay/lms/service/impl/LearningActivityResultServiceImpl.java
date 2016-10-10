@@ -146,7 +146,5 @@ public class LearningActivityResultServiceImpl	extends LearningActivityResultSer
         learningActivityTry.setEndDate(new Date());
         return learningActivityTryLocalService.updateLearningActivityTry(learningActivityTry, tryResultData, imsmanifest);*/
 
-        
-		
 	}
 }

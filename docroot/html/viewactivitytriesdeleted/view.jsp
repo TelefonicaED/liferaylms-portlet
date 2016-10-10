@@ -20,11 +20,11 @@
 			<liferay-ui:search-container-column-text name="user" property="user.screenName" />
 			
 			<liferay-ui:search-container-column-text name="start-date" >
-				<fmt:formatDate type="both" dateStyle="short" timeStyle="short" value="${activityTriesDeleted.startDate}" />
+				<fmt:formatDate type="both" value="${activityTriesDeleted.startDate}" />
 			</liferay-ui:search-container-column-text>
 			
 			<liferay-ui:search-container-column-text name="end-date" >
-				<fmt:formatDate type="both" dateStyle="short" timeStyle="short" value="${activityTriesDeleted.endDate}" />
+				<fmt:formatDate type="both" value="${activityTriesDeleted.endDate}" />
 			</liferay-ui:search-container-column-text>
 			
 			<liferay-ui:search-container-column-text name="status" >

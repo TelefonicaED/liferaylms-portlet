@@ -140,7 +140,7 @@ if(learnact!=null)
 	actId=learnact.getActId();
 	description=learnact.getDescription(themeDisplay.getLocale());
 	
-	if(!learnact.isNullStartDate() && learnact.getTypeId() != 8){
+	if(!learnact.isNullStartDate()){
 		Date startDate = learnact.getStartdate();
 		startDay=Integer.parseInt(formatDay.format(startDate));
 		startMonth=Integer.parseInt(formatMonth.format(startDate))-1;
@@ -149,7 +149,7 @@ if(learnact!=null)
 		startMin=Integer.parseInt(formatMin.format(startDate));
 	}
 	
-	if(!learnact.isNullEndDate() && learnact.getTypeId() != 8){
+	if(!learnact.isNullEndDate()){
 		Date endDate = learnact.getEnddate();
 		endDay=Integer.parseInt(formatDay.format(endDate));
 		endMonth=Integer.parseInt(formatMonth.format(endDate))-1;

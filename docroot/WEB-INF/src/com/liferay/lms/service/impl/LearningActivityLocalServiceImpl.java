@@ -429,11 +429,6 @@ public class LearningActivityLocalServiceImpl extends LearningActivityLocalServi
 		learningActivityPersistence.update(larn, true);
 		try
 		{
-			
-			
-			
-			
-
 			assetEntryLocalService.updateEntry(
 					userId, larn.getGroupId(), LearningActivity.class.getName(),
 					larn.getActId(), larn.getUuid(),larn.getTypeId(), serviceContext.getAssetCategoryIds(),
