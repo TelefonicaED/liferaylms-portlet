@@ -32,4 +32,5 @@ public interface LearningActivityTry extends LearningActivityTryModel,
 	 *
 	 * Never modify this interface directly. Add methods to {@link com.liferay.lms.model.impl.LearningActivityTryImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
+	public java.lang.String getResult(long groupId);
 }

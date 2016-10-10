@@ -405,6 +405,21 @@ public class LearningActivityResultLocalServiceUtil {
 			courseGropupCreatedId, _students);
 	}
 
+	public static long countFinishedOnlyStudents(long actId, long companyId,
+		long courseGropupCreatedId) {
+		return getService()
+				   .countFinishedOnlyStudents(actId, companyId,
+			courseGropupCreatedId);
+	}
+
+	public static long countFinishedOnlyStudents(long actId, long companyId,
+		long courseGropupCreatedId,
+		java.util.List<com.liferay.portal.model.User> _students) {
+		return getService()
+				   .countFinishedOnlyStudents(actId, companyId,
+			courseGropupCreatedId, _students);
+	}
+
 	public static double triesPerUser(long actId)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService().triesPerUser(actId);
@@ -482,6 +497,11 @@ public class LearningActivityResultLocalServiceUtil {
 	public static java.lang.String translateResult(java.util.Locale locale,
 		double result, long groupId) {
 		return getService().translateResult(locale, result, groupId);
+	}
+
+	public static java.lang.String getCalificationTypeSuffix(
+		java.util.Locale locale, double result, long groupId) {
+		return getService().getCalificationTypeSuffix(locale, result, groupId);
 	}
 
 	public static void clearService() {

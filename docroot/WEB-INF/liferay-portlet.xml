@@ -209,7 +209,6 @@
 	   	<custom-attributes-display>com.liferay.lms.expando.CourseCustomAttributesDisplay</custom-attributes-display>
 		<instanceable>false</instanceable>
 		<header-portlet-css>/css/main.css</header-portlet-css>
-		<header-portlet-javascript>/js/jquery.min.js</header-portlet-javascript>
 		<footer-portlet-javascript>/js/main.js</footer-portlet-javascript>
 		<css-class-wrapper>courseadmin-portlet</css-class-wrapper>
 	</portlet>

@@ -109,12 +109,35 @@ public class CalificationTypeClp implements CalificationType {
 		return ((String)returnObj);
 	}
 	
-	public String translate(Locale locale, double result){
+	
+	public String getSuffix(){
 		Object returnObj = null;
 
 		try {
-			MethodKey translateMethod = new MethodKey(clp.getClassName(), "translate", Locale.class, double.class); 
-			returnObj = clp.invoke(new MethodHandler(translateMethod, locale, result));
+			MethodKey getSuffixMethod = new MethodKey(clp.getClassName(), "getSuffix"); 
+			returnObj = clp.invoke(new MethodHandler(getSuffixMethod));
+		}
+		catch (Throwable t) {
+			t = ClpSerializer.translateThrowable(t);
+
+			if (t instanceof RuntimeException) {
+				throw (RuntimeException)t;
+			}
+			else {
+				throw new RuntimeException(t.getClass().getName() +
+					" is not a valid exception");
+			}
+		}
+
+		return ((String)returnObj);
+	}
+	
+	public String translate(double result){
+		Object returnObj = null;
+
+		try {
+			MethodKey translateMethod = new MethodKey(clp.getClassName(), "translate", double.class); 
+			returnObj = clp.invoke(new MethodHandler(translateMethod, result));
 		}
 		catch (Throwable t) {
 			t = ClpSerializer.translateThrowable(t);

@@ -236,6 +236,10 @@ public class LearningActivityResultClp extends BaseModelImpl<LearningActivityRes
 		_passed = passed;
 	}
 
+	public java.lang.String getResult(long groupId) {
+		throw new UnsupportedOperationException();
+	}
+
 	public BaseModel<?> getLearningActivityResultRemoteModel() {
 		return _learningActivityResultRemoteModel;
 	}

@@ -32,4 +32,5 @@ public interface LearningActivityResult extends LearningActivityResultModel,
 	 *
 	 * Never modify this interface directly. Add methods to {@link com.liferay.lms.model.impl.LearningActivityResultImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
+	public java.lang.String getResult(long groupId);
 }

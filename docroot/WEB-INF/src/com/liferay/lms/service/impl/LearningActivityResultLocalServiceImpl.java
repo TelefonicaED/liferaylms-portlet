@@ -51,6 +51,8 @@ import com.liferay.lms.service.LearningActivityTryLocalServiceUtil;
 import com.liferay.lms.service.ModuleResultLocalServiceUtil;
 import com.liferay.lms.service.SCORMContentLocalServiceUtil;
 import com.liferay.lms.service.base.LearningActivityResultLocalServiceBaseImpl;
+import com.liferay.lms.service.persistence.LearningActivityResultFinder;
+import com.liferay.lms.service.persistence.LearningActivityResultFinderUtil;
 import com.liferay.lms.service.persistence.LearningActivityResultUtil;
 import com.liferay.lms.service.persistence.LearningActivityUtil;
 import com.liferay.portal.kernel.bean.PortletBeanLocatorUtil;
@@ -1099,10 +1101,12 @@ public class LearningActivityResultLocalServiceImpl	extends LearningActivityResu
 		return countStartedOnlyStudents(actId, companyId, courseGropupCreatedId, null);
 	}
 
-	public long countStartedOnlyStudents(long actId, long companyId, long courseGropupCreatedId, List<User> _students) throws SystemException
-	{
+	public long countStartedOnlyStudents(long actId, long companyId, long courseGropupCreatedId, List<User> _students) throws SystemException{
+		
+		return LearningActivityResultFinderUtil.countStartedOnlyStudents(actId, companyId, courseGropupCreatedId, _students);
+		/*
 		long res = 0;
-
+		
 		try {
 			List<User> students = null;
 			// Se prepara el metodo para recibir un Listado de estudiantes especificos,, por ejemplo que pertenezcan a alguna organizacion. Sino, se trabaja con todos los estudiantes del curso.
@@ -1136,12 +1140,22 @@ public class LearningActivityResultLocalServiceImpl	extends LearningActivityResu
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
-		return res;
+		*/
+
 
 
 		//return learningActivityResultPersistence.countByac(actId);
 	}
 
+	public long countFinishedOnlyStudents(long actId, long companyId, long courseGropupCreatedId){
+		return LearningActivityResultFinderUtil.countFinishedOnlyStudents(actId, companyId, courseGropupCreatedId, null);
+	}
+	
+	public long countFinishedOnlyStudents(long actId, long companyId, long courseGropupCreatedId, List<User> _students){
+		return LearningActivityResultFinderUtil.countFinishedOnlyStudents(actId, companyId, courseGropupCreatedId, _students);
+	}
+	
+	
 	public double triesPerUser(long actId) throws SystemException
 	{
 		long tries=learningActivityTryPersistence.countByact(actId);
@@ -1378,7 +1392,7 @@ public class LearningActivityResultLocalServiceImpl	extends LearningActivityResu
 			Course curso = courseLocalService.getCourseByGroupCreatedId(groupId);
 			if(curso != null){
 				CalificationType ct = new CalificationTypeRegistry().getCalificationType(curso.getCalificationType());
-				translatedResult = ct.translate(locale, result);
+				translatedResult = ct.translate(result);
 			}
 		} catch (SystemException e) {
 			// TODO Auto-generated catch block
@@ -1386,6 +1400,23 @@ public class LearningActivityResultLocalServiceImpl	extends LearningActivityResu
 		}
 		return translatedResult;
 	}
+	
+	
+	public String getCalificationTypeSuffix(Locale locale, double result, long groupId){
+		String suffix = "";
+		try {
+			Course curso = courseLocalService.getCourseByGroupCreatedId(groupId);
+			if(curso != null){
+				CalificationType ct = new CalificationTypeRegistry().getCalificationType(curso.getCalificationType());
+				suffix = ct.getSuffix();
+			}
+		} catch (SystemException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return suffix;
+	}
+	
 	
 	@Override
 	public LearningActivityResult deleteLearningActivityResult(LearningActivityResult lar) throws SystemException{

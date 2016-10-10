@@ -414,6 +414,10 @@ public class LearningActivityTryWrapper implements LearningActivityTry,
 		_learningActivityTry.persist();
 	}
 
+	public java.lang.String getResult(long groupId) {
+		return _learningActivityTry.getResult(groupId);
+	}
+
 	/**
 	 * @deprecated Renamed to {@link #getWrappedModel}
 	 */

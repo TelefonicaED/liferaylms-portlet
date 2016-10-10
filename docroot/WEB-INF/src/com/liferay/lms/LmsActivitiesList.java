@@ -211,6 +211,7 @@ public class LmsActivitiesList extends MVCPortlet {
 		ThemeDisplay themeDisplay = (ThemeDisplay) uploadRequest.getAttribute(WebKeys.THEME_DISPLAY);
 		PermissionChecker permissionChecker=themeDisplay.getPermissionChecker();
 		String redirect = ParamUtil.getString(uploadRequest, "redirect");
+		log.debug("--- VALUE OF REDIRECT " + redirect);
 		if(Validator.isNull(redirect)) {
 			for(Map.Entry<String, String[]> parameter: (Set<Map.Entry<String,  String[]>>) uploadRequest.getParameterMap().entrySet()){
 				if(parameter.getValue()!=null) {
@@ -340,10 +341,12 @@ public class LmsActivitiesList extends MVCPortlet {
 		
 		
 		if (actId == 0){
-
 			if(permissionChecker.hasPermission(themeDisplay.getScopeGroupId(),Module.class.getName(), moduleId,"ADD_LACT")){
 				larn =LearningActivityLocalServiceUtil.addLearningActivity(
 						"", "", ahora, startDate, stopDate, type, tries, passpuntuation, moduleId, "", feedbackCorrect, feedbackNoCorrect, serviceContext);
+				if(log.isDebugEnabled())log.debug("----- Adding new activity: "+larn.getActId());
+				actionResponse.setRenderParameter("resId", String.valueOf(larn.getActId()));
+				uploadRequest.setAttribute("resId", larn.getActId());
 			}
 			
 			long teamId =ParamUtil.get(uploadRequest, "team", 0);

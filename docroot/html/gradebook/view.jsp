@@ -193,10 +193,13 @@ if(theTeam!=null)
 					for(LearningActivity learningActivity: activities){
 						String result= "-";
 						String status="not-started";
+						String divisor = "";
 						if(LearningActivityResultLocalServiceUtil.existsLearningActivityResult(learningActivity.getActId(), usuario.getUserId())){
 							status="started";
 							LearningActivityResult learningActivityResult = LearningActivityResultLocalServiceUtil.getByActIdAndUserId(learningActivity.getActId(), usuario.getUserId());
-							result = ""+learningActivityResult.getResult();
+							//result = ""+LearningActivityResultLocalServiceUtil.translateResult(themeDisplay.getLocale(), learningActivityResult.getResult(), learningActivity.getGroupId());
+							result = ""+learningActivityResult.getResult(learningActivity.getGroupId());
+							divisor = LearningActivityResultLocalServiceUtil.getCalificationTypeSuffix(themeDisplay.getLocale(), learningActivityResult.getResult(), learningActivity.getGroupId());
 							
 							if(learningActivityResult.getEndDate()!=null){
 								status="not-passed"	;
@@ -311,13 +314,14 @@ if(theTeam!=null)
 						</script>
 						<liferay-ui:search-container-column-text cssClass="number-column" name = "<%=learningActivity.getTitle(themeDisplay.getLocale()) %>" align="center">
 							<%
+							
+							
 							String resultValue = new String();
+							
 							if(result.trim().equalsIgnoreCase("-")){
 								resultValue = result;
 							}else{
-								resultValue = result + "/100" ;
-								
-								
+								resultValue = result + divisor ;
 							} 
 							
 							%>

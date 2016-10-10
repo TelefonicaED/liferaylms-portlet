@@ -49,7 +49,6 @@ import com.liferay.portal.kernel.servlet.ServletResponseUtil;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.theme.ThemeDisplay;
@@ -239,13 +238,17 @@ public class UserProgress extends MVCPortlet {
             	} else {
             		time.append(LanguageUtil.get(themeDisplay.getLocale(), "userprogress.export.pdf.status.elapsed"));
             	}
-				
+            	long calificationType =    CourseLocalServiceUtil.getCourseByGroupCreatedId(themeDisplay.getScopeGroupId()).getCalificationType();
+				String divisor = "/100";
+				if(calificationType!=0){
+					divisor="/10";
+				}	
             	// Titulo
 				addCellTable(activity.getTitle(themeDisplay.getLocale()), fontNormal, color, table);
 				// Estado
 				addCellTable(LanguageUtil.get(themeDisplay.getLocale(), status.toString()) , fontNormal, color, table);
 				// Resultado
-            	addCellTable((score.trim().equalsIgnoreCase("-")) ? score:  score + "/100", fontNormal, color, table);
+            	addCellTable((score.trim().equalsIgnoreCase("-")) ? score:  score + divisor, fontNormal, color, table);
             	// Tiempo Restante
             	addCellTable(time.toString(), fontNormal, color, table);
 

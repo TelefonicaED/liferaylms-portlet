@@ -232,6 +232,10 @@ public class LearningActivityTryClp extends BaseModelImpl<LearningActivityTry>
 		_comments = comments;
 	}
 
+	public java.lang.String getResult(long groupId) {
+		throw new UnsupportedOperationException();
+	}
+
 	public BaseModel<?> getLearningActivityTryRemoteModel() {
 		return _learningActivityTryRemoteModel;
 	}

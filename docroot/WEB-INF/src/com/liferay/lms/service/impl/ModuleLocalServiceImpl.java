@@ -32,8 +32,10 @@ import com.liferay.lms.service.CourseResultLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityTryLocalServiceUtil;
 import com.liferay.lms.service.ModuleLocalServiceUtil;
+import com.liferay.lms.service.ModuleServiceUtil;
 import com.liferay.lms.service.ScheduleLocalServiceUtil;
 import com.liferay.lms.service.base.ModuleLocalServiceBaseImpl;
+import com.liferay.lms.service.persistence.ModuleUtil;
 import com.liferay.portal.kernel.bean.PortletBeanLocatorUtil;
 import com.liferay.portal.kernel.dao.orm.Criterion;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
@@ -117,6 +119,7 @@ public class ModuleLocalServiceImpl extends ModuleLocalServiceBaseImpl {
 		return list.get(0);
 	}
 
+	@Deprecated
 	public int countInGroup(long groupId) throws SystemException{
 		return modulePersistence.countByGroupId(groupId);
 	}
@@ -288,6 +291,7 @@ public class ModuleLocalServiceImpl extends ModuleLocalServiceBaseImpl {
 	    fileobj.setDescription(validmodule.getDescription());
 	    fileobj.setOrdern(fileobj.getModuleId());
 	    fileobj.setIcon(validmodule.getIcon());
+	    fileobj.setPrecedence(validmodule.getPrecedence());
 	    try {
 			resourceLocalService.addResources(
 					validmodule.getCompanyId(), validmodule.getGroupId(), validmodule.getUserId(),
@@ -482,7 +486,7 @@ public class ModuleLocalServiceImpl extends ModuleLocalServiceBaseImpl {
 	}
 	public long countByGroupId(long groupId) throws SystemException
 	{
-		return modulePersistence.countByGroupId(groupId);
+		return ModuleUtil.countByGroupId(groupId);
 	}
 	public long usersStarted(long moduleId) throws SystemException
 	{

@@ -76,7 +76,9 @@ Course coursetmp = CourseLocalServiceUtil.getCourseByGroupCreatedId(groupId);
 		<%
 	}
 	%>
-	<%if((permissionChecker.hasPermission(groupId, name, primKey, ActionKeys.DELETE))&&
+	<%
+	long modulesInCourse = ModuleLocalServiceUtil.countByGroupId(groupId);
+	if((permissionChecker.hasPermission(groupId, name, primKey, ActionKeys.DELETE))&& modulesInCourse > 1 &&
 		 (LearningActivityLocalServiceUtil.dynamicQueryCount(DynamicQueryFactoryUtil.forClass(LearningActivity.class).
 			add(PropertyFactoryUtil.forName("moduleId").eq(theModule.getModuleId())))==0))
 	{

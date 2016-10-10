@@ -30,8 +30,14 @@ public class CeroToTenCalificationType extends BaseCalificationType{
 		return "cerototen_ct.description";
 	}
 
+	
 	@Override
-	public String translate(Locale locale, double result) {
+	public String getSuffix() {
+		return "/10";
+	}
+	
+	@Override
+	public String translate(double result) {
 		DecimalFormat df = new DecimalFormat("##.#");
 		return df.format(result/10);
 	}
