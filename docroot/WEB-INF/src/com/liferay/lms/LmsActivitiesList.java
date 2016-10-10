@@ -39,6 +39,7 @@ import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.model.Module;
 import com.liferay.lms.model.P2pActivity;
 import com.liferay.lms.model.P2pActivityCorrections;
+import com.liferay.lms.service.ActivityTriesDeletedLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityServiceUtil;
 import com.liferay.lms.service.LearningActivityTryLocalServiceUtil;
@@ -54,6 +55,7 @@ import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.messaging.Message;
+import com.liferay.portal.kernel.messaging.MessageBusException;
 import com.liferay.portal.kernel.messaging.MessageBusUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
@@ -519,9 +521,10 @@ public class LmsActivitiesList extends MVCPortlet {
 					ModuleLocalServiceUtil.deleteModule(moduleId);
 					if(moduleId==renderModule)
 					{
+						
+						System.out.println("Eliminamos los parámetros");
 						actionResponse.removePublicRenderParameter("moduleId");
 						actionResponse.removePublicRenderParameter("actId");	
-	
 					}
 				}
 				else
@@ -942,9 +945,11 @@ public class LmsActivitiesList extends MVCPortlet {
 			Message message=new Message();
 			message.put("learningActivity",la);
 			message.put("userc",themeDisplay.getUser());
+			message.put("activityTriesDeleted", ActivityTriesDeletedLocalServiceUtil.addActivityTriesDeleted(la.getGroupId(), la.getActId(), themeDisplay.getUserId()));
+			message.put("onlyNotPassed", true);
 			message.setResponseId("2222");
 
-			MessageBusUtil.sendSynchronousMessage("liferay/lms/cleanTriesNotPassed", message);
+			MessageBusUtil.sendMessage("liferay/lms/cleanTries", message);
 		}
 		
 
@@ -952,20 +957,31 @@ public class LmsActivitiesList extends MVCPortlet {
 		actionResponse.setRenderParameter("califications", String.valueOf(true));
 	}
 	
-	public void deleteAllTries(ActionRequest actionRequest, ActionResponse actionResponse) throws Exception {
+	public void deleteAllTries(ActionRequest actionRequest, ActionResponse actionResponse) {
 		long actId = ParamUtil.getInteger(actionRequest, "resId");
 		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(WebKeys.THEME_DISPLAY);    
 		
 		if(log.isDebugEnabled())log.debug(actId); 
 
-		LearningActivity la = LearningActivityLocalServiceUtil.getLearningActivity(actId);
+		LearningActivity la = null;
+		try {
+			la = LearningActivityLocalServiceUtil.getLearningActivity(actId);
+		} catch (PortalException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SystemException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		if(la!=null){
 			Message message=new Message();
 			message.put("learningActivity",la);
 			message.put("userc",themeDisplay.getUser());
+			message.put("activityTriesDeleted", ActivityTriesDeletedLocalServiceUtil.addActivityTriesDeleted(la.getGroupId(), la.getActId(), themeDisplay.getUserId()));
+			message.put("onlyNotPassed", false);
 			message.setResponseId("2222");
 
-			MessageBusUtil.sendSynchronousMessage("liferay/lms/cleanAllTries", message);
+			MessageBusUtil.sendMessage("liferay/lms/cleanTries", message);
 		}
 		
 

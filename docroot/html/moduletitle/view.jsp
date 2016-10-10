@@ -25,12 +25,13 @@
 		preferences = renderRequest.getPreferences();
 
 	boolean numerateModules = (preferences.getValue("numerateModules", "false")).compareTo("true") == 0;
-	
+
 	long moduleId=ParamUtil.getLong(request,"moduleId",0);
 	long currentModuleId=0;
 	long actId=ParamUtil.getLong(request,"actId",0);
 	long themeId=ParamUtil.getLong(request,"themeId");
 	boolean actionEditing=ParamUtil.getBoolean(request,"actionEditing",false);
+	System.out.println("moduleId: " + moduleId);
 	Module theModule=null;
 	if(moduleId!=0)
 	{
@@ -38,6 +39,7 @@
 	}
 	else
 	{
+		System.out.println("actId: " + actId);
 		if(actId!=0)
 		{
 			LearningActivity larn=LearningActivityLocalServiceUtil.getLearningActivity(actId);
@@ -46,6 +48,7 @@
 		else
 		{
 			List<Module> modules=(List<Module>)ModuleLocalServiceUtil.findAllInGroup(themeDisplay.getScopeGroupId());
+			System.out.println("modules: " + modules.size());
 			if(modules.size()>0)
 			{
 				theModule=modules.get(0);

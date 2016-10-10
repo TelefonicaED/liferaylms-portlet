@@ -16,6 +16,7 @@ package com.liferay.lms.model.impl;
 
 import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.service.LearningActivityLocalServiceUtil;
+import com.liferay.lms.util.LmsConstant;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.model.User;
@@ -36,10 +37,6 @@ public class ActivityTriesDeletedImpl extends ActivityTriesDeletedBaseImpl {
 	 *
 	 * Never reference this class directly. All methods that expect a activity tries deleted model instance should use the {@link com.liferay.lms.model.ActivityTriesDeleted} interface instead.
 	 */
-	
-	public final static int STATUS_NOT_STARTED = 0;
-	public final static int STATUS_IN_PROGRESS = 1;
-	public final static int STATUS_FINISH = 2;
 	
 	
 	public ActivityTriesDeletedImpl() {
@@ -72,11 +69,11 @@ public class ActivityTriesDeletedImpl extends ActivityTriesDeletedBaseImpl {
 	}
 	
 	public String getStatusProperties(){
-		if(STATUS_NOT_STARTED == getStatus()){
+		if(LmsConstant.STATUS_NOT_STARTED == getStatus()){
 			return "activity-tries-deleted.not-started";
-		}else if(STATUS_IN_PROGRESS == getStatus()){
+		}else if(LmsConstant.STATUS_IN_PROGRESS == getStatus()){
 			return "activity-tries-deleted.in-progress";
-		}else if(STATUS_FINISH == getStatus()){
+		}else if(LmsConstant.STATUS_FINISH == getStatus()){
 			return "activity-tries-deleted.finish";
 		}else{
 			return "-";

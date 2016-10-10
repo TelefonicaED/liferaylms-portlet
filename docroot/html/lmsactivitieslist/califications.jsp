@@ -1,4 +1,4 @@
-<%@page import="com.liferay.lms.model.impl.ActivityTriesDeletedImpl"%>
+<%@page import="com.liferay.lms.util.LmsConstant"%>
 <%@page import="com.liferay.lms.model.ActivityTriesDeleted"%>
 <%@page import="com.liferay.lms.service.ActivityTriesDeletedLocalServiceUtil"%>
 <%@page import="com.liferay.portal.kernel.util.PropsUtil"%>
@@ -31,7 +31,7 @@
 		
 
 	boolean delete = PrefsPropsUtil.getBoolean("learningactivity.show.califications.delete");
-	List<ActivityTriesDeleted> listActivityTriesDeleteds = ActivityTriesDeletedLocalServiceUtil.getByActIdStatus(actId, ActivityTriesDeletedImpl.STATUS_NOT_STARTED);
+	List<ActivityTriesDeleted> listActivityTriesDeleteds = ActivityTriesDeletedLocalServiceUtil.getByActIdStatus(actId, LmsConstant.STATUS_NOT_STARTED);
 %>
 
 <h2 class="table_title"><%=learnActivity.getTitle(themeDisplay.getLocale()) %></h2>
