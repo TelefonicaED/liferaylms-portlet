@@ -27,7 +27,6 @@ public class LearningActivityResultFinderImpl extends BasePersistenceImpl<Learni
 	 	
 	public long countStartedOnlyStudents(long actId, long companyId, long courseGropupCreatedId, List<User> _students){
 		Session session = null;
-		;
 		try{
 			LmsPrefs prefs = LmsPrefsLocalServiceUtil.fetchLmsPrefs(companyId);			
 			long teacherRoleId=RoleLocalServiceUtil.getRole(prefs.getTeacherRole()).getRoleId();
@@ -63,10 +62,10 @@ public class LearningActivityResultFinderImpl extends BasePersistenceImpl<Learni
 	
 	    return 0;
 	}
+
 	
 	public long countFinishedOnlyStudents(long actId, long companyId, long courseGropupCreatedId, List<User> _students){
 		Session session = null;
-		;
 		try{
 			LmsPrefs prefs = LmsPrefsLocalServiceUtil.fetchLmsPrefs(companyId);			
 			long teacherRoleId=RoleLocalServiceUtil.getRole(prefs.getTeacherRole()).getRoleId();

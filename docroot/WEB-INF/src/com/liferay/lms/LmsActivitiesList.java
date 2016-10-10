@@ -36,13 +36,16 @@ import com.liferay.lms.learningactivity.LearningActivityType;
 import com.liferay.lms.learningactivity.LearningActivityTypeRegistry;
 import com.liferay.lms.learningactivity.ResourceExternalLearningActivityType;
 import com.liferay.lms.model.LearningActivity;
+import com.liferay.lms.model.LearningActivityResult;
 import com.liferay.lms.model.Module;
 import com.liferay.lms.model.P2pActivity;
 import com.liferay.lms.model.P2pActivityCorrections;
 import com.liferay.lms.service.LearningActivityLocalServiceUtil;
+import com.liferay.lms.service.LearningActivityResultLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityServiceUtil;
 import com.liferay.lms.service.LearningActivityTryLocalServiceUtil;
 import com.liferay.lms.service.ModuleLocalServiceUtil;
+import com.liferay.lms.service.ModuleResultLocalServiceUtil;
 import com.liferay.lms.service.P2pActivityCorrectionsLocalServiceUtil;
 import com.liferay.lms.service.P2pActivityLocalServiceUtil;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
@@ -71,6 +74,7 @@ import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.portal.kernel.xml.DocumentException;
 import com.liferay.portal.model.Portlet;
 import com.liferay.portal.model.PublicRenderParameter;
 import com.liferay.portal.model.ResourceConstants;
@@ -516,22 +520,18 @@ public class LmsActivitiesList extends MVCPortlet {
 					Module.class.getName(), moduleId,
 					ActionKeys.DELETE))
 			{
-				if(LearningActivityLocalServiceUtil.dynamicQueryCount(DynamicQueryFactoryUtil.forClass(LearningActivity.class).
-				add(PropertyFactoryUtil.forName("moduleId").eq(moduleId)))==0)
-				{
-					ModuleLocalServiceUtil.deleteModule(moduleId);
-					if(moduleId==renderModule)
-					{
-						actionResponse.removePublicRenderParameter("moduleId");
-						actionResponse.removePublicRenderParameter("actId");	
-	
-					}
+				
+				List<LearningActivity> moduleActivities = LearningActivityLocalServiceUtil.getLearningActivitiesOfModule(moduleId);
+				for(LearningActivity la : moduleActivities){
+					deleteActivity(la, themeDisplay, actionRequest, actionResponse);
 				}
-				else
+				
+				ModuleLocalServiceUtil.deleteModule(moduleId);
+				if(moduleId==renderModule)
 				{
-				    SessionErrors.add(actionRequest, "activities-in-module");
-			
-				}			
+					actionResponse.removePublicRenderParameter("moduleId");
+					actionResponse.removePublicRenderParameter("actId");	
+				}							
 			}
 		}
 	}
@@ -612,22 +612,8 @@ public class LmsActivitiesList extends MVCPortlet {
 					ActionKeys.DELETE)|| permissionChecker.hasOwnerPermission(larn.getCompanyId(), LearningActivity.class.getName(), larn.getActId(),larn.getUserId(),
 							ActionKeys.DELETE))
 			{
-				LearningActivityType learningActivityType=new LearningActivityTypeRegistry().
-						getLearningActivityType(larn.getTypeId());
-				learningActivityType.deleteResources(actionRequest, actionResponse, larn);
-				List<LearningActivity> precedences = LearningActivityLocalServiceUtil.getByPrecedence(actId);
-				
-				if(precedences!=null && precedences.size()>0){
-					for(LearningActivity precedence : precedences){
-						precedence.setPrecedence(0);
-						LearningActivityLocalServiceUtil.updateLearningActivity(precedence);
-					}
-				}
-				LearningActivityServiceUtil.deleteLearningactivity(actId);
+				deleteActivity(larn,themeDisplay,actionRequest,actionResponse);
 				SessionMessages.add(actionRequest, "ok-deleteActivity");
-				//auditing
-				AuditingLogFactory.audit(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(), LearningActivity.class.getName(), actId, themeDisplay.getUserId(), AuditConstants.DELETE, null);
-				
 				if(actId==renderActId) {
 					List<LearningActivity> activities = LearningActivityLocalServiceUtil.getLearningActivitiesOfModule(moduleId);
 					actionResponse.removePublicRenderParameter("actId");		
@@ -646,6 +632,24 @@ public class LmsActivitiesList extends MVCPortlet {
 			}
 		}
 	
+	}
+	
+	
+	private void deleteActivity(LearningActivity larn, ThemeDisplay themeDisplay, ActionRequest actionRequest, ActionResponse actionResponse) throws PortalException, SystemException, DocumentException, IOException{
+		LearningActivityType learningActivityType=new LearningActivityTypeRegistry().
+				getLearningActivityType(larn.getTypeId());
+		learningActivityType.deleteResources(actionRequest, actionResponse, larn);
+		List<LearningActivity> precedences = LearningActivityLocalServiceUtil.getByPrecedence(larn.getActId());
+		if(precedences!=null && precedences.size()>0){
+			for(LearningActivity precedence : precedences){
+				precedence.setPrecedence(0);
+				LearningActivityLocalServiceUtil.updateLearningActivity(precedence);
+			}
+		}
+		LearningActivityServiceUtil.deleteLearningactivity(larn.getActId());
+		//auditing
+		AuditingLogFactory.audit(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(), LearningActivity.class.getName(), larn.getActId(), themeDisplay.getUserId(), AuditConstants.DELETE, null);
+		
 	}
 		
 	public void serveResource(ResourceRequest request, ResourceResponse response) throws PortletException,IOException{

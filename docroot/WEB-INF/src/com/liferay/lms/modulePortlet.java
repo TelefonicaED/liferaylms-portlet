@@ -25,12 +25,17 @@ import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 import javax.portlet.WindowStateException;
 
+import com.liferay.lms.auditing.AuditConstants;
+import com.liferay.lms.auditing.AuditingLogFactory;
+import com.liferay.lms.learningactivity.LearningActivityType;
+import com.liferay.lms.learningactivity.LearningActivityTypeRegistry;
 import com.liferay.lms.model.Course;
 import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.model.Module;
 import com.liferay.lms.model.impl.ModuleImpl;
 import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityLocalServiceUtil;
+import com.liferay.lms.service.LearningActivityServiceUtil;
 import com.liferay.lms.service.ModuleLocalServiceUtil;
 import com.liferay.portal.kernel.cache.MultiVMPoolUtil;
 import com.liferay.portal.kernel.exception.NestableException;
@@ -56,6 +61,7 @@ import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.portal.kernel.xml.DocumentException;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceContextFactory;
@@ -569,6 +575,11 @@ public static String SEPARATOR = "_";
 		long id = ParamUtil.getLong(request, "resourcePrimKey");
 		if (Validator.isNotNull(id)) {
 			Module module = ModuleLocalServiceUtil.getModule(id);
+			ThemeDisplay themeDisplay = (ThemeDisplay) request.getAttribute(WebKeys.THEME_DISPLAY);
+			List<LearningActivity> moduleActivities = LearningActivityLocalServiceUtil.getLearningActivitiesOfModule(id);
+			for(LearningActivity la : moduleActivities){
+				deleteActivity(la, themeDisplay, request, response);
+			}
 			ModuleLocalServiceUtil.deleteModule(module);
             //MultiVMPoolUtil.clear();
 			SessionMessages.add(request, "module-deleted-successfully");
@@ -577,6 +588,24 @@ public static String SEPARATOR = "_";
 		}
 	}
 
+	private void deleteActivity(LearningActivity larn, ThemeDisplay themeDisplay, ActionRequest actionRequest, ActionResponse actionResponse) throws PortalException, SystemException, DocumentException, IOException{
+		LearningActivityType learningActivityType=new LearningActivityTypeRegistry().
+				getLearningActivityType(larn.getTypeId());
+		learningActivityType.deleteResources(actionRequest, actionResponse, larn);
+		List<LearningActivity> precedences = LearningActivityLocalServiceUtil.getByPrecedence(larn.getActId());
+		if(precedences!=null && precedences.size()>0){
+			for(LearningActivity precedence : precedences){
+				precedence.setPrecedence(0);
+				LearningActivityLocalServiceUtil.updateLearningActivity(precedence);
+			}
+		}
+		LearningActivityServiceUtil.deleteLearningactivity(larn.getActId());
+		//auditing
+		AuditingLogFactory.audit(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(), LearningActivity.class.getName(), larn.getActId(), themeDisplay.getUserId(), AuditConstants.DELETE, null);
+		
+	}
+	
+	
 	@ProcessAction(name = "updatemodule")
 	public void updatemodule(ActionRequest request, ActionResponse response) throws Exception {
 		//System.out.println("dentro de updatemodule");

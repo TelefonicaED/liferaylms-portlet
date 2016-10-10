@@ -42,6 +42,7 @@ import com.liferay.lms.model.Course;
 import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.model.LearningActivityResult;
 import com.liferay.lms.model.LearningActivityTry;
+import com.liferay.lms.model.ModuleResult;
 import com.liferay.lms.model.SCORMContent;
 import com.liferay.lms.service.ClpSerializer;
 import com.liferay.lms.service.CourseLocalServiceUtil;
@@ -1423,8 +1424,17 @@ public class LearningActivityResultLocalServiceImpl	extends LearningActivityResu
 		try {
 			LearningActivityResultUtil.remove(lar.getLarId());
 			
-			//Si se ha borrado correctamente llamamos al update de moduleresult para qeu recalcule
-			ModuleResultLocalServiceUtil.update(lar);
+			
+			
+			long moduleId = LearningActivityLocalServiceUtil.fetchLearningActivity(lar.getActId()).getModuleId();
+			//Si se ha borrado correctamente llamamos al update de moduleresult para qeu recalcule, o borramos el moduleResult si no hay mas lar.
+			if(getByModuleIdUserId(moduleId,lar.getUserId()).size()>0){
+				ModuleResultLocalServiceUtil.update(lar);
+			}else{
+				ModuleResult moduleResult = ModuleResultLocalServiceUtil.getByModuleAndUser(moduleId, lar.getUserId());
+				ModuleResultLocalServiceUtil.deleteModuleResult(moduleResult);
+			}
+			
 			return lar;
 		} catch (NoSuchLearningActivityResultException e) {
 			// TODO Auto-generated catch block
