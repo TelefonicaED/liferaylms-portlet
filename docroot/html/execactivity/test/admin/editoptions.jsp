@@ -117,12 +117,12 @@ window.<portlet:namespace />validate_execactivity={
 		fieldStrings:
 		{
 			<portlet:namespace />random: {
-				randomRule: '<liferay-ui:message key="execActivity.options.error.random" />',
-				range: '<liferay-ui:message key="execActivity.options.error.randomquestion.number" />'
+				randomRule: Liferay.Language.get("execActivity.options.error.random"),
+				range: Liferay.Language.get("execActivity.options.error.randomquestion.number")
             },
             <portlet:namespace />questionsPerPage: {
-            	qppRule: '<liferay-ui:message key="execActivity.options.error.questionsPerPage" />',
-            	max: '<liferay-ui:message key="execActivity.options.error.questionsPerPage.max" />'
+            	qppRule: Liferay.Language.get("execActivity.options.error.questionsPerPage"),
+            	max: Liferay.Language.get("execActivity.options.error.questionsPerPage.max")
 			}
 		}	
 };

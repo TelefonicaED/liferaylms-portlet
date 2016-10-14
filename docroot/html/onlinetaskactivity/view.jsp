@@ -132,7 +132,7 @@ else
 
 			window.<portlet:namespace />popupGrades = new A.Dialog({
 				id:'<portlet:namespace />showPopupGradesStudent',
-	            title: '<liferay-ui:message key="onlineActivity.view.last" />',
+	            title: Liferay.Language.get("onlineActivity.view.last"),
 	            centered: true,
 	            modal: true,
 	            width: 600,
@@ -171,7 +171,7 @@ else
 
 			window.<portlet:namespace />popupGrades = new A.Dialog({
 				id:'<portlet:namespace />showPopupGradesTeacher',
-	            title: '<liferay-ui:message key="onlinetaskactivity.set.grades" />',
+	            title: Liferay.Language.get("onlinetaskactivity.set.grades"),
 	            centered: true,
 	            modal: true,
 	            width: 600,

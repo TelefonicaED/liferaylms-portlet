@@ -286,8 +286,8 @@ if(isTablet){%>
 								};
 						
 								new TestActivity({timeout:<%=Long.toString(timestamp)%>,
-												  warningText:'<liferay-ui:message key="execActivity.timeout.warning" />',
-												  expiredText:'<liferay-ui:message key="execActivity.timeout" />',
+												  warningText: Liferay.Language.get("execActivity.timeout.warning"),
+												  expiredText: Liferay.Language.get("execActivity.timeout"),
 												  onClose:function(){
 													document.getElementById('<portlet:namespace/>formulario').submit();
 												}});
@@ -365,11 +365,11 @@ if(isTablet){%>
 									
 										window.<portlet:namespace />confirmDialog = new A.Dialog(
 										    {
-										        title: '<liferay-ui:message key="execactivity.confirm.title"/>',
+										        title: Liferay.Language.get("execactivity.confirm.title"),
 										        bodyContent: content,
 										        buttons: [
 										                  {
-										                	  label: '<liferay-ui:message key="ok"/>',
+										                	  label: Liferay.Language.get("ok"),
 										                	  handler: function() {
 										                		  A.one('#<portlet:namespace/>formulario').detach('submit');
 										                		  document.getElementById('<portlet:namespace/>formulario').submit();
@@ -377,7 +377,7 @@ if(isTablet){%>
 										                	  }
 										                  },
 										                  {
-										                	  label: '<liferay-ui:message key="cancel"/>',
+										                	  label: Liferay.Language.get("cancel"),
 										                	  handler: function() {
 										                		  <portlet:namespace />confirmDialog.close();
 										                	  }

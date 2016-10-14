@@ -218,7 +218,7 @@ for(CalificationType calificationType :calificationTypeRegistry.getCalificationT
 
 	var checkUrl="${checkgroupsURL}";
 	function checkGroups(){
-		if(confirm('<liferay-ui:message key="change-groups-are-your-sure" />')){
+		if(confirm(Liferay.Language.get("change-groups-are-your-sure"))){
 			window.location.href=checkUrl;
 		}
 	}

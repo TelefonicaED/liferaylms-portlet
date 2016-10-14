@@ -121,7 +121,7 @@ if(activity.getEnddate() == null){
 </c:if>
 
 <script type="text/javascript">
-	var noFile ='<liferay-ui:message key="p2ptaskactivity.inc.nofileselected" />';
+	var noFile =Liferay.Language.get("p2ptaskactivity.inc.nofileselected");
 	
 	Liferay.provide(
 	        window,
@@ -135,7 +135,7 @@ if(activity.getEnddate() == null){
 				
 				
 				if (descriptionVal == "" || descriptionVal == "<%= StringEscapeUtils.unescapeHtml(textoCorrecion) %>") {
-					alert('<liferay-ui:message key="p2ptask-no-empty-answer" />');
+					alert(Liferay.Language.get("p2ptask-no-empty-answer"));
 				}
 				else {
 					<portlet:namespace />openPopUp(thisForm, thisEditor);

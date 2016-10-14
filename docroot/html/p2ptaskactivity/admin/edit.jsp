@@ -109,9 +109,9 @@ window.<portlet:namespace />validate_p2ptaskactivity={
 		fieldStrings:
 		{
 			<portlet:namespace />numValidaciones: {
-        		required: '<liferay-ui:message key="p2ptaskactivity.editActivity.numValidaciones.required" />',
-        		number: '<liferay-ui:message key="p2ptaskactivity.editActivity.numValidaciones.number" />',
-        		range: '<liferay-ui:message key="p2ptaskactivity.editActivity.numValidaciones.range" />'
+        		required: Liferay.Language.get("p2ptaskactivity.editActivity.numValidaciones.required"),
+        		number: Liferay.Language.get("p2ptaskactivity.editActivity.numValidaciones.number"),
+        		range: Liferay.Language.get("p2ptaskactivity.editActivity.numValidaciones.range")
             }
 		}	
 };

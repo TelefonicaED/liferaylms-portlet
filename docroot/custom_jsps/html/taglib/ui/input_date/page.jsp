@@ -14,6 +14,7 @@
  */
 --%>
 
+<%@page import="com.liferay.portal.kernel.language.LanguageUtil"%>
 <%@ include file="/html/taglib/init.jsp" %>
 
 
@@ -198,10 +199,10 @@ else if (yearNullable) {
 						firstDayOfWeek: <%= firstDayOfWeek %>,
 						locale: '<%= LanguageUtil.getLanguageId(request) %>',
 						strings: {
-							next: '<liferay-ui:message key="next" />',
-							none: '<liferay-ui:message key="none" />',
-							previous: '<liferay-ui:message key="previous" />',
-							today: '<liferay-ui:message key="today" />'
+							next:  Liferay.Language.get("next"),
+							none:   Liferay.Language.get("none"),
+							previous:   Liferay.Language.get("previous"),
+							today:   Liferay.Language.get("today")
 						}
 					},
 					dayNode: '#<%= dayParam %>',

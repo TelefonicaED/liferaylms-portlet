@@ -231,7 +231,7 @@ if(theTeam!=null)
 			
 								window.<portlet:namespace />popupActivity = new A.Dialog({
 									id:'<portlet:namespace />showPopupActivity',
-						            title: '<liferay-ui:message key="coursestats.modulestats.activity" />',
+						            title: Liferay.Language.get("coursestats.modulestats.activity"),
 						            centered: true,
 						            modal: true,
 						            width: 700,
@@ -266,7 +266,7 @@ if(theTeam!=null)
 			
 								window.<portlet:namespace />popupGrades = new A.Dialog({
 									id:'<portlet:namespace />showPopupGrades',
-						            title: '<liferay-ui:message key="offlinetaskactivity.set.grades" />',
+						            title: Liferay.Language.get("offlinetaskactivity.set.grades"),
 						            centered: true,
 						            modal: true,
 						            width: 370,

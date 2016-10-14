@@ -38,12 +38,12 @@
 					{
 						fieldName: '<portlet:namespace />numOfEvaluations',
 						validatorName: 'required',
-						errorMessage: '<liferay-ui:message key="num-of-evaluations-required" />'
+						errorMessage: Liferay.Language.get("num-of-evaluations-required")
 					},
 					{
 						fieldName: '<portlet:namespace />numOfEvaluations',
 						validatorName: 'number',
-						errorMessage: '<liferay-ui:message key="num-of-evaluations-number" />'
+						errorMessage: Liferay.Language.get("num-of-evaluations-number")
 					},
 				]
 			}

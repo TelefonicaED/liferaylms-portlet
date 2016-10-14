@@ -13,7 +13,7 @@
 <script type="text/javascript">
 	function areyousure(){
 			
-		if(confirm('<liferay-ui:message key="are-you-sure-you-want-to-permanently-delete-the-selected-users" />')){
+		if(confirm(Liferay.Language.get("are-you-sure-you-want-to-permanently-delete-the-selected-users"))){
 			 window.location.href = '<%=removeAllURL.toString()%>';
 		}
 	}
@@ -97,7 +97,7 @@
 		AUI().use('node','aui-dialog', function(A){
 			new A.Dialog({
 				id:'<portlet:namespace />showPopupImportUsers',
-	            title: '<liferay-ui:message key="import" />',
+	            title: Liferay.Language.get("import"),
 	            modal: true,
 	            centered: true,
 	            resizable: true,

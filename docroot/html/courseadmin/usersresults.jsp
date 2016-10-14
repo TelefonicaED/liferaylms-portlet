@@ -179,7 +179,7 @@ if(backToEdit) {
 				);
 				window.<portlet:namespace />selectedUsers.reset();
 				A.one('#<portlet:namespace />to').val ('');
-				A.one('#<portlet:namespace />selected_users').setContent('<liferay-ui:message key="all"/>');
+				A.one('#<portlet:namespace />selected_users').setContent(Liferay.Language.get("all"));
 				A.one('#<portlet:namespace />student_search').hide();
 				A.one('#<portlet:namespace />search_box').hide();
 			}
@@ -354,7 +354,7 @@ if(backToEdit) {
 			  function(A) {
 			    new A.Tooltip(
 			      {
-			        bodyContent: '<liferay-ui:message key="courseadmin.tooltip.add-all-users" />',
+			        bodyContent: Liferay.Language.get("courseadmin.tooltip.add-all-users"),
 			        trigger: '#<portlet:namespace />buttonAddAll'
 			      }
 			    ).render();
