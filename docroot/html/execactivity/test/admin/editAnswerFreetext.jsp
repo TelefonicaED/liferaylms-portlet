@@ -56,12 +56,10 @@ function <portlet:namespace />showHideSolution(){
 	if(A.one('input[id=<portlet:namespace />includeSolution]').attr('checked')) {
 		A.one('.solution').show();
 		A.one('.noSolution').hide();
-		console.log("a");
 		A.all('.leftSideAnswer input[id^="<portlet:namespace />correct_"]').val('true').attr('value', 'true');
 	}else if(A.one('input[id=<portlet:namespace />notIncludeSolution]').attr('checked')) {
 		A.one('.solution').hide();
 		A.one('.noSolution').show();
-		console.log("b");
 		A.all('.leftSideAnswer input[id^="<portlet:namespace />correct_"]').val('false').attr('value', 'false');
 	}
 }

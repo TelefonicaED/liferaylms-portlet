@@ -238,9 +238,6 @@
 		
 			var finishedscorm=false;
 			var finish_scorm = function(e) {
-				
-				console.log("finished_scorm");
-				
 				if(!finishedscorm) {
 					var scormpool = localStorage['scormpool'];
 					var serviceParameterTypes = [
@@ -248,9 +245,6 @@
 				    	'java.lang.String',
 				    	'java.lang.String'
 				    ];
-					
-					console.log("::LearningActivityResult.updateFinishTry::");
-					console.log("hasPermissionAccessCourseFinished: " + <%=hasPermissionAccessCourseFinished%>);
 					if(<%=!hasPermissionAccessCourseFinished%>){
 						
 					    var message = Liferay.Service.Lms.LearningActivityResult.updateFinishTry(
@@ -266,8 +260,7 @@
 					            
 						if (!exception) {
 							// Process Success - A LearningActivityResult returned
-							console.log(message);
-							
+						
 							if (message.passed) {
 								if(window.opener)
 								{
@@ -290,7 +283,6 @@
 							finishedscorm=true;
 							
 						}else {
-							console.log("::forceFinishTry::");
 							Liferay.Service.Lms.LearningActivityResult.forceFinishTry(
 								{ latId: <%= learningTry != null ? learningTry.getLatId() : 0 %> }
 							 );

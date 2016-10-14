@@ -277,9 +277,7 @@
 			    				case 1:
 			    				
 			    					correct = A.one('input[name=<portlet:namespace />correct_'+id+'Checkbox]');
-			    					console.log(correct);
-				    				correctVal = (correct != null && correct._node.checked);
-				    				console.log(correctVal);
+			    					correctVal = (correct != null && correct._node.checked);
 				    				if(correctVal==true)trueCounter++;
 				    				if (correct == null) {
 				    					correct =document.getElementById('input[name=<portlet:namespace />correct_'+id+']');
@@ -311,7 +309,6 @@
 			    				break;
 			    			
 			    				default:
-			    					console.log(id);
 			    					correct = A.one('input[name=<portlet:namespace />correct_'+id+'Checkbox]');
 			    				correctVal = (correct != null && correct._node.checked);
 			    				if(correctVal==true)trueCounter++;

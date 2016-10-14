@@ -12,11 +12,7 @@
 
 <script type="text/javascript">
 	function areyousure(){
-		console.log("1 ${redirectOfEdit}");
-		console.log("2 ${roleId}");
-		console.log("3 ${tab}");
-		console.log("4 ${backToEdit}");
-		
+			
 		if(confirm('<liferay-ui:message key="are-you-sure-you-want-to-permanently-delete-the-selected-users" />')){
 			 window.location.href = '<%=removeAllURL.toString()%>';
 		}

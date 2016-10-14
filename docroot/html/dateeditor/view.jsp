@@ -21,7 +21,6 @@
 				<aui:validator name="custom" errorMessage="please-enter-a-start-date-that-comes-before-the-end-date">
 				function (val, fieldNode, ruleValue) {
 			          	
-			          	console.log("MODULE "+${module.moduleId});
 			          	var moduleId = ${module.moduleId};
 			          						          	
 			          	var startDateYear = $('#<portlet:namespace />modInitYear_'+moduleId).val();
@@ -37,8 +36,6 @@
 						var endDateHour = $('select[name=<portlet:namespace />modEndHour_'+moduleId+']').val();
 						var endDateMinute = $('select[name=<portlet:namespace />modEndMinute_'+moduleId+']').val();
 						
-						console.log("Fecha Uno: "+startDateYear+"/"+startDateMonth+"/"+startDateDay+" "+startDateHour+":"+startDateMinute);
-						console.log("Fecha Dos: "+endDateYear+"/"+endDateMonth+"/"+endDateDay+" "+endDateHour+":"+endDateMinute);
 						
 						var start = new Date(startDateYear,startDateMonth,startDateDay,startDateHour,startDateMinute);
 						var end = new Date(endDateYear,endDateMonth,endDateDay,endDateHour,endDateMinute);
@@ -107,7 +104,6 @@
 					<aui:validator name="custom" errorMessage="please-enter-a-start-date-that-comes-before-the-end-date">
 					function (val, fieldNode, ruleValue) {
 				          	
-				          	console.log("MODULE "+${module.moduleId});
 				          	var moduleId = ${module.moduleId};
 				          	var actId= ${act.actId};
 				          		          	
@@ -128,9 +124,6 @@
 							
 							var moduleStart = new Date(startDateYear,startDateMonth,startDateDay,startDateHour,startDateMinute);
 							var moduleEnd = new Date(endDateYear,endDateMonth,endDateDay,endDateHour,endDateMinute);
-							
-							console.log("START "+moduleStart);
-							console.log("END "+moduleEnd);
 							
 							startDateYear = $('#<portlet:namespace />actInitYear_'+actId).val();
 				          	startDateMonth = $('#<portlet:namespace />actInitMonth_'+actId).val();

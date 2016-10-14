@@ -9,7 +9,6 @@
 
 <script>
 	function <portlet:namespace />waitForFinishScorm() {
-		console.log("renovamos sesión");
 		AUI().use("liferay-session", function(A){
 			Liferay.Session = new Liferay.SessionBase(
 				{

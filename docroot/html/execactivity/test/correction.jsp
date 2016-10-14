@@ -31,11 +31,9 @@ Liferay.provide(
         window,
         '<portlet:namespace />refreshPortlet',
         function() {
-		console.log("refreshPortlet");
-            <%-- refreshing the portlet [Liferay.Util.getOpener().] --%>
+		    <%-- refreshing the portlet [Liferay.Util.getOpener().] --%>
             var curPortletBoundaryId = '#p_p_id<portlet:namespace />showPopupActivity';
-            console.log(curPortletBoundaryId);
-
+        
             Liferay.Portlet.refresh(curPortletBoundaryId);
         },
         ['aui-dialog','aui-dialog-iframe']

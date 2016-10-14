@@ -202,7 +202,7 @@
 								        else 
 								        	result = true;
 					
-								    } catch (err) { console.log(err); }
+								    } catch (err) { }
 								    
 								    return result;
 								}

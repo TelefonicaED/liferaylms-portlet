@@ -440,7 +440,6 @@ else
 						<script>
 						  // 2. This code loads the IFrame Player API code asynchronously.
 						  var plays = <%=plays%>;
-						  console.log("plays: " + plays);
 						  var tag = document.createElement('script');
 						  var finished = false;
 
@@ -472,14 +471,12 @@ else
 							if (event.data == YT.PlayerState.PLAYING && !done) {
 								plays ++;
 								done=true;
-								console.log("plays: " + plays);
+								
 							}
 							if (event.data == YT.PlayerState.PAUSED){
 								done=false;
-								console.log("currentTime: " +event.target.getCurrentTime());
 							}
 							if (event.data == YT.PlayerState.ENDED){
-								console.log("Inicio video acabado");
 								var serviceParameterTypes = [
 		 					     	'long',
 		 					     	'long',
@@ -487,7 +484,6 @@ else
 		 					     	'double',
 		 					    	'int'
 		 					    ];
-		 						console.log("::LearningActivityTry.createLearningActivityTry::");
 		 					    var message = Liferay.Service.Lms.LearningActivityTry.createLearningActivityTry(
 		 					    	{
 		 					    		actId: <%= actId %>,
@@ -503,10 +499,8 @@ else
 		 					            
 		 						if (!exception) {
 		 							// Process Success - A LearningActivityResult returned
-									finished = true;
-		 							console.log(message);		 							
+									finished = true;		 							
 		 						}						
-								console.log("Fin video acabado");
 							}
 						  }
 						  /*
@@ -524,10 +518,6 @@ else
 								var duration = player.getDuration();
 								var score = 100;								
 								if (!isDefaultScore) score = Math.round((currentTime/duration)*100);
-								console.log("::currentTime:: " + currentTime);
-								console.log("::duration:: " + duration);
-								console.log("::score:: " + score);
-								console.log("::oldScore:: " + oldScore);
 								var serviceParameterTypes = [
 							     	'long',
 							     	'long',
@@ -537,7 +527,6 @@ else
 							    ];
 								
 								if ((score > oldScore) && !finished){
-									console.log("::LearningActivityTry.createLearningActivityTry::");
 									var message = Liferay.Service.Lms.LearningActivityTry.createLearningActivityTry(
 										{
 											actId: <%= actId %>,
@@ -551,15 +540,9 @@ else
 									
 									var exception = message.exception;
 											
-									if (!exception) {
-										// Process Success - A LearningActivityResult returned
-										console.log(message);
-										
-									}else {
-										console.log("::a ver q hacemos::");
-									}											
+																				
 							    } 	
-								console.log("::unloadEvent::");
+								
 						  };
 						  window.addEventListener("beforeunload", unloadEvent);					  
 						</script>							
@@ -585,7 +568,6 @@ else
 								var finished = false;
 								
 								 player.addEvent('ready', function() {
-									console.log('ready');
 									player.api('getDuration', function(dur) {
 										duration = dur;
 									});									
@@ -598,16 +580,14 @@ else
 								});
 							
 							    function onPause() {
-									console.log('paused');
+									
 								}
 							    
 								function onPlay() {
-									console.log('play');
 									plays++;
 								}	
 			
-								function onFinish() {
-									console.log("Inicio video acabado");									
+								function onFinish() {								
 									var serviceParameterTypes = [
 			 					     	'long',
 			 					     	'long',
@@ -615,7 +595,6 @@ else
 			 					     	'double',
 			 					    	'int'
 			 					    ];
-			 						console.log("::LearningActivityTry.createLearningActivityTry::");
 			 					    var message = Liferay.Service.Lms.LearningActivityTry.createLearningActivityTry(
 			 					    	{
 			 					    		actId: <%= actId %>,
@@ -632,10 +611,8 @@ else
 			 						if (!exception) {
 			 							// Process Success - A LearningActivityResult returned
 										finished = true;
-			 							console.log(message);
 			 							
-			 						}
-			 						console.log("Fin video acabado");									
+			 						}									
 								}
 								
 								  var unloadEvent = function (e) {
@@ -650,10 +627,6 @@ else
 											positionToSave = currentTime;
 										var score = 100;														
 										if (!isDefaultScore) score = Math.round((currentTime/duration)*100);
-										console.log("::currentTime:: " + currentTime);
-										console.log("::duration:: " + duration);
-										console.log("::score:: " + score);
-										console.log("::oldScore:: " + oldScore);
 										//debugger;
 										var serviceParameterTypes = [
 									     	'long',
@@ -662,7 +635,6 @@ else
 									     	'double',
 									    	'int'
 									    ];
-										console.log("::LearningActivityTry.createLearningActivityTry::");
 										if ((score > oldScore) && !finished){
 											var message = Liferay.Service.Lms.LearningActivityTry.createLearningActivityTry(
 												{
@@ -679,10 +651,8 @@ else
 													
 											if (!exception) {
 												// Process Success - A LearningActivityResult returned
-												console.log(message);	
 											}											
-									    } 	
-										console.log("::unloadEvent::");											
+									    } 			
 									});	
 									  
 

@@ -63,7 +63,6 @@ Liferay.provide(
 			renderUrl.setParameter('actionEditingDetails', true);
 			renderUrl.setParameter('resId', "<%=String.valueOf(learningActivity.getActId()) %>");
 			renderUrl.setParameter('backUrl', '<%= currentURL %>');
-			console.log(renderUrl.toString());
 			location.href=renderUrl.toString();
         },
         ['liferay-portlet-url']

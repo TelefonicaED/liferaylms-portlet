@@ -89,7 +89,6 @@ AUI().ready('node','aui-io-request','aui-parse-content','aui-sortable',function(
 });
 <%--
 var prueba = A.one('tbody#<portlet:namespace/>questionContainer');
-console.log(prueba.get('id'));
 new A.Sortable(
 		{
 			container: A.one('tbody#<portlet:namespace />questionContainer'),
@@ -111,9 +110,7 @@ new A.Sortable(
 			        if(next){
 			          nextPageId = parseInt(next.get('id').substr(<%="question-".length()%>),0);
 				    }
-					console.log(movedPageId);
-					console.log(prevPageId);
-					console.log(nextPageId);
+			
 					A.io.request('<%=moveQuestionURL %>', {  
 						data: {
 				            <portlet:namespace />pageId: movedPageId,
