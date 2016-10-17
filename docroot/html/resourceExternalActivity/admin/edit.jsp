@@ -114,7 +114,7 @@
 		var file = document.getElementById("file"+id);
 		var inputs = file.getElementsByTagName("input");
 		if(inputs[0].value!=null&&inputs[0].value!=""){
-			if(confirm('<liferay-ui:message key="are-you-sure-you-want-to-delete-this"  />')){
+			if(confirm(Liferay.Language.get("are-you-sure-you-want-to-delete-this"))){
 				divfiles.removeChild(file);
 			}	
 		}else{

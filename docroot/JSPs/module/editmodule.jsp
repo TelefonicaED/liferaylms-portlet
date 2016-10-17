@@ -56,10 +56,10 @@ AUI().ready('node-base' ,'aui-form-validator', 'aui-overlay-context-panel', 'wid
 		},
         fieldStrings: {			
         	<portlet:namespace />title_<%=renderRequest.getLocale().toString()%>: {
-        		required: '<liferay-ui:message key="module-title-required" />'
+        		required: Liferay.Language.get("module-title-required")
             },
         	<portlet:namespace />description: {
-        		required: '<liferay-ui:message key="module-description-required" />'
+        		required: Liferay.Language.get("module-description-required")
             }
 		},
 		

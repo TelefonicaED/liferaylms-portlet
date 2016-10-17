@@ -319,7 +319,7 @@ Course coursetmp = CourseLocalServiceUtil.getCourseByGroupCreatedId(groupId);
 											width: 700
 										},
 										id: '<portlet:namespace />Permissions',
-										title: '<liferay-ui:message key="permissions" />',
+										title: Liferay.Language.get("permissions"),
 										uri: '<%= permissionsURL %>'
 									}
 								);

@@ -156,11 +156,11 @@ textarea {
 							
 								window.<portlet:namespace />confirmDialog = new A.Dialog(
 								    {
-								        title: '<liferay-ui:message key="execativity.test.questions.without.response"/>',
+								        title: Liferay.Language.get("execativity.test.questions.without.response"),
 								        bodyContent: content,
 								        buttons: [
 								                  {
-								                	  label: '<liferay-ui:message key="ok"/>',
+								                	  label: Liferay.Language.get("ok"),
 								                	  handler: function() {
 								                		  A.one('#<portlet:namespace/>formulario').detach('submit');
 								                		  if (!<%=isEvaluationSurvey%>)
@@ -169,7 +169,7 @@ textarea {
 								                	  }
 								                  },
 								                  {
-								                	  label: '<liferay-ui:message key="cancel"/>',
+								                	  label: Liferay.Language.get("cancel"),
 								                	  handler: function() {
 								                		  <portlet:namespace />confirmDialog.close();
 								                	  }

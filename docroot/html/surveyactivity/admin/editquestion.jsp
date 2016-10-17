@@ -67,7 +67,7 @@ AUI().ready('node-base' ,'aui-form-validator', 'aui-overlay-context-panel', func
 		},
         fieldStrings: {
             <portlet:namespace />text: {
-	    		required: '<liferay-ui:message key="surveyactivity.editquestions.editquestion.error.text.required" />'
+	    		required: Liferay.Language.get("surveyactivity.editquestions.editquestion.error.text.required")
 	        }
 	    },
 		on: {		
@@ -105,7 +105,7 @@ AUI().ready('node-base' ,'aui-form-validator', 'aui-overlay-context-panel', func
 		},
         fieldStrings: {
             <portlet:namespace />answer: {
-	    		required: '<liferay-ui:message key="answer-test-required" />'
+	    		required: Liferay.Language.get("answer-test-required")
 	        }
 	    },
 		on: {		
