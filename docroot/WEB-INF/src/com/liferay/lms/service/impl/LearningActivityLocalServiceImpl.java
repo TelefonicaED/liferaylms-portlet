@@ -605,7 +605,7 @@ public class LearningActivityLocalServiceImpl extends LearningActivityLocalServi
 			learningActivityPersistence.update(previusActivity, true);
 
 			//auditing
-			System.out.println("Actividad con id: "+actId+" ha sido movido hacia arriba por el usuario: "+userIdAction);
+			log.debug("Actividad con id: "+actId+" ha sido movido hacia arriba por el usuario: "+userIdAction);
 
 			AuditingLogFactory.audit(previusActivity.getCompanyId(), previusActivity.getGroupId(), LearningActivity.class.getName(), 
 					actId,userIdAction, AuditConstants.UPDATE, "ACTIVITY_UP");
@@ -626,7 +626,7 @@ public class LearningActivityLocalServiceImpl extends LearningActivityLocalServi
 			learningActivityPersistence.update(previusActivity, true);
 			
 			//auditing
-			System.out.println("Actividad con id: "+actId+" ha sido movido hacia arriba por el usuario: "+userIdAction);
+			log.debug("Actividad con id: "+actId+" ha sido movido hacia arriba por el usuario: "+userIdAction);
 
 			AuditingLogFactory.audit(previusActivity.getCompanyId(), previusActivity.getGroupId(), LearningActivity.class.getName(), 
 					actId,userIdAction, AuditConstants.UPDATE, "ACTIVITY_DOWN");
@@ -755,7 +755,7 @@ public class LearningActivityLocalServiceImpl extends LearningActivityLocalServi
 				Iterator<Map.Entry<String,String>> it = hashMap.entrySet().iterator();
 			    while (it.hasNext()) {
 			        Map.Entry<String,String> pair = (Map.Entry<String, String>)it.next();
-			        System.out.println(pair.getKey() + " = " + pair.getValue());
+			        log.debug(pair.getKey() + " = " + pair.getValue());
 			        extraContentValues.add(pair.getValue());
 			        it.remove(); // avoids a ConcurrentModificationException
 			    }
@@ -846,7 +846,7 @@ public class LearningActivityLocalServiceImpl extends LearningActivityLocalServi
 					}
 					resultadosXML.add(eleXML);
 				}
-				System.out.println(resultadosXMLDoc.formattedString());
+				log.debug(resultadosXMLDoc.formattedString());
 				activity.setExtracontent(resultadosXMLDoc.formattedString());
 				learningActivityPersistence.update(activity, true);
 			}

@@ -221,7 +221,7 @@ public class SurveyActivity extends MVCPortlet {
 
 	public void addquestion(ActionRequest actionRequest, ActionResponse actionResponse)
 			throws Exception {
-		System.out.println("addquestion");
+		log.debug("addquestion");
 		long actid = ParamUtil.getLong(actionRequest, "resId");
 
 		String text = ParamUtil.getString(actionRequest, "text");
@@ -352,7 +352,7 @@ public class SurveyActivity extends MVCPortlet {
 
 	public void addanswer(ActionRequest actionRequest, ActionResponse actionResponse)
 			throws Exception {
-		System.out.println("addanswer");
+		log.debug("addanswer");
 
 		long questionId = ParamUtil.getLong(actionRequest, "questionId");
 		String answers = ParamUtil.getString(actionRequest, "answer");
@@ -413,11 +413,9 @@ public class SurveyActivity extends MVCPortlet {
 							type.equals(LiferaylmsUtil.CHARSET_UTF_16LE)|| 
 							type.equals(LiferaylmsUtil.CHARSET_UTF_32BE)|| 
 							type.equals(LiferaylmsUtil.CHARSET_UTF_32LE)) {
-						//System.out.println("UTF-8");
 						reader = new CSVReader(new InputStreamReader(csvFile, StringPool.UTF8),CharPool.SEMICOLON);
 
 					}else{
-						//System.out.println("ISO");
 						reader = new CSVReader(new InputStreamReader(csvFile, StringPool.ISO_8859_1),CharPool.SEMICOLON);
 					}
 
@@ -558,7 +556,7 @@ public class SurveyActivity extends MVCPortlet {
 
 	public void editanswer(ActionRequest actionRequest, ActionResponse actionResponse)
 			throws Exception {
-		System.out.println("editanswer");
+		log.debug("editanswer");
 		long answerId = ParamUtil.getLong(actionRequest, "answerId");
 		String answer = ParamUtil.getString(actionRequest, "answer");
 		boolean correct = ParamUtil.getBoolean(actionRequest, "correct");
@@ -905,8 +903,6 @@ public class SurveyActivity extends MVCPortlet {
 
 					for(int i = 0; i < answers.size()-1; i++) {
 						strbld.append(answers.get(i).getAnswer() + separator);
-						//						answerTitles[i] = answers.get(i).getAnswer();
-						//						System.out.println(answerTitles[i]);
 					}
 
 					if (answers.size() > 0)	

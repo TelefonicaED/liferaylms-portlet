@@ -9,8 +9,6 @@ String actId2 = renderRequest.getParameter("actId");
 String studentId2 = renderRequest.getParameter("studentId");
 
 if((actId2!=null)&&(studentId2!=null)){
-	//System.out.println("actId2: " + actId2);
-	//System.out.println("studentId2: " + studentId2);
 	Long lactId2 = ParamUtil.getLong(renderRequest,"actId");
 	Long lstudentId2 = ParamUtil.getLong(renderRequest,"studentId");
 	result = LearningActivityResultLocalServiceUtil.getByActIdAndUserId(lactId2, lstudentId2);

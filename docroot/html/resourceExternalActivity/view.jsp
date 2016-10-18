@@ -103,7 +103,6 @@ else
 			if(!hasPermissionAccessCourseFinished){
 				learningTry =LearningActivityTryLocalServiceUtil.getLastLearningActivityTryByActivityAndUser(actId,themeDisplay.getUserId());
 			}
-			//System.out.println(" :: learningTry:: " + learningTry);
 			if (learningTry != null){
 				//Poner posición del video.
 				String xml = learningTry.getTryResultData();
@@ -111,23 +110,14 @@ else
 
 					Document document = SAXReaderUtil.read(xml);
 					Element rootElement = document.getRootElement();
-					Element positionElement = rootElement.element("position");	
-					//System.out.println("positionElement: " + positionElement);
-					//System.out.println("positionElement: " + positionElement.getText());						
+					Element positionElement = rootElement.element("position");						
 					videoPosition =  Double.parseDouble(positionElement.getText());
-					//System.out.println("videoPosition:: " + videoPosition);
 					
 					Element playsElement = rootElement.element("plays");	
-					//System.out.println("playsElement: " + playsElement);
-					//System.out.println("playsElement: " + playsElement.getText());
 					plays =  Integer.parseInt(playsElement.getText());
-					//System.out.println("plays:: " + plays);	
 
 					Element scoreElement = rootElement.element("score");	
-					//System.out.println("scoreElement: " + scoreElement);
-					//System.out.println("scoreElement: " + scoreElement.getText());
-					oldScore =  Integer.parseInt(scoreElement.getText());
-					//System.out.println("oldScore:: " + oldScore);					
+					oldScore =  Integer.parseInt(scoreElement.getText());			
 				}	
 				
 			}
@@ -399,14 +389,10 @@ else
 							parametros += "&start="+df.format(videoPosition);
 						}
 						parteSegunda = parteSegunda.replace(src, src.concat(parametros));
-						//System.out.println("partePrimera: " + partePrimera);
-						//System.out.println("parteSegunda: " + parteSegunda);
-						//System.out.println("parteTercera: " + parteTercera);
 						StringBuilder tag  = new StringBuilder();
 						tag.append(partePrimera);
 						tag.append(" id=\"youtube-video\"");
 						tag.append(parteSegunda);
-						//System.out.println("videoCode: " + tag.toString());
 						videoCode = tag.toString();
 					}
 					if (isVimeoIframe && !isDefaultScore){
@@ -420,14 +406,10 @@ else
 						String src = split[1];
 						String parametros = "?api=1&amp;player_id=player_1";
 						parteSegunda = parteSegunda.replace(src, src.concat(parametros));
-						//System.out.println("partePrimera: " + partePrimera);
-						//System.out.println("parteSegunda: " + parteSegunda);
-						//System.out.println("parteTercera: " + parteTercera);
 						StringBuilder tag  = new StringBuilder();
 						tag.append(partePrimera);
 						tag.append(" id=\"player_1\"");
 						tag.append(parteSegunda);
-						//System.out.println("videoCode: " + tag.toString());
 						videoCode = tag.toString();
 					} 
 				%>

@@ -167,27 +167,7 @@ public class CloneCourse implements MessageListener {
 			layoutSetPrototypeId = Long.parseLong(courseTemplate);
 		}		
 		
-		/*LmsPrefs lmsPrefs=LmsPrefsLocalServiceUtil.getLmsPrefsIni(serviceContext.getCompanyId());
 		
-		System.out.println("  + getLmsTemplates: "+lmsPrefs.getLmsTemplates());
-		
-		if(lmsPrefs.getLmsTemplates().contains(",")){
-			String []ids = lmsPrefs.getLmsTemplates().split(",");
-			
-			for(String id:ids){
-				LayoutSetPrototype layout = LayoutSetPrototypeLocalServiceUtil.getLayoutSetPrototype(Long.valueOf(id));
-				layoutSetPrototypeId=Long.valueOf(id);
-				System.out.println("  + layout: "+layout.getDescription());
-				if(layout.getDescription().equals("course")){
-					break;
-				}
-			}
-		}else if(!"".equals(lmsPrefs.getLmsTemplates())){
-			LayoutSetPrototype layout = LayoutSetPrototypeLocalServiceUtil.getLayoutSetPrototype(Long.valueOf(lmsPrefs.getLmsTemplates()));
-			layoutSetPrototypeId=Long.valueOf(lmsPrefs.getLmsTemplates());
-		}else{
-			layoutSetPrototypeId = LayoutSetLocalServiceUtil.getLayoutSet(groupId, true).getLayoutSetPrototypeId();
-		}*/
 		log.debug("  + layoutSetPrototypeId: "+layoutSetPrototypeId);
 		cloneTraceStr += " layoutSetPrototypeId:" + layoutSetPrototypeId;
 		
@@ -293,22 +273,6 @@ public class CloneCourse implements MessageListener {
 		HashMap<Long,Long> correlationModules = new HashMap<Long, Long>();
 		HashMap<Long,Long> modulesDependencesList = new  HashMap<Long, Long>();
 		for(Module module:modules){
-			/*
-			if(isFirstModule){
-				Calendar c = Calendar.getInstance();
-				c.setTimeInMillis(startDate.getTime() - module.getStartDate().getTime());
-				days = c.get(Calendar.DAY_OF_YEAR);
-				
-				if(c.get(Calendar.YEAR) - 1970 > 0){
-					days += 365 * (c.get(Calendar.YEAR) - 1970);
-				}
-				isFirstModule = false;
-				
-				System.out.println(" Days to add: "+ days +" "+startDate+" "+module.getStartDate()+" "+c.getTime());
-				cloneTraceStr += "\n Days to add: "+ days +" "+startDate+" "+module.getStartDate()+" "+c.getTime();
-				cloneTraceStr += "\n\n";
-			}
-			*/
 			Module newModule;
 
 			try {
@@ -331,16 +295,7 @@ public class CloneCourse implements MessageListener {
 				//Icono
 				newModule.setIcon(module.getIcon());
 				
-				/*
-				Calendar start = Calendar.getInstance();
-				start.setTimeInMillis(module.getStartDate().getTime() + TimeUnit.MILLISECONDS.convert(days, TimeUnit.DAYS));
-				Calendar stop = Calendar.getInstance();
-				stop.setTimeInMillis(module.getEndDate().getTime() + TimeUnit.MILLISECONDS.convert(days, TimeUnit.DAYS));
-				*/
-				
-				//System.out.println(" startDate: "+ start.getTime() +"   -> "+module.getStartDate());
-				//System.out.println(" stopDate : "+ stop.getTime()  +"   -> "+module.getEndDate());
-				
+			
 				newModule.setStartDate(startDate);
 				newModule.setEndDate(endDate);
 				
@@ -395,21 +350,7 @@ public class CloneCourse implements MessageListener {
 					newLearnActivity.setStartdate(startDate);
 					newLearnActivity.setEnddate(endDate);
 					
-					/*
-					if(activity.getStartdate() != null){
-						Calendar start = Calendar.getInstance();
-						start.setTimeInMillis(activity.getStartdate().getTime() + TimeUnit.MILLISECONDS.convert(days, TimeUnit.DAYS));
-						newLearnActivity.setStartdate(start.getTime());
-						//System.out.println(" startDate: "+ start.getTime() +"   -> "+activity.getStartdate());
-					}
-					
-					if(activity.getEnddate() != null){
-						Calendar stop = Calendar.getInstance();
-						stop.setTimeInMillis(activity.getEnddate().getTime() + TimeUnit.MILLISECONDS.convert(days, TimeUnit.DAYS));
-						newLearnActivity.setEnddate(stop.getTime());
-						//System.out.println(" stopDate : "+ stop.getTime()  +"   -> "+activity.getEnddate());
-					}
-					*/
+			
 
 					newLearnActivity.setDescription(descriptionFilesClone(activity.getDescription(),newModule.getGroupId(), newLearnActivity.getActId(),themeDisplay.getUserId()));
 		
@@ -819,7 +760,6 @@ public class CloneCourse implements MessageListener {
 
 		res = description.replace(target, replacement);
 		
-		//System.out.println("   res         : " + res );
 		if(log.isDebugEnabled()){
 			if(res.equals(description)){
 				log.debug("   :: description         : " + description );
@@ -922,10 +862,7 @@ public class CloneCourse implements MessageListener {
 												userId, repositoryId , dlMainFolderId , oldFile.getTitle()+ficheroExtStr, oldFile.getMimeType(), 
 											oldFile.getTitle(), StringPool.BLANK, StringPool.BLANK, byteArray , serviceContext ) ;
 
-									
-										//AssetEntry asset  = AssetEntryLocalServiceUtil.getEntry(DLFileEntry.class.getName(), newFile.getPrimaryKey());
-										//System.out.println("      DLFileEntry newFile: "+newFile.getTitle()+", newFile PrimaryKey: "+newFile.getPrimaryKey()+", EntryId: "+asset.getEntryId());
-										
+																		
 										map.put(key, String.valueOf(AssetEntryLocalServiceUtil.getEntry(DLFileEntry.class.getName(), newFile.getPrimaryKey()).getEntryId()));
 										
 									

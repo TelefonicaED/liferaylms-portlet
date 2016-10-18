@@ -420,7 +420,7 @@ public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int e
 				
 				ModuleLocalServiceUtil.addModule(newModule);
 				
-				System.out.println("    + Module : " + newModule.getTitle(Locale.getDefault()) +"("+newModule.getModuleId()+")" );
+				log.debug("    + Module : " + newModule.getTitle(Locale.getDefault()) +"("+newModule.getModuleId()+")" );
 				
 			} catch (Exception e) {
 				e.printStackTrace();

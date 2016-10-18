@@ -206,7 +206,7 @@ public class ModuleLocalServiceImpl extends ModuleLocalServiceBaseImpl {
 			modulePersistence.update(previusModule, true);
 
 			//auditing
-			System.out.println("Módulo con id: "+theModule.getModuleId()+" ha sido movido hacia arriba por el usuario: "+theModule.getUserId());
+			log.debug("Módulo con id: "+theModule.getModuleId()+" ha sido movido hacia arriba por el usuario: "+theModule.getUserId());
 
 			AuditingLogFactory.audit(theModule.getCompanyId(), theModule.getGroupId(), Module.class.getName(), 
 					moduleId,userIdAction, AuditConstants.UPDATE, "MODULE_UP");
@@ -229,7 +229,7 @@ public class ModuleLocalServiceImpl extends ModuleLocalServiceBaseImpl {
 			modulePersistence.update(nextModule, true);
 
 			//auditing
-			System.out.println("Módulo con id: "+theModule.getModuleId()+" ha sido movido hacia abajo por el usuario: "+theModule.getUserId());
+			log.debug("Módulo con id: "+theModule.getModuleId()+" ha sido movido hacia abajo por el usuario: "+theModule.getUserId());
 
 			AuditingLogFactory.audit(theModule.getCompanyId(), theModule.getGroupId(), Module.class.getName(), 
 					moduleId, userIdAction, AuditConstants.UPDATE, "MODULE_DOWN");
@@ -250,7 +250,7 @@ public class ModuleLocalServiceImpl extends ModuleLocalServiceBaseImpl {
 				prevAct = getPreviusModule(actualMod);
 			}
 			//auditing
-			System.out.println("Módulo con id: "+actualMod.getModuleId()+" ha sido movido hacia arriba por el usuario: "+actualMod.getUserId());
+			log.debug("Módulo con id: "+actualMod.getModuleId()+" ha sido movido hacia arriba por el usuario: "+actualMod.getUserId());
 			AuditingLogFactory.audit(actualMod.getCompanyId(), actualMod.getGroupId(), Module.class.getName(), 
 					modId, userIdAction, AuditConstants.UPDATE, "MODULE_UP");
 		//Elemento bajado
@@ -261,7 +261,7 @@ public class ModuleLocalServiceImpl extends ModuleLocalServiceBaseImpl {
 				actualMod = modulePersistence.fetchByPrimaryKey(modId);
 				nexMod = getNextModule(actualMod);
 			}
-			System.out.println("Módulo con id: "+actualMod.getModuleId()+" ha sido movido hacia abajo por el usuario: "+actualMod.getUserId());
+			log.debug("Módulo con id: "+actualMod.getModuleId()+" ha sido movido hacia abajo por el usuario: "+actualMod.getUserId());
 
 			//auditing
 			AuditingLogFactory.audit(actualMod.getCompanyId(), actualMod.getGroupId(), Module.class.getName(), 

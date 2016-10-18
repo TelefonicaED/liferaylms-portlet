@@ -335,12 +335,6 @@ if(backToEdit) {
 		pageContext.setAttribute("results", userListPage);
 	    pageContext.setAttribute("total", userCount);
 
-		for(User us:userListPage){
-			
-			%> <input type="hidden" name="studentIdNameHidden" value='<%= us.getUserId() + "," + us.getFullName() %>' /> <%
-				
-		} 
-	
 	%>
 		<input type="hidden" id="allSelected" value="false" />
 		</liferay-ui:search-container-results>

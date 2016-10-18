@@ -283,9 +283,7 @@ public static String SEPARATOR = "_";
 			}
 			
 			Module module = ModuleLocalServiceUtil.getModule(moduleId);
-			//System.out.println("Paso por aqui: "+moduleId);
 			String title = module.getTitle();
-			//renderRequest.setAttribute(arg0, arg1);
 			renderRequest.setAttribute("title", title);
 			String description = module.getDescription(themeDisplay.getLocale())+"";
 			renderRequest.setAttribute("description", description);
@@ -419,8 +417,7 @@ public static String SEPARATOR = "_";
 
 	@ProcessAction(name = "addmodule")
 	public void addmodule(ActionRequest request, ActionResponse response) throws Exception {
-		//System.out.println("addmodule");
-            Module module = moduleFromRequest(request);
+		    Module module = moduleFromRequest(request);
             ArrayList<String> errors = moduleValidator.validatemodule(module, request);
             ThemeDisplay themeDisplay = (ThemeDisplay) request
 			.getAttribute(WebKeys.THEME_DISPLAY);
@@ -462,9 +459,7 @@ public static String SEPARATOR = "_";
 	}
 	
 	private void addmodulePopUp(RenderRequest request, RenderResponse response) throws IOException, PortalException, SystemException  {
-       // System.out.println("addmodulePopUp");
-        //ServiceContext serviceContext = ServiceContextFactory.getInstance( Module.class.getName(), request);
-
+     
 		Module module = moduleFromRequest(request);
         ArrayList<String> errors = moduleValidator.validatemodule(module, request);
         ThemeDisplay themeDisplay = (ThemeDisplay) request
@@ -561,7 +556,6 @@ public static String SEPARATOR = "_";
 	}
 	
 	private void editmodulePopUp(RenderRequest request, RenderResponse renderResponse) {
-		//System.out.println("editmodulePopUp");
 		long key = ParamUtil.getLong(request, "resourcePrimKey");
 		if (Validator.isNotNull(key)) {
 			request.setAttribute("moduleId",key);
@@ -608,8 +602,7 @@ public static String SEPARATOR = "_";
 	
 	@ProcessAction(name = "updatemodule")
 	public void updatemodule(ActionRequest request, ActionResponse response) throws Exception {
-		//System.out.println("dentro de updatemodule");
-            Module module = moduleFromRequest(request);
+		    Module module = moduleFromRequest(request);
             ArrayList<String> errors = moduleValidator.validatemodule(module, request);
             ThemeDisplay themeDisplay = (ThemeDisplay) request
 			.getAttribute(WebKeys.THEME_DISPLAY);
@@ -650,8 +643,7 @@ public static String SEPARATOR = "_";
         }
 	
 	private void updatemodulePopUp(RenderRequest request, RenderResponse response) throws PortalException, SystemException, IOException {
-       // System.out.println("Dentro de updatemodulePopUp");
-		Module module = moduleFromRequest(request);
+    	Module module = moduleFromRequest(request);
 		request.setAttribute("moduleId",module.getModuleId());
 		request.setAttribute("view", "editmodule");
 		request.setAttribute("editType", "edit");
@@ -712,7 +704,6 @@ public static String SEPARATOR = "_";
 	private Module moduleFromRequest(PortletRequest actRequest) throws PortalException, SystemException {
 		ThemeDisplay themeDisplay = (ThemeDisplay) actRequest.getAttribute(WebKeys.THEME_DISPLAY);
 		UploadPortletRequest request = PortalUtil.getUploadPortletRequest(actRequest);
-		//System.out.println("MODULE FROM REQUEST");
 		Module module = null;
         long moduleId=ParamUtil.getLong(request, "resourcePrimKey",0);
         ServiceContext  serviceContext = ServiceContextFactory.getInstance( Module.class.getName(), request);

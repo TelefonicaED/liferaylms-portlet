@@ -44,9 +44,6 @@ public class ModuleUpdateResult extends MVCPortlet {
 			String allCourses =request.getParameter("allcourses");
 			
 			Module m = ModuleLocalServiceUtil.getModule(moduleId);
-			
-			//System.out.println("email: "+emailAddress+", moduleId: "+moduleId+", allUsers: "+allUsers);
-			
 			saveStringToFile("ModuleUpdate.txt", "START: "+m.getTitle(themeDisplay.getLocale())+" ("+m.getModuleId()+") "+", allUsers: "+allUsers+", email: "+emailAddress);
 			
 			

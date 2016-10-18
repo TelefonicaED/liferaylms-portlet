@@ -29,7 +29,6 @@ public class CompetenceView {
     	return competence.getGenerateCertificate();
     }
 	public String getFormatDate(Date date, Locale locale, TimeZone timeZone) {
-		System.out.println(locale);
 		Format dateFormatDate = FastDateFormatFactoryUtil.getDate(locale, timeZone);
 		
 		

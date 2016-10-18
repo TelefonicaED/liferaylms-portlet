@@ -8,10 +8,8 @@ import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
 
 import com.liferay.lms.asset.TaskP2PAssetRenderer;
-import com.liferay.lms.model.Course;
 import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.service.ClpSerializer;
-import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.lms.service.P2pActivityLocalServiceUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
@@ -33,6 +31,11 @@ import com.liferay.portal.util.PortalUtil;
 import com.liferay.portlet.asset.model.AssetRenderer;
 
 public class TaskP2PLearningActivityType extends BaseLearningActivityType {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 
 	private static Log log = LogFactoryUtil.getLog(TaskP2PLearningActivityType.class);
 	
@@ -82,11 +85,6 @@ public class TaskP2PLearningActivityType extends BaseLearningActivityType {
 				JavaConstants.JAVAX_PORTLET_REQUEST);
 		
 		boolean validate = true;
-		boolean start = ParamUtil.getBoolean(uploadRequest, "startdate-enabled", false);
-		boolean stop  = ParamUtil.getBoolean(uploadRequest, "stopdate-enabled", false);
-		
-		Date upload = getDateFromRequest(uploadRequest,"upload");
-		Date end = getDateFromRequest(uploadRequest,"stop");
 
 		if((Validator.isNotNull(uploadRequest.getParameter("numValidaciones")))&&
 				(!Validator.isNumber(uploadRequest.getParameter("numValidaciones"))))
@@ -94,38 +92,12 @@ public class TaskP2PLearningActivityType extends BaseLearningActivityType {
 			SessionErrors.add(actionRequest, "p2ptaskactivity.editActivity.numValidaciones.number");
 			validate=false;
 		}
-		
-//		if(start && stop && upload != null && end != null && upload.after(end))
-//		{
-//			SessionErrors.add(actionRequest, "p2ptaskactivity.editActivity.dateupload.afteractivity");
-//			validate=false;
-//			System.out.println(" ERROR EN FECHA");
-//		}
+	
 		
 		return validate;
 	}
 	
-	private Date getDateFromRequest(UploadRequest uploadRequest, String key){
-		
-		ThemeDisplay themeDisplay = (ThemeDisplay)uploadRequest.getAttribute(WebKeys.THEME_DISPLAY);
-		
-		int uploadMonth = ParamUtil.getInteger(uploadRequest, key+"Mon");
-		int uploadYear = ParamUtil.getInteger(uploadRequest, key+"Year");
-		int uploadDay = ParamUtil.getInteger(uploadRequest, key+"Day");
-		int uploadHour = ParamUtil.getInteger(uploadRequest, key+"Hour");
-		int uploadMinute = ParamUtil.getInteger(uploadRequest, key+"Min");
-		int uploadAMPM = ParamUtil.getInteger(uploadRequest, key+"AMPM");
-		
-		if (uploadAMPM > 0) {
-			uploadHour += 12;
-		}
-		
-		try {
-			return PortalUtil.getDate(uploadMonth, uploadDay, uploadYear, uploadHour, uploadMinute, themeDisplay.getTimeZone(),  (Class<? extends PortalException>)null);
-		} catch (PortalException e) {}
-		
-		return null;
-	}
+
 	
 	@Override
 	public String setExtraContent(UploadRequest uploadRequest,PortletResponse portletResponse, LearningActivity learningActivity)
@@ -133,7 +105,6 @@ public class TaskP2PLearningActivityType extends BaseLearningActivityType {
 		
 		String error = null;
 		ThemeDisplay themeDisplay = (ThemeDisplay)uploadRequest.getAttribute(WebKeys.THEME_DISPLAY);	
-		Course course=CourseLocalServiceUtil.fetchByGroupCreatedId(themeDisplay.getScopeGroupId());
 				
 			Document document = null;
 			Element rootElement = null;

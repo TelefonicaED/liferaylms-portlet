@@ -424,12 +424,10 @@ public class LearningActivityResultLocalServiceImpl	extends LearningActivityResu
 				}
 			}
 		}
-		//System.out.println("total_completion_status "+total_completion_status);
 		for (int i = 0; i < scores.size(); i++) {
 			total_score += scores.get(i);
 		}
 		total_score = total_score / (manifestItems.size() > 0 ? manifestItems.size() : 1);
-		//System.out.println("BEFORE incomplete");
 		if ("incomplete".equals(total_completion_status) || "completed".equals(total_completion_status)) {
 			learningActivityTry.setTryResultData(tryResultData);
 			learningActivityTry.setResult(Math.round(total_score));

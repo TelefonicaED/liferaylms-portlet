@@ -22,6 +22,8 @@ import com.liferay.portal.kernel.lar.BasePortletDataHandler;
 import com.liferay.portal.kernel.lar.PortletDataContext;
 import com.liferay.portal.kernel.lar.PortletDataHandlerBoolean;
 import com.liferay.portal.kernel.lar.PortletDataHandlerControl;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
@@ -38,6 +40,8 @@ public class ScormDataHandlerImpl extends BasePortletDataHandler {
 
 	private static final String _NAMESPACE = "scorm"; // mejorable??
 	
+	private static Log log = LogFactoryUtil.getLog(ScormDataHandlerImpl.class);
+			
 	private static final boolean _ALWAYS_EXPORTABLE = true;
 
 	private static final boolean _PUBLISH_TO_LIVE_BY_DEFAULT = true;
@@ -97,7 +101,7 @@ public class ScormDataHandlerImpl extends BasePortletDataHandler {
 	protected PortletPreferences doDeleteData(PortletDataContext context,
 			String portletId, PortletPreferences preferences) throws Exception {
 
-		System.out.println("  ::: ScormDataHandlerImpl.doDeleteData ::: "
+		log.info("  ::: ScormDataHandlerImpl.doDeleteData ::: "
 				+ portletId + " " + context.getGroupId() + " "
 				+ context.getScopeGroupId());
 
@@ -107,7 +111,7 @@ public class ScormDataHandlerImpl extends BasePortletDataHandler {
 
 			long groupId = context.getScopeGroupId();
 
-			System.out.println("   groupId : " + groupId + ", name: "
+			log.info("   groupId : " + groupId + ", name: "
 					+ group.getName());
 
 			List<SCORMContent> scorms = SCORMContentLocalServiceUtil
@@ -115,7 +119,7 @@ public class ScormDataHandlerImpl extends BasePortletDataHandler {
 
 			for (SCORMContent scorm : scorms) {
 
-				System.out.println("    scorm : " + scorm.getScormId());
+				log.info("    scorm : " + scorm.getScormId());
 
 				SCORMContentLocalServiceUtil.delete(scorm.getScormId());
 
@@ -124,7 +128,7 @@ public class ScormDataHandlerImpl extends BasePortletDataHandler {
 			e.printStackTrace();
 		}
 
-		System.out.println("  ::: ScormDataHandlerImpl.doDeleteData ::: ends ");
+		log.info("  ::: ScormDataHandlerImpl.doDeleteData ::: ends ");
 
 		return super.doDeleteData(context, portletId, preferences);
 	}
@@ -133,7 +137,7 @@ public class ScormDataHandlerImpl extends BasePortletDataHandler {
 	protected String doExportData(PortletDataContext context, String portletId,
 			PortletPreferences preferences) throws Exception {
 
-		System.out.println(" doExportData portletId : " + portletId);
+		log.info(" doExportData portletId : " + portletId);
 
 		context.addPermissions("com.liferay.lms.model.SCORMContent",
 				context.getScopeGroupId());
@@ -149,7 +153,7 @@ public class ScormDataHandlerImpl extends BasePortletDataHandler {
 			List<SCORMContent> entries = SCORMContentLocalServiceUtil
 					.getSCORMContentOfGroup(context.getScopeGroupId());
 	
-			System.out.println(" entries : " + entries.size());
+			log.info(" entries : " + entries.size());
 	
 			for (SCORMContent entry : entries) {
 				exportEntry(context, rootElement, entry);
@@ -173,7 +177,7 @@ public class ScormDataHandlerImpl extends BasePortletDataHandler {
 
 		String path = getEntryPath(context, entry);
 
-		System.out.println(" path : " + path);
+		log.info(" path : " + path);
 
 		if (!context.isPathNotProcessed(path)) {
 			return;
@@ -256,7 +260,7 @@ public class ScormDataHandlerImpl extends BasePortletDataHandler {
 
 		Document document = SAXReaderUtil.read(data);
 
-		System.out.println("import xml : \n" + data);
+		log.info("import xml : \n" + data);
 
 		Element rootElement = document.getRootElement();
 
@@ -264,7 +268,7 @@ public class ScormDataHandlerImpl extends BasePortletDataHandler {
 			for (Element entryElement : rootElement.elements("scormentry")) {
 				String path = entryElement.attributeValue("path");
 	
-				System.out.println(" entry : " + path);
+				log.info(" entry : " + path);
 	
 				if (!context.isPathNotProcessed(path)) {
 					continue;
@@ -272,7 +276,7 @@ public class ScormDataHandlerImpl extends BasePortletDataHandler {
 				SCORMContent entry = (SCORMContent) context
 						.getZipEntryAsObject(path);
 	
-				System.out.println(" Scorm : " + entry.getScormId());
+				log.info(" Scorm : " + entry.getScormId());
 	
 				importEntry(context, entryElement, entry);
 			}
@@ -283,7 +287,6 @@ public class ScormDataHandlerImpl extends BasePortletDataHandler {
 
 	protected void importEntry(PortletDataContext context, Element entryElement,
 			SCORMContent entry) throws SystemException, PortalException {
-		System.out.println("DENTRO DE IMPORT ENTRY");
 		long userId = context.getUserId(entry.getUserUuid());
 		entry.setGroupId(context.getScopeGroupId());
 		entry.setUserId(userId);
@@ -348,8 +351,6 @@ public class ScormDataHandlerImpl extends BasePortletDataHandler {
 					
 				}
 			} else {
-				
-				System.out.println("POR EL ELSE!! RECOGE EL FICHERO");
 				
 				InputStream is = context.getZipEntryAsInputStream(entryElement
 						.attributeValue("file"));

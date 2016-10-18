@@ -953,9 +953,6 @@ private void importEntry(PortletDataContext context, Element entryElement, Modul
 					}
 				}
 			}
-				
-			//sSystem.out.println("TE ESTOY SACANDO ESTO "+newEntry.getEntryId());
-		
 		}
 		
 		
@@ -977,15 +974,12 @@ private void importEntry(PortletDataContext context, Element entryElement, Modul
 			
 			String messageException = "";
 			try {
-				//System.out.println("   dlfileentry path: "+actElement.element("dlfileentry").attributeValue("path"));
 				
 				//Crear el folder
 				dlFolder = createDLFoldersForLearningActivity(userId, context.getScopeGroupId(), nuevaLarn.getActId(), nuevaLarn.getTitle(Locale.getDefault()), serviceContext);
-				//System.out.println("    DLFolder dlFolder: "+dlFolder.getFolderId()+", title: "+dlFolder.getName());
 				
 				//Recuperar el fichero del xml.
 				//InputStream is = context.getZipEntryAsInputStream(actElement.element("dlfileentry").attributeValue("file"));
-				//System.out.println("    InputStream file: "+is.toString());
 				byte [] byteArray = context.getZipEntryAsByteArray(theElement.element("dlfileentry").attributeValue("file"));
 					
 				//Obtener los datos del dlfileentry del .lar para poner sus campos igual. 
@@ -1333,13 +1327,6 @@ private void importEntry(PortletDataContext context, Element entryElement, Modul
 								Element entryElementLoc= element.addElement("descriptionfile");
 								entryElementLoc.addAttribute("path", pathqu);
 								entryElementLoc.addAttribute("file", pathFile + file.getTitle());
-								
-								//System.out.println("titleFile =============="+titleFile);
-								//System.out.println("getMimeType =============="+file.getMimeType());
-								//System.out.println("file.getExtension =============="+file.getExtension());
-							
-								
-									
 							} catch (Exception e) {
 								// TODO Auto-generated catch block
 								//e.printStackTrace();
@@ -1423,7 +1410,6 @@ private void importEntry(PortletDataContext context, Element entryElement, Modul
 
 		res = description.replace(target, replacement);
 		
-		//System.out.println("   res         : " + res );
 		if(res.equals(description)){
 			log.info("   :: description         : " + description );
 			//log.info("   :: target      : " + target );	
@@ -1459,9 +1445,6 @@ private void importEntry(PortletDataContext context, Element entryElement, Modul
 		for (Element actElementFile : elements) {
 			
 			FileEntry oldFile = (FileEntry)context.getZipEntryAsObject(actElementFile.attributeValue("path"));
-			
-			//System.out.println("      Description File: " + oldFile.getTitle()); 
-
 			try {
 				
 				InputStream input = context.getZipEntryAsInputStream(actElementFile.attributeValue("file"));
@@ -1479,7 +1462,7 @@ private void importEntry(PortletDataContext context, Element entryElement, Modul
 					FileEntry existingFile = DLAppLocalServiceUtil.getFileEntry(context.getScopeGroupId(), folderId, oldFile.getTitle());
 					res = descriptionFileParserLarToDescription(description, oldFile, existingFile);
 				}catch(Exception e){
-					System.out.println("ERROR! descriptionfile descriptionFileParserLarToDescription : " +e.getMessage());
+					e.printStackTrace();
 				}
 				
 			} catch (Exception e) {

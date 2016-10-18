@@ -31,7 +31,7 @@ import com.liferay.portal.model.User;
 import com.liferay.portal.service.UserLocalServiceUtil;
 
 public class PortalAdminMessageListener implements MessageListener {
-
+	private static Log log = LogFactoryUtil.getLog(PortalAdminMessageListener.class);
 	@Override
 	public void receive(Message message) throws MessageListenerException {
 		// TODO Auto-generated method stub
@@ -43,7 +43,7 @@ public class PortalAdminMessageListener implements MessageListener {
 			
 			
 		} catch (Exception e) {
-			_log.error("Unable to process message " + message, e);
+			log.error("Unable to process message " + message, e);
 		}
 	}
 
@@ -66,7 +66,7 @@ public class PortalAdminMessageListener implements MessageListener {
 		
 		List<ModuleResult> modules = LearningActivityLocalServiceUtil.dynamicQuery(dq);
 		
-		System.out.println("\n\n ## START ## "+start.getTime()+"\nModules result passed without passedDate : " + modules.size() +", Update DB: "+ updateDB );
+		log.info("\n\n ## START ## "+start.getTime()+"\nModules result passed without passedDate : " + modules.size() +", Update DB: "+ updateDB );
 		trace += start.getTime()+", Update DB: "+ updateDB+"\n";
 		
 		for(ModuleResult moduleResult:modules){
@@ -77,7 +77,7 @@ public class PortalAdminMessageListener implements MessageListener {
 				user = UserLocalServiceUtil.getUserById(moduleResult.getUserId());
 				userName = user.getFullName();
 			} catch (Exception e1) {/*e1.printStackTrace();*/}
-			System.out.println("\n ModuleResult: moduleId: " + moduleResult.getModuleId() + ", passedDate: " + moduleResult.getPassedDate() + ", " + userName +" (" + moduleResult.getUserId()+")");
+			log.info("\n ModuleResult: moduleId: " + moduleResult.getModuleId() + ", passedDate: " + moduleResult.getPassedDate() + ", " + userName +" (" + moduleResult.getUserId()+")");
 		
 			//Obtenemos las actividades que tiene el módulo
 			DynamicQuery dqa = DynamicQueryFactoryUtil.forClass(LearningActivity.class,classLoader)
@@ -95,9 +95,9 @@ public class PortalAdminMessageListener implements MessageListener {
 					
 					conta++;
 					
-					System.out.println("   activity passed: " + activity.getTitle(Locale.getDefault()) + " " + activity.getPriority() );
+					log.info("   activity passed: " + activity.getTitle(Locale.getDefault()) + " " + activity.getPriority() );
 					
-					System.out.println("     passedDate : " + newestActivityResult.getEndDate());
+					log.info("     passedDate : " + newestActivityResult.getEndDate());
 					
 					if(updateDB){
 						moduleResult.setPassedDate(newestActivityResult.getEndDate());
@@ -114,15 +114,15 @@ public class PortalAdminMessageListener implements MessageListener {
 							CourseResult courseResult = CourseResultLocalServiceUtil.getByUserAndCourse(course.getCourseId(), moduleResult.getUserId());
 							
 							if(courseResult != null && courseResult.getPassedDate() == null && courseResult.getPassed()){
-								System.out.println("       course : " + course.getTitle(Locale.getDefault()));
-								System.out.println("       * courseResult : " + courseResult);
+								log.info("       course : " + course.getTitle(Locale.getDefault()));
+								log.info("       * courseResult : " + courseResult);
 								
 								Module nextModule = ModuleLocalServiceUtil.getNextModule(moduleResult.getModuleId());
 																
 								//Si no tiene modulo siguiente, es que es el ultimo.
 								if(nextModule == null){
 									
-									System.out.println("         + courseResult passedDate : " + newestActivityResult.getEndDate());
+									log.info("         + courseResult passedDate : " + newestActivityResult.getEndDate());
 									
 									if(updateDB){
 										courseResult.setPassedDate(newestActivityResult.getEndDate());
@@ -131,7 +131,7 @@ public class PortalAdminMessageListener implements MessageListener {
 								}
 							}
 						}else{
-							System.out.println("       No course result");
+							log.info("       No course result");
 						}
 												
 					} catch (Exception e) { e.printStackTrace();}
@@ -148,11 +148,11 @@ public class PortalAdminMessageListener implements MessageListener {
 		}
 		
 		Calendar end = Calendar.getInstance();
-		System.out.println("------------------------------------------------");
-		System.out.println(" ## START ## "+start.getTime());
-		System.out.println(" ##  END  ## "+end.getTime());
-		System.out.println(" ##  UPDATED  ## "+conta);
-		System.out.println("------------------------------------------------");
+		log.info("------------------------------------------------");
+		log.info(" ## START ## "+start.getTime());
+		log.info(" ##  END  ## "+end.getTime());
+		log.info(" ##  UPDATED  ## "+conta);
+		log.info("------------------------------------------------");
 		
 		
 		try {
@@ -160,11 +160,9 @@ public class PortalAdminMessageListener implements MessageListener {
 				ModuleUpdateResult.saveStringToFile("updateModulePassedDate.txt", trace+"\nUPDATED: "+conta+"\n");
 			}
 		} catch (Exception e) {
-			System.out.println("");
-			//e.printStackTrace();
+			e.printStackTrace();
 		}
 		
 	}
 		
-	private static Log _log = LogFactoryUtil.getLog(PortalAdminMessageListener.class);
 }

@@ -81,17 +81,10 @@
 		
 		boolean showActivity = ( !isLocked || accessLock ) && visible ;
 		
-		//System.out.println("\n-------------------\n activity: " +activity.getTitle(themeDisplay.getLocale()));
-		//System.out.println(" is locked: " + LearningActivityLocalServiceUtil.islocked(activity.getActId(),themeDisplay.getUserId()));
-		//System.out.println(" ACCESSLOCK: " + permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), "com.liferay.lms.model",themeDisplay.getScopeGroupId(),"ACCESSLOCK"));
-		//System.out.println(" ActionKeys.UPDATE: " + permissionChecker.hasPermission(activity.getGroupId(), LearningActivity.class.getName(), activity.getActId(), ActionKeys.UPDATE));
-		//System.out.println(" ActionKeys.VIEW: " +   permissionChecker.hasPermission(activity.getGroupId(), LearningActivity.class.getName(), activity.getActId(), ActionKeys.VIEW));
-		//System.out.println(" Visible: " + visible);
-		//System.out.println(" showActivity ( !isLocked || accessLock ) && ( visible ): " + showActivity);
+		
 					
 		//Cuando entramos en la primera actividad desde el módulo y se puede ver.
 		if(actId == 0 && showActivity){
-			//System.out.println("    start activity: " +activity.getTitle(themeDisplay.getLocale()));
 			%>
 				<portlet:actionURL name="viewactivity" var="viewstartURL">
 					<portlet:param name="actId" value="<%=Long.toString(activity.getActId()) %>" />
@@ -104,7 +97,6 @@
 		if(writeNext){
 
 			if(showActivity){
-				//System.out.println("    next activity: " +activity.getTitle(themeDisplay.getLocale()));
 				%>
 					<portlet:actionURL name="viewactivity" var="viewnextURL">
 						<portlet:param name="actId" value="<%=Long.toString(activity.getActId()) %>" />
@@ -125,7 +117,6 @@
 				
 				//Tenemos una anterior mostrable.
 				if(prevActivity != null){
-					//System.out.println("    previous activity: " +activity.getTitle(themeDisplay.getLocale()));
 					%>
 						<portlet:actionURL name="viewactivity" var="viewURL">
 							<portlet:param name="actId" value="<%=Long.toString(prevActivity.getActId()) %>" />
