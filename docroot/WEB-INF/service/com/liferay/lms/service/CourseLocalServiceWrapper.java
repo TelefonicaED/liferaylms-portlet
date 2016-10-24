@@ -452,6 +452,27 @@ public class CourseLocalServiceWrapper implements CourseLocalService,
 		return _courseLocalService.getStudentsFromCourseCount(courseId);
 	}
 
+	public int getStudentsFromCourseCount(long courseId, long teamId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _courseLocalService.getStudentsFromCourseCount(courseId, teamId);
+	}
+
+	public int getStudentsFromCourseCount(long courseId, long teamId,
+		java.lang.String firstName, java.lang.String lastName,
+		java.lang.String screeName, java.lang.String emailAddress,
+		boolean andComparator)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _courseLocalService.getStudentsFromCourseCount(courseId, teamId,
+			firstName, lastName, screeName, emailAddress, andComparator);
+	}
+
+	public java.util.List<com.liferay.portal.model.User> getStudentsFromCourse(
+		com.liferay.lms.model.Course course, int start, int end) {
+		return _courseLocalService.getStudentsFromCourse(course, start, end);
+	}
+
 	public java.util.List<com.liferay.portal.model.User> getStudentsFromCourse(
 		com.liferay.lms.model.Course course) {
 		return _courseLocalService.getStudentsFromCourse(course);
@@ -461,6 +482,35 @@ public class CourseLocalServiceWrapper implements CourseLocalService,
 		long companyId, long courseGropupCreatedId) {
 		return _courseLocalService.getStudentsFromCourse(companyId,
 			courseGropupCreatedId);
+	}
+
+	public java.util.List<com.liferay.portal.model.User> getStudentsFromCourse(
+		long companyId, long courseGropupCreatedId, long teamId) {
+		return _courseLocalService.getStudentsFromCourse(companyId,
+			courseGropupCreatedId, teamId);
+	}
+
+	public java.util.List<com.liferay.portal.model.User> getStudentsFromCourse(
+		com.liferay.lms.model.Course course, int start, int end, long teamId) {
+		return _courseLocalService.getStudentsFromCourse(course, start, end,
+			teamId);
+	}
+
+	public java.util.List<com.liferay.portal.model.User> getStudentsFromCourse(
+		long companyId, long courseGropupCreatedId, int start, int end,
+		long teamId) {
+		return _courseLocalService.getStudentsFromCourse(companyId,
+			courseGropupCreatedId, start, end, teamId);
+	}
+
+	public java.util.List<com.liferay.portal.model.User> getStudentsFromCourse(
+		long companyId, long courseGropupCreatedId, int start, int end,
+		long teamId, java.lang.String firstName, java.lang.String lastName,
+		java.lang.String screenName, java.lang.String emailAddress,
+		boolean andOperator) {
+		return _courseLocalService.getStudentsFromCourse(companyId,
+			courseGropupCreatedId, start, end, teamId, firstName, lastName,
+			screenName, emailAddress, andOperator);
 	}
 
 	public java.util.List<com.liferay.lms.model.Course> getByTitleStatusCategoriesTags(

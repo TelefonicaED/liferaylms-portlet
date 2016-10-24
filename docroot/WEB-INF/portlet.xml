@@ -1313,7 +1313,11 @@
 		<display-name>StudentSearch</display-name>
 		<portlet-class>com.liferay.lms.StudentSearch</portlet-class>
 		<init-param>
-			<name>view-jsp</name>
+			<name>config-template</name>
+			<value>/html/studentsearch/config/config.jsp</value>
+		</init-param>
+		<init-param>
+			<name>view-template</name>
 			<value>/html/studentsearch/view.jsp</value>
 		</init-param>
 		<expiration-cache>0</expiration-cache>

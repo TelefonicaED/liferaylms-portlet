@@ -1,3 +1,8 @@
+<%@page import="com.liferay.lms.service.ScheduleLocalServiceUtil"%>
+<%@page import="com.liferay.lms.service.ScheduleLocalService"%>
+<%@page import="com.liferay.lms.model.Schedule"%>
+<%@page import="com.liferay.portal.model.Team"%>
+<%@page import="com.liferay.portal.service.TeamLocalServiceUtil"%>
 <%@page import="com.liferay.lms.model.CourseResult"%>
 <%@page import="com.liferay.lms.service.CourseResultLocalServiceUtil"%>
 <%@page import="com.liferay.lms.model.Competence"%>
@@ -30,6 +35,11 @@
 			<liferay-ui:error message="inscription-error-max-users" key="inscription-error-max-users"></liferay-ui:error>
 			<liferay-ui:error message="inscription-error-already-enrolled" key="inscription-error-already-enrolled"></liferay-ui:error>
 			<liferay-ui:error message="inscription-error-already-disenrolled" key="inscription-error-already-disenrolled"></liferay-ui:error>
+			
+			
+			
+			
+			
 			
 			<%if(GroupLocalServiceUtil.hasUserGroup(themeDisplay.getUserId(),themeDisplay.getScopeGroupId())){ 
 				Date now = new Date();
@@ -87,20 +97,69 @@
 				<%}
 				
 				Date now=new Date(System.currentTimeMillis());
-				
+						
+						
+						
 				if((course.getStartDate().before(now)&&course.getEndDate().after(now))&&permissionChecker.hasPermission(course.getGroupId(),  Course.class.getName(),course.getCourseId(),"REGISTER")){
 					int numberUsers = UserLocalServiceUtil.getGroupUsersCount(course.getGroupCreatedId());
 					
 					if((course.getMaxusers()<=0||numberUsers<course.getMaxusers())&&groupC.getType()!=GroupConstants.TYPE_SITE_PRIVATE){
 						if(groupC.getType()==GroupConstants.TYPE_SITE_OPEN){%>
 						
-							<portlet:actionURL name="inscribir"  var="inscribirURL" windowState="NORMAL"/>
-							<%if(pass){ %>
-								<div class="mensaje_marcado"><liferay-ui:message key="inscripcion.noinscrito" /></div>
+						<%if(pass){ 		
+							List<Team> teams = TeamLocalServiceUtil.getGroupTeams(course.getGroupCreatedId());
+							boolean existTeam = false;
+							boolean scheduleOpen = false;
+							for(Team team : teams){
+								Schedule sch = ScheduleLocalServiceUtil.getScheduleByTeamId(team.getTeamId());	
+								if(sch!=null){
+									existTeam = true;
+									if(sch.getStartDate().before(now)&&sch.getEndDate().after(now)){
+										scheduleOpen = true;
+										%>
+										
+										<div class="mensaje_marcado"><liferay-ui:message key="inscripcion.noinscrito" /></div>
+										<aui:fieldset>
+											<aui:column>
+												<% team.getName();  %>
+											</aui:column>
+											<aui:column>
+												<% sch.getStartDate(); %>
+											</aui:column>
+											<aui:column>
+												<% sch.getEndDate(); %>
+											</aui:column>
+											<aui:column>
+												<div class="boton_inscibirse ">
+													<a href="javascript:${renderResponse.getNamespace()}inscribir('<%=team.getTeamId()%>');"><liferay-ui:message key="inscripcion.inscribete" /></a>
+												</div>
+											</aui:column>
+									</aui:fieldset>
+								  <%}									
+								}
+								
+							}
+							if(!existTeam){
+							%>
+							
+							<div class="mensaje_marcado"><liferay-ui:message key="inscripcion.noinscrito" /></div>
 								<div class="boton_inscibirse ">
-									<a href="<%=inscribirURL %>"><liferay-ui:message key="inscripcion.inscribete" /></a>
+									<a href="javascript:${renderResponse.getNamespace()}inscribir('0');"><liferay-ui:message key="inscripcion.inscribete" /></a>
 								</div>
-							<%}else{ %>
+						<%
+							}else{
+								if(!scheduleOpen){
+									%>
+									<div class="mensaje_marcado">
+										<liferay-ui:message key="inscripcion.no-schedule-open"/>
+									</div>
+									
+									<%
+								}
+							}
+						}else{ %>
+							
+						
 								<div class="boton_inscibirse ">
 									<liferay-ui:message key="competence.block" />
 								</div>
@@ -117,14 +176,60 @@
 								if(denied.size()>0){%>
 									<div class="mensaje_marcado"><liferay-ui:message key="course.denied" /></div><%
 								}else{%>
-									<portlet:actionURL name="member"  var="memberURL" windowState="NORMAL"/>
-									<%if(pass){ %>
+									<%if(pass){ 
+										List<Team> teams = TeamLocalServiceUtil.getGroupTeams(course.getGroupCreatedId());
+										boolean existTeam = false;
+										boolean scheduleOpen = false;
+										for(Team team : teams){
+											Schedule sch = ScheduleLocalServiceUtil.getScheduleByTeamId(team.getTeamId());	
+											if(sch!=null){
+												existTeam = true;
+												if(sch.getStartDate().before(now)&&sch.getEndDate().after(now)){
+													scheduleOpen = true;%>
+										
+										
 										<div class="mensaje_marcado"><liferay-ui:message key="inscripcion.surveillance" /></div>
-										<div class="boton_inscibirse ">
-											<a href="<%=memberURL %>"><liferay-ui:message key="inscripcion.request" /></a>
-										</div>
-									<%}else{ %>
-										<div class="boton_inscibirse ">
+										<aui:fieldset>
+											<aui:column>
+												<% team.getName();  %>
+											</aui:column>
+											<aui:column>
+												<% sch.getStartDate(); %>
+											</aui:column>
+											<aui:column>
+												<% sch.getEndDate(); %>
+											</aui:column>
+											<aui:column>
+												<div class="boton_inscibirse ">
+													<a href="javascript:${renderResponse.getNamespace()}member('<%=team.getTeamId()%>');"><liferay-ui:message key="inscripcion.request" /></a>
+												</div>
+											</aui:column>
+										</aui:fieldset>
+										<% 	
+									}									
+								}
+								
+							}
+							if(!existTeam){
+							%>
+							
+							<div class="mensaje_marcado"><liferay-ui:message key="inscripcion.surveillance" /></div>
+								<div class="boton_inscibirse ">
+									<a href="javascript:${renderResponse.getNamespace()}member('0');"><liferay-ui:message key="inscripcion.request" /></a>
+								</div>
+						<%
+							}else{
+								if(!scheduleOpen){
+									%>
+									<div class="mensaje_marcado">
+										<liferay-ui:message key="inscripcion.no-schedule-open"/>
+									</div>
+									
+									<%
+								}
+							}	
+						}else{ %>
+										<div class="mensaje_marcado ">
 											<liferay-ui:message key="competence.block" />
 										</div>
 									<%} %>
@@ -161,3 +266,33 @@
 		renderRequest.setAttribute(WebKeys.PORTLET_CONFIGURATOR_VISIBILITY, Boolean.FALSE);
 	}%>
 </div>
+
+<portlet:actionURL name="member"  var="memberURL" windowState="NORMAL"/>
+<portlet:actionURL name="inscribir"  var="inscribirURL" windowState="NORMAL"/>
+						
+<aui:form name="inscribirFm" action="inscribirURL">
+	<aui:input name="teamId" value=""></aui:input>
+</aui:form>
+
+
+<aui:form name="memberFm" action="memberURL">
+	<aui:input name="teamId" value=""></aui:input>
+</aui:form>
+
+
+
+<script type="text/javascript">
+
+	function <portlet:namespace />inscribir(teamId){
+		$('#<portlet:namespace />teamId').val(teamId);
+		$('#<portlet:namespace />inscribirFm').submit();
+	}
+
+
+	function <portlet:namespace />member(teamId){
+		$('#<portlet:namespace />teamId').val(teamId);
+		$('#<portlet:namespace />memberFm').submit();
+	}
+
+</script>
+

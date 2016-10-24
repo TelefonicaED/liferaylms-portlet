@@ -819,6 +819,14 @@ public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int e
 	}
 	
 	public int getStudentsFromCourseCount(long courseId) throws SystemException, PortalException{
+		return getStudentsFromCourseCount(courseId, 0);
+		
+	}
+	public int getStudentsFromCourseCount(long courseId, long teamId) throws SystemException, PortalException{
+		return getStudentsFromCourseCount(courseId, 0,null,null,null,null,true);
+	}
+	
+	public int getStudentsFromCourseCount(long courseId, long teamId, String firstName, String lastName, String screeName, String emailAddress, boolean andComparator) throws SystemException, PortalException{
 		Course course = CourseLocalServiceUtil.getCourse(courseId);		
 		int value = 0;
 		LmsPrefs prefs;
@@ -844,12 +852,14 @@ public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int e
 		              + " (SELECT Users_Groups.userId " + "  FROM Users_Groups "
 		              + "  WHERE  (Users_Groups.groupId = ?))", new Long[] {
 		            		  course.getGroupCreatedId() }));
-			 
+			 if(teamId > 0 ){
+				 params.put("usersTeams", teamId);	 
+			 }
 			 params.put("isActive", new CustomSQLParam("WHERE User_.status =0",null));
 			
 			 
-			value =  UserLocalServiceUtil.searchCount(prefs.getCompanyId(), null, null, 
-					null, null, null, 0, params, true);
+			value =  UserLocalServiceUtil.searchCount(prefs.getCompanyId(), firstName, null, 
+					lastName, screeName, emailAddress, 0, params, true);
 			
 		} catch (PortalException e) {
 			e.printStackTrace();
@@ -861,12 +871,31 @@ public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int e
 		return value;
 	}
 	
-	
-	public List<User> getStudentsFromCourse(Course course) {		
-		return getStudentsFromCourse(course.getCompanyId(), course.getGroupCreatedId());
+	public List<User> getStudentsFromCourse(Course course, int start, int end) {		
+		return getStudentsFromCourse(course.getCompanyId(), course.getGroupCreatedId(), start, end, 0);
 	}
 	
-	public List<User> getStudentsFromCourse(long companyId, long courseGropupCreatedId) {
+	public List<User> getStudentsFromCourse(Course course) {		
+		return getStudentsFromCourse(course.getCompanyId(), course.getGroupCreatedId(), QueryUtil.ALL_POS, QueryUtil.ALL_POS,0);
+	}
+	
+	public List<User> getStudentsFromCourse(long companyId, long courseGropupCreatedId){
+		return getStudentsFromCourse(companyId, courseGropupCreatedId, QueryUtil.ALL_POS, QueryUtil.ALL_POS,0);
+	}
+	
+	public List<User> getStudentsFromCourse(long companyId, long courseGropupCreatedId, long teamId){
+		return getStudentsFromCourse(companyId, courseGropupCreatedId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, teamId);
+	}
+	
+	public List<User> getStudentsFromCourse(Course course, int start, int end, long teamId) {		
+		return getStudentsFromCourse(course.getCompanyId(), course.getGroupCreatedId(), start, end, teamId);
+	}
+	
+	public List<User> getStudentsFromCourse(long companyId, long courseGropupCreatedId, int start, int end,long teamId){
+		return getStudentsFromCourse(companyId, courseGropupCreatedId, start, end, teamId, null, null, null, null, true);
+	}
+	
+	public List<User> getStudentsFromCourse(long companyId, long courseGropupCreatedId, int start, int end,long teamId, String firstName, String lastName, String screenName, String emailAddress, boolean andOperator) {
 		List<User> students = new ArrayList<User>();
 		//List<User> usersExcluded = new ArrayList<User>();
 		
@@ -877,25 +906,7 @@ public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int e
 			long teacherRoleId=RoleLocalServiceUtil.getRole(prefs.getTeacherRole()).getRoleId();
 			long editorRoleId=RoleLocalServiceUtil.getRole(prefs.getEditorRole()).getRoleId();
 			
-			/*List<User> users = UserLocalServiceUtil.getGroupUsers(courseGropupCreatedId);
 			
-			List<UserGroupRole> teachers=UserGroupRoleLocalServiceUtil.getUserGroupRolesByGroupAndRole(courseGropupCreatedId, teacherRoleId);
-			for(UserGroupRole teacher: teachers) {
-				usersExcluded.add(teacher.getUser());
-			}
-			List<UserGroupRole> editors=UserGroupRoleLocalServiceUtil.getUserGroupRolesByGroupAndRole(courseGropupCreatedId, editorRoleId);
-			for(UserGroupRole editor: editors) {
-				usersExcluded.add(editor.getUser());
-			}
-			
-			
-			
-			if(Validator.isNotNull(usersExcluded)) {
-				for(User user: users) {
-					if( !(usersExcluded.contains(user)) && !(students.contains(user)) && user.isActive())
-						students.add(user);
-				}
-			}*/
 			
 			LinkedHashMap<String,Object> params=new LinkedHashMap<String,Object>();			
 
@@ -913,11 +924,12 @@ public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int e
 		              + " (SELECT Users_Groups.userId " + "  FROM Users_Groups "
 		              + "  WHERE  (Users_Groups.groupId = ?))", new Long[] {
 		            		  courseGropupCreatedId }));
-			 
-			 params.put("isActive", new CustomSQLParam("WHERE User_.status =0",null));
+			 if(teamId > 0 ){
+				 params.put("usersTeams", teamId);	 
+			 }
 			
-			students = UserLocalServiceUtil.search(prefs.getCompanyId(), null, null, 
-					null, null, null, 0, params, true, QueryUtil.ALL_POS, QueryUtil.ALL_POS,  new UserLastNameComparator(true));
+			students = UserLocalServiceUtil.search(companyId, firstName, null, 
+					lastName, screenName, emailAddress, WorkflowConstants.STATUS_ANY, params, andOperator, start, end,  new UserLastNameComparator(true));
 			
 		} catch (PortalException e) {
 			e.printStackTrace();

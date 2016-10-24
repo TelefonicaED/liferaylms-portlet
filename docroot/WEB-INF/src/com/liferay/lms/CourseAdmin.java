@@ -368,7 +368,6 @@ public class CourseAdmin extends MVCPortlet {
 				themeDisplay.getScopeGroupId(), themeDisplay.getUserId(), themeDisplay.getLanguageId(), isAdmin, true));
 		
 		renderRequest.setAttribute("searchContainer", searchContainer);
-		
 		renderRequest.setAttribute("catIds", catIds);
 		renderRequest.setAttribute("noAssetCategoryIds", assetCategoryIds == null || assetCategoryIds.size() == 0);
 		renderRequest.setAttribute("catId", catId);

@@ -1,3 +1,7 @@
+<%@page import="com.liferay.portal.model.Team"%>
+<%@page import="com.liferay.portal.service.TeamLocalServiceUtil"%>
+<%@page import="com.liferay.lms.service.ScheduleLocalServiceUtil"%>
+<%@page import="com.liferay.lms.model.Schedule"%>
 <%@page import="com.liferay.portlet.documentlibrary.util.DLUtil"%>
 <%@page import="com.liferay.portal.kernel.util.PropsUtil"%>
 <%@page import="com.liferay.portlet.PortletPreferencesFactoryUtil"%>
@@ -46,6 +50,18 @@
 	
 
 	Course course=CourseLocalServiceUtil.fetchByGroupCreatedId(themeDisplay.getScopeGroupId());
+	if(showModuleStartDate || showModuleEndDate){
+		List<Team> teams = TeamLocalServiceUtil.getGroupTeams(themeDisplay.getScopeGroupId());
+		for(Team team : teams){		
+		  if(ScheduleLocalServiceUtil.getScheduleByTeamId(team.getTeamId())!=null){
+			  showModuleStartDate = false;
+			  showModuleEndDate = false;
+			  break;
+		  }
+		}	
+	}	
+	
+	
 %>
 <liferay-portlet:actionURL name="moveModule" var="moveModuleURL" windowState="<%= LiferayWindowState.EXCLUSIVE.toString()%>" />
 

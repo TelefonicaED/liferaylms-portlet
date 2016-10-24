@@ -49,7 +49,6 @@ public class CourseHistory extends MVCPortlet
 		ThemeDisplay themeDisplay = (ThemeDisplay)renderRequest.getAttribute(WebKeys.THEME_DISPLAY);
 		
 		List<CourseResultView> courses = new ArrayList<CourseResultView>();
-		
 		try {
 			List<Group> groups = GroupLocalServiceUtil.getUserGroups(themeDisplay.getUserId());
 			

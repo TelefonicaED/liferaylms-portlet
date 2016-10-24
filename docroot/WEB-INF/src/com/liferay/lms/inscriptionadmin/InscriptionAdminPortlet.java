@@ -24,11 +24,13 @@ import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.MembershipRequest;
 import com.liferay.portal.model.MembershipRequestConstants;
+import com.liferay.portal.model.Team;
 import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.security.permission.PermissionThreadLocal;
 import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.MembershipRequestLocalServiceUtil;
+import com.liferay.portal.service.TeamLocalServiceUtil;
 import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.util.bridges.mvc.MVCPortlet;
@@ -150,9 +152,20 @@ public class InscriptionAdminPortlet extends MVCPortlet {
 		long msrId = ParamUtil.getLong(request, "msrId");
 		try {
 			MembershipRequest msr = MembershipRequestLocalServiceUtil.getMembershipRequest(msrId);
+			List<Team> teams =  TeamLocalServiceUtil.getUserTeams(msr.getUserId(), msr.getGroupId());
+			if(teams!=null && teams.size()>0){
+				long[] userIds = new long[1];
+    			userIds[0] = msr.getUserId();
+    			for(Team team : teams){
+					UserLocalServiceUtil.unsetTeamUsers(team.getTeamId(), userIds);	
+				}
+			}			
+			
 			msr.setStatusId(MembershipRequestConstants.STATUS_DENIED);
 			msr.setReplyDate(new Date());
 			MembershipRequestLocalServiceUtil.updateMembershipRequest(msr);
+			
+			
 		} catch (NumberFormatException e) {
 			if(log.isDebugEnabled()){
 				e.printStackTrace();

@@ -18,12 +18,14 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.mail.MailMessage;
 import com.liferay.portal.kernel.servlet.SessionErrors;
+import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PrefsPropsUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.GroupConstants;
+import com.liferay.portal.model.Team;
 import com.liferay.portal.model.User;
 import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.security.permission.PermissionChecker;
@@ -32,6 +34,7 @@ import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.MembershipRequestLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceContextFactory;
+import com.liferay.portal.service.TeamLocalServiceUtil;
 import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portlet.social.service.SocialActivityLocalServiceUtil;
@@ -79,10 +82,18 @@ public class CommunityInscription extends MVCPortlet {
     	
 
 		try {
+			long teamId = ParamUtil.getLong(request, "teamId",0);
 	    	ServiceContext serviceContext=ServiceContextFactory.getInstance(request);
 	    	MembershipRequestLocalServiceUtil.addMembershipRequest(themeDisplay.getUserId(), themeDisplay.getScopeGroupId(), "Enroll petition", serviceContext);
 	    	SocialActivityLocalServiceUtil.addActivity(themeDisplay.getUserId(), course.getGroupId(), Course.class.getName(), course.getCourseId(), com.liferay.portlet.social.model.SocialActivityConstants.TYPE_SUBSCRIBE, "", course.getUserId());
 
+	    	if(teamId>0){
+    			long[] userIds = new long[1];
+    			userIds[0] = themeDisplay.getUserId();	
+    			if(!UserLocalServiceUtil.hasTeamUser(teamId, themeDisplay.getUserId())){
+    				UserLocalServiceUtil.addTeamUsers(teamId, userIds);	
+    			}			
+    		}
 			
 			List<User> allUsers = UserLocalServiceUtil.getGroupUsers(course.getGroupCreatedId());
 			
@@ -153,6 +164,8 @@ public class CommunityInscription extends MVCPortlet {
 		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(WebKeys.THEME_DISPLAY);
 		if (!themeDisplay.isSignedIn()) {return;}
 
+		long teamId = ParamUtil.getLong(request, "teamId",0);
+		
 		long[] groupId = new long[1];
     	groupId[0] = themeDisplay.getScopeGroupId();	
     	
@@ -170,6 +183,16 @@ public class CommunityInscription extends MVCPortlet {
         	}else{
         		long userId = themeDisplay.getUserId();
             	if (!GroupLocalServiceUtil.hasUserGroup(userId, course.getGroupCreatedId())) {
+            		
+            		if(teamId>0){
+            			long[] userIds = new long[1];
+            			userIds[0] = userId;	
+            			if(!UserLocalServiceUtil.hasTeamUser(teamId, themeDisplay.getUserId())){
+            				UserLocalServiceUtil.addTeamUsers(teamId, userIds);	
+            			}			
+            		}
+            		
+            		
         	    	GroupLocalServiceUtil.addUserGroups(userId, groupId);
         			SocialActivityLocalServiceUtil.addActivity(userId, course.getGroupId(), Course.class.getName(), course.getCourseId(), com.liferay.portlet.social.model.SocialActivityConstants.TYPE_SUBSCRIBE, "", course.getUserId());
         			// Informamos que se ha inscrito.
@@ -202,8 +225,25 @@ public class CommunityInscription extends MVCPortlet {
 		long[] groupId = new long[1];
     	groupId[0] = themeDisplay.getScopeGroupId();						
 		long userId = themeDisplay.getUserId();
+		
 		Course course = CourseLocalServiceUtil.getCourseByGroupCreatedId(groupId[0]);
 
+		
+		try{
+			List<Team> teams = TeamLocalServiceUtil.getUserTeams(userId, course.getGroupCreatedId());
+			if(teams!=null && teams.size()>0){
+				long[] userIds = new long[1];
+				userIds[0] = userId;
+				for(Team team : teams){
+					if(UserLocalServiceUtil.hasTeamUser(team.getTeamId(), userId)){
+						UserLocalServiceUtil.unsetTeamUsers(team.getTeamId(), userIds);
+					}
+				}
+			}
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		
     	log.debug("COURSE GROUP ID "+course.getGroupCreatedId());
     	log.debug("THEME DISPLAY GROUP "+groupId[0]);
 		if (GroupLocalServiceUtil.hasUserGroup(userId, course.getGroupCreatedId())) {

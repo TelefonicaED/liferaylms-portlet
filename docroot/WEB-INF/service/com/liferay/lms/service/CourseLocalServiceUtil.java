@@ -463,6 +463,28 @@ public class CourseLocalServiceUtil {
 		return getService().getStudentsFromCourseCount(courseId);
 	}
 
+	public static int getStudentsFromCourseCount(long courseId, long teamId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getService().getStudentsFromCourseCount(courseId, teamId);
+	}
+
+	public static int getStudentsFromCourseCount(long courseId, long teamId,
+		java.lang.String firstName, java.lang.String lastName,
+		java.lang.String screeName, java.lang.String emailAddress,
+		boolean andComparator)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getService()
+				   .getStudentsFromCourseCount(courseId, teamId, firstName,
+			lastName, screeName, emailAddress, andComparator);
+	}
+
+	public static java.util.List<com.liferay.portal.model.User> getStudentsFromCourse(
+		com.liferay.lms.model.Course course, int start, int end) {
+		return getService().getStudentsFromCourse(course, start, end);
+	}
+
 	public static java.util.List<com.liferay.portal.model.User> getStudentsFromCourse(
 		com.liferay.lms.model.Course course) {
 		return getService().getStudentsFromCourse(course);
@@ -472,6 +494,37 @@ public class CourseLocalServiceUtil {
 		long companyId, long courseGropupCreatedId) {
 		return getService()
 				   .getStudentsFromCourse(companyId, courseGropupCreatedId);
+	}
+
+	public static java.util.List<com.liferay.portal.model.User> getStudentsFromCourse(
+		long companyId, long courseGropupCreatedId, long teamId) {
+		return getService()
+				   .getStudentsFromCourse(companyId, courseGropupCreatedId,
+			teamId);
+	}
+
+	public static java.util.List<com.liferay.portal.model.User> getStudentsFromCourse(
+		com.liferay.lms.model.Course course, int start, int end, long teamId) {
+		return getService().getStudentsFromCourse(course, start, end, teamId);
+	}
+
+	public static java.util.List<com.liferay.portal.model.User> getStudentsFromCourse(
+		long companyId, long courseGropupCreatedId, int start, int end,
+		long teamId) {
+		return getService()
+				   .getStudentsFromCourse(companyId, courseGropupCreatedId,
+			start, end, teamId);
+	}
+
+	public static java.util.List<com.liferay.portal.model.User> getStudentsFromCourse(
+		long companyId, long courseGropupCreatedId, int start, int end,
+		long teamId, java.lang.String firstName, java.lang.String lastName,
+		java.lang.String screenName, java.lang.String emailAddress,
+		boolean andOperator) {
+		return getService()
+				   .getStudentsFromCourse(companyId, courseGropupCreatedId,
+			start, end, teamId, firstName, lastName, screenName, emailAddress,
+			andOperator);
 	}
 
 	public static java.util.List<com.liferay.lms.model.Course> getByTitleStatusCategoriesTags(
