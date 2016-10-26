@@ -528,7 +528,8 @@ public class CourseAdmin extends MVCPortlet {
 			renderRequest.setAttribute("backToEdit", backToEdit);
 			renderRequest.setAttribute("redirectOfEdit", redirectOfEdit);
 			renderRequest.setAttribute("createdGroupId", createdGroupId);
-			
+			renderRequest.setAttribute("showEmail", true);
+			renderRequest.setAttribute("showScreenName", true);
 			
 			PortletURL searchURL = renderResponse.createRenderURL();
 			searchURL.setParameter("view", "role-members-tab");

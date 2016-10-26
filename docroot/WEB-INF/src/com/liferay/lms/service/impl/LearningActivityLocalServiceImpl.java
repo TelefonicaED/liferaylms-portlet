@@ -57,7 +57,6 @@ import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.PrefsPropsUtil;
-import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
@@ -78,12 +77,10 @@ import com.liferay.portal.service.RoleLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.TeamLocalServiceUtil;
 import com.liferay.portal.service.UserLocalServiceUtil;
-import com.liferay.portal.util.PortalUtil;
 import com.liferay.portlet.announcements.model.AnnouncementsEntry;
 import com.liferay.portlet.announcements.model.AnnouncementsFlagConstants;
 import com.liferay.portlet.announcements.service.AnnouncementsEntryServiceUtil;
 import com.liferay.portlet.announcements.service.AnnouncementsFlagLocalServiceUtil;
-import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
 import com.liferay.portlet.social.service.SocialActivityLocalServiceUtil;
 import com.liferay.util.LmsLocaleUtil;
 
@@ -515,6 +512,8 @@ public class LearningActivityLocalServiceImpl extends LearningActivityLocalServi
 		learningActivityPersistence.update(larn, false);
 		return larn;
 	}
+	
+	
 
 	public java.util.List<LearningActivity> getLearningActivitiesOfGroup(long groupId) throws SystemException
 	{
@@ -528,6 +527,10 @@ public class LearningActivityLocalServiceImpl extends LearningActivityLocalServi
 	{
 		return learningActivityPersistence.countByg(groupId);
 	}
+	public long countLearningActivitiesOfModule(long moduleId) throws SystemException
+	{
+		return LearningActivityUtil.countBym(moduleId);
+	}
 	public java.util.List<LearningActivity> getLearningActivitiesOfGroupAndType(long groupId,int typeId) throws SystemException
 	{
 		return learningActivityPersistence.findByg_t(groupId, typeId);
@@ -536,6 +539,12 @@ public class LearningActivityLocalServiceImpl extends LearningActivityLocalServi
 	{
 		return learningActivityPersistence.findBym(moduleId, -1, -1);
 	}
+	
+	public List<LearningActivity> getLearningActivitiesOfModule(long moduleId, int start, int end) throws SystemException
+	{
+		return LearningActivityUtil.findBym(moduleId, start, end);
+	} 
+	
 	public java.util.List<Long> getLearningActivityIdsOfModule(long moduleId) throws SystemException
 	{
 		java.util.List<LearningActivity>larnacts= learningActivityPersistence.findBym(moduleId, -1, -1);
@@ -1064,7 +1073,7 @@ private void sendNotification(String title, String content, String url, String t
 		int expirationDateHour=Integer.parseInt(formatHour.format(today));
 		int expirationDateMinute=Integer.parseInt(formatMin.format(today));
 
-		long classNameId=PortalUtil.getClassNameId(User.class.getName());
+		//long classNameId=PortalUtil.getClassNameId(User.class.getName());
 		//long classPK=serviceContext.getUserId();
 
 		AnnouncementsEntry ae;

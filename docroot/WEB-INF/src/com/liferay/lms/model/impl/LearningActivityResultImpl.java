@@ -14,11 +14,15 @@
 
 package com.liferay.lms.model.impl;
 
+import java.util.Locale;
+
 import com.liferay.lms.learningactivity.calificationtype.CalificationType;
 import com.liferay.lms.learningactivity.calificationtype.CalificationTypeRegistry;
 import com.liferay.lms.model.Course;
 import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.model.User;
+import com.liferay.portal.service.UserLocalServiceUtil;
 
 /**
  * The extended model implementation for the LearningActivityResult service. Represents a row in the &quot;Lms_LearningActivityResult&quot; database table, with each column mapped to a property of this class.
@@ -45,9 +49,13 @@ public class LearningActivityResultImpl extends LearningActivityResultBaseImpl {
 			Course curso = CourseLocalServiceUtil.getCourseByGroupCreatedId(groupId);
 			if(curso != null){
 				CalificationType ct = new CalificationTypeRegistry().getCalificationType(curso.getCalificationType());
-				result = ct.translate(this.getResult());
+				
+				User user = UserLocalServiceUtil.fetchUser(this.getUserId());
+				Locale locale = user.getLocale();
+			
+				result = ct.translate(locale, this.getResult());
 			}
-		} catch (SystemException e) {
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

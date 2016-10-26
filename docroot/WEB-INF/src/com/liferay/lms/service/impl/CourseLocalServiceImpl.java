@@ -855,11 +855,10 @@ public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int e
 			 if(teamId > 0 ){
 				 params.put("usersTeams", teamId);	 
 			 }
-			 params.put("isActive", new CustomSQLParam("WHERE User_.status =0",null));
 			
 			 
 			value =  UserLocalServiceUtil.searchCount(prefs.getCompanyId(), firstName, null, 
-					lastName, screeName, emailAddress, 0, params, true);
+					lastName, screeName, emailAddress, WorkflowConstants.STATUS_APPROVED, params, true);
 			
 		} catch (PortalException e) {
 			e.printStackTrace();
@@ -929,7 +928,7 @@ public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int e
 			 }
 			
 			students = UserLocalServiceUtil.search(companyId, firstName, null, 
-					lastName, screenName, emailAddress, WorkflowConstants.STATUS_ANY, params, andOperator, start, end,  new UserLastNameComparator(true));
+					lastName, screenName, emailAddress, WorkflowConstants.STATUS_APPROVED, params, andOperator, start, end,  new UserLastNameComparator(true));
 			
 		} catch (PortalException e) {
 			e.printStackTrace();

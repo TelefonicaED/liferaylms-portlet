@@ -132,12 +132,12 @@ public class CalificationTypeClp implements CalificationType {
 		return ((String)returnObj);
 	}
 	
-	public String translate(double result){
+	public String translate(Locale locale, double result){
 		Object returnObj = null;
 
 		try {
-			MethodKey translateMethod = new MethodKey(clp.getClassName(), "translate", double.class); 
-			returnObj = clp.invoke(new MethodHandler(translateMethod, result));
+			MethodKey translateMethod = new MethodKey(clp.getClassName(), "translate", Locale.class, double.class); 
+			returnObj = clp.invoke(new MethodHandler(translateMethod, locale, result));
 		}
 		catch (Throwable t) {
 			t = ClpSerializer.translateThrowable(t);
@@ -153,5 +153,7 @@ public class CalificationTypeClp implements CalificationType {
 
 		return ((String)returnObj);
 	}
+	
+	
 	
 }

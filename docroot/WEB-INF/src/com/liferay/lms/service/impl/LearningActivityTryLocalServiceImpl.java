@@ -33,6 +33,7 @@ import com.liferay.lms.service.LearningActivityLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityResultLocalServiceUtil;
 import com.liferay.lms.service.ModuleResultLocalServiceUtil;
 import com.liferay.lms.service.base.LearningActivityTryLocalServiceBaseImpl;
+import com.liferay.lms.service.persistence.LearningActivityTryFinderUtil;
 import com.liferay.portal.kernel.bean.PortletBeanLocatorUtil;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
@@ -386,5 +387,11 @@ public class LearningActivityTryLocalServiceImpl
 		}
 		
 		return new ArrayList<LearningActivityTry>();
+	}
+	
+	
+	public long triesPerUserOnlyStudents(long actId, long companyId, long courseGropupCreatedId, List<User> _students, long teamId) throws SystemException {
+		
+		return LearningActivityTryFinderUtil.triesPerUserOnlyStudents(actId, companyId, courseGropupCreatedId, _students, teamId);
 	}
 }

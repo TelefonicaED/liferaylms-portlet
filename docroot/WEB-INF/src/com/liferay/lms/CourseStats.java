@@ -7,14 +7,16 @@ import java.text.MessageFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 
-import javax.portlet.PortletConfig;
 import javax.portlet.PortletException;
+import javax.portlet.PortletRequestDispatcher;
+import javax.portlet.PortletURL;
+import javax.portlet.RenderRequest;
+import javax.portlet.RenderResponse;
 import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
 
@@ -25,6 +27,7 @@ import com.liferay.lms.model.CourseResult;
 import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.model.LmsPrefs;
 import com.liferay.lms.model.Module;
+import com.liferay.lms.model.Schedule;
 import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.lms.service.CourseResultLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityLocalServiceUtil;
@@ -32,31 +35,35 @@ import com.liferay.lms.service.LearningActivityResultLocalServiceUtil;
 import com.liferay.lms.service.LmsPrefsLocalServiceUtil;
 import com.liferay.lms.service.ModuleLocalServiceUtil;
 import com.liferay.lms.service.ModuleResultLocalServiceUtil;
+import com.liferay.lms.service.ScheduleLocalServiceUtil;
+import com.liferay.lms.views.ActivityStatsView;
+import com.liferay.lms.views.CourseStatsView;
+import com.liferay.lms.views.ModuleStatsView;
 import com.liferay.portal.kernel.dao.orm.CustomSQLParam;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
+import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.NestableException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.servlet.HttpHeaders;
 import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.ContentTypes;
-import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.WebKeys;
-import com.liferay.portal.kernel.xml.DocumentException;
-import com.liferay.portal.kernel.xml.Element;
-import com.liferay.portal.kernel.xml.SAXReaderUtil;
 import com.liferay.portal.model.Group;
+import com.liferay.portal.model.Team;
 import com.liferay.portal.model.User;
 import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.RoleLocalServiceUtil;
+import com.liferay.portal.service.TeamLocalServiceUtil;
 import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.comparator.UserLastNameComparator;
@@ -69,6 +76,229 @@ import com.liferay.util.bridges.mvc.MVCPortlet;
  */
 public class CourseStats extends MVCPortlet {
  
+	
+	
+	private String viewJSP = null;
+	private String viewModuleJSP = null;
+
+	public void init() throws PortletException {	
+		viewJSP = getInitParameter("view-jsp");
+		viewModuleJSP = getInitParameter("view-module-jsp");
+	}
+
+	private static Log log = LogFactoryUtil.getLog(StudentSearch.class);
+	
+	public void doView(RenderRequest renderRequest, RenderResponse renderResponse) throws IOException, PortletException {
+		ThemeDisplay themeDisplay = (ThemeDisplay)renderRequest.getAttribute(WebKeys.THEME_DISPLAY);
+		String jsp = ParamUtil.get(renderRequest, "view", "");
+		if(jsp!=null && jsp.equals("viewModule")){
+			showViewModule(themeDisplay, renderRequest, renderResponse);
+		}else{
+			showViewDefault(themeDisplay, renderRequest, renderResponse);
+		}
+		
+	}
+	
+	private void showViewDefault(ThemeDisplay themeDisplay, RenderRequest renderRequest, RenderResponse renderResponse) throws PortletException, IOException{
+		try {
+			
+			log.debug(":: VIEW COURSE STATS "+this.viewJSP);
+			
+			long teamId = ParamUtil.getLong(renderRequest, "teamId",0);
+			List<Team> teams = TeamLocalServiceUtil.getGroupTeams(themeDisplay.getScopeGroupId());
+			Course course 	 = CourseLocalServiceUtil.fetchByGroupCreatedId(themeDisplay.getScopeGroupId());
+			
+						
+			renderRequest.setAttribute("teamId", teamId);
+			renderRequest.setAttribute("teams",teams);	
+			renderRequest.setAttribute("course", course);
+	
+			if(teams!=null && teams.size()>0){
+				renderRequest.setAttribute("existTeams", true);
+			}else{
+				renderRequest.setAttribute("existTeams", false);	
+			}
+			
+			PortletURL iteratorURL = renderResponse.createRenderURL();
+			iteratorURL.setParameter("teamId", String.valueOf(teamId));
+			
+			List<User> students = CourseLocalServiceUtil.getStudentsFromCourse(course.getCompanyId(), course.getGroupCreatedId(), teamId);
+			
+			long registered = students.size();
+			long finished = CourseResultLocalServiceUtil.countStudentsFinishedByCourseId(course, null, teamId);
+			long started = CourseResultLocalServiceUtil.countStudentsStartedByCourseId(course, null, teamId);
+			long passed = CourseResultLocalServiceUtil.countStudentsPassedByCourseId(course, null, teamId);
+			long failed = CourseResultLocalServiceUtil.countStudentsFailedByCourseId(course, null, teamId);
+		
+			//Se construye la vista de las estadisticas del curso
+			CourseStatsView courseStats = new CourseStatsView(course.getCourseId(), course.getTitle(themeDisplay.getLocale()));				
+			courseStats.setRegistered(registered);
+			courseStats.setStarted(started);
+			courseStats.setFinished(finished);
+			courseStats.setPassed(passed);
+			courseStats.setFailed(failed);
+			
+			List<CourseStatsView> courseStatsViews = new ArrayList<CourseStatsView>();
+			courseStatsViews.add(courseStats);
+			
+			SearchContainer<CourseStatsView> searchContainerCourses = new SearchContainer<CourseStatsView>(renderRequest, null, null, SearchContainer.DEFAULT_CUR_PARAM, 
+					SearchContainer.DEFAULT_DELTA, iteratorURL, 
+					null, "no-results");
+			searchContainerCourses.setIteratorURL(renderResponse.createRenderURL());
+			searchContainerCourses.setResults(courseStatsViews);
+			searchContainerCourses.setTotal(courseStatsViews.size());
+			
+			//Se construye la vista de las estadisticas de los módulos
+			List<Module> modules = ModuleLocalServiceUtil.findAllInGroup(themeDisplay.getScopeGroupId());
+			List<ModuleStatsView> moduleStatsViews = new ArrayList<ModuleStatsView>();
+			ModuleStatsView moduleStats;
+			long moduleFinished = 0;
+			long moduleStarted = 0;
+			
+			Schedule sch = ScheduleLocalServiceUtil.getScheduleByTeamId(teamId);
+			Module precedence;
+			for(Module module: modules){
+				moduleStats = new ModuleStatsView(module.getModuleId(), module.getTitle(themeDisplay.getLocale()));
+				moduleStarted = ModuleResultLocalServiceUtil.countStudentsStartedByModuleId(module, null, teamId);  
+				moduleFinished = ModuleResultLocalServiceUtil.countStudentsFinishedByModuleId(module, null, teamId); 
+				moduleStats.setStarted(moduleStarted);
+				moduleStats.setFinished(moduleFinished);
+				if(sch!=null){
+					moduleStats.setStartDate(sch.getStartDate());
+					moduleStats.setEndDate(sch.getEndDate());
+				}else{
+					moduleStats.setStartDate(module.getStartDate());
+					moduleStats.setEndDate(module.getEndDate());
+				}
+				moduleStats.setActivityNumber(LearningActivityLocalServiceUtil.countLearningActivitiesOfModule(module.getModuleId()));
+				if(module.getPrecedence()!=0){
+					precedence = ModuleLocalServiceUtil.fetchModule(module.getPrecedence());
+					if(precedence!=null){
+						moduleStats.setPrecedence(precedence.getTitle(themeDisplay.getLocale()));
+					}					
+				}
+				
+				moduleStatsViews.add(moduleStats);	
+			}
+			
+			
+			
+			
+			SearchContainer<ModuleStatsView> searchContainerModules = new SearchContainer<ModuleStatsView>(renderRequest, null, null, SearchContainer.DEFAULT_CUR_PARAM, 
+					SearchContainer.DEFAULT_DELTA, iteratorURL, 
+					null, "module-empty-results-message");
+			searchContainerModules.setIteratorURL(renderResponse.createRenderURL());
+			int endValue = searchContainerModules.getEnd();
+			if(endValue>moduleStatsViews.size()){
+				endValue=moduleStatsViews.size();
+			}
+			searchContainerModules.setResults(moduleStatsViews.subList(searchContainerModules.getStart(), endValue));
+			searchContainerModules.setTotal(moduleStatsViews.size());
+			
+			
+			renderRequest.setAttribute("searchContainer", searchContainerCourses);
+			renderRequest.setAttribute("moduleSearchContainer", searchContainerModules);
+			
+				
+		} catch (SystemException e) {
+			e.printStackTrace();
+		} 
+
+		this.include(this.viewJSP, renderRequest, renderResponse);
+		
+	}
+	
+	
+	private void showViewModule(ThemeDisplay themeDisplay, RenderRequest renderRequest, RenderResponse renderResponse) throws PortletException, IOException{
+		try {
+			AssetRendererFactory arf=AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(LearningActivity.class.getName());
+			Map<Long, String> classTypes;
+			classTypes = arf.getClassTypes(new long[]{themeDisplay.getScopeGroupId()}, themeDisplay.getLocale());
+			renderRequest.setAttribute("types", classTypes);
+			long moduleId = ParamUtil.getLong(renderRequest, "moduleId", 0);
+			long teamId = ParamUtil.getLong(renderRequest, "teamId", 0);
+			
+			renderRequest.setAttribute("moduleId", moduleId);
+			renderRequest.setAttribute("teamId", teamId);
+			
+			PortletURL iteratorURL = renderResponse.createRenderURL();
+			iteratorURL.setParameter("teamId", String.valueOf(teamId));
+			iteratorURL.setParameter("moduleId", String.valueOf(moduleId));
+			iteratorURL.setParameter("view", "viewModule");
+			
+			
+			SearchContainer<ActivityStatsView> searchContainerActivities = new SearchContainer<ActivityStatsView>(renderRequest, null, null, SearchContainer.DEFAULT_CUR_PARAM, 
+					SearchContainer.DEFAULT_DELTA, iteratorURL, 
+					null, "module-empty-results-message");
+			//Se construye la vista de las estadisticas de los módulos
+			List<LearningActivity> activities = LearningActivityLocalServiceUtil.getLearningActivitiesOfModule(moduleId,searchContainerActivities.getStart(), searchContainerActivities.getEnd() );
+			Long total = LearningActivityLocalServiceUtil.countLearningActivitiesOfModule(moduleId);
+			
+			List<ActivityStatsView> activityStatsViews = new ArrayList<ActivityStatsView>();
+			ActivityStatsView activityStats;
+			
+			Schedule sch = ScheduleLocalServiceUtil.getScheduleByTeamId(teamId);
+			
+			for(LearningActivity activity: activities){
+				activityStats = new ActivityStatsView(activity.getActId(), activity.getTitle(themeDisplay.getLocale()));
+							
+				activityStats.setStarted(LearningActivityResultLocalServiceUtil.countStartedOnlyStudents(activity.getActId(), activity.getCompanyId(), activity.getGroupId(), null, teamId));
+				activityStats.setFinished(LearningActivityResultLocalServiceUtil.countFinishedOnlyStudents(activity.getActId(), activity.getCompanyId(), activity.getGroupId(), null, teamId));
+				activityStats.setPassed(LearningActivityResultLocalServiceUtil.countPassedOnlyStudents(activity.getActId(), activity.getCompanyId(), activity.getGroupId(), true, null, teamId));
+				activityStats.setFailed(LearningActivityResultLocalServiceUtil.countNotPassedOnlyStudents(activity.getActId(), activity.getCompanyId(), activity.getGroupId(), null, teamId));
+				activityStats.setTriesPerUser(LearningActivityResultLocalServiceUtil.triesPerUserOnlyStudents(activity.getActId(), activity.getCompanyId(), activity.getGroupId(), null, teamId));
+				activityStats.setAvgResult(LearningActivityResultLocalServiceUtil.avgResultOnlyStudents(activity.getActId(), activity.getCompanyId(), activity.getGroupId(), null, teamId));
+			
+				activityStats.setPassPuntuation(activity.getPasspuntuation());
+				activityStats.setTries(activity.getTries());
+				
+				boolean hasPrecedence = false;
+				if(activity.getPrecedence() > 0)
+					hasPrecedence = true;
+				activityStats.setPrecedence(LanguageUtil.get(themeDisplay.getLocale(),"dependencies."+String.valueOf(hasPrecedence)));
+				activityStats.setType(LanguageUtil.get(themeDisplay.getLocale(),classTypes.get((long)activity.getTypeId())));
+				if(activity.getWeightinmodule() == 1){
+					activityStats.setMandatory(LanguageUtil.get(themeDisplay.getLocale(), "yes"));
+				}else{
+					activityStats.setMandatory(LanguageUtil.get(themeDisplay.getLocale(), "no"));
+				}
+				
+				if(sch!=null){
+					activityStats.setStartDate(sch.getStartDate());
+					activityStats.setEndDate(sch.getEndDate());
+				}else{
+					activityStats.setStartDate(activity.getStartdate());
+					activityStats.setEndDate(activity.getEnddate());
+				}
+				activityStatsViews.add(activityStats);
+			}
+			
+			
+		
+			searchContainerActivities.setResults(activityStatsViews);
+			searchContainerActivities.setTotal(total.intValue());
+			
+			
+			renderRequest.setAttribute("searchContainer", searchContainerActivities);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		this.include(this.viewModuleJSP, renderRequest, renderResponse);
+	}
+	
+	protected void include(String path, RenderRequest renderRequest, RenderResponse renderResponse) throws IOException, PortletException {
+		
+		PortletRequestDispatcher portletRequestDispatcher = getPortletContext().getRequestDispatcher(path);
+	
+		if (portletRequestDispatcher == null) {
+			
+		} else {
+			portletRequestDispatcher.include(renderRequest, renderResponse);
+		}
+	}
+	
 	@Override
 	public void serveResource(ResourceRequest resourceRequest,
 							  ResourceResponse resourceResponse) 
@@ -256,7 +486,7 @@ public class CourseStats extends MVCPortlet {
 			long registered=CourseLocalServiceUtil.getStudentsFromCourse(themeDisplay.getCompanyId(), module.getGroupId()).size();
 			//long registered=UserLocalServiceUtil.getGroupUsersCount(group.getGroupId(),0);
 			long iniciados = 0;
-	    	long finalizados = 0;
+
 	    	
 			if (teamId != 0){
 				//Usuarios registrados en el curso
@@ -264,7 +494,7 @@ public class CourseStats extends MVCPortlet {
 				
 				usersList = getUsersOfTeam(curso.getCourseId(), teamId, themeDisplay);
 				iniciados=ModuleResultLocalServiceUtil.countByModuleOnlyStudents(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(), module.getModuleId(), usersList);
-		    	finalizados=ModuleResultLocalServiceUtil.countByModulePassedOnlyStudents(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(),module.getModuleId(),true, usersList);
+		    	//finalizados=ModuleResultLocalServiceUtil.countByModulePassedOnlyStudents(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(),module.getModuleId(),true, usersList);
 		    	
 		    	registered = 0;
 		    	for (User usuario: usersList){	
@@ -274,7 +504,7 @@ public class CourseStats extends MVCPortlet {
 		    	}
 			}else{
 				iniciados=ModuleResultLocalServiceUtil.countByModuleOnlyStudents(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(), module.getModuleId());
-		    	finalizados=ModuleResultLocalServiceUtil.countByModulePassedOnlyStudents(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(),module.getModuleId(),true);
+		    	//finalizados=ModuleResultLocalServiceUtil.countByModulePassedOnlyStudents(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(),module.getModuleId(),true);
 			}
 			
 			String mStartDate = module.getStartDate() == null? "":sdf.format(module.getStartDate());
@@ -293,7 +523,7 @@ public class CourseStats extends MVCPortlet {
 		    writer.writeNext(new String[]{module.getTitle(themeDisplay.getLocale())});
 		    
 		    //Inscritos
-		    Object args[] = {registered};
+		   // Object args[] = {registered};
 		    writer.writeNext(new String[]{MessageFormat.format(rb.getString("coursestats.modulestats.inscritos"),registered)});
 		    
 		    //Iniciaron/finalizaron
@@ -382,80 +612,6 @@ public class CourseStats extends MVCPortlet {
 			resourceResponse.getPortletOutputStream().flush();
 			resourceResponse.getPortletOutputStream().close();
 		}
-	}
-
-	private String getExtraData(ThemeDisplay themeDisplay, LearningActivity activity,
-			ResourceRequest resourceRequest) {
-		
-		PortletConfig portletConfig = (PortletConfig)resourceRequest.getAttribute(JavaConstants.JAVAX_PORTLET_CONFIG);
-		
-		String typeId = StringPool.BLANK;
-		try {
-			AssetRendererFactory arf=AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(LearningActivity.class.getName());
-			Map<Long, String> classTypes = arf.getClassTypes(new long[0], themeDisplay.getLocale());
-			typeId = classTypes.get((long)activity.getTypeId());
-		} catch (Exception e) {
-		}
-		
-		String result = "", head="", val="";
-		LearningActivity precedenceActivity=null;
-		if(activity.getPrecedence()!=0) {
-			try{
-				precedenceActivity=LearningActivityLocalServiceUtil.getLearningActivity(activity.getPrecedence());
-				String title=precedenceActivity.getTitle(themeDisplay.getLocale());
-				int maxNameLength=GetterUtil.getInteger(LanguageUtil.get(portletConfig,resourceRequest.getLocale(), "coursestats.modulestats.large.name.length"),20);
-				
-				if(title.length()>maxNameLength) 
-					title=MessageFormat.format(LanguageUtil.get(portletConfig,resourceRequest.getLocale(), "coursestats.modulestats.large.name"),title.subSequence(0, maxNameLength+1));
-				
-				head=replaceAcutes(LanguageUtil.get(portletConfig,resourceRequest.getLocale(), "coursestats.modulestats.dependencies"));
-				val=replaceAcutes(title);
-				result = result == "" ? head + " = " + val:result + "; "+head + " = " + val;
-				head=""; val="";
-			}
-			catch(NestableException e){}
-		}
-
-		if((activity.getExtracontent()!=null)&&(activity.getExtracontent().length()!=0)) {
-			try{
-				Iterator<Element> nodes= SAXReaderUtil.read(activity.getExtracontent()).getRootElement().elementIterator();
-				while(nodes.hasNext()){
-					Element node =(Element)nodes.next();
-					if(node.getText().length()!=0) {
-						String extraFieldType = "";
-						try{
-							String headerKey="coursestats.modulestats."+typeId+"."+node.getName();
-							head=replaceAcutes(LanguageUtil.get(portletConfig,resourceRequest.getLocale(), headerKey));
-							extraFieldType=LanguageUtil.get(portletConfig,resourceRequest.getLocale(), headerKey + ".type");
-						}catch(Exception e){
-							e.printStackTrace();
-						}
-						String value=null;
-						if("seconds".equals(extraFieldType)) {
-							try{
-								long seconds = Long.parseLong(node.getTextTrim());
-								NumberFormat timeNumberFormat = NumberFormat.getInstance(themeDisplay.getLocale());
-								timeNumberFormat.setMinimumIntegerDigits(2);
-								value=timeNumberFormat.format(seconds / 3600)+StringPool.COLON+
-									  timeNumberFormat.format((seconds % 3600) / 60)+StringPool.COLON+
-									  timeNumberFormat.format(seconds % 60);
-							}
-							catch(NumberFormatException e) {
-								value=LanguageUtil.get(portletConfig,resourceRequest.getLocale(), node.getTextTrim());
-							}
-						}else {
-							value=LanguageUtil.get(portletConfig,resourceRequest.getLocale(), node.getTextTrim());
-						}
-						
-						val=replaceAcutes(value);
-						result = result == "" ? head + " = " + val:result + "; "+head + " = " + val;
-		    			head=""; val="";
-					}
-				}
-			}
-			catch(DocumentException e){}
-		}
-		return result;
 	}
 
 	private void endCsv(ResourceResponse resourceResponse, CSVWriter writer)

@@ -946,6 +946,10 @@
 			<value>/html/coursestats/view.jsp</value>
 		</init-param>
 		<init-param>
+			<name>view-module-jsp</name>
+			<value>/html/coursestats/viewmodule.jsp</value>
+		</init-param>
+		<init-param>
 			<name>wemooc-report</name>
 			<value>true</value>
 		</init-param>

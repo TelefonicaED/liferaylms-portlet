@@ -34,6 +34,8 @@ import com.liferay.lms.service.LearningActivityResultLocalServiceUtil;
 import com.liferay.lms.service.ModuleLocalServiceUtil;
 import com.liferay.lms.service.ModuleResultLocalServiceUtil;
 import com.liferay.lms.service.base.ModuleResultLocalServiceBaseImpl;
+import com.liferay.lms.service.persistence.CourseResultFinderUtil;
+import com.liferay.lms.service.persistence.ModuleResultFinderUtil;
 import com.liferay.lms.service.persistence.ModuleResultUtil;
 import com.liferay.portal.kernel.bean.PortletBeanLocatorUtil;
 import com.liferay.portal.kernel.dao.orm.Criterion;
@@ -122,49 +124,28 @@ public class ModuleResultLocalServiceImpl extends ModuleResultLocalServiceBaseIm
 		return moduleResultPersistence.countBym(moduleId);
 	}
 
-	
+	@Deprecated
 	public long countByModuleOnlyStudents(long companyId, long courseGropupCreatedId, long moduleId) throws SystemException{
 		return countByModuleOnlyStudents(companyId, courseGropupCreatedId, moduleId, null);
 	}
 	
+	@Deprecated
 	public long countByModuleOnlyStudents(long companyId, long courseGropupCreatedId, long moduleId ,List<User> _students)
 			throws SystemException {
 		
-		long res = 0;
-		
-		List<User> students = null;
-		// Se prepara el metodo para recibir un Listado de estudiantes especificos,, por ejemplo que pertenezcan a alguna organizacion. Sino, se trabaja con todos los estudiantes del curso.
-		if(Validator.isNotNull(_students) && _students.size() > 0)
-			students = _students;
-		else
-			students = CourseLocalServiceUtil.getStudentsFromCourse(companyId, courseGropupCreatedId);
-		
-		ClassLoader classLoader = (ClassLoader) PortletBeanLocatorUtil.locate(ClpSerializer.getServletContextName(), "portletClassLoader");
-		DynamicQuery consulta = DynamicQueryFactoryUtil.forClass(ModuleResult.class, classLoader)
-				.add(PropertyFactoryUtil.forName("moduleId").eq(moduleId));
-		
-		if(Validator.isNotNull(students) && students.size() > 0) {
-			Criterion criterion = null;
-			for (int i = 0; i < students.size(); i++) {
-				if(i==0) {
-					criterion = RestrictionsFactoryUtil.like("userId", students.get(i).getUserId());
-				} else {
-					criterion = RestrictionsFactoryUtil.or(criterion, RestrictionsFactoryUtil.like("userId", students.get(i).getUserId()));
-				}
-			}
-			if(Validator.isNotNull(criterion)) {
-				consulta.add(criterion);
-				
-				List<ModuleResult> results = moduleResultPersistence.findWithDynamicQuery(consulta);
-				if(results!=null && !results.isEmpty()) {
-					res = results.size();
-				}
-			}
-		}
-		
-		return res;
+		return ModuleResultFinderUtil.countStartedOnlyStudents(moduleId, companyId, courseGropupCreatedId, _students, 0);
 	}
 
+	
+	public long countStudentsStartedByModuleId(Module module, List<User> students, long teamId){
+		return ModuleResultFinderUtil.countStartedOnlyStudents(module.getModuleId(), module.getCompanyId(), module.getGroupId(), students, teamId);
+
+	}
+	
+	public long countStudentsFinishedByModuleId(Module module, List<User> students, long teamId){
+		return ModuleResultFinderUtil.countFinishedOnlyStudents(module.getModuleId(), module.getCompanyId(), module.getGroupId(), students, teamId);
+	}
+	
 	
 	public long countByModulePassed(long moduleId, boolean passed)
 		throws SystemException {
@@ -172,51 +153,18 @@ public class ModuleResultLocalServiceImpl extends ModuleResultLocalServiceBaseIm
 		return moduleResultPersistence.countBymp(moduleId, passed);
 	}
 	
+	@Deprecated
 	public long countByModulePassedOnlyStudents(long companyId, long courseGropupCreatedId, long moduleId, boolean passed)
 			throws SystemException {
 		return countByModulePassedOnlyStudents(companyId, courseGropupCreatedId, moduleId, passed, null);
 	}
 	
-	
+	@Deprecated
 	public long countByModulePassedOnlyStudents(long companyId, long courseGropupCreatedId, long moduleId, boolean passed, List<User> _students)
 			throws SystemException {
 
-		long res = 0;
-		
-		List<User> students = null;
-		// Se prepara el metodo para recibir un Listado de estudiantes especificos,, por ejemplo que pertenezcan a alguna organizacion. Sino, se trabaja con todos los estudiantes del curso.
-		if(Validator.isNotNull(_students) && _students.size() > 0)
-			students = _students;
-		else
-			students = CourseLocalServiceUtil.getStudentsFromCourse(companyId, courseGropupCreatedId);
-		
-		ClassLoader classLoader = (ClassLoader) PortletBeanLocatorUtil.locate(ClpSerializer.getServletContextName(), "portletClassLoader");
-		DynamicQuery consulta = DynamicQueryFactoryUtil.forClass(ModuleResult.class, classLoader)
-				.add(PropertyFactoryUtil.forName("moduleId").eq(moduleId));
-		
-		if(Validator.isNotNull(students) && students.size() > 0) {
-			Criterion criterion = null;
-			for (int i = 0; i < students.size(); i++) {
-				if(i==0) {
-					criterion = RestrictionsFactoryUtil.like("userId", students.get(i).getUserId());
-				} else {
-					criterion = RestrictionsFactoryUtil.or(criterion, RestrictionsFactoryUtil.like("userId", students.get(i).getUserId()));
-				}
-			}
-			if(Validator.isNotNull(criterion)) {
-				criterion=RestrictionsFactoryUtil.and(criterion,
-						RestrictionsFactoryUtil.eq("passed",new Boolean (true)));
-				
-				consulta.add(criterion);
-				
-				List<ModuleResult> results = moduleResultPersistence.findWithDynamicQuery(consulta);
-				if(results!=null && !results.isEmpty()) {
-					res = results.size();
-				}
-			}
-		}
-		
-		return res;
+		return ModuleResultFinderUtil.countPassedOnlyStudents(moduleId, companyId, courseGropupCreatedId, _students, passed, 0);
+
 	}
 
 

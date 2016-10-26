@@ -104,49 +104,49 @@ public class SurveyResultLocalServiceClpInvoker {
 				"com.liferay.lms.model.SurveyResult", "boolean"
 			};
 
-		_methodName148 = "getBeanIdentifier";
+		_methodName154 = "getBeanIdentifier";
 
-		_methodParameterTypes148 = new String[] {  };
+		_methodParameterTypes154 = new String[] {  };
 
-		_methodName149 = "setBeanIdentifier";
+		_methodName155 = "setBeanIdentifier";
 
-		_methodParameterTypes149 = new String[] { "java.lang.String" };
+		_methodParameterTypes155 = new String[] { "java.lang.String" };
 
-		_methodName154 = "getByUserId";
-
-		_methodParameterTypes154 = new String[] { "long" };
-
-		_methodName155 = "getSurveyResultByActId";
-
-		_methodParameterTypes155 = new String[] { "long" };
-
-		_methodName156 = "getSurveyResultsByQuestionIdActId";
-
-		_methodParameterTypes156 = new String[] { "long", "long" };
-
-		_methodName157 = "getPercentageByQuestionIdAndAnswerId";
-
-		_methodParameterTypes157 = new String[] { "long", "long", "long" };
-
-		_methodName158 = "getCountByQuestionIdAndAnswerId";
-
-		_methodParameterTypes158 = new String[] { "long", "long" };
-
-		_methodName159 = "getPercentageByQuestionIdAndAnswerId";
-
-		_methodParameterTypes159 = new String[] { "long", "long" };
-
-		_methodName160 = "getTotalAnswersByQuestionId";
+		_methodName160 = "getByUserId";
 
 		_methodParameterTypes160 = new String[] { "long" };
 
-		_methodName161 = "countStudentsByQuestionId";
+		_methodName161 = "getSurveyResultByActId";
 
-		_methodParameterTypes161 = new String[] { "long", "long", "long" };
+		_methodParameterTypes161 = new String[] { "long" };
 
-		_methodName162 = "countStudentsByQuestionIdAndAnswerId";
+		_methodName162 = "getSurveyResultsByQuestionIdActId";
 
-		_methodParameterTypes162 = new String[] { "long", "long", "long", "long" };
+		_methodParameterTypes162 = new String[] { "long", "long" };
+
+		_methodName163 = "getPercentageByQuestionIdAndAnswerId";
+
+		_methodParameterTypes163 = new String[] { "long", "long", "long" };
+
+		_methodName164 = "getCountByQuestionIdAndAnswerId";
+
+		_methodParameterTypes164 = new String[] { "long", "long" };
+
+		_methodName165 = "getPercentageByQuestionIdAndAnswerId";
+
+		_methodParameterTypes165 = new String[] { "long", "long" };
+
+		_methodName166 = "getTotalAnswersByQuestionId";
+
+		_methodParameterTypes166 = new String[] { "long" };
+
+		_methodName167 = "countStudentsByQuestionId";
+
+		_methodParameterTypes167 = new String[] { "long", "long", "long" };
+
+		_methodName168 = "countStudentsByQuestionIdAndAnswerId";
+
+		_methodParameterTypes168 = new String[] { "long", "long", "long", "long" };
 	}
 
 	public Object invokeMethod(String name, String[] parameterTypes,
@@ -238,65 +238,65 @@ public class SurveyResultLocalServiceClpInvoker {
 				((Boolean)arguments[1]).booleanValue());
 		}
 
-		if (_methodName148.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes148, parameterTypes)) {
-			return SurveyResultLocalServiceUtil.getBeanIdentifier();
-		}
-
-		if (_methodName149.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes149, parameterTypes)) {
-			SurveyResultLocalServiceUtil.setBeanIdentifier((java.lang.String)arguments[0]);
-		}
-
 		if (_methodName154.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes154, parameterTypes)) {
-			return SurveyResultLocalServiceUtil.getByUserId(((Long)arguments[0]).longValue());
+			return SurveyResultLocalServiceUtil.getBeanIdentifier();
 		}
 
 		if (_methodName155.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes155, parameterTypes)) {
+			SurveyResultLocalServiceUtil.setBeanIdentifier((java.lang.String)arguments[0]);
+		}
+
+		if (_methodName160.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes160, parameterTypes)) {
+			return SurveyResultLocalServiceUtil.getByUserId(((Long)arguments[0]).longValue());
+		}
+
+		if (_methodName161.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes161, parameterTypes)) {
 			return SurveyResultLocalServiceUtil.getSurveyResultByActId(((Long)arguments[0]).longValue());
 		}
 
-		if (_methodName156.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes156, parameterTypes)) {
+		if (_methodName162.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes162, parameterTypes)) {
 			return SurveyResultLocalServiceUtil.getSurveyResultsByQuestionIdActId(((Long)arguments[0]).longValue(),
 				((Long)arguments[1]).longValue());
 		}
 
-		if (_methodName157.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes157, parameterTypes)) {
+		if (_methodName163.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes163, parameterTypes)) {
 			return SurveyResultLocalServiceUtil.getPercentageByQuestionIdAndAnswerId(((Long)arguments[0]).longValue(),
 				((Long)arguments[1]).longValue(),
 				((Long)arguments[2]).longValue());
 		}
 
-		if (_methodName158.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes158, parameterTypes)) {
+		if (_methodName164.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes164, parameterTypes)) {
 			return SurveyResultLocalServiceUtil.getCountByQuestionIdAndAnswerId(((Long)arguments[0]).longValue(),
 				((Long)arguments[1]).longValue());
 		}
 
-		if (_methodName159.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes159, parameterTypes)) {
+		if (_methodName165.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes165, parameterTypes)) {
 			return SurveyResultLocalServiceUtil.getPercentageByQuestionIdAndAnswerId(((Long)arguments[0]).longValue(),
 				((Long)arguments[1]).longValue());
 		}
 
-		if (_methodName160.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes160, parameterTypes)) {
+		if (_methodName166.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes166, parameterTypes)) {
 			return SurveyResultLocalServiceUtil.getTotalAnswersByQuestionId(((Long)arguments[0]).longValue());
 		}
 
-		if (_methodName161.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes161, parameterTypes)) {
+		if (_methodName167.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes167, parameterTypes)) {
 			return SurveyResultLocalServiceUtil.countStudentsByQuestionId(((Long)arguments[0]).longValue(),
 				((Long)arguments[1]).longValue(),
 				((Long)arguments[2]).longValue());
 		}
 
-		if (_methodName162.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes162, parameterTypes)) {
+		if (_methodName168.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes168, parameterTypes)) {
 			return SurveyResultLocalServiceUtil.countStudentsByQuestionIdAndAnswerId(((Long)arguments[0]).longValue(),
 				((Long)arguments[1]).longValue(),
 				((Long)arguments[2]).longValue(),
@@ -338,26 +338,26 @@ public class SurveyResultLocalServiceClpInvoker {
 	private String[] _methodParameterTypes14;
 	private String _methodName15;
 	private String[] _methodParameterTypes15;
-	private String _methodName148;
-	private String[] _methodParameterTypes148;
-	private String _methodName149;
-	private String[] _methodParameterTypes149;
 	private String _methodName154;
 	private String[] _methodParameterTypes154;
 	private String _methodName155;
 	private String[] _methodParameterTypes155;
-	private String _methodName156;
-	private String[] _methodParameterTypes156;
-	private String _methodName157;
-	private String[] _methodParameterTypes157;
-	private String _methodName158;
-	private String[] _methodParameterTypes158;
-	private String _methodName159;
-	private String[] _methodParameterTypes159;
 	private String _methodName160;
 	private String[] _methodParameterTypes160;
 	private String _methodName161;
 	private String[] _methodParameterTypes161;
 	private String _methodName162;
 	private String[] _methodParameterTypes162;
+	private String _methodName163;
+	private String[] _methodParameterTypes163;
+	private String _methodName164;
+	private String[] _methodParameterTypes164;
+	private String _methodName165;
+	private String[] _methodParameterTypes165;
+	private String _methodName166;
+	private String[] _methodParameterTypes166;
+	private String _methodName167;
+	private String[] _methodParameterTypes167;
+	private String _methodName168;
+	private String[] _methodParameterTypes168;
 }

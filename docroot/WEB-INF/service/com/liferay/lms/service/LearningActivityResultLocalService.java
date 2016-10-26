@@ -288,6 +288,11 @@ public interface LearningActivityResultLocalService extends BaseLocalService,
 		java.util.List<com.liferay.portal.model.User> _students)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
+	public long countPassedOnlyStudents(long actId, long companyId,
+		long courseGropupCreatedId, boolean passed,
+		java.util.List<com.liferay.portal.model.User> _students, long teamId)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
 	public long countNotPassed(long actId)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
@@ -298,6 +303,11 @@ public interface LearningActivityResultLocalService extends BaseLocalService,
 	public long countNotPassedOnlyStudents(long actId, long companyId,
 		long courseGropupCreatedId,
 		java.util.List<com.liferay.portal.model.User> _students)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	public long countNotPassedOnlyStudents(long actId, long companyId,
+		long courseGropupCreatedId,
+		java.util.List<com.liferay.portal.model.User> _students, long teamId)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	public java.lang.Double avgResult(long actId)
@@ -312,6 +322,11 @@ public interface LearningActivityResultLocalService extends BaseLocalService,
 		java.util.List<com.liferay.portal.model.User> _students)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
+	public java.lang.Double avgResultOnlyStudents(long actId, long companyId,
+		long courseGropupCreatedId,
+		java.util.List<com.liferay.portal.model.User> _students, long teamId)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
 	public long countStarted(long actId)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
@@ -324,6 +339,11 @@ public interface LearningActivityResultLocalService extends BaseLocalService,
 		java.util.List<com.liferay.portal.model.User> _students)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
+	public long countStartedOnlyStudents(long actId, long companyId,
+		long courseGropupCreatedId,
+		java.util.List<com.liferay.portal.model.User> _students, long teamId)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
 	public long countFinishedOnlyStudents(long actId, long companyId,
 		long courseGropupCreatedId);
 
@@ -331,16 +351,31 @@ public interface LearningActivityResultLocalService extends BaseLocalService,
 		long courseGropupCreatedId,
 		java.util.List<com.liferay.portal.model.User> _students);
 
+	public long countFinishedOnlyStudents(long actId, long companyId,
+		long courseGropupCreatedId,
+		java.util.List<com.liferay.portal.model.User> _students, long teamId);
+
 	public double triesPerUser(long actId)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
+	/**
+	* @deprecated Depreciado el mï¿½todo
+	*/
 	public double triesPerUserOnlyStudents(long actId, long companyId,
 		long courseGropupCreatedId)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
+	/**
+	* @deprecated Depreciado el mï¿½todo
+	*/
 	public double triesPerUserOnlyStudents(long actId, long companyId,
 		long courseGropupCreatedId,
 		java.util.List<com.liferay.portal.model.User> _students)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	public double triesPerUserOnlyStudents(long actId, long companyId,
+		long courseGropupCreatedId,
+		java.util.List<com.liferay.portal.model.User> _students, long teamId)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)

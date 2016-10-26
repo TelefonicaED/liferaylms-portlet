@@ -939,50 +939,22 @@ public class LearningActivityResultLocalServiceImpl	extends LearningActivityResu
 		
 	}
 	
-	
+	@Deprecated
 	public long countPassedOnlyStudents(long actId, long companyId, long courseGropupCreatedId, boolean passed) throws SystemException{
-		return countPassedOnlyStudents(actId, companyId, courseGropupCreatedId, passed, null);
+		return countPassedOnlyStudents(actId, companyId, courseGropupCreatedId, passed, null,0);
 	}
 
+	@Deprecated
 	public long countPassedOnlyStudents(long actId, long companyId, long courseGropupCreatedId, boolean passed, List<User> _students) throws SystemException{
-		long res = 0;
-		List<User> students = null;
-		// Se prepara el metodo para recibir un Listado de estudiantes especificos,, por ejemplo que pertenezcan a alguna organizacion. Sino, se trabaja con todos los estudiantes del curso.
-		if(Validator.isNotNull(_students) && _students.size() > 0)
-			students = _students;
-		else
-			students = CourseLocalServiceUtil.getStudentsFromCourse(companyId, courseGropupCreatedId);
-
-		ClassLoader classLoader = (ClassLoader) PortletBeanLocatorUtil.locate(ClpSerializer.getServletContextName(), "portletClassLoader");
-		DynamicQuery consulta = DynamicQueryFactoryUtil.forClass(LearningActivityResult.class, classLoader)
-				.add(PropertyFactoryUtil.forName("actId").eq(actId));
-
-		if(Validator.isNotNull(students) && students.size() > 0) {
-			Criterion criterion = null;
-			for (int i = 0; i < students.size(); i++) {
-				if(i==0) {
-					criterion = RestrictionsFactoryUtil.like("userId", students.get(i).getUserId());
-				} else {
-					criterion = RestrictionsFactoryUtil.or(criterion, RestrictionsFactoryUtil.like("userId", students.get(i).getUserId()));
-				}
-			}
-			if(Validator.isNotNull(criterion)) {
-				criterion=RestrictionsFactoryUtil.and(criterion,
-						RestrictionsFactoryUtil.eq("passed",new Boolean (true)));
-
-				consulta.add(criterion);
-
-				List<LearningActivityResult> results = learningActivityResultPersistence.findWithDynamicQuery(consulta);
-				if(results!=null && !results.isEmpty()) {
-					res = results.size();
-				}
-			}
-		}
-
-		return res;
-
+		return countPassedOnlyStudents(actId, companyId, courseGropupCreatedId, passed, _students, 0);
 	}
 
+	public long countPassedOnlyStudents(long actId, long companyId, long courseGropupCreatedId, boolean passed, List<User> _students, long teamId) throws SystemException{
+		
+		return LearningActivityResultFinderUtil.countPassedOnlyStudents(actId, companyId, courseGropupCreatedId, _students, passed, teamId);
+
+	}
+	
 	public long countNotPassed(long actId) throws SystemException
 	{
 		ClassLoader classLoader = (ClassLoader) PortletBeanLocatorUtil.locate(ClpSerializer.getServletContextName(), "portletClassLoader"); 
@@ -996,54 +968,22 @@ public class LearningActivityResultLocalServiceImpl	extends LearningActivityResu
 		return learningActivityResultPersistence.countWithDynamicQuery(dq);
 	}
 
-
+    @Deprecated
 	public long countNotPassedOnlyStudents(long actId, long companyId, long courseGropupCreatedId) throws SystemException{
-		return countNotPassedOnlyStudents(actId, companyId, courseGropupCreatedId, null); 
+		return countNotPassedOnlyStudents(actId, companyId, courseGropupCreatedId, null,0); 
 	}
 
-
+	@Deprecated
 	public long countNotPassedOnlyStudents(long actId, long companyId, long courseGropupCreatedId, List<User> _students) throws SystemException
-	{
-		long res = 0;
-		List<User> students = null;
-		// Se prepara el metodo para recibir un Listado de estudiantes especificos,, por ejemplo que pertenezcan a alguna organizacion. Sino, se trabaja con todos los estudiantes del curso.
-		if(Validator.isNotNull(_students) && _students.size() > 0)
-			students = _students;
-		else
-			students = CourseLocalServiceUtil.getStudentsFromCourse(companyId, courseGropupCreatedId);
-
-		ClassLoader classLoader = (ClassLoader) PortletBeanLocatorUtil.locate(ClpSerializer.getServletContextName(), "portletClassLoader");
-		DynamicQuery consulta = DynamicQueryFactoryUtil.forClass(LearningActivityResult.class, classLoader)
-				.add(PropertyFactoryUtil.forName("actId").eq(actId));
-
-		if(Validator.isNotNull(students) && students.size() > 0) {
-			Criterion criterion = null;
-			for (int i = 0; i < students.size(); i++) {
-				if(i==0) {
-					criterion = RestrictionsFactoryUtil.like("userId", students.get(i).getUserId());
-				} else {
-					criterion = RestrictionsFactoryUtil.or(criterion, RestrictionsFactoryUtil.like("userId", students.get(i).getUserId()));
-				}
-			}
-			if(Validator.isNotNull(criterion)) {
-				criterion=RestrictionsFactoryUtil.and(criterion,
-						RestrictionsFactoryUtil.eq("passed",new Boolean (false)));
-
-				consulta.add(criterion);
-
-				criterion=PropertyFactoryUtil.forName("endDate").isNotNull();
-				consulta.add(criterion);
-
-				List<LearningActivityResult> results = learningActivityResultPersistence.findWithDynamicQuery(consulta);
-				if(results!=null && !results.isEmpty()) {
-					res = results.size();
-				}
-			}
-		}
-
-		return res;
+	{		
+		return countNotPassedOnlyStudents(actId, companyId, courseGropupCreatedId, _students, 0);
 	}
 
+	public long countNotPassedOnlyStudents(long actId, long companyId, long courseGropupCreatedId, List<User> _students, long teamId) throws SystemException{
+		return LearningActivityResultFinderUtil.countPassedOnlyStudents(actId, companyId, courseGropupCreatedId, _students, false, teamId);
+	}
+	
+	
 	public Double avgResult(long actId) throws SystemException
 	{
 		ClassLoader classLoader = (ClassLoader) PortletBeanLocatorUtil.locate(ClpSerializer.getServletContextName(), "portletClassLoader"); 
@@ -1056,104 +996,55 @@ public class LearningActivityResultLocalServiceImpl	extends LearningActivityResu
 		return (Double)(learningActivityResultPersistence.findWithDynamicQuery(dq).get(0));
 	}
 
+	@Deprecated
 	public Double avgResultOnlyStudents(long actId, long companyId, long courseGropupCreatedId) throws SystemException {
-		return avgResultOnlyStudents(actId, companyId, courseGropupCreatedId, null);
+		return avgResultOnlyStudents(actId, companyId, courseGropupCreatedId, null,0);
 	}
 
+	@Deprecated
 	public Double avgResultOnlyStudents(long actId, long companyId, long courseGropupCreatedId, List<User> _students) throws SystemException
-	{
-		ClassLoader classLoader = (ClassLoader) PortletBeanLocatorUtil.locate(ClpSerializer.getServletContextName(), "portletClassLoader"); 
-		DynamicQuery dq=DynamicQueryFactoryUtil.forClass(LearningActivityResult.class, classLoader);
-		Criterion criterion=PropertyFactoryUtil.forName("actId").eq(actId);
-		dq.add(criterion);
-		criterion=PropertyFactoryUtil.forName("endDate").isNotNull();
-		dq.add(criterion);
-
-		List<User> students = null;
-		// Se prepara el metodo para recibir un Listado de estudiantes especificos,, por ejemplo que pertenezcan a alguna organizacion. Sino, se trabaja con todos los estudiantes del curso.
-		if(Validator.isNotNull(_students) && _students.size() > 0)
-			students = _students;
-		else
-			students = CourseLocalServiceUtil.getStudentsFromCourse(companyId, courseGropupCreatedId);
-
-		if(Validator.isNotNull(students) && students.size() > 0) {
-			for (int i = 0; i < students.size(); i++) {
-				if(i==0) {
-					criterion = RestrictionsFactoryUtil.like("userId", students.get(i).getUserId());
-				} else {
-					criterion = RestrictionsFactoryUtil.or(criterion, RestrictionsFactoryUtil.like("userId", students.get(i).getUserId()));
-				}
-			}
-		}
-		dq.add(criterion);
-
-		dq.setProjection(ProjectionFactoryUtil.avg("result"));
-		return (Double)(learningActivityResultPersistence.findWithDynamicQuery(dq).get(0));
+	{	
+		return avgResultOnlyStudents(actId, companyId, courseGropupCreatedId, _students,0);
 	}
 
+	public Double avgResultOnlyStudents(long actId, long companyId, long courseGropupCreatedId, List<User> _students, long teamId) throws SystemException
+	{		
+		return LearningActivityResultFinderUtil.avgResultOnlyStudents(actId, companyId, courseGropupCreatedId, _students, teamId);
+	}
+	
 	public long countStarted(long actId) throws SystemException
 	{
 		return learningActivityResultPersistence.countByac(actId);
 	}
 
+	@Deprecated
 	public long countStartedOnlyStudents(long actId, long companyId, long courseGropupCreatedId) throws SystemException{
-		return countStartedOnlyStudents(actId, companyId, courseGropupCreatedId, null);
+		return countStartedOnlyStudents(actId, companyId, courseGropupCreatedId, null, 0);
 	}
-
+	
+	@Deprecated
 	public long countStartedOnlyStudents(long actId, long companyId, long courseGropupCreatedId, List<User> _students) throws SystemException{
-		
-		return LearningActivityResultFinderUtil.countStartedOnlyStudents(actId, companyId, courseGropupCreatedId, _students);
-		/*
-		long res = 0;
-		
-		try {
-			List<User> students = null;
-			// Se prepara el metodo para recibir un Listado de estudiantes especificos,, por ejemplo que pertenezcan a alguna organizacion. Sino, se trabaja con todos los estudiantes del curso.
-			if(Validator.isNotNull(_students) && _students.size() > 0)
-				students = _students;
-			else
-				students = CourseLocalServiceUtil.getStudentsFromCourse(companyId, courseGropupCreatedId);
-
-			ClassLoader classLoader = (ClassLoader) PortletBeanLocatorUtil.locate(ClpSerializer.getServletContextName(), "portletClassLoader");
-			DynamicQuery consulta = DynamicQueryFactoryUtil.forClass(LearningActivityResult.class, classLoader)
-					.add(PropertyFactoryUtil.forName("actId").eq(actId));
-
-			if(Validator.isNotNull(students) && students.size() > 0) {
-				Criterion criterion = null;
-				for (int i = 0; i < students.size(); i++) {
-					if(i==0) {
-						criterion = RestrictionsFactoryUtil.like("userId", students.get(i).getUserId());
-					} else {
-						criterion = RestrictionsFactoryUtil.or(criterion, RestrictionsFactoryUtil.like("userId", students.get(i).getUserId()));
-					}
-				}
-				if(Validator.isNotNull(criterion)) {
-					consulta.add(criterion);
-
-					List<LearningActivityResult> results = learningActivityResultPersistence.findWithDynamicQuery(consulta);
-					if(results!=null && !results.isEmpty()) {
-						res = results.size();
-					}
-				}
-			}
-		} catch(Exception e) {
-			e.printStackTrace();
-		}
-		*/
-
-
-
-		//return learningActivityResultPersistence.countByac(actId);
+		return countStartedOnlyStudents(actId, companyId, courseGropupCreatedId, _students, 0);
+	}
+	
+	public long countStartedOnlyStudents(long actId, long companyId, long courseGropupCreatedId, List<User> _students, long teamId) throws SystemException{
+		return LearningActivityResultFinderUtil.countStartedOnlyStudents(actId, companyId, courseGropupCreatedId, _students, teamId);
 	}
 
+	@Deprecated
+	@Override
 	public long countFinishedOnlyStudents(long actId, long companyId, long courseGropupCreatedId){
-		return LearningActivityResultFinderUtil.countFinishedOnlyStudents(actId, companyId, courseGropupCreatedId, null);
+		return countFinishedOnlyStudents(actId, companyId, courseGropupCreatedId, null,0);
 	}
 	
+	@Deprecated
 	public long countFinishedOnlyStudents(long actId, long companyId, long courseGropupCreatedId, List<User> _students){
-		return LearningActivityResultFinderUtil.countFinishedOnlyStudents(actId, companyId, courseGropupCreatedId, _students);
+		return countFinishedOnlyStudents(actId, companyId, courseGropupCreatedId, _students,0);
 	}
 	
+	public long countFinishedOnlyStudents(long actId, long companyId, long courseGropupCreatedId, List<User> _students, long teamId){
+		return LearningActivityResultFinderUtil.countFinishedOnlyStudents(actId, companyId, courseGropupCreatedId, _students, teamId);
+	}
 	
 	public double triesPerUser(long actId) throws SystemException
 	{
@@ -1166,50 +1057,35 @@ public class LearningActivityResultLocalServiceImpl	extends LearningActivityResu
 		return ((double) tries)/((double) started);
 	}
 
+	@Deprecated
+	@Override
+	/**
+	 * @deprecated Depreciado el método
+	 */
 	public double triesPerUserOnlyStudents(long actId, long companyId, long courseGropupCreatedId) throws SystemException {
-		return triesPerUserOnlyStudents(actId, companyId, courseGropupCreatedId, null);
+		return triesPerUserOnlyStudents(actId, companyId, courseGropupCreatedId, null, 0);
 	}
 
-
+	@Deprecated
+	@Override
+	/**
+	 * @deprecated Depreciado el método
+	 */
 	public double triesPerUserOnlyStudents(long actId, long companyId, long courseGropupCreatedId, List<User> _students) throws SystemException
 	{
-		long tries=0;
-		List<User> students = null;
-		// Se prepara el metodo para recibir un Listado de estudiantes especificos,, por ejemplo que pertenezcan a alguna organizacion. Sino, se trabaja con todos los estudiantes del curso.
-		if(Validator.isNotNull(_students) && _students.size() > 0)
-			students = _students;
-		else
-			students = CourseLocalServiceUtil.getStudentsFromCourse(companyId, courseGropupCreatedId);
-
-		ClassLoader classLoader = (ClassLoader) PortletBeanLocatorUtil.locate(ClpSerializer.getServletContextName(), "portletClassLoader");
-		DynamicQuery consulta = DynamicQueryFactoryUtil.forClass(LearningActivityTry.class, classLoader)
-				.add(PropertyFactoryUtil.forName("actId").eq(actId));
-
-		if(Validator.isNotNull(students) && students.size() > 0) {
-			Criterion criterion = null;
-			for (int i = 0; i < students.size(); i++) {
-				if(i==0) {
-					criterion = RestrictionsFactoryUtil.like("userId", students.get(i).getUserId());
-				} else {
-					criterion = RestrictionsFactoryUtil.or(criterion, RestrictionsFactoryUtil.like("userId", students.get(i).getUserId()));
-				}
-			}
-			if(Validator.isNotNull(criterion)) {
-				consulta.add(criterion);
-
-				List<LearningActivityTry> results = learningActivityTryPersistence.findWithDynamicQuery(consulta);
-				if(results!=null && !results.isEmpty()) {
-					tries = results.size();
-				}
-			}
-		}
-
-		long started=countStartedOnlyStudents(actId, companyId, courseGropupCreatedId, null);
-		if(started==0)
+		return triesPerUserOnlyStudents(actId, companyId, courseGropupCreatedId, _students, 0);
+	}
+	
+	public double triesPerUserOnlyStudents(long actId, long companyId, long courseGropupCreatedId, List<User> _students, long teamId) throws SystemException
+	{
+		long tries= LearningActivityTryLocalServiceUtil.triesPerUserOnlyStudents(actId, companyId, courseGropupCreatedId, _students, teamId);
+		long started=countStartedOnlyStudents(actId, companyId, courseGropupCreatedId, null, teamId);
+		double result = 0;
+		if(started>0)
 		{
-			return 0;
+			result =  ((double) tries)/((double) started);
 		}
-		return ((double) tries)/((double) started);
+		return result;
 	}
 
 	public LearningActivityResult getByActIdAndUserId(long actId,long userId) throws SystemException{
@@ -1391,7 +1267,7 @@ public class LearningActivityResultLocalServiceImpl	extends LearningActivityResu
 			Course curso = courseLocalService.getCourseByGroupCreatedId(groupId);
 			if(curso != null){
 				CalificationType ct = new CalificationTypeRegistry().getCalificationType(curso.getCalificationType());
-				translatedResult = ct.translate(result);
+				translatedResult = ct.translate(locale,result);
 			}
 		} catch (SystemException e) {
 			// TODO Auto-generated catch block

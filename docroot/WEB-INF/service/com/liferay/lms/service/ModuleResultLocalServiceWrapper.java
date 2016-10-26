@@ -311,6 +311,20 @@ public class ModuleResultLocalServiceWrapper implements ModuleResultLocalService
 			courseGropupCreatedId, moduleId, _students);
 	}
 
+	public long countStudentsStartedByModuleId(
+		com.liferay.lms.model.Module module,
+		java.util.List<com.liferay.portal.model.User> students, long teamId) {
+		return _moduleResultLocalService.countStudentsStartedByModuleId(module,
+			students, teamId);
+	}
+
+	public long countStudentsFinishedByModuleId(
+		com.liferay.lms.model.Module module,
+		java.util.List<com.liferay.portal.model.User> students, long teamId) {
+		return _moduleResultLocalService.countStudentsFinishedByModuleId(module,
+			students, teamId);
+	}
+
 	public long countByModulePassed(long moduleId, boolean passed)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _moduleResultLocalService.countByModulePassed(moduleId, passed);

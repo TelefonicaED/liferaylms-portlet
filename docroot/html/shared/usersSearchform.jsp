@@ -4,18 +4,20 @@
 
 <liferay-ui:search-toggle
 	buttonLabel="search"
-	displayTerms="${searchContainer.displayTerms }"
-	id="toggle_id_users_admin_user_search"
+	displayTerms="${searchContainer.displayTerms}"
+	id="${renderResponse.getNamespace()}toggle_register_search"
 >
 	<aui:fieldset>
 		<aui:input name="${searchContainer.displayTerms.getFIRST_NAME()}" size="20" value="${searchContainer.displayTerms.getFirstName() }" />
 
 		<aui:input name="${searchContainer.displayTerms.getLAST_NAME()}" size="20" value="${searchContainer.displayTerms.getLastName() }" />
-
-		<aui:input name="${searchContainer.displayTerms.getSCREEN_NAME()}" size="20" value="${searchContainer.displayTerms.getScreenName() }" />
-
-		<aui:input name="${searchContainer.displayTerms.getEMAIL_ADDRESS()}" size="20" value="${searchContainer.displayTerms.getEmailAddress() }" />
-
+		<c:if test="${showScreenName}">
+			<aui:input name="${searchContainer.displayTerms.getSCREEN_NAME()}" size="20" value="${searchContainer.displayTerms.getScreenName() }" />
+		</c:if>
+		
+		<c:if test="${showEmail}">
+			<aui:input name="${searchContainer.displayTerms.getEMAIL_ADDRESS()}" size="20" value="${searchContainer.displayTerms.getEmailAddress() }" />
+		</c:if>
 		<c:if test="${not empty teams}">
 			<aui:select name="${searchContainer.displayTerms.getTEAM()}" label="team">
 				<aui:option label="--" value="0"/>

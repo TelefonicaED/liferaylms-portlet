@@ -378,6 +378,15 @@ public class LearningActivityTryLocalServiceUtil {
 		return getService().getByUserId(userId);
 	}
 
+	public static long triesPerUserOnlyStudents(long actId, long companyId,
+		long courseGropupCreatedId,
+		java.util.List<com.liferay.portal.model.User> _students, long teamId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService()
+				   .triesPerUserOnlyStudents(actId, companyId,
+			courseGropupCreatedId, _students, teamId);
+	}
+
 	public static void clearService() {
 		_service = null;
 	}

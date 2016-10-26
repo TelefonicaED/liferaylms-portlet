@@ -5,12 +5,10 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 import javax.portlet.PortletException;
-import javax.portlet.PortletPreferences;
 import javax.portlet.PortletRequestDispatcher;
 import javax.portlet.PortletURL;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
-
 
 import com.liferay.lms.model.Course;
 import com.liferay.lms.model.LmsPrefs;
@@ -23,15 +21,10 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
-import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
-import com.liferay.portal.model.Role;
-import com.liferay.portal.model.RoleConstants;
 import com.liferay.portal.model.Team;
 import com.liferay.portal.model.User;
 import com.liferay.portal.service.RoleLocalServiceUtil;
@@ -39,7 +32,6 @@ import com.liferay.portal.service.TeamLocalServiceUtil;
 import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.comparator.UserLastNameComparator;
-import com.liferay.portlet.PortletPreferencesFactoryUtil;
 import com.liferay.util.bridges.mvc.MVCPortlet;
 
 
@@ -63,7 +55,7 @@ public class StudentManage extends MVCPortlet {
 	
 	public void doView(RenderRequest renderRequest, RenderResponse renderResponse) throws IOException, PortletException {
 		String jsp = renderRequest.getParameter("view");		
-		log.debug("::DOVIEW::"+jsp);
+		log.debug("::DOVIEW:: "+jsp);
 		
 		try{
 			if (jsp == null || jsp.equals("")) {
@@ -76,74 +68,43 @@ public class StudentManage extends MVCPortlet {
 	
 	public void showViewDefault(RenderRequest renderRequest, RenderResponse renderResponse) throws IOException, PortletException, SystemException, PortalException{		
 		ThemeDisplay themeDisplay = (ThemeDisplay) renderRequest.getAttribute(WebKeys.THEME_DISPLAY);	
-		log.debug(":::show view default:::");		
+		log.debug(":::show view default::: ");		
 
 		UserSearchContainer searchContainer = new UserSearchContainer(renderRequest, renderResponse.createRenderURL());		
 		UserSearchTerms searchTerms = (UserSearchTerms) searchContainer.getSearchTerms();
 		
 		long teamId = searchTerms.getTeamId();
-		log.debug("---teamId:"+teamId);
+		log.debug("---teamId: "+teamId);
 		
 		Course course=CourseLocalServiceUtil.getCourseByGroupCreatedId(themeDisplay.getScopeGroupId());
 		renderRequest.setAttribute("course", course);
 		
 		List<Team> teams=TeamLocalServiceUtil.getGroupTeams(themeDisplay.getScopeGroupId());
 		renderRequest.setAttribute("teams", teams);	
-		
-		LmsPrefs prefs=LmsPrefsLocalServiceUtil.getLmsPrefs(themeDisplay.getCompanyId());		
-		
-		OrderByComparator obc = new   UserLastNameComparator(true);			
-		LinkedHashMap userParams = new LinkedHashMap();
-
-		userParams.put("notInCourseRoleTeach", new CustomSQLParam("WHERE User_.userId NOT IN "
-	              + " (SELECT UserGroupRole.userId " + "  FROM UserGroupRole "
-	              + "  WHERE  (UserGroupRole.groupId = ?) AND (UserGroupRole.roleId = ?))", new Long[] {
-	            	themeDisplay.getScopeGroupId(),
-	              RoleLocalServiceUtil.getRole(prefs.getTeacherRole()).getRoleId() }));
-	           
-
-
-	   userParams.put("notInCourseRoleEdit", new CustomSQLParam("WHERE User_.userId NOT IN "
-	              + " (SELECT UserGroupRole.userId " + "  FROM UserGroupRole "
-	              + "  WHERE  (UserGroupRole.groupId = ?) AND (UserGroupRole.roleId = ?))", new Long[] {
-	            	themeDisplay.getScopeGroupId(),
-	              RoleLocalServiceUtil.getRole(prefs.getEditorRole()).getRoleId() }));
-	           
-		
-	    userParams.put("usersGroups", new Long(themeDisplay.getScopeGroupId()));
-	    
-		if(teamId > 0){
-			userParams.put("usersTeams", teamId);
-		}
-		
-				
-		List<User> users = null; 
-		int total = 0;		
-		
+			
 		if(searchTerms.isAdvancedSearch()){			
-			log.debug("firstName:"+searchTerms.getFirstName());
-			log.debug("lastName:"+searchTerms.getLastName());
-			log.debug("screenName:"+searchTerms.getScreenName());
-			log.debug("emailAddress:"+searchTerms.getEmailAddress());
+			log.debug("firstName: "+searchTerms.getFirstName());
+			log.debug("lastName: "+searchTerms.getLastName());
+			log.debug("screenName: "+searchTerms.getScreenName());
+			log.debug("emailAddress: "+searchTerms.getEmailAddress());
 			
-			users= UserLocalServiceUtil.search(themeDisplay.getCompanyId(), searchTerms.getFirstName(), StringPool.BLANK, 
-					searchTerms.getLastName(), searchTerms.getScreenName(), searchTerms.getEmailAddress(), 0, userParams, searchTerms.isAndOperator(), 
-					searchContainer.getStart(), searchContainer.getEnd(), obc);
-
-			total= UserLocalServiceUtil.searchCount(themeDisplay.getCompanyId(), searchTerms.getFirstName(), StringPool.BLANK,
-					searchTerms.getLastName(), searchTerms.getScreenName(), searchTerms.getEmailAddress(), 0, userParams, searchTerms.isAndOperator());
-			
+			searchContainer.setResults(CourseLocalServiceUtil.getStudentsFromCourse(themeDisplay.getCompanyId(), course.getGroupCreatedId(),  
+					searchContainer.getStart(), searchContainer.getEnd(), teamId, searchTerms.getFirstName(), searchTerms.getLastName(), 
+					searchTerms.getScreenName(), searchTerms.getEmailAddress(), searchTerms.isAndOperator()));
+			searchContainer.setTotal(CourseLocalServiceUtil.getStudentsFromCourseCount(course.getCourseId(), teamId, 
+					searchTerms.getFirstName(), searchTerms.getLastName(), 
+					searchTerms.getScreenName(), searchTerms.getEmailAddress(), searchTerms.isAndOperator()));
 		}else{
-			log.debug("Keywords:"+searchTerms.getKeywords());
-			
-			users= UserLocalServiceUtil.search(themeDisplay.getCompanyId(), searchTerms.getKeywords(), 0, userParams, 
-					searchContainer.getStart(), searchContainer.getEnd(), obc);
-			total= UserLocalServiceUtil.searchCount(themeDisplay.getCompanyId(), searchTerms.getKeywords(), WorkflowConstants.STATUS_APPROVED, userParams);
+			log.debug("Keywords: "+searchTerms.getKeywords());
+			searchContainer.setResults(CourseLocalServiceUtil.getStudentsFromCourse(themeDisplay.getCompanyId(), course.getGroupCreatedId(),  
+					searchContainer.getStart(), searchContainer.getEnd(), teamId, searchTerms.getKeywords(), searchTerms.getKeywords(), 
+					searchTerms.getKeywords(), searchTerms.getKeywords(), searchTerms.isAndOperator()));
+			searchContainer.setTotal(CourseLocalServiceUtil.getStudentsFromCourseCount(course.getCourseId(), teamId, 
+					 searchTerms.getKeywords(), searchTerms.getKeywords(), 
+						searchTerms.getKeywords(), searchTerms.getKeywords(), searchTerms.isAndOperator()));
 		}	
 		
-		searchContainer.setResults(users);
-		searchContainer.setTotal(total);
-		
+	
 		searchContainer.getIteratorURL().setParameter("view", "");
 		renderRequest.setAttribute("searchContainer", searchContainer);
 		
@@ -154,9 +115,11 @@ public class StudentManage extends MVCPortlet {
 		PortletURL returnURL = renderResponse.createRenderURL();
 		searchURL.setParameter("view", "");
 		renderRequest.setAttribute("returnURL", returnURL.toString());
+		renderRequest.setAttribute("showEmail", true);
+		renderRequest.setAttribute("showScreenName", true);
 		
-		log.debug("Total:"+searchContainer.getTotal());
-		log.debug("usersInPage:"+users.size());
+		log.debug("Total: "+searchContainer.getTotal());
+		log.debug("usersInPage: "+searchContainer.getResults().size());
 		
 		include(viewJSP, renderRequest, renderResponse);
 	}

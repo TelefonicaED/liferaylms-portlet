@@ -381,6 +381,11 @@ public class LearningActivityLocalServiceUtil {
 		return getService().countLearningActivitiesOfGroup(groupId);
 	}
 
+	public static long countLearningActivitiesOfModule(long moduleId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().countLearningActivitiesOfModule(moduleId);
+	}
+
 	public static java.util.List<com.liferay.lms.model.LearningActivity> getLearningActivitiesOfGroupAndType(
 		long groupId, int typeId)
 		throws com.liferay.portal.kernel.exception.SystemException {
@@ -391,6 +396,12 @@ public class LearningActivityLocalServiceUtil {
 		long moduleId)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService().getLearningActivitiesOfModule(moduleId);
+	}
+
+	public static java.util.List<com.liferay.lms.model.LearningActivity> getLearningActivitiesOfModule(
+		long moduleId, int start, int end)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().getLearningActivitiesOfModule(moduleId, start, end);
 	}
 
 	public static java.util.List<java.lang.Long> getLearningActivityIdsOfModule(

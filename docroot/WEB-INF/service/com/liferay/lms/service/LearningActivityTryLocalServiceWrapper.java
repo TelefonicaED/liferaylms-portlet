@@ -382,6 +382,14 @@ public class LearningActivityTryLocalServiceWrapper
 		return _learningActivityTryLocalService.getByUserId(userId);
 	}
 
+	public long triesPerUserOnlyStudents(long actId, long companyId,
+		long courseGropupCreatedId,
+		java.util.List<com.liferay.portal.model.User> _students, long teamId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _learningActivityTryLocalService.triesPerUserOnlyStudents(actId,
+			companyId, courseGropupCreatedId, _students, teamId);
+	}
+
 	/**
 	 * @deprecated Renamed to {@link #getWrappedService}
 	 */

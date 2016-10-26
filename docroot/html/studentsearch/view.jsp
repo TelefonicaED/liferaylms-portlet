@@ -7,13 +7,13 @@
 	<liferay-portlet:actionURL var="renderURL" />
 	<c:if test="${showSearcher}">
 		<aui:form action="${renderURL}" name="searchFm">
-			<liferay-ui:search-form page="/html/search/userSearch.jsp"
+			<liferay-ui:search-form page="/html/shared/usersSearchform.jsp"
 				searchContainer="${searchContainer}"
 				servletContext="<%= this.getServletConfig().getServletContext() %>">
 			</liferay-ui:search-form>
 		</aui:form>
 	</c:if>
-	<c:if test="${!showSearcher and existTeams}">
+	<c:if test="${!showSearcher and not empty teams}">
 		<aui:form action="${renderURL}" name="searchTeamsFm">
 			<aui:select name="teamId" label="team">
 				<aui:option label="" value="0"></aui:option>

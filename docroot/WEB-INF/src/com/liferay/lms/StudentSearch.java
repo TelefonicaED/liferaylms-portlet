@@ -56,11 +56,7 @@ public class StudentSearch extends MVCPortlet {
 			long teamId = ParamUtil.getLong(renderRequest, "teamId",0);
 			
 			List<Team> teams = TeamLocalServiceUtil.getGroupTeams(themeDisplay.getScopeGroupId());
-			boolean existTeams = false;
-			if(teams!=null && teams.size()>0){
-				existTeams=true;
-				renderRequest.setAttribute("teams", teams);
-			}
+			
 			
 			renderRequest.setAttribute("showSearcher", showSearcher);
 			renderRequest.setAttribute("showScreenName", showScreenName);
@@ -131,7 +127,6 @@ public class StudentSearch extends MVCPortlet {
 			
 			renderRequest.setAttribute("searchContainer", userSearchContainer);
 			renderRequest.setAttribute("teamId", teamId);
-			renderRequest.setAttribute("existTeams", existTeams);
 			
 		} catch (SystemException e) {
 			// TODO Auto-generated catch block

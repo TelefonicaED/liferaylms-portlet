@@ -58,13 +58,16 @@ import com.liferay.lms.service.persistence.CompetencePersistence;
 import com.liferay.lms.service.persistence.CourseCompetencePersistence;
 import com.liferay.lms.service.persistence.CourseFinder;
 import com.liferay.lms.service.persistence.CoursePersistence;
+import com.liferay.lms.service.persistence.CourseResultFinder;
 import com.liferay.lms.service.persistence.CourseResultPersistence;
 import com.liferay.lms.service.persistence.LearningActivityPersistence;
 import com.liferay.lms.service.persistence.LearningActivityResultFinder;
 import com.liferay.lms.service.persistence.LearningActivityResultPersistence;
+import com.liferay.lms.service.persistence.LearningActivityTryFinder;
 import com.liferay.lms.service.persistence.LearningActivityTryPersistence;
 import com.liferay.lms.service.persistence.LmsPrefsPersistence;
 import com.liferay.lms.service.persistence.ModulePersistence;
+import com.liferay.lms.service.persistence.ModuleResultFinder;
 import com.liferay.lms.service.persistence.ModuleResultPersistence;
 import com.liferay.lms.service.persistence.P2pActivityCorrectionsPersistence;
 import com.liferay.lms.service.persistence.P2pActivityPersistence;
@@ -490,6 +493,24 @@ public abstract class CourseServiceBaseImpl extends BaseServiceImpl
 	}
 
 	/**
+	 * Returns the course result finder.
+	 *
+	 * @return the course result finder
+	 */
+	public CourseResultFinder getCourseResultFinder() {
+		return courseResultFinder;
+	}
+
+	/**
+	 * Sets the course result finder.
+	 *
+	 * @param courseResultFinder the course result finder
+	 */
+	public void setCourseResultFinder(CourseResultFinder courseResultFinder) {
+		this.courseResultFinder = courseResultFinder;
+	}
+
+	/**
 	 * Returns the learning activity local service.
 	 *
 	 * @return the learning activity local service
@@ -680,6 +701,25 @@ public abstract class CourseServiceBaseImpl extends BaseServiceImpl
 	}
 
 	/**
+	 * Returns the learning activity try finder.
+	 *
+	 * @return the learning activity try finder
+	 */
+	public LearningActivityTryFinder getLearningActivityTryFinder() {
+		return learningActivityTryFinder;
+	}
+
+	/**
+	 * Sets the learning activity try finder.
+	 *
+	 * @param learningActivityTryFinder the learning activity try finder
+	 */
+	public void setLearningActivityTryFinder(
+		LearningActivityTryFinder learningActivityTryFinder) {
+		this.learningActivityTryFinder = learningActivityTryFinder;
+	}
+
+	/**
 	 * Returns the lms prefs local service.
 	 *
 	 * @return the lms prefs local service
@@ -824,6 +864,24 @@ public abstract class CourseServiceBaseImpl extends BaseServiceImpl
 	public void setModuleResultPersistence(
 		ModuleResultPersistence moduleResultPersistence) {
 		this.moduleResultPersistence = moduleResultPersistence;
+	}
+
+	/**
+	 * Returns the module result finder.
+	 *
+	 * @return the module result finder
+	 */
+	public ModuleResultFinder getModuleResultFinder() {
+		return moduleResultFinder;
+	}
+
+	/**
+	 * Sets the module result finder.
+	 *
+	 * @param moduleResultFinder the module result finder
+	 */
+	public void setModuleResultFinder(ModuleResultFinder moduleResultFinder) {
+		this.moduleResultFinder = moduleResultFinder;
 	}
 
 	/**
@@ -1851,6 +1909,8 @@ public abstract class CourseServiceBaseImpl extends BaseServiceImpl
 	protected CourseResultService courseResultService;
 	@BeanReference(type = CourseResultPersistence.class)
 	protected CourseResultPersistence courseResultPersistence;
+	@BeanReference(type = CourseResultFinder.class)
+	protected CourseResultFinder courseResultFinder;
 	@BeanReference(type = LearningActivityLocalService.class)
 	protected LearningActivityLocalService learningActivityLocalService;
 	@BeanReference(type = LearningActivityService.class)
@@ -1871,6 +1931,8 @@ public abstract class CourseServiceBaseImpl extends BaseServiceImpl
 	protected LearningActivityTryService learningActivityTryService;
 	@BeanReference(type = LearningActivityTryPersistence.class)
 	protected LearningActivityTryPersistence learningActivityTryPersistence;
+	@BeanReference(type = LearningActivityTryFinder.class)
+	protected LearningActivityTryFinder learningActivityTryFinder;
 	@BeanReference(type = LmsPrefsLocalService.class)
 	protected LmsPrefsLocalService lmsPrefsLocalService;
 	@BeanReference(type = LmsPrefsPersistence.class)
@@ -1887,6 +1949,8 @@ public abstract class CourseServiceBaseImpl extends BaseServiceImpl
 	protected ModuleResultService moduleResultService;
 	@BeanReference(type = ModuleResultPersistence.class)
 	protected ModuleResultPersistence moduleResultPersistence;
+	@BeanReference(type = ModuleResultFinder.class)
+	protected ModuleResultFinder moduleResultFinder;
 	@BeanReference(type = P2pActivityLocalService.class)
 	protected P2pActivityLocalService p2pActivityLocalService;
 	@BeanReference(type = P2pActivityPersistence.class)

@@ -23,69 +23,69 @@ import java.util.Arrays;
  */
 public class ModuleServiceClpInvoker {
 	public ModuleServiceClpInvoker() {
-		_methodName132 = "getBeanIdentifier";
+		_methodName138 = "getBeanIdentifier";
 
-		_methodParameterTypes132 = new String[] {  };
+		_methodParameterTypes138 = new String[] {  };
 
-		_methodName133 = "setBeanIdentifier";
+		_methodName139 = "setBeanIdentifier";
 
-		_methodParameterTypes133 = new String[] { "java.lang.String" };
+		_methodParameterTypes139 = new String[] { "java.lang.String" };
 
-		_methodName138 = "findAllInGroup";
+		_methodName144 = "findAllInGroup";
 
-		_methodParameterTypes138 = new String[] { "long" };
+		_methodParameterTypes144 = new String[] { "long" };
 
-		_methodName139 = "findAllInCourse";
+		_methodName145 = "findAllInCourse";
 
-		_methodParameterTypes139 = new String[] { "long" };
+		_methodParameterTypes145 = new String[] { "long" };
 
-		_methodName140 = "isLocked";
+		_methodName146 = "isLocked";
 
-		_methodParameterTypes140 = new String[] { "long" };
+		_methodParameterTypes146 = new String[] { "long" };
 
-		_methodName141 = "PassedByMe";
+		_methodName147 = "PassedByMe";
 
-		_methodParameterTypes141 = new String[] { "long" };
+		_methodParameterTypes147 = new String[] { "long" };
 
-		_methodName142 = "isUserPassed";
+		_methodName148 = "isUserPassed";
 
-		_methodParameterTypes142 = new String[] { "long", "java.lang.String" };
+		_methodParameterTypes148 = new String[] { "long", "java.lang.String" };
 	}
 
 	public Object invokeMethod(String name, String[] parameterTypes,
 		Object[] arguments) throws Throwable {
-		if (_methodName132.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes132, parameterTypes)) {
-			return ModuleServiceUtil.getBeanIdentifier();
-		}
-
-		if (_methodName133.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes133, parameterTypes)) {
-			ModuleServiceUtil.setBeanIdentifier((java.lang.String)arguments[0]);
-		}
-
 		if (_methodName138.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes138, parameterTypes)) {
-			return ModuleServiceUtil.findAllInGroup(((Long)arguments[0]).longValue());
+			return ModuleServiceUtil.getBeanIdentifier();
 		}
 
 		if (_methodName139.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes139, parameterTypes)) {
+			ModuleServiceUtil.setBeanIdentifier((java.lang.String)arguments[0]);
+		}
+
+		if (_methodName144.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes144, parameterTypes)) {
+			return ModuleServiceUtil.findAllInGroup(((Long)arguments[0]).longValue());
+		}
+
+		if (_methodName145.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes145, parameterTypes)) {
 			return ModuleServiceUtil.findAllInCourse(((Long)arguments[0]).longValue());
 		}
 
-		if (_methodName140.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes140, parameterTypes)) {
+		if (_methodName146.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes146, parameterTypes)) {
 			return ModuleServiceUtil.isLocked(((Long)arguments[0]).longValue());
 		}
 
-		if (_methodName141.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes141, parameterTypes)) {
+		if (_methodName147.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes147, parameterTypes)) {
 			return ModuleServiceUtil.PassedByMe(((Long)arguments[0]).longValue());
 		}
 
-		if (_methodName142.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes142, parameterTypes)) {
+		if (_methodName148.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes148, parameterTypes)) {
 			return ModuleServiceUtil.isUserPassed(((Long)arguments[0]).longValue(),
 				(java.lang.String)arguments[1]);
 		}
@@ -93,18 +93,18 @@ public class ModuleServiceClpInvoker {
 		throw new UnsupportedOperationException();
 	}
 
-	private String _methodName132;
-	private String[] _methodParameterTypes132;
-	private String _methodName133;
-	private String[] _methodParameterTypes133;
 	private String _methodName138;
 	private String[] _methodParameterTypes138;
 	private String _methodName139;
 	private String[] _methodParameterTypes139;
-	private String _methodName140;
-	private String[] _methodParameterTypes140;
-	private String _methodName141;
-	private String[] _methodParameterTypes141;
-	private String _methodName142;
-	private String[] _methodParameterTypes142;
+	private String _methodName144;
+	private String[] _methodParameterTypes144;
+	private String _methodName145;
+	private String[] _methodParameterTypes145;
+	private String _methodName146;
+	private String[] _methodParameterTypes146;
+	private String _methodName147;
+	private String[] _methodParameterTypes147;
+	private String _methodName148;
+	private String[] _methodParameterTypes148;
 }

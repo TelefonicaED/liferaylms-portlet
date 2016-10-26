@@ -319,6 +319,20 @@ public class ModuleResultLocalServiceUtil {
 			moduleId, _students);
 	}
 
+	public static long countStudentsStartedByModuleId(
+		com.liferay.lms.model.Module module,
+		java.util.List<com.liferay.portal.model.User> students, long teamId) {
+		return getService()
+				   .countStudentsStartedByModuleId(module, students, teamId);
+	}
+
+	public static long countStudentsFinishedByModuleId(
+		com.liferay.lms.model.Module module,
+		java.util.List<com.liferay.portal.model.User> students, long teamId) {
+		return getService()
+				   .countStudentsFinishedByModuleId(module, students, teamId);
+	}
+
 	public static long countByModulePassed(long moduleId, boolean passed)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService().countByModulePassed(moduleId, passed);

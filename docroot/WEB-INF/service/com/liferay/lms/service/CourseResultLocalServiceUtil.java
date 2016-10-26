@@ -292,12 +292,46 @@ public class CourseResultLocalServiceUtil {
 		return getService().countByUserId(userId);
 	}
 
+	public static long countStudentsStartedByCourseId(
+		com.liferay.lms.model.Course course,
+		java.util.List<com.liferay.portal.model.User> students, long teamId) {
+		return getService()
+				   .countStudentsStartedByCourseId(course, students, teamId);
+	}
+
+	public static long countStudentsFinishedByCourseId(
+		com.liferay.lms.model.Course course,
+		java.util.List<com.liferay.portal.model.User> students, long teamId) {
+		return getService()
+				   .countStudentsFinishedByCourseId(course, students, teamId);
+	}
+
+	public static long countStudentsPassedByCourseId(
+		com.liferay.lms.model.Course course,
+		java.util.List<com.liferay.portal.model.User> students, long teamId) {
+		return getService()
+				   .countStudentsPassedByCourseId(course, students, teamId);
+	}
+
+	public static long countStudentsFailedByCourseId(
+		com.liferay.lms.model.Course course,
+		java.util.List<com.liferay.portal.model.User> students, long teamId) {
+		return getService()
+				   .countStudentsFailedByCourseId(course, students, teamId);
+	}
+
+	/**
+	* @deprecated Renamed to {@link #countStudentsPassedByCourseId} or  {@link #countStudentsFailedByCourseId}
+	*/
 	public static long countStudentsByCourseId(
 		com.liferay.lms.model.Course course, boolean passed)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService().countStudentsByCourseId(course, passed);
 	}
 
+	/**
+	* @deprecated Renamed to {@link #countStudentsPassedByCourseId} or  {@link #countStudentsFailedByCourseId}
+	*/
 	public static long countStudentsByCourseId(
 		com.liferay.lms.model.Course course,
 		java.util.List<com.liferay.portal.model.User> students, boolean passed)
@@ -305,12 +339,18 @@ public class CourseResultLocalServiceUtil {
 		return getService().countStudentsByCourseId(course, students, passed);
 	}
 
+	/**
+	* @deprecated Renamed to {@link #countStartedOnlyStudents}
+	*/
 	public static long countStudentsByCourseId(
 		com.liferay.lms.model.Course course)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService().countStudentsByCourseId(course);
 	}
 
+	/**
+	* @deprecated Renamed to {@link #countStartedOnlyStudents}
+	*/
 	public static long countStudentsByCourseId(
 		com.liferay.lms.model.Course course,
 		java.util.List<com.liferay.portal.model.User> students)
@@ -328,17 +368,31 @@ public class CourseResultLocalServiceUtil {
 		return getService().avgResult(courseId);
 	}
 
+	/**
+	* @deprecated Renamed to {@link #avgPassedStudentsResult}
+	*/
 	public static java.lang.Double avgStudentsResult(
 		com.liferay.lms.model.Course course, boolean passed)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService().avgStudentsResult(course, passed);
 	}
 
+	/**
+	* @deprecated Renamed to {@link #avgPassedStudentsResult}
+	*/
 	public static java.lang.Double avgStudentsResult(
 		com.liferay.lms.model.Course course,
 		java.util.List<com.liferay.portal.model.User> students, boolean passed)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService().avgStudentsResult(course, students, passed);
+	}
+
+	public static java.lang.Double avgPassedStudentsResult(
+		com.liferay.lms.model.Course course,
+		java.util.List<com.liferay.portal.model.User> students, boolean passed,
+		long teamId) throws com.liferay.portal.kernel.exception.SystemException {
+		return getService()
+				   .avgPassedStudentsResult(course, students, passed, teamId);
 	}
 
 	public static com.liferay.lms.model.CourseResult create(long courseId,
