@@ -35,9 +35,7 @@ public class CourseToolsManage extends MVCPortlet
 				Role userRole = RoleLocalServiceUtil.getRole(themeDisplay.getCompanyId(), RoleConstants.USER);
 				boolean visible = ResourcePermissionLocalServiceUtil.hasResourcePermission(siteMemberRole.getCompanyId(), Layout.class.getName(), 
 						ResourceConstants.SCOPE_INDIVIDUAL, layoutid, new long[] {siteMemberRole.getRoleId(), userRole.getRoleId()}, ActionKeys.VIEW);
-				//if (ellayout.getHidden()) {
 				if(!visible){	
-					//ellayout.setHidden(false);
 					
 					ResourcePermissionLocalServiceUtil.setResourcePermissions(
 							themeDisplay.getCompanyId(),
@@ -45,13 +43,6 @@ public class CourseToolsManage extends MVCPortlet
 							ResourceConstants.SCOPE_INDIVIDUAL,
 							layoutid,
 							siteMemberRole.getRoleId(),
-							new String[] { ActionKeys.VIEW });
-					ResourcePermissionLocalServiceUtil.setResourcePermissions(
-							themeDisplay.getCompanyId(),
-							Layout.class.getName(),
-							ResourceConstants.SCOPE_INDIVIDUAL,
-							layoutid,
-							userRole.getRoleId(),
 							new String[] { ActionKeys.VIEW });
 				} else {
 					//ellayout.setHidden(true);
