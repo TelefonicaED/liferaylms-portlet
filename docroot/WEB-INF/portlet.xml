@@ -607,7 +607,6 @@
 		<supports>
 			<mime-type>text/html</mime-type>
 			<portlet-mode>VIEW</portlet-mode>
-			<portlet-mode>EDIT</portlet-mode>
 		</supports>
 		<resource-bundle>content/p2ptaskactivity/Language</resource-bundle>
 		<portlet-info>
@@ -1420,7 +1419,6 @@
 		<supports>
 			<mime-type>text/html</mime-type>
 			<portlet-mode>view</portlet-mode>
-			<portlet-mode>EDIT</portlet-mode>
 		</supports>
 		<resource-bundle>content/surveyactivity/Language</resource-bundle>
 		<portlet-info>
@@ -1474,7 +1472,6 @@
 		<supports>
 			<mime-type>text/html</mime-type>
 			<portlet-mode>view</portlet-mode>
-			<portlet-mode>EDIT</portlet-mode>
 		</supports>
 		<resource-bundle>content/onlinetaskactivity/Language</resource-bundle>
 		<portlet-info>
@@ -1524,7 +1521,6 @@
 		<supports>
 			<mime-type>text/html</mime-type>
 			<portlet-mode>view</portlet-mode>
-			<portlet-mode>EDIT</portlet-mode>
 		</supports>
 		<resource-bundle>content/offlinetaskactivity/Language</resource-bundle>
 		<portlet-info>
@@ -1570,7 +1566,6 @@
 		<supports>
 			<mime-type>text/html</mime-type>
 			<portlet-mode>view</portlet-mode>
-			<portlet-mode>EDIT</portlet-mode>
 		</supports>
 		<resource-bundle>content/evaluationtaskactivity/Language</resource-bundle>
 		<portlet-info>
