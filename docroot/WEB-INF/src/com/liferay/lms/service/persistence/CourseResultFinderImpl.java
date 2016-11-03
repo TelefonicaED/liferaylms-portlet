@@ -83,7 +83,7 @@ public class CourseResultFinderImpl extends BasePersistenceImpl<CourseResult> im
 					" INNER JOIN users_groups ug ON cr.userId = ug.userId " +
 					" AND ug.groupId ="+courseGropupCreatedId;
 			if(teamId>0){
-				sql+=" INNER JOIN users_teams ut ON mr.userId = ut.userId AND ut.teamId = "+teamId;
+				sql+=" INNER JOIN users_teams ut ON cr.userId = ut.userId AND ut.teamId = "+teamId;
 			}
 			sql+=" WHERE courseId="+courseId+" AND cr.passedDate IS NOT NULL ";
 			

@@ -2,6 +2,7 @@ package com.liferay.lms.views;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.TimeZone;
 
 
 public class ModuleStatsView {
@@ -18,11 +19,12 @@ public class ModuleStatsView {
 	private SimpleDateFormat sdf;
 	
 
-	public ModuleStatsView(long moduleId, String moduleTitle) {
+	public ModuleStatsView(long moduleId, String moduleTitle, TimeZone timeZone) {
 		super();
 		this.moduleId = moduleId;
 		this.moduleTitle = moduleTitle;
 		this.sdf = new SimpleDateFormat("dd/MM/yyyy");
+		this.sdf.setTimeZone(timeZone);
 		this.precedence = "-";
 	}
 

@@ -53,7 +53,7 @@ public class StudentSearch extends MVCPortlet {
 			boolean showEmail = GetterUtil.getBoolean(preferences.getValue("showEmail", StringPool.FALSE));
 			
 			
-			long teamId = ParamUtil.getLong(renderRequest, "teamId",0);
+			long teamId = ParamUtil.getLong(renderRequest, "team",0);
 			
 			List<Team> teams = TeamLocalServiceUtil.getGroupTeams(themeDisplay.getScopeGroupId());
 			
@@ -63,7 +63,7 @@ public class StudentSearch extends MVCPortlet {
 			renderRequest.setAttribute("showEmail", showEmail);
 
 			PortletURL iteratorURL = renderResponse.createRenderURL();
-			iteratorURL.setParameter("teamId" ,  String.valueOf(teamId));
+			iteratorURL.setParameter("team" ,  String.valueOf(teamId));
 			
 			/*iteratorURL.setParameter("showSearcher" ,  String.valueOf(showSearcher));
 			iteratorURL.setParameter("showScreenName" , String.valueOf(showScreenName));
@@ -78,7 +78,6 @@ public class StudentSearch extends MVCPortlet {
 			Course course = CourseLocalServiceUtil.fetchByGroupCreatedId(themeDisplay.getScopeGroupId());
 		
 			if(log.isDebugEnabled()){
-				log.debug("Course "+course);
 				log.debug("NAME "+displayTerms.getFirstName());
 				log.debug("SURNAME "+displayTerms.getLastName());
 				log.debug("SCREEN NAME "+displayTerms.getScreenName());
@@ -90,6 +89,13 @@ public class StudentSearch extends MVCPortlet {
 				log.debug("ADVANCED SEARCH "+displayTerms.isAdvancedSearch());
 				log.debug("AND OPERATOR "+displayTerms.isAndOperator());
 				log.debug("TEAM "+teamId);
+				
+			}
+			
+			
+			
+			if(log.isDebugEnabled()){
+				log.debug("NAME "+ParamUtil.getString(renderRequest, "firstName"));
 				
 			}
 			
@@ -126,7 +132,8 @@ public class StudentSearch extends MVCPortlet {
 			}
 			
 			renderRequest.setAttribute("searchContainer", userSearchContainer);
-			renderRequest.setAttribute("teamId", teamId);
+			renderRequest.setAttribute("team", teamId);
+			renderRequest.setAttribute("teams", teams);
 			
 		} catch (SystemException e) {
 			// TODO Auto-generated catch block

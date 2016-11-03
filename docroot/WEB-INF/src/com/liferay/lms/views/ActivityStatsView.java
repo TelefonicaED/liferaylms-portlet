@@ -3,6 +3,7 @@ package com.liferay.lms.views;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.TimeZone;
 
 
 public class ActivityStatsView {
@@ -27,11 +28,12 @@ public class ActivityStatsView {
 	private SimpleDateFormat sdf;
 	private DecimalFormat numberFormat;
 
-	public ActivityStatsView(long actId, String actTitle) {
+	public ActivityStatsView(long actId, String actTitle, TimeZone timeZone) {
 		super();
 		this.actId = actId;
 		this.actTitle = actTitle;
 		this.sdf = new SimpleDateFormat("dd/MM/yyyy");
+		this.sdf.setTimeZone(timeZone);
 		this.numberFormat = new DecimalFormat("#.#");
 		
 	}

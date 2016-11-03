@@ -94,13 +94,12 @@ String scourseIds=ListUtil.toString(courses,"courseId");
 	<liferay-ui:search-container-row className="com.liferay.lms.model.Course" keyProperty="courseId" modelVar="course">
 	<%			
 		Group groupsel= GroupLocalServiceUtil.getGroup(course.getGroupCreatedId());
-		List<User> students = CourseLocalServiceUtil.getStudentsFromCourse(course.getCompanyId(), course.getGroupCreatedId());	
-		long registered=(Validator.isNotNull(students) && students.size() > 0) ? students.size() : 0;
-		long iniciados = (registered > 0) ? CourseResultLocalServiceUtil.countStudentsByCourseId(course, students) : 0;
-		long finalizados = (registered > 0) ? CourseResultLocalServiceUtil.countStudentsByCourseId(course, students, true) : 0;
+		long registered=CourseLocalServiceUtil.getStudentsFromCourseCount(course.getCourseId());
+		long iniciados = (registered > 0) ? CourseResultLocalServiceUtil.countStudentsStartedByCourseId(course, null, 0) : 0;
+		long finalizados = (registered > 0) ? CourseResultLocalServiceUtil.countStudentsPassedByCourseId(course, null, 0): 0;
 		double avgResult=0;
 		if(finalizados>0){
-			avgResult=CourseResultLocalServiceUtil.avgStudentsResult(course, students, true);
+			avgResult=CourseResultLocalServiceUtil.avgPassedStudentsResult(course, null, true, 0);
 		}
 		long activitiesCount=LearningActivityLocalServiceUtil.countLearningActivitiesOfGroup(course.getGroupCreatedId());
 		long modulesCount=ModuleLocalServiceUtil.countByGroupId(course.getGroupCreatedId());
@@ -117,7 +116,7 @@ String scourseIds=ListUtil.toString(courses,"courseId");
 		
 		</liferay-ui:search-container-column-text>
 		<liferay-ui:search-container-column-text valign="right" name="coursestats.registered">
-		<%=registered %>
+		<%= registered  %>
 		</liferay-ui:search-container-column-text>
 		<liferay-ui:search-container-column-text  valign="right" name="coursestats.starts.course">
 		<%=iniciados %>

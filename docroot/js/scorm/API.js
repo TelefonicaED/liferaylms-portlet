@@ -730,7 +730,7 @@ SCORM_1_2.API_LIB = function(activityTreeNode) {
 	this.$3 = '^([0-9]{2,4}):([0-9]{2}):([0-9]{2})(\.[0-9]{1,2})?$';
 	this.$4 = '^\\d+$';
 	this.$5 = '^-?([0-9]+)$';
-	this.$6 = '^-?([0-9]{0,3})(\.[0-9]{1,2})?$';
+	this.$6 = '^-?([0-9]{0,3})(\.[0-9]{1,})?$';
 	this.$7 = '^\\w{1,255}$';
 	this.$8 = this.$0;
 	this.$9 = '[._](\\d+).';
@@ -1333,6 +1333,10 @@ SCORM_1_2.API_LIB.prototype = {
 						value = value + '';
 						var $2 = value.match($0);
 						if ($2 != null) {
+							if(element == 'cmi.core.score.raw'){
+								value = Number(Math.round(parseFloat(value)+'e'+7)+'e-'+7);
+								value = value + '';
+							}
 							if (element !== $1) {
 								var $3 = element.split('.');
 								var $4 = 'cmi';

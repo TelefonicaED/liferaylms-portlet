@@ -126,106 +126,110 @@ public class ModuleLocalServiceClp implements ModuleLocalService {
 
 		_methodName23 = "findAllInGroup";
 
-		_methodParameterTypes23 = new String[] {
+		_methodParameterTypes23 = new String[] { "long", "int", "int" };
+
+		_methodName24 = "findAllInGroup";
+
+		_methodParameterTypes24 = new String[] {
 				"long", "com.liferay.portal.kernel.util.OrderByComparator"
 			};
-
-		_methodName24 = "findFirstInGroup";
-
-		_methodParameterTypes24 = new String[] { "long" };
 
 		_methodName25 = "findFirstInGroup";
 
-		_methodParameterTypes25 = new String[] {
+		_methodParameterTypes25 = new String[] { "long" };
+
+		_methodName26 = "findFirstInGroup";
+
+		_methodParameterTypes26 = new String[] {
 				"long", "com.liferay.portal.kernel.util.OrderByComparator"
 			};
 
-		_methodName26 = "countInGroup";
+		_methodName27 = "countInGroup";
 
-		_methodParameterTypes26 = new String[] { "long" };
-
-		_methodName27 = "findAllInUserAndGroup";
-
-		_methodParameterTypes27 = new String[] { "long", "long" };
+		_methodParameterTypes27 = new String[] { "long" };
 
 		_methodName28 = "findAllInUserAndGroup";
 
-		_methodParameterTypes28 = new String[] {
+		_methodParameterTypes28 = new String[] { "long", "long" };
+
+		_methodName29 = "findAllInUserAndGroup";
+
+		_methodParameterTypes29 = new String[] {
 				"long", "long",
 				"com.liferay.portal.kernel.util.OrderByComparator"
 			};
 
-		_methodName29 = "getPreviusModule";
-
-		_methodParameterTypes29 = new String[] { "long" };
-
 		_methodName30 = "getPreviusModule";
 
-		_methodParameterTypes30 = new String[] { "com.liferay.lms.model.Module" };
+		_methodParameterTypes30 = new String[] { "long" };
 
-		_methodName31 = "getNextModule";
+		_methodName31 = "getPreviusModule";
 
-		_methodParameterTypes31 = new String[] { "long" };
+		_methodParameterTypes31 = new String[] { "com.liferay.lms.model.Module" };
 
 		_methodName32 = "getNextModule";
 
-		_methodParameterTypes32 = new String[] { "com.liferay.lms.model.Module" };
+		_methodParameterTypes32 = new String[] { "long" };
 
-		_methodName33 = "goUpModule";
+		_methodName33 = "getNextModule";
 
-		_methodParameterTypes33 = new String[] { "long", "long" };
+		_methodParameterTypes33 = new String[] { "com.liferay.lms.model.Module" };
 
-		_methodName34 = "goDownModule";
+		_methodName34 = "goUpModule";
 
 		_methodParameterTypes34 = new String[] { "long", "long" };
 
-		_methodName35 = "moveModule";
+		_methodName35 = "goDownModule";
 
-		_methodParameterTypes35 = new String[] { "long", "long", "long", "long" };
+		_methodParameterTypes35 = new String[] { "long", "long" };
 
-		_methodName36 = "addmodule";
+		_methodName36 = "moveModule";
 
-		_methodParameterTypes36 = new String[] { "com.liferay.lms.model.Module" };
+		_methodParameterTypes36 = new String[] { "long", "long", "long", "long" };
 
-		_methodName37 = "addModule";
+		_methodName37 = "addmodule";
 
-		_methodParameterTypes37 = new String[] {
+		_methodParameterTypes37 = new String[] { "com.liferay.lms.model.Module" };
+
+		_methodName38 = "addModule";
+
+		_methodParameterTypes38 = new String[] {
 				"java.lang.Long", "java.lang.Long", "java.lang.Long",
 				"java.lang.String", "java.lang.String", "java.util.Date",
 				"java.util.Date", "java.lang.Long"
 			};
 
-		_methodName38 = "remove";
-
-		_methodParameterTypes38 = new String[] {
-				"com.liferay.lms.model.Module", "long"
-			};
-
-		_methodName39 = "updateModule";
+		_methodName39 = "remove";
 
 		_methodParameterTypes39 = new String[] {
 				"com.liferay.lms.model.Module", "long"
 			};
 
-		_methodName40 = "isUserPassed";
+		_methodName40 = "updateModule";
 
-		_methodParameterTypes40 = new String[] { "long", "long" };
+		_methodParameterTypes40 = new String[] {
+				"com.liferay.lms.model.Module", "long"
+			};
 
-		_methodName41 = "isLocked";
+		_methodName41 = "isUserPassed";
 
 		_methodParameterTypes41 = new String[] { "long", "long" };
 
-		_methodName42 = "countByGroupId";
+		_methodName42 = "isLocked";
 
-		_methodParameterTypes42 = new String[] { "long" };
+		_methodParameterTypes42 = new String[] { "long", "long" };
 
-		_methodName43 = "usersStarted";
+		_methodName43 = "countByGroupId";
 
 		_methodParameterTypes43 = new String[] { "long" };
 
-		_methodName44 = "modulesUserPassed";
+		_methodName44 = "usersStarted";
 
-		_methodParameterTypes44 = new String[] { "long", "long" };
+		_methodParameterTypes44 = new String[] { "long" };
+
+		_methodName45 = "modulesUserPassed";
+
+		_methodParameterTypes45 = new String[] { "long", "long" };
 	}
 
 	public com.liferay.lms.model.Module addModule(
@@ -873,14 +877,43 @@ public class ModuleLocalServiceClp implements ModuleLocalService {
 	}
 
 	public java.util.List<com.liferay.lms.model.Module> findAllInGroup(
-		long groupId,
-		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		long groupId, int start, int end)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		Object returnObj = null;
 
 		try {
 			returnObj = _invokableLocalService.invokeMethod(_methodName23,
 					_methodParameterTypes23,
+					new Object[] { groupId, start, end });
+		}
+		catch (Throwable t) {
+			t = ClpSerializer.translateThrowable(t);
+
+			if (t instanceof com.liferay.portal.kernel.exception.SystemException) {
+				throw (com.liferay.portal.kernel.exception.SystemException)t;
+			}
+
+			if (t instanceof RuntimeException) {
+				throw (RuntimeException)t;
+			}
+			else {
+				throw new RuntimeException(t.getClass().getName() +
+					" is not a valid exception");
+			}
+		}
+
+		return (java.util.List<com.liferay.lms.model.Module>)ClpSerializer.translateOutput(returnObj);
+	}
+
+	public java.util.List<com.liferay.lms.model.Module> findAllInGroup(
+		long groupId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		Object returnObj = null;
+
+		try {
+			returnObj = _invokableLocalService.invokeMethod(_methodName24,
+					_methodParameterTypes24,
 					new Object[] {
 						groupId,
 						
@@ -911,8 +944,8 @@ public class ModuleLocalServiceClp implements ModuleLocalService {
 		Object returnObj = null;
 
 		try {
-			returnObj = _invokableLocalService.invokeMethod(_methodName24,
-					_methodParameterTypes24, new Object[] { groupId });
+			returnObj = _invokableLocalService.invokeMethod(_methodName25,
+					_methodParameterTypes25, new Object[] { groupId });
 		}
 		catch (Throwable t) {
 			t = ClpSerializer.translateThrowable(t);
@@ -939,8 +972,8 @@ public class ModuleLocalServiceClp implements ModuleLocalService {
 		Object returnObj = null;
 
 		try {
-			returnObj = _invokableLocalService.invokeMethod(_methodName25,
-					_methodParameterTypes25,
+			returnObj = _invokableLocalService.invokeMethod(_methodName26,
+					_methodParameterTypes26,
 					new Object[] {
 						groupId,
 						
@@ -971,8 +1004,8 @@ public class ModuleLocalServiceClp implements ModuleLocalService {
 		Object returnObj = null;
 
 		try {
-			returnObj = _invokableLocalService.invokeMethod(_methodName26,
-					_methodParameterTypes26, new Object[] { groupId });
+			returnObj = _invokableLocalService.invokeMethod(_methodName27,
+					_methodParameterTypes27, new Object[] { groupId });
 		}
 		catch (Throwable t) {
 			t = ClpSerializer.translateThrowable(t);
@@ -999,8 +1032,8 @@ public class ModuleLocalServiceClp implements ModuleLocalService {
 		Object returnObj = null;
 
 		try {
-			returnObj = _invokableLocalService.invokeMethod(_methodName27,
-					_methodParameterTypes27, new Object[] { userId, groupId });
+			returnObj = _invokableLocalService.invokeMethod(_methodName28,
+					_methodParameterTypes28, new Object[] { userId, groupId });
 		}
 		catch (Throwable t) {
 			t = ClpSerializer.translateThrowable(t);
@@ -1028,8 +1061,8 @@ public class ModuleLocalServiceClp implements ModuleLocalService {
 		Object returnObj = null;
 
 		try {
-			returnObj = _invokableLocalService.invokeMethod(_methodName28,
-					_methodParameterTypes28,
+			returnObj = _invokableLocalService.invokeMethod(_methodName29,
+					_methodParameterTypes29,
 					new Object[] {
 						userId,
 						
@@ -1062,8 +1095,8 @@ public class ModuleLocalServiceClp implements ModuleLocalService {
 		Object returnObj = null;
 
 		try {
-			returnObj = _invokableLocalService.invokeMethod(_methodName29,
-					_methodParameterTypes29, new Object[] { moduleId });
+			returnObj = _invokableLocalService.invokeMethod(_methodName30,
+					_methodParameterTypes30, new Object[] { moduleId });
 		}
 		catch (Throwable t) {
 			t = ClpSerializer.translateThrowable(t);
@@ -1090,8 +1123,8 @@ public class ModuleLocalServiceClp implements ModuleLocalService {
 		Object returnObj = null;
 
 		try {
-			returnObj = _invokableLocalService.invokeMethod(_methodName30,
-					_methodParameterTypes30,
+			returnObj = _invokableLocalService.invokeMethod(_methodName31,
+					_methodParameterTypes31,
 					new Object[] { ClpSerializer.translateInput(theModule) });
 		}
 		catch (Throwable t) {
@@ -1118,8 +1151,8 @@ public class ModuleLocalServiceClp implements ModuleLocalService {
 		Object returnObj = null;
 
 		try {
-			returnObj = _invokableLocalService.invokeMethod(_methodName31,
-					_methodParameterTypes31, new Object[] { moduleId });
+			returnObj = _invokableLocalService.invokeMethod(_methodName32,
+					_methodParameterTypes32, new Object[] { moduleId });
 		}
 		catch (Throwable t) {
 			t = ClpSerializer.translateThrowable(t);
@@ -1146,8 +1179,8 @@ public class ModuleLocalServiceClp implements ModuleLocalService {
 		Object returnObj = null;
 
 		try {
-			returnObj = _invokableLocalService.invokeMethod(_methodName32,
-					_methodParameterTypes32,
+			returnObj = _invokableLocalService.invokeMethod(_methodName33,
+					_methodParameterTypes33,
 					new Object[] { ClpSerializer.translateInput(theModule) });
 		}
 		catch (Throwable t) {
@@ -1172,8 +1205,8 @@ public class ModuleLocalServiceClp implements ModuleLocalService {
 	public void goUpModule(long moduleId, long userIdAction)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		try {
-			_invokableLocalService.invokeMethod(_methodName33,
-				_methodParameterTypes33, new Object[] { moduleId, userIdAction });
+			_invokableLocalService.invokeMethod(_methodName34,
+				_methodParameterTypes34, new Object[] { moduleId, userIdAction });
 		}
 		catch (Throwable t) {
 			t = ClpSerializer.translateThrowable(t);
@@ -1195,8 +1228,8 @@ public class ModuleLocalServiceClp implements ModuleLocalService {
 	public void goDownModule(long moduleId, long userIdAction)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		try {
-			_invokableLocalService.invokeMethod(_methodName34,
-				_methodParameterTypes34, new Object[] { moduleId, userIdAction });
+			_invokableLocalService.invokeMethod(_methodName35,
+				_methodParameterTypes35, new Object[] { moduleId, userIdAction });
 		}
 		catch (Throwable t) {
 			t = ClpSerializer.translateThrowable(t);
@@ -1219,8 +1252,8 @@ public class ModuleLocalServiceClp implements ModuleLocalService {
 		long userIdAction)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		try {
-			_invokableLocalService.invokeMethod(_methodName35,
-				_methodParameterTypes35,
+			_invokableLocalService.invokeMethod(_methodName36,
+				_methodParameterTypes36,
 				new Object[] { modId, previusMod, nextMod, userIdAction });
 		}
 		catch (Throwable t) {
@@ -1246,8 +1279,8 @@ public class ModuleLocalServiceClp implements ModuleLocalService {
 		Object returnObj = null;
 
 		try {
-			returnObj = _invokableLocalService.invokeMethod(_methodName36,
-					_methodParameterTypes36,
+			returnObj = _invokableLocalService.invokeMethod(_methodName37,
+					_methodParameterTypes37,
 					new Object[] { ClpSerializer.translateInput(validmodule) });
 		}
 		catch (Throwable t) {
@@ -1277,8 +1310,8 @@ public class ModuleLocalServiceClp implements ModuleLocalService {
 		Object returnObj = null;
 
 		try {
-			returnObj = _invokableLocalService.invokeMethod(_methodName37,
-					_methodParameterTypes37,
+			returnObj = _invokableLocalService.invokeMethod(_methodName38,
+					_methodParameterTypes38,
 					new Object[] {
 						ClpSerializer.translateInput(companyId),
 						
@@ -1319,8 +1352,8 @@ public class ModuleLocalServiceClp implements ModuleLocalService {
 	public void remove(com.liferay.lms.model.Module fileobj, long userIdAction)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		try {
-			_invokableLocalService.invokeMethod(_methodName38,
-				_methodParameterTypes38,
+			_invokableLocalService.invokeMethod(_methodName39,
+				_methodParameterTypes39,
 				new Object[] { ClpSerializer.translateInput(fileobj), userIdAction });
 		}
 		catch (Throwable t) {
@@ -1346,8 +1379,8 @@ public class ModuleLocalServiceClp implements ModuleLocalService {
 		Object returnObj = null;
 
 		try {
-			returnObj = _invokableLocalService.invokeMethod(_methodName39,
-					_methodParameterTypes39,
+			returnObj = _invokableLocalService.invokeMethod(_methodName40,
+					_methodParameterTypes40,
 					new Object[] {
 						ClpSerializer.translateInput(module),
 						
@@ -1378,8 +1411,8 @@ public class ModuleLocalServiceClp implements ModuleLocalService {
 		Object returnObj = null;
 
 		try {
-			returnObj = _invokableLocalService.invokeMethod(_methodName40,
-					_methodParameterTypes40, new Object[] { moduleId, userId });
+			returnObj = _invokableLocalService.invokeMethod(_methodName41,
+					_methodParameterTypes41, new Object[] { moduleId, userId });
 		}
 		catch (Throwable t) {
 			t = ClpSerializer.translateThrowable(t);
@@ -1405,8 +1438,8 @@ public class ModuleLocalServiceClp implements ModuleLocalService {
 		Object returnObj = null;
 
 		try {
-			returnObj = _invokableLocalService.invokeMethod(_methodName41,
-					_methodParameterTypes41, new Object[] { moduleId, userId });
+			returnObj = _invokableLocalService.invokeMethod(_methodName42,
+					_methodParameterTypes42, new Object[] { moduleId, userId });
 		}
 		catch (Throwable t) {
 			t = ClpSerializer.translateThrowable(t);
@@ -1432,8 +1465,8 @@ public class ModuleLocalServiceClp implements ModuleLocalService {
 		Object returnObj = null;
 
 		try {
-			returnObj = _invokableLocalService.invokeMethod(_methodName42,
-					_methodParameterTypes42, new Object[] { groupId });
+			returnObj = _invokableLocalService.invokeMethod(_methodName43,
+					_methodParameterTypes43, new Object[] { groupId });
 		}
 		catch (Throwable t) {
 			t = ClpSerializer.translateThrowable(t);
@@ -1459,8 +1492,8 @@ public class ModuleLocalServiceClp implements ModuleLocalService {
 		Object returnObj = null;
 
 		try {
-			returnObj = _invokableLocalService.invokeMethod(_methodName43,
-					_methodParameterTypes43, new Object[] { moduleId });
+			returnObj = _invokableLocalService.invokeMethod(_methodName44,
+					_methodParameterTypes44, new Object[] { moduleId });
 		}
 		catch (Throwable t) {
 			t = ClpSerializer.translateThrowable(t);
@@ -1486,8 +1519,8 @@ public class ModuleLocalServiceClp implements ModuleLocalService {
 		Object returnObj = null;
 
 		try {
-			returnObj = _invokableLocalService.invokeMethod(_methodName44,
-					_methodParameterTypes44, new Object[] { groupId, userId });
+			returnObj = _invokableLocalService.invokeMethod(_methodName45,
+					_methodParameterTypes45, new Object[] { groupId, userId });
 		}
 		catch (Throwable t) {
 			t = ClpSerializer.translateThrowable(t);
@@ -1597,4 +1630,6 @@ public class ModuleLocalServiceClp implements ModuleLocalService {
 	private String[] _methodParameterTypes43;
 	private String _methodName44;
 	private String[] _methodParameterTypes44;
+	private String _methodName45;
+	private String[] _methodParameterTypes45;
 }

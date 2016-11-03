@@ -4,7 +4,7 @@
 <%@include file="/init.jsp" %>
 
 <div class="student_search">
-	<liferay-portlet:actionURL var="renderURL" />
+	<liferay-portlet:renderURL var="renderURL" />
 	<c:if test="${showSearcher}">
 		<aui:form action="${renderURL}" name="searchFm">
 			<liferay-ui:search-form page="/html/shared/usersSearchform.jsp"
@@ -15,13 +15,13 @@
 	</c:if>
 	<c:if test="${!showSearcher and not empty teams}">
 		<aui:form action="${renderURL}" name="searchTeamsFm">
-			<aui:select name="teamId" label="team">
+			<aui:select name="team" label="team">
 				<aui:option label="" value="0"></aui:option>
 				<c:forEach items="${teams}" var="team">
 					<aui:option  value="${team.teamId}" label="${team.name}" selected="${team.teamId == teamId}"></aui:option>
 				</c:forEach>
 			</aui:select>	
-			<aui:button value="search"/>
+			<aui:button value="search" type="submit"/>
 		</aui:form>
 	</c:if>
 	

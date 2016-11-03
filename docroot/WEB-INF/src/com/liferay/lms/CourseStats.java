@@ -3,14 +3,11 @@ package com.liferay.lms;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
-import java.text.MessageFormat;
-import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
-import java.util.ResourceBundle;
+import java.util.TimeZone;
 
 import javax.portlet.PortletException;
 import javax.portlet.PortletRequestDispatcher;
@@ -23,27 +20,19 @@ import javax.portlet.ResourceResponse;
 import au.com.bytecode.opencsv.CSVWriter;
 
 import com.liferay.lms.model.Course;
-import com.liferay.lms.model.CourseResult;
 import com.liferay.lms.model.LearningActivity;
-import com.liferay.lms.model.LmsPrefs;
 import com.liferay.lms.model.Module;
 import com.liferay.lms.model.Schedule;
 import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.lms.service.CourseResultLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityResultLocalServiceUtil;
-import com.liferay.lms.service.LmsPrefsLocalServiceUtil;
 import com.liferay.lms.service.ModuleLocalServiceUtil;
 import com.liferay.lms.service.ModuleResultLocalServiceUtil;
 import com.liferay.lms.service.ScheduleLocalServiceUtil;
 import com.liferay.lms.views.ActivityStatsView;
 import com.liferay.lms.views.CourseStatsView;
 import com.liferay.lms.views.ModuleStatsView;
-import com.liferay.portal.kernel.dao.orm.CustomSQLParam;
-import com.liferay.portal.kernel.dao.orm.DynamicQuery;
-import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
-import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
-import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.NestableException;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -54,19 +43,12 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.servlet.HttpHeaders;
 import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.ContentTypes;
-import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.WebKeys;
-import com.liferay.portal.model.Group;
 import com.liferay.portal.model.Team;
-import com.liferay.portal.model.User;
-import com.liferay.portal.service.GroupLocalServiceUtil;
-import com.liferay.portal.service.RoleLocalServiceUtil;
 import com.liferay.portal.service.TeamLocalServiceUtil;
-import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.theme.ThemeDisplay;
-import com.liferay.portal.util.comparator.UserLastNameComparator;
 import com.liferay.portlet.asset.AssetRendererFactoryRegistryUtil;
 import com.liferay.portlet.asset.model.AssetRendererFactory;
 import com.liferay.util.bridges.mvc.MVCPortlet;
@@ -122,21 +104,8 @@ public class CourseStats extends MVCPortlet {
 			PortletURL iteratorURL = renderResponse.createRenderURL();
 			iteratorURL.setParameter("teamId", String.valueOf(teamId));
 			
-			List<User> students = CourseLocalServiceUtil.getStudentsFromCourse(course.getCompanyId(), course.getGroupCreatedId(), teamId);
 			
-			long registered = students.size();
-			long finished = CourseResultLocalServiceUtil.countStudentsFinishedByCourseId(course, null, teamId);
-			long started = CourseResultLocalServiceUtil.countStudentsStartedByCourseId(course, null, teamId);
-			long passed = CourseResultLocalServiceUtil.countStudentsPassedByCourseId(course, null, teamId);
-			long failed = CourseResultLocalServiceUtil.countStudentsFailedByCourseId(course, null, teamId);
-		
-			//Se construye la vista de las estadisticas del curso
-			CourseStatsView courseStats = new CourseStatsView(course.getCourseId(), course.getTitle(themeDisplay.getLocale()));				
-			courseStats.setRegistered(registered);
-			courseStats.setStarted(started);
-			courseStats.setFinished(finished);
-			courseStats.setPassed(passed);
-			courseStats.setFailed(failed);
+			CourseStatsView courseStats = getCourseStats(course, teamId, themeDisplay.getLocale());
 			
 			List<CourseStatsView> courseStatsViews = new ArrayList<CourseStatsView>();
 			courseStatsViews.add(courseStats);
@@ -149,50 +118,19 @@ public class CourseStats extends MVCPortlet {
 			searchContainerCourses.setTotal(courseStatsViews.size());
 			
 			//Se construye la vista de las estadisticas de los módulos
-			List<Module> modules = ModuleLocalServiceUtil.findAllInGroup(themeDisplay.getScopeGroupId());
+			List<Module> modules = ModuleLocalServiceUtil.findAllInGroup(themeDisplay.getScopeGroupId(), searchContainerCourses.getStart(), searchContainerCourses.getEnd());
 			List<ModuleStatsView> moduleStatsViews = new ArrayList<ModuleStatsView>();
-			ModuleStatsView moduleStats;
-			long moduleFinished = 0;
-			long moduleStarted = 0;
 			
 			Schedule sch = ScheduleLocalServiceUtil.getScheduleByTeamId(teamId);
-			Module precedence;
 			for(Module module: modules){
-				moduleStats = new ModuleStatsView(module.getModuleId(), module.getTitle(themeDisplay.getLocale()));
-				moduleStarted = ModuleResultLocalServiceUtil.countStudentsStartedByModuleId(module, null, teamId);  
-				moduleFinished = ModuleResultLocalServiceUtil.countStudentsFinishedByModuleId(module, null, teamId); 
-				moduleStats.setStarted(moduleStarted);
-				moduleStats.setFinished(moduleFinished);
-				if(sch!=null){
-					moduleStats.setStartDate(sch.getStartDate());
-					moduleStats.setEndDate(sch.getEndDate());
-				}else{
-					moduleStats.setStartDate(module.getStartDate());
-					moduleStats.setEndDate(module.getEndDate());
-				}
-				moduleStats.setActivityNumber(LearningActivityLocalServiceUtil.countLearningActivitiesOfModule(module.getModuleId()));
-				if(module.getPrecedence()!=0){
-					precedence = ModuleLocalServiceUtil.fetchModule(module.getPrecedence());
-					if(precedence!=null){
-						moduleStats.setPrecedence(precedence.getTitle(themeDisplay.getLocale()));
-					}					
-				}
-				
-				moduleStatsViews.add(moduleStats);	
+				moduleStatsViews.add(getModuleStats(module, teamId, themeDisplay.getLocale(), themeDisplay.getTimeZone(), sch));
 			}
-			
-			
-			
 			
 			SearchContainer<ModuleStatsView> searchContainerModules = new SearchContainer<ModuleStatsView>(renderRequest, null, null, SearchContainer.DEFAULT_CUR_PARAM, 
 					SearchContainer.DEFAULT_DELTA, iteratorURL, 
 					null, "module-empty-results-message");
 			searchContainerModules.setIteratorURL(renderResponse.createRenderURL());
-			int endValue = searchContainerModules.getEnd();
-			if(endValue>moduleStatsViews.size()){
-				endValue=moduleStatsViews.size();
-			}
-			searchContainerModules.setResults(moduleStatsViews.subList(searchContainerModules.getStart(), endValue));
+			searchContainerModules.setResults(moduleStatsViews);
 			searchContainerModules.setTotal(moduleStatsViews.size());
 			
 			
@@ -200,7 +138,7 @@ public class CourseStats extends MVCPortlet {
 			renderRequest.setAttribute("moduleSearchContainer", searchContainerModules);
 			
 				
-		} catch (SystemException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		} 
 
@@ -235,50 +173,14 @@ public class CourseStats extends MVCPortlet {
 			Long total = LearningActivityLocalServiceUtil.countLearningActivitiesOfModule(moduleId);
 			
 			List<ActivityStatsView> activityStatsViews = new ArrayList<ActivityStatsView>();
-			ActivityStatsView activityStats;
-			
 			Schedule sch = ScheduleLocalServiceUtil.getScheduleByTeamId(teamId);
 			
 			for(LearningActivity activity: activities){
-				activityStats = new ActivityStatsView(activity.getActId(), activity.getTitle(themeDisplay.getLocale()));
-							
-				activityStats.setStarted(LearningActivityResultLocalServiceUtil.countStartedOnlyStudents(activity.getActId(), activity.getCompanyId(), activity.getGroupId(), null, teamId));
-				activityStats.setFinished(LearningActivityResultLocalServiceUtil.countFinishedOnlyStudents(activity.getActId(), activity.getCompanyId(), activity.getGroupId(), null, teamId));
-				activityStats.setPassed(LearningActivityResultLocalServiceUtil.countPassedOnlyStudents(activity.getActId(), activity.getCompanyId(), activity.getGroupId(), true, null, teamId));
-				activityStats.setFailed(LearningActivityResultLocalServiceUtil.countNotPassedOnlyStudents(activity.getActId(), activity.getCompanyId(), activity.getGroupId(), null, teamId));
-				activityStats.setTriesPerUser(LearningActivityResultLocalServiceUtil.triesPerUserOnlyStudents(activity.getActId(), activity.getCompanyId(), activity.getGroupId(), null, teamId));
-				activityStats.setAvgResult(LearningActivityResultLocalServiceUtil.avgResultOnlyStudents(activity.getActId(), activity.getCompanyId(), activity.getGroupId(), null, teamId));
-			
-				activityStats.setPassPuntuation(activity.getPasspuntuation());
-				activityStats.setTries(activity.getTries());
-				
-				boolean hasPrecedence = false;
-				if(activity.getPrecedence() > 0)
-					hasPrecedence = true;
-				activityStats.setPrecedence(LanguageUtil.get(themeDisplay.getLocale(),"dependencies."+String.valueOf(hasPrecedence)));
-				activityStats.setType(LanguageUtil.get(themeDisplay.getLocale(),classTypes.get((long)activity.getTypeId())));
-				if(activity.getWeightinmodule() == 1){
-					activityStats.setMandatory(LanguageUtil.get(themeDisplay.getLocale(), "yes"));
-				}else{
-					activityStats.setMandatory(LanguageUtil.get(themeDisplay.getLocale(), "no"));
-				}
-				
-				if(sch!=null){
-					activityStats.setStartDate(sch.getStartDate());
-					activityStats.setEndDate(sch.getEndDate());
-				}else{
-					activityStats.setStartDate(activity.getStartdate());
-					activityStats.setEndDate(activity.getEnddate());
-				}
-				activityStatsViews.add(activityStats);
+				activityStatsViews.add(getActivityStats(activity, themeDisplay.getLocale(), teamId, classTypes, sch, themeDisplay.getTimeZone()));
 			}
 			
-			
-		
 			searchContainerActivities.setResults(activityStatsViews);
 			searchContainerActivities.setTotal(total.intValue());
-			
-			
 			renderRequest.setAttribute("searchContainer", searchContainerActivities);
 			
 		} catch (Exception e) {
@@ -289,9 +191,7 @@ public class CourseStats extends MVCPortlet {
 	}
 	
 	protected void include(String path, RenderRequest renderRequest, RenderResponse renderResponse) throws IOException, PortletException {
-		
 		PortletRequestDispatcher portletRequestDispatcher = getPortletContext().getRequestDispatcher(path);
-	
 		if (portletRequestDispatcher == null) {
 			
 		} else {
@@ -299,6 +199,89 @@ public class CourseStats extends MVCPortlet {
 		}
 	}
 	
+	
+	
+	
+	private CourseStatsView getCourseStats (Course course, long teamId, Locale locale) throws PortalException, SystemException{
+		
+		//Se construye la vista de las estadisticas del curso
+		CourseStatsView courseStats = new CourseStatsView(course.getCourseId(), course.getTitle(locale));				
+		courseStats.setRegistered(CourseLocalServiceUtil.getStudentsFromCourseCount(course.getCourseId(), teamId));
+		courseStats.setStarted(CourseResultLocalServiceUtil.countStudentsStartedByCourseId(course, null, teamId));
+		courseStats.setFinished(CourseResultLocalServiceUtil.countStudentsFinishedByCourseId(course, null, teamId));
+		courseStats.setPassed(CourseResultLocalServiceUtil.countStudentsPassedByCourseId(course, null, teamId));
+		courseStats.setFailed(CourseResultLocalServiceUtil.countStudentsFailedByCourseId(course, null, teamId));
+		
+		return courseStats;
+		
+	}
+	
+	
+	private ModuleStatsView getModuleStats(Module module, long teamId, Locale locale, TimeZone timeZone, Schedule sch) throws SystemException{
+		ModuleStatsView moduleStats = new ModuleStatsView(module.getModuleId(), module.getTitle(locale), timeZone);
+		moduleStats.setStarted(ModuleResultLocalServiceUtil.countStudentsStartedByModuleId(module, null, teamId));
+		moduleStats.setFinished(ModuleResultLocalServiceUtil.countStudentsFinishedByModuleId(module, null, teamId));
+		if(sch!=null){
+			moduleStats.setStartDate(sch.getStartDate());
+			moduleStats.setEndDate(sch.getEndDate());
+		}else{
+			moduleStats.setStartDate(module.getStartDate());
+			moduleStats.setEndDate(module.getEndDate());
+		}
+		moduleStats.setActivityNumber(LearningActivityLocalServiceUtil.countLearningActivitiesOfModule(module.getModuleId()));
+		if(module.getPrecedence()!=0){
+			Module precedence = ModuleLocalServiceUtil.fetchModule(module.getPrecedence());
+			if(precedence!=null){
+				moduleStats.setPrecedence(precedence.getTitle(locale));
+			}					
+		}
+		
+		return moduleStats;
+	}
+	
+	
+	private ActivityStatsView getActivityStats(LearningActivity activity, Locale locale, long teamId, Map<Long, String> classTypes, Schedule sch, TimeZone timeZone) throws SystemException{
+		ActivityStatsView activityStats = new ActivityStatsView(activity.getActId(), activity.getTitle(locale), timeZone);
+		
+		activityStats.setStarted(LearningActivityResultLocalServiceUtil.
+				countStartedOnlyStudents(activity.getActId(), activity.getCompanyId(), activity.getGroupId(), null, teamId));
+		activityStats.setFinished(LearningActivityResultLocalServiceUtil.
+				countFinishedOnlyStudents(activity.getActId(), activity.getCompanyId(), activity.getGroupId(), null, teamId));
+		activityStats.setPassed(LearningActivityResultLocalServiceUtil.
+				countPassedOnlyStudents(activity.getActId(), activity.getCompanyId(), activity.getGroupId(), true, null, teamId));
+		activityStats.setFailed(LearningActivityResultLocalServiceUtil.
+				countNotPassedOnlyStudents(activity.getActId(), activity.getCompanyId(), activity.getGroupId(), null, teamId));
+		activityStats.setTriesPerUser(LearningActivityResultLocalServiceUtil.
+				triesPerUserOnlyStudents(activity.getActId(), activity.getCompanyId(), activity.getGroupId(), null, teamId));
+		activityStats.setAvgResult(LearningActivityResultLocalServiceUtil.
+				avgResultOnlyStudents(activity.getActId(), activity.getCompanyId(), activity.getGroupId(), null, teamId));
+		
+		activityStats.setPassPuntuation(activity.getPasspuntuation());
+		activityStats.setTries(activity.getTries());
+		
+		boolean hasPrecedence = false;
+		if(activity.getPrecedence() > 0){
+			hasPrecedence = true;
+		}
+		activityStats.setPrecedence(LanguageUtil.get(locale,"dependencies."+String.valueOf(hasPrecedence)));
+		activityStats.setType(LanguageUtil.get(locale,classTypes.get((long)activity.getTypeId())));
+		if(activity.getWeightinmodule() == 1){
+			activityStats.setMandatory(LanguageUtil.get(locale, "yes"));
+		}else{
+			activityStats.setMandatory(LanguageUtil.get(locale, "no"));
+		}
+		
+		if(sch!=null){
+			activityStats.setStartDate(sch.getStartDate());
+			activityStats.setEndDate(sch.getEndDate());
+		}else{
+			activityStats.setStartDate(activity.getStartdate());
+			activityStats.setEndDate(activity.getEnddate());
+		}
+		
+		return activityStats;
+	}
+			
 	@Override
 	public void serveResource(ResourceRequest resourceRequest,
 							  ResourceResponse resourceResponse) 
@@ -316,298 +299,162 @@ public class CourseStats extends MVCPortlet {
 			exportModule(resourceResponse, moduleId, teamId, themeDisplay, resourceRequest);
 		}
 	}
+	
+	
 	private void exportCourse(ResourceResponse resourceResponse, long courseId,
 							  long teamId, ThemeDisplay themeDisplay) 
 									  throws IOException, UnsupportedEncodingException {
 		try {
 			Course course = CourseLocalServiceUtil.getCourse(courseId);
-			Group group = GroupLocalServiceUtil.getGroup(course.getGroupCreatedId());
-			List<User> usersList = new ArrayList<User>();
-			
-			long registered	 = 0;
-			long finalizados = 0;
-			long iniciados	 = 0;
-			
-			if (teamId != 0){
-				
-				//Usuarios del equipo
-				usersList = getUsersOfTeam(courseId, teamId, themeDisplay);
-				
-				//Colección con los id's de Usuario
-				Collection<Object> usersCollection = new ArrayList<Object>(usersList.size());
-				
-				//Usuarios registrados en el curso
-				List<User> registeredUsers = CourseLocalServiceUtil
-												.getStudentsFromCourse (course);
-				
-				for (User usuario: usersList){
-					//Añadimos el id a la colección de usuarios
-					usersCollection.add(usuario.getUserId());
-					
-					//Comprobamos si está registrado en el curso
-					if (registeredUsers.contains(usuario))
-						registered += 1;
-				}
-				DynamicQuery courseResultsQueryF = DynamicQueryFactoryUtil.forClass(CourseResult.class)
-													.add(PropertyFactoryUtil.forName("courseId").eq(new Long(course.getCourseId())))
-													.add(PropertyFactoryUtil.forName("passed").eq(new Boolean(true)))
-													.add(PropertyFactoryUtil.forName("userId")
-														.in(usersCollection));
-
-				DynamicQuery courseResultsQueryI = DynamicQueryFactoryUtil.forClass(CourseResult.class)
-													.add(PropertyFactoryUtil.forName("courseId").eq(new Long(course.getCourseId())))
-													.add(PropertyFactoryUtil.forName("passed").eq(new Boolean(false)))
-													.add(PropertyFactoryUtil.forName("userId")
-														.in(usersCollection));
-
-				finalizados  = CourseResultLocalServiceUtil.dynamicQuery(courseResultsQueryF).size();
-				iniciados 	 = CourseResultLocalServiceUtil.dynamicQuery(courseResultsQueryI).size() + finalizados;
-	
-			}else{
-				registered=CourseLocalServiceUtil.getStudentsFromCourse(themeDisplay.getCompanyId(), course.getGroupCreatedId()).size();
-				finalizados = CourseResultLocalServiceUtil.countStudentsByCourseId(course, true);
-				iniciados = CourseResultLocalServiceUtil.countStudentsByCourseId(course, false) + finalizados;
-			}
-			
-			List<Module> tempResults = ModuleLocalServiceUtil.findAllInGroup(group.getGroupId());
+			CourseStatsView courseView  = getCourseStats(course, teamId, themeDisplay.getLocale());
+			List<Module> modules = ModuleLocalServiceUtil.findAllInGroup(course.getGroupCreatedId());
 			CSVWriter writer = initCsv(resourceResponse);
-		    ResourceBundle rb =  ResourceBundle.getBundle("content.Language");
-		    rb = ResourceBundle.getBundle("content.Language", themeDisplay.getLocale());
-		    
-		    //Curso
-		    writer.writeNext(new String[]{course.getTitle(themeDisplay.getLocale())});
-		    
-		    //Inscritos
-		    Object args[] = {registered};
-		    writer.writeNext(new String[]{LanguageUtil.format(themeDisplay.getLocale(), "coursestats.modulestats.inscritos", args)});
-		    
-		    //Iniciaron/finalizaron
-		    writer.writeNext(new String[]{LanguageUtil.get(themeDisplay.getLocale(), "coursestats.start.course") +" "+ iniciados + LanguageUtil.get(themeDisplay.getLocale(),"coursestats.end.course") +" "+ finalizados});
-		    
-		    int numCols = 7;
-		    String[] cabeceras = new String[numCols];
-		    
+			 
+			//Cabecera del curso
+			int numCols = 6;  
+			String[] cabeceras = new String[numCols];
+			cabeceras[0]=LanguageUtil.get(themeDisplay.getLocale(),"title");
+			cabeceras[1]=LanguageUtil.get(themeDisplay.getLocale(),"coursestats.registered");
+			cabeceras[2]=LanguageUtil.get(themeDisplay.getLocale(),"coursestats.start.student");
+			cabeceras[3]=LanguageUtil.get(themeDisplay.getLocale(),"coursestats.end.student");
+			cabeceras[4]=LanguageUtil.get(themeDisplay.getLocale(),"coursestats.passed");
+			cabeceras[5]=LanguageUtil.get(themeDisplay.getLocale(),"coursestats.failed");
+			writer.writeNext(cabeceras);
+			
+			//Resultados del curso
+			String[] resultados = new String[numCols];
+			resultados[0]=courseView.getCourseTitle();
+	    	resultados[1]=Long.toString(courseView.getRegistered());
+	    	resultados[2]=Long.toString(courseView.getStarted());
+	    	resultados[3]=Long.toString(courseView.getFinished());
+	    	resultados[4]=Long.toString(courseView.getPassed());
+	    	resultados[5]=Long.toString(courseView.getFailed());	
+	      	writer.writeNext(resultados);
+			
+	      	//Cabecera del modulo
+		    numCols = 7;
+		    cabeceras = new String[numCols];
 		    cabeceras[0]=LanguageUtil.get(themeDisplay.getLocale(),"coursestats.module");
 		    cabeceras[1]=LanguageUtil.get(themeDisplay.getLocale(),"coursestats.modulestats.stardate");
 		    cabeceras[2]=LanguageUtil.get(themeDisplay.getLocale(),"coursestats.modulestats.enddate");
-		    cabeceras[3]=LanguageUtil.get(themeDisplay.getLocale(),"coursestats.start.student");
-		    cabeceras[4]=LanguageUtil.get(themeDisplay.getLocale(),"coursestats.end.student");
-		    cabeceras[5]=LanguageUtil.get(themeDisplay.getLocale(),"total.activity");
+		    cabeceras[3]=LanguageUtil.get(themeDisplay.getLocale(),"total.activity");
+		    cabeceras[4]=LanguageUtil.get(themeDisplay.getLocale(),"coursestats.start.student");
+		    cabeceras[5]=LanguageUtil.get(themeDisplay.getLocale(),"coursestats.end.student");
 		    cabeceras[6]=LanguageUtil.get(themeDisplay.getLocale(),"coursestats.modulestats.dependencies");
-		    
 		    writer.writeNext(cabeceras);
-
-	    	java.text.SimpleDateFormat sdf=new java.text.SimpleDateFormat("dd/MM/yyyy");
-	    	sdf.setTimeZone(themeDisplay.getTimeZone());
+    	
 		    
-		    for(Module modulo:tempResults){
-		    	String[] resultados = new String[numCols];
-		    	long started = 0;
-		    	long finished = 0;
-		    	
-		    	int totalActivity=0;
-				
-				List<LearningActivity> actividades = LearningActivityLocalServiceUtil.getLearningActivitiesOfModule(modulo.getModuleId());
-				totalActivity = actividades.size();
-		    	
-		    	if (teamId == 0) {
-		    		started=ModuleResultLocalServiceUtil.countByModuleOnlyStudents(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(), modulo.getModuleId());
-		    		finished=ModuleResultLocalServiceUtil.countByModulePassedOnlyStudents(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(),modulo.getModuleId(),true);
-		    	}else{
-		    		started=ModuleResultLocalServiceUtil.countByModuleOnlyStudents(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(), modulo.getModuleId(), usersList);
-		    		finished=ModuleResultLocalServiceUtil.countByModulePassedOnlyStudents(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(),modulo.getModuleId(),true, usersList);
-		    	}
-		    	String moduloBloqueo = "";
-		    	if(modulo.getPrecedence() != 0) {
-		    		Module modulePredence = ModuleLocalServiceUtil.getModule(modulo.getPrecedence());
-		    		moduloBloqueo=modulePredence.getTitle(themeDisplay.getLocale());
-		    	}else{
-		    		moduloBloqueo=rb.getString("dependencies.false");
-		    	}
-		    	resultados[0]=modulo.getTitle(themeDisplay.getLocale());
-		    	resultados[1]=sdf.format(modulo.getStartDate());
-		    	resultados[2]=sdf.format(modulo.getEndDate());
-		    	resultados[3]=Long.toString(started);
-		    	resultados[4]=Long.toString(finished);
-		    	resultados[5]=Long.toString(totalActivity);
-		    	resultados[6]=moduloBloqueo;
+		    //Resultados de los modulos
+	    	Schedule sch = ScheduleLocalServiceUtil.getScheduleByTeamId(teamId);
+	    	ModuleStatsView moduleStats;
+		    for(Module module:  modules){
+		    	resultados = new String[numCols];
+		    	moduleStats = getModuleStats(module, teamId, themeDisplay.getLocale(), themeDisplay.getTimeZone(), sch);
+		    	resultados[0]=moduleStats.getModuleTitle();
+		    	resultados[1]=moduleStats.getStartDateString();
+		    	resultados[2]=moduleStats.getEndDateString();
+		    	resultados[3]=Long.toString(moduleStats.getActivityNumber());
+		    	resultados[4]=Long.toString(moduleStats.getStarted());
+		    	resultados[5]=Long.toString(moduleStats.getFinished());		    	
+		    	resultados[6]=moduleStats.getPrecedence();
 		        writer.writeNext(resultados);
 		    }
 		    endCsv(resourceResponse, writer);
+		    
 		} catch (NestableException e) {
+			e.printStackTrace();
 		}finally{
 			resourceResponse.getPortletOutputStream().flush();
 			resourceResponse.getPortletOutputStream().close();
 		}
 	}
+
 	
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private List<User> getUsersOfTeam (	long courseId, 
-										long teamId, 
-										ThemeDisplay themeDisplay) 
-			throws PortalException, SystemException {
-		
-		OrderByComparator obc	 = new UserLastNameComparator(true);
-		LinkedHashMap userParams = new LinkedHashMap();
-		LmsPrefs prefs			 = LmsPrefsLocalServiceUtil.getLmsPrefs(themeDisplay.getCompanyId());
-		
-		Course curso = CourseLocalServiceUtil.getCourse(courseId);
-		
-		userParams.put( "notInCourseRoleTeach", new CustomSQLParam("WHERE User_.userId NOT IN "
-				        + " (SELECT UserGroupRole.userId " + "  FROM UserGroupRole "
-				        + "  WHERE  (UserGroupRole.groupId = ?) AND (UserGroupRole.roleId = ?))", new Long[] {
-				        curso.getGroupCreatedId(),
-				        RoleLocalServiceUtil.getRole(prefs.getTeacherRole()).getRoleId() }));
-
-		userParams.put( "notInCourseRoleEdit", new CustomSQLParam("WHERE User_.userId NOT IN "
-				        + " (SELECT UserGroupRole.userId " + "  FROM UserGroupRole "
-				        + "  WHERE  (UserGroupRole.groupId = ?) AND (UserGroupRole.roleId = ?))", new Long[] {
-				        curso.getGroupCreatedId(),
-				        RoleLocalServiceUtil.getRole(prefs.getEditorRole()).getRoleId() }));
-		
-		userParams.put("usersGroups", new Long(themeDisplay.getScopeGroupId()));
-		userParams.put("usersTeams", teamId);
-		
-		return UserLocalServiceUtil.search(themeDisplay.getCompanyId(), StringPool.BLANK, 0, 
-										   userParams, QueryUtil.ALL_POS, QueryUtil.ALL_POS, obc);
-	}
-
 	private void exportModule(ResourceResponse resourceResponse, long moduleId,
 							  long teamId, ThemeDisplay themeDisplay, ResourceRequest resourceRequest) 
 									  throws IOException, UnsupportedEncodingException {
 		try {
+			Module module = ModuleLocalServiceUtil.getModule(moduleId);		
+			Schedule sch = ScheduleLocalServiceUtil.getScheduleByTeamId(teamId);
+			ModuleStatsView moduleStats = getModuleStats(module, teamId, themeDisplay.getLocale(), themeDisplay.getTimeZone(), sch);
+			AssetRendererFactory arf=AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(LearningActivity.class.getName());
+			Map<Long, String> classTypes;
+			classTypes = arf.getClassTypes(new long[]{themeDisplay.getScopeGroupId()}, themeDisplay.getLocale());						
 			
-			java.text.SimpleDateFormat sdf=new java.text.SimpleDateFormat("dd/MM/yyyy");
-			List<User> usersList = new ArrayList<User>();
-			Course curso = CourseLocalServiceUtil.fetchByGroupCreatedId(themeDisplay.getScopeGroupId());
-
-			Module module = ModuleLocalServiceUtil.getModule(moduleId);
-			Group group = GroupLocalServiceUtil.getGroup(module.getGroupId());
-			long registered=CourseLocalServiceUtil.getStudentsFromCourse(themeDisplay.getCompanyId(), module.getGroupId()).size();
-			//long registered=UserLocalServiceUtil.getGroupUsersCount(group.getGroupId(),0);
-			long iniciados = 0;
-
-	    	
-			if (teamId != 0){
-				//Usuarios registrados en el curso
-				List<User> registeredUsers = CourseLocalServiceUtil.getStudentsFromCourse(	themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId());
-				
-				usersList = getUsersOfTeam(curso.getCourseId(), teamId, themeDisplay);
-				iniciados=ModuleResultLocalServiceUtil.countByModuleOnlyStudents(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(), module.getModuleId(), usersList);
-		    	//finalizados=ModuleResultLocalServiceUtil.countByModulePassedOnlyStudents(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(),module.getModuleId(),true, usersList);
-		    	
-		    	registered = 0;
-		    	for (User usuario: usersList){	
-					//Comprobamos si está registrado en el curso
-		    		if (registeredUsers.contains(usuario))
-		    			registered += 1;
-		    	}
-			}else{
-				iniciados=ModuleResultLocalServiceUtil.countByModuleOnlyStudents(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(), module.getModuleId());
-		    	//finalizados=ModuleResultLocalServiceUtil.countByModulePassedOnlyStudents(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(),module.getModuleId(),true);
-			}
-			
-			String mStartDate = module.getStartDate() == null? "":sdf.format(module.getStartDate());
-			String mEndDate = module.getEndDate() == null? "":sdf.format(module.getEndDate());
-			
-			List<LearningActivity> tempResults = LearningActivityLocalServiceUtil.getLearningActivitiesOfModule(moduleId);
 			CSVWriter writer = initCsv(resourceResponse);
 			
-			ResourceBundle rb =  ResourceBundle.getBundle("content.Language");
-		    rb = ResourceBundle.getBundle("content.Language", themeDisplay.getLocale());
-		    
-		    //Curso
-		    writer.writeNext(new String[]{group.getName()});
-		    
-		    //Modulo
-		    writer.writeNext(new String[]{module.getTitle(themeDisplay.getLocale())});
-		    
-		    //Inscritos
-		   // Object args[] = {registered};
-		    writer.writeNext(new String[]{MessageFormat.format(rb.getString("coursestats.modulestats.inscritos"),registered)});
-		    
-		    //Iniciaron/finalizaron
-		    writer.writeNext(new String[]{rb.getString("coursestats.start.course") + iniciados});// + rb.getString("coursestats.end.course") + finalizados});
-		    
-		    //Fechas del mï¿½dulo
-		    writer.writeNext(new String[]{mStartDate + " " + mEndDate});
-		    
-		    int numCols = 14;
+	
+			//Cabecera del modulo
+		    int numCols = 7;
 		    String[] cabeceras = new String[numCols];
-		    cabeceras[0]=rb.getString("coursestats.modulestats.activity");
-		    cabeceras[1]=rb.getString("coursestats.modulestats.activity.start");
-		    cabeceras[2]=rb.getString("coursestats.modulestats.activity.end");
-		    cabeceras[3]=rb.getString("coursestats.modulestats.init");
-		    cabeceras[4]=rb.getString("coursestats.modulestats.passed");
-		    cabeceras[5]=rb.getString("coursestats.modulestats.failed");
-		    cabeceras[6]=rb.getString("coursestats.modulestats.trials.average");
-		    cabeceras[7]=rb.getString("coursestats.modulestats.marks.average");
-		    cabeceras[8]=rb.getString("coursestats.modulestats.pass.mark");
-		    cabeceras[9]=rb.getString("coursestats.modulestats.trials.numbers");
-		    cabeceras[10]=rb.getString("coursestats.modulestats.dependencies");
-		    cabeceras[11]=rb.getString("coursestats.modulestats.type");
-		    cabeceras[12]=rb.getString("coursestats.modulestats.obligatory");
-		    cabeceras[13]="";
-		    		    
-		    writer.writeNext(cabeceras);
+		    cabeceras[0]=LanguageUtil.get(themeDisplay.getLocale(),"coursestats.module");
+		    cabeceras[1]=LanguageUtil.get(themeDisplay.getLocale(),"coursestats.modulestats.stardate");
+		    cabeceras[2]=LanguageUtil.get(themeDisplay.getLocale(),"coursestats.modulestats.enddate");
+		    cabeceras[3]=LanguageUtil.get(themeDisplay.getLocale(),"total.activity");
+		    cabeceras[4]=LanguageUtil.get(themeDisplay.getLocale(),"coursestats.start.student");
+		    cabeceras[5]=LanguageUtil.get(themeDisplay.getLocale(),"coursestats.end.student"); 
+		    cabeceras[6]=LanguageUtil.get(themeDisplay.getLocale(),"coursestats.modulestats.dependencies");
+		    
+		    //Resultados del modulo
+		    String[] resultados = new String[numCols];
+	    	moduleStats = getModuleStats(module, teamId, themeDisplay.getLocale(), themeDisplay.getTimeZone(), sch);
+	    	resultados[0]=moduleStats.getModuleTitle();
+	    	resultados[1]=moduleStats.getStartDateString();
+	    	resultados[2]=moduleStats.getEndDateString();
+	    	resultados[3]=Long.toString(moduleStats.getActivityNumber());
+	    	resultados[4]=Long.toString(moduleStats.getStarted());
+	    	resultados[5]=Long.toString(moduleStats.getFinished());	    	
+	    	resultados[6]=moduleStats.getPrecedence();
+	        writer.writeNext(resultados);
 		   
-		    for(LearningActivity activity:tempResults){
-		    	String[] resultados = new String[numCols];
-		    	
-		    	long started = 0;
-		    	long finished = 0;
-		    	long notpassed = 0;
-		    	double avgResult = 0;
-		    	double triesPerUser = 0;
-		    	boolean hasPrecedence = false;
-		    	if (teamId != 0){
-			    	started=LearningActivityResultLocalServiceUtil.countStartedOnlyStudents(activity.getActId(), activity.getCompanyId(), activity.getGroupId(), usersList);
-			    	finished=LearningActivityResultLocalServiceUtil.countPassedOnlyStudents(activity.getActId(), activity.getCompanyId(), activity.getGroupId(),true, usersList);
-			    	notpassed=LearningActivityResultLocalServiceUtil.countNotPassedOnlyStudents(activity.getActId(), activity.getCompanyId(), activity.getGroupId(), usersList);
-		    	
-			    	if(finished+notpassed>0)
-			    		avgResult=LearningActivityResultLocalServiceUtil.avgResultOnlyStudents(activity.getActId(), activity.getCompanyId(), activity.getGroupId(), usersList);
-			    	triesPerUser=LearningActivityResultLocalServiceUtil.triesPerUserOnlyStudents(activity.getActId(), activity.getCompanyId(), activity.getGroupId(), usersList);
-			    	
-			    	if(activity.getPrecedence() > 0)
-			    		hasPrecedence = true;
-		    	}else{
-		    		started=LearningActivityResultLocalServiceUtil.countStartedOnlyStudents(activity.getActId(), activity.getCompanyId(), activity.getGroupId());
-			    	finished=LearningActivityResultLocalServiceUtil.countPassedOnlyStudents(activity.getActId(), activity.getCompanyId(), activity.getGroupId(),true);
-			    	notpassed=LearningActivityResultLocalServiceUtil.countNotPassedOnlyStudents(activity.getActId(), activity.getCompanyId(), activity.getGroupId());
-		    	
-			    	if(finished+notpassed>0)
-			    		avgResult=LearningActivityResultLocalServiceUtil.avgResultOnlyStudents(activity.getActId(), activity.getCompanyId(), activity.getGroupId());
-			    	triesPerUser=LearningActivityResultLocalServiceUtil.triesPerUserOnlyStudents(activity.getActId(), activity.getCompanyId(), activity.getGroupId());
-			   
-			    	if(activity.getPrecedence() > 0)
-			    		hasPrecedence = true;
-		    	}
-		    	NumberFormat numberFormat = NumberFormat.getNumberInstance(themeDisplay.getLocale());
-		    	
-		    	resultados[0]=activity.getTitle(themeDisplay.getLocale());
-		    	if(activity.getStartdate()!=null) resultados[1]=sdf.format(activity.getStartdate());
-		    	else resultados[1]="-";
-		    	if(activity.getStartdate()!=null) resultados[2]=sdf.format(activity.getEnddate());
-		    	else resultados[2]="-";
-		    	resultados[3]=Long.toString(started);
-		    	resultados[4]=Long.toString(finished);
-		    	resultados[5]=Long.toString(notpassed);
-		    	resultados[6]=numberFormat.format(triesPerUser);
-		    	resultados[7]=numberFormat.format(avgResult);
-		    	resultados[8]=numberFormat.format(activity.getPasspuntuation());
-		    	resultados[9]=numberFormat.format(activity.getTries());
-		    	resultados[10]=String.valueOf(hasPrecedence);
-		    	resultados[11]=Integer.toString(activity.getTypeId());
-		    	resultados[12]=activity.getWeightinmodule() == 1 ? "Si":"No";
-		    	resultados[13]="";//getExtraData(themeDisplay, activity, resourceRequest);
-		    	
+	        //Cabecera de la actividad
+	        numCols = 14;
+		    cabeceras = new String[numCols];
+		    cabeceras[0]=LanguageUtil.get(themeDisplay.getLocale(),"coursestats.modulestats.activity");
+		    cabeceras[1]=LanguageUtil.get(themeDisplay.getLocale(),"coursestats.modulestats.activity.start");
+		    cabeceras[2]=LanguageUtil.get(themeDisplay.getLocale(),"coursestats.modulestats.activity.end");
+		    cabeceras[3]=LanguageUtil.get(themeDisplay.getLocale(),"coursestats.modulestats.init");
+		    cabeceras[4]=LanguageUtil.get(themeDisplay.getLocale(),"coursestats.finished");
+		    cabeceras[5]=LanguageUtil.get(themeDisplay.getLocale(),"coursestats.modulestats.passed");
+		    cabeceras[6]=LanguageUtil.get(themeDisplay.getLocale(),"coursestats.modulestats.failed");
+		    cabeceras[7]=LanguageUtil.get(themeDisplay.getLocale(),"coursestats.modulestats.trials.average");
+		    cabeceras[8]=LanguageUtil.get(themeDisplay.getLocale(),"coursestats.modulestats.marks.average");
+		    cabeceras[9]=LanguageUtil.get(themeDisplay.getLocale(),"coursestats.modulestats.pass.mark");
+		    cabeceras[10]=LanguageUtil.get(themeDisplay.getLocale(),"coursestats.modulestats.trials.numbers");
+		    cabeceras[11]=LanguageUtil.get(themeDisplay.getLocale(),"coursestats.modulestats.act-precedence");
+		    cabeceras[12]=LanguageUtil.get(themeDisplay.getLocale(),"coursestats.modulestats.type");
+		    cabeceras[13]=LanguageUtil.get(themeDisplay.getLocale(),"coursestats.modulestats.obligatory");    
+		    writer.writeNext(cabeceras);
+		    
+		    //Resultados de las actividades
+		    List<LearningActivity> activities = LearningActivityLocalServiceUtil.getLearningActivitiesOfModule(moduleId);
+		    ActivityStatsView activityView;
+		    for(LearningActivity activity : activities){
+		    	activityView = getActivityStats(activity, themeDisplay.getLocale(), teamId, classTypes, sch, themeDisplay.getTimeZone());
+		    	resultados = new String[numCols];
+		 		
+		    	resultados[0]=activityView.getActTitle();
+		    	resultados[1]=activityView.getStartDateString();
+		    	resultados[2]=activityView.getEndDateString();
+		    	resultados[3]=Long.toString(activityView.getStarted());
+		    	resultados[4]=Long.toString(activityView.getFinished());
+		    	resultados[5]=Long.toString(activityView.getPassed());
+		    	resultados[6]=Long.toString(activityView.getFailed());
+		    	resultados[7]=activityView.getTriesPerUserString();
+		    	resultados[8]=activityView.getAvgResultString();
+		    	resultados[9]=Long.toString(activityView.getPassPuntuation());
+		    	resultados[10]=Long.toString(activityView.getTries());
+		    	resultados[11]=activityView.getPrecedence();
+		    	resultados[12]=activityView.getType();
+		    	resultados[13]=activityView.getMandatory();
+		    			    	
 		        writer.writeNext(resultados);
 		    }
 			
 		    endCsv(resourceResponse, writer);
 		
-		} catch (NestableException e) {
+		} catch (Exception e) {
+			e.printStackTrace();
 		}finally{
 			resourceResponse.getPortletOutputStream().flush();
 			resourceResponse.getPortletOutputStream().close();
@@ -627,24 +474,13 @@ public class CourseStats extends MVCPortlet {
 		//Necesario para crear el fichero csv.
 		resourceResponse.setCharacterEncoding(StringPool.UTF8);
 		resourceResponse.setContentType(ContentTypes.TEXT_CSV_UTF8);
-		resourceResponse.addProperty(HttpHeaders.CONTENT_DISPOSITION,"attachment; fileName=data.csv");
+		resourceResponse.addProperty(HttpHeaders.CONTENT_DISPOSITION,"attachment; fileName=Statistics.csv");
 		byte b[] = {(byte)0xEF, (byte)0xBB, (byte)0xBF};
 		
 		resourceResponse.getPortletOutputStream().write(b);
 		
 		CSVWriter writer = new CSVWriter(new OutputStreamWriter(resourceResponse.getPortletOutputStream(),StringPool.UTF8),CharPool.SEMICOLON);
 		return writer;
-	}
-	
-	private String replaceAcutes(String text){
-		String result = text;
-		result = result.replaceAll("&aacute;", "ï¿½");
-		result = result.replaceAll("&eacute;", "ï¿½");
-		result = result.replaceAll("&iacute;", "ï¿½");
-		result = result.replaceAll("&oacute;", "ï¿½");
-		result = result.replaceAll("&uacute;", "ï¿½");
-		result = result.replaceAll("&ntilde;", "ï¿½");
-		return result;
 	}
 
 }

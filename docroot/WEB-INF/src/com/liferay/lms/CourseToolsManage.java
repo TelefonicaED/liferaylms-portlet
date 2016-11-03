@@ -10,7 +10,6 @@ import com.liferay.portal.model.ResourceConstants;
 import com.liferay.portal.model.Role;
 import com.liferay.portal.model.RoleConstants;
 import com.liferay.portal.security.permission.ActionKeys;
-import com.liferay.portal.service.LayoutLocalServiceUtil;
 import com.liferay.portal.service.ResourcePermissionLocalServiceUtil;
 import com.liferay.portal.service.RoleLocalServiceUtil;
 import com.liferay.portal.theme.ThemeDisplay;
@@ -28,8 +27,7 @@ public class CourseToolsManage extends MVCPortlet
 					return;
 				}
 				String layoutid = ParamUtil.getString(request, "layoutid");
-				Layout ellayout = LayoutLocalServiceUtil.getLayout(Long
-						.parseLong(layoutid));
+				//Layout ellayout = LayoutLocalServiceUtil.getLayout(Long.parseLong(layoutid));
 
 				Role siteMemberRole = RoleLocalServiceUtil.getRole(themeDisplay.getCompanyId(), RoleConstants.SITE_MEMBER);
 				Role userRole = RoleLocalServiceUtil.getRole(themeDisplay.getCompanyId(), RoleConstants.USER);
@@ -46,13 +44,7 @@ public class CourseToolsManage extends MVCPortlet
 							layoutid,
 							siteMemberRole.getRoleId(),
 							new String[] { ActionKeys.VIEW });
-					ResourcePermissionLocalServiceUtil.setResourcePermissions(
-							themeDisplay.getCompanyId(),
-							Layout.class.getName(),
-							ResourceConstants.SCOPE_INDIVIDUAL,
-							layoutid,
-							userRole.getRoleId(),
-							new String[] { ActionKeys.VIEW });
+				
 				} else {
 					//ellayout.setHidden(true);
 					ResourcePermissionLocalServiceUtil.removeResourcePermission(
