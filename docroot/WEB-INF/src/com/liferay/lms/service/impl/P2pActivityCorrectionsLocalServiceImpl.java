@@ -41,11 +41,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.model.Company;
-import com.liferay.portal.model.Group;
 import com.liferay.portal.model.User;
-import com.liferay.portal.service.CompanyLocalServiceUtil;
-import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceContextThreadLocal;
 import com.liferay.portal.service.UserLocalServiceUtil;
@@ -241,8 +237,6 @@ public class P2pActivityCorrectionsLocalServiceImpl
 			numAsigns = Integer.valueOf(validations);
 		} catch (Exception e) {}
 		
-		LearningActivity learning = null;
-		
 		for(User user : usersList){		
 			asigned = P2pActivityCorrectionsLocalServiceUtil.getNumCorrectionsAsignToP2P(p2pActId);
 			
@@ -268,7 +262,7 @@ public class P2pActivityCorrectionsLocalServiceImpl
 					activity.setCountCorrections(activity.getCountCorrections()+1);
 					P2pActivityLocalServiceUtil.updateP2pActivity(activity);
 					
-					learning = LearningActivityLocalServiceUtil.getLearningActivity(activity.getActId());
+					
 				} catch (PortalException e) {}
 				
 				asigned++;
@@ -328,10 +322,6 @@ public void asignCorrectionsToP2PActivities(long actId, long p2pActivityId,int n
 				try {
 					LearningActivity learn = LearningActivityLocalServiceUtil.getLearningActivity(actId);
 					User user = UserLocalServiceUtil.getUser(p2pActivity.getUserId());
-					
-					Group group = GroupLocalServiceUtil.getGroup(learn.getGroupId());
-					Company company = CompanyLocalServiceUtil.getCompany(group.getCompanyId());
-					
 					Course course= CourseLocalServiceUtil.getCourseByGroupCreatedId(learn.getGroupId());
 					
 					com.liferay.lms.model.Module module = ModuleLocalServiceUtil.getModule(learn.getModuleId());
@@ -344,10 +334,10 @@ public void asignCorrectionsToP2PActivities(long actId, long p2pActivityId,int n
 					// QUITAR EL PUERTO
 					String portalUrl = serviceContext.getPortalURL();
 					String[] urls = portalUrl.split(":");
-					portalUrl = urls[0];					
-					if(urls.length > 2){ // http:prueba.es:8080
+					portalUrl = urls[0] + ":" +urls[1];					
+					/*if(urls.length > 2){ // http:prueba.es:8080
 						portalUrl += urls[1];
-					}
+					}*/
 					log.debug("***portalUrl:"+portalUrl);
 					
 					//String portalUrl = PortalUtil.getPortalURL(company.getVirtualHostname(), PortalUtil.getPortalPort(), false);
