@@ -955,7 +955,7 @@ public class LmsActivitiesList extends MVCPortlet {
 			message.put("onlyNotPassed", true);
 			message.setResponseId("2222");
 
-			MessageBusUtil.sendMessage("liferay/lms/cleanTriessAllUsers", message);
+			MessageBusUtil.sendMessage("liferay/lms/cleanTriesAllUsers", message);
 		}
 		
 
@@ -987,7 +987,7 @@ public class LmsActivitiesList extends MVCPortlet {
 			message.put("onlyNotPassed", false);
 			message.setResponseId("2222");
 
-			MessageBusUtil.sendMessage("liferay/lms/cleanTriessAllUsers", message);
+			MessageBusUtil.sendMessage("liferay/lms/cleanTriesAllUsers", message);
 		}
 		
 
