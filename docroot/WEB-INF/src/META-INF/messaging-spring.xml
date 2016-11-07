@@ -18,8 +18,8 @@
 	<bean id="messageListener.liferay.lms.cleanTriesUser_listener"
 		class="com.liferay.lms.clean.CleanLearningActivityTriesUser" />
 	
-	<bean id="messageListener.liferay.lms.cleanTries_listener"
-		class="com.liferay.lms.clean.CleanLearningActivityTries" />
+	<bean id="messageListener.liferay.lms.cleanTriesAllUsers_listener"
+		class="com.liferay.lms.clean.CleanLearningActivityTriessAllUsers" />
 		
 	
 	<!-- Destinations -->
@@ -53,9 +53,9 @@
 		<property name="name" value="liferay/lms/cleanTriesUser" />
 	</bean>
 	
-	<bean id="destination.liferay.lms.cleanTries"
+	<bean id="destination.liferay.lms.cleanTriessAllUsers"
 		class="com.liferay.portal.kernel.messaging.SerialDestination">
-		<property name="name" value="liferay/lms/cleanTries" />
+		<property name="name" value="liferay/lms/cleanTriessAllUsers" />
 	</bean>	
 	
 	
@@ -94,9 +94,9 @@
 						<ref bean="messageListener.liferay.lms.cleanTriesUser_listener" />
 					</list>
 				</entry>
-				<entry key="liferay/lms/cleanTries">
+				<entry key="liferay/lms/cleanTriessAllUsers">
 					<list value-type="com.liferay.portal.kernel.messaging.MessageListener">
-						<ref bean="messageListener.liferay.lms.cleanTries_listener" />
+						<ref bean="messageListener.liferay.lms.cleanTriessAllUsers_listener" />
 					</list>
 				</entry>
 			</map>
@@ -109,7 +109,7 @@
 				<ref bean="destination.liferay.lms.courseExport" />
 				<ref bean="destination.liferay.lms.portalAdmin" />
 				<ref bean="destination.liferay.lms.cleanTriesUser" />
-				<ref bean="destination.liferay.lms.cleanTries" />
+				<ref bean="destination.liferay.lms.cleanTriessAllUsers" />
 			</list>
 		</property>
 	</bean>

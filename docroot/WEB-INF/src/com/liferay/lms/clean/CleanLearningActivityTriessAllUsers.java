@@ -25,14 +25,14 @@ import com.liferay.portal.kernel.messaging.MessageListener;
 import com.liferay.portal.kernel.messaging.MessageListenerException;
 import com.liferay.portal.model.User;
 
-public class CleanLearningActivityTries implements MessageListener{
-	Log log = LogFactoryUtil.getLog(CleanLearningActivityTries.class);
+public class CleanLearningActivityTriessAllUsers implements MessageListener{
+	Log log = LogFactoryUtil.getLog(CleanLearningActivityTriessAllUsers.class);
 	private LearningActivity la = null;
 	private User user = null;
 	private ActivityTriesDeleted activityTriesDeleted = null;
 	private boolean onlyNotPassed = false;
 	
-	public CleanLearningActivityTries(){
+	public CleanLearningActivityTriessAllUsers(){
 		super();
 	}
 
