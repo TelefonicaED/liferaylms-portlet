@@ -9,5 +9,5 @@ public interface CalificationType
 	public String getTitle(Locale locale);
 	public String getDescription(Locale locale);
 	public String getSuffix();
-	public String translate(double result);
+	public String translate(Locale locale, double result);
 }

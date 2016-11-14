@@ -93,7 +93,8 @@ public class LearningActivityResultLocalServiceImpl	extends LearningActivityResu
 		long actId=learningActivityTry.getActId();
 		long userId=learningActivityTry.getUserId();
 		LearningActivityResult learningActivityResult=getByActIdAndUserId(actId, userId);
-		LearningActivity learningActivity=LearningActivityLocalServiceUtil.getLearningActivity(actId);
+		LearningActivity learningActivity=learningActivityLocalService.getLearningActivity(actId);
+		boolean recalculateActivity = false;
 		if(learningActivityResult==null){	
 			learningActivityResult=
 					learningActivityResultPersistence.create(counterLocalService.increment(
@@ -102,11 +103,11 @@ public class LearningActivityResultLocalServiceImpl	extends LearningActivityResu
 			learningActivityResult.setActId(actId);
 			learningActivityResult.setUserId(userId);
 			learningActivityResult.setPassed(false);
-		}else{
-			learningActivityResult=learningActivityResultPersistence.fetchByact_user(actId, userId);
+			recalculateActivity = true;
 		}
 
 		if(learningActivityTry.getEndDate()!=null){
+			recalculateActivity= true;
 			long cuantosTryLlevo=LearningActivityTryLocalServiceUtil.getTriesCountByActivityAndUser(actId, userId);
 			if(learningActivity.getTries()>0&&cuantosTryLlevo>=learningActivity.getTries()){
 				learningActivityResult.setEndDate(learningActivityTry.getEndDate());
@@ -125,9 +126,10 @@ public class LearningActivityResultLocalServiceImpl	extends LearningActivityResu
 
 			learningActivityResult.setComments(learningActivityTry.getComments());
 		}
-
-		learningActivityResultPersistence.update(learningActivityResult, true);
-		ModuleResultLocalServiceUtil.update(learningActivityResult);
+		if(recalculateActivity){
+			learningActivityResultPersistence.update(learningActivityResult, true);
+			moduleResultLocalService.update(learningActivityResult);
+		}		
 
 
 		//auditing
@@ -1393,7 +1395,7 @@ public class LearningActivityResultLocalServiceImpl	extends LearningActivityResu
 			Course curso = courseLocalService.getCourseByGroupCreatedId(groupId);
 			if(curso != null){
 				CalificationType ct = new CalificationTypeRegistry().getCalificationType(curso.getCalificationType());
-				translatedResult = ct.translate(result);
+				translatedResult = ct.translate(locale, result);
 			}
 		} catch (SystemException e) {
 			// TODO Auto-generated catch block

@@ -71,12 +71,8 @@
 			long participants = LearningActivityResultLocalServiceUtil.countFinishedOnlyStudents(actId, themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId()); //LearningActivityResultLocalServiceUtil.countByActId(actId);
 			Course course = CourseLocalServiceUtil.getCourseByGroupCreatedId(learningActivity.getGroupId());
 			long courseUsers = CourseLocalServiceUtil.getStudentsFromCourseCount(course.getCourseId());
-			
-			System.out.println("PARTICIPANTES:"+participants);
-			System.out.println("COURSEUSERS:"+courseUsers);
-			
+						
 			double passPercent =  ((double)participants/(double)courseUsers)*100;
-			System.out.println("passPercent:"+passPercent);
 			percent  = df.format(passPercent);
 			%>
 		
@@ -223,7 +219,9 @@ function <portlet:namespace />downloadReport(url){
 						alert("Error en el readThreadState");
 					}
 				},
-				error: function(){					
+				error: function(){		
+					$('#<portlet:namespace />generating_report').addClass("aui-helper-hidden");
+		    		$('#<portlet:namespace />generate_report').removeClass("aui-helper-hidden");
 				}
 			});		
 		}	

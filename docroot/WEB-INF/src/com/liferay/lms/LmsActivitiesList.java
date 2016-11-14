@@ -514,7 +514,10 @@ public class LmsActivitiesList extends MVCPortlet {
 		long renderModule = ParamUtil.getLong(actionRequest, "moduleId",0);
 		ThemeDisplay themeDisplay = (ThemeDisplay) actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
 		PermissionChecker permissionChecker=themeDisplay.getPermissionChecker();
-	
+		Module rendModule = ModuleLocalServiceUtil.getPreviusModule(moduleId);
+		if(Validator.isNull(rendModule)){
+			rendModule=ModuleLocalServiceUtil.getNextModule(moduleId);
+		}
 		if(moduleId>0)
 		{
 			if(permissionChecker.hasPermission(
@@ -526,19 +529,21 @@ public class LmsActivitiesList extends MVCPortlet {
 				List<LearningActivity> moduleActivities = LearningActivityLocalServiceUtil.getLearningActivitiesOfModule(moduleId);
 				for(LearningActivity la : moduleActivities){
 					deleteActivity(la, themeDisplay, actionRequest, actionResponse);
-
-
-
-
-
-
 				}
 				
 				ModuleLocalServiceUtil.deleteModule(moduleId);
 				if(moduleId==renderModule)
 				{
-					actionResponse.removePublicRenderParameter("moduleId");
-					actionResponse.removePublicRenderParameter("actId");	
+					List<LearningActivity> activities = LearningActivityLocalServiceUtil.getLearningActivitiesOfModule(rendModule.getModuleId());
+					if(activities!=null && activities.size()>0){
+						actionResponse.setRenderParameter("actId", String.valueOf(activities.get(0).getActId()));
+						actionResponse.setRenderParameter("resId", String.valueOf(activities.get(0).getActId()));
+					}else{
+						actionResponse.setRenderParameter("actId", "0");
+						actionResponse.setRenderParameter("resId", "0");
+					}					
+					actionResponse.setRenderParameter("moduleId", String.valueOf(rendModule.getModuleId()));
+					
 				}							
 			}
 		}
@@ -627,8 +632,10 @@ public class LmsActivitiesList extends MVCPortlet {
 					actionResponse.removePublicRenderParameter("actId");		
 					if(activities!=null && activities.size()>0){
 						actionResponse.setRenderParameter("actId", String.valueOf(activities.get(0).getActId()));
+						actionResponse.setRenderParameter("resId", String.valueOf(activities.get(0).getActId()));
 					}else{
 						actionResponse.setRenderParameter("actId", "0");
+						actionResponse.setRenderParameter("resId", "0");
 					}
 				}
 				
