@@ -72,6 +72,7 @@ public class LearningActivityView {
 				String sdate = LearningActivityLocalServiceUtil.getExtraContentValue(la.getActId(), "dateupload");
 				Date date =  sdfP2p.parse(sdate);
 				uploadDate.setTime(date);
+				uploadDate.setTimeZone(timeZone);
 				this.uploadYear = uploadDate.get(Calendar.YEAR);
 				this.uploadMonth = uploadDate.get(Calendar.MONTH);
 				this.uploadDay = uploadDate.get(Calendar.DAY_OF_MONTH);

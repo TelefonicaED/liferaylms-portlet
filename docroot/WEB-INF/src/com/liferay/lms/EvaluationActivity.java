@@ -408,7 +408,8 @@ public class EvaluationActivity extends MVCPortlet implements MessageListener{
     			learningActivity.setExtracontent(document.formattedString());
 				LearningActivityLocalServiceUtil.updateLearningActivity(learningActivity);
 	    		actionResponse.setRenderParameter("responseCode",StringPool.ASCII_TABLE[49]); //1 
-	    		actionResponse.setRenderParameter("message",new String[]{LanguageUtil.get(getPortletConfig(), themeDisplay.getLocale(), "evaluationtaskactivity.updating")});  
+	    		actionResponse.setRenderParameter("message",new String[]{LanguageUtil.get(getPortletConfig(), themeDisplay.getLocale(), "evaluationtaskactivity.updating")}); 
+	    		SessionMessages.add(actionRequest, "evaluationtaskactivity.updating");
             }
             else{
 	    		actionResponse.setRenderParameter("responseCode",StringPool.ASCII_TABLE[48]); //0   

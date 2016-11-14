@@ -13,7 +13,7 @@ if(course!=null && permissionChecker.hasPermission(course.getGroupId(),  Course.
           }
           catch(NoSuchGroupException e)
           {
-
+        	  e.printStackTrace();
           }
           if(university!=null)
           {

@@ -344,10 +344,10 @@ public void asignCorrectionsToP2PActivities(long actId, long p2pActivityId,int n
 					// QUITAR EL PUERTO
 					String portalUrl = serviceContext.getPortalURL();
 					String[] urls = portalUrl.split(":");
-					portalUrl = urls[0];					
-					if(urls.length > 2){ // http:prueba.es:8080
-						portalUrl += urls[1];
-					}
+					portalUrl = urls[0] + ":" +urls[1];				
+//					if(urls.length > 2){ // http:prueba.es:8080
+//						portalUrl += urls[1];
+//					}
 					log.debug("***portalUrl:"+portalUrl);
 					
 					//String portalUrl = PortalUtil.getPortalURL(company.getVirtualHostname(), PortalUtil.getPortalPort(), false);
