@@ -107,24 +107,29 @@ public class LearningActivityResultLocalServiceImpl	extends LearningActivityResu
 		}
 
 		if(learningActivityTry.getEndDate()!=null){
-			recalculateActivity= true;
+			
 			long cuantosTryLlevo=LearningActivityTryLocalServiceUtil.getTriesCountByActivityAndUser(actId, userId);
 			if(learningActivity.getTries()>0&&cuantosTryLlevo>=learningActivity.getTries()){
 				learningActivityResult.setEndDate(learningActivityTry.getEndDate());
+				recalculateActivity= true;
 			}
 
 			if(learningActivityTry.getResult()>learningActivityResult.getResult()){			
 				learningActivityResult.setResult(learningActivityTry.getResult());
+				recalculateActivity= true;
 			}
 
 			if(!learningActivityResult.getPassed()){
 				if(learningActivityTry.getResult()>=learningActivity.getPasspuntuation()){
 					learningActivityResult.setEndDate(learningActivityTry.getEndDate());
-					learningActivityResult.setPassed(true);				  
+					learningActivityResult.setPassed(true);	
+					recalculateActivity= true;					
 				}
 			}	
-
-			learningActivityResult.setComments(learningActivityTry.getComments());
+			if(Validator.isNotNull(learningActivityTry.getComments())&&!learningActivityTry.getComments().equals(learningActivityResult.getComments())){
+				learningActivityResult.setComments(learningActivityTry.getComments());
+				recalculateActivity= true;
+			}
 		}
 		if(recalculateActivity){
 			learningActivityResultPersistence.update(learningActivityResult, true);
