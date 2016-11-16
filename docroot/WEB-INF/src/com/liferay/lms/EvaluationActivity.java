@@ -122,6 +122,7 @@ public class EvaluationActivity extends MVCPortlet implements MessageListener{
 						evaluate(learningActivity.getActId());
 					} catch (Exception e) {
 						_log.error("Error during evaluation: "+actId, e);
+						e.printStackTrace();
 					}					
 				}
 			} catch (SystemException e) {
