@@ -112,7 +112,7 @@ public class EvaluationActivity extends MVCPortlet implements MessageListener{
 		}
 		else{
 			// Scheduler trigger this execution. We must evaluate all activities.
-			
+			_log.debug("## Running EvaluationActivity cron ##");
 			try {
 				
 				for (LearningActivity learningActivity : (List<LearningActivity>)LearningActivityLocalServiceUtil.dynamicQuery(
@@ -126,6 +126,7 @@ public class EvaluationActivity extends MVCPortlet implements MessageListener{
 				}
 			} catch (SystemException e) {
 				_log.error("Error during evaluation job ");
+				e.printStackTrace();
 			}
 
 		}
@@ -185,7 +186,9 @@ public class EvaluationActivity extends MVCPortlet implements MessageListener{
 						try{
 							activities.put(Long.valueOf(activity.attribute("id").getValue()),Long.valueOf(activity.getText()));
 						}
-						catch(NumberFormatException e){}
+						catch(NumberFormatException e){
+							e.printStackTrace();
+						}
 					}
 				}				
 			}
@@ -226,7 +229,9 @@ public class EvaluationActivity extends MVCPortlet implements MessageListener{
 				}
 			}
 
-		}catch(DocumentException e){}	
+		}catch(DocumentException e){
+			e.printStackTrace();
+		}	
 	}
 
 	private void evaluateUser(long actId, long userId,Map<Long, Long> activities) throws SystemException {
@@ -284,7 +289,8 @@ public class EvaluationActivity extends MVCPortlet implements MessageListener{
 				jsonObjectModel = JSONFactoryUtil.createJSONObject(actionRequest.getParameter("model"));
 			} catch (JSONException e) {
         		actionResponse.setRenderParameter("responseCode",StringPool.ASCII_TABLE[48]); //0    		
-        		actionResponse.setRenderParameter("message",new String[]{LanguageUtil.get(getPortletConfig(), themeDisplay.getLocale(), "evaluationtaskactivity.error.courseModel")});  
+        		actionResponse.setRenderParameter("message",new String[]{LanguageUtil.get(getPortletConfig(), themeDisplay.getLocale(), "evaluationtaskactivity.error.courseModel")});
+        		e.printStackTrace();
         		return;
 			}
 
@@ -378,6 +384,7 @@ public class EvaluationActivity extends MVCPortlet implements MessageListener{
         					publishDate =(Date)_dateFormat.parseObject(publishdDateElement.getTextTrim());
         				}
         			} catch (Throwable e) {
+        				e.printStackTrace();
         			}	
         		}
         		
@@ -418,7 +425,8 @@ public class EvaluationActivity extends MVCPortlet implements MessageListener{
     		
     	} catch (Exception e) {	
     		actionResponse.setRenderParameter("responseCode",StringPool.ASCII_TABLE[48]); //0    		
-    		actionResponse.setRenderParameter("message",new String[]{LanguageUtil.get(getPortletConfig(), themeDisplay.getLocale(), "evaluationtaskactivity.error.systemError")});  
+    		actionResponse.setRenderParameter("message",new String[]{LanguageUtil.get(getPortletConfig(), themeDisplay.getLocale(), "evaluationtaskactivity.error.systemError")});
+    		e.printStackTrace();
     	} finally{
     		String returnToFullPageURL = actionRequest.getParameter("returnToFullPageURL");
     		if(Validator.isNotNull(returnToFullPageURL)) {
@@ -558,7 +566,8 @@ public class EvaluationActivity extends MVCPortlet implements MessageListener{
     	} catch (Exception e) {	
     		actionResponse.setRenderParameter("responseCode",StringPool.ASCII_TABLE[48]); //0    		
     		actionResponse.setRenderParameter("message",new String[]{LanguageUtil.get(getPortletConfig(), themeDisplay.getLocale(), "evaluationtaskactivity.error.systemError")});  
-    	} finally{
+    		e.printStackTrace();
+    		} finally{
     		String returnToFullPageURL = actionRequest.getParameter("returnToFullPageURL");
     		if(Validator.isNotNull(returnToFullPageURL)) {
     			actionResponse.setRenderParameter("returnToFullPageURL", returnToFullPageURL);
@@ -612,7 +621,9 @@ public class EvaluationActivity extends MVCPortlet implements MessageListener{
 						renderRequest.setAttribute(WebKeys.PORTLET_CONFIGURATOR_VISIBILITY, Boolean.FALSE);
 					}
 				} catch (PortalException e) {
+					e.printStackTrace();
 				} catch (SystemException e) {
+					e.printStackTrace();
 				}			
 		}
 	}
