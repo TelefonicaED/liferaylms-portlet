@@ -192,6 +192,13 @@ if(actId!=0)
 						urlFile = themeDisplay.getPortalURL()+"/documents/"+dlfile.getGroupId()+"/"+dlfile.getUuid(); 
 					}
 					
+					boolean anonimous = false;
+					String anonimousString = LearningActivityLocalServiceUtil.getExtraContentValue(actId,"anonimous");
+					
+					if(anonimousString.equals("true")){
+						anonimous = true;
+					}
+					
 					%>
 					<div class="option-more">
 						<span class="label-col">

@@ -47,11 +47,9 @@ public class CommunityInscription extends MVCPortlet {
 		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(WebKeys.THEME_DISPLAY);
 		Group group = null;
 		Course course = null;
-		int numberUsers = 0;
 		try {
 			group = GroupLocalServiceUtil.getGroup(themeDisplay.getScopeGroupId());
 			course = CourseLocalServiceUtil.getCourseByGroupCreatedId(themeDisplay.getScopeGroupId());
-			numberUsers = UserLocalServiceUtil.getGroupUsersCount(themeDisplay.getScopeGroupId());
 		} catch (PortalException e) {
 			if(log.isDebugEnabled()){
 				e.printStackTrace();
@@ -70,7 +68,7 @@ public class CommunityInscription extends MVCPortlet {
     		throw new SystemException("Site not restricted!");
     	}
     	
-    	if(course.getMaxusers()>0&&numberUsers>=course.getMaxusers()){
+    	if(course.getMaxusers()>0&&UserLocalServiceUtil.getGroupUsersCount(themeDisplay.getScopeGroupId())>=course.getMaxusers()){
     		if(log.isDebugEnabled()){
     			log.debug("Maxusers!"); 
     		}
@@ -153,23 +151,19 @@ public class CommunityInscription extends MVCPortlet {
 		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(WebKeys.THEME_DISPLAY);
 		if (!themeDisplay.isSignedIn()) {return;}
 
-		long[] groupId = new long[1];
-    	groupId[0] = themeDisplay.getScopeGroupId();	
+    	Course course = CourseLocalServiceUtil.getCourseByGroupCreatedId(themeDisplay.getScopeGroupId());
     	
-    	Group group = GroupLocalServiceUtil.getGroup(groupId[0]);
-    	Course course = CourseLocalServiceUtil.getCourseByGroupCreatedId(groupId[0]);
-    	
-    	log.debug("COURSE GROUP ID "+course.getGroupCreatedId());
-    	log.debug("THEME DISPLAY GROUP "+groupId[0]);
-    	int numberUsers = UserLocalServiceUtil.getGroupUsersCount(groupId[0]);
-    	if(course.getMaxusers()>0&&numberUsers>=course.getMaxusers()){
+    	if(log.isDebugEnabled()){log.debug("COURSE GROUP ID "+course.getGroupCreatedId());};
+    	if(course.getMaxusers()>0 && UserLocalServiceUtil.getGroupUsersCount(themeDisplay.getScopeGroupId())>=course.getMaxusers()){
     		SessionErrors.add(request, "inscription-error-max-users");
     	}else{
+    		Group group = GroupLocalServiceUtil.getGroup(themeDisplay.getScopeGroupId());
     		if(group.getType()==GroupConstants.TYPE_SITE_PRIVATE){
         		SessionErrors.add(request, "inscription-error-syte-restricted");
         	}else{
         		long userId = themeDisplay.getUserId();
             	if (!GroupLocalServiceUtil.hasUserGroup(userId, course.getGroupCreatedId())) {
+            		long[] groupId = {themeDisplay.getScopeGroupId()};	
         	    	GroupLocalServiceUtil.addUserGroups(userId, groupId);
         			SocialActivityLocalServiceUtil.addActivity(userId, course.getGroupId(), Course.class.getName(), course.getCourseId(), com.liferay.portlet.social.model.SocialActivityConstants.TYPE_SUBSCRIBE, "", course.getUserId());
         			// Informamos que se ha inscrito.
@@ -179,13 +173,14 @@ public class CommunityInscription extends MVCPortlet {
             			String userName = ""+userId;
             			String groupName = ""+groupId[0];
             			try {
-            				userName = userId + "[" + UserLocalServiceUtil.getUser(userId).getFullName() + "]";
+            				userName = userId + "[" + UserLocalServiceUtil.fetchUser(userId).getFullName() + "]";
             				groupName = groupId[0] + "[" + GroupLocalServiceUtil.getGroup(groupId[0]).getName() + "]";
             			}
-            			catch (Exception e) {}
+            			catch (Exception e) {
+            				e.printStackTrace();
+            			}
             	    	log.debug("INSCRIBIR: "+userName +" se ha incrito de la comunidad "+groupName+" el "+hoy.toString());
-            	    	
-            		}
+            	   	}
             	
             	}else{
             		SessionErrors.add(request, "inscription-error-already-enrolled");

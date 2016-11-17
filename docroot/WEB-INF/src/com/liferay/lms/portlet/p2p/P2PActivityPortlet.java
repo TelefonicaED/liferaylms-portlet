@@ -254,7 +254,7 @@ public class P2PActivityPortlet extends MVCPortlet {
 				_log.error("Error P2pActivityPortlet.addP2PActivity");
 				_log.error(e.getMessage());
 			}
-			if(_log.isDebugEnabled())e.printStackTrace();
+			e.printStackTrace();
 			SessionErrors.add(request, "error-subir-p2p");
 		}
 	}

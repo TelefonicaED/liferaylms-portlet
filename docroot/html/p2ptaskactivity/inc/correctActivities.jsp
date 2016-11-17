@@ -120,7 +120,7 @@ if(activity.getEnddate() == null){
 	</div>
 </c:if>
 
-<script type="text/javascript">
+<aui:script>
 	var noFile =Liferay.Language.get("p2ptaskactivity.inc.nofileselected");
 	
 	Liferay.provide(
@@ -128,10 +128,11 @@ if(activity.getEnddate() == null){
 	        '<portlet:namespace />checkDataformC',
 	        function (thisForm, thisEditor) {
 				var A = AUI();
+				var descriptionVal;
 				if(window.CKEDITOR)
-					var descriptionVal = CKEDITOR.instances[thisEditor].getData();
+					descriptionVal = CKEDITOR.instances[thisEditor].getData();
 				else
-					var descriptionVal = A.one('#'+thisEditor).val();
+					descriptionVal = A.one('#'+thisEditor).val();
 				
 				
 				if (descriptionVal == "" || descriptionVal == "<%= StringEscapeUtils.unescapeHtml(textoCorrecion) %>") {
@@ -149,13 +150,14 @@ if(activity.getEnddate() == null){
 	        '<portlet:namespace />clearText',
 	        function (id) {
 				var A = AUI();
+				var idDesc;
 				if (window.CKEDITOR)
-					var idDesc = CKEDITOR.instances[id].document.getBody().getText();
+					idDesc = CKEDITOR.instances[id].document.getBody().getText();
 				else
-					var idDesc = A.one('#'+id).val();
+					idDesc = A.one('#'+id).val();
 				
 				var textReplace = "<%= StringEscapeUtils.unescapeHtml(textoCorrecion)  %>";
-				if (desc == textReplace) {
+				if (idDesc == textReplace) {
 					if (window.CKEDITOR){
 						CKEDITOR.instances[id].setData("");
 						CKEDITOR.instances[id].focus();
@@ -249,7 +251,7 @@ if(activity.getEnddate() == null){
 	        function () {
 	        	var A = AUI();
 	        	A.DialogManager.closeByChild('#<portlet:namespace />showp2pSaved');
-				//window.setTimeout(function() {<portlet:namespace />openCompleted();}, 300);
+	        	//window.setTimeout(function() {<portlet:namespace />openCompleted();}, 300);
 	        },
 	        ['aui-dialog']
 	);
@@ -335,7 +337,7 @@ if(activity.getEnddate() == null){
 	        ['aui-dialog']
 	    );
 	
-</script>
+</aui:script>
 
 <!-- Start PopUp confirmation -->
 
@@ -590,13 +592,13 @@ if(!p2pActList.isEmpty()){
 						title = dlfile.getTitle();
 					}catch(Exception e){
 						e.printStackTrace();
-					}
+					}					
 					
-					if(myP2PActivity.getDescription() != null){
-						descriptionFile = myP2PActivity.getDescription();
-					}
 				}
 	
+				if(myP2PActivity.getDescription() != null){
+					descriptionFile = myP2PActivity.getDescription();
+				}
 				%>
 	
 				<div class="option-more2">
