@@ -17,6 +17,11 @@ package com.liferay.lms.service.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.portlet.ActionRequest;
+import javax.portlet.PortletRequest;
+import javax.portlet.WindowState;
+import javax.script.Invocable;
+
 import com.liferay.lms.P2PSendMailAsignation;
 import com.liferay.lms.auditing.AuditConstants;
 import com.liferay.lms.auditing.AuditingLogFactory;
@@ -41,15 +46,24 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
+import com.liferay.portal.kernel.portlet.LiferayPortletURL;
 import com.liferay.portal.model.Company;
 import com.liferay.portal.model.Group;
+import com.liferay.portal.model.Layout;
+import com.liferay.portal.model.PortletConstants;
 import com.liferay.portal.model.User;
 import com.liferay.portal.service.CompanyLocalServiceUtil;
 import com.liferay.portal.service.GroupLocalServiceUtil;
+import com.liferay.portal.service.LayoutLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceContextThreadLocal;
 import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.util.PortalUtil;
+import com.liferay.portlet.PortletURLFactoryUtil;
+import com.liferay.portlet.asset.AssetRendererFactoryRegistryUtil;
+import com.liferay.portlet.asset.model.AssetRendererFactory;
+import com.liferay.util.bridges.struts.LiferayPortletServlet;
 import com.tls.lms.util.LiferaylmsUtil;
 
 
@@ -357,8 +371,13 @@ public void asignCorrectionsToP2PActivities(long actId, long p2pActivityId,int n
 						courseFriendlyUrl = portalUrl + pathPublic + course.getFriendlyURL();
 						courseTitle = course.getTitle(user.getLocale());
 						courseFriendlyUrl += "/reto?p_p_id=p2ptaskactivity_WAR_liferaylmsportlet";
-						courseFriendlyUrl += "&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&actId="+learn.getActId();
-						courseFriendlyUrl += "&moduleId="+learn.getModuleId();
+						courseFriendlyUrl += "&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&p_r_p_564233524_actId="+learn.getActId();
+						courseFriendlyUrl += "&p_r_p_564233524_moduleId="+learn.getModuleId();
+						log.debug("URL "+ courseFriendlyUrl);
+						
+						
+					
+						
 					
 					}
 					

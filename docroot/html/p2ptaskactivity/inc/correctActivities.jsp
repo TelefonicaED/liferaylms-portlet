@@ -82,11 +82,11 @@ if(!activity.getExtracontent().equals("")){
 	numCorrecciones = LearningActivityLocalServiceUtil.getExtraContentValue(actId,"validaciones");
 }
 	
-boolean anonimous = false;
+boolean configAnonimous = false;
 String anonimousString = LearningActivityLocalServiceUtil.getExtraContentValue(actId,"anonimous");
 
 if(anonimousString.equals("true")){
-	anonimous = true;
+	configAnonimous = true;
 }
 
 
@@ -121,7 +121,7 @@ if(activity.getEnddate() == null){
 </c:if>
 
 <aui:script>
-	var noFile =Liferay.Language.get("p2ptaskactivity.inc.nofileselected");
+
 	
 	Liferay.provide(
 	        window,
@@ -139,7 +139,7 @@ if(activity.getEnddate() == null){
 					alert(Liferay.Language.get("p2ptask-no-empty-answer"));
 				}
 				else {
-					<portlet:namespace />openPopUp(thisForm, thisEditor);
+					<portlet:namespace />openPopUpCorrection(thisForm, thisEditor);
 				}
 	        },
 	        ['node']
@@ -147,7 +147,7 @@ if(activity.getEnddate() == null){
 	
 	Liferay.provide(
 	        window,
-	        '<portlet:namespace />clearText',
+	        '<portlet:namespace />clearTextCorrection',
 	        function (id) {
 				var A = AUI();
 				var idDesc;
@@ -173,7 +173,7 @@ if(activity.getEnddate() == null){
 	
 	Liferay.provide(
 	        window,
-	        '<portlet:namespace />openPopUp',
+	        '<portlet:namespace />openPopUpCorrection',
 	        function (formName, thisEditor) {
 				var A = AUI();
 				var selector = 'form[name="'+formName+'"]';
@@ -201,7 +201,8 @@ if(activity.getEnddate() == null){
 						fileName = fileName.substring(pos + 1);
 					}
 				} else {
-					fileName = noFile;
+					
+					fileName = Liferay.Language.get("p2ptaskactivity.inc.nofileselected");
 				}
 				
 				//Start opening popUp
@@ -226,7 +227,7 @@ if(activity.getEnddate() == null){
 				if(textResult != ''){
 					A.one("#contentResult").html(textResult);
 				}
-				A.one("#submitCorrec").on('click', function(){<portlet:namespace />commitForm(formName);});
+				A.one("#submitCorrec").on('click', function(){<portlet:namespace />commitFormCorrection(formName);});
 				
 				window.<portlet:namespace />p2pconfrmCorrec.show();
 	        },
@@ -235,7 +236,7 @@ if(activity.getEnddate() == null){
 	
 	Liferay.provide(
 	        window,
-	        '<portlet:namespace />commitForm',
+	        '<portlet:namespace />commitFormCorrection',
 	        function (formName) {
 	        	var A = AUI();
 				var selector = 'form[name="'+formName+'"]';
@@ -337,7 +338,7 @@ if(activity.getEnddate() == null){
 	        ['aui-dialog']
 	    );
 	
-</aui:script>
+	</aui:script>
 
 <!-- Start PopUp confirmation -->
 
@@ -444,7 +445,9 @@ String []arg = {String.valueOf(numCorrecl-listDone.size()) , String.valueOf(numC
 
 <%
 if(!p2pActList.isEmpty()){
-	
+	String fullName ="";
+	User propietary;
+	boolean anonimous;
 	for (P2pActivityCorrections myP2PActiCor : p2pActList){
 		
 		if(contaValidations >= numCorrecl){
@@ -452,14 +455,19 @@ if(!p2pActList.isEmpty()){
 		}
 		
 		P2pActivity myP2PActivity = P2pActivityLocalServiceUtil.getP2pActivity(myP2PActiCor.getP2pActivityId());
-		
+		propietary = UserLocalServiceUtil.fetchUser(myP2PActivity.getUserId());
+		anonimous  = configAnonimous;
+		if(propietary!=null){
+			fullName = propietary.getFullName();
+		}else{
+			anonimous = true;
+		}
 		//Si no estamos en el usuario actual.
 		if(myP2PActivity.getUserId()!=userId){
 			
 			//Si la fecha de corrección es null, es que no se ha corregido la tarea.
 			if(myP2PActiCor.getDate() == null)
 			{
-				User propietary = UserLocalServiceUtil.getUser(myP2PActivity.getUserId());
 				
 				DLFileEntry dlfile = null;
 				String urlFile = "";
@@ -499,7 +507,7 @@ if(!p2pActList.isEmpty()){
 						<c:if test="<%=!anonimous %>">
 							<span class="name">
 								<liferay-ui:message key="of" /> 
-								<%=propietary.getFullName() %>
+								<%=fullName %>
 							</span>
 						</c:if>
 						<c:if test="<%=anonimous %>">
@@ -528,14 +536,14 @@ if(!p2pActList.isEmpty()){
 								</div>
 							</c:if>
 
-							<aui:field-wrapper label="description" name="<%=\"description_\"+cont%>">
-								<liferay-ui:input-editor name="<%=\"description_\"+cont%>" width="100%" />
+							<aui:field-wrapper label="description">
+								<liferay-ui:input-editor name="<%=\"description_\"+cont%>" width="100%" initMethod="initEditorCorrection"/>
 								<aui:input name="<%=\"description_\"+cont%>" type="hidden"/>
 								<script type="text/javascript">
-					    		    function <portlet:namespace />initEditor() {
+					    		    function <portlet:namespace />initEditorCorrection() {
 						    		    return "<%= UnicodeFormatter.toString(textoCorrecion) %>"; 
 						    		};
-						    		AUI().on('domready', function(){CKEDITOR.instances.<portlet:namespace />description_<%=cont %>.on('focus',function(){<portlet:namespace />clearText('<portlet:namespace />description_'+<%=cont %>);});});
+						    		AUI().on('domready', function(){if(window.CKEDITOR)CKEDITOR.instances.<portlet:namespace />description_<%=cont %>.on('focus',function(){<portlet:namespace />clearTextCorrection('<portlet:namespace />description_'+<%=cont %>);});});
 					    		</script>
 							</aui:field-wrapper>
 							<aui:input name="description" type="hidden"/>
@@ -567,8 +575,7 @@ if(!p2pActList.isEmpty()){
 			else
 			{
 				listIdActivY.add(myP2PActivity.getPrimaryKey());
-				User propietary = UserLocalServiceUtil.getUser(myP2PActivity.getUserId());
-				
+							
 				cont++;
 				
 				String description = myP2PActiCor.getDescription();
@@ -607,13 +614,15 @@ if(!p2pActList.isEmpty()){
 						<c:if test="<%=!anonimous %>">
 							<span class="name">
 								<liferay-ui:message key="of" /> 
-								<%=propietary.getFullName() %>
+								<%=fullName %>
 							</span>
 						</c:if>
+						<c:if test="<%=anonimous %>">
 						<span class="number">
 							<liferay-ui:message key="number" /> 
 							<%=cont%>
 						</span>
+						</c:if>
 					</span>
 					<div class="collapsable2" style="display:none">
 
