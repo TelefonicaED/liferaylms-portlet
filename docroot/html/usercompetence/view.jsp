@@ -1,5 +1,5 @@
 <%@page import="com.liferay.lms.model.Competence"%>
-<%@ taglib uri="http://java.sun.com/jstl/fmt_rt" prefix="fmt" %>
+<%@ taglib uri="http://java.sun.com/jstl/fmt_rt" prefix="fmtr" %>
 
 <%@ include file="/init.jsp" %>
 
@@ -51,13 +51,13 @@
 				%>
 			</liferay-ui:search-container-column-text>
 			<liferay-ui:search-container-column-text name="date" >
-				 <fmt:setLocale value="<%= themeDisplay.getLocale()%>"/> 
+				 <fmtr:setLocale value="<%= themeDisplay.getLocale()%>"/> 
 				 	<%
 				 	if(!themeDisplay.getLocale().toString().equals("en_US")){%>
-						<fmt:formatDate value="<%=  cc.getDate()%>" type="date" pattern="dd/MM/yyyy"  />
+						<fmtr:formatDate value="<%=  cc.getDate()%>" type="date" pattern="dd/MM/yyyy"  />
 
 				 	<%}else{%>
-				 		<fmt:formatDate value="<%=  cc.getDate()%>" type="date" pattern="MM/dd/yyyy"  />
+				 		<fmtr:formatDate value="<%=  cc.getDate()%>" type="date" pattern="MM/dd/yyyy"  />
 				 	<%} %>
 				 
 				
