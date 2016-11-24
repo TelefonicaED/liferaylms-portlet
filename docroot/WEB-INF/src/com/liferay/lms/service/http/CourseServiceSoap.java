@@ -375,5 +375,19 @@ public class CourseServiceSoap {
 		}
 	}
 
+	public static int getStudentsFromCourseCount(long courseId)
+		throws RemoteException {
+		try {
+			int returnValue = CourseServiceUtil.getStudentsFromCourseCount(courseId);
+
+			return returnValue;
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
 	private static Log _log = LogFactoryUtil.getLog(CourseServiceSoap.class);
 }

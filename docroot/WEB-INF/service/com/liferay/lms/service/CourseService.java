@@ -170,4 +170,7 @@ public interface CourseService extends BaseService, InvokableService {
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.lang.String getLogoUrl(java.lang.Long courseId);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public int getStudentsFromCourseCount(long courseId);
 }

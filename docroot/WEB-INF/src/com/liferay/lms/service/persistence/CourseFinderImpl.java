@@ -135,7 +135,10 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 	public static final String COUNT_MY_COURSES =
 			 CourseFinder.class.getName() +
 				".countMyCourses";
-	
+	public static final String EXISTING_USER_COURSES =
+			 CourseFinder.class.getName() +
+				".getExistingUserCourses";
+		
 	
 	@SuppressWarnings("unchecked")
 	public List<Course> findByT_S_C_T(String freeText, int status, long[] categories, long[] tags, long companyId, long groupId, long userId, String language, boolean isAdmin, boolean andOperator, int start, int end){
@@ -1136,6 +1139,50 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 	
 		return listMyCourses;
 	}
+	
+	
+	public List<Course> getExistingUserCourses(long userId, int start, int end){
+		Session session = null;
+		List<Course> listExistingCourses = new ArrayList<Course>();
+		
+		try{
+			
+			session = openSession();
+			
+			String sql = CustomSQLUtil.get(EXISTING_USER_COURSES);
+			
+			if(start < 0 && end < 0){
+				sql = sql.replace("LIMIT [$START$], [$END$]", "");
+			}else{
+				sql = sql.replace("[$START$]", String.valueOf(start));
+				sql = sql.replace("[$END$]", String.valueOf(start+end));
+			}
+			
+			
+		
+			if(log.isDebugEnabled()){
+				log.debug("sql: " + sql);
+				log.debug("userId: " + userId);
+			}
+			
+			SQLQuery q = session.createSQLQuery(sql);
+			q.addEntity("Lms_Course", CourseImpl.class);
+			QueryPos qPos = QueryPos.getInstance(q);			
+			qPos.add(userId);			
+							
+			listExistingCourses = (List<Course>)q.list();
+			
+			
+			
+		} catch (Exception e) {
+	       e.printStackTrace();
+	    } finally {
+	        closeSession(session);
+	    }
+	
+		return listExistingCourses;
+	}
+	
 	
 	public int countMyCourses(long groupId, long userId, ThemeDisplay themeDisplay){
 		Session session = null;

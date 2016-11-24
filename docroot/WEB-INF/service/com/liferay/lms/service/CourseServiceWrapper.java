@@ -206,6 +206,10 @@ public class CourseServiceWrapper implements CourseService,
 		return _courseService.getLogoUrl(courseId);
 	}
 
+	public int getStudentsFromCourseCount(long courseId) {
+		return _courseService.getStudentsFromCourseCount(courseId);
+	}
+
 	/**
 	 * @deprecated Renamed to {@link #getWrappedService}
 	 */

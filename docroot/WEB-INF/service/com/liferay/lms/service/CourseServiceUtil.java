@@ -227,6 +227,10 @@ public class CourseServiceUtil {
 		return getService().getLogoUrl(courseId);
 	}
 
+	public static int getStudentsFromCourseCount(long courseId) {
+		return getService().getStudentsFromCourseCount(courseId);
+	}
+
 	public static void clearService() {
 		_service = null;
 	}

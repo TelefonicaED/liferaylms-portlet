@@ -153,6 +153,11 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 	
 	public java.util.List<Course> getUserCourses(long userId) throws PortalException, SystemException
 	{
+		
+		 return courseFinder.getExistingUserCourses(userId,-1,-1);
+		
+		
+		/*	
 		User usuario= userLocalService.getUser(userId);
 		java.util.List<Group> groups= GroupLocalServiceUtil.getUserGroups(usuario.getUserId());
 		java.util.List<Course> results=new java.util.ArrayList<Course>();
@@ -167,7 +172,33 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 				results.add(course);
 			}
 		}
-		return results;
+		return results;*/
+
+	}
+	
+	
+	public java.util.List<Course> getUserCourses(long userId, int start, int end) throws PortalException, SystemException
+	{
+		
+		 return courseFinder.getExistingUserCourses(userId,start,end);
+		
+		
+		/*	
+		User usuario= userLocalService.getUser(userId);
+		java.util.List<Group> groups= GroupLocalServiceUtil.getUserGroups(usuario.getUserId());
+		java.util.List<Course> results=new java.util.ArrayList<Course>();
+		
+		for(Group groupCourse:groups)
+		{
+			
+			
+			Course course=courseLocalService.fetchByGroupCreatedId(groupCourse.getGroupId());
+			if(course!=null)
+			{
+				results.add(course);
+			}
+		}
+		return results;*/
 
 	}
 	
@@ -928,6 +959,31 @@ public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int e
 		return students;
 	}
 	
+	
+	public List<User> getTeachersFromCourse(long courseId) {
+		List<User> users = new ArrayList<User>();
+		try{
+			
+			Course course = courseLocalService.fetchCourse(courseId);
+						
+			LinkedHashMap<String, Object> userParams = new LinkedHashMap<String, Object>();
+			LmsPrefs prefs;			
+			prefs = LmsPrefsLocalServiceUtil.getLmsPrefs(course.getCompanyId());
+			long teacherRoleId=RoleLocalServiceUtil.getRole(prefs.getTeacherRole()).getRoleId();
+			userParams.put("usersGroups", course.getGroupCreatedId());
+			userParams.put("userGroupRole", new Long[]{course.getGroupCreatedId(), teacherRoleId});
+			
+			users = UserLocalServiceUtil.search(course.getCompanyId(), "", 
+					WorkflowConstants.STATUS_APPROVED, userParams, 
+					QueryUtil.ALL_POS, QueryUtil.ALL_POS,(OrderByComparator)null);
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		
+		return users;
+		
+	}
+	
 	public List<Course> getByTitleStatusCategoriesTags(String freeText, int status, long[] categories, long[] tags, long companyId, long groupId, long userId, String language, boolean isAdmin, boolean andOperator, int start, int end){
 		return CourseFinderUtil.findByT_S_C_T(freeText, status, categories, tags, companyId, groupId, userId, language, isAdmin, andOperator, start, end);
 	}
@@ -974,6 +1030,8 @@ public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int e
 	public boolean hasUserTries(long courseId, long userId){
 		return CourseFinderUtil.hasUserTries(courseId, userId);
 	}
+	
+	
 }
 
 

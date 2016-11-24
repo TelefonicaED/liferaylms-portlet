@@ -14,10 +14,12 @@
 
 package com.liferay.lms.service.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.liferay.lms.model.Course;
 import com.liferay.lms.model.Module;
+import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.lms.service.base.ModuleServiceBaseImpl;
 import com.liferay.lms.service.persistence.ModuleUtil;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -52,9 +54,19 @@ public class ModuleServiceImpl extends ModuleServiceBaseImpl {
 	 */
 	@JSONWebService
 	public List<Module> findAllInGroup(long groupId) throws SystemException, PortalException {
-		User usuario= this.getUser();
-		List<Module> list = (List<Module>) modulePersistence.filterFindByGroupId(groupId);
-		return list;
+		List<Module> modules; 
+		Course course = CourseLocalServiceUtil.fetchByGroupCreatedId(groupId);
+		if (getPermissionChecker() == null
+				|| course == null
+				|| !(getPermissionChecker().hasPermission(course.getGroupId(), Course.class.getName(),
+						course.getCourseId(), "VIEW") || getPermissionChecker()
+						.hasOwnerPermission(course.getCompanyId(), Course.class.getName(), course.getCourseId(),
+								course.getUserId(), "VIEW"))) {
+			modules = new ArrayList<Module>();
+		}else{
+			modules= (List<Module>) modulePersistence.filterFindByGroupId(groupId);
+		}		
+		return modules;
 	}
 	@JSONWebService
 	public List<Module> findAllInCourse(long courseId) throws SystemException, PortalException {

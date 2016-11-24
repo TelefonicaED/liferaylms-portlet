@@ -140,6 +140,10 @@ public class CourseServiceClpInvoker {
 		_methodName204 = "getLogoUrl";
 
 		_methodParameterTypes204 = new String[] { "java.lang.Long" };
+
+		_methodName205 = "getStudentsFromCourseCount";
+
+		_methodParameterTypes205 = new String[] { "long" };
 	}
 
 	public Object invokeMethod(String name, String[] parameterTypes,
@@ -300,6 +304,11 @@ public class CourseServiceClpInvoker {
 			return CourseServiceUtil.getLogoUrl((java.lang.Long)arguments[0]);
 		}
 
+		if (_methodName205.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes205, parameterTypes)) {
+			return CourseServiceUtil.getStudentsFromCourseCount(((Long)arguments[0]).longValue());
+		}
+
 		throw new UnsupportedOperationException();
 	}
 
@@ -351,4 +360,6 @@ public class CourseServiceClpInvoker {
 	private String[] _methodParameterTypes203;
 	private String _methodName204;
 	private String[] _methodParameterTypes204;
+	private String _methodName205;
+	private String[] _methodParameterTypes205;
 }
