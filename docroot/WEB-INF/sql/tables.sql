@@ -1,3 +1,22 @@
+create table Lms_ActitityTriesDeleted (
+	activityTriesDeletedId LONG not null primary key,
+	actId LONG,
+	userId LONG,
+	startDate DATE null,
+	endDate DATE null,
+	status INTEGER
+);
+
+create table Lms_ActivityTriesDeleted (
+	activityTriesDeletedId LONG not null primary key,
+	groupId LONG,
+	actId LONG,
+	userId LONG,
+	startDate DATE null,
+	endDate DATE null,
+	status INTEGER
+);
+
 create table Lms_AuditEntry (
 	auditId LONG not null primary key,
 	auditDate DATE null,
@@ -80,13 +99,14 @@ create table Lms_CourseResult (
 	crId LONG not null primary key,
 	courseId LONG,
 	result LONG,
-	comments VARCHAR(75) null,
+	comments TEXT null,
 	userId LONG,
 	passed BOOLEAN,
 	startDate DATE null,
 	passedDate DATE null,
 	allowStartDate DATE null,
-	allowFinishDate DATE null
+	allowFinishDate DATE null,
+	extraData TEXT null
 );
 
 create table Lms_LearningActivity (
@@ -155,7 +175,10 @@ create table Lms_LmsPrefs (
 	courseevals VARCHAR(75) null,
 	scoretranslators VARCHAR(75) null,
 	usersResults LONG,
-	debugScorm BOOLEAN
+	debugScorm BOOLEAN,
+	hasAPILicence BOOLEAN,
+	showHideActivity BOOLEAN,
+	viewCoursesFinished BOOLEAN
 );
 
 create table Lms_Module (
@@ -228,6 +251,13 @@ create table Lms_SCORMContent (
 	ciphered BOOLEAN
 );
 
+create table Lms_Schedule (
+	secheduleId LONG not null primary key,
+	teamId LONG,
+	startDate DATE null,
+	endDate DATE null
+);
+
 create table Lms_SurveyResult (
 	uuid_ VARCHAR(75) null,
 	surveyResultId LONG not null primary key,
@@ -258,6 +288,7 @@ create table Lms_TestQuestion (
 	text_ TEXT null,
 	questionType LONG,
 	weight LONG,
+	penalize BOOLEAN,
 	extracontent TEXT null
 );
 

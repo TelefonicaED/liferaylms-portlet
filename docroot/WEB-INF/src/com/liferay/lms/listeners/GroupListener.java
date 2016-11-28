@@ -14,6 +14,9 @@ import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.mail.MailMessage;
+import com.liferay.portal.kernel.messaging.Message;
+import com.liferay.portal.kernel.messaging.MessageBusException;
+import com.liferay.portal.kernel.messaging.MessageBusUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.PrefsPropsUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
@@ -37,6 +40,7 @@ public class GroupListener extends BaseModelListener<Group> {
 			String associationClassName, Object associationClassPK)
 			throws ModelListenerException {
 		if(log.isDebugEnabled())log.debug("onAfterAddAssociation");
+		
 		long groupId = GetterUtil.getLong(classPK);
 		long userId = GetterUtil.getLong(associationClassPK);
 		try {
@@ -47,6 +51,7 @@ public class GroupListener extends BaseModelListener<Group> {
 						course.getCourseId(), userId, PrincipalThreadLocal.getUserId(), AuditConstants.REGISTER, null);
 				
 				if(course!=null&&course.isWelcome()&&course.getWelcomeMsg()!=null&&!StringPool.BLANK.equals(course.getWelcomeMsg())){
+					
 					User user = null;
 					Company company = null;
 					try {
@@ -65,7 +70,7 @@ public class GroupListener extends BaseModelListener<Group> {
 				    	String nameTo = user.getFullName();
 
 						try{
-							InternetAddress to = new InternetAddress(emailTo, nameTo);
+
 							InternetAddress from = new InternetAddress(fromAddress, fromName);
 							
 					    	String url = PortalUtil.getPortalURL(company.getVirtualHostname(), 80, false);
@@ -83,36 +88,64 @@ public class GroupListener extends BaseModelListener<Group> {
 				    			new String[] {"[$FROM_ADDRESS$]", "[$FROM_NAME$]", "[$PAGE_URL$]","[$PORTAL_URL$]","[$TO_ADDRESS$]","[$TO_NAME$]","[$USER_SCREENNAME$]"},
 				    			new String[] {fromAddress, fromName, urlcourse, url, user.getEmailAddress(), user.getFullName(),user.getScreenName()});
 				    	
-					    	System.out.println(body);
 							if(log.isDebugEnabled()){
 								log.debug(from);
-								log.debug(to);
+								log.debug(emailTo);
 								log.debug(subject);
 								log.debug(body);
 							}
-							MailMessage mailm = new MailMessage(from, to, subject, body, true);
-							MailServiceUtil.sendEmail(mailm);
+							
+							//Envio auditoria
+							Message messageAudit=new Message();
+							messageAudit.put("auditing", "TRUE");
+							messageAudit.put("groupId", course.getGroupCreatedId());
+							messageAudit.put("subject", subject);
+							messageAudit.put("body", 	body);
+							messageAudit.setResponseId("1111");
+							
+							try {
+								MessageBusUtil.sendSynchronousMessage("lms/mailing", messageAudit, 1000);
+							} catch (MessageBusException e) {
+								if (log.isDebugEnabled())
+									log.debug(e.getMessage());
+							}
+							
+							//Envio el correo
+							Message message=new Message();
+
+							message.put("to", emailTo);
+
+							message.put("subject", 	subject);
+							message.put("body", 	body);
+							message.put("groupId", 	course.getGroupCreatedId());
+							message.put("userId",  	user.getUserId());
+							message.put("testing", 	StringPool.FALSE);
+							message.put("type", 	"COURSE_INSCRIPTION");
+							message.put("url", 		url);
+							message.put("urlcourse",urlcourse);		
+
+							MessageBusUtil.sendMessage("lms/mailing", message);
+							
 						}
-						catch(Exception ex)
-						{
-							if(log.isDebugEnabled())ex.printStackTrace();
-						}		
+						catch(Exception ex){
+							if(log.isDebugEnabled()) ex.printStackTrace();
+						}	
 					}
 				}
 			}
-
 			
 		} catch (SystemException e) {
 			throw new ModelListenerException(e);
 		}
 	}
 	
-	
 	@Override
 	public void onAfterRemoveAssociation(Object classPK,
 			String associationClassName, Object associationClassPK)
 			throws ModelListenerException {
+		
 		if(log.isDebugEnabled())log.debug("onAfterRemoveAssociation");
+		
 		long groupId = GetterUtil.getLong(classPK);
 		long userId = GetterUtil.getLong(associationClassPK);
 		try {
@@ -122,9 +155,10 @@ public class GroupListener extends BaseModelListener<Group> {
 				AuditingLogFactory.audit(course.getCompanyId(), course.getGroupCreatedId(), Course.class.getName(), 
 						course.getCourseId(), userId, PrincipalThreadLocal.getUserId(), AuditConstants.UNREGISTER, null);
 				
-				
-				
 				if(course!=null&&course.isGoodbye()&&course.getGoodbyeMsg()!=null&&!StringPool.BLANK.equals(course.getGoodbyeMsg())){
+					if(log.isDebugEnabled())log.debug("course.courseId: " + course.getCourseId());
+					if(log.isDebugEnabled())log.debug("course.isGoodbye(): " + course.isGoodbye());
+					if(log.isDebugEnabled())log.debug("course.getGoodbyeMsg(): " + course.getGoodbyeMsg());
 					User user = null;
 					Company company = null;
 					try {
@@ -170,6 +204,22 @@ public class GroupListener extends BaseModelListener<Group> {
 							}
 							MailMessage mailm = new MailMessage(from, to, subject, body, true);
 							MailServiceUtil.sendEmail(mailm);
+							
+							//Envio el correo (Preparado para cuando se quiera mandar al mailing)
+//							Message message=new Message();
+//
+//							message.put("to", emailTo);
+//
+//							message.put("subject", 	subject);
+//							message.put("body", 	body);
+//							message.put("groupId", 	course.getGroupCreatedId());
+//							message.put("userId",  	user.getUserId());
+//							message.put("testing", 	StringPool.FALSE);
+//							message.put("type", 	"COURSE_INSCRIPTION");
+//							message.put("url", 		url);
+//							message.put("urlcourse",urlcourse);		
+//
+//							MessageBusUtil.sendMessage("lms/mailing", message);
 						}
 						catch(Exception ex)
 						{
@@ -177,7 +227,6 @@ public class GroupListener extends BaseModelListener<Group> {
 						}		
 					}
 				}
-				
 				
 			}
 		} catch (SystemException e) {

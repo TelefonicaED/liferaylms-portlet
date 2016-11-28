@@ -16,6 +16,38 @@
 <%@page import="com.liferay.lms.model.LearningActivity"%>
 
 <%@include file="/init.jsp" %>
+
+
+<script type="text/javascript">
+function hideDiv(element){
+	var ua = navigator.userAgent;
+	
+	var re  = new RegExp("MSIE ([0-9]{1,}[\.0-9]{0,})");
+	var rv;
+	 if (re.exec(ua) != null){
+	      rv = parseFloat( RegExp.$1 );
+	  }
+	 var childs;
+	if ( rv == 8.0 ) {
+		childs = element.parentNode.querySelectorAll('.collapsable');
+	}else{
+		childs = element.parentNode.getElementsByClassName("collapsable");
+	}
+	
+	if(childs.length>0){
+		var height;
+		if(element.parentNode.className == 'option-more'){
+			element.parentNode.removeClass("option-more");
+			element.parentNode.addClass("option-less");
+		}else{
+			element.parentNode.removeClass("option-less");
+			element.parentNode.addClass("option-more");			
+		}
+	}
+}
+</script>
+
+
 <%
 long actId=ParamUtil.getLong(request,"actId",0);
 long userId = themeDisplay.getUserId();
@@ -54,6 +86,10 @@ if(anonimousString.equals("true")){
 }	
 
 %>
+
+
+
+
 <c:if test="<%=result %>">
 <% if(resultTotal >= 0 && result) { %>
 		<div class="color_tercero font_14"><liferay-ui:message key="p2ptask.correction.result.total" />: <%= resultTotal %></div>
@@ -63,14 +99,20 @@ if(anonimousString.equals("true")){
 </c:if>
 
 <%
-
+String fullName = "";
 if(!p2pActCorList.isEmpty()){
 	for (P2pActivityCorrections myP2PActCor : p2pActCorList){
 		
 		cont++;
 		// Lo reseteamos en cada iteracción.
 		dlfile = null;
-		User propietary = UserLocalServiceUtil.getUser(myP2PActCor.getUserId());
+		User propietary = UserLocalServiceUtil.fetchUser(myP2PActCor.getUserId());
+		if(propietary != null){
+			fullName = propietary.getFullName();
+		}else{
+			fullName = "";
+		}
+		
 		String correctionText = myP2PActCor.getDescription();
 		if(myP2PActCor.getFileEntryId()!=0)
 		{
@@ -88,18 +130,18 @@ if(!p2pActCorList.isEmpty()){
 		<c:if test="<%=myP2PActCor.getDate() != null %>">
 			<%correctionsDone=true; %>
 			<div class="option-more">
-				<span class="label-col"><liferay-ui:message key="p2ptask-correction-title" />
+				<span class="label-col" onclick="hideDiv(this);"><liferay-ui:message key="p2ptask-correction-title" />
 			
 				
 					<c:if test="<%=!anonimous %>">
 					 	<span class="name">
 					 		<liferay-ui:message key="by" />
-					 		<%=propietary.getFullName() %>
+					 		<%=fullName %>
 					 	</span>
 				 	</c:if>
 				 	<c:if test="<%=anonimous %>">
 					 	<span class="number">
-					 		<liferay-ui:message key="number" /> 
+					 		<liferay-ui:message key="p2ptaskactivity.number" /> 
 					 		<%=cont%>
 					 	</span> 
 				 	</c:if>
@@ -108,7 +150,7 @@ if(!p2pActCorList.isEmpty()){
 				 	</c:if>
 			 	</span>
 	
-				<div class="collapsable" style="padding-left:10px">
+				<div class="collapsable" style="padding-left:10px;">
 					<c:if test="<%=myP2PActCor.getDate() != null %>">
 						<c:if test="<%=result %>">
 							<div class="container-result">

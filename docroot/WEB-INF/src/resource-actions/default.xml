@@ -24,6 +24,30 @@
 	</portlet-resource>
 	
 	<portlet-resource>
+		<portlet-name>activityComments</portlet-name>
+		<permissions>
+			<supports>
+				<action-key>ACCESS_IN_CONTROL_PANEL</action-key>
+				<action-key>ADD_TO_PAGE</action-key>
+				<action-key>CONFIGURATION</action-key>
+				<action-key>VIEW</action-key>
+			</supports>
+			<site-member-defaults>
+				<action-key>VIEW</action-key>
+				<action-key>ADD_TO_PAGE</action-key>
+			</site-member-defaults>
+			<guest-defaults>
+				<action-key>VIEW</action-key>
+				<action-key>ADD_TO_PAGE</action-key>
+			</guest-defaults>
+			<guest-unsupported>
+				<action-key>ACCESS_IN_CONTROL_PANEL</action-key>
+				<action-key>CONFIGURATION</action-key>
+			</guest-unsupported>
+		</permissions>
+	</portlet-resource>	
+	
+	<portlet-resource>
 		<portlet-name>competencesadmin</portlet-name>
 		<permissions>
 			<supports>
@@ -100,7 +124,7 @@
 		</guest-defaults>
 		<guest-unsupported />
 	</portlet-resource>
-	
+		
 	<model-resource>
 		<model-name>execactivity</model-name>
 		<portlet-ref>
@@ -308,7 +332,7 @@
 	<model-resource>
 		<model-name>com.liferay.lms.model.LearningActivity</model-name>
 		<portlet-ref>
-			<portlet-name>lmsactivitieslist</portlet-name>
+			<portlet-name>lmsactivitieslist</portlet-name>			
 		</portlet-ref>
 		<permissions>
 			<supports>
@@ -338,6 +362,58 @@
 			</guest-unsupported>
 		</permissions>
 	</model-resource>
+ 	<model-resource>
+		<model-name>com.liferay.lms.model.CourseComments</model-name>		
+ 		<portlet-ref>
+ 			<portlet-name>CourseComments</portlet-name>
+ 		</portlet-ref>
+ 		<permissions>
+ 			<supports>
+ 				<action-key>ADD_DISCUSSION</action-key>
+ 				<action-key>DELETE_DISCUSSION</action-key>
+ 				<action-key>UPDATE_DISCUSSION</action-key>
+ 				<action-key>VIEW</action-key>
+ 			</supports>
+ 			<site-member-defaults>
+ 				<action-key>ADD_DISCUSSION</action-key>
+ 				<action-key>VIEW</action-key>
+ 			</site-member-defaults>
+ 			<guest-defaults>
+ 				<action-key>ADD_DISCUSSION</action-key>
+ 				<action-key>VIEW</action-key>
+ 			</guest-defaults>
+ 			<guest-unsupported>
+ 				<action-key>DELETE_DISCUSSION</action-key>
+ 				<action-key>UPDATE_DISCUSSION</action-key>
+ 			</guest-unsupported>
+ 		</permissions>
+ 	</model-resource>	
+	<model-resource>
+		<model-name>com.liferay.lms.model.LearningActivityComments</model-name>
+		<portlet-ref>
+			<portlet-name>activityComments</portlet-name>			
+		</portlet-ref>
+		<permissions>
+			<supports>
+				<action-key>VIEW</action-key>
+				<action-key>ADD_DISCUSSION</action-key>
+				<action-key>UPDATE_DISCUSSION</action-key>
+            	<action-key>DELETE_DISCUSSION</action-key>
+			</supports>
+			<site-member-defaults>
+				<action-key>ADD_DISCUSSION</action-key>
+				<action-key>VIEW</action-key>
+			</site-member-defaults>
+			<guest-defaults>
+				<action-key>ADD_DISCUSSION</action-key>
+				<action-key>VIEW</action-key>			
+			</guest-defaults>
+			<guest-unsupported>
+				<action-key>DELETE_DISCUSSION</action-key>
+				<action-key>UPDATE_DISCUSSION</action-key>			
+			</guest-unsupported>
+		</permissions>
+	</model-resource>	
 	
 	<model-resource>
 		<model-name>com.liferay.lms.model.Module</model-name>
@@ -386,6 +462,7 @@
 		</social-equity>
 		<portlet-ref>
 			<portlet-name>courseadmin</portlet-name>
+			
 		</portlet-ref>
 		<permissions>
 			<supports>
@@ -398,6 +475,7 @@
 				<action-key>COURSEEDITOR</action-key>
 				<action-key>ASSIGN_MEMBERS</action-key>
 				<action-key>ACCESS</action-key>
+				
 			</supports>
 			<site-member-defaults>
 				<action-key>VIEW</action-key>
@@ -481,8 +559,7 @@
 		<guest-defaults/>
 		<guest-unsupported>
 			<action-key>ADD_COMPETENCE</action-key>
-			<action-key>PERMISSIONS</action-key>
-	
+			<action-key>PERMISSIONS</action-key>	
 		</guest-unsupported>
 	</model-resource>
 	<model-resource>

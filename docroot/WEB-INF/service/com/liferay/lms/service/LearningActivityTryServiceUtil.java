@@ -69,6 +69,15 @@ public class LearningActivityTryServiceUtil {
 		return getService().createLearningActivityTry(actId, userId);
 	}
 
+	public static com.liferay.lms.model.LearningActivityTry createLearningActivityTry(
+		long actId, long userId, int score, double position, int plays)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getService()
+				   .createLearningActivityTry(actId, userId, score, position,
+			plays);
+	}
+
 	public static java.util.List<com.liferay.lms.model.LearningActivityTry> getLearningActivityTries(
 		long actId, java.lang.String login)
 		throws com.liferay.portal.kernel.exception.PortalException,

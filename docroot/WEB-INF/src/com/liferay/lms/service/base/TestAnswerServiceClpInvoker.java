@@ -23,31 +23,31 @@ import java.util.Arrays;
  */
 public class TestAnswerServiceClpInvoker {
 	public TestAnswerServiceClpInvoker() {
-		_methodName122 = "getBeanIdentifier";
+		_methodName142 = "getBeanIdentifier";
 
-		_methodParameterTypes122 = new String[] {  };
+		_methodParameterTypes142 = new String[] {  };
 
-		_methodName123 = "setBeanIdentifier";
+		_methodName143 = "setBeanIdentifier";
 
-		_methodParameterTypes123 = new String[] { "java.lang.String" };
+		_methodParameterTypes143 = new String[] { "java.lang.String" };
 
-		_methodName128 = "getTestAnswersByQuestionId";
+		_methodName148 = "getTestAnswersByQuestionId";
 
-		_methodParameterTypes128 = new String[] { "long" };
+		_methodParameterTypes148 = new String[] { "long" };
 
-		_methodName129 = "getTestAnswer";
+		_methodName149 = "getTestAnswer";
 
-		_methodParameterTypes129 = new String[] { "long" };
+		_methodParameterTypes149 = new String[] { "long" };
 
-		_methodName130 = "modTestAnswer";
+		_methodName150 = "modTestAnswer";
 
-		_methodParameterTypes130 = new String[] {
+		_methodParameterTypes150 = new String[] {
 				"com.liferay.lms.model.TestAnswer"
 			};
 
-		_methodName131 = "addTestAnswer";
+		_methodName151 = "addTestAnswer";
 
-		_methodParameterTypes131 = new String[] {
+		_methodParameterTypes151 = new String[] {
 				"long", "java.lang.String", "java.lang.String",
 				"java.lang.String", "boolean"
 			};
@@ -55,35 +55,33 @@ public class TestAnswerServiceClpInvoker {
 
 	public Object invokeMethod(String name, String[] parameterTypes,
 		Object[] arguments) throws Throwable {
-		if (_methodName122.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes122, parameterTypes)) {
+		if (_methodName142.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes142, parameterTypes)) {
 			return TestAnswerServiceUtil.getBeanIdentifier();
 		}
 
-		if (_methodName123.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes123, parameterTypes)) {
+		if (_methodName143.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes143, parameterTypes)) {
 			TestAnswerServiceUtil.setBeanIdentifier((java.lang.String)arguments[0]);
-
-			return null;
 		}
 
-		if (_methodName128.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes128, parameterTypes)) {
+		if (_methodName148.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes148, parameterTypes)) {
 			return TestAnswerServiceUtil.getTestAnswersByQuestionId(((Long)arguments[0]).longValue());
 		}
 
-		if (_methodName129.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes129, parameterTypes)) {
+		if (_methodName149.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes149, parameterTypes)) {
 			return TestAnswerServiceUtil.getTestAnswer(((Long)arguments[0]).longValue());
 		}
 
-		if (_methodName130.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes130, parameterTypes)) {
+		if (_methodName150.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes150, parameterTypes)) {
 			return TestAnswerServiceUtil.modTestAnswer((com.liferay.lms.model.TestAnswer)arguments[0]);
 		}
 
-		if (_methodName131.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes131, parameterTypes)) {
+		if (_methodName151.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes151, parameterTypes)) {
 			return TestAnswerServiceUtil.addTestAnswer(((Long)arguments[0]).longValue(),
 				(java.lang.String)arguments[1], (java.lang.String)arguments[2],
 				(java.lang.String)arguments[3],
@@ -93,16 +91,16 @@ public class TestAnswerServiceClpInvoker {
 		throw new UnsupportedOperationException();
 	}
 
-	private String _methodName122;
-	private String[] _methodParameterTypes122;
-	private String _methodName123;
-	private String[] _methodParameterTypes123;
-	private String _methodName128;
-	private String[] _methodParameterTypes128;
-	private String _methodName129;
-	private String[] _methodParameterTypes129;
-	private String _methodName130;
-	private String[] _methodParameterTypes130;
-	private String _methodName131;
-	private String[] _methodParameterTypes131;
+	private String _methodName142;
+	private String[] _methodParameterTypes142;
+	private String _methodName143;
+	private String[] _methodParameterTypes143;
+	private String _methodName148;
+	private String[] _methodParameterTypes148;
+	private String _methodName149;
+	private String[] _methodParameterTypes149;
+	private String _methodName150;
+	private String[] _methodParameterTypes150;
+	private String _methodName151;
+	private String[] _methodParameterTypes151;
 }

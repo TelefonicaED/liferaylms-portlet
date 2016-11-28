@@ -1,3 +1,5 @@
+<%@page import="com.liferay.portal.kernel.util.PropsKeys"%>
+<%@page import="com.liferay.portal.kernel.util.PrefsPropsUtil"%>
 <%@page import="com.liferay.portal.model.ModelHintsUtil"%>
 <%@page import="java.util.Locale"%>
 <%@page import="com.liferay.portal.kernel.util.LocaleUtil"%>
@@ -49,17 +51,15 @@
 <%@page import="com.liferay.lms.model.LearningActivity"%>
 <%@ include file="/init.jsp" %>
 <liferay-ui:success key="activity-saved-successfully" message="activity-saved-successfully" />
-<liferay-ui:error/>
 <liferay-ui:error key="learningactivity.connect.error.timepassg" message="learningactivity.connect.error.timepassg"></liferay-ui:error>
 <liferay-ui:error key="learningactivity.connect.error.timepass.nan" message="learningactivity.connect.error.timepass.nan"></liferay-ui:error>
 <liferay-ui:error key="learningactivity.connect.error.time" message="learningactivity.connect.error.time"></liferay-ui:error>
 <liferay-ui:error key="learningactivity.connect.error.time.nan" message="learningactivity.connect.error.time.nan"></liferay-ui:error>
 <liferay-ui:error key="execactivity.editActivity.questionsPerPage.number" message="execActivity.options.error.questionsPerPage"></liferay-ui:error>
 <liferay-ui:error key="execactivity.editActivity.random.number" message="execActivity.options.error.random"></liferay-ui:error>
+<liferay-ui:error key="general.error" message="edit.activity.general.error"></liferay-ui:error>
+<liferay-ui:error key="error-p2pActivity-inProgress" message="p2ptaskactivity.error.extraContentInProgress" />
 
-<portlet:actionURL var="saveactivityURL" name="saveActivity" >
-	<portlet:param name="editing" value="<%=StringPool.TRUE %>"/>
-</portlet:actionURL>
 <%
 renderResponse.setProperty(
 		"clear-request-parameters", Boolean.TRUE.toString());
@@ -70,7 +70,7 @@ String backURL = ParamUtil.getString(request, "backURL");
 long typeId=ParamUtil.getLong(request, "type");
 AssetRendererFactory arf=AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(LearningActivity.class.getName());
 Map<Long,String> classTypes=arf.getClassTypes(new long[]{themeDisplay.getScopeGroupId()}, themeDisplay.getLocale());
-
+long fileMaxSize = GetterUtil.getLong(PrefsPropsUtil.getString(PropsKeys.UPLOAD_SERVLET_REQUEST_IMPL_MAX_SIZE));
 String referringPortletResource = ParamUtil.getString(request, "referringPortletResource");
 long actId=ParamUtil.getLong(request, "resId",0);
 LearningActivity learnact=null;
@@ -85,6 +85,17 @@ if(request.getAttribute("activity")!=null){
 		moduleId=learnact.getModuleId();
 	}
 }
+
+
+%>
+<portlet:actionURL var="saveactivityURL" name="saveActivity" >
+	<portlet:param name="editing" value="<%=StringPool.TRUE %>"/>
+	<portlet:param name="type" value="<%=String.valueOf(typeId) %>"/>
+	<portlet:param name="resId" value="<%=String.valueOf(actId) %>"/>
+</portlet:actionURL>
+
+
+<% 
 
 //Reload LearningActivity
 if(learnact!=null&&learnact.getActId()>0&&learnact.isNullStartDate()){
@@ -141,7 +152,7 @@ if(learnact!=null)
 	actId=learnact.getActId();
 	description=learnact.getDescription(themeDisplay.getLocale());
 	
-	if(!learnact.isNullStartDate() && learnact.getTypeId() != 8){
+	if(!learnact.isNullStartDate()){
 		Date startDate = learnact.getStartdate();
 		startDay=Integer.parseInt(formatDay.format(startDate));
 		startMonth=Integer.parseInt(formatMonth.format(startDate))-1;
@@ -150,7 +161,7 @@ if(learnact!=null)
 		startMin=Integer.parseInt(formatMin.format(startDate));
 	}
 	
-	if(!learnact.isNullEndDate() && learnact.getTypeId() != 8){
+	if(!learnact.isNullEndDate()){
 		Date endDate = learnact.getEnddate();
 		endDay=Integer.parseInt(formatDay.format(endDate));
 		endMonth=Integer.parseInt(formatMonth.format(endDate))-1;
@@ -166,6 +177,7 @@ if(learnact!=null)
 		<portlet:param name="redirect" value="<%=redirect %>" />
 		<portlet:param name="backURL" value="<%=backURL%>" />
 	</portlet:actionURL>
+
 	
 	<portlet:actionURL name="deleteActivityBank" var="deleteActivityBankURL">
 		<portlet:param name="resId" value="<%=Long.toString(learnact.getActId()) %>" />
@@ -390,12 +402,41 @@ AUI().ready('node-base' ,'aui-form-validator', 'aui-overlay-context-panel', 'wid
 
 
 
-	function validate(){
+	function getElementByNameStart(str){
+		var x=document.getElementsByTagName('input');
+		var a=[];
+		for(var i=0;i<x.length;i++){
+	  		if(x[i].id.indexOf(str)==0){
+	   			a.push(x[i]);
+	  		}
+		}
+		return a;
+	}
+
+	function <portlet:namespace/>validate(){
 		
 		var startInput = document.getElementById('<portlet:namespace />startdate-enabledCheckbox');
 		var start = startInput != null ? startInput.checked : true;
 		var stopInput = document.getElementById('<portlet:namespace />stopdate-enabledCheckbox');
 		var stop = stopInput != null ? stopInput.checked : true;
+		var i = 0;
+		var maxSize = document.getElementById('<portlet:namespace />maxSize').value;
+		var file_inputs =getElementByNameStart("<portlet:namespace />additionalFile");
+		for(i=0; i<file_inputs.length; i++){
+			if(file_inputs[i].files!=null){
+				if(file_inputs[i].files[0]!=null){
+					if (typeof file_inputs[i].files[0] != 'undefined'){
+						if(maxSize<file_inputs[i].files[0].size){
+							alert("<%=UnicodeFormatter.toString(LanguageUtil.get(pageContext, "server-file-size-upload-exceeded")) %>");	
+							return false;
+						}	
+					}				
+				}
+				
+			}
+		}
+		
+		
 		
 		if(start&&stop){	
 					
@@ -404,7 +445,7 @@ AUI().ready('node-base' ,'aui-form-validator', 'aui-overlay-context-panel', 'wid
 					
 			if(start.getTime()>=end.getTime()){
 				alert("<%=UnicodeFormatter.toString(LanguageUtil.get(pageContext, "please-enter-a-start-date-that-comes-before-the-end-date")) %>");
-				return;
+				return false;
 			}
 // 			else{
 // 				if(document.getElementById('<portlet:namespace />uploadDay')!=null){
@@ -468,8 +509,7 @@ AUI().ready('node-base' ,'aui-form-validator', 'aui-overlay-context-panel', 'wid
 				}
 			}
 		}
-		
-		document.getElementById('<portlet:namespace />fm').submit();
+		return true;
 	}
 
 	function getStartDate(){
@@ -517,13 +557,27 @@ AUI().ready('node-base' ,'aui-form-validator', 'aui-overlay-context-panel', 'wid
 	);
 //-->
 </script>
-<aui:form name="fm" action="<%=saveactivityURL%>"  method="post"  enctype="multipart/form-data">
+<aui:form name="fm" action="<%=saveactivityURL%>"  method="post"   onSubmit="event.preventDefault();${renderResponse.getNamespace()}validateForm();" enctype="multipart/form-data">
 	<aui:fieldset>
 		<aui:input name="redirect" type="hidden" value="<%= redirect %>" />
+		<aui:input name="maxSize" type="hidden" value="<%= fileMaxSize %>" />
 		<aui:input name="backURL" type="hidden" value="<%= backURL %>" />
 		<aui:input name="referringPortletResource" type="hidden" value="<%= referringPortletResource %>" />
-		<aui:input name="resId" type="hidden" value="<%=actId %>"/>
-
+	
+<aui:script>
+	Liferay.provide(
+		window,
+		'<portlet:namespace />validateForm',
+		function() {
+			if(<portlet:namespace />validate()){
+				submitForm(document.<portlet:namespace />fm);
+			}
+			
+		},
+		['liferay-util-list-fields']
+	);
+</aui:script>	
+	
 <script type="text/javascript">
 <!--
 
@@ -619,7 +673,7 @@ Liferay.provide(
 		        ['node']
 		    );
 		    
-		//-->
+		-->
 		</script>
 	    
 		<aui:field-wrapper label="description" name="description">
@@ -680,7 +734,8 @@ Liferay.provide(
 			}
 		%>
 		
-		<aui:input size="5" name="tries" label="tries" value="<%=Long.toString(tries) %>" type="number" disabled="<%=disabled%>">
+		<aui:input size="5" name="tries" label="tries" value="<%=Long.toString(tries) %>" type="number"  disabled="<%=disabled%>">
+			<aui:validator name="min" errorMessage="editActivity.tries.range">-1</aui:validator>
 		</aui:input><%--liferay-ui:icon-help message="number-of-tries"></liferay-ui:icon-help--%>
   		<div id="<portlet:namespace />triesError" class="<%=((SessionErrors.contains(renderRequest, "editActivity.tries.required"))||
 														      (SessionErrors.contains(renderRequest, "editActivity.tries.number"))||
@@ -709,9 +764,16 @@ Liferay.provide(
 			{
 				score=learnact.getPasspuntuation();
 			}
-			
+			String passpuntuationLabelProperty = "passpuntuation";
+			String passpunctuationHelpProperty= "editActivity.passpuntuation.help";
+			if (larntype.getTypeId() == 2){
+				passpuntuationLabelProperty = "resourceexternalactivity.passpuntuation";
+				passpunctuationHelpProperty= "resourceexternalactivity.passpuntuation.help";
+			}
 		%>
-		<aui:input size="5" name="passpuntuation" label="passpuntuation" type="text" value="<%=Long.toString(score) %>" disabled="<%=disabled %>" helpMessage="<%=LanguageUtil.get(pageContext,\"editActivity.passpuntuation.help\")%>">
+		<aui:input size="5" name="passpuntuation" label="<%=passpuntuationLabelProperty %>" type="number" value="<%=Long.toString(score) %>" disabled="<%=disabled %>" helpMessage="<%=LanguageUtil.get(pageContext, passpunctuationHelpProperty)%>">
+			<aui:validator name="min" errorMessage="editActivity.passpuntuation.range">-1</aui:validator>
+			<aui:validator name="max" errorMessage="editActivity.passpuntuation.range">101</aui:validator>
 		</aui:input>
 		<% if (disabled) { %>
 		<input name="<portlet:namespace />passpuntuation" type="hidden" value="<%=Long.toString(score) %>" />
@@ -795,44 +857,44 @@ Liferay.provide(
 	}
 	%>
 	 
-	<div id="<portlet:namespace />restrictions" style="display:none">
-		<liferay-ui:panel title="activity-constraints" collapsible="true" defaultState="<%=actCondefaultState %>">
-		    <script type="text/javascript">
-	
-	
-			    
-			    function setStarDateState(){
-			    	AUI().use('node',function(A) {
-				    	var enabled = document.getElementById('<%=renderResponse.getNamespace() %>startdate-enabledCheckbox').checked; 
-			    		var selector = 'form[name="<%=renderResponse.getNamespace() %>fm"]';
-			    		
-			    		if(enabled) {
-			    			A.all("#startDate").one(".aui-datepicker-button-wrapper").show();
-			    			A.all("#startDate").one("#startDateSpan").removeClass('aui-helper-hidden');
-			    		}else {
-			    			A.all("#startDate").one(".aui-datepicker-button-wrapper").hide();
-			    			A.all("#startDate").one("#startDateSpan").addClass('aui-helper-hidden');
-			    		}
-			    	});
-			    }
-			    
-			    function setStopDateState(){
-			    	AUI().use('node',function(A) {
-				    	var enabled = document.getElementById('<%=renderResponse.getNamespace() %>stopdate-enabledCheckbox').checked; 
-	
-			    		var selector = 'form[name="<%=renderResponse.getNamespace() %>fm"]';
-			    		
-			    		if(enabled) {
-			    			A.all("#endDate").one(".aui-datepicker-button-wrapper").show();
-			    			A.all("#endDate").one("#endDateSpan").removeClass('aui-helper-hidden');
-			    		}else {
-			    			A.all("#endDate").one(".aui-datepicker-button-wrapper").hide();
-			    			A.all("#endDate").one("#endDateSpan").addClass('aui-helper-hidden');
-			    		}
-			    	});
-			    }
-	
-		    </script>
+	 <liferay-ui:panel title="activity-constraints" collapsible="true" defaultState="<%=actCondefaultState %>">
+	   
+	    <script type="text/javascript">
+
+
+		    
+		    function setStarDateState(){
+		    	AUI().use('node',function(A) {
+			    	var enabled = document.getElementById('<%=renderResponse.getNamespace() %>startdate-enabledCheckbox').checked; 
+		    		var selector = 'form[name="<%=renderResponse.getNamespace() %>fm"]';
+		    		
+		    		if(enabled) {
+		    			A.all("#startDate").one(".aui-datepicker-button-wrapper").show();
+		    			A.all("#startDate").one("#startDateSpan").removeClass('aui-helper-hidden');
+		    		}else {
+		    			A.all("#startDate").one(".aui-datepicker-button-wrapper").hide();
+		    			A.all("#startDate").one("#startDateSpan").addClass('aui-helper-hidden');
+		    		}
+		    	});
+		    }
+		    
+		    function setStopDateState(){
+		    	AUI().use('node',function(A) {
+			    	var enabled = document.getElementById('<%=renderResponse.getNamespace() %>stopdate-enabledCheckbox').checked; 
+
+		    		var selector = 'form[name="<%=renderResponse.getNamespace() %>fm"]';
+		    		
+		    		if(enabled) {
+		    			A.all("#endDate").one(".aui-datepicker-button-wrapper").show();
+		    			A.all("#endDate").one("#endDateSpan").removeClass('aui-helper-hidden');
+		    		}else {
+		    			A.all("#endDate").one(".aui-datepicker-button-wrapper").hide();
+		    			A.all("#endDate").one("#endDateSpan").addClass('aui-helper-hidden');
+		    		}
+		    	});
+		    }
+
+	    </script>
 		<div id="startDate">
 			<aui:field-wrapper label="start-date">
 				<% if (!larntype.hasMandatoryDates()) { %>
@@ -937,7 +999,7 @@ Liferay.provide(
 		<%}
 		%>
 		</liferay-ui:panel>
-	</div>
+	
 		<c:if test="${showcategorization}">
 			<c:choose>
 				<c:when test="<%=isCourse %>">
@@ -958,11 +1020,10 @@ Liferay.provide(
 	</aui:fieldset>
 	
 	<aui:button-row>
-		<input type="button" value="<liferay-ui:message key="savechanges" />" onclick="javascript:validate()" >
-		<aui:button  type="cancel" value="canceledition" />
+		<aui:button type="submit" value="savechanges"/>
+		<aui:button type="cancel" value="canceledition" />
 	</aui:button-row>
 </aui:form>
-<liferay-ui:success key="activity-saved-successfully" message="activity-saved-successfully" />
 <%
 	if (isCourse){
 	%>

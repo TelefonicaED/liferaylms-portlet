@@ -20,6 +20,7 @@ import com.liferay.lms.service.ModuleResultLocalServiceUtil;
 import com.liferay.portal.model.User;
 import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.util.bridges.mvc.MVCPortlet;
+import com.tls.lms.util.LiferaylmsUtil;
 
 
 public class courseupdateresult extends MVCPortlet {
@@ -44,8 +45,6 @@ public class courseupdateresult extends MVCPortlet {
 					int calculated = 0;
 					
 					trace += " course: "+course.getTitle(Locale.getDefault())+" ("+ course.getCourseId() +")\n"; 
-					//System.out.println(" course: "+course.getTitle(Locale.getDefault())+" ("+ course.getCourseId() +")\n");
-					//System.out.print("Calculando.");
 					
 					//Obtenemos todos los usuarios del curso.
 					List<User> usersList = UserLocalServiceUtil.getGroupUsers(course.getGroupCreatedId());
@@ -64,21 +63,16 @@ public class courseupdateresult extends MVCPortlet {
 						long passedCount = 0;
 						long result = 0;
 						
-						//System.out.println("   user: "+user.getFullName()+" ("+ user.getUserId() +")");
-						
 						for(Module mod:moduleList){
 														
 							//Obtenemos todos los resultados que ha obtenidos el usuario del curso.
 							ModuleResult moduleResult = ModuleResultLocalServiceUtil.getByModuleAndUser(mod.getModuleId(), user.getUserId());
 							
 							//trace += "     module: "+mod.getTitle(Locale.getDefault())+" ("+ mod.getModuleId() +")\n"; 
-							//System.out.println("     module: "+mod.getTitle(Locale.getDefault())+" ("+ mod.getModuleId() +")");
-							
 							if(moduleResult != null && moduleResult.isPassed()){
 								passedCount++;
 								
 								//trace += "       moduleResult: "+moduleResult.getResult()+" ("+moduleResult.isPassed() +")\n";
-								//System.out.println("       moduleResult: "+moduleResult.getResult()+" ("+moduleResult.isPassed() +")");
 							}else{
 								passed = false;
 							}
@@ -100,13 +94,13 @@ public class courseupdateresult extends MVCPortlet {
 							//Si no exist�a el resultado del curso.
 							if(courseResult==null){
 								courseResult = CourseResultLocalServiceUtil.createCourseResult(CounterLocalServiceUtil.increment(CourseResult.class.getName()));
+								courseResult.setStartDate(new Date());
 								courseResult.setUserId(user.getUserId());
 								courseResult.setCourseId(course.getCourseId());
 								
 								//CourseResultLocalServiceUtil.updateCourseResult(courseResult, false);
 							}
 							
-							//System.out.println("- result: "+result+" = 100 * "+passedCount +" / "+moduleList.size()+", courseResult.getResult(): "+courseResult.getResult()+", courseResult.getPassed(): "+courseResult.getPassed());
 							//Solo actualizamos si mejora el resultado o si pasa de suspenso a aprobado.
 							if(courseResult.getResult() < result ){
 								//Asignamos los nuevos valores.
@@ -119,33 +113,25 @@ public class courseupdateresult extends MVCPortlet {
 								changes++;
 								
 								//trace += "\n  ** updated!"+", changes: "+changes+"\n";
-								//System.out.println("     ** updated!");
 								
 								trace += "    user: "+user.getFullName()+" ("+ user.getUserId() +")\n"; 
-								//System.out.println("   user: "+user.getFullName()+" ("+ user.getUserId() +")");
-								
 								trace += "      result: "+result+" = 100 * "+passedCount +" / "+moduleList.size()+"\n";
-								//System.out.println("         result: "+result+" = 100 * "+passedCount +" / "+moduleList.size());
-								
 								trace += "        courseResult: "+courseResult.getResult()+", passed: "+ courseResult.getPassed() +"\n";
-								//System.out.println("     ** courseResult: "+courseResult.getResult()+", passed: "+ courseResult.getPassed());
-								
 							}
 							
 						} catch (Exception e) {
 							trace += "  -- ERROR: "+e.getMessage()+"\n";
-							System.out.println(" ERROR: "+e.getMessage());
+							e.printStackTrace();
 						}
 
 					}// fin for Users	
 				}//fin if course
 			} catch (Exception e) {
 				trace += "  -- ERROR: "+e.getMessage()+"\n";
-				//System.out.println(" ERROR: "+e.getMessage());
+				e.printStackTrace();
 			}	
 
-			System.out.println("\n Cambios: "+changes);
-			ModuleUpdateResult.saveStringToFile("CourseUpdate.txt", trace+"\n Cambios: "+changes);
+			LiferaylmsUtil.saveStringToFile("CourseUpdate.txt", trace+"\n Cambios: "+changes);
 		}
 		
 		

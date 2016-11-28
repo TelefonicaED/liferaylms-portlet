@@ -136,6 +136,16 @@ public class AuditEntryLocalServiceClp implements AuditEntryLocalService {
 				"long", "long", "java.lang.String", "long", "long",
 				"java.util.Date", "java.util.Date", "int", "int"
 			};
+
+		_methodName23 = "findByclassName_classPK";
+
+		_methodParameterTypes23 = new String[] { "java.lang.String", "long" };
+
+		_methodName24 = "findByclassName_classPK_filterByActions";
+
+		_methodParameterTypes24 = new String[] {
+				"java.lang.String", "long", "java.util.List"
+			};
 	}
 
 	public com.liferay.lms.model.AuditEntry addAuditEntry(
@@ -839,6 +849,75 @@ public class AuditEntryLocalServiceClp implements AuditEntryLocalService {
 		return ((Long)returnObj).longValue();
 	}
 
+	public java.util.List<com.liferay.lms.model.AuditEntry> findByclassName_classPK(
+		java.lang.String className, long classPK)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		Object returnObj = null;
+
+		try {
+			returnObj = _invokableLocalService.invokeMethod(_methodName23,
+					_methodParameterTypes23,
+					new Object[] {
+						ClpSerializer.translateInput(className),
+						
+					classPK
+					});
+		}
+		catch (Throwable t) {
+			t = ClpSerializer.translateThrowable(t);
+
+			if (t instanceof com.liferay.portal.kernel.exception.SystemException) {
+				throw (com.liferay.portal.kernel.exception.SystemException)t;
+			}
+
+			if (t instanceof RuntimeException) {
+				throw (RuntimeException)t;
+			}
+			else {
+				throw new RuntimeException(t.getClass().getName() +
+					" is not a valid exception");
+			}
+		}
+
+		return (java.util.List<com.liferay.lms.model.AuditEntry>)ClpSerializer.translateOutput(returnObj);
+	}
+
+	public java.util.List<com.liferay.lms.model.AuditEntry> findByclassName_classPK_filterByActions(
+		java.lang.String className, long classPK,
+		java.util.List<java.lang.String> actions)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		Object returnObj = null;
+
+		try {
+			returnObj = _invokableLocalService.invokeMethod(_methodName24,
+					_methodParameterTypes24,
+					new Object[] {
+						ClpSerializer.translateInput(className),
+						
+					classPK,
+						
+					ClpSerializer.translateInput(actions)
+					});
+		}
+		catch (Throwable t) {
+			t = ClpSerializer.translateThrowable(t);
+
+			if (t instanceof com.liferay.portal.kernel.exception.SystemException) {
+				throw (com.liferay.portal.kernel.exception.SystemException)t;
+			}
+
+			if (t instanceof RuntimeException) {
+				throw (RuntimeException)t;
+			}
+			else {
+				throw new RuntimeException(t.getClass().getName() +
+					" is not a valid exception");
+			}
+		}
+
+		return (java.util.List<com.liferay.lms.model.AuditEntry>)ClpSerializer.translateOutput(returnObj);
+	}
+
 	private InvokableLocalService _invokableLocalService;
 	private String _methodName0;
 	private String[] _methodParameterTypes0;
@@ -884,4 +963,8 @@ public class AuditEntryLocalServiceClp implements AuditEntryLocalService {
 	private String[] _methodParameterTypes21;
 	private String _methodName22;
 	private String[] _methodParameterTypes22;
+	private String _methodName23;
+	private String[] _methodParameterTypes23;
+	private String _methodName24;
+	private String[] _methodParameterTypes24;
 }

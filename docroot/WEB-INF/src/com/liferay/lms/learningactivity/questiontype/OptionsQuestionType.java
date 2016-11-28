@@ -1,5 +1,6 @@
 package com.liferay.lms.learningactivity.questiontype;
 
+import java.util.Date;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -23,6 +24,7 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.DocumentException;
 import com.liferay.portal.kernel.xml.Element;
@@ -146,6 +148,7 @@ public class OptionsQuestionType extends BaseQuestionType {
 	private String getHtml(Document document, long questionId,boolean feedback, ThemeDisplay themeDisplay){
 		String html = "", answersFeedBack="", feedMessage = "", cssclass="", selected="";
 		String namespace = themeDisplay != null ? themeDisplay.getPortletDisplay().getNamespace() : "";
+		String timestamp="";
 		boolean isCombo = false;
 		String onclick = "";
 		try {
@@ -169,7 +172,8 @@ public class OptionsQuestionType extends BaseQuestionType {
 			List<TestAnswer> answersSelected=getAnswersSelected(document, questionId);
 			List<TestAnswer> testAnswers= TestAnswerLocalServiceUtil.getTestAnswersByQuestionId(question.getQuestionId());
 			int correctAnswers=0, correctAnswered=0, incorrectAnswered=0;
-			if(feedback) feedMessage = LanguageUtil.get(themeDisplay.getLocale(),"answer-in-blank") ;
+			if(feedback) feedMessage = "";
+			boolean notAnswers = true;
 			int numAnswer=0;
 			String disabled = "";
 			if (isCombo){
@@ -185,11 +189,17 @@ public class OptionsQuestionType extends BaseQuestionType {
 					showCorrectAnswer = LearningActivityLocalServiceUtil.getExtraContentValue(question.getActId(), "showCorrectAnswer");
 					String showCorrectAnswerOnlyOnFinalTryString = LearningActivityLocalServiceUtil.getExtraContentValue(question.getActId(), "showCorrectAnswerOnlyOnFinalTry");
 					try {
-						if ("true".equals(showCorrectAnswerOnlyOnFinalTryString) && LearningActivityTryLocalServiceUtil.canUserDoANewTry(question.getActId(), themeDisplay.getUserId())) {
-							showCorrectAnswer = "false";
+						if ("true".equals(showCorrectAnswerOnlyOnFinalTryString)) {
+							if(LearningActivityTryLocalServiceUtil.canUserDoANewTry(question.getActId(), themeDisplay.getUserId())){
+								showCorrectAnswer = "false";
+							}else{
+								showCorrectAnswer = "true";
+							}
 						}
 					} catch (Exception e) {}
 					disabled = "disabled='disabled'";
+					Date now = new Date();
+					timestamp = String.valueOf(now.getTime());
 				}
 				if(isCorrect(answer)){
 					correctAnswers++;
@@ -197,13 +207,19 @@ public class OptionsQuestionType extends BaseQuestionType {
 					if(answersSelected.contains(answer)){
 						correctAnswered++;
 						checked="checked='checked'";
-						feedMessage=(!LanguageUtil.get(themeDisplay.getLocale(),"answer-in-blank").equals(feedMessage))?feedMessage+"<br/>"+answer.getFeedbackCorrect():answer.getFeedbackCorrect();
+						notAnswers = false;
+						if(Validator.isNotNull(answer.getFeedbackCorrect())){
+							feedMessage=(!LanguageUtil.get(themeDisplay.getLocale(),"answer-in-blank").equals(feedMessage))?feedMessage+"<br/>"+answer.getFeedbackCorrect():answer.getFeedbackCorrect();
+						}
 					}
 				}else if(answersSelected.contains(answer)){
 					incorrectAnswered++;
 					checked="checked='checked'";
 					selected="selected";
-					feedMessage=(!LanguageUtil.get(themeDisplay.getLocale(),"answer-in-blank").equals(feedMessage))?feedMessage+"<br/>"+answer.getFeedbacknocorrect():answer.getFeedbacknocorrect();
+					notAnswers = false;
+					if(Validator.isNotNull(answer.getFeedbacknocorrect())){
+						feedMessage=(!LanguageUtil.get(themeDisplay.getLocale(),"answer-in-blank").equals(feedMessage))?feedMessage+"<br/>"+answer.getFeedbacknocorrect():answer.getFeedbacknocorrect();
+					}
 				}
 
 				if (isCombo){
@@ -225,6 +241,12 @@ public class OptionsQuestionType extends BaseQuestionType {
 			}
 
 			if(feedback){
+				
+				if(notAnswers){
+					feedMessage = LanguageUtil.get(themeDisplay.getLocale(),"answer-in-blank");
+				}
+				
+				
 				if(isQuestionCorrect(correctAnswers, correctAnswered, incorrectAnswered))	cssclass="correct ";
 				else cssclass="incorrect ";
 				

@@ -223,6 +223,21 @@ public interface CourseResultModel extends BaseModel<CourseResult> {
 	 */
 	public void setAllowFinishDate(Date allowFinishDate);
 
+	/**
+	 * Returns the extra data of this course result.
+	 *
+	 * @return the extra data of this course result
+	 */
+	@AutoEscape
+	public String getExtraData();
+
+	/**
+	 * Sets the extra data of this course result.
+	 *
+	 * @param extraData the extra data of this course result
+	 */
+	public void setExtraData(String extraData);
+
 	public boolean isNew();
 
 	public void setNew(boolean n);

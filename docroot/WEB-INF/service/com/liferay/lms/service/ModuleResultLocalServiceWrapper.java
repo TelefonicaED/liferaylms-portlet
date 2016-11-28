@@ -286,6 +286,11 @@ public class ModuleResultLocalServiceWrapper implements ModuleResultLocalService
 			userId);
 	}
 
+	public java.util.List<com.liferay.lms.model.ModuleResult> getByUserId(
+		long userId) {
+		return _moduleResultLocalService.getByUserId(userId);
+	}
+
 	public long countByModule(long moduleId)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _moduleResultLocalService.countByModule(moduleId);
@@ -298,6 +303,28 @@ public class ModuleResultLocalServiceWrapper implements ModuleResultLocalService
 			courseGropupCreatedId, moduleId);
 	}
 
+	public long countByModuleOnlyStudents(long companyId,
+		long courseGropupCreatedId, long moduleId,
+		java.util.List<com.liferay.portal.model.User> _students)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _moduleResultLocalService.countByModuleOnlyStudents(companyId,
+			courseGropupCreatedId, moduleId, _students);
+	}
+
+	public long countStudentsStartedByModuleId(
+		com.liferay.lms.model.Module module,
+		java.util.List<com.liferay.portal.model.User> students, long teamId) {
+		return _moduleResultLocalService.countStudentsStartedByModuleId(module,
+			students, teamId);
+	}
+
+	public long countStudentsFinishedByModuleId(
+		com.liferay.lms.model.Module module,
+		java.util.List<com.liferay.portal.model.User> students, long teamId) {
+		return _moduleResultLocalService.countStudentsFinishedByModuleId(module,
+			students, teamId);
+	}
+
 	public long countByModulePassed(long moduleId, boolean passed)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _moduleResultLocalService.countByModulePassed(moduleId, passed);
@@ -308,6 +335,14 @@ public class ModuleResultLocalServiceWrapper implements ModuleResultLocalService
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _moduleResultLocalService.countByModulePassedOnlyStudents(companyId,
 			courseGropupCreatedId, moduleId, passed);
+	}
+
+	public long countByModulePassedOnlyStudents(long companyId,
+		long courseGropupCreatedId, long moduleId, boolean passed,
+		java.util.List<com.liferay.portal.model.User> _students)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _moduleResultLocalService.countByModulePassedOnlyStudents(companyId,
+			courseGropupCreatedId, moduleId, passed, _students);
 	}
 
 	public void update(com.liferay.lms.model.LearningActivityResult lactr)
@@ -328,18 +363,18 @@ public class ModuleResultLocalServiceWrapper implements ModuleResultLocalService
 		_moduleResultLocalService.updateAllCoursesAllModulesAllUsers();
 	}
 
+	public boolean update(long moduleId, long userId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _moduleResultLocalService.update(moduleId, userId);
+	}
+
 	public java.util.Date calculateModuleResultStartDate(long moduleId,
 		long userId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		return _moduleResultLocalService.calculateModuleResultStartDate(moduleId,
 			userId);
-	}
-
-	public boolean update(long moduleId, long userId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
-		return _moduleResultLocalService.update(moduleId, userId);
 	}
 
 	/**

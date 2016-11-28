@@ -1,3 +1,7 @@
+<%@page import="com.liferay.portal.model.Team"%>
+<%@page import="com.liferay.portal.service.TeamLocalServiceUtil"%>
+<%@page import="com.liferay.lms.service.ScheduleLocalServiceUtil"%>
+<%@page import="com.liferay.lms.model.Schedule"%>
 <%@page import="com.liferay.portlet.documentlibrary.util.DLUtil"%>
 <%@page import="com.liferay.portal.kernel.util.PropsUtil"%>
 <%@page import="com.liferay.portlet.PortletPreferencesFactoryUtil"%>
@@ -46,6 +50,36 @@
 	
 
 	Course course=CourseLocalServiceUtil.fetchByGroupCreatedId(themeDisplay.getScopeGroupId());
+	
+	Date startSchDate = null;
+	Date endSchDate = null;
+	boolean existSchedule = false;
+	if(showModuleStartDate || showModuleEndDate){
+		List<Team> teams = TeamLocalServiceUtil.getGroupTeams(themeDisplay.getScopeGroupId());
+		for(Team team : teams){		
+			Schedule sch = ScheduleLocalServiceUtil.getScheduleByTeamId(team.getTeamId());
+			if(sch!=null){
+			  showModuleStartDate = false;
+			  showModuleEndDate = false;
+			  break;
+		  }
+		}	
+	}	
+	
+	List<Team> teams = TeamLocalServiceUtil.getUserTeams(themeDisplay.getUserId(), course.getGroupCreatedId());
+	if(teams!=null && teams.size()>0){
+		for(Team team : teams){
+			Schedule schedule = ScheduleLocalServiceUtil.getScheduleByTeamId(team.getTeamId());
+			if(schedule!=null){
+				existSchedule = true;
+				startSchDate=schedule.getStartDate();
+				endSchDate = schedule.getEndDate();
+				break;
+			}
+		}			
+	}
+	
+	
 %>
 <liferay-portlet:actionURL name="moveModule" var="moveModuleURL" windowState="<%= LiferayWindowState.EXCLUSIVE.toString()%>" />
 
@@ -114,6 +148,16 @@ if(!ismobile){
 			long modulesCount=theModules.size();
 			int themeId=0;
 			for(Module theModule:theModules){
+				Date startDate;
+				Date endDate;
+				if(existSchedule){
+					startDate = startSchDate;
+					endDate = endSchDate;
+				}else{
+					startDate = theModule.getStartDate();
+					endDate = theModule.getEndDate();
+				}
+				
 				themeId++;
 				boolean canAccessLock = permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), "com.liferay.lms.model", themeDisplay.getScopeGroupId() , "ACCESSLOCK");
 				boolean courseEditing = (permissionChecker.hasPermission(course.getGroupCreatedId(), Course.class.getName(), course.getCourseId() , ActionKeys.UPDATE))?true:false;
@@ -173,7 +217,7 @@ if(!ismobile){
 %>
 							<td class="icon">
 <%
-								if(theModule.getStartDate()!=null &&today.before(theModule.getStartDate())){
+								if(startDate!=null &&today.before(startDate)){
 %>
 									<liferay-ui:icon image="lock" alt="starting-soon" />
 <%
@@ -227,8 +271,8 @@ if(!ismobile){
 					Object[] arg =  new Object[2];
 					arg[0] = themeId;
 					arg[1] = theModule.getTitle(themeDisplay.getLocale());
-					Date startDate = theModule.getStartDate();
-					boolean canAccess = (startDate != null )?(!today.before(theModule.getStartDate())):true;
+					
+					boolean canAccess = (startDate != null )?(!today.before(startDate)):true;
 %>
 					
 					<td class="title">
@@ -271,25 +315,25 @@ if(!ismobile){
 %>
 						<td class="date">
 <%
-							if(theModule.getStartDate()!=null &&today.before(theModule.getStartDate())){
+							if(startDate!=null &&today.before(startDate)){
 								if(showModuleStartDate){
 %>
 									<liferay-ui:message key="fecha-inicio"/><br />
-									<%=	dateFormatDate.format(theModule.getStartDate())%>
+									<%=	dateFormatDate.format(startDate)%>
 <%
 								}
 							}else{
-								if(theModule.getEndDate()!=null&&today.before(theModule.getEndDate())){
+								if(endDate!=null&&today.before(endDate)){
 									if(showModuleStartDate){
 %>
 										<liferay-ui:message key="fecha-inicio"/><br />
-										<%=	dateFormatDateTime.format(theModule.getStartDate())%><br />
+										<%=	dateFormatDateTime.format(startDate)%><br />
 <%
 									}
 									if(showModuleEndDate){
 %>
 										<liferay-ui:message key="fecha-fin"/><br />
-										<%=	dateFormatDateTime.format(theModule.getEndDate())%>
+										<%=	dateFormatDateTime.format(endDate)%>
 <%
 									}
 								}
@@ -302,7 +346,7 @@ if(!ismobile){
 					
 					<td class="contain_actions">
 <%
-						if(theModule.getStartDate()!=null &&today.before(theModule.getStartDate()) && !canAccessLock){
+						if(startDate!=null &&today.before(startDate) && !canAccessLock){
 %>
 							<div class="access"><liferay-ui:message key="starting-soon"/><!-- En LMS esta etiqueta es vacía --></div>
 <%

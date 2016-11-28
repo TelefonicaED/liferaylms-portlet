@@ -64,7 +64,11 @@ public class ResourceExternalLearningActivityType extends BaseLearningActivityTy
 	public long getDefaultScore() {
 		return 0;
 	}
-
+	
+	@Override
+	public boolean isScoreConfigurable() {
+		return true;
+	}
 
 	@Override
 	public String getName() {
@@ -97,7 +101,7 @@ public class ResourceExternalLearningActivityType extends BaseLearningActivityTy
 
 	
 	@Override
-	public void setExtraContent(UploadRequest uploadRequest, PortletResponse portletResponse, LearningActivity learningActivity) {
+	public String setExtraContent(UploadRequest uploadRequest, PortletResponse portletResponse, LearningActivity learningActivity) {
 		/**
 		 * 	Todo esto te viene a continuación te puede resultar un poco confuso, pero el desarrollo siguiente debe ser compatible 
 		 *  con otras configuraciones de esta actividad.
@@ -107,6 +111,7 @@ public class ResourceExternalLearningActivityType extends BaseLearningActivityTy
 			//PortletRequest actionRequest = (PortletRequest)uploadRequest.getAttribute(JavaConstants.JAVAX_PORTLET_REQUEST);
 			
 			String youtubecode=ParamUtil.getString(uploadRequest,"youtubecode");
+			boolean videoControlEnabled=ParamUtil.getBoolean(uploadRequest,"videoControl");
 			//String additionalFile = uploadRequest.getFileName("additionalFile");
 			//boolean deleteVideo=ParamUtil.getBoolean(uploadRequest, "deleteAdditionalFile",false);
 			String team = ParamUtil.getString(uploadRequest, "team","0");
@@ -169,6 +174,17 @@ public class ResourceExternalLearningActivityType extends BaseLearningActivityTy
 					rootElement.add(video);
 				}
 				
+				Element videoControl=rootElement.element("video-control");
+				if(videoControl!=null)
+				{
+					videoControl.detach();
+					rootElement.remove(videoControl);
+				}
+				
+				videoControl = SAXReaderUtil.createElement("video-control");
+				videoControl.setText(String.valueOf(videoControlEnabled));		
+				rootElement.add(videoControl);				
+				
 				if(files.size()>0){
 					boolean changes = false;
 					boolean error = false;
@@ -183,11 +199,11 @@ public class ResourceExternalLearningActivityType extends BaseLearningActivityTy
 					} catch (PortalException e) {
 						if(log.isDebugEnabled())e.printStackTrace();
 						if(log.isErrorEnabled())log.error(e.getMessage());
-						return;
+						return null;
 					} catch (SystemException e) {
 						if(log.isDebugEnabled())e.printStackTrace();
 						if(log.isErrorEnabled())log.error(e.getMessage());
-						return;
+						return null;
 					}
 					
 					
@@ -385,6 +401,8 @@ public class ResourceExternalLearningActivityType extends BaseLearningActivityTy
 					if(log.isErrorEnabled())log.error(e.getMessage());
 				}	
 			}
+			
+			return null;
 	}
 	
 	private long createDLFolders(Long userId,Long repositoryId,PortletRequest portletRequest,long actId) throws PortalException, SystemException{

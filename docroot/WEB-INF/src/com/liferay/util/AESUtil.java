@@ -45,7 +45,6 @@ public class AESUtil {
 		r.nextBytes(iv);
 		out.write(iv); //write IV as a prefix
 		out.flush();
-		//System.out.println(">>>>>>>>written"+Arrays.toString(iv));
 
 		Cipher cipher = Cipher.getInstance("AES/CFB8/NoPadding"); //"DES/ECB/PKCS5Padding";"AES/CBC/PKCS5Padding"
 		SecretKeySpec keySpec = new SecretKeySpec(password.getBytes(), "AES");
@@ -66,8 +65,7 @@ public class AESUtil {
 
 		byte[] iv = new byte[IV_LENGTH];
 		in.read(iv);
-		//System.out.println(">>>>>>>>red"+Arrays.toString(iv));
-
+		
 		Cipher cipher = Cipher.getInstance("AES/CFB8/NoPadding"); //"DES/ECB/PKCS5Padding";"AES/CBC/PKCS5Padding"
 		SecretKeySpec keySpec = new SecretKeySpec(password.getBytes(), "AES");
 		IvParameterSpec ivSpec = new IvParameterSpec(iv);

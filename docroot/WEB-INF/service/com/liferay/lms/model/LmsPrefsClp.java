@@ -73,6 +73,9 @@ public class LmsPrefsClp extends BaseModelImpl<LmsPrefs> implements LmsPrefs {
 		attributes.put("scoretranslators", getScoretranslators());
 		attributes.put("usersResults", getUsersResults());
 		attributes.put("debugScorm", getDebugScorm());
+		attributes.put("hasAPILicence", getHasAPILicence());
+		attributes.put("showHideActivity", getShowHideActivity());
+		attributes.put("viewCoursesFinished", getViewCoursesFinished());
 
 		return attributes;
 	}
@@ -131,6 +134,25 @@ public class LmsPrefsClp extends BaseModelImpl<LmsPrefs> implements LmsPrefs {
 
 		if (debugScorm != null) {
 			setDebugScorm(debugScorm);
+		}
+
+		Boolean hasAPILicence = (Boolean)attributes.get("hasAPILicence");
+
+		if (hasAPILicence != null) {
+			setHasAPILicence(hasAPILicence);
+		}
+
+		Boolean showHideActivity = (Boolean)attributes.get("showHideActivity");
+
+		if (showHideActivity != null) {
+			setShowHideActivity(showHideActivity);
+		}
+
+		Boolean viewCoursesFinished = (Boolean)attributes.get(
+				"viewCoursesFinished");
+
+		if (viewCoursesFinished != null) {
+			setViewCoursesFinished(viewCoursesFinished);
 		}
 	}
 
@@ -210,6 +232,42 @@ public class LmsPrefsClp extends BaseModelImpl<LmsPrefs> implements LmsPrefs {
 		_debugScorm = debugScorm;
 	}
 
+	public boolean getHasAPILicence() {
+		return _hasAPILicence;
+	}
+
+	public boolean isHasAPILicence() {
+		return _hasAPILicence;
+	}
+
+	public void setHasAPILicence(boolean hasAPILicence) {
+		_hasAPILicence = hasAPILicence;
+	}
+
+	public boolean getShowHideActivity() {
+		return _showHideActivity;
+	}
+
+	public boolean isShowHideActivity() {
+		return _showHideActivity;
+	}
+
+	public void setShowHideActivity(boolean showHideActivity) {
+		_showHideActivity = showHideActivity;
+	}
+
+	public boolean getViewCoursesFinished() {
+		return _viewCoursesFinished;
+	}
+
+	public boolean isViewCoursesFinished() {
+		return _viewCoursesFinished;
+	}
+
+	public void setViewCoursesFinished(boolean viewCoursesFinished) {
+		_viewCoursesFinished = viewCoursesFinished;
+	}
+
 	public BaseModel<?> getLmsPrefsRemoteModel() {
 		return _lmsPrefsRemoteModel;
 	}
@@ -246,6 +304,9 @@ public class LmsPrefsClp extends BaseModelImpl<LmsPrefs> implements LmsPrefs {
 		clone.setScoretranslators(getScoretranslators());
 		clone.setUsersResults(getUsersResults());
 		clone.setDebugScorm(getDebugScorm());
+		clone.setHasAPILicence(getHasAPILicence());
+		clone.setShowHideActivity(getShowHideActivity());
+		clone.setViewCoursesFinished(getViewCoursesFinished());
 
 		return clone;
 	}
@@ -296,7 +357,7 @@ public class LmsPrefsClp extends BaseModelImpl<LmsPrefs> implements LmsPrefs {
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(19);
+		StringBundler sb = new StringBundler(25);
 
 		sb.append("{companyId=");
 		sb.append(getCompanyId());
@@ -316,13 +377,19 @@ public class LmsPrefsClp extends BaseModelImpl<LmsPrefs> implements LmsPrefs {
 		sb.append(getUsersResults());
 		sb.append(", debugScorm=");
 		sb.append(getDebugScorm());
+		sb.append(", hasAPILicence=");
+		sb.append(getHasAPILicence());
+		sb.append(", showHideActivity=");
+		sb.append(getShowHideActivity());
+		sb.append(", viewCoursesFinished=");
+		sb.append(getViewCoursesFinished());
 		sb.append("}");
 
 		return sb.toString();
 	}
 
 	public String toXmlString() {
-		StringBundler sb = new StringBundler(31);
+		StringBundler sb = new StringBundler(40);
 
 		sb.append("<model><model-name>");
 		sb.append("com.liferay.lms.model.LmsPrefs");
@@ -364,6 +431,18 @@ public class LmsPrefsClp extends BaseModelImpl<LmsPrefs> implements LmsPrefs {
 			"<column><column-name>debugScorm</column-name><column-value><![CDATA[");
 		sb.append(getDebugScorm());
 		sb.append("]]></column-value></column>");
+		sb.append(
+			"<column><column-name>hasAPILicence</column-name><column-value><![CDATA[");
+		sb.append(getHasAPILicence());
+		sb.append("]]></column-value></column>");
+		sb.append(
+			"<column><column-name>showHideActivity</column-name><column-value><![CDATA[");
+		sb.append(getShowHideActivity());
+		sb.append("]]></column-value></column>");
+		sb.append(
+			"<column><column-name>viewCoursesFinished</column-name><column-value><![CDATA[");
+		sb.append(getViewCoursesFinished());
+		sb.append("]]></column-value></column>");
 
 		sb.append("</model>");
 
@@ -379,5 +458,8 @@ public class LmsPrefsClp extends BaseModelImpl<LmsPrefs> implements LmsPrefs {
 	private String _scoretranslators;
 	private long _usersResults;
 	private boolean _debugScorm;
+	private boolean _hasAPILicence;
+	private boolean _showHideActivity;
+	private boolean _viewCoursesFinished;
 	private BaseModel<?> _lmsPrefsRemoteModel;
 }

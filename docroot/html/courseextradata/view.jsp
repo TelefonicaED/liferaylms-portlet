@@ -10,7 +10,6 @@ Course course=CourseLocalServiceUtil.fetchByGroupCreatedId(themeDisplay.getScope
 if(course!=null && permissionChecker.hasPermission(course.getGroupId(),  Course.class.getName(),course.getCourseId(),ActionKeys.VIEW))
 {
 	java.util.List<ExpandoValue> values=ExpandoValueLocalServiceUtil.getRowValues(themeDisplay.getCompanyId(),Course.class.getName(),ExpandoTableConstants.DEFAULT_TABLE_NAME,course.getCourseId(),0,100);
-	
 	if(values!=null&&values.size()>0)
 	{
 		if(values.get(0).getData().trim().length()!=0){
@@ -22,16 +21,21 @@ if(course!=null && permissionChecker.hasPermission(course.getGroupId(),  Course.
 <%
 		}else{
 			
-renderRequest.setAttribute(WebKeys.PORTLET_CONFIGURATOR_VISIBILITY,Boolean.FALSE);
+			renderRequest.setAttribute(WebKeys.PORTLET_DECORATE, false);
+			renderRequest.setAttribute(WebKeys.PORTLET_CONFIGURATOR_VISIBILITY, false);
 
 
 		}
 
+	}else{
+		renderRequest.setAttribute(WebKeys.PORTLET_DECORATE, false);
+		renderRequest.setAttribute(WebKeys.PORTLET_CONFIGURATOR_VISIBILITY, false);
 	}
 }
 else
 {
-	renderRequest.setAttribute(WebKeys.PORTLET_CONFIGURATOR_VISIBILITY, Boolean.FALSE);
+	renderRequest.setAttribute(WebKeys.PORTLET_DECORATE, false);
+	renderRequest.setAttribute(WebKeys.PORTLET_CONFIGURATOR_VISIBILITY, false);
 	
 	
 }

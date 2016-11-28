@@ -1,25 +1,38 @@
 package com.liferay.lms.lar;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLEncoder;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 
+import net.lingala.zip4j.core.ZipFile;
+import net.lingala.zip4j.exception.ZipException;
+
 import javax.portlet.PortletPreferences;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 
+import com.liferay.counter.service.CounterLocalServiceUtil;
 import com.liferay.lms.learningactivity.LearningActivityTypeRegistry;
 import com.liferay.lms.learningactivity.questiontype.QuestionType;
 import com.liferay.lms.learningactivity.questiontype.QuestionTypeRegistry;
 import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.model.Module;
+import com.liferay.lms.model.SCORMContent;
 import com.liferay.lms.model.TestQuestion;
+import com.liferay.lms.service.ClpSerializer;
 import com.liferay.lms.service.LearningActivityLocalServiceUtil;
 import com.liferay.lms.service.ModuleLocalServiceUtil;
+import com.liferay.lms.service.SCORMContentLocalServiceUtil;
 import com.liferay.lms.service.TestQuestionLocalServiceUtil;
+import com.liferay.lms.service.persistence.SCORMContentPersistence;
+import com.liferay.portal.kernel.bean.PortletBeanLocatorUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.language.LanguageUtil;
@@ -28,20 +41,37 @@ import com.liferay.portal.kernel.lar.PortletDataContext;
 import com.liferay.portal.kernel.lar.PortletDataException;
 import com.liferay.portal.kernel.lar.PortletDataHandlerBoolean;
 import com.liferay.portal.kernel.lar.PortletDataHandlerControl;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.Folder;
+import com.liferay.portal.kernel.search.Indexer;
+import com.liferay.portal.kernel.search.IndexerRegistryUtil;
+import com.liferay.portal.kernel.util.ContentTypes;
+import com.liferay.portal.kernel.util.HtmlUtil;
+import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.kernel.xml.Document;
+import com.liferay.portal.kernel.xml.DocumentException;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.Image;
-import com.liferay.portal.model.LayoutSetPrototype;
+import com.liferay.portal.model.ResourceConstants;
+import com.liferay.portal.model.Role;
+import com.liferay.portal.model.RoleConstants;
+import com.liferay.portal.security.permission.ActionKeys;
+import com.liferay.portal.service.ClassNameLocalServiceUtil;
 import com.liferay.portal.service.GroupLocalServiceUtil;
-import com.liferay.portal.service.LayoutSetPrototypeLocalServiceUtil;
+import com.liferay.portal.service.ResourceLocalServiceUtil;
+import com.liferay.portal.service.ResourcePermissionLocalServiceUtil;
+import com.liferay.portal.service.RoleLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
+import com.liferay.portal.service.ServiceContextThreadLocal;
+import com.liferay.portal.util.PortalUtil;
 import com.liferay.portlet.asset.model.AssetEntry;
 import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.DuplicateFileException;
@@ -56,6 +86,8 @@ import com.liferay.portlet.documentlibrary.service.DLFolderLocalServiceUtil;
 
 
 public class ModuleDataHandlerImpl extends BasePortletDataHandler {
+	
+	private static Log log = LogFactoryUtil.getLog(ModuleDataHandlerImpl.class);
 
 	public static String DOCUMENTLIBRARY_MAINFOLDER = "ResourceUploads";
 	
@@ -93,7 +125,7 @@ private static PortletDataHandlerBoolean _tags =
 protected PortletPreferences doDeleteData(PortletDataContext context,
 		String portletId, PortletPreferences preferences) throws Exception {
 	
-	System.out.println("\n-----------------------------\ndoDeleteData STARTS");
+	log.info("\n-----------------------------\ndoDeleteData STARTS");
 	
 	try {
 		String groupIdStr = String.valueOf(context.getScopeGroupId());
@@ -107,20 +139,20 @@ protected PortletPreferences doDeleteData(PortletDataContext context,
 		}
 		long repositoryId = DLFolderConstants.getDataRepositoryId(group.getGroupId(), DLFolderConstants.DEFAULT_PARENT_FOLDER_ID);
 		
-		System.out.println("  Course: "+ group.getName()+ ", groupId: " + repositoryId);
+		log.info("  Course: "+ group.getName()+ ", groupId: " + repositoryId);
 		
 		LearningActivityTypeRegistry learningActivityTypeRegistry = new LearningActivityTypeRegistry();
 		List<Module> modules = ModuleLocalServiceUtil.findAllInGroup(groupId);
 
 		for(Module module:modules){
 			
-			System.out.println("    Module : " + module.getTitle(Locale.getDefault()) );
+			log.info("    Module : " + module.getTitle(Locale.getDefault()) );
 			
 			List<LearningActivity> activities = LearningActivityLocalServiceUtil.getLearningActivitiesOfModule(module.getModuleId());
 			
 			for(LearningActivity activity:activities){
 				
-				System.out.println("      Learning Activity : " + activity.getTitle(Locale.getDefault())+ " (" + LanguageUtil.get(Locale.getDefault(),learningActivityTypeRegistry.getLearningActivityType(activity.getTypeId()).getName())+")");
+				log.info("      Learning Activity : " + activity.getTitle(Locale.getDefault())+ " (" + LanguageUtil.get(Locale.getDefault(),learningActivityTypeRegistry.getLearningActivityType(activity.getTypeId()).getName())+")");
 				
 				LearningActivityLocalServiceUtil.deleteLearningactivity(activity);
 				
@@ -137,18 +169,18 @@ protected PortletPreferences doDeleteData(PortletDataContext context,
 		e.printStackTrace();
 	}
 
-	System.out.println("doDeleteData ENDS\n-----------------------------\n");
+	log.info("doDeleteData ENDS\n-----------------------------\n");
 	
 	return super.doDeleteData(context, portletId, preferences);
 }
 
 @Override
 protected String doExportData(PortletDataContext context, String portletId, PortletPreferences preferences) throws Exception {
-
-	System.out.println("\n-----------------------------\ndoExportData STARTS, groupId : " + context.getScopeGroupId() );
+	
+	log.info("\n-----------------------------\ndoExportData STARTS, groupId : " + context.getScopeGroupId() );
 	
 	Group group = GroupLocalServiceUtil.getGroup(context.getScopeGroupId());
-	System.out.println(" Course: "+ group.getName());
+	log.info(" Course: "+ group.getName());
 	
 	
 	context.addPermissions("com.liferay.lms.model.module", context.getScopeGroupId());
@@ -162,19 +194,19 @@ protected String doExportData(PortletDataContext context, String portletId, Port
 	List<Module> entries = ModuleLocalServiceUtil.findAllInGroup(context.getScopeGroupId());
 	long entryOld=0L;
 	for (Module entry : entries) {
-		System.out.println("Moduleeeeeeeeeeeeeeeeeeeeeeeeeeeeee "+entry.getModuleId());
-		System.out.println("Moduleeeeeeeeeeeeeeeeeeeeeeeeeeeeee entryOld "+entryOld);
+		log.info("Moduleeeeeeeeeeeeeeeeeeeeeeeeeeeeee "+entry.getModuleId());
+		log.info("Moduleeeeeeeeeeeeeeeeeeeeeeeeeeeeee entryOld "+entryOld);
 		if(entryOld!=entry.getModuleId())
 		{
 			entryOld=entry.getModuleId();
 			exportEntry(context, rootElement, entry);
 		} else{
-			System.out.println("repetidooooo el modulo "+entry.getModuleId());
+			log.info("repetidooooo el modulo "+entry.getModuleId());
 
 		}
 	}
 
-	System.out.println("doExportData ENDS, modules:" + entries.size() + "\n-----------------------------\n"  );
+	log.info("doExportData ENDS, modules:" + entries.size() + "\n-----------------------------\n"  );
 	
 	return document.formattedString();
 }
@@ -183,7 +215,7 @@ private void exportEntry(PortletDataContext context, Element root, Module entry)
 	
 	String path = getEntryPath(context, entry);
 	
-	System.out.println("\n  Module: " + entry.getModuleId() +" "+ entry.getTitle(Locale.getDefault()) );
+	log.info("\n  Module: " + entry.getModuleId() +" "+ entry.getTitle(Locale.getDefault()) );
 	
 	
 	if (!context.isPathNotProcessed(path)) {
@@ -213,7 +245,7 @@ private void exportEntry(PortletDataContext context, Element root, Module entry)
 	for(LearningActivity actividad:actividades)
 	{
 		
-		System.out.println("    Learning Activity: " + actividad.getTitle(Locale.getDefault()) + " (" + LanguageUtil.get(Locale.getDefault(),learningActivityTypeRegistry.getLearningActivityType(actividad.getTypeId()).getName())+")" );
+		log.info("    Learning Activity: " + actividad.getTitle(Locale.getDefault()) + " (" + LanguageUtil.get(Locale.getDefault(),learningActivityTypeRegistry.getLearningActivityType(actividad.getTypeId()).getName())+")" );
 		
 		String pathlo = getEntryPath(context, actividad);
 		Element entryElementLoc= entryElement.addElement("learningactivity");
@@ -239,69 +271,124 @@ private void exportEntry(PortletDataContext context, Element root, Module entry)
 		
 		//Exportar los ficheros que tenga la descripci�n de la actividad.
 		descriptionFileParserDescriptionToLar(actividad.getDescription(), actividad.getGroupId(), actividad.getModuleId(), context, entryElementLoc);		
-
+		//Si es una actividad de tipo evaluación no tiene sentido guardar el extracontent
+		if(actividad.getTypeId() == 8){
+			actividad.setExtracontent("");
+		}
 	
 		//Exportar las imagenes de los resources.
-		if(actividad.getTypeId() == 2 || actividad.getTypeId() == 7 ){
-			
+		if(actividad.getTypeId() == 2 || actividad.getTypeId() == 7|| actividad.getTypeId() == 9 ){
 			List<String> img = new LinkedList<String>();
 			if(actividad.getTypeId() == 2){
 				//LearningActivityLocalServiceUtil.
 				//List<String> documents = LearningActivityLocalServiceUtil.getExtraContentValues(actividad.getActId(), "document");
 				img = LearningActivityLocalServiceUtil.getExtraContentValues(actividad.getActId(), "document");
-			}else if(actividad.getTypeId() == 7){
+			}else if(actividad.getTypeId() == 7 || actividad.getTypeId() == 9){
+				log.info("ENTRO CON "+actividad.getTypeId());
 				img.add(LearningActivityLocalServiceUtil.getExtraContentValue(actividad.getActId(), "assetEntry"));
 			}
 			
+			
+			/*else if(actividad.getTypeId() == 9){
+				img.add(LearningActivityLocalServiceUtil.getExtraContentValue(actividad.getActId(), "assetEntry"));
+			}*/
+			
+			
 				try {
-					System.out.println("actividad.getTypeId() "+actividad.getTypeId());
+					log.info("actividad.getTypeId() "+actividad.getTypeId());
 
 					for(int i=0;i<img.size();i++){
-						AssetEntry docAsset= AssetEntryLocalServiceUtil.getAssetEntry(Long.valueOf(img.get(i)));
-						DLFileEntry docfile=DLFileEntryLocalServiceUtil.getDLFileEntry(docAsset.getClassPK());
+						log.info("img "+img);
+						if(!img.get(i).startsWith("<") && !img.get(i).startsWith("http")){
+							AssetEntry docAsset= AssetEntryLocalServiceUtil.getAssetEntry(Long.valueOf(img.get(i)));
+							if(!docAsset.getMimeType().equals("text/plain") && actividad.getTypeId() != 9){
+								
+							DLFileEntry docfile=DLFileEntryLocalServiceUtil.getDLFileEntry(docAsset.getClassPK());
+							
+								
+							String extension = "";
+							if(!docfile.getTitle().contains(".") && docfile.getExtension().equals("")){
+								if(docfile.getMimeType().equals("image/jpeg")){
+									extension= ".jpg";
+								}else if(docfile.getMimeType().equals("image/png")){
+									extension= ".png";
+								}else if(docfile.getMimeType().equals("video/mpeg")){
+									extension= ".mpeg";
+								}else if(docfile.getMimeType().equals("application/pdf")){
+									extension= ".pdf";
+								}else{
+									String ext[] = extension.split("/");
+									if(ext.length>1){
+										extension = ext[1];
+									}
+								}
+							}else if(!docfile.getTitle().contains(".") && !docfile.getExtension().equals("")){
+								extension="."+docfile.getExtension();
+							}
+
+							String pathqu = getEntryPath(context, docfile);
+							String pathFile = getFilePath(context, docfile,actividad.getActId());
+							Element entryElementfe= entryElementLoc.addElement("dlfileentry");
+							entryElementfe.addAttribute("path", pathqu);
+							entryElementfe.addAttribute("file", pathFile+containsCharUpper(docfile.getTitle()+extension));
+							context.addZipEntry(pathqu, docfile);
+
+							//Guardar el fichero en el zip.
+							InputStream input = DLFileEntryLocalServiceUtil.getFileAsStream(docfile.getUserId(), docfile.getFileEntryId(), docfile.getVersion());
+
+							context.addZipEntry(getFilePath(context, docfile,actividad.getActId())+containsCharUpper(docfile.getTitle()+extension), input);
+							
+							String txt = (actividad.getTypeId() == 2) ? "external":"internal";
+							log.info("    - Resource "+ txt + ": " + containsCharUpper(docfile.getTitle()+extension));
 						
 							
-						String extension = "";
-						if(!docfile.getTitle().contains(".") && docfile.getExtension().equals("")){
-							if(docfile.getMimeType().equals("image/jpeg")){
-								extension= ".jpg";
-							}else if(docfile.getMimeType().equals("image/png")){
-								extension= ".png";
-							}else if(docfile.getMimeType().equals("video/mpeg")){
-								extension= ".mpeg";
-							}else if(docfile.getMimeType().equals("application/pdf")){
-								extension= ".pdf";
+							
 							}else{
-								String ext[] = extension.split("/");
-								if(ext.length>1){
-									extension = ext[1];
+								if(actividad.getTypeId() == 9){
+									
+									log.info("***************************************************************************************");
+									
+									log.info("PASO POR AQUI PARA "+actividad.getTitle());
+									
+//									String portalBaseDir = PropsUtil.get("liferay.home")+"/data/scormszip";
+//									
+//									String zipFileName = StringPool.SLASH+docAsset.getClassUuid()+".zip";
+//									
+//									String scormZipFilePath = portalBaseDir+StringPool.SLASH+docAsset.getCompanyId()+StringPool.SLASH+
+//											 				   docAsset.getGroupId()+StringPool.SLASH+docAsset.getClassUuid()+zipFileName;
+//									
+//									log.info("RUTA DEL ZIP DE SCORM "+scormZipFilePath);
+//									
+//									log.info("***************************************************************************************");
+//											 
+//									InputStream input = new FileInputStream(new File(scormZipFilePath));
+//									
+//									context.addZipEntry(getFilePath(context, null ,actividad.getActId())+containsCharUpper(zipFileName), input);
+									
+									if(docAsset.getClassName().equals(SCORMContent.class.getName())){
+										try{
+											ScormDataHandlerImpl scormHandler = new ScormDataHandlerImpl();
+											SCORMContent scocontent = SCORMContentLocalServiceUtil.getSCORMContent(docAsset.getClassPK());
+											scormHandler.exportEntry(context, entryElementLoc, scocontent);
+										}catch(Exception e){
+											e.printStackTrace();
+											actividad.setExtracontent("");
+										}
+									} else{
+										log.info("MPC CONTENT");
+										actividad.setExtracontent("");
+									}
+									
 								}
 							}
-						}else if(!docfile.getTitle().contains(".") && !docfile.getExtension().equals("")){
-							extension="."+docfile.getExtension();
 						}
-
-						String pathqu = getEntryPath(context, docfile);
-						String pathFile = getFilePath(context, docfile,actividad.getActId());
-						Element entryElementfe= entryElementLoc.addElement("dlfileentry");
-						entryElementfe.addAttribute("path", pathqu);
-						entryElementfe.addAttribute("file", pathFile+containsCharUpper(docfile.getTitle()+extension));
-						context.addZipEntry(pathqu, docfile);
-
-						//Guardar el fichero en el zip.
-						InputStream input = DLFileEntryLocalServiceUtil.getFileAsStream(docfile.getUserId(), docfile.getFileEntryId(), docfile.getVersion());
-
-						context.addZipEntry(getFilePath(context, docfile,actividad.getActId())+containsCharUpper(docfile.getTitle()+extension), input);
-						
-						String txt = (actividad.getTypeId() == 2) ? "external":"internal";
-						System.out.println("    - Resource "+ txt + ": " + containsCharUpper(docfile.getTitle()+extension));
 					}
 					
 
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
-					System.out.println("* ERROR! resource file: " + e.getMessage());
+					log.info("* ERROR! resource file: " + e.getMessage());
 				}
 			
 		}
@@ -318,9 +405,9 @@ private void exportEntry(PortletDataContext context, Element root, Module entry)
 			entryElementq.addAttribute("path", pathqu);
 			context.addZipEntry(pathqu, question);
 			
-			System.out.println("      Test Question: " + question.getQuestionId() /*Jsoup.parse(nuevaQuestion.getText()).text()*/);
+			log.info("      Test Question: " + question.getQuestionId() /*Jsoup.parse(nuevaQuestion.getText()).text()*/);
 			
-			System.out.println("question.getText():\n" + question.getText());
+			log.info("question.getText():\n" + question.getText());
 			//Exportar los ficheros que tiene la descripcion de la pregunta
 			descriptionFileParserDescriptionToLar("<root><Description>"+question.getText()+"</Description></root>", actividad.getGroupId(), actividad.getModuleId(), context, entryElementq);	
 			
@@ -351,7 +438,7 @@ private String getFileToIS(PortletDataContext context, long entryId, long module
 	} catch (Exception e) {
 		// TODO Auto-generated catch block
 		//e.printStackTrace();
-		System.out.println("* ERROR! getFileToIS: " + e.getMessage());
+		log.info("* ERROR! getFileToIS: " + e.getMessage());
 	}	
 	
 	return "";
@@ -449,9 +536,9 @@ protected String getEntryPath(PortletDataContext context, Module entry) {
 @Override
 protected PortletPreferences doImportData(PortletDataContext context, String portletId, PortletPreferences preferences, String data) throws Exception {
 	
-	context.importPermissions("com.liferay.lms.model.module", context.getSourceGroupId(),context.getScopeGroupId());
 	
-	System.out.println("\n-----------------------------\ndoImport1Data STARTS12");
+	context.importPermissions("com.liferay.lms.model.module", context.getSourceGroupId(),context.getScopeGroupId());
+	log.info("\n-----------------------------\ndoImport1Data STARTS12");
 	
 	
 	Document document = SAXReaderUtil.read(data);
@@ -462,36 +549,26 @@ protected PortletPreferences doImportData(PortletDataContext context, String por
 		String path = entryElement.attributeValue("path");
 		Group group = GroupLocalServiceUtil.getGroup(context.getScopeGroupId());
 		
-
 		if (!context.isPathNotProcessed(path)) {
 			continue;
 		}
 		Module entry = (Module)context.getZipEntryAsObject(path);
-
-		System.out.println("\n  Module: " + entry.getTitle(Locale.getDefault()) );
-		System.out.println("\n  getModuleId: " + entry.getModuleId() );
-		
 		
 		if(!entryOld.equalsIgnoreCase(String.valueOf(entry.getModuleId())))
-		{
-		
-			System.out.println("entraaaaa el modulo "+entry.getModuleId());
-			System.out.println("entraaaaa el entryOld "+entryOld);
+		{ 
 			entryOld=String.valueOf(entry.getModuleId());
 			importEntry(context,entryElement, entry);
 		} else{
-			System.out.println("repetidooooo el modulo "+entry.getModuleId());
-
-		}
-		
+			log.info("repetidooooo el modulo "+entry.getModuleId());
+		}	
 	}
 	
-	System.out.println("doImportData ENDS" + "\n-----------------------------\n"  );
+	log.info("doImportData ENDS" + "\n-----------------------------\n"  );
 	
 	return null;
 }
 
-private void importEntry(PortletDataContext context, Element entryElement, Module entry) throws SystemException, PortalException {
+private void importEntry(PortletDataContext context, Element entryElement, Module entry) throws SystemException, PortalException, DocumentException {
 	
 	long userId = context.getUserId(entry.getUserUuid());
 	
@@ -508,16 +585,21 @@ private void importEntry(PortletDataContext context, Element entryElement, Modul
 	entry.setDescription(entry.getDescription().replace("&amp;lt;", "&lt;"));
 	//entry.setDescription(parseFilesFromDescription(entry.getDescription().replace("&amp;lt;", "&lt;"), entryElement.elements("descriptionfile"), userId, context, serviceContext));
 	
-	System.out.println("entry.setGroupId" +entry.getGroupId()  );
-	System.out.println("entry.setGroupId" +entry.getUserId()  );
-	System.out.println("entry.setGroupId" +entry.getModuleId()  );
-	System.out.println("entry.setGroupId" +entry.getTitle()  );
+//	log.info("entry.setGroupId" +entry.getGroupId()  );
+//	log.info("entry.setGroupId" +entry.getUserId()  );
+//	log.info("entry.setGroupId" +entry.getModuleId()  );
+//	log.info("entry.setGroupId" +entry.getTitle()  );
+	
+	
+	log.info("ENTRY ELEMENT-->"+entryElement);
 	
 	
 	Module theModule=ModuleLocalServiceUtil.addmodule(entry);
 	
 	//Importar imagenes del modulo.
 	if(entryElement.attributeValue("file") != null){
+		
+		log.info("entryElement value file-->"+entryElement.attributeValue("file"));
 	
 		String name[] = entryElement.attributeValue("file").split("/");
 		String imageName = "module.jpg";
@@ -536,6 +618,8 @@ private void importEntry(PortletDataContext context, Element entryElement, Modul
 			}
 			
 			InputStream input = context.getZipEntryAsInputStream(entryElement.attributeValue("file"));
+			
+			//log.info("FILE!!!!!!!!!!!-->"+entryElement.attributeValue("file"));
 			
 			if(input != null){
 			
@@ -559,7 +643,7 @@ private void importEntry(PortletDataContext context, Element entryElement, Modul
 			
 		} catch (Exception e) {
 			e.printStackTrace();
-			System.out.println("* ERROR! module file: " + e.getCause().toString());
+			log.info("* ERROR! module file: " + e.getCause().toString());
 		}
 		
 	}
@@ -567,9 +651,6 @@ private void importEntry(PortletDataContext context, Element entryElement, Modul
 	for (Element actElement : entryElement.elements("descriptionfile")) {
 		
 		FileEntry oldFile = (FileEntry)context.getZipEntryAsObject(actElement.attributeValue("path"));
-		
-		
-								
 		FileEntry newFile;
 		long folderId=0;
 		String description = "";
@@ -580,8 +661,7 @@ private void importEntry(PortletDataContext context, Element entryElement, Modul
 			if(!oldFile.getTitle().endsWith(oldFile.getExtension())){
 				titleFile=oldFile.getTitle()+"."+oldFile.getExtension();
 			}
-		
-			
+
 			InputStream input = context.getZipEntryAsInputStream(actElement.attributeValue("file"));
 			
 			long repositoryId = DLFolderConstants.getDataRepositoryId(context.getScopeGroupId(), DLFolderConstants.DEFAULT_PARENT_FOLDER_ID);
@@ -597,7 +677,7 @@ private void importEntry(PortletDataContext context, Element entryElement, Modul
 			if(!ficheroExtStr.endsWith(oldFile.getExtension())){
 				ficheroExtStr="."+oldFile.getExtension();
 				ficheroStr=ficheroStr+"."+oldFile.getExtension();
-				}
+			}
 						
 			newFile = DLAppLocalServiceUtil.addFileEntry(userId, repositoryId , folderId , ficheroExtStr, oldFile.getMimeType(), titleFile, StringPool.BLANK, StringPool.BLANK, IOUtils.toByteArray(input), serviceContext );
 				
@@ -623,33 +703,25 @@ private void importEntry(PortletDataContext context, Element entryElement, Modul
 			
 			
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 		//	e.printStackTrace();
-			System.out.println("*2 ERROR! descriptionfile: " + e.getMessage());
+			log.info("*2 ERROR! descriptionfile: " + e.getMessage());
 		}
 
 		theModule.setDescription(description);
-		
 		ModuleLocalServiceUtil.updateModule(theModule);
-
 	}
 	
 	LearningActivityTypeRegistry learningActivityTypeRegistry = new LearningActivityTypeRegistry();
 	
 	for (Element actElement : entryElement.elements("learningactivity")) {
 		
-		//System.out.println("  Element : " + actElement.getPath() );
-		
 		String path = actElement.attributeValue("path");
-
 		LearningActivity larn=(LearningActivity)context.getZipEntryAsObject(path);
 		
 		if(larn == null){
-			System.out.println("    ERROR! LearningActivity, path: " + path);
+			log.info("    ERROR! LearningActivity, path: " + path);
 			continue;
 		}
-		
-		System.out.println("    Learning Activity: " + larn.getTitle(Locale.getDefault()) + " (" + LanguageUtil.get(Locale.getDefault(),learningActivityTypeRegistry.getLearningActivityType(larn.getTypeId()).getName())+")" );
 		
 		serviceContext.setAssetCategoryIds(context.getAssetCategoryIds(LearningActivity.class, larn.getActId()));
 		serviceContext.setAssetTagNames(context.getAssetTagNames(LearningActivity.class, larn.getActId()));
@@ -657,11 +729,234 @@ private void importEntry(PortletDataContext context, Element entryElement, Modul
 		serviceContext.setCompanyId(context.getCompanyId());
 		serviceContext.setScopeGroupId(context.getScopeGroupId());
 		
-		larn.setGroupId(context.getScopeGroupId());
+		larn.setGroupId(theModule.getGroupId());
 		larn.setModuleId(theModule.getModuleId());
 
 		LearningActivity nuevaLarn=LearningActivityLocalServiceUtil.addLearningActivity(larn,serviceContext);
+		serviceContext.setScopeGroupId(nuevaLarn.getGroupId());
 		
+		//Cambios Miguel para importar bien los ficheros asociados a recursos externos.
+		HashMap<String, String> map = LearningActivityLocalServiceUtil.convertXMLExtraContentToHashMap(nuevaLarn.getActId());
+		Iterator <String> keysString =  map.keySet().iterator();
+		int index = 0;
+		while (keysString.hasNext()){
+			String key = keysString.next();
+			log.info("KEY: "+key);
+			
+			if(!key.equals("video") && key.indexOf("document")!=-1){
+				
+				log.info("PASADO POR AQUI "+index);
+				index++;
+				long assetEntryIdOld =  Long.parseLong(map.get(key));
+				
+				AssetEntry docAssetOLD= AssetEntryLocalServiceUtil.getAssetEntry(assetEntryIdOld);
+				DLFileEntry oldFile=DLFileEntryLocalServiceUtil.getDLFileEntry(docAssetOLD.getClassPK());
+				
+				InputStream inputStream = DLFileEntryLocalServiceUtil.getFileAsStream(userId, oldFile.getFileVersion().getFileEntryId(), oldFile.getFileVersion().getVersion());
+				byte[] byteArray = null;
+				try {
+					byteArray = IOUtils.toByteArray(inputStream);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+				long repositoryId = DLFolderConstants.getDataRepositoryId(theModule.getGroupId(), DLFolderConstants.DEFAULT_PARENT_FOLDER_ID);
+					
+				long dlMainFolderId = 0;
+				boolean dlMainFolderFound = false;
+				
+				//Get main folder
+				try {
+					//Get main folder
+				    Folder dlFolderMain = DLAppLocalServiceUtil.getFolder(repositoryId,DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,DOCUMENTLIBRARY_MAINFOLDER+nuevaLarn.getActId());
+				    dlMainFolderId = dlFolderMain.getFolderId();
+				    dlMainFolderFound = true;
+
+				//Get portlet folder
+				} catch (Exception ex){}
+				        
+				//Damos permisos al archivo para usuarios de comunidad.
+				serviceContext.setAddGroupPermissions(true);
+				      
+				//Create main folder if not exist
+				if(!dlMainFolderFound){
+					Folder newDocumentMainFolder = DLAppLocalServiceUtil.addFolder(userId, repositoryId,DLFolderConstants.DEFAULT_PARENT_FOLDER_ID, DOCUMENTLIBRARY_MAINFOLDER+nuevaLarn.getActId(), DOCUMENTLIBRARY_MAINFOLDER+nuevaLarn.getActId(), serviceContext);
+				    dlMainFolderFound = true;
+				    dlMainFolderId = newDocumentMainFolder.getFolderId();
+				}
+					
+				String ficheroExtStr = "";
+				String extension[] = oldFile.getTitle().split("\\.");
+				if(extension.length > 0){
+					ficheroExtStr = "."+extension[extension.length-1];
+				}
+				
+				FileEntry newFile = DLAppLocalServiceUtil.addFileEntry( userId, repositoryId, dlMainFolderId,
+																		oldFile.getTitle() + ficheroExtStr,
+																		oldFile.getMimeType(), oldFile.getTitle(),
+																		StringPool.BLANK, StringPool.BLANK, byteArray,
+																		serviceContext);
+					
+				map.put(key,
+						String.valueOf(AssetEntryLocalServiceUtil.getEntry(
+									DLFileEntry.class.getName(),
+									newFile.getPrimaryKey()).getEntryId()));
+					
+				Role siteMemberRole = RoleLocalServiceUtil.getRole(context.getCompanyId(), RoleConstants.SITE_MEMBER);
+				ResourcePermissionLocalServiceUtil.setResourcePermissions (	context.getCompanyId(),
+																			LearningActivity.class.getName(),
+																			ResourceConstants.SCOPE_INDIVIDUAL,
+																			Long.toString(nuevaLarn.getActId()),
+																			siteMemberRole.getRoleId(),
+																			new String[] { ActionKeys.VIEW });
+			}
+				
+			//Ponemos a la actividad el fichero que hemos recuperado.
+					
+			if(larn.getTypeId() == 2){
+					
+			LearningActivityLocalServiceUtil.saveHashMapToXMLExtraContent(nuevaLarn.getActId(), map);
+			//LearningActivityLocalServiceUtil.updateLearningActivity(nuevaLarn);
+			//log.info("AL FINAL QUEDA ASI: "+nuevaLarn.getExtracontent());
+				
+			}else if(larn.getTypeId() == 7){
+				//LearningActivityLocalServiceUtil.setExtraContentValue(nuevaLarn.getActId(), "assetEntry", String.valueOf(asset.getEntryId()));
+			}
+			
+		}
+		
+		//Comprobamos si es un Recurso SCORM (Type=9) para guardarlo
+		if(larn.getTypeId() == 9){
+			context.importPermissions("com.liferay.lms.model.SCORMContent",  context.getSourceGroupId(),    context.getScopeGroupId());
+			
+			ScormDataHandlerImpl scormHandler = new ScormDataHandlerImpl();
+			Element scormEntry = actElement.element("scormentry");
+			
+			if(scormEntry!=null){
+				String scormPath = scormEntry.attributeValue("path");
+				
+				SCORMContent scocontentOld = (SCORMContent) context.getZipEntryAsObject(scormPath);
+				
+				
+				InputStream is = context.getZipEntryAsInputStream(scormEntry.attributeValue("file"));
+				try {
+					
+					
+					
+					byte[] dataFileScorm = IOUtils.toByteArray(is);
+					File scormfile = new File(System.getProperty("java.io.tmpdir")+ "/scorms/" + scocontentOld.getUuid() + ".zip");
+					FileUtils.writeByteArrayToFile(scormfile, dataFileScorm);
+					
+					log.info("AQUI");
+					
+					//SCORMContentPersistenceImpl scormContentPersistence = new SCORMContentPersistenceImpl();
+					SCORMContentPersistence _persistence = (SCORMContentPersistence)PortletBeanLocatorUtil.locate(com.liferay.lms.service.ClpSerializer.getServletContextName(),
+							SCORMContentPersistence.class.getName());
+					
+					SCORMContent scocontent = _persistence.create(CounterLocalServiceUtil.increment( SCORMContent.class.getName()));
+						scocontent.setCompanyId(serviceContext.getCompanyId());
+						String uuid = serviceContext.getUuid();
+						if (Validator.isNotNull(uuid)) {
+							scocontent.setUuid(uuid);
+						}
+						scocontent.setGroupId(serviceContext.getScopeGroupId());
+						scocontent.setUserId(userId);
+						scocontent.setDescription(scocontentOld.getDescription());
+						scocontent.setTitle(scocontentOld.getTitle());
+						scocontent.setCiphered(scocontentOld.getCiphered());
+						scocontent.setStatus(WorkflowConstants.STATUS_APPROVED);
+						scocontent.setExpandoBridgeAttributes(serviceContext);
+						_persistence.update(scocontent, true);
+						String dirScorm=getDirScormPath(scocontent);
+						File dir=new File(dirScorm);
+						String dirScormZip=getDirScormzipPath(scocontent);
+						File dirZip=new File(dirScormZip);
+						
+						FileUtils.forceMkdir(dir);
+						FileUtils.forceMkdir(dirZip);
+						File scormFileZip=new File(dirZip.getAbsolutePath()+"/"+scocontent.getUuid()+".zip");
+						FileUtils.copyFile(scormfile, scormFileZip);
+						try {
+							ZipFile zipFile= new ZipFile(scormfile);
+							zipFile.extractAll(dir.getCanonicalPath());
+							File manifestfile=new File(dir.getCanonicalPath()+"/imsmanifest.xml");
+							try {
+								Document imsdocument=SAXReaderUtil.read(manifestfile);
+								Element item=imsdocument.getRootElement().element("organizations").elements("organization").get(0).elements("item").get(0);
+								String resourceid=item.attributeValue("identifierref");
+								java.util.List<Element> resources=imsdocument.getRootElement().element("resources").elements("resource");
+								for(Element resource:resources)
+								{
+									if(resource.attributeValue("identifier").equals(resourceid))
+									{
+										scocontent.setIndex(resource.attributeValue("href"));
+										_persistence.update(scocontent, true);
+									}
+								}
+							} catch (DocumentException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+						} catch (ZipException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
+					
+							if (serviceContext.isAddGroupPermissions() ||
+									serviceContext.isAddGuestPermissions()) {
+								ResourceLocalServiceUtil.addResources(
+										serviceContext.getCompanyId(), serviceContext.getScopeGroupId(), userId,
+										SCORMContent.class.getName(), scocontent.getPrimaryKey(), false,
+									serviceContext.isAddGroupPermissions(),
+									serviceContext.isAddGuestPermissions());			
+								}
+								else {
+									
+									ResourceLocalServiceUtil.addModelResources(
+											serviceContext.getCompanyId(), serviceContext.getScopeGroupId(), userId,
+											SCORMContent.class.getName(), scocontent.getPrimaryKey(),
+									serviceContext.getGroupPermissions(),
+									serviceContext.getGuestPermissions());
+									
+									
+								}
+						
+						AssetEntry assentry = AssetEntryLocalServiceUtil.updateEntry(
+								userId, scocontent.getGroupId(), SCORMContent.class.getName(),
+								scocontent.getScormId(), scocontent.getUuid(),0, serviceContext.getAssetCategoryIds(),
+								serviceContext.getAssetTagNames(), true, null, null,
+								new java.util.Date(System.currentTimeMillis()), null,
+								ContentTypes.TEXT_HTML, scocontent.getTitle(),null,  HtmlUtil.extractText(scocontent.getDescription()), 
+								getUrlManifest(scocontent), 
+								null, 0, 0, null, false);
+						
+						
+						log.info("Assentry "+assentry);
+								
+						Indexer indexer = IndexerRegistryUtil.nullSafeGetIndexer(SCORMContent.class);
+
+						indexer.reindex(scocontent);
+						LearningActivityLocalServiceUtil.setExtraContentValue(nuevaLarn.getActId(), "assetEntry", assentry.getEntryId()+"");
+						
+				} catch (IOException e) {
+					e.printStackTrace();
+				} catch(Exception e){
+					e.printStackTrace();
+				}finally {
+					try {
+						if (is != null) {
+							is.close();
+						}
+					} catch (IOException e1) {
+						e1.printStackTrace();
+					}
+				}
+			}
+		}
+		
+		
+		// FIN CAMBIO MIGUEL
 		//Importar las imagenes de los resources.
 		
 		Iterator<Element> it = actElement.elementIterator("dlfileentry");
@@ -679,20 +974,17 @@ private void importEntry(PortletDataContext context, Element entryElement, Modul
 			
 			String messageException = "";
 			try {
-				//System.out.println("   dlfileentry path: "+actElement.element("dlfileentry").attributeValue("path"));
 				
 				//Crear el folder
 				dlFolder = createDLFoldersForLearningActivity(userId, context.getScopeGroupId(), nuevaLarn.getActId(), nuevaLarn.getTitle(Locale.getDefault()), serviceContext);
-				//System.out.println("    DLFolder dlFolder: "+dlFolder.getFolderId()+", title: "+dlFolder.getName());
 				
 				//Recuperar el fichero del xml.
 				//InputStream is = context.getZipEntryAsInputStream(actElement.element("dlfileentry").attributeValue("file"));
-				//System.out.println("    InputStream file: "+is.toString());
 				byte [] byteArray = context.getZipEntryAsByteArray(theElement.element("dlfileentry").attributeValue("file"));
 					
 				//Obtener los datos del dlfileentry del .lar para poner sus campos igual. 
 				oldFile = (DLFileEntry) context.getZipEntryAsObject(theElement.element("dlfileentry").attributeValue("path"));
-				//System.out.println("    DLFileEntry file: "+oldFile.getTitle()+",getFileEntryId "+oldFile.getFileEntryId()+",getFolderId "+oldFile.getFolderId()+",getGroupId "+oldFile.getGroupId());
+				log.info("    DLFileEntry file: "+oldFile.getTitle()+",getFileEntryId "+oldFile.getFileEntryId()+",getFolderId "+oldFile.getFolderId()+",getGroupId "+oldFile.getGroupId());
 				
 				messageException = "\n      - oldFile title: "+oldFile.getTitle()+ ", extension: "+oldFile.getExtension()+ ", mimetype: "+oldFile.getMimeType()+ ", size: "+oldFile.getSize()+" - ";		
 
@@ -711,12 +1003,13 @@ private void importEntry(PortletDataContext context, Element entryElement, Modul
 				messageException += "\n      - newFile title: "+newFile.getTitle()+ ", extension: "+newFile.getExtension()+ ", extension: "+newFile.getFolderId()+ ", size: "+newFile.getSize()+" - ";
 				
 				asset = AssetEntryLocalServiceUtil.getEntry(DLFileEntry.class.getName(), newFile.getPrimaryKey());
-				System.out.println("      DLFileEntry newFile: "+newFile.getTitle()+", newFile PrimaryKey: "+newFile.getPrimaryKey()+", EntryId: "+asset.getEntryId());
+				log.info("      DLFileEntry newFile: "+newFile.getTitle()+", newFile PrimaryKey: "+newFile.getPrimaryKey()+", EntryId: "+asset.getEntryId());
 				
 				
 				//Ponemos a la actividad el fichero que hemos recuperado.
-				//System.out.println("    Extracontent : \n"+nuevaLarn.getExtracontent());
+				log.info("    Extracontent : \n"+nuevaLarn.getExtracontent());
 				if(larn.getTypeId() == 2){
+					log.info("TIPO EXTERNO");
 					LearningActivityLocalServiceUtil.setExtraContentValue(nuevaLarn.getActId(), "document", String.valueOf(asset.getEntryId()));
 				}else if(larn.getTypeId() == 7){
 					LearningActivityLocalServiceUtil.setExtraContentValue(nuevaLarn.getActId(), "assetEntry", String.valueOf(asset.getEntryId()));
@@ -727,16 +1020,16 @@ private void importEntry(PortletDataContext context, Element entryElement, Modul
 				
 			}catch(FileExtensionException fee){
 				fee.printStackTrace();
-				System.out.println("*ERROR! dlfileentry path FileExtensionException:" + actElement.element("dlfileentry").attributeValue("path")+", "+messageException +", message: "+fee.getMessage());
+				log.info("*ERROR! dlfileentry path FileExtensionException:" + actElement.element("dlfileentry").attributeValue("path")+", "+messageException +", message: "+fee.getMessage());
 			}catch(FileSizeException fse){
-				System.out.println("*ERROR! dlfileentry path FileSizeException:" + actElement.element("dlfileentry").attributeValue("path")+messageException +", message: "+ fse.getMessage());
+				log.info("*ERROR! dlfileentry path FileSizeException:" + actElement.element("dlfileentry").attributeValue("path")+messageException +", message: "+ fse.getMessage());
 			} catch(DuplicateFileException dfl){
 				newFile = DLAppLocalServiceUtil.getFileEntry(context.getScopeGroupId(), dlFolder.getFolderId(), oldFile.getTitle());
-				System.out.println("*ERROR! dlfileentry path DuplicateFileException:" + actElement.element("dlfileentry").attributeValue("path")+messageException +", message: "+ dfl.getMessage());
+				log.info("*ERROR! dlfileentry path DuplicateFileException:" + actElement.element("dlfileentry").attributeValue("path")+messageException +", message: "+ dfl.getMessage());
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-				System.out.println("*ERROR! dlfileentry path: " + actElement.element("dlfileentry").attributeValue("path")+messageException +", message: "+e.getMessage());
+				log.info("*ERROR! dlfileentry path: " + actElement.element("dlfileentry").attributeValue("path")+messageException +", message: "+e.getMessage());
 			}
 
 		}
@@ -747,7 +1040,7 @@ private void importEntry(PortletDataContext context, Element entryElement, Modul
 			
 			FileEntry oldFile = (FileEntry)context.getZipEntryAsObject(actElementFile.attributeValue("path"));
 			
-			System.out.println("*  Description File: " + oldFile.getTitle()); 
+			log.info("*  Description File: " + oldFile.getTitle()); 
 									
 			FileEntry newFile;
 			long folderId=0;
@@ -767,8 +1060,8 @@ private void importEntry(PortletDataContext context, Element entryElement, Modul
 					ficheroExtStr = "."+extension[extension.length-1];
 				}
 				
-				System.out.println("*   getMimeType getMimeType: " + oldFile.getMimeType()); 
-				System.out.println("*   getExtension getExtension: " + oldFile.getExtension()); 
+				log.info("*   getMimeType getMimeType: " + oldFile.getMimeType()); 
+				log.info("*   getExtension getExtension: " + oldFile.getExtension()); 
 				
 			
 				
@@ -777,7 +1070,7 @@ private void importEntry(PortletDataContext context, Element entryElement, Modul
 					titleFile=oldFile.getTitle()+"."+oldFile.getExtension();
 				} 
 				
-				System.out.println("*   titleFile titleFile: " + titleFile); 
+				log.info("*   titleFile titleFile: " + titleFile); 
 				newFile = DLAppLocalServiceUtil.addFileEntry(userId, repositoryId , folderId , titleFile, oldFile.getMimeType(), oldFile.getTitle(), StringPool.BLANK, StringPool.BLANK, IOUtils.toByteArray(input), serviceContext );
 									
 				description = descriptionFileParserLarToDescription(nuevaLarn.getDescription(), oldFile, newFile);
@@ -790,17 +1083,17 @@ private void importEntry(PortletDataContext context, Element entryElement, Modul
 					FileEntry existingFile = DLAppLocalServiceUtil.getFileEntry(context.getScopeGroupId(), folderId, oldFile.getTitle());
 					description = descriptionFileParserLarToDescription(nuevaLarn.getDescription(), oldFile, existingFile);
 				}catch(Exception e){
-					System.out.println("ERROR! descriptionfile descriptionFileParserLarToDescription : " +e.getMessage());
+					log.info("ERROR! descriptionfile descriptionFileParserLarToDescription : " +e.getMessage());
 					description = nuevaLarn.getDescription();
 				}
 			} catch (PortletDataException e1){
-				System.out.println("ERROR! descriptionfile: ");
+				log.info("ERROR! descriptionfile: ");
 				
 			} catch (Exception e) {
 
 				// TODO Auto-generated catch block
 				//e.printStackTrace();
-				System.out.println("ERROR! descriptionfile: " + actElementFile.attributeValue("file") +"\n        "+e.getMessage());
+				log.info("ERROR! descriptionfile: " + actElementFile.attributeValue("file") +"\n        "+e.getMessage());
 			}
 
 			nuevaLarn.setDescription(description);
@@ -816,7 +1109,7 @@ private void importEntry(PortletDataContext context, Element entryElement, Modul
 			question.setActId(nuevaLarn.getActId());
 			TestQuestion nuevaQuestion=TestQuestionLocalServiceUtil.addQuestion(question.getActId(), question.getText(), question.getQuestionType());
 			
-			System.out.println("      Test Question: " + nuevaQuestion.getQuestionId() /*Jsoup.parse(nuevaQuestion.getText()).text()*/);
+			log.info("      Test Question: " + nuevaQuestion.getQuestionId() /*Jsoup.parse(nuevaQuestion.getText()).text()*/);
 			
 			//Si tenemos ficheros en las descripciones de las preguntas.
 			for (Element actElementFile : qElement.elements("descriptionfile")) {
@@ -854,9 +1147,9 @@ private void importEntry(PortletDataContext context, Element entryElement, Modul
 
 					// TODO Auto-generated catch block
 					//e.printStackTrace();
-					System.out.println("* ERROR! Question descriptionfile: " + e.getMessage());
+					log.info("* ERROR! Question descriptionfile: " + e.getMessage());
 				}
-				//System.out.println("   description : " + description );
+				//log.info("   description : " + description );
 				nuevaQuestion.setText(description);
 				TestQuestionLocalServiceUtil.updateTestQuestion(nuevaQuestion);
 				
@@ -904,7 +1197,7 @@ private void importEntry(PortletDataContext context, Element entryElement, Modul
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			//e.printStackTrace();
-			System.out.println("* ERROR! createDLFoldersForLearningActivity: " + e.getMessage());
+			log.info("* ERROR! createDLFoldersForLearningActivity: " + e.getMessage());
 		}
 		
     	return newDLFolder;
@@ -986,12 +1279,12 @@ private void importEntry(PortletDataContext context, Element entryElement, Modul
 								entryElementLoc.addAttribute("path", pathqu);
 								entryElementLoc.addAttribute("file", pathFile + file.getTitle());
 								
-								System.out.println("   + Description file image : " + file.getTitle() +" ("+file.getMimeType()+")");
+								log.info("   + Description file image : " + file.getTitle() +" ("+file.getMimeType()+")");
 								
 							} catch (Exception e) {
 								// TODO Auto-generated catch block
 								//e.printStackTrace();
-								System.out.println("* ERROR! Description file image : " + e.getMessage());
+								log.info("* ERROR! Description file image : " + e.getMessage());
 							}
 						}
 					}
@@ -1034,17 +1327,10 @@ private void importEntry(PortletDataContext context, Element entryElement, Modul
 								Element entryElementLoc= element.addElement("descriptionfile");
 								entryElementLoc.addAttribute("path", pathqu);
 								entryElementLoc.addAttribute("file", pathFile + file.getTitle());
-								
-								//System.out.println("titleFile =============="+titleFile);
-								//System.out.println("getMimeType =============="+file.getMimeType());
-								//System.out.println("file.getExtension =============="+file.getExtension());
-							
-								
-									
 							} catch (Exception e) {
 								// TODO Auto-generated catch block
 								//e.printStackTrace();
-								System.out.println("* ERROR! Description file pdf : " + e.getMessage());
+								log.info("* ERROR! Description file pdf : " + e.getMessage());
 							}
 						}
 						
@@ -1060,7 +1346,7 @@ private void importEntry(PortletDataContext context, Element entryElement, Modul
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			//e.printStackTrace();
-			System.out.println("* ERROR! Document Exception : " + e.getMessage());
+			log.info("* ERROR! Document Exception : " + e.getMessage());
 		}
 
 	}
@@ -1096,12 +1382,12 @@ private void importEntry(PortletDataContext context, Element entryElement, Modul
 				entryElementLoc.addAttribute("path", pathqu);
 				entryElementLoc.addAttribute("file", pathFile + file.getTitle());
 				
-				System.out.println("   + Description file image : " + file.getTitle() +" ("+file.getMimeType()+")");
+				log.info("   + Description file image : " + file.getTitle() +" ("+file.getMimeType()+")");
 				
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-				System.out.println("* ERROR! Description file image : " + e.getMessage());
+				log.info("* ERROR! Description file image : " + e.getMessage());
 			}
 		}
 		
@@ -1124,16 +1410,15 @@ private void importEntry(PortletDataContext context, Element entryElement, Modul
 
 		res = description.replace(target, replacement);
 		
-		//System.out.println("   res         : " + res );
 		if(res.equals(description)){
-			System.out.println("   :: description         : " + description );
-			//System.out.println("   :: target      : " + target );	
-			//System.out.println("   :: replacement : " + replacement );
+			log.info("   :: description         : " + description );
+			//log.info("   :: target      : " + target );	
+			//log.info("   :: replacement : " + replacement );
 		}
 				
 		String changed = (!res.equals(description))?" changed":" not changed";
 		
-		System.out.println("   + Description file : " + newFile.getTitle() +" (" + newFile.getMimeType() + ")" + changed);
+		log.info("   + Description file : " + newFile.getTitle() +" (" + newFile.getMimeType() + ")" + changed);
 		
 		return res;
 	}
@@ -1160,9 +1445,6 @@ private void importEntry(PortletDataContext context, Element entryElement, Modul
 		for (Element actElementFile : elements) {
 			
 			FileEntry oldFile = (FileEntry)context.getZipEntryAsObject(actElementFile.attributeValue("path"));
-			
-			//System.out.println("      Description File: " + oldFile.getTitle()); 
-
 			try {
 				
 				InputStream input = context.getZipEntryAsInputStream(actElementFile.attributeValue("file"));
@@ -1180,7 +1462,7 @@ private void importEntry(PortletDataContext context, Element entryElement, Modul
 					FileEntry existingFile = DLAppLocalServiceUtil.getFileEntry(context.getScopeGroupId(), folderId, oldFile.getTitle());
 					res = descriptionFileParserLarToDescription(description, oldFile, existingFile);
 				}catch(Exception e){
-					System.out.println("ERROR! descriptionfile descriptionFileParserLarToDescription : " +e.getMessage());
+					e.printStackTrace();
 				}
 				
 			} catch (Exception e) {
@@ -1191,5 +1473,33 @@ private void importEntry(PortletDataContext context, Element entryElement, Modul
 		return res;
 	}*/
 	
+	public String getDirScormzipPath(SCORMContent scocon)
+	{
+		String baseDir=PropsUtil.get("liferay.lms.scormzipsdir");
+		if(baseDir==null ||baseDir.equals(""))
+		{
+			baseDir=PropsUtil.get("liferay.home")+"/data/scormszip";
+		}
+		return baseDir+"/"+Long.toString(scocon.getCompanyId())+"/"+Long.toString(scocon.getGroupId())+"/"+scocon.getUuid();
+	}
+	public String getDirScormPath(SCORMContent scocon)
+	{
+		String baseDir=PropsUtil.get("liferay.lms.scormdir");
+		if(baseDir==null ||baseDir.equals(""))
+		{
+			baseDir=PropsUtil.get("liferay.home")+"/data/scorms";
+		}
+		return baseDir+"/"+Long.toString(scocon.getCompanyId())+"/"+Long.toString(scocon.getGroupId())+"/"+scocon.getUuid();
+	}
+	
+	public String getUrlManifest(SCORMContent scocontent) {
+		ServiceContext serviceContext = ServiceContextThreadLocal.getServiceContext();
+		return PortalUtil.getPortalURL(serviceContext.getRequest())+"/"+
+						ClpSerializer.getServletContextName()+
+						"/scorm/"+
+						Long.toString(scocontent.getCompanyId())+"/"+
+						Long.toString(scocontent.getGroupId())+"/"+
+						scocontent.getUuid()+"/imsmanifest.xml";
+	}
 	
 }

@@ -273,6 +273,12 @@ public class LearningActivityTryLocalServiceUtil {
 		return getService().invokeMethod(name, parameterTypes, arguments);
 	}
 
+	public static com.liferay.lms.model.LearningActivityTry softUpdateLearningActivityTry(
+		com.liferay.lms.model.LearningActivityTry learningActivityTry)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().softUpdateLearningActivityTry(learningActivityTry);
+	}
+
 	public static long getLearningActivityTryByActUserCount(long actId,
 		long userId) throws com.liferay.portal.kernel.exception.SystemException {
 		return getService().getLearningActivityTryByActUserCount(actId, userId);
@@ -288,6 +294,16 @@ public class LearningActivityTryLocalServiceUtil {
 		long actId, long userId)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService().getLearningActivityTryByActUser(actId, userId);
+	}
+
+	public static com.liferay.lms.model.LearningActivityResult updateLearningActivityTry(
+		com.liferay.lms.model.LearningActivityTry learningActivityTry,
+		java.lang.String tryResultData, java.lang.String imsmanifest)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getService()
+				   .updateLearningActivityTry(learningActivityTry,
+			tryResultData, imsmanifest);
 	}
 
 	public static com.liferay.lms.model.LearningActivityTry createLearningActivityTry(
@@ -355,6 +371,20 @@ public class LearningActivityTryLocalServiceUtil {
 		com.liferay.lms.model.LearningActivity activity)
 		throws java.lang.Exception {
 		return getService().areThereTriesNotFromEditors(activity);
+	}
+
+	public static java.util.List<com.liferay.lms.model.LearningActivityTry> getByUserId(
+		long userId) {
+		return getService().getByUserId(userId);
+	}
+
+	public static long triesPerUserOnlyStudents(long actId, long companyId,
+		long courseGropupCreatedId,
+		java.util.List<com.liferay.portal.model.User> _students, long teamId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService()
+				   .triesPerUserOnlyStudents(actId, companyId,
+			courseGropupCreatedId, _students, teamId);
 	}
 
 	public static void clearService() {

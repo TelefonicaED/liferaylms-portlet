@@ -248,9 +248,35 @@ public interface SurveyResultLocalService extends BaseLocalService,
 		throws java.lang.Throwable;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.util.List<com.liferay.lms.model.SurveyResult> getByUserId(
+		long userId);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.util.List<com.liferay.lms.model.SurveyResult> getSurveyResultByActId(
 		long actId) throws com.liferay.portal.kernel.exception.SystemException;
 
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.util.List<com.liferay.lms.model.SurveyResult> getSurveyResultsByQuestionIdActId(
+		long questionId, long actId);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public double getPercentageByQuestionIdAndAnswerId(long questionId,
+		long answerId, long total)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public long getCountByQuestionIdAndAnswerId(long questionId, long answerId)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Metodo depreciado, se utiliza una combinaciï¿½n de los dos anteriores, para evitar consultas a base de datos innecesarias dentro de bucles.
+	*
+	* @deprecated
+	* @param questionId
+	* @param answerId
+	* @return
+	* @throws SystemException
+	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public double getPercentageByQuestionIdAndAnswerId(long questionId,
 		long answerId)
@@ -259,4 +285,10 @@ public interface SurveyResultLocalService extends BaseLocalService,
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public long getTotalAnswersByQuestionId(long questionId)
 		throws com.liferay.portal.kernel.exception.SystemException;
+
+	public long countStudentsByQuestionId(long questionId, long companyId,
+		long courseGropupCreatedId);
+
+	public long countStudentsByQuestionIdAndAnswerId(long questionId,
+		long answerId, long companyId, long courseGropupCreatedId);
 }

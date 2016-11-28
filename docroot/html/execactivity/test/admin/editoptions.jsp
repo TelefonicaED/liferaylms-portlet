@@ -119,12 +119,12 @@ window.<portlet:namespace />validate_execactivity={
 		fieldStrings:
 		{
 			<portlet:namespace />random: {
-				randomRule: '<liferay-ui:message key="execActivity.options.error.random" />',
-				range: '<liferay-ui:message key="execActivity.options.error.randomquestion.number" />'
+				randomRule: Liferay.Language.get("execActivity.options.error.random"),
+				range: Liferay.Language.get("execActivity.options.error.randomquestion.number")
             },
             <portlet:namespace />questionsPerPage: {
-            	qppRule: '<liferay-ui:message key="execActivity.options.error.questionsPerPage" />',
-            	max: '<liferay-ui:message key="execActivity.options.error.questionsPerPage.max" />'
+            	qppRule: Liferay.Language.get("execActivity.options.error.questionsPerPage"),
+            	max: Liferay.Language.get("execActivity.options.error.questionsPerPage.max")
 			}
 		}	
 };
@@ -259,10 +259,53 @@ window.<portlet:namespace />validate_execactivity={
 	<aui:input type="checkbox" name="showCorrectAnswer" label="exectactivity.edit.showcorrect" checked="<%=showCorrectAnswer %>"
 		ignoreRequestValue="true" helpMessage="exectactivity.edit.showcorrect.helpMessage" onClick='<%= renderResponse.getNamespace() + "showAnswer2(event)" %>'></aui:input>
 	
-	<%if(tries>0){ %>
-		<aui:input type="checkbox" name="showCorrectAnswerOnlyOnFinalTry" label="exectactivity.edit.showcorrectonlyonfinaltry" checked="<%=showCorrectAnswerOnlyOnFinalTry %>"
+	
+	
+	<aui:script>
+	AUI().ready('node','event','aui-base',function(A) {
+		
+		var triesInput = A.one('#<portlet:namespace />tries');
+		var checkBox = A.one('#<portlet:namespace />showCorrectAnswerOnlyOnFinalTryCheckbox');
+		var numOftries =  triesInput.val();
+		if(numOftries>0){
+			checkBox.set('disabled', false);
+		}else{			
+			checkBox.set('disabled', true);
+		}
+		
+		
+		 A.one('#<portlet:namespace />tries').on('change',
+				      function(event) {
+				            
+				            var numOftries = event.target.val();
+				            if(numOftries>0){
+				    			checkBox.set('disabled', false);
+				    		}else{			
+				    			checkBox.set('disabled', true);
+				    		}
+				       });
+		 
+		 A.one('#<portlet:namespace />showCorrectAnswerCheckbox').on('change',function(event){
+			 
+			 var isShowCorrectAnswerChecked =  document.getElementById("<portlet:namespace />showCorrectAnswerCheckbox").checked;
+			 
+			 if(isShowCorrectAnswerChecked){
+				 document.getElementById("<portlet:namespace />improveCheckbox").checked = false;
+				 A.one('#<portlet:namespace />improveCheckbox').set('disabled', true);
+			 }else{
+				 A.one('#<portlet:namespace />improveCheckbox').set('disabled', false);
+			 }
+		 });
+		 
+	});
+	
+	
+	</aui:script>
+ 	
+
+	<aui:input type="checkbox" id="showCorrectAnswerOnlyOnFinalTry" name="showCorrectAnswerOnlyOnFinalTry" label="exectactivity.edit.showcorrectonlyonfinaltry" checked="<%=showCorrectAnswerOnlyOnFinalTry %>"
 		ignoreRequestValue="true" helpMessage="exectactivity.edit.showcorrectonlyonfinaltry.helpMessage" onClick='<%= renderResponse.getNamespace() + "showAnswer1(event)" %>'></aui:input>
-	<%} %>	
+	
 	
 		
 	<aui:input type="checkbox" name="improve" label="exectactivity.edit.improve" checked="<%=improve %>" disabled="<%=!edit %>" 

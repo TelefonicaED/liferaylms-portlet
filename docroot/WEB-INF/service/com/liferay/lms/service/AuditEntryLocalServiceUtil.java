@@ -308,6 +308,21 @@ public class AuditEntryLocalServiceUtil {
 			startDate, endDate, start, end);
 	}
 
+	public static java.util.List<com.liferay.lms.model.AuditEntry> findByclassName_classPK(
+		java.lang.String className, long classPK)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().findByclassName_classPK(className, classPK);
+	}
+
+	public static java.util.List<com.liferay.lms.model.AuditEntry> findByclassName_classPK_filterByActions(
+		java.lang.String className, long classPK,
+		java.util.List<java.lang.String> actions)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService()
+				   .findByclassName_classPK_filterByActions(className, classPK,
+			actions);
+	}
+
 	public static void clearService() {
 		_service = null;
 	}

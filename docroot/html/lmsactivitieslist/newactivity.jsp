@@ -23,6 +23,7 @@ AUI().ready(
 </script>
 
 <ul class="activity-list">
+<h1><liferay-ui:message key="content"></liferay-ui:message> </h1>
 <%
 	Course course=CourseLocalServiceUtil.fetchByGroupCreatedId(themeDisplay.getScopeGroupId());
 	LearningActivityTypeRegistry learningActivityTypeRegistry = new LearningActivityTypeRegistry();
@@ -33,13 +34,17 @@ AUI().ready(
 	{
 		if(learningActivityType != null && !ArrayUtil.contains(invisibleTypes, learningActivityType.getTypeId()) && 
 				(course==null && learningActivityType.allowsBank() || course!=null ) ){
-%>
+			
+			if(learningActivityType.getTypeId()==9||learningActivityType.getTypeId()==2||learningActivityType.getTypeId()==7){
+
+%>	
 	<liferay-portlet:renderURL var="newactivityURL">
 		<liferay-portlet:param name="editing" value="<%=StringPool.TRUE %>" />
 		<liferay-portlet:param name="resId" value="0" />
 		<liferay-portlet:param name="resModuleId" value="<%=ParamUtil.getString(renderRequest, \"resModuleId\") %>" />
 		<liferay-portlet:param name="type" value="<%=Long.toString(learningActivityType.getTypeId()) %>" />
 	</liferay-portlet:renderURL>
+	
 	<liferay-util:buffer var="activityMessage">
 	    <%=LanguageUtil.get(themeDisplay.getLocale(), learningActivityType.getName()) %>
 	    <span class="activity-help">
@@ -52,6 +57,39 @@ AUI().ready(
 	</li>
 <%
 		}
+			}
+	}%>
+	
+	<span class="separacion"></span><h1><liferay-ui:message key="activities"></liferay-ui:message> </h1>
+	<%for(LearningActivityType learningActivityType:learningActivityTypeRegistry.getLearningActivityTypesForCreating())
+	{
+		if(learningActivityType != null && !ArrayUtil.contains(invisibleTypes, learningActivityType.getTypeId())) {
+			
+			if(learningActivityType.getTypeId()!=9 && learningActivityType.getTypeId()!=2&&learningActivityType.getTypeId()!=7){
+
+%>	
+	<liferay-portlet:renderURL var="newactivityURLAux">
+		<liferay-portlet:param name="editing" value="<%=StringPool.TRUE %>" />
+		<liferay-portlet:param name="resId" value="0" />
+		<liferay-portlet:param name="resModuleId" value="<%=ParamUtil.getString(renderRequest, \"resModuleId\") %>" />
+		<liferay-portlet:param name="type" value="<%=Long.toString(learningActivityType.getTypeId()) %>" />
+	</liferay-portlet:renderURL>
+	
+	<liferay-util:buffer var="activityMessageAux">
+	    <%=LanguageUtil.get(themeDisplay.getLocale(), learningActivityType.getName()) %>
+	    <span class="activity-help">
+			<liferay-ui:icon-help message="<%=learningActivityType.getDescription() %>"  />
+		</span>
+	</liferay-util:buffer>
+
+	<li class="activity_<%=learningActivityType.getTypeId()%>">
+		<liferay-ui:icon image="add" label="<%=true%>" message="<%=activityMessageAux %>" url="<%=newactivityURLAux%>" cssClass="activity-icon" />
+	</li>
+<%
+		}
+			}
 	}
+	
+	
 %>
 </ul>

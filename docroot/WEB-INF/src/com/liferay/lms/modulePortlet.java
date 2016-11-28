@@ -25,11 +25,19 @@ import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 import javax.portlet.WindowStateException;
 
+import com.liferay.lms.auditing.AuditConstants;
+import com.liferay.lms.auditing.AuditingLogFactory;
+import com.liferay.lms.learningactivity.LearningActivityType;
+import com.liferay.lms.learningactivity.LearningActivityTypeRegistry;
 import com.liferay.lms.model.Course;
+import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.model.Module;
 import com.liferay.lms.model.impl.ModuleImpl;
 import com.liferay.lms.service.CourseLocalServiceUtil;
+import com.liferay.lms.service.LearningActivityLocalServiceUtil;
+import com.liferay.lms.service.LearningActivityServiceUtil;
 import com.liferay.lms.service.ModuleLocalServiceUtil;
+import com.liferay.portal.kernel.xml.DocumentException;
 import com.liferay.portal.kernel.cache.MultiVMPoolUtil;
 import com.liferay.portal.kernel.exception.NestableException;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -275,12 +283,10 @@ public static String SEPARATOR = "_";
 			}
 			
 			Module module = ModuleLocalServiceUtil.getModule(moduleId);
-			//System.out.println("Paso por aqui: "+moduleId);
 			String title = module.getTitle();
 			long allowedTime = module.getAllowedTime();	
 			long hourDuration = allowedTime / 3600000;
 			long minuteDuration = (allowedTime % 3600000) / 60000;
-			//renderRequest.setAttribute(arg0, arg1);
 			renderRequest.setAttribute("title", title);
 			String description = module.getDescription(themeDisplay.getLocale())+"";
 			renderRequest.setAttribute("description", description);
@@ -427,7 +433,7 @@ public static String SEPARATOR = "_";
 
 	@ProcessAction(name = "addmodule")
 	public void addmodule(ActionRequest request, ActionResponse response) throws Exception {
-		System.out.println("addmodule");
+		log.debug("addmodule");
             Module module = moduleFromRequest(request);
             ArrayList<String> errors = moduleValidator.validatemodule(module, request);
             ThemeDisplay themeDisplay = (ThemeDisplay) request
@@ -470,10 +476,8 @@ public static String SEPARATOR = "_";
 	}
 	
 	private void addmodulePopUp(RenderRequest request, RenderResponse response) throws IOException, PortalException, SystemException  {
-        //System.out.println("addmodulePopUp");
-        //ServiceContext serviceContext = ServiceContextFactory.getInstance( Module.class.getName(), request);
-
-		Module module = moduleFromRequest(request);
+       log.debug("addmodulePopUp");
+        Module module = moduleFromRequest(request);
         ArrayList<String> errors = moduleValidator.validatemodule(module, request);
         ThemeDisplay themeDisplay = (ThemeDisplay) request
 		.getAttribute(WebKeys.THEME_DISPLAY);
@@ -582,18 +586,41 @@ public static String SEPARATOR = "_";
 		long id = ParamUtil.getLong(request, "resourcePrimKey");
 		if (Validator.isNotNull(id)) {
 			Module module = ModuleLocalServiceUtil.getModule(id);
+			ThemeDisplay themeDisplay = (ThemeDisplay) request.getAttribute(WebKeys.THEME_DISPLAY);
+			List<LearningActivity> moduleActivities = LearningActivityLocalServiceUtil.getLearningActivitiesOfModule(id);
+			for(LearningActivity la : moduleActivities){
+				deleteActivity(la, themeDisplay, request, response);
+			}
 			ModuleLocalServiceUtil.deleteModule(module);
-            MultiVMPoolUtil.clear();
+            //MultiVMPoolUtil.clear();
 			SessionMessages.add(request, "module-deleted-successfully");
 		} else {
 			SessionErrors.add(request, "module-error-deleting");
 		}
 	}
+	
+	private void deleteActivity(LearningActivity larn, ThemeDisplay themeDisplay, ActionRequest actionRequest, ActionResponse actionResponse) throws PortalException, SystemException, DocumentException, IOException{
+		LearningActivityType learningActivityType=new LearningActivityTypeRegistry().
+				getLearningActivityType(larn.getTypeId());
+		learningActivityType.deleteResources(actionRequest, actionResponse, larn);
+		List<LearningActivity> precedences = LearningActivityLocalServiceUtil.getByPrecedence(larn.getActId());
+		if(precedences!=null && precedences.size()>0){
+			for(LearningActivity precedence : precedences){
+				precedence.setPrecedence(0);
+				LearningActivityLocalServiceUtil.updateLearningActivity(precedence);
+			}
+		}
+		LearningActivityServiceUtil.deleteLearningactivity(larn.getActId());
+		//auditing
+		AuditingLogFactory.audit(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(), LearningActivity.class.getName(), larn.getActId(), themeDisplay.getUserId(), AuditConstants.DELETE, null);
+		
+	}
+	
+	
 
 	@ProcessAction(name = "updatemodule")
 	public void updatemodule(ActionRequest request, ActionResponse response) throws Exception {
-		//System.out.println("dentro de updatemodule");
-            Module module = moduleFromRequest(request);
+		     Module module = moduleFromRequest(request);
             ArrayList<String> errors = moduleValidator.validatemodule(module, request);
             ThemeDisplay themeDisplay = (ThemeDisplay) request
 			.getAttribute(WebKeys.THEME_DISPLAY);
@@ -601,7 +628,7 @@ public static String SEPARATOR = "_";
             if (errors.isEmpty()) {
             	try {
                 	ModuleLocalServiceUtil.updateModule(module);
-                	MultiVMPoolUtil.clear();
+                	//MultiVMPoolUtil.clear();
                 	response.setRenderParameter("view", "");
                 	SessionMessages.add(request, "module-updated-successfully");
             	} catch (Exception cvex) {
@@ -634,7 +661,7 @@ public static String SEPARATOR = "_";
         }
 	
 	private void updatemodulePopUp(RenderRequest request, RenderResponse response) throws PortalException, SystemException, IOException {
-        //System.out.println("Dentro de updatemodulePopUp");
+        log.debug("Dentro de updatemodulePopUp");
 		Module module = moduleFromRequest(request);
 		request.setAttribute("moduleId",module.getModuleId());
 		request.setAttribute("view", "editmodule");
@@ -646,7 +673,7 @@ public static String SEPARATOR = "_";
         if (errors.isEmpty()) {
         	try {
             	ModuleLocalServiceUtil.updateModule(module);
-            	MultiVMPoolUtil.clear();
+            	//MultiVMPoolUtil.clear();
             	SessionMessages.add(request, "module-updated-successfully");
         	} catch (Exception cvex) {
         		SessionErrors.add(request, "please-enter-a-unique-code");
@@ -825,10 +852,37 @@ public static String SEPARATOR = "_";
 			}
 			module.setIcon(0);
 		}
-
+		updateActivitiesDates( module);
 		return module;
 	}
 
+	private void updateActivitiesDates(Module module){
+		try {
+			List<LearningActivity> activities = LearningActivityLocalServiceUtil.getLearningActivitiesOfModule(module.getModuleId());
+			
+			for(LearningActivity act: activities){
+				boolean isModifiend = false;
+				if(act.isNullStartDate()){
+					isModifiend = true;
+					act.setStartdate(module.getStartDate());
+				}
+				
+				if(act.isNullEndDate()){
+					isModifiend = true;
+					act.setEnddate(module.getEndDate());
+				}
+				
+				
+				if(isModifiend)LearningActivityLocalServiceUtil.updateLearningActivity(act);
+			}
+			
+		} catch (SystemException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
+	
 	public static Object invoke(
 	            boolean newInstance, String className, String methodName,
 	            String[] parameterTypeNames, Object... arguments)

@@ -33,6 +33,11 @@ public class PercentCalificationType extends BaseCalificationType {
 	}
 	
 	@Override
+	public String getSuffix() {
+		return "/100";
+	}
+
+	@Override
 	public String translate(Locale locale, double result) {
 		DecimalFormat df = new DecimalFormat("##.#");
 		return df.format(result);

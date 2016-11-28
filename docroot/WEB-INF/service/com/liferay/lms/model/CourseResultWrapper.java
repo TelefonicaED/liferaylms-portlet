@@ -56,6 +56,7 @@ public class CourseResultWrapper implements CourseResult,
 		attributes.put("passedDate", getPassedDate());
 		attributes.put("allowStartDate", getAllowStartDate());
 		attributes.put("allowFinishDate", getAllowFinishDate());
+		attributes.put("extraData", getExtraData());
 
 		return attributes;
 	}
@@ -119,6 +120,12 @@ public class CourseResultWrapper implements CourseResult,
 
 		if (allowFinishDate != null) {
 			setAllowFinishDate(allowFinishDate);
+		}
+
+		String extraData = (String)attributes.get("extraData");
+
+		if (extraData != null) {
+			setExtraData(extraData);
 		}
 	}
 
@@ -347,6 +354,24 @@ public class CourseResultWrapper implements CourseResult,
 	*/
 	public void setAllowFinishDate(java.util.Date allowFinishDate) {
 		_courseResult.setAllowFinishDate(allowFinishDate);
+	}
+
+	/**
+	* Returns the extra data of this course result.
+	*
+	* @return the extra data of this course result
+	*/
+	public java.lang.String getExtraData() {
+		return _courseResult.getExtraData();
+	}
+
+	/**
+	* Sets the extra data of this course result.
+	*
+	* @param extraData the extra data of this course result
+	*/
+	public void setExtraData(java.lang.String extraData) {
+		_courseResult.setExtraData(extraData);
 	}
 
 	public boolean isNew() {

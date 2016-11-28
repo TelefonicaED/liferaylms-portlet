@@ -14,6 +14,7 @@
 
 package com.liferay.lms.service.messaging;
 
+import com.liferay.lms.service.ActivityTriesDeletedLocalServiceUtil;
 import com.liferay.lms.service.AuditEntryLocalServiceUtil;
 import com.liferay.lms.service.AuditLoggerLocalServiceUtil;
 import com.liferay.lms.service.AuditLoggerServiceUtil;
@@ -42,6 +43,7 @@ import com.liferay.lms.service.P2pActivityCorrectionsLocalServiceUtil;
 import com.liferay.lms.service.P2pActivityLocalServiceUtil;
 import com.liferay.lms.service.SCORMContentLocalServiceUtil;
 import com.liferay.lms.service.SCORMContentServiceUtil;
+import com.liferay.lms.service.ScheduleLocalServiceUtil;
 import com.liferay.lms.service.SurveyResultLocalServiceUtil;
 import com.liferay.lms.service.TestAnswerLocalServiceUtil;
 import com.liferay.lms.service.TestAnswerServiceUtil;
@@ -68,6 +70,8 @@ public class ClpMessageListener extends BaseMessageListener {
 
 		if (command.equals("undeploy") &&
 				servletContextName.equals(getServletContextName())) {
+			ActivityTriesDeletedLocalServiceUtil.clearService();
+
 			AuditEntryLocalServiceUtil.clearService();
 
 			AuditLoggerLocalServiceUtil.clearService();
@@ -107,6 +111,8 @@ public class ClpMessageListener extends BaseMessageListener {
 			P2pActivityLocalServiceUtil.clearService();
 
 			P2pActivityCorrectionsLocalServiceUtil.clearService();
+
+			ScheduleLocalServiceUtil.clearService();
 
 			SCORMContentLocalServiceUtil.clearService();
 

@@ -272,6 +272,12 @@ public class LearningActivityTryLocalServiceWrapper
 			parameterTypes, arguments);
 	}
 
+	public com.liferay.lms.model.LearningActivityTry softUpdateLearningActivityTry(
+		com.liferay.lms.model.LearningActivityTry learningActivityTry)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _learningActivityTryLocalService.softUpdateLearningActivityTry(learningActivityTry);
+	}
+
 	public long getLearningActivityTryByActUserCount(long actId, long userId)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _learningActivityTryLocalService.getLearningActivityTryByActUserCount(actId,
@@ -289,6 +295,15 @@ public class LearningActivityTryLocalServiceWrapper
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _learningActivityTryLocalService.getLearningActivityTryByActUser(actId,
 			userId);
+	}
+
+	public com.liferay.lms.model.LearningActivityResult updateLearningActivityTry(
+		com.liferay.lms.model.LearningActivityTry learningActivityTry,
+		java.lang.String tryResultData, java.lang.String imsmanifest)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _learningActivityTryLocalService.updateLearningActivityTry(learningActivityTry,
+			tryResultData, imsmanifest);
 	}
 
 	public com.liferay.lms.model.LearningActivityTry createLearningActivityTry(
@@ -360,6 +375,19 @@ public class LearningActivityTryLocalServiceWrapper
 		com.liferay.lms.model.LearningActivity activity)
 		throws java.lang.Exception {
 		return _learningActivityTryLocalService.areThereTriesNotFromEditors(activity);
+	}
+
+	public java.util.List<com.liferay.lms.model.LearningActivityTry> getByUserId(
+		long userId) {
+		return _learningActivityTryLocalService.getByUserId(userId);
+	}
+
+	public long triesPerUserOnlyStudents(long actId, long companyId,
+		long courseGropupCreatedId,
+		java.util.List<com.liferay.portal.model.User> _students, long teamId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _learningActivityTryLocalService.triesPerUserOnlyStudents(actId,
+			companyId, courseGropupCreatedId, _students, teamId);
 	}
 
 	/**

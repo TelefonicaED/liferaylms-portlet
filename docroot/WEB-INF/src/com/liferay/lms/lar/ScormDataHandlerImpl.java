@@ -12,6 +12,7 @@ import javax.portlet.PortletPreferences;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 
+import com.liferay.counter.service.CounterLocalServiceUtil;
 import com.liferay.lms.NoSuchSCORMContentException;
 import com.liferay.lms.model.SCORMContent;
 import com.liferay.lms.service.SCORMContentLocalServiceUtil;
@@ -21,6 +22,8 @@ import com.liferay.portal.kernel.lar.BasePortletDataHandler;
 import com.liferay.portal.kernel.lar.PortletDataContext;
 import com.liferay.portal.kernel.lar.PortletDataHandlerBoolean;
 import com.liferay.portal.kernel.lar.PortletDataHandlerControl;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
@@ -37,6 +40,8 @@ public class ScormDataHandlerImpl extends BasePortletDataHandler {
 
 	private static final String _NAMESPACE = "scorm"; // mejorable??
 	
+	private static Log log = LogFactoryUtil.getLog(ScormDataHandlerImpl.class);
+			
 	private static final boolean _ALWAYS_EXPORTABLE = true;
 
 	private static final boolean _PUBLISH_TO_LIVE_BY_DEFAULT = true;
@@ -96,7 +101,7 @@ public class ScormDataHandlerImpl extends BasePortletDataHandler {
 	protected PortletPreferences doDeleteData(PortletDataContext context,
 			String portletId, PortletPreferences preferences) throws Exception {
 
-		System.out.println("  ::: ScormDataHandlerImpl.doDeleteData ::: "
+		log.info("  ::: ScormDataHandlerImpl.doDeleteData ::: "
 				+ portletId + " " + context.getGroupId() + " "
 				+ context.getScopeGroupId());
 
@@ -106,7 +111,7 @@ public class ScormDataHandlerImpl extends BasePortletDataHandler {
 
 			long groupId = context.getScopeGroupId();
 
-			System.out.println("   groupId : " + groupId + ", name: "
+			log.info("   groupId : " + groupId + ", name: "
 					+ group.getName());
 
 			List<SCORMContent> scorms = SCORMContentLocalServiceUtil
@@ -114,7 +119,7 @@ public class ScormDataHandlerImpl extends BasePortletDataHandler {
 
 			for (SCORMContent scorm : scorms) {
 
-				System.out.println("    scorm : " + scorm.getScormId());
+				log.info("    scorm : " + scorm.getScormId());
 
 				SCORMContentLocalServiceUtil.delete(scorm.getScormId());
 
@@ -123,7 +128,7 @@ public class ScormDataHandlerImpl extends BasePortletDataHandler {
 			e.printStackTrace();
 		}
 
-		System.out.println("  ::: ScormDataHandlerImpl.doDeleteData ::: ends ");
+		log.info("  ::: ScormDataHandlerImpl.doDeleteData ::: ends ");
 
 		return super.doDeleteData(context, portletId, preferences);
 	}
@@ -132,7 +137,7 @@ public class ScormDataHandlerImpl extends BasePortletDataHandler {
 	protected String doExportData(PortletDataContext context, String portletId,
 			PortletPreferences preferences) throws Exception {
 
-		System.out.println(" doExportData portletId : " + portletId);
+		log.info(" doExportData portletId : " + portletId);
 
 		context.addPermissions("com.liferay.lms.model.SCORMContent",
 				context.getScopeGroupId());
@@ -148,7 +153,7 @@ public class ScormDataHandlerImpl extends BasePortletDataHandler {
 			List<SCORMContent> entries = SCORMContentLocalServiceUtil
 					.getSCORMContentOfGroup(context.getScopeGroupId());
 	
-			System.out.println(" entries : " + entries.size());
+			log.info(" entries : " + entries.size());
 	
 			for (SCORMContent entry : entries) {
 				exportEntry(context, rootElement, entry);
@@ -158,7 +163,7 @@ public class ScormDataHandlerImpl extends BasePortletDataHandler {
 		return document.formattedString();
 	}
 
-	private void exportEntry(PortletDataContext context, Element root,
+	protected void exportEntry(PortletDataContext context, Element root,
 			SCORMContent entry) throws PortalException, SystemException {
 
 		AssetEntry assetEntry = AssetEntryLocalServiceUtil.getEntry(SCORMContent.class.getName(), entry.getScormId());
@@ -172,7 +177,7 @@ public class ScormDataHandlerImpl extends BasePortletDataHandler {
 
 		String path = getEntryPath(context, entry);
 
-		System.out.println(" path : " + path);
+		log.info(" path : " + path);
 
 		if (!context.isPathNotProcessed(path)) {
 			return;
@@ -255,7 +260,7 @@ public class ScormDataHandlerImpl extends BasePortletDataHandler {
 
 		Document document = SAXReaderUtil.read(data);
 
-		System.out.println("import xml : \n" + data);
+		log.info("import xml : \n" + data);
 
 		Element rootElement = document.getRootElement();
 
@@ -263,7 +268,7 @@ public class ScormDataHandlerImpl extends BasePortletDataHandler {
 			for (Element entryElement : rootElement.elements("scormentry")) {
 				String path = entryElement.attributeValue("path");
 	
-				System.out.println(" entry : " + path);
+				log.info(" entry : " + path);
 	
 				if (!context.isPathNotProcessed(path)) {
 					continue;
@@ -271,7 +276,7 @@ public class ScormDataHandlerImpl extends BasePortletDataHandler {
 				SCORMContent entry = (SCORMContent) context
 						.getZipEntryAsObject(path);
 	
-				System.out.println(" Scorm : " + entry.getScormId());
+				log.info(" Scorm : " + entry.getScormId());
 	
 				importEntry(context, entryElement, entry);
 			}
@@ -280,9 +285,8 @@ public class ScormDataHandlerImpl extends BasePortletDataHandler {
 		return null;
 	}
 
-	private void importEntry(PortletDataContext context, Element entryElement,
+	protected void importEntry(PortletDataContext context, Element entryElement,
 			SCORMContent entry) throws SystemException, PortalException {
-		
 		long userId = context.getUserId(entry.getUserUuid());
 		entry.setGroupId(context.getScopeGroupId());
 		entry.setUserId(userId);
@@ -291,18 +295,15 @@ public class ScormDataHandlerImpl extends BasePortletDataHandler {
 		// Long defaultGroupId =
 		// GroupLocalServiceUtil.getGroup(defaultCompanyId,
 		// "Guest").getGroupId();
-		SCORMContent scocontent = (SCORMContent) context
-				.getZipEntryAsObject(entryElement.attributeValue("path"));
+		//SCORMContent scocontent = (SCORMContent) context.getZipEntryAsObject(entryElement.attributeValue("path"));
 		
 		ServiceContext serviceContext2 = new ServiceContext();
-		serviceContext2.setAssetCategoryIds(context.getAssetCategoryIds(
-				SCORMContent.class, scocontent.getScormId()));
-		serviceContext2.setAssetTagNames(context.getAssetTagNames(
-				SCORMContent.class, scocontent.getScormId()));
+		serviceContext2.setAssetCategoryIds(context.getAssetCategoryIds(SCORMContent.class, entry.getScormId()));
+		serviceContext2.setAssetTagNames(context.getAssetTagNames(SCORMContent.class, entry.getScormId()));
 		serviceContext2.setUserId(userId);
 		serviceContext2.setCompanyId(context.getCompanyId());
 		serviceContext2.setScopeGroupId(context.getScopeGroupId());
-		serviceContext2.setUuid(scocontent.getUuid());
+		serviceContext2.setUuid(entry.getUuid());
 		
 		SCORMContent oldScormContent = null;
 		
@@ -310,35 +311,28 @@ public class ScormDataHandlerImpl extends BasePortletDataHandler {
 		
 		if (context.isDataStrategyMirror()) {
 			try {
-				oldScormContent = SCORMContentLocalServiceUtil
-						.getSCORMContentByUuidAndGroupId(scocontent.getUuid(),
-								context.getScopeGroupId());
+				oldScormContent = SCORMContentLocalServiceUtil.getSCORMContentByUuidAndGroupId(entry.getUuid(),context.getScopeGroupId());
 			} catch (NoSuchSCORMContentException e) {
-
+				e.printStackTrace();
 			}
 			
-			scocontent.setGroupId(context.getScopeGroupId());
+			entry.setGroupId(context.getScopeGroupId());
 			if (Validator.isNotNull(oldScormContent)) {
 				
-				if ((scocontent.getGroupId() ==
-						context.getSourceGroupId()) &&
-					context.
-						isDataStrategyMirrorWithOverwriting()) {
+				if ((entry.getGroupId() ==context.getSourceGroupId()) &&context.isDataStrategyMirrorWithOverwriting()) {
 
-					SCORMContentLocalServiceUtil.delete(
-							oldScormContent.getScormId());
+					SCORMContentLocalServiceUtil.delete(oldScormContent.getScormId());
 					
-					InputStream is = context.getZipEntryAsInputStream(entryElement
-							.attributeValue("file"));
+					InputStream is = context.getZipEntryAsInputStream(entryElement.attributeValue("file"));
 					try {
 						byte[] dataFileScorm = IOUtils.toByteArray(is);
 						File scormfile = new File(System.getProperty("java.io.tmpdir")
-								+ "/scorms/" + scocontent.getUuid() + ".zip");
+								+ "/scorms/" + entry.getUuid() + ".zip");
 						FileUtils.writeByteArrayToFile(scormfile, dataFileScorm);
 						
 						importedScocontent = SCORMContentLocalServiceUtil.addSCORMContent(
-								scocontent.getTitle(), scocontent.getDescription(),
-								scormfile, scocontent.getCiphered(), serviceContext2);
+								entry.getTitle(), entry.getDescription(),
+								scormfile, entry.getCiphered(), serviceContext2);
 
 					} catch (IOException e) {
 						e.printStackTrace();
@@ -352,22 +346,23 @@ public class ScormDataHandlerImpl extends BasePortletDataHandler {
 						}
 					}
 				} else {
-					scocontent.setScormId(oldScormContent.getScormId());
-					importedScocontent = SCORMContentLocalServiceUtil.updateSCORMContent(scocontent, serviceContext2);
+					entry.setScormId(oldScormContent.getScormId());
+					importedScocontent = SCORMContentLocalServiceUtil.updateSCORMContent(entry, serviceContext2);
 					
 				}
 			} else {
+				
 				InputStream is = context.getZipEntryAsInputStream(entryElement
 						.attributeValue("file"));
 				try {
 					byte[] dataFileScorm = IOUtils.toByteArray(is);
 					File scormfile = new File(System.getProperty("java.io.tmpdir")
-							+ "/scorms/" + scocontent.getUuid() + ".zip");
+							+ "/scorms/" + entry.getUuid() + ".zip");
 					FileUtils.writeByteArrayToFile(scormfile, dataFileScorm);
 					
 					importedScocontent = SCORMContentLocalServiceUtil.addSCORMContent(
-							scocontent.getTitle(), scocontent.getDescription(),
-							scormfile, scocontent.getCiphered(), serviceContext2);
+							entry.getTitle(), entry.getDescription(),
+							scormfile, entry.getCiphered(), serviceContext2);
 
 				} catch (IOException e) {
 					e.printStackTrace();
@@ -385,17 +380,16 @@ public class ScormDataHandlerImpl extends BasePortletDataHandler {
 			
 			serviceContext2.setUuid(null);
 			
-			InputStream is = context.getZipEntryAsInputStream(entryElement
-					.attributeValue("file"));
+			InputStream is = context.getZipEntryAsInputStream(entryElement.attributeValue("file"));
 			try {
 				byte[] dataFileScorm = IOUtils.toByteArray(is);
 				File scormfile = new File(System.getProperty("java.io.tmpdir")
-						+ "/scorms/" + scocontent.getUuid() + ".zip");
+						+ "/scorms/" + entry.getUuid() + ".zip");
 				FileUtils.writeByteArrayToFile(scormfile, dataFileScorm);
 				
 				importedScocontent = SCORMContentLocalServiceUtil.addSCORMContent(
-						scocontent.getTitle(), scocontent.getDescription(),
-						scormfile, scocontent.getCiphered(), serviceContext2);
+						entry.getTitle(), entry.getDescription(),
+						scormfile, entry.getCiphered(), serviceContext2);
 
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -411,7 +405,7 @@ public class ScormDataHandlerImpl extends BasePortletDataHandler {
 		}
 		
 		context.importClassedModel(
-				scocontent, importedScocontent, _NAMESPACE);
+				entry, importedScocontent, _NAMESPACE);
 	}
 
 }

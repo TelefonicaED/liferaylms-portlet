@@ -43,15 +43,15 @@ if(actId == 0){
 	
 	List<LearningActivityTry> triesList = LearningActivityTryLocalServiceUtil.getLearningActivityTryByActUser(actId, userId);
 	for(LearningActivityTry larntry:triesList){
-		java.text.SimpleDateFormat sdf=new java.text.SimpleDateFormat("dd/MM/yyyy");
+		java.text.SimpleDateFormat sdf=new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm");
 		sdf.setTimeZone(timeZone);
-		String fecha ="";
+		String fecha ="-";
 		if(larntry.getEndDate()!=null){
 			fecha = sdf.format(larntry.getEndDate());
 		}
-		else{ //just in case of the learningActivity hasn't got end date
-			fecha = sdf.format(ModuleLocalServiceUtil.getModule(LearningActivityLocalServiceUtil.getLearningActivity(larntry.getActId()).getModuleId()).getEndDate());
-		}
+	/*	else{ //just in case of the learningActivity hasn't got end date
+			fecha = "-";
+		}*/
 		String title = learningActivity.getTitle(themeDisplay.getLocale())  + " (" + fecha + ")";
 		%>
 		<liferay-ui:panel id="<%=Long.toString(larntry.getLatId()) %>" title="<%=title %>" collapsible="true" extended="true" defaultState="collapsed">

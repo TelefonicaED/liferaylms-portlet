@@ -53,6 +53,9 @@ public class LmsPrefsWrapper implements LmsPrefs, ModelWrapper<LmsPrefs> {
 		attributes.put("scoretranslators", getScoretranslators());
 		attributes.put("usersResults", getUsersResults());
 		attributes.put("debugScorm", getDebugScorm());
+		attributes.put("hasAPILicence", getHasAPILicence());
+		attributes.put("showHideActivity", getShowHideActivity());
+		attributes.put("viewCoursesFinished", getViewCoursesFinished());
 
 		return attributes;
 	}
@@ -110,6 +113,25 @@ public class LmsPrefsWrapper implements LmsPrefs, ModelWrapper<LmsPrefs> {
 
 		if (debugScorm != null) {
 			setDebugScorm(debugScorm);
+		}
+
+		Boolean hasAPILicence = (Boolean)attributes.get("hasAPILicence");
+
+		if (hasAPILicence != null) {
+			setHasAPILicence(hasAPILicence);
+		}
+
+		Boolean showHideActivity = (Boolean)attributes.get("showHideActivity");
+
+		if (showHideActivity != null) {
+			setShowHideActivity(showHideActivity);
+		}
+
+		Boolean viewCoursesFinished = (Boolean)attributes.get(
+				"viewCoursesFinished");
+
+		if (viewCoursesFinished != null) {
+			setViewCoursesFinished(viewCoursesFinished);
 		}
 	}
 
@@ -300,6 +322,87 @@ public class LmsPrefsWrapper implements LmsPrefs, ModelWrapper<LmsPrefs> {
 	*/
 	public void setDebugScorm(boolean debugScorm) {
 		_lmsPrefs.setDebugScorm(debugScorm);
+	}
+
+	/**
+	* Returns the has a p i licence of this lms prefs.
+	*
+	* @return the has a p i licence of this lms prefs
+	*/
+	public boolean getHasAPILicence() {
+		return _lmsPrefs.getHasAPILicence();
+	}
+
+	/**
+	* Returns <code>true</code> if this lms prefs is has a p i licence.
+	*
+	* @return <code>true</code> if this lms prefs is has a p i licence; <code>false</code> otherwise
+	*/
+	public boolean isHasAPILicence() {
+		return _lmsPrefs.isHasAPILicence();
+	}
+
+	/**
+	* Sets whether this lms prefs is has a p i licence.
+	*
+	* @param hasAPILicence the has a p i licence of this lms prefs
+	*/
+	public void setHasAPILicence(boolean hasAPILicence) {
+		_lmsPrefs.setHasAPILicence(hasAPILicence);
+	}
+
+	/**
+	* Returns the show hide activity of this lms prefs.
+	*
+	* @return the show hide activity of this lms prefs
+	*/
+	public boolean getShowHideActivity() {
+		return _lmsPrefs.getShowHideActivity();
+	}
+
+	/**
+	* Returns <code>true</code> if this lms prefs is show hide activity.
+	*
+	* @return <code>true</code> if this lms prefs is show hide activity; <code>false</code> otherwise
+	*/
+	public boolean isShowHideActivity() {
+		return _lmsPrefs.isShowHideActivity();
+	}
+
+	/**
+	* Sets whether this lms prefs is show hide activity.
+	*
+	* @param showHideActivity the show hide activity of this lms prefs
+	*/
+	public void setShowHideActivity(boolean showHideActivity) {
+		_lmsPrefs.setShowHideActivity(showHideActivity);
+	}
+
+	/**
+	* Returns the view courses finished of this lms prefs.
+	*
+	* @return the view courses finished of this lms prefs
+	*/
+	public boolean getViewCoursesFinished() {
+		return _lmsPrefs.getViewCoursesFinished();
+	}
+
+	/**
+	* Returns <code>true</code> if this lms prefs is view courses finished.
+	*
+	* @return <code>true</code> if this lms prefs is view courses finished; <code>false</code> otherwise
+	*/
+	public boolean isViewCoursesFinished() {
+		return _lmsPrefs.isViewCoursesFinished();
+	}
+
+	/**
+	* Sets whether this lms prefs is view courses finished.
+	*
+	* @param viewCoursesFinished the view courses finished of this lms prefs
+	*/
+	public void setViewCoursesFinished(boolean viewCoursesFinished) {
+		_lmsPrefs.setViewCoursesFinished(viewCoursesFinished);
 	}
 
 	public boolean isNew() {

@@ -1,3 +1,6 @@
+<%@page import="com.liferay.lms.model.Course"%>
+<%@page import="com.liferay.lms.service.CourseLocalServiceUtil"%>
+<%@page import="com.tls.lms.util.LiferaylmsUtil"%>
 <%@page import="com.liferay.portal.kernel.exception.SystemException"%>
 <%@page import="com.liferay.portal.kernel.exception.PortalException"%>
 <%@page import="com.liferay.portlet.asset.NoSuchEntryException"%>
@@ -35,10 +38,21 @@
 <%@page import="com.liferay.lms.model.LearningActivity"%>
 <%@page import="com.liferay.portal.kernel.util.ListUtil"%>
 <%@page import="com.liferay.lms.service.LearningActivityLocalServiceUtil"%>
+<%@page import="org.apache.commons.lang.StringEscapeUtils"%> 
+<%@page import="java.text.DecimalFormat"%>
+
 <%@ include file="/init.jsp" %>
+<script src="/liferaylms-portlet/js/service.js" type="text/javascript"></script>
 <div class="container-activity">
 <%
 long actId=ParamUtil.getLong(request,"actId",0);
+boolean isDefaultScore = true;
+boolean isYoutubeIframe = false;
+boolean isVimeoIframe = false;
+double videoPosition=0;
+int oldScore=0;
+int plays=0;
+LearningActivityTry learningTry = null;
 
 if(actId==0 )
 {
@@ -50,7 +64,7 @@ else
 
 	LearningActivity learnact=LearningActivityLocalServiceUtil.getLearningActivity(ParamUtil.getLong(request,"actId"));
 	
-	%>
+	%> 
 		<h2 class="description-title"><%=learnact.getTitle(themeDisplay.getLocale())%></h2>
 		<%--<h3 class="description-h3"><liferay-ui:message key="description" /></h3> --%>
 		<div class="description"><%=learnact.getDescriptionFiltered(themeDisplay.getLocale(),true) %></div>
@@ -64,30 +78,76 @@ else
 	}
 	else
 	{
-		if(!LearningActivityResultLocalServiceUtil.userPassed(actId,themeDisplay.getUserId()))
+		isDefaultScore = (learnact.getPasspuntuation() == 0);
+		if(learnact.getExtracontent()!=null &&!learnact.getExtracontent().trim().equals("")){
+			if(!Validator.isNumber(learnact.getExtracontent())){
+				Document document = SAXReaderUtil.read(learnact.getExtracontent());
+				Element root=document.getRootElement();
+				Element video=root.element("video");
+				if(video!=null)
+				{
+					if(video.attributeValue("id","").equals(""))
+					{
+						String youtubeIframeCode= video.getText();
+						isYoutubeIframe = ((youtubeIframeCode.indexOf("iframe")>-1) &&  (youtubeIframeCode.indexOf("youtube")>-1));
+						isVimeoIframe = ((youtubeIframeCode.indexOf("iframe")>-1) &&  (youtubeIframeCode.indexOf("vimeo")>-1));
+					}
+				}
+			}
+		}	
+		
+		Course course = CourseLocalServiceUtil.getCourseByGroupCreatedId(learnact.getGroupId());
+		boolean hasPermissionAccessCourseFinished = LiferaylmsUtil.hasPermissionAccessCourseFinished(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(), course.getCourseId(), themeDisplay.getUserId());
+		
+		if ((isYoutubeIframe || isVimeoIframe) && !isDefaultScore){
+			if(!hasPermissionAccessCourseFinished){
+				learningTry =LearningActivityTryLocalServiceUtil.getLastLearningActivityTryByActivityAndUser(actId,themeDisplay.getUserId());
+			}
+			if (learningTry != null){
+				//Poner posición del video.
+				String xml = learningTry.getTryResultData();
+				if(!xml.equals("")){
+
+					Document document = SAXReaderUtil.read(xml);
+					Element rootElement = document.getRootElement();
+					Element positionElement = rootElement.element("position");						
+					videoPosition =  Double.parseDouble(positionElement.getText());
+					
+					Element playsElement = rootElement.element("plays");	
+					plays =  Integer.parseInt(playsElement.getText());
+
+					Element scoreElement = rootElement.element("score");	
+					oldScore =  Integer.parseInt(scoreElement.getText());			
+				}	
+				
+			}
+		}	
+				
+		if(!hasPermissionAccessCourseFinished && !LearningActivityResultLocalServiceUtil.userPassed(actId,themeDisplay.getUserId()))
 		{
 			if(!permissionChecker.hasPermission(learnact.getGroupId(), LearningActivity.class.getName(), actId, ActionKeys.UPDATE) ||
 					!permissionChecker.hasOwnerPermission(learnact.getCompanyId(), LearningActivity.class.getName(), actId, learnact.getUserId(), ActionKeys.UPDATE)){
 			
 				ServiceContext serviceContext = ServiceContextFactory.getInstance(LearningActivityTry.class.getName(), renderRequest);
 	
-				LearningActivityTry learningTry =LearningActivityTryLocalServiceUtil.createLearningActivityTry(actId,serviceContext);
-				learningTry.setEndDate(new java.util.Date(System.currentTimeMillis()));
-				learningTry.setResult(100);
-				LearningActivityTryLocalServiceUtil.updateLearningActivityTry(learningTry);
+				if (isDefaultScore){				
+					learningTry =LearningActivityTryLocalServiceUtil.createLearningActivityTry(actId,serviceContext);
+					learningTry.setEndDate(new java.util.Date(System.currentTimeMillis()));
+					learningTry.setResult(100);
+					LearningActivityTryLocalServiceUtil.updateLearningActivityTry(learningTry);	
+				}
 				%>
 				<script type="text/javascript">
+				
 				document.addEventListener( "DOMContentLoaded", function(){
 					Liferay.Portlet.refresh('#p_p_id_activityNavigator_WAR_liferaylmsportlet_');
-				}, false );
-
-				
+				}, false );		
 				
 				</script>
 				<%
 			}
 
-		}
+		}		
 		if(learnact.getExtracontent()!=null &&!learnact.getExtracontent().trim().equals("") )
 		{
 			
@@ -306,11 +366,286 @@ else
 				}
 				else
 				{
-					%>
-					<div class="video">
-					<%=video.getText()%>
-					</div>
+					boolean videoControlDisabled = false;
+					Element videoControl=root.element("video-control");
+					if(videoControl!=null){
+						videoControlDisabled = Boolean.parseBoolean(videoControl.getText());
+					}
+					String videoCode= video.getText();
+					if (isYoutubeIframe && !isDefaultScore){
+						int delimitador = videoCode.indexOf("iframe") + "iframe".length();
+						String partePrimera = videoCode.substring(0, delimitador);
+						String parteSegunda = videoCode.substring(delimitador, videoCode.length());
+						String parteTercera = parteSegunda.substring(parteSegunda.indexOf("src=\""));
+						
+						String[] split = parteTercera.split("\"");
+						String src = split[1];
+						String parametros = "?enablejsapi=1";
+						if (videoControlDisabled){
+							parametros += "&controls=0";
+						}
+						if (videoPosition > 0){
+							DecimalFormat df = new DecimalFormat("#####");
+							parametros += "&start="+df.format(videoPosition);
+						}
+						parteSegunda = parteSegunda.replace(src, src.concat(parametros));
+						StringBuilder tag  = new StringBuilder();
+						tag.append(partePrimera);
+						tag.append(" id=\"youtube-video\"");
+						tag.append(parteSegunda);
+						videoCode = tag.toString();
+					}
+					if (isVimeoIframe && !isDefaultScore){
+				
+						int delimitador = videoCode.indexOf("iframe") + "iframe".length();
+						String partePrimera = videoCode.substring(0, delimitador);
+						String parteSegunda = videoCode.substring(delimitador, videoCode.length());
+						String parteTercera = parteSegunda.substring(parteSegunda.indexOf("src=\""));
+						
+						String[] split = parteTercera.split("\"");
+						String src = split[1];
+						String parametros = "?api=1&amp;player_id=player_1";
+						parteSegunda = parteSegunda.replace(src, src.concat(parametros));
+						StringBuilder tag  = new StringBuilder();
+						tag.append(partePrimera);
+						tag.append(" id=\"player_1\"");
+						tag.append(parteSegunda);
+						videoCode = tag.toString();
+					} 
+				%>
+						<div class="video">
+						<%=videoCode%>
+						</div>
 					<%
+					if (isYoutubeIframe && !isDefaultScore){
+					%>
+						<script>
+						  // 2. This code loads the IFrame Player API code asynchronously.
+						  var plays = <%=plays%>;
+						  var tag = document.createElement('script');
+						  var finished = false;
+
+						  tag.src = "https://www.youtube.com/iframe_api";
+						  var firstScriptTag = document.getElementsByTagName('script')[0];
+						  firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+						  // 3. This function creates an <iframe> (and YouTube player)
+						  //    after the API code downloads.
+						  var player;
+						  function onYouTubeIframeAPIReady() {
+							player = new YT.Player('youtube-video', {
+							  events: {
+								'onReady': onPlayerReady,
+								'onStateChange': onPlayerStateChange
+							  }
+							});
+						  }
+
+						  // 4. The API will call this function when the video player is ready.
+						  function onPlayerReady(event) {
+						  }
+
+						  // 5. The API calls this function when the player's state changes.
+						  //    The function indicates that when playing a video (state=1),
+						  //    the player should play for six seconds and then stop.
+						  var done = false;
+						  function onPlayerStateChange(event) {
+							if (event.data == YT.PlayerState.PLAYING && !done) {
+								plays ++;
+								done=true;
+								
+							}
+							if (event.data == YT.PlayerState.PAUSED){
+								done=false;
+							}
+							if (event.data == YT.PlayerState.ENDED){
+								var serviceParameterTypes = [
+		 					     	'long',
+		 					     	'long',
+		 					     	'int',
+		 					     	'double',
+		 					    	'int'
+		 					    ];
+		 					    var message = Liferay.Service.Lms.LearningActivityTry.createLearningActivityTry(
+		 					    	{
+		 					    		actId: <%= actId %>,
+		 					    		userId: <%= themeDisplay.getUserId() %>,
+		 					   			score: 100,
+		 					   			position: event.target.getDuration(),
+		 					   			plays: plays,
+		 					   			serviceParameterTypes: JSON.stringify(serviceParameterTypes)
+		 					    	}
+		 					    );
+		 					      	
+		 					    var exception = message.exception;
+		 					            
+		 						if (!exception) {
+		 							// Process Success - A LearningActivityResult returned
+									finished = true;		 							
+		 						}						
+							}
+						  }
+						  /*
+						  function stopVideo() {
+							player.stopVideo();
+						  }
+						  */
+						  var unloadEvent = function (e) {
+								var isDefaultScore = <%=isDefaultScore%>;
+								var positionToSave = <%=videoPosition%>;
+								var oldScore = <%=oldScore%>;
+								var currentTime = player.getCurrentTime();
+								if (currentTime > positionToSave)
+									positionToSave = currentTime;
+								var duration = player.getDuration();
+								var score = 100;								
+								if (!isDefaultScore) score = Math.round((currentTime/duration)*100);
+								var serviceParameterTypes = [
+							     	'long',
+							     	'long',
+							     	'int',
+							     	'double',
+							    	'int'
+							    ];
+								
+								if ((score > oldScore) && !finished){
+									var message = Liferay.Service.Lms.LearningActivityTry.createLearningActivityTry(
+										{
+											actId: <%= actId %>,
+											userId: <%= themeDisplay.getUserId() %>,
+											score: score,
+											position: positionToSave,
+											plays: plays,
+											serviceParameterTypes: JSON.stringify(serviceParameterTypes)
+										}
+									);
+									
+									var exception = message.exception;
+											
+																				
+							    } 	
+								
+						  };
+						  window.addEventListener("beforeunload", unloadEvent);					  
+						</script>							
+					<%
+					}
+					if (isVimeoIframe && !isDefaultScore){
+						int seekTo = 0;
+						if (videoPosition > 0){
+							DecimalFormat df = new DecimalFormat("#####");
+							seekTo = Integer.parseInt(df.format(videoPosition));
+						}
+					%>
+						<script src="/liferaylms-portlet/js/froogaloop.min.js"></script>
+				        <script>
+				           // $(function(){
+						   document.addEventListener('DOMContentLoaded', function() { 		
+								var iframe = document.getElementById('player_1');
+								var player = $f(iframe);
+								var plays = <%=plays%>;
+								var duration = 0;
+								var currentTime = 0;
+								var seekTo = <%=seekTo %>;
+								var finished = false;
+								
+								 player.addEvent('ready', function() {
+									player.api('getDuration', function(dur) {
+										duration = dur;
+									});									
+							        player.addEvent('pause', onPause);
+									player.addEvent('finish', onFinish);
+									player.addEvent('play', onPlay);
+									if (seekTo > 0)
+										player.api('seekTo', seekTo);
+									
+								});
+							
+							    function onPause() {
+									
+								}
+							    
+								function onPlay() {
+									plays++;
+								}	
+			
+								function onFinish() {								
+									var serviceParameterTypes = [
+			 					     	'long',
+			 					     	'long',
+			 					     	'int',
+			 					     	'double',
+			 					    	'int'
+			 					    ];
+			 					    var message = Liferay.Service.Lms.LearningActivityTry.createLearningActivityTry(
+			 					    	{
+			 					    		actId: <%= actId %>,
+			 					    		userId: <%= themeDisplay.getUserId() %>,
+			 					   			score: 100,
+			 					   			position: duration,
+			 					   			plays: plays,
+			 					   			serviceParameterTypes: JSON.stringify(serviceParameterTypes)
+			 					    	}
+			 					    );
+			 					      	
+			 					    var exception = message.exception;
+			 					            
+			 						if (!exception) {
+			 							// Process Success - A LearningActivityResult returned
+										finished = true;
+			 							
+			 						}									
+								}
+								
+								  var unloadEvent = function (e) {
+									  	
+									player.api('getCurrentTime', function(time) {
+										currentTime = time;
+											
+										var isDefaultScore = <%=isDefaultScore%>;
+										var positionToSave = <%=videoPosition%>;
+										var oldScore = <%=oldScore%>;
+										if (currentTime > positionToSave)
+											positionToSave = currentTime;
+										var score = 100;														
+										if (!isDefaultScore) score = Math.round((currentTime/duration)*100);
+										//debugger;
+										var serviceParameterTypes = [
+									     	'long',
+									     	'long',
+									     	'int',
+									     	'double',
+									    	'int'
+									    ];
+										if ((score > oldScore) && !finished){
+											var message = Liferay.Service.Lms.LearningActivityTry.createLearningActivityTry(
+												{
+													actId: <%= actId %>,
+													userId: <%= themeDisplay.getUserId() %>,
+													score: score,
+													position: positionToSave,
+													plays: plays,
+													serviceParameterTypes: JSON.stringify(serviceParameterTypes)
+												}
+											);
+											
+											var exception = message.exception;
+													
+											if (!exception) {
+												// Process Success - A LearningActivityResult returned
+											}											
+									    } 			
+									});	
+									  
+
+								  };
+								  window.addEventListener("beforeunload", unloadEvent);										
+							
+						  });
+				          //  });
+				        </script>					
+					<%	
+					}
 				}
 			}
 			%>

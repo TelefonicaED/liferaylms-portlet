@@ -704,6 +704,10 @@ public class LearningActivityClp extends BaseModelImpl<LearningActivity>
 		throw new UnsupportedOperationException();
 	}
 
+	public com.liferay.lms.model.Module getModule() {
+		throw new UnsupportedOperationException();
+	}
+
 	public boolean isNullEndDate() {
 		throw new UnsupportedOperationException();
 	}

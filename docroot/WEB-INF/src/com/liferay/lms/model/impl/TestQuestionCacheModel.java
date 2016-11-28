@@ -33,7 +33,7 @@ public class TestQuestionCacheModel implements CacheModel<TestQuestion>,
 	Serializable {
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(15);
+		StringBundler sb = new StringBundler(17);
 
 		sb.append("{uuid=");
 		sb.append(uuid);
@@ -47,6 +47,8 @@ public class TestQuestionCacheModel implements CacheModel<TestQuestion>,
 		sb.append(questionType);
 		sb.append(", weight=");
 		sb.append(weight);
+		sb.append(", penalize=");
+		sb.append(penalize);
 		sb.append(", extracontent=");
 		sb.append(extracontent);
 		sb.append("}");
@@ -76,6 +78,7 @@ public class TestQuestionCacheModel implements CacheModel<TestQuestion>,
 
 		testQuestionImpl.setQuestionType(questionType);
 		testQuestionImpl.setWeight(weight);
+		testQuestionImpl.setPenalize(penalize);
 
 		if (extracontent == null) {
 			testQuestionImpl.setExtracontent(StringPool.BLANK);
@@ -95,5 +98,6 @@ public class TestQuestionCacheModel implements CacheModel<TestQuestion>,
 	public String text;
 	public long questionType;
 	public long weight;
+	public boolean penalize;
 	public String extracontent;
 }

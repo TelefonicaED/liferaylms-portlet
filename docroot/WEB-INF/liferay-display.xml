@@ -13,6 +13,7 @@
 		<portlet id="changeEditingMode"></portlet>
 		<portlet id="activityNavigator"></portlet>
 		<portlet id="activityDates"></portlet>
+		<portlet id="activityComments"></portlet>
 		<portlet id="moduleDescription"></portlet>
 		<portlet id="moduleEditing"></portlet>
 		<portlet id="ModuleTitle"></portlet>
@@ -62,9 +63,11 @@
 		<portlet id="moduleselector"></portlet>
 		<portlet id="ponderatedevalconf"></portlet>
 		<portlet id="finalcourseresult"></portlet>
-
-		<portlet id="ActivityComments"></portlet>
 		<portlet id="moduletimer"></portlet>
 		<portlet id="checkcertificate"></portlet>
+		<portlet id="catalogcourses"></portlet>
+		<portlet id="dateeditor"></portlet>
+		<portlet id="deregisteracademymail"></portlet>
+		<portlet id="viewactivitytriesdeleted"></portlet>
 	</category>
 </display>

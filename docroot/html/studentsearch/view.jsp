@@ -3,61 +3,41 @@
 <%@page import="com.liferay.portal.util.comparator.*"%>
 <%@include file="/init.jsp" %>
 
-<%
-	String criteria = request.getParameter("criteria");
-
-	if (criteria == null) criteria = "";	
+<div class="student_search">
+	<liferay-portlet:renderURL var="renderURL" />
+	<c:if test="${showSearcher}">
+		<aui:form action="${renderURL}" name="searchFm">
+			<liferay-ui:search-form page="/html/shared/usersSearchform.jsp"
+				searchContainer="${searchContainer}"
+				servletContext="<%= this.getServletConfig().getServletContext() %>">
+			</liferay-ui:search-form>
+		</aui:form>
+	</c:if>
+	<c:if test="${!showSearcher and not empty teams}">
+		<aui:form action="${renderURL}" name="searchTeamsFm">
+			<aui:select name="team" label="team">
+				<aui:option label="" value="0"></aui:option>
+				<c:forEach items="${teams}" var="team">
+					<aui:option  value="${team.teamId}" label="${team.name}" selected="${team.teamId == teamId}"></aui:option>
+				</c:forEach>
+			</aui:select>	
+			<aui:button value="search" type="submit"/>
+		</aui:form>
+	</c:if>
 	
-	PortletURL portletURL = renderResponse.createRenderURL();
-	portletURL.setParameter("jspPage","/html/studentsearch/view.jsp");
-	portletURL.setParameter("criteria", criteria); 
-%>
-
-
-<div class="student_search"> 
-
-	<portlet:renderURL var="buscarURL">
-		<portlet:param name="jspPage" value="/html/studentsearch/view.jsp"></portlet:param>
-	</portlet:renderURL>
-
-	<aui:form name="studentsearch" action="<%=buscarURL %>" method="post">
-		<aui:fieldset>
-			<aui:column>
-				<aui:input label="studentsearch.criteria" name="criteria" size="20" value="<%=criteria %>" />	
-			</aui:column>	
-			<aui:column cssClass="search_lms_button">
-				<aui:button-row>
-					<aui:button name="searchUsers" value="search" type="submit" />
-				</aui:button-row>
-			</aui:column>	
-		</aui:fieldset>
-	</aui:form>
 	
-	<liferay-ui:search-container iteratorURL="<%=portletURL%>" emptyResultsMessage="there-are-no-results" delta="5">
-
-	   	<liferay-ui:search-container-results>
-			<%
-				String middleName = null;
-		
-				LinkedHashMap<String,Object> params=new LinkedHashMap<String, Object>();			
-				params.put("usersGroups", new Long(themeDisplay.getScopeGroupId()));			
-				
-				OrderByComparator obc = new UserFirstNameComparator(true);
+	<liferay-ui:search-container
+			searchContainer="${searchContainer}" 
+			iteratorURL="${searchContainer.iteratorURL}">
+			<liferay-ui:search-container-results 
+				total="${searchContainer.total }" 
+				results="${searchContainer.results }"/>
 			
-				List<User> userListPage = UserLocalServiceUtil.search(themeDisplay.getCompanyId(), criteria, WorkflowConstants.STATUS_APPROVED, params, searchContainer.getStart(), searchContainer.getEnd(), obc);
-				int userCount = UserLocalServiceUtil.searchCount(themeDisplay.getCompanyId(), criteria, WorkflowConstants.STATUS_APPROVED, params);
-						
-				pageContext.setAttribute("results", userListPage);
-			    pageContext.setAttribute("total", userCount);
-			%>
-		</liferay-ui:search-container-results>
-		
-		<liferay-ui:search-container-row className="com.liferay.portal.model.User" keyProperty="userId" modelVar="user">
-			<liferay-ui:user-display userId="<%=user.getUserId() %>"></liferay-ui:user-display>
-		</liferay-ui:search-container-row>
-		
-	 	<liferay-ui:search-iterator />
-	 	
+			<liferay-ui:search-container-row modelVar="student" keyProperty="userId" className="com.liferay.portal.model.User" >
+				<liferay-ui:search-container-column-text name="students"  title="students" orderable="false">
+				 	<liferay-ui:user-display userId="${student.userId}" />
+				</liferay-ui:search-container-column-text>
+			</liferay-ui:search-container-row>		
+			<liferay-ui:search-iterator />
 	</liferay-ui:search-container>
-	
 </div>

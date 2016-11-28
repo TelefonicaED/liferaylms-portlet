@@ -268,11 +268,44 @@ public class SurveyResultLocalServiceWrapper implements SurveyResultLocalService
 			arguments);
 	}
 
+	public java.util.List<com.liferay.lms.model.SurveyResult> getByUserId(
+		long userId) {
+		return _surveyResultLocalService.getByUserId(userId);
+	}
+
 	public java.util.List<com.liferay.lms.model.SurveyResult> getSurveyResultByActId(
 		long actId) throws com.liferay.portal.kernel.exception.SystemException {
 		return _surveyResultLocalService.getSurveyResultByActId(actId);
 	}
 
+	public java.util.List<com.liferay.lms.model.SurveyResult> getSurveyResultsByQuestionIdActId(
+		long questionId, long actId) {
+		return _surveyResultLocalService.getSurveyResultsByQuestionIdActId(questionId,
+			actId);
+	}
+
+	public double getPercentageByQuestionIdAndAnswerId(long questionId,
+		long answerId, long total)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _surveyResultLocalService.getPercentageByQuestionIdAndAnswerId(questionId,
+			answerId, total);
+	}
+
+	public long getCountByQuestionIdAndAnswerId(long questionId, long answerId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _surveyResultLocalService.getCountByQuestionIdAndAnswerId(questionId,
+			answerId);
+	}
+
+	/**
+	* Metodo depreciado, se utiliza una combinaciÃ¯Â¿Â½n de los dos anteriores, para evitar consultas a base de datos innecesarias dentro de bucles.
+	*
+	* @deprecated
+	* @param questionId
+	* @param answerId
+	* @return
+	* @throws SystemException
+	*/
 	public double getPercentageByQuestionIdAndAnswerId(long questionId,
 		long answerId)
 		throws com.liferay.portal.kernel.exception.SystemException {
@@ -283,6 +316,18 @@ public class SurveyResultLocalServiceWrapper implements SurveyResultLocalService
 	public long getTotalAnswersByQuestionId(long questionId)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _surveyResultLocalService.getTotalAnswersByQuestionId(questionId);
+	}
+
+	public long countStudentsByQuestionId(long questionId, long companyId,
+		long courseGropupCreatedId) {
+		return _surveyResultLocalService.countStudentsByQuestionId(questionId,
+			companyId, courseGropupCreatedId);
+	}
+
+	public long countStudentsByQuestionIdAndAnswerId(long questionId,
+		long answerId, long companyId, long courseGropupCreatedId) {
+		return _surveyResultLocalService.countStudentsByQuestionIdAndAnswerId(questionId,
+			answerId, companyId, courseGropupCreatedId);
 	}
 
 	/**

@@ -7,6 +7,25 @@
 			<access>PROPERTY</access>
 		</persistence-unit-defaults>
 	</persistence-unit-metadata>
+	<mapped-superclass class="com.liferay.lms.model.impl.ActivityTriesDeletedModelImpl">
+		<attributes>
+			<id name="activityTriesDeletedId" />
+			<basic name="groupId" />
+			<basic name="actId" />
+			<basic name="userId" />
+			<basic name="startDate">
+				<temporal>TIMESTAMP</temporal>
+			</basic>
+			<basic name="endDate">
+				<temporal>TIMESTAMP</temporal>
+			</basic>
+			<basic name="status" />
+			<transient name="modelAttributes" />
+			<transient name="primaryKey" />
+			<transient name="primaryKeyObj" />
+			<transient name="userUuid" />
+		</attributes>
+	</mapped-superclass>
 	<mapped-superclass class="com.liferay.lms.model.impl.AuditEntryModelImpl">
 		<attributes>
 			<id name="auditId" />
@@ -165,6 +184,7 @@
 			<basic name="allowFinishDate">
 				<temporal>TIMESTAMP</temporal>
 			</basic>
+			<basic name="extraData" />
 			<transient name="modelAttributes" />
 			<transient name="primaryKey" />
 			<transient name="primaryKeyObj" />
@@ -285,6 +305,9 @@
 			<basic name="scoretranslators" />
 			<basic name="usersResults" />
 			<basic name="debugScorm" />
+			<basic name="hasAPILicence" />
+			<basic name="showHideActivity" />
+			<basic name="viewCoursesFinished" />
 			<transient name="modelAttributes" />
 			<transient name="primaryKey" />
 			<transient name="primaryKeyObj" />
@@ -392,6 +415,21 @@
 			<transient name="userUuid" />
 		</attributes>
 	</mapped-superclass>
+	<mapped-superclass class="com.liferay.lms.model.impl.ScheduleModelImpl">
+		<attributes>
+			<id name="secheduleId" />
+			<basic name="teamId" />
+			<basic name="startDate">
+				<temporal>TIMESTAMP</temporal>
+			</basic>
+			<basic name="endDate">
+				<temporal>TIMESTAMP</temporal>
+			</basic>
+			<transient name="modelAttributes" />
+			<transient name="primaryKey" />
+			<transient name="primaryKeyObj" />
+		</attributes>
+	</mapped-superclass>
 	<mapped-superclass class="com.liferay.lms.model.impl.SCORMContentModelImpl">
 		<attributes>
 			<id name="scormId" />
@@ -468,6 +506,7 @@
 			</basic>
 			<basic name="questionType" />
 			<basic name="weight" />
+			<basic name="penalize" />
 			<basic name="extracontent" />
 			<transient name="modelAttributes" />
 			<transient name="primaryKey" />
@@ -492,6 +531,10 @@
 			<transient name="userUuid" />
 		</attributes>
 	</mapped-superclass>
+	<entity class="com.liferay.lms.model.impl.ActivityTriesDeletedImpl" name="ActivityTriesDeleted">
+		<table name="Lms_ActivityTriesDeleted" />
+		<attributes />
+	</entity>
 	<entity class="com.liferay.lms.model.impl.AuditEntryImpl" name="AuditEntry">
 		<table name="Lms_AuditEntry" />
 		<attributes />
@@ -546,6 +589,10 @@
 	</entity>
 	<entity class="com.liferay.lms.model.impl.P2pActivityCorrectionsImpl" name="P2pActivityCorrections">
 		<table name="Lms_P2pActivityCorrections" />
+		<attributes />
+	</entity>
+	<entity class="com.liferay.lms.model.impl.ScheduleImpl" name="Schedule">
+		<table name="Lms_Schedule" />
 		<attributes />
 	</entity>
 	<entity class="com.liferay.lms.model.impl.SCORMContentImpl" name="SCORMContent">

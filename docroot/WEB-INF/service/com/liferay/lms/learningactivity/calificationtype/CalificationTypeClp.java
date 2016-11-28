@@ -109,6 +109,29 @@ public class CalificationTypeClp implements CalificationType {
 		return ((String)returnObj);
 	}
 	
+	
+	public String getSuffix(){
+		Object returnObj = null;
+
+		try {
+			MethodKey getSuffixMethod = new MethodKey(clp.getClassName(), "getSuffix"); 
+			returnObj = clp.invoke(new MethodHandler(getSuffixMethod));
+		}
+		catch (Throwable t) {
+			t = ClpSerializer.translateThrowable(t);
+
+			if (t instanceof RuntimeException) {
+				throw (RuntimeException)t;
+			}
+			else {
+				throw new RuntimeException(t.getClass().getName() +
+					" is not a valid exception");
+			}
+		}
+
+		return ((String)returnObj);
+	}
+	
 	public String translate(Locale locale, double result){
 		Object returnObj = null;
 
@@ -130,5 +153,7 @@ public class CalificationTypeClp implements CalificationType {
 
 		return ((String)returnObj);
 	}
+	
+	
 	
 }

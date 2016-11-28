@@ -14,6 +14,7 @@
 
 package com.liferay.lms.service.impl;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -36,6 +37,10 @@ import com.liferay.lms.service.ClpSerializer;
 import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.lms.service.CourseResultLocalServiceUtil;
 import com.liferay.lms.service.base.CourseResultLocalServiceBaseImpl;
+import com.liferay.lms.service.persistence.CourseFinderUtil;
+import com.liferay.lms.service.persistence.CourseResultFinder;
+import com.liferay.lms.service.persistence.CourseResultFinderUtil;
+import com.liferay.lms.service.persistence.CourseResultUtil;
 import com.liferay.portal.kernel.bean.PortletBeanLocatorUtil;
 import com.liferay.portal.kernel.dao.orm.Criterion;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
@@ -71,83 +76,79 @@ import com.liferay.portal.security.permission.ActionKeys;
 public class CourseResultLocalServiceImpl
 	extends CourseResultLocalServiceBaseImpl {
 	
-	public CourseResult getByUserAndCourse(long courseId,long userId) throws SystemException
-	{
-		return courseResultPersistence.fetchByuc(userId, courseId);
-	}
-	
-	public long countByCourseId(long courseId, boolean passed) throws SystemException
-	{
-		return courseResultPersistence.countByc(courseId, passed);
-	}
-	
-	public long countStudentsByCourseId(Course course, boolean passed) throws SystemException
-	{
-		
-		long res = 0;
-		List<User> students = CourseLocalServiceUtil.getStudentsFromCourse(course.getCompanyId(), course.getGroupCreatedId());
-		
-		ClassLoader classLoader = (ClassLoader) PortletBeanLocatorUtil.locate(ClpSerializer.getServletContextName(), "portletClassLoader");
-		DynamicQuery consulta = DynamicQueryFactoryUtil.forClass(CourseResult.class, classLoader)
-				.add(PropertyFactoryUtil.forName("courseId").eq(course.getCourseId()));
-		
-		if(Validator.isNotNull(students) && students.size() > 0) {
-			Criterion criterion = null;
-			for (int i = 0; i < students.size(); i++) {
-				if(i==0) {
-					criterion = RestrictionsFactoryUtil.like("userId", students.get(i).getUserId());
-				} else {
-					criterion = RestrictionsFactoryUtil.or(criterion, RestrictionsFactoryUtil.like("userId", students.get(i).getUserId()));
-				}
-			}
-			if(Validator.isNotNull(criterion)) {
-				criterion=RestrictionsFactoryUtil.and(criterion,
-						RestrictionsFactoryUtil.eq("passed",passed));
-				
-				consulta.add(criterion);
-				
-				List<CourseResult> results = (List<CourseResult>)courseResultPersistence.findWithDynamicQuery(consulta);
-				if(results!=null && !results.isEmpty()) {
-					res = results.size();
-				}
-			}
+	public List<CourseResult> getByUserId(long userId){
+		List<CourseResult> results = new ArrayList<CourseResult>();
+		try {
+			results = CourseResultUtil.findByUserId(userId);
+		} catch (SystemException e) {
+			e.printStackTrace();
 		}
-		
-		return res;
+		return results;
 	}
 	
+	public CourseResult getByUserAndCourse(long courseId,long userId) throws SystemException{
+		return CourseResultUtil.fetchByuc(userId, courseId);
+	}
+	
+	public long countByCourseId(long courseId, boolean passed) throws SystemException{
+		return CourseResultUtil.countByc(courseId, passed);
+	}
+	
+	public long countByUserId(long userId) throws SystemException{
+		return CourseResultUtil.countByUserId(userId);
+	}
+	
+	
+	public long countStudentsStartedByCourseId(Course course, List<User> students, long teamId){
+		return CourseResultFinderUtil.countStartedOnlyStudents(course.getCourseId(), course.getCompanyId(), course.getGroupCreatedId(), students, teamId);
+	}
+	
+	public long countStudentsFinishedByCourseId(Course course, List<User> students, long teamId){
+		return CourseResultFinderUtil.countFinishedOnlyStudents(course.getCourseId(), course.getCompanyId(), course.getGroupCreatedId(), students, teamId);
+	}
+	
+	public long countStudentsPassedByCourseId(Course course, List<User> students, long teamId){
+		return CourseResultFinderUtil.countFinishedPassedOnlyStudents(course.getCourseId(), course.getCompanyId(), course.getGroupCreatedId(), students, true, teamId);
+	}
+	
+	public long countStudentsFailedByCourseId(Course course, List<User> students, long teamId){
+		return CourseResultFinderUtil.countFinishedPassedOnlyStudents(course.getCourseId(), course.getCompanyId(), course.getGroupCreatedId(), students, false, teamId);
+	}
+	
+	/**
+	 * @deprecated Renamed to {@link #countStudentsPassedByCourseId} or  {@link #countStudentsFailedByCourseId}
+	 */
+	public long countStudentsByCourseId(Course course, boolean passed) throws SystemException{
+		return countStudentsByCourseId(course, null, passed);
+	}
+	
+	/**
+	 * @deprecated Renamed to {@link #countStudentsPassedByCourseId} or  {@link #countStudentsFailedByCourseId}
+	 */
+	public long countStudentsByCourseId(Course course, List<User> students, boolean passed) throws SystemException {
+		
+		return CourseResultFinderUtil.countFinishedPassedOnlyStudents(course.getCourseId(), course.getCompanyId(), course.getGroupCreatedId(), students, passed, 0);
+	}
+	
+	
+
+	/**
+	 * @deprecated Renamed to {@link #countStartedOnlyStudents} 
+	 */
 	public long countStudentsByCourseId(Course course) throws SystemException
 	{
-		
-		long res = 0;
-		List<User> students = CourseLocalServiceUtil.getStudentsFromCourse(course.getCompanyId(), course.getGroupCreatedId());
-		
-		ClassLoader classLoader = (ClassLoader) PortletBeanLocatorUtil.locate(ClpSerializer.getServletContextName(), "portletClassLoader");
-		DynamicQuery consulta = DynamicQueryFactoryUtil.forClass(CourseResult.class, classLoader)
-				.add(PropertyFactoryUtil.forName("courseId").eq(course.getCourseId()));
-		
-		if(Validator.isNotNull(students) && students.size() > 0) {
-			Criterion criterion = null;
-			for (int i = 0; i < students.size(); i++) {
-				if(i==0) {
-					criterion = RestrictionsFactoryUtil.like("userId", students.get(i).getUserId());
-				} else {
-					criterion = RestrictionsFactoryUtil.or(criterion, RestrictionsFactoryUtil.like("userId", students.get(i).getUserId()));
-				}
-			}
-			if(Validator.isNotNull(criterion)) {
-				consulta.add(criterion);
-				List<CourseResult> results = (List<CourseResult>)courseResultPersistence.findWithDynamicQuery(consulta);
-				if(results!=null && !results.isEmpty()) {
-					res = results.size();
-				}
-			}
-		}
-		
-		return res;
+		return countStudentsByCourseId(course, null);
 	}
 	
+	/**
+	 * @deprecated Renamed to {@link #countStartedOnlyStudents} 
+	 */
+	public long countStudentsByCourseId(Course course, List<User> students) throws SystemException
+	{
+		return CourseResultFinderUtil.countStartedOnlyStudents(course.getCourseId(), course.getCompanyId(), course.getGroupCreatedId(), students, 0);
+	}
 	
+
 	public Double avgResult(long courseId, boolean passed) throws SystemException
 	{
 		ClassLoader classLoader = (ClassLoader) PortletBeanLocatorUtil.locate(ClpSerializer.getServletContextName(), "portletClassLoader"); 
@@ -160,6 +161,7 @@ public class CourseResultLocalServiceImpl
 		return (Double)(learningActivityResultPersistence.findWithDynamicQuery(dq).get(0));
 	}
 	
+
 	public Double avgResult(long courseId) throws SystemException
 	{
 		ClassLoader classLoader = (ClassLoader) PortletBeanLocatorUtil.locate(ClpSerializer.getServletContextName(), "portletClassLoader"); 
@@ -170,31 +172,25 @@ public class CourseResultLocalServiceImpl
 		return (Double)(learningActivityResultPersistence.findWithDynamicQuery(dq).get(0));
 	}
 	
+	/**
+	 * @deprecated Renamed to {@link #avgPassedStudentsResult} 
+	 */
 	public Double avgStudentsResult(Course course, boolean passed) throws SystemException
 	{
-		List<User> students = CourseLocalServiceUtil.getStudentsFromCourse(course.getCompanyId(), course.getGroupCreatedId());
-		
-		ClassLoader classLoader = (ClassLoader) PortletBeanLocatorUtil.locate(ClpSerializer.getServletContextName(), "portletClassLoader"); 
-		DynamicQuery consulta=DynamicQueryFactoryUtil.forClass(CourseResult.class, classLoader)
-				.add(PropertyFactoryUtil.forName("courseId").eq(course.getCourseId()));
-		
-		if(Validator.isNotNull(students) && students.size() > 0) {
-			Criterion criterion = null;
-			for (int i = 0; i < students.size(); i++) {
-				if(i==0) {
-					criterion = RestrictionsFactoryUtil.like("userId", students.get(i).getUserId());
-				} else {
-					criterion = RestrictionsFactoryUtil.or(criterion, RestrictionsFactoryUtil.like("userId", students.get(i).getUserId()));
-				}
-			}
-			if(Validator.isNotNull(criterion)) {
-				criterion=RestrictionsFactoryUtil.and(criterion,
-						RestrictionsFactoryUtil.eq("passed",passed));
-				consulta.add(criterion);
-			}
-		}
-		consulta.setProjection(ProjectionFactoryUtil.avg("result"));
-		return (Double)(learningActivityResultPersistence.findWithDynamicQuery(consulta).get(0));
+		return avgStudentsResult(course, null, passed);
+	}
+
+	/**
+	 * @deprecated Renamed to {@link #avgPassedStudentsResult} 
+	 */
+	public Double avgStudentsResult(Course course, List<User> students, boolean passed) throws SystemException
+	{
+		return CourseResultFinderUtil.avgFinishedOnlyStudents(course.getCourseId(), course.getCompanyId(), course.getGroupCreatedId(), students, passed, 0);
+	}
+	
+	public Double avgPassedStudentsResult(Course course, List<User> students, boolean passed, long teamId) throws SystemException
+	{
+		return CourseResultFinderUtil.avgFinishedOnlyStudents(course.getCourseId(), course.getCompanyId(), course.getGroupCreatedId(), students, passed, teamId);
 	}
 	
 	public CourseResult create(long courseId, long userId) throws SystemException
@@ -206,6 +202,7 @@ public class CourseResultLocalServiceImpl
 		courseResult.setResult(0);
 		courseResult.setPassed(false);
 		courseResult.setPassedDate(null);
+		courseResult.setStartDate(new Date());
 		courseResultPersistence.update(courseResult, false);
 
 		return courseResult;
@@ -221,23 +218,19 @@ public class CourseResultLocalServiceImpl
 		courseResult.setPassedDate(null);
 		courseResult.setAllowStartDate(allowStartDate);
 		courseResult.setAllowFinishDate(allowFinishDate);
+		courseResult.setStartDate(new Date());
 		courseResultPersistence.update(courseResult, false);
 
 		return courseResult;
 	}
-	public void update(CourseResult cresult) throws SystemException
-	{
+	
+	public void update(CourseResult cresult) throws SystemException{
 		if(cresult.getPassed()){
 			List<CourseCompetence> competences = courseCompetencePersistence.findBycourseId(cresult.getCourseId(), false);
 		
 			for(CourseCompetence cc: competences){
-				UserCompetence uc = null;
-				try {
-					uc = userCompetencePersistence.findByUserIdCompetenceId(cresult.getUserId(), cc.getCompetenceId());
-				} catch (NoSuchUserCompetenceException e) {
-					uc = null;
-				}
-				
+				UserCompetence uc = userCompetencePersistence.fetchByUserIdCompetenceId(cresult.getUserId(), cc.getCompetenceId());
+								
 				if(uc==null){
 					UserCompetence userCompetence=userCompetencePersistence.create(counterLocalService.increment(UserCompetence.class.getName()));
 					userCompetence.setUserId(cresult.getUserId());
@@ -247,59 +240,24 @@ public class CourseResultLocalServiceImpl
 					userCompetencePersistence.update(userCompetence, false);
 				}
 			}	
-		}
-		
+		}		
 		courseResultPersistence.update(cresult, false);
 	}
 	
-	public void update(ModuleResult mresult) throws PortalException, SystemException
-	{
+	public void update(ModuleResult mresult) throws PortalException, SystemException{
 		Module theModule=moduleLocalService.getModule(mresult.getModuleId());
 		Course course=coursePersistence.fetchByGroupCreatedId(theModule.getGroupId());
-		if(course!=null)
-		{
+		if(course!=null){
 			CourseEvalRegistry cer=new CourseEvalRegistry();
 			long courseEvalTypeId=course.getCourseEvalId();
 			CourseEval ceval=cer.getCourseEval(courseEvalTypeId);
-			CourseResult courseResult=CourseResultLocalServiceUtil.getByUserAndCourse(course.getCourseId(), mresult.getUserId());
-			//.fetchByuc(mresult.getUserId(), course.getCourseId());
-			if(courseResult==null)
-			{
-				courseResult=CourseResultLocalServiceUtil.create(course.getCourseId(),  mresult.getUserId());
-				courseResult.setStartDate(mresult.getStartDate());
-				CourseResultLocalServiceUtil.update(courseResult);
-			}
-			else
-			{
-				courseResult=CourseResultLocalServiceUtil.getByUserAndCourse( course.getCourseId(),  mresult.getUserId());
-				if(courseResult.getStartDate()==null)
-				{
-					courseResult.setStartDate(mresult.getStartDate());
-					CourseResultLocalServiceUtil.update(courseResult);
-				}
-			}
 			ceval.updateCourse(course, mresult);
 		}
 	}
 	
 	public CourseResult getCourseResultByCourseAndUser(long courseId,long userId) throws SystemException{
 
-		ClassLoader classLoader = (ClassLoader) PortletBeanLocatorUtil.locate(ClpSerializer.getServletContextName(), "portletClassLoader"); 
-		DynamicQuery consulta = DynamicQueryFactoryUtil.forClass(CourseResult.class, classLoader)
-				.add(PropertyFactoryUtil.forName("courseId").eq(courseId))
-				.add(PropertyFactoryUtil.forName("userId").eq(userId));
-	
-		List<CourseResult> list = (List<CourseResult>)courseResultPersistence.findWithDynamicQuery(consulta);
-		
-		if(list!=null){
-			if(list.size() > 0){
-				return list.get(0);
-			}
-		}
-		
-		return null;
-		
-		//return courseResultPersistence.fetchByuc(userId, courseId);
+		return CourseResultUtil.fetchByuc(userId, courseId);
 	}
 	
 	public String translateResult(Locale locale, double result, long groupId){
@@ -308,7 +266,7 @@ public class CourseResultLocalServiceImpl
 			Course curso = courseLocalService.getCourseByGroupCreatedId(groupId);
 			if(curso != null){
 				CalificationType ct = new CalificationTypeRegistry().getCalificationType(curso.getCalificationType());
-				translatedResult = ct.translate(locale, result);
+				translatedResult = ct.translate(locale,result);
 			}
 		} catch (SystemException e) {
 			// TODO Auto-generated catch block

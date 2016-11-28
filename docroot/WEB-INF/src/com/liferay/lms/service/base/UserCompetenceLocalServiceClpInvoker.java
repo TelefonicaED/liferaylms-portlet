@@ -104,40 +104,40 @@ public class UserCompetenceLocalServiceClpInvoker {
 				"com.liferay.lms.model.UserCompetence", "boolean"
 			};
 
-		_methodName138 = "getBeanIdentifier";
+		_methodName158 = "getBeanIdentifier";
 
-		_methodParameterTypes138 = new String[] {  };
+		_methodParameterTypes158 = new String[] {  };
 
-		_methodName139 = "setBeanIdentifier";
+		_methodName159 = "setBeanIdentifier";
 
-		_methodParameterTypes139 = new String[] { "java.lang.String" };
+		_methodParameterTypes159 = new String[] { "java.lang.String" };
 
-		_methodName144 = "findByUserIdCompetenceId";
+		_methodName164 = "findByUserIdCompetenceId";
 
-		_methodParameterTypes144 = new String[] { "long", "long" };
+		_methodParameterTypes164 = new String[] { "long", "long" };
 
-		_methodName145 = "findByUuid";
+		_methodName165 = "findByUuid";
 
-		_methodParameterTypes145 = new String[] { "java.lang.String" };
+		_methodParameterTypes165 = new String[] { "java.lang.String" };
 
-		_methodName146 = "getCertificateURL";
+		_methodName166 = "getCertificateURL";
 
-		_methodParameterTypes146 = new String[] {
+		_methodParameterTypes166 = new String[] {
 				"com.liferay.portal.kernel.portlet.LiferayPortletResponse",
 				"java.lang.String"
 			};
 
-		_methodName147 = "findBuUserId";
+		_methodName167 = "findBuUserId";
 
-		_methodParameterTypes147 = new String[] { "long" };
+		_methodParameterTypes167 = new String[] { "long" };
 
-		_methodName148 = "findBuUserId";
+		_methodName168 = "findBuUserId";
 
-		_methodParameterTypes148 = new String[] { "long", "int", "int" };
+		_methodParameterTypes168 = new String[] { "long", "int", "int" };
 
-		_methodName149 = "countByUserId";
+		_methodName169 = "countByUserId";
 
-		_methodParameterTypes149 = new String[] { "long" };
+		_methodParameterTypes169 = new String[] { "long" };
 	}
 
 	public Object invokeMethod(String name, String[] parameterTypes,
@@ -229,49 +229,47 @@ public class UserCompetenceLocalServiceClpInvoker {
 				((Boolean)arguments[1]).booleanValue());
 		}
 
-		if (_methodName138.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes138, parameterTypes)) {
+		if (_methodName158.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes158, parameterTypes)) {
 			return UserCompetenceLocalServiceUtil.getBeanIdentifier();
 		}
 
-		if (_methodName139.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes139, parameterTypes)) {
+		if (_methodName159.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes159, parameterTypes)) {
 			UserCompetenceLocalServiceUtil.setBeanIdentifier((java.lang.String)arguments[0]);
-
-			return null;
 		}
 
-		if (_methodName144.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes144, parameterTypes)) {
+		if (_methodName164.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes164, parameterTypes)) {
 			return UserCompetenceLocalServiceUtil.findByUserIdCompetenceId(((Long)arguments[0]).longValue(),
 				((Long)arguments[1]).longValue());
 		}
 
-		if (_methodName145.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes145, parameterTypes)) {
+		if (_methodName165.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes165, parameterTypes)) {
 			return UserCompetenceLocalServiceUtil.findByUuid((java.lang.String)arguments[0]);
 		}
 
-		if (_methodName146.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes146, parameterTypes)) {
+		if (_methodName166.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes166, parameterTypes)) {
 			return UserCompetenceLocalServiceUtil.getCertificateURL((com.liferay.portal.kernel.portlet.LiferayPortletResponse)arguments[0],
 				(java.lang.String)arguments[1]);
 		}
 
-		if (_methodName147.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes147, parameterTypes)) {
+		if (_methodName167.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes167, parameterTypes)) {
 			return UserCompetenceLocalServiceUtil.findBuUserId(((Long)arguments[0]).longValue());
 		}
 
-		if (_methodName148.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes148, parameterTypes)) {
+		if (_methodName168.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes168, parameterTypes)) {
 			return UserCompetenceLocalServiceUtil.findBuUserId(((Long)arguments[0]).longValue(),
 				((Integer)arguments[1]).intValue(),
 				((Integer)arguments[2]).intValue());
 		}
 
-		if (_methodName149.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes149, parameterTypes)) {
+		if (_methodName169.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes169, parameterTypes)) {
 			return UserCompetenceLocalServiceUtil.countByUserId(((Long)arguments[0]).longValue());
 		}
 
@@ -310,20 +308,20 @@ public class UserCompetenceLocalServiceClpInvoker {
 	private String[] _methodParameterTypes14;
 	private String _methodName15;
 	private String[] _methodParameterTypes15;
-	private String _methodName138;
-	private String[] _methodParameterTypes138;
-	private String _methodName139;
-	private String[] _methodParameterTypes139;
-	private String _methodName144;
-	private String[] _methodParameterTypes144;
-	private String _methodName145;
-	private String[] _methodParameterTypes145;
-	private String _methodName146;
-	private String[] _methodParameterTypes146;
-	private String _methodName147;
-	private String[] _methodParameterTypes147;
-	private String _methodName148;
-	private String[] _methodParameterTypes148;
-	private String _methodName149;
-	private String[] _methodParameterTypes149;
+	private String _methodName158;
+	private String[] _methodParameterTypes158;
+	private String _methodName159;
+	private String[] _methodParameterTypes159;
+	private String _methodName164;
+	private String[] _methodParameterTypes164;
+	private String _methodName165;
+	private String[] _methodParameterTypes165;
+	private String _methodName166;
+	private String[] _methodParameterTypes166;
+	private String _methodName167;
+	private String[] _methodParameterTypes167;
+	private String _methodName168;
+	private String[] _methodParameterTypes168;
+	private String _methodName169;
+	private String[] _methodParameterTypes169;
 }

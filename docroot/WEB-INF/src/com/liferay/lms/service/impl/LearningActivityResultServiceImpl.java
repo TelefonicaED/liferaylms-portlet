@@ -14,6 +14,8 @@
 
 package com.liferay.lms.service.impl;
 
+import java.util.Date;
+
 import com.liferay.lms.auditing.AuditConstants;
 import com.liferay.lms.auditing.AuditingLogFactory;
 import com.liferay.lms.model.LearningActivity;
@@ -30,30 +32,12 @@ import com.liferay.portal.model.User;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceContextThreadLocal;
 
-/**
- * The implementation of the learning activity result remote service.
- *
- * <p>
- * All custom service methods should be put in this class. Whenever methods are added, rerun ServiceBuilder to copy their definitions into the {@link com.liferay.lms.service.LearningActivityResultService} interface.
- * </p>
- *
- * <p>
- * Never reference this interface directly. Always use {@link com.liferay.lms.service.LearningActivityResultServiceUtil} to access the learning activity result remote service.
- * </p>
- *
- * <p>
- * This is a remote service. Methods of this service are expected to have security checks based on the propagated JAAS credentials because this service can be accessed remotely.
- * </p>
- *
- * @author cvicente
- * @see com.liferay.lms.service.base.LearningActivityResultServiceBaseImpl
- * @see com.liferay.lms.service.LearningActivityResultServiceUtil
- */
+
 @JSONWebService(mode = JSONWebServiceMode.MANUAL)
-public class LearningActivityResultServiceImpl
-	extends LearningActivityResultServiceBaseImpl 
-	{
-	Log log = LogFactoryUtil.getLog(LearningActivityResultServiceImpl.class);
+public class LearningActivityResultServiceImpl	extends LearningActivityResultServiceBaseImpl{
+	
+	private Log log = LogFactoryUtil.getLog(LearningActivityResultServiceImpl.class);
+	
 	@JSONWebService
 	public LearningActivityResult getByActId(long actId) throws PortalException, SystemException
 	{
@@ -83,7 +67,7 @@ public class LearningActivityResultServiceImpl
 	{
 		User user=this.getUser();
 		LearningActivityResult lar = learningActivityResultLocalService.update(latId, result, tryResultData, user.getUserId());
-
+		
 		//auditing
 		ServiceContext serviceContext = ServiceContextThreadLocal.getServiceContext();
 		if(serviceContext!=null){
@@ -106,7 +90,7 @@ public class LearningActivityResultServiceImpl
 	{
 		User user=this.getUser();
 		LearningActivityResult lar = learningActivityResultLocalService.update(latId, tryResultData, user.getUserId());
-
+	
 		//auditing
 		ServiceContext serviceContext = ServiceContextThreadLocal.getServiceContext();
 		if(serviceContext!=null){
@@ -125,40 +109,50 @@ public class LearningActivityResultServiceImpl
 		return lar;
 	}
 	
-	public LearningActivityResult update(long latId, String tryResultData, String imsmanifest) throws PortalException, SystemException
-	{
+	public LearningActivityResult update(long latId, String tryResultData, String imsmanifest) throws PortalException, SystemException{
+		
 		User user=this.getUser();
 		LearningActivityResult lar = learningActivityResultLocalService.update(latId, tryResultData, imsmanifest, user.getUserId());
+
 		if(log.isDebugEnabled()){
 			log.debug("Updating SCORM Status(LMSCommit): "+user.getFullName()+" actId:"+lar.getActId()+" \n manifest:\n"+imsmanifest+"tryResultData(JSON): \n"+tryResultData);
 		}
+		
 		//auditing
 		ServiceContext serviceContext = ServiceContextThreadLocal.getServiceContext();
 		if(serviceContext!=null){
 			AuditingLogFactory.audit(serviceContext.getCompanyId(), serviceContext.getScopeGroupId(), LearningActivityResult.class.getName(), 
 				latId, serviceContext.getUserId(), AuditConstants.UPDATE, null);
-		}else{
-			if(lar!=null){
-				LearningActivity la = learningActivityPersistence.fetchByPrimaryKey(lar.getActId());
-				if(la!=null){
-					AuditingLogFactory.audit(serviceContext.getCompanyId(), serviceContext.getScopeGroupId(), LearningActivityResult.class.getName(), 
-							latId, serviceContext.getUserId(), AuditConstants.UPDATE, null);
-				}
-			}
 		}
 		
 		return lar;
 	}
-	public LearningActivityResult updateFinishTry(long latId, String tryResultData, String imsmanifest) throws PortalException, SystemException
-	{
-		LearningActivityTry learningActivityTry = learningActivityTryLocalService.getLearningActivityTry(latId);
-		User user=this.getUser();
+	
+	public void forceFinishTry(long latId){
+		try{
+			LearningActivityTry lat = learningActivityTryLocalService.fetchLearningActivityTry(latId);
+			if(lat != null){
+				lat.setEndDate(new Date());
+				learningActivityTryLocalService.updateLearningActivityTry(lat);
+			}
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+	}
+	
+	public LearningActivityResult updateFinishTry(long latId, String tryResultData, String imsmanifest) throws PortalException, SystemException	{
+		log.debug("updateFinishTry "+latId);
+		return learningActivityResultLocalService.update(latId, tryResultData, imsmanifest, this.getUserId());
+		/*
+        log.debug("updateFinishTry "+latId);
+        LearningActivityTry learningActivityTry = learningActivityTryLocalService.getLearningActivityTry(latId);
+        User user=this.getUser();
 		learningActivityTry.setEndDate(new java.util.Date(System.currentTimeMillis()));
 		if(log.isDebugEnabled()){
 			log.debug("Updating an finish SCORM Status(LMSFinish): "+user.getFullName()+" actId:"+learningActivityTry.getActId()+" manifest:\n"+imsmanifest+"\n tryResultData(JSON): \n"+tryResultData);
 		}
-		learningActivityTryLocalService.updateLearningActivityTry(learningActivityTry);
-		
-		return update( latId,  tryResultData,  imsmanifest);
+        learningActivityTry.setEndDate(new Date());
+        return learningActivityTryLocalService.updateLearningActivityTry(learningActivityTry, tryResultData, imsmanifest);*/
+
 	}
 }

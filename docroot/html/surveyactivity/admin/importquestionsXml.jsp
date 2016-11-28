@@ -48,6 +48,8 @@ else
 <liferay-ui:error key="surveyactivity.editquestions.importquestions.xml.fileRequired" message="surveyactivity.editquestions.importquestions.xml.fileRequired" />
 <liferay-ui:error key="surveyactivity.editquestions.importquestions.xml.badFormat" message="surveyactivity.editquestions.importquestions.xml.badFormat" />
 <liferay-ui:error key="surveyactivity.editquestions.importquestions.xml.parseXML" message="surveyactivity.editquestions.importquestions.xml.parseXML" />
+<liferay-ui:error key="surveyactivity.editquestions.importquestions.xml.generic" message="surveyactivity.editquestions.importquestions.xml.generic" />
+<liferay-ui:error key="surveyactivity.editquestions.importquestions.xml.not.allowed" message="surveyactivity.editquestions.importquestions.xml.not.allowed" />
 <% if(SessionErrors.contains(renderRequest, "surveyactivity.editquestions.importquestions.xml.parseXMLLine")) { %>
 <div class="portlet-msg-error">
 	<%=LanguageUtil.format(pageContext, "surveyactivity.editquestions.importquestions.xml.parseXMLLine", SessionErrors.get(renderRequest, "surveyactivity.editquestions.importquestions.xml.parseXMLLine"),false) %>

@@ -44,4 +44,6 @@ public interface LearningActivity extends LearningActivityModel, PersistedModel 
 
 	public java.lang.String getDescriptionFiltered(
 		java.lang.String languageId, boolean useDefault);
+
+	public com.liferay.lms.model.Module getModule();
 }

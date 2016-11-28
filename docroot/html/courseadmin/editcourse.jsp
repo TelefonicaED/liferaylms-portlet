@@ -1,7 +1,6 @@
 <%@page import="com.liferay.portal.kernel.util.PropsKeys"%>
 <%@page import="com.liferay.portal.kernel.util.PrefsPropsUtil"%>
 <%@page import="com.liferay.portal.kernel.util.LocaleUtil"%>
-<%@page import="com.liferay.portal.kernel.util.ArrayUtil"%>
 <%@page import="com.liferay.lms.service.CompetenceServiceUtil"%>
 <%@page import="com.liferay.portal.kernel.util.ListUtil"%>
 <%@page import="com.liferay.lms.model.LmsPrefs"%>
@@ -40,7 +39,7 @@
 <%@ include file="/init.jsp" %>
 
 <portlet:actionURL var="savecourseURL" name="saveCourse" />
-<portlet:renderURL var="cancel" />
+<portlet:renderURL var="cancelURL" />
 <liferay-ui:success key="course-saved-successfully" message="successfully-saved" />
 <liferay-ui:error key="title-required" message="title-required" />
 <liferay-ui:error key="title-empty" message="title-empty" />
@@ -51,8 +50,7 @@
 <liferay-ui:error key="courseadmin.error.welcmessage.maxlenght" message="courseadmin.error.welcmessage.maxlenght" />
 	<%
 	
-	String maxLengthTitle = GetterUtil.getString(
-			ModelHintsUtil.getHints(Group.class.getName(), "name").get("max-length"),"");
+	String maxLengthTitle = GetterUtil.getString( ModelHintsUtil.getHints(Group.class.getName(), "name").get("max-length"),"");
 	String courseTitle = "";
 	
 	String site = PropsUtil.get("lms.site.types");
@@ -75,9 +73,9 @@
 		<div class="portlet-msg-error">
 			<% 
 				List<String> errors = (List<String>)SessionErrors.get(renderRequest, "newCourseErrors");
-			   if(errors.size()==1) {
-				  %><%=errors.get(0) %><%
-			   }	
+			   	if(errors.size()==1) {
+				  	%><%=errors.get(0) %><%
+			   	}	
 			   else {
 			%>
 				<ul>
@@ -93,10 +91,7 @@
 	if((maxUsersError!=null&&!"".equals(maxUsersError))){
 	%>
 		<div class="portlet-msg-error"><%=maxUsersError %></div>
-	<%} %>
-
-
-<%
+	<%} 
 
 String publishPermission="PUBLISH";
 String redirect = ParamUtil.getString(request, "redirect");
@@ -179,16 +174,12 @@ boolean showClone 	= preferences.getValue("showClone",  "true").equals("true");
 boolean showGo 		= preferences.getValue("showGo", 	 "true").equals("true");
 boolean showRegistrationType = preferences.getValue("showRegistrationType",  "true").equals("true");
 boolean showMaxUsers = preferences.getValue("showMaxUsers", "true").equals("true");
-boolean showWelcomeMsg = preferences.getValue("showWelcomeMsg", "true").equals("true");
-boolean showGoodbyeMsg = preferences.getValue("showGoodbyeMsg", "true").equals("true");
 
-
-boolean showPermission = preferences.getValue("showPermission", "true").equals("true");
+boolean showCoursePermission = preferences.getValue("showCoursePermission", "true").equals("true");
 
 String welcomeSubject= new String();
 String goodbyeSubject = new String();
-if(course!=null)
-{
+if(course!=null){
 	groupCreated = GroupLocalServiceUtil.getGroup(course.getGroupCreatedId());
 	entry=AssetEntryLocalServiceUtil.getEntry(Course.class.getName(),course.getCourseId());
 	assetEntryId=entry.getEntryId();
@@ -215,9 +206,7 @@ if(course!=null)
 	%>
 	<aui:model-context bean="<%= course %>" model="<%= Course.class %>" />
 	<%
-}
-else
-{
+} else {
 	%>
 	<aui:model-context  model="<%= Course.class %>" />
 	<%
@@ -225,80 +214,80 @@ else
 %>
 
 <c:if test="<%=course != null %>">
-<div class="aui-tab-back">
-	<liferay-ui:icon-menu>
-		<%if(permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), Course.class.getName(), courseId, ActionKeys.UPDATE) && ! course.isClosed() && showClose){%>
-			<portlet:actionURL name="closeCourse" var="closeURL">
-				<portlet:param name="courseId" value="<%=String.valueOf(courseId) %>" />
-				<portlet:param name="redirect" value='<%=ParamUtil.getString(request, "redirect", currentURL) %>'/>
-			</portlet:actionURL>
-			<liferay-ui:icon image="close" message="close" url="<%=closeURL.toString() %>" />
-		<%}else if(permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), Course.class.getName(), courseId, ActionKeys.UPDATE)&& course.isClosed()){%>
-			<portlet:actionURL name="openCourse" var="openURL">
-				<portlet:param name="courseId" value="<%=String.valueOf(course) %>" />
-				<portlet:param name="redirect" value='<%=ParamUtil.getString(request, "redirect", currentURL) %>'/>
-			</portlet:actionURL>
-		<%}%>
-		
-		<%if( permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), Course.class.getName(), courseId, ActionKeys.DELETE) && ! course.isClosed() && showDelete){%>
-			<portlet:actionURL name="deleteCourse" var="deleteURL">
-				<portlet:param name="courseId" value="<%=String.valueOf(courseId) %>" />
-			</portlet:actionURL>
-			<liferay-ui:icon-delete url="<%=deleteURL.toString() %>" />
-		<%}%>
-		
-		<%if(permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), Course.class.getName(), courseId, "ASSIGN_MEMBERS") && ! course.isClosed() && showMembers){%>
-			<portlet:renderURL var="memebersURL">
-				<portlet:param name="courseId" value="<%=String.valueOf(courseId) %>" />
-				<portlet:param name="backToEdit" value="<%=StringPool.TRUE %>" />
-				<portlet:param name="redirectOfEdit" value='<%=ParamUtil.getString(request, "redirect", currentURL) %>'/>
-				<portlet:param name="jspPage" value="/html/courseadmin/rolememberstab.jsp" />
-			</portlet:renderURL>
-			<liferay-ui:icon image="group" message="assign-member" url="<%=memebersURL.toString() %>" />
-		<%}%>
-		<%if(permissionChecker.hasPermission(course.getGroupId(), Course.class.getName(), course.getCourseId(), ActionKeys.PERMISSIONS) && ! course.isClosed()){%>
-			<%if(showPermission){%>
-			<liferay-security:permissionsURL modelResource="<%=Course.class.getName() %>" modelResourceDescription="<%=course.getTitle(themeDisplay.getLocale()) %>"
-				resourcePrimKey="<%= String.valueOf(course.getCourseId()) %>" var="permissionsURL" />
-			<liferay-ui:icon image="permissions" message="courseadmin.adminactions.permissions" url="<%=permissionsURL %>" />
+	<div class="aui-tab-back">
+		<liferay-ui:icon-menu>
+			<%if(permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), Course.class.getName(), courseId, ActionKeys.UPDATE) && ! course.isClosed() && showClose){%>
+				<portlet:actionURL name="closeCourse" var="closeURL">
+					<portlet:param name="courseId" value="<%=String.valueOf(courseId) %>" />
+					<portlet:param name="redirect" value='<%=ParamUtil.getString(request, "redirect", currentURL) %>'/>
+				</portlet:actionURL>
+				<liferay-ui:icon image="close" message="close" url="<%=closeURL.toString() %>" />
+			<%}else if(permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), Course.class.getName(), courseId, ActionKeys.UPDATE)&& course.isClosed()){%>
+				<portlet:actionURL name="openCourse" var="openURL">
+					<portlet:param name="courseId" value="<%=String.valueOf(course) %>" />
+					<portlet:param name="redirect" value='<%=ParamUtil.getString(request, "redirect", currentURL) %>'/>
+				</portlet:actionURL>
 			<%}%>
-			<%if(showExport){%>
-			<portlet:renderURL var="exportURL">
-				<portlet:param name="groupId" value="<%=String.valueOf(course.getGroupCreatedId()) %>" />
-				<portlet:param name="jspPage" value="/html/courseadmin/export.jsp" />
-			</portlet:renderURL>
-			<liferay-ui:icon image="download" message="courseadmin.adminactions.export" url="<%=exportURL %>" />	
+			
+			<%if( permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), Course.class.getName(), courseId, ActionKeys.DELETE) && ! course.isClosed() && showDelete){%>
+				<portlet:actionURL name="deleteCourse" var="deleteURL">
+					<portlet:param name="courseId" value="<%=String.valueOf(courseId) %>" />
+				</portlet:actionURL>
+				<liferay-ui:icon-delete url="<%=deleteURL.toString() %>" />
 			<%}%>
-			<%if(showImport){%>		
-			<portlet:renderURL var="importURL">
-				<portlet:param name="groupId" value="<%=String.valueOf(course.getGroupCreatedId()) %>" />
-				<portlet:param name="jspPage" value="/html/courseadmin/import.jsp" />
-			</portlet:renderURL>
-			<liferay-ui:icon image="post" message="courseadmin.adminactions.import" url="<%=importURL %>" />	
-			<%}%>	
-			<%if(showClone){%>	
-			<portlet:renderURL var="cloneURL">
-				<portlet:param name="groupId" value="<%=String.valueOf(course.getGroupCreatedId()) %>" />
-				<portlet:param name="jspPage" value="/html/courseadmin/clone.jsp" />
-			</portlet:renderURL>
-			<liferay-ui:icon image="copy" message="courseadmin.adminactions.clone" url="<%=cloneURL%>" />	
-			<%}%>		
-		<%}%>
-		<%if(count>0 && permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), Course.class.getName(), courseId,ActionKeys.UPDATE) && !course.isClosed() ){%>
-			<portlet:renderURL var="competenceURL">
-				<portlet:param name="groupId" value="<%=String.valueOf(course.getGroupCreatedId()) %>" />
-				<portlet:param name="courseId" value="<%=String.valueOf(course.getCourseId()) %>" />
-				<portlet:param name="jspPage" value="/html/courseadmin/competencetab.jsp" />
-			</portlet:renderURL>
-			<liferay-ui:icon image="tag" message="competence.label" url="<%=competenceURL %>" />
-		<%}%>
-		<%if(showGo && groupsel != null && permissionChecker.hasPermission(course.getGroupId(), Course.class.getName(),course.getCourseId(), ActionKeys.VIEW) && 
-				!course.isClosed() && ( PortalUtil.isOmniadmin(themeDisplay.getUserId()) || UserLocalServiceUtil.hasGroupUser(course.getGroupCreatedId(), themeDisplay.getUserId()))) {%>
-			<liferay-ui:icon image="submit" message="courseadmin.adminactions.gotocourse" target="_top" url="<%=themeDisplay.getPortalURL() +\"/\"+ response.getLocale().getLanguage() +\"/web/\"+ groupsel.getFriendlyURL()%>" />
-		<%}%>
-		
-	</liferay-ui:icon-menu>
-</div>
+			
+			<%if(permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), Course.class.getName(), courseId, "ASSIGN_MEMBERS") && ! course.isClosed() && showMembers){%>
+				<portlet:renderURL var="memebersURL">
+					<portlet:param name="courseId" value="<%=String.valueOf(courseId) %>" />
+					<portlet:param name="backToEdit" value="<%=StringPool.TRUE %>" />
+					<portlet:param name="redirectOfEdit" value='<%=ParamUtil.getString(request, "redirect", currentURL) %>'/>
+					<portlet:param name="view" value="role-members-tab" />
+				</portlet:renderURL>
+				<liferay-ui:icon image="group" message="assign-member" url="<%=memebersURL.toString() %>" />
+			<%}%>
+			<%if(permissionChecker.hasPermission(course.getGroupId(), Course.class.getName(), course.getCourseId(), ActionKeys.PERMISSIONS) && ! course.isClosed()){%>
+				<c:if test="${renderRequest.preferences.getValue('showPermission', 'true') }">
+					<liferay-security:permissionsURL modelResource="<%=Course.class.getName() %>" modelResourceDescription="<%=course.getTitle(themeDisplay.getLocale()) %>"
+						resourcePrimKey="<%= String.valueOf(course.getCourseId()) %>" var="permissionsURL" />
+					<liferay-ui:icon image="permissions" message="courseadmin.adminactions.permissions" url="<%=permissionsURL %>" />
+				</c:if>
+				<%if(showExport){%>
+				<portlet:renderURL var="exportURL">
+					<portlet:param name="groupId" value="<%=String.valueOf(course.getGroupCreatedId()) %>" />
+					<portlet:param name="view" value="export" />
+				</portlet:renderURL>
+				<liferay-ui:icon image="download" message="courseadmin.adminactions.export" url="<%=exportURL %>" />	
+				<%}%>
+				<%if(showImport){%>		
+				<portlet:renderURL var="importURL">
+					<portlet:param name="groupId" value="<%=String.valueOf(course.getGroupCreatedId()) %>" />
+					<portlet:param name="view" value="import" />
+				</portlet:renderURL>
+				<liferay-ui:icon image="post" message="courseadmin.adminactions.import" url="<%=importURL %>" />	
+				<%}%>	
+				<%if(showClone){%>	
+				<portlet:renderURL var="cloneURL">
+					<portlet:param name="groupId" value="<%=String.valueOf(course.getGroupCreatedId()) %>" />
+					<portlet:param name="view" value="clone" />
+				</portlet:renderURL>
+				<liferay-ui:icon image="copy" message="courseadmin.adminactions.clone" url="<%=cloneURL%>" />	
+				<%}%>		
+			<%}%>
+			<%if(count>0 && permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), Course.class.getName(), courseId,ActionKeys.UPDATE) && !course.isClosed() ){%>
+				<portlet:renderURL var="competenceURL">
+					<portlet:param name="groupId" value="<%=String.valueOf(course.getGroupCreatedId()) %>" />
+					<portlet:param name="courseId" value="<%=String.valueOf(course.getCourseId()) %>" />
+					<portlet:param name="view" value="competence-tab" />
+				</portlet:renderURL>
+				<liferay-ui:icon image="tag" message="competence.label" url="<%=competenceURL %>" />
+			<%}%>
+			<%if(showGo && groupsel != null && permissionChecker.hasPermission(course.getGroupId(), Course.class.getName(),course.getCourseId(), ActionKeys.VIEW) && 
+					!course.isClosed() && ( PortalUtil.isOmniadmin(themeDisplay.getUserId()) || UserLocalServiceUtil.hasGroupUser(course.getGroupCreatedId(), themeDisplay.getUserId()))) {%>
+				<liferay-ui:icon image="submit" message="courseadmin.adminactions.gotocourse" target="_top" url="<%=themeDisplay.getPortalURL() +\"/\"+ response.getLocale().getLanguage() +\"/web/\"+ groupsel.getFriendlyURL()%>" />
+			<%}%>
+			
+		</liferay-ui:icon-menu>
+	</div>
 </c:if>
 
 <aui:form name="fm" action="<%=savecourseURL%>"  method="post" enctype="multipart/form-data">
@@ -322,18 +311,20 @@ else
 	</span>
 	<aui:input name="friendlyURL" label="FriendlyURL" type="hidden" > <%=groupCreated!=null?groupCreated.getFriendlyURL():"" %> </aui:input>
 	
-	<aui:field-wrapper label="description" name="description">
-			<script type="text/javascript">
-				function <portlet:namespace />onChangeDescription(val) {
-			    	var A = AUI();
-					A.one('#<portlet:namespace />description').set('value',val);
-	        	}
-			</script>
-			<liferay-ui:input-editor name="description" width="100%" onChangeMethod="onChangeDescription" initMethod="initEditorDescription" />
-			<script type="text/javascript">
-    		    function <portlet:namespace />initEditorDescription() { return "<%= UnicodeFormatter.toString(description) %>"; }
-    		</script>
-	</aui:field-wrapper>
+	<c:if test="${renderRequest.preferences.getValue('showDescription', 'true') }">		
+		<aui:field-wrapper label="description" name="description">
+				<script type="text/javascript">
+					function <portlet:namespace />onChangeDescription(val) {
+				    	var A = AUI();
+						A.one('#<portlet:namespace />description').set('value',val);
+		        	}
+				</script>
+				<liferay-ui:input-editor name="description" width="100%" onChangeMethod="onChangeDescription" initMethod="initEditorDescription" />
+				<script type="text/javascript">
+	    		    function <portlet:namespace />initEditorDescription() { return "<%= UnicodeFormatter.toString(description) %>"; }
+	    		</script>
+		</aui:field-wrapper>
+	</c:if>
 	
 	<c:if test="<%= permissionChecker.hasPermission(themeDisplay.getScopeGroupId(),  Course.class.getName(),0,publishPermission) && 
 			GetterUtil.getBoolean(renderRequest.getPreferences().getValues(\"showcatalog\", new String[]{StringPool.TRUE})[0],true) %>">
@@ -348,54 +339,58 @@ else
 	</aui:input> 
 	<liferay-ui:error key="error-file-size" message="error-file-size" />
 	<script type="text/javascript">
-	Liferay.provide(
-		window,
-		'<portlet:namespace/>toggleInputLogo',
-		function() {
-			var A = AUI();
-			var discardCheckbox = A.one('#<portlet:namespace/>discardLogoCheckbox');
-			var fileInput = A.one('#<portlet:namespace/>fileName');
-			var iconCourse = A.one('#<portlet:namespace/>icon_course');
-			if (discardCheckbox.attr('checked')) {
-				fileInput.val('');
-				fileInput.hide();
-				iconCourse.hide();
-			} else {
-				fileInput.show();
-				iconCourse.show();
-			}
-		},
-		['node']
-	);
+		Liferay.provide(
+			window,
+			'<portlet:namespace/>toggleInputLogo',
+			function() {
+				var A = AUI();
+				var discardCheckbox = A.one('#<portlet:namespace/>discardLogoCheckbox');
+				var fileInput = A.one('#<portlet:namespace/>fileName');
+				var iconCourse = A.one('#<portlet:namespace/>icon_course');
+				if (discardCheckbox.attr('checked')) {
+					fileInput.val('');
+					fileInput.hide();
+					iconCourse.hide();
+				} else {
+					fileInput.show();
+					iconCourse.show();
+				}
+			},
+			['node']
+		);
 	</script>
-	<aui:field-wrapper cssClass="wrapper-icon-course">
-		<% if (course != null && course.getIcon() != 0 && !requiredCourseIcon) { %>
-				<aui:input type="checkbox" name="discardLogo" label="discard-course-icon" onClick='<%= renderResponse.getNamespace()+"toggleInputLogo()" %>'/>
-			<% } %>
-			<aui:input name="fileName" label="image" id="fileName" type="file" value="" >
-				<aui:validator name="acceptFiles">'jpg, jpeg, png, gif'</aui:validator>
-				<% if (requiredCourseIcon) { %>
-					<aui:validator errorMessage="course-icon-required" name="customRequiredCourseIcon1">(function(val, fieldNode, ruleValue) {return (AUI().one('#<portlet:namespace/>icon').val() || val != null);})()</aui:validator>
-				<% } %>
-			</aui:input>
-		<%	if(course != null && course.getIcon() != 0) {
-			FileEntry image_=DLAppLocalServiceUtil.getFileEntry(course.getIcon());	%>
-			<div class="container_ico_course">
-				<img id="<portlet:namespace/>icon_course" alt="" class="ico_course" src="<%= DLUtil.getPreviewURL(image_, image_.getFileVersion(), themeDisplay, StringPool.BLANK) %>"/>
-			</div>
-			
-		<%} %>
-	</aui:field-wrapper>
-	<liferay-ui:error key="course-icon-required" message="course-icon-required" />
-	<liferay-ui:error key="error_number_format" message="error_number_format" />
 	
-	<aui:input type="textarea" cols="100" rows="4" name="summary" label="summary" value="<%=summary %>"/>
+	<c:if test="${renderRequest.preferences.getValue('showIconCourse', 'true') }">
+		<aui:field-wrapper cssClass="wrapper-icon-course">
+			<% if (course != null && course.getIcon() != 0 && !requiredCourseIcon) { %>
+					<aui:input type="checkbox" name="discardLogo" label="discard-course-icon" onClick='<%= renderResponse.getNamespace()+"toggleInputLogo()" %>'/>
+				<% } %>
+				<aui:input name="fileName" label="image" id="fileName" type="file" value="" >
+					<aui:validator name="acceptFiles">'jpg, jpeg, png, gif'</aui:validator>
+					<% if (requiredCourseIcon) { %>
+						<aui:validator errorMessage="course-icon-required" name="customRequiredCourseIcon1">(function(val, fieldNode, ruleValue) {return (AUI().one('#<portlet:namespace/>icon').val() || val != null);})()</aui:validator>
+					<% } %>
+				</aui:input>
+			<%	if(course != null && course.getIcon() != 0) {
+				FileEntry image_=DLAppLocalServiceUtil.getFileEntry(course.getIcon());	%>
+				<div class="container_ico_course">
+					<img id="<portlet:namespace/>icon_course" alt="" class="ico_course" src="<%= DLUtil.getPreviewURL(image_, image_.getFileVersion(), themeDisplay, StringPool.BLANK) %>"/>
+				</div>
+				
+			<%} %>
+		</aui:field-wrapper>
+		<liferay-ui:error key="course-icon-required" message="course-icon-required" />
+		<liferay-ui:error key="error_number_format" message="error_number_format" />
+	</c:if>
+	<c:if test="${renderRequest.preferences.getValue('showResume', 'true') }">
+		<aui:input type="textarea" cols="100" rows="4" name="summary" label="summary" value="<%=summary %>"/>
+	</c:if>
+	
 	<%
 	List<Long> courseEvalIds = ListUtil.toList(StringUtil.split(LmsPrefsLocalServiceUtil.getLmsPrefsIni(themeDisplay.getCompanyId()).getCourseevals(),",",0L));
 	CourseEvalRegistry cer=new CourseEvalRegistry();
 	CourseEval courseEval = null;
-	if(courseEvalIds.size()>1)
-	{%>
+	if(courseEvalIds.size()>1){%>
 		<aui:select name="courseEvalId" label="course-correction-method" helpMessage="<%=LanguageUtil.get(pageContext,\"course-correction-method-help\")%>" 
 					onChange="<%=\"javascript:AUI().use('aui-io-request','aui-parse-content','querystring',function(A){ \"+
 							\"	var courseCombo = document.getElementById('\"+renderResponse.getNamespace()+\"courseEvalId'), \"+
@@ -428,7 +423,7 @@ else
 							\"					var courseEvalDetailsDiv = A.one('#\"+
 														renderResponse.getNamespace()+\"courseEvalDetails'); \"+
 							\"					courseEvalDetailsDiv.plug(A.Plugin.ParseContent); \"+ 
-							\"					courseEvalDetailsDiv.html(this.get('responseData')); \"+ 
+							\"					if(this.get('responseData')!=null){courseEvalDetailsDiv.html(this.get('responseData')); }else{ courseEvalDetailsDiv.html(''); } \"+ 
 							\"				} \"+
 							\"			} \"+
 							\"		} \"+
@@ -611,10 +606,6 @@ else
 			</aui:input>
 		</c:if>
 	</liferay-ui:panel>
-	
-	
-	
-	
 	<liferay-ui:panel title="categorization" collapsible="true" defaultState="closed">
 	<liferay-ui:custom-attributes-available className="<%= Course.class.getName() %>">
 	<liferay-ui:custom-attribute-list 
@@ -628,7 +619,8 @@ else
 					classPK="<%= courseId %>" assetEntryId="<%=assetEntryId %>" 	/>
 	</aui:fieldset>
 	</liferay-ui:panel>
-	<c:if test="<%=courseId==0%>">
+	
+	<c:if test="<%=courseId==0 && showCoursePermission%>">
 		<liferay-ui:panel title="permissions" collapsible="true" defaultState="closed">
 		
 			<liferay-ui:input-permissions modelName="<%= com.liferay.lms.model.Course.class.getName() %>">
@@ -639,8 +631,7 @@ else
 			boolean active =(course!=null&&course.getWelcome()?true:false);  
 			String welcomeMsg = (course!=null&&course.getWelcomeMsg()!=null?course.getWelcomeMsg():"");
 		%>
-		
-		<c:if test="<%=showWelcomeMsg %>">
+		<c:if test="${renderRequest.preferences.getValue('showWelcomeMsg', 'true') }">
 			<liferay-ui:panel title="welcome-msg" collapsible="true" defaultState='<%=active?"open":"closed" %>'>
 				<aui:input type="checkbox" name="welcome" label="enabled" value='<%=active %>' onChange='<%= renderResponse.getNamespace()+"changeWelcome()" %>'/>
 				
@@ -727,8 +718,7 @@ else
 			String goodbyeMsg = (course!=null&&course.getGoodbyeMsg()!=null?course.getGoodbyeMsg():"");
 		%>
 		
-		
-		<c:if test="<%=showGoodbyeMsg %>">
+		<c:if test="${renderRequest.preferences.getValue('showGoodbyeMsg', 'true') }">
 			<liferay-ui:panel title="goodbye-msg" collapsible="true" defaultState='<%=activeGoodbye?"open":"closed" %>'>
 				<aui:input type="checkbox" name="goodbye" label="enabled" value='<%=activeGoodbye %>' onChange='<%= renderResponse.getNamespace()+"changeGoodbye()" %>'/>
 				
@@ -810,16 +800,10 @@ else
 			</liferay-ui:panel>
 		</c:if>
 		
-		
-		
-		
-		
-		
-		
 </liferay-ui:panel-container>
 	<aui:button-row>
 		<aui:button type="submit"></aui:button>							
-		<aui:button onClick="<%=cancel %>" type="cancel" />
+		<aui:button onClick="${cancelURL }" type="cancel" />
 	</aui:button-row>
 </aui:form>
 
@@ -827,51 +811,32 @@ else
 <script src="/liferaylms-portlet/js/service.js" type="text/javascript"></script>
 
 <script type="text/javascript">
-function <portlet:namespace />changeWelcome(){
-	var div = document.getElementById("containerWelcomeMsg");
-	if(div.style.display&&div.style.display=='none'){
-		div.style.display='block';
-	}else{
-		div.style.display='none';
+	function <portlet:namespace />changeWelcome(){
+		var div = document.getElementById("containerWelcomeMsg");
+		if(div.style.display&&div.style.display=='none'){
+			div.style.display='block';
+		}else{
+			div.style.display='none';
+		}
 	}
-}
-function <portlet:namespace />changeGoodbye(){
-	var div = document.getElementById("containerGoodbyeMsg");
-	if(div.style.display&&div.style.display=='none'){
-		div.style.display='block';
-	}else{
-		div.style.display='none';
+	function <portlet:namespace />changeGoodbye(){
+		var div = document.getElementById("containerGoodbyeMsg");
+		if(div.style.display&&div.style.display=='none'){
+			div.style.display='block';
+		}else{
+			div.style.display='none';
+		}
 	}
-}
-
- function <portlet:namespace />checkduplicate(val, field)
-{
-	var courseId = document.getElementById('<portlet:namespace />courseId').value;
-   	return !Liferay.Service.Lms.Course.existsCourseName(
-   		{
-   			companyId: themeDisplay.getCompanyId(),
-   			courseId: (courseId > 0 ? courseId : null),
-   			groupName: val,
-   			serviceParameterTypes: JSON.stringify(['java.lang.Long', 'java.lang.Long', 'java.lang.String'])
-   		}
-   	);
-} 
+	
+	function <portlet:namespace />checkduplicate(val, field){
+		var courseId = document.getElementById('<portlet:namespace />courseId').value;
+	   	return !Liferay.Service.Lms.Course.existsCourseName(
+	   		{
+	   			companyId: themeDisplay.getCompanyId(),
+	   			courseId: (courseId > 0 ? courseId : null),
+	   			groupName: val,
+	   			serviceParameterTypes: JSON.stringify(['java.lang.Long', 'java.lang.Long', 'java.lang.String'])
+	   		}
+	   	);
+	} 
 </script>
-
-<%--  <aui:script use="liferay-form">
-	Liferay.Form.register(
-	     {
-	        id: '<portlet:namespace />fm',
-	        
-	        fieldRules: [
-	            {
-	                 body: function(val, fieldNode, ruleValue) {var res = <portlet:namespace />checkduplicate(val, fieldNode); console.log(res); return res; },
-	                 custom: true,
-	                 errorMessage: '<liferay-ui:message key="title-repeated" />',
-	                 fieldName: '<portlet:namespace />title_'+Liferay.ThemeDisplay.getLanguageId(),
-	                 validatorName: 'checkduplicate1'
-	            },
-	        ]
-	    }
-	);
-</aui:script>  --%>

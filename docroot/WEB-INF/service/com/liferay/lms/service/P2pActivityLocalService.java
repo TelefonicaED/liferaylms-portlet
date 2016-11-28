@@ -259,6 +259,8 @@ public interface P2pActivityLocalService extends BaseLocalService,
 		long actId, int start, int end)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
+	public int countByActId(long actId);
+
 	public java.util.List<com.liferay.lms.model.P2pActivity> findByActIdOrderByP2pId(
 		long actId) throws com.liferay.portal.kernel.exception.SystemException;
 
@@ -273,6 +275,9 @@ public interface P2pActivityLocalService extends BaseLocalService,
 		long actId, long p2pActivityId, int numValidaciones)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
+
+	public java.util.List<com.liferay.lms.model.P2pActivity> findByUserId(
+		long userId);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.util.List<com.liferay.lms.model.P2pActivity> getP2PActivitiesInDay(

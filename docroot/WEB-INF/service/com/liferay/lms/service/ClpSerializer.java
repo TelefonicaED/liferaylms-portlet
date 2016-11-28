@@ -14,6 +14,7 @@
 
 package com.liferay.lms.service;
 
+import com.liferay.lms.model.ActivityTriesDeletedClp;
 import com.liferay.lms.model.AuditEntryClp;
 import com.liferay.lms.model.CheckP2pMailingClp;
 import com.liferay.lms.model.CompetenceClp;
@@ -29,6 +30,7 @@ import com.liferay.lms.model.ModuleResultClp;
 import com.liferay.lms.model.P2pActivityClp;
 import com.liferay.lms.model.P2pActivityCorrectionsClp;
 import com.liferay.lms.model.SCORMContentClp;
+import com.liferay.lms.model.ScheduleClp;
 import com.liferay.lms.model.SurveyResultClp;
 import com.liferay.lms.model.TestAnswerClp;
 import com.liferay.lms.model.TestQuestionClp;
@@ -120,6 +122,10 @@ public class ClpSerializer {
 
 		String oldModelClassName = oldModelClass.getName();
 
+		if (oldModelClassName.equals(ActivityTriesDeletedClp.class.getName())) {
+			return translateInputActivityTriesDeleted(oldModel);
+		}
+
 		if (oldModelClassName.equals(AuditEntryClp.class.getName())) {
 			return translateInputAuditEntry(oldModel);
 		}
@@ -176,6 +182,10 @@ public class ClpSerializer {
 			return translateInputP2pActivityCorrections(oldModel);
 		}
 
+		if (oldModelClassName.equals(ScheduleClp.class.getName())) {
+			return translateInputSchedule(oldModel);
+		}
+
 		if (oldModelClassName.equals(SCORMContentClp.class.getName())) {
 			return translateInputSCORMContent(oldModel);
 		}
@@ -209,6 +219,17 @@ public class ClpSerializer {
 		}
 
 		return newList;
+	}
+
+	public static Object translateInputActivityTriesDeleted(
+		BaseModel<?> oldModel) {
+		ActivityTriesDeletedClp oldClpModel = (ActivityTriesDeletedClp)oldModel;
+
+		BaseModel<?> newModel = oldClpModel.getActivityTriesDeletedRemoteModel();
+
+		newModel.setModelAttributes(oldClpModel.getModelAttributes());
+
+		return newModel;
 	}
 
 	public static Object translateInputAuditEntry(BaseModel<?> oldModel) {
@@ -354,6 +375,16 @@ public class ClpSerializer {
 		return newModel;
 	}
 
+	public static Object translateInputSchedule(BaseModel<?> oldModel) {
+		ScheduleClp oldClpModel = (ScheduleClp)oldModel;
+
+		BaseModel<?> newModel = oldClpModel.getScheduleRemoteModel();
+
+		newModel.setModelAttributes(oldClpModel.getModelAttributes());
+
+		return newModel;
+	}
+
 	public static Object translateInputSCORMContent(BaseModel<?> oldModel) {
 		SCORMContentClp oldClpModel = (SCORMContentClp)oldModel;
 
@@ -422,6 +453,11 @@ public class ClpSerializer {
 		String oldModelClassName = oldModelClass.getName();
 
 		if (oldModelClassName.equals(
+					"com.liferay.lms.model.impl.ActivityTriesDeletedImpl")) {
+			return translateOutputActivityTriesDeleted(oldModel);
+		}
+
+		if (oldModelClassName.equals(
 					"com.liferay.lms.model.impl.AuditEntryImpl")) {
 			return translateOutputAuditEntry(oldModel);
 		}
@@ -486,6 +522,10 @@ public class ClpSerializer {
 		if (oldModelClassName.equals(
 					"com.liferay.lms.model.impl.P2pActivityCorrectionsImpl")) {
 			return translateOutputP2pActivityCorrections(oldModel);
+		}
+
+		if (oldModelClassName.equals("com.liferay.lms.model.impl.ScheduleImpl")) {
+			return translateOutputSchedule(oldModel);
 		}
 
 		if (oldModelClassName.equals(
@@ -597,6 +637,11 @@ public class ClpSerializer {
 			return new com.liferay.lms.NoSuchModuleException();
 		}
 
+		if (className.equals(
+					"com.liferay.lms.NoSuchActivityTriesDeletedException")) {
+			return new com.liferay.lms.NoSuchActivityTriesDeletedException();
+		}
+
 		if (className.equals("com.liferay.lms.NoSuchAuditEntryException")) {
 			return new com.liferay.lms.NoSuchAuditEntryException();
 		}
@@ -656,6 +701,10 @@ public class ClpSerializer {
 			return new com.liferay.lms.NoSuchP2pActivityCorrectionsException();
 		}
 
+		if (className.equals("com.liferay.lms.NoSuchScheduleException")) {
+			return new com.liferay.lms.NoSuchScheduleException();
+		}
+
 		if (className.equals("com.liferay.lms.NoSuchSCORMContentException")) {
 			return new com.liferay.lms.NoSuchSCORMContentException();
 		}
@@ -677,6 +726,17 @@ public class ClpSerializer {
 		}
 
 		return throwable;
+	}
+
+	public static Object translateOutputActivityTriesDeleted(
+		BaseModel<?> oldModel) {
+		ActivityTriesDeletedClp newModel = new ActivityTriesDeletedClp();
+
+		newModel.setModelAttributes(oldModel.getModelAttributes());
+
+		newModel.setActivityTriesDeletedRemoteModel(oldModel);
+
+		return newModel;
 	}
 
 	public static Object translateOutputAuditEntry(BaseModel<?> oldModel) {
@@ -818,6 +878,16 @@ public class ClpSerializer {
 		newModel.setModelAttributes(oldModel.getModelAttributes());
 
 		newModel.setP2pActivityCorrectionsRemoteModel(oldModel);
+
+		return newModel;
+	}
+
+	public static Object translateOutputSchedule(BaseModel<?> oldModel) {
+		ScheduleClp newModel = new ScheduleClp();
+
+		newModel.setModelAttributes(oldModel.getModelAttributes());
+
+		newModel.setScheduleRemoteModel(oldModel);
 
 		return newModel;
 	}

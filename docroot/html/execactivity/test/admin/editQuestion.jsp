@@ -157,6 +157,9 @@
 			        }
 			    </script>
 	    </aui:field-wrapper>
+	    
+	    <aui:input name="penalize" label="question.penalize" type="checkbox" checked="<%=question!=null?question.isPenalize():false%>"/>
+	    
 	</aui:field-wrapper>
 	
 	<portlet:renderURL var="viewAnswerURL" windowState="<%= LiferayWindowState.EXCLUSIVE.toString() %>">   
@@ -309,6 +312,7 @@
 			    			var id = this.get('id');
 			    			id=id.replace('testAnswer_','');
 			    			if(typeId==1 || typeId==4)id=id.replace('new','');
+
 			    			feedbackCorrect = A.one('input[name=<portlet:namespace />feedbackCorrect_'+id+']');
 			    			feedbackNoCorrect = A.one('input[name=<portlet:namespace />feedbackNoCorrect_'+id+']');
 			    			
@@ -328,9 +332,7 @@
 			    				case 1:
 			    				
 			    					correct = A.one('input[name=<portlet:namespace />correct_'+id+'Checkbox]');
-			    					console.log(correct);
-				    				correctVal = (correct != null && correct._node.checked);
-				    				console.log(correctVal);
+			    					correctVal = (correct != null && correct._node.checked);
 				    				if(correctVal==true)trueCounter++;
 				    				if (correct == null) {
 				    					correct =document.getElementById('input[name=<portlet:namespace />correct_'+id+']');
@@ -362,7 +364,6 @@
 			    				break;
 			    			
 			    				default:
-			    					console.log(id);
 			    					correct = A.one('input[name=<portlet:namespace />correct_'+id+'Checkbox]');
 			    				correctVal = (correct != null && correct._node.checked);
 			    				if(correctVal==true)trueCounter++;
@@ -408,6 +409,7 @@
 								
 				    			if((feedbackCorrect != null && feedbackCorrect.val().length > 600) || 
 										(feedbackNoCorrect != null && feedbackNoCorrect.val().length > 600)){
+
 										A.one('#<portlet:namespace />feedBackError_'+id).removeClass('aui-helper-hidden');
 					    				valid=false;
 					    				A.one('#panel_'+id).removeClass('lfr-collapsed');
@@ -432,10 +434,12 @@
 		   	}
 		);
 	</script>
+
 	<%
 	if(learningActivity.getTypeId()!=4){ %>
 	
 		<aui:field-wrapper label="answers" helpMessage="<%=qt.getDescription(themeDisplay.getLocale()) %>" /><%
+
 	 } %>
 	<liferay-ui:error key="answer-test-required" message="answer-test-required"/>
 	<jsp:include page="<%=(qt!=null)?qt.getURLEdit():\"\" %>"/>

@@ -21,6 +21,7 @@ import com.liferay.lms.learningactivity.descriptionfilter.DescriptionFilterRegis
 import com.liferay.lms.model.Module;
 import com.liferay.lms.service.ModuleLocalServiceUtil;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.util.Validator;
 
 /**
@@ -123,4 +124,17 @@ public class LearningActivityImpl extends LearningActivityBaseImpl {
     	return DescriptionFilterRegistry.filter(this.getDescription(languageId, useDefault));
     		  
     }
+	
+	public Module getModule(){
+		try {
+			return ModuleLocalServiceUtil.getModule(getModuleId());
+		} catch (PortalException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SystemException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+	}
 }

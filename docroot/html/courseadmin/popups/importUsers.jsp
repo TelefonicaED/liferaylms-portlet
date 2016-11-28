@@ -1,3 +1,5 @@
+<%@page import="com.liferay.portlet.PortletPreferencesFactoryUtil"%>
+<%@page import="javax.portlet.PortletPreferences"%>
 <%@page import="com.liferay.lms.service.ClpSerializer"%>
 <%@page import="com.liferay.portal.kernel.servlet.SessionMessages"%>
 <%@page import="com.liferay.portal.kernel.servlet.SessionErrors"%>
@@ -9,20 +11,41 @@
 <%@ include file="/init.jsp" %>
 
 <%
-String urlExample = "<a href=\"/"+ ClpSerializer.getServletContextName()+"/html/courseadmin/examples/document.csv\">"+LanguageUtil.get(themeDisplay.getLocale(),"example")+"</a>";
+	PortletPreferences preferences = null;
+	String portletResource = ParamUtil.getString(request, "portletResource");
+	
+	if (Validator.isNotNull(portletResource)) {
+		preferences = PortletPreferencesFactoryUtil.getPortletSetup(request, portletResource);
+	}
+	else{
+		preferences = renderRequest.getPreferences();
+	}
+
+	String urlExample = "<a href=\"/"+ ClpSerializer.getServletContextName();
+	
+	if(Integer.parseInt(preferences.getValue("tipoImport", "1")) == 1){
+		urlExample += "/html/courseadmin/examples/ImportCourseUsersByUserId.csv\">"+LanguageUtil.get(themeDisplay.getLocale(),"example")+"</a>";
+	}else{
+		urlExample += "/html/courseadmin/examples/ImportCourseUsersByName.csv\">"+LanguageUtil.get(themeDisplay.getLocale(),"example")+"</a>";
+	}
+
 %>
 
 <portlet:renderURL var="importUsersURL"  windowState="<%= LiferayWindowState.EXCLUSIVE.toString() %>">
 	<portlet:param name="ajaxAction" value="importUserRole" /> 
 	<portlet:param name="courseId" value="<%=ParamUtil.getString(renderRequest, \"courseId\") %>" /> 
 	<portlet:param name="roleId" value="<%=ParamUtil.getString(renderRequest, \"roleId\") %>" /> 
-	<portlet:param name="jspPage" value="/html/courseadmin/popups/importUsers.jsp" />  
+	<portlet:param name="view" value="import-users" />  
 </portlet:renderURL>
 
 <liferay-ui:header title="courseadmin.importuserrole"></liferay-ui:header>
 
 <liferay-ui:panel id="importuserrole_help" title="help" extended="closed">
-	<%=LanguageUtil.get(themeDisplay.getLocale(),"courseadmin.importuserrole.help") %>
+	<%if(Integer.parseInt(preferences.getValue("tipoImport", "1")) == 1){ %>
+		<%=LanguageUtil.get(themeDisplay.getLocale(),"courseadmin.importuserrole.help") %>
+	<%}else{ %>
+		<%=LanguageUtil.get(themeDisplay.getLocale(),"courseadmin.importuserrole.help.name") %>
+	<%}%>
 </liferay-ui:panel>
 
 <span>
@@ -60,7 +83,7 @@ String urlExample = "<a href=\"/"+ ClpSerializer.getServletContextName()+"/html/
 		<liferay-ui:error key="courseadmin.importuserrole.csv.fileRequired" message="courseadmin.importuserrole.csv.fileRequired" />
 		<liferay-ui:error key="courseadmin.importuserrole.csv.badFormat" message="courseadmin.importuserrole.csv.badFormat" />
 		<liferay-ui:error key="courseadmin.importuserrole.csv.badFormat.size" message="courseadmin.importuserrole.csv.badFormat.size" />
-		<% if(SessionErrors.contains(renderRequest, "courseadmin.importuserrole.csvErrors")) { %>
+		<% if(SessionErrors.contains(renderRequest, "courseadmin.importuserrole.csvErrors")) {%>
 		<div class="portlet-msg-error">
 			<% List<String> errors = (List<String>)SessionErrors.get(renderRequest, "courseadmin.importuserrole.csvErrors");
 			   if(errors.size()==1) {

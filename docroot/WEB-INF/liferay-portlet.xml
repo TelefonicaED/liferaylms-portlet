@@ -98,7 +98,14 @@
 		<footer-portlet-javascript>/js/main.js</footer-portlet-javascript>
 		<css-class-wrapper>activitydates-portlet</css-class-wrapper>
 	</portlet>
-	
+	<portlet>
+		<portlet-name>activityComments</portlet-name>
+		<icon>/icon.png</icon>
+		<instanceable>false</instanceable>
+		<header-portlet-css>/css/main.css</header-portlet-css>
+		<footer-portlet-javascript>/js/main.js</footer-portlet-javascript>
+		<css-class-wrapper>activitycomments-portlet</css-class-wrapper>
+	</portlet>
 	<portlet>
 		<portlet-name>moduleDescription</portlet-name>
 		<icon>/icon.png</icon>
@@ -202,7 +209,6 @@
 	   	<custom-attributes-display>com.liferay.lms.expando.CourseCustomAttributesDisplay</custom-attributes-display>
 		<instanceable>false</instanceable>
 		<header-portlet-css>/css/main.css</header-portlet-css>
-		<header-portlet-javascript>/js/jquery.min.js</header-portlet-javascript>
 		<footer-portlet-javascript>/js/main.js</footer-portlet-javascript>
 		<css-class-wrapper>courseadmin-portlet</css-class-wrapper>
 	</portlet>
@@ -322,6 +328,7 @@
 	<portlet>
 		<portlet-name>studentsearch</portlet-name>
 		<icon>/icon.png</icon>
+		<configuration-action-class>com.liferay.portal.kernel.portlet.DefaultConfigurationAction</configuration-action-class>
 		<instanceable>false</instanceable>		
 		<header-portlet-css>/css/main.css</header-portlet-css>
 		<footer-portlet-javascript>
@@ -658,13 +665,49 @@
 		<css-class-wrapper>finalcourseresult-portlet</css-class-wrapper>
 	</portlet>
 	<portlet>
-		<portlet-name>ActivityComments</portlet-name>
+		<portlet-name>catalogcourses</portlet-name>
 		<icon>/icon.png</icon>
+		<configuration-action-class>com.liferay.portal.kernel.portlet.DefaultConfigurationAction</configuration-action-class>
+		<instanceable>false</instanceable>
 		<header-portlet-css>/css/main.css</header-portlet-css>
 		<footer-portlet-javascript>
 			/js/main.js
 		</footer-portlet-javascript>
-		<css-class-wrapper>activitycomments-portlet</css-class-wrapper>
+		<css-class-wrapper>catalogcourses-portlet</css-class-wrapper>
+	</portlet>
+	<portlet>
+		<portlet-name>dateeditor</portlet-name>
+		<icon>/icon.png</icon>
+		<instanceable>false</instanceable>
+		<header-portlet-css>/css/main.css</header-portlet-css>
+		<footer-portlet-javascript>
+			/js/main.js
+		</footer-portlet-javascript>
+		<css-class-wrapper>dateeditor-portlet</css-class-wrapper>
+	</portlet>
+	<portlet>
+		<portlet-name>deregisteracademymail</portlet-name>
+		<icon>/icon.png</icon>
+		<instanceable>false</instanceable>
+		<header-portlet-css>/css/main.css</header-portlet-css>
+		<footer-portlet-javascript>
+			/js/main.js
+		</footer-portlet-javascript>
+		<css-class-wrapper>
+			deregisteracademymail-portlet
+		</css-class-wrapper>
+	</portlet>
+	<portlet>
+		<portlet-name>viewactivitytriesdeleted</portlet-name>
+		<icon>/icon.png</icon>
+		<instanceable>false</instanceable>
+		<header-portlet-css>/css/main.css</header-portlet-css>
+		<footer-portlet-javascript>
+			/js/main.js
+		</footer-portlet-javascript>
+		<css-class-wrapper>
+			viewactivitytriesdeleted-portlet
+		</css-class-wrapper>
 	</portlet>
 	<portlet>
 		<portlet-name>moduletimer</portlet-name>

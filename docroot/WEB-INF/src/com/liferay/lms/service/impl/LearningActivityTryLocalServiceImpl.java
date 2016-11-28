@@ -15,8 +15,11 @@
 package com.liferay.lms.service.impl;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+
+import org.jfree.util.Log;
 
 import com.liferay.lms.NoSuchLearningActivityException;
 import com.liferay.lms.auditing.AuditConstants;
@@ -30,6 +33,7 @@ import com.liferay.lms.service.LearningActivityLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityResultLocalServiceUtil;
 import com.liferay.lms.service.ModuleResultLocalServiceUtil;
 import com.liferay.lms.service.base.LearningActivityTryLocalServiceBaseImpl;
+import com.liferay.lms.service.persistence.LearningActivityTryFinderUtil;
 import com.liferay.portal.kernel.bean.PortletBeanLocatorUtil;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
@@ -70,6 +74,21 @@ import com.liferay.portal.service.UserLocalServiceUtil;
  */
 public class LearningActivityTryLocalServiceImpl
 	extends LearningActivityTryLocalServiceBaseImpl {
+	
+	public LearningActivityTry softUpdateLearningActivityTry(LearningActivityTry learningActivityTry) throws SystemException {		
+		
+		LearningActivityTry lar = super.updateLearningActivityTry(learningActivityTry, true);
+		
+		//auditing
+		ServiceContext serviceContext = ServiceContextThreadLocal.getServiceContext();
+		if(serviceContext!=null){
+			AuditingLogFactory.audit(serviceContext.getCompanyId(), serviceContext.getScopeGroupId(), LearningActivityTry.class.getName(), 
+									 learningActivityTry.getLatId(), serviceContext.getUserId(), AuditConstants.UPDATE, null);
+		}
+		
+		return lar;
+	}
+	
 	@Override
 	public LearningActivityTry updateLearningActivityTry(
 			LearningActivityTry learningActivityTry) throws SystemException {
@@ -121,32 +140,42 @@ public class LearningActivityTryLocalServiceImpl
 		
 	}
 	
-	public java.util.List<LearningActivityTry> getLearningActivityTryByActUser(long actId,long userId) throws SystemException
-	{
+	public java.util.List<LearningActivityTry> getLearningActivityTryByActUser(long actId,long userId) throws SystemException{
 		return learningActivityTryPersistence.findByact_u(actId, userId);
 	}
+	
 	@Override
-	public LearningActivityTry updateLearningActivityTry(
-			LearningActivityTry learningActivityTry, boolean merge)
-			throws SystemException{
-		try
-		{
-		if(learningActivityTry.getEndDate()!=null)
-		{
-			if(learningActivityTry.getEndUserDate()==null)
-			{
-				learningActivityTry.setEndUserDate(learningActivityTry.getEndDate());
+	public LearningActivityTry updateLearningActivityTry(LearningActivityTry learningActivityTry, boolean merge)throws SystemException{
+		try{
+			if(learningActivityTry.getEndDate()!=null){
+				if(learningActivityTry.getEndUserDate()==null){
+					learningActivityTry.setEndUserDate(learningActivityTry.getEndDate());
+				}
+				LearningActivityResultLocalServiceUtil.update(learningActivityTry)	;
 			}
-			LearningActivityResultLocalServiceUtil.update(learningActivityTry)	;
-		}
-		return super.updateLearningActivityTry(learningActivityTry, merge);
-	}
-		catch(PortalException e)
-		{
+			return super.updateLearningActivityTry(learningActivityTry, merge);
+		}catch(PortalException e){
 			throw new SystemException(e);
 		}
 	}
 
+
+	public LearningActivityResult updateLearningActivityTry(LearningActivityTry learningActivityTry, String tryResultData, String imsmanifest)throws SystemException, PortalException{
+		
+		super.updateLearningActivityTry(learningActivityTry, true);		
+		
+		LearningActivityResult lar = learningActivityResultLocalService.update(learningActivityTry.getLatId(), tryResultData, imsmanifest, learningActivityTry.getUserId());
+
+		//auditing
+		ServiceContext serviceContext = ServiceContextThreadLocal.getServiceContext();
+		if(serviceContext!=null){
+			AuditingLogFactory.audit(serviceContext.getCompanyId(), serviceContext.getScopeGroupId(), LearningActivityTry.class.getName(), 
+					learningActivityTry.getLatId(), serviceContext.getUserId(), AuditConstants.UPDATE, null);
+		}	
+		
+		return lar;
+	}
+	
 	public LearningActivityTry createLearningActivityTry(long actId,ServiceContext serviceContext) throws SystemException, PortalException
 	{
 		LearningActivity learningActivity = learningActivityPersistence.fetchByPrimaryKey(actId);
@@ -160,7 +189,7 @@ public class LearningActivityTryLocalServiceImpl
 					LearningActivityTry.class.getName()));
 		larnt.setUserId(serviceContext.getUserId());
 		larnt.setActId(actId);
-		larnt.setStartDate(serviceContext.getCreateDate(null));
+		larnt.setStartDate(new Date());
 		learningActivityTryPersistence.update(larnt, true);
 		learningActivityResultLocalService.update(larnt);
 		
@@ -220,17 +249,22 @@ public class LearningActivityTryLocalServiceImpl
 					.addOrder(PropertyFactoryUtil.forName("startDate").desc());
 					
 		List<LearningActivityTry> activities = (List<LearningActivityTry>)learningActivityTryPersistence.findWithDynamicQuery(consulta);
+				
 		LearningActivityTry  lastTry=null;
-		if(activities!=null && activities.size()>0)
-		{
+		if(activities!=null && activities.size()>0){
 		   lastTry=activities.get(0);
+			for(LearningActivityTry lat:activities){
+				if(lat.getEndDate() == null){
+					Log.debug("::CERRANDO EL LearningActivityTry:"+lat.getLatId());
+					lat.setEndDate(lat.getStartDate());
+					super.updateLearningActivityTry(lat, true);
+				}
+			}
 		}
-		if(lastTry==null)
-		{
+		
+		if(lastTry==null){
 			return createLearningActivityTry(actId, serviceContext);
-		}
-		else
-		{
+		}else{
 			LearningActivityTry newTry=createLearningActivityTry(actId, serviceContext);
 			newTry.setResult(lastTry.getResult());
 			newTry.setTryData(lastTry.getTryData());
@@ -300,7 +334,9 @@ public class LearningActivityTryLocalServiceImpl
 		//Si ya ha pasado el test, no puede hacer m�s intentos.
 		if(LearningActivityResultLocalServiceUtil.userPassed(actId, userId))
 		{
-			return false;
+			if(!"true".equals(LearningActivityLocalServiceUtil.getExtraContentValue(actId, "improve"))){
+				return false;	
+			}
 		}
 		if(LearningActivityLocalServiceUtil.islocked(actId, userId))
 		{
@@ -344,5 +380,21 @@ public class LearningActivityTryLocalServiceImpl
 			}
 		}
 		return resp;		
+	}
+	
+	public List<LearningActivityTry> getByUserId(long userId){
+		try {
+			return learningActivityTryPersistence.findByUserId(userId);
+		} catch (SystemException e) {
+			e.printStackTrace();
+		}
+		
+		return new ArrayList<LearningActivityTry>();
+	}
+	
+	
+	public long triesPerUserOnlyStudents(long actId, long companyId, long courseGropupCreatedId, List<User> _students, long teamId) throws SystemException {
+		
+		return LearningActivityTryFinderUtil.triesPerUserOnlyStudents(actId, companyId, courseGropupCreatedId, _students, teamId);
 	}
 }

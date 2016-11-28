@@ -28,7 +28,8 @@
 	{	
 		layusprsel=preferences.getValue("courseTemplates", "").split(",");
 	}
-	
+	boolean showResume = preferences.getValue("showResume",  "true").equals("true");
+	boolean showDescription = preferences.getValue("showDescription", "true").equals("true");
 	boolean showClose 	= preferences.getValue("showClose",  "true").equals("true");
 	boolean showDelete 	= preferences.getValue("showDelete", "true").equals("true");
 	boolean showMembers = preferences.getValue("showMembers","true").equals("true");
@@ -39,7 +40,15 @@
 	boolean showPermission = preferences.getValue("showPermission", "true").equals("true");
 	boolean showSearchTags = preferences.getValue("showSearchTags", "false").equals("true");
 	boolean showWelcomeMsg = preferences.getValue("showWelcomeMsg", "true").equals("true");
+	boolean showGoodbyeMsg = preferences.getValue("showGoodbyeMsg", "true").equals("true");
 	boolean showOnlyOrganizationUsers = preferences.getValue("showOnlyOrganizationUsers", "false").equals("true");
+	boolean showCalendar 	= preferences.getValue("showCalendar",  "false").equals("true");
+	boolean showIconCourse 	= preferences.getValue("showIconCourse",  "true").equals("true");
+	boolean showCoursePermission = preferences.getValue("showCoursePermission", "true").equals("true");
+	
+	int tipoImport = Integer.parseInt(preferences.getValue("tipoImport", "1"));
+	boolean hasImportById = (tipoImport != 2);
+
 %>
 
 <liferay-portlet:actionURL var="saveConfigurationURL"  portletConfiguration="true"/>
@@ -56,6 +65,7 @@
 		<aui:input type="checkbox" label="num-of-users" name="showMaxUsers" value="<%=preferences.getValue(\"showMaxUsers\", StringPool.TRUE) %>" ignoreRequestValue="true"/>
 		<aui:input type="checkbox" helpMessage="help-inscription-date" label="inscription-date" name="inscriptionDate" value="<%=preferences.getValue(\"showInscriptionDate\", StringPool.TRUE) %>" ignoreRequestValue="true"/>
 		<aui:input type="checkbox" helpMessage="help-published-in-catalog" label="published-in-catalog" name="showcatalog" value="<%=preferences.getValue(\"showcatalog\", StringPool.TRUE) %>" ignoreRequestValue="true"/>
+		<aui:input type="checkbox" name="showCoursePermission" label="courseadmin.config.showCoursePermission" 	value="<%=showCoursePermission %>" checked="<%=showCoursePermission %>"/>	
 	</aui:field-wrapper>
 	
 	<aui:field-wrapper label="courseadmin.config.courseactions" >
@@ -65,9 +75,24 @@
 		<aui:input type="checkbox" name="showExport" label="courseadmin.config.showExport"	value="<%=showExport %>" checked="<%=showExport %>"/>
 		<aui:input type="checkbox" name="showImport" label="courseadmin.config.showImport" 	value="<%=showImport %>" checked="<%=showImport %>"/>
 		<aui:input type="checkbox" name="showClone" label="courseadmin.config.showClone" 	value="<%=showClone %>" checked="<%=showClone %>"/>
-		<aui:input type="checkbox" name="showGo" label="courseadmin.config.showGo" 			value="<%=showGo %>" checked="<%=showGo %>"/>
-		<aui:input type="checkbox" name="showPermission" label="courseadmin.config.showPermission" 			value="<%=showPermission %>" checked="<%=showPermission %>"/>
-		<aui:input type="checkbox" name="showWelcomeMsg" label="courseadmin.config.showWelcomeMsg" 			value="<%=showWelcomeMsg %>" checked="<%=showWelcomeMsg %>"/>
+		
+		<aui:input type="checkbox" name="showResume" 		label="courseadmin.config.showResume" 		value="<%=showResume %>" checked="<%=showResume %>"/>
+		<aui:input type="checkbox" name="showDescription" 	label="courseadmin.config.showDescription" 	value="<%=showDescription %>" checked="<%=showDescription %>"/>
+		<aui:input type="checkbox" name="showIconCourse" 	label="courseadmin.config.showIconCourse" 	value="<%=showIconCourse %>" checked="<%=showIconCourse %>"/>
+		
+		<aui:input type="checkbox" name="showGo" 		 label="courseadmin.config.showGo" 			value="<%=showGo %>" checked="<%=showGo %>"/>
+		<aui:input type="checkbox" name="showPermission" label="courseadmin.config.showPermission" 	value="<%=showPermission %>" checked="<%=showPermission %>"/>
+		<aui:input type="checkbox" name="showWelcomeMsg" label="courseadmin.config.showWelcomeMsg" 	value="<%=showWelcomeMsg %>" checked="<%=showWelcomeMsg %>"/>
+		<aui:input type="checkbox" name="showGoodbyeMsg" label="courseadmin.config.showGoodbyeMsg" 	value="<%=showGoodbyeMsg %>" checked="<%=showGoodbyeMsg %>"/>
+	</aui:field-wrapper>
+	
+	<aui:field-wrapper label="courseadmin.config.import.export">
+		<aui:input name="tipoImport" type="radio" value="1" label="courseadmin.config.import.export.by.id" checked="<%= hasImportById %>"/>
+		<aui:input name="tipoImport" type="radio" value="2" label="courseadmin.config.import.export.by.name" checked="<%= !hasImportById %>"/>
+	</aui:field-wrapper>
+	
+	<aui:field-wrapper label="calendar" >
+		<aui:input type="checkbox" name="showCalendar" label="calendar" value="<%=showCalendar %>" checked="<%=showCalendar %>"/>
 	</aui:field-wrapper>
 
 <%

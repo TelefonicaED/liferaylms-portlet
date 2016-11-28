@@ -25,7 +25,7 @@
 		preferences = renderRequest.getPreferences();
 
 	boolean numerateModules = (preferences.getValue("numerateModules", "false")).compareTo("true") == 0;
-	
+
 	long moduleId=ParamUtil.getLong(request,"moduleId",0);
 	long currentModuleId=0;
 	long actId=ParamUtil.getLong(request,"actId",0);

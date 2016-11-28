@@ -1,3 +1,4 @@
+<%@page import="com.liferay.lms.service.ClpSerializer"%>
 <%@page import="com.liferay.lms.model.TestQuestion"%>
 <%@page import="com.liferay.lms.service.TestQuestionLocalServiceUtil"%>
 <%@page import="com.liferay.lms.service.LearningActivityLocalServiceUtil"%>
@@ -8,6 +9,7 @@
 <%@page import="java.io.FileNotFoundException"%>
 <%@ include file="/init.jsp" %>
 <%
+
 LearningActivity learnact=null;
 if(request.getAttribute("activity")!=null)
 {
@@ -19,6 +21,8 @@ else
 	learnact=LearningActivityLocalServiceUtil.getLearningActivity(ParamUtil.getLong(request,"actId"));
 }
 
+String urlExample = "<a href=\"/"+ ClpSerializer.getServletContextName()+"/html/offlinetaskactivity/examples/ImportGrades.csv\">"+LanguageUtil.get(themeDisplay.getLocale(),"example")+"</a>";
+
 %>
 
 <portlet:renderURL var="importGradesURL"  windowState="<%= LiferayWindowState.POP_UP.toString() %>">
@@ -26,6 +30,16 @@ else
 	<portlet:param name="ajaxAction" value="importGrades" /> 
 	<portlet:param name="jspPage" value="/html/offlinetaskactivity/popups/importGrades.jsp" /> 
 </portlet:renderURL>
+
+<liferay-ui:header title="offlinetaskactivity.file"></liferay-ui:header>
+
+<liferay-ui:panel id="importuserrole_help" title="help" extended="closed">
+	<%=LanguageUtil.get(themeDisplay.getLocale(),"offlinetaskactivity.importuser.help") %>
+</liferay-ui:panel>
+
+<span>
+	<%=LanguageUtil.get(pageContext,"courseadmin.importuserrole.download") +" "+ urlExample%>
+</span>
 
 <iframe name="<portlet:namespace />import_frame" src="" id="<portlet:namespace />import_frame" style="display:none;" onload="<portlet:namespace />doImportGrades();" ></iframe>
 <aui:form name="fm" action="<%=importGradesURL%>"  method="post" enctype="multipart/form-data" target='<%=renderResponse.getNamespace() +"import_frame" %>' >

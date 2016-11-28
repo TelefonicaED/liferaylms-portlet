@@ -1,3 +1,4 @@
+<%@page import="com.tls.lms.util.LiferaylmsUtil"%>
 <%@page import="com.liferay.lms.service.CourseLocalServiceUtil"%>
 <%@page import="com.liferay.lms.model.Course"%>
 <%@page import="com.liferay.portal.kernel.xml.Document"%>
@@ -22,18 +23,24 @@
 <%@ include file="/init.jsp" %>
 
 <%
-	if(ParamUtil.getLong(request,"actId",0 )==0) renderRequest.setAttribute(WebKeys.PORTLET_CONFIGURATOR_VISIBILITY, Boolean.FALSE);
+	Boolean isTablet = ParamUtil.getBoolean(renderRequest, "isTablet", false);
+
+	if(ParamUtil.getLong(request,"actId",0 ) == 0){
+		renderRequest.setAttribute(WebKeys.PORTLET_CONFIGURATOR_VISIBILITY, Boolean.FALSE);
+	}
 	else{
-		
-		
+
 		boolean hasFreeQuestion = false;
 
 		LearningActivity learningActivity=(LearningActivity)request.getAttribute("learningActivity");
-		if(learningActivity==null) learningActivity=LearningActivityLocalServiceUtil.getLearningActivity(ParamUtil.getLong(request,"actId" ));	
+		if(learningActivity==null){
+			learningActivity=LearningActivityLocalServiceUtil.getLearningActivity(ParamUtil.getLong(request,"actId" ));	
+		}
 		request.setAttribute("actId",learningActivity.getActId());
 		request.setAttribute("learningActivity",learningActivity);
 		
 		List<TestQuestion> questionList = TestQuestionLocalServiceUtil.getQuestions(learningActivity.getActId());
+		
 		Iterator<TestQuestion> questionListIt = questionList.iterator();
 		while(questionListIt.hasNext()){
 			TestQuestion q = questionListIt.next();
@@ -45,59 +52,79 @@
 		
 		boolean isTeacher=permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), "com.liferay.lms.model",themeDisplay.getScopeGroupId(), "VIEW_RESULTS");
 		Course course = CourseLocalServiceUtil.fetchByGroupCreatedId(themeDisplay.getScopeGroupId());
+		boolean hasPermissionAccessCourseFinished = LiferaylmsUtil.hasPermissionAccessCourseFinished(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(), course.getCourseId(), themeDisplay.getUserId());
+
 	
 		if (isTeacher) {
 			String popupcorrection = "javascript:" + renderResponse.getNamespace() + "showPopupGetReport();";
-%>
-<portlet:renderURL var="goToCorrection">
-	<portlet:param name="jspPage"
-		value="/html/execactivity/test/correction.jsp" />
-	<portlet:param name="actId"
-		value="<%=Long.toString(learningActivity.getActId())%>" />
-	<portlet:param name="courseId"
-		value="<%=Long.toString(course.getCourseId())%>" />
-</portlet:renderURL>
-<aui:button name="importButton" type="button" value="action.CORRECT"
-	last="true" href="<%=goToCorrection.toString()%>"></aui:button>
-
-<%}
+			%>
+			<portlet:renderURL var="goToCorrection">
+				<portlet:param name="jspPage"
+					value="/html/execactivity/test/correction.jsp" />
+				<portlet:param name="actId"
+					value="<%=Long.toString(learningActivity.getActId())%>" />
+				<portlet:param name="courseId"
+					value="<%=Long.toString(course.getCourseId())%>" />
+			</portlet:renderURL>
+			<aui:button name="importButton" type="button" value="action.CORRECT"
+				last="true" href="<%=goToCorrection.toString()%>"></aui:button>
+			
+			<%}
 	
-		LearningActivityTry larntry=(LearningActivityTry)request.getAttribute("larntry");
 		
-		if(larntry==null) larntry=LearningActivityTryLocalServiceUtil.getLearningActivityTry(ParamUtil.getLong(request,"latId" ));
+		long tries = 0;
+		long userTries = 0;
+		long score = 0;
+		long scoreTry = 0;
+		String tryResultData = null;
 		
-		if(larntry.getActId() == learningActivity.getActId()){
-			request.setAttribute("larntry",larntry);
+		if(!hasPermissionAccessCourseFinished){
+			
+			LearningActivityTry larntry=(LearningActivityTry)request.getAttribute("larntry");
+		
+			if(larntry==null) larntry=LearningActivityTryLocalServiceUtil.getLearningActivityTry(ParamUtil.getLong(request,"latId" ));
+			
+			if(larntry.getActId() == learningActivity.getActId()){
+				request.setAttribute("larntry",larntry);
+			}else{
+				larntry=LearningActivityTryLocalServiceUtil.getLastLearningActivityTryByActivityAndUser(ParamUtil.getLong(request,"actId",0 ), learningActivity.getUserId());
+				request.setAttribute("larntry",larntry);
+			}
+				request.setAttribute("hasFreeQuestion", hasFreeQuestion);	
+			tries = learningActivity.getTries();
+			userTries = Long.valueOf(LearningActivityTryLocalServiceUtil.getTriesCountByActivityAndUser(learningActivity.getActId(),themeDisplay.getUserId()));
+		
+			LearningActivityResult result = LearningActivityResultLocalServiceUtil.getByActIdAndUserId(learningActivity.getActId(), themeDisplay.getUserId());
+			score = result.getResult();
+			scoreTry = larntry.getResult();
+			tryResultData = larntry.getTryResultData();
 		}else{
-			larntry=LearningActivityTryLocalServiceUtil.getLastLearningActivityTryByActivityAndUser(ParamUtil.getLong(request,"actId",0 ), learningActivity.getUserId());
-			request.setAttribute("larntry",larntry);
+			score = ParamUtil.getLong(request, "score", 0);
+			scoreTry = score;
+			tryResultData = ParamUtil.getString(request, "tryResultData", "");
 		}
-				
-		Long tries = learningActivity.getTries();
-		Long userTries = Long.valueOf(LearningActivityTryLocalServiceUtil.getTriesCountByActivityAndUser(learningActivity.getActId(),themeDisplay.getUserId()));
-	
-		LearningActivityResult result = LearningActivityResultLocalServiceUtil.getByActIdAndUserId(learningActivity.getActId(), themeDisplay.getUserId());
-		boolean hideFeedback=false;
 		boolean userPassed=false;
-		hideFeedback = StringPool.TRUE.equals(LearningActivityLocalServiceUtil.getExtraContentValue(learningActivity.getActId(),"hideFeedback"));
+		boolean hideFeedback = StringPool.TRUE.equals(LearningActivityLocalServiceUtil.getExtraContentValue(learningActivity.getActId(),"hideFeedback"));
 		
 		boolean comesFromCorrection = ParamUtil.get(request, "correction", false);
 		long oldResult= ParamUtil.get(request, "oldResult", -1);
 		if(!comesFromCorrection) {
 			userPassed=LearningActivityResultLocalServiceUtil.userPassed(learningActivity.getActId(),themeDisplay.getUserId());
-		}else {
-			userPassed=learningActivity.getPasspuntuation()<=larntry.getResult();
+		}else if(!hasPermissionAccessCourseFinished){
+			userPassed=learningActivity.getPasspuntuation()<=scoreTry;
+			//Cuando estamos mejorando la nota no mostramos el popup.
+			//if(oldResult <= 0){
 			if(!hideFeedback)
 			{
-%>
-<jsp:include page="/html/shared/popResult.jsp" />
-<%
-			}
-%>
-			<h2><%=learningActivity.getTitle(themeDisplay.getLocale()) %></h2>
-<% 
+				%>
+				<jsp:include page="/html/shared/popResult.jsp" />
+				<%
+			}				//}
+				%>
+							<h2><%=learningActivity.getTitle(themeDisplay.getLocale()) %></h2>
+				<% 
 		}
-%>
+		%>
 		
 		<p><liferay-ui:message key="test-done" /></p>
 		<liferay-util:include page="/html/execactivity/test/timeout.jsp" servletContext="<%=this.getServletContext() %>">
@@ -109,14 +136,14 @@
 			<!-- <p>Respuesta libre</p> -->
 			
 			<% }else{%>
-			<p><liferay-ui:message key="your-result" arguments="<%=new Object[]{larntry.getResult()} %>" /></p>
+			<p><liferay-ui:message key="your-result" arguments="<%=new Object[]{scoreTry} %>" /></p>
 			
 			<% }
 		%>
 	
 <% 
 		if(!hasFreeQuestion && oldResult>0){
-			if(oldResult<larntry.getResult()){
+			if(oldResult<scoreTry){
 %>
 				<p><liferay-ui:message key="execActivity.improve.result" arguments="<%=new Object[]{oldResult} %>" /></p>
 <%		
@@ -146,25 +173,31 @@
 		}
 		if(!hideFeedback)
 		{
-	%>
+%>
 			<p class="negrita"><liferay-ui:message key="your-answers" /></p>
-	<%
+<%
 			List<TestQuestion> questions=null;
-			if (GetterUtil.getLong(LearningActivityLocalServiceUtil.getExtraContentValue(learningActivity.getActId(),"random"))==0)
+			if (GetterUtil.getLong(LearningActivityLocalServiceUtil.getExtraContentValue(learningActivity.getActId(),"random"))==0 || hasPermissionAccessCourseFinished)
 				questions=TestQuestionLocalServiceUtil.getQuestions(learningActivity.getActId());
 			else{
 				questions= new ArrayList<TestQuestion>();
-				Iterator<Element> nodeItr = SAXReaderUtil.read(larntry.getTryResultData()).getRootElement().elementIterator();
+				Iterator<Element> nodeItr = SAXReaderUtil.read(tryResultData).getRootElement().elementIterator();
+				TestQuestion question=null;
 				while(nodeItr.hasNext()) {
-					Element element = nodeItr.next();
-			         if("question".equals(element.getName())) questions.add(TestQuestionLocalServiceUtil.getTestQuestion(Long.valueOf(element.attributeValue("id"))));
-			    }	
+					Element element = nodeItr.next();				
+					 if("question".equals(element.getName())) {
+						 question=TestQuestionLocalServiceUtil.fetchTestQuestion(Long.valueOf(element.attributeValue("id")));
+						 if(question != null){
+							 questions.add(question); 
+						 }		        	 
+					 }
+				}	
 			}
 			
 			for(TestQuestion question:questions){
 				QuestionType qt = new QuestionTypeRegistry().getQuestionType(question.getQuestionType());
 				qt.setLocale(themeDisplay.getLocale());
-				%><%=qt.getHtmlFeedback(SAXReaderUtil.read(larntry.getTryResultData()), question.getQuestionId(), themeDisplay)%><%
+				%><%=qt.getHtmlFeedback(SAXReaderUtil.read(tryResultData), question.getQuestionId(), themeDisplay)%><%
 			}
 		}
 		if(tries==0 || userTries < tries ||permissionChecker.hasPermission(learningActivity.getGroupId(),LearningActivity.class.getName(),learningActivity.getActId(), ActionKeys.UPDATE)) {
@@ -184,15 +217,20 @@
 %>
 					<liferay-portlet:renderURL var="realizardir">
 						<liferay-portlet:param name="actId" value="<%=Long.toString(learningActivity.getActId()) %>"></liferay-portlet:param>
+						<%if(isTablet){%>
+							<liferay-portlet:param name="isTablet" value="<%=Boolean.toString(isTablet) %>"></liferay-portlet:param>
+
+						<%} %>
 						<liferay-portlet:param name="jspPage" value="/html/execactivity/test/view.jsp" />
 					</liferay-portlet:renderURL>
-<%
-					String enlace="self.location='"+realizardir.toString()+"'"; %>
+<%	
+					String enlace = "self.location='"+realizardir.toString()+"'"; 
+					%>
 					<aui:button name="repetir" value="<%=LanguageUtil.get(pageContext,\"execativity.test.try.again\")%>" onClick="<%=enlace %>"></aui:button>
 <%
 				}
 			}else{
-				if(result.getResult()<100){
+				if(score<100){
 					String improveStr = LearningActivityLocalServiceUtil.getExtraContentValue(ParamUtil.getLong(request,"actId"), "improve");
 					if(improveStr.equals("true")){
 						if(tries>0){

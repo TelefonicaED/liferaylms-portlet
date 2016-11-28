@@ -5020,6 +5020,8 @@ public class SCORMContentPersistenceImpl extends BasePersistenceImpl<SCORMConten
 		FinderCacheUtil.removeCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 	}
 
+	@BeanReference(type = ActivityTriesDeletedPersistence.class)
+	protected ActivityTriesDeletedPersistence activityTriesDeletedPersistence;
 	@BeanReference(type = AuditEntryPersistence.class)
 	protected AuditEntryPersistence auditEntryPersistence;
 	@BeanReference(type = CheckP2pMailingPersistence.class)
@@ -5048,6 +5050,8 @@ public class SCORMContentPersistenceImpl extends BasePersistenceImpl<SCORMConten
 	protected P2pActivityPersistence p2pActivityPersistence;
 	@BeanReference(type = P2pActivityCorrectionsPersistence.class)
 	protected P2pActivityCorrectionsPersistence p2pActivityCorrectionsPersistence;
+	@BeanReference(type = SchedulePersistence.class)
+	protected SchedulePersistence schedulePersistence;
 	@BeanReference(type = SCORMContentPersistence.class)
 	protected SCORMContentPersistence scormContentPersistence;
 	@BeanReference(type = SurveyResultPersistence.class)

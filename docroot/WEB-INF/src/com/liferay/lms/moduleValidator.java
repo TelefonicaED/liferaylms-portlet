@@ -144,7 +144,6 @@ public class moduleValidator {
 			//long size = 1024;
 			
 			long fileMaxSize = Long.parseLong(PrefsPropsUtil.getString(PropsKeys.DL_FILE_MAX_SIZE));
-			//System.out.println(" fileMaxSize 1 : " + fileMaxSize+", "+ img.getSize() );
 			if(img.getSize() > fileMaxSize){
 				valid = false;
 			}

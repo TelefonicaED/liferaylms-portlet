@@ -67,9 +67,10 @@ public class TestQuestionModelImpl extends BaseModelImpl<TestQuestion>
 			{ "text_", Types.VARCHAR },
 			{ "questionType", Types.BIGINT },
 			{ "weight", Types.BIGINT },
+			{ "penalize", Types.BOOLEAN },
 			{ "extracontent", Types.VARCHAR }
 		};
-	public static final String TABLE_SQL_CREATE = "create table Lms_TestQuestion (uuid_ VARCHAR(75) null,questionId LONG not null primary key,actId LONG,text_ TEXT null,questionType LONG,weight LONG,extracontent TEXT null)";
+	public static final String TABLE_SQL_CREATE = "create table Lms_TestQuestion (uuid_ VARCHAR(75) null,questionId LONG not null primary key,actId LONG,text_ TEXT null,questionType LONG,weight LONG,penalize BOOLEAN,extracontent TEXT null)";
 	public static final String TABLE_SQL_DROP = "drop table Lms_TestQuestion";
 	public static final String ORDER_BY_JPQL = " ORDER BY testQuestion.questionId ASC";
 	public static final String ORDER_BY_SQL = " ORDER BY Lms_TestQuestion.questionId ASC";
@@ -107,6 +108,7 @@ public class TestQuestionModelImpl extends BaseModelImpl<TestQuestion>
 		model.setText(soapModel.getText());
 		model.setQuestionType(soapModel.getQuestionType());
 		model.setWeight(soapModel.getWeight());
+		model.setPenalize(soapModel.getPenalize());
 		model.setExtracontent(soapModel.getExtracontent());
 
 		return model;
@@ -172,6 +174,7 @@ public class TestQuestionModelImpl extends BaseModelImpl<TestQuestion>
 		attributes.put("text", getText());
 		attributes.put("questionType", getQuestionType());
 		attributes.put("weight", getWeight());
+		attributes.put("penalize", getPenalize());
 		attributes.put("extracontent", getExtracontent());
 
 		return attributes;
@@ -213,6 +216,12 @@ public class TestQuestionModelImpl extends BaseModelImpl<TestQuestion>
 
 		if (weight != null) {
 			setWeight(weight);
+		}
+
+		Boolean penalize = (Boolean)attributes.get("penalize");
+
+		if (penalize != null) {
+			setPenalize(penalize);
 		}
 
 		String extracontent = (String)attributes.get("extracontent");
@@ -302,6 +311,18 @@ public class TestQuestionModelImpl extends BaseModelImpl<TestQuestion>
 		_weight = weight;
 	}
 
+	public boolean getPenalize() {
+		return _penalize;
+	}
+
+	public boolean isPenalize() {
+		return _penalize;
+	}
+
+	public void setPenalize(boolean penalize) {
+		_penalize = penalize;
+	}
+
 	public String getExtracontent() {
 		if (_extracontent == null) {
 			return StringPool.BLANK;
@@ -353,6 +374,7 @@ public class TestQuestionModelImpl extends BaseModelImpl<TestQuestion>
 		testQuestionImpl.setText(getText());
 		testQuestionImpl.setQuestionType(getQuestionType());
 		testQuestionImpl.setWeight(getWeight());
+		testQuestionImpl.setPenalize(getPenalize());
 		testQuestionImpl.setExtracontent(getExtracontent());
 
 		testQuestionImpl.resetOriginalValues();
@@ -451,6 +473,8 @@ public class TestQuestionModelImpl extends BaseModelImpl<TestQuestion>
 
 		testQuestionCacheModel.weight = getWeight();
 
+		testQuestionCacheModel.penalize = getPenalize();
+
 		testQuestionCacheModel.extracontent = getExtracontent();
 
 		String extracontent = testQuestionCacheModel.extracontent;
@@ -464,7 +488,7 @@ public class TestQuestionModelImpl extends BaseModelImpl<TestQuestion>
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(15);
+		StringBundler sb = new StringBundler(17);
 
 		sb.append("{uuid=");
 		sb.append(getUuid());
@@ -478,6 +502,8 @@ public class TestQuestionModelImpl extends BaseModelImpl<TestQuestion>
 		sb.append(getQuestionType());
 		sb.append(", weight=");
 		sb.append(getWeight());
+		sb.append(", penalize=");
+		sb.append(getPenalize());
 		sb.append(", extracontent=");
 		sb.append(getExtracontent());
 		sb.append("}");
@@ -486,7 +512,7 @@ public class TestQuestionModelImpl extends BaseModelImpl<TestQuestion>
 	}
 
 	public String toXmlString() {
-		StringBundler sb = new StringBundler(25);
+		StringBundler sb = new StringBundler(28);
 
 		sb.append("<model><model-name>");
 		sb.append("com.liferay.lms.model.TestQuestion");
@@ -517,6 +543,10 @@ public class TestQuestionModelImpl extends BaseModelImpl<TestQuestion>
 		sb.append(getWeight());
 		sb.append("]]></column-value></column>");
 		sb.append(
+			"<column><column-name>penalize</column-name><column-value><![CDATA[");
+		sb.append(getPenalize());
+		sb.append("]]></column-value></column>");
+		sb.append(
 			"<column><column-name>extracontent</column-name><column-value><![CDATA[");
 		sb.append(getExtracontent());
 		sb.append("]]></column-value></column>");
@@ -539,6 +569,7 @@ public class TestQuestionModelImpl extends BaseModelImpl<TestQuestion>
 	private String _text;
 	private long _questionType;
 	private long _weight;
+	private boolean _penalize;
 	private String _extracontent;
 	private long _columnBitmask;
 	private TestQuestion _escapedModelProxy;

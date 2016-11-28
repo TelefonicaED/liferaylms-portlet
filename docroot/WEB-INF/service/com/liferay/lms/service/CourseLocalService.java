@@ -290,11 +290,6 @@ public interface CourseLocalService extends BaseLocalService,
 			com.liferay.portal.kernel.exception.SystemException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public java.util.List<com.liferay.lms.model.Course> getChildCourses(
-		long courseId)
-		throws com.liferay.portal.kernel.exception.SystemException;
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.util.List<com.liferay.lms.model.Course> getUserCourses(
 		long userId)
 		throws com.liferay.portal.kernel.exception.PortalException,
@@ -303,10 +298,6 @@ public interface CourseLocalService extends BaseLocalService,
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.util.List<com.liferay.lms.model.Course> getPublicCoursesByCompanyId(
 		java.lang.Long companyId);
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public java.util.List<com.liferay.lms.model.Course> getPublicCoursesByCompanyId(
-		java.lang.Long companyId, int limit);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.util.List<com.liferay.lms.model.Course> getPublicCoursesByCompanyId(
@@ -384,12 +375,122 @@ public interface CourseLocalService extends BaseLocalService,
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public int getStudentsFromCourseCount(long courseId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public int getStudentsFromCourseCount(long courseId, long teamId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public int getStudentsFromCourseCount(long courseId, long teamId,
+		java.lang.String firstName, java.lang.String lastName,
+		java.lang.String screeName, java.lang.String emailAddress,
+		boolean andComparator)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.util.List<com.liferay.portal.model.User> getStudentsFromCourse(
+		com.liferay.lms.model.Course course, int start, int end);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.util.List<com.liferay.portal.model.User> getStudentsFromCourse(
 		com.liferay.lms.model.Course course);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.util.List<com.liferay.portal.model.User> getStudentsFromCourse(
 		long companyId, long courseGropupCreatedId);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.util.List<com.liferay.portal.model.User> getStudentsFromCourse(
+		long companyId, long courseGropupCreatedId, long teamId);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.util.List<com.liferay.portal.model.User> getStudentsFromCourse(
+		com.liferay.lms.model.Course course, int start, int end, long teamId);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.util.List<com.liferay.portal.model.User> getStudentsFromCourse(
+		long companyId, long courseGropupCreatedId, int start, int end,
+		long teamId);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.util.List<com.liferay.portal.model.User> getStudentsFromCourse(
+		long companyId, long courseGropupCreatedId, int start, int end,
+		long teamId, java.lang.String firstName, java.lang.String lastName,
+		java.lang.String screenName, java.lang.String emailAddress,
+		boolean andOperator);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.util.List<com.liferay.lms.model.Course> getByTitleStatusCategoriesTags(
+		java.lang.String freeText, int status, long[] categories, long[] tags,
+		long companyId, long groupId, long userId, java.lang.String language,
+		boolean isAdmin, boolean andOperator, int start, int end);
+
+	public int countByTitleStatusCategoriesTags(java.lang.String freeText,
+		int status, long[] categories, long[] tags, long companyId,
+		long groupId, long userId, java.lang.String language, boolean isAdmin,
+		boolean andOperator);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.util.List<com.liferay.portal.model.User> getStudents(
+		long courseId, long companyId, java.lang.String screenName,
+		java.lang.String firstName, java.lang.String lastName,
+		java.lang.String emailAddress, boolean andOperator, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator comparator);
+
+	public int countStudents(long courseId, long companyId,
+		java.lang.String screenName, java.lang.String firstName,
+		java.lang.String lastName, java.lang.String emailAddress,
+		boolean andOperator);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.util.List<com.liferay.lms.model.Course> getCoursesCatalogByTitleCategoriesTags(
+		java.lang.String freeText, long[] categories, long[] tags,
+		long companyId, long groupId, long userId, java.lang.String language,
+		int start, int end);
+
+	public int countCoursesCatalogByTitleCategoriesTags(
+		java.lang.String freeText, long[] categories, long[] tags,
+		long companyId, long groupId, long userId, java.lang.String language);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.util.List<java.lang.Long> getCatalogCoursesAssetTags(
+		java.lang.String freeText, long[] categories, long companyId,
+		long groupId, long userId, java.lang.String language);
+
+	public java.util.HashMap<java.lang.Long, java.lang.Long> countCategoryCourses(
+		java.lang.String freeText, long[] categories, long[] tags,
+		long companyId, long groupId, long userId, java.lang.String language);
+
+	public java.util.HashMap<java.lang.Long, java.lang.Long> countTagCourses(
+		java.lang.String freeText, long[] categories, long[] tags,
+		long companyId, long groupId, long userId, java.lang.String language);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.util.List<com.liferay.lms.views.CourseResultView> getMyCourses(
+		long groupId, long userId,
+		com.liferay.portal.theme.ThemeDisplay themeDisplay,
+		java.lang.String orderByColumn, java.lang.String orderByType,
+		int start, int end);
+
+	public int countMyCourses(long groupId, long userId,
+		com.liferay.portal.theme.ThemeDisplay themeDisplay);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public boolean hasUserTries(long courseId, long userId);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.util.List<com.liferay.lms.model.Course> getPublicCoursesByCompanyId(
+		java.lang.Long companyId, int limit);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.util.List<com.liferay.lms.model.Course> getChildCourses(
+		long courseId)
+		throws com.liferay.portal.kernel.exception.SystemException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.util.List<com.liferay.lms.model.Course> getCoursesParents(

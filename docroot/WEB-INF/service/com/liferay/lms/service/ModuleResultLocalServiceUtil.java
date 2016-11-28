@@ -292,6 +292,11 @@ public class ModuleResultLocalServiceUtil {
 		return getService().getListModuleResultByModuleAndUser(moduleId, userId);
 	}
 
+	public static java.util.List<com.liferay.lms.model.ModuleResult> getByUserId(
+		long userId) {
+		return getService().getByUserId(userId);
+	}
+
 	public static long countByModule(long moduleId)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService().countByModule(moduleId);
@@ -305,6 +310,29 @@ public class ModuleResultLocalServiceUtil {
 			moduleId);
 	}
 
+	public static long countByModuleOnlyStudents(long companyId,
+		long courseGropupCreatedId, long moduleId,
+		java.util.List<com.liferay.portal.model.User> _students)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService()
+				   .countByModuleOnlyStudents(companyId, courseGropupCreatedId,
+			moduleId, _students);
+	}
+
+	public static long countStudentsStartedByModuleId(
+		com.liferay.lms.model.Module module,
+		java.util.List<com.liferay.portal.model.User> students, long teamId) {
+		return getService()
+				   .countStudentsStartedByModuleId(module, students, teamId);
+	}
+
+	public static long countStudentsFinishedByModuleId(
+		com.liferay.lms.model.Module module,
+		java.util.List<com.liferay.portal.model.User> students, long teamId) {
+		return getService()
+				   .countStudentsFinishedByModuleId(module, students, teamId);
+	}
+
 	public static long countByModulePassed(long moduleId, boolean passed)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService().countByModulePassed(moduleId, passed);
@@ -316,6 +344,15 @@ public class ModuleResultLocalServiceUtil {
 		return getService()
 				   .countByModulePassedOnlyStudents(companyId,
 			courseGropupCreatedId, moduleId, passed);
+	}
+
+	public static long countByModulePassedOnlyStudents(long companyId,
+		long courseGropupCreatedId, long moduleId, boolean passed,
+		java.util.List<com.liferay.portal.model.User> _students)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService()
+				   .countByModulePassedOnlyStudents(companyId,
+			courseGropupCreatedId, moduleId, passed, _students);
 	}
 
 	public static void update(
@@ -337,17 +374,17 @@ public class ModuleResultLocalServiceUtil {
 		getService().updateAllCoursesAllModulesAllUsers();
 	}
 
+	public static boolean update(long moduleId, long userId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getService().update(moduleId, userId);
+	}
+
 	public static java.util.Date calculateModuleResultStartDate(long moduleId,
 		long userId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		return getService().calculateModuleResultStartDate(moduleId, userId);
-	}
-
-	public static boolean update(long moduleId, long userId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
-		return getService().update(moduleId, userId);
 	}
 
 	public static void clearService() {

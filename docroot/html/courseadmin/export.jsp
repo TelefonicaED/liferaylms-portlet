@@ -23,19 +23,20 @@
 
 <%
 	String groupId = request.getParameter("groupId");
-
+	long courseId = 0;
 	String name = groupId;
 	
 	Course course = CourseLocalServiceUtil.getCourseByGroupCreatedId(Long.valueOf(groupId));
 	
 	try{
 		if(course != null){
+			courseId = course.getCourseId();
 			name = course.getTitle(themeDisplay.getLocale());
 		}
 	}catch(Exception e){}
 %>
 
-<liferay-portlet:renderURL var="backURL"></liferay-portlet:renderURL>
+<liferay-portlet:renderURL var="backURL"/>
 <liferay-ui:header title="<%= course != null ? course.getTitle(themeDisplay.getLocale()) : \"course\" %>" backURL="<%=backURL %>"></liferay-ui:header>
 
 <liferay-portlet:resourceURL var="exportURL">
@@ -97,8 +98,7 @@ Liferay.provide(
 		);
 //-->
 </script>
-
-<script>
+	<script>
 function ignoreEnter(e) {
      if (event.keyCode == 10 || event.keyCode == 13) {
             event.preventDefault();
@@ -112,7 +112,7 @@ function ignoreEnter(e) {
 	<liferay-ui:success key="courseadmin.delete.exported.confirmation.success" message="courseadmin.delete.exported.confirmation.success"></liferay-ui:success>
 	<liferay-ui:success key="courseadmin.export.confirmation.success" message="courseadmin.export.confirmation.success"></liferay-ui:success>
 	
-   	<aui:input label="export-the-selected-data-to-the-given-lar-file-name" name="exportFileName" onkeypress="return ignoreEnter(event)" size="50" value='<%= HtmlUtil.escape(StringUtil.replace( StringUtil.replace(name, " ", "_"),"/",""   )) + "-" + Time.getShortTimestamp() + ".lar" %>' />
+    	<aui:input readonly="true" label="export-the-selected-data-to-the-given-lar-file-name" name="exportFileName" onkeypress="return ignoreEnter(event)" size="50" value='<%= "course_" + courseId + "-" + Time.getShortTimestamp() + ".lar" %>' />
 	
 	<aui:input type="hidden" name="key" value=""/>
 	
@@ -144,7 +144,8 @@ function ignoreEnter(e) {
 // Get exported lars
 String[] lars = _getExportedLars(themeDisplay.getCompanyId(), GetterUtil.getLong(groupId));
 
-for (String lar : lars) { %>
+for (String lar : lars) {
+	%>
 <div class="lar">
 	<span>
 		<liferay-portlet:actionURL var="deleteExportedURL" name="deleteExportedCourse">

@@ -31,4 +31,25 @@ public interface Course extends CourseModel, PersistedModel {
 	 *
 	 * Never modify this interface directly. Add methods to {@link com.liferay.lms.model.impl.CourseImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
+	public com.liferay.lms.model.Course getParentCourse()
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	public void setTitle(java.lang.String title);
+
+	public void setTitle(java.lang.String title, java.util.Locale locale);
+
+	public void setTitle(java.lang.String title, java.util.Locale locale,
+		java.util.Locale defaultLocale);
+
+	public java.lang.String getImageURL(
+		com.liferay.portal.theme.ThemeDisplay themeDisplay);
+
+	public double getAverageScore();
+
+	public java.util.List<com.liferay.portlet.asset.model.AssetCategory> getAssetCategoryIds();
+
+	public java.util.List<com.liferay.portlet.asset.model.AssetTag> getAssetTagIds();
+
+	public com.liferay.portal.model.Group getGroup();
 }

@@ -98,9 +98,7 @@
 	<% 
 				} 
 %>
-	<p class="color_tercero textcenter negrita">
-		<liferay-ui:message key="execativity.test.try.confirmation" />
-	</p>
+
 
 	<portlet:renderURL var="correctURL">
 		<portlet:param name="actId" value="<%=Long.toString(actId) %>"></portlet:param>
@@ -110,8 +108,14 @@
 	<%
 				List<TestQuestion> questions=TestQuestionLocalServiceUtil.getQuestions(actId);
 	
-				if (questions.size()>0){
+	if (questions.size()>0 ){
+		if(tries< activity.getTries() || activity.getTries() == 0){
 %>
+
+	<p class="color_tercero textcenter negrita">
+		<liferay-ui:message key="execativity.test.try.confirmation" />
+	</p>
+
 	<aui:form class="buttons_container" name="formulario"
 		action="<%=correctURL %>" method="POST">
 		<aui:button-row>
@@ -119,8 +123,8 @@
 				value="<%=LanguageUtil.get(pageContext,\"execativity.test.try.start\")%>" />
 		</aui:button-row>
 	</aui:form>
-	<% 
-				}else{
+	<%}
+	}else{
 %>
 	<p class="negrita">
 		<liferay-ui:message key="execativity.test.no.question" />

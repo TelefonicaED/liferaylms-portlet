@@ -262,6 +262,10 @@ public interface ModuleResultLocalService extends BaseLocalService,
 		long moduleId, long userId)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.util.List<com.liferay.lms.model.ModuleResult> getByUserId(
+		long userId);
+
 	public long countByModule(long moduleId)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
@@ -269,11 +273,29 @@ public interface ModuleResultLocalService extends BaseLocalService,
 		long courseGropupCreatedId, long moduleId)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
+	public long countByModuleOnlyStudents(long companyId,
+		long courseGropupCreatedId, long moduleId,
+		java.util.List<com.liferay.portal.model.User> _students)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	public long countStudentsStartedByModuleId(
+		com.liferay.lms.model.Module module,
+		java.util.List<com.liferay.portal.model.User> students, long teamId);
+
+	public long countStudentsFinishedByModuleId(
+		com.liferay.lms.model.Module module,
+		java.util.List<com.liferay.portal.model.User> students, long teamId);
+
 	public long countByModulePassed(long moduleId, boolean passed)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	public long countByModulePassedOnlyStudents(long companyId,
 		long courseGropupCreatedId, long moduleId, boolean passed)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	public long countByModulePassedOnlyStudents(long companyId,
+		long courseGropupCreatedId, long moduleId, boolean passed,
+		java.util.List<com.liferay.portal.model.User> _students)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	public void update(com.liferay.lms.model.LearningActivityResult lactr)
@@ -288,12 +310,12 @@ public interface ModuleResultLocalService extends BaseLocalService,
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
-	public java.util.Date calculateModuleResultStartDate(long moduleId,
-		long userId)
+	public boolean update(long moduleId, long userId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
-	public boolean update(long moduleId, long userId)
+	public java.util.Date calculateModuleResultStartDate(long moduleId,
+		long userId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 }

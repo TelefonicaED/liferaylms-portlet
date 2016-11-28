@@ -38,6 +38,9 @@ public class LmsPrefsSoap implements Serializable {
 		soapModel.setScoretranslators(model.getScoretranslators());
 		soapModel.setUsersResults(model.getUsersResults());
 		soapModel.setDebugScorm(model.getDebugScorm());
+		soapModel.setHasAPILicence(model.getHasAPILicence());
+		soapModel.setShowHideActivity(model.getShowHideActivity());
+		soapModel.setViewCoursesFinished(model.getViewCoursesFinished());
 
 		return soapModel;
 	}
@@ -166,6 +169,42 @@ public class LmsPrefsSoap implements Serializable {
 		_debugScorm = debugScorm;
 	}
 
+	public boolean getHasAPILicence() {
+		return _hasAPILicence;
+	}
+
+	public boolean isHasAPILicence() {
+		return _hasAPILicence;
+	}
+
+	public void setHasAPILicence(boolean hasAPILicence) {
+		_hasAPILicence = hasAPILicence;
+	}
+
+	public boolean getShowHideActivity() {
+		return _showHideActivity;
+	}
+
+	public boolean isShowHideActivity() {
+		return _showHideActivity;
+	}
+
+	public void setShowHideActivity(boolean showHideActivity) {
+		_showHideActivity = showHideActivity;
+	}
+
+	public boolean getViewCoursesFinished() {
+		return _viewCoursesFinished;
+	}
+
+	public boolean isViewCoursesFinished() {
+		return _viewCoursesFinished;
+	}
+
+	public void setViewCoursesFinished(boolean viewCoursesFinished) {
+		_viewCoursesFinished = viewCoursesFinished;
+	}
+
 	private long _companyId;
 	private long _teacherRole;
 	private long _editorRole;
@@ -175,4 +214,7 @@ public class LmsPrefsSoap implements Serializable {
 	private String _scoretranslators;
 	private long _usersResults;
 	private boolean _debugScorm;
+	private boolean _hasAPILicence;
+	private boolean _showHideActivity;
+	private boolean _viewCoursesFinished;
 }

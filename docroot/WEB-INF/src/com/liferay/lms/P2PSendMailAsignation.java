@@ -6,12 +6,15 @@ import javax.mail.internet.InternetAddress;
 
 import com.liferay.mail.service.MailServiceUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.mail.MailMessage;
 import com.liferay.portal.kernel.util.PrefsPropsUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 
 public class P2PSendMailAsignation {
 	
+	private static Log log = LogFactoryUtil.getLog(P2PSendMailAsignation.class);
 	public static void sendMail(String emailTo, String nameTo, String content[], long companyId, Locale userLocale) {
 		
 		try{
@@ -25,7 +28,7 @@ public class P2PSendMailAsignation {
 			String bodyEnd     = LanguageUtil.get(userLocale, "p2ptaskactivity.mail.body.end");
 			
 			String body = bodyTitle +"\n\n"+ bodyMessage +"\n\n"+ bodyEnd +"\n\n"+ portal+"\n";
-			
+			log.debug("MESSAGE: "+bodyMessage);
 			String fromName=PrefsPropsUtil.getString(companyId,PropsKeys.ADMIN_EMAIL_FROM_NAME,"");
 			String fromAddress=PrefsPropsUtil.getString(companyId,PropsKeys.ADMIN_EMAIL_FROM_ADDRESS,"");
 						

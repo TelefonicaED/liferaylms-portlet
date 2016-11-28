@@ -296,6 +296,12 @@ public class ModuleLocalServiceWrapper implements ModuleLocalService,
 	}
 
 	public java.util.List<com.liferay.lms.model.Module> findAllInGroup(
+		long groupId, int start, int end)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _moduleLocalService.findAllInGroup(groupId, start, end);
+	}
+
+	public java.util.List<com.liferay.lms.model.Module> findAllInGroup(
 		long groupId,
 		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
 		throws com.liferay.portal.kernel.exception.SystemException {

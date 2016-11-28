@@ -1189,6 +1189,10 @@ public class LearningActivityWrapper implements LearningActivity,
 		return _learningActivity.getDescriptionFiltered(languageId, useDefault);
 	}
 
+	public com.liferay.lms.model.Module getModule() {
+		return _learningActivity.getModule();
+	}
+
 	/**
 	 * @deprecated Renamed to {@link #getWrappedModel}
 	 */

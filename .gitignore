@@ -1,2 +1,14 @@
 *.class
+docroot/WEB-INF/lib/liferaylms-portlet-service.jar
 docroot/WEB-INF/classes
+docroot/WEB-INF/src/service.properties
+/bin/
+.settings
+/.classpath
+/.project
+/.tern-project
+docroot/css/.sass-cache/
+docroot/WEB-INF/src/com/liferay/lms/service/base/
+docroot/WEB-INF/service/com/liferay/lms/model
+docroot/WEB-INF/service/com/liferay/lms/service
+docroot/WEB-INF/service/com/liferay/lms/*.java

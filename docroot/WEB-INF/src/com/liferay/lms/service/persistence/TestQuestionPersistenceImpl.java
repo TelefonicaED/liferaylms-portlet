@@ -397,6 +397,7 @@ public class TestQuestionPersistenceImpl extends BasePersistenceImpl<TestQuestio
 		testQuestionImpl.setText(testQuestion.getText());
 		testQuestionImpl.setQuestionType(testQuestion.getQuestionType());
 		testQuestionImpl.setWeight(testQuestion.getWeight());
+		testQuestionImpl.setPenalize(testQuestion.isPenalize());
 		testQuestionImpl.setExtracontent(testQuestion.getExtracontent());
 
 		return testQuestionImpl;
@@ -1618,6 +1619,8 @@ public class TestQuestionPersistenceImpl extends BasePersistenceImpl<TestQuestio
 		FinderCacheUtil.removeCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 	}
 
+	@BeanReference(type = ActivityTriesDeletedPersistence.class)
+	protected ActivityTriesDeletedPersistence activityTriesDeletedPersistence;
 	@BeanReference(type = AuditEntryPersistence.class)
 	protected AuditEntryPersistence auditEntryPersistence;
 	@BeanReference(type = CheckP2pMailingPersistence.class)
@@ -1646,6 +1649,8 @@ public class TestQuestionPersistenceImpl extends BasePersistenceImpl<TestQuestio
 	protected P2pActivityPersistence p2pActivityPersistence;
 	@BeanReference(type = P2pActivityCorrectionsPersistence.class)
 	protected P2pActivityCorrectionsPersistence p2pActivityCorrectionsPersistence;
+	@BeanReference(type = SchedulePersistence.class)
+	protected SchedulePersistence schedulePersistence;
 	@BeanReference(type = SCORMContentPersistence.class)
 	protected SCORMContentPersistence scormContentPersistence;
 	@BeanReference(type = SurveyResultPersistence.class)

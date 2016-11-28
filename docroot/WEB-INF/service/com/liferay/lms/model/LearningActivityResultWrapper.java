@@ -424,6 +424,10 @@ public class LearningActivityResultWrapper implements LearningActivityResult,
 		_learningActivityResult.persist();
 	}
 
+	public java.lang.String getResult(long groupId) {
+		return _learningActivityResult.getResult(groupId);
+	}
+
 	/**
 	 * @deprecated Renamed to {@link #getWrappedModel}
 	 */

@@ -320,12 +320,6 @@ public class CourseLocalServiceWrapper implements CourseLocalService,
 			maxUsers, isFromClone);
 	}
 
-	public java.util.List<com.liferay.lms.model.Course> getChildCourses(
-		long courseId)
-		throws com.liferay.portal.kernel.exception.SystemException {
-		return _courseLocalService.getChildCourses(courseId);
-	}
-
 	public java.util.List<com.liferay.lms.model.Course> getUserCourses(
 		long userId)
 		throws com.liferay.portal.kernel.exception.PortalException,
@@ -336,11 +330,6 @@ public class CourseLocalServiceWrapper implements CourseLocalService,
 	public java.util.List<com.liferay.lms.model.Course> getPublicCoursesByCompanyId(
 		java.lang.Long companyId) {
 		return _courseLocalService.getPublicCoursesByCompanyId(companyId);
-	}
-
-	public java.util.List<com.liferay.lms.model.Course> getPublicCoursesByCompanyId(
-		java.lang.Long companyId, int limit) {
-		return _courseLocalService.getPublicCoursesByCompanyId(companyId, limit);
 	}
 
 	public java.util.List<com.liferay.lms.model.Course> getPublicCoursesByCompanyId(
@@ -452,6 +441,33 @@ public class CourseLocalServiceWrapper implements CourseLocalService,
 		return _courseLocalService.findByCompanyId(companyId);
 	}
 
+	public int getStudentsFromCourseCount(long courseId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _courseLocalService.getStudentsFromCourseCount(courseId);
+	}
+
+	public int getStudentsFromCourseCount(long courseId, long teamId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _courseLocalService.getStudentsFromCourseCount(courseId, teamId);
+	}
+
+	public int getStudentsFromCourseCount(long courseId, long teamId,
+		java.lang.String firstName, java.lang.String lastName,
+		java.lang.String screeName, java.lang.String emailAddress,
+		boolean andComparator)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _courseLocalService.getStudentsFromCourseCount(courseId, teamId,
+			firstName, lastName, screeName, emailAddress, andComparator);
+	}
+
+	public java.util.List<com.liferay.portal.model.User> getStudentsFromCourse(
+		com.liferay.lms.model.Course course, int start, int end) {
+		return _courseLocalService.getStudentsFromCourse(course, start, end);
+	}
+
 	public java.util.List<com.liferay.portal.model.User> getStudentsFromCourse(
 		com.liferay.lms.model.Course course) {
 		return _courseLocalService.getStudentsFromCourse(course);
@@ -461,6 +477,136 @@ public class CourseLocalServiceWrapper implements CourseLocalService,
 		long companyId, long courseGropupCreatedId) {
 		return _courseLocalService.getStudentsFromCourse(companyId,
 			courseGropupCreatedId);
+	}
+
+	public java.util.List<com.liferay.portal.model.User> getStudentsFromCourse(
+		long companyId, long courseGropupCreatedId, long teamId) {
+		return _courseLocalService.getStudentsFromCourse(companyId,
+			courseGropupCreatedId, teamId);
+	}
+
+	public java.util.List<com.liferay.portal.model.User> getStudentsFromCourse(
+		com.liferay.lms.model.Course course, int start, int end, long teamId) {
+		return _courseLocalService.getStudentsFromCourse(course, start, end,
+			teamId);
+	}
+
+	public java.util.List<com.liferay.portal.model.User> getStudentsFromCourse(
+		long companyId, long courseGropupCreatedId, int start, int end,
+		long teamId) {
+		return _courseLocalService.getStudentsFromCourse(companyId,
+			courseGropupCreatedId, start, end, teamId);
+	}
+
+	public java.util.List<com.liferay.portal.model.User> getStudentsFromCourse(
+		long companyId, long courseGropupCreatedId, int start, int end,
+		long teamId, java.lang.String firstName, java.lang.String lastName,
+		java.lang.String screenName, java.lang.String emailAddress,
+		boolean andOperator) {
+		return _courseLocalService.getStudentsFromCourse(companyId,
+			courseGropupCreatedId, start, end, teamId, firstName, lastName,
+			screenName, emailAddress, andOperator);
+	}
+
+	public java.util.List<com.liferay.lms.model.Course> getByTitleStatusCategoriesTags(
+		java.lang.String freeText, int status, long[] categories, long[] tags,
+		long companyId, long groupId, long userId, java.lang.String language,
+		boolean isAdmin, boolean andOperator, int start, int end) {
+		return _courseLocalService.getByTitleStatusCategoriesTags(freeText,
+			status, categories, tags, companyId, groupId, userId, language,
+			isAdmin, andOperator, start, end);
+	}
+
+	public int countByTitleStatusCategoriesTags(java.lang.String freeText,
+		int status, long[] categories, long[] tags, long companyId,
+		long groupId, long userId, java.lang.String language, boolean isAdmin,
+		boolean andOperator) {
+		return _courseLocalService.countByTitleStatusCategoriesTags(freeText,
+			status, categories, tags, companyId, groupId, userId, language,
+			isAdmin, andOperator);
+	}
+
+	public java.util.List<com.liferay.portal.model.User> getStudents(
+		long courseId, long companyId, java.lang.String screenName,
+		java.lang.String firstName, java.lang.String lastName,
+		java.lang.String emailAddress, boolean andOperator, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator comparator) {
+		return _courseLocalService.getStudents(courseId, companyId, screenName,
+			firstName, lastName, emailAddress, andOperator, start, end,
+			comparator);
+	}
+
+	public int countStudents(long courseId, long companyId,
+		java.lang.String screenName, java.lang.String firstName,
+		java.lang.String lastName, java.lang.String emailAddress,
+		boolean andOperator) {
+		return _courseLocalService.countStudents(courseId, companyId,
+			screenName, firstName, lastName, emailAddress, andOperator);
+	}
+
+	public java.util.List<com.liferay.lms.model.Course> getCoursesCatalogByTitleCategoriesTags(
+		java.lang.String freeText, long[] categories, long[] tags,
+		long companyId, long groupId, long userId, java.lang.String language,
+		int start, int end) {
+		return _courseLocalService.getCoursesCatalogByTitleCategoriesTags(freeText,
+			categories, tags, companyId, groupId, userId, language, start, end);
+	}
+
+	public int countCoursesCatalogByTitleCategoriesTags(
+		java.lang.String freeText, long[] categories, long[] tags,
+		long companyId, long groupId, long userId, java.lang.String language) {
+		return _courseLocalService.countCoursesCatalogByTitleCategoriesTags(freeText,
+			categories, tags, companyId, groupId, userId, language);
+	}
+
+	public java.util.List<java.lang.Long> getCatalogCoursesAssetTags(
+		java.lang.String freeText, long[] categories, long companyId,
+		long groupId, long userId, java.lang.String language) {
+		return _courseLocalService.getCatalogCoursesAssetTags(freeText,
+			categories, companyId, groupId, userId, language);
+	}
+
+	public java.util.HashMap<java.lang.Long, java.lang.Long> countCategoryCourses(
+		java.lang.String freeText, long[] categories, long[] tags,
+		long companyId, long groupId, long userId, java.lang.String language) {
+		return _courseLocalService.countCategoryCourses(freeText, categories,
+			tags, companyId, groupId, userId, language);
+	}
+
+	public java.util.HashMap<java.lang.Long, java.lang.Long> countTagCourses(
+		java.lang.String freeText, long[] categories, long[] tags,
+		long companyId, long groupId, long userId, java.lang.String language) {
+		return _courseLocalService.countTagCourses(freeText, categories, tags,
+			companyId, groupId, userId, language);
+	}
+
+	public java.util.List<com.liferay.lms.views.CourseResultView> getMyCourses(
+		long groupId, long userId,
+		com.liferay.portal.theme.ThemeDisplay themeDisplay,
+		java.lang.String orderByColumn, java.lang.String orderByType,
+		int start, int end) {
+		return _courseLocalService.getMyCourses(groupId, userId, themeDisplay,
+			orderByColumn, orderByType, start, end);
+	}
+
+	public int countMyCourses(long groupId, long userId,
+		com.liferay.portal.theme.ThemeDisplay themeDisplay) {
+		return _courseLocalService.countMyCourses(groupId, userId, themeDisplay);
+	}
+
+	public boolean hasUserTries(long courseId, long userId) {
+		return _courseLocalService.hasUserTries(courseId, userId);
+	}
+
+	public java.util.List<com.liferay.lms.model.Course> getPublicCoursesByCompanyId(
+		java.lang.Long companyId, int limit) {
+		return _courseLocalService.getPublicCoursesByCompanyId(companyId, limit);
+	}
+
+	public java.util.List<com.liferay.lms.model.Course> getChildCourses(
+		long courseId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _courseLocalService.getChildCourses(courseId);
 	}
 
 	public java.util.List<com.liferay.lms.model.Course> getCoursesParents(

@@ -50,7 +50,7 @@ long createdGroupId=course.getGroupCreatedId();
 <liferay-portlet:renderURL var="backURL">
 	<c:if test="<%=backToEdit %>">
 		<liferay-portlet:param name="courseId" value="<%=String.valueOf(primKey) %>" />
-		<liferay-portlet:param name="jspPage" value="/html/courseadmin/editcourse.jsp" />
+		<liferay-portlet:param name="view" value="edit-course" />
 		<liferay-portlet:param name="redirect" value='<%= redirectOfEdit %>'/>	
 	</c:if>
 </liferay-portlet:renderURL>
@@ -70,7 +70,7 @@ long createdGroupId=course.getGroupCreatedId();
 	<c:if test="<%=backToEdit %>">
 		<portlet:param name="redirectOfEdit" value='<%=redirectOfEdit %>'/>
 	</c:if>
-	<portlet:param name="jspPage" value="/html/courseadmin/rolememberstab.jsp" />
+	<portlet:param name="view" value="role-members-tab" />
 </portlet:renderURL>
 
 <liferay-ui:tabs names="<%=menu.toString() %>" url="<%=memebersURL %>" />

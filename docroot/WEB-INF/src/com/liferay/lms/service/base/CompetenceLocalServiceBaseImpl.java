@@ -17,6 +17,7 @@ package com.liferay.lms.service.base;
 import com.liferay.counter.service.CounterLocalService;
 
 import com.liferay.lms.model.Competence;
+import com.liferay.lms.service.ActivityTriesDeletedLocalService;
 import com.liferay.lms.service.AuditEntryLocalService;
 import com.liferay.lms.service.AuditLoggerLocalService;
 import com.liferay.lms.service.AuditLoggerService;
@@ -44,6 +45,7 @@ import com.liferay.lms.service.P2pActivityCorrectionsLocalService;
 import com.liferay.lms.service.P2pActivityLocalService;
 import com.liferay.lms.service.SCORMContentLocalService;
 import com.liferay.lms.service.SCORMContentService;
+import com.liferay.lms.service.ScheduleLocalService;
 import com.liferay.lms.service.SurveyResultLocalService;
 import com.liferay.lms.service.TestAnswerLocalService;
 import com.liferay.lms.service.TestAnswerService;
@@ -51,21 +53,29 @@ import com.liferay.lms.service.TestQuestionLocalService;
 import com.liferay.lms.service.TestQuestionService;
 import com.liferay.lms.service.UserCompetenceLocalService;
 import com.liferay.lms.service.UserCompetenceService;
+import com.liferay.lms.service.persistence.ActivityTriesDeletedPersistence;
 import com.liferay.lms.service.persistence.AuditEntryPersistence;
 import com.liferay.lms.service.persistence.CheckP2pMailingPersistence;
 import com.liferay.lms.service.persistence.CompetencePersistence;
 import com.liferay.lms.service.persistence.CourseCompetencePersistence;
+import com.liferay.lms.service.persistence.CourseFinder;
 import com.liferay.lms.service.persistence.CoursePersistence;
+import com.liferay.lms.service.persistence.CourseResultFinder;
 import com.liferay.lms.service.persistence.CourseResultPersistence;
 import com.liferay.lms.service.persistence.LearningActivityPersistence;
+import com.liferay.lms.service.persistence.LearningActivityResultFinder;
 import com.liferay.lms.service.persistence.LearningActivityResultPersistence;
+import com.liferay.lms.service.persistence.LearningActivityTryFinder;
 import com.liferay.lms.service.persistence.LearningActivityTryPersistence;
 import com.liferay.lms.service.persistence.LmsPrefsPersistence;
 import com.liferay.lms.service.persistence.ModulePersistence;
+import com.liferay.lms.service.persistence.ModuleResultFinder;
 import com.liferay.lms.service.persistence.ModuleResultPersistence;
 import com.liferay.lms.service.persistence.P2pActivityCorrectionsPersistence;
 import com.liferay.lms.service.persistence.P2pActivityPersistence;
 import com.liferay.lms.service.persistence.SCORMContentPersistence;
+import com.liferay.lms.service.persistence.SchedulePersistence;
+import com.liferay.lms.service.persistence.SurveyResultFinder;
 import com.liferay.lms.service.persistence.SurveyResultPersistence;
 import com.liferay.lms.service.persistence.TestAnswerPersistence;
 import com.liferay.lms.service.persistence.TestQuestionPersistence;
@@ -338,6 +348,44 @@ public abstract class CompetenceLocalServiceBaseImpl
 	}
 
 	/**
+	 * Returns the activity tries deleted local service.
+	 *
+	 * @return the activity tries deleted local service
+	 */
+	public ActivityTriesDeletedLocalService getActivityTriesDeletedLocalService() {
+		return activityTriesDeletedLocalService;
+	}
+
+	/**
+	 * Sets the activity tries deleted local service.
+	 *
+	 * @param activityTriesDeletedLocalService the activity tries deleted local service
+	 */
+	public void setActivityTriesDeletedLocalService(
+		ActivityTriesDeletedLocalService activityTriesDeletedLocalService) {
+		this.activityTriesDeletedLocalService = activityTriesDeletedLocalService;
+	}
+
+	/**
+	 * Returns the activity tries deleted persistence.
+	 *
+	 * @return the activity tries deleted persistence
+	 */
+	public ActivityTriesDeletedPersistence getActivityTriesDeletedPersistence() {
+		return activityTriesDeletedPersistence;
+	}
+
+	/**
+	 * Sets the activity tries deleted persistence.
+	 *
+	 * @param activityTriesDeletedPersistence the activity tries deleted persistence
+	 */
+	public void setActivityTriesDeletedPersistence(
+		ActivityTriesDeletedPersistence activityTriesDeletedPersistence) {
+		this.activityTriesDeletedPersistence = activityTriesDeletedPersistence;
+	}
+
+	/**
 	 * Returns the audit entry local service.
 	 *
 	 * @return the audit entry local service
@@ -561,6 +609,24 @@ public abstract class CompetenceLocalServiceBaseImpl
 	}
 
 	/**
+	 * Returns the course finder.
+	 *
+	 * @return the course finder
+	 */
+	public CourseFinder getCourseFinder() {
+		return courseFinder;
+	}
+
+	/**
+	 * Sets the course finder.
+	 *
+	 * @param courseFinder the course finder
+	 */
+	public void setCourseFinder(CourseFinder courseFinder) {
+		this.courseFinder = courseFinder;
+	}
+
+	/**
 	 * Returns the course competence local service.
 	 *
 	 * @return the course competence local service
@@ -671,6 +737,24 @@ public abstract class CompetenceLocalServiceBaseImpl
 	public void setCourseResultPersistence(
 		CourseResultPersistence courseResultPersistence) {
 		this.courseResultPersistence = courseResultPersistence;
+	}
+
+	/**
+	 * Returns the course result finder.
+	 *
+	 * @return the course result finder
+	 */
+	public CourseResultFinder getCourseResultFinder() {
+		return courseResultFinder;
+	}
+
+	/**
+	 * Sets the course result finder.
+	 *
+	 * @param courseResultFinder the course result finder
+	 */
+	public void setCourseResultFinder(CourseResultFinder courseResultFinder) {
+		this.courseResultFinder = courseResultFinder;
 	}
 
 	/**
@@ -788,6 +872,25 @@ public abstract class CompetenceLocalServiceBaseImpl
 	}
 
 	/**
+	 * Returns the learning activity result finder.
+	 *
+	 * @return the learning activity result finder
+	 */
+	public LearningActivityResultFinder getLearningActivityResultFinder() {
+		return learningActivityResultFinder;
+	}
+
+	/**
+	 * Sets the learning activity result finder.
+	 *
+	 * @param learningActivityResultFinder the learning activity result finder
+	 */
+	public void setLearningActivityResultFinder(
+		LearningActivityResultFinder learningActivityResultFinder) {
+		this.learningActivityResultFinder = learningActivityResultFinder;
+	}
+
+	/**
 	 * Returns the learning activity try local service.
 	 *
 	 * @return the learning activity try local service
@@ -842,6 +945,25 @@ public abstract class CompetenceLocalServiceBaseImpl
 	public void setLearningActivityTryPersistence(
 		LearningActivityTryPersistence learningActivityTryPersistence) {
 		this.learningActivityTryPersistence = learningActivityTryPersistence;
+	}
+
+	/**
+	 * Returns the learning activity try finder.
+	 *
+	 * @return the learning activity try finder
+	 */
+	public LearningActivityTryFinder getLearningActivityTryFinder() {
+		return learningActivityTryFinder;
+	}
+
+	/**
+	 * Sets the learning activity try finder.
+	 *
+	 * @param learningActivityTryFinder the learning activity try finder
+	 */
+	public void setLearningActivityTryFinder(
+		LearningActivityTryFinder learningActivityTryFinder) {
+		this.learningActivityTryFinder = learningActivityTryFinder;
 	}
 
 	/**
@@ -992,6 +1114,24 @@ public abstract class CompetenceLocalServiceBaseImpl
 	}
 
 	/**
+	 * Returns the module result finder.
+	 *
+	 * @return the module result finder
+	 */
+	public ModuleResultFinder getModuleResultFinder() {
+		return moduleResultFinder;
+	}
+
+	/**
+	 * Sets the module result finder.
+	 *
+	 * @param moduleResultFinder the module result finder
+	 */
+	public void setModuleResultFinder(ModuleResultFinder moduleResultFinder) {
+		this.moduleResultFinder = moduleResultFinder;
+	}
+
+	/**
 	 * Returns the p2p activity local service.
 	 *
 	 * @return the p2p activity local service
@@ -1065,6 +1205,43 @@ public abstract class CompetenceLocalServiceBaseImpl
 	public void setP2pActivityCorrectionsPersistence(
 		P2pActivityCorrectionsPersistence p2pActivityCorrectionsPersistence) {
 		this.p2pActivityCorrectionsPersistence = p2pActivityCorrectionsPersistence;
+	}
+
+	/**
+	 * Returns the schedule local service.
+	 *
+	 * @return the schedule local service
+	 */
+	public ScheduleLocalService getScheduleLocalService() {
+		return scheduleLocalService;
+	}
+
+	/**
+	 * Sets the schedule local service.
+	 *
+	 * @param scheduleLocalService the schedule local service
+	 */
+	public void setScheduleLocalService(
+		ScheduleLocalService scheduleLocalService) {
+		this.scheduleLocalService = scheduleLocalService;
+	}
+
+	/**
+	 * Returns the schedule persistence.
+	 *
+	 * @return the schedule persistence
+	 */
+	public SchedulePersistence getSchedulePersistence() {
+		return schedulePersistence;
+	}
+
+	/**
+	 * Sets the schedule persistence.
+	 *
+	 * @param schedulePersistence the schedule persistence
+	 */
+	public void setSchedulePersistence(SchedulePersistence schedulePersistence) {
+		this.schedulePersistence = schedulePersistence;
 	}
 
 	/**
@@ -1159,6 +1336,24 @@ public abstract class CompetenceLocalServiceBaseImpl
 	public void setSurveyResultPersistence(
 		SurveyResultPersistence surveyResultPersistence) {
 		this.surveyResultPersistence = surveyResultPersistence;
+	}
+
+	/**
+	 * Returns the survey result finder.
+	 *
+	 * @return the survey result finder
+	 */
+	public SurveyResultFinder getSurveyResultFinder() {
+		return surveyResultFinder;
+	}
+
+	/**
+	 * Sets the survey result finder.
+	 *
+	 * @param surveyResultFinder the survey result finder
+	 */
+	public void setSurveyResultFinder(SurveyResultFinder surveyResultFinder) {
+		this.surveyResultFinder = surveyResultFinder;
 	}
 
 	/**
@@ -1517,6 +1712,10 @@ public abstract class CompetenceLocalServiceBaseImpl
 		}
 	}
 
+	@BeanReference(type = ActivityTriesDeletedLocalService.class)
+	protected ActivityTriesDeletedLocalService activityTriesDeletedLocalService;
+	@BeanReference(type = ActivityTriesDeletedPersistence.class)
+	protected ActivityTriesDeletedPersistence activityTriesDeletedPersistence;
 	@BeanReference(type = AuditEntryLocalService.class)
 	protected AuditEntryLocalService auditEntryLocalService;
 	@BeanReference(type = AuditEntryPersistence.class)
@@ -1541,6 +1740,8 @@ public abstract class CompetenceLocalServiceBaseImpl
 	protected CourseService courseService;
 	@BeanReference(type = CoursePersistence.class)
 	protected CoursePersistence coursePersistence;
+	@BeanReference(type = CourseFinder.class)
+	protected CourseFinder courseFinder;
 	@BeanReference(type = CourseCompetenceLocalService.class)
 	protected CourseCompetenceLocalService courseCompetenceLocalService;
 	@BeanReference(type = CourseCompetenceService.class)
@@ -1553,6 +1754,8 @@ public abstract class CompetenceLocalServiceBaseImpl
 	protected CourseResultService courseResultService;
 	@BeanReference(type = CourseResultPersistence.class)
 	protected CourseResultPersistence courseResultPersistence;
+	@BeanReference(type = CourseResultFinder.class)
+	protected CourseResultFinder courseResultFinder;
 	@BeanReference(type = LearningActivityLocalService.class)
 	protected LearningActivityLocalService learningActivityLocalService;
 	@BeanReference(type = LearningActivityService.class)
@@ -1565,12 +1768,16 @@ public abstract class CompetenceLocalServiceBaseImpl
 	protected LearningActivityResultService learningActivityResultService;
 	@BeanReference(type = LearningActivityResultPersistence.class)
 	protected LearningActivityResultPersistence learningActivityResultPersistence;
+	@BeanReference(type = LearningActivityResultFinder.class)
+	protected LearningActivityResultFinder learningActivityResultFinder;
 	@BeanReference(type = LearningActivityTryLocalService.class)
 	protected LearningActivityTryLocalService learningActivityTryLocalService;
 	@BeanReference(type = LearningActivityTryService.class)
 	protected LearningActivityTryService learningActivityTryService;
 	@BeanReference(type = LearningActivityTryPersistence.class)
 	protected LearningActivityTryPersistence learningActivityTryPersistence;
+	@BeanReference(type = LearningActivityTryFinder.class)
+	protected LearningActivityTryFinder learningActivityTryFinder;
 	@BeanReference(type = LmsPrefsLocalService.class)
 	protected LmsPrefsLocalService lmsPrefsLocalService;
 	@BeanReference(type = LmsPrefsPersistence.class)
@@ -1587,6 +1794,8 @@ public abstract class CompetenceLocalServiceBaseImpl
 	protected ModuleResultService moduleResultService;
 	@BeanReference(type = ModuleResultPersistence.class)
 	protected ModuleResultPersistence moduleResultPersistence;
+	@BeanReference(type = ModuleResultFinder.class)
+	protected ModuleResultFinder moduleResultFinder;
 	@BeanReference(type = P2pActivityLocalService.class)
 	protected P2pActivityLocalService p2pActivityLocalService;
 	@BeanReference(type = P2pActivityPersistence.class)
@@ -1595,6 +1804,10 @@ public abstract class CompetenceLocalServiceBaseImpl
 	protected P2pActivityCorrectionsLocalService p2pActivityCorrectionsLocalService;
 	@BeanReference(type = P2pActivityCorrectionsPersistence.class)
 	protected P2pActivityCorrectionsPersistence p2pActivityCorrectionsPersistence;
+	@BeanReference(type = ScheduleLocalService.class)
+	protected ScheduleLocalService scheduleLocalService;
+	@BeanReference(type = SchedulePersistence.class)
+	protected SchedulePersistence schedulePersistence;
 	@BeanReference(type = SCORMContentLocalService.class)
 	protected SCORMContentLocalService scormContentLocalService;
 	@BeanReference(type = SCORMContentService.class)
@@ -1605,6 +1818,8 @@ public abstract class CompetenceLocalServiceBaseImpl
 	protected SurveyResultLocalService surveyResultLocalService;
 	@BeanReference(type = SurveyResultPersistence.class)
 	protected SurveyResultPersistence surveyResultPersistence;
+	@BeanReference(type = SurveyResultFinder.class)
+	protected SurveyResultFinder surveyResultFinder;
 	@BeanReference(type = TestAnswerLocalService.class)
 	protected TestAnswerLocalService testAnswerLocalService;
 	@BeanReference(type = TestAnswerService.class)

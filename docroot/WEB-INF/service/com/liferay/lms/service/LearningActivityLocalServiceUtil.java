@@ -387,6 +387,11 @@ public class LearningActivityLocalServiceUtil {
 		return getService().countLearningActivitiesOfGroup(groupId);
 	}
 
+	public static long countLearningActivitiesOfModule(long moduleId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().countLearningActivitiesOfModule(moduleId);
+	}
+
 	public static java.util.List<com.liferay.lms.model.LearningActivity> getLearningActivitiesOfGroupAndType(
 		long groupId, int typeId)
 		throws com.liferay.portal.kernel.exception.SystemException {
@@ -397,6 +402,12 @@ public class LearningActivityLocalServiceUtil {
 		long moduleId)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService().getLearningActivitiesOfModule(moduleId);
+	}
+
+	public static java.util.List<com.liferay.lms.model.LearningActivity> getLearningActivitiesOfModule(
+		long moduleId, int start, int end)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().getLearningActivitiesOfModule(moduleId, start, end);
 	}
 
 	public static java.util.List<java.lang.Long> getLearningActivityIdsOfModule(
@@ -522,6 +533,16 @@ public class LearningActivityLocalServiceUtil {
 		com.liferay.portal.security.permission.PermissionChecker permissionChecker)
 		throws java.lang.Exception {
 		return getService().canBeEdited(activity, permissionChecker);
+	}
+
+	public static java.util.List<com.liferay.lms.model.LearningActivity> getMandatoryActivities(
+		long moduleId) {
+		return getService().getMandatoryActivities(moduleId);
+	}
+
+	public static java.util.List<com.liferay.lms.model.LearningActivity> getByPrecedence(
+		long precedence) {
+		return getService().getByPrecedence(precedence);
 	}
 
 	public static void clearService() {

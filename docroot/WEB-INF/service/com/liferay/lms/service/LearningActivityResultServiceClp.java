@@ -62,9 +62,13 @@ public class LearningActivityResultServiceClp
 				"long", "java.lang.String", "java.lang.String"
 			};
 
-		_methodName10 = "updateFinishTry";
+		_methodName10 = "forceFinishTry";
 
-		_methodParameterTypes10 = new String[] {
+		_methodParameterTypes10 = new String[] { "long" };
+
+		_methodName11 = "updateFinishTry";
+
+		_methodParameterTypes11 = new String[] {
 				"long", "java.lang.String", "java.lang.String"
 			};
 	}
@@ -365,6 +369,24 @@ public class LearningActivityResultServiceClp
 		return (com.liferay.lms.model.LearningActivityResult)ClpSerializer.translateOutput(returnObj);
 	}
 
+	public void forceFinishTry(long latId) {
+		try {
+			_invokableService.invokeMethod(_methodName10,
+				_methodParameterTypes10, new Object[] { latId });
+		}
+		catch (Throwable t) {
+			t = ClpSerializer.translateThrowable(t);
+
+			if (t instanceof RuntimeException) {
+				throw (RuntimeException)t;
+			}
+			else {
+				throw new RuntimeException(t.getClass().getName() +
+					" is not a valid exception");
+			}
+		}
+	}
+
 	public com.liferay.lms.model.LearningActivityResult updateFinishTry(
 		long latId, java.lang.String tryResultData, java.lang.String imsmanifest)
 		throws com.liferay.portal.kernel.exception.PortalException,
@@ -372,8 +394,8 @@ public class LearningActivityResultServiceClp
 		Object returnObj = null;
 
 		try {
-			returnObj = _invokableService.invokeMethod(_methodName10,
-					_methodParameterTypes10,
+			returnObj = _invokableService.invokeMethod(_methodName11,
+					_methodParameterTypes11,
 					new Object[] {
 						latId,
 						
@@ -426,4 +448,6 @@ public class LearningActivityResultServiceClp
 	private String[] _methodParameterTypes9;
 	private String _methodName10;
 	private String[] _methodParameterTypes10;
+	private String _methodName11;
+	private String[] _methodParameterTypes11;
 }

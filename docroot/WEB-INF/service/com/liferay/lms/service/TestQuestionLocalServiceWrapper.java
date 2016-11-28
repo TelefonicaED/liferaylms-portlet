@@ -281,6 +281,10 @@ public class TestQuestionLocalServiceWrapper implements TestQuestionLocalService
 		_testQuestionLocalService.importXMLQuestion(actId, question);
 	}
 
+	public long getQuestionType(com.liferay.portal.kernel.xml.Element question) {
+		return _testQuestionLocalService.getQuestionType(question);
+	}
+
 	public com.liferay.lms.model.TestQuestion addQuestion(long actId,
 		java.lang.String text, long questionType)
 		throws com.liferay.portal.kernel.exception.SystemException {
@@ -361,6 +365,11 @@ public class TestQuestionLocalServiceWrapper implements TestQuestionLocalService
 		long actId, long typeId)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _testQuestionLocalService.generateAleatoryQuestions(actId, typeId);
+	}
+
+	public boolean isTypeAllowed(long actId,
+		com.liferay.portal.kernel.xml.Document document) {
+		return _testQuestionLocalService.isTypeAllowed(actId, document);
 	}
 
 	/**

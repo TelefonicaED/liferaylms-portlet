@@ -247,6 +247,10 @@ public interface LearningActivityTryLocalService extends BaseLocalService,
 		java.lang.String[] parameterTypes, java.lang.Object[] arguments)
 		throws java.lang.Throwable;
 
+	public com.liferay.lms.model.LearningActivityTry softUpdateLearningActivityTry(
+		com.liferay.lms.model.LearningActivityTry learningActivityTry)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public long getLearningActivityTryByActUserCount(long actId, long userId)
 		throws com.liferay.portal.kernel.exception.SystemException;
@@ -259,6 +263,12 @@ public interface LearningActivityTryLocalService extends BaseLocalService,
 	public java.util.List<com.liferay.lms.model.LearningActivityTry> getLearningActivityTryByActUser(
 		long actId, long userId)
 		throws com.liferay.portal.kernel.exception.SystemException;
+
+	public com.liferay.lms.model.LearningActivityResult updateLearningActivityTry(
+		com.liferay.lms.model.LearningActivityTry learningActivityTry,
+		java.lang.String tryResultData, java.lang.String imsmanifest)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException;
 
 	public com.liferay.lms.model.LearningActivityTry createLearningActivityTry(
 		long actId, com.liferay.portal.service.ServiceContext serviceContext)
@@ -310,4 +320,13 @@ public interface LearningActivityTryLocalService extends BaseLocalService,
 	public boolean areThereTriesNotFromEditors(
 		com.liferay.lms.model.LearningActivity activity)
 		throws java.lang.Exception;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.util.List<com.liferay.lms.model.LearningActivityTry> getByUserId(
+		long userId);
+
+	public long triesPerUserOnlyStudents(long actId, long companyId,
+		long courseGropupCreatedId,
+		java.util.List<com.liferay.portal.model.User> _students, long teamId)
+		throws com.liferay.portal.kernel.exception.SystemException;
 }

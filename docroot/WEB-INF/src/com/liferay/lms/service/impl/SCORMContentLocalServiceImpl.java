@@ -133,11 +133,16 @@ public class SCORMContentLocalServiceImpl
 		try {
 			//scorm
 			FileUtils.forceDelete( new File(getDirScormPath(scorm)));
-			//zip
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		//zip
+		try {
 			FileUtils.forceDelete( new File(getDirScormzipPath(scorm)));
 		} catch (IOException e) {
-		 throw new SystemException(e);
-	
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	
 	

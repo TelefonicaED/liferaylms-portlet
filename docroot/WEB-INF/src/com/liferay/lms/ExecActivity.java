@@ -26,6 +26,7 @@ import org.jsoup.Jsoup;
 
 import au.com.bytecode.opencsv.CSVWriter;
 
+import com.liferay.counter.service.CounterLocalServiceUtil;
 import com.liferay.lms.learningactivity.questiontype.QuestionType;
 import com.liferay.lms.learningactivity.questiontype.QuestionTypeRegistry;
 import com.liferay.lms.model.LearningActivity;
@@ -42,6 +43,8 @@ import com.liferay.portal.kernel.exception.NestableException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
@@ -80,8 +83,10 @@ import com.liferay.util.bridges.mvc.MVCPortlet;
 /**
  * Portlet implementation class ExecActivity
  */
-public class ExecActivity extends MVCPortlet 
-{
+public class ExecActivity extends MVCPortlet{
+	
+	private static Log log = LogFactoryUtil.getLog(ExecActivity.class);
+	
 	static final Pattern DOCUMENT_EXCEPTION_MATCHER = Pattern.compile("Error on line (\\d+) of document ([^ ]+) : (.*)");
 
 	HashMap<Long, TestAnswer> answersMap = new HashMap<Long, TestAnswer>(); 
@@ -90,6 +95,7 @@ public class ExecActivity extends MVCPortlet
 
 		long actId=ParamUtil.getLong(actionRequest, "actId");
 		long latId=ParamUtil.getLong(actionRequest,"latId" );
+		boolean isTablet = ParamUtil.getBoolean(actionRequest,"isTablet" );
 		String navigate = ParamUtil.getString(actionRequest, "navigate");
 		boolean isPartial = false;
 		if (Validator.isNotNull(navigate)) {
@@ -103,24 +109,30 @@ public class ExecActivity extends MVCPortlet
 		//Comprobar que el usuario tenga intentos posibles.
 		if (larntry.getEndDate() == null){
 
-			long correctanswers=0;
+			long correctanswers=0,penalizedAnswers=0;
 			Element resultadosXML=SAXReaderUtil.createElement("results");
 			Document resultadosXMLDoc=SAXReaderUtil.createDocument(resultadosXML);
 
 			long[] questionIds = ParamUtil.getLongValues(actionRequest, "question");
 
+
 			for (long questionId : questionIds) {
 				TestQuestion question = TestQuestionLocalServiceUtil.fetchTestQuestion(questionId);
 				QuestionType qt = new QuestionTypeRegistry().getQuestionType(question.getQuestionType());
-				if(!isPartial) {
-					correctanswers += qt.correct(actionRequest, questionId) ;
+				if(!isPartial){
+					if(qt.correct(actionRequest, questionId)>0) {
+						correctanswers += qt.correct(actionRequest, questionId) ;
+					}else if(question.isPenalize()){
+						penalizedAnswers++;
+					}
 				}
 				resultadosXML.add(qt.getResults(actionRequest, questionId));								
 			}
 
 			long random = GetterUtil.getLong(LearningActivityLocalServiceUtil.getExtraContentValue(actId,"random"));
 			long score=isPartial ? 0 : correctanswers/((random!=0 && random<questionIds.length)?random:questionIds.length);
-
+			if(score < 0)score = 0;
+			
 			LearningActivityResult learningActivityResult = LearningActivityResultLocalServiceUtil.getByActIdAndUserId(actId, PortalUtil.getUserId(actionRequest));
 			long oldResult=-1;
 			if(learningActivityResult!=null) oldResult=learningActivityResult.getResult();
@@ -137,10 +149,12 @@ public class ExecActivity extends MVCPortlet
 
 			if (isPartial) {
 				actionResponse.setRenderParameter("improve", ParamUtil.getString(actionRequest, "improve", Boolean.FALSE.toString()));
+				if(isTablet)actionResponse.setRenderParameter("isTablet", Boolean.toString(true));
 				actionResponse.setRenderParameter("jspPage", "/html/execactivity/test/view.jsp");
 			} else {
 				actionResponse.setRenderParameter("oldResult", Long.toString(oldResult));
 				actionResponse.setRenderParameter("correction", Boolean.toString(true));
+				if(isTablet)actionResponse.setRenderParameter("isTablet", Boolean.toString(true));
 				actionResponse.setRenderParameter("jspPage", "/html/execactivity/test/results.jsp");
 			}
 		}else{
@@ -148,6 +162,61 @@ public class ExecActivity extends MVCPortlet
 			actionRequest.setAttribute("actId", actId);
 			actionResponse.setRenderParameter("jspPage", "/html/execactivity/test/preview.jsp");
 		}						
+
+	}
+	
+	/**
+	 * Corrección para cuando estamos en modo observador ya que no se tiene que guardar nada en learningactivitytry
+	 * @param actionRequest
+	 * @param actionResponse
+	 * @throws SystemException 
+	 * @throws Exception
+	 */
+	
+	public void correctAccessFinished	(ActionRequest actionRequest,ActionResponse actionResponse) throws SystemException{
+
+		long actId=ParamUtil.getLong(actionRequest, "actId");
+
+		boolean isTablet = ParamUtil.getBoolean(actionRequest,"isTablet" );
+
+		long correctanswers=0,penalizedAnswers=0;
+		Element resultadosXML=SAXReaderUtil.createElement("results");
+		Document resultadosXMLDoc=SAXReaderUtil.createDocument(resultadosXML);
+
+		long[] questionIds = ParamUtil.getLongValues(actionRequest, "question");
+
+
+		for (long questionId : questionIds) {
+			TestQuestion question = TestQuestionLocalServiceUtil.fetchTestQuestion(questionId);
+			QuestionType qt = new QuestionTypeRegistry().getQuestionType(question.getQuestionType());
+			if(qt.correct(actionRequest, questionId)>0) {
+				correctanswers++;
+			}else if(question.isPenalize()){
+				penalizedAnswers++;
+			}
+			resultadosXML.add(qt.getResults(actionRequest, questionId));								
+		}
+
+
+		List<TestQuestion> questions=TestQuestionLocalServiceUtil.getQuestions(actId);
+		long score = (correctanswers-penalizedAnswers)*100/questions.size();
+		if(score < 0)score = 0;
+		
+		
+		actionResponse.setRenderParameters(actionRequest.getParameterMap());
+
+		actionResponse.setRenderParameter("correction", Boolean.toString(true));
+		if(isTablet)actionResponse.setRenderParameter("isTablet", Boolean.toString(true));
+		try {
+			//actionResponse.setRenderParameter("tryResultData", resultadosXMLDoc.formattedString());
+			actionResponse.setRenderParameter("tryResultData", resultadosXMLDoc.formattedString());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		actionResponse.setRenderParameter("score", String.valueOf(score));
+		actionResponse.setRenderParameter("jspPage", "/html/execactivity/test/results.jsp");					
 
 	}
 
@@ -231,6 +300,7 @@ public class ExecActivity extends MVCPortlet
 			LearningActivityLocalServiceUtil.setExtraContentValue(actId,"categoriesId", StringPool.BLANK);
 		}
 		
+
 		SessionMessages.add(actionRequest, "activity-saved-successfully");
 		actionResponse.setRenderParameter("jspPage", "/html/execactivity/test/admin/edit.jsp");
 
@@ -256,9 +326,14 @@ public class ExecActivity extends MVCPortlet
 			else {
 				try {
 					Document document = SAXReaderUtil.read(request.getFile("fileName"));
-					TestQuestionLocalServiceUtil.importXML(actId, document);
-					SessionMessages.add(actionRequest, "questions-added-successfully");
-					actionResponse.setRenderParameter("jspPage", "/html/execactivity/test/admin/editquestions.jsp");
+					if (TestQuestionLocalServiceUtil.isTypeAllowed(actId, document)){
+						TestQuestionLocalServiceUtil.importXML(actId, document);
+						SessionMessages.add(actionRequest, "questions-added-successfully");
+						actionResponse.setRenderParameter("jspPage", "/html/execactivity/test/admin/editquestions.jsp");
+					}else{
+						SessionErrors.add(actionRequest, "execativity.editquestions.importquestions.xml.not.allowed");
+						actionResponse.setRenderParameter("jspPage", "/html/execactivity/test/admin/importquestions.jsp");
+					}
 				} catch (DocumentException e) {
 					Matcher matcher = DOCUMENT_EXCEPTION_MATCHER.matcher(e.getMessage());
 
@@ -273,7 +348,6 @@ public class ExecActivity extends MVCPortlet
 					SessionErrors.add(actionRequest, "execativity.editquestions.importquestions.xml.generic");
 					actionResponse.setRenderParameter("jspPage", "/html/execactivity/test/admin/importquestions.jsp");
 				}
-
 			}
 
 		}
@@ -284,14 +358,18 @@ public class ExecActivity extends MVCPortlet
 
 	public void editQuestion(ActionRequest actionRequest, ActionResponse actionResponse)
 			throws Exception {
-
 		
 		long questionId = ParamUtil.getLong(actionRequest, "questionId", 0);
 		long actid = ParamUtil.getLong(actionRequest, "resId");
 		long questionType = ParamUtil.getLong(actionRequest, "typeId", -1);
 		String questionText = ParamUtil.get(actionRequest, "text", "");
+		boolean penalize = ParamUtil.getBoolean(actionRequest, "penalize");
+		
+		log.debug("***questionId:"+questionId);
+		log.debug("***penalize:"+penalize);
+		
 		String backUrl = ParamUtil.get(actionRequest, "backUrl", "");
-		String formatType = ParamUtil.getString(actionRequest, "formattype", PropsUtil.get("lms.question.formattype.normal"));
+		String formatType = ParamUtil.getString(actionRequest, "formattype", PropsUtil.get("lms.question.formattype.normal")); 
 		String partialCorrection = ParamUtil.getString(actionRequest, "partialcorrection", "false");
 		Document document = null;
 		Element rootElement = null;
@@ -302,14 +380,23 @@ public class ExecActivity extends MVCPortlet
 		if(Validator.isNotNull(questionText)){//porque no se permite vacio ya que eliminar pregunta va por otro lado
 			TestQuestion question = null;
 			if(questionId == 0){//Nueva pregunta
+				question = TestQuestionLocalServiceUtil.createTestQuestion(CounterLocalServiceUtil.increment(TestQuestion.class.getName()));
+				question.setText(questionText);
+				question.setPenalize(penalize);
+				question.setQuestionType(questionType);
+				question.setActId(actid);
+				question.setWeight(question.getQuestionId());
+				
 				document = SAXReaderUtil.createDocument();
 				rootElement = document.addElement("question");
 				Element elem = SAXReaderUtil.createElement("formattype");
 				elem.setText(formatType);		
-				rootElement.add(elem);
+				rootElement.add(elem);				
 				elem = SAXReaderUtil.createElement("partialcorrection");
 				elem.setText(partialCorrection);
-				question = TestQuestionLocalServiceUtil.addQuestion(actid, questionText, questionType, document.formattedString());
+				question.setExtracontent(document.formattedString());
+				TestQuestionLocalServiceUtil.addTestQuestion(question);
+				
 			}else{//Pregunta existente
 				question = TestQuestionLocalServiceUtil.getTestQuestion(questionId);
 				String typeOrderBefore = "false";
@@ -339,9 +426,11 @@ public class ExecActivity extends MVCPortlet
 					rootElement.add(ele);
 				}
 				Element elemQuestion = null;
-				//Edicion de pregunta o alineacion o correci�n
-				if(!questionText.equals(question.getText())||!formatType.equals(typeOrderBefore)||!partialCorrection.equals(partialCorrectionBefore)){
+				//Edicion de pregunta o alineacion o correción
+				if(!questionText.equals(question.getText())|| penalize != question.getPenalize() ||!formatType.equals(typeOrderBefore)||!partialCorrection.equals(partialCorrectionBefore)){
+
 					question.setText(questionText);
+					question.setPenalize(penalize);
 					if((question.getExtracontent()==null)||(question.getExtracontent().trim().length()==0)){
 						document = SAXReaderUtil.createDocument();
 						rootElement = document.addElement("question");
@@ -369,8 +458,7 @@ public class ExecActivity extends MVCPortlet
 					rootElement.add(elemQuestion);
 					question.setExtracontent(document.formattedString());
 					TestQuestionLocalServiceUtil.updateTestQuestion(question);
-				}					
-				
+				}
 			}
 			if(question!=null){
 				questionId = question.getQuestionId();
@@ -399,9 +487,6 @@ public class ExecActivity extends MVCPortlet
 								}else{
 									correct = ParamUtil.getBoolean(actionRequest, "correct_"+newAnswerId);
 								}
-								
-								
-
 							}else{
 								if(question.getQuestionType()==5 ){
 									correct = true;
@@ -416,16 +501,8 @@ public class ExecActivity extends MVCPortlet
 										}else{
 											correct = false;
 										}
-									
 									}
-								
-									
-										
-									
-									
 								}
-								
-
 							}
 							counter++;
 							if(correct)trueCounter++;
@@ -466,7 +543,6 @@ public class ExecActivity extends MVCPortlet
 						}
 					}else TestAnswerLocalServiceUtil.deleteTestAnswer(existingAnswerId);
 				}
-				
 				actionResponse.setRenderParameter("message", LanguageUtil.get(themeDisplay.getLocale(), "execativity.editquestions.editquestion"));
 			}else {
 				SessionErrors.add(actionRequest, "execativity.test.error");
@@ -929,6 +1005,7 @@ public class ExecActivity extends MVCPortlet
 		}
 		
 	}
+	
 	
 	private void updateLearningActivityTryAndResult(
 			LearningActivityTry learningActivityTry) throws PortalException,

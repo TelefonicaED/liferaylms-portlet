@@ -345,6 +345,11 @@ public class P2pActivityCorrectionsLocalServiceUtil {
 		return getService().getCorrectionsDoneByUserInP2PActivity(actId, userId);
 	}
 
+	public static java.util.List<com.liferay.lms.model.P2pActivityCorrections> getByUserId(
+		long userId) {
+		return getService().getByUserId(userId);
+	}
+
 	/**
 	* Para saber si el usuario ya ha realizado todas las correcciones que se indica en el extracontent.
 	*/

@@ -103,9 +103,9 @@ function <portlet:namespace />createValidator(){
 	
 	        fieldStrings: {
 	        	<portlet:namespace />result: {
-	        		required: '<liferay-ui:message key="evaluationAvg.result.required" />',
-	        		number: '<liferay-ui:message key="evaluationAvg.result.number" />',
-	        		range: '<liferay-ui:message key="evaluationAvg.result.range" />'     
+	        		required: Liferay.Language.get("evaluationAvg.result.required"),
+	        		number: Liferay.Language.get("evaluationAvg.result.number"),
+	        		range: Liferay.Language.get("evaluationAvg.result.range")     
 	            }
 	        },
 			

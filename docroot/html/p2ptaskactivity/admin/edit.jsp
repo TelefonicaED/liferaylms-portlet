@@ -17,6 +17,7 @@
 <%@page import="com.liferay.lms.learningactivity.TaskP2PLearningActivityType"%>
 <%@ include file="/init.jsp"%>
 
+
 <%
 	long moduleId=ParamUtil.getLong(renderRequest,"resModuleId",0);
 
@@ -49,6 +50,7 @@
 	long numEvaluaciones = TaskP2PLearningActivityType.DEFAULT_VALIDATION_NUMBER;
 	
 	LearningActivity learningActivity = (LearningActivity)request.getAttribute("activity");	
+
 	if(learningActivity!=null) {
 		anonimous = StringPool.TRUE.equals(LearningActivityLocalServiceUtil.getExtraContentValue(learningActivity.getActId(),"anonimous"));
 		result = StringPool.TRUE.equals(LearningActivityLocalServiceUtil.getExtraContentValue(learningActivity.getActId(),"result"));
@@ -107,9 +109,9 @@ window.<portlet:namespace />validate_p2ptaskactivity={
 		fieldStrings:
 		{
 			<portlet:namespace />numValidaciones: {
-        		required: '<liferay-ui:message key="p2ptaskactivity.editActivity.numValidaciones.required" />',
-        		number: '<liferay-ui:message key="p2ptaskactivity.editActivity.numValidaciones.number" />',
-        		range: '<liferay-ui:message key="p2ptaskactivity.editActivity.numValidaciones.range" />'
+        		required: Liferay.Language.get("p2ptaskactivity.editActivity.numValidaciones.required"),
+        		number: Liferay.Language.get("p2ptaskactivity.editActivity.numValidaciones.number"),
+        		range: Liferay.Language.get("p2ptaskactivity.editActivity.numValidaciones.range")
             }
 		}	
 };
@@ -151,7 +153,7 @@ AUI().ready('node','event','aui-io-request','aui-parse-content','liferay-portlet
 
 <aui:input type="checkbox" name="anonimous" label="p2ptaskactivity.edit.anonimous" checked="<%=anonimous %>" ignoreRequestValue="true"></aui:input>
 <aui:input type="checkbox" name="result" label="test.result" checked="<%=result %>" disabled="<%=disabled %>" 
-	ignoreRequestValue="true"></aui:input>
+	ignoreRequestValue="true"/>
 	
 <aui:input type="checkbox" name="fileoptional" label="p2ptaskactivity.edit.fileoptional" checked="<%=fileOptional%>" disabled="<%=disabled%>" ignoreRequestValue="true" />	
 	
@@ -172,10 +174,10 @@ AUI().ready('node','event','aui-io-request','aui-parse-content','liferay-portlet
 </aui:field-wrapper>
 
 
-	
 <aui:input type="text" size="3" cssClass="lms-inpnumval" name="numValidaciones" label="p2ptaskactivity.edit.numvalidations" value="<%=numEvaluaciones%>" disabled="<%=disabled %>" 
-	ignoreRequestValue="true"></aui:input>
-	
+		ignoreRequestValue="true"/>
+
+
 <div id="<portlet:namespace />numValidacionesError" class="<%=((SessionErrors.contains(renderRequest, "p2ptaskactivity.editActivity.numValidaciones.required"))||
 												      (SessionErrors.contains(renderRequest, "p2ptaskactivity.editActivity.numValidaciones.number"))||
 												      (SessionErrors.contains(renderRequest, "p2ptaskactivity.editActivity.numValidaciones.range")))?

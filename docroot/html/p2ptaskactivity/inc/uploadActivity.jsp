@@ -118,11 +118,11 @@ Liferay.provide(
 			var idFile = "#<portlet:namespace />fileName";
 			
 			if(descrip == "" || descrip == "<%=StringEscapeUtils.unescapeHtml(textCorrection)%>"){
-				alert('<liferay-ui:message key="p2ptask-empty-desc" />');
+				alert(Liferay.Language.get("p2ptask-empty-desc"));
 				return false;
 			}
 			if(A.one(idFile).val() == "" && <%=!StringPool.TRUE.equals(LearningActivityLocalServiceUtil.getExtraContentValue(actId, "fileoptional")) %> ){
-				alert('<liferay-ui:message key="p2ptask-empty-file" />');
+				alert(Liferay.Language.get("p2ptask-empty-file"));
 				return false;
 			}
 			<portlet:namespace />openPopUp();
@@ -225,7 +225,6 @@ Liferay.provide(
 <!-- Start PopUp confirmation -->
 <div id="<%= renderResponse.getNamespace() %>p2pconfirmation" style="display:none">
 	<h1><liferay-ui:message key="p2ptask-upload-confirmation" /></h1>
-	<div class="desc color_tercero"><liferay-ui:message key="p2ptask-upload-description" /></div>
 	<br />
 	<p><span class="label"><liferay-ui:message key="p2ptask-file-name" />:</span> <span id="contentFile"></span></p>
 	<div class="contDesc">
@@ -352,11 +351,6 @@ Liferay.provide(
 				</c:if>
 				<aui:input inlineLabel="left" inlineField="true" name="fileName" id="fileName" type="file" value="" />
 			</div>
-			<!--
-			<div>
-				<aui:input name="check" id="check" checked="false" label='<liferay-ui:message key="p2ptask-publish-task" />' type="checkbox" value="1"></aui:input>
-			</div>
-			 -->
 			<div class="container-buttons">
 				<input type="button" class="button floatr" value="<liferay-ui:message key="p2ptask-send" />" onclick="<%= renderResponse.getNamespace() %>checkDataform()" />
 			</div>

@@ -265,4 +265,13 @@ public interface AuditEntryLocalService extends BaseLocalService,
 		java.lang.String className, long classPK, long userId,
 		java.util.Date startDate, java.util.Date endDate, int start, int end)
 		throws com.liferay.portal.kernel.exception.SystemException;
+
+	public java.util.List<com.liferay.lms.model.AuditEntry> findByclassName_classPK(
+		java.lang.String className, long classPK)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	public java.util.List<com.liferay.lms.model.AuditEntry> findByclassName_classPK_filterByActions(
+		java.lang.String className, long classPK,
+		java.util.List<java.lang.String> actions)
+		throws com.liferay.portal.kernel.exception.SystemException;
 }

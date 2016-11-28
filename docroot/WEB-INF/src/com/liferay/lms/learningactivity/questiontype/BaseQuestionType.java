@@ -155,7 +155,7 @@ public abstract class BaseQuestionType implements QuestionType, Serializable {
 					FileEntry existingFile = DLAppLocalServiceUtil.getFileEntry(context.getScopeGroupId(), folderId, oldFile.getTitle());
 					description = m.descriptionFileParserLarToDescription(answer.getAnswer(), oldFile, existingFile);
 				} catch (Exception e) {
-					System.out.println("* ERROR! Question descriptionfile: " + e.getMessage());
+					e.printStackTrace();
 				}
 				answer.setAnswer(description);
 				TestAnswerLocalServiceUtil.updateTestAnswer(answer);

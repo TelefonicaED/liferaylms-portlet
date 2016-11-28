@@ -20,7 +20,6 @@ import javax.portlet.ProcessAction;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 
-import com.liferay.lms.ModuleUpdateResult;
 import com.liferay.lms.moduleUpload;
 import com.liferay.lms.auditing.AuditConstants;
 import com.liferay.lms.auditing.AuditingLogFactory;
@@ -62,11 +61,9 @@ import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
-import com.liferay.portal.model.Company;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.Layout;
 import com.liferay.portal.model.User;
-import com.liferay.portal.service.CompanyLocalServiceUtil;
 import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.LayoutLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
@@ -83,9 +80,7 @@ import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
 import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.service.DLFileEntryLocalServiceUtil;
 import com.liferay.util.bridges.mvc.MVCPortlet;
-import com.liferay.util.mail.MailEngine;
-import com.liferay.util.mail.MailEngineException;
-import com.liferay.util.mail.MailServerException;
+import com.tls.lms.util.LiferaylmsUtil;
 
 
 
@@ -230,14 +225,19 @@ public class P2PActivityPortlet extends MVCPortlet {
 					
 					//Creamos el LearningActivityTry
 					LearningActivityTry learningTry =LearningActivityTryLocalServiceUtil.createLearningActivityTry(actId,serviceContext);
-					learningTry.setStartDate(new java.util.Date(System.currentTimeMillis()));
+					learningTry.setStartDate(new Date());
 					learningTry.setUserId(user.getUserId());
 					learningTry.setResult(0);
 					LearningActivityTryLocalServiceUtil.updateLearningActivityTry(learningTry);
+					boolean deregisterMail = false;
+					if(user.getExpandoBridge().getAttribute(LiferaylmsUtil.DEREGISTER_USER_EXPANDO)!=null){
+						deregisterMail = (Boolean)user.getExpandoBridge().getAttribute(LiferaylmsUtil.DEREGISTER_USER_EXPANDO);
+					}
 					
-					//Enviar por email que se ha entregado una tarea p2p.
-					P2PActivityPortlet.sendMailP2pDone(user, actId, themeDisplay);
-					
+					if(!deregisterMail){
+						//Enviar por email que se ha entregado una tarea p2p.
+						P2PActivityPortlet.sendMailP2pDone(user, actId, themeDisplay);
+					}
 					request.setAttribute("latId", learningTry.getLatId());
 					
 				}
@@ -383,7 +383,6 @@ public class P2PActivityPortlet extends MVCPortlet {
 				
 		//Obtenemos los campos necesarios.
 		User user = UserLocalServiceUtil.getUser(themeDisplay.getUserId());
-		Long groupId = themeDisplay.getScopeGroupId();
 		long resultuser=0;
 		
 		String description = uploadRequest.getParameter("description");
@@ -398,7 +397,6 @@ public class P2PActivityPortlet extends MVCPortlet {
 		}
 		 		
 		String fileName = uploadRequest.getFileName("fileName");
-		String title = fileName;
 		File file = uploadRequest.getFile("fileName");
 		String mimeType = uploadRequest.getContentType("fileName");
 		
@@ -509,8 +507,14 @@ public class P2PActivityPortlet extends MVCPortlet {
 					
 					P2pActivity p2pActivity = P2pActivityLocalServiceUtil.getP2pActivity(p2pActivityId);
 					User userPropietaryP2pAct = UserLocalServiceUtil.getUser(p2pActivity.getUserId());
+					boolean deregisterMail = false;
+					if(user.getExpandoBridge().getAttribute(LiferaylmsUtil.DEREGISTER_USER_EXPANDO)!=null){
+						deregisterMail = (Boolean)userPropietaryP2pAct.getExpandoBridge().getAttribute(LiferaylmsUtil.DEREGISTER_USER_EXPANDO);
+					}
 					
-					sendMailCorrection(userPropietaryP2pAct, actId, p2pActCor, themeDisplay, portletConfig, url);
+					if(!deregisterMail){
+						sendMailCorrection(userPropietaryP2pAct, actId, p2pActCor, themeDisplay, portletConfig, url);
+					}
 					request.setAttribute("actId", actId);
 					request.setAttribute("latId", latId);
 		
@@ -605,6 +609,7 @@ public class P2PActivityPortlet extends MVCPortlet {
 		LearningActivityLocalServiceUtil.setExtraContentValue(actId, "anonimous", anonimous);
 		LearningActivityLocalServiceUtil.setExtraContentValue(actId, "result", result);
 	
+		_log.debug(":::numValidaciones:::");
 		SessionMessages.add(actionRequest, "activity-saved-successfully");
 	}
 
@@ -727,7 +732,7 @@ public class P2PActivityPortlet extends MVCPortlet {
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			//e.printStackTrace();
-			ModuleUpdateResult.saveStringToFile("updateResultP2PActivitiesERROR.txt", "ERROR: actId: "+actId+", userId: "+userId+", value: "+value+", Message:"+e.getMessage());
+			LiferaylmsUtil.saveStringToFile("updateResultP2PActivitiesERROR.txt", "ERROR: actId: "+actId+", userId: "+userId+", value: "+value+", Message:"+e.getMessage());
 		}
 	}
 	
@@ -750,21 +755,20 @@ public class P2PActivityPortlet extends MVCPortlet {
 			}
 			
 			Group group = GroupLocalServiceUtil.getGroup(activity.getGroupId());
-			Company company = CompanyLocalServiceUtil.getCompany(group.getCompanyId());
 			
 			Course course= CourseLocalServiceUtil.getCourseByGroupCreatedId(activity.getGroupId());
 			
 			Module module = ModuleLocalServiceUtil.getModule(activity.getModuleId());
 			String courseFriendlyUrl = "";
 			String courseTitle = "";
-			String activityTitle = activity.getTitle(themeDisplay.getLocale());
-			String moduleTitle =  module.getTitle(themeDisplay.getLocale());
+			String activityTitle = activity.getTitle(user.getLocale());
+			String moduleTitle =  module.getTitle(user.getLocale());
 			String portalUrl = PortalUtil.getPortalURL(themeDisplay);
 			String pathPublic = PortalUtil.getPathFriendlyURLPublic();
 			
 			if(course != null){
 				courseFriendlyUrl = portalUrl + pathPublic + group.getFriendlyURL();
-				courseTitle = course.getTitle(themeDisplay.getLocale());
+				courseTitle = course.getTitle(user.getLocale());
 			}
 							
 			String messageArgs[]= {activityTitle, moduleTitle, courseTitle, courseFriendlyUrl};
@@ -775,39 +779,48 @@ public class P2PActivityPortlet extends MVCPortlet {
 			
 			//Nuevos campos del email
 			//Subject
-			String subject = LanguageUtil.get(themeDisplay.getLocale(), "p2ptaskactivity.mail.valoration.recieved.subject"); 
+			String subject = LanguageUtil.get(user.getLocale(), "p2ptaskactivity.mail.valoration.recieved.subject"); 
 			
 			//Body
-			String title  			 = LanguageUtil.format(themeDisplay.getLocale(), "p2ptaskactivity.mail.valoration.recieved.body.title",   titleArgs); 
-			String message  		 = LanguageUtil.format(themeDisplay.getLocale(), "p2ptaskactivity.mail.valoration.recieved.body.message", messageArgs);
-			String usercorrection    = LanguageUtil.format(themeDisplay.getLocale(), "p2ptaskactivity.mail.valoration.recieved.body.usercorrection", userArgs); 
-			String resultcorrection  = LanguageUtil.format(themeDisplay.getLocale(), "p2ptaskactivity.mail.valoration.recieved.body.result",  resultArgs); 			
-			String end  			 = LanguageUtil.get(themeDisplay.getLocale(), 	"p2ptaskactivity.mail.valoration.recieved.body.end"); 
+			String title  			 = LanguageUtil.format(user.getLocale(), "p2ptaskactivity.mail.valoration.recieved.body.title",   titleArgs); 
+			String message  		 = LanguageUtil.format(user.getLocale(), "p2ptaskactivity.mail.valoration.recieved.body.message", messageArgs);
+			String usercorrection    = LanguageUtil.format(user.getLocale(), "p2ptaskactivity.mail.valoration.recieved.body.usercorrection", userArgs); 
+			String resultcorrection  = LanguageUtil.format(user.getLocale(), "p2ptaskactivity.mail.valoration.recieved.body.result",  resultArgs); 			
+			String end  			 = LanguageUtil.get(user.getLocale(), 	"p2ptaskactivity.mail.valoration.recieved.body.end"); 
 			
 			//Componer el body seg�n la actividad.
 			String body = title;
 			
-			body += "<br /><br />" + message;
+			if(message!=null){
+				body += "<br /><br />" + message;	
+			}
 			
 			if(!anonimous){
-				body += "<br /><br />" + usercorrection;
+				if(usercorrection!=null){
+					body += "<br /><br />" + usercorrection;
+				}
 			}
 			
 			//Comentarios realizados por el usuario que ha corregido la actividad.
-			body += "<br /><br />" + p2pActiCor.getDescription();
+			if(p2pActiCor!= null && p2pActiCor.getDescription()!=null){
+				body += "<br /><br />" + p2pActiCor.getDescription();	
+			}
 			
 			if(result){
-				body += "<br /><br />" + resultcorrection;
+				if(resultcorrection!=null){
+					body += "<br /><br />" + resultcorrection;	
+				}
 			}
 			
 			String fileId = String.valueOf(p2pActiCor.getFileEntryId());
 			if(fileId.length() == 1 && fileId.equals("0")){
-				body += "<br /><br />" + LanguageUtil.get(themeDisplay.getLocale(), 	"p2ptaskactivity.mail.valoration.recieved.body.file.no"); 
+				body += "<br /><br />" + LanguageUtil.get(user.getLocale(), 	"p2ptaskactivity.mail.valoration.recieved.body.file.no"); 
 			} else {
-				body += "<br /><br />" + LanguageUtil.get(themeDisplay.getLocale(), 	"p2ptaskactivity.mail.valoration.recieved.body.file.yes");
+				body += "<br /><br />" + LanguageUtil.get(user.getLocale(), 	"p2ptaskactivity.mail.valoration.recieved.body.file.yes");
 			}
 			
-			body += "<br /><br />" + end;
+			body += "<br /><br />" + end;	
+			
 			
 			if(_log.isDebugEnabled()){_log.debug("P2PActivityPortlet::sendMailCorrection::subject:"+subject);}
 			if(_log.isDebugEnabled()){_log.debug("P2PActivityPortlet::sendMailCorrection::body:"+body);}
@@ -843,21 +856,20 @@ public class P2PActivityPortlet extends MVCPortlet {
 			LearningActivity activity = LearningActivityLocalServiceUtil.getLearningActivity(actId);
 			
 			Group group = GroupLocalServiceUtil.getGroup(activity.getGroupId());
-			Company company = CompanyLocalServiceUtil.getCompany(group.getCompanyId());
 			
 			Course course= CourseLocalServiceUtil.getCourseByGroupCreatedId(activity.getGroupId());
 			
 			Module module = ModuleLocalServiceUtil.getModule(activity.getModuleId());
 			String courseFriendlyUrl = "";
 			String courseTitle = "";
-			String activityTitle = activity.getTitle(themeDisplay.getLocale());
-			String moduleTitle =  module.getTitle(themeDisplay.getLocale());
+			String activityTitle = activity.getTitle(user.getLocale());
+			String moduleTitle =  module.getTitle(user.getLocale());
 			String portalUrl = PortalUtil.getPortalURL(themeDisplay);
 			String pathPublic = PortalUtil.getPathFriendlyURLPublic();
 			
 			if(course != null){
 				courseFriendlyUrl = portalUrl + pathPublic + group.getFriendlyURL();
-				courseTitle = course.getTitle(themeDisplay.getLocale());
+				courseTitle = course.getTitle(user.getLocale());
 			}
 			
 			String messageArgs[]= {activityTitle, moduleTitle, courseTitle, courseFriendlyUrl};
@@ -865,9 +877,10 @@ public class P2PActivityPortlet extends MVCPortlet {
 			
 			//Nuevos campos del email
 			//Subject
-			String subject = LanguageUtil.get(themeDisplay.getLocale(), "p2ptaskactivity.mail.sendactivity.mail.subject"); 
-			String title = LanguageUtil.format(themeDisplay.getLocale(), "p2ptaskactivity.mail.sendactivity.mail.title", titleArgs);
-			String body = title +"<br /><br />"+ LanguageUtil.format(themeDisplay.getLocale(), "p2ptaskactivity.mail.sendactivity.mail.message", messageArgs);
+			
+			String subject = LanguageUtil.get(user.getLocale(), "p2ptaskactivity.mail.sendactivity.mail.subject"); 
+			String title = LanguageUtil.format(user.getLocale(), "p2ptaskactivity.mail.sendactivity.mail.title", titleArgs);
+			String body = title +"<br /><br />"+ LanguageUtil.format(user.getLocale(), "p2ptaskactivity.mail.sendactivity.mail.message", messageArgs);
 			
 			String firmaPortal  = PrefsPropsUtil.getString(themeDisplay.getCompanyId(),"firma.email.admin");
 			// JOD

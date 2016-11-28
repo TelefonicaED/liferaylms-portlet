@@ -59,7 +59,7 @@ public class CleanLearningActivity {
 		try {
 			res = LearningActivityResultLocalServiceUtil.getByActIdAndUserId(lat.getActId(), lat.getUserId());
 		} catch (SystemException e) {
-			System.out.println(e.getMessage());
+			e.printStackTrace();
 		}
 		
 
@@ -68,9 +68,9 @@ public class CleanLearningActivity {
 			larn = LearningActivityLocalServiceUtil.getLearningActivity(lat.getActId());
 		} catch (PortalException e) {
 			
-			System.out.println(e.getMessage());
+			e.printStackTrace();
 		} catch (SystemException e) {
-			System.out.println(e.getMessage());
+			e.printStackTrace();
 		}
 		
 		try {
@@ -91,7 +91,7 @@ public class CleanLearningActivity {
 			try {
 				LearningActivityResultLocalServiceUtil.updateLearningActivityResult(res);
 			} catch (SystemException e) {
-				System.out.println(e.getMessage());
+				e.printStackTrace();
 			}
 		}
 		

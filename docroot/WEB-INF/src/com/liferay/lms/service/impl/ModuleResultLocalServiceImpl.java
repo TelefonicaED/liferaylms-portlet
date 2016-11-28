@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import com.liferay.lms.auditing.AuditConstants;
 import com.liferay.lms.auditing.AuditingLogFactory;
@@ -35,6 +36,8 @@ import com.liferay.lms.service.LearningActivityResultLocalServiceUtil;
 import com.liferay.lms.service.ModuleLocalServiceUtil;
 import com.liferay.lms.service.ModuleResultLocalServiceUtil;
 import com.liferay.lms.service.base.ModuleResultLocalServiceBaseImpl;
+import com.liferay.lms.service.persistence.ModuleResultFinderUtil;
+import com.liferay.lms.service.persistence.ModuleResultUtil;
 import com.liferay.portal.kernel.bean.PortletBeanLocatorUtil;
 import com.liferay.portal.kernel.dao.orm.Criterion;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
@@ -43,10 +46,13 @@ import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.User;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceContextThreadLocal;
+import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.service.persistence.GroupUtil;
 
 /**
@@ -70,8 +76,9 @@ import com.liferay.portal.service.persistence.GroupUtil;
  */
 public class ModuleResultLocalServiceImpl extends ModuleResultLocalServiceBaseImpl {
 
-	public ModuleResult getByModuleAndUser(long moduleId, long userId)
-		throws SystemException {
+	private static Log log = LogFactoryUtil.getLog(ModuleResultLocalServiceImpl.class);
+	
+	public ModuleResult getByModuleAndUser(long moduleId, long userId)throws SystemException {
 
 		ModuleResult moduleResult = moduleResultPersistence.fetchBymu(userId, moduleId);
 		return moduleResult;	
@@ -103,44 +110,47 @@ public class ModuleResultLocalServiceImpl extends ModuleResultLocalServiceBaseIm
 		return res;
 	}
 	
+	public List<ModuleResult> getByUserId(long userId){
+		List<ModuleResult> res = new ArrayList<ModuleResult>();		
+		try {
+			res = ModuleResultUtil.findByUserId(userId);
+		} catch (SystemException e) {
+			e.printStackTrace();
+		}				
+		return res;
+	}
+	
+	
 	public long countByModule(long moduleId)
 		throws SystemException {
 
 		return moduleResultPersistence.countBym(moduleId);
 	}
 
-	public long countByModuleOnlyStudents(long companyId, long courseGropupCreatedId, long moduleId)
+	
+	@Deprecated
+	public long countByModuleOnlyStudents(long companyId, long courseGropupCreatedId, long moduleId) throws SystemException{
+		return countByModuleOnlyStudents(companyId, courseGropupCreatedId, moduleId, null);
+	}
+	
+	@Deprecated
+	public long countByModuleOnlyStudents(long companyId, long courseGropupCreatedId, long moduleId ,List<User> _students)
 			throws SystemException {
 		
-		long res = 0;
-		List<User> students = CourseLocalServiceUtil.getStudentsFromCourse(companyId, courseGropupCreatedId);
-		
-		ClassLoader classLoader = (ClassLoader) PortletBeanLocatorUtil.locate(ClpSerializer.getServletContextName(), "portletClassLoader");
-		DynamicQuery consulta = DynamicQueryFactoryUtil.forClass(ModuleResult.class, classLoader)
-				.add(PropertyFactoryUtil.forName("moduleId").eq(moduleId));
-		
-		if(Validator.isNotNull(students) && students.size() > 0) {
-			Criterion criterion = null;
-			for (int i = 0; i < students.size(); i++) {
-				if(i==0) {
-					criterion = RestrictionsFactoryUtil.like("userId", students.get(i).getUserId());
-				} else {
-					criterion = RestrictionsFactoryUtil.or(criterion, RestrictionsFactoryUtil.like("userId", students.get(i).getUserId()));
-				}
-			}
-			if(Validator.isNotNull(criterion)) {
-				consulta.add(criterion);
-				
-				List<ModuleResult> results = moduleResultPersistence.findWithDynamicQuery(consulta);
-				if(results!=null && !results.isEmpty()) {
-					res = results.size();
-				}
-			}
-		}
-		
-		return res;
+		return ModuleResultFinderUtil.countStartedOnlyStudents(moduleId, companyId, courseGropupCreatedId, _students, 0);
 	}
 
+	
+	public long countStudentsStartedByModuleId(Module module, List<User> students, long teamId){
+		return ModuleResultFinderUtil.countStartedOnlyStudents(module.getModuleId(), module.getCompanyId(), module.getGroupId(), students, teamId);
+
+	}
+	
+	public long countStudentsFinishedByModuleId(Module module, List<User> students, long teamId){
+		return ModuleResultFinderUtil.countFinishedOnlyStudents(module.getModuleId(), module.getCompanyId(), module.getGroupId(), students, teamId);
+	}
+	
+	
 	
 	public long countByModulePassed(long moduleId, boolean passed)
 		throws SystemException {
@@ -149,103 +159,83 @@ public class ModuleResultLocalServiceImpl extends ModuleResultLocalServiceBaseIm
 	}
 	
 	
+
 	public long countByModulePassedOnlyStudents(long companyId, long courseGropupCreatedId, long moduleId, boolean passed)
 			throws SystemException {
-
-		long res = 0;
-		List<User> students = CourseLocalServiceUtil.getStudentsFromCourse(companyId, courseGropupCreatedId);
-		
-		ClassLoader classLoader = (ClassLoader) PortletBeanLocatorUtil.locate(ClpSerializer.getServletContextName(), "portletClassLoader");
-		DynamicQuery consulta = DynamicQueryFactoryUtil.forClass(ModuleResult.class, classLoader)
-				.add(PropertyFactoryUtil.forName("moduleId").eq(moduleId));
-		
-		if(Validator.isNotNull(students) && students.size() > 0) {
-			Criterion criterion = null;
-			for (int i = 0; i < students.size(); i++) {
-				if(i==0) {
-					criterion = RestrictionsFactoryUtil.like("userId", students.get(i).getUserId());
-				} else {
-					criterion = RestrictionsFactoryUtil.or(criterion, RestrictionsFactoryUtil.like("userId", students.get(i).getUserId()));
-				}
-			}
-			if(Validator.isNotNull(criterion)) {
-				criterion=RestrictionsFactoryUtil.and(criterion,
-						RestrictionsFactoryUtil.eq("passed",new Boolean (true)));
-				
-				consulta.add(criterion);
-				
-				List<ModuleResult> results = moduleResultPersistence.findWithDynamicQuery(consulta);
-				if(results!=null && !results.isEmpty()) {
-					res = results.size();
-				}
-			}
-		}
-		
-		return res;
+		return countByModulePassedOnlyStudents(companyId, courseGropupCreatedId, moduleId, passed, null);
 	}
+	
+	public long countByModulePassedOnlyStudents(long companyId, long courseGropupCreatedId, long moduleId, boolean passed, List<User> _students)
+			throws SystemException {
 
-private ModuleResult getAndCreateIfNotExists(long userId, long moduleId,Date startDate) throws SystemException
-{
-	ModuleResult moduleResult = null;
-	if (moduleResultPersistence.countBymu(userId, moduleId) > 0) 
-	{
-		moduleResult = moduleResultPersistence.fetchBymu(userId, moduleId, false);
-	}
-	else 
-	{
-		moduleResult = moduleResultPersistence.create(counterLocalService.increment(ModuleResult.class.getName()));
-		moduleResult.setModuleId(moduleId);
-		moduleResult.setPassed(false);
-		moduleResult.setUserId(userId);
-		moduleResult.setStartDate(startDate);
-		moduleResult.setResult(0);
-		moduleResultPersistence.update(moduleResult, true);
+		return ModuleResultFinderUtil.countPassedOnlyStudents(moduleId, companyId, courseGropupCreatedId, _students, passed, 0);
 
 	}
-	return moduleResult;
-}
-	public void update(LearningActivityResult lactr)
-		throws PortalException, SystemException {
-
-		ModuleResult moduleResult = null;
+	
+	public void update(LearningActivityResult lactr) throws PortalException, SystemException {
+		
 		long actId = lactr.getActId();
 		long userId = lactr.getUserId();
-		LearningActivity learningActivity = learningActivityLocalService.getLearningActivity(actId);
+		LearningActivity learningActivity = LearningActivityLocalServiceUtil.getLearningActivity(actId);
+		long moduleId = learningActivity.getModuleId();
+		boolean recalcularModulo = false;
+		
+		ModuleResult moduleResult = getByModuleAndUser(moduleId, userId);
+		
 		// Si el Weight es mayor que cero (obligatoria) entonces calcula, sino
 		// no.
-		// Se elimina la restricciï¿½n de calcular solo en las obligatorias, se
+		// Se elimina la restriccion de calcular solo en las obligatorias, se
 		// calcula ent todas las que se terminen.
-		long moduleId = learningActivity.getModuleId();
 		
-		moduleResult= getAndCreateIfNotExists( userId,  moduleId,lactr.getStartDate());
+		if (moduleResult == null){
+			moduleResult = moduleResultPersistence.create(counterLocalService.increment(ModuleResult.class.getName()));
+			moduleResult.setModuleId(moduleId);
+			moduleResult.setPassed(false);
+			moduleResult.setUserId(userId);
+			moduleResult.setStartDate(lactr.getStartDate());
+			moduleResult.setResult(0);
+			recalcularModulo = true;
+		}
 		
-		if (learningActivity.getModuleId() > 0 && /*
-												 * learningActivity.
-												 * getWeightinmodule()>0 &&
-												 */lactr.getEndDate()!=null) 
-		{
+		if (lactr.getEndDate() != null) {
+			recalcularModulo = true;
+			List<LearningActivity> activities = LearningActivityLocalServiceUtil.getMandatoryActivities(moduleId);
+			int passedNumber = LearningActivityResultLocalServiceUtil.countMandatoryByModuleIdUserIdPassed(moduleId, userId);
+			log.debug("Mandatory activities passed for moduleId["+moduleId+"]:"+passedNumber);			
 			
-			calculateModuleResult(moduleResult);
+			if (activities.size() > 0) {
+				moduleResult.setResult(100 * passedNumber / activities.size());
+			}
+			if (passedNumber == activities.size()) {
+				moduleResult.setPassed(true);
+				moduleResult.setPassedDate(lactr.getEndDate());
+			}else{
+				moduleResult.setPassed(false);
+				log.debug("**Passed a false");
+			}
+			
 			//auditing
 			ServiceContext serviceContext = ServiceContextThreadLocal.getServiceContext();
 			if(serviceContext!=null){
 				AuditingLogFactory.audit(serviceContext.getCompanyId(), serviceContext.getScopeGroupId(), ModuleResult.class.getName(), 
 					moduleResult.getPrimaryKey(), serviceContext.getUserId(), AuditConstants.UPDATE, null);
-			}else{
-				if(moduleResult!=null){
-					Module module = modulePersistence.fetchByPrimaryKey(moduleResult.getModuleId());
-					if(module!=null){
-						AuditingLogFactory.audit(module.getCompanyId(), module.getGroupId(), ModuleResult.class.getName(), 
-								moduleResult.getPrimaryKey(), module.getUserId(), AuditConstants.UPDATE, null);
-					}
+			} else {
+				Module module = modulePersistence.fetchByPrimaryKey(moduleResult.getModuleId());
+				if(module!=null){
+					AuditingLogFactory.audit(module.getCompanyId(), module.getGroupId(), ModuleResult.class.getName(), 
+							moduleResult.getPrimaryKey(), module.getUserId(), AuditConstants.UPDATE, null);					
 				}
 				
-			}
-			
-			
+			}			
+		}
+		
+		if(recalcularModulo) {
+			moduleResultPersistence.update(moduleResult, true);			
+			courseResultLocalService.update(moduleResult);			
 		}
 		
 	}
+	
 	public int updateAllUsers(long groupId, long moduleId) throws PortalException, SystemException {
 		
 		//Obtenemos la lista de users del curso.
@@ -254,16 +244,16 @@ private ModuleResult getAndCreateIfNotExists(long userId, long moduleId,Date sta
 				
 		int changes = 0;
 		
-		System.out.println("groupId: "+groupId+", moduleId: "+moduleId+", alumnos en el curso: "+usersList.size());
+		log.debug("groupId: "+groupId+", moduleId: "+moduleId+", alumnos en el curso: "+usersList.size());
 		
-		System.out.println("........ START ............");
+		log.debug("........ START ............");
 		for(User user : usersList){
 			if(update(moduleId, user.getUserId())){
 				changes++;
 			}
 		}
-		System.out.println("Cambiaron "+ changes +" de "+usersList.size()+" alumnos.");
-		System.out.println("........ END ............");
+		log.debug("Cambiaron "+ changes +" de "+usersList.size()+" alumnos.");
+		log.debug("........ END ............");
 		
 		return changes;
 	}
@@ -276,108 +266,134 @@ private ModuleResult getAndCreateIfNotExists(long userId, long moduleId,Date sta
 		
 		Calendar start = Calendar.getInstance();
 		Calendar end = Calendar.getInstance();
-		System.out.println("........ START ............");
+		log.debug("........ START ............");
 		
 		int restantes = moduleResultList.size();
 		
 		for(ModuleResult mo : moduleResultList){
 						
-			System.out.println("   :: "+mo.getModuleId()+" :: Restantes: "+ (restantes--));
+			log.debug("   :: "+mo.getModuleId()+" :: Restantes: "+ (restantes--));
 			
 			if(update(mo.getModuleId(), mo.getUserId())){
 				changes++;
 			}
 			
-			System.out.println("-----------------------------------------------------------------------");
+			log.debug("-----------------------------------------------------------------------");
 			
 		}
-		System.out.println("  Cambiaron "+ changes +" alumnos.");
+		log.debug("  Cambiaron "+ changes +" alumnos.");
 		
 		end = Calendar.getInstance();
-		System.out.println(" ## Time start ## "+start.getTime());
-		System.out.println(" ## Time end   ## "+end.getTime());
-		System.out.println("........ END ............");
+		log.debug(" ## Time start ## "+start.getTime());
+		log.debug(" ## Time end   ## "+end.getTime());
+		log.debug("........ END ............");
 	}
-	private void calculateModuleResult(ModuleResult moduleResult) throws PortalException, SystemException
-	{
-		List<LearningActivity> learnActList = LearningActivityLocalServiceUtil.getLearningActivitiesOfModule(moduleResult.getModuleId());
-		Module module=moduleLocalService.getModule(moduleResult.getModuleId());
+	
+	public boolean update(long moduleId, long userId) throws PortalException, SystemException {
+	
 		boolean passedModule = true;
 		long totalActivities = 0;
 		long activitiesPassed = 0;
-        Date passedDate=new Date(0);
-		for(LearningActivity activity : learnActList){
-			
-			//Si la actividad no es opcional.
-			if(activity.getWeightinmodule() != 0){
-				
-				totalActivities++;
-				
-				LearningActivityResult result = LearningActivityResultLocalServiceUtil.getByActIdAndUserId(activity.getActId(), moduleResult.getUserId());
+		
+		ModuleResult moduleResult = null;
+		
+		//Actualizar el resultado del modulo en bd.
+		
+		log.debug("User::"+userId+"::moduleId"+moduleId);
+		//Obtenemos el moduleResult que tiene el usuario.Si no lo tiene, no lo creamos.
+		if (moduleResultPersistence.countBymu(userId, moduleId) > 0) {
+			moduleResult = moduleResultPersistence.findBymu(userId, moduleId);
+		}else{
+			moduleResult = moduleResultPersistence.create(counterLocalService.increment(ModuleResult.class.getName()));
+			moduleResult.setModuleId(moduleId);
+			moduleResult.setPassed(false);
+			moduleResult.setUserId(userId);
+			moduleResult.setResult(0);
+			moduleResult.setStartDate(new Date());
+		}
 
-				if(result != null && result.isPassed())
-				{
+		if(moduleResult!=null){
+			log.debug("Update!");
+			
+			List<LearningActivity> learnActList = LearningActivityLocalServiceUtil.getLearningActivitiesOfModule(moduleId);
+
+			for(LearningActivity activity : learnActList){
+				
+				//Si la actividad no es opcional.
+				if(activity.getWeightinmodule() != 0){
 					
-					activitiesPassed++;
-					if(result.getEndDate()!=null)
-					{
-						if(passedDate.before(result.getEndDate()))
-						{
-							passedDate=result.getEndDate();
-						}
+					totalActivities++;
+					
+					LearningActivityResult result = LearningActivityResultLocalServiceUtil.getByActIdAndUserId(activity.getActId(), userId);
+
+					if(result != null && result.isPassed()){
+						 
+						activitiesPassed++;
+						 
+					} else {
+						
+						passedModule = false;
+						
 					}
-					 
-				} else {
-					
-					passedModule = false;
 					
 				}
 				
 			}
 			
-		}
-		
-		if(learnActList.size() == 0){
-			passedModule = false;
+			if(learnActList.size() == 0){
+				passedModule = false;
+			}
+
+			//Indicamos la media y el resultado del modulo.
+			long result = 0;
+			if(totalActivities > 0){
+				
+				result = activitiesPassed * 100 / totalActivities;
+			}
+			
+			//Solo actualizamos si cambia el resultado.
+			if(moduleResult.getResult() < result){
+				
+				//Traza
+				User user = UserLocalServiceUtil.getUser(userId);
+				//log.debug("    *** USER: "+ user.getFullName() +" ("+ userId +")  ***\n           resultOLD: "+moduleResult.getResult()+", passedOLD: "+moduleResult.getPassed()+"\n           resultNEW: "+result+", passedNEW: "+passedModule);
+				Module m = ModuleLocalServiceUtil.getModule(moduleId);
+				Course c = CourseLocalServiceUtil.getCourseByGroupCreatedId(m.getGroupId());
+				
+				String text = (moduleResult.getResult()<result)?"Sube":"Baja";
+				try{
+					log.debug(c.getTitle(Locale.getDefault()) +" ("+ c.getCourseId() +")|"+m.getTitle(Locale.getDefault())+" ("+m.getModuleId()+")|"+moduleResult.getMrId()+"|"+user.getFullName() +" ("+ userId +")|"+moduleResult.getPassed()+"|"+passedModule+"|"+moduleResult.getResult() +"|"+result+"|"+text);
+				}catch (Exception e){log.debug("ERROR: moduleID: "+moduleId+", userID: "+userId);}
+				
+				moduleResult.setResult(result);
+				moduleResult.setPassed(passedModule);
+
+				//Update en la bd.
+				moduleResultPersistence.update(moduleResult, true);
+				
+				//Actualizar el resultado del curso.
+				courseResultLocalService.update(moduleResult);
+
+				//auditing
+				ServiceContext serviceContext = ServiceContextThreadLocal.getServiceContext();
+				if(serviceContext!=null){
+					AuditingLogFactory.audit(serviceContext.getCompanyId(), serviceContext.getScopeGroupId(), ModuleResult.class.getName(), 
+						moduleResult.getPrimaryKey(), serviceContext.getUserId(), AuditConstants.UPDATE, null);
+				}else{
+					if(c!=null){
+						AuditingLogFactory.audit(c.getCompanyId(), c.getGroupId(), ModuleResult.class.getName(), 
+								moduleResult.getPrimaryKey(), c.getUserId(), AuditConstants.UPDATE, null);
+					}
+				}
+				
+				return true;
+			}
 		}
 
-		//Indicamos la media y el resultado del mï¿½dulo.
-		long result = 0;
-		if(totalActivities > 0){
+		return false;
 			
-			result = activitiesPassed * 100 / totalActivities;
-		}
-		if(result>0)
-		{
-			//Vamos a ver si tiene un sistema de evaluación de módulo 
-			CourseEvalRegistry cer=new CourseEvalRegistry();
-			Course course=courseLocalService.fetchByGroupCreatedId(module.getGroupId());
-			long courseEvalTypeId=course.getCourseEvalId();
-			CourseEval ceval=cer.getCourseEval(courseEvalTypeId);
-			if(ceval.hasModuleResultCalculator())
-			{
-				result=ceval.calculateModuleResult(module.getModuleId(), moduleResult.getUserId());
-			}
-		}
-		
-		//Sï¿½lo actualizamos si cambia el resultado.
-		if(moduleResult.getResult() < result || (passedModule&&!moduleResult.getPassed()))
-		{	
-			moduleResult.setResult(result);
-			if(moduleResult.getPassed()==false)
-			{
-				moduleResult.setPassed(passedModule);
-				if(passedModule==true)
-				{
-					moduleResult.setPassedDate(passedDate);
-				}
-			}
-			//Update en la bd.
-			moduleResultPersistence.update(moduleResult, true);
-			//Actualizar el resultado del curso.
-			courseResultLocalService.update(moduleResult);
-		}
 	}
+	
 	
 	public Date calculateModuleResultStartDate(long moduleId, long userId) throws PortalException, SystemException
 	{
@@ -407,43 +423,5 @@ private ModuleResult getAndCreateIfNotExists(long userId, long moduleId,Date sta
 		}
 		return startDate;
 	}
-	public boolean update(long moduleId, long userId) throws PortalException, SystemException 
-	{
-	
-		Date startDate=calculateModuleResultStartDate(moduleId, userId);
-		
-		ModuleResult moduleResult = null;
-		
-		if(startDate!=null)
-		{
-			moduleResult=getAndCreateIfNotExists(userId, moduleId, startDate);
-		}
-		if(moduleResult!=null)
-		{
-	        calculateModuleResult(moduleResult);
-
-			//auditing
-			ServiceContext serviceContext = ServiceContextThreadLocal.getServiceContext();
-			if(serviceContext!=null){
-				AuditingLogFactory.audit(serviceContext.getCompanyId(), serviceContext.getScopeGroupId(), ModuleResult.class.getName(), 
-					moduleResult.getPrimaryKey(), serviceContext.getUserId(), AuditConstants.UPDATE, null);
-			}else{
-				Module m = ModuleLocalServiceUtil.getModule(moduleId);
-				Course c = CourseLocalServiceUtil.getCourseByGroupCreatedId(m.getGroupId());
-				if(c!=null){
-					AuditingLogFactory.audit(c.getCompanyId(), c.getGroupId(), ModuleResult.class.getName(), 
-							moduleResult.getPrimaryKey(), c.getUserId(), AuditConstants.UPDATE, null);
-				}
-			}
-			return true;
-		}
-		
-
-		return false;
-
-			
-	}
-	
-	
 	
 }

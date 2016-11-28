@@ -260,7 +260,7 @@ function <portlet:namespace />back() {
 		    <span class="aui-buttonitem-icon aui-icon aui-icon-search"></span>
 		    <span class="aui-buttonitem-label"><%= LanguageUtil.get(pageContext, "search") %></span>
 		</button>
-		<aui:input  name="sco" value="<%=sco %>" label="Sco"/>
+		<aui:input  name="sco" value="<%=sco %>" label="SCO"/>
 	</c:if>
 			
 </aui:field-wrapper>
@@ -283,10 +283,14 @@ function <portlet:namespace />back() {
 		LmsPrefs lmsPrefs = LmsPrefsLocalServiceUtil.getLmsPrefs(themeDisplay.getCompanyId());
 		boolean isVisibleOptionDebug = lmsPrefs.getDebugScorm();
 		if(isVisibleOptionDebug){
+			boolean isDebugEnable = false;
+			if(learningActivity!=null){
+				isDebugEnable = Boolean.parseBoolean(LearningActivityLocalServiceUtil.getExtraContentValue(learningActivity.getActId(), "scormDebug"));
+			}else{
+				isDebugEnable =ParamUtil.getBoolean(request, "debugScorm",false);
+			}
+				
 			
-			//boolean isDebugEnable =ParamUtil.getBoolean(request, "debugScorm",false);
-			boolean isDebugEnable = Boolean.parseBoolean(LearningActivityLocalServiceUtil.getExtraContentValue(learningActivity.getActId(), "scormDebug"));
-
 		%>
 			<aui:input type="checkbox" name="debugScorm" label="debugScorm" checked="<%=isDebugEnable %>"
 					 helpMessage="debugScorm"></aui:input>

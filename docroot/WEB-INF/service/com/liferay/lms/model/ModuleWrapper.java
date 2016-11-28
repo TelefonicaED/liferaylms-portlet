@@ -786,6 +786,12 @@ public class ModuleWrapper implements Module, ModelWrapper<Module> {
 		_module.persist();
 	}
 
+	public com.liferay.lms.model.Module getParentModule()
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _module.getParentModule();
+	}
+
 	/**
 	 * @deprecated Renamed to {@link #getWrappedModel}
 	 */

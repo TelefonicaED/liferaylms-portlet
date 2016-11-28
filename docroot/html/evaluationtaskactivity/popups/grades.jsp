@@ -107,9 +107,9 @@ function <portlet:namespace />createValidator(){
 	
 	        fieldStrings: {
 	        	<portlet:namespace />result: {
-	        		required: '<liferay-ui:message key="evaluationtaskactivity.result.required" />',
-	        		number: '<liferay-ui:message key="evaluationtaskactivity.result.number" />',
-	        		range: '<liferay-ui:message key="evaluationtaskactivity.result.range" />'     
+	        		required: Liferay.Language.get("evaluationtaskactivity.result.required"),
+	        		number: Liferay.Language.get("evaluationtaskactivity.result.number"),
+	        		range: Liferay.Language.get("evaluationtaskactivity.result.range")     
 	            }
 	        },
 			

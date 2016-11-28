@@ -194,6 +194,69 @@ public interface LmsPrefsModel extends BaseModel<LmsPrefs> {
 	 */
 	public void setDebugScorm(boolean debugScorm);
 
+	/**
+	 * Returns the has a p i licence of this lms prefs.
+	 *
+	 * @return the has a p i licence of this lms prefs
+	 */
+	public boolean getHasAPILicence();
+
+	/**
+	 * Returns <code>true</code> if this lms prefs is has a p i licence.
+	 *
+	 * @return <code>true</code> if this lms prefs is has a p i licence; <code>false</code> otherwise
+	 */
+	public boolean isHasAPILicence();
+
+	/**
+	 * Sets whether this lms prefs is has a p i licence.
+	 *
+	 * @param hasAPILicence the has a p i licence of this lms prefs
+	 */
+	public void setHasAPILicence(boolean hasAPILicence);
+
+	/**
+	 * Returns the show hide activity of this lms prefs.
+	 *
+	 * @return the show hide activity of this lms prefs
+	 */
+	public boolean getShowHideActivity();
+
+	/**
+	 * Returns <code>true</code> if this lms prefs is show hide activity.
+	 *
+	 * @return <code>true</code> if this lms prefs is show hide activity; <code>false</code> otherwise
+	 */
+	public boolean isShowHideActivity();
+
+	/**
+	 * Sets whether this lms prefs is show hide activity.
+	 *
+	 * @param showHideActivity the show hide activity of this lms prefs
+	 */
+	public void setShowHideActivity(boolean showHideActivity);
+
+	/**
+	 * Returns the view courses finished of this lms prefs.
+	 *
+	 * @return the view courses finished of this lms prefs
+	 */
+	public boolean getViewCoursesFinished();
+
+	/**
+	 * Returns <code>true</code> if this lms prefs is view courses finished.
+	 *
+	 * @return <code>true</code> if this lms prefs is view courses finished; <code>false</code> otherwise
+	 */
+	public boolean isViewCoursesFinished();
+
+	/**
+	 * Sets whether this lms prefs is view courses finished.
+	 *
+	 * @param viewCoursesFinished the view courses finished of this lms prefs
+	 */
+	public void setViewCoursesFinished(boolean viewCoursesFinished);
+
 	public boolean isNew();
 
 	public void setNew(boolean n);

@@ -297,6 +297,21 @@ public class AuditEntryLocalServiceWrapper implements AuditEntryLocalService,
 			className, classPK, userId, startDate, endDate, start, end);
 	}
 
+	public java.util.List<com.liferay.lms.model.AuditEntry> findByclassName_classPK(
+		java.lang.String className, long classPK)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _auditEntryLocalService.findByclassName_classPK(className,
+			classPK);
+	}
+
+	public java.util.List<com.liferay.lms.model.AuditEntry> findByclassName_classPK_filterByActions(
+		java.lang.String className, long classPK,
+		java.util.List<java.lang.String> actions)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _auditEntryLocalService.findByclassName_classPK_filterByActions(className,
+			classPK, actions);
+	}
+
 	/**
 	 * @deprecated Renamed to {@link #getWrappedService}
 	 */

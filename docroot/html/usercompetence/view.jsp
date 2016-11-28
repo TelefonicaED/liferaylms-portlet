@@ -1,5 +1,4 @@
 <%@page import="com.liferay.lms.model.Competence"%>
-<%@ taglib uri="http://java.sun.com/jstl/fmt_rt" prefix="fmt" %>
 
 <%@ include file="/init.jsp" %>
 

@@ -146,9 +146,9 @@
 
 			var fieldStrings = {			
 		        	<portlet:namespace />passPuntuation: {
-		        		required: '<liferay-ui:message key="evaluationtaskactivity.passPuntuation.required" />',
-		        		number: '<liferay-ui:message key="evaluationtaskactivity.passPuntuation.number" />',
-		        		range: '<liferay-ui:message key="evaluationtaskactivity.passPuntuation.range" />'     		
+		        		required: Liferay.Language.get("evaluationtaskactivity.passPuntuation.required"),
+		        		number: Liferay.Language.get("evaluationtaskactivity.passPuntuation.number"),
+		        		range: Liferay.Language.get("evaluationtaskactivity.passPuntuation.range")     		
 		            }
 				};
 
@@ -162,8 +162,8 @@
 							};
 
 						fieldStrings[evaluationWeight.get('id')] = {
-								number: '<liferay-ui:message key="evaluationtaskactivity.weight.number" />',
-				        		range: '<liferay-ui:message key="evaluationtaskactivity.weight.range" />'  
+								number: Liferay.Language.get("evaluationtaskactivity.weight.number"),
+				        		range: Liferay.Language.get("evaluationtaskactivity.weight.range")  
 							};
 
 						evaluationWeight.on('input',function(){

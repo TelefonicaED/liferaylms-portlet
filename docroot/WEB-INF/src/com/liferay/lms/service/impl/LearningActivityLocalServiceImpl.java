@@ -15,6 +15,7 @@
 package com.liferay.lms.service.impl;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -30,12 +31,16 @@ import com.liferay.lms.learningactivity.LearningActivityTypeRegistry;
 import com.liferay.lms.model.Course;
 import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.model.Module;
+import com.liferay.lms.model.Schedule;
 import com.liferay.lms.service.ClpSerializer;
 import com.liferay.lms.service.LearningActivityLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityResultLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityTryLocalServiceUtil;
+import com.liferay.lms.service.LmsPrefsLocalServiceUtil;
 import com.liferay.lms.service.ModuleLocalServiceUtil;
+import com.liferay.lms.service.ScheduleLocalServiceUtil;
 import com.liferay.lms.service.base.LearningActivityLocalServiceBaseImpl;
+import com.liferay.lms.service.persistence.LearningActivityUtil;
 import com.liferay.portal.kernel.bean.PortletBeanLocatorUtil;
 import com.liferay.portal.kernel.dao.orm.Criterion;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
@@ -53,7 +58,6 @@ import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.PrefsPropsUtil;
-import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
@@ -72,8 +76,8 @@ import com.liferay.portal.security.permission.PermissionCheckerFactoryUtil;
 import com.liferay.portal.service.ResourcePermissionLocalServiceUtil;
 import com.liferay.portal.service.RoleLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
+import com.liferay.portal.service.TeamLocalServiceUtil;
 import com.liferay.portal.service.UserLocalServiceUtil;
-import com.liferay.portal.util.PortalUtil;
 import com.liferay.portlet.announcements.model.AnnouncementsEntry;
 import com.liferay.portlet.announcements.model.AnnouncementsFlagConstants;
 import com.liferay.portlet.announcements.service.AnnouncementsEntryServiceUtil;
@@ -122,7 +126,24 @@ public class LearningActivityLocalServiceImpl extends LearningActivityLocalServi
 		{
 			return true;
 		}
-		if((larn.getEnddate()!=null&&larn.getEnddate().before(now)) ||(larn.getStartdate()!=null&&larn.getStartdate().after(now)))
+		
+		Date startDate = larn.getStartdate();
+		Date endDate = larn.getEnddate();
+		
+		List<Team> teams = TeamLocalServiceUtil.getUserTeams(userId, course.getGroupCreatedId());
+		if(teams!=null && teams.size()>0){
+			for(Team team : teams){
+				Schedule schedule = ScheduleLocalServiceUtil.getScheduleByTeamId(team.getTeamId());
+				if(schedule!=null){
+					startDate=schedule.getStartDate();
+					endDate = schedule.getEndDate();
+					break;
+				}
+			}			
+		}
+		
+		
+		if((endDate!=null&&endDate.before(now)) ||(startDate!=null&&startDate.after(now)))
 		{
 			return true;
 		}
@@ -411,11 +432,6 @@ public class LearningActivityLocalServiceImpl extends LearningActivityLocalServi
 		learningActivityPersistence.update(larn, true);
 		try
 		{
-			
-			
-			
-			
-
 			assetEntryLocalService.updateEntry(
 					userId, larn.getGroupId(), LearningActivity.class.getName(),
 					larn.getActId(), larn.getUuid(),larn.getTypeId(), serviceContext.getAssetCategoryIds(),
@@ -502,6 +518,8 @@ public class LearningActivityLocalServiceImpl extends LearningActivityLocalServi
 		learningActivityPersistence.update(larn, false);
 		return larn;
 	}
+	
+	
 
 	public java.util.List<LearningActivity> getLearningActivitiesOfGroup(long groupId) throws SystemException
 	{
@@ -515,17 +533,27 @@ public class LearningActivityLocalServiceImpl extends LearningActivityLocalServi
 	{
 		return learningActivityPersistence.countByg(groupId);
 	}
+	public long countLearningActivitiesOfModule(long moduleId) throws SystemException
+	{
+		return LearningActivityUtil.countBym(moduleId);
+	}
 	public java.util.List<LearningActivity> getLearningActivitiesOfGroupAndType(long groupId,int typeId) throws SystemException
 	{
 		return learningActivityPersistence.findByg_t(groupId, typeId);
 	}
 	public java.util.List<LearningActivity> getLearningActivitiesOfModule(long moduleId) throws SystemException
 	{
-		return learningActivityPersistence.findBym(moduleId, 0, 1000);
+		return learningActivityPersistence.findBym(moduleId, -1, -1);
 	}
+	
+	public List<LearningActivity> getLearningActivitiesOfModule(long moduleId, int start, int end) throws SystemException
+	{
+		return LearningActivityUtil.findBym(moduleId, start, end);
+	} 
+	
 	public java.util.List<Long> getLearningActivityIdsOfModule(long moduleId) throws SystemException
 	{
-		java.util.List<LearningActivity>larnacts= learningActivityPersistence.findBym(moduleId, 0, 1000);
+		java.util.List<LearningActivity>larnacts= learningActivityPersistence.findBym(moduleId, -1, -1);
 		java.util.List<Long> result=new java.util.ArrayList<Long>();
 		for(LearningActivity larn:larnacts)
 		{
@@ -542,7 +570,8 @@ public class LearningActivityLocalServiceImpl extends LearningActivityLocalServi
 				ResourceConstants.SCOPE_INDIVIDUAL, lernact.getPrimaryKey());
 		assetEntryLocalService.deleteEntry(
 				LearningActivity.class.getName(), lernact.getActId());
-		learningActivityPersistence.remove(lernact);
+		
+		LearningActivityUtil.remove(lernact.getActId());
 		SocialActivityLocalServiceUtil.addActivity(
 				lernact.getUserId(), lernact.getGroupId(),
 				LearningActivity.class.getName(), lernact.getActId(),
@@ -591,7 +620,7 @@ public class LearningActivityLocalServiceImpl extends LearningActivityLocalServi
 			learningActivityPersistence.update(previusActivity, true);
 
 			//auditing
-			System.out.println("Actividad con id: "+actId+" ha sido movido hacia arriba por el usuario: "+userIdAction);
+			log.debug("Actividad con id: "+actId+" ha sido movido hacia arriba por el usuario: "+userIdAction);
 
 			AuditingLogFactory.audit(previusActivity.getCompanyId(), previusActivity.getGroupId(), LearningActivity.class.getName(), 
 					actId,userIdAction, AuditConstants.UPDATE, "ACTIVITY_UP");
@@ -612,7 +641,7 @@ public class LearningActivityLocalServiceImpl extends LearningActivityLocalServi
 			learningActivityPersistence.update(previusActivity, true);
 			
 			//auditing
-			System.out.println("Actividad con id: "+actId+" ha sido movido hacia arriba por el usuario: "+userIdAction);
+			log.debug("Actividad con id: "+actId+" ha sido movido hacia arriba por el usuario: "+userIdAction);
 
 			AuditingLogFactory.audit(previusActivity.getCompanyId(), previusActivity.getGroupId(), LearningActivity.class.getName(), 
 					actId,userIdAction, AuditConstants.UPDATE, "ACTIVITY_DOWN");
@@ -741,7 +770,7 @@ public class LearningActivityLocalServiceImpl extends LearningActivityLocalServi
 				Iterator<Map.Entry<String,String>> it = hashMap.entrySet().iterator();
 			    while (it.hasNext()) {
 			        Map.Entry<String,String> pair = (Map.Entry<String, String>)it.next();
-			        System.out.println(pair.getKey() + " = " + pair.getValue());
+			        log.debug(pair.getKey() + " = " + pair.getValue());
 			        extraContentValues.add(pair.getValue());
 			        it.remove(); // avoids a ConcurrentModificationException
 			    }
@@ -825,13 +854,14 @@ public class LearningActivityLocalServiceImpl extends LearningActivityLocalServi
 				while (it.hasNext()) {
 					Map.Entry e = (Map.Entry)it.next();
 					Element eleXML=SAXReaderUtil.createElement(String.valueOf(e.getKey()));
-					if(e.getKey().equals("document")){
+					if(e.getKey().toString().contains("document")){
 						eleXML.addAttribute("id", String.valueOf(e.getValue()));
 					}else{
 						eleXML.addText(String.valueOf(e.getValue()));
 					}
 					resultadosXML.add(eleXML);
 				}
+				log.debug(resultadosXMLDoc.formattedString());
 				activity.setExtracontent(resultadosXMLDoc.formattedString());
 				learningActivityPersistence.update(activity, true);
 			}
@@ -914,8 +944,7 @@ public class LearningActivityLocalServiceImpl extends LearningActivityLocalServi
 					((activity.getEnddate()==null && (today.compareTo(module.getEndDate())<=0))||
 					(activity.getEnddate()!=null && (today.compareTo(activity.getEnddate())<=0)))
 				){
-					if(PropsUtil.getProperties().getProperty("learningactivity.show.hideactivity")!=null &&
-							Boolean.valueOf(PropsUtil.getProperties().getProperty("learningactivity.show.hideactivity"))){
+					if(LmsPrefsLocalServiceUtil.getLmsPrefs(activity.getCompanyId()).getShowHideActivity()){
 						Role siteMemberRole = RoleLocalServiceUtil.getRole(activity.getCompanyId(), RoleConstants.SITE_MEMBER);
 						if(!ResourcePermissionLocalServiceUtil.hasResourcePermission(activity.getCompanyId(), LearningActivity.class.getName(), 
 								ResourceConstants.SCOPE_INDIVIDUAL,	Long.toString(activity.getActId()),siteMemberRole.getRoleId(), ActionKeys.VIEW)){
@@ -974,8 +1003,7 @@ public class LearningActivityLocalServiceImpl extends LearningActivityLocalServi
 							((activity.getEnddate()==null && (today.compareTo(module.getEndDate())<=0))||
 							(activity.getEnddate()!=null && (today.compareTo(activity.getEnddate())<=0)))
 					){
-						if(PropsUtil.getProperties().getProperty("learningactivity.show.hideactivity")!=null &&
-								Boolean.valueOf(PropsUtil.getProperties().getProperty("learningactivity.show.hideactivity"))){
+						if(LmsPrefsLocalServiceUtil.getLmsPrefs(activity.getCompanyId()).getShowHideActivity()){
 							Role siteMemberRole = RoleLocalServiceUtil.getRole(activity.getCompanyId(), RoleConstants.SITE_MEMBER);
 							if(!ResourcePermissionLocalServiceUtil.hasResourcePermission(activity.getCompanyId(), LearningActivity.class.getName(), 
 									ResourceConstants.SCOPE_INDIVIDUAL,	Long.toString(activity.getActId()),siteMemberRole.getRoleId(), ActionKeys.VIEW)){
@@ -999,6 +1027,27 @@ public class LearningActivityLocalServiceImpl extends LearningActivityLocalServi
 		learningActivity = LmsLocaleUtil.checkDefaultLocale(LearningActivity.class, learningActivity, "description");
 		
 		return super.updateLearningActivity(learningActivity);
+	}
+	
+	
+	public List<LearningActivity> getMandatoryActivities(long moduleId){
+		List<LearningActivity> activities = new ArrayList<LearningActivity>();
+		try {
+			activities = LearningActivityUtil.findByModuleId_Weightinmodule(moduleId, 0);
+		} catch (SystemException e) {
+			e.printStackTrace();
+		}
+		return activities;
+	}
+	
+	public List<LearningActivity> getByPrecedence(long precedence){
+		List<LearningActivity> activities = new ArrayList<LearningActivity>();
+		try {
+			activities = LearningActivityUtil.findByPrecedence(precedence);
+		} catch (SystemException e) {
+			e.printStackTrace();
+		}
+		return activities;
 	}
 	
 private void sendNotification(String title, String content, String url, String type, int priority,ServiceContext serviceContext, java.util.Date startDate,java.util.Date endDate, Long userId){
@@ -1030,7 +1079,7 @@ private void sendNotification(String title, String content, String url, String t
 		int expirationDateHour=Integer.parseInt(formatHour.format(today));
 		int expirationDateMinute=Integer.parseInt(formatMin.format(today));
 
-		long classNameId=PortalUtil.getClassNameId(User.class.getName());
+		//long classNameId=PortalUtil.getClassNameId(User.class.getName());
 		//long classPK=serviceContext.getUserId();
 
 		AnnouncementsEntry ae;
@@ -1052,6 +1101,7 @@ private void sendNotification(String title, String content, String url, String t
 		}
 		                            
 	}
+
 
 	
 }

@@ -71,6 +71,7 @@ public class TestQuestionClp extends BaseModelImpl<TestQuestion>
 		attributes.put("text", getText());
 		attributes.put("questionType", getQuestionType());
 		attributes.put("weight", getWeight());
+		attributes.put("penalize", getPenalize());
 		attributes.put("extracontent", getExtracontent());
 
 		return attributes;
@@ -112,6 +113,12 @@ public class TestQuestionClp extends BaseModelImpl<TestQuestion>
 
 		if (weight != null) {
 			setWeight(weight);
+		}
+
+		Boolean penalize = (Boolean)attributes.get("penalize");
+
+		if (penalize != null) {
+			setPenalize(penalize);
 		}
 
 		String extracontent = (String)attributes.get("extracontent");
@@ -169,6 +176,18 @@ public class TestQuestionClp extends BaseModelImpl<TestQuestion>
 		_weight = weight;
 	}
 
+	public boolean getPenalize() {
+		return _penalize;
+	}
+
+	public boolean isPenalize() {
+		return _penalize;
+	}
+
+	public void setPenalize(boolean penalize) {
+		_penalize = penalize;
+	}
+
 	public String getExtracontent() {
 		return _extracontent;
 	}
@@ -210,6 +229,7 @@ public class TestQuestionClp extends BaseModelImpl<TestQuestion>
 		clone.setText(getText());
 		clone.setQuestionType(getQuestionType());
 		clone.setWeight(getWeight());
+		clone.setPenalize(getPenalize());
 		clone.setExtracontent(getExtracontent());
 
 		return clone;
@@ -267,7 +287,7 @@ public class TestQuestionClp extends BaseModelImpl<TestQuestion>
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(15);
+		StringBundler sb = new StringBundler(17);
 
 		sb.append("{uuid=");
 		sb.append(getUuid());
@@ -281,6 +301,8 @@ public class TestQuestionClp extends BaseModelImpl<TestQuestion>
 		sb.append(getQuestionType());
 		sb.append(", weight=");
 		sb.append(getWeight());
+		sb.append(", penalize=");
+		sb.append(getPenalize());
 		sb.append(", extracontent=");
 		sb.append(getExtracontent());
 		sb.append("}");
@@ -289,7 +311,7 @@ public class TestQuestionClp extends BaseModelImpl<TestQuestion>
 	}
 
 	public String toXmlString() {
-		StringBundler sb = new StringBundler(25);
+		StringBundler sb = new StringBundler(28);
 
 		sb.append("<model><model-name>");
 		sb.append("com.liferay.lms.model.TestQuestion");
@@ -320,6 +342,10 @@ public class TestQuestionClp extends BaseModelImpl<TestQuestion>
 		sb.append(getWeight());
 		sb.append("]]></column-value></column>");
 		sb.append(
+			"<column><column-name>penalize</column-name><column-value><![CDATA[");
+		sb.append(getPenalize());
+		sb.append("]]></column-value></column>");
+		sb.append(
 			"<column><column-name>extracontent</column-name><column-value><![CDATA[");
 		sb.append(getExtracontent());
 		sb.append("]]></column-value></column>");
@@ -335,6 +361,7 @@ public class TestQuestionClp extends BaseModelImpl<TestQuestion>
 	private String _text;
 	private long _questionType;
 	private long _weight;
+	private boolean _penalize;
 	private String _extracontent;
 	private BaseModel<?> _testQuestionRemoteModel;
 }

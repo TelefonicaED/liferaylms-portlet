@@ -23,45 +23,43 @@ import java.util.Arrays;
  */
 public class SCORMContentServiceClpInvoker {
 	public SCORMContentServiceClpInvoker() {
-		_methodName132 = "getBeanIdentifier";
+		_methodName152 = "getBeanIdentifier";
 
-		_methodParameterTypes132 = new String[] {  };
+		_methodParameterTypes152 = new String[] {  };
 
-		_methodName133 = "setBeanIdentifier";
+		_methodName153 = "setBeanIdentifier";
 
-		_methodParameterTypes133 = new String[] { "java.lang.String" };
+		_methodParameterTypes153 = new String[] { "java.lang.String" };
 
-		_methodName138 = "getSCORMContentOfGroup";
+		_methodName158 = "getSCORMContentOfGroup";
 
-		_methodParameterTypes138 = new String[] { "long" };
+		_methodParameterTypes158 = new String[] { "long" };
 	}
 
 	public Object invokeMethod(String name, String[] parameterTypes,
 		Object[] arguments) throws Throwable {
-		if (_methodName132.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes132, parameterTypes)) {
+		if (_methodName152.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes152, parameterTypes)) {
 			return SCORMContentServiceUtil.getBeanIdentifier();
 		}
 
-		if (_methodName133.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes133, parameterTypes)) {
+		if (_methodName153.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes153, parameterTypes)) {
 			SCORMContentServiceUtil.setBeanIdentifier((java.lang.String)arguments[0]);
-
-			return null;
 		}
 
-		if (_methodName138.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes138, parameterTypes)) {
+		if (_methodName158.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes158, parameterTypes)) {
 			return SCORMContentServiceUtil.getSCORMContentOfGroup(((Long)arguments[0]).longValue());
 		}
 
 		throw new UnsupportedOperationException();
 	}
 
-	private String _methodName132;
-	private String[] _methodParameterTypes132;
-	private String _methodName133;
-	private String[] _methodParameterTypes133;
-	private String _methodName138;
-	private String[] _methodParameterTypes138;
+	private String _methodName152;
+	private String[] _methodParameterTypes152;
+	private String _methodName153;
+	private String[] _methodParameterTypes153;
+	private String _methodName158;
+	private String[] _methodParameterTypes158;
 }

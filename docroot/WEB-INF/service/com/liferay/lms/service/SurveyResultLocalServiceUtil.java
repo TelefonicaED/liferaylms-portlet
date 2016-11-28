@@ -273,11 +273,44 @@ public class SurveyResultLocalServiceUtil {
 		return getService().invokeMethod(name, parameterTypes, arguments);
 	}
 
+	public static java.util.List<com.liferay.lms.model.SurveyResult> getByUserId(
+		long userId) {
+		return getService().getByUserId(userId);
+	}
+
 	public static java.util.List<com.liferay.lms.model.SurveyResult> getSurveyResultByActId(
 		long actId) throws com.liferay.portal.kernel.exception.SystemException {
 		return getService().getSurveyResultByActId(actId);
 	}
 
+	public static java.util.List<com.liferay.lms.model.SurveyResult> getSurveyResultsByQuestionIdActId(
+		long questionId, long actId) {
+		return getService().getSurveyResultsByQuestionIdActId(questionId, actId);
+	}
+
+	public static double getPercentageByQuestionIdAndAnswerId(long questionId,
+		long answerId, long total)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService()
+				   .getPercentageByQuestionIdAndAnswerId(questionId, answerId,
+			total);
+	}
+
+	public static long getCountByQuestionIdAndAnswerId(long questionId,
+		long answerId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().getCountByQuestionIdAndAnswerId(questionId, answerId);
+	}
+
+	/**
+	* Metodo depreciado, se utiliza una combinaciÃ¯Â¿Â½n de los dos anteriores, para evitar consultas a base de datos innecesarias dentro de bucles.
+	*
+	* @deprecated
+	* @param questionId
+	* @param answerId
+	* @return
+	* @throws SystemException
+	*/
 	public static double getPercentageByQuestionIdAndAnswerId(long questionId,
 		long answerId)
 		throws com.liferay.portal.kernel.exception.SystemException {
@@ -288,6 +321,20 @@ public class SurveyResultLocalServiceUtil {
 	public static long getTotalAnswersByQuestionId(long questionId)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService().getTotalAnswersByQuestionId(questionId);
+	}
+
+	public static long countStudentsByQuestionId(long questionId,
+		long companyId, long courseGropupCreatedId) {
+		return getService()
+				   .countStudentsByQuestionId(questionId, companyId,
+			courseGropupCreatedId);
+	}
+
+	public static long countStudentsByQuestionIdAndAnswerId(long questionId,
+		long answerId, long companyId, long courseGropupCreatedId) {
+		return getService()
+				   .countStudentsByQuestionIdAndAnswerId(questionId, answerId,
+			companyId, courseGropupCreatedId);
 	}
 
 	public static void clearService() {

@@ -14,6 +14,16 @@
 
 package com.liferay.lms.model.impl;
 
+import java.util.Locale;
+
+import com.liferay.lms.learningactivity.calificationtype.CalificationType;
+import com.liferay.lms.learningactivity.calificationtype.CalificationTypeRegistry;
+import com.liferay.lms.model.Course;
+import com.liferay.lms.service.CourseLocalServiceUtil;
+import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.model.User;
+import com.liferay.portal.service.UserLocalServiceUtil;
+
 /**
  * The extended model implementation for the LearningActivityTry service. Represents a row in the &quot;Lms_LearningActivityTry&quot; database table, with each column mapped to a property of this class.
  *
@@ -30,5 +40,24 @@ public class LearningActivityTryImpl extends LearningActivityTryBaseImpl {
 	 * Never reference this class directly. All methods that expect a learning activity try model instance should use the {@link com.liferay.lms.model.LearningActivityTry} interface instead.
 	 */
 	public LearningActivityTryImpl() {
+	}
+	
+	
+	public String getResult(long groupId){
+		String result ="";
+		try {
+			Course curso = CourseLocalServiceUtil.getCourseByGroupCreatedId(groupId);
+			if(curso != null){
+				CalificationType ct = new CalificationTypeRegistry().getCalificationType(curso.getCalificationType());
+				User user = UserLocalServiceUtil.fetchUser(this.getUserId());
+				Locale locale = user.getLocale();
+			
+				result = ct.translate(locale, this.getResult());			
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return result;
 	}
 }

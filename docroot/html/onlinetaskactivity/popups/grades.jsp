@@ -1,3 +1,4 @@
+<%@page import="java.text.SimpleDateFormat"%>
 <%@page import="com.liferay.lms.service.LearningActivityLocalServiceUtil"%>
 <%@page import="com.liferay.lms.model.LearningActivity"%>
 <%@page import="com.liferay.lms.service.LearningActivityResultLocalServiceUtil"%>
@@ -18,7 +19,6 @@
 
 <%@ include file="/init.jsp" %>
 <%
-
 LearningActivityTry lATry = null;
 LearningActivityResult result = null;
 boolean ownGrade=false;
@@ -35,6 +35,7 @@ if(renderRequest.getParameter("actId")!=null)
 	else {
 		ownGrade=true;	
 		lATry = LearningActivityTryLocalServiceUtil.getLastLearningActivityTryByActivityAndUser(ParamUtil.getLong(renderRequest,"actId"), themeDisplay.getUserId());
+		result = LearningActivityResultLocalServiceUtil.getByActIdAndUserId(ParamUtil.getLong(renderRequest,"actId"), themeDisplay.getUserId());
 	}
 	
 }
@@ -73,9 +74,21 @@ if(lATry!=null){
 	catch(DocumentException de)
 	{}
 }
-if(renderRequest.getParameter("studentId")!=null){%>
- <aui:a href="" label="<%=UserLocalServiceUtil.getUserById(ParamUtil.getLong(renderRequest, \"studentId\")).getFullName() %>"></aui:a>
+if(renderRequest.getParameter("studentId")!=null){
+	
+	SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+	String dateFormated = (result.getEndDate()!=null)? " ( "+dateFormat.format(result.getEndDate())+" )":"";
+%>
+ <aui:a href="" label="<%= UserLocalServiceUtil.getUserById(ParamUtil.getLong(renderRequest, \"studentId\")).getFullName() + dateFormated   %>"></aui:a>
 <%
+}else{
+	if (lATry != null){
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+		String dateFormated = (lATry.getStartDate()!=null)? " ( "+dateFormat.format(lATry.getStartDate())+" )":"";
+%>
+	<p class="label"><liferay-ui:message key="onlinetaskactivity.export.date"/>: <%=dateFormated %> </p>
+<%
+	}	
 }
  if(richtext!=null) { %>
 	<aui:field-wrapper label="onlinetaskactivity.text" name="panelLabel" >

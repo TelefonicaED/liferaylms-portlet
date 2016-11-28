@@ -72,7 +72,7 @@ public class FillblankQuestionType extends BaseQuestionType {
 			List<String> sols = getQuestionSols(solution.getAnswer());
 			int i=0;
 			for(String sol:sols){
-				String answer= ParamUtil.getString(actionRequest, "question_"+questionId+"_"+i, "");
+				String answer= ParamUtil.getString(actionRequest, "question_"+questionId+"_"+i, "").replace(",", "");
 				if(isCorrect(sol, answer)){
 					correctAnswers++;
 				}
@@ -103,8 +103,9 @@ public class FillblankQuestionType extends BaseQuestionType {
 						else temp = textAnswer.substring(start, end+2);
 					else temp = textAnswer.substring(start, end+1);
 				}
-				if(temp.startsWith("{{") || isMoodleAnswer(temp))sols.add(temp);
-				textAnswer = textAnswer.replace(temp, "");
+				if(temp.startsWith("{{") || isMoodleAnswer(temp))sols.add(temp);				
+				textAnswer = textAnswer.substring(0,start)+textAnswer.substring(start+temp.length());//textAnswer.replace(temp, "");
+				
 				start = textAnswer.indexOf("{");
 			}
 		}
@@ -187,7 +188,7 @@ public class FillblankQuestionType extends BaseQuestionType {
 			int i = getQuestionSols(solution.getAnswer()).size();
 			for(int k=0; k<i; k++){
 				if(answer!="") answer+=",";
-				answer+= ParamUtil.getString(actionRequest, "question_"+questionId+"_"+k, "");
+				answer+= ParamUtil.getString(actionRequest, "question_"+questionId+"_"+k, "").replace(",", ""); //Quito la , de la respuesta del usaurio
 			}
 		}
     	
@@ -201,6 +202,7 @@ public class FillblankQuestionType extends BaseQuestionType {
 		
 		Element answerXML=SAXReaderUtil.createElement("answer");
 		answerXML.addText(answer);
+		
 		questionXML.add(answerXML);
 		
 		return questionXML;
@@ -214,27 +216,33 @@ public class FillblankQuestionType extends BaseQuestionType {
 			//Cogemos las respuestas a los blancos (separadas por coma) de la pregunta a partir del xml de learningactivityresult
 			TestQuestion question = TestQuestionLocalServiceUtil.fetchTestQuestion(questionId);
 			String answer = getAnswersSelected(document, questionId);	
-			
+			String[] answers = answer.split(",");
 			//Cogemos el TestAnswer de la pregunta en formato Moodle para rellenar las respuestas dadas por el alumno
 			List<TestAnswer> testAnswers= TestAnswerLocalServiceUtil.getTestAnswersByQuestionId(question.getQuestionId());
 			if(testAnswers!=null && testAnswers.size()>0){
-				
 				//Comprobamos si todos los blancos son acertados para ver si la pregunta resulta correcta o no
 				TestAnswer solution = testAnswers.get(0);
 				List<String> sols = getQuestionSols(solution.getAnswer());
-				String[] answers = answer.split(",");
+
+				//String[] answers = answer.split(",");
 				if (feedback){
 					feedMessage = LanguageUtil.get(themeDisplay.getLocale(),"answer-in-blank") ;
 					showCorrectAnswer = LearningActivityLocalServiceUtil.getExtraContentValue(question.getActId(), "showCorrectAnswer");
 					String showCorrectAnswerOnlyOnFinalTryString = LearningActivityLocalServiceUtil.getExtraContentValue(question.getActId(), "showCorrectAnswerOnlyOnFinalTry");
 					try {
-						if ("true".equals(showCorrectAnswerOnlyOnFinalTryString) && LearningActivityTryLocalServiceUtil.canUserDoANewTry(question.getActId(), themeDisplay.getUserId())) {
-							showCorrectAnswer = "false";
+						if ("true".equals(showCorrectAnswerOnlyOnFinalTryString)) {
+							if(LearningActivityTryLocalServiceUtil.canUserDoANewTry(question.getActId(), themeDisplay.getUserId())){
+								showCorrectAnswer = "false";
+							}else{
+								showCorrectAnswer = "true";
+							}
 						}
 					} catch (Exception e) {}
-					int i=0, correctAnswers=0;
+					int correctAnswers=0,i=0;
+					
 					for(String sol:sols){
 						String ans= (answers.length>i)?answers[i]:"";
+						//String ans= answer;
 						if(isCorrect(sol, ans)){
 							correctAnswers++;
 						}
@@ -255,12 +263,15 @@ public class FillblankQuestionType extends BaseQuestionType {
 				
 				int i=0;
 				for(String sol:sols){
-					String ans = (answers.length>i)?answers[i]:"";
+					//String ans = (answers.length>i)?answers[i]:"";
+					String ans= answer;
 					String auxans = "";
 					List<String> blankSols = getBlankSols(sol, true);
 					
 					if(sol.contains(":SHORTANSWER") || sol.contains(":SA") || sol.contains(":MW")
 							|| sol.contains(":NUMERICAL:") || sol.contains(":NM:") || sol.contains("{{")) {
+						
+						ans= (answers.length>i)?answers[i]:"";
 						String readonly = "";
 						if (feedback) {
 							readonly = "readonly";
@@ -274,8 +285,7 @@ public class FillblankQuestionType extends BaseQuestionType {
 							}
 							auxans += "<div class=\" font_14 color_cuarto negrita\"> (" + solok + ") </div>";
 						}
-					}
-					else if(sol.contains(":MULTICHOICE_") || sol.contains(":MCV") || sol.contains(":MCH")){
+					}else if(sol.contains(":MULTICHOICE_") || sol.contains(":MCV") || sol.contains(":MCH")){
 						String aux = "";
 						auxans = "<br/><div class=\"multichoice\">";
 						List<String> totalBlankSols = getBlankSols(sol, false);
@@ -307,8 +317,11 @@ public class FillblankQuestionType extends BaseQuestionType {
 							}
 							auxans += "<div class=\" font_14 color_cuarto negrita\"> (" + solok + ") </div>";
 						}
-					}else auxans+=sol;
-					answersFeedBack = answersFeedBack.replace(sol, auxans);
+					}else{
+						auxans+=sol;
+					}
+					answersFeedBack = answersFeedBack.substring(0,answersFeedBack.indexOf(sol))+auxans+answersFeedBack.substring(answersFeedBack.indexOf(sol)+sol.length()); 
+					//answersFeedBack.replace(sol, auxans);
 					i++;solok="";
 				}
 				
@@ -441,5 +454,5 @@ public class FillblankQuestionType extends BaseQuestionType {
 	public int getDefaultAnswersNo(){
 		return 1;
 	}
-
+	
 }

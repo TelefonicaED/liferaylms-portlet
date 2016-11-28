@@ -2,6 +2,7 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
 
 <hibernate-mapping default-lazy="false" auto-import="false">
+	<import class="com.liferay.lms.model.ActivityTriesDeleted" />
 	<import class="com.liferay.lms.model.AuditEntry" />
 	<import class="com.liferay.lms.model.AuditLogger" />
 	<import class="com.liferay.lms.model.CheckP2pMailing" />
@@ -17,11 +18,24 @@
 	<import class="com.liferay.lms.model.ModuleResult" />
 	<import class="com.liferay.lms.model.P2pActivity" />
 	<import class="com.liferay.lms.model.P2pActivityCorrections" />
+	<import class="com.liferay.lms.model.Schedule" />
 	<import class="com.liferay.lms.model.SCORMContent" />
 	<import class="com.liferay.lms.model.SurveyResult" />
 	<import class="com.liferay.lms.model.TestAnswer" />
 	<import class="com.liferay.lms.model.TestQuestion" />
 	<import class="com.liferay.lms.model.UserCompetence" />
+	<class name="com.liferay.lms.model.impl.ActivityTriesDeletedImpl" table="Lms_ActivityTriesDeleted">
+		<cache usage="read-write" />
+		<id name="activityTriesDeletedId" type="long">
+			<generator class="assigned" />
+		</id>
+		<property name="groupId" type="com.liferay.portal.dao.orm.hibernate.LongType" />
+		<property name="actId" type="com.liferay.portal.dao.orm.hibernate.LongType" />
+		<property name="userId" type="com.liferay.portal.dao.orm.hibernate.LongType" />
+		<property name="startDate" type="org.hibernate.type.TimestampType" />
+		<property name="endDate" type="org.hibernate.type.TimestampType" />
+		<property name="status" type="com.liferay.portal.dao.orm.hibernate.IntegerType" />
+	</class>
 	<class name="com.liferay.lms.model.impl.AuditEntryImpl" table="Lms_AuditEntry">
 		<cache usage="read-write" />
 		<id name="auditId" type="long">
@@ -123,6 +137,7 @@
 		<property name="passedDate" type="org.hibernate.type.TimestampType" />
 		<property name="allowStartDate" type="org.hibernate.type.TimestampType" />
 		<property name="allowFinishDate" type="org.hibernate.type.TimestampType" />
+		<property name="extraData" type="com.liferay.portal.dao.orm.hibernate.StringType" />
 	</class>
 	<class name="com.liferay.lms.model.impl.LearningActivityImpl" table="Lms_LearningActivity">
 		<cache usage="read-write" />
@@ -198,6 +213,9 @@
 		<property name="scoretranslators" type="com.liferay.portal.dao.orm.hibernate.StringType" />
 		<property name="usersResults" type="com.liferay.portal.dao.orm.hibernate.LongType" />
 		<property name="debugScorm" type="com.liferay.portal.dao.orm.hibernate.BooleanType" />
+		<property name="hasAPILicence" type="com.liferay.portal.dao.orm.hibernate.BooleanType" />
+		<property name="showHideActivity" type="com.liferay.portal.dao.orm.hibernate.BooleanType" />
+		<property name="viewCoursesFinished" type="com.liferay.portal.dao.orm.hibernate.BooleanType" />
 	</class>
 	<class name="com.liferay.lms.model.impl.ModuleImpl" table="Lms_Module">
 		<cache usage="read-write" />
@@ -260,6 +278,15 @@
 		<property name="fileEntryId" type="com.liferay.portal.dao.orm.hibernate.LongType" />
 		<property name="result" type="com.liferay.portal.dao.orm.hibernate.LongType" />
 	</class>
+	<class name="com.liferay.lms.model.impl.ScheduleImpl" table="Lms_Schedule">
+		<cache usage="read-write" />
+		<id name="secheduleId" type="long">
+			<generator class="assigned" />
+		</id>
+		<property name="teamId" type="com.liferay.portal.dao.orm.hibernate.LongType" />
+		<property name="startDate" type="org.hibernate.type.TimestampType" />
+		<property name="endDate" type="org.hibernate.type.TimestampType" />
+	</class>
 	<class name="com.liferay.lms.model.impl.SCORMContentImpl" table="Lms_SCORMContent">
 		<cache usage="read-write" />
 		<id name="scormId" type="long">
@@ -315,6 +342,7 @@
 		<property name="text" type="com.liferay.portal.dao.orm.hibernate.StringType" column="text_" />
 		<property name="questionType" type="com.liferay.portal.dao.orm.hibernate.LongType" />
 		<property name="weight" type="com.liferay.portal.dao.orm.hibernate.LongType" />
+		<property name="penalize" type="com.liferay.portal.dao.orm.hibernate.BooleanType" />
 		<property name="extracontent" type="com.liferay.portal.dao.orm.hibernate.StringType" />
 	</class>
 	<class name="com.liferay.lms.model.impl.UserCompetenceImpl" table="Lms_UserCompetence">

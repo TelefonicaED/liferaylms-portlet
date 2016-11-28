@@ -54,18 +54,19 @@ import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
 import com.liferay.portlet.journal.model.JournalContentSearch;
 import com.liferay.portlet.journal.service.JournalContentSearchLocalServiceUtil;
 import com.liferay.util.bridges.mvc.MVCPortlet;
+import com.tls.lms.util.LiferaylmsUtil;
 
 /**
  * Portlet implementation class PortalAdmin
  */
 public class PortalAdmin extends MVCPortlet {
-	Log log = LogFactoryUtil.getLog(PortalAdmin.class);
+	private static Log log = LogFactoryUtil.getLog(PortalAdmin.class);
  
 	
 	@ProcessAction(name = "asignP2pActivity")
 	public void asignP2pActivity (ActionRequest request, ActionResponse response) throws Exception {
 		String ip = com.liferay.portal.util.PortalUtil.getHttpServletRequest(request).getRemoteAddr();
-		ModuleUpdateResult.saveStringToFile("asignP2pActivity.txt", "Asignar P2pActivity desde "+ip);
+		LiferaylmsUtil.saveStringToFile("asignP2pActivity.txt", "Asignar P2pActivity desde "+ip);
 		
 		P2PAssignations asignations = new P2PAssignations();
 		asignations.asignCorrectionsToP2PActivities();
@@ -81,30 +82,28 @@ public class PortalAdmin extends MVCPortlet {
 		List<P2pActivity> p2pActivityList = P2pActivityLocalServiceUtil.getP2pActivities(0, P2pActivityLocalServiceUtil.getP2pActivitiesCount());
 		
 		Calendar start = Calendar.getInstance();
-		System.out.println(" ## START ## "+start.getTime()+" tamano "+p2pActivityList.size());
+		log.info(" ## START ## "+start.getTime()+" tamano "+p2pActivityList.size());
 		
 		for(P2pActivity p2pActivity: p2pActivityList){
 			conta++;
 			
-			System.out.println(" :: P2P Update (numero: "+conta+"):: getUserId: "+p2pActivity.getUserId()+", P2pActivityId: "+p2pActivity.getP2pActivityId());
+			log.info(" :: P2P Update (numero: "+conta+"):: getUserId: "+p2pActivity.getUserId()+", P2pActivityId: "+p2pActivity.getP2pActivityId());
 			traza += p2pActivity.getP2pActivityId()+", ";
 
 			P2PActivityPortlet.updateResultP2PActivity(p2pActivity.getP2pActivityId(), p2pActivity.getUserId());
 			
 		}
-		
 		Calendar end = Calendar.getInstance();
-		System.out.println("------------------------------------------------");
-		System.out.println(" ## START ## "+start.getTime());
-		System.out.println(" ##  END  ## "+end.getTime());
-		System.out.println(" ##  UPDATED  ## "+conta);
-		System.out.println("------------------------------------------------");
+		log.info("------------------------------------------------");
+		log.info(" ## START ## "+start.getTime());
+		log.info(" ##  END  ## "+end.getTime());
+		log.info(" ##  UPDATED  ## "+conta);
+		log.info("------------------------------------------------");
 		
 		try {
-			ModuleUpdateResult.saveStringToFile("updateResultP2PActivities.txt", traza+"\nUPDATED: "+conta);
+			LiferaylmsUtil.saveStringToFile("updateResultP2PActivities.txt", traza+"\nUPDATED: "+conta);
 		} catch (Exception e) {
-			System.out.println("");
-			//e.printStackTrace();
+			e.printStackTrace();
 		}
 	}
 	
@@ -112,7 +111,7 @@ public class PortalAdmin extends MVCPortlet {
 	public void updateExtraContentMultimediaActivities (ActionRequest request, ActionResponse response) throws Exception {
 		
 		String ip = com.liferay.portal.util.PortalUtil.getHttpServletRequest(request).getRemoteAddr();
-		ModuleUpdateResult.saveStringToFile("updateExtraContentMultimediaActivities.txt", "Update ExtraContent Multimedia Activities desde "+ip);
+		LiferaylmsUtil.saveStringToFile("updateExtraContentMultimediaActivities.txt", "Update ExtraContent Multimedia Activities desde "+ip);
 		
 		String updateBD = ParamUtil.getString(request, "updateBD", "false");
 
@@ -122,8 +121,6 @@ public class PortalAdmin extends MVCPortlet {
 		String todas ="<p>Actualizado en base de datos:</p>", sqlUpdate = "";
 		
 		for(LearningActivity activity: learningActivityList){
-			
-			//System.out.println("activity: "+activity.getActId()+" "+activity.getTypeId()+" "+activity.getExtracontent().contains("<p2p>"));
 			
 			//Si es un multimediaentry y tiene etiqueta p2p.
 			if(activity.getTypeId() == 2 && activity.getExtracontent().contains("<p2p>")){
@@ -208,10 +205,8 @@ public class PortalAdmin extends MVCPortlet {
 			}
 		}
 		if(updateBD.equals("true")){
-			//System.out.println(todas);
 			response.setRenderParameter("resultados", todas);
 		}else if(updateBD.equals("false")){
-			//System.out.println("-->"+sqlUpdate);
 			response.setRenderParameter("resultados", sqlUpdate);
 		}
 		
@@ -284,10 +279,8 @@ public class PortalAdmin extends MVCPortlet {
 			}
 		}
 		if(updateBD.equals("true")){
-			//System.out.println(todas);
 			response.setRenderParameter("resultados", todas);
 		}else if(updateBD.equals("false")){
-			//System.out.println("-->"+sqlUpdate);
 			response.setRenderParameter("resultados", sqlUpdate);
 		}
 		
@@ -304,7 +297,7 @@ public class PortalAdmin extends MVCPortlet {
 		List<ModuleResult> moduleResultList = ModuleResultLocalServiceUtil.getModuleResults(0, ModuleResultLocalServiceUtil.getModuleResultsCount());
 		
 		Calendar start = Calendar.getInstance();
-		System.out.println(" ## START ## "+start.getTime()+", tamano "+moduleResultList.size());
+		log.info(" ## START ## "+start.getTime()+", tamano "+moduleResultList.size());
 		
 		for(ModuleResult module: moduleResultList){
 			
@@ -315,13 +308,13 @@ public class PortalAdmin extends MVCPortlet {
 				
 				if(moduleResultUserList.size() > 1){
 				
-					System.out.println("  module: "+module.getModuleId()+", user:  "+module.getUserId()+", Repetidos: "+moduleResultUserList.size());
+					log.info("  module: "+module.getModuleId()+", user:  "+module.getUserId()+", Repetidos: "+moduleResultUserList.size());
 					
 					boolean isFirst = true;
 					for(ModuleResult moduleRepeat: moduleResultUserList){
 						if(!isFirst){
 							
-							System.out.println("   * Borrado ( total borrados: "+deleted+"): "+moduleRepeat.getMrId());
+							log.info("   * Borrado ( total borrados: "+deleted+"): "+moduleRepeat.getMrId());
 							traza += "  * Borrado ( total borrados: "+deleted+") mrId: "+moduleRepeat.getMrId();
 							
 							moduleResultDeleted.add(moduleRepeat.getMrId());
@@ -339,7 +332,7 @@ public class PortalAdmin extends MVCPortlet {
 							deleted++;
 							
 						}else{
-							System.out.println("   Se mantiene : "+moduleRepeat.getMrId());
+							log.info("   Se mantiene : "+moduleRepeat.getMrId());
 							traza += "  Se mantiene : "+moduleRepeat.getMrId();
 						}
 							
@@ -350,17 +343,17 @@ public class PortalAdmin extends MVCPortlet {
 		}
 		
 		Calendar end = Calendar.getInstance();
-		System.out.println("------------------------------------------------");
-		System.out.println(" ## START ## "+start.getTime());
-		System.out.println(" ##  END  ## "+end.getTime());
-		System.out.println(" ##  DELETED  ## "+deleted);
-		System.out.println("------------------------------------------------");
+		log.info("------------------------------------------------");
+		log.info(" ## START ## "+start.getTime());
+		log.info(" ##  END  ## "+end.getTime());
+		log.info(" ##  DELETED  ## "+deleted);
+		log.info("------------------------------------------------");
 				
 		if(updateBD){
-			ModuleUpdateResult.saveStringToFile("deleteRepeatedModuleResult.txt", traza);
+			LiferaylmsUtil.saveStringToFile("deleteRepeatedModuleResult.txt", traza);
 		}
 		else{
-			ModuleUpdateResult.saveStringToFile("deleteRepeatedModuleResult.txt", resultados);
+			LiferaylmsUtil.saveStringToFile("deleteRepeatedModuleResult.txt", resultados);
 		}
 	}
 	
@@ -368,7 +361,7 @@ public class PortalAdmin extends MVCPortlet {
 	public void deleteRepeatedModuleResult (ActionRequest request, ActionResponse response) throws Exception {
 		
 		String ip = com.liferay.portal.util.PortalUtil.getHttpServletRequest(request).getRemoteAddr();
-		ModuleUpdateResult.saveStringToFile("deleteRepeatedModuleResult.txt", "Delete Repeated ModuleResult desde "+ip);
+		LiferaylmsUtil.saveStringToFile("deleteRepeatedModuleResult.txt", "Delete Repeated ModuleResult desde "+ip);
 		
 		String updateBD = ParamUtil.getString(request, "updateBD", "");
 		
@@ -386,24 +379,24 @@ public class PortalAdmin extends MVCPortlet {
 			//String oldPortletName = "p2ptaskactivity_WAR_liferaylmsportlet";
 			//String newPortletName = "courseadmin_WAR_liferaylmsportlet";
 			
-			System.out.println("OLD Portlet ID: "+oldPortletName);
+			log.debug("OLD Portlet ID: "+oldPortletName);
 			Portlet portletOld = PortletLocalServiceUtil.getPortletById(oldPortletName);
 			
-			System.out.println("NEW Portlet ID: "+newPortletName);
+			log.debug("NEW Portlet ID: "+newPortletName);
 			Portlet portletNew = PortletLocalServiceUtil.getPortletById(newPortletName);
 			
 			
 			
 			//journalcontentsearch 
-			System.out.println("\n journalcontentsearch");
-			System.out.println("----------------------------------------");
+			log.debug("\n journalcontentsearch");
+			log.debug("----------------------------------------");
 			
 			List<JournalContentSearch> journals = JournalContentSearchLocalServiceUtil.getArticleContentSearches();
 			for(JournalContentSearch journal:journals){
 				
 				if(journal.getPortletId().compareTo(oldPortletName) == 0){
-					System.out.println("  *  JournalContentSearch: " + journal.getPortletId());
-					System.out.println("    - Change: " + journal.getPortletId());
+					log.debug("  *  JournalContentSearch: " + journal.getPortletId());
+					log.debug("    - Change: " + journal.getPortletId());
 					
 					if(updateBD){
 						journal.setPortletId(newPortletName);
@@ -413,15 +406,15 @@ public class PortalAdmin extends MVCPortlet {
 			}
 			
 			//portletitem 
-			System.out.println("\n portletitem");
-			System.out.println("----------------------------------------");
+			log.debug("\n portletitem");
+			log.debug("----------------------------------------");
 			
 			List<PortletItem> portletItems = PortletItemLocalServiceUtil.getPortletItems(0, PortletItemLocalServiceUtil.getPortletItemsCount());
 			for(PortletItem item:portletItems){
 				
 				if(item.getPortletId().compareTo(oldPortletName) == 0){
-					System.out.println("  *  JournalContentSearch: " + item.getPortletId());
-					System.out.println("    - Change: " + item.getPortletId());
+					log.debug("  *  JournalContentSearch: " + item.getPortletId());
+					log.debug("    - Change: " + item.getPortletId());
 					
 					if(updateBD){
 						item.setPortletId(newPortletName);
@@ -431,15 +424,15 @@ public class PortalAdmin extends MVCPortlet {
 			}
 			
 			//portletpreferences 
-			System.out.println("\n portletpreferences");
-			System.out.println("----------------------------------------");
+			log.debug("\n portletpreferences");
+			log.debug("----------------------------------------");
 			
 			List<PortletPreferences> pPreferences = PortletPreferencesLocalServiceUtil.getPortletPreferences();
 			for(PortletPreferences prefs:pPreferences){
 				
 				if(prefs.getPortletId().compareTo(oldPortletName) == 0){
-					System.out.println("  *  PortletPreferences: " + prefs.getPortletPreferencesId());
-					System.out.println("    - Change: " + prefs.getPortletId());
+					log.debug("  *  PortletPreferences: " + prefs.getPortletPreferencesId());
+					log.debug("    - Change: " + prefs.getPortletId());
 					
 					if(updateBD){
 						prefs.setPortletId(newPortletName);
@@ -449,15 +442,15 @@ public class PortalAdmin extends MVCPortlet {
 			}
 			
 			//repository
-			System.out.println("\n repository");
-			System.out.println("----------------------------------------");
+			log.debug("\n repository");
+			log.debug("----------------------------------------");
 			
 			List<Layout> layouts = LayoutLocalServiceUtil.getLayouts(0, LayoutLocalServiceUtil.getLayoutsCount());
 			for(Layout layout:layouts){
 				
 				if(layout.getTypeSettings().contains(oldPortletName)){
-					System.out.println("  * Layout: " + layout.getName(Locale.getDefault()));
-					System.out.println("    - Change: " + layout.getGroup().getFriendlyURL() + layout.getFriendlyURL());
+					log.debug("  * Layout: " + layout.getName(Locale.getDefault()));
+					log.debug("    - Change: " + layout.getGroup().getFriendlyURL() + layout.getFriendlyURL());
 					
 					if(updateBD){
 						layout.setTypeSettings(layout.getTypeSettings().replace(oldPortletName, newPortletName));
@@ -465,9 +458,7 @@ public class PortalAdmin extends MVCPortlet {
 					}
 				}
 			}
-			
-			System.out.println("");
-			
+					
 			try {
 				//Borrar el nombre viejo.
 				if(updateBD){
@@ -475,13 +466,12 @@ public class PortalAdmin extends MVCPortlet {
 					PortletLocalServiceUtil.updatePortlet(portletOld);
 				}
 			} catch (Exception e) {
-				System.out.println(" No se ha podido borrar el portlet antiguo: "+e.getMessage());
-				//e.printStackTrace();
+				e.printStackTrace();
+				log.error(" No se ha podido borrar el portlet antiguo: "+e.getMessage());
 			}
 			
 			
 		} catch (Exception e) {
-			System.out.println("ERROR: "+e.getMessage());
 			e.printStackTrace();
 		}
 		

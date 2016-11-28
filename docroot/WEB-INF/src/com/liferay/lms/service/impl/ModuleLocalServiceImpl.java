@@ -27,13 +27,17 @@ import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.model.LearningActivityTry;
 import com.liferay.lms.model.Module;
 import com.liferay.lms.model.ModuleResult;
+import com.liferay.lms.model.Schedule;
 import com.liferay.lms.service.ClpSerializer;
 import com.liferay.lms.service.CourseResultLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityTryLocalServiceUtil;
 import com.liferay.lms.service.ModuleLocalServiceUtil;
 import com.liferay.lms.service.ModuleResultLocalServiceUtil;
+import com.liferay.lms.service.ModuleServiceUtil;
+import com.liferay.lms.service.ScheduleLocalServiceUtil;
 import com.liferay.lms.service.base.ModuleLocalServiceBaseImpl;
+import com.liferay.lms.service.persistence.ModuleUtil;
 import com.liferay.portal.kernel.bean.PortletBeanLocatorUtil;
 import com.liferay.portal.kernel.dao.orm.Criterion;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
@@ -51,10 +55,12 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.model.ResourceConstants;
+import com.liferay.portal.model.Team;
 import com.liferay.portal.model.User;
 import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.security.permission.PermissionCheckerFactoryUtil;
+import com.liferay.portal.service.TeamLocalServiceUtil;
 import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.util.LmsLocaleUtil;
@@ -96,6 +102,10 @@ public class ModuleLocalServiceImpl extends ModuleLocalServiceBaseImpl {
 		return list;
 	}
 
+	public List<Module> findAllInGroup(long groupId, int start, int end) throws SystemException {
+		return ModuleUtil.filterFindByGroupId(groupId, start, end);
+	}
+	
 	public List<Module> findAllInGroup(long groupId, OrderByComparator orderByComparator) throws SystemException{
 		List <Module> list = (List<Module>) modulePersistence.findByGroupId(groupId,QueryUtil.ALL_POS,QueryUtil.ALL_POS, orderByComparator);
 		return list;
@@ -117,6 +127,7 @@ public class ModuleLocalServiceImpl extends ModuleLocalServiceBaseImpl {
 		return list.get(0);
 	}
 
+	@Deprecated
 	public int countInGroup(long groupId) throws SystemException{
 		return modulePersistence.countByGroupId(groupId);
 	}
@@ -203,7 +214,7 @@ public class ModuleLocalServiceImpl extends ModuleLocalServiceBaseImpl {
 			modulePersistence.update(previusModule, true);
 
 			//auditing
-			System.out.println("Módulo con id: "+theModule.getModuleId()+" ha sido movido hacia arriba por el usuario: "+theModule.getUserId());
+			log.debug("Módulo con id: "+theModule.getModuleId()+" ha sido movido hacia arriba por el usuario: "+theModule.getUserId());
 
 			AuditingLogFactory.audit(theModule.getCompanyId(), theModule.getGroupId(), Module.class.getName(), 
 					moduleId,userIdAction, AuditConstants.UPDATE, "MODULE_UP");
@@ -226,7 +237,7 @@ public class ModuleLocalServiceImpl extends ModuleLocalServiceBaseImpl {
 			modulePersistence.update(nextModule, true);
 
 			//auditing
-			System.out.println("Módulo con id: "+theModule.getModuleId()+" ha sido movido hacia abajo por el usuario: "+theModule.getUserId());
+			log.debug("Módulo con id: "+theModule.getModuleId()+" ha sido movido hacia abajo por el usuario: "+theModule.getUserId());
 
 			AuditingLogFactory.audit(theModule.getCompanyId(), theModule.getGroupId(), Module.class.getName(), 
 					moduleId, userIdAction, AuditConstants.UPDATE, "MODULE_DOWN");
@@ -247,7 +258,7 @@ public class ModuleLocalServiceImpl extends ModuleLocalServiceBaseImpl {
 				prevAct = getPreviusModule(actualMod);
 			}
 			//auditing
-			System.out.println("Módulo con id: "+actualMod.getModuleId()+" ha sido movido hacia arriba por el usuario: "+actualMod.getUserId());
+			log.debug("Módulo con id: "+actualMod.getModuleId()+" ha sido movido hacia arriba por el usuario: "+actualMod.getUserId());
 			AuditingLogFactory.audit(actualMod.getCompanyId(), actualMod.getGroupId(), Module.class.getName(), 
 					modId, userIdAction, AuditConstants.UPDATE, "MODULE_UP");
 		//Elemento bajado
@@ -258,7 +269,7 @@ public class ModuleLocalServiceImpl extends ModuleLocalServiceBaseImpl {
 				actualMod = modulePersistence.fetchByPrimaryKey(modId);
 				nexMod = getNextModule(actualMod);
 			}
-			System.out.println("Módulo con id: "+actualMod.getModuleId()+" ha sido movido hacia abajo por el usuario: "+actualMod.getUserId());
+			log.debug("Módulo con id: "+actualMod.getModuleId()+" ha sido movido hacia abajo por el usuario: "+actualMod.getUserId());
 
 			//auditing
 			AuditingLogFactory.audit(actualMod.getCompanyId(), actualMod.getGroupId(), Module.class.getName(), 
@@ -288,6 +299,7 @@ public class ModuleLocalServiceImpl extends ModuleLocalServiceBaseImpl {
 	    fileobj.setDescription(validmodule.getDescription());
 	    fileobj.setOrdern(fileobj.getModuleId());
 	    fileobj.setIcon(validmodule.getIcon());
+	    fileobj.setPrecedence(validmodule.getPrecedence());
 	    try {
 			resourceLocalService.addResources(
 					validmodule.getCompanyId(), validmodule.getGroupId(), validmodule.getUserId(),
@@ -427,6 +439,7 @@ public class ModuleLocalServiceImpl extends ModuleLocalServiceBaseImpl {
 		}
 		return true;
 	}
+	
 	public boolean isUserFinished(long moduleId,long userId) throws SystemException, PortalException
 	{
 		if(isUserPassed(moduleId, userId))
@@ -501,8 +514,23 @@ public class ModuleLocalServiceImpl extends ModuleLocalServiceBaseImpl {
 		{
 			return true;
 		}
-       
-		if(!((theModule.getEndDate()!=null&&theModule.getEndDate().after(now)) &&(theModule.getStartDate()!=null&&theModule.getStartDate().before(now))))
+		
+		Date startDate = theModule.getStartDate();
+		Date endDate = theModule.getEndDate();
+		
+		List<Team> teams = TeamLocalServiceUtil.getUserTeams(userId, course.getGroupCreatedId());
+		if(teams!=null && teams.size()>0){
+			for(Team team : teams){
+				Schedule schedule = ScheduleLocalServiceUtil.getScheduleByTeamId(team.getTeamId());
+				if(schedule!=null){
+					startDate=schedule.getStartDate();
+					endDate = schedule.getEndDate();
+					break;
+				}
+			}			
+		}
+		
+		if(!((endDate!=null&&endDate.after(now)) &&(startDate!=null&&startDate.before(now))))
 		{
 			return true;
 		}
@@ -518,14 +546,16 @@ public class ModuleLocalServiceImpl extends ModuleLocalServiceBaseImpl {
 				return true;
 			}
         }
-        if(userTimeFinished(moduleId,userId)){
+		
+		if(userTimeFinished(moduleId,userId)){
         	return true;
         }
+		
 		return false;
 	}
 	public long countByGroupId(long groupId) throws SystemException
 	{
-		return modulePersistence.countByGroupId(groupId);
+		return ModuleUtil.countByGroupId(groupId);
 	}
 	public long usersStarted(long moduleId) throws SystemException
 	{

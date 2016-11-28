@@ -2,6 +2,7 @@ package com.liferay.lms.learningactivity.courseeval;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
@@ -16,6 +17,7 @@ import com.liferay.lms.model.ModuleResult;
 import com.liferay.lms.service.CourseResultLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityResultLocalServiceUtil;
+import com.liferay.lms.service.LearningActivityTryLocalServiceUtil;
 import com.liferay.lms.service.ModuleLocalServiceUtil;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -41,88 +43,75 @@ public class MandatoryAvgCourseEval extends BaseCourseEval {
 	
 	@Override
 	public boolean updateCourse(Course course, long userId) throws SystemException {
-		
-			CourseResult courseResult=CourseResultLocalServiceUtil.getByUserAndCourse(course.getCourseId(), userId);
-			//.fetchByuc(mresult.getUserId(), course.getCourseId());
-			if(courseResult==null)
-			{
-				courseResult=CourseResultLocalServiceUtil.create(course.getCourseId(), userId);
 
-				//auditing
-				AuditingLogFactory.audit(course.getCompanyId(), course.getGroupId(), CourseResult.class.getName(), courseResult.getPrimaryKey(), userId, AuditConstants.CREATE, null);
+		CourseResult courseResult=CourseResultLocalServiceUtil.getByUserAndCourse(course.getCourseId(), userId);
+
+		if(courseResult==null){
+			courseResult=CourseResultLocalServiceUtil.create(course.getCourseId(), userId);
+			//auditing
+			AuditingLogFactory.audit(course.getCompanyId(), course.getGroupId(), CourseResult.class.getName(), courseResult.getPrimaryKey(), userId, AuditConstants.CREATE, null);
+		}
+
+		if(courseResult.getStartDate() == null){
+			courseResult.setStartDate(new Date());
+		}
+		
+		boolean passed=true;
+		long result=0;
+		List<LearningActivity> learningActivities=LearningActivityLocalServiceUtil.getMandatoryLearningActivitiesOfGroup(course.getGroupCreatedId());
+		
+		//Guardo los resultados de las actividades del usuario en el curso en un hashmap para no tener que acceder a bbdd por cada uno de ellos
+		List<LearningActivityResult> lresult = LearningActivityResultLocalServiceUtil.getMandatoryByGroupIdUserId(course.getGroupCreatedId(), userId);
+		HashMap<Long, LearningActivityResult> results = new HashMap<Long, LearningActivityResult>();
+		for(LearningActivityResult ar:lresult){
+			results.put(ar.getActId(), ar);
+		}
+		
+		boolean isFailed=false;
+		LearningActivityResult learningActivityResult = null;
+		
+		for(LearningActivity activity:learningActivities){
+			
+			if(results.containsKey(activity.getActId())){
+				learningActivityResult = results.get(activity.getActId());
+			}else{
+				learningActivityResult = null;
 			}
 			
-			List<Module> modules=ModuleLocalServiceUtil.findAllInGroup(course.getGroupCreatedId());
-			boolean passed=true;
-			long result=0;
-			List<LearningActivity> learningActivities=LearningActivityLocalServiceUtil.getMandatoryLearningActivitiesOfGroup(course.getGroupCreatedId());
-			boolean isFired=false;
-			for(LearningActivity activity:learningActivities)
-			{
-				if(LearningActivityResultLocalServiceUtil.existsLearningActivityResult(activity.getActId(), userId))
-				{
-					LearningActivityResult learningActivityResult=LearningActivityResultLocalServiceUtil.getByActIdAndUserId(activity.getActId(), userId);
-					if(learningActivityResult.getEndDate()!=null&&!learningActivityResult.isPassed())
-					{
-						isFired=true;
-					}
-					else
-					{
-						if(learningActivityResult.getEndDate()==null)
-						{
-							passed=false;
-						}
-					}
-					result+=learningActivityResult.getResult();
-				}
-				else
-				{
-					passed=false;
-				}
-			}
-			if(learningActivities.size()>0)
-			{
-				result=result/learningActivities.size();
-			}
-				if(isFired)
-				{
-					if(courseResult.getPassedDate()==null)
-					{
-						courseResult.setPassed(false);
-						courseResult.setPassedDate(new Date());
-					}
-					courseResult.setResult(result);
-					CourseResultLocalServiceUtil.update(courseResult);
-					return true;
-				}
-				else
-				{
-					if(passed) 
-					{
-						if(courseResult.getPassedDate()==null)
-						{
-							courseResult.setPassedDate(new Date());
-							courseResult.setPassed(passed);
-						}
-						else
-						{
-							if(!courseResult.getPassed())
-							{
-								courseResult.setPassedDate(new Date());
-								courseResult.setPassed(passed);
+			if(learningActivityResult != null){					
+				if(learningActivityResult.getEndDate()!=null){
+					if(!learningActivityResult.isPassed()){
+						passed = false;
+						if(activity.getTries() > 0){
+							long  userTries = LearningActivityTryLocalServiceUtil.getLearningActivityTryByActUserCount(activity.getActId(), userId);
+							if(userTries >= activity.getTries()){
+								isFailed=true;
 							}
 						}
-					
 					}
-					else
-					{
-						courseResult.setPassedDate(null);
-						courseResult.setPassed(false);
-					}
-					courseResult.setResult(result);
-					CourseResultLocalServiceUtil.update(courseResult);
-					return true;
+				}else{
+					passed=false;					
 				}
+				result+=learningActivityResult.getResult();
+			}else{
+				passed=false;
+			}
+		}
+
+		if(learningActivities.size()>0){
+			result=result/learningActivities.size();
+		}
+		
+		// Si el usuario se ha marcado como isFailed es porque lo tiene suspenso. Se le asigna un passed a false y se marca la fecha de finalización del curso (passedDate).
+        courseResult.setPassed(passed && !isFailed);
+        // Se almacena el result del resultado del usuario en el curso.
+        courseResult.setResult(result);
+        if((passed || isFailed) && courseResult.getPassedDate() == null) {
+               courseResult.setPassedDate(new Date());
+        }
+        CourseResultLocalServiceUtil.update(courseResult);
+        return true;		
+		
 	}
 
 	@Override

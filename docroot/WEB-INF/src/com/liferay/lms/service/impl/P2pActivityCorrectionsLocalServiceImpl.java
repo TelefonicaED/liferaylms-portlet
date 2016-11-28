@@ -31,6 +31,7 @@ import com.liferay.lms.service.ModuleLocalServiceUtil;
 import com.liferay.lms.service.P2pActivityCorrectionsLocalServiceUtil;
 import com.liferay.lms.service.P2pActivityLocalServiceUtil;
 import com.liferay.lms.service.base.P2pActivityCorrectionsLocalServiceBaseImpl;
+import com.liferay.lms.service.persistence.P2pActivityCorrectionsUtil;
 import com.liferay.portal.kernel.bean.PortletBeanLocatorUtil;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
@@ -40,15 +41,12 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.model.Company;
-import com.liferay.portal.model.Group;
 import com.liferay.portal.model.User;
-import com.liferay.portal.service.CompanyLocalServiceUtil;
-import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceContextThreadLocal;
 import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.util.PortalUtil;
+import com.tls.lms.util.LiferaylmsUtil;
 
 
 /**
@@ -72,7 +70,7 @@ import com.liferay.portal.util.PortalUtil;
  */
 public class P2pActivityCorrectionsLocalServiceImpl
 	extends P2pActivityCorrectionsLocalServiceBaseImpl{
-	
+	private static Log log = LogFactoryUtil.getLog(P2pActivityCorrectionsLocalServiceImpl.class);
 	public P2pActivityCorrections findByP2pActivityIdAndUserId(Long p2pActivityId,
 			Long userId){
 		
@@ -239,8 +237,6 @@ public class P2pActivityCorrectionsLocalServiceImpl
 			numAsigns = Integer.valueOf(validations);
 		} catch (Exception e) {}
 		
-		LearningActivity learning = null;
-		
 		for(User user : usersList){		
 			asigned = P2pActivityCorrectionsLocalServiceUtil.getNumCorrectionsAsignToP2P(p2pActId);
 			
@@ -266,7 +262,7 @@ public class P2pActivityCorrectionsLocalServiceImpl
 					activity.setCountCorrections(activity.getCountCorrections()+1);
 					P2pActivityLocalServiceUtil.updateP2pActivity(activity);
 					
-					learning = LearningActivityLocalServiceUtil.getLearningActivity(activity.getActId());
+					
 				} catch (PortalException e) {}
 				
 				asigned++;
@@ -279,11 +275,14 @@ public void asignCorrectionsToP2PActivities(long actId, long p2pActivityId,int n
 		
 		//Precondicion: Solo asignamos las tareas cuando tengamos todas las que necesitamos.	
 		if(activityList == null || activityList.isEmpty() || activityList.size() < numValidaciones){
+			log.info("Solo asignamos las tareas cuando tengamos todas las que necesitamos. ");
 			return;
 		}
 	
-		for(P2pActivity activity : activityList){		
-	
+		//auditing
+		ServiceContext serviceContext = ServiceContextThreadLocal.getServiceContext();
+		
+		for(P2pActivity activity : activityList){	
 			long p2pActivityCorrectionsId = counterLocalService.increment(P2pActivityCorrections.class.getName());
 			P2pActivityCorrections p2p = p2pActivityCorrectionsPersistence.create(p2pActivityCorrectionsId);
 			p2p.setActId(actId);
@@ -293,8 +292,7 @@ public void asignCorrectionsToP2PActivities(long actId, long p2pActivityId,int n
 			p2p.setP2pActivityId(activity.getP2pActivityId());
 			p2pActivityCorrectionsPersistence.update(p2p, true);
 
-			//auditing
-			ServiceContext serviceContext = ServiceContextThreadLocal.getServiceContext();
+
 			if(serviceContext!=null){
 				AuditingLogFactory.audit(serviceContext.getCompanyId(), serviceContext.getScopeGroupId(), P2pActivityCorrections.class.getName(), 
 					p2pActivityCorrectionsId, serviceContext.getUserId(), AuditConstants.UPDATE, null);
@@ -306,28 +304,24 @@ public void asignCorrectionsToP2PActivities(long actId, long p2pActivityId,int n
 				}
 			}
 
-			//Incrementamos el contador de correcciones que se ha asignado para corregir.
+			log.debug("Incrementamos el contador de correcciones que se ha asignado para corregir.");
 			activity.setCountCorrections(activity.getCountCorrections()+1);
 			P2pActivityLocalServiceUtil.updateP2pActivity(activity);
 			
 		}
-		
+		log.debug("Ponemos que ya estan realizadas las asignaciones para no tener que calcular de nuevo las asignaciones.");
 		//Ponemos que ya estan realizadas las asignaciones para no tener que calcular de nuevo las asignaciones.
 		try {
 			P2pActivity p2pActivity = P2pActivityLocalServiceUtil.getP2pActivity(p2pActivityId);
 			p2pActivity.setAsignationsCompleted(true);
 			P2pActivityLocalServiceUtil.updateP2pActivity(p2pActivity);
 			
-			//Mandar email al usuario avisando de que ya puede corregir sus actividades.
+			log.debug("Mandar email al usuario avisando de que ya puede corregir sus actividades.");
 			if(!LearningActivityLocalServiceUtil.islocked(actId, p2pActivity.getUserId())){
 
 				try {
 					LearningActivity learn = LearningActivityLocalServiceUtil.getLearningActivity(actId);
 					User user = UserLocalServiceUtil.getUser(p2pActivity.getUserId());
-					
-					Group group = GroupLocalServiceUtil.getGroup(learn.getGroupId());
-					Company company = CompanyLocalServiceUtil.getCompany(group.getCompanyId());
-					
 					Course course= CourseLocalServiceUtil.getCourseByGroupCreatedId(learn.getGroupId());
 					
 					com.liferay.lms.model.Module module = ModuleLocalServiceUtil.getModule(learn.getModuleId());
@@ -335,20 +329,43 @@ public void asignCorrectionsToP2PActivities(long actId, long p2pActivityId,int n
 					String courseTitle = "";
 					String activityTitle = learn.getTitle(user.getLocale());
 					String moduleTitle =  module.getTitle(user.getLocale());
-					String portalUrl = PortalUtil.getPortalURL(company.getVirtualHostname(), PortalUtil.getPortalPort(), false);
+					
+					
+					// QUITAR EL PUERTO
+					String portalUrl = serviceContext.getPortalURL();
+					String[] urls = portalUrl.split(":");
+					portalUrl = urls[0] + ":" +urls[1];					
+					/*if(urls.length > 2){ // http:prueba.es:8080
+						portalUrl += urls[1];
+					}*/
+					log.debug("***portalUrl:"+portalUrl);
+					
+					//String portalUrl = PortalUtil.getPortalURL(company.getVirtualHostname(), PortalUtil.getPortalPort(), false);
 					String pathPublic = PortalUtil.getPathFriendlyURLPublic();
 					
 					if(course != null){
 						courseFriendlyUrl = portalUrl + pathPublic + course.getFriendlyURL();
 						courseTitle = course.getTitle(user.getLocale());
-					}
-						
-					String[] params={activityTitle, moduleTitle, courseTitle, courseFriendlyUrl};
+						courseFriendlyUrl += "/reto?p_p_id=p2ptaskactivity_WAR_liferaylmsportlet";
+						courseFriendlyUrl += "&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&actId="+learn.getActId();
+						courseFriendlyUrl += "&moduleId="+learn.getModuleId();
 					
-					//Enviar los emails.
-					P2PSendMailAsignation.sendMail(user.getEmailAddress(), user.getFullName(), params, user.getCompanyId(), user.getLocale());
+					}
+					
+					String[] params={activityTitle, moduleTitle, courseTitle, courseFriendlyUrl};
+					boolean deregisterMail = false;
+					if(user.getExpandoBridge().getAttribute(LiferaylmsUtil.DEREGISTER_USER_EXPANDO)!=null){
+						deregisterMail = (Boolean)user.getExpandoBridge().getAttribute(LiferaylmsUtil.DEREGISTER_USER_EXPANDO);
+					}
+					
+					if(!deregisterMail){
+						log.debug("Enviar los emails.");
+						P2PSendMailAsignation.sendMail(user.getEmailAddress(), user.getFullName(), params, user.getCompanyId(), user.getLocale());
+					}
 		
-				} catch (Exception e) {}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 				
 			} 			
 			
@@ -403,6 +420,18 @@ public void asignCorrectionsToP2PActivities(long actId, long p2pActivityId,int n
 		}
 		return res;
 	}
+	
+	public List<P2pActivityCorrections> getByUserId(long userId){
+		List<P2pActivityCorrections> corrections = new ArrayList<P2pActivityCorrections>();		
+		try {
+			corrections = P2pActivityCorrectionsUtil.findByUserId(userId);
+		} catch (SystemException e) {
+			e.printStackTrace();
+		}
+		
+		return corrections;
+	}
+	
 	
 	/**
 	 * Para saber si el usuario ya ha realizado todas las correcciones que se indica en el extracontent.

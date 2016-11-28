@@ -28,6 +28,7 @@
 <%@ include file="/init.jsp" %>
 
 <% 
+	boolean defaultValueCheckBox=false;
 	Integer maxfile = ResourceExternalLearningActivityType.DEFAULT_FILENUMBER;
 	PortletSession psession= renderRequest.getPortletSession();
 
@@ -77,6 +78,9 @@
 			Element video=root.element("video");
 			
 			if(video!=null) youtubecode=video.getText();
+			
+			Element videoControlEnabled = root.element("video-control");
+			if(videoControlEnabled!=null) defaultValueCheckBox= Boolean.parseBoolean(videoControlEnabled.getText());
 
 			Element documento=null;
 			int i = 0;
@@ -102,6 +106,7 @@
 %>
 <aui:field-wrapper label="video" >
   	<aui:input disabled="<%=readonly %>" name="youtubecode" type="textarea" rows="6" cols="45" label="youtube-code" value="<%=youtubecode %>" ignoreRequestValue="true" helpMessage="<%=LanguageUtil.get(pageContext,\"youtube-code-help\")%>"></aui:input>
+  	<aui:input label="resourceexternalactivity.videocontrol.disabled" name="videoControl" type="checkbox" value="<%= defaultValueCheckBox %>" />
 </aui:field-wrapper>
 <script type="text/javascript">
 	function deleteFile(id){
@@ -109,7 +114,7 @@
 		var file = document.getElementById("file"+id);
 		var inputs = file.getElementsByTagName("input");
 		if(inputs[0].value!=null&&inputs[0].value!=""){
-			if(confirm('<liferay-ui:message key="are-you-sure-you-want-to-delete-this"  />')){
+			if(confirm(Liferay.Language.get("are-you-sure-you-want-to-delete-this"))){
 				divfiles.removeChild(file);
 			}	
 		}else{
@@ -184,7 +189,7 @@
 					Double size = ((double)file.getSize())/1000;
 				%>
 				<input type="hidden" name="<portlet:namespace />additionalFile<%=append %>" id="<portlet:namespace />additionalFile<%=append %>" value="<%= aEntry.getEntryId() %>">
-				<span class="upfile"><a target="_blanck" href="<%=sb.toString()%>"><img class="dl-file-icon" src="<%= themeDisplay.getPathThemeImages() %>/file_system/small/<%= file.getIcon() %>.png" />
+				<span class="upfile"><a target="_blank" href="<%=sb.toString()%>"><img class="dl-file-icon" src="<%= themeDisplay.getPathThemeImages() %>/file_system/small/<%= file.getIcon() %>.png" />
 					<%= aEntry.getTitle(themeDisplay.getLocale()) %></a></span> <span class="ufilesize">(<%=String.format(themeDisplay.getLocale(), "%.2f", size) %> KB)</span>
 				<a href="#" onclick="javascript: deleteFile('<%=append %>'); return false;">
 					<img class="icon" title="<%=LanguageUtil.get(pageContext,"delete")%>" alt="<%=LanguageUtil.get(pageContext,"delete")%>" src="<%= themeDisplay.getPathThemeImages() %>/common/delete.png"></a>

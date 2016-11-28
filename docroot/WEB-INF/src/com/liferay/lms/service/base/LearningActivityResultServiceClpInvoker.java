@@ -23,109 +23,116 @@ import java.util.Arrays;
  */
 public class LearningActivityResultServiceClpInvoker {
 	public LearningActivityResultServiceClpInvoker() {
-		_methodName122 = "getBeanIdentifier";
+		_methodName142 = "getBeanIdentifier";
 
-		_methodParameterTypes122 = new String[] {  };
+		_methodParameterTypes142 = new String[] {  };
 
-		_methodName123 = "setBeanIdentifier";
+		_methodName143 = "setBeanIdentifier";
 
-		_methodParameterTypes123 = new String[] { "java.lang.String" };
+		_methodParameterTypes143 = new String[] { "java.lang.String" };
 
-		_methodName128 = "getByActId";
+		_methodName148 = "getByActId";
 
-		_methodParameterTypes128 = new String[] { "long" };
+		_methodParameterTypes148 = new String[] { "long" };
 
-		_methodName129 = "getByActIdAndUser";
+		_methodName149 = "getByActIdAndUser";
 
-		_methodParameterTypes129 = new String[] { "long", "java.lang.String" };
+		_methodParameterTypes149 = new String[] { "long", "java.lang.String" };
 
-		_methodName130 = "userPassed";
+		_methodName150 = "userPassed";
 
-		_methodParameterTypes130 = new String[] { "long" };
+		_methodParameterTypes150 = new String[] { "long" };
 
-		_methodName131 = "userLoginPassed";
+		_methodName151 = "userLoginPassed";
 
-		_methodParameterTypes131 = new String[] { "long", "java.lang.String" };
+		_methodParameterTypes151 = new String[] { "long", "java.lang.String" };
 
-		_methodName132 = "update";
+		_methodName152 = "update";
 
-		_methodParameterTypes132 = new String[] {
+		_methodParameterTypes152 = new String[] {
 				"long", "long", "java.lang.String"
 			};
 
-		_methodName133 = "update";
+		_methodName153 = "update";
 
-		_methodParameterTypes133 = new String[] { "long", "java.lang.String" };
+		_methodParameterTypes153 = new String[] { "long", "java.lang.String" };
 
-		_methodName134 = "update";
+		_methodName154 = "update";
 
-		_methodParameterTypes134 = new String[] {
+		_methodParameterTypes154 = new String[] {
 				"long", "java.lang.String", "java.lang.String"
 			};
 
-		_methodName135 = "updateFinishTry";
+		_methodName155 = "forceFinishTry";
 
-		_methodParameterTypes135 = new String[] {
+		_methodParameterTypes155 = new String[] { "long" };
+
+		_methodName156 = "updateFinishTry";
+
+		_methodParameterTypes156 = new String[] {
 				"long", "java.lang.String", "java.lang.String"
 			};
 	}
 
 	public Object invokeMethod(String name, String[] parameterTypes,
 		Object[] arguments) throws Throwable {
-		if (_methodName122.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes122, parameterTypes)) {
+		if (_methodName142.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes142, parameterTypes)) {
 			return LearningActivityResultServiceUtil.getBeanIdentifier();
 		}
 
-		if (_methodName123.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes123, parameterTypes)) {
+		if (_methodName143.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes143, parameterTypes)) {
 			LearningActivityResultServiceUtil.setBeanIdentifier((java.lang.String)arguments[0]);
-
-			return null;
 		}
 
-		if (_methodName128.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes128, parameterTypes)) {
+		if (_methodName148.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes148, parameterTypes)) {
 			return LearningActivityResultServiceUtil.getByActId(((Long)arguments[0]).longValue());
 		}
 
-		if (_methodName129.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes129, parameterTypes)) {
+		if (_methodName149.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes149, parameterTypes)) {
 			return LearningActivityResultServiceUtil.getByActIdAndUser(((Long)arguments[0]).longValue(),
 				(java.lang.String)arguments[1]);
 		}
 
-		if (_methodName130.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes130, parameterTypes)) {
+		if (_methodName150.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes150, parameterTypes)) {
 			return LearningActivityResultServiceUtil.userPassed(((Long)arguments[0]).longValue());
 		}
 
-		if (_methodName131.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes131, parameterTypes)) {
+		if (_methodName151.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes151, parameterTypes)) {
 			return LearningActivityResultServiceUtil.userLoginPassed(((Long)arguments[0]).longValue(),
 				(java.lang.String)arguments[1]);
 		}
 
-		if (_methodName132.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes132, parameterTypes)) {
+		if (_methodName152.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes152, parameterTypes)) {
 			return LearningActivityResultServiceUtil.update(((Long)arguments[0]).longValue(),
 				((Long)arguments[1]).longValue(), (java.lang.String)arguments[2]);
 		}
 
-		if (_methodName133.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes133, parameterTypes)) {
+		if (_methodName153.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes153, parameterTypes)) {
 			return LearningActivityResultServiceUtil.update(((Long)arguments[0]).longValue(),
 				(java.lang.String)arguments[1]);
 		}
 
-		if (_methodName134.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes134, parameterTypes)) {
+		if (_methodName154.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes154, parameterTypes)) {
 			return LearningActivityResultServiceUtil.update(((Long)arguments[0]).longValue(),
 				(java.lang.String)arguments[1], (java.lang.String)arguments[2]);
 		}
 
-		if (_methodName135.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes135, parameterTypes)) {
+		if (_methodName155.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes155, parameterTypes)) {
+			LearningActivityResultServiceUtil.forceFinishTry(((Long)arguments[0]).longValue());
+		}
+
+		if (_methodName156.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes156, parameterTypes)) {
 			return LearningActivityResultServiceUtil.updateFinishTry(((Long)arguments[0]).longValue(),
 				(java.lang.String)arguments[1], (java.lang.String)arguments[2]);
 		}
@@ -133,24 +140,26 @@ public class LearningActivityResultServiceClpInvoker {
 		throw new UnsupportedOperationException();
 	}
 
-	private String _methodName122;
-	private String[] _methodParameterTypes122;
-	private String _methodName123;
-	private String[] _methodParameterTypes123;
-	private String _methodName128;
-	private String[] _methodParameterTypes128;
-	private String _methodName129;
-	private String[] _methodParameterTypes129;
-	private String _methodName130;
-	private String[] _methodParameterTypes130;
-	private String _methodName131;
-	private String[] _methodParameterTypes131;
-	private String _methodName132;
-	private String[] _methodParameterTypes132;
-	private String _methodName133;
-	private String[] _methodParameterTypes133;
-	private String _methodName134;
-	private String[] _methodParameterTypes134;
-	private String _methodName135;
-	private String[] _methodParameterTypes135;
+	private String _methodName142;
+	private String[] _methodParameterTypes142;
+	private String _methodName143;
+	private String[] _methodParameterTypes143;
+	private String _methodName148;
+	private String[] _methodParameterTypes148;
+	private String _methodName149;
+	private String[] _methodParameterTypes149;
+	private String _methodName150;
+	private String[] _methodParameterTypes150;
+	private String _methodName151;
+	private String[] _methodParameterTypes151;
+	private String _methodName152;
+	private String[] _methodParameterTypes152;
+	private String _methodName153;
+	private String[] _methodParameterTypes153;
+	private String _methodName154;
+	private String[] _methodParameterTypes154;
+	private String _methodName155;
+	private String[] _methodParameterTypes155;
+	private String _methodName156;
+	private String[] _methodParameterTypes156;
 }

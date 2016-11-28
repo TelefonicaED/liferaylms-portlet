@@ -104,23 +104,23 @@ public class CheckP2pMailingLocalServiceClpInvoker {
 				"com.liferay.lms.model.CheckP2pMailing", "boolean"
 			};
 
-		_methodName138 = "getBeanIdentifier";
+		_methodName158 = "getBeanIdentifier";
 
-		_methodParameterTypes138 = new String[] {  };
+		_methodParameterTypes158 = new String[] {  };
 
-		_methodName139 = "setBeanIdentifier";
+		_methodName159 = "setBeanIdentifier";
 
-		_methodParameterTypes139 = new String[] { "java.lang.String" };
+		_methodParameterTypes159 = new String[] { "java.lang.String" };
 
-		_methodName144 = "addCheckP2pMailing";
+		_methodName164 = "addCheckP2pMailing";
 
-		_methodParameterTypes144 = new String[] {
+		_methodParameterTypes164 = new String[] {
 				"com.liferay.lms.model.CheckP2pMailing"
 			};
 
-		_methodName145 = "findByActId";
+		_methodName165 = "findByActId";
 
-		_methodParameterTypes145 = new String[] { "long" };
+		_methodParameterTypes165 = new String[] { "long" };
 	}
 
 	public Object invokeMethod(String name, String[] parameterTypes,
@@ -212,25 +212,23 @@ public class CheckP2pMailingLocalServiceClpInvoker {
 				((Boolean)arguments[1]).booleanValue());
 		}
 
-		if (_methodName138.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes138, parameterTypes)) {
+		if (_methodName158.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes158, parameterTypes)) {
 			return CheckP2pMailingLocalServiceUtil.getBeanIdentifier();
 		}
 
-		if (_methodName139.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes139, parameterTypes)) {
+		if (_methodName159.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes159, parameterTypes)) {
 			CheckP2pMailingLocalServiceUtil.setBeanIdentifier((java.lang.String)arguments[0]);
-
-			return null;
 		}
 
-		if (_methodName144.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes144, parameterTypes)) {
+		if (_methodName164.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes164, parameterTypes)) {
 			return CheckP2pMailingLocalServiceUtil.addCheckP2pMailing((com.liferay.lms.model.CheckP2pMailing)arguments[0]);
 		}
 
-		if (_methodName145.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes145, parameterTypes)) {
+		if (_methodName165.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes165, parameterTypes)) {
 			return CheckP2pMailingLocalServiceUtil.findByActId(((Long)arguments[0]).longValue());
 		}
 
@@ -269,12 +267,12 @@ public class CheckP2pMailingLocalServiceClpInvoker {
 	private String[] _methodParameterTypes14;
 	private String _methodName15;
 	private String[] _methodParameterTypes15;
-	private String _methodName138;
-	private String[] _methodParameterTypes138;
-	private String _methodName139;
-	private String[] _methodParameterTypes139;
-	private String _methodName144;
-	private String[] _methodParameterTypes144;
-	private String _methodName145;
-	private String[] _methodParameterTypes145;
+	private String _methodName158;
+	private String[] _methodParameterTypes158;
+	private String _methodName159;
+	private String[] _methodParameterTypes159;
+	private String _methodName164;
+	private String[] _methodParameterTypes164;
+	private String _methodName165;
+	private String[] _methodParameterTypes165;
 }

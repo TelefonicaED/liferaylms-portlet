@@ -14,17 +14,13 @@
 
 package com.liferay.lms.service.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.liferay.lms.model.SurveyResult;
-import com.liferay.lms.service.ClpSerializer;
-import com.liferay.lms.service.SurveyResultLocalServiceUtil;
 import com.liferay.lms.service.base.SurveyResultLocalServiceBaseImpl;
-import com.liferay.portal.kernel.bean.PortletBeanLocatorUtil;
-import com.liferay.portal.kernel.dao.orm.DynamicQuery;
-import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
-import com.liferay.portal.kernel.dao.orm.ProjectionFactoryUtil;
-import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
+import com.liferay.lms.service.persistence.SurveyResultFinderUtil;
+import com.liferay.lms.service.persistence.SurveyResultUtil;
 import com.liferay.portal.kernel.exception.SystemException;
 
 
@@ -50,53 +46,112 @@ import com.liferay.portal.kernel.exception.SystemException;
 public class SurveyResultLocalServiceImpl
 	extends SurveyResultLocalServiceBaseImpl {
 	
-	@SuppressWarnings("unchecked")
-	public java.util.List<SurveyResult> getSurveyResultByActId(long actId) throws SystemException
-	{ 
-		ClassLoader classLoader = (ClassLoader) PortletBeanLocatorUtil.locate(ClpSerializer.getServletContextName(), "portletClassLoader");
-		DynamicQuery query = DynamicQueryFactoryUtil.forClass(SurveyResult.class, classLoader)
-				.add(PropertyFactoryUtil.forName("actId").eq(actId));
-		
-		return surveyResultPersistence.findWithDynamicQuery(query);
+	public List<SurveyResult> getByUserId(long userId){ 
+		List<SurveyResult> results = new ArrayList<SurveyResult>();
+		try {
+			results = SurveyResultUtil.findByUserId(userId);
+		} catch (SystemException e) {
+			e.printStackTrace();
+		}
+		return results;
 	}
 	
-	public double getPercentageByQuestionIdAndAnswerId(long questionId, long answerId) throws SystemException
+	public List<SurveyResult> getSurveyResultByActId(long actId) throws SystemException{ 
+		
+		return SurveyResultUtil.findByActId(actId);
+	}
+	
+	public List<SurveyResult> getSurveyResultsByQuestionIdActId(long questionId, long actId) { 
+		List<SurveyResult> results = new ArrayList<SurveyResult>();
+		try{
+			results = SurveyResultUtil.findByQuestionIdActId(questionId, actId);
+		}catch(SystemException e){
+			e.printStackTrace();
+			results=null;
+		}
+		return results;
+	}
+	
+	
+	
+	
+	public double getPercentageByQuestionIdAndAnswerId(long questionId, long answerId, long total) throws SystemException
 	{ 
 		double res = 0;
+		long count = 0;
 		
-		ClassLoader classLoader = (ClassLoader) PortletBeanLocatorUtil.locate(ClpSerializer.getServletContextName(), "portletClassLoader");
-		DynamicQuery query = DynamicQueryFactoryUtil.forClass(SurveyResult.class, classLoader)
-				.add(PropertyFactoryUtil.forName("questionId").eq(new Long(questionId)))
-				.add(PropertyFactoryUtil.forName("answerId").eq(new Long(answerId)))
-				.setProjection(ProjectionFactoryUtil.count("answerId"));
-
-		@SuppressWarnings("unchecked")
-		List<Long> results = SurveyResultLocalServiceUtil.dynamicQuery(query);
-		
-		long total = getTotalAnswersByQuestionId(questionId);
-		
-		if(total > 0 && results.size()>0){
-			res = results.get(0) / (double)total * 100;
+		try {
+			count = SurveyResultUtil.countByAnswerIdQuestionId(answerId, questionId);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+				
+		if(total > 0 && count>0){
+			res = count / (double)total * 100;
 		}
 				
 		return res;
 	}
 	
-	public long getTotalAnswersByQuestionId(long questionId) throws SystemException
+	
+	public long getCountByQuestionIdAndAnswerId(long questionId, long answerId) throws SystemException
 	{ 
+		long count = 0;
+		
+		try {
+			count = SurveyResultUtil.countByAnswerIdQuestionId(answerId, questionId);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+								
+		return count;
+	}
+	
+	/**
+	 * Metodo depreciado, se utiliza una combinaci�n de los dos anteriores, para evitar consultas a base de datos innecesarias dentro de bucles.
+	 * @deprecated
+	 * @param questionId
+	 * @param answerId
+	 * @return
+	 * @throws SystemException
+	 */
+	public double getPercentageByQuestionIdAndAnswerId(long questionId, long answerId) throws SystemException
+	{ 
+		double res = 0;
+		long count = 0;
+		long total = getTotalAnswersByQuestionId(questionId);
+		
+		try {
+			count = SurveyResultUtil.countByAnswerIdQuestionId(answerId, questionId);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+				
+		if(total > 0 && count>0){
+			res = count / (double)total * 100;
+		}
+				
+		return res;
+	}
+	
+	public long getTotalAnswersByQuestionId(long questionId)
+			throws SystemException {
 		long res = new Long(0);
 
-		ClassLoader classLoader = (ClassLoader) PortletBeanLocatorUtil.locate(ClpSerializer.getServletContextName(), "portletClassLoader");
-		DynamicQuery query = DynamicQueryFactoryUtil.forClass(SurveyResult.class, classLoader)
-				.add(PropertyFactoryUtil.forName("questionId").eq(new Long(questionId)))
-				.setProjection(ProjectionFactoryUtil.count("questionId"));
-		
-		@SuppressWarnings("unchecked")
-		List<Long> results = SurveyResultLocalServiceUtil.dynamicQuery(query);
-		
-		if(results.size()>0)
-			res = results.get(0);
-		
+		try {
+			res = SurveyResultUtil.countByQuestionId(questionId);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
 		return res;
+	}
+	
+	public long countStudentsByQuestionId(long questionId, long companyId, long courseGropupCreatedId){
+		return SurveyResultFinderUtil.countStudentsByQuestionId(questionId, companyId, courseGropupCreatedId);
+	}
+	
+	public long countStudentsByQuestionIdAndAnswerId(long questionId, long answerId, long companyId, long courseGropupCreatedId){
+		return SurveyResultFinderUtil.countStudentsByQuestionIdAndAnswerId(questionId, answerId, companyId, courseGropupCreatedId);
 	}
 }

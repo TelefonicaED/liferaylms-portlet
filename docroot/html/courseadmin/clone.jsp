@@ -113,7 +113,6 @@
 		
 <script type="text/javascript">
 	function showAlert(ele){
-		console.log(ele);
 		document.getElementById("datesbox").style.visibility = "visible";			
 		if(<%=GroupLocalServiceUtil.getGroup(Long.parseLong(groupId)).getPublicLayoutSet().getLayoutSetPrototypeId()%> != ele.options[ele.selectedIndex].value){
 			alert("<%=UnicodeFormatter.toString(LanguageUtil.get(pageContext, "template-not-equals")) %>");
@@ -127,8 +126,17 @@
 		}
 	}
 </script>
-	
-					
+
+	<c:choose>
+		<c:when test="<%=GetterUtil.getBoolean(renderRequest.getPreferences().getValues(\"showcatalog\", new String[]{StringPool.TRUE})[0],true) %>">
+       			<aui:input type="hidden" name="visible"  value="true" />	
+		</c:when>
+		<c:otherwise>
+        		<aui:field-wrapper label="published-in-catalog">
+				<aui:input type="checkbox" name="visible" label="published-in-catalog" value="false" />	
+			</aui:field-wrapper>	
+		</c:otherwise>
+	</c:choose>
 				
 	<aui:button-row>
 		<aui:button type="submit" value="clone" />

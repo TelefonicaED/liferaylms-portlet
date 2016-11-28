@@ -244,6 +244,10 @@ public interface CourseResultLocalService extends BaseLocalService,
 		throws java.lang.Throwable;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.util.List<com.liferay.lms.model.CourseResult> getByUserId(
+		long userId);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.lms.model.CourseResult getByUserAndCourse(
 		long courseId, long userId)
 		throws com.liferay.portal.kernel.exception.SystemException;
@@ -251,11 +255,50 @@ public interface CourseResultLocalService extends BaseLocalService,
 	public long countByCourseId(long courseId, boolean passed)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
+	public long countByUserId(long userId)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	public long countStudentsStartedByCourseId(
+		com.liferay.lms.model.Course course,
+		java.util.List<com.liferay.portal.model.User> students, long teamId);
+
+	public long countStudentsFinishedByCourseId(
+		com.liferay.lms.model.Course course,
+		java.util.List<com.liferay.portal.model.User> students, long teamId);
+
+	public long countStudentsPassedByCourseId(
+		com.liferay.lms.model.Course course,
+		java.util.List<com.liferay.portal.model.User> students, long teamId);
+
+	public long countStudentsFailedByCourseId(
+		com.liferay.lms.model.Course course,
+		java.util.List<com.liferay.portal.model.User> students, long teamId);
+
+	/**
+	* @deprecated Renamed to {@link #countStudentsPassedByCourseId} or  {@link #countStudentsFailedByCourseId}
+	*/
 	public long countStudentsByCourseId(com.liferay.lms.model.Course course,
 		boolean passed)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
+	/**
+	* @deprecated Renamed to {@link #countStudentsPassedByCourseId} or  {@link #countStudentsFailedByCourseId}
+	*/
+	public long countStudentsByCourseId(com.liferay.lms.model.Course course,
+		java.util.List<com.liferay.portal.model.User> students, boolean passed)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* @deprecated Renamed to {@link #countStartedOnlyStudents}
+	*/
 	public long countStudentsByCourseId(com.liferay.lms.model.Course course)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* @deprecated Renamed to {@link #countStartedOnlyStudents}
+	*/
+	public long countStudentsByCourseId(com.liferay.lms.model.Course course,
+		java.util.List<com.liferay.portal.model.User> students)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	public java.lang.Double avgResult(long courseId, boolean passed)
@@ -264,9 +307,25 @@ public interface CourseResultLocalService extends BaseLocalService,
 	public java.lang.Double avgResult(long courseId)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
+	/**
+	* @deprecated Renamed to {@link #avgPassedStudentsResult}
+	*/
 	public java.lang.Double avgStudentsResult(
 		com.liferay.lms.model.Course course, boolean passed)
 		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* @deprecated Renamed to {@link #avgPassedStudentsResult}
+	*/
+	public java.lang.Double avgStudentsResult(
+		com.liferay.lms.model.Course course,
+		java.util.List<com.liferay.portal.model.User> students, boolean passed)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	public java.lang.Double avgPassedStudentsResult(
+		com.liferay.lms.model.Course course,
+		java.util.List<com.liferay.portal.model.User> students, boolean passed,
+		long teamId) throws com.liferay.portal.kernel.exception.SystemException;
 
 	public com.liferay.lms.model.CourseResult create(long courseId, long userId)
 		throws com.liferay.portal.kernel.exception.SystemException;
@@ -293,4 +352,8 @@ public interface CourseResultLocalService extends BaseLocalService,
 
 	public void softInitializeByGroupIdAndUserId(long groupId, long userId)
 		throws com.liferay.portal.kernel.exception.SystemException;
+
+	public void resetUser(long userId, long groupCreatedId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException;
 }

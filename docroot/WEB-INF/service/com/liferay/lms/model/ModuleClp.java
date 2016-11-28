@@ -515,6 +515,10 @@ public class ModuleClp extends BaseModelImpl<Module> implements Module {
 		_allowedTime = allowedTime;
 	}
 
+	public com.liferay.lms.model.Module getParentModule() {
+		throw new UnsupportedOperationException();
+	}
+
 	public BaseModel<?> getModuleRemoteModel() {
 		return _moduleRemoteModel;
 	}

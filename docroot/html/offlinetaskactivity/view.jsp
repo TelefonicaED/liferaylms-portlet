@@ -1,3 +1,5 @@
+<%@page import="com.liferay.lms.service.LmsPrefsLocalServiceUtil"%>
+<%@page import="com.liferay.lms.model.LmsPrefs"%>
 <%@page import="com.liferay.portal.service.TeamLocalServiceUtil"%>
 <%@page import="com.liferay.portal.model.Team"%>
 <%@page import="com.liferay.portal.kernel.util.ListUtil"%>
@@ -29,6 +31,7 @@
 <%@ include file="/init.jsp" %>
 <div class="container-activity">
 <%
+	LmsPrefs prefs=LmsPrefsLocalServiceUtil.getLmsPrefs(themeDisplay.getCompanyId());
 	long actId = ParamUtil.getLong(request,"actId",0);
 	
 	if(actId==0)
@@ -256,6 +259,17 @@
 							LinkedHashMap<String,Object> params = new LinkedHashMap<String,Object>();
 							
 							params.put("usersGroups", new Long(themeDisplay.getScopeGroupId()));
+							 params.put("notInCourseRoleTeach", new CustomSQLParam("WHERE User_.userId NOT IN "
+						              + " (SELECT UserGroupRole.userId " + "  FROM UserGroupRole "
+						              + "  WHERE  (UserGroupRole.groupId = ?) AND (UserGroupRole.roleId = ?))", new Long[] {
+						              course.getGroupCreatedId(),
+						              RoleLocalServiceUtil.getRole(prefs.getTeacherRole()).getRoleId() }));
+							 
+							 params.put("notInCourseRoleEdit", new CustomSQLParam("WHERE User_.userId NOT IN "
+						              + " (SELECT UserGroupRole.userId " + "  FROM UserGroupRole "
+						              + "  WHERE  (UserGroupRole.groupId = ?) AND (UserGroupRole.roleId = ?))", new Long[] {
+						              course.getGroupCreatedId(),
+						              RoleLocalServiceUtil.getRole(prefs.getEditorRole()).getRoleId() }));
 							if(gradeFilter.equals("passed")) {
 								params.put("passed",new CustomSQLParam(OfflineActivity.ACTIVITY_RESULT_PASSED_SQL,actId));
 							}

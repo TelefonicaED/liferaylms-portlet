@@ -35,7 +35,7 @@ AUI().ready('node-base' ,'aui-form-validator', 'aui-overlay-context-panel', func
 		},
         fieldStrings: {
             <portlet:namespace />text: {
-	    		required: '<liferay-ui:message key="execactivity.editquestions.newquestion.error.text.required" />'
+	    		required: Liferay.Language.get("execactivity.editquestions.newquestion.error.text.required")
 	        }
 	    },
 		on: {		

@@ -62,6 +62,16 @@
 		<finder name="m" return-type="Collection">
 			<finder-column name="moduleId" />
 		</finder>
+		
+		<finder name="ModuleId_Weightinmodule" return-type="Collection">
+			<finder-column name="moduleId" />
+			<finder-column name="weightinmodule" comparator="&gt;" />
+		</finder>
+		
+		<finder name="Precedence" return-type="Collection">
+			<finder-column name="precedence" />
+		</finder>
+		
 		<reference package-path="com.liferay.portal" entity="User" />
 		<reference package-path="com.liferay.portal" entity="Role" />
 		<reference package-path="com.liferay.portal" entity="Team" />
@@ -80,8 +90,9 @@
 		<column name="actId" type="long" />
 		<column name="text" type="String" />
 		<column name="questionType" type="long" />
-		<column name="weight" type="long" />
-        <column name="extracontent" type="String"></column>		
+		<column name="weight" type="long" />	
+		<column name="penalize" type="boolean" />	
+		<column name="extracontent" type="String"></column>	
 		<order by="asc">
 			<order-column name="questionId"  />
 		</order>
@@ -111,6 +122,9 @@
 		<finder name="ActId" return-type="Collection">
 			<finder-column name="actId" />
 		</finder>
+		<finder name="UserId" return-type="Collection">
+			<finder-column name="userId" />
+		</finder>			
 	</entity>
 	
 	<entity name="P2pActivityCorrections" uuid="true" local-service="true" remote-service="false" json-enabled="false">
@@ -134,6 +148,9 @@
 			<finder-column name="p2pActivityId" />
 			<finder-column name="userId" />
 		</finder>
+		<finder name="UserId" return-type="Collection">
+			<finder-column name="userId" />
+		</finder>			
 	</entity>
 	
 	<entity name="TestAnswer" uuid="true" local-service="true"
@@ -180,10 +197,15 @@
 			<finder-column name="actId" />
 			<finder-column name="userId" />
 		</finder>
+		<finder name="UserId" return-type="Collection">
+			<finder-column name="userId" />
+		</finder>		
 	</entity>
+
+
 	
 	<entity name="LearningActivityResult" uuid="true" local-service="true"
-		remote-service="true" json-enabled="false" cache-enabled="false">
+		remote-service="true" json-enabled="false" cache-enabled="false" persistence-class="com.liferay.lms.service.persistence.LearningActivityResultPersistenceImpl">
 
 		<column name="larId" type="long" primary="true" />
 		<column name="actId" type="long" />
@@ -280,6 +302,9 @@
 			<finder-column name="moduleId" />
 			<finder-column name="passed" />
 		</finder>
+		<finder name="UserId" return-type="Collection">
+			<finder-column name="userId" />
+		</finder>			
 	</entity>
 		<entity name="Competence" local-service="true" remote-service="true" uuid="true" json-enabled="false">
 		<!-- Primary key column -->
@@ -446,6 +471,9 @@
 			<finder-column name="courseId" />
 			<finder-column name="passed" />
 		</finder>
+		<finder name="UserId" return-type="Collection">
+			<finder-column name="userId" />
+		</finder>	
 	</entity>
 	
 	<entity name="CheckP2pMailing" local-service="true" json-enabled="false" remote-service="false">
@@ -467,7 +495,10 @@
         <column name="courseevals" type="String"></column>
         <column name="scoretranslators" type="String"></column>
         <column name="usersResults" type="long"></column>
-         <column name="debugScorm" type="boolean"></column>
+        <column name="debugScorm" type="boolean"></column>
+        <column name="hasAPILicence" type="boolean"></column>
+        <column name="showHideActivity" type="boolean"></column>
+        <column name="viewCoursesFinished" type="boolean"></column>
     </entity>
         
 	<entity name="SurveyResult" uuid="true" local-service="true" remote-service="false" json-enabled="false">
@@ -477,8 +508,26 @@
 		<column name="questionId" type="long" />
 		<column name="answerId" type="long" />
 		<column name="userId" type="long" />
-		<column name="freeAnswer" type="String"/>
-	</entity>        
+		<column name="freeAnswer" type="String"/>		
+		<finder name="UserId" return-type="Collection">
+			<finder-column name="userId" />
+		</finder>
+		<finder name="ActId" return-type="Collection">
+			<finder-column name="actId" />
+		</finder>
+		<finder name="QuestionIdActId"	return-type="Collection">
+			<finder-column name="questionId" />
+			<finder-column name="actId" />
+		</finder>
+		<finder name="QuestionId"	return-type="Collection">
+			<finder-column name="questionId" />
+		</finder>
+		<finder name="AnswerIdQuestionId"	return-type="Collection">
+			<finder-column name="answerId" />
+			<finder-column name="questionId" />
+		</finder>		
+	</entity>  
+	      
      <entity name="SCORMContent" local-service="true" remote-service="true" uuid="true" json-enabled="false">
 		<!-- Primary key column -->
 		<column name="scormId" type="long" primary="true" />
@@ -557,9 +606,35 @@
 			<finder-column name="classPK" />
 		</finder>
     </entity>   
+    <entity name="Schedule" local-service="true" remote-service="false" json-enabled="false">
+        <column name="secheduleId" type="long" primary="true"></column>
+        <column name="teamId" type="long"></column>
+    	<column name="startDate" type="Date"></column>     
+        <column name="endDate" type="Date"></column>
+        <finder name="TeamId" return-type="Sechedule">
+			<finder-column name="teamId" />
+		</finder>
+    </entity>
+    <entity name="ActivityTriesDeleted" local-service="true" remote-service="false">
+    	<column name="activityTriesDeletedId" type="long" primary="true"></column>
+    	<column name="groupId" type="long"></column>
+    	<column name="actId" type="long"></column>
+    	<column name="userId" type="long"></column>
+    	<column name="startDate" type="Date"></column> 
+    	<column name="endDate" type="Date"></column>
+    	<column name="status" type="int" />
+    	<finder name="GroupId" return-type="Collection">
+			<finder-column name="groupId" />
+		</finder>
+		<finder name="ActIdStatus" return-type="Collection">
+			<finder-column name="actId" />
+			<finder-column name="status" />
+		</finder>
+    </entity>
     <entity name="AuditLogger" local-service="true" remote-service="true">
     </entity>
-	<exceptions>
+    <exceptions>
 		<exception>NoSuchModule</exception>
 	</exceptions>
+
 </service-builder>
