@@ -148,6 +148,14 @@ public class CourseServiceClp implements CourseService {
 		_methodName26 = "getChildCourses";
 
 		_methodParameterTypes26 = new String[] { "long" };
+
+		_methodName27 = "getStudentsFromCourseCount";
+
+		_methodParameterTypes27 = new String[] { "long" };
+
+		_methodName28 = "getPublicCoursesByCompanyId";
+
+		_methodParameterTypes28 = new String[] { "java.lang.Long", "int", "int" };
 	}
 
 	public java.lang.String getBeanIdentifier() {
@@ -1027,6 +1035,63 @@ public class CourseServiceClp implements CourseService {
 		return (java.util.List<com.liferay.lms.model.Course>)ClpSerializer.translateOutput(returnObj);
 	}
 
+	public int getStudentsFromCourseCount(long courseId) {
+		Object returnObj = null;
+
+		try {
+			returnObj = _invokableService.invokeMethod(_methodName27,
+					_methodParameterTypes27, new Object[] { courseId });
+		}
+		catch (Throwable t) {
+			t = ClpSerializer.translateThrowable(t);
+
+			if (t instanceof RuntimeException) {
+				throw (RuntimeException)t;
+			}
+			else {
+				throw new RuntimeException(t.getClass().getName() +
+					" is not a valid exception");
+			}
+		}
+
+		return ((Integer)returnObj).intValue();
+	}
+
+	public java.util.List<com.liferay.lms.model.Course> getPublicCoursesByCompanyId(
+		java.lang.Long companyId, int start, int end)
+		throws com.liferay.portal.security.auth.PrincipalException {
+		Object returnObj = null;
+
+		try {
+			returnObj = _invokableService.invokeMethod(_methodName28,
+					_methodParameterTypes28,
+					new Object[] {
+						ClpSerializer.translateInput(companyId),
+						
+					start,
+						
+					end
+					});
+		}
+		catch (Throwable t) {
+			t = ClpSerializer.translateThrowable(t);
+
+			if (t instanceof com.liferay.portal.security.auth.PrincipalException) {
+				throw (com.liferay.portal.security.auth.PrincipalException)t;
+			}
+
+			if (t instanceof RuntimeException) {
+				throw (RuntimeException)t;
+			}
+			else {
+				throw new RuntimeException(t.getClass().getName() +
+					" is not a valid exception");
+			}
+		}
+
+		return (java.util.List<com.liferay.lms.model.Course>)ClpSerializer.translateOutput(returnObj);
+	}
+
 	private InvokableService _invokableService;
 	private String _methodName0;
 	private String[] _methodParameterTypes0;
@@ -1080,4 +1145,8 @@ public class CourseServiceClp implements CourseService {
 	private String[] _methodParameterTypes25;
 	private String _methodName26;
 	private String[] _methodParameterTypes26;
+	private String _methodName27;
+	private String[] _methodParameterTypes27;
+	private String _methodName28;
+	private String[] _methodParameterTypes28;
 }

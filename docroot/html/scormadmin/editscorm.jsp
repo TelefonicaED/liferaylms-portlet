@@ -46,6 +46,8 @@ String description=ParamUtil.getString(request, "description", "");
 String title=ParamUtil.getString(request, "title", "");
 String[] tags = ParamUtil.getParameterValues(request, "tags", new String[0]);
 String[] categories = ParamUtil.getParameterValues(request, "categories", new String[0]);
+String vocabularyTitle = ParamUtil.getString(request,"vocabularyTitle");
+Object[] args = vocabularyTitle.split(StringPool.COMMA);
 SCORMContent scorm=null;
 if(scormId>0)
 {
@@ -73,7 +75,12 @@ else
 <liferay-ui:error key="scormadmin.error.nozip.corrupt" message="scormadmin.error.nozip.corrupt"/>
 <liferay-ui:error key="scormadmin.error.nomanifest" message="scormadmin.error.nomanifest"/>
 <liferay-ui:error key="scormadmin.error.nomanifestincorrect" message="scormadmin.error.nomanifestincorrect"/>
-<liferay-ui:error key="scormadmin.error.requiredcategories" message="scormadmin.error.requiredcategories"/>
+<liferay-ui:error key="please-select-at-least-one-category-for-x">
+	<liferay-ui:message key="please-select-at-least-one-category-for-x" arguments="<%=args%>"/>
+</liferay-ui:error>
+<liferay-ui:error key="you-cannot-select-more-than-one-category-for-x">
+	<liferay-ui:message key="you-cannot-select-more-than-one-category-for-x" arguments="<%=args%>"/>
+</liferay-ui:error>
 
 <%
 long fileMaxSize = PrefsPropsUtil.getLong(PropsKeys.DL_FILE_MAX_SIZE);

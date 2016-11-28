@@ -72,7 +72,6 @@
 			Course course = CourseLocalServiceUtil.getCourseByGroupCreatedId(learningActivity.getGroupId());
 			long courseUsers = CourseLocalServiceUtil.getStudentsFromCourseCount(course.getCourseId());
 			double passPercent =  ((double)participants/(double)courseUsers)*100;
-
 			percent  = df.format(passPercent);
 			%>
 		
@@ -219,7 +218,9 @@ function <portlet:namespace />downloadReport(url){
 						alert("Error en el readThreadState");
 					}
 				},
-				error: function(){					
+				error: function(){		
+					$('#<portlet:namespace />generating_report').addClass("aui-helper-hidden");
+		    		$('#<portlet:namespace />generate_report').removeClass("aui-helper-hidden");
 				}
 			});		
 		}	

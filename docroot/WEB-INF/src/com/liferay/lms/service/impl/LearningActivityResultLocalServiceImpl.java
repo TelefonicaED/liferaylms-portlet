@@ -95,7 +95,8 @@ public class LearningActivityResultLocalServiceImpl	extends LearningActivityResu
 		long actId=learningActivityTry.getActId();
 		long userId=learningActivityTry.getUserId();
 		LearningActivityResult learningActivityResult=getByActIdAndUserId(actId, userId);
-		LearningActivity learningActivity=LearningActivityLocalServiceUtil.getLearningActivity(actId);
+		LearningActivity learningActivity=learningActivityLocalService.getLearningActivity(actId);
+		boolean recalculateActivity = false;
 		if(learningActivityResult==null){	
 			learningActivityResult=
 					learningActivityResultPersistence.create(counterLocalService.increment(
@@ -104,32 +105,38 @@ public class LearningActivityResultLocalServiceImpl	extends LearningActivityResu
 			learningActivityResult.setActId(actId);
 			learningActivityResult.setUserId(userId);
 			learningActivityResult.setPassed(false);
-		}else{
-			learningActivityResult=learningActivityResultPersistence.fetchByact_user(actId, userId);
+			recalculateActivity = true;
 		}
 
 		if(learningActivityTry.getEndDate()!=null){
+			
 			long cuantosTryLlevo=LearningActivityTryLocalServiceUtil.getTriesCountByActivityAndUser(actId, userId);
 			if(learningActivity.getTries()>0&&cuantosTryLlevo>=learningActivity.getTries()){
 				learningActivityResult.setEndDate(learningActivityTry.getEndDate());
+				recalculateActivity= true;
 			}
 
 			if(learningActivityTry.getResult()>learningActivityResult.getResult()){			
 				learningActivityResult.setResult(learningActivityTry.getResult());
+				recalculateActivity= true;
 			}
 
 			if(!learningActivityResult.getPassed()){
 				if(learningActivityTry.getResult()>=learningActivity.getPasspuntuation()){
 					learningActivityResult.setEndDate(learningActivityTry.getEndDate());
-					learningActivityResult.setPassed(true);				  
+					learningActivityResult.setPassed(true);	
+					recalculateActivity= true;					
 				}
 			}	
-
-			learningActivityResult.setComments(learningActivityTry.getComments());
+			if(Validator.isNotNull(learningActivityTry.getComments())&&!learningActivityTry.getComments().equals(learningActivityResult.getComments())){
+				learningActivityResult.setComments(learningActivityTry.getComments());
+				recalculateActivity= true;
+			}
 		}
-
-		learningActivityResultPersistence.update(learningActivityResult, true);
-		ModuleResultLocalServiceUtil.update(learningActivityResult);
+		if(recalculateActivity){
+			learningActivityResultPersistence.update(learningActivityResult, true);
+			moduleResultLocalService.update(learningActivityResult);
+		}		
 
 
 		//auditing
@@ -816,11 +823,11 @@ public class LearningActivityResultLocalServiceImpl	extends LearningActivityResu
 		// Se indica el final del try.
 		learningActivityTry.setEndDate(new Date());
 		if (log.isDebugEnabled()) {
-			log.debug("Se llama a la actualizaci�n del try " + latId);
+			log.debug("Se llama a la actualizaciï¿½n del try " + latId);
 		}
 		learningActivityTryLocalService
 				.updateLearningActivityTry(learningActivityTry);
-		// Se comprueba el nuevo estado del result para realizar la modificaci�n
+		// Se comprueba el nuevo estado del result para realizar la modificaciï¿½n
 		// del mismo si es necesario.
 		LearningActivityResult laResult = learningActivityResultLocalService
 				.getByActIdAndUserId(learningActivityTry.getActId(), userId);
@@ -828,7 +835,7 @@ public class LearningActivityResultLocalServiceImpl	extends LearningActivityResu
 		// result o no.
 		boolean saveResult = false;
 		// Si el resultado obtenido es mayor que el mastery score de la
-		// actividad se da como aprobada o la actividad tiene marcada la opci�n
+		// actividad se da como aprobada o la actividad tiene marcada la opciï¿½n
 		// de "Completado como Aprobado" y
 		// se ha obtenido un Completado, se cambia a Aprobado.
 		if (scoreTry > master_score || (completedAsPassed
@@ -846,21 +853,21 @@ public class LearningActivityResultLocalServiceImpl	extends LearningActivityResu
 						+ " la nota anterior era " + scoreResult);
 			}
 		}
-		// Se comprueban las distintas casu�sticas dependiendo del estado
+		// Se comprueban las distintas casuï¿½sticas dependiendo del estado
 		// obtenido.
-		// En el caso de que se haya obtenido un Iniciado se deber�a actualizar
+		// En el caso de que se haya obtenido un Iniciado se deberï¿½a actualizar
 		// el LearningActivityResult cuando se haya obtenido mejor resultado y/o
 		// se haya superado el mastery score (passed).
-		// Ambos casos est�n contemplados previamente, con lo que no se realiza
+		// Ambos casos estï¿½n contemplados previamente, con lo que no se realiza
 		// nada.
 		/*
 		 * if ("incomplete".equals(total_completion_status)) { }
 		 */
-		// En el caso de que se haya obtenido un Completado se deber�a
+		// En el caso de que se haya obtenido un Completado se deberï¿½a
 		// actualizar el LearningActivityResult cuando se haya obtenido mejor
 		// resultado, mastery score (passed) o se tenga un "completed"
-		// cuando est� establecido un "Completado como pasado" en la actividad.
-		// Todos los casos est�n contemplados previamente con lo que no se debe
+		// cuando estï¿½ establecido un "Completado como pasado" en la actividad.
+		// Todos los casos estï¿½n contemplados previamente con lo que no se debe
 		// hacer nada.
 		/*
 		 * if ("completed".equals(total_completion_status)) { }
@@ -871,11 +878,11 @@ public class LearningActivityResultLocalServiceImpl	extends LearningActivityResu
 			if (!laResult.getPassed()) {
 				laResult.setPassed(true);
 				laResult.setEndDate(new Date());
-				// No deber�a ser necesario, pero por si acaso se vuelve a
+				// No deberï¿½a ser necesario, pero por si acaso se vuelve a
 				// establecer el resultado.
 				laResult.setResult(scoreTry);
 				if (log.isDebugEnabled()) {
-					log.debug("Se llama a la actualizaci�n del LearningActivityResult (estado Aprobado) "
+					log.debug("Se llama a la actualizaciï¿½n del LearningActivityResult (estado Aprobado) "
 							+ laResult.getLarId());
 				}
 				saveResult = true;
@@ -888,7 +895,7 @@ public class LearningActivityResultLocalServiceImpl	extends LearningActivityResu
 				laResult.setPassed(false);
 				laResult.setEndDate(new Date());
 				if (log.isDebugEnabled()) {
-					log.debug("Se llama a la actualizaci�n del LearningActivityResult (estado Suspenso) "
+					log.debug("Se llama a la actualizaciï¿½n del LearningActivityResult (estado Suspenso) "
 							+ laResult.getLarId());
 				}
 				saveResult = true;
@@ -1062,7 +1069,7 @@ public class LearningActivityResultLocalServiceImpl	extends LearningActivityResu
 	@Deprecated
 	@Override
 	/**
-	 * @deprecated Depreciado el m�todo
+	 * @deprecated Depreciado el método
 	 */
 	public double triesPerUserOnlyStudents(long actId, long companyId, long courseGropupCreatedId) throws SystemException {
 		return triesPerUserOnlyStudents(actId, companyId, courseGropupCreatedId, null, 0);
@@ -1071,7 +1078,7 @@ public class LearningActivityResultLocalServiceImpl	extends LearningActivityResu
 	@Deprecated
 	@Override
 	/**
-	 * @deprecated Depreciado el m�todo
+	 * @deprecated Depreciado el método
 	 */
 	public double triesPerUserOnlyStudents(long actId, long companyId, long courseGropupCreatedId, List<User> _students) throws SystemException
 	{

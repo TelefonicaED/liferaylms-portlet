@@ -220,6 +220,16 @@ public class CourseServiceWrapper implements CourseService,
 		return _courseService.getChildCourses(courseId);
 	}
 
+	public int getStudentsFromCourseCount(long courseId) {
+		return _courseService.getStudentsFromCourseCount(courseId);
+	}
+
+	public java.util.List<com.liferay.lms.model.Course> getPublicCoursesByCompanyId(
+		java.lang.Long companyId, int start, int end)
+		throws com.liferay.portal.security.auth.PrincipalException {
+		return _courseService.getPublicCoursesByCompanyId(companyId, start, end);
+	}
+
 	/**
 	 * @deprecated Renamed to {@link #getWrappedService}
 	 */

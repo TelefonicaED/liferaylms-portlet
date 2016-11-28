@@ -33,7 +33,9 @@ Liferay.Service.registerClass(
 		existsCourseName: true,
 		getLogoUrl: true,
 		getCoursesParents: true,
-		getChildCourses: true
+		getChildCourses: true,
+		getStudentsFromCourseCount: true,
+		getPublicCoursesByCompanyId: true
 	}
 );
 

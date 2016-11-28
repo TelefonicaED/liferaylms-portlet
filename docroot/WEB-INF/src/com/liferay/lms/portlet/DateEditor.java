@@ -290,7 +290,7 @@ private static Log log = LogFactoryUtil.getLog(DateEditor.class);
 		date.set(Calendar.YEAR, year);
 		date.set(Calendar.MONTH, month);
 		date.set(Calendar.DAY_OF_MONTH, day);
-		date.set(Calendar.HOUR, hour);
+		date.set(Calendar.HOUR_OF_DAY, hour);
 		date.set(Calendar.MINUTE, minute);
 		date.set(Calendar.SECOND, 0);
 		date.set(Calendar.MILLISECOND,0);

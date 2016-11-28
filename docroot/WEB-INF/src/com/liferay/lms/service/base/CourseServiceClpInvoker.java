@@ -148,6 +148,14 @@ public class CourseServiceClpInvoker {
 		_methodName216 = "getChildCourses";
 
 		_methodParameterTypes216 = new String[] { "long" };
+
+		_methodName217 = "getStudentsFromCourseCount";
+
+		_methodParameterTypes217 = new String[] { "long" };
+
+		_methodName218 = "getPublicCoursesByCompanyId";
+
+		_methodParameterTypes218 = new String[] { "java.lang.Long", "int", "int" };
 	}
 
 	public Object invokeMethod(String name, String[] parameterTypes,
@@ -318,6 +326,18 @@ public class CourseServiceClpInvoker {
 			return CourseServiceUtil.getChildCourses(((Long)arguments[0]).longValue());
 		}
 
+		if (_methodName217.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes217, parameterTypes)) {
+			return CourseServiceUtil.getStudentsFromCourseCount(((Long)arguments[0]).longValue());
+		}
+
+		if (_methodName218.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes218, parameterTypes)) {
+			return CourseServiceUtil.getPublicCoursesByCompanyId((java.lang.Long)arguments[0],
+				((Integer)arguments[1]).intValue(),
+				((Integer)arguments[2]).intValue());
+		}
+
 		throw new UnsupportedOperationException();
 	}
 
@@ -373,4 +393,8 @@ public class CourseServiceClpInvoker {
 	private String[] _methodParameterTypes215;
 	private String _methodName216;
 	private String[] _methodParameterTypes216;
+	private String _methodName217;
+	private String[] _methodParameterTypes217;
+	private String _methodName218;
+	private String[] _methodParameterTypes218;
 }

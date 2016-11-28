@@ -28,6 +28,7 @@ import com.liferay.portal.model.ResourceAction;
 import com.liferay.portal.model.ResourceConstants;
 import com.liferay.portal.model.Role;
 import com.liferay.portal.model.RoleConstants;
+import com.liferay.portal.model.User;
 import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.service.LayoutLocalServiceUtil;
 import com.liferay.portal.service.LayoutSetPrototypeLocalServiceUtil;
@@ -91,6 +92,12 @@ public class StartupAction extends SimpleAction {
 		if (table2 != null) {
 				createExpandoColumn(table2, "Abreviatura", ExpandoColumnConstants.STRING,
 							ExpandoColumnConstants.INDEX_TYPE_TEXT, ExpandoColumnConstants.PROPERTY_DISPLAY_TYPE, "", true);
+		}
+		
+		ExpandoTable table3 = getExpandoTable(companyId, User.class.getName(), ExpandoTableConstants.DEFAULT_TABLE_NAME);
+		if (table2 != null) {
+				createExpandoColumn(table3, "deregister-mail", ExpandoColumnConstants.BOOLEAN,
+							ExpandoColumnConstants.INDEX_TYPE_TEXT, ExpandoColumnConstants.PROPERTY_DISPLAY_TYPE_CHECKBOX, "", true);
 		}
 		
 	}

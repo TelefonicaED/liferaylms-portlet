@@ -470,7 +470,7 @@ public class LearningActivityResultLocalServiceUtil {
 	}
 
 	/**
-	* @deprecated Depreciado el mÃ¯Â¿Â½todo
+	* @deprecated Depreciado el mÃƒÂ©todo
 	*/
 	public static double triesPerUserOnlyStudents(long actId, long companyId,
 		long courseGropupCreatedId)
@@ -481,7 +481,7 @@ public class LearningActivityResultLocalServiceUtil {
 	}
 
 	/**
-	* @deprecated Depreciado el mÃ¯Â¿Â½todo
+	* @deprecated Depreciado el mÃƒÂ©todo
 	*/
 	public static double triesPerUserOnlyStudents(long actId, long companyId,
 		long courseGropupCreatedId,

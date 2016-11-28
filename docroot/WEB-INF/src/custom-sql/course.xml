@@ -536,5 +536,21 @@
 				c.courseId
 		]]>
 	</sql>
+	<sql id="com.liferay.lms.service.persistence.CourseFinder.getExistingUserCourses">
+		<![CDATA[   		
+			SELECT 
+				c.*
+			FROM 
+				lms_course c
+			INNER JOIN 
+				users_groups u 
+					ON c.groupCreatedId = u.groupId AND u.userId = ?
+			WHERE 
+				c.closed = 0 
+			GROUP By 
+				c.courseId
+			LIMIT [$START$], [$END$]
+		]]>
+	</sql>
 	
 </custom-sql>

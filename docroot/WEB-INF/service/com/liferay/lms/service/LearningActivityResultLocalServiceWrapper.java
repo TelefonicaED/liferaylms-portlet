@@ -457,7 +457,7 @@ public class LearningActivityResultLocalServiceWrapper
 	}
 
 	/**
-	* @deprecated Depreciado el mÃ¯Â¿Â½todo
+	* @deprecated Depreciado el mÃƒÂ©todo
 	*/
 	public double triesPerUserOnlyStudents(long actId, long companyId,
 		long courseGropupCreatedId)
@@ -467,7 +467,7 @@ public class LearningActivityResultLocalServiceWrapper
 	}
 
 	/**
-	* @deprecated Depreciado el mÃ¯Â¿Â½todo
+	* @deprecated Depreciado el mÃƒÂ©todo
 	*/
 	public double triesPerUserOnlyStudents(long actId, long companyId,
 		long courseGropupCreatedId,

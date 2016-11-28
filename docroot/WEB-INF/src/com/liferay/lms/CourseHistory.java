@@ -67,6 +67,10 @@ public class CourseHistory extends MVCPortlet
 				} else if (course!= null){
 					groupsel= GroupLocalServiceUtil.getGroup(course.getGroupCreatedId());	
 			     	courseResult=CourseResultLocalServiceUtil.getByUserAndCourse(course.getCourseId(), themeDisplay.getUserId());
+			     	
+			     	if(courseResult != null && courseResult.getPassedDate() != null){
+			           courses.add(new CourseResultView(course, courseResult, themeDisplay));
+			        }
 
 					finishDate=null;
 					if(courseResult!=null && courseResult.getAllowFinishDate()!=null){

@@ -359,14 +359,14 @@ public interface LearningActivityResultLocalService extends BaseLocalService,
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	/**
-	* @deprecated Depreciado el mï¿½todo
+	* @deprecated Depreciado el mÃ©todo
 	*/
 	public double triesPerUserOnlyStudents(long actId, long companyId,
 		long courseGropupCreatedId)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	/**
-	* @deprecated Depreciado el mï¿½todo
+	* @deprecated Depreciado el mÃ©todo
 	*/
 	public double triesPerUserOnlyStudents(long actId, long companyId,
 		long courseGropupCreatedId,

@@ -241,6 +241,16 @@ public class CourseServiceUtil {
 		return getService().getChildCourses(courseId);
 	}
 
+	public static int getStudentsFromCourseCount(long courseId) {
+		return getService().getStudentsFromCourseCount(courseId);
+	}
+
+	public static java.util.List<com.liferay.lms.model.Course> getPublicCoursesByCompanyId(
+		java.lang.Long companyId, int start, int end)
+		throws com.liferay.portal.security.auth.PrincipalException {
+		return getService().getPublicCoursesByCompanyId(companyId, start, end);
+	}
+
 	public static void clearService() {
 		_service = null;
 	}

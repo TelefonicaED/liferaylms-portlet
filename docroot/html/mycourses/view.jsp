@@ -9,7 +9,7 @@
 		<div class="course option-more">
 			<c:set var="url" value="${courseResult.course.url }"/>
 			<c:if test="${not empty themeDisplay.doAsUserId }">
-				<c:set var="url" value='${url + "?doAsUserId=" + themeDisplay.doAsUserId }'/>
+				<c:set var="url" value='${url}?doAsUserId=${themeDisplay.doAsUserId}'/>
 			</c:if>
 			
 			<c:choose>

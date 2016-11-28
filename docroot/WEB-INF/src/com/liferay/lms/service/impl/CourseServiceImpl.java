@@ -14,12 +14,10 @@
 
 package com.liferay.lms.service.impl;
 
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
-
-import javax.mail.internet.InternetAddress;
 
 import com.liferay.lms.auditing.AuditConstants;
 import com.liferay.lms.auditing.AuditingLogFactory;
@@ -29,23 +27,23 @@ import com.liferay.lms.model.LmsPrefs;
 import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.lms.service.LmsPrefsLocalServiceUtil;
 import com.liferay.lms.service.base.CourseServiceBaseImpl;
-import com.liferay.mail.service.MailServiceUtil;
+import com.liferay.portal.kernel.dao.orm.DynamicQuery;
+import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
+import com.liferay.portal.kernel.dao.orm.ProjectionFactoryUtil;
+import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
+import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.jsonwebservice.JSONWebService;
 import com.liferay.portal.kernel.jsonwebservice.JSONWebServiceMode;
-import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.mail.MailMessage;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.util.ArrayUtil;
-import com.liferay.portal.kernel.util.PrefsPropsUtil;
-import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.model.Company;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.GroupConstants;
 import com.liferay.portal.model.Role;
@@ -55,7 +53,7 @@ import com.liferay.portal.model.UserGroup;
 import com.liferay.portal.model.UserGroupRole;
 import com.liferay.portal.security.auth.PrincipalException;
 import com.liferay.portal.security.permission.ActionKeys;
-import com.liferay.portal.service.CompanyLocalServiceUtil;
+import com.liferay.portal.service.ClassNameLocalServiceUtil;
 import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.RoleLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
@@ -66,6 +64,7 @@ import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.service.UserServiceUtil;
 import com.liferay.portal.service.permission.PortalPermissionUtil;
 import com.liferay.portal.util.PortalUtil;
+import com.liferay.portlet.asset.model.AssetEntry;
 import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.util.DLUtil;
 
@@ -222,22 +221,25 @@ public class CourseServiceImpl extends CourseServiceBaseImpl {
 	public void addStudentToCourse(long courseId,String login) throws PortalException, SystemException
 	{
 		ServiceContext serviceContext = ServiceContextThreadLocal.getServiceContext();
-		Course course=courseLocalService.getCourse(courseId);
-		if(getPermissionChecker().hasPermission(course.getGroupId(),  Course.class.getName(),courseId,"ASSIGN_MEMBERS")&& ! course.isClosed())
-		{
-			User user = userLocalService.getUserByScreenName(serviceContext.getCompanyId(), login);
-			if (!GroupLocalServiceUtil.hasUserGroup(user.getUserId(), course.getGroupCreatedId())) {
-				GroupLocalServiceUtil.addUserGroups(user.getUserId(), new long[] { course.getGroupCreatedId() });
-				//sendEmail(user,course);
-			}
-			
-			UserGroupRoleLocalServiceUtil.addUserGroupRoles(new long[] { user.getUserId() },
-					course.getGroupCreatedId(), RoleLocalServiceUtil.getRole(serviceContext.getCompanyId(), RoleConstants.SITE_MEMBER).getRoleId());
+		Course course=courseLocalService.fetchCourse(courseId);
+		User user = userLocalService.fetchUserByScreenName(serviceContext.getCompanyId(), login);
+		if(course!=null && user!=null){
+			if(getPermissionChecker().hasPermission(course.getGroupId(),  Course.class.getName(),courseId,"ASSIGN_MEMBERS")&& ! course.isClosed())
+			{
+				
+				if (!GroupLocalServiceUtil.hasUserGroup(user.getUserId(), course.getGroupCreatedId())) {
+					GroupLocalServiceUtil.addUserGroups(user.getUserId(), new long[] { course.getGroupCreatedId() });
+					//sendEmail(user,course);
+				}
+				
+				UserGroupRoleLocalServiceUtil.addUserGroupRoles(new long[] { user.getUserId() },
+						course.getGroupCreatedId(), RoleLocalServiceUtil.getRole(serviceContext.getCompanyId(), RoleConstants.SITE_MEMBER).getRoleId());
 
-			//auditing
-			AuditingLogFactory.audit(course.getCompanyId(), course.getGroupId(), Course.class.getName(), course.getCourseId(), serviceContext.getUserId(), AuditConstants.REGISTER, null);
-			
-		 
+				//auditing
+				AuditingLogFactory.audit(course.getCompanyId(), course.getGroupId(), Course.class.getName(), course.getCourseId(), serviceContext.getUserId(), AuditConstants.REGISTER, null);
+				
+			 
+			}
 		}
 	}
 	@JSONWebService
@@ -524,6 +526,7 @@ public class CourseServiceImpl extends CourseServiceBaseImpl {
 		}
 		return "";
 	}
+
 	@JSONWebService
 	public java.util.List<Course> getCoursesParents(long groupId) 
 			throws SystemException, PortalException
@@ -542,8 +545,140 @@ public class CourseServiceImpl extends CourseServiceBaseImpl {
 		}
 		return null;
 	}
-	private void sendEmail(User user, Course course){
-		if(course.isWelcome()&&user!=null&&course!=null){
+
+
+
+/*
+	@JSONWebService
+	public List<User> getTeachersFromCourse(long courseId) {
+		List<User> users = new ArrayList<User>();
+		try{
+			
+			Course course = courseLocalService.fetchCourse(courseId);
+			if (getPermissionChecker() == null
+					|| course == null
+					|| !(getPermissionChecker().hasPermission(course.getGroupId(), Course.class.getName(),
+							course.getCourseId(), "VIEW") || getPermissionChecker()
+							.hasOwnerPermission(course.getCompanyId(), Course.class.getName(), course.getCourseId(),
+									course.getUserId(), "VIEW"))) {
+				return users;
+			}
+	
+			
+			LinkedHashMap<String, Object> userParams = new LinkedHashMap<String, Object>();
+			LmsPrefs prefs;			
+			prefs = LmsPrefsLocalServiceUtil.getLmsPrefs(course.getCompanyId());
+			long teacherRoleId=RoleLocalServiceUtil.getRole(prefs.getTeacherRole()).getRoleId();
+			userParams.put("usersGroups", course.getGroupCreatedId());
+			userParams.put("userGroupRole", new Long[]{course.getGroupCreatedId(), teacherRoleId});
+			
+			users = UserLocalServiceUtil.search(course.getCompanyId(), "", 
+					WorkflowConstants.STATUS_APPROVED, userParams, 
+					QueryUtil.ALL_POS, QueryUtil.ALL_POS,(OrderByComparator)null);
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		
+		return users;
+		
+	}
+	
+	@JSONWebService(mode = JSONWebServiceMode.IGNORE)
+	public List<User> getStudentsFromCourse(long courseId) throws Exception {
+		List<User> users = new ArrayList<User>();
+		try{
+			
+			Course course = courseLocalService.fetchCourse(courseId);
+			if (getPermissionChecker() == null
+					|| course == null
+					|| !(getPermissionChecker().hasPermission(course.getGroupId(), Course.class.getName(),
+							course.getCourseId(), "VIEW") || getPermissionChecker()
+							.hasOwnerPermission(course.getCompanyId(), Course.class.getName(), course.getCourseId(),
+									course.getUserId(), "VIEW"))) {
+				return users;
+			}
+			
+			users=courseLocalService.getStudentsFromCourse(course);
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		return users;
+	}*/
+	
+	@JSONWebService
+	public int getStudentsFromCourseCount(long courseId){
+		int students = 0;
+		try{
+			
+			Course course = courseLocalService.fetchCourse(courseId);
+			if (getPermissionChecker() == null
+					|| course == null
+					|| !(getPermissionChecker().hasPermission(course.getGroupId(), Course.class.getName(),
+							course.getCourseId(), "VIEW") || getPermissionChecker()
+							.hasOwnerPermission(course.getCompanyId(), Course.class.getName(), course.getCourseId(),
+									course.getUserId(), "VIEW"))) {
+				return students;
+			}
+			
+			students=courseLocalService.getStudentsFromCourseCount(courseId);
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		return students;
+		
+	}
+	
+	@JSONWebService
+	public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int end) throws PrincipalException{
+		
+		Long classNameId = ClassNameLocalServiceUtil.getClassNameId(Course.class.getName());
+		
+		if(classNameId!=null){
+			try {
+				DynamicQuery dq = DynamicQueryFactoryUtil.forClass(AssetEntry.class);
+				dq.add(PropertyFactoryUtil.forName("companyId").eq(companyId));
+				dq.add(PropertyFactoryUtil.forName("classNameId").eq(classNameId));
+				dq.add(PropertyFactoryUtil.forName("visible").eq(true));
+				dq.setProjection(ProjectionFactoryUtil.distinct(ProjectionFactoryUtil.property("classPK")));
+				List<Long> results;
+				
+				if(start<0 && end<0){
+					results = (List<Long>)assetEntryLocalService.dynamicQuery(dq);
+				}else{
+					results = (List<Long>)assetEntryLocalService.dynamicQuery(dq, start, end);
+				}
+				
+				
+				
+				
+
+				List<Course> courses = new ArrayList<Course>();
+				for(Long courseId : results){
+					Course course = coursePersistence.fetchByPrimaryKey(courseId);
+					if (!(getPermissionChecker() == null
+								|| course == null
+								|| !(getPermissionChecker().hasPermission(course.getGroupId(), Course.class.getName(),
+										course.getCourseId(), "VIEW") || getPermissionChecker()
+										.hasOwnerPermission(course.getCompanyId(), Course.class.getName(), course.getCourseId(),
+												course.getUserId(), "VIEW")))) {
+							courses.add(course);
+					}
+				}
+				
+				return courses;
+				
+			} catch (SystemException e) {
+				if(log.isDebugEnabled())e.printStackTrace();
+			}
+		}
+		
+		return null;
+	}
+
+/*
+	private  void sendMail(Course course, User user){
+		
+			if(course.isWelcome()&&user!=null&&course!=null){
 			if(course.getWelcomeMsg()!=null&&course.getWelcomeMsg()!=null&&!StringPool.BLANK.equals(course.getWelcomeMsg())){
 				
 				try{
@@ -588,5 +723,5 @@ public class CourseServiceImpl extends CourseServiceBaseImpl {
 				}
 			}
 		}
-	}
+	}*/
 }

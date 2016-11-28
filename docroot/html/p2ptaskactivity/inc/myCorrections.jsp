@@ -18,8 +18,8 @@
 <%@include file="/init.jsp" %>
 
 
-<script type="text/javascript">
-function hideDiv(element){
+<script>
+function <portlet:namespace />hideDiv(element){
 	var ua = navigator.userAgent;
 	
 	var re  = new RegExp("MSIE ([0-9]{1,}[\.0-9]{0,})");
@@ -32,17 +32,6 @@ function hideDiv(element){
 		childs = element.parentNode.querySelectorAll('.collapsable');
 	}else{
 		childs = element.parentNode.getElementsByClassName("collapsable");
-	}
-	
-	if(childs.length>0){
-		var height;
-		if(element.parentNode.className == 'option-more'){
-			element.parentNode.removeClass("option-more");
-			element.parentNode.addClass("option-less");
-		}else{
-			element.parentNode.removeClass("option-less");
-			element.parentNode.addClass("option-more");			
-		}
 	}
 }
 </script>
@@ -78,11 +67,11 @@ LearningActivityResult actresult =LearningActivityResultLocalServiceUtil.getByAc
 resultTotal=actresult.getResult();
 
 
-boolean anonimous = false;
+boolean configAnonimous = false;
 String anonimousString = LearningActivityLocalServiceUtil.getExtraContentValue(actId,"anonimous");
 
 if(anonimousString.equals("true")){
-	anonimous = true;
+	configAnonimous = true;
 }	
 
 %>
@@ -100,6 +89,7 @@ if(anonimousString.equals("true")){
 
 <%
 String fullName = "";
+boolean anonimous;
 if(!p2pActCorList.isEmpty()){
 	for (P2pActivityCorrections myP2PActCor : p2pActCorList){
 		
@@ -107,10 +97,11 @@ if(!p2pActCorList.isEmpty()){
 		// Lo reseteamos en cada iteracción.
 		dlfile = null;
 		User propietary = UserLocalServiceUtil.fetchUser(myP2PActCor.getUserId());
+		anonimous = configAnonimous;
 		if(propietary != null){
 			fullName = propietary.getFullName();
 		}else{
-			fullName = "";
+			anonimous = true;
 		}
 		
 		String correctionText = myP2PActCor.getDescription();
@@ -130,16 +121,16 @@ if(!p2pActCorList.isEmpty()){
 		<c:if test="<%=myP2PActCor.getDate() != null %>">
 			<%correctionsDone=true; %>
 			<div class="option-more">
-				<span class="label-col" onclick="hideDiv(this);"><liferay-ui:message key="p2ptask-correction-title" />
+				<span class="label-col" onclick="${renderResponse.getNamespace()}hideDiv(this);"><liferay-ui:message key="p2ptask-correction-title" />
 			
 				
-					<c:if test="<%=!anonimous %>">
+					<c:if test="<%=!anonimous%>">
 					 	<span class="name">
 					 		<liferay-ui:message key="by" />
 					 		<%=fullName %>
 					 	</span>
 				 	</c:if>
-				 	<c:if test="<%=anonimous %>">
+				 	<c:if test="<%=anonimous%>">
 					 	<span class="number">
 					 		<liferay-ui:message key="p2ptaskactivity.number" /> 
 					 		<%=cont%>
@@ -150,7 +141,7 @@ if(!p2pActCorList.isEmpty()){
 				 	</c:if>
 			 	</span>
 	
-				<div class="collapsable" style="padding-left:10px;">
+				<div class="collapsable" style="display: none;">
 					<c:if test="<%=myP2PActCor.getDate() != null %>">
 						<c:if test="<%=result %>">
 							<div class="container-result">

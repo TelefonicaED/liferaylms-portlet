@@ -37,21 +37,16 @@ import com.liferay.lms.learningactivity.LearningActivityType;
 import com.liferay.lms.learningactivity.LearningActivityTypeRegistry;
 import com.liferay.lms.learningactivity.ResourceExternalLearningActivityType;
 import com.liferay.lms.model.LearningActivity;
-import com.liferay.lms.model.LearningActivityResult;
 import com.liferay.lms.model.Module;
 import com.liferay.lms.model.P2pActivity;
 import com.liferay.lms.model.P2pActivityCorrections;
 import com.liferay.lms.service.ActivityTriesDeletedLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityLocalServiceUtil;
-import com.liferay.lms.service.LearningActivityResultLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityServiceUtil;
 import com.liferay.lms.service.LearningActivityTryLocalServiceUtil;
 import com.liferay.lms.service.ModuleLocalServiceUtil;
-import com.liferay.lms.service.ModuleResultLocalServiceUtil;
 import com.liferay.lms.service.P2pActivityCorrectionsLocalServiceUtil;
 import com.liferay.lms.service.P2pActivityLocalServiceUtil;
-import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
-import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
@@ -59,7 +54,6 @@ import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.messaging.Message;
-import com.liferay.portal.kernel.messaging.MessageBusException;
 import com.liferay.portal.kernel.messaging.MessageBusUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
@@ -529,7 +523,10 @@ public class LmsActivitiesList extends MVCPortlet {
 		long renderModule = ParamUtil.getLong(actionRequest, "moduleId",0);
 		ThemeDisplay themeDisplay = (ThemeDisplay) actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
 		PermissionChecker permissionChecker=themeDisplay.getPermissionChecker();
-	
+		Module rendModule = ModuleLocalServiceUtil.getPreviusModule(moduleId);
+		if(Validator.isNull(rendModule)){
+			rendModule=ModuleLocalServiceUtil.getNextModule(moduleId);
+		}
 		if(moduleId>0)
 		{
 			if(permissionChecker.hasPermission(
@@ -541,19 +538,21 @@ public class LmsActivitiesList extends MVCPortlet {
 				List<LearningActivity> moduleActivities = LearningActivityLocalServiceUtil.getLearningActivitiesOfModule(moduleId);
 				for(LearningActivity la : moduleActivities){
 					deleteActivity(la, themeDisplay, actionRequest, actionResponse);
-
-
-
-
-
-
 				}
 				
 				ModuleLocalServiceUtil.deleteModule(moduleId);
 				if(moduleId==renderModule)
 				{
-					actionResponse.removePublicRenderParameter("moduleId");
-					actionResponse.removePublicRenderParameter("actId");	
+					List<LearningActivity> activities = LearningActivityLocalServiceUtil.getLearningActivitiesOfModule(rendModule.getModuleId());
+					if(activities!=null && activities.size()>0){
+						actionResponse.setRenderParameter("actId", String.valueOf(activities.get(0).getActId()));
+						actionResponse.setRenderParameter("resId", String.valueOf(activities.get(0).getActId()));
+					}else{
+						actionResponse.setRenderParameter("actId", "0");
+						actionResponse.setRenderParameter("resId", "0");
+					}					
+					actionResponse.setRenderParameter("moduleId", String.valueOf(rendModule.getModuleId()));
+					
 				}							
 			}
 		}
@@ -642,8 +641,10 @@ public class LmsActivitiesList extends MVCPortlet {
 					actionResponse.removePublicRenderParameter("actId");		
 					if(activities!=null && activities.size()>0){
 						actionResponse.setRenderParameter("actId", String.valueOf(activities.get(0).getActId()));
+						actionResponse.setRenderParameter("resId", String.valueOf(activities.get(0).getActId()));
 					}else{
 						actionResponse.setRenderParameter("actId", "0");
+						actionResponse.setRenderParameter("resId", "0");
 					}
 				}
 				
@@ -976,7 +977,7 @@ public class LmsActivitiesList extends MVCPortlet {
 			message.put("onlyNotPassed", true);
 			message.setResponseId("2222");
 
-			MessageBusUtil.sendMessage("liferay/lms/cleanTries", message);
+			MessageBusUtil.sendMessage("liferay/lms/cleanTriesAllUsers", message);
 		}
 		
 
@@ -1008,7 +1009,7 @@ public class LmsActivitiesList extends MVCPortlet {
 			message.put("onlyNotPassed", false);
 			message.setResponseId("2222");
 
-			MessageBusUtil.sendMessage("liferay/lms/cleanTries", message);
+			MessageBusUtil.sendMessage("liferay/lms/cleanTriesAllUsers", message);
 		}
 		
 

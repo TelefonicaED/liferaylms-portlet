@@ -403,5 +403,34 @@ public class CourseServiceSoap {
 		}
 	}
 
+	public static int getStudentsFromCourseCount(long courseId)
+		throws RemoteException {
+		try {
+			int returnValue = CourseServiceUtil.getStudentsFromCourseCount(courseId);
+
+			return returnValue;
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	public static com.liferay.lms.model.CourseSoap[] getPublicCoursesByCompanyId(
+		java.lang.Long companyId, int start, int end) throws RemoteException {
+		try {
+			java.util.List<com.liferay.lms.model.Course> returnValue = CourseServiceUtil.getPublicCoursesByCompanyId(companyId,
+					start, end);
+
+			return com.liferay.lms.model.CourseSoap.toSoapModels(returnValue);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
 	private static Log _log = LogFactoryUtil.getLog(CourseServiceSoap.class);
 }

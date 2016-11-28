@@ -47,12 +47,11 @@ public class LearningActivityTryImpl extends LearningActivityTryBaseImpl {
 		String result ="";
 		try {
 			Course curso = CourseLocalServiceUtil.getCourseByGroupCreatedId(groupId);
+			User user = UserLocalServiceUtil.fetchUser(this.getUserId());
+			Locale locale = user.getLocale();
 			if(curso != null){
 				CalificationType ct = new CalificationTypeRegistry().getCalificationType(curso.getCalificationType());
-				User user = UserLocalServiceUtil.fetchUser(this.getUserId());
-				Locale locale = user.getLocale();
-			
-				result = ct.translate(locale, this.getResult());			
+				result = ct.translate(locale, this.getResult());
 			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block

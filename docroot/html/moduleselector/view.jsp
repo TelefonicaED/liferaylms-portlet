@@ -1,3 +1,6 @@
+<%@page import="com.liferay.lms.model.Course"%>
+<%@page import="com.liferay.lms.service.CourseLocalServiceUtil"%>
+<%@page import="com.tls.lms.util.LiferaylmsUtil"%>
 <%@page import="javax.portlet.PortletRequest"%>
 <%@page import="com.liferay.portlet.PortletURLFactoryUtil"%>
 <%@page import="com.liferay.portal.kernel.portlet.LiferayPortletURL"%>
@@ -22,8 +25,11 @@
 	List<Module> modules = new ArrayList<Module>(allModules.size());
 	boolean actionEditing = ParamUtil.getBoolean(request, "actionEditing");
 	boolean canAccessLock = permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), "com.liferay.lms.model", themeDisplay.getScopeGroupId() , "ACCESSLOCK");
+	Course course = CourseLocalServiceUtil.getCourseByGroupCreatedId(themeDisplay.getScopeGroupId());
+	boolean hasPermissionAccessCourseFinished = LiferaylmsUtil.hasPermissionAccessCourseFinished(themeDisplay.getCompanyId(), course.getGroupCreatedId(), course.getCourseId(), themeDisplay.getUserId());
+	
 	for(Module module:allModules) {
-		boolean canAccess = (Validator.isNull(module.getStartDate()))?true:!module.getStartDate().after(now);
+		boolean canAccess = hasPermissionAccessCourseFinished || (Validator.isNull(module.getStartDate()))?true:!module.getStartDate().after(now);
 		boolean moduleEditing = permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), Module.class.getName(), themeDisplay.getScopeGroupId(), ActionKeys.UPDATE);
 		if((actionEditing&&moduleEditing)||(canAccess&&(canAccessLock||!ModuleLocalServiceUtil.isLocked(module.getModuleId(),themeDisplay.getUserId())))) {
 			modules.add(module);

@@ -182,4 +182,12 @@ public interface CourseService extends BaseService, InvokableService {
 		long courseId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public int getStudentsFromCourseCount(long courseId);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.util.List<com.liferay.lms.model.Course> getPublicCoursesByCompanyId(
+		java.lang.Long companyId, int start, int end)
+		throws com.liferay.portal.security.auth.PrincipalException;
 }

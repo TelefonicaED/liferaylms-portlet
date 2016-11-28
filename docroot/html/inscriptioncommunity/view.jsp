@@ -101,9 +101,8 @@
 						
 						
 				if((course.getStartDate().before(now)&&course.getEndDate().after(now))&&permissionChecker.hasPermission(course.getGroupId(),  Course.class.getName(),course.getCourseId(),"REGISTER")){
-					int numberUsers = UserLocalServiceUtil.getGroupUsersCount(course.getGroupCreatedId());
-					
-					if((course.getMaxusers()<=0||numberUsers<course.getMaxusers())&&groupC.getType()!=GroupConstants.TYPE_SITE_PRIVATE){
+				
+					if((course.getMaxusers()<=0||UserLocalServiceUtil.getGroupUsersCount(course.getGroupCreatedId())<course.getMaxusers())&&groupC.getType()!=GroupConstants.TYPE_SITE_PRIVATE){
 						if(groupC.getType()==GroupConstants.TYPE_SITE_OPEN){%>
 						
 						<%if(pass){ 		

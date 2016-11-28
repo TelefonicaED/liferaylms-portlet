@@ -327,6 +327,13 @@ public class CourseLocalServiceWrapper implements CourseLocalService,
 		return _courseLocalService.getUserCourses(userId);
 	}
 
+	public java.util.List<com.liferay.lms.model.Course> getUserCourses(
+		long userId, int start, int end)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _courseLocalService.getUserCourses(userId, start, end);
+	}
+
 	public java.util.List<com.liferay.lms.model.Course> getPublicCoursesByCompanyId(
 		java.lang.Long companyId) {
 		return _courseLocalService.getPublicCoursesByCompanyId(companyId);
@@ -506,6 +513,11 @@ public class CourseLocalServiceWrapper implements CourseLocalService,
 		return _courseLocalService.getStudentsFromCourse(companyId,
 			courseGropupCreatedId, start, end, teamId, firstName, lastName,
 			screenName, emailAddress, andOperator);
+	}
+
+	public java.util.List<com.liferay.portal.model.User> getTeachersFromCourse(
+		long courseId) {
+		return _courseLocalService.getTeachersFromCourse(courseId);
 	}
 
 	public java.util.List<com.liferay.lms.model.Course> getByTitleStatusCategoriesTags(

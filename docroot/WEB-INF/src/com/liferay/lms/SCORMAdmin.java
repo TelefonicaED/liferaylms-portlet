@@ -26,6 +26,8 @@ import com.liferay.portal.kernel.exception.NestableException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.upload.UploadPortletRequest;
@@ -47,6 +49,7 @@ import com.liferay.portlet.asset.model.AssetEntry;
 import com.liferay.portlet.asset.model.AssetVocabulary;
 import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
 import com.liferay.portlet.asset.service.persistence.AssetEntryUtil;
+import com.liferay.util.P2pCheckActivity;
 import com.liferay.util.bridges.mvc.MVCPortlet;
 
 /**
@@ -54,7 +57,7 @@ import com.liferay.util.bridges.mvc.MVCPortlet;
  */
 public class SCORMAdmin extends MVCPortlet 
 {
-	
+	private static Log log = LogFactoryUtil.getLog(SCORMAdmin.class);
 	public void saveSCORM(ActionRequest actRequest, ActionResponse response) throws PortalException, SystemException, IOException
 	{
 		ThemeDisplay themeDisplay = (ThemeDisplay) actRequest.getAttribute(WebKeys.THEME_DISPLAY);
@@ -102,13 +105,18 @@ public class SCORMAdmin extends MVCPortlet
 					}
 
 					if (ace.getType() == AssetCategoryException.AT_LEAST_ONE_CATEGORY) {
-						SessionErrors.add(actRequest, "please-select-at-least-one-category-for-x", vocabularyTitle);
+						SessionErrors.add(actRequest, "please-select-at-least-one-category-for-x");
 					} else if (ace.getType() == AssetCategoryException.TOO_MANY_CATEGORIES) { 
-						SessionErrors.add(actRequest, "you-cannot-select-more-than-one-category-for-x", vocabularyTitle);
+						SessionErrors.add(actRequest, "you-cannot-select-more-than-one-category-for-x");					
 					}
+					response.setRenderParameter("vocabularyTitle", vocabularyTitle);
 				} else {
 					SessionErrors.add(actRequest, "an-unexpected-error-occurred-while-saving");
 				}
+				
+				response.setRenderParameter("mvcPath", "/html/scormadmin/editscorm.jsp");
+				response.setRenderParameter("jspPage", "/html/scormadmin/editscorm.jsp");
+				return;
 			}
 			
 			String fileName = request.getFileName("fileName");

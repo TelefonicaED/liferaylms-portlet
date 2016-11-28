@@ -7,11 +7,8 @@
 		<icon>/icon.png</icon>
 			<configuration-action-class>com.liferay.lms.actions.LmsActivitiesListAction</configuration-action-class>
 		<indexer-class>com.liferay.lms.search.LearningActivityIndexer</indexer-class>
-		<control-panel-entry-category>content</control-panel-entry-category>
-		<control-panel-entry-weight>17.5</control-panel-entry-weight>
 		<asset-renderer-factory>com.liferay.lms.asset.LearningActivityAssetRendererFactory</asset-renderer-factory>
 		<instanceable>false</instanceable>
-		
 		<header-portlet-css>/css/main.css</header-portlet-css>
 		<footer-portlet-javascript>/js/main.js</footer-portlet-javascript>
 		<footer-portlet-javascript>/js/tree.js</footer-portlet-javascript>
@@ -142,6 +139,7 @@
 		<instanceable>false</instanceable>
 		<header-portlet-css>/css/main.css</header-portlet-css>
 		<footer-portlet-javascript>/js/main.js</footer-portlet-javascript>
+		<footer-portlet-javascript>/js/tree.js</footer-portlet-javascript>
 		<css-class-wrapper>p2ptaskactivity-portlet</css-class-wrapper>
 		<add-default-resource>true</add-default-resource>
 	</portlet>
