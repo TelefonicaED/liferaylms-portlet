@@ -1,239 +1,32 @@
-<%@page import="com.liferay.lms.CourseTeachers"%>
-<%@page import="com.tls.lms.util.LiferaylmsUtil"%>
-<%@page import="com.liferay.portal.model.PortalPreferences"%>
-<%@page import="java.util.Locale"%>
-<%@page import="com.liferay.portal.kernel.util.LocalizationUtil"%>
-<%@page import="com.liferay.portal.kernel.util.LocaleUtil"%>
-<%@page import="com.liferay.portal.security.permission.PermissionCheckerFactoryUtil"%>
 <%@page import="com.liferay.lms.learningactivity.LearningActivityType"%>
-<%@page import="com.liferay.portal.model.PublicRenderParameter"%>
-<%@page import="com.liferay.portal.kernel.util.HttpUtil"%>
-<%@page import="java.net.URL"%>
-<%@page import="com.liferay.portlet.PortletQNameUtil"%>
-<%@page import="javax.portlet.RenderResponse"%>
-<%@page import="java.util.Map"%>
-<%@page import="com.liferay.portal.kernel.portlet.LiferayWindowState"%>
-<%@page import="com.liferay.portal.security.permission.ResourceActionsUtil"%>
-<%@page import="com.liferay.lms.LmsActivitiesList"%>
-<%@page import="com.liferay.lms.asset.LearningActivityAssetRendererFactory"%>
-<%@page import="java.util.Enumeration"%>
-<%@page import="java.util.Hashtable"%>
-<%@page import="com.liferay.portlet.asset.model.AssetCategory"%>
-<%@page import="com.liferay.portlet.asset.service.AssetCategoryLocalServiceUtil"%>
+<%@page import="com.liferay.lms.model.LearningActivity"%>
 <%@page import="com.liferay.lms.model.LearningActivityResult"%>
 <%@page import="com.liferay.lms.service.LearningActivityResultLocalServiceUtil"%>
-<%@page import="com.liferay.portlet.asset.model.AssetRenderer"%>
-<%@page import="com.liferay.portal.kernel.portlet.LiferayPortletResponse"%>
-<%@page import="com.liferay.portal.kernel.portlet.LiferayPortletRequest"%>
-<%@page import="com.liferay.portlet.asset.AssetRendererFactoryRegistryUtil"%>
-<%@page import="com.liferay.portlet.asset.model.AssetRendererFactory"%>
-<%@page import="com.liferay.lms.service.ModuleLocalServiceUtil"%>
-<%@page import="com.liferay.lms.model.Module"%>
-<%@page import="com.liferay.portal.kernel.util.ListUtil"%>
-<%@page import="com.liferay.lms.service.LearningActivityLocalServiceUtil"%>
 <%@page import="com.liferay.lms.service.LearningActivityTryLocalServiceUtil"%>
 <%@page import="com.liferay.lms.service.LearningActivityServiceUtil"%>
-<%@page import="com.liferay.lms.model.LearningActivity"%>
-<%@page import="com.liferay.lms.learningactivity.LearningActivityTypeRegistry"%> 
-
-<%@ include file="/init.jsp"%>
-
+<%@page import="com.liferay.util.JavaScriptUtil"%> 
 
 <% 
-long moduleId = ParamUtil.getLong(request, "moduleId", 0);
-boolean actionEditing = ParamUtil.getBoolean(request, "actionEditing", false);
-long actId = ParamUtil.getLong(request, "actId", 0);
-String activityStatusStr = PrefsPropsUtil.getString("learningactivity.show.status", StringPool.FALSE);
-boolean activityStatus = Boolean.parseBoolean(activityStatusStr);
-
-NumberFormat resultNumberFormat = NumberFormat.getInstance(locale);
-resultNumberFormat.setMinimumIntegerDigits(1);
-
-LearningActivity currentLeaningActivity = null;
-
-if(actId!=0) {
-	currentLeaningActivity = LearningActivityLocalServiceUtil.getLearningActivity(actId);
-}
-
-Course coursetmp = CourseLocalServiceUtil.getCourseByGroupCreatedId(themeDisplay.getScopeGroupId());
-LearningActivityTypeRegistry learningActivityTypeRegistry = new LearningActivityTypeRegistry();
-AssetRendererFactory assetRendererFactory = AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(LearningActivity.class.getName());
-
-java.util.List<LearningActivity> activities = null;
-if (moduleId == 0) {
-	java.util.List<Module> modules = ModuleLocalServiceUtil.findAllInGroup(themeDisplay.getScopeGroupId());
-	if (modules.size() > 0) {
-		Module theModule = modules.get(0);
-		moduleId = theModule.getModuleId();
-	}
-}
-boolean hasPermissionAccessCourseFinished = LiferaylmsUtil.hasPermissionAccessCourseFinished(themeDisplay.getCompanyId(), coursetmp.getGroupCreatedId(), coursetmp.getCourseId(), themeDisplay.getUserId());
-
+List<LearningActivity> activities = null;
 
 if (moduleId == 0) {
 	activities = LearningActivityServiceUtil.getLearningActivitiesOfGroup(scopeGroupId);
 } else {
-	Module theModule =ModuleLocalServiceUtil.getModule(moduleId);
-	if(!permissionChecker.hasPermission( themeDisplay.getScopeGroupId(), Module.class.getName(), moduleId,"ADD_LACT")
-			&& ModuleLocalServiceUtil.isLocked(theModule.getPrimaryKey(),themeDisplay.getUserId()) 
-			&& !permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), "com.liferay.lms.model", themeDisplay.getScopeGroupId() , "ACCESSLOCK")
-			&& !hasPermissionAccessCourseFinished){
-		//renderRequest.setAttribute(WebKeys.PORTLET_CONFIGURATOR_VISIBILITY, Boolean.FALSE);
+	
+	if(!hasPermissionAddLact && moduleActuallyIsLocked && !accessLock && !hasPermissionAccessCourseFinished){
 		activities=new ArrayList<LearningActivity>(); 
 	}else{
 		activities = LearningActivityServiceUtil.getLearningActivitiesOfModule(moduleId);
 	}
 }
 
-
 String activityEnd = "desactivado";
-Hashtable<AssetCategory, java.util.List<LearningActivity>> catler = new Hashtable<AssetCategory, java.util.List<LearningActivity>>();
-for (LearningActivity activity : activities) {
-	java.util.List<AssetCategory> categorias = AssetCategoryLocalServiceUtil.getCategories(LearningActivity.class.getName(), activity.getActId());
-	for (AssetCategory categoria : categorias) {
-		if (!catler.containsKey(categoria)) {
-			catler.put(categoria, new ArrayList());
-		}
-		catler.get(categoria).add(activity);
-	}
-}
-if ((actionEditing
-		&& permissionChecker.hasPermission(themeDisplay.getScopeGroupId(),Module.class.getName(), moduleId,	"ADD_LACT"))||
-		(permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), "com.liferay.lms.learningactivitymodel", themeDisplay.getScopeGroupId(), "ADD_ACTIVITY")&&
-				moduleId==0)) {
-	%>
 
-
-<liferay-portlet:actionURL name="moveActivity" var="moveActivityURL" windowState="<%= LiferayWindowState.EXCLUSIVE.toString()%>" />
-
-<script type="text/javascript">
-
-Liferay.provide(
-        window,
-        '<portlet:namespace />refreshPortlet',
-        function() {
-		     <%-- refreshing the portlet [Liferay.Util.getOpener().] --%>
-            var curPortletBoundaryId = '#p_p_id<portlet:namespace />';
-
-            Liferay.Portlet.refresh(curPortletBoundaryId);
-        },
-        ['aui-dialog','aui-dialog-iframe']
-    );
-    
-    
-var ismobile=navigator.userAgent.match(/(iPad)|(iPhone)|(iPod)|(android)|(webOS)/i);
-
-if(!ismobile){
-AUI().ready('node','aui-io-request','aui-parse-content','aui-sortable',function(A) {
-
-	new A.Sortable(
-		{
-			container: A.one('#myActivities'),
-		    nodes: 'li',
-            after: {   
-            	'drag:end': function(event){ 
-            		
-				    var node = event.target.get('node'),
-			            prev = node.previous(),
-			            next = node.next(),
-                        movedPageId = parseInt(node.get('id').substr(<%=renderResponse.getNamespace().length() %>),0),
-		            	prevPageId = 0,
-		            	nextPageId = 0;
-				    
-			        if(prev){
-			          prevPageId = parseInt(prev.get('id').substr(<%=renderResponse.getNamespace().length() %>),0);
-				    }
-
-			        if(next){
-			          nextPageId = parseInt(next.get('id').substr(<%=renderResponse.getNamespace().length() %>),0);
-				    }
-
-					A.io.request('<%=moveActivityURL %>', {  
-						data: {
-				            <portlet:namespace />pageId: movedPageId,
-				            <portlet:namespace />prevPageId: prevPageId,
-				            <portlet:namespace />nextPageId: nextPageId
-				        },
-					    dataType : 'html', 
-					  on: {  
-				  		success: function() {  
-							 Liferay.Portlet.refresh(A.one('#p_p_id<portlet:namespace />'),{'p_t_lifecycle':0,'<%=renderResponse.getNamespace()+WebKeys.PORTLET_CONFIGURATOR_VISIBILITY %>':'<%=StringPool.TRUE %>'});
-				        }  
-					   }  
-					});    
-            	}              
-            }
-		}
-	); 
-  });
-}
-</script>
-
-<liferay-portlet:resourceURL var="baseChangeURL"/>
-
-<script>
-
-	
-function <portlet:namespace />downActivity(actId){
-	$.ajax({
-		dataType: 'json',
-		url:'${baseChangeURL}',
-	    cache:false,
-		data: {
-			actId: actId,
-			action: 'down'
-		},
-		success: function(data){
-			if(data){	
-				$item =  $("#<portlet:namespace />" + actId);
-				$after = $item.next();
-				if($after.prop("tagName").toUpperCase()=="LI"){
-					$item.hide().insertAfter($after).fadeIn("slow");
-				}			    
-			}
-		},
-		error: function(){
-
-		}
-	});  
- }
-
-
-function <portlet:namespace />upActivity(actId){
-	$.ajax({
-		dataType: 'json',
-		url:'${baseChangeURL}',
-	    cache:false,
-		data: {
-			actId: actId,
-			action: 'up'
-		},
-		success: function(data){
-			if(data){	
-				$item =  $("#<portlet:namespace />" + actId);
-				$before = $item.prev();
-				if($before.prop("tagName").toUpperCase()=="LI"){
-					$item.hide().insertBefore($before).fadeIn("slow");
-				}			    
-			}
-		},
-		error: function(){
-
-		}
-	});  
- }
-
-
-</script>
-
-<liferay-portlet:renderURL var="newactivityURL" windowState="<%= LiferayWindowState.POP_UP.toString() %>">
-	<liferay-portlet:param name="jspPage" value="/html/lmsactivitieslist/newactivity.jsp"/>
-	<liferay-portlet:param name="resModuleId" value="<%=Long.toString(moduleId) %>" />
-</liferay-portlet:renderURL>
-	<%
-
-	String portletnamespace = renderResponse.getNamespace();
-	String newactivitypopup = "javascript:AUI().use('aui-dialog','aui-dialog-iframe', "+
+if ((actionEditing && hasPermissionAddLact) ||
+		(moduleId==0 
+		&& permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), "com.liferay.lms.learningactivitymodel", themeDisplay.getScopeGroupId(), "ADD_ACTIVITY"))) {
+		
+		String newactivitypopup = "javascript:AUI().use('aui-dialog','aui-dialog-iframe', "+
 			"	function(A){ "+
 			"	new A.Dialog( "+
 			"		{ "+
@@ -253,7 +46,7 @@ function <portlet:namespace />upActivity(actId){
 			"	).plug( "+
 			"		A.Plugin.DialogIframe, "+
 			"		{ "+
-			"			uri: '" + JavaScriptUtil.markupToStringLiteral(newactivityURL) + "', "+
+			"			uri: '" + JavaScriptUtil.markupToStringLiteral(newactivityURL.toString()) + "', "+
 			"			on: { "+
 			"    			load: function(evt){ "+
 			"					var instance = evt.target; "+
@@ -273,130 +66,103 @@ function <portlet:namespace />upActivity(actId){
 			"		} "+
 			"	).render().show(); "+
 			"});";
-			 
-	%>
-	<liferay-ui:icon image="add" label="<%=true%>" message="activity.creation"
-		url="#" cssClass="newactivity" onClick="<%=newactivitypopup %>"/>
-	
-<%
+		%>
+
+
+		
+		<liferay-ui:icon image="add" label="<%=true%>" message="activity.creation" url="#" cssClass="newactivity" onClick="<%=newactivitypopup %>"/>	
+	<%
 }
 %>
 <liferay-ui:error></liferay-ui:error>
-<ul id="myActivities">
-			<%
-			String status;
-			long result;
-			long tries;
-			long userTried;
-			String type;
-			String moduletitle;
-			String title;
-			
-			for (LearningActivity activity : activities) {
-				title = activity.getTitle(themeDisplay.getLocale());				
-				moduletitle = "";
-				type= String.valueOf(activity.getTypeId());
-				
-				if (activity.getModuleId() != 0) {
-					Module theModule = ModuleLocalServiceUtil
-							.getModule(activity.getModuleId());
-					moduletitle = theModule.getTitle();
-				}
-				result = 0;
-				status = "not-started";
-				
-				LearningActivityResult learningActivityResult = LearningActivityResultLocalServiceUtil
-						.getByActIdAndUserId(activity.getActId(),
-									themeDisplay.getUserId());
-				
-				if(learningActivityResult!=null){
-					result = learningActivityResult.getResult();
-					tries = activity.getTries();
-					userTried = Long.valueOf(LearningActivityTryLocalServiceUtil.getTriesCountByActivityAndUser(activity.getActId(),themeDisplay.getUserId()));
-					
-					status="started";
-					if(learningActivityResult.getEndDate()!=null){
-						if (learningActivityResult.isPassed()) {
-							status = "passed";
-						}
-						else if ((userTried >= tries && tries > 0) && (!learningActivityResult.isPassed())) {
-							status = "failed";
-						}							
-					}
-				}				
-				
-				if (actId == activity.getActId()) {
-						activityEnd = "activado";
-				} else {
-					activityEnd = "desactivado";
-				}
-				String editing="";
-				if(actionEditing)
-				{
-					editing="editing";
-				}
-				
-				LearningActivityType learningActivityType = learningActivityTypeRegistry.getLearningActivityType(activity.getTypeId());
-				if (permissionChecker.hasPermission(activity.getGroupId(),LearningActivity.class.getName(),	activity.getActId(), ActionKeys.VIEW)){
-	
-					if((Validator.isNotNull(learningActivityType))&&
-						(!LearningActivityLocalServiceUtil.islocked(activity.getActId(),themeDisplay.getUserId())
-							|| permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), "com.liferay.lms.model", themeDisplay.getScopeGroupId() , "ACCESSLOCK") 
-							||(permissionChecker.hasPermission(activity.getGroupId(), LearningActivity.class.getName(), activity.getActId(), ActionKeys.UPDATE) && actionEditing))
-							||hasPermissionAccessCourseFinished)
-					{
-						%>
-						<portlet:actionURL var="goToActivity" windowState="<%= WindowState.NORMAL.toString()%>" >
-							<portlet:param name="actId" value="<%=Long.toString(activity.getActId()) %>" />
-						</portlet:actionURL>
 
-						<li class="learningActivity <%=activityEnd%> <%=editing %> <%=status%>"  <%=(status=="passed" || status=="failed")?"title =\""+LanguageUtil.format(pageContext, "activity.result",new Object[]{resultNumberFormat.format(result)})+"\"":StringPool.BLANK %> 
-							id="<portlet:namespace/><%=activity.getActId()%>">
-							<span class="type_<%=type%>"></span>
-							<a href="<%=assetRendererFactory.getAssetRenderer(activity.getActId()).
-									getURLView(liferayPortletResponse, WindowState.NORMAL) %>"  ><%=title%></a>
-							
-					<%
-					}
-					else
-					{
-					%>
-						<li class="learningActivity <%=activityEnd%> <%=editing %> <%=status%> locked"  <%=(status=="passed"||status=="failed" )?"title =\""+LanguageUtil.format(pageContext, "activity.result",new Object[]{resultNumberFormat.format(result)})+"\"":StringPool.BLANK %> 
-							id="<portlet:namespace/><%=activity.getActId()%>">
-							<span class="type_<%=type%>"></span>
-							<span><%=title%></span>
-					<%
-					}
+<ul id="myActivities">
+	<%String status = null;
+	long result = -1;
+	long tries = -1;
+	long userTried = -1;
+	String type = null;
+	String title = null;
+	LearningActivityResult learningActivityResult = null;
+	String editing=null;
+	LearningActivityType learningActivityType = null;
+	
+	for (LearningActivity activity : activities) {
+		title = activity.getTitle(themeDisplay.getLocale());				
+		type= String.valueOf(activity.getTypeId());
+		
+		result = 0;
+		status = "not-started";
+		
+		learningActivityResult = LearningActivityResultLocalServiceUtil.getByActIdAndUserId(activity.getActId(),themeDisplay.getUserId());
+		
+		if(learningActivityResult!=null){
+			result = learningActivityResult.getResult();
+			tries = activity.getTries();
+			
+			status="started";
+			if(learningActivityResult.getEndDate()!=null){
+				userTried = LearningActivityTryLocalServiceUtil.getTriesCountByActivityAndUser(activity.getActId(),themeDisplay.getUserId());
+				if (learningActivityResult.isPassed()) {
+					status = "passed";
+				} else if ((userTried >= tries && tries > 0) && (!learningActivityResult.isPassed())) {
+					status = "failed";
+				}							
+			}
+		}				
+		
+		if (actId == activity.getActId()) {
+				activityEnd = "activado";
+		} else {
+			activityEnd = "desactivado";
+		}
+		editing="";
+		if(actionEditing) {
+			editing="editing";
+		}
+		
+		learningActivityType = learningActivityTypeRegistry.getLearningActivityType(activity.getTypeId());
+		if (permissionChecker.hasPermission(activity.getGroupId(),LearningActivity.class.getName(),	activity.getActId(), ActionKeys.VIEW)){
+
+			if((Validator.isNotNull(learningActivityType))&&
+				(accessLock || hasPermissionAccessCourseFinished || !activity.isLocked(themeDisplay.getUser(), themeDisplay.getPermissionChecker())  
+					||(permissionChecker.hasPermission(activity.getGroupId(), LearningActivity.class.getName(), activity.getActId(), ActionKeys.UPDATE) && actionEditing))){%>
+
+				<li class="learningActivity <%=activityEnd%> <%=editing %> <%=status%>"  <%=(status=="passed" || status=="failed")?"title =\""+LanguageUtil.format(pageContext, "activity.result",new Object[]{resultNumberFormat.format(result)})+"\"":StringPool.BLANK %> 
+					id="<portlet:namespace/><%=activity.getActId()%>">
+					<span class="type_<%=type%>"></span>
+					<a href="<%=assetRendererFactory.getAssetRenderer(activity.getActId()).
+							getURLView(liferayPortletResponse, WindowState.NORMAL) %>"  ><%=title%></a>
 					
-				
-					if(!actionEditing && activityStatus)
-					{
-					%>
-					<span class="status"> <%=LanguageUtil.format(pageContext, status,new Object[]{})%></span>
-					<%
-						if(status=="passed"||status=="failed" ){
-						%>	
-							<span class="result"> <%=result%> %</span>
-						<% 
-						}
-					}
-					
-				if ((actionEditing)&&(Validator.isNotNull(learningActivityType))
-					&& (permissionChecker.hasPermission(activity.getGroupId(),LearningActivity.class.getName(),activity.getActId(), ActionKeys.UPDATE)
-						|| permissionChecker.hasPermission(activity.getGroupId(),LearningActivity.class.getName(),activity.getActId(), ActionKeys.DELETE) 
-						|| permissionChecker.hasPermission(activity.getGroupId(),LearningActivity.class.getName(),activity.getActId(),ActionKeys.PERMISSIONS)
-						|| permissionChecker.hasPermission(activity.getGroupId(),LearningActivity.class.getName(),activity.getActId(),"SOFT_PERMISSIONS")
-						|| permissionChecker.hasOwnerPermission(activity.getCompanyId(),LearningActivity.class.getName(),activity.getActId(),activity.getUserId(), ActionKeys.UPDATE)
-						|| permissionChecker.hasOwnerPermission(activity.getCompanyId(),LearningActivity.class.getName(),activity.getActId(),activity.getUserId(), ActionKeys.DELETE))) {
-				%>
-				<div class="iconsedit"><%@ include file="/html/lmsactivitieslist/admin_actions.jspf" %></div>
-				
-				<%
-				}
-				
-				%>
-				</li>
-			<%
-			}}
+			<%} else{ %>
+				<li class="learningActivity <%=activityEnd%> <%=editing %> <%=status%> locked"  <%=(status=="passed"||status=="failed" )?"title =\""+LanguageUtil.format(pageContext, "activity.result",new Object[]{resultNumberFormat.format(result)})+"\"":StringPool.BLANK %> 
+					id="<portlet:namespace/><%=activity.getActId()%>">
+					<span class="type_<%=type%>"></span>
+					<span><%=title%></span>
+			<%}
+		
+			if(!actionEditing && activityStatus) { %>
+			
+				<span class="status"> <%=LanguageUtil.format(pageContext, status,new Object[]{})%></span>
+				<%if(status=="passed"||status=="failed" ){%>	
+					<span class="result"> <%=result%> %</span>
+				<%}
+			}
+			
+			if (actionEditing&&Validator.isNotNull(learningActivityType)){
+				boolean hasPermissionUpdate = permissionChecker.hasPermission(activity.getGroupId(),LearningActivity.class.getName(),activity.getActId(), ActionKeys.UPDATE)
+												|| permissionChecker.hasOwnerPermission(activity.getCompanyId(),LearningActivity.class.getName(),activity.getActId(),activity.getUserId(), ActionKeys.UPDATE);
+				boolean hasPermissionDelete = permissionChecker.hasPermission(activity.getGroupId(),LearningActivity.class.getName(),activity.getActId(), ActionKeys.DELETE) 
+												|| permissionChecker.hasOwnerPermission(activity.getCompanyId(),LearningActivity.class.getName(),activity.getActId(),activity.getUserId(), ActionKeys.DELETE);
+				boolean hasPermissionPermissions = permissionChecker.hasPermission(activity.getGroupId(),LearningActivity.class.getName(),activity.getActId(),ActionKeys.PERMISSIONS);
+				boolean hasPermissionSoftPermissions = permissionChecker.hasPermission(activity.getGroupId(),LearningActivity.class.getName(),activity.getActId(),"SOFT_PERMISSIONS");
+				if(hasPermissionUpdate || hasPermissionDelete || hasPermissionPermissions || hasPermissionSoftPermissions) {
 			%>
+				<div class="iconsedit"><%@ include file="/html/lmsactivitieslist/admin_actions.jspf" %></div>
+				<%}
+			}%>
+			</li>
+		<%}
+	}
+	%>
 </ul>

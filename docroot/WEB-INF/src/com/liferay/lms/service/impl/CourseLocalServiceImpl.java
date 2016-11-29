@@ -80,6 +80,8 @@ import com.liferay.portal.model.ResourceConstants;
 import com.liferay.portal.model.RoleConstants;
 import com.liferay.portal.model.User;
 import com.liferay.portal.security.auth.PrincipalThreadLocal;
+import com.liferay.portal.security.permission.PermissionChecker;
+import com.liferay.portal.security.permission.PermissionCheckerFactoryUtil;
 import com.liferay.portal.service.ClassNameLocalServiceUtil;
 import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.LayoutSetPrototypeLocalServiceUtil;
@@ -89,6 +91,7 @@ import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.UserGroupRoleLocalServiceUtil;
 import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.theme.ThemeDisplay;
+import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.comparator.UserLastNameComparator;
 import com.liferay.portlet.asset.model.AssetEntry;
 import com.liferay.portlet.asset.model.AssetLinkConstants;
@@ -1114,6 +1117,53 @@ public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int e
 			//auditing
 			AuditingLogFactory.audit(course.getCompanyId(), course.getGroupId(), Course.class.getName(), course.getCourseId(), serviceContext.getUserId(), AuditConstants.UPDATE, null);		 
 		
+	}
+	
+	/**
+	 * Se van a realizar las siguientes comprobaciones:
+	 * - Curso cerrado
+	 * - Que pertenezcas a la comunidad
+	 * - Que tengas permiso para acceder al curso
+	 * - Comprobar que tenga una convocatoria en fecha
+	 * - Que el usuario tenga fechas propias para realizarlo y estén en fecha
+	 * @param courseId Id el curso
+	 * @param user Usuario
+	 * @return true si el curso está bloqueado, false en caso contrario
+	 */
+	
+	public boolean  isLocked(Course course, User user){
+
+		return course.isLocked(user);
+	}
+	
+	/**
+	 * Comprueba si un usuario puede acceder a los cursos/modulos/actividades bloqueadas
+	 * @param groupCreatedId id del grupo creado para el curso
+	 * @param user usuario
+	 * @return true en caso de que pueda acceder a bloqueados
+	 */
+	
+	public boolean canAccessLock(long groupCreatedId, User user){
+		//Si es administrador
+		if(PortalUtil.isOmniadmin(user.getUserId())){
+			return true;
+		}
+
+		PermissionChecker permissionChecker = null;
+		try {
+			permissionChecker = PermissionCheckerFactoryUtil.create(user);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		//Si tiene permiso ACCESSLOCK
+		
+		if(permissionChecker != null && permissionChecker.hasPermission(groupCreatedId, "com.liferay.lms.model",groupCreatedId,"ACCESSLOCK")){
+			return true;
+		}
+		
+		return false;
 	}
 }
 

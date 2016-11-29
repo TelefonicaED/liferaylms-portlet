@@ -84,7 +84,7 @@ public class P2pCheckActivity implements MessageListener
 								long userId = myp2p.getUserId();
 								User user = UserLocalServiceUtil.getUser(userId);
 								//Comprobamos que la actividad no esta bloqueada para el usuario.
-								if(!LearningActivityLocalServiceUtil.islocked(lAct.getActId(), userId)){
+								if(!lAct.isLocked(user)){
 									cont++;
 									deregisterMail = false;
 									if(user.getExpandoBridge().getAttribute(LiferaylmsUtil.DEREGISTER_USER_EXPANDO)!=null){

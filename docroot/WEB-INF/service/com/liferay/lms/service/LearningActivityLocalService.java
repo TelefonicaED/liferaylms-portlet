@@ -266,6 +266,17 @@ public interface LearningActivityLocalService extends BaseLocalService,
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
+	/**
+	* Se mira si la actividad estÃ¡ bloqueada, NO SE TIENE EN CUENTA NI EL CURSO NI EL MÃ“DULO,
+	* PARA SABER SI TIENES BLOQUEADO EL CURSO O EL MÃ“DULO LLAMAR AL ISLOCKED DEL CURSO Y MÃ“DULO
+	* Se harÃ¡n las siguientes comprobaciones:
+	* - Que hayas superado la actividad precedente
+	* - Fecha inicio/fin de la actividad (teniendo en cuenta las convocatorias del usuario)
+	*
+	* @param actId Id de la actividad
+	* @param userId Id del usuario
+	* @return true si la actividad estÃ¡ bloqueada, false en caso contrario
+	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public boolean islocked(long actId, long userId) throws java.lang.Exception;
 
@@ -368,6 +379,10 @@ public interface LearningActivityLocalService extends BaseLocalService,
 		com.liferay.lms.model.LearningActivity larn)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.util.List<com.liferay.lms.model.LearningActivity> getPreviusLearningActivites(
+		com.liferay.lms.model.LearningActivity larn);
+
 	public void goUpLearningActivity(long actId, long userIdAction)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
@@ -386,6 +401,10 @@ public interface LearningActivityLocalService extends BaseLocalService,
 	public com.liferay.lms.model.LearningActivity getNextLearningActivity(
 		com.liferay.lms.model.LearningActivity larn)
 		throws com.liferay.portal.kernel.exception.SystemException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.util.List<com.liferay.lms.model.LearningActivity> getNextLearningActivites(
+		com.liferay.lms.model.LearningActivity larn);
 
 	public void deleteLearningactivity(long actId)
 		throws com.liferay.portal.kernel.exception.PortalException,
@@ -446,4 +465,8 @@ public interface LearningActivityLocalService extends BaseLocalService,
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.util.List<com.liferay.lms.model.LearningActivity> getByPrecedence(
 		long precedence);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public com.liferay.lms.model.LearningActivity getByPriority(int position,
+		long moduleId, long companyId);
 }

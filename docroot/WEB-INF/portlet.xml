@@ -334,7 +334,7 @@
 		<display-name>activityNavigator</display-name>
 		<portlet-class>com.liferay.lms.ActivityNavigatorPortlet</portlet-class>
 		<init-param>
-			<name>view-jsp</name>
+			<name>view-template</name>
 			<value>/html/activitynavigator/view.jsp</value>
 		</init-param>
 		<init-param>

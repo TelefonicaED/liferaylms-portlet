@@ -34,4 +34,6 @@ public interface Module extends ModuleModel, PersistedModel {
 	public com.liferay.lms.model.Module getParentModule()
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
+
+	public boolean isLocked(long userId);
 }

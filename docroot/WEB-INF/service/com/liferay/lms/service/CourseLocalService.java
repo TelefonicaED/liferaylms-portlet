@@ -516,4 +516,30 @@ public interface CourseLocalService extends BaseLocalService,
 		java.util.Date allowStartDate, java.util.Date allowFinishDate)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Se van a realizar las siguientes comprobaciones:
+	* - Curso cerrado
+	* - Que pertenezcas a la comunidad
+	* - Que tengas permiso para acceder al curso
+	* - Comprobar que tenga una convocatoria en fecha
+	* - Que el usuario tenga fechas propias para realizarlo y estÃ©n en fecha
+	*
+	* @param courseId Id el curso
+	* @param user Usuario
+	* @return true si el curso estÃ¡ bloqueado, false en caso contrario
+	*/
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public boolean isLocked(com.liferay.lms.model.Course course,
+		com.liferay.portal.model.User user);
+
+	/**
+	* Comprueba si un usuario puede acceder a los cursos/modulos/actividades bloqueadas
+	*
+	* @param groupCreatedId id del grupo creado para el curso
+	* @param user usuario
+	* @return true en caso de que pueda acceder a bloqueados
+	*/
+	public boolean canAccessLock(long groupCreatedId,
+		com.liferay.portal.model.User user);
 }

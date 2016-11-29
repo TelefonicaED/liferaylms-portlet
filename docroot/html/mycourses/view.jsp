@@ -46,7 +46,7 @@
 									</liferay-portlet:renderURL>
 									
 									<c:choose>
-										<c:when test="${!moduleService.isLocked(module.moduleId,themeDisplay.userId) }">
+										<c:when test="${!module.isLocked(themeDisplay.userId) }">
 											<a href="${gotoModuleURL }">${module.getTitle(themeDisplay.locale)}</a>
 										</c:when>
 										<c:otherwise>

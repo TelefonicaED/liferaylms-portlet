@@ -519,6 +519,10 @@ public class ModuleClp extends BaseModelImpl<Module> implements Module {
 		throw new UnsupportedOperationException();
 	}
 
+	public boolean isLocked(long userId) {
+		throw new UnsupportedOperationException();
+	}
+
 	public BaseModel<?> getModuleRemoteModel() {
 		return _moduleRemoteModel;
 	}

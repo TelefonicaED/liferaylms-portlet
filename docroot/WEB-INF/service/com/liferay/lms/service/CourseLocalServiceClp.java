@@ -392,6 +392,18 @@ public class CourseLocalServiceClp implements CourseLocalService {
 		_methodParameterTypes69 = new String[] {
 				"long", "long", "java.util.Date", "java.util.Date"
 			};
+
+		_methodName70 = "isLocked";
+
+		_methodParameterTypes70 = new String[] {
+				"com.liferay.lms.model.Course", "com.liferay.portal.model.User"
+			};
+
+		_methodName71 = "canAccessLock";
+
+		_methodParameterTypes71 = new String[] {
+				"long", "com.liferay.portal.model.User"
+			};
 	}
 
 	public com.liferay.lms.model.Course addCourse(
@@ -2743,6 +2755,62 @@ public class CourseLocalServiceClp implements CourseLocalService {
 		}
 	}
 
+	public boolean isLocked(com.liferay.lms.model.Course course,
+		com.liferay.portal.model.User user) {
+		Object returnObj = null;
+
+		try {
+			returnObj = _invokableLocalService.invokeMethod(_methodName70,
+					_methodParameterTypes70,
+					new Object[] {
+						ClpSerializer.translateInput(course),
+						
+					ClpSerializer.translateInput(user)
+					});
+		}
+		catch (Throwable t) {
+			t = ClpSerializer.translateThrowable(t);
+
+			if (t instanceof RuntimeException) {
+				throw (RuntimeException)t;
+			}
+			else {
+				throw new RuntimeException(t.getClass().getName() +
+					" is not a valid exception");
+			}
+		}
+
+		return ((Boolean)returnObj).booleanValue();
+	}
+
+	public boolean canAccessLock(long groupCreatedId,
+		com.liferay.portal.model.User user) {
+		Object returnObj = null;
+
+		try {
+			returnObj = _invokableLocalService.invokeMethod(_methodName71,
+					_methodParameterTypes71,
+					new Object[] {
+						groupCreatedId,
+						
+					ClpSerializer.translateInput(user)
+					});
+		}
+		catch (Throwable t) {
+			t = ClpSerializer.translateThrowable(t);
+
+			if (t instanceof RuntimeException) {
+				throw (RuntimeException)t;
+			}
+			else {
+				throw new RuntimeException(t.getClass().getName() +
+					" is not a valid exception");
+			}
+		}
+
+		return ((Boolean)returnObj).booleanValue();
+	}
+
 	private InvokableLocalService _invokableLocalService;
 	private String _methodName0;
 	private String[] _methodParameterTypes0;
@@ -2882,4 +2950,8 @@ public class CourseLocalServiceClp implements CourseLocalService {
 	private String[] _methodParameterTypes68;
 	private String _methodName69;
 	private String[] _methodParameterTypes69;
+	private String _methodName70;
+	private String[] _methodParameterTypes70;
+	private String _methodName71;
+	private String[] _methodParameterTypes71;
 }

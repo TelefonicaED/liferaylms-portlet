@@ -1474,6 +1474,322 @@ public class LearningActivityUtil {
 	}
 
 	/**
+	* Returns all the learning activities where moduleId = &#63; and priority &lt; &#63;.
+	*
+	* @param moduleId the module ID
+	* @param priority the priority
+	* @return the matching learning activities
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.lms.model.LearningActivity> findByModuleIdPriorityLessThan(
+		long moduleId, long priority)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByModuleIdPriorityLessThan(moduleId, priority);
+	}
+
+	/**
+	* Returns a range of all the learning activities where moduleId = &#63; and priority &lt; &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param moduleId the module ID
+	* @param priority the priority
+	* @param start the lower bound of the range of learning activities
+	* @param end the upper bound of the range of learning activities (not inclusive)
+	* @return the range of matching learning activities
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.lms.model.LearningActivity> findByModuleIdPriorityLessThan(
+		long moduleId, long priority, int start, int end)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByModuleIdPriorityLessThan(moduleId, priority, start,
+			end);
+	}
+
+	/**
+	* Returns an ordered range of all the learning activities where moduleId = &#63; and priority &lt; &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param moduleId the module ID
+	* @param priority the priority
+	* @param start the lower bound of the range of learning activities
+	* @param end the upper bound of the range of learning activities (not inclusive)
+	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	* @return the ordered range of matching learning activities
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.lms.model.LearningActivity> findByModuleIdPriorityLessThan(
+		long moduleId, long priority, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByModuleIdPriorityLessThan(moduleId, priority, start,
+			end, orderByComparator);
+	}
+
+	/**
+	* Returns the first learning activity in the ordered set where moduleId = &#63; and priority &lt; &#63;.
+	*
+	* @param moduleId the module ID
+	* @param priority the priority
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the first matching learning activity
+	* @throws com.liferay.lms.NoSuchLearningActivityException if a matching learning activity could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.lms.model.LearningActivity findByModuleIdPriorityLessThan_First(
+		long moduleId, long priority,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchLearningActivityException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByModuleIdPriorityLessThan_First(moduleId, priority,
+			orderByComparator);
+	}
+
+	/**
+	* Returns the first learning activity in the ordered set where moduleId = &#63; and priority &lt; &#63;.
+	*
+	* @param moduleId the module ID
+	* @param priority the priority
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the first matching learning activity, or <code>null</code> if a matching learning activity could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.lms.model.LearningActivity fetchByModuleIdPriorityLessThan_First(
+		long moduleId, long priority,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .fetchByModuleIdPriorityLessThan_First(moduleId, priority,
+			orderByComparator);
+	}
+
+	/**
+	* Returns the last learning activity in the ordered set where moduleId = &#63; and priority &lt; &#63;.
+	*
+	* @param moduleId the module ID
+	* @param priority the priority
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the last matching learning activity
+	* @throws com.liferay.lms.NoSuchLearningActivityException if a matching learning activity could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.lms.model.LearningActivity findByModuleIdPriorityLessThan_Last(
+		long moduleId, long priority,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchLearningActivityException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByModuleIdPriorityLessThan_Last(moduleId, priority,
+			orderByComparator);
+	}
+
+	/**
+	* Returns the last learning activity in the ordered set where moduleId = &#63; and priority &lt; &#63;.
+	*
+	* @param moduleId the module ID
+	* @param priority the priority
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the last matching learning activity, or <code>null</code> if a matching learning activity could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.lms.model.LearningActivity fetchByModuleIdPriorityLessThan_Last(
+		long moduleId, long priority,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .fetchByModuleIdPriorityLessThan_Last(moduleId, priority,
+			orderByComparator);
+	}
+
+	/**
+	* Returns the learning activities before and after the current learning activity in the ordered set where moduleId = &#63; and priority &lt; &#63;.
+	*
+	* @param actId the primary key of the current learning activity
+	* @param moduleId the module ID
+	* @param priority the priority
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the previous, current, and next learning activity
+	* @throws com.liferay.lms.NoSuchLearningActivityException if a learning activity with the primary key could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.lms.model.LearningActivity[] findByModuleIdPriorityLessThan_PrevAndNext(
+		long actId, long moduleId, long priority,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchLearningActivityException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByModuleIdPriorityLessThan_PrevAndNext(actId, moduleId,
+			priority, orderByComparator);
+	}
+
+	/**
+	* Returns all the learning activities where moduleId = &#63; and priority &gt; &#63;.
+	*
+	* @param moduleId the module ID
+	* @param priority the priority
+	* @return the matching learning activities
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.lms.model.LearningActivity> findByModuleIdPriorityGreaterThan(
+		long moduleId, long priority)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByModuleIdPriorityGreaterThan(moduleId, priority);
+	}
+
+	/**
+	* Returns a range of all the learning activities where moduleId = &#63; and priority &gt; &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param moduleId the module ID
+	* @param priority the priority
+	* @param start the lower bound of the range of learning activities
+	* @param end the upper bound of the range of learning activities (not inclusive)
+	* @return the range of matching learning activities
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.lms.model.LearningActivity> findByModuleIdPriorityGreaterThan(
+		long moduleId, long priority, int start, int end)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByModuleIdPriorityGreaterThan(moduleId, priority,
+			start, end);
+	}
+
+	/**
+	* Returns an ordered range of all the learning activities where moduleId = &#63; and priority &gt; &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param moduleId the module ID
+	* @param priority the priority
+	* @param start the lower bound of the range of learning activities
+	* @param end the upper bound of the range of learning activities (not inclusive)
+	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	* @return the ordered range of matching learning activities
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.lms.model.LearningActivity> findByModuleIdPriorityGreaterThan(
+		long moduleId, long priority, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByModuleIdPriorityGreaterThan(moduleId, priority,
+			start, end, orderByComparator);
+	}
+
+	/**
+	* Returns the first learning activity in the ordered set where moduleId = &#63; and priority &gt; &#63;.
+	*
+	* @param moduleId the module ID
+	* @param priority the priority
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the first matching learning activity
+	* @throws com.liferay.lms.NoSuchLearningActivityException if a matching learning activity could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.lms.model.LearningActivity findByModuleIdPriorityGreaterThan_First(
+		long moduleId, long priority,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchLearningActivityException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByModuleIdPriorityGreaterThan_First(moduleId, priority,
+			orderByComparator);
+	}
+
+	/**
+	* Returns the first learning activity in the ordered set where moduleId = &#63; and priority &gt; &#63;.
+	*
+	* @param moduleId the module ID
+	* @param priority the priority
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the first matching learning activity, or <code>null</code> if a matching learning activity could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.lms.model.LearningActivity fetchByModuleIdPriorityGreaterThan_First(
+		long moduleId, long priority,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .fetchByModuleIdPriorityGreaterThan_First(moduleId,
+			priority, orderByComparator);
+	}
+
+	/**
+	* Returns the last learning activity in the ordered set where moduleId = &#63; and priority &gt; &#63;.
+	*
+	* @param moduleId the module ID
+	* @param priority the priority
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the last matching learning activity
+	* @throws com.liferay.lms.NoSuchLearningActivityException if a matching learning activity could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.lms.model.LearningActivity findByModuleIdPriorityGreaterThan_Last(
+		long moduleId, long priority,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchLearningActivityException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByModuleIdPriorityGreaterThan_Last(moduleId, priority,
+			orderByComparator);
+	}
+
+	/**
+	* Returns the last learning activity in the ordered set where moduleId = &#63; and priority &gt; &#63;.
+	*
+	* @param moduleId the module ID
+	* @param priority the priority
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the last matching learning activity, or <code>null</code> if a matching learning activity could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.lms.model.LearningActivity fetchByModuleIdPriorityGreaterThan_Last(
+		long moduleId, long priority,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .fetchByModuleIdPriorityGreaterThan_Last(moduleId, priority,
+			orderByComparator);
+	}
+
+	/**
+	* Returns the learning activities before and after the current learning activity in the ordered set where moduleId = &#63; and priority &gt; &#63;.
+	*
+	* @param actId the primary key of the current learning activity
+	* @param moduleId the module ID
+	* @param priority the priority
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the previous, current, and next learning activity
+	* @throws com.liferay.lms.NoSuchLearningActivityException if a learning activity with the primary key could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.lms.model.LearningActivity[] findByModuleIdPriorityGreaterThan_PrevAndNext(
+		long actId, long moduleId, long priority,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchLearningActivityException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByModuleIdPriorityGreaterThan_PrevAndNext(actId,
+			moduleId, priority, orderByComparator);
+	}
+
+	/**
 	* Returns all the learning activities.
 	*
 	* @return the learning activities
@@ -1617,6 +1933,32 @@ public class LearningActivityUtil {
 	public static void removeByPrecedence(long precedence)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		getPersistence().removeByPrecedence(precedence);
+	}
+
+	/**
+	* Removes all the learning activities where moduleId = &#63; and priority &lt; &#63; from the database.
+	*
+	* @param moduleId the module ID
+	* @param priority the priority
+	* @throws SystemException if a system exception occurred
+	*/
+	public static void removeByModuleIdPriorityLessThan(long moduleId,
+		long priority)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		getPersistence().removeByModuleIdPriorityLessThan(moduleId, priority);
+	}
+
+	/**
+	* Removes all the learning activities where moduleId = &#63; and priority &gt; &#63; from the database.
+	*
+	* @param moduleId the module ID
+	* @param priority the priority
+	* @throws SystemException if a system exception occurred
+	*/
+	public static void removeByModuleIdPriorityGreaterThan(long moduleId,
+		long priority)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		getPersistence().removeByModuleIdPriorityGreaterThan(moduleId, priority);
 	}
 
 	/**
@@ -1767,6 +2109,36 @@ public class LearningActivityUtil {
 	public static int countByPrecedence(long precedence)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getPersistence().countByPrecedence(precedence);
+	}
+
+	/**
+	* Returns the number of learning activities where moduleId = &#63; and priority &lt; &#63;.
+	*
+	* @param moduleId the module ID
+	* @param priority the priority
+	* @return the number of matching learning activities
+	* @throws SystemException if a system exception occurred
+	*/
+	public static int countByModuleIdPriorityLessThan(long moduleId,
+		long priority)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .countByModuleIdPriorityLessThan(moduleId, priority);
+	}
+
+	/**
+	* Returns the number of learning activities where moduleId = &#63; and priority &gt; &#63;.
+	*
+	* @param moduleId the module ID
+	* @param priority the priority
+	* @return the number of matching learning activities
+	* @throws SystemException if a system exception occurred
+	*/
+	public static int countByModuleIdPriorityGreaterThan(long moduleId,
+		long priority)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .countByModuleIdPriorityGreaterThan(moduleId, priority);
 	}
 
 	/**

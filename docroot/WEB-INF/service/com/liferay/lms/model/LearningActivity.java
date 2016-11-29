@@ -46,4 +46,33 @@ public interface LearningActivity extends LearningActivityModel, PersistedModel 
 		java.lang.String languageId, boolean useDefault);
 
 	public com.liferay.lms.model.Module getModule();
+
+	public boolean isLocked(com.liferay.portal.model.User user,
+		com.liferay.portal.security.permission.PermissionChecker permissionChecker);
+
+	public boolean isLocked(com.liferay.portal.model.User user);
+
+	public boolean isLocked(long userId);
+
+	/**
+	* Comprueba si se peude accceder a una actividad
+	*
+	* @param viewActivityFinish Si la actividad deja acceder coon el modo observador
+	* @return
+	*/
+	public boolean canAccess(boolean viewActivityFinish,
+		com.liferay.portal.model.User user,
+		com.liferay.portal.security.permission.PermissionChecker permissionChecker);
+
+	/**
+	* Comprueba si se peude accceder a una actividad
+	*
+	* @param viewActivityFinish Si la actividad deja acceder coon el modo observador
+	* @return
+	*/
+	public boolean canAccess(boolean viewActivityFinish,
+		com.liferay.portal.model.User user,
+		com.liferay.portal.security.permission.PermissionChecker permissionChecker,
+		boolean canAccessLock, com.liferay.lms.model.Course course,
+		boolean hasPermissionAccessCourseFinished);
 }

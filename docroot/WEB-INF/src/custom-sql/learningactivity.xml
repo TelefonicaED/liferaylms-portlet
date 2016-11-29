@@ -1,0 +1,15 @@
+<custom-sql>
+
+	<sql id="com.liferay.lms.service.persistence.LearningActivityFinder.findByPriority">
+		<![CDATA[   			
+			SELECT *
+			FROM 
+				lms_learningactivity 
+			WHERE 
+				moduleId = ? AND companyId = ?
+			ORDER BY 
+				priority
+			LIMIT ?,1;
+		]]>
+	</sql>
+</custom-sql>

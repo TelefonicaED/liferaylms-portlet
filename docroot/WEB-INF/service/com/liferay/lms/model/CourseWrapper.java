@@ -1314,6 +1314,15 @@ public class CourseWrapper implements Course, ModelWrapper<Course> {
 		return _course.getGroup();
 	}
 
+	public boolean isLocked(com.liferay.portal.model.User user) {
+		return _course.isLocked(user);
+	}
+
+	public boolean isLocked(com.liferay.portal.model.User user,
+		com.liferay.portal.security.permission.PermissionChecker permissionChecker) {
+		return _course.isLocked(user, permissionChecker);
+	}
+
 	/**
 	 * @deprecated Renamed to {@link #getWrappedModel}
 	 */

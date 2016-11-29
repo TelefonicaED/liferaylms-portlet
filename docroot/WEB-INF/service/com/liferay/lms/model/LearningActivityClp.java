@@ -704,7 +704,19 @@ public class LearningActivityClp extends BaseModelImpl<LearningActivity>
 		throw new UnsupportedOperationException();
 	}
 
+	public boolean isLocked(com.liferay.portal.model.User user) {
+		throw new UnsupportedOperationException();
+	}
+
 	public com.liferay.lms.model.Module getModule() {
+		throw new UnsupportedOperationException();
+	}
+
+	public boolean canAccess(boolean viewActivityFinish,
+		com.liferay.portal.model.User user,
+		com.liferay.portal.security.permission.PermissionChecker permissionChecker,
+		boolean canAccessLock, com.liferay.lms.model.Course course,
+		boolean hasPermissionAccessCourseFinished) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -712,8 +724,23 @@ public class LearningActivityClp extends BaseModelImpl<LearningActivity>
 		throw new UnsupportedOperationException();
 	}
 
+	public boolean isLocked(com.liferay.portal.model.User user,
+		com.liferay.portal.security.permission.PermissionChecker permissionChecker) {
+		throw new UnsupportedOperationException();
+	}
+
+	public boolean isLocked(long userId) {
+		throw new UnsupportedOperationException();
+	}
+
 	public java.lang.String getDescriptionFiltered(
 		java.lang.String languageId, boolean useDefault) {
+		throw new UnsupportedOperationException();
+	}
+
+	public boolean canAccess(boolean viewActivityFinish,
+		com.liferay.portal.model.User user,
+		com.liferay.portal.security.permission.PermissionChecker permissionChecker) {
 		throw new UnsupportedOperationException();
 	}
 

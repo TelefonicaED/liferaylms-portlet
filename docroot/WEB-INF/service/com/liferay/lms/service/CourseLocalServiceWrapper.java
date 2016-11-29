@@ -644,6 +644,35 @@ public class CourseLocalServiceWrapper implements CourseLocalService,
 	}
 
 	/**
+	* Se van a realizar las siguientes comprobaciones:
+	* - Curso cerrado
+	* - Que pertenezcas a la comunidad
+	* - Que tengas permiso para acceder al curso
+	* - Comprobar que tenga una convocatoria en fecha
+	* - Que el usuario tenga fechas propias para realizarlo y estÃƒÂ©n en fecha
+	*
+	* @param courseId Id el curso
+	* @param user Usuario
+	* @return true si el curso estÃƒÂ¡ bloqueado, false en caso contrario
+	*/
+	public boolean isLocked(com.liferay.lms.model.Course course,
+		com.liferay.portal.model.User user) {
+		return _courseLocalService.isLocked(course, user);
+	}
+
+	/**
+	* Comprueba si un usuario puede acceder a los cursos/modulos/actividades bloqueadas
+	*
+	* @param groupCreatedId id del grupo creado para el curso
+	* @param user usuario
+	* @return true en caso de que pueda acceder a bloqueados
+	*/
+	public boolean canAccessLock(long groupCreatedId,
+		com.liferay.portal.model.User user) {
+		return _courseLocalService.canAccessLock(groupCreatedId, user);
+	}
+
+	/**
 	 * @deprecated Renamed to {@link #getWrappedService}
 	 */
 	public CourseLocalService getWrappedCourseLocalService() {

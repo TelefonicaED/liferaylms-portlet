@@ -355,6 +355,17 @@ public interface ModuleLocalService extends BaseLocalService,
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
+	/**
+	* Se mira si el mÃ³dulo estÃ¡ bloqueado, NO SE TIENE EN CUENTA EL CURSO, PARA SABER SI TIENES BLOQUEADO EL CURSO LLAMAR AL ISLOCKED DEL CURSO
+	* Se harÃ¡n las siguientes comprobaciones:
+	* - Si tienes permisos
+	* - Que hayas superado el mÃ³dulo precedente
+	* - Fecha inicio/fin del mÃ³dulo (teniendo en cuenta las convocatorias del usuario)
+	*
+	* @param moduleId Id del mÃ³dulo
+	* @param userId Id del usuario
+	* @return true si el mÃ³dulo estÃ¡ bloqueado, false en caso contrario
+	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public boolean isLocked(long moduleId, long userId)
 		throws java.lang.Exception;

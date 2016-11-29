@@ -119,9 +119,10 @@ public class LearningActivityModelImpl extends BaseModelImpl<LearningActivity>
 	public static long GROUPID_COLUMN_BITMASK = 1L;
 	public static long MODULEID_COLUMN_BITMASK = 2L;
 	public static long PRECEDENCE_COLUMN_BITMASK = 4L;
-	public static long TYPEID_COLUMN_BITMASK = 8L;
-	public static long UUID_COLUMN_BITMASK = 16L;
-	public static long WEIGHTINMODULE_COLUMN_BITMASK = 32L;
+	public static long PRIORITY_COLUMN_BITMASK = 8L;
+	public static long TYPEID_COLUMN_BITMASK = 16L;
+	public static long UUID_COLUMN_BITMASK = 32L;
+	public static long WEIGHTINMODULE_COLUMN_BITMASK = 64L;
 
 	/**
 	 * Converts the soap model instance into a normal model instance.
@@ -826,7 +827,17 @@ public class LearningActivityModelImpl extends BaseModelImpl<LearningActivity>
 	public void setPriority(long priority) {
 		_columnBitmask = -1L;
 
+		if (!_setOriginalPriority) {
+			_setOriginalPriority = true;
+
+			_originalPriority = _priority;
+		}
+
 		_priority = priority;
+	}
+
+	public long getOriginalPriority() {
+		return _originalPriority;
 	}
 
 	public long getModuleId() {
@@ -1155,6 +1166,10 @@ public class LearningActivityModelImpl extends BaseModelImpl<LearningActivity>
 		learningActivityModelImpl._originalPrecedence = learningActivityModelImpl._precedence;
 
 		learningActivityModelImpl._setOriginalPrecedence = false;
+
+		learningActivityModelImpl._originalPriority = learningActivityModelImpl._priority;
+
+		learningActivityModelImpl._setOriginalPriority = false;
 
 		learningActivityModelImpl._originalModuleId = learningActivityModelImpl._moduleId;
 
@@ -1531,6 +1546,8 @@ public class LearningActivityModelImpl extends BaseModelImpl<LearningActivity>
 	private long _tries;
 	private int _passpuntuation;
 	private long _priority;
+	private long _originalPriority;
+	private boolean _setOriginalPriority;
 	private long _moduleId;
 	private long _originalModuleId;
 	private boolean _setOriginalModuleId;

@@ -48,10 +48,6 @@
 	long actId	=ParamUtil.getLong(request,"actId",0);
 	long userId = themeDisplay.getUserId();
 	
-	boolean isNewTry = false;
-
-	String openWindow = GetterUtil.getString(LearningActivityLocalServiceUtil.getExtraContentValue(actId, "openWindow"), "true");
-	boolean improve   = GetterUtil.getBoolean(LearningActivityLocalServiceUtil.getExtraContentValue(actId, "improve"), true);
 
 	//Obtener si puede hacer un intento de mejorar el resultado.
 	
@@ -60,14 +56,18 @@
 		renderRequest.setAttribute(WebKeys.PORTLET_CONFIGURATOR_VISIBILITY, Boolean.FALSE);
 	} else {
 		
-		boolean userLocked 		 = LearningActivityLocalServiceUtil.islocked(actId,userId);
-		boolean permissionUpdate = permissionChecker.hasPermission(activity.getGroupId(),LearningActivity.class.getName(), actId, ActionKeys.UPDATE);
 		boolean permissionAcLock = permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), "com.liferay.lms.model",themeDisplay.getScopeGroupId(),"ACCESSLOCK");
 		Course course = CourseLocalServiceUtil.getCourseByGroupCreatedId(activity.getGroupId());
 		boolean hasPermissionAccessCourseFinished = LiferaylmsUtil.hasPermissionAccessCourseFinished(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(), course.getCourseId(), themeDisplay.getUserId());
+		
 		request.setAttribute("hasPermissionAccessCourseFinished", hasPermissionAccessCourseFinished);
 		
-		if( !userLocked || permissionUpdate || permissionAcLock || hasPermissionAccessCourseFinished) {
+		if(activity.canAccess(true, themeDisplay.getUser(), themeDisplay.getPermissionChecker(), permissionAcLock, course, hasPermissionAccessCourseFinished)) {
+			
+			boolean isNewTry = false;
+
+			String openWindow = GetterUtil.getString(LearningActivityLocalServiceUtil.getExtraContentValue(actId, "openWindow"), "true");
+			boolean improve   = GetterUtil.getBoolean(LearningActivityLocalServiceUtil.getExtraContentValue(actId, "improve"), true);
 			
 			boolean improving = true;
 			LearningActivityResult result = LearningActivityResultLocalServiceUtil.getByActIdAndUserId(actId, userId);

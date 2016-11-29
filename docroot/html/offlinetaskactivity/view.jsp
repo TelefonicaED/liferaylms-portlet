@@ -40,215 +40,210 @@
 	}
 	else
 	{
-		Course course=CourseLocalServiceUtil.fetchByGroupCreatedId(themeDisplay.getScopeGroupId());
 		LearningActivity activity = LearningActivityLocalServiceUtil.getLearningActivity(actId);
-		long typeId=activity.getTypeId();
-		
-		boolean isOffline = activity.getTypeId() == 5;
-		
-		LearningActivityResult result = LearningActivityResultLocalServiceUtil.getByActIdAndUserId(actId, themeDisplay.getUserId());
-		Object  [] arguments=null;
-		
-		if(result!=null){	
-			arguments =  new Object[]{result.getResult()};
-		}
-		
-		boolean isTeacher=permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), "com.liferay.lms.model",themeDisplay.getScopeGroupId(), "VIEW_RESULTS");	
-		
-		if(typeId==5&&(!LearningActivityLocalServiceUtil.islocked(actId,themeDisplay.getUserId())||
-				permissionChecker.hasPermission(activity.getGroupId(), LearningActivity.class.getName(), actId, ActionKeys.UPDATE)||
-				permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), "com.liferay.lms.model",themeDisplay.getScopeGroupId(),"ACCESSLOCK")))
-		{
-		%>
-
-			<div class="offlinetaskactivity view">
-
-				<h2 class="description-title"><%=activity.getTitle(themeDisplay.getLocale()) %></h2>
-										
-				<% if(isTeacher){ %>
-									
-				<portlet:renderURL var="viewUrlPopImportGrades" windowState="<%= LiferayWindowState.POP_UP.toString() %>">   
-					<portlet:param name="actId" value="<%=String.valueOf(activity.getActId()) %>" />      
-		            <portlet:param name="jspPage" value="/html/offlinetaskactivity/popups/importGrades.jsp" />           
-		        </portlet:renderURL>
-		        
-				<portlet:renderURL var="viewUrlPopGrades" windowState="<%= LiferayWindowState.POP_UP.toString() %>">   
-					<portlet:param name="actId" value="<%=String.valueOf(activity.getActId()) %>" />      
-		            <portlet:param name="jspPage" value="/html/offlinetaskactivity/popups/grades.jsp" />           
-		        </portlet:renderURL>
-		        
-		        <portlet:renderURL var="setGradesURL" windowState="<%= LiferayWindowState.EXCLUSIVE.toString() %>">   
-					<portlet:param name="actId" value="<%=String.valueOf(activity.getActId()) %>" /> 
-					<portlet:param name="ajaxAction" value="setGrades" />      
-		            <portlet:param name="jspPage" value="/html/offlinetaskactivity/popups/grades.jsp" />           
-		        </portlet:renderURL>
-
-				<script type="text/javascript">
-			    <!--
-
-
-				    function <portlet:namespace />showPopupImportGrades()
-				    {
-						AUI().use('aui-dialog','liferay-portlet-url','event', function(A){
-							window.<portlet:namespace />popupImportGrades = new A.Dialog({
-								id:'<portlet:namespace />showPopupImportGrades',
-					            title: '<liferay-message key="offlinetaskactivity.import.grades" />',
-						    	centered: true,
-					            modal: true,
-					            width: 550,
-					            height: 320,
-					            after: {   
-						          	close: function(event){ 
-						          		document.getElementById('<portlet:namespace />studentsearch').submit();
-					            	}
-					            }
-					        }).plug(A.Plugin.IO, {
-					            uri: '<%= viewUrlPopImportGrades %>'
-					        }).render();
-							window.<portlet:namespace />popupImportGrades.show();   
-						});
-				    }
-
-				    function <portlet:namespace />doClosePopupImportGrades()
-				    {
-				        AUI().use('aui-dialog', function(A) {
-				        	window.<portlet:namespace />popupImportGrades.close();
-				        });
-				    }
-
-
-				    function <portlet:namespace />doImportGrades()
-				    {
-						var importGradesDIV=document.getElementById('<portlet:namespace />import_frame').
-											contentDocument.getElementById('<portlet:namespace />importErrors');
-						if(importGradesDIV){
-							document.getElementById('<portlet:namespace />importErrors').innerHTML=importGradesDIV.innerHTML;
-						}
-						else {
-							document.getElementById('<portlet:namespace />importErrors').innerHTML='';
-						}
-				    }
-
-
-				    function <portlet:namespace />showPopupGrades(studentId)
-				    {
-
-						AUI().use('aui-dialog','liferay-portlet-url', function(A){
-							var renderUrl = Liferay.PortletURL.createRenderURL();							
-							renderUrl.setWindowState('<%= LiferayWindowState.POP_UP.toString() %>');
-							renderUrl.setPortletId('<%=portletDisplay.getId()%>');
-							renderUrl.setParameter('actId', '<%=String.valueOf(activity.getActId()) %>');
-							renderUrl.setParameter('studentId', studentId);
-							renderUrl.setParameter('jspPage', '/html/offlinetaskactivity/popups/grades.jsp');
-
-							window.<portlet:namespace />popupGrades = new A.Dialog({
-								id:'<portlet:namespace />showPopupGrades',
-					            title: '<%=LanguageUtil.format(pageContext, "offlinetaskactivity.set.grades", new Object[]{""})%>',
-					            centered: true,
-					            modal: true,
-					            width: 600,
-					            height: 350,
-					            after: {   
-						          	close: function(event){ 
-						          		document.getElementById('<portlet:namespace />studentsearch').submit();
-					            	}
-					            }
-					        }).plug(A.Plugin.IO, {
-					            uri: renderUrl.toString(),
-					            parseContent: true
-					        }).render();
-							window.<portlet:namespace />popupGrades.show();   
-						});
-				    }
-
-				    function <portlet:namespace />doClosePopupGrades()
-				    {
-				        AUI().use('aui-dialog', function(A) {
-				        	window.<portlet:namespace />popupGrades.close();
-				        });
-				    }
-
-				    function <portlet:namespace />doSaveGrades()
-				    {
-				        AUI().use('aui-io-request','io-form', function(A) {
-				            A.io.request('<%= setGradesURL %>', { 
-				                method : 'POST', 
-				                form: {
-				                    id: '<portlet:namespace />fn_grades'
-				                },
-				                dataType : 'html', 
-				                on : { 
-				                    success : function() { 
-				                    	A.one('.aui-dialog-bd form').set('innerHTML',A.Node.create('<div>'+this.get('responseData')+'</div>').one('form').get('innerHTML'));	
-				                    	createValidator();			                    	
-				                    } 
-				                } 
-				            });
-				        });
-				    }
+		if(activity.getTypeId() == 5){
 			
-				    //-->
-				</script>
-
-				<div class="container-toolbar" >
+			if(activity.canAccess(false, themeDisplay.getUser(), themeDisplay.getPermissionChecker())){
+		
+				LearningActivityResult result = LearningActivityResultLocalServiceUtil.getByActIdAndUserId(actId, themeDisplay.getUserId());
+				Object  [] arguments=null;
+		
+				if(result!=null){	
+					arguments =  new Object[]{result.getResult()};
+				}
+		
+				boolean isTeacher=permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), "com.liferay.lms.model",themeDisplay.getScopeGroupId(), "VIEW_RESULTS");	
+		
+			%>
+	
+				<div class="offlinetaskactivity view">
+	
+					<h2 class="description-title"><%=activity.getTitle(themeDisplay.getLocale()) %></h2>
+											
+					<% if(isTeacher){ %>
+										
+					<portlet:renderURL var="viewUrlPopImportGrades" windowState="<%= LiferayWindowState.POP_UP.toString() %>">   
+						<portlet:param name="actId" value="<%=String.valueOf(activity.getActId()) %>" />      
+			            <portlet:param name="jspPage" value="/html/offlinetaskactivity/popups/importGrades.jsp" />           
+			        </portlet:renderURL>
+			        
+					<portlet:renderURL var="viewUrlPopGrades" windowState="<%= LiferayWindowState.POP_UP.toString() %>">   
+						<portlet:param name="actId" value="<%=String.valueOf(activity.getActId()) %>" />      
+			            <portlet:param name="jspPage" value="/html/offlinetaskactivity/popups/grades.jsp" />           
+			        </portlet:renderURL>
+			        
+			        <portlet:renderURL var="setGradesURL" windowState="<%= LiferayWindowState.EXCLUSIVE.toString() %>">   
+						<portlet:param name="actId" value="<%=String.valueOf(activity.getActId()) %>" /> 
+						<portlet:param name="ajaxAction" value="setGrades" />      
+			            <portlet:param name="jspPage" value="/html/offlinetaskactivity/popups/grades.jsp" />           
+			        </portlet:renderURL>
+	
+					<script type="text/javascript">
+				    <!--
+	
+	
+					    function <portlet:namespace />showPopupImportGrades()
+					    {
+							AUI().use('aui-dialog','liferay-portlet-url','event', function(A){
+								window.<portlet:namespace />popupImportGrades = new A.Dialog({
+									id:'<portlet:namespace />showPopupImportGrades',
+						            title: '<liferay-message key="offlinetaskactivity.import.grades" />',
+							    	centered: true,
+						            modal: true,
+						            width: 550,
+						            height: 320,
+						            after: {   
+							          	close: function(event){ 
+							          		document.getElementById('<portlet:namespace />studentsearch').submit();
+						            	}
+						            }
+						        }).plug(A.Plugin.IO, {
+						            uri: '<%= viewUrlPopImportGrades %>'
+						        }).render();
+								window.<portlet:namespace />popupImportGrades.show();   
+							});
+					    }
+	
+					    function <portlet:namespace />doClosePopupImportGrades()
+					    {
+					        AUI().use('aui-dialog', function(A) {
+					        	window.<portlet:namespace />popupImportGrades.close();
+					        });
+					    }
+	
+	
+					    function <portlet:namespace />doImportGrades()
+					    {
+							var importGradesDIV=document.getElementById('<portlet:namespace />import_frame').
+												contentDocument.getElementById('<portlet:namespace />importErrors');
+							if(importGradesDIV){
+								document.getElementById('<portlet:namespace />importErrors').innerHTML=importGradesDIV.innerHTML;
+							}
+							else {
+								document.getElementById('<portlet:namespace />importErrors').innerHTML='';
+							}
+					    }
+	
+	
+					    function <portlet:namespace />showPopupGrades(studentId)
+					    {
+	
+							AUI().use('aui-dialog','liferay-portlet-url', function(A){
+								var renderUrl = Liferay.PortletURL.createRenderURL();							
+								renderUrl.setWindowState('<%= LiferayWindowState.POP_UP.toString() %>');
+								renderUrl.setPortletId('<%=portletDisplay.getId()%>');
+								renderUrl.setParameter('actId', '<%=String.valueOf(activity.getActId()) %>');
+								renderUrl.setParameter('studentId', studentId);
+								renderUrl.setParameter('jspPage', '/html/offlinetaskactivity/popups/grades.jsp');
+	
+								window.<portlet:namespace />popupGrades = new A.Dialog({
+									id:'<portlet:namespace />showPopupGrades',
+						            title: '<%=LanguageUtil.format(pageContext, "offlinetaskactivity.set.grades", new Object[]{""})%>',
+						            centered: true,
+						            modal: true,
+						            width: 600,
+						            height: 350,
+						            after: {   
+							          	close: function(event){ 
+							          		document.getElementById('<portlet:namespace />studentsearch').submit();
+						            	}
+						            }
+						        }).plug(A.Plugin.IO, {
+						            uri: renderUrl.toString(),
+						            parseContent: true
+						        }).render();
+								window.<portlet:namespace />popupGrades.show();   
+							});
+					    }
+	
+					    function <portlet:namespace />doClosePopupGrades()
+					    {
+					        AUI().use('aui-dialog', function(A) {
+					        	window.<portlet:namespace />popupGrades.close();
+					        });
+					    }
+	
+					    function <portlet:namespace />doSaveGrades()
+					    {
+					        AUI().use('aui-io-request','io-form', function(A) {
+					            A.io.request('<%= setGradesURL %>', { 
+					                method : 'POST', 
+					                form: {
+					                    id: '<portlet:namespace />fn_grades'
+					                },
+					                dataType : 'html', 
+					                on : { 
+					                    success : function() { 
+					                    	A.one('.aui-dialog-bd form').set('innerHTML',A.Node.create('<div>'+this.get('responseData')+'</div>').one('form').get('innerHTML'));	
+					                    	createValidator();			                    	
+					                    } 
+					                } 
+					            });
+					        });
+					    }
+				
+					    //-->
+					</script>
+	
+					<div class="container-toolbar" >
+						
+						<liferay-ui:icon-menu cssClass='bt_importexport' direction="down" extended="<%= false %>" message="offlinetaskactivity.csv.export.import" showWhenSingleIcon="<%= true %>">
+						
+							<div>
+								<liferay-portlet:resourceURL var="exportURL" >
+									<portlet:param name="action" value="export"/>
+									<portlet:param name="resId" value="<%=String.valueOf(activity.getActId()) %>"/>
+								</liferay-portlet:resourceURL>
+								<liferay-ui:icon image="export" label="<%= true %>" message="offlinetaskactivity.csv.export" method="get" url="<%=exportURL%>" />
+							</div>
+							<div>
+								<liferay-ui:icon image="add" label="<%= true %>" message="offlinetaskactivity.import.grades" url='<%="javascript:"+renderResponse.getNamespace() + "showPopupImportGrades();" %>'/>
+							</div>
+						</liferay-ui:icon-menu>
+	
+					</div>
 					
-					<liferay-ui:icon-menu cssClass='bt_importexport' direction="down" extended="<%= false %>" message="offlinetaskactivity.csv.export.import" showWhenSingleIcon="<%= true %>">
+					<% } %>
+					<%--<h3 class="description-h3"><liferay-ui:message key="description" /></h3> --%>
+					<div class="description"><%=activity.getDescriptionFiltered(themeDisplay.getLocale(),true) %></div>
 					
-						<div>
-							<liferay-portlet:resourceURL var="exportURL" >
-								<portlet:param name="action" value="export"/>
-								<portlet:param name="resId" value="<%=String.valueOf(activity.getActId()) %>"/>
-							</liferay-portlet:resourceURL>
-							<liferay-ui:icon image="export" label="<%= true %>" message="offlinetaskactivity.csv.export" method="get" url="<%=exportURL%>" />
-						</div>
-						<div>
-							<liferay-ui:icon image="add" label="<%= true %>" message="offlinetaskactivity.import.grades" url='<%="javascript:"+renderResponse.getNamespace() + "showPopupImportGrades();" %>'/>
-						</div>
-					</liferay-ui:icon-menu>
-
-				</div>
-				
-				<% } %>
-				<%--<h3 class="description-h3"><liferay-ui:message key="description" /></h3> --%>
-				<div class="description"><%=activity.getDescriptionFiltered(themeDisplay.getLocale(),true) %></div>
-				
-				
-				<% if((PermissionCheckerFactoryUtil.create(themeDisplay.getUser())).hasPermission(themeDisplay.getScopeGroupId(), "com.liferay.lms.model", themeDisplay.getScopeGroupId(), "VIEW_RESULTS")){ 
-					String criteria = request.getParameter("criteria");
-					String gradeFilter = request.getParameter("gradeFilter");
-
-					if (criteria == null) criteria = "";	
-					if (gradeFilter == null) gradeFilter = "";	
 					
-					PortletURL portletURL = renderResponse.createRenderURL();
-					portletURL.setParameter("jspPage","/html/offlinetaskactivity/view.jsp");
-					portletURL.setParameter("criteria", criteria); 
-					portletURL.setParameter("gradeFilter", gradeFilter);
-				
-				%>
-				
-				<liferay-portlet:renderURL var="returnurl" />
-				
-				<h5><liferay-ui:message key="studentsearch"/></h5>
-				<aui:form name="studentsearch" action="<%=returnurl %>" method="post">
-					<aui:fieldset>
-						<aui:column>
-							<aui:input label="studentsearch.text.criteria" name="criteria" size="25" value="<%=criteria %>" />	
-						</aui:column>	
-						<aui:column>
-							<aui:select label="offlinetaskactivity.status" name="gradeFilter" onchange='<%="document.getElementById(\'" + renderResponse.getNamespace() + "studentsearch\').submit();" %>'>
-								<aui:option selected='<%= gradeFilter.equals("") %>' value=""><liferay-ui:message key="offlinetaskactivity.all" /></aui:option>
-								<aui:option selected='<%= gradeFilter.equals("nocalification") %>' value="nocalification"><liferay-ui:message key="offlinetaskactivity.status.passed" /></aui:option>
-								<aui:option selected='<%= gradeFilter.equals("passed") %>' value="passed"><liferay-ui:message key="offlinetaskactivity.passed" /></aui:option>
-								<aui:option selected='<%= gradeFilter.equals("failed") %>' value="failed"><liferay-ui:message key="offlinetaskactivity.failed" /></aui:option>
-							</aui:select>
-						</aui:column>	
-						<aui:column>
-							<aui:button cssClass="inline-button" name="searchUsers" value="search" type="submit" />
-						</aui:column>
-					</aui:fieldset>
-				</aui:form>
-				
+					<% if((PermissionCheckerFactoryUtil.create(themeDisplay.getUser())).hasPermission(themeDisplay.getScopeGroupId(), "com.liferay.lms.model", themeDisplay.getScopeGroupId(), "VIEW_RESULTS")){ 
+						String criteria = request.getParameter("criteria");
+						String gradeFilter = request.getParameter("gradeFilter");
+	
+						if (criteria == null) criteria = "";	
+						if (gradeFilter == null) gradeFilter = "";	
+						
+						PortletURL portletURL = renderResponse.createRenderURL();
+						portletURL.setParameter("jspPage","/html/offlinetaskactivity/view.jsp");
+						portletURL.setParameter("criteria", criteria); 
+						portletURL.setParameter("gradeFilter", gradeFilter);
+					
+					%>
+					
+					<liferay-portlet:renderURL var="returnurl" />
+					
+					<h5><liferay-ui:message key="studentsearch"/></h5>
+					<aui:form name="studentsearch" action="<%=returnurl %>" method="post">
+						<aui:fieldset>
+							<aui:column>
+								<aui:input label="studentsearch.text.criteria" name="criteria" size="25" value="<%=criteria %>" />	
+							</aui:column>	
+							<aui:column>
+								<aui:select label="offlinetaskactivity.status" name="gradeFilter" onchange='<%="document.getElementById(\'" + renderResponse.getNamespace() + "studentsearch\').submit();" %>'>
+									<aui:option selected='<%= gradeFilter.equals("") %>' value=""><liferay-ui:message key="offlinetaskactivity.all" /></aui:option>
+									<aui:option selected='<%= gradeFilter.equals("nocalification") %>' value="nocalification"><liferay-ui:message key="offlinetaskactivity.status.passed" /></aui:option>
+									<aui:option selected='<%= gradeFilter.equals("passed") %>' value="passed"><liferay-ui:message key="offlinetaskactivity.passed" /></aui:option>
+									<aui:option selected='<%= gradeFilter.equals("failed") %>' value="failed"><liferay-ui:message key="offlinetaskactivity.failed" /></aui:option>
+								</aui:select>
+							</aui:column>	
+							<aui:column>
+								<aui:button cssClass="inline-button" name="searchUsers" value="search" type="submit" />
+							</aui:column>
+						</aui:fieldset>
+					</aui:form>
+					
 					
 					<liferay-ui:search-container iteratorURL="<%=portletURL%>" emptyResultsMessage="there-are-no-results" delta="10" deltaConfigurable="true">
 
@@ -350,29 +345,30 @@
 				
 				<div class="nota"> 
 
-<%if(!isTeacher) {%>
-	<h3><liferay-ui:message key="offlinetaskactivity.your-calification" /> </h3>
-	<%if ((result!=null)&&(result.getEndDate()!=null)){ %>
-		<p><liferay-ui:message key="offlinetaskactivity.your-result" arguments="<%=new Object[]{(arguments.length>0) ? arguments[0]:\"\"} %>" /></p>
-		<p><liferay-ui:message key="offlinetaskactivity.needed-to-pass" arguments="<%=new Object[]{activity.getPasspuntuation()} %>" /></p>
-	<%}else {%>
-		<div class="nota_nocorregida"><liferay-ui:message key="offlinetaskactivity.not.qualificated.activity" /></div>
-	<%}%>
-	
-	<h3><liferay-ui:message key="offlinetaskactivity.result.teachercoment" /> </h3>
-	<%if ((result!=null)&&!"".equals(result.getComments().trim())){ %>
-		<p><span class="destacado"><%=result.getComments() %></span></p>
-	<% } else if(result==null){%>
-		<p><liferay-ui:message key="offlinetaskactivity.no-teacher-comments-yet" /></p>
-	<%}else {%>
-		<p><liferay-ui:message key="offlinetaskactivity.no-teacher-comments" /></p>
-	<%}
+				<%if(!isTeacher) {%>
+					<h3><liferay-ui:message key="offlinetaskactivity.your-calification" /> </h3>
+					<%if ((result!=null)&&(result.getEndDate()!=null)){ %>
+						<p><liferay-ui:message key="offlinetaskactivity.your-result" arguments="<%=new Object[]{(arguments.length>0) ? arguments[0]:\"\"} %>" /></p>
+						<p><liferay-ui:message key="offlinetaskactivity.needed-to-pass" arguments="<%=new Object[]{activity.getPasspuntuation()} %>" /></p>
+					<%}else {%>
+						<div class="nota_nocorregida"><liferay-ui:message key="offlinetaskactivity.not.qualificated.activity" /></div>
+					<%}%>
+					
+					<h3><liferay-ui:message key="offlinetaskactivity.result.teachercoment" /> </h3>
+					<%if ((result!=null)&&!"".equals(result.getComments().trim())){ %>
+						<p><span class="destacado"><%=result.getComments() %></span></p>
+					<% } else if(result==null){%>
+						<p><liferay-ui:message key="offlinetaskactivity.no-teacher-comments-yet" /></p>
+					<%}else {%>
+						<p><liferay-ui:message key="offlinetaskactivity.no-teacher-comments" /></p>
+					<%}
+						}
+					}
+						%>
+							</div>
+						</div>
+							<%
 		}
-	}
-		%>
-			</div>
-		</div>
-			<%
 	}
 %>
 </div>

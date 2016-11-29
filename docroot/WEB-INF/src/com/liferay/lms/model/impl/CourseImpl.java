@@ -14,19 +14,33 @@
 
 package com.liferay.lms.model.impl;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
 import com.liferay.lms.model.Course;
+import com.liferay.lms.model.CourseResult;
+import com.liferay.lms.model.Schedule;
 import com.liferay.lms.service.CourseLocalServiceUtil;
+import com.liferay.lms.service.CourseResultLocalServiceUtil;
+import com.liferay.lms.service.ScheduleLocalServiceUtil;
 
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.Group;
+import com.liferay.portal.model.Team;
+import com.liferay.portal.model.User;
+import com.liferay.portal.security.permission.ActionKeys;
+import com.liferay.portal.security.permission.PermissionChecker;
+import com.liferay.portal.security.permission.PermissionCheckerFactoryUtil;
 import com.liferay.portal.service.GroupLocalServiceUtil;
+import com.liferay.portal.service.TeamLocalServiceUtil;
+import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portlet.asset.model.AssetCategory;
 import com.liferay.portlet.asset.model.AssetEntry;
@@ -57,6 +71,8 @@ public class CourseImpl extends CourseBaseImpl {
 	private List<AssetCategory> assetCategoryIds;
 	private List<AssetTag> assetTagIds;
 	private Group groupsel;
+	
+	private static Log log = LogFactoryUtil.getLog(CourseImpl.class);
 	
 	public CourseImpl() {
 		imageURL = null;
@@ -205,5 +221,104 @@ public class CourseImpl extends CourseBaseImpl {
 			return null;
 		}
 		
+	}
+	
+	public boolean isLocked(User user){
+		PermissionChecker permissionChecker = null;
+		try {
+			permissionChecker = PermissionCheckerFactoryUtil.create(user);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return isLocked(user, permissionChecker);
+		
+	}
+	
+	public boolean isLocked(User user, PermissionChecker permissionChecker){
+		
+		log.debug("CourseImpl::isLocked::isClosed:" + this.isClosed());
+		
+		//Si el curso está cerrado
+		if(this.isClosed()){
+			return true;
+		}
+		
+		//Si perteneces a la comunidad
+		try {
+			if(!UserLocalServiceUtil.hasGroupUser(this.getGroupCreatedId(), user.getUserId())){
+				log.debug("CourseImpl::isLocked::hasGroupUser:" + false);
+				return true;
+			}
+		} catch (SystemException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		log.debug("CourseImpl::isLocked::hasGroupUser:" + true);
+		
+		//Si tienes permiso para acceder al curso
+		if(!permissionChecker.hasPermission(this.getGroupCreatedId(), Course.class.getName(), this.getCourseId() , ActionKeys.ACCESS)){
+			log.debug("CourseImpl::isLocked::hasPermissionAccess:" + false);
+			return true;
+		}
+		log.debug("CourseImpl::isLocked::hasPermissionAccess:" + true);
+
+		//Comprobamos si estás en alguna convocatoria y que esté abierta
+		Date startDate = null;
+		Date endDate = null;
+		List<Team> teams = null;
+		try {
+			teams = TeamLocalServiceUtil.getUserTeams(user.getUserId(), this.getGroupCreatedId());
+		} catch (SystemException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		if(teams!=null && teams.size()>0){
+			log.debug("CourseImpl::isLocked::hasTeams:" + true);
+			Schedule schedule = null;
+			for(Team team : teams){
+				try {
+					schedule = ScheduleLocalServiceUtil.getScheduleByTeamId(team.getTeamId());
+					if(schedule!=null){
+						startDate=schedule.getStartDate();
+						endDate = schedule.getEndDate();
+						log.debug("CourseImpl::isLocked::teams::startDate:" + schedule.getStartDate());
+						log.debug("CourseImpl::isLocked::teams::endDate:" + schedule.getEndDate());
+						break;
+					}
+				} catch (SystemException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}			
+		}
+		
+		Date now = new Date();
+		
+		if(Validator.isNotNull(startDate) && Validator.isNotNull(endDate) && (startDate.after(now) || endDate.before(endDate))){
+			log.debug("CourseImpl::isLocked::teams::dates:" + false);
+			return true;
+		}
+		log.debug("CourseImpl::isLocked::teams::dates:" + true);
+		
+		//Comprobamos si tiene fechas para realizar el curso
+		CourseResult courseResult = null;
+		try {
+			courseResult = CourseResultLocalServiceUtil.getByUserAndCourse(this.getCourseId(), user.getUserId());
+		} catch (SystemException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+        if(courseResult!=null && ((courseResult.getAllowFinishDate()!=null && courseResult.getAllowFinishDate().before(now)) ||(courseResult.getAllowStartDate()!=null && courseResult.getAllowStartDate().after(now)))){
+        	log.debug("CourseImpl::isLocked::allowdates::startDate:" + courseResult.getAllowStartDate());
+        	log.debug("CourseImpl::isLocked::allowdates::endDate:" + courseResult.getAllowFinishDate());
+			return true;
+		}
+        
+        log.debug("CourseImpl::isLocked::allowdates:" + true);
+		
+		return false;
 	}
 }

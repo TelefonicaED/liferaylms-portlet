@@ -14,12 +14,19 @@
 
 package com.liferay.lms.model.impl;
 
+import java.util.Date;
+import java.util.List;
+
 import com.liferay.lms.model.Course;
 import com.liferay.lms.model.Module;
+import com.liferay.lms.model.Schedule;
 import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.lms.service.ModuleLocalServiceUtil;
+import com.liferay.lms.service.ScheduleLocalServiceUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.model.Team;
+import com.liferay.portal.service.TeamLocalServiceUtil;
 
 /**
  * The extended model implementation for the Module service. Represents a row in the &quot;Lms_Module&quot; database table, with each column mapped to a property of this class.
@@ -50,5 +57,51 @@ public class ModuleImpl extends ModuleBaseImpl {
 			}
 		}
 		return null;
+	}
+	
+	public boolean isLocked(long userId){
+		
+		Date now = new Date(System.currentTimeMillis());
+
+		Date startDate = this.getStartDate();
+		Date endDate = this.getEndDate();
+		
+		try {
+			List<Team> teams = TeamLocalServiceUtil.getUserTeams(userId, this.getGroupId());
+			if(teams!=null && teams.size()>0){
+				for(Team team : teams){
+					Schedule schedule = null;
+					try {
+						schedule = ScheduleLocalServiceUtil.getScheduleByTeamId(team.getTeamId());
+						if(schedule!=null){
+							startDate=schedule.getStartDate();
+							endDate = schedule.getEndDate();
+							break;
+						}
+					} catch (SystemException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}			
+			}
+		} catch (SystemException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		if(!((endDate!=null&&endDate.after(now)) &&(startDate!=null&&startDate.before(now)))){
+			return true;
+		}
+		
+		if(this.getPrecedence()>0) {
+			try {
+				return !ModuleLocalServiceUtil.isUserPassed(this.getPrecedence(), userId);
+			} catch (SystemException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+
+		return false;
 	}
 }

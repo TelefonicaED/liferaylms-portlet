@@ -926,12 +926,11 @@ public class LearningActivityResultLocalServiceImpl	extends LearningActivityResu
 	}
 
 	public boolean userPassed(long actId,long userId) throws SystemException{
-		if(!existsLearningActivityResult(actId, userId)){
-			return false;
-		}else{
-			return getByActIdAndUserId(actId, userId).isPassed();
-		}
+		LearningActivityResult learningActivityResult = getByActIdAndUserId(actId, userId);
+
+		return learningActivityResult != null && learningActivityResult.isPassed();
 	}
+	
 	public long countPassed(long actId) throws SystemException{
 		return LearningActivityResultUtil.countByap(actId, true);
 	}

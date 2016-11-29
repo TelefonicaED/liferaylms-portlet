@@ -293,6 +293,17 @@ public class LearningActivityLocalServiceWrapper
 		return _learningActivityLocalService.isDone(actId, userId);
 	}
 
+	/**
+	* Se mira si la actividad estÃƒÂ¡ bloqueada, NO SE TIENE EN CUENTA NI EL CURSO NI EL MÃƒâ€œDULO,
+	* PARA SABER SI TIENES BLOQUEADO EL CURSO O EL MÃƒâ€œDULO LLAMAR AL ISLOCKED DEL CURSO Y MÃƒâ€œDULO
+	* Se harÃƒÂ¡n las siguientes comprobaciones:
+	* - Que hayas superado la actividad precedente
+	* - Fecha inicio/fin de la actividad (teniendo en cuenta las convocatorias del usuario)
+	*
+	* @param actId Id de la actividad
+	* @param userId Id del usuario
+	* @return true si la actividad estÃƒÂ¡ bloqueada, false en caso contrario
+	*/
 	public boolean islocked(long actId, long userId) throws java.lang.Exception {
 		return _learningActivityLocalService.islocked(actId, userId);
 	}
@@ -436,6 +447,11 @@ public class LearningActivityLocalServiceWrapper
 		return _learningActivityLocalService.getPreviusLearningActivity(larn);
 	}
 
+	public java.util.List<com.liferay.lms.model.LearningActivity> getPreviusLearningActivites(
+		com.liferay.lms.model.LearningActivity larn) {
+		return _learningActivityLocalService.getPreviusLearningActivites(larn);
+	}
+
 	public void goUpLearningActivity(long actId, long userIdAction)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		_learningActivityLocalService.goUpLearningActivity(actId, userIdAction);
@@ -462,6 +478,11 @@ public class LearningActivityLocalServiceWrapper
 		com.liferay.lms.model.LearningActivity larn)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _learningActivityLocalService.getNextLearningActivity(larn);
+	}
+
+	public java.util.List<com.liferay.lms.model.LearningActivity> getNextLearningActivites(
+		com.liferay.lms.model.LearningActivity larn) {
+		return _learningActivityLocalService.getNextLearningActivites(larn);
 	}
 
 	public void deleteLearningactivity(long actId)
@@ -547,6 +568,12 @@ public class LearningActivityLocalServiceWrapper
 	public java.util.List<com.liferay.lms.model.LearningActivity> getByPrecedence(
 		long precedence) {
 		return _learningActivityLocalService.getByPrecedence(precedence);
+	}
+
+	public com.liferay.lms.model.LearningActivity getByPriority(int position,
+		long moduleId, long companyId) {
+		return _learningActivityLocalService.getByPriority(position, moduleId,
+			companyId);
 	}
 
 	/**

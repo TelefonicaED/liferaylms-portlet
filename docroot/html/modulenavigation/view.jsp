@@ -19,7 +19,7 @@
 		Module module = ModuleLocalServiceUtil.getModule(moduleId);
 	
 		if(permissionChecker.hasPermission(themeDisplay.getScopeGroupId(),	Module.class.getName(), moduleId, "ADD_LACT")
-				|| !ModuleLocalServiceUtil.isLocked(module.getPrimaryKey(),themeDisplay.getUserId())){
+				|| !module.isLocked(themeDisplay.getUserId())){
 
 			Module previousModule = ModuleLocalServiceUtil.getPreviusModule(moduleId);
 			Module nextModule 	  = ModuleLocalServiceUtil.getNextModule(moduleId);
@@ -41,7 +41,7 @@
 					
 					if(previousModule == null){
 						break;
-					} else if(!ModuleLocalServiceUtil.isLocked(previousModule.getModuleId(),themeDisplay.getUserId())){
+					} else if(!previousModule.isLocked(themeDisplay.getUserId())){
 						showPreviousModule = true;
 					} else {
 						previousModule = ModuleLocalServiceUtil.getPreviusModule(previousModule.getModuleId());
@@ -70,7 +70,7 @@
 					
 					if(nextModule == null){
 						break;
-					} else if(!ModuleLocalServiceUtil.isLocked(nextModule.getModuleId(),themeDisplay.getUserId())){
+					} else if(!nextModule.isLocked(themeDisplay.getUserId())){
 						showNextModule = true;
 					} else {
 						nextModule = ModuleLocalServiceUtil.getNextModule(nextModule.getModuleId());

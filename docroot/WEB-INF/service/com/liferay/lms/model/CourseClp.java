@@ -774,7 +774,16 @@ public class CourseClp extends BaseModelImpl<Course> implements Course {
 		throw new UnsupportedOperationException();
 	}
 
+	public boolean isLocked(com.liferay.portal.model.User user) {
+		throw new UnsupportedOperationException();
+	}
+
 	public java.util.List<com.liferay.portlet.asset.model.AssetTag> getAssetTagIds() {
+		throw new UnsupportedOperationException();
+	}
+
+	public boolean isLocked(com.liferay.portal.model.User user,
+		com.liferay.portal.security.permission.PermissionChecker permissionChecker) {
 		throw new UnsupportedOperationException();
 	}
 

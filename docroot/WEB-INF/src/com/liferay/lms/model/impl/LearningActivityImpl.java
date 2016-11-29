@@ -15,14 +15,29 @@
 package com.liferay.lms.model.impl;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 import com.liferay.lms.learningactivity.descriptionfilter.DescriptionFilterRegistry;
+import com.liferay.lms.model.Course;
+import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.model.Module;
+import com.liferay.lms.model.Schedule;
+import com.liferay.lms.service.CourseLocalServiceUtil;
+import com.liferay.lms.service.LearningActivityResultLocalServiceUtil;
 import com.liferay.lms.service.ModuleLocalServiceUtil;
+import com.liferay.lms.service.ScheduleLocalServiceUtil;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.model.Team;
+import com.liferay.portal.model.User;
+import com.liferay.portal.security.permission.ActionKeys;
+import com.liferay.portal.security.permission.PermissionChecker;
+import com.liferay.portal.security.permission.PermissionCheckerFactoryUtil;
+import com.liferay.portal.service.TeamLocalServiceUtil;
+import com.liferay.portal.service.UserLocalServiceUtil;
+import com.tls.lms.util.LiferaylmsUtil;
 
 /**
  * The extended model implementation for the LearningActivity service. Represents a row in the &quot;Lms_LearningActivity&quot; database table, with each column mapped to a property of this class.
@@ -136,5 +151,152 @@ public class LearningActivityImpl extends LearningActivityBaseImpl {
 			e.printStackTrace();
 		}
 		return null;
+	}
+	
+	public boolean isLocked(User user, PermissionChecker permissionChecker){
+		if(!permissionChecker.hasPermission(this.getGroupId(),LearningActivity.class.getName(),	this.getActId(), ActionKeys.VIEW)){
+			return true;
+		}
+		
+		Date startDate = this.getStartdate();
+		Date endDate = this.getEnddate();
+		
+		Date now = new Date(System.currentTimeMillis());
+		
+		try {
+			List<Team> teams = TeamLocalServiceUtil.getUserTeams(user.getUserId(), this.getGroupId());
+			if(teams!=null && teams.size()>0){
+				Schedule schedule = null;
+				for(Team team : teams){
+					try {
+						schedule = ScheduleLocalServiceUtil.getScheduleByTeamId(team.getTeamId());
+						if(schedule!=null){
+							startDate=schedule.getStartDate();
+							endDate = schedule.getEndDate();
+							break;
+						}
+					} catch (SystemException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+
+				}			
+			}
+		} catch (SystemException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}	
+		
+		if((endDate!=null&&endDate.before(now)) ||(startDate!=null&&startDate.after(now))){
+			return true;
+		}
+		if(this.getPrecedence()!=0){
+			try {
+				return !LearningActivityResultLocalServiceUtil.userPassed(this.getPrecedence(), user.getUserId());
+			} catch (SystemException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		return false;			
+	}
+	
+	public boolean isLocked(User user){
+		PermissionChecker permissionChecker = null;
+		try {
+			permissionChecker = PermissionCheckerFactoryUtil.create(user);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return this.isLocked(user, permissionChecker);
+	
+	}
+	
+	public boolean isLocked(long userId){
+		
+		User user = null;
+		try {
+			user = UserLocalServiceUtil.getUser(userId);
+		} catch (PortalException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (SystemException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+		return this.isLocked(user);
+
+	}
+	
+	/**
+	 * Comprueba si se peude accceder a una actividad
+	 * @param viewActivityFinish Si la actividad deja acceder coon el modo observador
+	 * @return
+	 */
+	
+	public boolean canAccess(boolean viewActivityFinish, User user, PermissionChecker permissionChecker){
+		boolean canAccessLock = CourseLocalServiceUtil.canAccessLock(this.getGroupId(), user);
+		boolean hasPermissionAccessCourseFinished = false;
+		
+		Course course;
+		try {
+			course = CourseLocalServiceUtil.fetchByGroupCreatedId(this.getGroupId());
+		} catch (SystemException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return false;
+		}
+		
+		if(viewActivityFinish)
+			hasPermissionAccessCourseFinished = LiferaylmsUtil.hasPermissionAccessCourseFinished(this.getCompanyId(), this.getGroupId(), course.getCourseId(), user.getUserId());
+		
+		return canAccess(viewActivityFinish, user, permissionChecker, canAccessLock, course, hasPermissionAccessCourseFinished);
+		
+	}
+	
+	/**
+	 * Comprueba si se peude accceder a una actividad
+	 * @param viewActivityFinish Si la actividad deja acceder coon el modo observador
+	 * @return
+	 */
+	
+	public boolean canAccess(boolean viewActivityFinish, User user, PermissionChecker permissionChecker, boolean canAccessLock, Course course, boolean hasPermissionAccessCourseFinished){
+		if(canAccessLock){
+			return true;
+		}
+
+		
+		if(viewActivityFinish && hasPermissionAccessCourseFinished){
+			return true;
+		}
+
+		//Primero comprobamos bloqueo de curso
+		if(!course.isLocked(user, permissionChecker)){
+			
+			//Ahora comprobamos que no tengas bloqueado el módulo y si no lo tengo bloqueado ya comprobamos los bloqueos de la actividad
+			Module module;
+			try {
+				module = ModuleLocalServiceUtil.getModule(this.getModuleId());
+			} catch (PortalException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				return false;
+			} catch (SystemException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				return false;
+			}
+		
+			boolean activityIsLocked = isLocked(user, permissionChecker);
+			
+			if((!module.isLocked(user.getUserId()) && !activityIsLocked)
+					|| permissionChecker.hasPermission( this.getGroupId(),LearningActivity.class.getName(), this.getActId(), ActionKeys.UPDATE)){
+				return true;
+			}
+		}
+		return false;		
 	}
 }

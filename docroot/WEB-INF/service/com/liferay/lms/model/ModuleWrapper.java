@@ -792,6 +792,10 @@ public class ModuleWrapper implements Module, ModelWrapper<Module> {
 		return _module.getParentModule();
 	}
 
+	public boolean isLocked(long userId) {
+		return _module.isLocked(userId);
+	}
+
 	/**
 	 * @deprecated Renamed to {@link #getWrappedModel}
 	 */

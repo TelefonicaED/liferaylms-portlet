@@ -104,78 +104,78 @@ public class CompetenceLocalServiceClpInvoker {
 				"com.liferay.lms.model.Competence", "boolean"
 			};
 
-		_methodName159 = "getBeanIdentifier";
+		_methodName161 = "getBeanIdentifier";
 
-		_methodParameterTypes159 = new String[] {  };
+		_methodParameterTypes161 = new String[] {  };
 
-		_methodName160 = "setBeanIdentifier";
+		_methodName162 = "setBeanIdentifier";
 
-		_methodParameterTypes160 = new String[] { "java.lang.String" };
+		_methodParameterTypes162 = new String[] { "java.lang.String" };
 
-		_methodName165 = "addCompetence";
+		_methodName167 = "addCompetence";
 
-		_methodParameterTypes165 = new String[] {
+		_methodParameterTypes167 = new String[] {
 				"java.lang.String", "java.lang.String",
 				"com.liferay.portal.service.ServiceContext"
 			};
 
-		_methodName166 = "addCompetence";
+		_methodName168 = "addCompetence";
 
-		_methodParameterTypes166 = new String[] {
+		_methodParameterTypes168 = new String[] {
 				"java.lang.String", "java.lang.String", "boolean",
 				"com.liferay.portal.service.ServiceContext"
 			};
 
-		_methodName167 = "updateCompetence";
+		_methodName169 = "updateCompetence";
 
-		_methodParameterTypes167 = new String[] {
+		_methodParameterTypes169 = new String[] {
 				"com.liferay.lms.model.Competence",
 				"com.liferay.portal.service.ServiceContext"
 			};
 
-		_methodName168 = "modCompetence";
-
-		_methodParameterTypes168 = new String[] {
-				"com.liferay.lms.model.Competence",
-				"com.liferay.portal.service.ServiceContext"
-			};
-
-		_methodName169 = "deleteCompetence";
-
-		_methodParameterTypes169 = new String[] { "long" };
-
-		_methodName170 = "deleteCompetence";
+		_methodName170 = "modCompetence";
 
 		_methodParameterTypes170 = new String[] {
+				"com.liferay.lms.model.Competence",
+				"com.liferay.portal.service.ServiceContext"
+			};
+
+		_methodName171 = "deleteCompetence";
+
+		_methodParameterTypes171 = new String[] { "long" };
+
+		_methodName172 = "deleteCompetence";
+
+		_methodParameterTypes172 = new String[] {
 				"com.liferay.lms.model.Competence"
 			};
 
-		_methodName171 = "getBGImageURL";
+		_methodName173 = "getBGImageURL";
 
-		_methodParameterTypes171 = new String[] {
+		_methodParameterTypes173 = new String[] {
 				"long", "javax.servlet.http.HttpServletRequest"
 			};
 
-		_methodName172 = "getBGImageURL";
+		_methodName174 = "getBGImageURL";
 
-		_methodParameterTypes172 = new String[] {
+		_methodParameterTypes174 = new String[] {
 				"com.liferay.lms.model.Competence",
 				"javax.servlet.http.HttpServletRequest"
 			};
 
-		_methodName173 = "setBGImage";
+		_methodName175 = "setBGImage";
 
-		_methodParameterTypes173 = new String[] {
+		_methodParameterTypes175 = new String[] {
 				"byte[][]", "long", "java.lang.String"
 			};
 
-		_methodName174 = "countAll";
+		_methodName176 = "countAll";
 
-		_methodParameterTypes174 = new String[] {  };
+		_methodParameterTypes176 = new String[] {  };
 
-		_methodName175 = "findByCompanyId";
+		_methodName177 = "findByCompanyId";
 
-		_methodParameterTypes175 = new String[] { "long" };
+		_methodParameterTypes177 = new String[] { "long" };
 	}
 
 	public Object invokeMethod(String name, String[] parameterTypes,
@@ -273,78 +273,78 @@ public class CompetenceLocalServiceClpInvoker {
 				((Boolean)arguments[1]).booleanValue());
 		}
 
-		if (_methodName159.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes159, parameterTypes)) {
+		if (_methodName161.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes161, parameterTypes)) {
 			return CompetenceLocalServiceUtil.getBeanIdentifier();
 		}
 
-		if (_methodName160.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes160, parameterTypes)) {
+		if (_methodName162.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes162, parameterTypes)) {
 			CompetenceLocalServiceUtil.setBeanIdentifier((java.lang.String)arguments[0]);
 		}
 
-		if (_methodName165.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes165, parameterTypes)) {
+		if (_methodName167.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes167, parameterTypes)) {
 			return CompetenceLocalServiceUtil.addCompetence((java.lang.String)arguments[0],
 				(java.lang.String)arguments[1],
 				(com.liferay.portal.service.ServiceContext)arguments[2]);
 		}
 
-		if (_methodName166.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes166, parameterTypes)) {
+		if (_methodName168.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes168, parameterTypes)) {
 			return CompetenceLocalServiceUtil.addCompetence((java.lang.String)arguments[0],
 				(java.lang.String)arguments[1],
 				((Boolean)arguments[2]).booleanValue(),
 				(com.liferay.portal.service.ServiceContext)arguments[3]);
 		}
 
-		if (_methodName167.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes167, parameterTypes)) {
+		if (_methodName169.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes169, parameterTypes)) {
 			return CompetenceLocalServiceUtil.updateCompetence((com.liferay.lms.model.Competence)arguments[0],
 				(com.liferay.portal.service.ServiceContext)arguments[1]);
 		}
 
-		if (_methodName168.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes168, parameterTypes)) {
+		if (_methodName170.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes170, parameterTypes)) {
 			return CompetenceLocalServiceUtil.modCompetence((com.liferay.lms.model.Competence)arguments[0],
 				(com.liferay.portal.service.ServiceContext)arguments[1]);
 		}
 
-		if (_methodName169.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes169, parameterTypes)) {
-			return CompetenceLocalServiceUtil.deleteCompetence(((Long)arguments[0]).longValue());
-		}
-
-		if (_methodName170.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes170, parameterTypes)) {
-			return CompetenceLocalServiceUtil.deleteCompetence((com.liferay.lms.model.Competence)arguments[0]);
-		}
-
 		if (_methodName171.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes171, parameterTypes)) {
-			return CompetenceLocalServiceUtil.getBGImageURL(((Long)arguments[0]).longValue(),
-				(javax.servlet.http.HttpServletRequest)arguments[1]);
+			return CompetenceLocalServiceUtil.deleteCompetence(((Long)arguments[0]).longValue());
 		}
 
 		if (_methodName172.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes172, parameterTypes)) {
-			return CompetenceLocalServiceUtil.getBGImageURL((com.liferay.lms.model.Competence)arguments[0],
-				(javax.servlet.http.HttpServletRequest)arguments[1]);
+			return CompetenceLocalServiceUtil.deleteCompetence((com.liferay.lms.model.Competence)arguments[0]);
 		}
 
 		if (_methodName173.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes173, parameterTypes)) {
-			CompetenceLocalServiceUtil.setBGImage((byte[])arguments[0],
-				((Long)arguments[1]).longValue(), (java.lang.String)arguments[2]);
+			return CompetenceLocalServiceUtil.getBGImageURL(((Long)arguments[0]).longValue(),
+				(javax.servlet.http.HttpServletRequest)arguments[1]);
 		}
 
 		if (_methodName174.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes174, parameterTypes)) {
-			return CompetenceLocalServiceUtil.countAll();
+			return CompetenceLocalServiceUtil.getBGImageURL((com.liferay.lms.model.Competence)arguments[0],
+				(javax.servlet.http.HttpServletRequest)arguments[1]);
 		}
 
 		if (_methodName175.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes175, parameterTypes)) {
+			CompetenceLocalServiceUtil.setBGImage((byte[])arguments[0],
+				((Long)arguments[1]).longValue(), (java.lang.String)arguments[2]);
+		}
+
+		if (_methodName176.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes176, parameterTypes)) {
+			return CompetenceLocalServiceUtil.countAll();
+		}
+
+		if (_methodName177.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes177, parameterTypes)) {
 			return CompetenceLocalServiceUtil.findByCompanyId(((Long)arguments[0]).longValue());
 		}
 
@@ -385,14 +385,10 @@ public class CompetenceLocalServiceClpInvoker {
 	private String[] _methodParameterTypes15;
 	private String _methodName16;
 	private String[] _methodParameterTypes16;
-	private String _methodName159;
-	private String[] _methodParameterTypes159;
-	private String _methodName160;
-	private String[] _methodParameterTypes160;
-	private String _methodName165;
-	private String[] _methodParameterTypes165;
-	private String _methodName166;
-	private String[] _methodParameterTypes166;
+	private String _methodName161;
+	private String[] _methodParameterTypes161;
+	private String _methodName162;
+	private String[] _methodParameterTypes162;
 	private String _methodName167;
 	private String[] _methodParameterTypes167;
 	private String _methodName168;
@@ -411,4 +407,8 @@ public class CompetenceLocalServiceClpInvoker {
 	private String[] _methodParameterTypes174;
 	private String _methodName175;
 	private String[] _methodParameterTypes175;
+	private String _methodName176;
+	private String[] _methodParameterTypes176;
+	private String _methodName177;
+	private String[] _methodParameterTypes177;
 }

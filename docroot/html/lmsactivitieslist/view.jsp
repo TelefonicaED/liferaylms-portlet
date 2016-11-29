@@ -1,3 +1,7 @@
+<%@page import="com.liferay.portlet.asset.model.AssetRendererFactory"%>
+<%@page import="com.liferay.portal.kernel.util.PrefsPropsUtil"%>
+<%@page import="com.liferay.lms.service.LmsPrefsLocalServiceUtil"%>
+<%@page import="com.liferay.portlet.asset.AssetRendererFactoryRegistryUtil"%>
 <%@page import="com.liferay.lms.service.CourseLocalServiceUtil"%>
 <%@page import="com.liferay.lms.model.Course"%>
 <%@page import="com.tls.lms.util.LiferaylmsUtil"%>
@@ -7,10 +11,14 @@
 <%@page import="com.liferay.portal.kernel.util.Validator"%>
 <%@page import="com.liferay.portal.kernel.util.ParamUtil"%>
 <%@page import="javax.portlet.PortletPreferences"%>
+<%@page import="com.liferay.lms.learningactivity.LearningActivityTypeRegistry"%>
+<%@page import="com.liferay.lms.service.LearningActivityLocalServiceUtil" %>
+<%@page import="com.liferay.lms.learningactivity.LearningActivityType"%>
+<%@page import="com.liferay.lms.model.LearningActivity"%>
+
 <%@ include file="/init.jsp"%>
 
 <liferay-ui:success key="ok-deleteActivity" message="activity-deleted-successfully" />
-
 
 <%
 	long moduleId = ParamUtil.getLong(request, "moduleId", 0);
@@ -26,19 +34,78 @@
 	boolean completeMode = viewMode.compareTo("0") == 0;
 	boolean actualModuleMode = viewMode.compareTo("1") == 0;
 	
-	if(actualModuleMode && (moduleId>0 || ModuleLocalServiceUtil.countByGroupId(themeDisplay.getScopeGroupId())!=0)){
-		if(moduleId==0) {
-			moduleId = ModuleLocalServiceUtil.findFirstInGroup(themeDisplay.getScopeGroupId()).getModuleId();
+	Module currentModule = null;
+	
+	if (moduleId == 0){
+		currentModule = ModuleLocalServiceUtil.findFirstInGroup(themeDisplay.getScopeGroupId());
+		if(currentModule != null){
+			moduleId = currentModule.getModuleId();
 		}
+	}
+	
+	boolean moduleActuallyIsLocked = true;
+	if(moduleId > 0){
+		if(currentModule == null){
+			currentModule = ModuleLocalServiceUtil.getModule(moduleId);
+		}
+		if(currentModule != null){
+			moduleActuallyIsLocked = currentModule.isLocked(themeDisplay.getUserId());
+		}
+	}
+	
+	Course course=CourseLocalServiceUtil.fetchByGroupCreatedId(themeDisplay.getScopeGroupId());
+
+	boolean showChangeVisibility = LmsPrefsLocalServiceUtil.getLmsPrefs(themeDisplay.getCompanyId()).getShowHideActivity();
+	boolean showChangeAllVisibility = PrefsPropsUtil.getBoolean("learningactivity.show.hideallactivity", false);
+	boolean visibleCalifications = PrefsPropsUtil.getBoolean("learningactivity.show.califications", false);
+	boolean activityStatus = PrefsPropsUtil.getBoolean("learningactivity.show.status", false);
+	
+	long actId = ParamUtil.getLong(request, "actId", 0);
+	
+	boolean actionEditing = ParamUtil.getBoolean(request, "actionEditing", false);
+	boolean hasPermissionAddLact = permissionChecker.hasPermission( themeDisplay.getScopeGroupId(), Module.class.getName(), moduleId,"ADD_LACT");
+	
+	PortletURL newactivityURL = null;
+	
+	if ((actionEditing && hasPermissionAddLact) ||
+		(moduleId==0 
+		&& permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), "com.liferay.lms.learningactivitymodel", themeDisplay.getScopeGroupId(), "ADD_ACTIVITY"))) {
+		
+		newactivityURL = renderResponse.createRenderURL();
+		newactivityURL.setWindowState(LiferayWindowState.POP_UP);
+		newactivityURL.setParameter("jspPage", "/html/lmsactivitieslist/newactivity.jsp");
+		newactivityURL.setParameter("resModuleId", Long.toString(moduleId));
+		%>
+ 
+		<%@ include file="/html/lmsactivitieslist/moveactivity.jsp"%>
+		
+	<%}%>
+	
+	<c:if test="<%=actualModuleMode %>">
+	<%		
+		NumberFormat resultNumberFormat = NumberFormat.getInstance(locale);
+		resultNumberFormat.setMinimumIntegerDigits(1);
+		
+		LearningActivity currentLeaningActivity = null;
+
+		if(actId!=0) {
+			currentLeaningActivity = LearningActivityLocalServiceUtil.getLearningActivity(actId);
+		}
+		
+		LearningActivityTypeRegistry learningActivityTypeRegistry = new LearningActivityTypeRegistry();
+		AssetRendererFactory assetRendererFactory = AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(LearningActivity.class.getName());
+
+		boolean hasPermissionAccessCourseFinished = LiferaylmsUtil.hasPermissionAccessCourseFinished(themeDisplay.getCompanyId(), course.getGroupCreatedId(), course.getCourseId(), themeDisplay.getUserId());
+		boolean accessLock = CourseLocalServiceUtil.canAccessLock(themeDisplay.getScopeGroupId(), themeDisplay.getUser());
+		Module theModule = currentModule;
 %>	
-		<div class="lms-desplegable" style="overflow: hidden;" >
-			<jsp:include page="/html/lmsactivitieslist/viewactivities.jsp"></jsp:include>
+		<div class="lms-desplegable" style="overflow: hidden;" >	
+			<%@ include file="/html/lmsactivitieslist/viewactivities.jsp"%>
 		</div>
-<%
-	}else{
-%>
-		<jsp:include page="/html/lmsactivitieslist/viewComplete.jsp"></jsp:include>
-<%	} %>
+	</c:if>
+	<c:if test="<%=completeMode %>"	>	
+		<%@ include file="/html/lmsactivitieslist/viewComplete.jsp"%>
+	</c:if>
 	
 <script type="text/javascript">
 

@@ -40,6 +40,7 @@ import com.liferay.lms.service.LmsPrefsLocalServiceUtil;
 import com.liferay.lms.service.ModuleLocalServiceUtil;
 import com.liferay.lms.service.ScheduleLocalServiceUtil;
 import com.liferay.lms.service.base.LearningActivityLocalServiceBaseImpl;
+import com.liferay.lms.service.persistence.LearningActivityFinderUtil;
 import com.liferay.lms.service.persistence.LearningActivityUtil;
 import com.liferay.portal.kernel.bean.PortletBeanLocatorUtil;
 import com.liferay.portal.kernel.dao.orm.Criterion;
@@ -112,47 +113,29 @@ public class LearningActivityLocalServiceImpl extends LearningActivityLocalServi
 		   LearningActivityType lat=new LearningActivityTypeRegistry().getLearningActivityType(larn.getTypeId());
 		   return lat.isDone(larn, userId);
     }
+    
+    /**
+	 * Se mira si la actividad está bloqueada, NO SE TIENE EN CUENTA NI EL CURSO NI EL MÓDULO, 
+	 * PARA SABER SI TIENES BLOQUEADO EL CURSO O EL MÓDULO LLAMAR AL ISLOCKED DEL CURSO Y MÓDULO
+	 * Se harán las siguientes comprobaciones:
+	 * - Que hayas superado la actividad precedente
+	 * - Fecha inicio/fin de la actividad (teniendo en cuenta las convocatorias del usuario)
+	 * @param actId Id de la actividad
+	 * @param userId Id del usuario
+	 * @return true si la actividad está bloqueada, false en caso contrario
+	 */
+
 	public boolean islocked(long actId, long userId) throws Exception
 	{
-		LearningActivity larn =
-				learningActivityPersistence.fetchByPrimaryKey(actId);
-		java.util.Date now=new java.util.Date(System.currentTimeMillis());
-		Course course=courseLocalService.getCourseByGroupCreatedId(larn.getGroupId());
-		if(course.isClosed())
-		{
+		LearningActivity activity =learningActivityPersistence.fetchByPrimaryKey(actId);
+		
+		if(activity != null){
+			return activity.isLocked(userId);
+		}else{
 			return true;
 		}
-		if(larn.getModuleId()>0&&moduleLocalService.isLocked(larn.getModuleId(), userId))
-		{
-			return true;
-		}
-		
-		Date startDate = larn.getStartdate();
-		Date endDate = larn.getEnddate();
-		
-		List<Team> teams = TeamLocalServiceUtil.getUserTeams(userId, course.getGroupCreatedId());
-		if(teams!=null && teams.size()>0){
-			for(Team team : teams){
-				Schedule schedule = ScheduleLocalServiceUtil.getScheduleByTeamId(team.getTeamId());
-				if(schedule!=null){
-					startDate=schedule.getStartDate();
-					endDate = schedule.getEndDate();
-					break;
-				}
-			}			
-		}
-		
-		
-		if((endDate!=null&&endDate.before(now)) ||(startDate!=null&&startDate.after(now)))
-		{
-			return true;
-		}
-		if(larn.getPrecedence()!=0)
-		{
-			return !LearningActivityResultLocalServiceUtil.userPassed(larn.getPrecedence(), userId);
-		}
-		return false;
 	}
+	
 	@Override
 	public LearningActivity addLearningActivity(LearningActivity learningActivity,ServiceContext serviceContext) throws SystemException, PortalException {
 
@@ -577,35 +560,33 @@ public class LearningActivityLocalServiceImpl extends LearningActivityLocalServi
 				LearningActivity.class.getName(), lernact.getActId(),
 				2, StringPool.BLANK, 0);
 	}
-
-	public LearningActivity getPreviusLearningActivity(long actId) throws SystemException
-	{
+	
+	public LearningActivity getPreviusLearningActivity(long actId) throws SystemException{
 		LearningActivity larn=learningActivityPersistence.fetchByPrimaryKey(actId);
 		return getPreviusLearningActivity(larn);
 
 
 	}
 	public LearningActivity getPreviusLearningActivity(LearningActivity larn) throws SystemException {
-		ClassLoader classLoader = (ClassLoader) PortletBeanLocatorUtil.locate(ClpSerializer.getServletContextName(), "portletClassLoader");  
-		DynamicQuery dq=DynamicQueryFactoryUtil.forClass(LearningActivity.class, classLoader);
-		Criterion criterion=PropertyFactoryUtil.forName("priority").lt(larn.getPriority());
-		dq.add(criterion);
-		criterion=PropertyFactoryUtil.forName("moduleId").eq(larn.getModuleId());
-		dq.add(criterion);
-		Order createOrder=OrderFactoryUtil.getOrderFactory().desc("priority");
-		dq.addOrder(createOrder);
-
-		@SuppressWarnings("unchecked")
-		java.util.List<LearningActivity> larnsp=(java.util.List<LearningActivity>)learningActivityLocalService.dynamicQuery(dq,0,1);
-		if(larnsp!=null&& larnsp.size()>0)
-		{
-			return larnsp.get(0);
-		}
-		else
-		{
+		
+		List<LearningActivity> listLearningActivity = learningActivityPersistence.findByModuleIdPriorityLessThan(larn.getModuleId(), larn.getPriority());
+		if(listLearningActivity != null && listLearningActivity.size() > 0){
+			return listLearningActivity.get(listLearningActivity.size()-1);
+		}else{
 			return null;
 		}
 	}
+	
+	public List<LearningActivity> getPreviusLearningActivites(LearningActivity larn){
+		try {
+			return learningActivityPersistence.findByModuleIdPriorityLessThan(larn.getModuleId(), larn.getPriority());
+		} catch (SystemException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return new ArrayList<LearningActivity>();
+		}
+	}
+	
 	public void goUpLearningActivity(long actId, long userIdAction ) throws SystemException
 	{
 		LearningActivity previusActivity=getPreviusLearningActivity(actId);
@@ -682,26 +663,24 @@ public class LearningActivityLocalServiceImpl extends LearningActivityLocalServi
 
 	}
 	public LearningActivity getNextLearningActivity(LearningActivity larn) throws SystemException {
-		ClassLoader classLoader = (ClassLoader) PortletBeanLocatorUtil.locate(ClpSerializer.getServletContextName(), "portletClassLoader"); 
-		DynamicQuery dq=DynamicQueryFactoryUtil.forClass(LearningActivity.class, classLoader);
-		Criterion criterion=PropertyFactoryUtil.forName("priority").gt(larn.getPriority());
-		dq.add(criterion);
-		criterion=PropertyFactoryUtil.forName("moduleId").eq(larn.getModuleId());
-		dq.add(criterion);
-		Order createOrder=OrderFactoryUtil.getOrderFactory().asc("priority");
-		dq.addOrder(createOrder);
-
-		@SuppressWarnings("unchecked")
-		java.util.List<LearningActivity> larnsp=(java.util.List<LearningActivity>)learningActivityLocalService.dynamicQuery(dq,0,1);
-		if(larnsp!=null&& larnsp.size()>0)
-		{
-			return larnsp.get(0);
-		}
-		else
-		{
+		List<LearningActivity> listLearningActivity = learningActivityPersistence.findByModuleIdPriorityGreaterThan(larn.getModuleId(), larn.getPriority());
+		if(listLearningActivity != null && listLearningActivity.size() > 0){
+			return listLearningActivity.get(0);
+		}else{
 			return null;
 		}
 	}
+	
+	public List<LearningActivity> getNextLearningActivites(LearningActivity larn){
+		try {
+			return learningActivityPersistence.findByModuleIdPriorityGreaterThan(larn.getModuleId(), larn.getPriority());
+		} catch (SystemException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return new ArrayList<LearningActivity>();
+		}
+	}
+	
 	public void deleteLearningactivity (long actId) throws SystemException,
 	PortalException {
 		this.deleteLearningactivity(LearningActivityLocalServiceUtil.getLearningActivity(actId));
@@ -1102,6 +1081,8 @@ private void sendNotification(String title, String content, String url, String t
 		                            
 	}
 
-
+	public LearningActivity getByPriority(int position, long moduleId, long companyId){
+		return LearningActivityFinderUtil.findByPriority(position, moduleId, companyId);
+	}
 	
 }

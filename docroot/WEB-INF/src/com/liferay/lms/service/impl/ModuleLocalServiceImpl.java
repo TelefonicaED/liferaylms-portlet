@@ -430,14 +430,11 @@ public class ModuleLocalServiceImpl extends ModuleLocalServiceBaseImpl {
 		
 		return module;
 	}
+	
 	public boolean isUserPassed(long moduleId,long userId) throws SystemException
 	{
 		ModuleResult moduleResult=moduleResultLocalService.getByModuleAndUser(moduleId, userId);
-		if(moduleResult==null ||!moduleResult.getPassed())
-		{
-			return false;
-		}
-		return true;
+		return moduleResult!=null && moduleResult.getPassed();
 	}
 	
 	public boolean isUserFinished(long moduleId,long userId) throws SystemException, PortalException
@@ -498,61 +495,37 @@ public class ModuleLocalServiceImpl extends ModuleLocalServiceBaseImpl {
 		}
 		return false;
 	}
-	public boolean isLocked(long moduleId,long userId) throws Exception
-	{
-		Module theModule=ModuleLocalServiceUtil.getModule(moduleId);
-		java.util.Date now=new java.util.Date(System.currentTimeMillis());
-		Course course=courseLocalService.fetchByGroupCreatedId(theModule.getGroupId());
-		if(!UserLocalServiceUtil.hasGroupUser(theModule.getGroupId(), userId) && !PortalUtil.isOmniadmin(userId))
-		{
+	/**
+	 * Se mira si el módulo está bloqueado, NO SE TIENE EN CUENTA EL CURSO, PARA SABER SI TIENES BLOQUEADO EL CURSO LLAMAR AL ISLOCKED DEL CURSO
+	 * Se harán las siguientes comprobaciones:
+	 * - Si tienes permisos 
+	 * - Que hayas superado el módulo precedente
+	 * - Fecha inicio/fin del módulo (teniendo en cuenta las convocatorias del usuario)
+	 * @param moduleId Id del módulo
+	 * @param userId Id del usuario
+	 * @return true si el módulo está bloqueado, false en caso contrario
+	 */
+	public boolean isLocked(long moduleId,long userId) throws Exception{
+		
+		Module module = null;
+		try {
+			module = ModuleLocalServiceUtil.getModule(moduleId);
+		} catch (PortalException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SystemException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		if(module == null){
 			return true;
 		}
-		User user=UserLocalServiceUtil.getUser(userId);
 		
-		PermissionChecker permissionChecker=PermissionCheckerFactoryUtil.create(user);
-		if(!permissionChecker.hasPermission(course.getGroupId(),  Course.class.getName(),course.getCourseId(),ActionKeys.ACCESS))
-		{
-			return true;
-		}
-		
-		Date startDate = theModule.getStartDate();
-		Date endDate = theModule.getEndDate();
-		
-		List<Team> teams = TeamLocalServiceUtil.getUserTeams(userId, course.getGroupCreatedId());
-		if(teams!=null && teams.size()>0){
-			for(Team team : teams){
-				Schedule schedule = ScheduleLocalServiceUtil.getScheduleByTeamId(team.getTeamId());
-				if(schedule!=null){
-					startDate=schedule.getStartDate();
-					endDate = schedule.getEndDate();
-					break;
-				}
-			}			
-		}
-		
-		if(!((endDate!=null&&endDate.after(now)) &&(startDate!=null&&startDate.before(now))))
-		{
-			return true;
-		}
-		if(theModule.getPrecedence()>0)
-		{
-			return !isUserPassed(theModule.getPrecedence(), userId);
-		}
-		CourseResult courseResult=CourseResultLocalServiceUtil.getByUserAndCourse(course.getCourseId(), userId);
-        if(courseResult!=null)
-        {
-	        if(((courseResult.getAllowFinishDate()!=null&&courseResult.getAllowFinishDate().before(now)) ||(courseResult.getAllowStartDate()!=null&&courseResult.getAllowStartDate().after(now))))
-			{
-				return true;
-			}
-        }
-		
-		if(userTimeFinished(moduleId,userId)){
-        	return true;
-        }
-		
-		return false;
+		return module.isLocked(userId);
+
 	}
+	
 	public long countByGroupId(long groupId) throws SystemException
 	{
 		return ModuleUtil.countByGroupId(groupId);

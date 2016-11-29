@@ -1193,6 +1193,48 @@ public class LearningActivityWrapper implements LearningActivity,
 		return _learningActivity.getModule();
 	}
 
+	public boolean isLocked(com.liferay.portal.model.User user,
+		com.liferay.portal.security.permission.PermissionChecker permissionChecker) {
+		return _learningActivity.isLocked(user, permissionChecker);
+	}
+
+	public boolean isLocked(com.liferay.portal.model.User user) {
+		return _learningActivity.isLocked(user);
+	}
+
+	public boolean isLocked(long userId) {
+		return _learningActivity.isLocked(userId);
+	}
+
+	/**
+	* Comprueba si se peude accceder a una actividad
+	*
+	* @param viewActivityFinish Si la actividad deja acceder coon el modo observador
+	* @return
+	*/
+	public boolean canAccess(boolean viewActivityFinish,
+		com.liferay.portal.model.User user,
+		com.liferay.portal.security.permission.PermissionChecker permissionChecker) {
+		return _learningActivity.canAccess(viewActivityFinish, user,
+			permissionChecker);
+	}
+
+	/**
+	* Comprueba si se peude accceder a una actividad
+	*
+	* @param viewActivityFinish Si la actividad deja acceder coon el modo observador
+	* @return
+	*/
+	public boolean canAccess(boolean viewActivityFinish,
+		com.liferay.portal.model.User user,
+		com.liferay.portal.security.permission.PermissionChecker permissionChecker,
+		boolean canAccessLock, com.liferay.lms.model.Course course,
+		boolean hasPermissionAccessCourseFinished) {
+		return _learningActivity.canAccess(viewActivityFinish, user,
+			permissionChecker, canAccessLock, course,
+			hasPermissionAccessCourseFinished);
+	}
+
 	/**
 	 * @deprecated Renamed to {@link #getWrappedModel}
 	 */

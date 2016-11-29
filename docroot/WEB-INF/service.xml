@@ -71,6 +71,14 @@
 		<finder name="Precedence" return-type="Collection">
 			<finder-column name="precedence" />
 		</finder>
+		<finder name="ModuleIdPriorityLessThan" return-type="Collection">
+			<finder-column name="moduleId" />
+			<finder-column name="priority" comparator="&lt;"/>
+		</finder>
+		<finder name="ModuleIdPriorityGreaterThan" return-type="Collection">
+			<finder-column name="moduleId" />
+			<finder-column name="priority" comparator="&gt;"/>
+		</finder>
 		
 		<reference package-path="com.liferay.portal" entity="User" />
 		<reference package-path="com.liferay.portal" entity="Role" />

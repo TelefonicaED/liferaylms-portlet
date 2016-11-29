@@ -52,4 +52,9 @@ public interface Course extends CourseModel, PersistedModel {
 	public java.util.List<com.liferay.portlet.asset.model.AssetTag> getAssetTagIds();
 
 	public com.liferay.portal.model.Group getGroup();
+
+	public boolean isLocked(com.liferay.portal.model.User user);
+
+	public boolean isLocked(com.liferay.portal.model.User user,
+		com.liferay.portal.security.permission.PermissionChecker permissionChecker);
 }

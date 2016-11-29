@@ -77,7 +77,7 @@ if(isTablet){%>
 		
 <%}%>
 
-
+ 
 <div class="container-activity">
 	<%long actId=ParamUtil.getLong(request,"actId",0);
 	LearningActivity activity=LearningActivityLocalServiceUtil.getLearningActivity(actId);
@@ -86,16 +86,17 @@ if(isTablet){%>
 	if(actId==0 || typeId != 0)
 		renderRequest.setAttribute(WebKeys.PORTLET_CONFIGURATOR_VISIBILITY, Boolean.FALSE);
 	else{
-			
-		long userId = themeDisplay.getUserId();
-		Course course=CourseLocalServiceUtil.fetchByGroupCreatedId(themeDisplay.getScopeGroupId());
-		boolean hasPermissionAccessCourseFinished = LiferaylmsUtil.hasPermissionAccessCourseFinished(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(), course.getCourseId(), themeDisplay.getUserId());
-	
-		if(!LearningActivityLocalServiceUtil.islocked(actId,userId)
-				|| permissionChecker.hasPermission( activity.getGroupId(),LearningActivity.class.getName(), actId, ActionKeys.UPDATE)
-				|| permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), "com.liferay.lms.model",themeDisplay.getScopeGroupId(),"ACCESSLOCK")
-				|| hasPermissionAccessCourseFinished){
+		
+		boolean hasAccessLock = CourseLocalServiceUtil.canAccessLock(themeDisplay.getScopeGroupId(), user);
+		Course course = CourseLocalServiceUtil.getCourseByGroupCreatedId(themeDisplay.getScopeGroupId());
+		boolean hasPermissionAccessCourseFinished = LiferaylmsUtil.hasPermissionAccessCourseFinished(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(), course.getCourseId(), user.getUserId());
+				
+		if(activity.canAccess(true, themeDisplay.getUser(), themeDisplay.getPermissionChecker(), hasAccessLock, course, hasPermissionAccessCourseFinished)){
 
+			long userId = themeDisplay.getUserId();
+			
+			boolean activityIsLocked = activity.isLocked(themeDisplay.getUser(), themeDisplay.getPermissionChecker());
+			
 			//Obtener si puede hacer un intento de mejorar el resultado.
 			boolean improving = false;
 			LearningActivityResult result = LearningActivityResultLocalServiceUtil.getByActIdAndUserId(actId, userId);
@@ -104,7 +105,7 @@ if(isTablet){%>
 				int done =  LearningActivityTryLocalServiceUtil.getTriesCountByActivityAndUser(actId,userId);
 				LearningActivity act=LearningActivityLocalServiceUtil.getLearningActivity(actId);
 				
-				if(result.getResult() < 100 && !LearningActivityLocalServiceUtil.islocked(actId, userId) && LearningActivityResultLocalServiceUtil.userPassed(actId, userId) && (done < act.getTries() || act.getTries() == 0)){
+				if(result.getResult() < 100 && !activity.isLocked(userId) && LearningActivityResultLocalServiceUtil.userPassed(actId, userId) && (done < act.getTries() || act.getTries() == 0)){
 					improving = true;
 				}
 			}

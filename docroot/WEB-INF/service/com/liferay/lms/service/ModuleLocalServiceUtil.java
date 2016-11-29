@@ -430,6 +430,17 @@ public class ModuleLocalServiceUtil {
 		return getService().userTimeFinished(moduleId, userId);
 	}
 
+	/**
+	* Se mira si el mÃƒÂ³dulo estÃƒÂ¡ bloqueado, NO SE TIENE EN CUENTA EL CURSO, PARA SABER SI TIENES BLOQUEADO EL CURSO LLAMAR AL ISLOCKED DEL CURSO
+	* Se harÃƒÂ¡n las siguientes comprobaciones:
+	* - Si tienes permisos
+	* - Que hayas superado el mÃƒÂ³dulo precedente
+	* - Fecha inicio/fin del mÃƒÂ³dulo (teniendo en cuenta las convocatorias del usuario)
+	*
+	* @param moduleId Id del mÃƒÂ³dulo
+	* @param userId Id del usuario
+	* @return true si el mÃƒÂ³dulo estÃƒÂ¡ bloqueado, false en caso contrario
+	*/
 	public static boolean isLocked(long moduleId, long userId)
 		throws java.lang.Exception {
 		return getService().isLocked(moduleId, userId);

@@ -2,4 +2,5 @@
 
 <custom-sql>
 	<sql file="custom-sql/course.xml" />
+	<sql file="custom-sql/learningactivity.xml" />
 </custom-sql>
