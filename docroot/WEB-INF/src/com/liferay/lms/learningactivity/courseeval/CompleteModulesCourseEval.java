@@ -6,8 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
-import com.liferay.lms.auditing.AuditConstants;
-import com.liferay.lms.auditing.AuditingLogFactory;
 import com.liferay.lms.model.Course;
 import com.liferay.lms.model.CourseResult;
 import com.liferay.lms.model.LearningActivity;
@@ -25,6 +23,7 @@ import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.DocumentException;
 import com.liferay.portal.kernel.xml.Element;
@@ -96,7 +95,7 @@ public class CompleteModulesCourseEval extends BaseCourseEval {
 			
 			// Si el usuario no tiene resultado en la actividad.
 			if(lar != null) {
-				if (!lar.isPassed()) {
+				if (!lar.isPassed() && Validator.isNotNull(lar.getEndDate())) {
 					numTriesCurrentAct = activity.getTries();
 					// Si la actividad no tiene un número ilimitado de intentos (numTriesCurrentAct = 0) y el usuario ya ha hecho todos los intentos disponibles se marca el curso como "Suspenso" (isFailed). 
 					if(numTriesCurrentAct != 0) {						
@@ -106,6 +105,9 @@ public class CompleteModulesCourseEval extends BaseCourseEval {
 							isFailed = true;
 						}
 					}
+					passed = false;
+				}
+				else{
 					passed = false;
 				}
 			}else {
