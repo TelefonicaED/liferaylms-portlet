@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<!DOCTYPE project>
+
+<project name="liferaylms-portlet" basedir="." default="deploy" xmlns:antelope="antlib:ise.antelope.tasks">
+ <import file="../build-common-portlet.xml" />
+        
+ <target name="compile" depends="clean">
+  <antcall target="build-common-plugin.compile" />
+ </target>
+ <target name="war" depends="clean,compile">
+
+	<if>
+		<available file="tmp" />
+		<then>
+			<property name="docroot.dir" value="tmp" />
+		</then>
+		<else>
+			<property name="docroot.dir" value="docroot" />
+		</else>
+	</if>
+ 	
+  <zip basedir="${docroot.dir}" destfile="${plugin.file}"
+ 		excludes="**/*.java,WEB-INF/service/**,WEB-INF/service-classes/**,WEB-INF/src/**,WEB-INF/docs/**,WEB-INF/lib/liferaylms-portlet-service.jar"/>
+ 		<copy file="${docroot.dir}/WEB-INF/lib/${plugin.name}-service.jar" todir="${project.dir}/dist" overwrite="true" />	
+ </target>
+ 
+</project>
