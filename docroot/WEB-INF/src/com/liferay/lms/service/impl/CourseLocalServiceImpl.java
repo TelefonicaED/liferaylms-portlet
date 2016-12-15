@@ -623,70 +623,72 @@ public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int e
 	public Course modCourse (Course course,String summary, 
 			ServiceContext serviceContext)
 			throws SystemException, PortalException {
-			int numberUsers = UserLocalServiceUtil.getGroupUsersCount(course.getGroupCreatedId());
-			if(course.getMaxusers()>0&&numberUsers>course.getMaxusers()){
-				if(log.isDebugEnabled()){
-					log.debug("Throws exception max users violated");
-				}
-				throw new PortalException("maxUsers "+numberUsers);
-			}
-		
-			course.setModifiedDate(new java.util.Date(System.currentTimeMillis()));
-			course.setExpandoBridgeAttributes(serviceContext);
-			Locale locale=new Locale(serviceContext.getLanguageId());
-			coursePersistence.update(course, true);
-			long userId=serviceContext.getUserId();
-			Group theGroup=GroupLocalServiceUtil.getGroup(course.getGroupCreatedId());
-			theGroup.setName(course.getTitle(locale, true));
-			theGroup.setDescription(summary);
-			
-			int type=GroupConstants.TYPE_SITE_OPEN;
-			try{
-				if (serviceContext.getAttribute("type") != null) {
-					type = Integer.valueOf(serviceContext.getAttribute("type").toString());
-				}
-			}catch(NumberFormatException nfe){				
-			}
-			
-			theGroup.setType(type);
-			groupLocalService.updateGroup(theGroup);
-
-			CourseEval courseEval = new CourseEvalRegistry().getCourseEval(course.getCourseEvalId());
-			if(courseEval!=null) {
-				courseEval.setExtraContent(course, Constants.UPDATE, serviceContext);
-			}
-
-			AssetEntry assetEntry=assetEntryLocalService.updateEntry(
-					userId, course.getGroupId(), Course.class.getName(),
-					course.getCourseId(), course.getUuid(),0, serviceContext.getAssetCategoryIds(),
-					serviceContext.getAssetTagNames(), true, null, null,
-					new java.util.Date(System.currentTimeMillis()), null,
-					ContentTypes.TEXT_HTML, course.getTitle(), course.getDescription(locale), summary, null, null, 0, 0,
-					null, false);
-            
-			assetLinkLocalService.updateLinks(
-					userId, assetEntry.getEntryId(), serviceContext.getAssetLinkEntryIds(),
-					AssetLinkConstants.TYPE_RELATED);
-			//auditing
-			AuditingLogFactory.audit(course.getCompanyId(), course.getGroupId(), Course.class.getName(), course.getCourseId(), serviceContext.getUserId(), AuditConstants.UPDATE, null);
-			
-			return course;
-		
+				return this.modCourse(course, summary, serviceContext, true);
 			}
 
 	@Indexable(type=IndexableType.REINDEX)
 	public Course modCourse (Course course, 
 			ServiceContext serviceContext)
 			throws SystemException, PortalException {
-			course.setExpandoBridgeAttributes(serviceContext);
-			
-			course = this.modCourse(course, "", serviceContext);
-
-			//auditing
-			AuditingLogFactory.audit(course.getCompanyId(), course.getGroupId(), Course.class.getName(), course.getCourseId(), serviceContext.getUserId(), AuditConstants.UPDATE, null);
-			
-			return course;
+			return this.modCourse(course, "", serviceContext,true);
+	}
+	
+	@Indexable(type=IndexableType.REINDEX)
+	public Course modCourse (Course course,String summary, 
+			ServiceContext serviceContext, boolean visible)
+			throws SystemException, PortalException {
+		
+		
+		int numberUsers = UserLocalServiceUtil.getGroupUsersCount(course.getGroupCreatedId());
+		if(course.getMaxusers()>0&&numberUsers>course.getMaxusers()){
+			if(log.isDebugEnabled()){
+				log.debug("Throws exception max users violated");
 			}
+			throw new PortalException("maxUsers "+numberUsers);
+		}
+	
+		course.setModifiedDate(new java.util.Date(System.currentTimeMillis()));
+		course.setExpandoBridgeAttributes(serviceContext);
+		Locale locale=new Locale(serviceContext.getLanguageId());
+		coursePersistence.update(course, true);
+		long userId=serviceContext.getUserId();
+		Group theGroup=GroupLocalServiceUtil.getGroup(course.getGroupCreatedId());
+		theGroup.setName(course.getTitle(locale, true));
+		theGroup.setDescription(summary);
+		
+		int type=GroupConstants.TYPE_SITE_OPEN;
+		try{
+			if (serviceContext.getAttribute("type") != null) {
+				type = Integer.valueOf(serviceContext.getAttribute("type").toString());
+			}
+		}catch(NumberFormatException nfe){				
+		}
+		
+		theGroup.setType(type);
+		groupLocalService.updateGroup(theGroup);
+
+		CourseEval courseEval = new CourseEvalRegistry().getCourseEval(course.getCourseEvalId());
+		if(courseEval!=null) {
+			courseEval.setExtraContent(course, Constants.UPDATE, serviceContext);
+		}
+
+		AssetEntry assetEntry=assetEntryLocalService.updateEntry(
+				userId, course.getGroupId(), Course.class.getName(),
+				course.getCourseId(), course.getUuid(),0, serviceContext.getAssetCategoryIds(),
+				serviceContext.getAssetTagNames(), visible, null, null,
+				new java.util.Date(System.currentTimeMillis()), null,
+				ContentTypes.TEXT_HTML, course.getTitle(), course.getDescription(locale), summary, null, null, 0, 0,
+				null, false);
+        
+		assetLinkLocalService.updateLinks(
+				userId, assetEntry.getEntryId(), serviceContext.getAssetLinkEntryIds(),
+				AssetLinkConstants.TYPE_RELATED);
+		//auditing
+		AuditingLogFactory.audit(course.getCompanyId(), course.getGroupId(), Course.class.getName(), course.getCourseId(), serviceContext.getUserId(), AuditConstants.UPDATE, null);
+		
+		return course;
+		
+	}
 	
 	@Indexable(type=IndexableType.REINDEX)
 	public Course closeCourse(long courseId) throws SystemException,
@@ -773,9 +775,6 @@ public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int e
 			resourceLocalService.deleteResource(course.getCompanyId(), Course.class.getName(),ResourceConstants.SCOPE_INDIVIDUAL, course.getPrimaryKey());
 		} catch (Exception e) {e.printStackTrace();}
 		
-		try {
-			assetEntryLocalService.deleteEntry(LearningActivity.class.getName(),course.getCourseId());
-		} catch (Exception e) {e.printStackTrace();}
 		
 		try {
 			coursePersistence.remove(course);

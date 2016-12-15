@@ -898,8 +898,10 @@ public class CourseAdmin extends MVCPortlet {
 				course.setCalificationType(courseCalificationType);
 				course.setMaxusers(maxusers);
 				serviceContext.setAttribute("type", String.valueOf(type));
-				com.liferay.lms.service.CourseLocalServiceUtil.modCourse(course,
-						summary, serviceContext);
+				/*
+				 * Se llama más abajo
+				 * com.liferay.lms.service.CourseLocalServiceUtil.modCourse(course,
+						summary, serviceContext);*/
 			}catch(PortalException pe){ 
 				if(pe.getMessage().startsWith("maxUsers ")){ 
 					SessionErrors.add(actionRequest, "evaluationtaskactivity.error.systemError");
@@ -1012,7 +1014,16 @@ public class CourseAdmin extends MVCPortlet {
 			try {
 				try{
 					serviceContext.setAttribute("type", String.valueOf(type));
-					CourseLocalServiceUtil.modCourse(course,summary,serviceContext);
+					PermissionChecker permissionChecker = PermissionCheckerFactoryUtil
+							.getPermissionCheckerFactory().create(user);
+					log.debug("Updating the course");
+					if (permissionChecker.hasPermission(themeDisplay.getScopeGroupId(),
+							Course.class.getName(), 0, "PUBLISH")) {
+						log.debug("With publish permission, setting visible to "+visible);
+						CourseLocalServiceUtil.modCourse(course,summary,serviceContext, visible);
+					}else{
+						CourseLocalServiceUtil.modCourse(course,summary,serviceContext);
+					}
 				}catch(PortalException pe){ 
 					if(pe.getMessage().startsWith("maxUsers ")){
 						SessionErrors.add(actionRequest, "evaluationtaskactivity.error.systemError");
@@ -1032,22 +1043,11 @@ public class CourseAdmin extends MVCPortlet {
 					actionResponse.setRenderParameter("jspPage","/html/courseadmin/editcourse.jsp");
 					return;
 				}
-				
-				PermissionChecker permissionChecker = PermissionCheckerFactoryUtil
-						.getPermissionCheckerFactory().create(user);
-
-				if (permissionChecker.hasPermission(themeDisplay.getScopeGroupId(),
-						Course.class.getName(), 0, "PUBLISH")) {
-
-					com.liferay.lms.service.CourseLocalServiceUtil.setVisible(
-							course.getCourseId(), visible);
-				}
-				
-				SessionMessages.add(actionRequest, "course-saved-successfully");
-				
+				 
 				actionResponse.setRenderParameter("courseId", String.valueOf(course.getCourseId()));
-				actionResponse.setRenderParameter("jspPage","/html/courseadmin/editcourse.jsp");
-				
+				actionResponse.setRenderParameter("jspPage","/html/courseadmin/editcourse.jsp");			
+				SessionMessages.add(actionRequest, "course-saved-successfully");
+								
 				/*
 				WindowState windowState = actionRequest.getWindowState();
 				if (redirect != null && !StringPool.BLANK.equals(redirect)) {
