@@ -106,8 +106,7 @@ public class CompleteModulesCourseEval extends BaseCourseEval {
 						}
 					}
 					passed = false;
-				}
-				else{
+				} else if(!lar.isPassed()){
 					passed = false;
 				}
 			}else {
