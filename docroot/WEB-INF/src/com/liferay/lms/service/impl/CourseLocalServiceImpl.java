@@ -754,11 +754,7 @@ public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int e
 		try {
 			resourceLocalService.deleteResource(course.getCompanyId(), Course.class.getName(),ResourceConstants.SCOPE_INDIVIDUAL, course.getPrimaryKey());
 		} catch (Exception e) {e.printStackTrace();}
-		
-		try {
-			assetEntryLocalService.deleteEntry(LearningActivity.class.getName(),course.getCourseId());
-		} catch (Exception e) {e.printStackTrace();}
-		
+	
 		try {
 			coursePersistence.remove(course);
 		} catch (Exception e) {e.printStackTrace();}
