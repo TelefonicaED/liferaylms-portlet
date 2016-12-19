@@ -58,8 +58,8 @@
 
 %>
 
-<script type="text/javascript">
-<!--
+<aui:script use="aui-base">
+
 
 AUI().use('aui-form-validator', function(A) {
 	A.mix(
@@ -129,6 +129,14 @@ window.<portlet:namespace />validate_execactivity={
 
 	AUI().ready('node','event','aui-io-request','aui-parse-content','liferay-portlet-url', function(A) {
 
+ 			var isShowCorrectAnswerChecked =  document.getElementById("<portlet:namespace />showCorrectAnswerCheckbox").checked;
+			if(isShowCorrectAnswerChecked){
+				document.getElementById("<portlet:namespace />improveCheckbox").checked = false;
+				A.one('#<portlet:namespace />improveCheckbox').set('disabled', true);
+			}else{
+				A.one('#<portlet:namespace />improveCheckbox').set('disabled', false);
+			}
+
 		A.one('#<portlet:namespace />resModuleId').on('change', function (e) {
 			var renderUrl = Liferay.PortletURL.createRenderURL();							
 				renderUrl.setWindowState('<%=LiferayWindowState.EXCLUSIVE.toString()%>');
@@ -194,8 +202,8 @@ window.<portlet:namespace />validate_execactivity={
 			['node']
 			);
 
-//-->
-</script>
+
+</aui:script>
 
 
 	<aui:input type="text" size="3" name="random" label="execActivity.options.random" value="<%=(random>0)?Long.toString(random):StringPool.BLANK %>" disabled="<%=!edit %>" 
