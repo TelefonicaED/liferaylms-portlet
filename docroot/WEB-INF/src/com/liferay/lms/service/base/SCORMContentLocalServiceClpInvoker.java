@@ -108,73 +108,73 @@ public class SCORMContentLocalServiceClpInvoker {
 				"com.liferay.lms.model.SCORMContent", "boolean"
 			};
 
-		_methodName159 = "getBeanIdentifier";
+		_methodName161 = "getBeanIdentifier";
 
-		_methodParameterTypes159 = new String[] {  };
+		_methodParameterTypes161 = new String[] {  };
 
-		_methodName160 = "setBeanIdentifier";
+		_methodName162 = "setBeanIdentifier";
 
-		_methodParameterTypes160 = new String[] { "java.lang.String" };
+		_methodParameterTypes162 = new String[] { "java.lang.String" };
 
-		_methodName165 = "getBaseDir";
+		_methodName167 = "getBaseDir";
 
-		_methodParameterTypes165 = new String[] {  };
+		_methodParameterTypes167 = new String[] {  };
 
-		_methodName166 = "getBaseZipDir";
+		_methodName168 = "getBaseZipDir";
 
-		_methodParameterTypes166 = new String[] {  };
+		_methodParameterTypes168 = new String[] {  };
 
-		_methodName167 = "getDirScormzipPath";
+		_methodName169 = "getDirScormzipPath";
 
-		_methodParameterTypes167 = new String[] {
+		_methodParameterTypes169 = new String[] {
 				"com.liferay.lms.model.SCORMContent"
 			};
 
-		_methodName168 = "getDirScormPath";
+		_methodName170 = "getDirScormPath";
 
-		_methodParameterTypes168 = new String[] {
+		_methodParameterTypes170 = new String[] {
 				"com.liferay.lms.model.SCORMContent"
 			};
 
-		_methodName169 = "getSCORMContentOfGroup";
-
-		_methodParameterTypes169 = new String[] { "long" };
-
-		_methodName170 = "getSCORMContents";
-
-		_methodParameterTypes170 = new String[] { "long" };
-
-		_methodName171 = "countByGroupId";
+		_methodName171 = "getSCORMContentOfGroup";
 
 		_methodParameterTypes171 = new String[] { "long" };
 
-		_methodName172 = "delete";
+		_methodName172 = "getSCORMContents";
 
 		_methodParameterTypes172 = new String[] { "long" };
 
-		_methodName173 = "updateSCORMContent";
+		_methodName173 = "countByGroupId";
 
-		_methodParameterTypes173 = new String[] {
+		_methodParameterTypes173 = new String[] { "long" };
+
+		_methodName174 = "delete";
+
+		_methodParameterTypes174 = new String[] { "long" };
+
+		_methodName175 = "updateSCORMContent";
+
+		_methodParameterTypes175 = new String[] {
 				"com.liferay.lms.model.SCORMContent",
 				"com.liferay.portal.service.ServiceContext"
 			};
 
-		_methodName174 = "addSCORMContent";
+		_methodName176 = "addSCORMContent";
 
-		_methodParameterTypes174 = new String[] {
+		_methodParameterTypes176 = new String[] {
 				"java.lang.String", "java.lang.String", "java.io.File",
 				"boolean", "com.liferay.portal.service.ServiceContext"
 			};
 
-		_methodName175 = "getUrlManifest";
+		_methodName177 = "getUrlManifest";
 
-		_methodParameterTypes175 = new String[] {
+		_methodParameterTypes177 = new String[] {
 				"com.liferay.lms.model.SCORMContent"
 			};
 
-		_methodName176 = "force";
+		_methodName178 = "force";
 
-		_methodParameterTypes176 = new String[] { "long", "java.lang.String" };
+		_methodParameterTypes178 = new String[] { "long", "java.lang.String" };
 	}
 
 	public Object invokeMethod(String name, String[] parameterTypes,
@@ -272,77 +272,77 @@ public class SCORMContentLocalServiceClpInvoker {
 				((Boolean)arguments[1]).booleanValue());
 		}
 
-		if (_methodName159.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes159, parameterTypes)) {
+		if (_methodName161.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes161, parameterTypes)) {
 			return SCORMContentLocalServiceUtil.getBeanIdentifier();
 		}
 
-		if (_methodName160.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes160, parameterTypes)) {
+		if (_methodName162.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes162, parameterTypes)) {
 			SCORMContentLocalServiceUtil.setBeanIdentifier((java.lang.String)arguments[0]);
-		}
-
-		if (_methodName165.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes165, parameterTypes)) {
-			return SCORMContentLocalServiceUtil.getBaseDir();
-		}
-
-		if (_methodName166.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes166, parameterTypes)) {
-			return SCORMContentLocalServiceUtil.getBaseZipDir();
 		}
 
 		if (_methodName167.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes167, parameterTypes)) {
-			return SCORMContentLocalServiceUtil.getDirScormzipPath((com.liferay.lms.model.SCORMContent)arguments[0]);
+			return SCORMContentLocalServiceUtil.getBaseDir();
 		}
 
 		if (_methodName168.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes168, parameterTypes)) {
-			return SCORMContentLocalServiceUtil.getDirScormPath((com.liferay.lms.model.SCORMContent)arguments[0]);
+			return SCORMContentLocalServiceUtil.getBaseZipDir();
 		}
 
 		if (_methodName169.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes169, parameterTypes)) {
-			return SCORMContentLocalServiceUtil.getSCORMContentOfGroup(((Long)arguments[0]).longValue());
+			return SCORMContentLocalServiceUtil.getDirScormzipPath((com.liferay.lms.model.SCORMContent)arguments[0]);
 		}
 
 		if (_methodName170.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes170, parameterTypes)) {
-			return SCORMContentLocalServiceUtil.getSCORMContents(((Long)arguments[0]).longValue());
+			return SCORMContentLocalServiceUtil.getDirScormPath((com.liferay.lms.model.SCORMContent)arguments[0]);
 		}
 
 		if (_methodName171.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes171, parameterTypes)) {
-			return SCORMContentLocalServiceUtil.countByGroupId(((Long)arguments[0]).longValue());
+			return SCORMContentLocalServiceUtil.getSCORMContentOfGroup(((Long)arguments[0]).longValue());
 		}
 
 		if (_methodName172.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes172, parameterTypes)) {
-			SCORMContentLocalServiceUtil.delete(((Long)arguments[0]).longValue());
+			return SCORMContentLocalServiceUtil.getSCORMContents(((Long)arguments[0]).longValue());
 		}
 
 		if (_methodName173.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes173, parameterTypes)) {
-			return SCORMContentLocalServiceUtil.updateSCORMContent((com.liferay.lms.model.SCORMContent)arguments[0],
-				(com.liferay.portal.service.ServiceContext)arguments[1]);
+			return SCORMContentLocalServiceUtil.countByGroupId(((Long)arguments[0]).longValue());
 		}
 
 		if (_methodName174.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes174, parameterTypes)) {
+			SCORMContentLocalServiceUtil.delete(((Long)arguments[0]).longValue());
+		}
+
+		if (_methodName175.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes175, parameterTypes)) {
+			return SCORMContentLocalServiceUtil.updateSCORMContent((com.liferay.lms.model.SCORMContent)arguments[0],
+				(com.liferay.portal.service.ServiceContext)arguments[1]);
+		}
+
+		if (_methodName176.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes176, parameterTypes)) {
 			return SCORMContentLocalServiceUtil.addSCORMContent((java.lang.String)arguments[0],
 				(java.lang.String)arguments[1], (java.io.File)arguments[2],
 				((Boolean)arguments[3]).booleanValue(),
 				(com.liferay.portal.service.ServiceContext)arguments[4]);
 		}
 
-		if (_methodName175.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes175, parameterTypes)) {
+		if (_methodName177.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes177, parameterTypes)) {
 			return SCORMContentLocalServiceUtil.getUrlManifest((com.liferay.lms.model.SCORMContent)arguments[0]);
 		}
 
-		if (_methodName176.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes176, parameterTypes)) {
+		if (_methodName178.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes178, parameterTypes)) {
 			return SCORMContentLocalServiceUtil.force(((Long)arguments[0]).longValue(),
 				(java.lang.String)arguments[1]);
 		}
@@ -384,14 +384,10 @@ public class SCORMContentLocalServiceClpInvoker {
 	private String[] _methodParameterTypes15;
 	private String _methodName16;
 	private String[] _methodParameterTypes16;
-	private String _methodName159;
-	private String[] _methodParameterTypes159;
-	private String _methodName160;
-	private String[] _methodParameterTypes160;
-	private String _methodName165;
-	private String[] _methodParameterTypes165;
-	private String _methodName166;
-	private String[] _methodParameterTypes166;
+	private String _methodName161;
+	private String[] _methodParameterTypes161;
+	private String _methodName162;
+	private String[] _methodParameterTypes162;
 	private String _methodName167;
 	private String[] _methodParameterTypes167;
 	private String _methodName168;
@@ -412,4 +408,8 @@ public class SCORMContentLocalServiceClpInvoker {
 	private String[] _methodParameterTypes175;
 	private String _methodName176;
 	private String[] _methodParameterTypes176;
+	private String _methodName177;
+	private String[] _methodParameterTypes177;
+	private String _methodName178;
+	private String[] _methodParameterTypes178;
 }

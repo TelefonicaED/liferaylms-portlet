@@ -411,7 +411,6 @@
 					
 				)
 			ORDER BY [$ORDERBY$]
-			LIMIT ?, ?
 		]]>
 	</sql>
 	<sql id="com.liferay.lms.service.persistence.CourseFinder.countStudents">

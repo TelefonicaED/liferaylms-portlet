@@ -304,6 +304,12 @@ public class ModuleLocalServiceUtil {
 	}
 
 	public static java.util.List<com.liferay.lms.model.Module> findAllInGroup(
+		long groupId, int start, int end)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().findAllInGroup(groupId, start, end);
+	}
+
+	public static java.util.List<com.liferay.lms.model.Module> findAllInGroup(
 		long groupId,
 		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
 		throws com.liferay.portal.kernel.exception.SystemException {

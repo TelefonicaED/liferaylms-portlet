@@ -337,6 +337,14 @@ public interface LearningActivityLocalService extends BaseLocalService,
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.util.List<com.liferay.lms.model.LearningActivity> getLearningActivitiesOfModule(
+		long moduleId, int start, int end)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	public long countLearningActivitiesOfModule(long moduleId)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.util.List<java.lang.Long> getLearningActivityIdsOfModule(
 		long moduleId)
 		throws com.liferay.portal.kernel.exception.SystemException;

@@ -19,7 +19,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-import com.liferay.lms.NoSuchUserCompetenceException;
 import com.liferay.lms.learningactivity.calificationtype.CalificationType;
 import com.liferay.lms.learningactivity.calificationtype.CalificationTypeRegistry;
 import com.liferay.lms.learningactivity.courseeval.CourseEval;
@@ -27,15 +26,14 @@ import com.liferay.lms.learningactivity.courseeval.CourseEvalRegistry;
 import com.liferay.lms.model.Course;
 import com.liferay.lms.model.CourseCompetence;
 import com.liferay.lms.model.CourseResult;
-import com.liferay.lms.model.LearningActivityResult;
 import com.liferay.lms.model.Module;
 import com.liferay.lms.model.ModuleResult;
 import com.liferay.lms.model.UserCompetence;
 import com.liferay.lms.service.ClpSerializer;
 import com.liferay.lms.service.CourseLocalServiceUtil;
-import com.liferay.lms.service.CourseResultLocalServiceUtil;
 import com.liferay.lms.service.base.CourseResultLocalServiceBaseImpl;
-import com.liferay.lms.service.persistence.CourseResultUtil;
+import com.liferay.lms.service.persistence.CourseResultFinderUtil;
+import com.liferay.lms.service.persistence.LearningActivityResultFinderUtil;
 import com.liferay.portal.kernel.bean.PortletBeanLocatorUtil;
 import com.liferay.portal.kernel.dao.orm.Criterion;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
@@ -89,88 +87,255 @@ public class CourseResultLocalServiceImpl
 	}
 	
 	public long countByUserId(long userId) throws SystemException{
-		return CourseResultUtil.countByUserId(userId);
+		return courseResultPersistence.countByUserId(userId);
 	}
+	
+	/**
+	 * Pide la lista de profesores y editores para obtener los usuarios excluidos y llama a countStudentsByCourseIdUserIds
+	 * @param course curso del que quiero los usuarios
+	 * @param passed si quiero los aprobados
+	 * @return numero de usuarios que han pasado el curso si passed es a true
+	 * @throws SystemException
+	 */
 	
 	public long countStudentsByCourseId(Course course, boolean passed) throws SystemException{
-		return countStudentsByCourseId(course, null, passed);
+		long[] userExcludedIds = CourseLocalServiceUtil.getTeachersAndEditorsIdsFromCourse(course);
+		return countStudentsByCourseIdUserExcludedIds(course.getCourseId(), userExcludedIds, passed);
 	}
 	
+	/**
+	 * @deprecated ESTE SE VA A DEPRECAR PORQUE NO ES RECOMENDABLE USAR UNA LISTA GRANDE USUARIOS, ES MEJOR PASAR LA DE LOS EDITORES Y PROFESORES 
+	 * POR LO QUE SE RECOMIENDA LLAMAR A countStudentsByCourseId o countStudentsByCourseIdUserIds
+	 * @param course curso del que quiero los usuarios
+	 * @param students lista de estudiantes del curso, si no se pasa la lista se obtiene en la función
+	 * @param passed si quiero los aprobados
+	 * @return numero de usuarios que han pasado el curso si passed es a true
+	 * @throws SystemException
+	 */
+	@Deprecated
 	public long countStudentsByCourseId(Course course, List<User> students, boolean passed) throws SystemException {
 		
-		long res = 0;
 		if(Validator.isNull(students) || !(students.size()>0))
 			students = CourseLocalServiceUtil.getStudentsFromCourse(course.getCompanyId(), course.getGroupCreatedId());
 		
-		ClassLoader classLoader = (ClassLoader) PortletBeanLocatorUtil.locate(ClpSerializer.getServletContextName(), "portletClassLoader");
-		DynamicQuery consulta = DynamicQueryFactoryUtil.forClass(CourseResult.class, classLoader)
-				.add(PropertyFactoryUtil.forName("courseId").eq(course.getCourseId()));
-		
-		if(Validator.isNotNull(students) && students.size() > 0) {
-			Criterion criterion = null;
-			for (int i = 0; i < students.size(); i++) {
-				if(i==0) {
-					criterion = RestrictionsFactoryUtil.like("userId", students.get(i).getUserId());
-				} else {
-					criterion = RestrictionsFactoryUtil.or(criterion, RestrictionsFactoryUtil.like("userId", students.get(i).getUserId()));
-				}
+		if(students != null && students.size() > 0){
+			long[] userIds = new long[students.size()];
+			for(int i = 0; i < students.size(); i++){
+				userIds[i] = students.get(i).getUserId();
 			}
-			if(Validator.isNotNull(criterion)) {
-				criterion=RestrictionsFactoryUtil.and(criterion,
-						RestrictionsFactoryUtil.eq("passed",passed));
 				
-				consulta.add(criterion);
-				
-				List<CourseResult> results = (List<CourseResult>)courseResultPersistence.findWithDynamicQuery(consulta);
-				if(results!=null && !results.isEmpty()) {
-					res = results.size();
-				}
-			}
+			return courseResultPersistence.countByCourseIdPassedMultipleUserId(course.getCourseId(), passed, userIds);
+		}else{
+			return 0;
 		}
-		
-		return res;
 	}
+	
+	/**
+	 * Obtiene los estudiantes de un curso en función del passed
+	 * Solo usar si ya tengo la lista de usuarios dada
+	 * @param courseId id del curso del que quiero los usuarios
+	 * @param userExcludedIds ids de los usuarios que se excluyen para no contarlos (profesores y editores)
+	 * @param passed si quiero los aprobados
+	 * @return numero de usuarios que han pasado el curso si passed es a true
+	 * @throws SystemException
+	 */
+	
+	public int countStudentsByCourseIdUserExcludedIds(long courseId, long[] userExcludedIds, boolean passed) throws SystemException{
+
+		if(userExcludedIds != null && userExcludedIds.length > 0){
+		
+			return courseResultPersistence.countByCourseIdPassedNotMultipleUserId(courseId, passed, userExcludedIds);
+
+		}else{
+			return courseResultPersistence.countByc(courseId, passed);
+		}
+	}
+	
+	/**
+	 * Cuenta los estudiantes que han iniciado el curso, si no se tiene ya la lista de usuarios excluidos (profesores y editores) llamar
+	 * a este método, si se tiene la lista llamar a countStudentsByCourseIdUserIdsStarted
+	 * @param course curso del que quiero los usuarios
+	 * @return numero de usuarios que han iniciado el curso
+	 * @throws SystemException
+	 */
 	
 	public long countStudentsByCourseId(Course course) throws SystemException
 	{
-		return countStudentsByCourseId(course, null);
+		long[] userExcludedIds = CourseLocalServiceUtil.getTeachersAndEditorsIdsFromCourse(course);
+		return countStudentsByCourseIdUserExcludedIdsStarted(course.getCourseId(), userExcludedIds);
 	}
 	
-	public long countStudentsByCourseId(Course course, List<User> students) throws SystemException
-	{
+	/**
+	 * @deprecated ESTE LO VAMOS A DEPRECAR, HABRÍA QUE LLAMAR AL MÉTODO countStudentsByCourseId o countStudentsByCourseIdUserIdsStarted 
+	 * Cuenta los estudiantes que han iniciado el curso
+	 * @param course curso del que quiero los usuarios
+	 * @param students lista de estudiantes, si se pasa a null se obtienen dentro de la función
+	 * @return numero de usuarios que han iniciado el curso
+	 * @throws SystemException
+	 */
+	@Deprecated
+	public long countStudentsByCourseId(Course course, List<User> students) throws SystemException{
 		
-		long res = 0;
 		if(Validator.isNull(students) || !(students.size()>0))
 			students = CourseLocalServiceUtil.getStudentsFromCourse(course.getCompanyId(), course.getGroupCreatedId());
 		
-		ClassLoader classLoader = (ClassLoader) PortletBeanLocatorUtil.locate(ClpSerializer.getServletContextName(), "portletClassLoader");
-		DynamicQuery consulta = DynamicQueryFactoryUtil.forClass(CourseResult.class, classLoader)
-				.add(PropertyFactoryUtil.forName("courseId").eq(course.getCourseId()));
-		
-		if(Validator.isNotNull(students) && students.size() > 0) {
-			Criterion criterion = null;
-			for (int i = 0; i < students.size(); i++) {
-				if(i==0) {
-					criterion = RestrictionsFactoryUtil.like("userId", students.get(i).getUserId());
-				} else {
-					criterion = RestrictionsFactoryUtil.or(criterion, RestrictionsFactoryUtil.like("userId", students.get(i).getUserId()));
-				}
+		if(students != null && students.size() > 0){
+			long[] userIds = new long[students.size()];
+			for(int i = 0; i < students.size(); i++){
+				userIds[i] = students.get(i).getUserId();
 			}
-			if(Validator.isNotNull(criterion)) {
-				consulta.add(criterion);
-				List<CourseResult> results = (List<CourseResult>)courseResultPersistence.findWithDynamicQuery(consulta);
-				if(results!=null && !results.isEmpty()) {
-					res = results.size();
-				}
-			}
+			return courseResultPersistence.countByCourseIdMultipleUserIdStarted(course.getCourseId(), userIds);
+		}else{
+			return 0;
 		}
+	}
+	
+
+	/**
+	 * Devuelve el número de estudiantes que han comenzado un curso
+	 * @param courseId id del curso del que quiero contar estudiantes
+	 * @param userExcludedIds ids de los usuarios excluidos (profesores y editores)
+	 * @return número de usuarios que han iniciado el curso
+	 * @throws SystemException
+	 */
+	public int countStudentsByCourseIdUserExcludedIdsStarted(long courseId, long[] userExcludedIds) throws SystemException{
 		
-		return res;
+		if(userExcludedIds != null && userExcludedIds.length > 0){
+			return courseResultPersistence.countByCourseIdNotMultipleUserIdStarted(courseId, userExcludedIds);
+		}else{
+			return courseResultPersistence.countByCourseIdStarted(courseId);
+		}
+	}
+	
+	/**
+	 * Cuenta los estudiantes que han finalizado el curso
+	 * @param courseId id del curso del que quiero contar los estudiantes
+	 * @param userExcludedIds de los usuarios excluidos (profesores y editores)
+	 * @return número de usuarios que han finalizado el curso
+	 * @throws SystemException
+	 */
+	
+	public int countStudentsByCourseIdUserExcludedIdsFinished(long courseId, long[] userExcludedIds) throws SystemException{
+		
+		if(userExcludedIds != null && userExcludedIds.length > 0){
+			return courseResultPersistence.countByCourseIdNotMultipleUserIdFinished(courseId, null, userExcludedIds);
+
+		}else{ 
+			return courseResultPersistence.countByCourseIdFinished(courseId, null);
+		}
+	}
+	
+	/**
+	 * Cuenta los estudiantes que han finalizado el curso y lo hayan aprobado
+	 * @param courseId id del curso del que quiero contar los estudiantes
+	 * @param userExcludedIds de losusuarios excluidos(profesores y editores)
+	 * @return número de estudiantes que han aprobado el curso
+	 * @throws SystemException
+	 */
+	
+	public int countStudentsByCourseIdUserExcludedIdsPassed(long courseId, long[] userExcludedIds) throws SystemException{
+		
+		if(userExcludedIds != null && userExcludedIds.length > 0){
+			return courseResultPersistence.countByCourseIdPassedNotMultipleUserIdFinished(courseId, true, null, userExcludedIds);
+
+		}else{
+			return courseResultPersistence.countByCourseIdPassedFinished(courseId, true, null);
+		}
+	}
+	
+	/**
+	 * Cuenta los estudiantes que han finalizado el curso y lo hayan suspendido
+	 * @param courseId id del curso del que quiero contar los estudiantes
+	 * @param userExcludedIds de los usuarios excluidos (profesores y editores)
+	 * @return número de estudiantes que han finalizado el curso y lo han suspendido
+	 * @throws SystemException
+	 */
+	
+	public int countStudentsByCourseIdUserExcludedIdsFailed(long courseId, long[] userExcludedIds) throws SystemException{
+		
+		if(userExcludedIds != null && userExcludedIds.length > 0){
+			return courseResultPersistence.countByCourseIdPassedNotMultipleUserIdFinished(courseId, false, null, userExcludedIds);
+
+		}else{
+			return courseResultPersistence.countByCourseIdPassedFinished(courseId, false, null);
+		}
+	}
+	
+	/**
+	 * Devuelve el número de estudiantes que han comenzado un curso, esta función está pensada para pasar una lista de estudiantes filtrada
+	 * (por ejemplo para los equipos) para pedir de todos los estudiantes usar countStudentsByCourseIdUserExcludedIdsStarted
+	 * @param courseId id del curso del que quiero contar estudiantes
+	 * @param userIds ids de los usuarios filtrados
+	 * @return número de estudiantes que han iniciado el curso
+	 * @throws SystemException
+	 */
+	public int countStudentsByCourseIdUserIdsStarted(long courseId, long[] userIds) throws SystemException{
+		
+		if(userIds != null && userIds.length > 0){
+			return courseResultPersistence.countByCourseIdMultipleUserIdStarted(courseId, userIds);
+		}else{
+			return 0;
+		}
+	}
+	
+	/**
+	 * Cuenta los estudiantes que han finalizado el curso, esta función está pensada para pasar una lista de estudiantes filtrada
+	 * (por ejemplo para los equipos) para pedir de todos los estudiantes usar countStudentsByCourseIdUserExcludedIdsFinished
+	 * @param courseId id del curso del que quiero contar los estudiantes
+	 * @param userIds ids de los usuarios filtrados
+	 * @return número de usuarios que han finalizado el curso
+	 * @throws SystemException
+	 */
+	
+	public int countStudentsByCourseIdUserIdsFinished(long courseId, long[] userIds) throws SystemException{
+		
+		if(userIds != null && userIds.length > 0){
+			return courseResultPersistence.countByCourseIdMultipleUserIdFinished(courseId, null, userIds);
+
+		}else{
+			return 0;
+		}
+	}
+	
+	/**
+	 * Cuenta los estudiantes que han finalizado el curso y lo hayan aprobado, esta función está pensada para pasar una lista de estudiantes filtrada
+	 * (por ejemplo para los equipos) para pedir de todos los estudiantes usar countStudentsByCourseIdUserExcludedIdsPassed
+	 * @param courseId id del curso del que quiero contar los estudiantes
+	 * @param userIds ids de los usuarios filtrados
+	 * @return número de estudiantes que han aprobado el curso
+	 * @throws SystemException
+	 */
+	
+	public int countStudentsByCourseIdUserIdsPassed(long courseId, long[] userIds) throws SystemException{
+		
+		if(userIds != null && userIds.length > 0){
+			return courseResultPersistence.countByCourseIdPassedMultipleUserIdFinished(courseId, true, null, userIds);
+		}else{
+			return 0;
+		}
+	}
+	
+	/**
+	 * Cuenta los estudiantes que han finalizado el curso y lo hayan suspendido, esta función está pensada para pasar una lista de estudiantes filtrada
+	 * (por ejemplo para los equipos) para pedir de todos los estudiantes usar countStudentsByCourseIdUserExcludedIdsFailed
+	 * @param courseId id del curso del que quiero contar los estudiantes
+	 * @param userIds ids de los usuarios filtrados
+	 * @return número de estudiantes que han finalizado el curso y lo han suspendido
+	 * @throws SystemException
+	 */
+	
+	public int countStudentsByCourseIdUserIdsFailed(long courseId, long[] userIds) throws SystemException{
+		
+		if(userIds != null && userIds.length > 0){
+			return courseResultPersistence.countByCourseIdPassedMultipleUserIdFinished(courseId, false, null, userIds);
+		}else{
+			return 0;
+		}
 	}
 	
 	
-	public Double avgResult(long courseId, boolean passed) throws SystemException
-	{
+	public Double avgResult(long courseId, boolean passed) throws SystemException{
+		
 		ClassLoader classLoader = (ClassLoader) PortletBeanLocatorUtil.locate(ClpSerializer.getServletContextName(), "portletClassLoader"); 
 		DynamicQuery dq=DynamicQueryFactoryUtil.forClass(CourseResult.class, classLoader);
 		Criterion criterion=PropertyFactoryUtil.forName("courseId").eq(courseId);
@@ -191,37 +356,55 @@ public class CourseResultLocalServiceImpl
 		return (Double)(learningActivityResultPersistence.findWithDynamicQuery(dq).get(0));
 	}
 	
-	public Double avgStudentsResult(Course course, boolean passed) throws SystemException
-	{
-		return avgStudentsResult(course, null, passed);
+	/**
+	 * Devuelve la media de resultado de usuarios para un curso, si ya se tiene la lista de usuarios excluidos (profesores y editores)
+	 * llamar al método avgResultByCourseIdUserExcludedIds directamente
+	 * @param course curso
+	 * @param passed si queremos de los aprobados o suspendos
+	 * @return media de resultado de usuarios para una actividad
+	 */
+	public Double avgStudentsResult(Course course, boolean passed) throws SystemException{
+		long[] userExcludedIds = CourseLocalServiceUtil.getTeachersAndEditorsIdsFromCourse(course);
+		 
+		return CourseResultFinderUtil.avgResultByCourseId(course.getCourseId(), passed, null, userExcludedIds);
 	}
 	
-	public Double avgStudentsResult(Course course, List<User> students, boolean passed) throws SystemException
-	{
-		if(Validator.isNull(students) || !(students.size()>0))
+	/**
+	 * @deprecated SE RECOMIENDA NO USAR ESTE MÉTODO, SE RECOMIENDA USAR: avgStudentsResult(Course course, boolean passed)
+	 * o avgResultByCourseIdUserExcludedIds(long courseId, passed, long[] userExcludedIds)
+	 * @param course curso
+	 * @param _students lista de estudiantes, si viene vacía se calculan dentro
+	 * @param passed si queremos de los aprobados o suspendos
+	 * @return media de resultado de usuarios para un curso
+	 */
+	@Deprecated
+	public Double avgStudentsResult(Course course, List<User> _students, boolean passed) throws SystemException{
+		List<User> students = null;
+		// Se prepara el metodo para recibir un Listado de estudiantes especificos,, por ejemplo que pertenezcan a alguna organizacion. Sino, se trabaja con todos los estudiantes del curso.
+		if(Validator.isNotNull(_students) && _students.size() > 0)
+			students = _students;
+		else
 			students = CourseLocalServiceUtil.getStudentsFromCourse(course.getCompanyId(), course.getGroupCreatedId());
 		
-		ClassLoader classLoader = (ClassLoader) PortletBeanLocatorUtil.locate(ClpSerializer.getServletContextName(), "portletClassLoader"); 
-		DynamicQuery consulta=DynamicQueryFactoryUtil.forClass(CourseResult.class, classLoader)
-				.add(PropertyFactoryUtil.forName("courseId").eq(course.getCourseId()));
-		
-		if(Validator.isNotNull(students) && students.size() > 0) {
-			Criterion criterion = null;
-			for (int i = 0; i < students.size(); i++) {
-				if(i==0) {
-					criterion = RestrictionsFactoryUtil.like("userId", students.get(i).getUserId());
-				} else {
-					criterion = RestrictionsFactoryUtil.or(criterion, RestrictionsFactoryUtil.like("userId", students.get(i).getUserId()));
-				}
+		if(students != null && students.size() > 0){
+			long[] userIds = new long[students.size()];
+			for(int i = 0; i < students.size(); i++){
+				userIds[i] = students.get(i).getUserId();
 			}
-			if(Validator.isNotNull(criterion)) {
-				criterion=RestrictionsFactoryUtil.and(criterion,
-						RestrictionsFactoryUtil.eq("passed",passed));
-				consulta.add(criterion);
-			}
+			return CourseResultFinderUtil.avgResultByCourseId(course.getCourseId(), passed, userIds, null);
 		}
-		consulta.setProjection(ProjectionFactoryUtil.avg("result"));
-		return (Double)(learningActivityResultPersistence.findWithDynamicQuery(consulta).get(0));
+		return new Double(0);
+	}
+	
+	/**
+	 * Devuelve la media de resultado de usuarios para un curso
+	 * @param courseId id del curso
+	 * @param passed si queremos los aprobados o suspensos
+	 * @param userExcludedIds id de la company de la actividad
+	 * @return media de resultado de usuarios para una actividad
+	 */
+	public double avgResultByCourseIdUserExcludedIds(long courseId, boolean passed, long[] userExcludedIds) throws SystemException{
+		return CourseResultFinderUtil.avgResultByCourseId(courseId, passed, null, userExcludedIds);
 	}
 	
 	public CourseResult create(long courseId, long userId) throws SystemException

@@ -29,7 +29,6 @@ import com.liferay.lms.auditing.AuditingLogFactory;
 import com.liferay.lms.learningactivity.courseeval.CourseEval;
 import com.liferay.lms.learningactivity.courseeval.CourseEvalRegistry;
 import com.liferay.lms.model.Course;
-import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.model.LmsPrefs;
 import com.liferay.lms.model.Module;
 import com.liferay.lms.service.ClpSerializer;
@@ -155,24 +154,6 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 	{
 		
 		 return courseFinder.getExistingUserCourses(userId,-1,-1);
-		
-		
-		/*	
-		User usuario= userLocalService.getUser(userId);
-		java.util.List<Group> groups= GroupLocalServiceUtil.getUserGroups(usuario.getUserId());
-		java.util.List<Course> results=new java.util.ArrayList<Course>();
-		
-		for(Group groupCourse:groups)
-		{
-			
-			
-			Course course=courseLocalService.fetchByGroupCreatedId(groupCourse.getGroupId());
-			if(course!=null)
-			{
-				results.add(course);
-			}
-		}
-		return results;*/
 
 	}
 	
@@ -181,24 +162,6 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 	{
 		
 		 return courseFinder.getExistingUserCourses(userId,start,end);
-		
-		
-		/*	
-		User usuario= userLocalService.getUser(userId);
-		java.util.List<Group> groups= GroupLocalServiceUtil.getUserGroups(usuario.getUserId());
-		java.util.List<Course> results=new java.util.ArrayList<Course>();
-		
-		for(Group groupCourse:groups)
-		{
-			
-			
-			Course course=courseLocalService.fetchByGroupCreatedId(groupCourse.getGroupId());
-			if(course!=null)
-			{
-				results.add(course);
-			}
-		}
-		return results;*/
 
 	}
 	
@@ -896,66 +859,79 @@ public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int e
 		return getStudentsFromCourse(course.getCompanyId(), course.getGroupCreatedId());
 	}
 	
-	public List<User> getStudentsFromCourse(long companyId, long courseGropupCreatedId) {
-		List<User> students = new ArrayList<User>();
+	public List<User> getStudentsFromCourse(long companyId, long courseGroupCreatedId) {
+		List<User> students = null;
 		//List<User> usersExcluded = new ArrayList<User>();
 		
-		LmsPrefs prefs;
 		try {
-			prefs = LmsPrefsLocalServiceUtil.getLmsPrefs(companyId);
+			LinkedHashMap<String,Object> userParams = getUserParamsStudent(companyId, courseGroupCreatedId);
+			
+			students = UserLocalServiceUtil.search(companyId, null, null, 
+					null, null, null, 0, userParams, true, QueryUtil.ALL_POS, QueryUtil.ALL_POS,  new UserLastNameComparator(true));
+			
+		} catch (SystemException e) {
+			e.printStackTrace();
+			students = new ArrayList<User>();
+		}
+		
+		return students;
+	}
+	
+	public List<User> getStudentsFromCourse(long companyId, long courseGroupCreatedId, long teamId){
+		List<User> students = null;
+		//List<User> usersExcluded = new ArrayList<User>();
+		
+		try {
+			LinkedHashMap<String,Object> userParams = getUserParamsStudent(companyId, courseGroupCreatedId);
+			if(teamId > 0){
+				userParams.put("usersTeams", teamId);
+			}
+			
+			students = UserLocalServiceUtil.search(companyId, null, null, 
+					null, null, null, 0, userParams, true, QueryUtil.ALL_POS, QueryUtil.ALL_POS,  new UserLastNameComparator(true));
+			
+		} catch (SystemException e) {
+			e.printStackTrace();
+			students = new ArrayList<User>();
+		}
+		
+		return students;
+	}
+	
+	private LinkedHashMap<String,Object> getUserParamsStudent(long companyId, long courseGroupCreatedId){
+		try {
+			LmsPrefs prefs = LmsPrefsLocalServiceUtil.getLmsPrefs(companyId);
 			
 			long teacherRoleId=RoleLocalServiceUtil.getRole(prefs.getTeacherRole()).getRoleId();
 			long editorRoleId=RoleLocalServiceUtil.getRole(prefs.getEditorRole()).getRoleId();
-			
-			/*List<User> users = UserLocalServiceUtil.getGroupUsers(courseGropupCreatedId);
-			
-			List<UserGroupRole> teachers=UserGroupRoleLocalServiceUtil.getUserGroupRolesByGroupAndRole(courseGropupCreatedId, teacherRoleId);
-			for(UserGroupRole teacher: teachers) {
-				usersExcluded.add(teacher.getUser());
-			}
-			List<UserGroupRole> editors=UserGroupRoleLocalServiceUtil.getUserGroupRolesByGroupAndRole(courseGropupCreatedId, editorRoleId);
-			for(UserGroupRole editor: editors) {
-				usersExcluded.add(editor.getUser());
-			}
-			
-			
-			
-			if(Validator.isNotNull(usersExcluded)) {
-				for(User user: users) {
-					if( !(usersExcluded.contains(user)) && !(students.contains(user)) && user.isActive())
-						students.add(user);
-				}
-			}*/
 			
 			LinkedHashMap<String,Object> params=new LinkedHashMap<String,Object>();			
 
 			params.put("notInCourseRoleTeacherRoleId", new CustomSQLParam("WHERE User_.userId NOT IN "
 		              + " (SELECT UserGroupRole.userId " + "  FROM UserGroupRole "
 		              + "  WHERE  (UserGroupRole.groupId = ?) AND (UserGroupRole.roleId = ?))", new Long[] {
-		            		  courseGropupCreatedId, teacherRoleId }));
+		            		  courseGroupCreatedId, teacherRoleId }));
 			
 			params.put("notInCourseRoleEditorRoleId", new CustomSQLParam("WHERE User_.userId NOT IN "
 		              + " (SELECT UserGroupRole.userId " + "  FROM UserGroupRole "
 		              + "  WHERE  (UserGroupRole.groupId = ?) AND (UserGroupRole.roleId = ?))", new Long[] {
-		            		  courseGropupCreatedId, editorRoleId }));
+		            		  courseGroupCreatedId, editorRoleId }));
 			
 			 params.put("InCourseRoleStu", new CustomSQLParam("WHERE User_.userId  IN "
 		              + " (SELECT Users_Groups.userId " + "  FROM Users_Groups "
 		              + "  WHERE  (Users_Groups.groupId = ?))", new Long[] {
-		            		  courseGropupCreatedId }));
+		            		  courseGroupCreatedId }));
 			 
 			 params.put("isActive", new CustomSQLParam("WHERE User_.status =0",null));
-			
-			students = UserLocalServiceUtil.search(prefs.getCompanyId(), null, null, 
-					null, null, null, 0, params, true, QueryUtil.ALL_POS, QueryUtil.ALL_POS,  new UserLastNameComparator(true));
-			
+			 
+			 return params;
 		} catch (PortalException e) {
 			e.printStackTrace();
+			return null;
 		} catch (SystemException e) {
 			e.printStackTrace();
-		}
-		
-		return students;
+			return null;
+		}	 
 	}
 	
 	
@@ -981,6 +957,42 @@ public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int e
 		
 		return users;
 		
+	}
+	
+	public long[] getTeachersAndEditorsIdsFromCourse(Course course){
+		long[] userIds = null;
+		
+
+		try {
+			LmsPrefs prefs = LmsPrefsLocalServiceUtil.getLmsPrefs(course.getCompanyId());
+			LinkedHashMap<String, Object> userParams = new LinkedHashMap<String, Object>();
+			long teacherRoleId = RoleLocalServiceUtil.getRole(prefs.getTeacherRole()).getRoleId();
+			long editorRoleId = RoleLocalServiceUtil.getRole(prefs.getEditorRole()).getRoleId();
+			userParams.put("usersGroups", course.getGroupCreatedId());
+			userParams.put("inCourseRoleIds", new CustomSQLParam("WHERE User_.userId IN "
+		              + " (SELECT UserGroupRole.userId " + "  FROM UserGroupRole "
+		              + "  WHERE  (UserGroupRole.groupId = ?) AND (UserGroupRole.roleId IN (?,?)))", new Long[] {
+		            		 course.getGroupCreatedId(), teacherRoleId, editorRoleId}));
+			
+			List<User> users = UserLocalServiceUtil.search(course.getCompanyId(), "", 
+					WorkflowConstants.STATUS_APPROVED, userParams, 
+					QueryUtil.ALL_POS, QueryUtil.ALL_POS,(OrderByComparator)null);
+			if(users != null){
+				userIds = new long[users.size()];
+				for(int i = 0; i < users.size(); i++){
+					userIds[i] = users.get(i).getUserId();
+				}
+			}
+			
+		} catch (PortalException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SystemException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return userIds;
 	}
 	
 	public List<Course> getByTitleStatusCategoriesTags(String freeText, int status, long[] categories, long[] tags, long companyId, long groupId, long userId, String language, boolean isAdmin, boolean andOperator, int start, int end){

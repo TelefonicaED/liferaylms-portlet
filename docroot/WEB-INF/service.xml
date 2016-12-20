@@ -197,6 +197,17 @@
 		<finder name="UserId" return-type="Collection">
 			<finder-column name="userId" />
 		</finder>		
+		<finder name="ActIdNotMultipleUserIdStarted" return-type="Collection" where="startDate IS NOT null">
+			<finder-column name="actId" />
+			<finder-column name="userId" arrayable-operator="AND" comparator="!=" ></finder-column>
+		</finder>	
+		<finder name="ActIdMultipleUserIdStarted" return-type="Collection" where="startDate IS NOT null">
+			<finder-column name="actId" />
+			<finder-column name="userId" arrayable-operator="OR" comparator="="></finder-column>
+		</finder>
+		<finder name="ActIdStarted" return-type="Collection" where="startDate IS NOT null">
+			<finder-column name="actId" />
+		</finder>
 	</entity>
 
 
@@ -235,6 +246,56 @@
 		</finder>
 		<finder name="user" return-type="Collection">
 			<finder-column name="userId" />
+		</finder>
+		<finder name="ActIdNotMultipleUserId" return-type="Collection" >
+			<finder-column name="actId" />
+			<finder-column name="userId" arrayable-operator="AND" comparator="!="></finder-column>
+		</finder>	
+		<finder name="ActIdNotMultipleUserIdStarted" return-type="Collection"  where="startDate IS NOT null">
+			<finder-column name="actId" />
+			<finder-column name="userId" arrayable-operator="AND" comparator="!="></finder-column>
+		</finder>
+		<finder name="ActIdStarted" return-type="Collection"  where="startDate IS NOT null">
+			<finder-column name="actId" />
+		</finder>
+		<finder name="ActIdPassedNotMultipleUserId" return-type="Collection" >
+			<finder-column name="actId" />
+			<finder-column name="passed" />
+			<finder-column name="userId" arrayable-operator="AND" comparator="!="></finder-column>
+		</finder>
+		<finder name="ActIdNotMultipleUserIdFinished" return-type="Collection" where="endDate IS NOT null">
+			<finder-column name="actId" />
+			<finder-column name="userId" arrayable-operator="AND" comparator="!="></finder-column>
+		</finder>
+		<finder name="ActIdFinished" return-type="Collection" where="endDate IS NOT null">
+			<finder-column name="actId" />
+		</finder>
+		<finder name="ActIdPassedNotMultipleUserIdFinished" return-type="Collection" where="endDate IS NOT null">
+			<finder-column name="actId" />
+			<finder-column name="passed" />
+			<finder-column name="userId" arrayable-operator="AND" comparator="!="></finder-column>
+		</finder>
+		<finder name="ActIdPassedMultipleUserId" return-type="Collection">
+			<finder-column name="actId" />
+			<finder-column name="passed" />
+			<finder-column name="userId" arrayable-operator="OR" comparator="="></finder-column>
+		</finder>
+		<finder name="ActIdPassedMultipleUserIdFinished" return-type="Collection" where="endDate IS NOT null">
+			<finder-column name="actId" />
+			<finder-column name="passed" />
+			<finder-column name="userId" arrayable-operator="OR" comparator="="></finder-column>
+		</finder>
+		<finder name="ActIdPassedFinished" return-type="Collection" where="endDate IS NOT null">
+			<finder-column name="actId" />
+			<finder-column name="passed" />
+		</finder>
+		<finder name="ActIdMultipleUserIdStarted" return-type="Collection"  where="startDate IS NOT null">
+			<finder-column name="actId" />
+			<finder-column name="userId" arrayable-operator="OR" comparator="="></finder-column>
+		</finder>
+		<finder name="ActIdMultipleUserIdFinished" return-type="Collection" where="endDate IS NOT null">
+			<finder-column name="actId" />
+			<finder-column name="userId" arrayable-operator="OR" comparator="="></finder-column>
 		</finder>
 	</entity>
 	
@@ -283,7 +344,7 @@
 		<column name="startDate" type="Date" />
 		<column name="passed" type="boolean"></column>
 		<column name="mrId" type="long" primary="true"></column>
-		<column name="passedDate" type="Date"></column>
+		<column name="passedDate" type="Date"/>
         <order>
             <order-column name="mrId"></order-column>
         </order>
@@ -300,7 +361,50 @@
 		</finder>
 		<finder name="UserId" return-type="Collection">
 			<finder-column name="userId" />
-		</finder>			
+		</finder>		
+		<finder name="ModuleIdMultipleUserId" return-type="Collection" >
+			<finder-column name="moduleId" />
+			<finder-column name="userId" arrayable-operator="OR" comparator="="></finder-column>
+		</finder>	
+		<finder name="ModuleIdPassedMultipleUserId" return-type="Collection" >
+			<finder-column name="moduleId" />
+			<finder-column name="passed" />
+			<finder-column name="userId" arrayable-operator="OR" comparator="="></finder-column>
+		</finder>
+		<finder name="ModuleIdMultipleUserIdFinished" return-type="Collection" >
+			<finder-column name="moduleId" />
+			<finder-column name="passedDate" comparator="IS NOT"/>
+			<finder-column name="userId" arrayable-operator="OR" comparator="="></finder-column>
+		</finder>
+		<finder name="ModuleIdFinished" return-type="Collection" >
+			<finder-column name="moduleId" />
+			<finder-column name="passedDate" comparator="IS NOT"/>
+		</finder>
+		<finder name="ModuleIdPassedFinished" return-type="Collection">
+			<finder-column name="moduleId" />
+			<finder-column name="passed" />
+			<finder-column name="passedDate" comparator="IS NOT"/>
+		</finder>
+		<finder name="ModuleIdNotMultipleUserId" return-type="Collection" >
+			<finder-column name="moduleId" />
+			<finder-column name="userId" arrayable-operator="AND" comparator="!="></finder-column>
+		</finder>	
+		<finder name="ModuleIdPassedNotMultipleUserId" return-type="Collection" >
+			<finder-column name="moduleId" />
+			<finder-column name="passed" />
+			<finder-column name="userId" arrayable-operator="AND" comparator="!="></finder-column>
+		</finder>
+		<finder name="ModuleIdNotMultipleUserIdFinished" return-type="Collection" >
+			<finder-column name="moduleId" />
+			<finder-column name="passedDate" comparator="IS NOT"/>
+			<finder-column name="userId" arrayable-operator="AND" comparator="!="></finder-column>
+		</finder>
+		<finder name="ModuleIdPassedNotMultipleUserIdFinished" return-type="Collection">
+			<finder-column name="moduleId" />
+			<finder-column name="passed" />
+			<finder-column name="passedDate" comparator="IS NOT"/>
+			<finder-column name="userId" arrayable-operator="AND" comparator="!="></finder-column>
+		</finder>
 	</entity>
 		<entity name="Competence" local-service="true" remote-service="true" uuid="true" json-enabled="false">
 		<!-- Primary key column -->
@@ -443,9 +547,9 @@
 		<column name="userId" type="long" primary="false"></column>
 		<column name="passed" type="boolean"></column>
 		<column name="startDate" type="Date" />
-		<column name="passedDate" type="Date"></column>
-		<column name="allowStartDate" type="Date"></column>
-		<column name="allowFinishDate" type="Date"></column>
+		<column name="passedDate" type="Date"/>
+		<column name="allowStartDate" type="Date"/>
+		<column name="allowFinishDate" type="Date"/>
 
 		<finder name="uc" return-type="CourseResult" unique="true">
 			<finder-column name="userId" />
@@ -458,6 +562,61 @@
 		<finder name="UserId" return-type="Collection">
 			<finder-column name="userId" />
 		</finder>	
+		<finder name="CourseId" return-type="Collection">
+			<finder-column name="courseId" />
+		</finder>	
+		<finder name="CourseIdPassedMultipleUserId" return-type="Collection" >
+			<finder-column name="courseId" />
+			<finder-column name="passed" />
+			<finder-column name="userId" arrayable-operator="OR" comparator="="></finder-column>
+		</finder>
+		<finder name="CourseIdMultipleUserIdStarted" return-type="Collection" where="startDate IS NOT null">
+			<finder-column name="courseId" />
+			<finder-column name="userId" arrayable-operator="OR" comparator="="></finder-column>
+		</finder>
+		<finder name="CourseIdMultipleUserIdFinished" return-type="Collection" >
+			<finder-column name="courseId" />
+			<finder-column name="passedDate" comparator="IS NOT"/>
+			<finder-column name="userId" arrayable-operator="OR" comparator="="></finder-column>
+		</finder>
+		<finder name="CourseIdStarted" return-type="Collection" where="startDate IS NOT null">
+			<finder-column name="courseId" />
+		</finder>
+		<finder name="CourseIdFinished" return-type="Collection">
+			<finder-column name="courseId" />
+			<finder-column name="passedDate" comparator="IS NOT"/>
+		</finder>
+		<finder name="CourseIdPassedMultipleUserIdFinished" return-type="Collection" >
+			<finder-column name="courseId" />
+			<finder-column name="passed" />
+			<finder-column name="passedDate" comparator="IS NOT"/>
+			<finder-column name="userId" arrayable-operator="OR" comparator="="></finder-column>
+		</finder>
+		<finder name="CourseIdPassedFinished" return-type="Collection">
+			<finder-column name="courseId" />
+			<finder-column name="passed" />
+			<finder-column name="passedDate" comparator="IS NOT"/>
+		</finder>
+		<finder name="CourseIdPassedNotMultipleUserId" return-type="Collection" >
+			<finder-column name="courseId" />
+			<finder-column name="passed" />
+			<finder-column name="userId" arrayable-operator="AND" comparator="!="></finder-column>
+		</finder>
+		<finder name="CourseIdNotMultipleUserIdStarted" return-type="Collection" where="startDate IS NOT null">
+			<finder-column name="courseId" />
+			<finder-column name="userId" arrayable-operator="AND" comparator="!="></finder-column>
+		</finder>
+		<finder name="CourseIdNotMultipleUserIdFinished" return-type="Collection">
+			<finder-column name="courseId" />
+			<finder-column name="passedDate" comparator="IS NOT"/>
+			<finder-column name="userId" arrayable-operator="AND" comparator="!="></finder-column>
+		</finder>
+		<finder name="CourseIdPassedNotMultipleUserIdFinished" return-type="Collection">
+			<finder-column name="courseId" />
+			<finder-column name="passed" />
+			<finder-column name="passedDate" comparator="IS NOT"/>
+			<finder-column name="userId" arrayable-operator="AND" comparator="!="></finder-column>
+		</finder>
 	</entity>
 	
 	<entity name="CheckP2pMailing" local-service="true" json-enabled="false" remote-service="false">

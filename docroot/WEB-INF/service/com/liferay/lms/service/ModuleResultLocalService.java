@@ -269,10 +269,30 @@ public interface ModuleResultLocalService extends BaseLocalService,
 	public long countByModule(long moduleId)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
+	/**
+	* Devuelve los estudiantes que han comenzado el mÃ³dulo. Si se tienen ya los ids de los usuarios excluidos (profesores y editores) se
+	* deberÃ¡ llamar a countByModuleOnlyStudents(long moduleId, long[] userIds)
+	*
+	* @param companyId id del company del curso
+	* @param courseGroupCreatedId id del group del curso
+	* @param moduleId id del mÃ³dulo del que queremos los estudiantes que han comenzado
+	* @return nÃºmero de estudiantes que han iniciado el mÃ³dulo
+	* @throws SystemException
+	*/
 	public long countByModuleOnlyStudents(long companyId,
-		long courseGropupCreatedId, long moduleId)
+		long courseGroupCreatedId, long moduleId)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
+	/**
+	* @deprecated Deprecado por eficiencia, se debe llamar a los mÃ©todos countByModuleOnlyStudents(long companyId, long courseGroupCreatedId, long moduleId)
+	o countByModuleOnlyStudents(long moduleId ,long[] userIds) ya que se calcula en base a los usuarios excluidos
+	* @param companyId id del company del curso
+	* @param courseGroupCreatedId id del group del curso
+	* @param moduleId  id del mÃ³dulo del que queremos los estudiantes que han comenzado
+	* @param _students Lista de estudiantes, si viene vacÃ­a se calcula dentro
+	* @return nÃºmero de estudiantes que han iniciado el modulo
+	* @throws SystemException
+	*/
 	public long countByModuleOnlyStudents(long companyId,
 		long courseGropupCreatedId, long moduleId,
 		java.util.List<com.liferay.portal.model.User> _students)
@@ -281,13 +301,123 @@ public interface ModuleResultLocalService extends BaseLocalService,
 	public long countByModulePassed(long moduleId, boolean passed)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
+	/**
+	* Devuelve los estudiantes que han aprobado o suspendido (en el caso de suspenso no tiene en cuenta que hayan finalizado) el mÃ³dulo.
+	* Si se tienen ya los ids de los usuarios excluidos (profesores y editores) se deberÃ¡ llamar a
+	* countByModulePassedOnlyStudents(long moduleId, boolean passed, long[] userIds)
+	*
+	* @param companyId id del company del curso
+	* @param courseGroupCreatedId id del group del curso
+	* @param moduleId id del mÃ³dulo del que queremos los estudiantes que han comenzado
+	* @param passed Si queremos los que han aprobado el modulo o no
+	* @return nÃºmero de estudiantes que han aprobado el modulo (en caso de passed = true) o de los que lo han suspendido o todavÃ­a no lo han termiando (passed = false)
+	* @throws SystemException
+	*/
 	public long countByModulePassedOnlyStudents(long companyId,
-		long courseGropupCreatedId, long moduleId, boolean passed)
+		long courseGroupCreatedId, long moduleId, boolean passed)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
+	/**
+	* @deprecated Deprecado por eficiencia, se debe llamar a los mÃ©todos countByModulePassedOnlyStudents(long companyId, long courseGroupCreatedId, long moduleId, boolean passed)
+	o countByModulePassedOnlyStudents(long moduleId, boolean passed, long[] userIds) ya que se calcula en base a los usuarios excluidos
+	* @param companyId id del company del curso
+	* @param courseGroupCreatedId id del group del curso
+	* @param moduleId  id del mÃ³dulo del que queremos los estudiantes
+	* @param passed Si queremos los que han aprobado el modulo o no
+	* @param _students Lista de estudiantes, si viene vacÃ­a se calcula dentro
+	* @return nÃºmero de estudiantes que han aprobado el curso (en caso de passed = true) o de los que lo han suspendido o todavÃ­a no lo han termiando (passed = false)
+	* @throws SystemException
+	*/
 	public long countByModulePassedOnlyStudents(long companyId,
-		long courseGropupCreatedId, long moduleId, boolean passed,
+		long courseGroupCreatedId, long moduleId, boolean passed,
 		java.util.List<com.liferay.portal.model.User> _students)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Devuelve los estudiantes que han aprobado o suspendido (en el caso de suspenso no tiene en cuenta que hayan finalizado o no) el mÃ³dulo.
+	*
+	* @param moduleId id del mÃ³dulo del que queremos los estudiantes
+	* @param passed Si queremos los que han aprobado el modulo o no
+	* @param userExcludedIds ids de usuarios excluidos (profesores y editores)
+	* @return nÃºmero de estudiantes que han aprobado el modulo (en caso de passed = true) o de los que lo han suspendido o todavÃ­a no lo han termiando (passed = false)
+	* @throws SystemException
+	*/
+	public int countByModulePassedOnlyStudents(long moduleId, boolean passed,
+		long[] userExcludedIds)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Cuenta los estudiantes que han iniciado el modulo: solo llamar si se tiene la lista de usuarios excluidos
+	*
+	* @param moduleId id del mÃ³dulo
+	* @param userExcludedIds ids de usuarios excluidos (profesores y editores)
+	* @return nÃºmero de estudiantes que han comenzado el modulo
+	* @throws SystemException
+	*/
+	public int countStudentsByModuleIdUserExcludedIdsStarted(long moduleId,
+		long[] userExcludedIds)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Cuenta los estudiantes que han finalizado el modulo: solo llamar si se tiene la lista de usuarios excluidos
+	*
+	* @param moduleId id del mÃ³dulo
+	* @param userExcludedIds ids de usuarios excluidos (profesores y editores)
+	* @return nÃºmero de estudiantes que han finalizado el mÃ³dulo
+	* @throws SystemException
+	*/
+	public int countStudentsByModuleIdUserExcludedIdsFinished(long moduleId,
+		long[] userExcludedIds)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Cuenta los estudiantes que han iniciado el modulo, esta funciÃ³n estÃ¡ pensada para pasar una lista de estudiantes filtrada
+	* (por ejemplo para los equipos) para pedir de todos los estudiantes usar countStudentsByModuleIdUserExcludedIdsStarted
+	*
+	* @param moduleId id del mÃ³dulo
+	* @param userIds ids de los usuarios filtrados
+	* @return nÃºmero de estudiantes que han comenzado el modulo
+	* @throws SystemException
+	*/
+	public int countStudentsByModuleIdUserIdsStarted(long moduleId,
+		long[] userIds)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Cuenta los estudiantes que han finalizado el modulo, esta funciÃ³n estÃ¡ pensada para pasar una lista de estudiantes filtrada
+	* (por ejemplo para los equipos) para pedir de todos los estudiantes usar countStudentsByModuleIdUserExcludedIdsFinished
+	*
+	* @param moduleId id del mÃ³dulo
+	* @param userIds ids de los usuarios filtrados
+	* @return nÃºmero de estudiantes que han finalizado el mÃ³dulo
+	* @throws SystemException
+	*/
+	public int countStudentsByModuleIdUserIdsFinished(long moduleId,
+		long[] userIds)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Cuenta los estudiantes que han finalizado el modulo y lo hayan aprobado
+	*
+	* @param moduleId id del mÃ³dulo
+	* @param userExcludedIds ids de usuarios excluidos (profesores y editores)
+	* @return nÃºmero de estudiantes que han finalizado y aprobado el mÃ³dulo
+	* @throws SystemException
+	*/
+	public int countStudentsByModuleIdUserExcludedIdsPassed(long moduleId,
+		long[] userExcludedIds)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Cuenta los estudiantes que han finalizado el modulo y lo hayan suspendido
+	*
+	* @param moduleId id del mÃ³dulo
+	* @param userExcludedIds ids de usuarios excluidos (profesores y editores)
+	* @return nÃºmero de estudiantes que han finalizado y suspendido el mÃ³dulo
+	* @throws SystemException
+	*/
+	public int countStudentsByModuleIdUserExcludedIdsFailed(long moduleId,
+		long[] userExcludedIds)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	public void update(com.liferay.lms.model.LearningActivityResult lactr)

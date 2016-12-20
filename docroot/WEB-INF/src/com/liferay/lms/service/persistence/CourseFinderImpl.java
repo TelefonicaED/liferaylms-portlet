@@ -473,6 +473,10 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 				sql = sql.replace("[$ORDERBY$]", "u.lastName, u.firstName, u.middleName ");
 			}
 			
+			if(start >= 0 && end >= 0){
+				sql += " LIMIT " + start + ", " + (end-start);
+			}
+			
 			if(log.isDebugEnabled()) log.debug("sql: " + sql);
 			
 			SQLQuery q = session.createSQLQuery(sql);
@@ -514,8 +518,6 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 				log.debug("emailAddress: " + emailAddress);	
 			}
 			
-			qPos.add(start);
-			qPos.add((end-start));
 			
 			List<User> listUsers = (List<User>) q.list();
 			return listUsers;

@@ -93,14 +93,14 @@ String scourseIds=ListUtil.toString(courses,"courseId");
 
 	<liferay-ui:search-container-row className="com.liferay.lms.model.Course" keyProperty="courseId" modelVar="course">
 	<%			
+		long[] userExcludedIds = CourseLocalServiceUtil.getTeachersAndEditorsIdsFromCourse(course);
 		Group groupsel= GroupLocalServiceUtil.getGroup(course.getGroupCreatedId());
-		List<User> students = CourseLocalServiceUtil.getStudentsFromCourse(course.getCompanyId(), course.getGroupCreatedId());	
-		long registered=(Validator.isNotNull(students) && students.size() > 0) ? students.size() : 0;
-		long iniciados = (registered > 0) ? CourseResultLocalServiceUtil.countStudentsByCourseId(course, students) : 0;
-		long finalizados = (registered > 0) ? CourseResultLocalServiceUtil.countStudentsByCourseId(course, students, true) : 0;
+		long registered=CourseLocalServiceUtil.countStudents(course.getCourseId(), themeDisplay.getCompanyId(), null, null, null, null, false);
+		long iniciados = (registered > 0) ? CourseResultLocalServiceUtil.countStudentsByCourseIdUserExcludedIdsStarted(course.getCourseId(), userExcludedIds) : 0; 
+		long finalizados = (registered > 0) ? CourseResultLocalServiceUtil.countStudentsByCourseIdUserExcludedIdsFinished(course.getCourseId(), userExcludedIds) : 0;
 		double avgResult=0;
 		if(finalizados>0){
-			avgResult=CourseResultLocalServiceUtil.avgStudentsResult(course, students, true);
+			avgResult=CourseResultLocalServiceUtil.avgResultByCourseIdUserExcludedIds(course.getCourseId(), true, userExcludedIds);
 		}
 		long activitiesCount=LearningActivityLocalServiceUtil.countLearningActivitiesOfGroup(course.getGroupCreatedId());
 		long modulesCount=ModuleLocalServiceUtil.countByGroupId(course.getGroupCreatedId());
