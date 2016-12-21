@@ -503,7 +503,6 @@ public class P2PActivityPortlet extends MVCPortlet {
 					portletURL.setParameter("moduleId", Long.toString(myModule.getModuleId()));
 					portletURL.setParameter("actId", Long.toString(act.getActId()));
 					portletURL.setParameter("showRevision", "1");
-					String url = portletURL.toString();
 					
 					
 					P2pActivity p2pActivity = P2pActivityLocalServiceUtil.getP2pActivity(p2pActivityId);
@@ -514,7 +513,7 @@ public class P2PActivityPortlet extends MVCPortlet {
 					}
 					
 					if(!deregisterMail){
-						sendMailCorrection(userPropietaryP2pAct, actId, p2pActCor, themeDisplay, portletConfig, url);
+						sendMailCorrection(userPropietaryP2pAct, actId, p2pActCor, themeDisplay, portletConfig);
 					}
 					request.setAttribute("actId", actId);
 					request.setAttribute("latId", latId);
@@ -738,7 +737,7 @@ public class P2PActivityPortlet extends MVCPortlet {
 	}
 	
 	private static void sendMailCorrection(User user, long actId, 
-			P2pActivityCorrections p2pActiCor, ThemeDisplay themeDisplay,PortletConfig portletConfig, String url){
+			P2pActivityCorrections p2pActiCor, ThemeDisplay themeDisplay,PortletConfig portletConfig){
 		try
 		{
 			LearningActivity activity = LearningActivityLocalServiceUtil.getLearningActivity(actId);
@@ -767,9 +766,22 @@ public class P2PActivityPortlet extends MVCPortlet {
 			String portalUrl = PortalUtil.getPortalURL(themeDisplay);
 			String pathPublic = PortalUtil.getPathFriendlyURLPublic();
 			
+			//QUITANDO PUERTOS
+			String[] urls = portalUrl.split(":");
+			portalUrl = urls[0] + ":" +urls[1];				
+//			if(urls.length > 2){ // http:prueba.es:8080
+//				portalUrl += urls[1];
+//			}
+			_log.debug("***portalUrl:"+portalUrl);
+			
+					
 			if(course != null){
-				courseFriendlyUrl = portalUrl + pathPublic + group.getFriendlyURL();
 				courseTitle = course.getTitle(user.getLocale());
+				courseFriendlyUrl = portalUrl + pathPublic + course.getFriendlyURL();
+				courseFriendlyUrl += "/reto?p_p_id=p2ptaskactivity_WAR_liferaylmsportlet";
+				courseFriendlyUrl += "&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&p_r_p_564233524_actId="+actId;
+				courseFriendlyUrl += "&p_r_p_564233524_moduleId="+activity.getModuleId();
+				_log.debug("URL "+ courseFriendlyUrl);
 			}
 							
 			String messageArgs[]= {activityTitle, moduleTitle, courseTitle, courseFriendlyUrl};
@@ -868,9 +880,22 @@ public class P2PActivityPortlet extends MVCPortlet {
 			String portalUrl = PortalUtil.getPortalURL(themeDisplay);
 			String pathPublic = PortalUtil.getPathFriendlyURLPublic();
 			
+			//QUITANDO PUERTOS
+			String[] urls = portalUrl.split(":");
+			portalUrl = urls[0] + ":" +urls[1];				
+//			if(urls.length > 2){ // http:prueba.es:8080
+//				portalUrl += urls[1];
+//			}
+			_log.debug("***portalUrl:"+portalUrl);
+			
+					
 			if(course != null){
-				courseFriendlyUrl = portalUrl + pathPublic + group.getFriendlyURL();
 				courseTitle = course.getTitle(user.getLocale());
+				courseFriendlyUrl = portalUrl + pathPublic + course.getFriendlyURL();
+				courseFriendlyUrl += "/reto?p_p_id=p2ptaskactivity_WAR_liferaylmsportlet";
+				courseFriendlyUrl += "&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&p_r_p_564233524_actId="+actId;
+				courseFriendlyUrl += "&p_r_p_564233524_moduleId="+activity.getModuleId();
+				_log.debug("URL "+ courseFriendlyUrl);
 			}
 			
 			String messageArgs[]= {activityTitle, moduleTitle, courseTitle, courseFriendlyUrl};
