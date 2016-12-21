@@ -411,7 +411,6 @@
 					
 				)
 			ORDER BY [$ORDERBY$]
-			LIMIT ?, ?
 		]]>
 	</sql>
 	<sql id="com.liferay.lms.service.persistence.CourseFinder.countStudents">
@@ -507,7 +506,6 @@
 			WHERE 
 				c.closed = 0 
 				AND (SELECT MAX(mo.endDate) FROM lms_module mo WHERE mo.groupId = c.groupCreatedId) > '[$DATENOW$]' 
-				AND r.passedDate IS NULL	
 				AND (r.crId IS NULL OR r.allowFinishDate IS NULL OR r.allowFinishDate > '[$DATENOW$]')
 				AND c.groupId = ?
 			GROUP By 
@@ -529,7 +527,6 @@
 			WHERE 
 				c.closed = 0 
 				AND (SELECT MAX(mo.endDate) FROM lms_module mo WHERE mo.groupId = c.groupCreatedId) > '[$DATENOW$]' 
-				AND r.passedDate IS NULL	
 				AND (r.crId IS NULL OR r.allowFinishDate IS NULL OR r.allowFinishDate > '[$DATENOW$]')
 				AND c.groupId = ?
 			GROUP By 

@@ -475,14 +475,25 @@ public class CourseLocalServiceWrapper implements CourseLocalService,
 	}
 
 	public java.util.List<com.liferay.portal.model.User> getStudentsFromCourse(
-		long companyId, long courseGropupCreatedId) {
+		long companyId, long courseGroupCreatedId) {
 		return _courseLocalService.getStudentsFromCourse(companyId,
-			courseGropupCreatedId);
+			courseGroupCreatedId);
+	}
+
+	public java.util.List<com.liferay.portal.model.User> getStudentsFromCourse(
+		long companyId, long courseGroupCreatedId, long teamId) {
+		return _courseLocalService.getStudentsFromCourse(companyId,
+			courseGroupCreatedId, teamId);
 	}
 
 	public java.util.List<com.liferay.portal.model.User> getTeachersFromCourse(
 		long courseId) {
 		return _courseLocalService.getTeachersFromCourse(courseId);
+	}
+
+	public long[] getTeachersAndEditorsIdsFromCourse(
+		com.liferay.lms.model.Course course) {
+		return _courseLocalService.getTeachersAndEditorsIdsFromCourse(course);
 	}
 
 	public java.util.List<com.liferay.lms.model.Course> getByTitleStatusCategoriesTags(

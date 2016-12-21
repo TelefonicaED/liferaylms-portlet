@@ -20,6 +20,7 @@
 	<bean id="com.liferay.lms.service.CourseResultLocalService" class="com.liferay.lms.service.impl.CourseResultLocalServiceImpl" />
 	<bean id="com.liferay.lms.service.CourseResultService" class="com.liferay.lms.service.impl.CourseResultServiceImpl" />
 	<bean id="com.liferay.lms.service.persistence.CourseResultPersistence" class="com.liferay.lms.service.persistence.CourseResultPersistenceImpl" parent="basePersistence" />
+	<bean id="com.liferay.lms.service.persistence.CourseResultFinder" class="com.liferay.lms.service.persistence.CourseResultFinderImpl" parent="basePersistence" />
 	<bean id="com.liferay.lms.service.LearningActivityLocalService" class="com.liferay.lms.service.impl.LearningActivityLocalServiceImpl" />
 	<bean id="com.liferay.lms.service.LearningActivityService" class="com.liferay.lms.service.impl.LearningActivityServiceImpl" />
 	<bean id="com.liferay.lms.service.persistence.LearningActivityPersistence" class="com.liferay.lms.service.persistence.LearningActivityCustomPersistenceImpl" parent="basePersistence" />

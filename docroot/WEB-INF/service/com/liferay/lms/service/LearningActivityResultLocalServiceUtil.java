@@ -322,14 +322,34 @@ public class LearningActivityResultLocalServiceUtil {
 		return getService().countByActId(actId);
 	}
 
+	/**
+	* Devuelve el nÃƒÂºmero de estudiantes que han pasado una actividad (en caso de passed = true) o lo que han suspendido o la tienen en curos (en caso de passed = false)
+	*
+	* @param actId id de la actividad
+	* @param companyId id de la company de la actividad
+	* @param courseGroupCreatedId id del group del curso
+	* @param passed si se quieren los aprobados o no
+	* @return nÃƒÂºmero de estudiantes que han pasado la actividad o los que han suspendido + los que la tienen no la han finalizado
+	* @throws SystemException
+	*/
 	public static long countPassedOnlyStudents(long actId, long companyId,
-		long courseGropupCreatedId, boolean passed)
+		long courseGroupCreatedId, boolean passed)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService()
 				   .countPassedOnlyStudents(actId, companyId,
-			courseGropupCreatedId, passed);
+			courseGroupCreatedId, passed);
 	}
 
+	/**
+	* @deprecated SE RECOMIENDA NO USAR ESTE MÃƒâ€°TODO, SE RECOMIENDA USAR: countPassedOnlyStudents(long actId, long companyId, long courseGroupCreatedId, boolean passed)
+	o countPassedOnlyStudents(long actId, boolean passed, long[] userExcludedIds)
+	* @param actId id de la actividad
+	* @param companyId id de la company de la actividad
+	* @param courseGroupCreatedId id del group del curso
+	* @param passed si se quieren los aprobados o no
+	* @param lista de estudiantes, si viene vacÃƒÂ­a se calculan dentro
+	* @return nÃƒÂºmero de estudiantes que han pasado la actividad o los que han suspendido + los que la tienen no la han finalizado
+	*/
 	public static long countPassedOnlyStudents(long actId, long companyId,
 		long courseGropupCreatedId, boolean passed,
 		java.util.List<com.liferay.portal.model.User> _students)
@@ -339,19 +359,41 @@ public class LearningActivityResultLocalServiceUtil {
 			courseGropupCreatedId, passed, _students);
 	}
 
+	/**
+	* Devuelve el nÃƒÂºmero de usuarios que han suspendido una actividad
+	*
+	* @param actId id de la actividad
+	* @return nÃƒÂºmero de usuarios que han suspendido la actividad
+	*/
 	public static long countNotPassed(long actId)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService().countNotPassed(actId);
 	}
 
+	/**
+	* Devuelve el nÃƒÂºmero de estudiantes que han suspendido la actividad
+	*
+	* @param actId id de la actividad
+	* @param companyId id de la company de la actividad
+	* @param courseGroupCreatedId id del group de la actividad
+	*/
 	public static long countNotPassedOnlyStudents(long actId, long companyId,
-		long courseGropupCreatedId)
+		long courseGroupCreatedId)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService()
 				   .countNotPassedOnlyStudents(actId, companyId,
-			courseGropupCreatedId);
+			courseGroupCreatedId);
 	}
 
+	/**
+	* @deprecated SE RECOMIENDA NO USAR ESTE MÃƒâ€°TODO, SE RECOMIENDA USAR: countNotPassedOnlyStudents(long actId, long companyId, long courseGroupCreatedId)
+	o countStudentsByActIdUserExcludedIdsFailed(actId, userExcludedIds)
+	* @param actId id de la actividad
+	* @param companyId id de la company de la actividad
+	* @param courseGroupCreatedId id del group del curso
+	* @param lista de estudiantes, si viene vacÃƒÂ­a se calculan dentro
+	* @return nÃƒÂºmero de estudiantes que han suspendido la actividad
+	*/
 	public static long countNotPassedOnlyStudents(long actId, long companyId,
 		long courseGropupCreatedId,
 		java.util.List<com.liferay.portal.model.User> _students)
@@ -366,14 +408,31 @@ public class LearningActivityResultLocalServiceUtil {
 		return getService().avgResult(actId);
 	}
 
+	/**
+	* Devuelve la media de resultado de usuarios para una actividad, si ya se tiene la lista de usuarios excluidos (profesores y editores)
+	* llamar al mÃƒÂ©todo avgResultByActIdUserExcludedIds directamente
+	*
+	* @param actId id de la actividad
+	* @param companyId id de la company de la actividad
+	* @param courseGroupCreatedId id del group del curso
+	* @return media de resultado de usuarios para una actividad
+	*/
 	public static java.lang.Double avgResultOnlyStudents(long actId,
-		long companyId, long courseGropupCreatedId)
+		long companyId, long courseGroupCreatedId)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService()
-				   .avgResultOnlyStudents(actId, companyId,
-			courseGropupCreatedId);
+				   .avgResultOnlyStudents(actId, companyId, courseGroupCreatedId);
 	}
 
+	/**
+	* @deprecated SE RECOMIENDA NO USAR ESTE MÃƒâ€°TODO, SE RECOMIENDA USAR: avgResultOnlyStudents(long actId, long companyId, long courseGroupCreatedId)
+	o avgResultByActIdUserExcludedIds(long actId, long[] userExcludedIds)
+	* @param actId id de la actividad
+	* @param companyId id de la company de la actividad
+	* @param courseGroupCreatedId id del group del curso
+	* @param _students lista de estudiantes, si viene vacÃƒÂ­a se calculan dentro
+	* @return media de resultado de usuarios para una actividad
+	*/
 	public static java.lang.Double avgResultOnlyStudents(long actId,
 		long companyId, long courseGropupCreatedId,
 		java.util.List<com.liferay.portal.model.User> _students)
@@ -383,19 +442,65 @@ public class LearningActivityResultLocalServiceUtil {
 			courseGropupCreatedId, _students);
 	}
 
+	/**
+	* Devuelve la media de resultado de usuarios para una actividad
+	*
+	* @param actId id de la actividad
+	* @param userExcludedIds id de la company de la actividad
+	* @return media de resultado de usuarios para una actividad
+	*/
+	public static double avgResultByActIdUserExcludedIds(long actId,
+		long[] userExcludedIds)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService()
+				   .avgResultByActIdUserExcludedIds(actId, userExcludedIds);
+	}
+
+	/**
+	* Devuelve la media de resultado de usuarios para una actividad, esta funciÃƒÂ³n estÃƒÂ¡ pensada para pasar una lista de estudiantes filtrada
+	* (por ejemplo para los equipos) para pedir de todos los estudiantes usar avgTriesByActIdUserExcludedIds
+	*
+	* @param actId id de la actividad
+	* @param userIds ids de los usuarios filtrados
+	* @return media de resultado de usuarios para una actividad
+	* @throws SystemException
+	*/
+	public static double avgResultByActIdUserIds(long actId, long[] userIds)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().avgResultByActIdUserIds(actId, userIds);
+	}
+
 	public static long countStarted(long actId)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService().countStarted(actId);
 	}
 
+	/**
+	* Devuelve el nÃƒÂºmero de estudiantes que han comenzado una actividad, si ya se tiene la lista de usuarios excluidos (profesores y editores)
+	* llamar al mÃƒÂ©todo countStudentsByActIdUserExcludedIdsStarted directamente
+	*
+	* @param actId id de la actividad
+	* @param companyId id de la company de la actividad
+	* @param courseGroupCreatedId id del group del curso
+	* @return nÃƒÂºmero de estudiantes que han comenzado una actividad
+	*/
 	public static long countStartedOnlyStudents(long actId, long companyId,
-		long courseGropupCreatedId)
+		long courseGroupCreatedId)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService()
 				   .countStartedOnlyStudents(actId, companyId,
-			courseGropupCreatedId);
+			courseGroupCreatedId);
 	}
 
+	/**
+	* @deprecated SE RECOMIENDA NO USAR ESTE MÃƒâ€°TODO, SE RECOMIENDA USAR: countStartedOnlyStudents(long actId, long companyId, long courseGroupCreatedId)
+	o countStudentsByActIdUserExcludedIdsStarted(actId, userExcludedIds)
+	* @param actId id de la actividad
+	* @param companyId id de la company de la actividad
+	* @param courseGroupCreatedId id del group del curso
+	* @param _students lista de estudiantes, si viene vacÃƒÂ­a se calculan dentro
+	* @return nÃƒÂºmero de estudiantes que han comenzado la actividad
+	*/
 	public static long countStartedOnlyStudents(long actId, long companyId,
 		long courseGropupCreatedId,
 		java.util.List<com.liferay.portal.model.User> _students)
@@ -405,13 +510,31 @@ public class LearningActivityResultLocalServiceUtil {
 			courseGropupCreatedId, _students);
 	}
 
+	/**
+	* Devuelve el nÃƒÂºmero de estudiantes que han finalizado una actividad, si ya se tiene la lista de usuarios excluidos (profesores y editores)
+	* llamar al mÃƒÂ©todo countStudentsByActIdUserExcludedIdsFinished directamente
+	*
+	* @param actId id de la actividad
+	* @param companyId id de la company de la actividad
+	* @param courseGroupCreatedId id del group del curso
+	* @return nÃƒÂºmero de estudiantes que han finalizado una actividad
+	*/
 	public static long countFinishedOnlyStudents(long actId, long companyId,
-		long courseGropupCreatedId) {
+		long courseGroupCreatedId) {
 		return getService()
 				   .countFinishedOnlyStudents(actId, companyId,
-			courseGropupCreatedId);
+			courseGroupCreatedId);
 	}
 
+	/**
+	* @deprecated SE RECOMIENDA NO USAR ESTE MÃƒâ€°TODO, SE RECOMIENDA USAR: countFinishedOnlyStudents(long actId, long companyId, long courseGroupCreatedId)
+	o countStudentsByActIdUserExcludedIdsFinished(actId, userExcludedIds)
+	* @param actId id de la actividad
+	* @param companyId id de la company de la actividad
+	* @param courseGroupCreatedId id del group del curso
+	* @param _students lista de estudiantes, si viene vacÃƒÂ­a se calculan dentro
+	* @return nÃƒÂºmero de estudiantes que han finalizado la actividad
+	*/
 	public static long countFinishedOnlyStudents(long actId, long companyId,
 		long courseGropupCreatedId,
 		java.util.List<com.liferay.portal.model.User> _students) {
@@ -425,14 +548,32 @@ public class LearningActivityResultLocalServiceUtil {
 		return getService().triesPerUser(actId);
 	}
 
+	/**
+	* Devuelve la media de intentos por usuario para una actividad, si ya se tiene la lista de usuarios excluidos (profesores y editores)
+	* llamar al mÃƒÂ©todo avgTriesByActIdUserExcludedIds directamente
+	*
+	* @param actId id de la actividad
+	* @param companyId id de la company de la actividad
+	* @param courseGroupCreatedId id del group del curso
+	* @return media de intentos por usuario para una actividad
+	*/
 	public static double triesPerUserOnlyStudents(long actId, long companyId,
-		long courseGropupCreatedId)
+		long courseGroupCreatedId)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService()
 				   .triesPerUserOnlyStudents(actId, companyId,
-			courseGropupCreatedId);
+			courseGroupCreatedId);
 	}
 
+	/**
+	* @deprecated SE RECOMIENDA NO USAR ESTE MÃƒâ€°TODO, SE RECOMIENDA USAR: triesPerUserOnlyStudents(long actId, long companyId, long courseGroupCreatedId)
+	o avgTriesByActIdUserExcludedIds(long actId, long[] userExcludedIds)
+	* @param actId id de la actividad
+	* @param companyId id de la company de la actividad
+	* @param courseGroupCreatedId id del group del curso
+	* @param _students lista de estudiantes, si viene vacÃƒÂ­a se calculan dentro
+	* @return media de intentos por usuario para una actividad
+	*/
 	public static double triesPerUserOnlyStudents(long actId, long companyId,
 		long courseGropupCreatedId,
 		java.util.List<com.liferay.portal.model.User> _students)
@@ -440,6 +581,34 @@ public class LearningActivityResultLocalServiceUtil {
 		return getService()
 				   .triesPerUserOnlyStudents(actId, companyId,
 			courseGropupCreatedId, _students);
+	}
+
+	/**
+	* Devuelve la media de intentos por usuario para una actividad
+	*
+	* @param actId id de la actividad
+	* @param userExcludedIds id de la company de la actividad
+	* @return media de intentos por usuario para una actividad
+	*/
+	public static double avgTriesByActIdUserExcludedIds(long actId,
+		long[] userExcludedIds)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService()
+				   .avgTriesByActIdUserExcludedIds(actId, userExcludedIds);
+	}
+
+	/**
+	* Devuelve la media de intentos por usuario para una actividad, esta funciÃƒÂ³n estÃƒÂ¡ pensada para pasar una lista de estudiantes filtrada
+	* (por ejemplo para los equipos) para pedir de todos los estudiantes usar avgTriesByActIdUserExcludedIds
+	*
+	* @param actId id de la actividad
+	* @param userIds ids de los usuarios filtrados
+	* @return media de intentos por usuario para una actividad
+	* @throws SystemException
+	*/
+	public static double avgTriesByActIdUserIds(long actId, long[] userIds)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().avgTriesByActIdUserIds(actId, userIds);
 	}
 
 	public static com.liferay.lms.model.LearningActivityResult getByActIdAndUserId(
@@ -502,6 +671,130 @@ public class LearningActivityResultLocalServiceUtil {
 	public static java.lang.String getCalificationTypeSuffix(
 		java.util.Locale locale, double result, long groupId) {
 		return getService().getCalificationTypeSuffix(locale, result, groupId);
+	}
+
+	/**
+	* Cuenta los estudiantes que han iniciado la actividad: solo llamar si se tiene la lista de usuarios excluidos
+	*
+	* @param actId id de la actividad
+	* @param userExcludedIds ids de usuarios excluidos (profesores y editores)
+	* @return nÃƒÂºmero de estudiantes que han comenzado la actividad
+	* @throws SystemException
+	*/
+	public static int countStudentsByActIdUserExcludedIdsStarted(long actId,
+		long[] userExcludedIds)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService()
+				   .countStudentsByActIdUserExcludedIdsStarted(actId,
+			userExcludedIds);
+	}
+
+	/**
+	* Cuenta los estudiantes que han finalizado la actividad: solo llamar si se tiene la lista de usuarios excluidos
+	*
+	* @param actId id de la actividad
+	* @param userExcludedIds ids de usuarios excluidos (profesores y editores)
+	* @return nÃƒÂºmero de estudiantes que han finalizado la actividad
+	* @throws SystemException
+	*/
+	public static int countStudentsByActIdUserExcludedIdsFinished(long actId,
+		long[] userExcludedIds)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService()
+				   .countStudentsByActIdUserExcludedIdsFinished(actId,
+			userExcludedIds);
+	}
+
+	/**
+	* Cuenta los estudiantes que han finalizado la actividad y la han aprobado
+	*
+	* @param actId id de la actividad
+	* @param userExcludedIds ids de usuarios excluidos (profesores y editores)
+	* @return nÃƒÂºmero de estudiantes que han finalizado y aprobado la actividad
+	* @throws SystemException
+	*/
+	public static int countStudentsByActIdUserExcludedIdsPassed(long actId,
+		long[] userExcludedIds)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService()
+				   .countStudentsByActIdUserExcludedIdsPassed(actId,
+			userExcludedIds);
+	}
+
+	/**
+	* Cuenta los estudiantes que han finalizado la actividad y la han suspendido
+	*
+	* @param actId id de la actividad
+	* @param userExcludedIds ids de usuarios excluidos (profesores y editores)
+	* @return nÃƒÂºmero de estudiantes que han finalizado y suspendido la actividad
+	* @throws SystemException
+	*/
+	public static int countStudentsByActIdUserExcludedIdsFailed(long actId,
+		long[] userExcludedIds)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService()
+				   .countStudentsByActIdUserExcludedIdsFailed(actId,
+			userExcludedIds);
+	}
+
+	/**
+	* Cuenta los estudiantes que han iniciado la actividad, esta funciÃƒÂ³n estÃƒÂ¡ pensada para pasar una lista de estudiantes filtrada
+	* (por ejemplo para los equipos) para pedir de todos los estudiantes usar countStudentsByActIdUserExcludedIdsStarted
+	*
+	* @param actId id de la actividad
+	* @param userIds ids de los usuarios filtrados
+	* @return nÃƒÂºmero de estudiantes que han comenzado la actividad
+	* @throws SystemException
+	*/
+	public static int countStudentsByActIdUserIdsStarted(long actId,
+		long[] userIds)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().countStudentsByActIdUserIdsStarted(actId, userIds);
+	}
+
+	/**
+	* Cuenta los estudiantes que han finalizado la actividad, esta funciÃƒÂ³n estÃƒÂ¡ pensada para pasar una lista de estudiantes filtrada
+	* (por ejemplo para los equipos) para pedir de todos los estudiantes usar countStudentsByActIdUserExcludedIdsFinished
+	*
+	* @param actId id de la actividad
+	* @param userIds ids de los usuarios filtrados
+	* @return nÃƒÂºmero de estudiantes que han finalizado la actividad
+	* @throws SystemException
+	*/
+	public static int countStudentsByActIdUserIdsFinished(long actId,
+		long[] userIds)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().countStudentsByActIdUserIdsFinished(actId, userIds);
+	}
+
+	/**
+	* Cuenta los estudiantes que han finalizado la actividad y la han aprobado, esta funciÃƒÂ³n estÃƒÂ¡ pensada para pasar una lista de estudiantes filtrada
+	* (por ejemplo para los equipos) para pedir de todos los estudiantes usar countStudentsByActIdUserExcludedIdsPassed
+	*
+	* @param actId id de la actividad
+	* @param userIds ids de los usuarios filtrados
+	* @return nÃƒÂºmero de estudiantes que han finalizado y aprobado la actividad
+	* @throws SystemException
+	*/
+	public static int countStudentsByActIdUserIdsPassed(long actId,
+		long[] userIds)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().countStudentsByActIdUserIdsPassed(actId, userIds);
+	}
+
+	/**
+	* Cuenta los estudiantes que han finalizado la actividad y la han suspendido, esta funciÃƒÂ³n estÃƒÂ¡ pensada para pasar una lista de estudiantes filtrada
+	* (por ejemplo para los equipos) para pedir de todos los estudiantes usar countStudentsByActIdUserExcludedIdsFailed
+	*
+	* @param actId id de la actividad
+	* @param userIds ids de los usuarios filtrados
+	* @return nÃƒÂºmero de estudiantes que han finalizado y suspendido la actividad
+	* @throws SystemException
+	*/
+	public static int countStudentsByActIdUserIdsFailed(long actId,
+		long[] userIds)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().countStudentsByActIdUserIdsFailed(actId, userIds);
 	}
 
 	public static void clearService() {

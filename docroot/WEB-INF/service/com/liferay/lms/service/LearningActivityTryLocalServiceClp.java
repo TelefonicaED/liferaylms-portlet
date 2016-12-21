@@ -188,6 +188,18 @@ public class LearningActivityTryLocalServiceClp
 		_methodName34 = "getByUserId";
 
 		_methodParameterTypes34 = new String[] { "long" };
+
+		_methodName35 = "countTriesByActIdUserIdsStarted";
+
+		_methodParameterTypes35 = new String[] { "long", "long[][]" };
+
+		_methodName36 = "countTriesByActIdUserExcludedIdsStarted";
+
+		_methodParameterTypes36 = new String[] { "long", "long[][]" };
+
+		_methodName37 = "countTriesByActIdStarted";
+
+		_methodParameterTypes37 = new String[] { "long" };
 	}
 
 	public com.liferay.lms.model.LearningActivityTry addLearningActivityTry(
@@ -1232,6 +1244,94 @@ public class LearningActivityTryLocalServiceClp
 		return (java.util.List<com.liferay.lms.model.LearningActivityTry>)ClpSerializer.translateOutput(returnObj);
 	}
 
+	public int countTriesByActIdUserIdsStarted(long actId, long[] userIds)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		Object returnObj = null;
+
+		try {
+			returnObj = _invokableLocalService.invokeMethod(_methodName35,
+					_methodParameterTypes35,
+					new Object[] { actId, ClpSerializer.translateInput(userIds) });
+		}
+		catch (Throwable t) {
+			t = ClpSerializer.translateThrowable(t);
+
+			if (t instanceof com.liferay.portal.kernel.exception.SystemException) {
+				throw (com.liferay.portal.kernel.exception.SystemException)t;
+			}
+
+			if (t instanceof RuntimeException) {
+				throw (RuntimeException)t;
+			}
+			else {
+				throw new RuntimeException(t.getClass().getName() +
+					" is not a valid exception");
+			}
+		}
+
+		return ((Integer)returnObj).intValue();
+	}
+
+	public int countTriesByActIdUserExcludedIdsStarted(long actId,
+		long[] userExcludedIds)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		Object returnObj = null;
+
+		try {
+			returnObj = _invokableLocalService.invokeMethod(_methodName36,
+					_methodParameterTypes36,
+					new Object[] {
+						actId,
+						
+					ClpSerializer.translateInput(userExcludedIds)
+					});
+		}
+		catch (Throwable t) {
+			t = ClpSerializer.translateThrowable(t);
+
+			if (t instanceof com.liferay.portal.kernel.exception.SystemException) {
+				throw (com.liferay.portal.kernel.exception.SystemException)t;
+			}
+
+			if (t instanceof RuntimeException) {
+				throw (RuntimeException)t;
+			}
+			else {
+				throw new RuntimeException(t.getClass().getName() +
+					" is not a valid exception");
+			}
+		}
+
+		return ((Integer)returnObj).intValue();
+	}
+
+	public int countTriesByActIdStarted(long actId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		Object returnObj = null;
+
+		try {
+			returnObj = _invokableLocalService.invokeMethod(_methodName37,
+					_methodParameterTypes37, new Object[] { actId });
+		}
+		catch (Throwable t) {
+			t = ClpSerializer.translateThrowable(t);
+
+			if (t instanceof com.liferay.portal.kernel.exception.SystemException) {
+				throw (com.liferay.portal.kernel.exception.SystemException)t;
+			}
+
+			if (t instanceof RuntimeException) {
+				throw (RuntimeException)t;
+			}
+			else {
+				throw new RuntimeException(t.getClass().getName() +
+					" is not a valid exception");
+			}
+		}
+
+		return ((Integer)returnObj).intValue();
+	}
+
 	private InvokableLocalService _invokableLocalService;
 	private String _methodName0;
 	private String[] _methodParameterTypes0;
@@ -1301,4 +1401,10 @@ public class LearningActivityTryLocalServiceClp
 	private String[] _methodParameterTypes33;
 	private String _methodName34;
 	private String[] _methodParameterTypes34;
+	private String _methodName35;
+	private String[] _methodParameterTypes35;
+	private String _methodName36;
+	private String[] _methodParameterTypes36;
+	private String _methodName37;
+	private String[] _methodParameterTypes37;
 }

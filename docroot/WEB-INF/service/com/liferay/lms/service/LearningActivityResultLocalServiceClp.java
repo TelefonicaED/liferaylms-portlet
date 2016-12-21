@@ -192,95 +192,143 @@ public class LearningActivityResultLocalServiceClp
 				"long", "long", "long", "java.util.List"
 			};
 
-		_methodName35 = "countStarted";
+		_methodName35 = "avgResultByActIdUserExcludedIds";
 
-		_methodParameterTypes35 = new String[] { "long" };
+		_methodParameterTypes35 = new String[] { "long", "long[][]" };
 
-		_methodName36 = "countStartedOnlyStudents";
+		_methodName36 = "avgResultByActIdUserIds";
 
-		_methodParameterTypes36 = new String[] { "long", "long", "long" };
+		_methodParameterTypes36 = new String[] { "long", "long[][]" };
 
-		_methodName37 = "countStartedOnlyStudents";
+		_methodName37 = "countStarted";
 
-		_methodParameterTypes37 = new String[] {
-				"long", "long", "long", "java.util.List"
-			};
+		_methodParameterTypes37 = new String[] { "long" };
 
-		_methodName38 = "countFinishedOnlyStudents";
+		_methodName38 = "countStartedOnlyStudents";
 
 		_methodParameterTypes38 = new String[] { "long", "long", "long" };
 
-		_methodName39 = "countFinishedOnlyStudents";
+		_methodName39 = "countStartedOnlyStudents";
 
 		_methodParameterTypes39 = new String[] {
 				"long", "long", "long", "java.util.List"
 			};
 
-		_methodName40 = "triesPerUser";
+		_methodName40 = "countFinishedOnlyStudents";
 
-		_methodParameterTypes40 = new String[] { "long" };
+		_methodParameterTypes40 = new String[] { "long", "long", "long" };
 
-		_methodName41 = "triesPerUserOnlyStudents";
+		_methodName41 = "countFinishedOnlyStudents";
 
-		_methodParameterTypes41 = new String[] { "long", "long", "long" };
-
-		_methodName42 = "triesPerUserOnlyStudents";
-
-		_methodParameterTypes42 = new String[] {
+		_methodParameterTypes41 = new String[] {
 				"long", "long", "long", "java.util.List"
 			};
 
-		_methodName43 = "getByActIdAndUserId";
+		_methodName42 = "triesPerUser";
 
-		_methodParameterTypes43 = new String[] { "long", "long" };
+		_methodParameterTypes42 = new String[] { "long" };
 
-		_methodName44 = "getLastEndDateByUserId";
+		_methodName43 = "triesPerUserOnlyStudents";
 
-		_methodParameterTypes44 = new String[] { "long" };
+		_methodParameterTypes43 = new String[] { "long", "long", "long" };
 
-		_methodName45 = "getByActId";
+		_methodName44 = "triesPerUserOnlyStudents";
 
-		_methodParameterTypes45 = new String[] { "long" };
+		_methodParameterTypes44 = new String[] {
+				"long", "long", "long", "java.util.List"
+			};
 
-		_methodName46 = "getByGroupIdUserId";
+		_methodName45 = "avgTriesByActIdUserExcludedIds";
 
-		_methodParameterTypes46 = new String[] { "long", "long" };
+		_methodParameterTypes45 = new String[] { "long", "long[][]" };
 
-		_methodName47 = "getMandatoryByGroupIdUserId";
+		_methodName46 = "avgTriesByActIdUserIds";
+
+		_methodParameterTypes46 = new String[] { "long", "long[][]" };
+
+		_methodName47 = "getByActIdAndUserId";
 
 		_methodParameterTypes47 = new String[] { "long", "long" };
 
-		_methodName48 = "getByModuleIdUserId";
+		_methodName48 = "getLastEndDateByUserId";
 
-		_methodParameterTypes48 = new String[] { "long", "long" };
+		_methodParameterTypes48 = new String[] { "long" };
 
-		_methodName49 = "getByModuleIdUserIdPassed";
+		_methodName49 = "getByActId";
 
-		_methodParameterTypes49 = new String[] { "long", "long" };
+		_methodParameterTypes49 = new String[] { "long" };
 
-		_methodName50 = "getMandatoryByModuleIdUserIdPassed";
+		_methodName50 = "getByGroupIdUserId";
 
 		_methodParameterTypes50 = new String[] { "long", "long" };
 
-		_methodName51 = "getByUserId";
+		_methodName51 = "getMandatoryByGroupIdUserId";
 
-		_methodParameterTypes51 = new String[] { "long" };
+		_methodParameterTypes51 = new String[] { "long", "long" };
 
-		_methodName52 = "countMandatoryByModuleIdUserIdPassed";
+		_methodName52 = "getByModuleIdUserId";
 
 		_methodParameterTypes52 = new String[] { "long", "long" };
 
-		_methodName53 = "translateResult";
+		_methodName53 = "getByModuleIdUserIdPassed";
 
-		_methodParameterTypes53 = new String[] {
+		_methodParameterTypes53 = new String[] { "long", "long" };
+
+		_methodName54 = "getMandatoryByModuleIdUserIdPassed";
+
+		_methodParameterTypes54 = new String[] { "long", "long" };
+
+		_methodName55 = "getByUserId";
+
+		_methodParameterTypes55 = new String[] { "long" };
+
+		_methodName56 = "countMandatoryByModuleIdUserIdPassed";
+
+		_methodParameterTypes56 = new String[] { "long", "long" };
+
+		_methodName57 = "translateResult";
+
+		_methodParameterTypes57 = new String[] {
 				"java.util.Locale", "double", "long"
 			};
 
-		_methodName54 = "getCalificationTypeSuffix";
+		_methodName58 = "getCalificationTypeSuffix";
 
-		_methodParameterTypes54 = new String[] {
+		_methodParameterTypes58 = new String[] {
 				"java.util.Locale", "double", "long"
 			};
+
+		_methodName59 = "countStudentsByActIdUserExcludedIdsStarted";
+
+		_methodParameterTypes59 = new String[] { "long", "long[][]" };
+
+		_methodName60 = "countStudentsByActIdUserExcludedIdsFinished";
+
+		_methodParameterTypes60 = new String[] { "long", "long[][]" };
+
+		_methodName61 = "countStudentsByActIdUserExcludedIdsPassed";
+
+		_methodParameterTypes61 = new String[] { "long", "long[][]" };
+
+		_methodName62 = "countStudentsByActIdUserExcludedIdsFailed";
+
+		_methodParameterTypes62 = new String[] { "long", "long[][]" };
+
+		_methodName63 = "countStudentsByActIdUserIdsStarted";
+
+		_methodParameterTypes63 = new String[] { "long", "long[][]" };
+
+		_methodName64 = "countStudentsByActIdUserIdsFinished";
+
+		_methodParameterTypes64 = new String[] { "long", "long[][]" };
+
+		_methodName65 = "countStudentsByActIdUserIdsPassed";
+
+		_methodParameterTypes65 = new String[] { "long", "long[][]" };
+
+		_methodName66 = "countStudentsByActIdUserIdsFailed";
+
+		_methodParameterTypes66 = new String[] { "long", "long[][]" };
 	}
 
 	public com.liferay.lms.model.LearningActivityResult addLearningActivityResult(
@@ -1084,14 +1132,14 @@ public class LearningActivityResultLocalServiceClp
 	}
 
 	public long countPassedOnlyStudents(long actId, long companyId,
-		long courseGropupCreatedId, boolean passed)
+		long courseGroupCreatedId, boolean passed)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		Object returnObj = null;
 
 		try {
 			returnObj = _invokableLocalService.invokeMethod(_methodName27,
 					_methodParameterTypes27,
-					new Object[] { actId, companyId, courseGropupCreatedId, passed });
+					new Object[] { actId, companyId, courseGroupCreatedId, passed });
 		}
 		catch (Throwable t) {
 			t = ClpSerializer.translateThrowable(t);
@@ -1180,14 +1228,14 @@ public class LearningActivityResultLocalServiceClp
 	}
 
 	public long countNotPassedOnlyStudents(long actId, long companyId,
-		long courseGropupCreatedId)
+		long courseGroupCreatedId)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		Object returnObj = null;
 
 		try {
 			returnObj = _invokableLocalService.invokeMethod(_methodName30,
 					_methodParameterTypes30,
-					new Object[] { actId, companyId, courseGropupCreatedId });
+					new Object[] { actId, companyId, courseGroupCreatedId });
 		}
 		catch (Throwable t) {
 			t = ClpSerializer.translateThrowable(t);
@@ -1274,14 +1322,14 @@ public class LearningActivityResultLocalServiceClp
 	}
 
 	public java.lang.Double avgResultOnlyStudents(long actId, long companyId,
-		long courseGropupCreatedId)
+		long courseGroupCreatedId)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		Object returnObj = null;
 
 		try {
 			returnObj = _invokableLocalService.invokeMethod(_methodName33,
 					_methodParameterTypes33,
-					new Object[] { actId, companyId, courseGropupCreatedId });
+					new Object[] { actId, companyId, courseGroupCreatedId });
 		}
 		catch (Throwable t) {
 			t = ClpSerializer.translateThrowable(t);
@@ -1340,13 +1388,74 @@ public class LearningActivityResultLocalServiceClp
 		return (java.lang.Double)ClpSerializer.translateOutput(returnObj);
 	}
 
-	public long countStarted(long actId)
+	public double avgResultByActIdUserExcludedIds(long actId,
+		long[] userExcludedIds)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		Object returnObj = null;
 
 		try {
 			returnObj = _invokableLocalService.invokeMethod(_methodName35,
-					_methodParameterTypes35, new Object[] { actId });
+					_methodParameterTypes35,
+					new Object[] {
+						actId,
+						
+					ClpSerializer.translateInput(userExcludedIds)
+					});
+		}
+		catch (Throwable t) {
+			t = ClpSerializer.translateThrowable(t);
+
+			if (t instanceof com.liferay.portal.kernel.exception.SystemException) {
+				throw (com.liferay.portal.kernel.exception.SystemException)t;
+			}
+
+			if (t instanceof RuntimeException) {
+				throw (RuntimeException)t;
+			}
+			else {
+				throw new RuntimeException(t.getClass().getName() +
+					" is not a valid exception");
+			}
+		}
+
+		return ((Double)returnObj).doubleValue();
+	}
+
+	public double avgResultByActIdUserIds(long actId, long[] userIds)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		Object returnObj = null;
+
+		try {
+			returnObj = _invokableLocalService.invokeMethod(_methodName36,
+					_methodParameterTypes36,
+					new Object[] { actId, ClpSerializer.translateInput(userIds) });
+		}
+		catch (Throwable t) {
+			t = ClpSerializer.translateThrowable(t);
+
+			if (t instanceof com.liferay.portal.kernel.exception.SystemException) {
+				throw (com.liferay.portal.kernel.exception.SystemException)t;
+			}
+
+			if (t instanceof RuntimeException) {
+				throw (RuntimeException)t;
+			}
+			else {
+				throw new RuntimeException(t.getClass().getName() +
+					" is not a valid exception");
+			}
+		}
+
+		return ((Double)returnObj).doubleValue();
+	}
+
+	public long countStarted(long actId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		Object returnObj = null;
+
+		try {
+			returnObj = _invokableLocalService.invokeMethod(_methodName37,
+					_methodParameterTypes37, new Object[] { actId });
 		}
 		catch (Throwable t) {
 			t = ClpSerializer.translateThrowable(t);
@@ -1368,14 +1477,14 @@ public class LearningActivityResultLocalServiceClp
 	}
 
 	public long countStartedOnlyStudents(long actId, long companyId,
-		long courseGropupCreatedId)
+		long courseGroupCreatedId)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		Object returnObj = null;
 
 		try {
-			returnObj = _invokableLocalService.invokeMethod(_methodName36,
-					_methodParameterTypes36,
-					new Object[] { actId, companyId, courseGropupCreatedId });
+			returnObj = _invokableLocalService.invokeMethod(_methodName38,
+					_methodParameterTypes38,
+					new Object[] { actId, companyId, courseGroupCreatedId });
 		}
 		catch (Throwable t) {
 			t = ClpSerializer.translateThrowable(t);
@@ -1403,8 +1512,8 @@ public class LearningActivityResultLocalServiceClp
 		Object returnObj = null;
 
 		try {
-			returnObj = _invokableLocalService.invokeMethod(_methodName37,
-					_methodParameterTypes37,
+			returnObj = _invokableLocalService.invokeMethod(_methodName39,
+					_methodParameterTypes39,
 					new Object[] {
 						actId,
 						
@@ -1435,13 +1544,13 @@ public class LearningActivityResultLocalServiceClp
 	}
 
 	public long countFinishedOnlyStudents(long actId, long companyId,
-		long courseGropupCreatedId) {
+		long courseGroupCreatedId) {
 		Object returnObj = null;
 
 		try {
-			returnObj = _invokableLocalService.invokeMethod(_methodName38,
-					_methodParameterTypes38,
-					new Object[] { actId, companyId, courseGropupCreatedId });
+			returnObj = _invokableLocalService.invokeMethod(_methodName40,
+					_methodParameterTypes40,
+					new Object[] { actId, companyId, courseGroupCreatedId });
 		}
 		catch (Throwable t) {
 			t = ClpSerializer.translateThrowable(t);
@@ -1464,8 +1573,8 @@ public class LearningActivityResultLocalServiceClp
 		Object returnObj = null;
 
 		try {
-			returnObj = _invokableLocalService.invokeMethod(_methodName39,
-					_methodParameterTypes39,
+			returnObj = _invokableLocalService.invokeMethod(_methodName41,
+					_methodParameterTypes41,
 					new Object[] {
 						actId,
 						
@@ -1496,8 +1605,8 @@ public class LearningActivityResultLocalServiceClp
 		Object returnObj = null;
 
 		try {
-			returnObj = _invokableLocalService.invokeMethod(_methodName40,
-					_methodParameterTypes40, new Object[] { actId });
+			returnObj = _invokableLocalService.invokeMethod(_methodName42,
+					_methodParameterTypes42, new Object[] { actId });
 		}
 		catch (Throwable t) {
 			t = ClpSerializer.translateThrowable(t);
@@ -1519,14 +1628,14 @@ public class LearningActivityResultLocalServiceClp
 	}
 
 	public double triesPerUserOnlyStudents(long actId, long companyId,
-		long courseGropupCreatedId)
+		long courseGroupCreatedId)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		Object returnObj = null;
 
 		try {
-			returnObj = _invokableLocalService.invokeMethod(_methodName41,
-					_methodParameterTypes41,
-					new Object[] { actId, companyId, courseGropupCreatedId });
+			returnObj = _invokableLocalService.invokeMethod(_methodName43,
+					_methodParameterTypes43,
+					new Object[] { actId, companyId, courseGroupCreatedId });
 		}
 		catch (Throwable t) {
 			t = ClpSerializer.translateThrowable(t);
@@ -1554,8 +1663,8 @@ public class LearningActivityResultLocalServiceClp
 		Object returnObj = null;
 
 		try {
-			returnObj = _invokableLocalService.invokeMethod(_methodName42,
-					_methodParameterTypes42,
+			returnObj = _invokableLocalService.invokeMethod(_methodName44,
+					_methodParameterTypes44,
 					new Object[] {
 						actId,
 						
@@ -1585,14 +1694,75 @@ public class LearningActivityResultLocalServiceClp
 		return ((Double)returnObj).doubleValue();
 	}
 
+	public double avgTriesByActIdUserExcludedIds(long actId,
+		long[] userExcludedIds)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		Object returnObj = null;
+
+		try {
+			returnObj = _invokableLocalService.invokeMethod(_methodName45,
+					_methodParameterTypes45,
+					new Object[] {
+						actId,
+						
+					ClpSerializer.translateInput(userExcludedIds)
+					});
+		}
+		catch (Throwable t) {
+			t = ClpSerializer.translateThrowable(t);
+
+			if (t instanceof com.liferay.portal.kernel.exception.SystemException) {
+				throw (com.liferay.portal.kernel.exception.SystemException)t;
+			}
+
+			if (t instanceof RuntimeException) {
+				throw (RuntimeException)t;
+			}
+			else {
+				throw new RuntimeException(t.getClass().getName() +
+					" is not a valid exception");
+			}
+		}
+
+		return ((Double)returnObj).doubleValue();
+	}
+
+	public double avgTriesByActIdUserIds(long actId, long[] userIds)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		Object returnObj = null;
+
+		try {
+			returnObj = _invokableLocalService.invokeMethod(_methodName46,
+					_methodParameterTypes46,
+					new Object[] { actId, ClpSerializer.translateInput(userIds) });
+		}
+		catch (Throwable t) {
+			t = ClpSerializer.translateThrowable(t);
+
+			if (t instanceof com.liferay.portal.kernel.exception.SystemException) {
+				throw (com.liferay.portal.kernel.exception.SystemException)t;
+			}
+
+			if (t instanceof RuntimeException) {
+				throw (RuntimeException)t;
+			}
+			else {
+				throw new RuntimeException(t.getClass().getName() +
+					" is not a valid exception");
+			}
+		}
+
+		return ((Double)returnObj).doubleValue();
+	}
+
 	public com.liferay.lms.model.LearningActivityResult getByActIdAndUserId(
 		long actId, long userId)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		Object returnObj = null;
 
 		try {
-			returnObj = _invokableLocalService.invokeMethod(_methodName43,
-					_methodParameterTypes43, new Object[] { actId, userId });
+			returnObj = _invokableLocalService.invokeMethod(_methodName47,
+					_methodParameterTypes47, new Object[] { actId, userId });
 		}
 		catch (Throwable t) {
 			t = ClpSerializer.translateThrowable(t);
@@ -1618,8 +1788,8 @@ public class LearningActivityResultLocalServiceClp
 		Object returnObj = null;
 
 		try {
-			returnObj = _invokableLocalService.invokeMethod(_methodName44,
-					_methodParameterTypes44, new Object[] { userId });
+			returnObj = _invokableLocalService.invokeMethod(_methodName48,
+					_methodParameterTypes48, new Object[] { userId });
 		}
 		catch (Throwable t) {
 			t = ClpSerializer.translateThrowable(t);
@@ -1645,8 +1815,8 @@ public class LearningActivityResultLocalServiceClp
 		Object returnObj = null;
 
 		try {
-			returnObj = _invokableLocalService.invokeMethod(_methodName45,
-					_methodParameterTypes45, new Object[] { actId });
+			returnObj = _invokableLocalService.invokeMethod(_methodName49,
+					_methodParameterTypes49, new Object[] { actId });
 		}
 		catch (Throwable t) {
 			t = ClpSerializer.translateThrowable(t);
@@ -1668,8 +1838,8 @@ public class LearningActivityResultLocalServiceClp
 		Object returnObj = null;
 
 		try {
-			returnObj = _invokableLocalService.invokeMethod(_methodName46,
-					_methodParameterTypes46, new Object[] { groupId, userId });
+			returnObj = _invokableLocalService.invokeMethod(_methodName50,
+					_methodParameterTypes50, new Object[] { groupId, userId });
 		}
 		catch (Throwable t) {
 			t = ClpSerializer.translateThrowable(t);
@@ -1691,8 +1861,8 @@ public class LearningActivityResultLocalServiceClp
 		Object returnObj = null;
 
 		try {
-			returnObj = _invokableLocalService.invokeMethod(_methodName47,
-					_methodParameterTypes47, new Object[] { groupId, userId });
+			returnObj = _invokableLocalService.invokeMethod(_methodName51,
+					_methodParameterTypes51, new Object[] { groupId, userId });
 		}
 		catch (Throwable t) {
 			t = ClpSerializer.translateThrowable(t);
@@ -1714,8 +1884,8 @@ public class LearningActivityResultLocalServiceClp
 		Object returnObj = null;
 
 		try {
-			returnObj = _invokableLocalService.invokeMethod(_methodName48,
-					_methodParameterTypes48, new Object[] { moduleId, userId });
+			returnObj = _invokableLocalService.invokeMethod(_methodName52,
+					_methodParameterTypes52, new Object[] { moduleId, userId });
 		}
 		catch (Throwable t) {
 			t = ClpSerializer.translateThrowable(t);
@@ -1737,8 +1907,8 @@ public class LearningActivityResultLocalServiceClp
 		Object returnObj = null;
 
 		try {
-			returnObj = _invokableLocalService.invokeMethod(_methodName49,
-					_methodParameterTypes49, new Object[] { moduleId, userId });
+			returnObj = _invokableLocalService.invokeMethod(_methodName53,
+					_methodParameterTypes53, new Object[] { moduleId, userId });
 		}
 		catch (Throwable t) {
 			t = ClpSerializer.translateThrowable(t);
@@ -1760,8 +1930,8 @@ public class LearningActivityResultLocalServiceClp
 		Object returnObj = null;
 
 		try {
-			returnObj = _invokableLocalService.invokeMethod(_methodName50,
-					_methodParameterTypes50, new Object[] { moduleId, userId });
+			returnObj = _invokableLocalService.invokeMethod(_methodName54,
+					_methodParameterTypes54, new Object[] { moduleId, userId });
 		}
 		catch (Throwable t) {
 			t = ClpSerializer.translateThrowable(t);
@@ -1783,8 +1953,8 @@ public class LearningActivityResultLocalServiceClp
 		Object returnObj = null;
 
 		try {
-			returnObj = _invokableLocalService.invokeMethod(_methodName51,
-					_methodParameterTypes51, new Object[] { userId });
+			returnObj = _invokableLocalService.invokeMethod(_methodName55,
+					_methodParameterTypes55, new Object[] { userId });
 		}
 		catch (Throwable t) {
 			t = ClpSerializer.translateThrowable(t);
@@ -1805,8 +1975,8 @@ public class LearningActivityResultLocalServiceClp
 		Object returnObj = null;
 
 		try {
-			returnObj = _invokableLocalService.invokeMethod(_methodName52,
-					_methodParameterTypes52, new Object[] { moduleId, userId });
+			returnObj = _invokableLocalService.invokeMethod(_methodName56,
+					_methodParameterTypes56, new Object[] { moduleId, userId });
 		}
 		catch (Throwable t) {
 			t = ClpSerializer.translateThrowable(t);
@@ -1828,8 +1998,8 @@ public class LearningActivityResultLocalServiceClp
 		Object returnObj = null;
 
 		try {
-			returnObj = _invokableLocalService.invokeMethod(_methodName53,
-					_methodParameterTypes53,
+			returnObj = _invokableLocalService.invokeMethod(_methodName57,
+					_methodParameterTypes57,
 					new Object[] {
 						ClpSerializer.translateInput(locale),
 						
@@ -1858,8 +2028,8 @@ public class LearningActivityResultLocalServiceClp
 		Object returnObj = null;
 
 		try {
-			returnObj = _invokableLocalService.invokeMethod(_methodName54,
-					_methodParameterTypes54,
+			returnObj = _invokableLocalService.invokeMethod(_methodName58,
+					_methodParameterTypes58,
 					new Object[] {
 						ClpSerializer.translateInput(locale),
 						
@@ -1881,6 +2051,250 @@ public class LearningActivityResultLocalServiceClp
 		}
 
 		return (java.lang.String)ClpSerializer.translateOutput(returnObj);
+	}
+
+	public int countStudentsByActIdUserExcludedIdsStarted(long actId,
+		long[] userExcludedIds)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		Object returnObj = null;
+
+		try {
+			returnObj = _invokableLocalService.invokeMethod(_methodName59,
+					_methodParameterTypes59,
+					new Object[] {
+						actId,
+						
+					ClpSerializer.translateInput(userExcludedIds)
+					});
+		}
+		catch (Throwable t) {
+			t = ClpSerializer.translateThrowable(t);
+
+			if (t instanceof com.liferay.portal.kernel.exception.SystemException) {
+				throw (com.liferay.portal.kernel.exception.SystemException)t;
+			}
+
+			if (t instanceof RuntimeException) {
+				throw (RuntimeException)t;
+			}
+			else {
+				throw new RuntimeException(t.getClass().getName() +
+					" is not a valid exception");
+			}
+		}
+
+		return ((Integer)returnObj).intValue();
+	}
+
+	public int countStudentsByActIdUserExcludedIdsFinished(long actId,
+		long[] userExcludedIds)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		Object returnObj = null;
+
+		try {
+			returnObj = _invokableLocalService.invokeMethod(_methodName60,
+					_methodParameterTypes60,
+					new Object[] {
+						actId,
+						
+					ClpSerializer.translateInput(userExcludedIds)
+					});
+		}
+		catch (Throwable t) {
+			t = ClpSerializer.translateThrowable(t);
+
+			if (t instanceof com.liferay.portal.kernel.exception.SystemException) {
+				throw (com.liferay.portal.kernel.exception.SystemException)t;
+			}
+
+			if (t instanceof RuntimeException) {
+				throw (RuntimeException)t;
+			}
+			else {
+				throw new RuntimeException(t.getClass().getName() +
+					" is not a valid exception");
+			}
+		}
+
+		return ((Integer)returnObj).intValue();
+	}
+
+	public int countStudentsByActIdUserExcludedIdsPassed(long actId,
+		long[] userExcludedIds)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		Object returnObj = null;
+
+		try {
+			returnObj = _invokableLocalService.invokeMethod(_methodName61,
+					_methodParameterTypes61,
+					new Object[] {
+						actId,
+						
+					ClpSerializer.translateInput(userExcludedIds)
+					});
+		}
+		catch (Throwable t) {
+			t = ClpSerializer.translateThrowable(t);
+
+			if (t instanceof com.liferay.portal.kernel.exception.SystemException) {
+				throw (com.liferay.portal.kernel.exception.SystemException)t;
+			}
+
+			if (t instanceof RuntimeException) {
+				throw (RuntimeException)t;
+			}
+			else {
+				throw new RuntimeException(t.getClass().getName() +
+					" is not a valid exception");
+			}
+		}
+
+		return ((Integer)returnObj).intValue();
+	}
+
+	public int countStudentsByActIdUserExcludedIdsFailed(long actId,
+		long[] userExcludedIds)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		Object returnObj = null;
+
+		try {
+			returnObj = _invokableLocalService.invokeMethod(_methodName62,
+					_methodParameterTypes62,
+					new Object[] {
+						actId,
+						
+					ClpSerializer.translateInput(userExcludedIds)
+					});
+		}
+		catch (Throwable t) {
+			t = ClpSerializer.translateThrowable(t);
+
+			if (t instanceof com.liferay.portal.kernel.exception.SystemException) {
+				throw (com.liferay.portal.kernel.exception.SystemException)t;
+			}
+
+			if (t instanceof RuntimeException) {
+				throw (RuntimeException)t;
+			}
+			else {
+				throw new RuntimeException(t.getClass().getName() +
+					" is not a valid exception");
+			}
+		}
+
+		return ((Integer)returnObj).intValue();
+	}
+
+	public int countStudentsByActIdUserIdsStarted(long actId, long[] userIds)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		Object returnObj = null;
+
+		try {
+			returnObj = _invokableLocalService.invokeMethod(_methodName63,
+					_methodParameterTypes63,
+					new Object[] { actId, ClpSerializer.translateInput(userIds) });
+		}
+		catch (Throwable t) {
+			t = ClpSerializer.translateThrowable(t);
+
+			if (t instanceof com.liferay.portal.kernel.exception.SystemException) {
+				throw (com.liferay.portal.kernel.exception.SystemException)t;
+			}
+
+			if (t instanceof RuntimeException) {
+				throw (RuntimeException)t;
+			}
+			else {
+				throw new RuntimeException(t.getClass().getName() +
+					" is not a valid exception");
+			}
+		}
+
+		return ((Integer)returnObj).intValue();
+	}
+
+	public int countStudentsByActIdUserIdsFinished(long actId, long[] userIds)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		Object returnObj = null;
+
+		try {
+			returnObj = _invokableLocalService.invokeMethod(_methodName64,
+					_methodParameterTypes64,
+					new Object[] { actId, ClpSerializer.translateInput(userIds) });
+		}
+		catch (Throwable t) {
+			t = ClpSerializer.translateThrowable(t);
+
+			if (t instanceof com.liferay.portal.kernel.exception.SystemException) {
+				throw (com.liferay.portal.kernel.exception.SystemException)t;
+			}
+
+			if (t instanceof RuntimeException) {
+				throw (RuntimeException)t;
+			}
+			else {
+				throw new RuntimeException(t.getClass().getName() +
+					" is not a valid exception");
+			}
+		}
+
+		return ((Integer)returnObj).intValue();
+	}
+
+	public int countStudentsByActIdUserIdsPassed(long actId, long[] userIds)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		Object returnObj = null;
+
+		try {
+			returnObj = _invokableLocalService.invokeMethod(_methodName65,
+					_methodParameterTypes65,
+					new Object[] { actId, ClpSerializer.translateInput(userIds) });
+		}
+		catch (Throwable t) {
+			t = ClpSerializer.translateThrowable(t);
+
+			if (t instanceof com.liferay.portal.kernel.exception.SystemException) {
+				throw (com.liferay.portal.kernel.exception.SystemException)t;
+			}
+
+			if (t instanceof RuntimeException) {
+				throw (RuntimeException)t;
+			}
+			else {
+				throw new RuntimeException(t.getClass().getName() +
+					" is not a valid exception");
+			}
+		}
+
+		return ((Integer)returnObj).intValue();
+	}
+
+	public int countStudentsByActIdUserIdsFailed(long actId, long[] userIds)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		Object returnObj = null;
+
+		try {
+			returnObj = _invokableLocalService.invokeMethod(_methodName66,
+					_methodParameterTypes66,
+					new Object[] { actId, ClpSerializer.translateInput(userIds) });
+		}
+		catch (Throwable t) {
+			t = ClpSerializer.translateThrowable(t);
+
+			if (t instanceof com.liferay.portal.kernel.exception.SystemException) {
+				throw (com.liferay.portal.kernel.exception.SystemException)t;
+			}
+
+			if (t instanceof RuntimeException) {
+				throw (RuntimeException)t;
+			}
+			else {
+				throw new RuntimeException(t.getClass().getName() +
+					" is not a valid exception");
+			}
+		}
+
+		return ((Integer)returnObj).intValue();
 	}
 
 	private InvokableLocalService _invokableLocalService;
@@ -1992,4 +2406,28 @@ public class LearningActivityResultLocalServiceClp
 	private String[] _methodParameterTypes53;
 	private String _methodName54;
 	private String[] _methodParameterTypes54;
+	private String _methodName55;
+	private String[] _methodParameterTypes55;
+	private String _methodName56;
+	private String[] _methodParameterTypes56;
+	private String _methodName57;
+	private String[] _methodParameterTypes57;
+	private String _methodName58;
+	private String[] _methodParameterTypes58;
+	private String _methodName59;
+	private String[] _methodParameterTypes59;
+	private String _methodName60;
+	private String[] _methodParameterTypes60;
+	private String _methodName61;
+	private String[] _methodParameterTypes61;
+	private String _methodName62;
+	private String[] _methodParameterTypes62;
+	private String _methodName63;
+	private String[] _methodParameterTypes63;
+	private String _methodName64;
+	private String[] _methodParameterTypes64;
+	private String _methodName65;
+	private String[] _methodParameterTypes65;
+	private String _methodName66;
+	private String[] _methodParameterTypes66;
 }

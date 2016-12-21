@@ -58,6 +58,7 @@ import com.liferay.lms.service.persistence.CompetencePersistence;
 import com.liferay.lms.service.persistence.CourseCompetencePersistence;
 import com.liferay.lms.service.persistence.CourseFinder;
 import com.liferay.lms.service.persistence.CoursePersistence;
+import com.liferay.lms.service.persistence.CourseResultFinder;
 import com.liferay.lms.service.persistence.CourseResultPersistence;
 import com.liferay.lms.service.persistence.LearningActivityPersistence;
 import com.liferay.lms.service.persistence.LearningActivityResultFinder;
@@ -675,6 +676,24 @@ public abstract class LmsPrefsLocalServiceBaseImpl extends BaseLocalServiceImpl
 	public void setCourseResultPersistence(
 		CourseResultPersistence courseResultPersistence) {
 		this.courseResultPersistence = courseResultPersistence;
+	}
+
+	/**
+	 * Returns the course result finder.
+	 *
+	 * @return the course result finder
+	 */
+	public CourseResultFinder getCourseResultFinder() {
+		return courseResultFinder;
+	}
+
+	/**
+	 * Sets the course result finder.
+	 *
+	 * @param courseResultFinder the course result finder
+	 */
+	public void setCourseResultFinder(CourseResultFinder courseResultFinder) {
+		this.courseResultFinder = courseResultFinder;
 	}
 
 	/**
@@ -1633,6 +1652,8 @@ public abstract class LmsPrefsLocalServiceBaseImpl extends BaseLocalServiceImpl
 	protected CourseResultService courseResultService;
 	@BeanReference(type = CourseResultPersistence.class)
 	protected CourseResultPersistence courseResultPersistence;
+	@BeanReference(type = CourseResultFinder.class)
+	protected CourseResultFinder courseResultFinder;
 	@BeanReference(type = LearningActivityLocalService.class)
 	protected LearningActivityLocalService learningActivityLocalService;
 	@BeanReference(type = LearningActivityService.class)

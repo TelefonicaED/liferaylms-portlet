@@ -387,4 +387,43 @@ public class LearningActivityTryLocalServiceImpl
 		
 		return new ArrayList<LearningActivityTry>();
 	}
+	
+	/**
+	 * Cuenta el número de intentos de los estudiantes, esta función está pensada para pasar una lista de estudiantes filtrada
+	 * (por ejemplo para los equipos) para pedir de todos los estudiantes usar countStudentsByActIdUserExcludedIds
+	 * @param actId id de la actividad
+	 * @param userIds ids de los usuarios filtrados
+	 * @return número de intentos de los estudiantes
+	 * @throws SystemException
+	 */
+	
+	public int countTriesByActIdUserIdsStarted(long actId, long[] userIds) throws SystemException{
+		
+		if(userIds != null && userIds.length > 0){
+			return learningActivityTryPersistence.countByActIdMultipleUserIdStarted(actId, userIds);
+		}else{
+			return 0;
+		}
+	}
+	
+	/**
+	 *  Cuenta el número de intentos de los estudiantes
+	 * @param actId id de la actividad
+	 * @param userExcludedIds ids de usuarios excluidos (profesores y editores)
+	 * @return número de intentos de los estudiantes
+	 * @throws SystemException
+	 */
+	
+	public int countTriesByActIdUserExcludedIdsStarted(long actId, long[] userExcludedIds) throws SystemException{
+		
+		if(userExcludedIds != null && userExcludedIds.length > 0){
+			return learningActivityTryPersistence.countByActIdNotMultipleUserIdStarted(actId, userExcludedIds);
+		}else{
+			return learningActivityTryPersistence.countByActIdStarted(actId);
+		}
+	}
+	
+	public int countTriesByActIdStarted(long actId) throws SystemException{
+		return learningActivityTryPersistence.countByActIdStarted(actId);
+	}
 }

@@ -32,7 +32,6 @@ import com.liferay.lms.service.CourseResultLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityTryLocalServiceUtil;
 import com.liferay.lms.service.ModuleLocalServiceUtil;
-import com.liferay.lms.service.ModuleServiceUtil;
 import com.liferay.lms.service.ScheduleLocalServiceUtil;
 import com.liferay.lms.service.base.ModuleLocalServiceBaseImpl;
 import com.liferay.lms.service.persistence.ModuleUtil;
@@ -96,6 +95,10 @@ public class ModuleLocalServiceImpl extends ModuleLocalServiceBaseImpl {
 	public List<Module> findAllInGroup(long groupId) throws SystemException {
 		List<Module> list = (List<Module>) modulePersistence.findByGroupId(groupId);
 		return list;
+	}
+	
+	public List<Module> findAllInGroup(long groupId, int start, int end) throws SystemException {
+		return ModuleUtil.filterFindByGroupId(groupId, start, end);
 	}
 
 	public List<Module> findAllInGroup(long groupId, OrderByComparator orderByComparator) throws SystemException{

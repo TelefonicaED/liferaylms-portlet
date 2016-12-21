@@ -517,6 +517,2506 @@ public class CourseResultUtil {
 	}
 
 	/**
+	* Returns all the course results where courseId = &#63;.
+	*
+	* @param courseId the course ID
+	* @return the matching course results
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.lms.model.CourseResult> findByCourseId(
+		long courseId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence().findByCourseId(courseId);
+	}
+
+	/**
+	* Returns a range of all the course results where courseId = &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param courseId the course ID
+	* @param start the lower bound of the range of course results
+	* @param end the upper bound of the range of course results (not inclusive)
+	* @return the range of matching course results
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.lms.model.CourseResult> findByCourseId(
+		long courseId, int start, int end)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence().findByCourseId(courseId, start, end);
+	}
+
+	/**
+	* Returns an ordered range of all the course results where courseId = &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param courseId the course ID
+	* @param start the lower bound of the range of course results
+	* @param end the upper bound of the range of course results (not inclusive)
+	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	* @return the ordered range of matching course results
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.lms.model.CourseResult> findByCourseId(
+		long courseId, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByCourseId(courseId, start, end, orderByComparator);
+	}
+
+	/**
+	* Returns the first course result in the ordered set where courseId = &#63;.
+	*
+	* @param courseId the course ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the first matching course result
+	* @throws com.liferay.lms.NoSuchCourseResultException if a matching course result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.lms.model.CourseResult findByCourseId_First(
+		long courseId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchCourseResultException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence().findByCourseId_First(courseId, orderByComparator);
+	}
+
+	/**
+	* Returns the first course result in the ordered set where courseId = &#63;.
+	*
+	* @param courseId the course ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the first matching course result, or <code>null</code> if a matching course result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.lms.model.CourseResult fetchByCourseId_First(
+		long courseId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .fetchByCourseId_First(courseId, orderByComparator);
+	}
+
+	/**
+	* Returns the last course result in the ordered set where courseId = &#63;.
+	*
+	* @param courseId the course ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the last matching course result
+	* @throws com.liferay.lms.NoSuchCourseResultException if a matching course result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.lms.model.CourseResult findByCourseId_Last(
+		long courseId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchCourseResultException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence().findByCourseId_Last(courseId, orderByComparator);
+	}
+
+	/**
+	* Returns the last course result in the ordered set where courseId = &#63;.
+	*
+	* @param courseId the course ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the last matching course result, or <code>null</code> if a matching course result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.lms.model.CourseResult fetchByCourseId_Last(
+		long courseId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence().fetchByCourseId_Last(courseId, orderByComparator);
+	}
+
+	/**
+	* Returns the course results before and after the current course result in the ordered set where courseId = &#63;.
+	*
+	* @param crId the primary key of the current course result
+	* @param courseId the course ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the previous, current, and next course result
+	* @throws com.liferay.lms.NoSuchCourseResultException if a course result with the primary key could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.lms.model.CourseResult[] findByCourseId_PrevAndNext(
+		long crId, long courseId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchCourseResultException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByCourseId_PrevAndNext(crId, courseId, orderByComparator);
+	}
+
+	/**
+	* Returns all the course results where courseId = &#63; and passed = &#63; and userId = &#63;.
+	*
+	* @param courseId the course ID
+	* @param passed the passed
+	* @param userId the user ID
+	* @return the matching course results
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.lms.model.CourseResult> findByCourseIdPassedMultipleUserId(
+		long courseId, boolean passed, long userId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByCourseIdPassedMultipleUserId(courseId, passed, userId);
+	}
+
+	/**
+	* Returns a range of all the course results where courseId = &#63; and passed = &#63; and userId = &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param courseId the course ID
+	* @param passed the passed
+	* @param userId the user ID
+	* @param start the lower bound of the range of course results
+	* @param end the upper bound of the range of course results (not inclusive)
+	* @return the range of matching course results
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.lms.model.CourseResult> findByCourseIdPassedMultipleUserId(
+		long courseId, boolean passed, long userId, int start, int end)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByCourseIdPassedMultipleUserId(courseId, passed,
+			userId, start, end);
+	}
+
+	/**
+	* Returns an ordered range of all the course results where courseId = &#63; and passed = &#63; and userId = &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param courseId the course ID
+	* @param passed the passed
+	* @param userId the user ID
+	* @param start the lower bound of the range of course results
+	* @param end the upper bound of the range of course results (not inclusive)
+	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	* @return the ordered range of matching course results
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.lms.model.CourseResult> findByCourseIdPassedMultipleUserId(
+		long courseId, boolean passed, long userId, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByCourseIdPassedMultipleUserId(courseId, passed,
+			userId, start, end, orderByComparator);
+	}
+
+	/**
+	* Returns the first course result in the ordered set where courseId = &#63; and passed = &#63; and userId = &#63;.
+	*
+	* @param courseId the course ID
+	* @param passed the passed
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the first matching course result
+	* @throws com.liferay.lms.NoSuchCourseResultException if a matching course result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.lms.model.CourseResult findByCourseIdPassedMultipleUserId_First(
+		long courseId, boolean passed, long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchCourseResultException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByCourseIdPassedMultipleUserId_First(courseId, passed,
+			userId, orderByComparator);
+	}
+
+	/**
+	* Returns the first course result in the ordered set where courseId = &#63; and passed = &#63; and userId = &#63;.
+	*
+	* @param courseId the course ID
+	* @param passed the passed
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the first matching course result, or <code>null</code> if a matching course result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.lms.model.CourseResult fetchByCourseIdPassedMultipleUserId_First(
+		long courseId, boolean passed, long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .fetchByCourseIdPassedMultipleUserId_First(courseId, passed,
+			userId, orderByComparator);
+	}
+
+	/**
+	* Returns the last course result in the ordered set where courseId = &#63; and passed = &#63; and userId = &#63;.
+	*
+	* @param courseId the course ID
+	* @param passed the passed
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the last matching course result
+	* @throws com.liferay.lms.NoSuchCourseResultException if a matching course result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.lms.model.CourseResult findByCourseIdPassedMultipleUserId_Last(
+		long courseId, boolean passed, long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchCourseResultException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByCourseIdPassedMultipleUserId_Last(courseId, passed,
+			userId, orderByComparator);
+	}
+
+	/**
+	* Returns the last course result in the ordered set where courseId = &#63; and passed = &#63; and userId = &#63;.
+	*
+	* @param courseId the course ID
+	* @param passed the passed
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the last matching course result, or <code>null</code> if a matching course result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.lms.model.CourseResult fetchByCourseIdPassedMultipleUserId_Last(
+		long courseId, boolean passed, long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .fetchByCourseIdPassedMultipleUserId_Last(courseId, passed,
+			userId, orderByComparator);
+	}
+
+	/**
+	* Returns the course results before and after the current course result in the ordered set where courseId = &#63; and passed = &#63; and userId = &#63;.
+	*
+	* @param crId the primary key of the current course result
+	* @param courseId the course ID
+	* @param passed the passed
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the previous, current, and next course result
+	* @throws com.liferay.lms.NoSuchCourseResultException if a course result with the primary key could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.lms.model.CourseResult[] findByCourseIdPassedMultipleUserId_PrevAndNext(
+		long crId, long courseId, boolean passed, long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchCourseResultException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByCourseIdPassedMultipleUserId_PrevAndNext(crId,
+			courseId, passed, userId, orderByComparator);
+	}
+
+	/**
+	* Returns all the course results where courseId = &#63; and passed = &#63; and userId = any &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param courseId the course ID
+	* @param passed the passed
+	* @param userIds the user IDs
+	* @return the matching course results
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.lms.model.CourseResult> findByCourseIdPassedMultipleUserId(
+		long courseId, boolean passed, long[] userIds)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByCourseIdPassedMultipleUserId(courseId, passed, userIds);
+	}
+
+	/**
+	* Returns a range of all the course results where courseId = &#63; and passed = &#63; and userId = any &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param courseId the course ID
+	* @param passed the passed
+	* @param userIds the user IDs
+	* @param start the lower bound of the range of course results
+	* @param end the upper bound of the range of course results (not inclusive)
+	* @return the range of matching course results
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.lms.model.CourseResult> findByCourseIdPassedMultipleUserId(
+		long courseId, boolean passed, long[] userIds, int start, int end)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByCourseIdPassedMultipleUserId(courseId, passed,
+			userIds, start, end);
+	}
+
+	/**
+	* Returns an ordered range of all the course results where courseId = &#63; and passed = &#63; and userId = any &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param courseId the course ID
+	* @param passed the passed
+	* @param userIds the user IDs
+	* @param start the lower bound of the range of course results
+	* @param end the upper bound of the range of course results (not inclusive)
+	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	* @return the ordered range of matching course results
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.lms.model.CourseResult> findByCourseIdPassedMultipleUserId(
+		long courseId, boolean passed, long[] userIds, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByCourseIdPassedMultipleUserId(courseId, passed,
+			userIds, start, end, orderByComparator);
+	}
+
+	/**
+	* Returns all the course results where courseId = &#63; and userId = &#63;.
+	*
+	* @param courseId the course ID
+	* @param userId the user ID
+	* @return the matching course results
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.lms.model.CourseResult> findByCourseIdMultipleUserIdStarted(
+		long courseId, long userId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByCourseIdMultipleUserIdStarted(courseId, userId);
+	}
+
+	/**
+	* Returns a range of all the course results where courseId = &#63; and userId = &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param courseId the course ID
+	* @param userId the user ID
+	* @param start the lower bound of the range of course results
+	* @param end the upper bound of the range of course results (not inclusive)
+	* @return the range of matching course results
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.lms.model.CourseResult> findByCourseIdMultipleUserIdStarted(
+		long courseId, long userId, int start, int end)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByCourseIdMultipleUserIdStarted(courseId, userId,
+			start, end);
+	}
+
+	/**
+	* Returns an ordered range of all the course results where courseId = &#63; and userId = &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param courseId the course ID
+	* @param userId the user ID
+	* @param start the lower bound of the range of course results
+	* @param end the upper bound of the range of course results (not inclusive)
+	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	* @return the ordered range of matching course results
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.lms.model.CourseResult> findByCourseIdMultipleUserIdStarted(
+		long courseId, long userId, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByCourseIdMultipleUserIdStarted(courseId, userId,
+			start, end, orderByComparator);
+	}
+
+	/**
+	* Returns the first course result in the ordered set where courseId = &#63; and userId = &#63;.
+	*
+	* @param courseId the course ID
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the first matching course result
+	* @throws com.liferay.lms.NoSuchCourseResultException if a matching course result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.lms.model.CourseResult findByCourseIdMultipleUserIdStarted_First(
+		long courseId, long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchCourseResultException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByCourseIdMultipleUserIdStarted_First(courseId, userId,
+			orderByComparator);
+	}
+
+	/**
+	* Returns the first course result in the ordered set where courseId = &#63; and userId = &#63;.
+	*
+	* @param courseId the course ID
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the first matching course result, or <code>null</code> if a matching course result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.lms.model.CourseResult fetchByCourseIdMultipleUserIdStarted_First(
+		long courseId, long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .fetchByCourseIdMultipleUserIdStarted_First(courseId,
+			userId, orderByComparator);
+	}
+
+	/**
+	* Returns the last course result in the ordered set where courseId = &#63; and userId = &#63;.
+	*
+	* @param courseId the course ID
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the last matching course result
+	* @throws com.liferay.lms.NoSuchCourseResultException if a matching course result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.lms.model.CourseResult findByCourseIdMultipleUserIdStarted_Last(
+		long courseId, long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchCourseResultException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByCourseIdMultipleUserIdStarted_Last(courseId, userId,
+			orderByComparator);
+	}
+
+	/**
+	* Returns the last course result in the ordered set where courseId = &#63; and userId = &#63;.
+	*
+	* @param courseId the course ID
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the last matching course result, or <code>null</code> if a matching course result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.lms.model.CourseResult fetchByCourseIdMultipleUserIdStarted_Last(
+		long courseId, long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .fetchByCourseIdMultipleUserIdStarted_Last(courseId, userId,
+			orderByComparator);
+	}
+
+	/**
+	* Returns the course results before and after the current course result in the ordered set where courseId = &#63; and userId = &#63;.
+	*
+	* @param crId the primary key of the current course result
+	* @param courseId the course ID
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the previous, current, and next course result
+	* @throws com.liferay.lms.NoSuchCourseResultException if a course result with the primary key could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.lms.model.CourseResult[] findByCourseIdMultipleUserIdStarted_PrevAndNext(
+		long crId, long courseId, long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchCourseResultException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByCourseIdMultipleUserIdStarted_PrevAndNext(crId,
+			courseId, userId, orderByComparator);
+	}
+
+	/**
+	* Returns all the course results where courseId = &#63; and userId = any &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param courseId the course ID
+	* @param userIds the user IDs
+	* @return the matching course results
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.lms.model.CourseResult> findByCourseIdMultipleUserIdStarted(
+		long courseId, long[] userIds)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByCourseIdMultipleUserIdStarted(courseId, userIds);
+	}
+
+	/**
+	* Returns a range of all the course results where courseId = &#63; and userId = any &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param courseId the course ID
+	* @param userIds the user IDs
+	* @param start the lower bound of the range of course results
+	* @param end the upper bound of the range of course results (not inclusive)
+	* @return the range of matching course results
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.lms.model.CourseResult> findByCourseIdMultipleUserIdStarted(
+		long courseId, long[] userIds, int start, int end)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByCourseIdMultipleUserIdStarted(courseId, userIds,
+			start, end);
+	}
+
+	/**
+	* Returns an ordered range of all the course results where courseId = &#63; and userId = any &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param courseId the course ID
+	* @param userIds the user IDs
+	* @param start the lower bound of the range of course results
+	* @param end the upper bound of the range of course results (not inclusive)
+	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	* @return the ordered range of matching course results
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.lms.model.CourseResult> findByCourseIdMultipleUserIdStarted(
+		long courseId, long[] userIds, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByCourseIdMultipleUserIdStarted(courseId, userIds,
+			start, end, orderByComparator);
+	}
+
+	/**
+	* Returns all the course results where courseId = &#63; and passedDate IS NOT &#63; and userId = &#63;.
+	*
+	* @param courseId the course ID
+	* @param passedDate the passed date
+	* @param userId the user ID
+	* @return the matching course results
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.lms.model.CourseResult> findByCourseIdMultipleUserIdFinished(
+		long courseId, java.util.Date passedDate, long userId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByCourseIdMultipleUserIdFinished(courseId, passedDate,
+			userId);
+	}
+
+	/**
+	* Returns a range of all the course results where courseId = &#63; and passedDate IS NOT &#63; and userId = &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param courseId the course ID
+	* @param passedDate the passed date
+	* @param userId the user ID
+	* @param start the lower bound of the range of course results
+	* @param end the upper bound of the range of course results (not inclusive)
+	* @return the range of matching course results
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.lms.model.CourseResult> findByCourseIdMultipleUserIdFinished(
+		long courseId, java.util.Date passedDate, long userId, int start,
+		int end) throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByCourseIdMultipleUserIdFinished(courseId, passedDate,
+			userId, start, end);
+	}
+
+	/**
+	* Returns an ordered range of all the course results where courseId = &#63; and passedDate IS NOT &#63; and userId = &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param courseId the course ID
+	* @param passedDate the passed date
+	* @param userId the user ID
+	* @param start the lower bound of the range of course results
+	* @param end the upper bound of the range of course results (not inclusive)
+	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	* @return the ordered range of matching course results
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.lms.model.CourseResult> findByCourseIdMultipleUserIdFinished(
+		long courseId, java.util.Date passedDate, long userId, int start,
+		int end,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByCourseIdMultipleUserIdFinished(courseId, passedDate,
+			userId, start, end, orderByComparator);
+	}
+
+	/**
+	* Returns the first course result in the ordered set where courseId = &#63; and passedDate IS NOT &#63; and userId = &#63;.
+	*
+	* @param courseId the course ID
+	* @param passedDate the passed date
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the first matching course result
+	* @throws com.liferay.lms.NoSuchCourseResultException if a matching course result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.lms.model.CourseResult findByCourseIdMultipleUserIdFinished_First(
+		long courseId, java.util.Date passedDate, long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchCourseResultException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByCourseIdMultipleUserIdFinished_First(courseId,
+			passedDate, userId, orderByComparator);
+	}
+
+	/**
+	* Returns the first course result in the ordered set where courseId = &#63; and passedDate IS NOT &#63; and userId = &#63;.
+	*
+	* @param courseId the course ID
+	* @param passedDate the passed date
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the first matching course result, or <code>null</code> if a matching course result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.lms.model.CourseResult fetchByCourseIdMultipleUserIdFinished_First(
+		long courseId, java.util.Date passedDate, long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .fetchByCourseIdMultipleUserIdFinished_First(courseId,
+			passedDate, userId, orderByComparator);
+	}
+
+	/**
+	* Returns the last course result in the ordered set where courseId = &#63; and passedDate IS NOT &#63; and userId = &#63;.
+	*
+	* @param courseId the course ID
+	* @param passedDate the passed date
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the last matching course result
+	* @throws com.liferay.lms.NoSuchCourseResultException if a matching course result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.lms.model.CourseResult findByCourseIdMultipleUserIdFinished_Last(
+		long courseId, java.util.Date passedDate, long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchCourseResultException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByCourseIdMultipleUserIdFinished_Last(courseId,
+			passedDate, userId, orderByComparator);
+	}
+
+	/**
+	* Returns the last course result in the ordered set where courseId = &#63; and passedDate IS NOT &#63; and userId = &#63;.
+	*
+	* @param courseId the course ID
+	* @param passedDate the passed date
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the last matching course result, or <code>null</code> if a matching course result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.lms.model.CourseResult fetchByCourseIdMultipleUserIdFinished_Last(
+		long courseId, java.util.Date passedDate, long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .fetchByCourseIdMultipleUserIdFinished_Last(courseId,
+			passedDate, userId, orderByComparator);
+	}
+
+	/**
+	* Returns the course results before and after the current course result in the ordered set where courseId = &#63; and passedDate IS NOT &#63; and userId = &#63;.
+	*
+	* @param crId the primary key of the current course result
+	* @param courseId the course ID
+	* @param passedDate the passed date
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the previous, current, and next course result
+	* @throws com.liferay.lms.NoSuchCourseResultException if a course result with the primary key could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.lms.model.CourseResult[] findByCourseIdMultipleUserIdFinished_PrevAndNext(
+		long crId, long courseId, java.util.Date passedDate, long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchCourseResultException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByCourseIdMultipleUserIdFinished_PrevAndNext(crId,
+			courseId, passedDate, userId, orderByComparator);
+	}
+
+	/**
+	* Returns all the course results where courseId = &#63; and passedDate IS NOT &#63; and userId = any &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param courseId the course ID
+	* @param passedDate the passed date
+	* @param userIds the user IDs
+	* @return the matching course results
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.lms.model.CourseResult> findByCourseIdMultipleUserIdFinished(
+		long courseId, java.util.Date passedDate, long[] userIds)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByCourseIdMultipleUserIdFinished(courseId, passedDate,
+			userIds);
+	}
+
+	/**
+	* Returns a range of all the course results where courseId = &#63; and passedDate IS NOT &#63; and userId = any &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param courseId the course ID
+	* @param passedDate the passed date
+	* @param userIds the user IDs
+	* @param start the lower bound of the range of course results
+	* @param end the upper bound of the range of course results (not inclusive)
+	* @return the range of matching course results
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.lms.model.CourseResult> findByCourseIdMultipleUserIdFinished(
+		long courseId, java.util.Date passedDate, long[] userIds, int start,
+		int end) throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByCourseIdMultipleUserIdFinished(courseId, passedDate,
+			userIds, start, end);
+	}
+
+	/**
+	* Returns an ordered range of all the course results where courseId = &#63; and passedDate IS NOT &#63; and userId = any &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param courseId the course ID
+	* @param passedDate the passed date
+	* @param userIds the user IDs
+	* @param start the lower bound of the range of course results
+	* @param end the upper bound of the range of course results (not inclusive)
+	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	* @return the ordered range of matching course results
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.lms.model.CourseResult> findByCourseIdMultipleUserIdFinished(
+		long courseId, java.util.Date passedDate, long[] userIds, int start,
+		int end,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByCourseIdMultipleUserIdFinished(courseId, passedDate,
+			userIds, start, end, orderByComparator);
+	}
+
+	/**
+	* Returns all the course results where courseId = &#63;.
+	*
+	* @param courseId the course ID
+	* @return the matching course results
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.lms.model.CourseResult> findByCourseIdStarted(
+		long courseId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence().findByCourseIdStarted(courseId);
+	}
+
+	/**
+	* Returns a range of all the course results where courseId = &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param courseId the course ID
+	* @param start the lower bound of the range of course results
+	* @param end the upper bound of the range of course results (not inclusive)
+	* @return the range of matching course results
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.lms.model.CourseResult> findByCourseIdStarted(
+		long courseId, int start, int end)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence().findByCourseIdStarted(courseId, start, end);
+	}
+
+	/**
+	* Returns an ordered range of all the course results where courseId = &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param courseId the course ID
+	* @param start the lower bound of the range of course results
+	* @param end the upper bound of the range of course results (not inclusive)
+	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	* @return the ordered range of matching course results
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.lms.model.CourseResult> findByCourseIdStarted(
+		long courseId, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByCourseIdStarted(courseId, start, end,
+			orderByComparator);
+	}
+
+	/**
+	* Returns the first course result in the ordered set where courseId = &#63;.
+	*
+	* @param courseId the course ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the first matching course result
+	* @throws com.liferay.lms.NoSuchCourseResultException if a matching course result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.lms.model.CourseResult findByCourseIdStarted_First(
+		long courseId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchCourseResultException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByCourseIdStarted_First(courseId, orderByComparator);
+	}
+
+	/**
+	* Returns the first course result in the ordered set where courseId = &#63;.
+	*
+	* @param courseId the course ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the first matching course result, or <code>null</code> if a matching course result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.lms.model.CourseResult fetchByCourseIdStarted_First(
+		long courseId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .fetchByCourseIdStarted_First(courseId, orderByComparator);
+	}
+
+	/**
+	* Returns the last course result in the ordered set where courseId = &#63;.
+	*
+	* @param courseId the course ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the last matching course result
+	* @throws com.liferay.lms.NoSuchCourseResultException if a matching course result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.lms.model.CourseResult findByCourseIdStarted_Last(
+		long courseId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchCourseResultException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByCourseIdStarted_Last(courseId, orderByComparator);
+	}
+
+	/**
+	* Returns the last course result in the ordered set where courseId = &#63;.
+	*
+	* @param courseId the course ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the last matching course result, or <code>null</code> if a matching course result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.lms.model.CourseResult fetchByCourseIdStarted_Last(
+		long courseId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .fetchByCourseIdStarted_Last(courseId, orderByComparator);
+	}
+
+	/**
+	* Returns the course results before and after the current course result in the ordered set where courseId = &#63;.
+	*
+	* @param crId the primary key of the current course result
+	* @param courseId the course ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the previous, current, and next course result
+	* @throws com.liferay.lms.NoSuchCourseResultException if a course result with the primary key could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.lms.model.CourseResult[] findByCourseIdStarted_PrevAndNext(
+		long crId, long courseId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchCourseResultException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByCourseIdStarted_PrevAndNext(crId, courseId,
+			orderByComparator);
+	}
+
+	/**
+	* Returns all the course results where courseId = &#63; and passedDate IS NOT &#63;.
+	*
+	* @param courseId the course ID
+	* @param passedDate the passed date
+	* @return the matching course results
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.lms.model.CourseResult> findByCourseIdFinished(
+		long courseId, java.util.Date passedDate)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence().findByCourseIdFinished(courseId, passedDate);
+	}
+
+	/**
+	* Returns a range of all the course results where courseId = &#63; and passedDate IS NOT &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param courseId the course ID
+	* @param passedDate the passed date
+	* @param start the lower bound of the range of course results
+	* @param end the upper bound of the range of course results (not inclusive)
+	* @return the range of matching course results
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.lms.model.CourseResult> findByCourseIdFinished(
+		long courseId, java.util.Date passedDate, int start, int end)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByCourseIdFinished(courseId, passedDate, start, end);
+	}
+
+	/**
+	* Returns an ordered range of all the course results where courseId = &#63; and passedDate IS NOT &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param courseId the course ID
+	* @param passedDate the passed date
+	* @param start the lower bound of the range of course results
+	* @param end the upper bound of the range of course results (not inclusive)
+	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	* @return the ordered range of matching course results
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.lms.model.CourseResult> findByCourseIdFinished(
+		long courseId, java.util.Date passedDate, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByCourseIdFinished(courseId, passedDate, start, end,
+			orderByComparator);
+	}
+
+	/**
+	* Returns the first course result in the ordered set where courseId = &#63; and passedDate IS NOT &#63;.
+	*
+	* @param courseId the course ID
+	* @param passedDate the passed date
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the first matching course result
+	* @throws com.liferay.lms.NoSuchCourseResultException if a matching course result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.lms.model.CourseResult findByCourseIdFinished_First(
+		long courseId, java.util.Date passedDate,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchCourseResultException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByCourseIdFinished_First(courseId, passedDate,
+			orderByComparator);
+	}
+
+	/**
+	* Returns the first course result in the ordered set where courseId = &#63; and passedDate IS NOT &#63;.
+	*
+	* @param courseId the course ID
+	* @param passedDate the passed date
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the first matching course result, or <code>null</code> if a matching course result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.lms.model.CourseResult fetchByCourseIdFinished_First(
+		long courseId, java.util.Date passedDate,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .fetchByCourseIdFinished_First(courseId, passedDate,
+			orderByComparator);
+	}
+
+	/**
+	* Returns the last course result in the ordered set where courseId = &#63; and passedDate IS NOT &#63;.
+	*
+	* @param courseId the course ID
+	* @param passedDate the passed date
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the last matching course result
+	* @throws com.liferay.lms.NoSuchCourseResultException if a matching course result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.lms.model.CourseResult findByCourseIdFinished_Last(
+		long courseId, java.util.Date passedDate,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchCourseResultException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByCourseIdFinished_Last(courseId, passedDate,
+			orderByComparator);
+	}
+
+	/**
+	* Returns the last course result in the ordered set where courseId = &#63; and passedDate IS NOT &#63;.
+	*
+	* @param courseId the course ID
+	* @param passedDate the passed date
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the last matching course result, or <code>null</code> if a matching course result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.lms.model.CourseResult fetchByCourseIdFinished_Last(
+		long courseId, java.util.Date passedDate,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .fetchByCourseIdFinished_Last(courseId, passedDate,
+			orderByComparator);
+	}
+
+	/**
+	* Returns the course results before and after the current course result in the ordered set where courseId = &#63; and passedDate IS NOT &#63;.
+	*
+	* @param crId the primary key of the current course result
+	* @param courseId the course ID
+	* @param passedDate the passed date
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the previous, current, and next course result
+	* @throws com.liferay.lms.NoSuchCourseResultException if a course result with the primary key could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.lms.model.CourseResult[] findByCourseIdFinished_PrevAndNext(
+		long crId, long courseId, java.util.Date passedDate,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchCourseResultException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByCourseIdFinished_PrevAndNext(crId, courseId,
+			passedDate, orderByComparator);
+	}
+
+	/**
+	* Returns all the course results where courseId = &#63; and passed = &#63; and passedDate IS NOT &#63; and userId = &#63;.
+	*
+	* @param courseId the course ID
+	* @param passed the passed
+	* @param passedDate the passed date
+	* @param userId the user ID
+	* @return the matching course results
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.lms.model.CourseResult> findByCourseIdPassedMultipleUserIdFinished(
+		long courseId, boolean passed, java.util.Date passedDate, long userId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByCourseIdPassedMultipleUserIdFinished(courseId,
+			passed, passedDate, userId);
+	}
+
+	/**
+	* Returns a range of all the course results where courseId = &#63; and passed = &#63; and passedDate IS NOT &#63; and userId = &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param courseId the course ID
+	* @param passed the passed
+	* @param passedDate the passed date
+	* @param userId the user ID
+	* @param start the lower bound of the range of course results
+	* @param end the upper bound of the range of course results (not inclusive)
+	* @return the range of matching course results
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.lms.model.CourseResult> findByCourseIdPassedMultipleUserIdFinished(
+		long courseId, boolean passed, java.util.Date passedDate, long userId,
+		int start, int end)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByCourseIdPassedMultipleUserIdFinished(courseId,
+			passed, passedDate, userId, start, end);
+	}
+
+	/**
+	* Returns an ordered range of all the course results where courseId = &#63; and passed = &#63; and passedDate IS NOT &#63; and userId = &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param courseId the course ID
+	* @param passed the passed
+	* @param passedDate the passed date
+	* @param userId the user ID
+	* @param start the lower bound of the range of course results
+	* @param end the upper bound of the range of course results (not inclusive)
+	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	* @return the ordered range of matching course results
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.lms.model.CourseResult> findByCourseIdPassedMultipleUserIdFinished(
+		long courseId, boolean passed, java.util.Date passedDate, long userId,
+		int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByCourseIdPassedMultipleUserIdFinished(courseId,
+			passed, passedDate, userId, start, end, orderByComparator);
+	}
+
+	/**
+	* Returns the first course result in the ordered set where courseId = &#63; and passed = &#63; and passedDate IS NOT &#63; and userId = &#63;.
+	*
+	* @param courseId the course ID
+	* @param passed the passed
+	* @param passedDate the passed date
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the first matching course result
+	* @throws com.liferay.lms.NoSuchCourseResultException if a matching course result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.lms.model.CourseResult findByCourseIdPassedMultipleUserIdFinished_First(
+		long courseId, boolean passed, java.util.Date passedDate, long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchCourseResultException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByCourseIdPassedMultipleUserIdFinished_First(courseId,
+			passed, passedDate, userId, orderByComparator);
+	}
+
+	/**
+	* Returns the first course result in the ordered set where courseId = &#63; and passed = &#63; and passedDate IS NOT &#63; and userId = &#63;.
+	*
+	* @param courseId the course ID
+	* @param passed the passed
+	* @param passedDate the passed date
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the first matching course result, or <code>null</code> if a matching course result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.lms.model.CourseResult fetchByCourseIdPassedMultipleUserIdFinished_First(
+		long courseId, boolean passed, java.util.Date passedDate, long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .fetchByCourseIdPassedMultipleUserIdFinished_First(courseId,
+			passed, passedDate, userId, orderByComparator);
+	}
+
+	/**
+	* Returns the last course result in the ordered set where courseId = &#63; and passed = &#63; and passedDate IS NOT &#63; and userId = &#63;.
+	*
+	* @param courseId the course ID
+	* @param passed the passed
+	* @param passedDate the passed date
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the last matching course result
+	* @throws com.liferay.lms.NoSuchCourseResultException if a matching course result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.lms.model.CourseResult findByCourseIdPassedMultipleUserIdFinished_Last(
+		long courseId, boolean passed, java.util.Date passedDate, long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchCourseResultException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByCourseIdPassedMultipleUserIdFinished_Last(courseId,
+			passed, passedDate, userId, orderByComparator);
+	}
+
+	/**
+	* Returns the last course result in the ordered set where courseId = &#63; and passed = &#63; and passedDate IS NOT &#63; and userId = &#63;.
+	*
+	* @param courseId the course ID
+	* @param passed the passed
+	* @param passedDate the passed date
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the last matching course result, or <code>null</code> if a matching course result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.lms.model.CourseResult fetchByCourseIdPassedMultipleUserIdFinished_Last(
+		long courseId, boolean passed, java.util.Date passedDate, long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .fetchByCourseIdPassedMultipleUserIdFinished_Last(courseId,
+			passed, passedDate, userId, orderByComparator);
+	}
+
+	/**
+	* Returns the course results before and after the current course result in the ordered set where courseId = &#63; and passed = &#63; and passedDate IS NOT &#63; and userId = &#63;.
+	*
+	* @param crId the primary key of the current course result
+	* @param courseId the course ID
+	* @param passed the passed
+	* @param passedDate the passed date
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the previous, current, and next course result
+	* @throws com.liferay.lms.NoSuchCourseResultException if a course result with the primary key could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.lms.model.CourseResult[] findByCourseIdPassedMultipleUserIdFinished_PrevAndNext(
+		long crId, long courseId, boolean passed, java.util.Date passedDate,
+		long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchCourseResultException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByCourseIdPassedMultipleUserIdFinished_PrevAndNext(crId,
+			courseId, passed, passedDate, userId, orderByComparator);
+	}
+
+	/**
+	* Returns all the course results where courseId = &#63; and passed = &#63; and passedDate IS NOT &#63; and userId = any &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param courseId the course ID
+	* @param passed the passed
+	* @param passedDate the passed date
+	* @param userIds the user IDs
+	* @return the matching course results
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.lms.model.CourseResult> findByCourseIdPassedMultipleUserIdFinished(
+		long courseId, boolean passed, java.util.Date passedDate, long[] userIds)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByCourseIdPassedMultipleUserIdFinished(courseId,
+			passed, passedDate, userIds);
+	}
+
+	/**
+	* Returns a range of all the course results where courseId = &#63; and passed = &#63; and passedDate IS NOT &#63; and userId = any &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param courseId the course ID
+	* @param passed the passed
+	* @param passedDate the passed date
+	* @param userIds the user IDs
+	* @param start the lower bound of the range of course results
+	* @param end the upper bound of the range of course results (not inclusive)
+	* @return the range of matching course results
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.lms.model.CourseResult> findByCourseIdPassedMultipleUserIdFinished(
+		long courseId, boolean passed, java.util.Date passedDate,
+		long[] userIds, int start, int end)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByCourseIdPassedMultipleUserIdFinished(courseId,
+			passed, passedDate, userIds, start, end);
+	}
+
+	/**
+	* Returns an ordered range of all the course results where courseId = &#63; and passed = &#63; and passedDate IS NOT &#63; and userId = any &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param courseId the course ID
+	* @param passed the passed
+	* @param passedDate the passed date
+	* @param userIds the user IDs
+	* @param start the lower bound of the range of course results
+	* @param end the upper bound of the range of course results (not inclusive)
+	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	* @return the ordered range of matching course results
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.lms.model.CourseResult> findByCourseIdPassedMultipleUserIdFinished(
+		long courseId, boolean passed, java.util.Date passedDate,
+		long[] userIds, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByCourseIdPassedMultipleUserIdFinished(courseId,
+			passed, passedDate, userIds, start, end, orderByComparator);
+	}
+
+	/**
+	* Returns all the course results where courseId = &#63; and passed = &#63; and passedDate IS NOT &#63;.
+	*
+	* @param courseId the course ID
+	* @param passed the passed
+	* @param passedDate the passed date
+	* @return the matching course results
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.lms.model.CourseResult> findByCourseIdPassedFinished(
+		long courseId, boolean passed, java.util.Date passedDate)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByCourseIdPassedFinished(courseId, passed, passedDate);
+	}
+
+	/**
+	* Returns a range of all the course results where courseId = &#63; and passed = &#63; and passedDate IS NOT &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param courseId the course ID
+	* @param passed the passed
+	* @param passedDate the passed date
+	* @param start the lower bound of the range of course results
+	* @param end the upper bound of the range of course results (not inclusive)
+	* @return the range of matching course results
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.lms.model.CourseResult> findByCourseIdPassedFinished(
+		long courseId, boolean passed, java.util.Date passedDate, int start,
+		int end) throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByCourseIdPassedFinished(courseId, passed, passedDate,
+			start, end);
+	}
+
+	/**
+	* Returns an ordered range of all the course results where courseId = &#63; and passed = &#63; and passedDate IS NOT &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param courseId the course ID
+	* @param passed the passed
+	* @param passedDate the passed date
+	* @param start the lower bound of the range of course results
+	* @param end the upper bound of the range of course results (not inclusive)
+	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	* @return the ordered range of matching course results
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.lms.model.CourseResult> findByCourseIdPassedFinished(
+		long courseId, boolean passed, java.util.Date passedDate, int start,
+		int end,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByCourseIdPassedFinished(courseId, passed, passedDate,
+			start, end, orderByComparator);
+	}
+
+	/**
+	* Returns the first course result in the ordered set where courseId = &#63; and passed = &#63; and passedDate IS NOT &#63;.
+	*
+	* @param courseId the course ID
+	* @param passed the passed
+	* @param passedDate the passed date
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the first matching course result
+	* @throws com.liferay.lms.NoSuchCourseResultException if a matching course result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.lms.model.CourseResult findByCourseIdPassedFinished_First(
+		long courseId, boolean passed, java.util.Date passedDate,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchCourseResultException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByCourseIdPassedFinished_First(courseId, passed,
+			passedDate, orderByComparator);
+	}
+
+	/**
+	* Returns the first course result in the ordered set where courseId = &#63; and passed = &#63; and passedDate IS NOT &#63;.
+	*
+	* @param courseId the course ID
+	* @param passed the passed
+	* @param passedDate the passed date
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the first matching course result, or <code>null</code> if a matching course result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.lms.model.CourseResult fetchByCourseIdPassedFinished_First(
+		long courseId, boolean passed, java.util.Date passedDate,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .fetchByCourseIdPassedFinished_First(courseId, passed,
+			passedDate, orderByComparator);
+	}
+
+	/**
+	* Returns the last course result in the ordered set where courseId = &#63; and passed = &#63; and passedDate IS NOT &#63;.
+	*
+	* @param courseId the course ID
+	* @param passed the passed
+	* @param passedDate the passed date
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the last matching course result
+	* @throws com.liferay.lms.NoSuchCourseResultException if a matching course result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.lms.model.CourseResult findByCourseIdPassedFinished_Last(
+		long courseId, boolean passed, java.util.Date passedDate,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchCourseResultException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByCourseIdPassedFinished_Last(courseId, passed,
+			passedDate, orderByComparator);
+	}
+
+	/**
+	* Returns the last course result in the ordered set where courseId = &#63; and passed = &#63; and passedDate IS NOT &#63;.
+	*
+	* @param courseId the course ID
+	* @param passed the passed
+	* @param passedDate the passed date
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the last matching course result, or <code>null</code> if a matching course result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.lms.model.CourseResult fetchByCourseIdPassedFinished_Last(
+		long courseId, boolean passed, java.util.Date passedDate,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .fetchByCourseIdPassedFinished_Last(courseId, passed,
+			passedDate, orderByComparator);
+	}
+
+	/**
+	* Returns the course results before and after the current course result in the ordered set where courseId = &#63; and passed = &#63; and passedDate IS NOT &#63;.
+	*
+	* @param crId the primary key of the current course result
+	* @param courseId the course ID
+	* @param passed the passed
+	* @param passedDate the passed date
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the previous, current, and next course result
+	* @throws com.liferay.lms.NoSuchCourseResultException if a course result with the primary key could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.lms.model.CourseResult[] findByCourseIdPassedFinished_PrevAndNext(
+		long crId, long courseId, boolean passed, java.util.Date passedDate,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchCourseResultException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByCourseIdPassedFinished_PrevAndNext(crId, courseId,
+			passed, passedDate, orderByComparator);
+	}
+
+	/**
+	* Returns all the course results where courseId = &#63; and passed = &#63; and userId &ne; &#63;.
+	*
+	* @param courseId the course ID
+	* @param passed the passed
+	* @param userId the user ID
+	* @return the matching course results
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.lms.model.CourseResult> findByCourseIdPassedNotMultipleUserId(
+		long courseId, boolean passed, long userId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByCourseIdPassedNotMultipleUserId(courseId, passed,
+			userId);
+	}
+
+	/**
+	* Returns a range of all the course results where courseId = &#63; and passed = &#63; and userId &ne; &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param courseId the course ID
+	* @param passed the passed
+	* @param userId the user ID
+	* @param start the lower bound of the range of course results
+	* @param end the upper bound of the range of course results (not inclusive)
+	* @return the range of matching course results
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.lms.model.CourseResult> findByCourseIdPassedNotMultipleUserId(
+		long courseId, boolean passed, long userId, int start, int end)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByCourseIdPassedNotMultipleUserId(courseId, passed,
+			userId, start, end);
+	}
+
+	/**
+	* Returns an ordered range of all the course results where courseId = &#63; and passed = &#63; and userId &ne; &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param courseId the course ID
+	* @param passed the passed
+	* @param userId the user ID
+	* @param start the lower bound of the range of course results
+	* @param end the upper bound of the range of course results (not inclusive)
+	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	* @return the ordered range of matching course results
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.lms.model.CourseResult> findByCourseIdPassedNotMultipleUserId(
+		long courseId, boolean passed, long userId, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByCourseIdPassedNotMultipleUserId(courseId, passed,
+			userId, start, end, orderByComparator);
+	}
+
+	/**
+	* Returns the first course result in the ordered set where courseId = &#63; and passed = &#63; and userId &ne; &#63;.
+	*
+	* @param courseId the course ID
+	* @param passed the passed
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the first matching course result
+	* @throws com.liferay.lms.NoSuchCourseResultException if a matching course result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.lms.model.CourseResult findByCourseIdPassedNotMultipleUserId_First(
+		long courseId, boolean passed, long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchCourseResultException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByCourseIdPassedNotMultipleUserId_First(courseId,
+			passed, userId, orderByComparator);
+	}
+
+	/**
+	* Returns the first course result in the ordered set where courseId = &#63; and passed = &#63; and userId &ne; &#63;.
+	*
+	* @param courseId the course ID
+	* @param passed the passed
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the first matching course result, or <code>null</code> if a matching course result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.lms.model.CourseResult fetchByCourseIdPassedNotMultipleUserId_First(
+		long courseId, boolean passed, long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .fetchByCourseIdPassedNotMultipleUserId_First(courseId,
+			passed, userId, orderByComparator);
+	}
+
+	/**
+	* Returns the last course result in the ordered set where courseId = &#63; and passed = &#63; and userId &ne; &#63;.
+	*
+	* @param courseId the course ID
+	* @param passed the passed
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the last matching course result
+	* @throws com.liferay.lms.NoSuchCourseResultException if a matching course result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.lms.model.CourseResult findByCourseIdPassedNotMultipleUserId_Last(
+		long courseId, boolean passed, long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchCourseResultException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByCourseIdPassedNotMultipleUserId_Last(courseId,
+			passed, userId, orderByComparator);
+	}
+
+	/**
+	* Returns the last course result in the ordered set where courseId = &#63; and passed = &#63; and userId &ne; &#63;.
+	*
+	* @param courseId the course ID
+	* @param passed the passed
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the last matching course result, or <code>null</code> if a matching course result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.lms.model.CourseResult fetchByCourseIdPassedNotMultipleUserId_Last(
+		long courseId, boolean passed, long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .fetchByCourseIdPassedNotMultipleUserId_Last(courseId,
+			passed, userId, orderByComparator);
+	}
+
+	/**
+	* Returns the course results before and after the current course result in the ordered set where courseId = &#63; and passed = &#63; and userId &ne; &#63;.
+	*
+	* @param crId the primary key of the current course result
+	* @param courseId the course ID
+	* @param passed the passed
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the previous, current, and next course result
+	* @throws com.liferay.lms.NoSuchCourseResultException if a course result with the primary key could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.lms.model.CourseResult[] findByCourseIdPassedNotMultipleUserId_PrevAndNext(
+		long crId, long courseId, boolean passed, long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchCourseResultException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByCourseIdPassedNotMultipleUserId_PrevAndNext(crId,
+			courseId, passed, userId, orderByComparator);
+	}
+
+	/**
+	* Returns all the course results where courseId = &#63; and passed = &#63; and userId &ne; all &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param courseId the course ID
+	* @param passed the passed
+	* @param userIds the user IDs
+	* @return the matching course results
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.lms.model.CourseResult> findByCourseIdPassedNotMultipleUserId(
+		long courseId, boolean passed, long[] userIds)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByCourseIdPassedNotMultipleUserId(courseId, passed,
+			userIds);
+	}
+
+	/**
+	* Returns a range of all the course results where courseId = &#63; and passed = &#63; and userId &ne; all &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param courseId the course ID
+	* @param passed the passed
+	* @param userIds the user IDs
+	* @param start the lower bound of the range of course results
+	* @param end the upper bound of the range of course results (not inclusive)
+	* @return the range of matching course results
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.lms.model.CourseResult> findByCourseIdPassedNotMultipleUserId(
+		long courseId, boolean passed, long[] userIds, int start, int end)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByCourseIdPassedNotMultipleUserId(courseId, passed,
+			userIds, start, end);
+	}
+
+	/**
+	* Returns an ordered range of all the course results where courseId = &#63; and passed = &#63; and userId &ne; all &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param courseId the course ID
+	* @param passed the passed
+	* @param userIds the user IDs
+	* @param start the lower bound of the range of course results
+	* @param end the upper bound of the range of course results (not inclusive)
+	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	* @return the ordered range of matching course results
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.lms.model.CourseResult> findByCourseIdPassedNotMultipleUserId(
+		long courseId, boolean passed, long[] userIds, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByCourseIdPassedNotMultipleUserId(courseId, passed,
+			userIds, start, end, orderByComparator);
+	}
+
+	/**
+	* Returns all the course results where courseId = &#63; and userId &ne; &#63;.
+	*
+	* @param courseId the course ID
+	* @param userId the user ID
+	* @return the matching course results
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.lms.model.CourseResult> findByCourseIdNotMultipleUserIdStarted(
+		long courseId, long userId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByCourseIdNotMultipleUserIdStarted(courseId, userId);
+	}
+
+	/**
+	* Returns a range of all the course results where courseId = &#63; and userId &ne; &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param courseId the course ID
+	* @param userId the user ID
+	* @param start the lower bound of the range of course results
+	* @param end the upper bound of the range of course results (not inclusive)
+	* @return the range of matching course results
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.lms.model.CourseResult> findByCourseIdNotMultipleUserIdStarted(
+		long courseId, long userId, int start, int end)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByCourseIdNotMultipleUserIdStarted(courseId, userId,
+			start, end);
+	}
+
+	/**
+	* Returns an ordered range of all the course results where courseId = &#63; and userId &ne; &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param courseId the course ID
+	* @param userId the user ID
+	* @param start the lower bound of the range of course results
+	* @param end the upper bound of the range of course results (not inclusive)
+	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	* @return the ordered range of matching course results
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.lms.model.CourseResult> findByCourseIdNotMultipleUserIdStarted(
+		long courseId, long userId, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByCourseIdNotMultipleUserIdStarted(courseId, userId,
+			start, end, orderByComparator);
+	}
+
+	/**
+	* Returns the first course result in the ordered set where courseId = &#63; and userId &ne; &#63;.
+	*
+	* @param courseId the course ID
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the first matching course result
+	* @throws com.liferay.lms.NoSuchCourseResultException if a matching course result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.lms.model.CourseResult findByCourseIdNotMultipleUserIdStarted_First(
+		long courseId, long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchCourseResultException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByCourseIdNotMultipleUserIdStarted_First(courseId,
+			userId, orderByComparator);
+	}
+
+	/**
+	* Returns the first course result in the ordered set where courseId = &#63; and userId &ne; &#63;.
+	*
+	* @param courseId the course ID
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the first matching course result, or <code>null</code> if a matching course result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.lms.model.CourseResult fetchByCourseIdNotMultipleUserIdStarted_First(
+		long courseId, long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .fetchByCourseIdNotMultipleUserIdStarted_First(courseId,
+			userId, orderByComparator);
+	}
+
+	/**
+	* Returns the last course result in the ordered set where courseId = &#63; and userId &ne; &#63;.
+	*
+	* @param courseId the course ID
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the last matching course result
+	* @throws com.liferay.lms.NoSuchCourseResultException if a matching course result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.lms.model.CourseResult findByCourseIdNotMultipleUserIdStarted_Last(
+		long courseId, long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchCourseResultException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByCourseIdNotMultipleUserIdStarted_Last(courseId,
+			userId, orderByComparator);
+	}
+
+	/**
+	* Returns the last course result in the ordered set where courseId = &#63; and userId &ne; &#63;.
+	*
+	* @param courseId the course ID
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the last matching course result, or <code>null</code> if a matching course result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.lms.model.CourseResult fetchByCourseIdNotMultipleUserIdStarted_Last(
+		long courseId, long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .fetchByCourseIdNotMultipleUserIdStarted_Last(courseId,
+			userId, orderByComparator);
+	}
+
+	/**
+	* Returns the course results before and after the current course result in the ordered set where courseId = &#63; and userId &ne; &#63;.
+	*
+	* @param crId the primary key of the current course result
+	* @param courseId the course ID
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the previous, current, and next course result
+	* @throws com.liferay.lms.NoSuchCourseResultException if a course result with the primary key could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.lms.model.CourseResult[] findByCourseIdNotMultipleUserIdStarted_PrevAndNext(
+		long crId, long courseId, long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchCourseResultException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByCourseIdNotMultipleUserIdStarted_PrevAndNext(crId,
+			courseId, userId, orderByComparator);
+	}
+
+	/**
+	* Returns all the course results where courseId = &#63; and userId &ne; all &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param courseId the course ID
+	* @param userIds the user IDs
+	* @return the matching course results
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.lms.model.CourseResult> findByCourseIdNotMultipleUserIdStarted(
+		long courseId, long[] userIds)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByCourseIdNotMultipleUserIdStarted(courseId, userIds);
+	}
+
+	/**
+	* Returns a range of all the course results where courseId = &#63; and userId &ne; all &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param courseId the course ID
+	* @param userIds the user IDs
+	* @param start the lower bound of the range of course results
+	* @param end the upper bound of the range of course results (not inclusive)
+	* @return the range of matching course results
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.lms.model.CourseResult> findByCourseIdNotMultipleUserIdStarted(
+		long courseId, long[] userIds, int start, int end)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByCourseIdNotMultipleUserIdStarted(courseId, userIds,
+			start, end);
+	}
+
+	/**
+	* Returns an ordered range of all the course results where courseId = &#63; and userId &ne; all &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param courseId the course ID
+	* @param userIds the user IDs
+	* @param start the lower bound of the range of course results
+	* @param end the upper bound of the range of course results (not inclusive)
+	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	* @return the ordered range of matching course results
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.lms.model.CourseResult> findByCourseIdNotMultipleUserIdStarted(
+		long courseId, long[] userIds, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByCourseIdNotMultipleUserIdStarted(courseId, userIds,
+			start, end, orderByComparator);
+	}
+
+	/**
+	* Returns all the course results where courseId = &#63; and passedDate IS NOT &#63; and userId &ne; &#63;.
+	*
+	* @param courseId the course ID
+	* @param passedDate the passed date
+	* @param userId the user ID
+	* @return the matching course results
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.lms.model.CourseResult> findByCourseIdNotMultipleUserIdFinished(
+		long courseId, java.util.Date passedDate, long userId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByCourseIdNotMultipleUserIdFinished(courseId,
+			passedDate, userId);
+	}
+
+	/**
+	* Returns a range of all the course results where courseId = &#63; and passedDate IS NOT &#63; and userId &ne; &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param courseId the course ID
+	* @param passedDate the passed date
+	* @param userId the user ID
+	* @param start the lower bound of the range of course results
+	* @param end the upper bound of the range of course results (not inclusive)
+	* @return the range of matching course results
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.lms.model.CourseResult> findByCourseIdNotMultipleUserIdFinished(
+		long courseId, java.util.Date passedDate, long userId, int start,
+		int end) throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByCourseIdNotMultipleUserIdFinished(courseId,
+			passedDate, userId, start, end);
+	}
+
+	/**
+	* Returns an ordered range of all the course results where courseId = &#63; and passedDate IS NOT &#63; and userId &ne; &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param courseId the course ID
+	* @param passedDate the passed date
+	* @param userId the user ID
+	* @param start the lower bound of the range of course results
+	* @param end the upper bound of the range of course results (not inclusive)
+	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	* @return the ordered range of matching course results
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.lms.model.CourseResult> findByCourseIdNotMultipleUserIdFinished(
+		long courseId, java.util.Date passedDate, long userId, int start,
+		int end,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByCourseIdNotMultipleUserIdFinished(courseId,
+			passedDate, userId, start, end, orderByComparator);
+	}
+
+	/**
+	* Returns the first course result in the ordered set where courseId = &#63; and passedDate IS NOT &#63; and userId &ne; &#63;.
+	*
+	* @param courseId the course ID
+	* @param passedDate the passed date
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the first matching course result
+	* @throws com.liferay.lms.NoSuchCourseResultException if a matching course result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.lms.model.CourseResult findByCourseIdNotMultipleUserIdFinished_First(
+		long courseId, java.util.Date passedDate, long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchCourseResultException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByCourseIdNotMultipleUserIdFinished_First(courseId,
+			passedDate, userId, orderByComparator);
+	}
+
+	/**
+	* Returns the first course result in the ordered set where courseId = &#63; and passedDate IS NOT &#63; and userId &ne; &#63;.
+	*
+	* @param courseId the course ID
+	* @param passedDate the passed date
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the first matching course result, or <code>null</code> if a matching course result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.lms.model.CourseResult fetchByCourseIdNotMultipleUserIdFinished_First(
+		long courseId, java.util.Date passedDate, long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .fetchByCourseIdNotMultipleUserIdFinished_First(courseId,
+			passedDate, userId, orderByComparator);
+	}
+
+	/**
+	* Returns the last course result in the ordered set where courseId = &#63; and passedDate IS NOT &#63; and userId &ne; &#63;.
+	*
+	* @param courseId the course ID
+	* @param passedDate the passed date
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the last matching course result
+	* @throws com.liferay.lms.NoSuchCourseResultException if a matching course result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.lms.model.CourseResult findByCourseIdNotMultipleUserIdFinished_Last(
+		long courseId, java.util.Date passedDate, long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchCourseResultException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByCourseIdNotMultipleUserIdFinished_Last(courseId,
+			passedDate, userId, orderByComparator);
+	}
+
+	/**
+	* Returns the last course result in the ordered set where courseId = &#63; and passedDate IS NOT &#63; and userId &ne; &#63;.
+	*
+	* @param courseId the course ID
+	* @param passedDate the passed date
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the last matching course result, or <code>null</code> if a matching course result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.lms.model.CourseResult fetchByCourseIdNotMultipleUserIdFinished_Last(
+		long courseId, java.util.Date passedDate, long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .fetchByCourseIdNotMultipleUserIdFinished_Last(courseId,
+			passedDate, userId, orderByComparator);
+	}
+
+	/**
+	* Returns the course results before and after the current course result in the ordered set where courseId = &#63; and passedDate IS NOT &#63; and userId &ne; &#63;.
+	*
+	* @param crId the primary key of the current course result
+	* @param courseId the course ID
+	* @param passedDate the passed date
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the previous, current, and next course result
+	* @throws com.liferay.lms.NoSuchCourseResultException if a course result with the primary key could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.lms.model.CourseResult[] findByCourseIdNotMultipleUserIdFinished_PrevAndNext(
+		long crId, long courseId, java.util.Date passedDate, long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchCourseResultException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByCourseIdNotMultipleUserIdFinished_PrevAndNext(crId,
+			courseId, passedDate, userId, orderByComparator);
+	}
+
+	/**
+	* Returns all the course results where courseId = &#63; and passedDate IS NOT &#63; and userId &ne; all &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param courseId the course ID
+	* @param passedDate the passed date
+	* @param userIds the user IDs
+	* @return the matching course results
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.lms.model.CourseResult> findByCourseIdNotMultipleUserIdFinished(
+		long courseId, java.util.Date passedDate, long[] userIds)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByCourseIdNotMultipleUserIdFinished(courseId,
+			passedDate, userIds);
+	}
+
+	/**
+	* Returns a range of all the course results where courseId = &#63; and passedDate IS NOT &#63; and userId &ne; all &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param courseId the course ID
+	* @param passedDate the passed date
+	* @param userIds the user IDs
+	* @param start the lower bound of the range of course results
+	* @param end the upper bound of the range of course results (not inclusive)
+	* @return the range of matching course results
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.lms.model.CourseResult> findByCourseIdNotMultipleUserIdFinished(
+		long courseId, java.util.Date passedDate, long[] userIds, int start,
+		int end) throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByCourseIdNotMultipleUserIdFinished(courseId,
+			passedDate, userIds, start, end);
+	}
+
+	/**
+	* Returns an ordered range of all the course results where courseId = &#63; and passedDate IS NOT &#63; and userId &ne; all &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param courseId the course ID
+	* @param passedDate the passed date
+	* @param userIds the user IDs
+	* @param start the lower bound of the range of course results
+	* @param end the upper bound of the range of course results (not inclusive)
+	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	* @return the ordered range of matching course results
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.lms.model.CourseResult> findByCourseIdNotMultipleUserIdFinished(
+		long courseId, java.util.Date passedDate, long[] userIds, int start,
+		int end,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByCourseIdNotMultipleUserIdFinished(courseId,
+			passedDate, userIds, start, end, orderByComparator);
+	}
+
+	/**
+	* Returns all the course results where courseId = &#63; and passed = &#63; and passedDate IS NOT &#63; and userId &ne; &#63;.
+	*
+	* @param courseId the course ID
+	* @param passed the passed
+	* @param passedDate the passed date
+	* @param userId the user ID
+	* @return the matching course results
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.lms.model.CourseResult> findByCourseIdPassedNotMultipleUserIdFinished(
+		long courseId, boolean passed, java.util.Date passedDate, long userId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByCourseIdPassedNotMultipleUserIdFinished(courseId,
+			passed, passedDate, userId);
+	}
+
+	/**
+	* Returns a range of all the course results where courseId = &#63; and passed = &#63; and passedDate IS NOT &#63; and userId &ne; &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param courseId the course ID
+	* @param passed the passed
+	* @param passedDate the passed date
+	* @param userId the user ID
+	* @param start the lower bound of the range of course results
+	* @param end the upper bound of the range of course results (not inclusive)
+	* @return the range of matching course results
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.lms.model.CourseResult> findByCourseIdPassedNotMultipleUserIdFinished(
+		long courseId, boolean passed, java.util.Date passedDate, long userId,
+		int start, int end)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByCourseIdPassedNotMultipleUserIdFinished(courseId,
+			passed, passedDate, userId, start, end);
+	}
+
+	/**
+	* Returns an ordered range of all the course results where courseId = &#63; and passed = &#63; and passedDate IS NOT &#63; and userId &ne; &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param courseId the course ID
+	* @param passed the passed
+	* @param passedDate the passed date
+	* @param userId the user ID
+	* @param start the lower bound of the range of course results
+	* @param end the upper bound of the range of course results (not inclusive)
+	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	* @return the ordered range of matching course results
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.lms.model.CourseResult> findByCourseIdPassedNotMultipleUserIdFinished(
+		long courseId, boolean passed, java.util.Date passedDate, long userId,
+		int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByCourseIdPassedNotMultipleUserIdFinished(courseId,
+			passed, passedDate, userId, start, end, orderByComparator);
+	}
+
+	/**
+	* Returns the first course result in the ordered set where courseId = &#63; and passed = &#63; and passedDate IS NOT &#63; and userId &ne; &#63;.
+	*
+	* @param courseId the course ID
+	* @param passed the passed
+	* @param passedDate the passed date
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the first matching course result
+	* @throws com.liferay.lms.NoSuchCourseResultException if a matching course result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.lms.model.CourseResult findByCourseIdPassedNotMultipleUserIdFinished_First(
+		long courseId, boolean passed, java.util.Date passedDate, long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchCourseResultException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByCourseIdPassedNotMultipleUserIdFinished_First(courseId,
+			passed, passedDate, userId, orderByComparator);
+	}
+
+	/**
+	* Returns the first course result in the ordered set where courseId = &#63; and passed = &#63; and passedDate IS NOT &#63; and userId &ne; &#63;.
+	*
+	* @param courseId the course ID
+	* @param passed the passed
+	* @param passedDate the passed date
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the first matching course result, or <code>null</code> if a matching course result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.lms.model.CourseResult fetchByCourseIdPassedNotMultipleUserIdFinished_First(
+		long courseId, boolean passed, java.util.Date passedDate, long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .fetchByCourseIdPassedNotMultipleUserIdFinished_First(courseId,
+			passed, passedDate, userId, orderByComparator);
+	}
+
+	/**
+	* Returns the last course result in the ordered set where courseId = &#63; and passed = &#63; and passedDate IS NOT &#63; and userId &ne; &#63;.
+	*
+	* @param courseId the course ID
+	* @param passed the passed
+	* @param passedDate the passed date
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the last matching course result
+	* @throws com.liferay.lms.NoSuchCourseResultException if a matching course result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.lms.model.CourseResult findByCourseIdPassedNotMultipleUserIdFinished_Last(
+		long courseId, boolean passed, java.util.Date passedDate, long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchCourseResultException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByCourseIdPassedNotMultipleUserIdFinished_Last(courseId,
+			passed, passedDate, userId, orderByComparator);
+	}
+
+	/**
+	* Returns the last course result in the ordered set where courseId = &#63; and passed = &#63; and passedDate IS NOT &#63; and userId &ne; &#63;.
+	*
+	* @param courseId the course ID
+	* @param passed the passed
+	* @param passedDate the passed date
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the last matching course result, or <code>null</code> if a matching course result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.lms.model.CourseResult fetchByCourseIdPassedNotMultipleUserIdFinished_Last(
+		long courseId, boolean passed, java.util.Date passedDate, long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .fetchByCourseIdPassedNotMultipleUserIdFinished_Last(courseId,
+			passed, passedDate, userId, orderByComparator);
+	}
+
+	/**
+	* Returns the course results before and after the current course result in the ordered set where courseId = &#63; and passed = &#63; and passedDate IS NOT &#63; and userId &ne; &#63;.
+	*
+	* @param crId the primary key of the current course result
+	* @param courseId the course ID
+	* @param passed the passed
+	* @param passedDate the passed date
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the previous, current, and next course result
+	* @throws com.liferay.lms.NoSuchCourseResultException if a course result with the primary key could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.lms.model.CourseResult[] findByCourseIdPassedNotMultipleUserIdFinished_PrevAndNext(
+		long crId, long courseId, boolean passed, java.util.Date passedDate,
+		long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchCourseResultException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByCourseIdPassedNotMultipleUserIdFinished_PrevAndNext(crId,
+			courseId, passed, passedDate, userId, orderByComparator);
+	}
+
+	/**
+	* Returns all the course results where courseId = &#63; and passed = &#63; and passedDate IS NOT &#63; and userId &ne; all &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param courseId the course ID
+	* @param passed the passed
+	* @param passedDate the passed date
+	* @param userIds the user IDs
+	* @return the matching course results
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.lms.model.CourseResult> findByCourseIdPassedNotMultipleUserIdFinished(
+		long courseId, boolean passed, java.util.Date passedDate, long[] userIds)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByCourseIdPassedNotMultipleUserIdFinished(courseId,
+			passed, passedDate, userIds);
+	}
+
+	/**
+	* Returns a range of all the course results where courseId = &#63; and passed = &#63; and passedDate IS NOT &#63; and userId &ne; all &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param courseId the course ID
+	* @param passed the passed
+	* @param passedDate the passed date
+	* @param userIds the user IDs
+	* @param start the lower bound of the range of course results
+	* @param end the upper bound of the range of course results (not inclusive)
+	* @return the range of matching course results
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.lms.model.CourseResult> findByCourseIdPassedNotMultipleUserIdFinished(
+		long courseId, boolean passed, java.util.Date passedDate,
+		long[] userIds, int start, int end)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByCourseIdPassedNotMultipleUserIdFinished(courseId,
+			passed, passedDate, userIds, start, end);
+	}
+
+	/**
+	* Returns an ordered range of all the course results where courseId = &#63; and passed = &#63; and passedDate IS NOT &#63; and userId &ne; all &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param courseId the course ID
+	* @param passed the passed
+	* @param passedDate the passed date
+	* @param userIds the user IDs
+	* @param start the lower bound of the range of course results
+	* @param end the upper bound of the range of course results (not inclusive)
+	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	* @return the ordered range of matching course results
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.lms.model.CourseResult> findByCourseIdPassedNotMultipleUserIdFinished(
+		long courseId, boolean passed, java.util.Date passedDate,
+		long[] userIds, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByCourseIdPassedNotMultipleUserIdFinished(courseId,
+			passed, passedDate, userIds, start, end, orderByComparator);
+	}
+
+	/**
 	* Returns all the course results.
 	*
 	* @return the course results
@@ -604,6 +3104,176 @@ public class CourseResultUtil {
 	}
 
 	/**
+	* Removes all the course results where courseId = &#63; from the database.
+	*
+	* @param courseId the course ID
+	* @throws SystemException if a system exception occurred
+	*/
+	public static void removeByCourseId(long courseId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		getPersistence().removeByCourseId(courseId);
+	}
+
+	/**
+	* Removes all the course results where courseId = &#63; and passed = &#63; and userId = &#63; from the database.
+	*
+	* @param courseId the course ID
+	* @param passed the passed
+	* @param userId the user ID
+	* @throws SystemException if a system exception occurred
+	*/
+	public static void removeByCourseIdPassedMultipleUserId(long courseId,
+		boolean passed, long userId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		getPersistence()
+			.removeByCourseIdPassedMultipleUserId(courseId, passed, userId);
+	}
+
+	/**
+	* Removes all the course results where courseId = &#63; and userId = &#63; from the database.
+	*
+	* @param courseId the course ID
+	* @param userId the user ID
+	* @throws SystemException if a system exception occurred
+	*/
+	public static void removeByCourseIdMultipleUserIdStarted(long courseId,
+		long userId) throws com.liferay.portal.kernel.exception.SystemException {
+		getPersistence().removeByCourseIdMultipleUserIdStarted(courseId, userId);
+	}
+
+	/**
+	* Removes all the course results where courseId = &#63; and passedDate IS NOT &#63; and userId = &#63; from the database.
+	*
+	* @param courseId the course ID
+	* @param passedDate the passed date
+	* @param userId the user ID
+	* @throws SystemException if a system exception occurred
+	*/
+	public static void removeByCourseIdMultipleUserIdFinished(long courseId,
+		java.util.Date passedDate, long userId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		getPersistence()
+			.removeByCourseIdMultipleUserIdFinished(courseId, passedDate, userId);
+	}
+
+	/**
+	* Removes all the course results where courseId = &#63; from the database.
+	*
+	* @param courseId the course ID
+	* @throws SystemException if a system exception occurred
+	*/
+	public static void removeByCourseIdStarted(long courseId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		getPersistence().removeByCourseIdStarted(courseId);
+	}
+
+	/**
+	* Removes all the course results where courseId = &#63; and passedDate IS NOT &#63; from the database.
+	*
+	* @param courseId the course ID
+	* @param passedDate the passed date
+	* @throws SystemException if a system exception occurred
+	*/
+	public static void removeByCourseIdFinished(long courseId,
+		java.util.Date passedDate)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		getPersistence().removeByCourseIdFinished(courseId, passedDate);
+	}
+
+	/**
+	* Removes all the course results where courseId = &#63; and passed = &#63; and passedDate IS NOT &#63; and userId = &#63; from the database.
+	*
+	* @param courseId the course ID
+	* @param passed the passed
+	* @param passedDate the passed date
+	* @param userId the user ID
+	* @throws SystemException if a system exception occurred
+	*/
+	public static void removeByCourseIdPassedMultipleUserIdFinished(
+		long courseId, boolean passed, java.util.Date passedDate, long userId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		getPersistence()
+			.removeByCourseIdPassedMultipleUserIdFinished(courseId, passed,
+			passedDate, userId);
+	}
+
+	/**
+	* Removes all the course results where courseId = &#63; and passed = &#63; and passedDate IS NOT &#63; from the database.
+	*
+	* @param courseId the course ID
+	* @param passed the passed
+	* @param passedDate the passed date
+	* @throws SystemException if a system exception occurred
+	*/
+	public static void removeByCourseIdPassedFinished(long courseId,
+		boolean passed, java.util.Date passedDate)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		getPersistence()
+			.removeByCourseIdPassedFinished(courseId, passed, passedDate);
+	}
+
+	/**
+	* Removes all the course results where courseId = &#63; and passed = &#63; and userId &ne; &#63; from the database.
+	*
+	* @param courseId the course ID
+	* @param passed the passed
+	* @param userId the user ID
+	* @throws SystemException if a system exception occurred
+	*/
+	public static void removeByCourseIdPassedNotMultipleUserId(long courseId,
+		boolean passed, long userId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		getPersistence()
+			.removeByCourseIdPassedNotMultipleUserId(courseId, passed, userId);
+	}
+
+	/**
+	* Removes all the course results where courseId = &#63; and userId &ne; &#63; from the database.
+	*
+	* @param courseId the course ID
+	* @param userId the user ID
+	* @throws SystemException if a system exception occurred
+	*/
+	public static void removeByCourseIdNotMultipleUserIdStarted(long courseId,
+		long userId) throws com.liferay.portal.kernel.exception.SystemException {
+		getPersistence()
+			.removeByCourseIdNotMultipleUserIdStarted(courseId, userId);
+	}
+
+	/**
+	* Removes all the course results where courseId = &#63; and passedDate IS NOT &#63; and userId &ne; &#63; from the database.
+	*
+	* @param courseId the course ID
+	* @param passedDate the passed date
+	* @param userId the user ID
+	* @throws SystemException if a system exception occurred
+	*/
+	public static void removeByCourseIdNotMultipleUserIdFinished(
+		long courseId, java.util.Date passedDate, long userId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		getPersistence()
+			.removeByCourseIdNotMultipleUserIdFinished(courseId, passedDate,
+			userId);
+	}
+
+	/**
+	* Removes all the course results where courseId = &#63; and passed = &#63; and passedDate IS NOT &#63; and userId &ne; &#63; from the database.
+	*
+	* @param courseId the course ID
+	* @param passed the passed
+	* @param passedDate the passed date
+	* @param userId the user ID
+	* @throws SystemException if a system exception occurred
+	*/
+	public static void removeByCourseIdPassedNotMultipleUserIdFinished(
+		long courseId, boolean passed, java.util.Date passedDate, long userId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		getPersistence()
+			.removeByCourseIdPassedNotMultipleUserIdFinished(courseId, passed,
+			passedDate, userId);
+	}
+
+	/**
 	* Removes all the course results from the database.
 	*
 	* @throws SystemException if a system exception occurred
@@ -649,6 +3319,325 @@ public class CourseResultUtil {
 	public static int countByUserId(long userId)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getPersistence().countByUserId(userId);
+	}
+
+	/**
+	* Returns the number of course results where courseId = &#63;.
+	*
+	* @param courseId the course ID
+	* @return the number of matching course results
+	* @throws SystemException if a system exception occurred
+	*/
+	public static int countByCourseId(long courseId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence().countByCourseId(courseId);
+	}
+
+	/**
+	* Returns the number of course results where courseId = &#63; and passed = &#63; and userId = &#63;.
+	*
+	* @param courseId the course ID
+	* @param passed the passed
+	* @param userId the user ID
+	* @return the number of matching course results
+	* @throws SystemException if a system exception occurred
+	*/
+	public static int countByCourseIdPassedMultipleUserId(long courseId,
+		boolean passed, long userId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .countByCourseIdPassedMultipleUserId(courseId, passed, userId);
+	}
+
+	/**
+	* Returns the number of course results where courseId = &#63; and passed = &#63; and userId = any &#63;.
+	*
+	* @param courseId the course ID
+	* @param passed the passed
+	* @param userIds the user IDs
+	* @return the number of matching course results
+	* @throws SystemException if a system exception occurred
+	*/
+	public static int countByCourseIdPassedMultipleUserId(long courseId,
+		boolean passed, long[] userIds)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .countByCourseIdPassedMultipleUserId(courseId, passed,
+			userIds);
+	}
+
+	/**
+	* Returns the number of course results where courseId = &#63; and userId = &#63;.
+	*
+	* @param courseId the course ID
+	* @param userId the user ID
+	* @return the number of matching course results
+	* @throws SystemException if a system exception occurred
+	*/
+	public static int countByCourseIdMultipleUserIdStarted(long courseId,
+		long userId) throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .countByCourseIdMultipleUserIdStarted(courseId, userId);
+	}
+
+	/**
+	* Returns the number of course results where courseId = &#63; and userId = any &#63;.
+	*
+	* @param courseId the course ID
+	* @param userIds the user IDs
+	* @return the number of matching course results
+	* @throws SystemException if a system exception occurred
+	*/
+	public static int countByCourseIdMultipleUserIdStarted(long courseId,
+		long[] userIds)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .countByCourseIdMultipleUserIdStarted(courseId, userIds);
+	}
+
+	/**
+	* Returns the number of course results where courseId = &#63; and passedDate IS NOT &#63; and userId = &#63;.
+	*
+	* @param courseId the course ID
+	* @param passedDate the passed date
+	* @param userId the user ID
+	* @return the number of matching course results
+	* @throws SystemException if a system exception occurred
+	*/
+	public static int countByCourseIdMultipleUserIdFinished(long courseId,
+		java.util.Date passedDate, long userId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .countByCourseIdMultipleUserIdFinished(courseId, passedDate,
+			userId);
+	}
+
+	/**
+	* Returns the number of course results where courseId = &#63; and passedDate IS NOT &#63; and userId = any &#63;.
+	*
+	* @param courseId the course ID
+	* @param passedDate the passed date
+	* @param userIds the user IDs
+	* @return the number of matching course results
+	* @throws SystemException if a system exception occurred
+	*/
+	public static int countByCourseIdMultipleUserIdFinished(long courseId,
+		java.util.Date passedDate, long[] userIds)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .countByCourseIdMultipleUserIdFinished(courseId, passedDate,
+			userIds);
+	}
+
+	/**
+	* Returns the number of course results where courseId = &#63;.
+	*
+	* @param courseId the course ID
+	* @return the number of matching course results
+	* @throws SystemException if a system exception occurred
+	*/
+	public static int countByCourseIdStarted(long courseId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence().countByCourseIdStarted(courseId);
+	}
+
+	/**
+	* Returns the number of course results where courseId = &#63; and passedDate IS NOT &#63;.
+	*
+	* @param courseId the course ID
+	* @param passedDate the passed date
+	* @return the number of matching course results
+	* @throws SystemException if a system exception occurred
+	*/
+	public static int countByCourseIdFinished(long courseId,
+		java.util.Date passedDate)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence().countByCourseIdFinished(courseId, passedDate);
+	}
+
+	/**
+	* Returns the number of course results where courseId = &#63; and passed = &#63; and passedDate IS NOT &#63; and userId = &#63;.
+	*
+	* @param courseId the course ID
+	* @param passed the passed
+	* @param passedDate the passed date
+	* @param userId the user ID
+	* @return the number of matching course results
+	* @throws SystemException if a system exception occurred
+	*/
+	public static int countByCourseIdPassedMultipleUserIdFinished(
+		long courseId, boolean passed, java.util.Date passedDate, long userId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .countByCourseIdPassedMultipleUserIdFinished(courseId,
+			passed, passedDate, userId);
+	}
+
+	/**
+	* Returns the number of course results where courseId = &#63; and passed = &#63; and passedDate IS NOT &#63; and userId = any &#63;.
+	*
+	* @param courseId the course ID
+	* @param passed the passed
+	* @param passedDate the passed date
+	* @param userIds the user IDs
+	* @return the number of matching course results
+	* @throws SystemException if a system exception occurred
+	*/
+	public static int countByCourseIdPassedMultipleUserIdFinished(
+		long courseId, boolean passed, java.util.Date passedDate, long[] userIds)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .countByCourseIdPassedMultipleUserIdFinished(courseId,
+			passed, passedDate, userIds);
+	}
+
+	/**
+	* Returns the number of course results where courseId = &#63; and passed = &#63; and passedDate IS NOT &#63;.
+	*
+	* @param courseId the course ID
+	* @param passed the passed
+	* @param passedDate the passed date
+	* @return the number of matching course results
+	* @throws SystemException if a system exception occurred
+	*/
+	public static int countByCourseIdPassedFinished(long courseId,
+		boolean passed, java.util.Date passedDate)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .countByCourseIdPassedFinished(courseId, passed, passedDate);
+	}
+
+	/**
+	* Returns the number of course results where courseId = &#63; and passed = &#63; and userId &ne; &#63;.
+	*
+	* @param courseId the course ID
+	* @param passed the passed
+	* @param userId the user ID
+	* @return the number of matching course results
+	* @throws SystemException if a system exception occurred
+	*/
+	public static int countByCourseIdPassedNotMultipleUserId(long courseId,
+		boolean passed, long userId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .countByCourseIdPassedNotMultipleUserId(courseId, passed,
+			userId);
+	}
+
+	/**
+	* Returns the number of course results where courseId = &#63; and passed = &#63; and userId &ne; all &#63;.
+	*
+	* @param courseId the course ID
+	* @param passed the passed
+	* @param userIds the user IDs
+	* @return the number of matching course results
+	* @throws SystemException if a system exception occurred
+	*/
+	public static int countByCourseIdPassedNotMultipleUserId(long courseId,
+		boolean passed, long[] userIds)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .countByCourseIdPassedNotMultipleUserId(courseId, passed,
+			userIds);
+	}
+
+	/**
+	* Returns the number of course results where courseId = &#63; and userId &ne; &#63;.
+	*
+	* @param courseId the course ID
+	* @param userId the user ID
+	* @return the number of matching course results
+	* @throws SystemException if a system exception occurred
+	*/
+	public static int countByCourseIdNotMultipleUserIdStarted(long courseId,
+		long userId) throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .countByCourseIdNotMultipleUserIdStarted(courseId, userId);
+	}
+
+	/**
+	* Returns the number of course results where courseId = &#63; and userId &ne; all &#63;.
+	*
+	* @param courseId the course ID
+	* @param userIds the user IDs
+	* @return the number of matching course results
+	* @throws SystemException if a system exception occurred
+	*/
+	public static int countByCourseIdNotMultipleUserIdStarted(long courseId,
+		long[] userIds)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .countByCourseIdNotMultipleUserIdStarted(courseId, userIds);
+	}
+
+	/**
+	* Returns the number of course results where courseId = &#63; and passedDate IS NOT &#63; and userId &ne; &#63;.
+	*
+	* @param courseId the course ID
+	* @param passedDate the passed date
+	* @param userId the user ID
+	* @return the number of matching course results
+	* @throws SystemException if a system exception occurred
+	*/
+	public static int countByCourseIdNotMultipleUserIdFinished(long courseId,
+		java.util.Date passedDate, long userId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .countByCourseIdNotMultipleUserIdFinished(courseId,
+			passedDate, userId);
+	}
+
+	/**
+	* Returns the number of course results where courseId = &#63; and passedDate IS NOT &#63; and userId &ne; all &#63;.
+	*
+	* @param courseId the course ID
+	* @param passedDate the passed date
+	* @param userIds the user IDs
+	* @return the number of matching course results
+	* @throws SystemException if a system exception occurred
+	*/
+	public static int countByCourseIdNotMultipleUserIdFinished(long courseId,
+		java.util.Date passedDate, long[] userIds)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .countByCourseIdNotMultipleUserIdFinished(courseId,
+			passedDate, userIds);
+	}
+
+	/**
+	* Returns the number of course results where courseId = &#63; and passed = &#63; and passedDate IS NOT &#63; and userId &ne; &#63;.
+	*
+	* @param courseId the course ID
+	* @param passed the passed
+	* @param passedDate the passed date
+	* @param userId the user ID
+	* @return the number of matching course results
+	* @throws SystemException if a system exception occurred
+	*/
+	public static int countByCourseIdPassedNotMultipleUserIdFinished(
+		long courseId, boolean passed, java.util.Date passedDate, long userId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .countByCourseIdPassedNotMultipleUserIdFinished(courseId,
+			passed, passedDate, userId);
+	}
+
+	/**
+	* Returns the number of course results where courseId = &#63; and passed = &#63; and passedDate IS NOT &#63; and userId &ne; all &#63;.
+	*
+	* @param courseId the course ID
+	* @param passed the passed
+	* @param passedDate the passed date
+	* @param userIds the user IDs
+	* @return the number of matching course results
+	* @throws SystemException if a system exception occurred
+	*/
+	public static int countByCourseIdPassedNotMultipleUserIdFinished(
+		long courseId, boolean passed, java.util.Date passedDate, long[] userIds)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .countByCourseIdPassedNotMultipleUserIdFinished(courseId,
+			passed, passedDate, userIds);
 	}
 
 	/**

@@ -36,11 +36,9 @@ import com.liferay.lms.service.ModuleResultLocalServiceUtil;
 import com.liferay.lms.service.base.ModuleResultLocalServiceBaseImpl;
 import com.liferay.lms.service.persistence.ModuleResultUtil;
 import com.liferay.portal.kernel.bean.PortletBeanLocatorUtil;
-import com.liferay.portal.kernel.dao.orm.Criterion;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
-import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
@@ -122,47 +120,50 @@ public class ModuleResultLocalServiceImpl extends ModuleResultLocalServiceBaseIm
 		return moduleResultPersistence.countBym(moduleId);
 	}
 
-	
-	public long countByModuleOnlyStudents(long companyId, long courseGropupCreatedId, long moduleId) throws SystemException{
-		return countByModuleOnlyStudents(companyId, courseGropupCreatedId, moduleId, null);
+	/**
+	 * Devuelve los estudiantes que han comenzado el módulo. Si se tienen ya los ids de los usuarios excluidos (profesores y editores) se
+	 * deberá llamar a countByModuleOnlyStudents(long moduleId, long[] userIds)
+	 * @param companyId id del company del curso
+	 * @param courseGroupCreatedId id del group del curso
+	 * @param moduleId id del módulo del que queremos los estudiantes que han comenzado
+	 * @return número de estudiantes que han iniciado el módulo
+	 * @throws SystemException
+	 */
+	public long countByModuleOnlyStudents(long companyId, long courseGroupCreatedId, long moduleId) throws SystemException{
+		Course course = CourseLocalServiceUtil.getCourseByGroupCreatedId(courseGroupCreatedId);
+		long[] userExcludedIds = CourseLocalServiceUtil.getTeachersAndEditorsIdsFromCourse(course);
+		return countStudentsByModuleIdUserExcludedIdsStarted(moduleId, userExcludedIds);
 	}
-	
+
+	/**
+	 * @deprecated Deprecado por eficiencia, se debe llamar a los métodos countByModuleOnlyStudents(long companyId, long courseGroupCreatedId, long moduleId)
+	 * o countByModuleOnlyStudents(long moduleId ,long[] userIds) ya que se calcula en base a los usuarios excluidos
+	 * @param companyId id del company del curso
+	 * @param courseGroupCreatedId id del group del curso
+	 * @param moduleId  id del módulo del que queremos los estudiantes que han comenzado
+	 * @param _students Lista de estudiantes, si viene vacía se calcula dentro
+	 * @return número de estudiantes que han iniciado el modulo
+	 * @throws SystemException
+	 */
+	@Deprecated
 	public long countByModuleOnlyStudents(long companyId, long courseGropupCreatedId, long moduleId ,List<User> _students)
 			throws SystemException {
 		
-		long res = 0;
-		
 		List<User> students = null;
-		// Se prepara el metodo para recibir un Listado de estudiantes especificos,, por ejemplo que pertenezcan a alguna organizacion. Sino, se trabaja con todos los estudiantes del curso.
+		// Se prepara el metodo para recibir un Listado de estudiantes especificos, por ejemplo que pertenezcan a alguna organizacion. Sino, se trabaja con todos los estudiantes del curso.
 		if(Validator.isNotNull(_students) && _students.size() > 0)
 			students = _students;
 		else
 			students = CourseLocalServiceUtil.getStudentsFromCourse(companyId, courseGropupCreatedId);
 		
-		ClassLoader classLoader = (ClassLoader) PortletBeanLocatorUtil.locate(ClpSerializer.getServletContextName(), "portletClassLoader");
-		DynamicQuery consulta = DynamicQueryFactoryUtil.forClass(ModuleResult.class, classLoader)
-				.add(PropertyFactoryUtil.forName("moduleId").eq(moduleId));
-		
-		if(Validator.isNotNull(students) && students.size() > 0) {
-			Criterion criterion = null;
-			for (int i = 0; i < students.size(); i++) {
-				if(i==0) {
-					criterion = RestrictionsFactoryUtil.like("userId", students.get(i).getUserId());
-				} else {
-					criterion = RestrictionsFactoryUtil.or(criterion, RestrictionsFactoryUtil.like("userId", students.get(i).getUserId()));
-				}
+		if(students != null && students.size() > 0){
+			long[] userIds = new long[students.size()];
+			for(int i = 0; i < students.size(); i++){
+				userIds[i] = students.get(i).getUserId();
 			}
-			if(Validator.isNotNull(criterion)) {
-				consulta.add(criterion);
-				
-				List<ModuleResult> results = moduleResultPersistence.findWithDynamicQuery(consulta);
-				if(results!=null && !results.isEmpty()) {
-					res = results.size();
-				}
-			}
+			return moduleResultPersistence.countByModuleIdMultipleUserId(moduleId, userIds);
 		}
-		
-		return res;
+		return 0;
 	}
 
 	
@@ -172,51 +173,175 @@ public class ModuleResultLocalServiceImpl extends ModuleResultLocalServiceBaseIm
 		return moduleResultPersistence.countBymp(moduleId, passed);
 	}
 	
-	public long countByModulePassedOnlyStudents(long companyId, long courseGropupCreatedId, long moduleId, boolean passed)
-			throws SystemException {
-		return countByModulePassedOnlyStudents(companyId, courseGropupCreatedId, moduleId, passed, null);
+	/**
+	 * Devuelve los estudiantes que han aprobado o suspendido (en el caso de suspenso no tiene en cuenta que hayan finalizado) el módulo. 
+	 * Si se tienen ya los ids de los usuarios excluidos (profesores y editores) se deberá llamar a 
+	 * countByModulePassedOnlyStudents(long moduleId, boolean passed, long[] userIds)
+	 * @param companyId id del company del curso
+	 * @param courseGroupCreatedId id del group del curso
+	 * @param moduleId id del módulo del que queremos los estudiantes que han comenzado
+	 * @param passed Si queremos los que han aprobado el modulo o no
+	 * @return número de estudiantes que han aprobado el modulo (en caso de passed = true) o de los que lo han suspendido o todavía no lo han termiando (passed = false)
+	 * @throws SystemException
+	 */
+	public long countByModulePassedOnlyStudents(long companyId, long courseGroupCreatedId, long moduleId, boolean passed) throws SystemException {
+		Course course = CourseLocalServiceUtil.getCourseByGroupCreatedId(courseGroupCreatedId);
+		long[] userExcludedIds = CourseLocalServiceUtil.getTeachersAndEditorsIdsFromCourse(course);
+		
+		return countByModulePassedOnlyStudents(moduleId, passed, userExcludedIds);
 	}
 	
-	
-	public long countByModulePassedOnlyStudents(long companyId, long courseGropupCreatedId, long moduleId, boolean passed, List<User> _students)
+	/**
+	 * @deprecated Deprecado por eficiencia, se debe llamar a los métodos countByModulePassedOnlyStudents(long companyId, long courseGroupCreatedId, long moduleId, boolean passed)
+	 * o countByModulePassedOnlyStudents(long moduleId, boolean passed, long[] userIds) ya que se calcula en base a los usuarios excluidos
+	 * @param companyId id del company del curso
+	 * @param courseGroupCreatedId id del group del curso
+	 * @param moduleId  id del módulo del que queremos los estudiantes
+	 * @param passed Si queremos los que han aprobado el modulo o no
+	 * @param _students Lista de estudiantes, si viene vacía se calcula dentro
+	 * @return número de estudiantes que han aprobado el curso (en caso de passed = true) o de los que lo han suspendido o todavía no lo han termiando (passed = false)
+	 * @throws SystemException
+	 */
+	@Deprecated
+	public long countByModulePassedOnlyStudents(long companyId, long courseGroupCreatedId, long moduleId, boolean passed, List<User> _students)
 			throws SystemException {
 
-		long res = 0;
-		
 		List<User> students = null;
 		// Se prepara el metodo para recibir un Listado de estudiantes especificos,, por ejemplo que pertenezcan a alguna organizacion. Sino, se trabaja con todos los estudiantes del curso.
 		if(Validator.isNotNull(_students) && _students.size() > 0)
 			students = _students;
 		else
-			students = CourseLocalServiceUtil.getStudentsFromCourse(companyId, courseGropupCreatedId);
+			students = CourseLocalServiceUtil.getStudentsFromCourse(companyId, courseGroupCreatedId);
 		
-		ClassLoader classLoader = (ClassLoader) PortletBeanLocatorUtil.locate(ClpSerializer.getServletContextName(), "portletClassLoader");
-		DynamicQuery consulta = DynamicQueryFactoryUtil.forClass(ModuleResult.class, classLoader)
-				.add(PropertyFactoryUtil.forName("moduleId").eq(moduleId));
-		
-		if(Validator.isNotNull(students) && students.size() > 0) {
-			Criterion criterion = null;
-			for (int i = 0; i < students.size(); i++) {
-				if(i==0) {
-					criterion = RestrictionsFactoryUtil.like("userId", students.get(i).getUserId());
-				} else {
-					criterion = RestrictionsFactoryUtil.or(criterion, RestrictionsFactoryUtil.like("userId", students.get(i).getUserId()));
-				}
+		if(students != null && students.size() > 0){
+			long[] userIds = new long[students.size()];
+			for(int i = 0; i < students.size(); i++){
+				userIds[i] = students.get(i).getUserId();
 			}
-			if(Validator.isNotNull(criterion)) {
-				criterion=RestrictionsFactoryUtil.and(criterion,
-						RestrictionsFactoryUtil.eq("passed",new Boolean (true)));
-				
-				consulta.add(criterion);
-				
-				List<ModuleResult> results = moduleResultPersistence.findWithDynamicQuery(consulta);
-				if(results!=null && !results.isEmpty()) {
-					res = results.size();
-				}
-			}
+			return moduleResultPersistence.countByModuleIdPassedMultipleUserId(moduleId, passed, userIds);
 		}
+		return 0;
+	}
+	
+	/**
+	 * Devuelve los estudiantes que han aprobado o suspendido (en el caso de suspenso no tiene en cuenta que hayan finalizado o no) el módulo. 
+	 * @param moduleId id del módulo del que queremos los estudiantes
+	 * @param passed Si queremos los que han aprobado el modulo o no
+	 * @param userExcludedIds ids de usuarios excluidos (profesores y editores) 
+	 * @return número de estudiantes que han aprobado el modulo (en caso de passed = true) o de los que lo han suspendido o todavía no lo han termiando (passed = false)
+	 * @throws SystemException
+	 */
+	public int countByModulePassedOnlyStudents(long moduleId, boolean passed, long[] userExcludedIds) throws SystemException{
+		if(userExcludedIds != null && userExcludedIds.length > 0){
+			return moduleResultPersistence.countByModuleIdPassedNotMultipleUserId(moduleId, passed, userExcludedIds);
+		}else{
+			return moduleResultPersistence.countBymp(moduleId, passed);
+		}
+	}
+	
+	/**
+	 * Cuenta los estudiantes que han iniciado el modulo: solo llamar si se tiene la lista de usuarios excluidos
+	 * @param moduleId id del módulo
+	 * @param userExcludedIds ids de usuarios excluidos (profesores y editores)
+	 * @return número de estudiantes que han comenzado el modulo
+	 * @throws SystemException
+	 */
+	public int countStudentsByModuleIdUserExcludedIdsStarted(long moduleId, long[] userExcludedIds) throws SystemException{
 		
-		return res;
+		if(userExcludedIds != null && userExcludedIds.length > 0){
+			return moduleResultPersistence.countByModuleIdNotMultipleUserId(moduleId, userExcludedIds);
+
+		}else{
+			return moduleResultPersistence.countBym(moduleId);
+		}
+	}
+	
+	/**
+	 * Cuenta los estudiantes que han finalizado el modulo: solo llamar si se tiene la lista de usuarios excluidos
+	 * @param moduleId id del módulo
+	 * @param userExcludedIds ids de usuarios excluidos (profesores y editores)
+	 * @return número de estudiantes que han finalizado el módulo
+	 * @throws SystemException
+	 */
+	
+	public int countStudentsByModuleIdUserExcludedIdsFinished(long moduleId, long[] userExcludedIds) throws SystemException{
+		
+		if(userExcludedIds != null && userExcludedIds.length > 0){
+			return moduleResultPersistence.countByModuleIdNotMultipleUserIdFinished(moduleId, null, userExcludedIds);
+		}else{
+			return moduleResultPersistence.countByModuleIdFinished(moduleId, null);
+		}
+	}
+	
+	/**
+	 * Cuenta los estudiantes que han iniciado el modulo, esta función está pensada para pasar una lista de estudiantes filtrada
+	 * (por ejemplo para los equipos) para pedir de todos los estudiantes usar countStudentsByModuleIdUserExcludedIdsStarted
+	 * @param moduleId id del módulo
+	 * @param userIds ids de los usuarios filtrados
+	 * @return número de estudiantes que han comenzado el modulo
+	 * @throws SystemException
+	 */
+	public int countStudentsByModuleIdUserIdsStarted(long moduleId, long[] userIds) throws SystemException{
+		
+		if(userIds != null && userIds.length > 0){
+			return moduleResultPersistence.countByModuleIdMultipleUserId(moduleId, userIds);
+
+		}else{
+			return 0;
+		}
+	}
+	
+	/**
+	 * Cuenta los estudiantes que han finalizado el modulo, esta función está pensada para pasar una lista de estudiantes filtrada
+	 * (por ejemplo para los equipos) para pedir de todos los estudiantes usar countStudentsByModuleIdUserExcludedIdsFinished
+	 * @param moduleId id del módulo
+	 * @param userIds ids de los usuarios filtrados
+	 * @return número de estudiantes que han finalizado el módulo
+	 * @throws SystemException
+	 */
+	
+	public int countStudentsByModuleIdUserIdsFinished(long moduleId, long[] userIds) throws SystemException{
+		
+		if(userIds != null && userIds.length > 0){
+			return moduleResultPersistence.countByModuleIdMultipleUserIdFinished(moduleId, null, userIds);
+		}else{
+			return 0;
+		}
+	}
+	
+	/**
+	 * Cuenta los estudiantes que han finalizado el modulo y lo hayan aprobado
+	 * @param moduleId id del módulo
+	 * @param userExcludedIds ids de usuarios excluidos (profesores y editores)
+	 * @return número de estudiantes que han finalizado y aprobado el módulo
+	 * @throws SystemException
+	 */
+	
+	public int countStudentsByModuleIdUserExcludedIdsPassed(long moduleId, long[] userExcludedIds) throws SystemException{
+		
+		if(userExcludedIds != null && userExcludedIds.length > 0){
+			return moduleResultPersistence.countByModuleIdPassedNotMultipleUserIdFinished(moduleId, true, null, userExcludedIds);
+		}else{
+			return moduleResultPersistence.countByModuleIdPassedFinished(moduleId, true, null);
+		}
+	}
+	
+	/**
+	 * Cuenta los estudiantes que han finalizado el modulo y lo hayan suspendido
+	 * @param moduleId id del módulo
+	 * @param userExcludedIds ids de usuarios excluidos (profesores y editores)
+	 * @return número de estudiantes que han finalizado y suspendido el módulo
+	 * @throws SystemException
+	 */
+	
+	public int countStudentsByModuleIdUserExcludedIdsFailed(long moduleId, long[] userExcludedIds) throws SystemException{
+		
+		if(userExcludedIds != null && userExcludedIds.length > 0){
+			return moduleResultPersistence.countByModuleIdPassedNotMultipleUserIdFinished(moduleId, false, null, userExcludedIds);
+
+		}else{
+			return moduleResultPersistence.countByModuleIdPassedFinished(moduleId, false, null);
+		}
 	}
 
 
@@ -439,10 +564,7 @@ public class ModuleResultLocalServiceImpl extends ModuleResultLocalServiceBaseIm
 		}
 
 		return false;
-
-			
+	
 	}
-	
-	
-	
+
 }

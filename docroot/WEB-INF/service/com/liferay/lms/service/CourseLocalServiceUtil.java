@@ -485,14 +485,26 @@ public class CourseLocalServiceUtil {
 	}
 
 	public static java.util.List<com.liferay.portal.model.User> getStudentsFromCourse(
-		long companyId, long courseGropupCreatedId) {
+		long companyId, long courseGroupCreatedId) {
 		return getService()
-				   .getStudentsFromCourse(companyId, courseGropupCreatedId);
+				   .getStudentsFromCourse(companyId, courseGroupCreatedId);
+	}
+
+	public static java.util.List<com.liferay.portal.model.User> getStudentsFromCourse(
+		long companyId, long courseGroupCreatedId, long teamId) {
+		return getService()
+				   .getStudentsFromCourse(companyId, courseGroupCreatedId,
+			teamId);
 	}
 
 	public static java.util.List<com.liferay.portal.model.User> getTeachersFromCourse(
 		long courseId) {
 		return getService().getTeachersFromCourse(courseId);
+	}
+
+	public static long[] getTeachersAndEditorsIdsFromCourse(
+		com.liferay.lms.model.Course course) {
+		return getService().getTeachersAndEditorsIdsFromCourse(course);
 	}
 
 	public static java.util.List<com.liferay.lms.model.Course> getByTitleStatusCategoriesTags(

@@ -1,0 +1,25 @@
+<custom-sql>
+<!-- Query para la administración de cursos cuando eres administrador-->
+
+	<sql id="com.liferay.lms.service.persistence.LearningActivityResultFinder.avgResultActId">
+		<![CDATA[   			
+			SELECT 
+				SUM(lar.result) / COUNT(1) AS avgResult
+			FROM 
+				lms_learningactivityresult lar
+			WHERE 
+				lar.actId = ? 
+				AND lar.endDate IS NOT NULL 
+		]]>
+	</sql>
+	<sql id="com.liferay.lms.service.persistence.LearningActivityResultFinder.whereByUserExcludedIds">
+		<![CDATA[
+			AND lar.userId NOT IN ([$USEREXCLUDEDIDS$]) 
+		]]>
+	</sql>
+	<sql id="com.liferay.lms.service.persistence.LearningActivityResultFinder.whereByUserIds">
+		<![CDATA[
+			AND lar.userId IN ([$USERIDS$]) 
+		]]>
+	</sql>
+</custom-sql>
