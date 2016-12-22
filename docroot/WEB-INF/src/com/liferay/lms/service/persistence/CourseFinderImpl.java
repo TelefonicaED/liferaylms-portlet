@@ -1128,7 +1128,7 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 				}
 				courseView.setUrl(themeDisplay.getPortalURL()+"/"+themeDisplay.getLocale().getLanguage()+"/web" + (String)myCourse[7]);
 				result = ((BigInteger)myCourse[4]).longValue();
-				statusUser = ((Integer)myCourse[3]).intValue();
+				statusUser = Integer.parseInt((String)myCourse[3]);
 				courseResultView = new CourseResultView(courseView, result, statusUser);
 				
 				listMyCourses.add(courseResultView);

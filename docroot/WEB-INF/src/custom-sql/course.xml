@@ -493,7 +493,7 @@
 				c.courseId, 
 				u.userId, 
 				IF(EXTRACTVALUE(c.title, '//Title[@language-id=\"[$LANGUAGE$]\"]') != '', EXTRACTVALUE(c.title, '//Title[@language-id=\"[$LANGUAGE$]\"]'), IF(EXTRACTVALUE(c.title, '//root[@default-locale]//Title') != '', EXTRACTVALUE(c.title, '//root[@default-locale]//Title'), c.title )) AS courseTitle,
-				CASE WHEN r.crId IS NULL THEN 0 WHEN r.passedDate IS NULL THEN 1 WHEN r.passedDate IS NOT NULL AND r.passed = 0 THEN 2 WHEN r.passed = 1 AND r.passedDate IS NOT NULL THEN 3 ELSE 0 END AS statusUser,
+				CASE WHEN r.crId IS NULL THEN '0' WHEN r.passedDate IS NULL THEN '1' WHEN r.passedDate IS NOT NULL AND r.passed = 0 THEN '2' WHEN r.passed = 1 AND r.passedDate IS NOT NULL THEN '3' ELSE '0' END AS statusUser,
 				CASE WHEN r.crId IS NULL THEN 0 ELSE r.result END AS result, c.icon, c.groupCreatedId, c.friendlyURL
 			FROM 
 				lms_course c

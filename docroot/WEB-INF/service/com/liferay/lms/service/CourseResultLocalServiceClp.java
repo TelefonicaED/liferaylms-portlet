@@ -1410,7 +1410,7 @@ public class CourseResultLocalServiceClp implements CourseResultLocalService {
 		return (java.lang.Double)ClpSerializer.translateOutput(returnObj);
 	}
 
-	public double avgResultByCourseIdUserExcludedIds(long course,
+	public double avgResultByCourseIdUserExcludedIds(long courseId,
 		boolean passed, long[] userExcludedIds)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		Object returnObj = null;
@@ -1419,7 +1419,7 @@ public class CourseResultLocalServiceClp implements CourseResultLocalService {
 			returnObj = _invokableLocalService.invokeMethod(_methodName40,
 					_methodParameterTypes40,
 					new Object[] {
-						course,
+						courseId,
 						
 					passed,
 						

@@ -537,17 +537,18 @@ public class CourseResultLocalServiceUtil {
 	}
 
 	/**
-	* Devuelve la media de resultado de usuarios para una actividad
+	* Devuelve la media de resultado de usuarios para un curso
 	*
-	* @param actId id de la actividad
+	* @param courseId id del curso
+	* @param passed si queremos los aprobados o suspensos
 	* @param userExcludedIds id de la company de la actividad
 	* @return media de resultado de usuarios para una actividad
 	*/
-	public static double avgResultByCourseIdUserExcludedIds(long course,
+	public static double avgResultByCourseIdUserExcludedIds(long courseId,
 		boolean passed, long[] userExcludedIds)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService()
-				   .avgResultByCourseIdUserExcludedIds(course, passed,
+				   .avgResultByCourseIdUserExcludedIds(courseId, passed,
 			userExcludedIds);
 	}
 
