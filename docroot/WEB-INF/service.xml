@@ -232,6 +232,11 @@
 			<finder-column name="actId" />
 			<finder-column name="userId" />
 		</finder>
+		<!-- Creamos este finder porque al crear los de abajo se ha quitado la restriccion de unique, así lo añadimos -->
+		<finder name="UserIdActId" return-type="LearningActivityResult" unique="true">
+			<finder-column name="userId" />
+			<finder-column name="actId" />
+		</finder>
 		<finder name="ap" return-type="Collection">
 			<finder-column name="actId" />
 			<finder-column name="passed" />
@@ -251,7 +256,7 @@
 			<finder-column name="actId" />
 			<finder-column name="userId" arrayable-operator="AND" comparator="!="></finder-column>
 		</finder>	
-		<finder name="ActIdNotMultipleUserIdStarted" return-type="Collection"  where="startDate IS NOT null">
+		<finder name="ActIdNotMultipleUserIdStarted" return-type="Collection">
 			<finder-column name="actId" />
 			<finder-column name="userId" arrayable-operator="AND" comparator="!="></finder-column>
 		</finder>
@@ -289,7 +294,7 @@
 			<finder-column name="actId" />
 			<finder-column name="passed" />
 		</finder>
-		<finder name="ActIdMultipleUserIdStarted" return-type="Collection"  where="startDate IS NOT null">
+		<finder name="ActIdMultipleUserIdStarted" return-type="Collection" >
 			<finder-column name="actId" />
 			<finder-column name="userId" arrayable-operator="OR" comparator="="></finder-column>
 		</finder>

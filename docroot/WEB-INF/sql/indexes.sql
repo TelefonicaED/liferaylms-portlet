@@ -57,6 +57,7 @@ create index IX_9F67B375 on Lms_LearningActivityResult (actId, passed, endDate);
 create index IX_5E5BD95E on Lms_LearningActivityResult (actId, passed, userId);
 create index IX_2E4B457A on Lms_LearningActivityResult (actId, userId);
 create index IX_678F5817 on Lms_LearningActivityResult (userId);
+create unique index IX_8F7CCC6 on Lms_LearningActivityResult (userId, actId);
 create index IX_8B143A37 on Lms_LearningActivityResult (uuid_);
 
 create index IX_6C40B616 on Lms_LearningActivityTry (actId);

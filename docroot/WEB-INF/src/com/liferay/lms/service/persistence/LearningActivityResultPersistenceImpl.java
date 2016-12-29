@@ -113,6 +113,17 @@ public class LearningActivityResultPersistenceImpl extends BasePersistenceImpl<L
 			LearningActivityResultModelImpl.FINDER_CACHE_ENABLED, Long.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByact_user",
 			new String[] { Long.class.getName(), Long.class.getName() });
+	public static final FinderPath FINDER_PATH_FETCH_BY_USERIDACTID = new FinderPath(LearningActivityResultModelImpl.ENTITY_CACHE_ENABLED,
+			LearningActivityResultModelImpl.FINDER_CACHE_ENABLED,
+			LearningActivityResultImpl.class, FINDER_CLASS_NAME_ENTITY,
+			"fetchByUserIdActId",
+			new String[] { Long.class.getName(), Long.class.getName() },
+			LearningActivityResultModelImpl.USERID_COLUMN_BITMASK |
+			LearningActivityResultModelImpl.ACTID_COLUMN_BITMASK);
+	public static final FinderPath FINDER_PATH_COUNT_BY_USERIDACTID = new FinderPath(LearningActivityResultModelImpl.ENTITY_CACHE_ENABLED,
+			LearningActivityResultModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUserIdActId",
+			new String[] { Long.class.getName(), Long.class.getName() });
 	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_BY_AP = new FinderPath(LearningActivityResultModelImpl.ENTITY_CACHE_ENABLED,
 			LearningActivityResultModelImpl.FINDER_CACHE_ENABLED,
 			LearningActivityResultImpl.class,
@@ -553,6 +564,12 @@ public class LearningActivityResultPersistenceImpl extends BasePersistenceImpl<L
 				Long.valueOf(learningActivityResult.getUserId())
 			}, learningActivityResult);
 
+		FinderCacheUtil.putResult(FINDER_PATH_FETCH_BY_USERIDACTID,
+			new Object[] {
+				Long.valueOf(learningActivityResult.getUserId()),
+				Long.valueOf(learningActivityResult.getActId())
+			}, learningActivityResult);
+
 		learningActivityResult.resetOriginalValues();
 	}
 
@@ -635,6 +652,12 @@ public class LearningActivityResultPersistenceImpl extends BasePersistenceImpl<L
 			new Object[] {
 				Long.valueOf(learningActivityResult.getActId()),
 				Long.valueOf(learningActivityResult.getUserId())
+			});
+
+		FinderCacheUtil.removeResult(FINDER_PATH_FETCH_BY_USERIDACTID,
+			new Object[] {
+				Long.valueOf(learningActivityResult.getUserId()),
+				Long.valueOf(learningActivityResult.getActId())
 			});
 	}
 
@@ -1048,6 +1071,12 @@ public class LearningActivityResultPersistenceImpl extends BasePersistenceImpl<L
 					Long.valueOf(learningActivityResult.getActId()),
 					Long.valueOf(learningActivityResult.getUserId())
 				}, learningActivityResult);
+
+			FinderCacheUtil.putResult(FINDER_PATH_FETCH_BY_USERIDACTID,
+				new Object[] {
+					Long.valueOf(learningActivityResult.getUserId()),
+					Long.valueOf(learningActivityResult.getActId())
+				}, learningActivityResult);
 		}
 		else {
 			if ((learningActivityResultModelImpl.getColumnBitmask() &
@@ -1065,6 +1094,26 @@ public class LearningActivityResultPersistenceImpl extends BasePersistenceImpl<L
 					new Object[] {
 						Long.valueOf(learningActivityResult.getActId()),
 						Long.valueOf(learningActivityResult.getUserId())
+					}, learningActivityResult);
+			}
+
+			if ((learningActivityResultModelImpl.getColumnBitmask() &
+					FINDER_PATH_FETCH_BY_USERIDACTID.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] {
+						Long.valueOf(learningActivityResultModelImpl.getOriginalUserId()),
+						Long.valueOf(learningActivityResultModelImpl.getOriginalActId())
+					};
+
+				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_USERIDACTID,
+					args);
+
+				FinderCacheUtil.removeResult(FINDER_PATH_FETCH_BY_USERIDACTID,
+					args);
+
+				FinderCacheUtil.putResult(FINDER_PATH_FETCH_BY_USERIDACTID,
+					new Object[] {
+						Long.valueOf(learningActivityResult.getUserId()),
+						Long.valueOf(learningActivityResult.getActId())
 					}, learningActivityResult);
 			}
 		}
@@ -1738,6 +1787,157 @@ public class LearningActivityResultPersistenceImpl extends BasePersistenceImpl<L
 			finally {
 				if (result == null) {
 					FinderCacheUtil.removeResult(FINDER_PATH_FETCH_BY_ACT_USER,
+						finderArgs);
+				}
+
+				closeSession(session);
+			}
+		}
+		else {
+			if (result instanceof List<?>) {
+				return null;
+			}
+			else {
+				return (LearningActivityResult)result;
+			}
+		}
+	}
+
+	/**
+	 * Returns the learning activity result where userId = &#63; and actId = &#63; or throws a {@link com.liferay.lms.NoSuchLearningActivityResultException} if it could not be found.
+	 *
+	 * @param userId the user ID
+	 * @param actId the act ID
+	 * @return the matching learning activity result
+	 * @throws com.liferay.lms.NoSuchLearningActivityResultException if a matching learning activity result could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	public LearningActivityResult findByUserIdActId(long userId, long actId)
+		throws NoSuchLearningActivityResultException, SystemException {
+		LearningActivityResult learningActivityResult = fetchByUserIdActId(userId,
+				actId);
+
+		if (learningActivityResult == null) {
+			StringBundler msg = new StringBundler(6);
+
+			msg.append(_NO_SUCH_ENTITY_WITH_KEY);
+
+			msg.append("userId=");
+			msg.append(userId);
+
+			msg.append(", actId=");
+			msg.append(actId);
+
+			msg.append(StringPool.CLOSE_CURLY_BRACE);
+
+			if (_log.isWarnEnabled()) {
+				_log.warn(msg.toString());
+			}
+
+			throw new NoSuchLearningActivityResultException(msg.toString());
+		}
+
+		return learningActivityResult;
+	}
+
+	/**
+	 * Returns the learning activity result where userId = &#63; and actId = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
+	 *
+	 * @param userId the user ID
+	 * @param actId the act ID
+	 * @return the matching learning activity result, or <code>null</code> if a matching learning activity result could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	public LearningActivityResult fetchByUserIdActId(long userId, long actId)
+		throws SystemException {
+		return fetchByUserIdActId(userId, actId, true);
+	}
+
+	/**
+	 * Returns the learning activity result where userId = &#63; and actId = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
+	 *
+	 * @param userId the user ID
+	 * @param actId the act ID
+	 * @param retrieveFromCache whether to use the finder cache
+	 * @return the matching learning activity result, or <code>null</code> if a matching learning activity result could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	public LearningActivityResult fetchByUserIdActId(long userId, long actId,
+		boolean retrieveFromCache) throws SystemException {
+		Object[] finderArgs = new Object[] { userId, actId };
+
+		Object result = null;
+
+		if (retrieveFromCache) {
+			result = FinderCacheUtil.getResult(FINDER_PATH_FETCH_BY_USERIDACTID,
+					finderArgs, this);
+		}
+
+		if (result instanceof LearningActivityResult) {
+			LearningActivityResult learningActivityResult = (LearningActivityResult)result;
+
+			if ((userId != learningActivityResult.getUserId()) ||
+					(actId != learningActivityResult.getActId())) {
+				result = null;
+			}
+		}
+
+		if (result == null) {
+			StringBundler query = new StringBundler(4);
+
+			query.append(_SQL_SELECT_LEARNINGACTIVITYRESULT_WHERE);
+
+			query.append(_FINDER_COLUMN_USERIDACTID_USERID_2);
+
+			query.append(_FINDER_COLUMN_USERIDACTID_ACTID_2);
+
+			query.append(LearningActivityResultModelImpl.ORDER_BY_JPQL);
+
+			String sql = query.toString();
+
+			Session session = null;
+
+			try {
+				session = openSession();
+
+				Query q = session.createQuery(sql);
+
+				QueryPos qPos = QueryPos.getInstance(q);
+
+				qPos.add(userId);
+
+				qPos.add(actId);
+
+				List<LearningActivityResult> list = q.list();
+
+				result = list;
+
+				LearningActivityResult learningActivityResult = null;
+
+				if (list.isEmpty()) {
+					FinderCacheUtil.putResult(FINDER_PATH_FETCH_BY_USERIDACTID,
+						finderArgs, list);
+				}
+				else {
+					learningActivityResult = list.get(0);
+
+					cacheResult(learningActivityResult);
+
+					if ((learningActivityResult.getUserId() != userId) ||
+							(learningActivityResult.getActId() != actId)) {
+						FinderCacheUtil.putResult(FINDER_PATH_FETCH_BY_USERIDACTID,
+							finderArgs, learningActivityResult);
+					}
+				}
+
+				return learningActivityResult;
+			}
+			catch (Exception e) {
+				throw processException(e);
+			}
+			finally {
+				if (result == null) {
+					FinderCacheUtil.removeResult(FINDER_PATH_FETCH_BY_USERIDACTID,
 						finderArgs);
 				}
 
@@ -4484,12 +4684,6 @@ public class LearningActivityResultPersistenceImpl extends BasePersistenceImpl<L
 
 				conjunctionable = true;
 			}
-
-			if (conjunctionable) {
-				query.append(WHERE_AND);
-			}
-
-			query.append("learningActivityResult.startDate IS NOT null");
 
 			if (orderByComparator != null) {
 				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
@@ -9361,12 +9555,6 @@ public class LearningActivityResultPersistenceImpl extends BasePersistenceImpl<L
 				conjunctionable = true;
 			}
 
-			if (conjunctionable) {
-				query.append(WHERE_AND);
-			}
-
-			query.append("learningActivityResult.startDate IS NOT null");
-
 			if (orderByComparator != null) {
 				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
 					orderByComparator);
@@ -10153,6 +10341,22 @@ public class LearningActivityResultPersistenceImpl extends BasePersistenceImpl<L
 	}
 
 	/**
+	 * Removes the learning activity result where userId = &#63; and actId = &#63; from the database.
+	 *
+	 * @param userId the user ID
+	 * @param actId the act ID
+	 * @return the learning activity result that was removed
+	 * @throws SystemException if a system exception occurred
+	 */
+	public LearningActivityResult removeByUserIdActId(long userId, long actId)
+		throws NoSuchLearningActivityResultException, SystemException {
+		LearningActivityResult learningActivityResult = findByUserIdActId(userId,
+				actId);
+
+		return remove(learningActivityResult);
+	}
+
+	/**
 	 * Removes all the learning activity results where actId = &#63; and passed = &#63; from the database.
 	 *
 	 * @param actId the act ID
@@ -10513,6 +10717,65 @@ public class LearningActivityResultPersistenceImpl extends BasePersistenceImpl<L
 				}
 
 				FinderCacheUtil.putResult(FINDER_PATH_COUNT_BY_ACT_USER,
+					finderArgs, count);
+
+				closeSession(session);
+			}
+		}
+
+		return count.intValue();
+	}
+
+	/**
+	 * Returns the number of learning activity results where userId = &#63; and actId = &#63;.
+	 *
+	 * @param userId the user ID
+	 * @param actId the act ID
+	 * @return the number of matching learning activity results
+	 * @throws SystemException if a system exception occurred
+	 */
+	public int countByUserIdActId(long userId, long actId)
+		throws SystemException {
+		Object[] finderArgs = new Object[] { userId, actId };
+
+		Long count = (Long)FinderCacheUtil.getResult(FINDER_PATH_COUNT_BY_USERIDACTID,
+				finderArgs, this);
+
+		if (count == null) {
+			StringBundler query = new StringBundler(3);
+
+			query.append(_SQL_COUNT_LEARNINGACTIVITYRESULT_WHERE);
+
+			query.append(_FINDER_COLUMN_USERIDACTID_USERID_2);
+
+			query.append(_FINDER_COLUMN_USERIDACTID_ACTID_2);
+
+			String sql = query.toString();
+
+			Session session = null;
+
+			try {
+				session = openSession();
+
+				Query q = session.createQuery(sql);
+
+				QueryPos qPos = QueryPos.getInstance(q);
+
+				qPos.add(userId);
+
+				qPos.add(actId);
+
+				count = (Long)q.uniqueResult();
+			}
+			catch (Exception e) {
+				throw processException(e);
+			}
+			finally {
+				if (count == null) {
+					count = Long.valueOf(0);
+				}
+
+				FinderCacheUtil.putResult(FINDER_PATH_COUNT_BY_USERIDACTID,
 					finderArgs, count);
 
 				closeSession(session);
@@ -11011,12 +11274,6 @@ public class LearningActivityResultPersistenceImpl extends BasePersistenceImpl<L
 
 				conjunctionable = true;
 			}
-
-			if (conjunctionable) {
-				query.append(WHERE_AND);
-			}
-
-			query.append("learningActivityResult.startDate IS NOT null");
 
 			String sql = query.toString();
 
@@ -12149,12 +12406,6 @@ public class LearningActivityResultPersistenceImpl extends BasePersistenceImpl<L
 				conjunctionable = true;
 			}
 
-			if (conjunctionable) {
-				query.append(WHERE_AND);
-			}
-
-			query.append("learningActivityResult.startDate IS NOT null");
-
 			String sql = query.toString();
 
 			Session session = null;
@@ -12468,6 +12719,8 @@ public class LearningActivityResultPersistenceImpl extends BasePersistenceImpl<L
 	private static final String _FINDER_COLUMN_UUID_UUID_3 = "(learningActivityResult.uuid IS NULL OR learningActivityResult.uuid = ?)";
 	private static final String _FINDER_COLUMN_ACT_USER_ACTID_2 = "learningActivityResult.actId = ? AND ";
 	private static final String _FINDER_COLUMN_ACT_USER_USERID_2 = "learningActivityResult.userId = ?";
+	private static final String _FINDER_COLUMN_USERIDACTID_USERID_2 = "learningActivityResult.userId = ? AND ";
+	private static final String _FINDER_COLUMN_USERIDACTID_ACTID_2 = "learningActivityResult.actId = ?";
 	private static final String _FINDER_COLUMN_AP_ACTID_2 = "learningActivityResult.actId = ? AND ";
 	private static final String _FINDER_COLUMN_AP_PASSED_2 = "learningActivityResult.passed = ?";
 	private static final String _FINDER_COLUMN_APD_ACTID_2 = "learningActivityResult.actId = ? AND ";
@@ -12491,7 +12744,7 @@ public class LearningActivityResultPersistenceImpl extends BasePersistenceImpl<L
 		_removeConjunction(_FINDER_COLUMN_ACTIDNOTMULTIPLEUSERIDSTARTED_ACTID_2) +
 		")";
 	private static final String _FINDER_COLUMN_ACTIDNOTMULTIPLEUSERIDSTARTED_USERID_2 =
-		"learningActivityResult.userId != ? AND learningActivityResult.startDate IS NOT null";
+		"learningActivityResult.userId != ?";
 	private static final String _FINDER_COLUMN_ACTIDNOTMULTIPLEUSERIDSTARTED_USERID_5 =
 		"(" +
 		_removeConjunction(_FINDER_COLUMN_ACTIDNOTMULTIPLEUSERIDSTARTED_USERID_2) +
@@ -12591,7 +12844,7 @@ public class LearningActivityResultPersistenceImpl extends BasePersistenceImpl<L
 		_removeConjunction(_FINDER_COLUMN_ACTIDMULTIPLEUSERIDSTARTED_ACTID_2) +
 		")";
 	private static final String _FINDER_COLUMN_ACTIDMULTIPLEUSERIDSTARTED_USERID_2 =
-		"learningActivityResult.userId = ? AND learningActivityResult.startDate IS NOT null";
+		"learningActivityResult.userId = ?";
 	private static final String _FINDER_COLUMN_ACTIDMULTIPLEUSERIDSTARTED_USERID_5 =
 		"(" +
 		_removeConjunction(_FINDER_COLUMN_ACTIDMULTIPLEUSERIDSTARTED_USERID_2) +

@@ -260,6 +260,45 @@ public interface LearningActivityResultPersistence extends BasePersistence<Learn
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	/**
+	* Returns the learning activity result where userId = &#63; and actId = &#63; or throws a {@link com.liferay.lms.NoSuchLearningActivityResultException} if it could not be found.
+	*
+	* @param userId the user ID
+	* @param actId the act ID
+	* @return the matching learning activity result
+	* @throws com.liferay.lms.NoSuchLearningActivityResultException if a matching learning activity result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.LearningActivityResult findByUserIdActId(
+		long userId, long actId)
+		throws com.liferay.lms.NoSuchLearningActivityResultException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the learning activity result where userId = &#63; and actId = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
+	*
+	* @param userId the user ID
+	* @param actId the act ID
+	* @return the matching learning activity result, or <code>null</code> if a matching learning activity result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.LearningActivityResult fetchByUserIdActId(
+		long userId, long actId)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the learning activity result where userId = &#63; and actId = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
+	*
+	* @param userId the user ID
+	* @param actId the act ID
+	* @param retrieveFromCache whether to use the finder cache
+	* @return the matching learning activity result, or <code>null</code> if a matching learning activity result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.LearningActivityResult fetchByUserIdActId(
+		long userId, long actId, boolean retrieveFromCache)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
 	* Returns all the learning activity results where actId = &#63; and passed = &#63;.
 	*
 	* @param actId the act ID
@@ -2859,6 +2898,19 @@ public interface LearningActivityResultPersistence extends BasePersistence<Learn
 			com.liferay.portal.kernel.exception.SystemException;
 
 	/**
+	* Removes the learning activity result where userId = &#63; and actId = &#63; from the database.
+	*
+	* @param userId the user ID
+	* @param actId the act ID
+	* @return the learning activity result that was removed
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.LearningActivityResult removeByUserIdActId(
+		long userId, long actId)
+		throws com.liferay.lms.NoSuchLearningActivityResultException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	/**
 	* Removes all the learning activity results where actId = &#63; and passed = &#63; from the database.
 	*
 	* @param actId the act ID
@@ -3049,6 +3101,17 @@ public interface LearningActivityResultPersistence extends BasePersistence<Learn
 	* @throws SystemException if a system exception occurred
 	*/
 	public int countByact_user(long actId, long userId)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the number of learning activity results where userId = &#63; and actId = &#63;.
+	*
+	* @param userId the user ID
+	* @param actId the act ID
+	* @return the number of matching learning activity results
+	* @throws SystemException if a system exception occurred
+	*/
+	public int countByUserIdActId(long userId, long actId)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	/**
