@@ -92,38 +92,38 @@ public class ModuleDataHandlerImpl extends BasePortletDataHandler {
 	public static String DOCUMENTLIBRARY_MAINFOLDER = "ResourceUploads";
 	
 	public PortletDataHandlerControl[] getExportControls() {
-return new PortletDataHandlerControl[] {
-		_entries, _categories, _comments, _ratings, _tags
-	};
-}
-
-@Override
-public PortletDataHandlerControl[] getImportControls() {
-return new PortletDataHandlerControl[] {
-		_entries, _categories, _comments, _ratings, _tags
-	};
-}
-private static final String _NAMESPACE = "module";
-
-private static PortletDataHandlerBoolean _categories =
-	new PortletDataHandlerBoolean(_NAMESPACE, "categories");
-
-private static PortletDataHandlerBoolean _comments =
-	new PortletDataHandlerBoolean(_NAMESPACE, "comments");
-
-private static PortletDataHandlerBoolean _entries =
-	new PortletDataHandlerBoolean(_NAMESPACE, "entries", true, true);
-
-private static PortletDataHandlerBoolean _ratings =
-	new PortletDataHandlerBoolean(_NAMESPACE, "ratings");
-
-private static PortletDataHandlerBoolean _tags =
-	new PortletDataHandlerBoolean(_NAMESPACE, "tags");
-
-@SuppressWarnings("unchecked")
-@Override
-protected PortletPreferences doDeleteData(PortletDataContext context,
-		String portletId, PortletPreferences preferences) throws Exception {
+		return new PortletDataHandlerControl[] {
+				_entries, _categories, _comments, _ratings, _tags
+		};
+	}
+	
+	@Override
+	public PortletDataHandlerControl[] getImportControls() {
+	return new PortletDataHandlerControl[] {
+			_entries, _categories, _comments, _ratings, _tags
+		};
+	}
+	private static final String _NAMESPACE = "module";
+	
+	private static PortletDataHandlerBoolean _categories =
+		new PortletDataHandlerBoolean(_NAMESPACE, "categories");
+	
+	private static PortletDataHandlerBoolean _comments =
+		new PortletDataHandlerBoolean(_NAMESPACE, "comments");
+	
+	private static PortletDataHandlerBoolean _entries =
+		new PortletDataHandlerBoolean(_NAMESPACE, "entries", true, true);
+	
+	private static PortletDataHandlerBoolean _ratings =
+		new PortletDataHandlerBoolean(_NAMESPACE, "ratings");
+	
+	private static PortletDataHandlerBoolean _tags =
+		new PortletDataHandlerBoolean(_NAMESPACE, "tags");
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	protected PortletPreferences doDeleteData(PortletDataContext context,
+	String portletId, PortletPreferences preferences) throws Exception {
 	
 	log.info("\n-----------------------------\ndoDeleteData STARTS");
 	
@@ -532,41 +532,41 @@ protected String getEntryPath(PortletDataContext context, Module entry) {
 	sb.append(".xml");
 	return sb.toString();
 }
-
-@Override
-protected PortletPreferences doImportData(PortletDataContext context, String portletId, PortletPreferences preferences, String data) throws Exception {
 	
-	
-	context.importPermissions("com.liferay.lms.model.module", context.getSourceGroupId(),context.getScopeGroupId());
-	log.info("\n-----------------------------\ndoImport1Data STARTS12");
-	
-	
-	Document document = SAXReaderUtil.read(data);
-
-	Element rootElement = document.getRootElement();
-	String entryOld="";
-	for (Element entryElement : rootElement.elements("moduleentry")) {
-		String path = entryElement.attributeValue("path");
-		Group group = GroupLocalServiceUtil.getGroup(context.getScopeGroupId());
+	@Override
+	protected PortletPreferences doImportData(PortletDataContext context, String portletId, PortletPreferences preferences, String data) throws Exception {
 		
-		if (!context.isPathNotProcessed(path)) {
-			continue;
+		
+		context.importPermissions("com.liferay.lms.model.module", context.getSourceGroupId(),context.getScopeGroupId());
+		log.info("\n-----------------------------\ndoImport1Data STARTS12");
+		
+		
+		Document document = SAXReaderUtil.read(data);
+	
+		Element rootElement = document.getRootElement();
+		String entryOld="";
+		for (Element entryElement : rootElement.elements("moduleentry")) {
+			String path = entryElement.attributeValue("path");
+			Group group = GroupLocalServiceUtil.getGroup(context.getScopeGroupId());
+			
+			if (!context.isPathNotProcessed(path)) {
+				continue;
+			}
+			Module entry = (Module)context.getZipEntryAsObject(path);
+			
+			if(!entryOld.equalsIgnoreCase(String.valueOf(entry.getModuleId())))
+			{ 
+				entryOld=String.valueOf(entry.getModuleId());
+				importEntry(context,entryElement, entry);
+			} else{
+				log.info("repetidooooo el modulo "+entry.getModuleId());
+			}	
 		}
-		Module entry = (Module)context.getZipEntryAsObject(path);
 		
-		if(!entryOld.equalsIgnoreCase(String.valueOf(entry.getModuleId())))
-		{ 
-			entryOld=String.valueOf(entry.getModuleId());
-			importEntry(context,entryElement, entry);
-		} else{
-			log.info("repetidooooo el modulo "+entry.getModuleId());
-		}	
+		log.info("doImportData ENDS" + "\n-----------------------------\n"  );
+		
+		return null;
 	}
-	
-	log.info("doImportData ENDS" + "\n-----------------------------\n"  );
-	
-	return null;
-}
 
 private void importEntry(PortletDataContext context, Element entryElement, Module entry) throws SystemException, PortalException, DocumentException {
 	
@@ -965,10 +965,8 @@ private void importEntry(PortletDataContext context, Element entryElement, Modul
 		Iterator<Element> it = actElement.elementIterator("dlfileentry");
 		
 		while(it.hasNext()){
-			
-		Element theElement = it.next();
-		
-		if(theElement.element("dlfileentry") != null){
+			Element theElement = it.next();
+			log.info("element: " + theElement.toString());
 			
 			AssetEntry asset = null;
 			FileEntry newFile = null;
@@ -977,68 +975,69 @@ private void importEntry(PortletDataContext context, Element entryElement, Modul
 			
 			String messageException = "";
 			try {
-				//System.out.println("   dlfileentry path: "+actElement.element("dlfileentry").attributeValue("path"));
+				log.info("   dlfileentry path: "+theElement.attributeValue("path"));
 				
 				//Crear el folder
 				dlFolder = createDLFoldersForLearningActivity(userId, context.getScopeGroupId(), nuevaLarn.getActId(), nuevaLarn.getTitle(Locale.getDefault()), serviceContext);
-				//System.out.println("    DLFolder dlFolder: "+dlFolder.getFolderId()+", title: "+dlFolder.getName());
+				log.info("    DLFolder dlFolder: "+dlFolder.getFolderId()+", title: "+dlFolder.getName());
 				
 				//Recuperar el fichero del xml.
 				//InputStream is = context.getZipEntryAsInputStream(actElement.element("dlfileentry").attributeValue("file"));
 				//System.out.println("    InputStream file: "+is.toString());
-				byte [] byteArray = context.getZipEntryAsByteArray(theElement.element("dlfileentry").attributeValue("file"));
+				byte [] byteArray = context.getZipEntryAsByteArray(theElement.attributeValue("file"));
 					
 				//Obtener los datos del dlfileentry del .lar para poner sus campos igual. 
-				oldFile = (DLFileEntry) context.getZipEntryAsObject(theElement.element("dlfileentry").attributeValue("path"));
-				log.info("    DLFileEntry file: "+oldFile.getTitle()+",getFileEntryId "+oldFile.getFileEntryId()+",getFolderId "+oldFile.getFolderId()+",getGroupId "+oldFile.getGroupId());
-				
-				messageException = "\n      - oldFile title: "+oldFile.getTitle()+ ", extension: "+oldFile.getExtension()+ ", mimetype: "+oldFile.getMimeType()+ ", size: "+oldFile.getSize()+" - ";		
-
-				String ficheroStr = theElement.element("dlfileentry").attributeValue("file");	
-				String ficheroExtStr = "";
-				String extension[] = ficheroStr.split("\\.");
-				if(extension.length > 0){
-					ficheroExtStr = "."+extension[extension.length-1];
+				oldFile = (DLFileEntry) context.getZipEntryAsObject(theElement.attributeValue("path"));
+				if(oldFile != null){
+					log.info("    DLFileEntry file: "+oldFile.getTitle()+",getFileEntryId "+oldFile.getFileEntryId()+",getFolderId "+oldFile.getFolderId()+",getGroupId "+oldFile.getGroupId());
+					
+					messageException = "\n      - oldFile title: "+oldFile.getTitle()+ ", extension: "+oldFile.getExtension()+ ", mimetype: "+oldFile.getMimeType()+ ", size: "+oldFile.getSize()+" - ";		
+	
+					String ficheroStr = theElement.attributeValue("file");	
+					String ficheroExtStr = "";
+					String extension[] = ficheroStr.split("\\.");
+					if(extension.length > 0){
+						ficheroExtStr = "."+extension[extension.length-1];
+					}
+					
+					long repositoryId = DLFolderConstants.getDataRepositoryId(larn.getGroupId(), DLFolderConstants.DEFAULT_PARENT_FOLDER_ID);
+					newFile = DLAppLocalServiceUtil.addFileEntry(
+							serviceContext.getUserId(), repositoryId , dlFolder.getFolderId() , oldFile.getTitle()+ficheroExtStr, oldFile.getMimeType(), 
+							oldFile.getTitle(), StringPool.BLANK, StringPool.BLANK, byteArray , serviceContext ) ;
+	
+					messageException += "\n      - newFile title: "+newFile.getTitle()+ ", extension: "+newFile.getExtension()+ ", extension: "+newFile.getFolderId()+ ", size: "+newFile.getSize()+" - ";
+					
+					asset = AssetEntryLocalServiceUtil.getEntry(DLFileEntry.class.getName(), newFile.getPrimaryKey());
+					log.info("      DLFileEntry newFile: "+newFile.getTitle()+", newFile PrimaryKey: "+newFile.getPrimaryKey()+", EntryId: "+asset.getEntryId());
+					
+					
+					//Ponemos a la actividad el fichero que hemos recuperado.
+					log.info("    Extracontent : \n"+nuevaLarn.getExtracontent());
+					if(larn.getTypeId() == 2){
+						log.info("TIPO EXTERNO");
+						LearningActivityLocalServiceUtil.setExtraContentValue(nuevaLarn.getActId(), "document", String.valueOf(asset.getEntryId()));
+					}else if(larn.getTypeId() == 7){
+						LearningActivityLocalServiceUtil.setExtraContentValue(nuevaLarn.getActId(), "assetEntry", String.valueOf(asset.getEntryId()));
+					}
+					
+					Long newActId = nuevaLarn.getActId();
+					nuevaLarn = LearningActivityLocalServiceUtil.getLearningActivity(newActId);
 				}
-				
-				long repositoryId = DLFolderConstants.getDataRepositoryId(larn.getGroupId(), DLFolderConstants.DEFAULT_PARENT_FOLDER_ID);
-				newFile = DLAppLocalServiceUtil.addFileEntry(
-						serviceContext.getUserId(), repositoryId , dlFolder.getFolderId() , oldFile.getTitle()+ficheroExtStr, oldFile.getMimeType(), 
-						oldFile.getTitle(), StringPool.BLANK, StringPool.BLANK, byteArray , serviceContext ) ;
-
-				messageException += "\n      - newFile title: "+newFile.getTitle()+ ", extension: "+newFile.getExtension()+ ", extension: "+newFile.getFolderId()+ ", size: "+newFile.getSize()+" - ";
-				
-				asset = AssetEntryLocalServiceUtil.getEntry(DLFileEntry.class.getName(), newFile.getPrimaryKey());
-				log.info("      DLFileEntry newFile: "+newFile.getTitle()+", newFile PrimaryKey: "+newFile.getPrimaryKey()+", EntryId: "+asset.getEntryId());
-				
-				
-				//Ponemos a la actividad el fichero que hemos recuperado.
-				log.info("    Extracontent : \n"+nuevaLarn.getExtracontent());
-				if(larn.getTypeId() == 2){
-					log.info("TIPO EXTERNO");
-					LearningActivityLocalServiceUtil.setExtraContentValue(nuevaLarn.getActId(), "document", String.valueOf(asset.getEntryId()));
-				}else if(larn.getTypeId() == 7){
-					LearningActivityLocalServiceUtil.setExtraContentValue(nuevaLarn.getActId(), "assetEntry", String.valueOf(asset.getEntryId()));
-				}
-				
-				Long newActId = nuevaLarn.getActId();
-				nuevaLarn = LearningActivityLocalServiceUtil.getLearningActivity(newActId);
 				
 			}catch(FileExtensionException fee){
 				fee.printStackTrace();
-				log.info("*ERROR! dlfileentry path FileExtensionException:" + actElement.element("dlfileentry").attributeValue("path")+", "+messageException +", message: "+fee.getMessage());
+				log.info("*ERROR! dlfileentry path FileExtensionException:" + theElement.attributeValue("path")+", "+messageException +", message: "+fee.getMessage());
 			}catch(FileSizeException fse){
-				log.info("*ERROR! dlfileentry path FileSizeException:" + actElement.element("dlfileentry").attributeValue("path")+messageException +", message: "+ fse.getMessage());
+				log.info("*ERROR! dlfileentry path FileSizeException:" + theElement.attributeValue("path")+messageException +", message: "+ fse.getMessage());
 			} catch(DuplicateFileException dfl){
 				newFile = DLAppLocalServiceUtil.getFileEntry(context.getScopeGroupId(), dlFolder.getFolderId(), oldFile.getTitle());
-				log.info("*ERROR! dlfileentry path DuplicateFileException:" + actElement.element("dlfileentry").attributeValue("path")+messageException +", message: "+ dfl.getMessage());
+				log.info("*ERROR! dlfileentry path DuplicateFileException:" + theElement.attributeValue("path")+messageException +", message: "+ dfl.getMessage());
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-				log.info("*ERROR! dlfileentry path: " + actElement.element("dlfileentry").attributeValue("path")+messageException +", message: "+e.getMessage());
+				log.info("*ERROR! dlfileentry path: " + theElement.attributeValue("path")+messageException +", message: "+e.getMessage());
 			}
 
-		}
 	}
 		
 		//Si tenemos ficheros en las descripciones de las actividades
