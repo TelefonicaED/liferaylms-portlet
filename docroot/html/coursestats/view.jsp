@@ -3,7 +3,7 @@
 
 	<liferay-portlet:resourceURL var="exportURL" >
 		<portlet:param name="action" value="export"/>
-		<portlet:param name="courseId" value="${courseId}"/>
+		<portlet:param name="courseId" value="${course.courseId}"/>
 	</liferay-portlet:resourceURL>
 
 	<liferay-portlet:renderURL var="reloadTeamURL"/>
