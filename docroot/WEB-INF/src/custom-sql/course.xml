@@ -275,7 +275,7 @@
 			LEFT JOIN 
 				users_usergroups uug 
 					ON uug.userGroupId 
-						AND g.classPK AND g.classNameId = [$CLASSNAMEIDUSERGROUP$]
+						= g.classPK AND g.classNameId = [$CLASSNAMEIDUSERGROUP$]
 						AND uug.userId = [$USERID$]
 			LEFT JOIN 
 				users_orgs uo 
