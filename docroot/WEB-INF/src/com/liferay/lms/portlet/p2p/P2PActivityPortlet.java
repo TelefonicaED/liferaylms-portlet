@@ -231,8 +231,8 @@ public class P2PActivityPortlet extends MVCPortlet {
 					learningTry.setResult(0);
 					LearningActivityTryLocalServiceUtil.updateLearningActivityTry(learningTry);
 					boolean deregisterMail = false;
-					if(user.getExpandoBridge().getAttribute(LiferaylmsUtil.DEREGISTER_USER_EXPANDO)!=null){
-						deregisterMail = (Boolean)user.getExpandoBridge().getAttribute(LiferaylmsUtil.DEREGISTER_USER_EXPANDO);
+					if(user.getExpandoBridge().getAttribute(LiferaylmsUtil.DEREGISTER_USER_EXPANDO,false)!=null){
+						deregisterMail = (Boolean)user.getExpandoBridge().getAttribute(LiferaylmsUtil.DEREGISTER_USER_EXPANDO,false);
 					}
 					
 					if(!deregisterMail){
@@ -508,8 +508,8 @@ public class P2PActivityPortlet extends MVCPortlet {
 					P2pActivity p2pActivity = P2pActivityLocalServiceUtil.getP2pActivity(p2pActivityId);
 					User userPropietaryP2pAct = UserLocalServiceUtil.getUser(p2pActivity.getUserId());
 					boolean deregisterMail = false;
-					if(user.getExpandoBridge().getAttribute(LiferaylmsUtil.DEREGISTER_USER_EXPANDO)!=null){
-						deregisterMail = (Boolean)userPropietaryP2pAct.getExpandoBridge().getAttribute(LiferaylmsUtil.DEREGISTER_USER_EXPANDO);
+					if(user.getExpandoBridge().getAttribute(LiferaylmsUtil.DEREGISTER_USER_EXPANDO,false)!=null){
+						deregisterMail = (Boolean)userPropietaryP2pAct.getExpandoBridge().getAttribute(LiferaylmsUtil.DEREGISTER_USER_EXPANDO,false);
 					}
 					
 					if(!deregisterMail){

@@ -383,8 +383,8 @@ public void asignCorrectionsToP2PActivities(long actId, long p2pActivityId,int n
 					
 					String[] params={activityTitle, moduleTitle, courseTitle, courseFriendlyUrl};
 					boolean deregisterMail = false;
-					if(user.getExpandoBridge().getAttribute(LiferaylmsUtil.DEREGISTER_USER_EXPANDO)!=null){
-						deregisterMail = (Boolean)user.getExpandoBridge().getAttribute(LiferaylmsUtil.DEREGISTER_USER_EXPANDO);
+					if(user.getExpandoBridge().getAttribute(LiferaylmsUtil.DEREGISTER_USER_EXPANDO,false)!=null){
+						deregisterMail = (Boolean)user.getExpandoBridge().getAttribute(LiferaylmsUtil.DEREGISTER_USER_EXPANDO,false);
 					}
 					
 					if(!deregisterMail){

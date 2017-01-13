@@ -87,8 +87,8 @@ public class P2pCheckActivity implements MessageListener
 								if(!LearningActivityLocalServiceUtil.islocked(lAct.getActId(), userId)){
 									cont++;
 									deregisterMail = false;
-									if(user.getExpandoBridge().getAttribute(LiferaylmsUtil.DEREGISTER_USER_EXPANDO)!=null){
-										deregisterMail = (Boolean)user.getExpandoBridge().getAttribute(LiferaylmsUtil.DEREGISTER_USER_EXPANDO);
+									if(user.getExpandoBridge().getAttribute(LiferaylmsUtil.DEREGISTER_USER_EXPANDO,false)!=null){
+										deregisterMail = (Boolean)user.getExpandoBridge().getAttribute(LiferaylmsUtil.DEREGISTER_USER_EXPANDO,false);
 									}
 									
 									if(!deregisterMail){
