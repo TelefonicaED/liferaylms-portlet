@@ -439,6 +439,11 @@ public interface CourseLocalService extends BaseLocalService,
 		java.lang.String lastName, java.lang.String emailAddress,
 		boolean andOperator);
 
+	public int countStudentsStatus(long courseId, long companyId,
+		java.lang.String screenName, java.lang.String firstName,
+		java.lang.String lastName, java.lang.String emailAddress, int status,
+		boolean andOperator);
+
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.util.List<com.liferay.lms.model.Course> getCoursesCatalogByTitleCategoriesTags(
 		java.lang.String freeText, long[] categories, long[] tags,

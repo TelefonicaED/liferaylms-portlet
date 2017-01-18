@@ -546,6 +546,15 @@ public class CourseLocalServiceUtil {
 			lastName, emailAddress, andOperator);
 	}
 
+	public static int countStudentsStatus(long courseId, long companyId,
+		java.lang.String screenName, java.lang.String firstName,
+		java.lang.String lastName, java.lang.String emailAddress, int status,
+		boolean andOperator) {
+		return getService()
+				   .countStudentsStatus(courseId, companyId, screenName,
+			firstName, lastName, emailAddress, status, andOperator);
+	}
+
 	public static java.util.List<com.liferay.lms.model.Course> getCoursesCatalogByTitleCategoriesTags(
 		java.lang.String freeText, long[] categories, long[] tags,
 		long companyId, long groupId, long userId, java.lang.String language,

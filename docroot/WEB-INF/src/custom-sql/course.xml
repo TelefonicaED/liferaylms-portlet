@@ -432,7 +432,7 @@
 				usergrouprole urE 
 					ON ug.userId = urE.userId AND urE.groupId = ug.groupId AND urE.roleId = ?
 			WHERE 
-				ur.userId IS NULL AND urE.userId IS NULL AND co.courseId = ? AND u.status = ?
+				ur.userId IS NULL AND urE.userId IS NULL AND co.courseId = ? AND (u.status = ? OR ? = ?)
 				AND 
 				(
 					[$WHEREFIRSTNAME$]

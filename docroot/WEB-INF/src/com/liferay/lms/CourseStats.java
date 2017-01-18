@@ -46,6 +46,7 @@ import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.model.Team;
 import com.liferay.portal.model.User;
 import com.liferay.portal.service.TeamLocalServiceUtil;
@@ -252,7 +253,7 @@ public class CourseStats extends MVCPortlet {
 			courseStats.setPassed(CourseResultLocalServiceUtil.countStudentsByCourseIdUserIdsPassed(course.getCourseId(), userIds));
 			courseStats.setFailed(CourseResultLocalServiceUtil.countStudentsByCourseIdUserIdsFailed(course.getCourseId(), userIds));		
 		}else{
-			courseStats.setRegistered(CourseLocalServiceUtil.countStudents(course.getCourseId(), course.getCompanyId(), null, null, null, null, false));
+			courseStats.setRegistered(CourseLocalServiceUtil.countStudentsStatus(course.getCourseId(), course.getCompanyId(), null, null, null, null, WorkflowConstants.STATUS_ANY, false));
 			courseStats.setStarted(CourseResultLocalServiceUtil.countStudentsByCourseIdUserExcludedIdsStarted(course.getCourseId(), userExcludedIds));
 			courseStats.setFinished(CourseResultLocalServiceUtil.countStudentsByCourseIdUserExcludedIdsFinished(course.getCourseId(), userExcludedIds));
 			courseStats.setPassed(CourseResultLocalServiceUtil.countStudentsByCourseIdUserExcludedIdsPassed(course.getCourseId(), userExcludedIds));

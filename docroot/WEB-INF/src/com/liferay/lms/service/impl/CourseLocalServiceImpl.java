@@ -1008,7 +1008,11 @@ public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int e
 	}
 	
 	public int countStudents(long courseId, long companyId, String screenName, String firstName, String lastName, String emailAddress,boolean andOperator){
-		return CourseFinderUtil.countStudents(courseId, companyId, screenName,firstName, lastName, emailAddress,andOperator);
+		return CourseFinderUtil.countStudents(courseId, companyId, screenName,firstName, lastName, emailAddress, WorkflowConstants.STATUS_APPROVED, andOperator);
+	}
+	
+	public int countStudentsStatus(long courseId, long companyId, String screenName, String firstName, String lastName, String emailAddress, int status, boolean andOperator){
+		return CourseFinderUtil.countStudents(courseId, companyId, screenName,firstName, lastName, emailAddress, status, andOperator);
 	}
 	
 	public List<Course> getCoursesCatalogByTitleCategoriesTags(String freeText, long[] categories, long[] tags, long companyId, long groupId, long userId, String language, int start, int end){

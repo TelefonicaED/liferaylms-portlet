@@ -531,7 +531,7 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 	    return new ArrayList<User>();
 	}
 	
-	public int countStudents(long courseId, long companyId, String screenName, String firstName, String lastName, String emailAddress,boolean andOperator){
+	public int countStudents(long courseId, long companyId, String screenName, String firstName, String lastName, String emailAddress, int status,boolean andOperator){
 		Session session = null;
 		boolean whereClause = false;
 		try{
@@ -601,7 +601,9 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			qPos.add(teacherRoleId);
 			qPos.add(editorRoleId);
 			qPos.add(courseId);
-			qPos.add(WorkflowConstants.STATUS_APPROVED);
+			qPos.add(status);
+			qPos.add(status);
+			qPos.add(WorkflowConstants.STATUS_ANY);
 			
 			if(Validator.isNotNull(screenName)){
 				qPos.add(screenName);
