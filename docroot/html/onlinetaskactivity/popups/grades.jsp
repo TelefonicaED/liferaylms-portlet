@@ -77,6 +77,7 @@ if(lATry!=null){
 if(renderRequest.getParameter("studentId")!=null){
 	
 	SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+	dateFormat.setTimeZone(timeZone);
 	String dateFormated = (result.getEndDate()!=null)? " ( "+dateFormat.format(result.getEndDate())+" )":"";
 %>
  <aui:a href="" label="<%= UserLocalServiceUtil.getUserById(ParamUtil.getLong(renderRequest, \"studentId\")).getFullName() + dateFormated   %>"></aui:a>
@@ -84,6 +85,7 @@ if(renderRequest.getParameter("studentId")!=null){
 }else{
 	if (lATry != null){
 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+		dateFormat.setTimeZone(timeZone);
 		String dateFormated = (lATry.getStartDate()!=null)? " ( "+dateFormat.format(lATry.getStartDate())+" )":"";
 %>
 	<p class="label"><liferay-ui:message key="onlinetaskactivity.export.date"/>: <%=dateFormated %> </p>
