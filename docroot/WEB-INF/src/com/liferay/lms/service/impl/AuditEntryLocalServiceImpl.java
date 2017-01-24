@@ -58,7 +58,7 @@ public class AuditEntryLocalServiceImpl extends AuditEntryLocalServiceBaseImpl {
 		auditEntry.setExtradata(extraData);
 		auditEntry.setClassPK(classPK);
 		auditEntry.setAssociationClassPK(associationClassPK);
-		auditEntryPersistence.update(auditEntry, true);
+		auditEntryPersistence.update(auditEntry, false);
 		
 	}
 
