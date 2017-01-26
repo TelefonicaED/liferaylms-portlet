@@ -43,7 +43,7 @@
 
 <%@ include file="/init.jsp" %>
 <script src="/liferaylms-portlet/js/service.js" type="text/javascript"></script>
-<div class="container-activity">
+<%@ include file="/html/shared/isTablet.jsp" %>
 <%
 long actId=ParamUtil.getLong(request,"actId",0);
 boolean isDefaultScore = true;

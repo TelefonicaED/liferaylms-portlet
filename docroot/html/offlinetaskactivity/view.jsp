@@ -29,7 +29,7 @@
 <%@page import="com.liferay.portal.kernel.workflow.WorkflowConstants"%>
 <%@page import="com.liferay.portal.service.RoleLocalServiceUtil"%>
 <%@ include file="/init.jsp" %>
-<div class="container-activity">
+<%@ include file="/html/shared/isTablet.jsp" %>
 <%
 	LmsPrefs prefs=LmsPrefsLocalServiceUtil.getLmsPrefs(themeDisplay.getCompanyId());
 	long actId = ParamUtil.getLong(request,"actId",0);

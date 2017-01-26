@@ -21,7 +21,7 @@
 <%@page import="com.liferay.portal.kernel.xml.SAXReaderUtil"%>
 
 <%@ include file="/init.jsp" %>
-<div class="container-activity">
+<%@ include file="/html/shared/isTablet.jsp" %>
 <%
 long actId = ParamUtil.getLong(request,"actId",0);
 String returnToFullPageURL = renderRequest.getParameter("returnToFullPageURL");

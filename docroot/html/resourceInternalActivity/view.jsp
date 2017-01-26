@@ -41,7 +41,7 @@
 <%@page import="com.liferay.lms.service.LearningActivityLocalServiceUtil"%>
 <%@ include file="/init.jsp" %>
 
-<div class="container-activity">
+<%@ include file="/html/shared/isTablet.jsp" %>
 
 <%
 long actId=ParamUtil.getLong(request,"actId",0);
