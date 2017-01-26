@@ -222,7 +222,7 @@ if(theTeam!=null)
 							var url = '/html/gradebook/popups/activity.jsp';
 							AUI().use('aui-dialog','liferay-portlet-url', function(A){
 								var renderUrl = Liferay.PortletURL.createRenderURL();							
-								renderUrl.setWindowState('<%= LiferayWindowState.POP_UP.toString() %>');
+								renderUrl.setWindowState('<%= LiferayWindowState.EXCLUSIVE.toString() %>');
 								renderUrl.setPortletId('<%=portletDisplay.getId()%>');
 								renderUrl.setParameter('actId', actId);
 								renderUrl.setParameter('studentId', studentId);
@@ -258,7 +258,7 @@ if(theTeam!=null)
 			
 							AUI().use('aui-dialog','liferay-portlet-url', function(A){
 								var renderUrl = Liferay.PortletURL.createRenderURL();							
-								renderUrl.setWindowState('<%= LiferayWindowState.POP_UP.toString() %>');
+								renderUrl.setWindowState('<%= LiferayWindowState.EXCLUSIVE.toString() %>');
 								renderUrl.setPortletId('<%=portletDisplay.getId()%>');
 								renderUrl.setParameter('actId', actId);
 								renderUrl.setParameter('studentId', studentId);
