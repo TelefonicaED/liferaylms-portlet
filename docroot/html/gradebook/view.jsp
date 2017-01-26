@@ -139,7 +139,7 @@ if(theTeam!=null)
 			<liferay-portlet:renderURL var="returnurl">
 			<liferay-portlet:param name="jspPage" value="/html/gradebook/view.jsp" />
 			</liferay-portlet:renderURL>
-			<liferay-ui:search-container  emptyResultsMessage="there-are-no-results" delta="10" deltaConfigurable="true">
+			<liferay-ui:search-container  emptyResultsMessage="there-are-no-results" delta="10" deltaConfigurable="true" iteratorURL="<%= portletURL %>">
 				<liferay-ui:search-container-results>
 					<%
 					List<User> onlyStudents = null;

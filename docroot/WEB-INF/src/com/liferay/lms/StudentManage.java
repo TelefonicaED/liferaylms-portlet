@@ -102,10 +102,10 @@ public class StudentManage extends MVCPortlet {
 			searchContainer.setTotal(CourseLocalServiceUtil.getStudentsFromCourseCount(course.getCourseId(), teamId, 
 					 searchTerms.getKeywords(), searchTerms.getKeywords(), 
 						searchTerms.getKeywords(), searchTerms.getKeywords(), searchTerms.isAndOperator()));
-		}	
+		}
 		
-	
 		searchContainer.getIteratorURL().setParameter("view", "");
+		searchContainer.getIteratorURL().setParameter("team", String.valueOf(teamId));
 		renderRequest.setAttribute("searchContainer", searchContainer);
 		
 		PortletURL searchURL = renderResponse.createRenderURL();
