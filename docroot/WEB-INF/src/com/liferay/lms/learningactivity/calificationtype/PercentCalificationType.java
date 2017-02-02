@@ -4,6 +4,10 @@ package com.liferay.lms.learningactivity.calificationtype;
 import java.text.DecimalFormat;
 import java.util.Locale;
 
+import com.liferay.lms.model.CourseResult;
+import com.liferay.lms.model.LearningActivityResult;
+import com.liferay.lms.model.ModuleResult;
+
 
 public class PercentCalificationType extends BaseCalificationType {
 	
@@ -43,4 +47,18 @@ public class PercentCalificationType extends BaseCalificationType {
 		return df.format(result);
 	}
 	
+	@Override
+	public String translate(Locale locale, CourseResult result) {
+		return translate(locale, result.getResult());
+	}
+
+	@Override
+	public String translate(Locale locale, ModuleResult result) {
+		return translate(locale, result.getResult());
+	}
+
+	@Override
+	public String translate(Locale locale, LearningActivityResult result) {
+		return translate(locale, result.getResult());
+	}
 }

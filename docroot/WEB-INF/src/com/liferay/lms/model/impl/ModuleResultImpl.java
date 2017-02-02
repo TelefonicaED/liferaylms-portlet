@@ -14,21 +14,64 @@
 
 package com.liferay.lms.model.impl;
 
-/**
- * The extended model implementation for the ModuleResult service. Represents a row in the &quot;Lms_ModuleResult&quot; database table, with each column mapped to a property of this class.
- *
- * <p>
- * Helper methods and all application logic should be put in this class. Whenever methods are added, rerun ServiceBuilder to copy their definitions into the {@link com.liferay.lms.model.ModuleResult} interface.
- * </p>
- *
- * @author TLS
- */
+import java.util.Locale;
+
+import com.liferay.lms.learningactivity.calificationtype.CalificationType;
+import com.liferay.lms.learningactivity.calificationtype.CalificationTypeRegistry;
+import com.liferay.lms.model.Course;
+import com.liferay.lms.model.Module;
+import com.liferay.lms.service.CourseLocalServiceUtil;
+import com.liferay.lms.service.ModuleLocalServiceUtil;
+
+
 public class ModuleResultImpl extends ModuleResultBaseImpl {
-	/*
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never reference this class directly. All methods that expect a module result model instance should use the {@link com.liferay.lms.model.ModuleResult} interface instead.
-	 */
+
 	public ModuleResultImpl() {
+	}
+	
+	public String translateResult(Locale locale){
+		String translatedResult = "";
+		try {
+			Module module = ModuleLocalServiceUtil.fetchModule(getModuleId());
+			Course course = CourseLocalServiceUtil.fetchByGroupCreatedId(module.getGroupId());
+			
+			CalificationType ct = new CalificationTypeRegistry().getCalificationType(course.getCalificationType());
+			translatedResult = ct.translate(locale,getResult());
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return translatedResult;
+	}
+	
+	public String translateResultWithSuffix(Locale locale){
+		String translatedResult = "";
+		try {
+			Module module = ModuleLocalServiceUtil.fetchModule(getModuleId());
+			Course course = CourseLocalServiceUtil.fetchByGroupCreatedId(module.getGroupId());
+			
+			CalificationType ct = new CalificationTypeRegistry().getCalificationType(course.getCalificationType());
+			translatedResult = ct.translate(locale,getResult())+ct.getSuffix();
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return translatedResult;
+	}
+	
+	public String translateResult(Locale locale,CalificationType ct){
+		String translatedResult = "";
+		if(ct != null){
+			translatedResult = ct.translate(locale,getResult());
+		}		
+		return translatedResult;
+	}
+	
+	public String translateResultWithSuffix(Locale locale,CalificationType ct){
+		String translatedResult = "";
+		if(ct != null){
+			translatedResult = ct.translate(locale,getResult())+ct.getSuffix();
+		}		
+		return translatedResult;
 	}
 }

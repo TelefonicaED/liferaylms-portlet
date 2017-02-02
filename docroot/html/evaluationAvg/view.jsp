@@ -1,4 +1,6 @@
 
+<%@page import="com.liferay.lms.learningactivity.calificationtype.CalificationTypeRegistry"%>
+<%@page import="com.liferay.lms.learningactivity.calificationtype.CalificationType"%>
 <%@page import="com.liferay.lms.service.LearningActivityResultLocalServiceUtil"%>
 <%@page import="com.liferay.portal.kernel.json.JSONFactoryUtil"%>
 <%@page import="com.liferay.portal.kernel.json.JSONObject"%>
@@ -37,6 +39,10 @@
 		
 		String passedStudentMessageKey=(needPassPuntuation)?"evaluationAvg.student.passed":"evaluationAvg.student.passed.noPass";
 		String failedStudentMessageKey=(needPassPuntuation)?"evaluationAvg.student.failed":"evaluationAvg.student.failed.noPass";
+		
+		CalificationType ct = new CalificationTypeRegistry().getCalificationType(course.getCalificationType());
+		String resultadoNecesario = ct.translate(locale, (needPassPuntuation)?courseEval.getPassPuntuation(course):0) + ct.getSuffix();
+		
 		
 		
 		CourseResult result = CourseResultLocalServiceUtil.getCourseResultByCourseAndUser(course.getCourseId(), themeDisplay.getUserId());
@@ -244,26 +250,26 @@
 						%>
 					</liferay-ui:search-container-results>
 					
-					<liferay-ui:search-container-row className="com.liferay.portal.model.User" keyProperty="userId" modelVar="user">
+					<liferay-ui:search-container-row className="com.liferay.portal.model.User" keyProperty="userId" modelVar="usuario">
 					<liferay-ui:search-container-column-text name="name">
-						<liferay-ui:user-display userId="<%=user.getUserId() %>"></liferay-ui:user-display>
+						<liferay-ui:user-display userId="<%=usuario.getUserId() %>"></liferay-ui:user-display>
 					</liferay-ui:search-container-column-text>
 					<liferay-ui:search-container-column-text name="calification">
-						<% CourseResult courseResult = CourseResultLocalServiceUtil.getCourseResultByCourseAndUser(course.getCourseId(), user.getUserId()); 
+						<% CourseResult courseResult = CourseResultLocalServiceUtil.getCourseResultByCourseAndUser(course.getCourseId(), usuario.getUserId()); 
 							if((Validator.isNotNull(courseResult))&&(Validator.isNotNull(courseResult.getPassedDate()))) {   	   
-								   if(courseResult.getPassed()){
+								   if(courseResult.getPassed()){									   
 									   %><liferay-ui:message key="<%=passedStudentMessageKey %>"  arguments="<%=
-											   new Object[]{courseResult.getResult(),passPuntuation} %>" /><%
+											   new Object[]{ct.translate(themeDisplay.getLocale(), courseResult.getResult())} %>" /><%
 								   }else {
 									   %><liferay-ui:message key="<%=failedStudentMessageKey %>"  arguments="<%=
-											   new Object[]{courseResult.getResult(),passPuntuation} %>" /><%
+											   new Object[]{ct.translate(themeDisplay.getLocale(), courseResult.getResult()),resultadoNecesario} %>" /><%
 								   }
 								   %>
 
 								   
-								   <div id="<portlet:namespace />recalculateContents_<%=Long.toString(user.getUserId()) %>" class="aui-helper-hidden">
+								   <div id="<portlet:namespace />recalculateContents_<%=Long.toString(usuario.getUserId()) %>" class="aui-helper-hidden">
 							        	<portlet:actionURL name="reCalculate" var="reCalculateURL">
-									   		<portlet:param name="userId" value="<%=Long.toString(user.getUserId()) %>"/>
+									   		<portlet:param name="userId" value="<%=Long.toString(usuario.getUserId()) %>"/>
 							        		<c:if test="<%=Validator.isNotNull(returnToFullPageURL) %>" >
 							        			<portlet:param name="returnToFullPageURL" value="<%=returnToFullPageURL %>"/>
 							        		</c:if>
@@ -276,16 +282,16 @@
 								        		onclick="<%= \"location.href='\"+reCalculateURL+\"';\" %>"
 								        	/>
 								        	<aui:button type="button" name="cancel" value="cancel"  
-								        		onclick="<%= \"AUI().use('aui-dialog', function(A) { A.DialogManager.closeByChild('#\"+renderResponse.getNamespace()+\"recalculatePopup_\"+user.getUserId()+\"'); }); \" %>"
+								        		onclick="<%= \"AUI().use('aui-dialog', function(A) { A.DialogManager.closeByChild('#\"+renderResponse.getNamespace()+\"recalculatePopup_\"+usuario.getUserId()+\"'); }); \" %>"
 								        	/>
 										</aui:button-row>
 							       </div>
 						            <p class="see-more">
 									<a onClick="AUI().use('aui-dialog', function(A) {
 											    	var dialog1 = new A.Dialog({
-											    		id: '<portlet:namespace />recalculatePopup_<%=Long.toString(user.getUserId()) %>',
+											    		id: '<portlet:namespace />recalculatePopup_<%=Long.toString(usuario.getUserId()) %>',
 											    		title: '<liferay-ui:message key="evaluationAvg.recalculate" />',
-											    		bodyContent: A.one('#<portlet:namespace />recalculateContents_<%=Long.toString(user.getUserId()) %>').getContent(),
+											    		bodyContent: A.one('#<portlet:namespace />recalculateContents_<%=Long.toString(usuario.getUserId()) %>').getContent(),
 											    		height: 250,
 											    		width: 400,
 											    		modal: true,
@@ -338,39 +344,38 @@
 				<div class="nota"> 
 
 <%
-	if(!isTeacher){ 
+if(!isTeacher){ 
 	if((Validator.isNotNull(result))&&(Validator.isNotNull(result.getPassedDate()))) { %>
-	<h2><liferay-ui:message key="evaluationAvg.result.title" /></h2>
-	<p><liferay-ui:message key="evaluationAvg.result.youresult" /> <span class="destacado"><%= (arguments.length>0) ? LearningActivityResultLocalServiceUtil.translateResult(locale, arguments[0], themeDisplay.getScopeGroupId()):"" %></span></p>
-	<%
-	String resultadoNecesario = LearningActivityResultLocalServiceUtil.translateResult(locale, passPuntuation, themeDisplay.getScopeGroupId());
-	if(result.isPassed()){
-	%>
-		<p class="nota_superado"><liferay-ui:message key="evaluationAvg.result.pass"/></p>
-	<%
-	}else{
-
-		if(needPassPuntuation) {
-	%>	
-		<p class="nota_nosuperado"><liferay-ui:message key="evaluationAvg.result.notpass.passPuntuation"  arguments="<%=new String[]{resultadoNecesario} %>" /></p>
-	<% 
-		}else {
-	%>
-		<p class="nota_nosuperado"><liferay-ui:message key="evaluationAvg.result.notpass.notPassPuntuation" /></p>	
-	<%
+		<h2><liferay-ui:message key="evaluationAvg.result.title" /></h2>
+		<p><liferay-ui:message key="evaluationAvg.result.youresult" /> <span class="destacado"><%= (arguments.length>0) ? LearningActivityResultLocalServiceUtil.translateResult(locale, arguments[0], themeDisplay.getScopeGroupId()):"" %></span></p>
+		<%
+		if(result.isPassed()){
+		%>
+			<p class="nota_superado"><liferay-ui:message key="evaluationAvg.result.pass"/></p>
+		<%
+		}else{
+	
+			if(needPassPuntuation) {
+		%>	
+			<p class="nota_nosuperado"><liferay-ui:message key="evaluationAvg.result.notpass.passPuntuation"  arguments="<%=new String[]{resultadoNecesario} %>" /></p>
+		<% 
+			}else {
+		%>
+			<p class="nota_nosuperado"><liferay-ui:message key="evaluationAvg.result.notpass.notPassPuntuation" /></p>	
+		<%
+			}
 		}
-	}
-	if (!result.getComments().trim().equals("")){ %>
-	<p>
-		<liferay-ui:message key="evaluationAvg.result.teachercoment" /> 
-		<div class="activity-comments"><%=result.getComments() %></div>
-	</p>
-	<% } 
-}else {
-%>
-	<div class="nota_nocorregida"><liferay-ui:message key="evaluationAvg.not.qualificated.activity" /></div>
-<% 
-}	
+		if (!result.getComments().trim().equals("")){ %>
+		<p>
+			<liferay-ui:message key="evaluationAvg.result.teachercoment" /> 
+			<div class="activity-comments"><%=result.getComments() %></div>
+		</p>
+		<% } 
+	}else {
+	%>
+		<div class="nota_nocorregida"><liferay-ui:message key="evaluationAvg.not.qualificated.activity" /></div>
+	<% 
+	}	
 }%>
 
 </div>

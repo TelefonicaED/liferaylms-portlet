@@ -251,6 +251,24 @@ public class CourseResultClp extends BaseModelImpl<CourseResult>
 		_extraData = extraData;
 	}
 
+	public java.lang.String translateResultWithSuffix(java.util.Locale locale) {
+		throw new UnsupportedOperationException();
+	}
+
+	public java.lang.String translateResult(java.util.Locale locale) {
+		throw new UnsupportedOperationException();
+	}
+
+	public java.lang.String translateResult(java.util.Locale locale,
+		com.liferay.lms.learningactivity.calificationtype.CalificationType ct) {
+		throw new UnsupportedOperationException();
+	}
+
+	public java.lang.String translateResultWithSuffix(java.util.Locale locale,
+		com.liferay.lms.learningactivity.calificationtype.CalificationType ct) {
+		throw new UnsupportedOperationException();
+	}
+
 	public BaseModel<?> getCourseResultRemoteModel() {
 		return _courseResultRemoteModel;
 	}

@@ -152,7 +152,7 @@ long userId = ParamUtil.getLong(renderRequest, "userId");
 CourseResult courseResult = CourseResultLocalServiceUtil.getByUserAndCourse(course.getCourseId(), userId);
 CourseEval courseEval = new CourseEvalRegistry().getCourseEval(course.getCourseEvalId());
 
-String resultHelpMessage=LanguageUtil.format(pageContext, "evaluationAvg.grades.resultMessage", new Object[]{courseResult.getResult()});
+String resultHelpMessage=LanguageUtil.format(pageContext, "evaluationAvg.grades.resultMessage", new Object[]{courseResult.translateResultWithSuffix(themeDisplay.getLocale())});
 
 %>
 
@@ -171,7 +171,7 @@ String resultHelpMessage=LanguageUtil.format(pageContext, "evaluationAvg.grades.
 		<% } else { %>
 		    <liferay-ui:message key="evaluationAvg.result.percent.noPass" />
 		<% } %>
-		1111111111111
+		
 		<aui:input type="textarea"  helpMessage="<%=LanguageUtil.get(pageContext, \"evaluationAvg.grades.commentsMessage\")%>"  maxLength="350" cols="70"  rows="3" name="comments" label="offlinetaskactivity.comments" value='<%=(courseResult.getComments()!=null)?courseResult.getComments():"" %>'>
 			<aui:validator name="range">[0, 350]</aui:validator>
 		</aui:input>

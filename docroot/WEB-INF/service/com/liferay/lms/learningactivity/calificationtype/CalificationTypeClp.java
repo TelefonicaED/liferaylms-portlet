@@ -2,6 +2,9 @@ package com.liferay.lms.learningactivity.calificationtype;
 
 import java.util.Locale;
 
+import com.liferay.lms.model.CourseResult;
+import com.liferay.lms.model.LearningActivityResult;
+import com.liferay.lms.model.ModuleResult;
 import com.liferay.lms.service.ClpSerializer;
 import com.liferay.portal.kernel.util.ClassLoaderProxy;
 import com.liferay.portal.kernel.util.MethodHandler;
@@ -133,6 +136,74 @@ public class CalificationTypeClp implements CalificationType {
 	}
 	
 	public String translate(Locale locale, double result){
+		Object returnObj = null;
+
+		try {
+			MethodKey translateMethod = new MethodKey(clp.getClassName(), "translate", Locale.class, double.class); 
+			returnObj = clp.invoke(new MethodHandler(translateMethod, locale, result));
+		}
+		catch (Throwable t) {
+			t = ClpSerializer.translateThrowable(t);
+
+			if (t instanceof RuntimeException) {
+				throw (RuntimeException)t;
+			}
+			else {
+				throw new RuntimeException(t.getClass().getName() +
+					" is not a valid exception");
+			}
+		}
+
+		return ((String)returnObj);
+	}
+
+
+	public String translate(Locale locale, CourseResult result) {
+		Object returnObj = null;
+
+		try {
+			MethodKey translateMethod = new MethodKey(clp.getClassName(), "translate", Locale.class, double.class); 
+			returnObj = clp.invoke(new MethodHandler(translateMethod, locale, result));
+		}
+		catch (Throwable t) {
+			t = ClpSerializer.translateThrowable(t);
+
+			if (t instanceof RuntimeException) {
+				throw (RuntimeException)t;
+			}
+			else {
+				throw new RuntimeException(t.getClass().getName() +
+					" is not a valid exception");
+			}
+		}
+
+		return ((String)returnObj);
+	}
+
+
+	public String translate(Locale locale, LearningActivityResult result) {
+		Object returnObj = null;
+
+		try {
+			MethodKey translateMethod = new MethodKey(clp.getClassName(), "translate", Locale.class, double.class); 
+			returnObj = clp.invoke(new MethodHandler(translateMethod, locale, result));
+		}
+		catch (Throwable t) {
+			t = ClpSerializer.translateThrowable(t);
+
+			if (t instanceof RuntimeException) {
+				throw (RuntimeException)t;
+			}
+			else {
+				throw new RuntimeException(t.getClass().getName() +
+					" is not a valid exception");
+			}
+		}
+
+		return ((String)returnObj);
+	}
+
+	public String translate(Locale locale, ModuleResult result) {
 		Object returnObj = null;
 
 		try {

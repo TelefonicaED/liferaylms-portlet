@@ -428,6 +428,24 @@ public class LearningActivityResultWrapper implements LearningActivityResult,
 		return _learningActivityResult.getResult(groupId);
 	}
 
+	public java.lang.String translateResult(java.util.Locale locale) {
+		return _learningActivityResult.translateResult(locale);
+	}
+
+	public java.lang.String translateResultWithSuffix(java.util.Locale locale) {
+		return _learningActivityResult.translateResultWithSuffix(locale);
+	}
+
+	public java.lang.String translateResult(java.util.Locale locale,
+		com.liferay.lms.learningactivity.calificationtype.CalificationType ct) {
+		return _learningActivityResult.translateResult(locale, ct);
+	}
+
+	public java.lang.String translateResultWithSuffix(java.util.Locale locale,
+		com.liferay.lms.learningactivity.calificationtype.CalificationType ct) {
+		return _learningActivityResult.translateResultWithSuffix(locale, ct);
+	}
+
 	/**
 	 * @deprecated Renamed to {@link #getWrappedModel}
 	 */

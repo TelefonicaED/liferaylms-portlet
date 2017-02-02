@@ -447,6 +447,24 @@ public class CourseResultWrapper implements CourseResult,
 		_courseResult.persist();
 	}
 
+	public java.lang.String translateResult(java.util.Locale locale) {
+		return _courseResult.translateResult(locale);
+	}
+
+	public java.lang.String translateResultWithSuffix(java.util.Locale locale) {
+		return _courseResult.translateResultWithSuffix(locale);
+	}
+
+	public java.lang.String translateResult(java.util.Locale locale,
+		com.liferay.lms.learningactivity.calificationtype.CalificationType ct) {
+		return _courseResult.translateResult(locale, ct);
+	}
+
+	public java.lang.String translateResultWithSuffix(java.util.Locale locale,
+		com.liferay.lms.learningactivity.calificationtype.CalificationType ct) {
+		return _courseResult.translateResultWithSuffix(locale, ct);
+	}
+
 	/**
 	 * @deprecated Renamed to {@link #getWrappedModel}
 	 */

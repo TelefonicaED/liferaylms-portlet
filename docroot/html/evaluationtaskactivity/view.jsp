@@ -265,13 +265,13 @@ if(actId==0){
 						%>
 						</liferay-ui:search-container-results>
 						
-						<liferay-ui:search-container-row className="com.liferay.portal.model.User" keyProperty="userId" modelVar="user">
+						<liferay-ui:search-container-row className="com.liferay.portal.model.User" keyProperty="userId" modelVar="usuario">
 							<liferay-ui:search-container-column-text name="name">
-								<liferay-ui:user-display userId="<%=user.getUserId() %>"></liferay-ui:user-display>
+								<liferay-ui:user-display userId="<%=usuario.getUserId() %>"></liferay-ui:user-display>
 								</liferay-ui:search-container-column-text>
 							<liferay-ui:search-container-column-text name="calification">
 							<% 
-								LearningActivityResult learningActivityResult = LearningActivityResultLocalServiceUtil.getByActIdAndUserId(actId, user.getUserId());
+								LearningActivityResult learningActivityResult = LearningActivityResultLocalServiceUtil.getByActIdAndUserId(actId, usuario.getUserId());
 								if(learningActivityResult!=null) {	   
 									%>
 									<div class="floatl">
@@ -286,24 +286,22 @@ if(actId==0){
 									<%
 									if(!hasPublishDate) {%>
 										<portlet:actionURL name="reCalculate" var="reCalculateURL">
-									   		<portlet:param name="userId" value="<%=Long.toString(user.getUserId()) %>"/>
+									   		<portlet:param name="userId" value="<%=Long.toString(usuario.getUserId()) %>"/>
 							        		<c:if test="<%=Validator.isNotNull(returnToFullPageURL) %>" >
 							        			<portlet:param name="returnToFullPageURL" value="<%=returnToFullPageURL %>"/>
 							        		</c:if>
 									   	</portlet:actionURL>
 									   	
-									   	<div id="<portlet:namespace />recalculateContents_<%=Long.toString(user.getUserId()) %>" class="aui-helper-hidden">
-								        	<portlet:actionURL name="reCalculate" var="reCalculateURL">
-										   		<portlet:param name="userId" value="<%=Long.toString(user.getUserId()) %>"/>
-										    </portlet:actionURL>
-										    <h1><%=user.getFullName() %></h1>
+									   	<div id="<portlet:namespace />recalculateContents_<%=Long.toString(usuario.getUserId()) %>" class="aui-helper-hidden">
+
+										    <h1><%=usuario.getFullName() %></h1>
 								        	<liferay-ui:message key="evaluationtaskactivity.recalculate.confirm" />
 									        <aui:button-row  cssClass="container-buttons">
 									      		  <aui:button type="button" name="acept" value="acept"  
 									        		onclick="<%= \"location.href='\"+reCalculateURL+\"';\" %>"
 									        	/>
 									        	<aui:button type="button" name="cancel" value="cancel"  
-									        		onclick="<%= \"AUI().use('aui-dialog', function(A) { A.DialogManager.closeByChild('#\"+renderResponse.getNamespace()+\"recalculatePopup_\"+user.getUserId()+\"'); }); \" %>"
+									        		onclick="<%= \"AUI().use('aui-dialog', function(A) { A.DialogManager.closeByChild('#\"+renderResponse.getNamespace()+\"recalculatePopup_\"+usuario.getUserId()+\"'); }); \" %>"
 									        	/>
 									        	
 											</aui:button-row>
@@ -313,9 +311,9 @@ if(actId==0){
 											<liferay-ui:icon-help message="evaluationtaskactivity.recalculate.help" />
 											<a onClick="AUI().use('aui-dialog', function(A) {
 											   	var dialog1 = new A.Dialog({
-											   		id: '<portlet:namespace />recalculatePopup_<%=Long.toString(user.getUserId()) %>',
+											   		id: '<portlet:namespace />recalculatePopup_<%=Long.toString(usuario.getUserId()) %>',
 													title: '<liferay-ui:message key="evaluationtaskactivity.recalculate" />',
-												    bodyContent: A.one('#<portlet:namespace />recalculateContents_<%=Long.toString(user.getUserId()) %>').getContent(),
+												    bodyContent: A.one('#<portlet:namespace />recalculateContents_<%=Long.toString(usuario.getUserId()) %>').getContent(),
 												    height: 250,
 												    width: 400,
 												    modal: true,
@@ -325,7 +323,7 @@ if(actId==0){
 												<liferay-ui:message key="evaluationtaskactivity.recalculate"/>
 											</a>
 									    	<portlet:renderURL var="popupGradesURL" windowState="<%= LiferayWindowState.EXCLUSIVE.toString() %>">
-										   		<portlet:param name="userId" value="<%=Long.toString(user.getUserId()) %>"/>
+										   		<portlet:param name="userId" value="<%=Long.toString(usuario.getUserId()) %>"/>
 										   		<portlet:param name="jspPage" value="/html/evaluationtaskactivity/popups/grades.jsp"/>
 										   	</portlet:renderURL>
 										   	</p>
