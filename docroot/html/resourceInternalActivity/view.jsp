@@ -90,6 +90,7 @@ else
 					<script type="text/javascript">
 					document.addEventListener( "DOMContentLoaded", function(){
 						Liferay.Portlet.refresh('#p_p_id_activityNavigator_WAR_liferaylmsportlet_');
+						Liferay.Portlet.refresh('#p_p_id_lmsactivitieslist_WAR_liferaylmsportlet_');
 					}, false );
 	
 					
