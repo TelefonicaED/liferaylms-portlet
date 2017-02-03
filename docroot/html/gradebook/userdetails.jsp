@@ -1,3 +1,6 @@
+<%@page import="com.liferay.lms.service.CourseLocalServiceUtil"%>
+<%@page import="com.liferay.lms.learningactivity.calificationtype.CalificationTypeRegistry"%>
+<%@page import="com.liferay.lms.learningactivity.calificationtype.CalificationType"%>
 <%@page import="java.util.LinkedList"%>
 <%@page import="com.liferay.lms.service.ModuleResultLocalServiceUtil"%>
 <%@page import="com.liferay.lms.model.ModuleResult"%>
@@ -21,6 +24,8 @@
 	String returnurl=ParamUtil.getString(request,"returnurl","");
 	User usuario=UserLocalServiceUtil.getUser(userId);
 	String title = LanguageUtil.get(pageContext,"results") +" "+ usuario.getFullName();
+	
+	CalificationType ct = new CalificationTypeRegistry().getCalificationType(CourseLocalServiceUtil.getCourseByGroupCreatedId(themeDisplay.getScopeGroupId()).getCalificationType());
 %>
 
 <liferay-ui:header title="<%= title %>" backURL="<%=returnurl %>"></liferay-ui:header>
@@ -51,17 +56,11 @@
 				String score= "-";
 				String status="not-started";	
 				String comments =" ";
-				String divisor ="";
 				
 				if(LearningActivityResultLocalServiceUtil.existsLearningActivityResult(learningActivity.getActId(), usuario.getUserId())){
 					status="started";
 					LearningActivityResult learningActivityResult=LearningActivityResultLocalServiceUtil.getByActIdAndUserId(learningActivity.getActId(), usuario.getUserId());
-					//score=(learningActivityResult!=null)?LearningActivityResultLocalServiceUtil.translateResult(themeDisplay.getLocale(), learningActivityResult.getResult(), learningActivity.getGroupId()):"";
-					score=(learningActivityResult!=null)?LearningActivityResultLocalServiceUtil.translateResult(themeDisplay.getLocale(), learningActivityResult.getResult(), learningActivity.getGroupId()):"";
-					//score=(learningActivityResult!=null)? learningActivityResult.getResult()+"" :"";
-					if(learningActivityResult!=null){
-						divisor = LearningActivityResultLocalServiceUtil.getCalificationTypeSuffix(themeDisplay.getLocale(), learningActivityResult.getResult(), learningActivity.getGroupId());
-					}
+					score=(learningActivityResult!=null)?ct.translateResult(themeDisplay.getLocale(), themeDisplay.getCompanyId(),learningActivityResult.getResult())+ct.getSuffix():"";
 					
 					comments=learningActivityResult.getComments();
 					if(learningActivityResult.getEndDate()!=null){
@@ -76,7 +75,7 @@
 				<%=learningActivity.getTitle(themeDisplay.getLocale()) %>
 			</liferay-ui:search-container-column-text>
 			<liferay-ui:search-container-column-text cssClass="number-column" name = "result" align="center">
-				<%=(score.trim().equalsIgnoreCase("-")) ? score:  score + divisor%>
+				<%=score%>
 			</liferay-ui:search-container-column-text>
 			<liferay-ui:search-container-column-text cssClass="number-column" name = "status" align="center">
 	

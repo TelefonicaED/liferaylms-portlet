@@ -19,6 +19,8 @@ import javax.portlet.ResourceResponse;
 
 import au.com.bytecode.opencsv.CSVWriter;
 
+import com.liferay.lms.learningactivity.calificationtype.CalificationType;
+import com.liferay.lms.learningactivity.calificationtype.CalificationTypeRegistry;
 import com.liferay.lms.model.Course;
 import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.model.Module;
@@ -117,7 +119,7 @@ public class CourseStats extends MVCPortlet {
 			searchContainerCourses.setResults(courseStatsViews);
 			searchContainerCourses.setTotal(courseStatsViews.size());
 			
-			//Se construye la vista de las estadisticas de los módulos
+			//Se construye la vista de las estadisticas de los mï¿½dulos
 			List<Module> modules = ModuleLocalServiceUtil.findAllInGroup(themeDisplay.getScopeGroupId(), searchContainerCourses.getStart(), searchContainerCourses.getEnd());
 			List<ModuleStatsView> moduleStatsViews = new ArrayList<ModuleStatsView>();
 			
@@ -168,15 +170,17 @@ public class CourseStats extends MVCPortlet {
 			SearchContainer<ActivityStatsView> searchContainerActivities = new SearchContainer<ActivityStatsView>(renderRequest, null, null, SearchContainer.DEFAULT_CUR_PARAM, 
 					SearchContainer.DEFAULT_DELTA, iteratorURL, 
 					null, "module-empty-results-message");
-			//Se construye la vista de las estadisticas de los módulos
+			//Se construye la vista de las estadisticas de los mï¿½dulos
 			List<LearningActivity> activities = LearningActivityLocalServiceUtil.getLearningActivitiesOfModule(moduleId,searchContainerActivities.getStart(), searchContainerActivities.getEnd() );
 			Long total = LearningActivityLocalServiceUtil.countLearningActivitiesOfModule(moduleId);
 			
 			List<ActivityStatsView> activityStatsViews = new ArrayList<ActivityStatsView>();
 			Schedule sch = ScheduleLocalServiceUtil.getScheduleByTeamId(teamId);
 			
+			CalificationType ct = new CalificationTypeRegistry().getCalificationType(CourseLocalServiceUtil.getCourseByGroupCreatedId(themeDisplay.getScopeGroupId()).getCalificationType());
+			
 			for(LearningActivity activity: activities){
-				activityStatsViews.add(getActivityStats(activity, themeDisplay.getLocale(), teamId, classTypes, sch, themeDisplay.getTimeZone()));
+				activityStatsViews.add(getActivityStats(activity, themeDisplay.getLocale(), teamId, classTypes, sch, themeDisplay.getTimeZone(),ct));
 			}
 			
 			searchContainerActivities.setResults(activityStatsViews);
@@ -240,7 +244,7 @@ public class CourseStats extends MVCPortlet {
 	}
 	
 	
-	private ActivityStatsView getActivityStats(LearningActivity activity, Locale locale, long teamId, Map<Long, String> classTypes, Schedule sch, TimeZone timeZone) throws SystemException{
+	private ActivityStatsView getActivityStats(LearningActivity activity, Locale locale, long teamId, Map<Long, String> classTypes, Schedule sch, TimeZone timeZone, CalificationType ct) throws SystemException{
 		ActivityStatsView activityStats = new ActivityStatsView(activity.getActId(), activity.getTitle(locale), timeZone);
 		
 		activityStats.setStarted(LearningActivityResultLocalServiceUtil.
@@ -253,10 +257,16 @@ public class CourseStats extends MVCPortlet {
 				countNotPassedOnlyStudents(activity.getActId(), activity.getCompanyId(), activity.getGroupId(), null, teamId));
 		activityStats.setTriesPerUser(LearningActivityResultLocalServiceUtil.
 				triesPerUserOnlyStudents(activity.getActId(), activity.getCompanyId(), activity.getGroupId(), null, teamId));
-		activityStats.setAvgResult(LearningActivityResultLocalServiceUtil.
-				avgResultOnlyStudents(activity.getActId(), activity.getCompanyId(), activity.getGroupId(), null, teamId));
 		
-		activityStats.setPassPuntuation(activity.getPasspuntuation());
+		String avgResult = ct.translate(locale, activity.getCompanyId(), LearningActivityResultLocalServiceUtil.
+				avgResultOnlyStudents(activity.getActId(), activity.getCompanyId(), activity.getGroupId(), null, teamId));		
+		activityStats.setAvgResult(avgResult);
+		activityStats.setAvgResultWithSuffix(avgResult+ct.getSuffix());
+		
+		String passPuntuation = ct.translate(locale, activity.getCompanyId(), activity.getPasspuntuation());		
+		activityStats.setPassPuntuation(passPuntuation);
+		activityStats.setPassPuntuationWithSuffix(passPuntuation+ct.getSuffix());
+		
 		activityStats.setTries(activity.getTries());
 		
 		boolean hasPrecedence = false;
@@ -429,8 +439,12 @@ public class CourseStats extends MVCPortlet {
 		    //Resultados de las actividades
 		    List<LearningActivity> activities = LearningActivityLocalServiceUtil.getLearningActivitiesOfModule(moduleId);
 		    ActivityStatsView activityView;
+		    
+			CalificationType ct = new CalificationTypeRegistry().getCalificationType(CourseLocalServiceUtil.getCourseByGroupCreatedId(module.getGroupId()).getCalificationType());
+			
+		    
 		    for(LearningActivity activity : activities){
-		    	activityView = getActivityStats(activity, themeDisplay.getLocale(), teamId, classTypes, sch, themeDisplay.getTimeZone());
+		    	activityView = getActivityStats(activity, themeDisplay.getLocale(), teamId, classTypes, sch, themeDisplay.getTimeZone(),ct);
 		    	resultados = new String[numCols];
 		 		
 		    	resultados[0]=activityView.getActTitle();
@@ -441,8 +455,8 @@ public class CourseStats extends MVCPortlet {
 		    	resultados[5]=Long.toString(activityView.getPassed());
 		    	resultados[6]=Long.toString(activityView.getFailed());
 		    	resultados[7]=activityView.getTriesPerUserString();
-		    	resultados[8]=activityView.getAvgResultString();
-		    	resultados[9]=Long.toString(activityView.getPassPuntuation());
+		    	resultados[8]=activityView.getAvgResult();
+		    	resultados[9]=activityView.getPassPuntuation();
 		    	resultados[10]=Long.toString(activityView.getTries());
 		    	resultados[11]=activityView.getPrecedence();
 		    	resultados[12]=activityView.getType();

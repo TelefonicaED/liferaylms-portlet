@@ -1,3 +1,5 @@
+<%@page import="com.liferay.lms.learningactivity.calificationtype.CalificationTypeRegistry"%>
+<%@page import="com.liferay.lms.learningactivity.calificationtype.CalificationType"%>
 <%@page import="com.liferay.portal.util.comparator.UserLastNameComparator"%>
 <%@page import="com.liferay.lms.service.LmsPrefsLocalServiceUtil"%>
 <%@page import="com.liferay.lms.model.LmsPrefs"%>
@@ -32,6 +34,7 @@
 <%@page import="com.liferay.portal.kernel.portlet.LiferayPortletResponse"%>
 <%@page import="java.util.Arrays"%>
 <%@ include file="/init.jsp" %>
+
 <liferay-ui:panel-container >
 <%
 long teamId=ParamUtil.getLong(request, "teamId",0);
@@ -122,7 +125,7 @@ if(theTeam!=null)
 <%
 }
 	java.util.List<Module> modules = ModuleLocalServiceUtil.findAllInGroup(themeDisplay.getScopeGroupId());
-	long calificationType =    CourseLocalServiceUtil.getCourseByGroupCreatedId(themeDisplay.getScopeGroupId()).getCalificationType();
+	CalificationType ct = new CalificationTypeRegistry().getCalificationType(CourseLocalServiceUtil.getCourseByGroupCreatedId(themeDisplay.getScopeGroupId()).getCalificationType());
 	if(modules != null){
 		int fila = 0;
 	for(Module theModule:modules){
@@ -184,9 +187,11 @@ if(theTeam!=null)
 						<liferay-portlet:param name="jspPage" value="/html/gradebook/userdetails.jsp"></liferay-portlet:param>
 						<liferay-portlet:param name="userId" value="<%=Long.toString(usuario.getUserId()) %>"></liferay-portlet:param>
 					</liferay-portlet:renderURL>
+					
 					<liferay-ui:search-container-column-text name="student-name">
 						<liferay-ui:user-display userId="<%=usuario.getUserId() %>" url = "<%=userDetailsURL%>"/>
 					</liferay-ui:search-container-column-text>
+					
 					<% 	List<LearningActivity> activities = LearningActivityServiceUtil.getLearningActivitiesOfModule(theModule.getModuleId());
 					activities = LiferaylmsUtil.getVisibleActivities(themeDisplay, activities, permissionChecker);
 					if(activities != null){
@@ -197,9 +202,8 @@ if(theTeam!=null)
 						if(LearningActivityResultLocalServiceUtil.existsLearningActivityResult(learningActivity.getActId(), usuario.getUserId())){
 							status="started";
 							LearningActivityResult learningActivityResult = LearningActivityResultLocalServiceUtil.getByActIdAndUserId(learningActivity.getActId(), usuario.getUserId());
-							//result = ""+LearningActivityResultLocalServiceUtil.translateResult(themeDisplay.getLocale(), learningActivityResult.getResult(), learningActivity.getGroupId());
-							result = ""+learningActivityResult.getResult(learningActivity.getGroupId());
-							divisor = LearningActivityResultLocalServiceUtil.getCalificationTypeSuffix(themeDisplay.getLocale(), learningActivityResult.getResult(), learningActivity.getGroupId());
+							
+							result = ct.translate(themeDisplay.getLocale(), themeDisplay.getCompanyId(), learningActivityResult.getResult())+ct.getSuffix();
 							
 							if(learningActivityResult.getEndDate()!=null){
 								status="not-passed"	;

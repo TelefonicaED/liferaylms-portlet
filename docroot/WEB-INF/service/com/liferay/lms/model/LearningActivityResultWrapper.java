@@ -437,13 +437,16 @@ public class LearningActivityResultWrapper implements LearningActivityResult,
 	}
 
 	public java.lang.String translateResult(java.util.Locale locale,
+		long companyId,
 		com.liferay.lms.learningactivity.calificationtype.CalificationType ct) {
-		return _learningActivityResult.translateResult(locale, ct);
+		return _learningActivityResult.translateResult(locale, companyId, ct);
 	}
 
 	public java.lang.String translateResultWithSuffix(java.util.Locale locale,
+		long companyId,
 		com.liferay.lms.learningactivity.calificationtype.CalificationType ct) {
-		return _learningActivityResult.translateResultWithSuffix(locale, ct);
+		return _learningActivityResult.translateResultWithSuffix(locale,
+			companyId, ct);
 	}
 
 	/**

@@ -19,8 +19,9 @@ import java.util.Locale;
 import com.liferay.lms.learningactivity.calificationtype.CalificationType;
 import com.liferay.lms.learningactivity.calificationtype.CalificationTypeRegistry;
 import com.liferay.lms.model.Course;
+import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.service.CourseLocalServiceUtil;
-import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.lms.service.LearningActivityLocalServiceUtil;
 import com.liferay.portal.model.User;
 import com.liferay.portal.service.UserLocalServiceUtil;
 
@@ -58,5 +59,53 @@ public class LearningActivityTryImpl extends LearningActivityTryBaseImpl {
 			e.printStackTrace();
 		}
 		return result;
+	}
+	
+	
+
+	public String translateResult(Locale locale){
+		String translatedResult = "";
+		try {
+			LearningActivity activity = LearningActivityLocalServiceUtil.fetchLearningActivity(getActId());
+			Course course = CourseLocalServiceUtil.fetchByGroupCreatedId(activity.getGroupId());
+			
+			CalificationType ct = new CalificationTypeRegistry().getCalificationType(course.getCalificationType());
+			translatedResult = ct.translate(locale,course.getCompanyId(),getResult());
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return translatedResult;
+	}
+	
+	public String translateResultWithSuffix(Locale locale){
+		String translatedResult = "";
+		try {
+			LearningActivity activity = LearningActivityLocalServiceUtil.fetchLearningActivity(getActId());
+			Course course = CourseLocalServiceUtil.fetchByGroupCreatedId(activity.getGroupId());
+			
+			CalificationType ct = new CalificationTypeRegistry().getCalificationType(course.getCalificationType());
+			translatedResult = ct.translate(locale,course.getCompanyId(),getResult())+ct.getSuffix();
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return translatedResult;
+	}
+	
+	public String translateResult(Locale locale,long companyId,CalificationType ct){
+		String translatedResult = "";
+		if(ct != null){
+			translatedResult = ct.translate(locale,getResult());
+		}		
+		return translatedResult;
+	}
+	
+	public String translateResultWithSuffix(Locale locale,long companyId,CalificationType ct){
+		String translatedResult = "";
+		if(ct != null){
+			translatedResult = ct.translate(locale,getResult())+ct.getSuffix();
+		}		
+		return translatedResult;
 	}
 }

@@ -60,4 +60,9 @@ public abstract class BaseCalificationType implements CalificationType, Serializ
 	public String translate(Locale locale, LearningActivityResult result) {
 		return translate(locale, result.getResult());
 	}
+	
+	@Override
+	public String translate(Locale locale, long companyId, double result) {
+		return translate(locale, result);
+	}
 }

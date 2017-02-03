@@ -17,4 +17,5 @@ public interface CalificationType
 	public String translate(Locale locale, CourseResult result);
 	public String translate(Locale locale, ModuleResult result);
 	public String translate(Locale locale, LearningActivityResult result);
+	public String translate(Locale locale,long companyId, double result);
 }

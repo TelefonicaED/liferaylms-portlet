@@ -18,8 +18,10 @@ public class ActivityStatsView {
 	private long failed;
 	private long passed;
 	private Double triesPerUser;
-	private Double avgResult;
-	private long passPuntuation;
+	private String avgResult;
+	private String passPuntuation;
+	private String avgResultWithSuffix;
+	private String passPuntuationWithSuffix;
 	private long tries;
 	private String dependency;
 	private String precedence;
@@ -119,19 +121,19 @@ public class ActivityStatsView {
 		this.triesPerUser = triesPerUser;
 	}
 
-	public String getAvgResultString() {
-		return numberFormat.format(avgResult);
-	}
-
-	public void setAvgResult(Double avgResult) {
+	public void setAvgResult(String avgResult) {
 		this.avgResult = avgResult;
 	}
 
-	public long getPassPuntuation() {
+	public String getAvgResult() {
+		return avgResult;
+	}
+	
+	public String getPassPuntuation() {
 		return passPuntuation;
 	}
 
-	public void setPassPuntuation(long passPuntuation) {
+	public void setPassPuntuation(String passPuntuation) {
 		this.passPuntuation = passPuntuation;
 	}
 
@@ -173,6 +175,22 @@ public class ActivityStatsView {
 
 	public void setMandatory(String mandatory) {
 		this.mandatory = mandatory;
+	}
+
+	public String getPassPuntuationWithSuffix() {
+		return passPuntuationWithSuffix;
+	}
+
+	public void setPassPuntuationWithSuffix(String passPuntuationWithSuffix) {
+		this.passPuntuationWithSuffix = passPuntuationWithSuffix;
+	}
+
+	public String getAvgResultWithSuffix() {
+		return avgResultWithSuffix;
+	}
+
+	public void setAvgResultWithSuffix(String avgResultWithSuffix) {
+		this.avgResultWithSuffix = avgResultWithSuffix;
 	}
 
 }

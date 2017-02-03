@@ -1,4 +1,7 @@
 
+<%@page import="com.liferay.lms.service.CourseLocalServiceUtil"%>
+<%@page import="com.liferay.lms.learningactivity.calificationtype.CalificationTypeRegistry"%>
+<%@page import="com.liferay.lms.learningactivity.calificationtype.CalificationType"%>
 <%@page import="com.liferay.lms.service.TestQuestionLocalServiceUtil"%>
 <%@page import="com.liferay.lms.service.impl.TestQuestionLocalServiceImpl"%>
 <%@page import="com.liferay.lms.learningactivity.questiontype.FreetextQuestionType"%>
@@ -43,7 +46,7 @@ if(learnResult.getPassed())
 <h1><%=title %></h1>
 <div id="actfeedback"><%=actFeedback %></div>
 <div id="score" style='<%=(learningActivity.getTypeId()!=0)? "display:none":""%>'>
-	<b><liferay-ui:message key="shared-you-guess" /> <%=learnResult.getResult()%>% <liferay-ui:message key="shared-in-tarea" /></b>
+	<b><liferay-ui:message key="shared-you-guess" /> <%=learnResult.translateResultWithSuffix(themeDisplay.getLocale())%> <liferay-ui:message key="shared-in-tarea" /></b>
 </div>
 <%--div class="negrita color_principal"><liferay-ui:message key="shared-guess-badget" /></div--%>
 <!-- <a class="button">Ver revisi&oacute;n</a>-->
@@ -85,12 +88,14 @@ else
 			
 	<div id="actfeedback"><%=actFeedback %></div>
 	<div id="score" style='<%=(learningActivity.getTypeId()!=0)? "display:none":""%>'>
-	<b><liferay-ui:message key="shared-you-guess" /> <%=learnTry.getResult()%>% <liferay-ui:message key="shared-in-tarea" /></b>
+	<b><liferay-ui:message key="shared-you-guess" /> <%=learnTry.translateResultWithSuffix(themeDisplay.getLocale())%> <liferay-ui:message key="shared-in-tarea" /></b>
 	
 	
 			<%
-			String arguments = String.valueOf(oldResults);
-			arguments+="%";
+			
+			CalificationType clasificationType = new CalificationTypeRegistry().getCalificationType(CourseLocalServiceUtil.fetchByGroupCreatedId(learningActivity.getGroupId()).getCalificationType());
+			
+			String arguments = clasificationType.translate(themeDisplay.getLocale(), themeDisplay.getCompanyId(), oldResults)+clasificationType.getSuffix();
 			if(!hasFreeQuestion && oldResults>0){
 					if(oldResults<learnTry.getResult()){
 		%>

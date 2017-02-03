@@ -1,3 +1,5 @@
+<%@page import="com.liferay.lms.learningactivity.calificationtype.CalificationTypeRegistry"%>
+<%@page import="com.liferay.lms.learningactivity.calificationtype.CalificationType"%>
 <%@page import="com.liferay.lms.service.impl.CourseResultLocalServiceImpl"%>
 <%@page import="com.liferay.portal.util.comparator.UserLastNameComparator"%>
 <%@page import="com.liferay.portal.util.comparator.UserFirstNameComparator"%>
@@ -38,11 +40,13 @@
 	boolean showActionSocial = GetterUtil.getBoolean(preferences.getValue("showActionSocial", StringPool.FALSE),true);
 	boolean showActionAudit = GetterUtil.getBoolean(preferences.getValue("showActionAudit", StringPool.FALSE),true);
 	
+	CalificationType ct = new CalificationTypeRegistry().getCalificationType(course.getCalificationType());
 %>
 
 <div class="student_search"> 
 	
 	<aui:form name="fm" action="${searchURL }" method="POST">
+	
 		<liferay-ui:search-container
 					searchContainer="${searchContainer}"
 					iteratorURL="${searchContainer.iteratorURL}" >
@@ -73,7 +77,7 @@
 				
 				if(courseResult!=null){
 					status="started";
-					result=CourseResultLocalServiceUtil.translateResult(themeDisplay.getLocale(), courseResult.getResult(), themeDisplay.getScopeGroupId());
+					result=ct.translate(themeDisplay.getLocale(), themeDisplay.getCompanyId(), courseResult.getResult())+ct.getSuffix();
 					if(courseResult.getPassedDate()!=null){
 						status="not-passed"	;
 					}
@@ -81,14 +85,15 @@
 						status="passed"	;
 					}
 				}
+				
 				%>
 				<%=result %>
 				<% if(status.equals("passed")){%>
-						<liferay-ui:icon image="checked" alt="passed"></liferay-ui:icon>
+						<liferay-ui:icon image="checked" message="passed"></liferay-ui:icon>
 				<%} else if(status.equals("not-passed")){%>
-						<liferay-ui:icon image="close" alt="not-passed"></liferay-ui:icon>
+						<liferay-ui:icon image="close" message="not-passed"></liferay-ui:icon>
 				<%} else if(status.equals("started")){%>
-						<liferay-ui:icon image="unchecked" alt="unchecked"></liferay-ui:icon>
+						<liferay-ui:icon image="unchecked" message="unchecked"></liferay-ui:icon>
 				<%}%>
 			</liferay-ui:search-container-column-text>
 			

@@ -1,3 +1,6 @@
+<%@page import="com.liferay.lms.service.CourseLocalServiceUtil"%>
+<%@page import="com.liferay.lms.learningactivity.calificationtype.CalificationTypeRegistry"%>
+<%@page import="com.liferay.lms.learningactivity.calificationtype.CalificationType"%>
 <%@page import="com.liferay.lms.service.ModuleLocalServiceUtil"%>
 <%@page import="com.liferay.lms.service.ModuleLocalService"%>
 <%@page import="com.liferay.lms.learningactivity.questiontype.QuestionTypeRegistry"%>
@@ -34,6 +37,8 @@ if(actId == 0){
 
 	LearningActivity learningActivity=LearningActivityLocalServiceUtil.getLearningActivity(actId);	
 	User owner = UserLocalServiceUtil.getUser(userId);
+	
+	
 	%>
 	<h2 class="description-title"><%=learningActivity.getTitle(themeDisplay.getLocale()) %></h2>
 	<h3 class="description-h3"><liferay-ui:message key="description" /></h3>
@@ -42,6 +47,8 @@ if(actId == 0){
 	<%
 	
 	List<LearningActivityTry> triesList = LearningActivityTryLocalServiceUtil.getLearningActivityTryByActUser(actId, userId);
+	
+	LearningActivityResult result = LearningActivityResultLocalServiceUtil.getByActIdAndUserId(actId, userId);
 	for(LearningActivityTry larntry:triesList){
 		java.text.SimpleDateFormat sdf=new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm");
 		sdf.setTimeZone(timeZone);
@@ -49,9 +56,7 @@ if(actId == 0){
 		if(larntry.getEndDate()!=null){
 			fecha = sdf.format(larntry.getEndDate());
 		}
-	/*	else{ //just in case of the learningActivity hasn't got end date
-			fecha = "-";
-		}*/
+
 		String title = learningActivity.getTitle(themeDisplay.getLocale())  + " (" + fecha + ")";
 		%>
 		<liferay-ui:panel id="<%=Long.toString(larntry.getLatId()) %>" title="<%=title %>" collapsible="true" extended="true" defaultState="collapsed">
@@ -60,13 +65,13 @@ if(actId == 0){
 		long tries = learningActivity.getTries();
 		long userTries = Long.valueOf(LearningActivityTryLocalServiceUtil.getTriesCountByActivityAndUser(learningActivity.getActId(), userId));
 		
-		LearningActivityResult result = LearningActivityResultLocalServiceUtil.getByActIdAndUserId(learningActivity.getActId(), userId);
+		
 		
 		boolean userPassed=false;
 		long oldResult=-1;
-		if(result != null)
-			userPassed = result.getPassed();
-		else{
+		if(result != null){
+			userPassed = larntry.getResult()>= learningActivity.getPasspuntuation(); //result.getPassed();
+		}else{
 			userPassed=learningActivity.getPasspuntuation()<=larntry.getResult();
 			oldResult=(Long)request.getAttribute("oldResult");
 		%>
@@ -77,23 +82,29 @@ if(actId == 0){
 		<liferay-util:include page="/html/execactivity/test/timeout.jsp" servletContext="<%=this.getServletContext() %>">
 			<liferay-util:param value="<%=Long.toString(learningActivity.getActId()) %>" name="actId"/>
 		</liferay-util:include> 
-		<p><liferay-ui:message key="your-result" arguments="<%=new Object[]{larntry.getResult()} %>" /></p>
+		<p><liferay-ui:message key="your-result" arguments="<%=new Object[]{larntry.translateResultWithSuffix(themeDisplay.getLocale())} %>" /></p>
 		
 		<% 	if(oldResult>0){
+				
+			CalificationType ct = new CalificationTypeRegistry().getCalificationType(CourseLocalServiceUtil.getCourseByGroupCreatedId(learningActivity.getGroupId()).getCalificationType());
+			
 				if(oldResult<larntry.getResult()){
 		%>
-					<p><liferay-ui:message key="execActivity.improve.result" arguments="<%=new Object[]{oldResult} %>" /></p>
+					<p><liferay-ui:message key="execActivity.improve.result" arguments="<%=new Object[]{ct.translate(themeDisplay.getLocale(), themeDisplay.getCompanyId(),oldResult)} %>" /></p>
 		<%		
 				}else {
 		%>
-					<p><liferay-ui:message key="execActivity.not.improve.result" arguments="<%=new Object[]{oldResult} %>" /></p>
+					<p><liferay-ui:message key="execActivity.not.improve.result" arguments="<%=new Object[]{ct.translate(themeDisplay.getLocale(), themeDisplay.getCompanyId(),oldResult)} %>" /></p>
 		<%		}
 			}%>
 		
 		<%if(userPassed){%>
 			<p class="color_tercero negrita"><liferay-ui:message key="your-result-pass" /></p>
-		<%}else{%>	
-			<p class="color_tercero negrita"><liferay-ui:message key="your-result-dont-pass"  arguments="<%=new Object[]{learningActivity.getPasspuntuation()} %>" /></p>
+		<%}else{
+		
+			CalificationType ct = new CalificationTypeRegistry().getCalificationType(CourseLocalServiceUtil.getCourseByGroupCreatedId(learningActivity.getGroupId()).getCalificationType());
+		%>	
+			<p class="color_tercero negrita"><liferay-ui:message key="your-result-dont-pass"  arguments="<%=new Object[]{ct.translate(themeDisplay.getLocale(), themeDisplay.getCompanyId(), learningActivity.getPasspuntuation())+ct.getSuffix()} %>" /></p>
 		<% }
 		if(tries>0 && userTries >= tries )	{
 		%><p class="color_tercero"><liferay-ui:message key="your-result-no-more-tries" /></p><%

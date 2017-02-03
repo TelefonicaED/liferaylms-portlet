@@ -33,7 +33,7 @@ public class CourseResultImpl extends CourseResultBaseImpl {
 			Course course = CourseLocalServiceUtil.fetchCourse(getCourseId());
 			
 			CalificationType ct = new CalificationTypeRegistry().getCalificationType(course.getCalificationType());
-			translatedResult = ct.translate(locale,getResult());
+			translatedResult = ct.translate(locale,course.getCompanyId(),getResult());
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -47,7 +47,7 @@ public class CourseResultImpl extends CourseResultBaseImpl {
 			Course course = CourseLocalServiceUtil.fetchCourse(getCourseId());
 			
 			CalificationType ct = new CalificationTypeRegistry().getCalificationType(course.getCalificationType());
-			translatedResult = ct.translate(locale,getResult())+ct.getSuffix();			
+			translatedResult = ct.translate(locale,course.getCompanyId(),getResult())+ct.getSuffix();			
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -55,18 +55,18 @@ public class CourseResultImpl extends CourseResultBaseImpl {
 		return translatedResult;
 	}
 	
-	public String translateResult(Locale locale,CalificationType ct){
+	public String translateResult(Locale locale,long companyId,CalificationType ct){
 		String translatedResult = "";
 		if(ct != null){
-			translatedResult = ct.translate(locale,getResult());
+			translatedResult = ct.translate(locale,companyId,getResult());
 		}		
 		return translatedResult;
 	}
 	
-	public String translateResultWithSuffix(Locale locale,CalificationType ct){
+	public String translateResultWithSuffix(Locale locale,long companyId,CalificationType ct){
 		String translatedResult = "";
 		if(ct != null){
-			translatedResult = ct.translate(locale,getResult())+ct.getSuffix();
+			translatedResult = ct.translate(locale,companyId,getResult())+ct.getSuffix();
 		}		
 		return translatedResult;
 	}

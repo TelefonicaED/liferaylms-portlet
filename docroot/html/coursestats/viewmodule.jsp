@@ -54,10 +54,10 @@
 				${activityStats.triesPerUserString}
 			</liferay-ui:search-container-column-text>
 			<liferay-ui:search-container-column-text cssClass="number-column" name="coursestats.modulestats.marks.average">
-				${activityStats.avgResultString}
+				${activityStats.avgResultWithSuffix}
 			</liferay-ui:search-container-column-text>
 			<liferay-ui:search-container-column-text cssClass="number-column" name="coursestats.modulestats.pass.mark">
-				${activityStats.passPuntuation}
+				${activityStats.passPuntuationWithSuffix}
 			</liferay-ui:search-container-column-text>	
 			<liferay-ui:search-container-column-text cssClass="number-column"  name="coursestats.modulestats.trials.numbers">
 				${activityStats.tries}

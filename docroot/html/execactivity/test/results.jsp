@@ -1,3 +1,5 @@
+<%@page import="com.liferay.lms.learningactivity.calificationtype.CalificationTypeRegistry"%>
+<%@page import="com.liferay.lms.learningactivity.calificationtype.CalificationType"%>
 <%@page import="com.tls.lms.util.LiferaylmsUtil"%>
 <%@page import="com.liferay.lms.service.CourseLocalServiceUtil"%>
 <%@page import="com.liferay.lms.model.Course"%>
@@ -52,6 +54,9 @@
 		
 		boolean isTeacher=permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), "com.liferay.lms.model",themeDisplay.getScopeGroupId(), "VIEW_RESULTS");
 		Course course = CourseLocalServiceUtil.fetchByGroupCreatedId(themeDisplay.getScopeGroupId());
+		
+		CalificationType ct = new CalificationTypeRegistry().getCalificationType(course.getCalificationType());
+		
 		boolean hasPermissionAccessCourseFinished = LiferaylmsUtil.hasPermissionAccessCourseFinished(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(), course.getCourseId(), themeDisplay.getUserId());
 
 	
@@ -135,11 +140,10 @@
 		if(hasFreeQuestion){%>
 			<!-- <p>Respuesta libre</p> -->
 			
-			<% }else{%>
-			<p><liferay-ui:message key="your-result" arguments="<%=new Object[]{scoreTry} %>" /></p>
+		<% }else{%>
+			<p><liferay-ui:message key="your-result" arguments="<%=new Object[]{ct.translate(themeDisplay.getLocale(), course.getCompanyId(), scoreTry)+ct.getSuffix()} %>" /></p>
 			
-			<% }
-		%>
+		<%}%>
 	
 <% 
 		if(!hasFreeQuestion && oldResult>0){
@@ -161,7 +165,7 @@
 		}else{
 			if(!hasFreeQuestion){
 				%>			
-				<p class="color_tercero negrita"><liferay-ui:message key="your-result-dont-pass"  arguments="<%=new Object[]{learningActivity.getPasspuntuation()} %>" /></p>
+				<p class="color_tercero negrita"><liferay-ui:message key="your-result-dont-pass"  arguments="<%=new Object[]{ct.translate(themeDisplay.getLocale(), themeDisplay.getCompanyId(), learningActivity.getPasspuntuation())+ct.getSuffix()} %>" /></p>
 	<% 
 			}
 		}

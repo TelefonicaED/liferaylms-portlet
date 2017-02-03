@@ -1,3 +1,5 @@
+<%@page import="com.liferay.lms.learningactivity.calificationtype.CalificationTypeRegistry"%>
+<%@page import="com.liferay.lms.learningactivity.calificationtype.CalificationType"%>
 <%@page import="com.tls.lms.util.LiferaylmsUtil"%>
 <%@page import="com.liferay.portal.kernel.util.ListUtil"%>
 <%@page import="org.apache.commons.beanutils.BeanComparator"%>
@@ -718,10 +720,11 @@ if(isTablet){%>
 				</aui:form>
 			<%	
 			}
-		}
-		//Si no ha pasado el test, ni tiene mas intentos.
+		}//Si no ha pasado el test, ni tiene mas intentos.
 		else{
 			boolean hasFreeQuestion = false;
+			
+			CalificationType ct = new CalificationTypeRegistry().getCalificationType(course.getCalificationType());
 			
 			List<TestQuestion> questionList = TestQuestionLocalServiceUtil.getQuestions(activity.getActId());
 			Iterator<TestQuestion> questionListIt = questionList.iterator();
@@ -735,22 +738,18 @@ if(isTablet){%>
 			}
 			
 			if(hasFreeQuestion){
-				Object  [] arguments =  new Object[]{result.getResult()};
-				Object  [] arg =  new Object[]{activity.getPasspuntuation()};
 				%>
 				<h2><%=activity.getTitle(themeDisplay.getLocale()) %></h2>
 				<p><liferay-ui:message key="test-done" /></p>
-				<p>Esperar la corrección del profesor</p>
+				<p><liferay-ui:message key="wait-teacher-correction" /></p>
 				<%
 			}else{
-				//LearningActivityResult result = LearningActivityResultLocalServiceUtil.getByActIdAndUserId(actId, userId);
-				Object  [] arguments =  new Object[]{result.getResult()};
-				Object  [] arg =  new Object[]{activity.getPasspuntuation()};
+
 				%>
 				<h2><%=activity.getTitle(themeDisplay.getLocale()) %></h2>
 				<p><liferay-ui:message key="test-done" /></p>
-				<p><liferay-ui:message key="your-result" arguments="<%=arguments %>" /></p>
-				<p class="color_tercero negrita"><liferay-ui:message key="your-result-dont-pass"  arguments="<%=arg %>" /></p>
+				<p><liferay-ui:message key="your-result" arguments="<%=new Object[]{ct.translate(themeDisplay.getLocale(), themeDisplay.getCompanyId(), result.getResult())+ct.getSuffix()} %>" /></p>
+				<p class="color_tercero negrita"><liferay-ui:message key="your-result-dont-pass"  arguments="<%=new Object[]{ct.translate(themeDisplay.getLocale(), themeDisplay.getCompanyId(), activity.getPasspuntuation())+ct.getSuffix()} %>" /></p>
 				<p><liferay-ui:message key="your-result-no-more-tries" /></p>
 				<%
 			}
