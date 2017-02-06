@@ -1,3 +1,5 @@
+<%@page import="com.liferay.lms.learningactivity.calificationtype.CalificationTypeRegistry"%>
+<%@page import="com.liferay.lms.learningactivity.calificationtype.CalificationType"%>
 <%@page import="com.liferay.portal.kernel.servlet.SessionMessages"%>
 <%@page import="com.liferay.util.JavaScriptUtil"%>
 <%@page import="com.liferay.portal.kernel.servlet.SessionErrors"%>
@@ -148,11 +150,12 @@ AUI().ready('node-base',function(A) {
 
 <%
 Course course=CourseLocalServiceUtil.fetchByGroupCreatedId(themeDisplay.getScopeGroupId());
+CalificationType ct = new CalificationTypeRegistry().getCalificationType(course.getCalificationType());	
 long userId = ParamUtil.getLong(renderRequest, "userId");
 CourseResult courseResult = CourseResultLocalServiceUtil.getByUserAndCourse(course.getCourseId(), userId);
 CourseEval courseEval = new CourseEvalRegistry().getCourseEval(course.getCourseEvalId());
 
-String resultHelpMessage=LanguageUtil.format(pageContext, "evaluationAvg.grades.resultMessage", new Object[]{courseResult.translateResultWithSuffix(themeDisplay.getLocale())});
+String resultHelpMessage=LanguageUtil.format(pageContext, "evaluationAvg.grades.resultMessage", new Object[]{courseResult.translateResult(themeDisplay.getLocale())});
 
 %>
 

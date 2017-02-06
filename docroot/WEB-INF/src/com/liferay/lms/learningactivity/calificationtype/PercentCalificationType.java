@@ -72,4 +72,19 @@ public class PercentCalificationType extends BaseCalificationType {
 		log.debug("** translate -- companyId:"+companyId);		
 		return translate(locale, result);
 	}
+	
+	@Override
+	public long toBase100(double result) {
+		return (long) result;
+	}
+
+	@Override
+	public long getMinValue() {
+		return 0;
+	}
+
+	@Override
+	public long getMaxValue() {
+		return 100;
+	}
 }

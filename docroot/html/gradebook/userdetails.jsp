@@ -60,7 +60,7 @@
 				if(LearningActivityResultLocalServiceUtil.existsLearningActivityResult(learningActivity.getActId(), usuario.getUserId())){
 					status="started";
 					LearningActivityResult learningActivityResult=LearningActivityResultLocalServiceUtil.getByActIdAndUserId(learningActivity.getActId(), usuario.getUserId());
-					score=(learningActivityResult!=null)?ct.translateResult(themeDisplay.getLocale(), themeDisplay.getCompanyId(),learningActivityResult.getResult())+ct.getSuffix():"";
+					score=(learningActivityResult!=null)?learningActivityResult.translateResult(themeDisplay.getLocale(), learningActivity.getCompanyId(), ct):"";
 					
 					comments=learningActivityResult.getComments();
 					if(learningActivityResult.getEndDate()!=null){

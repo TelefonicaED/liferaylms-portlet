@@ -35,6 +35,13 @@
 <%@page import="java.util.Arrays"%>
 <%@ include file="/init.jsp" %>
 
+<%
+CalificationType ct = new CalificationTypeRegistry().getCalificationType(CourseLocalServiceUtil.getCourseByGroupCreatedId(themeDisplay.getScopeGroupId()).getCalificationType());
+%>
+
+<liferay-ui:error key="grades.bad-updating" message="offlinetaskactivity.grades.bad-updating" />
+<liferay-ui:success key="grades.updating" message="offlinetaskactivity.correct.saved" />
+
 <liferay-ui:panel-container >
 <%
 long teamId=ParamUtil.getLong(request, "teamId",0);
@@ -124,8 +131,7 @@ if(theTeam!=null)
 
 <%
 }
-	java.util.List<Module> modules = ModuleLocalServiceUtil.findAllInGroup(themeDisplay.getScopeGroupId());
-	CalificationType ct = new CalificationTypeRegistry().getCalificationType(CourseLocalServiceUtil.getCourseByGroupCreatedId(themeDisplay.getScopeGroupId()).getCalificationType());
+	java.util.List<Module> modules = ModuleLocalServiceUtil.findAllInGroup(themeDisplay.getScopeGroupId());	
 	if(modules != null){
 		int fila = 0;
 	for(Module theModule:modules){
@@ -203,7 +209,7 @@ if(theTeam!=null)
 							status="started";
 							LearningActivityResult learningActivityResult = LearningActivityResultLocalServiceUtil.getByActIdAndUserId(learningActivity.getActId(), usuario.getUserId());
 							
-							result = ct.translate(themeDisplay.getLocale(), themeDisplay.getCompanyId(), learningActivityResult.getResult())+ct.getSuffix();
+							result = ct.translate(themeDisplay.getLocale(), themeDisplay.getCompanyId(), learningActivityResult.getResult());
 							
 							if(learningActivityResult.getEndDate()!=null){
 								status="not-passed"	;
@@ -220,6 +226,7 @@ if(theTeam!=null)
 							<portlet:param name="ajaxAction" value="setGrades" />      
 						   	<portlet:param name="jspPage" value="/html/gradebook/popups/grades.jsp" />           
 						</portlet:renderURL>
+						
 						<script type="text/javascript">
 						function <portlet:namespace />showPopupActivity(studentId, actId, actType) {
 							

@@ -82,7 +82,7 @@ if(actId == 0){
 		<liferay-util:include page="/html/execactivity/test/timeout.jsp" servletContext="<%=this.getServletContext() %>">
 			<liferay-util:param value="<%=Long.toString(learningActivity.getActId()) %>" name="actId"/>
 		</liferay-util:include> 
-		<p><liferay-ui:message key="your-result" arguments="<%=new Object[]{larntry.translateResultWithSuffix(themeDisplay.getLocale())} %>" /></p>
+		<p><liferay-ui:message key="your-result" arguments="<%=new Object[]{larntry.translateResult(themeDisplay.getLocale())} %>" /></p>
 		
 		<% 	if(oldResult>0){
 				
@@ -104,7 +104,7 @@ if(actId == 0){
 		
 			CalificationType ct = new CalificationTypeRegistry().getCalificationType(CourseLocalServiceUtil.getCourseByGroupCreatedId(learningActivity.getGroupId()).getCalificationType());
 		%>	
-			<p class="color_tercero negrita"><liferay-ui:message key="your-result-dont-pass"  arguments="<%=new Object[]{ct.translate(themeDisplay.getLocale(), themeDisplay.getCompanyId(), learningActivity.getPasspuntuation())+ct.getSuffix()} %>" /></p>
+			<p class="color_tercero negrita"><liferay-ui:message key="your-result-dont-pass"  arguments="<%=new Object[]{ct.translate(themeDisplay.getLocale(), themeDisplay.getCompanyId(), learningActivity.getPasspuntuation())} %>" /></p>
 		<% }
 		if(tries>0 && userTries >= tries )	{
 		%><p class="color_tercero"><liferay-ui:message key="your-result-no-more-tries" /></p><%

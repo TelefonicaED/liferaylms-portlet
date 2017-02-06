@@ -1,3 +1,6 @@
+<%@page import="com.liferay.lms.service.CourseLocalServiceUtil"%>
+<%@page import="com.liferay.lms.learningactivity.calificationtype.CalificationTypeRegistry"%>
+<%@page import="com.liferay.lms.learningactivity.calificationtype.CalificationType"%>
 <%@page import="com.liferay.lms.service.LearningActivityResultLocalServiceUtil"%>
 <%@page import="com.liferay.lms.model.LearningActivityResult"%>
 <%@ include file="/init.jsp" %>
@@ -14,25 +17,33 @@ if((actId2!=null)&&(studentId2!=null)){
 	result = LearningActivityResultLocalServiceUtil.getByActIdAndUserId(lactId2, lstudentId2);
 }
 
+CalificationType ct = new CalificationTypeRegistry().getCalificationType(CourseLocalServiceUtil.getCourseByGroupCreatedId(themeDisplay.getScopeGroupId()).getCalificationType());
 
 %>
 
-<aui:form  name="fn_grades" method="post" >
+<portlet:actionURL name="setGrades" var="updateGradesURL" windowState="<%= LiferayWindowState.NORMAL.toString() %>" />
+
+<aui:form  name="fn_grades" method="post" action="${updateGradesURL}" >
 	<aui:fieldset>
 		<aui:input type="hidden" name="studentId" value='<%=studentId2%>' />
 		<aui:input type="hidden" name="actId" value='<%=actId2%>' />
-	    <aui:input type="text" name="result" label="offlinetaskactivity.grades" value='<%=((result!=null)&&(result.getResult()>0))?Long.toString(result.getResult()):"" %>' />
-	    <liferay-ui:error key="offlinetaskactivity.grades.result-bad-format" message="offlinetaskactivity.grades.result-bad-format" />
+	    <aui:input type="text" name="result" label="offlinetaskactivity.grades" value='<%=result!=null?ct.translate(themeDisplay.getLocale(), themeDisplay.getCompanyId(),result.getResult()):"" %>'>
+	    	<aui:validator name="number"></aui:validator>
+	    	<aui:validator  name="custom"  errorMessage="<%=LanguageUtil.format(themeDisplay.getLocale(), \"result.must-be-between\", new Object[]{ct.getMinValue(),ct.getMaxValue()})%>"  >
+				function (val, fieldNode, ruleValue) {
+					var result = false;
+					if (val >= <%=ct.getMinValue() %> && val <= <%= ct.getMaxValue() %>) {
+						result = true;
+					}
+					return result;					
+				}
+			</aui:validator>
+	    </aui:input>
 		<aui:input type="textarea" cols="40" rows="2" name="comments" label="offlinetaskactivity.comments" value='<%=((result!=null)&&(result.getComments()!=null))?result.getComments():"" %>'/>
 	</aui:fieldset>
 	<aui:button-row>
-	<button name="Save" value="save" onclick="<portlet:namespace />doSaveGrades(<%=studentId2%>,<%=actId2%>);" type="button">
-		<liferay-ui:message key="offlinetaskactivity.save" />
-	</button>
-	<button name="Close" value="close" onclick="<portlet:namespace />doClosePopupGrades();" type="button">
-		<liferay-ui:message key="offlinetaskactivity.cancel" />
-	</button>
-	</aui:button-row>
-	<liferay-ui:success key="offlinetaskactivity.grades.updating" message="offlinetaskactivity.correct.saved" />
-	<liferay-ui:error key="offlinetaskactivity.grades.bad-updating" message="offlinetaskactivity.grades.bad-updating" />
+		<aui:button name="Save" value="offlinetaskactivity.save" type="submit"/>
+		<aui:button name="Close" value="offlinetaskactivity.cancel" onclick="${renderResponse.getNamespace()}doClosePopupGrades();" type="button" />
+
+	</aui:button-row>	
 </aui:form>

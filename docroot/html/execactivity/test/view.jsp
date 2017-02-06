@@ -748,8 +748,8 @@ if(isTablet){%>
 				%>
 				<h2><%=activity.getTitle(themeDisplay.getLocale()) %></h2>
 				<p><liferay-ui:message key="test-done" /></p>
-				<p><liferay-ui:message key="your-result" arguments="<%=new Object[]{ct.translate(themeDisplay.getLocale(), themeDisplay.getCompanyId(), result.getResult())+ct.getSuffix()} %>" /></p>
-				<p class="color_tercero negrita"><liferay-ui:message key="your-result-dont-pass"  arguments="<%=new Object[]{ct.translate(themeDisplay.getLocale(), themeDisplay.getCompanyId(), activity.getPasspuntuation())+ct.getSuffix()} %>" /></p>
+				<p><liferay-ui:message key="your-result" arguments="<%=new Object[]{ct.translate(themeDisplay.getLocale(), themeDisplay.getCompanyId(), result.getResult())} %>" /></p>
+				<p class="color_tercero negrita"><liferay-ui:message key="your-result-dont-pass"  arguments="<%=new Object[]{ct.translate(themeDisplay.getLocale(), themeDisplay.getCompanyId(), activity.getPasspuntuation())} %>" /></p>
 				<p><liferay-ui:message key="your-result-no-more-tries" /></p>
 				<%
 			}

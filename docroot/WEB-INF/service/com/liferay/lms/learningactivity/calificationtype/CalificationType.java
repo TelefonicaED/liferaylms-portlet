@@ -18,4 +18,7 @@ public interface CalificationType
 	public String translate(Locale locale, ModuleResult result);
 	public String translate(Locale locale, LearningActivityResult result);
 	public String translate(Locale locale,long companyId, double result);
+	public long toBase100(double result);
+	public long getMinValue();
+	public long getMaxValue();
 }

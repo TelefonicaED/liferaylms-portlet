@@ -65,4 +65,19 @@ public abstract class BaseCalificationType implements CalificationType, Serializ
 	public String translate(Locale locale, long companyId, double result) {
 		return translate(locale, result);
 	}
+	
+	@Override
+	public long toBase100(double result) {
+		return (long)result;
+	}
+
+	@Override
+	public long getMinValue() {
+		return 0;
+	}
+
+	@Override
+	public long getMaxValue() {
+		return 0;
+	}
 }

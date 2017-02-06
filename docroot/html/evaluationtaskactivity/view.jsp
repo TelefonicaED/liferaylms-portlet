@@ -36,9 +36,7 @@ if(actId==0){
 		if(learningActivity.canAccess(false, themeDisplay.getUser(), themeDisplay.getPermissionChecker())){
 	
 			Course course=CourseLocalServiceUtil.fetchByGroupCreatedId(themeDisplay.getScopeGroupId());
-			
-			String passedStudentMessageKey="evaluationtaskactivity.student.passed";
-			String failedStudentMessageKey="evaluationtaskactivity.student.failed";
+
 			LearningActivityResult result = LearningActivityResultLocalServiceUtil.getByActIdAndUserId(actId, themeDisplay.getUserId());
 			Long  [] arguments=null;
 			
@@ -277,9 +275,9 @@ if(actId==0){
 									<div class="floatl">
 									<%
 									if(learningActivityResult.getPassed()){
-										%><liferay-ui:message key="<%=passedStudentMessageKey %>"  arguments="<%=new Object[]{learningActivityResult.getResult(),learningActivity.getPasspuntuation()} %>" /><%
+										%><liferay-ui:message key="evaluationtaskactivity.student.passed"  arguments="<%=new Object[]{learningActivityResult.getResult(),learningActivity.getPasspuntuation()} %>" /><%
 									}else {
-										%><liferay-ui:message key="<%=failedStudentMessageKey %>"  arguments="<%=new Object[]{learningActivityResult.getResult(),learningActivity.getPasspuntuation()} %>" /><%
+										%><liferay-ui:message key="evaluationtaskactivity.student.failed"  arguments="<%=new Object[]{learningActivityResult.getResult(),learningActivity.getPasspuntuation()} %>" /><%
 									}
 									%>
 									</div>

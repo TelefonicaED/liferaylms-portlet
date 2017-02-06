@@ -246,6 +246,72 @@ public class CalificationTypeClp implements CalificationType {
 
 		return ((String)returnObj);
 	}
+
+	@Override
+	public long toBase100(double result) {
+		Object returnObj = null;
+
+		try {
+			returnObj = clp.invoke("toBase100",	new Object[] {});
+		}
+		catch (Throwable t) {
+			t = ClpSerializer.translateThrowable(t);
+
+			if (t instanceof RuntimeException) {
+				throw (RuntimeException)t;
+			}
+			else {
+				throw new RuntimeException(t.getClass().getName() +
+					" is not a valid exception");
+			}
+		}
+
+		return ((Long)returnObj).longValue();
+	}
+
+	@Override
+	public long getMinValue() {
+		Object returnObj = null;
+
+		try {
+			returnObj = clp.invoke("getMinValue",	new Object[] {});
+		}
+		catch (Throwable t) {
+			t = ClpSerializer.translateThrowable(t);
+
+			if (t instanceof RuntimeException) {
+				throw (RuntimeException)t;
+			}
+			else {
+				throw new RuntimeException(t.getClass().getName() +
+					" is not a valid exception");
+			}
+		}
+
+		return ((Long)returnObj).longValue();
+	}
+
+	@Override
+	public long getMaxValue() {
+		Object returnObj = null;
+
+		try {
+			returnObj = clp.invoke("getMaxValue",	new Object[] {});
+		}
+		catch (Throwable t) {
+			t = ClpSerializer.translateThrowable(t);
+
+			if (t instanceof RuntimeException) {
+				throw (RuntimeException)t;
+			}
+			else {
+				throw new RuntimeException(t.getClass().getName() +
+					" is not a valid exception");
+			}
+		}
+
+		return ((Long)returnObj).longValue();
+	}
 	
 	
 	

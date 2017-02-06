@@ -141,7 +141,7 @@
 			<!-- <p>Respuesta libre</p> -->
 			
 		<% }else{%>
-			<p><liferay-ui:message key="your-result" arguments="<%=new Object[]{ct.translate(themeDisplay.getLocale(), course.getCompanyId(), scoreTry)+ct.getSuffix()} %>" /></p>
+			<p><liferay-ui:message key="your-result" arguments="<%=new Object[]{ct.translate(themeDisplay.getLocale(), course.getCompanyId(), scoreTry)} %>" /></p>
 			
 		<%}%>
 	
@@ -165,7 +165,7 @@
 		}else{
 			if(!hasFreeQuestion){
 				%>			
-				<p class="color_tercero negrita"><liferay-ui:message key="your-result-dont-pass"  arguments="<%=new Object[]{ct.translate(themeDisplay.getLocale(), themeDisplay.getCompanyId(), learningActivity.getPasspuntuation())+ct.getSuffix()} %>" /></p>
+				<p class="color_tercero negrita"><liferay-ui:message key="your-result-dont-pass"  arguments="<%=new Object[]{ct.translate(themeDisplay.getLocale(), themeDisplay.getCompanyId(), learningActivity.getPasspuntuation())} %>" /></p>
 	<% 
 			}
 		}

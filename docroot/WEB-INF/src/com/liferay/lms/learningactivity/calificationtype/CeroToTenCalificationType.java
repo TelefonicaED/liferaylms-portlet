@@ -72,5 +72,20 @@ public class CeroToTenCalificationType extends BaseCalificationType{
 		
 		return translate(locale, result);
 	}
+
+	@Override
+	public long toBase100(double result) {
+		return (long) (result*10);
+	}
+
+	@Override
+	public long getMinValue() {
+		return 0;
+	}
+
+	@Override
+	public long getMaxValue() {
+		return 10;
+	}
 	
 }

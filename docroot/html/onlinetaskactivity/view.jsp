@@ -1,4 +1,6 @@
 
+<%@page import="com.liferay.lms.learningactivity.calificationtype.CalificationType"%>
+<%@page import="com.liferay.lms.learningactivity.calificationtype.CalificationTypeRegistry"%>
 <%@page import="com.liferay.portal.security.permission.PermissionChecker"%>
 <%@page import="com.liferay.portal.kernel.xml.Element"%>
 <%@page import="com.liferay.portlet.documentlibrary.service.DLFileEntryLocalServiceUtil"%>
@@ -72,11 +74,6 @@ else
 			portletURL.setParameter("gradeFilter", gradeFilter);
 			
 			LearningActivityResult result = LearningActivityResultLocalServiceUtil.getByActIdAndUserId(actId, themeDisplay.getUserId());
-			Object  [] arguments=null;
-			
-			if(result!=null){	
-				arguments =  new Object[]{result.getResult()};
-			}
 			
 			boolean isTeacher=permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), "com.liferay.lms.model",themeDisplay.getScopeGroupId(), "VIEW_RESULTS");	
 			boolean isTablet = ParamUtil.getBoolean(request, "isTablet",false);
@@ -281,16 +278,7 @@ else
 							Team team = TeamLocalServiceUtil.getTeam(Long.parseLong(teamId));
 							params.put("usersTeams", team.getTeamId());
 						}
-						//if ((GetterUtil.getInteger(PropsUtil.get(PropsKeys.PERMISSIONS_USER_CHECK_ALGORITHM))==6)&&(!ResourceBlockLocalServiceUtil.isSupported("com.liferay.lms.model"))){		
-						//
-						//	params.put("notTeacher",new CustomSQLParam(OnlineActivity.NOT_TEACHER_SQL,themeDisplay.getScopeGroupId()));
-						//	List<User> userListPage = UserLocalServiceUtil.search(themeDisplay.getCompanyId(), criteria, WorkflowConstants.STATUS_ANY, params, searchContainer.getStart(), searchContainer.getEnd(), obc);
-						//	int userCount = UserLocalServiceUtil.searchCount(themeDisplay.getCompanyId(), criteria,  WorkflowConstants.STATUS_ANY, params);
-						//	pageContext.setAttribute("results", userListPage);
-						//	pageContext.setAttribute("total", userCount);
-						//
-						//}
-						//else{
+
 						
 							List<User> userListsOfCourse = UserLocalServiceUtil.search(themeDisplay.getCompanyId(), criteria, WorkflowConstants.STATUS_ANY, params, QueryUtil.ALL_POS, QueryUtil.ALL_POS, obc);
 							List<User> userLists =  new ArrayList<User>(userListsOfCourse.size());
@@ -303,7 +291,7 @@ else
 						
 							pageContext.setAttribute("results", ListUtil.subList(userLists, searchContainer.getStart(), searchContainer.getEnd()));
 							pageContext.setAttribute("total", userLists.size());	
-						//}
+
 					%>
 				</liferay-ui:search-container-results>
 				
@@ -453,12 +441,14 @@ else
 			<p class="doc_descarga"><a class="verMas" href="javascript:<portlet:namespace />showPopupGradesStudent(<%=Long.toString(user.getUserId()) %>,true);"><liferay-ui:message key="onlineActivity.view.last" /></a></p>
 			<%}
 			if(result.getEndDate()!= null){
-				%><p><liferay-ui:message key="your-result-activity" /><%=arguments[0] %></p><%
+				%><p><liferay-ui:message key="your-result-activity" /><%= result.translateResult(themeDisplay.getLocale())%></p><%
 				if(LearningActivityResultLocalServiceUtil.userPassed(actId,themeDisplay.getUserId())){
 					%><p><liferay-ui:message key="your-result-pass-activity" /> </p><%
 				}else{
-					Object  [] arg =  new Object[]{activity.getPasspuntuation()};
-					%><p><liferay-ui:message key="your-result-dont-pass-activity"  arguments="<%=arg %>" /> </p><%
+					
+					CalificationType ct = new CalificationTypeRegistry().getCalificationType(CourseLocalServiceUtil.fetchByGroupCreatedId(activity.getGroupId()).getCalificationType());
+					
+					%><p><liferay-ui:message key="your-result-dont-pass-activity"  arguments="<%=new Object[]{ct.translate(themeDisplay.getLocale(), activity.getCompanyId(), activity.getPasspuntuation())} %>" /> </p><%
 				}
 				if (!result.getComments().trim().equals("")){ %>
 					<h3><liferay-ui:message key="comment-teacher" /></h3>

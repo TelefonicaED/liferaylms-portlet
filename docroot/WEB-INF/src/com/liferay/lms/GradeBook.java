@@ -6,6 +6,8 @@ import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+import javax.portlet.ActionRequest;
+import javax.portlet.ActionResponse;
 import javax.portlet.PortletException;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
@@ -14,6 +16,8 @@ import javax.portlet.ResourceResponse;
 
 import au.com.bytecode.opencsv.CSVWriter;
 
+import com.liferay.lms.learningactivity.calificationtype.CalificationType;
+import com.liferay.lms.learningactivity.calificationtype.CalificationTypeRegistry;
 import com.liferay.lms.model.Course;
 import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.model.LearningActivityResult;
@@ -33,6 +37,8 @@ import com.liferay.portal.kernel.exception.NestableException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.servlet.HttpHeaders;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.SessionMessages;
@@ -57,6 +63,8 @@ import com.liferay.util.bridges.mvc.MVCPortlet;
  * Portlet implementation class GradeBook
  */
 public class GradeBook extends MVCPortlet {
+	
+	private static Log log = LogFactoryUtil.getLog(GradeBook.class);
 	
 	@Override
 	public void serveResource(ResourceRequest resourceRequest,
@@ -180,24 +188,41 @@ public class GradeBook extends MVCPortlet {
 		} 
 	}
  
-	private void setGrades(RenderRequest renderRequest,
-			RenderResponse renderResponse) throws IOException, PortletException {
+	
+	public void setGrades(ActionRequest request,	ActionResponse response){
+		
+		ThemeDisplay themeDisplay  =(ThemeDisplay)request.getAttribute(WebKeys.THEME_DISPLAY);
 		
 		boolean correct=true;
-		long actId = ParamUtil.getLong(renderRequest,"actId"); 
-		long studentId = ParamUtil.getLong(renderRequest,"studentId");
-				
-		String comments = renderRequest.getParameter("comments");
-		long result=0;
+		long actId = ParamUtil.getLong(request,"actId"); 
+		long studentId = ParamUtil.getLong(request,"studentId");		
+		String comments = ParamUtil.getString(request,"comments");
+		
+		log.debug("actId: "+actId);
+		log.debug("studentId: "+studentId);
+		log.debug("comments: "+comments);		
+		
+
+		CalificationType ct = null;
+		double result=0;
 		try {
-			result=Long.parseLong(renderRequest.getParameter("result"));
-			if(result<0 || result>100){
+			Course course = CourseLocalServiceUtil.getCourseByGroupCreatedId(themeDisplay.getScopeGroupId());			
+			ct = new CalificationTypeRegistry().getCalificationType(course.getCalificationType());			
+			result= Double.valueOf(ParamUtil.getString(request,"result").replace(",", "."));
+			log.debug("result: "+result);
+			if(result<ct.getMinValue() || result>ct.getMaxValue()){
 				correct=false;
-				SessionErrors.add(renderRequest, "offlinetaskactivity.grades.result-bad-format");
+				log.error("Result fuera de rango");
+				SessionErrors.add(request, "result-bad-format");
 			}
 		} catch (NumberFormatException e) {
+			e.printStackTrace();
 			correct=false;
-			SessionErrors.add(renderRequest, "offlinetaskactivity.grades.result-bad-format");
+			SessionErrors.add(request, "result-bad-format");
+		} catch (Exception e) {
+			e.printStackTrace();
+			correct=false;
+			SessionErrors.add(request, "grades.bad-updating");
 		}
 		
 		if(correct) {
@@ -209,7 +234,62 @@ public class GradeBook extends MVCPortlet {
 					learningActivityTry =  LearningActivityTryLocalServiceUtil.createLearningActivityTry(actId,serviceContext);
 				}
 				learningActivityTry.setEndDate(new Date());
-				learningActivityTry.setResult(result);
+				learningActivityTry.setResult(ct.toBase100(result));
+				learningActivityTry.setComments(comments);
+				updateLearningActivityTryAndResult(learningActivityTry);
+				
+				SessionMessages.add(request, "grades.updating");
+			} catch (NestableException e) {
+				SessionErrors.add(request, "grades.bad-updating");
+			}
+		}
+	}
+	
+	private void setGrades(RenderRequest renderRequest,	RenderResponse renderResponse) throws IOException {
+		
+		ThemeDisplay themeDisplay  =(ThemeDisplay)renderRequest.getAttribute(WebKeys.THEME_DISPLAY);
+		
+		boolean correct=true;
+		long actId = ParamUtil.getLong(renderRequest,"actId"); 
+		long studentId = ParamUtil.getLong(renderRequest,"studentId");		
+		String comments = renderRequest.getParameter("comments");
+		
+		log.debug("actId: "+actId);
+		log.debug("studentId: "+studentId);
+		log.debug("comments: "+comments);		
+		
+
+		CalificationType ct = null;
+		double result=ParamUtil.getDouble(renderRequest,"result");
+		try {
+			Course course = CourseLocalServiceUtil.getCourseByGroupCreatedId(themeDisplay.getScopeGroupId());			
+			ct = new CalificationTypeRegistry().getCalificationType(course.getCalificationType());			
+			log.debug("result: "+result);
+			if(result<ct.getMinValue() || result>ct.getMaxValue()){
+				correct=false;
+				log.error("Result fuera de rango");
+				SessionErrors.add(renderRequest, "offlinetaskactivity.grades.result-bad-format");
+			}
+		} catch (NumberFormatException e) {
+			e.printStackTrace();
+			correct=false;
+			SessionErrors.add(renderRequest, "offlinetaskactivity.grades.result-bad-format");
+		} catch (Exception e) {
+			e.printStackTrace();
+			correct=false;
+			SessionErrors.add(renderRequest, "offlinetaskactivity.grades.bad-updating");
+		}
+		
+		if(correct) {
+			try {
+				LearningActivityTry  learningActivityTry =  LearningActivityTryLocalServiceUtil.getLastLearningActivityTryByActivityAndUser(actId, studentId);
+				if(learningActivityTry==null){
+					ServiceContext serviceContext = new ServiceContext();
+					serviceContext.setUserId(studentId);
+					learningActivityTry =  LearningActivityTryLocalServiceUtil.createLearningActivityTry(actId,serviceContext);
+				}
+				learningActivityTry.setEndDate(new Date());
+				learningActivityTry.setResult(ct.toBase100(result));
 				learningActivityTry.setComments(comments);
 				updateLearningActivityTryAndResult(learningActivityTry);
 				
