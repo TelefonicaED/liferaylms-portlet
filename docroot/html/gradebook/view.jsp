@@ -222,10 +222,6 @@ if(theTeam!=null)
 							<portlet:param name="actId" value="<%=String.valueOf(learningActivity.getActId()) %>" />      
 						    <portlet:param name="jspPage" value="/html/gradebook/popups/grades.jsp" />           
 						</portlet:renderURL>
-						<portlet:renderURL var="setGradesURL" windowState="<%= LiferayWindowState.EXCLUSIVE.toString() %>">   
-							<portlet:param name="ajaxAction" value="setGrades" />      
-						   	<portlet:param name="jspPage" value="/html/gradebook/popups/grades.jsp" />           
-						</portlet:renderURL>
 						
 						<script type="text/javascript">
 						function <portlet:namespace />showPopupActivity(studentId, actId, actType) {
@@ -295,33 +291,6 @@ if(theTeam!=null)
 						    });
 						}
 						
-						function <portlet:namespace />doSaveGrades(studentId, actId) {
-					        AUI().use('aui-io-request','io-form', function(A) {
-					            A.io.request('<%= setGradesURL %>', { 
-					                method : 'POST', 
-					                form: {
-					                    id: '<portlet:namespace />fn_grades'
-					                },
-					                dataType : 'html', 
-					                headers:{
-					                	actId: actId,
-					                	studentId: studentId
-					                },
-					                on : {
-					                	success : function() { 
-					                    	A.one('.aui-dialog-bd').set('innerHTML',this.get('responseData'));	
-					                    	window.<portlet:namespace />popupGrades.close();
-					                    	// No se muy bien por qué se realizaba una recarga de la página. 
-					                    	// Parece que no afecta al funcionamiento del portlet a peor, sino a mejor.
-					                    	// document.location.reload();
-					                    },
-						                cancel : function() { 
-					                    	window.<portlet:namespace />popupGrades.close();
-					                    } 
-					                } 
-					            });
-					        });
-					    }
 						</script>
 						<liferay-ui:search-container-column-text cssClass="number-column" name = "<%=learningActivity.getTitle(themeDisplay.getLocale()) %>" align="center">
 							<%

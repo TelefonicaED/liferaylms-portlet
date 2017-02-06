@@ -42,8 +42,7 @@ CalificationType ct = new CalificationTypeRegistry().getCalificationType(CourseL
 		<aui:input type="textarea" cols="40" rows="2" name="comments" label="offlinetaskactivity.comments" value='<%=((result!=null)&&(result.getComments()!=null))?result.getComments():"" %>'/>
 	</aui:fieldset>
 	<aui:button-row>
-		<aui:button name="Save" value="offlinetaskactivity.save" type="submit"/>
-		<aui:button name="Close" value="offlinetaskactivity.cancel" onclick="${renderResponse.getNamespace()}doClosePopupGrades();" type="button" />
-
+		<aui:button name="Save" value="save" type="submit"/>
+		<aui:button name="Close" value="cancel" onclick="${renderResponse.getNamespace()}doClosePopupGrades();" type="button" />
 	</aui:button-row>	
 </aui:form>

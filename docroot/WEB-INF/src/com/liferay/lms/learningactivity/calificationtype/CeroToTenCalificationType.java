@@ -1,6 +1,7 @@
 package com.liferay.lms.learningactivity.calificationtype;
 
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.Locale;
 
 import com.liferay.lms.model.CourseResult;
@@ -45,8 +46,10 @@ public class CeroToTenCalificationType extends BaseCalificationType{
 	}
 	
 	@Override
-	public String translate(Locale locale, double result) {
-		DecimalFormat df = new DecimalFormat("##.#");
+	public String translate(Locale locale, double result) {		
+		DecimalFormatSymbols otherSymbols = new DecimalFormatSymbols(locale);
+		otherSymbols.setDecimalSeparator('.');
+		DecimalFormat df = new DecimalFormat("##.#",otherSymbols);				
 		return df.format(result/10);
 	}
 
@@ -67,9 +70,6 @@ public class CeroToTenCalificationType extends BaseCalificationType{
 
 	@Override
 	public String translate(Locale locale, long companyId, double result) {
-		
-		log.debug("** translate -- companyId:"+companyId);
-		
 		return translate(locale, result);
 	}
 

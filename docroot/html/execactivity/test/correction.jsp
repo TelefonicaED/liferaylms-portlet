@@ -1,3 +1,5 @@
+<%@page import="com.liferay.lms.learningactivity.calificationtype.CalificationType"%>
+<%@page import="com.liferay.lms.learningactivity.calificationtype.CalificationTypeRegistry"%>
 <%@page import="com.liferay.portal.kernel.util.OrderByComparator"%>
 <%@page import="com.liferay.portal.kernel.workflow.WorkflowConstants"%>
 <%@page import="com.liferay.portal.kernel.util.ListUtil"%>
@@ -22,10 +24,11 @@
 <%@page import="com.liferay.portal.kernel.util.PropsUtil"%>
 <%@include file="/init.jsp" %>
 
-<liferay-portlet:renderURL var="setGrades" windowState="<%= LiferayWindowState.EXCLUSIVE.toString() %>">   
-							<portlet:param name="ajaxAction" value="setGrades" />      
-						   	<portlet:param name="jspPage" value="/html/execactivity/test/admin/popups/grades.jsp" />           
-</liferay-portlet:renderURL>
+
+<liferay-ui:error key="grades.bad-updating" message="offlinetaskactivity.grades.bad-updating" />
+<liferay-ui:success key="grades.updating" message="offlinetaskactivity.correct.saved" />
+
+
 <aui:script>
 Liferay.provide(
         window,
@@ -96,11 +99,11 @@ function <portlet:namespace />showPopupGrades(studentId, actId) {
             modal: true,
             width: 370,
             height: 300,
-            after: {   
+            /*after: {   
 	          	close: function(event){ 
 	          		document.location.reload();
             	}
-            }
+            }*/
         }).plug(A.Plugin.IO, {
             uri: renderUrl.toString()
         }).render();
@@ -108,12 +111,20 @@ function <portlet:namespace />showPopupGrades(studentId, actId) {
 	});
 }
 
+function <portlet:namespace />doClosePopupGrades(){
+    AUI().use('aui-dialog', function(A) {
+    	window.<portlet:namespace />popupGrades.close();
+    });
+}
 
 </script>
 <%
 long actId=ParamUtil.getLong(request, "actId",0);
 long courseId=ParamUtil.getLong(request, "courseId",0);
 Course course = CourseLocalServiceUtil.getCourse(courseId);
+
+CalificationType ct = new CalificationTypeRegistry().getCalificationType(course.getCalificationType());
+
 LearningActivity activity = LearningActivityLocalServiceUtil.getLearningActivity(actId);
 
 String firstName = ParamUtil.getString(request, "first-name","");
@@ -231,9 +242,9 @@ userSearchContainer.setTotal(totalUsers);
 				status="started";
 				LearningActivityResult learningActivityResult = LearningActivityResultLocalServiceUtil.getByActIdAndUserId(actId, u.getUserId());
 				if(activity.getTypeId() == 8){
-					result= (learningActivityResult!=null)?LearningActivityResultLocalServiceUtil.translateResult(themeDisplay.getLocale(), learningActivityResult.getResult(), activity.getGroupId()):"";
+					result= (learningActivityResult!=null)?ct.translate(themeDisplay.getLocale(), course.getCompanyId(),learningActivityResult.getResult()):"";
 				}else{
-					result = ""+laResult.getResult();
+					result = ct.translate(themeDisplay.getLocale(), course.getCompanyId(),laResult.getResult());
 				}
 				if(learningActivityResult.getEndDate()!=null){
 					status="not-passed"	;
@@ -272,7 +283,7 @@ userSearchContainer.setTotal(totalUsers);
 		</liferay-ui:search-container-column-text>
 
 		<liferay-ui:search-container-column-text name="execactivity.notes">
-			<%=result %>
+			<%=result%>
 			<%
 			if(status.equals("passed")){%>
 			 	<liferay-ui:icon image="checked" message="passed"></liferay-ui:icon>

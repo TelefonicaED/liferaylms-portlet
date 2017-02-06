@@ -1,3 +1,5 @@
+<%@page import="com.liferay.lms.learningactivity.calificationtype.CalificationTypeRegistry"%>
+<%@page import="com.liferay.lms.learningactivity.calificationtype.CalificationType"%>
 <%@page import="com.liferay.lms.service.LmsPrefsLocalServiceUtil"%>
 <%@page import="com.liferay.lms.model.LmsPrefs"%>
 <%@page import="com.liferay.portal.service.TeamLocalServiceUtil"%>
@@ -29,6 +31,10 @@
 <%@page import="com.liferay.portal.kernel.workflow.WorkflowConstants"%>
 <%@page import="com.liferay.portal.service.RoleLocalServiceUtil"%>
 <%@ include file="/init.jsp" %>
+
+<liferay-ui:error key="grades.bad-updating" message="offlinetaskactivity.grades.bad-updating" />
+<liferay-ui:success key="grades.updating" message="offlinetaskactivity.correct.saved" />
+
 <div class="container-activity">
 <%
 	LmsPrefs prefs=LmsPrefsLocalServiceUtil.getLmsPrefs(themeDisplay.getCompanyId());
@@ -45,6 +51,8 @@
 			
 			if(activity.canAccess(false, themeDisplay.getUser(), themeDisplay.getPermissionChecker())){
 		
+				CalificationType ct = new CalificationTypeRegistry().getCalificationType(CourseLocalServiceUtil.getCourseByGroupCreatedId(themeDisplay.getScopeGroupId()).getCalificationType());
+				
 				LearningActivityResult result = LearningActivityResultLocalServiceUtil.getByActIdAndUserId(actId, themeDisplay.getUserId());
 				Object  [] arguments=null;
 		
@@ -71,12 +79,7 @@
 						<portlet:param name="actId" value="<%=String.valueOf(activity.getActId()) %>" />      
 			            <portlet:param name="jspPage" value="/html/offlinetaskactivity/popups/grades.jsp" />           
 			        </portlet:renderURL>
-			        
-			        <portlet:renderURL var="setGradesURL" windowState="<%= LiferayWindowState.EXCLUSIVE.toString() %>">   
-						<portlet:param name="actId" value="<%=String.valueOf(activity.getActId()) %>" /> 
-						<portlet:param name="ajaxAction" value="setGrades" />      
-			            <portlet:param name="jspPage" value="/html/offlinetaskactivity/popups/grades.jsp" />           
-			        </portlet:renderURL>
+
 	
 					<script type="text/javascript">
 				    <!--
@@ -143,11 +146,11 @@
 						            modal: true,
 						            width: 600,
 						            height: 350,
-						            after: {   
+						            /*after: {   
 							          	close: function(event){ 
 							          		document.getElementById('<portlet:namespace />studentsearch').submit();
 						            	}
-						            }
+						            }*/
 						        }).plug(A.Plugin.IO, {
 						            uri: renderUrl.toString(),
 						            parseContent: true
@@ -162,27 +165,7 @@
 					        	window.<portlet:namespace />popupGrades.close();
 					        });
 					    }
-	
-					    function <portlet:namespace />doSaveGrades()
-					    {
-					        AUI().use('aui-io-request','io-form', function(A) {
-					            A.io.request('<%= setGradesURL %>', { 
-					                method : 'POST', 
-					                form: {
-					                    id: '<portlet:namespace />fn_grades'
-					                },
-					                dataType : 'html', 
-					                on : { 
-					                    success : function() { 
-					                    	A.one('.aui-dialog-bd form').set('innerHTML',A.Node.create('<div>'+this.get('responseData')+'</div>').one('form').get('innerHTML'));	
-					                    	createValidator();			                    	
-					                    } 
-					                } 
-					            });
-					        });
-					    }
-				
-					    //-->
+
 					</script>
 	
 					<div class="container-toolbar" >
@@ -257,13 +240,13 @@
 							 params.put("notInCourseRoleTeach", new CustomSQLParam("WHERE User_.userId NOT IN "
 						              + " (SELECT UserGroupRole.userId " + "  FROM UserGroupRole "
 						              + "  WHERE  (UserGroupRole.groupId = ?) AND (UserGroupRole.roleId = ?))", new Long[] {
-						              course.getGroupCreatedId(),
+						              themeDisplay.getScopeGroupId(),
 						              RoleLocalServiceUtil.getRole(prefs.getTeacherRole()).getRoleId() }));
 							 
 							 params.put("notInCourseRoleEdit", new CustomSQLParam("WHERE User_.userId NOT IN "
 						              + " (SELECT UserGroupRole.userId " + "  FROM UserGroupRole "
 						              + "  WHERE  (UserGroupRole.groupId = ?) AND (UserGroupRole.roleId = ?))", new Long[] {
-						              course.getGroupCreatedId(),
+						            		  themeDisplay.getScopeGroupId(),
 						              RoleLocalServiceUtil.getRole(prefs.getEditorRole()).getRoleId() }));
 							if(gradeFilter.equals("passed")) {
 								params.put("passed",new CustomSQLParam(OfflineActivity.ACTIVITY_RESULT_PASSED_SQL,actId));
@@ -311,14 +294,14 @@
 						%>
 					</liferay-ui:search-container-results>
 					
-					<liferay-ui:search-container-row className="com.liferay.portal.model.User" keyProperty="userId" modelVar="user">
+					<liferay-ui:search-container-row className="com.liferay.portal.model.User" keyProperty="userId" modelVar="usuario">
 					<liferay-ui:search-container-column-text name="name">
-						<liferay-ui:user-display userId="<%=user.getUserId() %>"></liferay-ui:user-display>
+						<liferay-ui:user-display userId="<%=usuario.getUserId() %>"></liferay-ui:user-display>
 					</liferay-ui:search-container-column-text>
 					<liferay-ui:search-container-column-text name="calification">
-						<% LearningActivityResult learningActivityResult = LearningActivityResultLocalServiceUtil.getByActIdAndUserId(actId, user.getUserId()); 
+						<% LearningActivityResult learningActivityResult = LearningActivityResultLocalServiceUtil.getByActIdAndUserId(actId, usuario.getUserId()); 
 						   if((learningActivityResult!=null)&&(learningActivityResult.getEndDate()!= null)) {	   
-								   Object  [] arg =  new Object[]{learningActivityResult.getResult(),activity.getPasspuntuation()};
+								   Object  [] arg =  new Object[]{ct.translate(themeDisplay.getLocale(), themeDisplay.getCompanyId(), learningActivityResult.getResult()),ct.translate(themeDisplay.getLocale(), themeDisplay.getCompanyId(),activity.getPasspuntuation())};
 								   if(learningActivityResult.getPassed()){
 									   %><liferay-ui:message key="offlinetaskactivity.student.passed"  arguments="<%=arg %>" /><%
 								   }else {
@@ -329,7 +312,7 @@
 								   %><liferay-ui:message key="offlinetaskactivity.student.without.qualification" /><% 
 							}%>
 			            <p class="see-more">
-							<a href="javascript:<portlet:namespace />showPopupGrades(<%=Long.toString(user.getUserId()) %>);">
+							<a href="javascript:<portlet:namespace />showPopupGrades(<%=Long.toString(usuario.getUserId()) %>);">
 								<liferay-ui:message key="offlinetaskactivity.set.grades"/>
 							</a>
 						</p>

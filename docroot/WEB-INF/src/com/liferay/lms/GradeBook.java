@@ -260,8 +260,9 @@ public class GradeBook extends MVCPortlet {
 		
 
 		CalificationType ct = null;
-		double result=ParamUtil.getDouble(renderRequest,"result");
+		double result=0;
 		try {
+			result=ParamUtil.getDouble(renderRequest,"result");
 			Course course = CourseLocalServiceUtil.getCourseByGroupCreatedId(themeDisplay.getScopeGroupId());			
 			ct = new CalificationTypeRegistry().getCalificationType(course.getCalificationType());			
 			log.debug("result: "+result);

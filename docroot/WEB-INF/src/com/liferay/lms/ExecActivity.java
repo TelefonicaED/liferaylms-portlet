@@ -27,13 +27,17 @@ import org.jsoup.Jsoup;
 import au.com.bytecode.opencsv.CSVWriter;
 
 import com.liferay.counter.service.CounterLocalServiceUtil;
+import com.liferay.lms.learningactivity.calificationtype.CalificationType;
+import com.liferay.lms.learningactivity.calificationtype.CalificationTypeRegistry;
 import com.liferay.lms.learningactivity.questiontype.QuestionType;
 import com.liferay.lms.learningactivity.questiontype.QuestionTypeRegistry;
+import com.liferay.lms.model.Course;
 import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.model.LearningActivityResult;
 import com.liferay.lms.model.LearningActivityTry;
 import com.liferay.lms.model.TestAnswer;
 import com.liferay.lms.model.TestQuestion;
+import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityResultLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityTryLocalServiceUtil;
@@ -927,23 +931,41 @@ public class ExecActivity extends MVCPortlet{
 		}
 	}
 	
-	public void setGrades(ActionRequest renderRequest, ActionResponse actionResponse) throws IOException, PortletException {
+	public void setGrades(ActionRequest request, ActionResponse response) throws IOException, PortletException, SystemException {
+		
+		ThemeDisplay themeDisplay  =(ThemeDisplay)request.getAttribute(WebKeys.THEME_DISPLAY);
 		
 		boolean correct=true;
-		long actId = ParamUtil.getLong(renderRequest,"actId"); 
-		long studentId = ParamUtil.getLong(renderRequest,"studentId");
-						
-		String comments = renderRequest.getParameter("comments");
-		long result=0;
-		try {
-			result=Long.parseLong(renderRequest.getParameter("result"));
+		long actId = ParamUtil.getLong(request,"actId"); 
+		Course course = CourseLocalServiceUtil.getCourseByGroupCreatedId(themeDisplay.getScopeGroupId());	
+		long studentId = ParamUtil.getLong(request,"studentId");						
+		String comments = ParamUtil.getString(request,"comments");
+		
+		log.debug("actId: "+actId);
+		log.debug("studentId: "+studentId);
+		log.debug("comments: "+comments);
+		
+		CalificationType ct = null;
+		double result=0;
+		try {	
+			result = Double.valueOf(ParamUtil.getString(request,"result").replace(",", "."));
+					
+			ct = new CalificationTypeRegistry().getCalificationType(course.getCalificationType());			
+			
+			log.debug("result: "+result);
+			
 			if(result<0 || result>100){
 				correct=false;
-				SessionErrors.add(renderRequest, "offlinetaskactivity.grades.result-bad-format");
+				SessionErrors.add(request, "result-bad-format");
 			}
 		} catch (NumberFormatException e) {
+			e.printStackTrace();
 			correct=false;
-			SessionErrors.add(renderRequest, "offlinetaskactivity.grades.result-bad-format");
+			SessionErrors.add(request, "result-bad-format");
+		} catch (Exception e) {
+			e.printStackTrace();
+			correct=false;
+			SessionErrors.add(request, "grades.bad-updating");
 		}
 		
 		if(correct) {
@@ -955,15 +977,19 @@ public class ExecActivity extends MVCPortlet{
 					learningActivityTry =  LearningActivityTryLocalServiceUtil.createLearningActivityTry(actId,serviceContext);
 				}
 				learningActivityTry.setEndDate(new Date());
-				learningActivityTry.setResult(result);
+				learningActivityTry.setResult(ct.toBase100(result));
 				learningActivityTry.setComments(comments);
 				updateLearningActivityTryAndResult(learningActivityTry);
 				
-				SessionMessages.add(renderRequest, "offlinetaskactivity.grades.updating");
+				SessionMessages.add(request, "grades.updating");
 			} catch (NestableException e) {
-				SessionErrors.add(renderRequest, "offlinetaskactivity.grades.bad-updating");
+				SessionErrors.add(request, "grades.bad-updating");
 			}
 		}
+		
+		response.setRenderParameter("jspPage", "/html/execactivity/test/correction.jsp");
+		response.setRenderParameter("actId", String.valueOf(actId));
+		response.setRenderParameter("courseId", String.valueOf(course.getCourseId()));
 	}
 	
 	public void setBankTest(ActionRequest actionRequest, ActionResponse actionResponse) throws Exception{
