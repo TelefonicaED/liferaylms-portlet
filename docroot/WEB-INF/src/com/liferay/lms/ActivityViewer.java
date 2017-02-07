@@ -182,7 +182,6 @@ public class ActivityViewer extends MVCPortlet
 						Portlet portlet = PortletLocalServiceUtil.getPortletById(themeDisplay.getCompanyId(), learningActivityType.getPortletId());
 						HttpServletRequest renderHttpServletRequest = PortalUtil.getHttpServletRequest(renderRequest);
 						PortletPreferencesFactoryUtil.getLayoutPortletSetup(themeDisplay.getLayout(), portlet.getPortletId());
-						
 						if(isWidget){
 							Map<String, String[]> publicParameters = getPublicParameters(renderHttpServletRequest, themeDisplay.getPlid());
 							for(PublicRenderParameter publicRenderParameter:portlet.getPublicRenderParameters()) {

@@ -19,6 +19,14 @@
 
 <%@ include file="/init.jsp" %>
 <%
+
+
+Boolean isLinkTabletOnlineGrade = ParamUtil.getBoolean(request, "isTablet", false);
+String cssLinkTabletClassOnlineGrade="";
+if(isLinkTabletOnlineGrade){
+	cssLinkTabletClassOnlineGrade="tablet-link";
+}
+
 LearningActivityTry lATry = null;
 LearningActivityResult result = null;
 boolean ownGrade=false;
@@ -111,7 +119,7 @@ if(renderRequest.getParameter("studentId")!=null){
 	<p class="label"><liferay-ui:message key="onlinetaskactivity.grades.attach"/></p>
 	<div class="doc_descarga">
 		<span><%=titleFile+"&nbsp;("+ sizeKbFile +"Kb)&nbsp;"%></span>
-		<a href="<%=urlFile%>" class="verMas" target="_blank"><liferay-ui:message key="onlinetaskactivity.grades.download"/></a>
+		<a href="<%=urlFile%>" class="verMas <%=cssLinkTabletClassOnlineGrade %>" target="_blank"><liferay-ui:message key="onlinetaskactivity.grades.download"/></a>
 	</div>
 <% } 
 
