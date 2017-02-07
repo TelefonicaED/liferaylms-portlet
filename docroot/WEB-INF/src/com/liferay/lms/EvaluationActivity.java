@@ -22,9 +22,13 @@ import javax.portlet.WindowState;
 import com.liferay.lms.auditing.AuditConstants;
 import com.liferay.lms.auditing.AuditingLogFactory;
 import com.liferay.lms.learningactivity.TaskEvaluationLearningActivityType;
+import com.liferay.lms.learningactivity.calificationtype.CalificationType;
+import com.liferay.lms.learningactivity.calificationtype.CalificationTypeRegistry;
+import com.liferay.lms.model.Course;
 import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.model.LearningActivityResult;
 import com.liferay.lms.model.LearningActivityTry;
+import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityResultLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityTryLocalServiceUtil;
@@ -70,6 +74,8 @@ import com.liferay.util.bridges.mvc.MVCPortlet;
  * Portlet implementation class EvaluationActivity
  */
 public class EvaluationActivity extends MVCPortlet implements MessageListener{
+	
+	private static Log log = LogFactoryUtil.getLog(EvaluationActivity.class);
 	
 	private static DateFormat _dateFormat = DateFormatFactoryUtil.getSimpleDateFormat(
 			"yyyy-MM-dd'T'HH:mm:sszzz",Locale.US);
@@ -520,6 +526,78 @@ public class EvaluationActivity extends MVCPortlet implements MessageListener{
     	actionResponse.sendRedirect(viewPortletURL.toString());
 	}
 	
+	
+	
+	
+	public void setGrades(ActionRequest request,	ActionResponse response){
+		
+		ThemeDisplay themeDisplay  =(ThemeDisplay)request.getAttribute(WebKeys.THEME_DISPLAY);
+		
+		boolean correct=true;
+		long actId = ParamUtil.getLong(request,"actId"); 
+		long studentId = ParamUtil.getLong(request,"studentId");		
+		String comments = ParamUtil.getString(request,"comments");
+		
+		log.debug("actId: "+actId);
+		log.debug("studentId: "+studentId);
+		log.debug("comments: "+comments);		
+		
+		String gradeFilter = ParamUtil.getString(request, "gradeFilter");
+		String criteria = ParamUtil.getString(request, "criteria");
+
+		log.debug("gradeFilter: "+gradeFilter);
+		log.debug("criteria: "+criteria);
+		
+		response.setRenderParameter("gradeFilter", gradeFilter);
+		response.setRenderParameter("criteria", criteria);		
+		
+		CalificationType ct = null;
+		double result=0;
+		try {
+			Course course = CourseLocalServiceUtil.getCourseByGroupCreatedId(themeDisplay.getScopeGroupId());			
+			ct = new CalificationTypeRegistry().getCalificationType(course.getCalificationType());			
+			result= Double.valueOf(ParamUtil.getString(request,"result").replace(",", "."));
+			log.debug("result: "+result);
+			if(result<ct.getMinValue() || result>ct.getMaxValue()){
+				correct=false;
+				log.error("Result fuera de rango");
+				SessionErrors.add(request, "result-bad-format");
+			}
+		} catch (NumberFormatException e) {
+			e.printStackTrace();
+			correct=false;
+			SessionErrors.add(request, "result-bad-format");
+		} catch (Exception e) {
+			e.printStackTrace();
+			correct=false;
+			SessionErrors.add(request, "grades.bad-updating");
+		}
+		
+		if(correct) {
+			try {
+				LearningActivityTry  learningActivityTry =  LearningActivityTryLocalServiceUtil.getLastLearningActivityTryByActivityAndUser(actId, studentId);
+				if(learningActivityTry==null){
+					ServiceContext serviceContext = new ServiceContext();
+					serviceContext.setUserId(studentId);
+					learningActivityTry =  LearningActivityTryLocalServiceUtil.createLearningActivityTry(actId,serviceContext);
+				}
+				learningActivityTry.setEndDate(new Date());
+				learningActivityTry.setResult(ct.toBase100(result));
+				learningActivityTry.setComments(comments);
+				updateLearningActivityTryAndResult(learningActivityTry);
+				
+				SessionMessages.add(request, "grades.updating");
+			} catch (NestableException e) {
+				SessionErrors.add(request, "grades.bad-updating");
+			}
+		}
+	}
+	
+	
+	
+	/*	
+	
+	
 	public void setGrade(ActionRequest actionRequest,ActionResponse actionResponse) throws Exception{
 		
 		ThemeDisplay themeDisplay = (ThemeDisplay) actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
@@ -579,6 +657,9 @@ public class EvaluationActivity extends MVCPortlet implements MessageListener{
     	}
 
 	}
+	
+	
+	*/
 	
 	@Override
 	public void render(RenderRequest renderRequest, RenderResponse renderResponse)

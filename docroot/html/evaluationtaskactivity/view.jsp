@@ -1,4 +1,6 @@
 
+<%@page import="com.liferay.lms.learningactivity.calificationtype.CalificationTypeRegistry"%>
+<%@page import="com.liferay.lms.learningactivity.calificationtype.CalificationType"%>
 <%@page import="com.liferay.portal.kernel.util.ListUtil"%>
 <%@page import="com.liferay.portal.security.permission.PermissionCheckerFactoryUtil"%>
 <%@page import="com.liferay.portal.kernel.dao.orm.QueryUtil"%>
@@ -21,6 +23,21 @@
 <%@page import="com.liferay.portal.kernel.xml.SAXReaderUtil"%>
 
 <%@ include file="/init.jsp" %>
+
+
+
+
+<%
+CalificationType ct = new CalificationTypeRegistry().getCalificationType(CourseLocalServiceUtil.getCourseByGroupCreatedId(themeDisplay.getScopeGroupId()).getCalificationType());
+
+%>
+
+<liferay-ui:error key="result-bad-format" message="<%=LanguageUtil.format(themeDisplay.getLocale(), \"result.must-be-between\", new Object[]{ct.getMinValue(),ct.getMaxValue()})%>" />
+<liferay-ui:error key="grades.bad-updating" message="offlinetaskactivity.grades.bad-updating" />
+<liferay-ui:success key="grades.updating" message="offlinetaskactivity.correct.saved" />
+
+
+
 <div class="container-activity">
 <%
 long actId = ParamUtil.getLong(request,"actId",0);
@@ -243,23 +260,17 @@ if(actId==0){
 								}
 							}
 								
-							//if ((GetterUtil.getInteger(PropsUtil.get(PropsKeys.PERMISSIONS_USER_CHECK_ALGORITHM))==6)&&(!ResourceBlockLocalServiceUtil.isSupported("com.liferay.lms.model"))){		
-							//	params.put("notTeacher",new CustomSQLParam(EvaluationAvgPortlet.NOT_TEACHER_SQL,themeDisplay.getScopeGroupId()));
-							//	List<User> userListPage = UserLocalServiceUtil.search(themeDisplay.getCompanyId(), criteria, WorkflowConstants.STATUS_ANY, params, searchContainer.getStart(), searchContainer.getEnd(), obc);
-							//	int userCount = UserLocalServiceUtil.searchCount(themeDisplay.getCompanyId(), criteria,  WorkflowConstants.STATUS_ANY, params);
-							//	pageContext.setAttribute("results", userListPage);
-							//  pageContext.setAttribute("total", userCount);
-							//}else{
-								List<User> userListsOfCourse = UserLocalServiceUtil.search(themeDisplay.getCompanyId(), criteria, WorkflowConstants.STATUS_ANY, params, QueryUtil.ALL_POS, QueryUtil.ALL_POS, obc);
-								List<User> userLists =  new ArrayList<User>(userListsOfCourse.size());
-								for(User userOfCourse:userListsOfCourse){							
-									if(!PermissionCheckerFactoryUtil.create(userOfCourse).hasPermission(themeDisplay.getScopeGroupId(), "com.liferay.lms.model",themeDisplay.getScopeGroupId(), "VIEW_RESULTS")){
-										userLists.add(userOfCourse);
-									}
-								}	
-								pageContext.setAttribute("results", ListUtil.subList(userLists, searchContainer.getStart(), searchContainer.getEnd()));
-							    pageContext.setAttribute("total", userLists.size());	
-							//}
+
+							List<User> userListsOfCourse = UserLocalServiceUtil.search(themeDisplay.getCompanyId(), criteria, WorkflowConstants.STATUS_ANY, params, QueryUtil.ALL_POS, QueryUtil.ALL_POS, obc);
+							List<User> userLists =  new ArrayList<User>(userListsOfCourse.size());
+							for(User userOfCourse:userListsOfCourse){							
+								if(!PermissionCheckerFactoryUtil.create(userOfCourse).hasPermission(themeDisplay.getScopeGroupId(), "com.liferay.lms.model",themeDisplay.getScopeGroupId(), "VIEW_RESULTS")){
+									userLists.add(userOfCourse);
+								}
+							}	
+							pageContext.setAttribute("results", ListUtil.subList(userLists, searchContainer.getStart(), searchContainer.getEnd()));
+						    pageContext.setAttribute("total", userLists.size());	
+
 						%>
 						</liferay-ui:search-container-results>
 						
@@ -275,9 +286,9 @@ if(actId==0){
 									<div class="floatl">
 									<%
 									if(learningActivityResult.getPassed()){
-										%><liferay-ui:message key="evaluationtaskactivity.student.passed"  arguments="<%=new Object[]{learningActivityResult.getResult(),learningActivity.getPasspuntuation()} %>" /><%
+										%><liferay-ui:message key="evaluationtaskactivity.student.passed"  arguments="<%=new Object[]{ct.translate(themeDisplay.getLocale(), themeDisplay.getCompanyId(), learningActivityResult.getResult())} %>" /><%
 									}else {
-										%><liferay-ui:message key="evaluationtaskactivity.student.failed"  arguments="<%=new Object[]{learningActivityResult.getResult(),learningActivity.getPasspuntuation()} %>" /><%
+										%><liferay-ui:message key="evaluationtaskactivity.student.failed"  arguments="<%=new Object[]{ct.translate(themeDisplay.getLocale(), themeDisplay.getCompanyId(), learningActivityResult.getResult()),ct.translate(themeDisplay.getLocale(), themeDisplay.getCompanyId(), learningActivity.getPasspuntuation())} %>" /><%
 									}
 									%>
 									</div>
@@ -323,6 +334,8 @@ if(actId==0){
 									    	<portlet:renderURL var="popupGradesURL" windowState="<%= LiferayWindowState.EXCLUSIVE.toString() %>">
 										   		<portlet:param name="userId" value="<%=Long.toString(usuario.getUserId()) %>"/>
 										   		<portlet:param name="jspPage" value="/html/evaluationtaskactivity/popups/grades.jsp"/>
+										   		<portlet:param name="criteria" value="<%=ParamUtil.getString(renderRequest, \"criteria\",\"\") %>"/>
+										   		<portlet:param name="gradeFilter" value="<%=ParamUtil.getString(renderRequest, \"gradeFilter\",\"\") %>"/>
 										   	</portlet:renderURL>
 										   	</p>
 											<p class="see-more">
@@ -332,12 +345,7 @@ if(actId==0){
 												        "		id:'"+renderResponse.getNamespace()+"showPopupGrades', "+
 												        "		title: '"+LanguageUtil.get(pageContext, "evaluationtaskactivity.set.grades")+"', "+
 												        "		centered: true, "+
-												        "		modal: true, "+
-												        "		after: { "+   
-												        "		  	close: function(event){ "+ 
-												        "		  		Liferay.Portlet.refresh(A.one('#p_p_id"+renderResponse.getNamespace()+"'),{'p_t_lifecycle':0,'"+renderResponse.getNamespace()+WebKeys.PORTLET_CONFIGURATOR_VISIBILITY+"':'"+StringPool.TRUE+"'}); "+	
-												        "		 	} "+
-												        "		} "+
+												        "		modal: true "+
 												        "     }).plug(A.Plugin.IO, { "+
 												        "         uri: '"+popupGradesURL+"', "+
 												        "         parseContent: true "+

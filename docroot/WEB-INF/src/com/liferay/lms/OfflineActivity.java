@@ -109,9 +109,14 @@ public class OfflineActivity extends MVCPortlet {
     	ThemeDisplay themeDisplay = (ThemeDisplay) resourceRequest.getAttribute(WebKeys.THEME_DISPLAY);
 		String action = ParamUtil.getString(resourceRequest, "action");
 		long actId = ParamUtil.getLong(resourceRequest, "actId",0);
+		
+		
 		if(action.equals("export")){
 			
 			try {
+				
+				CalificationType ct = new CalificationTypeRegistry().getCalificationType(CourseLocalServiceUtil.getCourseByGroupCreatedId(themeDisplay.getScopeGroupId()).getCalificationType());
+				
 				//Necesario para crear el fichero csv.
 				resourceResponse.setCharacterEncoding(StringPool.UTF8);
 				resourceResponse.setContentType(ContentTypes.TEXT_CSV_UTF8);
@@ -143,8 +148,8 @@ public class OfflineActivity extends MVCPortlet {
 			        		//En la primera columna del csv introducidos el nombre del estudiante.
 			        		resultados[0] = UserLocalServiceUtil.getUser(learningActivityResult.getUserId()).getScreenName();
 			        		resultados[1] = _dateFormat.format(learningActivityResult.getEndDate());
-			        		resultados[2] = String.valueOf(learningActivityResult.getResult());
-			        		resultados[3] = String.valueOf(learningActivityResult.getComments());
+			        		resultados[2] = ct.translate(themeDisplay.getLocale(), themeDisplay.getCompanyId(), learningActivityResult.getResult());
+			        		resultados[3] = learningActivityResult.getComments()!=null?learningActivityResult.getComments():"";
 			        		
 			        		//Escribimos las respuestas obtenidas para el intento en el csv.
 			    			writer.writeNext(resultados);
@@ -182,6 +187,9 @@ public class OfflineActivity extends MVCPortlet {
 		}else{
 			CSVReader reader=null;
 			try {
+				
+				CalificationType ct = new CalificationTypeRegistry().getCalificationType(CourseLocalServiceUtil.getCourseByGroupCreatedId(themeDisplay.getScopeGroupId()).getCalificationType());
+				
 				reader = new CSVReader(new InputStreamReader(csvFile, StringPool.UTF8),CharPool.SEMICOLON);
 				int line=0;
 				String[] currLine;
@@ -193,7 +201,7 @@ public class OfflineActivity extends MVCPortlet {
 							User user=null;
 							String userFullName=StringPool.BLANK;
 							Date endDate = null;
-							long result=0;
+							double result=0;
 							
 							try {
 								user=UserLocalServiceUtil.getUserByScreenName(themeDisplay.getCompanyId(), currLine[0].trim());
@@ -226,14 +234,16 @@ public class OfflineActivity extends MVCPortlet {
 							}
 														
 							try {
-								result=Long.parseLong(currLine[2]);
-								if(result<0 || result>100){
+								result=Double.parseDouble(currLine[2]);
+								if(result<ct.getMinValue() || result>ct.getMaxValue()){	
+									log.error("***Result fuera de rango***");
 									correct=false;
-									errors.add(LanguageUtil.format(getPortletConfig(),locale,"offlinetaskactivity.csvError.result-bad-format",new Object[]{line},false));
+									errors.add(LanguageUtil.format(getPortletConfig(),locale,"offlinetaskactivity.csvError.result-bad-format",new Object[]{line,ct.getMinValue(),ct.getMaxValue()},false));
 								}
 							} catch (NumberFormatException e) {
+								e.printStackTrace();
 								correct=false;
-								errors.add(LanguageUtil.format(getPortletConfig(),locale,"offlinetaskactivity.csvError.result-bad-format",new Object[]{line},false));
+								errors.add(LanguageUtil.format(getPortletConfig(),locale,"offlinetaskactivity.csvError.result-bad-format",new Object[]{line,ct.getMinValue(),ct.getMaxValue()},false));
 							}
 												
 							if(correct){
@@ -245,7 +255,7 @@ public class OfflineActivity extends MVCPortlet {
 										learningActivityTry =  LearningActivityTryLocalServiceUtil.createLearningActivityTry(actId,serviceContext);
 									}
 									learningActivityTry.setEndDate(endDate);
-									learningActivityTry.setResult(result);
+									learningActivityTry.setResult(ct.toBase100(result));
 									learningActivityTry.setComments(currLine[3]);
 									updateLearningActivityTryAndResult(learningActivityTry);
 		
@@ -265,8 +275,14 @@ public class OfflineActivity extends MVCPortlet {
 				}
 	
 			} catch(FileNotFoundException e) {
+				e.printStackTrace();
 				errors.add(LanguageUtil.get(getPortletConfig(),locale,"offlinetaskactivity.csvError.empty-file"));
-			} finally {
+			} catch(Exception e){
+				e.printStackTrace();
+				errors.add(LanguageUtil.get(getPortletConfig(),locale,"offlinetaskactivity.csvError.bad-updating"));
+			}
+			
+			finally {
 				if(reader!=null) {
 					reader.close();
 				}
@@ -274,6 +290,7 @@ public class OfflineActivity extends MVCPortlet {
 		}
 	}
 	
+		
 	
 	public void setGrades(ActionRequest request,	ActionResponse response){
 		

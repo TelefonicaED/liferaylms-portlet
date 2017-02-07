@@ -36,7 +36,7 @@ CalificationType ct = new CalificationTypeRegistry().getCalificationType(CourseL
 	<aui:fieldset>
 		<aui:input type="hidden" name="studentId" value='<%=renderRequest.getParameter("studentId") %>' />
 		
-	    <aui:input type="text" name="result" helpMessage="<%=LanguageUtil.format(pageContext, \"offlinetaskactivity.grades.resultMessage\", new Object[]{activity.getPasspuntuation()})%>" label="offlinetaskactivity.grades" value='<%=(result!=null && result.getEndDate()!=null)?ct.translate(themeDisplay.getLocale(), themeDisplay.getCompanyId(), result.getResult()):"" %>'>
+	    <aui:input type="text" name="result" helpMessage="<%=LanguageUtil.format(pageContext, \"offlinetaskactivity.grades.resultMessage\", new Object[]{ct.translate(themeDisplay.getLocale(), themeDisplay.getCompanyId(), activity.getPasspuntuation())})%>" label="offlinetaskactivity.grades" value='<%=(result!=null && result.getEndDate()!=null)?ct.translate(themeDisplay.getLocale(), themeDisplay.getCompanyId(), result.getResult()):"" %>'>
 	    
 	    	<aui:validator name="number"></aui:validator>
 	    	<aui:validator  name="custom"  errorMessage="<%=LanguageUtil.format(themeDisplay.getLocale(), \"result.must-be-between\", new Object[]{ct.getMinValue(),ct.getMaxValue()})%>"  >
@@ -61,7 +61,5 @@ CalificationType ct = new CalificationTypeRegistry().getCalificationType(CourseL
 		<aui:button name="Save" value="save" type="submit"/>
 		<aui:button name="Close" value="cancel" onclick="${renderResponse.getNamespace()}doClosePopupGrades();" type="button" />
 	</aui:button-row>	
-	
-	<liferay-ui:success key="offlinetaskactivity.grades.updating" message="offlinetaskactivity.correct.saved" />
-	<liferay-ui:error key="offlinetaskactivity.grades.bad-updating" message="offlinetaskactivity.grades.bad-updating" />
+
 </aui:form>

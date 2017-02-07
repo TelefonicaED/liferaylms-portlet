@@ -132,7 +132,7 @@ if(!ownGrade){
 <aui:form  name="fn_grades" method="post" action="${updateGradesURL}" >
 	<aui:fieldset>
 		<aui:input type="hidden" name="studentId" value='<%=renderRequest.getParameter("studentId") %>' />
-	    <aui:input type="text" name="result" label="offlinetaskactivity.grades" value='<%=result!=null?ct.translate(themeDisplay.getLocale(), themeDisplay.getCompanyId(),result.getResult()):"" %>'>
+	    <aui:input type="text" name="result" label="offlinetaskactivity.grades" helpMessage="<%=LanguageUtil.format(pageContext, \"offlinetaskactivity.grades.resultMessage\", new Object[]{ct.translate(themeDisplay.getLocale(), themeDisplay.getCompanyId(), activity.getPasspuntuation())})%>" value='<%=result!=null?ct.translate(themeDisplay.getLocale(), themeDisplay.getCompanyId(),result.getResult()):"" %>'>
 	    	<aui:validator name="number"></aui:validator>
 	    	<aui:validator  name="custom"  errorMessage="<%=LanguageUtil.format(themeDisplay.getLocale(), \"result.must-be-between\", new Object[]{ct.getMinValue(),ct.getMaxValue()})%>"  >
 				function (val, fieldNode, ruleValue) {
@@ -144,7 +144,6 @@ if(!ownGrade){
 				}
 			</aui:validator>
 	    </aui:input>
-	    <liferay-ui:error key="onlinetaskactivity.grades.result-bad-format" message="onlinetaskactivity.grades.result-bad-format" />
 
 		<aui:input type="textarea" cols="75" rows="6" helpMessage="<%=LanguageUtil.get(pageContext, \"onlinetaskactivity.grades.commentsMessage\")%>" maxLength="350" name="comments" label="onlinetaskactivity.comments" value='<%=((result!=null)&&(result.getComments()!=null))?result.getComments():"" %>'>
 			<aui:validator name="range">[0, 350]</aui:validator>
@@ -154,8 +153,7 @@ if(!ownGrade){
 		<aui:button name="Save" value="save" type="submit"/>
 		<aui:button name="Close" value="cancel" onclick="${renderResponse.getNamespace()}doClosePopupGrades();" type="button" />
 	</aui:button-row>
-	<liferay-ui:success key="onlinetaskactivity.grades.updating" message="onlinetaskactivity.correct.saved" />
-	<liferay-ui:error key="onlinetaskactivity.grades.bad-updating" message="onlinetaskactivity.grades.bad-updating" />
+
 </aui:form>
 
 <% } 

@@ -76,7 +76,7 @@ CalificationType ct = new CalificationTypeRegistry().getCalificationType(CourseL
 										
 					<portlet:renderURL var="viewUrlPopImportGrades" windowState="<%= LiferayWindowState.POP_UP.toString() %>">   
 						<portlet:param name="actId" value="<%=String.valueOf(activity.getActId()) %>" />      
-			            <portlet:param name="jspPage" value="/html/offlinetaskactivity/popups/importGrades.jsp" />           
+			            <portlet:param name="jspPage" value="/html/offlinetaskactivity/popups/importGrades.jsp" />          
 			        </portlet:renderURL>
 			        
 					<portlet:renderURL var="viewUrlPopGrades" windowState="<%= LiferayWindowState.POP_UP.toString() %>">   
