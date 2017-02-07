@@ -945,6 +945,21 @@ public class ExecActivity extends MVCPortlet{
 		log.debug("studentId: "+studentId);
 		log.debug("comments: "+comments);
 		
+		String firstName = ParamUtil.getString(request, "first-name");
+		String lastName = ParamUtil.getString(request, "last-name");
+		String screenName = ParamUtil.getString(request, "screen-name");
+		String emailAddress = ParamUtil.getString(request, "email-address");
+		
+		log.debug("firstName: "+firstName);
+		log.debug("lastName: "+lastName);
+		log.debug("screenName: "+screenName);
+		log.debug("emailAddress: "+emailAddress);
+		
+		response.setRenderParameter("first-name", firstName);
+		response.setRenderParameter("last-name", lastName);	
+		response.setRenderParameter("screen-name", screenName);
+		response.setRenderParameter("email-address", emailAddress);	
+		
 		CalificationType ct = null;
 		double result=0;
 		try {	

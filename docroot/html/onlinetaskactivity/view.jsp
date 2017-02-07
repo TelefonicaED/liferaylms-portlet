@@ -43,6 +43,20 @@
 <%@page import="com.liferay.portal.service.RoleLocalServiceUtil"%>
 
 <%@ include file="/init.jsp" %>
+
+
+
+<%
+CalificationType ct = new CalificationTypeRegistry().getCalificationType(CourseLocalServiceUtil.getCourseByGroupCreatedId(themeDisplay.getScopeGroupId()).getCalificationType());
+
+%>
+
+<liferay-ui:error key="result-bad-format" message="<%=LanguageUtil.format(themeDisplay.getLocale(), \"result.must-be-between\", new Object[]{ct.getMinValue(),ct.getMaxValue()})%>" />
+<liferay-ui:error key="grades.bad-updating" message="offlinetaskactivity.grades.bad-updating" />
+<liferay-ui:success key="grades.updating" message="offlinetaskactivity.correct.saved" />
+
+
+
 <div class="container-activity">
 <%
 
@@ -150,15 +164,15 @@ else
 					renderUrl.setPortletId('<%=portletDisplay.getId()%>');
 					renderUrl.setParameter('actId', '<%=String.valueOf(activity.getActId()) %>');
 					renderUrl.setParameter('isTablet', '<%=String.valueOf(isTablet) %>');
-					<%
-					if(isTeacher){
-					%>
-					if(!selfGrade) {
-						renderUrl.setParameter('studentId', studentId);
-					}
-					<%
-					}
-					%>
+					renderUrl.setParameter('gradeFilter', '<%=gradeFilter %>');
+					renderUrl.setParameter('criteria', '<%=criteria %>');
+					
+					<%if(isTeacher){%>
+						if(!selfGrade) {
+							renderUrl.setParameter('studentId', studentId);
+						}
+					<%}%>
+					
 					renderUrl.setParameter('jspPage', '/html/onlinetaskactivity/popups/grades.jsp');
 		
 					window.<portlet:namespace />popupGrades = new A.Dialog({
@@ -168,11 +182,11 @@ else
 			            modal: true,
 			            width: 600,
 			            height: 800,
-			            after: {   
+			            /*after: {   
 				          	close: function(event){ 
 				          		document.getElementById('<portlet:namespace />studentsearch').submit();
 			            	}
-			            }
+			            }*/
 			        }).plug(A.Plugin.IO, {
 			            uri: renderUrl.toString()
 			        }).render();
@@ -187,32 +201,6 @@ else
 		        });
 		    }
 		
-			<%
-			if((PermissionCheckerFactoryUtil.create(themeDisplay.getUser())).hasPermission(themeDisplay.getScopeGroupId(), "com.liferay.lms.model", themeDisplay.getScopeGroupId(), "VIEW_RESULTS")){
-			%>
-		
-		    function <portlet:namespace />doSaveGrades()
-		    {
-		        AUI().use('aui-io-request','io-form', function(A) {
-		            A.io.request('<%= setGradesURL %>', { 
-		                method : 'POST', 
-		                form: {
-		                    id: '<portlet:namespace />fn_grades'
-		                },
-		                dataType : 'html', 
-		                on : { 
-		                    success : function() { 
-		                    	A.one('.aui-dialog-bd').set('innerHTML',this.get('responseData'));				                    	
-		                    } 
-		                } 
-		            });
-		        });
-		    }
-			<%
-			}
-			%>
-		
-		    //-->
 		</script>
 		
 		<%
@@ -295,14 +283,14 @@ else
 					%>
 				</liferay-ui:search-container-results>
 				
-				<liferay-ui:search-container-row className="com.liferay.portal.model.User" keyProperty="userId" modelVar="user">
+				<liferay-ui:search-container-row className="com.liferay.portal.model.User" keyProperty="userId" modelVar="usuario">
 				<liferay-ui:search-container-column-text name="name">
-					<liferay-ui:user-display userId="<%=user.getUserId() %>"></liferay-ui:user-display>
+					<liferay-ui:user-display userId="<%=usuario.getUserId() %>"></liferay-ui:user-display>
 				</liferay-ui:search-container-column-text>
 				<liferay-ui:search-container-column-text name="calification">
-					<% LearningActivityResult learningActivityResult = LearningActivityResultLocalServiceUtil.getByActIdAndUserId(actId, user.getUserId()); 
+					<% LearningActivityResult learningActivityResult = LearningActivityResultLocalServiceUtil.getByActIdAndUserId(actId, usuario.getUserId()); 
 					   if((learningActivityResult!=null)&&(learningActivityResult.getEndDate()!=null)) {	   
-							   Object  [] arg =  new Object[]{learningActivityResult.getResult(),activity.getPasspuntuation()};
+							   Object  [] arg =  new Object[]{ct.translate(themeDisplay.getLocale(), themeDisplay.getCompanyId(), learningActivityResult.getResult()),ct.translate(themeDisplay.getLocale(), themeDisplay.getCompanyId(), activity.getPasspuntuation())};
 							   if(learningActivityResult.getPassed()){
 								   %><liferay-ui:message key="onlinetaskactivity.student.passed"  arguments="<%=arg %>" /><%
 							   }else{ 
@@ -313,7 +301,7 @@ else
 		               }
 		
 					 	if(isTablet){
-					 		LearningActivityTry lATry = LearningActivityTryLocalServiceUtil.getLastLearningActivityTryByActivityAndUser(actId, user.getUserId()); 
+					 		LearningActivityTry lATry = LearningActivityTryLocalServiceUtil.getLastLearningActivityTryByActivityAndUser(actId, usuario.getUserId()); 
 					 		if(lATry!=null){
 					 			String urlFile = null;
 					 			String titleFile = null;
@@ -347,7 +335,7 @@ else
 						}
 					%>
 		            <p class="see-more">
-						<a href="javascript:<portlet:namespace />showPopupGradesTeacher(<%=Long.toString(user.getUserId()) %>);"><liferay-ui:message key="onlinetaskactivity.set.grades"/></a>
+						<a href="javascript:<portlet:namespace />showPopupGradesTeacher(<%=Long.toString(usuario.getUserId()) %>);"><liferay-ui:message key="onlinetaskactivity.set.grades"/></a>
 					</p>
 				</liferay-ui:search-container-column-text>
 				</liferay-ui:search-container-row>
@@ -445,9 +433,6 @@ else
 				if(LearningActivityResultLocalServiceUtil.userPassed(actId,themeDisplay.getUserId())){
 					%><p><liferay-ui:message key="your-result-pass-activity" /> </p><%
 				}else{
-					
-					CalificationType ct = new CalificationTypeRegistry().getCalificationType(CourseLocalServiceUtil.fetchByGroupCreatedId(activity.getGroupId()).getCalificationType());
-					
 					%><p><liferay-ui:message key="your-result-dont-pass-activity"  arguments="<%=new Object[]{ct.translate(themeDisplay.getLocale(), activity.getCompanyId(), activity.getPasspuntuation())} %>" /> </p><%
 				}
 				if (!result.getComments().trim().equals("")){ %>

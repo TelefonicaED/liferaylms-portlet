@@ -25,6 +25,17 @@
 <%@include file="/init.jsp" %>
 
 
+<%
+CalificationType ct = new CalificationTypeRegistry().getCalificationType(CourseLocalServiceUtil.getCourseByGroupCreatedId(themeDisplay.getScopeGroupId()).getCalificationType());
+
+String firstName = ParamUtil.getString(request, "first-name","");
+String lastName = ParamUtil.getString(request, "last-name","");
+String screenName = ParamUtil.getString(request, "screen-name","");
+String emailAddress = ParamUtil.getString(request, "email-address","");
+%>
+
+<liferay-ui:error key="result-bad-format" message="<%=LanguageUtil.format(themeDisplay.getLocale(), \"result.must-be-between\", new Object[]{ct.getMinValue(),ct.getMaxValue()})%>" />
+
 <liferay-ui:error key="grades.bad-updating" message="offlinetaskactivity.grades.bad-updating" />
 <liferay-ui:success key="grades.updating" message="offlinetaskactivity.correct.saved" />
 
@@ -65,11 +76,11 @@ function <portlet:namespace />showPopupActivity(studentId, actId, actType) {
             modal: true,
             width: 700,
             height: 800,
-            after: {   
+            /*after: {   
 	          	close: function(event){ 
 	          		document.location.reload();
             	}
-            }
+            }*/
         }).plug(A.Plugin.IO, {
             uri: renderUrl.toString()
         }).render();
@@ -92,6 +103,11 @@ function <portlet:namespace />showPopupGrades(studentId, actId) {
 		renderUrl.setParameter('studentId', studentId);
 		renderUrl.setParameter('jspPage', '/html/execactivity/test/admin/popups/grades.jsp');
 
+		renderUrl.setParameter('first-name', '<%=firstName%>');
+		renderUrl.setParameter('last-name', '<%=lastName%>');
+		renderUrl.setParameter('screen-name', '<%=screenName%>');
+		renderUrl.setParameter('email-address', '<%=emailAddress%>');
+		
 		window.<portlet:namespace />popupGrades = new A.Dialog({
 			id:'<portlet:namespace />showPopupGrades',
             title: Liferay.Language.get("offlinetaskactivity.set.grades"),
@@ -123,16 +139,7 @@ long actId=ParamUtil.getLong(request, "actId",0);
 long courseId=ParamUtil.getLong(request, "courseId",0);
 Course course = CourseLocalServiceUtil.getCourse(courseId);
 
-CalificationType ct = new CalificationTypeRegistry().getCalificationType(course.getCalificationType());
-
 LearningActivity activity = LearningActivityLocalServiceUtil.getLearningActivity(actId);
-
-String firstName = ParamUtil.getString(request, "first-name","");
-String lastName = ParamUtil.getString(request, "last-name","");
-String screenName = ParamUtil.getString(request, "screen-name","");
-String emailAddress = ParamUtil.getString(request, "email-address","");
-
-
 
 //List<User> listaUsuarioTotal = UserLocalServiceUtil.getGroupUsers(course.getGroupCreatedId());
 LinkedHashMap<String, Object> params = new LinkedHashMap<String, Object>();

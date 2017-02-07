@@ -15,15 +15,21 @@ import javax.portlet.RenderResponse;
 import com.liferay.lms.asset.LearningActivityAssetRendererFactory;
 import com.liferay.lms.auditing.AuditConstants;
 import com.liferay.lms.auditing.AuditingLogFactory;
+import com.liferay.lms.learningactivity.calificationtype.CalificationType;
+import com.liferay.lms.learningactivity.calificationtype.CalificationTypeRegistry;
+import com.liferay.lms.model.Course;
 import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.model.LearningActivityResult;
 import com.liferay.lms.model.LearningActivityTry;
+import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityResultLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityTryLocalServiceUtil;
 import com.liferay.portal.kernel.exception.NestableException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.repository.model.FileEntry;
@@ -57,6 +63,8 @@ import com.liferay.util.bridges.mvc.MVCPortlet;
  * Portlet implementation class SurveyActivity
  */
 public class OnlineActivity extends MVCPortlet {
+	
+	private static Log log = LogFactoryUtil.getLog(OnlineActivity.class);
 	
 	public static final String NOT_TEACHER_SQL = "WHERE User_.userId NOT IN "+
 			 "( SELECT Usergrouprole.userId "+
@@ -92,8 +100,7 @@ public class OnlineActivity extends MVCPortlet {
 	public static final String RICH_TEXT_XML = "richText";
 	public static final String FILE_XML = "file";	
 
-	private void setGrades(RenderRequest renderRequest,
-			RenderResponse renderResponse) throws IOException, PortletException {
+	private void setGrades(RenderRequest renderRequest,	RenderResponse renderResponse) throws IOException, PortletException {
 
 		boolean correct=true;
 		long actId = ParamUtil.getLong(renderRequest,"actId"); 
@@ -127,6 +134,71 @@ public class OnlineActivity extends MVCPortlet {
 		}
 	}
 
+	
+	public void setGrades(ActionRequest request,	ActionResponse response){
+		
+		ThemeDisplay themeDisplay  =(ThemeDisplay)request.getAttribute(WebKeys.THEME_DISPLAY);
+		
+		boolean correct=true;
+		long actId = ParamUtil.getLong(request,"actId"); 
+		long studentId = ParamUtil.getLong(request,"studentId");		
+		String comments = ParamUtil.getString(request,"comments");
+		
+		log.debug("actId: "+actId);
+		log.debug("studentId: "+studentId);
+		log.debug("comments: "+comments);		
+		
+		String gradeFilter = ParamUtil.getString(request, "gradeFilter");
+		String criteria = ParamUtil.getString(request, "criteria");
+
+		log.debug("gradeFilter: "+gradeFilter);
+		log.debug("criteria: "+criteria);
+		
+		response.setRenderParameter("gradeFilter", gradeFilter);
+		response.setRenderParameter("criteria", criteria);
+		
+		CalificationType ct = null;
+		double result=0;
+		try {
+			Course course = CourseLocalServiceUtil.getCourseByGroupCreatedId(themeDisplay.getScopeGroupId());			
+			ct = new CalificationTypeRegistry().getCalificationType(course.getCalificationType());			
+			result= Double.valueOf(ParamUtil.getString(request,"result").replace(",", "."));
+			log.debug("result: "+result);
+			if(result<ct.getMinValue() || result>ct.getMaxValue()){
+				correct=false;
+				log.error("Result fuera de rango");
+				SessionErrors.add(request, "result-bad-format");
+			}
+		} catch (NumberFormatException e) {
+			e.printStackTrace();
+			correct=false;
+			SessionErrors.add(request, "result-bad-format");
+		} catch (Exception e) {
+			e.printStackTrace();
+			correct=false;
+			SessionErrors.add(request, "grades.bad-updating");
+		}
+		
+		if(correct) {
+			try {
+				LearningActivityTry  learningActivityTry =  LearningActivityTryLocalServiceUtil.getLastLearningActivityTryByActivityAndUser(actId, studentId);
+				learningActivityTry.setEndDate(new Date());
+				learningActivityTry.setResult(ct.toBase100(result));
+				learningActivityTry.setComments(comments);
+				updateLearningActivityTryAndResult(learningActivityTry);
+				
+				SessionMessages.add(request, "grades.updating");
+			} catch (NestableException e) {
+				SessionErrors.add(request, "grades.bad-updating");
+			}
+		}
+	}
+	
+	
+	
+	
+	
+	
 	private void updateLearningActivityTryAndResult(
 			LearningActivityTry learningActivityTry) throws PortalException,
 			SystemException {

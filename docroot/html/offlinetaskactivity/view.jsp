@@ -32,6 +32,12 @@
 <%@page import="com.liferay.portal.service.RoleLocalServiceUtil"%>
 <%@ include file="/init.jsp" %>
 
+<%
+CalificationType ct = new CalificationTypeRegistry().getCalificationType(CourseLocalServiceUtil.getCourseByGroupCreatedId(themeDisplay.getScopeGroupId()).getCalificationType());
+
+%>
+
+<liferay-ui:error key="result-bad-format" message="<%=LanguageUtil.format(themeDisplay.getLocale(), \"result.must-be-between\", new Object[]{ct.getMinValue(),ct.getMaxValue()})%>" />
 <liferay-ui:error key="grades.bad-updating" message="offlinetaskactivity.grades.bad-updating" />
 <liferay-ui:success key="grades.updating" message="offlinetaskactivity.correct.saved" />
 
@@ -50,8 +56,6 @@
 		if(activity.getTypeId() == 5){
 			
 			if(activity.canAccess(false, themeDisplay.getUser(), themeDisplay.getPermissionChecker())){
-		
-				CalificationType ct = new CalificationTypeRegistry().getCalificationType(CourseLocalServiceUtil.getCourseByGroupCreatedId(themeDisplay.getScopeGroupId()).getCalificationType());
 				
 				LearningActivityResult result = LearningActivityResultLocalServiceUtil.getByActIdAndUserId(actId, themeDisplay.getUserId());
 				Object  [] arguments=null;
@@ -127,7 +131,6 @@
 							}
 					    }
 	
-	
 					    function <portlet:namespace />showPopupGrades(studentId)
 					    {
 	
@@ -138,7 +141,9 @@
 								renderUrl.setParameter('actId', '<%=String.valueOf(activity.getActId()) %>');
 								renderUrl.setParameter('studentId', studentId);
 								renderUrl.setParameter('jspPage', '/html/offlinetaskactivity/popups/grades.jsp');
-	
+								renderUrl.setParameter('gradeFilter', '<%= ParamUtil.getString(renderRequest, "gradeFilter","") %>');
+								renderUrl.setParameter('criteria', '<%=ParamUtil.getString(renderRequest, "criteria","") %>');
+								
 								window.<portlet:namespace />popupGrades = new A.Dialog({
 									id:'<portlet:namespace />showPopupGrades',
 						            title: '<%=LanguageUtil.format(pageContext, "offlinetaskactivity.set.grades", new Object[]{""})%>',

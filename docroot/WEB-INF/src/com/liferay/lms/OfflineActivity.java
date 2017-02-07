@@ -288,7 +288,15 @@ public class OfflineActivity extends MVCPortlet {
 		log.debug("studentId: "+studentId);
 		log.debug("comments: "+comments);		
 		
+		String gradeFilter = ParamUtil.getString(request, "gradeFilter");
+		String criteria = ParamUtil.getString(request, "criteria");
 
+		log.debug("gradeFilter: "+gradeFilter);
+		log.debug("criteria: "+criteria);
+		
+		response.setRenderParameter("gradeFilter", gradeFilter);
+		response.setRenderParameter("criteria", criteria);		
+		
 		CalificationType ct = null;
 		double result=0;
 		try {

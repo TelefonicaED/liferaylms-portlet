@@ -18,15 +18,22 @@ if((actId2!=null)&&(studentId2!=null)){
 	result = LearningActivityResultLocalServiceUtil.getByActIdAndUserId(lactId2, lstudentId2);
 }
 
+
+String firstName = ParamUtil.getString(renderRequest, "first-name");
+String lastName = ParamUtil.getString(renderRequest, "last-name");
+String screenName = ParamUtil.getString(renderRequest, "screen-name");
+String emailAddress = ParamUtil.getString(renderRequest, "email-address");
+
+
 CalificationType ct = new CalificationTypeRegistry().getCalificationType(CourseLocalServiceUtil.getCourseByGroupCreatedId(themeDisplay.getScopeGroupId()).getCalificationType());
 
 %>
-<portlet:actionURL var="setGradesURL" name="setGrades" windowState="<%= LiferayWindowState.EXCLUSIVE.toString() %>">   
-		<portlet:param name="ajaxAction" value="setGrades" />      
-		<portlet:param name="jspPage" value="/html/execactivity/test/admin/popups/grades.jsp" />           
-</portlet:actionURL>
 
-<portlet:actionURL var="updateGradesURL" name="setGrades" windowState="<%= LiferayWindowState.NORMAL.toString() %>">   
+<portlet:actionURL var="updateGradesURL" name="setGrades" windowState="<%= LiferayWindowState.NORMAL.toString() %>"> 
+	<portlet:param name="first-name" value="<%=firstName %>" />
+	<portlet:param name="last-name" value="<%=lastName %>" />
+	<portlet:param name="screen-name" value="<%=screenName %>" />
+	<portlet:param name="email-address" value="<%=emailAddress %>" />    
 </portlet:actionURL>
 
 <aui:form action="<%=updateGradesURL %>" name="fn_grades" method="post" >

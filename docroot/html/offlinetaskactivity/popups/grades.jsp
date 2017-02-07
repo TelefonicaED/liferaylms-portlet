@@ -20,12 +20,17 @@ if((renderRequest.getParameter("actId")!=null)&&(renderRequest.getParameter("stu
 	activity = LearningActivityLocalServiceUtil.getLearningActivity(ParamUtil.getLong(renderRequest,"actId"));
 }
 
+String gradeFilter = ParamUtil.getString(renderRequest, "gradeFilter");
+String criteria = ParamUtil.getString(renderRequest, "criteria");
 
 CalificationType ct = new CalificationTypeRegistry().getCalificationType(CourseLocalServiceUtil.getCourseByGroupCreatedId(themeDisplay.getScopeGroupId()).getCalificationType());
 
 %>
 
-<portlet:actionURL name="setGrades" var="updateGradesURL" windowState="<%= LiferayWindowState.NORMAL.toString() %>" />
+<portlet:actionURL name="setGrades" var="updateGradesURL" windowState="<%= LiferayWindowState.NORMAL.toString() %>">
+	<portlet:param name="gradeFilter" value="<%=gradeFilter %>" />
+	<portlet:param name="criteria" value="<%=criteria %>" />
+</portlet:actionURL>
 
 <aui:form  name="fn_grades" method="post" action="${updateGradesURL}"  >
 	<aui:fieldset>
