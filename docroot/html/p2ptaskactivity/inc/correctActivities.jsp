@@ -23,6 +23,13 @@
 
 <%@include file="/init.jsp" %>
 
+<%
+Boolean isLinkTabletP2PCorrect = ParamUtil.getBoolean(request, "isTablet", false);
+String cssLinkTabletClassP2PCorrect="";
+if(isLinkTabletP2PCorrect){
+	cssLinkTabletClassP2PCorrect="tablet-link";
+}
+%>
 
 
 <script type="text/javascript">
@@ -532,7 +539,7 @@ if(!p2pActList.isEmpty()){
 							<c:if test="<%=myP2PActivity.getFileEntryId() != 0 %>">
 								<div class="doc_descarga">
 									<span><%=title%>&nbsp;(<%= sizeKb%> Kb)&nbsp;</span>
-									<a href="<%=urlFile%>" class="verMas" target="_blank"><liferay-ui:message key="p2ptask-donwload" /></a>
+									<a href="<%=urlFile%>" class="verMas <%=cssLinkTabletClassP2PCorrect %>" target="_blank"><liferay-ui:message key="p2ptask-donwload" /></a>
 								</div>
 							</c:if>
 
@@ -633,7 +640,7 @@ if(!p2pActList.isEmpty()){
 						<c:if test="<%=myP2PActivity.getFileEntryId() != 0 %>">
 							<div class="doc_descarga">
 								<span><%=title%>&nbsp;(<%= sizeKb%> Kb)&nbsp;</span>
-								<a href="<%=urlFile%>" class="verMas" target="_blank"><liferay-ui:message key="p2ptask-donwload" /></a>
+								<a href="<%=urlFile%>" class="verMas <%=cssLinkTabletClassP2PCorrect %>" target="_blank"><liferay-ui:message key="p2ptask-donwload" /></a>
 							</div>
 						</c:if>
 						<div class="degradade">
@@ -660,7 +667,7 @@ if(!p2pActList.isEmpty()){
 								%>
 								<div class="doc_descarga">
 									<span><%=dlfileCor.getTitle()%>&nbsp;(<%= sizeKb%> Kb)&nbsp;</span>
-									<a href="<%=urlFileCor%>" class="verMas" target="_blank"><liferay-ui:message key="p2ptask-donwload" /></a>
+									<a href="<%=urlFileCor%>" class="verMas <%=cssLinkTabletClassP2PCorrect %>" target="_blank"><liferay-ui:message key="p2ptask-donwload" /></a>
 								</div>
 							<%	}
 							}%>

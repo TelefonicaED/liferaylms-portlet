@@ -9,7 +9,7 @@
 <%@page import="com.liferay.lms.model.LearningActivity"%>
 
 <%@ include file="/init.jsp" %>
-<div class="container-activity">
+<%@ include file="/html/shared/isTablet.jsp" %>
 <script type="text/javascript">
 <!--
 	

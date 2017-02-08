@@ -16,6 +16,15 @@
 
 <%@ include file="/init.jsp" %>
 
+<%
+Boolean isLinkTabletTaskP2PResult = ParamUtil.getBoolean(request, "isTablet", false);
+String cssLinkTabletClassTaskP2PResult="";
+if(isLinkTabletTaskP2PResult){
+	cssLinkTabletClassTaskP2PResult="tablet-link";
+}
+%>
+
+
 <script type="text/javascript">
 function actionDiv(element){
 	var ua = navigator.userAgent;
@@ -145,7 +154,7 @@ if(actId!=0){
 			
 			<div class="doc_descarga">
 			<span><%=dlfile.getTitle()%>&nbsp;(<%= sizeKb%> Kb)&nbsp;</span>
-			<a href="<%=urlFile%>" class="verMas" target="_blank"><liferay-ui:message key="p2ptask-donwload" /></a>
+			<a href="<%=urlFile%>" class="verMas <%=cssLinkTabletClassTaskP2PResult %>" target="_blank"><liferay-ui:message key="p2ptask-donwload" /></a>
 			</div>
 			
 			<% }%>
@@ -212,7 +221,7 @@ if(actId!=0){
 						<c:if test="<%=myP2PActivity.getFileEntryId() != 0 %>">
 							<div class="doc_descarga">
 								<span><%=title%>&nbsp;(<%= sizeKb%> Kb)&nbsp;</span>
-								<a href="<%=urlFile%>" class="verMas" target="_blank"><liferay-ui:message key="p2ptask-donwload" /></a>
+								<a href="<%=urlFile%>" class="verMas <%=cssLinkTabletClassTaskP2PResult %>" target="_blank"><liferay-ui:message key="p2ptask-donwload" /></a>
 							</div>
 						</c:if>
 						<div class="degradade">
@@ -238,7 +247,7 @@ if(actId!=0){
 								%>
 								<div class="doc_descarga">
 									<span><%=dlfileCor.getTitle()%>&nbsp;(<%= sizeKb%> Kb)&nbsp;</span>
-									<a href="<%=urlFileCor%>" class="verMas" target="_blank"><liferay-ui:message key="p2ptask-donwload" /></a>
+									<a href="<%=urlFileCor%>" class="verMas <%=cssLinkTabletClassTaskP2PResult %>" target="_blank"><liferay-ui:message key="p2ptask-donwload" /></a>
 								</div>
 							<%	}
 							}%>
@@ -308,7 +317,7 @@ if(actId!=0){
 						<c:if test="<%=myP2PActCor.getFileEntryId() != 0 %>">
 							<div class="doc_descarga">
 								<span><%=title%>&nbsp;(<%= sizeKb%> Kb)&nbsp;</span>
-								<a href="<%=urlFile%>" class="verMas" target="_blank"><liferay-ui:message key="p2ptask-donwload" /></a>
+								<a href="<%=urlFile%>" class="verMas <%=cssLinkTabletClassTaskP2PResult %>" target="_blank"><liferay-ui:message key="p2ptask-donwload" /></a>
 							</div>
 						</c:if>
 						<div class="degradade">
@@ -334,7 +343,7 @@ if(actId!=0){
 								%>
 								<div class="doc_descarga">
 									<span><%=dlfileCor.getTitle()%>&nbsp;(<%= sizeKb%> Kb)&nbsp;</span>
-									<a href="<%=urlFileCor%>" class="verMas" target="_blank"><liferay-ui:message key="p2ptask-donwload" /></a>
+									<a href="<%=urlFileCor%>" class="verMas <%=cssLinkTabletClassTaskP2PResult %>" target="_blank"><liferay-ui:message key="p2ptask-donwload" /></a>
 								</div>
 							<%	}
 							}%>

@@ -24,6 +24,11 @@
 <liferay-ui:error key="p2ptaskactivity-error-file-name" message="p2ptaskactivity-error-file-name" />
 <liferay-ui:error key="p2ptaskactivity-error-file" message="p2ptaskactivity-error-file" />
 <%
+Boolean isLinkTabletP2PUpload = ParamUtil.getBoolean(request, "isTablet", false);
+String cssLinkTabletClassP2PUpload="";
+if(isLinkTabletP2PUpload){
+	cssLinkTabletClassP2PUpload="tablet-link";
+}
 long actId = ParamUtil.getLong(request, "actId",0);
 String textCorrection = LanguageUtil.get(pageContext,"p2ptask-text-upload");
 
@@ -298,7 +303,7 @@ Liferay.provide(
 				%>
 					<div class="doc_descarga">
 						<span><%=title%>&nbsp;(<%= sizeKb%> Kb)&nbsp;</span>
-						<a href="<%=urlFile%>" class="verMas" target="_blank"><liferay-ui:message key="p2ptask-donwload" /></a>
+						<a href="<%=urlFile%>" class="verMas <%=cssLinkTabletClassP2PUpload %>" target="_blank"><liferay-ui:message key="p2ptask-donwload" /></a>
 					</div>
 				<%
 				}

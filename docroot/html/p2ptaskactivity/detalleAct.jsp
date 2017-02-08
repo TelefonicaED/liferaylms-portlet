@@ -15,7 +15,13 @@
 <%@page import="com.liferay.lms.model.LearningActivity"%>
 
 <%@ include file="/init.jsp" %>
-
+<%
+Boolean isLinkTabletP2PAct = ParamUtil.getBoolean(request, "isTablet", false);
+String cssLinkTabletClassP2PAct="";
+if(isLinkTabletP2PAct){
+	cssLinkTabletClassP2PAct="tablet-link";
+}
+%>
 <script type="text/javascript">
 <!--
 	Liferay.provide(
@@ -143,7 +149,7 @@ if(actId!=0)
 		<c:if test="<%=Validator.isNotNull(urlFile) %>">
 			<div class="doc_descarga">
 				<span><%=title%>&nbsp;(<%= sizeKb%> Kb)&nbsp;</span>
-				<a href="<%=urlFile%>" class="verMas" target="_blank"><liferay-ui:message key="p2ptask-donwload" /></a>
+				<a href="<%=urlFile%>" class="verMas <%=cssLinkTabletClassP2PAct %>" target="_blank"><liferay-ui:message key="p2ptask-donwload" /></a>
 			</div>
 		</c:if>
 	</div>
@@ -225,7 +231,7 @@ if(actId!=0)
 							<%if(dlfile != null){ %>
 								<div class="doc_descarga">
 									<span><%=title%>&nbsp;(<%= sizeKb%> Kb)&nbsp;</span>
-									<a href="<%=urlFile%>" class="verMas" target="_blank"><liferay-ui:message key="p2ptask-donwload" /></a>
+									<a href="<%=urlFile%>" class="verMas <%=cssLinkTabletClassP2PAct %>" target="_blank"><liferay-ui:message key="p2ptask-donwload" /></a>
 								</div>
 							<%} %>
 							<div class="degradade">
@@ -242,7 +248,7 @@ if(actId!=0)
 								%>
 								<div class="doc_descarga">
 									<span><%=dlfileCor.getTitle()%>&nbsp;(<%= sizeKb%> Kb)&nbsp;</span>
-									<a href="<%=urlFileCor%>" class="verMas" target="_blank"><liferay-ui:message key="p2ptask-donwload" /></a>
+									<a href="<%=urlFileCor%>" class="verMas <%=cssLinkTabletClassP2PAct %>" target="_blank"><liferay-ui:message key="p2ptask-donwload" /></a>
 								</div>
 								<%} %>
 							</div>
@@ -330,7 +336,7 @@ if(actId!=0)
 						<%if(dlfile!=null){%>
 						<div class="doc_descarga">
 							<span><%=title%>&nbsp;(<%= sizeKb%> Kb)&nbsp;</span>
-							<a href="<%=urlFile%>" class="verMas" target="_blank"><liferay-ui:message key="p2ptask-donwload" /></a>
+							<a href="<%=urlFile%>" class="verMas <%=cssLinkTabletClassP2PAct %>" target="_blank"><liferay-ui:message key="p2ptask-donwload" /></a>
 						</div>
 						<%
 						}
