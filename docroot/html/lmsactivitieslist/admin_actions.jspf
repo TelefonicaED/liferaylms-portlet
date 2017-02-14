@@ -1,3 +1,12 @@
+<%@page import="com.liferay.lms.asset.LearningActivityBaseAssetRenderer"%>
+<%@page import="javax.portlet.PortletURL"%>
+<%@page import="com.liferay.portal.model.Portlet"%>
+<%@page import="com.liferay.portlet.PortletQNameUtil"%>
+<%@page import="com.liferay.portal.service.PortletLocalServiceUtil"%>
+<%@page import="com.liferay.portal.model.PublicRenderParameter"%>
+<%@page import="com.liferay.portal.kernel.util.Validator"%>
+<%@page import="com.liferay.portal.kernel.util.StringPool"%>
+<%@page import="com.liferay.portal.kernel.util.HttpUtil"%>
 <%@page import="com.liferay.portal.service.ResourcePermissionLocalServiceUtil"%>
 <%@page import="com.liferay.portal.model.ResourceConstants"%>
 <%@page import="com.liferay.portal.model.RoleConstants"%>
@@ -13,81 +22,24 @@ LearningActivity myActivity = activity;
 String name = LearningActivity.class.getName();
 String primKey = String.valueOf(myActivity.getActId());%>
 				
-<c:if test="<%= hasPermissionUpdate %>">
-	<liferay-portlet:renderURL var="editoptionsURL" windowState="<%= LiferayWindowState.POP_UP.toString() %>">
-		<liferay-portlet:param name="editing" value="<%=StringPool.TRUE %>" />
-		<liferay-portlet:param name="resId" value="<%=primKey %>" />
-		<liferay-portlet:param name="resModuleId" value="<%=Long.toString(myActivity.getModuleId()) %>" />
-	</liferay-portlet:renderURL>
-	<%StringBuilder editActivityPopup = new StringBuilder("javascript:AUI().use('aui-dialog','aui-dialog-iframe', "+
-			"	function(A){ "+
-			"	  var interval; "+
-			"	  new A.Dialog( "+
-			"		{ "+
-			"    		id: 'editlesson', "+ 
-			"			title: '"+LanguageUtil.get(pageContext,"activity.edition")+StringPool.SPACE+ LanguageUtil.get(pageContext, learningActivityType.getName())  +"', "+
-		    "			destroyOnClose: true, "+
-		    "			width: 750, "+
-		    "			modal:true, "+
-		    "			x:50, "+
-		    "			y:50, "+
-		    "			on: { "+
-			"				close: function(evt){ "+
-		    "					if(!!interval){ "+
-			"						A.clearInterval(interval); "+
-			"						delete interval; "+
-			"					} "+
-			"					Liferay.Portlet.refresh(A.one('#p_p_id"+renderResponse.getNamespace()+"')); ");
-			
-	if(myActivity.getActId()==actId) {	
-		String activityPortletId = learningActivityTypeRegistry.getLearningActivityType(myActivity.getTypeId()).getPortletId();
-		if(activityPortletId!=null) {
-			editActivityPopup.append(
-			 "         			var activityTitlePortlet=AUI().one('#p_p_id_"+JavaScriptUtil.markupToStringLiteral(activityPortletId)+"_');"+
-			 "         			if(activityTitlePortlet!=null) {  "+
-			 "		      			Liferay.Portlet.refresh(activityTitlePortlet);  "+			 
-			 "	       			}  ");
-		}
-	}		
-			
-	editActivityPopup.append(
-			"				} "+
-			"			} "+
-			"		} "+
-			"	).plug( "+
-			"		A.Plugin.DialogIframe, "+
-			"		{ "+
-			"			uri: '" + JavaScriptUtil.markupToStringLiteral(editoptionsURL) + "', "+
-			"			on: { "+
-			"				load: function(evt){ "+
-			"					var instance = evt.target, "+
-			"						node = instance.node.ancestor(); "+
-			"					interval = A.setInterval(function(){ "+
-			"						if(!!node) { "+
-			"							var	iframe = node.one('iframe'); "+
-			"							if(!!iframe) { "+
-			"								var	iframeDocument = iframe.get('contentWindow.document') || iframe.get('contentDocument'); "+
-			"								if(!!iframeDocument) { "+
-		    "									var	iframeBody = iframeDocument.one('body'); "+	
-		    "									if(!!iframeBody) { "+
-			"									iframeBody.delegate( "+	
-			"										'click', "+	
-			"										function() { "+	
-			"											iframeDocument.purge(true); "+	
-			"											instance.get('host').close(); "+	
-			"										}, "+	
-			"										'.aui-button-input-cancel' "+	
-			"									); "+	
-			"						}}}} "+
-			"					}, 100); "+	
-			"				} "+
-			"			} "+
-			"		} "+
-			"	).render().show(); "+
-			"});");
+<c:if test="<%= hasPermissionUpdate %>">							
+							
+<%
 
-%>
-	<liferay-ui:icon image="edit" message="edit" url="#" onClick="<%=editActivityPopup.toString() %>" />
+liferayPortletRequest.setAttribute(LearningActivityBaseAssetRenderer.EDIT_DETAILS, true);
+//PortletURL urlEditDetails = assetRendererFactory.getAssetRenderer(myActivity.getActId()).getURLEdit(liferayPortletRequest,liferayPortletResponse);
+
+
+PortletURL urlEditDetails = LearningActivityBaseAssetRenderer.getURLEditViewer(liferayPortletRequest, liferayPortletResponse, myActivity);
+
+if(Validator.isNotNull(urlEditDetails)){
+	
+	%>
+	<liferay-ui:icon image="edit" message="" label="true" url="<%=urlEditDetails.toString()%>"/>
+	<%
+}
+
+%>	
 </c:if>
 
 

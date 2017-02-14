@@ -25,9 +25,10 @@
 	LearningActivity learningActivity = LearningActivityLocalServiceUtil.getLearningActivity(ParamUtil.getLong(request,"resId"));
 	request.setAttribute("activity", learningActivity);
 
-	LiferayPortletURL backUrl = PortletURLFactoryUtil.create(request, PortalUtil.getJsSafePortletId("lmsactivitieslist"+
+	LiferayPortletURL backUrl = PortletURLFactoryUtil.create(request, PortalUtil.getJsSafePortletId("editactivity"+
 				PortletConstants.WAR_SEPARATOR+portletConfig.getPortletContext().getPortletContextName()), themeDisplay.getPlid(), PortletRequest.RENDER_PHASE);
-	backUrl.setWindowState(LiferayWindowState.POP_UP);
+	backUrl.setWindowState(LiferayWindowState.NORMAL);
+	backUrl.setParameter("actionEditingActivity", StringPool.TRUE);
 	backUrl.setParameter("resId", String.valueOf(learningActivity.getActId()));	
 	backUrl.setParameter("resModuleId", String.valueOf(learningActivity.getModuleId()));
 	backUrl.setParameter("jspPage", "/html/editactivity/editactivity.jsp");
@@ -55,7 +56,7 @@ Liferay.provide(
         '<portlet:namespace />newQuestion',
         function(typeId) {
 			var renderUrl = Liferay.PortletURL.createRenderURL();							
-			renderUrl.setWindowState('<%= LiferayWindowState.POP_UP.toString() %>');
+			renderUrl.setWindowState('<%= LiferayWindowState.NORMAL.toString() %>');
 			renderUrl.setPortletId('surveyactivity_WAR_liferaylmsportlet');
 			renderUrl.setParameter('jspPage','/html/surveyactivity/admin/editquestion.jsp');
 			renderUrl.setParameter('typeId', typeId);
