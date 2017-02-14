@@ -86,9 +86,9 @@ import com.liferay.util.bridges.mvc.MVCPortlet;
 public class ActivityViewer extends MVCPortlet {
 
 	public static final String LMS_EDITACTIVITY_PORTLET_ID =  PortalUtil.getJsSafePortletId("editactivity"+PortletConstants.WAR_SEPARATOR+ClpSerializer.getServletContextName());
-	
+
 	private static Log log = LogFactoryUtil.getLog(ActivityViewer.class);
-	
+
 	private static Set<String> reservedAttrs = new HashSet<String>();
 	private volatile Constructor<?> createComponentContext;
 	private volatile Method getContext;
@@ -100,16 +100,16 @@ public class ActivityViewer extends MVCPortlet {
 		reservedAttrs.add(WebKeys.AUI_SCRIPT_DATA);
 		reservedAttrs.add(WebKeys.RUNTIME_PORTLET_IDS);
 	}
-	
-	
+
+
 	@Override
 	public void init(PortletConfig config) throws PortletException {
 		super.init(config);
 		try {
- 			Class<?> publicRenderParametersPoolClass = PortalClassLoaderUtil.getClassLoader().loadClass("com.liferay.portlet.PublicRenderParametersPool");
- 			getPublicParameters = publicRenderParametersPoolClass.getMethod("get", HttpServletRequest.class, Long.TYPE);
-			
- 			Class<?> componentContextClass = PortalClassLoaderUtil.getClassLoader().loadClass("org.apache.struts.tiles.ComponentContext");
+			Class<?> publicRenderParametersPoolClass = PortalClassLoaderUtil.getClassLoader().loadClass("com.liferay.portlet.PublicRenderParametersPool");
+			getPublicParameters = publicRenderParametersPoolClass.getMethod("get", HttpServletRequest.class, Long.TYPE);
+
+			Class<?> componentContextClass = PortalClassLoaderUtil.getClassLoader().loadClass("org.apache.struts.tiles.ComponentContext");
 			createComponentContext = componentContextClass.getConstructor(Map.class);
 			getContext = componentContextClass.getMethod("getContext", ServletRequest.class);
 			setContext = componentContextClass.getMethod("setContext",componentContextClass,ServletRequest.class);
@@ -117,7 +117,7 @@ public class ActivityViewer extends MVCPortlet {
 			throw new PortletException(e);
 		}
 	}
-	
+
 	@SuppressWarnings({"unchecked"})
 	private final Map<String, String[]> getPublicParameters(HttpServletRequest request, long plid) throws SystemException{
 		try {
@@ -126,7 +126,7 @@ public class ActivityViewer extends MVCPortlet {
 			throw new SystemException(e);
 		} 
 	}
-	
+
 	private final  Object createComponentContext(Map<String,String> attributes) throws SystemException{
 		try {
 			return createComponentContext.newInstance(attributes);
@@ -159,11 +159,11 @@ public class ActivityViewer extends MVCPortlet {
 		long actId=GetterUtil.DEFAULT_LONG;
 		boolean actionEditingDetails = ParamUtil.getBoolean(renderRequest, "actionEditingDetails", false);
 		boolean actionEditingActivity = ParamUtil.getBoolean(renderRequest, "actionEditingActivity", false);
-		
+
 		log.debug("isWidget:"+isWidget);
 		log.debug("actionEditingDetails:"+actionEditingDetails);
 		log.debug("actionEditingActivity:"+actionEditingActivity);
-		
+
 		if(!isWidget && actionEditingDetails){
 			actId=ParamUtil.getLong(renderRequest, "resId", ParamUtil.getLong(renderRequest, "actId",0));
 			renderResponse.setProperty("clear-request-parameters",Boolean.TRUE.toString());			
@@ -172,42 +172,114 @@ public class ActivityViewer extends MVCPortlet {
 			actId=ParamUtil.getLong(renderRequest, "actId");			
 			log.debug("::actId = "+actId);
 		}
-		
-		
-		
+
+
 		if(Validator.isNull(actId)) {
-			renderRequest.setAttribute(WebKeys.PORTLET_CONFIGURATOR_VISIBILITY, Boolean.FALSE);
-		}
-		else {
+
+			if(actionEditingActivity){
+
+				log.debug("***CREACION DE ACTIVIDAD O CREACION/EDICION DE MODULO");
+
+
+				try{
+					Portlet portlet = null;
+					log.debug("*****CARGO EL PORTLET: "+LMS_EDITACTIVITY_PORTLET_ID);
+					portlet = PortletLocalServiceUtil.getPortletById(themeDisplay.getCompanyId(), LMS_EDITACTIVITY_PORTLET_ID);
+
+					HttpServletRequest renderHttpServletRequest = PortalUtil.getHttpServletRequest(renderRequest);
+					PortletPreferencesFactoryUtil.getLayoutPortletSetup(themeDisplay.getLayout(), portlet.getPortletId());
+
+					if(isWidget){
+						Map<String, String[]> publicParameters = getPublicParameters(renderHttpServletRequest, themeDisplay.getPlid());
+						for(PublicRenderParameter publicRenderParameter:portlet.getPublicRenderParameters()) {
+							String[] parameterValues = renderRequest.getParameterValues(publicRenderParameter.getIdentifier());
+							if(Validator.isNotNull(parameterValues)) {
+								String publicRenderParameterName = PortletQNameUtil.getPublicRenderParameterName(publicRenderParameter.getQName());
+								String[] currentValues = publicParameters.get(publicRenderParameterName);
+								if(Validator.isNotNull(currentValues)){
+									parameterValues = ArrayUtil.append(parameterValues, currentValues);
+								}
+								publicParameters.put(publicRenderParameterName, parameterValues);
+							}
+						}
+						renderResponse.setProperty("clear-request-parameters",StringPool.TRUE);
+
+						if(ParamUtil.getBoolean(renderRequest, "scriptMobile",true)) {
+							RenderResponseWrapper renderResponseWrapper = new RenderResponseWrapper(renderResponse) {
+								private final StringWriter stringWriter = new StringWriter();
+
+								@Override
+								public PrintWriter getWriter() throws IOException {
+									return new PrintWriter(stringWriter);
+								}
+
+								@Override
+								public OutputStream getPortletOutputStream()
+										throws IOException {
+									return new WriterOutputStream(stringWriter);
+								}
+
+								@Override
+								public String toString() {
+									return stringWriter.toString();
+								}
+
+							};
+							include("/html/activityViewer/scriptMobile.jsp", renderRequest, renderResponseWrapper);
+
+							StringBundler pageTopStringBundler = (StringBundler)renderRequest.getAttribute(WebKeys.PAGE_TOP);
+
+							if (pageTopStringBundler == null) {
+								pageTopStringBundler = new StringBundler();
+								renderRequest.setAttribute(WebKeys.PAGE_TOP, pageTopStringBundler);
+							}
+
+
+							pageTopStringBundler.append(renderResponseWrapper.toString());
+						}
+					}
+
+					String activityContent = renderPortlet(renderRequest, renderResponse, 
+							themeDisplay, themeDisplay.getScopeGroupId(), portlet, isWidget, true);
+
+					renderResponse.setContentType(ContentTypes.TEXT_HTML_UTF8);
+					renderResponse.getWriter().print(activityContent);	
+				}catch(Exception e){
+					e.printStackTrace();
+				}
+
+			}else{
+				renderRequest.setAttribute(WebKeys.PORTLET_CONFIGURATOR_VISIBILITY, Boolean.FALSE);
+			}
+		}else {
 			try {
 				LearningActivity learningActivity = LearningActivityLocalServiceUtil.getLearningActivity(actId);
-	
+
 				if(Validator.isNull(learningActivity)) {
 					renderRequest.setAttribute(WebKeys.PORTLET_CONFIGURATOR_VISIBILITY, Boolean.FALSE);
-				}
-				else {
+				}else {
 					LearningActivityType learningActivityType=new LearningActivityTypeRegistry().getLearningActivityType(learningActivity.getTypeId());
-					
+
 					if((Validator.isNull(learningActivityType))||
-					   ((!isWidget)&&
-					    (themeDisplay.getLayoutTypePortlet().getPortletIds().contains(learningActivityType.getPortletId())))) {
+							((!isWidget)&&
+									(themeDisplay.getLayoutTypePortlet().getPortletIds().contains(learningActivityType.getPortletId())))) {
 						renderRequest.setAttribute(WebKeys.PORTLET_CONFIGURATOR_VISIBILITY, Boolean.FALSE);
 					}
 					else {						
 						Portlet portlet = null;
-						
+
 						if(!actionEditingActivity){
 							log.debug("*****CARGO EL PORTLET: "+learningActivityType.getPortletId());
 							portlet = PortletLocalServiceUtil.getPortletById(themeDisplay.getCompanyId(), learningActivityType.getPortletId());
 						}else{
 							log.debug("*****CARGO EL PORTLET: "+LMS_EDITACTIVITY_PORTLET_ID);
 							portlet = PortletLocalServiceUtil.getPortletById(themeDisplay.getCompanyId(), LMS_EDITACTIVITY_PORTLET_ID);
-							
+
 						}
 
 						HttpServletRequest renderHttpServletRequest = PortalUtil.getHttpServletRequest(renderRequest);
 						PortletPreferencesFactoryUtil.getLayoutPortletSetup(themeDisplay.getLayout(), portlet.getPortletId());
-						
+
 						if(isWidget){
 							Map<String, String[]> publicParameters = getPublicParameters(renderHttpServletRequest, themeDisplay.getPlid());
 							for(PublicRenderParameter publicRenderParameter:portlet.getPublicRenderParameters()) {
@@ -226,34 +298,34 @@ public class ActivityViewer extends MVCPortlet {
 							if(ParamUtil.getBoolean(renderRequest, "scriptMobile",true)) {
 								RenderResponseWrapper renderResponseWrapper = new RenderResponseWrapper(renderResponse) {
 									private final StringWriter stringWriter = new StringWriter();
-								
+
 									@Override
 									public PrintWriter getWriter() throws IOException {
 										return new PrintWriter(stringWriter);
 									}
-									
+
 									@Override
 									public OutputStream getPortletOutputStream()
-										throws IOException {
+											throws IOException {
 										return new WriterOutputStream(stringWriter);
 									}
-									
+
 									@Override
 									public String toString() {
 										return stringWriter.toString();
 									}
-							
+
 								};
 								include("/html/activityViewer/scriptMobile.jsp", renderRequest, renderResponseWrapper);
 
 								StringBundler pageTopStringBundler = (StringBundler)renderRequest.getAttribute(WebKeys.PAGE_TOP);
-	
+
 								if (pageTopStringBundler == null) {
 									pageTopStringBundler = new StringBundler();
 									renderRequest.setAttribute(WebKeys.PAGE_TOP, pageTopStringBundler);
 								}
-								
-								
+
+
 								pageTopStringBundler.append(renderResponseWrapper.toString());
 							}
 						}
@@ -267,7 +339,7 @@ public class ActivityViewer extends MVCPortlet {
 								SocialActivityConstants.TYPE_VIEW, StringPool.BLANK, 0);
 						renderResponse.setContentType(ContentTypes.TEXT_HTML_UTF8);
 						renderResponse.getWriter().print(activityContent);
-						
+
 						String resourcePrimKey = PortletPermissionUtil.getPrimaryKey(
 								themeDisplay.getPlid(), learningActivityType.getPortletId());
 						String portletName = learningActivityType.getPortletId();
@@ -280,10 +352,10 @@ public class ActivityViewer extends MVCPortlet {
 						if ((ResourcePermissionLocalServiceUtil.getResourcePermissionsCount(
 								themeDisplay.getCompanyId(), portletName,
 								ResourceConstants.SCOPE_INDIVIDUAL, resourcePrimKey) == 0)&&
-							(ResourceActionLocalServiceUtil.fetchResourceAction(portletName, ACTION_VIEW)!=null)) {
-				        	Role siteMember = RoleLocalServiceUtil.getRole(themeDisplay.getCompanyId(),RoleConstants.SITE_MEMBER);
-				        	ResourcePermissionLocalServiceUtil.setResourcePermissions(themeDisplay.getCompanyId(), portletName, ResourceConstants.SCOPE_INDIVIDUAL, 
-			        				resourcePrimKey,siteMember.getRoleId(), new String[]{ACTION_VIEW});
+								(ResourceActionLocalServiceUtil.fetchResourceAction(portletName, ACTION_VIEW)!=null)) {
+							Role siteMember = RoleLocalServiceUtil.getRole(themeDisplay.getCompanyId(),RoleConstants.SITE_MEMBER);
+							ResourcePermissionLocalServiceUtil.setResourcePermissions(themeDisplay.getCompanyId(), portletName, ResourceConstants.SCOPE_INDIVIDUAL, 
+									resourcePrimKey,siteMember.getRoleId(), new String[]{ACTION_VIEW});
 						}
 					}
 				}
@@ -292,114 +364,114 @@ public class ActivityViewer extends MVCPortlet {
 				renderRequest.setAttribute(WebKeys.PORTLET_CONFIGURATOR_VISIBILITY, Boolean.FALSE);
 			}
 		}
-		
+
 		//super.render(renderRequest, renderResponse);
 	}
-	
-	
-    /**
-     * Renders the given portlet as a runtime portlet and returns the portlet's HTML.
-     * Based on http://www.devatwork.nl/2011/07/liferay-embedding-portlets-in-your-portlet/
-     * @throws PortalException 
-     */
-    @SuppressWarnings("unchecked")
+
+
+	/**
+	 * Renders the given portlet as a runtime portlet and returns the portlet's HTML.
+	 * Based on http://www.devatwork.nl/2011/07/liferay-embedding-portlets-in-your-portlet/
+	 * @throws PortalException 
+	 */
+	@SuppressWarnings("unchecked")
 	public String renderPortlet(final RenderRequest request, final RenderResponse response,final ThemeDisplay themeDisplay,
 			final long scopeGroup, final Portlet portlet,final boolean copyNonNamespaceParameters,final boolean copyPublicParameters) 
-			throws SystemException, IOException, ServletException, ValidatorException, PortalException {
-        // Get servlet request / response
-    	HttpServletRequest renderServletRequest = PortalUtil.getHttpServletRequest(request);
-    	HttpSession renderServletSession = renderServletRequest.getSession();
-        HttpServletRequest servletRequest = PortalUtil.getOriginalServletRequest(renderServletRequest);
-    	HttpSession servletSession = servletRequest.getSession();
-        HttpServletResponse servletResponse = PortalUtil.getHttpServletResponse(response);
-    	
+					throws SystemException, IOException, ServletException, ValidatorException, PortalException {
+		// Get servlet request / response
+		HttpServletRequest renderServletRequest = PortalUtil.getHttpServletRequest(request);
+		HttpSession renderServletSession = renderServletRequest.getSession();
+		HttpServletRequest servletRequest = PortalUtil.getOriginalServletRequest(renderServletRequest);
+		HttpSession servletSession = servletRequest.getSession();
+		HttpServletResponse servletResponse = PortalUtil.getHttpServletResponse(response);
 
-        
-        PortletDisplay portletDisplay = themeDisplay.getPortletDisplay();
-        PortletDisplay portletDisplayClone = new PortletDisplay();
-        portletDisplay.copyTo(portletDisplayClone);
-        final Map<String, Object> requestAttributeBackup = new HashMap<String, Object>();
-        for (final String key : Collections.list((Enumeration<String>) servletRequest.getAttributeNames())) {
-            requestAttributeBackup.put(key, servletRequest.getAttribute(key));
-        }
-        
-        final Map<String, Object> sessionAttributeBackup = new HashMap<String, Object>();
-        for (final String key : Collections.list((Enumeration<String>) servletSession.getAttributeNames())) {
+
+
+		PortletDisplay portletDisplay = themeDisplay.getPortletDisplay();
+		PortletDisplay portletDisplayClone = new PortletDisplay();
+		portletDisplay.copyTo(portletDisplayClone);
+		final Map<String, Object> requestAttributeBackup = new HashMap<String, Object>();
+		for (final String key : Collections.list((Enumeration<String>) servletRequest.getAttributeNames())) {
+			requestAttributeBackup.put(key, servletRequest.getAttribute(key));
+		}
+
+		final Map<String, Object> sessionAttributeBackup = new HashMap<String, Object>();
+		for (final String key : Collections.list((Enumeration<String>) servletSession.getAttributeNames())) {
 			sessionAttributeBackup.put(key, servletSession.getAttribute(key));
-        }
+		}
 
-        for (final String key : Collections.list((Enumeration<String>) renderServletSession.getAttributeNames())) {
-        	if(Validator.isNull(servletSession.getAttribute(key))) {
-        		servletSession.setAttribute(key, renderServletSession.getAttribute(key));
-        	}
-        }
-        
-        // Render the portlet as a runtime portlet
-        String result=null;
-        long currentScopeGroup = themeDisplay.getScopeGroupId();
-        String currentOuterPortlet = (String) servletRequest.getAttribute("OUTER_PORTLET_ID");
-        Layout currentLayout = (Layout)servletRequest.getAttribute(WebKeys.LAYOUT);
-        try {
+		for (final String key : Collections.list((Enumeration<String>) renderServletSession.getAttributeNames())) {
+			if(Validator.isNull(servletSession.getAttribute(key))) {
+				servletSession.setAttribute(key, renderServletSession.getAttribute(key));
+			}
+		}
+
+		// Render the portlet as a runtime portlet
+		String result=null;
+		long currentScopeGroup = themeDisplay.getScopeGroupId();
+		String currentOuterPortlet = (String) servletRequest.getAttribute("OUTER_PORTLET_ID");
+		Layout currentLayout = (Layout)servletRequest.getAttribute(WebKeys.LAYOUT);
+		try {
 			ServletContext servletContext = (ServletContext)servletRequest.getAttribute(WebKeys.CTX);
-        	servletRequest.setAttribute(WebKeys.RENDER_PORTLET_RESOURCE, Boolean.TRUE);
-        	long defaultGroupPlid = LayoutLocalServiceUtil.getDefaultPlid(scopeGroup);
-        	if(defaultGroupPlid!=LayoutConstants.DEFAULT_PLID) {
-        		servletRequest.setAttribute(WebKeys.LAYOUT, LayoutLocalServiceUtil.getLayout(defaultGroupPlid));
-        	}
+			servletRequest.setAttribute(WebKeys.RENDER_PORTLET_RESOURCE, Boolean.TRUE);
+			long defaultGroupPlid = LayoutLocalServiceUtil.getDefaultPlid(scopeGroup);
+			if(defaultGroupPlid!=LayoutConstants.DEFAULT_PLID) {
+				servletRequest.setAttribute(WebKeys.LAYOUT, LayoutLocalServiceUtil.getLayout(defaultGroupPlid));
+			}
 
-        	servletRequest.setAttribute("OUTER_PORTLET_ID",PortalUtil.getPortletId(request));
+			servletRequest.setAttribute("OUTER_PORTLET_ID",PortalUtil.getPortletId(request));
 
-        	StringBundler queryStringStringBundler = new StringBundler();
+			StringBundler queryStringStringBundler = new StringBundler();
 
-        	if(copyNonNamespaceParameters) {
-        		String portletNamespace = PortalUtil.getPortletNamespace(portlet.getPortletId());
-        		Map<String, String[]> parameters = servletRequest.getParameterMap();
-	        	for (Map.Entry<String, String[]> entry : parameters.entrySet()) {
-	        		if((!entry.getKey().startsWith(PortletQName.PUBLIC_RENDER_PARAMETER_NAMESPACE))&&
-	        		   (!entry.getKey().startsWith(portletNamespace))&&
-	        		   (!PortalUtil.isReservedParameter(entry.getKey()))&&
-	        		   (!request.getPublicParameterMap().containsKey(entry.getKey()))) {
+			if(copyNonNamespaceParameters) {
+				String portletNamespace = PortalUtil.getPortletNamespace(portlet.getPortletId());
+				Map<String, String[]> parameters = servletRequest.getParameterMap();
+				for (Map.Entry<String, String[]> entry : parameters.entrySet()) {
+					if((!entry.getKey().startsWith(PortletQName.PUBLIC_RENDER_PARAMETER_NAMESPACE))&&
+							(!entry.getKey().startsWith(portletNamespace))&&
+							(!PortalUtil.isReservedParameter(entry.getKey()))&&
+							(!request.getPublicParameterMap().containsKey(entry.getKey()))) {
 						for(String value:entry.getValue()) {
 							if(queryStringStringBundler.index()!=0) {
 								queryStringStringBundler.append(StringPool.AMPERSAND);
 							}
 							queryStringStringBundler.append(entry.getKey());
-			        		queryStringStringBundler.append(StringPool.EQUAL);
-			        		queryStringStringBundler.append(value);
+							queryStringStringBundler.append(StringPool.EQUAL);
+							queryStringStringBundler.append(value);
 						}
-	        		}
+					}
 				}
-        	}
+			}
 
-        	if(copyPublicParameters) {
-	        	for (Entry<String, String[]> entry : request.getPublicParameterMap().entrySet()) {
-	        		String[] values = entry.getValue();
+			if(copyPublicParameters) {
+				for (Entry<String, String[]> entry : request.getPublicParameterMap().entrySet()) {
+					String[] values = entry.getValue();
 					for(int itrValues=values.length-1;itrValues>=0;itrValues--) {
 						if(queryStringStringBundler.index()!=0) {
 							queryStringStringBundler.append(StringPool.AMPERSAND);
 						}
 						queryStringStringBundler.append(entry.getKey());
-		        		queryStringStringBundler.append(StringPool.EQUAL);
-		        		queryStringStringBundler.append(values[itrValues]);
+						queryStringStringBundler.append(StringPool.EQUAL);
+						queryStringStringBundler.append(values[itrValues]);
 					}
 				}
-        	}
+			}
 
-            String renderedPortlet = PortalUtil.renderPortlet(servletContext, servletRequest, servletResponse, 
-            		new PortletWrapper(portlet){
-						private static final long serialVersionUID = 229422682924083706L;
-		
-						@Override
-		        		public boolean isUseDefaultTemplate() {
-		        			return false;
-		        		}
-					}, queryStringStringBundler.toString(), false);
+			String renderedPortlet = PortalUtil.renderPortlet(servletContext, servletRequest, servletResponse, 
+					new PortletWrapper(portlet){
+				private static final long serialVersionUID = 229422682924083706L;
 
-            for (final String key : Collections.list((Enumeration<String>) servletSession.getAttributeNames())) {
+				@Override
+				public boolean isUseDefaultTemplate() {
+					return false;
+				}
+			}, queryStringStringBundler.toString(), false);
+
+			for (final String key : Collections.list((Enumeration<String>) servletSession.getAttributeNames())) {
 				if(Validator.isNull(renderServletRequest.getAttribute(key))) {
 					renderServletRequest.setAttribute(key, servletSession.getAttribute(key));
 				}
-            }
+			}
 
 			List<String> markupHeaders = (List<String>)servletRequest.getAttribute(MimeResponse.MARKUP_HEAD_ELEMENT);
 			if((Validator.isNotNull(markupHeaders))&&(!markupHeaders.isEmpty())) {
@@ -409,13 +481,13 @@ public class ActivityViewer extends MVCPortlet {
 					pageTopStringBundler = new StringBundler();
 					request.setAttribute(WebKeys.PAGE_TOP, pageTopStringBundler);
 				}
-				
+
 				for(String markupHeader:markupHeaders) {
 					pageTopStringBundler.append(markupHeader);
 				}
 			}
 
-            if(portlet.isUseDefaultTemplate()) {
+			if(portlet.isUseDefaultTemplate()) {
 				String  portletHeader = StringPool.BLANK, 
 						portletBody = renderedPortlet,
 						portletQueue = StringPool.BLANK;
@@ -442,12 +514,12 @@ public class ActivityViewer extends MVCPortlet {
 				servletRequest.setAttribute(JavaConstants.JAVAX_PORTLET_CONFIG, PortletConfigFactoryUtil.create(portlet, servletContext));
 				servletRequest.setAttribute("PORTLET_CONTENT", portletBody);
 				result = portletHeader+
-						 PortalUtil.renderPage(servletContext, servletRequest, servletResponse, "/html/common/themes/portlet.jsp",false)+
-						 portletQueue;
-            }
-            else {
-            	result = renderedPortlet;
-            }
+						PortalUtil.renderPage(servletContext, servletRequest, servletResponse, "/html/common/themes/portlet.jsp",false)+
+						portletQueue;
+			}
+			else {
+				result = renderedPortlet;
+			}
 
 			Set<String> runtimePortletIds = (Set<String>)request.getAttribute(
 					WebKeys.RUNTIME_PORTLET_IDS);
@@ -459,39 +531,39 @@ public class ActivityViewer extends MVCPortlet {
 			runtimePortletIds.add(portlet.getPortletId());
 
 			request.setAttribute(WebKeys.RUNTIME_PORTLET_IDS, runtimePortletIds);
-        }finally {
-            // Restore the state
-        	Set<Entry<String,Object>> sessionAttributesSet = sessionAttributeBackup.entrySet();
-        	for (Entry<String, Object> entry : sessionAttributesSet) {
+		}finally {
+			// Restore the state
+			Set<Entry<String,Object>> sessionAttributesSet = sessionAttributeBackup.entrySet();
+			for (Entry<String, Object> entry : sessionAttributesSet) {
 				if(Validator.isNull(servletRequest.getAttribute(entry.getKey()))) {
 					servletSession.setAttribute(entry.getKey(), entry.getValue());
 				}
 			}
-        	        	
-            for (final String key : Collections.list((Enumeration<String>) servletSession.getAttributeNames())) {
-            	if(!sessionAttributeBackup.containsKey(key)) {
-            		servletSession.removeAttribute(key);
-            	}
-            }
-  
-        	themeDisplay.setScopeGroupId(currentScopeGroup);
-            servletRequest.setAttribute(WebKeys.LAYOUT, currentLayout);
-            servletRequest.setAttribute("OUTER_PORTLET_ID",currentOuterPortlet);
-            portletDisplay.copyFrom(portletDisplayClone);
-            portletDisplayClone.recycle();
-            for (final String key : Collections.list((Enumeration<String>) servletRequest.getAttributeNames())) {
-                if ((!requestAttributeBackup.containsKey(key))&&(!reservedAttrs.contains(key))) {
-                    servletRequest.removeAttribute(key);
-                }
-            }
-            for (final Map.Entry<String, Object> entry : requestAttributeBackup.entrySet()) {
-                servletRequest.setAttribute(entry.getKey(), entry.getValue());
-            }
-        }
 
-        return result;
-    }
-    
-    private static final String PORTLET_BODY = "<div class=\"portlet-body\">";
-    private static final String DIV_END = "</div>";
+			for (final String key : Collections.list((Enumeration<String>) servletSession.getAttributeNames())) {
+				if(!sessionAttributeBackup.containsKey(key)) {
+					servletSession.removeAttribute(key);
+				}
+			}
+
+			themeDisplay.setScopeGroupId(currentScopeGroup);
+			servletRequest.setAttribute(WebKeys.LAYOUT, currentLayout);
+			servletRequest.setAttribute("OUTER_PORTLET_ID",currentOuterPortlet);
+			portletDisplay.copyFrom(portletDisplayClone);
+			portletDisplayClone.recycle();
+			for (final String key : Collections.list((Enumeration<String>) servletRequest.getAttributeNames())) {
+				if ((!requestAttributeBackup.containsKey(key))&&(!reservedAttrs.contains(key))) {
+					servletRequest.removeAttribute(key);
+				}
+			}
+			for (final Map.Entry<String, Object> entry : requestAttributeBackup.entrySet()) {
+				servletRequest.setAttribute(entry.getKey(), entry.getValue());
+			}
+		}
+
+		return result;
+	}
+
+	private static final String PORTLET_BODY = "<div class=\"portlet-body\">";
+	private static final String DIV_END = "</div>";
 }

@@ -25,53 +25,15 @@ String activityEnd = "desactivado";
 if ((actionEditing && hasPermissionAddLact) ||
 		(moduleId==0 
 		&& permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), "com.liferay.lms.learningactivitymodel", themeDisplay.getScopeGroupId(), "ADD_ACTIVITY"))) {
+	
+	PortletURL urlCreateActivity = LmsActivitiesList.getURLCreateActivity(liferayPortletRequest, liferayPortletResponse, currentModule);
+
+	if(Validator.isNotNull(urlCreateActivity)){
 		
-		String newactivitypopup = "javascript:AUI().use('aui-dialog','aui-dialog-iframe', "+
-			"	function(A){ "+
-			"	new A.Dialog( "+
-			"		{ "+
-			"    		id: 'editlesson', "+ 
-			"			title: '"+LanguageUtil.get(pageContext,"activity.creation")+"', "+
-		    "			destroyOnClose: true, "+
-		    "			width: 750, "+
-		    "			modal:true, "+
-		    "			x:50, "+
-		    "			y:50, "+
-		    "			on: { "+
-			"    			close: function(evt){ "+
-			"					Liferay.Portlet.refresh(A.one('#p_p_id"+renderResponse.getNamespace()+"')); "+		
-			"				} "+
-			"			} "+
-			"		} "+
-			"	).plug( "+
-			"		A.Plugin.DialogIframe, "+
-			"		{ "+
-			"			uri: '" + JavaScriptUtil.markupToStringLiteral(newactivityURL.toString()) + "', "+
-			"			on: { "+
-			"    			load: function(evt){ "+
-			"					var instance = evt.target; "+
-			"					var iframe = instance.node; "+
-			"					var	iframeDocument = iframe.get('contentWindow.document') || iframe.get('contentDocument'); "+
-			"					var	iframeBody = iframeDocument.one('body'); "+	
-			"					iframeBody.delegate( "+	
-			"						'click', "+	
-			"						function() { "+	
-			"							iframeDocument.purge(true); "+	
-			"							instance.get('host').close(); "+	
-			"						}, "+	
-			"						'.aui-button-input-cancel' "+	
-			"					); "+	
-			"				} "+
-			"			} "+
-			"		} "+
-			"	).render().show(); "+
-			"});";
 		%>
-
-
-		
-		<liferay-ui:icon image="add" label="<%=true%>" message="activity.creation" url="#" cssClass="newactivity" onClick="<%=newactivitypopup %>"/>	
-	<%
+		<liferay-ui:icon image="add" message="activity.creation" label="true" cssClass="newactivity" url="<%=urlCreateActivity.toString()%>"/>
+		<%
+	}
 }
 %>
 <liferay-ui:error></liferay-ui:error>

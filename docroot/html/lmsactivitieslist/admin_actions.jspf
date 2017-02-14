@@ -1,4 +1,5 @@
 <%@page import="com.liferay.lms.asset.LearningActivityBaseAssetRenderer"%>
+<%@page import="com.liferay.lms.LmsActivitiesList"%>
 <%@page import="javax.portlet.PortletURL"%>
 <%@page import="com.liferay.portal.model.Portlet"%>
 <%@page import="com.liferay.portlet.PortletQNameUtil"%>
@@ -30,7 +31,7 @@ liferayPortletRequest.setAttribute(LearningActivityBaseAssetRenderer.EDIT_DETAIL
 //PortletURL urlEditDetails = assetRendererFactory.getAssetRenderer(myActivity.getActId()).getURLEdit(liferayPortletRequest,liferayPortletResponse);
 
 
-PortletURL urlEditDetails = LearningActivityBaseAssetRenderer.getURLEditViewer(liferayPortletRequest, liferayPortletResponse, myActivity);
+PortletURL urlEditDetails = LmsActivitiesList.getURLEditActivity(liferayPortletRequest, liferayPortletResponse, myActivity);
 
 if(Validator.isNotNull(urlEditDetails)){
 	
