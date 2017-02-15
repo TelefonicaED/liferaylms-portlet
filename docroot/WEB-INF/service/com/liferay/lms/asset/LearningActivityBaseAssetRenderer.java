@@ -239,6 +239,7 @@ public abstract class LearningActivityBaseAssetRenderer extends BaseAssetRendere
 		portletURL.setParameter("moduleId",Long.toString( _learningactivity.getModuleId()));
 		portletURL.setParameter("actionEditingActivity", StringPool.FALSE);
 		portletURL.setParameter("actionEditingDetails", StringPool.FALSE);
+		portletURL.setParameter("actionEditingModule", StringPool.FALSE);
 		
 		long userId = PrincipalThreadLocal.getUserId();
 		
@@ -250,8 +251,6 @@ public abstract class LearningActivityBaseAssetRenderer extends BaseAssetRendere
 		}
 		
 		prepareRuntimePortlet(portletURL);
-		
-		log.debug(" getURLVIEW: "+portletURL);
 		
 		return portletURL;
 	}

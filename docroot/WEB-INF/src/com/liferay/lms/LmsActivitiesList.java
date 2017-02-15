@@ -122,6 +122,7 @@ public class LmsActivitiesList extends MVCPortlet {
 	
 	public static final String LMS_EDITACTIVITY_PORTLET_ID =  PortalUtil.getJsSafePortletId("editactivity"+PortletConstants.WAR_SEPARATOR+ClpSerializer.getServletContextName());
 	public static final String ACTIVITY_VIEWER_PORTLET_ID =  PortalUtil.getJsSafePortletId("activityViewer"+PortletConstants.WAR_SEPARATOR+ClpSerializer.getServletContextName());
+	public static final String LMS_EDITMODULE_PORTLET_ID =  PortalUtil.getJsSafePortletId("editmodule"+PortletConstants.WAR_SEPARATOR+ClpSerializer.getServletContextName());
 	
     @ProcessEvent(qname = "{http://www.wemooc.com/}themeId")
     public void handlethemeEvent(EventRequest eventRequest, EventResponse eventResponse) {
@@ -535,9 +536,13 @@ public class LmsActivitiesList extends MVCPortlet {
 		actionResponse.setEvent(new QName("http://www.wemooc.com/" , "themeId"), themeIdEvent);
 	}
 	
-	public void deletemodule(ActionRequest actionRequest, ActionResponse actionResponse)throws Exception 
-	{
+	public void deletemodule(ActionRequest actionRequest, ActionResponse actionResponse)throws Exception {
 
+		log.debug("*******deletemodule*********");
+		
+		actionResponse.removePublicRenderParameter("actionEditingActivity");
+		actionResponse.removePublicRenderParameter("actionEditingModule");
+		
 		long moduleId = ParamUtil.getLong(actionRequest, "resId",0);
 		long renderModule = ParamUtil.getLong(actionRequest, "moduleId",0);
 		ThemeDisplay themeDisplay = (ThemeDisplay) actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
@@ -546,8 +551,7 @@ public class LmsActivitiesList extends MVCPortlet {
 		if(Validator.isNull(rendModule)){
 			rendModule=ModuleLocalServiceUtil.getNextModule(moduleId);
 		}
-		if(moduleId>0)
-		{
+		if(moduleId>0){
 			if(permissionChecker.hasPermission(
 					themeDisplay.getScopeGroupId(),
 					Module.class.getName(), moduleId,
@@ -560,6 +564,7 @@ public class LmsActivitiesList extends MVCPortlet {
 				}
 				
 				ModuleLocalServiceUtil.deleteModule(moduleId);
+				SessionMessages.add(actionRequest, "ok-delete-module");
 				if(moduleId==renderModule)
 				{
 					List<LearningActivity> activities = LearningActivityLocalServiceUtil.getLearningActivitiesOfModule(rendModule.getModuleId());
@@ -647,6 +652,11 @@ public class LmsActivitiesList extends MVCPortlet {
 
 		PermissionChecker permissionChecker=themeDisplay.getPermissionChecker();
 
+		log.debug("*****deleteactivity*****");
+		
+		actionResponse.removePublicRenderParameter("actionEditingActivity");
+		actionResponse.removePublicRenderParameter("actionEditingModule");
+		
 		if(actId>0){
 			LearningActivity larn = LearningActivityLocalServiceUtil.getLearningActivity(actId);
 			if(permissionChecker.hasPermission(larn.getGroupId(), LearningActivity.class.getName(), larn.getActId(),
@@ -667,11 +677,13 @@ public class LmsActivitiesList extends MVCPortlet {
 					}
 				}
 				
+				/*
 				if(!LiferayWindowState.EXCLUSIVE.equals(actionRequest.getWindowState())){
 					actionResponse.sendRedirect(
 							((LiferayPortletResponse)actionResponse).createRenderURL().toString());
 					
 				}
+				*/
 			}
 		}
 	
@@ -1153,17 +1165,13 @@ public class LmsActivitiesList extends MVCPortlet {
 		
 		portletURL.setParameter("p_o_p_id",ACTIVITY_VIEWER_PORTLET_ID);
 		
-		log.debug(" getURLEditActivity: "+portletURL);
+		//log.debug(" getURLEditActivity: "+portletURL);
 		
 		return portletURL;		
 	}
 	
 	public static final PortletURL getURLCreateActivity(LiferayPortletRequest liferayPortletRequest,
 			LiferayPortletResponse liferayPortletResponse, Module module) throws Exception {
-		
-		ThreadLocalCache<Layout> threadLocalCache =
-				ThreadLocalCacheManager.getThreadLocalCache(
-					Lifecycle.REQUEST, LearningActivityBaseAssetRenderer.class.getName());
 		
 		Layout layout = null;		
 		
@@ -1179,9 +1187,7 @@ public class LmsActivitiesList extends MVCPortlet {
 			throw new NoSuchLayoutException();			
 		}
 			
-			layout = layouts.get(0);
-		
-		
+		layout = layouts.get(0);		
 		
 
 		PortletURL portletURL = liferayPortletResponse.createLiferayPortletURL(layout.getPlid(), LMS_EDITACTIVITY_PORTLET_ID, PortletRequest.RENDER_PHASE);
@@ -1193,7 +1199,79 @@ public class LmsActivitiesList extends MVCPortlet {
 		portletURL.setParameter("resId",Long.toString(0)); 
 		portletURL.setParameter("p_o_p_id",ACTIVITY_VIEWER_PORTLET_ID);
 		
-		log.debug(" getURLCreateActivity: "+portletURL);
+		//log.debug(" getURLCreateActivity: "+portletURL);
+		
+		return portletURL;		
+	}
+	
+	public static final PortletURL getURLEditModule(LiferayPortletRequest liferayPortletRequest,
+			LiferayPortletResponse liferayPortletResponse, Module module) throws Exception {
+		
+		Layout layout = null;		
+		
+		@SuppressWarnings("unchecked")
+		List<Layout> layouts = LayoutLocalServiceUtil.dynamicQuery(LayoutLocalServiceUtil.dynamicQuery().
+				add(PropertyFactoryUtil.forName("privateLayout").eq(false)).
+				add(PropertyFactoryUtil.forName("type").eq(LayoutConstants.TYPE_PORTLET)).
+				add(PropertyFactoryUtil.forName("companyId").eq(module.getCompanyId())).
+				add(PropertyFactoryUtil.forName("groupId").eq(module.getGroupId())).
+				add(PropertyFactoryUtil.forName("friendlyURL").eq("/reto")), 0, 1);
+
+		if(layouts.isEmpty()) {
+			throw new NoSuchLayoutException();			
+		}
+			
+		layout = layouts.get(0);		
+		
+
+		PortletURL portletURL = liferayPortletResponse.createLiferayPortletURL(layout.getPlid(), LMS_EDITMODULE_PORTLET_ID, PortletRequest.RENDER_PHASE);
+		portletURL.setWindowState(WindowState.NORMAL);
+		portletURL.setParameter("actionEditingModule", StringPool.TRUE);
+		portletURL.setParameter("actionEditingActivity", StringPool.FALSE);
+		portletURL.setParameter("view", "editmodule");
+		portletURL.setParameter("moduleId",Long.toString(module.getModuleId()));
+		portletURL.setParameter("actId","");
+		portletURL.setParameter("resourcePrimKey",Long.toString(module.getModuleId()));		
+		portletURL.setParameter("editType","edit");		
+		portletURL.setParameter("p_o_p_id",ACTIVITY_VIEWER_PORTLET_ID);
+		
+		//log.debug(" getURLEditModule: "+portletURL);
+		
+		return portletURL;		
+	}
+	
+	public static final PortletURL getURLCreateModule(LiferayPortletRequest liferayPortletRequest,
+			LiferayPortletResponse liferayPortletResponse, ThemeDisplay themeDisplay) throws Exception {
+		
+		Layout layout = null;		
+		
+		@SuppressWarnings("unchecked")
+		List<Layout> layouts = LayoutLocalServiceUtil.dynamicQuery(LayoutLocalServiceUtil.dynamicQuery().
+				add(PropertyFactoryUtil.forName("privateLayout").eq(false)).
+				add(PropertyFactoryUtil.forName("type").eq(LayoutConstants.TYPE_PORTLET)).
+				add(PropertyFactoryUtil.forName("companyId").eq(themeDisplay.getCompanyId())).
+				add(PropertyFactoryUtil.forName("groupId").eq(themeDisplay.getScopeGroupId())).
+				add(PropertyFactoryUtil.forName("friendlyURL").eq("/reto")), 0, 1);
+
+		if(layouts.isEmpty()) {
+			throw new NoSuchLayoutException();			
+		}
+			
+		layout = layouts.get(0);		
+		
+
+		PortletURL portletURL = liferayPortletResponse.createLiferayPortletURL(layout.getPlid(), LMS_EDITMODULE_PORTLET_ID, PortletRequest.RENDER_PHASE);
+		portletURL.setWindowState(WindowState.NORMAL);
+		portletURL.setParameter("actionEditingModule", StringPool.TRUE);
+		portletURL.setParameter("actionEditingActivity", StringPool.FALSE);
+		portletURL.setParameter("view", "editmodule");
+		portletURL.setParameter("moduleId",Long.toString(0));
+		portletURL.setParameter("actId","");
+		portletURL.setParameter("resourcePrimKey",Long.toString(0));		
+		portletURL.setParameter("editType","add");		
+		portletURL.setParameter("p_o_p_id",ACTIVITY_VIEWER_PORTLET_ID);
+		
+		//log.debug(" getURLCreateModule: "+portletURL);
 		
 		return portletURL;		
 	}

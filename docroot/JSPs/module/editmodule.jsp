@@ -36,6 +36,7 @@
 <jsp:useBean id="allowedDateMinuto" class="java.lang.String" scope="request" />
 
 <portlet:defineObjects />
+
 <script type="text/javascript">
 <!--
 AUI().ready('node-base' ,'aui-form-validator', 'aui-overlay-context-panel', 'widget-locale', function(A) {
@@ -173,13 +174,11 @@ function validate(){
 	<input type="hidden" name="resourcePrimKey" value="<%=module.getPrimaryKey() %>">
 
 <%
-	if(moduleId>0)
-	{
+	if(moduleId>0){
 %>	<aui:model-context bean="<%= module %>" model="<%= Module.class %>"/>
 	<aui:input type="hidden" name="ordern" value="<%=Long.toString(module.getOrdern()) %>" />
 <% 
-	}
-	else {
+	}else {
 		%>	<aui:model-context bean="<%= module %>" model="<%= Module.class %>"/>
 	<% 
 	}
@@ -271,13 +270,10 @@ function validate(){
 %>
 		<aui:option value="0" ><liferay-ui:message key="module-nothing" /></aui:option>
 <%
-	for(Module theModule2:modules)
-	{
+	for(Module theModule2:modules){
 		boolean selected=false;
-		if(moduleId!= theModule2.getModuleId())
-		{
-			if(moduleId>0&& theModule2.getModuleId()==module.getPrecedence())
-			{
+		if(moduleId!= theModule2.getModuleId()){
+			if(moduleId>0&& theModule2.getModuleId()==module.getPrecedence()){
 				selected=true;
 			}
 %>
@@ -297,17 +293,7 @@ function validate(){
 	</liferay-ui:custom-attributes-available>
 	</liferay-ui:panel>
 </liferay-ui:panel-container>	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+		
 	
 	<script type="text/javascript">
 	<!--

@@ -69,5 +69,6 @@
 		<portlet id="dateeditor"></portlet>
 		<portlet id="deregisteracademymail"></portlet>
 		<portlet id="viewactivitytriesdeleted"></portlet>
+		<portlet id="editmodule"></portlet>
 	</category>
 </display>
