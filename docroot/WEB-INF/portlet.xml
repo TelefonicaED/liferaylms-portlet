@@ -2477,7 +2477,14 @@
 		<identifier>categoryId</identifier>
 		<qname xmlns:x="http://www.liferay.com/public-render-parameters">x:categoryId</qname>
 	</public-render-parameter>
-
+	<public-render-parameter>
+		<identifier>actionEditingActivity</identifier>
+		<qname xmlns:x="http://www.liferay.com/public-render-parameters">x:actionEditingActivity</qname>
+	</public-render-parameter>
+	<public-render-parameter>
+		<identifier>actionEditingDetails</identifier>
+		<qname xmlns:x="http://www.liferay.com/public-render-parameters">x:actionEditingDetails</qname>
+	</public-render-parameter>	
 
 
 
