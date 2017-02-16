@@ -120,6 +120,7 @@ public class LmsActivitiesList extends MVCPortlet {
 	public static final String LMS_EDITACTIVITY_PORTLET_ID =  PortalUtil.getJsSafePortletId("editactivity"+PortletConstants.WAR_SEPARATOR+ClpSerializer.getServletContextName());
 	public static final String ACTIVITY_VIEWER_PORTLET_ID =  PortalUtil.getJsSafePortletId("activityViewer"+PortletConstants.WAR_SEPARATOR+ClpSerializer.getServletContextName());
 	public static final String LMS_EDITMODULE_PORTLET_ID =  PortalUtil.getJsSafePortletId("editmodule"+PortletConstants.WAR_SEPARATOR+ClpSerializer.getServletContextName());
+	public static final String LMS_ACTIVITIES_LIST_PORTLET_ID =  PortalUtil.getJsSafePortletId("lmsactivitieslist"+PortletConstants.WAR_SEPARATOR+ClpSerializer.getServletContextName());
 	
     @ProcessEvent(qname = "{http://www.wemooc.com/}themeId")
     public void handlethemeEvent(EventRequest eventRequest, EventResponse eventResponse) {
@@ -913,8 +914,9 @@ public class LmsActivitiesList extends MVCPortlet {
 			else
 		*/
 		
-		if(ParamUtil.getBoolean(renderRequest,"editing"))
-		{
+		if(ParamUtil.getBoolean(renderRequest,"editing")){
+			
+			log.debug("***editing***");
 			
 			Integer maxfile = ResourceExternalLearningActivityType.DEFAULT_FILENUMBER;
 			try{
@@ -947,13 +949,12 @@ public class LmsActivitiesList extends MVCPortlet {
 			
 			renderRequest.setAttribute("showcategorization", ("false".equals(PropsUtil.get("activity.show.categorization")))?false:true);
 			include("/html/editactivity/editactivity.jsp",renderRequest,renderResponse);
-		}
-		else if(ParamUtil.getBoolean(renderRequest,"califications"))
-		{
+			
+		}else if(ParamUtil.getBoolean(renderRequest,"califications")){
+			log.debug("***califications***");
 			include("/html/lmsactivitieslist/califications.jsp",renderRequest,renderResponse);
-		}
-		else
-		{
+		}else{
+			log.debug("***normal***");
 			super.doView(renderRequest, renderResponse);
 		}
 	}
@@ -1083,6 +1084,19 @@ public class LmsActivitiesList extends MVCPortlet {
 	}
 	
 
+	public void goToActivity(ActionRequest request, ActionResponse response) throws IOException{
+		log.debug("********goToActivityURL********");
+		
+		String redirect = ParamUtil.get(request, "redirectURL", "");
+		
+		log.debug("redirect: "+redirect);
+		
+		response.removePublicRenderParameter("actionEditingActivity");
+		response.removePublicRenderParameter("actionEditingModule");
+		response.removePublicRenderParameter("actionCalifications");
+		response.sendRedirect(redirect);		
+	}
+	
 	public void modactivity(ActionRequest actionRequest, ActionResponse actionResponse)
 		throws Exception {
 
@@ -1098,6 +1112,64 @@ public class LmsActivitiesList extends MVCPortlet {
 		SessionMessages.add(actionRequest, "activity-modified-successfully");
 	}
 	
+	
+	
+	
+	
+	
+	
+	public static final PortletURL getURLCalifications(LiferayPortletRequest liferayPortletRequest,
+			LiferayPortletResponse liferayPortletResponse, LearningActivity activity) throws Exception {
+		
+		ThreadLocalCache<Layout> threadLocalCache =
+				ThreadLocalCacheManager.getThreadLocalCache(
+					Lifecycle.REQUEST, LearningActivityBaseAssetRenderer.class.getName());
+		
+		String layoutKey = activity.getCompanyId()+StringPool.SLASH+activity.getGroupId();
+		Layout layout  = threadLocalCache.get(layoutKey);
+		
+		if(Validator.isNull(activity)) {
+			@SuppressWarnings("unchecked")
+			List<Layout> layouts = LayoutLocalServiceUtil.dynamicQuery(LayoutLocalServiceUtil.dynamicQuery().
+					add(PropertyFactoryUtil.forName("privateLayout").eq(false)).
+					add(PropertyFactoryUtil.forName("type").eq(LayoutConstants.TYPE_PORTLET)).
+					add(PropertyFactoryUtil.forName("companyId").eq(activity.getCompanyId())).
+					add(PropertyFactoryUtil.forName("groupId").eq(activity.getGroupId())).
+					add(PropertyFactoryUtil.forName("friendlyURL").eq("/reto")), 0, 1);
+	
+			if(layouts.isEmpty()) {
+				throw new NoSuchLayoutException();			
+			}
+			
+			layout = layouts.get(0);
+		}
+		
+		
+
+		PortletURL portletURL = liferayPortletResponse.createLiferayPortletURL(layout.getPlid(), LMS_EDITACTIVITY_PORTLET_ID, PortletRequest.RENDER_PHASE);
+		portletURL.setWindowState(WindowState.NORMAL);
+		
+		portletURL.setParameter("actionEditingActivity", StringPool.FALSE);
+		portletURL.setParameter("actionEditingModule", StringPool.FALSE);
+		portletURL.setParameter("actionCalifications", StringPool.TRUE);
+		portletURL.setParameter("actId",Long.toString( activity.getActId()));
+		
+		long userId = PrincipalThreadLocal.getUserId();
+		
+		if(Validator.isNotNull(userId)) {			
+			//portletURL.setParameter("mvcPath", "/html/editactivity/editactivity.jsp");
+			portletURL.setParameter("califications", StringPool.TRUE);
+			portletURL.setParameter("editing", StringPool.FALSE);
+			portletURL.setParameter("resId",Long.toString( activity.getActId()));
+			portletURL.setParameter("resModuleId",Long.toString( activity.getModuleId())); 
+		}
+		
+		portletURL.setParameter("p_o_p_id",ACTIVITY_VIEWER_PORTLET_ID);
+		
+		//log.debug(" getURLCalifications: "+portletURL);
+		
+		return portletURL;		
+	}
 	
 
 	public static final PortletURL getURLEditActivity(LiferayPortletRequest liferayPortletRequest,
@@ -1133,6 +1205,8 @@ public class LmsActivitiesList extends MVCPortlet {
 		portletURL.setParameter("actId",Long.toString( activity.getActId()));
 		portletURL.setParameter("moduleId",Long.toString( activity.getModuleId()));
 		portletURL.setParameter("actionEditingActivity", StringPool.TRUE);
+		portletURL.setParameter("actionCalifications", StringPool.FALSE);
+		portletURL.setParameter("actionEditingModule", StringPool.FALSE);
 		
 		long userId = PrincipalThreadLocal.getUserId();
 		
@@ -1214,6 +1288,7 @@ public class LmsActivitiesList extends MVCPortlet {
 		portletURL.setWindowState(WindowState.NORMAL);
 		portletURL.setParameter("actionEditingModule", StringPool.TRUE);
 		portletURL.setParameter("actionEditingActivity", StringPool.FALSE);
+		portletURL.setParameter("actionCalifications", StringPool.FALSE);
 		portletURL.setParameter("view", "editmodule");
 		portletURL.setParameter("moduleId",Long.toString(module.getModuleId()));
 		portletURL.setParameter("actId","");
@@ -1250,6 +1325,7 @@ public class LmsActivitiesList extends MVCPortlet {
 		portletURL.setWindowState(WindowState.NORMAL);
 		portletURL.setParameter("actionEditingModule", StringPool.TRUE);
 		portletURL.setParameter("actionEditingActivity", StringPool.FALSE);
+		portletURL.setParameter("actionCalifications", StringPool.FALSE);
 		portletURL.setParameter("view", "editmodule");
 		portletURL.setParameter("moduleId",Long.toString(0));
 		portletURL.setParameter("actId","");

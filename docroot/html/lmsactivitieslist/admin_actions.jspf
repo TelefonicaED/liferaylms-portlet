@@ -283,40 +283,18 @@ String visibleStr = PrefsPropsUtil.getString("learningactivity.show.calification
 boolean visibleCalifications = Boolean.parseBoolean(visibleStr);
 %>
 <c:if test="<%=visibleCalifications %>">
-	<liferay-portlet:renderURL var="showCalificationsURL" windowState="<%= LiferayWindowState.POP_UP.toString() %>">
-		<liferay-portlet:param name="califications" value="<%=StringPool.TRUE %>" />
-		<liferay-portlet:param name="resId" value="<%=primKey %>" />
-		<liferay-portlet:param name="resModuleId" value="<%=Long.toString(myActivity.getModuleId()) %>" />
-	</liferay-portlet:renderURL>
+	
 	<%
-		
-	StringBuilder showCalificationsPopup = new StringBuilder("javascript:AUI().use('aui-dialog','aui-dialog-iframe', "+
-			"	function(A){ "+
-			"	new A.Dialog( "+
-			"		{ "+
-			"    		id: 'showCalifications', "+ 
-			"			title: '"); 
-			showCalificationsPopup.append(LanguageUtil.get(pageContext,"activity.showcalifications.popup"));
-			showCalificationsPopup.append("', "+
-		    "			destroyOnClose: true, "+
-		    "			width: 750, "+
-		    "			modal:true, "+
-		    "			x:50, "+
-		    "			y:50, "+
-		    "			on: { close: function(evt){ Liferay.Portlet.refresh(A.one('#p_p_id");
-		    showCalificationsPopup.append(renderResponse.getNamespace());
-		    showCalificationsPopup.append(">'),{'p_t_lifecycle':0}); }},"+	
-			"		} "+
-			"	).plug( "+
-			"		A.Plugin.DialogIframe, "+
-			"		{ "+
-			"			uri: '");
-			showCalificationsPopup.append(JavaScriptUtil.markupToStringLiteral(showCalificationsURL));
-			showCalificationsPopup.append("' "+
-			"		} "+
-			"	).render().show(); "+
-			"});");
 
-%>
-	<liferay-ui:icon message="activity.showcalifications" image="page" url="#" onClick="<%=showCalificationsPopup.toString() %>" />
+PortletURL urlCalifications = LmsActivitiesList.getURLCalifications(liferayPortletRequest, liferayPortletResponse, myActivity);
+
+if(Validator.isNotNull(urlCalifications)){
+	
+	%>
+	<liferay-ui:icon image="page" message="activity.showcalifications" label="" url="<%=urlCalifications.toString()%>"/>
+	<%
+}
+
+%>	
+	
 </c:if>

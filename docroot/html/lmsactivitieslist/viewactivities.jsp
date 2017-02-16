@@ -310,15 +310,18 @@ function <portlet:namespace />upActivity(actId){
 							||hasPermissionAccessCourseFinished)
 					{
 						%>
-						<portlet:actionURL var="goToActivity" windowState="<%= WindowState.NORMAL.toString()%>" >
-							<portlet:param name="actId" value="<%=Long.toString(activity.getActId()) %>" />
+						<portlet:actionURL var="goToActivityURL" name="goToActivity" >
+							<portlet:param name="redirectURL" value="<%=assetRendererFactory.getAssetRenderer(activity.getActId()).
+									getURLView(liferayPortletResponse, WindowState.NORMAL).toString() %>" />
 						</portlet:actionURL>
 
 						<li class="learningActivity <%=activityEnd%> <%=editing %> <%=status%>"  <%=(status=="passed" || status=="failed")?"title =\""+LanguageUtil.format(pageContext, "activity.result",new Object[]{resultNumberFormat.format(result)})+"\"":StringPool.BLANK %> 
 							id="<portlet:namespace/><%=activity.getActId()%>">
 							<span class="type_<%=type%>"></span>
-							<a href="<%=assetRendererFactory.getAssetRenderer(activity.getActId()).
-									getURLView(liferayPortletResponse, WindowState.NORMAL) %>"  ><%=title%></a>
+							
+							
+							
+							<a href="<%=goToActivityURL.toString()%>"  ><%=title%></a>
 							
 					<%
 					}

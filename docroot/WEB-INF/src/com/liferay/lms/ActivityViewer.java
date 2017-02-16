@@ -87,6 +87,7 @@ public class ActivityViewer extends MVCPortlet{
 
 	public static final String LMS_EDITACTIVITY_PORTLET_ID =  PortalUtil.getJsSafePortletId("editactivity"+PortletConstants.WAR_SEPARATOR+ClpSerializer.getServletContextName());
 	public static final String LMS_EDITMODULE_PORTLET_ID =  PortalUtil.getJsSafePortletId("editmodule"+PortletConstants.WAR_SEPARATOR+ClpSerializer.getServletContextName());
+	public static final String LMS_ACTIVITIES_LIST_PORTLET_ID =  PortalUtil.getJsSafePortletId("lmsactivitieslist"+PortletConstants.WAR_SEPARATOR+ClpSerializer.getServletContextName());
 	
 	private static Log log = LogFactoryUtil.getLog(ActivityViewer.class);
 	
@@ -162,11 +163,13 @@ public class ActivityViewer extends MVCPortlet{
 		boolean actionEditingDetails = ParamUtil.getBoolean(renderRequest, "actionEditingDetails", false);
 		boolean actionEditingActivity = ParamUtil.getBoolean(renderRequest, "actionEditingActivity", false);
 		boolean actionEditingModule = ParamUtil.getBoolean(renderRequest, "actionEditingModule", false);
+		boolean actionCalifications = ParamUtil.getBoolean(renderRequest, "actionCalifications", false);
 		
 		log.debug("isWidget:"+isWidget);
 		log.debug("actionEditingDetails:"+actionEditingDetails);
 		log.debug("actionEditingActivity:"+actionEditingActivity);
 		log.debug("actionEditingModule:"+actionEditingModule);
+		log.debug("actionCalifications:"+actionCalifications);
 		
 		if(!isWidget && actionEditingDetails){
 			actId=ParamUtil.getLong(renderRequest, "resId", ParamUtil.getLong(renderRequest, "actId",0));
@@ -280,13 +283,12 @@ public class ActivityViewer extends MVCPortlet{
 					}else {
 						Portlet portlet = null;
 						
-						if(!actionEditingActivity){
-							log.debug("*****CARGO EL PORTLET: "+learningActivityType.getPortletId());
-							portlet = PortletLocalServiceUtil.getPortletById(themeDisplay.getCompanyId(), learningActivityType.getPortletId());
-						}else{
+						if(actionEditingActivity || actionCalifications ){
 							log.debug("*****CARGO EL PORTLET: "+LMS_EDITACTIVITY_PORTLET_ID);
 							portlet = PortletLocalServiceUtil.getPortletById(themeDisplay.getCompanyId(), LMS_EDITACTIVITY_PORTLET_ID);
-							
+						}else{							
+							log.debug("*****CARGO EL PORTLET: "+learningActivityType.getPortletId());
+							portlet = PortletLocalServiceUtil.getPortletById(themeDisplay.getCompanyId(), learningActivityType.getPortletId());
 						}
 						
 						
