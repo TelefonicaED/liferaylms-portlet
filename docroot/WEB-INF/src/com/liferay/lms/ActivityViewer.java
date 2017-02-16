@@ -86,6 +86,7 @@ import com.liferay.util.bridges.mvc.MVCPortlet;
 public class ActivityViewer extends MVCPortlet{
 
 	public static final String LMS_EDITACTIVITY_PORTLET_ID =  PortalUtil.getJsSafePortletId("editactivity"+PortletConstants.WAR_SEPARATOR+ClpSerializer.getServletContextName());
+	public static final String LMS_EDITMODULE_PORTLET_ID =  PortalUtil.getJsSafePortletId("editmodule"+PortletConstants.WAR_SEPARATOR+ClpSerializer.getServletContextName());
 	
 	private static Log log = LogFactoryUtil.getLog(ActivityViewer.class);
 	
@@ -160,10 +161,12 @@ public class ActivityViewer extends MVCPortlet{
 		long actId=GetterUtil.DEFAULT_LONG;		
 		boolean actionEditingDetails = ParamUtil.getBoolean(renderRequest, "actionEditingDetails", false);
 		boolean actionEditingActivity = ParamUtil.getBoolean(renderRequest, "actionEditingActivity", false);
+		boolean actionEditingModule = ParamUtil.getBoolean(renderRequest, "actionEditingModule", false);
 		
 		log.debug("isWidget:"+isWidget);
 		log.debug("actionEditingDetails:"+actionEditingDetails);
 		log.debug("actionEditingActivity:"+actionEditingActivity);
+		log.debug("actionEditingModule:"+actionEditingModule);
 		
 		if(!isWidget && actionEditingDetails){
 			actId=ParamUtil.getLong(renderRequest, "resId", ParamUtil.getLong(renderRequest, "actId",0));
@@ -177,15 +180,24 @@ public class ActivityViewer extends MVCPortlet{
 		
 		
 		if(Validator.isNull(actId)) {
+			
+			String portletId = null;
+			
 			if(actionEditingActivity){
+				portletId = LMS_EDITACTIVITY_PORTLET_ID;
+			}else if(actionEditingModule){
+				portletId = LMS_EDITMODULE_PORTLET_ID;
+			}
+			
+			if(Validator.isNotNull(portletId)){
 
 				log.debug("***CREACION DE ACTIVIDAD O CREACION/EDICION DE MODULO");
 
 
 				try{
 					Portlet portlet = null;
-					log.debug("*****CARGO EL PORTLET: "+LMS_EDITACTIVITY_PORTLET_ID);
-					portlet = PortletLocalServiceUtil.getPortletById(themeDisplay.getCompanyId(), LMS_EDITACTIVITY_PORTLET_ID);
+					log.debug("*****CARGO EL PORTLET: "+portletId);
+					portlet = PortletLocalServiceUtil.getPortletById(themeDisplay.getCompanyId(), portletId);
 
 					HttpServletRequest renderHttpServletRequest = PortalUtil.getHttpServletRequest(renderRequest);
 					PortletPreferencesFactoryUtil.getLayoutPortletSetup(themeDisplay.getLayout(), portlet.getPortletId());
