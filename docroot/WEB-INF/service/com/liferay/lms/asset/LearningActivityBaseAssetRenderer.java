@@ -214,60 +214,6 @@ public abstract class LearningActivityBaseAssetRenderer extends BaseAssetRendere
 	}
 
 	
-	public static final PortletURL getURLEditViewer(LiferayPortletRequest liferayPortletRequest,
-			LiferayPortletResponse liferayPortletResponse, LearningActivity activity) throws Exception {
-		
-		ThreadLocalCache<Layout> threadLocalCache =
-				ThreadLocalCacheManager.getThreadLocalCache(
-					Lifecycle.REQUEST, LearningActivityBaseAssetRenderer.class.getName());
-		
-		String layoutKey = activity.getCompanyId()+StringPool.SLASH+activity.getGroupId();
-		Layout layout  = threadLocalCache.get(layoutKey);
-		
-		if(Validator.isNull(activity)) {
-			@SuppressWarnings("unchecked")
-			List<Layout> layouts = LayoutLocalServiceUtil.dynamicQuery(LayoutLocalServiceUtil.dynamicQuery().
-					add(PropertyFactoryUtil.forName("privateLayout").eq(false)).
-					add(PropertyFactoryUtil.forName("type").eq(LayoutConstants.TYPE_PORTLET)).
-					add(PropertyFactoryUtil.forName("companyId").eq(activity.getCompanyId())).
-					add(PropertyFactoryUtil.forName("groupId").eq(activity.getGroupId())).
-					add(PropertyFactoryUtil.forName("friendlyURL").eq("/reto")), 0, 1);
-	
-			if(layouts.isEmpty()) {
-				throw new NoSuchLayoutException();			
-			}
-			
-			layout = layouts.get(0);
-		}
-		
-		
-
-		PortletURL portletURL = liferayPortletResponse.createLiferayPortletURL(layout.getPlid(), LMS_EDITACTIVITY_PORTLET_ID, PortletRequest.RENDER_PHASE);
-		portletURL.setWindowState(WindowState.NORMAL);
-		portletURL.setParameter("actId",Long.toString( activity.getActId()));
-		portletURL.setParameter("moduleId",Long.toString( activity.getModuleId()));
-		portletURL.setParameter("actionEditingActivity", StringPool.TRUE);
-		
-		long userId = PrincipalThreadLocal.getUserId();
-		
-		if(Validator.isNotNull(userId)) {			
-			portletURL.setParameter("mvcPath", "/html/editactivity/editactivity.jsp");
-			portletURL.setParameter("editing", StringPool.TRUE);
-			portletURL.setParameter("resId",Long.toString( activity.getActId()));
-			portletURL.setParameter("resModuleId",Long.toString( activity.getModuleId())); 
-		}
-		
-		portletURL.setParameter("p_o_p_id",ACTIVITY_VIEWER_PORTLET_ID);
-		
-		log.debug(" getURLEditViewer: "+portletURL);
-		
-		return portletURL;
-	
-		
-	}
-	
-	
-	
 	protected String getMvcPathView(long userId, LiferayPortletResponse liferayPortletResponse, WindowState windowState) throws Exception {
 		return StringPool.BLANK;
 	}

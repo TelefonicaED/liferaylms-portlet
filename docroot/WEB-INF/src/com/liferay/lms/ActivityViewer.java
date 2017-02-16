@@ -177,24 +177,95 @@ public class ActivityViewer extends MVCPortlet{
 		
 		
 		if(Validator.isNull(actId)) {
-			renderRequest.setAttribute(WebKeys.PORTLET_CONFIGURATOR_VISIBILITY, Boolean.FALSE);
-		}
-		else {
+			if(actionEditingActivity){
+
+				log.debug("***CREACION DE ACTIVIDAD O CREACION/EDICION DE MODULO");
+
+
+				try{
+					Portlet portlet = null;
+					log.debug("*****CARGO EL PORTLET: "+LMS_EDITACTIVITY_PORTLET_ID);
+					portlet = PortletLocalServiceUtil.getPortletById(themeDisplay.getCompanyId(), LMS_EDITACTIVITY_PORTLET_ID);
+
+					HttpServletRequest renderHttpServletRequest = PortalUtil.getHttpServletRequest(renderRequest);
+					PortletPreferencesFactoryUtil.getLayoutPortletSetup(themeDisplay.getLayout(), portlet.getPortletId());
+
+					if(isWidget){
+						Map<String, String[]> publicParameters = getPublicParameters(renderHttpServletRequest, themeDisplay.getPlid());
+						for(PublicRenderParameter publicRenderParameter:portlet.getPublicRenderParameters()) {
+							String[] parameterValues = renderRequest.getParameterValues(publicRenderParameter.getIdentifier());
+							if(Validator.isNotNull(parameterValues)) {
+								String publicRenderParameterName = PortletQNameUtil.getPublicRenderParameterName(publicRenderParameter.getQName());
+								String[] currentValues = publicParameters.get(publicRenderParameterName);
+								if(Validator.isNotNull(currentValues)){
+									parameterValues = ArrayUtil.append(parameterValues, currentValues);
+								}
+								publicParameters.put(publicRenderParameterName, parameterValues);
+							}
+						}
+						renderResponse.setProperty("clear-request-parameters",StringPool.TRUE);
+
+						if(ParamUtil.getBoolean(renderRequest, "scriptMobile",true)) {
+							RenderResponseWrapper renderResponseWrapper = new RenderResponseWrapper(renderResponse) {
+								private final StringWriter stringWriter = new StringWriter();
+
+								@Override
+								public PrintWriter getWriter() throws IOException {
+									return new PrintWriter(stringWriter);
+								}
+
+								@Override
+								public OutputStream getPortletOutputStream()
+										throws IOException {
+									return new WriterOutputStream(stringWriter);
+								}
+
+								@Override
+								public String toString() {
+									return stringWriter.toString();
+								}
+
+							};
+							include("/html/activityViewer/scriptMobile.jsp", renderRequest, renderResponseWrapper);
+
+							StringBundler pageTopStringBundler = (StringBundler)renderRequest.getAttribute(WebKeys.PAGE_TOP);
+
+							if (pageTopStringBundler == null) {
+								pageTopStringBundler = new StringBundler();
+								renderRequest.setAttribute(WebKeys.PAGE_TOP, pageTopStringBundler);
+							}
+
+
+							pageTopStringBundler.append(renderResponseWrapper.toString());
+						}
+					}
+
+					String activityContent = renderPortlet(renderRequest, renderResponse, 
+							themeDisplay, themeDisplay.getScopeGroupId(), portlet, isWidget, true);
+
+					renderResponse.setContentType(ContentTypes.TEXT_HTML_UTF8);
+					renderResponse.getWriter().print(activityContent);	
+				}catch(Exception e){
+					e.printStackTrace();
+				}
+
+			}else{
+				renderRequest.setAttribute(WebKeys.PORTLET_CONFIGURATOR_VISIBILITY, Boolean.FALSE);
+			}
+		}else {
 			try {
 				LearningActivity learningActivity = LearningActivityLocalServiceUtil.getLearningActivity(actId);
 	
 				if(Validator.isNull(learningActivity)) {
 					renderRequest.setAttribute(WebKeys.PORTLET_CONFIGURATOR_VISIBILITY, Boolean.FALSE);
-				}
-				else {
+				}else {
 					LearningActivityType learningActivityType=new LearningActivityTypeRegistry().getLearningActivityType(learningActivity.getTypeId());
 					
 					if((Validator.isNull(learningActivityType))||
 					   ((!isWidget)&&
 					    (themeDisplay.getLayoutTypePortlet().getPortletIds().contains(learningActivityType.getPortletId())))) {
 						renderRequest.setAttribute(WebKeys.PORTLET_CONFIGURATOR_VISIBILITY, Boolean.FALSE);
-					}
-					else {
+					}else {
 						Portlet portlet = null;
 						
 						if(!actionEditingActivity){
@@ -288,8 +359,7 @@ public class ActivityViewer extends MVCPortlet{
 						}
 					}
 				}
-			}
-			catch(Throwable throwable) {
+			}catch(Throwable throwable) {
 				renderRequest.setAttribute(WebKeys.PORTLET_CONFIGURATOR_VISIBILITY, Boolean.FALSE);
 			}
 		}

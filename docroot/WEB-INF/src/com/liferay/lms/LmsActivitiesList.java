@@ -18,6 +18,8 @@ import javax.portlet.ActionResponse;
 import javax.portlet.EventRequest;
 import javax.portlet.EventResponse;
 import javax.portlet.PortletException;
+import javax.portlet.PortletRequest;
+import javax.portlet.PortletURL;
 import javax.portlet.ProcessEvent;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
@@ -29,6 +31,7 @@ import javax.xml.namespace.QName;
 import org.apache.commons.lang.StringUtils;
 
 import com.liferay.lms.asset.LearningActivityAssetRendererFactory;
+import com.liferay.lms.asset.LearningActivityBaseAssetRenderer;
 import com.liferay.lms.auditing.AuditConstants;
 import com.liferay.lms.auditing.AuditingLogFactory;
 import com.liferay.lms.events.ThemeIdEvent;
@@ -40,12 +43,18 @@ import com.liferay.lms.model.Module;
 import com.liferay.lms.model.P2pActivity;
 import com.liferay.lms.model.P2pActivityCorrections;
 import com.liferay.lms.service.ActivityTriesDeletedLocalServiceUtil;
+import com.liferay.lms.service.ClpSerializer;
 import com.liferay.lms.service.LearningActivityLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityServiceUtil;
 import com.liferay.lms.service.LearningActivityTryLocalServiceUtil;
 import com.liferay.lms.service.ModuleLocalServiceUtil;
 import com.liferay.lms.service.P2pActivityCorrectionsLocalServiceUtil;
 import com.liferay.lms.service.P2pActivityLocalServiceUtil;
+import com.liferay.portal.NoSuchLayoutException;
+import com.liferay.portal.kernel.cache.Lifecycle;
+import com.liferay.portal.kernel.cache.ThreadLocalCache;
+import com.liferay.portal.kernel.cache.ThreadLocalCacheManager;
+import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
@@ -71,15 +80,20 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.xml.DocumentException;
+import com.liferay.portal.model.Layout;
+import com.liferay.portal.model.LayoutConstants;
 import com.liferay.portal.model.Portlet;
+import com.liferay.portal.model.PortletConstants;
 import com.liferay.portal.model.PublicRenderParameter;
 import com.liferay.portal.model.ResourceConstants;
 import com.liferay.portal.model.Role;
 import com.liferay.portal.model.RoleConstants;
 import com.liferay.portal.model.Team;
 import com.liferay.portal.model.User;
+import com.liferay.portal.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.security.permission.PermissionChecker;
+import com.liferay.portal.service.LayoutLocalServiceUtil;
 import com.liferay.portal.service.PortletLocalServiceUtil;
 import com.liferay.portal.service.ResourcePermissionLocalServiceUtil;
 import com.liferay.portal.service.RoleLocalServiceUtil;
@@ -101,7 +115,11 @@ import com.liferay.util.bridges.mvc.MVCPortlet;
  */
 
 public class LmsActivitiesList extends MVCPortlet {
-	private Log log = LogFactoryUtil.getLog(LmsActivitiesList.class);
+	private static Log log = LogFactoryUtil.getLog(LmsActivitiesList.class);
+	
+	public static final String LMS_EDITACTIVITY_PORTLET_ID =  PortalUtil.getJsSafePortletId("editactivity"+PortletConstants.WAR_SEPARATOR+ClpSerializer.getServletContextName());
+	public static final String ACTIVITY_VIEWER_PORTLET_ID =  PortalUtil.getJsSafePortletId("activityViewer"+PortletConstants.WAR_SEPARATOR+ClpSerializer.getServletContextName());
+
 	
     @ProcessEvent(qname = "{http://www.wemooc.com/}themeId")
     public void handlethemeEvent(EventRequest eventRequest, EventResponse eventResponse) {
@@ -491,6 +509,9 @@ public class LmsActivitiesList extends MVCPortlet {
 			}
 		}
 		uploadRequest.setAttribute("activity", larn);
+		
+		log.debug("******SET RENDER PARAMETER actId:"+larn.getActId());
+		actionResponse.setRenderParameter("actId", String.valueOf(larn.getActId()));
 
 	}
 	
@@ -1065,6 +1086,98 @@ public class LmsActivitiesList extends MVCPortlet {
 		LearningActivityLocalServiceUtil.updateLearningActivity(learningActivity, false);
 		editactivity(actionRequest, actionResponse);
 		SessionMessages.add(actionRequest, "activity-modified-successfully");
+	}
+	
+	
+
+	public static final PortletURL getURLEditActivity(LiferayPortletRequest liferayPortletRequest,
+			LiferayPortletResponse liferayPortletResponse, LearningActivity activity) throws Exception {
+		
+		ThreadLocalCache<Layout> threadLocalCache =
+				ThreadLocalCacheManager.getThreadLocalCache(
+					Lifecycle.REQUEST, LearningActivityBaseAssetRenderer.class.getName());
+		
+		String layoutKey = activity.getCompanyId()+StringPool.SLASH+activity.getGroupId();
+		Layout layout  = threadLocalCache.get(layoutKey);
+		
+		if(Validator.isNull(activity)) {
+			@SuppressWarnings("unchecked")
+			List<Layout> layouts = LayoutLocalServiceUtil.dynamicQuery(LayoutLocalServiceUtil.dynamicQuery().
+					add(PropertyFactoryUtil.forName("privateLayout").eq(false)).
+					add(PropertyFactoryUtil.forName("type").eq(LayoutConstants.TYPE_PORTLET)).
+					add(PropertyFactoryUtil.forName("companyId").eq(activity.getCompanyId())).
+					add(PropertyFactoryUtil.forName("groupId").eq(activity.getGroupId())).
+					add(PropertyFactoryUtil.forName("friendlyURL").eq("/reto")), 0, 1);
+	
+			if(layouts.isEmpty()) {
+				throw new NoSuchLayoutException();			
+			}
+			
+			layout = layouts.get(0);
+		}
+		
+		
+
+		PortletURL portletURL = liferayPortletResponse.createLiferayPortletURL(layout.getPlid(), LMS_EDITACTIVITY_PORTLET_ID, PortletRequest.RENDER_PHASE);
+		portletURL.setWindowState(WindowState.NORMAL);
+		portletURL.setParameter("actId",Long.toString( activity.getActId()));
+		portletURL.setParameter("moduleId",Long.toString( activity.getModuleId()));
+		portletURL.setParameter("actionEditingActivity", StringPool.TRUE);
+		
+		long userId = PrincipalThreadLocal.getUserId();
+		
+		if(Validator.isNotNull(userId)) {			
+			portletURL.setParameter("mvcPath", "/html/editactivity/editactivity.jsp");
+			portletURL.setParameter("editing", StringPool.TRUE);
+			portletURL.setParameter("resId",Long.toString( activity.getActId()));
+			portletURL.setParameter("resModuleId",Long.toString( activity.getModuleId())); 
+		}
+		
+		portletURL.setParameter("p_o_p_id",ACTIVITY_VIEWER_PORTLET_ID);
+		
+		log.debug(" getURLEditActivity: "+portletURL);
+		
+		return portletURL;		
+	}
+	
+	public static final PortletURL getURLCreateActivity(LiferayPortletRequest liferayPortletRequest,
+			LiferayPortletResponse liferayPortletResponse, Module module) throws Exception {
+		
+		ThreadLocalCache<Layout> threadLocalCache =
+				ThreadLocalCacheManager.getThreadLocalCache(
+					Lifecycle.REQUEST, LearningActivityBaseAssetRenderer.class.getName());
+		
+		Layout layout = null;		
+		
+		@SuppressWarnings("unchecked")
+		List<Layout> layouts = LayoutLocalServiceUtil.dynamicQuery(LayoutLocalServiceUtil.dynamicQuery().
+				add(PropertyFactoryUtil.forName("privateLayout").eq(false)).
+				add(PropertyFactoryUtil.forName("type").eq(LayoutConstants.TYPE_PORTLET)).
+				add(PropertyFactoryUtil.forName("companyId").eq(module.getCompanyId())).
+				add(PropertyFactoryUtil.forName("groupId").eq(module.getGroupId())).
+				add(PropertyFactoryUtil.forName("friendlyURL").eq("/reto")), 0, 1);
+
+		if(layouts.isEmpty()) {
+			throw new NoSuchLayoutException();			
+		}
+			
+			layout = layouts.get(0);
+		
+		
+		
+
+		PortletURL portletURL = liferayPortletResponse.createLiferayPortletURL(layout.getPlid(), LMS_EDITACTIVITY_PORTLET_ID, PortletRequest.RENDER_PHASE);
+		portletURL.setWindowState(WindowState.NORMAL);
+		portletURL.setParameter("actionEditingActivity", StringPool.TRUE);			
+		portletURL.setParameter("mvcPath", "/html/lmsactivitieslist/newactivity.jsp");
+		portletURL.setParameter("resModuleId",Long.toString(module.getModuleId())); 	
+		portletURL.setParameter("actId",Long.toString(0)); 
+		portletURL.setParameter("resId",Long.toString(0)); 
+		portletURL.setParameter("p_o_p_id",ACTIVITY_VIEWER_PORTLET_ID);
+		
+		log.debug(" getURLCreateActivity: "+portletURL);
+		
+		return portletURL;		
 	}
 	
 }
