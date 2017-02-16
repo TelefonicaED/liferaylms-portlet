@@ -37,10 +37,13 @@ import com.liferay.lms.auditing.AuditingLogFactory;
 import com.liferay.lms.learningactivity.LearningActivityType;
 import com.liferay.lms.learningactivity.LearningActivityTypeRegistry;
 import com.liferay.lms.model.LearningActivity;
+import com.liferay.lms.service.ClpSerializer;
 import com.liferay.lms.service.LearningActivityLocalServiceUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.io.WriterOutputStream;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -80,9 +83,13 @@ import com.liferay.util.bridges.mvc.MVCPortlet;
 /**
  * Portlet implementation class ActivityViewer
  */
-public class ActivityViewer extends MVCPortlet 
-{
+public class ActivityViewer extends MVCPortlet{
 
+	public static final String LMS_EDITACTIVITY_PORTLET_ID =  PortalUtil.getJsSafePortletId("editactivity"+PortletConstants.WAR_SEPARATOR+ClpSerializer.getServletContextName());
+	
+	private static Log log = LogFactoryUtil.getLog(ActivityViewer.class);
+	
+	
 	private static Set<String> reservedAttrs = new HashSet<String>();
 	private volatile Constructor<?> createComponentContext;
 	private volatile Method getContext;
@@ -151,14 +158,23 @@ public class ActivityViewer extends MVCPortlet
 		ThemeDisplay themeDisplay = (ThemeDisplay) renderRequest.getAttribute(WebKeys.THEME_DISPLAY);
 		boolean isWidget = themeDisplay.isWidget();
 		long actId=GetterUtil.DEFAULT_LONG;		
-		if((!isWidget)&&
-				(ParamUtil.getBoolean(renderRequest, "actionEditingDetails", false))){
-			actId=ParamUtil.getLong(renderRequest, "resId", 0);
-			renderResponse.setProperty("clear-request-parameters",Boolean.TRUE.toString());
+		boolean actionEditingDetails = ParamUtil.getBoolean(renderRequest, "actionEditingDetails", false);
+		boolean actionEditingActivity = ParamUtil.getBoolean(renderRequest, "actionEditingActivity", false);
+		
+		log.debug("isWidget:"+isWidget);
+		log.debug("actionEditingDetails:"+actionEditingDetails);
+		log.debug("actionEditingActivity:"+actionEditingActivity);
+		
+		if(!isWidget && actionEditingDetails){
+			actId=ParamUtil.getLong(renderRequest, "resId", ParamUtil.getLong(renderRequest, "actId",0));
+			renderResponse.setProperty("clear-request-parameters",Boolean.TRUE.toString());			
+			log.debug("::actId = resId = "+actId);
+		}else{
+			actId=ParamUtil.getLong(renderRequest, "actId");			
+			log.debug("::actId = "+actId);
 		}
-		else{
-			actId=ParamUtil.getLong(renderRequest, "actId");
-		}
+		
+		
 		
 		if(Validator.isNull(actId)) {
 			renderRequest.setAttribute(WebKeys.PORTLET_CONFIGURATOR_VISIBILITY, Boolean.FALSE);
@@ -179,7 +195,18 @@ public class ActivityViewer extends MVCPortlet
 						renderRequest.setAttribute(WebKeys.PORTLET_CONFIGURATOR_VISIBILITY, Boolean.FALSE);
 					}
 					else {
-						Portlet portlet = PortletLocalServiceUtil.getPortletById(themeDisplay.getCompanyId(), learningActivityType.getPortletId());
+						Portlet portlet = null;
+						
+						if(!actionEditingActivity){
+							log.debug("*****CARGO EL PORTLET: "+learningActivityType.getPortletId());
+							portlet = PortletLocalServiceUtil.getPortletById(themeDisplay.getCompanyId(), learningActivityType.getPortletId());
+						}else{
+							log.debug("*****CARGO EL PORTLET: "+LMS_EDITACTIVITY_PORTLET_ID);
+							portlet = PortletLocalServiceUtil.getPortletById(themeDisplay.getCompanyId(), LMS_EDITACTIVITY_PORTLET_ID);
+							
+						}
+						
+						
 						HttpServletRequest renderHttpServletRequest = PortalUtil.getHttpServletRequest(renderRequest);
 						PortletPreferencesFactoryUtil.getLayoutPortletSetup(themeDisplay.getLayout(), portlet.getPortletId());
 						if(isWidget){

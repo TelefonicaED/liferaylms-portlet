@@ -1038,6 +1038,19 @@ public class LmsActivitiesList extends MVCPortlet {
 		actionResponse.setRenderParameter("califications", String.valueOf(true));
 		
 	}
+	
+	
+	public void editDetailsURL(ActionRequest request, ActionResponse response) throws IOException{
+		log.debug("********editDetails********");
+		
+		String redirect = ParamUtil.get(request, "redirectURL", "");
+		
+		log.debug("redirect: "+redirect);
+		
+		response.removePublicRenderParameter("actionEditingActivity");
+		response.sendRedirect(redirect);		
+	}
+	
 
 	public void modactivity(ActionRequest actionRequest, ActionResponse actionResponse)
 		throws Exception {

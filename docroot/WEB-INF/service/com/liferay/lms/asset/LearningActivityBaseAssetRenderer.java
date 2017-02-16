@@ -20,6 +20,8 @@ import com.liferay.portal.kernel.cache.ThreadLocalCacheManager;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -48,13 +50,15 @@ import com.liferay.portlet.asset.model.BaseAssetRenderer;
 
 public abstract class LearningActivityBaseAssetRenderer extends BaseAssetRenderer {
 	
-	
+	private static Log log = LogFactoryUtil.getLog(LearningActivityBaseAssetRenderer.class);
 	public static final String ACTION_VIEW = "ACTION_VIEW";
 	public static final String EDIT_DETAILS = "ACTIVITY_EDIT_DETAILS";
 	public static final String TEMPLATE_JSP = "template_JSP";
 	public static final String TEMPLATE_PORTLET_ID = "template_portlet_id";
 	protected static final String LMS_ACTIVITIES_LIST_PORTLET_ID =  PortalUtil.getJsSafePortletId("lmsactivitieslist"+PortletConstants.WAR_SEPARATOR+ClpSerializer.getServletContextName());
 	protected static final String ACTIVITY_VIEWER_PORTLET_ID =  PortalUtil.getJsSafePortletId("activityViewer"+PortletConstants.WAR_SEPARATOR+ClpSerializer.getServletContextName());
+	public static final String LMS_EDITACTIVITY_PORTLET_ID =  PortalUtil.getJsSafePortletId("editactivity"+PortletConstants.WAR_SEPARATOR+ClpSerializer.getServletContextName());
+	
 	
 	private LearningActivity _learningactivity;
 	private String _nameKey;
@@ -202,24 +206,91 @@ public abstract class LearningActivityBaseAssetRenderer extends BaseAssetRendere
 		}
 		ThemeDisplay themeDisplay = (ThemeDisplay)liferayPortletRequest.getAttribute(
 				WebKeys.THEME_DISPLAY);
-		portletURL = PortletURLFactoryUtil.create(liferayPortletRequest,LMS_ACTIVITIES_LIST_PORTLET_ID,getControlPanelPlid(themeDisplay),PortletRequest.RENDER_PHASE);
+		portletURL = PortletURLFactoryUtil.create(liferayPortletRequest,_portletId,getControlPanelPlid(themeDisplay),PortletRequest.RENDER_PHASE);
 		portletURL.setParameter("editing", StringPool.TRUE);
 		portletURL.setParameter("resId",Long.toString( _learningactivity.getActId()));
 		portletURL.setParameter("resModuleId",Long.toString( _learningactivity.getModuleId())); 
 	    return portletURL;
 	}
+
+	
+	public static final PortletURL getURLEditViewer(LiferayPortletRequest liferayPortletRequest,
+			LiferayPortletResponse liferayPortletResponse, LearningActivity activity) throws Exception {
+		
+		ThreadLocalCache<Layout> threadLocalCache =
+				ThreadLocalCacheManager.getThreadLocalCache(
+					Lifecycle.REQUEST, LearningActivityBaseAssetRenderer.class.getName());
+		
+		String layoutKey = activity.getCompanyId()+StringPool.SLASH+activity.getGroupId();
+		Layout layout  = threadLocalCache.get(layoutKey);
+		
+		if(Validator.isNull(activity)) {
+			@SuppressWarnings("unchecked")
+			List<Layout> layouts = LayoutLocalServiceUtil.dynamicQuery(LayoutLocalServiceUtil.dynamicQuery().
+					add(PropertyFactoryUtil.forName("privateLayout").eq(false)).
+					add(PropertyFactoryUtil.forName("type").eq(LayoutConstants.TYPE_PORTLET)).
+					add(PropertyFactoryUtil.forName("companyId").eq(activity.getCompanyId())).
+					add(PropertyFactoryUtil.forName("groupId").eq(activity.getGroupId())).
+					add(PropertyFactoryUtil.forName("friendlyURL").eq("/reto")), 0, 1);
+	
+			if(layouts.isEmpty()) {
+				throw new NoSuchLayoutException();			
+			}
+			
+			layout = layouts.get(0);
+		}
+		
+		
+
+		PortletURL portletURL = liferayPortletResponse.createLiferayPortletURL(layout.getPlid(), LMS_EDITACTIVITY_PORTLET_ID, PortletRequest.RENDER_PHASE);
+		portletURL.setWindowState(WindowState.NORMAL);
+		portletURL.setParameter("actId",Long.toString( activity.getActId()));
+		portletURL.setParameter("moduleId",Long.toString( activity.getModuleId()));
+		portletURL.setParameter("actionEditingActivity", StringPool.TRUE);
+		
+		long userId = PrincipalThreadLocal.getUserId();
+		
+		if(Validator.isNotNull(userId)) {			
+			portletURL.setParameter("mvcPath", "/html/editactivity/editactivity.jsp");
+			portletURL.setParameter("editing", StringPool.TRUE);
+			portletURL.setParameter("resId",Long.toString( activity.getActId()));
+			portletURL.setParameter("resModuleId",Long.toString( activity.getModuleId())); 
+		}
+		
+		portletURL.setParameter("p_o_p_id",ACTIVITY_VIEWER_PORTLET_ID);
+		
+		log.debug(" getURLEditViewer: "+portletURL);
+		
+		return portletURL;
+	
+		
+	}
+	
+	
 	
 	protected String getMvcPathView(long userId, LiferayPortletResponse liferayPortletResponse, WindowState windowState) throws Exception {
 		return StringPool.BLANK;
 	}
 	
+	
 	@Override
 	public final PortletURL getURLView(LiferayPortletResponse liferayPortletResponse,
 			WindowState windowState) throws Exception {
-		PortletURL portletURL = liferayPortletResponse.createLiferayPortletURL(_layout.getPlid(), _portletId, PortletRequest.RENDER_PHASE);
+		
+		String portletId;
+		
+		if(_isRuntimePortlet){
+			portletId = ACTIVITY_VIEWER_PORTLET_ID;
+		}else{
+			portletId = _portletId;
+		}
+		
+		PortletURL portletURL = liferayPortletResponse.createLiferayPortletURL(_layout.getPlid(),portletId, PortletRequest.RENDER_PHASE);
 		portletURL.setWindowState(windowState);
 		portletURL.setParameter("actId",Long.toString( _learningactivity.getActId()));
 		portletURL.setParameter("moduleId",Long.toString( _learningactivity.getModuleId()));
+		portletURL.setParameter("actionEditingActivity", StringPool.FALSE);
+		portletURL.setParameter("actionEditingDetails", StringPool.FALSE);
 		
 		long userId = PrincipalThreadLocal.getUserId();
 		
@@ -231,8 +302,12 @@ public abstract class LearningActivityBaseAssetRenderer extends BaseAssetRendere
 		}
 		
 		prepareRuntimePortlet(portletURL);
+		
+		log.debug(" getURLVIEW: "+portletURL);
+		
 		return portletURL;
 	}
+	
 	
 	@Override
 	public final String getURLViewInContext(
