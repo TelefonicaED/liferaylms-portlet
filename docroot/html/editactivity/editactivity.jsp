@@ -968,7 +968,21 @@ Liferay.provide(
 	</aui:fieldset>
 	
 	<aui:button-row>
-		<aui:button type="submit" value="savechanges"/>
-		<aui:button type="cancel" value="canceledition" />
+		<aui:button type="submit" value="save"/>
+		
+		<%
+		AssetRendererFactory assetRendererFactory = AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(LearningActivity.class.getName());
+
+		%>
+		
+		<portlet:actionURL var="goToActivityURL" name="goToActivity" >
+			<portlet:param name="redirectURL" value="<%=assetRendererFactory.getAssetRenderer(actId).
+					getURLView(liferayPortletResponse, WindowState.NORMAL).toString() %>" />
+		</portlet:actionURL>
+
+		<aui:button type="button" value="preview" onclick="javascript:location.href='${goToActivityURL.toString()}'" />
+		
+		
+		
 	</aui:button-row>
 </aui:form>
