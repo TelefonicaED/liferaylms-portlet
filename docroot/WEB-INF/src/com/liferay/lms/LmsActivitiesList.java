@@ -1112,41 +1112,20 @@ public class LmsActivitiesList extends MVCPortlet {
 		SessionMessages.add(actionRequest, "activity-modified-successfully");
 	}
 	
-	
-	
-	
-	
-	
+		
 	
 	public static final PortletURL getURLCalifications(LiferayPortletRequest liferayPortletRequest,
 			LiferayPortletResponse liferayPortletResponse, LearningActivity activity) throws Exception {
 		
-		ThreadLocalCache<Layout> threadLocalCache =
-				ThreadLocalCacheManager.getThreadLocalCache(
-					Lifecycle.REQUEST, LearningActivityBaseAssetRenderer.class.getName());
+		long plid = PortalUtil.getPlidFromPortletId(activity.getGroupId(), ACTIVITY_VIEWER_PORTLET_ID);
+	     
+		log.debug("PLID: "+plid);
 		
-		String layoutKey = activity.getCompanyId()+StringPool.SLASH+activity.getGroupId();
-		Layout layout  = threadLocalCache.get(layoutKey);
-		
-		if(Validator.isNull(activity)) {
-			@SuppressWarnings("unchecked")
-			List<Layout> layouts = LayoutLocalServiceUtil.dynamicQuery(LayoutLocalServiceUtil.dynamicQuery().
-					add(PropertyFactoryUtil.forName("privateLayout").eq(false)).
-					add(PropertyFactoryUtil.forName("type").eq(LayoutConstants.TYPE_PORTLET)).
-					add(PropertyFactoryUtil.forName("companyId").eq(activity.getCompanyId())).
-					add(PropertyFactoryUtil.forName("groupId").eq(activity.getGroupId())).
-					add(PropertyFactoryUtil.forName("friendlyURL").eq("/reto")), 0, 1);
-	
-			if(layouts.isEmpty()) {
-				throw new NoSuchLayoutException();			
-			}
-			
-			layout = layouts.get(0);
-		}
-		
-		
+		if (plid == LayoutConstants.DEFAULT_PLID) {
+			throw new NoSuchLayoutException();
+		}		
 
-		PortletURL portletURL = liferayPortletResponse.createLiferayPortletURL(layout.getPlid(), LMS_EDITACTIVITY_PORTLET_ID, PortletRequest.RENDER_PHASE);
+		PortletURL portletURL = liferayPortletResponse.createLiferayPortletURL(plid, LMS_EDITACTIVITY_PORTLET_ID, PortletRequest.RENDER_PHASE);
 		portletURL.setWindowState(WindowState.NORMAL);
 		
 		portletURL.setParameter("actionEditingActivity", StringPool.FALSE);
@@ -1175,32 +1154,15 @@ public class LmsActivitiesList extends MVCPortlet {
 	public static final PortletURL getURLEditActivity(LiferayPortletRequest liferayPortletRequest,
 			LiferayPortletResponse liferayPortletResponse, LearningActivity activity) throws Exception {
 		
-		ThreadLocalCache<Layout> threadLocalCache =
-				ThreadLocalCacheManager.getThreadLocalCache(
-					Lifecycle.REQUEST, LearningActivityBaseAssetRenderer.class.getName());
+		long plid = PortalUtil.getPlidFromPortletId(activity.getGroupId(), ACTIVITY_VIEWER_PORTLET_ID);
+	     
+		log.debug("PLID: "+plid);
 		
-		String layoutKey = activity.getCompanyId()+StringPool.SLASH+activity.getGroupId();
-		Layout layout  = threadLocalCache.get(layoutKey);
-		
-		if(Validator.isNull(activity)) {
-			@SuppressWarnings("unchecked")
-			List<Layout> layouts = LayoutLocalServiceUtil.dynamicQuery(LayoutLocalServiceUtil.dynamicQuery().
-					add(PropertyFactoryUtil.forName("privateLayout").eq(false)).
-					add(PropertyFactoryUtil.forName("type").eq(LayoutConstants.TYPE_PORTLET)).
-					add(PropertyFactoryUtil.forName("companyId").eq(activity.getCompanyId())).
-					add(PropertyFactoryUtil.forName("groupId").eq(activity.getGroupId())).
-					add(PropertyFactoryUtil.forName("friendlyURL").eq("/reto")), 0, 1);
-	
-			if(layouts.isEmpty()) {
-				throw new NoSuchLayoutException();			
-			}
-			
-			layout = layouts.get(0);
-		}
-		
-		
+		if (plid == LayoutConstants.DEFAULT_PLID) {
+			throw new NoSuchLayoutException();
+		}		
 
-		PortletURL portletURL = liferayPortletResponse.createLiferayPortletURL(layout.getPlid(), LMS_EDITACTIVITY_PORTLET_ID, PortletRequest.RENDER_PHASE);
+		PortletURL portletURL = liferayPortletResponse.createLiferayPortletURL(plid, LMS_EDITACTIVITY_PORTLET_ID, PortletRequest.RENDER_PHASE);
 		portletURL.setWindowState(WindowState.NORMAL);
 		portletURL.setParameter("actId",Long.toString( activity.getActId()));
 		portletURL.setParameter("moduleId",Long.toString( activity.getModuleId()));
@@ -1226,31 +1188,16 @@ public class LmsActivitiesList extends MVCPortlet {
 	
 	public static final PortletURL getURLCreateActivity(LiferayPortletRequest liferayPortletRequest,
 			LiferayPortletResponse liferayPortletResponse, Module module) throws Exception {
-		
-		ThreadLocalCache<Layout> threadLocalCache =
-				ThreadLocalCacheManager.getThreadLocalCache(
-					Lifecycle.REQUEST, LearningActivityBaseAssetRenderer.class.getName());
-		
-		Layout layout = null;		
-		
-		@SuppressWarnings("unchecked")
-		List<Layout> layouts = LayoutLocalServiceUtil.dynamicQuery(LayoutLocalServiceUtil.dynamicQuery().
-				add(PropertyFactoryUtil.forName("privateLayout").eq(false)).
-				add(PropertyFactoryUtil.forName("type").eq(LayoutConstants.TYPE_PORTLET)).
-				add(PropertyFactoryUtil.forName("companyId").eq(module.getCompanyId())).
-				add(PropertyFactoryUtil.forName("groupId").eq(module.getGroupId())).
-				add(PropertyFactoryUtil.forName("friendlyURL").eq("/reto")), 0, 1);
 
-		if(layouts.isEmpty()) {
-			throw new NoSuchLayoutException();			
-		}
-			
-			layout = layouts.get(0);
+		long plid = PortalUtil.getPlidFromPortletId(module.getGroupId(), ACTIVITY_VIEWER_PORTLET_ID);
+	     
+		log.debug("PLID: "+plid);
 		
-		
-		
+		if (plid == LayoutConstants.DEFAULT_PLID) {
+			throw new NoSuchLayoutException();
+		}		
 
-		PortletURL portletURL = liferayPortletResponse.createLiferayPortletURL(layout.getPlid(), LMS_EDITACTIVITY_PORTLET_ID, PortletRequest.RENDER_PHASE);
+		PortletURL portletURL = liferayPortletResponse.createLiferayPortletURL(plid, LMS_EDITACTIVITY_PORTLET_ID, PortletRequest.RENDER_PHASE);
 		portletURL.setWindowState(WindowState.NORMAL);
 		portletURL.setParameter("actionEditingActivity", StringPool.TRUE);			
 		portletURL.setParameter("mvcPath", "/html/lmsactivitieslist/newactivity.jsp");
@@ -1267,24 +1214,15 @@ public class LmsActivitiesList extends MVCPortlet {
 	public static final PortletURL getURLEditModule(LiferayPortletRequest liferayPortletRequest,
 			LiferayPortletResponse liferayPortletResponse, Module module) throws Exception {
 		
-		Layout layout = null;		
+		long plid = PortalUtil.getPlidFromPortletId(module.getGroupId(), ACTIVITY_VIEWER_PORTLET_ID);
+		     
+		log.debug("PLID: "+plid);
 		
-		@SuppressWarnings("unchecked")
-		List<Layout> layouts = LayoutLocalServiceUtil.dynamicQuery(LayoutLocalServiceUtil.dynamicQuery().
-				add(PropertyFactoryUtil.forName("privateLayout").eq(false)).
-				add(PropertyFactoryUtil.forName("type").eq(LayoutConstants.TYPE_PORTLET)).
-				add(PropertyFactoryUtil.forName("companyId").eq(module.getCompanyId())).
-				add(PropertyFactoryUtil.forName("groupId").eq(module.getGroupId())).
-				add(PropertyFactoryUtil.forName("friendlyURL").eq("/reto")), 0, 1);
-
-		if(layouts.isEmpty()) {
-			throw new NoSuchLayoutException();			
+		if (plid == LayoutConstants.DEFAULT_PLID) {
+			throw new NoSuchLayoutException();
 		}
-			
-		layout = layouts.get(0);		
-		
 
-		PortletURL portletURL = liferayPortletResponse.createLiferayPortletURL(layout.getPlid(), LMS_EDITMODULE_PORTLET_ID, PortletRequest.RENDER_PHASE);
+		PortletURL portletURL = liferayPortletResponse.createLiferayPortletURL(plid, LMS_EDITMODULE_PORTLET_ID, PortletRequest.RENDER_PHASE);
 		portletURL.setWindowState(WindowState.NORMAL);
 		portletURL.setParameter("actionEditingModule", StringPool.TRUE);
 		portletURL.setParameter("actionEditingActivity", StringPool.FALSE);
