@@ -517,6 +517,11 @@ public class LmsActivitiesList extends MVCPortlet {
 	}
 	
 	public void goToModule(ActionRequest actionRequest, ActionResponse actionResponse)throws Exception {
+		
+		log.debug("***goToModule***");
+		
+		actionResponse.removePublicRenderParameter("actionEditingModule");
+		
 		ThemeIdEvent themeIdEvent = new ThemeIdEvent();
 		themeIdEvent.setModuleId(ParamUtil.getLong(actionRequest, "moduleId",0));
 		themeIdEvent.setThemeId(ParamUtil.getLong(actionRequest, "themeId",1));		
