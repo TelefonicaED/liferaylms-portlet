@@ -54,6 +54,11 @@
 		<supported-public-render-parameter>actId</supported-public-render-parameter>
 		<supported-public-render-parameter>moduleId</supported-public-render-parameter>
 		<supported-public-render-parameter>actionEditing</supported-public-render-parameter>
+		
+				
+		<supported-public-render-parameter>actionEditingActivity</supported-public-render-parameter>	
+		<supported-public-render-parameter>actionEditingModule</supported-public-render-parameter>
+		<supported-public-render-parameter>actionCalifications</supported-public-render-parameter>
 	</portlet>
 
 	<portlet>
@@ -104,7 +109,7 @@
 		<supported-public-render-parameter>actId</supported-public-render-parameter>
 		<supported-public-render-parameter>moduleId</supported-public-render-parameter>
 		<supported-public-render-parameter>actionEditing</supported-public-render-parameter>
-
+		<supported-public-render-parameter>actionEditingDetails</supported-public-render-parameter>
 	</portlet>
 
 	<portlet>
@@ -202,6 +207,54 @@
 		<supported-public-render-parameter>moduleId</supported-public-render-parameter>
 		<supported-public-render-parameter>actionEditing</supported-public-render-parameter>
 	</portlet>
+
+
+	<portlet>
+		<portlet-name>editmodule</portlet-name>
+		<display-name>EditModule</display-name>
+		<portlet-class>com.liferay.lms.modulePortlet</portlet-class>
+		<init-param>
+			<name>view-jsp</name>
+			<value>/html/editmodule/view.jsp</value>
+		</init-param>
+		<init-param>
+			<name>edit-module-jsp</name>
+			<value>/JSPs/module/editmodule.jsp</value>
+		</init-param>		
+		<init-param>
+			<name>add-process-action-success-action</name>
+			<value>false</value>
+		</init-param>
+		<expiration-cache>0</expiration-cache>
+		<supports>
+			<mime-type>text/html</mime-type>
+			<portlet-mode>view</portlet-mode>
+		</supports>
+		<resource-bundle>content/editmodule/Language</resource-bundle>
+		<portlet-info>
+			<title>EditModule</title>
+			<short-title>EditModule</short-title>
+			<keywords></keywords>
+		</portlet-info>
+		<security-role-ref>
+			<role-name>administrator</role-name>
+		</security-role-ref>
+		<security-role-ref>
+			<role-name>guest</role-name>
+		</security-role-ref>
+		<security-role-ref>
+			<role-name>power-user</role-name>
+		</security-role-ref>
+		<security-role-ref>
+			<role-name>user</role-name>
+		</security-role-ref>
+		<supported-public-render-parameter>actId</supported-public-render-parameter>
+		<supported-public-render-parameter>moduleId</supported-public-render-parameter>
+		<supported-public-render-parameter>actionEditing</supported-public-render-parameter>
+		<supported-public-render-parameter>actionEditingModule</supported-public-render-parameter>
+		<supported-public-render-parameter>actionEditingActivity</supported-public-render-parameter>		
+	</portlet>
+
 
 	<portlet>
 		<portlet-name>resourceExternalActivity</portlet-name>
@@ -934,6 +987,8 @@
 		<supported-public-render-parameter>actId</supported-public-render-parameter>
 		<supported-public-render-parameter>moduleId</supported-public-render-parameter>
 		<supported-public-render-parameter>actionEditing</supported-public-render-parameter>
+		<supported-public-render-parameter>actionEditingActivity</supported-public-render-parameter>	
+		<supported-public-render-parameter>actionCalifications</supported-public-render-parameter>		
 	</portlet>
 
 	<portlet>
@@ -2210,6 +2265,10 @@
 		<supported-public-render-parameter>actId</supported-public-render-parameter>
 		<supported-public-render-parameter>moduleId</supported-public-render-parameter>
 		<supported-public-render-parameter>actionEditing</supported-public-render-parameter>
+		<supported-public-render-parameter>actionEditingActivity</supported-public-render-parameter>
+		<supported-public-render-parameter>actionEditingDetails</supported-public-render-parameter>
+		<supported-public-render-parameter>actionEditingModule</supported-public-render-parameter>	
+		<supported-public-render-parameter>actionCalifications</supported-public-render-parameter>		
 	</portlet>
 	<portlet>
 		<portlet-name>moduleselector</portlet-name>
@@ -2477,8 +2536,20 @@
 		<identifier>categoryId</identifier>
 		<qname xmlns:x="http://www.liferay.com/public-render-parameters">x:categoryId</qname>
 	</public-render-parameter>
-
-
-
-
+	<public-render-parameter>
+		<identifier>actionEditingActivity</identifier>
+		<qname xmlns:x="http://www.liferay.com/public-render-parameters">x:actionEditingActivity</qname>
+	</public-render-parameter>
+	<public-render-parameter>
+		<identifier>actionEditingDetails</identifier>
+		<qname xmlns:x="http://www.liferay.com/public-render-parameters">x:actionEditingDetails</qname>
+	</public-render-parameter>	
+	<public-render-parameter>
+		<identifier>actionEditingModule</identifier>
+		<qname xmlns:x="http://www.liferay.com/public-render-parameters">x:actionEditingModule</qname>
+	</public-render-parameter>
+	<public-render-parameter>
+		<identifier>actionCalifications</identifier>
+		<qname xmlns:x="http://www.liferay.com/public-render-parameters">x:actionCalifications</qname>
+	</public-render-parameter>		
 </portlet-app>

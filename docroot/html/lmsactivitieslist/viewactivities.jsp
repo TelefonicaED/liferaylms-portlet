@@ -50,6 +50,7 @@ NumberFormat resultNumberFormat = NumberFormat.getInstance(locale);
 resultNumberFormat.setMinimumIntegerDigits(1);
 
 LearningActivity currentLeaningActivity = null;
+Module currentModule = null;
 
 if(actId!=0) {
 	currentLeaningActivity = LearningActivityLocalServiceUtil.getLearningActivity(actId);
@@ -65,7 +66,10 @@ if (moduleId == 0) {
 	if (modules.size() > 0) {
 		Module theModule = modules.get(0);
 		moduleId = theModule.getModuleId();
+		currentModule = theModule;
 	}
+}else{
+	currentModule = ModuleLocalServiceUtil.fetchModule(moduleId);
 }
 boolean hasPermissionAccessCourseFinished = LiferaylmsUtil.hasPermissionAccessCourseFinished(themeDisplay.getCompanyId(), coursetmp.getGroupCreatedId(), coursetmp.getCourseId(), themeDisplay.getUserId());
 
@@ -231,54 +235,14 @@ function <portlet:namespace />upActivity(actId){
 	<liferay-portlet:param name="resModuleId" value="<%=Long.toString(moduleId) %>" />
 </liferay-portlet:renderURL>
 	<%
+	PortletURL urlCreateActivity = LmsActivitiesList.getURLCreateActivity(liferayPortletRequest, liferayPortletResponse, currentModule);
 
-	String portletnamespace = renderResponse.getNamespace();
-	String newactivitypopup = "javascript:AUI().use('aui-dialog','aui-dialog-iframe', "+
-			"	function(A){ "+
-			"	new A.Dialog( "+
-			"		{ "+
-			"    		id: 'editlesson', "+ 
-			"			title: '"+LanguageUtil.get(pageContext,"activity.creation")+"', "+
-		    "			destroyOnClose: true, "+
-		    "			width: 750, "+
-		    "			modal:true, "+
-		    "			x:50, "+
-		    "			y:50, "+
-		    "			on: { "+
-			"    			close: function(evt){ "+
-			"					Liferay.Portlet.refresh(A.one('#p_p_id"+renderResponse.getNamespace()+"')); "+		
-			"				} "+
-			"			} "+
-			"		} "+
-			"	).plug( "+
-			"		A.Plugin.DialogIframe, "+
-			"		{ "+
-			"			uri: '" + JavaScriptUtil.markupToStringLiteral(newactivityURL) + "', "+
-			"			on: { "+
-			"    			load: function(evt){ "+
-			"					var instance = evt.target; "+
-			"					var iframe = instance.node; "+
-			"					var	iframeDocument = iframe.get('contentWindow.document') || iframe.get('contentDocument'); "+
-			"					var	iframeBody = iframeDocument.one('body'); "+	
-			"					iframeBody.delegate( "+	
-			"						'click', "+	
-			"						function() { "+	
-			"							iframeDocument.purge(true); "+	
-			"							instance.get('host').close(); "+	
-			"						}, "+	
-			"						'.aui-button-input-cancel' "+	
-			"					); "+	
-			"				} "+
-			"			} "+
-			"		} "+
-			"	).render().show(); "+
-			"});";
-			 
-	%>
-	<liferay-ui:icon image="add" label="<%=true%>" message="activity.creation"
-		url="#" cssClass="newactivity" onClick="<%=newactivitypopup %>"/>
-	
-<%
+	if(Validator.isNotNull(urlCreateActivity)){
+		
+		%>
+		<liferay-ui:icon image="add" message="activity.creation" label="true" cssClass="newactivity" url="<%=urlCreateActivity.toString()%>"/>
+		<%
+	}
 }
 %>
 <liferay-ui:error></liferay-ui:error>
@@ -346,15 +310,18 @@ function <portlet:namespace />upActivity(actId){
 							||hasPermissionAccessCourseFinished)
 					{
 						%>
-						<portlet:actionURL var="goToActivity" windowState="<%= WindowState.NORMAL.toString()%>" >
-							<portlet:param name="actId" value="<%=Long.toString(activity.getActId()) %>" />
+						<portlet:actionURL var="goToActivityURL" name="goToActivity" >
+							<portlet:param name="redirectURL" value="<%=assetRendererFactory.getAssetRenderer(activity.getActId()).
+									getURLView(liferayPortletResponse, WindowState.NORMAL).toString() %>" />
 						</portlet:actionURL>
 
 						<li class="learningActivity <%=activityEnd%> <%=editing %> <%=status%>"  <%=(status=="passed" || status=="failed")?"title =\""+LanguageUtil.format(pageContext, "activity.result",new Object[]{resultNumberFormat.format(result)})+"\"":StringPool.BLANK %> 
 							id="<portlet:namespace/><%=activity.getActId()%>">
 							<span class="type_<%=type%>"></span>
-							<a href="<%=assetRendererFactory.getAssetRenderer(activity.getActId()).
-									getURLView(liferayPortletResponse, WindowState.NORMAL) %>"  ><%=title%></a>
+							
+							
+							
+							<a href="<%=goToActivityURL.toString()%>"  ><%=title%></a>
 							
 					<%
 					}

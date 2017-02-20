@@ -56,8 +56,7 @@
 <liferay-ui:error key="general.error" message="edit.activity.general.error"></liferay-ui:error>
 <liferay-ui:error key="error-p2pActivity-inProgress" message="p2ptaskactivity.error.extraContentInProgress" />
 <%
-renderResponse.setProperty(
-		"clear-request-parameters", Boolean.TRUE.toString());
+renderResponse.setProperty("clear-request-parameters", Boolean.TRUE.toString());
 
 long moduleId=ParamUtil.getLong(request,"resModuleId",0);
 String redirect = ParamUtil.getString(request, "redirect");
@@ -176,7 +175,7 @@ if(learnact!=null)
 				liferayPortletRequest.setAttribute(LearningActivityBaseAssetRenderer.EDIT_DETAILS, true);
 				PortletURL urlEditDetails = assetRenderer.getURLEdit(liferayPortletRequest, liferayPortletResponse);
 				if(Validator.isNotNull(urlEditDetails)){
-					urlEditDetails.setWindowState(LiferayWindowState.POP_UP);
+					urlEditDetails.setWindowState(LiferayWindowState.NORMAL);
 					String urlEdit = urlEditDetails.toString();
 					Portlet urlEditPortlet = PortletLocalServiceUtil.getPortletById(HttpUtil.getParameter(urlEdit, "p_p_id",false));
 					
@@ -191,10 +190,14 @@ if(learnact!=null)
 					urlEdit=HttpUtil.addParameter   (urlEdit, StringPool.UNDERLINE+urlEditPortlet.getPortletId()+StringPool.UNDERLINE+"resModuleId", Long.toString(learnact.getModuleId()) );
 					urlEdit=HttpUtil.removeParameter(urlEdit, StringPool.UNDERLINE+urlEditPortlet.getPortletId()+StringPool.UNDERLINE+"actionEditingDetails");
 					urlEdit=HttpUtil.addParameter   (urlEdit, StringPool.UNDERLINE+urlEditPortlet.getPortletId()+StringPool.UNDERLINE+"actionEditingDetails", true);
-					
 					%>
+					
+					<portlet:actionURL name="editDetailsURL" var="editDetailsURL">
+						<portlet:param name="redirectURL" value="<%=urlEdit %>" />
+					</portlet:actionURL>
+					
 					<liferay-ui:icon image="edit" message="<%=larntype.getMesageEditDetails()%>" label="true" 
-									 url="<%=urlEdit%>" />
+									 url="<%=editDetailsURL%>" />
 					<% 
 				}
 			}
@@ -965,7 +968,21 @@ Liferay.provide(
 	</aui:fieldset>
 	
 	<aui:button-row>
-		<aui:button type="submit" value="savechanges"/>
-		<aui:button type="cancel" value="canceledition" />
+		<aui:button type="submit" value="save"/>
+		
+		<%
+		AssetRendererFactory assetRendererFactory = AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(LearningActivity.class.getName());
+
+		%>
+		
+		<portlet:actionURL var="goToActivityURL" name="goToActivity" >
+			<portlet:param name="redirectURL" value="<%=assetRendererFactory.getAssetRenderer(actId).
+					getURLView(liferayPortletResponse, WindowState.NORMAL).toString() %>" />
+		</portlet:actionURL>
+
+		<aui:button type="button" value="preview" onclick="javascript:location.href='${goToActivityURL.toString()}'" />
+		
+		
+		
 	</aui:button-row>
 </aui:form>

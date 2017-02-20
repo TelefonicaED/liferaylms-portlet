@@ -10,7 +10,7 @@
 <%@ include file="/init.jsp"%>
 
 <liferay-ui:success key="ok-deleteActivity" message="activity-deleted-successfully" />
-
+<liferay-ui:success key="ok-delete-module" message="module-deleted-successfully" />
 
 <%
 	long moduleId = ParamUtil.getLong(request, "moduleId", 0);

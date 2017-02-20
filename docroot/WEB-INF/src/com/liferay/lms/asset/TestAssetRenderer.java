@@ -44,7 +44,7 @@ public class TestAssetRenderer extends LearningActivityBaseAssetRenderer {
 		PortletURL portletURL = PortletURLFactoryUtil.create(liferayPortletRequest,getPortletId(),getLayout().getPlid(),PortletRequest.RENDER_PHASE);	
 		portletURL.setParameter("mvcPath", "/html/execactivity/test/admin/editquestions.jsp");
 		portletURL.setParameter("actionEditingDetails", StringPool.TRUE);
-	    portletURL.setParameter("resId",Long.toString( getLearningactivity().getActId()));
+		portletURL.setParameter("resId",Long.toString( getLearningactivity().getActId()));
 	    return portletURL;
 	}
 }
