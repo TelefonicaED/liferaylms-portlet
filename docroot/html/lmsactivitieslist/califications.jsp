@@ -19,6 +19,8 @@
 
 <%@ include file="/init.jsp"%>
 
+<liferay-ui:success key="ok-deleting-tries" message="activity-tries-deleting-successfully" />
+
 <%
 	long actId = ParamUtil.getLong(request, "resId", 0);
 	LearningActivity learnActivity = LearningActivityLocalServiceUtil.getLearningActivity(actId);
