@@ -78,7 +78,6 @@ public class ExportCourse implements MessageListener {
 		}
 	}
 	
-	@SuppressWarnings("unchecked")
 	public void doExportCourse() throws Exception {
 		log.debug("::EXPORT COURSE::");
 		log.debug("fileName:"+fileName);

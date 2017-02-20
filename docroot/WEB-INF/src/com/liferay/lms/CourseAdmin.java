@@ -841,7 +841,7 @@ public class CourseAdmin extends MVCPortlet {
 		Course course = null;
 		if (courseId == 0) {
 			try{
-				course = com.liferay.lms.service.CourseLocalServiceUtil.addCourse(
+				course = CourseLocalServiceUtil.addCourse(
 						title, description, summary, friendlyURL,
 						themeDisplay.getLocale(), ahora, startDate, stopDate,courseTemplateId,type,courseEvalId,
 						courseCalificationType,maxusers,serviceContext,false);
@@ -899,7 +899,7 @@ public class CourseAdmin extends MVCPortlet {
 				course.setMaxusers(maxusers);
 				serviceContext.setAttribute("type", String.valueOf(type));
 				/*
-				 * Se llama más abajo
+				 * Se llama mï¿½s abajo
 				 * com.liferay.lms.service.CourseLocalServiceUtil.modCourse(course,
 						summary, serviceContext);*/
 			}catch(PortalException pe){ 
