@@ -520,7 +520,10 @@ public class LmsActivitiesList extends MVCPortlet {
 		
 		log.debug("***goToModule***");
 		
+		actionResponse.removePublicRenderParameter("actionEditingActivity");
 		actionResponse.removePublicRenderParameter("actionEditingModule");
+		actionResponse.removePublicRenderParameter("actionCalifications");
+		actionResponse.removePublicRenderParameter("actionEditingDetails");
 		
 		ThemeIdEvent themeIdEvent = new ThemeIdEvent();
 		themeIdEvent.setModuleId(ParamUtil.getLong(actionRequest, "moduleId",0));
