@@ -276,9 +276,8 @@ public class ActivityViewer extends MVCPortlet{
 				}else {
 					LearningActivityType learningActivityType=new LearningActivityTypeRegistry().getLearningActivityType(learningActivity.getTypeId());
 					
-					if((Validator.isNull(learningActivityType))||
-					   ((!isWidget)&&
-					    (themeDisplay.getLayoutTypePortlet().getPortletIds().contains(learningActivityType.getPortletId())))) {
+					if((!actionEditingActivity && !actionCalifications ) && ((Validator.isNull(learningActivityType))||((!isWidget)&&
+					    (themeDisplay.getLayoutTypePortlet().getPortletIds().contains(learningActivityType.getPortletId()))))) {
 						renderRequest.setAttribute(WebKeys.PORTLET_CONFIGURATOR_VISIBILITY, Boolean.FALSE);
 					}else {
 						Portlet portlet = null;

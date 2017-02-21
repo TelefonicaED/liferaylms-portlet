@@ -16,6 +16,8 @@ import com.liferay.lms.events.ThemeIdEvent;
 import com.liferay.lms.model.LearningActivity;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.servlet.SessionMessages;
@@ -26,6 +28,8 @@ import com.liferay.portlet.asset.model.AssetRenderer;
 import com.liferay.util.bridges.mvc.MVCPortlet;
 
 public class ActivityNavigatorPortlet extends MVCPortlet {
+	
+	private static Log log = LogFactoryUtil.getLog(ActivityNavigatorPortlet.class);
 	
     @ProcessEvent(qname = "{http://www.wemooc.com/}themeId")
     public void handlethemeEvent(EventRequest eventRequest, EventResponse eventResponse) {
@@ -46,8 +50,19 @@ public class ActivityNavigatorPortlet extends MVCPortlet {
 	public void doView(RenderRequest renderRequest,
 			RenderResponse renderResponse) throws IOException, PortletException {
 		
+		boolean actionEditingDetails = ParamUtil.getBoolean(renderRequest, "actionEditingDetails", false);
+		boolean actionEditingActivity = ParamUtil.getBoolean(renderRequest, "actionEditingActivity", false);
+		boolean actionEditingModule = ParamUtil.getBoolean(renderRequest, "actionEditingModule", false);
+		boolean actionCalifications = ParamUtil.getBoolean(renderRequest, "actionCalifications", false);
+		
+		log.debug("actionEditingDetails:"+actionEditingDetails);
+		log.debug("actionEditingActivity:"+actionEditingActivity);
+		log.debug("actionEditingModule:"+actionEditingModule);
+		log.debug("actionCalifications:"+actionCalifications);
+		
 		//Cuando no tenemos actividad ni modulo, ocultamos el portlet.
-		if(ParamUtil.getLong(renderRequest, "actId", 0) == 0 && ParamUtil.getLong(renderRequest, "moduleId", 0) == 0){
+		if( (ParamUtil.getLong(renderRequest, "actId", 0) == 0 && ParamUtil.getLong(renderRequest, "moduleId", 0) == 0)
+				|| actionEditingDetails || actionEditingActivity || actionEditingModule || actionCalifications){
 			renderRequest.setAttribute(WebKeys.PORTLET_CONFIGURATOR_VISIBILITY, Boolean.FALSE);
 		}
 				

@@ -688,6 +688,10 @@ public class P2PActivityPortlet extends MVCPortlet {
 			
 			boolean anonimous=false;
 			String anonimousString = LearningActivityLocalServiceUtil.getExtraContentValue(actId,"anonimous");
+			
+			boolean email_anonimous=false;
+			String email_anonimousString = LearningActivityLocalServiceUtil.getExtraContentValue(actId,"email_anonimous");
+			
 			boolean result = false;
 			String resultString = LearningActivityLocalServiceUtil.getExtraContentValue(actId,"result");
 			
@@ -697,7 +701,9 @@ public class P2PActivityPortlet extends MVCPortlet {
 			if(anonimousString.equals("true")){
 				anonimous =  true;
 			}
-			
+			if(email_anonimousString.equals("true")){
+				email_anonimous =  true;
+			}			
 			Group group = GroupLocalServiceUtil.getGroup(activity.getGroupId());
 			
 			Course course= CourseLocalServiceUtil.getCourseByGroupCreatedId(activity.getGroupId());
@@ -752,21 +758,29 @@ public class P2PActivityPortlet extends MVCPortlet {
 				body += "<br /><br />" + message;	
 			}
 			
-			if(!anonimous){
-				if(usercorrection!=null){
-					body += "<br /><br />" + usercorrection;
-				}
-			}
+			if(!email_anonimous){
 			
-			//Comentarios realizados por el usuario que ha corregido la actividad.
-			if(p2pActiCor!= null && p2pActiCor.getDescription()!=null){
-				body += "<br /><br />" + p2pActiCor.getDescription();	
-			}
-			
-			if(result){
-				if(resultcorrection!=null){
-					body += "<br /><br />" + resultcorrection;	
+				_log.debug("*********Email no anonimo********");
+				
+				if(!anonimous){
+					if(usercorrection!=null){
+						body += "<br /><br />" + usercorrection;
+					}
 				}
+				
+				//Comentarios realizados por el usuario que ha corregido la actividad.
+				if(p2pActiCor!= null && p2pActiCor.getDescription()!=null){
+					body += "<br /><br />" + p2pActiCor.getDescription();	
+				}
+				
+				if(result){
+					if(resultcorrection!=null){
+						body += "<br /><br />" + resultcorrection;	
+					}
+				}
+			
+			}else{
+				_log.debug("*********Email Anonimo. No se muestran las correcciones ********");
 			}
 			
 			String fileId = String.valueOf(p2pActiCor.getFileEntryId());

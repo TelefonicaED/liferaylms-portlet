@@ -137,28 +137,28 @@ public class LmsActivitiesList extends MVCPortlet {
         }
     }
 
-	public void deleteMyTries(ActionRequest actionRequest, ActionResponse actionResponse)
-	throws Exception {
+	public void deleteMyTries(ActionRequest actionRequest, ActionResponse actionResponse) throws Exception {
+		
+		log.debug("***deleteMyTries***");
+		
 		long actId = ParamUtil.getLong(actionRequest, "resId", 0);
 		String redirect = ParamUtil.getString(actionRequest, "redirect");
-		if(actId>0)
-		{
+		
+		if(actId>0){
 		LearningActivity larn=LearningActivityLocalServiceUtil.getLearningActivity(actId);
 		ThemeDisplay themeDisplay = (ThemeDisplay) actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
 		actionResponse.setRenderParameters(actionRequest.getParameterMap());
 		actionRequest.setAttribute("editing", "true");
 		LearningActivityTryLocalServiceUtil.deleteUserTries(actId, themeDisplay.getUserId());
-		if(P2pActivityLocalServiceUtil.existP2pAct(actId, themeDisplay.getUserId()))
-		{
+		
+		if(P2pActivityLocalServiceUtil.existP2pAct(actId, themeDisplay.getUserId())){
 			P2pActivity p2pact=P2pActivityLocalServiceUtil.findByActIdAndUserId(actId, themeDisplay.getUserId());
-			P2pActivityLocalServiceUtil.deleteP2pActivity(p2pact.getP2pActivityId());
-			
+			P2pActivityLocalServiceUtil.deleteP2pActivity(p2pact.getP2pActivityId());			
 			java.util.List<P2pActivityCorrections> p2pactcorrcs=P2pActivityCorrectionsLocalServiceUtil.findByP2pActivityId(p2pact.getP2pActivityId());
-			for(P2pActivityCorrections p2pactcorr:p2pactcorrcs)
-			{
-				P2pActivityCorrectionsLocalServiceUtil.deleteP2pActivityCorrections(p2pactcorr);
-			}
 			
+			for(P2pActivityCorrections p2pactcorr:p2pactcorrcs){
+				P2pActivityCorrectionsLocalServiceUtil.deleteP2pActivityCorrections(p2pactcorr);
+			}			
 		}
 		
 		actionRequest.setAttribute("activity", larn);
@@ -167,8 +167,7 @@ public class LmsActivitiesList extends MVCPortlet {
 		if (redirect != null && !"".equals(redirect)) {
 			if (!windowState.equals(LiferayWindowState.POP_UP)) {
 				actionResponse.sendRedirect(redirect);
-			}
-			else {
+			}else {
 				redirect = PortalUtil.escapeRedirect(redirect);
 
 				if (Validator.isNotNull(redirect)) {
@@ -177,6 +176,7 @@ public class LmsActivitiesList extends MVCPortlet {
 			}
 		}
 		
+		SessionMessages.add(actionRequest, "ok-deleting-tries");
 		
 	}
 	public void saveActivity(ActionRequest actionRequest, ActionResponse actionResponse) throws Exception {
@@ -520,7 +520,10 @@ public class LmsActivitiesList extends MVCPortlet {
 		
 		log.debug("***goToModule***");
 		
+		actionResponse.removePublicRenderParameter("actionEditingActivity");
 		actionResponse.removePublicRenderParameter("actionEditingModule");
+		actionResponse.removePublicRenderParameter("actionCalifications");
+		actionResponse.removePublicRenderParameter("actionEditingDetails");
 		
 		ThemeIdEvent themeIdEvent = new ThemeIdEvent();
 		themeIdEvent.setModuleId(ParamUtil.getLong(actionRequest, "moduleId",0));
@@ -985,6 +988,9 @@ public class LmsActivitiesList extends MVCPortlet {
 	}
 	
 	public void deleteAllURL(ActionRequest actionRequest, ActionResponse actionResponse) throws Exception {
+		
+		log.debug("***deleteAllURL***");
+		
 		long actId = ParamUtil.getInteger(actionRequest, "resId");
 		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(WebKeys.THEME_DISPLAY);    
 		
@@ -1005,9 +1011,14 @@ public class LmsActivitiesList extends MVCPortlet {
 
 		actionResponse.setRenderParameter("resId", String.valueOf(actId));
 		actionResponse.setRenderParameter("califications", String.valueOf(true));
+		
+		SessionMessages.add(actionRequest, "ok-deleting-tries");
 	}
 	
 	public void deleteAllTries(ActionRequest actionRequest, ActionResponse actionResponse) {
+		
+		log.debug("***deleteAllTries***");
+		
 		long actId = ParamUtil.getInteger(actionRequest, "resId");
 		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(WebKeys.THEME_DISPLAY);    
 		
@@ -1037,6 +1048,8 @@ public class LmsActivitiesList extends MVCPortlet {
 
 		actionResponse.setRenderParameter("resId", String.valueOf(actId));
 		actionResponse.setRenderParameter("califications", String.valueOf(true));
+		
+		SessionMessages.add(actionRequest, "ok-deleting-tries");
 	}
 	
 	public void deleteURL(ActionRequest actionRequest, ActionResponse actionResponse) throws Exception {
@@ -1099,6 +1112,7 @@ public class LmsActivitiesList extends MVCPortlet {
 		response.removePublicRenderParameter("actionEditingActivity");
 		response.removePublicRenderParameter("actionEditingModule");
 		response.removePublicRenderParameter("actionCalifications");
+		response.removePublicRenderParameter("actionEditingDetails");
 		response.sendRedirect(redirect);		
 	}
 	

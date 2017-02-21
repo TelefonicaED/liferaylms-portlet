@@ -11,6 +11,8 @@
 
 <liferay-ui:success key="ok-deleteActivity" message="activity-deleted-successfully" />
 <liferay-ui:success key="ok-delete-module" message="module-deleted-successfully" />
+<liferay-ui:success key="ok-deleting-tries" message="activity-tries-deleting-successfully" />
+
 
 <%
 	long moduleId = ParamUtil.getLong(request, "moduleId", 0);

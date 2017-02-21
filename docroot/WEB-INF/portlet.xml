@@ -380,6 +380,11 @@
 			<role-name>user</role-name>
 		</security-role-ref>
 		<supported-public-render-parameter>actionEditing</supported-public-render-parameter>
+		
+		<supported-public-render-parameter>actionEditingActivity</supported-public-render-parameter>
+		<supported-public-render-parameter>actionEditingDetails</supported-public-render-parameter>
+		<supported-public-render-parameter>actionEditingModule</supported-public-render-parameter>	
+		<supported-public-render-parameter>actionCalifications</supported-public-render-parameter>	
 	</portlet>
 
 	<portlet>
@@ -429,6 +434,11 @@
 		<supported-public-render-parameter>actId</supported-public-render-parameter>
 		<supported-public-render-parameter>moduleId</supported-public-render-parameter>
 		<supported-public-render-parameter>actionEditing</supported-public-render-parameter>
+
+		<supported-public-render-parameter>actionEditingActivity</supported-public-render-parameter>
+		<supported-public-render-parameter>actionEditingDetails</supported-public-render-parameter>
+		<supported-public-render-parameter>actionEditingModule</supported-public-render-parameter>	
+		<supported-public-render-parameter>actionCalifications</supported-public-render-parameter>		
 	</portlet>
 	<portlet>
 		<portlet-name>activityDates</portlet-name>
@@ -578,6 +588,11 @@
 		<supported-public-render-parameter>actId</supported-public-render-parameter>
 		<supported-public-render-parameter>moduleId</supported-public-render-parameter>
 		<supported-public-render-parameter>actionEditing</supported-public-render-parameter>
+		
+		<supported-public-render-parameter>actionEditingActivity</supported-public-render-parameter>
+		<supported-public-render-parameter>actionEditingDetails</supported-public-render-parameter>
+		<supported-public-render-parameter>actionEditingModule</supported-public-render-parameter>	
+		<supported-public-render-parameter>actionCalifications</supported-public-render-parameter>
 	</portlet>
 	<portlet>
 		<portlet-name>moduleEditing</portlet-name>
