@@ -238,6 +238,7 @@ public abstract class LearningActivityBaseAssetRenderer extends BaseAssetRendere
 		portletURL.setParameter("actionEditingActivity", StringPool.FALSE);
 		portletURL.setParameter("actionEditingDetails", StringPool.FALSE);
 		portletURL.setParameter("actionEditingModule", StringPool.FALSE);
+		portletURL.setParameter("actionCalifications", StringPool.FALSE);
 		
 		long userId = PrincipalThreadLocal.getUserId();
 		
@@ -263,6 +264,11 @@ public abstract class LearningActivityBaseAssetRenderer extends BaseAssetRendere
 		PortletURL portletURL = liferayPortletResponse.createLiferayPortletURL(_layout.getPlid(), _portletId, PortletRequest.RENDER_PHASE);
 		portletURL.setParameter("actId",Long.toString( _learningactivity.getActId()));
 		portletURL.setParameter("moduleId",Long.toString( _learningactivity.getModuleId()));
+		portletURL.setParameter("actionEditingActivity", StringPool.FALSE);
+		portletURL.setParameter("actionEditingDetails", StringPool.FALSE);
+		portletURL.setParameter("actionEditingModule", StringPool.FALSE);
+		portletURL.setParameter("actionCalifications", StringPool.FALSE);
+		
 		
 		String mvcPath = getMvcPathView(themeDisplay.getUserId(),liferayPortletResponse,liferayPortletRequest.getWindowState());
 		if(Validator.isNotNull(mvcPath)){

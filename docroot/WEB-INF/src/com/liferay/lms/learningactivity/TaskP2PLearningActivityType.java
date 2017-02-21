@@ -159,6 +159,16 @@ public class TaskP2PLearningActivityType extends BaseLearningActivityType {
 				anonimous.setText(Boolean.toString(ParamUtil.get(uploadRequest,"anonimous",false)));		
 				rootElement.add(anonimous);	
 				
+				Element email_anonimous=rootElement.element("email_anonimous");
+				if(email_anonimous!=null)
+				{
+					email_anonimous.detach();
+					rootElement.remove(email_anonimous);
+				}
+				email_anonimous = SAXReaderUtil.createElement("email_anonimous");
+				email_anonimous.setText(Boolean.toString(ParamUtil.get(uploadRequest,"email_anonimous",false)));		
+				rootElement.add(email_anonimous);	
+				
 				Element numValidaciones=rootElement.element("validaciones");
 				if(numValidaciones!=null)
 				{
