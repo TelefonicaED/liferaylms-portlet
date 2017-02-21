@@ -490,6 +490,38 @@ public void asignCorrectionsToP2PActivities(long actId, long p2pActivityId,int n
 	}
 	
 	/**
+	 * Para saber si al usuario le han realizado todas las correcciones que se indica en el extracontent.
+	 */
+	@SuppressWarnings("unchecked")
+	public boolean hasAllCorrectionsDoneAboutUserInP2PActivity(long actId, long p2pActivityId) {
+		
+		boolean res = false;
+		
+		// Obtener las validaciones que tiene que tener la actividad.
+		int numAsigns = 3;
+		try {
+			String validations = LearningActivityLocalServiceUtil.getExtraContentValue(actId, "validaciones");
+	
+			try {numAsigns = Integer.valueOf(validations);} catch (Exception e) {}
+			
+			ClassLoader classLoader = (ClassLoader) PortletBeanLocatorUtil.locate(ClpSerializer.getServletContextName(), "portletClassLoader");
+			DynamicQuery consulta = DynamicQueryFactoryUtil.forClass(P2pActivityCorrections.class, classLoader)
+					.add(PropertyFactoryUtil.forName("actId").eq(actId))
+					.add(PropertyFactoryUtil.forName("p2pActivityId").eq(p2pActivityId))
+					.add(PropertyFactoryUtil.forName("date").isNotNull());
+		
+			long num = p2pActivityCorrectionsPersistence.countWithDynamicQuery(consulta);
+			
+			return num >= numAsigns;
+		} catch (SystemException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+		return res;
+	}
+	
+	/**
 	 * Obtenemos la lista de correcciones que se le asignaron a una tarea p2p.
 	 * @param p2pActivityId
 	 * @return

@@ -184,17 +184,21 @@ public class P2pActivityCorrectionsLocalServiceClp
 
 		_methodParameterTypes32 = new String[] { "long", "long" };
 
-		_methodName33 = "getCorrectionByP2PActivity";
+		_methodName33 = "hasAllCorrectionsDoneAboutUserInP2PActivity";
 
-		_methodParameterTypes33 = new String[] { "long" };
+		_methodParameterTypes33 = new String[] { "long", "long" };
 
-		_methodName34 = "getAVGCorrectionsResults";
+		_methodName34 = "getCorrectionByP2PActivity";
 
 		_methodParameterTypes34 = new String[] { "long" };
 
-		_methodName35 = "isP2PAsignationDone";
+		_methodName35 = "getAVGCorrectionsResults";
 
-		_methodParameterTypes35 = new String[] { "long", "long" };
+		_methodParameterTypes35 = new String[] { "long" };
+
+		_methodName36 = "isP2PAsignationDone";
+
+		_methodParameterTypes36 = new String[] { "long", "long" };
 	}
 
 	public com.liferay.lms.model.P2pActivityCorrections addP2pActivityCorrections(
@@ -1135,14 +1139,38 @@ public class P2pActivityCorrectionsLocalServiceClp
 		return ((Boolean)returnObj).booleanValue();
 	}
 
+	public boolean hasAllCorrectionsDoneAboutUserInP2PActivity(long actId,
+		long p2pActivityId) {
+		Object returnObj = null;
+
+		try {
+			returnObj = _invokableLocalService.invokeMethod(_methodName33,
+					_methodParameterTypes33,
+					new Object[] { actId, p2pActivityId });
+		}
+		catch (Throwable t) {
+			t = ClpSerializer.translateThrowable(t);
+
+			if (t instanceof RuntimeException) {
+				throw (RuntimeException)t;
+			}
+			else {
+				throw new RuntimeException(t.getClass().getName() +
+					" is not a valid exception");
+			}
+		}
+
+		return ((Boolean)returnObj).booleanValue();
+	}
+
 	public java.util.List<com.liferay.lms.model.P2pActivityCorrections> getCorrectionByP2PActivity(
 		long p2pActivityId)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		Object returnObj = null;
 
 		try {
-			returnObj = _invokableLocalService.invokeMethod(_methodName33,
-					_methodParameterTypes33, new Object[] { p2pActivityId });
+			returnObj = _invokableLocalService.invokeMethod(_methodName34,
+					_methodParameterTypes34, new Object[] { p2pActivityId });
 		}
 		catch (Throwable t) {
 			t = ClpSerializer.translateThrowable(t);
@@ -1167,8 +1195,8 @@ public class P2pActivityCorrectionsLocalServiceClp
 		Object returnObj = null;
 
 		try {
-			returnObj = _invokableLocalService.invokeMethod(_methodName34,
-					_methodParameterTypes34, new Object[] { p2pActivityId });
+			returnObj = _invokableLocalService.invokeMethod(_methodName35,
+					_methodParameterTypes35, new Object[] { p2pActivityId });
 		}
 		catch (Throwable t) {
 			t = ClpSerializer.translateThrowable(t);
@@ -1190,8 +1218,8 @@ public class P2pActivityCorrectionsLocalServiceClp
 		Object returnObj = null;
 
 		try {
-			returnObj = _invokableLocalService.invokeMethod(_methodName35,
-					_methodParameterTypes35,
+			returnObj = _invokableLocalService.invokeMethod(_methodName36,
+					_methodParameterTypes36,
 					new Object[] { p2pActivityId, userId });
 		}
 		catch (Throwable t) {
@@ -1284,4 +1312,6 @@ public class P2pActivityCorrectionsLocalServiceClp
 	private String[] _methodParameterTypes34;
 	private String _methodName35;
 	private String[] _methodParameterTypes35;
+	private String _methodName36;
+	private String[] _methodParameterTypes36;
 }

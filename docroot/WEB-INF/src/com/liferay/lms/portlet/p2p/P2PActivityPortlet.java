@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
@@ -14,14 +13,11 @@ import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
 import javax.portlet.PortletConfig;
 import javax.portlet.PortletException;
-import javax.portlet.PortletRequest;
-import javax.portlet.PortletURL;
 import javax.portlet.ProcessAction;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 
 import com.liferay.lms.ModuleUpdateResult;
-import com.liferay.lms.moduleUpload;
 import com.liferay.lms.auditing.AuditConstants;
 import com.liferay.lms.auditing.AuditingLogFactory;
 import com.liferay.lms.model.Course;
@@ -49,7 +45,6 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.mail.MailMessage;
 import com.liferay.portal.kernel.repository.model.FileEntry;
-import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.upload.UploadPortletRequest;
@@ -63,24 +58,21 @@ import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
 import com.liferay.portal.model.Group;
-import com.liferay.portal.model.Layout;
 import com.liferay.portal.model.User;
 import com.liferay.portal.service.GroupLocalServiceUtil;
-import com.liferay.portal.service.LayoutLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceContextFactory;
 import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
-import com.liferay.portlet.PortletURLFactoryUtil;
 import com.liferay.portlet.documentlibrary.FileExtensionException;
 import com.liferay.portlet.documentlibrary.FileNameException;
 import com.liferay.portlet.documentlibrary.model.DLFileEntry;
-import com.liferay.portlet.documentlibrary.model.DLFolder;
 import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
 import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.service.DLFileEntryLocalServiceUtil;
 import com.liferay.util.bridges.mvc.MVCPortlet;
+import com.tls.lms.util.DLFolderUtil;
 import com.tls.lms.util.LiferaylmsUtil;
 
 
@@ -91,7 +83,12 @@ import com.tls.lms.util.LiferaylmsUtil;
 public class P2PActivityPortlet extends MVCPortlet {
 	Log log = LogFactoryUtil.getLog(P2PActivityPortlet.class);
 	
-
+	/**
+	 * Función para cuando un usuario entrega la p2p
+	 * @param request
+	 * @param response
+	 * @throws Exception
+	 */
 	@ProcessAction(name = "addP2PActivity")
 	public void addP2PActivity(ActionRequest request, ActionResponse response) throws Exception
 	{
@@ -191,7 +188,7 @@ public class P2PActivityPortlet extends MVCPortlet {
 						
 						long repositoryId = DLFolderConstants.getDataRepositoryId(themeDisplay.getScopeGroupId(), DLFolderConstants.DEFAULT_PARENT_FOLDER_ID);
 						//Obtenermos el Id de directorio. Creamos el directorio si no existe.
-						long folderId = createDLFolders(user.getUserId(), repositoryId, request);
+						long folderId = DLFolderUtil.createDLFoldersP2P(user.getUserId(), repositoryId, request);
 						
 						try {
 							
@@ -338,7 +335,7 @@ public class P2PActivityPortlet extends MVCPortlet {
 				}
 
 				long repositoryId = DLFolderConstants.getDataRepositoryId(themeDisplay.getScopeGroupId(), DLFolderConstants.DEFAULT_PARENT_FOLDER_ID);
-				long folderId = createDLFolders(user.getUserId(), repositoryId, actionRequest);
+				long folderId = DLFolderUtil.createDLFoldersP2P(user.getUserId(), repositoryId, actionRequest);
 
 				//Subimos el Archivo en la Document Library
 				ServiceContext serviceContext= ServiceContextFactory.getInstance( DLFileEntry.class.getName(), actionRequest);
@@ -374,74 +371,75 @@ public class P2PActivityPortlet extends MVCPortlet {
 		}
 
 	}
-		
+	
+	/**
+	 * Método para cuando se corrige una p2p
+	 * Se debe tener en cuenta a la hora de actualizar el LearningActivityResult los siguientes casos:
+	 * - Si el alumno no ha corregido todas las tareas p2p que debe corregir no se pone fecha fin, ya que no ha terminado las correcciones
+	 * - Si el alumno ha corregido todas las tareas p2p pero la actividad va con nota, no se le pone fecha fin hasta que:
+	 *    - Le hayan valorado todos los alumnos su p2p
+	 *    - Haya obtenido la nota necesaria para aprobar la actividad
+	 * @param request
+	 * @param response
+	 * @throws Exception
+	 */
 	@ProcessAction(name = "saveCorrection")
 	public void saveCorrection(ActionRequest request, ActionResponse response) throws Exception {
+		UploadPortletRequest uploadRequest = PortalUtil.getUploadPortletRequest(request);	
+		ThemeDisplay themeDisplay = (ThemeDisplay) request.getAttribute(WebKeys.THEME_DISPLAY);	
+		User user = themeDisplay.getUser();
 		
-		UploadPortletRequest uploadRequest = PortalUtil.getUploadPortletRequest(request);		
-		ThemeDisplay themeDisplay = (ThemeDisplay) request.getAttribute(WebKeys.THEME_DISPLAY);		
-		PortletConfig portletConfig = this.getPortletConfig();
-				
-		//Obtenemos los campos necesarios.
-		User user = UserLocalServiceUtil.getUser(themeDisplay.getUserId());
-		long resultuser=0;
-		
-		String description = uploadRequest.getParameter("description");
-		Long actId = Long.parseLong(uploadRequest.getParameter("actId"));
-		Long latId = Long.parseLong(uploadRequest.getParameter("latId"));
-		Long p2pActivityId = Long.parseLong(uploadRequest.getParameter("p2pActivityId"));
-		
-		String result = LearningActivityLocalServiceUtil.getExtraContentValue(actId,"result");
-							
-		if(result.equals("true")){
-			resultuser =  Long.parseLong(uploadRequest.getParameter("resultuser"));
-		}
-		 		
-		String fileName = uploadRequest.getFileName("fileName");
-		File file = uploadRequest.getFile("fileName");
-		String mimeType = uploadRequest.getContentType("fileName");
-		
-		if(	file.getName().endsWith(".bat") 
-				|| file.getName().endsWith(".com")
-				|| file.getName().endsWith(".exe")
-			    || file.getName().endsWith(".msi") ){
-				
-				SessionErrors.add(request, "p2ptaskactivity-error-file-type");
-				return;
-			}
-		
-		//Comprobar que el tamaño del fichero no supere los 300mb
-		if(file.length()> 300 * 1024 * 1024){
-			SessionErrors.add(request, "p2ptaskactivity-error-file-size");
-			request.setAttribute("actId", actId);
-			return;
-		}
+		long p2pActivityId = Long.parseLong(uploadRequest.getParameter("p2pActivityId"));
 		
 		//Ya debe existir una correcion en la bd para este usuario y para esta P2pActivity.
 		P2pActivityCorrections p2pActCor = P2pActivityCorrectionsLocalServiceUtil.findByP2pActivityIdAndUserId(p2pActivityId, user.getUserId());
 		
 		if(p2pActCor!=null){
+							
+			String description = uploadRequest.getParameter("description");
 			
 			if(description!=null && !description.equals("")){
+			 		
+				String fileName = uploadRequest.getFileName("fileName");
+				File file = uploadRequest.getFile("fileName");
+				String mimeType = uploadRequest.getContentType("fileName");
 				
+				if(	file.getName().endsWith(".bat") 
+						|| file.getName().endsWith(".com")
+						|| file.getName().endsWith(".exe")
+					    || file.getName().endsWith(".msi") ){
+						
+						SessionErrors.add(request, "p2ptaskactivity-error-file-type");
+						return;
+				}
+				
+				long actId = Long.parseLong(uploadRequest.getParameter("actId"));
+				
+				//Comprobar que el tamaño del fichero no supere los 300mb
+				if(file.length()> 300 * 1024 * 1024){
+					SessionErrors.add(request, "p2ptaskactivity-error-file-size");
+					request.setAttribute("actId", actId);
+					return;
+				}
+
+
 				try{
-					long fileId = new Long(0);
+					long fileId = 0;
 					
 					//Si ha subido un archivo se guarda.
 					if(fileName!=null && !fileName.equals("")){
 						//Obtenermos el Id de directorio. Creamos el directorio si no existe.
 						long repositoryId = DLFolderConstants.getDataRepositoryId(themeDisplay.getScopeGroupId(), DLFolderConstants.DEFAULT_PARENT_FOLDER_ID);
-						long folderId = createDLFolders(user.getUserId(), repositoryId, request);
+						long folderId = DLFolderUtil.createDLFoldersP2P(user.getUserId(), repositoryId, request);
 						
 						//Subimos el Archivo en la Document Library
 						ServiceContext serviceContext= ServiceContextFactory.getInstance( DLFileEntry.class.getName(), request);
 						//Damos permisos al archivo para usuarios de comunidad.
 						serviceContext.setAddGroupPermissions(true);
-						
-						FileEntry document;
+					
 						try {
 							
-							document = DLAppLocalServiceUtil.addFileEntry(user.getUserId(), repositoryId , folderId , fileName, mimeType, fileName, StringPool.BLANK, StringPool.BLANK, file , serviceContext );
+							FileEntry document = DLAppLocalServiceUtil.addFileEntry(user.getUserId(), repositoryId , folderId , fileName, mimeType, fileName, StringPool.BLANK, StringPool.BLANK, file , serviceContext );
 							
 							fileId = document.getFileEntryId();
 							
@@ -462,6 +460,13 @@ public class P2PActivityPortlet extends MVCPortlet {
 						
 						
 					}
+
+					String result = LearningActivityLocalServiceUtil.getExtraContentValue(actId,"result");
+							
+					long resultuser=0;
+					if(result.equals("true")){
+						resultuser =  Long.parseLong(uploadRequest.getParameter("resultuser"));
+					}
 					
 					//Usamos la que tenemos
 					p2pActCor.setActId(actId);
@@ -480,43 +485,22 @@ public class P2PActivityPortlet extends MVCPortlet {
 					} catch (Exception e) { }
 
 					
-					//Actualizar los resultados de las correcciones de las P2P. Antiguo updateStateActivity: updateStateActivity(latId, p2pActivityId);
+					//Actualizar los resultados de las correcciones de las P2P. 
 					updateResultP2PActivity(p2pActivityId, user.getUserId());
-
-					//Obtenemso la url del reto de la actividad.
-					Group grupo=themeDisplay.getScopeGroup();
-					long retoplid=themeDisplay.getPlid();
-					for(Layout theLayout:LayoutLocalServiceUtil.getLayouts(grupo.getGroupId(),false))
-					{
-						if(theLayout.getFriendlyURL().equals("/reto"))
-						{
-							retoplid=theLayout.getPlid();
-						}
-					}
-					
-					LearningActivity  act = LearningActivityLocalServiceUtil.getLearningActivity(actId);
-					Module myModule = ModuleLocalServiceUtil.getModule(act.getModuleId());
-					
-					PortletURL portletURL = PortletURLFactoryUtil.create(
-					uploadRequest, "p2ptaskactivity_WAR_liferaylmsportlet", retoplid,
-					PortletRequest.RENDER_PHASE);
-					portletURL.setParameter("moduleId", Long.toString(myModule.getModuleId()));
-					portletURL.setParameter("actId", Long.toString(act.getActId()));
-					portletURL.setParameter("showRevision", "1");
-					
-					
+									
 					P2pActivity p2pActivity = P2pActivityLocalServiceUtil.getP2pActivity(p2pActivityId);
 					User userPropietaryP2pAct = UserLocalServiceUtil.getUser(p2pActivity.getUserId());
 					boolean deregisterMail = false;
-					if(user.getExpandoBridge().getAttribute(LiferaylmsUtil.DEREGISTER_USER_EXPANDO,false)!=null){
+					if(userPropietaryP2pAct.getExpandoBridge().getAttribute(LiferaylmsUtil.DEREGISTER_USER_EXPANDO,false)!=null){
 						deregisterMail = (Boolean)userPropietaryP2pAct.getExpandoBridge().getAttribute(LiferaylmsUtil.DEREGISTER_USER_EXPANDO,false);
 					}
 					
 					if(!deregisterMail){
+						PortletConfig portletConfig = this.getPortletConfig();
 						sendMailCorrection(userPropietaryP2pAct, actId, p2pActCor, themeDisplay, portletConfig);
 					}
 					request.setAttribute("actId", actId);
-					request.setAttribute("latId", latId);
+					request.setAttribute("latId", Long.parseLong(uploadRequest.getParameter("latId")));
 		
 					//Para mostrar el mensaje de que ya ha corregido todas las actividades
 					List<P2pActivityCorrections> corrections = P2pActivityCorrectionsLocalServiceUtil.getCorrectionsDoneByUserInP2PActivity(actId, user.getUserId());
@@ -537,64 +521,13 @@ public class P2PActivityPortlet extends MVCPortlet {
 						_log.error(e);
 					}
 					SessionErrors.add(request, "error-p2ptask-correction");
+					request.setAttribute("actId", actId);
 				}
 			}else{
 				SessionErrors.add(request, "p2ptask-no-empty-answer");
 			}
 			
 		}
-	}
-	
-	private long createDLFolders(Long userId,Long repositoryId,PortletRequest portletRequest) throws PortalException, SystemException{
-		//Variables for folder ids
-		Long dlMainFolderId = 0L;
-		Long dlPortletFolderId = 0L;
-		Long dlRecordFolderId = 0L;
-		//Search for folder in Document Library
-        boolean dlMainFolderFound = false;
-        boolean dlPortletFolderFound = false;
-        
-        Folder dlFolderMain = null;
-        //Get main folder
-        try {
-        	//Get main folder
-        	dlFolderMain = DLAppLocalServiceUtil.getFolder(repositoryId,DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,moduleUpload.DOCUMENTLIBRARY_MAINFOLDER);
-        	dlMainFolderId = dlFolderMain.getFolderId();
-        	dlMainFolderFound = true;
-        	//Get portlet folder
-        	Folder dlFolderPortlet = DLAppLocalServiceUtil.getFolder(repositoryId,dlMainFolderId,moduleUpload.DOCUMENTLIBRARY_PORTLETFOLDER);
-        	dlPortletFolderId = dlFolderPortlet.getFolderId();
-        	dlPortletFolderFound = true;
-        } catch (Exception ex){
-        	//Not found Main Folder
-        }
-        
-		ServiceContext serviceContext= ServiceContextFactory.getInstance( DLFolder.class.getName(), portletRequest);
-		//Damos permisos al archivo para usuarios de comunidad.
-		serviceContext.setAddGroupPermissions(true);
-        
-        //Create main folder if not exist
-        if(!dlMainFolderFound || dlFolderMain==null){
-        	Folder newDocumentMainFolder = DLAppLocalServiceUtil.addFolder(userId, repositoryId, DLFolderConstants.DEFAULT_PARENT_FOLDER_ID, moduleUpload.DOCUMENTLIBRARY_MAINFOLDER, moduleUpload.DOCUMENTLIBRARY_MAINFOLDER_DESCRIPTION, serviceContext);
-        	dlMainFolderId = newDocumentMainFolder.getFolderId();
-        	dlMainFolderFound = true;
-        }
-        //Create portlet folder if not exist
-        if(dlMainFolderFound && !dlPortletFolderFound){
-        	Folder newDocumentPortletFolder = DLAppLocalServiceUtil.addFolder(userId, repositoryId, dlMainFolderId , moduleUpload.DOCUMENTLIBRARY_PORTLETFOLDER, moduleUpload.DOCUMENTLIBRARY_PORTLETFOLDER_DESCRIPTION, serviceContext);
-        	dlPortletFolderFound = true;
-            dlPortletFolderId = newDocumentPortletFolder.getFolderId();
-        }
-
-        //Create this record folder
-        if(dlPortletFolderFound){
-        	SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
-        	Date date = new Date();
-        	String dlRecordFolderName = dateFormat.format(date)+moduleUpload.SEPARATOR+userId;
-        	Folder newDocumentRecordFolder = DLAppLocalServiceUtil.addFolder(userId, repositoryId, dlPortletFolderId, dlRecordFolderName, dlRecordFolderName, serviceContext);
-        	dlRecordFolderId = newDocumentRecordFolder.getFolderId();
-        }
-        return dlRecordFolderId;
 	}
 	
 	public void numValidaciones(ActionRequest actionRequest, ActionResponse actionResponse)
@@ -613,11 +546,18 @@ public class P2PActivityPortlet extends MVCPortlet {
 		SessionMessages.add(actionRequest, "activity-saved-successfully");
 	}
 
-	//Antiguo updateStateActivity(Long latId, Long p2pActivityId
+
+	/**
+	 * Se actualizan los tries y los results de los usuarios implicados
+	 * @param p2pActivityId
+	 * @param userId
+	 * @throws Exception
+	 */
 	public static void updateResultP2PActivity(Long p2pActivityId, Long userId)throws Exception {
 		//El valor que añadiremos al LearningActivityResult
 		long newValueResult = 0;
 		boolean correctionCompleted = false;
+		boolean correctionCompletedAboutMe = false;
 		
 		//La p2p que se corrige.
 		P2pActivity p2pActivityCorrected = P2pActivityLocalServiceUtil.getP2pActivity(p2pActivityId);
@@ -643,12 +583,14 @@ public class P2PActivityPortlet extends MVCPortlet {
 			_log.debug("----------------------");
 		}
 		
+		LearningActivity activity = LearningActivityLocalServiceUtil.getLearningActivity(actId);
+		
 		//Si en las p2p tenemos nota en la correccion.
 		if (result.equals("true")) {
 
 			//PARA EL USUARIO QUE CORRIGE
 			correctionCompleted = P2pActivityCorrectionsLocalServiceUtil.areAllCorrectionsDoneByUserInP2PActivity(actId, p2pActivityFromCorrectorUser.getUserId());
-			
+			correctionCompletedAboutMe = P2pActivityCorrectionsLocalServiceUtil.hasAllCorrectionsDoneAboutUserInP2PActivity(actId, p2pActivityFromCorrectorUser.getP2pActivityId());
 			//Si ya ha corregido todas la tareas que debe correguir, le ponemos el 50% mas la media que ha recibido de sus correctores.
 			if(correctionCompleted){
 				long avg = P2pActivityCorrectionsLocalServiceUtil.getAVGCorrectionsResults(p2pActivityFromCorrectorUser.getP2pActivityId());
@@ -659,11 +601,11 @@ public class P2PActivityPortlet extends MVCPortlet {
 				newValueResult = 0;
 			}
 			//Guardamos el resultado
-			saveLearningActivityResult(actId, p2pActivityFromCorrectorUser.getUserId(), newValueResult);
+			saveLearningActivityResult(actId, p2pActivityFromCorrectorUser.getUserId(), newValueResult, correctionCompleted, result, activity, correctionCompletedAboutMe);
 			
 			//PARA EL USUARIO QUE ES CORREGIDO
 			correctionCompleted = P2pActivityCorrectionsLocalServiceUtil.areAllCorrectionsDoneByUserInP2PActivity(actId, p2pActivityCorrected.getUserId());
-			
+			correctionCompletedAboutMe = P2pActivityCorrectionsLocalServiceUtil.hasAllCorrectionsDoneAboutUserInP2PActivity(actId, p2pActivityCorrected.getP2pActivityId());
 			//Si ya ha corregido todas la tareas que debe correguir, le ponemos el 50% mas la media que ha recibido de sus correctores.
 			if(correctionCompleted){
 				long avg = P2pActivityCorrectionsLocalServiceUtil.getAVGCorrectionsResults(p2pActivityCorrected.getP2pActivityId());
@@ -674,7 +616,7 @@ public class P2PActivityPortlet extends MVCPortlet {
 				newValueResult = 0;
 			}
 			//Guardamos el resultado
-			saveLearningActivityResult(actId, p2pActivityCorrected.getUserId(), newValueResult);
+			saveLearningActivityResult(actId, p2pActivityCorrected.getUserId(), newValueResult, correctionCompleted, result, activity, correctionCompletedAboutMe);
 			
 		} 
 		//Si en las p2p NO tenemos nota en la correccion.
@@ -691,12 +633,12 @@ public class P2PActivityPortlet extends MVCPortlet {
 				newValueResult = 0;
 			}
 			//Guardamos el resultado
-			saveLearningActivityResult(actId, p2pActivityFromCorrectorUser.getUserId(), newValueResult);
+			saveLearningActivityResult(actId, p2pActivityFromCorrectorUser.getUserId(), newValueResult, correctionCompleted, result, activity, true);
 		}
 
 	}
 	
-	private static void saveLearningActivityResult(long actId, long userId, long value) throws SystemException, PortalException{
+	private static void saveLearningActivityResult(long actId, long userId, long value, boolean correctionCompleted, String result, LearningActivity activity, boolean correctionCompletedAboutMe) throws SystemException, PortalException{
 		
 		try {
 			
@@ -716,18 +658,20 @@ public class P2PActivityPortlet extends MVCPortlet {
 			LearningActivityResult learningActivityResult = LearningActivityResultLocalServiceUtil.getByActIdAndUserId(actId, userId);
 			
 			learningActivityResult.setResult(value);
-			learningActivityResult.setPassed(value >= learningActivity.getPasspuntuation());
-			learningActivityResult.setEndDate(new java.util.Date(System.currentTimeMillis()));
+			//Solo le ponemos pasado y fecha de fin si se cumplen las condiciones:
+			//- Ha entregado todas las tareas
+			//&&
+			//- (La actividad no tiene nota) || (nota mayor a la necesaria para aprobar) || (recibido todas las correcciones)
+			if(correctionCompleted && ((!result.equals("true")) || (value >= activity.getPasspuntuation()) || correctionCompletedAboutMe)){
+				learningActivityResult.setPassed(value >= learningActivity.getPasspuntuation());
+				learningActivityResult.setEndDate(new java.util.Date(System.currentTimeMillis()));
+			}
 			
 			LearningActivityResultLocalServiceUtil.updateLearningActivityResult(learningActivityResult);
 			
 			if(learningActivityResult.getPassed()){
 				ModuleResultLocalServiceUtil.update(learningActivityResult);
 			}
-			
-			
-			//Generar consultas update
-			//ModuleUpdateResult.saveStringToFile("updateResultP2PActivities.txt", "update ");
 			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block

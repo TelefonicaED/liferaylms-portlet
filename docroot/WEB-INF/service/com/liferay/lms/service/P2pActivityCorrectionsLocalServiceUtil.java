@@ -360,6 +360,16 @@ public class P2pActivityCorrectionsLocalServiceUtil {
 	}
 
 	/**
+	* Para saber si al usuario le han realizado todas las correcciones que se indica en el extracontent.
+	*/
+	public static boolean hasAllCorrectionsDoneAboutUserInP2PActivity(
+		long actId, long p2pActivityId) {
+		return getService()
+				   .hasAllCorrectionsDoneAboutUserInP2PActivity(actId,
+			p2pActivityId);
+	}
+
+	/**
 	* Obtenemos la lista de correcciones que se le asignaron a una tarea p2p.
 	*
 	* @param p2pActivityId
