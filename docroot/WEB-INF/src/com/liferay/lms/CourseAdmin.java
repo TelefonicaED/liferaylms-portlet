@@ -845,6 +845,18 @@ public class CourseAdmin extends MVCPortlet {
 						title, description, summary, friendlyURL,
 						themeDisplay.getLocale(), ahora, startDate, stopDate,courseTemplateId,type,courseEvalId,
 						courseCalificationType,maxusers,serviceContext,false);
+				try{
+				LmsPrefs prefs=LmsPrefsLocalServiceUtil.getLmsPrefs(course.getCompanyId());
+				//Añadimos el rol de editor del curso cuando lo crea
+				Long editorRoleId=RoleLocalServiceUtil.getRole(prefs.getEditorRole()).getRoleId();
+				
+				UserGroupRoleLocalServiceUtil.addUserGroupRoles(new long[] { themeDisplay.getUserId() }, course.getGroupCreatedId(), editorRoleId);
+
+				AuditingLogFactory.audit(course.getCompanyId(), course.getGroupCreatedId(), Course.class.getName(), 
+						course.getCourseId(),themeDisplay.getUserId(), AuditConstants.REGISTER, "COURSE_EDITOR_ADD");
+				} catch(Exception e){
+					e.printStackTrace();
+				}
 			}catch(PortalException pe){
 				if(log.isDebugEnabled())log.debug("Error:"+pe.getMessage());
 				if(pe instanceof DuplicateGroupException){
@@ -1529,12 +1541,13 @@ public class CourseAdmin extends MVCPortlet {
 
 	public void importCourse(ActionRequest actionRequest, ActionResponse actionResponse) throws Exception {
 
+		UploadPortletRequest uploadRequest = PortalUtil.getUploadPortletRequest(actionRequest);
+		long groupId = ParamUtil.getLong(uploadRequest, "groupId");
+		
 		try {
-			UploadPortletRequest uploadRequest = PortalUtil.getUploadPortletRequest(actionRequest);
 
 			ThemeDisplay themeDisplay = (ThemeDisplay) actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
 
-			long groupId = ParamUtil.getLong(uploadRequest, "groupId");
 			File file = uploadRequest.getFile("importFileName");
 			if (!file.exists()) {
 				//	log.debug("Import file does not exist");
@@ -1552,14 +1565,17 @@ public class CourseAdmin extends MVCPortlet {
 				CourseLocalServiceUtil.updateCourse(c);
 			}
 
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			//log.debug("Error importando lar.");
-
 			if ((e instanceof LARFileException) || (e instanceof LARTypeException)) {
 
 				SessionErrors.add(actionRequest, e.getClass().getName());
 
+			} if(e.getMessage().indexOf(NoLearningActivityTypeActiveException.class.getName()) >= 0){
+				e.printStackTrace();
+				actionResponse.setRenderParameter("view", "import");
+				actionResponse.setRenderParameter("groupId", String.valueOf(groupId));
+				SessionErrors.add(actionRequest, "error-learning-activity-type");	
 			}
 			else {
 				log.error(e, e);

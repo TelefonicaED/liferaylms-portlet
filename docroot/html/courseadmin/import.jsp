@@ -19,6 +19,8 @@
 
 <%@ include file="/init.jsp" %>	
 
+<liferay-ui:error key="error-learning-activity-type" message="course-admin.error-learning-activity-type" />
+
 <%
 	String groupId = request.getParameter("groupId");
 	Course course = CourseLocalServiceUtil.getCourseByGroupCreatedId(Long.parseLong(groupId));
