@@ -1,3 +1,5 @@
+<%@page import="com.liferay.portlet.asset.AssetRendererFactoryRegistryUtil"%>
+<%@page import="com.liferay.portlet.asset.model.AssetRendererFactory"%>
 <%@page import="com.liferay.lms.service.LmsPrefsLocalServiceUtil"%>
 <%@page import="com.liferay.lms.model.LmsPrefs"%>
 <%@page import="com.tls.lms.util.LiferaylmsUtil"%>
@@ -25,6 +27,10 @@
 	String sco=ParamUtil.getString(request, "sco","");
 	long typeId=ParamUtil.getLong(request, "type");
 	boolean completedAsPassed =ParamUtil.getBoolean(request, "completedAsPassed",false);
+	
+	long resId = ParamUtil.getLong(request, "resId");
+	long resModuleId = ParamUtil.getLong(request, "resModuleId");
+	
  LearningActivity learningActivity=null;
 	if(assetId!=0){
 		try{
@@ -166,13 +172,13 @@ function <portlet:namespace />load(source) {
 			{
 				A.one('#<portlet:namespace/>sco').set('value',params['<portlet:namespace />sco']);
 				A.one('#<portlet:namespace/>sco').show();
-				A.one("label[for='_lmsactivitieslist_WAR_liferaylmsportlet_sco']").show();
+				A.one("label[for='_editactivity_WAR_liferaylmsportlet_sco']").show();
 			}
 			else
 			{
 				A.one('#<portlet:namespace/>sco').set('value','');
 				A.one('#<portlet:namespace/>sco').hide();
-				A.one("label[for='_lmsactivitieslist_WAR_liferaylmsportlet_sco']").hide();
+				A.one("label[for='_editactivity_WAR_liferaylmsportlet_sco']").hide();
 			}
 			
 			if(params['<portlet:namespace />assertWindowable']=='true') {
@@ -256,11 +262,20 @@ function <portlet:namespace />back() {
 		<aui:validator name="required"></aui:validator>
 	</aui:input>
 	<c:if test="<%=!disabled %>" >
-		<button type="button" id="<portlet:namespace/>searchEntry" onclick="<portlet:namespace/>search();" >
+		
+		<liferay-portlet:renderURL var="buscarRecurso" >
+			<liferay-portlet:param name="mvcPath" value="/html/scormactivity/admin/searchresource.jsp" />
+			<liferay-portlet:param name="resId" value="<%=String.valueOf(resId) %>" />
+			<liferay-portlet:param name="resModuleId" value="<%=String.valueOf(resModuleId) %>" />
+		</liferay-portlet:renderURL>
+		
+		<button type="button" id="<portlet:namespace/>searchEntry" onclick="javascript:location.href='<%=buscarRecurso%>'" >
 		    <span class="aui-buttonitem-icon aui-icon aui-icon-search"></span>
 		    <span class="aui-buttonitem-label"><%= LanguageUtil.get(pageContext, "search") %></span>
 		</button>
+				
 		<aui:input  name="sco" value="<%=sco %>" label="SCO"/>
+		
 	</c:if>
 			
 </aui:field-wrapper>

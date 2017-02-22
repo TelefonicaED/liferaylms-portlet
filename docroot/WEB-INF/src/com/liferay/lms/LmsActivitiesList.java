@@ -922,6 +922,8 @@ public class LmsActivitiesList extends MVCPortlet {
 			else
 		*/
 		
+		log.debug("******doView**********");
+		
 		if(ParamUtil.getBoolean(renderRequest,"editing")){
 			
 			log.debug("***editing***");
