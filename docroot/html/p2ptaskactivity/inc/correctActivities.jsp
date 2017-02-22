@@ -706,7 +706,18 @@ if(p2pActList.isEmpty()){
 	<liferay-portlet:param name="moduleId" value="<%=Long.toString(myModule.getModuleId()) %>"></liferay-portlet:param>
 	</liferay-portlet:renderURL>
 	
-	<div class="no-p2pActivites-uploaded"><liferay-ui:message key="no-p2pActivites-uploaded" /></div>
+	<liferay-portlet:actionURL name="askForP2PActivities" var="askForP2PActivitiesURL">
+		<liferay-portlet:param name="actId" value="<%=String.valueOf(actId) %>" />
+	</liferay-portlet:actionURL>
+	
+	<div class="no-p2pActivites-uploaded">
+		<liferay-ui:message key="no-p2pActivites-uploaded" />
+		<c:if test='<%=LearningActivityLocalServiceUtil.getExtraContentValue(actId, "askforp2pactivities").equals("true") %>'>
+			<div>
+				<aui:button onClick="${askForP2PActivitiesURL }" value="ask-for-p2p-corrections"/>
+			</div>
+		</c:if>
+	</div>
 	<%
 }%>
 

@@ -106,62 +106,60 @@ public class P2PAssignations implements MessageListener {
 		}
 		
 		if(activities != null){
-			
-			int numAsigns = 3;
-			String validations = null;
-			long actId = 0;
-			int activityAsignations = 0;
-			
 			//Recorrer todas las activities.
 			for(P2pActivity activity:activities){
-				 actId = activity.getActId();
-				
-				//Obtener las validaciones que tiene que tener la actividad.
-				numAsigns = 3;
-				try {
-					validations = LearningActivityLocalServiceUtil.getExtraContentValue(actId,"validaciones");
-					numAsigns = Integer.valueOf(validations);
-				} catch (SystemException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-				
-				//Obtenemos las asignaciones que ya est�n realidas.
-				try {
-					activityAsignations =P2pActivityCorrectionsLocalServiceUtil.getNumCorrectionsAsignToUser(activity.getActId(),activity.getUserId());
-				
-					//Si la actividad no tiene asignadas todas las tareas que tiene que correguir.
-					if( activityAsignations < numAsigns && !activity.isAsignationsCompleted()){
-		
-						List<P2pActivity> activitiesToAsign = P2pActivityLocalServiceUtil.getP2pActivitiesToCorrect(actId, activity.getP2pActivityId(), numAsigns - activityAsignations);
-		
-						if(log.isDebugEnabled()){
-							log.debug("P2P assign corrections to activity::"+activity.getActId()+"::"+activity.getUserId());
-							for(P2pActivity p2pactivity : activitiesToAsign){
-								log.debug("assign::"+p2pactivity.getUserId());
-							}
-						}
-						
-						//Asignar al usuario que entrega sus correctores.
-						P2pActivityCorrectionsLocalServiceUtil.asignCorrectionsToP2PActivities(actId, activity.getP2pActivityId(),numAsigns - activityAsignations, activitiesToAsign, activity.getUserId());
-		
-					}else{
-						activity.setAsignationsCompleted(true);
-						P2pActivityLocalServiceUtil.updateP2pActivity(activity);
-					}
-				} catch (SystemException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (PortalException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+				asignCorrectionP2PActivity(activity);
 				
 			}
 		}
 	
+	}
+	
+	public void asignCorrectionP2PActivity(P2pActivity activity){
+		long actId = activity.getActId();
+		int activityAsignations = 0;	
+		//Obtener las validaciones que tiene que tener la actividad.
+		int numAsigns = 3;
+		try {
+			String validations = LearningActivityLocalServiceUtil.getExtraContentValue(actId,"validaciones");
+			numAsigns = Integer.valueOf(validations);
+		} catch (SystemException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		//Obtenemos las asignaciones que ya est�n realidas.
+		try {
+			activityAsignations =P2pActivityCorrectionsLocalServiceUtil.getNumCorrectionsAsignToUser(activity.getActId(),activity.getUserId());
+		
+			//Si la actividad no tiene asignadas todas las tareas que tiene que correguir.
+			if( activityAsignations < numAsigns && !activity.isAsignationsCompleted()){
+
+				List<P2pActivity> activitiesToAsign = P2pActivityLocalServiceUtil.getP2pActivitiesToCorrect(actId, activity.getP2pActivityId(), numAsigns - activityAsignations);
+
+				if(log.isDebugEnabled()){
+					log.debug("P2P assign corrections to activity::"+activity.getActId()+"::"+activity.getUserId());
+					for(P2pActivity p2pactivity : activitiesToAsign){
+						log.debug("assign::"+p2pactivity.getUserId());
+					}
+				}
+				
+				//Asignar al usuario que entrega sus correctores.
+				P2pActivityCorrectionsLocalServiceUtil.asignCorrectionsToP2PActivities(actId, activity.getP2pActivityId(),numAsigns - activityAsignations, activitiesToAsign, activity.getUserId());
+
+			}else{
+				activity.setAsignationsCompleted(true);
+				P2pActivityLocalServiceUtil.updateP2pActivity(activity);
+			}
+		} catch (SystemException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (PortalException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 }

@@ -921,6 +921,164 @@ public class P2pActivityCorrectionsUtil {
 	}
 
 	/**
+	* Returns all the p2p activity correctionses where p2pActivityId = &#63; and actId = &#63;.
+	*
+	* @param p2pActivityId the p2p activity ID
+	* @param actId the act ID
+	* @return the matching p2p activity correctionses
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.lms.model.P2pActivityCorrections> findByP2pActivityIdAndActIdDateNotNull(
+		long p2pActivityId, long actId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByP2pActivityIdAndActIdDateNotNull(p2pActivityId, actId);
+	}
+
+	/**
+	* Returns a range of all the p2p activity correctionses where p2pActivityId = &#63; and actId = &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param p2pActivityId the p2p activity ID
+	* @param actId the act ID
+	* @param start the lower bound of the range of p2p activity correctionses
+	* @param end the upper bound of the range of p2p activity correctionses (not inclusive)
+	* @return the range of matching p2p activity correctionses
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.lms.model.P2pActivityCorrections> findByP2pActivityIdAndActIdDateNotNull(
+		long p2pActivityId, long actId, int start, int end)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByP2pActivityIdAndActIdDateNotNull(p2pActivityId,
+			actId, start, end);
+	}
+
+	/**
+	* Returns an ordered range of all the p2p activity correctionses where p2pActivityId = &#63; and actId = &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param p2pActivityId the p2p activity ID
+	* @param actId the act ID
+	* @param start the lower bound of the range of p2p activity correctionses
+	* @param end the upper bound of the range of p2p activity correctionses (not inclusive)
+	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	* @return the ordered range of matching p2p activity correctionses
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.lms.model.P2pActivityCorrections> findByP2pActivityIdAndActIdDateNotNull(
+		long p2pActivityId, long actId, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByP2pActivityIdAndActIdDateNotNull(p2pActivityId,
+			actId, start, end, orderByComparator);
+	}
+
+	/**
+	* Returns the first p2p activity corrections in the ordered set where p2pActivityId = &#63; and actId = &#63;.
+	*
+	* @param p2pActivityId the p2p activity ID
+	* @param actId the act ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the first matching p2p activity corrections
+	* @throws com.liferay.lms.NoSuchP2pActivityCorrectionsException if a matching p2p activity corrections could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.lms.model.P2pActivityCorrections findByP2pActivityIdAndActIdDateNotNull_First(
+		long p2pActivityId, long actId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchP2pActivityCorrectionsException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByP2pActivityIdAndActIdDateNotNull_First(p2pActivityId,
+			actId, orderByComparator);
+	}
+
+	/**
+	* Returns the first p2p activity corrections in the ordered set where p2pActivityId = &#63; and actId = &#63;.
+	*
+	* @param p2pActivityId the p2p activity ID
+	* @param actId the act ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the first matching p2p activity corrections, or <code>null</code> if a matching p2p activity corrections could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.lms.model.P2pActivityCorrections fetchByP2pActivityIdAndActIdDateNotNull_First(
+		long p2pActivityId, long actId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .fetchByP2pActivityIdAndActIdDateNotNull_First(p2pActivityId,
+			actId, orderByComparator);
+	}
+
+	/**
+	* Returns the last p2p activity corrections in the ordered set where p2pActivityId = &#63; and actId = &#63;.
+	*
+	* @param p2pActivityId the p2p activity ID
+	* @param actId the act ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the last matching p2p activity corrections
+	* @throws com.liferay.lms.NoSuchP2pActivityCorrectionsException if a matching p2p activity corrections could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.lms.model.P2pActivityCorrections findByP2pActivityIdAndActIdDateNotNull_Last(
+		long p2pActivityId, long actId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchP2pActivityCorrectionsException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByP2pActivityIdAndActIdDateNotNull_Last(p2pActivityId,
+			actId, orderByComparator);
+	}
+
+	/**
+	* Returns the last p2p activity corrections in the ordered set where p2pActivityId = &#63; and actId = &#63;.
+	*
+	* @param p2pActivityId the p2p activity ID
+	* @param actId the act ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the last matching p2p activity corrections, or <code>null</code> if a matching p2p activity corrections could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.lms.model.P2pActivityCorrections fetchByP2pActivityIdAndActIdDateNotNull_Last(
+		long p2pActivityId, long actId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .fetchByP2pActivityIdAndActIdDateNotNull_Last(p2pActivityId,
+			actId, orderByComparator);
+	}
+
+	/**
+	* Returns the p2p activity correctionses before and after the current p2p activity corrections in the ordered set where p2pActivityId = &#63; and actId = &#63;.
+	*
+	* @param p2pActivityCorrectionsId the primary key of the current p2p activity corrections
+	* @param p2pActivityId the p2p activity ID
+	* @param actId the act ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the previous, current, and next p2p activity corrections
+	* @throws com.liferay.lms.NoSuchP2pActivityCorrectionsException if a p2p activity corrections with the primary key could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.lms.model.P2pActivityCorrections[] findByP2pActivityIdAndActIdDateNotNull_PrevAndNext(
+		long p2pActivityCorrectionsId, long p2pActivityId, long actId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchP2pActivityCorrectionsException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByP2pActivityIdAndActIdDateNotNull_PrevAndNext(p2pActivityCorrectionsId,
+			p2pActivityId, actId, orderByComparator);
+	}
+
+	/**
 	* Returns all the p2p activity correctionses.
 	*
 	* @return the p2p activity correctionses
@@ -1027,6 +1185,20 @@ public class P2pActivityCorrectionsUtil {
 	}
 
 	/**
+	* Removes all the p2p activity correctionses where p2pActivityId = &#63; and actId = &#63; from the database.
+	*
+	* @param p2pActivityId the p2p activity ID
+	* @param actId the act ID
+	* @throws SystemException if a system exception occurred
+	*/
+	public static void removeByP2pActivityIdAndActIdDateNotNull(
+		long p2pActivityId, long actId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		getPersistence()
+			.removeByP2pActivityIdAndActIdDateNotNull(p2pActivityId, actId);
+	}
+
+	/**
 	* Removes all the p2p activity correctionses from the database.
 	*
 	* @throws SystemException if a system exception occurred
@@ -1097,6 +1269,21 @@ public class P2pActivityCorrectionsUtil {
 	public static int countByUserId(long userId)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getPersistence().countByUserId(userId);
+	}
+
+	/**
+	* Returns the number of p2p activity correctionses where p2pActivityId = &#63; and actId = &#63;.
+	*
+	* @param p2pActivityId the p2p activity ID
+	* @param actId the act ID
+	* @return the number of matching p2p activity correctionses
+	* @throws SystemException if a system exception occurred
+	*/
+	public static int countByP2pActivityIdAndActIdDateNotNull(
+		long p2pActivityId, long actId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .countByP2pActivityIdAndActIdDateNotNull(p2pActivityId, actId);
 	}
 
 	/**

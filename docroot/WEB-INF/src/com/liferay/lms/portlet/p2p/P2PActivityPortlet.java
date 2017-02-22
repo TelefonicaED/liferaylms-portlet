@@ -18,6 +18,7 @@ import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 
 import com.liferay.lms.ModuleUpdateResult;
+import com.liferay.lms.P2PAssignations;
 import com.liferay.lms.auditing.AuditConstants;
 import com.liferay.lms.auditing.AuditingLogFactory;
 import com.liferay.lms.model.Course;
@@ -72,6 +73,7 @@ import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
 import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.service.DLFileEntryLocalServiceUtil;
 import com.liferay.util.bridges.mvc.MVCPortlet;
+import com.sun.org.apache.bcel.internal.generic.CPInstruction;
 import com.tls.lms.util.DLFolderUtil;
 import com.tls.lms.util.LiferaylmsUtil;
 
@@ -530,6 +532,38 @@ public class P2PActivityPortlet extends MVCPortlet {
 		}
 	}
 	
+	public void askForP2PActivities(ActionRequest request, ActionResponse response) {
+		ThemeDisplay themeDisplay = (ThemeDisplay) request.getAttribute(WebKeys.THEME_DISPLAY);	
+		long actId = ParamUtil.getLong(request, "actId");
+		
+		try {
+			P2pActivity activity = P2pActivityLocalServiceUtil.findByActIdAndUserId(actId, themeDisplay.getUserId());
+			
+			int activityAsignations =P2pActivityCorrectionsLocalServiceUtil.getNumCorrectionsAsignToUser(activity.getActId(),activity.getUserId());
+			
+			P2PAssignations asignations = new P2PAssignations();
+			asignations.asignCorrectionP2PActivity(activity);
+			if(activity.getAsignationsCompleted()){
+				SessionMessages.add(request, "p2p-activity-assign-correct");
+			}else{
+				int activityAsignationsAfter =P2pActivityCorrectionsLocalServiceUtil.getNumCorrectionsAsignToUser(activity.getActId(),activity.getUserId());
+				if(activityAsignations < activityAsignationsAfter){
+					SessionMessages.add(request, "p2p-activity-assign-correct");
+				}else{
+					SessionErrors.add(request, "no-p2p-activity-assign");
+				}
+			}
+		} catch (SystemException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			SessionErrors.add(request, "no-p2p-activity-assign");
+		}
+		
+		request.setAttribute("actId", actId);
+		response.setRenderParameter("jspPage","/html/p2ptaskactivity/view.jsp");
+	}
+	
+	
 	public void numValidaciones(ActionRequest actionRequest, ActionResponse actionResponse)
 		throws Exception {
 	
@@ -633,12 +667,20 @@ public class P2PActivityPortlet extends MVCPortlet {
 				newValueResult = 0;
 			}
 			//Guardamos el resultado
-			saveLearningActivityResult(actId, p2pActivityFromCorrectorUser.getUserId(), newValueResult, correctionCompleted, result, activity, true);
+			correctionCompletedAboutMe = P2pActivityCorrectionsLocalServiceUtil.hasAllCorrectionsDoneAboutUserInP2PActivity(actId, p2pActivityCorrected.getP2pActivityId());
+			saveLearningActivityResult(actId, p2pActivityFromCorrectorUser.getUserId(), newValueResult, correctionCompleted, result, activity, correctionCompletedAboutMe);
 		}
 
 	}
 	
 	private static void saveLearningActivityResult(long actId, long userId, long value, boolean correctionCompleted, String result, LearningActivity activity, boolean correctionCompletedAboutMe) throws SystemException, PortalException{
+		
+		_log.info("*****actId: " + actId);
+		_log.info("***userId: " + userId);
+		_log.info("value: " + value);
+		_log.info("correctionCompleted: " + correctionCompleted);
+		_log.info("result: " + result);
+		_log.info("correctionCompletedAboutMe: " + correctionCompletedAboutMe);
 		
 		try {
 			
@@ -646,7 +688,8 @@ public class P2PActivityPortlet extends MVCPortlet {
 			//Actualizamos el try, que a su vez actualiza el result
 			LearningActivityTry  learningActivityTry =  LearningActivityTryLocalServiceUtil.getLastLearningActivityTryByActivityAndUser(actId, userId);
 			
-			if(learningActivityTry != null){
+			if(learningActivityTry != null && correctionCompleted && ((!result.equals("true")) || (value >= activity.getPasspuntuation()) || correctionCompletedAboutMe)){
+				_log.info("Modifico la fecha de fin del try");
 				learningActivityTry.setEndDate(new Date());
 				learningActivityTry.setResult(value);
 				LearningActivityTryLocalServiceUtil.updateLearningActivityTry(learningActivityTry);
@@ -663,6 +706,7 @@ public class P2PActivityPortlet extends MVCPortlet {
 			//&&
 			//- (La actividad no tiene nota) || (nota mayor a la necesaria para aprobar) || (recibido todas las correcciones)
 			if(correctionCompleted && ((!result.equals("true")) || (value >= activity.getPasspuntuation()) || correctionCompletedAboutMe)){
+				_log.info("Modifiao la fecha de fin del result");
 				learningActivityResult.setPassed(value >= learningActivity.getPasspuntuation());
 				learningActivityResult.setEndDate(new java.util.Date(System.currentTimeMillis()));
 			}

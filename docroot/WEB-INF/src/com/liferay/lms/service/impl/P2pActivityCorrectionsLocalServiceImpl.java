@@ -492,7 +492,6 @@ public void asignCorrectionsToP2PActivities(long actId, long p2pActivityId,int n
 	/**
 	 * Para saber si al usuario le han realizado todas las correcciones que se indica en el extracontent.
 	 */
-	@SuppressWarnings("unchecked")
 	public boolean hasAllCorrectionsDoneAboutUserInP2PActivity(long actId, long p2pActivityId) {
 		
 		boolean res = false;
@@ -504,13 +503,9 @@ public void asignCorrectionsToP2PActivities(long actId, long p2pActivityId,int n
 	
 			try {numAsigns = Integer.valueOf(validations);} catch (Exception e) {}
 			
-			ClassLoader classLoader = (ClassLoader) PortletBeanLocatorUtil.locate(ClpSerializer.getServletContextName(), "portletClassLoader");
-			DynamicQuery consulta = DynamicQueryFactoryUtil.forClass(P2pActivityCorrections.class, classLoader)
-					.add(PropertyFactoryUtil.forName("actId").eq(actId))
-					.add(PropertyFactoryUtil.forName("p2pActivityId").eq(p2pActivityId))
-					.add(PropertyFactoryUtil.forName("date").isNotNull());
-		
-			long num = p2pActivityCorrectionsPersistence.countWithDynamicQuery(consulta);
+			long num = p2pActivityCorrectionsPersistence.countByP2pActivityIdAndActIdDateNotNull(p2pActivityId, actId);
+			log.debug("num de corregidas: " + num);
+			log.debug("numAsigns: " + numAsigns);
 			
 			return num >= numAsigns;
 		} catch (SystemException e1) {

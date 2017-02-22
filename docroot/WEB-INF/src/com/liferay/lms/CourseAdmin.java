@@ -152,6 +152,7 @@ public class CourseAdmin extends MVCPortlet {
 	private String importUsersJSP = null;
 	private String usersResultsJSP = null;
 	private String competenceResultsJSP = null;
+	private String configLmsPrefsJSP = null;
 	
 	public void init() throws PortletException {	
 		viewJSP = getInitParameter("view-template");
@@ -164,6 +165,7 @@ public class CourseAdmin extends MVCPortlet {
 		importUsersJSP = getInitParameter("import-users-template");
 		usersResultsJSP = getInitParameter("users-results-template");
 		competenceResultsJSP = getInitParameter("competence-results-template");
+		configLmsPrefsJSP = getInitParameter("config-lms-prefs");
 	}
 
 	public static String DOCUMENTLIBRARY_MAINFOLDER = "ResourceUploads"; 
@@ -176,39 +178,51 @@ public class CourseAdmin extends MVCPortlet {
 	private static Log log = LogFactoryUtil.getLog(CourseAdmin.class);
 	
 	public void doView(RenderRequest renderRequest, RenderResponse renderResponse) throws IOException, PortletException {
-		
-		String jsp = renderRequest.getParameter("view");
-		if(log.isDebugEnabled())log.debug("VIEW "+jsp);
+		ThemeDisplay themeDisplay = (ThemeDisplay)renderRequest.getAttribute(WebKeys.THEME_DISPLAY);
+		LmsPrefs lmsPrefs = null;
 		try {
-			if(jsp == null || "".equals(jsp)){
+			lmsPrefs = LmsPrefsLocalServiceUtil.getLmsPrefsIni(themeDisplay.getCompanyId());
+		} catch (SystemException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+		if(lmsPrefs != null){		
+			String jsp = renderRequest.getParameter("view");
+			if(log.isDebugEnabled())log.debug("VIEW "+jsp);
+			try {
+				if(jsp == null || "".equals(jsp)){
+					showViewDefault(renderRequest, renderResponse);
+				}else if("edit-course".equals(jsp)){
+					showViewEditCourse(renderRequest, renderResponse);
+				}else if("role-members-tab".equals(jsp)){
+					showViewRoleMembersTab(renderRequest, renderResponse);
+				}else if("export".equals(jsp)){
+					showViewExport(renderRequest, renderResponse);
+				}else if("import".equals(jsp)){
+					showViewImport(renderRequest, renderResponse);
+				}else if("clone".equals(jsp)){
+					showViewClone(renderRequest, renderResponse);
+				}else if("competence-tab".equals(jsp)){
+					showViewCompetenceTab(renderRequest, renderResponse);
+				}else if("import-users".equals(jsp)){
+					showViewImportUsers(renderRequest, renderResponse);
+				}else if("users-results".equals(jsp)){
+					showViewUsersResults(renderRequest, renderResponse);
+				}else if("competence-results".equals(jsp)){
+					showViewCompetenceResults(renderRequest, renderResponse);
+				}
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 				showViewDefault(renderRequest, renderResponse);
-			}else if("edit-course".equals(jsp)){
-				showViewEditCourse(renderRequest, renderResponse);
-			}else if("role-members-tab".equals(jsp)){
-				showViewRoleMembersTab(renderRequest, renderResponse);
-			}else if("export".equals(jsp)){
-				showViewExport(renderRequest, renderResponse);
-			}else if("import".equals(jsp)){
-				showViewImport(renderRequest, renderResponse);
-			}else if("clone".equals(jsp)){
-				showViewClone(renderRequest, renderResponse);
-			}else if("competence-tab".equals(jsp)){
-				showViewCompetenceTab(renderRequest, renderResponse);
-			}else if("import-users".equals(jsp)){
-				showViewImportUsers(renderRequest, renderResponse);
-			}else if("users-results".equals(jsp)){
-				showViewUsersResults(renderRequest, renderResponse);
-			}else if("competence-results".equals(jsp)){
-				showViewCompetenceResults(renderRequest, renderResponse);
+			} catch (PortletException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				showViewDefault(renderRequest, renderResponse);
 			}
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			showViewDefault(renderRequest, renderResponse);
-		} catch (PortletException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			showViewDefault(renderRequest, renderResponse);
+		}else{
+			include(this.configLmsPrefsJSP, renderRequest, renderResponse);
 		}
 	}
 	

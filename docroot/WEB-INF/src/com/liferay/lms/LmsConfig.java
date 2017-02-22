@@ -35,7 +35,7 @@ public class LmsConfig extends MVCPortlet {
 		
 		boolean hasAPILicence = ParamUtil.getBoolean(request, "hasAPILicence");
 	
-		boolean showHideActivity = ParamUtil.getBoolean(request, "showHideActivity", false);
+		boolean showHideActivity = ParamUtil.getBoolean(request, "showHideActivity", true);
 		boolean viewCoursesFinished = ParamUtil.getBoolean(request, "viewCoursesFinished", false);
 		
 		LmsPrefs prefs=LmsPrefsLocalServiceUtil.getLmsPrefsIni(themeDisplay.getCompanyId());
