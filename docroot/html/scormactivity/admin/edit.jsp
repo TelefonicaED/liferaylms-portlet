@@ -24,7 +24,7 @@
 	long assetId=ParamUtil.getLong(request, "assertId");
 	boolean openWindow = false, editDetails = false, improve = true; 
 	String assetTitle=StringPool.BLANK;
-	String sco=ParamUtil.getString(request, "sco","");
+	String sco=ParamUtil.getString(request, "sco",null);
 	long typeId=ParamUtil.getLong(request, "type");
 	boolean completedAsPassed =ParamUtil.getBoolean(request, "completedAsPassed",false);
 	
@@ -61,7 +61,9 @@
 					editDetails = GetterUtil.getBoolean(PropsUtil.get("lms.scorm.editable."+entry.getClassName()),false);
 				}	
 				openWindow = GetterUtil.getBoolean(LearningActivityLocalServiceUtil.getExtraContentValue(learningActivity.getActId(), "openWindow"));
-				sco=LearningActivityLocalServiceUtil.getExtraContentValue(learningActivity.getActId(),"sco","");
+				if(sco==null){
+					sco=LearningActivityLocalServiceUtil.getExtraContentValue(learningActivity.getActId(),"sco","");
+				}
 				String improveString = LearningActivityLocalServiceUtil.getExtraContentValue(learningActivity.getActId(),"improve");
 				 windowWith=LearningActivityLocalServiceUtil.getExtraContentValue(learningActivity.getActId(),"windowWith","1024");
 				 height=LearningActivityLocalServiceUtil.getExtraContentValue(learningActivity.getActId(),"height","768");
@@ -113,17 +115,6 @@ if(learningActivity!=null){  %>
 
 <script type="text/javascript">
 
-	AUI().ready(function(A) {
-		var inputScormValue = A.one('#<portlet:namespace/>sco').get('value');
-		A.one("label[for='<portlet:namespace/>sco']").hide();
-		A.one('#<portlet:namespace/>sco').hide();
-		if(inputScormValue.length > 0 ) {
-			A.one("label[for='<portlet:namespace/>sco']").show();
-			A.one('#<portlet:namespace/>sco').show();
-		}
-	}); 
-<!--
-
 <% if(editDetails){ %>
 	AUI().ready('node',function(A) {
 		A.one('.acticons').html('<%=editResourceUnicode%>');
@@ -170,7 +161,7 @@ if(learningActivity!=null){  %>
 		    <span class="aui-buttonitem-label"><%= LanguageUtil.get(pageContext, "search") %></span>
 		</button>
 				
-		<aui:input  name="sco" value="<%=sco %>" label="SCO"/>
+		<aui:input  name="sco" value="<%=Validator.isNotNull(sco)?sco.trim():\"\" %>" label="SCO" type="<%= Validator.isNotNull(sco)?\"text\":\"hidden\" %>"/>
 		
 	</c:if>
 			

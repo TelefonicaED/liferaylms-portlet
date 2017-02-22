@@ -98,6 +98,7 @@ pageContext.setAttribute("total", total);
 	 <liferay-portlet:param value="9" name="type"/>
 	 <liferay-portlet:param name="resModuleId" value="<%=String.valueOf(resModuleId) %>"/>
 	 <liferay-portlet:param name="resId" value="<%=String.valueOf(resId) %>"/>
+	 <liferay-portlet:param name="sco" value=" "/>
 	</liferay-portlet:renderURL>
 	
 	<liferay-portlet:renderURL var="selectSCOURL">
