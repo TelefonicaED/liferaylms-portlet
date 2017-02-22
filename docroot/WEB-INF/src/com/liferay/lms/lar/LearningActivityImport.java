@@ -249,7 +249,7 @@ public class LearningActivityImport {
 	 * @throws SystemException 
 	 * @throws PortalException 
 	 */
-	private static void importDLFileEntries(LearningActivity newLarn, long userId, PortletDataContext context, ServiceContext serviceContext, Element actElement) throws PortalException, SystemException {
+	private static void importDLFileEntries(LearningActivity newLarn, long userId, PortletDataContext context, ServiceContext serviceContext, Element actElement) throws PortalException, SystemException, FileExtensionException, FileSizeException {
 		//Importar las imagenes de los resources.
 		Iterator<Element> it = actElement.elementIterator("dlfileentry");
 		
@@ -260,7 +260,7 @@ public class LearningActivityImport {
 			log.info("element: " + theElement.toString());
 			
 			String messageException = "";
-			try {
+			//try {
 				log.info("   dlfileentry path: "+theElement.attributeValue("path"));
 
 				FileEntry newFile = ImportUtil.importDLFileEntry(context, theElement, serviceContext, userId);
@@ -284,7 +284,7 @@ public class LearningActivityImport {
 				Long newActId = newLarn.getActId();
 				newLarn = LearningActivityLocalServiceUtil.getLearningActivity(newActId);
 				
-			}catch(FileExtensionException fee){
+		/*	}catch(FileExtensionException fee){
 				fee.printStackTrace();
 				log.info("*ERROR! dlfileentry path FileExtensionException:" + theElement.attributeValue("path")+", "+messageException +", message: "+fee.getMessage());
 			}catch(FileSizeException fse){
@@ -293,7 +293,7 @@ public class LearningActivityImport {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 				log.info("*ERROR! dlfileentry path: " + theElement.attributeValue("path")+messageException +", message: "+e.getMessage());
-			}
+			}*/
 
 	}	
 	}

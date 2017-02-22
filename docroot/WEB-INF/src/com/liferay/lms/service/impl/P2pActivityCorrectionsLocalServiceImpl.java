@@ -490,6 +490,33 @@ public void asignCorrectionsToP2PActivities(long actId, long p2pActivityId,int n
 	}
 	
 	/**
+	 * Para saber si al usuario le han realizado todas las correcciones que se indica en el extracontent.
+	 */
+	public boolean hasAllCorrectionsDoneAboutUserInP2PActivity(long actId, long p2pActivityId) {
+		
+		boolean res = false;
+		
+		// Obtener las validaciones que tiene que tener la actividad.
+		int numAsigns = 3;
+		try {
+			String validations = LearningActivityLocalServiceUtil.getExtraContentValue(actId, "validaciones");
+	
+			try {numAsigns = Integer.valueOf(validations);} catch (Exception e) {}
+			
+			long num = p2pActivityCorrectionsPersistence.countByP2pActivityIdAndActIdDateNotNull(p2pActivityId, actId);
+			log.debug("num de corregidas: " + num);
+			log.debug("numAsigns: " + numAsigns);
+			
+			return num >= numAsigns;
+		} catch (SystemException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+		return res;
+	}
+	
+	/**
 	 * Obtenemos la lista de correcciones que se le asignaron a una tarea p2p.
 	 * @param p2pActivityId
 	 * @return

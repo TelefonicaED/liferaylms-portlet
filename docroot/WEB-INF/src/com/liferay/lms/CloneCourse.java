@@ -1071,34 +1071,6 @@ public class CloneCourse implements MessageListener {
 		return null;
 	}
 	
-	/*private long createDLFolders(Long userId,Long repositoryId,PortletRequest portletRequest) throws PortalException, SystemException{
-		//Variables for folder ids
-		Long dlMainFolderId = 0L;
-		//Search for folder in Document Library
-        boolean dlMainFolderFound = false;
-        //Get main folder
-        try {
-        	//Get main folder
-        	Folder dlFolderMain = DLAppLocalServiceUtil.getFolder(repositoryId,DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,DOCUMENTLIBRARY_MAINFOLDER);
-        	dlMainFolderId = dlFolderMain.getFolderId();
-        	dlMainFolderFound = true;
-        	//Get portlet folder
-        } catch (Exception ex){
-        }
-        
-		ServiceContext serviceContext= ServiceContextFactory.getInstance( DLFolder.class.getName(), portletRequest);
-		//Damos permisos al archivo para usuarios de comunidad.
-		serviceContext.setAddGroupPermissions(true);
-        
-        //Create main folder if not exist
-        if(!dlMainFolderFound){
-        	Folder newDocumentMainFolder = DLAppLocalServiceUtil.addFolder(userId, repositoryId,DLFolderConstants.DEFAULT_PARENT_FOLDER_ID, DOCUMENTLIBRARY_MAINFOLDER, DOCUMENTLIBRARY_MAINFOLDER, serviceContext);
-        	dlMainFolderId = newDocumentMainFolder.getFolderId();
-        }//Create portlet folder if not exist
-     
-        return dlMainFolderId;
-	}*/
-	
 	private DLFolder getMainDLFolder(Long userId, Long groupId, ServiceContext serviceContext) throws PortalException, SystemException{
 
 		DLFolder mainFolder = null;

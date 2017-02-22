@@ -148,7 +148,11 @@
 		</finder>
 		<finder name="UserId" return-type="Collection">
 			<finder-column name="userId" />
-		</finder>			
+		</finder>	
+		<finder name="P2pActivityIdAndActIdDateNotNull" return-type="Collection" where="date IS NOT null">
+			<finder-column name="p2pActivityId" />
+			<finder-column name="actId" />
+		</finder>		
 	</entity>
 	
 	<entity name="TestAnswer" uuid="true" local-service="true"

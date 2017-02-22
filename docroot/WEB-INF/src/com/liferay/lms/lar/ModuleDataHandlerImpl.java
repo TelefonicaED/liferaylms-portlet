@@ -12,6 +12,7 @@ import javax.portlet.PortletPreferences;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang.StringUtils;
 
+import com.liferay.lms.NoLearningActivityTypeActiveException;
 import com.liferay.lms.learningactivity.LearningActivityType;
 import com.liferay.lms.learningactivity.LearningActivityTypeRegistry;
 import com.liferay.lms.learningactivity.questiontype.QuestionType;
@@ -234,10 +235,6 @@ public class ModuleDataHandlerImpl extends BasePortletDataHandler {
 			
 			//Exportar los ficheros que tenga la descripci�n de la actividad.
 			ExportUtil.descriptionFileParserDescriptionToLar(actividad.getDescription(), actividad.getGroupId(), actividad.getModuleId(), context, entryElementLoc);		
-			//Si es una actividad de tipo evaluación no tiene sentido guardar el extracontent
-			/*if(actividad.getTypeId() == 8){
-				actividad.setExtracontent("");
-			}*/
 		
 			//Exportar las imagenes de los resources.
 			if(actividad.getTypeId() == 2 || actividad.getTypeId() == 7|| actividad.getTypeId() == 9 ){
@@ -485,7 +482,7 @@ public class ModuleDataHandlerImpl extends BasePortletDataHandler {
 				relationActivities.put(larn.getActId(), newActId);
 			}else{
 				log.info("actividad incorrecta: " + larn.getTypeId());
-				throw new PortalException("No existe el tipo de actividad: "  + larn.getTypeId());
+				throw new NoLearningActivityTypeActiveException("No existe el tipo de actividad: "  + larn.getTypeId());
 			}
 		}
 		

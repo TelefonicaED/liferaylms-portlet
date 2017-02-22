@@ -3,12 +3,18 @@ package com.tls.lms.util;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import javax.portlet.PortletRequest;
+
 import com.liferay.lms.modulePortlet;
+import com.liferay.lms.moduleUpload;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.service.ServiceContext;
+import com.liferay.portal.service.ServiceContextFactory;
 import com.liferay.portlet.documentlibrary.model.DLFolder;
 import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
+import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.service.DLFolderLocalServiceUtil;
 
 public class DLFolderUtil {
@@ -100,6 +106,58 @@ public class DLFolderUtil {
 		}
   
         return mainFolder;
+	}
+	
+	public static long createDLFoldersP2P(Long userId,Long repositoryId,PortletRequest portletRequest) throws PortalException, SystemException{
+		//Variables for folder ids
+		Long dlMainFolderId = 0L;
+		Long dlPortletFolderId = 0L;
+		Long dlRecordFolderId = 0L;
+		//Search for folder in Document Library
+        boolean dlMainFolderFound = false;
+        boolean dlPortletFolderFound = false;
+        
+        Folder dlFolderMain = null;
+        //Get main folder
+        try {
+        	//Get main folder
+        	dlFolderMain = DLAppLocalServiceUtil.getFolder(repositoryId,DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,moduleUpload.DOCUMENTLIBRARY_MAINFOLDER);
+        	dlMainFolderId = dlFolderMain.getFolderId();
+        	dlMainFolderFound = true;
+        	//Get portlet folder
+        	Folder dlFolderPortlet = DLAppLocalServiceUtil.getFolder(repositoryId,dlMainFolderId,moduleUpload.DOCUMENTLIBRARY_PORTLETFOLDER);
+        	dlPortletFolderId = dlFolderPortlet.getFolderId();
+        	dlPortletFolderFound = true;
+        } catch (Exception ex){
+        	//Not found Main Folder
+        }
+        
+		ServiceContext serviceContext= ServiceContextFactory.getInstance( DLFolder.class.getName(), portletRequest);
+		//Damos permisos al archivo para usuarios de comunidad.
+		serviceContext.setAddGroupPermissions(true);
+        
+        //Create main folder if not exist
+        if(!dlMainFolderFound || dlFolderMain==null){
+        	Folder newDocumentMainFolder = DLAppLocalServiceUtil.addFolder(userId, repositoryId, DLFolderConstants.DEFAULT_PARENT_FOLDER_ID, moduleUpload.DOCUMENTLIBRARY_MAINFOLDER, moduleUpload.DOCUMENTLIBRARY_MAINFOLDER_DESCRIPTION, serviceContext);
+        	dlMainFolderId = newDocumentMainFolder.getFolderId();
+        	dlMainFolderFound = true;
+        }
+        //Create portlet folder if not exist
+        if(dlMainFolderFound && !dlPortletFolderFound){
+        	Folder newDocumentPortletFolder = DLAppLocalServiceUtil.addFolder(userId, repositoryId, dlMainFolderId , moduleUpload.DOCUMENTLIBRARY_PORTLETFOLDER, moduleUpload.DOCUMENTLIBRARY_PORTLETFOLDER_DESCRIPTION, serviceContext);
+        	dlPortletFolderFound = true;
+            dlPortletFolderId = newDocumentPortletFolder.getFolderId();
+        }
+
+        //Create this record folder
+        if(dlPortletFolderFound){
+        	SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+        	Date date = new Date();
+        	String dlRecordFolderName = dateFormat.format(date)+moduleUpload.SEPARATOR+userId;
+        	Folder newDocumentRecordFolder = DLAppLocalServiceUtil.addFolder(userId, repositoryId, dlPortletFolderId, dlRecordFolderName, dlRecordFolderName, serviceContext);
+        	dlRecordFolderId = newDocumentRecordFolder.getFolderId();
+        }
+        return dlRecordFolderId;
 	}
 
 }

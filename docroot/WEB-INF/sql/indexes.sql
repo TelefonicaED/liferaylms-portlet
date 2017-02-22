@@ -89,6 +89,7 @@ create index IX_E73266FE on Lms_P2pActivity (uuid_);
 
 create index IX_70AAED8C on Lms_P2pActivityCorrections (actId, userId);
 create index IX_599E425D on Lms_P2pActivityCorrections (p2pActivityId);
+create index IX_85BFE7C0 on Lms_P2pActivityCorrections (p2pActivityId, actId);
 create index IX_86D5ED97 on Lms_P2pActivityCorrections (p2pActivityId, userId);
 create index IX_C0C0C045 on Lms_P2pActivityCorrections (userId);
 create index IX_331E1449 on Lms_P2pActivityCorrections (uuid_);
