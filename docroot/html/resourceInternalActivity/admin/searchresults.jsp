@@ -87,20 +87,22 @@ pageContext.setAttribute("results", results);
 pageContext.setAttribute("total", total);
 %>
 </liferay-ui:search-container-results>
-<liferay-ui:search-container-row
-className="com.liferay.portlet.asset.model.AssetEntry"
-keyProperty="entryId"
-modelVar="assetEntry">
-<liferay-ui:search-container-column-text
-name="title"
-property="title"
-orderable="false"
-/>
+<liferay-ui:search-container-row 
+	className="com.liferay.portlet.asset.model.AssetEntry"
+	keyProperty="entryId"
+	modelVar="assetEntry">
+	
+	<liferay-ui:search-container-column-text name="title" property="title" orderable="false"/>
+	
 <liferay-portlet:renderURL var="selectResourceURL">
- <liferay-portlet:param value="/html/resourceInternalActivity/admin/result.jsp" name="jspPage"/>
+ <liferay-portlet:param value="/html/editactivity/editactivity.jsp" name="jspPage"/>
  <liferay-portlet:param value="<%=Long.toString(assetEntry.getEntryId()) %>" name="assertId"/>
  <liferay-portlet:param value="<%=assetEntry.getTitle(renderRequest.getLocale()) %>" name="assertTitle"/>
+ <liferay-portlet:param value="7" name="type"/>
+ <liferay-portlet:param name="resModuleId" value="<%=String.valueOf(resModuleId) %>"/>
+ <liferay-portlet:param name="resId" value="<%=String.valueOf(resId) %>"/>
 </liferay-portlet:renderURL>
+
 <liferay-ui:search-container-column-text>
 	<a class="newitem2" href="<%=selectResourceURL.toString() %>" ><liferay-ui:message key="select" /></a>
 </liferay-ui:search-container-column-text>

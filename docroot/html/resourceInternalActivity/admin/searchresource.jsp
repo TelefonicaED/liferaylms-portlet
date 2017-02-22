@@ -1,3 +1,4 @@
+<%@page import="com.liferay.lms.service.LearningActivityLocalServiceUtil"%>
 <%@page import="java.util.Map"%>
 <%@page import="java.util.Properties"%>
 <%@page import="com.liferay.portlet.PortletURLUtil"%>
@@ -38,12 +39,39 @@ for(Map.Entry<Object,Object> entry:props.entrySet()) {
 	}
 }
 
+long resId = ParamUtil.getLong(request,"resId",0);
+long resModuleId = ParamUtil.getLong(request,"resModuleId",0);
+String message = "new-activity-resourceinternal";
+if(resId > 0){
+	message = LearningActivityLocalServiceUtil.fetchLearningActivity(resId).getTitle(themeDisplay.getLocale());
+}
 %>
+
+<liferay-portlet:renderURL var="backURL" >
+	<liferay-portlet:param name="mvcPath" value="/html/editactivity/editactivity.jsp" />
+	<liferay-portlet:param name="resId" value="<%=String.valueOf(resId) %>" />
+	<liferay-portlet:param name="resModuleId" value="<%=String.valueOf(resModuleId) %>" />
+	<liferay-portlet:param name="type" value="9" />
+</liferay-portlet:renderURL>
+
+
+<liferay-ui:header 
+	title="<%=message %>" 
+	backURL="<%=backURL  %>"
+	localizeTitle="<%=resId <= 0 %>"
+/>
+
+
 
 <liferay-portlet:renderURL var="selectResource">
 	<liferay-portlet:param name="jspPage" value="/html/resourceInternalActivity/admin/searchresults.jsp"/>
 </liferay-portlet:renderURL>
+
 <aui:form name="<portlet:namespace />ressearch" action="<%=selectResource %>" method="POST">
+
+<aui:input type="hidden" name="resId" value="<%=resId%>"/>
+<aui:input type="hidden" name="resModuleId" value="<%=resModuleId %>"/>
+
 <aui:select name="className" label="asset-type">
 <% 
 
