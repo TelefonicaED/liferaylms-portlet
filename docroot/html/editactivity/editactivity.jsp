@@ -982,7 +982,7 @@ Liferay.provide(
 						getURLView(liferayPortletResponse, WindowState.NORMAL).toString() %>" />
 			</portlet:actionURL>
 	
-			<aui:button type="button" value="preview" onclick="javascript:location.href='${goToActivityURL.toString()}'" />
+			<aui:button type="button" value="go-to-activity" onclick="javascript:location.href='${goToActivityURL.toString()}'" />
 		
 		<%
 		}

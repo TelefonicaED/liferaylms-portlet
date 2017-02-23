@@ -41,10 +41,12 @@ LearningActivity learningActivity=(LearningActivity)request.getAttribute("activi
 if(learningActivity!=null) {	
 	if ((learningActivity.getExtracontent()!=null)&&(learningActivity.getExtracontent().trim().length()!=0)) {
 		try{
-			AssetEntry entry=AssetEntryLocalServiceUtil.getEntry(
-				GetterUtil.getLong(LearningActivityLocalServiceUtil.getExtraContentValue(learningActivity.getActId(),"assetEntry")));
-			assetId=entry.getEntryId();
-			assetTitle=entry.getTitle(renderRequest.getLocale());	
+			if(assetId==0){
+				AssetEntry entry=AssetEntryLocalServiceUtil.getEntry(
+					GetterUtil.getLong(LearningActivityLocalServiceUtil.getExtraContentValue(learningActivity.getActId(),"assetEntry")));
+				assetId=entry.getEntryId();
+				assetTitle=entry.getTitle(renderRequest.getLocale());	
+			}
 		}
 		catch(PortalException e){}
 	}	

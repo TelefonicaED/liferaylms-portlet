@@ -30,6 +30,8 @@ portletURL.setParameter("className",className);
 portletURL.setParameter("jspPage","/html/resourceInternalActivity/admin/searchresults.jsp");
 portletURL.setParameter("groupId",Long.toString(groupIdSelected));
 portletURL.setParameter("actionEditing","true");
+portletURL.setParameter("resModuleId",String.valueOf(resModuleId));
+portletURL.setParameter("resId",String.valueOf(resId));
 
 %>
 <liferay-ui:search-container emptyResultsMessage="resourceInternalActivity.there-are-no-assets" iteratorURL="<%=portletURL%>"
