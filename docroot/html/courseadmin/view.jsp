@@ -29,6 +29,7 @@ if( permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), "com.liferay
 }
 %>
 <liferay-ui:success key="courseadmin.clone.confirmation.success" message="courseadmin.clone.confirmation.success" />
+<liferay-ui:success key="import-course-ok" message="courseadmin.import-course-ok" />
 <liferay-ui:error></liferay-ui:error>
 
 <liferay-ui:search-container 

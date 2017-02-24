@@ -93,7 +93,7 @@ public class ImportUtil {
 						FileEntry newFile;
 						try {
 							Date date = new Date();
-							newFile = DLAppLocalServiceUtil.addFileEntry(userId, repositoryId , folderId , date.toString() + imageName, mimeType, imageName, StringPool.BLANK, StringPool.BLANK, IOUtils.toByteArray(input), serviceContext ) ;
+							newFile = DLAppLocalServiceUtil.addFileEntry(userId, repositoryId , folderId , date.getTime() + imageName, mimeType, date.getTime() + imageName, StringPool.BLANK, StringPool.BLANK, IOUtils.toByteArray(input), serviceContext ) ;
 							return newFile;
 						} catch (SystemException e) {
 							// TODO Auto-generated catch block
@@ -120,8 +120,10 @@ public class ImportUtil {
 		
 		for(Module module: listModules){
 			if(module.getPrecedence() > 0){
-				module.setPrecedence(relationModule.get(module.getPrecedence()));
-				ModuleLocalServiceUtil.updateModule(module);
+				if(relationModule.get(module.getPrecedence())!= null){
+					module.setPrecedence(relationModule.get(module.getPrecedence()));
+					ModuleLocalServiceUtil.updateModule(module);
+				}
 			}
 		}
 	}
@@ -131,6 +133,14 @@ public class ImportUtil {
 		List<LearningActivity> listLearningActivity = LearningActivityLocalServiceUtil.getLearningActivitiesOfGroupAndType(groupId, 8);
 		List<Attribute> listAttributes = null;
 		for(LearningActivity activity: listLearningActivity){
+			
+			if(activity.getPrecedence() > 0){
+				if(relationActivities.get(activity.getPrecedence()) != null){
+					activity.setPrecedence(relationActivities.get(activity.getPrecedence()));
+					LearningActivityLocalServiceUtil.updateLearningActivity(activity);
+				}
+			}
+			
 			log.info("acitivtyid: " + activity.getActId());
 			log.info("activity extra content: " + activity.getExtracontent());
 			if(activity.getExtracontent() != null && !activity.getExtracontent().equals("")){
@@ -149,13 +159,15 @@ public class ImportUtil {
 								log.info("elementActivity: " + elementActivity.toString());
 								Attribute attribute = elementActivity.attribute("id");
 								log.info("attribute: " + attribute.toString());
-								log.info("relation: " + relationActivities.get(Long.parseLong(attribute.getValue())));
-								attribute.setValue(String.valueOf(relationActivities.get(Long.parseLong(attribute.getValue()))));
-								log.info("attribute: " + attribute.toString());
-								listAttributes = new ArrayList<Attribute>();
-								listAttributes.add(attribute);
-								elementActivity.setAttributes(listAttributes);
-								log.info("elementActivity: " + elementActivity.toString());
+								if(relationActivities.get(Long.parseLong(attribute.getValue())) != null){
+									log.info("relation: " + relationActivities.get(Long.parseLong(attribute.getValue())));
+									attribute.setValue(String.valueOf(relationActivities.get(Long.parseLong(attribute.getValue()))));
+									log.info("attribute: " + attribute.toString());
+									listAttributes = new ArrayList<Attribute>();
+									listAttributes.add(attribute);
+									elementActivity.setAttributes(listAttributes);
+									log.info("elementActivity: " + elementActivity.toString());
+								}
 							}
 							activity.setExtracontent(document.formattedString());
 							LearningActivityLocalServiceUtil.updateLearningActivity(activity);

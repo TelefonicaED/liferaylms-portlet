@@ -1578,6 +1578,8 @@ public class CourseAdmin extends MVCPortlet {
 				c.setIcon(0);
 				CourseLocalServiceUtil.updateCourse(c);
 			}
+			
+			SessionMessages.add(actionRequest, "import-course-ok");
 
 		} catch (Exception e) {
 			//log.debug("Error importando lar.");
