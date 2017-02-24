@@ -129,18 +129,27 @@ public class ImportUtil {
 	}
 	
 	public static void updateActivityIds(long groupId, HashMap<Long,Long> relationActivities) throws SystemException, DocumentException, IOException{
-		//Actualizamos las precedentes y el extracontent que contenga ids de actividades
-		List<LearningActivity> listLearningActivity = LearningActivityLocalServiceUtil.getLearningActivitiesOfGroupAndType(groupId, 8);
-		List<Attribute> listAttributes = null;
+		
+		List<LearningActivity> listLearningActivity = LearningActivityLocalServiceUtil.getLearningActivitiesOfGroup(groupId);
 		for(LearningActivity activity: listLearningActivity){
-			
 			if(activity.getPrecedence() > 0){
+				log.debug("precedente: " + relationActivities.get(activity.getPrecedence()));
 				if(relationActivities.get(activity.getPrecedence()) != null){
 					activity.setPrecedence(relationActivities.get(activity.getPrecedence()));
+					log.debug("activity precedente update: " + activity.getPrecedence());
 					LearningActivityLocalServiceUtil.updateLearningActivity(activity);
 				}
 			}
-			
+		}
+		
+		//Actualizamos las precedentes y el extracontent que contenga ids de actividades
+		listLearningActivity = LearningActivityLocalServiceUtil.getLearningActivitiesOfGroupAndType(groupId, 8);
+		List<Attribute> listAttributes = null;
+		
+		log.debug("relationActivities: " + relationActivities);
+		
+		for(LearningActivity activity: listLearningActivity){
+					
 			log.info("acitivtyid: " + activity.getActId());
 			log.info("activity extra content: " + activity.getExtracontent());
 			if(activity.getExtracontent() != null && !activity.getExtracontent().equals("")){
