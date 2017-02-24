@@ -556,7 +556,7 @@ Liferay.provide(
         function(moduleId) {
         	var A = AUI();
 			var renderUrl = Liferay.PortletURL.createRenderURL();							
-			renderUrl.setWindowState('<%= LiferayWindowState.EXCLUSIVE.toString() %>');
+			renderUrl.setWindowState('<%= LiferayWindowState.NORMAL.toString() %>');
 			renderUrl.setPortletId('<%=portletDisplay.getId()%>');
 			renderUrl.setParameter('jspPage','/html/editactivity/comboActivities.jsp');
 			renderUrl.setParameter('resId','<%=Long.toString(actId) %>');
