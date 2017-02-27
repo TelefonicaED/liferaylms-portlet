@@ -1,4 +1,7 @@
 
+<%@page import="com.liferay.portal.kernel.json.JSONObject"%>
+<%@page import="com.liferay.portal.kernel.json.JSONFactoryUtil"%>
+<%@page import="com.liferay.portal.kernel.json.JSONArray"%>
 <%@page import="com.liferay.portal.kernel.servlet.BrowserSnifferUtil"%>
 <%@page import="com.liferay.lms.service.LearningActivityResultLocalServiceUtil"%>
 <%@page import="com.liferay.lms.service.impl.LearningActivityResultLocalServiceImpl"%>
@@ -123,6 +126,14 @@ if(!p2pActCorList.isEmpty()){
 			correctionDate = "";
 		}
 
+		P2pActivity myP2PActivity = null;
+		
+		try{
+			myP2PActivity = P2pActivityLocalServiceUtil.getP2pActivity(myP2PActCor.getP2pActivityId());
+		}catch(Exception e){
+			
+		}
+		
 		%>
 		<c:if test="<%=myP2PActCor.getDate() != null %>">
 			<%correctionsDone=true; %>
@@ -156,8 +167,46 @@ if(!p2pActCorList.isEmpty()){
 						</c:if>
 						<label class="aui-field-label" style="font-size: 14px;"> <liferay-ui:message key="p2ptaskactivity.comment" /> </label>
 						<div class="container-textarea">
-							<label for="<portlet:namespace/>corrected" />
-							<%=correctionText %>
+<%
+							
+								if(myP2PActivity!=null){
+									JSONArray jArrayDes = null;
+									JSONArray jArray = null;
+									try{
+										jArrayDes = JSONFactoryUtil.createJSONArray(correctionText);
+									}catch(Exception e){}
+									
+									try{
+										jArray = JSONFactoryUtil.createJSONArray(myP2PActivity.getDescription());
+									}catch(Exception e){}
+								
+									if(jArray!=null&&jArray.length()>0){
+										%><div class="p2pResponse"><ul><%
+										for(int i=0;i<jArray.length();i++){
+											JSONObject jsonObject = jArray.getJSONObject(i);
+											JSONObject jsonObjectDes = jArrayDes.getJSONObject(i);
+											String answer = jsonObject.getString("text"+i);
+											String valoration = null;
+											if(jsonObjectDes!=null)
+												valoration = jsonObjectDes.getString("text"+i);
+											
+												String question = LearningActivityLocalServiceUtil.getExtraContentValue(actId, "text"+i);
+											%>
+												<li>
+													<div class="p2pQuestion"><%=question!=null?question:StringPool.BLANK %></div>
+													<div class="p2pAnswer"><%=answer!=null?answer:StringPool.BLANK %></div>
+													<label class="aui-field-label p2pMulti" style="font-size: 14px;"> <liferay-ui:message key="p2ptaskactivity.comment" /> </label>
+													<div class="p2pCorrect"><%=valoration!=null?valoration:StringPool.BLANK %></div>
+												</li>
+											<%
+										}%></ul></div><%
+										
+									}else{
+										String description = myP2PActCor.getDescription();
+										%><%=description %><%
+									}
+								}
+							%>
 						</div>
 						<%
 						if(dlfile!=null){

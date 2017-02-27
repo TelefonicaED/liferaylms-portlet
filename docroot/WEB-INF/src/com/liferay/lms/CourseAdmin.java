@@ -1582,12 +1582,12 @@ public class CourseAdmin extends MVCPortlet {
 			SessionMessages.add(actionRequest, "import-course-ok");
 
 		} catch (Exception e) {
-			//log.debug("Error importando lar.");
+			e.printStackTrace();
 			if ((e instanceof LARFileException) || (e instanceof LARTypeException)) {
 
 				SessionErrors.add(actionRequest, e.getClass().getName());
 
-			} if(e.getMessage().indexOf(NoLearningActivityTypeActiveException.class.getName()) >= 0){
+			} if(e.getMessage() != null && e.getMessage().indexOf(NoLearningActivityTypeActiveException.class.getName()) >= 0){
 				e.printStackTrace();
 				actionResponse.setRenderParameter("view", "import");
 				actionResponse.setRenderParameter("groupId", String.valueOf(groupId));

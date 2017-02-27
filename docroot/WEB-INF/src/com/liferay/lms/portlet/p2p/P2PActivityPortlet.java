@@ -41,6 +41,9 @@ import com.liferay.mail.service.MailServiceUtil;
 import com.liferay.portal.kernel.exception.NestableException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.json.JSONArray;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
+import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -169,6 +172,23 @@ public class P2PActivityPortlet extends MVCPortlet {
 			boolean fileoptional = StringPool.TRUE.equals(LearningActivityLocalServiceUtil.getExtraContentValue(actId, "fileoptional"));
 			
 			if(p2pAc==null){
+				
+				if(description==null||description.equals(StringPool.BLANK)){
+					JSONArray jArray = JSONFactoryUtil.createJSONArray();
+					boolean change = false;
+					for(int i=0;i<5;i++){
+						String param = ParamUtil.getString(uploadRequest, "text"+i);
+						if(param!=null && param.equals(StringPool.BLANK)){
+							break;
+						}
+						change = true;
+						JSONObject obj = JSONFactoryUtil.createJSONObject();
+						obj.put("text"+i, param);
+						jArray.put(obj);
+					}
+					if(change)
+						description = jArray.toString();
+				}
 
 				//Cuando el fichero es obligatorio y no esta seleccionado.
 				if( !fileoptional &&  (fileName == null || fileName.equals("")) ){
@@ -397,10 +417,34 @@ public class P2PActivityPortlet extends MVCPortlet {
 		P2pActivityCorrections p2pActCor = P2pActivityCorrectionsLocalServiceUtil.findByP2pActivityIdAndUserId(p2pActivityId, user.getUserId());
 		
 		if(p2pActCor!=null){
-							
+						
 			String description = uploadRequest.getParameter("description");
 			
+			if(description==null || description.equals(StringPool.BLANK)){
+				Enumeration<String> parameterNames = uploadRequest.getParameterNames();
+				boolean fill = false;
+				JSONArray jArray = JSONFactoryUtil.createJSONArray();
+				int cont = 0;
+				while(parameterNames.hasMoreElements()){
+					String param = parameterNames.nextElement();
+					if(param.matches("description\\_\\d*_\\d*i")){
+						_log.debug(param+":"+uploadRequest.getParameter(param));
+						fill=true;
+						JSONObject jo = JSONFactoryUtil.createJSONObject();
+						jo.put("text"+cont, uploadRequest.getParameter(param));
+						jArray.put(jo);
+						cont++;
+					}
+				}
+
+				if(fill){
+					_log.debug(jArray.toString());
+					description = jArray.toString();
+				}
+			}
+			
 			if(description!=null && !description.equals("")){
+				
 			 		
 				String fileName = uploadRequest.getFileName("fileName");
 				File file = uploadRequest.getFile("fileName");

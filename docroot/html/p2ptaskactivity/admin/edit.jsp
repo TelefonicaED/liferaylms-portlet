@@ -159,6 +159,49 @@ AUI().ready('node','event','aui-io-request','aui-parse-content','liferay-portlet
 		}); 
 	});
 });
+
+function <portlet:namespace />addText(){
+	var container = document.getElementById("<portlet:namespace />texts");
+	if(container){
+		var number=-1;
+		for(var i=1;i<5;i++){
+			if(document.getElementById("<portlet:namespace />texts"+i)==null){
+				number=i;
+				break;
+			}
+		}
+		if(number<0){
+			alert('<liferay-ui:message key="p2pv2.noMoreCkeditors" />');
+			return;
+		}
+		
+		var legend = document.getElementById("<portlet:namespace />legend");
+		if(legend.style.display=='none'){
+			legend.style.display='block';
+		}
+
+		var fSpan = document.createElement("span");
+		fSpan.className = "aui-field-content";
+		fSpan.id = "<portlet:namespace />texts"+number;
+		var span = document.createElement("span");
+		span.className = "aui-field-element";
+		var input = document.createElement("input");
+		input.type = "text";
+		input.name = "text"+number;
+		input.className = "aui-field-input aui-field-input-text aui-form-validator-valid";
+		span.appendChild(input);
+		var img = document.createElement("img");
+		img.className = "icon";
+		img.src='/html/themes/control_panel/images/common/remove.png';
+		img.style.cursor='pointer';
+		img.onclick=function() {
+			this.parentNode.remove();
+		}
+		fSpan.appendChild(span);
+		fSpan.appendChild(img);
+		container.appendChild(fSpan);
+	}
+}
 //-->
 </script>
 
@@ -188,6 +231,48 @@ AUI().ready('node','event','aui-io-request','aui-parse-content','liferay-portlet
 
 <aui:input type="text" size="3" cssClass="lms-inpnumval" name="numValidaciones" label="p2ptaskactivity.edit.numvalidations" value="<%=numEvaluaciones%>" disabled="<%=disabled %>" 
 		ignoreRequestValue="true"/>
+		
+<%if(!disabled){ %>
+	<aui:button value="p2pv2.addText" onClick="${renderResponse.getNamespace()}addText()" />
+<%} %>
+<div id="<portlet:namespace />texts">
+	<span id="<portlet:namespace />legend" class="aui-field-content">
+		<label class="aui-field-label"><liferay-ui:message key="p2pv2.addedTexts" /></label>
+	</span>
+	<%
+
+		String value = null;
+
+		if(learningActivity!=null&&learningActivity.getActId()>0)
+			value = LearningActivityLocalServiceUtil.getExtraContentValue(learningActivity.getActId(),"text0");
+		%>  
+			<span id="_lmsactivitieslist_WAR_liferaylmsportlet_texts0" class="aui-field-content">
+				<span id="aui_3_4_0_1_2024" class="aui-field-element">
+					<input id="aui_3_4_0_1_2020" class="aui-field-input aui-field-input-text aui-form-validator-valid" type="text" value="<%=value!=null?value:LanguageUtil.get(locale, "description") %>" name="text0">
+				</span>
+			</span>
+		<%
+
+		if(learningActivity!=null&&learningActivity.getActId()>0){
+			for(int i=1;i<5;i++){
+					value = LearningActivityLocalServiceUtil.getExtraContentValue(learningActivity.getActId(),"text"+i);
+					if(value==null||value.equals(StringPool.BLANK))
+						break;
+				%>
+				<script type="text/javascript">document.getElementById("<portlet:namespace />legend").style.display='block';</script>
+				<span id="_lmsactivitieslist_WAR_liferaylmsportlet_texts<%=i %>" class="aui-field-content">
+					<span id="aui_3_4_0_1_2024" class="aui-field-element">
+						<input id="aui_3_4_0_1_2020" class="aui-field-input aui-field-input-text aui-form-validator-valid" type="text" value="<%=value %>" name="text<%=i %>">
+					</span>
+					<%if(!disabled){ %>
+						<img class="icon" src="/html/themes/control_panel/images/common/remove.png" style="cursor: pointer;" onclick="this.parentNode.remove();">
+					<%} %>
+				</span>
+				<%
+			}
+		}
+	%>
+</div>
 
 
 <div id="<portlet:namespace />numValidacionesError" class="<%=((SessionErrors.contains(renderRequest, "p2ptaskactivity.editActivity.numValidaciones.required"))||
