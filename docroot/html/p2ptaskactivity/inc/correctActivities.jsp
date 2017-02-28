@@ -569,40 +569,54 @@ if(!p2pActList.isEmpty()){
 							</c:if>
 							
 							<% 
-								JSONArray jarray = JSONFactoryUtil.createJSONArray(descriptionFile);
 
-								for(int i=0;i<numQuestion;i++){ 
-									String des = LearningActivityLocalServiceUtil.getExtraContentValue(actId, "text"+i);
-									JSONObject jobject = jarray.getJSONObject(i);
-									if(jobject==null){
-										break;
-									}
+								JSONArray jArray = null;								
+								try{
+									 jArray = JSONFactoryUtil.createJSONArray(descriptionFile);
+								}catch(Exception e){
 									
-									String text = jobject.getString("text"+i);
+								}
+							
+								if(jArray==null||jArray.length()<=0){
+									%><%=descriptionFile %><%
+								}else{
+									for(int i=0;i<numQuestion;i++){ 
+										String des = LearningActivityLocalServiceUtil.getExtraContentValue(actId, "text"+i);
+										JSONObject jobject = jArray.getJSONObject(i);
+										if(jobject==null){
+											break;
+										}
+										
+										String text = jobject.getString("text"+i);
 
-									if(text==null){
-										break;
-									}
+										if(text==null){
+											break;
+										}
+										
+										%>
 									
-									%>
+									<div class="description">
+										<div class="correctQuestion"><%=des.replaceAll(StringPool.DOUBLE_QUOTE, StringPool.BLANK)+StringPool.COLON%></div><div class="correctAnswer"><%= text %></div>
+									</div>
+		
+									<aui:field-wrapper label='p2ptask-correction' name='<%="description_"+cont+"_"+i%>'>
+										<liferay-ui:input-editor name='<%="description_"+cont+"_"+i%>' width="100%" />
+										<aui:input name='<%="description_"+cont+"_"+i%>' type="hidden"/>
+										<script type="text/javascript">
+							    		    function <portlet:namespace />initEditor() {
+								    		    return "<%= UnicodeFormatter.toString(textoCorrecion) %>"; 
+								    		};
+								    		AUI().on('domready', function(){CKEDITOR.instances.<portlet:namespace />description_<%=cont%>_<%=i%>.on('focus',function(){<portlet:namespace />clearTextCorrection('<portlet:namespace />description_<%=cont %>_<%=i%>');});});
+							    		</script>
+									</aui:field-wrapper>
+									<aui:input name='<%="description_"+cont+StringPool.UNDERLINE+i+"i" %>' type="hidden"/>
+
+								<% } 	
+									
+								}%>
+							
+							
 								
-								<div class="description">
-									<div class="correctQuestion"><%=des.replaceAll(StringPool.DOUBLE_QUOTE, StringPool.BLANK)+StringPool.COLON%></div><div class="correctAnswer"><%= text %></div>
-								</div>
-	
-								<aui:field-wrapper label='p2ptask-correction' name='<%="description_"+cont+"_"+i%>'>
-									<liferay-ui:input-editor name='<%="description_"+cont+"_"+i%>' width="100%" />
-									<aui:input name='<%="description_"+cont+"_"+i%>' type="hidden"/>
-									<script type="text/javascript">
-						    		    function <portlet:namespace />initEditor() {
-							    		    return "<%= UnicodeFormatter.toString(textoCorrecion) %>"; 
-							    		};
-							    		AUI().on('domready', function(){CKEDITOR.instances.<portlet:namespace />description_<%=cont%>_<%=i%>.on('focus',function(){<portlet:namespace />clearTextCorrection('<portlet:namespace />description_<%=cont %>_<%=i%>');});});
-						    		</script>
-								</aui:field-wrapper>
-								<aui:input name='<%="description_"+cont+StringPool.UNDERLINE+i+"i" %>' type="hidden"/>
-
-							<% } %>
 							<liferay-ui:error key="p2ptaskactivity-error-file-size" message="p2ptaskactivity.error.file.size" />
 							<div class="container-file">
 								<aui:input inlineLabel="left" inlineField="true"
@@ -679,7 +693,7 @@ if(!p2pActList.isEmpty()){
 						</span>
 						</c:if>
 					</span>
-					<div class="collapsable2" style="display:none">
+					<div class="collapsable2" style="display:none;">
 
 						<div class="description">
 							<%

@@ -614,6 +614,8 @@ public class P2PActivityPortlet extends MVCPortlet {
 		throws Exception {
 	
 		long actId = ParamUtil.getLong(actionRequest, "actId", 0);
+		
+		LearningActivity learningActivity = LearningActivityLocalServiceUtil.fetchLearningActivity(actId);
 		long numValidaciones = ParamUtil.getLong(actionRequest, "numValidaciones", 3);
 		String anonimous = ParamUtil.getString(actionRequest, "anonimous", "false");
 		String result = ParamUtil.getString(actionRequest, "result", "false");
@@ -623,7 +625,9 @@ public class P2PActivityPortlet extends MVCPortlet {
 		LearningActivityLocalServiceUtil.setExtraContentValue(actId, "result", result);
 	
 		_log.debug(":::numValidaciones:::");
-		SessionMessages.add(actionRequest, "activity-saved-successfully");
+		if(P2pActivityLocalServiceUtil.countByActId(learningActivity.getActId())==0){
+			SessionMessages.add(actionRequest, "activity-saved-successfully");	
+		}
 	}
 
 

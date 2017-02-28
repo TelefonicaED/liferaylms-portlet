@@ -1105,8 +1105,7 @@ public class LearningActivityWrapper implements LearningActivity,
 		return new LearningActivityWrapper((LearningActivity)_learningActivity.clone());
 	}
 
-	public int compareTo(
-		com.liferay.lms.model.LearningActivity learningActivity) {
+	public int compareTo(LearningActivity learningActivity) {
 		return _learningActivity.compareTo(learningActivity);
 	}
 
@@ -1115,11 +1114,11 @@ public class LearningActivityWrapper implements LearningActivity,
 		return _learningActivity.hashCode();
 	}
 
-	public com.liferay.portal.model.CacheModel<com.liferay.lms.model.LearningActivity> toCacheModel() {
+	public com.liferay.portal.model.CacheModel<LearningActivity> toCacheModel() {
 		return _learningActivity.toCacheModel();
 	}
 
-	public com.liferay.lms.model.LearningActivity toEscapedModel() {
+	public LearningActivity toEscapedModel() {
 		return new LearningActivityWrapper(_learningActivity.toEscapedModel());
 	}
 

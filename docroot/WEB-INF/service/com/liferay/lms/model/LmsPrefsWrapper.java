@@ -447,7 +447,7 @@ public class LmsPrefsWrapper implements LmsPrefs, ModelWrapper<LmsPrefs> {
 		return new LmsPrefsWrapper((LmsPrefs)_lmsPrefs.clone());
 	}
 
-	public int compareTo(com.liferay.lms.model.LmsPrefs lmsPrefs) {
+	public int compareTo(LmsPrefs lmsPrefs) {
 		return _lmsPrefs.compareTo(lmsPrefs);
 	}
 
@@ -456,11 +456,11 @@ public class LmsPrefsWrapper implements LmsPrefs, ModelWrapper<LmsPrefs> {
 		return _lmsPrefs.hashCode();
 	}
 
-	public com.liferay.portal.model.CacheModel<com.liferay.lms.model.LmsPrefs> toCacheModel() {
+	public com.liferay.portal.model.CacheModel<LmsPrefs> toCacheModel() {
 		return _lmsPrefs.toCacheModel();
 	}
 
-	public com.liferay.lms.model.LmsPrefs toEscapedModel() {
+	public LmsPrefs toEscapedModel() {
 		return new LmsPrefsWrapper(_lmsPrefs.toEscapedModel());
 	}
 

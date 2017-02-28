@@ -359,8 +359,7 @@ public class P2pActivityCorrectionsWrapper implements P2pActivityCorrections,
 		return new P2pActivityCorrectionsWrapper((P2pActivityCorrections)_p2pActivityCorrections.clone());
 	}
 
-	public int compareTo(
-		com.liferay.lms.model.P2pActivityCorrections p2pActivityCorrections) {
+	public int compareTo(P2pActivityCorrections p2pActivityCorrections) {
 		return _p2pActivityCorrections.compareTo(p2pActivityCorrections);
 	}
 
@@ -369,11 +368,11 @@ public class P2pActivityCorrectionsWrapper implements P2pActivityCorrections,
 		return _p2pActivityCorrections.hashCode();
 	}
 
-	public com.liferay.portal.model.CacheModel<com.liferay.lms.model.P2pActivityCorrections> toCacheModel() {
+	public com.liferay.portal.model.CacheModel<P2pActivityCorrections> toCacheModel() {
 		return _p2pActivityCorrections.toCacheModel();
 	}
 
-	public com.liferay.lms.model.P2pActivityCorrections toEscapedModel() {
+	public P2pActivityCorrections toEscapedModel() {
 		return new P2pActivityCorrectionsWrapper(_p2pActivityCorrections.toEscapedModel());
 	}
 
