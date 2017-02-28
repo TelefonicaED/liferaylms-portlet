@@ -1,3 +1,4 @@
+<%@page import="com.liferay.portal.kernel.util.PropsUtil"%>
 <%@page import="com.liferay.portal.kernel.json.JSONObject"%>
 <%@page import="com.liferay.portal.kernel.json.JSONFactoryUtil"%>
 <%@page import="com.liferay.portal.kernel.json.JSONArray"%>
@@ -130,6 +131,8 @@ if(activity.getEnddate() == null){
 	</div>
 </c:if>
 
+<%int numQuestion = Integer.parseInt(PropsUtil.get("lms.p2p.numcustomquestion"));%>
+
 <aui:script>
 
 	
@@ -139,7 +142,7 @@ if(activity.getEnddate() == null){
 	        function (thisForm, thisEditor) {
 				var A = AUI();
 				<%
-					for(int i=0;i<5;i++){ 
+					for(int i=0;i<numQuestion;i++){ 
 						String des = LearningActivityLocalServiceUtil.getExtraContentValue(actId, "text"+i);
 						if(des!=null&&!des.equals(StringPool.BLANK)){
 					%>
@@ -189,7 +192,7 @@ if(activity.getEnddate() == null){
 				//Se copia el atributo para no modificar el servicio
 				
 				<%
-					for(int i=0;i<5;i++){
+					for(int i=0;i<numQuestion;i++){
 						String des = LearningActivityLocalServiceUtil.getExtraContentValue(actId, "text"+i);
 						if(des!=null&&!des.equals(StringPool.BLANK)){
 				%>
@@ -370,7 +373,7 @@ if(activity.getEnddate() == null){
 	<br />
 	<div class="contDesc description">
 		<%
-			for(int i=0;i<5;i++){ 
+			for(int i=0;i<numQuestion;i++){ 
 				String des = LearningActivityLocalServiceUtil.getExtraContentValue(actId, "text"+i);
 				if(des!=null&&!des.equals(StringPool.BLANK)){
 		%>
@@ -568,7 +571,7 @@ if(!p2pActList.isEmpty()){
 							<% 
 								JSONArray jarray = JSONFactoryUtil.createJSONArray(descriptionFile);
 
-								for(int i=0;i<5;i++){ 
+								for(int i=0;i<numQuestion;i++){ 
 									String des = LearningActivityLocalServiceUtil.getExtraContentValue(actId, "text"+i);
 									JSONObject jobject = jarray.getJSONObject(i);
 									if(jobject==null){

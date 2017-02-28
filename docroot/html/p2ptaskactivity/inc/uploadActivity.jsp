@@ -1,3 +1,4 @@
+<%@page import="com.liferay.portal.kernel.util.PropsUtil"%>
 <%@page import="com.liferay.portal.kernel.json.JSONObject"%>
 <%@page import="com.liferay.portal.kernel.json.JSONFactoryUtil"%>
 <%@page import="com.liferay.portal.kernel.json.JSONArray"%>
@@ -62,7 +63,8 @@ if(!dateUpload.equals("")){
 
 boolean more = false;
 List<String> messages = new ArrayList<String>();
-for(int i=0;i<5;i++){ 
+int numQuestion = Integer.parseInt(PropsUtil.get("lms.p2p.numcustomquestion"));
+for(int i=0;i<numQuestion;i++){ 
 	String value = LearningActivityLocalServiceUtil.getExtraContentValue(actId,"text"+i);
 	if(value==null||value.equals(StringPool.BLANK)){
 		break;

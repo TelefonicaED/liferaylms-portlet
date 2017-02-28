@@ -55,6 +55,7 @@ import com.liferay.portal.kernel.upload.UploadPortletRequest;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PrefsPropsUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -176,7 +177,8 @@ public class P2PActivityPortlet extends MVCPortlet {
 				if(description==null||description.equals(StringPool.BLANK)){
 					JSONArray jArray = JSONFactoryUtil.createJSONArray();
 					boolean change = false;
-					for(int i=0;i<5;i++){
+					int numQuestion = Integer.parseInt(PropsUtil.get("lms.p2p.numcustomquestion"));
+					for(int i=0;i<numQuestion;i++){
 						String param = ParamUtil.getString(uploadRequest, "text"+i);
 						if(param!=null && param.equals(StringPool.BLANK)){
 							break;

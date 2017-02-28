@@ -1,3 +1,4 @@
+<%@page import="com.liferay.portal.kernel.util.PropsUtil"%>
 <%@page import="com.liferay.lms.service.LearningActivityTryLocalServiceUtil"%>
 <%@page import="com.liferay.lms.model.LearningActivityTry"%>
 <%@page import="com.tls.lms.util.LiferaylmsUtil"%>
@@ -96,7 +97,7 @@
 	if(LearningActivityLocalServiceUtil.canBeEdited(learningActivity, user.getUserId())){
 		disabled = false;
 	}
-
+	int numQuestion = Integer.parseInt(PropsUtil.get("lms.p2p.numcustomquestion"));
 %>
 
 <script type="text/javascript">
@@ -162,9 +163,11 @@ AUI().ready('node','event','aui-io-request','aui-parse-content','liferay-portlet
 
 function <portlet:namespace />addText(){
 	var container = document.getElementById("<portlet:namespace />texts");
+	var numberQuestion = parseInt('<%=numQuestion%>');
+	
 	if(container){
 		var number=-1;
-		for(var i=1;i<5;i++){
+		for(var i=1;i < numberQuestion;i++){
 			if(document.getElementById("<portlet:namespace />texts"+i)==null){
 				number=i;
 				break;
@@ -254,7 +257,7 @@ function <portlet:namespace />addText(){
 		<%
 
 		if(learningActivity!=null&&learningActivity.getActId()>0){
-			for(int i=1;i<5;i++){
+			for(int i=1;i<numQuestion;i++){
 					value = LearningActivityLocalServiceUtil.getExtraContentValue(learningActivity.getActId(),"text"+i);
 					if(value==null||value.equals(StringPool.BLANK))
 						break;

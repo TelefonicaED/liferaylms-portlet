@@ -19,6 +19,7 @@ import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.upload.UploadRequest;
 import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.xml.Document;
@@ -222,7 +223,8 @@ public class TaskP2PLearningActivityType extends BaseLearningActivityType {
 			}
 			
 			int elements = 0;
-			for(int i=0;i<5;i++){
+			int numQuestion = Integer.parseInt(PropsUtil.get("lms.p2p.numcustomquestion"));
+			for(int i=0;i<numQuestion;i++){
 				Element text=rootElement.element("text"+i);
 				if(text!=null)
 				{
