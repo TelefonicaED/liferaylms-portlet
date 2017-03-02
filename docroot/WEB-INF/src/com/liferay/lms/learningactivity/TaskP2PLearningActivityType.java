@@ -198,11 +198,34 @@ public class TaskP2PLearningActivityType extends BaseLearningActivityType {
 				}
 				dateUpload = SAXReaderUtil.createElement("dateupload");
 				dateUpload.setText(formatUploadDate.format(uploadDate));		
-				rootElement.add(dateUpload);	
+				rootElement.add(dateUpload);
+				
+				
+				int elements = 0;
+				int numQuestion = Integer.parseInt(PropsUtil.get("lms.p2p.numcustomquestion"));
+				for(int i=0;i<numQuestion;i++){
+					Element text=rootElement.element("text"+i);
+					if(text!=null)
+					{
+						text.detach();
+						rootElement.remove(text);
+					}
+					
+					String textAdd = ParamUtil.getString(uploadRequest,"text"+i,null);
+					
+					if(textAdd!=null){
+						Element textAddElement = SAXReaderUtil.createElement("text"+elements);
+						textAddElement.setText(textAdd);
+						rootElement.add(textAddElement);
+						elements++;
+					}
+				}
 				
 			}else{
 				log.debug("***NO SE ACTUALIZA EL EXTRA CONTENT PORQUE YA HAY P2PACTIVITY ASOCIADOS A LA ACTIVIDAD***");
 				error = "error-p2pActivity-inProgress";
+				
+				
 			}
 			
 			
@@ -222,25 +245,7 @@ public class TaskP2PLearningActivityType extends BaseLearningActivityType {
 				rootElement.add(teamElement);
 			}
 			
-			int elements = 0;
-			int numQuestion = Integer.parseInt(PropsUtil.get("lms.p2p.numcustomquestion"));
-			for(int i=0;i<numQuestion;i++){
-				Element text=rootElement.element("text"+i);
-				if(text!=null)
-				{
-					text.detach();
-					rootElement.remove(text);
-				}
-				
-				String textAdd = ParamUtil.getString(uploadRequest,"text"+i,null);
-				
-				if(textAdd!=null){
-					Element textAddElement = SAXReaderUtil.createElement("text"+elements);
-					textAddElement.setText(textAdd);
-					rootElement.add(textAddElement);
-					elements++;
-				}
-			}
+			
 		
 			learningActivity.setExtracontent(document.formattedString());
 			return error;

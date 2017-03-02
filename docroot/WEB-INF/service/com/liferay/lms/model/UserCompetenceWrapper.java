@@ -282,7 +282,7 @@ public class UserCompetenceWrapper implements UserCompetence,
 		return new UserCompetenceWrapper((UserCompetence)_userCompetence.clone());
 	}
 
-	public int compareTo(com.liferay.lms.model.UserCompetence userCompetence) {
+	public int compareTo(UserCompetence userCompetence) {
 		return _userCompetence.compareTo(userCompetence);
 	}
 
@@ -291,11 +291,11 @@ public class UserCompetenceWrapper implements UserCompetence,
 		return _userCompetence.hashCode();
 	}
 
-	public com.liferay.portal.model.CacheModel<com.liferay.lms.model.UserCompetence> toCacheModel() {
+	public com.liferay.portal.model.CacheModel<UserCompetence> toCacheModel() {
 		return _userCompetence.toCacheModel();
 	}
 
-	public com.liferay.lms.model.UserCompetence toEscapedModel() {
+	public UserCompetence toEscapedModel() {
 		return new UserCompetenceWrapper(_userCompetence.toEscapedModel());
 	}
 

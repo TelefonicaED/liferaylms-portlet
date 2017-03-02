@@ -1231,7 +1231,7 @@ public class CourseWrapper implements Course, ModelWrapper<Course> {
 		return new CourseWrapper((Course)_course.clone());
 	}
 
-	public int compareTo(com.liferay.lms.model.Course course) {
+	public int compareTo(Course course) {
 		return _course.compareTo(course);
 	}
 
@@ -1240,11 +1240,11 @@ public class CourseWrapper implements Course, ModelWrapper<Course> {
 		return _course.hashCode();
 	}
 
-	public com.liferay.portal.model.CacheModel<com.liferay.lms.model.Course> toCacheModel() {
+	public com.liferay.portal.model.CacheModel<Course> toCacheModel() {
 		return _course.toCacheModel();
 	}
 
-	public com.liferay.lms.model.Course toEscapedModel() {
+	public Course toEscapedModel() {
 		return new CourseWrapper(_course.toEscapedModel());
 	}
 

@@ -251,7 +251,7 @@ function <portlet:namespace />addText(){
 		%>  
 			<span id="_lmsactivitieslist_WAR_liferaylmsportlet_texts0" class="aui-field-content">
 				<span id="aui_3_4_0_1_2024" class="aui-field-element">
-					<input id="aui_3_4_0_1_2020" class="aui-field-input aui-field-input-text aui-form-validator-valid" type="text" value="<%=value!=null?value:LanguageUtil.get(locale, "description") %>" name="text0">
+					<input id="aui_3_4_0_1_2020" class="aui-field-input aui-field-input-text aui-form-validator-valid" type="text" value="<%=Validator.isNotNull(value)?value:LanguageUtil.get(locale, "feedback") %>" name="text0">
 				</span>
 			</span>
 		<%
