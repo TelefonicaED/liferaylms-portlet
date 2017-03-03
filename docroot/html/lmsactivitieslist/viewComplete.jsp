@@ -216,7 +216,7 @@ if(moduleEditing) idModuleUl = "myModule";
 				LearningActivityTypeRegistry learningActivityTypeRegistry = new LearningActivityTypeRegistry();
 				AssetRendererFactory assetRendererFactory = AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(LearningActivity.class.getName());
 		
-				boolean hasPermissionAccessCourseFinished = LiferaylmsUtil.hasPermissionAccessCourseFinished(themeDisplay.getCompanyId(), course.getGroupCreatedId(), course.getCourseId(), themeDisplay.getUserId());
+				boolean hasPermissionAccessCourseFinished = false;
 				boolean accessLock = CourseLocalServiceUtil.canAccessLock(themeDisplay.getScopeGroupId(), themeDisplay.getUser());
 				Module theModule = currentModule;
 				%>

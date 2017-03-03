@@ -66,7 +66,11 @@
 		}	
 	}	
 	
-	List<Team> teams = TeamLocalServiceUtil.getUserTeams(themeDisplay.getUserId(), course.getGroupCreatedId());
+	List<Team> teams = null;
+			
+	if(course!=null){
+		teams = TeamLocalServiceUtil.getUserTeams(themeDisplay.getUserId(), course.getGroupCreatedId());
+	}
 	if(teams!=null && teams.size()>0){
 		for(Team team : teams){
 			Schedule schedule = ScheduleLocalServiceUtil.getScheduleByTeamId(team.getTeamId());
@@ -138,12 +142,14 @@ if(!ismobile){
 	if(moduleEditing){ 
 		idModuleTable = "myModule";
 	}
+	
+	if(course!=null && permissionChecker.hasPermission(course.getGroupCreatedId(),  Course.class.getName(),course.getCourseId(),ActionKeys.VIEW)){
 %>
 	<div id="myContainer">
 	<table class="coursemodule <%="course-status-".concat(String.valueOf(course.getStatus()))%>" id="<%=idModuleTable%>">
 <%
 		Date today=new java.util.Date(System.currentTimeMillis());
-		if(course!=null && permissionChecker.hasPermission(course.getGroupCreatedId(),  Course.class.getName(),course.getCourseId(),ActionKeys.VIEW)){
+		
 			java.util.List<Module> theModules=ModuleLocalServiceUtil.findAllInGroup(themeDisplay.getScopeGroupId());
 			long currentThemeId=0, moduleId=0;
 			String currentActivityPortletId =  null;
@@ -382,10 +388,10 @@ if(!ismobile){
 %>
 					</td>
 				</tr>
-<%		}
-	}else{
-		renderRequest.setAttribute(WebKeys.PORTLET_CONFIGURATOR_VISIBILITY, Boolean.FALSE);
-	}	
-%>
+<%		}%>
   </table>
 </div>
+
+<%}else{
+	renderRequest.setAttribute(WebKeys.PORTLET_CONFIGURATOR_VISIBILITY, Boolean.FALSE);
+}%>

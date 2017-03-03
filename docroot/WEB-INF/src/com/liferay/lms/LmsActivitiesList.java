@@ -1188,60 +1188,67 @@ public class LmsActivitiesList extends MVCPortlet {
 
 	public static final PortletURL getURLEditActivity(LiferayPortletRequest liferayPortletRequest,
 			LiferayPortletResponse liferayPortletResponse, LearningActivity activity) throws Exception {
-		
-		long plid = PortalUtil.getPlidFromPortletId(activity.getGroupId(), ACTIVITY_VIEWER_PORTLET_ID);
-	     
-		log.debug("PLID: "+plid);
-		
-		if (plid == LayoutConstants.DEFAULT_PLID) {
-			throw new NoSuchLayoutException();
-		}		
+		PortletURL portletURL = null;
+		if(activity!=null){
+			long plid = PortalUtil.getPlidFromPortletId(activity.getGroupId(), ACTIVITY_VIEWER_PORTLET_ID);
+		     
+			
+			log.debug("PLID: "+plid);
+			
+			if (plid == LayoutConstants.DEFAULT_PLID) {
+				throw new NoSuchLayoutException();
+			}		
 
-		PortletURL portletURL = liferayPortletResponse.createLiferayPortletURL(plid, LMS_EDITACTIVITY_PORTLET_ID, PortletRequest.RENDER_PHASE);
-		portletURL.setWindowState(WindowState.NORMAL);
-		portletURL.setParameter("actId",Long.toString( activity.getActId()));
-		portletURL.setParameter("moduleId",Long.toString( activity.getModuleId()));
-		portletURL.setParameter("actionEditingActivity", StringPool.TRUE);
-		portletURL.setParameter("actionCalifications", StringPool.FALSE);
-		portletURL.setParameter("actionEditingModule", StringPool.FALSE);
-		
-		long userId = PrincipalThreadLocal.getUserId();
-		
-		if(Validator.isNotNull(userId)) {			
-			portletURL.setParameter("mvcPath", "/html/editactivity/editactivity.jsp");
-			portletURL.setParameter("editing", StringPool.TRUE);
-			portletURL.setParameter("resId",Long.toString( activity.getActId()));
-			portletURL.setParameter("resModuleId",Long.toString( activity.getModuleId())); 
+			portletURL = liferayPortletResponse.createLiferayPortletURL(plid, LMS_EDITACTIVITY_PORTLET_ID, PortletRequest.RENDER_PHASE);
+			portletURL.setWindowState(WindowState.NORMAL);
+			portletURL.setParameter("actId",Long.toString( activity.getActId()));
+			portletURL.setParameter("moduleId",Long.toString( activity.getModuleId()));
+			portletURL.setParameter("actionEditingActivity", StringPool.TRUE);
+			portletURL.setParameter("actionCalifications", StringPool.FALSE);
+			portletURL.setParameter("actionEditingModule", StringPool.FALSE);
+			
+			long userId = PrincipalThreadLocal.getUserId();
+			
+			if(Validator.isNotNull(userId)) {			
+				portletURL.setParameter("mvcPath", "/html/editactivity/editactivity.jsp");
+				portletURL.setParameter("editing", StringPool.TRUE);
+				portletURL.setParameter("resId",Long.toString( activity.getActId()));
+				portletURL.setParameter("resModuleId",Long.toString( activity.getModuleId())); 
+			}
+			
+			portletURL.setParameter("p_o_p_id",ACTIVITY_VIEWER_PORTLET_ID);
+			
+			//log.debug(" getURLEditActivity: "+portletURL);
+					
 		}
+		return portletURL;
 		
-		portletURL.setParameter("p_o_p_id",ACTIVITY_VIEWER_PORTLET_ID);
-		
-		//log.debug(" getURLEditActivity: "+portletURL);
-		
-		return portletURL;		
 	}
 	
 	public static final PortletURL getURLCreateActivity(LiferayPortletRequest liferayPortletRequest,
 			LiferayPortletResponse liferayPortletResponse, Module module) throws Exception {
+		PortletURL portletURL = null;
+		if(module!=null){
+			long plid = PortalUtil.getPlidFromPortletId(module.getGroupId(), ACTIVITY_VIEWER_PORTLET_ID);
+		     
+			log.debug("PLID: "+plid);
+			
+			if (plid == LayoutConstants.DEFAULT_PLID) {
+				throw new NoSuchLayoutException();
+			}		
 
-		long plid = PortalUtil.getPlidFromPortletId(module.getGroupId(), ACTIVITY_VIEWER_PORTLET_ID);
-	     
-		log.debug("PLID: "+plid);
-		
-		if (plid == LayoutConstants.DEFAULT_PLID) {
-			throw new NoSuchLayoutException();
-		}		
-
-		PortletURL portletURL = liferayPortletResponse.createLiferayPortletURL(plid, LMS_EDITACTIVITY_PORTLET_ID, PortletRequest.RENDER_PHASE);
-		portletURL.setWindowState(WindowState.NORMAL);
-		portletURL.setParameter("actionEditingActivity", StringPool.TRUE);			
-		portletURL.setParameter("mvcPath", "/html/lmsactivitieslist/newactivity.jsp");
-		portletURL.setParameter("resModuleId",Long.toString(module.getModuleId())); 	
-		portletURL.setParameter("actId",Long.toString(0)); 
-		portletURL.setParameter("resId",Long.toString(0)); 
-		portletURL.setParameter("p_o_p_id",ACTIVITY_VIEWER_PORTLET_ID);
-		
-		log.debug(" getURLCreateActivity: "+portletURL);
+			portletURL = liferayPortletResponse.createLiferayPortletURL(plid, LMS_EDITACTIVITY_PORTLET_ID, PortletRequest.RENDER_PHASE);
+			portletURL.setWindowState(WindowState.NORMAL);
+			portletURL.setParameter("actionEditingActivity", StringPool.TRUE);			
+			portletURL.setParameter("mvcPath", "/html/lmsactivitieslist/newactivity.jsp");
+			portletURL.setParameter("resModuleId",Long.toString(module.getModuleId())); 	
+			portletURL.setParameter("actId",Long.toString(0)); 
+			portletURL.setParameter("resId",Long.toString(0)); 
+			portletURL.setParameter("p_o_p_id",ACTIVITY_VIEWER_PORTLET_ID);
+			
+			log.debug(" getURLCreateActivity: "+portletURL);
+			
+		}
 		
 		return portletURL;		
 	}
@@ -1249,27 +1256,31 @@ public class LmsActivitiesList extends MVCPortlet {
 	public static final PortletURL getURLEditModule(LiferayPortletRequest liferayPortletRequest,
 			LiferayPortletResponse liferayPortletResponse, Module module) throws Exception {
 		
-		long plid = PortalUtil.getPlidFromPortletId(module.getGroupId(), ACTIVITY_VIEWER_PORTLET_ID);
+		PortletURL portletURL = null;
+		if(module!=null){
+			long plid = PortalUtil.getPlidFromPortletId(module.getGroupId(), ACTIVITY_VIEWER_PORTLET_ID);
 		     
-		log.debug("PLID: "+plid);
-		
-		if (plid == LayoutConstants.DEFAULT_PLID) {
-			throw new NoSuchLayoutException();
-		}
+			log.debug("PLID: "+plid);
+			
+			if (plid == LayoutConstants.DEFAULT_PLID) {
+				throw new NoSuchLayoutException();
+			}
 
-		PortletURL portletURL = liferayPortletResponse.createLiferayPortletURL(plid, LMS_EDITMODULE_PORTLET_ID, PortletRequest.RENDER_PHASE);
-		portletURL.setWindowState(WindowState.NORMAL);
-		portletURL.setParameter("actionEditingModule", StringPool.TRUE);
-		portletURL.setParameter("actionEditingActivity", StringPool.FALSE);
-		portletURL.setParameter("actionCalifications", StringPool.FALSE);
-		portletURL.setParameter("view", "editmodule");
-		portletURL.setParameter("moduleId",Long.toString(module.getModuleId()));
-		portletURL.setParameter("actId","");
-		portletURL.setParameter("resourcePrimKey",Long.toString(module.getModuleId()));		
-		portletURL.setParameter("editType","edit");		
-		portletURL.setParameter("p_o_p_id",ACTIVITY_VIEWER_PORTLET_ID);
+			portletURL = liferayPortletResponse.createLiferayPortletURL(plid, LMS_EDITMODULE_PORTLET_ID, PortletRequest.RENDER_PHASE);
+			portletURL.setWindowState(WindowState.NORMAL);
+			portletURL.setParameter("actionEditingModule", StringPool.TRUE);
+			portletURL.setParameter("actionEditingActivity", StringPool.FALSE);
+			portletURL.setParameter("actionCalifications", StringPool.FALSE);
+			portletURL.setParameter("view", "editmodule");
+			portletURL.setParameter("moduleId",Long.toString(module.getModuleId()));
+			portletURL.setParameter("actId","");
+			portletURL.setParameter("resourcePrimKey",Long.toString(module.getModuleId()));		
+			portletURL.setParameter("editType","edit");		
+			portletURL.setParameter("p_o_p_id",ACTIVITY_VIEWER_PORTLET_ID);
+			
+			//log.debug(" getURLEditModule: "+portletURL);
+		}
 		
-		//log.debug(" getURLEditModule: "+portletURL);
 		
 		return portletURL;		
 	}

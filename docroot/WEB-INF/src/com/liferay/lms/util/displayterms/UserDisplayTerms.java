@@ -19,6 +19,8 @@ public class UserDisplayTerms extends DisplayTerms{
 	public static final String SCREEN_NAME = "screenName";
 
 	public static final String STATUS = "status";
+	
+	public static final String KEYWORDS = "keywords";
 
 	public static final String TEAM = "team";
 	
@@ -35,6 +37,7 @@ public class UserDisplayTerms extends DisplayTerms{
 		firstName = ParamUtil.getString(portletRequest, FIRST_NAME);
 		lastName = ParamUtil.getString(portletRequest, LAST_NAME);
 		screenName = ParamUtil.getString(portletRequest, SCREEN_NAME);
+		keywords = ParamUtil.getString(portletRequest, KEYWORDS);
 	}
 
 	public String getEmailAddress() {
@@ -57,6 +60,11 @@ public class UserDisplayTerms extends DisplayTerms{
 		return status;
 	}
 
+	public String getKeywords() {
+		return keywords;
+	}
+
+	
 	public long getTeamId() {
 		return teamId;
 	}
@@ -98,11 +106,15 @@ public class UserDisplayTerms extends DisplayTerms{
 		return TEAM;
 	}
 
+	public static String getKEYWORDS(){
+		return KEYWORDS;
+	}
 
 	protected String emailAddress;
 	protected String firstName;
 	protected String lastName;
 	protected String screenName;
+	protected String keywords;
 	protected int status;
 	protected long teamId;
 }

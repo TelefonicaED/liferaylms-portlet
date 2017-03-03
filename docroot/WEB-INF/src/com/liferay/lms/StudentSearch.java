@@ -26,6 +26,7 @@ import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.model.Team;
 import com.liferay.portal.service.TeamLocalServiceUtil;
 import com.liferay.portal.theme.ThemeDisplay;
+import com.liferay.portal.util.comparator.UserLastNameComparator;
 import com.liferay.util.bridges.mvc.MVCPortlet;
 
 /**
@@ -92,32 +93,33 @@ public class StudentSearch extends MVCPortlet {
 				
 			}
 			
-			
-			
-			if(log.isDebugEnabled()){
-				log.debug("NAME "+ParamUtil.getString(renderRequest, "firstName"));
-				
-			}
-			
 			if(course!=null){
 				try {
 					if(displayTerms.isAdvancedSearch()){		
-						userSearchContainer.setResults(CourseLocalServiceUtil.getStudentsFromCourse(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(), 
+						/*userSearchContainer.setResults(CourseLocalServiceUtil.getStudentsFromCourse(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(), 
 										userSearchContainer.getStart(), userSearchContainer.getEnd(), teamId, displayTerms.getFirstName(),  
 										displayTerms.getLastName(), displayTerms.getScreenName(), displayTerms.getEmailAddress(), displayTerms.isAndOperator()));
-						
+						*/
+						userSearchContainer.setResults(CourseLocalServiceUtil.getStudents(course.getCourseId(), course.getCompanyId(), 
+								displayTerms.getScreenName(), displayTerms.getFirstName(), displayTerms.getLastName(), 
+								displayTerms.getEmailAddress(), displayTerms.isAndOperator(), userSearchContainer.getStart(), 
+								userSearchContainer.getEnd(),  new UserLastNameComparator(true))); 
 						userSearchContainer.setTotal(CourseLocalServiceUtil.getStudentsFromCourseCount(course.getCourseId(), teamId, displayTerms.getFirstName(), 
 													displayTerms.getLastName(), displayTerms.getScreenName(), 
 													displayTerms.getEmailAddress(), displayTerms.isAndOperator()));
 						
 					}else{
-						userSearchContainer.setResults(CourseLocalServiceUtil.getStudentsFromCourse(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(), 
+						/*userSearchContainer.setResults(CourseLocalServiceUtil.getStudentsFromCourse(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(), 
 								userSearchContainer.getStart(), userSearchContainer.getEnd(), teamId, displayTerms.getKeywords(),  
-								displayTerms.getKeywords(), displayTerms.getKeywords(), displayTerms.getKeywords(), true));
+								displayTerms.getKeywords(), displayTerms.getKeywords(), displayTerms.getKeywords(), false));*/
+						
+						userSearchContainer.setResults(CourseLocalServiceUtil.getStudents(course.getCourseId(), course.getCompanyId(), 
+								displayTerms.getKeywords(), displayTerms.getKeywords(), displayTerms.getKeywords(), displayTerms.getKeywords(), false, 
+								userSearchContainer.getStart(), userSearchContainer.getEnd(), new UserLastNameComparator(true)));
 				
 						userSearchContainer.setTotal(CourseLocalServiceUtil.getStudentsFromCourseCount(course.getCourseId(), teamId, 
 											displayTerms.getKeywords(), displayTerms.getKeywords(), displayTerms.getKeywords(), 
-											displayTerms.getKeywords(), true));
+											displayTerms.getKeywords(), false));
 					}
 
 				} catch (SystemException e) {

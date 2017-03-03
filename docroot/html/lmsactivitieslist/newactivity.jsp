@@ -33,37 +33,38 @@ AUI().ready(
 	for(LearningActivityType learningActivityType:learningActivityTypeRegistry.getLearningActivityTypesForCreating())
 	{
 		if(learningActivityType != null && !ArrayUtil.contains(invisibleTypes, learningActivityType.getTypeId()) && 
-				(course==null && learningActivityType.allowsBank() || course!=null ) ){
+				((course==null && learningActivityType.allowsBank()) || course!=null ) ){
 			
 			if(learningActivityType.getTypeId()==9||learningActivityType.getTypeId()==2||learningActivityType.getTypeId()==7){
 
-%>	
-	<liferay-portlet:renderURL var="newactivityURL">
-		<liferay-portlet:param name="editing" value="<%=StringPool.TRUE %>" />
-		<liferay-portlet:param name="resId" value="0" />
-		<liferay-portlet:param name="resModuleId" value="<%=ParamUtil.getString(renderRequest, \"resModuleId\") %>" />
-		<liferay-portlet:param name="type" value="<%=Long.toString(learningActivityType.getTypeId()) %>" />
-	</liferay-portlet:renderURL>
-	
-	<liferay-util:buffer var="activityMessage">
-	    <%=LanguageUtil.get(themeDisplay.getLocale(), learningActivityType.getName()) %>
-	    <span class="activity-help">
-			<liferay-ui:icon-help message="<%=learningActivityType.getDescription() %>"  />
-		</span>
-	</liferay-util:buffer>
-
-	<li class="activity_<%=learningActivityType.getTypeId()%>">
-		<liferay-ui:icon image="add" label="<%=true%>" message="<%=activityMessage %>" url="<%=newactivityURL%>" cssClass="activity-icon" />
-	</li>
-<%
-		}
+				%>	
+					<liferay-portlet:renderURL var="newactivityURL">
+						<liferay-portlet:param name="editing" value="<%=StringPool.TRUE %>" />
+						<liferay-portlet:param name="resId" value="0" />
+						<liferay-portlet:param name="resModuleId" value="<%=ParamUtil.getString(renderRequest, \"resModuleId\") %>" />
+						<liferay-portlet:param name="type" value="<%=Long.toString(learningActivityType.getTypeId()) %>" />
+					</liferay-portlet:renderURL>
+					
+					<liferay-util:buffer var="activityMessage">
+					    <%=LanguageUtil.get(themeDisplay.getLocale(), learningActivityType.getName()) %>
+					    <span class="activity-help">
+							<liferay-ui:icon-help message="<%=learningActivityType.getDescription() %>"  />
+						</span>
+					</liferay-util:buffer>
+				
+					<li class="activity_<%=learningActivityType.getTypeId()%>">
+						<liferay-ui:icon image="add" label="<%=true%>" message="<%=activityMessage %>" url="<%=newactivityURL%>" cssClass="activity-icon" />
+					</li>
+				<%
+						}
 			}
 	}%>
 	
 	<span class="separacion"></span><h1><liferay-ui:message key="activities"></liferay-ui:message> </h1>
 	<%for(LearningActivityType learningActivityType:learningActivityTypeRegistry.getLearningActivityTypesForCreating())
 	{
-		if(learningActivityType != null && !ArrayUtil.contains(invisibleTypes, learningActivityType.getTypeId())) {
+		if(learningActivityType != null && !ArrayUtil.contains(invisibleTypes, learningActivityType.getTypeId())
+				&& (course==null && learningActivityType.allowsBank() || course!=null )) {
 			
 			if(learningActivityType.getTypeId()!=9 && learningActivityType.getTypeId()!=2&&learningActivityType.getTypeId()!=7){
 

@@ -35,7 +35,12 @@
 
 	LiferayPortletURL backUrl = PortletURLFactoryUtil.create(request, PortalUtil.getJsSafePortletId("editactivity"+
 				PortletConstants.WAR_SEPARATOR+portletConfig.getPortletContext().getPortletContextName()), themeDisplay.getPlid(), PortletRequest.RENDER_PHASE);
-	backUrl.setWindowState(LiferayWindowState.NORMAL);
+	
+	if(learningActivity.getModuleId()>0){
+		backUrl.setWindowState(LiferayWindowState.NORMAL);
+	}else{
+		backUrl.setWindowState(LiferayWindowState.POP_UP);
+	}
 	backUrl.setParameter("actId", String.valueOf(learningActivity.getActId()));
 	backUrl.setParameter("actionEditingActivity", StringPool.TRUE);
 	backUrl.setParameter("resId", String.valueOf(learningActivity.getActId()));	
@@ -65,8 +70,13 @@ Liferay.provide(
         window,
         '<portlet:namespace />newQuestion',
         function(typeId) {
-			var renderUrl = Liferay.PortletURL.createRenderURL();							
-			renderUrl.setWindowState('<%= LiferayWindowState.NORMAL.toString() %>');
+			var renderUrl = Liferay.PortletURL.createRenderURL();	
+			<% if(learningActivity.getModuleId()>0){ %>
+				renderUrl.setWindowState('<%= LiferayWindowState.NORMAL.toString() %>');
+			<% }else{ %>
+				renderUrl.setWindowState('<%= LiferayWindowState.POP_UP.toString() %>');
+			<% } %>
+			
 			renderUrl.setPortletId('<%=themeDisplay.getPortletDisplay().getId()%>');
 			renderUrl.setParameter('jspPage','/html/execactivity/test/admin/editQuestion.jsp');
 			renderUrl.setParameter('typeId', typeId);

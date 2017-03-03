@@ -192,7 +192,11 @@ if(learnact!=null)
 				PortletURL urlEditDetails = assetRenderer.getURLEdit(liferayPortletRequest, liferayPortletResponse);
 
 				if(Validator.isNotNull(urlEditDetails)){
-					urlEditDetails.setWindowState(LiferayWindowState.NORMAL);
+					if(learnact.getModuleId()>0){
+						urlEditDetails.setWindowState(LiferayWindowState.NORMAL);	
+					}else{
+						urlEditDetails.setWindowState(LiferayWindowState.POP_UP);
+					}
 					String urlEdit = urlEditDetails.toString();
 					Portlet urlEditPortlet = PortletLocalServiceUtil.getPortletById(HttpUtil.getParameter(urlEdit, "p_p_id",false));
 					
