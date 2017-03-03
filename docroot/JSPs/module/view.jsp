@@ -55,6 +55,7 @@
 	        ['aui-dialog','aui-dialog-iframe']
 	    );
 	
+	
 	AUI().ready('event', 'node','aui-base','aui-dialog','aui-dialog-iframe','anim','json',function(A) {
 		
 		A.one(window).on('message', 

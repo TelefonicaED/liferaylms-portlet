@@ -21,6 +21,8 @@ import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityLocalServiceUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.servlet.SessionMessages;
@@ -33,6 +35,7 @@ import com.liferay.util.bridges.mvc.MVCPortlet;
 
 public class ActivityNavigatorPortlet extends MVCPortlet {
 	
+	private static Log log = LogFactoryUtil.getLog(ActivityNavigatorPortlet.class);
 	private String viewJSP = null;
 	
 	public void init() throws PortletException {	
@@ -58,9 +61,19 @@ public class ActivityNavigatorPortlet extends MVCPortlet {
 	public void doView(RenderRequest renderRequest, RenderResponse renderResponse) throws IOException, PortletException {
 		
 		ThemeDisplay themeDisplay = (ThemeDisplay)renderRequest.getAttribute(WebKeys.THEME_DISPLAY);
+		boolean actionEditingDetails = ParamUtil.getBoolean(renderRequest, "actionEditingDetails", false);
+		boolean actionEditingActivity = ParamUtil.getBoolean(renderRequest, "actionEditingActivity", false);
+		boolean actionEditingModule = ParamUtil.getBoolean(renderRequest, "actionEditingModule", false);
+		boolean actionCalifications = ParamUtil.getBoolean(renderRequest, "actionCalifications", false);
+		
+		log.debug("actionEditingDetails:"+actionEditingDetails);
+		log.debug("actionEditingActivity:"+actionEditingActivity);
+		log.debug("actionEditingModule:"+actionEditingModule);
+		log.debug("actionCalifications:"+actionCalifications);
 		
 		//Cuando no tenemos actividad ni modulo, ocultamos el portlet.
-		if(ParamUtil.getLong(renderRequest, "actId", 0) == 0 && ParamUtil.getLong(renderRequest, "moduleId", 0) == 0){
+		if( (ParamUtil.getLong(renderRequest, "actId", 0) == 0 && ParamUtil.getLong(renderRequest, "moduleId", 0) == 0)
+				|| actionEditingDetails || actionEditingActivity || actionEditingModule || actionCalifications){
 			renderRequest.setAttribute(WebKeys.PORTLET_CONFIGURATOR_VISIBILITY, Boolean.FALSE);
 		}
 				
@@ -72,8 +85,8 @@ public class ActivityNavigatorPortlet extends MVCPortlet {
 			long moduleId = ParamUtil.getLong(renderRequest,"moduleId",0);
 			long actId = ParamUtil.getLong(renderRequest,"actId",0);
 			
-			//Comprobamos la primera opciÃ³n: seleccionado un mÃ³dulo
-			//Debemos tener en cuenta tambiÃ©n los bloqueos
+			//Comprobamos la primera opción: seleccionado un módulo
+			//Debemos tener en cuenta también los bloqueos
 			if(moduleId != 0 && actId == 0){
 				
 				boolean foundActivity = false;

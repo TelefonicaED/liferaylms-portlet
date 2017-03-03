@@ -22,6 +22,14 @@
 
 <%@ include file="/init.jsp" %>
 <%
+
+
+Boolean isLinkTabletOnlineGrade = ParamUtil.getBoolean(request, "isTablet", false);
+String cssLinkTabletClassOnlineGrade="";
+if(isLinkTabletOnlineGrade){
+	cssLinkTabletClassOnlineGrade="tablet-link";
+}
+
 LearningActivityTry lATry = null;
 LearningActivityResult result = null;
 boolean ownGrade=false;
@@ -85,6 +93,7 @@ if(lATry!=null){
 if(renderRequest.getParameter("studentId")!=null){
 	
 	SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+	dateFormat.setTimeZone(timeZone);
 	String dateFormated = (result.getEndDate()!=null)? " ( "+dateFormat.format(result.getEndDate())+" )":"";
 %>
  <aui:a href="" label="<%= UserLocalServiceUtil.getUserById(ParamUtil.getLong(renderRequest, \"studentId\")).getFullName() + dateFormated   %>"></aui:a>
@@ -92,6 +101,7 @@ if(renderRequest.getParameter("studentId")!=null){
 }else{
 	if (lATry != null){
 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+		dateFormat.setTimeZone(timeZone);
 		String dateFormated = (lATry.getStartDate()!=null)? " ( "+dateFormat.format(lATry.getStartDate())+" )":"";
 %>
 	<p class="label"><liferay-ui:message key="onlinetaskactivity.export.date"/>: <%=dateFormated %> </p>
@@ -117,7 +127,7 @@ if(renderRequest.getParameter("studentId")!=null){
 	<p class="label"><liferay-ui:message key="onlinetaskactivity.grades.attach"/></p>
 	<div class="doc_descarga">
 		<span><%=titleFile+"&nbsp;("+ sizeKbFile +"Kb)&nbsp;"%></span>
-		<a href="<%=urlFile%>" class="verMas" target="_blank"><liferay-ui:message key="onlinetaskactivity.grades.download"/></a>
+		<a href="<%=urlFile%>" class="verMas <%=cssLinkTabletClassOnlineGrade %>" target="_blank"><liferay-ui:message key="onlinetaskactivity.grades.download"/></a>
 	</div>
 <% } 
 

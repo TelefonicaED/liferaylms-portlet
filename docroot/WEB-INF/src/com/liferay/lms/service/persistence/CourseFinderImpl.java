@@ -473,6 +473,10 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 				sql = sql.replace("[$ORDERBY$]", "u.lastName, u.firstName, u.middleName ");
 			}
 			
+			if(start >= 0 && end >= 0){
+				sql += " LIMIT " + start + ", " + (end-start);
+			}
+			
 			if(log.isDebugEnabled()) log.debug("sql: " + sql);
 			
 			SQLQuery q = session.createSQLQuery(sql);
@@ -514,8 +518,6 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 				log.debug("emailAddress: " + emailAddress);	
 			}
 			
-			qPos.add(start);
-			qPos.add((end-start));
 			
 			List<User> listUsers = (List<User>) q.list();
 			return listUsers;
@@ -529,7 +531,7 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 	    return new ArrayList<User>();
 	}
 	
-	public int countStudents(long courseId, long companyId, String screenName, String firstName, String lastName, String emailAddress,boolean andOperator){
+	public int countStudents(long courseId, long companyId, String screenName, String firstName, String lastName, String emailAddress, int status,boolean andOperator){
 		Session session = null;
 		boolean whereClause = false;
 		try{
@@ -599,7 +601,9 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			qPos.add(teacherRoleId);
 			qPos.add(editorRoleId);
 			qPos.add(courseId);
-			qPos.add(WorkflowConstants.STATUS_APPROVED);
+			qPos.add(status);
+			qPos.add(status);
+			qPos.add(WorkflowConstants.STATUS_ANY);
 			
 			if(Validator.isNotNull(screenName)){
 				qPos.add(screenName);
@@ -1106,7 +1110,8 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			Object[] myCourse = null;
 			CourseResultView courseResultView = null;
 			CourseView courseView = null;
-			
+			long result = 0;
+			int statusUser = 0;
 			while (itr.hasNext()) {
 				myCourse = itr.next();
 
@@ -1124,7 +1129,9 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 					}	
 				}
 				courseView.setUrl(themeDisplay.getPortalURL()+"/"+themeDisplay.getLocale().getLanguage()+"/web" + (String)myCourse[7]);
-				courseResultView = new CourseResultView(courseView, ((BigInteger)myCourse[4]).longValue(), (Integer)myCourse[3]);
+				result = ((BigInteger)myCourse[4]).longValue();
+				statusUser = Integer.parseInt((String)myCourse[3]);
+				courseResultView = new CourseResultView(courseView, result, statusUser);
 				
 				listMyCourses.add(courseResultView);
 			}

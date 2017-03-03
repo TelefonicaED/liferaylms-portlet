@@ -19,6 +19,8 @@
 
 <%@ include file="/init.jsp" %>	
 
+<liferay-ui:error key="error-learning-activity-type" message="course-admin.error-learning-activity-type" />
+
 <%
 	String groupId = request.getParameter("groupId");
 	Course course = CourseLocalServiceUtil.getCourseByGroupCreatedId(Long.parseLong(groupId));
@@ -31,6 +33,7 @@
 </portlet:actionURL>
 	
 <aui:form name="form" action="<%=importURL%>" method="post" enctype="multipart/form-data">
+	
 	
 	<liferay-ui:error exception="<%= LARFileException.class %>" message="please-specify-a-lar-file-to-import" />
 	<liferay-ui:error exception="<%= LARTypeException.class %>" message="please-import-a-lar-file-of-the-correct-type" />

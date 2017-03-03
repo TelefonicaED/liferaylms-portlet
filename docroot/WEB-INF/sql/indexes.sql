@@ -33,7 +33,15 @@ create unique index IX_4AF8B71 on Lms_CourseCompetence (courseId, competenceId, 
 create index IX_17104179 on Lms_CourseCompetence (courseId, condition_);
 create index IX_F3F3D23D on Lms_CourseCompetence (uuid_);
 
+create index IX_8C107135 on Lms_CourseResult (courseId);
 create index IX_E5606419 on Lms_CourseResult (courseId, passed);
+create index IX_BF5FDCB on Lms_CourseResult (courseId, passed, passedDate);
+create index IX_A4AA5B05 on Lms_CourseResult (courseId, passed, passedDate, userId);
+create index IX_E5289353 on Lms_CourseResult (courseId, passed, userId);
+create index IX_E84F40E7 on Lms_CourseResult (courseId, passedDate);
+create index IX_388CC221 on Lms_CourseResult (courseId, passedDate, userId);
+create index IX_B4BB8BC5 on Lms_CourseResult (courseId, startDate, userId);
+create index IX_8CF7C46F on Lms_CourseResult (courseId, userId);
 create index IX_583EFC25 on Lms_CourseResult (userId);
 create unique index IX_3F29EDEF on Lms_CourseResult (userId, courseId);
 
@@ -50,8 +58,10 @@ create unique index IX_75B864D6 on Lms_LearningActivity (uuid_, groupId);
 create index IX_4AEF2D40 on Lms_LearningActivityResult (actId);
 create index IX_86B3E524 on Lms_LearningActivityResult (actId, passed);
 create index IX_9F67B375 on Lms_LearningActivityResult (actId, passed, endDate);
-create unique index IX_2E4B457A on Lms_LearningActivityResult (actId, userId);
+create index IX_5E5BD95E on Lms_LearningActivityResult (actId, passed, userId);
+create index IX_2E4B457A on Lms_LearningActivityResult (actId, userId);
 create index IX_678F5817 on Lms_LearningActivityResult (userId);
+create unique index IX_8F7CCC6 on Lms_LearningActivityResult (userId, actId);
 create index IX_8B143A37 on Lms_LearningActivityResult (uuid_);
 
 create index IX_6C40B616 on Lms_LearningActivityTry (actId);
@@ -67,6 +77,12 @@ create unique index IX_B29B7175 on Lms_Module (uuid_, groupId);
 
 create index IX_7D47DB17 on Lms_ModuleResult (moduleId);
 create index IX_A588CBFB on Lms_ModuleResult (moduleId, passed);
+create index IX_1767A2AD on Lms_ModuleResult (moduleId, passed, passedDate);
+create index IX_6AA1FDE7 on Lms_ModuleResult (moduleId, passed, passedDate, userId);
+create index IX_6A63F935 on Lms_ModuleResult (moduleId, passed, userId);
+create index IX_C5CE7C9 on Lms_ModuleResult (moduleId, passedDate);
+create index IX_43FE6703 on Lms_ModuleResult (moduleId, passedDate, userId);
+create index IX_4D202C51 on Lms_ModuleResult (moduleId, userId);
 create index IX_40BB0076 on Lms_ModuleResult (userId);
 create unique index IX_A378B6D1 on Lms_ModuleResult (userId, moduleId);
 
@@ -77,6 +93,7 @@ create index IX_E73266FE on Lms_P2pActivity (uuid_);
 
 create index IX_70AAED8C on Lms_P2pActivityCorrections (actId, userId);
 create index IX_599E425D on Lms_P2pActivityCorrections (p2pActivityId);
+create index IX_85BFE7C0 on Lms_P2pActivityCorrections (p2pActivityId, actId);
 create index IX_86D5ED97 on Lms_P2pActivityCorrections (p2pActivityId, userId);
 create index IX_C0C0C045 on Lms_P2pActivityCorrections (userId);
 create index IX_331E1449 on Lms_P2pActivityCorrections (uuid_);

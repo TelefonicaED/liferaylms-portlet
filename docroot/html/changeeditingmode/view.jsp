@@ -15,6 +15,12 @@ if (!themeDisplay.getPermissionChecker().hasPermission(themeDisplay.getScopeGrou
 
 	<liferay-portlet:renderURL var="changeEditingMode">
 		<liferay-portlet:param name="actionEditing" value="<%=Boolean.toString(!actionEditing)%>"/>
+		<%if(actionEditing){ %>
+			<liferay-portlet:param name="actionEditingActivity" value="<%=StringPool.FALSE%>"/>
+			<liferay-portlet:param name="actionEditingDetails" value="<%=StringPool.FALSE%>"/>
+			<liferay-portlet:param name="actionEditingModule" value="<%=StringPool.FALSE%>"/>
+			<liferay-portlet:param name="actionCalifications" value="<%=StringPool.FALSE%>"/>
+		<%}%>
 	</liferay-portlet:renderURL>
 	
 	<% String redirect="self.location='"+changeEditingMode.toString()+"'"; %>

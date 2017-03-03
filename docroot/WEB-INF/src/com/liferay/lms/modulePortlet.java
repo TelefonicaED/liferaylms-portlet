@@ -37,7 +37,6 @@ import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityServiceUtil;
 import com.liferay.lms.service.ModuleLocalServiceUtil;
-import com.liferay.portal.kernel.xml.DocumentException;
 import com.liferay.portal.kernel.cache.MultiVMPoolUtil;
 import com.liferay.portal.kernel.exception.NestableException;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -62,6 +61,7 @@ import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.portal.kernel.xml.DocumentException;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceContextFactory;
@@ -123,11 +123,9 @@ public class modulePortlet extends MVCPortlet {
 		}
 	}
 
-
 	public void doView(RenderRequest renderRequest,
 			RenderResponse renderResponse) throws IOException, PortletException {
 		ThemeDisplay themeDisplay = (ThemeDisplay) renderRequest.getAttribute(WebKeys.THEME_DISPLAY);
-
 
 		if(renderRequest.getWindowState().equals(LiferayWindowState.POP_UP)){
 			String popUpAction = ParamUtil.getString(renderRequest, "popUpAction");
@@ -172,8 +170,6 @@ public class modulePortlet extends MVCPortlet {
 			}
 		}
 	}
-
-
 	public void doEdit(RenderRequest renderRequest,
 			RenderResponse renderResponse) throws IOException, PortletException {
 
@@ -235,7 +231,7 @@ public class modulePortlet extends MVCPortlet {
 	public void showViewEditmodule(RenderRequest renderRequest, RenderResponse renderResponse) throws Exception {
 
 		log.debug("-------showViewEditmodule----------"+renderResponse.getNamespace());
-
+		
 		boolean isPopUp = renderRequest.getWindowState().equals(LiferayWindowState.POP_UP);
 
 		ThemeDisplay themeDisplay = (ThemeDisplay)renderRequest.getAttribute(
@@ -258,14 +254,14 @@ public class modulePortlet extends MVCPortlet {
 		if(isPopUp){
 			editmoduleURL = liferayPortletResponse.createRenderURL();
 			editmoduleURL.setParameter("view", "editmodule");
-		}else {
+		}else{
 			editmoduleURL = liferayPortletResponse.createActionURL();
 		}
 		//editmoduleURL.setWindowState(LiferayWindowState.POP_UP);
 
 		String editType = ParamUtil.getString(renderRequest, "editType",(String)renderRequest.getAttribute("editType"));
-
 		if ("edit".equalsIgnoreCase(editType)) {
+			
 			if(isPopUp){
 				editmoduleURL.setParameter("popUpAction", "updatemodule");
 			}else{
@@ -280,8 +276,9 @@ public class modulePortlet extends MVCPortlet {
 			}
 
 			log.debug("*******moduleId:"+moduleId);
-
+			
 			Module module = ModuleLocalServiceUtil.getModule(moduleId);
+			//System.out.println("Paso por aqui: "+moduleId);
 			String title = module.getTitle();
 			long allowedTime = module.getAllowedTime();	
 			long hourDuration = allowedTime / 3600000;
@@ -293,15 +290,15 @@ public class modulePortlet extends MVCPortlet {
 			renderRequest.setAttribute("ordern", order);
 			String icon = module.getIcon()+"";
 			renderRequest.setAttribute("icon", icon);
-
+			
 			if(module.getStartDate()==null){
 				module.setStartDate(new java.util.Date(System.currentTimeMillis()));
 			}
-
+			
 			if(module.getEndDate()==null){
 				module.setEndDate(new java.util.Date(System.currentTimeMillis()+1000*84000*365));
 			}
-
+			
 			renderRequest.setAttribute("startDateDia", formatDia.format(module.getStartDate()));
 			renderRequest.setAttribute("startDateMes", formatMes.format(module.getStartDate()));
 			renderRequest.setAttribute("startDateAno", formatAno.format(module.getStartDate()));
@@ -316,15 +313,13 @@ public class modulePortlet extends MVCPortlet {
 			renderRequest.setAttribute("endDateMinuto", formatMinuto.format(module.getEndDate()));
 			renderRequest.setAttribute("allowedDateHora",Long.toString(hourDuration));
 			renderRequest.setAttribute("allowedDateMinuto",Long.toString(minuteDuration) );
-
 			String endDate = dateToJsp(renderRequest, module.getEndDate());
 			renderRequest.setAttribute("endDate", endDate);
 			renderRequest.setAttribute("module", module);
 		} else {
 			if(isPopUp){
 				editmoduleURL.setParameter("popUpAction", "addmodule");
-			}
-			else{
+			}else{
 				editmoduleURL.setParameter("javax.portlet.action", "addmodule");
 			}
 			Module errormodule = (Module) renderRequest.getAttribute("errormodule");
@@ -396,9 +391,9 @@ public class modulePortlet extends MVCPortlet {
 
 		renderRequest.setAttribute("editmoduleURL", editmoduleURL.toString());
 		renderRequest.setAttribute("showicon", ("false".equals(PropsUtil.get("module.show.icon")))?false:true);
-
+		
 		log.debug("-------FIN showViewEditmodule----------"+renderResponse.getNamespace());
-
+		
 		include(editmoduleJSP, renderRequest, renderResponse);
 
 	}
@@ -436,7 +431,9 @@ public class modulePortlet extends MVCPortlet {
 
 	@ProcessAction(name = "addmodule")
 	public void addmodule(ActionRequest request, ActionResponse response) throws Exception {
+
 		log.debug("**********addmodule***********");
+		
 		Module module = moduleFromRequest(request);
 		ArrayList<String> errors = moduleValidator.validatemodule(module, request);
 		ThemeDisplay themeDisplay = (ThemeDisplay) request
@@ -449,7 +446,7 @@ public class modulePortlet extends MVCPortlet {
 				//module.setExpandoBridgeAttributes(serviceContext);
 				Module modcreated = ModuleLocalServiceUtil.addmodule(module);
 
-				//response.setRenderParameter("view", "");				
+				//response.setRenderParameter("view", "");
 				response.setRenderParameter("editType","edit");	
 				response.setRenderParameter("view","editmodule");
 				response.setRenderParameter("editType", "edit");
@@ -482,12 +479,14 @@ public class modulePortlet extends MVCPortlet {
 			response.setRenderParameter("startDate", module.getStartDate()+"");
 			response.setRenderParameter("endDate", module.getEndDate()+"");
 		}
-				
+		
 		log.debug("**********FIN addmodule***********");
 	}
 
 	private void addmodulePopUp(RenderRequest request, RenderResponse response) throws IOException, PortalException, SystemException  {
 		log.debug("addmodulePopUp");
+		//ServiceContext serviceContext = ServiceContextFactory.getInstance( Module.class.getName(), request);
+
 		Module module = moduleFromRequest(request);
 		ArrayList<String> errors = moduleValidator.validatemodule(module, request);
 		ThemeDisplay themeDisplay = (ThemeDisplay) request
@@ -584,6 +583,7 @@ public class modulePortlet extends MVCPortlet {
 	}
 
 	private void editmodulePopUp(RenderRequest request, RenderResponse renderResponse) {
+		//System.out.println("editmodulePopUp");
 		long key = ParamUtil.getLong(request, "resourcePrimKey");
 		if (Validator.isNotNull(key)) {
 			request.setAttribute("moduleId",key);
@@ -628,12 +628,12 @@ public class modulePortlet extends MVCPortlet {
 	}
 
 
-
 	@ProcessAction(name = "updatemodule")
 	public void updatemodule(ActionRequest request, ActionResponse response) throws Exception {
 		
 		log.debug("**********updatemodule***********");
 		
+		//System.out.println("dentro de updatemodule");
 		Module module = moduleFromRequest(request);
 		ArrayList<String> errors = moduleValidator.validatemodule(module, request);
 		ThemeDisplay themeDisplay = (ThemeDisplay) request
@@ -672,7 +672,7 @@ public class modulePortlet extends MVCPortlet {
 			response.setRenderParameter("startDate", module.getStartDate()+"");
 			response.setRenderParameter("endDate", module.getEndDate()+"");
 		}
-
+		
 		response.setRenderParameter("editType","edit");	
 		response.setRenderParameter("view","editmodule");
 		response.setRenderParameter("editType", "edit");
@@ -872,6 +872,7 @@ public class modulePortlet extends MVCPortlet {
 			}
 			module.setIcon(0);
 		}
+
 		updateActivitiesDates( module);
 		return module;
 	}

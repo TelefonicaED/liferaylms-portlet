@@ -34,7 +34,7 @@ import java.util.Map;
 import org.xml.sax.InputSource;
 
 import com.liferay.lms.NoSuchLearningActivityResultException;
-import com.liferay.lms.auditing.AuditConstants;
+import com.tls.AuditConstants;
 import com.liferay.lms.auditing.AuditingLogFactory;
 import com.liferay.lms.learningactivity.calificationtype.CalificationType;
 import com.liferay.lms.learningactivity.calificationtype.CalificationTypeRegistry;
@@ -54,10 +54,8 @@ import com.liferay.lms.service.ModuleLocalServiceUtil;
 import com.liferay.lms.service.ModuleResultLocalServiceUtil;
 import com.liferay.lms.service.SCORMContentLocalServiceUtil;
 import com.liferay.lms.service.base.LearningActivityResultLocalServiceBaseImpl;
-import com.liferay.lms.service.persistence.LearningActivityResultFinder;
 import com.liferay.lms.service.persistence.LearningActivityResultFinderUtil;
 import com.liferay.lms.service.persistence.LearningActivityResultUtil;
-import com.liferay.lms.service.persistence.LearningActivityUtil;
 import com.liferay.portal.kernel.bean.PortletBeanLocatorUtil;
 import com.liferay.portal.kernel.dao.orm.Criterion;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
@@ -134,7 +132,7 @@ public class LearningActivityResultLocalServiceImpl	extends LearningActivityResu
 			}
 		}
 		if(recalculateActivity){
-			learningActivityResultPersistence.update(learningActivityResult, true);
+			learningActivityResultPersistence.update(learningActivityResult, false);
 			moduleResultLocalService.update(learningActivityResult);
 		}		
 
@@ -947,51 +945,105 @@ public class LearningActivityResultLocalServiceImpl	extends LearningActivityResu
 		
 	}
 	
-	@Deprecated
-	public long countPassedOnlyStudents(long actId, long companyId, long courseGropupCreatedId, boolean passed) throws SystemException{
-		return countPassedOnlyStudents(actId, companyId, courseGropupCreatedId, passed, null,0);
-	}
-
-	@Deprecated
-	public long countPassedOnlyStudents(long actId, long companyId, long courseGropupCreatedId, boolean passed, List<User> _students) throws SystemException{
-		return countPassedOnlyStudents(actId, companyId, courseGropupCreatedId, passed, _students, 0);
-	}
-
-	public long countPassedOnlyStudents(long actId, long companyId, long courseGropupCreatedId, boolean passed, List<User> _students, long teamId) throws SystemException{
+	/**
+	 * Devuelve el número de estudiantes que han pasado una actividad (en caso de passed = true) o lo que han suspendido o la tienen en curos (en caso de passed = false)
+	 * @param actId id de la actividad
+	 * @param companyId id de la company de la actividad
+	 * @param courseGroupCreatedId id del group del curso
+	 * @param passed si se quieren los aprobados o no
+	 * @return número de estudiantes que han pasado la actividad o los que han suspendido + los que la tienen no la han finalizado
+	 * @throws SystemException
+	 */
+	public long countPassedOnlyStudents(long actId, long companyId, long courseGroupCreatedId, boolean passed) throws SystemException{
+		Course course = CourseLocalServiceUtil.getCourseByGroupCreatedId(courseGroupCreatedId);
+		long[] userExcludedIds = CourseLocalServiceUtil.getTeachersAndEditorsIdsFromCourse(course);
 		
-		return LearningActivityResultFinderUtil.countPassedOnlyStudents(actId, companyId, courseGropupCreatedId, _students, passed, teamId);
-
-	}
-	
-	public long countNotPassed(long actId) throws SystemException
-	{
-		ClassLoader classLoader = (ClassLoader) PortletBeanLocatorUtil.locate(ClpSerializer.getServletContextName(), "portletClassLoader"); 
-		DynamicQuery dq=DynamicQueryFactoryUtil.forClass(LearningActivityResult.class, classLoader);
-		Criterion criterion=PropertyFactoryUtil.forName("passed").eq(false);
-		dq.add(criterion);
-		criterion=PropertyFactoryUtil.forName("actId").eq(actId);
-		dq.add(criterion);
-		criterion=PropertyFactoryUtil.forName("endDate").isNotNull();
-		dq.add(criterion);
-		return learningActivityResultPersistence.countWithDynamicQuery(dq);
+		if(passed)
+			return countStudentsByActIdUserExcludedIdsPassed(actId, userExcludedIds);
+		else
+			return countStudentsByActIdUserExcludedIdsFailed(actId, userExcludedIds);
 	}
 
-    @Deprecated
-	public long countNotPassedOnlyStudents(long actId, long companyId, long courseGropupCreatedId) throws SystemException{
-		return countNotPassedOnlyStudents(actId, companyId, courseGropupCreatedId, null,0); 
+	/**
+	 * @deprecated SE RECOMIENDA NO USAR ESTE MÉTODO, SE RECOMIENDA USAR: countPassedOnlyStudents(long actId, long companyId, long courseGroupCreatedId, boolean passed)
+	 * o countPassedOnlyStudents(long actId, boolean passed, long[] userExcludedIds)
+	 * @param actId id de la actividad
+	 * @param companyId id de la company de la actividad
+	 * @param courseGroupCreatedId id del group del curso
+	 * @param passed si se quieren los aprobados o no
+	 * @param lista de estudiantes, si viene vacía se calculan dentro
+	 * @return número de estudiantes que han pasado la actividad o los que han suspendido + los que la tienen no la han finalizado
+	 */
+	public long countPassedOnlyStudents(long actId, long companyId, long courseGropupCreatedId, boolean passed, List<User> _students) throws SystemException{
+		List<User> students = null;
+		// Se prepara el metodo para recibir un Listado de estudiantes especificos,, por ejemplo que pertenezcan a alguna organizacion. Sino, se trabaja con todos los estudiantes del curso.
+		if(Validator.isNotNull(_students) && _students.size() > 0)
+			students = _students;
+		else
+			students = CourseLocalServiceUtil.getStudentsFromCourse(companyId, courseGropupCreatedId);
+		
+		if(students != null && students.size() > 0){
+			long[] userIds = new long[students.size()];
+			for(int i = 0; i < students.size(); i++){
+				userIds[i] = students.get(i).getUserId();
+			}
+			return learningActivityResultPersistence.countByActIdPassedMultipleUserId(actId, passed, userIds);
+		}
+
+		return 0;
 	}
 
-	@Deprecated
+	/**
+	 * Devuelve el número de usuarios que han suspendido una actividad
+	 * @param actId id de la actividad
+	 * @return número de usuarios que han suspendido la actividad
+	 */
+	public long countNotPassed(long actId) throws SystemException{	
+		return learningActivityResultPersistence.countByActIdPassedFinished(actId, false);
+	}
+
+	/**
+	 * Devuelve el número de estudiantes que han suspendido la actividad
+	 * @param actId id de la actividad
+	 * @param companyId id de la company de la actividad
+	 * @param courseGroupCreatedId id del group de la actividad
+	 */
+	public long countNotPassedOnlyStudents(long actId, long companyId, long courseGroupCreatedId) throws SystemException{
+		Course course = CourseLocalServiceUtil.getCourseByGroupCreatedId(courseGroupCreatedId);
+		long[] userExcludedIds = CourseLocalServiceUtil.getTeachersAndEditorsIdsFromCourse(course);
+		
+		return countStudentsByActIdUserExcludedIdsFailed(actId, userExcludedIds); 
+	}
+
+	/**
+	 * @deprecated SE RECOMIENDA NO USAR ESTE MÉTODO, SE RECOMIENDA USAR: countNotPassedOnlyStudents(long actId, long companyId, long courseGroupCreatedId)
+	 * o countStudentsByActIdUserExcludedIdsFailed(actId, userExcludedIds)
+	 * @param actId id de la actividad
+	 * @param companyId id de la company de la actividad
+	 * @param courseGroupCreatedId id del group del curso
+	 * @param lista de estudiantes, si viene vacía se calculan dentro
+	 * @return número de estudiantes que han suspendido la actividad
+	 */
 	public long countNotPassedOnlyStudents(long actId, long companyId, long courseGropupCreatedId, List<User> _students) throws SystemException
-	{		
-		return countNotPassedOnlyStudents(actId, companyId, courseGropupCreatedId, _students, 0);
+	{
+		List<User> students = null;
+		// Se prepara el metodo para recibir un Listado de estudiantes especificos,, por ejemplo que pertenezcan a alguna organizacion. Sino, se trabaja con todos los estudiantes del curso.
+		if(Validator.isNotNull(_students) && _students.size() > 0)
+			students = _students;
+		else
+			students = CourseLocalServiceUtil.getStudentsFromCourse(companyId, courseGropupCreatedId);
+		
+		if(students != null && students.size() > 0){
+			long[] userIds = new long[students.size()];
+			for(int i = 0; i < students.size(); i++){
+				userIds[i] = students.get(i).getUserId();
+			}
+			return learningActivityResultPersistence.countByActIdPassedMultipleUserIdFinished(actId, false, userIds);
+		}
+
+		return 0;
 	}
 
-	public long countNotPassedOnlyStudents(long actId, long companyId, long courseGropupCreatedId, List<User> _students, long teamId) throws SystemException{
-		return LearningActivityResultFinderUtil.countPassedOnlyStudents(actId, companyId, courseGropupCreatedId, _students, false, teamId);
-	}
-	
-	
 	public Double avgResult(long actId) throws SystemException
 	{
 		ClassLoader classLoader = (ClassLoader) PortletBeanLocatorUtil.locate(ClpSerializer.getServletContextName(), "portletClassLoader"); 
@@ -1003,56 +1055,147 @@ public class LearningActivityResultLocalServiceImpl	extends LearningActivityResu
 		dq.setProjection(ProjectionFactoryUtil.avg("result"));
 		return (Double)(learningActivityResultPersistence.findWithDynamicQuery(dq).get(0));
 	}
-
-	@Deprecated
-	public Double avgResultOnlyStudents(long actId, long companyId, long courseGropupCreatedId) throws SystemException {
-		return avgResultOnlyStudents(actId, companyId, courseGropupCreatedId, null,0);
+	
+	/**
+	 * Devuelve la media de resultado de usuarios para una actividad, si ya se tiene la lista de usuarios excluidos (profesores y editores)
+	 * llamar al método avgResultByActIdUserExcludedIds directamente
+	 * @param actId id de la actividad
+	 * @param companyId id de la company de la actividad
+	 * @param courseGroupCreatedId id del group del curso
+	 * @return media de resultado de usuarios para una actividad
+	 */
+	public Double avgResultOnlyStudents(long actId, long companyId, long courseGroupCreatedId) throws SystemException {
+		Course course = CourseLocalServiceUtil.getCourseByGroupCreatedId(courseGroupCreatedId);
+		long[] userExcludedIds = CourseLocalServiceUtil.getTeachersAndEditorsIdsFromCourse(course);
+		
+		return LearningActivityResultFinderUtil.avgResultByActId(actId, null, userExcludedIds);
 	}
 
+	/**
+	 * @deprecated SE RECOMIENDA NO USAR ESTE MÉTODO, SE RECOMIENDA USAR: avgResultOnlyStudents(long actId, long companyId, long courseGroupCreatedId)
+	 * o avgResultByActIdUserExcludedIds(long actId, long[] userExcludedIds)
+	 * @param actId id de la actividad
+	 * @param companyId id de la company de la actividad
+	 * @param courseGroupCreatedId id del group del curso
+	 * @param _students lista de estudiantes, si viene vacía se calculan dentro
+	 * @return media de resultado de usuarios para una actividad
+	 */
 	@Deprecated
-	public Double avgResultOnlyStudents(long actId, long companyId, long courseGropupCreatedId, List<User> _students) throws SystemException
-	{	
-		return avgResultOnlyStudents(actId, companyId, courseGropupCreatedId, _students,0);
-	}
+	public Double avgResultOnlyStudents(long actId, long companyId, long courseGropupCreatedId, List<User> _students) throws SystemException{
 
-	public Double avgResultOnlyStudents(long actId, long companyId, long courseGropupCreatedId, List<User> _students, long teamId) throws SystemException
-	{		
-		return LearningActivityResultFinderUtil.avgResultOnlyStudents(actId, companyId, courseGropupCreatedId, _students, teamId);
+		List<User> students = null;
+		// Se prepara el metodo para recibir un Listado de estudiantes especificos,, por ejemplo que pertenezcan a alguna organizacion. Sino, se trabaja con todos los estudiantes del curso.
+		if(Validator.isNotNull(_students) && _students.size() > 0)
+			students = _students;
+		else
+			students = CourseLocalServiceUtil.getStudentsFromCourse(companyId, courseGropupCreatedId);
+		
+		if(students != null && students.size() > 0){
+			long[] userIds = new long[students.size()];
+			for(int i = 0; i < students.size(); i++){
+				userIds[i] = students.get(i).getUserId();
+			}
+			return LearningActivityResultFinderUtil.avgResultByActId(actId, userIds, null);
+		}
+		return new Double(0);
 	}
 	
-	public long countStarted(long actId) throws SystemException
-	{
-		return learningActivityResultPersistence.countByac(actId);
-	}
-
-	@Deprecated
-	public long countStartedOnlyStudents(long actId, long companyId, long courseGropupCreatedId) throws SystemException{
-		return countStartedOnlyStudents(actId, companyId, courseGropupCreatedId, null, 0);
+	/**
+	 * Devuelve la media de resultado de usuarios para una actividad
+	 * @param actId id de la actividad
+	 * @param userExcludedIds id de la company de la actividad
+	 * @return media de resultado de usuarios para una actividad
+	 */
+	public double avgResultByActIdUserExcludedIds(long actId, long[] userExcludedIds) throws SystemException{
+		return LearningActivityResultFinderUtil.avgResultByActId(actId, null, userExcludedIds);
 	}
 	
+	/**
+	 * Devuelve la media de resultado de usuarios para una actividad, esta función está pensada para pasar una lista de estudiantes filtrada
+	 * (por ejemplo para los equipos) para pedir de todos los estudiantes usar avgTriesByActIdUserExcludedIds
+	 * @param actId id de la actividad
+	 * @param userIds ids de los usuarios filtrados
+	 * @return media de resultado de usuarios para una actividad
+	 * @throws SystemException
+	 */
+	public double avgResultByActIdUserIds(long actId, long[] userIds) throws SystemException{
+		if(userIds != null && userIds.length > 0){
+			return LearningActivityResultFinderUtil.avgResultByActId(actId, userIds, null);
+		}else{
+			return 0;
+		}
+	}
+
+	public long countStarted(long actId) throws SystemException{
+		return learningActivityResultPersistence.countByActIdStarted(actId);
+	}
+
+	/**
+	 * Devuelve el n�mero de estudiantes que han comenzado una actividad, si ya se tiene la lista de usuarios excluidos (profesores y editores)
+	 * llamar al m�todo countStudentsByActIdUserExcludedIdsStarted directamente
+	 * @param actId id de la actividad
+	 * @param companyId id de la company de la actividad
+	 * @param courseGroupCreatedId id del group del curso
+	 * @return n�mero de estudiantes que han comenzado una actividad
+	 */
+	public long countStartedOnlyStudents(long actId, long companyId, long courseGroupCreatedId) throws SystemException{
+		Course course = CourseLocalServiceUtil.getCourseByGroupCreatedId(courseGroupCreatedId);
+		long[] userExcludedIds = CourseLocalServiceUtil.getTeachersAndEditorsIdsFromCourse(course);
+		
+		return countStudentsByActIdUserExcludedIdsStarted(actId, userExcludedIds);
+	}
+
+	/**
+	 * @deprecated SE RECOMIENDA NO USAR ESTE M�TODO, SE RECOMIENDA USAR: countStartedOnlyStudents(long actId, long companyId, long courseGroupCreatedId)
+	 * o countStudentsByActIdUserExcludedIdsStarted(actId, userExcludedIds)
+	 * @param actId id de la actividad
+	 * @param companyId id de la company de la actividad
+	 * @param courseGroupCreatedId id del group del curso
+	 * @param _students lista de estudiantes, si viene vac�a se calculan dentro
+	 * @return n�mero de estudiantes que han comenzado la actividad
+	 */
 	@Deprecated
 	public long countStartedOnlyStudents(long actId, long companyId, long courseGropupCreatedId, List<User> _students) throws SystemException{
-		return countStartedOnlyStudents(actId, companyId, courseGropupCreatedId, _students, 0);
-	}
-	
-	public long countStartedOnlyStudents(long actId, long companyId, long courseGropupCreatedId, List<User> _students, long teamId) throws SystemException{
-		return LearningActivityResultFinderUtil.countStartedOnlyStudents(actId, companyId, courseGropupCreatedId, _students, teamId);
+		
+		return LearningActivityResultFinderUtil.countStartedOnlyStudents(actId, companyId, courseGropupCreatedId, _students);
 	}
 
-	@Deprecated
-	@Override
-	public long countFinishedOnlyStudents(long actId, long companyId, long courseGropupCreatedId){
-		return countFinishedOnlyStudents(actId, companyId, courseGropupCreatedId, null,0);
+	/**
+	 * Devuelve el n�mero de estudiantes que han finalizado una actividad, si ya se tiene la lista de usuarios excluidos (profesores y editores)
+	 * llamar al m�todo countStudentsByActIdUserExcludedIdsFinished directamente
+	 * @param actId id de la actividad
+	 * @param companyId id de la company de la actividad
+	 * @param courseGroupCreatedId id del group del curso
+	 * @return n�mero de estudiantes que han finalizado una actividad
+	 */
+	public long countFinishedOnlyStudents(long actId, long companyId, long courseGroupCreatedId){
+		try {
+			Course course = CourseLocalServiceUtil.getCourseByGroupCreatedId(courseGroupCreatedId);
+			long[] userExcludedIds = CourseLocalServiceUtil.getTeachersAndEditorsIdsFromCourse(course);
+			
+			return countStudentsByActIdUserExcludedIdsFinished(actId, userExcludedIds);
+		} catch (SystemException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return 0;
+
 	}
 	
+	/**
+	 * @deprecated SE RECOMIENDA NO USAR ESTE M�TODO, SE RECOMIENDA USAR: countFinishedOnlyStudents(long actId, long companyId, long courseGroupCreatedId)
+	 * o countStudentsByActIdUserExcludedIdsFinished(actId, userExcludedIds)
+	 * @param actId id de la actividad
+	 * @param companyId id de la company de la actividad
+	 * @param courseGroupCreatedId id del group del curso
+	 * @param _students lista de estudiantes, si viene vac�a se calculan dentro
+	 * @return n�mero de estudiantes que han finalizado la actividad
+	 */
 	@Deprecated
 	public long countFinishedOnlyStudents(long actId, long companyId, long courseGropupCreatedId, List<User> _students){
-		return countFinishedOnlyStudents(actId, companyId, courseGropupCreatedId, _students,0);
+		return LearningActivityResultFinderUtil.countFinishedOnlyStudents(actId, companyId, courseGropupCreatedId, _students);
 	}
 	
-	public long countFinishedOnlyStudents(long actId, long companyId, long courseGropupCreatedId, List<User> _students, long teamId){
-		return LearningActivityResultFinderUtil.countFinishedOnlyStudents(actId, companyId, courseGropupCreatedId, _students, teamId);
-	}
 	
 	public double triesPerUser(long actId) throws SystemException
 	{
@@ -1065,35 +1208,88 @@ public class LearningActivityResultLocalServiceImpl	extends LearningActivityResu
 		return ((double) tries)/((double) started);
 	}
 
-	@Deprecated
-	@Override
 	/**
-	 * @deprecated Depreciado el método
+	 * Devuelve la media de intentos por usuario para una actividad, si ya se tiene la lista de usuarios excluidos (profesores y editores)
+	 * llamar al método avgTriesByActIdUserExcludedIds directamente
+	 * @param actId id de la actividad
+	 * @param companyId id de la company de la actividad
+	 * @param courseGroupCreatedId id del group del curso
+	 * @return media de intentos por usuario para una actividad
 	 */
-	public double triesPerUserOnlyStudents(long actId, long companyId, long courseGropupCreatedId) throws SystemException {
-		return triesPerUserOnlyStudents(actId, companyId, courseGropupCreatedId, null, 0);
+	public double triesPerUserOnlyStudents(long actId, long companyId, long courseGroupCreatedId) throws SystemException {
+		Course course = CourseLocalServiceUtil.getCourseByGroupCreatedId(courseGroupCreatedId);
+		long[] userExcludedIds = CourseLocalServiceUtil.getTeachersAndEditorsIdsFromCourse(course);
+		
+		return avgTriesByActIdUserExcludedIds(actId, userExcludedIds);
 	}
 
-	@Deprecated
-	@Override
 	/**
-	 * @deprecated Depreciado el método
+	 * @deprecated SE RECOMIENDA NO USAR ESTE MÉTODO, SE RECOMIENDA USAR: triesPerUserOnlyStudents(long actId, long companyId, long courseGroupCreatedId)
+	 * o avgTriesByActIdUserExcludedIds(long actId, long[] userExcludedIds)
+	 * @param actId id de la actividad
+	 * @param companyId id de la company de la actividad
+	 * @param courseGroupCreatedId id del group del curso
+	 * @param _students lista de estudiantes, si viene vacía se calculan dentro
+	 * @return media de intentos por usuario para una actividad
 	 */
+	@Deprecated
 	public double triesPerUserOnlyStudents(long actId, long companyId, long courseGropupCreatedId, List<User> _students) throws SystemException
 	{
-		return triesPerUserOnlyStudents(actId, companyId, courseGropupCreatedId, _students, 0);
+		long tries=0;
+		List<User> students = null;
+		// Se prepara el metodo para recibir un Listado de estudiantes especificos, por ejemplo que pertenezcan a alguna organizacion. Sino, se trabaja con todos los estudiantes del curso.
+		if(Validator.isNotNull(_students) && _students.size() > 0)
+			students = _students;
+		else
+			students = CourseLocalServiceUtil.getStudentsFromCourse(companyId, courseGropupCreatedId);
+
+		if(students != null && students.size() > 0){
+			long[] userIds = new long[students.size()];
+			for(int i = 0; i < students.size(); i++){
+				userIds[i] = students.get(i).getUserId();
+			}
+			
+			tries = LearningActivityTryLocalServiceUtil.countTriesByActIdUserIdsStarted(actId, userIds);
+	
+			long started = countStudentsByActIdUserIdsStarted(actId, userIds);
+			if(started==0){
+				return 0;
+			}
+			return ((double) tries)/((double) started);
+		}else{
+			return 0;
+		}
 	}
 	
-	public double triesPerUserOnlyStudents(long actId, long companyId, long courseGropupCreatedId, List<User> _students, long teamId) throws SystemException
-	{
-		long tries= LearningActivityTryLocalServiceUtil.triesPerUserOnlyStudents(actId, companyId, courseGropupCreatedId, _students, teamId);
-		long started=countStartedOnlyStudents(actId, companyId, courseGropupCreatedId, null, teamId);
-		double result = 0;
-		if(started>0)
-		{
-			result =  ((double) tries)/((double) started);
+	/**
+	 * Devuelve la media de intentos por usuario para una actividad
+	 * @param actId id de la actividad
+	 * @param userExcludedIds id de la company de la actividad
+	 * @return media de intentos por usuario para una actividad
+	 */
+	public double avgTriesByActIdUserExcludedIds(long actId, long[] userExcludedIds) throws SystemException{
+		int tries = LearningActivityTryLocalServiceUtil.countTriesByActIdUserExcludedIdsStarted(actId, userExcludedIds);
+		int started = countStudentsByActIdUserExcludedIdsStarted(actId, userExcludedIds);
+		if(started == 0){
+			return 0;
 		}
-		return result;
+		return (double) tries / (double) started; 
+	}
+	
+	/**
+	 * Devuelve la media de intentos por usuario para una actividad, esta función está pensada para pasar una lista de estudiantes filtrada
+	 * (por ejemplo para los equipos) para pedir de todos los estudiantes usar avgTriesByActIdUserExcludedIds
+	 * @param actId id de la actividad
+	 * @param userIds ids de los usuarios filtrados
+	 * @return media de intentos por usuario para una actividad
+	 * @throws SystemException
+	 */
+	public double avgTriesByActIdUserIds(long actId, long[] userIds) throws SystemException{
+		int tries = LearningActivityTryLocalServiceUtil.countTriesByActIdUserIdsStarted(actId, userIds);
+		int started = countStudentsByActIdUserIdsStarted(actId, userIds);
+		if(started == 0){
+		}
+		return (double) tries / (double) started; 
 	}
 
 	public LearningActivityResult getByActIdAndUserId(long actId,long userId) throws SystemException{
@@ -1328,6 +1524,148 @@ public class LearningActivityResultLocalServiceImpl	extends LearningActivityResu
 		return null;
 	}
 	
+	/**
+	 * Cuenta los estudiantes que han iniciado la actividad: solo llamar si se tiene la lista de usuarios excluidos
+	 * @param actId id de la actividad
+	 * @param userExcludedIds ids de usuarios excluidos (profesores y editores)
+	 * @return número de estudiantes que han comenzado la actividad
+	 * @throws SystemException
+	 */
+	public int countStudentsByActIdUserExcludedIdsStarted(long actId, long[] userExcludedIds) throws SystemException{
+		
+		if(userExcludedIds != null && userExcludedIds.length > 0){
+			return learningActivityResultPersistence.countByActIdNotMultipleUserIdStarted(actId, userExcludedIds);
+
+		}else{
+			return learningActivityResultPersistence.countByActIdStarted(actId);
+		}
+	}
+	
+	/**
+	 * Cuenta los estudiantes que han finalizado la actividad: solo llamar si se tiene la lista de usuarios excluidos
+	 * @param actId id de la actividad
+	 * @param userExcludedIds ids de usuarios excluidos (profesores y editores)
+	 * @return número de estudiantes que han finalizado la actividad
+	 * @throws SystemException
+	 */
+	
+	public int countStudentsByActIdUserExcludedIdsFinished(long actId, long[] userExcludedIds) throws SystemException{
+		
+		if(userExcludedIds != null && userExcludedIds.length > 0){
+			return learningActivityResultPersistence.countByActIdNotMultipleUserIdFinished(actId, userExcludedIds);
+		}else{
+			return learningActivityResultPersistence.countByActIdFinished(actId);
+		}
+	}
+	
+	/**
+	 * Cuenta los estudiantes que han finalizado la actividad y la han aprobado
+	 * @param actId id de la actividad
+	 * @param userExcludedIds ids de usuarios excluidos (profesores y editores)
+	 * @return número de estudiantes que han finalizado y aprobado la actividad
+	 * @throws SystemException
+	 */
+	
+	public int countStudentsByActIdUserExcludedIdsPassed(long actId, long[] userExcludedIds) throws SystemException{
+		
+		if(userExcludedIds != null && userExcludedIds.length > 0){
+			return learningActivityResultPersistence.countByActIdPassedNotMultipleUserIdFinished(actId, true, userExcludedIds);
+		}else{
+			return learningActivityResultPersistence.countByActIdPassedFinished(actId, true);
+		}
+	}
+	
+	/**
+	 * Cuenta los estudiantes que han finalizado la actividad y la han suspendido
+	 * @param actId id de la actividad
+	 * @param userExcludedIds ids de usuarios excluidos (profesores y editores)
+	 * @return número de estudiantes que han finalizado y suspendido la actividad
+	 * @throws SystemException
+	 */
+	
+	public int countStudentsByActIdUserExcludedIdsFailed(long actId, long[] userExcludedIds) throws SystemException{
+		
+		if(userExcludedIds != null && userExcludedIds.length > 0){
+			return learningActivityResultPersistence.countByActIdPassedNotMultipleUserIdFinished(actId, false, userExcludedIds);
+
+		}else{
+			return learningActivityResultPersistence.countByActIdPassedFinished(actId, false);
+		}
+	}
+	
+	/**
+	 * Cuenta los estudiantes que han iniciado la actividad, esta función está pensada para pasar una lista de estudiantes filtrada
+	 * (por ejemplo para los equipos) para pedir de todos los estudiantes usar countStudentsByActIdUserExcludedIdsStarted
+	 * @param actId id de la actividad
+	 * @param userIds ids de los usuarios filtrados
+	 * @return número de estudiantes que han comenzado la actividad
+	 * @throws SystemException
+	 */
+	public int countStudentsByActIdUserIdsStarted(long actId, long[] userIds) throws SystemException{
+		
+		if(userIds != null && userIds.length > 0){
+			return learningActivityResultPersistence.countByActIdMultipleUserIdStarted(actId, userIds);
+
+		}else{
+			return 0;
+		}
+	}
+	
+	/**
+	 * Cuenta los estudiantes que han finalizado la actividad, esta función está pensada para pasar una lista de estudiantes filtrada
+	 * (por ejemplo para los equipos) para pedir de todos los estudiantes usar countStudentsByActIdUserExcludedIdsFinished
+	 * @param actId id de la actividad
+	 * @param userIds ids de los usuarios filtrados
+	 * @return número de estudiantes que han finalizado la actividad
+	 * @throws SystemException
+	 */
+	
+	public int countStudentsByActIdUserIdsFinished(long actId, long[] userIds) throws SystemException{
+		
+		if(userIds != null && userIds.length > 0){
+			return learningActivityResultPersistence.countByActIdMultipleUserIdFinished(actId, userIds);
+		}else{
+			return 0;
+		}
+	}
+	
+	/**
+	 * Cuenta los estudiantes que han finalizado la actividad y la han aprobado, esta función está pensada para pasar una lista de estudiantes filtrada
+	 * (por ejemplo para los equipos) para pedir de todos los estudiantes usar countStudentsByActIdUserExcludedIdsPassed
+	 * @param actId id de la actividad
+	 * @param userIds ids de los usuarios filtrados
+	 * @return número de estudiantes que han finalizado y aprobado la actividad
+	 * @throws SystemException
+	 */
+	
+	public int countStudentsByActIdUserIdsPassed(long actId, long[] userIds) throws SystemException{
+		
+		if(userIds != null && userIds.length > 0){
+			return learningActivityResultPersistence.countByActIdPassedMultipleUserIdFinished(actId, true, userIds);
+		}else{
+			return 0;
+		}
+	}
+	
+	/**
+	 * Cuenta los estudiantes que han finalizado la actividad y la han suspendido, esta función está pensada para pasar una lista de estudiantes filtrada
+	 * (por ejemplo para los equipos) para pedir de todos los estudiantes usar countStudentsByActIdUserExcludedIdsFailed
+	 * @param actId id de la actividad
+	 * @param userIds ids de los usuarios filtrados
+	 * @return número de estudiantes que han finalizado y suspendido la actividad
+	 * @throws SystemException
+	 */
+	
+	public int countStudentsByActIdUserIdsFailed(long actId, long[] userIds) throws SystemException{
+		
+		if(userIds != null && userIds.length > 0){
+			return learningActivityResultPersistence.countByActIdPassedMultipleUserIdFinished(actId, false, userIds);
+
+		}else{
+			return 0;
+		}
+	}
+
 	public Date getLastEndDateByUserIdCourseId(long userId, long courseId) throws SystemException
 	{
 		ClassLoader classLoader = (ClassLoader) PortletBeanLocatorUtil.locate(ClpSerializer.getServletContextName(), "portletClassLoader"); 

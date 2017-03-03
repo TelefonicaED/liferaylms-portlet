@@ -19,6 +19,7 @@ import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.upload.UploadRequest;
 import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.xml.Document;
@@ -93,11 +94,8 @@ public class TaskP2PLearningActivityType extends BaseLearningActivityType {
 			validate=false;
 		}
 	
-		
 		return validate;
 	}
-	
-
 	
 	@Override
 	public String setExtraContent(UploadRequest uploadRequest,PortletResponse portletResponse, LearningActivity learningActivity)
@@ -129,6 +127,26 @@ public class TaskP2PLearningActivityType extends BaseLearningActivityType {
 				anonimous = SAXReaderUtil.createElement("anonimous");
 				anonimous.setText(Boolean.toString(ParamUtil.get(uploadRequest,"anonimous",false)));		
 				rootElement.add(anonimous);	
+				
+				Element email_anonimous=rootElement.element("email_anonimous");
+				if(email_anonimous!=null)
+				{
+					email_anonimous.detach();
+					rootElement.remove(email_anonimous);
+				}
+				email_anonimous = SAXReaderUtil.createElement("email_anonimous");
+				email_anonimous.setText(Boolean.toString(ParamUtil.get(uploadRequest,"email_anonimous",false)));		
+				rootElement.add(email_anonimous);	
+				
+				Element askForP2PActivities=rootElement.element("askforp2pactivities");
+				if(askForP2PActivities!=null)
+				{
+					askForP2PActivities.detach();
+					rootElement.remove(askForP2PActivities);
+				}
+				askForP2PActivities = SAXReaderUtil.createElement("askforp2pactivities");
+				askForP2PActivities.setText(Boolean.toString(ParamUtil.get(uploadRequest,"askforp2pactivities",false)));		
+				rootElement.add(askForP2PActivities);
 				
 				Element numValidaciones=rootElement.element("validaciones");
 				if(numValidaciones!=null)
@@ -185,11 +203,34 @@ public class TaskP2PLearningActivityType extends BaseLearningActivityType {
 				}
 				dateUpload = SAXReaderUtil.createElement("dateupload");
 				dateUpload.setText(formatUploadDate.format(uploadDate));		
-				rootElement.add(dateUpload);	
+				rootElement.add(dateUpload);
+				
+				
+				int elements = 0;
+				int numQuestion = Integer.parseInt(PropsUtil.get("lms.p2p.numcustomquestion"));
+				for(int i=0;i<numQuestion;i++){
+					Element text=rootElement.element("text"+i);
+					if(text!=null)
+					{
+						text.detach();
+						rootElement.remove(text);
+					}
+					
+					String textAdd = ParamUtil.getString(uploadRequest,"text"+i,null);
+					
+					if(textAdd!=null){
+						Element textAddElement = SAXReaderUtil.createElement("text"+elements);
+						textAddElement.setText(textAdd);
+						rootElement.add(textAddElement);
+						elements++;
+					}
+				}
 				
 			}else{
 				log.debug("***NO SE ACTUALIZA EL EXTRA CONTENT PORQUE YA HAY P2PACTIVITY ASOCIADOS A LA ACTIVIDAD***");
 				error = "error-p2pActivity-inProgress";
+				
+				
 			}
 			
 			
@@ -208,6 +249,8 @@ public class TaskP2PLearningActivityType extends BaseLearningActivityType {
 				teamElement.setText(Long.toString(teamId));
 				rootElement.add(teamElement);
 			}
+		
+			
 		
 			learningActivity.setExtracontent(document.formattedString());
 			return error;

@@ -43,9 +43,15 @@
 
 <%@ include file="/init.jsp" %>
 <script src="/liferaylms-portlet/js/service.js" type="text/javascript"></script>
-<div class="container-activity">
+<%@ include file="/html/shared/isTablet.jsp" %>
 <%
 long actId=ParamUtil.getLong(request,"actId",0);
+
+Boolean isLinkTabletResourceExternal = ParamUtil.getBoolean(request, "isTablet", false);
+String cssLinkTabletClassResourceExternal="";
+if(isLinkTabletResourceExternal){
+	cssLinkTabletClassResourceExternal="tablet-link";
+}
 
 if(actId==0 )
 {
@@ -678,7 +684,7 @@ else
 							String docURL=themeDisplay.getPortalURL() + themeDisplay.getPathContext() + "/documents/" + docfileVersion.getGroupId() + StringPool.SLASH + docfileVersion.getFolderId() + StringPool.SLASH + HttpUtil.encodeURL(HtmlUtil.unescape(docfileVersion.getTitle()));
 							%>
 							<div class="row_file">
-								<span class="upfile"><a href="<%=docURL%>" target="_blank"><img class="dl-file-icon" src="<%= themeDisplay.getPathThemeImages() %>/file_system/small/<%= docfileVersion.getIcon() %>.png" /><liferay-ui:message key="resourceexternalactivity.downloadFile"  arguments="<%=new Object[]{HtmlUtil.escape(docfileVersion.getTitle())} %>" /></a></span>
+							<span class="upfile"><a href="<%=docURL%>" class="<%=cssLinkTabletClassResourceExternal%>" target="_blank"><img class="dl-file-icon" src="<%= themeDisplay.getPathThemeImages() %>/file_system/small/<%= docfileVersion.getIcon() %>.png" /><liferay-ui:message key="resourceexternalactivity.downloadFile"  arguments="<%=new Object[]{HtmlUtil.escape(docfileVersion.getTitle())} %>" /></a></span>
 							</div>
 							<%
 						}catch(NoSuchEntryException nsee){}

@@ -325,6 +325,33 @@ public interface LearningActivityTryLocalService extends BaseLocalService,
 	public java.util.List<com.liferay.lms.model.LearningActivityTry> getByUserId(
 		long userId);
 
+	/**
+	* Cuenta el nÃºmero de intentos de los estudiantes, esta funciÃ³n estÃ¡ pensada para pasar una lista de estudiantes filtrada
+	* (por ejemplo para los equipos) para pedir de todos los estudiantes usar countStudentsByActIdUserExcludedIds
+	*
+	* @param actId id de la actividad
+	* @param userIds ids de los usuarios filtrados
+	* @return nÃºmero de intentos de los estudiantes
+	* @throws SystemException
+	*/
+	public int countTriesByActIdUserIdsStarted(long actId, long[] userIds)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Cuenta el nÃºmero de intentos de los estudiantes
+	*
+	* @param actId id de la actividad
+	* @param userExcludedIds ids de usuarios excluidos (profesores y editores)
+	* @return nÃºmero de intentos de los estudiantes
+	* @throws SystemException
+	*/
+	public int countTriesByActIdUserExcludedIdsStarted(long actId,
+		long[] userExcludedIds)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	public int countTriesByActIdStarted(long actId)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
 	public long triesPerUserOnlyStudents(long actId, long companyId,
 		long courseGropupCreatedId,
 		java.util.List<com.liferay.portal.model.User> _students, long teamId)

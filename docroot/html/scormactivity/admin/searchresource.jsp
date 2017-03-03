@@ -1,3 +1,4 @@
+<%@page import="com.liferay.lms.service.LearningActivityLocalServiceUtil"%>
 <%@page import="java.util.Properties"%>
 <%@page import="com.liferay.lms.model.SCORMContent"%>
 <%@page import="com.liferay.portlet.PortletURLUtil"%>
@@ -32,12 +33,36 @@ for (Object key:props.keySet()) {
 	allowedAssetTypes.addAll(ListUtil.toList(props.get(key).toString().split(",")));
 }
 
+long resId = ParamUtil.getLong(request,"resId",0);
+long resModuleId = ParamUtil.getLong(request,"resModuleId",0);
+String message = "new-activity-scorm";
+if(resId > 0){
+	message = LearningActivityLocalServiceUtil.fetchLearningActivity(resId).getTitle(themeDisplay.getLocale());
+}
 %>
+
+<liferay-portlet:renderURL var="backURL" >
+	<liferay-portlet:param name="mvcPath" value="/html/editactivity/editactivity.jsp" />
+	<liferay-portlet:param name="resId" value="<%=String.valueOf(resId) %>" />
+	<liferay-portlet:param name="resModuleId" value="<%=String.valueOf(resModuleId) %>" />
+	<liferay-portlet:param name="type" value="9" />
+</liferay-portlet:renderURL>
+
+
+<liferay-ui:header 
+	title="<%=message %>" 
+	backURL="<%=backURL  %>"
+	localizeTitle="<%=resId <= 0 %>"
+/>
+
+
+
+
 
 <liferay-portlet:renderURL var="selectResource">
 	<liferay-portlet:param name="jspPage" value="/html/scormactivity/admin/searchresults.jsp"/>
 </liferay-portlet:renderURL>
-<aui:form name="<portlet:namespace />ressearch" action="<%=selectResource %>" method="POST">
+<aui:form name="ressearch" action="<%=selectResource %>" method="POST">
 
 <aui:select name="className" label="asset-type">
 <% 
@@ -52,6 +77,9 @@ for(String className:allowedAssetTypes)
 }
 %>
 </aui:select>
+
+<aui:input type="hidden" name="resId" value="<%=resId%>"/>
+<aui:input type="hidden" name="resModuleId" value="<%=resModuleId %>"/>
 
 <aui:input name="keywords" size="20" type="text"/>
 
@@ -69,53 +97,3 @@ for(String className:allowedAssetTypes)
 	<aui:button type="submit" value="search" />
 </aui:button-row>
 </aui:form>
-<%!
-public PortletURL getAddPortletURL(long groupId,LiferayPortletRequest liferayPortletRequest, LiferayPortletResponse liferayPortletResponse, String className) throws Exception {
-	ThemeDisplay themeDisplay = (ThemeDisplay)liferayPortletRequest.getAttribute(WebKeys.THEME_DISPLAY);
-
-	AssetRendererFactory assetRendererFactory = AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(className);
-
-	if (assetRendererFactory == null) {
-		return null;
-	}
-
-	liferayPortletRequest.setAttribute(WebKeys.ASSET_RENDERER_FACTORY_CLASS_TYPE_ID, 0);
-
-	PortletURL addPortletURL = assetRendererFactory.getURLAdd(liferayPortletRequest, liferayPortletResponse);
-
-	if (addPortletURL == null) {
-		return null;
-	}
-
-	addPortletURL.setWindowState(LiferayWindowState.POP_UP);
-	addPortletURL.setParameter("groupId", String.valueOf(groupId));
-
-
-	addPortletURL.setPortletMode(PortletMode.VIEW);
-	PortletURL redirectPortletURL=liferayPortletResponse.createRenderURL();
-	redirectPortletURL.setParameter("className",className);
-	redirectPortletURL.setParameter("jspPage","/html/scormactivity/admin/searchresults.jsp");
-	redirectPortletURL.setParameter("groupId",Long.toString(groupId));
-	redirectPortletURL.setParameter("actionEditing","true");
-
-	addPortletURL.setParameter("redirect", redirectPortletURL.toString());
-
-	String referringPortletResource = ParamUtil.getString(liferayPortletRequest, "portletResource");
-
-	if (Validator.isNotNull(referringPortletResource)) {
-		addPortletURL.setParameter("referringPortletResource", referringPortletResource);
-	}
-	else {
-		PortletDisplay portletDisplay = themeDisplay.getPortletDisplay();
-
-		addPortletURL.setParameter("referringPortletResource", portletDisplay.getId());
-
-		
-	}
-
-	
-
-	return addPortletURL;
-}
-
-%>

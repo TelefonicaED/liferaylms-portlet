@@ -92,7 +92,8 @@ public class CourseResultModelImpl extends BaseModelImpl<CourseResult>
 			true);
 	public static long COURSEID_COLUMN_BITMASK = 1L;
 	public static long PASSED_COLUMN_BITMASK = 2L;
-	public static long USERID_COLUMN_BITMASK = 4L;
+	public static long PASSEDDATE_COLUMN_BITMASK = 4L;
+	public static long USERID_COLUMN_BITMASK = 8L;
 
 	/**
 	 * Converts the soap model instance into a normal model instance.
@@ -374,7 +375,17 @@ public class CourseResultModelImpl extends BaseModelImpl<CourseResult>
 	}
 
 	public void setPassedDate(Date passedDate) {
+		_columnBitmask |= PASSEDDATE_COLUMN_BITMASK;
+
+		if (_originalPassedDate == null) {
+			_originalPassedDate = _passedDate;
+		}
+
 		_passedDate = passedDate;
+	}
+
+	public Date getOriginalPassedDate() {
+		return _originalPassedDate;
 	}
 
 	public Date getAllowStartDate() {
@@ -514,6 +525,8 @@ public class CourseResultModelImpl extends BaseModelImpl<CourseResult>
 		courseResultModelImpl._originalPassed = courseResultModelImpl._passed;
 
 		courseResultModelImpl._setOriginalPassed = false;
+
+		courseResultModelImpl._originalPassedDate = courseResultModelImpl._passedDate;
 
 		courseResultModelImpl._columnBitmask = 0;
 	}
@@ -694,6 +707,7 @@ public class CourseResultModelImpl extends BaseModelImpl<CourseResult>
 	private boolean _setOriginalPassed;
 	private Date _startDate;
 	private Date _passedDate;
+	private Date _originalPassedDate;
 	private Date _allowStartDate;
 	private Date _allowFinishDate;
 	private String _extraData;

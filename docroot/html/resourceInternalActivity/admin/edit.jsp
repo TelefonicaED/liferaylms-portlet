@@ -18,70 +18,35 @@
 	<liferay-portlet:param name="jspPage" value="/html/resourceInternalActivity/admin/searchresource.jsp"/>
 </liferay-portlet:renderURL>
 
-<script type="text/javascript">
-<!--
-
-function <portlet:namespace />search() {
-	AUI().use('node','aui-resize-iframe',function(A) {
-		var backbutton = A.one('#<portlet:namespace/>backButton').one('span').clone();
-		backbutton.setAttribute('id','<portlet:namespace/>backbutton');
-		A.one('.portlet-body').prepend(backbutton);
-		var iframe = A.Node.create('<iframe id="<portlet:namespace/>finder" src="javascript:false;" onload="<portlet:namespace />load(this)" frameBorder="0" scrolling="no" width="'+A.getBody().width()+'" height="0"></iframe>');
-		A.one('.portlet-body').append(iframe);
-		A.all('.acticons').each(function(icon){ icon.hide(); });
-		A.one('#<portlet:namespace/>fm').hide();
-		A.one('#<portlet:namespace/>backbutton').scrollIntoView();
-
-		iframe.plug(A.Plugin.ResizeIframe);
-		iframe.setAttribute('src','<%=selectResource %>');
-	});
-}
-	
-function <portlet:namespace />load(source) {
-
-	AUI().use('node','querystring-parse',function(A) {
-		
-		var params=A.QueryString.parse(source.contentWindow.location.search.replace('?',''));
-	
-		if((params['<portlet:namespace />jspPage']=='/html/resourceInternalActivity/admin/result.jsp')&&
-			(A.Lang.isNumber(params['<portlet:namespace />assertId']))&&
-			(A.Lang.isString(params['<portlet:namespace />assertTitle']))) {
-			A.one('#<portlet:namespace/>backbutton').remove();
-			A.one('#<portlet:namespace/>finder').remove();
-			A.all('.acticons').each(function(icon){ icon.show(); });
-			A.one('#<portlet:namespace/>fm').show();
-			A.one('#<portlet:namespace/>assetEntryId').set('value',params['<portlet:namespace />assertId']);		
-			A.one('#<portlet:namespace/>assetEntryName').set('value',params['<portlet:namespace />assertTitle']);	
-		}
-
-	});
-}
-
-function <portlet:namespace />back() {
-	AUI().use('node',function(A) {
-		A.one('#<portlet:namespace/>backbutton').remove();
-		A.one('#<portlet:namespace/>finder').remove();
-		A.all('.acticons').each(function(icon){ icon.show(); });
-		A.one('#<portlet:namespace/>fm').show();
-
-	});
-}
-
-//-->
-</script>
 
 <%
-long assetId=0;
+long resId = ParamUtil.getLong(request, "resId");
+long resModuleId = ParamUtil.getLong(request, "resModuleId");
+
+long assetId=ParamUtil.getLong(request, "assertId");
 String assetTitle=StringPool.BLANK;
 String disabled = "disabled=\"disabled\"";
+
+if(assetId!=0){
+	try{
+		AssetEntry entry=AssetEntryLocalServiceUtil.getEntry(assetId);
+		assetId=entry.getEntryId();
+		assetTitle=entry.getTitle(renderRequest.getLocale());
+	}catch(Exception e){
+		assetId=0;
+	}
+}
+
 LearningActivity learningActivity=(LearningActivity)request.getAttribute("activity");
 if(learningActivity!=null) {	
 	if ((learningActivity.getExtracontent()!=null)&&(learningActivity.getExtracontent().trim().length()!=0)) {
 		try{
-			AssetEntry entry=AssetEntryLocalServiceUtil.getEntry(
-				GetterUtil.getLong(LearningActivityLocalServiceUtil.getExtraContentValue(learningActivity.getActId(),"assetEntry")));
-			assetId=entry.getEntryId();
-			assetTitle=entry.getTitle(renderRequest.getLocale());	
+			if(assetId==0){
+				AssetEntry entry=AssetEntryLocalServiceUtil.getEntry(
+					GetterUtil.getLong(LearningActivityLocalServiceUtil.getExtraContentValue(learningActivity.getActId(),"assetEntry")));
+				assetId=entry.getEntryId();
+				assetTitle=entry.getTitle(renderRequest.getLocale());	
+			}
 		}
 		catch(PortalException e){}
 	}	
@@ -94,10 +59,19 @@ if(LearningActivityLocalServiceUtil.canBeEdited(learningActivity, user.getUserId
 <aui:input type="hidden" name="assetEntryId" ignoreRequestValue="true" value="<%=Long.toString(assetId) %>"/>
 <aui:field-wrapper name="resourceinternalactivity.edit.asserts" cssClass="search-button-container">
 	<aui:input type="text" name="assetEntryName" ignoreRequestValue="true" value="<%=assetTitle %>" label="" inlineField="true" disabled="true"  size="50"/>
-	<button <%=disabled %> type="button" id="<portlet:namespace/>searchEntry" onclick="<portlet:namespace/>search();" >
-	    <span class="aui-buttonitem-icon aui-icon aui-icon-search"></span>
-	    <span class="aui-buttonitem-label"><%= LanguageUtil.get(pageContext, "search") %></span>
-	</button>
+	
+	
+		<liferay-portlet:renderURL var="buscarRecurso" >
+			<liferay-portlet:param name="mvcPath" value="/html/resourceInternalActivity/admin/searchresource.jsp" />
+			<liferay-portlet:param name="resId" value="<%=String.valueOf(resId) %>" />
+			<liferay-portlet:param name="resModuleId" value="<%=String.valueOf(resModuleId) %>" />
+		</liferay-portlet:renderURL>
+		
+		<button <%=disabled %> type="button" id="<portlet:namespace/>searchEntry" onclick="javascript:location.href='<%=buscarRecurso%>'" >
+		    <span class="aui-buttonitem-icon aui-icon aui-icon-search"></span>
+		    <span class="aui-buttonitem-label"><%= LanguageUtil.get(pageContext, "search") %></span>
+		</button>
+	
 </aui:field-wrapper>
 		
 <div id="<portlet:namespace/>backButton" style="display:none;">

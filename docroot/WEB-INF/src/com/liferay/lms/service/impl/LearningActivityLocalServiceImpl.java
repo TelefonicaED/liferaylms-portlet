@@ -532,7 +532,7 @@ public class LearningActivityLocalServiceImpl extends LearningActivityLocalServi
 	public List<LearningActivity> getLearningActivitiesOfModule(long moduleId, int start, int end) throws SystemException
 	{
 		return LearningActivityUtil.findBym(moduleId, start, end);
-	} 
+	}	
 	
 	public java.util.List<Long> getLearningActivityIdsOfModule(long moduleId) throws SystemException
 	{

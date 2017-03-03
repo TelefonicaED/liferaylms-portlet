@@ -1,3 +1,5 @@
+<%@page import="com.liferay.portlet.asset.AssetRendererFactoryRegistryUtil"%>
+<%@page import="com.liferay.portlet.asset.model.AssetRendererFactory"%>
 <%@page import="com.liferay.lms.service.LmsPrefsLocalServiceUtil"%>
 <%@page import="com.liferay.lms.model.LmsPrefs"%>
 <%@page import="com.tls.lms.util.LiferaylmsUtil"%>
@@ -22,9 +24,13 @@
 	long assetId=ParamUtil.getLong(request, "assertId");
 	boolean openWindow = false, editDetails = false, improve = true; 
 	String assetTitle=StringPool.BLANK;
-	String sco=ParamUtil.getString(request, "sco","");
+	String sco=ParamUtil.getString(request, "sco",null);
 	long typeId=ParamUtil.getLong(request, "type");
 	boolean completedAsPassed =ParamUtil.getBoolean(request, "completedAsPassed",false);
+	
+	long resId = ParamUtil.getLong(request, "resId");
+	long resModuleId = ParamUtil.getLong(request, "resModuleId");
+	
  LearningActivity learningActivity=null;
 	if(assetId!=0){
 		try{
@@ -55,7 +61,9 @@
 					editDetails = GetterUtil.getBoolean(PropsUtil.get("lms.scorm.editable."+entry.getClassName()),false);
 				}	
 				openWindow = GetterUtil.getBoolean(LearningActivityLocalServiceUtil.getExtraContentValue(learningActivity.getActId(), "openWindow"));
-				sco=LearningActivityLocalServiceUtil.getExtraContentValue(learningActivity.getActId(),"sco","");
+				if(sco==null){
+					sco=LearningActivityLocalServiceUtil.getExtraContentValue(learningActivity.getActId(),"sco","");
+				}
 				String improveString = LearningActivityLocalServiceUtil.getExtraContentValue(learningActivity.getActId(),"improve");
 				 windowWith=LearningActivityLocalServiceUtil.getExtraContentValue(learningActivity.getActId(),"windowWith","1024");
 				 height=LearningActivityLocalServiceUtil.getExtraContentValue(learningActivity.getActId(),"height","768");
@@ -107,17 +115,6 @@ if(learningActivity!=null){  %>
 
 <script type="text/javascript">
 
-	AUI().ready(function(A) {
-		var inputScormValue = A.one('#<portlet:namespace/>sco').get('value');
-		A.one("label[for='<portlet:namespace/>sco']").hide();
-		A.one('#<portlet:namespace/>sco').hide();
-		if(inputScormValue.length > 0 ) {
-			A.one("label[for='<portlet:namespace/>sco']").show();
-			A.one('#<portlet:namespace/>sco').show();
-		}
-	}); 
-<!--
-
 <% if(editDetails){ %>
 	AUI().ready('node',function(A) {
 		A.one('.acticons').html('<%=editResourceUnicode%>');
@@ -129,110 +126,6 @@ if(learningActivity!=null){  %>
 
 
 
-function <portlet:namespace />search() {
-	AUI().use('node',function(A) {
-		var backbutton = A.one('#<portlet:namespace/>backButton').one('span').clone();
-		backbutton.setAttribute('id','<portlet:namespace/>backbutton');
-		A.one('.portlet-body').prepend(backbutton);
-		A.one('#<portlet:namespace/>backbutton').scrollIntoView();
-		var iframe = A.Node.create('<iframe id="<portlet:namespace/>finder" src="javascript:false;" onload="<portlet:namespace />load(this)" frameBorder="0" scrolling="no" width="'+A.getBody().width()+'" height="0"></iframe>');
-		A.one('.portlet-body').append(iframe);
-		A.all('.acticons').each(function(icon){ icon.hide(); });
-		A.one('#<portlet:namespace/>fm').hide();
-		A.one('#<portlet:namespace/>backbutton').scrollIntoView();
-
-		iframe.plug(A.Plugin.ResizeIframe);
-		iframe.setAttribute('src','<%=selectResource %>');
-	});
-}
-	
-function <portlet:namespace />load(source) {
-	AUI().use('node','querystring-parse',function(A) {
-		
-		var params=A.QueryString.parse(source.contentWindow.location.search.replace('?',''));
-	
-		if((params['<portlet:namespace />jspPage']=='/html/scormactivity/admin/result.jsp')&&
-           (A.Lang.isNumber(params['<portlet:namespace />assertId'])) &&
-           (A.Lang.isString(params['<portlet:namespace />assertTitle'])) &&
-           (A.Lang.isString(params['<portlet:namespace />assertEditable'])) &&
-           (A.Lang.isString(params['<portlet:namespace />assertWindowable']))) {
-			A.one('#<portlet:namespace/>backbutton').remove();
-			A.one('#<portlet:namespace/>finder').remove();
-			A.all('.acticons').each(function(icon){ icon.show(); });
-			A.one('#<portlet:namespace/>fm').show();
-			A.one('#<portlet:namespace/>assetEntryId').set('value',params['<portlet:namespace />assertId']);		
-			A.one('#<portlet:namespace/>assetEntryName').set('value',params['<portlet:namespace />assertTitle']);
-			if(A.Lang.isString(params['<portlet:namespace />sco']))
-			{
-				A.one('#<portlet:namespace/>sco').set('value',params['<portlet:namespace />sco']);
-				A.one('#<portlet:namespace/>sco').show();
-				A.one("label[for='_lmsactivitieslist_WAR_liferaylmsportlet_sco']").show();
-			}
-			else
-			{
-				A.one('#<portlet:namespace/>sco').set('value','');
-				A.one('#<portlet:namespace/>sco').hide();
-				A.one("label[for='_lmsactivitieslist_WAR_liferaylmsportlet_sco']").hide();
-			}
-			
-			if(params['<portlet:namespace />assertWindowable']=='true') {
-				document.getElementById("<portlet:namespace/>openWindow").value = "true";
-				document.getElementById("<portlet:namespace/>openWindowCheckbox").checked = true;
-			} else {
-				document.getElementById("<portlet:namespace/>openWindow").value = "false";
-				document.getElementById("<portlet:namespace/>openWindowCheckbox").checked = false;
-			}
-			
-			<% if(learningActivity!=null){  %>
-				if(params['<portlet:namespace />assertEditable']=='true') {
-					A.one('.acticons').html('<%=editResourceUnicode%>');
-					var editResource=A.one('#<portlet:namespace/>editResource');
-					editResource.set('href',editResource.get('href')+'&assertId='+
-							encodeURIComponent(params['<portlet:namespace />assertId']));
-				}
-				else{
-					A.one('.acticons').html('');
-				}
-				
-			<% } %>
-
-			window.messageHandler.detach();
-			window.messageHandler=null;
-		}
-		else {
-			
-			if(navigator.userAgent.indexOf("MSIE")!=-1 || navigator.userAgent.indexOf("Trident")!=-1){
-				if (source.Document && source.Document.body.scrollHeight) 
-			        source.height = source.contentWindow.document.body.scrollHeight;
-			    else if (source.contentDocument && source.contentDocument.body.scrollHeight) 
-			        source.height = source.contentDocument.body.scrollHeight + 75;
-			    else if (source.contentDocument && source.contentDocument.body.offsetHeight) 
-			        source.height = source.contentDocument.body.offsetHeight + 75;
-			}else{
-				  if (source.Document && source.Document.body.scrollHeight) 
-				        source.height = source.contentWindow.document.body.scrollHeight;
-				    else if (source.contentDocument && source.contentDocument.body.scrollHeight) 
-				        source.height = source.contentDocument.body.scrollHeight + 35;
-				    else if (source.contentDocument && source.contentDocument.body.offsetHeight) 
-				        source.height = source.contentDocument.body.offsetHeight + 35;
-			}
-
-		}
-	
-	});
-}
-
-function <portlet:namespace />back() {
-	AUI().use('node',function(A) {
-		A.one('#<portlet:namespace/>backbutton').remove();
-		A.one('#<portlet:namespace/>finder').remove();
-		A.all('.acticons').each(function(icon){ icon.show(); });
-		A.one('#<portlet:namespace/>fm').show();
-
-		window.messageHandler.detach();
-		window.messageHandler=null;
-	});
-}
 
 //-->
 
@@ -256,11 +149,20 @@ function <portlet:namespace />back() {
 		<aui:validator name="required"></aui:validator>
 	</aui:input>
 	<c:if test="<%=!disabled %>" >
-		<button type="button" id="<portlet:namespace/>searchEntry" onclick="<portlet:namespace/>search();" >
+		
+		<liferay-portlet:renderURL var="buscarRecurso" >
+			<liferay-portlet:param name="mvcPath" value="/html/scormactivity/admin/searchresource.jsp" />
+			<liferay-portlet:param name="resId" value="<%=String.valueOf(resId) %>" />
+			<liferay-portlet:param name="resModuleId" value="<%=String.valueOf(resModuleId) %>" />
+		</liferay-portlet:renderURL>
+		
+		<button type="button" id="<portlet:namespace/>searchEntry" onclick="javascript:location.href='<%=buscarRecurso%>'" >
 		    <span class="aui-buttonitem-icon aui-icon aui-icon-search"></span>
 		    <span class="aui-buttonitem-label"><%= LanguageUtil.get(pageContext, "search") %></span>
 		</button>
-		<aui:input  name="sco" value="<%=sco %>" label="SCO"/>
+				
+		<aui:input  name="sco" value="<%=Validator.isNotNull(sco)?sco.trim():\"\" %>" label="SCO" type="<%= Validator.isNotNull(sco)?\"text\":\"hidden\" %>"/>
+		
 	</c:if>
 			
 </aui:field-wrapper>

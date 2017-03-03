@@ -14,6 +14,7 @@ import javax.portlet.RenderResponse;
 
 import com.liferay.lms.model.Course;
 import com.liferay.lms.service.CourseLocalServiceUtil;
+import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
@@ -50,16 +51,12 @@ public class InscriptionAdminPortlet extends MVCPortlet {
 	public void doView(RenderRequest renderRequest,RenderResponse renderResponse) throws IOException, PortletException {
 		if(log.isDebugEnabled())log.debug(this.getClass().getName());
 		ThemeDisplay themeDisplay = (ThemeDisplay)renderRequest.getAttribute(WebKeys.THEME_DISPLAY);
-		List<MembershipRequest> memberships = null;
 		
-		Group group = null; 
 		Course course = null;
 		int numberUsers = 0;
-		int total = 0;
 		long maxUsers = 0;
 		
 		try {
-			group = GroupLocalServiceUtil.getGroup(themeDisplay.getScopeGroupId());
 			course = CourseLocalServiceUtil.getCourseByGroupCreatedId(themeDisplay.getScopeGroupId());
 			
 			if(course==null){
@@ -69,16 +66,15 @@ public class InscriptionAdminPortlet extends MVCPortlet {
 				maxUsers = course.getMaxusers();
 				numberUsers = UserLocalServiceUtil.getGroupUsersCount(themeDisplay.getScopeGroupId());
 			}
-		} catch (PortalException e) {
-			if(log.isDebugEnabled()){
-				e.printStackTrace();
-			}
-			
 		} catch (SystemException e) {
 			if(log.isDebugEnabled()){
 				e.printStackTrace();
 			}
 		}
+		
+		SearchContainer<MembershipRequest> searchContainer = new SearchContainer<MembershipRequest>(renderRequest, null, null, SearchContainer.DEFAULT_CUR_PARAM, 
+				SearchContainer.DEFAULT_DELTA, renderResponse.createRenderURL(), 
+				null, "no-results");
 		
 		PermissionChecker permissionChecker = PermissionThreadLocal.getPermissionChecker();
 		
@@ -88,24 +84,20 @@ public class InscriptionAdminPortlet extends MVCPortlet {
 		}
 				
 		try {
-			memberships = MembershipRequestLocalServiceUtil.search(themeDisplay.getScopeGroupId(), MembershipRequestConstants.STATUS_PENDING, -1, -1);
-			total = MembershipRequestLocalServiceUtil.searchCount(themeDisplay.getScopeGroupId(), MembershipRequestConstants.STATUS_PENDING);
-			//memberships.get(0).getUserId()
+			searchContainer.setResults(MembershipRequestLocalServiceUtil.search(themeDisplay.getScopeGroupId(), MembershipRequestConstants.STATUS_PENDING, searchContainer.getStart(), searchContainer.getEnd()));
+			searchContainer.setTotal(MembershipRequestLocalServiceUtil.searchCount(themeDisplay.getScopeGroupId(), MembershipRequestConstants.STATUS_PENDING));
 		} catch (SystemException e) {
 			if(log.isDebugEnabled()){
 				e.printStackTrace();
 			}
 		}
 		
-		if(maxUsers<=0){
-			renderRequest.setAttribute("maxUsers", "&#8734;");
-		}else{
-			renderRequest.setAttribute("maxUsers", maxUsers); 
+		if(maxUsers>0){
+			renderRequest.setAttribute("maxUsers", "/"+maxUsers); 
 		}
 		
-		renderRequest.setAttribute("total", total);
+		renderRequest.setAttribute("searchContainer", searchContainer);
 		renderRequest.setAttribute("numberUsers", numberUsers);
-		renderRequest.setAttribute("memberships", memberships);
 		
 		include(viewJSP, renderRequest, renderResponse);
 	}

@@ -1,6 +1,7 @@
 package com.liferay.lms.learningactivity;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
 
@@ -119,6 +120,15 @@ public class LearningActivityTypeRegistry {
 		}	
 		return null;
 	}
+	
+	public HashMap<Integer, LearningActivityType> getLearningActivityTypesForCreatingHash(){
+		HashMap<Integer, LearningActivityType> hashLearningActivityType = new HashMap<Integer, LearningActivityType>();
+		for(LearningActivityType lat: _learningActivityTypesForCreating){
+			hashLearningActivityType.put((int)lat.getTypeId(), lat);
+		}
+		return hashLearningActivityType;
+	}
+	
 
 	public List<LearningActivityType> getLearningActivityTypes() {
 		return _learningActivityTypes;

@@ -51,7 +51,6 @@ import com.liferay.portlet.asset.model.BaseAssetRenderer;
 public abstract class LearningActivityBaseAssetRenderer extends BaseAssetRenderer {
 	
 	private static Log log = LogFactoryUtil.getLog(LearningActivityBaseAssetRenderer.class);
-	
 	public static final String ACTION_VIEW = "ACTION_VIEW";
 	public static final String EDIT_DETAILS = "ACTIVITY_EDIT_DETAILS";
 	public static final String TEMPLATE_JSP = "template_JSP";
@@ -59,6 +58,7 @@ public abstract class LearningActivityBaseAssetRenderer extends BaseAssetRendere
 	protected static final String LMS_ACTIVITIES_LIST_PORTLET_ID =  PortalUtil.getJsSafePortletId("lmsactivitieslist"+PortletConstants.WAR_SEPARATOR+ClpSerializer.getServletContextName());
 	protected static final String ACTIVITY_VIEWER_PORTLET_ID =  PortalUtil.getJsSafePortletId("activityViewer"+PortletConstants.WAR_SEPARATOR+ClpSerializer.getServletContextName());
 	public static final String LMS_EDITACTIVITY_PORTLET_ID =  PortalUtil.getJsSafePortletId("editactivity"+PortletConstants.WAR_SEPARATOR+ClpSerializer.getServletContextName());
+	
 	
 	private LearningActivity _learningactivity;
 	private String _nameKey;
@@ -98,13 +98,12 @@ public abstract class LearningActivityBaseAssetRenderer extends BaseAssetRendere
 			_layout = layouts.get(0);
 			threadLocalCache.put(layoutKey, _layout);
 		}
-				
 		
 		if(!((LayoutTypePortlet)_layout.getLayoutType()).getPortletIds().contains(_portletId)){
 			_isRuntimePortlet = true;
 		}
+		
 	}
-	
 	
 	@Override
 	public long getClassPK() {
@@ -164,9 +163,8 @@ public abstract class LearningActivityBaseAssetRenderer extends BaseAssetRendere
 
 	private void prepareRuntimePortlet(PortletURL portletURL)
 			throws SystemException, PortalException {
-		
 		if(_isRuntimePortlet){
-			
+
 			portletURL.setParameter("p_o_p_id",ACTIVITY_VIEWER_PORTLET_ID);
 
 			PortletPreferencesFactoryUtil.getLayoutPortletSetup(_layout, _portletId);
@@ -198,7 +196,6 @@ public abstract class LearningActivityBaseAssetRenderer extends BaseAssetRendere
 	@Override
 	public final PortletURL getURLEdit(LiferayPortletRequest liferayPortletRequest,
 			LiferayPortletResponse liferayPortletResponse) throws Exception {
-		
 		PortletURL portletURL = null;
 		if((_editDetails)&&(GetterUtil.getBoolean(liferayPortletRequest.getAttribute(EDIT_DETAILS)))) {
 			portletURL = getURLEditDetails(liferayPortletRequest, liferayPortletResponse);
@@ -209,17 +206,18 @@ public abstract class LearningActivityBaseAssetRenderer extends BaseAssetRendere
 		}
 		ThemeDisplay themeDisplay = (ThemeDisplay)liferayPortletRequest.getAttribute(
 				WebKeys.THEME_DISPLAY);
-		portletURL = PortletURLFactoryUtil.create(liferayPortletRequest,_portletId/*LMS_EDITACTIVITY_PORTLET_ID LMS_ACTIVITIES_LIST_PORTLET_ID*/,getControlPanelPlid(themeDisplay),PortletRequest.RENDER_PHASE);
+		portletURL = PortletURLFactoryUtil.create(liferayPortletRequest,_portletId,getControlPanelPlid(themeDisplay),PortletRequest.RENDER_PHASE);
 		portletURL.setParameter("editing", StringPool.TRUE);
 		portletURL.setParameter("resId",Long.toString( _learningactivity.getActId()));
 		portletURL.setParameter("resModuleId",Long.toString( _learningactivity.getModuleId())); 
 	    return portletURL;
 	}
-	
+
 	
 	protected String getMvcPathView(long userId, LiferayPortletResponse liferayPortletResponse, WindowState windowState) throws Exception {
 		return StringPool.BLANK;
 	}
+	
 	
 	@Override
 	public final PortletURL getURLView(LiferayPortletResponse liferayPortletResponse,
@@ -240,6 +238,7 @@ public abstract class LearningActivityBaseAssetRenderer extends BaseAssetRendere
 		portletURL.setParameter("actionEditingActivity", StringPool.FALSE);
 		portletURL.setParameter("actionEditingDetails", StringPool.FALSE);
 		portletURL.setParameter("actionEditingModule", StringPool.FALSE);
+		portletURL.setParameter("actionCalifications", StringPool.FALSE);
 		
 		long userId = PrincipalThreadLocal.getUserId();
 		
@@ -255,6 +254,7 @@ public abstract class LearningActivityBaseAssetRenderer extends BaseAssetRendere
 		return portletURL;
 	}
 	
+	
 	@Override
 	public final String getURLViewInContext(
 			LiferayPortletRequest liferayPortletRequest,
@@ -264,6 +264,11 @@ public abstract class LearningActivityBaseAssetRenderer extends BaseAssetRendere
 		PortletURL portletURL = liferayPortletResponse.createLiferayPortletURL(_layout.getPlid(), _portletId, PortletRequest.RENDER_PHASE);
 		portletURL.setParameter("actId",Long.toString( _learningactivity.getActId()));
 		portletURL.setParameter("moduleId",Long.toString( _learningactivity.getModuleId()));
+		portletURL.setParameter("actionEditingActivity", StringPool.FALSE);
+		portletURL.setParameter("actionEditingDetails", StringPool.FALSE);
+		portletURL.setParameter("actionEditingModule", StringPool.FALSE);
+		portletURL.setParameter("actionCalifications", StringPool.FALSE);
+		
 		
 		String mvcPath = getMvcPathView(themeDisplay.getUserId(),liferayPortletResponse,liferayPortletRequest.getWindowState());
 		if(Validator.isNotNull(mvcPath)){

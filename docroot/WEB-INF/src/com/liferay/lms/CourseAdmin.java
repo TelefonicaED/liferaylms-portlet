@@ -152,6 +152,7 @@ public class CourseAdmin extends MVCPortlet {
 	private String importUsersJSP = null;
 	private String usersResultsJSP = null;
 	private String competenceResultsJSP = null;
+	private String configLmsPrefsJSP = null;
 	
 	public void init() throws PortletException {	
 		viewJSP = getInitParameter("view-template");
@@ -164,6 +165,7 @@ public class CourseAdmin extends MVCPortlet {
 		importUsersJSP = getInitParameter("import-users-template");
 		usersResultsJSP = getInitParameter("users-results-template");
 		competenceResultsJSP = getInitParameter("competence-results-template");
+		configLmsPrefsJSP = getInitParameter("config-lms-prefs");
 	}
 
 	public static String DOCUMENTLIBRARY_MAINFOLDER = "ResourceUploads"; 
@@ -176,39 +178,51 @@ public class CourseAdmin extends MVCPortlet {
 	private static Log log = LogFactoryUtil.getLog(CourseAdmin.class);
 	
 	public void doView(RenderRequest renderRequest, RenderResponse renderResponse) throws IOException, PortletException {
-		
-		String jsp = renderRequest.getParameter("view");
-		if(log.isDebugEnabled())log.debug("VIEW "+jsp);
+		ThemeDisplay themeDisplay = (ThemeDisplay)renderRequest.getAttribute(WebKeys.THEME_DISPLAY);
+		LmsPrefs lmsPrefs = null;
 		try {
-			if(jsp == null || "".equals(jsp)){
+			lmsPrefs = LmsPrefsLocalServiceUtil.getLmsPrefsIni(themeDisplay.getCompanyId());
+		} catch (SystemException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+		if(lmsPrefs != null){		
+			String jsp = renderRequest.getParameter("view");
+			if(log.isDebugEnabled())log.debug("VIEW "+jsp);
+			try {
+				if(jsp == null || "".equals(jsp)){
+					showViewDefault(renderRequest, renderResponse);
+				}else if("edit-course".equals(jsp)){
+					showViewEditCourse(renderRequest, renderResponse);
+				}else if("role-members-tab".equals(jsp)){
+					showViewRoleMembersTab(renderRequest, renderResponse);
+				}else if("export".equals(jsp)){
+					showViewExport(renderRequest, renderResponse);
+				}else if("import".equals(jsp)){
+					showViewImport(renderRequest, renderResponse);
+				}else if("clone".equals(jsp)){
+					showViewClone(renderRequest, renderResponse);
+				}else if("competence-tab".equals(jsp)){
+					showViewCompetenceTab(renderRequest, renderResponse);
+				}else if("import-users".equals(jsp)){
+					showViewImportUsers(renderRequest, renderResponse);
+				}else if("users-results".equals(jsp)){
+					showViewUsersResults(renderRequest, renderResponse);
+				}else if("competence-results".equals(jsp)){
+					showViewCompetenceResults(renderRequest, renderResponse);
+				}
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 				showViewDefault(renderRequest, renderResponse);
-			}else if("edit-course".equals(jsp)){
-				showViewEditCourse(renderRequest, renderResponse);
-			}else if("role-members-tab".equals(jsp)){
-				showViewRoleMembersTab(renderRequest, renderResponse);
-			}else if("export".equals(jsp)){
-				showViewExport(renderRequest, renderResponse);
-			}else if("import".equals(jsp)){
-				showViewImport(renderRequest, renderResponse);
-			}else if("clone".equals(jsp)){
-				showViewClone(renderRequest, renderResponse);
-			}else if("competence-tab".equals(jsp)){
-				showViewCompetenceTab(renderRequest, renderResponse);
-			}else if("import-users".equals(jsp)){
-				showViewImportUsers(renderRequest, renderResponse);
-			}else if("users-results".equals(jsp)){
-				showViewUsersResults(renderRequest, renderResponse);
-			}else if("competence-results".equals(jsp)){
-				showViewCompetenceResults(renderRequest, renderResponse);
+			} catch (PortletException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				showViewDefault(renderRequest, renderResponse);
 			}
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			showViewDefault(renderRequest, renderResponse);
-		} catch (PortletException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			showViewDefault(renderRequest, renderResponse);
+		}else{
+			include(this.configLmsPrefsJSP, renderRequest, renderResponse);
 		}
 	}
 	
@@ -841,10 +855,22 @@ public class CourseAdmin extends MVCPortlet {
 		Course course = null;
 		if (courseId == 0) {
 			try{
-				course = com.liferay.lms.service.CourseLocalServiceUtil.addCourse(
+				course = CourseLocalServiceUtil.addCourse(
 						title, description, summary, friendlyURL,
 						themeDisplay.getLocale(), ahora, startDate, stopDate,courseTemplateId,type,courseEvalId,
 						courseCalificationType,maxusers,serviceContext,false);
+				try{
+				LmsPrefs prefs=LmsPrefsLocalServiceUtil.getLmsPrefs(course.getCompanyId());
+				//Añadimos el rol de editor del curso cuando lo crea
+				Long editorRoleId=RoleLocalServiceUtil.getRole(prefs.getEditorRole()).getRoleId();
+				
+				UserGroupRoleLocalServiceUtil.addUserGroupRoles(new long[] { themeDisplay.getUserId() }, course.getGroupCreatedId(), editorRoleId);
+
+				AuditingLogFactory.audit(course.getCompanyId(), course.getGroupCreatedId(), Course.class.getName(), 
+						course.getCourseId(),themeDisplay.getUserId(), AuditConstants.REGISTER, "COURSE_EDITOR_ADD");
+				} catch(Exception e){
+					e.printStackTrace();
+				}
 			}catch(PortalException pe){
 				if(log.isDebugEnabled())log.debug("Error:"+pe.getMessage());
 				if(pe instanceof DuplicateGroupException){
@@ -898,8 +924,10 @@ public class CourseAdmin extends MVCPortlet {
 				course.setCalificationType(courseCalificationType);
 				course.setMaxusers(maxusers);
 				serviceContext.setAttribute("type", String.valueOf(type));
-				com.liferay.lms.service.CourseLocalServiceUtil.modCourse(course,
-						summary, serviceContext);
+				/*
+				 * Se llama m�s abajo
+				 * com.liferay.lms.service.CourseLocalServiceUtil.modCourse(course,
+						summary, serviceContext);*/
 			}catch(PortalException pe){ 
 				if(pe.getMessage().startsWith("maxUsers ")){ 
 					SessionErrors.add(actionRequest, "evaluationtaskactivity.error.systemError");
@@ -1012,7 +1040,16 @@ public class CourseAdmin extends MVCPortlet {
 			try {
 				try{
 					serviceContext.setAttribute("type", String.valueOf(type));
-					CourseLocalServiceUtil.modCourse(course,summary,serviceContext);
+					PermissionChecker permissionChecker = PermissionCheckerFactoryUtil
+							.getPermissionCheckerFactory().create(user);
+					log.debug("Updating the course");
+					if (permissionChecker.hasPermission(themeDisplay.getScopeGroupId(),
+							Course.class.getName(), 0, "PUBLISH")) {
+						log.debug("With publish permission, setting visible to "+visible);
+						CourseLocalServiceUtil.modCourse(course,summary,serviceContext, visible);
+					}else{
+						CourseLocalServiceUtil.modCourse(course,summary,serviceContext);
+					}
 				}catch(PortalException pe){ 
 					if(pe.getMessage().startsWith("maxUsers ")){
 						SessionErrors.add(actionRequest, "evaluationtaskactivity.error.systemError");
@@ -1032,22 +1069,11 @@ public class CourseAdmin extends MVCPortlet {
 					actionResponse.setRenderParameter("jspPage","/html/courseadmin/editcourse.jsp");
 					return;
 				}
-				
-				PermissionChecker permissionChecker = PermissionCheckerFactoryUtil
-						.getPermissionCheckerFactory().create(user);
-
-				if (permissionChecker.hasPermission(themeDisplay.getScopeGroupId(),
-						Course.class.getName(), 0, "PUBLISH")) {
-
-					com.liferay.lms.service.CourseLocalServiceUtil.setVisible(
-							course.getCourseId(), visible);
-				}
-				
-				SessionMessages.add(actionRequest, "course-saved-successfully");
-				
+				 
 				actionResponse.setRenderParameter("courseId", String.valueOf(course.getCourseId()));
-				actionResponse.setRenderParameter("jspPage","/html/courseadmin/editcourse.jsp");
-				
+				actionResponse.setRenderParameter("jspPage","/html/courseadmin/editcourse.jsp");			
+				SessionMessages.add(actionRequest, "course-saved-successfully");
+								
 				/*
 				WindowState windowState = actionRequest.getWindowState();
 				if (redirect != null && !StringPool.BLANK.equals(redirect)) {
@@ -1529,12 +1555,13 @@ public class CourseAdmin extends MVCPortlet {
 
 	public void importCourse(ActionRequest actionRequest, ActionResponse actionResponse) throws Exception {
 
+		UploadPortletRequest uploadRequest = PortalUtil.getUploadPortletRequest(actionRequest);
+		long groupId = ParamUtil.getLong(uploadRequest, "groupId");
+		
 		try {
-			UploadPortletRequest uploadRequest = PortalUtil.getUploadPortletRequest(actionRequest);
 
 			ThemeDisplay themeDisplay = (ThemeDisplay) actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
 
-			long groupId = ParamUtil.getLong(uploadRequest, "groupId");
 			File file = uploadRequest.getFile("importFileName");
 			if (!file.exists()) {
 				//	log.debug("Import file does not exist");
@@ -1551,15 +1578,20 @@ public class CourseAdmin extends MVCPortlet {
 				c.setIcon(0);
 				CourseLocalServiceUtil.updateCourse(c);
 			}
+			
+			SessionMessages.add(actionRequest, "import-course-ok");
 
-		}
-		catch (Exception e) {
-			//log.debug("Error importando lar.");
-
+		} catch (Exception e) {
+			e.printStackTrace();
 			if ((e instanceof LARFileException) || (e instanceof LARTypeException)) {
 
 				SessionErrors.add(actionRequest, e.getClass().getName());
 
+			} if(e.getMessage() != null && e.getMessage().indexOf(NoLearningActivityTypeActiveException.class.getName()) >= 0){
+				e.printStackTrace();
+				actionResponse.setRenderParameter("view", "import");
+				actionResponse.setRenderParameter("groupId", String.valueOf(groupId));
+				SessionErrors.add(actionRequest, "error-learning-activity-type");	
 			}
 			else {
 				log.error(e, e);

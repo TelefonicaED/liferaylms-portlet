@@ -1,35 +1,9 @@
-
-<%@page import="com.liferay.portal.kernel.dao.orm.QueryUtil"%>
-<%@page import="com.liferay.lms.service.LmsPrefsLocalServiceUtil"%>
-<%@page import="com.liferay.lms.model.LmsPrefs"%>
-<%@page import="com.liferay.portal.service.RoleLocalServiceUtil"%>
-<%@page import="com.liferay.portal.kernel.dao.orm.CustomSQLParam"%>
-<%@page import="com.liferay.portal.util.comparator.UserLastNameComparator"%>
-<%@page import="com.liferay.portal.kernel.util.OrderByComparator"%>
-<%@page import="com.liferay.lms.model.CourseResult"%>
-<%@page import="java.util.Collection"%>
-<%@page import="com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil"%>
-<%@page import="com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil"%>
-<%@page import="com.liferay.portal.kernel.dao.orm.DynamicQuery"%>
-<%@page import="com.liferay.portal.service.TeamLocalServiceUtil"%>
-<%@page import="com.liferay.portal.model.Team"%>
-<%@page import="java.util.Locale"%>
-<%@page import="com.liferay.lms.service.CourseLocalServiceUtil"%>
-<%@page import="com.liferay.lms.model.Course"%>
-<%@page import="com.liferay.lms.service.CourseResultLocalServiceUtil"%>
-<%@page import="com.liferay.lms.service.ModuleResultLocalServiceUtil"%>
-<%@page import="com.liferay.portal.kernel.util.ListUtil"%>
-<%@page import="com.liferay.lms.service.ModuleLocalServiceUtil"%>
-<%@page import="com.liferay.lms.model.Module"%>
-<%@page import="com.liferay.lms.service.LearningActivityResultLocalServiceUtil"%>
-<%@page import="com.liferay.lms.model.LearningActivity"%>
-<%@page import="com.liferay.lms.service.LearningActivityLocalServiceUtil"%>
 <%@ include file="/init.jsp" %>
 
 
 	<liferay-portlet:resourceURL var="exportURL" >
 		<portlet:param name="action" value="export"/>
-		<portlet:param name="courseId" value="${courseId}"/>
+		<portlet:param name="courseId" value="${course.courseId}"/>
 	</liferay-portlet:resourceURL>
 
 	<liferay-portlet:renderURL var="reloadTeamURL"/>
@@ -133,4 +107,3 @@
 			</liferay-ui:search-container-row>	
 			<liferay-ui:search-iterator />
 	</liferay-ui:search-container>
-

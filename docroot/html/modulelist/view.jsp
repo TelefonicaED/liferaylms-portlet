@@ -33,11 +33,11 @@
 <%
 	PortletPreferences preferences = null;
 	String portletResource = ParamUtil.getString(request, "portletResource");
-	if (Validator.isNotNull(portletResource)) 
+	if (Validator.isNotNull(portletResource)){ 
 		preferences = PortletPreferencesFactoryUtil.getPortletSetup(request, portletResource);
-	else
+	}else{
 		preferences = renderRequest.getPreferences();
-	
+	}
 	boolean showLockedModulesIcon = (preferences.getValue("showLockedModulesIcon", "false")).compareTo("true") == 0;
 	boolean showModuleIcon = (preferences.getValue("showModuleIcon", "true")).compareTo("true") == 0;
 	boolean numerateModules = (preferences.getValue("numerateModules", "false")).compareTo("true") == 0;
@@ -135,7 +135,9 @@ if(!ismobile){
 <%
 	String idModuleTable = "idModuleTable";
 	boolean moduleEditing = permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), Module.class.getName(), themeDisplay.getScopeGroupId(), ActionKeys.UPDATE);
-	if(moduleEditing) idModuleTable = "myModule";
+	if(moduleEditing){ 
+		idModuleTable = "myModule";
+	}
 %>
 	<div id="myContainer">
 	<table class="coursemodule <%="course-status-".concat(String.valueOf(course.getStatus()))%>" id="<%=idModuleTable%>">
@@ -178,9 +180,9 @@ if(!ismobile){
 						
 								if(html5Event.data.name=='reloadModule'){
 									<% if(theModule.getModuleId()!=0){ %>
-									if(html5Event.data.moduleId==<%=Long.toString(theModule.getModuleId())%>)
+										if(html5Event.data.moduleId==<%=Long.toString(theModule.getModuleId())%>){
 									<% } %>
-									{
+									
 										var moduleTitlePortlet=A.one('#p_p_id<%=StringPool.UNDERLINE+PortalUtil.getJsSafePortletId("ModuleTitle"+
 												PortletConstants.WAR_SEPARATOR+portletConfig.getPortletContext().getPortletContextName())+StringPool.UNDERLINE %>');
 										if(moduleTitlePortlet!=null) {
@@ -198,7 +200,9 @@ if(!ismobile){
 										if(activityNavigatorPortlet!=null) {
 											Liferay.Portlet.refresh(activityNavigatorPortlet);
 										}
-									}
+									<% if(theModule.getModuleId()!=0){ %>
+										}
+									<%}%>
 
 									Liferay.Portlet.refresh(A.one('#p_p_id<portlet:namespace />'));	
 					  
@@ -248,7 +252,7 @@ if(!ismobile){
     <%
                                     }    
                                 }catch(Exception e){
-                                    }
+                                }
                             }
 %>
                         </td>
@@ -258,8 +262,12 @@ if(!ismobile){
 					
 					Group grupo=themeDisplay.getScopeGroup();
 					long retoplid=themeDisplay.getPlid();
-					for(Layout theLayout:LayoutLocalServiceUtil.getLayouts(grupo.getGroupId(),false))
-						if(theLayout.getFriendlyURL().equals("/reto")) retoplid=theLayout.getPlid();
+					for(Layout theLayout:LayoutLocalServiceUtil.getLayouts(grupo.getGroupId(),false)){
+						if(theLayout.getFriendlyURL().equals("/reto")){
+							retoplid=theLayout.getPlid();
+						}
+					}
+						
 					LiferayPortletURL  gotoModuleURL = PortletURLFactoryUtil.create(PortalUtil.getHttpServletRequest(renderRequest),
 								PortalUtil.getJsSafePortletId("lmsactivitieslist"+PortletConstants.WAR_SEPARATOR+ClpSerializer.getServletContextName()), retoplid, PortletRequest.ACTION_PHASE);		
 					gotoModuleURL.setParameter(ActionRequest.ACTION_NAME, "goToModule");
@@ -374,11 +382,10 @@ if(!ismobile){
 %>
 					</td>
 				</tr>
-<%
-			}
-		}else{
-			renderRequest.setAttribute(WebKeys.PORTLET_CONFIGURATOR_VISIBILITY, Boolean.FALSE);
-		}
+<%		}
+	}else{
+		renderRequest.setAttribute(WebKeys.PORTLET_CONFIGURATOR_VISIBILITY, Boolean.FALSE);
+	}	
 %>
-	</table>
-	</div>
+  </table>
+</div>

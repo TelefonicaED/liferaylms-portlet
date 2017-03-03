@@ -109,6 +109,8 @@ public class SurveyActivity extends MVCPortlet {
 		long latId=ParamUtil.getLong(actionRequest,"latId" );
 		long actId=ParamUtil.getLong(actionRequest,"actId",0 );
 
+		boolean isTablet = ParamUtil.getBoolean(actionRequest,"isTablet" );
+		
 		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
 
 		Enumeration<String> params=actionRequest.getParameterNames();
@@ -208,6 +210,8 @@ public class SurveyActivity extends MVCPortlet {
 
 		actionResponse.setRenderParameter("jspPage", "/html/surveyactivity/view.jsp");
 
+		if(isTablet)actionResponse.setRenderParameter("isTablet", Boolean.toString(true));
+		
 	}
 
 	public void edit(ActionRequest actionRequest,ActionResponse actionResponse)throws Exception {

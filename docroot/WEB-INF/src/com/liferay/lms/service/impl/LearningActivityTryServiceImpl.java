@@ -70,7 +70,7 @@ public class LearningActivityTryServiceImpl
 		lat.setUserId(userId);
 		java.util.Date today=new java.util.Date(System.currentTimeMillis());
 		lat.setStartDate(today);
-		learningActivityTryPersistence.update(lat, true);
+		learningActivityTryPersistence.update(lat, false);
 		
 		ServiceContext serviceContext = ServiceContextThreadLocal.getServiceContext();
 		

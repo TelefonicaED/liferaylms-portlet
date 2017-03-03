@@ -1,3 +1,7 @@
+<%@page import="com.liferay.portal.kernel.util.PropsUtil"%>
+<%@page import="com.liferay.portal.kernel.json.JSONObject"%>
+<%@page import="com.liferay.portal.kernel.json.JSONFactoryUtil"%>
+<%@page import="com.liferay.portal.kernel.json.JSONArray"%>
 <%@page import="com.liferay.portal.kernel.servlet.BrowserSnifferUtil"%>
 <%@page import="org.apache.commons.lang.StringEscapeUtils"%>
 <%@page import="com.liferay.portal.kernel.util.Constants"%>
@@ -23,6 +27,13 @@
 
 <%@include file="/init.jsp" %>
 
+<%
+Boolean isLinkTabletP2PCorrect = ParamUtil.getBoolean(request, "isTablet", false);
+String cssLinkTabletClassP2PCorrect="";
+if(isLinkTabletP2PCorrect){
+	cssLinkTabletClassP2PCorrect="tablet-link";
+}
+%>
 
 
 <script type="text/javascript">
@@ -120,6 +131,8 @@ if(activity.getEnddate() == null){
 	</div>
 </c:if>
 
+<%int numQuestion = Integer.parseInt(PropsUtil.get("lms.p2p.numcustomquestion"));%>
+
 <aui:script>
 
 	
@@ -128,19 +141,24 @@ if(activity.getEnddate() == null){
 	        '<portlet:namespace />checkDataformC',
 	        function (thisForm, thisEditor) {
 				var A = AUI();
-				var descriptionVal;
-				if(window.CKEDITOR)
-					descriptionVal = CKEDITOR.instances[thisEditor].getData();
-				else
-					descriptionVal = A.one('#'+thisEditor).val();
-				
-				
-				if (descriptionVal == "" || descriptionVal == "<%= StringEscapeUtils.unescapeHtml(textoCorrecion) %>") {
-					alert(Liferay.Language.get("p2ptask-no-empty-answer"));
-				}
-				else {
+				<%
+					for(int i=0;i<numQuestion;i++){ 
+						String des = LearningActivityLocalServiceUtil.getExtraContentValue(actId, "text"+i);
+						if(des!=null&&!des.equals(StringPool.BLANK)){
+					%>
+							var descriptionVal = CKEDITOR.instances[thisEditor+'_<%=i%>'].getData();
+							
+							
+							if (descriptionVal == "" || descriptionVal == "<%= StringEscapeUtils.unescapeHtml(textoCorrecion) %>") {
+								alert(Liferay.Language.get("p2ptask-no-empty-answer"));
+								return;
+							}
+					<%	}else{
+							break;			
+						}
+					}
+					%>
 					<portlet:namespace />openPopUpCorrection(thisForm, thisEditor);
-				}
 	        },
 	        ['node']
 	);
@@ -149,24 +167,14 @@ if(activity.getEnddate() == null){
 	        window,
 	        '<portlet:namespace />clearTextCorrection',
 	        function (id) {
-				var A = AUI();
-				var idDesc;
-				if (window.CKEDITOR)
-					idDesc = CKEDITOR.instances[id].document.getBody().getText();
-				else
-					idDesc = A.one('#'+id).val();
-				
+				var desc = CKEDITOR.instances[id].document.getBody().getText();
+	
 				var textReplace = "<%= StringEscapeUtils.unescapeHtml(textoCorrecion)  %>";
-				if (idDesc == textReplace) {
-					if (window.CKEDITOR){
-						CKEDITOR.instances[id].setData("");
-						CKEDITOR.instances[id].focus();
-					}else{
-						A.one('#'+id).set('value',"");
-						A.one('#'+id).focus();
-					}
+				if (desc == textReplace) {
+
+					CKEDITOR.instances[id].setData("");
+					CKEDITOR.instances[id].focus();
 				}
-				
 	        },
 	        ['node']
 	);
@@ -178,18 +186,35 @@ if(activity.getEnddate() == null){
 				var A = AUI();
 				var selector = 'form[name="'+formName+'"]';
 				var fileName = A.one(selector).one('input[name="<portlet:namespace />fileName"]').val();
-				if(window.CKEDITOR)
-					var textDesc = CKEDITOR.instances[thisEditor].getData();
-				else
-					var textDesc = A.one('#'+thisEditor).val();
+
 				var textResult = ''; 
 
 				//Se copia el atributo para no modificar el servicio
-				AUI().one(selector).get('<portlet:namespace />description').set('value',textDesc);
-				if(window.CKEDITOR)
-					textDesc = CKEDITOR.instances[thisEditor].document.getBody().getText();
-				else
-					textDesc = A.one('#'+thisEditor).val();
+				
+				<%
+					for(int i=0;i<numQuestion;i++){
+						String des = LearningActivityLocalServiceUtil.getExtraContentValue(actId, "text"+i);
+						if(des!=null&&!des.equals(StringPool.BLANK)){
+				%>
+
+							var textDesc = CKEDITOR.instances[thisEditor+'_<%=i%>'].getData();
+	
+							console.log("2-"+thisEditor+'_<%=i%>');
+							AUI().one(selector).get(thisEditor+'_<%=i%>i').set('value',textDesc);
+	
+							AUI().one(selector).get(thisEditor+'_<%=i%>').set('value',textDesc);
+							textDesc = CKEDITOR.instances[thisEditor+'_<%=i%>'].document.getBody().getText();
+	
+	
+							
+	
+							A.one("#contentDescriptionCorrec_<%=i%>").html(textDesc);
+				<%
+						}else{
+							break;
+						}
+					}
+				%>
 				
 				if(	A.one('select[name="<portlet:namespace />resultuser"]') != null){
 					textResult = A.one('select[name="<portlet:namespace />resultuser"]').val();
@@ -223,7 +248,7 @@ if(activity.getEnddate() == null){
 		        }).render();
 		        
 				A.one("#contentFileCorrec").html(fileName);
-				A.one("#contentDescriptionCorrec").html(textDesc);
+
 				if(textResult != ''){
 					A.one("#contentResult").html(textResult);
 				}
@@ -347,7 +372,18 @@ if(activity.getEnddate() == null){
 	<div class="desc color_tercero"><liferay-ui:message key="p2ptask-uploadcorrect-description" /></div>
 	<br />
 	<div class="contDesc description">
-		<p><span class="label"><liferay-ui:message key="p2ptask-description-task" />: </span><span id="contentDescriptionCorrec"></span></p>
+		<%
+			for(int i=0;i<numQuestion;i++){ 
+				String des = LearningActivityLocalServiceUtil.getExtraContentValue(actId, "text"+i);
+				if(des!=null&&!des.equals(StringPool.BLANK)){
+		%>
+				
+				<p><span class="label"><%=des %>: </span><span id="contentDescriptionCorrec_<%=i%>"></span></p>
+		<%		}else{
+					break;			
+				}
+			}
+		%>
 		<p><span class="label"><liferay-ui:message key="p2ptask-file-name" />: </span> <span id="contentFileCorrec"></span></p>
 		<c:if test="<%=result %>">
 			<p><span class="label"><liferay-ui:message key="p2ptask-file-result" />: </span> <span id="contentResult"></span></p>
@@ -524,30 +560,63 @@ if(!p2pActList.isEmpty()){
 							<input type="hidden" name="p2pActivityCorrectionId" value="0"  />
 							<input type="hidden" name="p2pActivityId" value="<%=myP2PActivity.getP2pActivityId()%>"  />
 							<input type="hidden" name="userId" value="<%=userId%>"  />
-							
-							<div class="description">
-								<%=descriptionFile %>
-							</div>
 	
 							<c:if test="<%=myP2PActivity.getFileEntryId() != 0 %>">
 								<div class="doc_descarga">
 									<span><%=title%>&nbsp;(<%= sizeKb%> Kb)&nbsp;</span>
-									<a href="<%=urlFile%>" class="verMas" target="_blank"><liferay-ui:message key="p2ptask-donwload" /></a>
+									<a href="<%=urlFile%>" class="verMas <%=cssLinkTabletClassP2PCorrect %>" target="_blank"><liferay-ui:message key="p2ptask-donwload" /></a>
 								</div>
 							</c:if>
+							
+							<% 
 
-							<aui:field-wrapper label="description">
-								<liferay-ui:input-editor name="<%=\"description_\"+cont%>" width="100%" initMethod="initEditorCorrection"/>
-								<aui:input name="<%=\"description_\"+cont%>" type="hidden"/>
-								<script type="text/javascript">
-					    		    function <portlet:namespace />initEditorCorrection() {
-						    		    return "<%= UnicodeFormatter.toString(textoCorrecion) %>"; 
-						    		};
-						    		AUI().on('domready', function(){if(window.CKEDITOR)CKEDITOR.instances.<portlet:namespace />description_<%=cont %>.on('focus',function(){<portlet:namespace />clearTextCorrection('<portlet:namespace />description_'+<%=cont %>);});});
-					    		</script>
-							</aui:field-wrapper>
-							<aui:input name="description" type="hidden"/>
+								JSONArray jArray = null;								
+								try{
+									 jArray = JSONFactoryUtil.createJSONArray(descriptionFile);
+								}catch(Exception e){
+									
+								}
+							
+								if(jArray==null||jArray.length()<=0){
+									%><%=descriptionFile %><%
+								}else{
+									for(int i=0;i<numQuestion;i++){ 
+										String des = LearningActivityLocalServiceUtil.getExtraContentValue(actId, "text"+i);
+										JSONObject jobject = jArray.getJSONObject(i);
+										if(jobject==null){
+											break;
+										}
+										
+										String text = jobject.getString("text"+i);
 
+										if(text==null){
+											break;
+										}
+										
+										%>
+									
+									<div class="description">
+										<div class="correctQuestion"><%=des.replaceAll(StringPool.DOUBLE_QUOTE, StringPool.BLANK)+StringPool.COLON%></div><div class="correctAnswer"><%= text %></div>
+									</div>
+		
+									<aui:field-wrapper label='p2ptask-correction' name='<%="description_"+cont+"_"+i%>'>
+										<liferay-ui:input-editor name='<%="description_"+cont+"_"+i%>' width="100%" />
+										<aui:input name='<%="description_"+cont+"_"+i%>' type="hidden"/>
+										<script type="text/javascript">
+							    		    function <portlet:namespace />initEditor() {
+								    		    return "<%= UnicodeFormatter.toString(textoCorrecion) %>"; 
+								    		};
+								    		AUI().on('domready', function(){CKEDITOR.instances.<portlet:namespace />description_<%=cont%>_<%=i%>.on('focus',function(){<portlet:namespace />clearTextCorrection('<portlet:namespace />description_<%=cont %>_<%=i%>');});});
+							    		</script>
+									</aui:field-wrapper>
+									<aui:input name='<%="description_"+cont+StringPool.UNDERLINE+i+"i" %>' type="hidden"/>
+
+								<% } 	
+									
+								}%>
+							
+							
+								
 							<liferay-ui:error key="p2ptaskactivity-error-file-size" message="p2ptaskactivity.error.file.size" />
 							<div class="container-file">
 								<aui:input inlineLabel="left" inlineField="true"
@@ -624,23 +693,80 @@ if(!p2pActList.isEmpty()){
 						</span>
 						</c:if>
 					</span>
-					<div class="collapsable2" style="display:none">
+					<div class="collapsable2" style="display:none;">
 
 						<div class="description">
-							<%=descriptionFile %>
+							<%
+								JSONArray jArray = null;
+							
+								try{
+									 jArray = JSONFactoryUtil.createJSONArray(descriptionFile);
+								}catch(Exception e){
+									
+								}
+							
+								if(jArray==null||jArray.length()<=0){
+									%><%=descriptionFile %><%
+								}
+							%>
 						</div>
 
 						<c:if test="<%=myP2PActivity.getFileEntryId() != 0 %>">
 							<div class="doc_descarga">
 								<span><%=title%>&nbsp;(<%= sizeKb%> Kb)&nbsp;</span>
-								<a href="<%=urlFile%>" class="verMas" target="_blank"><liferay-ui:message key="p2ptask-donwload" /></a>
+								<a href="<%=urlFile%>" class="verMas <%=cssLinkTabletClassP2PCorrect %>" target="_blank"><liferay-ui:message key="p2ptask-donwload" /></a>
 							</div>
 						</c:if>
 						<div class="degradade">
 							<div class="subtitle"><liferay-ui:message key="p2ptask-your-valoration" /> :</div>
 							<div class="container-textarea">
 								<label for="<portlet:namespace/>readonlydesc" />
-								<%=description %>
+								<%
+										JSONArray jArrayDes = null;
+										jArray = null;
+										try{
+											jArrayDes = JSONFactoryUtil.createJSONArray(description);
+										}catch(Exception e){}
+										
+										try{
+											jArray = JSONFactoryUtil.createJSONArray(myP2PActivity.getDescription());
+										}catch(Exception e){}
+									
+										if(jArray!=null&&jArray.length()>0){
+											%><div class="p2pResponse"><ul><%
+											for(int i=0;i<jArray.length();i++){
+												JSONObject jsonObject = null;
+												JSONObject jsonObjectDes = null;
+												try{
+												jsonObject = jArray.getJSONObject(i);
+												jsonObjectDes = jArrayDes.getJSONObject(i);
+												}catch(Exception e){}
+
+												String answer = jsonObject.getString("text"+i);
+												String valoration = null;
+												if(jsonObjectDes!=null)
+													valoration = jsonObjectDes.getString("text"+i);
+												
+												%>
+													<li>
+														<% 
+															String value = LearningActivityLocalServiceUtil.getExtraContentValue(actId, "text"+i);
+															if(value!=null&&!value.equals(StringPool.BLANK)){
+														%>
+															<div class="p2pQuestion"><%=value %></div>
+															<div class="p2pAnswer"><%=answer!=null?answer:StringPool.BLANK %></div>
+															<div class="p2pCorrect"><%=valoration!=null?valoration:StringPool.BLANK %></div>
+														<%
+															}
+														%>
+													</li>
+												<%
+											}%></ul></div><%
+											
+										}else{
+											%><%=description %><%
+										}
+									%>
 							</div>
 							<%
 
@@ -660,7 +786,7 @@ if(!p2pActList.isEmpty()){
 								%>
 								<div class="doc_descarga">
 									<span><%=dlfileCor.getTitle()%>&nbsp;(<%= sizeKb%> Kb)&nbsp;</span>
-									<a href="<%=urlFileCor%>" class="verMas" target="_blank"><liferay-ui:message key="p2ptask-donwload" /></a>
+									<a href="<%=urlFileCor%>" class="verMas <%=cssLinkTabletClassP2PCorrect %>" target="_blank"><liferay-ui:message key="p2ptask-donwload" /></a>
 								</div>
 							<%	}
 							}%>
@@ -699,7 +825,18 @@ if(p2pActList.isEmpty()){
 	<liferay-portlet:param name="moduleId" value="<%=Long.toString(myModule.getModuleId()) %>"></liferay-portlet:param>
 	</liferay-portlet:renderURL>
 	
-	<div class="no-p2pActivites-uploaded"><liferay-ui:message key="no-p2pActivites-uploaded" /></div>
+	<liferay-portlet:actionURL name="askForP2PActivities" var="askForP2PActivitiesURL">
+		<liferay-portlet:param name="actId" value="<%=String.valueOf(actId) %>" />
+	</liferay-portlet:actionURL>
+	
+	<div class="no-p2pActivites-uploaded">
+		<liferay-ui:message key="no-p2pActivites-uploaded" />
+		<c:if test='<%=LearningActivityLocalServiceUtil.getExtraContentValue(actId, "askforp2pactivities").equals("true") %>'>
+			<div>
+				<aui:button onClick="${askForP2PActivitiesURL }" value="ask-for-p2p-corrections"/>
+			</div>
+		</c:if>
+	</div>
 	<%
 }%>
 

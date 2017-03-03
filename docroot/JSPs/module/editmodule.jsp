@@ -335,6 +335,5 @@ function validate(){
 	   
 	<aui:button-row>
 		<input type="button" value="<liferay-ui:message key="save" />" onclick="javascript:validate()" >
-		<aui:button onClick="<%=renderResponse.getNamespace() + \"closeWindow()\"%>" value="<%=LanguageUtil.get(pageContext,\"cancel\")%>" type="cancel" />
 	</aui:button-row>
 </aui:form>

@@ -23,7 +23,7 @@
 <%@page import="com.liferay.portal.kernel.xml.SAXReaderUtil"%>
 
 <%@ include file="/init.jsp" %>
-
+<%@ include file="/html/shared/isTablet.jsp" %>
 
 
 
@@ -38,7 +38,6 @@ CalificationType ct = new CalificationTypeRegistry().getCalificationType(CourseL
 
 
 
-<div class="container-activity">
 <%
 long actId = ParamUtil.getLong(request,"actId",0);
 String returnToFullPageURL = renderRequest.getParameter("returnToFullPageURL");

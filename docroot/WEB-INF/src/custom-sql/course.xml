@@ -275,7 +275,7 @@
 			LEFT JOIN 
 				users_usergroups uug 
 					ON uug.userGroupId 
-						AND g.classPK AND g.classNameId = [$CLASSNAMEIDUSERGROUP$]
+						= g.classPK AND g.classNameId = [$CLASSNAMEIDUSERGROUP$]
 						AND uug.userId = [$USERID$]
 			LEFT JOIN 
 				users_orgs uo 
@@ -411,7 +411,6 @@
 					
 				)
 			ORDER BY [$ORDERBY$]
-			LIMIT ?, ?
 		]]>
 	</sql>
 	<sql id="com.liferay.lms.service.persistence.CourseFinder.countStudents">
@@ -433,7 +432,7 @@
 				usergrouprole urE 
 					ON ug.userId = urE.userId AND urE.groupId = ug.groupId AND urE.roleId = ?
 			WHERE 
-				ur.userId IS NULL AND urE.userId IS NULL AND co.courseId = ? AND u.status = ?
+				ur.userId IS NULL AND urE.userId IS NULL AND co.courseId = ? AND (u.status = ? OR ? = ?)
 				AND 
 				(
 					[$WHEREFIRSTNAME$]
@@ -493,8 +492,8 @@
 			SELECT 
 				c.courseId, 
 				u.userId, 
-				IF(EXTRACTVALUE(c.title, '//Title[@language-id=\"[$LANGUAGE$]\"]') != '', EXTRACTVALUE(c.title, '//Title[@language-id=\"[$LANGUAGE$]\"]'), EXTRACTVALUE(c.title, '//root[@default-locale]//Title')) AS courseTitle, 
-				CASE WHEN r.crId IS NULL THEN 0 WHEN r.passedDate IS NULL THEN 1 WHEN r.passedDate IS NOT NULL AND r.passed = 0 THEN 2 WHEN r.passed = 1 AND r.passedDate IS NOT NULL THEN 3 ELSE 0 END AS statusUser,
+				IF(EXTRACTVALUE(c.title, '//Title[@language-id=\"[$LANGUAGE$]\"]') != '', EXTRACTVALUE(c.title, '//Title[@language-id=\"[$LANGUAGE$]\"]'), IF(EXTRACTVALUE(c.title, '//root[@default-locale]//Title') != '', EXTRACTVALUE(c.title, '//root[@default-locale]//Title'), c.title )) AS courseTitle,
+				CASE WHEN r.crId IS NULL THEN '0' WHEN r.passedDate IS NULL THEN '1' WHEN r.passedDate IS NOT NULL AND r.passed = 0 THEN '2' WHEN r.passed = 1 AND r.passedDate IS NOT NULL THEN '3' ELSE '0' END AS statusUser,
 				CASE WHEN r.crId IS NULL THEN 0 ELSE r.result END AS result, c.icon, c.groupCreatedId, c.friendlyURL
 			FROM 
 				lms_course c
@@ -507,7 +506,6 @@
 			WHERE 
 				c.closed = 0 
 				AND (SELECT MAX(mo.endDate) FROM lms_module mo WHERE mo.groupId = c.groupCreatedId) > '[$DATENOW$]' 
-				AND r.passedDate IS NULL	
 				AND (r.crId IS NULL OR r.allowFinishDate IS NULL OR r.allowFinishDate > '[$DATENOW$]')
 				AND c.groupId = ?
 			GROUP By 
@@ -529,7 +527,6 @@
 			WHERE 
 				c.closed = 0 
 				AND (SELECT MAX(mo.endDate) FROM lms_module mo WHERE mo.groupId = c.groupCreatedId) > '[$DATENOW$]' 
-				AND r.passedDate IS NULL	
 				AND (r.crId IS NULL OR r.allowFinishDate IS NULL OR r.allowFinishDate > '[$DATENOW$]')
 				AND c.groupId = ?
 			GROUP By 

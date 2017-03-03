@@ -41,10 +41,10 @@ public class TestAssetRenderer extends LearningActivityBaseAssetRenderer {
 	@Override
 	protected PortletURL getURLEditDetails(LiferayPortletRequest liferayPortletRequest,
 			LiferayPortletResponse liferayPortletResponse) throws Exception {
-		PortletURL portletURL = PortletURLFactoryUtil.create(liferayPortletRequest, /*LearningActivityBaseAssetRenderer.LMS_EDITACTIVITY_PORTLET_ID */getPortletId(),getLayout().getPlid(),PortletRequest.RENDER_PHASE);	
+		PortletURL portletURL = PortletURLFactoryUtil.create(liferayPortletRequest,getPortletId(),getLayout().getPlid(),PortletRequest.RENDER_PHASE);	
 		portletURL.setParameter("mvcPath", "/html/execactivity/test/admin/editquestions.jsp");
 		portletURL.setParameter("actionEditingDetails", StringPool.TRUE);
-		portletURL.setParameter("resId",Long.toString( getLearningactivity().getActId()));		
+		portletURL.setParameter("resId",Long.toString( getLearningactivity().getActId()));
 	    return portletURL;
 	}
 }

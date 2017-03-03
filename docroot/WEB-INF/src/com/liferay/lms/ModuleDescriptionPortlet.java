@@ -13,6 +13,8 @@ import com.liferay.lms.auditing.AuditConstants;
 import com.liferay.lms.auditing.AuditingLogFactory;
 import com.liferay.lms.events.ThemeIdEvent;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -20,6 +22,8 @@ import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.util.bridges.mvc.MVCPortlet;
 
 public class ModuleDescriptionPortlet extends MVCPortlet {
+	
+	private static Log log = LogFactoryUtil.getLog(ModuleDescriptionPortlet.class);
 	
     @ProcessEvent(qname = "{http://www.wemooc.com/}themeId")
     public void handlethemeEvent(EventRequest eventRequest, EventResponse eventResponse) {
@@ -49,10 +53,22 @@ public class ModuleDescriptionPortlet extends MVCPortlet {
 		}
 
 		
-		if(ParamUtil.getBoolean(renderRequest, WebKeys.PORTLET_CONFIGURATOR_VISIBILITY,true)) {
+		boolean actionEditingDetails = ParamUtil.getBoolean(renderRequest, "actionEditingDetails", false);
+		boolean actionEditingActivity = ParamUtil.getBoolean(renderRequest, "actionEditingActivity", false);
+		boolean actionEditingModule = ParamUtil.getBoolean(renderRequest, "actionEditingModule", false);
+		boolean actionCalifications = ParamUtil.getBoolean(renderRequest, "actionCalifications", false);
+		
+		log.debug("actionEditingDetails:"+actionEditingDetails);
+		log.debug("actionEditingActivity:"+actionEditingActivity);
+		log.debug("actionEditingModule:"+actionEditingModule);
+		log.debug("actionCalifications:"+actionCalifications);
+		
+		//Cuando no tenemos actividad ni modulo, ocultamos el portlet.
+		if(actionEditingDetails || actionEditingActivity || actionEditingModule || actionCalifications){
+			renderRequest.setAttribute(WebKeys.PORTLET_CONFIGURATOR_VISIBILITY, Boolean.FALSE);
+		}else if(ParamUtil.getBoolean(renderRequest, WebKeys.PORTLET_CONFIGURATOR_VISIBILITY,true)) {
 			super.doView(renderRequest, renderResponse);
-		}
-		else {
+		}else {
 			renderRequest.setAttribute(WebKeys.PORTLET_CONFIGURATOR_VISIBILITY, Boolean.FALSE);
 		}
 	}

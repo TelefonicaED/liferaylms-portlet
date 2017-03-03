@@ -1,4 +1,3 @@
-
 <%@page import="com.liferay.lms.service.LearningActivityLocalServiceUtil"%>
 <%@page import="com.liferay.lms.service.P2pActivityLocalServiceUtil"%>
 <%@page import="com.liferay.lms.service.LearningActivityTryLocalServiceUtil"%>
@@ -9,7 +8,11 @@
 <%@page import="com.liferay.lms.model.LearningActivity"%>
 
 <%@ include file="/init.jsp" %>
-<div class="container-activity">
+<%@ include file="/html/shared/isTablet.jsp" %>
+
+<liferay-ui:success key="p2p-activity-assign-correct" message="p2p-activity-assign-correct" />
+<liferay-ui:error key="no-p2p-activity-assign" message="no-p2p-activity-assign" />
+
 <script type="text/javascript">
 <!--
 	

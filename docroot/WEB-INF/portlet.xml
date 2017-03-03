@@ -57,6 +57,11 @@
 		
 		<supported-public-render-parameter>actionEditingActivity</supported-public-render-parameter>	
 		<supported-public-render-parameter>actionEditingModule</supported-public-render-parameter>	
+		
+				
+		<supported-public-render-parameter>actionEditingActivity</supported-public-render-parameter>	
+		<supported-public-render-parameter>actionEditingModule</supported-public-render-parameter>
+		<supported-public-render-parameter>actionCalifications</supported-public-render-parameter>
 	</portlet>
 
 	<portlet>
@@ -255,8 +260,6 @@
 	</portlet>
 
 
-
-
 	<portlet>
 		<portlet-name>resourceExternalActivity</portlet-name>
 		<display-name>ResourceExternalActivity</display-name>
@@ -381,6 +384,11 @@
 			<role-name>user</role-name>
 		</security-role-ref>
 		<supported-public-render-parameter>actionEditing</supported-public-render-parameter>
+		
+		<supported-public-render-parameter>actionEditingActivity</supported-public-render-parameter>
+		<supported-public-render-parameter>actionEditingDetails</supported-public-render-parameter>
+		<supported-public-render-parameter>actionEditingModule</supported-public-render-parameter>	
+		<supported-public-render-parameter>actionCalifications</supported-public-render-parameter>	
 	</portlet>
 
 	<portlet>
@@ -430,6 +438,11 @@
 		<supported-public-render-parameter>actId</supported-public-render-parameter>
 		<supported-public-render-parameter>moduleId</supported-public-render-parameter>
 		<supported-public-render-parameter>actionEditing</supported-public-render-parameter>
+
+		<supported-public-render-parameter>actionEditingActivity</supported-public-render-parameter>
+		<supported-public-render-parameter>actionEditingDetails</supported-public-render-parameter>
+		<supported-public-render-parameter>actionEditingModule</supported-public-render-parameter>	
+		<supported-public-render-parameter>actionCalifications</supported-public-render-parameter>		
 	</portlet>
 	<portlet>
 		<portlet-name>activityDates</portlet-name>
@@ -579,6 +592,11 @@
 		<supported-public-render-parameter>actId</supported-public-render-parameter>
 		<supported-public-render-parameter>moduleId</supported-public-render-parameter>
 		<supported-public-render-parameter>actionEditing</supported-public-render-parameter>
+		
+		<supported-public-render-parameter>actionEditingActivity</supported-public-render-parameter>
+		<supported-public-render-parameter>actionEditingDetails</supported-public-render-parameter>
+		<supported-public-render-parameter>actionEditingModule</supported-public-render-parameter>	
+		<supported-public-render-parameter>actionCalifications</supported-public-render-parameter>
 	</portlet>
 	<portlet>
 		<portlet-name>moduleEditing</portlet-name>
@@ -922,6 +940,10 @@
 			<name>competence-results-template</name>
 			<value>/html/courseadmin/competenceresults.jsp</value>
 		</init-param>
+		<init-param>
+			<name>config-lms-prefs</name>
+			<value>/html/courseadmin/configlmsprefs.jsp</value>
+		</init-param>
 		<expiration-cache>0</expiration-cache>
 		<supports>
 			<mime-type>text/html</mime-type>
@@ -988,7 +1010,8 @@
 		<supported-public-render-parameter>actId</supported-public-render-parameter>
 		<supported-public-render-parameter>moduleId</supported-public-render-parameter>
 		<supported-public-render-parameter>actionEditing</supported-public-render-parameter>
-		<supported-public-render-parameter>actionEditingActivity</supported-public-render-parameter>
+		<supported-public-render-parameter>actionEditingActivity</supported-public-render-parameter>	
+		<supported-public-render-parameter>actionCalifications</supported-public-render-parameter>		
 	</portlet>
 
 	<portlet>
@@ -1510,6 +1533,7 @@
 		<supported-public-render-parameter>actId</supported-public-render-parameter>
 		<supported-public-render-parameter>moduleId</supported-public-render-parameter>
 		<supported-public-render-parameter>actionEditing</supported-public-render-parameter>
+		<supported-public-render-parameter>actionEditingDetails</supported-public-render-parameter>
 	</portlet>
 	<portlet>
 		<portlet-name>onlinetaskactivity</portlet-name>
@@ -2271,7 +2295,8 @@
 		<supported-public-render-parameter>actionEditing</supported-public-render-parameter>
 		<supported-public-render-parameter>actionEditingActivity</supported-public-render-parameter>
 		<supported-public-render-parameter>actionEditingDetails</supported-public-render-parameter>
-		<supported-public-render-parameter>actionEditingModule</supported-public-render-parameter>		
+		<supported-public-render-parameter>actionEditingModule</supported-public-render-parameter>	
+		<supported-public-render-parameter>actionCalifications</supported-public-render-parameter>		
 	</portlet>
 	<portlet>
 		<portlet-name>moduleselector</portlet-name>
@@ -2619,5 +2644,9 @@
 	<public-render-parameter>
 		<identifier>actionEditingModule</identifier>
 		<qname xmlns:x="http://www.liferay.com/public-render-parameters">x:actionEditingModule</qname>
-	</public-render-parameter>	
+	</public-render-parameter>
+	<public-render-parameter>
+		<identifier>actionCalifications</identifier>
+		<qname xmlns:x="http://www.liferay.com/public-render-parameters">x:actionCalifications</qname>
+	</public-render-parameter>		
 </portlet-app>

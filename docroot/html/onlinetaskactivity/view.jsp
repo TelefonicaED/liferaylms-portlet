@@ -57,8 +57,16 @@ CalificationType ct = new CalificationTypeRegistry().getCalificationType(CourseL
 
 
 
-<div class="container-activity">
-<%
+<%@ include file="/html/shared/isTablet.jsp" %><%
+
+
+Boolean isLinkTabletOnlineView = ParamUtil.getBoolean(request, "isTablet", false);
+String cssLinkTabletClassOnlineView="";
+if(isLinkTabletOnlineView){
+	cssLinkTabletClassOnlineView="tablet-link";
+}
+
+
 
 long actId = ParamUtil.getLong(request,"actId",0);
 if(actId==0)
@@ -324,7 +332,7 @@ else
 					 			if(urlFile!=null){
 					%>		
 							<p class="see-more">
-									<a class="verMas2" href="<%=urlFile%>"><%=titleFile+"&nbsp;("+ sizeKbFile +"Kb)&nbsp;"%> <liferay-ui:message key="onlinetaskactivity.grades.download"/></a>
+							<a class="verMas2 <%=cssLinkTabletClassOnlineView %>" href="<%=urlFile%>"><%=titleFile+"&nbsp;("+ sizeKbFile +"Kb)&nbsp;"%> <liferay-ui:message key="onlinetaskactivity.grades.download"/></a>
 							</p>
 		            		<!-- Very ugly -->
 							<br /><br />
@@ -426,7 +434,7 @@ else
 		
 		<%if (result!=null){ 
 			if(!isTablet){%>
-			<p class="doc_descarga"><a class="verMas" href="javascript:<portlet:namespace />showPopupGradesStudent(<%=Long.toString(user.getUserId()) %>,true);"><liferay-ui:message key="onlineActivity.view.last" /></a></p>
+	<p class="doc_descarga"><a class="verMas <%=cssLinkTabletClassOnlineView %>" href="javascript:<portlet:namespace />showPopupGradesStudent(<%=Long.toString(user.getUserId()) %>,true);"><liferay-ui:message key="onlineActivity.view.last" /></a></p>
 			<%}
 			if(result.getEndDate()!= null){
 				%><p><liferay-ui:message key="your-result-activity" /><%= result.translateResult(themeDisplay.getLocale())%></p><%
@@ -448,7 +456,7 @@ else
 			long numeroIntentos = LearningActivityTryLocalServiceUtil.getTriesCountByActivityAndUser(actId, user.getUserId());
 			if(numeroIntentos!=0 && !isTablet && !isTeacher) {
 		%>
-			<p class="doc_descarga"><span><liferay-ui:message key="onlinetaskactivity.not.qualificated.activity" /></span> <a class="verMas" href="javascript:<portlet:namespace />showPopupGradesStudent(<%=Long.toString(user.getUserId()) %>,true);"><liferay-ui:message key="onlineActivity.view.last" /></a></p>
+	<p class="doc_descarga"><span><liferay-ui:message key="onlinetaskactivity.not.qualificated.activity" /></span> <a class="verMas <%=cssLinkTabletClassOnlineView %>" href="javascript:<portlet:namespace />showPopupGradesStudent(<%=Long.toString(user.getUserId()) %>,true);"><liferay-ui:message key="onlineActivity.view.last" /></a></p>
 		<% }else if(activity.getTries()!=0 && isTablet && !isTeacher){%>
 				<h2><liferay-ui:message key="onlinetaskactivity.not.qualificated.activity" /></h2>
 				<% }

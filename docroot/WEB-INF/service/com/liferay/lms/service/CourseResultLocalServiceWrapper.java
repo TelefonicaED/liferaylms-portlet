@@ -285,36 +285,13 @@ public class CourseResultLocalServiceWrapper implements CourseResultLocalService
 		return _courseResultLocalService.countByUserId(userId);
 	}
 
-	public long countStudentsStartedByCourseId(
-		com.liferay.lms.model.Course course,
-		java.util.List<com.liferay.portal.model.User> students, long teamId) {
-		return _courseResultLocalService.countStudentsStartedByCourseId(course,
-			students, teamId);
-	}
-
-	public long countStudentsFinishedByCourseId(
-		com.liferay.lms.model.Course course,
-		java.util.List<com.liferay.portal.model.User> students, long teamId) {
-		return _courseResultLocalService.countStudentsFinishedByCourseId(course,
-			students, teamId);
-	}
-
-	public long countStudentsPassedByCourseId(
-		com.liferay.lms.model.Course course,
-		java.util.List<com.liferay.portal.model.User> students, long teamId) {
-		return _courseResultLocalService.countStudentsPassedByCourseId(course,
-			students, teamId);
-	}
-
-	public long countStudentsFailedByCourseId(
-		com.liferay.lms.model.Course course,
-		java.util.List<com.liferay.portal.model.User> students, long teamId) {
-		return _courseResultLocalService.countStudentsFailedByCourseId(course,
-			students, teamId);
-	}
-
 	/**
-	* @deprecated Renamed to {@link #countStudentsPassedByCourseId} or  {@link #countStudentsFailedByCourseId}
+	* Pide la lista de profesores y editores para obtener los usuarios excluidos y llama a countStudentsByCourseIdUserIds
+	*
+	* @param course curso del que quiero los usuarios
+	* @param passed si quiero los aprobados
+	* @return numero de usuarios que han pasado el curso si passed es a true
+	* @throws SystemException
 	*/
 	public long countStudentsByCourseId(com.liferay.lms.model.Course course,
 		boolean passed)
@@ -323,13 +300,36 @@ public class CourseResultLocalServiceWrapper implements CourseResultLocalService
 	}
 
 	/**
-	* @deprecated Renamed to {@link #countStudentsPassedByCourseId} or  {@link #countStudentsFailedByCourseId}
+	* @deprecated ESTE SE VA A DEPRECAR PORQUE NO ES RECOMENDABLE USAR UNA LISTA GRANDE USUARIOS, ES MEJOR PASAR LA DE LOS EDITORES Y PROFESORES
+	POR LO QUE SE RECOMIENDA LLAMAR A countStudentsByCourseId o countStudentsByCourseIdUserIds
+	* @param course curso del que quiero los usuarios
+	* @param students lista de estudiantes del curso, si no se pasa la lista se obtiene en la funciÃƒÂ³n
+	* @param passed si quiero los aprobados
+	* @return numero de usuarios que han pasado el curso si passed es a true
+	* @throws SystemException
 	*/
 	public long countStudentsByCourseId(com.liferay.lms.model.Course course,
 		java.util.List<com.liferay.portal.model.User> students, boolean passed)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _courseResultLocalService.countStudentsByCourseId(course,
 			students, passed);
+	}
+
+	/**
+	* Obtiene los estudiantes de un curso en funciÃƒÂ³n del passed
+	* Solo usar si ya tengo la lista de usuarios dada
+	*
+	* @param courseId id del curso del que quiero los usuarios
+	* @param userExcludedIds ids de los usuarios que se excluyen para no contarlos (profesores y editores)
+	* @param passed si quiero los aprobados
+	* @return numero de usuarios que han pasado el curso si passed es a true
+	* @throws SystemException
+	*/
+	public int countStudentsByCourseIdUserExcludedIds(long courseId,
+		long[] userExcludedIds, boolean passed)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _courseResultLocalService.countStudentsByCourseIdUserExcludedIds(courseId,
+			userExcludedIds, passed);
 	}
 
 	/**
@@ -341,13 +341,142 @@ public class CourseResultLocalServiceWrapper implements CourseResultLocalService
 	}
 
 	/**
-	* @deprecated Renamed to {@link #countStartedOnlyStudents}
+	* @deprecated ESTE LO VAMOS A DEPRECAR, HABRÃƒï¿½A QUE LLAMAR AL MÃƒâ€°TODO countStudentsByCourseId o countStudentsByCourseIdUserIdsStarted
+	Cuenta los estudiantes que han iniciado el curso
+	* @param course curso del que quiero los usuarios
+	* @param students lista de estudiantes, si se pasa a null se obtienen dentro de la funciÃƒÂ³n
+	* @return numero de usuarios que han iniciado el curso
+	* @throws SystemException
 	*/
 	public long countStudentsByCourseId(com.liferay.lms.model.Course course,
 		java.util.List<com.liferay.portal.model.User> students)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _courseResultLocalService.countStudentsByCourseId(course,
 			students);
+	}
+
+	/**
+	* Devuelve el nÃƒÂºmero de estudiantes que han comenzado un curso
+	*
+	* @param courseId id del curso del que quiero contar estudiantes
+	* @param userExcludedIds ids de los usuarios excluidos (profesores y editores)
+	* @return nÃƒÂºmero de usuarios que han iniciado el curso
+	* @throws SystemException
+	*/
+	public int countStudentsByCourseIdUserExcludedIdsStarted(long courseId,
+		long[] userExcludedIds)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _courseResultLocalService.countStudentsByCourseIdUserExcludedIdsStarted(courseId,
+			userExcludedIds);
+	}
+
+	/**
+	* Cuenta los estudiantes que han finalizado el curso
+	*
+	* @param courseId id del curso del que quiero contar los estudiantes
+	* @param userExcludedIds de los usuarios excluidos (profesores y editores)
+	* @return nÃƒÂºmero de usuarios que han finalizado el curso
+	* @throws SystemException
+	*/
+	public int countStudentsByCourseIdUserExcludedIdsFinished(long courseId,
+		long[] userExcludedIds)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _courseResultLocalService.countStudentsByCourseIdUserExcludedIdsFinished(courseId,
+			userExcludedIds);
+	}
+
+	/**
+	* Cuenta los estudiantes que han finalizado el curso y lo hayan aprobado
+	*
+	* @param courseId id del curso del que quiero contar los estudiantes
+	* @param userExcludedIds de losusuarios excluidos(profesores y editores)
+	* @return nÃƒÂºmero de estudiantes que han aprobado el curso
+	* @throws SystemException
+	*/
+	public int countStudentsByCourseIdUserExcludedIdsPassed(long courseId,
+		long[] userExcludedIds)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _courseResultLocalService.countStudentsByCourseIdUserExcludedIdsPassed(courseId,
+			userExcludedIds);
+	}
+
+	/**
+	* Cuenta los estudiantes que han finalizado el curso y lo hayan suspendido
+	*
+	* @param courseId id del curso del que quiero contar los estudiantes
+	* @param userExcludedIds de los usuarios excluidos (profesores y editores)
+	* @return nÃƒÂºmero de estudiantes que han finalizado el curso y lo han suspendido
+	* @throws SystemException
+	*/
+	public int countStudentsByCourseIdUserExcludedIdsFailed(long courseId,
+		long[] userExcludedIds)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _courseResultLocalService.countStudentsByCourseIdUserExcludedIdsFailed(courseId,
+			userExcludedIds);
+	}
+
+	/**
+	* Devuelve el nÃƒÂºmero de estudiantes que han comenzado un curso, esta funciÃƒÂ³n estÃƒÂ¡ pensada para pasar una lista de estudiantes filtrada
+	* (por ejemplo para los equipos) para pedir de todos los estudiantes usar countStudentsByCourseIdUserExcludedIdsStarted
+	*
+	* @param courseId id del curso del que quiero contar estudiantes
+	* @param userIds ids de los usuarios filtrados
+	* @return nÃƒÂºmero de estudiantes que han iniciado el curso
+	* @throws SystemException
+	*/
+	public int countStudentsByCourseIdUserIdsStarted(long courseId,
+		long[] userIds)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _courseResultLocalService.countStudentsByCourseIdUserIdsStarted(courseId,
+			userIds);
+	}
+
+	/**
+	* Cuenta los estudiantes que han finalizado el curso, esta funciÃƒÂ³n estÃƒÂ¡ pensada para pasar una lista de estudiantes filtrada
+	* (por ejemplo para los equipos) para pedir de todos los estudiantes usar countStudentsByCourseIdUserExcludedIdsFinished
+	*
+	* @param courseId id del curso del que quiero contar los estudiantes
+	* @param userIds ids de los usuarios filtrados
+	* @return nÃƒÂºmero de usuarios que han finalizado el curso
+	* @throws SystemException
+	*/
+	public int countStudentsByCourseIdUserIdsFinished(long courseId,
+		long[] userIds)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _courseResultLocalService.countStudentsByCourseIdUserIdsFinished(courseId,
+			userIds);
+	}
+
+	/**
+	* Cuenta los estudiantes que han finalizado el curso y lo hayan aprobado, esta funciÃƒÂ³n estÃƒÂ¡ pensada para pasar una lista de estudiantes filtrada
+	* (por ejemplo para los equipos) para pedir de todos los estudiantes usar countStudentsByCourseIdUserExcludedIdsPassed
+	*
+	* @param courseId id del curso del que quiero contar los estudiantes
+	* @param userIds ids de los usuarios filtrados
+	* @return nÃƒÂºmero de estudiantes que han aprobado el curso
+	* @throws SystemException
+	*/
+	public int countStudentsByCourseIdUserIdsPassed(long courseId,
+		long[] userIds)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _courseResultLocalService.countStudentsByCourseIdUserIdsPassed(courseId,
+			userIds);
+	}
+
+	/**
+	* Cuenta los estudiantes que han finalizado el curso y lo hayan suspendido, esta funciÃƒÂ³n estÃƒÂ¡ pensada para pasar una lista de estudiantes filtrada
+	* (por ejemplo para los equipos) para pedir de todos los estudiantes usar countStudentsByCourseIdUserExcludedIdsFailed
+	*
+	* @param courseId id del curso del que quiero contar los estudiantes
+	* @param userIds ids de los usuarios filtrados
+	* @return nÃƒÂºmero de estudiantes que han finalizado el curso y lo han suspendido
+	* @throws SystemException
+	*/
+	public int countStudentsByCourseIdUserIdsFailed(long courseId,
+		long[] userIds)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _courseResultLocalService.countStudentsByCourseIdUserIdsFailed(courseId,
+			userIds);
 	}
 
 	public java.lang.Double avgResult(long courseId, boolean passed)
@@ -361,7 +490,12 @@ public class CourseResultLocalServiceWrapper implements CourseResultLocalService
 	}
 
 	/**
-	* @deprecated Renamed to {@link #avgPassedStudentsResult}
+	* Devuelve la media de resultado de usuarios para un curso, si ya se tiene la lista de usuarios excluidos (profesores y editores)
+	* llamar al mÃƒÂ©todo avgResultByCourseIdUserExcludedIds directamente
+	*
+	* @param course curso
+	* @param passed si queremos de los aprobados o suspendos
+	* @return media de resultado de usuarios para una actividad
 	*/
 	public java.lang.Double avgStudentsResult(
 		com.liferay.lms.model.Course course, boolean passed)
@@ -370,22 +504,34 @@ public class CourseResultLocalServiceWrapper implements CourseResultLocalService
 	}
 
 	/**
-	* @deprecated Renamed to {@link #avgPassedStudentsResult}
+	* @deprecated SE RECOMIENDA NO USAR ESTE MÃƒâ€°TODO, SE RECOMIENDA USAR: avgStudentsResult(Course course, boolean passed)
+	o avgResultByCourseIdUserExcludedIds(long courseId, passed, long[] userExcludedIds)
+	* @param course curso
+	* @param _students lista de estudiantes, si viene vacÃƒÂ­a se calculan dentro
+	* @param passed si queremos de los aprobados o suspendos
+	* @return media de resultado de usuarios para un curso
 	*/
 	public java.lang.Double avgStudentsResult(
 		com.liferay.lms.model.Course course,
-		java.util.List<com.liferay.portal.model.User> students, boolean passed)
+		java.util.List<com.liferay.portal.model.User> _students, boolean passed)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		return _courseResultLocalService.avgStudentsResult(course, students,
+		return _courseResultLocalService.avgStudentsResult(course, _students,
 			passed);
 	}
 
-	public java.lang.Double avgPassedStudentsResult(
-		com.liferay.lms.model.Course course,
-		java.util.List<com.liferay.portal.model.User> students, boolean passed,
-		long teamId) throws com.liferay.portal.kernel.exception.SystemException {
-		return _courseResultLocalService.avgPassedStudentsResult(course,
-			students, passed, teamId);
+	/**
+	* Devuelve la media de resultado de usuarios para un curso
+	*
+	* @param courseId id del curso
+	* @param passed si queremos los aprobados o suspensos
+	* @param userExcludedIds id de la company de la actividad
+	* @return media de resultado de usuarios para una actividad
+	*/
+	public double avgResultByCourseIdUserExcludedIds(long courseId,
+		boolean passed, long[] userExcludedIds)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _courseResultLocalService.avgResultByCourseIdUserExcludedIds(courseId,
+			passed, userExcludedIds);
 	}
 
 	public com.liferay.lms.model.CourseResult create(long courseId, long userId)

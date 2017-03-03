@@ -382,6 +382,41 @@ public class LearningActivityTryLocalServiceWrapper
 		return _learningActivityTryLocalService.getByUserId(userId);
 	}
 
+	/**
+	* Cuenta el nÃƒÂºmero de intentos de los estudiantes, esta funciÃƒÂ³n estÃƒÂ¡ pensada para pasar una lista de estudiantes filtrada
+	* (por ejemplo para los equipos) para pedir de todos los estudiantes usar countStudentsByActIdUserExcludedIds
+	*
+	* @param actId id de la actividad
+	* @param userIds ids de los usuarios filtrados
+	* @return nÃƒÂºmero de intentos de los estudiantes
+	* @throws SystemException
+	*/
+	public int countTriesByActIdUserIdsStarted(long actId, long[] userIds)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _learningActivityTryLocalService.countTriesByActIdUserIdsStarted(actId,
+			userIds);
+	}
+
+	/**
+	* Cuenta el nÃƒÂºmero de intentos de los estudiantes
+	*
+	* @param actId id de la actividad
+	* @param userExcludedIds ids de usuarios excluidos (profesores y editores)
+	* @return nÃƒÂºmero de intentos de los estudiantes
+	* @throws SystemException
+	*/
+	public int countTriesByActIdUserExcludedIdsStarted(long actId,
+		long[] userExcludedIds)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _learningActivityTryLocalService.countTriesByActIdUserExcludedIdsStarted(actId,
+			userExcludedIds);
+	}
+
+	public int countTriesByActIdStarted(long actId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _learningActivityTryLocalService.countTriesByActIdStarted(actId);
+	}
+
 	public long triesPerUserOnlyStudents(long actId, long companyId,
 		long courseGropupCreatedId,
 		java.util.List<com.liferay.portal.model.User> _students, long teamId)

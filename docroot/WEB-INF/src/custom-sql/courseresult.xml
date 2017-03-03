@@ -1,0 +1,26 @@
+<custom-sql>
+<!-- Query para la administración de cursos cuando eres administrador-->
+
+	<sql id="com.liferay.lms.service.persistence.CourseResultFinder.avgResultCourseId">
+		<![CDATA[   			
+			SELECT 
+				SUM(cr.result) / COUNT(1) AS avgResult
+			FROM 
+				lms_courseresult cr
+			WHERE 
+				cr.courseId = ? 
+				AND cr.passedDate IS NOT NULL 
+				AND cr.passed = ?
+		]]>
+	</sql>
+	<sql id="com.liferay.lms.service.persistence.CourseResultFinder.whereByUserExcludedIds">
+		<![CDATA[
+			AND cr.userId NOT IN ([$USEREXCLUDEDIDS$]) 
+		]]>
+	</sql>
+	<sql id="com.liferay.lms.service.persistence.CourseResultFinder.whereByUserIds">
+		<![CDATA[
+			AND cr.userId IN ([$USERIDS$]) 
+		]]>
+	</sql>
+</custom-sql>

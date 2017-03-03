@@ -101,10 +101,10 @@ public class ModuleLocalServiceImpl extends ModuleLocalServiceBaseImpl {
 		List<Module> list = (List<Module>) modulePersistence.findByGroupId(groupId);
 		return list;
 	}
-
+	
 	public List<Module> findAllInGroup(long groupId, int start, int end) throws SystemException {
 		return ModuleUtil.filterFindByGroupId(groupId, start, end);
-	}
+	}	
 	
 	public List<Module> findAllInGroup(long groupId, OrderByComparator orderByComparator) throws SystemException{
 		List <Module> list = (List<Module>) modulePersistence.findByGroupId(groupId,QueryUtil.ALL_POS,QueryUtil.ALL_POS, orderByComparator);

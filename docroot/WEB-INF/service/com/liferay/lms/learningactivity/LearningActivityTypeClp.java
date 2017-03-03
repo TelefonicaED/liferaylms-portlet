@@ -641,7 +641,7 @@ public class LearningActivityTypeClp implements LearningActivityType {
 			t = ClpSerializer.translateThrowable(t);
 			if (t instanceof RuntimeException) {
 				throw (RuntimeException)t;
-			}
+	}
 			else {
 				throw new RuntimeException(t.getClass().getName() + " is not a valid exception");
 			}

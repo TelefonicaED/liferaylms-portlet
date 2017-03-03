@@ -6,7 +6,6 @@
 	if(request.getAttribute("activity")!=null) {
 		LearningActivity learningActivity=(LearningActivity)request.getAttribute("activity");	
 %>
-
 	<aui:button onClick="<%= (request.getAttribute(\"backUrl\")!=null)?(String)request.getAttribute(\"backUrl\"):\"\" %>" type="cancel" value="canceledition"/>
 <%
 	}

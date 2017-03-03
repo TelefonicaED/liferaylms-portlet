@@ -434,7 +434,7 @@ if(backToEdit) {
 									failure: function(event, id, obj) {
 										var portlet = A.one('#p_p_id<portlet:namespace />');
 										portlet.hide();
-										portlet.placeAfter('<div class="portlet-msg-error"><liferay-ui:message key="there-was-an-unexpected-error.-please-refresh-the-current-page"/></div>');
+										portlet.placeAfter('<div class="portlet-msg-error">'+Liferay.Language.get("there-was-an-unexpected-error.-please-refresh-the-current-page")+'</div>');
 									},
 									success: function(event, id, obj) {
 										searchContainer.setContent(A.Node.create(this.get('responseData')).one('#<%=renderResponse.getNamespace() %><%= searchContainer.getId(request, renderResponse.getNamespace()) %>SearchContainer').ancestor('.lfr-search-container').getContent ());

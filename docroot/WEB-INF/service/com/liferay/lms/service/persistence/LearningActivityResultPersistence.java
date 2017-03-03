@@ -260,6 +260,45 @@ public interface LearningActivityResultPersistence extends BasePersistence<Learn
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	/**
+	* Returns the learning activity result where userId = &#63; and actId = &#63; or throws a {@link com.liferay.lms.NoSuchLearningActivityResultException} if it could not be found.
+	*
+	* @param userId the user ID
+	* @param actId the act ID
+	* @return the matching learning activity result
+	* @throws com.liferay.lms.NoSuchLearningActivityResultException if a matching learning activity result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.LearningActivityResult findByUserIdActId(
+		long userId, long actId)
+		throws com.liferay.lms.NoSuchLearningActivityResultException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the learning activity result where userId = &#63; and actId = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
+	*
+	* @param userId the user ID
+	* @param actId the act ID
+	* @return the matching learning activity result, or <code>null</code> if a matching learning activity result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.LearningActivityResult fetchByUserIdActId(
+		long userId, long actId)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the learning activity result where userId = &#63; and actId = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
+	*
+	* @param userId the user ID
+	* @param actId the act ID
+	* @param retrieveFromCache whether to use the finder cache
+	* @return the matching learning activity result, or <code>null</code> if a matching learning activity result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.LearningActivityResult fetchByUserIdActId(
+		long userId, long actId, boolean retrieveFromCache)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
 	* Returns all the learning activity results where actId = &#63; and passed = &#63;.
 	*
 	* @param actId the act ID
@@ -758,6 +797,2042 @@ public interface LearningActivityResultPersistence extends BasePersistence<Learn
 			com.liferay.portal.kernel.exception.SystemException;
 
 	/**
+	* Returns all the learning activity results where actId = &#63; and userId &ne; &#63;.
+	*
+	* @param actId the act ID
+	* @param userId the user ID
+	* @return the matching learning activity results
+	* @throws SystemException if a system exception occurred
+	*/
+	public java.util.List<com.liferay.lms.model.LearningActivityResult> findByActIdNotMultipleUserId(
+		long actId, long userId)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns a range of all the learning activity results where actId = &#63; and userId &ne; &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param actId the act ID
+	* @param userId the user ID
+	* @param start the lower bound of the range of learning activity results
+	* @param end the upper bound of the range of learning activity results (not inclusive)
+	* @return the range of matching learning activity results
+	* @throws SystemException if a system exception occurred
+	*/
+	public java.util.List<com.liferay.lms.model.LearningActivityResult> findByActIdNotMultipleUserId(
+		long actId, long userId, int start, int end)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns an ordered range of all the learning activity results where actId = &#63; and userId &ne; &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param actId the act ID
+	* @param userId the user ID
+	* @param start the lower bound of the range of learning activity results
+	* @param end the upper bound of the range of learning activity results (not inclusive)
+	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	* @return the ordered range of matching learning activity results
+	* @throws SystemException if a system exception occurred
+	*/
+	public java.util.List<com.liferay.lms.model.LearningActivityResult> findByActIdNotMultipleUserId(
+		long actId, long userId, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the first learning activity result in the ordered set where actId = &#63; and userId &ne; &#63;.
+	*
+	* @param actId the act ID
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the first matching learning activity result
+	* @throws com.liferay.lms.NoSuchLearningActivityResultException if a matching learning activity result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.LearningActivityResult findByActIdNotMultipleUserId_First(
+		long actId, long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchLearningActivityResultException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the first learning activity result in the ordered set where actId = &#63; and userId &ne; &#63;.
+	*
+	* @param actId the act ID
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the first matching learning activity result, or <code>null</code> if a matching learning activity result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.LearningActivityResult fetchByActIdNotMultipleUserId_First(
+		long actId, long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the last learning activity result in the ordered set where actId = &#63; and userId &ne; &#63;.
+	*
+	* @param actId the act ID
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the last matching learning activity result
+	* @throws com.liferay.lms.NoSuchLearningActivityResultException if a matching learning activity result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.LearningActivityResult findByActIdNotMultipleUserId_Last(
+		long actId, long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchLearningActivityResultException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the last learning activity result in the ordered set where actId = &#63; and userId &ne; &#63;.
+	*
+	* @param actId the act ID
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the last matching learning activity result, or <code>null</code> if a matching learning activity result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.LearningActivityResult fetchByActIdNotMultipleUserId_Last(
+		long actId, long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the learning activity results before and after the current learning activity result in the ordered set where actId = &#63; and userId &ne; &#63;.
+	*
+	* @param larId the primary key of the current learning activity result
+	* @param actId the act ID
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the previous, current, and next learning activity result
+	* @throws com.liferay.lms.NoSuchLearningActivityResultException if a learning activity result with the primary key could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.LearningActivityResult[] findByActIdNotMultipleUserId_PrevAndNext(
+		long larId, long actId, long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchLearningActivityResultException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns all the learning activity results where actId = &#63; and userId &ne; all &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param actId the act ID
+	* @param userIds the user IDs
+	* @return the matching learning activity results
+	* @throws SystemException if a system exception occurred
+	*/
+	public java.util.List<com.liferay.lms.model.LearningActivityResult> findByActIdNotMultipleUserId(
+		long actId, long[] userIds)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns a range of all the learning activity results where actId = &#63; and userId &ne; all &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param actId the act ID
+	* @param userIds the user IDs
+	* @param start the lower bound of the range of learning activity results
+	* @param end the upper bound of the range of learning activity results (not inclusive)
+	* @return the range of matching learning activity results
+	* @throws SystemException if a system exception occurred
+	*/
+	public java.util.List<com.liferay.lms.model.LearningActivityResult> findByActIdNotMultipleUserId(
+		long actId, long[] userIds, int start, int end)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns an ordered range of all the learning activity results where actId = &#63; and userId &ne; all &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param actId the act ID
+	* @param userIds the user IDs
+	* @param start the lower bound of the range of learning activity results
+	* @param end the upper bound of the range of learning activity results (not inclusive)
+	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	* @return the ordered range of matching learning activity results
+	* @throws SystemException if a system exception occurred
+	*/
+	public java.util.List<com.liferay.lms.model.LearningActivityResult> findByActIdNotMultipleUserId(
+		long actId, long[] userIds, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns all the learning activity results where actId = &#63; and userId &ne; &#63;.
+	*
+	* @param actId the act ID
+	* @param userId the user ID
+	* @return the matching learning activity results
+	* @throws SystemException if a system exception occurred
+	*/
+	public java.util.List<com.liferay.lms.model.LearningActivityResult> findByActIdNotMultipleUserIdStarted(
+		long actId, long userId)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns a range of all the learning activity results where actId = &#63; and userId &ne; &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param actId the act ID
+	* @param userId the user ID
+	* @param start the lower bound of the range of learning activity results
+	* @param end the upper bound of the range of learning activity results (not inclusive)
+	* @return the range of matching learning activity results
+	* @throws SystemException if a system exception occurred
+	*/
+	public java.util.List<com.liferay.lms.model.LearningActivityResult> findByActIdNotMultipleUserIdStarted(
+		long actId, long userId, int start, int end)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns an ordered range of all the learning activity results where actId = &#63; and userId &ne; &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param actId the act ID
+	* @param userId the user ID
+	* @param start the lower bound of the range of learning activity results
+	* @param end the upper bound of the range of learning activity results (not inclusive)
+	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	* @return the ordered range of matching learning activity results
+	* @throws SystemException if a system exception occurred
+	*/
+	public java.util.List<com.liferay.lms.model.LearningActivityResult> findByActIdNotMultipleUserIdStarted(
+		long actId, long userId, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the first learning activity result in the ordered set where actId = &#63; and userId &ne; &#63;.
+	*
+	* @param actId the act ID
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the first matching learning activity result
+	* @throws com.liferay.lms.NoSuchLearningActivityResultException if a matching learning activity result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.LearningActivityResult findByActIdNotMultipleUserIdStarted_First(
+		long actId, long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchLearningActivityResultException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the first learning activity result in the ordered set where actId = &#63; and userId &ne; &#63;.
+	*
+	* @param actId the act ID
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the first matching learning activity result, or <code>null</code> if a matching learning activity result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.LearningActivityResult fetchByActIdNotMultipleUserIdStarted_First(
+		long actId, long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the last learning activity result in the ordered set where actId = &#63; and userId &ne; &#63;.
+	*
+	* @param actId the act ID
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the last matching learning activity result
+	* @throws com.liferay.lms.NoSuchLearningActivityResultException if a matching learning activity result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.LearningActivityResult findByActIdNotMultipleUserIdStarted_Last(
+		long actId, long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchLearningActivityResultException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the last learning activity result in the ordered set where actId = &#63; and userId &ne; &#63;.
+	*
+	* @param actId the act ID
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the last matching learning activity result, or <code>null</code> if a matching learning activity result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.LearningActivityResult fetchByActIdNotMultipleUserIdStarted_Last(
+		long actId, long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the learning activity results before and after the current learning activity result in the ordered set where actId = &#63; and userId &ne; &#63;.
+	*
+	* @param larId the primary key of the current learning activity result
+	* @param actId the act ID
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the previous, current, and next learning activity result
+	* @throws com.liferay.lms.NoSuchLearningActivityResultException if a learning activity result with the primary key could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.LearningActivityResult[] findByActIdNotMultipleUserIdStarted_PrevAndNext(
+		long larId, long actId, long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchLearningActivityResultException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns all the learning activity results where actId = &#63; and userId &ne; all &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param actId the act ID
+	* @param userIds the user IDs
+	* @return the matching learning activity results
+	* @throws SystemException if a system exception occurred
+	*/
+	public java.util.List<com.liferay.lms.model.LearningActivityResult> findByActIdNotMultipleUserIdStarted(
+		long actId, long[] userIds)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns a range of all the learning activity results where actId = &#63; and userId &ne; all &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param actId the act ID
+	* @param userIds the user IDs
+	* @param start the lower bound of the range of learning activity results
+	* @param end the upper bound of the range of learning activity results (not inclusive)
+	* @return the range of matching learning activity results
+	* @throws SystemException if a system exception occurred
+	*/
+	public java.util.List<com.liferay.lms.model.LearningActivityResult> findByActIdNotMultipleUserIdStarted(
+		long actId, long[] userIds, int start, int end)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns an ordered range of all the learning activity results where actId = &#63; and userId &ne; all &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param actId the act ID
+	* @param userIds the user IDs
+	* @param start the lower bound of the range of learning activity results
+	* @param end the upper bound of the range of learning activity results (not inclusive)
+	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	* @return the ordered range of matching learning activity results
+	* @throws SystemException if a system exception occurred
+	*/
+	public java.util.List<com.liferay.lms.model.LearningActivityResult> findByActIdNotMultipleUserIdStarted(
+		long actId, long[] userIds, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns all the learning activity results where actId = &#63;.
+	*
+	* @param actId the act ID
+	* @return the matching learning activity results
+	* @throws SystemException if a system exception occurred
+	*/
+	public java.util.List<com.liferay.lms.model.LearningActivityResult> findByActIdStarted(
+		long actId) throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns a range of all the learning activity results where actId = &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param actId the act ID
+	* @param start the lower bound of the range of learning activity results
+	* @param end the upper bound of the range of learning activity results (not inclusive)
+	* @return the range of matching learning activity results
+	* @throws SystemException if a system exception occurred
+	*/
+	public java.util.List<com.liferay.lms.model.LearningActivityResult> findByActIdStarted(
+		long actId, int start, int end)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns an ordered range of all the learning activity results where actId = &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param actId the act ID
+	* @param start the lower bound of the range of learning activity results
+	* @param end the upper bound of the range of learning activity results (not inclusive)
+	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	* @return the ordered range of matching learning activity results
+	* @throws SystemException if a system exception occurred
+	*/
+	public java.util.List<com.liferay.lms.model.LearningActivityResult> findByActIdStarted(
+		long actId, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the first learning activity result in the ordered set where actId = &#63;.
+	*
+	* @param actId the act ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the first matching learning activity result
+	* @throws com.liferay.lms.NoSuchLearningActivityResultException if a matching learning activity result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.LearningActivityResult findByActIdStarted_First(
+		long actId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchLearningActivityResultException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the first learning activity result in the ordered set where actId = &#63;.
+	*
+	* @param actId the act ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the first matching learning activity result, or <code>null</code> if a matching learning activity result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.LearningActivityResult fetchByActIdStarted_First(
+		long actId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the last learning activity result in the ordered set where actId = &#63;.
+	*
+	* @param actId the act ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the last matching learning activity result
+	* @throws com.liferay.lms.NoSuchLearningActivityResultException if a matching learning activity result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.LearningActivityResult findByActIdStarted_Last(
+		long actId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchLearningActivityResultException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the last learning activity result in the ordered set where actId = &#63;.
+	*
+	* @param actId the act ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the last matching learning activity result, or <code>null</code> if a matching learning activity result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.LearningActivityResult fetchByActIdStarted_Last(
+		long actId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the learning activity results before and after the current learning activity result in the ordered set where actId = &#63;.
+	*
+	* @param larId the primary key of the current learning activity result
+	* @param actId the act ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the previous, current, and next learning activity result
+	* @throws com.liferay.lms.NoSuchLearningActivityResultException if a learning activity result with the primary key could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.LearningActivityResult[] findByActIdStarted_PrevAndNext(
+		long larId, long actId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchLearningActivityResultException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns all the learning activity results where actId = &#63; and passed = &#63; and userId &ne; &#63;.
+	*
+	* @param actId the act ID
+	* @param passed the passed
+	* @param userId the user ID
+	* @return the matching learning activity results
+	* @throws SystemException if a system exception occurred
+	*/
+	public java.util.List<com.liferay.lms.model.LearningActivityResult> findByActIdPassedNotMultipleUserId(
+		long actId, boolean passed, long userId)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns a range of all the learning activity results where actId = &#63; and passed = &#63; and userId &ne; &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param actId the act ID
+	* @param passed the passed
+	* @param userId the user ID
+	* @param start the lower bound of the range of learning activity results
+	* @param end the upper bound of the range of learning activity results (not inclusive)
+	* @return the range of matching learning activity results
+	* @throws SystemException if a system exception occurred
+	*/
+	public java.util.List<com.liferay.lms.model.LearningActivityResult> findByActIdPassedNotMultipleUserId(
+		long actId, boolean passed, long userId, int start, int end)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns an ordered range of all the learning activity results where actId = &#63; and passed = &#63; and userId &ne; &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param actId the act ID
+	* @param passed the passed
+	* @param userId the user ID
+	* @param start the lower bound of the range of learning activity results
+	* @param end the upper bound of the range of learning activity results (not inclusive)
+	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	* @return the ordered range of matching learning activity results
+	* @throws SystemException if a system exception occurred
+	*/
+	public java.util.List<com.liferay.lms.model.LearningActivityResult> findByActIdPassedNotMultipleUserId(
+		long actId, boolean passed, long userId, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the first learning activity result in the ordered set where actId = &#63; and passed = &#63; and userId &ne; &#63;.
+	*
+	* @param actId the act ID
+	* @param passed the passed
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the first matching learning activity result
+	* @throws com.liferay.lms.NoSuchLearningActivityResultException if a matching learning activity result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.LearningActivityResult findByActIdPassedNotMultipleUserId_First(
+		long actId, boolean passed, long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchLearningActivityResultException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the first learning activity result in the ordered set where actId = &#63; and passed = &#63; and userId &ne; &#63;.
+	*
+	* @param actId the act ID
+	* @param passed the passed
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the first matching learning activity result, or <code>null</code> if a matching learning activity result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.LearningActivityResult fetchByActIdPassedNotMultipleUserId_First(
+		long actId, boolean passed, long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the last learning activity result in the ordered set where actId = &#63; and passed = &#63; and userId &ne; &#63;.
+	*
+	* @param actId the act ID
+	* @param passed the passed
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the last matching learning activity result
+	* @throws com.liferay.lms.NoSuchLearningActivityResultException if a matching learning activity result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.LearningActivityResult findByActIdPassedNotMultipleUserId_Last(
+		long actId, boolean passed, long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchLearningActivityResultException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the last learning activity result in the ordered set where actId = &#63; and passed = &#63; and userId &ne; &#63;.
+	*
+	* @param actId the act ID
+	* @param passed the passed
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the last matching learning activity result, or <code>null</code> if a matching learning activity result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.LearningActivityResult fetchByActIdPassedNotMultipleUserId_Last(
+		long actId, boolean passed, long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the learning activity results before and after the current learning activity result in the ordered set where actId = &#63; and passed = &#63; and userId &ne; &#63;.
+	*
+	* @param larId the primary key of the current learning activity result
+	* @param actId the act ID
+	* @param passed the passed
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the previous, current, and next learning activity result
+	* @throws com.liferay.lms.NoSuchLearningActivityResultException if a learning activity result with the primary key could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.LearningActivityResult[] findByActIdPassedNotMultipleUserId_PrevAndNext(
+		long larId, long actId, boolean passed, long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchLearningActivityResultException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns all the learning activity results where actId = &#63; and passed = &#63; and userId &ne; all &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param actId the act ID
+	* @param passed the passed
+	* @param userIds the user IDs
+	* @return the matching learning activity results
+	* @throws SystemException if a system exception occurred
+	*/
+	public java.util.List<com.liferay.lms.model.LearningActivityResult> findByActIdPassedNotMultipleUserId(
+		long actId, boolean passed, long[] userIds)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns a range of all the learning activity results where actId = &#63; and passed = &#63; and userId &ne; all &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param actId the act ID
+	* @param passed the passed
+	* @param userIds the user IDs
+	* @param start the lower bound of the range of learning activity results
+	* @param end the upper bound of the range of learning activity results (not inclusive)
+	* @return the range of matching learning activity results
+	* @throws SystemException if a system exception occurred
+	*/
+	public java.util.List<com.liferay.lms.model.LearningActivityResult> findByActIdPassedNotMultipleUserId(
+		long actId, boolean passed, long[] userIds, int start, int end)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns an ordered range of all the learning activity results where actId = &#63; and passed = &#63; and userId &ne; all &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param actId the act ID
+	* @param passed the passed
+	* @param userIds the user IDs
+	* @param start the lower bound of the range of learning activity results
+	* @param end the upper bound of the range of learning activity results (not inclusive)
+	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	* @return the ordered range of matching learning activity results
+	* @throws SystemException if a system exception occurred
+	*/
+	public java.util.List<com.liferay.lms.model.LearningActivityResult> findByActIdPassedNotMultipleUserId(
+		long actId, boolean passed, long[] userIds, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns all the learning activity results where actId = &#63; and userId &ne; &#63;.
+	*
+	* @param actId the act ID
+	* @param userId the user ID
+	* @return the matching learning activity results
+	* @throws SystemException if a system exception occurred
+	*/
+	public java.util.List<com.liferay.lms.model.LearningActivityResult> findByActIdNotMultipleUserIdFinished(
+		long actId, long userId)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns a range of all the learning activity results where actId = &#63; and userId &ne; &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param actId the act ID
+	* @param userId the user ID
+	* @param start the lower bound of the range of learning activity results
+	* @param end the upper bound of the range of learning activity results (not inclusive)
+	* @return the range of matching learning activity results
+	* @throws SystemException if a system exception occurred
+	*/
+	public java.util.List<com.liferay.lms.model.LearningActivityResult> findByActIdNotMultipleUserIdFinished(
+		long actId, long userId, int start, int end)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns an ordered range of all the learning activity results where actId = &#63; and userId &ne; &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param actId the act ID
+	* @param userId the user ID
+	* @param start the lower bound of the range of learning activity results
+	* @param end the upper bound of the range of learning activity results (not inclusive)
+	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	* @return the ordered range of matching learning activity results
+	* @throws SystemException if a system exception occurred
+	*/
+	public java.util.List<com.liferay.lms.model.LearningActivityResult> findByActIdNotMultipleUserIdFinished(
+		long actId, long userId, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the first learning activity result in the ordered set where actId = &#63; and userId &ne; &#63;.
+	*
+	* @param actId the act ID
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the first matching learning activity result
+	* @throws com.liferay.lms.NoSuchLearningActivityResultException if a matching learning activity result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.LearningActivityResult findByActIdNotMultipleUserIdFinished_First(
+		long actId, long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchLearningActivityResultException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the first learning activity result in the ordered set where actId = &#63; and userId &ne; &#63;.
+	*
+	* @param actId the act ID
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the first matching learning activity result, or <code>null</code> if a matching learning activity result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.LearningActivityResult fetchByActIdNotMultipleUserIdFinished_First(
+		long actId, long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the last learning activity result in the ordered set where actId = &#63; and userId &ne; &#63;.
+	*
+	* @param actId the act ID
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the last matching learning activity result
+	* @throws com.liferay.lms.NoSuchLearningActivityResultException if a matching learning activity result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.LearningActivityResult findByActIdNotMultipleUserIdFinished_Last(
+		long actId, long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchLearningActivityResultException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the last learning activity result in the ordered set where actId = &#63; and userId &ne; &#63;.
+	*
+	* @param actId the act ID
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the last matching learning activity result, or <code>null</code> if a matching learning activity result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.LearningActivityResult fetchByActIdNotMultipleUserIdFinished_Last(
+		long actId, long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the learning activity results before and after the current learning activity result in the ordered set where actId = &#63; and userId &ne; &#63;.
+	*
+	* @param larId the primary key of the current learning activity result
+	* @param actId the act ID
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the previous, current, and next learning activity result
+	* @throws com.liferay.lms.NoSuchLearningActivityResultException if a learning activity result with the primary key could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.LearningActivityResult[] findByActIdNotMultipleUserIdFinished_PrevAndNext(
+		long larId, long actId, long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchLearningActivityResultException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns all the learning activity results where actId = &#63; and userId &ne; all &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param actId the act ID
+	* @param userIds the user IDs
+	* @return the matching learning activity results
+	* @throws SystemException if a system exception occurred
+	*/
+	public java.util.List<com.liferay.lms.model.LearningActivityResult> findByActIdNotMultipleUserIdFinished(
+		long actId, long[] userIds)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns a range of all the learning activity results where actId = &#63; and userId &ne; all &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param actId the act ID
+	* @param userIds the user IDs
+	* @param start the lower bound of the range of learning activity results
+	* @param end the upper bound of the range of learning activity results (not inclusive)
+	* @return the range of matching learning activity results
+	* @throws SystemException if a system exception occurred
+	*/
+	public java.util.List<com.liferay.lms.model.LearningActivityResult> findByActIdNotMultipleUserIdFinished(
+		long actId, long[] userIds, int start, int end)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns an ordered range of all the learning activity results where actId = &#63; and userId &ne; all &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param actId the act ID
+	* @param userIds the user IDs
+	* @param start the lower bound of the range of learning activity results
+	* @param end the upper bound of the range of learning activity results (not inclusive)
+	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	* @return the ordered range of matching learning activity results
+	* @throws SystemException if a system exception occurred
+	*/
+	public java.util.List<com.liferay.lms.model.LearningActivityResult> findByActIdNotMultipleUserIdFinished(
+		long actId, long[] userIds, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns all the learning activity results where actId = &#63;.
+	*
+	* @param actId the act ID
+	* @return the matching learning activity results
+	* @throws SystemException if a system exception occurred
+	*/
+	public java.util.List<com.liferay.lms.model.LearningActivityResult> findByActIdFinished(
+		long actId) throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns a range of all the learning activity results where actId = &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param actId the act ID
+	* @param start the lower bound of the range of learning activity results
+	* @param end the upper bound of the range of learning activity results (not inclusive)
+	* @return the range of matching learning activity results
+	* @throws SystemException if a system exception occurred
+	*/
+	public java.util.List<com.liferay.lms.model.LearningActivityResult> findByActIdFinished(
+		long actId, int start, int end)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns an ordered range of all the learning activity results where actId = &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param actId the act ID
+	* @param start the lower bound of the range of learning activity results
+	* @param end the upper bound of the range of learning activity results (not inclusive)
+	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	* @return the ordered range of matching learning activity results
+	* @throws SystemException if a system exception occurred
+	*/
+	public java.util.List<com.liferay.lms.model.LearningActivityResult> findByActIdFinished(
+		long actId, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the first learning activity result in the ordered set where actId = &#63;.
+	*
+	* @param actId the act ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the first matching learning activity result
+	* @throws com.liferay.lms.NoSuchLearningActivityResultException if a matching learning activity result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.LearningActivityResult findByActIdFinished_First(
+		long actId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchLearningActivityResultException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the first learning activity result in the ordered set where actId = &#63;.
+	*
+	* @param actId the act ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the first matching learning activity result, or <code>null</code> if a matching learning activity result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.LearningActivityResult fetchByActIdFinished_First(
+		long actId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the last learning activity result in the ordered set where actId = &#63;.
+	*
+	* @param actId the act ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the last matching learning activity result
+	* @throws com.liferay.lms.NoSuchLearningActivityResultException if a matching learning activity result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.LearningActivityResult findByActIdFinished_Last(
+		long actId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchLearningActivityResultException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the last learning activity result in the ordered set where actId = &#63;.
+	*
+	* @param actId the act ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the last matching learning activity result, or <code>null</code> if a matching learning activity result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.LearningActivityResult fetchByActIdFinished_Last(
+		long actId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the learning activity results before and after the current learning activity result in the ordered set where actId = &#63;.
+	*
+	* @param larId the primary key of the current learning activity result
+	* @param actId the act ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the previous, current, and next learning activity result
+	* @throws com.liferay.lms.NoSuchLearningActivityResultException if a learning activity result with the primary key could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.LearningActivityResult[] findByActIdFinished_PrevAndNext(
+		long larId, long actId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchLearningActivityResultException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns all the learning activity results where actId = &#63; and passed = &#63; and userId &ne; &#63;.
+	*
+	* @param actId the act ID
+	* @param passed the passed
+	* @param userId the user ID
+	* @return the matching learning activity results
+	* @throws SystemException if a system exception occurred
+	*/
+	public java.util.List<com.liferay.lms.model.LearningActivityResult> findByActIdPassedNotMultipleUserIdFinished(
+		long actId, boolean passed, long userId)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns a range of all the learning activity results where actId = &#63; and passed = &#63; and userId &ne; &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param actId the act ID
+	* @param passed the passed
+	* @param userId the user ID
+	* @param start the lower bound of the range of learning activity results
+	* @param end the upper bound of the range of learning activity results (not inclusive)
+	* @return the range of matching learning activity results
+	* @throws SystemException if a system exception occurred
+	*/
+	public java.util.List<com.liferay.lms.model.LearningActivityResult> findByActIdPassedNotMultipleUserIdFinished(
+		long actId, boolean passed, long userId, int start, int end)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns an ordered range of all the learning activity results where actId = &#63; and passed = &#63; and userId &ne; &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param actId the act ID
+	* @param passed the passed
+	* @param userId the user ID
+	* @param start the lower bound of the range of learning activity results
+	* @param end the upper bound of the range of learning activity results (not inclusive)
+	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	* @return the ordered range of matching learning activity results
+	* @throws SystemException if a system exception occurred
+	*/
+	public java.util.List<com.liferay.lms.model.LearningActivityResult> findByActIdPassedNotMultipleUserIdFinished(
+		long actId, boolean passed, long userId, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the first learning activity result in the ordered set where actId = &#63; and passed = &#63; and userId &ne; &#63;.
+	*
+	* @param actId the act ID
+	* @param passed the passed
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the first matching learning activity result
+	* @throws com.liferay.lms.NoSuchLearningActivityResultException if a matching learning activity result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.LearningActivityResult findByActIdPassedNotMultipleUserIdFinished_First(
+		long actId, boolean passed, long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchLearningActivityResultException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the first learning activity result in the ordered set where actId = &#63; and passed = &#63; and userId &ne; &#63;.
+	*
+	* @param actId the act ID
+	* @param passed the passed
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the first matching learning activity result, or <code>null</code> if a matching learning activity result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.LearningActivityResult fetchByActIdPassedNotMultipleUserIdFinished_First(
+		long actId, boolean passed, long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the last learning activity result in the ordered set where actId = &#63; and passed = &#63; and userId &ne; &#63;.
+	*
+	* @param actId the act ID
+	* @param passed the passed
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the last matching learning activity result
+	* @throws com.liferay.lms.NoSuchLearningActivityResultException if a matching learning activity result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.LearningActivityResult findByActIdPassedNotMultipleUserIdFinished_Last(
+		long actId, boolean passed, long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchLearningActivityResultException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the last learning activity result in the ordered set where actId = &#63; and passed = &#63; and userId &ne; &#63;.
+	*
+	* @param actId the act ID
+	* @param passed the passed
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the last matching learning activity result, or <code>null</code> if a matching learning activity result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.LearningActivityResult fetchByActIdPassedNotMultipleUserIdFinished_Last(
+		long actId, boolean passed, long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the learning activity results before and after the current learning activity result in the ordered set where actId = &#63; and passed = &#63; and userId &ne; &#63;.
+	*
+	* @param larId the primary key of the current learning activity result
+	* @param actId the act ID
+	* @param passed the passed
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the previous, current, and next learning activity result
+	* @throws com.liferay.lms.NoSuchLearningActivityResultException if a learning activity result with the primary key could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.LearningActivityResult[] findByActIdPassedNotMultipleUserIdFinished_PrevAndNext(
+		long larId, long actId, boolean passed, long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchLearningActivityResultException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns all the learning activity results where actId = &#63; and passed = &#63; and userId &ne; all &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param actId the act ID
+	* @param passed the passed
+	* @param userIds the user IDs
+	* @return the matching learning activity results
+	* @throws SystemException if a system exception occurred
+	*/
+	public java.util.List<com.liferay.lms.model.LearningActivityResult> findByActIdPassedNotMultipleUserIdFinished(
+		long actId, boolean passed, long[] userIds)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns a range of all the learning activity results where actId = &#63; and passed = &#63; and userId &ne; all &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param actId the act ID
+	* @param passed the passed
+	* @param userIds the user IDs
+	* @param start the lower bound of the range of learning activity results
+	* @param end the upper bound of the range of learning activity results (not inclusive)
+	* @return the range of matching learning activity results
+	* @throws SystemException if a system exception occurred
+	*/
+	public java.util.List<com.liferay.lms.model.LearningActivityResult> findByActIdPassedNotMultipleUserIdFinished(
+		long actId, boolean passed, long[] userIds, int start, int end)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns an ordered range of all the learning activity results where actId = &#63; and passed = &#63; and userId &ne; all &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param actId the act ID
+	* @param passed the passed
+	* @param userIds the user IDs
+	* @param start the lower bound of the range of learning activity results
+	* @param end the upper bound of the range of learning activity results (not inclusive)
+	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	* @return the ordered range of matching learning activity results
+	* @throws SystemException if a system exception occurred
+	*/
+	public java.util.List<com.liferay.lms.model.LearningActivityResult> findByActIdPassedNotMultipleUserIdFinished(
+		long actId, boolean passed, long[] userIds, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns all the learning activity results where actId = &#63; and passed = &#63; and userId = &#63;.
+	*
+	* @param actId the act ID
+	* @param passed the passed
+	* @param userId the user ID
+	* @return the matching learning activity results
+	* @throws SystemException if a system exception occurred
+	*/
+	public java.util.List<com.liferay.lms.model.LearningActivityResult> findByActIdPassedMultipleUserId(
+		long actId, boolean passed, long userId)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns a range of all the learning activity results where actId = &#63; and passed = &#63; and userId = &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param actId the act ID
+	* @param passed the passed
+	* @param userId the user ID
+	* @param start the lower bound of the range of learning activity results
+	* @param end the upper bound of the range of learning activity results (not inclusive)
+	* @return the range of matching learning activity results
+	* @throws SystemException if a system exception occurred
+	*/
+	public java.util.List<com.liferay.lms.model.LearningActivityResult> findByActIdPassedMultipleUserId(
+		long actId, boolean passed, long userId, int start, int end)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns an ordered range of all the learning activity results where actId = &#63; and passed = &#63; and userId = &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param actId the act ID
+	* @param passed the passed
+	* @param userId the user ID
+	* @param start the lower bound of the range of learning activity results
+	* @param end the upper bound of the range of learning activity results (not inclusive)
+	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	* @return the ordered range of matching learning activity results
+	* @throws SystemException if a system exception occurred
+	*/
+	public java.util.List<com.liferay.lms.model.LearningActivityResult> findByActIdPassedMultipleUserId(
+		long actId, boolean passed, long userId, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the first learning activity result in the ordered set where actId = &#63; and passed = &#63; and userId = &#63;.
+	*
+	* @param actId the act ID
+	* @param passed the passed
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the first matching learning activity result
+	* @throws com.liferay.lms.NoSuchLearningActivityResultException if a matching learning activity result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.LearningActivityResult findByActIdPassedMultipleUserId_First(
+		long actId, boolean passed, long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchLearningActivityResultException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the first learning activity result in the ordered set where actId = &#63; and passed = &#63; and userId = &#63;.
+	*
+	* @param actId the act ID
+	* @param passed the passed
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the first matching learning activity result, or <code>null</code> if a matching learning activity result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.LearningActivityResult fetchByActIdPassedMultipleUserId_First(
+		long actId, boolean passed, long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the last learning activity result in the ordered set where actId = &#63; and passed = &#63; and userId = &#63;.
+	*
+	* @param actId the act ID
+	* @param passed the passed
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the last matching learning activity result
+	* @throws com.liferay.lms.NoSuchLearningActivityResultException if a matching learning activity result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.LearningActivityResult findByActIdPassedMultipleUserId_Last(
+		long actId, boolean passed, long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchLearningActivityResultException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the last learning activity result in the ordered set where actId = &#63; and passed = &#63; and userId = &#63;.
+	*
+	* @param actId the act ID
+	* @param passed the passed
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the last matching learning activity result, or <code>null</code> if a matching learning activity result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.LearningActivityResult fetchByActIdPassedMultipleUserId_Last(
+		long actId, boolean passed, long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the learning activity results before and after the current learning activity result in the ordered set where actId = &#63; and passed = &#63; and userId = &#63;.
+	*
+	* @param larId the primary key of the current learning activity result
+	* @param actId the act ID
+	* @param passed the passed
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the previous, current, and next learning activity result
+	* @throws com.liferay.lms.NoSuchLearningActivityResultException if a learning activity result with the primary key could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.LearningActivityResult[] findByActIdPassedMultipleUserId_PrevAndNext(
+		long larId, long actId, boolean passed, long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchLearningActivityResultException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns all the learning activity results where actId = &#63; and passed = &#63; and userId = any &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param actId the act ID
+	* @param passed the passed
+	* @param userIds the user IDs
+	* @return the matching learning activity results
+	* @throws SystemException if a system exception occurred
+	*/
+	public java.util.List<com.liferay.lms.model.LearningActivityResult> findByActIdPassedMultipleUserId(
+		long actId, boolean passed, long[] userIds)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns a range of all the learning activity results where actId = &#63; and passed = &#63; and userId = any &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param actId the act ID
+	* @param passed the passed
+	* @param userIds the user IDs
+	* @param start the lower bound of the range of learning activity results
+	* @param end the upper bound of the range of learning activity results (not inclusive)
+	* @return the range of matching learning activity results
+	* @throws SystemException if a system exception occurred
+	*/
+	public java.util.List<com.liferay.lms.model.LearningActivityResult> findByActIdPassedMultipleUserId(
+		long actId, boolean passed, long[] userIds, int start, int end)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns an ordered range of all the learning activity results where actId = &#63; and passed = &#63; and userId = any &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param actId the act ID
+	* @param passed the passed
+	* @param userIds the user IDs
+	* @param start the lower bound of the range of learning activity results
+	* @param end the upper bound of the range of learning activity results (not inclusive)
+	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	* @return the ordered range of matching learning activity results
+	* @throws SystemException if a system exception occurred
+	*/
+	public java.util.List<com.liferay.lms.model.LearningActivityResult> findByActIdPassedMultipleUserId(
+		long actId, boolean passed, long[] userIds, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns all the learning activity results where actId = &#63; and passed = &#63; and userId = &#63;.
+	*
+	* @param actId the act ID
+	* @param passed the passed
+	* @param userId the user ID
+	* @return the matching learning activity results
+	* @throws SystemException if a system exception occurred
+	*/
+	public java.util.List<com.liferay.lms.model.LearningActivityResult> findByActIdPassedMultipleUserIdFinished(
+		long actId, boolean passed, long userId)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns a range of all the learning activity results where actId = &#63; and passed = &#63; and userId = &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param actId the act ID
+	* @param passed the passed
+	* @param userId the user ID
+	* @param start the lower bound of the range of learning activity results
+	* @param end the upper bound of the range of learning activity results (not inclusive)
+	* @return the range of matching learning activity results
+	* @throws SystemException if a system exception occurred
+	*/
+	public java.util.List<com.liferay.lms.model.LearningActivityResult> findByActIdPassedMultipleUserIdFinished(
+		long actId, boolean passed, long userId, int start, int end)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns an ordered range of all the learning activity results where actId = &#63; and passed = &#63; and userId = &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param actId the act ID
+	* @param passed the passed
+	* @param userId the user ID
+	* @param start the lower bound of the range of learning activity results
+	* @param end the upper bound of the range of learning activity results (not inclusive)
+	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	* @return the ordered range of matching learning activity results
+	* @throws SystemException if a system exception occurred
+	*/
+	public java.util.List<com.liferay.lms.model.LearningActivityResult> findByActIdPassedMultipleUserIdFinished(
+		long actId, boolean passed, long userId, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the first learning activity result in the ordered set where actId = &#63; and passed = &#63; and userId = &#63;.
+	*
+	* @param actId the act ID
+	* @param passed the passed
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the first matching learning activity result
+	* @throws com.liferay.lms.NoSuchLearningActivityResultException if a matching learning activity result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.LearningActivityResult findByActIdPassedMultipleUserIdFinished_First(
+		long actId, boolean passed, long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchLearningActivityResultException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the first learning activity result in the ordered set where actId = &#63; and passed = &#63; and userId = &#63;.
+	*
+	* @param actId the act ID
+	* @param passed the passed
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the first matching learning activity result, or <code>null</code> if a matching learning activity result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.LearningActivityResult fetchByActIdPassedMultipleUserIdFinished_First(
+		long actId, boolean passed, long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the last learning activity result in the ordered set where actId = &#63; and passed = &#63; and userId = &#63;.
+	*
+	* @param actId the act ID
+	* @param passed the passed
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the last matching learning activity result
+	* @throws com.liferay.lms.NoSuchLearningActivityResultException if a matching learning activity result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.LearningActivityResult findByActIdPassedMultipleUserIdFinished_Last(
+		long actId, boolean passed, long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchLearningActivityResultException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the last learning activity result in the ordered set where actId = &#63; and passed = &#63; and userId = &#63;.
+	*
+	* @param actId the act ID
+	* @param passed the passed
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the last matching learning activity result, or <code>null</code> if a matching learning activity result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.LearningActivityResult fetchByActIdPassedMultipleUserIdFinished_Last(
+		long actId, boolean passed, long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the learning activity results before and after the current learning activity result in the ordered set where actId = &#63; and passed = &#63; and userId = &#63;.
+	*
+	* @param larId the primary key of the current learning activity result
+	* @param actId the act ID
+	* @param passed the passed
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the previous, current, and next learning activity result
+	* @throws com.liferay.lms.NoSuchLearningActivityResultException if a learning activity result with the primary key could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.LearningActivityResult[] findByActIdPassedMultipleUserIdFinished_PrevAndNext(
+		long larId, long actId, boolean passed, long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchLearningActivityResultException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns all the learning activity results where actId = &#63; and passed = &#63; and userId = any &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param actId the act ID
+	* @param passed the passed
+	* @param userIds the user IDs
+	* @return the matching learning activity results
+	* @throws SystemException if a system exception occurred
+	*/
+	public java.util.List<com.liferay.lms.model.LearningActivityResult> findByActIdPassedMultipleUserIdFinished(
+		long actId, boolean passed, long[] userIds)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns a range of all the learning activity results where actId = &#63; and passed = &#63; and userId = any &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param actId the act ID
+	* @param passed the passed
+	* @param userIds the user IDs
+	* @param start the lower bound of the range of learning activity results
+	* @param end the upper bound of the range of learning activity results (not inclusive)
+	* @return the range of matching learning activity results
+	* @throws SystemException if a system exception occurred
+	*/
+	public java.util.List<com.liferay.lms.model.LearningActivityResult> findByActIdPassedMultipleUserIdFinished(
+		long actId, boolean passed, long[] userIds, int start, int end)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns an ordered range of all the learning activity results where actId = &#63; and passed = &#63; and userId = any &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param actId the act ID
+	* @param passed the passed
+	* @param userIds the user IDs
+	* @param start the lower bound of the range of learning activity results
+	* @param end the upper bound of the range of learning activity results (not inclusive)
+	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	* @return the ordered range of matching learning activity results
+	* @throws SystemException if a system exception occurred
+	*/
+	public java.util.List<com.liferay.lms.model.LearningActivityResult> findByActIdPassedMultipleUserIdFinished(
+		long actId, boolean passed, long[] userIds, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns all the learning activity results where actId = &#63; and passed = &#63;.
+	*
+	* @param actId the act ID
+	* @param passed the passed
+	* @return the matching learning activity results
+	* @throws SystemException if a system exception occurred
+	*/
+	public java.util.List<com.liferay.lms.model.LearningActivityResult> findByActIdPassedFinished(
+		long actId, boolean passed)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns a range of all the learning activity results where actId = &#63; and passed = &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param actId the act ID
+	* @param passed the passed
+	* @param start the lower bound of the range of learning activity results
+	* @param end the upper bound of the range of learning activity results (not inclusive)
+	* @return the range of matching learning activity results
+	* @throws SystemException if a system exception occurred
+	*/
+	public java.util.List<com.liferay.lms.model.LearningActivityResult> findByActIdPassedFinished(
+		long actId, boolean passed, int start, int end)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns an ordered range of all the learning activity results where actId = &#63; and passed = &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param actId the act ID
+	* @param passed the passed
+	* @param start the lower bound of the range of learning activity results
+	* @param end the upper bound of the range of learning activity results (not inclusive)
+	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	* @return the ordered range of matching learning activity results
+	* @throws SystemException if a system exception occurred
+	*/
+	public java.util.List<com.liferay.lms.model.LearningActivityResult> findByActIdPassedFinished(
+		long actId, boolean passed, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the first learning activity result in the ordered set where actId = &#63; and passed = &#63;.
+	*
+	* @param actId the act ID
+	* @param passed the passed
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the first matching learning activity result
+	* @throws com.liferay.lms.NoSuchLearningActivityResultException if a matching learning activity result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.LearningActivityResult findByActIdPassedFinished_First(
+		long actId, boolean passed,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchLearningActivityResultException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the first learning activity result in the ordered set where actId = &#63; and passed = &#63;.
+	*
+	* @param actId the act ID
+	* @param passed the passed
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the first matching learning activity result, or <code>null</code> if a matching learning activity result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.LearningActivityResult fetchByActIdPassedFinished_First(
+		long actId, boolean passed,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the last learning activity result in the ordered set where actId = &#63; and passed = &#63;.
+	*
+	* @param actId the act ID
+	* @param passed the passed
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the last matching learning activity result
+	* @throws com.liferay.lms.NoSuchLearningActivityResultException if a matching learning activity result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.LearningActivityResult findByActIdPassedFinished_Last(
+		long actId, boolean passed,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchLearningActivityResultException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the last learning activity result in the ordered set where actId = &#63; and passed = &#63;.
+	*
+	* @param actId the act ID
+	* @param passed the passed
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the last matching learning activity result, or <code>null</code> if a matching learning activity result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.LearningActivityResult fetchByActIdPassedFinished_Last(
+		long actId, boolean passed,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the learning activity results before and after the current learning activity result in the ordered set where actId = &#63; and passed = &#63;.
+	*
+	* @param larId the primary key of the current learning activity result
+	* @param actId the act ID
+	* @param passed the passed
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the previous, current, and next learning activity result
+	* @throws com.liferay.lms.NoSuchLearningActivityResultException if a learning activity result with the primary key could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.LearningActivityResult[] findByActIdPassedFinished_PrevAndNext(
+		long larId, long actId, boolean passed,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchLearningActivityResultException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns all the learning activity results where actId = &#63; and userId = &#63;.
+	*
+	* @param actId the act ID
+	* @param userId the user ID
+	* @return the matching learning activity results
+	* @throws SystemException if a system exception occurred
+	*/
+	public java.util.List<com.liferay.lms.model.LearningActivityResult> findByActIdMultipleUserIdStarted(
+		long actId, long userId)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns a range of all the learning activity results where actId = &#63; and userId = &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param actId the act ID
+	* @param userId the user ID
+	* @param start the lower bound of the range of learning activity results
+	* @param end the upper bound of the range of learning activity results (not inclusive)
+	* @return the range of matching learning activity results
+	* @throws SystemException if a system exception occurred
+	*/
+	public java.util.List<com.liferay.lms.model.LearningActivityResult> findByActIdMultipleUserIdStarted(
+		long actId, long userId, int start, int end)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns an ordered range of all the learning activity results where actId = &#63; and userId = &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param actId the act ID
+	* @param userId the user ID
+	* @param start the lower bound of the range of learning activity results
+	* @param end the upper bound of the range of learning activity results (not inclusive)
+	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	* @return the ordered range of matching learning activity results
+	* @throws SystemException if a system exception occurred
+	*/
+	public java.util.List<com.liferay.lms.model.LearningActivityResult> findByActIdMultipleUserIdStarted(
+		long actId, long userId, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the first learning activity result in the ordered set where actId = &#63; and userId = &#63;.
+	*
+	* @param actId the act ID
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the first matching learning activity result
+	* @throws com.liferay.lms.NoSuchLearningActivityResultException if a matching learning activity result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.LearningActivityResult findByActIdMultipleUserIdStarted_First(
+		long actId, long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchLearningActivityResultException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the first learning activity result in the ordered set where actId = &#63; and userId = &#63;.
+	*
+	* @param actId the act ID
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the first matching learning activity result, or <code>null</code> if a matching learning activity result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.LearningActivityResult fetchByActIdMultipleUserIdStarted_First(
+		long actId, long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the last learning activity result in the ordered set where actId = &#63; and userId = &#63;.
+	*
+	* @param actId the act ID
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the last matching learning activity result
+	* @throws com.liferay.lms.NoSuchLearningActivityResultException if a matching learning activity result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.LearningActivityResult findByActIdMultipleUserIdStarted_Last(
+		long actId, long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchLearningActivityResultException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the last learning activity result in the ordered set where actId = &#63; and userId = &#63;.
+	*
+	* @param actId the act ID
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the last matching learning activity result, or <code>null</code> if a matching learning activity result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.LearningActivityResult fetchByActIdMultipleUserIdStarted_Last(
+		long actId, long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the learning activity results before and after the current learning activity result in the ordered set where actId = &#63; and userId = &#63;.
+	*
+	* @param larId the primary key of the current learning activity result
+	* @param actId the act ID
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the previous, current, and next learning activity result
+	* @throws com.liferay.lms.NoSuchLearningActivityResultException if a learning activity result with the primary key could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.LearningActivityResult[] findByActIdMultipleUserIdStarted_PrevAndNext(
+		long larId, long actId, long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchLearningActivityResultException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns all the learning activity results where actId = &#63; and userId = any &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param actId the act ID
+	* @param userIds the user IDs
+	* @return the matching learning activity results
+	* @throws SystemException if a system exception occurred
+	*/
+	public java.util.List<com.liferay.lms.model.LearningActivityResult> findByActIdMultipleUserIdStarted(
+		long actId, long[] userIds)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns a range of all the learning activity results where actId = &#63; and userId = any &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param actId the act ID
+	* @param userIds the user IDs
+	* @param start the lower bound of the range of learning activity results
+	* @param end the upper bound of the range of learning activity results (not inclusive)
+	* @return the range of matching learning activity results
+	* @throws SystemException if a system exception occurred
+	*/
+	public java.util.List<com.liferay.lms.model.LearningActivityResult> findByActIdMultipleUserIdStarted(
+		long actId, long[] userIds, int start, int end)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns an ordered range of all the learning activity results where actId = &#63; and userId = any &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param actId the act ID
+	* @param userIds the user IDs
+	* @param start the lower bound of the range of learning activity results
+	* @param end the upper bound of the range of learning activity results (not inclusive)
+	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	* @return the ordered range of matching learning activity results
+	* @throws SystemException if a system exception occurred
+	*/
+	public java.util.List<com.liferay.lms.model.LearningActivityResult> findByActIdMultipleUserIdStarted(
+		long actId, long[] userIds, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns all the learning activity results where actId = &#63; and userId = &#63;.
+	*
+	* @param actId the act ID
+	* @param userId the user ID
+	* @return the matching learning activity results
+	* @throws SystemException if a system exception occurred
+	*/
+	public java.util.List<com.liferay.lms.model.LearningActivityResult> findByActIdMultipleUserIdFinished(
+		long actId, long userId)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns a range of all the learning activity results where actId = &#63; and userId = &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param actId the act ID
+	* @param userId the user ID
+	* @param start the lower bound of the range of learning activity results
+	* @param end the upper bound of the range of learning activity results (not inclusive)
+	* @return the range of matching learning activity results
+	* @throws SystemException if a system exception occurred
+	*/
+	public java.util.List<com.liferay.lms.model.LearningActivityResult> findByActIdMultipleUserIdFinished(
+		long actId, long userId, int start, int end)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns an ordered range of all the learning activity results where actId = &#63; and userId = &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param actId the act ID
+	* @param userId the user ID
+	* @param start the lower bound of the range of learning activity results
+	* @param end the upper bound of the range of learning activity results (not inclusive)
+	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	* @return the ordered range of matching learning activity results
+	* @throws SystemException if a system exception occurred
+	*/
+	public java.util.List<com.liferay.lms.model.LearningActivityResult> findByActIdMultipleUserIdFinished(
+		long actId, long userId, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the first learning activity result in the ordered set where actId = &#63; and userId = &#63;.
+	*
+	* @param actId the act ID
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the first matching learning activity result
+	* @throws com.liferay.lms.NoSuchLearningActivityResultException if a matching learning activity result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.LearningActivityResult findByActIdMultipleUserIdFinished_First(
+		long actId, long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchLearningActivityResultException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the first learning activity result in the ordered set where actId = &#63; and userId = &#63;.
+	*
+	* @param actId the act ID
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the first matching learning activity result, or <code>null</code> if a matching learning activity result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.LearningActivityResult fetchByActIdMultipleUserIdFinished_First(
+		long actId, long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the last learning activity result in the ordered set where actId = &#63; and userId = &#63;.
+	*
+	* @param actId the act ID
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the last matching learning activity result
+	* @throws com.liferay.lms.NoSuchLearningActivityResultException if a matching learning activity result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.LearningActivityResult findByActIdMultipleUserIdFinished_Last(
+		long actId, long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchLearningActivityResultException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the last learning activity result in the ordered set where actId = &#63; and userId = &#63;.
+	*
+	* @param actId the act ID
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the last matching learning activity result, or <code>null</code> if a matching learning activity result could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.LearningActivityResult fetchByActIdMultipleUserIdFinished_Last(
+		long actId, long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the learning activity results before and after the current learning activity result in the ordered set where actId = &#63; and userId = &#63;.
+	*
+	* @param larId the primary key of the current learning activity result
+	* @param actId the act ID
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the previous, current, and next learning activity result
+	* @throws com.liferay.lms.NoSuchLearningActivityResultException if a learning activity result with the primary key could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.LearningActivityResult[] findByActIdMultipleUserIdFinished_PrevAndNext(
+		long larId, long actId, long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchLearningActivityResultException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns all the learning activity results where actId = &#63; and userId = any &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param actId the act ID
+	* @param userIds the user IDs
+	* @return the matching learning activity results
+	* @throws SystemException if a system exception occurred
+	*/
+	public java.util.List<com.liferay.lms.model.LearningActivityResult> findByActIdMultipleUserIdFinished(
+		long actId, long[] userIds)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns a range of all the learning activity results where actId = &#63; and userId = any &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param actId the act ID
+	* @param userIds the user IDs
+	* @param start the lower bound of the range of learning activity results
+	* @param end the upper bound of the range of learning activity results (not inclusive)
+	* @return the range of matching learning activity results
+	* @throws SystemException if a system exception occurred
+	*/
+	public java.util.List<com.liferay.lms.model.LearningActivityResult> findByActIdMultipleUserIdFinished(
+		long actId, long[] userIds, int start, int end)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns an ordered range of all the learning activity results where actId = &#63; and userId = any &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param actId the act ID
+	* @param userIds the user IDs
+	* @param start the lower bound of the range of learning activity results
+	* @param end the upper bound of the range of learning activity results (not inclusive)
+	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	* @return the ordered range of matching learning activity results
+	* @throws SystemException if a system exception occurred
+	*/
+	public java.util.List<com.liferay.lms.model.LearningActivityResult> findByActIdMultipleUserIdFinished(
+		long actId, long[] userIds, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
 	* Returns all the learning activity results.
 	*
 	* @return the learning activity results
@@ -823,6 +2898,19 @@ public interface LearningActivityResultPersistence extends BasePersistence<Learn
 			com.liferay.portal.kernel.exception.SystemException;
 
 	/**
+	* Removes the learning activity result where userId = &#63; and actId = &#63; from the database.
+	*
+	* @param userId the user ID
+	* @param actId the act ID
+	* @return the learning activity result that was removed
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.LearningActivityResult removeByUserIdActId(
+		long userId, long actId)
+		throws com.liferay.lms.NoSuchLearningActivityResultException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	/**
 	* Removes all the learning activity results where actId = &#63; and passed = &#63; from the database.
 	*
 	* @param actId the act ID
@@ -862,6 +2950,131 @@ public interface LearningActivityResultPersistence extends BasePersistence<Learn
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	/**
+	* Removes all the learning activity results where actId = &#63; and userId &ne; &#63; from the database.
+	*
+	* @param actId the act ID
+	* @param userId the user ID
+	* @throws SystemException if a system exception occurred
+	*/
+	public void removeByActIdNotMultipleUserId(long actId, long userId)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Removes all the learning activity results where actId = &#63; and userId &ne; &#63; from the database.
+	*
+	* @param actId the act ID
+	* @param userId the user ID
+	* @throws SystemException if a system exception occurred
+	*/
+	public void removeByActIdNotMultipleUserIdStarted(long actId, long userId)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Removes all the learning activity results where actId = &#63; from the database.
+	*
+	* @param actId the act ID
+	* @throws SystemException if a system exception occurred
+	*/
+	public void removeByActIdStarted(long actId)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Removes all the learning activity results where actId = &#63; and passed = &#63; and userId &ne; &#63; from the database.
+	*
+	* @param actId the act ID
+	* @param passed the passed
+	* @param userId the user ID
+	* @throws SystemException if a system exception occurred
+	*/
+	public void removeByActIdPassedNotMultipleUserId(long actId,
+		boolean passed, long userId)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Removes all the learning activity results where actId = &#63; and userId &ne; &#63; from the database.
+	*
+	* @param actId the act ID
+	* @param userId the user ID
+	* @throws SystemException if a system exception occurred
+	*/
+	public void removeByActIdNotMultipleUserIdFinished(long actId, long userId)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Removes all the learning activity results where actId = &#63; from the database.
+	*
+	* @param actId the act ID
+	* @throws SystemException if a system exception occurred
+	*/
+	public void removeByActIdFinished(long actId)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Removes all the learning activity results where actId = &#63; and passed = &#63; and userId &ne; &#63; from the database.
+	*
+	* @param actId the act ID
+	* @param passed the passed
+	* @param userId the user ID
+	* @throws SystemException if a system exception occurred
+	*/
+	public void removeByActIdPassedNotMultipleUserIdFinished(long actId,
+		boolean passed, long userId)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Removes all the learning activity results where actId = &#63; and passed = &#63; and userId = &#63; from the database.
+	*
+	* @param actId the act ID
+	* @param passed the passed
+	* @param userId the user ID
+	* @throws SystemException if a system exception occurred
+	*/
+	public void removeByActIdPassedMultipleUserId(long actId, boolean passed,
+		long userId) throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Removes all the learning activity results where actId = &#63; and passed = &#63; and userId = &#63; from the database.
+	*
+	* @param actId the act ID
+	* @param passed the passed
+	* @param userId the user ID
+	* @throws SystemException if a system exception occurred
+	*/
+	public void removeByActIdPassedMultipleUserIdFinished(long actId,
+		boolean passed, long userId)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Removes all the learning activity results where actId = &#63; and passed = &#63; from the database.
+	*
+	* @param actId the act ID
+	* @param passed the passed
+	* @throws SystemException if a system exception occurred
+	*/
+	public void removeByActIdPassedFinished(long actId, boolean passed)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Removes all the learning activity results where actId = &#63; and userId = &#63; from the database.
+	*
+	* @param actId the act ID
+	* @param userId the user ID
+	* @throws SystemException if a system exception occurred
+	*/
+	public void removeByActIdMultipleUserIdStarted(long actId, long userId)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Removes all the learning activity results where actId = &#63; and userId = &#63; from the database.
+	*
+	* @param actId the act ID
+	* @param userId the user ID
+	* @throws SystemException if a system exception occurred
+	*/
+	public void removeByActIdMultipleUserIdFinished(long actId, long userId)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
 	* Removes all the learning activity results from the database.
 	*
 	* @throws SystemException if a system exception occurred
@@ -888,6 +3101,17 @@ public interface LearningActivityResultPersistence extends BasePersistence<Learn
 	* @throws SystemException if a system exception occurred
 	*/
 	public int countByact_user(long actId, long userId)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the number of learning activity results where userId = &#63; and actId = &#63;.
+	*
+	* @param userId the user ID
+	* @param actId the act ID
+	* @return the number of matching learning activity results
+	* @throws SystemException if a system exception occurred
+	*/
+	public int countByUserIdActId(long userId, long actId)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	/**
@@ -931,6 +3155,249 @@ public interface LearningActivityResultPersistence extends BasePersistence<Learn
 	* @throws SystemException if a system exception occurred
 	*/
 	public int countByuser(long userId)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the number of learning activity results where actId = &#63; and userId &ne; &#63;.
+	*
+	* @param actId the act ID
+	* @param userId the user ID
+	* @return the number of matching learning activity results
+	* @throws SystemException if a system exception occurred
+	*/
+	public int countByActIdNotMultipleUserId(long actId, long userId)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the number of learning activity results where actId = &#63; and userId &ne; all &#63;.
+	*
+	* @param actId the act ID
+	* @param userIds the user IDs
+	* @return the number of matching learning activity results
+	* @throws SystemException if a system exception occurred
+	*/
+	public int countByActIdNotMultipleUserId(long actId, long[] userIds)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the number of learning activity results where actId = &#63; and userId &ne; &#63;.
+	*
+	* @param actId the act ID
+	* @param userId the user ID
+	* @return the number of matching learning activity results
+	* @throws SystemException if a system exception occurred
+	*/
+	public int countByActIdNotMultipleUserIdStarted(long actId, long userId)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the number of learning activity results where actId = &#63; and userId &ne; all &#63;.
+	*
+	* @param actId the act ID
+	* @param userIds the user IDs
+	* @return the number of matching learning activity results
+	* @throws SystemException if a system exception occurred
+	*/
+	public int countByActIdNotMultipleUserIdStarted(long actId, long[] userIds)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the number of learning activity results where actId = &#63;.
+	*
+	* @param actId the act ID
+	* @return the number of matching learning activity results
+	* @throws SystemException if a system exception occurred
+	*/
+	public int countByActIdStarted(long actId)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the number of learning activity results where actId = &#63; and passed = &#63; and userId &ne; &#63;.
+	*
+	* @param actId the act ID
+	* @param passed the passed
+	* @param userId the user ID
+	* @return the number of matching learning activity results
+	* @throws SystemException if a system exception occurred
+	*/
+	public int countByActIdPassedNotMultipleUserId(long actId, boolean passed,
+		long userId) throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the number of learning activity results where actId = &#63; and passed = &#63; and userId &ne; all &#63;.
+	*
+	* @param actId the act ID
+	* @param passed the passed
+	* @param userIds the user IDs
+	* @return the number of matching learning activity results
+	* @throws SystemException if a system exception occurred
+	*/
+	public int countByActIdPassedNotMultipleUserId(long actId, boolean passed,
+		long[] userIds)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the number of learning activity results where actId = &#63; and userId &ne; &#63;.
+	*
+	* @param actId the act ID
+	* @param userId the user ID
+	* @return the number of matching learning activity results
+	* @throws SystemException if a system exception occurred
+	*/
+	public int countByActIdNotMultipleUserIdFinished(long actId, long userId)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the number of learning activity results where actId = &#63; and userId &ne; all &#63;.
+	*
+	* @param actId the act ID
+	* @param userIds the user IDs
+	* @return the number of matching learning activity results
+	* @throws SystemException if a system exception occurred
+	*/
+	public int countByActIdNotMultipleUserIdFinished(long actId, long[] userIds)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the number of learning activity results where actId = &#63;.
+	*
+	* @param actId the act ID
+	* @return the number of matching learning activity results
+	* @throws SystemException if a system exception occurred
+	*/
+	public int countByActIdFinished(long actId)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the number of learning activity results where actId = &#63; and passed = &#63; and userId &ne; &#63;.
+	*
+	* @param actId the act ID
+	* @param passed the passed
+	* @param userId the user ID
+	* @return the number of matching learning activity results
+	* @throws SystemException if a system exception occurred
+	*/
+	public int countByActIdPassedNotMultipleUserIdFinished(long actId,
+		boolean passed, long userId)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the number of learning activity results where actId = &#63; and passed = &#63; and userId &ne; all &#63;.
+	*
+	* @param actId the act ID
+	* @param passed the passed
+	* @param userIds the user IDs
+	* @return the number of matching learning activity results
+	* @throws SystemException if a system exception occurred
+	*/
+	public int countByActIdPassedNotMultipleUserIdFinished(long actId,
+		boolean passed, long[] userIds)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the number of learning activity results where actId = &#63; and passed = &#63; and userId = &#63;.
+	*
+	* @param actId the act ID
+	* @param passed the passed
+	* @param userId the user ID
+	* @return the number of matching learning activity results
+	* @throws SystemException if a system exception occurred
+	*/
+	public int countByActIdPassedMultipleUserId(long actId, boolean passed,
+		long userId) throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the number of learning activity results where actId = &#63; and passed = &#63; and userId = any &#63;.
+	*
+	* @param actId the act ID
+	* @param passed the passed
+	* @param userIds the user IDs
+	* @return the number of matching learning activity results
+	* @throws SystemException if a system exception occurred
+	*/
+	public int countByActIdPassedMultipleUserId(long actId, boolean passed,
+		long[] userIds)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the number of learning activity results where actId = &#63; and passed = &#63; and userId = &#63;.
+	*
+	* @param actId the act ID
+	* @param passed the passed
+	* @param userId the user ID
+	* @return the number of matching learning activity results
+	* @throws SystemException if a system exception occurred
+	*/
+	public int countByActIdPassedMultipleUserIdFinished(long actId,
+		boolean passed, long userId)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the number of learning activity results where actId = &#63; and passed = &#63; and userId = any &#63;.
+	*
+	* @param actId the act ID
+	* @param passed the passed
+	* @param userIds the user IDs
+	* @return the number of matching learning activity results
+	* @throws SystemException if a system exception occurred
+	*/
+	public int countByActIdPassedMultipleUserIdFinished(long actId,
+		boolean passed, long[] userIds)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the number of learning activity results where actId = &#63; and passed = &#63;.
+	*
+	* @param actId the act ID
+	* @param passed the passed
+	* @return the number of matching learning activity results
+	* @throws SystemException if a system exception occurred
+	*/
+	public int countByActIdPassedFinished(long actId, boolean passed)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the number of learning activity results where actId = &#63; and userId = &#63;.
+	*
+	* @param actId the act ID
+	* @param userId the user ID
+	* @return the number of matching learning activity results
+	* @throws SystemException if a system exception occurred
+	*/
+	public int countByActIdMultipleUserIdStarted(long actId, long userId)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the number of learning activity results where actId = &#63; and userId = any &#63;.
+	*
+	* @param actId the act ID
+	* @param userIds the user IDs
+	* @return the number of matching learning activity results
+	* @throws SystemException if a system exception occurred
+	*/
+	public int countByActIdMultipleUserIdStarted(long actId, long[] userIds)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the number of learning activity results where actId = &#63; and userId = &#63;.
+	*
+	* @param actId the act ID
+	* @param userId the user ID
+	* @return the number of matching learning activity results
+	* @throws SystemException if a system exception occurred
+	*/
+	public int countByActIdMultipleUserIdFinished(long actId, long userId)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the number of learning activity results where actId = &#63; and userId = any &#63;.
+	*
+	* @param actId the act ID
+	* @param userIds the user IDs
+	* @return the number of matching learning activity results
+	* @throws SystemException if a system exception occurred
+	*/
+	public int countByActIdMultipleUserIdFinished(long actId, long[] userIds)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	/**

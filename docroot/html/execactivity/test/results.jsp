@@ -58,23 +58,6 @@
 		CalificationType ct = new CalificationTypeRegistry().getCalificationType(course.getCalificationType());
 		
 		boolean hasPermissionAccessCourseFinished = LiferaylmsUtil.hasPermissionAccessCourseFinished(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(), course.getCourseId(), themeDisplay.getUserId());
-
-	
-		if (isTeacher) {
-			String popupcorrection = "javascript:" + renderResponse.getNamespace() + "showPopupGetReport();";
-			%>
-			<portlet:renderURL var="goToCorrection">
-				<portlet:param name="jspPage"
-					value="/html/execactivity/test/correction.jsp" />
-				<portlet:param name="actId"
-					value="<%=Long.toString(learningActivity.getActId())%>" />
-				<portlet:param name="courseId"
-					value="<%=Long.toString(course.getCourseId())%>" />
-			</portlet:renderURL>
-			<aui:button name="importButton" type="button" value="action.CORRECT"
-				last="true" href="<%=goToCorrection.toString()%>"></aui:button>
-			
-			<%}
 	
 		
 		long tries = 0;

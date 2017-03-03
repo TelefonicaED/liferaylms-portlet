@@ -54,7 +54,7 @@ public class LearningActivityResultServiceImpl	extends LearningActivityResultSer
 	public boolean userPassed(long actId) throws PortalException, SystemException
 	{
 		User user=this.getUser();
-		return learningActivityResultLocalService.userPassed(actId, user.getUserId());
+		return learningActivityResultLocalService.userPassed(actId, user.getUserId()); 
 	}
 	@JSONWebService
 	public boolean userLoginPassed(long actId,String login) throws PortalException, SystemException

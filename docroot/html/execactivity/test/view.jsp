@@ -80,7 +80,8 @@ if(isTablet){%>
 <%}%>
 
  
-<div class="container-activity">
+<%@ include file="/html/shared/isTablet.jsp" %>
+
 	<%long actId=ParamUtil.getLong(request,"actId",0);
 	LearningActivity activity=LearningActivityLocalServiceUtil.getLearningActivity(actId);
 	long typeId = activity != null ? activity.getTypeId() : 0;

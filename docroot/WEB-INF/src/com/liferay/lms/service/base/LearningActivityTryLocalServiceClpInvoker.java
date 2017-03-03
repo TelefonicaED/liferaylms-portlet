@@ -199,9 +199,21 @@ public class LearningActivityTryLocalServiceClpInvoker {
 
 		_methodParameterTypes183 = new String[] { "long" };
 
-		_methodName184 = "triesPerUserOnlyStudents";
+		_methodName184 = "countTriesByActIdUserIdsStarted";
 
-		_methodParameterTypes184 = new String[] {
+		_methodParameterTypes184 = new String[] { "long", "long[][]" };
+
+		_methodName185 = "countTriesByActIdUserExcludedIdsStarted";
+
+		_methodParameterTypes185 = new String[] { "long", "long[][]" };
+
+		_methodName186 = "countTriesByActIdStarted";
+
+		_methodParameterTypes186 = new String[] { "long" };
+
+		_methodName187 = "triesPerUserOnlyStudents";
+
+		_methodParameterTypes187 = new String[] {
 				"long", "long", "long", "java.util.List", "long"
 			};
 	}
@@ -409,6 +421,23 @@ public class LearningActivityTryLocalServiceClpInvoker {
 
 		if (_methodName184.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes184, parameterTypes)) {
+			return LearningActivityTryLocalServiceUtil.countTriesByActIdUserIdsStarted(((Long)arguments[0]).longValue(),
+				(long[])arguments[1]);
+		}
+
+		if (_methodName185.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes185, parameterTypes)) {
+			return LearningActivityTryLocalServiceUtil.countTriesByActIdUserExcludedIdsStarted(((Long)arguments[0]).longValue(),
+				(long[])arguments[1]);
+		}
+
+		if (_methodName186.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes186, parameterTypes)) {
+			return LearningActivityTryLocalServiceUtil.countTriesByActIdStarted(((Long)arguments[0]).longValue());
+		}
+
+		if (_methodName187.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes187, parameterTypes)) {
 			return LearningActivityTryLocalServiceUtil.triesPerUserOnlyStudents(((Long)arguments[0]).longValue(),
 				((Long)arguments[1]).longValue(),
 				((Long)arguments[2]).longValue(),
@@ -493,4 +522,10 @@ public class LearningActivityTryLocalServiceClpInvoker {
 	private String[] _methodParameterTypes183;
 	private String _methodName184;
 	private String[] _methodParameterTypes184;
+	private String _methodName185;
+	private String[] _methodParameterTypes185;
+	private String _methodName186;
+	private String[] _methodParameterTypes186;
+	private String _methodName187;
+	private String[] _methodParameterTypes187;
 }

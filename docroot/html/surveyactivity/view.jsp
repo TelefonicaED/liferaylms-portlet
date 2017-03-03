@@ -51,7 +51,7 @@ textarea {
 }
 
 </style>
-<div class="container-activity">
+<%@ include file="/html/shared/isTablet.jsp" %>
 <%
 	long actId = ParamUtil.getLong(request,"actId",0);
 	Course course=CourseLocalServiceUtil.fetchByGroupCreatedId(themeDisplay.getScopeGroupId());
@@ -92,7 +92,8 @@ textarea {
 					
 					if(userPassed){
 					%>
-						<h2 class="description-title"><liferay-ui:message key="surveyactivity.survey.done" /></h2>
+					<p class="color_tercero negrita"><liferay-ui:message key="surveyactivity.survey.done" /></p>
+					
 					<%}
 					
 					if(!userPassed || permissionChecker.hasPermission(activity.getGroupId(),LearningActivity.class.getName(), activity.getActId(), ActionKeys.UPDATE)){
@@ -225,9 +226,14 @@ textarea {
 						</script>
 						
 						<aui:form name="formulario" action="<%=correctURL %>" method="POST">
-						<%
-						for(TestQuestion question:questions)
-						{
+					
+					<%if(isInitTablet){%>
+				       <aui:input type="hidden" name="isTablet" value="<%= true %>"/>
+				      <%}
+					
+					
+					for(TestQuestion question:questions){
+						
 							if( question.getQuestionType() != 7 && question.getQuestionType() != 2 ){
 						%>
 								<div class="question questiontype_options">

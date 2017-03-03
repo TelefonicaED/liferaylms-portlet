@@ -1,17 +1,20 @@
 <?xml version="1.0"?>
 <!DOCTYPE project>
 
-<project name="liferaylms-portlet" basedir="." default="deploy" xmlns:antelope="antlib:ise.antelope.tasks">
- <import file="../build-common-portlet.xml" />
+<project name="liferaylms-portlet" basedir="." default="deploy"> <!-- xmlns:antelope="antlib:ise.antelope.tasks"-->
 
- <property name="native.lang.dir" value="docroot/WEB-INF/src/content/" />
+	<import file="../build-common-portlet.xml" />
+ <!-- <import file="../build-common-portlet.xml" />
+
+ <property name="native.lang.dir" value="docroot/WEB-INF/src/content/" /> -->
  <!--property name="lang.dir" value="docroot/WEB-INF/classes/content/" /-->
- <property name="lang.dir" value="docroot/WEB-INF/src/content/" />
-        
+ <!-- <property name="lang.dir" value="docroot/WEB-INF/src/content/" />-->
+
+<!--         
  <target name="compile" depends="clean">
-  <antcall target="build-common-plugin.compile" />
+  <antcall target="build-common-plugin.compile" /> -->
   <!--antcall target="build-portlet-language-files" /-->
- </target>
+<!-- </target>
 
  <target name="build-portlet-language-files">
 
@@ -112,5 +115,5 @@
                 <var name="portlet.names" unset="true"/>    
         </sequential>
     </for>
- </target>
+ </target>-->
 </project>

@@ -304,6 +304,13 @@ public interface P2pActivityCorrectionsLocalService extends BaseLocalService,
 		long userId) throws com.liferay.portal.kernel.exception.SystemException;
 
 	/**
+	* Para saber si al usuario le han realizado todas las correcciones que se indica en el extracontent.
+	*/
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public boolean hasAllCorrectionsDoneAboutUserInP2PActivity(long actId,
+		long p2pActivityId);
+
+	/**
 	* Obtenemos la lista de correcciones que se le asignaron a una tarea p2p.
 	*
 	* @param p2pActivityId

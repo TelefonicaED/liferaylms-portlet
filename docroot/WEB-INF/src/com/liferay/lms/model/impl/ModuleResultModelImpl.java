@@ -91,7 +91,8 @@ public class ModuleResultModelImpl extends BaseModelImpl<ModuleResult>
 			true);
 	public static long MODULEID_COLUMN_BITMASK = 1L;
 	public static long PASSED_COLUMN_BITMASK = 2L;
-	public static long USERID_COLUMN_BITMASK = 4L;
+	public static long PASSEDDATE_COLUMN_BITMASK = 4L;
+	public static long USERID_COLUMN_BITMASK = 8L;
 
 	/**
 	 * Converts the soap model instance into a normal model instance.
@@ -351,7 +352,17 @@ public class ModuleResultModelImpl extends BaseModelImpl<ModuleResult>
 	}
 
 	public void setPassedDate(Date passedDate) {
+		_columnBitmask |= PASSEDDATE_COLUMN_BITMASK;
+
+		if (_originalPassedDate == null) {
+			_originalPassedDate = _passedDate;
+		}
+
 		_passedDate = passedDate;
+	}
+
+	public Date getOriginalPassedDate() {
+		return _originalPassedDate;
 	}
 
 	public long getColumnBitmask() {
@@ -465,6 +476,8 @@ public class ModuleResultModelImpl extends BaseModelImpl<ModuleResult>
 		moduleResultModelImpl._originalPassed = moduleResultModelImpl._passed;
 
 		moduleResultModelImpl._setOriginalPassed = false;
+
+		moduleResultModelImpl._originalPassedDate = moduleResultModelImpl._passedDate;
 
 		moduleResultModelImpl._columnBitmask = 0;
 	}
@@ -601,6 +614,7 @@ public class ModuleResultModelImpl extends BaseModelImpl<ModuleResult>
 	private boolean _setOriginalPassed;
 	private long _mrId;
 	private Date _passedDate;
+	private Date _originalPassedDate;
 	private long _columnBitmask;
 	private ModuleResult _escapedModelProxy;
 }

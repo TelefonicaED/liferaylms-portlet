@@ -18,15 +18,15 @@
 <%
 //Module module=theModule;
 
-long groupId = theModule.getGroupId();
-String name = Module.class.getName();
-String primKey = String.valueOf(theModule.getPrimaryKey());
+	long groupId = theModule.getGroupId();
+	String name = Module.class.getName();
+	String primKey = String.valueOf(theModule.getPrimaryKey());
+	
+	Course coursetmp = CourseLocalServiceUtil.getCourseByGroupCreatedId(groupId);
+	%>
 
-Course coursetmp = CourseLocalServiceUtil.getCourseByGroupCreatedId(groupId);
-%>
-
-	<%if(permissionChecker.hasPermission(groupId, name, primKey, ActionKeys.UPDATE)){	
-
+	<%if(permissionChecker.hasPermission(groupId, name, primKey, ActionKeys.UPDATE)){
+		
 		PortletURL urlEditModule = LmsActivitiesList.getURLEditModule(liferayPortletRequest, liferayPortletResponse, theModule);
 
 		if(Validator.isNotNull(urlEditModule)){
@@ -34,8 +34,9 @@ Course coursetmp = CourseLocalServiceUtil.getCourseByGroupCreatedId(groupId);
 		%>
 			<liferay-ui:icon image="edit" message="edit" url="<%=urlEditModule.toString()%>"/>
 		<%
-		}
+		}	
 	}
+	
 	
 	long modulesInCourse = ModuleLocalServiceUtil.countByGroupId(groupId);
 	if((permissionChecker.hasPermission(groupId, name, primKey, ActionKeys.DELETE))&& modulesInCourse > 1){
@@ -52,13 +53,12 @@ Course coursetmp = CourseLocalServiceUtil.getCourseByGroupCreatedId(groupId);
 			<liferay-ui:icon image="delete" message="delete" url="#" onClick="javascript: alert(Liferay.Language.get('module.delete-module-with-result'));" />
 		<%}else{ %>
 			<liferay-ui:icon image="delete" message="delete" onClick="javascript:if(confirm(Liferay.Language.get('are-you-sure-you-want-to-delete-this'))){location.href='${deleteModuleURL.toString()}';}" url="#"/>
-		<%} %>
+		<%} 
+	}%>
+	
+	<%if(permissionChecker.hasPermission(groupId, name, primKey, ActionKeys.UPDATE)){
 		
-<%
-	}
-	if(permissionChecker.hasPermission(groupId, name, primKey, ActionKeys.UPDATE)){
-		
-%>
+	%>
 
 	<portlet:actionURL name="downmodule" var="downModuleURL" windowState="<%= LiferayWindowState.EXCLUSIVE.toString()%>" >
 		<portlet:param name="resId" value="<%=primKey %>" />

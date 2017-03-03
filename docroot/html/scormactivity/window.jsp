@@ -238,31 +238,30 @@
 		
 			var finishedscorm=false;
 			var update_scorm = function(e)  {
-           
-                  var scormpool = localStorage['scormpool'];
-                  var serviceParameterTypes = [
-                  'long',
-                  'java.lang.String',
-                  'java.lang.String'
-       			];                                                                                                         
-                var message = Liferay.Service.Lms.LearningActivityResult.update( {
-                                                           latId: <%= learningTry.getLatId() %>,
-                                                           tryResultData: scormpool,
-                                                           imsmanifest: Run.$1.xml,
-                                                           serviceParameterTypes: JSON.stringify(serviceParameterTypes)
-                           }
-                );
-                           
-                var exception = message.exception;  
-                	if (!exception){
-                		// Process Success - A LearningActivityResult returned
-                    } 
-                	else {
-                        // Process Exception
-                        
-                    }
-           		};
-           		
+		           
+                var scormpool = localStorage['scormpool'];
+                var serviceParameterTypes = [
+                'long',
+                'java.lang.String',
+                'java.lang.String'
+     			];                                                                                                         
+              var message = Liferay.Service.Lms.LearningActivityResult.update( {
+                                                         latId: <%= learningTry.getLatId() %>,
+                                                         tryResultData: scormpool,
+                                                         imsmanifest: Run.$1.xml,
+                                                         serviceParameterTypes: JSON.stringify(serviceParameterTypes)
+                         }
+              );
+                         
+              var exception = message.exception;  
+              	if (!exception){
+              		// Process Success - A LearningActivityResult returned
+                  } 
+              	else {
+                      // Process Exception
+                      
+                  }
+         		};
 			var finish_scorm = function(e) {
 				if(!finishedscorm) {
 					var scormpool = localStorage['scormpool'];

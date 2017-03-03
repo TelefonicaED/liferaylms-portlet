@@ -32,7 +32,7 @@ import com.liferay.lms.service.LearningActivityResultLocalServiceUtil;
 import com.liferay.lms.service.ModuleLocalServiceUtil;
 import com.liferay.lms.service.ModuleResultLocalServiceUtil;
 import com.liferay.lms.service.ScheduleLocalServiceUtil;
-import com.liferay.lms.views.ActivityStatsView;
+import com.liferay.lms.views.ActivityStatsView; 
 import com.liferay.lms.views.CourseStatsView;
 import com.liferay.lms.views.ModuleStatsView;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
@@ -48,7 +48,9 @@ import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.model.Team;
+import com.liferay.portal.model.User;
 import com.liferay.portal.service.TeamLocalServiceUtil;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portlet.asset.AssetRendererFactoryRegistryUtil;
@@ -60,8 +62,6 @@ import com.liferay.util.bridges.mvc.MVCPortlet;
  */
 public class CourseStats extends MVCPortlet {
  
-	
-	
 	private String viewJSP = null;
 	private String viewModuleJSP = null;
 
@@ -70,7 +70,7 @@ public class CourseStats extends MVCPortlet {
 		viewModuleJSP = getInitParameter("view-module-jsp");
 	}
 
-	private static Log log = LogFactoryUtil.getLog(StudentSearch.class);
+	private static Log log = LogFactoryUtil.getLog(CourseStats.class);
 	
 	public void doView(RenderRequest renderRequest, RenderResponse renderResponse) throws IOException, PortletException {
 		ThemeDisplay themeDisplay = (ThemeDisplay)renderRequest.getAttribute(WebKeys.THEME_DISPLAY);
@@ -106,8 +106,18 @@ public class CourseStats extends MVCPortlet {
 			PortletURL iteratorURL = renderResponse.createRenderURL();
 			iteratorURL.setParameter("teamId", String.valueOf(teamId));
 			
+			//Lo primero que hacemos es pedir la lista de usuarios sobre la que queremos los resultados para no repetirlo en cada función
+			long[] userIds  = null;
+			long[] userExcludedIds = null;
+			log.debug("CourseStats::showViewDefault::Pedimos la lista de usuarios");
+			if(teamId > 0){
+				userIds = getUsersStudentsTeam(course, themeDisplay.getCompanyId(), teamId);
+			}else{
+				userExcludedIds = CourseLocalServiceUtil.getTeachersAndEditorsIdsFromCourse(course);
+			}
+			log.debug("CourseStats::showViewDefault::Lista de usuarios obtenida");
 			
-			CourseStatsView courseStats = getCourseStats(course, teamId, themeDisplay.getLocale());
+			CourseStatsView courseStats = getCourseStats(course, teamId, themeDisplay.getLocale(), userExcludedIds, userIds);
 			
 			List<CourseStatsView> courseStatsViews = new ArrayList<CourseStatsView>();
 			courseStatsViews.add(courseStats);
@@ -119,13 +129,13 @@ public class CourseStats extends MVCPortlet {
 			searchContainerCourses.setResults(courseStatsViews);
 			searchContainerCourses.setTotal(courseStatsViews.size());
 			
-			//Se construye la vista de las estadisticas de los m�dulos
+			//Se construye la vista de las estadisticas de los módulos 
 			List<Module> modules = ModuleLocalServiceUtil.findAllInGroup(themeDisplay.getScopeGroupId(), searchContainerCourses.getStart(), searchContainerCourses.getEnd());
 			List<ModuleStatsView> moduleStatsViews = new ArrayList<ModuleStatsView>();
 			
 			Schedule sch = ScheduleLocalServiceUtil.getScheduleByTeamId(teamId);
 			for(Module module: modules){
-				moduleStatsViews.add(getModuleStats(module, teamId, themeDisplay.getLocale(), themeDisplay.getTimeZone(), sch));
+				moduleStatsViews.add(getModuleStats(module, teamId, themeDisplay.getLocale(), themeDisplay.getTimeZone(), sch, userExcludedIds, userIds));
 			}
 			
 			SearchContainer<ModuleStatsView> searchContainerModules = new SearchContainer<ModuleStatsView>(renderRequest, null, null, SearchContainer.DEFAULT_CUR_PARAM, 
@@ -147,16 +157,17 @@ public class CourseStats extends MVCPortlet {
 		this.include(this.viewJSP, renderRequest, renderResponse);
 		
 	}
-	
-	
+
 	private void showViewModule(ThemeDisplay themeDisplay, RenderRequest renderRequest, RenderResponse renderResponse) throws PortletException, IOException{
 		try {
+			log.debug("CourseStats::showViewModule::Pedimos los tipos de actividades");
 			AssetRendererFactory arf=AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(LearningActivity.class.getName());
-			Map<Long, String> classTypes;
-			classTypes = arf.getClassTypes(new long[]{themeDisplay.getScopeGroupId()}, themeDisplay.getLocale());
+			Map<Long, String> classTypes = arf.getClassTypes(new long[]{themeDisplay.getScopeGroupId()}, themeDisplay.getLocale());
 			renderRequest.setAttribute("types", classTypes);
+			log.debug("CourseStats::showViewModule::Tenemos los tipos de actividades");
 			long moduleId = ParamUtil.getLong(renderRequest, "moduleId", 0);
 			long teamId = ParamUtil.getLong(renderRequest, "teamId", 0);
+			Course course 	 = CourseLocalServiceUtil.fetchByGroupCreatedId(themeDisplay.getScopeGroupId());
 			
 			renderRequest.setAttribute("moduleId", moduleId);
 			renderRequest.setAttribute("teamId", teamId);
@@ -170,17 +181,34 @@ public class CourseStats extends MVCPortlet {
 			SearchContainer<ActivityStatsView> searchContainerActivities = new SearchContainer<ActivityStatsView>(renderRequest, null, null, SearchContainer.DEFAULT_CUR_PARAM, 
 					SearchContainer.DEFAULT_DELTA, iteratorURL, 
 					null, "module-empty-results-message");
-			//Se construye la vista de las estadisticas de los m�dulos
+			//Se construye la vista de las estadisticas de los módulos
+			log.debug("CourseStats::showViewModule::Pedimos las actividades");
 			List<LearningActivity> activities = LearningActivityLocalServiceUtil.getLearningActivitiesOfModule(moduleId,searchContainerActivities.getStart(), searchContainerActivities.getEnd() );
 			Long total = LearningActivityLocalServiceUtil.countLearningActivitiesOfModule(moduleId);
+			log.debug("CourseStats::showViewModule::Tenemos llas actividades");
 			
 			List<ActivityStatsView> activityStatsViews = new ArrayList<ActivityStatsView>();
+			log.debug("CourseStats::showViewModule::Pedimos la convocatoria");
 			Schedule sch = ScheduleLocalServiceUtil.getScheduleByTeamId(teamId);
+			log.debug("CourseStats::showViewModule::Tenemos la convocatoria");
 			
+			long[] userIds  = null;
+			long[] userExcludedIds = null;
+			log.debug("CourseStats::showViewModule::Pedimos los usuarios excluidos");
+			if(teamId > 0){
+				userIds = getUsersStudentsTeam(course, themeDisplay.getCompanyId(), teamId);
+			}else{
+				userExcludedIds = CourseLocalServiceUtil.getTeachersAndEditorsIdsFromCourse(course);
+			}
+			
+			
+			log.debug("CourseStats::showViewModule::Tenemos los usuarios excluidos");
 			CalificationType ct = new CalificationTypeRegistry().getCalificationType(CourseLocalServiceUtil.getCourseByGroupCreatedId(themeDisplay.getScopeGroupId()).getCalificationType());
 			
+			
+			
 			for(LearningActivity activity: activities){
-				activityStatsViews.add(getActivityStats(activity, themeDisplay.getLocale(), teamId, classTypes, sch, themeDisplay.getTimeZone(),ct));
+				activityStatsViews.add(getActivityStats(activity, themeDisplay.getLocale(), teamId, classTypes, sch, themeDisplay.getTimeZone(), userExcludedIds, userIds,ct));
 			}
 			
 			searchContainerActivities.setResults(activityStatsViews);
@@ -204,27 +232,57 @@ public class CourseStats extends MVCPortlet {
 	}
 	
 	
-	
-	
-	private CourseStatsView getCourseStats (Course course, long teamId, Locale locale) throws PortalException, SystemException{
+	private long[] getUsersStudentsTeam(Course course, long companyId, long teamId) {
+		List<User> students = CourseLocalServiceUtil.getStudentsFromCourse(companyId, course.getGroupCreatedId(), teamId);
+
+		//Lo pasamos a array de long que es lo que necesitan las funciones, lo hacemos aquí para no hacerlo una vez en cada función ya que es necesario
+		long[] userIds = null;
+		if(students != null){
+			userIds = new long[students.size()];
+			for(int i = 0; i < students.size(); i++){
+				userIds[i] = students.get(i).getUserId();
+			}
+		}
 		
-		//Se construye la vista de las estadisticas del curso
-		CourseStatsView courseStats = new CourseStatsView(course.getCourseId(), course.getTitle(locale));				
-		courseStats.setRegistered(CourseLocalServiceUtil.getStudentsFromCourseCount(course.getCourseId(), teamId));
-		courseStats.setStarted(CourseResultLocalServiceUtil.countStudentsStartedByCourseId(course, null, teamId));
-		courseStats.setFinished(CourseResultLocalServiceUtil.countStudentsFinishedByCourseId(course, null, teamId));
-		courseStats.setPassed(CourseResultLocalServiceUtil.countStudentsPassedByCourseId(course, null, teamId));
-		courseStats.setFailed(CourseResultLocalServiceUtil.countStudentsFailedByCourseId(course, null, teamId));
-		
-		return courseStats;
-		
+		return userIds;
 	}
 	
 	
-	private ModuleStatsView getModuleStats(Module module, long teamId, Locale locale, TimeZone timeZone, Schedule sch) throws SystemException{
+	private CourseStatsView getCourseStats (Course course, long teamId, Locale locale, long[] userExcludedIds, long[] userIds) throws PortalException, SystemException{
+		log.debug("CourseStats::getCourseStats::Obtenemos las estadísticas del curso");
+		//Se construye la vista de las estadisticas del curso
+		CourseStatsView courseStats = new CourseStatsView(course.getCourseId(), course.getTitle(locale));				
+
+		if(teamId > 0){
+			courseStats.setRegistered(userIds.length);
+			courseStats.setStarted(CourseResultLocalServiceUtil.countStudentsByCourseIdUserIdsStarted(course.getCourseId(), userIds));
+			courseStats.setFinished(CourseResultLocalServiceUtil.countStudentsByCourseIdUserIdsFinished(course.getCourseId(), userIds));
+			courseStats.setPassed(CourseResultLocalServiceUtil.countStudentsByCourseIdUserIdsPassed(course.getCourseId(), userIds));
+			courseStats.setFailed(CourseResultLocalServiceUtil.countStudentsByCourseIdUserIdsFailed(course.getCourseId(), userIds));		
+		}else{
+			courseStats.setRegistered(CourseLocalServiceUtil.countStudentsStatus(course.getCourseId(), course.getCompanyId(), null, null, null, null, WorkflowConstants.STATUS_ANY, false));
+			courseStats.setStarted(CourseResultLocalServiceUtil.countStudentsByCourseIdUserExcludedIdsStarted(course.getCourseId(), userExcludedIds));
+			courseStats.setFinished(CourseResultLocalServiceUtil.countStudentsByCourseIdUserExcludedIdsFinished(course.getCourseId(), userExcludedIds));
+			courseStats.setPassed(CourseResultLocalServiceUtil.countStudentsByCourseIdUserExcludedIdsPassed(course.getCourseId(), userExcludedIds));
+			courseStats.setFailed(CourseResultLocalServiceUtil.countStudentsByCourseIdUserExcludedIdsFailed(course.getCourseId(), userExcludedIds));
+		}
+		log.debug("CourseStats::getCourseStats::Estadísticas del curso obtenidas");
+		
+		return courseStats;
+	}
+	
+	
+	private ModuleStatsView getModuleStats(Module module, long teamId, Locale locale, TimeZone timeZone, Schedule sch, long[] userExcludedIds, long[] userIds) throws SystemException{
 		ModuleStatsView moduleStats = new ModuleStatsView(module.getModuleId(), module.getTitle(locale), timeZone);
-		moduleStats.setStarted(ModuleResultLocalServiceUtil.countStudentsStartedByModuleId(module, null, teamId));
-		moduleStats.setFinished(ModuleResultLocalServiceUtil.countStudentsFinishedByModuleId(module, null, teamId));
+
+		if(teamId > 0){
+			moduleStats.setStarted(ModuleResultLocalServiceUtil.countStudentsByModuleIdUserIdsStarted(module.getModuleId(), userIds));
+			moduleStats.setFinished(ModuleResultLocalServiceUtil.countStudentsByModuleIdUserIdsFinished(module.getModuleId(), userIds));
+		}else{
+			moduleStats.setStarted(ModuleResultLocalServiceUtil.countStudentsByModuleIdUserExcludedIdsStarted(module.getModuleId(), userExcludedIds));
+			moduleStats.setFinished(ModuleResultLocalServiceUtil.countStudentsByModuleIdUserExcludedIdsFinished(module.getModuleId(), userExcludedIds));
+		}
+		
 		if(sch!=null){
 			moduleStats.setStartDate(sch.getStartDate());
 			moduleStats.setEndDate(sch.getEndDate());
@@ -239,34 +297,52 @@ public class CourseStats extends MVCPortlet {
 				moduleStats.setPrecedence(precedence.getTitle(locale));
 			}					
 		}
-		
+
 		return moduleStats;
 	}
 	
 	
-	private ActivityStatsView getActivityStats(LearningActivity activity, Locale locale, long teamId, Map<Long, String> classTypes, Schedule sch, TimeZone timeZone, CalificationType ct) throws SystemException{
+	private ActivityStatsView getActivityStats(LearningActivity activity, Locale locale, long teamId, Map<Long, String> classTypes, Schedule sch, 
+												TimeZone timeZone, long[] userExcludedIds, long[] userIds, CalificationType ct ) throws SystemException{
+		log.debug("CourseStats::getActivityStats::Estadísticas de la actividad: " + activity.getActId());
 		ActivityStatsView activityStats = new ActivityStatsView(activity.getActId(), activity.getTitle(locale), timeZone);
-		
-		activityStats.setStarted(LearningActivityResultLocalServiceUtil.
-				countStartedOnlyStudents(activity.getActId(), activity.getCompanyId(), activity.getGroupId(), null, teamId));
-		activityStats.setFinished(LearningActivityResultLocalServiceUtil.
-				countFinishedOnlyStudents(activity.getActId(), activity.getCompanyId(), activity.getGroupId(), null, teamId));
-		activityStats.setPassed(LearningActivityResultLocalServiceUtil.
-				countPassedOnlyStudents(activity.getActId(), activity.getCompanyId(), activity.getGroupId(), true, null, teamId));
-		activityStats.setFailed(LearningActivityResultLocalServiceUtil.
-				countNotPassedOnlyStudents(activity.getActId(), activity.getCompanyId(), activity.getGroupId(), null, teamId));
-		activityStats.setTriesPerUser(LearningActivityResultLocalServiceUtil.
-				triesPerUserOnlyStudents(activity.getActId(), activity.getCompanyId(), activity.getGroupId(), null, teamId));
-		
-		String avgResult = ct.translate(locale, activity.getCompanyId(), LearningActivityResultLocalServiceUtil.
-				avgResultOnlyStudents(activity.getActId(), activity.getCompanyId(), activity.getGroupId(), null, teamId));		
-		activityStats.setAvgResult(avgResult);
-		activityStats.setAvgResultWithSuffix(avgResult+ct.getSuffix());
+		String avgResult;
+		if(teamId > 0){
+			activityStats.setStarted(LearningActivityResultLocalServiceUtil.countStudentsByActIdUserIdsStarted(activity.getActId(), userIds));
+			activityStats.setFinished(LearningActivityResultLocalServiceUtil.countStudentsByActIdUserIdsFinished(activity.getActId(), userIds));
+			activityStats.setPassed(LearningActivityResultLocalServiceUtil.countStudentsByActIdUserIdsPassed(activity.getActId(), userIds));
+			activityStats.setFailed(LearningActivityResultLocalServiceUtil.countStudentsByActIdUserIdsFailed(activity.getActId(), userIds));
+			activityStats.setTriesPerUser(LearningActivityResultLocalServiceUtil.avgTriesByActIdUserIds(activity.getActId(), userIds));
+			avgResult = ct.translate(locale, activity.getCompanyId(), LearningActivityResultLocalServiceUtil.avgResultByActIdUserIds(activity.getActId(), userIds));				
+			activityStats.setAvgResult(avgResult);
+			activityStats.setAvgResultWithSuffix(avgResult+ct.getSuffix());
+		}else{
+			log.debug("CourseStats::getActivityStats:: INICIO countStudentsByActIdUserExcludedIdsStarted");
+			activityStats.setStarted(LearningActivityResultLocalServiceUtil.countStudentsByActIdUserExcludedIdsStarted(activity.getActId(), userExcludedIds));
+			log.debug("CourseStats::getActivityStats:: FIN countStudentsByActIdUserExcludedIdsStarted");
+			log.debug("CourseStats::getActivityStats:: INICIO countStudentsByActIdUserExcludedIdsFinished");
+			activityStats.setFinished(LearningActivityResultLocalServiceUtil.countStudentsByActIdUserExcludedIdsFinished(activity.getActId(), userExcludedIds));
+			log.debug("CourseStats::getActivityStats:: FIN countStudentsByActIdUserExcludedIdsFinished");
+			log.debug("CourseStats::getActivityStats:: INICIO countStudentsByActIdUserExcludedIdsPassed");
+			activityStats.setPassed(LearningActivityResultLocalServiceUtil.countStudentsByActIdUserExcludedIdsPassed(activity.getActId(), userExcludedIds));
+			log.debug("CourseStats::getActivityStats:: FIN countStudentsByActIdUserExcludedIdsPassed");
+			log.debug("CourseStats::getActivityStats:: INICIO countStudentsByActIdUserExcludedIdsFailed");
+			activityStats.setFailed(LearningActivityResultLocalServiceUtil.countStudentsByActIdUserExcludedIdsFailed(activity.getActId(), userExcludedIds));
+			log.debug("CourseStats::getActivityStats:: FIN countStudentsByActIdUserExcludedIdsFailed");
+			log.debug("CourseStats::getActivityStats:: INICIO avgTriesByActIdUserExcludedIds");
+			activityStats.setTriesPerUser(LearningActivityResultLocalServiceUtil.avgTriesByActIdUserExcludedIds(activity.getActId(), userExcludedIds));
+			log.debug("CourseStats::getActivityStats:: FIN avgTriesByActIdUserExcludedIds");
+			log.debug("CourseStats::getActivityStats:: INICIO avgResultByActIdUserExcludedIds");
+			avgResult = ct.translate(locale, activity.getCompanyId(), LearningActivityResultLocalServiceUtil.avgResultByActIdUserExcludedIds(activity.getActId(), userExcludedIds));				
+			activityStats.setAvgResult(avgResult);
+			activityStats.setAvgResultWithSuffix(avgResult+ct.getSuffix());
+			log.debug("CourseStats::getActivityStats:: FIN avgResultByActIdUserExcludedIds");
+		}
 		
 		String passPuntuation = ct.translate(locale, activity.getCompanyId(), activity.getPasspuntuation());		
 		activityStats.setPassPuntuation(passPuntuation);
 		activityStats.setPassPuntuationWithSuffix(passPuntuation+ct.getSuffix());
-		
+	
 		activityStats.setTries(activity.getTries());
 		
 		boolean hasPrecedence = false;
@@ -288,6 +364,7 @@ public class CourseStats extends MVCPortlet {
 			activityStats.setStartDate(activity.getStartdate());
 			activityStats.setEndDate(activity.getEnddate());
 		}
+		log.debug("CourseStats::getActivityStats:: Tenemos las estadísticas de la actividad");
 		
 		return activityStats;
 	}
@@ -316,7 +393,16 @@ public class CourseStats extends MVCPortlet {
 									  throws IOException, UnsupportedEncodingException {
 		try {
 			Course course = CourseLocalServiceUtil.getCourse(courseId);
-			CourseStatsView courseView  = getCourseStats(course, teamId, themeDisplay.getLocale());
+			//Lo primero que hacemos es pedir la lista de usuarios sobre la que queremos los resultados para no repetirlo en cada función
+			long[] userIds  = null;
+			long[] userExcludedIds = null;
+			if(teamId > 0){
+				userIds = getUsersStudentsTeam(course, themeDisplay.getCompanyId(), teamId);
+			}else{
+				userExcludedIds = CourseLocalServiceUtil.getTeachersAndEditorsIdsFromCourse(course);
+			}
+			
+			CourseStatsView courseView  = getCourseStats(course, teamId, themeDisplay.getLocale(), userExcludedIds, userIds);
 			List<Module> modules = ModuleLocalServiceUtil.findAllInGroup(course.getGroupCreatedId());
 			CSVWriter writer = initCsv(resourceResponse);
 			 
@@ -359,7 +445,7 @@ public class CourseStats extends MVCPortlet {
 	    	ModuleStatsView moduleStats;
 		    for(Module module:  modules){
 		    	resultados = new String[numCols];
-		    	moduleStats = getModuleStats(module, teamId, themeDisplay.getLocale(), themeDisplay.getTimeZone(), sch);
+		    	moduleStats = getModuleStats(module, teamId, themeDisplay.getLocale(), themeDisplay.getTimeZone(), sch, userExcludedIds, userIds);
 		    	resultados[0]=moduleStats.getModuleTitle();
 		    	resultados[1]=moduleStats.getStartDateString();
 		    	resultados[2]=moduleStats.getEndDateString();
@@ -386,7 +472,17 @@ public class CourseStats extends MVCPortlet {
 		try {
 			Module module = ModuleLocalServiceUtil.getModule(moduleId);		
 			Schedule sch = ScheduleLocalServiceUtil.getScheduleByTeamId(teamId);
-			ModuleStatsView moduleStats = getModuleStats(module, teamId, themeDisplay.getLocale(), themeDisplay.getTimeZone(), sch);
+			//Lo primero que hacemos es pedir la lista de usuarios sobre la que queremos los resultados para no repetirlo en cada función
+			Course course 	 = CourseLocalServiceUtil.fetchByGroupCreatedId(themeDisplay.getScopeGroupId());
+			long[] userIds  = null;
+			long[] userExcludedIds = null;
+			if(teamId > 0){
+				userIds = getUsersStudentsTeam(course, themeDisplay.getCompanyId(), teamId);
+			}else{
+				userExcludedIds = CourseLocalServiceUtil.getTeachersAndEditorsIdsFromCourse(course);
+			}
+			
+			ModuleStatsView moduleStats = getModuleStats(module, teamId, themeDisplay.getLocale(), themeDisplay.getTimeZone(), sch, userExcludedIds, userIds);
 			AssetRendererFactory arf=AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(LearningActivity.class.getName());
 			Map<Long, String> classTypes;
 			classTypes = arf.getClassTypes(new long[]{themeDisplay.getScopeGroupId()}, themeDisplay.getLocale());						
@@ -407,7 +503,7 @@ public class CourseStats extends MVCPortlet {
 		    
 		    //Resultados del modulo
 		    String[] resultados = new String[numCols];
-	    	moduleStats = getModuleStats(module, teamId, themeDisplay.getLocale(), themeDisplay.getTimeZone(), sch);
+	    	moduleStats = getModuleStats(module, teamId, themeDisplay.getLocale(), themeDisplay.getTimeZone(), sch, userExcludedIds, userIds);
 	    	resultados[0]=moduleStats.getModuleTitle();
 	    	resultados[1]=moduleStats.getStartDateString();
 	    	resultados[2]=moduleStats.getEndDateString();
@@ -436,15 +532,17 @@ public class CourseStats extends MVCPortlet {
 		    cabeceras[13]=LanguageUtil.get(themeDisplay.getLocale(),"coursestats.modulestats.obligatory");    
 		    writer.writeNext(cabeceras);
 		    
-		    //Resultados de las actividades
-		    List<LearningActivity> activities = LearningActivityLocalServiceUtil.getLearningActivitiesOfModule(moduleId);
-		    ActivityStatsView activityView;
+		    
 		    
 			CalificationType ct = new CalificationTypeRegistry().getCalificationType(CourseLocalServiceUtil.getCourseByGroupCreatedId(module.getGroupId()).getCalificationType());
 			
+		   
 		    
+		    //Resultados de las actividades
+		    List<LearningActivity> activities = LearningActivityLocalServiceUtil.getLearningActivitiesOfModule(moduleId);
+		    ActivityStatsView activityView;
 		    for(LearningActivity activity : activities){
-		    	activityView = getActivityStats(activity, themeDisplay.getLocale(), teamId, classTypes, sch, themeDisplay.getTimeZone(),ct);
+		    	activityView = getActivityStats(activity, themeDisplay.getLocale(), teamId, classTypes, sch, themeDisplay.getTimeZone(), userExcludedIds, userIds, ct);
 		    	resultados = new String[numCols];
 		 		
 		    	resultados[0]=activityView.getActTitle();

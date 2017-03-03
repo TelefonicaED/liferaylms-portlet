@@ -1,7 +1,5 @@
 package com.liferay.lms;
 
-import static com.liferay.lms.asset.LearningActivityBaseAssetRenderer.ACTION_VIEW;
-
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
@@ -60,15 +58,8 @@ import com.liferay.portal.model.Portlet;
 import com.liferay.portal.model.PortletConstants;
 import com.liferay.portal.model.PortletWrapper;
 import com.liferay.portal.model.PublicRenderParameter;
-import com.liferay.portal.model.ResourceConstants;
-import com.liferay.portal.model.Role;
-import com.liferay.portal.model.RoleConstants;
 import com.liferay.portal.service.LayoutLocalServiceUtil;
 import com.liferay.portal.service.PortletLocalServiceUtil;
-import com.liferay.portal.service.ResourceActionLocalServiceUtil;
-import com.liferay.portal.service.ResourcePermissionLocalServiceUtil;
-import com.liferay.portal.service.RoleLocalServiceUtil;
-import com.liferay.portal.service.permission.PortletPermissionUtil;
 import com.liferay.portal.theme.PortletDisplay;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
@@ -87,9 +78,11 @@ public class ActivityViewer extends MVCPortlet {
 
 	public static final String LMS_EDITACTIVITY_PORTLET_ID =  PortalUtil.getJsSafePortletId("editactivity"+PortletConstants.WAR_SEPARATOR+ClpSerializer.getServletContextName());
 	public static final String LMS_EDITMODULE_PORTLET_ID =  PortalUtil.getJsSafePortletId("editmodule"+PortletConstants.WAR_SEPARATOR+ClpSerializer.getServletContextName());
-
+	public static final String LMS_ACTIVITIES_LIST_PORTLET_ID =  PortalUtil.getJsSafePortletId("lmsactivitieslist"+PortletConstants.WAR_SEPARATOR+ClpSerializer.getServletContextName());
+	
 	private static Log log = LogFactoryUtil.getLog(ActivityViewer.class);
-
+	
+	
 	private static Set<String> reservedAttrs = new HashSet<String>();
 	private volatile Constructor<?> createComponentContext;
 	private volatile Method getContext;
@@ -157,16 +150,17 @@ public class ActivityViewer extends MVCPortlet {
 			throws PortletException, IOException {
 		ThemeDisplay themeDisplay = (ThemeDisplay) renderRequest.getAttribute(WebKeys.THEME_DISPLAY);
 		boolean isWidget = themeDisplay.isWidget();
-		long actId=GetterUtil.DEFAULT_LONG;
+		long actId=GetterUtil.DEFAULT_LONG;		
 		boolean actionEditingDetails = ParamUtil.getBoolean(renderRequest, "actionEditingDetails", false);
 		boolean actionEditingActivity = ParamUtil.getBoolean(renderRequest, "actionEditingActivity", false);
 		boolean actionEditingModule = ParamUtil.getBoolean(renderRequest, "actionEditingModule", false);
-		
+		boolean actionCalifications = ParamUtil.getBoolean(renderRequest, "actionCalifications", false);
 		
 		log.debug("isWidget:"+isWidget);
 		log.debug("actionEditingDetails:"+actionEditingDetails);
 		log.debug("actionEditingActivity:"+actionEditingActivity);
 		log.debug("actionEditingModule:"+actionEditingModule);
+		log.debug("actionCalifications:"+actionCalifications);
 		
 		if(!isWidget && actionEditingDetails){
 			actId=ParamUtil.getLong(renderRequest, "resId", ParamUtil.getLong(renderRequest, "actId",0));
@@ -176,10 +170,11 @@ public class ActivityViewer extends MVCPortlet {
 			actId=ParamUtil.getLong(renderRequest, "actId");			
 			log.debug("::actId = "+actId);
 		}
-
-
-		if(Validator.isNull(actId)){
-
+		
+		
+		
+		if(Validator.isNull(actId)) {
+			
 			String portletId = null;
 			
 			if(actionEditingActivity){
@@ -272,26 +267,23 @@ public class ActivityViewer extends MVCPortlet {
 				}else {
 					LearningActivityType learningActivityType=new LearningActivityTypeRegistry().getLearningActivityType(learningActivity.getTypeId());
 
-					if((Validator.isNull(learningActivityType))||
-							((!isWidget)&&
-									(themeDisplay.getLayoutTypePortlet().getPortletIds().contains(learningActivityType.getPortletId())))) {
+					if((!actionEditingActivity && !actionCalifications ) && ((Validator.isNull(learningActivityType))||((!isWidget)&&
+					    (themeDisplay.getLayoutTypePortlet().getPortletIds().contains(learningActivityType.getPortletId()))))) {
 						renderRequest.setAttribute(WebKeys.PORTLET_CONFIGURATOR_VISIBILITY, Boolean.FALSE);
-					}
-					else {						
+					}else {
 						Portlet portlet = null;
-
-						if(!actionEditingActivity){
-							log.debug("*****CARGO EL PORTLET: "+learningActivityType.getPortletId());
-							portlet = PortletLocalServiceUtil.getPortletById(themeDisplay.getCompanyId(), learningActivityType.getPortletId());
-						}else{
+						
+						if(actionEditingActivity || actionCalifications ){
 							log.debug("*****CARGO EL PORTLET: "+LMS_EDITACTIVITY_PORTLET_ID);
 							portlet = PortletLocalServiceUtil.getPortletById(themeDisplay.getCompanyId(), LMS_EDITACTIVITY_PORTLET_ID);
-
-						}
-
+						}else{							
+							log.debug("*****CARGO EL PORTLET: "+learningActivityType.getPortletId());
+							portlet = PortletLocalServiceUtil.getPortletById(themeDisplay.getCompanyId(), learningActivityType.getPortletId());
+					}
+						
+						
 						HttpServletRequest renderHttpServletRequest = PortalUtil.getHttpServletRequest(renderRequest);
 						PortletPreferencesFactoryUtil.getLayoutPortletSetup(themeDisplay.getLayout(), portlet.getPortletId());
-
 						if(isWidget){
 							Map<String, String[]> publicParameters = getPublicParameters(renderHttpServletRequest, themeDisplay.getPlid());
 							for(PublicRenderParameter publicRenderParameter:portlet.getPublicRenderParameters()) {
@@ -351,28 +343,15 @@ public class ActivityViewer extends MVCPortlet {
 								SocialActivityConstants.TYPE_VIEW, StringPool.BLANK, 0);
 						renderResponse.setContentType(ContentTypes.TEXT_HTML_UTF8);
 						renderResponse.getWriter().print(activityContent);
-
-						String resourcePrimKey = PortletPermissionUtil.getPrimaryKey(
-								themeDisplay.getPlid(), learningActivityType.getPortletId());
 						String portletName = learningActivityType.getPortletId();
 
 						int warSeparatorIndex = portletName.indexOf(PortletConstants.WAR_SEPARATOR);
 						if (warSeparatorIndex != -1) {
 							portletName = portletName.substring(0, warSeparatorIndex);
 						}
-
-						if ((ResourcePermissionLocalServiceUtil.getResourcePermissionsCount(
-								themeDisplay.getCompanyId(), portletName,
-								ResourceConstants.SCOPE_INDIVIDUAL, resourcePrimKey) == 0)&&
-								(ResourceActionLocalServiceUtil.fetchResourceAction(portletName, ACTION_VIEW)!=null)) {
-							Role siteMember = RoleLocalServiceUtil.getRole(themeDisplay.getCompanyId(),RoleConstants.SITE_MEMBER);
-							ResourcePermissionLocalServiceUtil.setResourcePermissions(themeDisplay.getCompanyId(), portletName, ResourceConstants.SCOPE_INDIVIDUAL, 
-									resourcePrimKey,siteMember.getRoleId(), new String[]{ACTION_VIEW});
-						}
 					}
 				}
-			}
-			catch(Throwable throwable) {
+			}catch(Throwable throwable) {
 				renderRequest.setAttribute(WebKeys.PORTLET_CONFIGURATOR_VISIBILITY, Boolean.FALSE);
 			}
 		}

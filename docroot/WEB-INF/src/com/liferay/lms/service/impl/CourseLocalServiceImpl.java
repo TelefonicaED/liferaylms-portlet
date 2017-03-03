@@ -24,13 +24,11 @@ import java.util.Locale;
 import java.util.Map;
 
 import com.liferay.counter.service.CounterLocalServiceUtil;
-import com.liferay.lms.auditing.AuditConstants;
 import com.liferay.lms.auditing.AuditingLogFactory;
 import com.liferay.lms.learningactivity.courseeval.CourseEval;
 import com.liferay.lms.learningactivity.courseeval.CourseEvalRegistry;
 import com.liferay.lms.model.Course;
 import com.liferay.lms.model.CourseResult;
-import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.model.LmsPrefs;
 import com.liferay.lms.model.Module;
 import com.liferay.lms.service.ClpSerializer;
@@ -49,7 +47,6 @@ import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.jsonwebservice.JSONWebService;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.lar.PortletDataHandlerKeys;
 import com.liferay.portal.kernel.lar.UserIdStrategy;
@@ -86,8 +83,8 @@ import com.liferay.portal.service.ClassNameLocalServiceUtil;
 import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.LayoutSetPrototypeLocalServiceUtil;
 import com.liferay.portal.service.RoleLocalServiceUtil;
-import com.liferay.portal.service.ServiceContextThreadLocal;
 import com.liferay.portal.service.ServiceContext;
+import com.liferay.portal.service.ServiceContextThreadLocal;
 import com.liferay.portal.service.UserGroupRoleLocalServiceUtil;
 import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.theme.ThemeDisplay;
@@ -102,6 +99,7 @@ import com.liferay.portlet.social.model.SocialActivitySetting;
 import com.liferay.portlet.social.service.SocialActivitySettingLocalServiceUtil;
 import com.liferay.portlet.social.service.SocialActivitySettingServiceUtil;
 import com.liferay.util.LmsLocaleUtil;
+import com.tls.AuditConstants;
 
 
 
@@ -163,24 +161,6 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 	{
 		
 		 return courseFinder.getExistingUserCourses(userId,-1,-1);
-		
-		
-		/*	
-		User usuario= userLocalService.getUser(userId);
-		java.util.List<Group> groups= GroupLocalServiceUtil.getUserGroups(usuario.getUserId());
-		java.util.List<Course> results=new java.util.ArrayList<Course>();
-		
-		for(Group groupCourse:groups)
-		{
-			
-			
-			Course course=courseLocalService.fetchByGroupCreatedId(groupCourse.getGroupId());
-			if(course!=null)
-			{
-				results.add(course);
-			}
-		}
-		return results;*/
 
 	}
 	
@@ -189,24 +169,6 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 	{
 		
 		 return courseFinder.getExistingUserCourses(userId,start,end);
-		
-		
-		/*	
-		User usuario= userLocalService.getUser(userId);
-		java.util.List<Group> groups= GroupLocalServiceUtil.getUserGroups(usuario.getUserId());
-		java.util.List<Course> results=new java.util.ArrayList<Course>();
-		
-		for(Group groupCourse:groups)
-		{
-			
-			
-			Course course=courseLocalService.fetchByGroupCreatedId(groupCourse.getGroupId());
-			if(course!=null)
-			{
-				results.add(course);
-			}
-		}
-		return results;*/
 
 	}
 	
@@ -604,6 +566,22 @@ public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int e
 	public Course modCourse (Course course,String summary, 
 			ServiceContext serviceContext)
 			throws SystemException, PortalException {
+				return this.modCourse(course, summary, serviceContext, true);
+			}
+
+	@Indexable(type=IndexableType.REINDEX)
+	public Course modCourse (Course course, 
+			ServiceContext serviceContext)
+			throws SystemException, PortalException {
+			return this.modCourse(course, "", serviceContext,true);
+	}
+	
+	@Indexable(type=IndexableType.REINDEX)
+	public Course modCourse (Course course,String summary, 
+			ServiceContext serviceContext, boolean visible)
+			throws SystemException, PortalException {
+		
+		
 			int numberUsers = UserLocalServiceUtil.getGroupUsersCount(course.getGroupCreatedId());
 			if(course.getMaxusers()>0&&numberUsers>course.getMaxusers()){
 				if(log.isDebugEnabled()){
@@ -641,7 +619,7 @@ public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int e
 			AssetEntry assetEntry=assetEntryLocalService.updateEntry(
 					userId, course.getGroupId(), Course.class.getName(),
 					course.getCourseId(), course.getUuid(),0, serviceContext.getAssetCategoryIds(),
-					serviceContext.getAssetTagNames(), previousEntry.getVisible(), null, null,
+				serviceContext.getAssetTagNames(), visible, null, null,
 					new java.util.Date(System.currentTimeMillis()), null,
 					ContentTypes.TEXT_HTML, course.getTitle(), course.getDescription(locale), summary, null, null, 0, 0,
 					null, false);
@@ -655,21 +633,7 @@ public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int e
 			return course;
 		
 			}
-
-	@Indexable(type=IndexableType.REINDEX)
-	public Course modCourse (Course course, 
-			ServiceContext serviceContext)
-			throws SystemException, PortalException {
-			course.setExpandoBridgeAttributes(serviceContext);
 			
-			course = this.modCourse(course, "", serviceContext);
-
-			//auditing
-			AuditingLogFactory.audit(course.getCompanyId(), course.getGroupId(), Course.class.getName(), course.getCourseId(), serviceContext.getUserId(), AuditConstants.UPDATE, null);
-			
-			return course;
-			}
-	
 	@Indexable(type=IndexableType.REINDEX)
 	public Course closeCourse(long courseId) throws SystemException,
 	PortalException {
@@ -755,6 +719,7 @@ public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int e
 			resourceLocalService.deleteResource(course.getCompanyId(), Course.class.getName(),ResourceConstants.SCOPE_INDIVIDUAL, course.getPrimaryKey());
 		} catch (Exception e) {e.printStackTrace();}
 	
+		
 		try {
 			coursePersistence.remove(course);
 		} catch (Exception e) {e.printStackTrace();}
@@ -879,59 +844,48 @@ public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int e
 		return value;
 	}
 	
-	public List<User> getStudentsFromCourse(Course course, int start, int end) {		
-		return getStudentsFromCourse(course.getCompanyId(), course.getGroupCreatedId(), start, end, 0);
-	}
-	
 	public List<User> getStudentsFromCourse(Course course) {		
-		return getStudentsFromCourse(course.getCompanyId(), course.getGroupCreatedId(), QueryUtil.ALL_POS, QueryUtil.ALL_POS,0);
+		return getStudentsFromCourse(course.getCompanyId(), course.getGroupCreatedId());
 	}
 	
-	public List<User> getStudentsFromCourse(long companyId, long courseGropupCreatedId){
-		return getStudentsFromCourse(companyId, courseGropupCreatedId, QueryUtil.ALL_POS, QueryUtil.ALL_POS,0);
+	public List<User> getStudentsFromCourse(long companyId, long courseGroupCreatedId) {
+		List<User> students = null;
+		//List<User> usersExcluded = new ArrayList<User>();
+		
+		try {
+			LinkedHashMap<String,Object> userParams = getUserParamsStudent(companyId, courseGroupCreatedId);
+			
+			students = UserLocalServiceUtil.search(companyId, null, null, 
+					null, null, null, 0, userParams, true, QueryUtil.ALL_POS, QueryUtil.ALL_POS,  new UserLastNameComparator(true));
+			
+		} catch (SystemException e) {
+			e.printStackTrace();
+			students = new ArrayList<User>();
+		}
+		
+		return students;
 	}
 	
-	public List<User> getStudentsFromCourse(long companyId, long courseGropupCreatedId, long teamId){
-		return getStudentsFromCourse(companyId, courseGropupCreatedId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, teamId);
+	public List<User> getStudentsFromCourse(long companyId, long courseGroupCreatedId, long teamId){
+		
+		return getStudentsFromCourse(companyId, courseGroupCreatedId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, teamId, null, null, null, null, true);
+
 	}
 	
-	public List<User> getStudentsFromCourse(Course course, int start, int end, long teamId) {		
-		return getStudentsFromCourse(course.getCompanyId(), course.getGroupCreatedId(), start, end, teamId);
-	}
 	
-	public List<User> getStudentsFromCourse(long companyId, long courseGropupCreatedId, int start, int end,long teamId){
-		return getStudentsFromCourse(companyId, courseGropupCreatedId, start, end, teamId, null, null, null, null, true);
-	}
 	
-	public List<User> getStudentsFromCourse(long companyId, long courseGropupCreatedId, int start, int end,long teamId, String firstName, String lastName, String screenName, String emailAddress, boolean andOperator) {
+	
+	
+	public List<User> getStudentsFromCourse(long companyId, long courseGroupCreatedId, int start, int end,long teamId, String firstName, String lastName, String screenName, String emailAddress, boolean andOperator) {
 		List<User> students = new ArrayList<User>();
 		//List<User> usersExcluded = new ArrayList<User>();
 		
-		LmsPrefs prefs;
 		try {
-			prefs = LmsPrefsLocalServiceUtil.getLmsPrefs(companyId);
-			
-			long teacherRoleId=RoleLocalServiceUtil.getRole(prefs.getTeacherRole()).getRoleId();
-			long editorRoleId=RoleLocalServiceUtil.getRole(prefs.getEditorRole()).getRoleId();
 			
 			
-			
-			LinkedHashMap<String,Object> params=new LinkedHashMap<String,Object>();			
+			LinkedHashMap<String,Object> params= getUserParamsStudent(companyId, courseGroupCreatedId);
 
-			params.put("notInCourseRoleTeacherRoleId", new CustomSQLParam("WHERE User_.userId NOT IN "
-		              + " (SELECT UserGroupRole.userId " + "  FROM UserGroupRole "
-		              + "  WHERE  (UserGroupRole.groupId = ?) AND (UserGroupRole.roleId = ?))", new Long[] {
-		            		  courseGropupCreatedId, teacherRoleId }));
 			
-			params.put("notInCourseRoleEditorRoleId", new CustomSQLParam("WHERE User_.userId NOT IN "
-		              + " (SELECT UserGroupRole.userId " + "  FROM UserGroupRole "
-		              + "  WHERE  (UserGroupRole.groupId = ?) AND (UserGroupRole.roleId = ?))", new Long[] {
-		            		  courseGropupCreatedId, editorRoleId }));
-			
-			 params.put("InCourseRoleStu", new CustomSQLParam("WHERE User_.userId  IN "
-		              + " (SELECT Users_Groups.userId " + "  FROM Users_Groups "
-		              + "  WHERE  (Users_Groups.groupId = ?))", new Long[] {
-		            		  courseGropupCreatedId }));
 			 if(teamId > 0 ){
 				 params.put("usersTeams", teamId);	 
 			 }
@@ -939,8 +893,6 @@ public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int e
 			students = UserLocalServiceUtil.search(companyId, firstName, null, 
 					lastName, screenName, emailAddress, WorkflowConstants.STATUS_APPROVED, params, andOperator, start, end,  new UserLastNameComparator(true));
 			
-		} catch (PortalException e) {
-			e.printStackTrace();
 		} catch (SystemException e) {
 			e.printStackTrace();
 		}
@@ -948,6 +900,50 @@ public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int e
 		return students;
 	}
 	
+	
+	
+	
+	
+	
+	
+	private LinkedHashMap<String,Object> getUserParamsStudent(long companyId, long courseGroupCreatedId){
+		try {
+			LmsPrefs prefs = LmsPrefsLocalServiceUtil.getLmsPrefs(companyId);
+			
+			long teacherRoleId=RoleLocalServiceUtil.getRole(prefs.getTeacherRole()).getRoleId();
+			long editorRoleId=RoleLocalServiceUtil.getRole(prefs.getEditorRole()).getRoleId();
+			
+			LinkedHashMap<String,Object> params=new LinkedHashMap<String,Object>();			
+
+			params.put("notInCourseRoleTeacherRoleId", new CustomSQLParam("WHERE User_.userId NOT IN "
+		              + " (SELECT UserGroupRole.userId " + "  FROM UserGroupRole "
+		              + "  WHERE  (UserGroupRole.groupId = ?) AND (UserGroupRole.roleId = ?))", new Long[] {
+		            		  courseGroupCreatedId, teacherRoleId }));
+			
+			params.put("notInCourseRoleEditorRoleId", new CustomSQLParam("WHERE User_.userId NOT IN "
+		              + " (SELECT UserGroupRole.userId " + "  FROM UserGroupRole "
+		              + "  WHERE  (UserGroupRole.groupId = ?) AND (UserGroupRole.roleId = ?))", new Long[] {
+		            		  courseGroupCreatedId, editorRoleId }));
+			
+			 params.put("InCourseRoleStu", new CustomSQLParam("WHERE User_.userId  IN "
+		              + " (SELECT Users_Groups.userId " + "  FROM Users_Groups "
+		              + "  WHERE  (Users_Groups.groupId = ?))", new Long[] {
+		            		  courseGroupCreatedId }));
+			 
+			 params.put("isActive", new CustomSQLParam("WHERE User_.status =0",null));
+			 
+			 return params;
+		} catch (PortalException e) {
+			e.printStackTrace();
+			return null;
+		} catch (SystemException e) {
+			e.printStackTrace();
+			return null;
+		}	 
+	}
+	
+	
+		
 	
 	public List<User> getTeachersFromCourse(long courseId) {
 		List<User> users = new ArrayList<User>();
@@ -973,6 +969,42 @@ public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int e
 		
 	}
 	
+	public long[] getTeachersAndEditorsIdsFromCourse(Course course){
+		long[] userIds = null;
+		
+
+		try {
+			LmsPrefs prefs = LmsPrefsLocalServiceUtil.getLmsPrefs(course.getCompanyId());
+			LinkedHashMap<String, Object> userParams = new LinkedHashMap<String, Object>();
+			long teacherRoleId = RoleLocalServiceUtil.getRole(prefs.getTeacherRole()).getRoleId();
+			long editorRoleId = RoleLocalServiceUtil.getRole(prefs.getEditorRole()).getRoleId();
+			userParams.put("usersGroups", course.getGroupCreatedId());
+			userParams.put("inCourseRoleIds", new CustomSQLParam("WHERE User_.userId IN "
+		              + " (SELECT UserGroupRole.userId " + "  FROM UserGroupRole "
+		              + "  WHERE  (UserGroupRole.groupId = ?) AND (UserGroupRole.roleId IN (?,?)))", new Long[] {
+		            		 course.getGroupCreatedId(), teacherRoleId, editorRoleId}));
+			
+			List<User> users = UserLocalServiceUtil.search(course.getCompanyId(), "", 
+					WorkflowConstants.STATUS_APPROVED, userParams, 
+					QueryUtil.ALL_POS, QueryUtil.ALL_POS,(OrderByComparator)null);
+			if(users != null){
+				userIds = new long[users.size()];
+				for(int i = 0; i < users.size(); i++){
+					userIds[i] = users.get(i).getUserId();
+				}
+			}
+			
+		} catch (PortalException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SystemException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return userIds;
+	}
+	
 	public List<Course> getByTitleStatusCategoriesTags(String freeText, int status, long[] categories, long[] tags, long companyId, long groupId, long userId, String language, boolean isAdmin, boolean andOperator, int start, int end){
 		return CourseFinderUtil.findByT_S_C_T(freeText, status, categories, tags, companyId, groupId, userId, language, isAdmin, andOperator, start, end);
 	}
@@ -986,7 +1018,11 @@ public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int e
 	}
 	
 	public int countStudents(long courseId, long companyId, String screenName, String firstName, String lastName, String emailAddress,boolean andOperator){
-		return CourseFinderUtil.countStudents(courseId, companyId, screenName,firstName, lastName, emailAddress,andOperator);
+		return CourseFinderUtil.countStudents(courseId, companyId, screenName,firstName, lastName, emailAddress, WorkflowConstants.STATUS_APPROVED, andOperator);
+	}
+	
+	public int countStudentsStatus(long courseId, long companyId, String screenName, String firstName, String lastName, String emailAddress, int status, boolean andOperator){
+		return CourseFinderUtil.countStudents(courseId, companyId, screenName,firstName, lastName, emailAddress, status, andOperator);
 	}
 	
 	public List<Course> getCoursesCatalogByTitleCategoriesTags(String freeText, long[] categories, long[] tags, long companyId, long groupId, long userId, String language, int start, int end){

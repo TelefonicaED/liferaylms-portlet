@@ -383,8 +383,8 @@ public void asignCorrectionsToP2PActivities(long actId, long p2pActivityId,int n
 					
 					String[] params={activityTitle, moduleTitle, courseTitle, courseFriendlyUrl};
 					boolean deregisterMail = false;
-					if(user.getExpandoBridge().getAttribute(LiferaylmsUtil.DEREGISTER_USER_EXPANDO, false)!=null){
-						deregisterMail = (Boolean)user.getExpandoBridge().getAttribute(LiferaylmsUtil.DEREGISTER_USER_EXPANDO, false);
+					if(user.getExpandoBridge().getAttribute(LiferaylmsUtil.DEREGISTER_USER_EXPANDO,false)!=null){
+						deregisterMail = (Boolean)user.getExpandoBridge().getAttribute(LiferaylmsUtil.DEREGISTER_USER_EXPANDO,false);
 					}
 					
 					if(!deregisterMail){
@@ -486,6 +486,33 @@ public void asignCorrectionsToP2PActivities(long actId, long p2pActivityId,int n
 		if(list!=null){
 			return list.size() >= numAsigns;
 		}
+		return res;
+	}
+	
+	/**
+	 * Para saber si al usuario le han realizado todas las correcciones que se indica en el extracontent.
+	 */
+	public boolean hasAllCorrectionsDoneAboutUserInP2PActivity(long actId, long p2pActivityId) {
+		
+		boolean res = false;
+		
+		// Obtener las validaciones que tiene que tener la actividad.
+		int numAsigns = 3;
+		try {
+			String validations = LearningActivityLocalServiceUtil.getExtraContentValue(actId, "validaciones");
+	
+			try {numAsigns = Integer.valueOf(validations);} catch (Exception e) {}
+			
+			long num = p2pActivityCorrectionsPersistence.countByP2pActivityIdAndActIdDateNotNull(p2pActivityId, actId);
+			log.debug("num de corregidas: " + num);
+			log.debug("numAsigns: " + numAsigns);
+			
+			return num >= numAsigns;
+		} catch (SystemException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
 		return res;
 	}
 	

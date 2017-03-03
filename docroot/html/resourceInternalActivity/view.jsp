@@ -41,7 +41,7 @@
 <%@page import="com.liferay.lms.service.LearningActivityLocalServiceUtil"%>
 <%@ include file="/init.jsp" %>
 
-<div class="container-activity">
+<%@ include file="/html/shared/isTablet.jsp" %>
 
 <%
 long actId=ParamUtil.getLong(request,"actId",0);
@@ -90,7 +90,7 @@ else
 					<script type="text/javascript">
 					document.addEventListener( "DOMContentLoaded", function(){
 						Liferay.Portlet.refresh('#p_p_id_activityNavigator_WAR_liferaylmsportlet_');
-						Liferay.Portlet.refresh('#p_p_id_lmsactivitieslist_WAR_liferaylmsportlet_');
+					Liferay.Portlet.refresh('#p_p_id_lmsactivitieslist_WAR_liferaylmsportlet_');
 					}, false );
 	
 					

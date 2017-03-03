@@ -74,9 +74,14 @@ public class GroupListener extends BaseModelListener<Group> {
 							InternetAddress from = new InternetAddress(fromAddress, fromName);
 							
 					    	String url = PortalUtil.getPortalURL(company.getVirtualHostname(), 80, false);
+					    	//QUITANDO PUERTOS
+							String[] urls = url.split(":");
+							url = urls[0] + ":" +urls[1];  // http:prueba.es:8080		
+							log.debug("url: " + url);
+							
 					    	String urlcourse = url+"/web"+course.getFriendlyURL();
 					    	String subject = new String();
-					    	
+					    
 					    	if(course.getWelcomeSubject()!=null&&!StringPool.BLANK.equals(course.getWelcomeSubject())){
 						    	subject = course.getWelcomeSubject();
 					    	}else{
@@ -181,6 +186,11 @@ public class GroupListener extends BaseModelListener<Group> {
 							InternetAddress from = new InternetAddress(fromAddress, fromName);
 							
 					    	String url = PortalUtil.getPortalURL(company.getVirtualHostname(), 80, false);
+					    	//QUITANDO PUERTOS
+							String[] urls = url.split(":");
+							url = urls[0] + ":" +urls[1];  // http:prueba.es:8080		
+							log.debug("url: " + url);
+					    	
 					    	String urlcourse = url+"/web"+course.getFriendlyURL();
 					    	String subject = new String();
 					    	

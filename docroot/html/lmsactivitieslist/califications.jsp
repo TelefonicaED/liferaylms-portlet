@@ -19,6 +19,8 @@
 
 <%@ include file="/init.jsp"%>
 
+<liferay-ui:success key="ok-deleting-tries" message="activity-tries-deleting-successfully" />
+
 <%
 	long actId = ParamUtil.getLong(request, "resId", 0);
 	LearningActivity learnActivity = LearningActivityLocalServiceUtil.getLearningActivity(actId);
@@ -154,7 +156,14 @@ userSearchContainer.setTotal(totalUsers);
 				}else{
 					
 					String puntuation = String.valueOf(lar.getResult());
-					String res = lar.getPassed()?LanguageUtil.get(themeDisplay.getLocale(),"passed"):LanguageUtil.get(themeDisplay.getLocale(),"not-passed");
+					String res = "";
+					if(lar.getPassed())
+						res = LanguageUtil.get(themeDisplay.getLocale(),"passed");
+					else if(!lar.getPassed() && lar.getEndDate() != null){
+						res = LanguageUtil.get(themeDisplay.getLocale(),"not-passed");
+					}else{
+						res = LanguageUtil.get(themeDisplay.getLocale(),"started");
+					}
 					String startdate = (lar.getStartDate()!=null)?dateFormat.format(lar.getStartDate()):"";
 					
 					//Si es de tipo test y no se ha entregado

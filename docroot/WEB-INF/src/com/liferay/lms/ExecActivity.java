@@ -593,8 +593,7 @@ public class ExecActivity extends MVCPortlet{
 	}
 
 	@Override
-	public void render(RenderRequest renderRequest, RenderResponse renderResponse)
-			throws PortletException, IOException {
+	public void render(RenderRequest renderRequest, RenderResponse renderResponse) throws PortletException, IOException {
 		long actId=0;
 		boolean actionEditingDetails = ParamUtil.getBoolean(renderRequest, "actionEditingDetails", false);
 

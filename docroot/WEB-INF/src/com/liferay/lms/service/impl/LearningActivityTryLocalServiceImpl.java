@@ -77,7 +77,7 @@ public class LearningActivityTryLocalServiceImpl
 	
 	public LearningActivityTry softUpdateLearningActivityTry(LearningActivityTry learningActivityTry) throws SystemException {		
 		
-		LearningActivityTry lar = super.updateLearningActivityTry(learningActivityTry, true);
+		LearningActivityTry lar = super.updateLearningActivityTry(learningActivityTry, false);
 		
 		//auditing
 		ServiceContext serviceContext = ServiceContextThreadLocal.getServiceContext();
@@ -93,7 +93,7 @@ public class LearningActivityTryLocalServiceImpl
 	public LearningActivityTry updateLearningActivityTry(
 			LearningActivityTry learningActivityTry) throws SystemException {
 		
-		return updateLearningActivityTry(learningActivityTry,true);
+		return updateLearningActivityTry(learningActivityTry,false);
 	}
 	public long getLearningActivityTryByActUserCount(long actId,long userId) throws SystemException
 	{
@@ -162,7 +162,7 @@ public class LearningActivityTryLocalServiceImpl
 
 	public LearningActivityResult updateLearningActivityTry(LearningActivityTry learningActivityTry, String tryResultData, String imsmanifest)throws SystemException, PortalException{
 		
-		super.updateLearningActivityTry(learningActivityTry, true);		
+		super.updateLearningActivityTry(learningActivityTry, false);		
 		
 		LearningActivityResult lar = learningActivityResultLocalService.update(learningActivityTry.getLatId(), tryResultData, imsmanifest, learningActivityTry.getUserId());
 
@@ -190,7 +190,7 @@ public class LearningActivityTryLocalServiceImpl
 		larnt.setUserId(serviceContext.getUserId());
 		larnt.setActId(actId);
 		larnt.setStartDate(new Date());
-		learningActivityTryPersistence.update(larnt, true);
+		learningActivityTryPersistence.update(larnt, false);
 		learningActivityResultLocalService.update(larnt);
 		
 		courseResultLocalService.softInitializeByGroupIdAndUserId(learningActivity.getGroupId(), serviceContext.getUserId());
@@ -257,7 +257,7 @@ public class LearningActivityTryLocalServiceImpl
 				if(lat.getEndDate() == null){
 					Log.debug("::CERRANDO EL LearningActivityTry:"+lat.getLatId());
 					lat.setEndDate(lat.getStartDate());
-					super.updateLearningActivityTry(lat, true);
+					super.updateLearningActivityTry(lat, false);
 				}
 			}
 		}
@@ -392,9 +392,49 @@ public class LearningActivityTryLocalServiceImpl
 		return new ArrayList<LearningActivityTry>();
 	}
 	
+	/**
+	 * Cuenta el número de intentos de los estudiantes, esta función está pensada para pasar una lista de estudiantes filtrada
+	 * (por ejemplo para los equipos) para pedir de todos los estudiantes usar countStudentsByActIdUserExcludedIds
+	 * @param actId id de la actividad
+	 * @param userIds ids de los usuarios filtrados
+	 * @return número de intentos de los estudiantes
+	 * @throws SystemException
+	 */
 	
+	public int countTriesByActIdUserIdsStarted(long actId, long[] userIds) throws SystemException{
+		
+		if(userIds != null && userIds.length > 0){
+			return learningActivityTryPersistence.countByActIdMultipleUserIdStarted(actId, userIds);
+		}else{
+			return 0;
+		}
+	}
+	
+	/**
+	 *  Cuenta el número de intentos de los estudiantes
+	 * @param actId id de la actividad
+	 * @param userExcludedIds ids de usuarios excluidos (profesores y editores)
+	 * @return número de intentos de los estudiantes
+	 * @throws SystemException
+	 */
+	
+	public int countTriesByActIdUserExcludedIdsStarted(long actId, long[] userExcludedIds) throws SystemException{
+		
+		if(userExcludedIds != null && userExcludedIds.length > 0){
+			return learningActivityTryPersistence.countByActIdNotMultipleUserIdStarted(actId, userExcludedIds);
+		}else{
+			return learningActivityTryPersistence.countByActIdStarted(actId);
+		}
+	}
+	
+	public int countTriesByActIdStarted(long actId) throws SystemException{
+		return learningActivityTryPersistence.countByActIdStarted(actId);
+	}
+
 	public long triesPerUserOnlyStudents(long actId, long companyId, long courseGropupCreatedId, List<User> _students, long teamId) throws SystemException {
 		
 		return LearningActivityTryFinderUtil.triesPerUserOnlyStudents(actId, companyId, courseGropupCreatedId, _students, teamId);
 	}
+
+
 }

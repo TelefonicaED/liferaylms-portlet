@@ -1,3 +1,4 @@
+<%@page import="com.liferay.portal.kernel.util.PropsUtil"%>
 <%@page import="com.liferay.lms.service.LearningActivityTryLocalServiceUtil"%>
 <%@page import="com.liferay.lms.model.LearningActivityTry"%>
 <%@page import="com.tls.lms.util.LiferaylmsUtil"%>
@@ -25,6 +26,8 @@
 	boolean result=false;
 	boolean disabled=true;
 	boolean fileOptional = false;
+	boolean email_anonimous=false;
+	boolean askForP2PActivities=false;
 	
 	String dateUpload = "";
 
@@ -55,6 +58,9 @@
 		anonimous = StringPool.TRUE.equals(LearningActivityLocalServiceUtil.getExtraContentValue(learningActivity.getActId(),"anonimous"));
 		result = StringPool.TRUE.equals(LearningActivityLocalServiceUtil.getExtraContentValue(learningActivity.getActId(),"result"));
 		fileOptional = StringPool.TRUE.equals(LearningActivityLocalServiceUtil.getExtraContentValue(learningActivity.getActId(),"fileoptional"));
+		email_anonimous = StringPool.TRUE.equals(LearningActivityLocalServiceUtil.getExtraContentValue(learningActivity.getActId(),"email_anonimous"));
+		askForP2PActivities = StringPool.TRUE.equals(LearningActivityLocalServiceUtil.getExtraContentValue(learningActivity.getActId(),"askforp2pactivities"));
+		
 		String numEvaStr = LearningActivityLocalServiceUtil.getExtraContentValue(learningActivity.getActId(),"validaciones");
 		numEvaluaciones = numEvaStr.equals("") ? TaskP2PLearningActivityType.DEFAULT_VALIDATION_NUMBER : Long.parseLong(numEvaStr);
 		fileOptional = StringPool.TRUE .equals(LearningActivityLocalServiceUtil .getExtraContentValue( learningActivity.getActId(), "fileoptional"));
@@ -91,7 +97,7 @@
 	if(LearningActivityLocalServiceUtil.canBeEdited(learningActivity, user.getUserId())){
 		disabled = false;
 	}
-
+	int numQuestion = Integer.parseInt(PropsUtil.get("lms.p2p.numcustomquestion"));
 %>
 
 <script type="text/javascript">
@@ -129,6 +135,8 @@ AUI().ready('node','event','aui-io-request','aui-parse-content','liferay-portlet
 	      		success: function() {  
 	      			var notEditable = !!this.get('responseData')['notEditable'];
 	      			A.one('#<portlet:namespace />anonimousCheckbox').set('disabled',notEditable);
+	      			A.one('#<portlet:namespace />email_anonimousCheckbox').set('disabled',notEditable);
+	      			A.one('#<portlet:namespace />askForP2PActivitiesCheckbox').set('disabled',notEditable);
 	      			<% if(!disabled){ %>
 	      				A.one('#<portlet:namespace />resultCheckbox').set('disabled',notEditable);
 	      				A.one('#<portlet:namespace />numValidaciones').set('disabled',notEditable);
@@ -136,6 +144,11 @@ AUI().ready('node','event','aui-io-request','aui-parse-content','liferay-portlet
 	      			if(notEditable) {
 	      				A.one('#<portlet:namespace />anonimous').set('value','<%=Boolean.toString(anonimous)%>');
 		      			A.one('#<portlet:namespace />anonimousCheckbox').set('checked',<%=Boolean.toString(anonimous)%>);
+		      			
+	      				A.one('#<portlet:namespace />email_anonimous').set('value','<%=Boolean.toString(email_anonimous)%>');
+		      			A.one('#<portlet:namespace />askForP2PActivities').set('value','<%=Boolean.toString(askForP2PActivities)%>');
+		      			A.one('#<portlet:namespace />email_anonimousCheckbox').set('checked',<%=Boolean.toString(email_anonimous)%>);
+		      			A.one('#<portlet:namespace />askForP2PActivitiesCheckbox').set('checked',<%=Boolean.toString(askForP2PActivities)%>);
 		      			<% if(!disabled){ %>
 		      				A.one('#<portlet:namespace />result').set('value','<%=Boolean.toString(result)%>');
 		      				A.one('#<portlet:namespace />resultCheckbox').set('checked',<%=Boolean.toString(result)%>);
@@ -147,15 +160,60 @@ AUI().ready('node','event','aui-io-request','aui-parse-content','liferay-portlet
 		}); 
 	});
 });
+
+function <portlet:namespace />addText(){
+	var container = document.getElementById("<portlet:namespace />texts");
+	var numberQuestion = parseInt('<%=numQuestion%>');
+	
+	if(container){
+		var number=-1;
+		for(var i=1;i < numberQuestion;i++){
+			if(document.getElementById("<portlet:namespace />texts"+i)==null){
+				number=i;
+				break;
+			}
+		}
+		if(number<0){
+			alert('<liferay-ui:message key="p2pv2.noMoreCkeditors" />');
+			return;
+		}
+		
+		var legend = document.getElementById("<portlet:namespace />legend");
+		if(legend.style.display=='none'){
+			legend.style.display='block';
+		}
+
+		var fSpan = document.createElement("span");
+		fSpan.className = "aui-field-content";
+		fSpan.id = "<portlet:namespace />texts"+number;
+		var span = document.createElement("span");
+		span.className = "aui-field-element";
+		var input = document.createElement("input");
+		input.type = "text";
+		input.name = "text"+number;
+		input.className = "aui-field-input aui-field-input-text aui-form-validator-valid";
+		span.appendChild(input);
+		var img = document.createElement("img");
+		img.className = "icon";
+		img.src='/html/themes/control_panel/images/common/remove.png';
+		img.style.cursor='pointer';
+		img.onclick=function() {
+			this.parentNode.remove();
+		}
+		fSpan.appendChild(span);
+		fSpan.appendChild(img);
+		container.appendChild(fSpan);
+	}
+}
 //-->
 </script>
 
 
-<aui:input type="checkbox" name="anonimous" label="p2ptaskactivity.edit.anonimous" checked="<%=anonimous %>" ignoreRequestValue="true"></aui:input>
-<aui:input type="checkbox" name="result" label="test.result" checked="<%=result %>" disabled="<%=disabled %>" 
-	ignoreRequestValue="true"/>
-	
+<aui:input type="checkbox" name="anonimous" label="p2ptaskactivity.edit.anonimous" checked="<%=anonimous %>" ignoreRequestValue="true"/>
+<aui:input type="checkbox" name="result" label="test.result" checked="<%=result %>" disabled="<%=disabled %>" ignoreRequestValue="true"/>	
 <aui:input type="checkbox" name="fileoptional" label="p2ptaskactivity.edit.fileoptional" checked="<%=fileOptional%>" disabled="<%=disabled%>" ignoreRequestValue="true" />	
+<aui:input type="checkbox" name="email_anonimous" label="p2ptaskactivity.edit.email_anonimous" checked="<%=email_anonimous %>" ignoreRequestValue="true"/>
+<aui:input type="checkbox" name="askForP2PActivities" label="p2ptaskactivity.edit.ask-for-p2p-activities" checked="<%=askForP2PActivities %>" ignoreRequestValue="true"/>
 	
 <aui:field-wrapper label="p2ptaskactivity.edit.dateUpload">
 
@@ -176,6 +234,48 @@ AUI().ready('node','event','aui-io-request','aui-parse-content','liferay-portlet
 
 <aui:input type="text" size="3" cssClass="lms-inpnumval" name="numValidaciones" label="p2ptaskactivity.edit.numvalidations" value="<%=numEvaluaciones%>" disabled="<%=disabled %>" 
 		ignoreRequestValue="true"/>
+		
+<%if(!disabled){ %>
+	<aui:button value="p2pv2.addText" onClick="${renderResponse.getNamespace()}addText()" />
+<%} %>
+<div id="<portlet:namespace />texts">
+	<span id="<portlet:namespace />legend" class="aui-field-content">
+		<label class="aui-field-label"><liferay-ui:message key="p2pv2.addedTexts" /></label>
+	</span>
+	<%
+
+		String value = null;
+
+		if(learningActivity!=null&&learningActivity.getActId()>0)
+			value = LearningActivityLocalServiceUtil.getExtraContentValue(learningActivity.getActId(),"text0");
+		%>  
+			<span id="_lmsactivitieslist_WAR_liferaylmsportlet_texts0" class="aui-field-content">
+				<span id="aui_3_4_0_1_2024" class="aui-field-element">
+					<input id="aui_3_4_0_1_2020" class="aui-field-input aui-field-input-text aui-form-validator-valid" type="text" value="<%=Validator.isNotNull(value)?value:LanguageUtil.get(locale, "feedback") %>" name="text0">
+				</span>
+			</span>
+		<%
+
+		if(learningActivity!=null&&learningActivity.getActId()>0){
+			for(int i=1;i<numQuestion;i++){
+					value = LearningActivityLocalServiceUtil.getExtraContentValue(learningActivity.getActId(),"text"+i);
+					if(value==null||value.equals(StringPool.BLANK))
+						break;
+				%>
+				<script type="text/javascript">document.getElementById("<portlet:namespace />legend").style.display='block';</script>
+				<span id="_lmsactivitieslist_WAR_liferaylmsportlet_texts<%=i %>" class="aui-field-content">
+					<span id="aui_3_4_0_1_2024" class="aui-field-element">
+						<input id="aui_3_4_0_1_2020" class="aui-field-input aui-field-input-text aui-form-validator-valid" type="text" value="<%=value %>" name="text<%=i %>">
+					</span>
+					<%if(!disabled){ %>
+						<img class="icon" src="/html/themes/control_panel/images/common/remove.png" style="cursor: pointer;" onclick="this.parentNode.remove();">
+					<%} %>
+				</span>
+				<%
+			}
+		}
+	%>
+</div>
 
 
 <div id="<portlet:namespace />numValidacionesError" class="<%=((SessionErrors.contains(renderRequest, "p2ptaskactivity.editActivity.numValidaciones.required"))||

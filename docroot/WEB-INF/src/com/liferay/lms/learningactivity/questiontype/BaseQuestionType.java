@@ -9,6 +9,8 @@ import javax.portlet.ActionRequest;
 
 import org.apache.commons.io.IOUtils;
 
+import com.liferay.lms.lar.ExportUtil;
+import com.liferay.lms.lar.ImportUtil;
 import com.liferay.lms.lar.ModuleDataHandlerImpl;
 import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.model.TestAnswer;
@@ -30,6 +32,7 @@ import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portlet.documentlibrary.DuplicateFileException;
 import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
 import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
+import com.tls.lms.util.DLFolderUtil;
 
 
 public abstract class BaseQuestionType implements QuestionType, Serializable {
@@ -126,7 +129,7 @@ public abstract class BaseQuestionType implements QuestionType, Serializable {
 			
 			//Exportar los ficheros que tiene la descripcion de la respuesta
 			ModuleDataHandlerImpl m = new ModuleDataHandlerImpl();
-			m.descriptionFileParserDescriptionToLar("<root><Description>"+answer.getAnswer()+"</Description></root>", activity.getGroupId(), activity.getModuleId(), context, entryElementa);	
+			ExportUtil.descriptionFileParserDescriptionToLar("<root><Description>"+answer.getAnswer()+"</Description></root>", activity.getGroupId(), activity.getModuleId(), context, entryElementa);	
 		}
 	}
 	
@@ -148,12 +151,12 @@ public abstract class BaseQuestionType implements QuestionType, Serializable {
 				try {
 					InputStream input = context.getZipEntryAsInputStream(actElementFile.attributeValue("file"));
 					long repositoryId = DLFolderConstants.getDataRepositoryId(context.getScopeGroupId(), DLFolderConstants.DEFAULT_PARENT_FOLDER_ID);
-					folderId = m.createDLFolders(userId,repositoryId,serviceContext);
+					folderId = DLFolderUtil.createDLFoldersForLearningActivity(userId,repositoryId,serviceContext).getFolderId();
 					newFile = DLAppLocalServiceUtil.addFileEntry(userId, repositoryId , folderId , oldFile.getTitle(), "contentType", oldFile.getTitle(), StringPool.BLANK, StringPool.BLANK, IOUtils.toByteArray(input), serviceContext );
-					description = m.descriptionFileParserLarToDescription(answer.getAnswer(), oldFile, newFile);
+					description = ImportUtil.descriptionFileParserLarToDescription(answer.getAnswer(), oldFile, newFile);
 				} catch(DuplicateFileException dfl){
 					FileEntry existingFile = DLAppLocalServiceUtil.getFileEntry(context.getScopeGroupId(), folderId, oldFile.getTitle());
-					description = m.descriptionFileParserLarToDescription(answer.getAnswer(), oldFile, existingFile);
+					description = ImportUtil.descriptionFileParserLarToDescription(answer.getAnswer(), oldFile, existingFile);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}

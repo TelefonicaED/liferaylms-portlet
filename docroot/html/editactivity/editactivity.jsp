@@ -209,13 +209,13 @@ if(learnact!=null)
 					urlEdit=HttpUtil.addParameter   (urlEdit, StringPool.UNDERLINE+urlEditPortlet.getPortletId()+StringPool.UNDERLINE+"actionEditingDetails", true);
 					%>
 					
-						<portlet:actionURL name="editDetailsURL" var="editDetailsURL">
-							<portlet:param name="redirectURL" value="<%=urlEdit %>" />
-						</portlet:actionURL>
+					<portlet:actionURL name="editDetailsURL" var="editDetailsURL">
+						<portlet:param name="redirectURL" value="<%=urlEdit %>" />
+					</portlet:actionURL>
 					
 					<liferay-ui:icon image="edit" message="<%=larntype.getMesageEditDetails()%>" label="true" 
 									 url="<%=editDetailsURL%>" />
-					<%
+					<% 
 				}
 			}
 		}
@@ -591,7 +591,7 @@ Liferay.provide(
         function(moduleId) {
         	var A = AUI();
 			var renderUrl = Liferay.PortletURL.createRenderURL();							
-			renderUrl.setWindowState('<%= LiferayWindowState.EXCLUSIVE.toString() %>');
+			renderUrl.setWindowState('<%= LiferayWindowState.NORMAL.toString() %>');
 			renderUrl.setPortletId('<%=portletDisplay.getId()%>');
 			renderUrl.setParameter('jspPage','/html/editactivity/comboActivities.jsp');
 			renderUrl.setParameter('resId','<%=Long.toString(actId) %>');
@@ -1024,8 +1024,26 @@ Liferay.provide(
 	</aui:fieldset>
 	
 	<aui:button-row>
-		<aui:button type="submit" value="savechanges"/>
-		<aui:button type="cancel" value="canceledition" />
+		<aui:button type="submit" value="save"/>
+		
+		<%
+		
+		if(actId > 0){
+			AssetRendererFactory assetRendererFactory = AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(LearningActivity.class.getName());
+
+		%>
+					
+			<portlet:actionURL var="goToActivityURL" name="goToActivity" >
+				<portlet:param name="redirectURL" value="<%=assetRendererFactory.getAssetRenderer(actId).
+						getURLView(liferayPortletResponse, WindowState.NORMAL).toString() %>" />
+			</portlet:actionURL>
+	
+			<aui:button type="button" value="go-to-activity" onclick="javascript:location.href='${goToActivityURL.toString()}'" />
+		
+		<%
+		}
+		%>
+		
 	</aui:button-row>
 </aui:form>
 <%
