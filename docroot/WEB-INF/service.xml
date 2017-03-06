@@ -470,6 +470,11 @@
 				<finder-column name="userId" />
 				<finder-column name="competenceId" />
 			</finder>
+			<finder name="UserIdCompetenceIdCourseId" return-type="UserCompetence" unique="true">
+				<finder-column name="userId" />
+				<finder-column name="competenceId" />
+				<finder-column name="courseId" />
+			</finder>			
 	    </entity>
 	    	<entity name="CourseCompetence" local-service="true" remote-service="true" uuid="true" json-enabled="false">
 	    		<column name="CourcompetenceId" type="long" primary="true" />

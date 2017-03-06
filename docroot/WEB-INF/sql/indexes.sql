@@ -125,4 +125,5 @@ create index IX_CDBACDE9 on Lms_TestQuestion (uuid_);
 
 create index IX_EB2113C1 on Lms_UserCompetence (userId);
 create index IX_B2E889B9 on Lms_UserCompetence (userId, competenceId);
+create unique index IX_253E9283 on Lms_UserCompetence (userId, competenceId, courseId);
 create index IX_E1E7614D on Lms_UserCompetence (uuid_);

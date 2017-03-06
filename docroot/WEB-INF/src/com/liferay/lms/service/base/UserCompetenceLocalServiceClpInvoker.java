@@ -116,28 +116,32 @@ public class UserCompetenceLocalServiceClpInvoker {
 
 		_methodParameterTypes166 = new String[] { "long", "long" };
 
-		_methodName167 = "findByUuid";
+		_methodName167 = "findByUserIdCompetenceIdCourseId";
 
-		_methodParameterTypes167 = new String[] { "java.lang.String" };
+		_methodParameterTypes167 = new String[] { "long", "long", "long" };
 
-		_methodName168 = "getCertificateURL";
+		_methodName168 = "findByUuid";
 
-		_methodParameterTypes168 = new String[] {
+		_methodParameterTypes168 = new String[] { "java.lang.String" };
+
+		_methodName169 = "getCertificateURL";
+
+		_methodParameterTypes169 = new String[] {
 				"com.liferay.portal.kernel.portlet.LiferayPortletResponse",
 				"java.lang.String"
 			};
 
-		_methodName169 = "findBuUserId";
-
-		_methodParameterTypes169 = new String[] { "long" };
-
 		_methodName170 = "findBuUserId";
 
-		_methodParameterTypes170 = new String[] { "long", "int", "int" };
+		_methodParameterTypes170 = new String[] { "long" };
 
-		_methodName171 = "countByUserId";
+		_methodName171 = "findBuUserId";
 
-		_methodParameterTypes171 = new String[] { "long" };
+		_methodParameterTypes171 = new String[] { "long", "int", "int" };
+
+		_methodName172 = "countByUserId";
+
+		_methodParameterTypes172 = new String[] { "long" };
 	}
 
 	public Object invokeMethod(String name, String[] parameterTypes,
@@ -247,29 +251,36 @@ public class UserCompetenceLocalServiceClpInvoker {
 
 		if (_methodName167.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes167, parameterTypes)) {
-			return UserCompetenceLocalServiceUtil.findByUuid((java.lang.String)arguments[0]);
+			return UserCompetenceLocalServiceUtil.findByUserIdCompetenceIdCourseId(((Long)arguments[0]).longValue(),
+				((Long)arguments[1]).longValue(),
+				((Long)arguments[2]).longValue());
 		}
 
 		if (_methodName168.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes168, parameterTypes)) {
-			return UserCompetenceLocalServiceUtil.getCertificateURL((com.liferay.portal.kernel.portlet.LiferayPortletResponse)arguments[0],
-				(java.lang.String)arguments[1]);
+			return UserCompetenceLocalServiceUtil.findByUuid((java.lang.String)arguments[0]);
 		}
 
 		if (_methodName169.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes169, parameterTypes)) {
-			return UserCompetenceLocalServiceUtil.findBuUserId(((Long)arguments[0]).longValue());
+			return UserCompetenceLocalServiceUtil.getCertificateURL((com.liferay.portal.kernel.portlet.LiferayPortletResponse)arguments[0],
+				(java.lang.String)arguments[1]);
 		}
 
 		if (_methodName170.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes170, parameterTypes)) {
+			return UserCompetenceLocalServiceUtil.findBuUserId(((Long)arguments[0]).longValue());
+		}
+
+		if (_methodName171.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes171, parameterTypes)) {
 			return UserCompetenceLocalServiceUtil.findBuUserId(((Long)arguments[0]).longValue(),
 				((Integer)arguments[1]).intValue(),
 				((Integer)arguments[2]).intValue());
 		}
 
-		if (_methodName171.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes171, parameterTypes)) {
+		if (_methodName172.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes172, parameterTypes)) {
 			return UserCompetenceLocalServiceUtil.countByUserId(((Long)arguments[0]).longValue());
 		}
 
@@ -324,4 +335,6 @@ public class UserCompetenceLocalServiceClpInvoker {
 	private String[] _methodParameterTypes170;
 	private String _methodName171;
 	private String[] _methodParameterTypes171;
+	private String _methodName172;
+	private String[] _methodParameterTypes172;
 }

@@ -250,6 +250,9 @@ public interface UserCompetenceLocalService extends BaseLocalService,
 	public com.liferay.lms.model.UserCompetence findByUserIdCompetenceId(
 		long userId, long competenceId);
 
+	public com.liferay.lms.model.UserCompetence findByUserIdCompetenceIdCourseId(
+		long userId, long competenceId, long courseId);
+
 	public com.liferay.lms.model.UserCompetence findByUuid(
 		java.lang.String uuid);
 

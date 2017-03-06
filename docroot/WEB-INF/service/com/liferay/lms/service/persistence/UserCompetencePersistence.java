@@ -376,6 +376,48 @@ public interface UserCompetencePersistence extends BasePersistence<UserCompetenc
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	/**
+	* Returns the user competence where userId = &#63; and competenceId = &#63; and courseId = &#63; or throws a {@link com.liferay.lms.NoSuchUserCompetenceException} if it could not be found.
+	*
+	* @param userId the user ID
+	* @param competenceId the competence ID
+	* @param courseId the course ID
+	* @return the matching user competence
+	* @throws com.liferay.lms.NoSuchUserCompetenceException if a matching user competence could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.UserCompetence findByUserIdCompetenceIdCourseId(
+		long userId, long competenceId, long courseId)
+		throws com.liferay.lms.NoSuchUserCompetenceException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the user competence where userId = &#63; and competenceId = &#63; and courseId = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
+	*
+	* @param userId the user ID
+	* @param competenceId the competence ID
+	* @param courseId the course ID
+	* @return the matching user competence, or <code>null</code> if a matching user competence could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.UserCompetence fetchByUserIdCompetenceIdCourseId(
+		long userId, long competenceId, long courseId)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the user competence where userId = &#63; and competenceId = &#63; and courseId = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
+	*
+	* @param userId the user ID
+	* @param competenceId the competence ID
+	* @param courseId the course ID
+	* @param retrieveFromCache whether to use the finder cache
+	* @return the matching user competence, or <code>null</code> if a matching user competence could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.UserCompetence fetchByUserIdCompetenceIdCourseId(
+		long userId, long competenceId, long courseId, boolean retrieveFromCache)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
 	* Returns all the user competences.
 	*
 	* @return the user competences
@@ -450,6 +492,20 @@ public interface UserCompetencePersistence extends BasePersistence<UserCompetenc
 			com.liferay.portal.kernel.exception.SystemException;
 
 	/**
+	* Removes the user competence where userId = &#63; and competenceId = &#63; and courseId = &#63; from the database.
+	*
+	* @param userId the user ID
+	* @param competenceId the competence ID
+	* @param courseId the course ID
+	* @return the user competence that was removed
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.UserCompetence removeByUserIdCompetenceIdCourseId(
+		long userId, long competenceId, long courseId)
+		throws com.liferay.lms.NoSuchUserCompetenceException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	/**
 	* Removes all the user competences from the database.
 	*
 	* @throws SystemException if a system exception occurred
@@ -486,6 +542,19 @@ public interface UserCompetencePersistence extends BasePersistence<UserCompetenc
 	* @throws SystemException if a system exception occurred
 	*/
 	public int countByUserIdCompetenceId(long userId, long competenceId)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the number of user competences where userId = &#63; and competenceId = &#63; and courseId = &#63;.
+	*
+	* @param userId the user ID
+	* @param competenceId the competence ID
+	* @param courseId the course ID
+	* @return the number of matching user competences
+	* @throws SystemException if a system exception occurred
+	*/
+	public int countByUserIdCompetenceIdCourseId(long userId,
+		long competenceId, long courseId)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	/**
