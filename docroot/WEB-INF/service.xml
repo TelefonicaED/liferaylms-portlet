@@ -79,6 +79,10 @@
 			<finder-column name="moduleId" />
 			<finder-column name="priority" comparator="&gt;"/>
 		</finder>
+		<finder name="CompanyIdTypeId" return-type="Collection">
+			<finder-column name="companyId" />
+			<finder-column name="typeId" />
+		</finder>
 		
 		<reference package-path="com.liferay.portal" entity="User" />
 		<reference package-path="com.liferay.portal" entity="Role" />

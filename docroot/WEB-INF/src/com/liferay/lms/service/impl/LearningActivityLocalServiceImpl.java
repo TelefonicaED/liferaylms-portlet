@@ -524,6 +524,10 @@ public class LearningActivityLocalServiceImpl extends LearningActivityLocalServi
 	{
 		return learningActivityPersistence.findByg_t(groupId, typeId);
 	}
+	public java.util.List<LearningActivity> getLearningActivitiesByType(long companyId,int typeId) throws SystemException
+	{
+		return learningActivityPersistence.findByCompanyIdTypeId(companyId, typeId);
+	}	
 	public java.util.List<LearningActivity> getLearningActivitiesOfModule(long moduleId) throws SystemException
 	{
 		return learningActivityPersistence.findBym(moduleId, -1, -1);

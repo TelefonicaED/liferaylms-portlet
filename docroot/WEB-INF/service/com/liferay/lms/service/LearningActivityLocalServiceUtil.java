@@ -409,6 +409,12 @@ public class LearningActivityLocalServiceUtil {
 		return getService().getLearningActivitiesOfGroupAndType(groupId, typeId);
 	}
 
+	public static java.util.List<com.liferay.lms.model.LearningActivity> getLearningActivitiesByType(
+		long companyId, int typeId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().getLearningActivitiesByType(companyId, typeId);
+	}
+
 	public static java.util.List<com.liferay.lms.model.LearningActivity> getLearningActivitiesOfModule(
 		long moduleId)
 		throws com.liferay.portal.kernel.exception.SystemException {
