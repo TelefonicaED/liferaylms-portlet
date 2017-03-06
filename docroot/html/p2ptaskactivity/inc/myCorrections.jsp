@@ -171,21 +171,16 @@ if(!p2pActCorList.isEmpty()){
 							
 								if(myP2PActivity!=null){
 									JSONArray jArrayDes = null;
-									JSONArray jArray = null;
 									try{
 										jArrayDes = JSONFactoryUtil.createJSONArray(correctionText);
 									}catch(Exception e){}
-									
-									try{
-										jArray = JSONFactoryUtil.createJSONArray(myP2PActivity.getDescription());
-									}catch(Exception e){}
 								
-									if(jArray!=null&&jArray.length()>0){
-										%><div class="p2pResponse"><ul><%
-										for(int i=0;i<jArray.length();i++){
-											JSONObject jsonObject = jArray.getJSONObject(i);
+									if(jArrayDes!=null&&jArrayDes.length()>0){
+										%><div class="p2pResponse">
+											<div class="p2pAnswer"><%=myp2pActivity.getDescription()%></div>
+										<ul><%
+										for(int i=0;i<jArrayDes.length();i++){
 											JSONObject jsonObjectDes = jArrayDes.getJSONObject(i);
-											String answer = jsonObject.getString("text"+i);
 											String valoration = null;
 											if(jsonObjectDes!=null)
 												valoration = jsonObjectDes.getString("text"+i);
@@ -194,8 +189,6 @@ if(!p2pActCorList.isEmpty()){
 											%>
 												<li>
 													<div class="p2pQuestion"><%=question!=null?question:StringPool.BLANK %></div>
-													<div class="p2pAnswer"><%=answer!=null?answer:StringPool.BLANK %></div>
-													<label class="aui-field-label p2pMulti" style="font-size: 14px;"> <liferay-ui:message key="p2ptaskactivity.comment" /> </label>
 													<div class="p2pCorrect"><%=valoration!=null?valoration:StringPool.BLANK %></div>
 												</li>
 											<%

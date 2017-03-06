@@ -77,7 +77,6 @@ import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
 import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.service.DLFileEntryLocalServiceUtil;
 import com.liferay.util.bridges.mvc.MVCPortlet;
-import com.sun.org.apache.bcel.internal.generic.CPInstruction;
 import com.tls.lms.util.DLFolderUtil;
 import com.tls.lms.util.LiferaylmsUtil;
 
@@ -173,24 +172,6 @@ public class P2PActivityPortlet extends MVCPortlet {
 			boolean fileoptional = StringPool.TRUE.equals(LearningActivityLocalServiceUtil.getExtraContentValue(actId, "fileoptional"));
 			
 			if(p2pAc==null){
-				
-				if(description==null||description.equals(StringPool.BLANK)){
-					JSONArray jArray = JSONFactoryUtil.createJSONArray();
-					boolean change = false;
-					int numQuestion = Integer.parseInt(PropsUtil.get("lms.p2p.numcustomquestion"));
-					for(int i=0;i<numQuestion;i++){
-						String param = ParamUtil.getString(uploadRequest, "text"+i);
-						if(param!=null && param.equals(StringPool.BLANK)){
-							break;
-						}
-						change = true;
-						JSONObject obj = JSONFactoryUtil.createJSONObject();
-						obj.put("text"+i, param);
-						jArray.put(obj);
-					}
-					if(change)
-						description = jArray.toString();
-				}
 
 				//Cuando el fichero es obligatorio y no esta seleccionado.
 				if( !fileoptional &&  (fileName == null || fileName.equals("")) ){

@@ -861,6 +861,9 @@ public class CourseAdmin extends MVCPortlet {
 						courseCalificationType,maxusers,serviceContext,false);
 				try{
 				LmsPrefs prefs=LmsPrefsLocalServiceUtil.getLmsPrefs(course.getCompanyId());
+				//Añadimos como miembro del sitio web
+				GroupLocalServiceUtil.addUserGroups(themeDisplay.getUserId(), new long[] {course.getGroupCreatedId()});
+				
 				//Añadimos el rol de editor del curso cuando lo crea
 				Long editorRoleId=RoleLocalServiceUtil.getRole(prefs.getEditorRole()).getRoleId();
 				
