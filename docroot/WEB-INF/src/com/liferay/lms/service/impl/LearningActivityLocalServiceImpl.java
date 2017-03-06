@@ -528,6 +528,10 @@ public class LearningActivityLocalServiceImpl extends LearningActivityLocalServi
 	{
 		return learningActivityPersistence.findByCompanyIdTypeId(companyId, typeId);
 	}	
+	public java.util.List<LearningActivity> getLearningActivitiesByType(int typeId) throws SystemException
+	{
+		return learningActivityPersistence.findByTypeId( typeId);
+	}	
 	public java.util.List<LearningActivity> getLearningActivitiesOfModule(long moduleId) throws SystemException
 	{
 		return learningActivityPersistence.findBym(moduleId, -1, -1);

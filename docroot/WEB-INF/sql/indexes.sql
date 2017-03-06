@@ -53,6 +53,7 @@ create index IX_A907C93B on Lms_LearningActivity (moduleId);
 create index IX_CA9C7713 on Lms_LearningActivity (moduleId, priority);
 create index IX_C1A494B8 on Lms_LearningActivity (moduleId, weightinmodule);
 create index IX_7D8395E on Lms_LearningActivity (precedence);
+create index IX_3ABA7B89 on Lms_LearningActivity (typeId);
 create index IX_A331EE54 on Lms_LearningActivity (uuid_);
 create unique index IX_75B864D6 on Lms_LearningActivity (uuid_, groupId);
 

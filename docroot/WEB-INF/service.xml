@@ -83,7 +83,10 @@
 			<finder-column name="companyId" />
 			<finder-column name="typeId" />
 		</finder>
-		
+		<finder name="TypeId" return-type="Collection">
+			<finder-column name="typeId" />
+		</finder>
+				
 		<reference package-path="com.liferay.portal" entity="User" />
 		<reference package-path="com.liferay.portal" entity="Role" />
 		<reference package-path="com.liferay.portal" entity="Team" />
