@@ -229,7 +229,7 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 		return sql;
 	}
 
-	private String replaceResourcePermission(String sql, boolean isAdmin,long companyId, long userId) throws PortalException {
+	private String replaceResourcePermission(String sql, boolean isAdmin,long companyId, long userId) throws PortalException, SystemException {
 		/**Si no es administrador filtramos por permisos **/
 		if(!isAdmin){
 			LmsPrefs prefs=LmsPrefsLocalServiceUtil.getLmsPrefs(companyId);
