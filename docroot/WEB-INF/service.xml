@@ -79,7 +79,14 @@
 			<finder-column name="moduleId" />
 			<finder-column name="priority" comparator="&gt;"/>
 		</finder>
-		
+		<finder name="CompanyIdTypeId" return-type="Collection">
+			<finder-column name="companyId" />
+			<finder-column name="typeId" />
+		</finder>
+		<finder name="TypeId" return-type="Collection">
+			<finder-column name="typeId" />
+		</finder>
+				
 		<reference package-path="com.liferay.portal" entity="User" />
 		<reference package-path="com.liferay.portal" entity="Role" />
 		<reference package-path="com.liferay.portal" entity="Team" />
@@ -463,6 +470,11 @@
 				<finder-column name="userId" />
 				<finder-column name="competenceId" />
 			</finder>
+			<finder name="UserIdCompetenceIdCourseId" return-type="UserCompetence" unique="true">
+				<finder-column name="userId" />
+				<finder-column name="competenceId" />
+				<finder-column name="courseId" />
+			</finder>			
 	    </entity>
 	    	<entity name="CourseCompetence" local-service="true" remote-service="true" uuid="true" json-enabled="false">
 	    		<column name="CourcompetenceId" type="long" primary="true" />

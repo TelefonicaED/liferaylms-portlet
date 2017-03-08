@@ -1440,6 +1440,251 @@ public interface LearningActivityPersistence extends BasePersistence<LearningAct
 			com.liferay.portal.kernel.exception.SystemException;
 
 	/**
+	* Returns all the learning activities where companyId = &#63; and typeId = &#63;.
+	*
+	* @param companyId the company ID
+	* @param typeId the type ID
+	* @return the matching learning activities
+	* @throws SystemException if a system exception occurred
+	*/
+	public java.util.List<com.liferay.lms.model.LearningActivity> findByCompanyIdTypeId(
+		long companyId, int typeId)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns a range of all the learning activities where companyId = &#63; and typeId = &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param companyId the company ID
+	* @param typeId the type ID
+	* @param start the lower bound of the range of learning activities
+	* @param end the upper bound of the range of learning activities (not inclusive)
+	* @return the range of matching learning activities
+	* @throws SystemException if a system exception occurred
+	*/
+	public java.util.List<com.liferay.lms.model.LearningActivity> findByCompanyIdTypeId(
+		long companyId, int typeId, int start, int end)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns an ordered range of all the learning activities where companyId = &#63; and typeId = &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param companyId the company ID
+	* @param typeId the type ID
+	* @param start the lower bound of the range of learning activities
+	* @param end the upper bound of the range of learning activities (not inclusive)
+	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	* @return the ordered range of matching learning activities
+	* @throws SystemException if a system exception occurred
+	*/
+	public java.util.List<com.liferay.lms.model.LearningActivity> findByCompanyIdTypeId(
+		long companyId, int typeId, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the first learning activity in the ordered set where companyId = &#63; and typeId = &#63;.
+	*
+	* @param companyId the company ID
+	* @param typeId the type ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the first matching learning activity
+	* @throws com.liferay.lms.NoSuchLearningActivityException if a matching learning activity could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.LearningActivity findByCompanyIdTypeId_First(
+		long companyId, int typeId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchLearningActivityException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the first learning activity in the ordered set where companyId = &#63; and typeId = &#63;.
+	*
+	* @param companyId the company ID
+	* @param typeId the type ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the first matching learning activity, or <code>null</code> if a matching learning activity could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.LearningActivity fetchByCompanyIdTypeId_First(
+		long companyId, int typeId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the last learning activity in the ordered set where companyId = &#63; and typeId = &#63;.
+	*
+	* @param companyId the company ID
+	* @param typeId the type ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the last matching learning activity
+	* @throws com.liferay.lms.NoSuchLearningActivityException if a matching learning activity could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.LearningActivity findByCompanyIdTypeId_Last(
+		long companyId, int typeId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchLearningActivityException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the last learning activity in the ordered set where companyId = &#63; and typeId = &#63;.
+	*
+	* @param companyId the company ID
+	* @param typeId the type ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the last matching learning activity, or <code>null</code> if a matching learning activity could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.LearningActivity fetchByCompanyIdTypeId_Last(
+		long companyId, int typeId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the learning activities before and after the current learning activity in the ordered set where companyId = &#63; and typeId = &#63;.
+	*
+	* @param actId the primary key of the current learning activity
+	* @param companyId the company ID
+	* @param typeId the type ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the previous, current, and next learning activity
+	* @throws com.liferay.lms.NoSuchLearningActivityException if a learning activity with the primary key could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.LearningActivity[] findByCompanyIdTypeId_PrevAndNext(
+		long actId, long companyId, int typeId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchLearningActivityException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns all the learning activities where typeId = &#63;.
+	*
+	* @param typeId the type ID
+	* @return the matching learning activities
+	* @throws SystemException if a system exception occurred
+	*/
+	public java.util.List<com.liferay.lms.model.LearningActivity> findByTypeId(
+		int typeId) throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns a range of all the learning activities where typeId = &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param typeId the type ID
+	* @param start the lower bound of the range of learning activities
+	* @param end the upper bound of the range of learning activities (not inclusive)
+	* @return the range of matching learning activities
+	* @throws SystemException if a system exception occurred
+	*/
+	public java.util.List<com.liferay.lms.model.LearningActivity> findByTypeId(
+		int typeId, int start, int end)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns an ordered range of all the learning activities where typeId = &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param typeId the type ID
+	* @param start the lower bound of the range of learning activities
+	* @param end the upper bound of the range of learning activities (not inclusive)
+	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	* @return the ordered range of matching learning activities
+	* @throws SystemException if a system exception occurred
+	*/
+	public java.util.List<com.liferay.lms.model.LearningActivity> findByTypeId(
+		int typeId, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the first learning activity in the ordered set where typeId = &#63;.
+	*
+	* @param typeId the type ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the first matching learning activity
+	* @throws com.liferay.lms.NoSuchLearningActivityException if a matching learning activity could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.LearningActivity findByTypeId_First(
+		int typeId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchLearningActivityException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the first learning activity in the ordered set where typeId = &#63;.
+	*
+	* @param typeId the type ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the first matching learning activity, or <code>null</code> if a matching learning activity could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.LearningActivity fetchByTypeId_First(
+		int typeId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the last learning activity in the ordered set where typeId = &#63;.
+	*
+	* @param typeId the type ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the last matching learning activity
+	* @throws com.liferay.lms.NoSuchLearningActivityException if a matching learning activity could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.LearningActivity findByTypeId_Last(
+		int typeId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchLearningActivityException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the last learning activity in the ordered set where typeId = &#63;.
+	*
+	* @param typeId the type ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the last matching learning activity, or <code>null</code> if a matching learning activity could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.LearningActivity fetchByTypeId_Last(
+		int typeId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the learning activities before and after the current learning activity in the ordered set where typeId = &#63;.
+	*
+	* @param actId the primary key of the current learning activity
+	* @param typeId the type ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the previous, current, and next learning activity
+	* @throws com.liferay.lms.NoSuchLearningActivityException if a learning activity with the primary key could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.lms.model.LearningActivity[] findByTypeId_PrevAndNext(
+		long actId, int typeId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.lms.NoSuchLearningActivityException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	/**
 	* Returns all the learning activities.
 	*
 	* @return the learning activities
@@ -1580,6 +1825,25 @@ public interface LearningActivityPersistence extends BasePersistence<LearningAct
 	* @throws SystemException if a system exception occurred
 	*/
 	public void removeByModuleIdPriorityGreaterThan(long moduleId, long priority)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Removes all the learning activities where companyId = &#63; and typeId = &#63; from the database.
+	*
+	* @param companyId the company ID
+	* @param typeId the type ID
+	* @throws SystemException if a system exception occurred
+	*/
+	public void removeByCompanyIdTypeId(long companyId, int typeId)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Removes all the learning activities where typeId = &#63; from the database.
+	*
+	* @param typeId the type ID
+	* @throws SystemException if a system exception occurred
+	*/
+	public void removeByTypeId(int typeId)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	/**
@@ -1726,6 +1990,27 @@ public interface LearningActivityPersistence extends BasePersistence<LearningAct
 	* @throws SystemException if a system exception occurred
 	*/
 	public int countByModuleIdPriorityGreaterThan(long moduleId, long priority)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the number of learning activities where companyId = &#63; and typeId = &#63;.
+	*
+	* @param companyId the company ID
+	* @param typeId the type ID
+	* @return the number of matching learning activities
+	* @throws SystemException if a system exception occurred
+	*/
+	public int countByCompanyIdTypeId(long companyId, int typeId)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the number of learning activities where typeId = &#63;.
+	*
+	* @param typeId the type ID
+	* @return the number of matching learning activities
+	* @throws SystemException if a system exception occurred
+	*/
+	public int countByTypeId(int typeId)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	/**

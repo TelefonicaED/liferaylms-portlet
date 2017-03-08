@@ -45,6 +45,7 @@ create index IX_8CF7C46F on Lms_CourseResult (courseId, userId);
 create index IX_583EFC25 on Lms_CourseResult (userId);
 create unique index IX_3F29EDEF on Lms_CourseResult (userId, courseId);
 
+create index IX_48E2DCF1 on Lms_LearningActivity (companyId, typeId);
 create index IX_A674914A on Lms_LearningActivity (groupId);
 create index IX_A26B5373 on Lms_LearningActivity (groupId, typeId);
 create index IX_D6755EC7 on Lms_LearningActivity (groupId, weightinmodule);
@@ -52,6 +53,7 @@ create index IX_A907C93B on Lms_LearningActivity (moduleId);
 create index IX_CA9C7713 on Lms_LearningActivity (moduleId, priority);
 create index IX_C1A494B8 on Lms_LearningActivity (moduleId, weightinmodule);
 create index IX_7D8395E on Lms_LearningActivity (precedence);
+create index IX_3ABA7B89 on Lms_LearningActivity (typeId);
 create index IX_A331EE54 on Lms_LearningActivity (uuid_);
 create unique index IX_75B864D6 on Lms_LearningActivity (uuid_, groupId);
 
@@ -123,4 +125,5 @@ create index IX_CDBACDE9 on Lms_TestQuestion (uuid_);
 
 create index IX_EB2113C1 on Lms_UserCompetence (userId);
 create index IX_B2E889B9 on Lms_UserCompetence (userId, competenceId);
+create unique index IX_253E9283 on Lms_UserCompetence (userId, competenceId, courseId);
 create index IX_E1E7614D on Lms_UserCompetence (uuid_);

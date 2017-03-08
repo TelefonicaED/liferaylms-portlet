@@ -116,13 +116,14 @@ public class LearningActivityModelImpl extends BaseModelImpl<LearningActivity>
 	public static final boolean COLUMN_BITMASK_ENABLED = GetterUtil.getBoolean(com.liferay.util.service.ServiceProps.get(
 				"value.object.column.bitmask.enabled.com.liferay.lms.model.LearningActivity"),
 			true);
-	public static long GROUPID_COLUMN_BITMASK = 1L;
-	public static long MODULEID_COLUMN_BITMASK = 2L;
-	public static long PRECEDENCE_COLUMN_BITMASK = 4L;
-	public static long PRIORITY_COLUMN_BITMASK = 8L;
-	public static long TYPEID_COLUMN_BITMASK = 16L;
-	public static long UUID_COLUMN_BITMASK = 32L;
-	public static long WEIGHTINMODULE_COLUMN_BITMASK = 64L;
+	public static long COMPANYID_COLUMN_BITMASK = 1L;
+	public static long GROUPID_COLUMN_BITMASK = 2L;
+	public static long MODULEID_COLUMN_BITMASK = 4L;
+	public static long PRECEDENCE_COLUMN_BITMASK = 8L;
+	public static long PRIORITY_COLUMN_BITMASK = 16L;
+	public static long TYPEID_COLUMN_BITMASK = 32L;
+	public static long UUID_COLUMN_BITMASK = 64L;
+	public static long WEIGHTINMODULE_COLUMN_BITMASK = 128L;
 
 	/**
 	 * Converts the soap model instance into a normal model instance.
@@ -453,7 +454,19 @@ public class LearningActivityModelImpl extends BaseModelImpl<LearningActivity>
 	}
 
 	public void setCompanyId(long companyId) {
+		_columnBitmask |= COMPANYID_COLUMN_BITMASK;
+
+		if (!_setOriginalCompanyId) {
+			_setOriginalCompanyId = true;
+
+			_originalCompanyId = _companyId;
+		}
+
 		_companyId = companyId;
+	}
+
+	public long getOriginalCompanyId() {
+		return _originalCompanyId;
 	}
 
 	public long getUserId() {
@@ -1155,6 +1168,10 @@ public class LearningActivityModelImpl extends BaseModelImpl<LearningActivity>
 
 		learningActivityModelImpl._originalUuid = learningActivityModelImpl._uuid;
 
+		learningActivityModelImpl._originalCompanyId = learningActivityModelImpl._companyId;
+
+		learningActivityModelImpl._setOriginalCompanyId = false;
+
 		learningActivityModelImpl._originalGroupId = learningActivityModelImpl._groupId;
 
 		learningActivityModelImpl._setOriginalGroupId = false;
@@ -1518,6 +1535,8 @@ public class LearningActivityModelImpl extends BaseModelImpl<LearningActivity>
 	private String _originalUuid;
 	private long _actId;
 	private long _companyId;
+	private long _originalCompanyId;
+	private boolean _setOriginalCompanyId;
 	private long _userId;
 	private String _userUuid;
 	private long _groupId;

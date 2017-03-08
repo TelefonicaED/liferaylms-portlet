@@ -276,6 +276,12 @@ public class UserCompetenceLocalServiceWrapper
 			competenceId);
 	}
 
+	public com.liferay.lms.model.UserCompetence findByUserIdCompetenceIdCourseId(
+		long userId, long competenceId, long courseId) {
+		return _userCompetenceLocalService.findByUserIdCompetenceIdCourseId(userId,
+			competenceId, courseId);
+	}
+
 	public com.liferay.lms.model.UserCompetence findByUuid(
 		java.lang.String uuid) {
 		return _userCompetenceLocalService.findByUuid(uuid);
