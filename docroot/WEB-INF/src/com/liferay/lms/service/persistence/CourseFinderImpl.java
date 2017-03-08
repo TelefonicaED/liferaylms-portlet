@@ -138,7 +138,12 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 	public static final String EXISTING_USER_COURSES =
 			 CourseFinder.class.getName() +
 				".getExistingUserCourses";
-		
+	public static final String WHERE_TITLE_DESCRIPTION_CATEGORIES_TAGS_AND =
+			 CourseFinder.class.getName() + 
+			 	".whereC_BytTitleDescriptionCategoriesTagsAND";
+	public static final String WHERE_TITLE_DESCRIPTION_CATEGORIES_TAGS_OR =
+			 CourseFinder.class.getName() + 
+			 	".whereC_BytTitleDescriptionCategoriesTagsOR";	
 	
 	@SuppressWarnings("unchecked")
 	public List<Course> findByT_S_C_T(String freeText, int status, long[] categories, long[] tags, long companyId, long groupId, long userId, String language, boolean isAdmin, boolean andOperator, int start, int end){
@@ -153,14 +158,16 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			
 			String sql = CustomSQLUtil.get(FIND_BY_TITLE_STATUS);
 			
-			sql = replaceLanguage(sql, language);
+			sql = replaceWhereTitleDescriptionCategoriesTags(sql, freeText, status, categories, tags, andOperator);
 			
+			sql = replaceLanguage(sql, language);
+					
 			sql = replaceAssetEntry(sql, categories, tags);
 
 			sql = replaceCategory(sql, categories);
 
 			sql = replaceTag(sql, tags);
-			
+
 			sql = replaceResourcePermission(sql, isAdmin, companyId, userId);
 
 			if(start < 0 && end < 0){
@@ -184,20 +191,7 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			qPos.add(companyId);
 			qPos.add(companyId);
 			qPos.add(groupId);
-			qPos.add(groupId);
-			qPos.add(freeText);
-			qPos.add(status);
-			qPos.add(andOperator);
-			qPos.add(freeText);
-			qPos.add(freeText);
-			qPos.add(freeText);
-			qPos.add(status);
-			qPos.add(status);
-			qPos.add(andOperator);
-			qPos.add(freeText);
-			qPos.add(freeText);
-			qPos.add(status);
-			
+			qPos.add(groupId);	
 			
 			List<Course> listCourse = (List<Course>) q.list();
 			
@@ -215,9 +209,30 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 	
 	
 	
-	private String replaceResourcePermission(String sql, boolean isAdmin,long companyId, long userId) throws PortalException {
+	private String replaceWhereTitleDescriptionCategoriesTags(String sql, String freeText, int status, long[] categories, long[] tags, boolean andOperator) {
+		
+		if(andOperator && ((freeText != null && !freeText.equals("")) || status != -1 || (categories != null && categories.length > 0) || (tags != null && tags.length > 0))){
+			sql = sql.replace("[$WHERETITLEDESCRIPTIONCATEGORIESTAGSAND$]", CustomSQLUtil.get(WHERE_TITLE_DESCRIPTION_CATEGORIES_TAGS_AND));
+			sql = sql.replace("[$FREETEXT$]", String.valueOf(freeText));
+			sql = sql.replace("[$STATUS$]", String.valueOf(status));
+			sql = sql.replace("[$WHERETITLEDESCRIPTIONCATEGORIESTAGSOR$]", "");
+		}else if(!andOperator && ((freeText != null && !freeText.equals("")) || status != -1 || (categories != null && categories.length > 0) || (tags != null && tags.length > 0))){
+			sql = sql.replace("[$WHERETITLEDESCRIPTIONCATEGORIESTAGSAND$]", "");
+			sql = sql.replace("[$WHERETITLEDESCRIPTIONCATEGORIESTAGSOR$]", CustomSQLUtil.get(WHERE_TITLE_DESCRIPTION_CATEGORIES_TAGS_OR));
+			sql = sql.replace("[$FREETEXT$]", String.valueOf(freeText));
+			sql = sql.replace("[$STATUS$]", String.valueOf(status));
+		}else{
+			sql = sql.replace("[$WHERETITLEDESCRIPTIONCATEGORIESTAGSAND$]", "");
+			sql = sql.replace("[$WHERETITLEDESCRIPTIONCATEGORIESTAGSOR$]", "");
+		}
+
+		return sql;
+	}
+
+	private String replaceResourcePermission(String sql, boolean isAdmin,long companyId, long userId) throws PortalException, SystemException {
 		/**Si no es administrador filtramos por permisos **/
 		if(!isAdmin){
+			LmsPrefs prefs=LmsPrefsLocalServiceUtil.getLmsPrefs(companyId);
 			sql = sql.replace("[$JOINRESOURCEPERMISSION$]", CustomSQLUtil.get(JOIN_BY_RESOURCE_PERMISSION));
 			sql = sql.replace("[$COMPANYID$]", String.valueOf(companyId));
 			sql = sql.replace("[$ACTIONPUBLISH$]", String.valueOf(ResourceActionLocalServiceUtil.getResourceAction(Course.class.getName(), "PUBLISH").getBitwiseValue()));
@@ -230,6 +245,8 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			sql = sql.replace("[$CLASSNAMEIDUSERGROUP$]", String.valueOf(ClassNameLocalServiceUtil.getClassNameId(UserGroup.class)));
 			sql = sql.replace("[$CLASSNAMEIDORGANIZATION$]", String.valueOf(ClassNameLocalServiceUtil.getClassNameId(Organization.class)));
 			sql = sql.replace("[$CLASSNAMEIDGROUP$]", String.valueOf(ClassNameLocalServiceUtil.getClassNameId(Group.class)));
+			sql = sql.replace("[$ROLEEDITOR$]", String.valueOf(prefs.getEditorRole()));
+			sql = sql.replace("[$ROLETEACHER$]", String.valueOf(prefs.getTeacherRole()));
 			
 			sql = sql.replace("[$WHERERESOURCEPERMISSION$]", CustomSQLUtil.get(WHERE_BY_RESOURCE_PERMISSION));
 		}else{
@@ -253,25 +270,6 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			}
 			tagIds = tagIds.substring(0, tagIds.length()-1);
 			
-			/*
-			 * PARA LA REALIZACI�N POR = EN VEZ DE POR IN
-			 * 
-			String joins = "";
-			String wheres = "";
-			
-			for(int i = 0; i < tags.length; i++){
-				joins += CustomSQLUtil.get(JOIN_BY_ASSET_TAG);
-				wheres += CustomSQLUtil.get(WHERE_BY_AND_ASSET_TAG);
-
-				wheres = wheres.replace("[$TAGIDS$]", String.valueOf(tags[i]));	
-				
-				joins = joins.replace("[$i$]", String.valueOf(i));
-				wheres = wheres.replace("[$i$]", String.valueOf(i));
-				
-				tagIds += tags[i] + ",";
-			}
-			  
-			 */
 			
 			sql = sql.replace("[$JOINASSETTAGS$]", joins);
 			
@@ -349,6 +347,8 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 				freeText = "%" + freeText + "%";
 			
 			String sql = CustomSQLUtil.get(COUNT_BY_TITLE_STATUS);
+			
+			sql = replaceWhereTitleDescriptionCategoriesTags(sql, freeText, status, categories, tags, andOperator);
 
 			sql = replaceLanguage(sql, language);
 			
@@ -376,18 +376,6 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			qPos.add(companyId);
 			qPos.add(groupId);
 			qPos.add(groupId);
-			qPos.add(freeText);
-			qPos.add(status);
-			qPos.add(andOperator);
-			qPos.add(freeText);
-			qPos.add(freeText);
-			qPos.add(freeText);
-			qPos.add(status);
-			qPos.add(status);
-			qPos.add(andOperator);
-			qPos.add(freeText);
-			qPos.add(freeText);
-			qPos.add(status);
 			
 			Iterator<Long> itr = q.iterate();
 
@@ -649,6 +637,8 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			
 			String sql = CustomSQLUtil.get(FIND_BY_TITLE_STATUS);
 			
+			sql = replaceWhereTitleDescriptionCategoriesTags(sql, freeText, WorkflowConstants.STATUS_APPROVED, categories, tags, true);
+			
 			sql = replaceLanguage(sql, language);
 			
 			sql = sql.replace("[$JOINASSET$]", CustomSQLUtil.get(JOIN_BY_ASSET_ENTRY));
@@ -682,18 +672,6 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			qPos.add(companyId);
 			qPos.add(groupId);
 			qPos.add(groupId);
-			qPos.add(freeText);
-			qPos.add(WorkflowConstants.STATUS_APPROVED);
-			qPos.add(true);
-			qPos.add(freeText);
-			qPos.add(freeText);
-			qPos.add(freeText);
-			qPos.add(WorkflowConstants.STATUS_APPROVED);
-			qPos.add(WorkflowConstants.STATUS_APPROVED);
-			qPos.add(true);
-			qPos.add(freeText);
-			qPos.add(freeText);
-			qPos.add(WorkflowConstants.STATUS_APPROVED);
 			
 			List<Course> listCourse = (List<Course>) q.list();
 			
@@ -938,9 +916,11 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 				freeText = "%" + freeText + "%";
 			
 			String sql = CustomSQLUtil.get(COUNT_BY_TITLE_STATUS);
+			
+			sql = replaceWhereTitleDescriptionCategoriesTags(sql, freeText, WorkflowConstants.STATUS_APPROVED, categories, tags, true);
 
 			sql = replaceLanguage(sql, language);
-			
+						
 			sql = sql.replace("[$JOINASSET$]", CustomSQLUtil.get(JOIN_BY_ASSET_ENTRY));
 			sql = sql.replace("[$CLASSNAMECOURSEID$]", String.valueOf(ClassNameLocalServiceUtil.fetchClassNameId(Course.class)));
 			
@@ -965,18 +945,6 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			qPos.add(companyId);
 			qPos.add(groupId);
 			qPos.add(groupId);
-			qPos.add(freeText);
-			qPos.add(WorkflowConstants.STATUS_APPROVED);
-			qPos.add(true);
-			qPos.add(freeText);
-			qPos.add(freeText);
-			qPos.add(freeText);
-			qPos.add(WorkflowConstants.STATUS_APPROVED);
-			qPos.add(WorkflowConstants.STATUS_APPROVED);
-			qPos.add(true);
-			qPos.add(freeText);
-			qPos.add(freeText);
-			qPos.add(WorkflowConstants.STATUS_APPROVED);
 			
 			Iterator<Long> itr = q.iterate();
 

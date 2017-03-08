@@ -213,7 +213,7 @@ function <portlet:namespace />addText(){
 <aui:input type="checkbox" name="result" label="test.result" checked="<%=result %>" disabled="<%=disabled %>" ignoreRequestValue="true"/>	
 <aui:input type="checkbox" name="fileoptional" label="p2ptaskactivity.edit.fileoptional" checked="<%=fileOptional%>" disabled="<%=disabled%>" ignoreRequestValue="true" />	
 <aui:input type="checkbox" name="email_anonimous" label="p2ptaskactivity.edit.email_anonimous" checked="<%=email_anonimous %>" ignoreRequestValue="true"/>
-<aui:input type="checkbox" name="askForP2PActivities" label="p2ptaskactivity.edit.ask-for-p2p-activities" checked="<%=askForP2PActivities %>" ignoreRequestValue="true"/>
+<aui:input type="checkbox" name="askforp2pactivities" label="p2ptaskactivity.edit.ask-for-p2p-activities" checked="<%=askForP2PActivities %>" ignoreRequestValue="true"/>
 	
 <aui:field-wrapper label="p2ptaskactivity.edit.dateUpload">
 

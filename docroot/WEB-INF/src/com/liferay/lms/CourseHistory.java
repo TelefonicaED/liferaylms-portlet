@@ -63,7 +63,8 @@ public class CourseHistory extends MVCPortlet
 				course = CourseLocalServiceUtil.fetchByGroupCreatedId(groupCourse.getGroupId());
 				
 				if(course!=null && course.isClosed()){
-					courses.add(new CourseResultView(course, null, themeDisplay));
+					courseResult=CourseResultLocalServiceUtil.getByUserAndCourse(course.getCourseId(), themeDisplay.getUserId());
+					courses.add(new CourseResultView(course, courseResult, themeDisplay));
 				} else if (course!= null){
 					groupsel= GroupLocalServiceUtil.getGroup(course.getGroupCreatedId());	
 			     	courseResult=CourseResultLocalServiceUtil.getByUserAndCourse(course.getCourseId(), themeDisplay.getUserId());
