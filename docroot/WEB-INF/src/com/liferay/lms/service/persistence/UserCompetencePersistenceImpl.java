@@ -132,6 +132,25 @@ public class UserCompetencePersistenceImpl extends BasePersistenceImpl<UserCompe
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION,
 			"countByUserIdCompetenceId",
 			new String[] { Long.class.getName(), Long.class.getName() });
+	public static final FinderPath FINDER_PATH_FETCH_BY_USERIDCOMPETENCEIDCOURSEID =
+		new FinderPath(UserCompetenceModelImpl.ENTITY_CACHE_ENABLED,
+			UserCompetenceModelImpl.FINDER_CACHE_ENABLED,
+			UserCompetenceImpl.class, FINDER_CLASS_NAME_ENTITY,
+			"fetchByUserIdCompetenceIdCourseId",
+			new String[] {
+				Long.class.getName(), Long.class.getName(), Long.class.getName()
+			},
+			UserCompetenceModelImpl.USERID_COLUMN_BITMASK |
+			UserCompetenceModelImpl.COMPETENCEID_COLUMN_BITMASK |
+			UserCompetenceModelImpl.COURSEID_COLUMN_BITMASK);
+	public static final FinderPath FINDER_PATH_COUNT_BY_USERIDCOMPETENCEIDCOURSEID =
+		new FinderPath(UserCompetenceModelImpl.ENTITY_CACHE_ENABLED,
+			UserCompetenceModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION,
+			"countByUserIdCompetenceIdCourseId",
+			new String[] {
+				Long.class.getName(), Long.class.getName(), Long.class.getName()
+			});
 	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_ALL = new FinderPath(UserCompetenceModelImpl.ENTITY_CACHE_ENABLED,
 			UserCompetenceModelImpl.FINDER_CACHE_ENABLED,
 			UserCompetenceImpl.class, FINDER_CLASS_NAME_LIST_WITH_PAGINATION,
@@ -158,6 +177,13 @@ public class UserCompetencePersistenceImpl extends BasePersistenceImpl<UserCompe
 			new Object[] {
 				Long.valueOf(userCompetence.getUserId()),
 				Long.valueOf(userCompetence.getCompetenceId())
+			}, userCompetence);
+
+		FinderCacheUtil.putResult(FINDER_PATH_FETCH_BY_USERIDCOMPETENCEIDCOURSEID,
+			new Object[] {
+				Long.valueOf(userCompetence.getUserId()),
+				Long.valueOf(userCompetence.getCompetenceId()),
+				Long.valueOf(userCompetence.getCourseId())
 			}, userCompetence);
 
 		userCompetence.resetOriginalValues();
@@ -237,6 +263,13 @@ public class UserCompetencePersistenceImpl extends BasePersistenceImpl<UserCompe
 			new Object[] {
 				Long.valueOf(userCompetence.getUserId()),
 				Long.valueOf(userCompetence.getCompetenceId())
+			});
+
+		FinderCacheUtil.removeResult(FINDER_PATH_FETCH_BY_USERIDCOMPETENCEIDCOURSEID,
+			new Object[] {
+				Long.valueOf(userCompetence.getUserId()),
+				Long.valueOf(userCompetence.getCompetenceId()),
+				Long.valueOf(userCompetence.getCourseId())
 			});
 	}
 
@@ -423,6 +456,13 @@ public class UserCompetencePersistenceImpl extends BasePersistenceImpl<UserCompe
 					Long.valueOf(userCompetence.getUserId()),
 					Long.valueOf(userCompetence.getCompetenceId())
 				}, userCompetence);
+
+			FinderCacheUtil.putResult(FINDER_PATH_FETCH_BY_USERIDCOMPETENCEIDCOURSEID,
+				new Object[] {
+					Long.valueOf(userCompetence.getUserId()),
+					Long.valueOf(userCompetence.getCompetenceId()),
+					Long.valueOf(userCompetence.getCourseId())
+				}, userCompetence);
 		}
 		else {
 			if ((userCompetenceModelImpl.getColumnBitmask() &
@@ -442,6 +482,28 @@ public class UserCompetencePersistenceImpl extends BasePersistenceImpl<UserCompe
 					new Object[] {
 						Long.valueOf(userCompetence.getUserId()),
 						Long.valueOf(userCompetence.getCompetenceId())
+					}, userCompetence);
+			}
+
+			if ((userCompetenceModelImpl.getColumnBitmask() &
+					FINDER_PATH_FETCH_BY_USERIDCOMPETENCEIDCOURSEID.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] {
+						Long.valueOf(userCompetenceModelImpl.getOriginalUserId()),
+						Long.valueOf(userCompetenceModelImpl.getOriginalCompetenceId()),
+						Long.valueOf(userCompetenceModelImpl.getOriginalCourseId())
+					};
+
+				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_USERIDCOMPETENCEIDCOURSEID,
+					args);
+
+				FinderCacheUtil.removeResult(FINDER_PATH_FETCH_BY_USERIDCOMPETENCEIDCOURSEID,
+					args);
+
+				FinderCacheUtil.putResult(FINDER_PATH_FETCH_BY_USERIDCOMPETENCEIDCOURSEID,
+					new Object[] {
+						Long.valueOf(userCompetence.getUserId()),
+						Long.valueOf(userCompetence.getCompetenceId()),
+						Long.valueOf(userCompetence.getCourseId())
 					}, userCompetence);
 			}
 		}
@@ -1489,6 +1551,170 @@ public class UserCompetencePersistenceImpl extends BasePersistenceImpl<UserCompe
 	}
 
 	/**
+	 * Returns the user competence where userId = &#63; and competenceId = &#63; and courseId = &#63; or throws a {@link com.liferay.lms.NoSuchUserCompetenceException} if it could not be found.
+	 *
+	 * @param userId the user ID
+	 * @param competenceId the competence ID
+	 * @param courseId the course ID
+	 * @return the matching user competence
+	 * @throws com.liferay.lms.NoSuchUserCompetenceException if a matching user competence could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	public UserCompetence findByUserIdCompetenceIdCourseId(long userId,
+		long competenceId, long courseId)
+		throws NoSuchUserCompetenceException, SystemException {
+		UserCompetence userCompetence = fetchByUserIdCompetenceIdCourseId(userId,
+				competenceId, courseId);
+
+		if (userCompetence == null) {
+			StringBundler msg = new StringBundler(8);
+
+			msg.append(_NO_SUCH_ENTITY_WITH_KEY);
+
+			msg.append("userId=");
+			msg.append(userId);
+
+			msg.append(", competenceId=");
+			msg.append(competenceId);
+
+			msg.append(", courseId=");
+			msg.append(courseId);
+
+			msg.append(StringPool.CLOSE_CURLY_BRACE);
+
+			if (_log.isWarnEnabled()) {
+				_log.warn(msg.toString());
+			}
+
+			throw new NoSuchUserCompetenceException(msg.toString());
+		}
+
+		return userCompetence;
+	}
+
+	/**
+	 * Returns the user competence where userId = &#63; and competenceId = &#63; and courseId = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
+	 *
+	 * @param userId the user ID
+	 * @param competenceId the competence ID
+	 * @param courseId the course ID
+	 * @return the matching user competence, or <code>null</code> if a matching user competence could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	public UserCompetence fetchByUserIdCompetenceIdCourseId(long userId,
+		long competenceId, long courseId) throws SystemException {
+		return fetchByUserIdCompetenceIdCourseId(userId, competenceId,
+			courseId, true);
+	}
+
+	/**
+	 * Returns the user competence where userId = &#63; and competenceId = &#63; and courseId = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
+	 *
+	 * @param userId the user ID
+	 * @param competenceId the competence ID
+	 * @param courseId the course ID
+	 * @param retrieveFromCache whether to use the finder cache
+	 * @return the matching user competence, or <code>null</code> if a matching user competence could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	public UserCompetence fetchByUserIdCompetenceIdCourseId(long userId,
+		long competenceId, long courseId, boolean retrieveFromCache)
+		throws SystemException {
+		Object[] finderArgs = new Object[] { userId, competenceId, courseId };
+
+		Object result = null;
+
+		if (retrieveFromCache) {
+			result = FinderCacheUtil.getResult(FINDER_PATH_FETCH_BY_USERIDCOMPETENCEIDCOURSEID,
+					finderArgs, this);
+		}
+
+		if (result instanceof UserCompetence) {
+			UserCompetence userCompetence = (UserCompetence)result;
+
+			if ((userId != userCompetence.getUserId()) ||
+					(competenceId != userCompetence.getCompetenceId()) ||
+					(courseId != userCompetence.getCourseId())) {
+				result = null;
+			}
+		}
+
+		if (result == null) {
+			StringBundler query = new StringBundler(4);
+
+			query.append(_SQL_SELECT_USERCOMPETENCE_WHERE);
+
+			query.append(_FINDER_COLUMN_USERIDCOMPETENCEIDCOURSEID_USERID_2);
+
+			query.append(_FINDER_COLUMN_USERIDCOMPETENCEIDCOURSEID_COMPETENCEID_2);
+
+			query.append(_FINDER_COLUMN_USERIDCOMPETENCEIDCOURSEID_COURSEID_2);
+
+			String sql = query.toString();
+
+			Session session = null;
+
+			try {
+				session = openSession();
+
+				Query q = session.createQuery(sql);
+
+				QueryPos qPos = QueryPos.getInstance(q);
+
+				qPos.add(userId);
+
+				qPos.add(competenceId);
+
+				qPos.add(courseId);
+
+				List<UserCompetence> list = q.list();
+
+				result = list;
+
+				UserCompetence userCompetence = null;
+
+				if (list.isEmpty()) {
+					FinderCacheUtil.putResult(FINDER_PATH_FETCH_BY_USERIDCOMPETENCEIDCOURSEID,
+						finderArgs, list);
+				}
+				else {
+					userCompetence = list.get(0);
+
+					cacheResult(userCompetence);
+
+					if ((userCompetence.getUserId() != userId) ||
+							(userCompetence.getCompetenceId() != competenceId) ||
+							(userCompetence.getCourseId() != courseId)) {
+						FinderCacheUtil.putResult(FINDER_PATH_FETCH_BY_USERIDCOMPETENCEIDCOURSEID,
+							finderArgs, userCompetence);
+					}
+				}
+
+				return userCompetence;
+			}
+			catch (Exception e) {
+				throw processException(e);
+			}
+			finally {
+				if (result == null) {
+					FinderCacheUtil.removeResult(FINDER_PATH_FETCH_BY_USERIDCOMPETENCEIDCOURSEID,
+						finderArgs);
+				}
+
+				closeSession(session);
+			}
+		}
+		else {
+			if (result instanceof List<?>) {
+				return null;
+			}
+			else {
+				return (UserCompetence)result;
+			}
+		}
+	}
+
+	/**
 	 * Returns all the user competences.
 	 *
 	 * @return the user competences
@@ -1640,6 +1866,24 @@ public class UserCompetencePersistenceImpl extends BasePersistenceImpl<UserCompe
 		throws NoSuchUserCompetenceException, SystemException {
 		UserCompetence userCompetence = findByUserIdCompetenceId(userId,
 				competenceId);
+
+		return remove(userCompetence);
+	}
+
+	/**
+	 * Removes the user competence where userId = &#63; and competenceId = &#63; and courseId = &#63; from the database.
+	 *
+	 * @param userId the user ID
+	 * @param competenceId the competence ID
+	 * @param courseId the course ID
+	 * @return the user competence that was removed
+	 * @throws SystemException if a system exception occurred
+	 */
+	public UserCompetence removeByUserIdCompetenceIdCourseId(long userId,
+		long competenceId, long courseId)
+		throws NoSuchUserCompetenceException, SystemException {
+		UserCompetence userCompetence = findByUserIdCompetenceIdCourseId(userId,
+				competenceId, courseId);
 
 		return remove(userCompetence);
 	}
@@ -1833,6 +2077,70 @@ public class UserCompetencePersistenceImpl extends BasePersistenceImpl<UserCompe
 	}
 
 	/**
+	 * Returns the number of user competences where userId = &#63; and competenceId = &#63; and courseId = &#63;.
+	 *
+	 * @param userId the user ID
+	 * @param competenceId the competence ID
+	 * @param courseId the course ID
+	 * @return the number of matching user competences
+	 * @throws SystemException if a system exception occurred
+	 */
+	public int countByUserIdCompetenceIdCourseId(long userId,
+		long competenceId, long courseId) throws SystemException {
+		Object[] finderArgs = new Object[] { userId, competenceId, courseId };
+
+		Long count = (Long)FinderCacheUtil.getResult(FINDER_PATH_COUNT_BY_USERIDCOMPETENCEIDCOURSEID,
+				finderArgs, this);
+
+		if (count == null) {
+			StringBundler query = new StringBundler(4);
+
+			query.append(_SQL_COUNT_USERCOMPETENCE_WHERE);
+
+			query.append(_FINDER_COLUMN_USERIDCOMPETENCEIDCOURSEID_USERID_2);
+
+			query.append(_FINDER_COLUMN_USERIDCOMPETENCEIDCOURSEID_COMPETENCEID_2);
+
+			query.append(_FINDER_COLUMN_USERIDCOMPETENCEIDCOURSEID_COURSEID_2);
+
+			String sql = query.toString();
+
+			Session session = null;
+
+			try {
+				session = openSession();
+
+				Query q = session.createQuery(sql);
+
+				QueryPos qPos = QueryPos.getInstance(q);
+
+				qPos.add(userId);
+
+				qPos.add(competenceId);
+
+				qPos.add(courseId);
+
+				count = (Long)q.uniqueResult();
+			}
+			catch (Exception e) {
+				throw processException(e);
+			}
+			finally {
+				if (count == null) {
+					count = Long.valueOf(0);
+				}
+
+				FinderCacheUtil.putResult(FINDER_PATH_COUNT_BY_USERIDCOMPETENCEIDCOURSEID,
+					finderArgs, count);
+
+				closeSession(session);
+			}
+		}
+
+		return count.intValue();
+	}
+
+	/**
 	 * Returns the number of user competences.
 	 *
 	 * @return the number of user competences
@@ -1958,6 +2266,12 @@ public class UserCompetencePersistenceImpl extends BasePersistenceImpl<UserCompe
 	private static final String _FINDER_COLUMN_USERIDCOMPETENCEID_USERID_2 = "userCompetence.userId = ? AND ";
 	private static final String _FINDER_COLUMN_USERIDCOMPETENCEID_COMPETENCEID_2 =
 		"userCompetence.competenceId = ?";
+	private static final String _FINDER_COLUMN_USERIDCOMPETENCEIDCOURSEID_USERID_2 =
+		"userCompetence.userId = ? AND ";
+	private static final String _FINDER_COLUMN_USERIDCOMPETENCEIDCOURSEID_COMPETENCEID_2 =
+		"userCompetence.competenceId = ? AND ";
+	private static final String _FINDER_COLUMN_USERIDCOMPETENCEIDCOURSEID_COURSEID_2 =
+		"userCompetence.courseId = ?";
 	private static final String _ORDER_BY_ENTITY_ALIAS = "userCompetence.";
 	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY = "No UserCompetence exists with the primary key ";
 	private static final String _NO_SUCH_ENTITY_WITH_KEY = "No UserCompetence exists with the key {";

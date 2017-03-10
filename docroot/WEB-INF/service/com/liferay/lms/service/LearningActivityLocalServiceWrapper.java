@@ -410,6 +410,18 @@ public class LearningActivityLocalServiceWrapper
 			typeId);
 	}
 
+	public java.util.List<com.liferay.lms.model.LearningActivity> getLearningActivitiesByType(
+		long companyId, int typeId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _learningActivityLocalService.getLearningActivitiesByType(companyId,
+			typeId);
+	}
+
+	public java.util.List<com.liferay.lms.model.LearningActivity> getLearningActivitiesByType(
+		int typeId) throws com.liferay.portal.kernel.exception.SystemException {
+		return _learningActivityLocalService.getLearningActivitiesByType(typeId);
+	}
+
 	public java.util.List<com.liferay.lms.model.LearningActivity> getLearningActivitiesOfModule(
 		long moduleId)
 		throws com.liferay.portal.kernel.exception.SystemException {

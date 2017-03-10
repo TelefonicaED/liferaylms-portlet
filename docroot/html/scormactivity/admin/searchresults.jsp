@@ -38,87 +38,69 @@ portletURL.setParameter("resId",String.valueOf(resId));
 
 
 <liferay-ui:search-container emptyResultsMessage="scormactivity.there-are-no-assets" iteratorURL="<%=portletURL%>" delta="10">
-<liferay-ui:search-container-results>
-<%
-total=0;
-if (keywords.length() > 0) {
-
-	SearchContext searchContext=SearchContextFactory.getInstance(request);
-	searchContext.setAssetCategoryIds(serviceContext.getAssetCategoryIds());
-	searchContext.setUserId(themeDisplay.getUserId());
-	searchContext.setGroupIds(groupIds);
-	searchContext.setEntryClassNames(entryClassNames);
-	searchContext.setKeywords(keywords);
-	searchContext.setStart(searchContainer.getStart());
-	searchContext.setEnd(searchContainer.getEnd());
+	<liferay-ui:search-container-results>
+		<%
 	
-	Indexer indexer=IndexerRegistryUtil.getIndexer(className);
-	Hits hits = indexer.search(searchContext);
+		SearchContext searchContext=SearchContextFactory.getInstance(request);
+		searchContext.setAssetCategoryIds(serviceContext.getAssetCategoryIds());
+		searchContext.setUserId(themeDisplay.getUserId());
+		searchContext.setGroupIds(groupIds);
+		searchContext.setEntryClassNames(entryClassNames);
+		if (keywords.length() > 0) {
+			searchContext.setKeywords(keywords);
+		}
+		searchContext.setStart(searchContainer.getStart());
+		searchContext.setEnd(searchContainer.getEnd());
+		
+		Indexer indexer=IndexerRegistryUtil.getIndexer(className);
+		Hits hits = indexer.search(searchContext);
+		
+		total=hits.getLength();
 	
-	total=hits.getLength();
-
-	results = new ArrayList<AssetEntry>();
-	for (Document doc : hits.getDocs()) { 
-		Long classPK = Long.parseLong(doc.get(Field.ENTRY_CLASS_PK)); 
-	    
-	    AssetEntry asset = AssetEntryLocalServiceUtil.getEntry(className, classPK);
-	    results.add(asset);
-	    
-	}
-} else {
+		results = new ArrayList<AssetEntry>();
+		for (Document doc : hits.getDocs()) { 
+			Long classPK = Long.parseLong(doc.get(Field.ENTRY_CLASS_PK)); 
+		    
+		    AssetEntry asset = AssetEntryLocalServiceUtil.getEntry(className, classPK);
+		    results.add(asset);
+		    
+		}
 	
-	AssetEntryQuery query = new AssetEntryQuery();
-	query.setClassName(className);
-	query.setGroupIds(groupIds);
-	query.setEnablePermissions(true);
-	query.setExcludeZeroViewCount(false);
-	if (serviceContext.getAssetCategoryIds() != null) {
-		query.setAllCategoryIds(serviceContext.getAssetCategoryIds());
-	}
-	query.setVisible(true);
-	
-	total = AssetEntryServiceUtil.getEntriesCount(query);
-	
-	query.setStart(searchContainer.getStart());
-	query.setEnd(searchContainer.getEnd());
-	results = AssetEntryServiceUtil.getEntries(query);
-}
-
-pageContext.setAttribute("results", results);
-pageContext.setAttribute("total", total);
-%>
-</liferay-ui:search-container-results>
-<liferay-ui:search-container-row className="com.liferay.portlet.asset.model.AssetEntry" keyProperty="entryId" modelVar="assetEntry">
-	<liferay-ui:search-container-column-text name="title" property="title" orderable="false" />
-	
-	<liferay-portlet:renderURL var="selectResourceURL">
-	 <liferay-portlet:param value="/html/editactivity/editactivity.jsp" name="jspPage"/>
-	 <liferay-portlet:param value="<%=Long.toString(assetEntry.getEntryId()) %>" name="assertId"/>
-	 <liferay-portlet:param value="<%=assetEntry.getTitle(renderRequest.getLocale()) %>" name="assertTitle"/>
-	 <liferay-portlet:param value="9" name="type"/>
-	 <liferay-portlet:param name="resModuleId" value="<%=String.valueOf(resModuleId) %>"/>
-	 <liferay-portlet:param name="resId" value="<%=String.valueOf(resId) %>"/>
-	 <liferay-portlet:param name="sco" value=" "/>
-	</liferay-portlet:renderURL>
-	
-	<liferay-portlet:renderURL var="selectSCOURL">
-	 <liferay-portlet:param value="/html/scormactivity/admin/selectsco.jsp" name="jspPage"/>
-	 <liferay-portlet:param value="<%=Long.toString(assetEntry.getEntryId()) %>" name="assertId"/>
-	 <liferay-portlet:param value="<%=assetEntry.getTitle(renderRequest.getLocale()) %>" name="assertTitle"/>
-	 <liferay-portlet:param name="resModuleId" value="<%=String.valueOf(resModuleId) %>"/>
-	 <liferay-portlet:param name="resId" value="<%=String.valueOf(resId) %>"/>
-	 <liferay-portlet:param value="9" name="type"/>
-	</liferay-portlet:renderURL>
-	
-	<liferay-ui:search-container-column-text>
-		<liferay-ui:icon image="add" label="false" message="scormactivity.complete" url="<%=selectResourceURL.toString()%>"><a href="<%=selectResourceURL.toString() %>"><liferay-ui:message key="scormactivity.complete" /></a></liferay-ui:icon>
-	</liferay-ui:search-container-column-text>
-	
-	<liferay-ui:search-container-column-text>
-		<liferay-ui:icon image="add" label="specificsco" message="scormactivity.selection" url="<%=selectSCOURL.toString() %>"><a href="<%=selectSCOURL.toString() %>"><liferay-ui:message key="scormactivity.selection" /></a></liferay-ui:icon>
-	</liferay-ui:search-container-column-text>
-	
-	
-</liferay-ui:search-container-row>
-<liferay-ui:search-iterator />
+		pageContext.setAttribute("results", results);
+		pageContext.setAttribute("total", total);
+		%>
+	</liferay-ui:search-container-results>
+	<liferay-ui:search-container-row className="com.liferay.portlet.asset.model.AssetEntry" keyProperty="entryId" modelVar="assetEntry">
+		<liferay-ui:search-container-column-text name="title" property="title" orderable="false" />
+		
+		<liferay-portlet:renderURL var="selectResourceURL">
+		 <liferay-portlet:param value="/html/editactivity/editactivity.jsp" name="jspPage"/>
+		 <liferay-portlet:param value="<%=Long.toString(assetEntry.getEntryId()) %>" name="assertId"/>
+		 <liferay-portlet:param value="<%=assetEntry.getTitle(renderRequest.getLocale()) %>" name="assertTitle"/>
+		 <liferay-portlet:param value="9" name="type"/>
+		 <liferay-portlet:param name="resModuleId" value="<%=String.valueOf(resModuleId) %>"/>
+		 <liferay-portlet:param name="resId" value="<%=String.valueOf(resId) %>"/>
+		 <liferay-portlet:param name="sco" value=" "/>
+		</liferay-portlet:renderURL>
+		
+		<liferay-portlet:renderURL var="selectSCOURL">
+		 <liferay-portlet:param value="/html/scormactivity/admin/selectsco.jsp" name="jspPage"/>
+		 <liferay-portlet:param value="<%=Long.toString(assetEntry.getEntryId()) %>" name="assertId"/>
+		 <liferay-portlet:param value="<%=assetEntry.getTitle(renderRequest.getLocale()) %>" name="assertTitle"/>
+		 <liferay-portlet:param name="resModuleId" value="<%=String.valueOf(resModuleId) %>"/>
+		 <liferay-portlet:param name="resId" value="<%=String.valueOf(resId) %>"/>
+		 <liferay-portlet:param value="9" name="type"/>
+		</liferay-portlet:renderURL>
+		
+		<liferay-ui:search-container-column-text>
+			<liferay-ui:icon image="add" label="false" message="scormactivity.complete" url="<%=selectResourceURL.toString()%>"><a href="<%=selectResourceURL.toString() %>"><liferay-ui:message key="scormactivity.complete" /></a></liferay-ui:icon>
+		</liferay-ui:search-container-column-text>
+		
+		<liferay-ui:search-container-column-text>
+			<liferay-ui:icon image="add" label="specificsco" message="scormactivity.selection" url="<%=selectSCOURL.toString() %>"><a href="<%=selectSCOURL.toString() %>"><liferay-ui:message key="scormactivity.selection" /></a></liferay-ui:icon>
+		</liferay-ui:search-container-column-text>
+		
+		
+	</liferay-ui:search-container-row>
+	<liferay-ui:search-iterator />
 </liferay-ui:search-container>

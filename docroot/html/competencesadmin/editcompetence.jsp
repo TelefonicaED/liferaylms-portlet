@@ -1,3 +1,11 @@
+<%@page import="com.liferay.portal.kernel.repository.model.FileEntry"%>
+<%@page import="com.liferay.portal.kernel.exception.SystemException"%>
+<%@page import="com.liferay.portlet.documentlibrary.NoSuchFolderException"%>
+<%@page import="com.liferay.portal.kernel.exception.PortalException"%>
+<%@page import="com.liferay.portlet.documentlibrary.service.DLAppServiceUtil"%>
+<%@page import="com.liferay.portal.kernel.repository.model.Folder"%>
+<%@page import="java.util.StringTokenizer"%>
+<%@page import="com.liferay.portlet.documentlibrary.model.DLFolderConstants"%>
 <%@page import="com.liferay.portlet.PortletPreferencesFactoryUtil"%>
 <%@page import="javax.portlet.PortletPreferences"%>
 <%@page import="com.liferay.portal.kernel.util.PrefsPropsUtil"%>
@@ -9,10 +17,18 @@
 
 <portlet:actionURL var="savecompetenceURL" name="saveCompetence" />
 <portlet:renderURL var="cancel" />
+<portlet:resourceURL var="resourcePreviewURL" />
+
 <liferay-ui:error key="title-required" message="title-required" />
 <liferay-ui:error key="title-empty" message="title-empty" />
 <liferay-ui:error key="title-repeated" message="title-repeated" />
+
+
+<liferay-ui:header backURL="<%=cancel%>" showBackURL="<%=Boolean.TRUE%>" title="" />
+
 <%
+
+	String portletId = themeDisplay.getPortletDisplay().getId();
 
 	PortletPreferences preferences = null;
 	
@@ -72,6 +88,48 @@ else
 	<aui:model-context  model="<%= Competence.class %>" />
 	<%
 }
+
+	// Recuperar fondos del directorio incluido en el fichero de propiedades
+	String path = PropsUtil.get("com.liferay.lms.diploma.background.path");
+	long repositoryId = DLFolderConstants.getDataRepositoryId(themeDisplay.getScopeGroupId(), DLFolderConstants.DEFAULT_PARENT_FOLDER_ID);
+	List<FileEntry> fileEntryList = new ArrayList<FileEntry>();
+	if (Validator.isNotNull(path) && !path.isEmpty()) {
+		StringTokenizer st = new StringTokenizer(path, "/");
+		Folder folder = null;
+		while (st.hasMoreTokens()) {
+			String folderName = st.nextToken();
+			long parentFolderId = DLFolderConstants.DEFAULT_PARENT_FOLDER_ID;
+			if (Validator.isNotNull(folder)) {
+				parentFolderId = folder.getFolderId();
+			}
+			
+			try {
+				folder = DLAppServiceUtil.getFolder(repositoryId, parentFolderId, folderName);
+			} catch (NoSuchFolderException e) {
+				folder = null;
+			} catch (PortalException e) {
+				folder = null;
+			} catch (SystemException e) {
+				folder = null;
+			}
+		}
+		
+		if (Validator.isNotNull(folder)) {
+			
+			try {
+				fileEntryList = DLAppServiceUtil.getFileEntries(repositoryId, folder.getFolderId());
+				
+// 				for(FileEntry fileEntry : fileEntryList) {
+// 					log.info(fileEntry.getTitle() + " (" + fileEntry.getSize() + ")");
+// 				}
+			} catch (PortalException e) {
+			} catch (SystemException e) {
+			}
+		} else {
+// 			log.error("No se ha encontrado el directorio " + path);
+		}
+	}
+
 %>
 
 <script type="text/javascript">
@@ -110,6 +168,48 @@ else
 				<aui:option value="<%=pagei%>" label="<%=pagei %>" selected="<%= competence==null?false:(pagei.equals(competence.getPage())) %>" ></aui:option>
 			<%} %>
 		</aui:select>
+		<%-- Campo fondo de diploma --%>
+		<aui:select name="diplomaBackground" label="competence.diplomaBackground">
+			<aui:option label="" value="" />
+			<c:forEach items="<%=fileEntryList%>" var="fondo" >
+				<aui:option label="${fondo.title}" value="${fondo.fileEntryId}" selected="${fondo.fileEntryId == competence.diplomaBackground}" data-uuid="${fondo.uuid}" data-groupId="${fondo.groupId}" />
+			</c:forEach>
+		</aui:select>
+		
+		<br/>
+		
+		<a id='<portlet:namespace/>diplomaBackgroundLink' href="" target="_BLANK" title="view-image" ><liferay-ui:message key="view"/></a>
+		
+		<aui:script>
+			AUI().use('aui-base',function(A) {
+			
+				function showImage() {
+			
+					var diplomaBackgroundValue = A.one('#<portlet:namespace/>diplomaBackground').val();
+					var diplomaBackgroundLink = A.one('#<portlet:namespace/>diplomaBackgroundLink');
+					if (diplomaBackgroundValue != "" && diplomaBackgroundValue != "0") {
+						var uuid = A.one('#<portlet:namespace/>diplomaBackground :checked').attr('data-uuid');
+						var groupId = A.one('#<portlet:namespace/>diplomaBackground :checked').attr('data-groupId');
+						
+						var imageurl = '/c/document_library/get_file?uuid=' + uuid + '&groupId=' + groupId;
+						diplomaBackgroundLink.attr('href', imageurl);
+						
+						diplomaBackgroundLink.show();
+					} else {
+						diplomaBackgroundLink.hide();
+					}
+					
+				}
+			
+				A.one('#<portlet:namespace/>diplomaBackground').on('change', function() {
+					showImage();
+				});
+				
+				showImage();
+			
+			});
+		</aui:script>
+		
 		<aui:field-wrapper label="competence.diplomaTemplate">
 				<liferay-ui:input-editor name="template" width="100%" initMethod="initEditorTemplate" />
 				<aui:input name="/>template" type="hidden" />
@@ -120,6 +220,37 @@ else
 		<div>
 			<liferay-ui:message key="competence.helpcertificate" />
 		</div>
+		
+		<aui:button-row>
+			<a id='<portlet:namespace/>viewPreviewLink' href="" target="_blank" ><liferay-ui:message key="preview"/></a>
+
+			<aui:script use="aui-base,liferay-util-window,liferay-portlet-url,aui-io-request">
+			
+			A.one('#<portlet:namespace/>viewPreviewLink').on('click', function() {
+			
+				var title = '';
+				if (A.one('input#<portlet:namespace/>title_<%=themeDisplay.getLanguageId()%>') != null) {
+					title = A.one('input#<portlet:namespace/>title_<%=themeDisplay.getLanguageId()%>').val();
+				}
+				var page = A.one('select#<portlet:namespace/>page').val();
+				var template = window.<portlet:namespace/>template.getHTML();
+				var background = A.one('#<portlet:namespace/>diplomaBackground').val();
+							
+				var resourceURL = Liferay.PortletURL.createResourceURL();
+				resourceURL.setPortletId('<%=portletId%>');
+				resourceURL.setParameter('title', title);
+				resourceURL.setParameter('page', page);
+				resourceURL.setParameter('template', template);
+				resourceURL.setParameter('background', background);
+				
+				var viewPreviewLink = A.one('a#<portlet:namespace/>viewPreviewLink');
+				viewPreviewLink.attr('href', resourceURL.toString());
+				
+			});
+			
+			</aui:script>
+		</aui:button-row>
+		
 	</div>
 		<liferay-ui:panel-container>
 		<liferay-ui:panel title="categorization" extended="false">

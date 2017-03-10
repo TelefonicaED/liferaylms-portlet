@@ -568,35 +568,19 @@ if(!p2pActList.isEmpty()){
 								</div>
 							</c:if>
 							
+							<div class="correctAnswer"><%=descriptionFile  %></div>
+							
 							<% 
 
-								JSONArray jArray = null;								
-								try{
-									 jArray = JSONFactoryUtil.createJSONArray(descriptionFile);
-								}catch(Exception e){
-									
-								}
-							
-								if(jArray==null||jArray.length()<=0){
-									%><%=descriptionFile %><%
-								}else{
-									for(int i=0;i<numQuestion;i++){ 
-										String des = LearningActivityLocalServiceUtil.getExtraContentValue(actId, "text"+i);
-										JSONObject jobject = jArray.getJSONObject(i);
-										if(jobject==null){
-											break;
-										}
-										
-										String text = jobject.getString("text"+i);
-
-										if(text==null){
-											break;
-										}
-										
+							for(int i=0;i<numQuestion;i++){ 
+								String des = LearningActivityLocalServiceUtil.getExtraContentValue(actId, "text"+i);
+								
+								if(des != null && des.length() > 0){
+								
 										%>
 									
 									<div class="description">
-										<div class="correctQuestion"><%=des.replaceAll(StringPool.DOUBLE_QUOTE, StringPool.BLANK)+StringPool.COLON%></div><div class="correctAnswer"><%= text %></div>
+										<div class="correctQuestion"><%=des.replaceAll(StringPool.DOUBLE_QUOTE, StringPool.BLANK)+StringPool.COLON%></div>
 									</div>
 		
 									<aui:field-wrapper label='p2ptask-correction' name='<%="description_"+cont+"_"+i%>'>
@@ -612,8 +596,9 @@ if(!p2pActList.isEmpty()){
 									<aui:input name='<%="description_"+cont+StringPool.UNDERLINE+i+"i" %>' type="hidden"/>
 
 								<% } 	
+							}
 									
-								}%>
+								%>
 							
 							
 								
@@ -696,19 +681,9 @@ if(!p2pActList.isEmpty()){
 					<div class="collapsable2" style="display:none;">
 
 						<div class="description">
-							<%
-								JSONArray jArray = null;
 							
-								try{
-									 jArray = JSONFactoryUtil.createJSONArray(descriptionFile);
-								}catch(Exception e){
-									
-								}
+							<%=descriptionFile %>
 							
-								if(jArray==null||jArray.length()<=0){
-									%><%=descriptionFile %><%
-								}
-							%>
 						</div>
 
 						<c:if test="<%=myP2PActivity.getFileEntryId() != 0 %>">
@@ -719,30 +694,25 @@ if(!p2pActList.isEmpty()){
 						</c:if>
 						<div class="degradade">
 							<div class="subtitle"><liferay-ui:message key="p2ptask-your-valoration" /> :</div>
+
 							<div class="container-textarea">
 								<label for="<portlet:namespace/>readonlydesc" />
+								
 								<%
 										JSONArray jArrayDes = null;
-										jArray = null;
 										try{
 											jArrayDes = JSONFactoryUtil.createJSONArray(description);
 										}catch(Exception e){}
 										
-										try{
-											jArray = JSONFactoryUtil.createJSONArray(myP2PActivity.getDescription());
-										}catch(Exception e){}
 									
-										if(jArray!=null&&jArray.length()>0){
+										if(jArrayDes!=null&&jArrayDes.length()>0){
 											%><div class="p2pResponse"><ul><%
-											for(int i=0;i<jArray.length();i++){
-												JSONObject jsonObject = null;
+											for(int i=0;i<jArrayDes.length();i++){
 												JSONObject jsonObjectDes = null;
 												try{
-												jsonObject = jArray.getJSONObject(i);
 												jsonObjectDes = jArrayDes.getJSONObject(i);
 												}catch(Exception e){}
 
-												String answer = jsonObject.getString("text"+i);
 												String valoration = null;
 												if(jsonObjectDes!=null)
 													valoration = jsonObjectDes.getString("text"+i);
@@ -754,7 +724,6 @@ if(!p2pActList.isEmpty()){
 															if(value!=null&&!value.equals(StringPool.BLANK)){
 														%>
 															<div class="p2pQuestion"><%=value %></div>
-															<div class="p2pAnswer"><%=answer!=null?answer:StringPool.BLANK %></div>
 															<div class="p2pCorrect"><%=valoration!=null?valoration:StringPool.BLANK %></div>
 														<%
 															}

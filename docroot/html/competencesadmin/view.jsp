@@ -23,6 +23,9 @@
 <portlet:renderURL var="editcompimageURL">
 <portlet:param name="jspPage" value="/html/competencesadmin/editimage.jsp"></portlet:param>
 </portlet:renderURL>
+<portlet:renderURL var="editbackgroundURL">
+<portlet:param name="jspPage" value="/html/competencesadmin/editbackground.jsp"></portlet:param>
+</portlet:renderURL>
 <portlet:renderURL var="editpageURL">
 <portlet:param name="jspPage" value="/html/competencesadmin/editpage.jsp"></portlet:param>
 </portlet:renderURL>
@@ -39,6 +42,9 @@
 		<liferay-ui:icon image="edit" label="<%= true %>"
 		message="edit-image"
 		url='<%= editcompimageURL %>' />
+		<liferay-ui:icon image="edit" label="<%= true %>"
+		message="competence.edit-background"
+		url='<%= editbackgroundURL %>' />
 		<liferay-ui:icon image="edit" label="<%= true %>"
 		message="configure-pages"
 		url='<%= editpageURL %>' />

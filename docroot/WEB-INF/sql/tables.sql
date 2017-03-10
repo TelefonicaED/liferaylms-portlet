@@ -50,7 +50,8 @@ create table Lms_Competence (
 	description STRING null,
 	page VARCHAR(75) null,
 	generateCertificate BOOLEAN,
-	diplomaTemplate STRING null
+	diplomaTemplate STRING null,
+	diplomaBackground LONG
 );
 
 create table Lms_Course (

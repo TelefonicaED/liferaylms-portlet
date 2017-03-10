@@ -79,6 +79,7 @@
 			<basic name="page" />
 			<basic name="generateCertificate" />
 			<basic name="diplomaTemplate" />
+			<basic name="diplomaBackground" />
 			<transient name="descriptionCurrentLanguageId" />
 			<transient name="descriptionMap" />
 			<transient name="diplomaTemplateCurrentLanguageId" />

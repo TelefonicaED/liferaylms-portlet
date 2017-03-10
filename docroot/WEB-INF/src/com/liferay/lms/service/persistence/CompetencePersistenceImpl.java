@@ -500,6 +500,7 @@ public class CompetencePersistenceImpl extends BasePersistenceImpl<Competence>
 		competenceImpl.setPage(competence.getPage());
 		competenceImpl.setGenerateCertificate(competence.isGenerateCertificate());
 		competenceImpl.setDiplomaTemplate(competence.getDiplomaTemplate());
+		competenceImpl.setDiplomaBackground(competence.getDiplomaBackground());
 
 		return competenceImpl;
 	}

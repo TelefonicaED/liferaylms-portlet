@@ -24,21 +24,23 @@ import java.util.Locale;
 import javax.servlet.http.HttpServletRequest;
 
 import com.liferay.lms.model.Competence;
-import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.service.base.CompetenceLocalServiceBaseImpl;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
+import com.liferay.portlet.documentlibrary.service.DLAppServiceUtil;
 import com.liferay.util.LmsLocaleUtil;
 
 /**
@@ -226,10 +228,37 @@ public class CompetenceLocalServiceImpl extends CompetenceLocalServiceBaseImpl {
 		}
 	    return imageurl;
 	}
+	public String getBGImageURL(long fileEntryId, long groupId, HttpServletRequest request) {
+
+		String imageurl = request.getScheme()
+			      + "://"
+			      + request.getServerName()
+			      + ":"
+			      + request.getServerPort();
+		String url = StringPool.BLANK;
+		try {
+			FileEntry fileEntry = DLAppServiceUtil.getFileEntry(fileEntryId);
+			if (Validator.isNotNull(fileEntry)) {
+				url = imageurl + "/c/document_library/get_file?uuid=" + fileEntry.getUuid() + "&groupId=" + fileEntry.getGroupId();
+			} else {
+				url = getBGImageURL(groupId, request);
+			}
+		} catch (PortalException e) {
+			url = getBGImageURL(groupId, request);
+		} catch (SystemException e) {
+			url = getBGImageURL(groupId, request);
+		}
+		return url;
+		
+	}
 	
 	public String getBGImageURL(Competence competence,HttpServletRequest request)
 	{
-		return getBGImageURL(competence.getGroupId(), request);
+		if (competence.getDiplomaBackground() > 0) {
+			return getBGImageURL(competence.getDiplomaBackground(), competence.getGroupId(), request);
+		} else {
+			return getBGImageURL(competence.getGroupId(), request);
+		}
 	}
 	
 	public void setBGImage(byte[] data,long groupId, String name) throws IOException

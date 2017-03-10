@@ -44,9 +44,11 @@ import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.xml.Attribute;
 import com.liferay.portal.kernel.xml.Document;
@@ -109,10 +111,11 @@ public class UserCompetencePortlet extends MVCPortlet {
 		List<CompetenceView> competences = new ArrayList<CompetenceView>();
 		for(UserCompetence uc : ucs){
 			try {
+				Course course = CourseLocalServiceUtil.getCourse(uc.getCourseId());
 				Competence competence = CompetenceLocalServiceUtil.getCompetence(uc.getCompetenceId());
-				if(competence!=null){
+				if(competence!=null && course != null){
 					
-					competences.add(new CompetenceView(competence, uc));
+					competences.add(new CompetenceView(course, competence, uc));
 				}
 			} catch (PortalException e) {
 				if(log.isDebugEnabled())e.printStackTrace();
@@ -228,18 +231,25 @@ public class UserCompetencePortlet extends MVCPortlet {
 				if(log.isDebugEnabled())e.printStackTrace();
 			}
 			
-			String cssurl = GetterUtil.get(PropsUtil.get("com.ted.siele.diploma.css"), StringPool.BLANK);
-			String imageurl =CompetenceLocalServiceUtil.getBGImageURL( competence, PortalUtil.getHttpServletRequest(request));
+			String cssurl = GetterUtil.get(PropsUtil.get("com.liferay.lms.diploma.css"), StringPool.BLANK);
+			String imageurl = CompetenceLocalServiceUtil.getBGImageURL( competence, PortalUtil.getHttpServletRequest(request));
 			StringBuffer html = new StringBuffer("<html xmlns=\"http://www.w3.org/1999/xhtml\"><head><style type=\"text/css\">");
 			html.append("@page { size: ");
 			html.append(competence.getPage()); 
-			File file = new File(imageurl.replace("file:", ""));
-			if(file.exists()){
-				html.append(" ; background: url('");
-				html.append(imageurl);
-				html.append("') repeat-y top center}");
-			}else{
-				html.append("}");
+			if (competence.getDiplomaBackground() <= 0) {
+				// No esta en la document library o no tiene asociado fondo
+				File file = new File(imageurl.replace("file:", ""));
+				if(file.exists()){
+					html.append(" ; background: url('");
+					html.append(imageurl);
+					html.append("') repeat-y top center}");
+				}else{
+					html.append("}");
+				}
+			} else {
+				html.append(" ; background: url(");
+				html.append(HtmlUtil.escape(imageurl));
+				html.append(") repeat-y top center}");
 			}
 			if(!StringPool.BLANK.equals(cssurl)){
 				String css = getFileContent(cssurl);
@@ -253,10 +263,12 @@ public class UserCompetencePortlet extends MVCPortlet {
 				
 			if(log.isDebugEnabled())log.debug(html);
 			
-			String listafuentes = GetterUtil.get(PropsUtil.get("com.ted.siele.diploma.fonts"), StringPool.BLANK);
-			String[] fonts = listafuentes.split(",");
-			for (int i = 0; i<fonts.length; i++){
-				renderer.getFontResolver().addFont(getAbsolutePath(fonts[i]),BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
+			String listafuentes = GetterUtil.get(PropsUtil.get("com.liferay.lms.diploma.fonts"), StringPool.BLANK);
+			if (Validator.isNotNull(listafuentes) && !listafuentes.isEmpty()) {
+				String[] fonts = listafuentes.split(",");
+				for (int i = 0; i<fonts.length; i++){
+					renderer.getFontResolver().addFont(getAbsolutePath(fonts[i]),BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
+				}
 			}
 			renderer.setDocumentFromString(html.toString());
 			renderer.layout();
@@ -284,12 +296,13 @@ public class UserCompetencePortlet extends MVCPortlet {
 	public void serveResource(ResourceRequest request, ResourceResponse response) throws PortletException,IOException{
 		
 		Long competenceId = ParamUtil.getLong(request, "competenceId", 0);
+		Long courseId = ParamUtil.getLong(request, "courseId", 0);
 		String uuid=ParamUtil.getString(request, "uuid", "");
 		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(WebKeys.THEME_DISPLAY);
 		UserCompetence userCompetence=null;
 		if("".equals(uuid))
 		{
-			userCompetence= UserCompetenceLocalServiceUtil.findByUserIdCompetenceId(themeDisplay.getUserId(), competenceId);
+			userCompetence= UserCompetenceLocalServiceUtil.findByUserIdCompetenceIdCourseId(themeDisplay.getUserId(), competenceId, courseId);
 		}
 		else
 		{

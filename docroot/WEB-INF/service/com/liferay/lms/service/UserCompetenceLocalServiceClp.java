@@ -117,28 +117,32 @@ public class UserCompetenceLocalServiceClp implements UserCompetenceLocalService
 
 		_methodParameterTypes19 = new String[] { "long", "long" };
 
-		_methodName20 = "findByUuid";
+		_methodName20 = "findByUserIdCompetenceIdCourseId";
 
-		_methodParameterTypes20 = new String[] { "java.lang.String" };
+		_methodParameterTypes20 = new String[] { "long", "long", "long" };
 
-		_methodName21 = "getCertificateURL";
+		_methodName21 = "findByUuid";
 
-		_methodParameterTypes21 = new String[] {
+		_methodParameterTypes21 = new String[] { "java.lang.String" };
+
+		_methodName22 = "getCertificateURL";
+
+		_methodParameterTypes22 = new String[] {
 				"com.liferay.portal.kernel.portlet.LiferayPortletResponse",
 				"java.lang.String"
 			};
 
-		_methodName22 = "findBuUserId";
-
-		_methodParameterTypes22 = new String[] { "long" };
-
 		_methodName23 = "findBuUserId";
 
-		_methodParameterTypes23 = new String[] { "long", "int", "int" };
+		_methodParameterTypes23 = new String[] { "long" };
 
-		_methodName24 = "countByUserId";
+		_methodName24 = "findBuUserId";
 
-		_methodParameterTypes24 = new String[] { "long" };
+		_methodParameterTypes24 = new String[] { "long", "int", "int" };
+
+		_methodName25 = "countByUserId";
+
+		_methodParameterTypes25 = new String[] { "long" };
 	}
 
 	public com.liferay.lms.model.UserCompetence addUserCompetence(
@@ -695,13 +699,37 @@ public class UserCompetenceLocalServiceClp implements UserCompetenceLocalService
 		return (com.liferay.lms.model.UserCompetence)ClpSerializer.translateOutput(returnObj);
 	}
 
-	public com.liferay.lms.model.UserCompetence findByUuid(
-		java.lang.String uuid) {
+	public com.liferay.lms.model.UserCompetence findByUserIdCompetenceIdCourseId(
+		long userId, long competenceId, long courseId) {
 		Object returnObj = null;
 
 		try {
 			returnObj = _invokableLocalService.invokeMethod(_methodName20,
 					_methodParameterTypes20,
+					new Object[] { userId, competenceId, courseId });
+		}
+		catch (Throwable t) {
+			t = ClpSerializer.translateThrowable(t);
+
+			if (t instanceof RuntimeException) {
+				throw (RuntimeException)t;
+			}
+			else {
+				throw new RuntimeException(t.getClass().getName() +
+					" is not a valid exception");
+			}
+		}
+
+		return (com.liferay.lms.model.UserCompetence)ClpSerializer.translateOutput(returnObj);
+	}
+
+	public com.liferay.lms.model.UserCompetence findByUuid(
+		java.lang.String uuid) {
+		Object returnObj = null;
+
+		try {
+			returnObj = _invokableLocalService.invokeMethod(_methodName21,
+					_methodParameterTypes21,
 					new Object[] { ClpSerializer.translateInput(uuid) });
 		}
 		catch (Throwable t) {
@@ -725,8 +753,8 @@ public class UserCompetenceLocalServiceClp implements UserCompetenceLocalService
 		Object returnObj = null;
 
 		try {
-			returnObj = _invokableLocalService.invokeMethod(_methodName21,
-					_methodParameterTypes21,
+			returnObj = _invokableLocalService.invokeMethod(_methodName22,
+					_methodParameterTypes22,
 					new Object[] {
 						ClpSerializer.translateInput(liferayPortletResponse),
 						
@@ -753,8 +781,8 @@ public class UserCompetenceLocalServiceClp implements UserCompetenceLocalService
 		Object returnObj = null;
 
 		try {
-			returnObj = _invokableLocalService.invokeMethod(_methodName22,
-					_methodParameterTypes22, new Object[] { userId });
+			returnObj = _invokableLocalService.invokeMethod(_methodName23,
+					_methodParameterTypes23, new Object[] { userId });
 		}
 		catch (Throwable t) {
 			t = ClpSerializer.translateThrowable(t);
@@ -776,8 +804,8 @@ public class UserCompetenceLocalServiceClp implements UserCompetenceLocalService
 		Object returnObj = null;
 
 		try {
-			returnObj = _invokableLocalService.invokeMethod(_methodName23,
-					_methodParameterTypes23, new Object[] { userId, start, end });
+			returnObj = _invokableLocalService.invokeMethod(_methodName24,
+					_methodParameterTypes24, new Object[] { userId, start, end });
 		}
 		catch (Throwable t) {
 			t = ClpSerializer.translateThrowable(t);
@@ -798,8 +826,8 @@ public class UserCompetenceLocalServiceClp implements UserCompetenceLocalService
 		Object returnObj = null;
 
 		try {
-			returnObj = _invokableLocalService.invokeMethod(_methodName24,
-					_methodParameterTypes24, new Object[] { userId });
+			returnObj = _invokableLocalService.invokeMethod(_methodName25,
+					_methodParameterTypes25, new Object[] { userId });
 		}
 		catch (Throwable t) {
 			t = ClpSerializer.translateThrowable(t);
@@ -865,4 +893,6 @@ public class UserCompetenceLocalServiceClp implements UserCompetenceLocalService
 	private String[] _methodParameterTypes23;
 	private String _methodName24;
 	private String[] _methodParameterTypes24;
+	private String _methodName25;
+	private String[] _methodParameterTypes25;
 }

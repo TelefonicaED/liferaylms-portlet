@@ -20,10 +20,9 @@ import com.liferay.portal.kernel.cache.ThreadLocalCacheManager;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
+import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
@@ -50,7 +49,6 @@ import com.liferay.portlet.asset.model.BaseAssetRenderer;
 
 public abstract class LearningActivityBaseAssetRenderer extends BaseAssetRenderer {
 	
-	private static Log log = LogFactoryUtil.getLog(LearningActivityBaseAssetRenderer.class);
 	public static final String ACTION_VIEW = "ACTION_VIEW";
 	public static final String EDIT_DETAILS = "ACTIVITY_EDIT_DETAILS";
 	public static final String TEMPLATE_JSP = "template_JSP";
@@ -197,6 +195,7 @@ public abstract class LearningActivityBaseAssetRenderer extends BaseAssetRendere
 	public final PortletURL getURLEdit(LiferayPortletRequest liferayPortletRequest,
 			LiferayPortletResponse liferayPortletResponse) throws Exception {
 		PortletURL portletURL = null;
+		
 		if((_editDetails)&&(GetterUtil.getBoolean(liferayPortletRequest.getAttribute(EDIT_DETAILS)))) {
 			portletURL = getURLEditDetails(liferayPortletRequest, liferayPortletResponse);
 			if(Validator.isNotNull(portletURL)) {
@@ -206,7 +205,15 @@ public abstract class LearningActivityBaseAssetRenderer extends BaseAssetRendere
 		}
 		ThemeDisplay themeDisplay = (ThemeDisplay)liferayPortletRequest.getAttribute(
 				WebKeys.THEME_DISPLAY);
-		portletURL = PortletURLFactoryUtil.create(liferayPortletRequest,_portletId,getControlPanelPlid(themeDisplay),PortletRequest.RENDER_PHASE);
+		
+		if(_learningactivity.getModuleId()==0){
+			portletURL= 
+	    			  PortletURLFactoryUtil.create(liferayPortletRequest,"lmsactivitieslist_WAR_liferaylmsportlet",getControlPanelPlid(themeDisplay), PortletRequest.RENDER_PHASE);
+			portletURL.setWindowState(LiferayWindowState.POP_UP);
+		}else{
+			portletURL = PortletURLFactoryUtil.create(liferayPortletRequest,_portletId,getControlPanelPlid(themeDisplay),PortletRequest.RENDER_PHASE);
+		}
+		
 		portletURL.setParameter("editing", StringPool.TRUE);
 		portletURL.setParameter("resId",Long.toString( _learningactivity.getActId()));
 		portletURL.setParameter("resModuleId",Long.toString( _learningactivity.getModuleId())); 

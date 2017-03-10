@@ -509,6 +509,60 @@ public class UserCompetenceUtil {
 	}
 
 	/**
+	* Returns the user competence where userId = &#63; and competenceId = &#63; and courseId = &#63; or throws a {@link com.liferay.lms.NoSuchUserCompetenceException} if it could not be found.
+	*
+	* @param userId the user ID
+	* @param competenceId the competence ID
+	* @param courseId the course ID
+	* @return the matching user competence
+	* @throws com.liferay.lms.NoSuchUserCompetenceException if a matching user competence could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.lms.model.UserCompetence findByUserIdCompetenceIdCourseId(
+		long userId, long competenceId, long courseId)
+		throws com.liferay.lms.NoSuchUserCompetenceException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByUserIdCompetenceIdCourseId(userId, competenceId,
+			courseId);
+	}
+
+	/**
+	* Returns the user competence where userId = &#63; and competenceId = &#63; and courseId = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
+	*
+	* @param userId the user ID
+	* @param competenceId the competence ID
+	* @param courseId the course ID
+	* @return the matching user competence, or <code>null</code> if a matching user competence could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.lms.model.UserCompetence fetchByUserIdCompetenceIdCourseId(
+		long userId, long competenceId, long courseId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .fetchByUserIdCompetenceIdCourseId(userId, competenceId,
+			courseId);
+	}
+
+	/**
+	* Returns the user competence where userId = &#63; and competenceId = &#63; and courseId = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
+	*
+	* @param userId the user ID
+	* @param competenceId the competence ID
+	* @param courseId the course ID
+	* @param retrieveFromCache whether to use the finder cache
+	* @return the matching user competence, or <code>null</code> if a matching user competence could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.lms.model.UserCompetence fetchByUserIdCompetenceIdCourseId(
+		long userId, long competenceId, long courseId, boolean retrieveFromCache)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .fetchByUserIdCompetenceIdCourseId(userId, competenceId,
+			courseId, retrieveFromCache);
+	}
+
+	/**
 	* Returns all the user competences.
 	*
 	* @return the user competences
@@ -595,6 +649,24 @@ public class UserCompetenceUtil {
 	}
 
 	/**
+	* Removes the user competence where userId = &#63; and competenceId = &#63; and courseId = &#63; from the database.
+	*
+	* @param userId the user ID
+	* @param competenceId the competence ID
+	* @param courseId the course ID
+	* @return the user competence that was removed
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.lms.model.UserCompetence removeByUserIdCompetenceIdCourseId(
+		long userId, long competenceId, long courseId)
+		throws com.liferay.lms.NoSuchUserCompetenceException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .removeByUserIdCompetenceIdCourseId(userId, competenceId,
+			courseId);
+	}
+
+	/**
 	* Removes all the user competences from the database.
 	*
 	* @throws SystemException if a system exception occurred
@@ -639,6 +711,23 @@ public class UserCompetenceUtil {
 	public static int countByUserIdCompetenceId(long userId, long competenceId)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getPersistence().countByUserIdCompetenceId(userId, competenceId);
+	}
+
+	/**
+	* Returns the number of user competences where userId = &#63; and competenceId = &#63; and courseId = &#63;.
+	*
+	* @param userId the user ID
+	* @param competenceId the competence ID
+	* @param courseId the course ID
+	* @return the number of matching user competences
+	* @throws SystemException if a system exception occurred
+	*/
+	public static int countByUserIdCompetenceIdCourseId(long userId,
+		long competenceId, long courseId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .countByUserIdCompetenceIdCourseId(userId, competenceId,
+			courseId);
 	}
 
 	/**

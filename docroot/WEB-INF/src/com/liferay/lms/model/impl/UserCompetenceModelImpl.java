@@ -86,8 +86,9 @@ public class UserCompetenceModelImpl extends BaseModelImpl<UserCompetence>
 				"value.object.column.bitmask.enabled.com.liferay.lms.model.UserCompetence"),
 			true);
 	public static long COMPETENCEID_COLUMN_BITMASK = 1L;
-	public static long USERID_COLUMN_BITMASK = 2L;
-	public static long UUID_COLUMN_BITMASK = 4L;
+	public static long COURSEID_COLUMN_BITMASK = 2L;
+	public static long USERID_COLUMN_BITMASK = 4L;
+	public static long UUID_COLUMN_BITMASK = 8L;
 
 	/**
 	 * Converts the soap model instance into a normal model instance.
@@ -305,7 +306,19 @@ public class UserCompetenceModelImpl extends BaseModelImpl<UserCompetence>
 	}
 
 	public void setCourseId(long courseId) {
+		_columnBitmask |= COURSEID_COLUMN_BITMASK;
+
+		if (!_setOriginalCourseId) {
+			_setOriginalCourseId = true;
+
+			_originalCourseId = _courseId;
+		}
+
 		_courseId = courseId;
+	}
+
+	public long getOriginalCourseId() {
+		return _originalCourseId;
 	}
 
 	public long getColumnBitmask() {
@@ -409,6 +422,10 @@ public class UserCompetenceModelImpl extends BaseModelImpl<UserCompetence>
 		userCompetenceModelImpl._originalCompetenceId = userCompetenceModelImpl._competenceId;
 
 		userCompetenceModelImpl._setOriginalCompetenceId = false;
+
+		userCompetenceModelImpl._originalCourseId = userCompetenceModelImpl._courseId;
+
+		userCompetenceModelImpl._setOriginalCourseId = false;
 
 		userCompetenceModelImpl._columnBitmask = 0;
 	}
@@ -519,6 +536,8 @@ public class UserCompetenceModelImpl extends BaseModelImpl<UserCompetence>
 	private boolean _setOriginalCompetenceId;
 	private Date _compDate;
 	private long _courseId;
+	private long _originalCourseId;
+	private boolean _setOriginalCourseId;
 	private long _columnBitmask;
 	private UserCompetence _escapedModelProxy;
 }

@@ -85,9 +85,10 @@ public class CompetenceModelImpl extends BaseModelImpl<Competence>
 			{ "description", Types.VARCHAR },
 			{ "page", Types.VARCHAR },
 			{ "generateCertificate", Types.BOOLEAN },
-			{ "diplomaTemplate", Types.VARCHAR }
+			{ "diplomaTemplate", Types.VARCHAR },
+			{ "diplomaBackground", Types.BIGINT }
 		};
-	public static final String TABLE_SQL_CREATE = "create table Lms_Competence (uuid_ VARCHAR(75) null,competenceId LONG not null primary key,companyId LONG,groupId LONG,userId LONG,status INTEGER,statusByUserId LONG,statusByUserName VARCHAR(75) null,statusDate DATE null,title STRING null,description STRING null,page VARCHAR(75) null,generateCertificate BOOLEAN,diplomaTemplate STRING null)";
+	public static final String TABLE_SQL_CREATE = "create table Lms_Competence (uuid_ VARCHAR(75) null,competenceId LONG not null primary key,companyId LONG,groupId LONG,userId LONG,status INTEGER,statusByUserId LONG,statusByUserName VARCHAR(75) null,statusDate DATE null,title STRING null,description STRING null,page VARCHAR(75) null,generateCertificate BOOLEAN,diplomaTemplate STRING null,diplomaBackground LONG)";
 	public static final String TABLE_SQL_DROP = "drop table Lms_Competence";
 	public static final String DATA_SOURCE = "liferayDataSource";
 	public static final String SESSION_FACTORY = "liferaySessionFactory";
@@ -132,6 +133,7 @@ public class CompetenceModelImpl extends BaseModelImpl<Competence>
 		model.setPage(soapModel.getPage());
 		model.setGenerateCertificate(soapModel.getGenerateCertificate());
 		model.setDiplomaTemplate(soapModel.getDiplomaTemplate());
+		model.setDiplomaBackground(soapModel.getDiplomaBackground());
 
 		return model;
 	}
@@ -204,6 +206,7 @@ public class CompetenceModelImpl extends BaseModelImpl<Competence>
 		attributes.put("page", getPage());
 		attributes.put("generateCertificate", getGenerateCertificate());
 		attributes.put("diplomaTemplate", getDiplomaTemplate());
+		attributes.put("diplomaBackground", getDiplomaBackground());
 
 		return attributes;
 	}
@@ -293,6 +296,12 @@ public class CompetenceModelImpl extends BaseModelImpl<Competence>
 
 		if (diplomaTemplate != null) {
 			setDiplomaTemplate(diplomaTemplate);
+		}
+
+		Long diplomaBackground = (Long)attributes.get("diplomaBackground");
+
+		if (diplomaBackground != null) {
+			setDiplomaBackground(diplomaBackground);
 		}
 	}
 
@@ -725,6 +734,14 @@ public class CompetenceModelImpl extends BaseModelImpl<Competence>
 		}
 	}
 
+	public long getDiplomaBackground() {
+		return _diplomaBackground;
+	}
+
+	public void setDiplomaBackground(long diplomaBackground) {
+		_diplomaBackground = diplomaBackground;
+	}
+
 	/**
 	 * @deprecated {@link #isApproved}
 	 */
@@ -862,6 +879,7 @@ public class CompetenceModelImpl extends BaseModelImpl<Competence>
 		competenceImpl.setPage(getPage());
 		competenceImpl.setGenerateCertificate(getGenerateCertificate());
 		competenceImpl.setDiplomaTemplate(getDiplomaTemplate());
+		competenceImpl.setDiplomaBackground(getDiplomaBackground());
 
 		competenceImpl.resetOriginalValues();
 
@@ -1004,12 +1022,14 @@ public class CompetenceModelImpl extends BaseModelImpl<Competence>
 			competenceCacheModel.diplomaTemplate = null;
 		}
 
+		competenceCacheModel.diplomaBackground = getDiplomaBackground();
+
 		return competenceCacheModel;
 	}
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(29);
+		StringBundler sb = new StringBundler(31);
 
 		sb.append("{uuid=");
 		sb.append(getUuid());
@@ -1039,13 +1059,15 @@ public class CompetenceModelImpl extends BaseModelImpl<Competence>
 		sb.append(getGenerateCertificate());
 		sb.append(", diplomaTemplate=");
 		sb.append(getDiplomaTemplate());
+		sb.append(", diplomaBackground=");
+		sb.append(getDiplomaBackground());
 		sb.append("}");
 
 		return sb.toString();
 	}
 
 	public String toXmlString() {
-		StringBundler sb = new StringBundler(46);
+		StringBundler sb = new StringBundler(49);
 
 		sb.append("<model><model-name>");
 		sb.append("com.liferay.lms.model.Competence");
@@ -1107,6 +1129,10 @@ public class CompetenceModelImpl extends BaseModelImpl<Competence>
 			"<column><column-name>diplomaTemplate</column-name><column-value><![CDATA[");
 		sb.append(getDiplomaTemplate());
 		sb.append("]]></column-value></column>");
+		sb.append(
+			"<column><column-name>diplomaBackground</column-name><column-value><![CDATA[");
+		sb.append(getDiplomaBackground());
+		sb.append("]]></column-value></column>");
 
 		sb.append("</model>");
 
@@ -1141,6 +1167,7 @@ public class CompetenceModelImpl extends BaseModelImpl<Competence>
 	private boolean _generateCertificate;
 	private String _diplomaTemplate;
 	private String _diplomaTemplateCurrentLanguageId;
+	private long _diplomaBackground;
 	private long _columnBitmask;
 	private Competence _escapedModelProxy;
 }

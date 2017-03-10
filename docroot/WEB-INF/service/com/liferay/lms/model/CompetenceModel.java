@@ -560,6 +560,20 @@ public interface CompetenceModel extends BaseModel<Competence>, WorkflowedModel 
 		Locale defaultLocale);
 
 	/**
+	 * Returns the diploma background of this competence.
+	 *
+	 * @return the diploma background of this competence
+	 */
+	public long getDiplomaBackground();
+
+	/**
+	 * Sets the diploma background of this competence.
+	 *
+	 * @param diplomaBackground the diploma background of this competence
+	 */
+	public void setDiplomaBackground(long diplomaBackground);
+
+	/**
 	 * @deprecated Renamed to {@link #isApproved()}
 	 */
 	public boolean getApproved();

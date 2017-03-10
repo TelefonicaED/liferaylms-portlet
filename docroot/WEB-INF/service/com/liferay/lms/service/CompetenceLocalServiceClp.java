@@ -150,23 +150,29 @@ public class CompetenceLocalServiceClp implements CompetenceLocalService {
 		_methodName25 = "getBGImageURL";
 
 		_methodParameterTypes25 = new String[] {
+				"long", "long", "javax.servlet.http.HttpServletRequest"
+			};
+
+		_methodName26 = "getBGImageURL";
+
+		_methodParameterTypes26 = new String[] {
 				"com.liferay.lms.model.Competence",
 				"javax.servlet.http.HttpServletRequest"
 			};
 
-		_methodName26 = "setBGImage";
+		_methodName27 = "setBGImage";
 
-		_methodParameterTypes26 = new String[] {
+		_methodParameterTypes27 = new String[] {
 				"byte[][]", "long", "java.lang.String"
 			};
 
-		_methodName27 = "countAll";
+		_methodName28 = "countAll";
 
-		_methodParameterTypes27 = new String[] {  };
+		_methodParameterTypes28 = new String[] {  };
 
-		_methodName28 = "findByCompanyId";
+		_methodName29 = "findByCompanyId";
 
-		_methodParameterTypes28 = new String[] { "long" };
+		_methodParameterTypes29 = new String[] { "long" };
 	}
 
 	public com.liferay.lms.model.Competence addCompetence(
@@ -913,14 +919,44 @@ public class CompetenceLocalServiceClp implements CompetenceLocalService {
 		return (java.lang.String)ClpSerializer.translateOutput(returnObj);
 	}
 
-	public java.lang.String getBGImageURL(
-		com.liferay.lms.model.Competence competence,
+	public java.lang.String getBGImageURL(long fileEntryId, long groupId,
 		javax.servlet.http.HttpServletRequest request) {
 		Object returnObj = null;
 
 		try {
 			returnObj = _invokableLocalService.invokeMethod(_methodName25,
 					_methodParameterTypes25,
+					new Object[] {
+						fileEntryId,
+						
+					groupId,
+						
+					ClpSerializer.translateInput(request)
+					});
+		}
+		catch (Throwable t) {
+			t = ClpSerializer.translateThrowable(t);
+
+			if (t instanceof RuntimeException) {
+				throw (RuntimeException)t;
+			}
+			else {
+				throw new RuntimeException(t.getClass().getName() +
+					" is not a valid exception");
+			}
+		}
+
+		return (java.lang.String)ClpSerializer.translateOutput(returnObj);
+	}
+
+	public java.lang.String getBGImageURL(
+		com.liferay.lms.model.Competence competence,
+		javax.servlet.http.HttpServletRequest request) {
+		Object returnObj = null;
+
+		try {
+			returnObj = _invokableLocalService.invokeMethod(_methodName26,
+					_methodParameterTypes26,
 					new Object[] {
 						ClpSerializer.translateInput(competence),
 						
@@ -945,8 +981,8 @@ public class CompetenceLocalServiceClp implements CompetenceLocalService {
 	public void setBGImage(byte[] data, long groupId, java.lang.String name)
 		throws java.io.IOException {
 		try {
-			_invokableLocalService.invokeMethod(_methodName26,
-				_methodParameterTypes26,
+			_invokableLocalService.invokeMethod(_methodName27,
+				_methodParameterTypes27,
 				new Object[] {
 					ClpSerializer.translateInput(data),
 					
@@ -977,8 +1013,8 @@ public class CompetenceLocalServiceClp implements CompetenceLocalService {
 		Object returnObj = null;
 
 		try {
-			returnObj = _invokableLocalService.invokeMethod(_methodName27,
-					_methodParameterTypes27, new Object[] {  });
+			returnObj = _invokableLocalService.invokeMethod(_methodName28,
+					_methodParameterTypes28, new Object[] {  });
 		}
 		catch (Throwable t) {
 			t = ClpSerializer.translateThrowable(t);
@@ -1004,8 +1040,8 @@ public class CompetenceLocalServiceClp implements CompetenceLocalService {
 		Object returnObj = null;
 
 		try {
-			returnObj = _invokableLocalService.invokeMethod(_methodName28,
-					_methodParameterTypes28, new Object[] { companyId });
+			returnObj = _invokableLocalService.invokeMethod(_methodName29,
+					_methodParameterTypes29, new Object[] { companyId });
 		}
 		catch (Throwable t) {
 			t = ClpSerializer.translateThrowable(t);
@@ -1083,4 +1119,6 @@ public class CompetenceLocalServiceClp implements CompetenceLocalService {
 	private String[] _methodParameterTypes27;
 	private String _methodName28;
 	private String[] _methodParameterTypes28;
+	private String _methodName29;
+	private String[] _methodParameterTypes29;
 }

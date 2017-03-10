@@ -2084,6 +2084,10 @@
 			<name>view-template</name>
 			<value>/html/usercompetence/view.jsp</value>
 		</init-param>
+		<init-param>
+			<name>config-template</name>
+			<value>/html/usercompetence/config/config.jsp</value>
+		</init-param>
 		<expiration-cache>0</expiration-cache>
 		<supports>
 			<mime-type>text/html</mime-type>

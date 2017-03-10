@@ -50,6 +50,15 @@ public class UserCompetenceLocalServiceImpl	extends UserCompetenceLocalServiceBa
 			return null;
 		}
 	}
+	
+	public UserCompetence findByUserIdCompetenceIdCourseId(long userId,long competenceId, long courseId){
+		try {
+			return userCompetencePersistence.fetchByUserIdCompetenceIdCourseId(userId, competenceId, courseId);
+		}  catch (SystemException e) {
+			return null;
+		}
+	}
+	
 	public UserCompetence findByUuid(String uuid) 
 	{
 		try {

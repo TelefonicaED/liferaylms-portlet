@@ -45,6 +45,7 @@ public class CompetenceSoap implements Serializable {
 		soapModel.setPage(model.getPage());
 		soapModel.setGenerateCertificate(model.getGenerateCertificate());
 		soapModel.setDiplomaTemplate(model.getDiplomaTemplate());
+		soapModel.setDiplomaBackground(model.getDiplomaBackground());
 
 		return soapModel;
 	}
@@ -213,6 +214,14 @@ public class CompetenceSoap implements Serializable {
 		_diplomaTemplate = diplomaTemplate;
 	}
 
+	public long getDiplomaBackground() {
+		return _diplomaBackground;
+	}
+
+	public void setDiplomaBackground(long diplomaBackground) {
+		_diplomaBackground = diplomaBackground;
+	}
+
 	private String _uuid;
 	private long _competenceId;
 	private long _companyId;
@@ -227,4 +236,5 @@ public class CompetenceSoap implements Serializable {
 	private String _page;
 	private boolean _generateCertificate;
 	private String _diplomaTemplate;
+	private long _diplomaBackground;
 }

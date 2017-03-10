@@ -160,24 +160,8 @@
 			( 
 				c.groupId = ? OR ? = 0 
 			)
-			AND
-			(
-				((? = '') AND (? = -1) )
-				OR 
-				(? = true AND  
-						(? = '' OR IF (ExtractValue(c.title, '//Title[@language-id=\"[$LANGUAGE$]\"]' )='', ExtractValue(c.title, '//root[@default-locale]//Title'), ExtractValue(c.title, '//Title[@language-id=\"[$LANGUAGE$]\"]' )) LIKE ? OR
-						 IF (ExtractValue(c.description, '//Description[@language-id=\"[$LANGUAGE$]\"]' )='', ExtractValue(c.description, '//root[@default-locale]//Description' ), ExtractValue(c.description, '//Description[@language-id=\"[$LANGUAGE$]\"]' )) LIKE ?) AND 
-						(? = -1 OR ? = c.closed) 
-						[$WHEREANDASSETCATEGORY$]
-						[$WHEREANDASSETTAG$]
-				) 
-				OR 
-				(? = false AND 
-					(IF (ExtractValue(c.title, '//Title[@language-id=\"[$LANGUAGE$]\"]' )='', ExtractValue(c.title,  '//root[@default-locale]//Title' ), ExtractValue(c.title, '//Title[@language-id=\"[$LANGUAGE$]\"]' )) LIKE ? OR 
-					IF (ExtractValue(c.description, '//Description[@language-id=\"[$LANGUAGE$]\"]' )='', ExtractValue(c.description, '//root[@default-locale]//Description' ), ExtractValue(c.description, '//Description[@language-id=\"[$LANGUAGE$]\"]' )) LIKE ? 
-					OR ? = c.closed [$WHEREORASSETCATEGORY$] [$WHEREORASSETTAG$]) 
-				) 
-			) 
+			[$WHERETITLEDESCRIPTIONCATEGORIESTAGSAND$]
+			[$WHERETITLEDESCRIPTIONCATEGORIESTAGSOR$]
 			[$WHERERESOURCEPERMISSION$] 
 			ORDER BY IF (ExtractValue(c.title, '//Title[@language-id=\"[$LANGUAGE$]\"]' )='', ExtractValue(c.title,  '//root[@default-locale]//Title' ), ExtractValue(c.title, '//Title[@language-id=\"[$LANGUAGE$]\"]' ))
 			LIMIT [$START$], [$END$]
@@ -204,23 +188,8 @@
 			( 
 				c.groupId = ? OR ? = 0 
 			)
-			AND
-			(
-				((? = '') AND (? = -1) )
-				OR 
-				(? = true AND  
-						(? = '' OR IF (ExtractValue(c.title, '//Title[@language-id=\"[$LANGUAGE$]\"]' )='', ExtractValue(c.title, '//root[@default-locale]//Title'), ExtractValue(c.title, '//Title[@language-id=\"[$LANGUAGE$]\"]' )) LIKE ? OR
-						 IF (ExtractValue(c.description, '//Description[@language-id=\"[$LANGUAGE$]\"]' )='', ExtractValue(c.description, '//root[@default-locale]//Description' ), ExtractValue(c.description, '//Description[@language-id=\"[$LANGUAGE$]\"]' )) LIKE ?) AND 
-						(? = -1 OR ? = c.closed) 
-						[$WHEREANDASSETCATEGORY$]
-						[$WHEREANDASSETTAG$]
-				) 
-				OR 
-				(? = false AND 
-					(IF (ExtractValue(c.title, '//Title[@language-id=\"[$LANGUAGE$]\"]' )='', ExtractValue(c.title, '//root[@default-locale]//Title'), ExtractValue(c.title, '//Title[@language-id=\"[$LANGUAGE$]\"]' )) LIKE ? OR 
-					IF (ExtractValue(c.description, '//Description[@language-id=\"[$LANGUAGE$]\"]' )='', ExtractValue(c.description, '//root[@default-locale]//Description' ), ExtractValue(c.description, '//Description[@language-id=\"[$LANGUAGE$]\"]' )) LIKE ? OR ? = c.closed [$WHEREORASSETCATEGORY$] [$WHEREORASSETTAG$]) 
-				) 
-			) 
+			[$WHERETITLEDESCRIPTIONCATEGORIESTAGSAND$]
+			[$WHERETITLEDESCRIPTIONCATEGORIESTAGSOR$]
 			[$WHERERESOURCEPERMISSION$]
 		]]>
 	</sql>
@@ -287,6 +256,10 @@
 					ON ug2.groupId = g.classPK 
 						AND g.classNameId = [$CLASSNAMEIDGROUP$] 
 						AND ug2.userId = [$USERID$]
+			LEFT JOIN 
+				usergrouprole ugrC 
+					ON ugrC.groupId = c.groupCreatedId 
+						AND ugrC.userId = [$USERID$] AND ugrC.roleId IN ([$ROLEEDITOR$],[$ROLETEACHER$])
 		]]>
 	</sql>
 	<sql id="com.liferay.lms.service.persistence.CourseFinder.joinC_ByResourcePermissionView">
@@ -338,7 +311,7 @@
 		<![CDATA[
 			AND 
 			( 
-				ur.userId IS NOT NULL OR ug.userId IS NOT NULL OR uug.userGroupId IS NOT NULL OR uo.userId IS NOT NULL OR ug2.userId IS NOT NULL
+				ur.userId IS NOT NULL OR ug.userId IS NOT NULL OR uug.userGroupId IS NOT NULL OR uo.userId IS NOT NULL OR ug2.userId IS NOT NULL OR ugrC.userId IS NOT NULL
 			)
 		]]>
 	</sql>
@@ -348,6 +321,28 @@
 			( 
 				ur.userId IS NOT NULL OR ug.userId IS NOT NULL OR uug.userGroupId IS NOT NULL OR uo.userId IS NOT NULL OR ug2.userId IS NOT NULL OR (rp.roleId = [$ROLEMEMBER$] AND ugroup.userId IS NOT NULL) OR rp.roleId = [$ROLEGUEST$]
 			)
+		]]>
+	</sql>
+	<sql id="com.liferay.lms.service.persistence.CourseFinder.whereC_BytTitleDescriptionCategoriesTagsAND">
+		<![CDATA[
+			AND
+			(
+				('[$FREETEXT$]' = '' OR IF (ExtractValue(c.title, '//Title[@language-id=\"[$LANGUAGE$]\"]' )='', ExtractValue(c.title, '//root[@default-locale]//Title'), ExtractValue(c.title, '//Title[@language-id=\"[$LANGUAGE$]\"]' )) LIKE '[$FREETEXT$]' OR
+				IF (ExtractValue(c.description, '//Description[@language-id=\"[$LANGUAGE$]\"]' )='', ExtractValue(c.description, '//root[@default-locale]//Description' ), ExtractValue(c.description, '//Description[@language-id=\"[$LANGUAGE$]\"]' )) LIKE '[$FREETEXT$]') AND 
+				([$STATUS$] = -1 OR [$STATUS$] = c.closed) 
+				[$WHEREANDASSETCATEGORY$]
+				[$WHEREANDASSETTAG$]
+			) 
+		]]>
+	</sql>
+	<sql id="com.liferay.lms.service.persistence.CourseFinder.whereC_BytTitleDescriptionCategoriesTagsOR">
+		<![CDATA[
+			AND
+			(
+				(IF (ExtractValue(c.title, '//Title[@language-id=\"[$LANGUAGE$]\"]' )='', ExtractValue(c.title,  '//root[@default-locale]//Title' ), ExtractValue(c.title, '//Title[@language-id=\"[$LANGUAGE$]\"]' )) LIKE '[$FREETEXT$]' OR 
+				IF (ExtractValue(c.description, '//Description[@language-id=\"[$LANGUAGE$]\"]' )='', ExtractValue(c.description, '//root[@default-locale]//Description' ), ExtractValue(c.description, '//Description[@language-id=\"[$LANGUAGE$]\"]' )) LIKE '[$FREETEXT$]' 
+				OR [$STATUS$] = c.closed [$WHEREORASSETCATEGORY$] [$WHEREORASSETTAG$])  
+			) 
 		]]>
 	</sql>
 	<sql id="com.liferay.lms.service.persistence.CourseFinder.whereC_ByAndAssetCategory">
