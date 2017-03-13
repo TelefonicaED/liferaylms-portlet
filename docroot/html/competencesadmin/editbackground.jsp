@@ -40,9 +40,10 @@
 						folder = DLAppServiceUtil.addFolder(repositoryId, parentFolderId, folderName, StringPool.BLANK, serviceContext);
 						
 						if (Validator.isNotNull(folder)) {
-							String [] actionIds = { ActionKeys.VIEW };
-							ResourcePermissionLocalServiceUtil.setResourcePermissions(companyId, DLFolderConstants.getClassName(), ResourceConstants.SCOPE_INDIVIDUAL, String.valueOf(folder.getFolderId()), siteMemberRole.getRoleId(), actionIds);
-							ResourcePermissionLocalServiceUtil.setResourcePermissions(companyId, DLFolderConstants.getClassName(), ResourceConstants.SCOPE_INDIVIDUAL, String.valueOf(folder.getFolderId()), guestRole.getRoleId(), actionIds);
+							String [] siteMemberActionIds = { ActionKeys.VIEW, ActionKeys.ADD_DOCUMENT };
+							String [] guestActionIds = { ActionKeys.VIEW };
+							ResourcePermissionLocalServiceUtil.setResourcePermissions(companyId, DLFolderConstants.getClassName(), ResourceConstants.SCOPE_INDIVIDUAL, String.valueOf(folder.getFolderId()), siteMemberRole.getRoleId(), siteMemberActionIds);
+							ResourcePermissionLocalServiceUtil.setResourcePermissions(companyId, DLFolderConstants.getClassName(), ResourceConstants.SCOPE_INDIVIDUAL, String.valueOf(folder.getFolderId()), guestRole.getRoleId(), guestActionIds);
 						}
 					} catch (Exception e1) {
 						
@@ -92,15 +93,17 @@
 	<liferay-ui:search-container-results total="<%=fondosTotal%>" results="<%=fileEntryList%>" />
 	<liferay-ui:search-container-row modelVar="fileEntry" className="com.liferay.portal.kernel.repository.model.FileEntry" rowIdProperty="fileEntryId" keyProperty="fileEntryId" >
 	
+		<c:set var="imageURL" value="/c/document_library/get_file?uuid=${fileEntry.uuid}&groupId=${fileEntry.groupId}"/>
 		<liferay-ui:search-container-column-text name="" align="center" >
-			<c:set var="imageURL" value="/c/document_library/get_file?uuid=${fileEntry.uuid}&groupId=${fileEntry.groupId}"/>
 			<a href="${imageURL}" title="${fileEntry.title}" target="_BLANK" >
 				<img src="${imageURL}" alt="${fileEntry.title}" style="max-height: 50px;" />
 			</a>
 		</liferay-ui:search-container-column-text>
 		
 		<liferay-ui:search-container-column-text name="title">
-			${fileEntry.title}
+			<a href="${imageURL}" title="${fileEntry.title}" target="_BLANK" >
+				${fileEntry.title}
+			</a>
 		</liferay-ui:search-container-column-text>
 		
 		<liferay-ui:search-container-column-text>

@@ -244,8 +244,10 @@ public class CompetenceLocalServiceImpl extends CompetenceLocalServiceBaseImpl {
 				url = getBGImageURL(groupId, request);
 			}
 		} catch (PortalException e) {
+			log.error("Se ha producido un error al obtener el fileEntryId=" + fileEntryId, e);
 			url = getBGImageURL(groupId, request);
 		} catch (SystemException e) {
+			log.error("Se ha producido un error al obtener el fileEntryId=" + fileEntryId, e);
 			url = getBGImageURL(groupId, request);
 		}
 		return url;

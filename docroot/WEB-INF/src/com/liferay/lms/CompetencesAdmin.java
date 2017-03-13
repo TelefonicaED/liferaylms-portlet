@@ -74,6 +74,7 @@ import com.liferay.portal.util.PortalUtil;
 import com.liferay.portlet.PortletPreferencesFactoryUtil;
 import com.liferay.portlet.documentlibrary.DuplicateFileException;
 import com.liferay.portlet.documentlibrary.model.DLFileEntry;
+import com.liferay.portlet.documentlibrary.model.DLFileEntryConstants;
 import com.liferay.portlet.documentlibrary.model.DLFolder;
 import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
 import com.liferay.portlet.documentlibrary.service.DLAppServiceUtil;
@@ -345,10 +346,10 @@ public class CompetencesAdmin extends MVCPortlet{
 
 						String [] actionIds = { ActionKeys.VIEW };
 						if (Validator.isNotNull(siteMemberRole)) {
-							ResourcePermissionLocalServiceUtil.setResourcePermissions(companyId, DLFolder.class.getName(), ResourceConstants.SCOPE_INDIVIDUAL, String.valueOf(folderId), siteMemberRole.getRoleId(), actionIds);
+							ResourcePermissionLocalServiceUtil.setResourcePermissions(companyId, DLFileEntryConstants.getClassName(), ResourceConstants.SCOPE_INDIVIDUAL, String.valueOf(fileEntry.getFileEntryId()), siteMemberRole.getRoleId(), actionIds);
 						}
 						if (Validator.isNotNull(guestRole)) {
-							ResourcePermissionLocalServiceUtil.setResourcePermissions(companyId, DLFolder.class.getName(), ResourceConstants.SCOPE_INDIVIDUAL, String.valueOf(folderId), guestRole.getRoleId(), actionIds);
+							ResourcePermissionLocalServiceUtil.setResourcePermissions(companyId, DLFileEntryConstants.getClassName(), ResourceConstants.SCOPE_INDIVIDUAL, String.valueOf(fileEntry.getFileEntryId()), guestRole.getRoleId(), actionIds);
 						}
 						
 						if (Validator.isNotNull(fileEntry)) {
