@@ -100,21 +100,21 @@ public class TestAnswerLocalServiceClpInvoker {
 				"com.liferay.lms.model.TestAnswer", "boolean"
 			};
 
-		_methodName160 = "getBeanIdentifier";
+		_methodName164 = "getBeanIdentifier";
 
-		_methodParameterTypes160 = new String[] {  };
+		_methodParameterTypes164 = new String[] {  };
 
-		_methodName161 = "setBeanIdentifier";
+		_methodName165 = "setBeanIdentifier";
 
-		_methodParameterTypes161 = new String[] { "java.lang.String" };
+		_methodParameterTypes165 = new String[] { "java.lang.String" };
 
-		_methodName166 = "getTestAnswersByQuestionId";
+		_methodName170 = "getTestAnswersByQuestionId";
 
-		_methodParameterTypes166 = new String[] { "long" };
+		_methodParameterTypes170 = new String[] { "long" };
 
-		_methodName167 = "addTestAnswer";
+		_methodName171 = "addTestAnswer";
 
-		_methodParameterTypes167 = new String[] {
+		_methodParameterTypes171 = new String[] {
 				"long", "java.lang.String", "java.lang.String",
 				"java.lang.String", "boolean"
 			};
@@ -209,23 +209,23 @@ public class TestAnswerLocalServiceClpInvoker {
 				((Boolean)arguments[1]).booleanValue());
 		}
 
-		if (_methodName160.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes160, parameterTypes)) {
+		if (_methodName164.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes164, parameterTypes)) {
 			return TestAnswerLocalServiceUtil.getBeanIdentifier();
 		}
 
-		if (_methodName161.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes161, parameterTypes)) {
+		if (_methodName165.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes165, parameterTypes)) {
 			TestAnswerLocalServiceUtil.setBeanIdentifier((java.lang.String)arguments[0]);
 		}
 
-		if (_methodName166.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes166, parameterTypes)) {
+		if (_methodName170.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes170, parameterTypes)) {
 			return TestAnswerLocalServiceUtil.getTestAnswersByQuestionId(((Long)arguments[0]).longValue());
 		}
 
-		if (_methodName167.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes167, parameterTypes)) {
+		if (_methodName171.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes171, parameterTypes)) {
 			return TestAnswerLocalServiceUtil.addTestAnswer(((Long)arguments[0]).longValue(),
 				(java.lang.String)arguments[1], (java.lang.String)arguments[2],
 				(java.lang.String)arguments[3],
@@ -267,12 +267,12 @@ public class TestAnswerLocalServiceClpInvoker {
 	private String[] _methodParameterTypes14;
 	private String _methodName15;
 	private String[] _methodParameterTypes15;
-	private String _methodName160;
-	private String[] _methodParameterTypes160;
-	private String _methodName161;
-	private String[] _methodParameterTypes161;
-	private String _methodName166;
-	private String[] _methodParameterTypes166;
-	private String _methodName167;
-	private String[] _methodParameterTypes167;
+	private String _methodName164;
+	private String[] _methodParameterTypes164;
+	private String _methodName165;
+	private String[] _methodParameterTypes165;
+	private String _methodName170;
+	private String[] _methodParameterTypes170;
+	private String _methodName171;
+	private String[] _methodParameterTypes171;
 }

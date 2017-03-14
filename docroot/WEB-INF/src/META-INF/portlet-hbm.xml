@@ -23,6 +23,7 @@
 	<import class="com.liferay.lms.model.SurveyResult" />
 	<import class="com.liferay.lms.model.TestAnswer" />
 	<import class="com.liferay.lms.model.TestQuestion" />
+	<import class="com.liferay.lms.model.UserCertificateDownload" />
 	<import class="com.liferay.lms.model.UserCompetence" />
 	<class name="com.liferay.lms.model.impl.ActivityTriesDeletedImpl" table="Lms_ActivityTriesDeleted">
 		<cache usage="read-write" />
@@ -345,6 +346,14 @@
 		<property name="weight" type="com.liferay.portal.dao.orm.hibernate.LongType" />
 		<property name="penalize" type="com.liferay.portal.dao.orm.hibernate.BooleanType" />
 		<property name="extracontent" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+	</class>
+	<class name="com.liferay.lms.model.impl.UserCertificateDownloadImpl" table="Lms_UserCertificateDownload">
+		<cache usage="read-write" />
+		<composite-id name="primaryKey" class="com.liferay.lms.service.persistence.UserCertificateDownloadPK">
+			<key-property name="userId" type="com.liferay.portal.dao.orm.hibernate.LongType" />
+			<key-property name="courseId" type="com.liferay.portal.dao.orm.hibernate.LongType" />
+		</composite-id>
+		<property name="downloadDate" type="org.hibernate.type.TimestampType" />
 	</class>
 	<class name="com.liferay.lms.model.impl.UserCompetenceImpl" table="Lms_UserCompetence">
 		<cache usage="read-write" />

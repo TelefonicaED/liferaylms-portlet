@@ -293,6 +293,13 @@ create table Lms_TestQuestion (
 	extracontent TEXT null
 );
 
+create table Lms_UserCertificateDownload (
+	userId LONG not null,
+	courseId LONG not null,
+	downloadDate DATE null,
+	primary key (userId, courseId)
+);
+
 create table Lms_UserCompetence (
 	uuid_ VARCHAR(75) null,
 	usercompId LONG not null primary key,

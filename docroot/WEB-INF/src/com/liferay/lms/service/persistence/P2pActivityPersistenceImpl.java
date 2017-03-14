@@ -2670,6 +2670,8 @@ public class P2pActivityPersistenceImpl extends BasePersistenceImpl<P2pActivity>
 	protected TestAnswerPersistence testAnswerPersistence;
 	@BeanReference(type = TestQuestionPersistence.class)
 	protected TestQuestionPersistence testQuestionPersistence;
+	@BeanReference(type = UserCertificateDownloadPersistence.class)
+	protected UserCertificateDownloadPersistence userCertificateDownloadPersistence;
 	@BeanReference(type = UserCompetencePersistence.class)
 	protected UserCompetencePersistence userCompetencePersistence;
 	@BeanReference(type = ResourcePersistence.class)

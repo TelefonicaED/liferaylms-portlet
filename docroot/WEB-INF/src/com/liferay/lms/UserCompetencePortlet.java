@@ -39,6 +39,7 @@ import com.liferay.lms.service.CourseResultLocalServiceUtil;
 import com.liferay.lms.service.LmsPrefsLocalServiceUtil;
 import com.liferay.lms.service.ModuleLocalServiceUtil;
 import com.liferay.lms.service.ModuleResultLocalServiceUtil;
+import com.liferay.lms.service.UserCertificateDownloadLocalServiceUtil;
 import com.liferay.lms.service.UserCompetenceLocalServiceUtil;
 import com.liferay.lms.views.CompetenceView;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -315,6 +316,12 @@ public class UserCompetencePortlet extends MVCPortlet {
 			renderer.layout(); 
 			
 			renderer.finishPDF();
+			
+			// Si se ha descargado el diploma => Se deja traza de la descarga 
+			// (Solo tiene en cuenta la primera vez que lo descarga)
+			if (themeDisplay.getUser().getUserId() == themeDisplay.getRealUserId()) {
+				UserCertificateDownloadLocalServiceUtil.addUserCertificateDownload(themeDisplay.getUser().getUserId(), course.getCourseId());
+			}
 			
 		}else{
 			if(log.isDebugEnabled())log.debug("Nodata!");

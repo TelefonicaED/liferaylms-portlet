@@ -123,6 +123,8 @@ create index IX_43412151 on Lms_TestAnswer (uuid_);
 create index IX_8D95C0F2 on Lms_TestQuestion (actId);
 create index IX_CDBACDE9 on Lms_TestQuestion (uuid_);
 
+create index IX_40D5BB91 on Lms_UserCertificateDownload (userId, courseId);
+
 create index IX_EB2113C1 on Lms_UserCompetence (userId);
 create index IX_B2E889B9 on Lms_UserCompetence (userId, competenceId);
 create unique index IX_253E9283 on Lms_UserCompetence (userId, competenceId, courseId);

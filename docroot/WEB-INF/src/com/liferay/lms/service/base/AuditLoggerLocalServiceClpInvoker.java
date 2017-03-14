@@ -23,24 +23,24 @@ import java.util.Arrays;
  */
 public class AuditLoggerLocalServiceClpInvoker {
 	public AuditLoggerLocalServiceClpInvoker() {
-		_methodName144 = "getBeanIdentifier";
+		_methodName148 = "getBeanIdentifier";
 
-		_methodParameterTypes144 = new String[] {  };
+		_methodParameterTypes148 = new String[] {  };
 
-		_methodName145 = "setBeanIdentifier";
+		_methodName149 = "setBeanIdentifier";
 
-		_methodParameterTypes145 = new String[] { "java.lang.String" };
+		_methodParameterTypes149 = new String[] { "java.lang.String" };
 
-		_methodName148 = "audit";
+		_methodName152 = "audit";
 
-		_methodParameterTypes148 = new String[] {
+		_methodParameterTypes152 = new String[] {
 				"long", "long", "java.lang.String", "long", "long",
 				"java.lang.String", "java.lang.String"
 			};
 
-		_methodName149 = "audit";
+		_methodName153 = "audit";
 
-		_methodParameterTypes149 = new String[] {
+		_methodParameterTypes153 = new String[] {
 				"long", "long", "java.lang.String", "long", "long", "long",
 				"java.lang.String", "java.lang.String"
 			};
@@ -48,18 +48,18 @@ public class AuditLoggerLocalServiceClpInvoker {
 
 	public Object invokeMethod(String name, String[] parameterTypes,
 		Object[] arguments) throws Throwable {
-		if (_methodName144.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes144, parameterTypes)) {
+		if (_methodName148.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes148, parameterTypes)) {
 			return AuditLoggerLocalServiceUtil.getBeanIdentifier();
 		}
 
-		if (_methodName145.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes145, parameterTypes)) {
+		if (_methodName149.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes149, parameterTypes)) {
 			AuditLoggerLocalServiceUtil.setBeanIdentifier((java.lang.String)arguments[0]);
 		}
 
-		if (_methodName148.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes148, parameterTypes)) {
+		if (_methodName152.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes152, parameterTypes)) {
 			AuditLoggerLocalServiceUtil.audit(((Long)arguments[0]).longValue(),
 				((Long)arguments[1]).longValue(),
 				(java.lang.String)arguments[2],
@@ -68,8 +68,8 @@ public class AuditLoggerLocalServiceClpInvoker {
 				(java.lang.String)arguments[5], (java.lang.String)arguments[6]);
 		}
 
-		if (_methodName149.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes149, parameterTypes)) {
+		if (_methodName153.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes153, parameterTypes)) {
 			AuditLoggerLocalServiceUtil.audit(((Long)arguments[0]).longValue(),
 				((Long)arguments[1]).longValue(),
 				(java.lang.String)arguments[2],
@@ -82,12 +82,12 @@ public class AuditLoggerLocalServiceClpInvoker {
 		throw new UnsupportedOperationException();
 	}
 
-	private String _methodName144;
-	private String[] _methodParameterTypes144;
-	private String _methodName145;
-	private String[] _methodParameterTypes145;
 	private String _methodName148;
 	private String[] _methodParameterTypes148;
 	private String _methodName149;
 	private String[] _methodParameterTypes149;
+	private String _methodName152;
+	private String[] _methodParameterTypes152;
+	private String _methodName153;
+	private String[] _methodParameterTypes153;
 }

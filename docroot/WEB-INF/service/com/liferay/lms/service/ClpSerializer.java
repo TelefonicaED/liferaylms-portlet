@@ -34,6 +34,7 @@ import com.liferay.lms.model.ScheduleClp;
 import com.liferay.lms.model.SurveyResultClp;
 import com.liferay.lms.model.TestAnswerClp;
 import com.liferay.lms.model.TestQuestionClp;
+import com.liferay.lms.model.UserCertificateDownloadClp;
 import com.liferay.lms.model.UserCompetenceClp;
 
 import com.liferay.portal.kernel.exception.PortalException;
@@ -200,6 +201,10 @@ public class ClpSerializer {
 
 		if (oldModelClassName.equals(TestQuestionClp.class.getName())) {
 			return translateInputTestQuestion(oldModel);
+		}
+
+		if (oldModelClassName.equals(UserCertificateDownloadClp.class.getName())) {
+			return translateInputUserCertificateDownload(oldModel);
 		}
 
 		if (oldModelClassName.equals(UserCompetenceClp.class.getName())) {
@@ -425,6 +430,17 @@ public class ClpSerializer {
 		return newModel;
 	}
 
+	public static Object translateInputUserCertificateDownload(
+		BaseModel<?> oldModel) {
+		UserCertificateDownloadClp oldClpModel = (UserCertificateDownloadClp)oldModel;
+
+		BaseModel<?> newModel = oldClpModel.getUserCertificateDownloadRemoteModel();
+
+		newModel.setModelAttributes(oldClpModel.getModelAttributes());
+
+		return newModel;
+	}
+
 	public static Object translateInputUserCompetence(BaseModel<?> oldModel) {
 		UserCompetenceClp oldClpModel = (UserCompetenceClp)oldModel;
 
@@ -546,6 +562,11 @@ public class ClpSerializer {
 		if (oldModelClassName.equals(
 					"com.liferay.lms.model.impl.TestQuestionImpl")) {
 			return translateOutputTestQuestion(oldModel);
+		}
+
+		if (oldModelClassName.equals(
+					"com.liferay.lms.model.impl.UserCertificateDownloadImpl")) {
+			return translateOutputUserCertificateDownload(oldModel);
 		}
 
 		if (oldModelClassName.equals(
@@ -719,6 +740,11 @@ public class ClpSerializer {
 
 		if (className.equals("com.liferay.lms.NoSuchTestQuestionException")) {
 			return new com.liferay.lms.NoSuchTestQuestionException();
+		}
+
+		if (className.equals(
+					"com.liferay.lms.NoSuchUserCertificateDownloadException")) {
+			return new com.liferay.lms.NoSuchUserCertificateDownloadException();
 		}
 
 		if (className.equals("com.liferay.lms.NoSuchUserCompetenceException")) {
@@ -928,6 +954,17 @@ public class ClpSerializer {
 		newModel.setModelAttributes(oldModel.getModelAttributes());
 
 		newModel.setTestQuestionRemoteModel(oldModel);
+
+		return newModel;
+	}
+
+	public static Object translateOutputUserCertificateDownload(
+		BaseModel<?> oldModel) {
+		UserCertificateDownloadClp newModel = new UserCertificateDownloadClp();
+
+		newModel.setModelAttributes(oldModel.getModelAttributes());
+
+		newModel.setUserCertificateDownloadRemoteModel(oldModel);
 
 		return newModel;
 	}
