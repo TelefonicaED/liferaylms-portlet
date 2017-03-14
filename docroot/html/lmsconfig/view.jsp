@@ -191,9 +191,6 @@ for(CalificationType calificationType :calificationTypeRegistry.getCalificationT
 
 <aui:field-wrapper>
 	<aui:button type="submit" value="save" />
-	<button name="check" value="check" onclick="javascrip:checkGroups();" type="button">
-		<liferay-ui:message key="checkGroups" />
-	</button>
 </aui:field-wrapper>
 
 </aui:form>
@@ -201,8 +198,6 @@ for(CalificationType calificationType :calificationTypeRegistry.getCalificationT
 }
 %>
 
-<liferay-portlet:actionURL name="checkgroups" var="checkgroupsURL">
-</liferay-portlet:actionURL>
 
 <script type="text/javascript">
 	AUI().ready(
@@ -214,12 +209,5 @@ for(CalificationType calificationType :calificationTypeRegistry.getCalificationT
 	            }
 	        );
 	    }
-	);
-
-	var checkUrl="${checkgroupsURL}";
-	function checkGroups(){
-		if(confirm(Liferay.Language.get("change-groups-are-your-sure"))){
-			window.location.href=checkUrl;
-		}
-	}
+	);	
 </script>
