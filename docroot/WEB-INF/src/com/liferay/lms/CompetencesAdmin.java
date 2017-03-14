@@ -78,6 +78,8 @@ import com.liferay.portlet.documentlibrary.model.DLFileEntryConstants;
 import com.liferay.portlet.documentlibrary.model.DLFolder;
 import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
 import com.liferay.portlet.documentlibrary.service.DLAppServiceUtil;
+import com.liferay.portlet.expando.model.ExpandoColumn;
+import com.liferay.portlet.expando.service.ExpandoColumnLocalServiceUtil;
 import com.liferay.util.VelocityUtil;
 import com.liferay.util.bridges.mvc.MVCPortlet;
 import com.lowagie.text.DocumentException;
@@ -497,6 +499,12 @@ public class CompetencesAdmin extends MVCPortlet{
 		}
 		modulesNames.append("</ul>");
 		variables.put("modulesNames", modulesNames);
+		
+		// Sustitucion de campos expando de Course
+		List<ExpandoColumn> courseExpandoColumnList = ExpandoColumnLocalServiceUtil.getDefaultTableColumns(themeDisplay.getCompanyId(), Course.class.getName());
+		for (ExpandoColumn courseExpandoColumn : courseExpandoColumnList) {
+			variables.put(courseExpandoColumn.getName(), "[" + courseExpandoColumn.getDisplayName(themeDisplay.getLocale()) + "]");
+		}
 			
 		String templateStr = StringPool.BLANK;
 			

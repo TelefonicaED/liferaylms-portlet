@@ -1,3 +1,7 @@
+<%@page import="com.liferay.portlet.expando.model.ExpandoColumnConstants"%>
+<%@page import="com.liferay.portlet.expando.service.ExpandoColumnLocalServiceUtil"%>
+<%@page import="com.liferay.portlet.expando.model.ExpandoColumn"%>
+<%@page import="com.liferay.lms.model.Course"%>
 <%@page import="com.liferay.portal.kernel.repository.model.FileEntry"%>
 <%@page import="com.liferay.portal.kernel.exception.SystemException"%>
 <%@page import="com.liferay.portlet.documentlibrary.NoSuchFolderException"%>
@@ -129,6 +133,13 @@ else
 // 			log.error("No se ha encontrado el directorio " + path);
 		}
 	}
+	
+	// Se obtienen los campos personalizados asociados a Curso
+	List<ExpandoColumn> courseExpandoColumnList = new ArrayList<ExpandoColumn>();
+	try {
+		courseExpandoColumnList = ExpandoColumnLocalServiceUtil.getDefaultTableColumns(themeDisplay.getCompanyId(), Course.class.getName());
+	} catch (SystemException e) {
+	}
 
 %>
 
@@ -219,6 +230,20 @@ else
 		</aui:field-wrapper>
 		<div>
 			<liferay-ui:message key="competence.helpcertificate" />
+			<%-- Campos personalizados asociados al Curso --%>
+			<c:set var="propertyHidden" value="<%=ExpandoColumnConstants.PROPERTY_HIDDEN%>" />
+			<c:forEach items="<%=courseExpandoColumnList%>" var="courseExpandoColumn" >
+				<c:choose>
+					<c:when test="${courseExpandoColumn.getTypeSettingsProperties().get(propertyHidden) != null}">
+						<c:if test='${"1".compareTo(courseExpandoColumn.getTypeSettingsProperties().get(propertyHidden)) != 0}'>
+							<strong>&#36;${courseExpandoColumn.name}</strong>&nbsp;&#58;&nbsp;${courseExpandoColumn.getDisplayName(locale)}<br/>
+						</c:if>
+					</c:when>
+					<c:otherwise>
+						<strong>&#36;${courseExpandoColumn.name}</strong>&nbsp;&#58;&nbsp;${courseExpandoColumn.getDisplayName(locale)}<br/>
+					</c:otherwise>
+				</c:choose>
+			</c:forEach>
 		</div>
 		
 		<aui:button-row>

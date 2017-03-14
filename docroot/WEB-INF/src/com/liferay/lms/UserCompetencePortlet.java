@@ -6,9 +6,11 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -60,6 +62,9 @@ import com.liferay.portal.service.UserGroupRoleLocalServiceUtil;
 import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
+import com.liferay.portlet.expando.model.ExpandoColumn;
+import com.liferay.portlet.expando.model.ExpandoColumnConstants;
+import com.liferay.portlet.expando.service.ExpandoColumnLocalServiceUtil;
 import com.liferay.util.VelocityUtil;
 import com.liferay.util.bridges.mvc.MVCPortlet;
 import com.lowagie.text.DocumentException;
@@ -222,6 +227,35 @@ public class UserCompetencePortlet extends MVCPortlet {
 			variables.put("modulesNames", modulesNames);
 			variables.put("teachers", teachers);
 			variables.put("teachersNames", teachersNames);
+			
+			// Sustitucion de campos expando de Course
+			List<ExpandoColumn> courseExpandoColumnList = ExpandoColumnLocalServiceUtil.getDefaultTableColumns(themeDisplay.getCompanyId(), Course.class.getName());
+			for (ExpandoColumn courseExpandoColumn : courseExpandoColumnList) {
+				Serializable courseExpandoValue = course.getExpandoBridge().getAttribute(courseExpandoColumn.getName());
+				if (Validator.isNotNull(courseExpandoValue)){ 
+					if (courseExpandoColumn.getType() == ExpandoColumnConstants.BOOLEAN) {
+						variables.put(courseExpandoColumn.getName(), String.valueOf((Boolean) courseExpandoValue));
+					} else if (courseExpandoColumn.getType() == ExpandoColumnConstants.DATE) {
+						variables.put(courseExpandoColumn.getName(), dateFormatDate.format((Date) courseExpandoValue));
+					} else if (courseExpandoColumn.getType() == ExpandoColumnConstants.DOUBLE) {
+						variables.put(courseExpandoColumn.getName(), String.valueOf((Double) courseExpandoValue));
+					} else if (courseExpandoColumn.getType() == ExpandoColumnConstants.FLOAT) {
+						variables.put(courseExpandoColumn.getName(), String.valueOf((Float) courseExpandoValue));
+					} else if (courseExpandoColumn.getType() == ExpandoColumnConstants.INTEGER) {
+						variables.put(courseExpandoColumn.getName(), String.valueOf((Integer) courseExpandoValue));
+					} else if (courseExpandoColumn.getType() == ExpandoColumnConstants.SHORT) {
+						variables.put(courseExpandoColumn.getName(), String.valueOf((Short) courseExpandoValue));
+					} else if (courseExpandoColumn.getType() == ExpandoColumnConstants.LONG) {
+						variables.put(courseExpandoColumn.getName(), String.valueOf((Long) courseExpandoValue));
+					} else if (courseExpandoColumn.getType() == ExpandoColumnConstants.NUMBER) {
+						variables.put(courseExpandoColumn.getName(), String.valueOf((Number) courseExpandoValue));
+					} else if (courseExpandoColumn.getType() == ExpandoColumnConstants.STRING) {
+						variables.put(courseExpandoColumn.getName(), (String) courseExpandoValue);
+					} else {
+						variables.put(courseExpandoColumn.getName(), courseExpandoValue);
+					}
+				}
+			}
 			
 			String template = StringPool.BLANK;
 			
