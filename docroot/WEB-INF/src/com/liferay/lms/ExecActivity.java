@@ -991,7 +991,7 @@ public class ExecActivity extends MVCPortlet{
 					learningActivityTry =  LearningActivityTryLocalServiceUtil.createLearningActivityTry(actId,serviceContext);
 				}
 				learningActivityTry.setEndDate(new Date());
-				learningActivityTry.setResult(ct.toBase100(result));
+				learningActivityTry.setResult(ct.toBase100(course.getGroupCreatedId(),result));
 				learningActivityTry.setComments(comments);
 				updateLearningActivityTryAndResult(learningActivityTry);
 				

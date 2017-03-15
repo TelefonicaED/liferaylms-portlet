@@ -4,11 +4,15 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
 
+import javax.portlet.PortletResponse;
+
+import com.liferay.lms.model.Course;
 import com.liferay.lms.model.CourseResult;
 import com.liferay.lms.model.LearningActivityResult;
 import com.liferay.lms.model.ModuleResult;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.upload.UploadRequest;
 
 public class CeroToTenCalificationType extends BaseCalificationType{
 
@@ -69,7 +73,7 @@ public class CeroToTenCalificationType extends BaseCalificationType{
 	}
 
 	@Override
-	public String translate(Locale locale, long companyId, double result) {
+	public String translate(Locale locale, long groupId, double result) {
 		return translate(locale, result);
 	}
 
@@ -79,13 +83,26 @@ public class CeroToTenCalificationType extends BaseCalificationType{
 	}
 
 	@Override
-	public long getMinValue() {
+	public long getMinValue(long groupId) {
 		return 0;
 	}
 
 	@Override
-	public long getMaxValue() {
+	public long getMaxValue(long groupId) {
 		return 10;
+	}
+
+	@Override
+	public String getExpecificContentPage() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String setExtraContent(UploadRequest uploadRequest,
+			PortletResponse portletResponse, Course course) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 }
