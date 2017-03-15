@@ -164,7 +164,7 @@ public class OnlineActivity extends MVCPortlet {
 			ct = new CalificationTypeRegistry().getCalificationType(course.getCalificationType());			
 			result= Double.valueOf(ParamUtil.getString(request,"result").replace(",", "."));
 			log.debug("result: "+result);
-			if(result<ct.getMinValue() || result>ct.getMaxValue()){
+			if(result<ct.getMinValue(course.getGroupCreatedId()) || result>ct.getMaxValue(course.getGroupCreatedId())){
 				correct=false;
 				log.error("Result fuera de rango");
 				SessionErrors.add(request, "result-bad-format");
@@ -183,7 +183,7 @@ public class OnlineActivity extends MVCPortlet {
 			try {
 				LearningActivityTry  learningActivityTry =  LearningActivityTryLocalServiceUtil.getLastLearningActivityTryByActivityAndUser(actId, studentId);
 				learningActivityTry.setEndDate(new Date());
-				learningActivityTry.setResult(ct.toBase100(result));
+				learningActivityTry.setResult(ct.toBase100(themeDisplay.getScopeGroupId(),result));
 				learningActivityTry.setComments(comments);
 				updateLearningActivityTryAndResult(learningActivityTry);
 				

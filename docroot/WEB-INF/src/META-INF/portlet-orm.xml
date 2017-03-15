@@ -514,6 +514,20 @@
 			<transient name="primaryKeyObj" />
 		</attributes>
 	</mapped-superclass>
+	<mapped-superclass class="com.liferay.lms.model.impl.UserCertificateDownloadModelImpl">
+		<id-class class="com.liferay.lms.service.persistence.UserCertificateDownloadPK" />
+		<attributes>
+			<id name="userId" />
+			<id name="courseId" />
+			<basic name="downloadDate">
+				<temporal>TIMESTAMP</temporal>
+			</basic>
+			<transient name="modelAttributes" />
+			<transient name="primaryKey" />
+			<transient name="primaryKeyObj" />
+			<transient name="userUuid" />
+		</attributes>
+	</mapped-superclass>
 	<mapped-superclass class="com.liferay.lms.model.impl.UserCompetenceModelImpl">
 		<attributes>
 			<id name="usercompId" />
@@ -610,6 +624,10 @@
 	</entity>
 	<entity class="com.liferay.lms.model.impl.TestQuestionImpl" name="TestQuestion">
 		<table name="Lms_TestQuestion" />
+		<attributes />
+	</entity>
+	<entity class="com.liferay.lms.model.impl.UserCertificateDownloadImpl" name="UserCertificateDownload">
+		<table name="Lms_UserCertificateDownload" />
 		<attributes />
 	</entity>
 	<entity class="com.liferay.lms.model.impl.UserCompetenceImpl" name="UserCompetence">

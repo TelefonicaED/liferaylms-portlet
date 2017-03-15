@@ -34,7 +34,7 @@ LearningActivityResult result = LearningActivityResultLocalServiceUtil.getByActI
 
 CalificationType ct = new CalificationTypeRegistry().getCalificationType(CourseLocalServiceUtil.getCourseByGroupCreatedId(themeDisplay.getScopeGroupId()).getCalificationType());
 
-String resultHelpMessage=LanguageUtil.format(pageContext, "evaluationtaskactivity.grades.resultMessage", new Object[]{ct.translate(themeDisplay.getLocale(), themeDisplay.getCompanyId(), result.getResult())+ct.getSuffix()});
+String resultHelpMessage=LanguageUtil.format(pageContext, "evaluationtaskactivity.grades.resultMessage", new Object[]{ct.translate(themeDisplay.getLocale(), themeDisplay.getScopeGroupId(), result.getResult())+ct.getSuffix(themeDisplay.getScopeGroupId())});
 String gradeFilter = ParamUtil.getString(renderRequest, "gradeFilter");
 String criteria = ParamUtil.getString(renderRequest, "criteria");
 %>
@@ -48,12 +48,12 @@ String criteria = ParamUtil.getString(renderRequest, "criteria");
 	<aui:fieldset>
 		<h1><%=UserLocalServiceUtil.getUser(userId).getFullName() %></h1>
 		<aui:input type="hidden" name="studentId" value='<%=userId %>' />
-	    <aui:input type="text" name="result" size="3" helpMessage="<%=resultHelpMessage %>" label="evaluationtaskactivity.grades" value='<%=ct.translate(themeDisplay.getLocale(), themeDisplay.getCompanyId(),result.getResult()) %>'>
+	    <aui:input type="text" name="result" size="3" helpMessage="<%=resultHelpMessage %>" label="evaluationtaskactivity.grades" value='<%=ct.translate(themeDisplay.getLocale(), themeDisplay.getScopeGroupId(),result.getResult()) %>'>
 	    	<aui:validator name="number"></aui:validator>
-	    	<aui:validator  name="custom"  errorMessage="<%=LanguageUtil.format(themeDisplay.getLocale(), \"result.must-be-between\", new Object[]{ct.getMinValue(),ct.getMaxValue()})%>"  >
+	    	<aui:validator  name="custom"  errorMessage="<%=LanguageUtil.format(themeDisplay.getLocale(), \"result.must-be-between\", new Object[]{ct.getMinValue(themeDisplay.getScopeGroupId()),ct.getMaxValue(themeDisplay.getScopeGroupId())})%>"  >
 				function (val, fieldNode, ruleValue) {
 					var result = false;
-					if (val >= <%=ct.getMinValue() %> && val <= <%= ct.getMaxValue() %>) {
+					if (val >= <%=ct.getMinValue(themeDisplay.getScopeGroupId()) %> && val <= <%= ct.getMaxValue(themeDisplay.getScopeGroupId()) %>) {
 						result = true;
 					}
 					return result;					
@@ -61,7 +61,7 @@ String criteria = ParamUtil.getString(renderRequest, "criteria");
 			</aui:validator>
 	    </aui:input>
 
-	    <liferay-ui:message key="evaluationtaskactivity.result.percent"  arguments="<%=new Object[]{ct.translate(themeDisplay.getLocale(), themeDisplay.getCompanyId(),learningActivity.getPasspuntuation())} %>" />
+	    <liferay-ui:message key="evaluationtaskactivity.result.percent"  arguments="<%=new Object[]{ct.translate(themeDisplay.getLocale(), themeDisplay.getScopeGroupId(),learningActivity.getPasspuntuation())} %>" />
 
 		<aui:input type="textarea"  helpMessage="<%=LanguageUtil.get(pageContext, \"evaluationtaskactivity.grades.commentsMessage\")%>"  maxLength="350" cols="70"  rows="3" name="comments" label="evaluationtaskactivity.comments" value='<%=(result.getComments()!=null)?result.getComments():"" %>'>
 			<aui:validator name="range">[0, 350]</aui:validator>

@@ -2,10 +2,14 @@ package com.liferay.lms.learningactivity.calificationtype;
 
 import java.util.Locale;
 
+import javax.portlet.PortletResponse;
+
+import com.liferay.lms.model.Course;
 import com.liferay.lms.model.CourseResult;
 import com.liferay.lms.model.LearningActivityResult;
 import com.liferay.lms.model.ModuleResult;
 import com.liferay.lms.service.ClpSerializer;
+import com.liferay.portal.kernel.upload.UploadRequest;
 import com.liferay.portal.kernel.util.ClassLoaderProxy;
 import com.liferay.portal.kernel.util.MethodHandler;
 import com.liferay.portal.kernel.util.MethodKey;
@@ -135,6 +139,28 @@ public class CalificationTypeClp implements CalificationType {
 		return ((String)returnObj);
 	}
 	
+	public String getSuffix(long groupId){
+		Object returnObj = null;
+
+		try {
+			MethodKey getSuffixMethod = new MethodKey(clp.getClassName(), "getSuffix"); 
+			returnObj = clp.invoke(new MethodHandler(getSuffixMethod));
+		}
+		catch (Throwable t) {
+			t = ClpSerializer.translateThrowable(t);
+
+			if (t instanceof RuntimeException) {
+				throw (RuntimeException)t;
+			}
+			else {
+				throw new RuntimeException(t.getClass().getName() +
+					" is not a valid exception");
+			}
+		}
+
+		return ((String)returnObj);
+	}
+	
 	public String translate(Locale locale, double result){
 		Object returnObj = null;
 
@@ -225,7 +251,7 @@ public class CalificationTypeClp implements CalificationType {
 		return ((String)returnObj);
 	}
 
-	public String translate(Locale locale, long companyId, double result) {
+	public String translate(Locale locale, long groupId, double result) {
 		Object returnObj = null;
 
 		try {
@@ -270,7 +296,29 @@ public class CalificationTypeClp implements CalificationType {
 	}
 
 	@Override
-	public long getMinValue() {
+	public long toBase100(long groupId, double result) {
+		Object returnObj = null;
+
+		try {
+			returnObj = clp.invoke("toBase100",	new Object[] {});
+		}
+		catch (Throwable t) {
+			t = ClpSerializer.translateThrowable(t);
+
+			if (t instanceof RuntimeException) {
+				throw (RuntimeException)t;
+			}
+			else {
+				throw new RuntimeException(t.getClass().getName() +
+					" is not a valid exception");
+			}
+		}
+
+		return ((Long)returnObj).longValue();
+	}
+	
+	@Override
+	public long getMinValue(long groupId) {
 		Object returnObj = null;
 
 		try {
@@ -292,7 +340,7 @@ public class CalificationTypeClp implements CalificationType {
 	}
 
 	@Override
-	public long getMaxValue() {
+	public long getMaxValue(long groupId) {
 		Object returnObj = null;
 
 		try {
@@ -311,6 +359,36 @@ public class CalificationTypeClp implements CalificationType {
 		}
 
 		return ((Long)returnObj).longValue();
+	}
+
+	@Override
+	public String getExpecificContentPage() {
+		Object returnObj = null;
+
+		try {
+			MethodKey getExpecificContentPageMethod = new MethodKey(clp.getClassName(), "getExpecificContentPage", Locale.class); 
+			returnObj = clp.invoke(new MethodHandler(getExpecificContentPageMethod));
+		}
+		catch (Throwable t) {
+			t = ClpSerializer.translateThrowable(t);
+
+			if (t instanceof RuntimeException) {
+				throw (RuntimeException)t;
+			}
+			else {
+				throw new RuntimeException(t.getClass().getName() +
+					" is not a valid exception");
+			}
+		}
+
+		return ((String)returnObj);
+	}
+
+	@Override
+	public String setExtraContent(UploadRequest uploadRequest,
+			PortletResponse portletResponse, Course course) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 	

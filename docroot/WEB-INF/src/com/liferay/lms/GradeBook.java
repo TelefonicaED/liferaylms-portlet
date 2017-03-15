@@ -210,7 +210,7 @@ public class GradeBook extends MVCPortlet {
 			ct = new CalificationTypeRegistry().getCalificationType(course.getCalificationType());			
 			result= Double.valueOf(ParamUtil.getString(request,"result").replace(",", "."));
 			log.debug("result: "+result);
-			if(result<ct.getMinValue() || result>ct.getMaxValue()){
+			if(result<ct.getMinValue(course.getGroupCreatedId()) || result>ct.getMaxValue(course.getGroupCreatedId())){
 				correct=false;
 				log.error("Result fuera de rango");
 				SessionErrors.add(request, "result-bad-format");
@@ -234,7 +234,7 @@ public class GradeBook extends MVCPortlet {
 					learningActivityTry =  LearningActivityTryLocalServiceUtil.createLearningActivityTry(actId,serviceContext);
 				}
 				learningActivityTry.setEndDate(new Date());
-				learningActivityTry.setResult(ct.toBase100(result));
+				learningActivityTry.setResult(ct.toBase100(themeDisplay.getScopeGroupId(),result));
 				learningActivityTry.setComments(comments);
 				updateLearningActivityTryAndResult(learningActivityTry);
 				
@@ -266,7 +266,7 @@ public class GradeBook extends MVCPortlet {
 			Course course = CourseLocalServiceUtil.getCourseByGroupCreatedId(themeDisplay.getScopeGroupId());			
 			ct = new CalificationTypeRegistry().getCalificationType(course.getCalificationType());			
 			log.debug("result: "+result);
-			if(result<ct.getMinValue() || result>ct.getMaxValue()){
+			if(result<ct.getMinValue(course.getGroupCreatedId()) || result>ct.getMaxValue(course.getGroupCreatedId())){
 				correct=false;
 				log.error("Result fuera de rango");
 				SessionErrors.add(renderRequest, "offlinetaskactivity.grades.result-bad-format");
@@ -290,7 +290,7 @@ public class GradeBook extends MVCPortlet {
 					learningActivityTry =  LearningActivityTryLocalServiceUtil.createLearningActivityTry(actId,serviceContext);
 				}
 				learningActivityTry.setEndDate(new Date());
-				learningActivityTry.setResult(ct.toBase100(result));
+				learningActivityTry.setResult(ct.toBase100(themeDisplay.getScopeGroupId(),result));
 				learningActivityTry.setComments(comments);
 				updateLearningActivityTryAndResult(learningActivityTry);
 				

@@ -49,6 +49,7 @@ import com.liferay.lms.service.TestAnswerLocalServiceUtil;
 import com.liferay.lms.service.TestAnswerServiceUtil;
 import com.liferay.lms.service.TestQuestionLocalServiceUtil;
 import com.liferay.lms.service.TestQuestionServiceUtil;
+import com.liferay.lms.service.UserCertificateDownloadLocalServiceUtil;
 import com.liferay.lms.service.UserCompetenceLocalServiceUtil;
 import com.liferay.lms.service.UserCompetenceServiceUtil;
 
@@ -125,6 +126,8 @@ public class ClpMessageListener extends BaseMessageListener {
 			TestQuestionLocalServiceUtil.clearService();
 
 			TestQuestionServiceUtil.clearService();
+			UserCertificateDownloadLocalServiceUtil.clearService();
+
 			UserCompetenceLocalServiceUtil.clearService();
 
 			UserCompetenceServiceUtil.clearService();

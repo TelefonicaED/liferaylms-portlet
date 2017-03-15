@@ -51,6 +51,7 @@ import com.liferay.lms.service.TestAnswerLocalService;
 import com.liferay.lms.service.TestAnswerService;
 import com.liferay.lms.service.TestQuestionLocalService;
 import com.liferay.lms.service.TestQuestionService;
+import com.liferay.lms.service.UserCertificateDownloadLocalService;
 import com.liferay.lms.service.UserCompetenceLocalService;
 import com.liferay.lms.service.UserCompetenceService;
 import com.liferay.lms.service.persistence.ActivityTriesDeletedPersistence;
@@ -80,6 +81,7 @@ import com.liferay.lms.service.persistence.SurveyResultFinder;
 import com.liferay.lms.service.persistence.SurveyResultPersistence;
 import com.liferay.lms.service.persistence.TestAnswerPersistence;
 import com.liferay.lms.service.persistence.TestQuestionPersistence;
+import com.liferay.lms.service.persistence.UserCertificateDownloadPersistence;
 import com.liferay.lms.service.persistence.UserCompetencePersistence;
 
 import com.liferay.portal.kernel.bean.BeanReference;
@@ -1258,6 +1260,44 @@ public abstract class UserCompetenceServiceBaseImpl extends BaseServiceImpl
 	}
 
 	/**
+	 * Returns the user certificate download local service.
+	 *
+	 * @return the user certificate download local service
+	 */
+	public UserCertificateDownloadLocalService getUserCertificateDownloadLocalService() {
+		return userCertificateDownloadLocalService;
+	}
+
+	/**
+	 * Sets the user certificate download local service.
+	 *
+	 * @param userCertificateDownloadLocalService the user certificate download local service
+	 */
+	public void setUserCertificateDownloadLocalService(
+		UserCertificateDownloadLocalService userCertificateDownloadLocalService) {
+		this.userCertificateDownloadLocalService = userCertificateDownloadLocalService;
+	}
+
+	/**
+	 * Returns the user certificate download persistence.
+	 *
+	 * @return the user certificate download persistence
+	 */
+	public UserCertificateDownloadPersistence getUserCertificateDownloadPersistence() {
+		return userCertificateDownloadPersistence;
+	}
+
+	/**
+	 * Sets the user certificate download persistence.
+	 *
+	 * @param userCertificateDownloadPersistence the user certificate download persistence
+	 */
+	public void setUserCertificateDownloadPersistence(
+		UserCertificateDownloadPersistence userCertificateDownloadPersistence) {
+		this.userCertificateDownloadPersistence = userCertificateDownloadPersistence;
+	}
+
+	/**
 	 * Returns the user competence local service.
 	 *
 	 * @return the user competence local service
@@ -1619,6 +1659,10 @@ public abstract class UserCompetenceServiceBaseImpl extends BaseServiceImpl
 	protected TestQuestionService testQuestionService;
 	@BeanReference(type = TestQuestionPersistence.class)
 	protected TestQuestionPersistence testQuestionPersistence;
+	@BeanReference(type = UserCertificateDownloadLocalService.class)
+	protected UserCertificateDownloadLocalService userCertificateDownloadLocalService;
+	@BeanReference(type = UserCertificateDownloadPersistence.class)
+	protected UserCertificateDownloadPersistence userCertificateDownloadPersistence;
 	@BeanReference(type = UserCompetenceLocalService.class)
 	protected UserCompetenceLocalService userCompetenceLocalService;
 	@BeanReference(type = UserCompetenceService.class)

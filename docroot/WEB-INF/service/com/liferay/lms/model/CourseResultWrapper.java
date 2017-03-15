@@ -456,15 +456,15 @@ public class CourseResultWrapper implements CourseResult,
 	}
 
 	public java.lang.String translateResult(java.util.Locale locale,
-		long companyId,
+		long groupId,
 		com.liferay.lms.learningactivity.calificationtype.CalificationType ct) {
-		return _courseResult.translateResult(locale, companyId, ct);
+		return _courseResult.translateResult(locale, groupId, ct);
 	}
 
 	public java.lang.String translateResultWithSuffix(java.util.Locale locale,
-		long companyId,
+		long groupId,
 		com.liferay.lms.learningactivity.calificationtype.CalificationType ct) {
-		return _courseResult.translateResultWithSuffix(locale, companyId, ct);
+		return _courseResult.translateResultWithSuffix(locale, groupId, ct);
 	}
 
 	/**

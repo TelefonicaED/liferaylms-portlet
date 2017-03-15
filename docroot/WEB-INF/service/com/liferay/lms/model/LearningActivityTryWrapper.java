@@ -452,16 +452,16 @@ public class LearningActivityTryWrapper implements LearningActivityTry,
 	}
 
 	public java.lang.String translateResult(java.util.Locale locale,
-		long companyId,
+		long groupId,
 		com.liferay.lms.learningactivity.calificationtype.CalificationType ct) {
-		return _learningActivityTry.translateResult(locale, companyId, ct);
+		return _learningActivityTry.translateResult(locale, groupId, ct);
 	}
 
 	public java.lang.String translateResultWithSuffix(java.util.Locale locale,
-		long companyId,
+		long groupId,
 		com.liferay.lms.learningactivity.calificationtype.CalificationType ct) {
-		return _learningActivityTry.translateResultWithSuffix(locale,
-			companyId, ct);
+		return _learningActivityTry.translateResultWithSuffix(locale, groupId,
+			ct);
 	}
 
 	/**
