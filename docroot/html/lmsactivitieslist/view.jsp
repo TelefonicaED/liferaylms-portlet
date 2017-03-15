@@ -60,7 +60,7 @@
 
 	boolean showChangeVisibility = LmsPrefsLocalServiceUtil.getLmsPrefs(themeDisplay.getCompanyId()).getShowHideActivity();
 	boolean showChangeAllVisibility = PrefsPropsUtil.getBoolean("learningactivity.show.hideallactivity", false);
-	boolean visibleCalifications = PrefsPropsUtil.getBoolean("learningactivity.show.califications", false);
+	boolean visibleCalifications = PrefsPropsUtil.getBoolean("learningactivity.show.califications", true);
 	boolean activityStatus = PrefsPropsUtil.getBoolean("learningactivity.show.status", false);
 	
 	long actId = ParamUtil.getLong(request, "actId", 0);
