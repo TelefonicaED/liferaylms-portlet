@@ -34,7 +34,7 @@ String screenName = ParamUtil.getString(request, "screen-name","");
 String emailAddress = ParamUtil.getString(request, "email-address","");
 %>
 
-<liferay-ui:error key="result-bad-format" message="<%=LanguageUtil.format(themeDisplay.getLocale(), \"result.must-be-between\", new Object[]{ct.getMinValue(),ct.getMaxValue()})%>" />
+<liferay-ui:error key="result-bad-format" message="<%=LanguageUtil.format(themeDisplay.getLocale(), \"result.must-be-between\", new Object[]{ct.getMinValue(themeDisplay.getScopeGroupId()),ct.getMaxValue(themeDisplay.getScopeGroupId())})%>" />
 
 <liferay-ui:error key="grades.bad-updating" message="offlinetaskactivity.grades.bad-updating" />
 <liferay-ui:success key="grades.updating" message="offlinetaskactivity.correct.saved" />
@@ -249,9 +249,9 @@ userSearchContainer.setTotal(totalUsers);
 				status="started";
 				LearningActivityResult learningActivityResult = LearningActivityResultLocalServiceUtil.getByActIdAndUserId(actId, u.getUserId());
 				if(activity.getTypeId() == 8){
-					result= (learningActivityResult!=null)?ct.translate(themeDisplay.getLocale(), course.getCompanyId(),learningActivityResult.getResult()):"";
+					result= (learningActivityResult!=null)?ct.translate(themeDisplay.getLocale(), course.getScopeGroupId(),learningActivityResult.getResult()):"";
 				}else{
-					result = ct.translate(themeDisplay.getLocale(), course.getCompanyId(),laResult.getResult());
+					result = ct.translate(themeDisplay.getLocale(), course.getScopeGroupId(),laResult.getResult());
 				}
 				if(learningActivityResult.getEndDate()!=null){
 					status="not-passed"	;

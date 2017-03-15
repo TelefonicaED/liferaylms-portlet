@@ -95,7 +95,7 @@ else
 			
 			CalificationType clasificationType = new CalificationTypeRegistry().getCalificationType(CourseLocalServiceUtil.fetchByGroupCreatedId(learningActivity.getGroupId()).getCalificationType());
 			
-			String arguments = clasificationType.translate(themeDisplay.getLocale(), themeDisplay.getCompanyId(), oldResults);
+			String arguments = clasificationType.translate(themeDisplay.getLocale(), themeDisplay.getScopeGroupId(), oldResults);
 			if(!hasFreeQuestion && oldResults>0){
 					if(oldResults<learnTry.getResult()){
 		%>

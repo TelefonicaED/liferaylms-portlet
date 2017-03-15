@@ -1131,12 +1131,12 @@ public class LearningActivityResultLocalServiceImpl	extends LearningActivityResu
 	}
 
 	/**
-	 * Devuelve el número de estudiantes que han comenzado una actividad, si ya se tiene la lista de usuarios excluidos (profesores y editores)
-	 * llamar al método countStudentsByActIdUserExcludedIdsStarted directamente
+	 * Devuelve el nï¿½mero de estudiantes que han comenzado una actividad, si ya se tiene la lista de usuarios excluidos (profesores y editores)
+	 * llamar al mï¿½todo countStudentsByActIdUserExcludedIdsStarted directamente
 	 * @param actId id de la actividad
 	 * @param companyId id de la company de la actividad
 	 * @param courseGroupCreatedId id del group del curso
-	 * @return número de estudiantes que han comenzado una actividad
+	 * @return nï¿½mero de estudiantes que han comenzado una actividad
 	 */
 	public long countStartedOnlyStudents(long actId, long companyId, long courseGroupCreatedId) throws SystemException{
 		Course course = CourseLocalServiceUtil.getCourseByGroupCreatedId(courseGroupCreatedId);
@@ -1146,13 +1146,13 @@ public class LearningActivityResultLocalServiceImpl	extends LearningActivityResu
 	}
 
 	/**
-	 * @deprecated SE RECOMIENDA NO USAR ESTE MÉTODO, SE RECOMIENDA USAR: countStartedOnlyStudents(long actId, long companyId, long courseGroupCreatedId)
+	 * @deprecated SE RECOMIENDA NO USAR ESTE Mï¿½TODO, SE RECOMIENDA USAR: countStartedOnlyStudents(long actId, long companyId, long courseGroupCreatedId)
 	 * o countStudentsByActIdUserExcludedIdsStarted(actId, userExcludedIds)
 	 * @param actId id de la actividad
 	 * @param companyId id de la company de la actividad
 	 * @param courseGroupCreatedId id del group del curso
-	 * @param _students lista de estudiantes, si viene vacía se calculan dentro
-	 * @return número de estudiantes que han comenzado la actividad
+	 * @param _students lista de estudiantes, si viene vacï¿½a se calculan dentro
+	 * @return nï¿½mero de estudiantes que han comenzado la actividad
 	 */
 	@Deprecated
 	public long countStartedOnlyStudents(long actId, long companyId, long courseGropupCreatedId, List<User> _students) throws SystemException{
@@ -1161,12 +1161,12 @@ public class LearningActivityResultLocalServiceImpl	extends LearningActivityResu
 	}
 
 	/**
-	 * Devuelve el número de estudiantes que han finalizado una actividad, si ya se tiene la lista de usuarios excluidos (profesores y editores)
-	 * llamar al método countStudentsByActIdUserExcludedIdsFinished directamente
+	 * Devuelve el nï¿½mero de estudiantes que han finalizado una actividad, si ya se tiene la lista de usuarios excluidos (profesores y editores)
+	 * llamar al mï¿½todo countStudentsByActIdUserExcludedIdsFinished directamente
 	 * @param actId id de la actividad
 	 * @param companyId id de la company de la actividad
 	 * @param courseGroupCreatedId id del group del curso
-	 * @return número de estudiantes que han finalizado una actividad
+	 * @return nï¿½mero de estudiantes que han finalizado una actividad
 	 */
 	public long countFinishedOnlyStudents(long actId, long companyId, long courseGroupCreatedId){
 		try {
@@ -1183,13 +1183,13 @@ public class LearningActivityResultLocalServiceImpl	extends LearningActivityResu
 	}
 	
 	/**
-	 * @deprecated SE RECOMIENDA NO USAR ESTE MÉTODO, SE RECOMIENDA USAR: countFinishedOnlyStudents(long actId, long companyId, long courseGroupCreatedId)
+	 * @deprecated SE RECOMIENDA NO USAR ESTE Mï¿½TODO, SE RECOMIENDA USAR: countFinishedOnlyStudents(long actId, long companyId, long courseGroupCreatedId)
 	 * o countStudentsByActIdUserExcludedIdsFinished(actId, userExcludedIds)
 	 * @param actId id de la actividad
 	 * @param companyId id de la company de la actividad
 	 * @param courseGroupCreatedId id del group del curso
-	 * @param _students lista de estudiantes, si viene vacía se calculan dentro
-	 * @return número de estudiantes que han finalizado la actividad
+	 * @param _students lista de estudiantes, si viene vacï¿½a se calculan dentro
+	 * @return nï¿½mero de estudiantes que han finalizado la actividad
 	 */
 	@Deprecated
 	public long countFinishedOnlyStudents(long actId, long companyId, long courseGropupCreatedId, List<User> _students){
@@ -1471,7 +1471,7 @@ public class LearningActivityResultLocalServiceImpl	extends LearningActivityResu
 			Course curso = courseLocalService.getCourseByGroupCreatedId(groupId);
 			if(curso != null){
 				CalificationType ct = new CalificationTypeRegistry().getCalificationType(curso.getCalificationType());
-				translatedResult = ct.translate(locale,result);
+				translatedResult = ct.translate(locale,groupId,result);
 			}
 		} catch (SystemException e) {
 			// TODO Auto-generated catch block
@@ -1487,7 +1487,7 @@ public class LearningActivityResultLocalServiceImpl	extends LearningActivityResu
 			Course curso = courseLocalService.getCourseByGroupCreatedId(groupId);
 			if(curso != null){
 				CalificationType ct = new CalificationTypeRegistry().getCalificationType(curso.getCalificationType());
-				suffix = ct.getSuffix();
+				suffix = ct.getSuffix(groupId);
 			}
 		} catch (SystemException e) {
 			// TODO Auto-generated catch block

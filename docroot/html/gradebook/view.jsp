@@ -39,7 +39,7 @@
 CalificationType ct = new CalificationTypeRegistry().getCalificationType(CourseLocalServiceUtil.getCourseByGroupCreatedId(themeDisplay.getScopeGroupId()).getCalificationType());
 %>
 
-<liferay-ui:error key="result-bad-format" message="<%=LanguageUtil.format(themeDisplay.getLocale(), \"result.must-be-between\", new Object[]{ct.getMinValue(),ct.getMaxValue()})%>" />
+<liferay-ui:error key="result-bad-format" message="<%=LanguageUtil.format(themeDisplay.getLocale(), \"result.must-be-between\", new Object[]{ct.getMinValue(themeDisplay.getScopeGroupId()),ct.getMaxValue(themeDisplay.getScopeGroupId())})%>" />
 
 <liferay-ui:error key="grades.bad-updating" message="offlinetaskactivity.grades.bad-updating" />
 <liferay-ui:success key="grades.updating" message="offlinetaskactivity.correct.saved" />
@@ -211,7 +211,7 @@ if(theTeam!=null)
 							status="started";
 							LearningActivityResult learningActivityResult = LearningActivityResultLocalServiceUtil.getByActIdAndUserId(learningActivity.getActId(), usuario.getUserId());
 							
-							result = ct.translate(themeDisplay.getLocale(), themeDisplay.getCompanyId(), learningActivityResult.getResult());
+							result = ct.translate(themeDisplay.getLocale(), themeDisplay.getScopeGroupId(), learningActivityResult.getResult());
 							
 							if(learningActivityResult.getEndDate()!=null){
 								status="not-passed"	;

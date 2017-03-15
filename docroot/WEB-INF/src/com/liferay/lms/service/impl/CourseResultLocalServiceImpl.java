@@ -493,7 +493,7 @@ public class CourseResultLocalServiceImpl
 			Course curso = courseLocalService.getCourseByGroupCreatedId(groupId);
 			if(curso != null){
 				CalificationType ct = new CalificationTypeRegistry().getCalificationType(curso.getCalificationType());
-				translatedResult = ct.translate(locale,result);
+				translatedResult = ct.translate(locale,groupId,result);
 			}
 		} catch (SystemException e) {
 			// TODO Auto-generated catch block

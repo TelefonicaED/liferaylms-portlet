@@ -77,7 +77,7 @@
 				
 				if(courseResult!=null){
 					status="started";
-					result=ct.translate(themeDisplay.getLocale(), themeDisplay.getCompanyId(), courseResult.getResult())+ct.getSuffix();
+					result=ct.translate(themeDisplay.getLocale(), themeDisplay.getScopeGroupId(), courseResult.getResult())+ct.getSuffix(course.getGroupCreatedId());
 					if(courseResult.getPassedDate()!=null){
 						status="not-passed"	;
 					}

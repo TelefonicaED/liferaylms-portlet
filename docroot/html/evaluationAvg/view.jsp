@@ -41,7 +41,7 @@
 		String failedStudentMessageKey=(needPassPuntuation)?"evaluationAvg.student.failed":"evaluationAvg.student.failed.noPass";
 		
 		CalificationType ct = new CalificationTypeRegistry().getCalificationType(course.getCalificationType());
-		String resultadoNecesario = ct.translate(locale, (needPassPuntuation)?courseEval.getPassPuntuation(course):0) + ct.getSuffix();
+		String resultadoNecesario = ct.translate(locale,themeDisplay.getScopeGroupId(), (needPassPuntuation)?courseEval.getPassPuntuation(course):0) + ct.getSuffix(themeDisplay.getScopeGroupId());
 		
 		
 		
@@ -259,10 +259,10 @@
 							if((Validator.isNotNull(courseResult))&&(Validator.isNotNull(courseResult.getPassedDate()))) {   	   
 								   if(courseResult.getPassed()){									   
 									   %><liferay-ui:message key="<%=passedStudentMessageKey %>"  arguments="<%=
-											   new Object[]{ct.translate(themeDisplay.getLocale(), courseResult.getResult())} %>" /><%
+											   new Object[]{ct.translate(themeDisplay.getLocale(), course.getGroupCreatedId(),courseResult.getResult())} %>" /><%
 								   }else {
 									   %><liferay-ui:message key="<%=failedStudentMessageKey %>"  arguments="<%=
-											   new Object[]{ct.translate(themeDisplay.getLocale(), courseResult.getResult()),resultadoNecesario} %>" /><%
+											   new Object[]{ct.translate(themeDisplay.getLocale(), course.getGroupCreatedId(), courseResult.getResult()),resultadoNecesario} %>" /><%
 								   }
 								   %>
 

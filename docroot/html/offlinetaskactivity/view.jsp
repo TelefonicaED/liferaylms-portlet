@@ -37,7 +37,7 @@ CalificationType ct = new CalificationTypeRegistry().getCalificationType(CourseL
 
 %>
 
-<liferay-ui:error key="result-bad-format" message="<%=LanguageUtil.format(themeDisplay.getLocale(), \"result.must-be-between\", new Object[]{ct.getMinValue(),ct.getMaxValue()})%>" />
+<liferay-ui:error key="result-bad-format" message="<%=LanguageUtil.format(themeDisplay.getLocale(), \"result.must-be-between\", new Object[]{ct.getMinValue(themeDisplay.getScopeGroupId()),ct.getMaxValue(themeDisplay.getScopeGroupId())})%>" />
 <liferay-ui:error key="grades.bad-updating" message="offlinetaskactivity.grades.bad-updating" />
 <liferay-ui:success key="grades.updating" message="offlinetaskactivity.correct.saved" />
 
@@ -305,7 +305,7 @@ CalificationType ct = new CalificationTypeRegistry().getCalificationType(CourseL
 					<liferay-ui:search-container-column-text name="calification">
 						<% LearningActivityResult learningActivityResult = LearningActivityResultLocalServiceUtil.getByActIdAndUserId(actId, usuario.getUserId()); 
 						   if((learningActivityResult!=null)&&(learningActivityResult.getEndDate()!= null)) {	   
-								   Object  [] arg =  new Object[]{ct.translate(themeDisplay.getLocale(), themeDisplay.getCompanyId(), learningActivityResult.getResult()),ct.translate(themeDisplay.getLocale(), themeDisplay.getCompanyId(),activity.getPasspuntuation())};
+								   Object  [] arg =  new Object[]{ct.translate(themeDisplay.getLocale(), themeDisplay.getScopeGroupId(), learningActivityResult.getResult()),ct.translate(themeDisplay.getLocale(), themeDisplay.getScopeGroupId(),activity.getPasspuntuation())};
 								   if(learningActivityResult.getPassed()){
 									   %><liferay-ui:message key="offlinetaskactivity.student.passed"  arguments="<%=arg %>" /><%
 								   }else {

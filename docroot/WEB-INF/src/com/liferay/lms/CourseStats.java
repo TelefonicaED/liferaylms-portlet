@@ -313,9 +313,9 @@ public class CourseStats extends MVCPortlet {
 			activityStats.setPassed(LearningActivityResultLocalServiceUtil.countStudentsByActIdUserIdsPassed(activity.getActId(), userIds));
 			activityStats.setFailed(LearningActivityResultLocalServiceUtil.countStudentsByActIdUserIdsFailed(activity.getActId(), userIds));
 			activityStats.setTriesPerUser(LearningActivityResultLocalServiceUtil.avgTriesByActIdUserIds(activity.getActId(), userIds));
-			avgResult = ct.translate(locale, activity.getCompanyId(), LearningActivityResultLocalServiceUtil.avgResultByActIdUserIds(activity.getActId(), userIds));				
+			avgResult = ct.translate(locale, activity.getGroupId(), LearningActivityResultLocalServiceUtil.avgResultByActIdUserIds(activity.getActId(), userIds));				
 			activityStats.setAvgResult(avgResult);
-			activityStats.setAvgResultWithSuffix(avgResult+ct.getSuffix());
+			activityStats.setAvgResultWithSuffix(avgResult+ct.getSuffix(activity.getGroupId()));
 		}else{
 			log.debug("CourseStats::getActivityStats:: INICIO countStudentsByActIdUserExcludedIdsStarted");
 			activityStats.setStarted(LearningActivityResultLocalServiceUtil.countStudentsByActIdUserExcludedIdsStarted(activity.getActId(), userExcludedIds));
@@ -333,15 +333,15 @@ public class CourseStats extends MVCPortlet {
 			activityStats.setTriesPerUser(LearningActivityResultLocalServiceUtil.avgTriesByActIdUserExcludedIds(activity.getActId(), userExcludedIds));
 			log.debug("CourseStats::getActivityStats:: FIN avgTriesByActIdUserExcludedIds");
 			log.debug("CourseStats::getActivityStats:: INICIO avgResultByActIdUserExcludedIds");
-			avgResult = ct.translate(locale, activity.getCompanyId(), LearningActivityResultLocalServiceUtil.avgResultByActIdUserExcludedIds(activity.getActId(), userExcludedIds));				
+			avgResult = ct.translate(locale, activity.getGroupId(), LearningActivityResultLocalServiceUtil.avgResultByActIdUserExcludedIds(activity.getActId(), userExcludedIds));				
 			activityStats.setAvgResult(avgResult);
-			activityStats.setAvgResultWithSuffix(avgResult+ct.getSuffix());
+			activityStats.setAvgResultWithSuffix(avgResult+ct.getSuffix(activity.getGroupId()));
 			log.debug("CourseStats::getActivityStats:: FIN avgResultByActIdUserExcludedIds");
 		}
 		
-		String passPuntuation = ct.translate(locale, activity.getCompanyId(), activity.getPasspuntuation());		
+		String passPuntuation = ct.translate(locale, activity.getGroupId(), activity.getPasspuntuation());		
 		activityStats.setPassPuntuation(passPuntuation);
-		activityStats.setPassPuntuationWithSuffix(passPuntuation+ct.getSuffix());
+		activityStats.setPassPuntuationWithSuffix(passPuntuation+ct.getSuffix(activity.getGroupId()));
 	
 		activityStats.setTries(activity.getTries());
 		
