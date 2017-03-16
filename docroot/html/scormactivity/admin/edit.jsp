@@ -156,7 +156,7 @@ if(learningActivity!=null){  %>
 			<liferay-portlet:param name="resModuleId" value="<%=String.valueOf(resModuleId) %>" />
 		</liferay-portlet:renderURL>
 		
-		<button type="button" id="<portlet:namespace/>searchEntry" onclick="javascript:location.href='<%=buscarRecurso%>'" >
+		<button type="button" id="<portlet:namespace/>searchEntry" onclick="javascript:${renderResponse.getNamespace()}goToSearchResource();" " >
 		    <span class="aui-buttonitem-icon aui-icon aui-icon-search"></span>
 		    <span class="aui-buttonitem-label"><%= LanguageUtil.get(pageContext, "search") %></span>
 		</button>
@@ -203,3 +203,18 @@ if(learningActivity!=null){  %>
 	<liferay-ui:icon image="back" message="back" url="<%=\"javascript:\"+renderResponse.getNamespace()+\"back();\" %>" label="true"  />
 </div>
 
+<script type="text/javascript">
+
+function <portlet:namespace />goToSearchResource(){
+	var url =  '${buscarRecurso}';
+	var languageId = '<%= themeDisplay.getLanguageId()%>';
+	
+	url +='&<portlet:namespace/>title='+$('#<portlet:namespace />title_'+languageId).val();
+	url += '&<portlet:namespace/>description='+$('#<portlet:namespace />description').val();
+		
+	location.href=url;
+		
+
+}
+
+</script>

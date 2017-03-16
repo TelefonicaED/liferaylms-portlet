@@ -14,11 +14,6 @@
 <%@page import="com.liferay.portal.kernel.portlet.LiferayWindowState"%>
 <%@ include file="/init.jsp" %>
 
-<liferay-portlet:renderURL var="selectResource" windowState="<%=LiferayWindowState.POP_UP.toString() %>">
-	<liferay-portlet:param name="jspPage" value="/html/resourceInternalActivity/admin/searchresource.jsp"/>
-</liferay-portlet:renderURL>
-
-
 <%
 long resId = ParamUtil.getLong(request, "resId");
 long resModuleId = ParamUtil.getLong(request, "resModuleId");
@@ -26,6 +21,8 @@ long resModuleId = ParamUtil.getLong(request, "resModuleId");
 long assetId=ParamUtil.getLong(request, "assertId");
 String assetTitle=StringPool.BLANK;
 String disabled = "disabled=\"disabled\"";
+
+
 
 if(assetId!=0){
 	try{
@@ -55,6 +52,10 @@ if(learningActivity!=null) {
 if(LearningActivityLocalServiceUtil.canBeEdited(learningActivity, user.getUserId())) disabled="";
 
 %>
+<liferay-portlet:renderURL var="selectResource" windowState="<%=LiferayWindowState.POP_UP.toString() %>">
+	<liferay-portlet:param name="jspPage" value="/html/resourceInternalActivity/admin/searchresource.jsp"/>
+</liferay-portlet:renderURL>
+
 
 <aui:input type="hidden" name="assetEntryId" ignoreRequestValue="true" value="<%=Long.toString(assetId) %>"/>
 <aui:field-wrapper name="resourceinternalactivity.edit.asserts" cssClass="search-button-container">
@@ -67,7 +68,7 @@ if(LearningActivityLocalServiceUtil.canBeEdited(learningActivity, user.getUserId
 			<liferay-portlet:param name="resModuleId" value="<%=String.valueOf(resModuleId) %>" />
 		</liferay-portlet:renderURL>
 		
-		<button <%=disabled %> type="button" id="<portlet:namespace/>searchEntry" onclick="javascript:location.href='<%=buscarRecurso%>'" >
+		<button <%=disabled %> type="button" id="<portlet:namespace/>searchEntry" onclick="javascript:${renderResponse.getNamespace()}goToSearchResource();" >
 		    <span class="aui-buttonitem-icon aui-icon aui-icon-search"></span>
 		    <span class="aui-buttonitem-label"><%= LanguageUtil.get(pageContext, "search") %></span>
 		</button>
@@ -78,3 +79,18 @@ if(LearningActivityLocalServiceUtil.canBeEdited(learningActivity, user.getUserId
 	<liferay-ui:icon image="back" message="back" url="<%=\"javascript:\"+renderResponse.getNamespace()+\"back();\" %>" label="true"  />
 </div>
 
+<script type="text/javascript">
+
+function <portlet:namespace />goToSearchResource(){
+	var url =  '${buscarRecurso}';
+	var languageId = '<%= themeDisplay.getLanguageId()%>';
+	
+	url +='&<portlet:namespace/>title='+$('#<portlet:namespace />title_'+languageId).val();
+	url += '&<portlet:namespace/>description='+$('#<portlet:namespace />description').val();
+		
+	location.href=url;
+		
+
+}
+
+</script>
