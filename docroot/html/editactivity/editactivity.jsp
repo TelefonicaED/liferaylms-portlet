@@ -1048,7 +1048,7 @@ Liferay.provide(
 		
 		<%
 		
-		if(actId > 0){
+		if(actId > 0 && moduleId>0){
 			AssetRendererFactory assetRendererFactory = AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(LearningActivity.class.getName());
 
 		%>

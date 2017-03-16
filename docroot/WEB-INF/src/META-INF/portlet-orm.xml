@@ -519,6 +519,7 @@
 		<attributes>
 			<id name="userId" />
 			<id name="courseId" />
+			<id name="competenceId" />
 			<basic name="downloadDate">
 				<temporal>TIMESTAMP</temporal>
 			</basic>

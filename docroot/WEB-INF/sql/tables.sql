@@ -296,8 +296,9 @@ create table Lms_TestQuestion (
 create table Lms_UserCertificateDownload (
 	userId LONG not null,
 	courseId LONG not null,
+	competenceId LONG not null,
 	downloadDate DATE null,
-	primary key (userId, courseId)
+	primary key (userId, courseId, competenceId)
 );
 
 create table Lms_UserCompetence (

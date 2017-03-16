@@ -316,6 +316,7 @@ public class UserCertificateDownloadPersistenceImpl extends BasePersistenceImpl<
 
 		userCertificateDownloadImpl.setUserId(userCertificateDownload.getUserId());
 		userCertificateDownloadImpl.setCourseId(userCertificateDownload.getCourseId());
+		userCertificateDownloadImpl.setCompetenceId(userCertificateDownload.getCompetenceId());
 		userCertificateDownloadImpl.setDownloadDate(userCertificateDownload.getDownloadDate());
 
 		return userCertificateDownloadImpl;
