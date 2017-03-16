@@ -522,8 +522,12 @@ public class CompetencesAdmin extends MVCPortlet{
 				
 			try {
 				FileEntry fileEntry = DLAppServiceUtil.getFileEntry(background);
-				String imageurl = request.getScheme() + "://" + request.getServerName() + ":" 
-						+ request.getServerPort() + "/c/document_library/get_file?uuid=" + fileEntry.getUuid() + "&groupId=" + fileEntry.getGroupId();
+				String imageurl = PropsUtil.get("dl.store.file.system.root.dir")
+						+ "/" + fileEntry.getCompanyId() + "/"
+					    + fileEntry.getFolderId() + "/"
+					    + ((DLFileEntry) fileEntry.getModel()).getName() + "/"
+					    + fileEntry.getVersion();
+				log.info("URL: " + imageurl);
 				
 				html.append(" ; background: url(");
 				html.append(HtmlUtil.escape(imageurl));

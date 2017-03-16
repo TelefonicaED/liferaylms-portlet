@@ -40,6 +40,7 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
+import com.liferay.portlet.documentlibrary.model.DLFileEntry;
 import com.liferay.portlet.documentlibrary.service.DLAppServiceUtil;
 import com.liferay.util.LmsLocaleUtil;
 
@@ -82,6 +83,7 @@ public class CompetenceLocalServiceImpl extends CompetenceLocalServiceBaseImpl {
 			competence.setCompanyId(serviceContext.getCompanyId());
 			competence.setGroupId(serviceContext.getScopeGroupId());
 			competence.setDiplomaTemplate(ParamUtil.getString(serviceContext.getRequest(),"template",StringPool.BLANK ),serviceContext.getLocale());
+			competence.setDiplomaBackground(ParamUtil.getLong(serviceContext.getRequest(), "diplomaBackground", 0));
 			competence.setGenerateCertificate(generateCertificate);
 			competence.setUserId(userId);
 			competence.setDescription(description,serviceContext.getLocale());
@@ -230,16 +232,15 @@ public class CompetenceLocalServiceImpl extends CompetenceLocalServiceBaseImpl {
 	}
 	public String getBGImageURL(long fileEntryId, long groupId, HttpServletRequest request) {
 
-		String imageurl = request.getScheme()
-			      + "://"
-			      + request.getServerName()
-			      + ":"
-			      + request.getServerPort();
 		String url = StringPool.BLANK;
 		try {
 			FileEntry fileEntry = DLAppServiceUtil.getFileEntry(fileEntryId);
 			if (Validator.isNotNull(fileEntry)) {
-				url = imageurl + "/c/document_library/get_file?uuid=" + fileEntry.getUuid() + "&groupId=" + fileEntry.getGroupId();
+				url = PropsUtil.get("dl.store.file.system.root.dir") 
+						+ "/" + fileEntry.getCompanyId() + "/"
+					    + fileEntry.getFolderId() + "/"
+					    + ((DLFileEntry) fileEntry.getModel()).getName() + "/"
+					    + fileEntry.getVersion();
 			} else {
 				url = getBGImageURL(groupId, request);
 			}
@@ -250,6 +251,7 @@ public class CompetenceLocalServiceImpl extends CompetenceLocalServiceBaseImpl {
 			log.error("Se ha producido un error al obtener el fileEntryId=" + fileEntryId, e);
 			url = getBGImageURL(groupId, request);
 		}
+		log.info("URL imagen: " + url);
 		return url;
 		
 	}
