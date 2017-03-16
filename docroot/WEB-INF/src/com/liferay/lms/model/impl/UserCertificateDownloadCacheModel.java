@@ -34,12 +34,14 @@ public class UserCertificateDownloadCacheModel implements CacheModel<UserCertifi
 	Serializable {
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(7);
+		StringBundler sb = new StringBundler(9);
 
 		sb.append("{userId=");
 		sb.append(userId);
 		sb.append(", courseId=");
 		sb.append(courseId);
+		sb.append(", competenceId=");
+		sb.append(competenceId);
 		sb.append(", downloadDate=");
 		sb.append(downloadDate);
 		sb.append("}");
@@ -52,6 +54,7 @@ public class UserCertificateDownloadCacheModel implements CacheModel<UserCertifi
 
 		userCertificateDownloadImpl.setUserId(userId);
 		userCertificateDownloadImpl.setCourseId(courseId);
+		userCertificateDownloadImpl.setCompetenceId(competenceId);
 
 		if (downloadDate == Long.MIN_VALUE) {
 			userCertificateDownloadImpl.setDownloadDate(null);
@@ -67,5 +70,6 @@ public class UserCertificateDownloadCacheModel implements CacheModel<UserCertifi
 
 	public long userId;
 	public long courseId;
+	public long competenceId;
 	public long downloadDate;
 }

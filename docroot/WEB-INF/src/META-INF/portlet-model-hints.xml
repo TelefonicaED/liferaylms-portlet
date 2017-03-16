@@ -336,6 +336,7 @@
 	<model name="com.liferay.lms.model.UserCertificateDownload">
 		<field name="userId" type="long" />
 		<field name="courseId" type="long" />
+		<field name="competenceId" type="long" />
 		<field name="downloadDate" type="Date" />
 	</model>
 	<model name="com.liferay.lms.model.UserCompetence">

@@ -59,9 +59,10 @@ public class UserCertificateDownloadModelImpl extends BaseModelImpl<UserCertific
 	public static final Object[][] TABLE_COLUMNS = {
 			{ "userId", Types.BIGINT },
 			{ "courseId", Types.BIGINT },
+			{ "competenceId", Types.BIGINT },
 			{ "downloadDate", Types.TIMESTAMP }
 		};
-	public static final String TABLE_SQL_CREATE = "create table Lms_UserCertificateDownload (userId LONG not null,courseId LONG not null,downloadDate DATE null,primary key (userId, courseId))";
+	public static final String TABLE_SQL_CREATE = "create table Lms_UserCertificateDownload (userId LONG not null,courseId LONG not null,competenceId LONG not null,downloadDate DATE null,primary key (userId, courseId, competenceId))";
 	public static final String TABLE_SQL_DROP = "drop table Lms_UserCertificateDownload";
 	public static final String DATA_SOURCE = "liferayDataSource";
 	public static final String SESSION_FACTORY = "liferaySessionFactory";
@@ -80,16 +81,17 @@ public class UserCertificateDownloadModelImpl extends BaseModelImpl<UserCertific
 	}
 
 	public UserCertificateDownloadPK getPrimaryKey() {
-		return new UserCertificateDownloadPK(_userId, _courseId);
+		return new UserCertificateDownloadPK(_userId, _courseId, _competenceId);
 	}
 
 	public void setPrimaryKey(UserCertificateDownloadPK primaryKey) {
 		setUserId(primaryKey.userId);
 		setCourseId(primaryKey.courseId);
+		setCompetenceId(primaryKey.competenceId);
 	}
 
 	public Serializable getPrimaryKeyObj() {
-		return new UserCertificateDownloadPK(_userId, _courseId);
+		return new UserCertificateDownloadPK(_userId, _courseId, _competenceId);
 	}
 
 	public void setPrimaryKeyObj(Serializable primaryKeyObj) {
@@ -110,6 +112,7 @@ public class UserCertificateDownloadModelImpl extends BaseModelImpl<UserCertific
 
 		attributes.put("userId", getUserId());
 		attributes.put("courseId", getCourseId());
+		attributes.put("competenceId", getCompetenceId());
 		attributes.put("downloadDate", getDownloadDate());
 
 		return attributes;
@@ -127,6 +130,12 @@ public class UserCertificateDownloadModelImpl extends BaseModelImpl<UserCertific
 
 		if (courseId != null) {
 			setCourseId(courseId);
+		}
+
+		Long competenceId = (Long)attributes.get("competenceId");
+
+		if (competenceId != null) {
+			setCompetenceId(competenceId);
 		}
 
 		Date downloadDate = (Date)attributes.get("downloadDate");
@@ -160,6 +169,14 @@ public class UserCertificateDownloadModelImpl extends BaseModelImpl<UserCertific
 		_courseId = courseId;
 	}
 
+	public long getCompetenceId() {
+		return _competenceId;
+	}
+
+	public void setCompetenceId(long competenceId) {
+		_competenceId = competenceId;
+	}
+
 	public Date getDownloadDate() {
 		return _downloadDate;
 	}
@@ -185,6 +202,7 @@ public class UserCertificateDownloadModelImpl extends BaseModelImpl<UserCertific
 
 		userCertificateDownloadImpl.setUserId(getUserId());
 		userCertificateDownloadImpl.setCourseId(getCourseId());
+		userCertificateDownloadImpl.setCompetenceId(getCompetenceId());
 		userCertificateDownloadImpl.setDownloadDate(getDownloadDate());
 
 		userCertificateDownloadImpl.resetOriginalValues();
@@ -240,6 +258,8 @@ public class UserCertificateDownloadModelImpl extends BaseModelImpl<UserCertific
 
 		userCertificateDownloadCacheModel.courseId = getCourseId();
 
+		userCertificateDownloadCacheModel.competenceId = getCompetenceId();
+
 		Date downloadDate = getDownloadDate();
 
 		if (downloadDate != null) {
@@ -254,12 +274,14 @@ public class UserCertificateDownloadModelImpl extends BaseModelImpl<UserCertific
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(7);
+		StringBundler sb = new StringBundler(9);
 
 		sb.append("{userId=");
 		sb.append(getUserId());
 		sb.append(", courseId=");
 		sb.append(getCourseId());
+		sb.append(", competenceId=");
+		sb.append(getCompetenceId());
 		sb.append(", downloadDate=");
 		sb.append(getDownloadDate());
 		sb.append("}");
@@ -268,7 +290,7 @@ public class UserCertificateDownloadModelImpl extends BaseModelImpl<UserCertific
 	}
 
 	public String toXmlString() {
-		StringBundler sb = new StringBundler(13);
+		StringBundler sb = new StringBundler(16);
 
 		sb.append("<model><model-name>");
 		sb.append("com.liferay.lms.model.UserCertificateDownload");
@@ -281,6 +303,10 @@ public class UserCertificateDownloadModelImpl extends BaseModelImpl<UserCertific
 		sb.append(
 			"<column><column-name>courseId</column-name><column-value><![CDATA[");
 		sb.append(getCourseId());
+		sb.append("]]></column-value></column>");
+		sb.append(
+			"<column><column-name>competenceId</column-name><column-value><![CDATA[");
+		sb.append(getCompetenceId());
 		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>downloadDate</column-name><column-value><![CDATA[");
@@ -299,6 +325,7 @@ public class UserCertificateDownloadModelImpl extends BaseModelImpl<UserCertific
 	private long _userId;
 	private String _userUuid;
 	private long _courseId;
+	private long _competenceId;
 	private Date _downloadDate;
 	private UserCertificateDownload _escapedModelProxy;
 }
