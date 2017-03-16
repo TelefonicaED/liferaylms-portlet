@@ -249,9 +249,9 @@ userSearchContainer.setTotal(totalUsers);
 				status="started";
 				LearningActivityResult learningActivityResult = LearningActivityResultLocalServiceUtil.getByActIdAndUserId(actId, u.getUserId());
 				if(activity.getTypeId() == 8){
-					result= (learningActivityResult!=null)?ct.translate(themeDisplay.getLocale(), course.getScopeGroupId(),learningActivityResult.getResult()):"";
+					result= (learningActivityResult!=null)?ct.translate(themeDisplay.getLocale(), course.getGroupCreatedId(),learningActivityResult.getResult()):"";
 				}else{
-					result = ct.translate(themeDisplay.getLocale(), course.getScopeGroupId(),laResult.getResult());
+					result = ct.translate(themeDisplay.getLocale(), course.getGroupCreatedId(),laResult.getResult());
 				}
 				if(learningActivityResult.getEndDate()!=null){
 					status="not-passed"	;
