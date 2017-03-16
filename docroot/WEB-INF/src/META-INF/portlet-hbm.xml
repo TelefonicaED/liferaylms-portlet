@@ -352,6 +352,7 @@
 		<composite-id name="primaryKey" class="com.liferay.lms.service.persistence.UserCertificateDownloadPK">
 			<key-property name="userId" type="com.liferay.portal.dao.orm.hibernate.LongType" />
 			<key-property name="courseId" type="com.liferay.portal.dao.orm.hibernate.LongType" />
+			<key-property name="competenceId" type="com.liferay.portal.dao.orm.hibernate.LongType" />
 		</composite-id>
 		<property name="downloadDate" type="org.hibernate.type.TimestampType" />
 	</class>

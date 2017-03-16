@@ -320,7 +320,7 @@ public class UserCompetencePortlet extends MVCPortlet {
 			// Si se ha descargado el diploma => Se deja traza de la descarga 
 			// (Solo tiene en cuenta la primera vez que lo descarga)
 			if (themeDisplay.getUser().getUserId() == themeDisplay.getRealUserId()) {
-				UserCertificateDownloadLocalServiceUtil.addUserCertificateDownload(themeDisplay.getUser().getUserId(), course.getCourseId());
+				UserCertificateDownloadLocalServiceUtil.addUserCertificateDownload(themeDisplay.getUser().getUserId(), course.getCourseId(), competence.getCompetenceId());
 			}
 			
 		}else{

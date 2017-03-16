@@ -21,6 +21,8 @@ import com.liferay.lms.model.UserCertificateDownload;
 import com.liferay.lms.service.base.UserCertificateDownloadLocalServiceBaseImpl;
 import com.liferay.lms.service.persistence.UserCertificateDownloadPK;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 
 /**
  * The implementation of the user certificate download local service.
@@ -38,22 +40,25 @@ import com.liferay.portal.kernel.exception.SystemException;
  */
 public class UserCertificateDownloadLocalServiceImpl
 	extends UserCertificateDownloadLocalServiceBaseImpl {
+	
+	private static Log log = LogFactoryUtil.getLog(UserCertificateDownloadLocalServiceImpl.class);
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never reference this interface directly. Always use {@link com.liferay.lms.service.UserCertificateDownloadLocalServiceUtil} to access the user certificate download local service.
 	 */
 	
-	public void addUserCertificateDownload(long userId, long courseId) throws SystemException {
+	public void addUserCertificateDownload(long userId, long courseId, long competenceId) throws SystemException {
 		
-		UserCertificateDownloadPK userCertificateDownloadPK = new UserCertificateDownloadPK(userId, courseId);
+		UserCertificateDownloadPK userCertificateDownloadPK = new UserCertificateDownloadPK(userId, courseId, competenceId);
 		
 		UserCertificateDownload userCertificationDownload = null;
 		try {
 			userCertificationDownload = userCertificateDownloadPersistence.findByPrimaryKey(userCertificateDownloadPK);
 			
+			log.info("El usuario " + userId + " ya se habia descargado con anterioridad el diploma, fecha=" + userCertificationDownload.getDownloadDate());
 		} catch (NoSuchUserCertificateDownloadException e) {
-			// Si no se encuentra, se añade
+			// Si no se encuentra, se aï¿½ade
 			userCertificationDownload = userCertificateDownloadPersistence.create(userCertificateDownloadPK);
 			userCertificationDownload.setDownloadDate(new Date());
 			
