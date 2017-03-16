@@ -41,6 +41,13 @@ for(Map.Entry<Object,Object> entry:props.entrySet()) {
 
 long resId = ParamUtil.getLong(request,"resId",0);
 long resModuleId = ParamUtil.getLong(request,"resModuleId",0);
+String title =  ParamUtil.getString(request, "title", "");
+String description = ParamUtil.getString(request, "description","");
+
+System.out.println("TITLE SEARCH RESOURCE "+title);
+System.out.println("DESCRIPTION SEARCH RESOURCE "+description);
+
+
 String message = "new-activity-resourceinternal";
 if(resId > 0){
 	message = LearningActivityLocalServiceUtil.fetchLearningActivity(resId).getTitle(themeDisplay.getLocale());
@@ -51,7 +58,9 @@ if(resId > 0){
 	<liferay-portlet:param name="mvcPath" value="/html/editactivity/editactivity.jsp" />
 	<liferay-portlet:param name="resId" value="<%=String.valueOf(resId) %>" />
 	<liferay-portlet:param name="resModuleId" value="<%=String.valueOf(resModuleId) %>" />
-	<liferay-portlet:param name="type" value="9" />
+	<liferay-portlet:param name="title" value="<%=String.valueOf(title) %>" />
+	<liferay-portlet:param name="description" value="<%=String.valueOf(description) %>" />
+	<liferay-portlet:param name="type" value="7" />
 </liferay-portlet:renderURL>
 
 
@@ -65,6 +74,8 @@ if(resId > 0){
 
 <liferay-portlet:renderURL var="selectResource">
 	<liferay-portlet:param name="jspPage" value="/html/resourceInternalActivity/admin/searchresults.jsp"/>
+	<liferay-portlet:param name="title" value="<%=String.valueOf(title) %>" />
+	<liferay-portlet:param name="description" value="<%=String.valueOf(description) %>" />
 </liferay-portlet:renderURL>
 
 <aui:form name="<portlet:namespace />ressearch" action="<%=selectResource %>" method="POST">

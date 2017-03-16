@@ -25,6 +25,13 @@ long[] groupIds=new long[1];
 groupIds[0]=groupIdSelected;
 String[] entryClassNames={className};
 
+title =  ParamUtil.getString(request, "title", "");
+description = ParamUtil.getString(request, "description","");
+
+
+System.out.println("TITLE SEARCH RESULTS "+title);
+System.out.println("DESCRIPTION SEARCH RESULTS "+description);
+
 PortletURL portletURL= renderResponse.createRenderURL();
 portletURL.setParameter("className",className);
 portletURL.setParameter("jspPage","/html/resourceInternalActivity/admin/searchresults.jsp");
@@ -32,6 +39,8 @@ portletURL.setParameter("groupId",Long.toString(groupIdSelected));
 portletURL.setParameter("actionEditing","true");
 portletURL.setParameter("resModuleId",String.valueOf(resModuleId));
 portletURL.setParameter("resId",String.valueOf(resId));
+portletURL.setParameter("title",String.valueOf(title));
+portletURL.setParameter("description",String.valueOf(description));
 
 %>
 <liferay-ui:search-container emptyResultsMessage="resourceInternalActivity.there-are-no-assets" iteratorURL="<%=portletURL%>"
@@ -103,6 +112,8 @@ pageContext.setAttribute("total", total);
  <liferay-portlet:param value="7" name="type"/>
  <liferay-portlet:param name="resModuleId" value="<%=String.valueOf(resModuleId) %>"/>
  <liferay-portlet:param name="resId" value="<%=String.valueOf(resId) %>"/>
+ <liferay-portlet:param name="title" value="<%=String.valueOf(title) %>" />
+<liferay-portlet:param name="description" value="<%=String.valueOf(description) %>" />
 </liferay-portlet:renderURL>
 
 <liferay-ui:search-container-column-text>

@@ -33,6 +33,9 @@ for (Object key:props.keySet()) {
 	allowedAssetTypes.addAll(ListUtil.toList(props.get(key).toString().split(",")));
 }
 
+String title =  ParamUtil.getString(request, "title", "");
+String description = ParamUtil.getString(request, "description","");
+
 long resId = ParamUtil.getLong(request,"resId",0);
 long resModuleId = ParamUtil.getLong(request,"resModuleId",0);
 String message = "new-activity-scorm";
@@ -46,6 +49,8 @@ if(resId > 0){
 	<liferay-portlet:param name="resId" value="<%=String.valueOf(resId) %>" />
 	<liferay-portlet:param name="resModuleId" value="<%=String.valueOf(resModuleId) %>" />
 	<liferay-portlet:param name="type" value="9" />
+	<liferay-portlet:param name="title" value="<%=String.valueOf(title) %>" />
+	<liferay-portlet:param name="description" value="<%=String.valueOf(description) %>" />
 </liferay-portlet:renderURL>
 
 
@@ -61,6 +66,8 @@ if(resId > 0){
 
 <liferay-portlet:renderURL var="selectResource">
 	<liferay-portlet:param name="jspPage" value="/html/scormactivity/admin/searchresults.jsp"/>
+	<liferay-portlet:param name="title" value="<%=String.valueOf(title) %>" />
+	<liferay-portlet:param name="description" value="<%=String.valueOf(description) %>" />
 </liferay-portlet:renderURL>
 <aui:form name="ressearch" action="<%=selectResource %>" method="POST">
 

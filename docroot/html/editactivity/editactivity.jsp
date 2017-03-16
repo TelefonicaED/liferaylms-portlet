@@ -1,3 +1,4 @@
+<%@page import="com.liferay.lms.model.impl.LearningActivityImpl"%>
 <%@page import="com.liferay.portal.kernel.util.PropsKeys"%>
 <%@page import="com.liferay.portal.kernel.util.PrefsPropsUtil"%>
 <%@page import="com.liferay.portal.model.ModelHintsUtil"%>
@@ -143,13 +144,20 @@ if (course!=null){
 	isCourse = true;
 }
 
+//title = ParamUtil.getString(request, "title", null);
+description = ParamUtil.getString(request, "description", "");
+String title = ParamUtil.getString(request, "title", "");
+System.out.println("TITLE ");
+System.out.println("DESCRIPTION "+description);
 %>
 
 <%
 if(learnact!=null)
 {
 	actId=learnact.getActId();
-	description=learnact.getDescription(themeDisplay.getLocale());
+	if(Validator.isNotNull(description)){
+		description=learnact.getDescription(themeDisplay.getLocale());	
+	}
 	
 	if(!learnact.isNullStartDate()){
 		Date startDate = learnact.getStartdate();
@@ -242,13 +250,21 @@ if(learnact!=null)
 		}
 	%>
 </div>
+	<% 
+	 if(Validator.isNotNull(title)){
+		 learnact.setTitle(title, themeDisplay.getLocale());
+	 }
 	
+	%>
 	<aui:model-context bean="<%= learnact %>" model="<%= LearningActivity.class %>" />
 
 <%
 }else{
+	learnact = new LearningActivityImpl();
+	learnact.setTitle(title, themeDisplay.getLocale());
+	
 	%>
-	<aui:model-context model="<%= LearningActivity.class %>" />
+	<aui:model-context  bean="<%= learnact %>"  model="<%= LearningActivity.class %>" />
 	<%
 }
 %>
