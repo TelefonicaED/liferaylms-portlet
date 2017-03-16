@@ -1,3 +1,8 @@
+<%@page import="com.liferay.portal.kernel.portlet.LiferayPortletResponse"%>
+<%@page import="com.liferay.portal.kernel.portlet.LiferayPortletRequest"%>
+<%@page import="com.liferay.portlet.asset.model.AssetRenderer"%>
+<%@page import="com.liferay.portlet.asset.model.AssetRendererFactory"%>
+<%@page import="com.liferay.portlet.asset.AssetRendererFactoryRegistryUtil"%>
 <%@page import="java.util.Collections"%>
 <%@page import="org.apache.commons.beanutils.BeanComparator"%>
 <%@page import="com.liferay.portal.kernel.util.PropsUtil"%>
@@ -33,20 +38,35 @@
 	LearningActivity learningActivity = LearningActivityLocalServiceUtil.getLearningActivity(ParamUtil.getLong(request,"resId"));
 	request.setAttribute("activity", learningActivity);
 
-	LiferayPortletURL backUrl = PortletURLFactoryUtil.create(request, PortalUtil.getJsSafePortletId("editactivity"+
-				PortletConstants.WAR_SEPARATOR+portletConfig.getPortletContext().getPortletContextName()), themeDisplay.getPlid(), PortletRequest.RENDER_PHASE);
-	
+	LiferayPortletURL backUrl = null;
+
 	if(learningActivity.getModuleId()>0){
+		backUrl = PortletURLFactoryUtil.create(request, PortalUtil.getJsSafePortletId("editactivity"+
+				PortletConstants.WAR_SEPARATOR+portletConfig.getPortletContext().getPortletContextName()), themeDisplay.getPlid(), PortletRequest.RENDER_PHASE);
+
 		backUrl.setWindowState(LiferayWindowState.NORMAL);
+		backUrl.setParameter("actId", String.valueOf(learningActivity.getActId()));
+		backUrl.setParameter("actionEditingActivity", StringPool.TRUE);
+		backUrl.setParameter("resId", String.valueOf(learningActivity.getActId()));	
+		backUrl.setParameter("resModuleId", String.valueOf(learningActivity.getModuleId()));
+		backUrl.setParameter("jspPage", "/html/editactivity/editactivity.jsp");
+		request.setAttribute("backUrl", backUrl.toString());
+		
 	}else{
-		backUrl.setWindowState(LiferayWindowState.POP_UP);
+		AssetRendererFactory laf = AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(LearningActivity.class.getName());
+		if (laf != null) {
+			AssetRenderer assetRenderer = laf.getAssetRenderer(learningActivity.getActId(), 0);
+
+			String urlEdit = assetRenderer.getURLEdit(liferayPortletRequest, liferayPortletResponse).toString();
+			System.out.println("*******URL EDIT: "+urlEdit);
+			request.setAttribute("backUrl", urlEdit);
+		}else{
+			System.out.println("*******laf: NULL");
+		}
 	}
-	backUrl.setParameter("actId", String.valueOf(learningActivity.getActId()));
-	backUrl.setParameter("actionEditingActivity", StringPool.TRUE);
-	backUrl.setParameter("resId", String.valueOf(learningActivity.getActId()));	
-	backUrl.setParameter("resModuleId", String.valueOf(learningActivity.getModuleId()));
-	backUrl.setParameter("jspPage", "/html/editactivity/editactivity.jsp");
-	request.setAttribute("backUrl", backUrl.toString());
+	
+
+	
 	String orderByCol =  (String)request.getAttribute("orderByCol");
 	if(orderByCol==null)
 		orderByCol="weight";
