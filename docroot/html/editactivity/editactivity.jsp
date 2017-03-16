@@ -147,8 +147,6 @@ if (course!=null){
 //title = ParamUtil.getString(request, "title", null);
 description = ParamUtil.getString(request, "description", "");
 String title = ParamUtil.getString(request, "title", "");
-System.out.println("TITLE ");
-System.out.println("DESCRIPTION "+description);
 %>
 
 <%
@@ -1048,7 +1046,7 @@ Liferay.provide(
 		
 		<%
 		
-		if(actId > 0 && moduleId>0){
+		if(actId > 0){
 			AssetRendererFactory assetRendererFactory = AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(LearningActivity.class.getName());
 
 		%>

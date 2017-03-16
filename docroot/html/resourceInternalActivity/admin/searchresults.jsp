@@ -29,9 +29,6 @@ title =  ParamUtil.getString(request, "title", "");
 description = ParamUtil.getString(request, "description","");
 
 
-System.out.println("TITLE SEARCH RESULTS "+title);
-System.out.println("DESCRIPTION SEARCH RESULTS "+description);
-
 PortletURL portletURL= renderResponse.createRenderURL();
 portletURL.setParameter("className",className);
 portletURL.setParameter("jspPage","/html/resourceInternalActivity/admin/searchresults.jsp");

@@ -44,8 +44,6 @@ long resModuleId = ParamUtil.getLong(request,"resModuleId",0);
 String title =  ParamUtil.getString(request, "title", "");
 String description = ParamUtil.getString(request, "description","");
 
-System.out.println("TITLE SEARCH RESOURCE "+title);
-System.out.println("DESCRIPTION SEARCH RESOURCE "+description);
 
 
 String message = "new-activity-resourceinternal";
