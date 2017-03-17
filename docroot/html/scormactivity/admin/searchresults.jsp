@@ -23,6 +23,7 @@ ServiceContext serviceContext=ServiceContextFactory.getInstance( renderRequest);
 
 title =  ParamUtil.getString(request, "title", "");
 description = ParamUtil.getString(request, "description","");
+passPuntuation = ParamUtil.getString(request,"passpuntuation","0");
 
 AssetRendererFactory selarf=AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(className);
 long[] groupIds=new long[1];
@@ -39,6 +40,7 @@ portletURL.setParameter("resModuleId",String.valueOf(resModuleId));
 portletURL.setParameter("resId",String.valueOf(resId));
 portletURL.setParameter("title",String.valueOf(title));
 portletURL.setParameter("description",String.valueOf(description));
+portletURL.setParameter("passpuntuation",String.valueOf(passPuntuation));
 %>
 
 
@@ -88,6 +90,7 @@ portletURL.setParameter("description",String.valueOf(description));
 		 <liferay-portlet:param name="sco" value=" "/>
 		  <liferay-portlet:param name="title" value="<%=String.valueOf(title) %>" />
 		 <liferay-portlet:param name="description" value="<%=String.valueOf(description) %>" />
+		 <liferay-portlet:param name="passpuntuation" value="<%=String.valueOf(passPuntuation) %>" />
 		</liferay-portlet:renderURL>
 		
 		<liferay-portlet:renderURL var="selectSCOURL">
@@ -99,6 +102,7 @@ portletURL.setParameter("description",String.valueOf(description));
 		 <liferay-portlet:param value="9" name="type"/>
 		 <liferay-portlet:param name="title" value="<%=String.valueOf(title) %>" />
 		<liferay-portlet:param name="description" value="<%=String.valueOf(description) %>" />
+		<liferay-portlet:param name="passpuntuation" value="<%=String.valueOf(passPuntuation) %>" />
 		</liferay-portlet:renderURL>
 		
 		<liferay-ui:search-container-column-text>

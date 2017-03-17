@@ -781,10 +781,14 @@ Liferay.provide(
 				
 		if(larntype.isScoreConfigurable())
 		{
-			long score=Long.valueOf(larntype.getDefaultScore());
-			if(learnact!=null)
-			{
-				score=learnact.getPasspuntuation();
+			
+			long score = Long.parseLong(ParamUtil.getString(request, "passpuntuation","0"));
+			if(score==0){
+				score=Long.valueOf(larntype.getDefaultScore());
+				if(learnact!=null)
+				{
+					score=learnact.getPasspuntuation();
+				}
 			}
 			String passpuntuationLabelProperty = "passpuntuation";
 			String passpunctuationHelpProperty= "editActivity.passpuntuation.help";

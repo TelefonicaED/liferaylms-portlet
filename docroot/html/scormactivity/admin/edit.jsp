@@ -211,7 +211,7 @@ function <portlet:namespace />goToSearchResource(){
 	
 	url +='&<portlet:namespace/>title='+$('#<portlet:namespace />title_'+languageId).val();
 	url += '&<portlet:namespace/>description='+$('#<portlet:namespace />description').val();
-		
+	url += '&<portlet:namespace/>passpuntuation='+$('#<portlet:namespace />passpuntuation').val();	
 	location.href=url;
 		
 

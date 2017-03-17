@@ -35,6 +35,8 @@ for (Object key:props.keySet()) {
 
 String title =  ParamUtil.getString(request, "title", "");
 String description = ParamUtil.getString(request, "description","");
+String passPuntuation = ParamUtil.getString(request,"passpuntuation","0");
+
 
 long resId = ParamUtil.getLong(request,"resId",0);
 long resModuleId = ParamUtil.getLong(request,"resModuleId",0);
@@ -51,6 +53,7 @@ if(resId > 0){
 	<liferay-portlet:param name="type" value="9" />
 	<liferay-portlet:param name="title" value="<%=String.valueOf(title) %>" />
 	<liferay-portlet:param name="description" value="<%=String.valueOf(description) %>" />
+	<liferay-portlet:param name="passpuntuation" value="<%=String.valueOf(passPuntuation) %>" />
 </liferay-portlet:renderURL>
 
 
@@ -68,6 +71,7 @@ if(resId > 0){
 	<liferay-portlet:param name="jspPage" value="/html/scormactivity/admin/searchresults.jsp"/>
 	<liferay-portlet:param name="title" value="<%=String.valueOf(title) %>" />
 	<liferay-portlet:param name="description" value="<%=String.valueOf(description) %>" />
+	<liferay-portlet:param name="passpuntuation" value="<%=String.valueOf(passPuntuation) %>" />
 </liferay-portlet:renderURL>
 <aui:form name="ressearch" action="<%=selectResource %>" method="POST">
 
