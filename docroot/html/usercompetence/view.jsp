@@ -62,7 +62,7 @@
 				    else
 				    {
 				    	%>
-				    	<%=cc.getTitle(themeDisplay.getLocale())%>
+				    	<%=cc.getCourseTitle(themeDisplay.getLocale())%>
 				    	<%
 				    }
 					%>
