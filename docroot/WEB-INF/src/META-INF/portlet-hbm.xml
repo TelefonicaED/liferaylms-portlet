@@ -79,6 +79,7 @@
 		<property name="generateCertificate" type="com.liferay.portal.dao.orm.hibernate.BooleanType" />
 		<property name="diplomaTemplate" type="com.liferay.portal.dao.orm.hibernate.StringType" />
 		<property name="diplomaBackground" type="com.liferay.portal.dao.orm.hibernate.LongType" />
+		<property name="diplomaAdditional" type="com.liferay.portal.dao.orm.hibernate.LongType" />
 	</class>
 	<class name="com.liferay.lms.model.impl.CourseImpl" table="Lms_Course">
 		<cache usage="read-write" />

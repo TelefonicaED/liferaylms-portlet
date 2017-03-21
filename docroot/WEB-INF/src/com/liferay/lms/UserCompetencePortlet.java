@@ -29,6 +29,7 @@ import org.xhtmlrenderer.pdf.ITextRenderer;
 import com.liferay.lms.model.Competence;
 import com.liferay.lms.model.Course;
 import com.liferay.lms.model.CourseResult;
+import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.model.LmsPrefs;
 import com.liferay.lms.model.Module;
 import com.liferay.lms.model.ModuleResult;
@@ -36,6 +37,7 @@ import com.liferay.lms.model.UserCompetence;
 import com.liferay.lms.service.CompetenceLocalServiceUtil;
 import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.lms.service.CourseResultLocalServiceUtil;
+import com.liferay.lms.service.LearningActivityServiceUtil;
 import com.liferay.lms.service.LmsPrefsLocalServiceUtil;
 import com.liferay.lms.service.ModuleLocalServiceUtil;
 import com.liferay.lms.service.ModuleResultLocalServiceUtil;
@@ -44,6 +46,7 @@ import com.liferay.lms.service.UserCompetenceLocalServiceUtil;
 import com.liferay.lms.views.CompetenceView;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -57,12 +60,16 @@ import com.liferay.portal.kernel.xml.Attribute;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
+import com.liferay.portal.model.Group;
 import com.liferay.portal.model.User;
 import com.liferay.portal.model.UserGroupRole;
+import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.UserGroupRoleLocalServiceUtil;
 import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
+import com.liferay.portlet.asset.model.AssetEntry;
+import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
 import com.liferay.portlet.expando.model.ExpandoColumn;
 import com.liferay.portlet.expando.model.ExpandoColumnConstants;
 import com.liferay.portlet.expando.service.ExpandoColumnLocalServiceUtil;
@@ -315,6 +322,71 @@ public class UserCompetencePortlet extends MVCPortlet {
 			
 			renderer.layout(); 
 			
+			// Si se incluye otra pagina mas informacion adicional en el diploma
+			if (competence.getDiplomaAdditional() > 0) {
+				StringBuffer sb = new StringBuffer("<html xmlns=\"http://www.w3.org/1999/xhtml\"><head><style type=\"text/css\">");
+				sb.append("@page { size: ");
+				sb.append(competence.getPage() + "}");
+				sb.append("</style></head><body>");
+				if (competence.getDiplomaAdditional() == 1 || competence.getDiplomaAdditional() == 2) {
+					sb.append("<h3>" + LanguageUtil.get(themeDisplay.getLocale(), "competence.template.topics") + "</h3>");
+					sb.append("<ul>");
+					for(Module module : modules) {
+						sb.append("<li>");
+						sb.append("<h4>" + module.getTitle(themeDisplay.getLocale()) + "</h4>");
+						if(competence.getDiplomaAdditional() == 2) {
+							List<LearningActivity> activities = new ArrayList<LearningActivity>();
+							try {
+								activities = LearningActivityServiceUtil.getLearningActivitiesOfModule(module.getModuleId());
+							} catch (Exception e) {
+								log.error("Se ha producido un error al obtener la lista de actividades del módulo " + module.getTitle(themeDisplay.getLocale()));
+							}
+							sb.append("<ul>");
+							for(LearningActivity learningActivity : activities) {
+								sb.append("<li>");
+								sb.append(learningActivity.getTitle(themeDisplay.getLocale()));
+								sb.append("</li>");
+							}
+							sb.append("</ul>");
+						}
+						sb.append("</li>");
+						
+					}
+					sb.append("</ul>");
+				} else if (competence.getDiplomaAdditional() == 3) {
+					sb.append("<p>");
+					try {
+						Group group = GroupLocalServiceUtil.getGroup(course.getGroupCreatedId());
+						if (Validator.isNotNull(group)) {
+							AssetEntry entry = null; 
+							try {
+								entry = AssetEntryLocalServiceUtil.getEntry(Course.class.getName(),course.getCourseId());
+							} catch (Exception e) {
+								log.error("Se ha producido un error al buscar la información adicional del curso " + course.getCourseId());
+							}
+							if (Validator.isNotNull(entry)) {
+								String summary = entry.getSummary(themeDisplay.getLocale(), Boolean.TRUE);
+								if (Validator.isNotNull(summary) && !summary.isEmpty()) {
+									summary = summary.replaceAll(StringPool.NEW_LINE, "<br/>");
+								}
+								sb.append(summary);
+							}
+						}
+					} catch (Exception e) {
+						log.error("Se ha producido un error al obtener la información adicional del curso " + course.getGroupCreatedId(), e);
+					}
+					sb.append("</p>");
+				}
+				 
+				sb.append("</body></html>");
+					
+				log.info(sb.toString());
+					
+				renderer.setDocumentFromString(sb.toString());
+				renderer.layout();
+				renderer.writeNextDocument();
+			}
+				
 			renderer.finishPDF();
 			
 			// Si se ha descargado el diploma => Se deja traza de la descarga 

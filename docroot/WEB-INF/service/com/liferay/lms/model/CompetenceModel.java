@@ -574,6 +574,20 @@ public interface CompetenceModel extends BaseModel<Competence>, WorkflowedModel 
 	public void setDiplomaBackground(long diplomaBackground);
 
 	/**
+	 * Returns the diploma additional of this competence.
+	 *
+	 * @return the diploma additional of this competence
+	 */
+	public long getDiplomaAdditional();
+
+	/**
+	 * Sets the diploma additional of this competence.
+	 *
+	 * @param diplomaAdditional the diploma additional of this competence
+	 */
+	public void setDiplomaAdditional(long diplomaAdditional);
+
+	/**
 	 * @deprecated Renamed to {@link #isApproved()}
 	 */
 	public boolean getApproved();
