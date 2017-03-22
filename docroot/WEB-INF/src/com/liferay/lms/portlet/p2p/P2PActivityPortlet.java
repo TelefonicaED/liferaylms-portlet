@@ -54,7 +54,6 @@ import com.liferay.portal.kernel.upload.UploadPortletRequest;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PrefsPropsUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
-import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -223,24 +222,29 @@ public class P2PActivityPortlet extends MVCPortlet {
 					}
 					
 					//A�adir la actividad a bd
-					P2pActivityLocalServiceUtil.addP2pActivity(p2pActivity);
+					P2pActivity p2pActivityResult = P2pActivityLocalServiceUtil.addP2pActivity(p2pActivity);
 					
-					//Creamos el LearningActivityTry
-					LearningActivityTry learningTry =LearningActivityTryLocalServiceUtil.createLearningActivityTry(actId,serviceContext);
-					learningTry.setStartDate(new Date());
-					learningTry.setUserId(user.getUserId());
-					learningTry.setResult(0);
-					LearningActivityTryLocalServiceUtil.updateLearningActivityTry(learningTry);
-					boolean deregisterMail = false;
-					if(user.getExpandoBridge().getAttribute(LiferaylmsUtil.DEREGISTER_USER_EXPANDO,false)!=null){
-						deregisterMail = (Boolean)user.getExpandoBridge().getAttribute(LiferaylmsUtil.DEREGISTER_USER_EXPANDO,false);
-					}
+					if(p2pActivityResult != null){
 					
-					if(!deregisterMail){
-						//Enviar por email que se ha entregado una tarea p2p.
-						P2PActivityPortlet.sendMailP2pDone(user, actId, themeDisplay);
+						//Creamos el LearningActivityTry
+						LearningActivityTry learningTry =LearningActivityTryLocalServiceUtil.createLearningActivityTry(actId,serviceContext);
+						learningTry.setStartDate(new Date());
+						learningTry.setUserId(user.getUserId());
+						learningTry.setResult(0);
+						LearningActivityTryLocalServiceUtil.updateLearningActivityTry(learningTry);
+						boolean deregisterMail = false;
+						if(user.getExpandoBridge().getAttribute(LiferaylmsUtil.DEREGISTER_USER_EXPANDO,false)!=null){
+							deregisterMail = (Boolean)user.getExpandoBridge().getAttribute(LiferaylmsUtil.DEREGISTER_USER_EXPANDO,false);
+						}
+						
+						if(!deregisterMail){
+							//Enviar por email que se ha entregado una tarea p2p.
+							P2PActivityPortlet.sendMailP2pDone(user, actId, themeDisplay);
+						}
+						request.setAttribute("latId", learningTry.getLatId());
+					}else{
+						SessionErrors.add(request, "error-subir-p2p");
 					}
-					request.setAttribute("latId", learningTry.getLatId());
 					
 				}
 			}
@@ -737,8 +741,8 @@ public class P2PActivityPortlet extends MVCPortlet {
 			//- (La actividad no tiene nota) || (nota mayor a la necesaria para aprobar) || (recibido todas las correcciones)
 			if(correctionCompleted && ((!result.equals("true")) || (value >= activity.getPasspuntuation()) || correctionCompletedAboutMe)){
 				_log.info("Modifiao la fecha de fin del result");
-			learningActivityResult.setPassed(value >= learningActivity.getPasspuntuation());
-			learningActivityResult.setEndDate(new java.util.Date(System.currentTimeMillis()));
+				learningActivityResult.setPassed(value >= learningActivity.getPasspuntuation());
+				learningActivityResult.setEndDate(new java.util.Date(System.currentTimeMillis()));
 			}
 			
 			LearningActivityResultLocalServiceUtil.updateLearningActivityResult(learningActivityResult);
