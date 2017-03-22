@@ -84,6 +84,7 @@ public class CompetenceLocalServiceImpl extends CompetenceLocalServiceBaseImpl {
 			competence.setGroupId(serviceContext.getScopeGroupId());
 			competence.setDiplomaTemplate(ParamUtil.getString(serviceContext.getRequest(),"template",StringPool.BLANK ),serviceContext.getLocale());
 			competence.setDiplomaBackground(ParamUtil.getLong(serviceContext.getRequest(), "diplomaBackground", 0));
+			competence.setDiplomaAdditional(ParamUtil.getLong(serviceContext.getRequest(), "diplomaAdditional", 0));
 			competence.setGenerateCertificate(generateCertificate);
 			competence.setUserId(userId);
 			competence.setDescription(description,serviceContext.getLocale());
@@ -241,6 +242,7 @@ public class CompetenceLocalServiceImpl extends CompetenceLocalServiceBaseImpl {
 					    + fileEntry.getFolderId() + "/"
 					    + ((DLFileEntry) fileEntry.getModel()).getName() + "/"
 					    + fileEntry.getVersion();
+				
 			} else {
 				url = getBGImageURL(groupId, request);
 			}

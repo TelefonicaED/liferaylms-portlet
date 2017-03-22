@@ -60,8 +60,6 @@
 	if (Validator.isNotNull(folder)) {
 		
 		fondosTotal = DLAppServiceUtil.getFileEntriesCount(repositoryId, folder.getFolderId());
-		
-// 		fileEntryList = DLAppServiceUtil.getFileEntries(repositoryId, folder.getFolderId());
 
 		int start = (cur - 1) * delta;
 		int end = start + delta;
@@ -82,12 +80,6 @@
 <liferay-ui:success key="add-diploma-background-success" message="competence.add-diploma-background-success" />
 <liferay-ui:error key="add-diploma-background-error" message="competence.add-diploma-background-error" />
 <liferay-ui:error key="duplicate-diploma-background-error" message="competence.duplicate-diploma-background-error" />
-
-<%--
-<liferay-portlet:renderURL var="fondosSearchContainerURL" >
-	<liferay-portlet:param name="jspPage" value="/html/competencesadmin/editbackground.jsp"/>
-</liferay-portlet:renderURL>
---%>
 
 <liferay-ui:search-container iteratorURL="<%=fondosSearchContainerURL%>">
 	<liferay-ui:search-container-results total="<%=fondosTotal%>" results="<%=fileEntryList%>" />

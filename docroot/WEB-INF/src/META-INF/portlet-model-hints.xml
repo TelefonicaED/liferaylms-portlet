@@ -50,6 +50,7 @@
 		<field name="generateCertificate" type="boolean" />
 		<field name="diplomaTemplate" type="String" localized="true" />
 		<field name="diplomaBackground" type="long" />
+		<field name="diplomaAdditional" type="long" />
 	</model>
 	<model name="com.liferay.lms.model.Course">
 		<field name="uuid" type="String" />

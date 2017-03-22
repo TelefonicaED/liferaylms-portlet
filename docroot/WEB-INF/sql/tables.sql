@@ -51,7 +51,8 @@ create table Lms_Competence (
 	page VARCHAR(75) null,
 	generateCertificate BOOLEAN,
 	diplomaTemplate STRING null,
-	diplomaBackground LONG
+	diplomaBackground LONG,
+	diplomaAdditional LONG
 );
 
 create table Lms_Course (

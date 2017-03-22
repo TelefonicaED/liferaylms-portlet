@@ -122,16 +122,13 @@ else
 			
 			try {
 				fileEntryList = DLAppServiceUtil.getFileEntries(repositoryId, folder.getFolderId());
-				
-// 				for(FileEntry fileEntry : fileEntryList) {
-// 					log.info(fileEntry.getTitle() + " (" + fileEntry.getSize() + ")");
-// 				}
 			} catch (PortalException e) {
+				
 			} catch (SystemException e) {
+				
 			}
-		} else {
-// 			log.error("No se ha encontrado el directorio " + path);
 		}
+		
 	}
 	
 	// Se obtienen los campos personalizados asociados a Curso
@@ -140,6 +137,9 @@ else
 		courseExpandoColumnList = ExpandoColumnLocalServiceUtil.getDefaultTableColumns(themeDisplay.getCompanyId(), Course.class.getName());
 	} catch (SystemException e) {
 	}
+	
+	// Tipos de informacion a mostrar en la segunda pagina
+	String [] diplomaAdditionalTypes = PropsUtil.get("com.liferay.lms.diploma.additional.type").split(StringPool.COMMA);
 
 %>
 
@@ -246,6 +246,17 @@ else
 			</c:forEach>
 		</div>
 		
+		<aui:field-wrapper>
+		
+			<aui:select name="diplomaAdditional" label="competence.diplomaAdditional" >
+				<aui:option label="" value="0" />
+				<c:forEach items="<%=diplomaAdditionalTypes%>" var="type" >
+					<aui:option label="competence.diplomaAdditional.${type}" value="${type}" selected="${type == competence.diplomaAdditional}" />
+				</c:forEach>
+			</aui:select>
+		
+		</aui:field-wrapper>
+		
 		<aui:button-row>
 			<a id='<portlet:namespace/>viewPreviewLink' href="" target="_blank" ><liferay-ui:message key="preview"/></a>
 
@@ -260,6 +271,7 @@ else
 				var page = A.one('select#<portlet:namespace/>page').val();
 				var template = window.<portlet:namespace/>template.getHTML();
 				var background = A.one('#<portlet:namespace/>diplomaBackground').val();
+				var additional = A.one('select#<portlet:namespace/>diplomaAdditional').val();
 							
 				var resourceURL = Liferay.PortletURL.createResourceURL();
 				resourceURL.setPortletId('<%=portletId%>');
@@ -267,6 +279,7 @@ else
 				resourceURL.setParameter('page', page);
 				resourceURL.setParameter('template', template);
 				resourceURL.setParameter('background', background);
+				resourceURL.setParameter('additional', additional);
 				
 				var viewPreviewLink = A.one('a#<portlet:namespace/>viewPreviewLink');
 				viewPreviewLink.attr('href', resourceURL.toString());

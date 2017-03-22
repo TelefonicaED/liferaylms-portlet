@@ -80,6 +80,7 @@
 			<basic name="generateCertificate" />
 			<basic name="diplomaTemplate" />
 			<basic name="diplomaBackground" />
+			<basic name="diplomaAdditional" />
 			<transient name="descriptionCurrentLanguageId" />
 			<transient name="descriptionMap" />
 			<transient name="diplomaTemplateCurrentLanguageId" />

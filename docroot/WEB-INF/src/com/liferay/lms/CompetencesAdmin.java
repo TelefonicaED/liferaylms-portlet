@@ -42,6 +42,7 @@ import com.liferay.portal.kernel.bean.PortletBeanLocatorUtil;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
+import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.language.LanguageUtil;
@@ -199,6 +200,7 @@ public class CompetencesAdmin extends MVCPortlet{
 		boolean generateCertificate= ParamUtil.getBoolean(actionRequest, "generateCertificate", false);
 		String template= ParamUtil.getString(actionRequest, "template", StringPool.BLANK);
 		long background = ParamUtil.getLong(actionRequest, "diplomaBackground", 0);
+		long additional = ParamUtil.getLong(actionRequest, "diplomaAdditional", 0);
 		String page = ParamUtil.getString(actionRequest, "page", StringPool.BLANK);
 		
 		Competence competence=null;
@@ -228,6 +230,7 @@ public class CompetencesAdmin extends MVCPortlet{
 			competence.setGenerateCertificate(generateCertificate);
 			competence.setDiplomaTemplate(template);
 			competence.setDiplomaBackground(background);
+			competence.setDiplomaAdditional(additional);
 			competence.setPage(page);
 			try {
 				CompetenceLocalServiceUtil.updateCompetence(competence, serviceContext);
@@ -392,6 +395,15 @@ public class CompetencesAdmin extends MVCPortlet{
 				DLAppServiceUtil.deleteFileEntry(fileEntryId);
 				
 				SessionMessages.add(actionRequest, "delete-diploma-background-success");
+				
+				List<Competence> competenceList = CompetenceLocalServiceUtil.getCompetences(QueryUtil.ALL_POS, QueryUtil.ALL_POS);
+				for(Competence competence : competenceList) {
+					if (competence.getDiplomaBackground() == fileEntryId) {
+						competence.setDiplomaBackground(0L);
+						
+						CompetenceLocalServiceUtil.updateCompetence(competence);
+					}
+				}
 			} catch (PortalException e) {
 				log.error("No se ha podido eliminar el fichero fileEntryId=" + fileEntryId, e);
 				
@@ -426,6 +438,7 @@ public class CompetencesAdmin extends MVCPortlet{
 		String page = ParamUtil.getString(resourceRequest, "page", "A4");
 		String template = ParamUtil.getString(resourceRequest, "template", templateContentDefault);
 		long background = ParamUtil.getLong(resourceRequest, "background", 0);
+		long additional = ParamUtil.getLong(resourceRequest, "additional", 0);
 		
 		log.debug(title);
 		log.debug(page);
@@ -437,7 +450,7 @@ public class CompetencesAdmin extends MVCPortlet{
 		if(themeDisplay.isSignedIn()) {
 			try {
 				OutputStream out = resourceResponse.getPortletOutputStream();
-				printCertificate(out, title, page, template, background, resourceRequest);
+				printCertificate(out, title, page, template, background, additional, resourceRequest);
 				out.close();
 			} catch (PortalException e) {
 				if (log.isDebugEnabled())
@@ -453,7 +466,7 @@ public class CompetencesAdmin extends MVCPortlet{
 		
 	}
 	
-    private void printCertificate(OutputStream out,String title, String page, String template, long background,PortletRequest request) throws SystemException, PortalException, IOException, DocumentException {
+    private void printCertificate(OutputStream out,String title, String page, String template, long background, long additional, PortletRequest request) throws SystemException, PortalException, IOException, DocumentException {
     	
 		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(WebKeys.THEME_DISPLAY);
 		long groupId = themeDisplay.getScopeGroupId();
@@ -463,6 +476,7 @@ public class CompetencesAdmin extends MVCPortlet{
 		String courseNameDefault = LanguageUtil.get(themeDisplay.getLocale(), "competence.template.courseName");
 		String userNameDefault = LanguageUtil.get(themeDisplay.getLocale(), "competence.template.userName");
 		String modulesNamesDefault = LanguageUtil.get(themeDisplay.getLocale(), "competence.template.modulesNames");
+		String activitiesNamesDefault = LanguageUtil.get(themeDisplay.getLocale(), "competence.template.activitiesNames");
 		String teachersNamesDefault = LanguageUtil.get(themeDisplay.getLocale(), "competence.template.teachersNames");
 		
 		DateFormat dateFormatDate = DateFormat.getDateInstance(DateFormat.SHORT,user.getLocale());
@@ -494,7 +508,8 @@ public class CompetencesAdmin extends MVCPortlet{
 			
 		StringBuffer modulesNames = new StringBuffer(StringPool.BLANK);
 		modulesNames.append("<ul>");
-		for(int i = 0; i < 3; i++) {
+		int modulesMax = 5;
+		for(int i = 0; i < modulesMax; i++) {
 			modulesNames.append("<li>" + modulesNamesDefault.replace("{0}", String.valueOf(i)) + "</li>");
 		}
 		modulesNames.append("</ul>");
@@ -527,6 +542,7 @@ public class CompetencesAdmin extends MVCPortlet{
 					    + fileEntry.getFolderId() + "/"
 					    + ((DLFileEntry) fileEntry.getModel()).getName() + "/"
 					    + fileEntry.getVersion();
+				
 				log.info("URL: " + imageurl);
 				
 				html.append(" ; background: url(");
@@ -575,7 +591,49 @@ public class CompetencesAdmin extends MVCPortlet{
 			if(log.isDebugEnabled())e.printStackTrace();
 		}
 			
-		renderer.layout(); 
+		renderer.layout();
+		
+		// Si se incluye otra pagina mas informacion adicional en el diploma
+		if (additional > 0) {
+			StringBuffer sb = new StringBuffer("<html xmlns=\"http://www.w3.org/1999/xhtml\"><head><style type=\"text/css\">");
+			sb.append("@page { size: ");
+			sb.append(page + "}");
+			sb.append("</style></head><body>");
+			if (additional == 1 || additional == 2) {
+				sb.append("<h3>" + LanguageUtil.get(themeDisplay.getLocale(), "competence.template.topics") + "</h3>");
+				sb.append("<ul>");
+				for(int i = 0; i < modulesMax; i++) {
+					sb.append("<li>");
+					sb.append("<h4>" + modulesNamesDefault.replace("{0}", String.valueOf(i)) + "</h4>");
+					if(additional == 2) {
+						int max = i * 2 + 1;
+						sb.append("<ul>");
+						for(int j = 0; j < max; j++) {
+							sb.append("<li>");
+							sb.append(activitiesNamesDefault.replace("{0}", String.valueOf(j)));
+							sb.append("</li>");
+						}
+						sb.append("</ul>");
+					}
+					sb.append("</li>");
+					
+				}
+				sb.append("</ul>");
+			} else if (additional == 3) {
+//				sb.append("<h3>" + LanguageUtil.get(themeDisplay.getLocale(), "competence.template.topics") + "</h3>");
+				sb.append("<p>");
+				sb.append(LanguageUtil.get(themeDisplay.getLocale(), "competence.template.courseSummary"));
+				sb.append("</p>");
+			}
+			 
+			sb.append("</body></html>");
+				
+			log.info(sb.toString());
+				
+			renderer.setDocumentFromString(sb.toString());
+			renderer.layout();
+			renderer.writeNextDocument();
+		}
 			
 		renderer.finishPDF();
 

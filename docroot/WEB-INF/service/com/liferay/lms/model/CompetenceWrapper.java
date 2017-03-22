@@ -60,6 +60,7 @@ public class CompetenceWrapper implements Competence, ModelWrapper<Competence> {
 		attributes.put("generateCertificate", getGenerateCertificate());
 		attributes.put("diplomaTemplate", getDiplomaTemplate());
 		attributes.put("diplomaBackground", getDiplomaBackground());
+		attributes.put("diplomaAdditional", getDiplomaAdditional());
 
 		return attributes;
 	}
@@ -154,6 +155,12 @@ public class CompetenceWrapper implements Competence, ModelWrapper<Competence> {
 
 		if (diplomaBackground != null) {
 			setDiplomaBackground(diplomaBackground);
+		}
+
+		Long diplomaAdditional = (Long)attributes.get("diplomaAdditional");
+
+		if (diplomaAdditional != null) {
+			setDiplomaAdditional(diplomaAdditional);
 		}
 	}
 
@@ -820,6 +827,24 @@ public class CompetenceWrapper implements Competence, ModelWrapper<Competence> {
 	*/
 	public void setDiplomaBackground(long diplomaBackground) {
 		_competence.setDiplomaBackground(diplomaBackground);
+	}
+
+	/**
+	* Returns the diploma additional of this competence.
+	*
+	* @return the diploma additional of this competence
+	*/
+	public long getDiplomaAdditional() {
+		return _competence.getDiplomaAdditional();
+	}
+
+	/**
+	* Sets the diploma additional of this competence.
+	*
+	* @param diplomaAdditional the diploma additional of this competence
+	*/
+	public void setDiplomaAdditional(long diplomaAdditional) {
+		_competence.setDiplomaAdditional(diplomaAdditional);
 	}
 
 	/**
