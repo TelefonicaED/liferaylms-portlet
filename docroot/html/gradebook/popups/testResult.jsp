@@ -90,11 +90,11 @@ if(actId == 0){
 			
 				if(oldResult<larntry.getResult()){
 		%>
-					<p><liferay-ui:message key="execActivity.improve.result" arguments="<%=new Object[]{ct.translate(themeDisplay.getLocale(), themeDisplay.getCompanyId(),oldResult)} %>" /></p>
+					<p><liferay-ui:message key="execActivity.improve.result" arguments="<%=new Object[]{ct.translate(themeDisplay.getLocale(), themeDisplay.getScopeGroupId(),oldResult)} %>" /></p>
 		<%		
 				}else {
 		%>
-					<p><liferay-ui:message key="execActivity.not.improve.result" arguments="<%=new Object[]{ct.translate(themeDisplay.getLocale(), themeDisplay.getCompanyId(),oldResult)} %>" /></p>
+					<p><liferay-ui:message key="execActivity.not.improve.result" arguments="<%=new Object[]{ct.translate(themeDisplay.getLocale(), themeDisplay.getScopeGroupId(),oldResult)} %>" /></p>
 		<%		}
 			}%>
 		
@@ -104,7 +104,7 @@ if(actId == 0){
 		
 			CalificationType ct = new CalificationTypeRegistry().getCalificationType(CourseLocalServiceUtil.getCourseByGroupCreatedId(learningActivity.getGroupId()).getCalificationType());
 		%>	
-			<p class="color_tercero negrita"><liferay-ui:message key="your-result-dont-pass"  arguments="<%=new Object[]{ct.translate(themeDisplay.getLocale(), themeDisplay.getCompanyId(), learningActivity.getPasspuntuation())} %>" /></p>
+			<p class="color_tercero negrita"><liferay-ui:message key="your-result-dont-pass"  arguments="<%=new Object[]{ct.translate(themeDisplay.getLocale(), themeDisplay.getScopeGroupId(), learningActivity.getPasspuntuation())} %>" /></p>
 		<% }
 		if(tries>0 && userTries >= tries )	{
 		%><p class="color_tercero"><liferay-ui:message key="your-result-no-more-tries" /></p><%

@@ -7683,6 +7683,8 @@ public class LearningActivityPersistenceImpl extends BasePersistenceImpl<Learnin
 	protected TestAnswerPersistence testAnswerPersistence;
 	@BeanReference(type = TestQuestionPersistence.class)
 	protected TestQuestionPersistence testQuestionPersistence;
+	@BeanReference(type = UserCertificateDownloadPersistence.class)
+	protected UserCertificateDownloadPersistence userCertificateDownloadPersistence;
 	@BeanReference(type = UserCompetencePersistence.class)
 	protected UserCompetencePersistence userCompetencePersistence;
 	@BeanReference(type = ResourcePersistence.class)

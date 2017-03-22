@@ -105,7 +105,11 @@
 	
 %>
 <aui:field-wrapper label="video" >
-  	<aui:input readonly="<%=readonly %>" name="youtubecode" type="textarea" rows="6" cols="45" label="youtube-code" value="<%=youtubecode %>" ignoreRequestValue="true" helpMessage="<%=LanguageUtil.get(pageContext,\"youtube-code-help\")%>"></aui:input>
+	<%if(readonly) {%>
+		<aui:input readonly="<%=readonly %>" name="youtubecode" type="textarea" rows="6" cols="45" label="youtube-code" value="<%=youtubecode %>" ignoreRequestValue="true" helpMessage="<%=LanguageUtil.get(pageContext,\"youtube-code-help\")%>"></aui:input>
+	<%}else{ %>
+		<aui:input name="youtubecode" type="textarea" rows="6" cols="45" label="youtube-code" value="<%=youtubecode %>" ignoreRequestValue="true" helpMessage="<%=LanguageUtil.get(pageContext,\"youtube-code-help\")%>"></aui:input>
+	<%} %>
   	<aui:input label="resourceexternalactivity.videocontrol.disabled" name="videoControl" type="checkbox" value="<%= defaultValueCheckBox %>" />
 </aui:field-wrapper>
 <script type="text/javascript">
@@ -198,9 +202,12 @@
 			<%}
 			
 			if(elements.size()==0){
-			%>			
-				<aui:input readonly="<%=readonly %>" inlineLabel="left" inlineField="true" name="additionalFile" label="" id="additionalFile" type="file" value="" />
-			<%} %>
+				if(readonly) {%>
+					<aui:input readonly="<%=readonly %>" inlineLabel="left" inlineField="true" name="additionalFile" label="" id="additionalFile" type="file" value="" />
+				<%}else{ %>
+					<aui:input inlineLabel="left" inlineField="true" name="additionalFile" label="" id="additionalFile" type="file" value="" />
+				<%} 
+			} %>
 		</div>
 	<div class="container-buttons">
 		<a href="#" id="add_attachment" style="<%=(elements.size()>=maxfile)?"display:none":"" %>" class="add_attachment bt_new" onclick="addFileInput(); return false;"><liferay-ui:message key="resource.external.add.other" /></a>		

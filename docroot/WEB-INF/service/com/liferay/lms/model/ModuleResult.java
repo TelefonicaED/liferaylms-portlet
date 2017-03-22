@@ -36,10 +36,10 @@ public interface ModuleResult extends ModuleResultModel, PersistedModel {
 	public java.lang.String translateResultWithSuffix(java.util.Locale locale);
 
 	public java.lang.String translateResult(java.util.Locale locale,
-		long companyId,
+		long groupId,
 		com.liferay.lms.learningactivity.calificationtype.CalificationType ct);
 
 	public java.lang.String translateResultWithSuffix(java.util.Locale locale,
-		long companyId,
+		long groupId,
 		com.liferay.lms.learningactivity.calificationtype.CalificationType ct);
 }

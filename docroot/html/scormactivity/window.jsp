@@ -255,8 +255,27 @@
                          
               var exception = message.exception;  
               	if (!exception){
-              		// Process Success - A LearningActivityResult returned
-                  } 
+              		if (message.passed) {
+						if(window.opener)
+						{
+					    	if (typeof window.opener.updateActivityNavigation == 'function')
+								window.opener.updateActivityNavigation(); 
+							if (typeof window.opener.updateActivityList == 'function') 
+								window.opener.updateActivityList(); 
+							if (typeof window.opener.updateScormStatus == 'function')
+								window.opener.updateScormStatus(message); 
+						}
+						
+						if (typeof window.updateActivityNavigation == 'function')
+							window.updateActivityNavigation(); 
+						if (typeof window.updateActivityList == 'function') 
+							window.updateActivityList(); 
+						if (typeof window.updateScormStatus == 'function') 
+							window.updateScormStatus(message); 
+					}
+					
+					finishedscorm=true;
+	            } 
               	else {
                       // Process Exception
                       

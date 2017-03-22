@@ -381,15 +381,15 @@ public class ModuleResultWrapper implements ModuleResult,
 	}
 
 	public java.lang.String translateResult(java.util.Locale locale,
-		long companyId,
+		long groupId,
 		com.liferay.lms.learningactivity.calificationtype.CalificationType ct) {
-		return _moduleResult.translateResult(locale, companyId, ct);
+		return _moduleResult.translateResult(locale, groupId, ct);
 	}
 
 	public java.lang.String translateResultWithSuffix(java.util.Locale locale,
-		long companyId,
+		long groupId,
 		com.liferay.lms.learningactivity.calificationtype.CalificationType ct) {
-		return _moduleResult.translateResultWithSuffix(locale, companyId, ct);
+		return _moduleResult.translateResultWithSuffix(locale, groupId, ct);
 	}
 
 	/**

@@ -1,3 +1,5 @@
+<%@page import="com.liferay.lms.learningactivity.calificationtype.CalificationTypeRegistry"%>
+<%@page import="com.liferay.lms.learningactivity.calificationtype.CalificationType"%>
 <%@page import="com.liferay.lms.util.LmsConstant"%>
 <%@page import="com.liferay.lms.model.ActivityTriesDeleted"%>
 <%@page import="com.liferay.lms.service.ActivityTriesDeletedLocalServiceUtil"%>
@@ -154,8 +156,10 @@ userSearchContainer.setTotal(totalUsers);
 				<liferay-ui:search-container-column-text name="actions"> - </liferay-ui:search-container-column-text>
 			<%
 				}else{
+					CalificationType ct = new CalificationTypeRegistry().getCalificationType(course.getCalificationType());
 					
-					String puntuation = String.valueOf(lar.getResult());
+					
+					String puntuation = ct.translate(themeDisplay.getLocale(), course.getGroupCreatedId(), lar.getResult());
 					String res = "";
 					if(lar.getPassed())
 						res = LanguageUtil.get(themeDisplay.getLocale(),"passed");

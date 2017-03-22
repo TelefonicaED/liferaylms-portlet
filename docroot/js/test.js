@@ -1,4 +1,4 @@
-$(function() {
+
 	var ismobile=navigator.userAgent.match(/(iPad)|(iPhone)|(iPod)|(android)|(webOS)/i);
 	if(ismobile){
 		doStuff();
@@ -107,7 +107,7 @@ $(function() {
 
 }
 
-});
+
 
 function doStuff() {
 

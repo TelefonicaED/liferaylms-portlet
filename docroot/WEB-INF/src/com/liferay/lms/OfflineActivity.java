@@ -74,91 +74,91 @@ import com.liferay.util.bridges.mvc.MVCPortlet;
  * Portlet implementation class OfflineActivity
  */
 public class OfflineActivity extends MVCPortlet {
-	
+
 	private static Log log = LogFactoryUtil.getLog(OfflineActivity.class);
-	
+
 	private static DateFormat _dateFormat = DateFormatFactoryUtil.getSimpleDateFormat(
 			"dd/MM/yyyy",Locale.US);
-	
+
 	public static final String NOT_TEACHER_SQL = "WHERE User_.userId NOT IN "+
-			 "( SELECT Usergrouprole.userId "+
-			 "    FROM Usergrouprole "+ 
-			 "   INNER JOIN Resourcepermission ON Usergrouprole.roleId = Resourcepermission.roleId "+
-			 "   INNER JOIN Resourceaction ON Resourcepermission.name = Resourceaction.name "+
-			 "	   					      AND (BITAND(CAST_LONG(ResourcePermission.actionIds), CAST_LONG(ResourceAction.bitwiseValue)) != 0)"+
-			 "   WHERE Resourcepermission.scope="+ResourceConstants.SCOPE_GROUP_TEMPLATE+
-			 "     AND Resourceaction.actionId = 'VIEW_RESULTS' "+
-			 "     AND Resourceaction.name='com.liferay.lms.model' "+
-			 "     AND Usergrouprole.groupid=? ) ";
-	
+			"( SELECT Usergrouprole.userId "+
+			"    FROM Usergrouprole "+ 
+			"   INNER JOIN Resourcepermission ON Usergrouprole.roleId = Resourcepermission.roleId "+
+			"   INNER JOIN Resourceaction ON Resourcepermission.name = Resourceaction.name "+
+			"	   					      AND (BITAND(CAST_LONG(ResourcePermission.actionIds), CAST_LONG(ResourceAction.bitwiseValue)) != 0)"+
+			"   WHERE Resourcepermission.scope="+ResourceConstants.SCOPE_GROUP_TEMPLATE+
+			"     AND Resourceaction.actionId = 'VIEW_RESULTS' "+
+			"     AND Resourceaction.name='com.liferay.lms.model' "+
+			"     AND Usergrouprole.groupid=? ) ";
+
 	public static final String ACTIVITY_RESULT_PASSED_SQL = "WHERE (EXISTS (SELECT 1 FROM lms_learningactivityresult " +
 			"WHERE User_.userId = lms_learningactivityresult.userId" +
 			" AND lms_learningactivityresult.passed > 0 AND lms_learningactivityresult.actId = ? ))"; 
-	
+
 	public static final String ACTIVITY_RESULT_FAIL_SQL = "WHERE (EXISTS (SELECT 1 FROM lms_learningactivityresult " +
 			"WHERE User_.userId = lms_learningactivityresult.userId" +
 			" AND lms_learningactivityresult.passed = 0 AND lms_learningactivityresult.actId = ? ))"; 
-	
+
 	public static final String ACTIVITY_RESULT_NO_CALIFICATION_SQL = "WHERE (NOT EXISTS (SELECT 1 FROM lms_learningactivityresult " +
 			"WHERE User_.userId = lms_learningactivityresult.userId AND lms_learningactivityresult.actId = ? ))"; 
-	
+
 	@Override
 	public void serveResource(ResourceRequest resourceRequest,
 			ResourceResponse resourceResponse) throws IOException,
 			PortletException {
-    	ThemeDisplay themeDisplay = (ThemeDisplay) resourceRequest.getAttribute(WebKeys.THEME_DISPLAY);
+		ThemeDisplay themeDisplay = (ThemeDisplay) resourceRequest.getAttribute(WebKeys.THEME_DISPLAY);
 		String action = ParamUtil.getString(resourceRequest, "action");
 		long actId = ParamUtil.getLong(resourceRequest, "actId",0);
-		
-		
+
+
 		if(action.equals("export")){
-			
+
 			try {
-				
+
 				CalificationType ct = new CalificationTypeRegistry().getCalificationType(CourseLocalServiceUtil.getCourseByGroupCreatedId(themeDisplay.getScopeGroupId()).getCalificationType());
-				
+
 				//Necesario para crear el fichero csv.
 				resourceResponse.setCharacterEncoding(StringPool.UTF8);
 				resourceResponse.setContentType(ContentTypes.TEXT_CSV_UTF8);
 				resourceResponse.addProperty(HttpHeaders.CONTENT_DISPOSITION,"attachment; fileName=data.csv");
-		        byte b[] = {(byte)0xEF, (byte)0xBB, (byte)0xBF};
-		        
-		        resourceResponse.getPortletOutputStream().write(b);
-		        
-		        CSVWriter writer = new CSVWriter(new OutputStreamWriter(resourceResponse.getPortletOutputStream(),StringPool.UTF8),CharPool.SEMICOLON);
-		        String[] cabeceras = new String[4];
-		        
-		        
-		        //En esta columna vamos a tener el nombre del usuario.
-		        cabeceras[0]= LanguageUtil.get(getPortletConfig(), themeDisplay.getLocale(), "onlinetaskactivity.export.user");
-		        cabeceras[1]= LanguageUtil.get(getPortletConfig(), themeDisplay.getLocale(), "onlinetaskactivity.export.date");
-		        cabeceras[2]= LanguageUtil.get(getPortletConfig(), themeDisplay.getLocale(), "onlinetaskactivity.export.result");
-		        cabeceras[3]= LanguageUtil.get(getPortletConfig(), themeDisplay.getLocale(), "onlinetaskactivity.export.comment");
-		        		    
-		        writer.writeNext(cabeceras);
-		        DynamicQuery dq=DynamicQueryFactoryUtil.forClass(LearningActivityResult.class);
-		      	Criterion criterion=PropertyFactoryUtil.forName("actId").eq(actId);
+				byte b[] = {(byte)0xEF, (byte)0xBB, (byte)0xBF};
+
+				resourceResponse.getPortletOutputStream().write(b);
+
+				CSVWriter writer = new CSVWriter(new OutputStreamWriter(resourceResponse.getPortletOutputStream(),StringPool.UTF8),CharPool.SEMICOLON);
+				String[] cabeceras = new String[4];
+
+
+				//En esta columna vamos a tener el nombre del usuario.
+				cabeceras[0]= LanguageUtil.get(getPortletConfig(), themeDisplay.getLocale(), "onlinetaskactivity.export.user");
+				cabeceras[1]= LanguageUtil.get(getPortletConfig(), themeDisplay.getLocale(), "onlinetaskactivity.export.date");
+				cabeceras[2]= LanguageUtil.get(getPortletConfig(), themeDisplay.getLocale(), "onlinetaskactivity.export.result");
+				cabeceras[3]= LanguageUtil.get(getPortletConfig(), themeDisplay.getLocale(), "onlinetaskactivity.export.comment");
+
+				writer.writeNext(cabeceras);
+				DynamicQuery dq=DynamicQueryFactoryUtil.forClass(LearningActivityResult.class);
+				Criterion criterion=PropertyFactoryUtil.forName("actId").eq(actId);
 				dq.add(criterion);
-				
+
 				//Partiremos del usuario para crear el csv para que sea más facil ver los intentos.
-		        List<LearningActivityResult> listresult = LearningActivityResultLocalServiceUtil.dynamicQuery(dq);
-		        for(LearningActivityResult learningActivityResult:listresult){
-		        			//Array con los resultados de los intentos.
-			        		String[] resultados = new String[4];
-			        		//En la primera columna del csv introducidos el nombre del estudiante.
-			        		resultados[0] = UserLocalServiceUtil.getUser(learningActivityResult.getUserId()).getScreenName();
-			        		resultados[1] = _dateFormat.format(learningActivityResult.getEndDate());
-			        		resultados[2] = ct.translate(themeDisplay.getLocale(), themeDisplay.getCompanyId(), learningActivityResult.getResult());
-			        		resultados[3] = learningActivityResult.getComments()!=null?learningActivityResult.getComments():"";
-			        		
-			        		//Escribimos las respuestas obtenidas para el intento en el csv.
-			    			writer.writeNext(resultados);
-		        }
-		        writer.flush();
+				List<LearningActivityResult> listresult = LearningActivityResultLocalServiceUtil.dynamicQuery(dq);
+				for(LearningActivityResult learningActivityResult:listresult){
+					//Array con los resultados de los intentos.
+					String[] resultados = new String[4];
+					//En la primera columna del csv introducidos el nombre del estudiante.
+					resultados[0] = UserLocalServiceUtil.getUser(learningActivityResult.getUserId()).getScreenName();
+					resultados[1] = _dateFormat.format(learningActivityResult.getEndDate());
+					resultados[2] = ct.translate(themeDisplay.getLocale(), themeDisplay.getScopeGroupId(), learningActivityResult.getResult());
+					resultados[3] = learningActivityResult.getComments()!=null?learningActivityResult.getComments():"";
+
+					//Escribimos las respuestas obtenidas para el intento en el csv.
+					writer.writeNext(resultados);
+				}
+				writer.flush();
 				writer.close();
 				resourceResponse.getPortletOutputStream().flush();
 				resourceResponse.getPortletOutputStream().close();
-			
+
 			} catch (NestableException e) {
 
 			}finally{
@@ -167,29 +167,29 @@ public class OfflineActivity extends MVCPortlet {
 			}
 		} 
 	}
-		
+
 	private void importGrades(RenderRequest renderRequest,
 			RenderResponse renderResponse) throws PortletException, IOException {
 		UploadPortletRequest uploadRequest = PortalUtil.getUploadPortletRequest(renderRequest);
-		
+
 		List<String> errors= new ArrayList<String>();
 		renderRequest.setAttribute("errorsInCSV", errors);
-		
+
 		ThemeDisplay themeDisplay = (ThemeDisplay) renderRequest.getAttribute(WebKeys.THEME_DISPLAY);
 		Locale locale = themeDisplay.getLocale();
-		
+
 		long actId = ParamUtil.getLong(renderRequest,"actId");
 		long groupId = themeDisplay.getScopeGroupId();
 		InputStream csvFile = uploadRequest.getFileAsStream("fileName");
-		
+
 		if(csvFile==null){
 			errors.add(LanguageUtil.get(getPortletConfig(),locale,"offlinetaskactivity.csvError.empty-file"));
 		}else{
 			CSVReader reader=null;
 			try {
-				
+
 				CalificationType ct = new CalificationTypeRegistry().getCalificationType(CourseLocalServiceUtil.getCourseByGroupCreatedId(themeDisplay.getScopeGroupId()).getCalificationType());
-				
+
 				reader = new CSVReader(new InputStreamReader(csvFile, StringPool.UTF8),CharPool.SEMICOLON);
 				int line=0;
 				String[] currLine;
@@ -197,19 +197,19 @@ public class OfflineActivity extends MVCPortlet {
 					boolean correct=true;
 					if(line++!=0){			
 						if(currLine.length>=4){
-							
+
 							User user=null;
 							String userFullName=StringPool.BLANK;
 							Date endDate = null;
 							double result=0;
-							
+
 							try {
 								user=UserLocalServiceUtil.getUserByScreenName(themeDisplay.getCompanyId(), currLine[0].trim());
 							} catch (NestableException e) {
 								correct=false;
 								errors.add(LanguageUtil.format(getPortletConfig(),locale,"offlinetaskactivity.csvError.user-id-bad-format",new Object[]{line},false));
 							}
-							
+
 							if(correct) {
 								try {
 									userFullName=user.getFullName();
@@ -225,27 +225,27 @@ public class OfflineActivity extends MVCPortlet {
 									errors.add(LanguageUtil.format(getPortletConfig(),locale,"offlinetaskactivity.csvError.user-id-system-error",new Object[]{line},false));
 								}
 							}
-							
+
 							try {
 								endDate=_dateFormat.parse(currLine[1]);
 							} catch (ParseException e) {
 								correct=false;
 								errors.add(LanguageUtil.format(getPortletConfig(),locale,"offlinetaskactivity.csvError.date-bad-format",new Object[]{line},false));
 							}
-														
+
 							try {
 								result=Double.parseDouble(currLine[2]);
-								if(result<ct.getMinValue() || result>ct.getMaxValue()){	
+								if(result<ct.getMinValue(groupId) || result>ct.getMaxValue(groupId)){	
 									log.error("***Result fuera de rango***");
 									correct=false;
-									errors.add(LanguageUtil.format(getPortletConfig(),locale,"offlinetaskactivity.csvError.result-bad-format",new Object[]{line,ct.getMinValue(),ct.getMaxValue()},false));
+									errors.add(LanguageUtil.format(getPortletConfig(),locale,"offlinetaskactivity.csvError.result-bad-format",new Object[]{line,ct.getMinValue(groupId),ct.getMaxValue(groupId)},false));
 								}
 							} catch (NumberFormatException e) {
 								e.printStackTrace();
 								correct=false;
-								errors.add(LanguageUtil.format(getPortletConfig(),locale,"offlinetaskactivity.csvError.result-bad-format",new Object[]{line,ct.getMinValue(),ct.getMaxValue()},false));
+								errors.add(LanguageUtil.format(getPortletConfig(),locale,"offlinetaskactivity.csvError.result-bad-format",new Object[]{line,ct.getMinValue(groupId),ct.getMaxValue(groupId)},false));
 							}
-												
+
 							if(correct){
 								try {
 									LearningActivityTry  learningActivityTry =  LearningActivityTryLocalServiceUtil.getLastLearningActivityTryByActivityAndUser(actId, user.getUserId());
@@ -255,10 +255,10 @@ public class OfflineActivity extends MVCPortlet {
 										learningActivityTry =  LearningActivityTryLocalServiceUtil.createLearningActivityTry(actId,serviceContext);
 									}
 									learningActivityTry.setEndDate(endDate);
-									learningActivityTry.setResult(ct.toBase100(result));
+									learningActivityTry.setResult(ct.toBase100(themeDisplay.getScopeGroupId(),result));
 									learningActivityTry.setComments(currLine[3]);
 									updateLearningActivityTryAndResult(learningActivityTry);
-		
+
 								} catch (NestableException e) {
 									correct=false;
 									errors.add(LanguageUtil.format(getPortletConfig(),locale,"offlinetaskactivity.csvError.bad-updating",new Object[]{line,userFullName},false));
@@ -273,7 +273,7 @@ public class OfflineActivity extends MVCPortlet {
 						}
 					}
 				}
-	
+
 			} catch(FileNotFoundException e) {
 				e.printStackTrace();
 				errors.add(LanguageUtil.get(getPortletConfig(),locale,"offlinetaskactivity.csvError.empty-file"));
@@ -281,7 +281,7 @@ public class OfflineActivity extends MVCPortlet {
 				e.printStackTrace();
 				errors.add(LanguageUtil.get(getPortletConfig(),locale,"offlinetaskactivity.csvError.bad-updating"));
 			}
-			
+
 			finally {
 				if(reader!=null) {
 					reader.close();
@@ -289,31 +289,31 @@ public class OfflineActivity extends MVCPortlet {
 			}
 		}
 	}
-	
-		
-	
+
+
+
 	public void setGrades(ActionRequest request,	ActionResponse response){
-		
+
 		ThemeDisplay themeDisplay  =(ThemeDisplay)request.getAttribute(WebKeys.THEME_DISPLAY);
-		
+
 		boolean correct=true;
 		long actId = ParamUtil.getLong(request,"actId"); 
 		long studentId = ParamUtil.getLong(request,"studentId");		
 		String comments = ParamUtil.getString(request,"comments");
-		
+
 		log.debug("actId: "+actId);
 		log.debug("studentId: "+studentId);
 		log.debug("comments: "+comments);		
-		
+
 		String gradeFilter = ParamUtil.getString(request, "gradeFilter");
 		String criteria = ParamUtil.getString(request, "criteria");
 
 		log.debug("gradeFilter: "+gradeFilter);
 		log.debug("criteria: "+criteria);
-		
+
 		response.setRenderParameter("gradeFilter", gradeFilter);
 		response.setRenderParameter("criteria", criteria);		
-		
+
 		CalificationType ct = null;
 		double result=0;
 		try {
@@ -321,7 +321,7 @@ public class OfflineActivity extends MVCPortlet {
 			ct = new CalificationTypeRegistry().getCalificationType(course.getCalificationType());			
 			result= Double.valueOf(ParamUtil.getString(request,"result").replace(",", "."));
 			log.debug("result: "+result);
-			if(result<ct.getMinValue() || result>ct.getMaxValue()){
+			if(result<ct.getMinValue(course.getGroupCreatedId()) || result>ct.getMaxValue(course.getGroupCreatedId())){
 				correct=false;
 				log.error("Result fuera de rango");
 				SessionErrors.add(request, "result-bad-format");
@@ -335,7 +335,7 @@ public class OfflineActivity extends MVCPortlet {
 			correct=false;
 			SessionErrors.add(request, "grades.bad-updating");
 		}
-		
+
 		if(correct) {
 			try {
 				LearningActivityTry  learningActivityTry =  LearningActivityTryLocalServiceUtil.getLastLearningActivityTryByActivityAndUser(actId, studentId);
@@ -345,21 +345,21 @@ public class OfflineActivity extends MVCPortlet {
 					learningActivityTry =  LearningActivityTryLocalServiceUtil.createLearningActivityTry(actId,serviceContext);
 				}
 				learningActivityTry.setEndDate(new Date());
-				learningActivityTry.setResult(ct.toBase100(result));
+				learningActivityTry.setResult(ct.toBase100(themeDisplay.getScopeGroupId(),result));
 				learningActivityTry.setComments(comments);
 				updateLearningActivityTryAndResult(learningActivityTry);
-				
+
 				SessionMessages.add(request, "grades.updating");
 			} catch (NestableException e) {
 				SessionErrors.add(request, "grades.bad-updating");
 			}
 		}
 	}
-	
-	
+
+
 	private void setGrades(RenderRequest renderRequest,
 			RenderResponse renderResponse) throws IOException, PortletException {
-		
+
 		boolean correct=true;
 		long actId = ParamUtil.getLong(renderRequest,"actId"); 
 		long studentId = ParamUtil.getLong(renderRequest,"studentId");
@@ -376,7 +376,7 @@ public class OfflineActivity extends MVCPortlet {
 			correct=false;
 			SessionErrors.add(renderRequest, "offlinetaskactivity.grades.result-bad-format");
 		}
-		
+
 		if(correct) {
 			try {
 				LearningActivityTry  learningActivityTry =  LearningActivityTryLocalServiceUtil.getLastLearningActivityTryByActivityAndUser(actId, studentId);
@@ -389,7 +389,7 @@ public class OfflineActivity extends MVCPortlet {
 				learningActivityTry.setResult(result);
 				learningActivityTry.setComments(comments);
 				updateLearningActivityTryAndResult(learningActivityTry);
-				
+
 				SessionMessages.add(renderRequest, "offlinetaskactivity.grades.updating");
 			} catch (NestableException e) {
 				SessionErrors.add(renderRequest, "offlinetaskactivity.grades.bad-updating");
@@ -401,7 +401,7 @@ public class OfflineActivity extends MVCPortlet {
 			LearningActivityTry learningActivityTry) throws PortalException,
 			SystemException {
 		LearningActivityTryLocalServiceUtil.updateLearningActivityTry(learningActivityTry);
-		
+
 		LearningActivityResult learningActivityResult = LearningActivityResultLocalServiceUtil.getByActIdAndUserId(learningActivityTry.getActId(), learningActivityTry.getUserId());
 		if(learningActivityResult.getResult() != learningActivityTry.getResult()) {
 			LearningActivity learningActivity = LearningActivityLocalServiceUtil.getLearningActivity(learningActivityTry.getActId());
@@ -410,12 +410,12 @@ public class OfflineActivity extends MVCPortlet {
 			LearningActivityResultLocalServiceUtil.updateLearningActivityResult(learningActivityResult);
 		}
 	}
-	
+
 	@Override
 	protected void doDispatch(RenderRequest renderRequest,
 			RenderResponse renderResponse) throws IOException, PortletException {
 		String ajaxAction = renderRequest.getParameter("ajaxAction");
-		
+
 		if(ajaxAction!=null) {
 			if("importGrades".equals(ajaxAction)) {
 				importGrades(renderRequest, renderResponse);
@@ -424,11 +424,11 @@ public class OfflineActivity extends MVCPortlet {
 				setGrades(renderRequest, renderResponse);
 			} 
 		}
-		
-		
+
+
 		super.doDispatch(renderRequest, renderResponse);
 	}
-	
+
 	public void edit(ActionRequest actionRequest,ActionResponse actionResponse)throws Exception {
 
 		actionResponse.setRenderParameters(actionRequest.getParameterMap());
@@ -437,49 +437,49 @@ public class OfflineActivity extends MVCPortlet {
 			actionResponse.setRenderParameter("jspPage", "/html/offlinetaskactivity/admin/edit.jsp");
 		}
 	}
-	
+
 	@Override
 	public void render(RenderRequest renderRequest, RenderResponse renderResponse)
 			throws PortletException, IOException {
 		long actId=0;
-		
+
 		if(ParamUtil.getBoolean(renderRequest, "actionEditingDetails", false)){
-			
+
 			actId=ParamUtil.getLong(renderRequest, "resId", 0);
 			renderResponse.setProperty("clear-request-parameters",Boolean.TRUE.toString());
 		}
 		else{
 			actId=ParamUtil.getLong(renderRequest, "actId", 0);
 		}
-					
+
 		if(actId==0)// TODO Auto-generated method stub
 		{
 			renderRequest.setAttribute(WebKeys.PORTLET_CONFIGURATOR_VISIBILITY, Boolean.FALSE);
 		}
 		else
 		{
-				LearningActivity activity;
-				try {
+			LearningActivity activity;
+			try {
 
-					//auditing
-					ThemeDisplay themeDisplay = (ThemeDisplay) renderRequest.getAttribute(WebKeys.THEME_DISPLAY);
-					
-					activity = LearningActivityLocalServiceUtil.getLearningActivity(actId);
-					long typeId=activity.getTypeId();
-					
-					if(typeId==5)
-					{
-						super.render(renderRequest, renderResponse);
-					}
-					else
-					{
-						renderRequest.setAttribute(WebKeys.PORTLET_CONFIGURATOR_VISIBILITY, Boolean.FALSE);
-					}
-				} catch (PortalException e) {
-				} catch (SystemException e) {
-				}			
+				//auditing
+				ThemeDisplay themeDisplay = (ThemeDisplay) renderRequest.getAttribute(WebKeys.THEME_DISPLAY);
+
+				activity = LearningActivityLocalServiceUtil.getLearningActivity(actId);
+				long typeId=activity.getTypeId();
+
+				if(typeId==5)
+				{
+					super.render(renderRequest, renderResponse);
+				}
+				else
+				{
+					renderRequest.setAttribute(WebKeys.PORTLET_CONFIGURATOR_VISIBILITY, Boolean.FALSE);
+				}
+			} catch (PortalException e) {
+			} catch (SystemException e) {
+			}			
 		}
 	}
-	
-			
+
+
 }

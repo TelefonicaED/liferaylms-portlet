@@ -322,6 +322,12 @@ public class CompetenceLocalServiceWrapper implements CompetenceLocalService,
 		return _competenceLocalService.getBGImageURL(groupId, request);
 	}
 
+	public java.lang.String getBGImageURL(long fileEntryId, long groupId,
+		javax.servlet.http.HttpServletRequest request) {
+		return _competenceLocalService.getBGImageURL(fileEntryId, groupId,
+			request);
+	}
+
 	public java.lang.String getBGImageURL(
 		com.liferay.lms.model.Competence competence,
 		javax.servlet.http.HttpServletRequest request) {

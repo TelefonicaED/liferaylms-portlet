@@ -500,6 +500,8 @@ public class CompetencePersistenceImpl extends BasePersistenceImpl<Competence>
 		competenceImpl.setPage(competence.getPage());
 		competenceImpl.setGenerateCertificate(competence.isGenerateCertificate());
 		competenceImpl.setDiplomaTemplate(competence.getDiplomaTemplate());
+		competenceImpl.setDiplomaBackground(competence.getDiplomaBackground());
+		competenceImpl.setDiplomaAdditional(competence.getDiplomaAdditional());
 
 		return competenceImpl;
 	}
@@ -2774,6 +2776,8 @@ public class CompetencePersistenceImpl extends BasePersistenceImpl<Competence>
 	protected TestAnswerPersistence testAnswerPersistence;
 	@BeanReference(type = TestQuestionPersistence.class)
 	protected TestQuestionPersistence testQuestionPersistence;
+	@BeanReference(type = UserCertificateDownloadPersistence.class)
+	protected UserCertificateDownloadPersistence userCertificateDownloadPersistence;
 	@BeanReference(type = UserCompetencePersistence.class)
 	protected UserCompetencePersistence userCompetencePersistence;
 	@BeanReference(type = ResourcePersistence.class)

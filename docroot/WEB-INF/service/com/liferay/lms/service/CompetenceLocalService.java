@@ -288,6 +288,10 @@ public interface CompetenceLocalService extends BaseLocalService,
 		javax.servlet.http.HttpServletRequest request);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.lang.String getBGImageURL(long fileEntryId, long groupId,
+		javax.servlet.http.HttpServletRequest request);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.lang.String getBGImageURL(
 		com.liferay.lms.model.Competence competence,
 		javax.servlet.http.HttpServletRequest request);

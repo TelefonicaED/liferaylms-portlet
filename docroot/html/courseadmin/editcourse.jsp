@@ -48,8 +48,13 @@
 <liferay-ui:error key="duplicate-course" message="duplicate-course" />
 <liferay-ui:error key="courseadmin.new.error.dateinterval" message="courseadmin.new.error.dateinterval" />
 <liferay-ui:error key="courseadmin.error.welcmessage.maxlenght" message="courseadmin.error.welcmessage.maxlenght" />
+
+<%
+String calificationTypeExtraContentError = ParamUtil.getString(request, "calificationTypeExtraContentError");
+%>
+<liferay-ui:error key="calificationTypeExtraContentError" message="<%=calificationTypeExtraContentError %>" />
 	<%
-	
+
 	String maxLengthTitle = GetterUtil.getString( ModelHintsUtil.getHints(Group.class.getName(), "name").get("max-length"),"");
 	String courseTitle = "";
 	
@@ -521,7 +526,7 @@ if(course!=null){
 	CalificationTypeRegistry cal = new CalificationTypeRegistry();
 	if(califications.size()>1){
 		%>
-			<aui:select name="calificationType" label="calificationType">
+			<aui:select name="calificationType" label="calificationType" onchange="${renderResponse.getNamespace()}changeCalificationType(this.value)">			
 		<%
 		for(Long ct:califications){
 			boolean selected = false;
@@ -534,9 +539,32 @@ if(course!=null){
 		}
 		%>
 			</aui:select>
+			
+		<%	
+		for(Long ct:califications){
+			boolean selected = false;
+			CalificationType ctype = cal.getCalificationType(ct);
+			if(Validator.isNotNull(ctype.getExpecificContentPage())){%>
+				<div class="<%if(course == null || ct != course.getCalificationType()){%>aui-helper-hidden<%}%> especific_content_page" id="${renderResponse.getNamespace()}especific_content_page_<%=ctype.getTypeId()%>">
+					<liferay-util:include page="<%=ctype.getExpecificContentPage() %>" servletContext="<%=getServletContext() %>">
+						<%if(course != null){ %>
+							<liferay-util:param name="groupId" value="<%=Long.toString(course.getGroupCreatedId()) %>" />
+						<%} %>	
+					</liferay-util:include>	
+				</div>
+			<%
+			}
+		}
+		%>	
+			<script>
+			function <portlet:namespace />changeCalificationType(typeId){
+				$(".especific_content_page").addClass("aui-helper-hidden");
+				$("#<portlet:namespace />especific_content_page_"+typeId).removeClass("aui-helper-hidden");
+			}
+			</script>
+			
 		<%
-	}
-	else{
+	}else{
 		
 		CalificationType ctype = null;
 		try{
@@ -546,10 +574,21 @@ if(course!=null){
 		}catch(Exception e){}
 		%>
 		<aui:input name="calificationType" value="<%=ctype==null?\"0\":ctype.getTypeId()%>" type="hidden"/>
-	<%}
+		
+		<%
+		if(Validator.isNotNull(ctype.getExpecificContentPage())){%>
+				<div class="especific_content_page" id="${renderResponse.getNamespace()}especific_content_page_<%=ctype.getTypeId()%>">
+					<liferay-util:include page="<%=ctype.getExpecificContentPage() %>" servletContext="<%=getServletContext() %>">
+						<%if(course != null){ %>
+							<liferay-util:param name="groupId" value="<%=Long.toString(course.getGroupCreatedId()) %>" />
+						<%} %>
+					</liferay-util:include>		
+				</div>
+			<%
+		}
+	}
 	
 	boolean showInscriptionDate = GetterUtil.getBoolean(renderRequest.getPreferences().getValues("showInscriptionDate", new String[]{StringPool.TRUE})[0],true);
-
 	%>
 <liferay-ui:panel-container extended="false"  persistState="false">
     <liferay-ui:panel title="lms-inscription-configuration" collapsible="true" defaultState="closed" cssClass="<%=(showInscriptionDate||showMaxUsers)?StringPool.BLANK:\"aui-helper-hidden\" %>">

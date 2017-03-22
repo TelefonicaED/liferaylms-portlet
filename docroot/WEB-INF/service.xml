@@ -450,6 +450,8 @@
 		<column name="page" type="String" />
         <column name="generateCertificate" type="boolean"></column>
 		<column name="diplomaTemplate" type="String" localized="true"/>
+		<column name="diplomaBackground" type="long" />
+		<column name="diplomaAdditional" type="long" />
 		<finder name="GroupId" return-type="Collection">
 			<finder-column name="groupId" />
 		</finder>
@@ -820,6 +822,12 @@
 		</finder>
     </entity>
     <entity name="AuditLogger" local-service="true" remote-service="true">
+    </entity>
+    <entity name="UserCertificateDownload" local-service="true" remote-service="false">
+    	<column name="userId" type="long" primary="true" />
+    	<column name="courseId" type="long" primary="true" />
+    	<column name="competenceId" type="long" primary="true" />
+    	<column name="downloadDate" type="Date" />
     </entity>
     <exceptions>
 		<exception>NoSuchModule</exception>

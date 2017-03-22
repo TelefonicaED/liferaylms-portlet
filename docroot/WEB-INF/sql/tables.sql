@@ -50,7 +50,9 @@ create table Lms_Competence (
 	description STRING null,
 	page VARCHAR(75) null,
 	generateCertificate BOOLEAN,
-	diplomaTemplate STRING null
+	diplomaTemplate STRING null,
+	diplomaBackground LONG,
+	diplomaAdditional LONG
 );
 
 create table Lms_Course (
@@ -290,6 +292,14 @@ create table Lms_TestQuestion (
 	weight LONG,
 	penalize BOOLEAN,
 	extracontent TEXT null
+);
+
+create table Lms_UserCertificateDownload (
+	userId LONG not null,
+	courseId LONG not null,
+	competenceId LONG not null,
+	downloadDate DATE null,
+	primary key (userId, courseId, competenceId)
 );
 
 create table Lms_UserCompetence (

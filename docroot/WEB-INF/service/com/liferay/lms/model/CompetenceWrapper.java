@@ -59,6 +59,8 @@ public class CompetenceWrapper implements Competence, ModelWrapper<Competence> {
 		attributes.put("page", getPage());
 		attributes.put("generateCertificate", getGenerateCertificate());
 		attributes.put("diplomaTemplate", getDiplomaTemplate());
+		attributes.put("diplomaBackground", getDiplomaBackground());
+		attributes.put("diplomaAdditional", getDiplomaAdditional());
 
 		return attributes;
 	}
@@ -147,6 +149,18 @@ public class CompetenceWrapper implements Competence, ModelWrapper<Competence> {
 
 		if (diplomaTemplate != null) {
 			setDiplomaTemplate(diplomaTemplate);
+		}
+
+		Long diplomaBackground = (Long)attributes.get("diplomaBackground");
+
+		if (diplomaBackground != null) {
+			setDiplomaBackground(diplomaBackground);
+		}
+
+		Long diplomaAdditional = (Long)attributes.get("diplomaAdditional");
+
+		if (diplomaAdditional != null) {
+			setDiplomaAdditional(diplomaAdditional);
 		}
 	}
 
@@ -795,6 +809,42 @@ public class CompetenceWrapper implements Competence, ModelWrapper<Competence> {
 		java.util.Map<java.util.Locale, java.lang.String> diplomaTemplateMap,
 		java.util.Locale defaultLocale) {
 		_competence.setDiplomaTemplateMap(diplomaTemplateMap, defaultLocale);
+	}
+
+	/**
+	* Returns the diploma background of this competence.
+	*
+	* @return the diploma background of this competence
+	*/
+	public long getDiplomaBackground() {
+		return _competence.getDiplomaBackground();
+	}
+
+	/**
+	* Sets the diploma background of this competence.
+	*
+	* @param diplomaBackground the diploma background of this competence
+	*/
+	public void setDiplomaBackground(long diplomaBackground) {
+		_competence.setDiplomaBackground(diplomaBackground);
+	}
+
+	/**
+	* Returns the diploma additional of this competence.
+	*
+	* @return the diploma additional of this competence
+	*/
+	public long getDiplomaAdditional() {
+		return _competence.getDiplomaAdditional();
+	}
+
+	/**
+	* Sets the diploma additional of this competence.
+	*
+	* @param diplomaAdditional the diploma additional of this competence
+	*/
+	public void setDiplomaAdditional(long diplomaAdditional) {
+		_competence.setDiplomaAdditional(diplomaAdditional);
 	}
 
 	/**

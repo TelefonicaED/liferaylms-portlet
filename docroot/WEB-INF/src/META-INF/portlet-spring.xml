@@ -62,6 +62,8 @@
 	<bean id="com.liferay.lms.service.TestQuestionLocalService" class="com.liferay.lms.service.impl.TestQuestionLocalServiceImpl" />
 	<bean id="com.liferay.lms.service.TestQuestionService" class="com.liferay.lms.service.impl.TestQuestionServiceImpl" />
 	<bean id="com.liferay.lms.service.persistence.TestQuestionPersistence" class="com.liferay.lms.service.persistence.TestQuestionPersistenceImpl" parent="basePersistence" />
+	<bean id="com.liferay.lms.service.UserCertificateDownloadLocalService" class="com.liferay.lms.service.impl.UserCertificateDownloadLocalServiceImpl" />
+	<bean id="com.liferay.lms.service.persistence.UserCertificateDownloadPersistence" class="com.liferay.lms.service.persistence.UserCertificateDownloadPersistenceImpl" parent="basePersistence" />
 	<bean id="com.liferay.lms.service.UserCompetenceLocalService" class="com.liferay.lms.service.impl.UserCompetenceLocalServiceImpl" />
 	<bean id="com.liferay.lms.service.UserCompetenceService" class="com.liferay.lms.service.impl.UserCompetenceServiceImpl" />
 	<bean id="com.liferay.lms.service.persistence.UserCompetencePersistence" class="com.liferay.lms.service.persistence.UserCompetencePersistenceImpl" parent="basePersistence" />

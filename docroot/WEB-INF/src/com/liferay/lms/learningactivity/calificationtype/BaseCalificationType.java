@@ -42,6 +42,11 @@ public abstract class BaseCalificationType implements CalificationType, Serializ
 	}	
 	
 	@Override
+	public String getSuffix(long groupId) {
+		return getSuffix();
+	}	
+	
+	@Override
 	public String translate(Locale locale, double result) {
 		return "";
 	}
@@ -62,7 +67,7 @@ public abstract class BaseCalificationType implements CalificationType, Serializ
 	}
 	
 	@Override
-	public String translate(Locale locale, long companyId, double result) {
+	public String translate(Locale locale, long groupId, double result) {
 		return translate(locale, result);
 	}
 	
@@ -72,12 +77,17 @@ public abstract class BaseCalificationType implements CalificationType, Serializ
 	}
 
 	@Override
-	public long getMinValue() {
+	public long toBase100(long groupId, double result) {
+		return toBase100(result);
+	}
+	
+	@Override
+	public long getMinValue(long groupId) {
 		return 0;
 	}
 
 	@Override
-	public long getMaxValue() {
+	public long getMaxValue(long groupId) {
 		return 0;
 	}
 }

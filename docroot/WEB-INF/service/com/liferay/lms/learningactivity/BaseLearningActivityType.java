@@ -53,7 +53,7 @@ public abstract class BaseLearningActivityType implements LearningActivityType, 
 
 	@Override
 	public boolean hasDeleteTries() {
-		return false;
+		return true;
 	}
 	
 	@Override

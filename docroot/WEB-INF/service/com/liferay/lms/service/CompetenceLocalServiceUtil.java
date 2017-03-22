@@ -329,6 +329,11 @@ public class CompetenceLocalServiceUtil {
 		return getService().getBGImageURL(groupId, request);
 	}
 
+	public static java.lang.String getBGImageURL(long fileEntryId,
+		long groupId, javax.servlet.http.HttpServletRequest request) {
+		return getService().getBGImageURL(fileEntryId, groupId, request);
+	}
+
 	public static java.lang.String getBGImageURL(
 		com.liferay.lms.model.Competence competence,
 		javax.servlet.http.HttpServletRequest request) {

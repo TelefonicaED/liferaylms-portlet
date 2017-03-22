@@ -39,6 +39,8 @@ import au.com.bytecode.opencsv.CSVWriter;
 import com.liferay.counter.service.CounterLocalServiceUtil;
 import com.liferay.lms.auditing.AuditConstants;
 import com.liferay.lms.auditing.AuditingLogFactory;
+import com.liferay.lms.learningactivity.calificationtype.CalificationType;
+import com.liferay.lms.learningactivity.calificationtype.CalificationTypeRegistry;
 import com.liferay.lms.learningactivity.courseeval.CourseEval;
 import com.liferay.lms.learningactivity.courseeval.CourseEvalRegistry;
 import com.liferay.lms.model.Course;
@@ -1041,6 +1043,19 @@ public class CourseAdmin extends MVCPortlet {
 			course.setGoodbyeMsg(goodbyeMsg);
 		
 			try {
+				
+				//Update especific content of calificationType
+				
+				CalificationTypeRegistry cal = new CalificationTypeRegistry();
+				CalificationType ctype = cal.getCalificationType(course.getCalificationType());
+				String calificationTypeExtraContentError = ctype.setExtraContent(uploadRequest, actionResponse, course);
+				log.debug("****calificationTypeExtraContentError:"+calificationTypeExtraContentError);
+				
+				if(calificationTypeExtraContentError != null){
+					SessionErrors.add(actionRequest, "calificationTypeExtraContentError");
+					actionResponse.setRenderParameter("calificationTypeExtraContentError", calificationTypeExtraContentError);
+				}
+				
 				try{
 					serviceContext.setAttribute("type", String.valueOf(type));
 					PermissionChecker permissionChecker = PermissionCheckerFactoryUtil
@@ -1076,20 +1091,6 @@ public class CourseAdmin extends MVCPortlet {
 				actionResponse.setRenderParameter("courseId", String.valueOf(course.getCourseId()));
 				actionResponse.setRenderParameter("jspPage","/html/courseadmin/editcourse.jsp");			
 				SessionMessages.add(actionRequest, "course-saved-successfully");
-								
-				/*
-				WindowState windowState = actionRequest.getWindowState();
-				if (redirect != null && !StringPool.BLANK.equals(redirect)) {
-					if (!windowState.equals(LiferayWindowState.POP_UP)) {
-						actionResponse.sendRedirect(redirect);
-					} else {
-						redirect = PortalUtil.escapeRedirect(redirect);
-
-						if (Validator.isNotNull(redirect)) {
-							actionResponse.sendRedirect(redirect);
-						}
-					}
-				}*/
 				
 			} catch (Exception e) {
 				SessionErrors.add(actionRequest, "evaluationtaskactivity.error.systemError");
