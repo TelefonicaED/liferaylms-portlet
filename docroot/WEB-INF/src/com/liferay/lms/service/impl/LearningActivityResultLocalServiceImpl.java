@@ -174,14 +174,7 @@ public class LearningActivityResultLocalServiceImpl	extends LearningActivityResu
 		if (userId != learningActivityTry.getUserId()) {
 			throw new PortalException();
 		}
-
-		/************************************************************************************
-		boolean isMaxScoreByPassed = GetterUtil.getBoolean(PropsUtil.get("scorm.max.score.by.passed"),false);
-		/************************************************************************************/
-
-
-
-
+		
 		LearningActivity learningActivity = learningActivityLocalService.getLearningActivity(learningActivityTry.getActId());
 		String assetEntryId = learningActivityLocalService.getExtraContentValue(learningActivityTry.getActId(), "assetEntry");
 		AssetEntry assetEntry = AssetEntryLocalServiceUtil.getAssetEntry(Long.valueOf(assetEntryId));
@@ -310,16 +303,6 @@ public class LearningActivityResultLocalServiceImpl	extends LearningActivityResu
 				min_score = cmi.getJSONObject("cmi.core.score.min").getDouble("value", 0);
 				raw_score = cmi.getJSONObject("cmi.core.score.raw").getDouble("value", "asset".equals(typeCmi) ? 100 : 0);
 
-				/**********************************************************************************************************************
-				if(log.isDebugEnabled())log.debug("ConvertPassedToMaxSCORE?  "+isMaxScoreByPassed);
-				if( ("passed".equalsIgnoreCase(lesson_status)||"completed".equalsIgnoreCase(lesson_status)) &&  isMaxScoreByPassed){
-
-					raw_score = 69.0;
-
-				}
-				/***********************************************************************************************************************/
-
-
 				scaled_score = new Double(Math.round((raw_score * 100) / (max_score - min_score)));
 				scaled_score_long = Math.round(scaled_score);
 			} else { // 1.3
@@ -331,15 +314,6 @@ public class LearningActivityResultLocalServiceImpl	extends LearningActivityResu
 				max_score = cmi.getJSONObject("cmi.score.max").getDouble("value", 100);
 				min_score = cmi.getJSONObject("cmi.score.min").getDouble("value", 0);
 				raw_score = cmi.getJSONObject("cmi.score.raw").getDouble("value", "asset".equals(typeCmi) ? 100 : 0);
-
-				/***********************************************************************************************************************
-				if(log.isDebugEnabled())log.debug("ConvertPassedToMaxSCORE?  "+isMaxScoreByPassed);
-				if( ("passed".equalsIgnoreCase(success_status)||"completed".equalsIgnoreCase(completion_status)) &&  isMaxScoreByPassed){
-
-					raw_score = 69.0;
-					if(log.isDebugEnabled())log.debug("HE PASADO Y PONGO EL RAW_SCORE "+raw_score);
-				}
-				/***********************************************************************************************************************/
 
 				scaled_score = new Double(Math.round((raw_score * 100) / (max_score - min_score)));
 				scaled_score = cmi.getJSONObject("cmi.score.scaled").getDouble("value", -1) != -1 ? (cmi.getJSONObject("cmi.score.scaled").getDouble("value") * (max_score - min_score) + min_score) : scaled_score;
