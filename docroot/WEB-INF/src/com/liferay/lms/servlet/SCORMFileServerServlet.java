@@ -95,6 +95,7 @@ public class SCORMFileServerServlet extends HttpServlet {
     private static final String MULTIPART_BOUNDARY = "MULTIPART_BYTERANGES";
 	private static final long serialVersionUID = 1L;
 
+		
 	private String hexStringToStringByAscii(String hexString) {
 		byte[] bytes = new byte[hexString.length() / 2];
 		for (int i = 0; i < hexString.length() / 2; i++) {
@@ -536,9 +537,7 @@ public class SCORMFileServerServlet extends HttpServlet {
 		}
 		catch (Exception e) 
 		{
-			System.out
-					.println("Error en el processRequest() de ServidorArchivos: "
-							+ e.getMessage());
+			e.printStackTrace();
 		}
 	}
 	/**
