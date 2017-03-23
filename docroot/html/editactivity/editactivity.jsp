@@ -153,7 +153,7 @@ String title = ParamUtil.getString(request, "title", "");
 if(learnact!=null)
 {
 	actId=learnact.getActId();
-	if(Validator.isNotNull(description)){
+	if(Validator.isNull(description)){
 		description=learnact.getDescription(themeDisplay.getLocale());	
 	}
 	
