@@ -120,13 +120,13 @@
 										<div class="mensaje_marcado"><liferay-ui:message key="inscripcion.noinscrito" /></div>
 										<aui:fieldset>
 											<aui:column>
-												<% team.getName();  %>
+												<%= team.getName() %>
 											</aui:column>
 											<aui:column>
-												<% sch.getStartDate(); %>
+												<%= sch.getStartDate() %>
 											</aui:column>
 											<aui:column>
-												<% sch.getEndDate(); %>
+												<%= sch.getEndDate() %>
 											</aui:column>
 											<aui:column>
 												<div class="boton_inscibirse ">
