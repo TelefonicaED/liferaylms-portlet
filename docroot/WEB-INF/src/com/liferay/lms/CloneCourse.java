@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -77,6 +78,8 @@ import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
 import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.service.DLFileEntryLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.service.DLFolderLocalServiceUtil;
+import com.liferay.portlet.messageboards.model.MBCategory;
+import com.liferay.portlet.messageboards.service.MBCategoryLocalServiceUtil;
 
 public class CloneCourse implements MessageListener {
 	private static Log log = LogFactoryUtil.getLog(CloneCourse.class);
@@ -96,15 +99,18 @@ public class CloneCourse implements MessageListener {
 	boolean visible;
 	boolean includeTeacher;
 	
+	boolean cloneForum;
+	
 	private String cloneTraceStr = "--------------- Clone course trace ----------------"; 
 	private Boolean childCourse; 	
-	public CloneCourse(long groupId, String newCourseName, ThemeDisplay themeDisplay, Date startDate, Date endDate, ServiceContext serviceContext) {
+	public CloneCourse(long groupId, String newCourseName, ThemeDisplay themeDisplay, Date startDate, Date endDate, boolean cloneForum, ServiceContext serviceContext) {
 		super();
 		this.groupId = groupId;
 		this.newCourseName = newCourseName;
 		this.themeDisplay = themeDisplay;
 		this.startDate = startDate;
 		this.endDate = endDate;
+		this.cloneForum = cloneForum;
 		this.serviceContext = serviceContext;
 	}
 	
@@ -131,6 +137,7 @@ public class CloneCourse implements MessageListener {
 			
 			this.visible = message.getBoolean("visible");
 			this.includeTeacher = message.getBoolean("includeTeacher");
+			this.cloneForum = message.getBoolean("cloneForum");
 			Role adminRole = RoleLocalServiceUtil.getRole(themeDisplay.getCompanyId(),"Administrator");
 			List<User> adminUsers = UserLocalServiceUtil.getRoleUsers(adminRole.getRoleId());
 			 
@@ -562,6 +569,30 @@ public class CloneCourse implements MessageListener {
 			ModuleLocalServiceUtil.updateModule(moduleNew);
 		}
 		
+		if(this.cloneForum){
+		
+			//-------------------------------------------
+			//Categorias y subcategorias del foro
+			//-------------------------------------
+			List<MBCategory> listCategories = MBCategoryLocalServiceUtil.getCategories(groupId);
+			
+			//Si existen las categorias se clonan
+			if(listCategories!=null && listCategories.size()>0){
+				
+				log.debug("------------------------Foro:: listCategories.size:: " + listCategories.size());
+				
+				long newCourseGroupId = newCourse.getGroupCreatedId();//Para asociar las categorias creadas con el nuevo curso
+				
+				boolean resultCloneForo = cloneForo(newCourseGroupId, listCategories);
+				
+				log.debug("----------------------- Foro: CloneCat:: " + resultCloneForo);
+
+			}
+			
+			
+			//---------------------------------------------------------------------
+			
+		}
 		
 		log.debug(" ENDS!");
 		
@@ -1141,6 +1172,130 @@ public class CloneCourse implements MessageListener {
 			e.printStackTrace();
 		}
 		                            
+	}
+	
+	/**
+	 * Clona las categorias/subcategorias/subsubcategorias... del foro
+	 * @param newCourseGroupId: groupId del curso clonado
+	 * @param listCategories: lista de categorias del foro del curso
+	 * 
+	 * @return: boolean = true -> Se realiza correctamente
+	 * 			boolean = false -> Se ha producido algun error durante el proceso
+	 */
+	private boolean cloneForo(long newCourseGroupId, List<MBCategory> listCategories){
+		
+		boolean resultCloneForo = true;
+		
+		List<MBCategory> listParentCat = new ArrayList<MBCategory>();
+		List<MBCategory> listSubCat = new ArrayList<MBCategory>();
+		
+		long parentCategoryId = 0;
+		
+		for(MBCategory category:listCategories){
+			if(0 == category.getParentCategoryId()) listParentCat.add(category);
+			else listSubCat.add(category);
+		}
+		
+		resultCloneForo = subCategories(parentCategoryId, newCourseGroupId, listParentCat, listSubCat);
+		
+		return resultCloneForo;
+	}
+	
+	/**
+	 * 
+	 * Funcion recursiva que clona las categorias del foro y busca si cada categoria tiene una subcategoria para
+	 * volver a realizar la misma operacion
+	 * 
+	 * @param parentCategoryId: Id de la categoria padre (la clonada)
+	 * @param newCourseGroupId: Id del curso clonado
+	 * @param listParentCat
+	 * @param listSubCat
+	 * @return: boolean = true -> Si se realiza el proceso correctamente
+	 * 			boolean = false -> Si se produce algun error durante el proceso
+	 */
+	private boolean subCategories(long parentCategoryId, long newCourseGroupId, List<MBCategory> listParentCat, List<MBCategory> listSubCat){
+		
+		log.debug("-----------Clone Foro: listParentCat.size:: [" + listParentCat.size() + "], listSubCat.size :: [" + listSubCat.size() + "]");
+		
+		boolean result = true;
+		
+		long newParentCategoryId;
+		
+		MBCategory newCourseCategory = null;
+		
+		List<MBCategory> listSubSubCat;
+		List<MBCategory> listParentSubCat;
+		
+		for(MBCategory category:listParentCat){
+			
+			newCourseCategory = createNewCategory(newCourseGroupId, category, parentCategoryId);
+			if (newCourseCategory==null) return false;
+			
+			newParentCategoryId = newCourseCategory.getCategoryId();
+			
+			if(listSubCat.size()>0) {
+				
+				listParentSubCat = new ArrayList<MBCategory>();
+				listSubSubCat = new ArrayList<MBCategory>();
+				
+				for(MBCategory subCategory:listSubCat) {
+					
+					if(category.getCategoryId() == subCategory.getParentCategoryId()) listParentSubCat.add(subCategory);
+					else listSubSubCat.add(subCategory);
+		
+				}
+				
+				if(listParentSubCat.size()>0){//Si encuentro subcategorias de esta categoria vuelvo a llamar a esta misma funcion
+					result = subCategories(newParentCategoryId, newCourseGroupId, listParentSubCat, listSubSubCat);
+					if(!result) return result;
+				}
+			}
+		}
+		
+		return result;
+		
+	}
+	
+	/**
+	 * 
+	 * Crea una categoria del foro
+	 * 
+	 * @param newCourseGroupId: Id del curso clonado
+	 * @param category: Datos de la categoria que se quiere clonar
+	 * @param parentCategoryId: Id de la categoria de la que depende esta categoria (parentCategoryId=0 si no depende de ninguna categoria, y si tiene 
+	 * 			dependencia, parentCategoryId = categoryId de la categoria de la que depende)
+	 * @return 	null -> en caso de que se produzca algun error
+	 * 			Objeto MBCategory creado en caso de que la operacion se realice correctamente
+	 */
+	private MBCategory createNewCategory(long newCourseGroupId, MBCategory category, long parentCategoryId) {
+		
+		log.debug("-----------Clone Foro: createNewCategory:: newCourseGroupId:: [" + newCourseGroupId + "], category:: [" + category.getName() + "], parentCatId:: [" + parentCategoryId + "]");
+		
+		MBCategory newCourseCategory = null;
+		
+		try {
+			
+			newCourseCategory = MBCategoryLocalServiceUtil.createMBCategory(CounterLocalServiceUtil.increment(MBCategory.class.getName()));
+			newCourseCategory.setGroupId(newCourseGroupId);
+			newCourseCategory.setCompanyId(category.getCompanyId());
+			newCourseCategory.setName(category.getName());
+			newCourseCategory.setDescription(category.getDescription());
+			newCourseCategory.setCreateDate(Calendar.getInstance().getTime());
+			newCourseCategory.setModifiedDate(Calendar.getInstance().getTime());
+			newCourseCategory.setDisplayStyle(category.getDisplayStyle());
+			newCourseCategory.setUserId(themeDisplay.getUserId());
+			newCourseCategory.setUserName(themeDisplay.getUser().getFullName());
+			
+			newCourseCategory.setParentCategoryId(parentCategoryId);
+		
+			newCourseCategory = MBCategoryLocalServiceUtil.addMBCategory(newCourseCategory);
+			
+			return newCourseCategory;
+			
+		} catch (SystemException e) {
+			log.error(e.getMessage());
+			return null;
+		}
 	}
 
 }

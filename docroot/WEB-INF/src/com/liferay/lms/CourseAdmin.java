@@ -1627,6 +1627,7 @@ public class CourseAdmin extends MVCPortlet {
 	
 		String newCourseName  = ParamUtil.getString(actionRequest, "newCourseName", "New course cloned");
 		boolean childCourse=ParamUtil.getBoolean(actionRequest, "childCourse",false);
+		boolean cloneForum = ParamUtil.getBoolean(actionRequest, "cloneForum");
 		int startMonth = 	ParamUtil.getInteger(actionRequest, "startMon");
 		int startYear = 	ParamUtil.getInteger(actionRequest, "startYear");
 		int startDay = 		ParamUtil.getInteger(actionRequest, "startDay");
@@ -1684,6 +1685,7 @@ public class CourseAdmin extends MVCPortlet {
 			message.put("childCourse", childCourse);
 			message.put("serviceContext",serviceContext);
 			message.put("visible",visible);
+			message.put("cloneForum", cloneForum);
 			MessageBusUtil.sendMessage("liferay/lms/courseClone", message);
 			SessionMessages.add(actionRequest, "courseadmin.clone.confirmation.success");
 		}
