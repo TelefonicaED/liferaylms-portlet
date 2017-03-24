@@ -60,7 +60,7 @@ CalificationType ct = new CalificationTypeRegistry().getCalificationType(CourseL
 				Object  [] arguments=null;
 		
 				if(result!=null){	
-					arguments =  new Object[]{result.getResult()};
+					arguments =  new Object[]{ct.translate(themeDisplay.getLocale(), themeDisplay.getScopeGroupId(), result.getResult())};
 				}
 		
 				boolean isTeacher=permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), "com.liferay.lms.model",themeDisplay.getScopeGroupId(), "VIEW_RESULTS");	
@@ -336,7 +336,7 @@ CalificationType ct = new CalificationTypeRegistry().getCalificationType(CourseL
 					<h3><liferay-ui:message key="offlinetaskactivity.your-calification" /> </h3>
 					<%if ((result!=null)&&(result.getEndDate()!=null)){ %>
 						<p><liferay-ui:message key="offlinetaskactivity.your-result" arguments="<%=new Object[]{(arguments.length>0) ? arguments[0]:\"\"} %>" /></p>
-						<p><liferay-ui:message key="offlinetaskactivity.needed-to-pass" arguments="<%=new Object[]{activity.getPasspuntuation()} %>" /></p>
+						<p><liferay-ui:message key="offlinetaskactivity.needed-to-pass" arguments="<%=new Object[]{ct.translate(themeDisplay.getLocale(), themeDisplay.getScopeGroupId(), activity.getPasspuntuation())} %>" /></p>
 					<%}else {%>
 						<div class="nota_nocorregida"><liferay-ui:message key="offlinetaskactivity.not.qualificated.activity" /></div>
 					<%}%>

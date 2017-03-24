@@ -170,7 +170,7 @@ String resultHelpMessage=LanguageUtil.format(pageContext, "evaluationAvg.grades.
 	    															LanguageUtil.get(pageContext,"evaluationAvg.result.bad-format"):StringPool.BLANK %>
 	    		</div>
 	    <% if(courseEval.getNeedPassPuntuation()){ %>
-			<liferay-ui:message key="evaluationAvg.result.percent"  arguments="<%=new Object[]{courseEval.getPassPuntuation(course)} %>" />
+			<liferay-ui:message key="evaluationAvg.result.percent"  arguments="<%=new Object[]{ct.translate(themeDisplay.getLocale(), themeDisplay.getScopeGroupId(), courseEval.getPassPuntuation(course))} %>" />
 		<% } else { %>
 		    <liferay-ui:message key="evaluationAvg.result.percent.noPass" />
 		<% } %>

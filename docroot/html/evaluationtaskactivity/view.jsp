@@ -54,10 +54,8 @@ if(actId==0){
 			Course course=CourseLocalServiceUtil.fetchByGroupCreatedId(themeDisplay.getScopeGroupId());
 
 			LearningActivityResult result = LearningActivityResultLocalServiceUtil.getByActIdAndUserId(actId, themeDisplay.getUserId());
-			Long  [] arguments=null;
 			
-			if(result!=null)	
-				arguments =  new Long[]{result.getResult()};
+			
 			boolean isTeacher=permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), "com.liferay.lms.model",themeDisplay.getScopeGroupId(), "VIEW_RESULTS");
 			boolean hasFiredDate=false;
 			boolean hasPublishDate=false;
@@ -389,11 +387,12 @@ if(actId==0){
 				if(!isTeacher){ 
 					if((result!=null)&&(hasPublishDate)){ %>
 						<h2 class="description-title"><liferay-ui:message key="evaluationtaskactivity.result.title" /></h2>
-						<p><liferay-ui:message key="evaluationtaskactivity.result.youresult" /> <span class="destacado"><%= (arguments.length>0) ? LearningActivityResultLocalServiceUtil.translateResult(locale, arguments[0], themeDisplay.getScopeGroupId()):"" %></span></p>
+						<p><liferay-ui:message key="evaluationtaskactivity.result.youresult" /> <span class="destacado"><%= (result!=null) ? ct.translate(themeDisplay.getLocale(), themeDisplay.getScopeGroupId(),result.getResult()):"" %></span></p>
 						<% 
-						String resultadoNecesario = LearningActivityResultLocalServiceUtil.translateResult(locale, learningActivity.getPasspuntuation(), themeDisplay.getScopeGroupId());
+						String resultadoNecesario = ct.translate(themeDisplay.getLocale(), themeDisplay.getScopeGroupId(),learningActivity.getPasspuntuation());
+						
 						if(LearningActivityResultLocalServiceUtil.userPassed(actId,themeDisplay.getUserId())){%>
-							<p class="nota_superado"><liferay-ui:message key="evaluationtaskactivity.result.pass" arguments="<%=new String[]{resultadoNecesario} %>" /></p>
+							<p class="nota_superado"><liferay-ui:message key="evaluationtaskactivity.result.pass"/></p>
 						<%}else{%>
 							<p class="nota_nosuperado"><liferay-ui:message key="evaluationtaskactivity.result.notpass.passPuntuation"  arguments="<%=new String[]{resultadoNecesario} %>" /></p>
 						<%}

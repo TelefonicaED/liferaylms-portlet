@@ -103,9 +103,6 @@
 					<aui:option selected="<%=formatType.equals(PropsUtil.get(\"lms.question.formattype.horizontal\")) %>" value="<%=PropsUtil.get(\"lms.question.formattype.horizontal\") %>">
 						<liferay-ui:message key="exectactivity.editquestions.formattype.horizontal" />
 					</aui:option>
-					<aui:option selected="<%=formatType.equals(PropsUtil.get(\"lms.question.formattype.combo\")) %>" value="<%=PropsUtil.get(\"lms.question.formattype.combo\") %>">
-						<liferay-ui:message key="exectactivity.editquestions.formattype.combo" />
-					</aui:option>
 				</aui:select>
 	<%
 			}else{
