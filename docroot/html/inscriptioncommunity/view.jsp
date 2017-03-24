@@ -123,10 +123,10 @@
 												<%= team.getName() %>
 											</aui:column>
 											<aui:column>
-												<%= sch.getStartDate() %>
+												<%= dateFormatDateTime.format(sch.getStartDate()) %>
 											</aui:column>
 											<aui:column>
-												<%= sch.getEndDate() %>
+												<%= dateFormatDateTime.format(sch.getEndDate()) %>
 											</aui:column>
 											<aui:column>
 												<div class="boton_inscibirse ">
@@ -190,13 +190,13 @@
 										<div class="mensaje_marcado"><liferay-ui:message key="inscripcion.surveillance" /></div>
 										<aui:fieldset>
 											<aui:column>
-												<% team.getName();  %>
+												<%= team.getName()  %>
 											</aui:column>
 											<aui:column>
-												<% sch.getStartDate(); %>
+												<%= dateFormatDateTime.format(sch.getStartDate()) %>
 											</aui:column>
 											<aui:column>
-												<% sch.getEndDate(); %>
+												<%= dateFormatDateTime.format(sch.getEndDate()) %>
 											</aui:column>
 											<aui:column>
 												<div class="boton_inscibirse ">
