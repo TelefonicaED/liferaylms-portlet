@@ -13,18 +13,6 @@
 			</liferay-ui:search-form>
 		</aui:form>
 	</c:if>
-	<c:if test="${!showSearcher and not empty teams}">
-		<aui:form action="${renderURL}" name="searchTeamsFm">
-			<aui:select name="team" label="team">
-				<aui:option label="" value="0"></aui:option>
-				<c:forEach items="${teams}" var="team">
-					<aui:option  value="${team.teamId}" label="${team.name}" selected="${team.teamId == teamId}"></aui:option>
-				</c:forEach>
-			</aui:select>	
-			<aui:button value="search" type="submit"/>
-		</aui:form>
-	</c:if>
-	
 	
 	<liferay-ui:search-container
 			searchContainer="${searchContainer}" 
