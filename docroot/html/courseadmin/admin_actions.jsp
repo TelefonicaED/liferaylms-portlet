@@ -40,7 +40,6 @@ boolean showPermission = preferences.getValue("showPermission", "true").equals("
 
 <portlet:actionURL name="closeCourse" var="closeURL">
 	<portlet:param name="courseId" value="<%= primKey %>" />
-	<portlet:param name="redirect" value='<%= ParamUtil.getString(request, "redirect", currentURL) %>'/>
 </portlet:actionURL>
 
 <liferay-ui:icon-menu>

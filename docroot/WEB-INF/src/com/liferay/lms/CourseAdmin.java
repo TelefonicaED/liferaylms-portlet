@@ -635,17 +635,15 @@ public class CourseAdmin extends MVCPortlet {
 			CourseLocalServiceUtil.deleteCourse(courseId);
 		}
 	}
-	public void closeCourse(ActionRequest actionRequest,
-			ActionResponse actionResponse) throws Exception {
+	public void closeCourse(ActionRequest actionRequest, ActionResponse actionResponse) throws Exception {
 
+		log.debug("******CloseCourse**********");
 
 		Indexer indexer=IndexerRegistryUtil.getIndexer(Course.class);
 		
-		ServiceContext serviceContext = ServiceContextFactory.getInstance(
-				Course.class.getName(), actionRequest);
+		ServiceContext serviceContext = ServiceContextFactory.getInstance(Course.class.getName(), actionRequest);
 
-		ThemeDisplay themeDisplay = (ThemeDisplay) actionRequest
-				.getAttribute(WebKeys.THEME_DISPLAY);
+		ThemeDisplay themeDisplay = (ThemeDisplay) actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
 		String redirect = ParamUtil.getString(actionRequest, "redirect");
 
 		User user = themeDisplay.getUser();
