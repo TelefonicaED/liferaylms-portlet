@@ -72,8 +72,11 @@ import com.liferay.portlet.asset.service.persistence.AssetEntryQuery;
  * @see com.liferay.lms.service.base.TestQuestionLocalServiceBaseImpl
  * @see com.liferay.lms.service.TestQuestionLocalServiceUtil
  */
-public class TestQuestionLocalServiceImpl
-	extends TestQuestionLocalServiceBaseImpl {
+public class TestQuestionLocalServiceImpl extends TestQuestionLocalServiceBaseImpl {
+	
+	private final String CATEGORY_TYPE = "category";
+	private final long CATEGORY = -999;
+	
 	public void importXML(long actId, Document document) throws DocumentException, SystemException, PortalException
 	{
 		Element rootElement = document.getRootElement();
@@ -85,13 +88,18 @@ public class TestQuestionLocalServiceImpl
 	}
 	public void importXMLQuestion(long actId, Element question) throws SystemException, PortalException {
 		long type = getQuestionType(question);
-		if(type != -1){
+		if(type != -1 && type != CATEGORY){
 			QuestionType qt = new QuestionTypeRegistry().getQuestionType(type);
 			qt.importXML(actId, question, testAnswerLocalService);
 		}
 	}
 	public long getQuestionType(Element question) {
-		long type = -1;
+		long type = -1;		
+		
+		if(CATEGORY_TYPE.equals(question.attributeValue("type"))){
+			return CATEGORY;
+		}
+		
 		boolean isSurveyHorizontal = "surveyoptionshorizontal".equals(question.element("name").element("text").getText());
 		boolean isSurvey = "surveyoptions".equals(question.element("name").element("text").getText());
 		if("multichoice".equals(question.attributeValue("type")) && "true".equals(question.element("single").getText()) && !isSurveyHorizontal && !isSurvey) type = 0;
@@ -369,14 +377,13 @@ public class TestQuestionLocalServiceImpl
 	
 	public boolean isTypeAllowed(long actId, Document document){
 		try {
-			LearningActivity learningActivity = LearningActivityLocalServiceUtil
-													.getLearningActivity(actId);
-			List<String> allowedTypes = ListUtil.fromArray(PropsUtil.getArray(
-															"lms.questions.allowed.for."
-															+ learningActivity.getTypeId()));
+			LearningActivity learningActivity = LearningActivityLocalServiceUtil.getLearningActivity(actId);
+			List<String> allowedTypes = ListUtil.fromArray(PropsUtil.getArray("lms.questions.allowed.for."+ learningActivity.getTypeId()));
+			
+			allowedTypes.add(String.valueOf(CATEGORY));
+			
 			//Añadimos el tipo SurveyHorizontalOptionsQuestionType si es de tipo encuesta 
-			if (learningActivity.getTypeId() == 4)
-				allowedTypes.add("7");
+			if (learningActivity.getTypeId() == 4)allowedTypes.add("7");
 			
 			Element rootElement = document.getRootElement();
 			for(Element question:rootElement.elements("question"))
