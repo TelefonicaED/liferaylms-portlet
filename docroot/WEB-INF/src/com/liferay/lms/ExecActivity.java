@@ -339,6 +339,7 @@ public class ExecActivity extends MVCPortlet{
 						actionResponse.setRenderParameter("jspPage", "/html/execactivity/test/admin/importquestions.jsp");
 					}
 				} catch (DocumentException e) {
+					e.printStackTrace();
 					Matcher matcher = DOCUMENT_EXCEPTION_MATCHER.matcher(e.getMessage());
 
 					if(matcher.matches()) {
@@ -349,6 +350,7 @@ public class ExecActivity extends MVCPortlet{
 					}
 					actionResponse.setRenderParameter("jspPage", "/html/execactivity/test/admin/importquestions.jsp");
 				} catch (Exception e) {
+					e.printStackTrace();
 					SessionErrors.add(actionRequest, "execativity.editquestions.importquestions.xml.generic");
 					actionResponse.setRenderParameter("jspPage", "/html/execactivity/test/admin/importquestions.jsp");
 				}

@@ -34,7 +34,7 @@ import java.util.Map;
 import org.xml.sax.InputSource;
 
 import com.liferay.lms.NoSuchLearningActivityResultException;
-import com.tls.AuditConstants;
+import com.liferay.lms.auditing.AuditConstants;
 import com.liferay.lms.auditing.AuditingLogFactory;
 import com.liferay.lms.learningactivity.calificationtype.CalificationType;
 import com.liferay.lms.learningactivity.calificationtype.CalificationTypeRegistry;

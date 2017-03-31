@@ -212,24 +212,23 @@ public class GroupListener extends BaseModelListener<Group> {
 								log.debug(subject);
 								log.debug(body);
 							}
-							MailMessage mailm = new MailMessage(from, to, subject, body, true);
-							MailServiceUtil.sendEmail(mailm);
+							//MailMessage mailm = new MailMessage(from, to, subject, body, true);
+							//MailServiceUtil.sendEmail(mailm);
 							
 							//Envio el correo (Preparado para cuando se quiera mandar al mailing)
-//							Message message=new Message();
-//
-//							message.put("to", emailTo);
-//
-//							message.put("subject", 	subject);
-//							message.put("body", 	body);
-//							message.put("groupId", 	course.getGroupCreatedId());
-//							message.put("userId",  	user.getUserId());
-//							message.put("testing", 	StringPool.FALSE);
-//							message.put("type", 	"COURSE_INSCRIPTION");
-//							message.put("url", 		url);
-//							message.put("urlcourse",urlcourse);		
-//
-//							MessageBusUtil.sendMessage("lms/mailing", message);
+							Message message=new Message();
+
+							message.put("to", emailTo);
+							message.put("subject", 	subject);
+							message.put("body", 	body);
+							message.put("groupId", 	course.getGroupCreatedId());
+							message.put("userId",  	user.getUserId());
+							message.put("testing", 	StringPool.FALSE);
+							message.put("type", 	"COURSE_INSCRIPTION");
+							message.put("url", 		url);
+							message.put("urlcourse",urlcourse);		
+
+							MessageBusUtil.sendMessage("lms/mailing", message);
 						}
 						catch(Exception ex)
 						{

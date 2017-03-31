@@ -635,17 +635,15 @@ public class CourseAdmin extends MVCPortlet {
 			CourseLocalServiceUtil.deleteCourse(courseId);
 		}
 	}
-	public void closeCourse(ActionRequest actionRequest,
-			ActionResponse actionResponse) throws Exception {
+	public void closeCourse(ActionRequest actionRequest, ActionResponse actionResponse) throws Exception {
 
+		log.debug("******CloseCourse**********");
 
 		Indexer indexer=IndexerRegistryUtil.getIndexer(Course.class);
 		
-		ServiceContext serviceContext = ServiceContextFactory.getInstance(
-				Course.class.getName(), actionRequest);
+		ServiceContext serviceContext = ServiceContextFactory.getInstance(Course.class.getName(), actionRequest);
 
-		ThemeDisplay themeDisplay = (ThemeDisplay) actionRequest
-				.getAttribute(WebKeys.THEME_DISPLAY);
+		ThemeDisplay themeDisplay = (ThemeDisplay) actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
 		String redirect = ParamUtil.getString(actionRequest, "redirect");
 
 		User user = themeDisplay.getUser();
@@ -1627,6 +1625,7 @@ public class CourseAdmin extends MVCPortlet {
 	
 		String newCourseName  = ParamUtil.getString(actionRequest, "newCourseName", "New course cloned");
 		boolean childCourse=ParamUtil.getBoolean(actionRequest, "childCourse",false);
+		boolean cloneForum = ParamUtil.getBoolean(actionRequest, "cloneForum");
 		int startMonth = 	ParamUtil.getInteger(actionRequest, "startMon");
 		int startYear = 	ParamUtil.getInteger(actionRequest, "startYear");
 		int startDay = 		ParamUtil.getInteger(actionRequest, "startDay");
@@ -1684,6 +1683,7 @@ public class CourseAdmin extends MVCPortlet {
 			message.put("childCourse", childCourse);
 			message.put("serviceContext",serviceContext);
 			message.put("visible",visible);
+			message.put("cloneForum", cloneForum);
 			MessageBusUtil.sendMessage("liferay/lms/courseClone", message);
 			SessionMessages.add(actionRequest, "courseadmin.clone.confirmation.success");
 		}

@@ -24,6 +24,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import com.liferay.counter.service.CounterLocalServiceUtil;
+import com.liferay.lms.auditing.AuditConstants;
 import com.liferay.lms.auditing.AuditingLogFactory;
 import com.liferay.lms.learningactivity.courseeval.CourseEval;
 import com.liferay.lms.learningactivity.courseeval.CourseEvalRegistry;
@@ -99,7 +100,6 @@ import com.liferay.portlet.social.model.SocialActivitySetting;
 import com.liferay.portlet.social.service.SocialActivitySettingLocalServiceUtil;
 import com.liferay.portlet.social.service.SocialActivitySettingServiceUtil;
 import com.liferay.util.LmsLocaleUtil;
-import com.tls.AuditConstants;
 
 
 

@@ -199,7 +199,6 @@ if(activity.getEnddate() == null){
 
 							var textDesc = CKEDITOR.instances[thisEditor+'_<%=i%>'].getData();
 	
-							console.log("2-"+thisEditor+'_<%=i%>');
 							AUI().one(selector).get(thisEditor+'_<%=i%>i').set('value',textDesc);
 	
 							AUI().one(selector).get(thisEditor+'_<%=i%>').set('value',textDesc);
@@ -216,8 +215,8 @@ if(activity.getEnddate() == null){
 					}
 				%>
 				
-				if(	A.one('select[name="<portlet:namespace />resultuser"]') != null){
-					textResult = A.one('select[name="<portlet:namespace />resultuser"]').val();
+				if(	A.one(selector).one('select[name="<portlet:namespace />resultuser"]') != null){
+					textResult = A.one(selector).one('select[name="<portlet:namespace />resultuser"]').val();
 				}
 
 				if (fileName != "") {

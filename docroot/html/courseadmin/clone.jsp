@@ -57,6 +57,7 @@
 		<aui:validator name="required" errorMessage="field.required"></aui:validator>
 	</aui:input>
     <aui:input type="checkbox"  name="childCourse" label="courseadmin.clone.childcourse" helpMessage="courseadmin.clone.childcourse.help" />
+    <aui:input type="checkbox"  name="cloneForum" label="courseadmin.clone.clone-forum" helpMessage="courseadmin.clone.clone-forum.help" />
 <div id="datesbox" style="visibility: visible">				
 	<aui:field-wrapper label="start-course-date">
 		<liferay-ui:input-date yearRangeEnd="<%=LiferaylmsUtil.defaultEndYear %>" yearRangeStart="<%=LiferaylmsUtil.defaultStartYear %>"  dayParam="startDay" monthParam="startMon"

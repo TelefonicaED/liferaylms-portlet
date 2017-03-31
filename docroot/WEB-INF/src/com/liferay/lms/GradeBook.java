@@ -124,6 +124,8 @@ public class GradeBook extends MVCPortlet {
 				
 				Course course = CourseLocalServiceUtil.getCourseByGroupCreatedId(module.getGroupId());
 				
+				CalificationType ct = new CalificationTypeRegistry().getCalificationType(course.getCalificationType());
+				
 				if(theTeam!=null)
 				{
 					userParams.put("usersGroups", theTeam.getGroupId());
@@ -167,7 +169,7 @@ public class GradeBook extends MVCPortlet {
 							resultados[column++]=StringPool.BLANK;
 						}
 						else {
-							resultados[column++]=Long.toString(learningActivityResult.getResult());
+							resultados[column++]=ct.translate(themeDisplay.getLocale(), course.getGroupCreatedId(),learningActivityResult.getResult());
 						}
 
 			        }
