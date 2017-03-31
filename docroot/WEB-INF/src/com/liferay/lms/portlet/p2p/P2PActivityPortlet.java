@@ -40,6 +40,7 @@ import com.liferay.mail.service.MailServiceUtil;
 import com.liferay.portal.kernel.exception.NestableException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.json.JSON;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
@@ -54,6 +55,7 @@ import com.liferay.portal.kernel.upload.UploadPortletRequest;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PrefsPropsUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -848,7 +850,18 @@ public class P2PActivityPortlet extends MVCPortlet {
 			
 			//Comentarios realizados por el usuario que ha corregido la actividad.
 			if(p2pActiCor!= null && p2pActiCor.getDescription()!=null){
-				body += "<br /><br />" + p2pActiCor.getDescription();	
+				int numQuestion = Integer.parseInt(PropsUtil.get("lms.p2p.numcustomquestion"));
+				JSONObject object=null;
+				JSONArray jArray = JSONFactoryUtil.createJSONArray(p2pActiCor.getDescription());
+				for(int i=0;i<numQuestion;i++){
+					String des = LearningActivityLocalServiceUtil.getExtraContentValue(actId, "text"+i);
+					if(des!=null&&!des.equals(StringPool.BLANK)){
+						body+= "<br />" +des;
+						object=jArray.getJSONObject(i);
+						body+= "<br />" +object.getString("text"+i, "");
+					}
+				}
+				
 			}
 			
 			if(result){
