@@ -667,6 +667,9 @@ public class LmsActivitiesList extends MVCPortlet {
 		
 		if(actId>0){
 			LearningActivity larn = LearningActivityLocalServiceUtil.getLearningActivity(actId);
+			if(moduleId<=0){
+				moduleId = larn.getModuleId();
+			}
 			if(permissionChecker.hasPermission(larn.getGroupId(), LearningActivity.class.getName(), larn.getActId(),
 					ActionKeys.DELETE)|| permissionChecker.hasOwnerPermission(larn.getCompanyId(), LearningActivity.class.getName(), larn.getActId(),larn.getUserId(),
 							ActionKeys.DELETE))
@@ -682,6 +685,7 @@ public class LmsActivitiesList extends MVCPortlet {
 					}else{
 						actionResponse.setRenderParameter("actId", "0");
 						actionResponse.setRenderParameter("resId", "0");
+						actionResponse.setRenderParameter("moduleId", String.valueOf(moduleId));
 					}
 				}
 				
