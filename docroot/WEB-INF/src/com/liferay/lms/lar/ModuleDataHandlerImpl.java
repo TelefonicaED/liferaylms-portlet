@@ -1,15 +1,15 @@
 package com.liferay.lms.lar;
 
 import java.io.InputStream;
+import java.text.Normalizer;
+import java.text.Normalizer.Form;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Set;
 
 import javax.portlet.PortletPreferences;
 
-import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang.StringUtils;
 
 import com.liferay.lms.NoLearningActivityTypeActiveException;
@@ -116,11 +116,7 @@ public class ModuleDataHandlerImpl extends BasePortletDataHandler {
 				List<LearningActivity> activities = LearningActivityLocalServiceUtil.getLearningActivitiesOfModule(module.getModuleId());
 				
 				for(LearningActivity activity:activities){
-					
-					log.info("      Learning Activity : " + activity.getTitle(Locale.getDefault())+ " (" + LanguageUtil.get(Locale.getDefault(),learningActivityTypeRegistry.getLearningActivityType(activity.getTypeId()).getName())+")");
-					
 					LearningActivityLocalServiceUtil.deleteLearningactivity(activity);
-					
 				}
 				
 				//Borrar todos los ficheros 
@@ -255,76 +251,7 @@ public class ModuleDataHandlerImpl extends BasePortletDataHandler {
 						//Comprobamos que sea un long
 						if(StringUtils.isNumeric(content)){
 							log.info("Es un id");
-							AssetEntry docAsset= AssetEntryLocalServiceUtil.getAssetEntry(Long.valueOf(img.get(i)));
-							log.info("docAsset: " + docAsset.getClassPK());
-							if(actividad.getTypeId() != 9){
-								
-								log.info("mimeType: " + docAsset.getMimeType());
-								DLFileEntry docfile=DLFileEntryLocalServiceUtil.getDLFileEntry(docAsset.getClassPK());
-								
-								log.info("docFile: " + docfile.getFileEntryId());
-								String extension = "";
-								if(!docfile.getTitle().contains(".") && docfile.getExtension().equals("")){
-									if(docfile.getMimeType().equals("image/jpeg")){
-										extension= ".jpg";
-									}else if(docfile.getMimeType().equals("image/png")){
-										extension= ".png";
-									}else if(docfile.getMimeType().equals("video/mpeg")){
-										extension= ".mpeg";
-									}else if(docfile.getMimeType().equals("application/pdf")){
-										extension= ".pdf";
-									}else{
-										String ext[] = extension.split("/");
-										if(ext.length>1){
-											extension = ext[1];
-										}
-									}
-								}else if(!docfile.getTitle().contains(".") && !docfile.getExtension().equals("")){
-									extension="."+docfile.getExtension();
-								}
-	
-								String pathqu = getEntryPath(context, docfile);
-								String pathFile = getFilePath(context, docfile,actividad.getActId());
-								Element entryElementfe= entryElementLoc.addElement("dlfileentry");
-								entryElementfe.addAttribute("path", pathqu);
-								entryElementfe.addAttribute("file", pathFile+containsCharUpper(docfile.getTitle()+extension));
-								context.addZipEntry(pathqu, docfile);
-								
-								log.info("pathqu: " + pathqu);
-								log.info("pathFile: " + pathFile);
-	
-								//Guardar el fichero en el zip.
-								InputStream input = DLFileEntryLocalServiceUtil.getFileAsStream(docfile.getUserId(), docfile.getFileEntryId(), docfile.getVersion());
-	
-								context.addZipEntry(getFilePath(context, docfile,actividad.getActId())+containsCharUpper(docfile.getTitle()+extension), input);
-								
-								String txt = (actividad.getTypeId() == 2) ? "external":"internal";
-								log.info("    - Resource "+ txt + ": " + containsCharUpper(docfile.getTitle()+extension));
-	
-							}else{
-								if(actividad.getTypeId() == 9){
-										
-									log.info("***************************************************************************************");
-										
-									log.info("PASO POR AQUI PARA "+actividad.getTitle());
-	
-										
-									if(docAsset.getClassName().equals(SCORMContent.class.getName())){
-										try{
-											ScormDataHandlerImpl scormHandler = new ScormDataHandlerImpl();
-											SCORMContent scocontent = SCORMContentLocalServiceUtil.getSCORMContent(docAsset.getClassPK());
-											scormHandler.exportEntry(context, entryElementLoc, scocontent);
-										}catch(Exception e){
-											e.printStackTrace();
-											actividad.setExtracontent("");
-										}
-									} else{
-										log.info("MPC CONTENT");
-										actividad.setExtracontent("");
-									}
-										
-								}
-							}
+							ExportUtil.addZipEntry(actividad, Long.valueOf(img.get(i)), context, entryElementLoc);
 						}
 					}
 						
@@ -494,13 +421,7 @@ public class ModuleDataHandlerImpl extends BasePortletDataHandler {
 
 	public String containsCharUpper(String str) {
 	    
-	    String characters = "�����";
-
-	    for (int i=0; i<characters.length(); i++) {
-	    	if(str.contains(String.valueOf(characters.charAt(i)))){
-	    		return str.toLowerCase();
-	    	}
-	    }
+		str = str.replaceAll("[^a-zA-Z0-9]", "");
 	    return str;
 	}
 	
@@ -536,15 +457,7 @@ public class ModuleDataHandlerImpl extends BasePortletDataHandler {
 		return sb.toString();
 	}
 	
-	private String getEntryPath(PortletDataContext context, DLFileEntry file) {
-	
-		StringBundler sb = new StringBundler(4);
-		sb.append(context.getPortletPath("resourceactivity_WAR_liferaylmsportlet"));
-		sb.append("/moduleentries/");
-		sb.append(file.getFileEntryId());
-		sb.append(".xml");
-		return sb.toString();
-	}
+
 	
 	private static String getEntryPath(PortletDataContext context, FileEntry file) {
 	
@@ -556,13 +469,7 @@ public class ModuleDataHandlerImpl extends BasePortletDataHandler {
 		return sb.toString();
 	}
 	
-	private String getFilePath(PortletDataContext context,DLFileEntry file, long actId) {
-		
-		StringBundler sb = new StringBundler(4);
-		sb.append(context.getPortletPath("moduleportlet_WAR_liferaylmsportlet"));
-		sb.append("/moduleentries/activities/"+String.valueOf(actId)+"/");
-		return sb.toString();
-	}
+
 	
 	private String getEntryPath(PortletDataContext context, TestQuestion question) {
 	

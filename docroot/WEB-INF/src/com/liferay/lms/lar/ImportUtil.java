@@ -20,7 +20,6 @@ import com.liferay.portal.kernel.lar.PortletDataContext;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
-import com.liferay.portal.kernel.util.MimeTypesUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.xml.Attribute;
 import com.liferay.portal.kernel.xml.Document;
@@ -29,6 +28,7 @@ import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portlet.documentlibrary.DuplicateFileException;
+import com.liferay.portlet.documentlibrary.model.DLFileEntry;
 import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
 import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
 import com.tls.lms.util.DLFolderUtil;
@@ -44,8 +44,7 @@ public class ImportUtil {
 		if(oldFile == null || newFile == null){
 			return res;
 		}
-		
-		
+			
 		String target 		= "/documents/"+oldFile.getRepositoryId()+"/"+oldFile.getFolderId()+"/"+URLEncoder.encode(oldFile.getTitle())+"/"+oldFile.getUuid();
 		String replacement 	= "/documents/"+newFile.getRepositoryId()+"/"+newFile.getFolderId()+"/"+URLEncoder.encode(newFile.getTitle())+"/"+newFile.getUuid();
 
@@ -66,6 +65,8 @@ public class ImportUtil {
 		if(entryElement.attributeValue("file") != null){
 			
 			log.info("entryElement value file-->"+entryElement.attributeValue("file"));
+			log.info("entry value path: " + entryElement.attributeValue("path"));
+			DLFileEntry fileEntryOld = (DLFileEntry)context.getZipEntryAsObject(entryElement.attributeValue("path"));
 		
 			long repositoryId = DLFolderConstants.getDataRepositoryId(context.getScopeGroupId(), DLFolderConstants.DEFAULT_PARENT_FOLDER_ID);
 			long folderId=DLFolderUtil.createDLFoldersForLearningActivity(userId, repositoryId, serviceContext).getFolderId();
@@ -78,13 +79,11 @@ public class ImportUtil {
 			if(name.length > 0){
 				String imageName = name[name.length-1];
 				InputStream input = context.getZipEntryAsInputStream(entryElement.attributeValue("file"));
-			
 				
 				if(input != null){
-					String mimeType = MimeTypesUtil.getContentType(imageName);
-					log.info("mimeType: " + mimeType);
+					log.info("mimeType: " + fileEntryOld.getMimeType());
 					try {								
-						FileEntry newFile = DLAppLocalServiceUtil.addFileEntry(userId, repositoryId , folderId , imageName, mimeType, imageName, StringPool.BLANK, StringPool.BLANK, IOUtils.toByteArray(input), serviceContext ) ;
+						FileEntry newFile = DLAppLocalServiceUtil.addFileEntry(userId, repositoryId , folderId , imageName, fileEntryOld.getMimeType(), fileEntryOld.getTitle(), fileEntryOld.getDescription(), StringPool.BLANK, IOUtils.toByteArray(input), serviceContext ) ;
 						if(newFile != null)log.info("newFile: " + newFile.getFileEntryId());
 						return newFile;
 					} catch(DuplicateFileException dfl){
@@ -93,7 +92,7 @@ public class ImportUtil {
 						FileEntry newFile;
 						try {
 							Date date = new Date();
-							newFile = DLAppLocalServiceUtil.addFileEntry(userId, repositoryId , folderId , date.getTime() + imageName, mimeType, date.getTime() + imageName, StringPool.BLANK, StringPool.BLANK, IOUtils.toByteArray(input), serviceContext ) ;
+							newFile = DLAppLocalServiceUtil.addFileEntry(userId, repositoryId , folderId , date.getTime() + imageName, fileEntryOld.getMimeType(), date.getTime() + fileEntryOld.getTitle(), fileEntryOld.getDescription(), StringPool.BLANK, IOUtils.toByteArray(input), serviceContext ) ;
 							return newFile;
 						} catch (SystemException e) {
 							// TODO Auto-generated catch block
