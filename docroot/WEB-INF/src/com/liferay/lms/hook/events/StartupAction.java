@@ -13,6 +13,7 @@ import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.model.LmsPrefs;
 import com.liferay.lms.model.Module;
 import com.liferay.lms.service.LmsPrefsLocalServiceUtil;
+import com.liferay.lms.util.LmsConstant;
 import com.liferay.portal.kernel.events.ActionException;
 import com.liferay.portal.kernel.events.SimpleAction;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -86,6 +87,8 @@ public class StartupAction extends SimpleAction {
 		if (table != null) {
 				createExpandoColumn(table, "Abreviatura", ExpandoColumnConstants.STRING,
 							ExpandoColumnConstants.INDEX_TYPE_TEXT, ExpandoColumnConstants.PROPERTY_DISPLAY_TYPE, "", true);
+				createExpandoColumn(table, LmsConstant.ADDITIONAL_INFORMATION_COURSE_EXPANDO, ExpandoColumnConstants.STRING,
+						ExpandoColumnConstants.INDEX_TYPE_NONE, ExpandoColumnConstants.PROPERTY_DISPLAY_TYPE_TEXT_BOX, "", true);
 		}
 		
 		ExpandoTable table2 = getExpandoTable(companyId, Group.class.getName(), ExpandoTableConstants.DEFAULT_TABLE_NAME);

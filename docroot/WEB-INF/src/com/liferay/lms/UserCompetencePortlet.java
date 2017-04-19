@@ -43,6 +43,7 @@ import com.liferay.lms.service.ModuleLocalServiceUtil;
 import com.liferay.lms.service.ModuleResultLocalServiceUtil;
 import com.liferay.lms.service.UserCertificateDownloadLocalServiceUtil;
 import com.liferay.lms.service.UserCompetenceLocalServiceUtil;
+import com.liferay.lms.util.LmsConstant;
 import com.liferay.lms.views.CompetenceView;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
@@ -72,7 +73,10 @@ import com.liferay.portlet.asset.model.AssetEntry;
 import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
 import com.liferay.portlet.expando.model.ExpandoColumn;
 import com.liferay.portlet.expando.model.ExpandoColumnConstants;
+import com.liferay.portlet.expando.model.ExpandoTable;
+import com.liferay.portlet.expando.model.ExpandoTableConstants;
 import com.liferay.portlet.expando.service.ExpandoColumnLocalServiceUtil;
+import com.liferay.portlet.expando.service.ExpandoTableLocalServiceUtil;
 import com.liferay.util.VelocityUtil;
 import com.liferay.util.bridges.mvc.MVCPortlet;
 import com.lowagie.text.DocumentException;
@@ -356,25 +360,26 @@ public class UserCompetencePortlet extends MVCPortlet {
 				} else if (competence.getDiplomaAdditional() == 3) {
 					sb.append("<p>");
 					try {
-						Group group = GroupLocalServiceUtil.getGroup(course.getGroupCreatedId());
-						if (Validator.isNotNull(group)) {
-							AssetEntry entry = null; 
-							try {
-								entry = AssetEntryLocalServiceUtil.getEntry(Course.class.getName(),course.getCourseId());
-							} catch (Exception e) {
-								log.error("Se ha producido un error al buscar la información adicional del curso " + course.getCourseId());
-							}
-							if (Validator.isNotNull(entry)) {
-								String summary = entry.getSummary(themeDisplay.getLocale(), Boolean.TRUE);
-								if (Validator.isNotNull(summary) && !summary.isEmpty()) {
-									summary = summary.replaceAll(StringPool.NEW_LINE, "<br/>");
+						ExpandoColumn column = null;
+						//Si existe el expando para la informacion adicional, se añade.
+						ExpandoTable table = ExpandoTableLocalServiceUtil.getTable(themeDisplay.getCompanyId(), Course.class.getName(), ExpandoTableConstants.DEFAULT_TABLE_NAME);
+						if (table != null) {
+							column =  ExpandoColumnLocalServiceUtil.getColumn (table.getTableId(), LmsConstant.ADDITIONAL_INFORMATION_COURSE_EXPANDO);
+							if(column!=null){
+								if(course.getExpandoBridge().getAttribute(LmsConstant.ADDITIONAL_INFORMATION_COURSE_EXPANDO,false)!=null){
+									String summary = String.valueOf(course.getExpandoBridge().getAttribute(LmsConstant.ADDITIONAL_INFORMATION_COURSE_EXPANDO,false));
+									if (Validator.isNotNull(summary) && !summary.isEmpty()) {
+										summary = summary.replaceAll(StringPool.NEW_LINE, "<br/>");
+									}
+									sb.append(summary);
 								}
-								sb.append(summary);
 							}
 						}
-					} catch (Exception e) {
-						log.error("Se ha producido un error al obtener la información adicional del curso " + course.getGroupCreatedId(), e);
+					}catch(Exception e){
+						log.error("Se ha producido un error al buscar la información adicional del curso " + course.getCourseId());
+						e.printStackTrace();
 					}
+					
 					sb.append("</p>");
 				}
 				 
