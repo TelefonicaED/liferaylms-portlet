@@ -280,6 +280,11 @@ public interface LearningActivityLocalService extends BaseLocalService,
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public boolean islocked(long actId, long userId) throws java.lang.Exception;
 
+	public boolean canAccess(long actId, boolean viewActivityFinish,
+		com.liferay.portal.model.User user,
+		com.liferay.portal.security.permission.PermissionChecker permissionChecker)
+		throws java.lang.Exception;
+
 	public com.liferay.lms.model.LearningActivity addLearningActivity(
 		com.liferay.lms.model.LearningActivity learningActivity,
 		com.liferay.portal.service.ServiceContext serviceContext)

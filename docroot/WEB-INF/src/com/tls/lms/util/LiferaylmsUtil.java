@@ -16,10 +16,12 @@ import com.liferay.lms.model.CourseResult;
 import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.model.LmsPrefs;
 import com.liferay.lms.model.Module;
+import com.liferay.lms.model.Schedule;
 import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.lms.service.CourseResultLocalServiceUtil;
 import com.liferay.lms.service.LmsPrefsLocalServiceUtil;
 import com.liferay.lms.service.ModuleLocalServiceUtil;
+import com.liferay.lms.service.ScheduleLocalServiceUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
@@ -29,6 +31,7 @@ import com.liferay.portal.model.Resource;
 import com.liferay.portal.model.ResourceConstants;
 import com.liferay.portal.model.Role;
 import com.liferay.portal.model.RoleConstants;
+import com.liferay.portal.model.Team;
 import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.service.ResourceBlockLocalServiceUtil;
@@ -37,6 +40,7 @@ import com.liferay.portal.service.ResourceLocalServiceUtil;
 import com.liferay.portal.service.ResourcePermissionLocalServiceUtil;
 import com.liferay.portal.service.ResourcePermissionServiceUtil;
 import com.liferay.portal.service.RoleLocalServiceUtil;
+import com.liferay.portal.service.TeamLocalServiceUtil;
 import com.liferay.portal.theme.ThemeDisplay;
 
 public class LiferaylmsUtil {
@@ -174,6 +178,7 @@ public class LiferaylmsUtil {
 		
 		Date now = new Date();
 		Date lastModuleDate = null;
+		
 		//Ahora comprobamos si se cumple alguna de las otras tres condiciones
 		try {
 			for(Module module:ModuleLocalServiceUtil.findAllInGroup(groupId)){
@@ -187,6 +192,35 @@ public class LiferaylmsUtil {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+		
+		
+		
+		
+		//Si hay equipos 
+		try {
+			List<Team> teams = TeamLocalServiceUtil.getUserTeams(userId, groupId);
+			if(teams!=null && teams.size()>0){
+				for(Team team : teams){
+					Schedule schedule = null;
+					try {
+						schedule = ScheduleLocalServiceUtil.getScheduleByTeamId(team.getTeamId());
+						if(schedule!=null){
+							log.debug(":::hasPermissionAccessCourseFinished::--ExistTime--::scheduleEndDate: " + lastModuleDate);
+							lastModuleDate = schedule.getEndDate();
+							break;
+						}
+					} catch (SystemException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}			
+			}
+		} catch (SystemException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		
 		log.debug(":::hasPermissionAccessCourseFinished:::lastModuleDate: " + lastModuleDate);
 		

@@ -310,6 +310,14 @@ public class LearningActivityLocalServiceUtil {
 		return getService().islocked(actId, userId);
 	}
 
+	public static boolean canAccess(long actId, boolean viewActivityFinish,
+		com.liferay.portal.model.User user,
+		com.liferay.portal.security.permission.PermissionChecker permissionChecker)
+		throws java.lang.Exception {
+		return getService()
+				   .canAccess(actId, viewActivityFinish, user, permissionChecker);
+	}
+
 	public static com.liferay.lms.model.LearningActivity addLearningActivity(
 		com.liferay.lms.model.LearningActivity learningActivity,
 		com.liferay.portal.service.ServiceContext serviceContext)

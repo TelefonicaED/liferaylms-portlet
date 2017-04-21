@@ -136,6 +136,18 @@ public class LearningActivityLocalServiceImpl extends LearningActivityLocalServi
 		}
 	}
 	
+	
+	public boolean canAccess(long actId, boolean viewActivityFinish, User user,
+			PermissionChecker permissionChecker) throws Exception{
+		LearningActivity activity =learningActivityPersistence.fetchByPrimaryKey(actId);
+		
+		if(activity != null){
+			return activity.canAccess(viewActivityFinish, user, permissionChecker);
+		}else{
+			return true;
+		}
+	}
+	
 	@Override
 	public LearningActivity addLearningActivity(LearningActivity learningActivity,ServiceContext serviceContext) throws SystemException, PortalException {
 
