@@ -551,4 +551,13 @@ public interface CourseLocalService extends BaseLocalService,
 	*/
 	public boolean canAccessLock(long groupCreatedId,
 		com.liferay.portal.model.User user);
+
+	/**
+	* Returns the last module date in course, because the course end date is for enrollments.
+	*
+	* @param courseId Course Identifier
+	* @return Course last module date.
+	*/
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.util.Date getLastModuleDateInCourse(long courseId);
 }

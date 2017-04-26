@@ -98,7 +98,7 @@ public class StartupAction extends SimpleAction {
 		}
 		
 		ExpandoTable table3 = getExpandoTable(companyId, User.class.getName(), ExpandoTableConstants.DEFAULT_TABLE_NAME);
-		if (table2 != null) {
+		if (table3 != null) {
 				createExpandoColumn(table3, "deregister-mail", ExpandoColumnConstants.BOOLEAN,
 							ExpandoColumnConstants.INDEX_TYPE_TEXT, ExpandoColumnConstants.PROPERTY_DISPLAY_TYPE_CHECKBOX, "", true);
 		}

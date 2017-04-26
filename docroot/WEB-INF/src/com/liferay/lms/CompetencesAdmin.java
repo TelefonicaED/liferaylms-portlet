@@ -58,6 +58,7 @@ import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.model.ResourceConstants;
@@ -524,7 +525,10 @@ public class CompetencesAdmin extends MVCPortlet{
 		String templateStr = StringPool.BLANK;
 			
 		try {
-			templateStr = VelocityUtil.evaluate(template.replaceAll("&nbsp;", StringPool.BLANK), variables);
+			templateStr =template.replace("<p>&nbsp;</p>","<br/>");
+			templateStr = VelocityUtil.evaluate(templateStr.replace("&nbsp;", StringPool.BLANK), variables);
+			
+			log.debug("TEMPLATE "+templateStr);
 		} catch (Exception e) {
 			if(log.isDebugEnabled())e.printStackTrace();
 		} 

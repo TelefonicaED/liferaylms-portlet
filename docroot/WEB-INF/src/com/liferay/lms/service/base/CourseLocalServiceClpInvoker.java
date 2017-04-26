@@ -416,6 +416,10 @@ public class CourseLocalServiceClpInvoker {
 		_methodParameterTypes274 = new String[] {
 				"long", "com.liferay.portal.model.User"
 			};
+
+		_methodName275 = "getLastModuleDateInCourse";
+
+		_methodParameterTypes275 = new String[] { "long" };
 	}
 
 	public Object invokeMethod(String name, String[] parameterTypes,
@@ -926,6 +930,11 @@ public class CourseLocalServiceClpInvoker {
 				(com.liferay.portal.model.User)arguments[1]);
 		}
 
+		if (_methodName275.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes275, parameterTypes)) {
+			return CourseLocalServiceUtil.getLastModuleDateInCourse(((Long)arguments[0]).longValue());
+		}
+
 		throw new UnsupportedOperationException();
 	}
 
@@ -1077,4 +1086,6 @@ public class CourseLocalServiceClpInvoker {
 	private String[] _methodParameterTypes273;
 	private String _methodName274;
 	private String[] _methodParameterTypes274;
+	private String _methodName275;
+	private String[] _methodParameterTypes275;
 }

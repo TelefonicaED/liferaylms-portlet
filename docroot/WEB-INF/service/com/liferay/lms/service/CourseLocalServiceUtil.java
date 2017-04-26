@@ -709,6 +709,16 @@ public class CourseLocalServiceUtil {
 		return getService().canAccessLock(groupCreatedId, user);
 	}
 
+	/**
+	* Returns the last module date in course, because the course end date is for enrollments.
+	*
+	* @param courseId Course Identifier
+	* @return Course last module date.
+	*/
+	public static java.util.Date getLastModuleDateInCourse(long courseId) {
+		return getService().getLastModuleDateInCourse(courseId);
+	}
+
 	public static void clearService() {
 		_service = null;
 	}

@@ -685,6 +685,16 @@ public class CourseLocalServiceWrapper implements CourseLocalService,
 	}
 
 	/**
+	* Returns the last module date in course, because the course end date is for enrollments.
+	*
+	* @param courseId Course Identifier
+	* @return Course last module date.
+	*/
+	public java.util.Date getLastModuleDateInCourse(long courseId) {
+		return _courseLocalService.getLastModuleDateInCourse(courseId);
+	}
+
+	/**
 	 * @deprecated Renamed to {@link #getWrappedService}
 	 */
 	public CourseLocalService getWrappedCourseLocalService() {

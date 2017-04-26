@@ -272,7 +272,8 @@ public class UserCompetencePortlet extends MVCPortlet {
 			String template = StringPool.BLANK;
 			
 			try {
-				template = VelocityUtil.evaluate(competence.getDiplomaTemplate(user.getLocale()).replaceAll("&nbsp;", StringPool.BLANK), variables);
+				template = competence.getDiplomaTemplate(user.getLocale()).replace("<p>&nbsp;</p>","<br/>");
+				template = VelocityUtil.evaluate(template.replace("&nbsp;", StringPool.BLANK), variables);
 			} catch (Exception e) {
 				if(log.isDebugEnabled())e.printStackTrace();
 			}
