@@ -246,7 +246,7 @@
                 'java.lang.String'
      			];                                                                                                         
               var message = Liferay.Service.Lms.LearningActivityResult.update( {
-                                                         latId: <%= learningTry.getLatId() %>,
+                                                         latId: <%= learningTry != null ? learningTry.getLatId() : 0 %>,
                                                          tryResultData: scormpool,
                                                          imsmanifest: Run.$1.xml,
                                                          serviceParameterTypes: JSON.stringify(serviceParameterTypes)

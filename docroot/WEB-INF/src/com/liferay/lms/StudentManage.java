@@ -79,8 +79,14 @@ public class StudentManage extends MVCPortlet {
 		Course course=CourseLocalServiceUtil.getCourseByGroupCreatedId(themeDisplay.getScopeGroupId());
 		renderRequest.setAttribute("course", course);
 		
-		List<Team> teams=TeamLocalServiceUtil.getGroupTeams(themeDisplay.getScopeGroupId());
-		renderRequest.setAttribute("teams", teams);	
+		List<Team> teams = TeamLocalServiceUtil.getUserTeams(themeDisplay.getUserId(), themeDisplay.getScopeGroupId());
+		if(teams != null && teams.size()>0){
+			renderRequest.setAttribute("teams",teams);	
+		}else{
+			teams = TeamLocalServiceUtil.getGroupTeams(themeDisplay.getScopeGroupId());
+			renderRequest.setAttribute("teams",teams);	
+		}
+		
 			
 		if(searchTerms.isAdvancedSearch()){			
 			log.debug("firstName: "+searchTerms.getFirstName());

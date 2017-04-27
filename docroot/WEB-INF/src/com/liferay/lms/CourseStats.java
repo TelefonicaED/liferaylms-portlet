@@ -89,12 +89,20 @@ public class CourseStats extends MVCPortlet {
 			log.debug(":: VIEW COURSE STATS "+this.viewJSP);
 			
 			long teamId = ParamUtil.getLong(renderRequest, "teamId",0);
-			List<Team> teams = TeamLocalServiceUtil.getGroupTeams(themeDisplay.getScopeGroupId());
+			List<Team> teams = TeamLocalServiceUtil.getUserTeams(themeDisplay.getUserId(), themeDisplay.getScopeGroupId());
+			
+			if(teams != null && teams.size()>0){
+				renderRequest.setAttribute("teams",teams);	
+			}else{
+				teams = TeamLocalServiceUtil.getGroupTeams(themeDisplay.getScopeGroupId());
+				renderRequest.setAttribute("teams",teams);	
+			}
+			
 			Course course 	 = CourseLocalServiceUtil.fetchByGroupCreatedId(themeDisplay.getScopeGroupId());
 			
 						
 			renderRequest.setAttribute("teamId", teamId);
-			renderRequest.setAttribute("teams",teams);	
+			
 			renderRequest.setAttribute("course", course);
 	
 			if(teams!=null && teams.size()>0){
