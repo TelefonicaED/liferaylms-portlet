@@ -23,6 +23,7 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.model.Team;
@@ -96,12 +97,17 @@ public class StudentManage extends MVCPortlet {
 					searchTerms.getScreenName(), searchTerms.getEmailAddress(), searchTerms.isAndOperator()));
 		}else{
 			log.debug("Keywords: "+searchTerms.getKeywords());
+			boolean andOperator = false;
+			if(Validator.isNull(searchTerms.getKeywords())){
+				andOperator = true;
+			}
+			
 			searchContainer.setResults(CourseLocalServiceUtil.getStudentsFromCourse(themeDisplay.getCompanyId(), course.getGroupCreatedId(),  
 					searchContainer.getStart(), searchContainer.getEnd(), teamId, searchTerms.getKeywords(), searchTerms.getKeywords(), 
-					searchTerms.getKeywords(), searchTerms.getKeywords(), searchTerms.isAndOperator()));
+					searchTerms.getKeywords(), searchTerms.getKeywords(), andOperator));
 			searchContainer.setTotal(CourseLocalServiceUtil.getStudentsFromCourseCount(course.getCourseId(), teamId, 
-					 searchTerms.getKeywords(), searchTerms.getKeywords(), 
-						searchTerms.getKeywords(), searchTerms.getKeywords(), searchTerms.isAndOperator()));
+					searchTerms.getKeywords(), searchTerms.getKeywords(), 
+					searchTerms.getKeywords(), searchTerms.getKeywords(), andOperator));
 		}
 		
 		searchContainer.getIteratorURL().setParameter("view", "");
