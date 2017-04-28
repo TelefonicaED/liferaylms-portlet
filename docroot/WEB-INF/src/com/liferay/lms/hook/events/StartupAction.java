@@ -83,20 +83,6 @@ public class StartupAction extends SimpleAction {
 			createDefaultPreferences(companyId);
 		}
 		
-		ExpandoTable table = getExpandoTable(companyId, Course.class.getName(), ExpandoTableConstants.DEFAULT_TABLE_NAME);
-		if (table != null) {
-				createExpandoColumn(table, "Abreviatura", ExpandoColumnConstants.STRING,
-							ExpandoColumnConstants.INDEX_TYPE_TEXT, ExpandoColumnConstants.PROPERTY_DISPLAY_TYPE, "", true);
-				createExpandoColumn(table, LmsConstant.ADDITIONAL_INFORMATION_COURSE_EXPANDO, ExpandoColumnConstants.STRING,
-						ExpandoColumnConstants.INDEX_TYPE_NONE, ExpandoColumnConstants.PROPERTY_DISPLAY_TYPE_TEXT_BOX, "", true);
-		}
-		
-		ExpandoTable table2 = getExpandoTable(companyId, Group.class.getName(), ExpandoTableConstants.DEFAULT_TABLE_NAME);
-		if (table2 != null) {
-				createExpandoColumn(table2, "Abreviatura", ExpandoColumnConstants.STRING,
-							ExpandoColumnConstants.INDEX_TYPE_TEXT, ExpandoColumnConstants.PROPERTY_DISPLAY_TYPE, "", true);
-		}
-		
 		ExpandoTable table3 = getExpandoTable(companyId, User.class.getName(), ExpandoTableConstants.DEFAULT_TABLE_NAME);
 		if (table3 != null) {
 				createExpandoColumn(table3, "deregister-mail", ExpandoColumnConstants.BOOLEAN,
