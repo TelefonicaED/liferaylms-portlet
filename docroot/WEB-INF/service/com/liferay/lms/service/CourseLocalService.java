@@ -560,4 +560,13 @@ public interface CourseLocalService extends BaseLocalService,
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.util.Date getLastModuleDateInCourse(long courseId);
+
+	/**
+	* Returns the last module date in course, because the course end date is for enrollments.
+	*
+	* @param courseId Course Identifier
+	* @return Course last module date.
+	*/
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.util.Date getFirstModuleDateInCourse(long courseId);
 }

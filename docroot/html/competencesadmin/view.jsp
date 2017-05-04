@@ -39,15 +39,19 @@
 		<liferay-ui:icon image="add" label="<%= true %>"
 		message="new-competence"
 		url='<%= newcompetenceURL %>' />
-		<liferay-ui:icon image="edit" label="<%= true %>"
-		message="edit-image"
-		url='<%= editcompimageURL %>' />
+		<% if(permissionChecker.isCompanyAdmin() || permissionChecker.isOmniadmin()) { %>
+			<liferay-ui:icon image="edit" label="<%= true %>"
+			message="edit-image"
+			url='<%= editcompimageURL %>' />
+		<%} %>
 		<liferay-ui:icon image="edit" label="<%= true %>"
 		message="competence.edit-background"
 		url='<%= editbackgroundURL %>' />
-		<liferay-ui:icon image="edit" label="<%= true %>"
-		message="configure-pages"
-		url='<%= editpageURL %>' />
+		<% if(permissionChecker.isCompanyAdmin() || permissionChecker.isOmniadmin()) { %>
+			<liferay-ui:icon image="edit" label="<%= true %>"
+			message="configure-pages"
+			url='<%= editpageURL %>' />
+		<%} %>
 	</liferay-ui:icon-list>
 <%
 	}

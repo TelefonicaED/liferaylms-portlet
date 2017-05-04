@@ -412,6 +412,10 @@ public class CourseLocalServiceClp implements CourseLocalService {
 		_methodName73 = "getLastModuleDateInCourse";
 
 		_methodParameterTypes73 = new String[] { "long" };
+
+		_methodName74 = "getFirstModuleDateInCourse";
+
+		_methodParameterTypes74 = new String[] { "long" };
 	}
 
 	public com.liferay.lms.model.Course addCourse(
@@ -2887,6 +2891,28 @@ public class CourseLocalServiceClp implements CourseLocalService {
 		return (java.util.Date)ClpSerializer.translateOutput(returnObj);
 	}
 
+	public java.util.Date getFirstModuleDateInCourse(long courseId) {
+		Object returnObj = null;
+
+		try {
+			returnObj = _invokableLocalService.invokeMethod(_methodName74,
+					_methodParameterTypes74, new Object[] { courseId });
+		}
+		catch (Throwable t) {
+			t = ClpSerializer.translateThrowable(t);
+
+			if (t instanceof RuntimeException) {
+				throw (RuntimeException)t;
+			}
+			else {
+				throw new RuntimeException(t.getClass().getName() +
+					" is not a valid exception");
+			}
+		}
+
+		return (java.util.Date)ClpSerializer.translateOutput(returnObj);
+	}
+
 	private InvokableLocalService _invokableLocalService;
 	private String _methodName0;
 	private String[] _methodParameterTypes0;
@@ -3034,4 +3060,6 @@ public class CourseLocalServiceClp implements CourseLocalService {
 	private String[] _methodParameterTypes72;
 	private String _methodName73;
 	private String[] _methodParameterTypes73;
+	private String _methodName74;
+	private String[] _methodParameterTypes74;
 }

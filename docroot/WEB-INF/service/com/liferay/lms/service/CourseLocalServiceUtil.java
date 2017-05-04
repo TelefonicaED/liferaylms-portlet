@@ -719,6 +719,16 @@ public class CourseLocalServiceUtil {
 		return getService().getLastModuleDateInCourse(courseId);
 	}
 
+	/**
+	* Returns the last module date in course, because the course end date is for enrollments.
+	*
+	* @param courseId Course Identifier
+	* @return Course last module date.
+	*/
+	public static java.util.Date getFirstModuleDateInCourse(long courseId) {
+		return getService().getFirstModuleDateInCourse(courseId);
+	}
+
 	public static void clearService() {
 		_service = null;
 	}

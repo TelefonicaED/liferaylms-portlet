@@ -161,7 +161,7 @@ else
 	<aui:input name="backURL" type="hidden" value="<%= backURL %>" />
 	<aui:input name="referringPortletResource" type="hidden" value="<%= referringPortletResource %>" />
 	<aui:input name="competenceId" type="hidden" value="<%=competenceId %>"/>
-	<aui:input name="title" label="title">
+	<aui:input name="title" label="competence.title">
 		<aui:validator name="required" errorMessage="field.required"></aui:validator>
 	</aui:input>
 	<aui:field-wrapper label="description">

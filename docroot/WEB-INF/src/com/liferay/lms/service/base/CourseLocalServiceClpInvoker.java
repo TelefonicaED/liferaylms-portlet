@@ -420,6 +420,10 @@ public class CourseLocalServiceClpInvoker {
 		_methodName275 = "getLastModuleDateInCourse";
 
 		_methodParameterTypes275 = new String[] { "long" };
+
+		_methodName276 = "getFirstModuleDateInCourse";
+
+		_methodParameterTypes276 = new String[] { "long" };
 	}
 
 	public Object invokeMethod(String name, String[] parameterTypes,
@@ -935,6 +939,11 @@ public class CourseLocalServiceClpInvoker {
 			return CourseLocalServiceUtil.getLastModuleDateInCourse(((Long)arguments[0]).longValue());
 		}
 
+		if (_methodName276.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes276, parameterTypes)) {
+			return CourseLocalServiceUtil.getFirstModuleDateInCourse(((Long)arguments[0]).longValue());
+		}
+
 		throw new UnsupportedOperationException();
 	}
 
@@ -1088,4 +1097,6 @@ public class CourseLocalServiceClpInvoker {
 	private String[] _methodParameterTypes274;
 	private String _methodName275;
 	private String[] _methodParameterTypes275;
+	private String _methodName276;
+	private String[] _methodParameterTypes276;
 }

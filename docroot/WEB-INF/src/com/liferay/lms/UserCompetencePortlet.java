@@ -61,16 +61,12 @@ import com.liferay.portal.kernel.xml.Attribute;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
-import com.liferay.portal.model.Group;
 import com.liferay.portal.model.User;
 import com.liferay.portal.model.UserGroupRole;
-import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.UserGroupRoleLocalServiceUtil;
 import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
-import com.liferay.portlet.asset.model.AssetEntry;
-import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
 import com.liferay.portlet.expando.model.ExpandoColumn;
 import com.liferay.portlet.expando.model.ExpandoColumnConstants;
 import com.liferay.portlet.expando.model.ExpandoTable;
@@ -197,6 +193,8 @@ public class UserCompetencePortlet extends MVCPortlet {
 			variables.put("courseName", course.getTitle(user.getLocale()));
 			variables.put("competenceName", competence.getTitle(user.getLocale()));
 			variables.put("userName", user.getFullName());
+			variables.put("startDate", dateFormatDate.format(CourseLocalServiceUtil.getFirstModuleDateInCourse(course.getCourseId())));
+			variables.put("endDate",dateFormatDate.format(CourseLocalServiceUtil.getLastModuleDateInCourse(course.getCourseId())));
 			variables.put("themeDisplay", themeDisplay);
 			
 			LmsPrefs lmsprefs=LmsPrefsLocalServiceUtil.getLmsPrefs(themeDisplay.getCompanyId());

@@ -92,7 +92,7 @@
 			</a>
 		</liferay-ui:search-container-column-text>
 		
-		<liferay-ui:search-container-column-text name="title">
+		<liferay-ui:search-container-column-text name="competence.file-name">
 			<a href="${imageURL}" title="${fileEntry.title}" target="_BLANK" >
 				${fileEntry.title}
 			</a>

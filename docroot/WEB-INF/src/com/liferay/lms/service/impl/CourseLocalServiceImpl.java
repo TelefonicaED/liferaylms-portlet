@@ -1245,6 +1245,34 @@ public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int e
 		
 		return lastModuleDate;
 	}
+	
+	
+	/**
+	 * Returns the last module date in course, because the course end date is for enrollments.
+	 * 
+	 * @param courseId Course Identifier
+	 * @return Course last module date.
+	 */
+	public Date getFirstModuleDateInCourse (long courseId){
+		Date firstModuleDate = null;
+		
+		try{
+			Course course = CourseLocalServiceUtil.fetchCourse(courseId);
+			if(course!=null){
+				for(Module module:ModuleLocalServiceUtil.findAllInGroup(course.getGroupCreatedId())){
+					if(firstModuleDate==null){
+						firstModuleDate=module.getStartDate();
+					} else if(module.getStartDate()!=null && firstModuleDate.after(module.getStartDate())){
+						firstModuleDate=module.getStartDate();
+					}
+				}
+			}		
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		
+		return firstModuleDate;
+	}
 }
 
 
