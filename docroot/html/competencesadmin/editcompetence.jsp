@@ -189,7 +189,7 @@ else
 		
 		<br/>
 		
-		<a id='<portlet:namespace/>diplomaBackgroundLink' href="" target="_BLANK" title="view-image" ><liferay-ui:message key="view"/></a>
+		<a id='<portlet:namespace/>diplomaBackgroundLink' href="" target="_BLANK" title="view-image" class="aui-buttonitem-content yui3-widget aui-component aui-buttonitem aui-state-default aui-buttonitem-icon-label aui-toolbar-first aui-toolbar-item"><liferay-ui:message key="view"/></a>
 		
 		<aui:script>
 			AUI().use('aui-base',function(A) {
@@ -258,7 +258,7 @@ else
 		</aui:field-wrapper>
 		
 		<aui:button-row>
-			<a id='<portlet:namespace/>viewPreviewLink' href="" target="_blank" ><liferay-ui:message key="preview"/></a>
+			<a id='<portlet:namespace/>viewPreviewLink' href="" target="_blank" class="aui-buttonitem-content yui3-widget aui-component aui-buttonitem aui-state-default aui-buttonitem-icon-label aui-toolbar-first aui-toolbar-item"><liferay-ui:message key="preview"/></a>
 
 			<aui:script use="aui-base,liferay-util-window,liferay-portlet-url,aui-io-request">
 			
