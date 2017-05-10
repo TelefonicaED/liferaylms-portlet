@@ -283,9 +283,17 @@ public class ExportUtil {
 	}
 	
 	public static String changeSpecialCharacter(String str) {
-	    
-		str = str.replaceAll("[^a-zA-Z0-9]", "");
-	    return str;
+		String fullName = "";
+		if(str.lastIndexOf(".")>0){
+			String name = str.substring(0, str.lastIndexOf("."));
+		    String extension = str.substring(str.lastIndexOf("."));
+		    fullName =   name.replaceAll("[^a-zA-Z0-9]", "") + extension;
+			
+		}else{
+			fullName = str.replaceAll("[^a-zA-Z0-9]", "");
+		}		
+		return fullName;
+		
 	}
 	
 	private static String getEntryPath(PortletDataContext context, DLFileEntry file) {
