@@ -50,6 +50,7 @@ import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.servlet.HttpHeaders;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -192,7 +193,7 @@ public class UserCompetencePortlet extends MVCPortlet {
 			}
 			variables.put("courseName", course.getTitle(user.getLocale()));
 			variables.put("competenceName", competence.getTitle(user.getLocale()));
-			variables.put("userName", user.getFullName());
+			variables.put("userName", user.getFirstName() + " "+user.getLastName());
 			variables.put("startDate", dateFormatDate.format(CourseLocalServiceUtil.getFirstModuleDateInCourse(course.getCourseId())));
 			variables.put("endDate",dateFormatDate.format(CourseLocalServiceUtil.getLastModuleDateInCourse(course.getCourseId())));
 			variables.put("themeDisplay", themeDisplay);
@@ -238,10 +239,14 @@ public class UserCompetencePortlet extends MVCPortlet {
 			variables.put("teachers", teachers);
 			variables.put("teachersNames", teachersNames);
 			
+			
 			// Sustitucion de campos expando de Course
 			List<ExpandoColumn> courseExpandoColumnList = ExpandoColumnLocalServiceUtil.getDefaultTableColumns(themeDisplay.getCompanyId(), Course.class.getName());
+			
 			for (ExpandoColumn courseExpandoColumn : courseExpandoColumnList) {
-				Serializable courseExpandoValue = course.getExpandoBridge().getAttribute(courseExpandoColumn.getName());
+				log.debug("ExapandoColumn "+courseExpandoColumn.getName());
+				Serializable courseExpandoValue = course.getExpandoBridge().getAttribute(courseExpandoColumn.getName(),false);
+				log.debug("ExpandoValue "+courseExpandoValue);
 				if (Validator.isNotNull(courseExpandoValue)){ 
 					if (courseExpandoColumn.getType() == ExpandoColumnConstants.BOOLEAN) {
 						variables.put(courseExpandoColumn.getName(), String.valueOf((Boolean) courseExpandoValue));
@@ -414,8 +419,12 @@ public class UserCompetencePortlet extends MVCPortlet {
 		
 		Long competenceId = ParamUtil.getLong(request, "competenceId", 0);
 		Long courseId = ParamUtil.getLong(request, "courseId", 0);
+		
+		String courseName="";
 		String uuid=ParamUtil.getString(request, "uuid", "");
 		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(WebKeys.THEME_DISPLAY);
+		
+		
 		UserCompetence userCompetence=null;
 		if("".equals(uuid))
 		{
@@ -426,6 +435,18 @@ public class UserCompetencePortlet extends MVCPortlet {
 			userCompetence= UserCompetenceLocalServiceUtil.findByUuid(uuid);
 		}
 		
+		Course course=null;
+		if(userCompetence!=null){
+			try {
+				course = CourseLocalServiceUtil.fetchCourse(userCompetence.getCourseId());
+				if(course!=null){
+					courseName = "_"+course.getTitle(themeDisplay.getLocale());
+				}
+			} catch (SystemException e1) {
+				e1.printStackTrace();
+			}
+		}
+		response.addProperty(HttpHeaders.CONTENT_DISPOSITION, "attachment; fileName=\"" + LanguageUtil.get(themeDisplay.getLocale(), "competence.generated-file-name") + courseName +".pdf\"");
 		response.setContentType("application/pdf");
 		if(themeDisplay.isSignedIn())
 		 {
