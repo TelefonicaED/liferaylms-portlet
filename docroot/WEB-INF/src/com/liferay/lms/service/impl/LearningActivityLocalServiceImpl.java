@@ -905,7 +905,7 @@ public class LearningActivityLocalServiceImpl extends LearningActivityLocalServi
 	}
 	
 	public boolean canBeView(LearningActivity activity, long userId) throws Exception{
-		if(activity == null) {
+		if(activity == null || activity.getActId()<=0) {
 			return false;
 		}
 		
@@ -960,7 +960,7 @@ public class LearningActivityLocalServiceImpl extends LearningActivityLocalServi
 	}
 	
 	public boolean canBeEdited(LearningActivity activity, long userId) throws Exception{
-		if(activity == null) {
+		if(activity == null || activity.getActId()<=0) {
 			return true;
 		}
 		

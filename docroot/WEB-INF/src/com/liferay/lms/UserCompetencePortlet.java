@@ -7,7 +7,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Serializable;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -150,23 +149,16 @@ public class UserCompetencePortlet extends MVCPortlet {
     	Competence competence = CompetenceLocalServiceUtil.getCompetence(userCompetence.getCompetenceId());
 		Course course=CourseLocalServiceUtil.getCourse(userCompetence.getCourseId());
 		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(WebKeys.THEME_DISPLAY);
-		DateFormat dateFormatDate = DateFormat.getDateInstance(DateFormat.SHORT,user.getLocale());
-		dateFormatDate.setTimeZone(user.getTimeZone());
-		 if (dateFormatDate instanceof SimpleDateFormat)
-	      {
-	            SimpleDateFormat sdf = (SimpleDateFormat) dateFormatDate;
-	            // To show Locale specific short date expression with full year
-	            String pattern = sdf.toPattern().replaceAll("y+","yyyy");
-	            sdf.applyPattern(pattern); 
-	            dateFormatDate=sdf;
-	      }
+		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+		sdf.setTimeZone(user.getTimeZone());
+		
 		if(user!=null&&competence!=null&&course!=null){
 			if(log.isDebugEnabled())log.debug("Enter:"+user.getLocale());
 			
 			CourseResult courseResult = CourseResultLocalServiceUtil.getCourseResultByCourseAndUser(course.getCourseId(), user.getUserId());
 			ITextRenderer renderer = new ITextRenderer();
 			Map<String, Object> variables = new HashMap<String, Object>();
-			variables.put("dateFormatDate", dateFormatDate);
+			variables.put("dateFormatDate", sdf);
 			variables.put("dateTool", new DateTool());
 			variables.put("user", user);
 			variables.put("competence", competence);
@@ -194,8 +186,8 @@ public class UserCompetencePortlet extends MVCPortlet {
 			variables.put("courseName", course.getTitle(user.getLocale()));
 			variables.put("competenceName", competence.getTitle(user.getLocale()));
 			variables.put("userName", user.getFirstName() + " "+user.getLastName());
-			variables.put("startDate", dateFormatDate.format(CourseLocalServiceUtil.getFirstModuleDateInCourse(course.getCourseId())));
-			variables.put("endDate",dateFormatDate.format(CourseLocalServiceUtil.getLastModuleDateInCourse(course.getCourseId())));
+			variables.put("startDate", sdf.format(CourseLocalServiceUtil.getFirstModuleDateInCourse(course.getCourseId())));
+			variables.put("endDate",sdf.format(CourseLocalServiceUtil.getLastModuleDateInCourse(course.getCourseId())));
 			variables.put("themeDisplay", themeDisplay);
 			
 			LmsPrefs lmsprefs=LmsPrefsLocalServiceUtil.getLmsPrefs(themeDisplay.getCompanyId());
@@ -251,7 +243,7 @@ public class UserCompetencePortlet extends MVCPortlet {
 					if (courseExpandoColumn.getType() == ExpandoColumnConstants.BOOLEAN) {
 						variables.put(courseExpandoColumn.getName(), String.valueOf((Boolean) courseExpandoValue));
 					} else if (courseExpandoColumn.getType() == ExpandoColumnConstants.DATE) {
-						variables.put(courseExpandoColumn.getName(), dateFormatDate.format((Date) courseExpandoValue));
+						variables.put(courseExpandoColumn.getName(), sdf.format((Date) courseExpandoValue));
 					} else if (courseExpandoColumn.getType() == ExpandoColumnConstants.DOUBLE) {
 						variables.put(courseExpandoColumn.getName(), String.valueOf((Double) courseExpandoValue));
 					} else if (courseExpandoColumn.getType() == ExpandoColumnConstants.FLOAT) {
