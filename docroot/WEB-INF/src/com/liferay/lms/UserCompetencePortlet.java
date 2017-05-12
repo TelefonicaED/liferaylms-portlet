@@ -9,6 +9,7 @@ import java.io.OutputStream;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -183,11 +184,34 @@ public class UserCompetencePortlet extends MVCPortlet {
 					}
 				}
 			}
+			
+			Date endDate = CourseLocalServiceUtil.getLastModuleDateInCourse(course.getCourseId());
+			Calendar endDateCalendar = Calendar.getInstance();
+			endDateCalendar.setTimeZone(user.getTimeZone());
+			endDateCalendar.setTime(endDate);
+			SimpleDateFormat longSdf = null;
+			
+			if(themeDisplay.getLocale().getLanguage().toLowerCase().equals("es")){
+				longSdf = new SimpleDateFormat("dd '"+LanguageUtil.get(themeDisplay.getLocale(), "of")+"' MMMM '"+LanguageUtil.get(themeDisplay.getLocale(), "of")+"' yyyy", themeDisplay.getLocale());
+			}else if(themeDisplay.getLocale().getLanguage().toLowerCase().equals("en")){
+				longSdf = new SimpleDateFormat("dd'"+getDaySuffix(endDateCalendar.get(Calendar.DATE))+"' MMMM yyyy", themeDisplay.getLocale());
+			}else if(themeDisplay.getLocale().getLanguage().toLowerCase().equals("pt")){
+				longSdf = new SimpleDateFormat("dd '"+LanguageUtil.get(themeDisplay.getLocale(), "of")+"' MMMM '"+LanguageUtil.get(themeDisplay.getLocale(), "of")+"' yyyy", themeDisplay.getLocale());
+			}
+			
+			if(longSdf==null){
+				longSdf = new SimpleDateFormat("EEEE',' dd MMMM yyyy", themeDisplay.getLocale());
+			}
+			longSdf.setTimeZone(user.getTimeZone());
+					
+					
+					
 			variables.put("courseName", course.getTitle(user.getLocale()));
 			variables.put("competenceName", competence.getTitle(user.getLocale()));
 			variables.put("userName", user.getFirstName() + " "+user.getLastName());
 			variables.put("startDate", sdf.format(CourseLocalServiceUtil.getFirstModuleDateInCourse(course.getCourseId())));
-			variables.put("endDate",sdf.format(CourseLocalServiceUtil.getLastModuleDateInCourse(course.getCourseId())));
+			variables.put("endDate",sdf.format(endDate));
+			variables.put("endLongDate", longSdf.format(endDate));
 			variables.put("themeDisplay", themeDisplay);
 			
 			LmsPrefs lmsprefs=LmsPrefsLocalServiceUtil.getLmsPrefs(themeDisplay.getCompanyId());
@@ -406,6 +430,19 @@ public class UserCompetencePortlet extends MVCPortlet {
 		}
     }
     
+    
+    private static String getDaySuffix(int day){
+	    if (day >= 11 && day <= 13) {
+	        return "th";
+	    }
+	    switch (day % 10) {
+	        case 1:  return "st";
+	        case 2:  return "nd";
+	        case 3:  return "rd";
+	        default: return "th";
+	    }
+			
+	}
     
 	public void serveResource(ResourceRequest request, ResourceResponse response) throws PortletException,IOException{
 		
