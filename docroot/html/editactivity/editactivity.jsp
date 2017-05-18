@@ -626,6 +626,7 @@ Liferay.provide(
 						A.one('#<portlet:namespace />precedence').
 							replace(A.Node.create(this.get('responseData')).one('#<portlet:namespace />precedence'));
 					}
+				}
 			}); 
 			
         },
