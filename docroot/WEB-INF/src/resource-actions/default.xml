@@ -89,27 +89,7 @@
 			</guest-unsupported>
 		</permissions>
 	</portlet-resource>
-	<portlet-resource>
-		<portlet-name>scormadmin</portlet-name>
-		<permissions>
-			<supports>
-				<action-key>ACCESS_IN_CONTROL_PANEL</action-key>
-				<action-key>ADD_TO_PAGE</action-key>
-				<action-key>CONFIGURATION</action-key>
-				<action-key>VIEW</action-key>
-			</supports>
-			<site-member-defaults>
-				<action-key>VIEW</action-key>
-			</site-member-defaults>
-			<guest-defaults>
-				<action-key>VIEW</action-key>
-			</guest-defaults>
-			<guest-unsupported>
-				<action-key>ACCESS_IN_CONTROL_PANEL</action-key>
-				<action-key>CONFIGURATION</action-key>
-			</guest-unsupported>
-		</permissions>
-	</portlet-resource>
+
 	<portlet-resource>
 		<portlet-name>module-portlet</portlet-name>
 		<supports>
@@ -260,23 +240,6 @@
 			</guest-unsupported>
 		</permissions>
 	</model-resource>
-
-	<model-resource>
-		<model-name>scormactivity</model-name>
-		<portlet-ref>
-			<portlet-name>scormactivity</portlet-name>
-		</portlet-ref>
-		<permissions>
-			<supports>
-				<action-key>ACTION_VIEW</action-key>
-			</supports>
-			<site-member-defaults />
-			<guest-defaults />
-			<guest-unsupported>
-				<action-key>ACTION_VIEW</action-key>
-			</guest-unsupported>
-		</permissions>
-	</model-resource>	
 
 	<model-resource>
 		<model-name>com.liferay.lms.model</model-name>
