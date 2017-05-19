@@ -411,9 +411,11 @@ public class ModuleDataHandlerImpl extends BasePortletDataHandler {
 	}
 
 	public String containsCharUpper(String str) {
-	    
-		str = str.replaceAll("[^a-zA-Z0-9]", "");
+	    return ExportUtil.changeSpecialCharacter(str);
+	    /*
+	     str = str.replaceAll("[^a-zA-Z0-9]", "");
 	    return str;
+	    */
 	}
 	
 	private String getFileToIS(PortletDataContext context, long entryId, long moduleId){
@@ -424,7 +426,6 @@ public class ModuleDataHandlerImpl extends BasePortletDataHandler {
 			
 			String pathqu = getEntryPath(context, image);
 			String pathFile = getImgModulePath(context, moduleId); 
-					
 			context.addZipEntry(pathqu, image);
 			
 			context.addZipEntry(pathFile + containsCharUpper(image.getTitle()), image.getContentStream());

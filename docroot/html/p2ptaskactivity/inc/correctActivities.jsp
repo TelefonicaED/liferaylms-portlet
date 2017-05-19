@@ -144,7 +144,11 @@ if(activity.getEnddate() == null){
 				<%
 					for(int i=0;i<numQuestion;i++){ 
 						String des = LearningActivityLocalServiceUtil.getExtraContentValue(actId, "text"+i);
-						if(des!=null&&!des.equals(StringPool.BLANK)){
+						if(i==0 || (des != null && des.length() > 0)){
+							if(Validator.isNull(des)){
+								des = LanguageUtil.get(themeDisplay.getLocale(), "feedback");
+							}
+						
 					%>
 							var descriptionVal = CKEDITOR.instances[thisEditor+'_<%=i%>'].getData();
 							
@@ -194,7 +198,10 @@ if(activity.getEnddate() == null){
 				<%
 					for(int i=0;i<numQuestion;i++){
 						String des = LearningActivityLocalServiceUtil.getExtraContentValue(actId, "text"+i);
-						if(des!=null&&!des.equals(StringPool.BLANK)){
+						if(i==0 || (des != null && des.length() > 0)){
+							if(Validator.isNull(des)){
+								des = LanguageUtil.get(themeDisplay.getLocale(), "feedback");
+							}
 				%>
 
 							var textDesc = CKEDITOR.instances[thisEditor+'_<%=i%>'].getData();
@@ -374,7 +381,10 @@ if(activity.getEnddate() == null){
 		<%
 			for(int i=0;i<numQuestion;i++){ 
 				String des = LearningActivityLocalServiceUtil.getExtraContentValue(actId, "text"+i);
-				if(des!=null&&!des.equals(StringPool.BLANK)){
+				if(i==0 || (des != null && des.length() > 0)){
+					if(Validator.isNull(des)){
+						des = LanguageUtil.get(themeDisplay.getLocale(), "feedback");
+					}
 		%>
 				
 				<p><span class="label"><%=des %>: </span><span id="contentDescriptionCorrec_<%=i%>"></span></p>
@@ -574,8 +584,10 @@ if(!p2pActList.isEmpty()){
 							for(int i=0;i<numQuestion;i++){ 
 								String des = LearningActivityLocalServiceUtil.getExtraContentValue(actId, "text"+i);
 								
-								if(des != null && des.length() > 0){
-								
+								if(i==0 || (des != null && des.length() > 0)){
+									if(Validator.isNull(des)){
+										des = LanguageUtil.get(themeDisplay.getLocale(), "feedback");
+									}
 										%>
 									
 									<div class="description">
@@ -720,7 +732,10 @@ if(!p2pActList.isEmpty()){
 													<li>
 														<% 
 															String value = LearningActivityLocalServiceUtil.getExtraContentValue(actId, "text"+i);
-															if(value!=null&&!value.equals(StringPool.BLANK)){
+															if(i==0 || (value!=null&&!value.equals(StringPool.BLANK))){
+																if(Validator.isNull(value)){
+																	value = LanguageUtil.get(themeDisplay.getLocale(), "feedback");
+																}
 														%>
 															<div class="p2pQuestion"><%=value %></div>
 															<div class="p2pCorrect"><%=valoration!=null?valoration:StringPool.BLANK %></div>

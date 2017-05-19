@@ -186,6 +186,7 @@ if(!p2pActCorList.isEmpty()){
 												valoration = jsonObjectDes.getString("text"+i);
 											
 												String question = LearningActivityLocalServiceUtil.getExtraContentValue(actId, "text"+i);
+												
 											%>
 												<li>
 													<div class="p2pQuestion"><%=question!=null?question:StringPool.BLANK %></div>

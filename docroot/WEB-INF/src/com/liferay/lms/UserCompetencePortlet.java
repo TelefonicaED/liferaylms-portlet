@@ -7,9 +7,9 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Serializable;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -50,6 +50,7 @@ import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.servlet.HttpHeaders;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -149,23 +150,16 @@ public class UserCompetencePortlet extends MVCPortlet {
     	Competence competence = CompetenceLocalServiceUtil.getCompetence(userCompetence.getCompetenceId());
 		Course course=CourseLocalServiceUtil.getCourse(userCompetence.getCourseId());
 		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(WebKeys.THEME_DISPLAY);
-		DateFormat dateFormatDate = DateFormat.getDateInstance(DateFormat.SHORT,user.getLocale());
-		dateFormatDate.setTimeZone(user.getTimeZone());
-		 if (dateFormatDate instanceof SimpleDateFormat)
-	      {
-	            SimpleDateFormat sdf = (SimpleDateFormat) dateFormatDate;
-	            // To show Locale specific short date expression with full year
-	            String pattern = sdf.toPattern().replaceAll("y+","yyyy");
-	            sdf.applyPattern(pattern); 
-	            dateFormatDate=sdf;
-	      }
+		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+		sdf.setTimeZone(user.getTimeZone());
+		
 		if(user!=null&&competence!=null&&course!=null){
 			if(log.isDebugEnabled())log.debug("Enter:"+user.getLocale());
 			
 			CourseResult courseResult = CourseResultLocalServiceUtil.getCourseResultByCourseAndUser(course.getCourseId(), user.getUserId());
 			ITextRenderer renderer = new ITextRenderer();
 			Map<String, Object> variables = new HashMap<String, Object>();
-			variables.put("dateFormatDate", dateFormatDate);
+			variables.put("dateFormatDate", sdf);
 			variables.put("dateTool", new DateTool());
 			variables.put("user", user);
 			variables.put("competence", competence);
@@ -190,11 +184,34 @@ public class UserCompetencePortlet extends MVCPortlet {
 					}
 				}
 			}
+			
+			Date endDate = CourseLocalServiceUtil.getLastModuleDateInCourse(course.getCourseId());
+			Calendar endDateCalendar = Calendar.getInstance();
+			endDateCalendar.setTimeZone(user.getTimeZone());
+			endDateCalendar.setTime(endDate);
+			SimpleDateFormat longSdf = null;
+			
+			if(themeDisplay.getLocale().getLanguage().toLowerCase().equals("es")){
+				longSdf = new SimpleDateFormat("dd '"+LanguageUtil.get(themeDisplay.getLocale(), "of")+"' MMMM '"+LanguageUtil.get(themeDisplay.getLocale(), "of")+"' yyyy", themeDisplay.getLocale());
+			}else if(themeDisplay.getLocale().getLanguage().toLowerCase().equals("en")){
+				longSdf = new SimpleDateFormat("dd'"+getDaySuffix(endDateCalendar.get(Calendar.DATE))+"' MMMM yyyy", themeDisplay.getLocale());
+			}else if(themeDisplay.getLocale().getLanguage().toLowerCase().equals("pt")){
+				longSdf = new SimpleDateFormat("dd '"+LanguageUtil.get(themeDisplay.getLocale(), "of")+"' MMMM '"+LanguageUtil.get(themeDisplay.getLocale(), "of")+"' yyyy", themeDisplay.getLocale());
+			}
+			
+			if(longSdf==null){
+				longSdf = new SimpleDateFormat("EEEE',' dd MMMM yyyy", themeDisplay.getLocale());
+			}
+			longSdf.setTimeZone(user.getTimeZone());
+					
+					
+					
 			variables.put("courseName", course.getTitle(user.getLocale()));
 			variables.put("competenceName", competence.getTitle(user.getLocale()));
-			variables.put("userName", user.getFullName());
-			variables.put("startDate", dateFormatDate.format(CourseLocalServiceUtil.getFirstModuleDateInCourse(course.getCourseId())));
-			variables.put("endDate",dateFormatDate.format(CourseLocalServiceUtil.getLastModuleDateInCourse(course.getCourseId())));
+			variables.put("userName", user.getFirstName() + " "+user.getLastName());
+			variables.put("startDate", sdf.format(CourseLocalServiceUtil.getFirstModuleDateInCourse(course.getCourseId())));
+			variables.put("endDate",sdf.format(endDate));
+			variables.put("endLongDate", longSdf.format(endDate));
 			variables.put("themeDisplay", themeDisplay);
 			
 			LmsPrefs lmsprefs=LmsPrefsLocalServiceUtil.getLmsPrefs(themeDisplay.getCompanyId());
@@ -238,15 +255,19 @@ public class UserCompetencePortlet extends MVCPortlet {
 			variables.put("teachers", teachers);
 			variables.put("teachersNames", teachersNames);
 			
+			
 			// Sustitucion de campos expando de Course
 			List<ExpandoColumn> courseExpandoColumnList = ExpandoColumnLocalServiceUtil.getDefaultTableColumns(themeDisplay.getCompanyId(), Course.class.getName());
+			
 			for (ExpandoColumn courseExpandoColumn : courseExpandoColumnList) {
-				Serializable courseExpandoValue = course.getExpandoBridge().getAttribute(courseExpandoColumn.getName());
+				log.debug("ExapandoColumn "+courseExpandoColumn.getName());
+				Serializable courseExpandoValue = course.getExpandoBridge().getAttribute(courseExpandoColumn.getName(),false);
+				log.debug("ExpandoValue "+courseExpandoValue);
 				if (Validator.isNotNull(courseExpandoValue)){ 
 					if (courseExpandoColumn.getType() == ExpandoColumnConstants.BOOLEAN) {
 						variables.put(courseExpandoColumn.getName(), String.valueOf((Boolean) courseExpandoValue));
 					} else if (courseExpandoColumn.getType() == ExpandoColumnConstants.DATE) {
-						variables.put(courseExpandoColumn.getName(), dateFormatDate.format((Date) courseExpandoValue));
+						variables.put(courseExpandoColumn.getName(), sdf.format((Date) courseExpandoValue));
 					} else if (courseExpandoColumn.getType() == ExpandoColumnConstants.DOUBLE) {
 						variables.put(courseExpandoColumn.getName(), String.valueOf((Double) courseExpandoValue));
 					} else if (courseExpandoColumn.getType() == ExpandoColumnConstants.FLOAT) {
@@ -410,12 +431,29 @@ public class UserCompetencePortlet extends MVCPortlet {
     }
     
     
+    private static String getDaySuffix(int day){
+	    if (day >= 11 && day <= 13) {
+	        return "th";
+	    }
+	    switch (day % 10) {
+	        case 1:  return "st";
+	        case 2:  return "nd";
+	        case 3:  return "rd";
+	        default: return "th";
+	    }
+			
+	}
+    
 	public void serveResource(ResourceRequest request, ResourceResponse response) throws PortletException,IOException{
 		
 		Long competenceId = ParamUtil.getLong(request, "competenceId", 0);
 		Long courseId = ParamUtil.getLong(request, "courseId", 0);
+		
+		String courseName="";
 		String uuid=ParamUtil.getString(request, "uuid", "");
 		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(WebKeys.THEME_DISPLAY);
+		
+		
 		UserCompetence userCompetence=null;
 		if("".equals(uuid))
 		{
@@ -426,6 +464,18 @@ public class UserCompetencePortlet extends MVCPortlet {
 			userCompetence= UserCompetenceLocalServiceUtil.findByUuid(uuid);
 		}
 		
+		Course course=null;
+		if(userCompetence!=null){
+			try {
+				course = CourseLocalServiceUtil.fetchCourse(userCompetence.getCourseId());
+				if(course!=null){
+					courseName = "_"+course.getTitle(themeDisplay.getLocale());
+				}
+			} catch (SystemException e1) {
+				e1.printStackTrace();
+			}
+		}
+		response.addProperty(HttpHeaders.CONTENT_DISPOSITION, "attachment; fileName=\"" + LanguageUtil.get(themeDisplay.getLocale(), "competence.generated-file-name") + courseName +".pdf\"");
 		response.setContentType("application/pdf");
 		if(themeDisplay.isSignedIn())
 		 {

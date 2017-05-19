@@ -622,10 +622,10 @@ Liferay.provide(
 			  dataType : 'html',	 
 			  on: 
 				{   
-					success: function() { 
+				  	success: function() { 
 						A.one('#<portlet:namespace />precedence').
-							replace(A.Node.create(this.get('responseData')).one('select'));   
-					}   
+							replace(A.Node.create(this.get('responseData')).one('#<portlet:namespace />precedence'));
+					}
 				}
 			}); 
 			
