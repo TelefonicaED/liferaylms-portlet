@@ -1,8 +1,5 @@
 package com.liferay.lms.lar;
 
-import java.io.InputStream;
-import java.text.Normalizer;
-import java.text.Normalizer.Form;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -19,11 +16,9 @@ import com.liferay.lms.learningactivity.questiontype.QuestionType;
 import com.liferay.lms.learningactivity.questiontype.QuestionTypeRegistry;
 import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.model.Module;
-import com.liferay.lms.model.SCORMContent;
 import com.liferay.lms.model.TestQuestion;
 import com.liferay.lms.service.LearningActivityLocalServiceUtil;
 import com.liferay.lms.service.ModuleLocalServiceUtil;
-import com.liferay.lms.service.SCORMContentLocalServiceUtil;
 import com.liferay.lms.service.TestQuestionLocalServiceUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
@@ -44,12 +39,8 @@ import com.liferay.portal.kernel.xml.SAXReaderUtil;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
-import com.liferay.portlet.asset.model.AssetEntry;
-import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
-import com.liferay.portlet.documentlibrary.model.DLFileEntry;
 import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
 import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
-import com.liferay.portlet.documentlibrary.service.DLFileEntryLocalServiceUtil;
 
 
 public class ModuleDataHandlerImpl extends BasePortletDataHandler {

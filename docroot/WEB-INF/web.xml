@@ -45,28 +45,6 @@
     <filter-name>Secure JSON Web Service Servlet Filter</filter-name>
     <url-pattern>/api/secure/jsonws/*</url-pattern>
   </filter-mapping>
-  <filter-mapping>
-    <filter-name>Auto Login Filter</filter-name>
-    <url-pattern>/scorm/*</url-pattern>
-  </filter-mapping>
-  <filter-mapping>
-    <filter-name>Auto Login Filter</filter-name>
-    <url-pattern>/scormzip/*</url-pattern>
-  </filter-mapping>
-    <filter-mapping>
-        <filter-name>Secure JSON Web Service Servlet Filter</filter-name>
-        <url-pattern>/scormzip/*</url-pattern>
-    </filter-mapping>
-  <servlet>
-    <servlet-name>scormfileservlet</servlet-name>
-    <servlet-class>com.liferay.lms.servlet.SCORMFileServerServlet</servlet-class>
-    <load-on-startup>0</load-on-startup>
-  </servlet>
-  <servlet>
-    <servlet-name>scormzipfileservlet</servlet-name>
-    <servlet-class>com.liferay.lms.servlet.SCORMZipFileServerServlet</servlet-class>
-    <load-on-startup>0</load-on-startup>
-  </servlet>
   <servlet>
     <servlet-name>exportedcourseservlet</servlet-name>
     <servlet-class>com.liferay.lms.servlet.ExportedCourseServlet</servlet-class>
@@ -85,14 +63,7 @@
     <servlet-name>exportedcourseservlet</servlet-name>
     <url-pattern>/exports/courses/*</url-pattern>
   </servlet-mapping>
-  <servlet-mapping>
-    <servlet-name>scormfileservlet</servlet-name>
-    <url-pattern>/scorm/*</url-pattern>
-  </servlet-mapping>
-  <servlet-mapping>
-    <servlet-name>scormzipfileservlet</servlet-name>
-    <url-pattern>/scormzip/*</url-pattern>
-  </servlet-mapping>
+
   <servlet-mapping>
     <servlet-name>JSON Web Service Servlet</servlet-name>
     <url-pattern>/api/jsonws/*</url-pattern>

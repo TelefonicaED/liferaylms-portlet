@@ -2,9 +2,10 @@ package com.liferay.lms.lar;
 
 import java.io.InputStream;
 
+import com.liferay.lms.learningactivity.LearningActivityType;
+import com.liferay.lms.learningactivity.LearningActivityTypeRegistry;
 import com.liferay.lms.model.LearningActivity;
-import com.liferay.lms.model.SCORMContent;
-import com.liferay.lms.service.SCORMContentLocalServiceUtil;
+import com.liferay.lms.service.LearningActivityLocalServiceUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.lar.PortletDataContext;
@@ -205,81 +206,17 @@ public class ExportUtil {
 	}
 
 	public static void addZipEntry(LearningActivity actividad, long assetEntryId, PortletDataContext context, Element entryElementLoc) throws PortalException, SystemException {
-		AssetEntry docAsset= AssetEntryLocalServiceUtil.getAssetEntry(assetEntryId);
-		log.info("docAsset: " + docAsset.getClassPK());
-		if(actividad.getTypeId() != 9){
-			
-			log.info("mimeType: " + docAsset.getMimeType());
-			DLFileEntry docfile=DLFileEntryLocalServiceUtil.getDLFileEntry(docAsset.getClassPK());
-			
-			log.info("docFile: " + docfile.getFileEntryId());
-			String extension = "";
-			if(!docfile.getTitle().endsWith(docfile.getExtension()) && docfile.getExtension().equals("")){
-				if(docfile.getMimeType().equals("image/jpeg")){
-					extension= ".jpg";
-				}else if(docfile.getMimeType().equals("image/png")){
-					extension= ".png";
-				}else if(docfile.getMimeType().equals("video/mpeg")){
-					extension= ".mpeg";
-				}else if(docfile.getMimeType().equals("application/pdf")){
-					extension= ".pdf";
-				}else{
-					String ext[] = extension.split("/");
-					if(ext.length>1){
-						extension = ext[1];
-					}
-				}
-			}else if(!docfile.getTitle().endsWith(docfile.getExtension()) && !docfile.getExtension().equals("")){
-				extension="."+docfile.getExtension();
-			}
 
-			log.info("file Title: " + docfile.getTitle());
-			String title = changeSpecialCharacter(docfile.getTitle());
-			title += extension;
-			log.info("title: " + title);
-			
-			String pathqu = getEntryPath(context, docfile);
-			String pathFile = getFilePath(context, docfile,actividad.getActId());
-			Element entryElementfe= entryElementLoc.addElement("dlfileentry");
-			entryElementfe.addAttribute("path", pathqu);
-			entryElementfe.addAttribute("file", pathFile+title);
-			context.addZipEntry(pathqu, docfile);
-			
-			log.info("pathqu: " + pathqu);
-			log.info("pathFile: " + pathFile);
-
-			//Guardar el fichero en el zip.
-			InputStream input = DLFileEntryLocalServiceUtil.getFileAsStream(docfile.getUserId(), docfile.getFileEntryId(), docfile.getVersion());
-
-			context.addZipEntry(getFilePath(context, docfile,actividad.getActId())+title, input);
-			
-			String txt = (actividad.getTypeId() == 2) ? "external":"internal";
-			log.info("    - Resource "+ txt + ": " + title);
-
-		}else{
-			if(actividad.getTypeId() == 9){
-					
-				log.info("***************************************************************************************");
-					
-				log.info("PASO POR AQUI PARA "+actividad.getTitle());
-
-					
-				if(docAsset.getClassName().equals(SCORMContent.class.getName())){
-					try{
-						ScormDataHandlerImpl scormHandler = new ScormDataHandlerImpl();
-						SCORMContent scocontent = SCORMContentLocalServiceUtil.getSCORMContent(docAsset.getClassPK());
-						scormHandler.exportEntry(context, entryElementLoc, scocontent);
-					}catch(Exception e){
-						e.printStackTrace();
-						actividad.setExtracontent("");
-					}
-				} else{
-					log.info("MPC CONTENT");
-					actividad.setExtracontent("");
-				}
-					
-			}
-		}
+		log.debug("*** addZipEntry Implementacion de cada actividad****: typeId:"+actividad.getTypeId());
+		LearningActivityType learningActivityType=new LearningActivityTypeRegistry().getLearningActivityType(actividad.getTypeId());
+		
+		String addZipEntryResult = null;
+		try {
+			addZipEntryResult = learningActivityType.addZipEntry(actividad, assetEntryId, context, entryElementLoc);
+		} catch (Exception e) {
+			e.printStackTrace();
+		} 
+		log.debug("++++ addZipEntryResult:"+addZipEntryResult);
 	}
 	
 	public static String changeSpecialCharacter(String str) {

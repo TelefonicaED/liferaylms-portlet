@@ -432,34 +432,6 @@
 			<transient name="primaryKeyObj" />
 		</attributes>
 	</mapped-superclass>
-	<mapped-superclass class="com.liferay.lms.model.impl.SCORMContentModelImpl">
-		<attributes>
-			<id name="scormId" />
-			<basic name="uuid">
-				<column name="UUID_" />
-			</basic>
-			<basic name="companyId" />
-			<basic name="groupId" />
-			<basic name="userId" />
-			<basic name="status" />
-			<basic name="statusByUserId" />
-			<basic name="statusByUserName" />
-			<basic name="statusDate">
-				<temporal>TIMESTAMP</temporal>
-			</basic>
-			<basic name="title" />
-			<basic name="description" />
-			<basic name="index">
-				<column name="INDEX_" />
-			</basic>
-			<basic name="ciphered" />
-			<transient name="modelAttributes" />
-			<transient name="primaryKey" />
-			<transient name="primaryKeyObj" />
-			<transient name="statusByUserUuid" />
-			<transient name="userUuid" />
-		</attributes>
-	</mapped-superclass>
 	<mapped-superclass class="com.liferay.lms.model.impl.SurveyResultModelImpl">
 		<attributes>
 			<id name="surveyResultId" />
@@ -610,10 +582,6 @@
 	</entity>
 	<entity class="com.liferay.lms.model.impl.ScheduleImpl" name="Schedule">
 		<table name="Lms_Schedule" />
-		<attributes />
-	</entity>
-	<entity class="com.liferay.lms.model.impl.SCORMContentImpl" name="SCORMContent">
-		<table name="Lms_SCORMContent" />
 		<attributes />
 	</entity>
 	<entity class="com.liferay.lms.model.impl.SurveyResultImpl" name="SurveyResult">

@@ -718,47 +718,6 @@
 		</finder>		
 	</entity>  
 	      
-     <entity name="SCORMContent" local-service="true" remote-service="true" uuid="true" json-enabled="false">
-		<!-- Primary key column -->
-		<column name="scormId" type="long" primary="true" />
-		<!-- Foreign key columns -->
-		<column name="companyId" type="long" />
-		<column name="groupId" type="long" />
-		<column name="userId" type="long" />
-		<column name="status" type="int" />
-		<column name="statusByUserId" type="long" />
-		<column name="statusByUserName" type="String" />
-		<column name="statusDate" type="Date" />
-		<!-- Other columns -->
-		<column name="title" type="String" localized="false"/>
-		<column name="description" type="String" localized="false"/>
-		<column name="index" type="String" />
-		<column name="ciphered" type="boolean" />
- 		<order by="asc">
-			<order-column name="scormId" />
-		</order>
-		<!-- Finder Methods Standard -->
-		<finder name="scormId" return-type="Collection">
-			<finder-column name="groupId" />
-		</finder>
-		<finder name="CompanyId" return-type="Collection">
-			<finder-column name="companyId" />
-		</finder>
-		<finder name="UserId" return-type="Collection">
-			<finder-column name="userId" />
-		</finder>
-		<finder name="GroupId" return-type="Collection">
-			<finder-column name="groupId" />
-		</finder>
-		<finder name="UserIdGroupId" return-type="Collection">
-			<finder-column name="userId" />
-			<finder-column name="groupId" />
-		</finder>
-		<reference package-path="com.liferay.portal" entity="User" />
-		<reference package-path="com.liferay.portlet.asset" entity="AssetEntry" />
-		<reference package-path="com.liferay.portlet.ratings"
-			entity="RatingsStats" />
-	</entity>
     <entity name="AuditEntry" local-service="true" remote-service="false">
     	<column name="auditId" type="long" primary="true" />
     	<column name="auditDate" type="Date" primary="false" />

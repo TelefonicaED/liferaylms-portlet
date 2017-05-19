@@ -237,22 +237,6 @@ create table Lms_P2pActivityCorrections (
 	result LONG
 );
 
-create table Lms_SCORMContent (
-	uuid_ VARCHAR(75) null,
-	scormId LONG not null primary key,
-	companyId LONG,
-	groupId LONG,
-	userId LONG,
-	status INTEGER,
-	statusByUserId LONG,
-	statusByUserName VARCHAR(75) null,
-	statusDate DATE null,
-	title VARCHAR(75) null,
-	description TEXT null,
-	index_ VARCHAR(75) null,
-	ciphered BOOLEAN
-);
-
 create table Lms_Schedule (
 	secheduleId LONG not null primary key,
 	teamId LONG,

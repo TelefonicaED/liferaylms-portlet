@@ -43,8 +43,6 @@ import com.liferay.lms.service.ModuleResultService;
 import com.liferay.lms.service.ModuleService;
 import com.liferay.lms.service.P2pActivityCorrectionsLocalService;
 import com.liferay.lms.service.P2pActivityLocalService;
-import com.liferay.lms.service.SCORMContentLocalService;
-import com.liferay.lms.service.SCORMContentService;
 import com.liferay.lms.service.ScheduleLocalService;
 import com.liferay.lms.service.SurveyResultLocalService;
 import com.liferay.lms.service.TestAnswerLocalService;
@@ -75,7 +73,6 @@ import com.liferay.lms.service.persistence.ModuleResultFinder;
 import com.liferay.lms.service.persistence.ModuleResultPersistence;
 import com.liferay.lms.service.persistence.P2pActivityCorrectionsPersistence;
 import com.liferay.lms.service.persistence.P2pActivityPersistence;
-import com.liferay.lms.service.persistence.SCORMContentPersistence;
 import com.liferay.lms.service.persistence.SchedulePersistence;
 import com.liferay.lms.service.persistence.SurveyResultFinder;
 import com.liferay.lms.service.persistence.SurveyResultPersistence;
@@ -1036,62 +1033,6 @@ public abstract class LearningActivityTryServiceBaseImpl extends BaseServiceImpl
 	}
 
 	/**
-	 * Returns the s c o r m content local service.
-	 *
-	 * @return the s c o r m content local service
-	 */
-	public SCORMContentLocalService getSCORMContentLocalService() {
-		return scormContentLocalService;
-	}
-
-	/**
-	 * Sets the s c o r m content local service.
-	 *
-	 * @param scormContentLocalService the s c o r m content local service
-	 */
-	public void setSCORMContentLocalService(
-		SCORMContentLocalService scormContentLocalService) {
-		this.scormContentLocalService = scormContentLocalService;
-	}
-
-	/**
-	 * Returns the s c o r m content remote service.
-	 *
-	 * @return the s c o r m content remote service
-	 */
-	public SCORMContentService getSCORMContentService() {
-		return scormContentService;
-	}
-
-	/**
-	 * Sets the s c o r m content remote service.
-	 *
-	 * @param scormContentService the s c o r m content remote service
-	 */
-	public void setSCORMContentService(SCORMContentService scormContentService) {
-		this.scormContentService = scormContentService;
-	}
-
-	/**
-	 * Returns the s c o r m content persistence.
-	 *
-	 * @return the s c o r m content persistence
-	 */
-	public SCORMContentPersistence getSCORMContentPersistence() {
-		return scormContentPersistence;
-	}
-
-	/**
-	 * Sets the s c o r m content persistence.
-	 *
-	 * @param scormContentPersistence the s c o r m content persistence
-	 */
-	public void setSCORMContentPersistence(
-		SCORMContentPersistence scormContentPersistence) {
-		this.scormContentPersistence = scormContentPersistence;
-	}
-
-	/**
 	 * Returns the survey result local service.
 	 *
 	 * @return the survey result local service
@@ -1635,12 +1576,6 @@ public abstract class LearningActivityTryServiceBaseImpl extends BaseServiceImpl
 	protected ScheduleLocalService scheduleLocalService;
 	@BeanReference(type = SchedulePersistence.class)
 	protected SchedulePersistence schedulePersistence;
-	@BeanReference(type = SCORMContentLocalService.class)
-	protected SCORMContentLocalService scormContentLocalService;
-	@BeanReference(type = SCORMContentService.class)
-	protected SCORMContentService scormContentService;
-	@BeanReference(type = SCORMContentPersistence.class)
-	protected SCORMContentPersistence scormContentPersistence;
 	@BeanReference(type = SurveyResultLocalService.class)
 	protected SurveyResultLocalService surveyResultLocalService;
 	@BeanReference(type = SurveyResultPersistence.class)

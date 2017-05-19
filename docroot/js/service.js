@@ -60,8 +60,7 @@ Liferay.Service.registerClass(
 		userPassed: true,
 		userLoginPassed: true,
 		update: true,
-		forceFinishTry: true,
-		updateFinishTry: true
+		forceFinishTry: true
 	}
 );
 
@@ -81,13 +80,6 @@ Liferay.Service.registerClass(
 		isLocked: true,
 		PassedByMe: true,
 		isUserPassed: true
-	}
-);
-
-Liferay.Service.registerClass(
-	Liferay.Service.Lms, "SCORMContent",
-	{
-		getSCORMContentOfGroup: true
 	}
 );
 

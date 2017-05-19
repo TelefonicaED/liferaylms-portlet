@@ -29,7 +29,6 @@ import com.liferay.lms.model.ModuleClp;
 import com.liferay.lms.model.ModuleResultClp;
 import com.liferay.lms.model.P2pActivityClp;
 import com.liferay.lms.model.P2pActivityCorrectionsClp;
-import com.liferay.lms.model.SCORMContentClp;
 import com.liferay.lms.model.ScheduleClp;
 import com.liferay.lms.model.SurveyResultClp;
 import com.liferay.lms.model.TestAnswerClp;
@@ -185,10 +184,6 @@ public class ClpSerializer {
 
 		if (oldModelClassName.equals(ScheduleClp.class.getName())) {
 			return translateInputSchedule(oldModel);
-		}
-
-		if (oldModelClassName.equals(SCORMContentClp.class.getName())) {
-			return translateInputSCORMContent(oldModel);
 		}
 
 		if (oldModelClassName.equals(SurveyResultClp.class.getName())) {
@@ -390,16 +385,6 @@ public class ClpSerializer {
 		return newModel;
 	}
 
-	public static Object translateInputSCORMContent(BaseModel<?> oldModel) {
-		SCORMContentClp oldClpModel = (SCORMContentClp)oldModel;
-
-		BaseModel<?> newModel = oldClpModel.getSCORMContentRemoteModel();
-
-		newModel.setModelAttributes(oldClpModel.getModelAttributes());
-
-		return newModel;
-	}
-
 	public static Object translateInputSurveyResult(BaseModel<?> oldModel) {
 		SurveyResultClp oldClpModel = (SurveyResultClp)oldModel;
 
@@ -542,11 +527,6 @@ public class ClpSerializer {
 
 		if (oldModelClassName.equals("com.liferay.lms.model.impl.ScheduleImpl")) {
 			return translateOutputSchedule(oldModel);
-		}
-
-		if (oldModelClassName.equals(
-					"com.liferay.lms.model.impl.SCORMContentImpl")) {
-			return translateOutputSCORMContent(oldModel);
 		}
 
 		if (oldModelClassName.equals(
@@ -724,10 +704,6 @@ public class ClpSerializer {
 
 		if (className.equals("com.liferay.lms.NoSuchScheduleException")) {
 			return new com.liferay.lms.NoSuchScheduleException();
-		}
-
-		if (className.equals("com.liferay.lms.NoSuchSCORMContentException")) {
-			return new com.liferay.lms.NoSuchSCORMContentException();
 		}
 
 		if (className.equals("com.liferay.lms.NoSuchSurveyResultException")) {
@@ -914,16 +890,6 @@ public class ClpSerializer {
 		newModel.setModelAttributes(oldModel.getModelAttributes());
 
 		newModel.setScheduleRemoteModel(oldModel);
-
-		return newModel;
-	}
-
-	public static Object translateOutputSCORMContent(BaseModel<?> oldModel) {
-		SCORMContentClp newModel = new SCORMContentClp();
-
-		newModel.setModelAttributes(oldModel.getModelAttributes());
-
-		newModel.setSCORMContentRemoteModel(oldModel);
 
 		return newModel;
 	}

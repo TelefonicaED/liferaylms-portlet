@@ -1,6 +1,7 @@
 package com.liferay.lms.learningactivity;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
 
 import javax.portlet.ActionRequest;
@@ -12,13 +13,25 @@ import com.liferay.lms.model.LearningActivityResult;
 import com.liferay.lms.service.LearningActivityResultLocalServiceUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.lar.PortletDataContext;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.upload.UploadRequest;
+import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.xml.DocumentException;
+import com.liferay.portal.kernel.xml.Element;
+import com.liferay.portal.service.ServiceContext;
+import com.liferay.portlet.asset.model.AssetEntry;
 import com.liferay.portlet.asset.model.AssetRenderer;
+import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
+import com.liferay.portlet.documentlibrary.model.DLFileEntry;
+import com.liferay.portlet.documentlibrary.service.DLFileEntryLocalServiceUtil;
 
 
 public abstract class BaseLearningActivityType implements LearningActivityType, Serializable {
 
+	private static Log log = LogFactoryUtil.getLog(BaseLearningActivityType.class);
+	
 	@Override
 	public String getMesageEditDetails() {
 		return "edit-activity-details";
@@ -130,6 +143,7 @@ public abstract class BaseLearningActivityType implements LearningActivityType, 
 		return null;
 	}
 	
+	
 	@Override
 	public boolean especificValidations(UploadRequest uploadRequest,PortletResponse portletResponse) {
 		return true;
@@ -167,5 +181,89 @@ public abstract class BaseLearningActivityType implements LearningActivityType, 
 		return true;
 	}
 
+	@Override
+	public String importExtraContent(LearningActivity newLarn, Long userId, PortletDataContext context, ServiceContext serviceContext, Element actElement) throws PortalException, IOException, DocumentException, SystemException{
+		return null;
+	}
+	
+	@Override
+	public String addZipEntry(LearningActivity actividad, Long assetEntryId,PortletDataContext context, Element entryElementLoc)
+			throws PortalException, SystemException {
+		
+		AssetEntry docAsset= AssetEntryLocalServiceUtil.getAssetEntry(assetEntryId);
+		
+		log.info("mimeType: " + docAsset.getMimeType());
+		DLFileEntry docfile=DLFileEntryLocalServiceUtil.getDLFileEntry(docAsset.getClassPK());
+		
+		log.info("docFile: " + docfile.getFileEntryId());
+		String extension = "";
+		if(!docfile.getTitle().endsWith(docfile.getExtension()) && docfile.getExtension().equals("")){
+			if(docfile.getMimeType().equals("image/jpeg")){
+				extension= ".jpg";
+			}else if(docfile.getMimeType().equals("image/png")){
+				extension= ".png";
+			}else if(docfile.getMimeType().equals("video/mpeg")){
+				extension= ".mpeg";
+			}else if(docfile.getMimeType().equals("application/pdf")){
+				extension= ".pdf";
+			}else{
+				String ext[] = extension.split("/");
+				if(ext.length>1){
+					extension = ext[1];
+				}
+			}
+		}else if(!docfile.getTitle().endsWith(docfile.getExtension()) && !docfile.getExtension().equals("")){
+			extension="."+docfile.getExtension();
+		}
+
+		log.info("file Title: " + docfile.getTitle());
+		String title = changeSpecialCharacter(docfile.getTitle());
+		title += extension;
+		log.info("title: " + title);
+		
+		String pathqu = getEntryPath(context, docfile);
+		String pathFile = getFilePath(context, docfile,actividad.getActId());
+		Element entryElementfe= entryElementLoc.addElement("dlfileentry");
+		entryElementfe.addAttribute("path", pathqu);
+		entryElementfe.addAttribute("file", pathFile+title);
+		context.addZipEntry(pathqu, docfile);
+		
+		log.info("pathqu: " + pathqu);
+		log.info("pathFile: " + pathFile);
+
+		//Guardar el fichero en el zip.
+		InputStream input = DLFileEntryLocalServiceUtil.getFileAsStream(docfile.getUserId(), docfile.getFileEntryId(), docfile.getVersion());
+
+		context.addZipEntry(getFilePath(context, docfile,actividad.getActId())+title, input);
+		
+		String txt = (actividad.getTypeId() == 2) ? "external":"internal";
+		log.info("    - Resource "+ txt + ": " + title);
+
+		return null;
+	}
+	
+	private static String changeSpecialCharacter(String str) {
+	    
+		str = str.replaceAll("[^a-zA-Z0-9]", "");
+	    return str;
+	}
+	
+	private static String getEntryPath(PortletDataContext context, DLFileEntry file) {
+		
+		StringBundler sb = new StringBundler(4);
+		sb.append(context.getPortletPath("resourceactivity_WAR_liferaylmsportlet"));
+		sb.append("/moduleentries/");
+		sb.append(file.getFileEntryId());
+		sb.append(".xml");
+		return sb.toString();
+	}
+	
+	private static String getFilePath(PortletDataContext context,DLFileEntry file, long actId) {
+		
+		StringBundler sb = new StringBundler(4);
+		sb.append(context.getPortletPath("moduleportlet_WAR_liferaylmsportlet"));
+		sb.append("/moduleentries/activities/"+String.valueOf(actId)+"/");
+		return sb.toString();
+	}
 	
 }

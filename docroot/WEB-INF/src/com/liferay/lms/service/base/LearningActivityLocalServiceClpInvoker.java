@@ -108,48 +108,48 @@ public class LearningActivityLocalServiceClpInvoker {
 				"com.liferay.lms.model.LearningActivity", "boolean"
 			};
 
-		_methodName197 = "getBeanIdentifier";
+		_methodName191 = "getBeanIdentifier";
 
-		_methodParameterTypes197 = new String[] {  };
+		_methodParameterTypes191 = new String[] {  };
 
-		_methodName198 = "setBeanIdentifier";
+		_methodName192 = "setBeanIdentifier";
 
-		_methodParameterTypes198 = new String[] { "java.lang.String" };
+		_methodParameterTypes192 = new String[] { "java.lang.String" };
 
-		_methodName203 = "isDone";
+		_methodName197 = "isDone";
 
-		_methodParameterTypes203 = new String[] { "long", "long" };
+		_methodParameterTypes197 = new String[] { "long", "long" };
 
-		_methodName204 = "islocked";
+		_methodName198 = "islocked";
 
-		_methodParameterTypes204 = new String[] { "long", "long" };
+		_methodParameterTypes198 = new String[] { "long", "long" };
 
-		_methodName205 = "canAccess";
+		_methodName199 = "canAccess";
 
-		_methodParameterTypes205 = new String[] {
+		_methodParameterTypes199 = new String[] {
 				"long", "boolean", "com.liferay.portal.model.User",
 				"com.liferay.portal.security.permission.PermissionChecker"
 			};
 
-		_methodName206 = "addLearningActivity";
+		_methodName200 = "addLearningActivity";
 
-		_methodParameterTypes206 = new String[] {
+		_methodParameterTypes200 = new String[] {
 				"com.liferay.lms.model.LearningActivity",
 				"com.liferay.portal.service.ServiceContext"
 			};
 
-		_methodName207 = "addLearningActivity";
+		_methodName201 = "addLearningActivity";
 
-		_methodParameterTypes207 = new String[] {
+		_methodParameterTypes201 = new String[] {
 				"java.lang.String", "java.lang.String", "java.util.Date",
 				"java.util.Date", "java.util.Date", "int", "long", "int", "long",
 				"java.lang.String", "java.lang.String", "java.lang.String",
 				"com.liferay.portal.service.ServiceContext"
 			};
 
-		_methodName208 = "addLearningActivity";
+		_methodName202 = "addLearningActivity";
 
-		_methodParameterTypes208 = new String[] {
+		_methodParameterTypes202 = new String[] {
 				"long", "long", "int", "java.util.Map", "java.util.Map", "int",
 				"java.util.Date", "java.util.Date", "long", "long", "int",
 				"long", "java.lang.String", "java.lang.String",
@@ -157,197 +157,197 @@ public class LearningActivityLocalServiceClpInvoker {
 				"com.liferay.portal.service.ServiceContext"
 			};
 
-		_methodName209 = "modLearningActivity";
+		_methodName203 = "modLearningActivity";
 
-		_methodParameterTypes209 = new String[] {
+		_methodParameterTypes203 = new String[] {
 				"long", "java.lang.String", "java.lang.String", "java.util.Date",
 				"java.util.Date", "java.util.Date", "int", "long", "int", "long",
 				"java.lang.String", "java.lang.String", "java.lang.String",
 				"com.liferay.portal.service.ServiceContext"
 			};
 
-		_methodName210 = "modLearningActivity";
+		_methodName204 = "modLearningActivity";
 
-		_methodParameterTypes210 = new String[] {
+		_methodParameterTypes204 = new String[] {
 				"com.liferay.lms.model.LearningActivity",
 				"com.liferay.portal.service.ServiceContext"
 			};
 
-		_methodName211 = "modLearningActivity";
+		_methodName205 = "modLearningActivity";
 
-		_methodParameterTypes211 = new String[] {
+		_methodParameterTypes205 = new String[] {
 				"com.liferay.lms.model.LearningActivity"
 			};
 
-		_methodName212 = "getLearningActivitiesOfGroup";
+		_methodName206 = "getLearningActivitiesOfGroup";
 
-		_methodParameterTypes212 = new String[] { "long" };
+		_methodParameterTypes206 = new String[] { "long" };
 
-		_methodName213 = "getMandatoryLearningActivitiesOfGroup";
+		_methodName207 = "getMandatoryLearningActivitiesOfGroup";
+
+		_methodParameterTypes207 = new String[] { "long" };
+
+		_methodName208 = "countLearningActivitiesOfGroup";
+
+		_methodParameterTypes208 = new String[] { "long" };
+
+		_methodName209 = "countLearningActivitiesOfModule";
+
+		_methodParameterTypes209 = new String[] { "long" };
+
+		_methodName210 = "getLearningActivitiesOfGroupAndType";
+
+		_methodParameterTypes210 = new String[] { "long", "int" };
+
+		_methodName211 = "getLearningActivitiesByType";
+
+		_methodParameterTypes211 = new String[] { "long", "int" };
+
+		_methodName212 = "getLearningActivitiesByType";
+
+		_methodParameterTypes212 = new String[] { "int" };
+
+		_methodName213 = "getLearningActivitiesOfModule";
 
 		_methodParameterTypes213 = new String[] { "long" };
 
-		_methodName214 = "countLearningActivitiesOfGroup";
+		_methodName214 = "getLearningActivitiesOfModule";
 
-		_methodParameterTypes214 = new String[] { "long" };
+		_methodParameterTypes214 = new String[] { "long", "int", "int" };
 
-		_methodName215 = "countLearningActivitiesOfModule";
+		_methodName215 = "getLearningActivityIdsOfModule";
 
 		_methodParameterTypes215 = new String[] { "long" };
 
-		_methodName216 = "getLearningActivitiesOfGroupAndType";
+		_methodName216 = "deleteLearningactivity";
 
-		_methodParameterTypes216 = new String[] { "long", "int" };
-
-		_methodName217 = "getLearningActivitiesByType";
-
-		_methodParameterTypes217 = new String[] { "long", "int" };
-
-		_methodName218 = "getLearningActivitiesByType";
-
-		_methodParameterTypes218 = new String[] { "int" };
-
-		_methodName219 = "getLearningActivitiesOfModule";
-
-		_methodParameterTypes219 = new String[] { "long" };
-
-		_methodName220 = "getLearningActivitiesOfModule";
-
-		_methodParameterTypes220 = new String[] { "long", "int", "int" };
-
-		_methodName221 = "getLearningActivityIdsOfModule";
-
-		_methodParameterTypes221 = new String[] { "long" };
-
-		_methodName222 = "deleteLearningactivity";
-
-		_methodParameterTypes222 = new String[] {
+		_methodParameterTypes216 = new String[] {
 				"com.liferay.lms.model.LearningActivity"
 			};
 
-		_methodName223 = "getPreviusLearningActivity";
+		_methodName217 = "getPreviusLearningActivity";
+
+		_methodParameterTypes217 = new String[] { "long" };
+
+		_methodName218 = "getPreviusLearningActivity";
+
+		_methodParameterTypes218 = new String[] {
+				"com.liferay.lms.model.LearningActivity"
+			};
+
+		_methodName219 = "getPreviusLearningActivites";
+
+		_methodParameterTypes219 = new String[] {
+				"com.liferay.lms.model.LearningActivity"
+			};
+
+		_methodName220 = "goUpLearningActivity";
+
+		_methodParameterTypes220 = new String[] { "long", "long" };
+
+		_methodName221 = "goDownLearningActivity";
+
+		_methodParameterTypes221 = new String[] { "long", "long" };
+
+		_methodName222 = "moveActivity";
+
+		_methodParameterTypes222 = new String[] { "long", "long", "long", "long" };
+
+		_methodName223 = "getNextLearningActivity";
 
 		_methodParameterTypes223 = new String[] { "long" };
 
-		_methodName224 = "getPreviusLearningActivity";
+		_methodName224 = "getNextLearningActivity";
 
 		_methodParameterTypes224 = new String[] {
 				"com.liferay.lms.model.LearningActivity"
 			};
 
-		_methodName225 = "getPreviusLearningActivites";
+		_methodName225 = "getNextLearningActivites";
 
 		_methodParameterTypes225 = new String[] {
 				"com.liferay.lms.model.LearningActivity"
 			};
 
-		_methodName226 = "goUpLearningActivity";
+		_methodName226 = "deleteLearningactivity";
 
-		_methodParameterTypes226 = new String[] { "long", "long" };
+		_methodParameterTypes226 = new String[] { "long" };
 
-		_methodName227 = "goDownLearningActivity";
+		_methodName227 = "getExtraContentValue";
 
-		_methodParameterTypes227 = new String[] { "long", "long" };
+		_methodParameterTypes227 = new String[] {
+				"long", "java.lang.String", "java.lang.String"
+			};
 
-		_methodName228 = "moveActivity";
+		_methodName228 = "getExtraContentValue";
 
-		_methodParameterTypes228 = new String[] { "long", "long", "long", "long" };
+		_methodParameterTypes228 = new String[] { "long", "java.lang.String" };
 
-		_methodName229 = "getNextLearningActivity";
+		_methodName229 = "getExtraContentValues";
 
-		_methodParameterTypes229 = new String[] { "long" };
+		_methodParameterTypes229 = new String[] { "long", "java.lang.String" };
 
-		_methodName230 = "getNextLearningActivity";
+		_methodName230 = "setExtraContentValue";
 
 		_methodParameterTypes230 = new String[] {
-				"com.liferay.lms.model.LearningActivity"
-			};
-
-		_methodName231 = "getNextLearningActivites";
-
-		_methodParameterTypes231 = new String[] {
-				"com.liferay.lms.model.LearningActivity"
-			};
-
-		_methodName232 = "deleteLearningactivity";
-
-		_methodParameterTypes232 = new String[] { "long" };
-
-		_methodName233 = "getExtraContentValue";
-
-		_methodParameterTypes233 = new String[] {
 				"long", "java.lang.String", "java.lang.String"
 			};
 
-		_methodName234 = "getExtraContentValue";
+		_methodName231 = "convertXMLExtraContentToHashMap";
 
-		_methodParameterTypes234 = new String[] { "long", "java.lang.String" };
+		_methodParameterTypes231 = new String[] { "long" };
 
-		_methodName235 = "getExtraContentValues";
+		_methodName232 = "saveHashMapToXMLExtraContent";
 
-		_methodParameterTypes235 = new String[] { "long", "java.lang.String" };
+		_methodParameterTypes232 = new String[] { "long", "java.util.HashMap" };
 
-		_methodName236 = "setExtraContentValue";
+		_methodName233 = "isLearningActivityDeleteTries";
+
+		_methodParameterTypes233 = new String[] { "long" };
+
+		_methodName235 = "canBeView";
+
+		_methodParameterTypes235 = new String[] {
+				"com.liferay.lms.model.LearningActivity", "long"
+			};
+
+		_methodName236 = "canBeView";
 
 		_methodParameterTypes236 = new String[] {
-				"long", "java.lang.String", "java.lang.String"
-			};
-
-		_methodName237 = "convertXMLExtraContentToHashMap";
-
-		_methodParameterTypes237 = new String[] { "long" };
-
-		_methodName238 = "saveHashMapToXMLExtraContent";
-
-		_methodParameterTypes238 = new String[] { "long", "java.util.HashMap" };
-
-		_methodName239 = "isLearningActivityDeleteTries";
-
-		_methodParameterTypes239 = new String[] { "long" };
-
-		_methodName241 = "canBeView";
-
-		_methodParameterTypes241 = new String[] {
-				"com.liferay.lms.model.LearningActivity", "long"
-			};
-
-		_methodName242 = "canBeView";
-
-		_methodParameterTypes242 = new String[] {
 				"com.liferay.lms.model.LearningActivity",
 				"com.liferay.portal.security.permission.PermissionChecker"
 			};
 
-		_methodName243 = "canBeEdited";
+		_methodName237 = "canBeEdited";
 
-		_methodParameterTypes243 = new String[] {
+		_methodParameterTypes237 = new String[] {
 				"com.liferay.lms.model.LearningActivity", "long"
 			};
 
-		_methodName244 = "canBeEdited";
+		_methodName238 = "canBeEdited";
 
-		_methodParameterTypes244 = new String[] {
+		_methodParameterTypes238 = new String[] {
 				"com.liferay.lms.model.LearningActivity",
 				"com.liferay.portal.security.permission.PermissionChecker"
 			};
 
-		_methodName245 = "updateLearningActivity";
+		_methodName239 = "updateLearningActivity";
 
-		_methodParameterTypes245 = new String[] {
+		_methodParameterTypes239 = new String[] {
 				"com.liferay.lms.model.LearningActivity"
 			};
 
-		_methodName246 = "getMandatoryActivities";
+		_methodName240 = "getMandatoryActivities";
 
-		_methodParameterTypes246 = new String[] { "long" };
+		_methodParameterTypes240 = new String[] { "long" };
 
-		_methodName247 = "getByPrecedence";
+		_methodName241 = "getByPrecedence";
 
-		_methodParameterTypes247 = new String[] { "long" };
+		_methodParameterTypes241 = new String[] { "long" };
 
-		_methodName249 = "getByPriority";
+		_methodName243 = "getByPriority";
 
-		_methodParameterTypes249 = new String[] { "int", "long", "long" };
+		_methodParameterTypes243 = new String[] { "int", "long", "long" };
 	}
 
 	public Object invokeMethod(String name, String[] parameterTypes,
@@ -445,44 +445,44 @@ public class LearningActivityLocalServiceClpInvoker {
 				((Boolean)arguments[1]).booleanValue());
 		}
 
-		if (_methodName197.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes197, parameterTypes)) {
+		if (_methodName191.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes191, parameterTypes)) {
 			return LearningActivityLocalServiceUtil.getBeanIdentifier();
 		}
 
-		if (_methodName198.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes198, parameterTypes)) {
+		if (_methodName192.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes192, parameterTypes)) {
 			LearningActivityLocalServiceUtil.setBeanIdentifier((java.lang.String)arguments[0]);
 		}
 
-		if (_methodName203.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes203, parameterTypes)) {
+		if (_methodName197.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes197, parameterTypes)) {
 			return LearningActivityLocalServiceUtil.isDone(((Long)arguments[0]).longValue(),
 				((Long)arguments[1]).longValue());
 		}
 
-		if (_methodName204.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes204, parameterTypes)) {
+		if (_methodName198.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes198, parameterTypes)) {
 			return LearningActivityLocalServiceUtil.islocked(((Long)arguments[0]).longValue(),
 				((Long)arguments[1]).longValue());
 		}
 
-		if (_methodName205.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes205, parameterTypes)) {
+		if (_methodName199.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes199, parameterTypes)) {
 			return LearningActivityLocalServiceUtil.canAccess(((Long)arguments[0]).longValue(),
 				((Boolean)arguments[1]).booleanValue(),
 				(com.liferay.portal.model.User)arguments[2],
 				(com.liferay.portal.security.permission.PermissionChecker)arguments[3]);
 		}
 
-		if (_methodName206.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes206, parameterTypes)) {
+		if (_methodName200.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes200, parameterTypes)) {
 			return LearningActivityLocalServiceUtil.addLearningActivity((com.liferay.lms.model.LearningActivity)arguments[0],
 				(com.liferay.portal.service.ServiceContext)arguments[1]);
 		}
 
-		if (_methodName207.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes207, parameterTypes)) {
+		if (_methodName201.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes201, parameterTypes)) {
 			return LearningActivityLocalServiceUtil.addLearningActivity((java.lang.String)arguments[0],
 				(java.lang.String)arguments[1], (java.util.Date)arguments[2],
 				(java.util.Date)arguments[3], (java.util.Date)arguments[4],
@@ -496,8 +496,8 @@ public class LearningActivityLocalServiceClpInvoker {
 				(com.liferay.portal.service.ServiceContext)arguments[12]);
 		}
 
-		if (_methodName208.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes208, parameterTypes)) {
+		if (_methodName202.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes202, parameterTypes)) {
 			return LearningActivityLocalServiceUtil.addLearningActivity(((Long)arguments[0]).longValue(),
 				((Long)arguments[1]).longValue(),
 				((Integer)arguments[2]).intValue(),
@@ -517,8 +517,8 @@ public class LearningActivityLocalServiceClpInvoker {
 				(com.liferay.portal.service.ServiceContext)arguments[17]);
 		}
 
-		if (_methodName209.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes209, parameterTypes)) {
+		if (_methodName203.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes203, parameterTypes)) {
 			return LearningActivityLocalServiceUtil.modLearningActivity(((Long)arguments[0]).longValue(),
 				(java.lang.String)arguments[1], (java.lang.String)arguments[2],
 				(java.util.Date)arguments[3], (java.util.Date)arguments[4],
@@ -533,212 +533,212 @@ public class LearningActivityLocalServiceClpInvoker {
 				(com.liferay.portal.service.ServiceContext)arguments[13]);
 		}
 
-		if (_methodName210.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes210, parameterTypes)) {
+		if (_methodName204.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes204, parameterTypes)) {
 			return LearningActivityLocalServiceUtil.modLearningActivity((com.liferay.lms.model.LearningActivity)arguments[0],
 				(com.liferay.portal.service.ServiceContext)arguments[1]);
 		}
 
-		if (_methodName211.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes211, parameterTypes)) {
+		if (_methodName205.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes205, parameterTypes)) {
 			return LearningActivityLocalServiceUtil.modLearningActivity((com.liferay.lms.model.LearningActivity)arguments[0]);
 		}
 
-		if (_methodName212.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes212, parameterTypes)) {
+		if (_methodName206.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes206, parameterTypes)) {
 			return LearningActivityLocalServiceUtil.getLearningActivitiesOfGroup(((Long)arguments[0]).longValue());
 		}
 
-		if (_methodName213.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes213, parameterTypes)) {
+		if (_methodName207.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes207, parameterTypes)) {
 			return LearningActivityLocalServiceUtil.getMandatoryLearningActivitiesOfGroup(((Long)arguments[0]).longValue());
 		}
 
-		if (_methodName214.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes214, parameterTypes)) {
+		if (_methodName208.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes208, parameterTypes)) {
 			return LearningActivityLocalServiceUtil.countLearningActivitiesOfGroup(((Long)arguments[0]).longValue());
 		}
 
-		if (_methodName215.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes215, parameterTypes)) {
+		if (_methodName209.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes209, parameterTypes)) {
 			return LearningActivityLocalServiceUtil.countLearningActivitiesOfModule(((Long)arguments[0]).longValue());
 		}
 
-		if (_methodName216.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes216, parameterTypes)) {
+		if (_methodName210.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes210, parameterTypes)) {
 			return LearningActivityLocalServiceUtil.getLearningActivitiesOfGroupAndType(((Long)arguments[0]).longValue(),
 				((Integer)arguments[1]).intValue());
 		}
 
-		if (_methodName217.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes217, parameterTypes)) {
+		if (_methodName211.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes211, parameterTypes)) {
 			return LearningActivityLocalServiceUtil.getLearningActivitiesByType(((Long)arguments[0]).longValue(),
 				((Integer)arguments[1]).intValue());
 		}
 
-		if (_methodName218.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes218, parameterTypes)) {
+		if (_methodName212.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes212, parameterTypes)) {
 			return LearningActivityLocalServiceUtil.getLearningActivitiesByType(((Integer)arguments[0]).intValue());
 		}
 
-		if (_methodName219.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes219, parameterTypes)) {
+		if (_methodName213.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes213, parameterTypes)) {
 			return LearningActivityLocalServiceUtil.getLearningActivitiesOfModule(((Long)arguments[0]).longValue());
 		}
 
-		if (_methodName220.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes220, parameterTypes)) {
+		if (_methodName214.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes214, parameterTypes)) {
 			return LearningActivityLocalServiceUtil.getLearningActivitiesOfModule(((Long)arguments[0]).longValue(),
 				((Integer)arguments[1]).intValue(),
 				((Integer)arguments[2]).intValue());
 		}
 
-		if (_methodName221.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes221, parameterTypes)) {
+		if (_methodName215.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes215, parameterTypes)) {
 			return LearningActivityLocalServiceUtil.getLearningActivityIdsOfModule(((Long)arguments[0]).longValue());
 		}
 
-		if (_methodName222.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes222, parameterTypes)) {
+		if (_methodName216.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes216, parameterTypes)) {
 			LearningActivityLocalServiceUtil.deleteLearningactivity((com.liferay.lms.model.LearningActivity)arguments[0]);
 		}
 
-		if (_methodName223.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes223, parameterTypes)) {
+		if (_methodName217.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes217, parameterTypes)) {
 			return LearningActivityLocalServiceUtil.getPreviusLearningActivity(((Long)arguments[0]).longValue());
 		}
 
-		if (_methodName224.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes224, parameterTypes)) {
+		if (_methodName218.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes218, parameterTypes)) {
 			return LearningActivityLocalServiceUtil.getPreviusLearningActivity((com.liferay.lms.model.LearningActivity)arguments[0]);
 		}
 
-		if (_methodName225.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes225, parameterTypes)) {
+		if (_methodName219.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes219, parameterTypes)) {
 			return LearningActivityLocalServiceUtil.getPreviusLearningActivites((com.liferay.lms.model.LearningActivity)arguments[0]);
 		}
 
-		if (_methodName226.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes226, parameterTypes)) {
+		if (_methodName220.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes220, parameterTypes)) {
 			LearningActivityLocalServiceUtil.goUpLearningActivity(((Long)arguments[0]).longValue(),
 				((Long)arguments[1]).longValue());
 		}
 
-		if (_methodName227.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes227, parameterTypes)) {
+		if (_methodName221.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes221, parameterTypes)) {
 			LearningActivityLocalServiceUtil.goDownLearningActivity(((Long)arguments[0]).longValue(),
 				((Long)arguments[1]).longValue());
 		}
 
-		if (_methodName228.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes228, parameterTypes)) {
+		if (_methodName222.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes222, parameterTypes)) {
 			LearningActivityLocalServiceUtil.moveActivity(((Long)arguments[0]).longValue(),
 				((Long)arguments[1]).longValue(),
 				((Long)arguments[2]).longValue(),
 				((Long)arguments[3]).longValue());
 		}
 
-		if (_methodName229.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes229, parameterTypes)) {
+		if (_methodName223.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes223, parameterTypes)) {
 			return LearningActivityLocalServiceUtil.getNextLearningActivity(((Long)arguments[0]).longValue());
 		}
 
-		if (_methodName230.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes230, parameterTypes)) {
+		if (_methodName224.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes224, parameterTypes)) {
 			return LearningActivityLocalServiceUtil.getNextLearningActivity((com.liferay.lms.model.LearningActivity)arguments[0]);
 		}
 
-		if (_methodName231.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes231, parameterTypes)) {
+		if (_methodName225.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes225, parameterTypes)) {
 			return LearningActivityLocalServiceUtil.getNextLearningActivites((com.liferay.lms.model.LearningActivity)arguments[0]);
 		}
 
-		if (_methodName232.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes232, parameterTypes)) {
+		if (_methodName226.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes226, parameterTypes)) {
 			LearningActivityLocalServiceUtil.deleteLearningactivity(((Long)arguments[0]).longValue());
 		}
 
-		if (_methodName233.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes233, parameterTypes)) {
+		if (_methodName227.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes227, parameterTypes)) {
 			return LearningActivityLocalServiceUtil.getExtraContentValue(((Long)arguments[0]).longValue(),
 				(java.lang.String)arguments[1], (java.lang.String)arguments[2]);
 		}
 
-		if (_methodName234.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes234, parameterTypes)) {
+		if (_methodName228.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes228, parameterTypes)) {
 			return LearningActivityLocalServiceUtil.getExtraContentValue(((Long)arguments[0]).longValue(),
 				(java.lang.String)arguments[1]);
 		}
 
-		if (_methodName235.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes235, parameterTypes)) {
+		if (_methodName229.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes229, parameterTypes)) {
 			return LearningActivityLocalServiceUtil.getExtraContentValues(((Long)arguments[0]).longValue(),
 				(java.lang.String)arguments[1]);
 		}
 
-		if (_methodName236.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes236, parameterTypes)) {
+		if (_methodName230.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes230, parameterTypes)) {
 			LearningActivityLocalServiceUtil.setExtraContentValue(((Long)arguments[0]).longValue(),
 				(java.lang.String)arguments[1], (java.lang.String)arguments[2]);
 		}
 
-		if (_methodName237.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes237, parameterTypes)) {
+		if (_methodName231.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes231, parameterTypes)) {
 			return LearningActivityLocalServiceUtil.convertXMLExtraContentToHashMap(((Long)arguments[0]).longValue());
 		}
 
-		if (_methodName238.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes238, parameterTypes)) {
+		if (_methodName232.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes232, parameterTypes)) {
 			LearningActivityLocalServiceUtil.saveHashMapToXMLExtraContent(((Long)arguments[0]).longValue(),
 				(java.util.HashMap<java.lang.String, java.lang.String>)arguments[1]);
 		}
 
+		if (_methodName233.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes233, parameterTypes)) {
+			return LearningActivityLocalServiceUtil.isLearningActivityDeleteTries(((Long)arguments[0]).longValue());
+		}
+
+		if (_methodName235.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes235, parameterTypes)) {
+			return LearningActivityLocalServiceUtil.canBeView((com.liferay.lms.model.LearningActivity)arguments[0],
+				((Long)arguments[1]).longValue());
+		}
+
+		if (_methodName236.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes236, parameterTypes)) {
+			return LearningActivityLocalServiceUtil.canBeView((com.liferay.lms.model.LearningActivity)arguments[0],
+				(com.liferay.portal.security.permission.PermissionChecker)arguments[1]);
+		}
+
+		if (_methodName237.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes237, parameterTypes)) {
+			return LearningActivityLocalServiceUtil.canBeEdited((com.liferay.lms.model.LearningActivity)arguments[0],
+				((Long)arguments[1]).longValue());
+		}
+
+		if (_methodName238.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes238, parameterTypes)) {
+			return LearningActivityLocalServiceUtil.canBeEdited((com.liferay.lms.model.LearningActivity)arguments[0],
+				(com.liferay.portal.security.permission.PermissionChecker)arguments[1]);
+		}
+
 		if (_methodName239.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes239, parameterTypes)) {
-			return LearningActivityLocalServiceUtil.isLearningActivityDeleteTries(((Long)arguments[0]).longValue());
+			return LearningActivityLocalServiceUtil.updateLearningActivity((com.liferay.lms.model.LearningActivity)arguments[0]);
+		}
+
+		if (_methodName240.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes240, parameterTypes)) {
+			return LearningActivityLocalServiceUtil.getMandatoryActivities(((Long)arguments[0]).longValue());
 		}
 
 		if (_methodName241.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes241, parameterTypes)) {
-			return LearningActivityLocalServiceUtil.canBeView((com.liferay.lms.model.LearningActivity)arguments[0],
-				((Long)arguments[1]).longValue());
-		}
-
-		if (_methodName242.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes242, parameterTypes)) {
-			return LearningActivityLocalServiceUtil.canBeView((com.liferay.lms.model.LearningActivity)arguments[0],
-				(com.liferay.portal.security.permission.PermissionChecker)arguments[1]);
+			return LearningActivityLocalServiceUtil.getByPrecedence(((Long)arguments[0]).longValue());
 		}
 
 		if (_methodName243.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes243, parameterTypes)) {
-			return LearningActivityLocalServiceUtil.canBeEdited((com.liferay.lms.model.LearningActivity)arguments[0],
-				((Long)arguments[1]).longValue());
-		}
-
-		if (_methodName244.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes244, parameterTypes)) {
-			return LearningActivityLocalServiceUtil.canBeEdited((com.liferay.lms.model.LearningActivity)arguments[0],
-				(com.liferay.portal.security.permission.PermissionChecker)arguments[1]);
-		}
-
-		if (_methodName245.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes245, parameterTypes)) {
-			return LearningActivityLocalServiceUtil.updateLearningActivity((com.liferay.lms.model.LearningActivity)arguments[0]);
-		}
-
-		if (_methodName246.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes246, parameterTypes)) {
-			return LearningActivityLocalServiceUtil.getMandatoryActivities(((Long)arguments[0]).longValue());
-		}
-
-		if (_methodName247.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes247, parameterTypes)) {
-			return LearningActivityLocalServiceUtil.getByPrecedence(((Long)arguments[0]).longValue());
-		}
-
-		if (_methodName249.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes249, parameterTypes)) {
 			return LearningActivityLocalServiceUtil.getByPriority(((Integer)arguments[0]).intValue(),
 				((Long)arguments[1]).longValue(),
 				((Long)arguments[2]).longValue());
@@ -781,10 +781,22 @@ public class LearningActivityLocalServiceClpInvoker {
 	private String[] _methodParameterTypes15;
 	private String _methodName16;
 	private String[] _methodParameterTypes16;
+	private String _methodName191;
+	private String[] _methodParameterTypes191;
+	private String _methodName192;
+	private String[] _methodParameterTypes192;
 	private String _methodName197;
 	private String[] _methodParameterTypes197;
 	private String _methodName198;
 	private String[] _methodParameterTypes198;
+	private String _methodName199;
+	private String[] _methodParameterTypes199;
+	private String _methodName200;
+	private String[] _methodParameterTypes200;
+	private String _methodName201;
+	private String[] _methodParameterTypes201;
+	private String _methodName202;
+	private String[] _methodParameterTypes202;
 	private String _methodName203;
 	private String[] _methodParameterTypes203;
 	private String _methodName204;
@@ -847,8 +859,6 @@ public class LearningActivityLocalServiceClpInvoker {
 	private String[] _methodParameterTypes232;
 	private String _methodName233;
 	private String[] _methodParameterTypes233;
-	private String _methodName234;
-	private String[] _methodParameterTypes234;
 	private String _methodName235;
 	private String[] _methodParameterTypes235;
 	private String _methodName236;
@@ -859,20 +869,10 @@ public class LearningActivityLocalServiceClpInvoker {
 	private String[] _methodParameterTypes238;
 	private String _methodName239;
 	private String[] _methodParameterTypes239;
+	private String _methodName240;
+	private String[] _methodParameterTypes240;
 	private String _methodName241;
 	private String[] _methodParameterTypes241;
-	private String _methodName242;
-	private String[] _methodParameterTypes242;
 	private String _methodName243;
 	private String[] _methodParameterTypes243;
-	private String _methodName244;
-	private String[] _methodParameterTypes244;
-	private String _methodName245;
-	private String[] _methodParameterTypes245;
-	private String _methodName246;
-	private String[] _methodParameterTypes246;
-	private String _methodName247;
-	private String[] _methodParameterTypes247;
-	private String _methodName249;
-	private String[] _methodParameterTypes249;
 }
