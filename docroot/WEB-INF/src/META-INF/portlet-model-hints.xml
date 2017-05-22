@@ -273,23 +273,6 @@
 		<field name="startDate" type="Date" />
 		<field name="endDate" type="Date" />
 	</model>
-	<model name="com.liferay.lms.model.SCORMContent">
-		<field name="uuid" type="String" />
-		<field name="scormId" type="long" />
-		<field name="companyId" type="long" />
-		<field name="groupId" type="long" />
-		<field name="userId" type="long" />
-		<field name="status" type="int" />
-		<field name="statusByUserId" type="long" />
-		<field name="statusByUserName" type="String" />
-		<field name="statusDate" type="Date" />
-		<field name="title" type="String" />
-		<field name="description" type="String">
-			<hint name="max-length">500000</hint>
-		</field>
-		<field name="index" type="String" />
-		<field name="ciphered" type="boolean" />
-	</model>
 	<model name="com.liferay.lms.model.SurveyResult">
 		<field name="uuid" type="String" />
 		<field name="surveyResultId" type="long" />

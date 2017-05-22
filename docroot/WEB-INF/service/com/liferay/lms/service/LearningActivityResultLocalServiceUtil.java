@@ -288,21 +288,6 @@ public class LearningActivityResultLocalServiceUtil {
 		return getService().update(latId, result, tryResultData, userId);
 	}
 
-	public static com.liferay.lms.model.LearningActivityResult update(
-		long latId, java.lang.String tryResultData, long userId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
-		return getService().update(latId, tryResultData, userId);
-	}
-
-	public static com.liferay.lms.model.LearningActivityResult update(
-		long latId, java.lang.String tryResultData,
-		java.lang.String imsmanifest, long userId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
-		return getService().update(latId, tryResultData, imsmanifest, userId);
-	}
-
 	public static boolean existsLearningActivityResult(long actId, long userId)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService().existsLearningActivityResult(actId, userId);

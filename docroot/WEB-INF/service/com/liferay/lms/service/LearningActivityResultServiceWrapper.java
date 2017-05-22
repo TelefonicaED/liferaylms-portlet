@@ -91,31 +91,8 @@ public class LearningActivityResultServiceWrapper
 			tryResultData);
 	}
 
-	public com.liferay.lms.model.LearningActivityResult update(long latId,
-		java.lang.String tryResultData)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
-		return _learningActivityResultService.update(latId, tryResultData);
-	}
-
-	public com.liferay.lms.model.LearningActivityResult update(long latId,
-		java.lang.String tryResultData, java.lang.String imsmanifest)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
-		return _learningActivityResultService.update(latId, tryResultData,
-			imsmanifest);
-	}
-
 	public void forceFinishTry(long latId) {
 		_learningActivityResultService.forceFinishTry(latId);
-	}
-
-	public com.liferay.lms.model.LearningActivityResult updateFinishTry(
-		long latId, java.lang.String tryResultData, java.lang.String imsmanifest)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
-		return _learningActivityResultService.updateFinishTry(latId,
-			tryResultData, imsmanifest);
 	}
 
 	/**

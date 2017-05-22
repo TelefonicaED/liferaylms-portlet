@@ -100,13 +100,6 @@ create index IX_86D5ED97 on Lms_P2pActivityCorrections (p2pActivityId, userId);
 create index IX_C0C0C045 on Lms_P2pActivityCorrections (userId);
 create index IX_331E1449 on Lms_P2pActivityCorrections (uuid_);
 
-create index IX_7B067356 on Lms_SCORMContent (companyId);
-create index IX_7D1FD758 on Lms_SCORMContent (groupId);
-create index IX_5A14E7CC on Lms_SCORMContent (userId);
-create index IX_4E8A925E on Lms_SCORMContent (userId, groupId);
-create index IX_C4735FE2 on Lms_SCORMContent (uuid_);
-create unique index IX_1942D308 on Lms_SCORMContent (uuid_, groupId);
-
 create index IX_3AA8B3F6 on Lms_Schedule (teamId);
 
 create index IX_ED91C253 on Lms_SurveyResult (actId);

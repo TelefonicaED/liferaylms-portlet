@@ -41,8 +41,6 @@ import com.liferay.lms.service.ModuleResultServiceUtil;
 import com.liferay.lms.service.ModuleServiceUtil;
 import com.liferay.lms.service.P2pActivityCorrectionsLocalServiceUtil;
 import com.liferay.lms.service.P2pActivityLocalServiceUtil;
-import com.liferay.lms.service.SCORMContentLocalServiceUtil;
-import com.liferay.lms.service.SCORMContentServiceUtil;
 import com.liferay.lms.service.ScheduleLocalServiceUtil;
 import com.liferay.lms.service.SurveyResultLocalServiceUtil;
 import com.liferay.lms.service.TestAnswerLocalServiceUtil;
@@ -115,9 +113,6 @@ public class ClpMessageListener extends BaseMessageListener {
 
 			ScheduleLocalServiceUtil.clearService();
 
-			SCORMContentLocalServiceUtil.clearService();
-
-			SCORMContentServiceUtil.clearService();
 			SurveyResultLocalServiceUtil.clearService();
 
 			TestAnswerLocalServiceUtil.clearService();

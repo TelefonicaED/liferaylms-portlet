@@ -479,39 +479,6 @@
 		<css-class-wrapper>userprogress-portlet</css-class-wrapper>
 	</portlet>
 	<portlet>
-		<portlet-name>scormadmin</portlet-name>
-		<icon>/icon.png</icon>
-		
-		<indexer-class>com.liferay.lms.indexer.SCORMContentIndexer</indexer-class>
-		<portlet-data-handler-class>com.liferay.lms.lar.ScormDataHandlerImpl</portlet-data-handler-class>
-		<social-activity-interpreter-class>com.liferay.lms.social.ScormContentActivityInterpreter</social-activity-interpreter-class>
-		<control-panel-entry-category>
-			content
-		</control-panel-entry-category>
-		<control-panel-entry-weight>1.9</control-panel-entry-weight>	
-		<asset-renderer-factory>com.liferay.lms.asset.SCORMContentAssetRendererFactory</asset-renderer-factory>
-	
-		<custom-attributes-display>com.liferay.lms.expando.SCORMContentCustomAttributesDisplay</custom-attributes-display>
-	
-		<instanceable>false</instanceable>
-		<header-portlet-css>/css/main.css</header-portlet-css>
-		<footer-portlet-javascript>
-			/js/main.js
-		</footer-portlet-javascript>
-		<css-class-wrapper>scormadmin-portlet</css-class-wrapper>
-	</portlet>
-	<portlet>
-		<portlet-name>scormactivity</portlet-name>
-		<icon>/icon.png</icon>
-		<instanceable>false</instanceable>
-		<header-portlet-css>/css/main.css</header-portlet-css>
-		<footer-portlet-javascript>
-			/js/main.js
-		</footer-portlet-javascript>
-		<css-class-wrapper>scormactivity-portlet</css-class-wrapper>
-		<add-default-resource>true</add-default-resource>
-	</portlet>
-	<portlet>
 		<portlet-name>evaluation</portlet-name>
 		<icon>/icon.png</icon>
 		<instanceable>false</instanceable>

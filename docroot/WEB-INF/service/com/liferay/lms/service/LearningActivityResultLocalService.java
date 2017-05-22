@@ -257,17 +257,6 @@ public interface LearningActivityResultLocalService extends BaseLocalService,
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
-	public com.liferay.lms.model.LearningActivityResult update(long latId,
-		java.lang.String tryResultData, long userId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException;
-
-	public com.liferay.lms.model.LearningActivityResult update(long latId,
-		java.lang.String tryResultData, java.lang.String imsmanifest,
-		long userId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException;
-
 	public boolean existsLearningActivityResult(long actId, long userId)
 		throws com.liferay.portal.kernel.exception.SystemException;
 

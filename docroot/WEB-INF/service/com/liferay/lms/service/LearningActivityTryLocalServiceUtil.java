@@ -296,16 +296,6 @@ public class LearningActivityTryLocalServiceUtil {
 		return getService().getLearningActivityTryByActUser(actId, userId);
 	}
 
-	public static com.liferay.lms.model.LearningActivityResult updateLearningActivityTry(
-		com.liferay.lms.model.LearningActivityTry learningActivityTry,
-		java.lang.String tryResultData, java.lang.String imsmanifest)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
-		return getService()
-				   .updateLearningActivityTry(learningActivityTry,
-			tryResultData, imsmanifest);
-	}
-
 	public static com.liferay.lms.model.LearningActivityTry createLearningActivityTry(
 		long actId, com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException,

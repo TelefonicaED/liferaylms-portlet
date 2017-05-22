@@ -100,49 +100,49 @@ public class AuditEntryLocalServiceClpInvoker {
 				"com.liferay.lms.model.AuditEntry", "boolean"
 			};
 
-		_methodName164 = "getBeanIdentifier";
+		_methodName158 = "getBeanIdentifier";
 
-		_methodParameterTypes164 = new String[] {  };
+		_methodParameterTypes158 = new String[] {  };
 
-		_methodName165 = "setBeanIdentifier";
+		_methodName159 = "setBeanIdentifier";
 
-		_methodParameterTypes165 = new String[] { "java.lang.String" };
+		_methodParameterTypes159 = new String[] { "java.lang.String" };
 
-		_methodName170 = "addAuditEntry";
+		_methodName164 = "addAuditEntry";
 
-		_methodParameterTypes170 = new String[] {
+		_methodParameterTypes164 = new String[] {
 				"long", "long", "java.lang.String", "long", "long", "long",
 				"java.lang.String", "java.lang.String"
 			};
 
-		_methodName171 = "addAuditEntry";
+		_methodName165 = "addAuditEntry";
 
-		_methodParameterTypes171 = new String[] {
+		_methodParameterTypes165 = new String[] {
 				"long", "long", "java.lang.String", "long", "long",
 				"java.lang.String", "java.lang.String"
 			};
 
-		_methodName172 = "search";
+		_methodName166 = "search";
 
-		_methodParameterTypes172 = new String[] {
+		_methodParameterTypes166 = new String[] {
 				"long", "long", "java.lang.String", "long", "long",
 				"java.util.Date", "java.util.Date", "int", "int"
 			};
 
-		_methodName173 = "searchCount";
+		_methodName167 = "searchCount";
 
-		_methodParameterTypes173 = new String[] {
+		_methodParameterTypes167 = new String[] {
 				"long", "long", "java.lang.String", "long", "long",
 				"java.util.Date", "java.util.Date", "int", "int"
 			};
 
-		_methodName174 = "findByclassName_classPK";
+		_methodName168 = "findByclassName_classPK";
 
-		_methodParameterTypes174 = new String[] { "java.lang.String", "long" };
+		_methodParameterTypes168 = new String[] { "java.lang.String", "long" };
 
-		_methodName175 = "findByclassName_classPK_filterByActions";
+		_methodName169 = "findByclassName_classPK_filterByActions";
 
-		_methodParameterTypes175 = new String[] {
+		_methodParameterTypes169 = new String[] {
 				"java.lang.String", "long", "java.util.List"
 			};
 	}
@@ -236,18 +236,18 @@ public class AuditEntryLocalServiceClpInvoker {
 				((Boolean)arguments[1]).booleanValue());
 		}
 
-		if (_methodName164.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes164, parameterTypes)) {
+		if (_methodName158.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes158, parameterTypes)) {
 			return AuditEntryLocalServiceUtil.getBeanIdentifier();
 		}
 
-		if (_methodName165.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes165, parameterTypes)) {
+		if (_methodName159.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes159, parameterTypes)) {
 			AuditEntryLocalServiceUtil.setBeanIdentifier((java.lang.String)arguments[0]);
 		}
 
-		if (_methodName170.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes170, parameterTypes)) {
+		if (_methodName164.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes164, parameterTypes)) {
 			AuditEntryLocalServiceUtil.addAuditEntry(((Long)arguments[0]).longValue(),
 				((Long)arguments[1]).longValue(),
 				(java.lang.String)arguments[2],
@@ -257,8 +257,8 @@ public class AuditEntryLocalServiceClpInvoker {
 				(java.lang.String)arguments[6], (java.lang.String)arguments[7]);
 		}
 
-		if (_methodName171.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes171, parameterTypes)) {
+		if (_methodName165.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes165, parameterTypes)) {
 			AuditEntryLocalServiceUtil.addAuditEntry(((Long)arguments[0]).longValue(),
 				((Long)arguments[1]).longValue(),
 				(java.lang.String)arguments[2],
@@ -267,8 +267,8 @@ public class AuditEntryLocalServiceClpInvoker {
 				(java.lang.String)arguments[5], (java.lang.String)arguments[6]);
 		}
 
-		if (_methodName172.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes172, parameterTypes)) {
+		if (_methodName166.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes166, parameterTypes)) {
 			return AuditEntryLocalServiceUtil.search(((Long)arguments[0]).longValue(),
 				((Long)arguments[1]).longValue(),
 				(java.lang.String)arguments[2],
@@ -279,8 +279,8 @@ public class AuditEntryLocalServiceClpInvoker {
 				((Integer)arguments[8]).intValue());
 		}
 
-		if (_methodName173.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes173, parameterTypes)) {
+		if (_methodName167.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes167, parameterTypes)) {
 			return AuditEntryLocalServiceUtil.searchCount(((Long)arguments[0]).longValue(),
 				((Long)arguments[1]).longValue(),
 				(java.lang.String)arguments[2],
@@ -291,14 +291,14 @@ public class AuditEntryLocalServiceClpInvoker {
 				((Integer)arguments[8]).intValue());
 		}
 
-		if (_methodName174.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes174, parameterTypes)) {
+		if (_methodName168.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes168, parameterTypes)) {
 			return AuditEntryLocalServiceUtil.findByclassName_classPK((java.lang.String)arguments[0],
 				((Long)arguments[1]).longValue());
 		}
 
-		if (_methodName175.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes175, parameterTypes)) {
+		if (_methodName169.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes169, parameterTypes)) {
 			return AuditEntryLocalServiceUtil.findByclassName_classPK_filterByActions((java.lang.String)arguments[0],
 				((Long)arguments[1]).longValue(),
 				(java.util.List<java.lang.String>)arguments[2]);
@@ -339,20 +339,20 @@ public class AuditEntryLocalServiceClpInvoker {
 	private String[] _methodParameterTypes14;
 	private String _methodName15;
 	private String[] _methodParameterTypes15;
+	private String _methodName158;
+	private String[] _methodParameterTypes158;
+	private String _methodName159;
+	private String[] _methodParameterTypes159;
 	private String _methodName164;
 	private String[] _methodParameterTypes164;
 	private String _methodName165;
 	private String[] _methodParameterTypes165;
-	private String _methodName170;
-	private String[] _methodParameterTypes170;
-	private String _methodName171;
-	private String[] _methodParameterTypes171;
-	private String _methodName172;
-	private String[] _methodParameterTypes172;
-	private String _methodName173;
-	private String[] _methodParameterTypes173;
-	private String _methodName174;
-	private String[] _methodParameterTypes174;
-	private String _methodName175;
-	private String[] _methodParameterTypes175;
+	private String _methodName166;
+	private String[] _methodParameterTypes166;
+	private String _methodName167;
+	private String[] _methodParameterTypes167;
+	private String _methodName168;
+	private String[] _methodParameterTypes168;
+	private String _methodName169;
+	private String[] _methodParameterTypes169;
 }

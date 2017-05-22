@@ -9,9 +9,12 @@ import javax.portlet.PortletResponse;
 import com.liferay.lms.model.LearningActivity;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.lar.PortletDataContext;
 import com.liferay.portal.kernel.upload.UploadRequest;
 import com.liferay.portal.kernel.xml.DocumentException;
+import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.service.InvokableService;
+import com.liferay.portal.service.ServiceContext;
 import com.liferay.portlet.asset.model.AssetRenderer;
 
 
@@ -45,4 +48,7 @@ public interface LearningActivityType extends InvokableService
 	public String getPortletId();
 	public void deleteResources(ActionRequest actionRequest,ActionResponse actionResponse,LearningActivity larn) throws PortalException,SystemException,DocumentException,IOException;
 	public boolean isAutoCorrect();
+	
+	public String importExtraContent(LearningActivity newLarn, Long userId, PortletDataContext context, ServiceContext serviceContext, Element actElement) throws PortalException, IOException, DocumentException, SystemException;
+	public String addZipEntry(LearningActivity actividad, Long assetEntryId, PortletDataContext context, Element entryElementLoc) throws PortalException, SystemException;
 }

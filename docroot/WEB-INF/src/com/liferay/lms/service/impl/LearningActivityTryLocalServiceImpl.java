@@ -160,21 +160,6 @@ public class LearningActivityTryLocalServiceImpl
 	}
 
 
-	public LearningActivityResult updateLearningActivityTry(LearningActivityTry learningActivityTry, String tryResultData, String imsmanifest)throws SystemException, PortalException{
-		
-		super.updateLearningActivityTry(learningActivityTry, false);		
-		
-		LearningActivityResult lar = learningActivityResultLocalService.update(learningActivityTry.getLatId(), tryResultData, imsmanifest, learningActivityTry.getUserId());
-
-		//auditing
-		ServiceContext serviceContext = ServiceContextThreadLocal.getServiceContext();
-		if(serviceContext!=null){
-			AuditingLogFactory.audit(serviceContext.getCompanyId(), serviceContext.getScopeGroupId(), LearningActivityTry.class.getName(), 
-					learningActivityTry.getLatId(), serviceContext.getUserId(), AuditConstants.UPDATE, null);
-		}	
-		
-		return lar;
-	}
 	
 	public LearningActivityTry createLearningActivityTry(long actId,ServiceContext serviceContext) throws SystemException, PortalException
 	{

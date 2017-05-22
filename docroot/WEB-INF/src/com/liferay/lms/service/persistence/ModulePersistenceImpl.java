@@ -3688,8 +3688,6 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 	protected P2pActivityCorrectionsPersistence p2pActivityCorrectionsPersistence;
 	@BeanReference(type = SchedulePersistence.class)
 	protected SchedulePersistence schedulePersistence;
-	@BeanReference(type = SCORMContentPersistence.class)
-	protected SCORMContentPersistence scormContentPersistence;
 	@BeanReference(type = SurveyResultPersistence.class)
 	protected SurveyResultPersistence surveyResultPersistence;
 	@BeanReference(type = TestAnswerPersistence.class)

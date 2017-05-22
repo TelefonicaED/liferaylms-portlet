@@ -13,15 +13,21 @@ import com.liferay.lms.model.LearningActivityClp;
 import com.liferay.lms.service.ClpSerializer;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.lar.PortletDataContext;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.upload.UploadRequest;
 import com.liferay.portal.kernel.util.ClassLoaderProxy;
 import com.liferay.portal.kernel.util.MethodHandler;
 import com.liferay.portal.kernel.util.MethodKey;
 import com.liferay.portal.kernel.xml.DocumentException;
+import com.liferay.portal.kernel.xml.Element;
+import com.liferay.portal.service.ServiceContext;
 import com.liferay.portlet.asset.model.AssetRenderer;
 
 public class LearningActivityTypeClp implements LearningActivityType {
 
+	private static Log log = LogFactoryUtil.getLog(LearningActivityTypeClp.class);
 	private ClassLoaderProxy clp;
 	
 	public LearningActivityTypeClp(ClassLoaderProxy clp) {
@@ -451,11 +457,15 @@ public class LearningActivityTypeClp implements LearningActivityType {
 			PortletResponse portletResponse,LearningActivity learningActivity) 
 			throws PortalException,SystemException,DocumentException,IOException {
 		try {
+			
+			log.info(":::::setExtraContent:::::");
 			ClassLoader classLoader = clp.getClassLoader();
 			Class learningActivityClass = Class.forName(LearningActivity.class.getName(),true, classLoader);
 			MethodKey setExtraContentMethod = new MethodKey(clp.getClassName(), "setExtraContent", UploadRequest.class, PortletResponse.class, learningActivityClass);
 			Object learningActivityObj = translateLearningActivity(learningActivity);
+			log.info(":::::invoke:::::");
 			clp.invoke(new MethodHandler(setExtraContentMethod, uploadRequest, portletResponse, learningActivityObj));
+			log.info(":::::invoked:::::");
 			ClassLoaderProxy classLoaderProxy = new ClassLoaderProxy(learningActivityObj, clp.getClassLoader());
 			learningActivity.setModelAttributes((Map<String, Object>) classLoaderProxy.invoke("getModelAttributes", new Object[]{}));
 		}
@@ -489,6 +499,7 @@ public class LearningActivityTypeClp implements LearningActivityType {
 		return null;
 
 	}
+	
 	
 	public boolean especificValidations(UploadRequest uploadRequest,PortletResponse portletResponse) {
 		Object returnObj = null;
@@ -718,6 +729,83 @@ public class LearningActivityTypeClp implements LearningActivityType {
 		}
 		
 		return ((Boolean)returnObj);
+	}
+
+	@Override
+	public String importExtraContent(LearningActivity newLarn, Long userId,
+			PortletDataContext context, ServiceContext serviceContext,Element actElement) throws PortalException, IOException, DocumentException, SystemException {
+		try {
+			ClassLoader classLoader = clp.getClassLoader();
+			Class learningActivityClass = Class.forName(LearningActivity.class.getName(),true, classLoader);
+			MethodKey importExtraContentMethod = new MethodKey(clp.getClassName(), "importExtraContent", learningActivityClass, Long.class , PortletDataContext.class, ServiceContext.class, Element.class);
+			Object learningActivityObj = translateLearningActivity(newLarn);
+			clp.invoke(new MethodHandler(importExtraContentMethod, learningActivityObj, userId, context,serviceContext, actElement));
+		}
+		catch (Throwable t) {
+			t = ClpSerializer.translateThrowable(t);
+			
+			if (t instanceof com.liferay.portal.kernel.exception.PortalException) {
+				throw (com.liferay.portal.kernel.exception.PortalException)t;
+			}
+			
+			if (t instanceof IOException) {
+				throw (IOException)t;
+			}
+			
+			if (t instanceof DocumentException) {
+				throw (DocumentException)t;
+			}
+			
+			if (t instanceof com.liferay.portal.kernel.exception.SystemException) {
+				throw (com.liferay.portal.kernel.exception.SystemException)t;
+			}
+
+			if (t instanceof RuntimeException) {
+				throw (RuntimeException)t;
+			}
+			else {
+				throw new RuntimeException(t.getClass().getName() +
+					" is not a valid exception");
+			}
+		}
+		return null;
+
+	}
+
+	@Override
+	public String addZipEntry(LearningActivity actividad, Long assetEntryId,PortletDataContext context, Element entryElementLoc)
+			throws PortalException, SystemException {
+		try {			
+			log.info(":::::addZipEntry:::::");
+			ClassLoader classLoader = clp.getClassLoader();
+			Class learningActivityClass = Class.forName(LearningActivity.class.getName(),true, classLoader);
+			MethodKey addZipEntryMethod = new MethodKey(clp.getClassName(), "addZipEntry", learningActivityClass, Long.class , PortletDataContext.class, Element.class);
+			Object learningActivityObj = translateLearningActivity(actividad);
+			log.info(":::::invoke:::::");
+			clp.invoke(new MethodHandler(addZipEntryMethod, learningActivityObj, assetEntryId, context, entryElementLoc));
+			log.info(":::::invoked:::::");
+		}
+		catch (Throwable t) {
+			t = ClpSerializer.translateThrowable(t);
+			
+			if (t instanceof com.liferay.portal.kernel.exception.PortalException) {
+				throw (com.liferay.portal.kernel.exception.PortalException)t;
+			}			
+			
+			if (t instanceof com.liferay.portal.kernel.exception.SystemException) {
+				throw (com.liferay.portal.kernel.exception.SystemException)t;
+			}
+
+			if (t instanceof RuntimeException) {
+				throw (RuntimeException)t;
+			}
+			else {
+				throw new RuntimeException(t.getClass().getName() +
+					" is not a valid exception");
+			}
+		}
+		return null;
+		
 	}
 
 }

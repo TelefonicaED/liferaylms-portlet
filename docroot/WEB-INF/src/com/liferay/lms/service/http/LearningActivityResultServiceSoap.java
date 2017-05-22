@@ -138,56 +138,9 @@ public class LearningActivityResultServiceSoap {
 		}
 	}
 
-	public static com.liferay.lms.model.LearningActivityResultSoap update(
-		long latId, java.lang.String tryResultData) throws RemoteException {
-		try {
-			com.liferay.lms.model.LearningActivityResult returnValue = LearningActivityResultServiceUtil.update(latId,
-					tryResultData);
-
-			return com.liferay.lms.model.LearningActivityResultSoap.toSoapModel(returnValue);
-		}
-		catch (Exception e) {
-			_log.error(e, e);
-
-			throw new RemoteException(e.getMessage());
-		}
-	}
-
-	public static com.liferay.lms.model.LearningActivityResultSoap update(
-		long latId, java.lang.String tryResultData, java.lang.String imsmanifest)
-		throws RemoteException {
-		try {
-			com.liferay.lms.model.LearningActivityResult returnValue = LearningActivityResultServiceUtil.update(latId,
-					tryResultData, imsmanifest);
-
-			return com.liferay.lms.model.LearningActivityResultSoap.toSoapModel(returnValue);
-		}
-		catch (Exception e) {
-			_log.error(e, e);
-
-			throw new RemoteException(e.getMessage());
-		}
-	}
-
 	public static void forceFinishTry(long latId) throws RemoteException {
 		try {
 			LearningActivityResultServiceUtil.forceFinishTry(latId);
-		}
-		catch (Exception e) {
-			_log.error(e, e);
-
-			throw new RemoteException(e.getMessage());
-		}
-	}
-
-	public static com.liferay.lms.model.LearningActivityResultSoap updateFinishTry(
-		long latId, java.lang.String tryResultData, java.lang.String imsmanifest)
-		throws RemoteException {
-		try {
-			com.liferay.lms.model.LearningActivityResult returnValue = LearningActivityResultServiceUtil.updateFinishTry(latId,
-					tryResultData, imsmanifest);
-
-			return com.liferay.lms.model.LearningActivityResultSoap.toSoapModel(returnValue);
 		}
 		catch (Exception e) {
 			_log.error(e, e);

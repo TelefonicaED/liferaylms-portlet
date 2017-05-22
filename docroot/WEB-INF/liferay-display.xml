@@ -46,8 +46,6 @@
 		<portlet id="portaladmin"></portlet>
 		<portlet id="tutoring"></portlet>
 		<portlet id="userprogress"></portlet>
-		<portlet id="scormadmin"></portlet>
-		<portlet id="scormactivity"></portlet>
 		<portlet id="evaluation"></portlet>
 		<portlet id="evaluationAvg"></portlet>
 		<portlet id="announcementsdelivery"></portlet>

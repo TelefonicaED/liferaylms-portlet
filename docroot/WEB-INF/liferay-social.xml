@@ -156,42 +156,4 @@
 			<owner-type>actor</owner-type>
 		</counter>
 	</activity>
-	<activity>
-		<model-name>com.liferay.lms.model.SCORMContent</model-name>
-		<activity-type>${com.liferay.portlet.social.model.SocialActivityConstants.TYPE_ADD_COMMENT}</activity-type>
-		<language-key>ADD_COMMENT</language-key>
-		<log-activity>true</log-activity>
-		<contribution-value>2</contribution-value>
-		<participation-value>2</participation-value>
-		<participation-limit period="day">10</participation-limit>
-		<counter>
-			<name>asset.comments</name>
-			<owner-type>asset</owner-type>
-		</counter>
-		<counter>
-			<name>creator.comments</name>
-			<owner-type>creator</owner-type>
-		</counter>
-		<counter>
-			<name>user.comments</name>
-			<owner-type>actor</owner-type>
-		</counter>
-	</activity>
-	<activity>
-		<model-name>com.liferay.lms.model.SCORMContent</model-name>
-		<activity-type>${com.liferay.portlet.social.model.SocialActivityConstants.TYPE_ADD_VOTE}</activity-type>
-		<language-key>ADD_VOTE</language-key>
-		<log-activity>false</log-activity>
-		<contribution-value>5</contribution-value>
-		<contribution-limit enabled="false" />
-		<participation-value>1</participation-value>
-		<counter>
-			<name>asset.votes</name>
-			<owner-type>asset</owner-type>
-		</counter>
-		<counter>
-			<name>user.votes</name>
-			<owner-type>actor</owner-type>
-		</counter>
-	</activity>
 	</liferay-social>
