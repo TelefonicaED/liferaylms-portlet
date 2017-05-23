@@ -155,12 +155,14 @@ public class ActivityViewer extends MVCPortlet {
 		boolean actionEditingActivity = ParamUtil.getBoolean(renderRequest, "actionEditingActivity", false);
 		boolean actionEditingModule = ParamUtil.getBoolean(renderRequest, "actionEditingModule", false);
 		boolean actionCalifications = ParamUtil.getBoolean(renderRequest, "actionCalifications", false);
+		long typeId = ParamUtil.getLong(renderRequest, "typeId",0);	
 		
 		log.debug("isWidget:"+isWidget);
 		log.debug("actionEditingDetails:"+actionEditingDetails);
 		log.debug("actionEditingActivity:"+actionEditingActivity);
 		log.debug("actionEditingModule:"+actionEditingModule);
 		log.debug("actionCalifications:"+actionCalifications);
+		log.debug("typeId:"+typeId);
 		
 		if(!isWidget && actionEditingDetails){
 			actId=ParamUtil.getLong(renderRequest, "resId", ParamUtil.getLong(renderRequest, "actId",0));
@@ -177,7 +179,11 @@ public class ActivityViewer extends MVCPortlet {
 			
 			String portletId = null;
 			
-			if(actionEditingActivity){
+			if(Validator.isNotNull(typeId) && actionEditingDetails){
+				LearningActivityType learningActivityType=new LearningActivityTypeRegistry().getLearningActivityType(typeId);
+				portletId = learningActivityType.getPortletId();
+				log.debug("*****Creando actividad, editando detalles : "+typeId);
+			}else if(actionEditingActivity){
 				portletId = LMS_EDITACTIVITY_PORTLET_ID;
 			}else if(actionEditingModule){
 				portletId = LMS_EDITMODULE_PORTLET_ID;

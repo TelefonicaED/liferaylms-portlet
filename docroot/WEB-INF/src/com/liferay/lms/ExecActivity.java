@@ -564,7 +564,7 @@ public class ExecActivity extends MVCPortlet{
 		actionResponse.setRenderParameter("questionId", Long.toString(questionId));
 		actionResponse.setRenderParameter("actionEditingDetails", StringPool.TRUE);
 		actionResponse.setRenderParameter("resId", Long.toString(actid));
-		actionResponse.setRenderParameter("typeId", Long.toString(questionType));
+		actionResponse.setRenderParameter("questionTypeId", Long.toString(questionType));
 		actionResponse.setRenderParameter("backUrl", backUrl);
 		actionResponse.setRenderParameter("jspPage", "/html/execactivity/test/admin/editQuestion.jsp");
 	}

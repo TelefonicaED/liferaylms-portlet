@@ -335,7 +335,7 @@ public class SurveyActivity extends MVCPortlet {
 		actionResponse.setRenderParameter("questionId", Long.toString(questionId));
 		actionResponse.setRenderParameter("actionEditingDetails", StringPool.TRUE);
 		actionResponse.setRenderParameter("resId", Long.toString(question.getActId()));
-		actionResponse.setRenderParameter("typeId", Long.toString(questionType));
+		actionResponse.setRenderParameter("questionTypeId", Long.toString(questionType));
 
 
 		actionResponse.setRenderParameter("jspPage", "/html/surveyactivity/admin/editquestion.jsp");

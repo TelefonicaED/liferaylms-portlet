@@ -21,7 +21,7 @@
 
 <%
 	long questionId = ParamUtil.getLong(request,"questionId", 0);
-	long typeId = ParamUtil.getLong(request,"typeId", -1);
+	long typeId = ParamUtil.getLong(request,"questionTypeId", -1);
 	long actId = ParamUtil.getLong(request,"resId", 0);
 	String backUrl = ParamUtil.getString(request, "backUrl", currentURL);
 	String formatType = PropsUtil.get("lms.question.formattype.normal");

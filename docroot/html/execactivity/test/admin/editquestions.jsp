@@ -99,7 +99,7 @@ Liferay.provide(
 			
 			renderUrl.setPortletId('<%=themeDisplay.getPortletDisplay().getId()%>');
 			renderUrl.setParameter('jspPage','/html/execactivity/test/admin/editQuestion.jsp');
-			renderUrl.setParameter('typeId', typeId);
+			renderUrl.setParameter('questionTypeId', typeId);
 			renderUrl.setParameter('message', Liferay.Language.get('execactivity.editquestions.newquestion'));
 			renderUrl.setParameter('actionEditingDetails', true);
 			renderUrl.setParameter('resId', "<%=String.valueOf(learningActivity.getActId()) %>");

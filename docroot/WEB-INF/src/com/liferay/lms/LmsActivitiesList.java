@@ -1176,6 +1176,7 @@ public class LmsActivitiesList extends MVCPortlet {
 		PortletURL portletURL = liferayPortletResponse.createLiferayPortletURL(plid, LMS_EDITACTIVITY_PORTLET_ID, PortletRequest.RENDER_PHASE);
 		portletURL.setWindowState(WindowState.NORMAL);
 		
+		portletURL.setParameter("actionEditingDetails", StringPool.FALSE);
 		portletURL.setParameter("actionEditingActivity", StringPool.FALSE);
 		portletURL.setParameter("actionEditingModule", StringPool.FALSE);
 		portletURL.setParameter("actionCalifications", StringPool.TRUE);
@@ -1219,6 +1220,8 @@ public class LmsActivitiesList extends MVCPortlet {
 			portletURL.setParameter("actionEditingActivity", StringPool.TRUE);
 			portletURL.setParameter("actionCalifications", StringPool.FALSE);
 			portletURL.setParameter("actionEditingModule", StringPool.FALSE);
+			portletURL.setParameter("actionEditingDetails", StringPool.FALSE);
+			
 			
 			long userId = PrincipalThreadLocal.getUserId();
 			
@@ -1252,7 +1255,8 @@ public class LmsActivitiesList extends MVCPortlet {
 
 			portletURL = liferayPortletResponse.createLiferayPortletURL(plid, LMS_EDITACTIVITY_PORTLET_ID, PortletRequest.RENDER_PHASE);
 			portletURL.setWindowState(WindowState.NORMAL);
-			portletURL.setParameter("actionEditingActivity", StringPool.TRUE);			
+			portletURL.setParameter("actionEditingActivity", StringPool.TRUE);
+			portletURL.setParameter("actionEditingDetails", StringPool.FALSE);
 			portletURL.setParameter("mvcPath", "/html/lmsactivitieslist/newactivity.jsp");
 			portletURL.setParameter("resModuleId",Long.toString(module.getModuleId())); 	
 			portletURL.setParameter("actId",Long.toString(0)); 
@@ -1283,6 +1287,7 @@ public class LmsActivitiesList extends MVCPortlet {
 			portletURL.setWindowState(WindowState.NORMAL);
 			portletURL.setParameter("actionEditingModule", StringPool.TRUE);
 			portletURL.setParameter("actionEditingActivity", StringPool.FALSE);
+			portletURL.setParameter("actionEditingDetails", StringPool.FALSE);
 			portletURL.setParameter("actionCalifications", StringPool.FALSE);
 			portletURL.setParameter("view", "editmodule");
 			portletURL.setParameter("moduleId",Long.toString(module.getModuleId()));
@@ -1322,6 +1327,7 @@ public class LmsActivitiesList extends MVCPortlet {
 		portletURL.setWindowState(WindowState.NORMAL);
 		portletURL.setParameter("actionEditingModule", StringPool.TRUE);
 		portletURL.setParameter("actionEditingActivity", StringPool.FALSE);
+		portletURL.setParameter("actionEditingDetails", StringPool.FALSE);
 		portletURL.setParameter("actionCalifications", StringPool.FALSE);
 		portletURL.setParameter("view", "editmodule");
 		portletURL.setParameter("moduleId",Long.toString(0));

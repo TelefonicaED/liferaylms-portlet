@@ -146,10 +146,10 @@ public class ModuleDataHandlerImpl extends BasePortletDataHandler {
 		List<Module> entries = ModuleLocalServiceUtil.findAllInGroup(context.getScopeGroupId());
 		long entryOld=0L;
 		for (Module entry : entries) {
-			log.info("ModuleDataHandlerImpl::Module "+entry.getModuleId());
-			log.info("ModuleDataHandlerImpl::Module entryOld "+entryOld);
-			if(entryOld!=entry.getModuleId())
-			{
+			log.info("++++++++++++++ModuleDataHandlerImpl::Module "+entry.getModuleId());
+			log.info("++++++++++++++ModuleDataHandlerImpl::Module entryOld "+entryOld);
+			
+			if(entryOld!=entry.getModuleId()){
 				entryOld=entry.getModuleId();
 				exportEntry(context, rootElement, entry);
 			} else{
@@ -158,7 +158,7 @@ public class ModuleDataHandlerImpl extends BasePortletDataHandler {
 			}
 		}
 	
-		log.info("doExportData ENDS, modules:" + entries.size() + "\n-----------------------------\n"  );
+		log.info("\n-----------------------------\ndoExportData ENDS, modules:" + entries.size() + "\n-----------------------------\n"  );
 		
 		return document.formattedString();
 	}
@@ -167,7 +167,7 @@ public class ModuleDataHandlerImpl extends BasePortletDataHandler {
 		
 		String path = getEntryPath(context, entry);
 		
-		log.info("\n  Module: " + entry.getModuleId() +" "+ entry.getTitle(Locale.getDefault()) );
+		log.info("----------- Module: " + entry.getModuleId() +" "+ entry.getTitle(Locale.getDefault()) );
 		
 		
 		if (!context.isPathNotProcessed(path)) {
@@ -177,6 +177,8 @@ public class ModuleDataHandlerImpl extends BasePortletDataHandler {
 		Element entryElement = root.addElement("moduleentry");
 	
 		entryElement.addAttribute("path", path);
+		
+		log.debug("--------------moduleenttry path:"+path);
 	
 		context.addPermissions(Module.class, entry.getModuleId());
 		
@@ -193,14 +195,20 @@ public class ModuleDataHandlerImpl extends BasePortletDataHandler {
 		ExportUtil.descriptionFileParserDescriptionToLar(entry.getDescription(), entry.getGroupId(), entry.getModuleId(), context, entryElement);		
 		
 		LearningActivityTypeRegistry learningActivityTypeRegistry = new LearningActivityTypeRegistry();
-			List<LearningActivity> actividades=LearningActivityLocalServiceUtil.getLearningActivitiesOfModule(entry.getModuleId());
+		List<LearningActivity> actividades=LearningActivityLocalServiceUtil.getLearningActivitiesOfModule(entry.getModuleId());
+		
 		for(LearningActivity actividad:actividades){
 			
-			log.info("    Learning Activity: " + actividad.getTitle(Locale.getDefault()) + " (" + LanguageUtil.get(Locale.getDefault(),learningActivityTypeRegistry.getLearningActivityType(actividad.getTypeId()).getName())+")" );
+			log.info(" **************    Learning Activity: " + actividad.getTitle(Locale.getDefault()) + " (" + LanguageUtil.get(Locale.getDefault(),learningActivityTypeRegistry.getLearningActivityType(actividad.getTypeId()).getName())+")" );
+			
+			log.debug("*******ActID:"+actividad.getActId());
 			
 			String pathlo = getEntryPath(context, actividad);
-			Element entryElementLoc= entryElement.addElement("learningactivity");
+			Element entryElementLoc= entryElement.addElement("learningactivity");			
 			entryElementLoc.addAttribute("path", pathlo);
+			log.debug("--------------learningactivity path:"+pathlo);
+			
+			
 			context.addPermissions(Module.class, entry.getModuleId());
 			
 			if (context.getBooleanParameter(_NAMESPACE, "categories")) {
@@ -220,7 +228,7 @@ public class ModuleDataHandlerImpl extends BasePortletDataHandler {
 			}
 			
 			
-			//Exportar los ficheros que tenga la descripci�n de la actividad.
+			//Exportar los ficheros que tenga la descripcion de la actividad.
 			ExportUtil.descriptionFileParserDescriptionToLar(actividad.getDescription(), actividad.getGroupId(), actividad.getModuleId(), context, entryElementLoc);		
 		
 			//Exportar las imagenes de los resources.
@@ -241,7 +249,7 @@ public class ModuleDataHandlerImpl extends BasePortletDataHandler {
 						String content = img.get(i);
 						//Comprobamos que sea un long
 						if(StringUtils.isNumeric(content)){
-							log.info("Es un id");
+							log.info("*** Es un id:"+content);
 							ExportUtil.addZipEntry(actividad, Long.valueOf(img.get(i)), context, entryElementLoc);
 						}
 					}

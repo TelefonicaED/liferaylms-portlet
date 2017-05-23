@@ -21,7 +21,7 @@ QuestionType qt =new QuestionTypeRegistry().getQuestionType(question.getQuestion
 	<liferay-portlet:param name="resId" value="<%= actId %>" />
 	<liferay-portlet:param name="actionEditingDetails" value="<%= StringPool.TRUE %>" />
 	<liferay-portlet:param name="message" value="<%= LanguageUtil.get(themeDisplay.getLocale(), \"execativity.editquestions.editquestion\")%>" />
-	<liferay-portlet:param name="typeId" value="<%=String.valueOf(qt.getTypeId()) %>" />
+	<liferay-portlet:param name="questionTypeId" value="<%=String.valueOf(qt.getTypeId()) %>" />
 	<liferay-portlet:param name="backUrl" value="<%= currentURL %>"/>
 </liferay-portlet:renderURL>
 <liferay-ui:icon image="edit" message="edit" url="<%=editURL.toString() %>" />

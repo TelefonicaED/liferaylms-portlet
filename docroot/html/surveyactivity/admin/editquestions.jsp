@@ -59,7 +59,7 @@ Liferay.provide(
 			renderUrl.setWindowState('<%= LiferayWindowState.NORMAL.toString() %>');
 			renderUrl.setPortletId('surveyactivity_WAR_liferaylmsportlet');
 			renderUrl.setParameter('jspPage','/html/surveyactivity/admin/editquestion.jsp');
-			renderUrl.setParameter('typeId', typeId);
+			renderUrl.setParameter('questionTypeId', typeId);
 			renderUrl.setParameter('message', Liferay.Language.get('surveyactivity.editquestions.newquestion'));
 			renderUrl.setParameter('actionEditingDetails', true);
 			renderUrl.setParameter('resId', "<%=String.valueOf(learningActivity.getActId()) %>");
