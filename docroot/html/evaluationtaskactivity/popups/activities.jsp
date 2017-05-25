@@ -279,8 +279,9 @@
 									else{
 										divResult.addClass('portlet-msg-error');
 										divResult.removeClass('portlet-msg-success');
+										divResult.setContent(Liferay.Language.get("evaluationAvg.error.incorrectNumber"));
 									}
-									divResult.setContent('');
+									//divResult.setContent('');
 									
 									var messageList = A.Node.create('<ul></ul>');
 									if(responseData.messages.length==1){
