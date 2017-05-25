@@ -442,6 +442,48 @@ if(isTablet){%>
 							);
 				
 							Liferay.provide(
+							        window,
+							        '<portlet:namespace />popContinue',
+							        function(content, boton) {
+										var A = AUI();
+									
+										window.<portlet:namespace />confirmDialog = new A.Dialog(
+										    {
+										        title: Liferay.Language.get("execactivity.confirm.title"),
+										        bodyContent: content,
+										        buttons: [
+										                  {
+										                	  label: Liferay.Language.get("continue"),
+										                	  handler: function() {
+										                		  A.one('#<portlet:namespace/>formulario').detach('submit');
+										                		  document.getElementById('<portlet:namespace/>formulario').submit();
+										                		  <portlet:namespace />confirmDialog.close();
+										                	  }
+										                  },
+										                  {
+										                	  label: Liferay.Language.get("lms.dialog.cancel"),
+										                	  handler: function() {
+										                		  <portlet:namespace />confirmDialog.close();
+										                	  }
+										                  }
+										                  ],
+										        width: 'auto',
+										        height: 'auto',
+										        resizable: false,
+										        draggable: false,
+										        close: true,
+												cssClass: 'dialog-principal',
+										        destroyOnClose: true,
+										        centered: true,
+										        modal: true
+										    }
+										).render();
+										
+							        },
+							        ['node', 'aui-dialog', 'event', 'node-event-simulate']
+							);
+							
+							Liferay.provide(
 					        	window,
 					        	'<portlet:namespace/>submitForm',
 								function(e, navigate) {
@@ -472,7 +514,7 @@ if(isTablet){%>
 									 	<%
 											if(GetterUtil.getLong(LearningActivityLocalServiceUtil.getExtraContentValue(activity.getActId(), "questionsPerPage"))!=0){
 										%>
-												<%= renderResponse.getNamespace() %>popConfirm('<%=JavaScriptUtil.markupToStringLiteral(LanguageUtil.get(pageContext, "execativity.test.questions.without.responsepagination")) %>', e.srcElement);
+												<%= renderResponse.getNamespace() %>popContinue('<%=JavaScriptUtil.markupToStringLiteral(LanguageUtil.get(pageContext, "execativity.test.questions.without.responsepagination")) %>', e.srcElement);
 										<%
 											}else{
 										%>
