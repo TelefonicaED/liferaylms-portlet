@@ -152,19 +152,6 @@ for(CalificationType calificationType :calificationTypeRegistry.getCalificationT
 </aui:field-wrapper>
 
 
-<liferay-ui:header title="debugScorm" />
-<aui:field-wrapper>
-<%
-
-	boolean checked=prefs.getDebugScorm();	
-	%>
-	
-	<aui:input type="checkbox" name="debugScorm"
-	label="debugScorm" checked="<%=checked%>" value="<%=checked%>" />
-
-</aui:field-wrapper>
-
-
 <liferay-ui:header title="show-hide-activity" />
 <aui:field-wrapper>
 
