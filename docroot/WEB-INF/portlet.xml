@@ -2279,6 +2279,7 @@
 			<mime-type>text/html</mime-type>
 			<portlet-mode>view</portlet-mode>
 		</supports>
+		<resource-bundle>content/ponderatedevalconf/Language</resource-bundle>
 		<portlet-info>
 			<title>Mandatory Ponderated Conf Portlet</title>
 			<short-title>Mandatory Ponderated Conf Portlet</short-title>
