@@ -1273,6 +1273,10 @@ public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int e
 		
 		return firstModuleDate;
 	}
+	
+	public String getImageURL(Course course, ThemeDisplay themeDisplay){
+		return course.getImageURL(themeDisplay);
+	}
 }
 
 
