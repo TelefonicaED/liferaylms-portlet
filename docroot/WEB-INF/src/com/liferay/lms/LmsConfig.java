@@ -17,7 +17,6 @@ import com.liferay.util.bridges.mvc.MVCPortlet;
  */
 public class LmsConfig extends MVCPortlet {
 	
-	private final long DEFAULT_USERS_RESULTS = 1000;
 	
 	public void changeSettings(ActionRequest request , ActionResponse response) throws Exception
 	{
@@ -30,8 +29,6 @@ public class LmsConfig extends MVCPortlet {
 		String courseEvalsTypes=StringUtil.merge(request.getParameterMap().get( "courseEvalsCheckbox"));
 		ThemeDisplay themeDisplay  =(ThemeDisplay)request.getAttribute(WebKeys.THEME_DISPLAY);
 		
-		boolean isDebugScorm = ParamUtil.getBoolean(request, "debugScorm");
-		
 		boolean hasAPILicence = ParamUtil.getBoolean(request, "hasAPILicence");
 	
 		boolean showHideActivity = ParamUtil.getBoolean(request, "showHideActivity", true);
@@ -39,7 +36,6 @@ public class LmsConfig extends MVCPortlet {
 		
 		LmsPrefs prefs=LmsPrefsLocalServiceUtil.getLmsPrefsIni(themeDisplay.getCompanyId());
 		prefs.setLmsTemplates(sitetemplates);
-		prefs.setDebugScorm(isDebugScorm);
 		prefs.setActivities(activitytypes);
 		prefs.setCourseevals(courseEvalsTypes);
 		prefs.setScoretranslators(calificationTypes);
