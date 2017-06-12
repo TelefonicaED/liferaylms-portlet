@@ -23,8 +23,8 @@ import com.liferay.lms.model.LmsPrefs;
 import com.liferay.lms.model.Module;
 import com.liferay.lms.model.TestAnswer;
 import com.liferay.lms.model.TestQuestion;
-import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.lms.service.CourseCompetenceLocalServiceUtil;
+import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityLocalServiceUtil;
 import com.liferay.lms.service.LmsPrefsLocalServiceUtil;
 import com.liferay.lms.service.ModuleLocalServiceUtil;
@@ -42,12 +42,15 @@ import com.liferay.portal.kernel.messaging.MessageListenerException;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.DocumentException;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
 import com.liferay.portal.model.Group;
+import com.liferay.portal.model.ResourceAction;
 import com.liferay.portal.model.ResourceConstants;
+import com.liferay.portal.model.ResourcePermission;
 import com.liferay.portal.model.Role;
 import com.liferay.portal.model.RoleConstants;
 import com.liferay.portal.model.User;
@@ -57,6 +60,7 @@ import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.security.permission.PermissionCheckerFactoryUtil;
 import com.liferay.portal.security.permission.PermissionThreadLocal;
 import com.liferay.portal.service.GroupLocalServiceUtil;
+import com.liferay.portal.service.ResourceActionLocalServiceUtil;
 import com.liferay.portal.service.ResourcePermissionLocalServiceUtil;
 import com.liferay.portal.service.RoleLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
@@ -1270,7 +1274,6 @@ public class CloneCourse implements MessageListener {
 	private MBCategory createNewCategory(long newCourseGroupId, MBCategory category, long parentCategoryId) {
 		
 		log.debug("-----------Clone Foro: createNewCategory:: newCourseGroupId:: [" + newCourseGroupId + "], category:: [" + category.getName() + "], parentCatId:: [" + parentCategoryId + "]");
-		
 		MBCategory newCourseCategory = null;
 		
 		try {
@@ -1289,6 +1292,24 @@ public class CloneCourse implements MessageListener {
 			newCourseCategory.setParentCategoryId(parentCategoryId);
 		
 			newCourseCategory = MBCategoryLocalServiceUtil.addMBCategory(newCourseCategory);
+			
+			// Copiar permisos de la categoria antigua en la nueva
+    		int [] scopeIds = ResourceConstants.SCOPES;
+    		for(int scope : scopeIds) {
+    			List<ResourcePermission> resourcePermissionList = ResourcePermissionLocalServiceUtil.getResourcePermissions(category.getCompanyId(), MBCategory.class.getName(), scope, String.valueOf(category.getPrimaryKey()));
+        		for(ResourcePermission resourcePermission : resourcePermissionList) {
+        			long resourcePermissionId = CounterLocalServiceUtil.increment(ResourcePermission.class.getName());
+        			ResourcePermission rpNew = ResourcePermissionLocalServiceUtil.createResourcePermission(resourcePermissionId);
+        			rpNew.setActionIds(resourcePermission.getActionIds());
+        			rpNew.setCompanyId(resourcePermission.getCompanyId());
+        			rpNew.setName(resourcePermission.getName());
+        			rpNew.setRoleId(resourcePermission.getRoleId());
+        			rpNew.setScope(resourcePermission.getScope());
+        			rpNew.setPrimKey(String.valueOf(newCourseCategory.getCategoryId()));
+        			rpNew.setOwnerId(resourcePermission.getOwnerId());
+        			rpNew = ResourcePermissionLocalServiceUtil.updateResourcePermission(rpNew);
+        		}
+    		}
 			
 			return newCourseCategory;
 			
