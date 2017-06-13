@@ -787,10 +787,8 @@ public class CourseAdmin extends MVCPortlet {
 		Enumeration<String> parNames = uploadRequest.getParameterNames();
 		while (parNames.hasMoreElements()) {
 			String paramName = parNames.nextElement();
-			if (paramName.startsWith("title_")
-					&& paramName.length() > 6
-					&& ParamUtil.getString(uploadRequest, paramName, StringPool.BLANK)
-					.length() > 0) {
+			if (paramName.startsWith("title_") && paramName.length() > 6
+					&& ParamUtil.getString(uploadRequest, paramName, StringPool.BLANK).length() > 0) {
 				noTitle = false;
 			}
 		}
@@ -798,8 +796,7 @@ public class CourseAdmin extends MVCPortlet {
 			SessionErrors.add(actionRequest, "title-required");
 			actionResponse.setRenderParameter("courseId", String.valueOf(courseId));
 			actionResponse.setRenderParameter("redirect", redirect);
-			actionResponse.setRenderParameter("jspPage",
-					"/html/courseadmin/editcourse.jsp");
+			actionResponse.setRenderParameter("jspPage","/html/courseadmin/editcourse.jsp");
 			return;
 		}
 		

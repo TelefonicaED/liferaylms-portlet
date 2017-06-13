@@ -100,7 +100,7 @@ public class GradeBook extends MVCPortlet {
 		        //Comunidad
 		        writer.writeNext(new String[]{themeDisplay.getScopeGroupName()});
 		        
-		        //M�dulo
+		        //Módulo
 		        writer.writeNext(new String[]{module.getTitle(themeDisplay.getLocale())});
 		        
 		        String[] cabeceras = new String[learningActivities.size()+4];

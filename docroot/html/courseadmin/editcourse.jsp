@@ -295,7 +295,22 @@ if(course!=null){
 	</div>
 </c:if>
 
-<aui:form name="fm" action="<%=savecourseURL%>"  method="post" enctype="multipart/form-data">
+<aui:form name="fm" action="<%=savecourseURL%>"  method="post" onSubmit="event.preventDefault();${renderResponse.getNamespace()}validateForm();" enctype="multipart/form-data">
+
+
+	<aui:script>
+		Liferay.provide(
+			window,
+			'<portlet:namespace />validateForm',
+			function() {
+				if(<portlet:namespace />validateCourse()){
+					submitForm(document.<portlet:namespace />fm);
+				}
+				
+			},
+			['liferay-util-list-fields']
+		);
+	</aui:script>
 
 	<aui:input name="redirect" type="hidden" value="<%= redirect %>" />
 	<aui:input name="backURL" type="hidden" value="<%= backURL %>" />
@@ -306,14 +321,20 @@ if(course!=null){
 		 	<liferay-ui:message key="title" /> 
 		 </label> 
 		 <span class="aui-field-element " > 
+		 
 		  <liferay-ui:input-localized 
 		   cssClass="<%=renderResponse.getNamespace()+\"localized lfr-input-text\"%>" 
 		   name="title"
 		   defaultLanguageId="<%=LanguageUtil.getLanguageId(LocaleUtil.getDefault()) %>"
 		   xml="<%=courseTitle %>"
-		   maxLength="<%=maxLengthTitle %>"/>
-		 </span> 
+		   maxLength="<%=maxLengthTitle %>"/>		   
+		   
+		 </span>
+		  
 	</span>
+		<div id="<%=renderResponse.getNamespace()+"title"+StringPool.UNDERLINE+themeDisplay.getLanguageId()+"Error" %>" class="portlet-msg-error aui-helper-hidden"> 
+			<liferay-ui:message key="title-required"/>
+	 	</div>
 	<aui:input name="friendlyURL" label="FriendlyURL" type="hidden" > <%=groupCreated!=null?groupCreated.getFriendlyURL():"" %> </aui:input>
 	
 	<c:if test="${renderRequest.preferences.getValue('showDescription', 'true') }">		
@@ -877,5 +898,21 @@ if(course!=null){
 	   			serviceParameterTypes: JSON.stringify(['java.lang.Long', 'java.lang.Long', 'java.lang.String'])
 	   		}
 	   	);
-	} 
+	} 	
+	
+	
+	function <portlet:namespace/>validateCourse(){
+		
+		var title = document.getElementById('<portlet:namespace />title_<%=renderRequest.getLocale().toString()%>').value;
+		
+		if(title!=null && title != ''){
+			var div = document.getElementById('<portlet:namespace/>title<%=StringPool.UNDERLINE+themeDisplay.getLanguageId()%>Error').className = "portlet-msg-error aui-helper-hidden";
+			return true;
+		}else{
+			document.getElementById('<portlet:namespace/>title<%=StringPool.UNDERLINE+themeDisplay.getLanguageId()%>Error').className = "portlet-msg-error";
+			return false;
+		}		
+	}
+	
+	
 </script>
