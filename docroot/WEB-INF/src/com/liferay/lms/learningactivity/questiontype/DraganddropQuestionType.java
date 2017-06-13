@@ -81,9 +81,22 @@ public class DraganddropQuestionType extends BaseQuestionType {
 	}
 
 	protected boolean isCorrect(List<Long> answersId, List<TestAnswer> testAnswers){
-		for(int i=0;i<testAnswers.size();i++) 
-			if(answersId.get(i) == -1 || answersId.get(i) != testAnswers.get(i).getAnswerId())	return false;
-		return true;
+		/*
+		 * Ticket #111189 - Error en corrección de preguntas de tipo Arrastrar
+		 * Unicamente las daba por validas si estaban en el mismo orden de respuesta.
+		 */
+		boolean result = Boolean.TRUE;
+		if (testAnswers.size() == answersId.size()) {
+			// El numero de respuestas ha de coincidir
+			for(TestAnswer testAnswer : testAnswers) {
+				if (!answersId.contains(testAnswer.getAnswerId())) {
+					result = Boolean.FALSE;
+				}
+			}
+		} else {
+			return Boolean.FALSE;
+		}
+		return result;
 	}
 
 	public String getHtmlView(long questionId, ThemeDisplay themeDisplay, Document document){
