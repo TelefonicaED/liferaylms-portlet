@@ -39,6 +39,8 @@ import au.com.bytecode.opencsv.CSVWriter;
 import com.liferay.counter.service.CounterLocalServiceUtil;
 import com.liferay.lms.auditing.AuditConstants;
 import com.liferay.lms.auditing.AuditingLogFactory;
+import com.liferay.lms.course.diploma.CourseDiploma;
+import com.liferay.lms.course.diploma.CourseDiplomaRegistry;
 import com.liferay.lms.learningactivity.calificationtype.CalificationType;
 import com.liferay.lms.learningactivity.calificationtype.CalificationTypeRegistry;
 import com.liferay.lms.learningactivity.courseeval.CourseEval;
@@ -1050,6 +1052,24 @@ public class CourseAdmin extends MVCPortlet {
 					SessionErrors.add(actionRequest, "calificationTypeExtraContentError");
 					actionResponse.setRenderParameter("calificationTypeExtraContentError", calificationTypeExtraContentError);
 				}
+				
+				
+				//Update especific content of diploma (if exists)
+				CourseDiplomaRegistry cdr = new CourseDiplomaRegistry();
+				if(cdr!=null){
+					CourseDiploma courseDiploma = cdr.getCourseDiploma();
+					if(courseDiploma!=null){
+						String courseDiplomaError = courseDiploma.saveDiploma(uploadRequest, course.getCourseId());
+						log.debug("****calificationTypeExtraContentError:"+courseDiplomaError);
+						
+						if(Validator.isNotNull(courseDiplomaError)){
+							SessionErrors.add(actionRequest, "courseDiplomaError");
+							actionResponse.setRenderParameter("courseDiplomaError", courseDiplomaError);
+						}
+					}
+				}
+				
+				
 				
 				try{
 					serviceContext.setAttribute("type", String.valueOf(type));

@@ -729,6 +729,12 @@ public class CourseLocalServiceUtil {
 		return getService().getFirstModuleDateInCourse(courseId);
 	}
 
+	public static java.lang.String getImageURL(
+		com.liferay.lms.model.Course course,
+		com.liferay.portal.theme.ThemeDisplay themeDisplay) {
+		return getService().getImageURL(course, themeDisplay);
+	}
+
 	public static void clearService() {
 		_service = null;
 	}

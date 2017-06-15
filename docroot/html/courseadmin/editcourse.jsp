@@ -51,8 +51,12 @@
 
 <%
 String calificationTypeExtraContentError = ParamUtil.getString(request, "calificationTypeExtraContentError");
+String courseDiplomaError = ParamUtil.getString(request, "courseDiplomaError");
 %>
 <liferay-ui:error key="calificationTypeExtraContentError" message="<%=calificationTypeExtraContentError %>" />
+<liferay-ui:error key="courseDiplomaError" message="<%=courseDiplomaError %>" />
+
+
 	<%
 
 	String maxLengthTitle = GetterUtil.getString( ModelHintsUtil.getHints(Group.class.getName(), "name").get("max-length"),"");
@@ -295,22 +299,7 @@ if(course!=null){
 	</div>
 </c:if>
 
-<aui:form name="fm" action="<%=savecourseURL%>"  method="post" onSubmit="event.preventDefault();${renderResponse.getNamespace()}validateForm();" enctype="multipart/form-data">
-
-
-	<aui:script>
-		Liferay.provide(
-			window,
-			'<portlet:namespace />validateForm',
-			function() {
-				if(<portlet:namespace />validateCourse()){
-					submitForm(document.<portlet:namespace />fm);
-				}
-				
-			},
-			['liferay-util-list-fields']
-		);
-	</aui:script>
+<aui:form name="fm" action="<%=savecourseURL%>"  method="post" enctype="multipart/form-data">
 
 	<aui:input name="redirect" type="hidden" value="<%= redirect %>" />
 	<aui:input name="backURL" type="hidden" value="<%= backURL %>" />
@@ -321,20 +310,14 @@ if(course!=null){
 		 	<liferay-ui:message key="title" /> 
 		 </label> 
 		 <span class="aui-field-element " > 
-		 
 		  <liferay-ui:input-localized 
 		   cssClass="<%=renderResponse.getNamespace()+\"localized lfr-input-text\"%>" 
 		   name="title"
 		   defaultLanguageId="<%=LanguageUtil.getLanguageId(LocaleUtil.getDefault()) %>"
 		   xml="<%=courseTitle %>"
-		   maxLength="<%=maxLengthTitle %>"/>		   
-		   
-		 </span>
-		  
+		   maxLength="<%=maxLengthTitle %>"/>
+		 </span> 
 	</span>
-		<div id="<%=renderResponse.getNamespace()+"title"+StringPool.UNDERLINE+themeDisplay.getLanguageId()+"Error" %>" class="portlet-msg-error aui-helper-hidden"> 
-			<liferay-ui:message key="title-required"/>
-	 	</div>
 	<aui:input name="friendlyURL" label="FriendlyURL" type="hidden" > <%=groupCreated!=null?groupCreated.getFriendlyURL():"" %> </aui:input>
 	
 	<c:if test="${renderRequest.preferences.getValue('showDescription', 'true') }">		
@@ -411,6 +394,10 @@ if(course!=null){
 	<c:if test="${renderRequest.preferences.getValue('showResume', 'true') }">
 		<aui:input type="textarea" cols="100" rows="4" name="summary" label="summary" value="<%=summary %>"/>
 	</c:if>
+	<div id="<portlet:namespace/>diplomaContent">
+		<%@include file="/html/courseadmin/inc/specificContent.jsp" %>
+	</div>
+	
 	
 	<%
 	List<Long> courseEvalIds = ListUtil.toList(StringUtil.split(LmsPrefsLocalServiceUtil.getLmsPrefsIni(themeDisplay.getCompanyId()).getCourseevals(),",",0L));
@@ -600,8 +587,10 @@ if(course!=null){
 		if(Validator.isNotNull(ctype.getExpecificContentPage())){%>
 				<div class="especific_content_page" id="${renderResponse.getNamespace()}especific_content_page_<%=ctype.getTypeId()%>">
 					<liferay-util:include page="<%=ctype.getExpecificContentPage() %>" servletContext="<%=getServletContext() %>">
-						<%if(course != null){ %>
-							<liferay-util:param name="groupId" value="<%=Long.toString(course.getGroupCreatedId()) %>" />
+						<%if(course != null){ 
+							String courseGroupId = Long.toString(course.getGroupCreatedId());
+							%>
+							<liferay-util:param name="groupId" value="<%=courseGroupId %>" />
 						<%} %>
 					</liferay-util:include>		
 				</div>
@@ -898,21 +887,5 @@ if(course!=null){
 	   			serviceParameterTypes: JSON.stringify(['java.lang.Long', 'java.lang.Long', 'java.lang.String'])
 	   		}
 	   	);
-	} 	
-	
-	
-	function <portlet:namespace/>validateCourse(){
-		
-		var title = document.getElementById('<portlet:namespace />title_<%=renderRequest.getLocale().toString()%>').value;
-		
-		if(title!=null && title != ''){
-			var div = document.getElementById('<portlet:namespace/>title<%=StringPool.UNDERLINE+themeDisplay.getLanguageId()%>Error').className = "portlet-msg-error aui-helper-hidden";
-			return true;
-		}else{
-			document.getElementById('<portlet:namespace/>title<%=StringPool.UNDERLINE+themeDisplay.getLanguageId()%>Error').className = "portlet-msg-error";
-			return false;
-		}		
-	}
-	
-	
+	} 
 </script>

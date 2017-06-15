@@ -704,6 +704,11 @@ public class CourseLocalServiceWrapper implements CourseLocalService,
 		return _courseLocalService.getFirstModuleDateInCourse(courseId);
 	}
 
+	public java.lang.String getImageURL(com.liferay.lms.model.Course course,
+		com.liferay.portal.theme.ThemeDisplay themeDisplay) {
+		return _courseLocalService.getImageURL(course, themeDisplay);
+	}
+
 	/**
 	 * @deprecated Renamed to {@link #getWrappedService}
 	 */

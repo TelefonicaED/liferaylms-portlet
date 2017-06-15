@@ -569,4 +569,8 @@ public interface CourseLocalService extends BaseLocalService,
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.util.Date getFirstModuleDateInCourse(long courseId);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.lang.String getImageURL(com.liferay.lms.model.Course course,
+		com.liferay.portal.theme.ThemeDisplay themeDisplay);
 }

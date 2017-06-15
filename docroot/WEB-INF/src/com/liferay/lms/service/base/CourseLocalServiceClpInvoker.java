@@ -424,6 +424,13 @@ public class CourseLocalServiceClpInvoker {
 		_methodName270 = "getFirstModuleDateInCourse";
 
 		_methodParameterTypes270 = new String[] { "long" };
+
+		_methodName271 = "getImageURL";
+
+		_methodParameterTypes271 = new String[] {
+				"com.liferay.lms.model.Course",
+				"com.liferay.portal.theme.ThemeDisplay"
+			};
 	}
 
 	public Object invokeMethod(String name, String[] parameterTypes,
@@ -944,6 +951,12 @@ public class CourseLocalServiceClpInvoker {
 			return CourseLocalServiceUtil.getFirstModuleDateInCourse(((Long)arguments[0]).longValue());
 		}
 
+		if (_methodName271.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes271, parameterTypes)) {
+			return CourseLocalServiceUtil.getImageURL((com.liferay.lms.model.Course)arguments[0],
+				(com.liferay.portal.theme.ThemeDisplay)arguments[1]);
+		}
+
 		throw new UnsupportedOperationException();
 	}
 
@@ -1099,4 +1112,6 @@ public class CourseLocalServiceClpInvoker {
 	private String[] _methodParameterTypes269;
 	private String _methodName270;
 	private String[] _methodParameterTypes270;
+	private String _methodName271;
+	private String[] _methodParameterTypes271;
 }
