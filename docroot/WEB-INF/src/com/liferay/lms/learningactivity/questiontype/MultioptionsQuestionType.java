@@ -41,14 +41,12 @@ public class MultioptionsQuestionType extends OptionsQuestionType {
 		return correctAnswers==correctAnswered && incorrectAnswered==0;
 	}
 	
-	public String getHtmlFeedback(Document document, long questionId,
-			ThemeDisplay themeDisplay) {
+	public String getHtmlFeedback(Document document, long questionId, long actId, ThemeDisplay themeDisplay) {
 		inputType="checkbox";
-		return super.getHtmlFeedback(document, questionId, themeDisplay);
+		return super.getHtmlFeedback(document, questionId, actId, themeDisplay);
 	}
 	
-	public String getHtmlView(long questionId, ThemeDisplay themeDisplay,
-			Document document) {
+	public String getHtmlView(long questionId, ThemeDisplay themeDisplay, Document document) {
 		inputType="checkbox";
 		return super.getHtmlView(questionId, themeDisplay, document);
 	}

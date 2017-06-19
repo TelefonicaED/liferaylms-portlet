@@ -268,12 +268,12 @@ public class QuestionTypeClp implements QuestionType {
 		return ((Element)returnObj);
 	}
 	
-	public String getHtmlFeedback(Document document,long questionId, ThemeDisplay themeDisplay){
+	public String getHtmlFeedback(Document document,long questionId, long actId, ThemeDisplay themeDisplay){
 		Object returnObj = null;
 
 		try {
-			Method method = QuestionType.class.getMethod("getHtmlFeedback", Document.class, long.class, ThemeDisplay.class);
-			returnObj = clp.invoke(new MethodHandler(method, document, questionId, themeDisplay));
+			Method method = QuestionType.class.getMethod("getHtmlFeedback", Document.class, long.class, long.class, ThemeDisplay.class);
+			returnObj = clp.invoke(new MethodHandler(method, document, questionId, actId, themeDisplay));
 		}
 		catch (Throwable t) {
 			t = ClpSerializer.translateThrowable(t);

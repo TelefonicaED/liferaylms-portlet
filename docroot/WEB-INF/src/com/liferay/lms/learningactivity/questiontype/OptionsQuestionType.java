@@ -118,7 +118,7 @@ public class OptionsQuestionType extends BaseQuestionType {
 	}
 
 	public String getHtmlView(long questionId, ThemeDisplay themeDisplay, Document document){
-		return getHtml(document, questionId, false, themeDisplay);
+		return getHtml(document, questionId, false, 0, themeDisplay);
 	}
 
 	public Element getResults(ActionRequest actionRequest, long questionId){
@@ -145,7 +145,7 @@ public class OptionsQuestionType extends BaseQuestionType {
 		return questionXML;
 	}
 
-	private String getHtml(Document document, long questionId,boolean feedback, ThemeDisplay themeDisplay){
+	private String getHtml(Document document, long questionId,boolean feedback, long actId, ThemeDisplay themeDisplay){
 		String html = "", answersFeedBack="", feedMessage = "", cssclass="", selected="";
 		String namespace = themeDisplay != null ? themeDisplay.getPortletDisplay().getNamespace() : "";
 		String timestamp="";
@@ -153,6 +153,9 @@ public class OptionsQuestionType extends BaseQuestionType {
 		String onclick = "";
 		try {
 			TestQuestion question = TestQuestionLocalServiceUtil.fetchTestQuestion(questionId);
+			if( Validator.equals(actId, 0) ){
+				actId = question.getActId();
+			}
 			String formatType = "0";
 			boolean enableOrder = StringPool.TRUE.equals(PropsUtil.get("lms.learningactivity.testoption.editformat"));
 			if(question.getExtracontent()!=null && !question.getExtracontent().trim().isEmpty()){
@@ -176,7 +179,7 @@ public class OptionsQuestionType extends BaseQuestionType {
 			boolean notAnswers = true;
 			int numAnswer=0;
 			String disabled = "";
-			if (isCombo){
+			if (isCombo && !feedback){
 				answersFeedBack+="<option class=\"selected\" value=\"\">"+LanguageUtil.get(themeDisplay.getLocale(),"select")+"</option>";
 			}
 			for(TestAnswer answer:testAnswers){
@@ -186,11 +189,11 @@ public class OptionsQuestionType extends BaseQuestionType {
 				String correct="", checked="", showCorrectAnswer="false";
 				disabled = "";
 				if(feedback) {
-					showCorrectAnswer = LearningActivityLocalServiceUtil.getExtraContentValue(question.getActId(), "showCorrectAnswer");
-					String showCorrectAnswerOnlyOnFinalTryString = LearningActivityLocalServiceUtil.getExtraContentValue(question.getActId(), "showCorrectAnswerOnlyOnFinalTry");
+					showCorrectAnswer = LearningActivityLocalServiceUtil.getExtraContentValue(actId, "showCorrectAnswer");
+					String showCorrectAnswerOnlyOnFinalTryString = LearningActivityLocalServiceUtil.getExtraContentValue(actId, "showCorrectAnswerOnlyOnFinalTry");
 					try {
 						if ("true".equals(showCorrectAnswerOnlyOnFinalTryString)) {
-							if(LearningActivityTryLocalServiceUtil.canUserDoANewTry(question.getActId(), themeDisplay.getUserId())){
+							if(LearningActivityTryLocalServiceUtil.canUserDoANewTry(actId, themeDisplay.getUserId())){
 								showCorrectAnswer = "false";
 							}else{
 								showCorrectAnswer = "true";
@@ -222,7 +225,7 @@ public class OptionsQuestionType extends BaseQuestionType {
 					}
 				}
 
-				if (isCombo){
+				if (isCombo && !feedback){
 					answersFeedBack += 	"<option " + selected + " value= \"" + answer.getAnswerId() + "\" >" +
 											answer.getAnswer() +			
 										"</option>";
@@ -256,7 +259,7 @@ public class OptionsQuestionType extends BaseQuestionType {
 				}
 			}
 			
-			if (isCombo){
+			if (isCombo && !feedback){
 				html += "<div class=\"question " + cssclass + "questiontype_" + getName() + "_select questiontype_" + getTypeId() + "\">" +
 							"<input type=\"hidden\" name=\""+namespace+"question\" value=\"" + question.getQuestionId() + "\"/>"+
 							"<div class=\"questiontext select\">" + question.getText() + "</div>" +
@@ -281,8 +284,9 @@ public class OptionsQuestionType extends BaseQuestionType {
 		return html;
 	}
 
-	public String getHtmlFeedback(Document document,long questionId, ThemeDisplay themeDisplay){
-		return getHtml(document, questionId, true, themeDisplay);
+	@Override
+	public String getHtmlFeedback(Document document, long questionId, long actId, ThemeDisplay themeDisplay){
+		return getHtml(document, questionId, true, actId, themeDisplay);
 	}
 
 	protected List<TestAnswer> getAnswersSelected(Document document,long questionId){

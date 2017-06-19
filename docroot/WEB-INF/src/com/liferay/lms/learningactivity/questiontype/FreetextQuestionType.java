@@ -168,7 +168,7 @@ public class FreetextQuestionType extends BaseQuestionType {
 		return feedBack;
 	}
 
-	public String getHtmlFeedback(Document document,long questionId, ThemeDisplay themeDisplay){
+	public String getHtmlFeedback(Document document,long questionId, long actId, ThemeDisplay themeDisplay){
 		return getHtml(document, questionId, true, themeDisplay);
 	}
 

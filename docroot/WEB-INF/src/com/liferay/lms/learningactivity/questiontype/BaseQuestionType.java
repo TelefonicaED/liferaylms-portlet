@@ -52,7 +52,7 @@ public abstract class BaseQuestionType implements QuestionType, Serializable {
 
 	@Override
 	public void setLocale(Locale locale){
-		this.locale=locale;
+		BaseQuestionType.locale=locale;
 	}
 	
 	@Override
@@ -114,7 +114,7 @@ public abstract class BaseQuestionType implements QuestionType, Serializable {
 	}
 	
 	@Override
-	public String getHtmlFeedback(Document document,long questionId, ThemeDisplay themeDisplay){
+	public String getHtmlFeedback(Document document, long questionId, long actId, ThemeDisplay themeDisplay){
 		return "";
 	}
 	

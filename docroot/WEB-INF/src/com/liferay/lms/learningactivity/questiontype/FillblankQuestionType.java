@@ -344,7 +344,8 @@ public class FillblankQuestionType extends BaseQuestionType {
 		return html;
 	}
 	
-	public String getHtmlFeedback(Document document,long questionId, ThemeDisplay themeDisplay){
+	@Override
+	public String getHtmlFeedback(Document document, long questionId, long actId, ThemeDisplay themeDisplay){
 		return getHtml(document, questionId, true, themeDisplay);
 	}
 
