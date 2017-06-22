@@ -74,7 +74,7 @@ public class CompleteModulesCourseEval extends BaseCourseEval {
 		
 		if(numModules > modulesPassedByUser){
 			passed = false;
-		}else{
+		}
 			
 			// Se obtienen las actividades que son obligatorias en el curso.
 			List<LearningActivity> learningActivities = LearningActivityLocalServiceUtil.getMandatoryLearningActivitiesOfGroup(groupCreatedId);
@@ -119,7 +119,7 @@ public class CompleteModulesCourseEval extends BaseCourseEval {
 					passed = false;
 				}
 			}
-		}
+		
 		
 		// Si el usuario se ha marcado como isFailed es porque lo tiene suspenso. Se le asigna un passed a false y se marca la fecha de finalización del curso (passedDate).
 		courseResult.setPassed(passed && !isFailed);
