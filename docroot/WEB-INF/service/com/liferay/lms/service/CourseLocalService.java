@@ -450,6 +450,17 @@ public interface CourseLocalService extends BaseLocalService,
 		boolean andOperator);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.util.List<com.liferay.lms.model.Course> getParentCoursesByTitleStatusCategoriesTags(
+		java.lang.String freeText, int status, long[] categories, long[] tags,
+		long companyId, long groupId, long userId, java.lang.String language,
+		boolean isAdmin, boolean andOperator, int start, int end);
+
+	public int countParentCoursesByTitleStatusCategoriesTags(
+		java.lang.String freeText, int status, long[] categories, long[] tags,
+		long companyId, long groupId, long userId, java.lang.String language,
+		boolean isAdmin, boolean andOperator);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.util.List<com.liferay.portal.model.User> getStudents(
 		long courseId, long companyId, java.lang.String screenName,
 		java.lang.String firstName, java.lang.String lastName,
@@ -512,6 +523,12 @@ public interface CourseLocalService extends BaseLocalService,
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.util.List<com.liferay.lms.model.Course> getChildCourses(
+		long courseId, int start, int end);
+
+	public int countChildCourses(long courseId);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.util.List<com.liferay.lms.model.Course> getCoursesParents(
 		long groupId)
 		throws com.liferay.portal.kernel.exception.SystemException;
@@ -562,7 +579,7 @@ public interface CourseLocalService extends BaseLocalService,
 	public java.util.Date getLastModuleDateInCourse(long courseId);
 
 	/**
-	* Returns the last module date in course, because the course end date is for enrollments.
+	* Returns the first module date in course, because the course end date is for enrollments.
 	*
 	* @param courseId Course Identifier
 	* @return Course last module date.
@@ -573,4 +590,19 @@ public interface CourseLocalService extends BaseLocalService,
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.lang.String getImageURL(com.liferay.lms.model.Course course,
 		com.liferay.portal.theme.ThemeDisplay themeDisplay);
+
+	/**
+	* Service that validates the course inscription as it is validated in web.
+	*
+	* @param courseId
+	* @param userId
+	* @return ok or error and the error description.
+	* @throws PortalException
+	* @throws SystemException
+	*/
+	public java.lang.String addStudentToCourseByUserId(long courseId,
+		long userId, long teamId,
+		com.liferay.portal.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException;
 }

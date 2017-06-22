@@ -234,6 +234,7 @@
 			<basic name="feedbackNoCorrect" />
 			<basic name="weightinmodule" />
 			<basic name="commentsActivated" />
+			<basic name="linkedActivityId" />
 			<transient name="descriptionCurrentLanguageId" />
 			<transient name="descriptionMap" />
 			<transient name="modelAttributes" />

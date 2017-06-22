@@ -20,7 +20,8 @@
 	
 	<bean id="messageListener.liferay.lms.cleanTriesAllUsers_listener"
 		class="com.liferay.lms.clean.CleanLearningActivityTriesAllUsers" />
-		
+	<bean id="messageListener.liferay.lms.createEdition_listener"
+		class="com.liferay.lms.CreateEdition" />	
 	
 	<!-- Destinations -->
 	<bean id="destination.liferay.lms.evaluationActivity"
@@ -58,6 +59,10 @@
 		<property name="name" value="liferay/lms/cleanTriesAllUsers" />
 	</bean>	
 	
+	<bean id="destination.liferay.lms.createEdition"
+		class="com.liferay.portal.kernel.messaging.SerialDestination">
+		<property name="name" value="liferay/lms/createEdition" />
+	</bean>
 	
 	<!-- Configurator -->
 	<bean id="messagingConfigurator"
@@ -99,6 +104,11 @@
 						<ref bean="messageListener.liferay.lms.cleanTriesAllUsers_listener" />
 					</list>
 				</entry>
+				<entry key="liferay/lms/createEdition">
+					<list value-type="com.liferay.portal.kernel.messaging.MessageListener">
+						<ref bean="messageListener.liferay.lms.createEdition_listener" />
+					</list>
+				</entry>
 			</map>
 		</property>
 		<property name="destinations">
@@ -110,6 +120,7 @@
 				<ref bean="destination.liferay.lms.portalAdmin" />
 				<ref bean="destination.liferay.lms.cleanTriesUser" />
 				<ref bean="destination.liferay.lms.cleanTriesAllUsers" />
+				<ref bean="destination.liferay.lms.createEdition" />
 			</list>
 		</property>
 	</bean>

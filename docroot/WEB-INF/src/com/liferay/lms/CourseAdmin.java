@@ -17,6 +17,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.TimeZone;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
@@ -101,6 +102,7 @@ import com.liferay.portal.kernel.util.PrefsPropsUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
@@ -140,6 +142,7 @@ import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.service.DLFolderLocalServiceUtil;
 import com.liferay.portlet.usersadmin.util.UsersAdminUtil;
 import com.liferay.util.bridges.mvc.MVCPortlet;
+import com.tls.lms.util.LiferaylmsUtil;
 
 /**
  * Portlet implementation class CourseAdmin
@@ -157,6 +160,8 @@ public class CourseAdmin extends MVCPortlet {
 	private String usersResultsJSP = null;
 	private String competenceResultsJSP = null;
 	private String configLmsPrefsJSP = null;
+	private String editionsJSP = null;
+	private String newEditionJSP = null;
 	
 	public void init() throws PortletException {	
 		viewJSP = getInitParameter("view-template");
@@ -170,6 +175,8 @@ public class CourseAdmin extends MVCPortlet {
 		usersResultsJSP = getInitParameter("users-results-template");
 		competenceResultsJSP = getInitParameter("competence-results-template");
 		configLmsPrefsJSP = getInitParameter("config-lms-prefs");
+		editionsJSP = getInitParameter("editions-template");
+		newEditionJSP = getInitParameter("new-edition-template");
 	}
 
 	public static String DOCUMENTLIBRARY_MAINFOLDER = "ResourceUploads"; 
@@ -215,7 +222,12 @@ public class CourseAdmin extends MVCPortlet {
 					showViewUsersResults(renderRequest, renderResponse);
 				}else if("competence-results".equals(jsp)){
 					showViewCompetenceResults(renderRequest, renderResponse);
+				}else if("editions".equals(jsp)){
+					showViewEditions(renderRequest, renderResponse);
+				}else if("new-edition".equals(jsp)){
+					showViewNewEdition(renderRequest, renderResponse);
 				}
+				
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -265,7 +277,7 @@ public class CourseAdmin extends MVCPortlet {
 		Enumeration<String> pnames =renderRequest.getParameterNames();
 		ArrayList<String> tparams = new ArrayList<String>();
 		ArrayList<Long> assetCategoryIds = new ArrayList<Long>();
-		ArrayList<Long> assetTagIds = new ArrayList<Long>();
+		
 
 
 		while(pnames.hasMoreElements()){
@@ -299,19 +311,17 @@ public class CourseAdmin extends MVCPortlet {
 				if(freetextTemp!=null){
 					freetext = freetextTemp;
 				}
-			}catch(Exception e){}
+			}catch(Exception e){
+				log.debug(e);
+			}
 			try{
 				ArrayList<Long> assetCategoryIdsTemp = (ArrayList<Long>)portletSession.getAttribute("assetCategoryIds");
 				if(assetCategoryIdsTemp!=null){
 					assetCategoryIds = assetCategoryIdsTemp;
 				}
-			}catch(Exception e){}
-			try{
-				ArrayList<Long> assetTagIdsTemp = (ArrayList<Long>)portletSession.getAttribute("assetTagIds");
-				if(assetTagIdsTemp!=null){
-					assetTagIds = assetTagIdsTemp;
-				}
-			}catch(Exception e){}
+			}catch(Exception e){
+				log.debug(e);
+			}
 			try{
 				Integer stateTemp = (Integer)portletSession.getAttribute("state");
 				if(stateTemp!=null){
@@ -380,9 +390,9 @@ public class CourseAdmin extends MVCPortlet {
 				SearchContainer.DEFAULT_DELTA, portletURL, 
 				null, "there-are-no-courses");
 
-		searchContainer.setResults(CourseLocalServiceUtil.getByTitleStatusCategoriesTags(freetext, closed, categoryIds, tagsSelIds, themeDisplay.getCompanyId(), 
+		searchContainer.setResults(CourseLocalServiceUtil.getParentCoursesByTitleStatusCategoriesTags(freetext, closed, categoryIds, tagsSelIds, themeDisplay.getCompanyId(), 
 				themeDisplay.getScopeGroupId(), themeDisplay.getUserId(), themeDisplay.getLanguageId(), isAdmin, true, searchContainer.getStart(), searchContainer.getEnd()));
-		searchContainer.setTotal(CourseLocalServiceUtil.countByTitleStatusCategoriesTags(freetext, closed, categoryIds, tagsSelIds, themeDisplay.getCompanyId(), 
+		searchContainer.setTotal(CourseLocalServiceUtil.countParentCoursesByTitleStatusCategoriesTags(freetext, closed, categoryIds, tagsSelIds, themeDisplay.getCompanyId(), 
 				themeDisplay.getScopeGroupId(), themeDisplay.getUserId(), themeDisplay.getLanguageId(), isAdmin, true));
 		
 		renderRequest.setAttribute("searchContainer", searchContainer);
@@ -407,7 +417,126 @@ public class CourseAdmin extends MVCPortlet {
 		
 		include(this.editCourseJSP, renderRequest, renderResponse);
 	}
+	
+	private void showViewEditions(RenderRequest renderRequest,RenderResponse renderResponse) throws IOException, PortletException{
+		
+		ThemeDisplay themeDisplay = (ThemeDisplay)renderRequest.getAttribute(WebKeys.THEME_DISPLAY);
+		long courseId = ParamUtil.getLong(renderRequest, "courseId");
+		PortletURL portletURL = renderResponse.createRenderURL();
+		portletURL.setParameter("javax.portlet.action","doView");
+		portletURL.setParameter("courseId", String.valueOf(courseId));
+		portletURL.setParameter("view", "editions");
+		renderRequest.setAttribute("courseId", courseId);
+		Course course;
+		try {
+			course = CourseLocalServiceUtil.fetchCourse(courseId);
+			if(course!=null){
+				String editionsTitle =LanguageUtil.format(themeDisplay.getLocale(), "course-admin.edition-title-x", course.getTitle(themeDisplay.getLocale()));
+				renderRequest.setAttribute("editionsTitle", editionsTitle);
+			}
+		} catch (SystemException e) {
+			e.printStackTrace();
+		}
+		
+		PortletURL backURL = renderResponse.createRenderURL();
+		backURL.setParameter("javax.portlet.action","doView");
+		renderRequest.setAttribute("backURL", backURL);
+		
+		SearchContainer<Course> searchContainer = new SearchContainer<Course>(renderRequest, null, null, SearchContainer.DEFAULT_CUR_PARAM, 
+				SearchContainer.DEFAULT_DELTA, portletURL, 
+				null, "there-are-no-editions");
 
+		searchContainer.setResults(CourseLocalServiceUtil.getChildCourses(courseId, searchContainer.getStart(), searchContainer.getEnd()));
+		searchContainer.setTotal(CourseLocalServiceUtil.countChildCourses(courseId));
+
+		
+		renderRequest.setAttribute("searchContainer", searchContainer);
+		
+		include(this.editionsJSP, renderRequest, renderResponse);
+	}
+
+	
+	private void showViewNewEdition(RenderRequest renderRequest,RenderResponse renderResponse) throws IOException, PortletException{
+		
+		ThemeDisplay themeDisplay = (ThemeDisplay)renderRequest.getAttribute(WebKeys.THEME_DISPLAY);
+		
+		TimeZone timeZone = themeDisplay.getTimeZone();
+		
+		long courseId = ParamUtil.getLong(renderRequest, "courseId", 0);
+		log.debug("CourseId "+courseId);
+		try{
+			Course course = CourseLocalServiceUtil.fetchCourse(courseId);
+			if(course!=null){
+				Group group = GroupLocalServiceUtil.fetchGroup(course.getGroupCreatedId());
+				renderRequest.setAttribute("courseGroup", group);
+				log.debug("GroupId "+group);
+				log.debug("CourseId "+course);
+						
+				PortletURL backURL = renderResponse.createRenderURL();
+				backURL.setParameter("javax.portlet.action","doView");
+				backURL.setParameter("courseId", String.valueOf(course.getCourseId()));
+				backURL.setParameter("view", "editions");
+				renderRequest.setAttribute("backURL", backURL);
+				renderRequest.setAttribute("course", course);
+				
+				
+				String newCourseName = group.getName()+"_"+Time.getShortTimestamp();
+				renderRequest.setAttribute("newCourseName", newCourseName);
+				renderRequest.setAttribute("courseId", courseId);
+				
+				String editionsTitle =LanguageUtil.format(themeDisplay.getLocale(), "course-admin.new-edition-x", course.getTitle(themeDisplay.getLocale()));
+				renderRequest.setAttribute("editionTitle", editionsTitle);
+				
+				
+				
+			}
+			
+			
+			SimpleDateFormat formatDay = new SimpleDateFormat("dd");
+			formatDay.setTimeZone(timeZone);
+			SimpleDateFormat formatMonth = new SimpleDateFormat("MM");
+			formatMonth.setTimeZone(timeZone);
+			SimpleDateFormat formatYear = new SimpleDateFormat("yyyy");
+			formatYear.setTimeZone(timeZone);
+			SimpleDateFormat formatHour = new SimpleDateFormat("HH");
+			formatHour.setTimeZone(timeZone);
+			SimpleDateFormat formatMin = new SimpleDateFormat("mm");
+			formatMin.setTimeZone(timeZone);
+			Date today=new Date(System.currentTimeMillis());
+			
+			int startDay=Integer.parseInt(formatDay.format(today));
+			int startMonth=Integer.parseInt(formatMonth.format(today))-1;
+			int startYear=Integer.parseInt(formatYear.format(today));
+			int startHour=Integer.parseInt(formatHour.format(today));
+			int startMin=Integer.parseInt(formatMin.format(today));
+			
+			int endDay=Integer.parseInt(formatDay.format(today));
+			int endMonth=Integer.parseInt(formatMonth.format(today))-1;
+			int endYear=Integer.parseInt(formatYear.format(today))+1;
+			int endHour=Integer.parseInt(formatHour.format(today));
+			int endMin=Integer.parseInt(formatMin.format(today));
+			
+			renderRequest.setAttribute("startDay", startDay);
+			renderRequest.setAttribute("startMonth", startMonth);
+			renderRequest.setAttribute("startYear", startYear);
+			renderRequest.setAttribute("startHour", startHour);
+			renderRequest.setAttribute("startMin", startMin);
+			renderRequest.setAttribute("defaultStartYear", LiferaylmsUtil.defaultStartYear);
+			renderRequest.setAttribute("defaultEndYear", LiferaylmsUtil.defaultEndYear);
+			renderRequest.setAttribute("endDay", endDay);
+			renderRequest.setAttribute("endMonth", endMonth);
+			renderRequest.setAttribute("endYear", endYear);
+			renderRequest.setAttribute("endHour", endHour);
+			renderRequest.setAttribute("endMin", endMin);
+			
+			
+		}catch(Exception e){
+			e.printStackTrace();
+		}	
+		
+		include(this.newEditionJSP, renderRequest, renderResponse);
+	}
+	
 	private void showViewRoleMembersTab(RenderRequest renderRequest,RenderResponse renderResponse) throws IOException, PortletException{
 		
 		ThemeDisplay themeDisplay = (ThemeDisplay)renderRequest.getAttribute(WebKeys.THEME_DISPLAY);
@@ -1687,28 +1816,109 @@ public class CourseAdmin extends MVCPortlet {
 			if(log.isDebugEnabled())
 				e.printStackTrace();
 		}
-		if(group != null) {
-			SessionErrors.add(actionRequest, "courseadmin.clone.error.duplicateName");
-			errors = true;
-		} else {
-			Message message=new Message();
-			message.put("groupId",groupId);
-			message.put("newCourseName",newCourseName);
-			message.put("themeDisplay",themeDisplay);
-			message.put("startDate",startDate);
-			message.put("endDate",endDate);
-			message.put("childCourse", childCourse);
-			message.put("serviceContext",serviceContext);
-			message.put("visible",visible);
-			message.put("cloneForum", cloneForum);
-			MessageBusUtil.sendMessage("liferay/lms/courseClone", message);
-			SessionMessages.add(actionRequest, "courseadmin.clone.confirmation.success");
+		if(!errors){
+			if(group != null) {
+				SessionErrors.add(actionRequest, "courseadmin.clone.error.duplicateName");
+				errors = true;
+			} else {
+				Message message=new Message();
+				message.put("groupId",groupId);
+				message.put("newCourseName",newCourseName);
+				message.put("themeDisplay",themeDisplay);
+				message.put("startDate",startDate);
+				message.put("endDate",endDate);
+				message.put("childCourse", childCourse);
+				message.put("serviceContext",serviceContext);
+				message.put("visible",visible);
+				message.put("cloneForum", cloneForum);
+				MessageBusUtil.sendMessage("liferay/lms/courseClone", message);
+				SessionMessages.add(actionRequest, "courseadmin.clone.confirmation.success");
+			}
 		}
-		
 		if(errors)
 			actionResponse.sendRedirect(ParamUtil.getString(actionRequest, "redirect"));
 
 	}
+	
+	
+	public void createEdition(ActionRequest actionRequest, ActionResponse actionResponse) throws Exception {
+		
+		ThemeDisplay themeDisplay = (ThemeDisplay) actionRequest.getAttribute(WebKeys.THEME_DISPLAY);	
+		ServiceContext serviceContext = ServiceContextFactory.getInstance(Course.class.getName(), actionRequest);
+		
+		long parentCourseId = ParamUtil.getLong(actionRequest, "parentCourseId",0);
+		
+		String newEditionName  = ParamUtil.getString(actionRequest, "newCourseName", "New edition");
+		
+		int startMonth = 	ParamUtil.getInteger(actionRequest, "startMon");
+		int startYear = 	ParamUtil.getInteger(actionRequest, "startYear");
+		int startDay = 		ParamUtil.getInteger(actionRequest, "startDay");
+		int startHour = 	ParamUtil.getInteger(actionRequest, "startHour");
+		int startMinute = 	ParamUtil.getInteger(actionRequest, "startMin");
+		int startAMPM = 	ParamUtil.getInteger(actionRequest, "startAMPM");
+		if (startAMPM > 0) {
+			startHour += 12;
+		}
+		Date startDate = PortalUtil.getDate(startMonth, startDay, startYear, startHour, startMinute, themeDisplay.getTimeZone(), EntryDisplayDateException.class);
+		
+		int stopMonth = 	ParamUtil.getInteger(actionRequest, "stopMon");
+		int stopYear = 		ParamUtil.getInteger(actionRequest, "stopYear");
+		int stopDay = 		ParamUtil.getInteger(actionRequest, "stopDay");
+		int stopHour = 		ParamUtil.getInteger(actionRequest, "stopHour");
+		int stopMinute = 	ParamUtil.getInteger(actionRequest, "stopMin");
+		int stopAMPM = 		ParamUtil.getInteger(actionRequest, "stopAMPM");
+		if (stopAMPM > 0) {
+			stopHour += 12;
+		}
+		Date endDate = PortalUtil.getDate(stopMonth, stopDay, stopYear, stopHour, stopMinute, themeDisplay.getTimeZone(), EntryDisplayDateException.class);
+		
+		// Comprobaciones antes del proceso
+		boolean errors = false;
+		if(endDate.before(startDate)){
+			SessionErrors.add(actionRequest, "course-admin.error.date-interval");
+			errors = true;
+		}
+		
+	
+		Group group = null;
+		try{
+			group = GroupLocalServiceUtil.getGroup(themeDisplay.getCompanyId(), newEditionName);
+		}catch(NoSuchGroupException e){
+			group = null;
+			if(log.isDebugEnabled()){
+				e.printStackTrace();
+			}
+		}
+		if(!errors){
+			if(group != null) {
+				SessionErrors.add(actionRequest, "course-admin.error.duplicate-name");
+				errors = true;
+			} else {
+				
+				Message message=new Message();
+				message.put("parentCourseId", parentCourseId);
+				message.put("newEditionName",newEditionName);
+				message.put("themeDisplay",themeDisplay);
+				message.put("startDate",startDate);
+				message.put("endDate",endDate);
+				message.put("serviceContext",serviceContext);
+				MessageBusUtil.sendMessage("liferay/lms/createEdition", message);
+				
+			}
+		}
+		
+		
+		if(errors){
+			actionResponse.setRenderParameter("view", "new-edition");
+			actionResponse.setRenderParameter("courseId", String.valueOf(parentCourseId));
+		}else{
+			SessionMessages.add(actionRequest, "course-admin.confirmation.new-edition-success");
+			actionResponse.setRenderParameter("courseId", String.valueOf(parentCourseId));
+			actionResponse.setRenderParameter("view", "editions");
+		}
+		
+	}
+	
 	
 	public void exportCourse(ActionRequest actionRequest, ActionResponse actionResponse) throws Exception {
 		

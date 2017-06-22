@@ -256,4 +256,9 @@ public class ResourceInternalLearningActivityType extends BaseLearningActivityTy
 	public boolean hasDeleteTries() {
 		return true;
 	}
+	
+	@Override
+	public boolean canBeLinked(){
+		return true;
+	}
 }

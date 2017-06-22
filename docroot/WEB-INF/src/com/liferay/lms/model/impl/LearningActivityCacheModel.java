@@ -35,7 +35,7 @@ public class LearningActivityCacheModel implements CacheModel<LearningActivity>,
 	Serializable {
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(55);
+		StringBundler sb = new StringBundler(57);
 
 		sb.append("{uuid=");
 		sb.append(uuid);
@@ -91,6 +91,8 @@ public class LearningActivityCacheModel implements CacheModel<LearningActivity>,
 		sb.append(weightinmodule);
 		sb.append(", commentsActivated=");
 		sb.append(commentsActivated);
+		sb.append(", linkedActivityId=");
+		sb.append(linkedActivityId);
 		sb.append("}");
 
 		return sb.toString();
@@ -208,6 +210,7 @@ public class LearningActivityCacheModel implements CacheModel<LearningActivity>,
 
 		learningActivityImpl.setWeightinmodule(weightinmodule);
 		learningActivityImpl.setCommentsActivated(commentsActivated);
+		learningActivityImpl.setLinkedActivityId(linkedActivityId);
 
 		learningActivityImpl.resetOriginalValues();
 
@@ -241,4 +244,5 @@ public class LearningActivityCacheModel implements CacheModel<LearningActivity>,
 	public String feedbackNoCorrect;
 	public long weightinmodule;
 	public boolean commentsActivated;
+	public long linkedActivityId;
 }

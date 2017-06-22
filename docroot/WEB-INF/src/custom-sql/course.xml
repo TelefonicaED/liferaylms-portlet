@@ -160,6 +160,7 @@
 			( 
 				c.groupId = ? OR ? = 0 
 			)
+			[$WHEREPARENTCOURSE$]
 			[$WHERETITLEDESCRIPTIONCATEGORIESTAGSAND$]
 			[$WHERETITLEDESCRIPTIONCATEGORIESTAGSOR$]
 			[$WHERERESOURCEPERMISSION$] 
@@ -188,6 +189,7 @@
 			( 
 				c.groupId = ? OR ? = 0 
 			)
+			[$WHEREPARENTCOURSE$]
 			[$WHERETITLEDESCRIPTIONCATEGORIESTAGSAND$]
 			[$WHERETITLEDESCRIPTIONCATEGORIESTAGSOR$]
 			[$WHERERESOURCEPERMISSION$]
@@ -458,6 +460,13 @@
 			(u.emailAddress LIKE ?) [$AND_OR_CONNECTOR$]
 		]]>
 	</sql>
+	
+	<sql id="com.liferay.lms.service.persistence.CourseFinder.whereParentCourse">
+		<![CDATA[
+			AND (c.parentCourseId = 0) 
+		]]>
+	</sql>
+	
 	<sql id="com.liferay.lms.service.persistence.CourseFinder.hasUserTries">
 		<![CDATA[   			
 			SELECT 

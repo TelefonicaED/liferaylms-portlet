@@ -74,4 +74,9 @@ public class TaskLearningActivityType extends BaseLearningActivityType
 		return PORTLET_ID;
 	}
 	
+	@Override
+	public boolean canBeLinked(){
+		return true;
+	}
+	
 }

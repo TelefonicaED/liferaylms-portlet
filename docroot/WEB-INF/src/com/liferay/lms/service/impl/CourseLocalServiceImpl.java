@@ -29,13 +29,19 @@ import com.liferay.lms.auditing.AuditingLogFactory;
 import com.liferay.lms.learningactivity.courseeval.CourseEval;
 import com.liferay.lms.learningactivity.courseeval.CourseEvalRegistry;
 import com.liferay.lms.model.Course;
+import com.liferay.lms.model.CourseCompetence;
 import com.liferay.lms.model.CourseResult;
 import com.liferay.lms.model.LmsPrefs;
 import com.liferay.lms.model.Module;
+import com.liferay.lms.model.Schedule;
+import com.liferay.lms.model.UserCompetence;
 import com.liferay.lms.service.ClpSerializer;
+import com.liferay.lms.service.CourseCompetenceLocalServiceUtil;
 import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.lms.service.LmsPrefsLocalServiceUtil;
 import com.liferay.lms.service.ModuleLocalServiceUtil;
+import com.liferay.lms.service.ScheduleLocalServiceUtil;
+import com.liferay.lms.service.UserCompetenceLocalServiceUtil;
 import com.liferay.lms.service.base.CourseLocalServiceBaseImpl;
 import com.liferay.lms.service.persistence.CourseFinderUtil;
 import com.liferay.lms.views.CourseResultView;
@@ -48,6 +54,9 @@ import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
+import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.jsonwebservice.JSONWebService;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.lar.PortletDataHandlerKeys;
 import com.liferay.portal.kernel.lar.UserIdStrategy;
@@ -72,9 +81,11 @@ import com.liferay.portal.model.Group;
 import com.liferay.portal.model.GroupConstants;
 import com.liferay.portal.model.LayoutSet;
 import com.liferay.portal.model.LayoutSetPrototype;
+import com.liferay.portal.model.MembershipRequestConstants;
 import com.liferay.portal.model.ModelHintsConstants;
 import com.liferay.portal.model.ModelHintsUtil;
 import com.liferay.portal.model.ResourceConstants;
+import com.liferay.portal.model.Role;
 import com.liferay.portal.model.RoleConstants;
 import com.liferay.portal.model.User;
 import com.liferay.portal.security.auth.PrincipalThreadLocal;
@@ -83,6 +94,7 @@ import com.liferay.portal.security.permission.PermissionCheckerFactoryUtil;
 import com.liferay.portal.service.ClassNameLocalServiceUtil;
 import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.LayoutSetPrototypeLocalServiceUtil;
+import com.liferay.portal.service.MembershipRequestLocalServiceUtil;
 import com.liferay.portal.service.RoleLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceContextThreadLocal;
@@ -97,6 +109,7 @@ import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
 import com.liferay.portlet.social.model.SocialActivityCounterDefinition;
 import com.liferay.portlet.social.model.SocialActivityDefinition;
 import com.liferay.portlet.social.model.SocialActivitySetting;
+import com.liferay.portlet.social.service.SocialActivityLocalServiceUtil;
 import com.liferay.portlet.social.service.SocialActivitySettingLocalServiceUtil;
 import com.liferay.portlet.social.service.SocialActivitySettingServiceUtil;
 import com.liferay.util.LmsLocaleUtil;
@@ -163,7 +176,7 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 		User usuario= userLocalService.getUser(userId);
 		List<Group> groups= GroupLocalServiceUtil.getUserGroups(usuario.getUserId());
 		List<Course> results=new java.util.ArrayList<Course>();
-		
+
 		for(Group groupCourse:groups)
 		{
 			
@@ -188,7 +201,6 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 	
 	public List<Course> getOpenedUserCourses(long userId, int start, int end) throws PortalException, SystemException
 	{
-		
 		 return courseFinder.getExistingUserCourses(userId,start,end);
 
 	}
@@ -1027,12 +1039,21 @@ public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int e
 	}
 	
 	public List<Course> getByTitleStatusCategoriesTags(String freeText, int status, long[] categories, long[] tags, long companyId, long groupId, long userId, String language, boolean isAdmin, boolean andOperator, int start, int end){
-		return CourseFinderUtil.findByT_S_C_T(freeText, status, categories, tags, companyId, groupId, userId, language, isAdmin, andOperator, start, end);
+		return CourseFinderUtil.findByT_S_C_T(freeText, status, categories, tags, companyId, groupId, userId, language, isAdmin, false, andOperator, start, end);
 	}
 	
 	public int countByTitleStatusCategoriesTags(String freeText, int status, long[] categories, long[] tags, long companyId, long groupId, long userId, String language, boolean isAdmin, boolean andOperator){
-		return CourseFinderUtil.countByT_S_C_T(freeText, status, categories, tags, companyId, groupId, userId, language, isAdmin, andOperator);
+		return CourseFinderUtil.countByT_S_C_T(freeText, status, categories, tags, companyId, groupId, userId, language, isAdmin, false, andOperator);
 	}
+	
+	public List<Course> getParentCoursesByTitleStatusCategoriesTags(String freeText, int status, long[] categories, long[] tags, long companyId, long groupId, long userId, String language, boolean isAdmin, boolean andOperator, int start, int end){
+		return CourseFinderUtil.findByT_S_C_T(freeText, status, categories, tags, companyId, groupId, userId, language, isAdmin, true, andOperator, start, end);
+	}
+	
+	public int countParentCoursesByTitleStatusCategoriesTags(String freeText, int status, long[] categories, long[] tags, long companyId, long groupId, long userId, String language, boolean isAdmin, boolean andOperator){
+		return CourseFinderUtil.countByT_S_C_T(freeText, status, categories, tags, companyId, groupId, userId, language, isAdmin, true, andOperator);
+	}
+	
 	
 	public List<User> getStudents(long courseId, long companyId, String screenName, String firstName, String lastName, String emailAddress, boolean andOperator, int start, int end,OrderByComparator comparator){
 		return CourseFinderUtil.findStudents(courseId, companyId, screenName,firstName, lastName, emailAddress, andOperator, start, end, comparator);
@@ -1109,9 +1130,29 @@ public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int e
 
 	
 	
-	public java.util.List<Course> getChildCourses(long courseId) throws SystemException
+	public List<Course> getChildCourses(long courseId) throws SystemException
 	{
 		return coursePersistence.findByParentCourseId(courseId);
+	}
+	
+	public List<Course> getChildCourses(long courseId, int start, int end) {
+		List<Course> childCourses = new ArrayList<Course>();
+		try{
+			childCourses = coursePersistence.findByParentCourseId(courseId, start, end);
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		return childCourses;
+	}
+	
+	public int countChildCourses(long courseId) {
+		int childCoursesCount = 0;
+		try{
+			childCoursesCount = coursePersistence.countByParentCourseId(courseId);
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		return childCoursesCount;
 	}
 	
 	public java.util.List<Course> getCoursesParents(long groupId) throws SystemException
@@ -1248,7 +1289,7 @@ public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int e
 	
 	
 	/**
-	 * Returns the last module date in course, because the course end date is for enrollments.
+	 * Returns the first module date in course, because the course end date is for enrollments.
 	 * 
 	 * @param courseId Course Identifier
 	 * @return Course last module date.
@@ -1277,6 +1318,119 @@ public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int e
 	public String getImageURL(Course course, ThemeDisplay themeDisplay){
 		return course.getImageURL(themeDisplay);
 	}
+	
+	/**
+	 * Service that validates the course inscription as it is validated in web.
+	 * 
+	 * @param courseId
+	 * @param userId 
+	 * @return ok or error and the error description.
+	 * @throws PortalException
+	 * @throws SystemException
+	 */
+	public String addStudentToCourseByUserId(long courseId, long userId, long teamId, ServiceContext serviceContext) throws PortalException, SystemException {
+		String result="ok";
+		try{
+			Course course=CourseLocalServiceUtil.getCourse(courseId);
+			int i = 0;
+			boolean enoughCompetences = true;
+			CourseCompetence courseCompetence = null;
+			if(userId > 0){
+				//1. Si no estÃ¡ ya inscrito
+				if(!GroupLocalServiceUtil.hasUserGroup(userId,course.getGroupCreatedId())){
+					Group group = GroupLocalServiceUtil.getGroup(course.getGroupCreatedId());
+					
+					//2. Fecha actual dentro del periodo de inscripcion
+					Date now=new Date(System.currentTimeMillis());
+					Date startDate = course.getStartDate();
+					Date endDate = course.getEndDate();
+					if(teamId>0){
+						Schedule sch = scheduleLocalService.getScheduleByTeamId(teamId);	
+						if(sch!=null){
+							startDate = sch.getStartDate();
+							endDate = sch.getEndDate();
+						}
+					}
+					
+					if((startDate.before(now) && endDate.after(now))){
+						//3. Control de competencias 
+						List<CourseCompetence> courseCompetences = CourseCompetenceLocalServiceUtil.findBycourseId(course.getCourseId(), true);
+						//Busco si al usuario le falta alguna competencia que es necesaria para la inscripcion al curso
+						while (i < courseCompetences.size() && enoughCompetences){
+							courseCompetence = courseCompetences.get(i);
+							UserCompetence uc = UserCompetenceLocalServiceUtil.findByUserIdCompetenceId(userId, courseCompetence.getCompetenceId());
+							if(uc == null){
+								enoughCompetences = false;
+								log.debug("Al usuario le falta la competencia obligatoria con id: " + courseCompetence.getCompetenceId() + " para poder ser inscrito al curso");
+							}
+							i++;
+						}
+						if(enoughCompetences){
+							// 4. El mÃ¡ximo de inscripciones del curso no ha sido superado
+							if(course.getMaxusers()<=0 || UserLocalServiceUtil.getGroupUsersCount(course.getGroupCreatedId()) < course.getMaxusers()){
+								if(group.getType()==GroupConstants.TYPE_SITE_OPEN){
+									Role sitemember=RoleLocalServiceUtil.getRole(course.getCompanyId(), RoleConstants.SITE_MEMBER) ;
+									
+									if(teamId>0){
+				            			long[] userIds = new long[1];
+				            			userIds[0] = userId;	
+				            			if(!UserLocalServiceUtil.hasTeamUser(teamId, userId)){
+				            				UserLocalServiceUtil.addTeamUsers(teamId, userIds);	
+				            			}			
+				            		}
+									
+									GroupLocalServiceUtil.addUserGroups(userId, new long[]{group.getGroupId()});
+									UserGroupRoleLocalServiceUtil.addUserGroupRoles(new long[] { userId }, group.getGroupId(), sitemember.getRoleId());
+									SocialActivityLocalServiceUtil.addActivity(userId, group.getGroupId(), Group.class.getName(), group.getGroupId(), com.liferay.portlet.social.model.SocialActivityConstants.TYPE_SUBSCRIBE, "", userId);
+									User u = UserLocalServiceUtil.getUser(userId);
+									log.debug("Inscribimos usuario con id: " + u.getUserId() + " (" + u.getScreenName() + ")" + " en la comunidad con id: " + group.getGroupId() + " (" + group.getName() + ")");
+								}else{
+									if(group.getType()==GroupConstants.TYPE_SITE_RESTRICTED){
+										if(!MembershipRequestLocalServiceUtil.hasMembershipRequest(userId, group.getGroupId(), MembershipRequestConstants.STATUS_PENDING)){
+											MembershipRequestLocalServiceUtil.addMembershipRequest(userId, group.getGroupId(), "Enroll petition", serviceContext);
+											SocialActivityLocalServiceUtil.addActivity(userId, group.getGroupId(), Group.class.getName(), group.getGroupId(), com.liferay.portlet.social.model.SocialActivityConstants.TYPE_SUBSCRIBE, "", userId);
+											log.debug("Lanzamos peticion de inscripcion del usuario " + userId + " en la comunidad con id: " + group.getGroupId() + " (" + group.getName() + ")");
+											result="warning-restricted-course";
+										}
+									}else{
+										if(group.getType()==GroupConstants.TYPE_SITE_PRIVATE){
+											log.debug("Curso privado, no se pueden inscribir usuarios");
+											result="error-private-course";
+										}
+									}
+								}
+							}else{
+								log.debug("El curso esta completo, el maximo numero de inscripciones ha sido alcanzado");
+								result = "error-complete-course";
+							}
+						}else{
+							log.debug("El usuario no tiene las competencias necesarias del curso");
+							result = "error-competences";						}
+					}else{
+						log.debug("El curso " + courseId + " se encuentra cerrado.");
+						log.debug("Fecha Incicio " + course.getStartDate());
+						log.debug("Fecha Fin " + course.getEndDate());
+						result =  "error-course-closed";
+					}
+				}else{
+					log.debug("el usuario: " + userId + ", ya pertenece al curso: " + courseId);
+					result="error-user-suscribed";
+				}
+			}else{
+				log.debug("Usuario no valido, userId: " + userId);
+				result="error-not-valid-user";
+			}
+		}catch (PortalException e){
+			e.printStackTrace();
+		}catch (SystemException e){
+			e.printStackTrace();
+		}
+		return result;
+	}
+	
+	
+	
+	
 }
 
 

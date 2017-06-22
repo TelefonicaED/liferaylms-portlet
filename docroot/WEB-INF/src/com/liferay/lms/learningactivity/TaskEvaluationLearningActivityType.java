@@ -52,4 +52,8 @@ public class TaskEvaluationLearningActivityType extends BaseLearningActivityType
 		return PORTLET_ID;
 	}
 
+	@Override
+	public boolean canBeLinked(){
+		return true;
+	}
 }

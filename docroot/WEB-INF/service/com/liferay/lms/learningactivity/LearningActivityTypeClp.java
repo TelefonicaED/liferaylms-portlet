@@ -661,6 +661,26 @@ public class LearningActivityTypeClp implements LearningActivityType {
 		return ((Boolean)returnObj);
 	}
 
+	
+	@Override
+	public boolean canBeLinked() {
+		
+		Object returnObj = null;
+		try {
+			returnObj = clp.invoke("canBeLinked", new Object[] {});
+		}catch (Throwable t) {
+			t = ClpSerializer.translateThrowable(t);
+			if (t instanceof RuntimeException) {
+				throw (RuntimeException)t;
+	}
+			else {
+				throw new RuntimeException(t.getClass().getName() + " is not a valid exception");
+			}
+		}
+		
+		return ((Boolean)returnObj);
+	}
+	
 	@Override
 	public boolean isDone(LearningActivity learningActivity, long userId)
 			throws SystemException, PortalException {

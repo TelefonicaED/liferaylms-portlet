@@ -58,6 +58,7 @@ public class LearningActivitySoap implements Serializable {
 		soapModel.setFeedbackNoCorrect(model.getFeedbackNoCorrect());
 		soapModel.setWeightinmodule(model.getWeightinmodule());
 		soapModel.setCommentsActivated(model.getCommentsActivated());
+		soapModel.setLinkedActivityId(model.getLinkedActivityId());
 
 		return soapModel;
 	}
@@ -332,6 +333,14 @@ public class LearningActivitySoap implements Serializable {
 		_commentsActivated = commentsActivated;
 	}
 
+	public long getLinkedActivityId() {
+		return _linkedActivityId;
+	}
+
+	public void setLinkedActivityId(long linkedActivityId) {
+		_linkedActivityId = linkedActivityId;
+	}
+
 	private String _uuid;
 	private long _actId;
 	private long _companyId;
@@ -359,4 +368,5 @@ public class LearningActivitySoap implements Serializable {
 	private String _feedbackNoCorrect;
 	private long _weightinmodule;
 	private boolean _commentsActivated;
+	private long _linkedActivityId;
 }

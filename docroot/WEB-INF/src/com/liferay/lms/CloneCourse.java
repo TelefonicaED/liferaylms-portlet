@@ -84,6 +84,8 @@ import com.liferay.portlet.documentlibrary.service.DLFileEntryLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.service.DLFolderLocalServiceUtil;
 import com.liferay.portlet.messageboards.model.MBCategory;
 import com.liferay.portlet.messageboards.service.MBCategoryLocalServiceUtil;
+import com.liferay.util.CourseCopyUtil;
+import com.tls.lms.util.DLFolderUtil;
 
 public class CloneCourse implements MessageListener {
 	private static Log log = LogFactoryUtil.getLog(CloneCourse.class);
@@ -651,7 +653,7 @@ public class CloneCourse implements MessageListener {
 									serviceContext.setCompanyId(file.getCompanyId());
 									serviceContext.setAddGroupPermissions(true);
 									
-									FileEntry newFile = cloneFileDescription(file, actId, file.getUserId(), serviceContext);
+									FileEntry newFile = CourseCopyUtil.cloneFileDescription(file, actId, file.getUserId(), serviceContext);
 									
 									newDescription = descriptionCloneFile(newDescription, file, newFile);
 									
@@ -693,7 +695,7 @@ public class CloneCourse implements MessageListener {
 									serviceContext.setCompanyId(file.getCompanyId());
 									serviceContext.setAddGroupPermissions(true);
 									
-									FileEntry newFile = cloneFileDescription(file, actId, file.getUserId(), serviceContext);
+									FileEntry newFile = CourseCopyUtil.cloneFileDescription(file, actId, file.getUserId(), serviceContext);
 									
 									newDescription = descriptionCloneFile(newDescription, file, newFile);
 									
@@ -707,9 +709,9 @@ public class CloneCourse implements MessageListener {
 							}
 							
 							//Si en los enlaces tienen una imagen para hacer click.
-							for (Element entryElementLinkImage : entryElementLink.elements("img")) {
+							/*for (Element entryElementLinkImage : entryElementLink.elements("img")) {
 								;//parseImage(entryElementLinkImage, element, context, moduleId);
-							}
+							}*/
 							
 						}
 					}
@@ -745,7 +747,7 @@ public class CloneCourse implements MessageListener {
 								serviceContext.setCompanyId(file.getCompanyId());
 								serviceContext.setAddGroupPermissions(true);
 								
-								FileEntry newFile = cloneFileDescription(file, actId, file.getUserId(), serviceContext);
+								FileEntry newFile = CourseCopyUtil.cloneFileDescription(file, actId, file.getUserId(), serviceContext);
 								
 								newDescription = descriptionCloneFile(newDescription, file, newFile);
 								
@@ -787,7 +789,7 @@ public class CloneCourse implements MessageListener {
 								serviceContext.setCompanyId(file.getCompanyId());
 								serviceContext.setAddGroupPermissions(true);
 								
-								FileEntry newFile = cloneFileDescription(file, actId, file.getUserId(), serviceContext);
+								FileEntry newFile = CourseCopyUtil.cloneFileDescription(file, actId, file.getUserId(), serviceContext);
 								
 								newDescription = descriptionCloneFile(newDescription, file, newFile);
 								
@@ -1012,7 +1014,7 @@ public class CloneCourse implements MessageListener {
 			InputStream is = DLFileEntryLocalServiceUtil.getFileAsStream(userId, docfile.getFileEntryId(), docfile.getVersion());
 			
 			//Crear el folder
-			DLFolder dlFolder = createDLFoldersForLearningActivity(userId, serviceContext.getScopeGroupId(), actNew.getActId(), actNew.getTitle(Locale.getDefault()), serviceContext);
+			DLFolder dlFolder = DLFolderUtil.createDLFoldersForLearningActivity(userId, serviceContext.getScopeGroupId(), serviceContext);
 
 			long repositoryId = DLFolderConstants.getDataRepositoryId(actNew.getGroupId(), DLFolderConstants.DEFAULT_PARENT_FOLDER_ID);
 			
@@ -1045,88 +1047,6 @@ public class CloneCourse implements MessageListener {
 		return assetEntryId;
 	}
 	
-	private FileEntry cloneFileDescription(FileEntry file, long actId, long userId, ServiceContext serviceContext){
-		
-		long folderId = 0;
-		
-		try {
-			
-			InputStream is = DLFileEntryLocalServiceUtil.getFileAsStream(userId, file.getFileEntryId(), file.getVersion());
-			
-			//Crear el folder
-			DLFolder dlFolder = createDLFoldersForLearningActivity(userId, serviceContext.getScopeGroupId(), actId, String.valueOf(actId), serviceContext);
-			folderId = dlFolder.getFolderId();
-			
-			//long repId = DLFolderConstants.getDataRepositoryId(file.getGroupId(), DLFolderConstants.DEFAULT_PARENT_FOLDER_ID);
-			long repositoryId = DLFolderConstants.getDataRepositoryId(serviceContext.getScopeGroupId(), DLFolderConstants.DEFAULT_PARENT_FOLDER_ID);
-			
-			String ficheroStr = file.getTitle();	
-			if(!file.getTitle().endsWith(file.getExtension())){
-				ficheroStr = ficheroStr +"."+ file.getExtension();
-			}
-			return  DLAppLocalServiceUtil.addFileEntry(
-					serviceContext.getUserId(), repositoryId , folderId , ficheroStr, file.getMimeType(), 
-					file.getTitle(), StringPool.BLANK, StringPool.BLANK, is, file.getSize() , serviceContext ) ;
-			
-			
-		}catch(DuplicateFileException dfl){
-			
-			try{
-				
-				return DLAppLocalServiceUtil.getFileEntry(serviceContext.getScopeGroupId(), folderId, file.getTitle());
-				
-			}catch(Exception e){
-				e.printStackTrace();
-			}
-			
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		return null;
-	}
-	
-	private DLFolder getMainDLFolder(Long userId, Long groupId, ServiceContext serviceContext) throws PortalException, SystemException{
-
-		DLFolder mainFolder = null;
-		boolean addGroupPermissions = serviceContext.isAddGroupPermissions();
-		try {
-
-			mainFolder = DLFolderLocalServiceUtil.getFolder(groupId,0,"ResourceUploads");
-
-        } catch (Exception ex){
-
-        	long repositoryId = DLFolderConstants.getDataRepositoryId(groupId, DLFolderConstants.DEFAULT_PARENT_FOLDER_ID);
-        	//mountPoint -> Si es carpeta raiz.
-        	serviceContext.setAddGroupPermissions(true);
-        	mainFolder = DLFolderLocalServiceUtil.addFolder(userId, groupId, repositoryId, false, 0, "ResourceUploads", "ResourceUploads", serviceContext);
-        } finally {
-        	serviceContext.setAddGroupPermissions(addGroupPermissions);
-        }
-  
-        return mainFolder;
-	}
-	
-	private DLFolder createDLFoldersForLearningActivity(Long userId, Long groupId, Long actId, String title, ServiceContext serviceContext) throws PortalException, SystemException{
-		
-		DLFolder newDLFolder = null;
-		
-		try {
-
-			DLFolder dlMainFolder = getMainDLFolder(userId, groupId, serviceContext);
-			
-			//A partir de ahora, guardamos los ficheros en el "Resource Uploads".
-			return dlMainFolder;
-			
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			//e.printStackTrace();
-			log.error("* ERROR! createDLFoldersForLearningActivity: " + e.getMessage());
-		}
-		
-    	return newDLFolder;
-	}
 	
 	private void sendNotification(String title, String content, String url, String type, int priority){
 		

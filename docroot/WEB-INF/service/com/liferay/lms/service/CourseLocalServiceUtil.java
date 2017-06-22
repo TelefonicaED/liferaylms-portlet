@@ -557,6 +557,26 @@ public class CourseLocalServiceUtil {
 			andOperator);
 	}
 
+	public static java.util.List<com.liferay.lms.model.Course> getParentCoursesByTitleStatusCategoriesTags(
+		java.lang.String freeText, int status, long[] categories, long[] tags,
+		long companyId, long groupId, long userId, java.lang.String language,
+		boolean isAdmin, boolean andOperator, int start, int end) {
+		return getService()
+				   .getParentCoursesByTitleStatusCategoriesTags(freeText,
+			status, categories, tags, companyId, groupId, userId, language,
+			isAdmin, andOperator, start, end);
+	}
+
+	public static int countParentCoursesByTitleStatusCategoriesTags(
+		java.lang.String freeText, int status, long[] categories, long[] tags,
+		long companyId, long groupId, long userId, java.lang.String language,
+		boolean isAdmin, boolean andOperator) {
+		return getService()
+				   .countParentCoursesByTitleStatusCategoriesTags(freeText,
+			status, categories, tags, companyId, groupId, userId, language,
+			isAdmin, andOperator);
+	}
+
 	public static java.util.List<com.liferay.portal.model.User> getStudents(
 		long courseId, long companyId, java.lang.String screenName,
 		java.lang.String firstName, java.lang.String lastName,
@@ -656,6 +676,15 @@ public class CourseLocalServiceUtil {
 		return getService().getChildCourses(courseId);
 	}
 
+	public static java.util.List<com.liferay.lms.model.Course> getChildCourses(
+		long courseId, int start, int end) {
+		return getService().getChildCourses(courseId, start, end);
+	}
+
+	public static int countChildCourses(long courseId) {
+		return getService().countChildCourses(courseId);
+	}
+
 	public static java.util.List<com.liferay.lms.model.Course> getCoursesParents(
 		long groupId)
 		throws com.liferay.portal.kernel.exception.SystemException {
@@ -720,7 +749,7 @@ public class CourseLocalServiceUtil {
 	}
 
 	/**
-	* Returns the last module date in course, because the course end date is for enrollments.
+	* Returns the first module date in course, because the course end date is for enrollments.
 	*
 	* @param courseId Course Identifier
 	* @return Course last module date.
@@ -733,6 +762,25 @@ public class CourseLocalServiceUtil {
 		com.liferay.lms.model.Course course,
 		com.liferay.portal.theme.ThemeDisplay themeDisplay) {
 		return getService().getImageURL(course, themeDisplay);
+	}
+
+	/**
+	* Service that validates the course inscription as it is validated in web.
+	*
+	* @param courseId
+	* @param userId
+	* @return ok or error and the error description.
+	* @throws PortalException
+	* @throws SystemException
+	*/
+	public static java.lang.String addStudentToCourseByUserId(long courseId,
+		long userId, long teamId,
+		com.liferay.portal.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getService()
+				   .addStudentToCourseByUserId(courseId, userId, teamId,
+			serviceContext);
 	}
 
 	public static void clearService() {

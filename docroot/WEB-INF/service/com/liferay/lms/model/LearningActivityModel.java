@@ -660,6 +660,20 @@ public interface LearningActivityModel extends BaseModel<LearningActivity>,
 	public void setCommentsActivated(boolean commentsActivated);
 
 	/**
+	 * Returns the linked activity ID of this learning activity.
+	 *
+	 * @return the linked activity ID of this learning activity
+	 */
+	public long getLinkedActivityId();
+
+	/**
+	 * Sets the linked activity ID of this learning activity.
+	 *
+	 * @param linkedActivityId the linked activity ID of this learning activity
+	 */
+	public void setLinkedActivityId(long linkedActivityId);
+
+	/**
 	 * @deprecated Renamed to {@link #isApproved()}
 	 */
 	public boolean getApproved();

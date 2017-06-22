@@ -138,7 +138,8 @@ create table Lms_LearningActivity (
 	feedbackCorrect VARCHAR(1000) null,
 	feedbackNoCorrect VARCHAR(1000) null,
 	weightinmodule LONG,
-	commentsActivated BOOLEAN
+	commentsActivated BOOLEAN,
+	linkedActivityId LONG
 );
 
 create table Lms_LearningActivityResult (

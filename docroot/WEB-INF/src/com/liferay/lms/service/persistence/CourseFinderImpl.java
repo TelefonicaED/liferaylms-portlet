@@ -144,9 +144,13 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 	public static final String WHERE_TITLE_DESCRIPTION_CATEGORIES_TAGS_OR =
 			 CourseFinder.class.getName() + 
 			 	".whereC_BytTitleDescriptionCategoriesTagsOR";	
+	public static final String WHERE_PARENT_COURSE =
+			 CourseFinder.class.getName() +
+				".whereParentCourse";
+	
 	
 	@SuppressWarnings("unchecked")
-	public List<Course> findByT_S_C_T(String freeText, int status, long[] categories, long[] tags, long companyId, long groupId, long userId, String language, boolean isAdmin, boolean andOperator, int start, int end){
+	public List<Course> findByT_S_C_T(String freeText, int status, long[] categories, long[] tags, long companyId, long groupId, long userId, String language, boolean isAdmin, boolean searchParentCourses, boolean andOperator, int start, int end){
 		Session session = null;
 		
 		try{
@@ -169,6 +173,8 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			sql = replaceTag(sql, tags);
 
 			sql = replaceResourcePermission(sql, isAdmin, companyId, userId);
+			
+			sql = replaceSearchParentCourse(sql, searchParentCourses);
 
 			if(start < 0 && end < 0){
 				sql = sql.replace("LIMIT [$START$], [$END$]", "");
@@ -206,7 +212,16 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 	    return new ArrayList<Course>();
 	}
 	
-	
+	private String replaceSearchParentCourse(String sql, boolean searchParentCourse) {
+		/** Sustituimos los tags si buscamos por ellos queda preparado para buscar por = en vez de por IN**/
+		if(searchParentCourse){
+			
+			sql = sql.replace("[$WHEREPARENTCOURSE$]", CustomSQLUtil.get(WHERE_PARENT_COURSE));
+		}else{
+			sql = sql.replace("[$WHEREPARENTCOURSE$]", "");
+		}
+		return sql;
+	}
 	
 	
 	private String replaceWhereTitleDescriptionCategoriesTags(String sql, String freeText, int status, long[] categories, long[] tags, boolean andOperator) {
@@ -337,7 +352,7 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 
 	
 	
-	public int countByT_S_C_T(String freeText, int status, long[] categories, long[] tags, long companyId, long groupId, long userId, String language, boolean isAdmin, boolean andOperator){
+	public int countByT_S_C_T(String freeText, int status, long[] categories, long[] tags, long companyId, long groupId, long userId, String language, boolean isAdmin, boolean searchParentCourses, boolean andOperator){
 		Session session = null;
 		
 		try{
@@ -359,6 +374,8 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			sql = replaceTag(sql, tags);
 			
 			sql = replaceResourcePermission(sql, isAdmin, companyId, userId);
+			
+			sql = replaceSearchParentCourse(sql, searchParentCourses);
 			
 			if(log.isDebugEnabled()){
 				log.debug("sql: " + sql);

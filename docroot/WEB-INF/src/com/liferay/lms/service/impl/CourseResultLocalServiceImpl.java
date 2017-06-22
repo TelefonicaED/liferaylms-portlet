@@ -19,6 +19,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import org.jfree.util.Log;
+
 import com.liferay.lms.course.diploma.CourseDiploma;
 import com.liferay.lms.course.diploma.CourseDiplomaRegistry;
 import com.liferay.lms.learningactivity.calificationtype.CalificationType;
@@ -473,8 +475,10 @@ public class CourseResultLocalServiceImpl
 			
 			//Actualizamos los diplomas externos (si los hay)
 			CourseDiplomaRegistry cdr=new CourseDiplomaRegistry();
+			Log.debug("CourseDiplomaRegistry "+cdr);
 			if(cdr!=null){
 				CourseDiploma courseDiploma = cdr.getCourseDiploma();
+				Log.debug("courseDiploma "+courseDiploma);
 				if(courseDiploma!=null){
 					courseDiploma.updateUserDiploma(cresult.getCrId());
 				}

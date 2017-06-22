@@ -172,6 +172,7 @@
 		<property name="feedbackNoCorrect" type="com.liferay.portal.dao.orm.hibernate.StringType" />
 		<property name="weightinmodule" type="com.liferay.portal.dao.orm.hibernate.LongType" />
 		<property name="commentsActivated" type="com.liferay.portal.dao.orm.hibernate.BooleanType" />
+		<property name="linkedActivityId" type="com.liferay.portal.dao.orm.hibernate.LongType" />
 	</class>
 	<class name="com.liferay.lms.model.impl.LearningActivityResultImpl" table="Lms_LearningActivityResult">
 		<id name="larId" type="long">

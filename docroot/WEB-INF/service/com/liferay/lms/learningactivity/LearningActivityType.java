@@ -48,7 +48,7 @@ public interface LearningActivityType extends InvokableService
 	public String getPortletId();
 	public void deleteResources(ActionRequest actionRequest,ActionResponse actionResponse,LearningActivity larn) throws PortalException,SystemException,DocumentException,IOException;
 	public boolean isAutoCorrect();
-	
 	public String importExtraContent(LearningActivity newLarn, Long userId, PortletDataContext context, ServiceContext serviceContext, Element actElement) throws PortalException, IOException, DocumentException, SystemException;
 	public String addZipEntry(LearningActivity actividad, Long assetEntryId, PortletDataContext context, Element entryElementLoc) throws PortalException, SystemException;
+	public boolean canBeLinked();
 }

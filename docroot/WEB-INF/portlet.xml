@@ -945,6 +945,14 @@
 			<name>config-lms-prefs</name>
 			<value>/html/courseadmin/configlmsprefs.jsp</value>
 		</init-param>
+		<init-param>
+			<name>editions-template</name>
+			<value>/html/courseadmin/editions.jsp</value>
+		</init-param>
+		<init-param>
+			<name>new-edition-template</name>
+			<value>/html/courseadmin/newedition.jsp</value>
+		</init-param>
 		<expiration-cache>0</expiration-cache>
 		<supports>
 			<mime-type>text/html</mime-type>

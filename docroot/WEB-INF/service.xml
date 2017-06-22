@@ -33,8 +33,6 @@
 		<column name="enddate" type="Date" />
 		<column name="precedence" type="long" />
 
-
-		<!-- Order -->
 		<column name="tries" type="long" convert-null="false"></column>
 		<column name="passpuntuation" type="int"></column>
 		<column name="priority" type="long"></column>
@@ -44,6 +42,9 @@
 		<column name="feedbackNoCorrect" type="String"></column>
 		<column name="weightinmodule" type="long"></column>
 		<column name="commentsActivated" type="boolean"></column>
+		<column name="linkedActivityId" type="long"></column>
+		
+		<!-- Order -->
 		<order by="asc">
 			<order-column name="moduleId" />
 			<order-column name="priority" />

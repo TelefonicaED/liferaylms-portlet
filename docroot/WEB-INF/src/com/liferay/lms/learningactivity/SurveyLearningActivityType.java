@@ -109,4 +109,11 @@ public class SurveyLearningActivityType extends BaseLearningActivityType {
 	public boolean hasDeleteTries() {
 		return true;
 	}
+	
+	
+	@Override
+	public boolean canBeLinked(){
+		return true;
+	}
+	
 }

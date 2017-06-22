@@ -127,4 +127,9 @@ public class TaskOfflineLearningActivityType extends BaseLearningActivityType {
 	public boolean isAutoCorrect() {
 		return false;
 	}
+	
+	@Override
+	public boolean canBeLinked(){
+		return false;
+	}
 }

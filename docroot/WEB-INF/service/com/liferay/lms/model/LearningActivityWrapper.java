@@ -73,6 +73,7 @@ public class LearningActivityWrapper implements LearningActivity,
 		attributes.put("feedbackNoCorrect", getFeedbackNoCorrect());
 		attributes.put("weightinmodule", getWeightinmodule());
 		attributes.put("commentsActivated", getCommentsActivated());
+		attributes.put("linkedActivityId", getLinkedActivityId());
 
 		return attributes;
 	}
@@ -238,6 +239,12 @@ public class LearningActivityWrapper implements LearningActivity,
 
 		if (commentsActivated != null) {
 			setCommentsActivated(commentsActivated);
+		}
+
+		Long linkedActivityId = (Long)attributes.get("linkedActivityId");
+
+		if (linkedActivityId != null) {
+			setLinkedActivityId(linkedActivityId);
 		}
 	}
 
@@ -1010,6 +1017,24 @@ public class LearningActivityWrapper implements LearningActivity,
 	*/
 	public void setCommentsActivated(boolean commentsActivated) {
 		_learningActivity.setCommentsActivated(commentsActivated);
+	}
+
+	/**
+	* Returns the linked activity ID of this learning activity.
+	*
+	* @return the linked activity ID of this learning activity
+	*/
+	public long getLinkedActivityId() {
+		return _learningActivity.getLinkedActivityId();
+	}
+
+	/**
+	* Sets the linked activity ID of this learning activity.
+	*
+	* @param linkedActivityId the linked activity ID of this learning activity
+	*/
+	public void setLinkedActivityId(long linkedActivityId) {
+		_learningActivity.setLinkedActivityId(linkedActivityId);
 	}
 
 	/**

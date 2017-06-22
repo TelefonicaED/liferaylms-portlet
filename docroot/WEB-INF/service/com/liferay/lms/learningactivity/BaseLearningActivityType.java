@@ -187,6 +187,11 @@ public abstract class BaseLearningActivityType implements LearningActivityType, 
 	}
 	
 	@Override
+	public boolean canBeLinked(){
+		return false;
+	}
+	
+	@Override
 	public String addZipEntry(LearningActivity actividad, Long assetEntryId,PortletDataContext context, Element entryElementLoc)
 			throws PortalException, SystemException {
 		

@@ -102,6 +102,7 @@ public class LearningActivityClp extends BaseModelImpl<LearningActivity>
 		attributes.put("feedbackNoCorrect", getFeedbackNoCorrect());
 		attributes.put("weightinmodule", getWeightinmodule());
 		attributes.put("commentsActivated", getCommentsActivated());
+		attributes.put("linkedActivityId", getLinkedActivityId());
 
 		return attributes;
 	}
@@ -268,6 +269,12 @@ public class LearningActivityClp extends BaseModelImpl<LearningActivity>
 
 		if (commentsActivated != null) {
 			setCommentsActivated(commentsActivated);
+		}
+
+		Long linkedActivityId = (Long)attributes.get("linkedActivityId");
+
+		if (linkedActivityId != null) {
+			setLinkedActivityId(linkedActivityId);
 		}
 	}
 
@@ -695,6 +702,14 @@ public class LearningActivityClp extends BaseModelImpl<LearningActivity>
 		_commentsActivated = commentsActivated;
 	}
 
+	public long getLinkedActivityId() {
+		return _linkedActivityId;
+	}
+
+	public void setLinkedActivityId(long linkedActivityId) {
+		_linkedActivityId = linkedActivityId;
+	}
+
 	public boolean isNullStartDate() {
 		throw new UnsupportedOperationException();
 	}
@@ -888,6 +903,7 @@ public class LearningActivityClp extends BaseModelImpl<LearningActivity>
 		clone.setFeedbackNoCorrect(getFeedbackNoCorrect());
 		clone.setWeightinmodule(getWeightinmodule());
 		clone.setCommentsActivated(getCommentsActivated());
+		clone.setLinkedActivityId(getLinkedActivityId());
 
 		return clone;
 	}
@@ -958,7 +974,7 @@ public class LearningActivityClp extends BaseModelImpl<LearningActivity>
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(55);
+		StringBundler sb = new StringBundler(57);
 
 		sb.append("{uuid=");
 		sb.append(getUuid());
@@ -1014,13 +1030,15 @@ public class LearningActivityClp extends BaseModelImpl<LearningActivity>
 		sb.append(getWeightinmodule());
 		sb.append(", commentsActivated=");
 		sb.append(getCommentsActivated());
+		sb.append(", linkedActivityId=");
+		sb.append(getLinkedActivityId());
 		sb.append("}");
 
 		return sb.toString();
 	}
 
 	public String toXmlString() {
-		StringBundler sb = new StringBundler(85);
+		StringBundler sb = new StringBundler(88);
 
 		sb.append("<model><model-name>");
 		sb.append("com.liferay.lms.model.LearningActivity");
@@ -1134,6 +1152,10 @@ public class LearningActivityClp extends BaseModelImpl<LearningActivity>
 			"<column><column-name>commentsActivated</column-name><column-value><![CDATA[");
 		sb.append(getCommentsActivated());
 		sb.append("]]></column-value></column>");
+		sb.append(
+			"<column><column-name>linkedActivityId</column-name><column-value><![CDATA[");
+		sb.append(getLinkedActivityId());
+		sb.append("]]></column-value></column>");
 
 		sb.append("</model>");
 
@@ -1171,5 +1193,6 @@ public class LearningActivityClp extends BaseModelImpl<LearningActivity>
 	private String _feedbackNoCorrect;
 	private long _weightinmodule;
 	private boolean _commentsActivated;
+	private long _linkedActivityId;
 	private BaseModel<?> _learningActivityRemoteModel;
 }

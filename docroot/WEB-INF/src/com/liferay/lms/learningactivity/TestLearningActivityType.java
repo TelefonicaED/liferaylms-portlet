@@ -279,4 +279,9 @@ public class TestLearningActivityType extends BaseLearningActivityType
 		return true;
 	}
 	
+	@Override
+	public boolean canBeLinked(){
+		return true;
+	}
+	
 }

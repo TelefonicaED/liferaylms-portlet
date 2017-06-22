@@ -165,55 +165,28 @@ public class CommunityInscription extends MVCPortlet {
 		if (!themeDisplay.isSignedIn()) {return;}
 
 		long teamId = ParamUtil.getLong(request, "teamId",0);
-		
-		long[] groupId = new long[1];
-    	groupId[0] = themeDisplay.getScopeGroupId();	
+		long groupId = themeDisplay.getScopeGroupId();	
     	
-    	Group group = GroupLocalServiceUtil.getGroup(groupId[0]);
-    	Course course = CourseLocalServiceUtil.getCourseByGroupCreatedId(groupId[0]);
+    	Course course = CourseLocalServiceUtil.getCourseByGroupCreatedId(groupId);
     	
     	log.debug("COURSE GROUP ID "+course.getGroupCreatedId());
-    	log.debug("THEME DISPLAY GROUP "+groupId[0]);
-    	int numberUsers = UserLocalServiceUtil.getGroupUsersCount(groupId[0]);
-    	if(course.getMaxusers()>0&&numberUsers>=course.getMaxusers()){
-    		SessionErrors.add(request, "inscription-error-max-users");
-    	}else{
-    		if(group.getType()==GroupConstants.TYPE_SITE_PRIVATE){
-        		SessionErrors.add(request, "inscription-error-syte-restricted");
-        	}else{
-        		long userId = themeDisplay.getUserId();
-            	if (!GroupLocalServiceUtil.hasUserGroup(userId, course.getGroupCreatedId())) {
-            		
-            		if(teamId>0){
-            			long[] userIds = new long[1];
-            			userIds[0] = userId;	
-            			if(!UserLocalServiceUtil.hasTeamUser(teamId, themeDisplay.getUserId())){
-            				UserLocalServiceUtil.addTeamUsers(teamId, userIds);	
-            			}			
-            		}
-            		
-            		
-        	    	GroupLocalServiceUtil.addUserGroups(userId, groupId);
-        			SocialActivityLocalServiceUtil.addActivity(userId, course.getGroupId(), Course.class.getName(), course.getCourseId(), com.liferay.portlet.social.model.SocialActivityConstants.TYPE_SUBSCRIBE, "", course.getUserId());
-        			// Informamos que se ha inscrito.
-        		
-        			if(log.isDebugEnabled()){
-            			Date hoy = new Date();
-            			String userName = ""+userId;
-            			String groupName = ""+groupId[0];
-            			try {
-            				userName = userId + "[" + UserLocalServiceUtil.getUser(userId).getFullName() + "]";
-            				groupName = groupId[0] + "[" + GroupLocalServiceUtil.getGroup(groupId[0]).getName() + "]";
-            			}
-            			catch (Exception e) {}
-            	    	log.debug("INSCRIBIR: "+userName +" se ha incrito de la comunidad "+groupName+" el "+hoy.toString());
-            	    	
-            		}
-            	
-            	}else{
-            		SessionErrors.add(request, "inscription-error-already-enrolled");
-            	}        		
-        	}
+    	log.debug("THEME DISPLAY GROUP "+groupId);
+    	long userId = themeDisplay.getUserId();
+    	
+    	ServiceContext serviceContext=ServiceContextFactory.getInstance(request);
+    	
+    	String result = CourseLocalServiceUtil.addStudentToCourseByUserId(course.getCourseId(), userId, teamId, serviceContext);
+    	
+    	if(!result.equalsIgnoreCase("ok")){
+    		if(result.equalsIgnoreCase("error-complete-course")){
+    			SessionErrors.add(request, "inscription-error-max-users");
+    		}else if(result.equalsIgnoreCase("error-private-course")){
+    			SessionErrors.add(request, "inscription-error-syte-restricted");
+    		}else if(result.equalsIgnoreCase("error-user-suscribed")){
+    			SessionErrors.add(request, "inscription-error-already-enrolled");
+    		}else{
+    			SessionErrors.add(request, "inscription-error");
+    		}
     	}
     }
 	
