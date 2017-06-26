@@ -729,6 +729,31 @@ public class CourseLocalServiceUtil {
 		return getService().getFirstModuleDateInCourse(courseId);
 	}
 
+	public static java.lang.String getImageURL(
+		com.liferay.lms.model.Course course,
+		com.liferay.portal.theme.ThemeDisplay themeDisplay) {
+		return getService().getImageURL(course, themeDisplay);
+	}
+
+	/**
+	* Service that validates the course inscription as it is validated in web.
+	*
+	* @param courseId
+	* @param userId
+	* @return ok or error and the error description.
+	* @throws PortalException
+	* @throws SystemException
+	*/
+	public static java.lang.String addStudentToCourseByUserId(long courseId,
+		long userId, long teamId,
+		com.liferay.portal.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getService()
+				   .addStudentToCourseByUserId(courseId, userId, teamId,
+			serviceContext);
+	}
+
 	public static void clearService() {
 		_service = null;
 	}

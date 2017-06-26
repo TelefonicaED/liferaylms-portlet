@@ -126,12 +126,12 @@ public class ModuleResultLocalServiceImpl extends ModuleResultLocalServiceBaseIm
 		}
 
 		/**
-		 * Devuelve los estudiantes que han comenzado el módulo. Si se tienen ya los ids de los usuarios excluidos (profesores y editores) se
-		 * deberá llamar a countByModuleOnlyStudents(long moduleId, long[] userIds)
+		 * Devuelve los estudiantes que han comenzado el mï¿½dulo. Si se tienen ya los ids de los usuarios excluidos (profesores y editores) se
+		 * deberï¿½ llamar a countByModuleOnlyStudents(long moduleId, long[] userIds)
 		 * @param companyId id del company del curso
 		 * @param courseGroupCreatedId id del group del curso
-		 * @param moduleId id del módulo del que queremos los estudiantes que han comenzado
-		 * @return número de estudiantes que han iniciado el módulo
+		 * @param moduleId id del mï¿½dulo del que queremos los estudiantes que han comenzado
+		 * @return nï¿½mero de estudiantes que han iniciado el mï¿½dulo
 		 * @throws SystemException
 		 */
 		public long countByModuleOnlyStudents(long companyId, long courseGroupCreatedId, long moduleId) throws SystemException{
@@ -141,13 +141,13 @@ public class ModuleResultLocalServiceImpl extends ModuleResultLocalServiceBaseIm
 		}
 
 		/**
-		 * @deprecated Deprecado por eficiencia, se debe llamar a los métodos countByModuleOnlyStudents(long companyId, long courseGroupCreatedId, long moduleId)
+		 * @deprecated Deprecado por eficiencia, se debe llamar a los mï¿½todos countByModuleOnlyStudents(long companyId, long courseGroupCreatedId, long moduleId)
 		 * o countByModuleOnlyStudents(long moduleId ,long[] userIds) ya que se calcula en base a los usuarios excluidos
 		 * @param companyId id del company del curso
 		 * @param courseGroupCreatedId id del group del curso
-		 * @param moduleId  id del módulo del que queremos los estudiantes que han comenzado
-		 * @param _students Lista de estudiantes, si viene vacía se calcula dentro
-		 * @return número de estudiantes que han iniciado el modulo
+		 * @param moduleId  id del mï¿½dulo del que queremos los estudiantes que han comenzado
+		 * @param _students Lista de estudiantes, si viene vacï¿½a se calcula dentro
+		 * @return nï¿½mero de estudiantes que han iniciado el modulo
 		 * @throws SystemException
 		 */
 		@Deprecated
@@ -179,14 +179,14 @@ public class ModuleResultLocalServiceImpl extends ModuleResultLocalServiceBaseIm
 		}
 		
 		/**
-		 * Devuelve los estudiantes que han aprobado o suspendido (en el caso de suspenso no tiene en cuenta que hayan finalizado) el módulo. 
-		 * Si se tienen ya los ids de los usuarios excluidos (profesores y editores) se deberá llamar a 
+		 * Devuelve los estudiantes que han aprobado o suspendido (en el caso de suspenso no tiene en cuenta que hayan finalizado) el mï¿½dulo. 
+		 * Si se tienen ya los ids de los usuarios excluidos (profesores y editores) se deberï¿½ llamar a 
 		 * countByModulePassedOnlyStudents(long moduleId, boolean passed, long[] userIds)
 		 * @param companyId id del company del curso
 		 * @param courseGroupCreatedId id del group del curso
-		 * @param moduleId id del módulo del que queremos los estudiantes que han comenzado
+		 * @param moduleId id del mï¿½dulo del que queremos los estudiantes que han comenzado
 		 * @param passed Si queremos los que han aprobado el modulo o no
-		 * @return número de estudiantes que han aprobado el modulo (en caso de passed = true) o de los que lo han suspendido o todavía no lo han termiando (passed = false)
+		 * @return nï¿½mero de estudiantes que han aprobado el modulo (en caso de passed = true) o de los que lo han suspendido o todavï¿½a no lo han termiando (passed = false)
 		 * @throws SystemException
 		 */
 		public long countByModulePassedOnlyStudents(long companyId, long courseGroupCreatedId, long moduleId, boolean passed) throws SystemException {
@@ -197,14 +197,14 @@ public class ModuleResultLocalServiceImpl extends ModuleResultLocalServiceBaseIm
 		}
 		
 		/**
-		 * @deprecated Deprecado por eficiencia, se debe llamar a los métodos countByModulePassedOnlyStudents(long companyId, long courseGroupCreatedId, long moduleId, boolean passed)
+		 * @deprecated Deprecado por eficiencia, se debe llamar a los mï¿½todos countByModulePassedOnlyStudents(long companyId, long courseGroupCreatedId, long moduleId, boolean passed)
 		 * o countByModulePassedOnlyStudents(long moduleId, boolean passed, long[] userIds) ya que se calcula en base a los usuarios excluidos
 		 * @param companyId id del company del curso
 		 * @param courseGroupCreatedId id del group del curso
-		 * @param moduleId  id del módulo del que queremos los estudiantes
+		 * @param moduleId  id del mï¿½dulo del que queremos los estudiantes
 		 * @param passed Si queremos los que han aprobado el modulo o no
-		 * @param _students Lista de estudiantes, si viene vacía se calcula dentro
-		 * @return número de estudiantes que han aprobado el curso (en caso de passed = true) o de los que lo han suspendido o todavía no lo han termiando (passed = false)
+		 * @param _students Lista de estudiantes, si viene vacï¿½a se calcula dentro
+		 * @return nï¿½mero de estudiantes que han aprobado el curso (en caso de passed = true) o de los que lo han suspendido o todavï¿½a no lo han termiando (passed = false)
 		 * @throws SystemException
 		 */
 		@Deprecated
@@ -229,11 +229,11 @@ public class ModuleResultLocalServiceImpl extends ModuleResultLocalServiceBaseIm
 		}
 		
 		/**
-		 * Devuelve los estudiantes que han aprobado o suspendido (en el caso de suspenso no tiene en cuenta que hayan finalizado o no) el módulo. 
-		 * @param moduleId id del módulo del que queremos los estudiantes
+		 * Devuelve los estudiantes que han aprobado o suspendido (en el caso de suspenso no tiene en cuenta que hayan finalizado o no) el mï¿½dulo. 
+		 * @param moduleId id del mï¿½dulo del que queremos los estudiantes
 		 * @param passed Si queremos los que han aprobado el modulo o no
 		 * @param userExcludedIds ids de usuarios excluidos (profesores y editores) 
-		 * @return número de estudiantes que han aprobado el modulo (en caso de passed = true) o de los que lo han suspendido o todavía no lo han termiando (passed = false)
+		 * @return nï¿½mero de estudiantes que han aprobado el modulo (en caso de passed = true) o de los que lo han suspendido o todavï¿½a no lo han termiando (passed = false)
 		 * @throws SystemException
 		 */
 		public int countByModulePassedOnlyStudents(long moduleId, boolean passed, long[] userExcludedIds) throws SystemException{
@@ -246,9 +246,9 @@ public class ModuleResultLocalServiceImpl extends ModuleResultLocalServiceBaseIm
 		
 		/**
 		 * Cuenta los estudiantes que han iniciado el modulo: solo llamar si se tiene la lista de usuarios excluidos
-		 * @param moduleId id del módulo
+		 * @param moduleId id del mï¿½dulo
 		 * @param userExcludedIds ids de usuarios excluidos (profesores y editores)
-		 * @return número de estudiantes que han comenzado el modulo
+		 * @return nï¿½mero de estudiantes que han comenzado el modulo
 		 * @throws SystemException
 		 */
 		public int countStudentsByModuleIdUserExcludedIdsStarted(long moduleId, long[] userExcludedIds) throws SystemException{
@@ -263,9 +263,9 @@ public class ModuleResultLocalServiceImpl extends ModuleResultLocalServiceBaseIm
 		
 		/**
 		 * Cuenta los estudiantes que han finalizado el modulo: solo llamar si se tiene la lista de usuarios excluidos
-		 * @param moduleId id del módulo
+		 * @param moduleId id del mï¿½dulo
 		 * @param userExcludedIds ids de usuarios excluidos (profesores y editores)
-		 * @return número de estudiantes que han finalizado el módulo
+		 * @return nï¿½mero de estudiantes que han finalizado el mï¿½dulo
 		 * @throws SystemException
 		 */
 		
@@ -279,11 +279,11 @@ public class ModuleResultLocalServiceImpl extends ModuleResultLocalServiceBaseIm
 		}
 		
 		/**
-		 * Cuenta los estudiantes que han iniciado el modulo, esta función está pensada para pasar una lista de estudiantes filtrada
+		 * Cuenta los estudiantes que han iniciado el modulo, esta funciï¿½n estï¿½ pensada para pasar una lista de estudiantes filtrada
 		 * (por ejemplo para los equipos) para pedir de todos los estudiantes usar countStudentsByModuleIdUserExcludedIdsStarted
-		 * @param moduleId id del módulo
+		 * @param moduleId id del mï¿½dulo
 		 * @param userIds ids de los usuarios filtrados
-		 * @return número de estudiantes que han comenzado el modulo
+		 * @return nï¿½mero de estudiantes que han comenzado el modulo
 		 * @throws SystemException
 		 */
 		public int countStudentsByModuleIdUserIdsStarted(long moduleId, long[] userIds) throws SystemException{
@@ -297,11 +297,11 @@ public class ModuleResultLocalServiceImpl extends ModuleResultLocalServiceBaseIm
 		}
 		
 		/**
-		 * Cuenta los estudiantes que han finalizado el modulo, esta función está pensada para pasar una lista de estudiantes filtrada
+		 * Cuenta los estudiantes que han finalizado el modulo, esta funciï¿½n estï¿½ pensada para pasar una lista de estudiantes filtrada
 		 * (por ejemplo para los equipos) para pedir de todos los estudiantes usar countStudentsByModuleIdUserExcludedIdsFinished
-		 * @param moduleId id del módulo
+		 * @param moduleId id del mï¿½dulo
 		 * @param userIds ids de los usuarios filtrados
-		 * @return número de estudiantes que han finalizado el módulo
+		 * @return nï¿½mero de estudiantes que han finalizado el mï¿½dulo
 		 * @throws SystemException
 		 */
 		
@@ -316,9 +316,9 @@ public class ModuleResultLocalServiceImpl extends ModuleResultLocalServiceBaseIm
 		
 		/**
 		 * Cuenta los estudiantes que han finalizado el modulo y lo hayan aprobado
-		 * @param moduleId id del módulo
+		 * @param moduleId id del mï¿½dulo
 		 * @param userExcludedIds ids de usuarios excluidos (profesores y editores)
-		 * @return número de estudiantes que han finalizado y aprobado el módulo
+		 * @return nï¿½mero de estudiantes que han finalizado y aprobado el mï¿½dulo
 		 * @throws SystemException
 		 */
 		
@@ -333,9 +333,9 @@ public class ModuleResultLocalServiceImpl extends ModuleResultLocalServiceBaseIm
 		
 		/**
 		 * Cuenta los estudiantes que han finalizado el modulo y lo hayan suspendido
-		 * @param moduleId id del módulo
+		 * @param moduleId id del mï¿½dulo
 		 * @param userExcludedIds ids de usuarios excluidos (profesores y editores)
-		 * @return número de estudiantes que han finalizado y suspendido el módulo
+		 * @return nï¿½mero de estudiantes que han finalizado y suspendido el mï¿½dulo
 		 * @throws SystemException
 		 */
 		
@@ -350,69 +350,49 @@ public class ModuleResultLocalServiceImpl extends ModuleResultLocalServiceBaseIm
 		}
 
 
-	public void update(LearningActivityResult lactr) throws PortalException, SystemException {
-		
-		long actId = lactr.getActId();
-		long userId = lactr.getUserId();
-		LearningActivity learningActivity = LearningActivityLocalServiceUtil.getLearningActivity(actId);
-		long moduleId = learningActivity.getModuleId();
-		boolean recalcularModulo = false;
-		
-		ModuleResult moduleResult = getByModuleAndUser(moduleId, userId);
-		
-		// Si el Weight es mayor que cero (obligatoria) entonces calcula, sino
-		// no.
-		// Se elimina la restriccion de calcular solo en las obligatorias, se
-		// calcula ent todas las que se terminen.
-		
-		if (moduleResult == null){
-			moduleResult = moduleResultPersistence.create(counterLocalService.increment(ModuleResult.class.getName()));
-			moduleResult.setModuleId(moduleId);
-			moduleResult.setPassed(false);
-			moduleResult.setUserId(userId);
-			moduleResult.setStartDate(lactr.getStartDate());
-			moduleResult.setResult(0);
-			recalcularModulo = true;
-		}
-		
-		if (lactr.getEndDate() != null) {
-			recalcularModulo = true;
-			List<LearningActivity> activities = LearningActivityLocalServiceUtil.getMandatoryActivities(moduleId);
-			int passedNumber = LearningActivityResultLocalServiceUtil.countMandatoryByModuleIdUserIdPassed(moduleId, userId);
-			log.debug("Mandatory activities passed for moduleId["+moduleId+"]:"+passedNumber);			
+
+		public void update(LearningActivityResult lactr)
+					throws PortalException, SystemException {
+
+			ModuleResult moduleResult = null;
+			long actId = lactr.getActId();
+			long userId = lactr.getUserId();
+			LearningActivity learningActivity = learningActivityLocalService.getLearningActivity(actId);
+			// Si el Weight es mayor que cero (obligatoria) entonces calcula, sino
+			// no.
+			// Se elimina la restricciï¿½n de calcular solo en las obligatorias, se
+			// calcula ent todas las que se terminen.
+			long moduleId = learningActivity.getModuleId();
 			
-			if (activities.size() > 0) {
-				moduleResult.setResult(100 * passedNumber / activities.size());
-			}
-			if (passedNumber == activities.size()) {
-				moduleResult.setPassed(true);
-				moduleResult.setPassedDate(lactr.getEndDate());
-			}else{
-				moduleResult.setPassed(false);
-				log.debug("**Passed a false");
-			}
+			moduleResult= getAndCreateIfNotExists( userId,  moduleId,lactr.getStartDate());
 			
-			//auditing
-			ServiceContext serviceContext = ServiceContextThreadLocal.getServiceContext();
-			if(serviceContext!=null){
-				AuditingLogFactory.audit(serviceContext.getCompanyId(), serviceContext.getScopeGroupId(), ModuleResult.class.getName(), 
-					moduleResult.getPrimaryKey(), serviceContext.getUserId(), AuditConstants.UPDATE, null);
-			} else {
-				Module module = modulePersistence.fetchByPrimaryKey(moduleResult.getModuleId());
-				if(module!=null){
-					AuditingLogFactory.audit(module.getCompanyId(), module.getGroupId(), ModuleResult.class.getName(), 
-							moduleResult.getPrimaryKey(), module.getUserId(), AuditConstants.UPDATE, null);					
+			if (learningActivity.getModuleId() > 0 && /*
+													 * learningActivity.
+													 * getWeightinmodule()>0 &&
+													 */lactr.getEndDate()!=null) 
+			{
+				
+				calculateModuleResult(moduleResult);
+				//auditing
+				ServiceContext serviceContext = ServiceContextThreadLocal.getServiceContext();
+				if(serviceContext!=null){
+					AuditingLogFactory.audit(serviceContext.getCompanyId(), serviceContext.getScopeGroupId(), ModuleResult.class.getName(), 
+						moduleResult.getPrimaryKey(), serviceContext.getUserId(), AuditConstants.UPDATE, null);
+				}else{
+					if(moduleResult!=null){
+						Module module = modulePersistence.fetchByPrimaryKey(moduleResult.getModuleId());
+						if(module!=null){
+							AuditingLogFactory.audit(module.getCompanyId(), module.getGroupId(), ModuleResult.class.getName(), 
+									moduleResult.getPrimaryKey(), module.getUserId(), AuditConstants.UPDATE, null);
+						}
+					}
+					
 				}
 				
-			}			
+				
+			}
+			
 		}
-		
-		if(recalcularModulo) {
-			moduleResultPersistence.update(moduleResult, false);			
-			courseResultLocalService.update(moduleResult);			
-		}
-		
-	}
 	
 	public int updateAllUsers(long groupId, long moduleId) throws PortalException, SystemException {
 		
@@ -602,4 +582,106 @@ public class ModuleResultLocalServiceImpl extends ModuleResultLocalServiceBaseIm
 		return startDate;
 	}
 	
+	
+	private void calculateModuleResult(ModuleResult moduleResult) throws PortalException, SystemException
+	{
+		List<LearningActivity> learnActList = LearningActivityLocalServiceUtil.getLearningActivitiesOfModule(moduleResult.getModuleId());
+		Module module=moduleLocalService.getModule(moduleResult.getModuleId());
+		boolean passedModule = true;
+		long totalActivities = 0;
+		long activitiesPassed = 0;
+        Date passedDate=new Date(0);
+		for(LearningActivity activity : learnActList){
+			
+			//Si la actividad no es opcional.
+			if(activity.getWeightinmodule() != 0){
+				
+				totalActivities++;
+				
+				LearningActivityResult result = LearningActivityResultLocalServiceUtil.getByActIdAndUserId(activity.getActId(), moduleResult.getUserId());
+
+				if(result != null && result.isPassed())
+				{
+					
+					activitiesPassed++;
+					if(result.getEndDate()!=null)
+					{
+						if(passedDate.before(result.getEndDate()))
+						{
+							passedDate=result.getEndDate();
+						}
+					}
+					 
+				} else {
+					
+					passedModule = false;
+					
+				}
+				
+			}
+			
+		}
+		
+		if(learnActList.size() == 0){
+			passedModule = false;
+		}
+
+		//Indicamos la media y el resultado del mï¿½dulo.
+		long result = 0;
+		if(totalActivities > 0){
+			
+			result = activitiesPassed * 100 / totalActivities;
+		}
+		if(result>0)
+		{
+			//Vamos a ver si tiene un sistema de evaluaci?e m?o 
+			CourseEvalRegistry cer=new CourseEvalRegistry();
+			Course course=courseLocalService.fetchByGroupCreatedId(module.getGroupId());
+			long courseEvalTypeId=course.getCourseEvalId();
+			CourseEval ceval=cer.getCourseEval(courseEvalTypeId);
+			if(ceval.hasModuleResultCalculator())
+			{
+				result=ceval.calculateModuleResult(module.getModuleId(), moduleResult.getUserId());
+			}
+		}
+		
+		//Sï¿½lo actualizamos si cambia el resultado.
+		if(moduleResult.getResult() < result || (passedModule&&!moduleResult.getPassed()))
+		{	
+			moduleResult.setResult(result);
+			if(moduleResult.getPassed()==false)
+			{
+				moduleResult.setPassed(passedModule);
+				if(passedModule==true)
+				{
+					moduleResult.setPassedDate(passedDate);
+				}
+			}
+			//Update en la bd.
+			moduleResultPersistence.update(moduleResult, true);
+			//Actualizar el resultado del curso.
+			courseResultLocalService.update(moduleResult);
+		}
+	}
+	
+	private ModuleResult getAndCreateIfNotExists(long userId, long moduleId,Date startDate) throws SystemException
+	{
+		ModuleResult moduleResult = null;
+		if (moduleResultPersistence.countBymu(userId, moduleId) > 0) 
+		{
+			moduleResult = moduleResultPersistence.fetchBymu(userId, moduleId, false);
+		}
+		else 
+		{
+			moduleResult = moduleResultPersistence.create(counterLocalService.increment(ModuleResult.class.getName()));
+			moduleResult.setModuleId(moduleId);
+			moduleResult.setPassed(false);
+			moduleResult.setUserId(userId);
+			moduleResult.setStartDate(startDate);
+			moduleResult.setResult(0);
+			moduleResultPersistence.update(moduleResult, true);
+
+		}
+		return moduleResult;
+	}
 }

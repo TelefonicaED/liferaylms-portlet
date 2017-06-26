@@ -156,6 +156,10 @@ if(!ismobile){
 			long modulesCount=theModules.size();
 			int themeId=0;
 			boolean moduleIsLocked = false;
+			boolean courseIsLocked = course.isLocked(themeDisplay.getUser(), permissionChecker);
+			boolean canAccessLock = permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), "com.liferay.lms.model", themeDisplay.getScopeGroupId() , "ACCESSLOCK");
+			boolean courseEditing = (permissionChecker.hasPermission(course.getGroupCreatedId(), Course.class.getName(), course.getCourseId() , ActionKeys.UPDATE))?true:false;
+			
 			for(Module theModule:theModules){
 				Date startDate;
 				Date endDate;
@@ -168,8 +172,6 @@ if(!ismobile){
 				}
 				
 				themeId++;
-				boolean canAccessLock = permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), "com.liferay.lms.model", themeDisplay.getScopeGroupId() , "ACCESSLOCK");
-				boolean courseEditing = (permissionChecker.hasPermission(course.getGroupCreatedId(), Course.class.getName(), course.getCourseId() , ActionKeys.UPDATE))?true:false;
 				moduleIsLocked = theModule.isLocked(themeDisplay.getUserId());
 %>
 				<script type="text/javascript">
@@ -233,7 +235,7 @@ if(!ismobile){
 %>
 									<liferay-ui:icon image="lock" alt="starting-soon" />
 <%
-								}else if(moduleIsLocked){
+								}else if(courseIsLocked || moduleIsLocked){
 %>
 									<liferay-ui:icon image="lock" alt="closed"/>
 <%
@@ -288,7 +290,7 @@ if(!ismobile){
 					arg[0] = themeId;
 					arg[1] = theModule.getTitle(themeDisplay.getLocale());
 					
-					boolean canAccess = (startDate != null )?(!today.before(startDate)):true;
+					boolean canAccess = (startDate != null )?(!today.before(startDate)&&!courseIsLocked):true;
 %>
 					
 					<td class="title">
@@ -366,11 +368,12 @@ if(!ismobile){
 %>
 							<div class="access"><liferay-ui:message key="starting-soon"/><!-- En LMS esta etiqueta es vacía --></div>
 <%
-						}else if(moduleIsLocked && !canAccessLock){
-%>
+						
+						}else if((moduleIsLocked || courseIsLocked) && !canAccessLock){
+							%>
 							<div class="access"><liferay-ui:message key="module-closed"/><!-- En LMS esta etiqueta es vacía --></div>
-<%
-						}else if(!moduleIsLocked || canAccessLock){
+							<%
+						}else if((!moduleIsLocked && !courseIsLocked) || canAccessLock){
 							if(allowEditionMode && moduleEditing){
 								%>
 								<div class="iconsedit"><%@ include file="/JSPs/module/edit_actions.jspf" %></div>

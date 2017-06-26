@@ -193,7 +193,9 @@ public class CeroToNCalificationType extends BaseCalificationType{
 			}
 			
 			try {
-				Integer.parseInt(value);
+				if(Integer.parseInt(value)<= 0){
+					return "ceroton_ct.n-value-positive";
+				}
 			} catch (NumberFormatException nfe){
 				return "ceroton_ct.n-value-number";
 			}

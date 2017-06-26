@@ -163,24 +163,42 @@
 %>
 			<p class="negrita"><liferay-ui:message key="your-answers" /></p>
 <%
+			long actId = learningActivity.getActId();
+			long userId = themeDisplay.getUserId();
 			List<TestQuestion> questions=null;
-			if (GetterUtil.getLong(LearningActivityLocalServiceUtil.getExtraContentValue(learningActivity.getActId(),"random"))==0 || hasPermissionAccessCourseFinished)
-				questions=TestQuestionLocalServiceUtil.getQuestions(learningActivity.getActId());
-			else{
-				questions= new ArrayList<TestQuestion>();
-				Iterator<Element> nodeItr = SAXReaderUtil.read(tryResultData).getRootElement().elementIterator();
-				TestQuestion question=null;
-				while(nodeItr.hasNext()) {
-					Element element = nodeItr.next();				
-					 if("question".equals(element.getName())) {
-						 question=TestQuestionLocalServiceUtil.fetchTestQuestion(Long.valueOf(element.attributeValue("id")));
-						 if(question != null){
-							 questions.add(question); 
-						 }		        	 
-					 }
-				}	
+			if( StringPool.TRUE.equals(LearningActivityLocalServiceUtil.getExtraContentValue(actId, "isBank")) ){
+				LearningActivityTry learningTry = LearningActivityTryLocalServiceUtil.getLastLearningActivityTryByActivityAndUser(actId, userId);
+				if( learningTry != null && Validator.isXml(learningTry.getTryResultData()) ){
+					tryResultData = learningTry.getTryResultData();
+					Document docQuestions = SAXReaderUtil.read(tryResultData);
+					List<Element> xmlQuestions = docQuestions.getRootElement().elements("question");
+					String questionIdString = xmlQuestions.get(0).attributeValue("id");
+					Long questionId = Long.valueOf(questionIdString);
+					TestQuestion testQuestion = TestQuestionLocalServiceUtil.getTestQuestion(questionId);
+					LearningActivity bankActivity = LearningActivityLocalServiceUtil.getLearningActivity(testQuestion.getActId());
+					questions = TestQuestionLocalServiceUtil.getQuestions(bankActivity.getActId());
+				}
+			}else{
+				if( GetterUtil.getLong(LearningActivityLocalServiceUtil.getExtraContentValue(actId,"random"))==0 
+						|| hasPermissionAccessCourseFinished )
+					questions=TestQuestionLocalServiceUtil.getQuestions(learningActivity.getActId());
+				else{
+					questions= new ArrayList<TestQuestion>();
+					Iterator<Element> nodeItr = SAXReaderUtil.read(tryResultData).getRootElement().elementIterator();
+					TestQuestion question=null;
+					while(nodeItr.hasNext()) {
+						Element element = nodeItr.next();				
+						 if("question".equals(element.getName())) {
+							 question=TestQuestionLocalServiceUtil.fetchTestQuestion(Long.valueOf(element.attributeValue("id")));
+							 if(question != null){
+								 questions.add(question); 
+							 }		        	 
+						 }
+					}	
+				}
 			}
-			
+
+		
 			for(TestQuestion question:questions){
 				QuestionType qt = new QuestionTypeRegistry().getQuestionType(question.getQuestionType());
 				qt.setLocale(themeDisplay.getLocale());

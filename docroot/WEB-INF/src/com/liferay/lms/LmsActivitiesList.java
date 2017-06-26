@@ -468,7 +468,17 @@ public class LmsActivitiesList extends MVCPortlet {
 		else setExtraContent = LearningActivityLocalServiceUtil.canBeEdited(larn, user.getUserId());
 		if(setExtraContent)*/		
 		
-		String extraContentError = learningActivityType.setExtraContent(uploadRequest,actionResponse,larn);
+		String extraContentError = null;
+		
+		log.debug("*******SET EXTRA CONTENT********");
+		try{
+			extraContentError = learningActivityType.setExtraContent(uploadRequest,actionResponse,larn);
+		}catch(Exception e){
+			e.printStackTrace();
+			extraContentError = e.getMessage();
+		}
+		
+		log.debug("*******extraContentError:"+extraContentError);
 		
 		if(Validator.isNotNull(extraContentError)){
 			SessionErrors.add(actionRequest, extraContentError);

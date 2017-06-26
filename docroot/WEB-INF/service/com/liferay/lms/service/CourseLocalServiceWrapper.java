@@ -704,6 +704,29 @@ public class CourseLocalServiceWrapper implements CourseLocalService,
 		return _courseLocalService.getFirstModuleDateInCourse(courseId);
 	}
 
+	public java.lang.String getImageURL(com.liferay.lms.model.Course course,
+		com.liferay.portal.theme.ThemeDisplay themeDisplay) {
+		return _courseLocalService.getImageURL(course, themeDisplay);
+	}
+
+	/**
+	* Service that validates the course inscription as it is validated in web.
+	*
+	* @param courseId
+	* @param userId
+	* @return ok or error and the error description.
+	* @throws PortalException
+	* @throws SystemException
+	*/
+	public java.lang.String addStudentToCourseByUserId(long courseId,
+		long userId, long teamId,
+		com.liferay.portal.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _courseLocalService.addStudentToCourseByUserId(courseId, userId,
+			teamId, serviceContext);
+	}
+
 	/**
 	 * @deprecated Renamed to {@link #getWrappedService}
 	 */

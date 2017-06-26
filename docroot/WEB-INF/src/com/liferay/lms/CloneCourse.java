@@ -48,6 +48,7 @@ import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.ResourceConstants;
+import com.liferay.portal.model.ResourcePermission;
 import com.liferay.portal.model.Role;
 import com.liferay.portal.model.RoleConstants;
 import com.liferay.portal.model.User;
@@ -1289,6 +1290,27 @@ public class CloneCourse implements MessageListener {
 			newCourseCategory.setParentCategoryId(parentCategoryId);
 		
 			newCourseCategory = MBCategoryLocalServiceUtil.addMBCategory(newCourseCategory);
+			
+			// Copiar permisos de la categoria antigua en la nueva
+    		int [] scopeIds = ResourceConstants.SCOPES;
+    		for(int scope : scopeIds) {
+    			List<ResourcePermission> resourcePermissionList = ResourcePermissionLocalServiceUtil.getResourcePermissions(category.getCompanyId(), MBCategory.class.getName(), scope, String.valueOf(category.getPrimaryKey()));
+        		for(ResourcePermission resourcePermission : resourcePermissionList) {
+        			long resourcePermissionId = CounterLocalServiceUtil.increment(ResourcePermission.class.getName());
+        			ResourcePermission rpNew = ResourcePermissionLocalServiceUtil.createResourcePermission(resourcePermissionId);
+        			rpNew.setActionIds(resourcePermission.getActionIds());
+        			rpNew.setCompanyId(resourcePermission.getCompanyId());
+        			rpNew.setName(resourcePermission.getName());
+        			rpNew.setRoleId(resourcePermission.getRoleId());
+        			rpNew.setScope(resourcePermission.getScope());
+        			rpNew.setPrimKey(String.valueOf(newCourseCategory.getCategoryId()));
+        			rpNew.setOwnerId(resourcePermission.getOwnerId());
+        			rpNew = ResourcePermissionLocalServiceUtil.updateResourcePermission(rpNew);
+        		}
+    		}
+			
+			
+			
 			
 			return newCourseCategory;
 			

@@ -63,7 +63,7 @@ if(catIds!=null&&catIds.length>0)
 		<aui:fieldset cssClass="checkBoxes">
 			<aui:input name="search" type="hidden" value="search" />
 			<aui:input inlineField="true" name="freetext" type="text" value="${freetext}">
-				<aui:validator name="maxLength">75</aui:validator>
+				<aui:validator name="maxLength">150</aui:validator>
 			</aui:input>
 			<aui:select inlineField="true" name="state">
 				<aui:option label="active" selected="${state == STATUS_APPROVED}" value="${STATUS_APPROVED}" />

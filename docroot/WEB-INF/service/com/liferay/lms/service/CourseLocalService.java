@@ -569,4 +569,23 @@ public interface CourseLocalService extends BaseLocalService,
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.util.Date getFirstModuleDateInCourse(long courseId);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.lang.String getImageURL(com.liferay.lms.model.Course course,
+		com.liferay.portal.theme.ThemeDisplay themeDisplay);
+
+	/**
+	* Service that validates the course inscription as it is validated in web.
+	*
+	* @param courseId
+	* @param userId
+	* @return ok or error and the error description.
+	* @throws PortalException
+	* @throws SystemException
+	*/
+	public java.lang.String addStudentToCourseByUserId(long courseId,
+		long userId, long teamId,
+		com.liferay.portal.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException;
 }
