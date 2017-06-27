@@ -149,7 +149,6 @@
 									if (browser.indexOf('firefox') > -1) {
 										var iframeHeight = 680; 
 										iframeHeight = iframeHeight + "px";
-										console.log('Height '+iframeHeight);
 										document.getElementById("placeholder_contentIFrame").style.height = iframeHeight;
 										document.getElementById("contentIFrame").style.height = iframeHeight;
 									}
@@ -180,8 +179,7 @@
 				    		var iframeHeight = height-nav-20;
 				    		var iframeWidth = width-nav-20;
 				    		iframeHeight = iframeHeight+"px";
-				    		iframeWidth  = iframeWidth +"px"
-				    		console.log('Height '+iframeHeight);
+				    		iframeWidth  = iframeWidth +"px";
 				    		document.getElementById("placeholder_contentIFrame").style.height=iframeHeight;
 				    		document.getElementById("contentIFrame").style.height=iframeHeight;
 				    		document.getElementById("placeholder_contentIFrame").style.width=iframeWidth;
