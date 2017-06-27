@@ -149,6 +149,7 @@
 									if (browser.indexOf('firefox') > -1) {
 										var iframeHeight = 680; 
 										iframeHeight = iframeHeight + "px";
+										console.log('Height '+iframeHeight);
 										document.getElementById("placeholder_contentIFrame").style.height = iframeHeight;
 										document.getElementById("contentIFrame").style.height = iframeHeight;
 									}
@@ -157,8 +158,8 @@
 						};
 					</script>
 		
-					<div id="placeholder_contentIFrame" style="height: 680px; width: 100%;">
-				          <iframe id="contentIFrame" style="height:680px; width:100%" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" ></iframe>
+					<div id="placeholder_contentIFrame" style="width: 100%;">
+				          <iframe id="contentIFrame" style="width:100%" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" ></iframe>
 				    </div>
 			    <%
 				}
@@ -170,20 +171,26 @@
 				    	{
 				    	    var html 	= document.documentElement;
 				            var height	= html.clientHeight || html.offsetHeight;
+				            var width	= html.clientWidth || html.offsetWidth;
 				            
 				    		//var nav1 = document.getElementById("placeholder_navigationContainer").clientHeight;
 				    		var nav = document.getElementById("placeholder_navigationContainer2").clientHeight;
+				    		var navWidth = document.getElementById("placeholder_navigationContainer2").clientWidth;
 				    		
 				    		var iframeHeight = height-nav-20;
+				    		var iframeWidth = width-nav-20;
 				    		iframeHeight = iframeHeight+"px";
-				    			
+				    		iframeWidth  = iframeWidth +"px"
+				    		console.log('Height '+iframeHeight);
 				    		document.getElementById("placeholder_contentIFrame").style.height=iframeHeight;
 				    		document.getElementById("contentIFrame").style.height=iframeHeight;
+				    		document.getElementById("placeholder_contentIFrame").style.width=iframeWidth;
+				    		document.getElementById("contentIFrame").style.width=iframeWidth;
 				    	}
 			    	</script>
 			    	
 			    	<div id="placeholder_contentIFrame" style="width:100%" >
-			          <iframe id="contentIFrame" style="height:688px;width:100%" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" ></iframe>
+			          <iframe id="contentIFrame" style="width:100%" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" ></iframe>
 			   	 	</div>
 			    <%
 			    } 
