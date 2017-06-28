@@ -68,11 +68,15 @@ String courseDiplomaError = ParamUtil.getString(request, "courseDiplomaError");
 		for(int i=0;i<ssites.length;i++){
 			try{
 				sites.add(Integer.valueOf(ssites[i]));
-			}catch(Exception e){}
+			}catch(Exception e){
+				e.printStackTrace();
+			}
 		}
 	}
 	if (sites.isEmpty()) {
 		sites.add(GroupConstants.TYPE_SITE_OPEN);
+		sites.add(GroupConstants.TYPE_SITE_RESTRICTED);
+		sites.add(GroupConstants.TYPE_SITE_PRIVATE);
 	}
 	
 	
