@@ -287,7 +287,7 @@ function validate(){
 	
 	<%
 	module = ModuleLocalServiceUtil.fetchModule(moduleId);
-	if( module.getExpandoBridge().getAttributes().size()!=0 ){
+	if(module!=null && module.getExpandoBridge().getAttributes().size()!=0 ){
 	%>	
 			<liferay-ui:panel-container extended="false" persistState="false">
 				<liferay-ui:panel title="custom-fields" collapsible="true" defaultState="closed" >
