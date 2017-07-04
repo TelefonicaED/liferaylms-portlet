@@ -126,7 +126,7 @@ if(actId == 0){
 			QuestionType qt = new QuestionTypeRegistry().getQuestionType(question.getQuestionType());
 			qt.setLocale(themeDisplay.getLocale());
 			if(Validator.isNotNull(larntry.getTryResultData())){
-			%><%=qt.getHtmlFeedback(SAXReaderUtil.read(larntry.getTryResultData()), question.getQuestionId(), themeDisplay)%><%
+			%><%=qt.getHtmlFeedback(SAXReaderUtil.read(larntry.getTryResultData()), question.getQuestionId(), question.getActId(), themeDisplay)%><%
 			}
 		}
 		
