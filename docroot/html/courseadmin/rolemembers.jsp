@@ -36,7 +36,7 @@ AUI().use(function(A)
 		{ var resizeInterval; 
 		Liferay.Util.openWindow( 
 				{ 
-					id: '_courseadmin_WAR_liferaylmsportlet_showPopupInsctiptionDates', 
+					id: '<portlet:namespace />showPopupInsctiptionDates', 
 					title: '<%=LanguageUtil.get(pageContext, "calendar")%>',
 					dialog: 
 					{
@@ -44,7 +44,7 @@ AUI().use(function(A)
 					  height:400, modal:true,
 					  centered:true, 
 					  after: 
-					  { visibleChange: function(evt){ var instance = evt.target; if(instance.get('visible')){ instance.centered(); } else { delete Liferay.Util.Window._map['_courseadmin_WAR_liferaylmsportlet_showPopupInsctiptionDates']; Liferay.Portlet.refresh(A.one('#p_p_id_courseadmin_WAR_liferaylmsportlet_'),{'p_t_lifecycle':0}); } }, init: function(evt){ var instance = evt.target; resizeInterval = A.setInterval(function(){ if(instance.get('y')<0){ instance.set('y',0); } }, 100); }, bodyContentChange: function(evt){ var instance = evt.target, bodyContent = instance.get('bodyContent'); if(!bodyContent.item) { if((!!bodyContent.get('tagName').toLowerCase)&&(bodyContent.get('tagName').toLowerCase()=='iframe')){ bodyContent.on('load',function(evt){ var messageDiv = evt.target.get('contentWindow.document').one('.portlet-msg-success'); if(messageDiv!=null){ var portlet = A.one('#p_p_id_courseadmin_WAR_liferaylmsportlet_'); Liferay.onceAfter(portlet.portletId + ':portletRefreshed', function(evt){ evt.portlet.one('.portlet-body * .portlet-body'). prepend('<div class="portlet-msg-success">'+messageDiv.getContent()+'</div>'); }); instance.close(); } }); } } }, destroy: function(evt){ A.clearInterval(resizeInterval); } } },
+					  { visibleChange: function(evt){ var instance = evt.target; if(instance.get('visible')){ instance.centered(); } else { delete Liferay.Util.Window._map['<portlet:namespace />showPopupInsctiptionDates']; Liferay.Portlet.refresh(A.one('#p_p_id<portlet:namespace />'),{'p_t_lifecycle':0}); } }, init: function(evt){ var instance = evt.target; resizeInterval = A.setInterval(function(){ if(instance.get('y')<0){ instance.set('y',0); } }, 100); }, bodyContentChange: function(evt){ var instance = evt.target, bodyContent = instance.get('bodyContent'); if(!bodyContent.item) { if((!!bodyContent.get('tagName').toLowerCase)&&(bodyContent.get('tagName').toLowerCase()=='iframe')){ bodyContent.on('load',function(evt){ var messageDiv = evt.target.get('contentWindow.document').one('.portlet-msg-success'); if(messageDiv!=null){ var portlet = A.one('#p_p_id<portlet:namespace />'); Liferay.onceAfter(portlet.portletId + ':portletRefreshed', function(evt){ evt.portlet.one('.portlet-body * .portlet-body'). prepend('<div class="portlet-msg-success">'+messageDiv.getContent()+'</div>'); }); instance.close(); } }); } } }, destroy: function(evt){ A.clearInterval(resizeInterval); } } },
 					  uri: theURI 
 					  } 
 				);
