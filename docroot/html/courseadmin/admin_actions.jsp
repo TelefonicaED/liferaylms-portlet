@@ -48,12 +48,83 @@ boolean showPermission = preferences.getValue("showPermission", "true").equals("
 	<portlet:param name="view" value="edit-course" />
 	<portlet:param name="redirect" value='<%= ParamUtil.getString(request, "redirect", currentURL) %>'/>
 </portlet:renderURL>
+
+<%-- Editar --%>
 <%
 if( permissionChecker.hasPermission(themeDisplay.getScopeGroupId(),  Course.class.getName(),primKey,ActionKeys.UPDATE)&& ! myCourse.isClosed()){%>
 	<liferay-ui:icon image="edit" message="edit" url="<%=editURL.toString() %>" />
 
 <%}%>
 
+<%-- Asignar miembros --%>
+<portlet:renderURL var="memebersURL">
+	<portlet:param name="courseId" value="<%=primKey %>" />
+	<portlet:param name="backToEdit" value="<%=StringPool.FALSE %>" />
+	<portlet:param name="view" value="role-members-tab" />
+</portlet:renderURL>
+<%
+if(permissionChecker.hasPermission(themeDisplay.getScopeGroupId(),  Course.class.getName(),primKey,ActionKeys.ASSIGN_MEMBERS)&& ! myCourse.isClosed() && showMembers)
+{
+%>
+
+<liferay-ui:icon image="group" message="assign-member" url="<%=memebersURL.toString() %>" />
+
+<%
+}
+%>
+
+<%-- Competencias --%>
+<c:if test="<%=count>0 && permissionChecker.hasPermission(themeDisplay.getScopeGroupId(),  Course.class.getName(),primKey,ActionKeys.UPDATE) && ! myCourse.isClosed()%>">
+	<portlet:renderURL var="competenceURL">
+		<portlet:param name="groupId" value="<%=String.valueOf(myCourse.getGroupCreatedId()) %>" />
+		<portlet:param name="courseId" value="<%=String.valueOf(myCourse.getCourseId()) %>" />
+		<portlet:param name="view" value="competence-tab" />
+	</portlet:renderURL>
+	<liferay-ui:icon image="tag" message="competence.label" url="<%=competenceURL %>" />
+</c:if>
+
+<%-- Exportar curso --%>
+	<%if(showExport && permissionChecker.hasPermission(themeDisplay.getScopeGroupId(),  Course.class.getName(),primKey,ActionKeys.UPDATE)){%>	
+	<portlet:renderURL var="exportURL">
+		<portlet:param name="groupId" value="<%=String.valueOf(myCourse.getGroupCreatedId()) %>" />
+		<portlet:param name="view" value="export" />
+	</portlet:renderURL>
+	<liferay-ui:icon image="download" message="courseadmin.adminactions.export" url="<%=exportURL %>" />			
+	<%}%>
+	
+<%-- Importar curso --%>
+	<%if(showImport && permissionChecker.hasPermission(themeDisplay.getScopeGroupId(),  Course.class.getName(),primKey,ActionKeys.UPDATE)){%>	
+	<portlet:renderURL var="importURL">
+		<portlet:param name="groupId" value="<%=String.valueOf(myCourse.getGroupCreatedId()) %>" />
+		<portlet:param name="view" value="import" />
+	</portlet:renderURL>
+	<liferay-ui:icon image="post" message="courseadmin.adminactions.import" url="<%=importURL %>" />			
+	<%}%>
+	
+<%-- Duplicar curso --%>
+	<%if(showClone && permissionChecker.hasPermission(themeDisplay.getScopeGroupId(),  Course.class.getName(),primKey,ActionKeys.UPDATE)){%>	
+	<portlet:renderURL var="cloneURL">
+		<portlet:param name="groupId" value="<%=String.valueOf(myCourse.getGroupCreatedId()) %>" />
+		<portlet:param name="view" value="clone" />
+	</portlet:renderURL>
+	<liferay-ui:icon image="copy" message="courseadmin.adminactions.clone" url="<%=cloneURL%>" />	
+	<%}%>
+	
+<c:if test="<%= permissionChecker.hasPermission(myCourse.getGroupId(), Course.class.getName(), myCourse.getCourseId(), ActionKeys.PERMISSIONS)&& ! myCourse.isClosed() %>">
+
+	<%-- Permisos --%>
+	<%if(showPermission){%>
+	<liferay-security:permissionsURL
+		modelResource="<%=Course.class.getName() %>"
+		modelResourceDescription="<%= myCourse.getTitle(themeDisplay.getLocale()) %>"
+		resourcePrimKey="<%= String.valueOf(myCourse.getCourseId()) %>"
+		var="permissionsURL"
+	/>
+	<liferay-ui:icon image="permissions" message="courseadmin.adminactions.permissions" url="<%=permissionsURL %>" />
+	<%}%>
+</c:if>
+
+<%-- Cerrar --%>
 <%
 if( permissionChecker.hasPermission(themeDisplay.getScopeGroupId(),  Course.class.getName(),primKey,ActionKeys.UPDATE)&& ! myCourse.isClosed() && showClose)
 {
@@ -76,6 +147,8 @@ if( permissionChecker.hasPermission(themeDisplay.getScopeGroupId(),  Course.clas
 	</portlet:actionURL>
 	<liferay-ui:icon src="<%= themeDisplay.getPathThemeImages() + \"/dock/my_places_private.png\" %>" message="open-course" url="<%=openURL.toString() %>" />
 <%} %>
+
+<%-- Eliminar --%>
 <portlet:actionURL name="deleteCourse" var="deleteURL">
 <portlet:param name="courseId" value="<%= primKey %>" />
 </portlet:actionURL>
@@ -87,62 +160,5 @@ if( permissionChecker.hasPermission(themeDisplay.getScopeGroupId(),  Course.clas
 <%
 }
 %>
-<portlet:renderURL var="memebersURL">
-	<portlet:param name="courseId" value="<%=primKey %>" />
-	<portlet:param name="backToEdit" value="<%=StringPool.FALSE %>" />
-	<portlet:param name="view" value="role-members-tab" />
-</portlet:renderURL>
-<%
-if(permissionChecker.hasPermission(themeDisplay.getScopeGroupId(),  Course.class.getName(),primKey,ActionKeys.ASSIGN_MEMBERS)&& ! myCourse.isClosed() && showMembers)
-{
-%>
 
-<liferay-ui:icon image="group" message="assign-member" url="<%=memebersURL.toString() %>" />
-
-<%
-}
-%>
-
-<c:if test="<%= permissionChecker.hasPermission(myCourse.getGroupId(), Course.class.getName(), myCourse.getCourseId(), ActionKeys.PERMISSIONS)&& ! myCourse.isClosed() %>">
-	<%if(showPermission){%>
-	<liferay-security:permissionsURL
-		modelResource="<%=Course.class.getName() %>"
-		modelResourceDescription="<%= myCourse.getTitle(themeDisplay.getLocale()) %>"
-		resourcePrimKey="<%= String.valueOf(myCourse.getCourseId()) %>"
-		var="permissionsURL"
-	/>
-	<liferay-ui:icon image="permissions" message="courseadmin.adminactions.permissions" url="<%=permissionsURL %>" />
-	<%}%>
-	</c:if>
-	<%if(showExport && permissionChecker.hasPermission(themeDisplay.getScopeGroupId(),  Course.class.getName(),primKey,ActionKeys.UPDATE)){%>	
-	<portlet:renderURL var="exportURL">
-		<portlet:param name="groupId" value="<%=String.valueOf(myCourse.getGroupCreatedId()) %>" />
-		<portlet:param name="view" value="export" />
-	</portlet:renderURL>
-	<liferay-ui:icon image="download" message="courseadmin.adminactions.export" url="<%=exportURL %>" />			
-	<%}%>
-	<%if(showImport && permissionChecker.hasPermission(themeDisplay.getScopeGroupId(),  Course.class.getName(),primKey,ActionKeys.UPDATE)){%>	
-	<portlet:renderURL var="importURL">
-		<portlet:param name="groupId" value="<%=String.valueOf(myCourse.getGroupCreatedId()) %>" />
-		<portlet:param name="view" value="import" />
-	</portlet:renderURL>
-	<liferay-ui:icon image="post" message="courseadmin.adminactions.import" url="<%=importURL %>" />			
-	<%}%>
-	<%if(showClone && permissionChecker.hasPermission(themeDisplay.getScopeGroupId(),  Course.class.getName(),primKey,ActionKeys.UPDATE)){%>	
-	<portlet:renderURL var="cloneURL">
-		<portlet:param name="groupId" value="<%=String.valueOf(myCourse.getGroupCreatedId()) %>" />
-		<portlet:param name="view" value="clone" />
-	</portlet:renderURL>
-	<liferay-ui:icon image="copy" message="courseadmin.adminactions.clone" url="<%=cloneURL%>" />	
-	<%}%>			
-
-
-<c:if test="<%=count>0 && permissionChecker.hasPermission(themeDisplay.getScopeGroupId(),  Course.class.getName(),primKey,ActionKeys.UPDATE) && ! myCourse.isClosed()%>">
-	<portlet:renderURL var="competenceURL">
-		<portlet:param name="groupId" value="<%=String.valueOf(myCourse.getGroupCreatedId()) %>" />
-		<portlet:param name="courseId" value="<%=String.valueOf(myCourse.getCourseId()) %>" />
-		<portlet:param name="view" value="competence-tab" />
-	</portlet:renderURL>
-	<liferay-ui:icon image="tag" message="competence.label" url="<%=competenceURL %>" />
-</c:if>
 </liferay-ui:icon-menu>

@@ -121,12 +121,12 @@ if(backToEdit) {
 			A.all('#<portlet:namespace />addUser_'+userId).each(function(addUserDiv){addUserDiv.hide(); });  
 			A.all('#<portlet:namespace />deleteUser_'+userId).each(function(deleteUserDiv){ deleteUserDiv.show(); });		
 			
-			var addUserElement = A.one('#_courseadmin_WAR_liferaylmsportlet_addUser_'+userId);
+			var addUserElement = A.one('#<portlet:namespace />addUser_'+userId);
 			if (addUserElement != null) {
 				addUserElement.ancestor('tr').addClass('taglib-search-iterator-highlighted');
 			}
 			
-			var checkIfEmpty = A.one('#_courseadmin_WAR_liferaylmsportlet_to').val();
+			var checkIfEmpty = A.one('#<portlet:namespace />to').val();
  			if (checkIfEmpty != "") {
  				var x = document.getElementsByClassName("assign-form");
  				if(x[0].style.display == "none"){
@@ -153,12 +153,12 @@ if(backToEdit) {
 			A.all('#<portlet:namespace />addUser_'+userId).each(function(addUserDiv){ addUserDiv.show(); });  
 			A.all('#<portlet:namespace />deleteUser_'+userId).each(function(deleteUserDiv){deleteUserDiv.hide(); });
 			
-			var addUserElement = A.one('#_courseadmin_WAR_liferaylmsportlet_addUser_'+userId);
+			var addUserElement = A.one('#<portlet:namespace />addUser_'+userId);
 			if (addUserElement != null) {
 				addUserElement.ancestor('tr').removeClass('taglib-search-iterator-highlighted');
 			}
 			
-			var checkIfEmpty = A.one('#_courseadmin_WAR_liferaylmsportlet_to').val();			
+			var checkIfEmpty = A.one('#<portlet:namespace />to').val();			
  			if (checkIfEmpty != "") {
  				A.one('.assign-form').show();
 			} else {
