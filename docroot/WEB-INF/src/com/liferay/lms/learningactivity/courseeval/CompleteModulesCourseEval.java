@@ -22,6 +22,8 @@ import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.DocumentException;
@@ -34,6 +36,8 @@ import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 
 public class CompleteModulesCourseEval extends BaseCourseEval {
 
+	private static Log log = LogFactoryUtil.getLog(CompleteModulesCourseEval.class);
+	
 	@Override
 	public void updateCourse(Course course, ModuleResult mresult) throws SystemException 
 	{
