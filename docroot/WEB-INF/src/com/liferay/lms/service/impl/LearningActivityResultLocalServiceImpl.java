@@ -95,6 +95,7 @@ public class LearningActivityResultLocalServiceImpl	extends LearningActivityResu
 		LearningActivityResult learningActivityResult=getByActIdAndUserId(actId, userId);
 		LearningActivity learningActivity=learningActivityLocalService.getLearningActivity(actId);
 		boolean recalculateActivity = false;
+		log.debug("****LAR "+learningActivityResult);
 		if(learningActivityResult==null){	
 			learningActivityResult=
 					learningActivityResultPersistence.create(counterLocalService.increment(
@@ -105,32 +106,39 @@ public class LearningActivityResultLocalServiceImpl	extends LearningActivityResu
 			learningActivityResult.setPassed(false);
 			recalculateActivity = true;
 		}
-
+		log.debug("****END DATE "+learningActivityTry.getEndDate());
 		if(learningActivityTry.getEndDate()!=null){
 			
 			long cuantosTryLlevo=LearningActivityTryLocalServiceUtil.getTriesCountByActivityAndUser(actId, userId);
+			log.debug("****Cuantos try llevo "+cuantosTryLlevo);
 			if(learningActivity.getTries()>0&&cuantosTryLlevo>=learningActivity.getTries()){
 				learningActivityResult.setEndDate(learningActivityTry.getEndDate());
 				recalculateActivity= true;
+				log.debug("****Recalculamos 1");
 			}
 
 			if(learningActivityTry.getResult()>learningActivityResult.getResult()){			
 				learningActivityResult.setResult(learningActivityTry.getResult());
 				recalculateActivity= true;
+				log.debug("****Recalculamos 2");
 			}
 
 			if(!learningActivityResult.getPassed()){
 				if(learningActivityTry.getResult()>=learningActivity.getPasspuntuation()){
 					learningActivityResult.setEndDate(learningActivityTry.getEndDate());
 					learningActivityResult.setPassed(true);	
-					recalculateActivity= true;					
+					recalculateActivity= true;	
+					log.debug("****Recalculamos 3");
 				}
 			}	
 			if(Validator.isNotNull(learningActivityTry.getComments())&&!learningActivityTry.getComments().equals(learningActivityResult.getComments())){
 				learningActivityResult.setComments(learningActivityTry.getComments());
 				recalculateActivity= true;
+				log.debug("****Recalculamos 4");
 			}
 		}
+		
+		log.debug("****Recalculate "+recalculateActivity);
 		if(recalculateActivity){
 			learningActivityResultPersistence.update(learningActivityResult, false);
 			moduleResultLocalService.update(learningActivityResult);

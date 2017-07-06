@@ -365,13 +365,14 @@ public class ModuleResultLocalServiceImpl extends ModuleResultLocalServiceBaseIm
 			long moduleId = learningActivity.getModuleId();
 			
 			moduleResult= getAndCreateIfNotExists( userId,  moduleId,lactr.getStartDate());
-			
+			log.debug("****Modulo "+learningActivity.getModuleId() );
+			log.debug("****REsult End Date "+lactr.getEndDate());
 			if (learningActivity.getModuleId() > 0 && /*
 													 * learningActivity.
 													 * getWeightinmodule()>0 &&
 													 */lactr.getEndDate()!=null) 
 			{
-				
+				log.debug("****Recalculamos Modulo");
 				calculateModuleResult(moduleResult);
 				//auditing
 				ServiceContext serviceContext = ServiceContextThreadLocal.getServiceContext();
@@ -646,8 +647,17 @@ public class ModuleResultLocalServiceImpl extends ModuleResultLocalServiceBaseIm
 		}
 		
 		//S�lo actualizamos si cambia el resultado.
-		if(moduleResult.getResult() < result || (passedModule&&!moduleResult.getPassed()))
+		
+		log.debug("Vamos a ver si actualizamos...");
+		log.debug("Module result "+moduleResult.getResult());
+		log.debug("Result "+result);
+		log.debug("PassedModule "+passedModule);
+		log.debug("Module Result passed "+moduleResult.getPassed());
+		
+		if(moduleResult.getResult() <= result || (passedModule&&!moduleResult.getPassed()))
 		{	
+			
+			log.debug("Actualizamos curso");
 			moduleResult.setResult(result);
 			if(moduleResult.getPassed()==false)
 			{

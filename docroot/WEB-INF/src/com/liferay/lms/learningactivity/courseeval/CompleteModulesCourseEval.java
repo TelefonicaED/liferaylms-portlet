@@ -62,14 +62,16 @@ public class CompleteModulesCourseEval extends BaseCourseEval {
 		// Se obtienen todos los módulos del curso.
 		List<Module> modules = ModuleLocalServiceUtil.findAllInGroup(groupCreatedId);
 		long numModules = modules.size();
-
+		log.debug("--- Numero de modulos "+numModules);
 		boolean passed = true;
 		long result = 0;
 		// Se obtienen los módulos aprobados por el usuario.
 		long modulesPassedByUser = ModuleLocalServiceUtil.modulesUserPassed(groupCreatedId, userId);
+		log.debug("--- Numero de modulos pasados "+modulesPassedByUser);
+		
 		// Se calcula el resultado del usuario.
 		result = 100 * modulesPassedByUser / numModules;
-
+		log.debug("--- Result "+result);
 		boolean isFailed = false;
 		
 		if(numModules > modulesPassedByUser){
@@ -92,25 +94,28 @@ public class CompleteModulesCourseEval extends BaseCourseEval {
 		// Se iteran por las actividades obligatorias para comprobar si se tienen resultados de las mismas y se tienen aprobadas.
 		for(LearningActivity activity:learningActivities) {   
 			currentActId = activity.getActId();
-			
+			log.debug("--- Actividad actual "+currentActId);
 			if(results.containsKey(currentActId)){
 				lar = results.get(currentActId);
 			}else{
 				lar = null;
 			}
-			
+			log.debug("--- LAR "+lar);
 			// Si el usuario no tiene resultado en la actividad.
 			if(lar != null) {
+				log.debug("--- LAR "+lar.isPassed());
 				if (!lar.isPassed() && Validator.isNotNull(lar.getEndDate())) {
 					numTriesCurrentAct = activity.getTries();
 					// Si la actividad no tiene un número ilimitado de intentos (numTriesCurrentAct = 0) y el usuario ya ha hecho todos los intentos disponibles se marca el curso como "Suspenso" (isFailed). 
 					if(numTriesCurrentAct != 0) {						
 						numTriesDone = LearningActivityTryLocalServiceUtil.getLearningActivityTryByActUserCount(currentActId, userId);					
-						
+						log.debug("-- NUM TRIES CURRENT ACT "+numTriesCurrentAct);
+						log.debug("-- NUM TRIES DONE "+numTriesDone);
 						if (numTriesCurrentAct <= numTriesDone) {
 							isFailed = true;
 						}
 					}
+					
 					passed = false;
 				} else if(!lar.isPassed()){
 					passed = false;
@@ -118,16 +123,21 @@ public class CompleteModulesCourseEval extends BaseCourseEval {
 			}else {
 				passed = false;
 			}
+			
+			log.debug("--- Passed "+passed);
+			log.debug("--- IsFailed "+isFailed);
 		}
 		
-		
+		log.debug("---Course Passed "+(passed && !isFailed));
 		// Si el usuario se ha marcado como isFailed es porque lo tiene suspenso. Se le asigna un passed a false y se marca la fecha de finalización del curso (passedDate).
 		courseResult.setPassed(passed && !isFailed);
+		log.debug("---Course Result "+result);
 		// Se almacena el result del resultado del usuario en el curso.
 		courseResult.setResult(result);
 		if((passed || isFailed) && courseResult.getPassedDate() == null) {
 			courseResult.setPassedDate(new Date());
 		}
+		log.debug("---Course Passed Date "+courseResult.getPassedDate());
 		CourseResultLocalServiceUtil.update(courseResult);
 		return true;
 
