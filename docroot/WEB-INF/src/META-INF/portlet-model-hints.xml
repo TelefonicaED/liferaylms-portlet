@@ -99,6 +99,7 @@
 			<hint name="max-length">500000</hint>
 		</field>
 		<field name="goodbyeSubject" type="String" />
+		<field name="isLinked" type="boolean" />
 	</model>
 	<model name="com.liferay.lms.model.CourseCompetence">
 		<field name="uuid" type="String" />

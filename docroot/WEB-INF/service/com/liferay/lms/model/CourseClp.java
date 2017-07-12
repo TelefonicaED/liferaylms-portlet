@@ -105,6 +105,7 @@ public class CourseClp extends BaseModelImpl<Course> implements Course {
 		attributes.put("goodbye", getGoodbye());
 		attributes.put("goodbyeMsg", getGoodbyeMsg());
 		attributes.put("goodbyeSubject", getGoodbyeSubject());
+		attributes.put("isLinked", getIsLinked());
 
 		return attributes;
 	}
@@ -295,6 +296,12 @@ public class CourseClp extends BaseModelImpl<Course> implements Course {
 
 		if (goodbyeSubject != null) {
 			setGoodbyeSubject(goodbyeSubject);
+		}
+
+		Boolean isLinked = (Boolean)attributes.get("isLinked");
+
+		if (isLinked != null) {
+			setIsLinked(isLinked);
 		}
 	}
 
@@ -762,6 +769,18 @@ public class CourseClp extends BaseModelImpl<Course> implements Course {
 		_goodbyeSubject = goodbyeSubject;
 	}
 
+	public boolean getIsLinked() {
+		return _isLinked;
+	}
+
+	public boolean isIsLinked() {
+		return _isLinked;
+	}
+
+	public void setIsLinked(boolean isLinked) {
+		_isLinked = isLinked;
+	}
+
 	public java.util.List<com.liferay.portlet.asset.model.AssetCategory> getAssetCategoryIds() {
 		throw new UnsupportedOperationException();
 	}
@@ -942,6 +961,7 @@ public class CourseClp extends BaseModelImpl<Course> implements Course {
 		clone.setGoodbye(getGoodbye());
 		clone.setGoodbyeMsg(getGoodbyeMsg());
 		clone.setGoodbyeSubject(getGoodbyeSubject());
+		clone.setIsLinked(getIsLinked());
 
 		return clone;
 	}
@@ -998,7 +1018,7 @@ public class CourseClp extends BaseModelImpl<Course> implements Course {
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(63);
+		StringBundler sb = new StringBundler(65);
 
 		sb.append("{uuid=");
 		sb.append(getUuid());
@@ -1062,13 +1082,15 @@ public class CourseClp extends BaseModelImpl<Course> implements Course {
 		sb.append(getGoodbyeMsg());
 		sb.append(", goodbyeSubject=");
 		sb.append(getGoodbyeSubject());
+		sb.append(", isLinked=");
+		sb.append(getIsLinked());
 		sb.append("}");
 
 		return sb.toString();
 	}
 
 	public String toXmlString() {
-		StringBundler sb = new StringBundler(97);
+		StringBundler sb = new StringBundler(100);
 
 		sb.append("<model><model-name>");
 		sb.append("com.liferay.lms.model.Course");
@@ -1198,6 +1220,10 @@ public class CourseClp extends BaseModelImpl<Course> implements Course {
 			"<column><column-name>goodbyeSubject</column-name><column-value><![CDATA[");
 		sb.append(getGoodbyeSubject());
 		sb.append("]]></column-value></column>");
+		sb.append(
+			"<column><column-name>isLinked</column-name><column-value><![CDATA[");
+		sb.append(getIsLinked());
+		sb.append("]]></column-value></column>");
 
 		sb.append("</model>");
 
@@ -1239,5 +1265,6 @@ public class CourseClp extends BaseModelImpl<Course> implements Course {
 	private boolean _goodbye;
 	private String _goodbyeMsg;
 	private String _goodbyeSubject;
+	private boolean _isLinked;
 	private BaseModel<?> _courseRemoteModel;
 }

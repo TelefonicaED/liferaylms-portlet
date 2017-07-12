@@ -733,6 +733,27 @@ public interface CourseModel extends BaseModel<Course>, GroupedModel,
 	public void setGoodbyeSubject(String goodbyeSubject);
 
 	/**
+	 * Returns the is linked of this course.
+	 *
+	 * @return the is linked of this course
+	 */
+	public boolean getIsLinked();
+
+	/**
+	 * Returns <code>true</code> if this course is is linked.
+	 *
+	 * @return <code>true</code> if this course is is linked; <code>false</code> otherwise
+	 */
+	public boolean isIsLinked();
+
+	/**
+	 * Sets whether this course is is linked.
+	 *
+	 * @param isLinked the is linked of this course
+	 */
+	public void setIsLinked(boolean isLinked);
+
+	/**
 	 * @deprecated Renamed to {@link #isApproved()}
 	 */
 	public boolean getApproved();

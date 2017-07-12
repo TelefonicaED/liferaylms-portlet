@@ -102,9 +102,10 @@ public class CourseModelImpl extends BaseModelImpl<Course>
 			{ "welcomeSubject", Types.VARCHAR },
 			{ "goodbye", Types.BOOLEAN },
 			{ "goodbyeMsg", Types.VARCHAR },
-			{ "goodbyeSubject", Types.VARCHAR }
+			{ "goodbyeSubject", Types.VARCHAR },
+			{ "isLinked", Types.BOOLEAN }
 		};
-	public static final String TABLE_SQL_CREATE = "create table Lms_Course (uuid_ VARCHAR(75) null,courseId LONG not null primary key,parentCourseId LONG,companyId LONG,groupId LONG,userId LONG,userName VARCHAR(75) null,groupCreatedId LONG,createDate DATE null,modifiedDate DATE null,status INTEGER,statusByUserId LONG,statusByUserName VARCHAR(75) null,statusDate DATE null,title STRING null,description STRING null,friendlyURL VARCHAR(100) null,startDate DATE null,endDate DATE null,icon LONG,CourseEvalId LONG,CourseExtraData TEXT null,closed BOOLEAN,maxusers LONG,calificationType LONG,welcome BOOLEAN,welcomeMsg TEXT null,welcomeSubject VARCHAR(75) null,goodbye BOOLEAN,goodbyeMsg TEXT null,goodbyeSubject VARCHAR(75) null)";
+	public static final String TABLE_SQL_CREATE = "create table Lms_Course (uuid_ VARCHAR(75) null,courseId LONG not null primary key,parentCourseId LONG,companyId LONG,groupId LONG,userId LONG,userName VARCHAR(75) null,groupCreatedId LONG,createDate DATE null,modifiedDate DATE null,status INTEGER,statusByUserId LONG,statusByUserName VARCHAR(75) null,statusDate DATE null,title STRING null,description STRING null,friendlyURL VARCHAR(100) null,startDate DATE null,endDate DATE null,icon LONG,CourseEvalId LONG,CourseExtraData TEXT null,closed BOOLEAN,maxusers LONG,calificationType LONG,welcome BOOLEAN,welcomeMsg TEXT null,welcomeSubject VARCHAR(75) null,goodbye BOOLEAN,goodbyeMsg TEXT null,goodbyeSubject VARCHAR(75) null,isLinked BOOLEAN)";
 	public static final String TABLE_SQL_DROP = "drop table Lms_Course";
 	public static final String ORDER_BY_JPQL = " ORDER BY course.courseId ASC";
 	public static final String ORDER_BY_SQL = " ORDER BY Lms_Course.courseId ASC";
@@ -173,6 +174,7 @@ public class CourseModelImpl extends BaseModelImpl<Course>
 		model.setGoodbye(soapModel.getGoodbye());
 		model.setGoodbyeMsg(soapModel.getGoodbyeMsg());
 		model.setGoodbyeSubject(soapModel.getGoodbyeSubject());
+		model.setIsLinked(soapModel.getIsLinked());
 
 		return model;
 	}
@@ -262,6 +264,7 @@ public class CourseModelImpl extends BaseModelImpl<Course>
 		attributes.put("goodbye", getGoodbye());
 		attributes.put("goodbyeMsg", getGoodbyeMsg());
 		attributes.put("goodbyeSubject", getGoodbyeSubject());
+		attributes.put("isLinked", getIsLinked());
 
 		return attributes;
 	}
@@ -452,6 +455,12 @@ public class CourseModelImpl extends BaseModelImpl<Course>
 
 		if (goodbyeSubject != null) {
 			setGoodbyeSubject(goodbyeSubject);
+		}
+
+		Boolean isLinked = (Boolean)attributes.get("isLinked");
+
+		if (isLinked != null) {
+			setIsLinked(isLinked);
 		}
 	}
 
@@ -1034,6 +1043,18 @@ public class CourseModelImpl extends BaseModelImpl<Course>
 		_goodbyeSubject = goodbyeSubject;
 	}
 
+	public boolean getIsLinked() {
+		return _isLinked;
+	}
+
+	public boolean isIsLinked() {
+		return _isLinked;
+	}
+
+	public void setIsLinked(boolean isLinked) {
+		_isLinked = isLinked;
+	}
+
 	/**
 	 * @deprecated {@link #isApproved}
 	 */
@@ -1186,6 +1207,7 @@ public class CourseModelImpl extends BaseModelImpl<Course>
 		courseImpl.setGoodbye(getGoodbye());
 		courseImpl.setGoodbyeMsg(getGoodbyeMsg());
 		courseImpl.setGoodbyeSubject(getGoodbyeSubject());
+		courseImpl.setIsLinked(getIsLinked());
 
 		courseImpl.resetOriginalValues();
 
@@ -1444,12 +1466,14 @@ public class CourseModelImpl extends BaseModelImpl<Course>
 			courseCacheModel.goodbyeSubject = null;
 		}
 
+		courseCacheModel.isLinked = getIsLinked();
+
 		return courseCacheModel;
 	}
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(63);
+		StringBundler sb = new StringBundler(65);
 
 		sb.append("{uuid=");
 		sb.append(getUuid());
@@ -1513,13 +1537,15 @@ public class CourseModelImpl extends BaseModelImpl<Course>
 		sb.append(getGoodbyeMsg());
 		sb.append(", goodbyeSubject=");
 		sb.append(getGoodbyeSubject());
+		sb.append(", isLinked=");
+		sb.append(getIsLinked());
 		sb.append("}");
 
 		return sb.toString();
 	}
 
 	public String toXmlString() {
-		StringBundler sb = new StringBundler(97);
+		StringBundler sb = new StringBundler(100);
 
 		sb.append("<model><model-name>");
 		sb.append("com.liferay.lms.model.Course");
@@ -1649,6 +1675,10 @@ public class CourseModelImpl extends BaseModelImpl<Course>
 			"<column><column-name>goodbyeSubject</column-name><column-value><![CDATA[");
 		sb.append(getGoodbyeSubject());
 		sb.append("]]></column-value></column>");
+		sb.append(
+			"<column><column-name>isLinked</column-name><column-value><![CDATA[");
+		sb.append(getIsLinked());
+		sb.append("]]></column-value></column>");
 
 		sb.append("</model>");
 
@@ -1708,6 +1738,7 @@ public class CourseModelImpl extends BaseModelImpl<Course>
 	private boolean _goodbye;
 	private String _goodbyeMsg;
 	private String _goodbyeSubject;
+	private boolean _isLinked;
 	private long _columnBitmask;
 	private Course _escapedModelProxy;
 }

@@ -62,6 +62,7 @@ public class CourseSoap implements Serializable {
 		soapModel.setGoodbye(model.getGoodbye());
 		soapModel.setGoodbyeMsg(model.getGoodbyeMsg());
 		soapModel.setGoodbyeSubject(model.getGoodbyeSubject());
+		soapModel.setIsLinked(model.getIsLinked());
 
 		return soapModel;
 	}
@@ -374,6 +375,18 @@ public class CourseSoap implements Serializable {
 		_goodbyeSubject = goodbyeSubject;
 	}
 
+	public boolean getIsLinked() {
+		return _isLinked;
+	}
+
+	public boolean isIsLinked() {
+		return _isLinked;
+	}
+
+	public void setIsLinked(boolean isLinked) {
+		_isLinked = isLinked;
+	}
+
 	private String _uuid;
 	private long _courseId;
 	private long _parentCourseId;
@@ -405,4 +418,5 @@ public class CourseSoap implements Serializable {
 	private boolean _goodbye;
 	private String _goodbyeMsg;
 	private String _goodbyeSubject;
+	private boolean _isLinked;
 }

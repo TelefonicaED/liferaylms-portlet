@@ -39,7 +39,6 @@
 <%@ include file="/init.jsp" %>
 
 <portlet:actionURL var="savecourseURL" name="saveCourse" />
-<portlet:renderURL var="cancelURL" />
 <liferay-ui:success key="course-saved-successfully" message="successfully-saved" />
 <liferay-ui:error key="title-required" message="title-required" />
 <liferay-ui:error key="title-empty" message="title-empty" />
@@ -109,13 +108,18 @@ String backURL = ParamUtil.getString(request, "backURL");
 String referringPortletResource = ParamUtil.getString(request, "referringPortletResource");
 long courseId=ParamUtil.getLong(request, "courseId",0);
 Course course=null;
-
+boolean isCourseChild = false;
 if(request.getAttribute("course")!=null){
 	course=(Course)request.getAttribute("course");
 }
 else{
 	if(courseId>0){
-		course=CourseLocalServiceUtil.getCourse(courseId);
+		course=CourseLocalServiceUtil.fetchCourse(courseId);
+		if(course!=null){
+			if(course.getParentCourseId()>0){
+				isCourseChild=true;
+			}
+		}
 	}
 }	
 
@@ -334,12 +338,12 @@ if(course!=null){
 	    		</script>
 		</aui:field-wrapper>
 	</c:if>
-	
-	<c:if test="<%= permissionChecker.hasPermission(themeDisplay.getScopeGroupId(),  Course.class.getName(),0,publishPermission) && 
-			GetterUtil.getBoolean(renderRequest.getPreferences().getValues(\"showcatalog\", new String[]{StringPool.TRUE})[0],true) %>">
-		<aui:input type="checkbox" name="visible" label="published-in-catalog" value="<%=visibleencatalogo %>" />
+	<c:if test="<%=!isCourseChild%>">
+		<c:if test="<%= permissionChecker.hasPermission(themeDisplay.getScopeGroupId(),  Course.class.getName(),0,publishPermission) && 
+				GetterUtil.getBoolean(renderRequest.getPreferences().getValues(\"showcatalog\", new String[]{StringPool.TRUE})[0],true) %>">
+			<aui:input type="checkbox" name="visible" label="published-in-catalog" value="<%=visibleencatalogo %>" />
+		</c:if>
 	</c:if>
-	
 	<% boolean requiredCourseIcon = GetterUtil.getBoolean(PropsUtil.get("lms.course.icon.required"), false); %>
 	<aui:input type="hidden" name="icon" >
 		<% if (requiredCourseIcon) { %>
@@ -394,210 +398,214 @@ if(course!=null){
 	<c:if test="${renderRequest.preferences.getValue('showResume', 'true') }">
 		<aui:input type="textarea" cols="100" rows="4" name="summary" label="summary" value="<%=summary %>"/>
 	</c:if>
-	<div id="<portlet:namespace/>diplomaContent">
-		<%@include file="/html/courseadmin/inc/specificContent.jsp" %>
-	</div>
 	
+	<c:if test="<%=!isCourseChild%>">
+		<div id="<portlet:namespace/>diplomaContent">
+			<%@include file="/html/courseadmin/inc/specificContent.jsp" %>
+		</div>
+	</c:if>
 	
-	<%
-	List<Long> courseEvalIds = ListUtil.toList(StringUtil.split(LmsPrefsLocalServiceUtil.getLmsPrefsIni(themeDisplay.getCompanyId()).getCourseevals(),",",0L));
-	CourseEvalRegistry cer=new CourseEvalRegistry();
-	CourseEval courseEval = null;
-	if(courseEvalIds.size()>1){%>
-		<aui:select name="courseEvalId" label="course-correction-method" helpMessage="<%=LanguageUtil.get(pageContext,\"course-correction-method-help\")%>" 
-					onChange="<%=\"javascript:AUI().use('aui-io-request','aui-parse-content','querystring',function(A){ \"+
-							\"	var courseCombo = document.getElementById('\"+renderResponse.getNamespace()+\"courseEvalId'), \"+
-							\"		currentCourseEvalId = courseCombo.options[courseCombo.selectedIndex].value, \"+
-							\"		params = {}, \"+
-							\"		urlPieces = '\"+
-										UnicodeFormatter.toString(renderResponse.createRenderURL().toString()) +\"'.split('?'); \"+
-							\"	if (urlPieces.length > 1) { \"+
-							\"		params = A.QueryString.parse(urlPieces[1]); \"+
-							\"		params.p_p_state='\"+LiferayWindowState.EXCLUSIVE.toString() +\"'; \"+
-							((course==null)?StringPool.BLANK:
-								\"	params.\"+renderResponse.getNamespace()+\"courseId=\"+course.getCourseId()+\"; \")+
-							\"		params.\"+renderResponse.getNamespace()+\"courseEvalId=currentCourseEvalId; \"+
-							\"		params.\"+renderResponse.getNamespace()+\"mvcPath='/html/courseadmin/editcourseeval.jsp'; \"+
-							\"	} \"+
-							\"	A.io.request( \"+
-							\"		urlPieces[0], \"+
-							\"		{ \"+
-							\"			data: params, \"+
-							\"			dataType: 'html', \"+
-							\"			on: { \"+
-							\"				failure: function(event, id, obj) { \"+
-							\"					var portlet = A.one('#p_p_id\"+renderResponse.getNamespace()+\"'); \"+
-							\"					portlet.hide(); \"+
-							\"					portlet.placeAfter('<div class=\\\\'portlet-msg-error\\\\'>\"+
-													UnicodeFormatter.toString(LanguageUtil.get(pageContext, 
-													\"there-was-an-unexpected-error.-please-refresh-the-current-page\")) +\"</div>'); \"+
-							\"				}, \"+
-							\"				success: function(event, id, obj) { \"+
-							\"					var courseEvalDetailsDiv = A.one('#\"+
-														renderResponse.getNamespace()+\"courseEvalDetails'); \"+
-							\"					courseEvalDetailsDiv.plug(A.Plugin.ParseContent); \"+ 
-							\"					if(this.get('responseData')!=null){courseEvalDetailsDiv.html(this.get('responseData')); }else{ courseEvalDetailsDiv.html(''); } \"+ 
-							\"				} \"+
-							\"			} \"+
-							\"		} \"+
-							\"	); \"+
-							\"}); \"%>">
+	<c:if test="<%=!isCourseChild%>">
 		<%
-		long courseEvalId = 0;
-		if(Validator.isNull(renderRequest.getParameter("courseEvalId"))) {
-			if((course!=null)&&(courseEvalIds.contains(course.getCourseEvalId()))) {
-				courseEvalId = course.getCourseEvalId();
-			}
-			else {
-				courseEvalId = courseEvalIds.get(0);
-			}
-		}
-		else {
-			courseEvalId = ParamUtil.getLong(renderRequest, "courseEvalId");
-		}
-
-		for(Long ce:courseEvalIds)
-		{
-			CourseEval cel = cer.getCourseEval(ce);
-			if(ce == courseEvalId) {
-				courseEval = cel;
-				%>
-				<aui:option value="<%=String.valueOf(ce)%>" selected="<%=true %>"><liferay-ui:message key="<%=cel.getName() %>" /></aui:option>
-				<%				
-			}
-			else {
-				%>
-				<aui:option value="<%=String.valueOf(ce)%>" selected="<%=false %>"><liferay-ui:message key="<%=cel.getName() %>" /></aui:option>
-				<%				
-			}
-		}
-		%>
-		</aui:select>
-	<%
-	}
-	else{
-		try{
-			if(courseEvalIds.isEmpty()){
-				courseEval = cer.getCourseEval(0);
-			}
-			else {
-				courseEval = cer.getCourseEval(courseEvalIds.get(0));
-			}
-		}catch(Exception e){
-			courseEval = cer.getCourseEval(0);
-		}
-		%>
-		<aui:input name="courseEvalId" value="<%=courseEval.getTypeId()%>" type="hidden"/>
-	<%}%>
-	<div id="<portlet:namespace/>courseEvalDetails" >
-		<liferay-util:include page="/html/courseadmin/editcourseeval.jsp" servletContext="<%=getServletContext() %>">
-			<liferay-util:param name="courseId" value="<%=String.valueOf((course==null)?0:course.getCourseId())%>" />
-			<liferay-util:param name="courseEvalId" value="<%=String.valueOf(courseEval.getTypeId())%>" />
-		</liferay-util:include>
-	</div>
-<%	if(course==null)
-	{
-		String[] layusprsel=null;
-		if(renderRequest.getPreferences().getValue("courseTemplates", null)!=null&&renderRequest.getPreferences().getValue("courseTemplates", null).length()>0)
-		{
-				layusprsel=renderRequest.getPreferences().getValue("courseTemplates", "").split(",");
-		}
-
-		String[] lspist=LmsPrefsLocalServiceUtil.getLmsPrefsIni(themeDisplay.getCompanyId()).getLmsTemplates().split(",");
-		if(layusprsel!=null &&layusprsel.length>0)
-		{
-			lspist=layusprsel;
-
-		}
-		if(lspist.length>1){
-		%>
-			<aui:select name="courseTemplate" label="course-template">
+		List<Long> courseEvalIds = ListUtil.toList(StringUtil.split(LmsPrefsLocalServiceUtil.getLmsPrefsIni(themeDisplay.getCompanyId()).getCourseevals(),",",0L));
+		CourseEvalRegistry cer=new CourseEvalRegistry();
+		CourseEval courseEval = null;
+		if(courseEvalIds.size()>1){%>
+			<aui:select name="courseEvalId" label="course-correction-method" helpMessage="<%=LanguageUtil.get(pageContext,\"course-correction-method-help\")%>" 
+						onChange="<%=\"javascript:AUI().use('aui-io-request','aui-parse-content','querystring',function(A){ \"+
+								\"	var courseCombo = document.getElementById('\"+renderResponse.getNamespace()+\"courseEvalId'), \"+
+								\"		currentCourseEvalId = courseCombo.options[courseCombo.selectedIndex].value, \"+
+								\"		params = {}, \"+
+								\"		urlPieces = '\"+
+											UnicodeFormatter.toString(renderResponse.createRenderURL().toString()) +\"'.split('?'); \"+
+								\"	if (urlPieces.length > 1) { \"+
+								\"		params = A.QueryString.parse(urlPieces[1]); \"+
+								\"		params.p_p_state='\"+LiferayWindowState.EXCLUSIVE.toString() +\"'; \"+
+								((course==null)?StringPool.BLANK:
+									\"	params.\"+renderResponse.getNamespace()+\"courseId=\"+course.getCourseId()+\"; \")+
+								\"		params.\"+renderResponse.getNamespace()+\"courseEvalId=currentCourseEvalId; \"+
+								\"		params.\"+renderResponse.getNamespace()+\"mvcPath='/html/courseadmin/editcourseeval.jsp'; \"+
+								\"	} \"+
+								\"	A.io.request( \"+
+								\"		urlPieces[0], \"+
+								\"		{ \"+
+								\"			data: params, \"+
+								\"			dataType: 'html', \"+
+								\"			on: { \"+
+								\"				failure: function(event, id, obj) { \"+
+								\"					var portlet = A.one('#p_p_id\"+renderResponse.getNamespace()+\"'); \"+
+								\"					portlet.hide(); \"+
+								\"					portlet.placeAfter('<div class=\\\\'portlet-msg-error\\\\'>\"+
+														UnicodeFormatter.toString(LanguageUtil.get(pageContext, 
+														\"there-was-an-unexpected-error.-please-refresh-the-current-page\")) +\"</div>'); \"+
+								\"				}, \"+
+								\"				success: function(event, id, obj) { \"+
+								\"					var courseEvalDetailsDiv = A.one('#\"+
+															renderResponse.getNamespace()+\"courseEvalDetails'); \"+
+								\"					courseEvalDetailsDiv.plug(A.Plugin.ParseContent); \"+ 
+								\"					if(this.get('responseData')!=null){courseEvalDetailsDiv.html(this.get('responseData')); }else{ courseEvalDetailsDiv.html(''); } \"+ 
+								\"				} \"+
+								\"			} \"+
+								\"		} \"+
+								\"	); \"+
+								\"}); \"%>">
 			<%
-			for(String lspis:lspist)
+			long courseEvalId = 0;
+			if(Validator.isNull(renderRequest.getParameter("courseEvalId"))) {
+				if((course!=null)&&(courseEvalIds.contains(course.getCourseEvalId()))) {
+					courseEvalId = course.getCourseEvalId();
+				}
+				else {
+					courseEvalId = courseEvalIds.get(0);
+				}
+			}
+			else {
+				courseEvalId = ParamUtil.getLong(renderRequest, "courseEvalId");
+			}
+	
+			for(Long ce:courseEvalIds)
 			{
-				LayoutSetPrototype lsp=LayoutSetPrototypeLocalServiceUtil.getLayoutSetPrototype(Long.parseLong(lspis));
-				%>
-				<aui:option value="<%=lsp.getLayoutSetPrototypeId() %>" ><%=lsp.getName(themeDisplay.getLocale()) %></aui:option>
-				<%
+				CourseEval cel = cer.getCourseEval(ce);
+				if(ce == courseEvalId) {
+					courseEval = cel;
+					%>
+					<aui:option value="<%=String.valueOf(ce)%>" selected="<%=true %>"><liferay-ui:message key="<%=cel.getName() %>" /></aui:option>
+					<%				
+				}
+				else {
+					%>
+					<aui:option value="<%=String.valueOf(ce)%>" selected="<%=false %>"><liferay-ui:message key="<%=cel.getName() %>" /></aui:option>
+					<%				
+				}
 			}
 			%>
 			</aui:select>
 		<%
 		}
 		else{
-			LayoutSetPrototype lsp=LayoutSetPrototypeLocalServiceUtil.getLayoutSetPrototype(Long.parseLong(lspist[0]));
-		%>
-			<aui:input name="courseTemplate" value="<%=lsp.getLayoutSetPrototypeId()%>" type="hidden"/>
-		<%}
-	}
-	List <Long> califications = ListUtil.toList(StringUtil.split(LmsPrefsLocalServiceUtil.getLmsPrefsIni(themeDisplay.getCompanyId()).getScoretranslators(),",",0L));	
-	CalificationTypeRegistry cal = new CalificationTypeRegistry();
-	if(califications.size()>1){
-		%>
-			<aui:select name="calificationType" label="calificationType" onchange="${renderResponse.getNamespace()}changeCalificationType(this.value)">			
-		<%
-		for(Long ct:califications){
-			boolean selected = false;
-			CalificationType ctype = cal.getCalificationType(ct);
-			if((course == null && PropsUtil.get("lms.calification.default.type").equals(String.valueOf(ct))) || (course != null && ct == course.getCalificationType()))
-				selected = true;
+			try{
+				if(courseEvalIds.isEmpty()){
+					courseEval = cer.getCourseEval(0);
+				}
+				else {
+					courseEval = cer.getCourseEval(courseEvalIds.get(0));
+				}
+			}catch(Exception e){
+				courseEval = cer.getCourseEval(0);
+			}
 			%>
-				<aui:option value="<%=String.valueOf(ct)%>"  selected="<%=selected %>"><liferay-ui:message key="<%=ctype.getTitle(themeDisplay.getLocale()) %>" /></aui:option>
-			<%
-		}
-		%>
-			</aui:select>
-			
-		<%	
-		for(Long ct:califications){
-			boolean selected = false;
-			CalificationType ctype = cal.getCalificationType(ct);
-			if(Validator.isNotNull(ctype.getExpecificContentPage())){%>
-				<div class="<%if(course == null || ct != course.getCalificationType()){%>aui-helper-hidden<%}%> especific_content_page" id="${renderResponse.getNamespace()}especific_content_page_<%=ctype.getTypeId()%>">
-					<liferay-util:include page="<%=ctype.getExpecificContentPage() %>" servletContext="<%=getServletContext() %>">
-						<%if(course != null){ %>
-							<liferay-util:param name="groupId" value="<%=Long.toString(course.getGroupCreatedId()) %>" />
-						<%} %>	
-					</liferay-util:include>	
-				</div>
-			<%
+			<aui:input name="courseEvalId" value="<%=courseEval.getTypeId()%>" type="hidden"/>
+		<%}%>
+		<div id="<portlet:namespace/>courseEvalDetails" >
+			<liferay-util:include page="/html/courseadmin/editcourseeval.jsp" servletContext="<%=getServletContext() %>">
+				<liferay-util:param name="courseId" value="<%=String.valueOf((course==null)?0:course.getCourseId())%>" />
+				<liferay-util:param name="courseEvalId" value="<%=String.valueOf(courseEval.getTypeId())%>" />
+			</liferay-util:include>
+		</div>
+	<%	if(course==null)
+		{
+			String[] layusprsel=null;
+			if(renderRequest.getPreferences().getValue("courseTemplates", null)!=null&&renderRequest.getPreferences().getValue("courseTemplates", null).length()>0)
+			{
+					layusprsel=renderRequest.getPreferences().getValue("courseTemplates", "").split(",");
 			}
-		}
-		%>	
-			<script>
-			function <portlet:namespace />changeCalificationType(typeId){
-				$(".especific_content_page").addClass("aui-helper-hidden");
-				$("#<portlet:namespace />especific_content_page_"+typeId).removeClass("aui-helper-hidden");
-			}
-			</script>
-			
-		<%
-	}else{
-		
-		CalificationType ctype = null;
-		try{
-			if(califications.size()>0){
-				ctype =cal.getCalificationType(califications.get(0));
-			}
-		}catch(Exception e){}
-		%>
-		<aui:input name="calificationType" value="<%=ctype==null?\"0\":ctype.getTypeId()%>" type="hidden"/>
-		
-		<%
-		if(Validator.isNotNull(ctype.getExpecificContentPage())){%>
-				<div class="especific_content_page" id="${renderResponse.getNamespace()}especific_content_page_<%=ctype.getTypeId()%>">
-					<liferay-util:include page="<%=ctype.getExpecificContentPage() %>" servletContext="<%=getServletContext() %>">
-						<%if(course != null){ 
-							String courseGroupId = Long.toString(course.getGroupCreatedId());
-							%>
-							<liferay-util:param name="groupId" value="<%=courseGroupId %>" />
-						<%} %>
-					</liferay-util:include>		
-				</div>
-			<%
-		}
-	}
 	
+			String[] lspist=LmsPrefsLocalServiceUtil.getLmsPrefsIni(themeDisplay.getCompanyId()).getLmsTemplates().split(",");
+			if(layusprsel!=null &&layusprsel.length>0)
+			{
+				lspist=layusprsel;
+	
+			}
+			if(lspist.length>1){
+			%>
+				<aui:select name="courseTemplate" label="course-template">
+				<%
+				for(String lspis:lspist)
+				{
+					LayoutSetPrototype lsp=LayoutSetPrototypeLocalServiceUtil.getLayoutSetPrototype(Long.parseLong(lspis));
+					%>
+					<aui:option value="<%=lsp.getLayoutSetPrototypeId() %>" ><%=lsp.getName(themeDisplay.getLocale()) %></aui:option>
+					<%
+				}
+				%>
+				</aui:select>
+			<%
+			}
+			else{
+				LayoutSetPrototype lsp=LayoutSetPrototypeLocalServiceUtil.getLayoutSetPrototype(Long.parseLong(lspist[0]));
+			%>
+				<aui:input name="courseTemplate" value="<%=lsp.getLayoutSetPrototypeId()%>" type="hidden"/>
+			<%}
+		}
+		List <Long> califications = ListUtil.toList(StringUtil.split(LmsPrefsLocalServiceUtil.getLmsPrefsIni(themeDisplay.getCompanyId()).getScoretranslators(),",",0L));	
+		CalificationTypeRegistry cal = new CalificationTypeRegistry();
+		if(califications.size()>1){
+			%>
+				<aui:select name="calificationType" label="calificationType" onchange="${renderResponse.getNamespace()}changeCalificationType(this.value)">			
+			<%
+			for(Long ct:califications){
+				boolean selected = false;
+				CalificationType ctype = cal.getCalificationType(ct);
+				if((course == null && PropsUtil.get("lms.calification.default.type").equals(String.valueOf(ct))) || (course != null && ct == course.getCalificationType()))
+					selected = true;
+				%>
+					<aui:option value="<%=String.valueOf(ct)%>"  selected="<%=selected %>"><liferay-ui:message key="<%=ctype.getTitle(themeDisplay.getLocale()) %>" /></aui:option>
+				<%
+			}
+			%>
+				</aui:select>
+				
+			<%	
+			for(Long ct:califications){
+				boolean selected = false;
+				CalificationType ctype = cal.getCalificationType(ct);
+				if(Validator.isNotNull(ctype.getExpecificContentPage())){%>
+					<div class="<%if(course == null || ct != course.getCalificationType()){%>aui-helper-hidden<%}%> especific_content_page" id="${renderResponse.getNamespace()}especific_content_page_<%=ctype.getTypeId()%>">
+						<liferay-util:include page="<%=ctype.getExpecificContentPage() %>" servletContext="<%=getServletContext() %>">
+							<%if(course != null){ %>
+								<liferay-util:param name="groupId" value="<%=Long.toString(course.getGroupCreatedId()) %>" />
+							<%} %>	
+						</liferay-util:include>	
+					</div>
+				<%
+				}
+			}
+			%>	
+				<script>
+				function <portlet:namespace />changeCalificationType(typeId){
+					$(".especific_content_page").addClass("aui-helper-hidden");
+					$("#<portlet:namespace />especific_content_page_"+typeId).removeClass("aui-helper-hidden");
+				}
+				</script>
+				
+			<%
+		}else{
+			
+			CalificationType ctype = null;
+			try{
+				if(califications.size()>0){
+					ctype =cal.getCalificationType(califications.get(0));
+				}
+			}catch(Exception e){}
+			%>
+			<aui:input name="calificationType" value="<%=ctype==null?\"0\":ctype.getTypeId()%>" type="hidden"/>
+			
+			<%
+			if(Validator.isNotNull(ctype.getExpecificContentPage())){%>
+					<div class="especific_content_page" id="${renderResponse.getNamespace()}especific_content_page_<%=ctype.getTypeId()%>">
+						<liferay-util:include page="<%=ctype.getExpecificContentPage() %>" servletContext="<%=getServletContext() %>">
+							<%if(course != null){ 
+								String courseGroupId = Long.toString(course.getGroupCreatedId());
+								%>
+								<liferay-util:param name="groupId" value="<%=courseGroupId %>" />
+							<%} %>
+						</liferay-util:include>		
+					</div>
+				<%
+			}
+		}%>
+	</c:if>
+	<% 
 	boolean showInscriptionDate = GetterUtil.getBoolean(renderRequest.getPreferences().getValues("showInscriptionDate", new String[]{StringPool.TRUE})[0],true);
 	%>
 <liferay-ui:panel-container extended="false"  persistState="false">
@@ -655,19 +663,22 @@ if(course!=null){
 			</aui:input>
 		</c:if>
 	</liferay-ui:panel>
-	<liferay-ui:panel title="categorization" collapsible="true" defaultState="closed">
-	<liferay-ui:custom-attributes-available className="<%= Course.class.getName() %>">
-	<liferay-ui:custom-attribute-list 
-		className="<%=com.liferay.lms.model.Course.class.getName()%>" classPK="<%=courseId %>" editable="true" label="true"></liferay-ui:custom-attribute-list>
-	</liferay-ui:custom-attributes-available>
-	<aui:input name="tags" type="assetTags" />
-	<aui:input name="categories" type="assetCategories" />
-	<aui:fieldset label="related-assets">
-	<liferay-ui:input-asset-links
-					className="<%= Course.class.getName() %>"
-					classPK="<%= courseId %>" assetEntryId="<%=assetEntryId %>" 	/>
-	</aui:fieldset>
-	</liferay-ui:panel>
+	
+	<c:if test="<%=!isCourseChild%>">
+		<liferay-ui:panel title="categorization" collapsible="true" defaultState="closed">
+		<liferay-ui:custom-attributes-available className="<%= Course.class.getName() %>">
+		<liferay-ui:custom-attribute-list 
+			className="<%=com.liferay.lms.model.Course.class.getName()%>" classPK="<%=courseId %>" editable="true" label="true"></liferay-ui:custom-attribute-list>
+		</liferay-ui:custom-attributes-available>
+		<aui:input name="tags" type="assetTags" />
+		<aui:input name="categories" type="assetCategories" />
+		<aui:fieldset label="related-assets">
+		<liferay-ui:input-asset-links
+						className="<%= Course.class.getName() %>"
+						classPK="<%= courseId %>" assetEntryId="<%=assetEntryId %>" 	/>
+		</aui:fieldset>
+		</liferay-ui:panel>
+	</c:if>
 	
 	<c:if test="<%=courseId==0 && showCoursePermission%>">
 		<liferay-ui:panel title="permissions" collapsible="true" defaultState="closed">
@@ -849,7 +860,19 @@ if(course!=null){
 			</liferay-ui:panel>
 		</c:if>
 		
-</liferay-ui:panel-container>
+	</liferay-ui:panel-container>
+	<c:choose>
+		<c:when test="<%=isCourseChild%>">
+			<liferay-portlet:renderURL var="cancelURL">
+				<liferay-portlet:param name="view" value="editions"/>
+				<liferay-portlet:param name="courseId" value="<%=String.valueOf(course.getParentCourseId())%>"/>
+			</liferay-portlet:renderURL>
+		</c:when>
+		<c:otherwise>
+			<portlet:renderURL var="cancelURL" />
+		</c:otherwise>
+	</c:choose>
+	
 	<aui:button-row>
 		<aui:button type="submit"></aui:button>							
 		<aui:button onClick="${cancelURL }" type="cancel" />

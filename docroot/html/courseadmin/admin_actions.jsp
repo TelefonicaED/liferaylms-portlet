@@ -1,3 +1,4 @@
+<%@page import="com.liferay.lms.service.CourseLocalServiceUtil"%>
 <%@page import="javax.portlet.PortletPreferences"%>
 <%@page import="com.liferay.portlet.PortletPreferencesFactoryUtil"%>
 <%@page import="com.liferay.lms.service.CompetenceServiceUtil"%>
@@ -17,6 +18,9 @@ String primKey = String.valueOf(myCourse.getCourseId());
 long count = 0;
 long countGroup = CompetenceServiceUtil.getCountCompetencesOfGroup(myCourse.getGroupCreatedId());
 long countParentGroup = CompetenceServiceUtil.getCountCompetencesOfGroup(myCourse.getGroupId());
+long countStudents = CourseLocalServiceUtil.getStudentsFromCourseCount(myCourse.getCourseId());
+long countChildCourses = CourseLocalServiceUtil.countChildCourses(myCourse.getCourseId());
+
 count = countGroup + countParentGroup;
 
 PortletPreferences preferences = null;
@@ -93,7 +97,7 @@ if( permissionChecker.hasPermission(themeDisplay.getScopeGroupId(),  Course.clas
 	<portlet:param name="view" value="role-members-tab" />
 </portlet:renderURL>
 <%
-if(permissionChecker.hasPermission(themeDisplay.getScopeGroupId(),  Course.class.getName(),primKey,ActionKeys.ASSIGN_MEMBERS)&& ! myCourse.isClosed() && showMembers)
+if(permissionChecker.hasPermission(themeDisplay.getScopeGroupId(),  Course.class.getName(),primKey,ActionKeys.ASSIGN_MEMBERS)&& ! myCourse.isClosed() && showMembers && countChildCourses <=0)
 {
 %>
 
@@ -128,7 +132,7 @@ if(permissionChecker.hasPermission(themeDisplay.getScopeGroupId(),  Course.class
 	</portlet:renderURL>
 	<liferay-ui:icon image="post" message="courseadmin.adminactions.import" url="<%=importURL %>" />			
 	<%}%>
-	<%if(showClone && permissionChecker.hasPermission(themeDisplay.getScopeGroupId(),  Course.class.getName(),primKey,ActionKeys.UPDATE) && myCourse.getParentCourseId()<=0){%>	
+	<%if(showClone && permissionChecker.hasPermission(themeDisplay.getScopeGroupId(),  Course.class.getName(),primKey,ActionKeys.UPDATE)){%>	
 	<portlet:renderURL var="cloneURL">
 		<portlet:param name="groupId" value="<%=String.valueOf(myCourse.getGroupCreatedId()) %>" />
 		<portlet:param name="view" value="clone" />
@@ -137,7 +141,7 @@ if(permissionChecker.hasPermission(themeDisplay.getScopeGroupId(),  Course.class
 	<%}%>			
 
 
-	<c:if test="<%=count>0 && permissionChecker.hasPermission(themeDisplay.getScopeGroupId(),  Course.class.getName(),primKey,ActionKeys.UPDATE) && ! myCourse.isClosed() && myCourse.getParentCourseId()<=0%>">
+	<c:if test="<%=count>0 && permissionChecker.hasPermission(themeDisplay.getScopeGroupId(),  Course.class.getName(),primKey,ActionKeys.UPDATE) && ! myCourse.isClosed() && myCourse.getParentCourseId()<=0 %>">
 		<portlet:renderURL var="competenceURL">
 			<portlet:param name="groupId" value="<%=String.valueOf(myCourse.getGroupCreatedId()) %>" />
 			<portlet:param name="courseId" value="<%=String.valueOf(myCourse.getCourseId()) %>" />
@@ -147,7 +151,7 @@ if(permissionChecker.hasPermission(themeDisplay.getScopeGroupId(),  Course.class
 	</c:if>
 	
 	
-	<c:if test="<%=permissionChecker.hasPermission(themeDisplay.getScopeGroupId(),  Course.class.getName(),primKey,ActionKeys.UPDATE) && ! myCourse.isClosed() && myCourse.getParentCourseId()>0%>">
+	<c:if test="<%=permissionChecker.hasPermission(themeDisplay.getScopeGroupId(),  Course.class.getName(),primKey,ActionKeys.UPDATE) && ! myCourse.isClosed() && myCourse.getParentCourseId()<=0 && countStudents<=0%>">
 		<liferay-portlet:renderURL var="editionsURL">
 			<liferay-portlet:param name="courseId" value="<%=String.valueOf(myCourse.getCourseId()) %>"/>
 			<liferay-portlet:param name="view" value="editions"/>

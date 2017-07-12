@@ -76,6 +76,7 @@ public class CourseWrapper implements Course, ModelWrapper<Course> {
 		attributes.put("goodbye", getGoodbye());
 		attributes.put("goodbyeMsg", getGoodbyeMsg());
 		attributes.put("goodbyeSubject", getGoodbyeSubject());
+		attributes.put("isLinked", getIsLinked());
 
 		return attributes;
 	}
@@ -265,6 +266,12 @@ public class CourseWrapper implements Course, ModelWrapper<Course> {
 
 		if (goodbyeSubject != null) {
 			setGoodbyeSubject(goodbyeSubject);
+		}
+
+		Boolean isLinked = (Boolean)attributes.get("isLinked");
+
+		if (isLinked != null) {
+			setIsLinked(isLinked);
 		}
 	}
 
@@ -1127,6 +1134,33 @@ public class CourseWrapper implements Course, ModelWrapper<Course> {
 	*/
 	public void setGoodbyeSubject(java.lang.String goodbyeSubject) {
 		_course.setGoodbyeSubject(goodbyeSubject);
+	}
+
+	/**
+	* Returns the is linked of this course.
+	*
+	* @return the is linked of this course
+	*/
+	public boolean getIsLinked() {
+		return _course.getIsLinked();
+	}
+
+	/**
+	* Returns <code>true</code> if this course is is linked.
+	*
+	* @return <code>true</code> if this course is is linked; <code>false</code> otherwise
+	*/
+	public boolean isIsLinked() {
+		return _course.isIsLinked();
+	}
+
+	/**
+	* Sets whether this course is is linked.
+	*
+	* @param isLinked the is linked of this course
+	*/
+	public void setIsLinked(boolean isLinked) {
+		_course.setIsLinked(isLinked);
 	}
 
 	/**

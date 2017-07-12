@@ -284,21 +284,14 @@ function validate(){
 %>
 	</aui:select>		
 	
-<%
-	module = ModuleLocalServiceUtil.fetchModule(moduleId);
-	if( module.getExpandoBridge().getAttributes().size()!=0 ){
-%>	
-		<liferay-ui:panel-container extended="false" persistState="false">
-			<liferay-ui:panel title="custom-fields" collapsible="true" defaultState="closed" >
-				<liferay-ui:custom-attributes-available className="<%= Module.class.getName() %>" >
-					<liferay-ui:custom-attribute-list className="<%=Module.class.getName()%>" classPK="<%=(moduleId==0)?0:moduleId %>" editable="true" 
-						label="true" />
-				</liferay-ui:custom-attributes-available>
-			</liferay-ui:panel>
-		</liferay-ui:panel-container>
-<%
-	}
-%>
+		<liferay-ui:custom-attributes-available className="<%= Module.class.getName() %>" >
+		  <liferay-ui:panel-container extended="false" persistState="false">
+		   <liferay-ui:panel title="custom-fields" collapsible="true" defaultState="closed" >
+		    <liferay-ui:custom-attribute-list className="<%=Module.class.getName()%>" classPK="<%=(moduleId==0)?0:moduleId %>" 
+		     editable="true" label="true" />
+		   </liferay-ui:panel>
+		  </liferay-ui:panel-container>
+		 </liferay-ui:custom-attributes-available>
 
 	<script type="text/javascript">
 	<!--

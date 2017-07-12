@@ -60,6 +60,10 @@ if( permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), "com.liferay
 		</c:choose>
 		
 		</liferay-ui:search-container-column-text>
+			<%=CourseLocalServiceUtil.countChildCourses(course.getCourseId()) %>
+		<liferay-ui:search-container-column-text name="course.editions-number">
+		
+		</liferay-ui:search-container-column-text>
 		
 		<c:if test="${renderRequest.preferences.getValue('showRegistrationType', 'false')}">		
 			<liferay-ui:search-container-column-text name="registration-type">

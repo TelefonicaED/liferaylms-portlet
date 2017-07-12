@@ -530,6 +530,7 @@
 		<column name="goodbye" type="boolean"/>
 		<column name="goodbyeMsg" type="String"/>
 		<column name="goodbyeSubject" type="String"/>
+		<column name="isLinked" type="boolean"/>
 		
  		<order by="asc">
 			<order-column name="courseId" />

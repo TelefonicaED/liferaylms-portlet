@@ -45,14 +45,25 @@ if(Validator.isNotNull(roleId)){
 long primKey=ParamUtil.getLong(request, "courseId",0);
 Course course=CourseLocalServiceUtil.getCourse(primKey);
 long createdGroupId=course.getGroupCreatedId();
+boolean isChildCourse=false;
+if(!backToEdit){
+	if(course!=null){
+		if(course.getParentCourseId()>0){
+			isChildCourse = true;
+		}
+	}	
+}
 
 %>
 <liferay-portlet:renderURL var="backURL">
-	<c:if test="<%=backToEdit %>">
+	<% if(backToEdit){%>
 		<liferay-portlet:param name="courseId" value="<%=String.valueOf(primKey) %>" />
 		<liferay-portlet:param name="view" value="edit-course" />
 		<liferay-portlet:param name="redirect" value='<%= redirectOfEdit %>'/>	
-	</c:if>
+	<%}else if(isChildCourse){%>
+		<liferay-portlet:param name="courseId" value="<%=String.valueOf(course.getParentCourseId()) %>" />
+		<liferay-portlet:param name="view" value="editions"/>
+	<%}%>
 </liferay-portlet:renderURL>
 <liferay-ui:header title="<%=course.getTitle(themeDisplay.getLocale()) %>" backURL="<%=backURL %>"></liferay-ui:header>
 

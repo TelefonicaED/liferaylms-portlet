@@ -752,35 +752,34 @@ public class CourseAdmin extends MVCPortlet {
 
 		ServiceContext serviceContext = ServiceContextFactory.getInstance(
 				Course.class.getName(), actionRequest);
-
-		ThemeDisplay themeDisplay = (ThemeDisplay) actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
-		String redirect = ParamUtil.getString(actionRequest, "redirect");
-
-		User user = themeDisplay.getUser();
 		long courseId = ParamUtil.getLong(actionRequest, "courseId", 0);
 		if (courseId > 0) {
-
-			//auditing
-			AuditingLogFactory.audit(serviceContext.getCompanyId(), serviceContext.getScopeGroupId(), Course.class.getName(), courseId, serviceContext.getUserId(), AuditConstants.CLOSE, null);
-			
-			CourseLocalServiceUtil.deleteCourse(courseId);
+			Course course = CourseLocalServiceUtil.fetchCourse(courseId);
+			if(course!=null){
+				//auditing
+				AuditingLogFactory.audit(serviceContext.getCompanyId(), serviceContext.getScopeGroupId(), Course.class.getName(), courseId, serviceContext.getUserId(), AuditConstants.CLOSE, null);
+				CourseLocalServiceUtil.deleteCourse(courseId);
+				if(course.getParentCourseId()>0){
+					actionResponse.setRenderParameter("view", "editions");
+					actionResponse.setRenderParameter("courseId", String.valueOf(course.getParentCourseId()));
+				}
+			}
 		}
 	}
 	public void closeCourse(ActionRequest actionRequest, ActionResponse actionResponse) throws Exception {
 
 		log.debug("******CloseCourse**********");
-
-		Indexer indexer=IndexerRegistryUtil.getIndexer(Course.class);
-		
-		ServiceContext serviceContext = ServiceContextFactory.getInstance(Course.class.getName(), actionRequest);
-
-		ThemeDisplay themeDisplay = (ThemeDisplay) actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
-		String redirect = ParamUtil.getString(actionRequest, "redirect");
-
-		User user = themeDisplay.getUser();
 		long courseId = ParamUtil.getLong(actionRequest, "courseId", 0);
 		if (courseId > 0) {	
-			CourseLocalServiceUtil.closeCourse(courseId);
+			Course course = CourseLocalServiceUtil.fetchCourse(courseId);
+			if(course!=null){
+				CourseLocalServiceUtil.closeCourse(courseId);
+				if(course.getParentCourseId()>0){
+					actionResponse.setRenderParameter("view", "editions");
+					actionResponse.setRenderParameter("courseId", String.valueOf(course.getParentCourseId()));
+				}
+			}
+			
 		}
 	}
 	
@@ -1835,8 +1834,17 @@ public class CourseAdmin extends MVCPortlet {
 				SessionMessages.add(actionRequest, "courseadmin.clone.confirmation.success");
 			}
 		}
-		if(errors)
+		if(errors){
 			actionResponse.sendRedirect(ParamUtil.getString(actionRequest, "redirect"));
+		}else{
+			Course course = CourseLocalServiceUtil.fetchByGroupCreatedId(groupId);
+			if(course!=null){
+				if(course.getParentCourseId()>0){
+					actionResponse.setRenderParameter("view", "editions");
+					actionResponse.setRenderParameter("courseId", String.valueOf(course.getParentCourseId()));
+				}
+			}
+		}
 
 	}
 	

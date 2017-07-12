@@ -906,6 +906,7 @@ public class CoursePersistenceImpl extends BasePersistenceImpl<Course>
 		courseImpl.setGoodbye(course.isGoodbye());
 		courseImpl.setGoodbyeMsg(course.getGoodbyeMsg());
 		courseImpl.setGoodbyeSubject(course.getGoodbyeSubject());
+		courseImpl.setIsLinked(course.isIsLinked());
 
 		return courseImpl;
 	}
