@@ -16,6 +16,13 @@
 	Group groupObj = GroupLocalServiceUtil.getGroup(Long.valueOf(groupId));
 	Course course = CourseLocalServiceUtil.getCourseByGroupCreatedId(Long.parseLong(groupId));
 	
+	boolean isCourseChild = false;
+	if(course!=null){
+		if(course.getParentCourseId()>0){
+			isCourseChild=true;
+		}
+	}	
+	
 	SimpleDateFormat formatDay = new SimpleDateFormat("dd");
 	formatDay.setTimeZone(timeZone);
 	SimpleDateFormat formatMonth = new SimpleDateFormat("MM");
@@ -43,7 +50,20 @@
 <liferay-ui:error key="courseadmin.clone.error.duplicateName" message="courseadmin.clone.error.duplicateName" />
 <liferay-ui:error key="courseadmin.clone.error.dateinterval" message="courseadmin.clone.error.dateinterval" />
 
-<liferay-portlet:renderURL var="backURL"></liferay-portlet:renderURL>
+<liferay-portlet:renderURL var="backURL"/>
+
+<c:choose>
+		<c:when test="<%=isCourseChild%>">
+			<liferay-portlet:renderURL var="backURL">
+				<liferay-portlet:param name="view" value="editions"/>
+				<liferay-portlet:param name="courseId" value="<%=String.valueOf(course.getParentCourseId())%>"/>
+			</liferay-portlet:renderURL>
+		</c:when>
+		<c:otherwise>
+			<liferay-portlet:renderURL var="backURL"/>
+		</c:otherwise>
+	</c:choose>
+
 <liferay-ui:header title="<%= course != null ? course.getTitle(themeDisplay.getLocale()) : \"course\" %>" backURL="<%=backURL %>"></liferay-ui:header>
 
 <portlet:actionURL name="cloneCourse" var="cloneCourseURL">

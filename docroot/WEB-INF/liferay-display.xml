@@ -68,5 +68,6 @@
 		<portlet id="deregisteracademymail"></portlet>
 		<portlet id="viewactivitytriesdeleted"></portlet>
 		<portlet id="editmodule"></portlet>
+		<portlet id="coursedetail"></portlet>
 	</category>
 </display>

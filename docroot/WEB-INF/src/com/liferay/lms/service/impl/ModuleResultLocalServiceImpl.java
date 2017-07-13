@@ -350,48 +350,50 @@ public class ModuleResultLocalServiceImpl extends ModuleResultLocalServiceBaseIm
 		}
 
 
-	public void update(LearningActivityResult lactr)
-				throws PortalException, SystemException {
 
-		ModuleResult moduleResult = null;
-		long actId = lactr.getActId();
-		long userId = lactr.getUserId();
-		LearningActivity learningActivity = learningActivityLocalService.getLearningActivity(actId);
-		// Si el Weight es mayor que cero (obligatoria) entonces calcula, sino
-		// no.
-		// Se elimina la restricci�n de calcular solo en las obligatorias, se
-		// calcula ent todas las que se terminen.
-		long moduleId = learningActivity.getModuleId();
-		
-		moduleResult= getAndCreateIfNotExists( userId,  moduleId,lactr.getStartDate());
-		
-		if (learningActivity.getModuleId() > 0 && /*
-												 * learningActivity.
-												 * getWeightinmodule()>0 &&
-												 */lactr.getEndDate()!=null) 
-		{
+		public void update(LearningActivityResult lactr)
+					throws PortalException, SystemException {
+
+			ModuleResult moduleResult = null;
+			long actId = lactr.getActId();
+			long userId = lactr.getUserId();
+			LearningActivity learningActivity = learningActivityLocalService.getLearningActivity(actId);
+			// Si el Weight es mayor que cero (obligatoria) entonces calcula, sino
+			// no.
+			// Se elimina la restricci�n de calcular solo en las obligatorias, se
+			// calcula ent todas las que se terminen.
+			long moduleId = learningActivity.getModuleId();
 			
-			calculateModuleResult(moduleResult);
-			//auditing
-			ServiceContext serviceContext = ServiceContextThreadLocal.getServiceContext();
-			if(serviceContext!=null){
-				AuditingLogFactory.audit(serviceContext.getCompanyId(), serviceContext.getScopeGroupId(), ModuleResult.class.getName(), 
-					moduleResult.getPrimaryKey(), serviceContext.getUserId(), AuditConstants.UPDATE, null);
-			}else{
-				if(moduleResult!=null){
-					Module module = modulePersistence.fetchByPrimaryKey(moduleResult.getModuleId());
-					if(module!=null){
-						AuditingLogFactory.audit(module.getCompanyId(), module.getGroupId(), ModuleResult.class.getName(), 
-								moduleResult.getPrimaryKey(), module.getUserId(), AuditConstants.UPDATE, null);
+			moduleResult= getAndCreateIfNotExists( userId,  moduleId,lactr.getStartDate());
+			log.debug("****Modulo "+learningActivity.getModuleId() );
+			log.debug("****REsult End Date "+lactr.getEndDate());
+			if (learningActivity.getModuleId() > 0 && /*
+													 * learningActivity.
+													 * getWeightinmodule()>0 &&
+													 */lactr.getEndDate()!=null) 
+			{
+				log.debug("****Recalculamos Modulo");
+				calculateModuleResult(moduleResult);
+				//auditing
+				ServiceContext serviceContext = ServiceContextThreadLocal.getServiceContext();
+				if(serviceContext!=null){
+					AuditingLogFactory.audit(serviceContext.getCompanyId(), serviceContext.getScopeGroupId(), ModuleResult.class.getName(), 
+						moduleResult.getPrimaryKey(), serviceContext.getUserId(), AuditConstants.UPDATE, null);
+				}else{
+					if(moduleResult!=null){
+						Module module = modulePersistence.fetchByPrimaryKey(moduleResult.getModuleId());
+						if(module!=null){
+							AuditingLogFactory.audit(module.getCompanyId(), module.getGroupId(), ModuleResult.class.getName(), 
+									moduleResult.getPrimaryKey(), module.getUserId(), AuditConstants.UPDATE, null);
+						}
 					}
+					
 				}
+				
 				
 			}
 			
-			
 		}
-		
-	}
 	
 	public int updateAllUsers(long groupId, long moduleId) throws PortalException, SystemException {
 		
@@ -581,6 +583,7 @@ public class ModuleResultLocalServiceImpl extends ModuleResultLocalServiceBaseIm
 		return startDate;
 	}
 	
+	
 	private void calculateModuleResult(ModuleResult moduleResult) throws PortalException, SystemException
 	{
 		List<LearningActivity> learnActList = LearningActivityLocalServiceUtil.getLearningActivitiesOfModule(moduleResult.getModuleId());
@@ -644,8 +647,17 @@ public class ModuleResultLocalServiceImpl extends ModuleResultLocalServiceBaseIm
 		}
 		
 		//S�lo actualizamos si cambia el resultado.
-		if(moduleResult.getResult() < result || (passedModule&&!moduleResult.getPassed()))
+		
+		log.debug("Vamos a ver si actualizamos...");
+		log.debug("Module result "+moduleResult.getResult());
+		log.debug("Result "+result);
+		log.debug("PassedModule "+passedModule);
+		log.debug("Module Result passed "+moduleResult.getPassed());
+		
+		if(moduleResult.getResult() <= result || (passedModule&&!moduleResult.getPassed()))
 		{	
+			
+			log.debug("Actualizamos curso");
 			moduleResult.setResult(result);
 			if(moduleResult.getPassed()==false)
 			{
@@ -682,5 +694,4 @@ public class ModuleResultLocalServiceImpl extends ModuleResultLocalServiceBaseIm
 		}
 		return moduleResult;
 	}
-	
 }

@@ -181,7 +181,9 @@ if(isTablet){%>
 						</liferay-util:include>  	
 <%
 					}else{	
-						List<TestQuestion> questions = TestQuestionLocalServiceUtil.getQuestions(actId);
+						List<TestQuestion> questions =  new ArrayList<TestQuestion>();
+						questions = ListUtil.copy(TestQuestionLocalServiceUtil.getQuestions(actId));
+						
 						if (useBank){
 							
 							LearningActivity bankActivity;
@@ -400,7 +402,49 @@ if(isTablet){%>
 							);
 				
 							Liferay.provide(
-							        window,
+								      window,
+								        '<portlet:namespace />popContinue',
+								        function(content, boton) {
+											var A = AUI();
+										
+											window.<portlet:namespace />confirmDialog = new A.Dialog(
+											    {
+											        title: Liferay.Language.get("execactivity.confirm.title"),
+											        bodyContent: content,
+											        buttons: [
+											                  {
+											                	  label: Liferay.Language.get("continue"),
+											                	  handler: function() {
+											                		  A.one('#<portlet:namespace/>formulario').detach('submit');
+											                		  document.getElementById('<portlet:namespace/>formulario').submit();
+											                		  <portlet:namespace />confirmDialog.close();
+											                	  }
+											                  },
+											                  {
+											                	  label: Liferay.Language.get("lms.dialog.cancel"),
+											                	  handler: function() {
+											                		  <portlet:namespace />confirmDialog.close();
+											                	  }
+											                  }
+											                  ],
+											        width: 'auto',
+											        height: 'auto',
+											        resizable: false,
+											        draggable: false,
+											        close: true,
+													cssClass: 'dialog-principal',
+											        destroyOnClose: true,
+											        centered: true,
+											        modal: true
+											    }
+											).render();
+											
+								        },
+								        ['node', 'aui-dialog', 'event', 'node-event-simulate']
+								);
+								
+								Liferay.provide(
+										window,
 							        '<portlet:namespace />popConfirm',
 							        function(content, boton) {
 										var A = AUI();

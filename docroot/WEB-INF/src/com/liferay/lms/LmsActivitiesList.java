@@ -479,6 +479,7 @@ public class LmsActivitiesList extends MVCPortlet {
 		}
 		
 		log.debug("*******extraContentError:"+extraContentError);
+		
 		if(Validator.isNotNull(extraContentError)){
 			SessionErrors.add(actionRequest, extraContentError);
 		}

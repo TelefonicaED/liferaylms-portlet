@@ -31,8 +31,8 @@ import com.liferay.lms.service.LearningActivityServiceUtil;
 import com.liferay.lms.service.LearningActivityTryLocalServiceUtil;
 import com.liferay.lms.service.LmsPrefsLocalServiceUtil;
 import com.liferay.lms.service.ModuleLocalServiceUtil;
-import com.liferay.lms.service.impl.CourseServiceImpl;
 import com.liferay.portal.kernel.dao.orm.CustomSQLParam;
+import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.NestableException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
@@ -56,7 +56,6 @@ import com.liferay.portal.service.TeamLocalServiceUtil;
 import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.comparator.UserFirstNameComparator;
-import com.liferay.portal.util.comparator.UserLastNameComparator;
 import com.liferay.util.bridges.mvc.MVCPortlet;
 
 /**
@@ -84,8 +83,7 @@ public class GradeBook extends MVCPortlet {
 					theTeam=TeamLocalServiceUtil.fetchTeam(teamId);	
 				}
 				Module module = ModuleLocalServiceUtil.getModule(moduleId);
-				List<LearningActivity> learningActivities = LearningActivityServiceUtil
-						.getLearningActivitiesOfModule(moduleId);
+				List<LearningActivity> learningActivities = LearningActivityServiceUtil.getLearningActivitiesOfModule(moduleId);
 
 				//Necesario para crear el fichero csv.
 				resourceResponse.setCharacterEncoding(StringPool.UTF8);
@@ -97,8 +95,10 @@ public class GradeBook extends MVCPortlet {
 		        
 		        CSVWriter writer = new CSVWriter(new OutputStreamWriter(resourceResponse.getPortletOutputStream(),StringPool.UTF8),CharPool.SEMICOLON);
 	
-		        //Comunidad
-		        writer.writeNext(new String[]{themeDisplay.getScopeGroupName()});
+		        Course course = CourseLocalServiceUtil.fetchByGroupCreatedId(module.getGroupId());
+		        
+		        //Curso
+		        writer.writeNext(new String[]{course.getTitle(themeDisplay.getLocale())});
 		        
 		        //Módulo
 		        writer.writeNext(new String[]{module.getTitle(themeDisplay.getLocale())});
@@ -108,7 +108,7 @@ public class GradeBook extends MVCPortlet {
 		        int column=4;
 		        cabeceras[0]=LanguageUtil.get(themeDisplay.getLocale(),"user-name");
 		        cabeceras[1]=LanguageUtil.get(themeDisplay.getLocale(),"last-name");
-		        cabeceras[2]=LanguageUtil.get(themeDisplay.getLocale(),"user-id");
+		        cabeceras[2]=LanguageUtil.get(themeDisplay.getLocale(),"screen-name");
 		        cabeceras[3]=LanguageUtil.get(themeDisplay.getLocale(),"email");
 		        
 		        for(LearningActivity learningActivity:learningActivities){
@@ -120,9 +120,6 @@ public class GradeBook extends MVCPortlet {
 				LmsPrefs prefs=LmsPrefsLocalServiceUtil.getLmsPrefs(themeDisplay.getCompanyId());
 
 				LinkedHashMap userParams = new LinkedHashMap();
-
-				
-				Course course = CourseLocalServiceUtil.getCourseByGroupCreatedId(module.getGroupId());
 				
 				CalificationType ct = new CalificationTypeRegistry().getCalificationType(course.getCalificationType());
 				
@@ -149,16 +146,15 @@ public class GradeBook extends MVCPortlet {
 				              RoleLocalServiceUtil.getRole(prefs.getEditorRole()).getRoleId() }));
 
 					OrderByComparator obc = new UserFirstNameComparator(true);
-					usus  = UserLocalServiceUtil.search(themeDisplay.getCompanyId(), "", 0, userParams, 0, 5000, obc);	
+					usus  = UserLocalServiceUtil.search(themeDisplay.getCompanyId(), "", 0, userParams, QueryUtil.ALL_POS, QueryUtil.ALL_POS, obc);	
 				
 		        for(User usuario:usus){
 		        	String[] resultados = new String[learningActivities.size()+4];
 		        	
 		        	column=4;
 		        	resultados[0]=usuario.getFirstName();
-		        	resultados[1]=usuario.getLastName();
-		        	
-		        	resultados[2]=String.valueOf(usuario.getUserId());
+		        	resultados[1]=usuario.getLastName();		        	
+		        	resultados[2]=usuario.getScreenName();
 		        	resultados[3]=usuario.getEmailAddress();
 		        	
 

@@ -2552,6 +2552,64 @@
 			<role-name>user</role-name>
 		</security-role-ref>
 	</portlet>
+	<portlet>
+		<portlet-name>coursedetail</portlet-name>
+		<display-name>Course Detail Portlet</display-name>
+		<portlet-class>
+			com.liferay.lms.CourseDetailPortlet
+		</portlet-class>
+		<init-param>
+			<name>view-template</name>
+			<value>/html/coursedetail/view.jsp</value>
+		</init-param>
+		<init-param>
+			<name>edit-course-template</name>
+			<value>/html/courseadmin/editcourse.jsp</value>
+		</init-param>
+		<init-param>
+			<name>role-members-tab-template</name>
+			<value>/html/courseadmin/rolememberstab.jsp</value>
+		</init-param>
+		<init-param>
+			<name>competence-tab-template</name>
+			<value>/html/courseadmin/competencetab.jsp</value>
+		</init-param>
+		<init-param>
+			<name>users-results-template</name>
+			<value>/html/courseadmin/usersresults.jsp</value>
+		</init-param>
+		<init-param>
+			<name>competence-results-template</name>
+			<value>/html/courseadmin/competenceresults.jsp</value>
+		</init-param>
+		<init-param>
+			<name>import-users-template</name>
+			<value>/html/courseadmin/popups/importUsers.jsp</value>
+		</init-param>
+		<expiration-cache>0</expiration-cache>
+		<supports>
+			<mime-type>text/html</mime-type>
+			<portlet-mode>view</portlet-mode>
+		</supports>
+		<resource-bundle>content/coursedetail/Language</resource-bundle>
+		<portlet-info>
+			<title>Course Detail Portlet</title>
+			<short-title>Course Detail Portlet</short-title>
+			<keywords></keywords>
+		</portlet-info>
+		<security-role-ref>
+			<role-name>administrator</role-name>
+		</security-role-ref>
+		<security-role-ref>
+			<role-name>guest</role-name>
+		</security-role-ref>
+		<security-role-ref>
+			<role-name>power-user</role-name>
+		</security-role-ref>
+		<security-role-ref>
+			<role-name>user</role-name>
+		</security-role-ref>
+	</portlet>
 	<event-definition>
 		<qname xmlns:x="http://www.wemooc.com/">x:themeId</qname>
 	</event-definition>
@@ -2595,4 +2653,5 @@
 		<identifier>typeId</identifier>
 		<qname xmlns:x="http://www.liferay.com/public-render-parameters">x:typeId</qname>
 	</public-render-parameter>		
+
 </portlet-app>

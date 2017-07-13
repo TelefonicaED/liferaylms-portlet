@@ -172,7 +172,6 @@ if(!ismobile){
 				}
 				
 				themeId++;
-
 				moduleIsLocked = theModule.isLocked(themeDisplay.getUserId());
 %>
 				<script type="text/javascript">

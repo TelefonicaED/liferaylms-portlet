@@ -22,6 +22,8 @@ import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.DocumentException;
@@ -34,6 +36,8 @@ import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 
 public class CompleteModulesCourseEval extends BaseCourseEval {
 
+	private static Log log = LogFactoryUtil.getLog(CompleteModulesCourseEval.class);
+	
 	@Override
 	public void updateCourse(Course course, ModuleResult mresult) throws SystemException 
 	{
@@ -62,72 +66,82 @@ public class CompleteModulesCourseEval extends BaseCourseEval {
 		// Se obtienen todos los módulos del curso.
 		List<Module> modules = ModuleLocalServiceUtil.findAllInGroup(groupCreatedId);
 		long numModules = modules.size();
-
+		log.debug("--- Numero de modulos "+numModules);
 		boolean passed = true;
 		long result = 0;
 		// Se obtienen los módulos aprobados por el usuario.
 		long modulesPassedByUser = ModuleLocalServiceUtil.modulesUserPassed(groupCreatedId, userId);
+		log.debug("--- Numero de modulos pasados "+modulesPassedByUser);
+		
 		// Se calcula el resultado del usuario.
 		result = 100 * modulesPassedByUser / numModules;
-
+		log.debug("--- Result "+result);
 		boolean isFailed = false;
 		
 		if(numModules > modulesPassedByUser){
 			passed = false;
 		}
 			
-			// Se obtienen las actividades que son obligatorias en el curso.
-			List<LearningActivity> learningActivities = LearningActivityLocalServiceUtil.getMandatoryLearningActivitiesOfGroup(groupCreatedId);
-			
-			//Guardo los resultados de las actividades del usuario en el curso en un hashmap para no tener que acceder a bbdd por cada uno de ellos
-			List<LearningActivityResult> lresult = LearningActivityResultLocalServiceUtil.getMandatoryByGroupIdUserId(course.getGroupCreatedId(), userId);
-			HashMap<Long, LearningActivityResult> results = new HashMap<Long, LearningActivityResult>();
-			for(LearningActivityResult ar:lresult){
-				results.put(ar.getActId(), ar);
+		// Se obtienen las actividades que son obligatorias en el curso.
+		List<LearningActivity> learningActivities = LearningActivityLocalServiceUtil.getMandatoryLearningActivitiesOfGroup(groupCreatedId);
+		
+		//Guardo los resultados de las actividades del usuario en el curso en un hashmap para no tener que acceder a bbdd por cada uno de ellos
+		List<LearningActivityResult> lresult = LearningActivityResultLocalServiceUtil.getMandatoryByGroupIdUserId(course.getGroupCreatedId(), userId);
+		HashMap<Long, LearningActivityResult> results = new HashMap<Long, LearningActivityResult>();
+		for(LearningActivityResult ar:lresult){
+			results.put(ar.getActId(), ar);
+		}
+		
+		
+		long currentActId = 0, numTriesDone = 0, numTriesCurrentAct;
+		LearningActivityResult lar = null;
+		// Se iteran por las actividades obligatorias para comprobar si se tienen resultados de las mismas y se tienen aprobadas.
+		for(LearningActivity activity:learningActivities) {   
+			currentActId = activity.getActId();
+			log.debug("--- Actividad actual "+currentActId);
+			if(results.containsKey(currentActId)){
+				lar = results.get(currentActId);
+			}else{
+				lar = null;
 			}
-			
-			
-			long currentActId = 0, numTriesDone = 0, numTriesCurrentAct;
-			LearningActivityResult lar = null;
-			// Se iteran por las actividades obligatorias para comprobar si se tienen resultados de las mismas y se tienen aprobadas.
-			for(LearningActivity activity:learningActivities) {   
-				currentActId = activity.getActId();
-				
-				if(results.containsKey(currentActId)){
-					lar = results.get(currentActId);
-				}else{
-					lar = null;
-				}
-				
-				// Si el usuario no tiene resultado en la actividad.
-				if(lar != null) {
-					if (!lar.isPassed() && Validator.isNotNull(lar.getEndDate())) {
-						numTriesCurrentAct = activity.getTries();
-						// Si la actividad no tiene un número ilimitado de intentos (numTriesCurrentAct = 0) y el usuario ya ha hecho todos los intentos disponibles se marca el curso como "Suspenso" (isFailed). 
-						if(numTriesCurrentAct != 0) {						
-							numTriesDone = LearningActivityTryLocalServiceUtil.getLearningActivityTryByActUserCount(currentActId, userId);					
-							
-							if (numTriesCurrentAct <= numTriesDone) {
-								isFailed = true;
-							}
+			log.debug("--- LAR "+lar);
+			// Si el usuario no tiene resultado en la actividad.
+			if(lar != null) {
+				log.debug("--- LAR "+lar.isPassed());
+				if (!lar.isPassed() && Validator.isNotNull(lar.getEndDate())) {
+					numTriesCurrentAct = activity.getTries();
+					// Si la actividad no tiene un número ilimitado de intentos (numTriesCurrentAct = 0) y el usuario ya ha hecho todos los intentos disponibles se marca el curso como "Suspenso" (isFailed). 
+					if(numTriesCurrentAct != 0) {						
+						numTriesDone = LearningActivityTryLocalServiceUtil.getLearningActivityTryByActUserCount(currentActId, userId);					
+						log.debug("-- NUM TRIES CURRENT ACT "+numTriesCurrentAct);
+						log.debug("-- NUM TRIES DONE "+numTriesDone);
+						if (numTriesCurrentAct <= numTriesDone) {
+							isFailed = true;
 						}
-						passed = false;
-					} else if(!lar.isPassed()){
-						passed = false;
 					}
-				}else {
+					
+					passed = false;
+				} else if(!lar.isPassed()){
 					passed = false;
 				}
+			}else {
+				passed = false;
 			}
+			
+			log.debug("--- Passed "+passed);
+			log.debug("--- IsFailed "+isFailed);
+		}
 		
-		
+		log.debug("---Course Passed "+(passed && !isFailed));
 		// Si el usuario se ha marcado como isFailed es porque lo tiene suspenso. Se le asigna un passed a false y se marca la fecha de finalización del curso (passedDate).
 		courseResult.setPassed(passed && !isFailed);
+		log.debug("---Course Result "+result);
 		// Se almacena el result del resultado del usuario en el curso.
 		courseResult.setResult(result);
 		if((passed || isFailed) && courseResult.getPassedDate() == null) {
 			courseResult.setPassedDate(new Date());
 		}
+		log.debug("---Course Passed Date "+courseResult.getPassedDate());
 		CourseResultLocalServiceUtil.update(courseResult);
 		return true;
 

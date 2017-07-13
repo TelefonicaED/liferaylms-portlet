@@ -29,6 +29,10 @@
 			 <liferay-ui:input-time minuteParam="stopMin" amPmParam="stopAMPM" hourParam="stopHour"  hourValue="${endHour}" minuteValue="${endMin}"></liferay-ui:input-time></br>
 		</aui:field-wrapper>
 	</div>	
+	
+	<aui:fieldset>
+		<aui:input name="linkedCourse" label="course-admin.linked-course" helpMessage="course-admin.linked-course-help" type="checkbox" value="false" checked="false"/>
+	</aui:fieldset>
 				
 	<aui:button-row>
 		<aui:button type="submit" value="course-admin.create-edition" />

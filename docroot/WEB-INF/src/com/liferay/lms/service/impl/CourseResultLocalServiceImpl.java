@@ -19,8 +19,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-import org.jfree.util.Log;
-
 import com.liferay.lms.course.diploma.CourseDiploma;
 import com.liferay.lms.course.diploma.CourseDiplomaRegistry;
 import com.liferay.lms.learningactivity.calificationtype.CalificationType;
@@ -40,7 +38,6 @@ import com.liferay.lms.service.ClpSerializer;
 import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.lms.service.base.CourseResultLocalServiceBaseImpl;
 import com.liferay.lms.service.persistence.CourseResultFinderUtil;
-import com.liferay.lms.service.persistence.LearningActivityResultFinderUtil;
 import com.liferay.lms.service.persistence.CourseResultUtil;
 import com.liferay.portal.kernel.bean.PortletBeanLocatorUtil;
 import com.liferay.portal.kernel.dao.orm.Criterion;
@@ -48,7 +45,6 @@ import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.ProjectionFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
-import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.util.Validator;
@@ -470,21 +466,17 @@ public class CourseResultLocalServiceImpl
 					userCompetence.setCourseId(cc.getCourseId());
 					userCompetencePersistence.update(userCompetence, false);
 				}
+				
 			}	
-			
 			
 			//Actualizamos los diplomas externos (si los hay)
 			CourseDiplomaRegistry cdr=new CourseDiplomaRegistry();
-			Log.debug("CourseDiplomaRegistry "+cdr);
 			if(cdr!=null){
 				CourseDiploma courseDiploma = cdr.getCourseDiploma();
-				Log.debug("courseDiploma "+courseDiploma);
 				if(courseDiploma!=null){
 					courseDiploma.updateUserDiploma(cresult.getCrId());
 				}
 			}
-			
-
 		}		
 		courseResultPersistence.update(cresult, false);
 	}

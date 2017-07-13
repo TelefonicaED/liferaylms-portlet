@@ -40,7 +40,6 @@ import com.liferay.lms.service.CourseCompetenceLocalServiceUtil;
 import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.lms.service.LmsPrefsLocalServiceUtil;
 import com.liferay.lms.service.ModuleLocalServiceUtil;
-import com.liferay.lms.service.ScheduleLocalServiceUtil;
 import com.liferay.lms.service.UserCompetenceLocalServiceUtil;
 import com.liferay.lms.service.base.CourseLocalServiceBaseImpl;
 import com.liferay.lms.service.persistence.CourseFinderUtil;
@@ -1319,6 +1318,7 @@ public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int e
 		return course.getImageURL(themeDisplay);
 	}
 	
+	
 	/**
 	 * Service that validates the course inscription as it is validated in web.
 	 * 
@@ -1427,8 +1427,6 @@ public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int e
 		}
 		return result;
 	}
-	
-	
 	
 	
 }
