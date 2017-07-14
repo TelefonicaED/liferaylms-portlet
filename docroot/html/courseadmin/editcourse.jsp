@@ -359,12 +359,17 @@ if(course!=null){
 	    		</script>
 		</aui:field-wrapper>
 	</c:if>
-	<c:if test="<%=!isCourseChild%>">
-		<c:if test="<%= permissionChecker.hasPermission(themeDisplay.getScopeGroupId(),  Course.class.getName(),0,publishPermission) && 
-				GetterUtil.getBoolean(renderRequest.getPreferences().getValues(\"showcatalog\", new String[]{StringPool.TRUE})[0],true) %>">
-			<aui:input type="checkbox" name="visible" label="published-in-catalog" value="<%=visibleencatalogo %>" />
-		</c:if>
+	
+	<%
+	 boolean showCatalog = GetterUtil.getBoolean(renderRequest.getPreferences().getValues("showcatalog", new String[]{StringPool.TRUE})[0],true);
+	 boolean showCatalogForEdition = GetterUtil.getBoolean(renderRequest.getPreferences().getValue("showCourseCatalogForEditions", StringPool.FALSE),false);
+	%>
+	
+	<c:if test="<%=((permissionChecker.hasPermission(themeDisplay.getScopeGroupId(),  Course.class.getName(),0,publishPermission)) &&
+					((!isCourseChild && showCatalog) || (isCourseChild && showCatalogForEdition))) %>">
+		<aui:input type="checkbox" name="visible" label="published-in-catalog" value="<%=visibleencatalogo %>" />
 	</c:if>
+
 	<% boolean requiredCourseIcon = GetterUtil.getBoolean(PropsUtil.get("lms.course.icon.required"), false); %>
 	<aui:input type="hidden" name="icon" >
 		<% if (requiredCourseIcon) { %>

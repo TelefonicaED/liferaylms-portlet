@@ -81,6 +81,16 @@ if( permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), "com.liferay
 		<liferay-ui:search-container-column-text name="course-admin.end-inscription-date">
 			<%=dateFormatDateTime.format(course.getEndDate()) %>
 		</liferay-ui:search-container-column-text>
+		<liferay-ui:search-container-column-text name="course-admin.linked">
+			<c:choose>
+				<c:when test="<%=course.getIsLinked() %>">
+					<liferay-ui:message key="yes"/>
+				</c:when>
+				<c:otherwise>
+					<liferay-ui:message key="no"/>
+				</c:otherwise>
+			</c:choose>
+		</liferay-ui:search-container-column-text>
 		<liferay-ui:search-container-column-text name="course-admin.number-of-members">
 			<%=	CourseLocalServiceUtil.getStudentsFromCourseCount(course.getCourseId()) %>
 		</liferay-ui:search-container-column-text>

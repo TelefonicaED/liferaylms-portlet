@@ -39,7 +39,8 @@ public class CourseAdminConfigurationAction implements ConfigurationAction {
 		portletPreferences.setValue("categories",Boolean.toString(ParamUtil.getBoolean(actionRequest, "categories",true)));
 		portletPreferences.setValue("showcatalog",Boolean.toString(ParamUtil.getBoolean(actionRequest, "showcatalog",true)));
 		portletPreferences.setValue("courseTemplates",	StringUtil.merge(actionRequest.getParameterMap().get( "courseTemplates")));
-		
+		portletPreferences.setValue("showCourseCatalogForEditions",Boolean.toString(ParamUtil.getBoolean(actionRequest, "showCourseCatalogForEditions",	false)));
+
 		portletPreferences.setValue("showClose",	Boolean.toString(ParamUtil.getBoolean(actionRequest, "showClose",	true)));
 		portletPreferences.setValue("showDelete",	Boolean.toString(ParamUtil.getBoolean(actionRequest, "showDelete",	true)));
 		portletPreferences.setValue("showMembers",	Boolean.toString(ParamUtil.getBoolean(actionRequest, "showMembers",	true)));

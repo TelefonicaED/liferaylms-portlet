@@ -329,6 +329,7 @@ public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int e
 					null, 0, title,summary,typesite,friendlyURL,true,true,serviceContext);
 			course.setGroupCreatedId(group.getGroupId());
 			course.setFriendlyURL(group.getFriendlyURL());
+			course.setIsLinked(false);
 
 			coursePersistence.update(course, true);
 			

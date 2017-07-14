@@ -51,6 +51,7 @@ public class CreateEdition implements MessageListener {
 	private ServiceContext serviceContext;
 	private Date startDate;
 	private Date endDate;
+	private boolean isLinked;
 	private long parentCourseId;
 	
 	private String cloneTraceStr = "--------------- Creating edition trace ----------------"; 
@@ -81,6 +82,7 @@ public class CreateEdition implements MessageListener {
 			this.serviceContext = (ServiceContext)message.get("serviceContext");
 			this.themeDisplay = (ThemeDisplay)message.get("themeDisplay");
 			this.parentCourseId = (Long)message.get("parentCourseId");
+			this.isLinked = (Boolean)message.get("isLinked");
 			
 			log.debug("Parent Course Id: "+parentCourseId);
 			Role adminRole = RoleLocalServiceUtil.getRole(themeDisplay.getCompanyId(),"Administrator");
@@ -145,6 +147,7 @@ public class CreateEdition implements MessageListener {
 			newCourse.setGoodbyeMsg(course.getGoodbyeMsg());
 			newCourse.setGoodbyeSubject(course.getGoodbyeSubject());
 			newCourse.setCourseEvalId(course.getCourseEvalId());
+			newCourse.setIsLinked(isLinked);
 			
 		} catch(DuplicateGroupException e){
 			if(log.isDebugEnabled())e.printStackTrace();

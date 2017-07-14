@@ -735,7 +735,7 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 		
 		ThemeDisplay themeDisplay = (ThemeDisplay) actionRequest.getAttribute(WebKeys.THEME_DISPLAY);	
 		ServiceContext serviceContext = ServiceContextFactory.getInstance(Course.class.getName(), actionRequest);
-		
+		boolean isLinked = ParamUtil.getBoolean(actionRequest, "linkedCourse", false);
 		long parentCourseId = ParamUtil.getLong(actionRequest, "parentCourseId",0);
 		
 		String newEditionName  = ParamUtil.getString(actionRequest, "newCourseName", "New edition");
@@ -769,6 +769,7 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 			errors = true;
 		}
 		
+		
 	
 		Group group = null;
 		try{
@@ -791,6 +792,7 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 				message.put("themeDisplay",themeDisplay);
 				message.put("startDate",startDate);
 				message.put("endDate",endDate);
+				message.put("isLinked",isLinked);
 				message.put("serviceContext",serviceContext);
 				MessageBusUtil.sendMessage("liferay/lms/createEdition", message);
 				
