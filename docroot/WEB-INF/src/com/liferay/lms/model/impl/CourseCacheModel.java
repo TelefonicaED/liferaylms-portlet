@@ -34,7 +34,7 @@ import java.util.Date;
 public class CourseCacheModel implements CacheModel<Course>, Serializable {
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(65);
+		StringBundler sb = new StringBundler(69);
 
 		sb.append("{uuid=");
 		sb.append(uuid);
@@ -100,6 +100,10 @@ public class CourseCacheModel implements CacheModel<Course>, Serializable {
 		sb.append(goodbyeSubject);
 		sb.append(", isLinked=");
 		sb.append(isLinked);
+		sb.append(", executionStartDate=");
+		sb.append(executionStartDate);
+		sb.append(", executionEndDate=");
+		sb.append(executionEndDate);
 		sb.append("}");
 
 		return sb.toString();
@@ -243,6 +247,20 @@ public class CourseCacheModel implements CacheModel<Course>, Serializable {
 
 		courseImpl.setIsLinked(isLinked);
 
+		if (executionStartDate == Long.MIN_VALUE) {
+			courseImpl.setExecutionStartDate(null);
+		}
+		else {
+			courseImpl.setExecutionStartDate(new Date(executionStartDate));
+		}
+
+		if (executionEndDate == Long.MIN_VALUE) {
+			courseImpl.setExecutionEndDate(null);
+		}
+		else {
+			courseImpl.setExecutionEndDate(new Date(executionEndDate));
+		}
+
 		courseImpl.resetOriginalValues();
 
 		return courseImpl;
@@ -280,4 +298,6 @@ public class CourseCacheModel implements CacheModel<Course>, Serializable {
 	public String goodbyeMsg;
 	public String goodbyeSubject;
 	public boolean isLinked;
+	public long executionStartDate;
+	public long executionEndDate;
 }

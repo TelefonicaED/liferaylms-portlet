@@ -77,6 +77,8 @@ public class CourseWrapper implements Course, ModelWrapper<Course> {
 		attributes.put("goodbyeMsg", getGoodbyeMsg());
 		attributes.put("goodbyeSubject", getGoodbyeSubject());
 		attributes.put("isLinked", getIsLinked());
+		attributes.put("executionStartDate", getExecutionStartDate());
+		attributes.put("executionEndDate", getExecutionEndDate());
 
 		return attributes;
 	}
@@ -272,6 +274,18 @@ public class CourseWrapper implements Course, ModelWrapper<Course> {
 
 		if (isLinked != null) {
 			setIsLinked(isLinked);
+		}
+
+		Date executionStartDate = (Date)attributes.get("executionStartDate");
+
+		if (executionStartDate != null) {
+			setExecutionStartDate(executionStartDate);
+		}
+
+		Date executionEndDate = (Date)attributes.get("executionEndDate");
+
+		if (executionEndDate != null) {
+			setExecutionEndDate(executionEndDate);
 		}
 	}
 
@@ -1161,6 +1175,42 @@ public class CourseWrapper implements Course, ModelWrapper<Course> {
 	*/
 	public void setIsLinked(boolean isLinked) {
 		_course.setIsLinked(isLinked);
+	}
+
+	/**
+	* Returns the execution start date of this course.
+	*
+	* @return the execution start date of this course
+	*/
+	public java.util.Date getExecutionStartDate() {
+		return _course.getExecutionStartDate();
+	}
+
+	/**
+	* Sets the execution start date of this course.
+	*
+	* @param executionStartDate the execution start date of this course
+	*/
+	public void setExecutionStartDate(java.util.Date executionStartDate) {
+		_course.setExecutionStartDate(executionStartDate);
+	}
+
+	/**
+	* Returns the execution end date of this course.
+	*
+	* @return the execution end date of this course
+	*/
+	public java.util.Date getExecutionEndDate() {
+		return _course.getExecutionEndDate();
+	}
+
+	/**
+	* Sets the execution end date of this course.
+	*
+	* @param executionEndDate the execution end date of this course
+	*/
+	public void setExecutionEndDate(java.util.Date executionEndDate) {
+		_course.setExecutionEndDate(executionEndDate);
 	}
 
 	/**

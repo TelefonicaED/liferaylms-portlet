@@ -63,6 +63,8 @@ public class CourseSoap implements Serializable {
 		soapModel.setGoodbyeMsg(model.getGoodbyeMsg());
 		soapModel.setGoodbyeSubject(model.getGoodbyeSubject());
 		soapModel.setIsLinked(model.getIsLinked());
+		soapModel.setExecutionStartDate(model.getExecutionStartDate());
+		soapModel.setExecutionEndDate(model.getExecutionEndDate());
 
 		return soapModel;
 	}
@@ -387,6 +389,22 @@ public class CourseSoap implements Serializable {
 		_isLinked = isLinked;
 	}
 
+	public Date getExecutionStartDate() {
+		return _executionStartDate;
+	}
+
+	public void setExecutionStartDate(Date executionStartDate) {
+		_executionStartDate = executionStartDate;
+	}
+
+	public Date getExecutionEndDate() {
+		return _executionEndDate;
+	}
+
+	public void setExecutionEndDate(Date executionEndDate) {
+		_executionEndDate = executionEndDate;
+	}
+
 	private String _uuid;
 	private long _courseId;
 	private long _parentCourseId;
@@ -419,4 +437,6 @@ public class CourseSoap implements Serializable {
 	private String _goodbyeMsg;
 	private String _goodbyeSubject;
 	private boolean _isLinked;
+	private Date _executionStartDate;
+	private Date _executionEndDate;
 }

@@ -164,6 +164,19 @@ int endMonth=ParamUtil.getInteger(request, "stopMonth", Integer.parseInt(formatM
 int endYear=ParamUtil.getInteger(request, "stopYear", Integer.parseInt(formatYear.format(today))+1);
 int endHour=ParamUtil.getInteger(request, "stopHour", Integer.parseInt(formatHour.format(today)));
 int endMin=ParamUtil.getInteger(request, "stopMin", Integer.parseInt(formatMin.format(today)));
+
+int startExecutionDay=ParamUtil.getInteger(request, "startExecutionDay", Integer.parseInt(formatDay.format(today)));
+int startExecutionMonth=ParamUtil.getInteger(request, "startExecutionMonth", Integer.parseInt(formatMonth.format(today))-1);
+int startExecutionYear=ParamUtil.getInteger(request, "startExecutionYear", Integer.parseInt(formatYear.format(today)));
+int startExecutionHour=ParamUtil.getInteger(request, "startExecutionHour", Integer.parseInt(formatHour.format(today)));
+int startExecutionMin=ParamUtil.getInteger(request, "startExecutionMin", Integer.parseInt(formatMin.format(today)));
+int endExecutionDay=ParamUtil.getInteger(request, "stopExecutionDay", Integer.parseInt(formatDay.format(today)));
+int endExecutionMonth=ParamUtil.getInteger(request, "stopExecutionMonth", Integer.parseInt(formatMonth.format(today))-1);
+int endExecutionYear=ParamUtil.getInteger(request, "stopExecutionYear", Integer.parseInt(formatYear.format(today))+1);
+int endExecutionHour=ParamUtil.getInteger(request, "stopExecutionHour", Integer.parseInt(formatHour.format(today)));
+int endExecutionMin=ParamUtil.getInteger(request, "stopExecutionMin", Integer.parseInt(formatMin.format(today)));
+
+
 String summary="";
 AssetEntry entry=null;
 boolean visibleencatalogo=false;
@@ -217,6 +230,18 @@ if(course!=null){
 	endYear=Integer.parseInt(formatYear.format(course.getEndDate()));
 	endHour=Integer.parseInt(formatHour.format(course.getEndDate()));
 	endMin=Integer.parseInt(formatMin.format(course.getEndDate()));
+	
+	startExecutionDay=Integer.parseInt(formatDay.format(course.getExecutionStartDate()));
+	startExecutionMonth=Integer.parseInt(formatMonth.format(course.getExecutionStartDate()))-1;
+	startExecutionYear=Integer.parseInt(formatYear.format(course.getExecutionStartDate()));
+	startExecutionHour=Integer.parseInt(formatHour.format(course.getExecutionStartDate()));
+	startExecutionMin=Integer.parseInt(formatMin.format(course.getExecutionStartDate()));
+	endExecutionDay=Integer.parseInt(formatDay.format(course.getExecutionEndDate()));
+	endExecutionMonth=Integer.parseInt(formatMonth.format(course.getExecutionEndDate()))-1;
+	endExecutionYear=Integer.parseInt(formatYear.format(course.getExecutionEndDate()));
+	endExecutionHour=Integer.parseInt(formatHour.format(course.getExecutionEndDate()));
+	endExecutionMin=Integer.parseInt(formatMin.format(course.getExecutionEndDate()));
+	
 	type=course.getStatus(); //TODO
 	welcomeSubject = course.getWelcomeSubject();
 	goodbyeSubject = course.getGoodbyeSubject();
@@ -633,8 +658,28 @@ if(course!=null){
 	</c:if>
 	<% 
 	boolean showInscriptionDate = GetterUtil.getBoolean(renderRequest.getPreferences().getValues("showInscriptionDate", new String[]{StringPool.TRUE})[0],true);
+	boolean showExecutionDate = GetterUtil.getBoolean(renderRequest.getPreferences().getValues("showExecutionDate", new String[]{StringPool.TRUE})[0],true);
 	%>
+	
 <liferay-ui:panel-container extended="false"  persistState="false">
+   	  
+   	  <liferay-ui:panel title="lms-execution-configuration" collapsible="true" defaultState="closed" cssClass="<%=(showExecutionDate)?StringPool.BLANK:\"aui-helper-hidden\" %>">
+		<aui:field-wrapper name="executionDate" label="start-execution-date" cssClass="<%=(showExecutionDate)?StringPool.BLANK:\"aui-helper-hidden\" %>">
+			<aui:input type="hidden" name="executionDate"/>
+			<liferay-ui:input-date yearRangeEnd="<%=LiferaylmsUtil.defaultEndYear %>" yearRangeStart="<%=LiferaylmsUtil.defaultStartYear %>"  dayParam="startExecutionDay" monthParam="startExecutionMon"
+					 yearParam="startExecutionYear"  yearNullable="false" dayNullable="false" monthNullable="false" yearValue="<%=startExecutionYear %>" monthValue="<%=startExecutionMonth %>" dayValue="<%=startExecutionDay %>"></liferay-ui:input-date>
+			<liferay-ui:input-time minuteParam="startExecutionMin" amPmParam="startExecutionAMPM" hourParam="startExecutionHour" hourValue="<%=startExecutionHour %>" minuteValue="<%=startExecutionMin %>"></liferay-ui:input-time>
+		</aui:field-wrapper>
+		<aui:field-wrapper name="endExecutionDate" label="end-execution-date"  cssClass="<%=(showExecutionDate)?StringPool.BLANK:\"aui-helper-hidden\" %>">
+			<aui:input type="hidden" name="endExecutionDate"/>
+			<liferay-ui:input-date yearRangeEnd="<%=LiferaylmsUtil.defaultEndYear %>" yearRangeStart="<%=LiferaylmsUtil.defaultStartYear %>" dayParam="stopExecutionDay" monthParam="stopExecutionMon"
+					 yearParam="stopExecutionYear"  yearNullable="false" dayNullable="false" monthNullable="false"  yearValue="<%=endExecutionYear %>" monthValue="<%=endExecutionMonth %>" dayValue="<%=endExecutionDay %>"></liferay-ui:input-date>
+			 <liferay-ui:input-time minuteParam="stopExecutionMin" amPmParam="stopExecutionAMPM" hourParam="stopExecutionHour"  hourValue="<%=endExecutionHour %>" minuteValue="<%=endExecutionMin %>"></liferay-ui:input-time></br>
+		</aui:field-wrapper>
+	</liferay-ui:panel> 
+    
+    
+    
     <liferay-ui:panel title="lms-inscription-configuration" collapsible="true" defaultState="closed" cssClass="<%=(showInscriptionDate||showMaxUsers)?StringPool.BLANK:\"aui-helper-hidden\" %>">
 		<aui:field-wrapper name="inscriptionDate" label="start-inscription-date" cssClass="<%=(showInscriptionDate)?StringPool.BLANK:\"aui-helper-hidden\" %>">
 			<aui:input type="hidden" name="inscriptionDate"/>

@@ -531,7 +531,9 @@
 		<column name="goodbyeMsg" type="String"/>
 		<column name="goodbyeSubject" type="String"/>
 		<column name="isLinked" type="boolean"/>
-		
+		<column name="executionStartDate" type="Date"></column>
+        <column name="executionEndDate" type="Date"></column>
+        
  		<order by="asc">
 			<order-column name="courseId" />
 		</order>

@@ -100,6 +100,8 @@
 		</field>
 		<field name="goodbyeSubject" type="String" />
 		<field name="isLinked" type="boolean" />
+		<field name="executionStartDate" type="Date" />
+		<field name="executionEndDate" type="Date" />
 	</model>
 	<model name="com.liferay.lms.model.CourseCompetence">
 		<field name="uuid" type="String" />

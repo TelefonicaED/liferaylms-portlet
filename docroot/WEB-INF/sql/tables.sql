@@ -87,7 +87,9 @@ create table Lms_Course (
 	goodbye BOOLEAN,
 	goodbyeMsg TEXT null,
 	goodbyeSubject VARCHAR(75) null,
-	isLinked BOOLEAN
+	isLinked BOOLEAN,
+	executionStartDate DATE null,
+	executionEndDate DATE null
 );
 
 create table Lms_CourseCompetence (

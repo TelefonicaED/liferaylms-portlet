@@ -106,6 +106,8 @@ public class CourseClp extends BaseModelImpl<Course> implements Course {
 		attributes.put("goodbyeMsg", getGoodbyeMsg());
 		attributes.put("goodbyeSubject", getGoodbyeSubject());
 		attributes.put("isLinked", getIsLinked());
+		attributes.put("executionStartDate", getExecutionStartDate());
+		attributes.put("executionEndDate", getExecutionEndDate());
 
 		return attributes;
 	}
@@ -302,6 +304,18 @@ public class CourseClp extends BaseModelImpl<Course> implements Course {
 
 		if (isLinked != null) {
 			setIsLinked(isLinked);
+		}
+
+		Date executionStartDate = (Date)attributes.get("executionStartDate");
+
+		if (executionStartDate != null) {
+			setExecutionStartDate(executionStartDate);
+		}
+
+		Date executionEndDate = (Date)attributes.get("executionEndDate");
+
+		if (executionEndDate != null) {
+			setExecutionEndDate(executionEndDate);
 		}
 	}
 
@@ -781,6 +795,22 @@ public class CourseClp extends BaseModelImpl<Course> implements Course {
 		_isLinked = isLinked;
 	}
 
+	public Date getExecutionStartDate() {
+		return _executionStartDate;
+	}
+
+	public void setExecutionStartDate(Date executionStartDate) {
+		_executionStartDate = executionStartDate;
+	}
+
+	public Date getExecutionEndDate() {
+		return _executionEndDate;
+	}
+
+	public void setExecutionEndDate(Date executionEndDate) {
+		_executionEndDate = executionEndDate;
+	}
+
 	public java.util.List<com.liferay.portlet.asset.model.AssetCategory> getAssetCategoryIds() {
 		throw new UnsupportedOperationException();
 	}
@@ -962,6 +992,8 @@ public class CourseClp extends BaseModelImpl<Course> implements Course {
 		clone.setGoodbyeMsg(getGoodbyeMsg());
 		clone.setGoodbyeSubject(getGoodbyeSubject());
 		clone.setIsLinked(getIsLinked());
+		clone.setExecutionStartDate(getExecutionStartDate());
+		clone.setExecutionEndDate(getExecutionEndDate());
 
 		return clone;
 	}
@@ -1018,7 +1050,7 @@ public class CourseClp extends BaseModelImpl<Course> implements Course {
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(65);
+		StringBundler sb = new StringBundler(69);
 
 		sb.append("{uuid=");
 		sb.append(getUuid());
@@ -1084,13 +1116,17 @@ public class CourseClp extends BaseModelImpl<Course> implements Course {
 		sb.append(getGoodbyeSubject());
 		sb.append(", isLinked=");
 		sb.append(getIsLinked());
+		sb.append(", executionStartDate=");
+		sb.append(getExecutionStartDate());
+		sb.append(", executionEndDate=");
+		sb.append(getExecutionEndDate());
 		sb.append("}");
 
 		return sb.toString();
 	}
 
 	public String toXmlString() {
-		StringBundler sb = new StringBundler(100);
+		StringBundler sb = new StringBundler(106);
 
 		sb.append("<model><model-name>");
 		sb.append("com.liferay.lms.model.Course");
@@ -1224,6 +1260,14 @@ public class CourseClp extends BaseModelImpl<Course> implements Course {
 			"<column><column-name>isLinked</column-name><column-value><![CDATA[");
 		sb.append(getIsLinked());
 		sb.append("]]></column-value></column>");
+		sb.append(
+			"<column><column-name>executionStartDate</column-name><column-value><![CDATA[");
+		sb.append(getExecutionStartDate());
+		sb.append("]]></column-value></column>");
+		sb.append(
+			"<column><column-name>executionEndDate</column-name><column-value><![CDATA[");
+		sb.append(getExecutionEndDate());
+		sb.append("]]></column-value></column>");
 
 		sb.append("</model>");
 
@@ -1266,5 +1310,7 @@ public class CourseClp extends BaseModelImpl<Course> implements Course {
 	private String _goodbyeMsg;
 	private String _goodbyeSubject;
 	private boolean _isLinked;
+	private Date _executionStartDate;
+	private Date _executionEndDate;
 	private BaseModel<?> _courseRemoteModel;
 }

@@ -754,6 +754,34 @@ public interface CourseModel extends BaseModel<Course>, GroupedModel,
 	public void setIsLinked(boolean isLinked);
 
 	/**
+	 * Returns the execution start date of this course.
+	 *
+	 * @return the execution start date of this course
+	 */
+	public Date getExecutionStartDate();
+
+	/**
+	 * Sets the execution start date of this course.
+	 *
+	 * @param executionStartDate the execution start date of this course
+	 */
+	public void setExecutionStartDate(Date executionStartDate);
+
+	/**
+	 * Returns the execution end date of this course.
+	 *
+	 * @return the execution end date of this course
+	 */
+	public Date getExecutionEndDate();
+
+	/**
+	 * Sets the execution end date of this course.
+	 *
+	 * @param executionEndDate the execution end date of this course
+	 */
+	public void setExecutionEndDate(Date executionEndDate);
+
+	/**
 	 * @deprecated Renamed to {@link #isApproved()}
 	 */
 	public boolean getApproved();

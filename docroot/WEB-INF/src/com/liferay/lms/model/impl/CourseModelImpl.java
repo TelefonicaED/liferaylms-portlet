@@ -103,9 +103,11 @@ public class CourseModelImpl extends BaseModelImpl<Course>
 			{ "goodbye", Types.BOOLEAN },
 			{ "goodbyeMsg", Types.VARCHAR },
 			{ "goodbyeSubject", Types.VARCHAR },
-			{ "isLinked", Types.BOOLEAN }
+			{ "isLinked", Types.BOOLEAN },
+			{ "executionStartDate", Types.TIMESTAMP },
+			{ "executionEndDate", Types.TIMESTAMP }
 		};
-	public static final String TABLE_SQL_CREATE = "create table Lms_Course (uuid_ VARCHAR(75) null,courseId LONG not null primary key,parentCourseId LONG,companyId LONG,groupId LONG,userId LONG,userName VARCHAR(75) null,groupCreatedId LONG,createDate DATE null,modifiedDate DATE null,status INTEGER,statusByUserId LONG,statusByUserName VARCHAR(75) null,statusDate DATE null,title STRING null,description STRING null,friendlyURL VARCHAR(100) null,startDate DATE null,endDate DATE null,icon LONG,CourseEvalId LONG,CourseExtraData TEXT null,closed BOOLEAN,maxusers LONG,calificationType LONG,welcome BOOLEAN,welcomeMsg TEXT null,welcomeSubject VARCHAR(75) null,goodbye BOOLEAN,goodbyeMsg TEXT null,goodbyeSubject VARCHAR(75) null,isLinked BOOLEAN)";
+	public static final String TABLE_SQL_CREATE = "create table Lms_Course (uuid_ VARCHAR(75) null,courseId LONG not null primary key,parentCourseId LONG,companyId LONG,groupId LONG,userId LONG,userName VARCHAR(75) null,groupCreatedId LONG,createDate DATE null,modifiedDate DATE null,status INTEGER,statusByUserId LONG,statusByUserName VARCHAR(75) null,statusDate DATE null,title STRING null,description STRING null,friendlyURL VARCHAR(100) null,startDate DATE null,endDate DATE null,icon LONG,CourseEvalId LONG,CourseExtraData TEXT null,closed BOOLEAN,maxusers LONG,calificationType LONG,welcome BOOLEAN,welcomeMsg TEXT null,welcomeSubject VARCHAR(75) null,goodbye BOOLEAN,goodbyeMsg TEXT null,goodbyeSubject VARCHAR(75) null,isLinked BOOLEAN,executionStartDate DATE null,executionEndDate DATE null)";
 	public static final String TABLE_SQL_DROP = "drop table Lms_Course";
 	public static final String ORDER_BY_JPQL = " ORDER BY course.courseId ASC";
 	public static final String ORDER_BY_SQL = " ORDER BY Lms_Course.courseId ASC";
@@ -175,6 +177,8 @@ public class CourseModelImpl extends BaseModelImpl<Course>
 		model.setGoodbyeMsg(soapModel.getGoodbyeMsg());
 		model.setGoodbyeSubject(soapModel.getGoodbyeSubject());
 		model.setIsLinked(soapModel.getIsLinked());
+		model.setExecutionStartDate(soapModel.getExecutionStartDate());
+		model.setExecutionEndDate(soapModel.getExecutionEndDate());
 
 		return model;
 	}
@@ -265,6 +269,8 @@ public class CourseModelImpl extends BaseModelImpl<Course>
 		attributes.put("goodbyeMsg", getGoodbyeMsg());
 		attributes.put("goodbyeSubject", getGoodbyeSubject());
 		attributes.put("isLinked", getIsLinked());
+		attributes.put("executionStartDate", getExecutionStartDate());
+		attributes.put("executionEndDate", getExecutionEndDate());
 
 		return attributes;
 	}
@@ -461,6 +467,18 @@ public class CourseModelImpl extends BaseModelImpl<Course>
 
 		if (isLinked != null) {
 			setIsLinked(isLinked);
+		}
+
+		Date executionStartDate = (Date)attributes.get("executionStartDate");
+
+		if (executionStartDate != null) {
+			setExecutionStartDate(executionStartDate);
+		}
+
+		Date executionEndDate = (Date)attributes.get("executionEndDate");
+
+		if (executionEndDate != null) {
+			setExecutionEndDate(executionEndDate);
 		}
 	}
 
@@ -1055,6 +1073,22 @@ public class CourseModelImpl extends BaseModelImpl<Course>
 		_isLinked = isLinked;
 	}
 
+	public Date getExecutionStartDate() {
+		return _executionStartDate;
+	}
+
+	public void setExecutionStartDate(Date executionStartDate) {
+		_executionStartDate = executionStartDate;
+	}
+
+	public Date getExecutionEndDate() {
+		return _executionEndDate;
+	}
+
+	public void setExecutionEndDate(Date executionEndDate) {
+		_executionEndDate = executionEndDate;
+	}
+
 	/**
 	 * @deprecated {@link #isApproved}
 	 */
@@ -1208,6 +1242,8 @@ public class CourseModelImpl extends BaseModelImpl<Course>
 		courseImpl.setGoodbyeMsg(getGoodbyeMsg());
 		courseImpl.setGoodbyeSubject(getGoodbyeSubject());
 		courseImpl.setIsLinked(getIsLinked());
+		courseImpl.setExecutionStartDate(getExecutionStartDate());
+		courseImpl.setExecutionEndDate(getExecutionEndDate());
 
 		courseImpl.resetOriginalValues();
 
@@ -1468,12 +1504,30 @@ public class CourseModelImpl extends BaseModelImpl<Course>
 
 		courseCacheModel.isLinked = getIsLinked();
 
+		Date executionStartDate = getExecutionStartDate();
+
+		if (executionStartDate != null) {
+			courseCacheModel.executionStartDate = executionStartDate.getTime();
+		}
+		else {
+			courseCacheModel.executionStartDate = Long.MIN_VALUE;
+		}
+
+		Date executionEndDate = getExecutionEndDate();
+
+		if (executionEndDate != null) {
+			courseCacheModel.executionEndDate = executionEndDate.getTime();
+		}
+		else {
+			courseCacheModel.executionEndDate = Long.MIN_VALUE;
+		}
+
 		return courseCacheModel;
 	}
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(65);
+		StringBundler sb = new StringBundler(69);
 
 		sb.append("{uuid=");
 		sb.append(getUuid());
@@ -1539,13 +1593,17 @@ public class CourseModelImpl extends BaseModelImpl<Course>
 		sb.append(getGoodbyeSubject());
 		sb.append(", isLinked=");
 		sb.append(getIsLinked());
+		sb.append(", executionStartDate=");
+		sb.append(getExecutionStartDate());
+		sb.append(", executionEndDate=");
+		sb.append(getExecutionEndDate());
 		sb.append("}");
 
 		return sb.toString();
 	}
 
 	public String toXmlString() {
-		StringBundler sb = new StringBundler(100);
+		StringBundler sb = new StringBundler(106);
 
 		sb.append("<model><model-name>");
 		sb.append("com.liferay.lms.model.Course");
@@ -1679,6 +1737,14 @@ public class CourseModelImpl extends BaseModelImpl<Course>
 			"<column><column-name>isLinked</column-name><column-value><![CDATA[");
 		sb.append(getIsLinked());
 		sb.append("]]></column-value></column>");
+		sb.append(
+			"<column><column-name>executionStartDate</column-name><column-value><![CDATA[");
+		sb.append(getExecutionStartDate());
+		sb.append("]]></column-value></column>");
+		sb.append(
+			"<column><column-name>executionEndDate</column-name><column-value><![CDATA[");
+		sb.append(getExecutionEndDate());
+		sb.append("]]></column-value></column>");
 
 		sb.append("</model>");
 
@@ -1739,6 +1805,8 @@ public class CourseModelImpl extends BaseModelImpl<Course>
 	private String _goodbyeMsg;
 	private String _goodbyeSubject;
 	private boolean _isLinked;
+	private Date _executionStartDate;
+	private Date _executionEndDate;
 	private long _columnBitmask;
 	private Course _escapedModelProxy;
 }

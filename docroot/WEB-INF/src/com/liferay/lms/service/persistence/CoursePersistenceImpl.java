@@ -907,6 +907,8 @@ public class CoursePersistenceImpl extends BasePersistenceImpl<Course>
 		courseImpl.setGoodbyeMsg(course.getGoodbyeMsg());
 		courseImpl.setGoodbyeSubject(course.getGoodbyeSubject());
 		courseImpl.setIsLinked(course.isIsLinked());
+		courseImpl.setExecutionStartDate(course.getExecutionStartDate());
+		courseImpl.setExecutionEndDate(course.getExecutionEndDate());
 
 		return courseImpl;
 	}

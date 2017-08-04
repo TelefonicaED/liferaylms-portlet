@@ -83,6 +83,7 @@ import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.upload.UploadPortletRequest;
 import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.ContentTypes;
+import com.liferay.portal.kernel.util.DateUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -422,6 +423,23 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 		int startHour = ParamUtil.getInteger(uploadRequest, "startHour");
 		int startMinute = ParamUtil.getInteger(uploadRequest, "startMin");
 		int startAMPM = ParamUtil.getInteger(uploadRequest, "startAMPM");
+		//Execution Date
+		
+		int startExecutionMonth = ParamUtil.getInteger(uploadRequest, "startExecutionMon");
+		int startExecutionYear = ParamUtil.getInteger(uploadRequest, "startExecutionYear");
+		int startExecutionDay = ParamUtil.getInteger(uploadRequest, "startExecutionDay");
+		int startExecutionHour = ParamUtil.getInteger(uploadRequest, "startExecutionHour");
+		int startExecutionMinute = ParamUtil.getInteger(uploadRequest, "startExecutionMin");
+		int startExecutionAMPM = ParamUtil.getInteger(uploadRequest, "startExecutionAMPM");
+		
+		int stopExecutionMonth = ParamUtil.getInteger(uploadRequest, "stopExecutionMon");
+		int stopExecutionYear = ParamUtil.getInteger(uploadRequest, "stopExecutionYear");
+		int stopExecutionDay = ParamUtil.getInteger(uploadRequest, "stopExecutionDay");
+		int stopExecutionHour = ParamUtil.getInteger(uploadRequest, "stopExecutionHour");
+		int stopExecutionMinute = ParamUtil.getInteger(uploadRequest, "stopExecutionMin");
+		int stopExecutionAMPM = ParamUtil.getInteger(uploadRequest, "stopExecutionAMPM");
+		
+		
 		String summary = ParamUtil.getString(uploadRequest, "summary", StringPool.BLANK);
 		boolean visible = ParamUtil.getBoolean(uploadRequest, "visible", false);
 		boolean welcome = ParamUtil.getBoolean(uploadRequest, "welcome", false);
@@ -497,7 +515,51 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 			return;
 		}
 
-		java.util.Date ahora = new java.util.Date(System.currentTimeMillis());
+		
+		
+		//Execution Date Validation
+		if (startExecutionAMPM > 0) {
+			startExecutionHour += 12;
+		}
+		
+		Calendar startExecutionDate = Calendar.getInstance(user.getTimeZone());
+		startExecutionDate.set(Calendar.YEAR, startExecutionYear);
+		startExecutionDate.set(Calendar.MONTH, startExecutionMonth);
+		startExecutionDate.set(Calendar.DAY_OF_MONTH, startExecutionDay);
+		startExecutionDate.set(Calendar.HOUR_OF_DAY, startExecutionHour);
+		startExecutionDate.set(Calendar.MINUTE, startExecutionMinute);
+		startExecutionDate.set(Calendar.SECOND, 0);
+		startExecutionDate.set(Calendar.MILLISECOND,0);
+			
+		log.error("START EXECUTION DATE "+startExecutionDate.getTime());
+	
+		if (stopExecutionAMPM > 0) {
+			stopExecutionHour += 12;
+		}
+		Calendar stopExecutionDate = Calendar.getInstance(user.getTimeZone());
+		stopExecutionDate.set(Calendar.YEAR, stopExecutionYear);
+		stopExecutionDate.set(Calendar.MONTH, stopExecutionMonth);
+		stopExecutionDate.set(Calendar.DAY_OF_MONTH, stopExecutionDay);
+		stopExecutionDate.set(Calendar.HOUR_OF_DAY, stopExecutionHour);
+		stopExecutionDate.set(Calendar.MINUTE, stopExecutionMinute);
+		stopExecutionDate.set(Calendar.SECOND, 0);
+		stopExecutionDate.set(Calendar.MILLISECOND,0);
+		
+		log.error("STOP EXECUTION DATE "+stopExecutionDate.getTime());
+		
+		if (stopExecutionDate.before(startExecutionDate)) {
+			SessionErrors.add(actionRequest, "courseadmin.new.error.dateinterval");
+			actionResponse.setRenderParameter("courseId", String.valueOf(courseId));
+			actionResponse.setRenderParameter("redirect", redirect);
+			actionResponse.setRenderParameter("jspPage",
+					"/html/courseadmin/editcourse.jsp");
+			return;
+		}
+		
+		
+		
+		
+		Date ahora = new Date(System.currentTimeMillis());
 		// Validations
 		boolean noTitle = true;
 		Enumeration<String> parNames = uploadRequest.getParameterNames();
@@ -752,6 +814,8 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 			course.setGoodbye(goodbye);
 			course.setGoodbyeSubject(goodbyeSubject);
 			course.setGoodbyeMsg(goodbyeMsg);
+			course.setExecutionStartDate(startExecutionDate.getTime());
+			course.setExecutionEndDate(stopExecutionDate.getTime());
 		
 			try {
 				
@@ -824,6 +888,7 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 				SessionMessages.add(actionRequest, "course-saved-successfully");
 				
 			} catch (Exception e) {
+				e.printStackTrace();
 				SessionErrors.add(actionRequest, "evaluationtaskactivity.error.systemError");
 				actionResponse.setRenderParameter("courseId", String.valueOf(courseId));
 				actionResponse.setRenderParameter("jspPage","/html/courseadmin/editcourse.jsp");

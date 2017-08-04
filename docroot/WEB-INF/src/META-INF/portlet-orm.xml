@@ -140,6 +140,12 @@
 			<basic name="goodbyeMsg" />
 			<basic name="goodbyeSubject" />
 			<basic name="isLinked" />
+			<basic name="executionStartDate">
+				<temporal>TIMESTAMP</temporal>
+			</basic>
+			<basic name="executionEndDate">
+				<temporal>TIMESTAMP</temporal>
+			</basic>
 			<transient name="descriptionCurrentLanguageId" />
 			<transient name="descriptionMap" />
 			<transient name="modelAttributes" />
