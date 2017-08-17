@@ -23,7 +23,6 @@
 <%@page import="com.liferay.portal.kernel.xml.SAXReaderUtil"%>
 
 <%@ include file="/init.jsp" %>
-
 <%
 	Boolean isTablet = ParamUtil.getBoolean(renderRequest, "isTablet", false);
 
@@ -31,13 +30,42 @@
 		renderRequest.setAttribute(WebKeys.PORTLET_CONFIGURATOR_VISIBILITY, Boolean.FALSE);
 	}
 	else{
-
+%>
+	<div class="container-activity isFeedback">
+<%
 		boolean hasFreeQuestion = false;
 
 		LearningActivity learningActivity=(LearningActivity)request.getAttribute("learningActivity");
 		if(learningActivity==null){
 			learningActivity=LearningActivityLocalServiceUtil.getLearningActivity(ParamUtil.getLong(request,"actId" ));	
 		}
+		LearningActivity bankActivity = learningActivity;
+		boolean useBank = StringPool.TRUE.equals(LearningActivityLocalServiceUtil.getExtraContentValue(learningActivity.getActId(), "isBank"));
+		LearningActivityTry larntry=(LearningActivityTry)request.getAttribute("larntry");
+		if(larntry==null) larntry=LearningActivityTryLocalServiceUtil.getLearningActivityTry(ParamUtil.getLong(request,"latId" ));
+		
+		if(larntry.getActId() == learningActivity.getActId()){
+			request.setAttribute("larntry",larntry);
+		}else{
+			larntry=LearningActivityTryLocalServiceUtil.getLastLearningActivityTryByActivityAndUser(ParamUtil.getLong(request,"actId",0 ), learningActivity.getUserId());
+			request.setAttribute("larntry",larntry);
+		}
+		
+		if( useBank && Validator.isNotNull(larntry) && Validator.isXml(larntry.getTryResultData()) ){
+			String tryResultData = larntry.getTryResultData();
+			Document docQuestions = SAXReaderUtil.read(tryResultData);
+			List<Element> xmlQuestions = docQuestions.getRootElement().elements("question");
+			String questionIdString = xmlQuestions.get(0).attributeValue("id");
+			Long questionId = Long.valueOf(questionIdString);
+			TestQuestion testQuestion = TestQuestionLocalServiceUtil.getTestQuestion(questionId);
+			bankActivity = LearningActivityLocalServiceUtil.getLearningActivity(testQuestion.getActId());
+		}
+%>
+		<h2 class="description-title"><%=bankActivity.getTitle(themeDisplay.getLocale()) %></h2>
+		<div class="description">
+			<%=bankActivity.getDescriptionFiltered(themeDisplay.getLocale(),true) %>
+		</div>
+<%
 		request.setAttribute("actId",learningActivity.getActId());
 		request.setAttribute("learningActivity",learningActivity);
 		
@@ -67,18 +95,7 @@
 		String tryResultData = null;
 		
 		if(!hasPermissionAccessCourseFinished){
-			
-			LearningActivityTry larntry=(LearningActivityTry)request.getAttribute("larntry");
-		
-			if(larntry==null) larntry=LearningActivityTryLocalServiceUtil.getLearningActivityTry(ParamUtil.getLong(request,"latId" ));
-			
-			if(larntry.getActId() == learningActivity.getActId()){
-				request.setAttribute("larntry",larntry);
-			}else{
-				larntry=LearningActivityTryLocalServiceUtil.getLastLearningActivityTryByActivityAndUser(ParamUtil.getLong(request,"actId",0 ), learningActivity.getUserId());
-				request.setAttribute("larntry",larntry);
-			}
-				request.setAttribute("hasFreeQuestion", hasFreeQuestion);	
+			request.setAttribute("hasFreeQuestion", hasFreeQuestion);	
 			tries = learningActivity.getTries();
 			userTries = Long.valueOf(LearningActivityTryLocalServiceUtil.getTriesCountByActivityAndUser(learningActivity.getActId(),themeDisplay.getUserId()));
 		
@@ -167,17 +184,7 @@
 			long userId = themeDisplay.getUserId();
 			List<TestQuestion> questions=null;
 			if( StringPool.TRUE.equals(LearningActivityLocalServiceUtil.getExtraContentValue(actId, "isBank")) ){
-				LearningActivityTry learningTry = LearningActivityTryLocalServiceUtil.getLastLearningActivityTryByActivityAndUser(actId, userId);
-				if( learningTry != null && Validator.isXml(learningTry.getTryResultData()) ){
-					tryResultData = learningTry.getTryResultData();
-					Document docQuestions = SAXReaderUtil.read(tryResultData);
-					List<Element> xmlQuestions = docQuestions.getRootElement().elements("question");
-					String questionIdString = xmlQuestions.get(0).attributeValue("id");
-					Long questionId = Long.valueOf(questionIdString);
-					TestQuestion testQuestion = TestQuestionLocalServiceUtil.getTestQuestion(questionId);
-					LearningActivity bankActivity = LearningActivityLocalServiceUtil.getLearningActivity(testQuestion.getActId());
-					questions = TestQuestionLocalServiceUtil.getQuestions(bankActivity.getActId());
-				}
+				questions = TestQuestionLocalServiceUtil.getQuestions(bankActivity.getActId());
 			}else{
 				if( GetterUtil.getLong(LearningActivityLocalServiceUtil.getExtraContentValue(actId,"random"))==0 
 						|| hasPermissionAccessCourseFinished )
@@ -259,5 +266,8 @@
 				}
 			}
 		}
+%>
+	</div>
+<%
 	}
 %>

@@ -231,16 +231,20 @@ if(course!=null){
 	endHour=Integer.parseInt(formatHour.format(course.getEndDate()));
 	endMin=Integer.parseInt(formatMin.format(course.getEndDate()));
 	
-	startExecutionDay=Integer.parseInt(formatDay.format(course.getExecutionStartDate()));
-	startExecutionMonth=Integer.parseInt(formatMonth.format(course.getExecutionStartDate()))-1;
-	startExecutionYear=Integer.parseInt(formatYear.format(course.getExecutionStartDate()));
-	startExecutionHour=Integer.parseInt(formatHour.format(course.getExecutionStartDate()));
-	startExecutionMin=Integer.parseInt(formatMin.format(course.getExecutionStartDate()));
-	endExecutionDay=Integer.parseInt(formatDay.format(course.getExecutionEndDate()));
-	endExecutionMonth=Integer.parseInt(formatMonth.format(course.getExecutionEndDate()))-1;
-	endExecutionYear=Integer.parseInt(formatYear.format(course.getExecutionEndDate()));
-	endExecutionHour=Integer.parseInt(formatHour.format(course.getExecutionEndDate()));
-	endExecutionMin=Integer.parseInt(formatMin.format(course.getExecutionEndDate()));
+	if(course.getExecutionStartDate()!=null){
+		startExecutionDay=Integer.parseInt(formatDay.format(course.getExecutionStartDate()));
+		startExecutionMonth=Integer.parseInt(formatMonth.format(course.getExecutionStartDate()))-1;
+		startExecutionYear=Integer.parseInt(formatYear.format(course.getExecutionStartDate()));
+		startExecutionHour=Integer.parseInt(formatHour.format(course.getExecutionStartDate()));
+		startExecutionMin=Integer.parseInt(formatMin.format(course.getExecutionStartDate()));
+	}
+	if(course.getExecutionEndDate()!=null){
+		endExecutionDay=Integer.parseInt(formatDay.format(course.getExecutionEndDate()));
+		endExecutionMonth=Integer.parseInt(formatMonth.format(course.getExecutionEndDate()))-1;
+		endExecutionYear=Integer.parseInt(formatYear.format(course.getExecutionEndDate()));
+		endExecutionHour=Integer.parseInt(formatHour.format(course.getExecutionEndDate()));
+		endExecutionMin=Integer.parseInt(formatMin.format(course.getExecutionEndDate()));
+	}
 	
 	type=course.getStatus(); //TODO
 	welcomeSubject = course.getWelcomeSubject();

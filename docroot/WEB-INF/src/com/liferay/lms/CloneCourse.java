@@ -14,6 +14,7 @@ import java.util.Locale;
 
 import org.apache.commons.io.IOUtils;
 
+import com.liferay.counter.model.Counter;
 import com.liferay.counter.service.CounterLocalServiceUtil;
 import com.liferay.lms.learningactivity.LearningActivityTypeRegistry;
 import com.liferay.lms.model.Course;
@@ -979,13 +980,12 @@ public class CloneCourse implements MessageListener {
 					LearningActivityLocalServiceUtil.setExtraContentValue(actNew.getActId(), "assetEntry", String.valueOf(entryId));
 				}else if(actNew.getTypeId() == 9){
 					AssetEntry entry =  AssetEntryLocalServiceUtil.getAssetEntry(entryId);
-					AssetEntry newEntry = AssetEntryLocalServiceUtil.createAssetEntry(CounterLocalServiceUtil.increment(AssetEntry.class.getName()));
+					AssetEntry newEntry = AssetEntryLocalServiceUtil.createAssetEntry(CounterLocalServiceUtil.increment(Counter.class.getName()));
 					long newEntryId = newEntry.getEntryId();
 					newEntry = (AssetEntry)entry.clone();
-					newEntry.setEntryId(newEntryId);
 					newEntry.setGroupId(actNew.getGroupId());
-					AssetEntryLocalServiceUtil.updateAssetEntry(newEntry);
 					log.error("NEW ENTRY ID "+ newEntryId);
+					AssetEntryLocalServiceUtil.updateAssetEntry(newEntry);
 					LearningActivityLocalServiceUtil.setExtraContentValue(actNew.getActId(), "assetEntry", String.valueOf(newEntryId));
 					
 				}
