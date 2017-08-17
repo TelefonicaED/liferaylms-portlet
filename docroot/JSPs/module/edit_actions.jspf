@@ -175,7 +175,7 @@
 			</c:if>
  		--%>
 		<c:choose>
-			<c:when test="<%=permissionChecker.isOmniadmin() || permissionChecker.hasPermission(groupId,name,Long.parseLong(primKey),ActionKeys.PERMISSIONS) 
+			<c:when test="<%=permissionChecker.isOmniadmin() ||  permissionChecker.isCompanyAdmin() || permissionChecker.hasPermission(groupId,name,Long.parseLong(primKey),ActionKeys.PERMISSIONS) 
 					&& !permissionChecker.hasPermission(groupId,name,Long.parseLong(primKey),\"SOFT_PERMISSIONS\") %>">
 				<portlet:renderURL var="redirectURL" windowState="<%=WindowState.NORMAL.toString() %>"/>
 				<liferay-security:permissionsURL

@@ -26,7 +26,11 @@ import com.liferay.lms.service.ScheduleLocalServiceUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.model.Team;
+import com.liferay.portal.model.User;
+import com.liferay.portal.security.permission.PermissionChecker;
+import com.liferay.portal.security.permission.PermissionCheckerFactoryUtil;
 import com.liferay.portal.service.TeamLocalServiceUtil;
+import com.liferay.portal.service.UserLocalServiceUtil;
 
 /**
  * The extended model implementation for the Module service. Represents a row in the &quot;Lms_Module&quot; database table, with each column mapped to a property of this class.
@@ -88,6 +92,20 @@ public class ModuleImpl extends ModuleBaseImpl {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+
+		try {
+			User user = UserLocalServiceUtil.fetchUser(userId);
+			PermissionChecker permissionChecker = PermissionCheckerFactoryUtil.create(user);
+			if(!permissionChecker.hasPermission(this.getGroupId(), Module.class.getName(), this.getModuleId(), "ACCESS")){
+				return true;
+			}
+		} catch (Exception e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+		
 		
 		if(!((endDate!=null&&endDate.after(now)) &&(startDate!=null&&startDate.before(now)))){
 			return true;

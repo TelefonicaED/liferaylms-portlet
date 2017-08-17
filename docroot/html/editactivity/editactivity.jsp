@@ -1,3 +1,4 @@
+<%@page import="com.liferay.portal.kernel.util.PropsUtil"%>
 <%@page import="com.liferay.lms.model.impl.LearningActivityImpl"%>
 <%@page import="com.liferay.portal.kernel.util.PropsKeys"%>
 <%@page import="com.liferay.portal.kernel.util.PrefsPropsUtil"%>
@@ -1025,8 +1026,10 @@ Liferay.provide(
 		<%}
 		%>
 		</liferay-ui:panel>
-	
-		<c:if test="${showcategorization}">
+		<%
+		boolean showCategorization = ("false".equals(PropsUtil.get("activity.show.categorization")))?false:true;
+		%>
+		<c:if test="<%= showCategorization %>">
 			<c:choose>
 				<c:when test="<%=isCourse %>">
 					<liferay-ui:panel title="categorization" collapsible="true" defaultState="closed">

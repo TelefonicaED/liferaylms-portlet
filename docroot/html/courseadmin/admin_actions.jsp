@@ -1,3 +1,4 @@
+<%@page import="com.liferay.portal.kernel.util.PrefsPropsUtil"%>
 <%@page import="com.liferay.lms.service.CourseLocalServiceUtil"%>
 <%@page import="javax.portlet.PortletPreferences"%>
 <%@page import="com.liferay.portlet.PortletPreferencesFactoryUtil"%>
@@ -55,6 +56,9 @@ boolean showPermission = preferences.getValue("showPermission", "true").equals("
 
 <%-- Editar --%>
 <%
+
+boolean editionsWithoutRestrictions = GetterUtil.getBoolean(renderRequest.getPreferences().getValue("showEditionsWithoutRestrictions", StringPool.FALSE),false);
+
 if( permissionChecker.hasPermission(themeDisplay.getScopeGroupId(),  Course.class.getName(),primKey,ActionKeys.UPDATE)&& ! myCourse.isClosed()){%>
 	<liferay-ui:icon image="edit" message="edit" url="<%=editURL.toString() %>" />
 
@@ -67,7 +71,7 @@ if( permissionChecker.hasPermission(themeDisplay.getScopeGroupId(),  Course.clas
 	<portlet:param name="view" value="role-members-tab" />
 </portlet:renderURL>
 <%
-if(permissionChecker.hasPermission(themeDisplay.getScopeGroupId(),  Course.class.getName(),primKey,ActionKeys.ASSIGN_MEMBERS)&& ! myCourse.isClosed() && showMembers && countChildCourses <=0)
+if(permissionChecker.hasPermission(themeDisplay.getScopeGroupId(),  Course.class.getName(),primKey,ActionKeys.ASSIGN_MEMBERS)&& ! myCourse.isClosed() && showMembers && (editionsWithoutRestrictions || countChildCourses <=0))
 {
 %>
 
@@ -126,7 +130,7 @@ if(permissionChecker.hasPermission(themeDisplay.getScopeGroupId(),  Course.class
 	<%}%>
 </c:if>
 
-<c:if test="<%=permissionChecker.hasPermission(themeDisplay.getScopeGroupId(),  Course.class.getName(),primKey,ActionKeys.UPDATE) && ! myCourse.isClosed() && myCourse.getParentCourseId()<=0 && countStudents<=0%>">
+<c:if test="<%=permissionChecker.hasPermission(themeDisplay.getScopeGroupId(),  Course.class.getName(),primKey,ActionKeys.UPDATE) && ! myCourse.isClosed() && myCourse.getParentCourseId()<=0 && (countStudents<=0 || editionsWithoutRestrictions)%>">
 		<liferay-portlet:renderURL var="editionsURL">
 			<liferay-portlet:param name="courseId" value="<%=String.valueOf(myCourse.getCourseId()) %>"/>
 			<liferay-portlet:param name="view" value="editions"/>

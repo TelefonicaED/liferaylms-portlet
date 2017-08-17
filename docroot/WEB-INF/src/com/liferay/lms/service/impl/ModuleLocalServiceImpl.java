@@ -55,11 +55,15 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.model.ResourceConstants;
+import com.liferay.portal.model.Role;
+import com.liferay.portal.model.RoleConstants;
 import com.liferay.portal.model.Team;
 import com.liferay.portal.model.User;
 import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.security.permission.PermissionCheckerFactoryUtil;
+import com.liferay.portal.service.ResourcePermissionLocalServiceUtil;
+import com.liferay.portal.service.RoleLocalServiceUtil;
 import com.liferay.portal.service.TeamLocalServiceUtil;
 import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.util.PortalUtil;
@@ -301,6 +305,14 @@ public class ModuleLocalServiceImpl extends ModuleLocalServiceBaseImpl {
 	    fileobj.setIcon(validmodule.getIcon());
 	    fileobj.setPrecedence(validmodule.getPrecedence());
 	    try {
+	    	Role siteMember = RoleLocalServiceUtil.fetchRole(validmodule.getCompanyId(), RoleConstants.SITE_MEMBER);
+	    	ResourcePermissionLocalServiceUtil.setResourcePermissions(validmodule.getCompanyId(), 
+	    			Module.class.getName(),ResourceConstants.SCOPE_INDIVIDUAL, String.valueOf(fileobj.getModuleId()),  siteMember.getRoleId(),  new String[]{"VIEW","ACCESS"});
+	   
+	    	
+	    	
+	    	
+	    	
 			resourceLocalService.addResources(
 					validmodule.getCompanyId(), validmodule.getGroupId(), validmodule.getUserId(),
 			Module.class.getName(), validmodule.getPrimaryKey(), false,
@@ -347,6 +359,13 @@ public class ModuleLocalServiceImpl extends ModuleLocalServiceBaseImpl {
 	    fileobj.setOrdern(ordern != null ? ordern : fileobj.getModuleId());
 	    
 	    try {
+	    	
+	    	 Role siteMember = RoleLocalServiceUtil.fetchRole(companyId, RoleConstants.SITE_MEMBER);
+		     ResourcePermissionLocalServiceUtil.setResourcePermissions(companyId, 
+		     			Module.class.getName(),ResourceConstants.SCOPE_INDIVIDUAL, String.valueOf(fileobj.getModuleId()),  siteMember.getRoleId(),  new String[]{"VIEW","ACCESS"});
+		    
+				
+	    	
 			resourceLocalService.addResources(
 					companyId, courseId, userId,
 					Module.class.getName(), fileobj.getPrimaryKey(), 

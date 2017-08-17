@@ -46,6 +46,7 @@
 	boolean showIconCourse 	= preferences.getValue("showIconCourse",  "true").equals("true");
 	boolean showCoursePermission = preferences.getValue("showCoursePermission", "true").equals("true");
 	boolean showCourseCatalogForEditions = preferences.getValue("showCourseCatalogForEditions","false").equals("true");
+	boolean showEditionsWithoutRestrictions = preferences.getValue("showEditionsWithoutRestrictions","false").equals("true");
 	
 	int tipoImport = Integer.parseInt(preferences.getValue("tipoImport", "1"));
 	boolean hasImportById = (tipoImport != 2);
@@ -68,7 +69,8 @@
 		<aui:input type="checkbox" helpMessage="help-execution-date" label="execution-date" name="executionDate" value="<%=preferences.getValue(\"showExecutionDate\", StringPool.TRUE) %>" ignoreRequestValue="true"/>
 		<aui:input type="checkbox" helpMessage="help-published-in-catalog" label="published-in-catalog" name="showcatalog" value="<%=preferences.getValue(\"showcatalog\", StringPool.TRUE) %>" ignoreRequestValue="true"/>
 		<aui:input type="checkbox" name="showCourseCatalogForEditions" label="courseadmin.config.show-course-catalog-editions" 	value="<%=showCourseCatalogForEditions %>" checked="<%=showCourseCatalogForEditions %>"/>
-		<aui:input type="checkbox" name="showCoursePermission" label="courseadmin.config.showCoursePermission" 	value="<%=showCoursePermission %>" checked="<%=showCoursePermission %>"/>	
+		<aui:input type="checkbox" name="showCoursePermission" label="courseadmin.config.showCoursePermission" 	value="<%=showCoursePermission %>" checked="<%=showCoursePermission %>"/>
+		<aui:input type="checkbox" name="showEditionsWithoutRestrictions" label="courseadmin.config.show-editions-without-restrictions" 	value="<%=showEditionsWithoutRestrictions %>" checked="<%=showEditionsWithoutRestrictions %>"/>	
 	</aui:field-wrapper>
 	
 	<aui:field-wrapper label="courseadmin.config.courseactions" >
