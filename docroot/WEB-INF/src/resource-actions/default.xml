@@ -389,6 +389,7 @@
 			<action-key>PERMISSIONS</action-key>
 			<action-key>UPDATE</action-key>
 			<action-key>VIEW</action-key>
+			<action-key>ACCESS</action-key>
 			<action-key>ADD_LACT</action-key>
 			<action-key>ADD_DISCUSSION</action-key>				
 			<action-key>UPDATE_DISCUSSION</action-key>
@@ -397,6 +398,7 @@
 		</supports>
 		<site-member-defaults>
 			<action-key>VIEW</action-key>
+			<action-key>ACCESS</action-key>
 		</site-member-defaults>
 		<guest-defaults>
 			<action-key>VIEW</action-key>
@@ -438,7 +440,6 @@
 				<action-key>COURSEEDITOR</action-key>
 				<action-key>ASSIGN_MEMBERS</action-key>
 				<action-key>ACCESS</action-key>
-				
 			</supports>
 			<site-member-defaults>
 				<action-key>VIEW</action-key>
