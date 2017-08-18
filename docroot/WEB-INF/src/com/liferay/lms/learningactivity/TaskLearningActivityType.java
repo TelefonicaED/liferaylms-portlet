@@ -76,7 +76,7 @@ public class TaskLearningActivityType extends BaseLearningActivityType
 	
 	@Override
 	public boolean canBeLinked(){
-		return true;
+		return false;
 	}
 	
 }

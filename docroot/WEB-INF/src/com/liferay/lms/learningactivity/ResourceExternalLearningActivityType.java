@@ -451,6 +451,6 @@ public class ResourceExternalLearningActivityType extends BaseLearningActivityTy
 	
 	@Override
 	public boolean canBeLinked(){
-		return true;
+		return false;
 	}
 }
