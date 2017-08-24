@@ -605,4 +605,17 @@ public interface CourseLocalService extends BaseLocalService,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* @param groupId
+	* @param userId
+	* @param teamId
+	* @return
+	* @throws PortalException
+	* @throws SystemException
+	*/
+	public boolean validateAddUserToCourse(long groupId, long userId,
+		long teamId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException;
 }

@@ -755,6 +755,22 @@ public class CourseLocalServiceWrapper implements CourseLocalService,
 	}
 
 	/**
+	* @param groupId
+	* @param userId
+	* @param teamId
+	* @return
+	* @throws PortalException
+	* @throws SystemException
+	*/
+	public boolean validateAddUserToCourse(long groupId, long userId,
+		long teamId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _courseLocalService.validateAddUserToCourse(groupId, userId,
+			teamId);
+	}
+
+	/**
 	 * @deprecated Renamed to {@link #getWrappedService}
 	 */
 	public CourseLocalService getWrappedCourseLocalService() {

@@ -91,7 +91,6 @@ import com.tls.lms.util.DLFolderUtil;
 public class CloneCourse implements MessageListener {
 	private static Log log = LogFactoryUtil.getLog(CloneCourse.class);
 
-	public static String DOCUMENTLIBRARY_MAINFOLDER = "ResourceUploads";
 
 	long groupId;
 	
@@ -418,7 +417,7 @@ public class CloneCourse implements MessageListener {
 					log.debug("      + Learning Activity : " + nuevaLarn.getTitle(Locale.getDefault())+ " ("+nuevaLarn.getActId()+", " + LanguageUtil.get(Locale.getDefault(),learningActivityTypeRegistry.getLearningActivityType(nuevaLarn.getTypeId()).getName())+")");
 					cloneTraceStr += "   Learning Activity: " + nuevaLarn.getTitle(Locale.getDefault())+ " ("+nuevaLarn.getActId()+", " + LanguageUtil.get(Locale.getDefault(),learningActivityTypeRegistry.getLearningActivityType(nuevaLarn.getTypeId()).getName())+")";
 					
-					cloneActivityFile(activity, nuevaLarn, themeDisplay.getUserId(), serviceContext);
+					CourseCopyUtil.cloneActivityFile(activity, nuevaLarn, themeDisplay.getUserId(), serviceContext);
 					
 					
 					long actId = nuevaLarn.getActId();
@@ -445,52 +444,9 @@ public class CloneCourse implements MessageListener {
 					continue;
 				}
 
-				List<TestQuestion> questions = TestQuestionLocalServiceUtil.getQuestions(activity.getActId());
-				for(TestQuestion question:questions)
-				{
-					TestQuestion newTestQuestion;
-					try {
-						newTestQuestion = TestQuestionLocalServiceUtil.addQuestion(nuevaLarn.getActId(), question.getText(), question.getQuestionType());
-						
-						String newTestDescription = descriptionFilesClone(question.getText(),newModule.getGroupId(), newTestQuestion.getActId(),themeDisplay.getUserId());
-						
-						newTestQuestion.setText(newTestDescription);
-						TestQuestionLocalServiceUtil.updateTestQuestion(newTestQuestion, true);
-						
-						log.debug("      Test question : " + question.getQuestionId() );
-						log.debug("      + Test question : " + newTestQuestion.getQuestionId() );
-						log.debug("      + Test question TEXT : " + newTestDescription );
-						cloneTraceStr += "\n   Test question: " + newTestQuestion.getQuestionId();
-						
-					} catch (Exception e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-						continue;
-					}
-					
-					List<TestAnswer> answers = TestAnswerLocalServiceUtil.getTestAnswersByQuestionId(question.getQuestionId());
-					for(TestAnswer answer:answers){
-						
-						try {
-							TestAnswer newTestAnswer = TestAnswerLocalServiceUtil.addTestAnswer(question.getQuestionId(), answer.getAnswer(), answer.getFeedbackCorrect(), answer.getFeedbacknocorrect(), answer.isIsCorrect());
-							newTestAnswer.setActId(nuevaLarn.getActId());
-							newTestAnswer.setQuestionId(newTestQuestion.getQuestionId());
-							newTestAnswer.setAnswer(descriptionFilesClone(answer.getAnswer(),newModule.getGroupId(), newTestAnswer.getActId(),themeDisplay.getUserId()));
-							
-							TestAnswerLocalServiceUtil.updateTestAnswer(newTestAnswer, true);
-							
-							log.debug("        Test answer : " + answer.getAnswerId());
-							log.debug("        + Test answer : " + newTestAnswer.getAnswerId());
-							cloneTraceStr += "\n     Test answer: " + newTestAnswer.getAnswerId();
-							
-						} catch (Exception e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-						
-					}
-
-				}
+				cloneTraceStr += CourseCopyUtil.createTestQuestionsAndAnswers(activity, nuevaLarn, newModule, themeDisplay.getUserId(), cloneTraceStr);
+				
+				
 			}
 			
 			if(pending.size()>0){
@@ -515,51 +471,7 @@ public class CloneCourse implements MessageListener {
 			
 			
 			//Extra Content de las evaluaciones
-			LearningActivity evaluationActivity;
-			for(Long evaluation : evaluations){
-				evaluationActivity = LearningActivityLocalServiceUtil.getLearningActivity(evaluation);
-				try{
-				if((evaluationActivity.getExtracontent()!=null)&&(evaluationActivity.getExtracontent().length()!=0)) {	
-					//Element activitiesElement = SAXReaderUtil.read(evaluationActivity.getExtracontent()).getRootElement().element("activities");
-					Document document =SAXReaderUtil.read(evaluationActivity.getExtracontent());
-					if(log.isDebugEnabled())log.debug(" --- OLD EXTRA CONTENT "+document.formattedString());
-					
-					Element evaluationXML = document.getRootElement();
-									
-					if(log.isDebugEnabled())log.debug("--- OLD Evaluation Element "+evaluationXML.asXML());
-					Element activitiesElement = evaluationXML.element("activities");
-					if(log.isDebugEnabled())log.debug("--- OLD Activities Element "+activitiesElement.asXML());
-					if(activitiesElement!=null){
-						Iterator<Element> activitiesElementItr = activitiesElement.elementIterator();
-						while(activitiesElementItr.hasNext()) {
-							Element activity =activitiesElementItr.next();
-							if(log.isDebugEnabled())log.debug("-- Activity "+ activity);
-							if(("activity".equals(activity.getName()))&&(activity.attribute("id")!=null)&&(activity.attribute("id").getValue().length()!=0)){
-								try{
-									if(log.isDebugEnabled())log.debug("Old Value "+Long.parseLong(activity.attribute("id").getValue()));
-									Long newValue = correlationActivities.get(Long.parseLong(activity.attribute("id").getValue()));
-									if(log.isDebugEnabled())log.debug("New Value "+ newValue);
-									activity.attribute("id").setValue(String.valueOf(newValue));
-								}
-								catch(NumberFormatException e){}
-							}
-							
-							if(log.isDebugEnabled())log.debug("-- Activity Changed "+ activity.asXML());
-						}		
-						
-						if(log.isDebugEnabled())log.debug("--- NEW Activities Element "+activitiesElement.asXML());
-					}
-
-					if(log.isDebugEnabled()){
-						log.debug("--- NEW Evaluation Element "+evaluationXML.asXML());
-						log.debug(" --- NEW EXTRA CONTENT "+document.formattedString());
-					}
-					evaluationActivity.setExtracontent(document.formattedString());
-					LearningActivityLocalServiceUtil.updateLearningActivity(evaluationActivity);
-				}
-				}catch(Exception e){e.printStackTrace();}
-			
-			}
+			CourseCopyUtil.copyEvaluationExtraContent(evaluations, correlationActivities);
 			
 		}	
 		
@@ -858,194 +770,6 @@ public class CloneCourse implements MessageListener {
 		return res;
 	}
 	
-	private void cloneActivityFile(LearningActivity actOld, LearningActivity actNew, long userId, ServiceContext serviceContext){
-					
-		try {
-			log.error("cloneActivityFile");
-			String entryIdStr = "";
-			if(actOld.getTypeId() == 2){
-				entryIdStr = LearningActivityLocalServiceUtil.getExtraContentValue(actOld.getActId(), "document");
-			}else if(actOld.getTypeId() == 7 || actOld.getTypeId() == 9){
-				entryIdStr = LearningActivityLocalServiceUtil.getExtraContentValue(actOld.getActId(), "assetEntry");
-			}
-			
-			
-			
-			if(!entryIdStr.equals("")){
-				
-				AssetEntry docAsset = AssetEntryLocalServiceUtil.getAssetEntry(Long.valueOf(entryIdStr));
-				long entryId = 0;
-				if(docAsset.getUrl()!=null && docAsset.getUrl().trim().length()>0){
-					entryId = Long.valueOf(entryIdStr);
-				}else{
-					
-					if(actNew.getTypeId() == 2){
-						try{
-							
-							HashMap<String, String> map = LearningActivityLocalServiceUtil.convertXMLExtraContentToHashMap(actNew.getActId());
-							Iterator <String> keysString =  map.keySet().iterator();
-							//int index = 0;
-							while (keysString.hasNext()){
-								String key = keysString.next();
-								
-								if(!key.equals("video") && key.indexOf("document")!=-1){
-									
-									//index++;
-									long assetEntryIdOld =  Long.parseLong(map.get(key));
-									
-									AssetEntry docAssetOLD= AssetEntryLocalServiceUtil.getAssetEntry(assetEntryIdOld);
-									DLFileEntry oldFile=DLFileEntryLocalServiceUtil.getDLFileEntry(docAssetOLD.getClassPK());
-									
-									InputStream inputStream = DLFileEntryLocalServiceUtil.getFileAsStream(userId, oldFile.getFileVersion().getFileEntryId(), oldFile.getFileVersion().getVersion());
-									byte[] byteArray = null;
-									try {
-										byteArray = IOUtils.toByteArray(inputStream);
-									} catch (IOException e) {
-										// TODO Auto-generated catch block
-										e.printStackTrace();
-									}
-									
-									
-									
-										long repositoryId = DLFolderConstants.getDataRepositoryId(actNew.getGroupId(), DLFolderConstants.DEFAULT_PARENT_FOLDER_ID);
-										
-										long dlMainFolderId = 0;
-										 boolean dlMainFolderFound = false;
-									        //Get main folder
-									        try {
-									        	//Get main folder
-									        	Folder dlFolderMain = DLAppLocalServiceUtil.getFolder(repositoryId,DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,DOCUMENTLIBRARY_MAINFOLDER+actNew.getActId());
-									        	dlMainFolderId = dlFolderMain.getFolderId();
-									        	dlMainFolderFound = true;
-									        	//Get portlet folder
-									        } catch (Exception ex){
-									        }
-									        
-											//Damos permisos al archivo para usuarios de comunidad.
-											serviceContext.setAddGroupPermissions(true);
-									        
-									        //Create main folder if not exist
-									        if(!dlMainFolderFound){
-									        	Folder newDocumentMainFolder = DLAppLocalServiceUtil.addFolder(userId, repositoryId,DLFolderConstants.DEFAULT_PARENT_FOLDER_ID, DOCUMENTLIBRARY_MAINFOLDER+actNew.getActId(), DOCUMENTLIBRARY_MAINFOLDER+actNew.getActId(), serviceContext);
-									        	dlMainFolderFound = true;
-									        	dlMainFolderId = newDocumentMainFolder.getFolderId();
-									        }
-										
-
-
-										
-										String ficheroExtStr = "";
-										String extension[] = oldFile.getTitle().split("\\.");
-										if(extension.length > 0){
-											ficheroExtStr = "."+extension[extension.length-1];
-										}
-									
-										FileEntry newFile = DLAppLocalServiceUtil.addFileEntry(
-												userId, repositoryId , dlMainFolderId , oldFile.getTitle()+ficheroExtStr, oldFile.getMimeType(), 
-											oldFile.getTitle(), StringPool.BLANK, StringPool.BLANK, byteArray , serviceContext ) ;
-
-																		
-										map.put(key, String.valueOf(AssetEntryLocalServiceUtil.getEntry(DLFileEntry.class.getName(), newFile.getPrimaryKey()).getEntryId()));
-										
-									
-										
-										Role siteMemberRole = RoleLocalServiceUtil.getRole(serviceContext.getCompanyId(), RoleConstants.SITE_MEMBER);
-										ResourcePermissionLocalServiceUtil.setResourcePermissions(serviceContext.getCompanyId(), LearningActivity.class.getName(), 
-												ResourceConstants.SCOPE_INDIVIDUAL,	Long.toString(actNew.getActId()),siteMemberRole.getRoleId(), new String[] {ActionKeys.VIEW});
-
-								}
-
-										LearningActivityLocalServiceUtil.saveHashMapToXMLExtraContent(actNew.getActId(), map);
-							
-						}
-						
-						
-					} catch (NoSuchEntryException nsee) {
-						log.error(" asset not exits ");
-					} catch (Exception e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} finally {
-						serviceContext.setAddGroupPermissions(serviceContext.isAddGroupPermissions());
-					}
-				}else{
-					entryId = cloneFile(Long.valueOf(entryIdStr), actNew, userId, serviceContext);
-				}
-					
-					
-
-				}
-				
-				if(actNew.getTypeId() == 7){
-					LearningActivityLocalServiceUtil.setExtraContentValue(actNew.getActId(), "assetEntry", String.valueOf(entryId));
-				}else if(actNew.getTypeId() == 9){
-					AssetEntry entry =  AssetEntryLocalServiceUtil.getAssetEntry(entryId);
-					AssetEntry newEntry = AssetEntryLocalServiceUtil.createAssetEntry(CounterLocalServiceUtil.increment(Counter.class.getName()));
-					long newEntryId = newEntry.getEntryId();
-					newEntry = (AssetEntry)entry.clone();
-					newEntry.setGroupId(actNew.getGroupId());
-					log.error("NEW ENTRY ID "+ newEntryId);
-					AssetEntryLocalServiceUtil.updateAssetEntry(newEntry);
-					LearningActivityLocalServiceUtil.setExtraContentValue(actNew.getActId(), "assetEntry", String.valueOf(newEntryId));
-					
-				}
-				
-			}
-			
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-	}
-	
-	private long cloneFile(long entryId, LearningActivity actNew, long userId, ServiceContext serviceContext){
-		
-		long assetEntryId = 0;
-		boolean addGroupPermissions = serviceContext.isAddGroupPermissions();
-		
-		try {
-			log.debug("EntryId: "+entryId);
-			AssetEntry docAsset = AssetEntryLocalServiceUtil.getAssetEntry(entryId);
-			//docAsset.getUrl()!=""
-			//DLFileEntryLocalServiceUtil.getDLFileEntry(fileEntryId)
-			log.debug(docAsset.getClassPK());
-			DLFileEntry docfile = DLFileEntryLocalServiceUtil.getDLFileEntry(docAsset.getClassPK());
-			InputStream is = DLFileEntryLocalServiceUtil.getFileAsStream(userId, docfile.getFileEntryId(), docfile.getVersion());
-			
-			//Crear el folder
-			DLFolder dlFolder = DLFolderUtil.createDLFoldersForLearningActivity(userId, serviceContext.getScopeGroupId(), serviceContext);
-
-			long repositoryId = DLFolderConstants.getDataRepositoryId(actNew.getGroupId(), DLFolderConstants.DEFAULT_PARENT_FOLDER_ID);
-			
-			String ficheroStr = docfile.getTitle();	
-			if(!docfile.getTitle().endsWith(docfile.getExtension())){
-				ficheroStr = ficheroStr +"."+ docfile.getExtension();
-			}
-			
-			serviceContext.setAddGroupPermissions(true);
-			FileEntry newFile = DLAppLocalServiceUtil.addFileEntry(
-					serviceContext.getUserId(), repositoryId , dlFolder.getFolderId() , ficheroStr, docfile.getMimeType(), 
-					docfile.getTitle(), StringPool.BLANK, StringPool.BLANK, is, docfile.getSize() , serviceContext ) ;
-			
-			
-			AssetEntry asset = AssetEntryLocalServiceUtil.getEntry(DLFileEntry.class.getName(), newFile.getPrimaryKey());
-			
-			log.debug(" asset : " + asset.getEntryId());
-			
-			assetEntryId = asset.getEntryId();
-			
-		} catch (NoSuchEntryException nsee) {
-			log.error(" asset not exits ");
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} finally {
-			serviceContext.setAddGroupPermissions(addGroupPermissions);
-		}
-		
-		return assetEntryId;
-	}
 	
 	
 	private void sendNotification(String title, String content, String url, String type, int priority){

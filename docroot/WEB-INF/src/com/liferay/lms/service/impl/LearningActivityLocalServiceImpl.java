@@ -899,6 +899,8 @@ public class LearningActivityLocalServiceImpl extends LearningActivityLocalServi
 		case 6: res = "online"; break;
 		//resource internal
 		case 7: res = "resourceInternal"; break;
+		//scorm
+		case 9: res = "scorm"; break;
 		}
 
 		return res;

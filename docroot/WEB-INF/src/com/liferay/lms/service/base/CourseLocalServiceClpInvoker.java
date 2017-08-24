@@ -461,6 +461,10 @@ public class CourseLocalServiceClpInvoker {
 				"long", "long", "long",
 				"com.liferay.portal.service.ServiceContext"
 			};
+
+		_methodName277 = "validateAddUserToCourse";
+
+		_methodParameterTypes277 = new String[] { "long", "long", "long" };
 	}
 
 	public Object invokeMethod(String name, String[] parameterTypes,
@@ -1033,6 +1037,13 @@ public class CourseLocalServiceClpInvoker {
 				(com.liferay.portal.service.ServiceContext)arguments[3]);
 		}
 
+		if (_methodName277.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes277, parameterTypes)) {
+			return CourseLocalServiceUtil.validateAddUserToCourse(((Long)arguments[0]).longValue(),
+				((Long)arguments[1]).longValue(),
+				((Long)arguments[2]).longValue());
+		}
+
 		throw new UnsupportedOperationException();
 	}
 
@@ -1200,4 +1211,6 @@ public class CourseLocalServiceClpInvoker {
 	private String[] _methodParameterTypes275;
 	private String _methodName276;
 	private String[] _methodParameterTypes276;
+	private String _methodName277;
+	private String[] _methodParameterTypes277;
 }

@@ -1430,6 +1430,75 @@ public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int e
 	}
 	
 	
+	/**
+	 * 
+	 * @param groupId
+	 * @param userId
+	 * @param teamId
+	 * @return
+	 * @throws PortalException
+	 * @throws SystemException
+	 */
+	public boolean validateAddUserToCourse(long groupId, long userId, long teamId) throws PortalException, SystemException {
+		boolean result=false;
+		try{
+			Course course=CourseLocalServiceUtil.fetchByGroupCreatedId(groupId);
+			int i = 0;
+			boolean enoughCompetences = true;
+			CourseCompetence courseCompetence = null;
+			if(userId > 0){
+				//1. Si no estÃ¡ ya inscrito
+				if(!GroupLocalServiceUtil.hasUserGroup(userId,course.getGroupCreatedId())){
+					Group group = GroupLocalServiceUtil.getGroup(course.getGroupCreatedId());
+					
+					//2. Fecha actual dentro del periodo de inscripcion
+					Date now=new Date(System.currentTimeMillis());
+					Date startDate = course.getStartDate();
+					Date endDate = course.getEndDate();
+					if(teamId>0){
+						Schedule sch = scheduleLocalService.getScheduleByTeamId(teamId);	
+						if(sch!=null){
+							startDate = sch.getStartDate();
+							endDate = sch.getEndDate();
+						}
+					}
+					
+					if((startDate.before(now) && endDate.after(now))){
+						//3. Control de competencias 
+						List<CourseCompetence> courseCompetences = CourseCompetenceLocalServiceUtil.findBycourseId(course.getCourseId(), true);
+						//Busco si al usuario le falta alguna competencia que es necesaria para la inscripcion al curso
+						while (i < courseCompetences.size() && enoughCompetences){
+							courseCompetence = courseCompetences.get(i);
+							UserCompetence uc = UserCompetenceLocalServiceUtil.findByUserIdCompetenceId(userId, courseCompetence.getCompetenceId());
+							if(uc == null){
+								enoughCompetences = false;
+								log.debug("Al usuario le falta la competencia obligatoria con id: " + courseCompetence.getCompetenceId() + " para poder ser inscrito al curso");
+							}
+							i++;
+						}
+						if(enoughCompetences){
+							// 4. El mÃ¡ximo de inscripciones del curso no ha sido superado
+							if(course.getMaxusers()<=0 || UserLocalServiceUtil.getGroupUsersCount(course.getGroupCreatedId()) < course.getMaxusers()){
+								if(group.getType()==GroupConstants.TYPE_SITE_OPEN){
+									result=true;
+								}else if(group.getType()==GroupConstants.TYPE_SITE_RESTRICTED){
+									if(!MembershipRequestLocalServiceUtil.hasMembershipRequest(userId, group.getGroupId(), MembershipRequestConstants.STATUS_PENDING)){
+										result=true;
+									}								
+								}
+							}
+						}
+					}
+				}
+			}
+		}catch (PortalException e){
+			e.printStackTrace();
+		}catch (SystemException e){
+			e.printStackTrace();
+		}
+		return result;
+	}
+	
 }
 
 

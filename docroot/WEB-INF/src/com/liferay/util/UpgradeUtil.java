@@ -11,6 +11,8 @@ import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.model.Company;
 import com.liferay.portal.model.ResourceConstants;
 import com.liferay.portal.model.Role;
@@ -22,19 +24,19 @@ import com.liferay.portal.service.RoleLocalServiceUtil;
 
 public class UpgradeUtil {
 
-	
+	private static Log log = LogFactoryUtil.getLog(UpgradeUtil.class);
 	public static void upgrade() throws SystemException{
 		 Role siteMember;
 		    
-			System.out.println("--- UPGRADING LMS TO 3.1.1 ");
-			System.out.println("--- CREATING ACCESS PERMISSION TO MODULE ");
+			log.warn("--- UPGRADING LMS TO 3.2 ");
+			log.warn("--- CREATING ACCESS PERMISSION TO MODULE ");
 			
 			List<String> actionIds = new ArrayList<String>();
 			actionIds.add("ACCESS");
 			ResourceActionLocalServiceUtil.checkResourceActions(
 					Module.class.getName(), actionIds);
 			
-			System.out.println("--- SETTING ACCESS PERMISSION TO COURSE ADMINISTRATION");
+			log.warn("--- SETTING ACCESS PERMISSION TO COURSE ADMINISTRATION");
 		    List<Company> companys = CompanyLocalServiceUtil.getCompanies();
 		    for(Company company : companys){
 		    	try{
@@ -44,17 +46,17 @@ public class UpgradeUtil {
 					     			Module.class.getName(),ResourceConstants.SCOPE_COMPANY, String.valueOf(company.getCompanyId()),  courseAdministrator.getRoleId(),  new String[]{"ACCESS","VIEW","DELETE", "ADD_LACT","UPDATE","PERMISSIONS","SOFT_PERMISSIONS"});
 			    	  }
 		    	 }catch(Exception e){
-		    		 System.out.println("No hay Administrador de cursos");
+		    		 log.warn("No hay Administrador de cursos");
 		    	}
 		    			  
 		    }
 		    
 		    
-		    System.out.println("--- SETTING ACCESS PERMISSION TO MODULES ");
+		    log.warn("--- SETTING ACCESS PERMISSION TO MODULES ");
 		    List<Module> modules = ModuleLocalServiceUtil.getModules(QueryUtil.ALL_POS, QueryUtil.ALL_POS);
 			for(Module module : modules){
 				try{
-					System.out.println("--- MODULE  "+ module.getModuleId());
+					log.warn("--- MODULE  "+ module.getModuleId());
 				    siteMember = RoleLocalServiceUtil.fetchRole(module.getCompanyId(), RoleConstants.SITE_MEMBER);
 					if(siteMember!=null){
 						ResourcePermissionLocalServiceUtil.setResourcePermissions(module.getCompanyId(), 
@@ -64,7 +66,7 @@ public class UpgradeUtil {
 					e.printStackTrace();
 				}
 			}
-			 System.out.println("--- END SETTING ACCESS PERMISSION TO MODULES ");
+			 log.warn("--- END SETTING ACCESS PERMISSION TO MODULES ");
 			 
 			 String createScormTables = "CREATE TABLE sco_scormcontent (  uuid_ VARCHAR(75) NULL DEFAULT NULL, "+
 					 					"scormId BIGINT(20) NOT NULL,  companyId BIGINT(20) NULL DEFAULT NULL, "+
@@ -78,8 +80,25 @@ public class UpgradeUtil {
 					 					"INDEX IX_884753FF (userId), INDEX IX_9EF32F8B (userId, groupId), "+
 					 					"INDEX IX_E6F9214F (uuid_) ) COLLATE='utf8_general_ci' ENGINE=InnoDB ;";
 			 String insertScormContent = "insert into sco_scormcontent select * from lms_scormcontent;";
+			 
+			 
+			 String alterLearningActivity = "ALTER TABLE `lms_learningactivity` " +
+					 	"ADD COLUMN `linkedActivityId` BIGINT(20) NULL DEFAULT NULL AFTER `commentsActivated`;";
+
+			 String alterCourseLinked = "ALTER TABLE `lms_course` "+
+			 			"ADD COLUMN `isLinked` TINYINT(4) NULL DEFAULT NULL AFTER `goodbyeSubject`;";
+
+			 String alterCourseStartDate = "ALTER TABLE `lms_course` "+
+					 	"ADD COLUMN `executionStartDate` DATETIME NULL DEFAULT NULL AFTER `isLinked`;";
+
+			 String alterCourseEndDate = "ALTER TABLE `lms_course` "+
+					 	"ADD COLUMN `executionEndDate` DATETIME NULL DEFAULT NULL AFTER `executionStartDate`;";
+			 
+			 
 
 			 //Execute SQL Queries
+			 //Create Scorm Tables
+			 log.warn("Creating Scorm Tables ");
 			 DB db = DBFactoryUtil.getDB();
 			 try {
 				db.runSQL(createScormTables);
@@ -91,8 +110,61 @@ public class UpgradeUtil {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			 
+			//Insert Scorm
+			 log.warn("Insert Scorm content "); 
 			try {
 				db.runSQL(insertScormContent);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			 log.warn("Alter table activity linked ");
+			//Activity linked
+			try {
+				db.runSQL(alterLearningActivity);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			//Course Linked
+			 log.warn("Alter table course linked ");
+			 try {
+				db.runSQL(alterCourseLinked);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			
+			//Course Start Date
+			log.warn("Alter table course start execution date ");
+			try {
+				db.runSQL(alterCourseStartDate);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			
+			//Course End Date
+			log.warn("Alter table course end execution date ");
+			try {
+				db.runSQL(alterCourseEndDate);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

@@ -783,6 +783,21 @@ public class CourseLocalServiceUtil {
 			serviceContext);
 	}
 
+	/**
+	* @param groupId
+	* @param userId
+	* @param teamId
+	* @return
+	* @throws PortalException
+	* @throws SystemException
+	*/
+	public static boolean validateAddUserToCourse(long groupId, long userId,
+		long teamId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getService().validateAddUserToCourse(groupId, userId, teamId);
+	}
+
 	public static void clearService() {
 		_service = null;
 	}

@@ -1,18 +1,47 @@
 package com.liferay.util;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLEncoder;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 
+import org.apache.commons.io.IOUtils;
+
+import com.liferay.counter.model.Counter;
+import com.liferay.counter.service.CounterLocalServiceUtil;
+import com.liferay.lms.CloneCourse;
+import com.liferay.lms.model.LearningActivity;
+import com.liferay.lms.model.Module;
+import com.liferay.lms.model.TestAnswer;
+import com.liferay.lms.model.TestQuestion;
+import com.liferay.lms.service.LearningActivityLocalServiceUtil;
+import com.liferay.lms.service.TestAnswerLocalServiceUtil;
+import com.liferay.lms.service.TestQuestionLocalServiceUtil;
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
+import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.DocumentException;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
+import com.liferay.portal.model.ResourceConstants;
+import com.liferay.portal.model.Role;
+import com.liferay.portal.model.RoleConstants;
+import com.liferay.portal.security.permission.ActionKeys;
+import com.liferay.portal.service.ResourcePermissionLocalServiceUtil;
+import com.liferay.portal.service.RoleLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
+import com.liferay.portlet.asset.NoSuchEntryException;
+import com.liferay.portlet.asset.model.AssetEntry;
+import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.DuplicateFileException;
+import com.liferay.portlet.documentlibrary.model.DLFileEntry;
 import com.liferay.portlet.documentlibrary.model.DLFolder;
 import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
 import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
@@ -21,6 +50,8 @@ import com.tls.lms.util.DLFolderUtil;
 
 public class CourseCopyUtil {
 	private static Log log = LogFactoryUtil.getLog(CourseCopyUtil.class);
+
+	public static String DOCUMENTLIBRARY_MAINFOLDER = "ResourceUploads";
 	
 	public static String descriptionFilesClone(String description, long groupId, long actId, long userId){
 
@@ -314,6 +345,297 @@ public class CourseCopyUtil {
 	}
 	
 	
+	public static String createTestQuestionsAndAnswers(LearningActivity oldActivity, LearningActivity newActivity, Module newModule, long userId, String cloneTraceStr) throws SystemException{
+		List<TestQuestion> questions = TestQuestionLocalServiceUtil.getQuestions(oldActivity.getActId());
+		for(TestQuestion question:questions){
+			TestQuestion newTestQuestion;
+			try {
+				newTestQuestion = TestQuestionLocalServiceUtil.addQuestion(newActivity.getActId(), question.getText(), question.getQuestionType());
+				
+				String newTestDescription = CourseCopyUtil.descriptionFilesClone(question.getText(),newModule.getGroupId(), newTestQuestion.getActId(),userId);
+				
+				newTestQuestion.setText(newTestDescription);
+				TestQuestionLocalServiceUtil.updateTestQuestion(newTestQuestion, true);
+				
+				log.debug("      Test question : " + question.getQuestionId() );
+				log.debug("      + Test question : " + newTestQuestion.getQuestionId() );
+				log.debug("      + Test question TEXT : " + newTestDescription );
+				cloneTraceStr += "\n   Test question: " + newTestQuestion.getQuestionId();
+				
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				continue;
+			}
+			
+			List<TestAnswer> answers = TestAnswerLocalServiceUtil.getTestAnswersByQuestionId(question.getQuestionId());
+			for(TestAnswer answer:answers){
+				try {
+					TestAnswer newTestAnswer = TestAnswerLocalServiceUtil.addTestAnswer(question.getQuestionId(), answer.getAnswer(), answer.getFeedbackCorrect(), answer.getFeedbacknocorrect(), answer.isIsCorrect());
+					newTestAnswer.setActId(newActivity.getActId());
+					newTestAnswer.setQuestionId(newTestQuestion.getQuestionId());
+					newTestAnswer.setAnswer(CourseCopyUtil.descriptionFilesClone(answer.getAnswer(),newModule.getGroupId(), newTestAnswer.getActId(),userId));
+					
+					TestAnswerLocalServiceUtil.updateTestAnswer(newTestAnswer, true);
+					
+					log.debug("        Test answer : " + answer.getAnswerId());
+					log.debug("        + Test answer : " + newTestAnswer.getAnswerId());
+					cloneTraceStr += "\n     Test answer: " + newTestAnswer.getAnswerId();
+					
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+			}
+
+		}
+		
+		return cloneTraceStr;
+		
+	}
 	
+	
+	
+	public static void copyEvaluationExtraContent(List<Long> evaluations, HashMap<Long,Long> correlationActivities) throws PortalException, SystemException{
+		
+		//Extra Content de las evaluaciones
+		LearningActivity evaluationActivity;
+		for(Long evaluation : evaluations){
+			evaluationActivity = LearningActivityLocalServiceUtil.getLearningActivity(evaluation);
+			try{
+			if((evaluationActivity.getExtracontent()!=null)&&(evaluationActivity.getExtracontent().length()!=0)) {	
+				//Element activitiesElement = SAXReaderUtil.read(evaluationActivity.getExtracontent()).getRootElement().element("activities");
+				Document document =SAXReaderUtil.read(evaluationActivity.getExtracontent());
+				if(log.isDebugEnabled())log.debug(" --- OLD EXTRA CONTENT "+document.formattedString());
+				
+				Element evaluationXML = document.getRootElement();
+								
+				if(log.isDebugEnabled())log.debug("--- OLD Evaluation Element "+evaluationXML.asXML());
+				Element activitiesElement = evaluationXML.element("activities");
+				if(log.isDebugEnabled())log.debug("--- OLD Activities Element "+activitiesElement.asXML());
+				if(activitiesElement!=null){
+					Iterator<Element> activitiesElementItr = activitiesElement.elementIterator();
+					while(activitiesElementItr.hasNext()) {
+						Element activity =activitiesElementItr.next();
+						if(log.isDebugEnabled())log.debug("-- Activity "+ activity);
+						if(("activity".equals(activity.getName()))&&(activity.attribute("id")!=null)&&(activity.attribute("id").getValue().length()!=0)){
+							try{
+								if(log.isDebugEnabled())log.debug("Old Value "+Long.parseLong(activity.attribute("id").getValue()));
+								Long newValue = correlationActivities.get(Long.parseLong(activity.attribute("id").getValue()));
+								if(log.isDebugEnabled())log.debug("New Value "+ newValue);
+								activity.attribute("id").setValue(String.valueOf(newValue));
+							}
+							catch(NumberFormatException e){}
+						}
+						
+						if(log.isDebugEnabled())log.debug("-- Activity Changed "+ activity.asXML());
+					}		
+					
+					if(log.isDebugEnabled())log.debug("--- NEW Activities Element "+activitiesElement.asXML());
+				}
+
+				if(log.isDebugEnabled()){
+					log.debug("--- NEW Evaluation Element "+evaluationXML.asXML());
+					log.debug(" --- NEW EXTRA CONTENT "+document.formattedString());
+				}
+				evaluationActivity.setExtracontent(document.formattedString());
+				LearningActivityLocalServiceUtil.updateLearningActivity(evaluationActivity);
+			}
+			}catch(Exception e){e.printStackTrace();}
+		
+		}
+		
+		
+	}
+	
+	
+	public static void cloneActivityFile(LearningActivity actOld, LearningActivity actNew, long userId, ServiceContext serviceContext){
+		
+		try {
+			log.error("cloneActivityFile");
+			String entryIdStr = "";
+			if(actOld.getTypeId() == 2){
+				entryIdStr = LearningActivityLocalServiceUtil.getExtraContentValue(actOld.getActId(), "document");
+			}
+			
+			
+			if(!entryIdStr.equals("")){
+				
+				AssetEntry docAsset = AssetEntryLocalServiceUtil.getAssetEntry(Long.valueOf(entryIdStr));
+				long entryId = 0;
+				if(docAsset.getUrl()!=null && docAsset.getUrl().trim().length()>0){
+					entryId = Long.valueOf(entryIdStr);
+				}else{
+					
+					if(actNew.getTypeId() == 2){
+						try{
+							
+							HashMap<String, String> map = LearningActivityLocalServiceUtil.convertXMLExtraContentToHashMap(actNew.getActId());
+							Iterator <String> keysString =  map.keySet().iterator();
+							//int index = 0;
+							while (keysString.hasNext()){
+								String key = keysString.next();
+								
+								if(!key.equals("video") && key.indexOf("document")!=-1){
+									
+									//index++;
+									long assetEntryIdOld =  Long.parseLong(map.get(key));
+									
+									AssetEntry docAssetOLD= AssetEntryLocalServiceUtil.getAssetEntry(assetEntryIdOld);
+									DLFileEntry oldFile=DLFileEntryLocalServiceUtil.getDLFileEntry(docAssetOLD.getClassPK());
+									
+									InputStream inputStream = DLFileEntryLocalServiceUtil.getFileAsStream(userId, oldFile.getFileVersion().getFileEntryId(), oldFile.getFileVersion().getVersion());
+									byte[] byteArray = null;
+									try {
+										byteArray = IOUtils.toByteArray(inputStream);
+									} catch (IOException e) {
+										// TODO Auto-generated catch block
+										e.printStackTrace();
+									}
+									
+									
+									
+										long repositoryId = DLFolderConstants.getDataRepositoryId(actNew.getGroupId(), DLFolderConstants.DEFAULT_PARENT_FOLDER_ID);
+										
+										long dlMainFolderId = 0;
+										 boolean dlMainFolderFound = false;
+									        //Get main folder
+									        try {
+									        	//Get main folder
+									        	Folder dlFolderMain = DLAppLocalServiceUtil.getFolder(repositoryId,DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,DOCUMENTLIBRARY_MAINFOLDER+actNew.getActId());
+									        	dlMainFolderId = dlFolderMain.getFolderId();
+									        	dlMainFolderFound = true;
+									        	//Get portlet folder
+									        } catch (Exception ex){
+									        }
+									        
+											//Damos permisos al archivo para usuarios de comunidad.
+											serviceContext.setAddGroupPermissions(true);
+									        
+									        //Create main folder if not exist
+									        if(!dlMainFolderFound){
+									        	Folder newDocumentMainFolder = DLAppLocalServiceUtil.addFolder(userId, repositoryId,DLFolderConstants.DEFAULT_PARENT_FOLDER_ID, DOCUMENTLIBRARY_MAINFOLDER+actNew.getActId(), DOCUMENTLIBRARY_MAINFOLDER+actNew.getActId(), serviceContext);
+									        	dlMainFolderFound = true;
+									        	dlMainFolderId = newDocumentMainFolder.getFolderId();
+									        }
+										
+
+
+										
+										String ficheroExtStr = "";
+										String extension[] = oldFile.getTitle().split("\\.");
+										if(extension.length > 0){
+											ficheroExtStr = "."+extension[extension.length-1];
+										}
+									
+										FileEntry newFile = DLAppLocalServiceUtil.addFileEntry(
+												userId, repositoryId , dlMainFolderId , oldFile.getTitle()+ficheroExtStr, oldFile.getMimeType(), 
+											oldFile.getTitle(), StringPool.BLANK, StringPool.BLANK, byteArray , serviceContext ) ;
+
+																		
+										map.put(key, String.valueOf(AssetEntryLocalServiceUtil.getEntry(DLFileEntry.class.getName(), newFile.getPrimaryKey()).getEntryId()));
+										
+									
+										
+										Role siteMemberRole = RoleLocalServiceUtil.getRole(serviceContext.getCompanyId(), RoleConstants.SITE_MEMBER);
+										ResourcePermissionLocalServiceUtil.setResourcePermissions(serviceContext.getCompanyId(), LearningActivity.class.getName(), 
+												ResourceConstants.SCOPE_INDIVIDUAL,	Long.toString(actNew.getActId()),siteMemberRole.getRoleId(), new String[] {ActionKeys.VIEW});
+
+								}
+
+										LearningActivityLocalServiceUtil.saveHashMapToXMLExtraContent(actNew.getActId(), map);
+							
+						}
+						
+						
+					} catch (NoSuchEntryException nsee) {
+						log.error(" asset not exits ");
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} finally {
+						serviceContext.setAddGroupPermissions(serviceContext.isAddGroupPermissions());
+					}
+				}else{
+					entryId = CourseCopyUtil.cloneFile(Long.valueOf(entryIdStr), actNew, userId, serviceContext);
+				}
+					
+					
+
+				}
+				
+				/*if(actNew.getTypeId() == 7){
+					LearningActivityLocalServiceUtil.setExtraContentValue(actNew.getActId(), "assetEntry", String.valueOf(entryId));
+				}else if(actNew.getTypeId() == 9){
+					AssetEntry entry =  AssetEntryLocalServiceUtil.getAssetEntry(entryId);
+					AssetEntry newEntry = AssetEntryLocalServiceUtil.createAssetEntry(CounterLocalServiceUtil.increment(Counter.class.getName()));
+					long newEntryId = newEntry.getEntryId();
+					newEntry = (AssetEntry)entry.clone();
+					newEntry.setGroupId(actNew.getGroupId());
+					log.error("NEW ENTRY ID "+ newEntryId);
+					AssetEntryLocalServiceUtil.updateAssetEntry(newEntry);
+					log.error("ACTIVITY EXTRA CONTENT "+ actNew.getExtracontent());
+					LearningActivityLocalServiceUtil.setExtraContentValue(actNew.getActId(), "assetEntry", String.valueOf(newEntryId));
+					log.error("ACTIVITY EXTRA CONTENT AFTER "+ actNew.getExtracontent());
+					
+				}*/
+				
+			}
+			
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
+	
+	private static long cloneFile(long entryId, LearningActivity actNew, long userId, ServiceContext serviceContext){
+		
+		long assetEntryId = 0;
+		boolean addGroupPermissions = serviceContext.isAddGroupPermissions();
+		
+		try {
+			log.debug("EntryId: "+entryId);
+			AssetEntry docAsset = AssetEntryLocalServiceUtil.getAssetEntry(entryId);
+			//docAsset.getUrl()!=""
+			//DLFileEntryLocalServiceUtil.getDLFileEntry(fileEntryId)
+			log.debug(docAsset.getClassPK());
+			DLFileEntry docfile = DLFileEntryLocalServiceUtil.getDLFileEntry(docAsset.getClassPK());
+			InputStream is = DLFileEntryLocalServiceUtil.getFileAsStream(userId, docfile.getFileEntryId(), docfile.getVersion());
+			
+			//Crear el folder
+			DLFolder dlFolder = DLFolderUtil.createDLFoldersForLearningActivity(userId, serviceContext.getScopeGroupId(), serviceContext);
+
+			long repositoryId = DLFolderConstants.getDataRepositoryId(actNew.getGroupId(), DLFolderConstants.DEFAULT_PARENT_FOLDER_ID);
+			
+			String ficheroStr = docfile.getTitle();	
+			if(!docfile.getTitle().endsWith(docfile.getExtension())){
+				ficheroStr = ficheroStr +"."+ docfile.getExtension();
+			}
+			
+			serviceContext.setAddGroupPermissions(true);
+			FileEntry newFile = DLAppLocalServiceUtil.addFileEntry(
+					serviceContext.getUserId(), repositoryId , dlFolder.getFolderId() , ficheroStr, docfile.getMimeType(), 
+					docfile.getTitle(), StringPool.BLANK, StringPool.BLANK, is, docfile.getSize() , serviceContext ) ;
+			
+			
+			AssetEntry asset = AssetEntryLocalServiceUtil.getEntry(DLFileEntry.class.getName(), newFile.getPrimaryKey());
+			
+			log.debug(" asset : " + asset.getEntryId());
+			
+			assetEntryId = asset.getEntryId();
+			
+		} catch (NoSuchEntryException nsee) {
+			log.error(" asset not exits ");
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
+			serviceContext.setAddGroupPermissions(addGroupPermissions);
+		}
+		
+		return assetEntryId;
+	}
 	
 }

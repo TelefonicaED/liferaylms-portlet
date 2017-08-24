@@ -1,18 +1,25 @@
 package com.liferay.lms;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+
+import org.apache.axiom.om.util.CopyUtils;
 
 import com.liferay.counter.service.CounterLocalServiceUtil;
 import com.liferay.lms.learningactivity.LearningActivityTypeRegistry;
 import com.liferay.lms.model.Course;
 import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.model.Module;
+import com.liferay.lms.model.TestAnswer;
+import com.liferay.lms.model.TestQuestion;
 import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityLocalServiceUtil;
 import com.liferay.lms.service.ModuleLocalServiceUtil;
+import com.liferay.lms.service.TestAnswerLocalServiceUtil;
+import com.liferay.lms.service.TestQuestionLocalServiceUtil;
 import com.liferay.portal.DuplicateGroupException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
@@ -265,6 +272,7 @@ public class CreateEdition implements MessageListener {
 		LearningActivity newLearnActivity=null;
 		LearningActivity nuevaLarn = null;
 		boolean canBeLinked = false;
+		List<Long> evaluations = new ArrayList<Long>(); 
 		for(LearningActivity activity:activities){
 			try {
 				
@@ -290,21 +298,28 @@ public class CreateEdition implements MessageListener {
 				
 				if(canBeLinked){
 					newLearnActivity.setLinkedActivityId(activity.getActId());
-				}else{
+				}
+				//TODO Cuando esté preparado la parte de linkar no habrá que copiar todo
+				//else{
 					newLearnActivity.setExtracontent(activity.getExtracontent());
 					newLearnActivity.setTitle(activity.getTitle());
 					newLearnActivity.setDescription(activity.getDescription());
 					newLearnActivity.setTries(activity.getTries());
 					newLearnActivity.setPasspuntuation(activity.getPasspuntuation());
 					newLearnActivity.setDescription(CourseCopyUtil.descriptionFilesClone(activity.getDescription(),newModule.getGroupId(), newLearnActivity.getActId(),themeDisplay.getUserId()));
-				}
+				//}
 				
 				
 				nuevaLarn=LearningActivityLocalServiceUtil.addLearningActivity(newLearnActivity,serviceContext);
 
+				log.error("ACTIVITY EXTRA CONTENT BEFORE "+ newLearnActivity.getExtracontent());
+				
 				log.debug("Learning Activity : " + activity.getTitle(Locale.getDefault())+ " ("+activity.getActId()+", " + LanguageUtil.get(Locale.getDefault(),learningActivityTypeRegistry.getLearningActivityType(activity.getTypeId()).getName())+")");
 				log.debug("+Learning Activity : " + nuevaLarn.getTitle(Locale.getDefault())+ " ("+nuevaLarn.getActId()+", " + LanguageUtil.get(Locale.getDefault(),learningActivityTypeRegistry.getLearningActivityType(nuevaLarn.getTypeId()).getName())+") Can Be Linked: "+canBeLinked);
 				cloneTraceStr += "   Learning Activity: " + nuevaLarn.getTitle(Locale.getDefault())+ " ("+nuevaLarn.getActId()+", " + LanguageUtil.get(Locale.getDefault(),learningActivityTypeRegistry.getLearningActivityType(nuevaLarn.getTypeId()).getName())+") Can Be Linked: "+canBeLinked;
+				
+
+				CourseCopyUtil.cloneActivityFile(activity, nuevaLarn, themeDisplay.getUserId(), serviceContext);
 				
 				
 				long actId = nuevaLarn.getActId();
@@ -318,6 +333,10 @@ public class CreateEdition implements MessageListener {
 							ResourceConstants.SCOPE_INDIVIDUAL,	Long.toString(actId),siteMemberRole.getRoleId(), new String[] {ActionKeys.VIEW});
 				}
 				
+				if(nuevaLarn.getTypeId() == 8){
+					evaluations.add(nuevaLarn.getActId());
+				}
+				
 				if(actPending){
 					pending.put(actId, activity.getPrecedence());
 				}
@@ -327,7 +346,15 @@ public class CreateEdition implements MessageListener {
 			}
 
 			
+			//TODO Descomentar cuando esté implementado las actividades linkadas.
+			//if(!canBeLinked){
+			cloneTraceStr += CourseCopyUtil.createTestQuestionsAndAnswers(activity, nuevaLarn, newModule, themeDisplay.getUserId(), cloneTraceStr);
+		
+		
+		
 		}
+		
+		
 		
 		//Set the precedences
 		if(pending.size()>0){
@@ -350,6 +377,7 @@ public class CreateEdition implements MessageListener {
 			}
 		}
 		
-		
+		//Extra Content de las evaluaciones
+		CourseCopyUtil.copyEvaluationExtraContent(evaluations, correlationActivities);
 	}	
 }
