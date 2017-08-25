@@ -81,7 +81,8 @@ if( permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), "com.liferay
 		<liferay-ui:search-container-column-text name="course-admin.end-inscription-date">
 			<%=dateFormatDateTime.format(course.getEndDate()) %>
 		</liferay-ui:search-container-column-text>
-		<liferay-ui:search-container-column-text name="course-admin.linked">
+		<%--  DE MOMENTO COMENTADO HASTA QUE SE APLIQUE EL FUNCIONAMIENTO DE CURSO LINKADO -->  
+		 <liferay-ui:search-container-column-text name="course-admin.linked">
 			<c:choose>
 				<c:when test="<%=course.getIsLinked() %>">
 					<liferay-ui:message key="yes"/>
@@ -91,6 +92,7 @@ if( permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), "com.liferay
 				</c:otherwise>
 			</c:choose>
 		</liferay-ui:search-container-column-text>
+		 --%>
 		<liferay-ui:search-container-column-text name="course-admin.number-of-members">
 			<%=	CourseLocalServiceUtil.getStudentsFromCourseCount(course.getCourseId()) %>
 		</liferay-ui:search-container-column-text>

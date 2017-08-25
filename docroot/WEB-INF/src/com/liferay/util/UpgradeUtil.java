@@ -73,7 +73,7 @@ public class UpgradeUtil {
 					 					"groupId BIGINT(20) NULL DEFAULT NULL,  userId BIGINT(20) NULL DEFAULT NULL, "+
 					 					"status INT(11) NULL DEFAULT NULL,  statusByUserId BIGINT(20) NULL DEFAULT NULL, "+
 					 					"statusByUserName VARCHAR(75) NULL DEFAULT NULL,  statusDate DATETIME NULL DEFAULT NULL, "+
-					 					"title VARCHAR(75) NULL DEFAULT NULL,  description VARCHAR(75) NULL DEFAULT NULL, "+
+					 					"title VARCHAR(75) NULL DEFAULT NULL,  description LONGTEXT NULL DEFAULT NULL, "+
 					 					"index_ VARCHAR(75) NULL DEFAULT NULL,  ciphered TINYINT(4) NULL DEFAULT NULL, "+
 					 					"PRIMARY KEY (scormId), UNIQUE INDEX IX_5DEB5C3B (uuid_,  groupId), "+
 					 					"INDEX IX_78C3B643 (companyId), INDEX IX_153AF185 (groupId), "+

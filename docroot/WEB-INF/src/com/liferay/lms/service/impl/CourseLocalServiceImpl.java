@@ -1039,19 +1039,27 @@ public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int e
 	}
 	
 	public List<Course> getByTitleStatusCategoriesTags(String freeText, int status, long[] categories, long[] tags, long companyId, long groupId, long userId, String language, boolean isAdmin, boolean andOperator, int start, int end){
-		return CourseFinderUtil.findByT_S_C_T(freeText, status, categories, tags, companyId, groupId, userId, language, isAdmin, false, andOperator, start, end);
+		return CourseFinderUtil.findByT_S_C_T_T(freeText, status, categories, tags,null, companyId, groupId, userId, language, isAdmin, false, andOperator, start, end);
 	}
 	
 	public int countByTitleStatusCategoriesTags(String freeText, int status, long[] categories, long[] tags, long companyId, long groupId, long userId, String language, boolean isAdmin, boolean andOperator){
-		return CourseFinderUtil.countByT_S_C_T(freeText, status, categories, tags, companyId, groupId, userId, language, isAdmin, false, andOperator);
+		return CourseFinderUtil.countByT_S_C_T_T(freeText, status, categories, tags, null, companyId, groupId, userId, language, isAdmin, false, andOperator);
 	}
 	
 	public List<Course> getParentCoursesByTitleStatusCategoriesTags(String freeText, int status, long[] categories, long[] tags, long companyId, long groupId, long userId, String language, boolean isAdmin, boolean andOperator, int start, int end){
-		return CourseFinderUtil.findByT_S_C_T(freeText, status, categories, tags, companyId, groupId, userId, language, isAdmin, true, andOperator, start, end);
+		return CourseFinderUtil.findByT_S_C_T_T(freeText, status, categories, tags, null, companyId, groupId, userId, language, isAdmin, true, andOperator, start, end);
 	}
 	
 	public int countParentCoursesByTitleStatusCategoriesTags(String freeText, int status, long[] categories, long[] tags, long companyId, long groupId, long userId, String language, boolean isAdmin, boolean andOperator){
-		return CourseFinderUtil.countByT_S_C_T(freeText, status, categories, tags, companyId, groupId, userId, language, isAdmin, true, andOperator);
+		return CourseFinderUtil.countByT_S_C_T_T(freeText, status, categories, tags, null, companyId, groupId, userId, language, isAdmin, true, andOperator);
+	}
+	
+	public List<Course> getParentCoursesByTitleStatusCategoriesTagsTemplates(String freeText, int status, long[] categories, long[] tags, String templates, long companyId, long groupId, long userId, String language, boolean isAdmin, boolean andOperator, int start, int end){
+		return CourseFinderUtil.findByT_S_C_T_T(freeText, status, categories, tags, templates, companyId, groupId, userId, language, isAdmin, true, andOperator, start, end);
+	}
+	
+	public int countParentCoursesByTitleStatusCategoriesTagsTemplates(String freeText, int status, long[] categories, long[] tags, String templates, long companyId, long groupId, long userId, String language, boolean isAdmin, boolean andOperator){
+		return CourseFinderUtil.countByT_S_C_T_T(freeText, status, categories, tags, templates, companyId, groupId, userId, language, isAdmin, true, andOperator);
 	}
 	
 	

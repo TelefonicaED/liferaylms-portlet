@@ -69,6 +69,9 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 	public static final String JOIN_BY_ASSET_TAG =
 		    CourseFinder.class.getName() +
 		        ".joinC_ByAssetTag";
+	public static final String JOIN_BY_TEMPLATES =
+		    CourseFinder.class.getName() +
+		        ".joinC_ByTemplates";
 	public static final String JOIN_BY_RESOURCE_PERMISSION =
 		    CourseFinder.class.getName() +
 		        ".joinC_ByResourcePermission";
@@ -150,7 +153,7 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 	
 	
 	@SuppressWarnings("unchecked")
-	public List<Course> findByT_S_C_T(String freeText, int status, long[] categories, long[] tags, long companyId, long groupId, long userId, String language, boolean isAdmin, boolean searchParentCourses, boolean andOperator, int start, int end){
+	public List<Course> findByT_S_C_T_T(String freeText, int status, long[] categories, long[] tags, String templates, long companyId, long groupId, long userId, String language, boolean isAdmin, boolean searchParentCourses, boolean andOperator, int start, int end){
 		Session session = null;
 		
 		try{
@@ -172,6 +175,8 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 
 			sql = replaceTag(sql, tags);
 
+			sql = replaceTemplates(sql, templates);
+			
 			sql = replaceResourcePermission(sql, isAdmin, companyId, userId);
 			
 			sql = replaceSearchParentCourse(sql, searchParentCourses);
@@ -344,6 +349,19 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 		
 		return sql;
 	}
+	
+	private String replaceTemplates(String sql, String templates) {
+		/**Si buscamos por templates**/
+		if(Validator.isNotNull(templates)){
+			sql = sql.replace("[$JOINTEMPLATES$]", CustomSQLUtil.get(JOIN_BY_TEMPLATES));
+			sql = sql.replace("[$TEMPLATES$]", templates);
+		}else{
+			sql = sql.replace("[$JOINTEMPLATES$]", " ");
+		}
+		
+		return sql;
+	}
+	
 
 	private String replaceLanguage(String sql, String language) {
 		/**Reemplazamos el lenguage**/
@@ -352,7 +370,7 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 
 	
 	
-	public int countByT_S_C_T(String freeText, int status, long[] categories, long[] tags, long companyId, long groupId, long userId, String language, boolean isAdmin, boolean searchParentCourses, boolean andOperator){
+	public int countByT_S_C_T_T(String freeText, int status, long[] categories, long[] tags, String templates, long companyId, long groupId, long userId, String language, boolean isAdmin, boolean searchParentCourses, boolean andOperator){
 		Session session = null;
 		
 		try{
@@ -372,6 +390,8 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			sql = replaceCategory(sql, categories);
 			
 			sql = replaceTag(sql, tags);
+			
+			sql = replaceTemplates(sql, templates);
 			
 			sql = replaceResourcePermission(sql, isAdmin, companyId, userId);
 			
@@ -665,6 +685,8 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 
 			sql = replaceTag(sql, tags);
 			
+			sql = replaceTemplates(sql, null);
+			
 			sql = replaceResourcePermissionView(sql, companyId, userId);
 
 			if(start < 0 && end < 0){
@@ -944,6 +966,8 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			sql = replaceCategory(sql, categories);
 			
 			sql = replaceTag(sql, tags);
+			
+			sql = replaceTemplates(sql, null);
 			
 			sql = replaceResourcePermissionView(sql, companyId, userId);
 			

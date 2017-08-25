@@ -98,6 +98,7 @@ import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.GroupConstants;
+import com.liferay.portal.model.LayoutSetPrototype;
 import com.liferay.portal.model.Organization;
 import com.liferay.portal.model.Role;
 import com.liferay.portal.model.RoleConstants;
@@ -107,6 +108,7 @@ import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.security.permission.PermissionCheckerFactoryUtil;
 import com.liferay.portal.service.GroupLocalServiceUtil;
+import com.liferay.portal.service.LayoutSetPrototypeLocalServiceUtil;
 import com.liferay.portal.service.OrganizationLocalServiceUtil;
 import com.liferay.portal.service.RoleLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
@@ -1551,7 +1553,7 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 				e.printStackTrace();
 			}
 			
-			List<Course> listCourse = CourseLocalServiceUtil.getByTitleStatusCategoriesTags(courseTitle, -1, null, null, themeDisplay.getCompanyId(), 
+			List<Course> listCourse = CourseLocalServiceUtil.getParentCoursesByTitleStatusCategoriesTagsTemplates(courseTitle, -1, null, null, getCourseTemplates(request.getPreferences(), themeDisplay.getCompanyId()), themeDisplay.getCompanyId(), 
 					themeDisplay.getScopeGroupId(), themeDisplay.getUserId(), themeDisplay.getLanguageId(), isAdmin, true, -1, -1);
 			
 			JSONObject userJSON = null;
@@ -1566,6 +1568,42 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 			PrintWriter out = response.getWriter();
 			out.println(usersJSONArray.toString());
 		}
+	}
+	
+	
+	protected String getCourseTemplates(PortletPreferences preferences, long companyId){
+
+		// Templates
+		String templates = null;
+		boolean filterByTemplates = GetterUtil.getBoolean(preferences.getValue("filterByTemplates", StringPool.FALSE),false);
+		log.debug("Filtrando por plantillas "+filterByTemplates);
+		if(filterByTemplates){
+			try {  
+				templates = "";
+				String[] layusprsel=null;
+				if(preferences.getValue("courseTemplates", null)!=null&&preferences.getValue("courseTemplates", null).length()>0){
+					layusprsel=preferences.getValue("courseTemplates", "").split(",");
+				}
+			    
+				if(layusprsel==null || layusprsel.length<=0){
+					layusprsel = LmsPrefsLocalServiceUtil.getLmsPrefsIni(companyId).getLmsTemplates().split(",");
+				}
+				if(layusprsel!=null &&layusprsel.length>0){
+					LayoutSetPrototype layoutSetPrototype = null;
+					for (int i=0; i<layusprsel.length; i++) {
+						layoutSetPrototype = LayoutSetPrototypeLocalServiceUtil.fetchLayoutSetPrototype(Long.parseLong(layusprsel[i]));
+						templates += "'" + layoutSetPrototype.getUuid() + "'";
+						if (i<(layusprsel.length-1)){
+							templates += ", ";
+						}	
+				    }
+			   }
+			} catch (Exception e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		}
+		return templates;
 	}
 	
 	@ProcessAction(name="activateCompetence")

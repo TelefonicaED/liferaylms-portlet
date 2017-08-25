@@ -667,24 +667,7 @@ if(course!=null){
 	
 <liferay-ui:panel-container extended="false"  persistState="false">
    	  
-   	  <liferay-ui:panel title="lms-execution-configuration" collapsible="true" defaultState="closed" cssClass="<%=(showExecutionDate)?StringPool.BLANK:\"aui-helper-hidden\" %>">
-		<aui:field-wrapper name="executionDate" label="start-execution-date" cssClass="<%=(showExecutionDate)?StringPool.BLANK:\"aui-helper-hidden\" %>">
-			<aui:input type="hidden" name="executionDate"/>
-			<liferay-ui:input-date yearRangeEnd="<%=LiferaylmsUtil.defaultEndYear %>" yearRangeStart="<%=LiferaylmsUtil.defaultStartYear %>"  dayParam="startExecutionDay" monthParam="startExecutionMon"
-					 yearParam="startExecutionYear"  yearNullable="false" dayNullable="false" monthNullable="false" yearValue="<%=startExecutionYear %>" monthValue="<%=startExecutionMonth %>" dayValue="<%=startExecutionDay %>"></liferay-ui:input-date>
-			<liferay-ui:input-time minuteParam="startExecutionMin" amPmParam="startExecutionAMPM" hourParam="startExecutionHour" hourValue="<%=startExecutionHour %>" minuteValue="<%=startExecutionMin %>"></liferay-ui:input-time>
-		</aui:field-wrapper>
-		<aui:field-wrapper name="endExecutionDate" label="end-execution-date"  cssClass="<%=(showExecutionDate)?StringPool.BLANK:\"aui-helper-hidden\" %>">
-			<aui:input type="hidden" name="endExecutionDate"/>
-			<liferay-ui:input-date yearRangeEnd="<%=LiferaylmsUtil.defaultEndYear %>" yearRangeStart="<%=LiferaylmsUtil.defaultStartYear %>" dayParam="stopExecutionDay" monthParam="stopExecutionMon"
-					 yearParam="stopExecutionYear"  yearNullable="false" dayNullable="false" monthNullable="false"  yearValue="<%=endExecutionYear %>" monthValue="<%=endExecutionMonth %>" dayValue="<%=endExecutionDay %>"></liferay-ui:input-date>
-			 <liferay-ui:input-time minuteParam="stopExecutionMin" amPmParam="stopExecutionAMPM" hourParam="stopExecutionHour"  hourValue="<%=endExecutionHour %>" minuteValue="<%=endExecutionMin %>"></liferay-ui:input-time></br>
-		</aui:field-wrapper>
-	</liferay-ui:panel> 
-    
-    
-    
-    <liferay-ui:panel title="lms-inscription-configuration" collapsible="true" defaultState="closed" cssClass="<%=(showInscriptionDate||showMaxUsers)?StringPool.BLANK:\"aui-helper-hidden\" %>">
+   	  <liferay-ui:panel title="lms-inscription-configuration" collapsible="true" defaultState="closed" cssClass="<%=(showInscriptionDate||showMaxUsers)?StringPool.BLANK:\"aui-helper-hidden\" %>">
 		<aui:field-wrapper name="inscriptionDate" label="start-inscription-date" cssClass="<%=(showInscriptionDate)?StringPool.BLANK:\"aui-helper-hidden\" %>">
 			<aui:input type="hidden" name="inscriptionDate"/>
 			<liferay-ui:input-date yearRangeEnd="<%=LiferaylmsUtil.defaultEndYear %>" yearRangeStart="<%=LiferaylmsUtil.defaultStartYear %>"  dayParam="startDay" monthParam="startMon"
@@ -738,6 +721,22 @@ if(course!=null){
 			</aui:input>
 		</c:if>
 	</liferay-ui:panel>
+	
+	<liferay-ui:panel title="lms-execution-configuration" collapsible="true" defaultState="closed" cssClass="<%=(showExecutionDate)?StringPool.BLANK:\"aui-helper-hidden\" %>">
+		<aui:field-wrapper name="executionDate" label="start-execution-date" cssClass="<%=(showExecutionDate)?StringPool.BLANK:\"aui-helper-hidden\" %>">
+			<aui:input type="hidden" name="executionDate"/>
+			<liferay-ui:input-date yearRangeEnd="<%=LiferaylmsUtil.defaultEndYear %>" yearRangeStart="<%=LiferaylmsUtil.defaultStartYear %>"  dayParam="startExecutionDay" monthParam="startExecutionMon"
+					 yearParam="startExecutionYear"  yearNullable="false" dayNullable="false" monthNullable="false" yearValue="<%=startExecutionYear %>" monthValue="<%=startExecutionMonth %>" dayValue="<%=startExecutionDay %>"></liferay-ui:input-date>
+			<liferay-ui:input-time minuteParam="startExecutionMin" amPmParam="startExecutionAMPM" hourParam="startExecutionHour" hourValue="<%=startExecutionHour %>" minuteValue="<%=startExecutionMin %>"></liferay-ui:input-time>
+		</aui:field-wrapper>
+		<aui:field-wrapper name="endExecutionDate" label="end-execution-date"  cssClass="<%=(showExecutionDate)?StringPool.BLANK:\"aui-helper-hidden\" %>">
+			<aui:input type="hidden" name="endExecutionDate"/>
+			<liferay-ui:input-date yearRangeEnd="<%=LiferaylmsUtil.defaultEndYear %>" yearRangeStart="<%=LiferaylmsUtil.defaultStartYear %>" dayParam="stopExecutionDay" monthParam="stopExecutionMon"
+					 yearParam="stopExecutionYear"  yearNullable="false" dayNullable="false" monthNullable="false"  yearValue="<%=endExecutionYear %>" monthValue="<%=endExecutionMonth %>" dayValue="<%=endExecutionDay %>"></liferay-ui:input-date>
+			 <liferay-ui:input-time minuteParam="stopExecutionMin" amPmParam="stopExecutionAMPM" hourParam="stopExecutionHour"  hourValue="<%=endExecutionHour %>" minuteValue="<%=endExecutionMin %>"></liferay-ui:input-time></br>
+		</aui:field-wrapper>
+	</liferay-ui:panel> 
+    
 	
 	<c:if test="<%=!isCourseChild%>">
 		<liferay-ui:panel title="categorization" collapsible="true" defaultState="closed">

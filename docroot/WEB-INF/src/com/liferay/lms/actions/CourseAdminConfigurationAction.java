@@ -68,6 +68,8 @@ public class CourseAdminConfigurationAction implements ConfigurationAction {
 		portletPreferences.setValue("showCoursePermission",Boolean.toString(ParamUtil.getBoolean(actionRequest, "showCoursePermission",	true)));
 		portletPreferences.setValue("showEditionsWithoutRestrictions",Boolean.toString(ParamUtil.getBoolean(actionRequest, "showEditionsWithoutRestrictions",	false)));
 
+		portletPreferences.setValue("filterByTemplates",	Boolean.toString(ParamUtil.getBoolean(actionRequest, "filterByTemplates",	false)));
+		
 		portletPreferences.setValue	("tipoImport", ParamUtil.getString(actionRequest, "tipoImport", ""));
 		
 		portletPreferences.store();

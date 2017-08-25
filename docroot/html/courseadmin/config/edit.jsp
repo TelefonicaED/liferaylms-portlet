@@ -47,6 +47,7 @@
 	boolean showCoursePermission = preferences.getValue("showCoursePermission", "true").equals("true");
 	boolean showCourseCatalogForEditions = preferences.getValue("showCourseCatalogForEditions","false").equals("true");
 	boolean showEditionsWithoutRestrictions = preferences.getValue("showEditionsWithoutRestrictions","false").equals("true");
+	boolean filterByTemplates = preferences.getValue("filterByTemplates","false").equals("true");
 	
 	int tipoImport = Integer.parseInt(preferences.getValue("tipoImport", "1"));
 	boolean hasImportById = (tipoImport != 2);
@@ -120,7 +121,12 @@ String[] lspist=LmsPrefsLocalServiceUtil.getLmsPrefsIni(themeDisplay.getCompanyI
 			<%
 		}
 		%>
+		
+		 
+			<aui:input type="checkbox" name="filterByTemplates" label="courseadmin.config.filter-by-template" value="<%=filterByTemplates %>" checked="<%=filterByTemplates %>"/>
 		</aui:field-wrapper>
+		
+		
 
 	<aui:field-wrapper  label="modulenavigation.Mode" >
 		<aui:input type="checkbox" name="showOnlyOrganizationUsers" label="modulenavigation.organizationMode" value="<%=showOnlyOrganizationUsers %>" checked="<%=showOnlyOrganizationUsers %>"/>

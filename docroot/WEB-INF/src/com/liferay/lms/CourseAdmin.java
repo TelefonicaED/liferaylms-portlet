@@ -69,6 +69,7 @@ import com.liferay.portal.kernel.dao.orm.CustomSQLParam;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
+import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.NestableException;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -109,6 +110,7 @@ import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.kernel.lar.PortletDataHandlerKeys;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.GroupConstants;
+import com.liferay.portal.model.LayoutSetPrototype;
 import com.liferay.portal.model.Organization;
 import com.liferay.portal.model.Role;
 import com.liferay.portal.model.RoleConstants;
@@ -120,6 +122,7 @@ import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.security.permission.PermissionCheckerFactoryUtil;
 import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.LayoutServiceUtil;
+import com.liferay.portal.service.LayoutSetPrototypeLocalServiceUtil;
 import com.liferay.portal.service.OrganizationLocalServiceUtil;
 import com.liferay.portal.service.RoleLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
@@ -341,6 +344,12 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 			}
 		}
 		
+		
+		//***********************  COGEMOS LAS PLANTILLAS ********************/
+		
+		// Templates
+		String templates = getCourseTemplates(renderRequest.getPreferences(), themeDisplay.getCompanyId());
+		
 		PortletURL portletURL = renderResponse.createRenderURL();
 		portletURL.setParameter("javax.portlet.action","doView");
 		portletURL.setParameter("freetext",freetext);
@@ -385,9 +394,9 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 				SearchContainer.DEFAULT_DELTA, portletURL, 
 				null, "there-are-no-courses");
 
-		searchContainer.setResults(CourseLocalServiceUtil.getParentCoursesByTitleStatusCategoriesTags(freetext, closed, categoryIds, tagsSelIds, themeDisplay.getCompanyId(), 
+		searchContainer.setResults(CourseLocalServiceUtil.getParentCoursesByTitleStatusCategoriesTagsTemplates(freetext, closed, categoryIds, tagsSelIds, templates, themeDisplay.getCompanyId(), 
 				themeDisplay.getScopeGroupId(), themeDisplay.getUserId(), themeDisplay.getLanguageId(), isAdmin, true, searchContainer.getStart(), searchContainer.getEnd()));
-		searchContainer.setTotal(CourseLocalServiceUtil.countParentCoursesByTitleStatusCategoriesTags(freetext, closed, categoryIds, tagsSelIds, themeDisplay.getCompanyId(), 
+		searchContainer.setTotal(CourseLocalServiceUtil.countParentCoursesByTitleStatusCategoriesTagsTemplates(freetext, closed, categoryIds, tagsSelIds, templates, themeDisplay.getCompanyId(), 
 				themeDisplay.getScopeGroupId(), themeDisplay.getUserId(), themeDisplay.getLanguageId(), isAdmin, true));
 		
 		renderRequest.setAttribute("searchContainer", searchContainer);
@@ -475,7 +484,7 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 				renderRequest.setAttribute("course", course);
 				
 				
-				String newCourseName = group.getName()+"_"+Time.getShortTimestamp();
+				String newCourseName = LanguageUtil.get(themeDisplay.getLocale(), "courseadmin.edition")+" "+(CourseLocalServiceUtil.countChildCourses(course.getCourseId())+1);
 				renderRequest.setAttribute("newCourseName", newCourseName);
 				renderRequest.setAttribute("courseId", courseId);
 				

@@ -577,6 +577,27 @@ public class CourseLocalServiceUtil {
 			isAdmin, andOperator);
 	}
 
+	public static java.util.List<com.liferay.lms.model.Course> getParentCoursesByTitleStatusCategoriesTagsTemplates(
+		java.lang.String freeText, int status, long[] categories, long[] tags,
+		java.lang.String templates, long companyId, long groupId, long userId,
+		java.lang.String language, boolean isAdmin, boolean andOperator,
+		int start, int end) {
+		return getService()
+				   .getParentCoursesByTitleStatusCategoriesTagsTemplates(freeText,
+			status, categories, tags, templates, companyId, groupId, userId,
+			language, isAdmin, andOperator, start, end);
+	}
+
+	public static int countParentCoursesByTitleStatusCategoriesTagsTemplates(
+		java.lang.String freeText, int status, long[] categories, long[] tags,
+		java.lang.String templates, long companyId, long groupId, long userId,
+		java.lang.String language, boolean isAdmin, boolean andOperator) {
+		return getService()
+				   .countParentCoursesByTitleStatusCategoriesTagsTemplates(freeText,
+			status, categories, tags, templates, companyId, groupId, userId,
+			language, isAdmin, andOperator);
+	}
+
 	public static java.util.List<com.liferay.portal.model.User> getStudents(
 		long courseId, long companyId, java.lang.String screenName,
 		java.lang.String firstName, java.lang.String lastName,

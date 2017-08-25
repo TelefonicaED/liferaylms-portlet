@@ -142,11 +142,14 @@ public class CreateEdition implements MessageListener {
 		//Creamos el nuevo curso para la edición 
 		Course newCourse = null;  
 		String summary = "";
+		
+		
 		try{
 			summary = AssetEntryLocalServiceUtil.getEntry(Course.class.getName(),course.getCourseId()).getSummary(themeDisplay.getLocale());
-			newCourse = CourseLocalServiceUtil.addCourse(newEditionName, course.getDescription(themeDisplay.getLocale()),summary
+			newCourse = CourseLocalServiceUtil.addCourse(course.getTitle(themeDisplay.getLocale())+"-"+newEditionName, course.getDescription(themeDisplay.getLocale()),summary
 					, "", themeDisplay.getLocale(), today, startDate, endDate, layoutSetPrototypeId, typeSite, serviceContext, course.getCalificationType(), (int)course.getMaxusers(),true);
 			
+			newCourse.setTitle(newEditionName, themeDisplay.getLocale());
 			newCourse.setWelcome(course.getWelcome());
 			newCourse.setWelcomeMsg(course.getWelcomeMsg());
 			newCourse.setWelcomeSubject(course.getWelcomeSubject());
@@ -178,7 +181,7 @@ public class CreateEdition implements MessageListener {
 			entry.setVisible(false);
 			entry.setSummary(summary);
 			AssetEntryLocalServiceUtil.updateAssetEntry(entry);
-			newGroup.setName(newCourse.getTitle(themeDisplay.getLocale(), true));
+			newGroup.setName(course.getTitle(themeDisplay.getLocale(),true)+"-"+newEditionName);
 			newGroup.setDescription(summary);
 			GroupLocalServiceUtil.updateGroup(newGroup);
 			

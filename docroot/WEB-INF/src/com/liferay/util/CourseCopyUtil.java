@@ -11,7 +11,6 @@ import org.apache.commons.io.IOUtils;
 
 import com.liferay.counter.model.Counter;
 import com.liferay.counter.service.CounterLocalServiceUtil;
-import com.liferay.lms.CloneCourse;
 import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.model.Module;
 import com.liferay.lms.model.TestAnswer;
@@ -457,7 +456,10 @@ public class CourseCopyUtil {
 			String entryIdStr = "";
 			if(actOld.getTypeId() == 2){
 				entryIdStr = LearningActivityLocalServiceUtil.getExtraContentValue(actOld.getActId(), "document");
+			}else if(actOld.getTypeId() == 7){
+				entryIdStr = LearningActivityLocalServiceUtil.getExtraContentValue(actOld.getActId(), "assetEntry");
 			}
+			
 			
 			
 			if(!entryIdStr.equals("")){
@@ -565,7 +567,7 @@ public class CourseCopyUtil {
 
 				}
 				
-				/*if(actNew.getTypeId() == 7){
+				if(actNew.getTypeId() == 7){
 					LearningActivityLocalServiceUtil.setExtraContentValue(actNew.getActId(), "assetEntry", String.valueOf(entryId));
 				}else if(actNew.getTypeId() == 9){
 					AssetEntry entry =  AssetEntryLocalServiceUtil.getAssetEntry(entryId);
@@ -573,13 +575,10 @@ public class CourseCopyUtil {
 					long newEntryId = newEntry.getEntryId();
 					newEntry = (AssetEntry)entry.clone();
 					newEntry.setGroupId(actNew.getGroupId());
-					log.error("NEW ENTRY ID "+ newEntryId);
 					AssetEntryLocalServiceUtil.updateAssetEntry(newEntry);
-					log.error("ACTIVITY EXTRA CONTENT "+ actNew.getExtracontent());
 					LearningActivityLocalServiceUtil.setExtraContentValue(actNew.getActId(), "assetEntry", String.valueOf(newEntryId));
-					log.error("ACTIVITY EXTRA CONTENT AFTER "+ actNew.getExtracontent());
 					
-				}*/
+				}
 				
 			}
 			

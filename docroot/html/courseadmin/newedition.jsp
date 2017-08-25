@@ -5,7 +5,6 @@
 <liferay-ui:error key="course-admin.error.duplicate-name" message="course-admin.error.duplicate-name" />
 <liferay-ui:error key="course-admin.error.date-interval" message="course-admin.error.date-interval" />
 
-<liferay-portlet:renderURL var="backURL"></liferay-portlet:renderURL>
 <liferay-ui:header title="${editionTitle}" backURL="${backURL}"></liferay-ui:header>
 
 <portlet:actionURL name="createEdition" var="createEditionURL">
@@ -29,12 +28,13 @@
 			 <liferay-ui:input-time minuteParam="stopMin" amPmParam="stopAMPM" hourParam="stopHour"  hourValue="${endHour}" minuteValue="${endMin}"></liferay-ui:input-time></br>
 		</aui:field-wrapper>
 	</div>	
-	
+	<!-- DE MOMENTO COMENTADO HASTA QUE SE EMPIECE A APLICAR  
 	<aui:fieldset>
 		<aui:input name="linkedCourse" label="course-admin.linked-course" helpMessage="course-admin.linked-course-help" type="checkbox" value="false" checked="false"/>
 	</aui:fieldset>
-				
+	-->	
 	<aui:button-row>
 		<aui:button type="submit" value="course-admin.create-edition" />
+		<aui:button type="cancel" value="cancel" onClick="${backURL}" />
 	</aui:button-row>
 </aui:form>

@@ -151,6 +151,7 @@
 			[$JOINASSET$] 
 			[$JOINASSETCATEGORIES$] 
 			[$JOINASSETTAGS$]
+			[$JOINTEMPLATES$]
 			[$JOINRESOURCEPERMISSION$]
 			WHERE 
 			( 
@@ -180,6 +181,7 @@
 			[$JOINASSET$] 
 			[$JOINASSETCATEGORIES$] 
 			[$JOINASSETTAGS$]
+			[$JOINTEMPLATES$]
 			[$JOINRESOURCEPERMISSION$]
 			WHERE 
 			( 
@@ -218,6 +220,18 @@
 					ON aat[$i$].entryId = ae.entryId 
 		]]>
 	</sql>
+	
+	
+	<sql id="com.liferay.lms.service.persistence.CourseFinder.joinC_ByTemplates">
+		<![CDATA[
+			INNER JOIN 
+				 layoutset l 
+				 	ON l.groupId = c.groupCreatedId 
+				 	AND l.layoutSetPrototypeUuid IN ([$TEMPLATES$])
+		]]>
+	</sql>
+	
+	
 	<sql id="com.liferay.lms.service.persistence.CourseFinder.joinC_ByResourcePermission">
 		<![CDATA[
 			INNER JOIN 
@@ -463,7 +477,7 @@
 	
 	<sql id="com.liferay.lms.service.persistence.CourseFinder.whereParentCourse">
 		<![CDATA[
-			AND (c.parentCourseId = 0) 
+			AND (c.parentCourseId = 0 OR c.parentCourseId IS NULL) 
 		]]>
 	</sql>
 	
