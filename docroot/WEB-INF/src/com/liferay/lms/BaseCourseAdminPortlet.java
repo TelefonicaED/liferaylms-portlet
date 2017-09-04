@@ -83,7 +83,6 @@ import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.upload.UploadPortletRequest;
 import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.ContentTypes;
-import com.liferay.portal.kernel.util.DateUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -454,7 +453,13 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 		int type = ParamUtil.getInteger(uploadRequest, "type", GroupConstants.TYPE_SITE_OPEN);
 		int maxusers = ParamUtil.getInteger(uploadRequest, "maxUsers");
 		
-		long courseEvalId=ParamUtil.getLong(uploadRequest, "courseEvalId", 0);
+		Course course = null;
+		try{
+			course = CourseLocalServiceUtil.fetchCourse(courseId);
+		}catch(SystemException e){
+		}
+		
+		long courseEvalId=ParamUtil.getLong(uploadRequest, "courseEvalId", course.getCourseEvalId());
 		CourseEval courseEval = new CourseEvalRegistry().getCourseEval(courseEvalId);
 		
 		//course eval Validation
@@ -628,8 +633,6 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 			return;
 		}
 
-
-		Course course = null;
 		if (courseId == 0) {
 			try{
 				course = CourseLocalServiceUtil.addCourse(
