@@ -6,20 +6,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
-import org.apache.axiom.om.util.CopyUtils;
-
 import com.liferay.counter.service.CounterLocalServiceUtil;
 import com.liferay.lms.learningactivity.LearningActivityTypeRegistry;
 import com.liferay.lms.model.Course;
 import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.model.Module;
-import com.liferay.lms.model.TestAnswer;
-import com.liferay.lms.model.TestQuestion;
 import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityLocalServiceUtil;
 import com.liferay.lms.service.ModuleLocalServiceUtil;
-import com.liferay.lms.service.TestAnswerLocalServiceUtil;
-import com.liferay.lms.service.TestQuestionLocalServiceUtil;
 import com.liferay.portal.DuplicateGroupException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
