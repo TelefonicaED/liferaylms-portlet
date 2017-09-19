@@ -52,7 +52,7 @@ public class CourseCopyUtil {
 
 	public static String DOCUMENTLIBRARY_MAINFOLDER = "ResourceUploads";
 	
-	public static String descriptionFilesClone(String description, long groupId, long actId, long userId){
+	public String descriptionFilesClone(String description, long groupId, long actId, long userId){
 
 		String newDescription = description;
 		
@@ -342,24 +342,24 @@ public class CourseCopyUtil {
 		
 		return null;
 	}
-	
-	
-	public static String createTestQuestionsAndAnswers(LearningActivity oldActivity, LearningActivity newActivity, Module newModule, long userId, String cloneTraceStr) throws SystemException{
+		
+	public StringBuffer createTestQuestionsAndAnswers(LearningActivity oldActivity, LearningActivity newActivity, Module newModule, long userId, StringBuffer cloneTraceStr) throws SystemException{
 		List<TestQuestion> questions = TestQuestionLocalServiceUtil.getQuestions(oldActivity.getActId());
+		TestQuestion newTestQuestion=null;
+		List<TestAnswer> answers = null;
+		TestAnswer newTestAnswer = null;
 		for(TestQuestion question:questions){
-			TestQuestion newTestQuestion;
 			try {
 				newTestQuestion = TestQuestionLocalServiceUtil.addQuestion(newActivity.getActId(), question.getText(), question.getQuestionType());
-				
-				String newTestDescription = CourseCopyUtil.descriptionFilesClone(question.getText(),newModule.getGroupId(), newTestQuestion.getActId(),userId);
-				
+				String newTestDescription = descriptionFilesClone(question.getText(),newModule.getGroupId(), newTestQuestion.getActId(),userId);
 				newTestQuestion.setText(newTestDescription);
 				TestQuestionLocalServiceUtil.updateTestQuestion(newTestQuestion, true);
-				
-				log.debug("      Test question : " + question.getQuestionId() );
-				log.debug("      + Test question : " + newTestQuestion.getQuestionId() );
-				log.debug("      + Test question TEXT : " + newTestDescription );
-				cloneTraceStr += "\n   Test question: " + newTestQuestion.getQuestionId();
+				if(log.isDebugEnabled()){
+					log.debug("      Test question : " + question.getQuestionId() );
+					log.debug("      + Test question : " + newTestQuestion.getQuestionId() );
+					log.debug("      + Test question TEXT : " + newTestDescription );
+				}
+				cloneTraceStr.append("\n   Test question: " + newTestQuestion.getQuestionId());
 				
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
@@ -367,19 +367,20 @@ public class CourseCopyUtil {
 				continue;
 			}
 			
-			List<TestAnswer> answers = TestAnswerLocalServiceUtil.getTestAnswersByQuestionId(question.getQuestionId());
+			answers = TestAnswerLocalServiceUtil.getTestAnswersByQuestionId(question.getQuestionId());
 			for(TestAnswer answer:answers){
 				try {
-					TestAnswer newTestAnswer = TestAnswerLocalServiceUtil.addTestAnswer(question.getQuestionId(), answer.getAnswer(), answer.getFeedbackCorrect(), answer.getFeedbacknocorrect(), answer.isIsCorrect());
+					newTestAnswer = TestAnswerLocalServiceUtil.addTestAnswer(question.getQuestionId(), answer.getAnswer(), answer.getFeedbackCorrect(), answer.getFeedbacknocorrect(), answer.isIsCorrect());
 					newTestAnswer.setActId(newActivity.getActId());
 					newTestAnswer.setQuestionId(newTestQuestion.getQuestionId());
-					newTestAnswer.setAnswer(CourseCopyUtil.descriptionFilesClone(answer.getAnswer(),newModule.getGroupId(), newTestAnswer.getActId(),userId));
+					newTestAnswer.setAnswer(descriptionFilesClone(answer.getAnswer(),newModule.getGroupId(), newTestAnswer.getActId(),userId));
 					
 					TestAnswerLocalServiceUtil.updateTestAnswer(newTestAnswer, true);
-					
-					log.debug("        Test answer : " + answer.getAnswerId());
-					log.debug("        + Test answer : " + newTestAnswer.getAnswerId());
-					cloneTraceStr += "\n     Test answer: " + newTestAnswer.getAnswerId();
+					if(log.isDebugEnabled()){
+						log.debug("        Test answer : " + answer.getAnswerId());
+						log.debug("        + Test answer : " + newTestAnswer.getAnswerId());	
+					}
+					cloneTraceStr.append("\n     Test answer: " + newTestAnswer.getAnswerId());
 					
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
@@ -393,75 +394,76 @@ public class CourseCopyUtil {
 		return cloneTraceStr;
 		
 	}
-	
-	
-	
-	public static void copyEvaluationExtraContent(List<Long> evaluations, HashMap<Long,Long> correlationActivities) throws PortalException, SystemException{
+		
+	public void copyEvaluationExtraContent(List<Long> evaluations, HashMap<Long,Long> correlationActivities) throws PortalException, SystemException{
 		
 		//Extra Content de las evaluaciones
-		LearningActivity evaluationActivity;
+		LearningActivity evaluationActivity=null;
+		Document document = null;
+		Element evaluationXML = null;
+		Iterator<Element> activitiesElementItr = null;
+		Element activity = null;
+		long newValue;
 		for(Long evaluation : evaluations){
 			evaluationActivity = LearningActivityLocalServiceUtil.getLearningActivity(evaluation);
 			try{
-			if((evaluationActivity.getExtracontent()!=null)&&(evaluationActivity.getExtracontent().length()!=0)) {	
-				//Element activitiesElement = SAXReaderUtil.read(evaluationActivity.getExtracontent()).getRootElement().element("activities");
-				Document document =SAXReaderUtil.read(evaluationActivity.getExtracontent());
-				if(log.isDebugEnabled())log.debug(" --- OLD EXTRA CONTENT "+document.formattedString());
-				
-				Element evaluationXML = document.getRootElement();
-								
-				if(log.isDebugEnabled())log.debug("--- OLD Evaluation Element "+evaluationXML.asXML());
-				Element activitiesElement = evaluationXML.element("activities");
-				if(log.isDebugEnabled())log.debug("--- OLD Activities Element "+activitiesElement.asXML());
-				if(activitiesElement!=null){
-					Iterator<Element> activitiesElementItr = activitiesElement.elementIterator();
-					while(activitiesElementItr.hasNext()) {
-						Element activity =activitiesElementItr.next();
-						if(log.isDebugEnabled())log.debug("-- Activity "+ activity);
-						if(("activity".equals(activity.getName()))&&(activity.attribute("id")!=null)&&(activity.attribute("id").getValue().length()!=0)){
-							try{
-								if(log.isDebugEnabled())log.debug("Old Value "+Long.parseLong(activity.attribute("id").getValue()));
-								Long newValue = correlationActivities.get(Long.parseLong(activity.attribute("id").getValue()));
-								if(log.isDebugEnabled())log.debug("New Value "+ newValue);
-								activity.attribute("id").setValue(String.valueOf(newValue));
+				if((evaluationActivity.getExtracontent()!=null)&&(evaluationActivity.getExtracontent().length()!=0)) {	
+					//Element activitiesElement = SAXReaderUtil.read(evaluationActivity.getExtracontent()).getRootElement().element("activities");
+					document =SAXReaderUtil.read(evaluationActivity.getExtracontent());
+					if(log.isDebugEnabled())log.debug(" --- OLD EXTRA CONTENT "+document.formattedString());
+					evaluationXML = document.getRootElement();
+					if(log.isDebugEnabled())log.debug("--- OLD Evaluation Element "+evaluationXML.asXML());
+					Element activitiesElement = evaluationXML.element("activities");
+					if(log.isDebugEnabled())log.debug("--- OLD Activities Element "+activitiesElement.asXML());
+					if(activitiesElement!=null){
+						activitiesElementItr = activitiesElement.elementIterator();
+						while(activitiesElementItr.hasNext()) {
+							activity =activitiesElementItr.next();
+							if(log.isDebugEnabled())log.debug("-- Activity "+ activity);
+							if(("activity".equals(activity.getName()))&&(activity.attribute("id")!=null)&&(activity.attribute("id").getValue().length()!=0)){
+								try{
+									if(log.isDebugEnabled())log.debug("Old Value "+Long.parseLong(activity.attribute("id").getValue()));
+									newValue = correlationActivities.get(Long.parseLong(activity.attribute("id").getValue()));
+									if(log.isDebugEnabled())log.debug("New Value "+ newValue);
+									activity.attribute("id").setValue(String.valueOf(newValue));
+								}
+								catch(NumberFormatException e){
+									if(log.isDebugEnabled())e.printStackTrace();
+								}
 							}
-							catch(NumberFormatException e){}
-						}
-						
-						if(log.isDebugEnabled())log.debug("-- Activity Changed "+ activity.asXML());
-					}		
-					
-					if(log.isDebugEnabled())log.debug("--- NEW Activities Element "+activitiesElement.asXML());
+							if(log.isDebugEnabled())log.debug("-- Activity Changed "+ activity.asXML());
+						}		
+						if(log.isDebugEnabled())log.debug("--- NEW Activities Element "+activitiesElement.asXML());
+					}
+	
+					if(log.isDebugEnabled()){
+						log.debug("--- NEW Evaluation Element "+evaluationXML.asXML());
+						log.debug(" --- NEW EXTRA CONTENT "+document.formattedString());
+					}
+					evaluationActivity.setExtracontent(document.formattedString());
+					LearningActivityLocalServiceUtil.updateLearningActivity(evaluationActivity);
 				}
-
-				if(log.isDebugEnabled()){
-					log.debug("--- NEW Evaluation Element "+evaluationXML.asXML());
-					log.debug(" --- NEW EXTRA CONTENT "+document.formattedString());
-				}
-				evaluationActivity.setExtracontent(document.formattedString());
-				LearningActivityLocalServiceUtil.updateLearningActivity(evaluationActivity);
-			}
-			}catch(Exception e){e.printStackTrace();}
-		
+			}catch(Exception e){
+				e.printStackTrace();
+			}		
 		}
 		
 		
 	}
 	
-	
-	public static void cloneActivityFile(LearningActivity actOld, LearningActivity actNew, long userId, ServiceContext serviceContext){
+	public void cloneActivityFile(LearningActivity actOld, LearningActivity actNew, long userId, ServiceContext serviceContext){
 		
 		try {
-			log.error("cloneActivityFile");
+			if(log.isDebugEnabled()){
+				log.debug("cloneActivityFile");
+			}
+	
 			String entryIdStr = "";
 			if(actOld.getTypeId() == 2){
 				entryIdStr = LearningActivityLocalServiceUtil.getExtraContentValue(actOld.getActId(), "document");
 			}else if(actOld.getTypeId() == 7){
 				entryIdStr = LearningActivityLocalServiceUtil.getExtraContentValue(actOld.getActId(), "assetEntry");
 			}
-			
-			
-			
 			if(!entryIdStr.equals("")){
 				
 				AssetEntry docAsset = AssetEntryLocalServiceUtil.getAssetEntry(Long.valueOf(entryIdStr));
@@ -475,63 +477,68 @@ public class CourseCopyUtil {
 							
 							HashMap<String, String> map = LearningActivityLocalServiceUtil.convertXMLExtraContentToHashMap(actNew.getActId());
 							Iterator <String> keysString =  map.keySet().iterator();
+							String key = null;
+							AssetEntry docAssetOLD = null;
+							DLFileEntry oldFile = null;
+							InputStream inputStream = null;
+							byte[] byteArray = null;
 							//int index = 0;
+							Folder dlFolderMain = null;
+							long repositoryId = 0;
+							long dlMainFolderId = 0;
+							boolean dlMainFolderFound = false;
+							Folder newDocumentMainFolder =null;
+							String ficheroExtStr= null;
+							String extension[] = null;
+							FileEntry newFile = null;
+							Role siteMemberRole = null;
 							while (keysString.hasNext()){
-								String key = keysString.next();
-								
+								key = keysString.next();
 								if(!key.equals("video") && key.indexOf("document")!=-1){
-									
 									//index++;
 									long assetEntryIdOld =  Long.parseLong(map.get(key));
-									
-									AssetEntry docAssetOLD= AssetEntryLocalServiceUtil.getAssetEntry(assetEntryIdOld);
-									DLFileEntry oldFile=DLFileEntryLocalServiceUtil.getDLFileEntry(docAssetOLD.getClassPK());
-									
-									InputStream inputStream = DLFileEntryLocalServiceUtil.getFileAsStream(userId, oldFile.getFileVersion().getFileEntryId(), oldFile.getFileVersion().getVersion());
-									byte[] byteArray = null;
+									docAssetOLD= AssetEntryLocalServiceUtil.getAssetEntry(assetEntryIdOld);
+									oldFile=DLFileEntryLocalServiceUtil.getDLFileEntry(docAssetOLD.getClassPK());
+									inputStream = DLFileEntryLocalServiceUtil.getFileAsStream(userId, oldFile.getFileVersion().getFileEntryId(), oldFile.getFileVersion().getVersion());
 									try {
 										byteArray = IOUtils.toByteArray(inputStream);
 									} catch (IOException e) {
 										// TODO Auto-generated catch block
 										e.printStackTrace();
 									}
-									
-									
-									
-										long repositoryId = DLFolderConstants.getDataRepositoryId(actNew.getGroupId(), DLFolderConstants.DEFAULT_PARENT_FOLDER_ID);
-										
-										long dlMainFolderId = 0;
-										 boolean dlMainFolderFound = false;
-									        //Get main folder
-									        try {
-									        	//Get main folder
-									        	Folder dlFolderMain = DLAppLocalServiceUtil.getFolder(repositoryId,DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,DOCUMENTLIBRARY_MAINFOLDER+actNew.getActId());
-									        	dlMainFolderId = dlFolderMain.getFolderId();
-									        	dlMainFolderFound = true;
-									        	//Get portlet folder
-									        } catch (Exception ex){
-									        }
+									repositoryId = DLFolderConstants.getDataRepositoryId(actNew.getGroupId(), DLFolderConstants.DEFAULT_PARENT_FOLDER_ID);
+									dlMainFolderId = 0;
+									dlMainFolderFound = false;
+									//Get main folder
+									 try {
+										 //Get main folder
+									     dlFolderMain = DLAppLocalServiceUtil.getFolder(repositoryId,DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,DOCUMENTLIBRARY_MAINFOLDER+actNew.getActId());
+									     dlMainFolderId = dlFolderMain.getFolderId();
+									     dlMainFolderFound = true;
+									     //Get portlet folder
+									  } catch (Exception ex){
+										  if(log.isDebugEnabled()){
+											  ex.printStackTrace();
+										  }
+									  }
 									        
-											//Damos permisos al archivo para usuarios de comunidad.
-											serviceContext.setAddGroupPermissions(true);
+									//Damos permisos al archivo para usuarios de comunidad.
+									serviceContext.setAddGroupPermissions(true);
 									        
-									        //Create main folder if not exist
-									        if(!dlMainFolderFound){
-									        	Folder newDocumentMainFolder = DLAppLocalServiceUtil.addFolder(userId, repositoryId,DLFolderConstants.DEFAULT_PARENT_FOLDER_ID, DOCUMENTLIBRARY_MAINFOLDER+actNew.getActId(), DOCUMENTLIBRARY_MAINFOLDER+actNew.getActId(), serviceContext);
-									        	dlMainFolderFound = true;
-									        	dlMainFolderId = newDocumentMainFolder.getFolderId();
-									        }
+									 //Create main folder if not exist
+									 if(!dlMainFolderFound){
+										 newDocumentMainFolder = DLAppLocalServiceUtil.addFolder(userId, repositoryId,DLFolderConstants.DEFAULT_PARENT_FOLDER_ID, DOCUMENTLIBRARY_MAINFOLDER+actNew.getActId(), DOCUMENTLIBRARY_MAINFOLDER+actNew.getActId(), serviceContext);
+									     dlMainFolderFound = true;
+									     dlMainFolderId = newDocumentMainFolder.getFolderId();
+									 }
 										
-
-
-										
-										String ficheroExtStr = "";
-										String extension[] = oldFile.getTitle().split("\\.");
-										if(extension.length > 0){
+									 ficheroExtStr = "";
+									extension = oldFile.getTitle().split("\\.");
+									if(extension.length > 0){
 											ficheroExtStr = "."+extension[extension.length-1];
 										}
 									
-										FileEntry newFile = DLAppLocalServiceUtil.addFileEntry(
+										newFile = DLAppLocalServiceUtil.addFileEntry(
 												userId, repositoryId , dlMainFolderId , oldFile.getTitle()+ficheroExtStr, oldFile.getMimeType(), 
 											oldFile.getTitle(), StringPool.BLANK, StringPool.BLANK, byteArray , serviceContext ) ;
 
@@ -540,13 +547,13 @@ public class CourseCopyUtil {
 										
 									
 										
-										Role siteMemberRole = RoleLocalServiceUtil.getRole(serviceContext.getCompanyId(), RoleConstants.SITE_MEMBER);
+										siteMemberRole = RoleLocalServiceUtil.getRole(serviceContext.getCompanyId(), RoleConstants.SITE_MEMBER);
 										ResourcePermissionLocalServiceUtil.setResourcePermissions(serviceContext.getCompanyId(), LearningActivity.class.getName(), 
 												ResourceConstants.SCOPE_INDIVIDUAL,	Long.toString(actNew.getActId()),siteMemberRole.getRoleId(), new String[] {ActionKeys.VIEW});
 
 								}
 
-										LearningActivityLocalServiceUtil.saveHashMapToXMLExtraContent(actNew.getActId(), map);
+								LearningActivityLocalServiceUtil.saveHashMapToXMLExtraContent(actNew.getActId(), map);
 							
 						}
 						
@@ -560,7 +567,7 @@ public class CourseCopyUtil {
 						serviceContext.setAddGroupPermissions(serviceContext.isAddGroupPermissions());
 					}
 				}else{
-					entryId = CourseCopyUtil.cloneFile(Long.valueOf(entryIdStr), actNew, userId, serviceContext);
+					entryId = cloneFile(Long.valueOf(entryIdStr), actNew, userId, serviceContext);
 				}
 					
 					
@@ -589,17 +596,17 @@ public class CourseCopyUtil {
 		
 	}
 	
-	private static long cloneFile(long entryId, LearningActivity actNew, long userId, ServiceContext serviceContext){
+	private long cloneFile(long entryId, LearningActivity actNew, long userId, ServiceContext serviceContext){
 		
 		long assetEntryId = 0;
 		boolean addGroupPermissions = serviceContext.isAddGroupPermissions();
 		
 		try {
-			log.debug("EntryId: "+entryId);
+			if(log.isDebugEnabled()){log.debug("EntryId: "+entryId);}
 			AssetEntry docAsset = AssetEntryLocalServiceUtil.getAssetEntry(entryId);
 			//docAsset.getUrl()!=""
 			//DLFileEntryLocalServiceUtil.getDLFileEntry(fileEntryId)
-			log.debug(docAsset.getClassPK());
+			if(log.isDebugEnabled()){log.debug(docAsset.getClassPK());}
 			DLFileEntry docfile = DLFileEntryLocalServiceUtil.getDLFileEntry(docAsset.getClassPK());
 			InputStream is = DLFileEntryLocalServiceUtil.getFileAsStream(userId, docfile.getFileEntryId(), docfile.getVersion());
 			
@@ -621,7 +628,7 @@ public class CourseCopyUtil {
 			
 			AssetEntry asset = AssetEntryLocalServiceUtil.getEntry(DLFileEntry.class.getName(), newFile.getPrimaryKey());
 			
-			log.debug(" asset : " + asset.getEntryId());
+			if(log.isDebugEnabled()){log.debug(" asset : " + asset.getEntryId());};
 			
 			assetEntryId = asset.getEntryId();
 			
