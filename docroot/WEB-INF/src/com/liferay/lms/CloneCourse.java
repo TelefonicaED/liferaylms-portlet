@@ -1,6 +1,5 @@
 package com.liferay.lms;
 
-import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -84,7 +83,6 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 	
 	boolean cloneForum;
 	
-	private StringBuffer cloneTraceStr = new StringBuffer("--------------- Clone course trace ----------------"); 
 	private Boolean childCourse; 	
 	public CloneCourse(long groupId, String newCourseName, ThemeDisplay themeDisplay, Date startDate, Date endDate, boolean cloneForum, ServiceContext serviceContext) {
 		super();
@@ -127,8 +125,6 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 		
 			doCloneCourse();
 			
-			log.debug("Clone Stack Trace: "+cloneTraceStr);
-			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -136,15 +132,14 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 	
 	@SuppressWarnings("unchecked")
 	public void doCloneCourse() throws Exception {
-		cloneTraceStr.append("Course to clone\n........................." + groupId);
+		log.debug("Course to clone\n........................." + groupId);
 		Group group = GroupLocalServiceUtil.fetchGroup(groupId);
 		Course course = CourseLocalServiceUtil.fetchByGroupCreatedId(groupId);
 		if(log.isDebugEnabled()){
+			log.debug("Course to clone\n.........................");
 			log.debug("  + groupId: "+groupId);
 			log.debug("  + course: "+course.getTitle(themeDisplay.getLocale()));
 		}
-		cloneTraceStr.append(" course:" + course.getTitle(themeDisplay.getLocale())); 
-		cloneTraceStr.append(" groupId:" + groupId);
 		
 		Date today=new Date(System.currentTimeMillis());
 		String courseTemplate = this.serviceContext.getRequest().getParameter("courseTemplate");
@@ -155,9 +150,10 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 			layoutSetPrototypeId = Long.parseLong(courseTemplate);
 		}		
 		
+		if(log.isDebugEnabled()){
+			log.debug("  + layoutSetPrototypeId: "+layoutSetPrototypeId);	
+		}
 		
-		log.debug("  + layoutSetPrototypeId: "+layoutSetPrototypeId);
-		cloneTraceStr.append(" layoutSetPrototypeId:" + layoutSetPrototypeId);
 		
 		try{
 			AssetEntryLocalServiceUtil.validate(course.getGroupCreatedId(), Course.class.getName(), serviceContext.getAssetCategoryIds(), serviceContext.getAssetTagNames());
@@ -228,7 +224,7 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 		
 		if(this.childCourse)
 		{
-			log.debug("hijo de:"+Long.toString(course.getCourseId()));
+			log.debug("hijo de: "+Long.toString(course.getCourseId()));
 			newCourse.setParentCourseId(course.getCourseId());
 			CourseLocalServiceUtil.setVisible(newCourse.getCourseId(), false);
 		}
@@ -254,13 +250,11 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 		}
 		
 		newCourse.setUserId(themeDisplay.getUserId());
-
-		log.debug("-----------------------\n  From course: "+  group.getName());
-		log.debug("  + to course: "+  newCourse.getTitle(Locale.getDefault()) +", GroupCreatedId: "+newCourse.getGroupCreatedId()+", GroupId: "+newCourse.getGroupId());
-		
-		cloneTraceStr.append("\n New course\n........................." + groupId);
-		cloneTraceStr.append(" Course: "+  newCourse.getTitle(Locale.getDefault()) +"\n GroupCreatedId: "+newCourse.getGroupCreatedId()+"\n GroupId: "+newCourse.getGroupId());
-		cloneTraceStr.append("\n.........................");
+		if(log.isDebugEnabled()){
+			log.debug("-----------------------\n  From course: "+  group.getName());
+			log.debug("  + to course: "+  newCourse.getTitle(Locale.getDefault()) +", GroupCreatedId: "+newCourse.getGroupCreatedId()+", GroupId: "+newCourse.getGroupId());
+			
+		}
 		
 		/**
 		 * METO AL USUARIO CREADOR DEL CURSO COMO PROFESOR
@@ -336,11 +330,10 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 				newModule.setDescription(descriptionFilesClone(module.getDescription(),newCourse.getGroupCreatedId(), newModule.getModuleId(),themeDisplay.getUserId()));
 				
 				ModuleLocalServiceUtil.addModule(newModule);
-				
-				log.debug("\n    Module : " + module.getTitle(Locale.getDefault()) +"("+module.getModuleId()+")");
-				log.debug("    + Module : " + newModule.getTitle(Locale.getDefault()) +"("+newModule.getModuleId()+")" );
-				cloneTraceStr.append("  Module: " + newModule.getTitle(Locale.getDefault()) +"("+newModule.getModuleId()+")");
-				
+				if(log.isDebugEnabled()){
+					log.debug("\n    Module : " + module.getTitle(Locale.getDefault()) +"("+module.getModuleId()+")");
+					log.debug("    + Module : " + newModule.getTitle(Locale.getDefault()) +"("+newModule.getModuleId()+")" );
+				}
 			} catch (Exception e) {
 				e.printStackTrace();
 				continue;
@@ -394,7 +387,6 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 						log.debug("      Learning Activity : " + activity.getTitle(Locale.getDefault())+ " ("+activity.getActId()+", " + LanguageUtil.get(Locale.getDefault(),learningActivityTypeRegistry.getLearningActivityType(activity.getTypeId()).getName())+")");
 						log.debug("      + Learning Activity : " + nuevaLarn.getTitle(Locale.getDefault())+ " ("+nuevaLarn.getActId()+", " + LanguageUtil.get(Locale.getDefault(),learningActivityTypeRegistry.getLearningActivityType(nuevaLarn.getTypeId()).getName())+")");
 					}
-					cloneTraceStr.append("   Learning Activity: " + nuevaLarn.getTitle(Locale.getDefault())+ " ("+nuevaLarn.getActId()+", " + LanguageUtil.get(Locale.getDefault(),learningActivityTypeRegistry.getLearningActivityType(nuevaLarn.getTypeId()).getName())+")");
 					
 					cloneActivityFile(activity, nuevaLarn, themeDisplay.getUserId(), serviceContext);
 					
@@ -423,7 +415,7 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 					continue;
 				}
 
-				cloneTraceStr.append(createTestQuestionsAndAnswers(activity, nuevaLarn, newModule, themeDisplay.getUserId(), cloneTraceStr));
+				createTestQuestionsAndAnswers(activity, nuevaLarn, newModule, themeDisplay.getUserId());
 				
 				
 			}

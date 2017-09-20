@@ -55,7 +55,6 @@ public class CreateEdition extends CourseCopyUtil implements MessageListener {
 	private boolean isLinked;
 	private long parentCourseId;
 	
-	private StringBuffer cloneTraceStr = new StringBuffer("--------------- Creating edition trace ----------------"); 
 	public CreateEdition(long groupId, String newEditionName, ThemeDisplay themeDisplay, Date startDate, Date endDate, long parentCourseId, ServiceContext serviceContext) {
 		super();
 		this.newEditionName = newEditionName;
@@ -95,7 +94,7 @@ public class CreateEdition extends CourseCopyUtil implements MessageListener {
 		
 			doCreateEdition();
 			
-			log.debug("Clone Stack Trace: "+cloneTraceStr);
+			
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -103,18 +102,18 @@ public class CreateEdition extends CourseCopyUtil implements MessageListener {
 	}
 	
 	public void doCreateEdition() throws Exception {
-		cloneTraceStr.append(" Course to create edition\n........................." + parentCourseId);
-		cloneTraceStr.append(" New edition name\n........................." + newEditionName);
+		
 		Course course = CourseLocalServiceUtil.fetchCourse(parentCourseId);
 	
 		Group group = GroupLocalServiceUtil.getGroup(course.getGroupCreatedId());
 		
 		if(log.isDebugEnabled()){
-			log.debug("  + Parent course: "+course.getTitle(themeDisplay.getLocale()));
+			log.debug(" Course to create edition\n........................." + parentCourseId);
 			log.debug(" New edition name\n........................." + newEditionName);
+			log.debug("  + Parent course: "+course.getTitle(themeDisplay.getLocale()));
+		 
 		}
 		
-		cloneTraceStr.append(" Parent course:" + course.getTitle(themeDisplay.getLocale())); 
 		
 		Date today=new Date(System.currentTimeMillis());
 
@@ -124,7 +123,7 @@ public class CreateEdition extends CourseCopyUtil implements MessageListener {
 		if(log.isDebugEnabled()){
 			log.debug("  + layoutSetPrototypeId: "+layoutSetPrototypeId);
 		}
-		cloneTraceStr.append(" layoutSetPrototypeId:" + layoutSetPrototypeId);
+		
 	
 		
 		//Tags y categorias
@@ -194,9 +193,6 @@ public class CreateEdition extends CourseCopyUtil implements MessageListener {
 			log.debug("-----------------------\n  Creating edition from: "+  group.getName());
 			log.debug("  + editionName : "+  newCourse.getTitle(Locale.getDefault()) +", GroupCreatedId: "+newCourse.getGroupCreatedId()+", GroupId: "+newCourse.getGroupId());
 		}
-		cloneTraceStr.append("\n New edition\n.........................");
-		cloneTraceStr.append(" Edition: "+  newCourse.getTitle(Locale.getDefault()) +"\n GroupCreatedId: "+newCourse.getGroupCreatedId()+"\n GroupId: "+newCourse.getGroupId());
-		cloneTraceStr.append("\n.........................");
 		
 		/*********************************************************/
 		
@@ -243,10 +239,11 @@ public class CreateEdition extends CourseCopyUtil implements MessageListener {
 				newModule.setEndDate(endDate);
 				newModule.setDescription(descriptionFilesClone(module.getDescription(),newCourse.getGroupCreatedId(), newModule.getModuleId(),themeDisplay.getUserId()));
 				ModuleLocalServiceUtil.addModule(newModule);
+				if(log.isDebugEnabled()){
+					log.debug("\n    Module : " + module.getTitle(Locale.getDefault()) +"("+module.getModuleId()+")");
+					log.debug("    + Module : " + newModule.getTitle(Locale.getDefault()) +"("+newModule.getModuleId()+")" );
+				}
 				
-				log.debug("\n    Module : " + module.getTitle(Locale.getDefault()) +"("+module.getModuleId()+")");
-				log.debug("    + Module : " + newModule.getTitle(Locale.getDefault()) +"("+newModule.getModuleId()+")" );
-				cloneTraceStr.append("  Module: " + newModule.getTitle(Locale.getDefault()) +"("+newModule.getModuleId()+")");
 				createLearningActivities(module, newModule, siteMemberRole, learningActivityTypeRegistry, pending, correlationActivities, activities, newLearnActivity, nuevaLarn, evaluations);
 				
 				
@@ -325,7 +322,7 @@ public class CreateEdition extends CourseCopyUtil implements MessageListener {
 				
 				log.debug("Learning Activity : " + activity.getTitle(Locale.getDefault())+ " ("+activity.getActId()+", " + LanguageUtil.get(Locale.getDefault(),learningActivityTypeRegistry.getLearningActivityType(activity.getTypeId()).getName())+")");
 				log.debug("+Learning Activity : " + nuevaLarn.getTitle(Locale.getDefault())+ " ("+nuevaLarn.getActId()+", " + LanguageUtil.get(Locale.getDefault(),learningActivityTypeRegistry.getLearningActivityType(nuevaLarn.getTypeId()).getName())+") Can Be Linked: "+canBeLinked);
-				cloneTraceStr.append("   Learning Activity: " + nuevaLarn.getTitle(Locale.getDefault())+ " ("+nuevaLarn.getActId()+", " + LanguageUtil.get(Locale.getDefault(),learningActivityTypeRegistry.getLearningActivityType(nuevaLarn.getTypeId()).getName())+") Can Be Linked: "+canBeLinked);
+				
 				
 
 				cloneActivityFile(activity, nuevaLarn, themeDisplay.getUserId(), serviceContext);
@@ -357,7 +354,7 @@ public class CreateEdition extends CourseCopyUtil implements MessageListener {
 			
 			//TODO Descomentar cuando esté implementado las actividades linkadas.
 			//if(!canBeLinked){
-			cloneTraceStr.append(createTestQuestionsAndAnswers(activity, nuevaLarn, newModule, themeDisplay.getUserId(), cloneTraceStr));
+			createTestQuestionsAndAnswers(activity, nuevaLarn, newModule, themeDisplay.getUserId());
 		
 		
 		

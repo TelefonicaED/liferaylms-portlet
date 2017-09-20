@@ -344,7 +344,7 @@ public class CourseCopyUtil {
 		return null;
 	}
 		
-	public StringBuffer createTestQuestionsAndAnswers(LearningActivity oldActivity, LearningActivity newActivity, Module newModule, long userId, StringBuffer cloneTraceStr) throws SystemException{
+	public void createTestQuestionsAndAnswers(LearningActivity oldActivity, LearningActivity newActivity, Module newModule, long userId) throws SystemException{
 		List<TestQuestion> questions = TestQuestionLocalServiceUtil.getQuestions(oldActivity.getActId());
 		TestQuestion newTestQuestion= null;
 		List<TestAnswer> answers = new ArrayList<TestAnswer>();
@@ -360,8 +360,6 @@ public class CourseCopyUtil {
 					log.debug("      + Test question : " + newTestQuestion.getQuestionId() );
 					log.debug("      + Test question TEXT : " + newTestDescription );
 				}
-				cloneTraceStr.append("\n   Test question: " + newTestQuestion.getQuestionId());
-				
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -381,7 +379,7 @@ public class CourseCopyUtil {
 						log.debug("        Test answer : " + answer.getAnswerId());
 						log.debug("        + Test answer : " + newTestAnswer.getAnswerId());	
 					}
-					cloneTraceStr.append("\n     Test answer: " + newTestAnswer.getAnswerId());
+					
 					
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
@@ -392,7 +390,6 @@ public class CourseCopyUtil {
 
 		}
 		
-		return cloneTraceStr;
 		
 	}
 		
