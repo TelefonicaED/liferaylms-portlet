@@ -3,6 +3,7 @@ package com.liferay.util;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -345,8 +346,8 @@ public class CourseCopyUtil {
 		
 	public StringBuffer createTestQuestionsAndAnswers(LearningActivity oldActivity, LearningActivity newActivity, Module newModule, long userId, StringBuffer cloneTraceStr) throws SystemException{
 		List<TestQuestion> questions = TestQuestionLocalServiceUtil.getQuestions(oldActivity.getActId());
-		TestQuestion newTestQuestion=null;
-		List<TestAnswer> answers = null;
+		TestQuestion newTestQuestion= null;
+		List<TestAnswer> answers = new ArrayList<TestAnswer>();
 		TestAnswer newTestAnswer = null;
 		for(TestQuestion question:questions){
 			try {

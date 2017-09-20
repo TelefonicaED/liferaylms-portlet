@@ -209,15 +209,14 @@ public class CreateEdition extends CourseCopyUtil implements MessageListener {
 	private void createModulesAndActivities(Course newCourse, Role siteMemberRole, long groupId) throws SystemException{
 		
 		LearningActivityTypeRegistry learningActivityTypeRegistry = new LearningActivityTypeRegistry();
-		List<Module> modules;
-		modules = ModuleLocalServiceUtil.findAllInGroup(groupId);
+		List<Module> modules = ModuleLocalServiceUtil.findAllInGroup(groupId);
 		
 		HashMap<Long,Long> correlationModules = new HashMap<Long, Long>();
 		HashMap<Long,Long> modulesDependencesList = new  HashMap<Long, Long>();
 		Module newModule=null;
 		HashMap<Long, Long> pending = new HashMap<Long, Long>();
 		HashMap<Long,Long> correlationActivities = new HashMap<Long, Long>();
-		List<LearningActivity> activities = null;
+		List<LearningActivity> activities =  new ArrayList<LearningActivity>();
 		LearningActivity newLearnActivity=null;
 		LearningActivity nuevaLarn = null;
 		List<Long> evaluations = new ArrayList<Long>(); 
@@ -282,6 +281,7 @@ public class CreateEdition extends CourseCopyUtil implements MessageListener {
 			HashMap<Long, Long> pending, HashMap<Long,Long> correlationActivities, List<LearningActivity> activities, LearningActivity newLearnActivity, LearningActivity nuevaLarn, List<Long> evaluations) throws SystemException, PortalException{
 		
 		boolean canBeLinked = false;
+		activities = LearningActivityLocalServiceUtil.getLearningActivitiesOfModule(parentModule.getModuleId());
 		for(LearningActivity activity:activities){
 			try {
 				

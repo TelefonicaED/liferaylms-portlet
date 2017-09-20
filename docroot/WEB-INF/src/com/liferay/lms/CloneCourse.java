@@ -294,9 +294,9 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 		HashMap<Long,Long> correlationModules = new HashMap<Long, Long>();
 		HashMap<Long,Long> modulesDependencesList = new  HashMap<Long, Long>();
 		
-		List<LearningActivity> activities = null;
+		List<LearningActivity> activities = new ArrayList<LearningActivity>();
 		HashMap<Long, Long> pending = null;
-		List<Long> evaluations = null; 
+		List<Long> evaluations = new ArrayList<Long>(); 
 		LearningActivity newLearnActivity=null;
 		LearningActivity nuevaLarn = null;
 		Module newModule=null;
@@ -827,8 +827,8 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 		boolean result = true;
 		long newParentCategoryId;
 		MBCategory newCourseCategory = null;
-		List<MBCategory> listSubSubCat=null;
-		List<MBCategory> listParentSubCat=null;
+		List<MBCategory> listSubSubCat= new ArrayList<MBCategory>();
+		List<MBCategory> listParentSubCat= new ArrayList<MBCategory>();
 		
 		for(MBCategory category:listParentCat){
 			
@@ -891,7 +891,7 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 			newCourseCategory = MBCategoryLocalServiceUtil.addMBCategory(newCourseCategory);
 			
 			// Copiar permisos de la categoria antigua en la nueva
-			List<ResourcePermission> resourcePermissionList = null;
+			List<ResourcePermission> resourcePermissionList = new ArrayList<ResourcePermission>();
 			ResourcePermission rpNew = null;
 			long resourcePermissionId = 0;
     		int [] scopeIds = ResourceConstants.SCOPES;
