@@ -848,7 +848,7 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 					CourseDiploma courseDiploma = cdr.getCourseDiploma();
 					if(courseDiploma!=null){
 						String courseDiplomaError = courseDiploma.saveDiploma(uploadRequest, course.getCourseId());
-						log.debug("****calificationTypeExtraContentError:"+courseDiplomaError);
+						log.debug("****CourseDiplomaError:"+courseDiplomaError);
 						
 						if(Validator.isNotNull(courseDiplomaError)){
 							SessionErrors.add(actionRequest, "courseDiplomaError");
@@ -857,6 +857,18 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 					}
 				}
 				
+				//Cambiamos la FriendlyURL del curso y del grupo (solo al editar)
+				if(Validator.isNotNull(friendlyURL)){
+					try{
+						GroupLocalServiceUtil.updateFriendlyURL(course.getGroupCreatedId(), friendlyURL);
+						course.setFriendlyURL(friendlyURL);
+					}catch(Exception e){
+						SessionErrors.add(actionRequest, "friendly-url-error");
+						actionResponse.setRenderParameter("courseId", String.valueOf(courseId));
+						actionResponse.setRenderParameter("jspPage","/html/courseadmin/editcourse.jsp");
+						return;
+					}
+				}
 				
 				
 				

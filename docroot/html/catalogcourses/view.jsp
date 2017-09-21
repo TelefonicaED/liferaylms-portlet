@@ -137,7 +137,7 @@
 						<span class="asset-entry"> 
 							<span class="asset-entry-type"> </span> 
 							<span class="asset-entry-title"> 
-								<a href="${themeDisplay.portalURL}/${themeDisplay.locale.language}/web/${course.friendlyURL}" >${course.getTitle(themeDisplay.locale) } </a> 
+								<a href="${themeDisplay.portalURL}/${themeDisplay.locale.language}/web/${course.group.friendlyURL}" >${course.getTitle(themeDisplay.locale) } </a> 
 							</span> 
 							<div class="asset-entry-content"> 
 								<div class="asset-resource-image"> 
