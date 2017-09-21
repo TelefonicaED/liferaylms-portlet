@@ -459,7 +459,11 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 		}catch(SystemException e){
 		}
 		
-		long courseEvalId=ParamUtil.getLong(uploadRequest, "courseEvalId", course.getCourseEvalId());
+		long defaultEvalId = 0;
+		if(course!=null){
+			defaultEvalId = course.getCourseEvalId();
+		}
+		long courseEvalId=ParamUtil.getLong(uploadRequest, "courseEvalId", defaultEvalId);
 		CourseEval courseEval = new CourseEvalRegistry().getCourseEval(courseEvalId);
 		
 		//course eval Validation
