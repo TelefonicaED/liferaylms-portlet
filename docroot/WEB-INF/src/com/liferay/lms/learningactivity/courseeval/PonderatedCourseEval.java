@@ -131,7 +131,7 @@ public class PonderatedCourseEval extends BaseCourseEval {
 			
 			boolean isFailed=false;
 			LearningActivityResult learningActivityResult = null;
-
+			boolean hasTries = false;
 			for(LearningActivity act:learningActivities){
 
 				if(!weights.containsKey(act.getActId())){//Solo se tienen en cuenta las actividades obligatorias que tienen peso definido
@@ -152,20 +152,28 @@ public class PonderatedCourseEval extends BaseCourseEval {
 								long  userTries = LearningActivityTryLocalServiceUtil.getLearningActivityTryByActUserCount(act.getActId(), userId);
 								if(userTries >= act.getTries()){
 									isFailed=true;
+								}else{
+									hasTries = true;
 								}
+							}else{
+								hasTries = true;
 							}
 						}
 						result=result+(learningActivityResult.getResult()*weights.get(act.getActId()));
 
 					}else{
 						passed=false;
+						hasTries = true;
 					}
 				}else{
 					passed=false;
+					hasTries = true;
 				}
 				weight+=weights.get(act.getActId());
 			}
 
+			
+			
 			if(result>0&&weight>0){
 				result=result/weight;
 			}
@@ -174,6 +182,10 @@ public class PonderatedCourseEval extends BaseCourseEval {
 				passed=false;
 			}
 						
+
+			if(!hasTries && !passed){
+				isFailed = true;
+			}
 			
 			// Si el usuario se ha marcado como isFailed es porque lo tiene suspenso. Se le asigna un passed a false y se marca la fecha de finalización del curso (passedDate).
             courseResult.setPassed(passed && !isFailed);

@@ -403,7 +403,7 @@ if(backToEdit) {
 				<a id="<portlet:namespace />addUser_<%=user.getUserId() %>" onClick="<portlet:namespace />addUser(<%=user.getUserId() %>, '<%=user.getFullName() %>', false)" style="Cursor:pointer;" >
 				<liferay-ui:message key="select" /></a>
 				<a id="<portlet:namespace />deleteUser_<%=user.getUserId() %>" class="aui-helper-hidden" onClick="<portlet:namespace />deleteUser(<%=user.getUserId() %>, false)" style="Cursor:pointer;" >
-				<liferay-ui:message key="groupmailing.deselect" /></a>	
+				<liferay-ui:message key="unselect" /></a>	
 			</liferay-ui:search-container-column-text>
 			
 		</liferay-ui:search-container-row>

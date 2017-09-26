@@ -296,7 +296,7 @@ public class CourseImpl extends CourseBaseImpl {
 		
 		Date now = new Date();
 		
-		if(Validator.isNotNull(startDate) && Validator.isNotNull(endDate) && (startDate.after(now) || endDate.before(endDate))){
+		if(Validator.isNotNull(startDate) && Validator.isNotNull(endDate) && (startDate.after(now) || endDate.before(now))){
 			log.debug("CourseImpl::isLocked::teams::dates:" + false);
 			return true;
 		}

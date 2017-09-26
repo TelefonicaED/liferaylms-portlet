@@ -1430,8 +1430,10 @@ public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int e
 				result="error-not-valid-user";
 			}
 		}catch (PortalException e){
+			result = e.getMessage();
 			e.printStackTrace();
 		}catch (SystemException e){
+			result = e.getMessage();
 			e.printStackTrace();
 		}
 		return result;
