@@ -149,6 +149,7 @@ else
 			            title: Liferay.Language.get("onlineActivity.view.last"),
 			            centered: true,
 			            modal: true,
+			            cssClass:'lms-activity',
 			            width: 600,
 			            height: 350,
 			            after: {   
@@ -189,6 +190,7 @@ else
 			            centered: true,
 			            modal: true,
 			            width: 600,
+			            cssClass:'lms-activity',
 			            height: 800,
 			            /*after: {   
 				          	close: function(event){ 

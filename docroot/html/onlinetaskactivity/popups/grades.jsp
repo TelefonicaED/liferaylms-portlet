@@ -104,30 +104,38 @@ if(renderRequest.getParameter("studentId")!=null){
 		dateFormat.setTimeZone(timeZone);
 		String dateFormated = (lATry.getStartDate()!=null)? " ( "+dateFormat.format(lATry.getStartDate())+" )":"";
 %>
-	<p class="label"><liferay-ui:message key="onlinetaskactivity.export.date"/>: <%=dateFormated %> </p>
+	<div class="grey-box">
+		<p class="label"><liferay-ui:message key="onlinetaskactivity.export.date"/>: <%=dateFormated %> </p>
+	</div>
 <%
 	}	
 }
  if(richtext!=null) { %>
-	<aui:field-wrapper label="onlinetaskactivity.text" name="panelLabel" >
-		<liferay-ui:panel-container >
-			<liferay-ui:panel id="panelId" title="" collapsible="false" extended="false" >
-				<%=richtext %>
-				<aui:input type="hidden" name="panelLabel"/>
-			</liferay-ui:panel>
-		</liferay-ui:panel-container >
-	</aui:field-wrapper>
+	<div class="grey-box">
+		<aui:field-wrapper label="onlinetaskactivity.text" name="panelLabel" >
+			<liferay-ui:panel-container >
+				<liferay-ui:panel id="panelId" title="" collapsible="false" extended="false" >
+					<%=richtext %>
+					<aui:input type="hidden" name="panelLabel"/>
+				</liferay-ui:panel>
+			</liferay-ui:panel-container >
+		</aui:field-wrapper>
+	</div>
 <% } 
  if(text!=null) {
 %>
-	<aui:input type="textarea" cols="60" rows="10" name="text" label="onlinetaskactivity.text" value='<%=text %>' readonly='readonly'/>
+	<div class="grey-box">
+		<aui:input type="textarea" cols="60" rows="10" name="text" label="onlinetaskactivity.text" value='<%=text %>' readonly='readonly'/>
+	</div>
 <% } 
  if(urlFile!=null) {
 %>
-	<p class="label"><liferay-ui:message key="onlinetaskactivity.grades.attach"/></p>
-	<div class="doc_descarga">
-		<span><%=titleFile+"&nbsp;("+ sizeKbFile +"Kb)&nbsp;"%></span>
-		<a href="<%=urlFile%>" class="verMas <%=cssLinkTabletClassOnlineGrade %>" target="_blank"><liferay-ui:message key="onlinetaskactivity.grades.download"/></a>
+	<div class="grey-box">
+		<p class="label"><liferay-ui:message key="onlinetaskactivity.grades.attach"/></p>
+		<div class="doc_descarga">
+			<span><%=titleFile+"&nbsp;("+ sizeKbFile +"Kb)&nbsp;"%></span>
+			<a href="<%=urlFile%>" class="verMas <%=cssLinkTabletClassOnlineGrade %>" target="_blank"><liferay-ui:message key="onlinetaskactivity.grades.download"/></a>
+		</div>
 	</div>
 <% } 
 

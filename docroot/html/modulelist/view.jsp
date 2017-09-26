@@ -146,6 +146,14 @@ if(!ismobile){
 	if(course!=null && permissionChecker.hasPermission(course.getGroupCreatedId(),  Course.class.getName(),course.getCourseId(),ActionKeys.VIEW)){
 %>
 	<div id="myContainer">
+	<script type="text/javascript">
+
+		function <portlet:namespace/>changeRowStyle(id, cssClass){
+			var trId = '#'+id;
+			$(id).addClass(cssClass);
+		}
+
+	</script>
 	<table class="coursemodule <%="course-status-".concat(String.valueOf(course.getStatus()))%>" id="<%=idModuleTable%>">
 <%
 		Date today=new java.util.Date(System.currentTimeMillis());
@@ -364,35 +372,63 @@ if(!ismobile){
 					
 					<td class="contain_actions">
 <%
+					if(themeDisplay.isSignedIn()){
 						if(startDate!=null &&today.before(startDate) && !canAccessLock){
 %>
+							<script type="text/javascript">
+								<portlet:namespace/>changeRowStyle(<portlet:namespace/><%=theModule.getModuleId()%>,'starting-soon');
+							</script>
+
 							<div class="access"><liferay-ui:message key="starting-soon"/><!-- En LMS esta etiqueta es vacía --></div>
 <%
 						}else if((moduleIsLocked || courseIsLocked) && !canAccessLock){
-%>
-							<div class="access"><liferay-ui:message key="module-closed"/><!-- En LMS esta etiqueta es vacía --></div>
+							if(UserLocalServiceUtil.hasGroupUser(themeDisplay.getScopeGroupId(),themeDisplay.getUserId())){
+%>								
+								<script type="text/javascript">
+									<portlet:namespace/>changeRowStyle(<portlet:namespace/><%=theModule.getModuleId()%>,'module-closed');
+								</script>
+								<div class="access"><liferay-ui:message key="module-closed"/><!-- En LMS esta etiqueta es vacía --></div>
 <%
+							}
 						}else if((!moduleIsLocked && !courseIsLocked) || canAccessLock){
 							if(allowEditionMode && moduleEditing){
 								%>
+								<script type="text/javascript">
+									<portlet:namespace/>changeRowStyle(<portlet:namespace/><%=theModule.getModuleId()%>,'module-actions');
+								</script>
 								<div class="iconsedit"><%@ include file="/JSPs/module/edit_actions.jspf" %></div>
 								<%							
 							}else if(!allowAccessWhenFinishedButNotClosed && ModuleLocalServiceUtil.isUserPassed(theModule.getModuleId(),themeDisplay.getUserId())){
 %>
+								<script type="text/javascript">
+									<portlet:namespace/>changeRowStyle(<portlet:namespace/><%=theModule.getModuleId()%>,'module-finished');
+								</script>
 								<div class="access"><a href="<%=gotoModuleURL.toString() %>"><liferay-ui:message key="module-finissed" /></a></div>
 <%
 							}else { 
 %>
+								<script type="text/javascript">
+									<portlet:namespace/>changeRowStyle(<portlet:namespace/><%=theModule.getModuleId()%>,'module-access');
+								</script>
 								<div class="access"><a class="module-list-button-access" href="<%=gotoModuleURL.toString() %>"><liferay-ui:message key="module-access" /></a></div>
 <%
 							} 
 						}
+					}
 %>
 					</td>
 				</tr>
 <%		}%>
   </table>
 </div>
+
+<script type="text/javascript">
+
+function <portlet:namespace/>changeRowStyle(id, cssClass){
+	$('#'+id).addClass(cssClass);
+}
+
+</script>
 
 <%}else{
 	renderRequest.setAttribute(WebKeys.PORTLET_CONFIGURATOR_VISIBILITY, Boolean.FALSE);
