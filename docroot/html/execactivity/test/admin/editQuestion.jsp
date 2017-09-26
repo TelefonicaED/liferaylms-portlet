@@ -103,6 +103,9 @@
 					<aui:option selected="<%=formatType.equals(PropsUtil.get(\"lms.question.formattype.horizontal\")) %>" value="<%=PropsUtil.get(\"lms.question.formattype.horizontal\") %>">
 						<liferay-ui:message key="exectactivity.editquestions.formattype.horizontal" />
 					</aui:option>
+					<aui:option selected="<%=formatType.equals(PropsUtil.get(\"lms.question.formattype.combo\")) %>" value="<%=PropsUtil.get(\"lms.question.formattype.combo\") %>">
+						<liferay-ui:message key="exectactivity.editquestions.formattype.combo" />
+					</aui:option>
 				</aui:select>
 	<%
 			}else{
@@ -292,7 +295,7 @@
 			    			this.addClass('lfr-collapsed');
 			    		});
 			    		
-			    		//Pregunta no vacía
+			    		//Pregunta no vacÃ­a
 			    		var question = A.one('#<portlet:namespace />text');
 			    		if(question.val()==""){
 			    			A.one('#<portlet:namespace />questionError').removeClass('aui-helper-hidden');
@@ -301,7 +304,7 @@
 			    			A.one('#<portlet:namespace />questionError').addClass('aui-helper-hidden');
 			    		}
 			    		
-			    		//Ninguna respuesta vacía
+			    		//Ninguna respuesta vacÃ­a
 			    		var list = A.all('.solution > div');
 			    		var trueCounter = 0;
 			    		var index = 1;
