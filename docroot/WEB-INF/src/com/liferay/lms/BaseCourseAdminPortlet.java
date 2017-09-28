@@ -340,34 +340,39 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 		ServiceContext serviceContext = ServiceContextFactory.getInstance(
 				Course.class.getName(), actionRequest);
 
-		ThemeDisplay themeDisplay = (ThemeDisplay) actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
-		String redirect = ParamUtil.getString(actionRequest, "redirect");
-
-		User user = themeDisplay.getUser();
 		long courseId = ParamUtil.getLong(actionRequest, "courseId", 0);
 		if (courseId > 0) {
 
 			//auditing
-			AuditingLogFactory.audit(serviceContext.getCompanyId(), serviceContext.getScopeGroupId(), Course.class.getName(), courseId, serviceContext.getUserId(), AuditConstants.CLOSE, null);
+			List<Course> editions = CourseLocalServiceUtil.getChildCourses(courseId);
+			for(Course edition : editions){
+				CourseLocalServiceUtil.deleteCourse(edition.getCourseId());
+				AuditingLogFactory.audit(serviceContext.getCompanyId(), serviceContext.getScopeGroupId(), Course.class.getName(), edition.getCourseId(), serviceContext.getUserId(), AuditConstants.CLOSE, null);
+			}
 			
 			CourseLocalServiceUtil.deleteCourse(courseId);
+			AuditingLogFactory.audit(serviceContext.getCompanyId(), serviceContext.getScopeGroupId(), Course.class.getName(), courseId, serviceContext.getUserId(), AuditConstants.CLOSE, null);
+			
+			
 		}
 	}
 	public void closeCourse(ActionRequest actionRequest, ActionResponse actionResponse) throws Exception {
 
 		log.debug("******CloseCourse**********");
 
-		Indexer indexer=IndexerRegistryUtil.getIndexer(Course.class);
 		
 		ServiceContext serviceContext = ServiceContextFactory.getInstance(Course.class.getName(), actionRequest);
 
-		ThemeDisplay themeDisplay = (ThemeDisplay) actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
-		String redirect = ParamUtil.getString(actionRequest, "redirect");
-
-		User user = themeDisplay.getUser();
 		long courseId = ParamUtil.getLong(actionRequest, "courseId", 0);
 		if (courseId > 0) {	
+			List<Course> editions = CourseLocalServiceUtil.getChildCourses(courseId);
+			for(Course edition : editions){
+				CourseLocalServiceUtil.closeCourse(edition.getCourseId());
+				AuditingLogFactory.audit(serviceContext.getCompanyId(), serviceContext.getScopeGroupId(), Course.class.getName(), edition.getCourseId(), serviceContext.getUserId(), AuditConstants.CLOSE, null);
+			}
+			
 			CourseLocalServiceUtil.closeCourse(courseId);
+			AuditingLogFactory.audit(serviceContext.getCompanyId(), serviceContext.getScopeGroupId(), Course.class.getName(), courseId, serviceContext.getUserId(), AuditConstants.CLOSE, null);
 		}
 	}
 	
@@ -376,6 +381,10 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 
 		long courseId = ParamUtil.getLong(actionRequest, "courseId", 0);
 		if (courseId > 0) {	
+			List<Course> editions = CourseLocalServiceUtil.getChildCourses(courseId);
+			for(Course edition : editions){
+				CourseLocalServiceUtil.openCourse(edition.getCourseId());
+			}
 			CourseLocalServiceUtil.openCourse(courseId);
 		}
 	}
@@ -387,9 +396,10 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 		try {
 			serviceContext = ServiceContextFactory.getInstance(Course.class.getName(), uploadRequest);
 		} catch (PortalException e1) {
+			if(log.isDebugEnabled())e1.printStackTrace();
 			
 		} catch (SystemException e1) {
-			
+			if(log.isDebugEnabled())e1.printStackTrace();
 		}
 
 		ThemeDisplay themeDisplay = (ThemeDisplay) actionRequest
@@ -641,7 +651,7 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 			try{
 				course = CourseLocalServiceUtil.addCourse(
 						title, description, summary, friendlyURL,
-						themeDisplay.getLocale(), ahora, startDate, stopDate,courseTemplateId,type,courseEvalId,
+						themeDisplay.getLocale(), ahora, startDate, stopDate, startExecutionDate.getTime(), stopExecutionDate.getTime() , courseTemplateId,type,courseEvalId,
 						courseCalificationType,maxusers,serviceContext,false);
 				try{
 				LmsPrefs prefs=LmsPrefsLocalServiceUtil.getLmsPrefs(course.getCompanyId());

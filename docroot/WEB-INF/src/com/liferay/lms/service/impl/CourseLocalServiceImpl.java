@@ -94,6 +94,7 @@ import com.liferay.portal.service.ClassNameLocalServiceUtil;
 import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.LayoutSetPrototypeLocalServiceUtil;
 import com.liferay.portal.service.MembershipRequestLocalServiceUtil;
+import com.liferay.portal.service.ResourcePermissionLocalServiceUtil;
 import com.liferay.portal.service.RoleLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceContextThreadLocal;
@@ -268,7 +269,19 @@ public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int e
 
 
 	public Course addCourse (String title, String description,String summary,String friendlyURL, Locale locale,
-			java.util.Date createDate,java.util.Date startDate,java.util.Date endDate,long layoutSetPrototypeId,int typesite, long CourseEvalId, long calificationType, int maxUsers,ServiceContext serviceContext,boolean isfromClone)
+		java.util.Date createDate,java.util.Date startDate,java.util.Date endDate,long layoutSetPrototypeId,int typesite, long CourseEvalId, long calificationType, int maxUsers,ServiceContext serviceContext,boolean isfromClone)
+		throws SystemException, PortalException {
+		
+		Course course = addCourse (title, description,summary,friendlyURL, locale,
+				createDate,startDate,endDate,null,null,layoutSetPrototypeId,typesite, CourseEvalId, calificationType, maxUsers,
+				 serviceContext, isfromClone);
+
+		
+		return course;
+	}
+
+	public Course addCourse (String title, String description,String summary,String friendlyURL, Locale locale,
+			Date createDate,Date startDate,Date endDate, Date executionStartDate, Date executionEndDate, long layoutSetPrototypeId,int typesite, long CourseEvalId, long calificationType, int maxUsers,ServiceContext serviceContext,boolean isfromClone)
 			throws SystemException, PortalException {
 		LmsPrefs lmsPrefs=lmsPrefsLocalService.getLmsPrefsIni(serviceContext.getCompanyId());
 		long userId=serviceContext.getUserId();
@@ -317,6 +330,8 @@ public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int e
 			course.setModifiedDate(createDate);
 			course.setStartDate(startDate);
 			course.setEndDate(endDate);
+			course.setExecutionStartDate(executionStartDate);
+			course.setExecutionEndDate(executionEndDate);
 			course.setStatus(WorkflowConstants.STATUS_APPROVED);
 			course.setExpandoBridgeAttributes(serviceContext);
 			course.setCourseEvalId(CourseEvalId);
@@ -421,13 +436,34 @@ public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int e
 				newModule.setGroupId(course.getGroupCreatedId());
 				newModule.setUserId(course.getUserId());
 				newModule.setOrdern(newModule.getModuleId());				
-				newModule.setStartDate(startDate);
-				newModule.setEndDate(endDate);
+				newModule.setStartDate(executionStartDate);
+				newModule.setEndDate(executionEndDate);
 				
 				
 				ModuleLocalServiceUtil.addModule(newModule);
 				
+				
+				 try {
+				    	Role siteMember = RoleLocalServiceUtil.fetchRole(newModule.getCompanyId(), RoleConstants.SITE_MEMBER);
+				    	ResourcePermissionLocalServiceUtil.setResourcePermissions(newModule.getCompanyId(), 
+				    			Module.class.getName(),ResourceConstants.SCOPE_INDIVIDUAL, String.valueOf(newModule.getModuleId()),  siteMember.getRoleId(),  new String[]{"VIEW","ACCESS"});
+				   
+				    	
+				    	
+				    	
+				    	
+						resourceLocalService.addResources(
+								newModule.getCompanyId(), newModule.getGroupId(), newModule.getUserId(),
+						Module.class.getName(), newModule.getPrimaryKey(), false,
+						true, true);
+					} catch (PortalException e) {
+						if(log.isDebugEnabled())e.printStackTrace();
+						if(log.isInfoEnabled())log.info(e.getMessage());
+						throw new SystemException(e);
+					}
+				
 				log.debug("    + Module : " + newModule.getTitle(Locale.getDefault()) +"("+newModule.getModuleId()+")" );
+				ModuleLocalServiceUtil.updateModule(newModule);
 				
 			} catch (Exception e) {
 				e.printStackTrace();

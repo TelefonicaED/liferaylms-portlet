@@ -384,6 +384,25 @@ public class CourseLocalServiceUtil {
 		java.lang.String summary, java.lang.String friendlyURL,
 		java.util.Locale locale, java.util.Date createDate,
 		java.util.Date startDate, java.util.Date endDate,
+		java.util.Date executionStartDate, java.util.Date executionEndDate,
+		long layoutSetPrototypeId, int typesite, long CourseEvalId,
+		long calificationType, int maxUsers,
+		com.liferay.portal.service.ServiceContext serviceContext,
+		boolean isfromClone)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getService()
+				   .addCourse(title, description, summary, friendlyURL, locale,
+			createDate, startDate, endDate, executionStartDate,
+			executionEndDate, layoutSetPrototypeId, typesite, CourseEvalId,
+			calificationType, maxUsers, serviceContext, isfromClone);
+	}
+
+	public static com.liferay.lms.model.Course addCourse(
+		java.lang.String title, java.lang.String description,
+		java.lang.String summary, java.lang.String friendlyURL,
+		java.util.Locale locale, java.util.Date createDate,
+		java.util.Date startDate, java.util.Date endDate,
 		com.liferay.portal.service.ServiceContext serviceContext,
 		long calificationType)
 		throws com.liferay.portal.kernel.exception.PortalException,

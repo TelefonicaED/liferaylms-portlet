@@ -263,7 +263,7 @@ if(course!=null){
 }
 %>
 
-<c:if test="<%=course != null %>">
+<c:if test="<%=course != null && course.getParentCourseId()<=0%>">
 	<div class="aui-tab-back">
 		<liferay-ui:icon-menu>
 			<%-- Ir al curso --%>

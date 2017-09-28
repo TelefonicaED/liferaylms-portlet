@@ -265,8 +265,8 @@ public class CourseImpl extends CourseBaseImpl {
 		log.debug("CourseImpl::isLocked::hasPermissionAccess:" + true);
 
 		//Comprobamos si estás en alguna convocatoria y que esté abierta
-		Date startDate = null;
-		Date endDate = null;
+		Date startDate = this.getExecutionStartDate();
+		Date endDate = this.getExecutionEndDate();
 		List<Team> teams = null;
 		try {
 			teams = TeamLocalServiceUtil.getUserTeams(user.getUserId(), this.getGroupCreatedId());
