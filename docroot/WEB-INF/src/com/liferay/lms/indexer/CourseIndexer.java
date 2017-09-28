@@ -109,6 +109,10 @@ public class CourseIndexer extends BaseIndexer {
 		String userName = UserLocalServiceUtil.getUser(userId).getFullName();
 		long entryId = entry.getCourseId();
 		String title = entry.getTitle();
+		Date startDate = entry.getStartDate();
+		Date endDate = entry.getEndDate();
+		Date executionStartDate = entry.getExecutionStartDate();
+		Date executionEndDate = entry.getExecutionEndDate();
 		
 		AssetEntry assetEntry= null;
 		try{
@@ -142,6 +146,10 @@ public class CourseIndexer extends BaseIndexer {
 
 		document.addUID(PORTLET_ID, entryId);
 		document.addDate(Field.MODIFIED_DATE, displayDate);
+		document.addDate("startDate", startDate);
+		document.addDate("endDate", endDate);
+		document.addDate("executionStartDate", executionStartDate);
+		document.addDate("executionEndDate", executionEndDate);
 		document.addKeyword(Field.COMPANY_ID, companyId);
 		document.addKeyword(Field.PORTLET_ID, PORTLET_ID);
 		document.addKeyword(Field.GROUP_ID, groupId);
