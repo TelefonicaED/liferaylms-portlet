@@ -163,8 +163,8 @@ if(!ownGrade){
 			</aui:validator>
 	    </aui:input>
 
-		<aui:input type="textarea" cols="75" rows="6" helpMessage="<%=LanguageUtil.get(pageContext, \"onlinetaskactivity.grades.commentsMessage\")%>" maxLength="350" name="comments" label="onlinetaskactivity.comments" value='<%=((result!=null)&&(result.getComments()!=null))?result.getComments():"" %>'>
-			<aui:validator name="range">[0, 350]</aui:validator>
+		<aui:input type="textarea" cols="75" rows="6" helpMessage="<%=LanguageUtil.get(pageContext, \"onlinetaskactivity.grades.commentsMessage\")%>" maxLength="1000" name="comments" label="onlinetaskactivity.comments" value='<%=((result!=null)&&(result.getComments()!=null))?result.getComments():"" %>'>
+			<aui:validator name="range">[0, 1000]</aui:validator>
 		</aui:input>
 	</aui:fieldset>
 	<aui:button-row>
