@@ -2,7 +2,6 @@ package com.liferay.lms.indexer;
 
 import java.text.Normalizer;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
 
@@ -10,6 +9,7 @@ import javax.portlet.PortletURL;
 
 import com.liferay.lms.model.Course;
 import com.liferay.lms.service.CourseLocalServiceUtil;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.search.BaseIndexer;
@@ -52,7 +52,7 @@ public class CourseIndexer extends BaseIndexer {
 	
 	@Override
 	public boolean isPermissionAware() {
-		return true;
+		return true; 
 	}
 
 
@@ -137,7 +137,7 @@ public class CourseIndexer extends BaseIndexer {
 		if(assetEntry!=null){
 			displayDate = assetEntry.getPublishDate();
 		}		
-
+		
 		long[] assetCategoryIds = AssetCategoryLocalServiceUtil.getCategoryIds(Course.class.getName(), entryId);
 		String[] assetTagNames = AssetTagLocalServiceUtil.getTagNames(Course.class.getName(), entryId);
 		ExpandoBridge expandoBridge = entry.getExpandoBridge();
@@ -158,8 +158,11 @@ public class CourseIndexer extends BaseIndexer {
 		document.addText("groupName",dependentGroup.getName());
 		document.addKeyword(Field.USER_ID, userId);
 		document.addText(Field.USER_NAME, userName);
-
 		document.addText(Field.TITLE, title);
+		Locale[] locales = LanguageUtil.getAvailableLocales();
+		for(Locale locale: locales){
+			document.addText(Field.TITLE + "_" + locale.getLanguage(), entry.getTitle(locale));
+		}
 		document.addText(Field.CONTENT, content);
 		document.addKeyword(Field.ASSET_CATEGORY_IDS, assetCategoryIds);
 		document.addKeyword(Field.ASSET_TAG_NAMES, assetTagNames);
