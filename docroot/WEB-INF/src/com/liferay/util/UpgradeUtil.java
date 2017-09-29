@@ -5,7 +5,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.liferay.lms.model.Course;
 import com.liferay.lms.model.Module;
+import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.lms.service.ModuleLocalServiceUtil;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBFactoryUtil;
@@ -171,6 +173,26 @@ public class UpgradeUtil {
 			} catch (SQLException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+			}
+			
+			
+			
+			//Establecer las fechas de incio y fin
+			List<Course> allCourses = CourseLocalServiceUtil.getCourses(QueryUtil.ALL_POS, QueryUtil.ALL_POS);
+			boolean changesInCourse;
+			for(Course course : allCourses){
+				changesInCourse = false;
+				if(course.getExecutionStartDate()==null){
+					course.setExecutionStartDate(CourseLocalServiceUtil.getFirstModuleDateInCourse(course.getCourseId()));
+					changesInCourse=true;
+				}
+				if(course.getExecutionEndDate()==null){
+					course.setExecutionEndDate(CourseLocalServiceUtil.getLastModuleDateInCourse(course.getCourseId()));
+					changesInCourse=true;
+				}
+				if(changesInCourse){
+					CourseLocalServiceUtil.updateCourse(course);
+				}	
 			}
 	}
 	

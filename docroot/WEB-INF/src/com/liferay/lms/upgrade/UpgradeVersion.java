@@ -6,7 +6,7 @@ import com.liferay.util.UpgradeUtil;
 
 public class UpgradeVersion extends UpgradeProcess {
 	public int getThreshold() {
-		return 234;
+		return 320;
 	}
 
 	protected void doUpgrade() throws Exception {
