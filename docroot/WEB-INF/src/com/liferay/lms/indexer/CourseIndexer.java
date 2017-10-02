@@ -108,7 +108,7 @@ public class CourseIndexer extends BaseIndexer {
 		long userId = entry.getUserId();
 		String userName = UserLocalServiceUtil.getUser(userId).getFullName();
 		long entryId = entry.getCourseId();
-		String title = entry.getTitle();
+		Map<Locale, String> titleMap = entry.getTitleMap();
 		Date startDate = entry.getStartDate();
 		Date endDate = entry.getEndDate();
 		Date executionStartDate = entry.getExecutionStartDate();
@@ -158,11 +158,7 @@ public class CourseIndexer extends BaseIndexer {
 		document.addText("groupName",dependentGroup.getName());
 		document.addKeyword(Field.USER_ID, userId);
 		document.addText(Field.USER_NAME, userName);
-		document.addText(Field.TITLE, title);
-		Locale[] locales = LanguageUtil.getAvailableLocales();
-		for(Locale locale: locales){
-			document.addText(Field.TITLE + "_" + locale.getLanguage(), entry.getTitle(locale));
-		}
+		document.addLocalizedText(Field.TITLE, titleMap);
 		document.addText(Field.CONTENT, content);
 		document.addKeyword(Field.ASSET_CATEGORY_IDS, assetCategoryIds);
 		document.addKeyword(Field.ASSET_TAG_NAMES, assetTagNames);

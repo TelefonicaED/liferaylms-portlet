@@ -366,11 +366,11 @@ if(course!=null){
 		 </label> 
 		 <span class="aui-field-element " > 
 		  <liferay-ui:input-localized 
-		   cssClass="<%=renderResponse.getNamespace()+\"localized lfr-input-text\"%>" 
-		   name="title"
-		   defaultLanguageId="<%=LanguageUtil.getLanguageId(LocaleUtil.getDefault()) %>"
-		   xml="<%=courseTitle %>"
-		   maxLength="<%=maxLengthTitle %>"/>
+			   cssClass="<%=renderResponse.getNamespace()+\"localized lfr-input-text\"%>" 
+			   name="title"
+			   defaultLanguageId="<%=LanguageUtil.getLanguageId(LocaleUtil.getDefault()) %>"
+			   xml="<%=courseTitle %>"
+			   maxLength="<%=maxLengthTitle %>"/>
 		 </span> 
 	</span>
 	

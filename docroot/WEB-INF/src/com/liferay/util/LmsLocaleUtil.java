@@ -1,13 +1,20 @@
 package com.liferay.util;
 
 import java.lang.reflect.Method;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
+
+import javax.portlet.ActionRequest;
 
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.upload.UploadRequest;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.LocalizationUtil;
+import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringPool;
 
 public class LmsLocaleUtil {
@@ -54,5 +61,25 @@ public class LmsLocaleUtil {
 		}
 		
 		return type.cast(oinstance);
+	}
+	
+	public static Map<Locale, String> getLocalizationMap(
+			UploadRequest request, String parameter) {
+
+			Locale[] locales = LanguageUtil.getAvailableLocales();
+
+			Map<Locale, String> map = new HashMap<Locale, String>();
+
+			for (Locale locale : locales) {
+				String languageId = LocaleUtil.toLanguageId(locale);
+
+				String localeParameter = parameter.concat(
+					StringPool.UNDERLINE).concat(languageId);
+				map.put(
+					locale,
+					ParamUtil.getString(request,localeParameter));
+			}
+
+			return map;
 	}
 }

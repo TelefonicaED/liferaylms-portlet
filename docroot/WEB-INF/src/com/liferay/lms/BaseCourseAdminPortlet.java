@@ -85,6 +85,7 @@ import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
@@ -125,6 +126,7 @@ import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
 import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.service.DLFolderLocalServiceUtil;
 import com.liferay.portlet.usersadmin.util.UsersAdminUtil;
+import com.liferay.util.LmsLocaleUtil;
 import com.liferay.util.bridges.mvc.MVCPortlet;
 
 public class BaseCourseAdminPortlet extends MVCPortlet {
@@ -401,21 +403,36 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 		} catch (SystemException e1) {
 			if(log.isDebugEnabled())e1.printStackTrace();
 		}
+		
+		long courseId = ParamUtil.getLong(uploadRequest, "courseId", 0);
 
 		ThemeDisplay themeDisplay = (ThemeDisplay) actionRequest
 				.getAttribute(WebKeys.THEME_DISPLAY);
 		String redirect = ParamUtil.getString(uploadRequest, "redirect");
 
 		User user = themeDisplay.getUser();
-		Enumeration<String> parNam = uploadRequest.getParameterNames();
-		String title = StringPool.BLANK;
-		while (parNam.hasMoreElements()) {
-			String paramName = parNam.nextElement();
-			if (paramName.startsWith("title_") && paramName.length() > 6) {
-				if (title.equals(StringPool.BLANK)) {
-					title = uploadRequest.getParameter(paramName);
-				}
-			}
+		
+		Locale localeDefault = null;
+		try {
+			localeDefault = themeDisplay.getCompany().getLocale();
+		} catch (PortalException e2) {
+			// TODO Auto-generated catch block
+			e2.printStackTrace();
+			localeDefault = LocaleUtil.getDefault();
+		} catch (SystemException e2) {
+			// TODO Auto-generated catch block
+			e2.printStackTrace();
+			localeDefault = LocaleUtil.getDefault();
+		}
+		
+		Map<Locale,String> titleMap = LmsLocaleUtil.getLocalizationMap(uploadRequest, "title");
+		
+		if(titleMap == null || Validator.isNull(titleMap.get(localeDefault))){
+			SessionErrors.add(actionRequest, "title-required");
+			actionResponse.setRenderParameter("courseId", String.valueOf(courseId));
+			actionResponse.setRenderParameter("redirect", redirect);
+			actionResponse.setRenderParameter("jspPage","/html/courseadmin/editcourse.jsp");
+			return;
 		}
 
 		String description = uploadRequest.getParameter("description");
@@ -423,7 +440,6 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 		//Cambiar la imagen de la comunidad
 		
 		String fileName = uploadRequest.getFileName("fileName");
-		long courseId = ParamUtil.getLong(uploadRequest, "courseId", 0);
 		long courseTemplateId=ParamUtil.getLong(uploadRequest,"courseTemplate",0);
 		long courseCalificationType=ParamUtil.getLong(uploadRequest,"calificationType",0);
 		String friendlyURL = ParamUtil.getString(uploadRequest, "friendlyURL",
@@ -493,7 +509,7 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 			return;					
 		}
 
-		if (friendlyURL.equals(StringPool.BLANK) && !title.equals(StringPool.BLANK)) {
+		if (friendlyURL.equals(StringPool.BLANK)) {
 			friendlyURL = StringPool.BLANK;
 		}
 
@@ -581,23 +597,6 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 		
 		
 		Date ahora = new Date(System.currentTimeMillis());
-		// Validations
-		boolean noTitle = true;
-		Enumeration<String> parNames = uploadRequest.getParameterNames();
-		while (parNames.hasMoreElements()) {
-			String paramName = parNames.nextElement();
-			if (paramName.startsWith("title_") && paramName.length() > 6
-					&& ParamUtil.getString(uploadRequest, paramName, StringPool.BLANK).length() > 0) {
-				noTitle = false;
-			}
-		}
-		if (noTitle) {
-			SessionErrors.add(actionRequest, "title-required");
-			actionResponse.setRenderParameter("courseId", String.valueOf(courseId));
-			actionResponse.setRenderParameter("redirect", redirect);
-			actionResponse.setRenderParameter("jspPage","/html/courseadmin/editcourse.jsp");
-			return;
-		}
 		
 		boolean requiredCourseIcon = GetterUtil.getBoolean(PropsUtil.get("lms.course.icon.required"), false);
 
@@ -650,7 +649,7 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 		if (courseId == 0) {
 			try{
 				course = CourseLocalServiceUtil.addCourse(
-						title, description, summary, friendlyURL,
+						titleMap, description, summary, friendlyURL,
 						themeDisplay.getLocale(), ahora, startDate, stopDate, startExecutionDate.getTime(), stopExecutionDate.getTime() , courseTemplateId,type,courseEvalId,
 						courseCalificationType,maxusers,serviceContext,false);
 				try{
@@ -703,18 +702,8 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 
 			try{
 				course = CourseLocalServiceUtil.getCourse(courseId);
-				course.setTitle(StringPool.BLANK);
 				
-				parNam = uploadRequest.getParameterNames();
-				while (parNam.hasMoreElements()) {
-					String paramName = parNam.nextElement();
-					if (paramName.startsWith("title_") && paramName.length() > 6) {
-						  String language=paramName.substring(6);
-						  Locale locale=LocaleUtil.fromLanguageId(language);
-						  course.setTitle(uploadRequest.getParameter(paramName),locale);
-					}
-				}
-				
+				course.setTitleMap(titleMap);
 				course.setDescription( description,themeDisplay.getLocale());
 				course.setStartDate(startDate); 
 				course.setEndDate(stopDate);
@@ -722,7 +711,7 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 				course.setMaxusers(maxusers);
 				serviceContext.setAttribute("type", String.valueOf(type));
 				/*
-				 * Se llama m�s abajo
+				 * Se llama más abajo
 				 * com.liferay.lms.service.CourseLocalServiceUtil.modCourse(course,
 						summary, serviceContext);*/
 			}catch(PortalException pe){ 
@@ -794,27 +783,6 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 				course.setIcon(0);
 			}
 
-			boolean oneTitleNotEmpty = false;
-			parNames = uploadRequest.getParameterNames();
-			while (parNames.hasMoreElements()) {
-				String paramName = parNames.nextElement();
-				if (paramName.startsWith("title_") && paramName.length() > 6) {
-					String language = paramName.substring(6);
-					Locale locale = LocaleUtil.fromLanguageId(language);
-					course.setTitle(uploadRequest.getParameter(paramName),locale);
-
-					if (!uploadRequest.getParameter(paramName).equals(StringPool.BLANK)) {
-						oneTitleNotEmpty = true;
-					}
-				}
-			}
-
-			if (!oneTitleNotEmpty) {
-				SessionErrors.add(actionRequest, "title-empty");
-				actionResponse.setRenderParameter("jspPage",
-						"/html/courseadmin/editcourse.jsp");
-				return;
-			}
 			//Miramos si hay imagen en WelcomeMsg y GoobyeMsg con dominio correcto
 			String dominio = themeDisplay.getURLPortal();
 			

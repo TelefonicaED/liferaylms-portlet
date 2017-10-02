@@ -22,6 +22,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import com.liferay.counter.service.CounterLocalServiceUtil;
 import com.liferay.lms.auditing.AuditConstants;
@@ -70,6 +71,7 @@ import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.FriendlyURLNormalizerUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
 import com.liferay.portal.kernel.util.PropsUtil;
@@ -279,13 +281,31 @@ public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int e
 		
 		return course;
 	}
-
+	
 	public Course addCourse (String title, String description,String summary,String friendlyURL, Locale locale,
+			Date createDate,Date startDate,Date endDate, Date executionStartDate, Date executionEndDate, long layoutSetPrototypeId,int typesite, long CourseEvalId, long calificationType, int maxUsers,ServiceContext serviceContext,boolean isfromClone)
+			throws SystemException, PortalException {
+		Map<Locale, String> titleMap = new HashMap<Locale, String>();
+		titleMap.put(locale, title);
+		return addCourse(titleMap, description, summary, friendlyURL, locale, createDate, startDate, endDate, executionStartDate, executionEndDate, 
+						layoutSetPrototypeId, typesite, CourseEvalId, calificationType, maxUsers, serviceContext, isfromClone);
+	}
+
+	public Course addCourse (Map<Locale,String> titleMap, String description,String summary,String friendlyURL, Locale locale,
 			Date createDate,Date startDate,Date endDate, Date executionStartDate, Date executionEndDate, long layoutSetPrototypeId,int typesite, long CourseEvalId, long calificationType, int maxUsers,ServiceContext serviceContext,boolean isfromClone)
 			throws SystemException, PortalException {
 		LmsPrefs lmsPrefs=lmsPrefsLocalService.getLmsPrefsIni(serviceContext.getCompanyId());
 		long userId=serviceContext.getUserId();
 		Course course = coursePersistence.create(counterLocalService.increment(Course.class.getName()));
+		String title = null;
+		if(titleMap.containsKey(locale)){
+			title = titleMap.get(locale);
+		}else{
+			//Cogemos el primero
+			Entry<Locale, String> entry = titleMap.entrySet().iterator().next();
+			title = entry.getValue();
+		}
+		
 		try{
 			
 			//Se asegura que la longitud de friendlyURL no supere el maximo
@@ -318,14 +338,13 @@ public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int e
 			}
 			
 			friendlyURL = StringPool.SLASH+friendlyURL.replaceAll("[^a-zA-Z0-9_-]+", "");
-
 			course.setCompanyId(serviceContext.getCompanyId());
 			course.setGroupId(serviceContext.getScopeGroupId());
 			course.setUserId(userId);
 			course.setUserName(userLocalService.getUser(userId).getFullName());
 			course.setFriendlyURL(friendlyURL);
-			course.setDescription(description,locale);
-			course.setTitle(title,locale);
+			course.setDescription(description,locale, locale);
+			course.setTitleMap(titleMap);
 			course.setCreateDate(createDate);
 			course.setModifiedDate(createDate);
 			course.setStartDate(startDate);
@@ -357,7 +376,7 @@ public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int e
 					userId, assetEntry.getEntryId(), serviceContext.getAssetLinkEntryIds(),
 					AssetLinkConstants.TYPE_RELATED);
 			
-			//A�adimos el rol Teacher al usuario que crea el blog
+			//Añadimos el rol Teacher al usuario que crea el blog
 			long[] usuarios = new long[]{userId};
 			boolean teacherRoleToCreator = GetterUtil.getBoolean(PropsUtil.get("lms.course.add.teacherRoleToCreator"));
 			boolean editorRoleToCreator = GetterUtil.getBoolean(PropsUtil.get("lms.course.add.editorRoleToCreator"));
