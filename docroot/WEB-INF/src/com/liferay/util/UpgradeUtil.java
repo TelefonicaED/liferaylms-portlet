@@ -41,87 +41,7 @@ public class UpgradeUtil {
 		 Role siteMember;
 	    
 		log.warn("--- UPGRADING LMS TO 3.2 ");
-		log.warn("--- CREATING ACCESS PERMISSION TO MODULE ");
-		
-		List<String> actionIds = new ArrayList<String>();
-		actionIds.add("ACCESS");
-		ResourceActionLocalServiceUtil.checkResourceActions(
-				Module.class.getName(), actionIds);
-		
-		log.warn("--- SETTING ACCESS PERMISSION TO COURSE ADMINISTRATION");
-	    List<Company> companys = CompanyLocalServiceUtil.getCompanies();
-	    List<Course> listCourses = null;
-	    String title = null;
-	    Map<Locale, String> titleMap = null;
-	    Iterator<Entry<Locale,String>> iterator = null;
-	    boolean finded = false;
-	    Entry<Locale,String> entry = null;
-	    AssetEntry assetEntry = null;
-	    for(Company company : companys){
-	    	try{
-	    		 Role courseAdministrator = RoleLocalServiceUtil.getRole(company.getCompanyId(), "Administrador de cursos");
-		    	 if(courseAdministrator!=null){
-		    		  ResourcePermissionLocalServiceUtil.setResourcePermissions(company.getCompanyId(), 
-				     			Module.class.getName(),ResourceConstants.SCOPE_COMPANY, String.valueOf(company.getCompanyId()),  courseAdministrator.getRoleId(),  new String[]{"ACCESS","VIEW","DELETE", "ADD_LACT","UPDATE","PERMISSIONS","SOFT_PERMISSIONS"});
-		    	  }
-	    	 }catch(Exception e){
-	    		 log.warn("No hay Administrador de cursos");
-	    	}
-	    	//Ponemos el idioma por defecto a los cursos que no lo tienen
-	    	listCourses = CourseLocalServiceUtil.getCourses(company.getCompanyId());
-	    	if(listCourses != null && listCourses.size() > 0){
-	    		for(Course course: listCourses){
-	    			try {
-	    				assetEntry = AssetEntryLocalServiceUtil.getEntry(Course.class.getName(), course.getCourseId());
-	    				titleMap = course.getTitleMap();
-						log.debug("courseId: " + course.getCourseId());
-						//Si no tienen el idioma por defecto relleno, se lo cargamos
-						log.debug("idioma por defect contenido: " + titleMap.containsKey(company.getLocale()));
-						if(!titleMap.containsKey(company.getLocale()) || Validator.isNull(titleMap.get(company.getLocale()))){
-							//Buscamos idioma que no esté vacio
-							iterator = titleMap.entrySet().iterator();
-							finded = false;
-							while(!finded && iterator.hasNext()){
-								entry = iterator.next();
-								if(Validator.isNotNull(entry.getValue())){
-									title = entry.getValue();
-									finded = true;
-								}
-							}
-							
-							log.debug("Cargamos el titulo: " + title);
-							titleMap.put(company.getLocale(), title);
-						}
-						course.setTitleMap(titleMap, company.getLocale());
-						assetEntry.setTitleMap(titleMap, company.getLocale());
-						CourseLocalServiceUtil.updateCourse(course);
-					} catch (PortalException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} catch (Exception e){
-						e.printStackTrace();
-					}
-	    			
-	    		}
-	    	}	  
-	    }
-	    
-	    
-	    log.warn("--- SETTING ACCESS PERMISSION TO MODULES ");
-	    List<Module> modules = ModuleLocalServiceUtil.getModules(QueryUtil.ALL_POS, QueryUtil.ALL_POS);
-		for(Module module : modules){
-			try{
-				log.warn("--- MODULE  "+ module.getModuleId());
-			    siteMember = RoleLocalServiceUtil.fetchRole(module.getCompanyId(), RoleConstants.SITE_MEMBER);
-				if(siteMember!=null){
-					ResourcePermissionLocalServiceUtil.setResourcePermissions(module.getCompanyId(), 
-			     			Module.class.getName(),ResourceConstants.SCOPE_INDIVIDUAL, String.valueOf(module.getModuleId()),  siteMember.getRoleId(),  new String[]{"ACCESS","VIEW"});
-				}
-			}catch(Exception e){
-				e.printStackTrace();
-			}
-		}
-		 log.warn("--- END SETTING ACCESS PERMISSION TO MODULES ");
+
 		 
 		 String createScormTables = "CREATE TABLE sco_scormcontent (  uuid_ VARCHAR(75) NULL DEFAULT NULL, "+
 				 					"scormId BIGINT(20) NOT NULL,  companyId BIGINT(20) NULL DEFAULT NULL, "+
@@ -247,6 +167,90 @@ public class UpgradeUtil {
 				CourseLocalServiceUtil.updateCourse(course);
 			}	
 		}
+		
+		log.warn("--- CREATING ACCESS PERMISSION TO MODULE ");
+		
+		List<String> actionIds = new ArrayList<String>();
+		actionIds.add("ACCESS");
+		ResourceActionLocalServiceUtil.checkResourceActions(
+				Module.class.getName(), actionIds);
+		
+
+		
+		log.warn("--- SETTING ACCESS PERMISSION TO COURSE ADMINISTRATION");
+	    List<Company> companys = CompanyLocalServiceUtil.getCompanies();
+	    List<Course> listCourses = null;
+	    String title = null;
+	    Map<Locale, String> titleMap = null;
+	    Iterator<Entry<Locale,String>> iterator = null;
+	    boolean finded = false;
+	    Entry<Locale,String> entry = null;
+	    AssetEntry assetEntry = null;
+	    for(Company company : companys){
+	    	try{
+	    		 Role courseAdministrator = RoleLocalServiceUtil.getRole(company.getCompanyId(), "Administrador de cursos");
+		    	 if(courseAdministrator!=null){
+		    		  ResourcePermissionLocalServiceUtil.setResourcePermissions(company.getCompanyId(), 
+				     			Module.class.getName(),ResourceConstants.SCOPE_COMPANY, String.valueOf(company.getCompanyId()),  courseAdministrator.getRoleId(),  new String[]{"ACCESS","VIEW","DELETE", "ADD_LACT","UPDATE","PERMISSIONS","SOFT_PERMISSIONS"});
+		    	  }
+	    	 }catch(Exception e){
+	    		 log.warn("No hay Administrador de cursos");
+	    	}
+	    	//Ponemos el idioma por defecto a los cursos que no lo tienen
+	    	listCourses = CourseLocalServiceUtil.getCourses(company.getCompanyId());
+	    	if(listCourses != null && listCourses.size() > 0){
+	    		for(Course course: listCourses){
+	    			try {
+	    				assetEntry = AssetEntryLocalServiceUtil.getEntry(Course.class.getName(), course.getCourseId());
+	    				titleMap = course.getTitleMap();
+						log.debug("courseId: " + course.getCourseId());
+						//Si no tienen el idioma por defecto relleno, se lo cargamos
+						log.debug("idioma por defect contenido: " + titleMap.containsKey(company.getLocale()));
+						if(!titleMap.containsKey(company.getLocale()) || Validator.isNull(titleMap.get(company.getLocale()))){
+							//Buscamos idioma que no esté vacio
+							iterator = titleMap.entrySet().iterator();
+							finded = false;
+							while(!finded && iterator.hasNext()){
+								entry = iterator.next();
+								if(Validator.isNotNull(entry.getValue())){
+									title = entry.getValue();
+									finded = true;
+								}
+							}
+							
+							log.debug("Cargamos el titulo: " + title);
+							titleMap.put(company.getLocale(), title);
+						}
+						course.setTitleMap(titleMap, company.getLocale());
+						assetEntry.setTitleMap(titleMap, company.getLocale());
+						CourseLocalServiceUtil.updateCourse(course);
+					} catch (PortalException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (Exception e){
+						e.printStackTrace();
+					}
+	    			
+	    		}
+	    	}	  
+	    }
+	    
+	    
+	    log.warn("--- SETTING ACCESS PERMISSION TO MODULES ");
+	    List<Module> modules = ModuleLocalServiceUtil.getModules(QueryUtil.ALL_POS, QueryUtil.ALL_POS);
+		for(Module module : modules){
+			try{
+				log.warn("--- MODULE  "+ module.getModuleId());
+			    siteMember = RoleLocalServiceUtil.fetchRole(module.getCompanyId(), RoleConstants.SITE_MEMBER);
+				if(siteMember!=null){
+					ResourcePermissionLocalServiceUtil.setResourcePermissions(module.getCompanyId(), 
+			     			Module.class.getName(),ResourceConstants.SCOPE_INDIVIDUAL, String.valueOf(module.getModuleId()),  siteMember.getRoleId(),  new String[]{"ACCESS","VIEW"});
+				}
+			}catch(Exception e){
+				e.printStackTrace();
+			}
+		}
+		 log.warn("--- END SETTING ACCESS PERMISSION TO MODULES ");
 			
 			
 	}

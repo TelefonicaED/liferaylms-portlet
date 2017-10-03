@@ -9,7 +9,6 @@ import javax.portlet.PortletURL;
 
 import com.liferay.lms.model.Course;
 import com.liferay.lms.service.CourseLocalServiceUtil;
-import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.search.BaseIndexer;
@@ -20,6 +19,7 @@ import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.SearchEngineUtil;
 import com.liferay.portal.kernel.search.SearchException;
+import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.search.Summary;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
@@ -178,7 +178,7 @@ public class CourseIndexer extends BaseIndexer {
 		Map<String, Field> values = document.getFields();
 		for (Map.Entry<String, Field> entri : values.entrySet()) {
 			log.debug("Key = " + entri.getKey() + ", Value = " + entri.getValue());
-		}
+		}    
 
 		if(log.isDebugEnabled())log.debug("return Document");
 		return document;
@@ -251,6 +251,42 @@ public class CourseIndexer extends BaseIndexer {
 		int status = GetterUtil.getInteger(searchContext.getAttribute(Field.STATUS), WorkflowConstants.STATUS_APPROVED);
 		if (status != WorkflowConstants.STATUS_ANY) {
 			contextQuery.addRequiredTerm(Field.STATUS, status);
+		}
+	}
+	
+	@Override
+	public void postProcessSearchQuery(
+			BooleanQuery searchQuery, SearchContext searchContext) throws Exception {
+		addSearchLocalizedTerm(searchQuery, searchContext, Field.TITLE, true);
+	}
+	
+	@Override
+	protected void addSearchLocalizedTerm(
+			BooleanQuery searchQuery, SearchContext searchContext, String field,
+			boolean like)
+		throws Exception {
+
+		if (Validator.isNull(field)) {
+			return;
+		}
+
+		String value = String.valueOf(searchContext.getAttribute(field));
+
+		if (Validator.isNull(value)) {
+			value = searchContext.getKeywords();
+		}
+
+		if (Validator.isNull(value)) {
+			return;
+		}
+
+		field = DocumentImpl.getLocalizedName(searchContext.getLocale(), field);
+
+		if (searchContext.isAndSearch()) {
+			searchQuery.addRequiredTerm(field, value, like);
+		}
+		else {
+			searchQuery.addTerm(field, value, like);
 		}
 	}
 }
