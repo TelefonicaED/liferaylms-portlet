@@ -20,6 +20,8 @@ import com.liferay.portal.kernel.cache.ThreadLocalCacheManager;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
@@ -48,6 +50,8 @@ import com.liferay.portlet.PortletURLFactoryUtil;
 import com.liferay.portlet.asset.model.BaseAssetRenderer;
 
 public abstract class LearningActivityBaseAssetRenderer extends BaseAssetRenderer {
+	
+	private static Log log = LogFactoryUtil.getLog(LearningActivityBaseAssetRenderer.class);
 	
 	public static final String ACTION_VIEW = "ACTION_VIEW";
 	public static final String EDIT_DETAILS = "ACTIVITY_EDIT_DETAILS";
@@ -246,6 +250,7 @@ public abstract class LearningActivityBaseAssetRenderer extends BaseAssetRendere
 		portletURL.setParameter("actionEditingDetails", StringPool.FALSE);
 		portletURL.setParameter("actionEditingModule", StringPool.FALSE);
 		portletURL.setParameter("actionCalifications", StringPool.FALSE);
+		portletURL.setParameter("activityStarted", StringPool.TRUE);
 		
 		long userId = PrincipalThreadLocal.getUserId();
 		
@@ -257,6 +262,8 @@ public abstract class LearningActivityBaseAssetRenderer extends BaseAssetRendere
 		}
 		
 		prepareRuntimePortlet(portletURL);
+		
+		log.debug("portletURL::"+portletURL.toString());
 		
 		return portletURL;
 	}
@@ -275,7 +282,7 @@ public abstract class LearningActivityBaseAssetRenderer extends BaseAssetRendere
 		portletURL.setParameter("actionEditingDetails", StringPool.FALSE);
 		portletURL.setParameter("actionEditingModule", StringPool.FALSE);
 		portletURL.setParameter("actionCalifications", StringPool.FALSE);
-		
+		portletURL.setParameter("activityStarted", StringPool.TRUE);		
 		
 		String mvcPath = getMvcPathView(themeDisplay.getUserId(),liferayPortletResponse,liferayPortletRequest.getWindowState());
 		if(Validator.isNotNull(mvcPath)){

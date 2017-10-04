@@ -56,12 +56,12 @@
 		<supported-public-render-parameter>actionEditing</supported-public-render-parameter>	
 		
 		<supported-public-render-parameter>actionEditingActivity</supported-public-render-parameter>	
-		<supported-public-render-parameter>actionEditingModule</supported-public-render-parameter>	
-		
-				
+		<supported-public-render-parameter>actionEditingModule</supported-public-render-parameter>				
 		<supported-public-render-parameter>actionEditingActivity</supported-public-render-parameter>	
 		<supported-public-render-parameter>actionEditingModule</supported-public-render-parameter>
 		<supported-public-render-parameter>actionCalifications</supported-public-render-parameter>
+		<supported-public-render-parameter>activityStarted</supported-public-render-parameter>		
+		
 	</portlet>
 
 	<portlet>
@@ -2238,6 +2238,7 @@
 		<supported-public-render-parameter>actionEditingModule</supported-public-render-parameter>	
 		<supported-public-render-parameter>actionCalifications</supported-public-render-parameter>		
 		<supported-public-render-parameter>typeId</supported-public-render-parameter>
+		<supported-public-render-parameter>activityStarted</supported-public-render-parameter>	
 	</portlet>
 	<portlet>
 		<portlet-name>moduleselector</portlet-name>
@@ -2652,6 +2653,10 @@
 	<public-render-parameter>
 		<identifier>typeId</identifier>
 		<qname xmlns:x="http://www.liferay.com/public-render-parameters">x:typeId</qname>
-	</public-render-parameter>		
+	</public-render-parameter>
+	<public-render-parameter>
+		<identifier>activityStarted</identifier>
+		<qname xmlns:x="http://www.liferay.com/public-render-parameters">x:activityStarted</qname>
+	</public-render-parameter>			
 
 </portlet-app>
