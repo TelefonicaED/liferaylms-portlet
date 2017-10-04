@@ -116,6 +116,49 @@ if(permissionChecker.hasPermission(themeDisplay.getScopeGroupId(),  Course.class
 	<liferay-ui:icon image="copy" message="courseadmin.adminactions.clone" url="<%=cloneURL%>" />	
 	<%}%>
 	
+	<%-- Cerrar Curso --%>
+	<%
+if( permissionChecker.hasPermission(themeDisplay.getScopeGroupId(),  Course.class.getName(),primKey,ActionKeys.UPDATE)&& ! myCourse.isClosed() && showClose)
+{
+%>
+	<liferay-ui:icon image="close" message="close" url="<%= 
+			\"javascript:AUI().use(function(A){ \"+
+			\"   msg = '\" + LanguageUtil.get(pageContext, \"courseadmin.confirm.close\") + \"';\" +
+			\"   if(confirm(msg)) { \" +
+			\"       window.location.href = '\" + closeURL.toString() + \"';\" +
+			\"   } else { \" +
+			\"       return false; \" +
+			\"   } \" +
+			\"}) && undefined\"%>" />
+			
+			
+	<%-- Abrir Curso --%>
+<%
+}else if(permissionChecker.hasPermission(themeDisplay.getScopeGroupId(),  Course.class.getName(),primKey,ActionKeys.UPDATE)&& myCourse.isClosed()){
+%>
+	<portlet:actionURL name="openCourse" var="openURL">
+		<portlet:param name="courseId" value="<%= primKey %>" />
+		<portlet:param name="redirect" value='<%= ParamUtil.getString(request, "redirect", currentURL) %>'/>
+	</portlet:actionURL>
+	<liferay-ui:icon src="<%= themeDisplay.getPathThemeImages() + \"/dock/my_places_private.png\" %>" message="open-course" url="<%=openURL.toString() %>" />
+<%} %>
+<portlet:actionURL name="deleteCourse" var="deleteURL">
+<portlet:param name="courseId" value="<%= primKey %>" />
+</portlet:actionURL>
+
+<%-- Eliminar Curso --%>
+
+
+<%
+if( permissionChecker.hasPermission(themeDisplay.getScopeGroupId(),  Course.class.getName(),primKey,ActionKeys.DELETE)&& ! myCourse.isClosed() && showDelete)
+{
+%>
+<liferay-ui:icon-delete url="<%=deleteURL.toString() %>" />
+<%
+}
+%>
+
+	
 <c:if test="<%= permissionChecker.hasPermission(myCourse.getGroupId(), Course.class.getName(), myCourse.getCourseId(), ActionKeys.PERMISSIONS)&& ! myCourse.isClosed() %>">
 
 	<%-- Permisos --%>

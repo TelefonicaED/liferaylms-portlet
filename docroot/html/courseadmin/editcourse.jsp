@@ -47,6 +47,7 @@
 <liferay-ui:error key="duplicate-course" message="duplicate-course" />
 <liferay-ui:error key="courseadmin.new.error.dateinterval" message="courseadmin.new.error.dateinterval" />
 <liferay-ui:error key="courseadmin.error.welcmessage.maxlenght" message="courseadmin.error.welcmessage.maxlenght" />
+<liferay-ui:error key="friendly-url-error" message="courseadmin.error.friendly-url" />
 
 <%
 String calificationTypeExtraContentError = ParamUtil.getString(request, "calificationTypeExtraContentError");
@@ -262,7 +263,7 @@ if(course!=null){
 }
 %>
 
-<c:if test="<%=course != null %>">
+<c:if test="<%=course != null && course.getParentCourseId()<=0%>">
 	<div class="aui-tab-back">
 		<liferay-ui:icon-menu>
 			<%-- Ir al curso --%>
@@ -365,14 +366,17 @@ if(course!=null){
 		 </label> 
 		 <span class="aui-field-element " > 
 		  <liferay-ui:input-localized 
-		   cssClass="<%=renderResponse.getNamespace()+\"localized lfr-input-text\"%>" 
-		   name="title"
-		   defaultLanguageId="<%=LanguageUtil.getLanguageId(LocaleUtil.getDefault()) %>"
-		   xml="<%=courseTitle %>"
-		   maxLength="<%=maxLengthTitle %>"/>
+			   cssClass="<%=renderResponse.getNamespace()+\"localized lfr-input-text\"%>" 
+			   name="title"
+			   defaultLanguageId="<%=LanguageUtil.getLanguageId(LocaleUtil.getDefault()) %>"
+			   xml="<%=courseTitle %>"
+			   maxLength="<%=maxLengthTitle %>"/>
 		 </span> 
 	</span>
-	<aui:input name="friendlyURL" label="FriendlyURL" type="hidden" > <%=groupCreated!=null?groupCreated.getFriendlyURL():"" %> </aui:input>
+	
+	<c:if test="<%=groupCreated!=null%>">
+		<aui:input name="friendlyURL" label="courseadmin.friendly-url" value="<%=groupCreated.getFriendlyURL()%>" />
+	</c:if>
 	
 	<c:if test="${renderRequest.preferences.getValue('showDescription', 'true') }">		
 		<aui:field-wrapper label="description" name="description">

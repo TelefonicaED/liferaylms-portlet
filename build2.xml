@@ -20,7 +20,7 @@
 	</if>
  	
   <zip basedir="${docroot.dir}" destfile="${plugin.file}"
- 		excludes="**/*.java,WEB-INF/service/**,WEB-INF/service-classes/**,WEB-INF/src/**,WEB-INF/docs/**,WEB-INF/lib/liferaylms-portlet-service.jar"/>
+ 		excludes="**/*.java,WEB-INF/service/**,WEB-INF/service-classes/**,WEB-INF/docs/**,WEB-INF/lib/liferaylms-portlet-service.jar"/>
  		<copy file="${docroot.dir}/WEB-INF/lib/${plugin.name}-service.jar" todir="${project.dir}/dist" overwrite="true" />	
  </target>
  

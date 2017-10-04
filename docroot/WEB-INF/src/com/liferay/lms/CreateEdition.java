@@ -6,20 +6,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
-import org.apache.axiom.om.util.CopyUtils;
-
 import com.liferay.counter.service.CounterLocalServiceUtil;
 import com.liferay.lms.learningactivity.LearningActivityTypeRegistry;
 import com.liferay.lms.model.Course;
 import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.model.Module;
-import com.liferay.lms.model.TestAnswer;
-import com.liferay.lms.model.TestQuestion;
 import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityLocalServiceUtil;
 import com.liferay.lms.service.ModuleLocalServiceUtil;
-import com.liferay.lms.service.TestAnswerLocalServiceUtil;
-import com.liferay.lms.service.TestQuestionLocalServiceUtil;
 import com.liferay.portal.DuplicateGroupException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
@@ -49,7 +43,7 @@ import com.liferay.portlet.asset.model.AssetEntry;
 import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
 import com.liferay.util.CourseCopyUtil;
 
-public class CreateEdition implements MessageListener {
+public class CreateEdition extends CourseCopyUtil implements MessageListener {
 	private static Log log = LogFactoryUtil.getLog(CreateEdition.class);
 
 	public static String DOCUMENTLIBRARY_MAINFOLDER = "ResourceUploads";
@@ -61,7 +55,6 @@ public class CreateEdition implements MessageListener {
 	private boolean isLinked;
 	private long parentCourseId;
 	
-	private String cloneTraceStr = "--------------- Creating edition trace ----------------"; 
 	public CreateEdition(long groupId, String newEditionName, ThemeDisplay themeDisplay, Date startDate, Date endDate, long parentCourseId, ServiceContext serviceContext) {
 		super();
 		this.newEditionName = newEditionName;
@@ -101,7 +94,7 @@ public class CreateEdition implements MessageListener {
 		
 			doCreateEdition();
 			
-			log.debug("Clone Stack Trace: "+cloneTraceStr);
+			
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -109,31 +102,38 @@ public class CreateEdition implements MessageListener {
 	}
 	
 	public void doCreateEdition() throws Exception {
-		cloneTraceStr += " Course to create edition\n........................." + parentCourseId;
-		cloneTraceStr += " New edition name\n........................." + newEditionName;
+		
 		Course course = CourseLocalServiceUtil.fetchCourse(parentCourseId);
 	
 		Group group = GroupLocalServiceUtil.getGroup(course.getGroupCreatedId());
-		log.debug("  + Parent course: "+course.getTitle(themeDisplay.getLocale()));
-		log.debug(" New edition name\n........................." + newEditionName);
-		cloneTraceStr += " Parent course:" + course.getTitle(themeDisplay.getLocale()); 
+		
+		if(log.isDebugEnabled()){
+			log.debug(" Course to create edition\n........................." + parentCourseId);
+			log.debug(" New edition name\n........................." + newEditionName);
+			log.debug("  + Parent course: "+course.getTitle(themeDisplay.getLocale()));
+		 
+		}
+		
 		
 		Date today=new Date(System.currentTimeMillis());
 
 		
 		//Plantilla
 		long layoutSetPrototypeId = group.getPublicLayoutSet().getLayoutSetPrototypeId();
-		log.debug("  + layoutSetPrototypeId: "+layoutSetPrototypeId);
-		cloneTraceStr += " layoutSetPrototypeId:" + layoutSetPrototypeId;
+		if(log.isDebugEnabled()){
+			log.debug("  + layoutSetPrototypeId: "+layoutSetPrototypeId);
+		}
+		
 	
 		
 		//Tags y categorias
 		try{
 			serviceContext.setAssetCategoryIds(AssetEntryLocalServiceUtil.getEntry(Course.class.getName(), course.getCourseId()).getCategoryIds());
-			log.debug("  + AssetCategoryIds: "+AssetEntryLocalServiceUtil.getEntry(Course.class.getName(), course.getCourseId()).getCategoryIds().toString());
+			if(log.isDebugEnabled()){
+				log.debug("  + AssetCategoryIds: "+AssetEntryLocalServiceUtil.getEntry(Course.class.getName(), course.getCourseId()).getCategoryIds().toString());
+			}
 		}catch(Exception e){
 			serviceContext.setAssetCategoryIds(new long[]{});
-			
 		}
 		//Tipo del grupo
 		int typeSite = group.getType();
@@ -141,8 +141,7 @@ public class CreateEdition implements MessageListener {
 		
 		//Creamos el nuevo curso para la edición 
 		Course newCourse = null;  
-		String summary = "";
-		
+		String summary = null;
 		
 		try{
 			summary = AssetEntryLocalServiceUtil.getEntry(Course.class.getName(),course.getCourseId()).getSummary(themeDisplay.getLocale());
@@ -190,11 +189,10 @@ public class CreateEdition implements MessageListener {
 		}
 		newCourse.setUserId(themeDisplay.getUserId());
 
-		log.debug("-----------------------\n  Creating edition from: "+  group.getName());
-		log.debug("  + editionName : "+  newCourse.getTitle(Locale.getDefault()) +", GroupCreatedId: "+newCourse.getGroupCreatedId()+", GroupId: "+newCourse.getGroupId());
-		cloneTraceStr += "\n New edition\n.........................";
-		cloneTraceStr += " Edition: "+  newCourse.getTitle(Locale.getDefault()) +"\n GroupCreatedId: "+newCourse.getGroupCreatedId()+"\n GroupId: "+newCourse.getGroupId();
-		cloneTraceStr += "\n.........................";
+		if(log.isDebugEnabled()){
+			log.debug("-----------------------\n  Creating edition from: "+  group.getName());
+			log.debug("  + editionName : "+  newCourse.getTitle(Locale.getDefault()) +", GroupCreatedId: "+newCourse.getGroupCreatedId()+", GroupId: "+newCourse.getGroupId());
+		}
 		
 		/*********************************************************/
 		
@@ -207,12 +205,18 @@ public class CreateEdition implements MessageListener {
 	private void createModulesAndActivities(Course newCourse, Role siteMemberRole, long groupId) throws SystemException{
 		
 		LearningActivityTypeRegistry learningActivityTypeRegistry = new LearningActivityTypeRegistry();
-		List<Module> modules;
-		modules = ModuleLocalServiceUtil.findAllInGroup(groupId);
+		List<Module> modules = ModuleLocalServiceUtil.findAllInGroup(groupId);
 		
 		HashMap<Long,Long> correlationModules = new HashMap<Long, Long>();
 		HashMap<Long,Long> modulesDependencesList = new  HashMap<Long, Long>();
-		Module newModule;
+		Module newModule=null;
+		HashMap<Long, Long> pending = new HashMap<Long, Long>();
+		HashMap<Long,Long> correlationActivities = new HashMap<Long, Long>();
+		List<LearningActivity> activities =  new ArrayList<LearningActivity>();
+		LearningActivity newLearnActivity=null;
+		LearningActivity nuevaLarn = null;
+		List<Long> evaluations = new ArrayList<Long>(); 
+		
 		for(Module module:modules){
 			
 			try {
@@ -233,13 +237,15 @@ public class CreateEdition implements MessageListener {
 				newModule.setIcon(module.getIcon());
 				newModule.setStartDate(startDate);
 				newModule.setEndDate(endDate);
-				newModule.setDescription(CourseCopyUtil.descriptionFilesClone(module.getDescription(),newCourse.getGroupCreatedId(), newModule.getModuleId(),themeDisplay.getUserId()));
+				newModule.setDescription(descriptionFilesClone(module.getDescription(),newCourse.getGroupCreatedId(), newModule.getModuleId(),themeDisplay.getUserId()));
 				ModuleLocalServiceUtil.addModule(newModule);
+				if(log.isDebugEnabled()){
+					log.debug("\n    Module : " + module.getTitle(Locale.getDefault()) +"("+module.getModuleId()+")");
+					log.debug("    + Module : " + newModule.getTitle(Locale.getDefault()) +"("+newModule.getModuleId()+")" );
+				}
 				
-				log.debug("\n    Module : " + module.getTitle(Locale.getDefault()) +"("+module.getModuleId()+")");
-				log.debug("    + Module : " + newModule.getTitle(Locale.getDefault()) +"("+newModule.getModuleId()+")" );
-				cloneTraceStr += "  Module: " + newModule.getTitle(Locale.getDefault()) +"("+newModule.getModuleId()+")";
-				createLearningActivities(module, newModule, siteMemberRole,learningActivityTypeRegistry);	
+				createLearningActivities(module, newModule, siteMemberRole, learningActivityTypeRegistry, pending, correlationActivities, activities, newLearnActivity, nuevaLarn, evaluations);
+				
 				
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -251,9 +257,9 @@ public class CreateEdition implements MessageListener {
 		
 		//Dependencias de modulos
 		log.debug("modulesDependencesList "+modulesDependencesList.keySet());
-		Long moduleToBePrecededNew;
-		Long modulePredecesorIdOld;
-		Long modulePredecesorIdNew;
+		Long moduleToBePrecededNew = null;
+		Long modulePredecesorIdOld = null;
+		Long modulePredecesorIdNew = null;
 		for(Long id : modulesDependencesList.keySet()){
 			//id del modulo actual
 			moduleToBePrecededNew = correlationModules.get(id);
@@ -268,14 +274,11 @@ public class CreateEdition implements MessageListener {
 	}
 	
 	
-	private void createLearningActivities(Module parentModule, Module newModule, Role siteMemberRole, LearningActivityTypeRegistry learningActivityTypeRegistry) throws SystemException, PortalException{
-		HashMap<Long, Long> pending = new HashMap<Long, Long>();
-		HashMap<Long,Long> correlationActivities = new HashMap<Long, Long>();
-		List<LearningActivity> activities = LearningActivityLocalServiceUtil.getLearningActivitiesOfModule(parentModule.getModuleId());
-		LearningActivity newLearnActivity=null;
-		LearningActivity nuevaLarn = null;
+	private void createLearningActivities(Module parentModule, Module newModule, Role siteMemberRole, LearningActivityTypeRegistry learningActivityTypeRegistry,
+			HashMap<Long, Long> pending, HashMap<Long,Long> correlationActivities, List<LearningActivity> activities, LearningActivity newLearnActivity, LearningActivity nuevaLarn, List<Long> evaluations) throws SystemException, PortalException{
+		
 		boolean canBeLinked = false;
-		List<Long> evaluations = new ArrayList<Long>(); 
+		activities = LearningActivityLocalServiceUtil.getLearningActivitiesOfModule(parentModule.getModuleId());
 		for(LearningActivity activity:activities){
 			try {
 				
@@ -309,7 +312,7 @@ public class CreateEdition implements MessageListener {
 					newLearnActivity.setDescription(activity.getDescription());
 					newLearnActivity.setTries(activity.getTries());
 					newLearnActivity.setPasspuntuation(activity.getPasspuntuation());
-					newLearnActivity.setDescription(CourseCopyUtil.descriptionFilesClone(activity.getDescription(),newModule.getGroupId(), newLearnActivity.getActId(),themeDisplay.getUserId()));
+					newLearnActivity.setDescription(descriptionFilesClone(activity.getDescription(),newModule.getGroupId(), newLearnActivity.getActId(),themeDisplay.getUserId()));
 				//}
 				
 				
@@ -319,10 +322,10 @@ public class CreateEdition implements MessageListener {
 				
 				log.debug("Learning Activity : " + activity.getTitle(Locale.getDefault())+ " ("+activity.getActId()+", " + LanguageUtil.get(Locale.getDefault(),learningActivityTypeRegistry.getLearningActivityType(activity.getTypeId()).getName())+")");
 				log.debug("+Learning Activity : " + nuevaLarn.getTitle(Locale.getDefault())+ " ("+nuevaLarn.getActId()+", " + LanguageUtil.get(Locale.getDefault(),learningActivityTypeRegistry.getLearningActivityType(nuevaLarn.getTypeId()).getName())+") Can Be Linked: "+canBeLinked);
-				cloneTraceStr += "   Learning Activity: " + nuevaLarn.getTitle(Locale.getDefault())+ " ("+nuevaLarn.getActId()+", " + LanguageUtil.get(Locale.getDefault(),learningActivityTypeRegistry.getLearningActivityType(nuevaLarn.getTypeId()).getName())+") Can Be Linked: "+canBeLinked;
+				
 				
 
-				CourseCopyUtil.cloneActivityFile(activity, nuevaLarn, themeDisplay.getUserId(), serviceContext);
+				cloneActivityFile(activity, nuevaLarn, themeDisplay.getUserId(), serviceContext);
 				
 				
 				long actId = nuevaLarn.getActId();
@@ -351,7 +354,7 @@ public class CreateEdition implements MessageListener {
 			
 			//TODO Descomentar cuando esté implementado las actividades linkadas.
 			//if(!canBeLinked){
-			cloneTraceStr += CourseCopyUtil.createTestQuestionsAndAnswers(activity, nuevaLarn, newModule, themeDisplay.getUserId(), cloneTraceStr);
+			createTestQuestionsAndAnswers(activity, nuevaLarn, newModule, themeDisplay.getUserId());
 		
 		
 		
@@ -381,6 +384,6 @@ public class CreateEdition implements MessageListener {
 		}
 		
 		//Extra Content de las evaluaciones
-		CourseCopyUtil.copyEvaluationExtraContent(evaluations, correlationActivities);
+		copyEvaluationExtraContent(evaluations, correlationActivities);
 	}	
 }

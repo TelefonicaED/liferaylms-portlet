@@ -265,8 +265,8 @@ public class CourseImpl extends CourseBaseImpl {
 		log.debug("CourseImpl::isLocked::hasPermissionAccess:" + true);
 
 		//Comprobamos si estás en alguna convocatoria y que esté abierta
-		Date startDate = null;
-		Date endDate = null;
+		Date startDate = this.getExecutionStartDate();
+		Date endDate = this.getExecutionEndDate();
 		List<Team> teams = null;
 		try {
 			teams = TeamLocalServiceUtil.getUserTeams(user.getUserId(), this.getGroupCreatedId());
@@ -296,7 +296,7 @@ public class CourseImpl extends CourseBaseImpl {
 		
 		Date now = new Date();
 		
-		if(Validator.isNotNull(startDate) && Validator.isNotNull(endDate) && (startDate.after(now) || endDate.before(endDate))){
+		if(Validator.isNotNull(startDate) && Validator.isNotNull(endDate) && (startDate.after(now) || endDate.before(now))){
 			log.debug("CourseImpl::isLocked::teams::dates:" + false);
 			return true;
 		}

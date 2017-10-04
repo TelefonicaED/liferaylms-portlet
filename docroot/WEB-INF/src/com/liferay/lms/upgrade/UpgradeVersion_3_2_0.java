@@ -4,9 +4,9 @@ package com.liferay.lms.upgrade;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.util.UpgradeUtil;
 
-public class UpgradeVersion extends UpgradeProcess {
+public class UpgradeVersion_3_2_0 extends UpgradeProcess {
 	public int getThreshold() {
-		return 232;
+		return 320;
 	}
 
 	protected void doUpgrade() throws Exception {

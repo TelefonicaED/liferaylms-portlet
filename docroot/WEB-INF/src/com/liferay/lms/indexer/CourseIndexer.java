@@ -2,7 +2,6 @@ package com.liferay.lms.indexer;
 
 import java.text.Normalizer;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
 
@@ -20,6 +19,7 @@ import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.SearchEngineUtil;
 import com.liferay.portal.kernel.search.SearchException;
+import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.search.Summary;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
@@ -52,7 +52,7 @@ public class CourseIndexer extends BaseIndexer {
 	
 	@Override
 	public boolean isPermissionAware() {
-		return true;
+		return true; 
 	}
 
 
@@ -108,7 +108,11 @@ public class CourseIndexer extends BaseIndexer {
 		long userId = entry.getUserId();
 		String userName = UserLocalServiceUtil.getUser(userId).getFullName();
 		long entryId = entry.getCourseId();
-		String title = entry.getTitle();
+		Map<Locale, String> titleMap = entry.getTitleMap();
+		Date startDate = entry.getStartDate();
+		Date endDate = entry.getEndDate();
+		Date executionStartDate = entry.getExecutionStartDate();
+		Date executionEndDate = entry.getExecutionEndDate();
 		
 		AssetEntry assetEntry= null;
 		try{
@@ -133,7 +137,7 @@ public class CourseIndexer extends BaseIndexer {
 		if(assetEntry!=null){
 			displayDate = assetEntry.getPublishDate();
 		}		
-
+		
 		long[] assetCategoryIds = AssetCategoryLocalServiceUtil.getCategoryIds(Course.class.getName(), entryId);
 		String[] assetTagNames = AssetTagLocalServiceUtil.getTagNames(Course.class.getName(), entryId);
 		ExpandoBridge expandoBridge = entry.getExpandoBridge();
@@ -142,6 +146,10 @@ public class CourseIndexer extends BaseIndexer {
 
 		document.addUID(PORTLET_ID, entryId);
 		document.addDate(Field.MODIFIED_DATE, displayDate);
+		document.addDate("startDate", startDate);
+		document.addDate("endDate", endDate);
+		document.addDate("executionStartDate", executionStartDate);
+		document.addDate("executionEndDate", executionEndDate);
 		document.addKeyword(Field.COMPANY_ID, companyId);
 		document.addKeyword(Field.PORTLET_ID, PORTLET_ID);
 		document.addKeyword(Field.GROUP_ID, groupId);
@@ -150,8 +158,7 @@ public class CourseIndexer extends BaseIndexer {
 		document.addText("groupName",dependentGroup.getName());
 		document.addKeyword(Field.USER_ID, userId);
 		document.addText(Field.USER_NAME, userName);
-
-		document.addText(Field.TITLE, title);
+		document.addLocalizedText(Field.TITLE, titleMap);
 		document.addText(Field.CONTENT, content);
 		document.addKeyword(Field.ASSET_CATEGORY_IDS, assetCategoryIds);
 		document.addKeyword(Field.ASSET_TAG_NAMES, assetTagNames);
@@ -171,7 +178,7 @@ public class CourseIndexer extends BaseIndexer {
 		Map<String, Field> values = document.getFields();
 		for (Map.Entry<String, Field> entri : values.entrySet()) {
 			log.debug("Key = " + entri.getKey() + ", Value = " + entri.getValue());
-		}
+		}    
 
 		if(log.isDebugEnabled())log.debug("return Document");
 		return document;
@@ -244,6 +251,42 @@ public class CourseIndexer extends BaseIndexer {
 		int status = GetterUtil.getInteger(searchContext.getAttribute(Field.STATUS), WorkflowConstants.STATUS_APPROVED);
 		if (status != WorkflowConstants.STATUS_ANY) {
 			contextQuery.addRequiredTerm(Field.STATUS, status);
+		}
+	}
+	
+	@Override
+	public void postProcessSearchQuery(
+			BooleanQuery searchQuery, SearchContext searchContext) throws Exception {
+		addSearchLocalizedTerm(searchQuery, searchContext, Field.TITLE, true);
+	}
+	
+	@Override
+	protected void addSearchLocalizedTerm(
+			BooleanQuery searchQuery, SearchContext searchContext, String field,
+			boolean like)
+		throws Exception {
+
+		if (Validator.isNull(field)) {
+			return;
+		}
+
+		String value = String.valueOf(searchContext.getAttribute(field));
+
+		if (Validator.isNull(value)) {
+			value = searchContext.getKeywords();
+		}
+
+		if (Validator.isNull(value)) {
+			return;
+		}
+
+		field = DocumentImpl.getLocalizedName(searchContext.getLocale(), field);
+
+		if (searchContext.isAndSearch()) {
+			searchQuery.addRequiredTerm(field, value, like);
+		}
+		else {
+			searchQuery.addTerm(field, value, like);
 		}
 	}
 }

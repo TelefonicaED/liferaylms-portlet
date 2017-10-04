@@ -22,6 +22,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import com.liferay.counter.service.CounterLocalServiceUtil;
 import com.liferay.lms.auditing.AuditConstants;
@@ -70,6 +71,7 @@ import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.FriendlyURLNormalizerUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
 import com.liferay.portal.kernel.util.PropsUtil;
@@ -94,6 +96,7 @@ import com.liferay.portal.service.ClassNameLocalServiceUtil;
 import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.LayoutSetPrototypeLocalServiceUtil;
 import com.liferay.portal.service.MembershipRequestLocalServiceUtil;
+import com.liferay.portal.service.ResourcePermissionLocalServiceUtil;
 import com.liferay.portal.service.RoleLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceContextThreadLocal;
@@ -268,11 +271,41 @@ public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int e
 
 
 	public Course addCourse (String title, String description,String summary,String friendlyURL, Locale locale,
-			java.util.Date createDate,java.util.Date startDate,java.util.Date endDate,long layoutSetPrototypeId,int typesite, long CourseEvalId, long calificationType, int maxUsers,ServiceContext serviceContext,boolean isfromClone)
+		java.util.Date createDate,java.util.Date startDate,java.util.Date endDate,long layoutSetPrototypeId,int typesite, long CourseEvalId, long calificationType, int maxUsers,ServiceContext serviceContext,boolean isfromClone)
+		throws SystemException, PortalException {
+		
+		Course course = addCourse (title, description,summary,friendlyURL, locale,
+				createDate,startDate,endDate,null,null,layoutSetPrototypeId,typesite, CourseEvalId, calificationType, maxUsers,
+				 serviceContext, isfromClone);
+
+		
+		return course;
+	}
+	
+	public Course addCourse (String title, String description,String summary,String friendlyURL, Locale locale,
+			Date createDate,Date startDate,Date endDate, Date executionStartDate, Date executionEndDate, long layoutSetPrototypeId,int typesite, long CourseEvalId, long calificationType, int maxUsers,ServiceContext serviceContext,boolean isfromClone)
+			throws SystemException, PortalException {
+		Map<Locale, String> titleMap = new HashMap<Locale, String>();
+		titleMap.put(locale, title);
+		return addCourse(titleMap, description, summary, friendlyURL, locale, createDate, startDate, endDate, executionStartDate, executionEndDate, 
+						layoutSetPrototypeId, typesite, CourseEvalId, calificationType, maxUsers, serviceContext, isfromClone);
+	}
+
+	public Course addCourse (Map<Locale,String> titleMap, String description,String summary,String friendlyURL, Locale locale,
+			Date createDate,Date startDate,Date endDate, Date executionStartDate, Date executionEndDate, long layoutSetPrototypeId,int typesite, long CourseEvalId, long calificationType, int maxUsers,ServiceContext serviceContext,boolean isfromClone)
 			throws SystemException, PortalException {
 		LmsPrefs lmsPrefs=lmsPrefsLocalService.getLmsPrefsIni(serviceContext.getCompanyId());
 		long userId=serviceContext.getUserId();
 		Course course = coursePersistence.create(counterLocalService.increment(Course.class.getName()));
+		String title = null;
+		if(titleMap.containsKey(locale)){
+			title = titleMap.get(locale);
+		}else{
+			//Cogemos el primero
+			Entry<Locale, String> entry = titleMap.entrySet().iterator().next();
+			title = entry.getValue();
+		}
+		
 		try{
 			
 			//Se asegura que la longitud de friendlyURL no supere el maximo
@@ -305,18 +338,19 @@ public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int e
 			}
 			
 			friendlyURL = StringPool.SLASH+friendlyURL.replaceAll("[^a-zA-Z0-9_-]+", "");
-
 			course.setCompanyId(serviceContext.getCompanyId());
 			course.setGroupId(serviceContext.getScopeGroupId());
 			course.setUserId(userId);
 			course.setUserName(userLocalService.getUser(userId).getFullName());
 			course.setFriendlyURL(friendlyURL);
-			course.setDescription(description,locale);
-			course.setTitle(title,locale);
+			course.setDescription(description,locale, locale);
+			course.setTitleMap(titleMap);
 			course.setCreateDate(createDate);
 			course.setModifiedDate(createDate);
 			course.setStartDate(startDate);
 			course.setEndDate(endDate);
+			course.setExecutionStartDate(executionStartDate);
+			course.setExecutionEndDate(executionEndDate);
 			course.setStatus(WorkflowConstants.STATUS_APPROVED);
 			course.setExpandoBridgeAttributes(serviceContext);
 			course.setCourseEvalId(CourseEvalId);
@@ -336,13 +370,13 @@ public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int e
 			resourceLocalService.addResources(serviceContext.getCompanyId(), serviceContext.getScopeGroupId(), userId,Course.class.getName(), course.getPrimaryKey(), false,true, true);
 			AssetEntry assetEntry=assetEntryLocalService.updateEntry(userId, course.getGroupId(), Course.class.getName(),
 					course.getCourseId(), course.getUuid(),0, serviceContext.getAssetCategoryIds(),
-					serviceContext.getAssetTagNames(), true, null, null,new java.util.Date(System.currentTimeMillis()), null,
+					serviceContext.getAssetTagNames(), true, executionStartDate, executionEndDate,new java.util.Date(System.currentTimeMillis()), null,
 					ContentTypes.TEXT_HTML, course.getTitle(), course.getDescription(locale), summary, null, null, 0, 0,null, false);
 			assetLinkLocalService.updateLinks(
 					userId, assetEntry.getEntryId(), serviceContext.getAssetLinkEntryIds(),
 					AssetLinkConstants.TYPE_RELATED);
 			
-			//A�adimos el rol Teacher al usuario que crea el blog
+			//Añadimos el rol Teacher al usuario que crea el blog
 			long[] usuarios = new long[]{userId};
 			boolean teacherRoleToCreator = GetterUtil.getBoolean(PropsUtil.get("lms.course.add.teacherRoleToCreator"));
 			boolean editorRoleToCreator = GetterUtil.getBoolean(PropsUtil.get("lms.course.add.editorRoleToCreator"));
@@ -421,13 +455,34 @@ public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int e
 				newModule.setGroupId(course.getGroupCreatedId());
 				newModule.setUserId(course.getUserId());
 				newModule.setOrdern(newModule.getModuleId());				
-				newModule.setStartDate(startDate);
-				newModule.setEndDate(endDate);
+				newModule.setStartDate(executionStartDate);
+				newModule.setEndDate(executionEndDate);
 				
 				
 				ModuleLocalServiceUtil.addModule(newModule);
 				
+				
+				 try {
+				    	Role siteMember = RoleLocalServiceUtil.fetchRole(newModule.getCompanyId(), RoleConstants.SITE_MEMBER);
+				    	ResourcePermissionLocalServiceUtil.setResourcePermissions(newModule.getCompanyId(), 
+				    			Module.class.getName(),ResourceConstants.SCOPE_INDIVIDUAL, String.valueOf(newModule.getModuleId()),  siteMember.getRoleId(),  new String[]{"VIEW","ACCESS"});
+				   
+				    	
+				    	
+				    	
+				    	
+						resourceLocalService.addResources(
+								newModule.getCompanyId(), newModule.getGroupId(), newModule.getUserId(),
+						Module.class.getName(), newModule.getPrimaryKey(), false,
+						true, true);
+					} catch (PortalException e) {
+						if(log.isDebugEnabled())e.printStackTrace();
+						if(log.isInfoEnabled())log.info(e.getMessage());
+						throw new SystemException(e);
+					}
+				
 				log.debug("    + Module : " + newModule.getTitle(Locale.getDefault()) +"("+newModule.getModuleId()+")" );
+				ModuleLocalServiceUtil.updateModule(newModule);
 				
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -1430,8 +1485,10 @@ public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int e
 				result="error-not-valid-user";
 			}
 		}catch (PortalException e){
+			result = e.getMessage();
 			e.printStackTrace();
 		}catch (SystemException e){
+			result = e.getMessage();
 			e.printStackTrace();
 		}
 		return result;

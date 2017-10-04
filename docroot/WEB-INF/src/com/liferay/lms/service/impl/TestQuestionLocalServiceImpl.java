@@ -15,18 +15,18 @@
 package com.liferay.lms.service.impl;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import com.liferay.lms.auditing.AuditConstants;
 import com.liferay.lms.auditing.AuditingLogFactory;
 import com.liferay.lms.learningactivity.questiontype.QuestionType;
 import com.liferay.lms.learningactivity.questiontype.QuestionTypeRegistry;
+import com.liferay.lms.learningactivity.testquestion.GenerateQuestionRegistry;
 import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.model.TestQuestion;
+import com.liferay.lms.model.impl.TestQuestionImpl;
 import com.liferay.lms.service.ClpSerializer;
 import com.liferay.lms.service.LearningActivityLocalServiceUtil;
-import com.liferay.lms.service.TestQuestionLocalServiceUtil;
 import com.liferay.lms.service.base.TestQuestionLocalServiceBaseImpl;
 import com.liferay.portal.kernel.bean.PortletBeanLocatorUtil;
 import com.liferay.portal.kernel.dao.orm.Criterion;
@@ -37,21 +37,14 @@ import com.liferay.portal.kernel.dao.orm.OrderFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.Validator;
-
+import com.liferay.portal.kernel.json.JSONArray;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
+import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.DocumentException;
 import com.liferay.portal.kernel.xml.Element;
-import com.liferay.portlet.asset.model.AssetEntry;
-import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
-import com.liferay.portlet.asset.service.persistence.AssetEntryQuery;
 
 /**
  * The implementation of the test question local service.
@@ -332,46 +325,28 @@ public class TestQuestionLocalServiceImpl extends TestQuestionLocalServiceBaseIm
 	public List<TestQuestion> generateAleatoryQuestions(long actId, long typeId)
 			throws SystemException {
 		
-		boolean isMultiple = StringPool.TRUE.equals(LearningActivityLocalServiceUtil.getExtraContentValue(actId,"isMultiple"));
-		long[] assetCategoryIds = GetterUtil.getLongValues(StringUtil.split(LearningActivityLocalServiceUtil.getExtraContentValue(actId,"categoriesId")));
-		long[] classTypeIds = new long[]{typeId};
-		int maxQuestions = GetterUtil.getInteger(LearningActivityLocalServiceUtil.getExtraContentValue(actId,"random"), 0);
-		
-		AssetEntryQuery entryQuery = new AssetEntryQuery();
-		entryQuery.getAllCategoryIds();
-		List<AssetEntry> banks= new ArrayList<AssetEntry>();
 		List<TestQuestion> questions = new ArrayList<TestQuestion>();
-		List<TestQuestion> sortQuestions = new ArrayList<TestQuestion>();
-		
-		if(!Validator.equals(assetCategoryIds.length, 0)){
-			
-			entryQuery.setAllCategoryIds(assetCategoryIds);
-			entryQuery.setClassTypeIds(classTypeIds);
-			entryQuery.setVisible(true);
-			banks.addAll(AssetEntryLocalServiceUtil.getEntries(entryQuery));
-
-			if(!Validator.equals(banks.size(), 0)){
-				if (isMultiple){
-					for (AssetEntry bank : banks){
-						questions.addAll(TestQuestionLocalServiceUtil.getQuestions(bank.getClassPK()));
-						Collections.shuffle(questions);
-					}
-				}else{
-					Collections.shuffle(banks);
-					questions = TestQuestionLocalServiceUtil.getQuestions(banks.get(0).getClassPK());
-				}
-				
-				List<TestQuestion> questionsCopy = new ArrayList<TestQuestion>(questions);
-				while ( ( maxQuestions > sortQuestions.size() && questionsCopy.size() > 0) || ( maxQuestions == 0 && questionsCopy.size() > 0 ) ) {
-					sortQuestions.add(questionsCopy.get(0));
-					questionsCopy.remove(0);
-				}
-				
-				return sortQuestions;
+		try{
+			GenerateQuestionRegistry generateQuestionRegistry = new GenerateQuestionRegistry();
+			JSONArray json = JSONFactoryUtil.createJSONArray(generateQuestionRegistry.generateAleatoryQuestions(actId, typeId));
+			for (int i = 0; i < json.length(); i++) {
+				JSONObject o = json.getJSONObject(i);
+				TestQuestion t = new TestQuestionImpl();
+				t.setActId(o.getLong("actId"));
+				t.setExtracontent(o.getString("extracontent"));
+				t.setPenalize(o.getBoolean("penalize"));
+				t.setQuestionId(o.getLong("questionId"));
+				t.setQuestionType(o.getLong("questionType"));
+				t.setText(o.getString("text"));
+				t.setUuid(o.getString("uuid"));
+				t.setWeight(o.getLong("weight"));
+				questions.add(t);
 			}
+		} catch (Exception e){
+			e.printStackTrace();
+			return questions;
 		}
-		
-		return sortQuestions;
+		return questions;
 	}
 	
 	
