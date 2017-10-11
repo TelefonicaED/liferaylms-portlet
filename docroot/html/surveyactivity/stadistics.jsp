@@ -31,13 +31,21 @@
 		renderRequest.setAttribute( WebKeys.PORTLET_CONFIGURATOR_VISIBILITY, Boolean.FALSE);
 	} 
 	else
-	{
-		
+	{	
 		String uuid = ParamUtil.getString(renderRequest, "UUID",null);
 		
 		long actId = ParamUtil.getLong(request, "actId",0);
 		LearningActivity learningActivity = LearningActivityLocalServiceUtil.getLearningActivity(actId);
 	%>
+		<portlet:renderURL var="backURL">
+			<portlet:param name="jspPage" value="/html/surveyactivity/view.jsp"></portlet:param>
+		</portlet:renderURL>
+		<liferay-ui:header
+					backURL="${backURL }"
+					localizeTitle="<%= false %>"
+					title=""
+				/>
+				
 		<liferay-portlet:resourceURL var="stadisticsReportURL" >
 			<portlet:param name="action" value="stadisticsReport"/>
 			<portlet:param name="resId" value="<%=Long.toString(learningActivity.getActId()) %>"/>
@@ -83,9 +91,7 @@
 			<div  class="questiontext"><span class="participation color_tercero"><liferay-ui:message key="surveyactivity.stadistics.participation-rate" /><%= percent %>%</span></div>	
 			
 			
-			<portlet:renderURL var="backToQuestionsURL">
-				<portlet:param name="jspPage" value="/html/surveyactivity/view.jsp"></portlet:param>
-			</portlet:renderURL>
+			
 		
 			<% 
 			for(TestQuestion question:questions){
@@ -105,7 +111,12 @@
 						texto = textoAux.length() > 50 ? textoAux.substring(0,50)+"..." : textoAux;
 						totalAnswer = SurveyResultLocalServiceUtil.countStudentsByQuestionIdAndAnswerId(question.getQuestionId(), answer.getAnswerId(), themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId());
 						//percent = df.format(SurveyResultLocalServiceUtil.getPercentageByQuestionIdAndAnswerId(question.getQuestionId(), answer.getAnswerId(), total));
-						percent = df.format(100*(double)totalAnswer/(double)total);
+						if(total>0){
+							percent = df.format(100*(double)totalAnswer/(double)total);	
+						}else{
+							percent = "0";
+						}
+						
 					%>
 						<div class="answer">
 							<%=texto %>
@@ -126,7 +137,6 @@
 			<%
 			} 
 			%>
-			<a href="<%=backToQuestionsURL.toString() %>" ><liferay-ui:message key="back" /></a>
 		</div>
 		
 	

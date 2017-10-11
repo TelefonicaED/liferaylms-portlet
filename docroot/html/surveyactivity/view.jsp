@@ -82,6 +82,7 @@ textarea {
 					<%if(permissionChecker.hasPermission(activity.getGroupId(),LearningActivity.class.getName(), activity.getActId(), ActionKeys.UPDATE)){ %>
 						<portlet:renderURL var="stadisticsURL">
 							<portlet:param name="jspPage" value="/html/surveyactivity/stadistics.jsp"></portlet:param>
+							<portlet:param name="activityStarted" value="false"/>
 							<portlet:param name="actId" value="<%=String.valueOf(actId) %>" />
 						</portlet:renderURL>
 						<liferay-ui:icon image="view" message="surveyactivity.stadistics" label="true" url="<%=stadisticsURL.toString() %>" />
