@@ -24,7 +24,6 @@ import com.liferay.lms.model.Schedule;
 import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.lms.service.CourseResultLocalServiceUtil;
 import com.liferay.lms.service.ScheduleLocalServiceUtil;
-
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
@@ -96,19 +95,25 @@ public class CourseImpl extends CourseBaseImpl {
 	
 	@Override
 	public void setTitle(String title) {
-		title = title.replaceAll("\"", "\'");
+		if(Validator.isNotNull(title)){
+			title = title.replaceAll("\"", "\'");	
+		}
 		super.setTitle(title);
 	}
 	
 	@Override
 	public void setTitle(String title, Locale locale) {
-		title = title.replaceAll("\"", "\'");
+		if(Validator.isNotNull(title)){
+			title = title.replaceAll("\"", "\'");
+		}
 		super.setTitle(title, locale);
 	}
 	
 	@Override
 	public void setTitle(String title, Locale locale, Locale defaultLocale) {
-		title = title.replaceAll("\"", "\'");
+		if(Validator.isNotNull(title)){
+			title = title.replaceAll("\"", "\'");
+		}
 		super.setTitle(title, locale, defaultLocale);
 	}
 	
