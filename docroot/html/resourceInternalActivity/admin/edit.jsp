@@ -84,9 +84,10 @@ if(LearningActivityLocalServiceUtil.canBeEdited(learningActivity, user.getUserId
 function <portlet:namespace />goToSearchResource(){
 	var url =  '${buscarRecurso}';
 	var languageId = '<%= themeDisplay.getLanguageId()%>';
-	
+	var description = $('#<portlet:namespace />description').val();
+	description = description.replace(/&nbsp;/g, ' ');
 	url +='&<portlet:namespace/>title='+$('#<portlet:namespace />title_'+languageId).val();
-	url += '&<portlet:namespace/>description='+$('#<portlet:namespace />description').val();
+	url += '&<portlet:namespace/>description='+encodeURI(description);
 		
 	location.href=url;
 		

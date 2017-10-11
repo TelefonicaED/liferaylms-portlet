@@ -23,6 +23,7 @@ import java.util.regex.Pattern;
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
 import javax.portlet.PortletException;
+import javax.portlet.PortletRequestDispatcher;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 import javax.portlet.ResourceRequest;
@@ -96,6 +97,39 @@ public class SurveyActivity extends MVCPortlet {
 	static final Pattern DOCUMENT_EXCEPTION_MATCHER = Pattern.compile("Error on line (\\d+) of document ([^ ]+) : (.*)");
 	private static Log log = LogFactoryUtil.getLog(SurveyActivity.class);
 
+	protected String viewJSP = null;
+	
+	public void init() throws PortletException{
+		viewJSP = getInitParameter("view-jsp");
+	}
+	
+	
+	public void doView(RenderRequest renderRequest,
+			RenderResponse renderResponse) throws IOException, PortletException {
+		log.debug("STARTED ACTIVITYaaaaaaa "+ParamUtil.getBoolean(renderRequest, "activityStarted", false));
+		if(ParamUtil.getBoolean(renderRequest, "activityStarted", false)){
+			String jsp = renderRequest.getParameter("view");
+			if(log.isDebugEnabled())log.debug("VIEW "+jsp);
+			include(viewJSP, renderRequest, renderResponse);
+			
+		}
+		
+	}
+	
+	protected void include(String path, RenderRequest renderRequest,
+			RenderResponse renderResponse) throws IOException, PortletException {
+
+		PortletRequestDispatcher portletRequestDispatcher = getPortletContext()
+				.getRequestDispatcher(path);
+
+		if (portletRequestDispatcher == null) {
+			// do nothing
+			// _log.error(path + " is not a valid include");
+		} else {
+			portletRequestDispatcher.include(renderRequest, renderResponse);
+		}
+	}
+	
 	public void saveSurvey(ActionRequest actionRequest, ActionResponse actionResponse) throws Exception {
 
 		//com.liferay.lms.model.SurveyActivity surveyActivity = null;
@@ -736,7 +770,17 @@ public class SurveyActivity extends MVCPortlet {
 
 				if(typeId==4)
 				{
-					super.render(renderRequest, renderResponse);
+					
+					log.debug("STARTED ACTIVITY "+ParamUtil.getBoolean(renderRequest, "activityStarted", false));
+					if(ParamUtil.getBoolean(renderRequest, "activityStarted", false) && !ParamUtil.getBoolean(renderRequest, "actionEditing",false)  && !ParamUtil.getBoolean(renderRequest, "actionEditingDetails",false)){
+						String jsp = renderRequest.getParameter("view");
+						if(log.isDebugEnabled())log.debug("VIEW "+jsp);
+						include(viewJSP, renderRequest, renderResponse);
+						
+					}else{
+						super.render(renderRequest, renderResponse);
+					}
+					
 				}
 				else
 				{
