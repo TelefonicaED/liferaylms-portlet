@@ -39,6 +39,8 @@ if(tabs1.equals("1")){
 }else{
 	tabs1 = LanguageUtil.get(pageContext,"competences.assigned");
 }
+
+
 %>
 <liferay-portlet:renderURL var="backURL" >
 	<portlet:param name="courseId" value="<%=Long.toString(courseId) %>" />
@@ -51,7 +53,8 @@ if(tabs1.equals("1")){
 <liferay-portlet:renderURL var="buscarURL">
 	<liferay-portlet:param name="view" value="competence-results" />
 	<portlet:param name="courseId" value="<%=Long.toString(courseId) %>" />
-	<portlet:param name="tabs1" value="<%=tabs1 %>" />
+	<portlet:param name="condition" value="<%=String.valueOf(condition) %>" />
+	<portlet:param name="tabs1" value="<%=tab %>" />
 </liferay-portlet:renderURL>
 
 <div class="npa_search_user"> 

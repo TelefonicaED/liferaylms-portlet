@@ -39,24 +39,7 @@ public class UpgradeUtil {
 	private static Log log = LogFactoryUtil.getLog(UpgradeUtil.class);
 	public static void upgrade() throws SystemException{
 		 Role siteMember;
-	    
-		log.warn("--- UPGRADING LMS TO 3.2 ");
-
-		 
-		 String createScormTables = "CREATE TABLE sco_scormcontent (  uuid_ VARCHAR(75) NULL DEFAULT NULL, "+
-				 					"scormId BIGINT(20) NOT NULL,  companyId BIGINT(20) NULL DEFAULT NULL, "+
-				 					"groupId BIGINT(20) NULL DEFAULT NULL,  userId BIGINT(20) NULL DEFAULT NULL, "+
-				 					"status INT(11) NULL DEFAULT NULL,  statusByUserId BIGINT(20) NULL DEFAULT NULL, "+
-				 					"statusByUserName VARCHAR(75) NULL DEFAULT NULL,  statusDate DATETIME NULL DEFAULT NULL, "+
-				 					"title VARCHAR(75) NULL DEFAULT NULL,  description LONGTEXT NULL DEFAULT NULL, "+
-				 					"index_ VARCHAR(75) NULL DEFAULT NULL,  ciphered TINYINT(4) NULL DEFAULT NULL, "+
-				 					"PRIMARY KEY (scormId), UNIQUE INDEX IX_5DEB5C3B (uuid_,  groupId), "+
-				 					"INDEX IX_78C3B643 (companyId), INDEX IX_153AF185 (groupId), "+
-				 					"INDEX IX_884753FF (userId), INDEX IX_9EF32F8B (userId, groupId), "+
-				 					"INDEX IX_E6F9214F (uuid_) ) COLLATE='utf8_general_ci' ENGINE=InnoDB ;";
-		 String insertScormContent = "insert into sco_scormcontent select * from lms_scormcontent;";
-		 
-		 
+	     log.warn("--- UPGRADING LMS TO 3.2 ");
 		 String alterLearningActivity = "ALTER TABLE `lms_learningactivity` " +
 				 	"ADD COLUMN `linkedActivityId` BIGINT(20) NULL DEFAULT NULL AFTER `commentsActivated`;";
 
@@ -69,35 +52,8 @@ public class UpgradeUtil {
 		 String alterCourseEndDate = "ALTER TABLE `lms_course` "+
 				 	"ADD COLUMN `executionEndDate` DATETIME NULL DEFAULT NULL AFTER `executionStartDate`;";
 		 
-		 
-
 		 //Execute SQL Queries
-		 //Create Scorm Tables
-		 log.warn("Creating Scorm Tables ");
 		 DB db = DBFactoryUtil.getDB();
-		 try {
-			db.runSQL(createScormTables);
-			
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		 
-		//Insert Scorm
-		 log.warn("Insert Scorm content "); 
-		try {
-			db.runSQL(insertScormContent);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
 		 log.warn("Alter table activity linked ");
 		//Activity linked
 		try {

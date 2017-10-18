@@ -392,7 +392,7 @@ else
 							
 							String[] split = parteTercera.split("\"");
 							String src = split[1];
-							String parametros = "?enablejsapi=1";
+							String parametros = ((src.indexOf("?")> -1) ? "&enablejsapi=1" : "?enablejsapi=1");
 							if (videoControlDisabled){
 								parametros += "&controls=0";
 							}

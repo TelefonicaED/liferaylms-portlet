@@ -29,7 +29,7 @@ if(actId!=0){
 	}
 }
 %>
-<aui:select label="group-activity" name="team" helpMessage="<%=LanguageUtil.get(pageContext,\"helpmessage.team\")%>" disabled="<%=disabled %>" >
+<aui:select label="team-activity" name="team" helpMessage="<%=LanguageUtil.get(pageContext,\"helpmessage.team\")%>" disabled="<%=disabled %>" >
 <%
 	
 	long teamId=ParamUtil.getLong(request, "teamId", 0);
