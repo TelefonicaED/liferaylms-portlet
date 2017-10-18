@@ -124,15 +124,17 @@ public class LearningActivityImport {
 				String description = "";
 				
 				try {
-					
+					log.debug("newFile: " + actElementFile.getPath());
 					newFile = ImportUtil.importDLFileEntry(context, actElementFile, serviceContext, userId);
-					
+					log.debug("newFile: " + newFile.getFileEntryId());
 					description = ImportUtil.descriptionFileParserLarToDescription(nuevaQuestion.getText(), oldFile, newFile);
-					
+					log.debug("description: " + description);
 				} catch(DuplicateFileException dfl){
-					
+					log.debug("DuplicateFileException: " + dfl.getMessage());
 					FileEntry existingFile = DLAppLocalServiceUtil.getFileEntry(context.getScopeGroupId(), folderId, oldFile.getTitle());
+					log.debug("existingFile: " + existingFile.getFileEntryId());
 					description = ImportUtil.descriptionFileParserLarToDescription(nuevaQuestion.getText(), oldFile, existingFile);
+					log.debug("description: " + description);
 					
 				} catch (Exception e) {
 

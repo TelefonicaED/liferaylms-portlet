@@ -393,8 +393,6 @@ public class ModuleDataHandlerImpl extends BasePortletDataHandler {
 		LearningActivity larn = null;
 		String path = null;
 		
-
-		
 		for (Element actElement : entryElement.elements("learningactivity")) {
 			path = actElement.attributeValue("path");
 			

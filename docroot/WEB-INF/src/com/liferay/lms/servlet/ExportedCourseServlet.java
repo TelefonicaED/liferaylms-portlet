@@ -12,10 +12,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.liferay.lms.model.Course;
-
-import com.liferay.lms.service.CourseLocalServiceUtil;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.servlet.HttpHeaders;
@@ -37,7 +33,6 @@ public class ExportedCourseServlet extends HttpServlet {
      */
     public ExportedCourseServlet() {
         super();
-
     }
 
 	/**
