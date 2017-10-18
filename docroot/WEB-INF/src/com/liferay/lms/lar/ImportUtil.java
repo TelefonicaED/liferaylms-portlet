@@ -66,6 +66,7 @@ public class ImportUtil {
 			
 			log.info("entryElement value file-->"+entryElement.attributeValue("file"));
 			log.info("entry value path: " + entryElement.attributeValue("path"));
+			try{
 			DLFileEntry fileEntryOld = (DLFileEntry)context.getZipEntryAsObject(entryElement.attributeValue("path"));
 		
 			long repositoryId = DLFolderConstants.getDataRepositoryId(context.getScopeGroupId(), DLFolderConstants.DEFAULT_PARENT_FOLDER_ID);
@@ -109,7 +110,10 @@ public class ImportUtil {
 						log.info("* ERROR! module file: " + e.getCause().toString());
 					}	
 				}
-			}		
+			}	
+			}catch(Exception e){
+				e.printStackTrace();
+			}
 		}	
 		return null;
 	}

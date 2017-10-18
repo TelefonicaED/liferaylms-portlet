@@ -116,32 +116,9 @@ public class LearningActivityImport {
 			
 			//Si tenemos ficheros en las descripciones de las preguntas.
 			for (Element actElementFile : qElement.elements("descriptionfile")) {
-				
-				FileEntry oldFile = (FileEntry)context.getZipEntryAsObject(actElementFile.attributeValue("path"));
 										
-				FileEntry newFile;
-				long folderId=0;
-				String description = "";
-				
-				try {
-					log.debug("newFile: " + actElementFile.getPath());
-					newFile = ImportUtil.importDLFileEntry(context, actElementFile, serviceContext, userId);
-					log.debug("newFile: " + newFile.getFileEntryId());
-					description = ImportUtil.descriptionFileParserLarToDescription(nuevaQuestion.getText(), oldFile, newFile);
-					log.debug("description: " + description);
-				} catch(DuplicateFileException dfl){
-					log.debug("DuplicateFileException: " + dfl.getMessage());
-					FileEntry existingFile = DLAppLocalServiceUtil.getFileEntry(context.getScopeGroupId(), folderId, oldFile.getTitle());
-					log.debug("existingFile: " + existingFile.getFileEntryId());
-					description = ImportUtil.descriptionFileParserLarToDescription(nuevaQuestion.getText(), oldFile, existingFile);
-					log.debug("description: " + description);
-					
-				} catch (Exception e) {
+				String description = importDescriptionFile(nuevaQuestion.getText(), actElementFile, userId, context, serviceContext);
 
-					// TODO Auto-generated catch block
-					//e.printStackTrace();
-					log.info("* ERROR! Question descriptionfile: " + e.getMessage());
-				}
 				//log.info("   description : " + description );
 				nuevaQuestion.setText(description);
 				TestQuestionLocalServiceUtil.updateTestQuestion(nuevaQuestion);
@@ -166,68 +143,65 @@ public class LearningActivityImport {
 		//Si tenemos ficheros en las descripciones de las actividades
 		for (Element actElementFile : actElement.elements("descriptionfile")) {
 			
-			FileEntry oldFile = (FileEntry)context.getZipEntryAsObject(actElementFile.attributeValue("path"));
-			
-			log.info("*  Description File: " + oldFile.getTitle()); 
-									
-			FileEntry newFile;
-			long folderId=0;
-			String description = "";
-			
-			try {
-				
-				InputStream input = context.getZipEntryAsInputStream(actElementFile.attributeValue("file"));
-				
-				long repositoryId = DLFolderConstants.getDataRepositoryId(context.getScopeGroupId(), DLFolderConstants.DEFAULT_PARENT_FOLDER_ID);
-				folderId=DLFolderUtil.createDLFoldersForLearningActivity(userId,repositoryId,serviceContext).getFolderId();
-				
-				String ficheroStr = actElementFile.attributeValue("file");	
-				String ficheroExtStr = "";
-				String extension[] = ficheroStr.split("\\.");
-				if(extension.length > 0){
-					ficheroExtStr = "."+extension[extension.length-1];
-				}
-				
-				log.info("*   getMimeType getMimeType: " + oldFile.getMimeType()); 
-				log.info("*   getExtension getExtension: " + oldFile.getExtension()); 
-				
-			
-				
-				String titleFile=oldFile.getTitle();
-				if(!oldFile.getTitle().endsWith(oldFile.getExtension())){
-					titleFile=oldFile.getTitle()+"."+oldFile.getExtension();
-				} 
-				
-				log.info("*   titleFile titleFile: " + titleFile); 
-				newFile = DLAppLocalServiceUtil.addFileEntry(userId, repositoryId , folderId , titleFile, oldFile.getMimeType(), oldFile.getTitle(), StringPool.BLANK, StringPool.BLANK, IOUtils.toByteArray(input), serviceContext );
-									
-				description = ImportUtil.descriptionFileParserLarToDescription(newLarn.getDescription(), oldFile, newFile);
-				
-			} catch(DuplicateFileException dfl){
-				
-				try{
-								
-					
-					FileEntry existingFile = DLAppLocalServiceUtil.getFileEntry(context.getScopeGroupId(), folderId, oldFile.getTitle());
-					description = ImportUtil.descriptionFileParserLarToDescription(newLarn.getDescription(), oldFile, existingFile);
-				}catch(Exception e){
-					log.info("ERROR! descriptionfile descriptionFileParserLarToDescription : " +e.getMessage());
-					description = newLarn.getDescription();
-				}
-			} catch (PortletDataException e1){
-				log.info("ERROR! descriptionfile: ");
-				
-			} catch (Exception e) {
-
-				// TODO Auto-generated catch block
-				//e.printStackTrace();
-				log.info("ERROR! descriptionfile: " + actElementFile.attributeValue("file") +"\n        "+e.getMessage());
-			}
+			String description = importDescriptionFile(newLarn.getDescription(), actElementFile, userId, context, serviceContext);
 
 			newLarn.setDescription(description);
 			LearningActivityLocalServiceUtil.updateLearningActivity(newLarn);
 			
 		}
+	}
+	
+	private static String importDescriptionFile(String descriptionLearningActivity, Element actElementFile, long userId, PortletDataContext context, ServiceContext serviceContext) throws SystemException {
+		FileEntry oldFile = (FileEntry)context.getZipEntryAsObject(actElementFile.attributeValue("path"));
+		
+		log.info("*  Description File: " + oldFile.getTitle()); 
+								
+		FileEntry newFile;
+		long folderId=0;
+		String description = "";
+		
+		try {
+			
+			InputStream input = context.getZipEntryAsInputStream(actElementFile.attributeValue("file"));
+			
+			long repositoryId = DLFolderConstants.getDataRepositoryId(context.getScopeGroupId(), DLFolderConstants.DEFAULT_PARENT_FOLDER_ID);
+			folderId=DLFolderUtil.createDLFoldersForLearningActivity(userId,repositoryId,serviceContext).getFolderId();	
+			
+			log.info("*   getMimeType getMimeType: " + oldFile.getMimeType()); 
+			log.info("*   getExtension getExtension: " + oldFile.getExtension()); 
+			
+			String titleFile=oldFile.getTitle();
+			if(!oldFile.getTitle().endsWith(oldFile.getExtension())){
+				titleFile=oldFile.getTitle()+"."+oldFile.getExtension();
+			} 
+			
+			log.info("*   titleFile titleFile: " + titleFile); 
+			newFile = DLAppLocalServiceUtil.addFileEntry(userId, repositoryId , folderId , titleFile, oldFile.getMimeType(), oldFile.getTitle(), StringPool.BLANK, StringPool.BLANK, IOUtils.toByteArray(input), serviceContext );
+								
+			description = ImportUtil.descriptionFileParserLarToDescription(descriptionLearningActivity, oldFile, newFile);
+			
+		} catch(DuplicateFileException dfl){
+			
+			try{
+							
+				
+				FileEntry existingFile = DLAppLocalServiceUtil.getFileEntry(context.getScopeGroupId(), folderId, oldFile.getTitle());
+				description = ImportUtil.descriptionFileParserLarToDescription(descriptionLearningActivity, oldFile, existingFile);
+			}catch(Exception e){
+				log.info("ERROR! descriptionfile descriptionFileParserLarToDescription : " +e.getMessage());
+				description = descriptionLearningActivity;
+			}
+		} catch (PortletDataException e1){
+			log.info("ERROR! descriptionfile: ");
+			
+		} catch (Exception e) {
+
+			// TODO Auto-generated catch block
+			//e.printStackTrace();
+			log.info("ERROR! descriptionfile: " + actElementFile.attributeValue("file") +"\n        "+e.getMessage());
+		}
+		
+		return description;
 	}
 
 	/**
@@ -286,7 +260,7 @@ public class LearningActivityImport {
 				log.info("*ERROR! dlfileentry path: " + theElement.attributeValue("path")+messageException +", message: "+e.getMessage());
 			}*/
 
-	}	
+		}	
 	}
 
 
