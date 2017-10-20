@@ -1,7 +1,10 @@
 package com.liferay.lms.indexer;
 
 import java.text.Normalizer;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -19,7 +22,6 @@ import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.SearchEngineUtil;
 import com.liferay.portal.kernel.search.SearchException;
-import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.search.Summary;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
@@ -39,10 +41,12 @@ import com.liferay.portlet.expando.model.ExpandoBridge;
 import com.liferay.portlet.expando.util.ExpandoBridgeIndexerUtil;
 
 public class CourseIndexer extends BaseIndexer {
+	
 	private static Log log = LogFactoryUtil.getLog(CourseIndexer.class);
 
 	public static final String[] CLASS_NAMES = {Course.class.getName()};
 	public static final String PORTLET_ID = "courseadmin_WAR_liferaylmsportlet"; 
+	
 	@Override
 	public String[] getClassNames() {
 		if(log.isDebugEnabled())log.debug("getClassNames");
@@ -52,49 +56,68 @@ public class CourseIndexer extends BaseIndexer {
 	
 	@Override
 	public boolean isPermissionAware() {
-		return true; 
-	}
-
-
-	public Summary getSummary(Document document, String snippet, PortletURL portletURL) {
-		if(log.isDebugEnabled())log.debug("getSummary");
-		String title = document.get(Field.TITLE);
-
-		String content = snippet;
-
-		if (Validator.isNull(snippet)) {
-			content = StringUtil.shorten(document.get(Field.CONTENT), 200);
-		}
-
-		String groupId = document.get("groupId");
-		String articleId = document.get(Field.ENTRY_CLASS_PK);
-		String version = document.get("version");
-		return new Summary(title, content, portletURL);
-	}
-
-	@Override
-	protected void doDelete(Object obj) throws Exception {
-		if(log.isDebugEnabled())log.debug("doDelete");
-		Course entry = (Course)obj;
-
-		Document document = new DocumentImpl();
-
-		document.addUID(PORTLET_ID, entry.getCourseId());
-
-		SearchEngineUtil.deleteDocument(
-			entry.getCompanyId(), document.get(Field.UID));
-
+		return _PERMISSION_AWARE; 
 	}
 	
 	@Override
-	public Document getDocument(Object obj) throws SearchException {
-		try {
-			return doGetDocument(obj);
-		} catch (Exception e) {
-			if(log.isDebugEnabled())e.printStackTrace();
-			if(log.isErrorEnabled())log.error(e.getMessage());
-			return null;
+	public void postProcessContextQuery(BooleanQuery contextQuery, SearchContext searchContext) throws Exception {
+		
+		int status = GetterUtil.getInteger(searchContext.getAttribute(Field.STATUS), WorkflowConstants.STATUS_APPROVED);
+		
+		if (status != WorkflowConstants.STATUS_ANY) {
+			contextQuery.addRequiredTerm(Field.STATUS, status);
 		}
+		
+		int statusCourse = GetterUtil.getInteger(searchContext.getAttribute("statusCourse"), WorkflowConstants.STATUS_ANY);
+		
+		if (statusCourse != WorkflowConstants.STATUS_ANY) {
+			contextQuery.addRequiredTerm("statusCourse", statusCourse);
+		}
+	}
+
+	@Override
+	public void postProcessSearchQuery(BooleanQuery searchQuery, SearchContext searchContext) throws Exception {
+		
+		addSearchLocalizedTerm(searchQuery, searchContext, Field.TITLE, true);
+	}
+	
+	@Override
+	protected void addSearchLocalizedTerm(
+			BooleanQuery searchQuery, SearchContext searchContext, String field,
+			boolean like)
+		throws Exception {
+
+		if (Validator.isNull(field)) {
+			return;
+		}
+
+		String value = String.valueOf(searchContext.getAttribute(field));
+
+		if (Validator.isNull(value)) {
+			value = searchContext.getKeywords();
+		}
+
+		if (Validator.isNull(value)) {
+			return;
+		}
+
+		field = DocumentImpl.getLocalizedName(searchContext.getLocale(), field);
+
+		if (searchContext.isAndSearch()) {
+			searchQuery.addRequiredTerm(field, value, like);
+		}else {
+			searchQuery.addTerm(field, value, like);
+		}
+	}
+	
+	@Override
+	protected void doDelete(Object obj) throws Exception {
+		
+		if(log.isDebugEnabled())log.debug("doDelete");
+		Course course = (Course)obj;
+
+		deleteDocument(course.getCompanyId(), course.getCourseId());
+
 	}
 	
 	@Override
@@ -162,6 +185,7 @@ public class CourseIndexer extends BaseIndexer {
 		document.addText(Field.CONTENT, content);
 		document.addKeyword(Field.ASSET_CATEGORY_IDS, assetCategoryIds);
 		document.addKeyword(Field.ASSET_TAG_NAMES, assetTagNames);
+		document.addKeyword("statusCourse", entry.getStatus());
 
 		document.addKeyword(Field.ENTRY_CLASS_NAME, Course.class.getName());
 		document.addKeyword(Field.ENTRY_CLASS_PK, entryId);
@@ -183,17 +207,44 @@ public class CourseIndexer extends BaseIndexer {
 		if(log.isDebugEnabled())log.debug("return Document");
 		return document;
 	}
+	
+	@Override
+	protected Summary doGetSummary(Document document, Locale locale, String snippet,
+			PortletURL portletURL) throws Exception {
+		
+		if(log.isDebugEnabled())log.debug("doGetSummary");
+		
+		String title = document.get(locale, Field.TITLE);
 
+		String content = snippet;
+
+		if (Validator.isNull(snippet)) {
+			content = StringUtil.shorten(
+				document.get(locale, Field.CONTENT), 200);
+		}
+
+		return new Summary(title, content, portletURL);
+	}
+	
+	/**
+	 * Solo se reindexan los cursos que son visibles y estan abiertos
+	 */
 	@Override
 	protected void doReindex(Object obj) throws Exception {
-		Course entry = (Course)obj;
-		if(log.isDebugEnabled())log.debug("doReindex::"+entry.getCourseId());
+		Course course = (Course)obj;
+		if(log.isDebugEnabled())log.debug("doReindex::"+course.getCourseId());
 		
-		Document document = getDocument(entry);
-
-		SearchEngineUtil.updateDocument(getSearchEngineId(),entry.getCompanyId(), document);
+		Document document = getDocument(course);
+		
+		AssetEntry entry = AssetEntryLocalServiceUtil.getEntry(Course.class.getName(),course.getCourseId());
+		
+		if(course.isClosed() || !entry.getVisible()){
+			SearchEngineUtil.deleteDocument(getSearchEngineId(), course.getCompanyId(), document.get(Field.UID));
+		}else{
+			SearchEngineUtil.updateDocument(getSearchEngineId(),entry.getCompanyId(), document);
+		}
 	}
-
+	
 	@Override
 	protected void doReindex(String className, long classPK) throws Exception {
 		if(log.isDebugEnabled())log.debug("doReindex");
@@ -209,18 +260,56 @@ public class CourseIndexer extends BaseIndexer {
 		reindexEntries(companyId);
 
 	}
+	
+	@Override
+	public Document getDocument(Object obj) throws SearchException {
+		try {
+			return doGetDocument(obj);
+		} catch (Exception e) {
+			if(log.isDebugEnabled())e.printStackTrace();
+			if(log.isErrorEnabled())log.error(e.getMessage());
+			return null;
+		}
+	}
 
+	/**
+	 * Solo se reindexan los cursos que están publicados y abiertos ya que son los que se muestran en las busquedas
+	 * @param companyId
+	 * @throws Exception
+	 */
 	private void reindexEntries(long companyId) throws Exception {
 		if(log.isDebugEnabled())log.debug("reindexEntries company::"+companyId);
-		java.util.List<Course> entries=CourseLocalServiceUtil.getCourses(companyId);
-		if(entries==null ||entries.isEmpty())
-		{
+		
+		List<Course> courses = CourseLocalServiceUtil.getCourses(companyId);
+		
+		if(courses==null ||courses.isEmpty()){
 			return;
 		}
-		for(Course entry:entries)
+		
+		AssetEntry entry = null;
+		Document document = null;
+		
+		Collection<Document> documents = new ArrayList<Document>(courses.size());
+		
+		for(Course course : courses)
 		{
-			doReindex(entry);
+			if(course.isClosed()){
+				continue;
+			}
+			
+			entry = AssetEntryLocalServiceUtil.getEntry(Course.class.getName(),course.getCourseId());
+			
+			if(!entry.getVisible()){
+				continue;
+			}
+			
+			document = getDocument(course);
+			
+			documents.add(document);
 		}
+		
+		SearchEngineUtil.updateDocuments(getSearchEngineId(), companyId, documents);
+
 	}
 	
 
@@ -236,57 +325,6 @@ public class CourseIndexer extends BaseIndexer {
 		if(log.isDebugEnabled())log.debug("getPortletId");
 		return PORTLET_ID;
 	}
-
-
-	@Override
-	protected Summary doGetSummary(Document document, Locale locale, String snippet,
-			PortletURL portletURL) throws Exception {
-		if(log.isDebugEnabled())log.debug("doGetSummary");
-		return getSummary(document, snippet, portletURL);
-	}
-
-	@Override
-	public void postProcessContextQuery(BooleanQuery contextQuery, SearchContext searchContext)
-			throws Exception {
-		int status = GetterUtil.getInteger(searchContext.getAttribute(Field.STATUS), WorkflowConstants.STATUS_APPROVED);
-		if (status != WorkflowConstants.STATUS_ANY) {
-			contextQuery.addRequiredTerm(Field.STATUS, status);
-		}
-	}
 	
-	@Override
-	public void postProcessSearchQuery(
-			BooleanQuery searchQuery, SearchContext searchContext) throws Exception {
-		addSearchLocalizedTerm(searchQuery, searchContext, Field.TITLE, true);
-	}
-	
-	@Override
-	protected void addSearchLocalizedTerm(
-			BooleanQuery searchQuery, SearchContext searchContext, String field,
-			boolean like)
-		throws Exception {
-
-		if (Validator.isNull(field)) {
-			return;
-		}
-
-		String value = String.valueOf(searchContext.getAttribute(field));
-
-		if (Validator.isNull(value)) {
-			value = searchContext.getKeywords();
-		}
-
-		if (Validator.isNull(value)) {
-			return;
-		}
-
-		field = DocumentImpl.getLocalizedName(searchContext.getLocale(), field);
-
-		if (searchContext.isAndSearch()) {
-			searchQuery.addRequiredTerm(field, value, like);
-		}
-		else {
-			searchQuery.addTerm(field, value, like);
-		}
-	}
+	private static final boolean _PERMISSION_AWARE = true;
 }
