@@ -12,6 +12,8 @@ import org.apache.commons.io.IOUtils;
 
 import com.liferay.counter.model.Counter;
 import com.liferay.counter.service.CounterLocalServiceUtil;
+import com.liferay.lms.learningactivity.LearningActivityType;
+import com.liferay.lms.learningactivity.LearningActivityTypeRegistry;
 import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.model.Module;
 import com.liferay.lms.model.TestAnswer;
@@ -440,13 +442,17 @@ public class CourseCopyUtil {
 					}
 					evaluationActivity.setExtracontent(document.formattedString());
 					LearningActivityLocalServiceUtil.updateLearningActivity(evaluationActivity);
+					
+					LearningActivityType learningActivityType=new LearningActivityTypeRegistry().getLearningActivityType(evaluationActivity.getTypeId());
+					learningActivityType.importExtraContent(evaluationActivity, 0L, null, null, null);
+					   
 				}
 			}catch(Exception e){
 				e.printStackTrace();
 			}		
 		}
 		
-		
+	
 	}
 	
 	public void cloneActivityFile(LearningActivity actOld, LearningActivity actNew, long userId, ServiceContext serviceContext){
