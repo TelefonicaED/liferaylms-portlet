@@ -14,6 +14,7 @@
 
 package com.liferay.lms.service.impl;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -23,6 +24,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import com.liferay.lms.auditing.AuditConstants;
 import com.liferay.lms.auditing.AuditingLogFactory;
@@ -839,34 +841,50 @@ public class LearningActivityLocalServiceImpl extends LearningActivityLocalServi
 	@SuppressWarnings("rawtypes")
 	public void saveHashMapToXMLExtraContent(long actId, HashMap<String, String> map) throws SystemException, PortalException 
 	{
+		LearningActivity activity = learningActivityPersistence.fetchByPrimaryKey(actId);
+		saveHashMapToXMLExtraContent(activity, map);
+	}
+	
+	@SuppressWarnings("rawtypes")
+	public String saveHashMapToXMLExtraContent(LearningActivity activity, HashMap<String, String> map) throws SystemException, PortalException 
+	{
 		try {
-			LearningActivity activity = learningActivityPersistence.fetchByPrimaryKey(actId);
-
 			if(activity != null  && !map.isEmpty()){
 
-				//Element resultadosXML=SAXReaderUtil.createElement("p2p");
-				Element resultadosXML=SAXReaderUtil.createElement(getNameLearningActivity(activity.getTypeId()));
-				Document resultadosXMLDoc=SAXReaderUtil.createDocument(resultadosXML);
-
-				Iterator it = map.entrySet().iterator();
-
-				while (it.hasNext()) {
-					Map.Entry e = (Map.Entry)it.next();
-					Element eleXML=SAXReaderUtil.createElement(String.valueOf(e.getKey()));
-					if(e.getKey().toString().contains("document")){
-						eleXML.addAttribute("id", String.valueOf(e.getValue()));
-					}else{
-						eleXML.addText(String.valueOf(e.getValue()));
-					}
-					resultadosXML.add(eleXML);
-				}
-				log.debug(resultadosXMLDoc.formattedString());
-				activity.setExtracontent(resultadosXMLDoc.formattedString());
+				String extraContent = convertHashMapToString(map, activity.getTypeId());
+				
+				log.debug(extraContent);
+				activity.setExtracontent(extraContent);
 				learningActivityPersistence.update(activity, true);
+				return extraContent;
+			}else{
+				return null;
 			}
 
 		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
 		}
+	}
+	
+	@SuppressWarnings("rawtypes")
+	public String convertHashMapToString(HashMap<String, String> map, int typeId) throws IOException, SystemException{
+		Element resultadosXML=SAXReaderUtil.createElement(getNameLearningActivity(typeId));
+		Document resultadosXMLDoc=SAXReaderUtil.createDocument(resultadosXML);
+
+		Iterator<Entry<String, String>> it = map.entrySet().iterator();
+
+		while (it.hasNext()) {
+			Map.Entry<String, String> e = (Map.Entry<String, String>)it.next();
+			Element eleXML=SAXReaderUtil.createElement(String.valueOf(e.getKey()));
+			if(e.getKey().toString().contains("document")){
+				eleXML.addAttribute("id", String.valueOf(e.getValue()));
+			}else{
+				eleXML.addText(String.valueOf(e.getValue()));
+			}
+			resultadosXML.add(eleXML);
+		}
+		return resultadosXMLDoc.formattedString();
 	}
 
 	public boolean isLearningActivityDeleteTries(long typeId){

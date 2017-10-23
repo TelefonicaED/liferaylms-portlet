@@ -12,6 +12,7 @@ import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceContextFactory;
+import com.liferay.portlet.documentlibrary.DuplicateFolderNameException;
 import com.liferay.portlet.documentlibrary.model.DLFolder;
 import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
 import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
@@ -68,8 +69,12 @@ public class DLFolderUtil {
     	SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
     	Date date = new Date();
     	String igRecordFolderName=dateFormat.format(date)+modulePortlet.SEPARATOR+userId;
-    	DLFolder dlFolderImage = DLFolderLocalServiceUtil.addFolder(userId,groupId, groupId, false, dlFolderModule.getFolderId(),igRecordFolderName, igRecordFolderName, serviceContext);
-
+    	DLFolder dlFolderImage = null;
+    	try{
+    		dlFolderImage = DLFolderLocalServiceUtil.addFolder(userId,groupId, groupId, false, dlFolderModule.getFolderId(),igRecordFolderName, igRecordFolderName, serviceContext);
+    	}catch (DuplicateFolderNameException e){
+    		dlFolderImage = DLFolderLocalServiceUtil.getFolder(groupId, dlFolderModule.getFolderId(), igRecordFolderName);
+    	}
 		
 		return dlFolderImage.getFolderId();
 	}

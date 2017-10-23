@@ -545,6 +545,21 @@ public class LearningActivityLocalServiceUtil {
 		getService().saveHashMapToXMLExtraContent(actId, map);
 	}
 
+	public static java.lang.String saveHashMapToXMLExtraContent(
+		com.liferay.lms.model.LearningActivity activity,
+		java.util.HashMap<java.lang.String, java.lang.String> map)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getService().saveHashMapToXMLExtraContent(activity, map);
+	}
+
+	public static java.lang.String convertHashMapToString(
+		java.util.HashMap<java.lang.String, java.lang.String> map, int typeId)
+		throws com.liferay.portal.kernel.exception.SystemException,
+			java.io.IOException {
+		return getService().convertHashMapToString(map, typeId);
+	}
+
 	public static boolean isLearningActivityDeleteTries(long typeId) {
 		return getService().isLearningActivityDeleteTries(typeId);
 	}

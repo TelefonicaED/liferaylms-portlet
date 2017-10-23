@@ -550,6 +550,22 @@ public class LearningActivityLocalServiceWrapper
 		_learningActivityLocalService.saveHashMapToXMLExtraContent(actId, map);
 	}
 
+	public java.lang.String saveHashMapToXMLExtraContent(
+		com.liferay.lms.model.LearningActivity activity,
+		java.util.HashMap<java.lang.String, java.lang.String> map)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _learningActivityLocalService.saveHashMapToXMLExtraContent(activity,
+			map);
+	}
+
+	public java.lang.String convertHashMapToString(
+		java.util.HashMap<java.lang.String, java.lang.String> map, int typeId)
+		throws com.liferay.portal.kernel.exception.SystemException,
+			java.io.IOException {
+		return _learningActivityLocalService.convertHashMapToString(map, typeId);
+	}
+
 	public boolean isLearningActivityDeleteTries(long typeId) {
 		return _learningActivityLocalService.isLearningActivityDeleteTries(typeId);
 	}

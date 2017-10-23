@@ -431,11 +431,13 @@ public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int e
 			if(log.isInfoEnabled()){
 				log.info("CourseLocalServiceImpl.addCourse(): " + e + "message: " + e.getMessage());
 			}
+			e.printStackTrace();
 			throw e;
 		}catch(Exception e){
 			if(log.isInfoEnabled()){
 				log.info("CourseLocalServiceImpl.addCourse(): " + e + "message: " + e.getMessage());
 			}
+			e.printStackTrace();
 			throw new PortalException(e.getMessage());
 			
 		}
