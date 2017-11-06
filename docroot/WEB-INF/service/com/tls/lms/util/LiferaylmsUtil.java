@@ -255,17 +255,7 @@ public class LiferaylmsUtil {
 		return !CourseLocalServiceUtil.hasUserTries(courseId, userId);
 	}
 	
-	
 	public static void saveStringToFile(String fileName, String text){
-		/*
-		StringBuffer sb = new StringBuffer(PropsUtil.get("default.liferay.home"));
-		sb.append(File.separator);
-		sb.append("tomcat-6.0.29");
-		sb.append(File.separator);
-		sb.append("webapps");
-		sb.append(File.separator);
-		sb.append("custom_logs"); //Directorio para los ficheros.
-		*/
 		
 		StringBuffer sb = new StringBuffer(PropsUtil.get("java.io.tmpdir"));
 		sb.append(File.separator);
@@ -293,6 +283,4 @@ public class LiferaylmsUtil {
 		}
 		
 	}
-
-	 
 }

@@ -570,9 +570,30 @@ public class CourseLocalServiceUtil {
 		return getService().getTeachersFromCourse(courseId);
 	}
 
+	public static java.util.List<com.liferay.portal.model.User> getTeachersFromCourse(
+		com.liferay.lms.model.Course course, long teacherRoleId) {
+		return getService().getTeachersFromCourse(course, teacherRoleId);
+	}
+
 	public static long[] getTeachersAndEditorsIdsFromCourse(
 		com.liferay.lms.model.Course course) {
 		return getService().getTeachersAndEditorsIdsFromCourse(course);
+	}
+
+	/**
+	* Devuelve los profesores de un curso teniendo en cuenta si el usuario pertenece a algÃƒÂºn equipo, si pertenece
+	* a algÃƒÂºn equipo, devuelve los profesores de ese equipo. Si no los equipos a los que pertenece no tienen ningÃƒÂºn
+	* profesor o no pertenece a ningÃƒÂºn equipo devuelve todos los profesores del curso
+	*
+	* @param course
+	* @param teacherRoleId
+	* @param userId
+	* @return List<User> Lista de usuarios profesores
+	*/
+	public static java.util.List<com.liferay.portal.model.User> getTeachersFromCourseTeams(
+		com.liferay.lms.model.Course course, long teacherRoleId, long userId) {
+		return getService()
+				   .getTeachersFromCourseTeams(course, teacherRoleId, userId);
 	}
 
 	public static java.util.List<com.liferay.lms.model.Course> getByTitleStatusCategoriesTags(

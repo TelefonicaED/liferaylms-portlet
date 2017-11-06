@@ -460,8 +460,26 @@ public interface CourseLocalService extends BaseLocalService,
 		long courseId);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.util.List<com.liferay.portal.model.User> getTeachersFromCourse(
+		com.liferay.lms.model.Course course, long teacherRoleId);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public long[] getTeachersAndEditorsIdsFromCourse(
 		com.liferay.lms.model.Course course);
+
+	/**
+	* Devuelve los profesores de un curso teniendo en cuenta si el usuario pertenece a algÃºn equipo, si pertenece
+	* a algÃºn equipo, devuelve los profesores de ese equipo. Si no los equipos a los que pertenece no tienen ningÃºn
+	* profesor o no pertenece a ningÃºn equipo devuelve todos los profesores del curso
+	*
+	* @param course
+	* @param teacherRoleId
+	* @param userId
+	* @return List<User> Lista de usuarios profesores
+	*/
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.util.List<com.liferay.portal.model.User> getTeachersFromCourseTeams(
+		com.liferay.lms.model.Course course, long teacherRoleId, long userId);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.util.List<com.liferay.lms.model.Course> getByTitleStatusCategoriesTags(
