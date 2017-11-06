@@ -480,16 +480,16 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 		int maxusers = ParamUtil.getInteger(uploadRequest, "maxUsers");
 		
 		Course course = null;
+		long courseEvalId = 0;
 		try{
 			course = CourseLocalServiceUtil.fetchCourse(courseId);
+			if( Validator.isNotNull(course) ){
+				courseEvalId = course.getCourseEvalId();
+			}
 		}catch(SystemException e){
 		}
 		
-		long defaultEvalId = 0;
-		if(course!=null){
-			defaultEvalId = course.getCourseEvalId();
-		}
-		long courseEvalId=ParamUtil.getLong(uploadRequest, "courseEvalId", defaultEvalId);
+		courseEvalId = ParamUtil.getLong(uploadRequest, "courseEvalId", courseEvalId);
 		CourseEval courseEval = new CourseEvalRegistry().getCourseEval(courseEvalId);
 		
 		//course eval Validation
