@@ -128,7 +128,7 @@ String primKey = String.valueOf(myActivity.getActId());%>
 		</c:otherwise>
 	</c:choose>
 
-<c:if test="<%=showChangeVisibility %>">
+<c:if test="<%=showChangeVisibility && hasPermissionChangeVisibility%>">
 
 	<portlet:actionURL name="changeVisibility" var="visibiltyURL" windowState="<%= LiferayWindowState.EXCLUSIVE.toString()%>" >
 		<portlet:param name="resId" value="<%=primKey %>" />
@@ -184,7 +184,7 @@ String primKey = String.valueOf(myActivity.getActId());%>
 	} %>
 </c:if>
 
-<c:if test="<%=showChangeAllVisibility %>">
+<c:if test="<%=showChangeAllVisibility && hasPermissionChangeAllVisibility%>">
 
 	<portlet:actionURL name="changeAllVisibility" var="visibiltyURL" windowState="<%= LiferayWindowState.EXCLUSIVE.toString()%>" >
 		<portlet:param name="resId" value="<%=primKey %>" />
@@ -221,7 +221,7 @@ String primKey = String.valueOf(myActivity.getActId());%>
 		<liferay-ui:icon message="activity.just.one.visible"  image="actividad" url="#" onClick="<%=visibiltyURLJavascript %>"/>
 </c:if>
 <!-- Mostrar calificaciones actividad. -->
-<c:if test="<%=visibleCalifications %>">
+<c:if test="<%=visibleCalifications && hasPermissionViewResults%>">
 	
 	<%
 	PortletURL urlCalifications = LmsActivitiesList.getURLCalifications(liferayPortletRequest, liferayPortletResponse, myActivity);

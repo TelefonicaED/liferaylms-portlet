@@ -309,6 +309,10 @@
             	<action-key>DELETE_DISCUSSION</action-key>
 				<action-key>SOFT_PERMISSIONS</action-key>
 				<action-key>UPDATE_ACTIVE</action-key>
+				<action-key>VIEW_RESULTS</action-key>
+				<action-key>CHANGE_VISIBILITY</action-key>
+				<action-key>CHANGE_ALL_VISIBILITY</action-key>
+				<action-key>DELETE_TRIES</action-key>
 			</supports>
 			<site-member-defaults>
 				<action-key>VIEW</action-key>
@@ -322,6 +326,8 @@
 				<action-key>CORRECT</action-key>
 				<action-key>SOFT_PERMISSIONS</action-key>
 				<action-key>UPDATE_ACTIVE</action-key>
+				<action-key>VIEW_RESULTS</action-key>
+				<action-key>CHANGE_ALL_VISIBILITY</action-key>
 			</guest-unsupported>
 		</permissions>
 	</model-resource>

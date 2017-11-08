@@ -121,7 +121,11 @@ if ((actionEditing && hasPermissionAddLact) ||
 												|| permissionChecker.hasOwnerPermission(activity.getCompanyId(),LearningActivity.class.getName(),activity.getActId(),activity.getUserId(), ActionKeys.DELETE);
 				boolean hasPermissionPermissions = permissionChecker.hasPermission(activity.getGroupId(),LearningActivity.class.getName(),activity.getActId(),ActionKeys.PERMISSIONS);
 				boolean hasPermissionSoftPermissions = permissionChecker.hasPermission(activity.getGroupId(),LearningActivity.class.getName(),activity.getActId(),"SOFT_PERMISSIONS");
-				if(hasPermissionUpdate || hasPermissionDelete || hasPermissionPermissions || hasPermissionSoftPermissions) {
+				boolean hasPermissionViewResults = permissionChecker.hasPermission(activity.getGroupId(),LearningActivity.class.getName(),activity.getActId(),"VIEW_RESULTS");
+				boolean hasPermissionChangeAllVisibility = permissionChecker.hasPermission(activity.getGroupId(),LearningActivity.class.getName(),activity.getActId(),"CHANGE_ALL_VISIBILITY");
+				boolean hasPermissionChangeVisibility = permissionChecker.hasPermission(activity.getGroupId(),LearningActivity.class.getName(),activity.getActId(),"CHANGE_VISIBILITY");
+				if(hasPermissionUpdate || hasPermissionDelete || hasPermissionPermissions || hasPermissionSoftPermissions || hasPermissionViewResults || hasPermissionChangeAllVisibility
+						|| hasPermissionChangeVisibility) {
 			%>
 				<div class="iconsedit"><%@ include file="/html/lmsactivitieslist/admin_actions.jspf" %></div>
 				<%}

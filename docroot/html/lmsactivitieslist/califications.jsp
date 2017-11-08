@@ -34,7 +34,7 @@
 	dateFormat.setTimeZone(timeZone);
 		
 
-	boolean delete = PrefsPropsUtil.getBoolean("learningactivity.show.califications.delete");
+	boolean delete = PrefsPropsUtil.getBoolean("learningactivity.show.califications.delete") && permissionChecker.hasPermission(learnActivity.getGroupId(),LearningActivity.class.getName(),learnActivity.getActId(),"DELETE_TRIES");
 	List<ActivityTriesDeleted> listActivityTriesDeleteds = ActivityTriesDeletedLocalServiceUtil.getByActIdStatus(actId, LmsConstant.STATUS_NOT_STARTED);
 %>
 
