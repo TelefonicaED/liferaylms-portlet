@@ -1202,7 +1202,7 @@
 		<display-name>CourseTeachers</display-name>
 		<portlet-class>com.liferay.lms.CourseTeachers</portlet-class>
 		<init-param>
-			<name>view-jsp</name>
+			<name>view-template</name>
 			<value>/html/courseteachers/view.jsp</value>
 		</init-param>
 		<expiration-cache>0</expiration-cache>

@@ -30,27 +30,15 @@ import com.liferay.lms.auditing.AuditConstants;
 import com.liferay.lms.auditing.AuditingLogFactory;
 import com.liferay.lms.learningactivity.LearningActivityType;
 import com.liferay.lms.learningactivity.LearningActivityTypeRegistry;
-import com.liferay.lms.model.Course;
 import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.model.Module;
-import com.liferay.lms.model.Schedule;
-import com.liferay.lms.service.ClpSerializer;
 import com.liferay.lms.service.LearningActivityLocalServiceUtil;
-import com.liferay.lms.service.LearningActivityResultLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityTryLocalServiceUtil;
 import com.liferay.lms.service.LmsPrefsLocalServiceUtil;
 import com.liferay.lms.service.ModuleLocalServiceUtil;
-import com.liferay.lms.service.ScheduleLocalServiceUtil;
 import com.liferay.lms.service.base.LearningActivityLocalServiceBaseImpl;
 import com.liferay.lms.service.persistence.LearningActivityFinderUtil;
 import com.liferay.lms.service.persistence.LearningActivityUtil;
-import com.liferay.portal.kernel.bean.PortletBeanLocatorUtil;
-import com.liferay.portal.kernel.dao.orm.Criterion;
-import com.liferay.portal.kernel.dao.orm.DynamicQuery;
-import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
-import com.liferay.portal.kernel.dao.orm.Order;
-import com.liferay.portal.kernel.dao.orm.OrderFactoryUtil;
-import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.language.LanguageUtil;
@@ -79,7 +67,6 @@ import com.liferay.portal.security.permission.PermissionCheckerFactoryUtil;
 import com.liferay.portal.service.ResourcePermissionLocalServiceUtil;
 import com.liferay.portal.service.RoleLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
-import com.liferay.portal.service.TeamLocalServiceUtil;
 import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portlet.announcements.model.AnnouncementsEntry;
 import com.liferay.portlet.announcements.model.AnnouncementsFlagConstants;
@@ -169,29 +156,29 @@ public class LearningActivityLocalServiceImpl extends LearningActivityLocalServi
 		if(isNotificationActivated && learningActivity.getTypeId()!=8){
 			List<User> listaUsuarios = userService.getGroupUsers(retorno.getGroupId());
 			if(!listaUsuarios.isEmpty()){
-			Iterator<User> it = listaUsuarios.iterator();
-			while(it.hasNext()){
-				User u = it.next();
-				try {
-					
-					if(u.isActive() 
-							&& !(PermissionCheckerFactoryUtil.create(u)).hasPermission(retorno.getGroupId(), "com.liferay.lms.model", retorno.getGroupId(), "VIEW_RESULTS")
-							&& !retorno.isInactive()
-							&& !retorno.isExpired()
-							&& !moduleLocalService.isLocked(retorno.getModuleId(),u.getUserId())
-							&& !courseLocalService.getCourseByGroupCreatedId(retorno.getGroupId()).isInactive()
-							&& !courseLocalService.getCourseByGroupCreatedId(retorno.getGroupId()).isExpired()
-							&& !courseLocalService.getCourseByGroupCreatedId(retorno.getGroupId()).isClosed()){
-						String courseTitle = courseLocalService.getCourseByGroupCreatedId(retorno.getGroupId()).getTitle(u.getLocale());
-						String subject = LanguageUtil.format(u.getLocale(),"notif.modification.new.title", null);
-						String body =LanguageUtil.format(u.getLocale(),"notif.modification.new.body", new String[]{retorno.getTitle(u.getLocale()),courseTitle});
-						sendNotification(subject, body, "", "announcements.type.general", 1,serviceContext, retorno.getStartdate(), retorno.getEnddate(),u.getUserId());
+				Iterator<User> it = listaUsuarios.iterator();
+				while(it.hasNext()){
+					User u = it.next();
+					try {
+						
+						if(u.isActive() 
+								&& !(PermissionCheckerFactoryUtil.create(u)).hasPermission(retorno.getGroupId(), "com.liferay.lms.model", retorno.getGroupId(), "VIEW_RESULTS")
+								&& !retorno.isInactive()
+								&& !retorno.isExpired()
+								&& !moduleLocalService.isLocked(retorno.getModuleId(),u.getUserId())
+								&& !courseLocalService.getCourseByGroupCreatedId(retorno.getGroupId()).isInactive()
+								&& !courseLocalService.getCourseByGroupCreatedId(retorno.getGroupId()).isExpired()
+								&& !courseLocalService.getCourseByGroupCreatedId(retorno.getGroupId()).isClosed()){
+							String courseTitle = courseLocalService.getCourseByGroupCreatedId(retorno.getGroupId()).getTitle(u.getLocale());
+							String subject = LanguageUtil.format(u.getLocale(),"notif.modification.new.title", null);
+							String body =LanguageUtil.format(u.getLocale(),"notif.modification.new.body", new String[]{retorno.getTitle(u.getLocale()),courseTitle});
+							sendNotification(subject, body, "", "announcements.type.general", 1,serviceContext, retorno.getStartdate(), retorno.getEnddate(),u.getUserId());
+						}
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
 					}
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
 				}
-			}
 			}
 		}
 		
@@ -703,21 +690,26 @@ public class LearningActivityLocalServiceImpl extends LearningActivityLocalServi
 		}
 	}
 	
-	public void deleteLearningactivity (long actId) throws SystemException,
-	PortalException {
+	public void deleteLearningactivity (long actId) throws SystemException, PortalException {
 		this.deleteLearningactivity(LearningActivityLocalServiceUtil.getLearningActivity(actId));
 	}
 
-	public String getExtraContentValue(long actId, String key,String defaultValue) throws SystemException
+	public String getExtraContentValue(long actId, String key,String defaultValue) throws SystemException{
+
+		LearningActivity activity = learningActivityPersistence.fetchByPrimaryKey(actId);
+
+		return getExtraContentValue(activity, key, defaultValue);
+	}
+	
+	public String getExtraContentValue(LearningActivity activity, String key,String defaultValue) throws SystemException
 	{
 		try {
-			LearningActivity activity = learningActivityPersistence.fetchByPrimaryKey(actId);
 
 			HashMap<String, String> hashMap = new HashMap<String, String>();
 
 			if(activity != null){
 
-				hashMap = convertXMLExtraContentToHashMap(actId);
+				hashMap = convertXMLExtraContentToHashMap(activity.getActId());
 				//Para evitar que retorne null si no existe la clave.
 				if(hashMap.containsKey(key)){
 					return hashMap.get(key);
@@ -731,28 +723,12 @@ public class LearningActivityLocalServiceImpl extends LearningActivityLocalServi
 
 		return "";
 	}
+	
 	public String getExtraContentValue(long actId, String key) throws SystemException{
 
-		try {
-			LearningActivity activity = learningActivityPersistence.fetchByPrimaryKey(actId);
+		LearningActivity activity = learningActivityPersistence.fetchByPrimaryKey(actId);
 
-			HashMap<String, String> hashMap = new HashMap<String, String>();
-
-			if(activity != null){
-
-				hashMap = convertXMLExtraContentToHashMap(actId);
-				//Para evitar que retorne null si no existe la clave.
-				if(hashMap.containsKey(key)){
-					return hashMap.get(key);
-				}
-				else{
-					return "";
-				}
-			}
-		} catch (Exception e) {
-		}
-
-		return "";
+		return getExtraContentValue(activity, key, "");
 	}
 	
 	public List<String> getExtraContentValues(long actId, String key) throws SystemException{

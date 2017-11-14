@@ -556,9 +556,30 @@ public class CourseLocalServiceWrapper implements CourseLocalService,
 		return _courseLocalService.getTeachersFromCourse(courseId);
 	}
 
+	public java.util.List<com.liferay.portal.model.User> getTeachersFromCourse(
+		com.liferay.lms.model.Course course, long teacherRoleId) {
+		return _courseLocalService.getTeachersFromCourse(course, teacherRoleId);
+	}
+
 	public long[] getTeachersAndEditorsIdsFromCourse(
 		com.liferay.lms.model.Course course) {
 		return _courseLocalService.getTeachersAndEditorsIdsFromCourse(course);
+	}
+
+	/**
+	* Devuelve los profesores de un curso teniendo en cuenta si el usuario pertenece a algÃƒÂºn equipo, si pertenece
+	* a algÃƒÂºn equipo, devuelve los profesores de ese equipo. Si no los equipos a los que pertenece no tienen ningÃƒÂºn
+	* profesor o no pertenece a ningÃƒÂºn equipo devuelve todos los profesores del curso
+	*
+	* @param course
+	* @param teacherRoleId
+	* @param userId
+	* @return List<User> Lista de usuarios profesores
+	*/
+	public java.util.List<com.liferay.portal.model.User> getTeachersFromCourseTeams(
+		com.liferay.lms.model.Course course, long teacherRoleId, long userId) {
+		return _courseLocalService.getTeachersFromCourseTeams(course,
+			teacherRoleId, userId);
 	}
 
 	public java.util.List<com.liferay.lms.model.Course> getByTitleStatusCategoriesTags(

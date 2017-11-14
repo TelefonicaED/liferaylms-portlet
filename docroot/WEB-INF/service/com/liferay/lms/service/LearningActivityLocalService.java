@@ -430,6 +430,12 @@ public interface LearningActivityLocalService extends BaseLocalService,
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.lang.String getExtraContentValue(
+		com.liferay.lms.model.LearningActivity activity, java.lang.String key,
+		java.lang.String defaultValue)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.lang.String getExtraContentValue(long actId,
 		java.lang.String key)
 		throws com.liferay.portal.kernel.exception.SystemException;

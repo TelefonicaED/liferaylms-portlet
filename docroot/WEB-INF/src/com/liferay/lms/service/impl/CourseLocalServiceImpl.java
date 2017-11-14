@@ -54,9 +54,6 @@ import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.json.JSONFactoryUtil;
-import com.liferay.portal.kernel.json.JSONObject;
-import com.liferay.portal.kernel.jsonwebservice.JSONWebService;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.lar.PortletDataHandlerKeys;
 import com.liferay.portal.kernel.lar.UserIdStrategy;
@@ -71,7 +68,6 @@ import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.FriendlyURLNormalizerUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
 import com.liferay.portal.kernel.util.PropsUtil;
@@ -88,6 +84,7 @@ import com.liferay.portal.model.ModelHintsUtil;
 import com.liferay.portal.model.ResourceConstants;
 import com.liferay.portal.model.Role;
 import com.liferay.portal.model.RoleConstants;
+import com.liferay.portal.model.Team;
 import com.liferay.portal.model.User;
 import com.liferay.portal.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.security.permission.PermissionChecker;
@@ -100,6 +97,7 @@ import com.liferay.portal.service.ResourcePermissionLocalServiceUtil;
 import com.liferay.portal.service.RoleLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceContextThreadLocal;
+import com.liferay.portal.service.TeamLocalServiceUtil;
 import com.liferay.portal.service.UserGroupRoleLocalServiceUtil;
 import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.theme.ThemeDisplay;
@@ -124,7 +122,7 @@ import com.liferay.util.LmsLocaleUtil;
  * <p>
  * All custom service methods should be put in this class. Whenever methods are added, rerun ServiceBuilder to copy their definitions into the {@link com.liferay.lms.service.CourseLocalService} interface.
  * </p>
- *
+ * 
  * <p>
  * Never reference this interface directly. Always use {@link com.liferay.lms.service.CourseLocalServiceUtil} to access the course local service.
  * </p>
@@ -1041,10 +1039,22 @@ public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int e
 			
 			Course course = courseLocalService.fetchCourse(courseId);
 						
-			LinkedHashMap<String, Object> userParams = new LinkedHashMap<String, Object>();
-			LmsPrefs prefs;			
-			prefs = LmsPrefsLocalServiceUtil.getLmsPrefs(course.getCompanyId());
+			LmsPrefs prefs = LmsPrefsLocalServiceUtil.getLmsPrefs(course.getCompanyId());
 			long teacherRoleId=RoleLocalServiceUtil.getRole(prefs.getTeacherRole()).getRoleId();
+			return getTeachersFromCourse(course, teacherRoleId);
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		
+		return users;
+		
+	}
+	
+	public List<User> getTeachersFromCourse(Course course, long teacherRoleId) {
+		List<User> users = new ArrayList<User>();
+		try{
+						
+			LinkedHashMap<String, Object> userParams = new LinkedHashMap<String, Object>();
 			userParams.put("usersGroups", course.getGroupCreatedId());
 			userParams.put("userGroupRole", new Long[]{course.getGroupCreatedId(), teacherRoleId});
 			
@@ -1093,6 +1103,60 @@ public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int e
 		}
 		
 		return userIds;
+	}
+	
+	/**
+	 * Devuelve los profesores de un curso teniendo en cuenta si el usuario pertenece a algún equipo, si pertenece
+	 * a algún equipo, devuelve los profesores de ese equipo. Si no los equipos a los que pertenece no tienen ningún
+	 * profesor o no pertenece a ningún equipo devuelve todos los profesores del curso
+	 * @param course
+	 * @param teacherRoleId
+	 * @param userId
+	 * @return List<User> Lista de usuarios profesores
+	 */
+	public List<User> getTeachersFromCourseTeams(Course course, long teacherRoleId, long userId){
+		List<User> users = null;
+		try{
+			
+			//Primero comprobamos si el usuario pertenece a algún equipo
+			List<Team> userTeams = null;
+			try {
+				userTeams=TeamLocalServiceUtil.getUserTeams(userId, course.getGroupCreatedId());
+			} catch (SystemException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			if(userTeams != null && userTeams.size() > 0){
+				log.debug("CourseTeachers::Pedimos los profesores de los equipos");
+				String teamIds = "";
+				for(int i = 0; i < userTeams.size();i++){
+					teamIds += userTeams.get(i).getTeamId() + ",";
+				}
+				if(teamIds.length() > 0) teamIds = teamIds.substring(0, teamIds.length()-1);
+				
+				LinkedHashMap<String, Object> userParams = new LinkedHashMap<String, Object>();
+				userParams.put("usersGroups", course.getGroupCreatedId());
+				userParams.put("userGroupRole", new Long[]{course.getGroupCreatedId(), teacherRoleId});
+				userParams.put("userTeamIds", new CustomSQLParam("INNER JOIN users_teams ON user_.userId = users_teams.userId "
+						+ "WHERE users_teams.teamId IN (" + teamIds + ")", null));
+				
+				users = UserLocalServiceUtil.search(course.getCompanyId(), "", 
+						WorkflowConstants.STATUS_APPROVED, userParams, 
+						QueryUtil.ALL_POS, QueryUtil.ALL_POS,(OrderByComparator)null);
+			}
+			 
+			if(users == null){
+				log.debug("CourseTeachers::Pedimos los profesores");
+				users = CourseLocalServiceUtil.getTeachersFromCourse(course, teacherRoleId);
+			}
+						
+
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		
+		return users;
 	}
 	
 	public List<Course> getByTitleStatusCategoriesTags(String freeText, int status, long[] categories, long[] tags, long companyId, long groupId, long userId, String language, boolean isAdmin, boolean andOperator, int start, int end){
