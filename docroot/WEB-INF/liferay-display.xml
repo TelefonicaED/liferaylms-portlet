@@ -65,7 +65,6 @@
 		<portlet id="checkcertificate"></portlet>
 		<portlet id="catalogcourses"></portlet>
 		<portlet id="dateeditor"></portlet>
-		<portlet id="deregisteracademymail"></portlet>
 		<portlet id="viewactivitytriesdeleted"></portlet>
 		<portlet id="editmodule"></portlet>
 		<portlet id="coursedetail"></portlet>
