@@ -84,11 +84,11 @@ public class CourseResultLocalServiceImpl
 	}
 	
 	public CourseResult getByUserAndCourse(long courseId,long userId) throws SystemException{
-		return CourseResultUtil.fetchByuc(userId, courseId);
+		return courseResultPersistence.fetchByuc(userId, courseId);
 	}
 	
 	public long countByCourseId(long courseId, boolean passed) throws SystemException{
-		return CourseResultUtil.countByc(courseId, passed);
+		return courseResultPersistence.countByc(courseId, passed);
 	}
 	
 	public long countByUserId(long userId) throws SystemException{
@@ -494,7 +494,7 @@ public class CourseResultLocalServiceImpl
 	
 	public CourseResult getCourseResultByCourseAndUser(long courseId,long userId) throws SystemException{
 
-		return CourseResultUtil.fetchByuc(userId, courseId);
+		return courseResultPersistence.fetchByuc(userId, courseId);
 	}
 	
 	public String translateResult(Locale locale, double result, long groupId){
