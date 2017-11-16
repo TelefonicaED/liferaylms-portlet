@@ -38,7 +38,6 @@ import com.liferay.lms.service.ClpSerializer;
 import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.lms.service.base.CourseResultLocalServiceBaseImpl;
 import com.liferay.lms.service.persistence.CourseResultFinderUtil;
-import com.liferay.lms.service.persistence.CourseResultUtil;
 import com.liferay.portal.kernel.bean.PortletBeanLocatorUtil;
 import com.liferay.portal.kernel.dao.orm.Criterion;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
@@ -76,7 +75,7 @@ public class CourseResultLocalServiceImpl
 	public List<CourseResult> getByUserId(long userId){
 		List<CourseResult> results = new ArrayList<CourseResult>();
 		try {
-			results = CourseResultUtil.findByUserId(userId);
+			results = courseResultPersistence.findByUserId(userId);
 		} catch (SystemException e) {
 			e.printStackTrace();
 		}
@@ -84,11 +83,11 @@ public class CourseResultLocalServiceImpl
 	}
 	
 	public CourseResult getByUserAndCourse(long courseId,long userId) throws SystemException{
-		return CourseResultUtil.fetchByuc(userId, courseId);
+		return courseResultPersistence.fetchByuc(userId, courseId);
 	}
 	
 	public long countByCourseId(long courseId, boolean passed) throws SystemException{
-		return CourseResultUtil.countByc(courseId, passed);
+		return courseResultPersistence.countByc(courseId, passed);
 	}
 	
 	public long countByUserId(long userId) throws SystemException{
