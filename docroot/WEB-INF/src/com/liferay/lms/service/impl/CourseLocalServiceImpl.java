@@ -1247,17 +1247,6 @@ public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int e
 		}
 		AuditingLogFactory.audit(course.getCompanyId(), course.getGroupId(), Course.class.getName(), course.getCourseId(), userId, AuditConstants.REGISTER, null);
 	}
-	
-	
-	/**
-	 * 
-	 * 
-	 */
-	public void addStudentToCourseWithDates(long courseId, long userId, Date allowStartDate, Date allowFinishDate)
-			throws PortalException, SystemException{
-				 
-		
-	}
 
 	public void editUserInscriptionDates(long courseId,long userId,Date allowStartDate,Date allowFinishDate) throws PortalException, SystemException
 	{
