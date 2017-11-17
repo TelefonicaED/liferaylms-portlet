@@ -1225,7 +1225,7 @@ public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int e
 		return coursePersistence.filterFindByGroupIdParentCourseId(groupId, 0);
 	}
 	
-	public void addStudentToCourseWithDates(long courseId, long userId, Date startDate, Date allowStartDate, Date allowFinishDate) 
+	public void addStudentToCourseWithDates(long courseId, long userId, Date allowStartDate, Date allowFinishDate) 
 			throws PortalException, SystemException {
 	
 		Course course = courseLocalService.getCourse(courseId);
@@ -1240,7 +1240,6 @@ public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int e
 		if( Validator.isNull(courseResult) ){
 			courseResultLocalService.create(courseId, user.getUserId(), allowStartDate, allowFinishDate);
 		}else{
-			courseResult.setStartDate(startDate);
 			courseResult.setAllowStartDate(allowStartDate);
 			courseResult.setAllowFinishDate(allowFinishDate);
 			courseResultLocalService.updateCourseResult(courseResult);
