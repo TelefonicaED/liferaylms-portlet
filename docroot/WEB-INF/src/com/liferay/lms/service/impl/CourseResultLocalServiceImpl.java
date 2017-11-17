@@ -493,7 +493,7 @@ public class CourseResultLocalServiceImpl
 	
 	public CourseResult getCourseResultByCourseAndUser(long courseId,long userId) throws SystemException{
 
-		return courseResultPersistence.fetchByuc(userId, courseId);
+		return CourseResultUtil.fetchByuc(userId, courseId);
 	}
 	
 	public String translateResult(Locale locale, double result, long groupId){
