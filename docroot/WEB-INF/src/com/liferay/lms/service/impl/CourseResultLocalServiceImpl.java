@@ -433,7 +433,8 @@ public class CourseResultLocalServiceImpl
 
 		return courseResult;
 	}
-	public CourseResult create(long courseId, long userId,Date allowStartDate,Date allowFinishDate) throws SystemException
+	
+	public CourseResult create(long courseId, long userId, Date allowStartDate, Date allowFinishDate) throws SystemException
 	{
 
 		CourseResult courseResult=courseResultPersistence.create(counterLocalService.increment(CourseResult.class.getName()));
@@ -444,7 +445,24 @@ public class CourseResultLocalServiceImpl
 		courseResult.setPassedDate(null);
 		courseResult.setAllowStartDate(allowStartDate);
 		courseResult.setAllowFinishDate(allowFinishDate);
-		courseResult.setStartDate(new Date());
+		courseResult.setStartDate(null);
+		courseResultPersistence.update(courseResult, false);
+
+		return courseResult;
+	}
+	
+	public CourseResult create(long courseId, long userId, Date startDate, Date allowStartDate, Date allowFinishDate) throws SystemException
+	{
+
+		CourseResult courseResult=courseResultPersistence.create(counterLocalService.increment(CourseResult.class.getName()));
+		courseResult.setUserId(userId);
+		courseResult.setCourseId(courseId);
+		courseResult.setResult(0);
+		courseResult.setPassed(false);
+		courseResult.setPassedDate(null);
+		courseResult.setAllowStartDate(allowStartDate);
+		courseResult.setAllowFinishDate(allowFinishDate);
+		courseResult.setStartDate(startDate);
 		courseResultPersistence.update(courseResult, false);
 
 		return courseResult;

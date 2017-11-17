@@ -54,9 +54,6 @@ import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.json.JSONFactoryUtil;
-import com.liferay.portal.kernel.json.JSONObject;
-import com.liferay.portal.kernel.jsonwebservice.JSONWebService;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.lar.PortletDataHandlerKeys;
 import com.liferay.portal.kernel.lar.UserIdStrategy;
@@ -71,7 +68,6 @@ import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.FriendlyURLNormalizerUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
 import com.liferay.portal.kernel.util.PropsUtil;
@@ -1225,57 +1221,110 @@ public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int e
 		return coursePersistence.filterFindByGroupIdParentCourseId(groupId, 0);
 	}
 	
-	public void addStudentToCourseWithDates(long courseId,long userId,Date allowStartDate,Date allowFinishDate) throws PortalException, SystemException
-	{
-		Course course=courseLocalService.getCourse(courseId);
-		;
-			User user = userLocalService.fetchUser(userId);
-			if (!GroupLocalServiceUtil.hasUserGroup(user.getUserId(), course.getGroupCreatedId())) {
-				GroupLocalServiceUtil.addUserGroups(user.getUserId(), new long[] { course.getGroupCreatedId() });
-				//sendEmail(user,course);
-			}
-			
-			UserGroupRoleLocalServiceUtil.addUserGroupRoles(new long[] { user.getUserId() },
-					course.getGroupCreatedId(), RoleLocalServiceUtil.getRole(user.getCompanyId(), RoleConstants.SITE_MEMBER).getRoleId());
-			CourseResult courseResult=courseResultLocalService.getCourseResultByCourseAndUser(courseId, user.getUserId());
-			if(courseResult==null)
-			{
-				courseResultLocalService.create(courseId, user.getUserId(), allowStartDate, allowFinishDate);
-			}
-			else
-			{
-				courseResult.setAllowStartDate(allowStartDate);
-				courseResult.setAllowFinishDate(allowFinishDate);
-				courseResultLocalService.updateCourseResult(courseResult);
-			}
-			//auditing
-			AuditingLogFactory.audit(course.getCompanyId(), course.getGroupId(), Course.class.getName(), course.getCourseId(), userId, AuditConstants.REGISTER, null);		 
-		
+	/**
+	 * Este servicio inscribe a un usuario en un curso. Setea el valor del startDate a null
+	 * 
+	 * @param courseId
+	 * @param userId
+	 * @param allowStartDate
+	 * @param allowFinishDate
+	 * @throws PortalException
+	 * @throws SystemException
+	 */
+	public void addStudentToCourseWithDates(long courseId, long userId, Date allowStartDate, Date allowFinishDate)
+			throws PortalException, SystemException{
+				 
+		courseLocalService.addStudentToCourseWithDates(courseId, userId, null, allowStartDate, allowFinishDate);
 	}
-
-	public void editUserInscriptionDates(long courseId,long userId,Date allowStartDate,Date allowFinishDate) throws PortalException, SystemException
-	{
-		ServiceContext serviceContext = ServiceContextThreadLocal.getServiceContext();
-		Course course=courseLocalService.getCourse(courseId);
-		
-			User user = userLocalService.getUser(userId);
-			if (!GroupLocalServiceUtil.hasUserGroup(user.getUserId(), course.getGroupCreatedId())) {
-				return;
-			}		
-			CourseResult courseResult=courseResultLocalService.getCourseResultByCourseAndUser(courseId, user.getUserId());
-			if(courseResult==null)
-			{
+	
+	/**
+	 * Este servicio inscribe a un usuario en un curso.
+	 * 
+	 * @param courseId
+	 * @param userId
+	 * @param startDate
+	 * @param allowStartDate
+	 * @param allowFinishDate
+	 * @throws PortalException
+	 * @throws SystemException
+	 */
+	public void addStudentToCourseWithDates(long courseId, long userId, Date startDate, Date allowStartDate, Date allowFinishDate) 
+			throws PortalException, SystemException {
+	
+		Course course = courseLocalService.getCourse(courseId);
+		User user = userLocalService.fetchUser(userId);
+		if( !GroupLocalServiceUtil.hasUserGroup(user.getUserId(), course.getGroupCreatedId()) ){
+			GroupLocalServiceUtil.addUserGroups(user.getUserId(), new long[] { course.getGroupCreatedId() });
+		}
+		UserGroupRoleLocalServiceUtil.addUserGroupRoles(new long[] { user.getUserId() },
+				course.getGroupCreatedId(), RoleLocalServiceUtil.getRole(user.getCompanyId(), RoleConstants.SITE_MEMBER).getRoleId());
+		CourseResult courseResult = courseResultLocalService.getCourseResultByCourseAndUser(courseId, user.getUserId());
+		if( Validator.isNull(courseResult) ){
+			if( Validator.isNotNull(startDate) ){
+				courseResultLocalService.create(courseId, user.getUserId(), startDate, allowStartDate, allowFinishDate);
+			}else{
 				courseResultLocalService.create(courseId, user.getUserId(), allowStartDate, allowFinishDate);
 			}
-			else
-			{
-				courseResult.setAllowStartDate(allowStartDate);
-				courseResult.setAllowFinishDate(allowFinishDate);
-				courseResultLocalService.updateCourseResult(courseResult);
-			}
-			//auditing
-			AuditingLogFactory.audit(course.getCompanyId(), course.getGroupId(), Course.class.getName(), course.getCourseId(), serviceContext.getUserId(), AuditConstants.UPDATE, null);		 
+		}else{
+			courseResult.setStartDate(startDate);
+			courseResult.setAllowStartDate(allowStartDate);
+			courseResult.setAllowFinishDate(allowFinishDate);
+			courseResultLocalService.updateCourseResult(courseResult);
+		}
+		AuditingLogFactory.audit(course.getCompanyId(), course.getGroupId(), Course.class.getName(), course.getCourseId(), userId, AuditConstants.REGISTER, null);
+	}
+	
+	/**
+	 * Este servicio actualiza la inscripcion de un usuario en un curso. Setea el valor del startDate a null
+	 * 
+	 * @param courseId
+	 * @param userId
+	 * @param allowStartDate
+	 * @param allowFinishDate
+	 * @throws PortalException
+	 * @throws SystemException
+	 */
+	public void editUserInscriptionDates(long courseId, long userId, Date allowStartDate, Date allowFinishDate) 
+			throws PortalException, SystemException{
+
+		courseLocalService.editUserInscriptionDates(courseId, userId, null, allowStartDate, allowFinishDate);
+	}
+	
+	/**
+	 * Este servicio actualiza la inscripcion de un usuario en un curso.
+	 * 
+	 * @param courseId
+	 * @param userId
+	 * @param startDate
+	 * @param allowStartDate
+	 * @param allowFinishDate
+	 * @throws PortalException
+	 * @throws SystemException
+	 */
+	public void editUserInscriptionDates(long courseId, long userId, Date startDate, Date allowStartDate, Date allowFinishDate) 
+			throws PortalException, SystemException{
 		
+		ServiceContext serviceContext = ServiceContextThreadLocal.getServiceContext();
+		Course course = courseLocalService.getCourse(courseId);
+		User user = userLocalService.getUser(userId);
+		if( !GroupLocalServiceUtil.hasUserGroup(user.getUserId(), course.getGroupCreatedId()) ){
+			return;
+		}		
+		CourseResult courseResult = courseResultLocalService.getCourseResultByCourseAndUser(courseId, user.getUserId());
+		if( Validator.isNull(courseResult) ){
+			if( Validator.isNotNull(startDate) ){
+				courseResultLocalService.create(courseId, user.getUserId(), startDate, allowStartDate, allowFinishDate);
+			}else{
+				courseResultLocalService.create(courseId, user.getUserId(), allowStartDate, allowFinishDate);
+			}
+		}
+		else{
+			courseResult.setStartDate(startDate);
+			courseResult.setAllowStartDate(allowStartDate);
+			courseResult.setAllowFinishDate(allowFinishDate);
+			courseResultLocalService.updateCourseResult(courseResult);
+		}
+		AuditingLogFactory.audit(course.getCompanyId(), course.getGroupId(), Course.class.getName(), course.getCourseId(), serviceContext.getUserId(), AuditConstants.UPDATE, null);		 
 	}
 	
 	/**
