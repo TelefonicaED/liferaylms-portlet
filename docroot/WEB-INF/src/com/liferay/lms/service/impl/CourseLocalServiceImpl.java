@@ -1238,7 +1238,7 @@ public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int e
 				course.getGroupCreatedId(), RoleLocalServiceUtil.getRole(user.getCompanyId(), RoleConstants.SITE_MEMBER).getRoleId());
 		CourseResult courseResult=courseResultLocalService.getCourseResultByCourseAndUser(courseId, user.getUserId());
 		if( Validator.isNull(courseResult) ){
-			courseResultLocalService.create(courseId, user.getUserId(), allowStartDate, allowFinishDate, startDate);
+			courseResultLocalService.create(courseId, user.getUserId(), allowStartDate, allowFinishDate);
 		}else{
 			courseResult.setStartDate(startDate);
 			courseResult.setAllowStartDate(allowStartDate);
