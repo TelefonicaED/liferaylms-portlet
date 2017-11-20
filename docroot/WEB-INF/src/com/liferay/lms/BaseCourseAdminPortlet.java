@@ -383,10 +383,6 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 
 		long courseId = ParamUtil.getLong(actionRequest, "courseId", 0);
 		if (courseId > 0) {	
-			List<Course> editions = CourseLocalServiceUtil.getChildCourses(courseId);
-			for(Course edition : editions){
-				CourseLocalServiceUtil.openCourse(edition.getCourseId());
-			}
 			CourseLocalServiceUtil.openCourse(courseId);
 		}
 	}
