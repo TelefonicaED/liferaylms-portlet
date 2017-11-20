@@ -36,13 +36,13 @@ if(prefs!=null)
 %>
 
 <liferay-ui:success message="your-request-completed-successfully" key="ok" />
+<liferay-ui:success message="lms-configuration.upgrade-ok" key="upgrade-ok" />
 <c:if test="${not empty counter}">
 	<div class="portlet-msg-success"><liferay-ui:message key="groups-changed" arguments="<%=new String[]{request.getParameter(\"counter\")} %>" /></div>
 </c:if>
 
 
-<liferay-portlet:actionURL name="changeSettings" var="changeSettingsURL">
-</liferay-portlet:actionURL>
+<liferay-portlet:actionURL name="changeSettings" var="changeSettingsURL"/>
 
 <aui:form action="<%=changeSettingsURL %>" method="POST">
 <aui:input type="hidden" name="redirect" value="<%= currentURL %>" />
@@ -170,7 +170,14 @@ for(CalificationType calificationType :calificationTypeRegistry.getCalificationT
 
 </aui:field-wrapper>
 
+
+<aui:field-wrapper>
+	<aui:button type="submit" value="save" />
+</aui:field-wrapper>
+
 </aui:form>
+
+
 
 
 <%
