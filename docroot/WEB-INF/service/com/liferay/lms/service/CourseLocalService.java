@@ -516,6 +516,17 @@ public interface CourseLocalService extends BaseLocalService,
 		java.lang.String language, boolean isAdmin, boolean andOperator);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.util.List<com.liferay.lms.model.Course> getChildCoursesByTitle(
+		java.lang.String freeText, long parentCourseId, int status,
+		long companyId, long groupId, long userId, java.lang.String language,
+		boolean isAdmin, boolean andOperator, int start, int end);
+
+	public int countChildCoursesByTitle(java.lang.String freeText,
+		long parentCourseId, int status, long companyId, long groupId,
+		long userId, java.lang.String language, boolean isAdmin,
+		boolean andOperator);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.util.List<com.liferay.portal.model.User> getStudents(
 		long courseId, long companyId, java.lang.String screenName,
 		java.lang.String firstName, java.lang.String lastName,

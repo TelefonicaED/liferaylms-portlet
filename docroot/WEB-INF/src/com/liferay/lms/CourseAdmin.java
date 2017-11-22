@@ -34,6 +34,7 @@ import javax.portlet.RenderResponse;
 import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
 
+import sun.security.acl.WorldGroupImpl;
 import au.com.bytecode.opencsv.CSVReader;
 import au.com.bytecode.opencsv.CSVWriter;
 
@@ -426,10 +427,12 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 		
 		ThemeDisplay themeDisplay = (ThemeDisplay)renderRequest.getAttribute(WebKeys.THEME_DISPLAY);
 		long courseId = ParamUtil.getLong(renderRequest, "courseId");
+		String name = ParamUtil.getString(renderRequest, "name");
 		PortletURL portletURL = renderResponse.createRenderURL();
 		portletURL.setParameter("javax.portlet.action","doView");
 		portletURL.setParameter("courseId", String.valueOf(courseId));
 		portletURL.setParameter("view", "editions");
+		portletURL.setParameter("name", name);
 		renderRequest.setAttribute("courseId", courseId);
 		Course course;
 		try {
@@ -450,9 +453,21 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 				SearchContainer.DEFAULT_DELTA, portletURL, 
 				null, "there-are-no-editions");
 
-		searchContainer.setResults(CourseLocalServiceUtil.getChildCourses(courseId, searchContainer.getStart(), searchContainer.getEnd()));
-		searchContainer.setTotal(CourseLocalServiceUtil.countChildCourses(courseId));
+		
+		boolean isAdmin = false;
+		try {
+			isAdmin = RoleLocalServiceUtil.hasUserRole(themeDisplay.getUserId(), RoleLocalServiceUtil.getRole(themeDisplay.getCompanyId(), RoleConstants.ADMINISTRATOR).getRoleId());
+		} catch (SystemException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (PortalException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
+		searchContainer.setResults(CourseLocalServiceUtil.getChildCoursesByTitle(name, courseId, WorkflowConstants.STATUS_ANY, themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(), themeDisplay.getUserId(),themeDisplay.getLanguageId() , isAdmin , true, searchContainer.getStart(), searchContainer.getEnd()));
+		searchContainer.setTotal(CourseLocalServiceUtil.countChildCoursesByTitle(name, courseId, WorkflowConstants.STATUS_ANY, themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(), themeDisplay.getUserId(),themeDisplay.getLanguageId() , isAdmin , true));
+		
 		
 		renderRequest.setAttribute("searchContainer", searchContainer);
 		
@@ -475,12 +490,6 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 				renderRequest.setAttribute("courseGroup", group);
 				log.debug("GroupId "+group);
 				log.debug("CourseId "+course);
-						
-				PortletURL backURL = renderResponse.createRenderURL();
-				backURL.setParameter("javax.portlet.action","doView");
-				backURL.setParameter("courseId", String.valueOf(course.getCourseId()));
-				backURL.setParameter("view", "editions");
-				renderRequest.setAttribute("backURL", backURL);
 				renderRequest.setAttribute("course", course);
 				
 				
@@ -490,11 +499,36 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 				
 				String editionsTitle =LanguageUtil.format(themeDisplay.getLocale(), "course-admin.new-edition-x", course.getTitle(themeDisplay.getLocale()));
 				renderRequest.setAttribute("editionTitle", editionsTitle);
+				renderRequest.setAttribute("editionFriendlyURL", course.getFriendlyURL()+"-"+newCourseName.replace(" ", "-"));
 				
-				
-				
+				String[] layusprsel=null;
+				if(renderRequest.getPreferences().getValue("courseTemplates", null)!=null&&renderRequest.getPreferences().getValue("courseTemplates", null).length()>0)
+				{
+						layusprsel=renderRequest.getPreferences().getValue("courseTemplates", "").split(",");
+				}
+				String[] lspList=LmsPrefsLocalServiceUtil.getLmsPrefsIni(themeDisplay.getCompanyId()).getLmsTemplates().split(",");
+				if(layusprsel!=null && layusprsel.length>0)
+				{
+					lspList=layusprsel;
+
+				}
+				if(lspList.length>1){
+					List<LayoutSetPrototype> prototypeList = new ArrayList<LayoutSetPrototype>();
+					for(String lspId: lspList){
+						prototypeList.add(LayoutSetPrototypeLocalServiceUtil.getLayoutSetPrototype(Long.parseLong(lspId)));
+						
+					}
+					
+					long parentCourseLspId = GroupLocalServiceUtil.fetchGroup(course.getGroupCreatedId()).getPublicLayoutSet().getLayoutSetPrototypeId();
+					renderRequest.setAttribute("lspList", prototypeList);
+					renderRequest.setAttribute("parentCourseLspId", parentCourseLspId);
+					renderRequest.setAttribute("viewTemplateSelector", true);
+				}else{
+					LayoutSetPrototype lsp=LayoutSetPrototypeLocalServiceUtil.getLayoutSetPrototype(Long.parseLong(lspList[0]));
+					renderRequest.setAttribute("lspId", lsp.getLayoutSetPrototypeId());
+					renderRequest.setAttribute("viewTemplateSelector", false);
+				}
 			}
-			
 			
 			SimpleDateFormat formatDay = new SimpleDateFormat("dd");
 			formatDay.setTimeZone(timeZone);
@@ -506,20 +540,27 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 			formatHour.setTimeZone(timeZone);
 			SimpleDateFormat formatMin = new SimpleDateFormat("mm");
 			formatMin.setTimeZone(timeZone);
-			Date today=new Date(System.currentTimeMillis());
-			
+			Date today=course.getStartDate();
+			if(Validator.isNull(today)){
+				today = new Date();
+			}
 			int startDay=Integer.parseInt(formatDay.format(today));
 			int startMonth=Integer.parseInt(formatMonth.format(today))-1;
 			int startYear=Integer.parseInt(formatYear.format(today));
 			int startHour=Integer.parseInt(formatHour.format(today));
 			int startMin=Integer.parseInt(formatMin.format(today));
 			
+			today = course.getEndDate();
+			if(Validator.isNull(today)){
+				today = new Date();
+			}
+			
 			int endDay=Integer.parseInt(formatDay.format(today));
 			int endMonth=Integer.parseInt(formatMonth.format(today))-1;
-			int endYear=Integer.parseInt(formatYear.format(today))+1;
+			int endYear=Integer.parseInt(formatYear.format(today));
 			int endHour=Integer.parseInt(formatHour.format(today));
 			int endMin=Integer.parseInt(formatMin.format(today));
-			
+			//Inscription Date
 			renderRequest.setAttribute("startDay", startDay);
 			renderRequest.setAttribute("startMonth", startMonth);
 			renderRequest.setAttribute("startYear", startYear);
@@ -532,6 +573,44 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 			renderRequest.setAttribute("endYear", endYear);
 			renderRequest.setAttribute("endHour", endHour);
 			renderRequest.setAttribute("endMin", endMin);
+			
+			
+			today = course.getExecutionStartDate();
+			
+			if(Validator.isNull(today)){
+				today = new Date();
+			}
+			startDay=Integer.parseInt(formatDay.format(today));
+			startMonth=Integer.parseInt(formatMonth.format(today))-1;
+			startYear=Integer.parseInt(formatYear.format(today));
+			startHour=Integer.parseInt(formatHour.format(today));
+			startMin=Integer.parseInt(formatMin.format(today));
+			
+			today = course.getExecutionEndDate();
+			
+			if(Validator.isNull(today)){
+				today = new Date();
+			}
+			endDay=Integer.parseInt(formatDay.format(today));
+			endMonth=Integer.parseInt(formatMonth.format(today))-1;
+			endYear=Integer.parseInt(formatYear.format(today));
+			endHour=Integer.parseInt(formatHour.format(today));
+			endMin=Integer.parseInt(formatMin.format(today));
+			
+			//Execution Date
+			renderRequest.setAttribute("startExecutionDay", startDay);
+			renderRequest.setAttribute("startExecutionMonth", startMonth);
+			renderRequest.setAttribute("startExecutionYear", startYear);
+			renderRequest.setAttribute("startExecutionHour", startHour);
+			renderRequest.setAttribute("startExecutionMin", startMin);
+			renderRequest.setAttribute("defaultStartYear", LiferaylmsUtil.defaultStartYear);
+			renderRequest.setAttribute("defaultEndYear", LiferaylmsUtil.defaultEndYear);
+			renderRequest.setAttribute("endExecutionDay", endDay);
+			renderRequest.setAttribute("endExecutionMonth", endMonth);
+			renderRequest.setAttribute("endExecutionYear", endYear);
+			renderRequest.setAttribute("endExecutionHour", endHour);
+			renderRequest.setAttribute("endExecutionMin", endMin);
+			
 			
 			
 		}catch(Exception e){
@@ -746,9 +825,13 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 		ServiceContext serviceContext = ServiceContextFactory.getInstance(Course.class.getName(), actionRequest);
 		boolean isLinked = ParamUtil.getBoolean(actionRequest, "linkedCourse", false);
 		long parentCourseId = ParamUtil.getLong(actionRequest, "parentCourseId",0);
-		
+		String friendlyURL = ParamUtil.getString(actionRequest, "editionFriendlyURL");
 		String newEditionName  = ParamUtil.getString(actionRequest, "newCourseName", "New edition");
+		long editionLayoutId = ParamUtil.getLong(actionRequest, "courseTemplate");
 		
+		
+		
+		//Inscription Date
 		int startMonth = 	ParamUtil.getInteger(actionRequest, "startMon");
 		int startYear = 	ParamUtil.getInteger(actionRequest, "startYear");
 		int startDay = 		ParamUtil.getInteger(actionRequest, "startDay");
@@ -771,15 +854,38 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 		}
 		Date endDate = PortalUtil.getDate(stopMonth, stopDay, stopYear, stopHour, stopMinute, themeDisplay.getTimeZone(), EntryDisplayDateException.class);
 		
+		
+		
+		startMonth = 	ParamUtil.getInteger(actionRequest, "startExecutionMon");
+		startYear = 	ParamUtil.getInteger(actionRequest, "startExecutionYear");
+		startDay = 		ParamUtil.getInteger(actionRequest, "startExecutionDay");
+		startHour = 	ParamUtil.getInteger(actionRequest, "startExecutionHour");
+		startMinute = 	ParamUtil.getInteger(actionRequest, "startExecutionMin");
+		startAMPM = 	ParamUtil.getInteger(actionRequest, "startExecutionAMPM");
+		if(startAMPM > 0) {
+			startHour += 12;
+		}
+		Date startExecutionDate = PortalUtil.getDate(startMonth, startDay, startYear, startHour, startMinute, themeDisplay.getTimeZone(), EntryDisplayDateException.class);
+		
+		stopMonth = 	ParamUtil.getInteger(actionRequest, "stopExecutionMon");
+		stopYear = 		ParamUtil.getInteger(actionRequest, "stopExecutionYear");
+		stopDay = 		ParamUtil.getInteger(actionRequest, "stopExecutionDay");
+		stopHour = 		ParamUtil.getInteger(actionRequest, "stopExecutionHour");
+		stopMinute = 	ParamUtil.getInteger(actionRequest, "stopExecutionMin");
+		stopAMPM = 		ParamUtil.getInteger(actionRequest, "stopExecutionAMPM");
+		if (stopAMPM > 0) {
+			stopHour += 12;
+		}
+		Date endExecutionDate = PortalUtil.getDate(stopMonth, stopDay, stopYear, stopHour, stopMinute, themeDisplay.getTimeZone(), EntryDisplayDateException.class);
+		
+		
 		// Comprobaciones antes del proceso
 		boolean errors = false;
 		if(endDate.before(startDate)){
-			SessionErrors.add(actionRequest, "course-admin.error.date-interval");
+			SessionErrors.add(actionRequest, "date-interval");
 			errors = true;
 		}
 		
-		
-	
 		Group group = null;
 		try{
 			group = GroupLocalServiceUtil.getGroup(themeDisplay.getCompanyId(), newEditionName);
@@ -791,20 +897,30 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 		}
 		if(!errors){
 			if(group != null) {
-				SessionErrors.add(actionRequest, "course-admin.error.duplicate-name");
+				SessionErrors.add(actionRequest, "duplicate-name");
 				errors = true;
 			} else {
-				
-				Message message=new Message();
-				message.put("parentCourseId", parentCourseId);
-				message.put("newEditionName",newEditionName);
-				message.put("themeDisplay",themeDisplay);
-				message.put("startDate",startDate);
-				message.put("endDate",endDate);
-				message.put("isLinked",isLinked);
-				message.put("serviceContext",serviceContext);
-				MessageBusUtil.sendMessage("liferay/lms/createEdition", message);
-				
+				group=GroupLocalServiceUtil.fetchFriendlyURLGroup(themeDisplay.getCompanyId(), friendlyURL);
+				if(group!=null){
+					SessionErrors.add(actionRequest, "duplicate-friendly-url");
+					errors = true;
+				}else{
+					Message message=new Message();
+					message.put("parentCourseId", parentCourseId);
+					message.put("newEditionName",newEditionName);
+					message.put("themeDisplay",themeDisplay);
+					message.put("startDate",startDate);
+					message.put("endDate",endDate);
+					message.put("startExecutionDate",startExecutionDate);
+					message.put("endExecutionDate",endExecutionDate);
+					message.put("editionFriendlyURL",friendlyURL);
+					message.put("isLinked",isLinked);
+					message.put("serviceContext",serviceContext);
+					message.put("editionLayoutId", editionLayoutId);
+					MessageBusUtil.sendMessage("liferay/lms/createEdition", message);
+			
+				}
+						
 			}
 		}
 		

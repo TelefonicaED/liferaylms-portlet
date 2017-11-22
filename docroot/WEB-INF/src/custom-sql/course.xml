@@ -475,9 +475,15 @@
 		]]>
 	</sql>
 	
-	<sql id="com.liferay.lms.service.persistence.CourseFinder.whereParentCourse">
+	<sql id="com.liferay.lms.service.persistence.CourseFinder.whereParentCourseNull">
 		<![CDATA[
 			AND (c.parentCourseId = 0 OR c.parentCourseId IS NULL) 
+		]]>
+	</sql>
+	
+	<sql id="com.liferay.lms.service.persistence.CourseFinder.whereParentCourse">
+		<![CDATA[
+			AND (c.parentCourseId = ?) 
 		]]>
 	</sql>
 	

@@ -147,13 +147,21 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 	public static final String WHERE_TITLE_DESCRIPTION_CATEGORIES_TAGS_OR =
 			 CourseFinder.class.getName() + 
 			 	".whereC_BytTitleDescriptionCategoriesTagsOR";	
+	public static final String WHERE_PARENT_COURSE_NULL =
+			 CourseFinder.class.getName() +
+				".whereParentCourseNull";
 	public static final String WHERE_PARENT_COURSE =
 			 CourseFinder.class.getName() +
 				".whereParentCourse";
 	
 	
-	@SuppressWarnings("unchecked")
 	public List<Course> findByT_S_C_T_T(String freeText, int status, long[] categories, long[] tags, String templates, long companyId, long groupId, long userId, String language, boolean isAdmin, boolean searchParentCourses, boolean andOperator, int start, int end){
+		return findByT_S_C_T_T(freeText, -1, status, categories, tags, templates, companyId, groupId, userId, language, isAdmin, searchParentCourses, andOperator, start, end);
+	}
+	
+	
+	@SuppressWarnings("unchecked")
+	public List<Course> findByT_S_C_T_T(String freeText, long parentCourseId, int status, long[] categories, long[] tags, String templates, long companyId, long groupId, long userId, String language, boolean isAdmin, boolean searchParentCourses, boolean andOperator, int start, int end){
 		Session session = null;
 		
 		try{
@@ -179,7 +187,7 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			
 			sql = replaceResourcePermission(sql, isAdmin, companyId, userId);
 			
-			sql = replaceSearchParentCourse(sql, searchParentCourses);
+			sql = replaceSearchParentCourse(sql, searchParentCourses,parentCourseId);
 
 			if(start < 0 && end < 0){
 				sql = sql.replace("LIMIT [$START$], [$END$]", "");
@@ -202,7 +210,12 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			qPos.add(companyId);
 			qPos.add(companyId);
 			qPos.add(groupId);
-			qPos.add(groupId);	
+			qPos.add(groupId);
+			if(searchParentCourses){
+				if(parentCourseId>0){
+					qPos.add(parentCourseId);
+				}
+			}
 			
 			List<Course> listCourse = (List<Course>) q.list();
 			
@@ -217,11 +230,15 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 	    return new ArrayList<Course>();
 	}
 	
-	private String replaceSearchParentCourse(String sql, boolean searchParentCourse) {
+	private String replaceSearchParentCourse(String sql, boolean searchParentCourses, long parentCourseId) {
 		/** Sustituimos los tags si buscamos por ellos queda preparado para buscar por = en vez de por IN**/
-		if(searchParentCourse){
+		if(searchParentCourses){
+			if(parentCourseId>0){
+				sql = sql.replace("[$WHEREPARENTCOURSE$]", CustomSQLUtil.get(WHERE_PARENT_COURSE));
+			}else{
+				sql = sql.replace("[$WHEREPARENTCOURSE$]", CustomSQLUtil.get(WHERE_PARENT_COURSE_NULL));	
+			}
 			
-			sql = sql.replace("[$WHEREPARENTCOURSE$]", CustomSQLUtil.get(WHERE_PARENT_COURSE));
 		}else{
 			sql = sql.replace("[$WHEREPARENTCOURSE$]", "");
 		}
@@ -368,9 +385,11 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 		return sql.replace("[$LANGUAGE$]", language);
 	}
 
-	
-	
 	public int countByT_S_C_T_T(String freeText, int status, long[] categories, long[] tags, String templates, long companyId, long groupId, long userId, String language, boolean isAdmin, boolean searchParentCourses, boolean andOperator){
+		return countByT_S_C_T_T(freeText, -1, status, categories, tags, templates, companyId, groupId, userId, language, isAdmin, searchParentCourses, andOperator);
+	}
+	
+	public int countByT_S_C_T_T(String freeText, long parentCourseId, int status, long[] categories, long[] tags, String templates, long companyId, long groupId, long userId, String language, boolean isAdmin, boolean searchParentCourses, boolean andOperator){
 		Session session = null;
 		
 		try{
@@ -395,7 +414,7 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			
 			sql = replaceResourcePermission(sql, isAdmin, companyId, userId);
 			
-			sql = replaceSearchParentCourse(sql, searchParentCourses);
+			sql = replaceSearchParentCourse(sql, searchParentCourses, parentCourseId);
 			
 			if(log.isDebugEnabled()){
 				log.debug("sql: " + sql);
@@ -413,7 +432,11 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			qPos.add(companyId);
 			qPos.add(groupId);
 			qPos.add(groupId);
-			
+			if(searchParentCourses){
+				if(parentCourseId>0){
+					qPos.add(parentCourseId);
+				}
+			}
 			Iterator<Long> itr = q.iterate();
 
 			if (itr.hasNext()) {
