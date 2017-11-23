@@ -1281,6 +1281,17 @@ public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int e
 		return childCourses;
 	}
 	
+	public List<Course> getOpenOrRestrictedChildCourses(long courseId) {
+		List<Course> childCourses = new ArrayList<Course>();
+		try{
+			childCourses = courseFinder.getOpenOrRestrictedChildCourses(courseId, QueryUtil.ALL_POS, QueryUtil.ALL_POS);
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		return childCourses;
+	}
+	
+	
 	public int countChildCourses(long courseId) {
 		int childCoursesCount = 0;
 		try{
@@ -1290,6 +1301,17 @@ public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int e
 		}
 		return childCoursesCount;
 	}
+	
+	public int countOpenOrRestrictedChildCourses(long courseId) {
+		int childCoursesCount = 0;
+		try{
+			childCoursesCount = courseFinder.countOpenOrRestrictedChildCourses(courseId);	
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		return childCoursesCount;
+	}
+	
 	
 	public java.util.List<Course> getCoursesParents(long groupId) throws SystemException
 	{

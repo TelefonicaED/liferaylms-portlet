@@ -780,8 +780,17 @@ public class CourseLocalServiceUtil {
 		return getService().getChildCourses(courseId, start, end);
 	}
 
+	public static java.util.List<com.liferay.lms.model.Course> getOpenOrRestrictedChildCourses(
+		long courseId) {
+		return getService().getOpenOrRestrictedChildCourses(courseId);
+	}
+
 	public static int countChildCourses(long courseId) {
 		return getService().countChildCourses(courseId);
+	}
+
+	public static int countOpenOrRestrictedChildCourses(long courseId) {
+		return getService().countOpenOrRestrictedChildCourses(courseId);
 	}
 
 	public static java.util.List<com.liferay.lms.model.Course> getCoursesParents(

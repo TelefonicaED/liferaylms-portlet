@@ -592,7 +592,13 @@ public interface CourseLocalService extends BaseLocalService,
 	public java.util.List<com.liferay.lms.model.Course> getChildCourses(
 		long courseId, int start, int end);
 
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.util.List<com.liferay.lms.model.Course> getOpenOrRestrictedChildCourses(
+		long courseId);
+
 	public int countChildCourses(long courseId);
+
+	public int countOpenOrRestrictedChildCourses(long courseId);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.util.List<com.liferay.lms.model.Course> getCoursesParents(

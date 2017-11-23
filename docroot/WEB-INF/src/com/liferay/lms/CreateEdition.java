@@ -138,6 +138,7 @@ public class CreateEdition extends CourseCopyUtil implements MessageListener {
 		
 		//Tags y categorias
 		try{
+			AssetEntryLocalServiceUtil.validate(course.getGroupCreatedId(), Course.class.getName(), serviceContext.getAssetCategoryIds(), serviceContext.getAssetTagNames());
 			serviceContext.setAssetCategoryIds(AssetEntryLocalServiceUtil.getEntry(Course.class.getName(), course.getCourseId()).getCategoryIds());
 			if(log.isDebugEnabled()){
 				log.debug("  + AssetCategoryIds: "+AssetEntryLocalServiceUtil.getEntry(Course.class.getName(), course.getCourseId()).getCategoryIds().toString());
@@ -210,6 +211,9 @@ public class CreateEdition extends CourseCopyUtil implements MessageListener {
 		
 		//Create modules and activities
 		createModulesAndActivities(newCourse, siteMemberRole, group.getGroupId());
+		
+		//Create Tags and Categories
+		
 		log.debug(" ENDS!");
 	}
 	

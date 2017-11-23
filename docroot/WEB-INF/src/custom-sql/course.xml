@@ -573,5 +573,36 @@
 			LIMIT [$START$], [$END$]
 		]]>
 	</sql>
+	<sql id="com.liferay.lms.service.persistence.CourseFinder.getOpenOrRestrictedCoursesByParentId">
+		<![CDATA[   		
+			SELECT 
+				c.*
+			FROM 
+				lms_course c
+			INNER JOIN 
+				group_ g 
+					ON c.groupCreatedId = g.groupId
+			WHERE 
+				c.parentCourseId = ? AND
+				c.closed = 0 AND
+				(g.type_ = ? OR g.type_ = ?)
+ 			LIMIT [$START$], [$END$]
+		]]>
+	</sql>
+	<sql id="com.liferay.lms.service.persistence.CourseFinder.countOpenOrRestrictedCoursesByParentId">
+		<![CDATA[   		
+			SELECT 
+				COUNT(DISTINCT c.courseId) AS COUNT_VALUE
+			FROM 
+				lms_course c
+			INNER JOIN 
+				group_ g 
+					ON c.groupCreatedId = g.groupId
+			WHERE 
+				c.parentCourseId = ? AND
+				c.closed = 0 AND
+				(g.type_ = ? OR g.type_ = ?)
+		]]>
+	</sql>
 	
 </custom-sql>
