@@ -881,9 +881,6 @@ if(course!=null){
 		    		    	function <portlet:namespace />initEditorGoodbyeMsg() { return "<%= UnicodeFormatter.toString(goodbyeMsg) %>"; }
 		    			</script>
 		    			
-		    			
-		    			
-		    			
 					</aui:field-wrapper>
 					<div class="definition-of-terms">
 						<h4><liferay-ui:message key="definition-of-terms" /></h4>

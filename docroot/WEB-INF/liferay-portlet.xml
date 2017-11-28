@@ -5,7 +5,7 @@
 	<portlet>
 		<portlet-name>lmsactivitieslist</portlet-name>
 		<icon>/icon.png</icon>
-			<configuration-action-class>com.liferay.lms.actions.LmsActivitiesListAction</configuration-action-class>
+		<configuration-action-class>com.liferay.lms.actions.LmsActivitiesListAction</configuration-action-class>
 		<indexer-class>com.liferay.lms.search.LearningActivityIndexer</indexer-class>
 		<control-panel-entry-category>content</control-panel-entry-category>
 		<control-panel-entry-weight>17.5</control-panel-entry-weight>

@@ -293,17 +293,19 @@ public class CourseIndexer extends BaseIndexer {
 		
 		for(Course course : courses)
 		{
+			document = getDocument(course);
+			
 			if(course.isClosed()){
+				SearchEngineUtil.deleteDocument(getSearchEngineId(), course.getCompanyId(), document.get(Field.UID));
 				continue;
 			}
 			
 			entry = AssetEntryLocalServiceUtil.getEntry(Course.class.getName(),course.getCourseId());
 			
 			if(!entry.getVisible()){
+				SearchEngineUtil.deleteDocument(getSearchEngineId(), course.getCompanyId(), document.get(Field.UID));
 				continue;
 			}
-			
-			document = getDocument(course);
 			
 			documents.add(document);
 		}

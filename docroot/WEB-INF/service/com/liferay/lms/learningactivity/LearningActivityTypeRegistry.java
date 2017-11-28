@@ -5,16 +5,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
 
-import com.liferay.lms.learningactivity.courseeval.CourseEvalClp;
 import com.liferay.lms.service.ClpSerializer;
 import com.liferay.lms.service.LmsPrefsLocalServiceUtil;
 import com.liferay.portal.kernel.exception.NestableException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.PortletClassLoaderUtil;
 import com.liferay.portal.kernel.util.AutoResetThreadLocal;
 import com.liferay.portal.kernel.util.ClassLoaderProxy;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
-import com.liferay.portal.kernel.util.PrefsPropsUtil;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -26,18 +26,23 @@ import com.liferay.portal.util.PortalUtil;
 
 public class LearningActivityTypeRegistry {
 	
+	private static Log log = LogFactoryUtil.getLog(LearningActivityTypeRegistry.class);
 	protected static final String LMS_ACTIVITIES_LIST_PORTLET_ID =  PortalUtil.getJsSafePortletId("lmsactivitieslist"+PortletConstants.WAR_SEPARATOR+ClpSerializer.getServletContextName());
 	
 	private static LearningActivityType[] _getLearningActivityTypes(){
 		Properties properties = PropsUtil.getProperties("lms.learningactivity.type", true);
 		LearningActivityType[] learningActivityTypes = new LearningActivityType[properties.size()];
+		log.debug("properties size: " + properties.size());
 		int currentLearningActivityType = 0;
 		for (Object key:properties.keySet()) {
+			log.debug("key: " + key.toString());
 			String type=properties.getProperty(key.toString());
+			log.debug("type: " + type);
 			try {	
 				LearningActivityType learningActivityType = (LearningActivityType)getPortletClassLoader().loadClass(type).newInstance();
 				learningActivityTypes[currentLearningActivityType++]=learningActivityType;
 			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
 				try {
 					String [] context = ((String) key).split("\\.");
 					if (Validator.isNotNull(context) && context.length == 2) {
@@ -48,16 +53,20 @@ public class LearningActivityTypeRegistry {
 						PortletClassLoaderUtil.getClassLoader(context[1]));
 					learningActivityTypes[currentLearningActivityType++]=new LearningActivityTypeClp(classLoaderProxy);
 				} catch (Throwable throwable) {
+					throwable.printStackTrace();
 				}
 			} catch (ClassCastException e) {
+				e.printStackTrace();
 				try {
 					ClassLoaderProxy classLoaderProxy = new ClassLoaderProxy(Class.forName(type, true, 
 						getPortletClassLoader()).newInstance(), type, 
 						getPortletClassLoader());
 					learningActivityTypes[currentLearningActivityType++]=new LearningActivityTypeClp(classLoaderProxy);
 				} catch (Throwable throwable) {
+					throwable.printStackTrace();
 				}
 			} catch (Throwable throwable) {
+				throwable.printStackTrace();
 			}
 		}
 		

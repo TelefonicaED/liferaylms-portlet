@@ -192,6 +192,20 @@ public class ActivityStatsView {
 	public void setAvgResultWithSuffix(String avgResultWithSuffix) {
 		this.avgResultWithSuffix = avgResultWithSuffix;
 	}
+	
+	public final static int COLUMN_START_DATE = 1;
+	public final static int COLUMN_END_DATE = 2;
+	public final static int COLUMN_AVG_ATTEMPT = 3;
+	public final static int COLUMN_AVG_SCORE = 4;
+	public final static int COLUMN_PASS_SCORE = 5;
+	public final static int COLUMN_NUM_TRIES = 6;
+	public final static int COLUMN_PRECEDENCE = 7;
+	public final static int COLUMN_TYPE = 8;
+	public final static int COLUMN_MANDATORY = 9;
+	
+	public final static int[] COLUMNS_CONFIG = {COLUMN_START_DATE,COLUMN_END_DATE,COLUMN_AVG_ATTEMPT,COLUMN_AVG_SCORE,COLUMN_PASS_SCORE,
+		COLUMN_NUM_TRIES,COLUMN_PRECEDENCE,COLUMN_TYPE,COLUMN_MANDATORY};
+
 
 }
 
