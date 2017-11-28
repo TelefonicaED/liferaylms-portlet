@@ -396,7 +396,7 @@ else
 							if (videoControlDisabled){
 								parametros += "&controls=0";
 							}
-							if (videoPosition > 0){
+							if (videoPosition > 0 && videoPosition<100){
 								DecimalFormat df = new DecimalFormat("#####");
 								parametros += "&start="+df.format(videoPosition);
 							}
@@ -544,7 +544,7 @@ else
 						}
 						if (isVimeoIframe && !isDefaultScore){
 							int seekTo = 0;
-							if (videoPosition > 0){
+							if (videoPosition > 0 && videoPosition<100){
 								DecimalFormat df = new DecimalFormat("#####");
 								seekTo = Integer.parseInt(df.format(videoPosition));
 							}

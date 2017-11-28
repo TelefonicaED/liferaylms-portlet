@@ -751,8 +751,17 @@ public class CourseLocalServiceWrapper implements CourseLocalService,
 		return _courseLocalService.getChildCourses(courseId, start, end);
 	}
 
+	public java.util.List<com.liferay.lms.model.Course> getOpenOrRestrictedChildCourses(
+		long courseId) {
+		return _courseLocalService.getOpenOrRestrictedChildCourses(courseId);
+	}
+
 	public int countChildCourses(long courseId) {
 		return _courseLocalService.countChildCourses(courseId);
+	}
+
+	public int countOpenOrRestrictedChildCourses(long courseId) {
+		return _courseLocalService.countOpenOrRestrictedChildCourses(courseId);
 	}
 
 	public java.util.List<com.liferay.lms.model.Course> getCoursesParents(
@@ -863,6 +872,11 @@ public class CourseLocalServiceWrapper implements CourseLocalService,
 			com.liferay.portal.kernel.exception.SystemException {
 		return _courseLocalService.validateAddUserToCourse(groupId, userId,
 			teamId);
+	}
+
+	public java.util.List<com.liferay.portal.model.Group> getDistinctCourseGroups(
+		long companyId) {
+		return _courseLocalService.getDistinctCourseGroups(companyId);
 	}
 
 	/**

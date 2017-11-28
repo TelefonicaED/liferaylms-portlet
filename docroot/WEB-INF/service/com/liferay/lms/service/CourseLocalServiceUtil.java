@@ -780,8 +780,17 @@ public class CourseLocalServiceUtil {
 		return getService().getChildCourses(courseId, start, end);
 	}
 
+	public static java.util.List<com.liferay.lms.model.Course> getOpenOrRestrictedChildCourses(
+		long courseId) {
+		return getService().getOpenOrRestrictedChildCourses(courseId);
+	}
+
 	public static int countChildCourses(long courseId) {
 		return getService().countChildCourses(courseId);
+	}
+
+	public static int countOpenOrRestrictedChildCourses(long courseId) {
+		return getService().countOpenOrRestrictedChildCourses(courseId);
 	}
 
 	public static java.util.List<com.liferay.lms.model.Course> getCoursesParents(
@@ -895,6 +904,11 @@ public class CourseLocalServiceUtil {
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		return getService().validateAddUserToCourse(groupId, userId, teamId);
+	}
+
+	public static java.util.List<com.liferay.portal.model.Group> getDistinctCourseGroups(
+		long companyId) {
+		return getService().getDistinctCourseGroups(companyId);
 	}
 
 	public static void clearService() {

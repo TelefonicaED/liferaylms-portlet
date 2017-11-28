@@ -28,18 +28,13 @@
 	Course course=CourseLocalServiceUtil.fetchByGroupCreatedId(themeDisplay.getScopeGroupId());
 	
 	if(course!=null && permissionChecker.hasPermission(course.getGroupId(),  Course.class.getName(),course.getCourseId(),ActionKeys.VIEW)){
-		
+		Group groupC = GroupLocalServiceUtil.getGroup(course.getGroupCreatedId());
 		if(themeDisplay.isSignedIn()){	%>
 		
 			<liferay-ui:error message="inscription-error-syte-restricted" key="inscription-error-syte-restricted"></liferay-ui:error>
 			<liferay-ui:error message="inscription-error-max-users" key="inscription-error-max-users"></liferay-ui:error>
 			<liferay-ui:error message="inscription-error-already-enrolled" key="inscription-error-already-enrolled"></liferay-ui:error>
 			<liferay-ui:error message="inscription-error-already-disenrolled" key="inscription-error-already-disenrolled"></liferay-ui:error>
-			
-			
-			
-			
-			
 			
 			<%if(GroupLocalServiceUtil.hasUserGroup(themeDisplay.getUserId(),themeDisplay.getScopeGroupId())){ 
 				Date now = new Date();
@@ -48,7 +43,7 @@
 				<%} else {
 					CourseResult courseResult = CourseResultLocalServiceUtil.getByUserAndCourse(course.getCourseId(), themeDisplay.getUserId()); 
 					
-					if(courseResult != null && courseResult.getPassedDate() != null){%>
+					if((courseResult != null && courseResult.getPassedDate() != null) ||  (groupC.getType()!=GroupConstants.TYPE_SITE_OPEN)){%>
 						<div class="mensaje_marcado"><liferay-ui:message key="inscripcion.inscrito" /></div>	
 					<%}else{ %>
 					
@@ -69,7 +64,7 @@
 					<%}
 				}
 			} else {
-				Group groupC = GroupLocalServiceUtil.getGroup(course.getGroupCreatedId());
+				
 				List<CourseCompetence> courseCompetences = CourseCompetenceLocalServiceUtil.findBycourseId(course.getCourseId(), true);
 					
 				boolean pass=true;

@@ -1,5 +1,9 @@
 package com.liferay.lms.actions;
 
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.List;
+
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
 import javax.portlet.PortletConfig;
@@ -7,12 +11,19 @@ import javax.portlet.PortletPreferences;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 
+import com.liferay.lms.model.Course;
 import com.liferay.portal.kernel.portlet.ConfigurationAction;
 import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.portal.service.ClassNameLocalServiceUtil;
+import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portlet.PortletPreferencesFactoryUtil;
+import com.liferay.portlet.expando.model.ExpandoColumn;
+import com.liferay.portlet.expando.service.ExpandoColumnLocalServiceUtil;
 
 public class CourseAdminConfigurationAction implements ConfigurationAction {
 	public static final String JSP = "/html/courseadmin/config/edit.jsp";
@@ -47,6 +58,7 @@ public class CourseAdminConfigurationAction implements ConfigurationAction {
 		portletPreferences.setValue("showMembers",	Boolean.toString(ParamUtil.getBoolean(actionRequest, "showMembers",	true)));
 		portletPreferences.setValue("showExport",	Boolean.toString(ParamUtil.getBoolean(actionRequest, "showExport",	true)));
 		portletPreferences.setValue("showImport",	Boolean.toString(ParamUtil.getBoolean(actionRequest, "showImport",	true)));
+		portletPreferences.setValue("showGroupFilter",	Boolean.toString(ParamUtil.getBoolean(actionRequest, "showGroupFilter",	false)));
 		portletPreferences.setValue("showClone",	Boolean.toString(ParamUtil.getBoolean(actionRequest, "showClone",	true)));
 		portletPreferences.setValue("showGo",		Boolean.toString(ParamUtil.getBoolean(actionRequest, "showGo",		true)));
 		portletPreferences.setValue("showPermission",Boolean.toString(ParamUtil.getBoolean(actionRequest, "showPermission",	true)));
@@ -71,6 +83,23 @@ public class CourseAdminConfigurationAction implements ConfigurationAction {
 		portletPreferences.setValue("filterByTemplates",	Boolean.toString(ParamUtil.getBoolean(actionRequest, "filterByTemplates",	false)));
 		
 		portletPreferences.setValue	("tipoImport", ParamUtil.getString(actionRequest, "tipoImport", ""));
+		
+		
+		//Campos personalizados a mostrar en la tabla
+		// Expandos dinamicos
+		ThemeDisplay themeDisplay = (ThemeDisplay) actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
+		List<ExpandoColumn> expandosColumnCourse = ExpandoColumnLocalServiceUtil.getDefaultTableColumns(themeDisplay.getCompanyId(), ClassNameLocalServiceUtil.getClassNameId(Course.class));
+		if(Validator.isNotNull(expandosColumnCourse) && expandosColumnCourse.size()>0) {
+			String expandoName="";
+			for (ExpandoColumn expandoCourse : expandosColumnCourse) {
+				expandoName = StringUtil.upperCaseFirstLetter(expandoCourse.getName());
+				if(ParamUtil.getBoolean(actionRequest, "show" + expandoName,	false)){
+					System.out.println("SAVE: show" + expandoName+ "   VALUE:  "+actionRequest.getParameter("show" + expandoName));
+					portletPreferences.setValue("show" + expandoName, actionRequest.getParameter("show" + expandoName));
+				}
+			}	
+		}
+		
 		
 		portletPreferences.store();
 		SessionMessages.add( 

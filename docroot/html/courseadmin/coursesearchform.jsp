@@ -73,6 +73,14 @@ if(catIds!=null&&catIds.length>0)
 						
 			<aui:button type="submit" value="search"></aui:button>
 		</aui:fieldset>
+		<c:if test="${renderRequest.preferences.getValue('showGroupFilter', 'false') }">
+			<aui:select name="groupId" label="courseadmin.search.select-group">
+					<aui:option label="" value="0"/>
+					<c:forEach items="${listGroups}"  var="courseGroup">
+						<aui:option label="${courseGroup.name }" value="${courseGroup.groupId}"/>
+					</c:forEach>
+			</aui:select>
+		</c:if>
 		<c:if test="${renderRequest.preferences.getValue('showSearchTags', 'false') }">
 			<liferay-ui:panel id="panel_tags" title="tags" collapsible="true" defaultState="closed">
 				<liferay-ui:asset-tags-selector ></liferay-ui:asset-tags-selector>
