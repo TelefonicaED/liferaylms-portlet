@@ -527,6 +527,10 @@ public class CourseLocalServiceClp implements CourseLocalService {
 		_methodName91 = "validateAddUserToCourse";
 
 		_methodParameterTypes91 = new String[] { "long", "long", "long" };
+
+		_methodName92 = "getDistinctCourseGroups";
+
+		_methodParameterTypes92 = new String[] { "long" };
 	}
 
 	public com.liferay.lms.model.Course addCourse(
@@ -3718,6 +3722,29 @@ public class CourseLocalServiceClp implements CourseLocalService {
 		return ((Boolean)returnObj).booleanValue();
 	}
 
+	public java.util.List<com.liferay.portal.model.Group> getDistinctCourseGroups(
+		long companyId) {
+		Object returnObj = null;
+
+		try {
+			returnObj = _invokableLocalService.invokeMethod(_methodName92,
+					_methodParameterTypes92, new Object[] { companyId });
+		}
+		catch (Throwable t) {
+			t = ClpSerializer.translateThrowable(t);
+
+			if (t instanceof RuntimeException) {
+				throw (RuntimeException)t;
+			}
+			else {
+				throw new RuntimeException(t.getClass().getName() +
+					" is not a valid exception");
+			}
+		}
+
+		return (java.util.List<com.liferay.portal.model.Group>)ClpSerializer.translateOutput(returnObj);
+	}
+
 	private InvokableLocalService _invokableLocalService;
 	private String _methodName0;
 	private String[] _methodParameterTypes0;
@@ -3901,4 +3928,6 @@ public class CourseLocalServiceClp implements CourseLocalService {
 	private String[] _methodParameterTypes90;
 	private String _methodName91;
 	private String[] _methodParameterTypes91;
+	private String _methodName92;
+	private String[] _methodParameterTypes92;
 }

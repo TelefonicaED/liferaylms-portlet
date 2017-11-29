@@ -535,6 +535,10 @@ public class CourseLocalServiceClpInvoker {
 		_methodName287 = "validateAddUserToCourse";
 
 		_methodParameterTypes287 = new String[] { "long", "long", "long" };
+
+		_methodName288 = "getDistinctCourseGroups";
+
+		_methodParameterTypes288 = new String[] { "long" };
 	}
 
 	public Object invokeMethod(String name, String[] parameterTypes,
@@ -1227,6 +1231,11 @@ public class CourseLocalServiceClpInvoker {
 				((Long)arguments[2]).longValue());
 		}
 
+		if (_methodName288.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes288, parameterTypes)) {
+			return CourseLocalServiceUtil.getDistinctCourseGroups(((Long)arguments[0]).longValue());
+		}
+
 		throw new UnsupportedOperationException();
 	}
 
@@ -1416,4 +1425,6 @@ public class CourseLocalServiceClpInvoker {
 	private String[] _methodParameterTypes286;
 	private String _methodName287;
 	private String[] _methodParameterTypes287;
+	private String _methodName288;
+	private String[] _methodParameterTypes288;
 }

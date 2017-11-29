@@ -690,4 +690,8 @@ public interface CourseLocalService extends BaseLocalService,
 		long teamId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.util.List<com.liferay.portal.model.Group> getDistinctCourseGroups(
+		long companyId);
 }

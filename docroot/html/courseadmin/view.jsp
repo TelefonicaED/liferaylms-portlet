@@ -48,18 +48,25 @@ if( permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), "com.liferay
 		Layout initCourseLayout = LayoutLocalServiceUtil.fetchFirstLayout(course.getGroupCreatedId(), false, 0);
 		%>
 		<liferay-ui:search-container-column-text name="course">
-
-		<c:choose>
-		
-			<c:when test="<%= !course.isClosed()  && permissionChecker.hasPermission(course.getGroupCreatedId(),  Course.class.getName(),course.getCourseId(),ActionKeys.VIEW) %>">
-				<a href='<%=themeDisplay.getPortalURL() +"/"+ themeDisplay.getLocale().getLanguage() +"/web"+ groupsel.getFriendlyURL()%>'><%=course.getTitle(themeDisplay.getLocale()) %></a>
-			</c:when>
-			<c:otherwise>
-				<span class="cclosed"><%=course.getTitle(themeDisplay.getLocale()) %></span>
-			</c:otherwise>
-		</c:choose>
-		
+			<c:choose>
+				<c:when test="<%= !course.isClosed()  && permissionChecker.hasPermission(course.getGroupCreatedId(),  Course.class.getName(),course.getCourseId(),ActionKeys.VIEW) %>">
+					<a href='<%=themeDisplay.getPortalURL() +"/"+ themeDisplay.getLocale().getLanguage() +"/web"+ groupsel.getFriendlyURL()%>'><%=course.getTitle(themeDisplay.getLocale()) %></a>
+				</c:when>
+				<c:otherwise>
+					<span class="cclosed"><%=course.getTitle(themeDisplay.getLocale()) %></span>
+				</c:otherwise>
+			</c:choose>
 		</liferay-ui:search-container-column-text>
+		
+		<c:if test="${not empty expandoNames}">
+			<c:forEach items="${expandoNames}" var="expName">
+				<liferay-ui:search-container-column-text name="${expName}">
+					<liferay-ui:custom-attribute classPK="${courseId}" name="${expName}" 
+								className="<%= Course.class.getName() %>" editable="false" label="false" >
+					</liferay-ui:custom-attribute>
+				</liferay-ui:search-container-column-text>
+			</c:forEach>
+		</c:if>
 			
 		<liferay-ui:search-container-column-text name="course.editions-number">
 			<%=CourseLocalServiceUtil.countChildCourses(course.getCourseId()) %>

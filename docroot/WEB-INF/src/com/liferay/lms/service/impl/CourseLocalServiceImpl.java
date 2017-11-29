@@ -1659,6 +1659,11 @@ public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int e
 		return result;
 	}
 	
+	
+	public List<Group> getDistinctCourseGroups(long companyId){
+		return courseFinder.getDistinctCourseGroups(companyId);
+	}
+	
 }
 
 

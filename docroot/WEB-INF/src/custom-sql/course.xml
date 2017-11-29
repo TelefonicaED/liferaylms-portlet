@@ -604,5 +604,16 @@
 				(g.type_ = ? OR g.type_ = ?)
 		]]>
 	</sql>
-	
+	<sql id="com.liferay.lms.service.persistence.CourseFinder.getDistinctCourseGroups">
+		<![CDATA[   		
+			SELECT 
+				DISTINCT g.*
+			FROM 
+				group_ g
+			INNER JOIN 
+				lms_course c 
+					ON g.groupId = c.groupId
+			WHERE g.companyId = ?
+		]]>
+	</sql>
 </custom-sql>

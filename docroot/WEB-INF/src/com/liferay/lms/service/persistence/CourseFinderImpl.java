@@ -158,6 +158,9 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			CourseFinder.class.getName() + ".getOpenOrRestrictedCoursesByParentId";
 	public static final String COUNT_OPEN_OR_RESTRICTED_CHILD_COURSES = 
 			CourseFinder.class.getName() + ".countOpenOrRestrictedCoursesByParentId";
+	public static final String GET_DISTINCT_COURSE_GROUPS = 
+			CourseFinder.class.getName() + ".getDistinctCourseGroups";
+	
 	
 	public List<Course> findByT_S_C_T_T(String freeText, int status, long[] categories, long[] tags, String templates, long companyId, long groupId, long userId, String language, boolean isAdmin, boolean searchParentCourses, boolean andOperator, int start, int end){
 		return findByT_S_C_T_T(freeText, -1, status, categories, tags, templates, companyId, groupId, userId, language, isAdmin, searchParentCourses, andOperator, start, end);
@@ -1320,6 +1323,7 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 		return 0;
 	}
 	
+	
 	public int countOpenOrRestrictedChildCourses(long parentCourseId){
 		Session session = null;
 
@@ -1363,6 +1367,38 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 	
 		return 0;
 	}
+	
+	
+	public List<Group> getDistinctCourseGroups(long companyId){
+		Session session = null;
+		List<Group> distinctCourseGroups = new ArrayList<Group>();
+		
+		try{
+			
+			session = openSessionLiferay();
+			
+			String sql = CustomSQLUtil.get(GET_DISTINCT_COURSE_GROUPS);
+			if(log.isDebugEnabled()){
+				log.debug("sql: " + sql);
+			}
+			SQLQuery q = session.createSQLQuery(sql);
+			q.addEntity("Group_",PortalClassLoaderUtil.getClassLoader().loadClass("com.liferay.portal.model.impl.GroupImpl"));
+			
+			QueryPos qPos = QueryPos.getInstance(q);			
+			qPos.add(companyId);				
+			distinctCourseGroups = (List<Group>)q.list();
+			
+			
+			
+		} catch (Exception e) {
+	       e.printStackTrace();
+	    } finally {
+	        closeSessionLiferay(session);
+	    }
+	
+		return distinctCourseGroups;
+	}
+	
 	
 	private final Class<?> getPortalClass(String className) {
 		ClassLoader portalCl = PortalClassLoaderUtil.getClassLoader();

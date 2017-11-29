@@ -874,6 +874,11 @@ public class CourseLocalServiceWrapper implements CourseLocalService,
 			teamId);
 	}
 
+	public java.util.List<com.liferay.portal.model.Group> getDistinctCourseGroups(
+		long companyId) {
+		return _courseLocalService.getDistinctCourseGroups(companyId);
+	}
+
 	/**
 	 * @deprecated Renamed to {@link #getWrappedService}
 	 */

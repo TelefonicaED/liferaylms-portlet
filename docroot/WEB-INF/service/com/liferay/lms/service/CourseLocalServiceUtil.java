@@ -906,6 +906,11 @@ public class CourseLocalServiceUtil {
 		return getService().validateAddUserToCourse(groupId, userId, teamId);
 	}
 
+	public static java.util.List<com.liferay.portal.model.Group> getDistinctCourseGroups(
+		long companyId) {
+		return getService().getDistinctCourseGroups(companyId);
+	}
+
 	public static void clearService() {
 		_service = null;
 	}
