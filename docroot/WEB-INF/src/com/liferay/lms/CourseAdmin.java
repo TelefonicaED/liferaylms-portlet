@@ -194,10 +194,6 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 		//*****************************************Si se muestra el filtro de grupos, cogemos los grupos*****//
 		if(Boolean.parseBoolean(renderRequest.getPreferences().getValue("showGroupFilter", "false"))){
 			List<Group> courseGroups = CourseLocalServiceUtil.getDistinctCourseGroups(themeDisplay.getCompanyId());
-			System.out.println("Grupos "+courseGroups.size());
-			for(Group courseGroup : courseGroups){
-				System.out.println("VALUE: "+courseGroup.getGroupId() + " NAME: "+courseGroup.getName());
-			}
 			renderRequest.setAttribute("listGroups", courseGroups);
 			renderRequest.setAttribute("selectedGroupId", selectedGroupId);
 		}
@@ -324,6 +320,7 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 		}
 
 		long groupId = themeDisplay.getScopeGroupId();
+		log.debug("SELECTED GROUP ID " + selectedGroupId);
 		if(selectedGroupId>-1){
 			groupId = selectedGroupId;
 		}

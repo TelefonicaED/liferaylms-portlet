@@ -74,7 +74,7 @@ if(catIds!=null&&catIds.length>0)
 			<aui:button type="submit" value="search"></aui:button>
 		</aui:fieldset>
 		<c:if test="${renderRequest.preferences.getValue('showGroupFilter', 'false') }">
-			<aui:select name="groupId" label="courseadmin.search.select-group">
+			<aui:select name="selectedGroupId" label="courseadmin.search.select-group">
 					<aui:option label="" value="0"/>
 					<c:forEach items="${listGroups}"  var="courseGroup">
 						<aui:option label="${courseGroup.name }" value="${courseGroup.groupId}"/>
