@@ -1,150 +1,71 @@
 package com.liferay.lms;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.Enumeration;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
 import java.util.TimeZone;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
 import javax.portlet.PortletException;
-import javax.portlet.PortletPreferences;
-import javax.portlet.PortletRequest;
-import javax.portlet.PortletRequestDispatcher;
-import javax.portlet.PortletResponse;
 import javax.portlet.PortletSession;
 import javax.portlet.PortletURL;
-import javax.portlet.ProcessAction;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
-import javax.portlet.ResourceRequest;
-import javax.portlet.ResourceResponse;
 
-import au.com.bytecode.opencsv.CSVReader;
-import au.com.bytecode.opencsv.CSVWriter;
-
-import com.liferay.counter.service.CounterLocalServiceUtil;
-import com.liferay.lms.auditing.AuditConstants;
-import com.liferay.lms.auditing.AuditingLogFactory;
-import com.liferay.lms.course.diploma.CourseDiploma;
-import com.liferay.lms.course.diploma.CourseDiplomaRegistry;
-import com.liferay.lms.learningactivity.calificationtype.CalificationType;
-import com.liferay.lms.learningactivity.calificationtype.CalificationTypeRegistry;
-import com.liferay.lms.learningactivity.courseeval.CourseEval;
-import com.liferay.lms.learningactivity.courseeval.CourseEvalRegistry;
 import com.liferay.lms.model.Course;
-import com.liferay.lms.model.CourseCompetence;
-import com.liferay.lms.model.CourseResult;
 import com.liferay.lms.model.LmsPrefs;
-import com.liferay.lms.service.CourseCompetenceLocalServiceUtil;
 import com.liferay.lms.service.CourseLocalServiceUtil;
-import com.liferay.lms.service.CourseResultLocalServiceUtil;
 import com.liferay.lms.service.CourseServiceUtil;
 import com.liferay.lms.service.LmsPrefsLocalServiceUtil;
-import com.liferay.lms.util.searchcontainer.UserSearchContainer;
-import com.liferay.lms.util.searchterms.UserSearchTerms;
-import com.liferay.portal.DuplicateGroupException;
 import com.liferay.portal.LARFileException;
 import com.liferay.portal.LARTypeException;
 import com.liferay.portal.LayoutImportException;
 import com.liferay.portal.NoSuchGroupException;
-import com.liferay.portal.kernel.cache.MultiVMPoolUtil;
-import com.liferay.portal.kernel.cluster.ClusterExecutorUtil;
-import com.liferay.portal.kernel.cluster.ClusterNode;
-import com.liferay.portal.kernel.dao.orm.CustomSQLParam;
-import com.liferay.portal.kernel.dao.orm.DynamicQuery;
-import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
-import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
-import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
-import com.liferay.portal.kernel.exception.NestableException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.json.JSONArray;
-import com.liferay.portal.kernel.json.JSONFactoryUtil;
-import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.lar.PortletDataHandlerKeys;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.messaging.Message;
 import com.liferay.portal.kernel.messaging.MessageBusUtil;
-import com.liferay.portal.kernel.repository.model.FileEntry;
-import com.liferay.portal.kernel.repository.model.Folder;
-import com.liferay.portal.kernel.search.Indexer;
-import com.liferay.portal.kernel.search.IndexerRegistryUtil;
-import com.liferay.portal.kernel.servlet.HttpHeaders;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.upload.UploadPortletRequest;
 import com.liferay.portal.kernel.util.ArrayUtil;
-import com.liferay.portal.kernel.util.CharPool;
-import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.FileUtil;
-import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ParamUtil;
-import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
-import com.liferay.portal.kernel.util.PrefsPropsUtil;
-import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.kernel.util.Time;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
-import com.liferay.portal.kernel.lar.PortletDataHandlerKeys;
 import com.liferay.portal.model.Group;
-import com.liferay.portal.model.GroupConstants;
 import com.liferay.portal.model.LayoutSetPrototype;
-import com.liferay.portal.model.Organization;
-import com.liferay.portal.model.Role;
 import com.liferay.portal.model.RoleConstants;
-import com.liferay.portal.model.Team;
 import com.liferay.portal.model.User;
-import com.liferay.portal.model.UserGroupRole;
 import com.liferay.portal.security.permission.ActionKeys;
-import com.liferay.portal.security.permission.PermissionChecker;
-import com.liferay.portal.security.permission.PermissionCheckerFactoryUtil;
+import com.liferay.portal.service.ClassNameLocalServiceUtil;
 import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.LayoutServiceUtil;
 import com.liferay.portal.service.LayoutSetPrototypeLocalServiceUtil;
-import com.liferay.portal.service.OrganizationLocalServiceUtil;
 import com.liferay.portal.service.RoleLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceContextFactory;
-import com.liferay.portal.service.TeamLocalServiceUtil;
-import com.liferay.portal.service.UserGroupRoleLocalServiceUtil;
 import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
-import com.liferay.portal.util.comparator.UserLastNameComparator;
 import com.liferay.portlet.announcements.EntryDisplayDateException;
-import com.liferay.portlet.asset.AssetCategoryException;
-import com.liferay.portlet.asset.model.AssetCategory;
-import com.liferay.portlet.asset.model.AssetVocabulary;
-import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
 import com.liferay.portlet.asset.service.AssetTagLocalServiceUtil;
-import com.liferay.portlet.documentlibrary.model.DLFolder;
-import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
-import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
-import com.liferay.portlet.documentlibrary.service.DLFolderLocalServiceUtil;
-import com.liferay.portlet.usersadmin.util.UsersAdminUtil;
-import com.liferay.util.bridges.mvc.MVCPortlet;
+import com.liferay.portlet.expando.model.ExpandoColumn;
+import com.liferay.portlet.expando.service.ExpandoColumnLocalServiceUtil;
 import com.tls.lms.util.LiferaylmsUtil;
 
 /**
@@ -248,7 +169,7 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 		String freetext = ParamUtil.getString(renderRequest, "freetext","");
 		String tags = ParamUtil.getString(renderRequest, "tags","");
 		int state = ParamUtil.getInteger(renderRequest, "state",WorkflowConstants.STATUS_APPROVED);
-
+		long selectedGroupId = ParamUtil.get(renderRequest,"selectedGroupId",-1);
 		long catId=ParamUtil.getLong(renderRequest, "categoryId",0);
 		
 		//*****************************************Cogemos los tags************************************//
@@ -270,7 +191,18 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 			e1.printStackTrace();
 		}
 
-
+		//*****************************************Si se muestra el filtro de grupos, cogemos los grupos*****//
+		if(Boolean.parseBoolean(renderRequest.getPreferences().getValue("showGroupFilter", "false"))){
+			List<Group> courseGroups = CourseLocalServiceUtil.getDistinctCourseGroups(themeDisplay.getCompanyId());
+			System.out.println("Grupos "+courseGroups.size());
+			for(Group courseGroup : courseGroups){
+				System.out.println("VALUE: "+courseGroup.getGroupId() + " NAME: "+courseGroup.getName());
+			}
+			renderRequest.setAttribute("listGroups", courseGroups);
+			renderRequest.setAttribute("selectedGroupId", selectedGroupId);
+		}
+		
+		
 		//*****************************************Cogemos las categorias************************************//
 		Enumeration<String> pnames =renderRequest.getParameterNames();
 		ArrayList<String> tparams = new ArrayList<String>();
@@ -353,6 +285,7 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 		PortletURL portletURL = renderResponse.createRenderURL();
 		portletURL.setParameter("javax.portlet.action","doView");
 		portletURL.setParameter("freetext",freetext);
+		portletURL.setParameter("selectedGroupId", String.valueOf(selectedGroupId));
 		portletURL.setParameter("state",String.valueOf(state));
 
 		pnames =renderRequest.getParameterNames();
@@ -390,14 +323,19 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 			e.printStackTrace();
 		}
 
+		long groupId = themeDisplay.getScopeGroupId();
+		if(selectedGroupId>-1){
+			groupId = selectedGroupId;
+		}
+		
 		SearchContainer<Course> searchContainer = new SearchContainer<Course>(renderRequest, null, null, SearchContainer.DEFAULT_CUR_PARAM, 
 				SearchContainer.DEFAULT_DELTA, portletURL, 
 				null, "there-are-no-courses");
 
 		searchContainer.setResults(CourseLocalServiceUtil.getParentCoursesByTitleStatusCategoriesTagsTemplates(freetext, closed, categoryIds, tagsSelIds, templates, themeDisplay.getCompanyId(), 
-				themeDisplay.getScopeGroupId(), themeDisplay.getUserId(), themeDisplay.getLanguageId(), isAdmin, true, searchContainer.getStart(), searchContainer.getEnd()));
+				groupId, themeDisplay.getUserId(), themeDisplay.getLanguageId(), isAdmin, true, searchContainer.getStart(), searchContainer.getEnd()));
 		searchContainer.setTotal(CourseLocalServiceUtil.countParentCoursesByTitleStatusCategoriesTagsTemplates(freetext, closed, categoryIds, tagsSelIds, templates, themeDisplay.getCompanyId(), 
-				themeDisplay.getScopeGroupId(), themeDisplay.getUserId(), themeDisplay.getLanguageId(), isAdmin, true));
+				groupId, themeDisplay.getUserId(), themeDisplay.getLanguageId(), isAdmin, true));
 		
 		renderRequest.setAttribute("searchContainer", searchContainer);
 		renderRequest.setAttribute("catIds", catIds);
@@ -411,6 +349,26 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 		renderRequest.setAttribute("STATUS_APPROVED", WorkflowConstants.STATUS_APPROVED);
 		renderRequest.setAttribute("STATUS_INACTIVE", WorkflowConstants.STATUS_INACTIVE);
 		renderRequest.setAttribute("STATUS_ANY", WorkflowConstants.STATUS_ANY);
+		
+		
+		try {
+			List<ExpandoColumn> expandosColumnUser = ExpandoColumnLocalServiceUtil.getDefaultTableColumns(themeDisplay.getCompanyId(), ClassNameLocalServiceUtil.getClassNameId(Course.class));
+			List<String> expandoNames = new ArrayList<String>();
+			if(Validator.isNotNull(expandosColumnUser) && expandosColumnUser.size()>0) {
+				String expandoName="";
+				for (ExpandoColumn expandoUser : expandosColumnUser) {
+					expandoName = StringUtil.upperCaseFirstLetter(expandoUser.getName());
+					if(((renderRequest.getPreferences().getValue("show" + expandoName, "false")).compareTo("true") == 0)) {
+						expandoNames.add(expandoName);
+					}
+				}	
+			}
+		
+			renderRequest.setAttribute("expandoNames", expandoNames);
+		} catch (SystemException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		include(this.viewJSP, renderRequest, renderResponse);
 	}
@@ -426,10 +384,12 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 		
 		ThemeDisplay themeDisplay = (ThemeDisplay)renderRequest.getAttribute(WebKeys.THEME_DISPLAY);
 		long courseId = ParamUtil.getLong(renderRequest, "courseId");
+		String name = ParamUtil.getString(renderRequest, "name");
 		PortletURL portletURL = renderResponse.createRenderURL();
 		portletURL.setParameter("javax.portlet.action","doView");
 		portletURL.setParameter("courseId", String.valueOf(courseId));
 		portletURL.setParameter("view", "editions");
+		portletURL.setParameter("name", name);
 		renderRequest.setAttribute("courseId", courseId);
 		Course course;
 		try {
@@ -450,9 +410,21 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 				SearchContainer.DEFAULT_DELTA, portletURL, 
 				null, "there-are-no-editions");
 
-		searchContainer.setResults(CourseLocalServiceUtil.getChildCourses(courseId, searchContainer.getStart(), searchContainer.getEnd()));
-		searchContainer.setTotal(CourseLocalServiceUtil.countChildCourses(courseId));
+		
+		boolean isAdmin = false;
+		try {
+			isAdmin = RoleLocalServiceUtil.hasUserRole(themeDisplay.getUserId(), RoleLocalServiceUtil.getRole(themeDisplay.getCompanyId(), RoleConstants.ADMINISTRATOR).getRoleId());
+		} catch (SystemException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (PortalException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
+		searchContainer.setResults(CourseLocalServiceUtil.getChildCoursesByTitle(name, courseId, WorkflowConstants.STATUS_ANY, themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(), themeDisplay.getUserId(),themeDisplay.getLanguageId() , isAdmin , true, searchContainer.getStart(), searchContainer.getEnd()));
+		searchContainer.setTotal(CourseLocalServiceUtil.countChildCoursesByTitle(name, courseId, WorkflowConstants.STATUS_ANY, themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(), themeDisplay.getUserId(),themeDisplay.getLanguageId() , isAdmin , true));
+		
 		
 		renderRequest.setAttribute("searchContainer", searchContainer);
 		
@@ -475,12 +447,6 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 				renderRequest.setAttribute("courseGroup", group);
 				log.debug("GroupId "+group);
 				log.debug("CourseId "+course);
-						
-				PortletURL backURL = renderResponse.createRenderURL();
-				backURL.setParameter("javax.portlet.action","doView");
-				backURL.setParameter("courseId", String.valueOf(course.getCourseId()));
-				backURL.setParameter("view", "editions");
-				renderRequest.setAttribute("backURL", backURL);
 				renderRequest.setAttribute("course", course);
 				
 				
@@ -490,11 +456,36 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 				
 				String editionsTitle =LanguageUtil.format(themeDisplay.getLocale(), "course-admin.new-edition-x", course.getTitle(themeDisplay.getLocale()));
 				renderRequest.setAttribute("editionTitle", editionsTitle);
+				renderRequest.setAttribute("editionFriendlyURL", course.getFriendlyURL()+"-"+newCourseName.replace(" ", "-"));
 				
-				
-				
+				String[] layusprsel=null;
+				if(renderRequest.getPreferences().getValue("courseTemplates", null)!=null&&renderRequest.getPreferences().getValue("courseTemplates", null).length()>0)
+				{
+						layusprsel=renderRequest.getPreferences().getValue("courseTemplates", "").split(",");
+				}
+				String[] lspList=LmsPrefsLocalServiceUtil.getLmsPrefsIni(themeDisplay.getCompanyId()).getLmsTemplates().split(",");
+				if(layusprsel!=null && layusprsel.length>0)
+				{
+					lspList=layusprsel;
+
+				}
+				if(lspList.length>1){
+					List<LayoutSetPrototype> prototypeList = new ArrayList<LayoutSetPrototype>();
+					for(String lspId: lspList){
+						prototypeList.add(LayoutSetPrototypeLocalServiceUtil.getLayoutSetPrototype(Long.parseLong(lspId)));
+						
+					}
+					
+					long parentCourseLspId = GroupLocalServiceUtil.fetchGroup(course.getGroupCreatedId()).getPublicLayoutSet().getLayoutSetPrototypeId();
+					renderRequest.setAttribute("lspList", prototypeList);
+					renderRequest.setAttribute("parentCourseLspId", parentCourseLspId);
+					renderRequest.setAttribute("viewTemplateSelector", true);
+				}else{
+					LayoutSetPrototype lsp=LayoutSetPrototypeLocalServiceUtil.getLayoutSetPrototype(Long.parseLong(lspList[0]));
+					renderRequest.setAttribute("lspId", lsp.getLayoutSetPrototypeId());
+					renderRequest.setAttribute("viewTemplateSelector", false);
+				}
 			}
-			
 			
 			SimpleDateFormat formatDay = new SimpleDateFormat("dd");
 			formatDay.setTimeZone(timeZone);
@@ -506,20 +497,27 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 			formatHour.setTimeZone(timeZone);
 			SimpleDateFormat formatMin = new SimpleDateFormat("mm");
 			formatMin.setTimeZone(timeZone);
-			Date today=new Date(System.currentTimeMillis());
-			
+			Date today=course.getStartDate();
+			if(Validator.isNull(today)){
+				today = new Date();
+			}
 			int startDay=Integer.parseInt(formatDay.format(today));
 			int startMonth=Integer.parseInt(formatMonth.format(today))-1;
 			int startYear=Integer.parseInt(formatYear.format(today));
 			int startHour=Integer.parseInt(formatHour.format(today));
 			int startMin=Integer.parseInt(formatMin.format(today));
 			
+			today = course.getEndDate();
+			if(Validator.isNull(today)){
+				today = new Date();
+			}
+			
 			int endDay=Integer.parseInt(formatDay.format(today));
 			int endMonth=Integer.parseInt(formatMonth.format(today))-1;
-			int endYear=Integer.parseInt(formatYear.format(today))+1;
+			int endYear=Integer.parseInt(formatYear.format(today));
 			int endHour=Integer.parseInt(formatHour.format(today));
 			int endMin=Integer.parseInt(formatMin.format(today));
-			
+			//Inscription Date
 			renderRequest.setAttribute("startDay", startDay);
 			renderRequest.setAttribute("startMonth", startMonth);
 			renderRequest.setAttribute("startYear", startYear);
@@ -532,6 +530,44 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 			renderRequest.setAttribute("endYear", endYear);
 			renderRequest.setAttribute("endHour", endHour);
 			renderRequest.setAttribute("endMin", endMin);
+			
+			
+			today = course.getExecutionStartDate();
+			
+			if(Validator.isNull(today)){
+				today = new Date();
+			}
+			startDay=Integer.parseInt(formatDay.format(today));
+			startMonth=Integer.parseInt(formatMonth.format(today))-1;
+			startYear=Integer.parseInt(formatYear.format(today));
+			startHour=Integer.parseInt(formatHour.format(today));
+			startMin=Integer.parseInt(formatMin.format(today));
+			
+			today = course.getExecutionEndDate();
+			
+			if(Validator.isNull(today)){
+				today = new Date();
+			}
+			endDay=Integer.parseInt(formatDay.format(today));
+			endMonth=Integer.parseInt(formatMonth.format(today))-1;
+			endYear=Integer.parseInt(formatYear.format(today));
+			endHour=Integer.parseInt(formatHour.format(today));
+			endMin=Integer.parseInt(formatMin.format(today));
+			
+			//Execution Date
+			renderRequest.setAttribute("startExecutionDay", startDay);
+			renderRequest.setAttribute("startExecutionMonth", startMonth);
+			renderRequest.setAttribute("startExecutionYear", startYear);
+			renderRequest.setAttribute("startExecutionHour", startHour);
+			renderRequest.setAttribute("startExecutionMin", startMin);
+			renderRequest.setAttribute("defaultStartYear", LiferaylmsUtil.defaultStartYear);
+			renderRequest.setAttribute("defaultEndYear", LiferaylmsUtil.defaultEndYear);
+			renderRequest.setAttribute("endExecutionDay", endDay);
+			renderRequest.setAttribute("endExecutionMonth", endMonth);
+			renderRequest.setAttribute("endExecutionYear", endYear);
+			renderRequest.setAttribute("endExecutionHour", endHour);
+			renderRequest.setAttribute("endExecutionMin", endMin);
+			
 			
 			
 		}catch(Exception e){
@@ -746,9 +782,13 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 		ServiceContext serviceContext = ServiceContextFactory.getInstance(Course.class.getName(), actionRequest);
 		boolean isLinked = ParamUtil.getBoolean(actionRequest, "linkedCourse", false);
 		long parentCourseId = ParamUtil.getLong(actionRequest, "parentCourseId",0);
-		
+		String friendlyURL = ParamUtil.getString(actionRequest, "editionFriendlyURL");
 		String newEditionName  = ParamUtil.getString(actionRequest, "newCourseName", "New edition");
+		long editionLayoutId = ParamUtil.getLong(actionRequest, "courseTemplate");
 		
+		
+		
+		//Inscription Date
 		int startMonth = 	ParamUtil.getInteger(actionRequest, "startMon");
 		int startYear = 	ParamUtil.getInteger(actionRequest, "startYear");
 		int startDay = 		ParamUtil.getInteger(actionRequest, "startDay");
@@ -771,15 +811,38 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 		}
 		Date endDate = PortalUtil.getDate(stopMonth, stopDay, stopYear, stopHour, stopMinute, themeDisplay.getTimeZone(), EntryDisplayDateException.class);
 		
+		
+		
+		startMonth = 	ParamUtil.getInteger(actionRequest, "startExecutionMon");
+		startYear = 	ParamUtil.getInteger(actionRequest, "startExecutionYear");
+		startDay = 		ParamUtil.getInteger(actionRequest, "startExecutionDay");
+		startHour = 	ParamUtil.getInteger(actionRequest, "startExecutionHour");
+		startMinute = 	ParamUtil.getInteger(actionRequest, "startExecutionMin");
+		startAMPM = 	ParamUtil.getInteger(actionRequest, "startExecutionAMPM");
+		if(startAMPM > 0) {
+			startHour += 12;
+		}
+		Date startExecutionDate = PortalUtil.getDate(startMonth, startDay, startYear, startHour, startMinute, themeDisplay.getTimeZone(), EntryDisplayDateException.class);
+		
+		stopMonth = 	ParamUtil.getInteger(actionRequest, "stopExecutionMon");
+		stopYear = 		ParamUtil.getInteger(actionRequest, "stopExecutionYear");
+		stopDay = 		ParamUtil.getInteger(actionRequest, "stopExecutionDay");
+		stopHour = 		ParamUtil.getInteger(actionRequest, "stopExecutionHour");
+		stopMinute = 	ParamUtil.getInteger(actionRequest, "stopExecutionMin");
+		stopAMPM = 		ParamUtil.getInteger(actionRequest, "stopExecutionAMPM");
+		if (stopAMPM > 0) {
+			stopHour += 12;
+		}
+		Date endExecutionDate = PortalUtil.getDate(stopMonth, stopDay, stopYear, stopHour, stopMinute, themeDisplay.getTimeZone(), EntryDisplayDateException.class);
+		
+		
 		// Comprobaciones antes del proceso
 		boolean errors = false;
 		if(endDate.before(startDate)){
-			SessionErrors.add(actionRequest, "course-admin.error.date-interval");
+			SessionErrors.add(actionRequest, "date-interval");
 			errors = true;
 		}
 		
-		
-	
 		Group group = null;
 		try{
 			group = GroupLocalServiceUtil.getGroup(themeDisplay.getCompanyId(), newEditionName);
@@ -791,20 +854,30 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 		}
 		if(!errors){
 			if(group != null) {
-				SessionErrors.add(actionRequest, "course-admin.error.duplicate-name");
+				SessionErrors.add(actionRequest, "duplicate-name");
 				errors = true;
 			} else {
-				
-				Message message=new Message();
-				message.put("parentCourseId", parentCourseId);
-				message.put("newEditionName",newEditionName);
-				message.put("themeDisplay",themeDisplay);
-				message.put("startDate",startDate);
-				message.put("endDate",endDate);
-				message.put("isLinked",isLinked);
-				message.put("serviceContext",serviceContext);
-				MessageBusUtil.sendMessage("liferay/lms/createEdition", message);
-				
+				group=GroupLocalServiceUtil.fetchFriendlyURLGroup(themeDisplay.getCompanyId(), friendlyURL);
+				if(group!=null){
+					SessionErrors.add(actionRequest, "duplicate-friendly-url");
+					errors = true;
+				}else{
+					Message message=new Message();
+					message.put("parentCourseId", parentCourseId);
+					message.put("newEditionName",newEditionName);
+					message.put("themeDisplay",themeDisplay);
+					message.put("startDate",startDate);
+					message.put("endDate",endDate);
+					message.put("startExecutionDate",startExecutionDate);
+					message.put("endExecutionDate",endExecutionDate);
+					message.put("editionFriendlyURL",friendlyURL);
+					message.put("isLinked",isLinked);
+					message.put("serviceContext",serviceContext);
+					message.put("editionLayoutId", editionLayoutId);
+					MessageBusUtil.sendMessage("liferay/lms/createEdition", message);
+			
+				}
+						
 			}
 		}
 		

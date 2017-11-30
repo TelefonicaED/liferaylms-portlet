@@ -1183,6 +1183,13 @@ public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int e
 		return CourseFinderUtil.countByT_S_C_T_T(freeText, status, categories, tags, templates, companyId, groupId, userId, language, isAdmin, true, andOperator);
 	}
 	
+	public List<Course> getChildCoursesByTitle(String freeText, long parentCourseId, int status, long companyId, long groupId, long userId, String language, boolean isAdmin, boolean andOperator, int start, int end){
+		return CourseFinderUtil.findByT_S_C_T_T(freeText, parentCourseId, status, null, null, null, companyId, groupId, userId, language, isAdmin, true, andOperator, start, end);
+	}
+	
+	public int countChildCoursesByTitle(String freeText, long parentCourseId, int status, long companyId, long groupId, long userId, String language, boolean isAdmin, boolean andOperator){
+		return CourseFinderUtil.countByT_S_C_T_T(freeText, parentCourseId, status, null, null, null, companyId, groupId, userId, language, isAdmin, true, andOperator);
+	}
 	
 	public List<User> getStudents(long courseId, long companyId, String screenName, String firstName, String lastName, String emailAddress, boolean andOperator, int start, int end,OrderByComparator comparator){
 		return CourseFinderUtil.findStudents(courseId, companyId, screenName,firstName, lastName, emailAddress, andOperator, start, end, comparator);
@@ -1274,6 +1281,17 @@ public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int e
 		return childCourses;
 	}
 	
+	public List<Course> getOpenOrRestrictedChildCourses(long courseId) {
+		List<Course> childCourses = new ArrayList<Course>();
+		try{
+			childCourses = courseFinder.getOpenOrRestrictedChildCourses(courseId, QueryUtil.ALL_POS, QueryUtil.ALL_POS);
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		return childCourses;
+	}
+	
+	
 	public int countChildCourses(long courseId) {
 		int childCoursesCount = 0;
 		try{
@@ -1283,6 +1301,17 @@ public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int e
 		}
 		return childCoursesCount;
 	}
+	
+	public int countOpenOrRestrictedChildCourses(long courseId) {
+		int childCoursesCount = 0;
+		try{
+			childCoursesCount = courseFinder.countOpenOrRestrictedChildCourses(courseId);	
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		return childCoursesCount;
+	}
+	
 	
 	public java.util.List<Course> getCoursesParents(long groupId) throws SystemException
 	{
@@ -1628,6 +1657,11 @@ public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int e
 			e.printStackTrace();
 		}
 		return result;
+	}
+	
+	
+	public List<Group> getDistinctCourseGroups(long companyId){
+		return courseFinder.getDistinctCourseGroups(companyId);
 	}
 	
 }

@@ -475,9 +475,15 @@
 		]]>
 	</sql>
 	
-	<sql id="com.liferay.lms.service.persistence.CourseFinder.whereParentCourse">
+	<sql id="com.liferay.lms.service.persistence.CourseFinder.whereParentCourseNull">
 		<![CDATA[
 			AND (c.parentCourseId = 0 OR c.parentCourseId IS NULL) 
+		]]>
+	</sql>
+	
+	<sql id="com.liferay.lms.service.persistence.CourseFinder.whereParentCourse">
+		<![CDATA[
+			AND (c.parentCourseId = ?) 
 		]]>
 	</sql>
 	
@@ -567,5 +573,47 @@
 			LIMIT [$START$], [$END$]
 		]]>
 	</sql>
-	
+	<sql id="com.liferay.lms.service.persistence.CourseFinder.getOpenOrRestrictedCoursesByParentId">
+		<![CDATA[   		
+			SELECT 
+				c.*
+			FROM 
+				lms_course c
+			INNER JOIN 
+				group_ g 
+					ON c.groupCreatedId = g.groupId
+			WHERE 
+				c.parentCourseId = ? AND
+				c.closed = 0 AND
+				(g.type_ = ? OR g.type_ = ?)
+ 			LIMIT [$START$], [$END$]
+		]]>
+	</sql>
+	<sql id="com.liferay.lms.service.persistence.CourseFinder.countOpenOrRestrictedCoursesByParentId">
+		<![CDATA[   		
+			SELECT 
+				COUNT(DISTINCT c.courseId) AS COUNT_VALUE
+			FROM 
+				lms_course c
+			INNER JOIN 
+				group_ g 
+					ON c.groupCreatedId = g.groupId
+			WHERE 
+				c.parentCourseId = ? AND
+				c.closed = 0 AND
+				(g.type_ = ? OR g.type_ = ?)
+		]]>
+	</sql>
+	<sql id="com.liferay.lms.service.persistence.CourseFinder.getDistinctCourseGroups">
+		<![CDATA[   		
+			SELECT 
+				DISTINCT g.*
+			FROM 
+				group_ g
+			INNER JOIN 
+				lms_course c 
+					ON g.groupId = c.groupId
+			WHERE g.companyId = ?
+		]]>
+	</sql>
 </custom-sql>

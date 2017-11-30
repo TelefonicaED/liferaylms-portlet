@@ -637,6 +637,24 @@ public class CourseLocalServiceWrapper implements CourseLocalService,
 			language, isAdmin, andOperator);
 	}
 
+	public java.util.List<com.liferay.lms.model.Course> getChildCoursesByTitle(
+		java.lang.String freeText, long parentCourseId, int status,
+		long companyId, long groupId, long userId, java.lang.String language,
+		boolean isAdmin, boolean andOperator, int start, int end) {
+		return _courseLocalService.getChildCoursesByTitle(freeText,
+			parentCourseId, status, companyId, groupId, userId, language,
+			isAdmin, andOperator, start, end);
+	}
+
+	public int countChildCoursesByTitle(java.lang.String freeText,
+		long parentCourseId, int status, long companyId, long groupId,
+		long userId, java.lang.String language, boolean isAdmin,
+		boolean andOperator) {
+		return _courseLocalService.countChildCoursesByTitle(freeText,
+			parentCourseId, status, companyId, groupId, userId, language,
+			isAdmin, andOperator);
+	}
+
 	public java.util.List<com.liferay.portal.model.User> getStudents(
 		long courseId, long companyId, java.lang.String screenName,
 		java.lang.String firstName, java.lang.String lastName,
@@ -733,8 +751,17 @@ public class CourseLocalServiceWrapper implements CourseLocalService,
 		return _courseLocalService.getChildCourses(courseId, start, end);
 	}
 
+	public java.util.List<com.liferay.lms.model.Course> getOpenOrRestrictedChildCourses(
+		long courseId) {
+		return _courseLocalService.getOpenOrRestrictedChildCourses(courseId);
+	}
+
 	public int countChildCourses(long courseId) {
 		return _courseLocalService.countChildCourses(courseId);
+	}
+
+	public int countOpenOrRestrictedChildCourses(long courseId) {
+		return _courseLocalService.countOpenOrRestrictedChildCourses(courseId);
 	}
 
 	public java.util.List<com.liferay.lms.model.Course> getCoursesParents(
@@ -845,6 +872,11 @@ public class CourseLocalServiceWrapper implements CourseLocalService,
 			com.liferay.portal.kernel.exception.SystemException {
 		return _courseLocalService.validateAddUserToCourse(groupId, userId,
 			teamId);
+	}
+
+	public java.util.List<com.liferay.portal.model.Group> getDistinctCourseGroups(
+		long companyId) {
+		return _courseLocalService.getDistinctCourseGroups(companyId);
 	}
 
 	/**

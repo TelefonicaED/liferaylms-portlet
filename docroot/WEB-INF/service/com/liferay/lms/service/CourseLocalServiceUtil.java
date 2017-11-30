@@ -657,6 +657,25 @@ public class CourseLocalServiceUtil {
 			language, isAdmin, andOperator);
 	}
 
+	public static java.util.List<com.liferay.lms.model.Course> getChildCoursesByTitle(
+		java.lang.String freeText, long parentCourseId, int status,
+		long companyId, long groupId, long userId, java.lang.String language,
+		boolean isAdmin, boolean andOperator, int start, int end) {
+		return getService()
+				   .getChildCoursesByTitle(freeText, parentCourseId, status,
+			companyId, groupId, userId, language, isAdmin, andOperator, start,
+			end);
+	}
+
+	public static int countChildCoursesByTitle(java.lang.String freeText,
+		long parentCourseId, int status, long companyId, long groupId,
+		long userId, java.lang.String language, boolean isAdmin,
+		boolean andOperator) {
+		return getService()
+				   .countChildCoursesByTitle(freeText, parentCourseId, status,
+			companyId, groupId, userId, language, isAdmin, andOperator);
+	}
+
 	public static java.util.List<com.liferay.portal.model.User> getStudents(
 		long courseId, long companyId, java.lang.String screenName,
 		java.lang.String firstName, java.lang.String lastName,
@@ -761,8 +780,17 @@ public class CourseLocalServiceUtil {
 		return getService().getChildCourses(courseId, start, end);
 	}
 
+	public static java.util.List<com.liferay.lms.model.Course> getOpenOrRestrictedChildCourses(
+		long courseId) {
+		return getService().getOpenOrRestrictedChildCourses(courseId);
+	}
+
 	public static int countChildCourses(long courseId) {
 		return getService().countChildCourses(courseId);
+	}
+
+	public static int countOpenOrRestrictedChildCourses(long courseId) {
+		return getService().countOpenOrRestrictedChildCourses(courseId);
 	}
 
 	public static java.util.List<com.liferay.lms.model.Course> getCoursesParents(
@@ -876,6 +904,11 @@ public class CourseLocalServiceUtil {
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		return getService().validateAddUserToCourse(groupId, userId, teamId);
+	}
+
+	public static java.util.List<com.liferay.portal.model.Group> getDistinctCourseGroups(
+		long companyId) {
+		return getService().getDistinctCourseGroups(companyId);
 	}
 
 	public static void clearService() {

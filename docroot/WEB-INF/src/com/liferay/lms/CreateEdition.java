@@ -54,6 +54,10 @@ public class CreateEdition extends CourseCopyUtil implements MessageListener {
 	private Date endDate;
 	private boolean isLinked;
 	private long parentCourseId;
+	private String editionFriendlyURL;
+	private long editionLayoutId;
+	private Date startExecutionDate;
+	private Date endExecutionDate;
 	
 	public CreateEdition(long groupId, String newEditionName, ThemeDisplay themeDisplay, Date startDate, Date endDate, long parentCourseId, ServiceContext serviceContext) {
 		super();
@@ -83,7 +87,10 @@ public class CreateEdition extends CourseCopyUtil implements MessageListener {
 			this.themeDisplay = (ThemeDisplay)message.get("themeDisplay");
 			this.parentCourseId = (Long)message.get("parentCourseId");
 			this.isLinked = (Boolean)message.get("isLinked");
-			
+			this.startExecutionDate = (Date) message.get("startExecutionDate");
+			this.endExecutionDate = (Date) message.get("endExecutionDate");
+			this.editionFriendlyURL = (String)message.get("editionFriendlyURL");
+			this.editionLayoutId = (Long)message.get("editionLayoutId");
 			log.debug("Parent Course Id: "+parentCourseId);
 			Role adminRole = RoleLocalServiceUtil.getRole(themeDisplay.getCompanyId(),"Administrator");
 			List<User> adminUsers = UserLocalServiceUtil.getRoleUsers(adminRole.getRoleId());
@@ -119,15 +126,19 @@ public class CreateEdition extends CourseCopyUtil implements MessageListener {
 
 		
 		//Plantilla
-		long layoutSetPrototypeId = group.getPublicLayoutSet().getLayoutSetPrototypeId();
+		
+		if(editionLayoutId<=0){
+			editionLayoutId = group.getPublicLayoutSet().getLayoutSetPrototypeId();
+		}
 		if(log.isDebugEnabled()){
-			log.debug("  + layoutSetPrototypeId: "+layoutSetPrototypeId);
+			log.debug("  + layoutSetPrototypeId: "+editionLayoutId);
 		}
 		
 	
 		
 		//Tags y categorias
 		try{
+			AssetEntryLocalServiceUtil.validate(course.getGroupCreatedId(), Course.class.getName(), serviceContext.getAssetCategoryIds(), serviceContext.getAssetTagNames());
 			serviceContext.setAssetCategoryIds(AssetEntryLocalServiceUtil.getEntry(Course.class.getName(), course.getCourseId()).getCategoryIds());
 			if(log.isDebugEnabled()){
 				log.debug("  + AssetCategoryIds: "+AssetEntryLocalServiceUtil.getEntry(Course.class.getName(), course.getCourseId()).getCategoryIds().toString());
@@ -146,13 +157,15 @@ public class CreateEdition extends CourseCopyUtil implements MessageListener {
 		try{
 			summary = AssetEntryLocalServiceUtil.getEntry(Course.class.getName(),course.getCourseId()).getSummary(themeDisplay.getLocale());
 			newCourse = CourseLocalServiceUtil.addCourse(course.getTitle(themeDisplay.getLocale())+"-"+newEditionName, course.getDescription(themeDisplay.getLocale()),summary
-					, "", themeDisplay.getLocale(), today, startDate, endDate, layoutSetPrototypeId, typeSite, serviceContext, course.getCalificationType(), (int)course.getMaxusers(),true);
+					, editionFriendlyURL, themeDisplay.getLocale(), today, startDate, endDate, editionLayoutId, typeSite, serviceContext, course.getCalificationType(), (int)course.getMaxusers(),true);
 			
 			newCourse.setTitle(newEditionName, themeDisplay.getLocale());
 			newCourse.setWelcome(course.getWelcome());
 			newCourse.setWelcomeMsg(course.getWelcomeMsg());
 			newCourse.setWelcomeSubject(course.getWelcomeSubject());
 			newCourse.setGoodbye(course.getGoodbye());
+			newCourse.setExecutionStartDate(startExecutionDate);
+			newCourse.setExecutionEndDate(endExecutionDate);
 			newCourse.setGoodbyeMsg(course.getGoodbyeMsg());
 			newCourse.setGoodbyeSubject(course.getGoodbyeSubject());
 			newCourse.setCourseEvalId(course.getCourseEvalId());
@@ -198,6 +211,9 @@ public class CreateEdition extends CourseCopyUtil implements MessageListener {
 		
 		//Create modules and activities
 		createModulesAndActivities(newCourse, siteMemberRole, group.getGroupId());
+		
+		//Create Tags and Categories
+		
 		log.debug(" ENDS!");
 	}
 	
@@ -318,7 +334,7 @@ public class CreateEdition extends CourseCopyUtil implements MessageListener {
 				
 				nuevaLarn=LearningActivityLocalServiceUtil.addLearningActivity(newLearnActivity,serviceContext);
 
-				log.error("ACTIVITY EXTRA CONTENT BEFORE "+ newLearnActivity.getExtracontent());
+				log.debug("ACTIVITY EXTRA CONTENT BEFORE "+ newLearnActivity.getExtracontent());
 				
 				log.debug("Learning Activity : " + activity.getTitle(Locale.getDefault())+ " ("+activity.getActId()+", " + LanguageUtil.get(Locale.getDefault(),learningActivityTypeRegistry.getLearningActivityType(activity.getTypeId()).getName())+")");
 				log.debug("+Learning Activity : " + nuevaLarn.getTitle(Locale.getDefault())+ " ("+nuevaLarn.getActId()+", " + LanguageUtil.get(Locale.getDefault(),learningActivityTypeRegistry.getLearningActivityType(nuevaLarn.getTypeId()).getName())+") Can Be Linked: "+canBeLinked);

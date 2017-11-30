@@ -58,10 +58,7 @@
 			AssetRenderer assetRenderer = laf.getAssetRenderer(learningActivity.getActId(), 0);
 
 			String urlEdit = assetRenderer.getURLEdit(liferayPortletRequest, liferayPortletResponse).toString();
-			System.out.println("*******URL EDIT: "+urlEdit);
 			request.setAttribute("backUrl", urlEdit);
-		}else{
-			System.out.println("*******laf: NULL");
 		}
 	}
 	
@@ -142,10 +139,12 @@ Liferay.provide(
 		}
 	%>
 	<c:if test="<%=isCourse%>">
-		<aui:select id="banks-support" name="banks-support" label="execativity.editquestions.banksquestions" onChange="modifyIsBank(this.value)">
-			<aui:option value="false" selected="<%=!useBank %>"><liferay-ui:message key='editactivity.mandatory.no'/></aui:option>
-			<aui:option value="true" selected="<%=useBank %>"><liferay-ui:message key='editactivity.mandatory.yes'/></aui:option>
-		</aui:select>
+		<div class="banks-support">
+			<aui:select id="banks-support" cssClass="banks-support" name="banks-support" label="execativity.editquestions.banksquestions" onChange="modifyIsBank(this.value)">
+				<aui:option value="false" selected="<%=!useBank %>"><liferay-ui:message key='editactivity.mandatory.no'/></aui:option>
+				<aui:option value="true" selected="<%=useBank %>"><liferay-ui:message key='editactivity.mandatory.yes'/></aui:option>
+			</aui:select>
+		</div>
 		<c:if test="<%=useBank%>">
 			<script>
 				AUI().ready(function(A) {

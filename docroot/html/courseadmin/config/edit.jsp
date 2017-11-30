@@ -1,3 +1,10 @@
+<%@page import="com.liferay.portal.kernel.util.DateUtil"%>
+<%@page import="com.liferay.portlet.expando.model.ExpandoColumnConstants"%>
+<%@page import="com.liferay.lms.model.Course"%>
+<%@page import="com.liferay.portal.service.ClassNameLocalServiceUtil"%>
+<%@page import="com.liferay.portlet.expando.service.ExpandoColumnLocalServiceUtil"%>
+<%@page import="com.liferay.lms.service.CourseLocalServiceUtil"%>
+<%@page import="com.liferay.portlet.expando.model.ExpandoColumn"%>
 <%@page import="org.apache.commons.lang.ArrayUtils"%>
 <%@page import="com.liferay.portal.kernel.util.ArrayUtil"%>
 <%@page import="com.liferay.portal.service.LayoutSetPrototypeLocalServiceUtil"%>
@@ -48,6 +55,7 @@
 	boolean showCourseCatalogForEditions = preferences.getValue("showCourseCatalogForEditions","false").equals("true");
 	boolean showEditionsWithoutRestrictions = preferences.getValue("showEditionsWithoutRestrictions","false").equals("true");
 	boolean filterByTemplates = preferences.getValue("filterByTemplates","false").equals("true");
+	boolean showGroupFilter = preferences.getValue("showGroupFilter", "false").equals("true");
 	
 	int tipoImport = Integer.parseInt(preferences.getValue("tipoImport", "1"));
 	boolean hasImportById = (tipoImport != 2);
@@ -60,6 +68,7 @@
 		
 	<aui:field-wrapper label="courseadmin.config.showSearch" >
 		<aui:input type="checkbox" name="showSearchTags" label="courseadmin.config.showSearchTags" value="<%=showSearchTags %>" checked="<%=showSearchTags %>"/>
+		<aui:input type="checkbox" name="showGroupFilter" label="courseadmin.config.show-group-filter" value="<%=showGroupFilter %>" checked="<%=showGroupFilter %>"/>
 		<aui:input type="checkbox" helpMessage="help-available-categories" label="available-categories" name="categories" value="<%=preferences.getValue(\"categories\", StringPool.TRUE) %>" ignoreRequestValue="true"/>
 	</aui:field-wrapper>
 	
@@ -90,6 +99,44 @@
 		<aui:input type="checkbox" name="showPermission" label="courseadmin.config.showPermission" 	value="<%=showPermission %>" checked="<%=showPermission %>"/>
 		<aui:input type="checkbox" name="showWelcomeMsg" label="courseadmin.config.showWelcomeMsg" 	value="<%=showWelcomeMsg %>" checked="<%=showWelcomeMsg %>"/>
 		<aui:input type="checkbox" name="showGoodbyeMsg" label="courseadmin.config.showGoodbyeMsg" 	value="<%=showGoodbyeMsg %>" checked="<%=showGoodbyeMsg %>"/>
+	</aui:field-wrapper>
+	
+	
+	<%-- Obtener el listado de expandos del curso --%>
+	<aui:field-wrapper label="courseadmin.config.expando.table">
+	<%
+		try{
+		
+			List<ExpandoColumn> expandosColumnCourse = ExpandoColumnLocalServiceUtil.getDefaultTableColumns(themeDisplay.getCompanyId(), ClassNameLocalServiceUtil.getClassNameId(Course.class));
+			boolean showExpandoDateFormat = false;
+			if(Validator.isNotNull(expandosColumnCourse) && expandosColumnCourse.size()>0) {
+				boolean show=false;
+				String expandoName="";
+				%><h2><%=LanguageUtil.get(pageContext,"courseadmin.config.customfields")%></h2>
+				<%
+				for (ExpandoColumn expandoCourse : expandosColumnCourse) {
+					expandoName = StringUtil.upperCaseFirstLetter(expandoCourse.getName());
+					show = (preferences.getValue("show" + expandoName, "false")).compareTo("true") == 0;
+					if(ExpandoColumnConstants.DATE==expandoCourse.getType())
+						showExpandoDateFormat = true;
+					%>
+					<aui:input type="checkbox" 
+						label="<%=LanguageUtil.get(portletConfig, themeDisplay.getLocale(), \"show\") + StringPool.SPACE +  expandoName%>"
+						name="<%=\"show\"+ expandoName %>" 
+						value="<%=show %>" checked="<%=show %>"/>
+					<%
+				}	
+			}
+			if(showExpandoDateFormat) {
+				String expandoDateFormat = preferences.getValue("expandoDateFormat", DateUtil.ISO_8601_PATTERN);
+		%>
+				<aui:input name="expandoDateFormat" label="courseadmin.config.expandos.date.format" value="<%=expandoDateFormat%>" />
+		<%  } 
+		
+		}catch(Exception e){
+			e.printStackTrace();
+		}%>	
+	
 	</aui:field-wrapper>
 	
 	<aui:field-wrapper label="courseadmin.config.import.export">

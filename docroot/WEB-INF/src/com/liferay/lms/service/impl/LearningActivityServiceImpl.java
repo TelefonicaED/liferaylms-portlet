@@ -53,13 +53,13 @@ public class LearningActivityServiceImpl extends LearningActivityServiceBaseImpl
 {
 	public java.util.List<LearningActivity> getLearningActivitiesOfGroup(long groupId) throws SystemException
 	{
-		return learningActivityPersistence.filterFindByg(groupId, 0, 1000);
+		return learningActivityPersistence.filterFindByg(groupId);
 	}
 	@JSONWebService
 	public java.util.List<LearningActivity> getLearningActivitiesOfModule(long moduleId) throws SystemException
 	{
 		
-		return learningActivityPersistence.findBym(moduleId, 0, 1000);
+		return learningActivityPersistence.findBym(moduleId);
 		
 	}
 	public void deleteLearningactivity (LearningActivity lernact) throws SystemException,

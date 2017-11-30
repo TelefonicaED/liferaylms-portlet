@@ -516,6 +516,17 @@ public interface CourseLocalService extends BaseLocalService,
 		java.lang.String language, boolean isAdmin, boolean andOperator);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.util.List<com.liferay.lms.model.Course> getChildCoursesByTitle(
+		java.lang.String freeText, long parentCourseId, int status,
+		long companyId, long groupId, long userId, java.lang.String language,
+		boolean isAdmin, boolean andOperator, int start, int end);
+
+	public int countChildCoursesByTitle(java.lang.String freeText,
+		long parentCourseId, int status, long companyId, long groupId,
+		long userId, java.lang.String language, boolean isAdmin,
+		boolean andOperator);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.util.List<com.liferay.portal.model.User> getStudents(
 		long courseId, long companyId, java.lang.String screenName,
 		java.lang.String firstName, java.lang.String lastName,
@@ -581,7 +592,13 @@ public interface CourseLocalService extends BaseLocalService,
 	public java.util.List<com.liferay.lms.model.Course> getChildCourses(
 		long courseId, int start, int end);
 
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.util.List<com.liferay.lms.model.Course> getOpenOrRestrictedChildCourses(
+		long courseId);
+
 	public int countChildCourses(long courseId);
+
+	public int countOpenOrRestrictedChildCourses(long courseId);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.util.List<com.liferay.lms.model.Course> getCoursesParents(
@@ -673,4 +690,8 @@ public interface CourseLocalService extends BaseLocalService,
 		long teamId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.util.List<com.liferay.portal.model.Group> getDistinctCourseGroups(
+		long companyId);
 }

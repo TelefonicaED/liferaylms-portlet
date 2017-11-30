@@ -35,6 +35,7 @@ import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.model.Group;
+import com.liferay.portal.model.GroupConstants;
 import com.liferay.portal.model.Organization;
 import com.liferay.portal.model.RoleConstants;
 import com.liferay.portal.model.User;
@@ -147,13 +148,27 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 	public static final String WHERE_TITLE_DESCRIPTION_CATEGORIES_TAGS_OR =
 			 CourseFinder.class.getName() + 
 			 	".whereC_BytTitleDescriptionCategoriesTagsOR";	
+	public static final String WHERE_PARENT_COURSE_NULL =
+			 CourseFinder.class.getName() +
+				".whereParentCourseNull";
 	public static final String WHERE_PARENT_COURSE =
 			 CourseFinder.class.getName() +
 				".whereParentCourse";
+	public static final String OPEN_OR_RESTRICTED_CHILD_COURSES = 
+			CourseFinder.class.getName() + ".getOpenOrRestrictedCoursesByParentId";
+	public static final String COUNT_OPEN_OR_RESTRICTED_CHILD_COURSES = 
+			CourseFinder.class.getName() + ".countOpenOrRestrictedCoursesByParentId";
+	public static final String GET_DISTINCT_COURSE_GROUPS = 
+			CourseFinder.class.getName() + ".getDistinctCourseGroups";
+	
+	
+	public List<Course> findByT_S_C_T_T(String freeText, int status, long[] categories, long[] tags, String templates, long companyId, long groupId, long userId, String language, boolean isAdmin, boolean searchParentCourses, boolean andOperator, int start, int end){
+		return findByT_S_C_T_T(freeText, -1, status, categories, tags, templates, companyId, groupId, userId, language, isAdmin, searchParentCourses, andOperator, start, end);
+	}
 	
 	
 	@SuppressWarnings("unchecked")
-	public List<Course> findByT_S_C_T_T(String freeText, int status, long[] categories, long[] tags, String templates, long companyId, long groupId, long userId, String language, boolean isAdmin, boolean searchParentCourses, boolean andOperator, int start, int end){
+	public List<Course> findByT_S_C_T_T(String freeText, long parentCourseId, int status, long[] categories, long[] tags, String templates, long companyId, long groupId, long userId, String language, boolean isAdmin, boolean searchParentCourses, boolean andOperator, int start, int end){
 		Session session = null;
 		
 		try{
@@ -179,7 +194,7 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			
 			sql = replaceResourcePermission(sql, isAdmin, companyId, userId);
 			
-			sql = replaceSearchParentCourse(sql, searchParentCourses);
+			sql = replaceSearchParentCourse(sql, searchParentCourses,parentCourseId);
 
 			if(start < 0 && end < 0){
 				sql = sql.replace("LIMIT [$START$], [$END$]", "");
@@ -202,7 +217,12 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			qPos.add(companyId);
 			qPos.add(companyId);
 			qPos.add(groupId);
-			qPos.add(groupId);	
+			qPos.add(groupId);
+			if(searchParentCourses){
+				if(parentCourseId>0){
+					qPos.add(parentCourseId);
+				}
+			}
 			
 			List<Course> listCourse = (List<Course>) q.list();
 			
@@ -217,11 +237,15 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 	    return new ArrayList<Course>();
 	}
 	
-	private String replaceSearchParentCourse(String sql, boolean searchParentCourse) {
+	private String replaceSearchParentCourse(String sql, boolean searchParentCourses, long parentCourseId) {
 		/** Sustituimos los tags si buscamos por ellos queda preparado para buscar por = en vez de por IN**/
-		if(searchParentCourse){
+		if(searchParentCourses){
+			if(parentCourseId>0){
+				sql = sql.replace("[$WHEREPARENTCOURSE$]", CustomSQLUtil.get(WHERE_PARENT_COURSE));
+			}else{
+				sql = sql.replace("[$WHEREPARENTCOURSE$]", CustomSQLUtil.get(WHERE_PARENT_COURSE_NULL));	
+			}
 			
-			sql = sql.replace("[$WHEREPARENTCOURSE$]", CustomSQLUtil.get(WHERE_PARENT_COURSE));
 		}else{
 			sql = sql.replace("[$WHEREPARENTCOURSE$]", "");
 		}
@@ -368,9 +392,11 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 		return sql.replace("[$LANGUAGE$]", language);
 	}
 
-	
-	
 	public int countByT_S_C_T_T(String freeText, int status, long[] categories, long[] tags, String templates, long companyId, long groupId, long userId, String language, boolean isAdmin, boolean searchParentCourses, boolean andOperator){
+		return countByT_S_C_T_T(freeText, -1, status, categories, tags, templates, companyId, groupId, userId, language, isAdmin, searchParentCourses, andOperator);
+	}
+	
+	public int countByT_S_C_T_T(String freeText, long parentCourseId, int status, long[] categories, long[] tags, String templates, long companyId, long groupId, long userId, String language, boolean isAdmin, boolean searchParentCourses, boolean andOperator){
 		Session session = null;
 		
 		try{
@@ -395,7 +421,7 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			
 			sql = replaceResourcePermission(sql, isAdmin, companyId, userId);
 			
-			sql = replaceSearchParentCourse(sql, searchParentCourses);
+			sql = replaceSearchParentCourse(sql, searchParentCourses, parentCourseId);
 			
 			if(log.isDebugEnabled()){
 				log.debug("sql: " + sql);
@@ -413,7 +439,11 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			qPos.add(companyId);
 			qPos.add(groupId);
 			qPos.add(groupId);
-			
+			if(searchParentCourses){
+				if(parentCourseId>0){
+					qPos.add(parentCourseId);
+				}
+			}
 			Iterator<Long> itr = q.iterate();
 
 			if (itr.hasNext()) {
@@ -1199,6 +1229,51 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 		return listExistingCourses;
 	}
 	
+	public List<Course> getOpenOrRestrictedChildCourses(long parentCourseId, int start, int end){
+		Session session = null;
+		List<Course> listExistingCourses = new ArrayList<Course>();
+		
+		try{
+			
+			session = openSession();
+			
+			String sql = CustomSQLUtil.get(OPEN_OR_RESTRICTED_CHILD_COURSES);
+			
+			if(start < 0 && end < 0){
+				sql = sql.replace("LIMIT [$START$], [$END$]", "");
+			}else{
+				sql = sql.replace("[$START$]", String.valueOf(start));
+				sql = sql.replace("[$END$]", String.valueOf(start+end));
+			}
+			
+			
+		
+			if(log.isDebugEnabled()){
+				log.debug("sql: " + sql);
+				log.debug("parentCourseId: " + parentCourseId);
+			}
+			
+			SQLQuery q = session.createSQLQuery(sql);
+			q.addEntity("Lms_Course", CourseImpl.class);
+			QueryPos qPos = QueryPos.getInstance(q);			
+			qPos.add(parentCourseId);		
+			qPos.add(GroupConstants.TYPE_SITE_OPEN);
+			qPos.add(GroupConstants.TYPE_SITE_RESTRICTED);
+							
+			listExistingCourses = (List<Course>)q.list();
+			
+			
+			
+		} catch (Exception e) {
+	       e.printStackTrace();
+	    } finally {
+	        closeSession(session);
+	    }
+	
+		return listExistingCourses;
+	}
+	
+	
 	
 	public int countMyCourses(long groupId, long userId, ThemeDisplay themeDisplay){
 		Session session = null;
@@ -1247,6 +1322,83 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 	
 		return 0;
 	}
+	
+	
+	public int countOpenOrRestrictedChildCourses(long parentCourseId){
+		Session session = null;
+
+		try{
+			
+			session = openSession();
+			
+			String sql = CustomSQLUtil.get(COUNT_OPEN_OR_RESTRICTED_CHILD_COURSES);
+			
+			
+		
+			if(log.isDebugEnabled()){
+				log.debug("sql: " + sql);
+				log.debug("parentCourseId: " + parentCourseId);
+			}
+			
+			SQLQuery q = session.createSQLQuery(sql);
+			q.addScalar("COUNT_VALUE", Type.LONG);
+			QueryPos qPos = QueryPos.getInstance(q);
+			qPos.add(parentCourseId);
+			qPos.add(GroupConstants.TYPE_SITE_OPEN);
+			qPos.add(GroupConstants.TYPE_SITE_RESTRICTED);
+			
+			Iterator<Long> itr = q.iterate();
+
+			if (itr.hasNext()) {
+				Long count = itr.next();
+
+				if (count != null) {
+					return count.intValue();
+				}
+			}
+			
+			
+			
+		} catch (Exception e) {
+	       e.printStackTrace();
+	    } finally {
+	        closeSession(session);
+	    }
+	
+		return 0;
+	}
+	
+	
+	public List<Group> getDistinctCourseGroups(long companyId){
+		Session session = null;
+		List<Group> distinctCourseGroups = new ArrayList<Group>();
+		
+		try{
+			
+			session = openSessionLiferay();
+			
+			String sql = CustomSQLUtil.get(GET_DISTINCT_COURSE_GROUPS);
+			if(log.isDebugEnabled()){
+				log.debug("sql: " + sql);
+			}
+			SQLQuery q = session.createSQLQuery(sql);
+			q.addEntity("Group_",PortalClassLoaderUtil.getClassLoader().loadClass("com.liferay.portal.model.impl.GroupImpl"));
+			
+			QueryPos qPos = QueryPos.getInstance(q);			
+			qPos.add(companyId);				
+			distinctCourseGroups = (List<Group>)q.list();
+			
+			
+			
+		} catch (Exception e) {
+	       e.printStackTrace();
+	    } finally {
+	        closeSessionLiferay(session);
+	    }
+	
+		return distinctCourseGroups;
+	}
+	
 	
 	private final Class<?> getPortalClass(String className) {
 		ClassLoader portalCl = PortalClassLoaderUtil.getClassLoader();
