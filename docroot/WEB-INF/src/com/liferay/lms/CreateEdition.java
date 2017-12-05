@@ -128,13 +128,19 @@ public class CreateEdition extends CourseCopyUtil implements MessageListener {
 		
 		//Tags y categorias
 		try{
+			AssetEntryLocalServiceUtil.validate(course.getGroupCreatedId(), Course.class.getName(), serviceContext.getAssetCategoryIds(), serviceContext.getAssetTagNames());
 			serviceContext.setAssetCategoryIds(AssetEntryLocalServiceUtil.getEntry(Course.class.getName(), course.getCourseId()).getCategoryIds());
 			if(log.isDebugEnabled()){
 				log.debug("  + AssetCategoryIds: "+AssetEntryLocalServiceUtil.getEntry(Course.class.getName(), course.getCourseId()).getCategoryIds().toString());
 			}
 		}catch(Exception e){
+			log.debug(e);
 			serviceContext.setAssetCategoryIds(new long[]{});
+			//serviceContext.setAssetTagNames(AssetEntryLocalServiceUtil.getEntry(Course.class.getName(), course.getCourseId()).getTags());
 		}
+		
+		
+		
 		//Tipo del grupo
 		int typeSite = group.getType();
 		
