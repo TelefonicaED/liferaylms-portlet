@@ -47,8 +47,8 @@ public class LiferaylmsUtil {
 	private static Log log = LogFactoryUtil.getLog(LiferaylmsUtil.class); 
 	
 	public static final String DEREGISTER_USER_EXPANDO = "deregister-mail";
-	public static final int defaultStartYear = 2012; //porque es necesario mantener los valores antiguos para los cursos antiguos
-	public static final int defaultEndYear = Calendar.getInstance().get(Calendar.YEAR) + 8;
+	public static final int defaultStartYear = Calendar.getInstance().get(Calendar.YEAR) - 10; //porque es necesario mantener los valores antiguos para los cursos antiguos
+	public static final int defaultEndYear = Calendar.getInstance().get(Calendar.YEAR) + 10;
     public static final String CHARSET_UTF_8        = "UTF-8".intern();
     public static final String CHARSET_X_ISO_10646_UCS_4_3412 = "X-ISO-10646-UCS-4-3412".intern(); // Malformed UTF-32
     public static final String CHARSET_UTF_16BE     = "UTF-16BE".intern();

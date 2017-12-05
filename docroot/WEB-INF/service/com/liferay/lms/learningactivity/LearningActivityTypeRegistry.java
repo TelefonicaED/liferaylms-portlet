@@ -42,7 +42,7 @@ public class LearningActivityTypeRegistry {
 				LearningActivityType learningActivityType = (LearningActivityType)getPortletClassLoader().loadClass(type).newInstance();
 				learningActivityTypes[currentLearningActivityType++]=learningActivityType;
 			} catch (ClassNotFoundException e) {
-				e.printStackTrace();
+				log.debug(e);
 				try {
 					String [] context = ((String) key).split("\\.");
 					if (Validator.isNotNull(context) && context.length == 2) {
@@ -56,7 +56,7 @@ public class LearningActivityTypeRegistry {
 					throwable.printStackTrace();
 				}
 			} catch (ClassCastException e) {
-				e.printStackTrace();
+				log.debug(e);
 				try {
 					ClassLoaderProxy classLoaderProxy = new ClassLoaderProxy(Class.forName(type, true, 
 						getPortletClassLoader()).newInstance(), type, 

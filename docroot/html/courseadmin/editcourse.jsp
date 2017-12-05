@@ -667,6 +667,16 @@ if(course!=null){
 	<% 
 	boolean showInscriptionDate = GetterUtil.getBoolean(renderRequest.getPreferences().getValues("showInscriptionDate", new String[]{StringPool.TRUE})[0],true);
 	boolean showExecutionDate = GetterUtil.getBoolean(renderRequest.getPreferences().getValues("showExecutionDate", new String[]{StringPool.TRUE})[0],true);
+	int defaultStartYear = LiferaylmsUtil.defaultStartYear;
+	if(course!=null){
+		Calendar defaultStartDate = Calendar.getInstance();
+		defaultStartDate.setTime(course.getStartDate());
+		if(defaultStartYear>defaultStartDate.get(Calendar.YEAR)){
+			defaultStartYear = defaultStartDate.get(Calendar.YEAR) - 10;
+		}
+			
+	}
+	
 	%>
 	
 <liferay-ui:panel-container extended="false"  persistState="false">
@@ -674,7 +684,7 @@ if(course!=null){
    	  <liferay-ui:panel title="lms-inscription-configuration" collapsible="true" defaultState="closed" cssClass="<%=(showInscriptionDate||showMaxUsers)?StringPool.BLANK:\"aui-helper-hidden\" %>">
 		<aui:field-wrapper name="inscriptionDate" label="start-inscription-date" cssClass="<%=(showInscriptionDate)?StringPool.BLANK:\"aui-helper-hidden\" %>">
 			<aui:input type="hidden" name="inscriptionDate"/>
-			<liferay-ui:input-date yearRangeEnd="<%=LiferaylmsUtil.defaultEndYear %>" yearRangeStart="<%=LiferaylmsUtil.defaultStartYear %>"  dayParam="startDay" monthParam="startMon"
+			<liferay-ui:input-date yearRangeEnd="<%=LiferaylmsUtil.defaultEndYear %>" yearRangeStart="<%=defaultStartYear %>"  dayParam="startDay" monthParam="startMon"
 					 yearParam="startYear"  yearNullable="false" dayNullable="false" monthNullable="false" yearValue="<%=startYear %>" monthValue="<%=startMonth %>" dayValue="<%=startDay %>"></liferay-ui:input-date>
 			<liferay-ui:input-time minuteParam="startMin" amPmParam="startAMPM" hourParam="startHour" hourValue="<%=startHour %>" minuteValue="<%=startMin %>"></liferay-ui:input-time>
 		</aui:field-wrapper>
@@ -726,10 +736,23 @@ if(course!=null){
 		</c:if>
 	</liferay-ui:panel>
 	
+	<% 
+	defaultStartYear = LiferaylmsUtil.defaultStartYear;
+	if(course!=null){
+		Calendar defaultStartDate = Calendar.getInstance();
+		defaultStartDate.setTime(course.getExecutionStartDate());
+		if(defaultStartYear>defaultStartDate.get(Calendar.YEAR)){
+			defaultStartYear = defaultStartDate.get(Calendar.YEAR) - 10;
+		}
+			
+	}
+	
+	%>
+	
 	<liferay-ui:panel title="lms-execution-configuration" collapsible="true" defaultState="closed" cssClass="<%=(showExecutionDate)?StringPool.BLANK:\"aui-helper-hidden\" %>">
 		<aui:field-wrapper name="executionDate" label="start-execution-date" cssClass="<%=(showExecutionDate)?StringPool.BLANK:\"aui-helper-hidden\" %>">
 			<aui:input type="hidden" name="executionDate"/>
-			<liferay-ui:input-date yearRangeEnd="<%=LiferaylmsUtil.defaultEndYear %>" yearRangeStart="<%=LiferaylmsUtil.defaultStartYear %>"  dayParam="startExecutionDay" monthParam="startExecutionMon"
+			<liferay-ui:input-date yearRangeEnd="<%=LiferaylmsUtil.defaultEndYear %>" yearRangeStart="<%=defaultStartYear %>"  dayParam="startExecutionDay" monthParam="startExecutionMon"
 					 yearParam="startExecutionYear"  yearNullable="false" dayNullable="false" monthNullable="false" yearValue="<%=startExecutionYear %>" monthValue="<%=startExecutionMonth %>" dayValue="<%=startExecutionDay %>"></liferay-ui:input-date>
 			<liferay-ui:input-time minuteParam="startExecutionMin" amPmParam="startExecutionAMPM" hourParam="startExecutionHour" hourValue="<%=startExecutionHour %>" minuteValue="<%=startExecutionMin %>"></liferay-ui:input-time>
 		</aui:field-wrapper>
