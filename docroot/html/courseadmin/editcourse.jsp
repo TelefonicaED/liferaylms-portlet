@@ -742,7 +742,7 @@ if(course!=null){
 	</liferay-ui:panel> 
     
 	
-	<c:if test="<%=!isCourseChild%>">
+	<c:if test="<%=(!isCourseChild || (isCourseChild && showCatalogForEdition))%>">
 		<liferay-ui:panel title="categorization" collapsible="true" defaultState="closed">
 		<liferay-ui:custom-attributes-available className="<%= Course.class.getName() %>">
 		<liferay-ui:custom-attribute-list 
