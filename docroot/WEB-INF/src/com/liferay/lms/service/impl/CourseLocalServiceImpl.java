@@ -668,6 +668,14 @@ public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int e
 	public Course modCourse (Course course,String summary, 
 			ServiceContext serviceContext, boolean visible)
 			throws SystemException, PortalException {
+		return this.modCourse(course,summary, serviceContext, visible, false);
+	}
+	
+	
+	@Indexable(type=IndexableType.REINDEX)
+	public Course modCourse (Course course,String summary, 
+			ServiceContext serviceContext, boolean visible, boolean allowDuplicateName)
+			throws SystemException, PortalException {
 		
 		
 			int numberUsers = UserLocalServiceUtil.getGroupUsersCount(course.getGroupCreatedId());
@@ -684,7 +692,14 @@ public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int e
 			coursePersistence.update(course, true);
 			long userId=serviceContext.getUserId();
 			Group theGroup=GroupLocalServiceUtil.getGroup(course.getGroupCreatedId());
-			theGroup.setName(course.getTitle(locale, true));
+			String groupName = course.getTitle(locale,true);
+			if(allowDuplicateName){
+				if(GroupLocalServiceUtil.fetchGroup(course.getCompanyId(), groupName)!=null){
+					groupName = course.getTitle(locale,true)+" ("+course.getCourseId()+")";
+				}
+			}
+			
+			theGroup.setName(groupName);
 			theGroup.setDescription(summary);
 			
 			int type=GroupConstants.TYPE_SITE_OPEN;

@@ -464,7 +464,7 @@ if(course!=null){
 		</div>
 	</c:if>
 	
-	<c:if test="<%=!isCourseChild%>">
+	
 		<%
 		List<Long> courseEvalIds = ListUtil.toList(StringUtil.split(LmsPrefsLocalServiceUtil.getLmsPrefsIni(themeDisplay.getCompanyId()).getCourseevals(),",",0L));
 		CourseEvalRegistry cer=new CourseEvalRegistry();
@@ -663,12 +663,11 @@ if(course!=null){
 				<%
 			}
 		}%>
-	</c:if>
 	<% 
 	boolean showInscriptionDate = GetterUtil.getBoolean(renderRequest.getPreferences().getValues("showInscriptionDate", new String[]{StringPool.TRUE})[0],true);
 	boolean showExecutionDate = GetterUtil.getBoolean(renderRequest.getPreferences().getValues("showExecutionDate", new String[]{StringPool.TRUE})[0],true);
 	int defaultStartYear = LiferaylmsUtil.defaultStartYear;
-	if(course!=null){
+	if(course!=null && course.getStartDate()!=null){
 		Calendar defaultStartDate = Calendar.getInstance();
 		defaultStartDate.setTime(course.getStartDate());
 		if(defaultStartYear>defaultStartDate.get(Calendar.YEAR)){
@@ -738,7 +737,7 @@ if(course!=null){
 	
 	<% 
 	defaultStartYear = LiferaylmsUtil.defaultStartYear;
-	if(course!=null){
+	if(course!=null && course.getExecutionStartDate()!=null){
 		Calendar defaultStartDate = Calendar.getInstance();
 		defaultStartDate.setTime(course.getExecutionStartDate());
 		if(defaultStartYear>defaultStartDate.get(Calendar.YEAR)){

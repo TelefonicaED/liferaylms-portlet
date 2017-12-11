@@ -564,7 +564,7 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 		startExecutionDate.set(Calendar.SECOND, 0);
 		startExecutionDate.set(Calendar.MILLISECOND,0);
 			
-		log.error("START EXECUTION DATE "+startExecutionDate.getTime());
+		log.debug("START EXECUTION DATE "+startExecutionDate.getTime());
 	
 		if (stopExecutionAMPM > 0) {
 			stopExecutionHour += 12;
@@ -578,7 +578,7 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 		stopExecutionDate.set(Calendar.SECOND, 0);
 		stopExecutionDate.set(Calendar.MILLISECOND,0);
 		
-		log.error("STOP EXECUTION DATE "+stopExecutionDate.getTime());
+		log.debug("STOP EXECUTION DATE "+stopExecutionDate.getTime());
 		
 		if (stopExecutionDate.before(startExecutionDate)) {
 			SessionErrors.add(actionRequest, "courseadmin.new.error.dateinterval");
@@ -851,12 +851,13 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 					PermissionChecker permissionChecker = PermissionCheckerFactoryUtil
 							.getPermissionCheckerFactory().create(user);
 					log.debug("Updating the course");
+					boolean allowDuplicateName =  actionRequest.getPreferences().getValue("allowDuplicateName", "false").equals("true");
 					if (permissionChecker.hasPermission(themeDisplay.getScopeGroupId(),
 							Course.class.getName(), 0, "PUBLISH")) {
 						log.debug("With publish permission, setting visible to "+visible);
-						CourseLocalServiceUtil.modCourse(course,summary,serviceContext, visible);
+						CourseLocalServiceUtil.modCourse(course,summary,serviceContext, visible, allowDuplicateName);
 					}else{
-						CourseLocalServiceUtil.modCourse(course,summary,serviceContext);
+						CourseLocalServiceUtil.modCourse(course,summary,serviceContext, true, allowDuplicateName);
 					}
 				}catch(PortalException pe){ 
 					if(pe.getMessage().startsWith("maxUsers ")){
