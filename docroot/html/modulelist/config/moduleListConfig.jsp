@@ -20,6 +20,7 @@
 	boolean showModuleStartDate = (preferences.getValue("showModuleStartDate", "true")).compareTo("true") == 0;
 	boolean showModuleEndDate = (preferences.getValue("showModuleEndDate", "true")).compareTo("true") == 0;
 	boolean allowEditionMode = (preferences.getValue("allowEditionMode", "false")).compareTo("true") == 0;
+	boolean allowSorting = (preferences.getValue("allowSorting", "false")).compareTo("true") == 0;
 	boolean allowAccessWhenFinishedButNotClosed = (preferences.getValue("allowAccessWhenFinishedButNotClosed", "false")).compareTo("true") == 0;
 %>
 
@@ -34,6 +35,7 @@
 	<aui:input type="checkbox" name="showModuleStartDate" label="modulelist.showModuleStartDate" value="<%=showModuleStartDate %>" checked="<%=showModuleStartDate %>"/>
 	<aui:input type="checkbox" name="showModuleEndDate" label="modulelist.showModuleEndDate" value="<%=showModuleEndDate %>" checked="<%=showModuleEndDate %>"/>
 	<aui:input type="checkbox" name="allowEditionMode" label="modulelist.allowEditionMode" value="<%=allowEditionMode %>" checked="<%=allowEditionMode %>"/>
+	<aui:input type="checkbox" name="allowSorting" label="modulelist.allowSorting" value="<%=allowSorting %>" checked="<%=allowSorting %>"/>
 	<aui:input type="checkbox" name="allowAccessWhenFinishedButNotClosed" label="modulelist.allowAccessWhenFinishedButNotClosed" value="<%=allowAccessWhenFinishedButNotClosed %>" checked="<%=allowAccessWhenFinishedButNotClosed %>"/>
 	<aui:button-row>
 		<aui:button type="submit" value="save" />

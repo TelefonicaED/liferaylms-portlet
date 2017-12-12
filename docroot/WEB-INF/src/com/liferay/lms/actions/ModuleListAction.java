@@ -46,6 +46,7 @@ public class ModuleListAction implements ConfigurationAction {
 		prefs.setValue("showModuleStartDate", actionRequest.getParameter("showModuleStartDate"));
 		prefs.setValue("showModuleEndDate", actionRequest.getParameter("showModuleEndDate"));
 		prefs.setValue("allowEditionMode", actionRequest.getParameter("allowEditionMode"));
+		prefs.setValue("allowSorting", actionRequest.getParameter("allowSorting"));
 		prefs.setValue("allowAccessWhenFinishedButNotClosed", actionRequest.getParameter("allowAccessWhenFinishedButNotClosed"));
 		
 		prefs.store();
