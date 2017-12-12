@@ -46,6 +46,7 @@
 	boolean showModuleStartDate = (preferences.getValue("showModuleStartDate", "true")).compareTo("true") == 0;
 	boolean showModuleEndDate = (preferences.getValue("showModuleEndDate", "true")).compareTo("true") == 0;
 	boolean allowEditionMode = (preferences.getValue("allowEditionMode", "false")).compareTo("true") == 0;
+	boolean allowSorting = (preferences.getValue("allowSorting", "false")).compareTo("true") == 0;
 	boolean allowAccessWhenFinishedButNotClosed = (preferences.getValue("allowAccessWhenFinishedButNotClosed", "false")).compareTo("true") == 0;
 	
 
@@ -83,7 +84,7 @@
 		}			
 	}
 	
-	
+	if(allowSorting){
 %>
 <liferay-portlet:actionURL name="moveModule" var="moveModuleURL" windowState="<%= LiferayWindowState.EXCLUSIVE.toString()%>" />
 
@@ -137,6 +138,8 @@ if(!ismobile){
 
   </script>
 <%
+	}
+	
 	String idModuleTable = "idModuleTable";
 	boolean moduleEditing = permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), Module.class.getName(), themeDisplay.getScopeGroupId(), ActionKeys.UPDATE);
 	if(moduleEditing){ 
@@ -303,7 +306,9 @@ if(!ismobile){
 					
 					<td class="title">
 <%				
-						if((moduleTitleLinkable || (allowEditionMode && moduleEditing)) && canAccess && (canAccessLock || !moduleIsLocked)){				 
+						if((moduleTitleLinkable || (allowEditionMode && moduleEditing)) 
+								&& canAccess 
+								&& (canAccessLock || !moduleIsLocked)){				 
 %>
 							<a href="<%=gotoModuleURL.toString() %>"><%=(numerateModules)?
 																			LanguageUtil.format(pageContext, "moduleTitle.chapter", arg):
