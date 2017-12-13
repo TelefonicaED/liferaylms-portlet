@@ -29,7 +29,7 @@ import com.liferay.portal.theme.ThemeDisplay;
 public class TaskAssetRenderer extends BaseAssetRenderer {
 
 	private LearningActivity _learningactivity;
-	private static Log _log = LogFactoryUtil.getLog(TaskP2PAssetRenderer.class);
+	private static Log _log = LogFactoryUtil.getLog(TaskAssetRenderer.class);
 	public TaskAssetRenderer (LearningActivity learningactivity) {
 		_learningactivity = learningactivity;
 		}

@@ -8,7 +8,6 @@ import com.liferay.lms.service.LearningActivityLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityResultLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityTryLocalServiceUtil;
 import com.liferay.lms.service.ModuleResultLocalServiceUtil;
-import com.liferay.lms.service.impl.LearningActivityTryLocalServiceImpl;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
@@ -29,32 +28,6 @@ public class CleanLearningActivity {
 	public boolean processTry(LearningActivityTry lat){
 	
 		//Audit
-	
-		/*LearningActivityTryDeleted latd = new LearningActivityTryDeletedImpl();
-		
-		latd.setActId(lat.getActId());
-		latd.setActManAuditId(actManAudit.getActManAuditId());
-		latd.setEndDate(lat.getEndDate());
-		latd.setLatId(lat.getLatId());
-		latd.setUserId(lat.getUserId());
-		latd.setStartDate(lat.getStartDate());
-		latd.setResult(lat.getResult());
-		latd.setTryData(lat.getTryData());
-		latd.setTryResultData(lat.getTryResultData());
-		latd.setComments(lat.getComments());
-		
-		try {
-			latd = LearningActivityTryDeletedLocalServiceUtil.addLearningActivityTryDeleted(latd);
-			LearningActivityTryLocalServiceUtil.deleteLearningActivityTry(lat);
-			actManAudit.setNumber(actManAudit.getNumber()+1);
-			actManAudit = ActManAuditLocalServiceUtil.updateActManAudit(actManAudit);
-			
-		} catch (SystemException e) {
-			if(log.isInfoEnabled())log.info(e.getMessage());
-			if(log.isDebugEnabled())e.printStackTrace();
-		}*/
-		
-		
 		LearningActivityResult res= null;
 		try {
 			res = LearningActivityResultLocalServiceUtil.getByActIdAndUserId(lat.getActId(), lat.getUserId());

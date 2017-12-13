@@ -29,6 +29,7 @@ public class P2PAssignations implements MessageListener {
 	}
 	
 	/* DEPRECATED */
+	@Deprecated
 	public void asignP2PActivities(){
 
 		//Obtener el dia de ayer
@@ -90,7 +91,6 @@ public class P2PAssignations implements MessageListener {
 	public void asignCorrectionsToP2PActivities(){
 		if(log.isDebugEnabled())log.debug("Check P2P asign corrections");
 
-		Calendar day = Calendar.getInstance();
 		//Obtener la lista de actividades p2p de todos los usuarios.
 		List<P2pActivity> activities = null;
 		

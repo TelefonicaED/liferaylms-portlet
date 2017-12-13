@@ -350,4 +350,9 @@ public interface LearningActivityTryLocalService extends BaseLocalService,
 		long courseGropupCreatedId,
 		java.util.List<com.liferay.portal.model.User> _students, long teamId)
 		throws com.liferay.portal.kernel.exception.SystemException;
+
+	public com.liferay.lms.model.LearningActivityTry update(long latId,
+		int score, double position, int plays)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException;
 }

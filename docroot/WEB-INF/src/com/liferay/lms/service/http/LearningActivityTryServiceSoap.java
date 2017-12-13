@@ -112,5 +112,21 @@ public class LearningActivityTryServiceSoap {
 		}
 	}
 
+	public static com.liferay.lms.model.LearningActivityTrySoap update(
+		long latId, int score, double position, int plays)
+		throws RemoteException {
+		try {
+			com.liferay.lms.model.LearningActivityTry returnValue = LearningActivityTryServiceUtil.update(latId,
+					score, position, plays);
+
+			return com.liferay.lms.model.LearningActivityTrySoap.toSoapModel(returnValue);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
 	private static Log _log = LogFactoryUtil.getLog(LearningActivityTryServiceSoap.class);
 }
