@@ -83,6 +83,18 @@ if( permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), "com.liferay
 		
 		</liferay-ui:search-container-column-text>
 		
+		
+		<c:if test="${not empty expandoNames}">
+			<c:forEach items="${expandoNames}" var="expName">
+				<liferay-ui:search-container-column-text name="${expName}">
+					<liferay-ui:custom-attribute classPK="${course.courseId}" name="${expName}" 
+								className="<%= Course.class.getName() %>" editable="false" label="false" >
+					</liferay-ui:custom-attribute>
+				</liferay-ui:search-container-column-text>
+			</c:forEach>
+		</c:if>
+		
+		
 		<c:if test="${renderRequest.preferences.getValue('showRegistrationType', 'false')}">		
 			<liferay-ui:search-container-column-text name="registration-type">
 			    <c:if test="<%=groupsel.getType() == GroupConstants.TYPE_SITE_OPEN  %>">
@@ -96,12 +108,30 @@ if( permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), "com.liferay
 				</c:if>     			
 			</liferay-ui:search-container-column-text>
 		</c:if>
-		<liferay-ui:search-container-column-text name="course-admin.start-inscription-date">
-			<%=dateFormatDateTime.format(course.getStartDate()) %>
-		</liferay-ui:search-container-column-text>
-		<liferay-ui:search-container-column-text name="course-admin.end-inscription-date">
-			<%=dateFormatDateTime.format(course.getEndDate()) %>
-		</liferay-ui:search-container-column-text>
+		<c:if test="${showInscriptionDate}">
+			<liferay-ui:search-container-column-text name="course-admin.start-inscription-date">
+				<%=dateFormatDateTime.format(course.getStartDate()) %>
+			</liferay-ui:search-container-column-text>
+			<liferay-ui:search-container-column-text name="course-admin.end-inscription-date">
+				<%=dateFormatDateTime.format(course.getEndDate()) %>
+			</liferay-ui:search-container-column-text>
+		</c:if>
+		<c:if test="${showExecutionDate}">
+			<liferay-ui:search-container-column-text name="course-admin.start-execution-date">
+				<% if(course.getExecutionStartDate()!=null){%>
+						<%= dateFormatDateTime.format(course.getExecutionStartDate())%>
+					<% }else{%>
+						<%= "-"%>
+					<%}%>
+			</liferay-ui:search-container-column-text>
+			<liferay-ui:search-container-column-text name="course-admin.end-execution-date">
+				<% if(course.getExecutionEndDate()!=null){%>
+						<%= dateFormatDateTime.format(course.getExecutionEndDate())%>
+					<% }else{%>
+						<%= "-"%>
+					<%}%>
+			</liferay-ui:search-container-column-text>
+		</c:if>
 		<%--  DE MOMENTO COMENTADO HASTA QUE SE APLIQUE EL FUNCIONAMIENTO DE CURSO LINKADO -->  
 		 <liferay-ui:search-container-column-text name="course-admin.linked">
 			<c:choose>

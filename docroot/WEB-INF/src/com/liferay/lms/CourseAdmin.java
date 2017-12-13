@@ -419,11 +419,34 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 			e.printStackTrace();
 		}
 
-		searchContainer.setResults(CourseLocalServiceUtil.getChildCoursesByTitle(name, courseId, WorkflowConstants.STATUS_ANY, themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(), themeDisplay.getUserId(),themeDisplay.getLanguageId() , isAdmin , true, searchContainer.getStart(), searchContainer.getEnd()));
-		searchContainer.setTotal(CourseLocalServiceUtil.countChildCoursesByTitle(name, courseId, WorkflowConstants.STATUS_ANY, themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(), themeDisplay.getUserId(),themeDisplay.getLanguageId() , isAdmin , true));
+		searchContainer.setResults(CourseLocalServiceUtil.getChildCoursesByTitle(name, courseId, WorkflowConstants.STATUS_ANY, themeDisplay.getCompanyId(), 0, themeDisplay.getUserId(),themeDisplay.getLanguageId() , isAdmin , true, searchContainer.getStart(), searchContainer.getEnd()));
+		searchContainer.setTotal(CourseLocalServiceUtil.countChildCoursesByTitle(name, courseId, WorkflowConstants.STATUS_ANY, themeDisplay.getCompanyId(), 0, themeDisplay.getUserId(),themeDisplay.getLanguageId() , isAdmin , true));
 		
 		
 		renderRequest.setAttribute("searchContainer", searchContainer);
+		
+		try {
+			List<ExpandoColumn> expandosColumnUser = ExpandoColumnLocalServiceUtil.getDefaultTableColumns(themeDisplay.getCompanyId(), ClassNameLocalServiceUtil.getClassNameId(Course.class));
+			List<String> expandoNames = new ArrayList<String>();
+			if(Validator.isNotNull(expandosColumnUser) && expandosColumnUser.size()>0) {
+				String expandoName="";
+				for (ExpandoColumn expandoUser : expandosColumnUser) {
+					expandoName = StringUtil.upperCaseFirstLetter(expandoUser.getName());
+					if(((renderRequest.getPreferences().getValue("show" + expandoName, "false")).compareTo("true") == 0)) {
+						expandoNames.add(expandoName);
+					}
+				}	
+			}
+		
+			renderRequest.setAttribute("expandoNames", expandoNames);
+		} catch (SystemException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+		renderRequest.setAttribute("showInscriptionDate", Boolean.parseBoolean(renderRequest.getPreferences().getValue("inscriptionDateColumn", "true")));
+		renderRequest.setAttribute("showExecutionDate", Boolean.parseBoolean(renderRequest.getPreferences().getValue("executionDateColumn", "true")));
 		
 		include(this.editionsJSP, renderRequest, renderResponse);
 	}

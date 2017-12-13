@@ -393,6 +393,13 @@ public interface CourseLocalService extends BaseLocalService,
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
+	public com.liferay.lms.model.Course modCourse(
+		com.liferay.lms.model.Course course, java.lang.String summary,
+		com.liferay.portal.service.ServiceContext serviceContext,
+		boolean visible, boolean allowDuplicateName)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException;
+
 	public com.liferay.lms.model.Course closeCourse(long courseId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;

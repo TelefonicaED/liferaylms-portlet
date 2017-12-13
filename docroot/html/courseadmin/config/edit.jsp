@@ -80,7 +80,9 @@
 		<aui:input type="checkbox" helpMessage="help-published-in-catalog" label="published-in-catalog" name="showcatalog" value="<%=preferences.getValue(\"showcatalog\", StringPool.TRUE) %>" ignoreRequestValue="true"/>
 		<aui:input type="checkbox" name="showCourseCatalogForEditions" label="courseadmin.config.show-course-catalog-editions" 	value="<%=showCourseCatalogForEditions %>" checked="<%=showCourseCatalogForEditions %>"/>
 		<aui:input type="checkbox" name="showCoursePermission" label="courseadmin.config.showCoursePermission" 	value="<%=showCoursePermission %>" checked="<%=showCoursePermission %>"/>
-		<aui:input type="checkbox" name="showEditionsWithoutRestrictions" label="courseadmin.config.show-editions-without-restrictions" 	value="<%=showEditionsWithoutRestrictions %>" checked="<%=showEditionsWithoutRestrictions %>"/>	
+		<aui:input type="checkbox" name="showEditionsWithoutRestrictions" label="courseadmin.config.show-editions-without-restrictions" 	value="<%=showEditionsWithoutRestrictions %>" checked="<%=showEditionsWithoutRestrictions %>"/>
+		<aui:input type="checkbox" label="courseadmin.config.allow-duplicate-name" name="allowDuplicateName" value="<%=preferences.getValue(\"allowDuplicateName\", StringPool.FALSE) %>" ignoreRequestValue="true"/>
+			
 	</aui:field-wrapper>
 	
 	<aui:field-wrapper label="courseadmin.config.courseactions" >
@@ -103,8 +105,14 @@
 	
 	
 	<%-- Obtener el listado de expandos del curso --%>
-	<aui:field-wrapper label="courseadmin.config.expando.table">
+	<aui:field-wrapper label="courseadmin.config.columns">
+	
+		<aui:input type="checkbox"  label="courseadmin.config.inscription-date-column" name="inscriptionDateColumn" value="<%=preferences.getValue(\"inscriptionDateColumn\", StringPool.TRUE) %>" ignoreRequestValue="true"/>
+		<aui:input type="checkbox"  label="courseadmin.config.execution-date-column" name="executionDateColumn" value="<%=preferences.getValue(\"executionDateColumn\", StringPool.TRUE) %>" ignoreRequestValue="true"/>
+		
+	
 	<%
+		
 		try{
 		
 			List<ExpandoColumn> expandosColumnCourse = ExpandoColumnLocalServiceUtil.getDefaultTableColumns(themeDisplay.getCompanyId(), ClassNameLocalServiceUtil.getClassNameId(Course.class));
