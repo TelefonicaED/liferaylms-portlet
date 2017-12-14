@@ -30,6 +30,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.model.Group;
+import com.liferay.portal.model.User;
 import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portlet.asset.model.AssetCategory;
@@ -129,7 +130,8 @@ public class CourseIndexer extends BaseIndexer {
 		long groupId = getParentGroupId(entry.getGroupId());
 		long scopeGroupId = entry.getGroupId();
 		long userId = entry.getUserId();
-		String userName = UserLocalServiceUtil.getUser(userId).getFullName();
+		User user = UserLocalServiceUtil.fetchUserById(userId);
+		String userName =  user != null ? user.getFullName() : "";
 		long entryId = entry.getCourseId();
 		Map<Locale, String> titleMap = entry.getTitleMap();
 		Date startDate = entry.getStartDate();
@@ -148,7 +150,7 @@ public class CourseIndexer extends BaseIndexer {
 		if(assetEntry!=null){
 			content = assetEntry.getSummary();
 		}
-			content= content+" "+HtmlUtil.extractText(entry.getDescription(LocaleUtil.getDefault(),true));
+		content= content+" "+HtmlUtil.extractText(entry.getDescription(LocaleUtil.getDefault(),true));
 			
 		String contentSinAcentos=content.toLowerCase();
 		contentSinAcentos = Normalizer.normalize(contentSinAcentos, Normalizer.Form.NFD);

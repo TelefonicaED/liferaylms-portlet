@@ -68,7 +68,8 @@ Liferay.Service.registerClass(
 	Liferay.Service.Lms, "LearningActivityTry",
 	{
 		createLearningActivityTry: true,
-		getLearningActivityTries: true
+		getLearningActivityTries: true,
+		update: true
 	}
 );
 

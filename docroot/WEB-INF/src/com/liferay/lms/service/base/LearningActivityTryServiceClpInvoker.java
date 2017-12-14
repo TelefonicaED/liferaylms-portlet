@@ -44,6 +44,10 @@ public class LearningActivityTryServiceClpInvoker {
 		_methodName150 = "getLearningActivityTries";
 
 		_methodParameterTypes150 = new String[] { "long", "java.lang.String" };
+
+		_methodName151 = "update";
+
+		_methodParameterTypes151 = new String[] { "long", "int", "double", "int" };
 	}
 
 	public Object invokeMethod(String name, String[] parameterTypes,
@@ -79,6 +83,14 @@ public class LearningActivityTryServiceClpInvoker {
 				(java.lang.String)arguments[1]);
 		}
 
+		if (_methodName151.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes151, parameterTypes)) {
+			return LearningActivityTryServiceUtil.update(((Long)arguments[0]).longValue(),
+				((Integer)arguments[1]).intValue(),
+				((Double)arguments[2]).doubleValue(),
+				((Integer)arguments[3]).intValue());
+		}
+
 		throw new UnsupportedOperationException();
 	}
 
@@ -92,4 +104,6 @@ public class LearningActivityTryServiceClpInvoker {
 	private String[] _methodParameterTypes149;
 	private String _methodName150;
 	private String[] _methodParameterTypes150;
+	private String _methodName151;
+	private String[] _methodParameterTypes151;
 }

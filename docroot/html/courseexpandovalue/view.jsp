@@ -17,7 +17,7 @@ if (Validator.isNotNull(portletResource)) {
     String expandoColumn=prefs.getValue("expandoColumn","");
     String columnValue=ExpandoValueLocalServiceUtil.getData(themeDisplay.getCompanyId(),Course.class.getName(),ExpandoTableConstants.DEFAULT_TABLE_NAME,expandoColumn,course.getCourseId(),"");
      if(columnValue != null && !"".equals(columnValue)){%>
-   	<%= columnValue %>
+   		<%= columnValue %>
     <%
      }else{
     	 renderRequest.setAttribute(WebKeys.PORTLET_CONFIGURATOR_VISIBILITY, Boolean.FALSE);

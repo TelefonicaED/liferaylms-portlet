@@ -2,6 +2,10 @@
 package com.liferay.lms;
 
 import java.io.IOException;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
@@ -12,30 +16,55 @@ import javax.portlet.RenderResponse;
 
 import com.liferay.lms.auditing.AuditConstants;
 import com.liferay.lms.auditing.AuditingLogFactory;
+import com.liferay.lms.model.Course;
 import com.liferay.lms.model.LearningActivity;
+import com.liferay.lms.model.LearningActivityTry;
+import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityLocalServiceUtil;
+import com.liferay.lms.service.LearningActivityResultLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityServiceUtil;
+import com.liferay.lms.service.LearningActivityTryLocalServiceUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.repository.model.FileEntry;
+import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.upload.UploadPortletRequest;
+import com.liferay.portal.kernel.util.HtmlUtil;
+import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.xml.Document;
+import com.liferay.portal.kernel.xml.DocumentException;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceContextFactory;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
+import com.liferay.portlet.asset.NoSuchEntryException;
+import com.liferay.portlet.asset.model.AssetEntry;
+import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
+import com.liferay.portlet.documentlibrary.model.DLFileEntry;
+import com.liferay.portlet.documentlibrary.model.DLFileVersion;
+import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
+import com.liferay.portlet.documentlibrary.service.DLFileEntryLocalServiceUtil;
+import com.liferay.portlet.documentlibrary.util.DLUtil;
 import com.liferay.util.bridges.mvc.MVCPortlet;
+import com.tls.lms.util.LiferaylmsUtil;
 import com.tls.util.liferay.patch.PortalClassInvokerPatched;
 
 /**
  * Portlet implementation class ResourceActivity
  */
 public class ResourceExternalActivity extends MVCPortlet {
+	
+	private static Log log = LogFactoryUtil.getLog(ResourceExternalActivity.class);
+	
 	public static String DOCUMENTLIBRARY_MAINFOLDER = "ResourceUploads";
 
 	public void selectResource(ActionRequest actionRequest, ActionResponse actionResponse)
@@ -120,40 +149,237 @@ public class ResourceExternalActivity extends MVCPortlet {
 		long actId=0;
 
 		if(ParamUtil.getBoolean(renderRequest, "actionEditingDetails", false)){
-
 			actId=ParamUtil.getLong(renderRequest, "resId", 0);
 			renderResponse.setProperty("clear-request-parameters",Boolean.TRUE.toString());
-		}
-		else{
+		} else{
 			actId=ParamUtil.getLong(renderRequest, "actId", 0);
 		}
 
-
-		if(actId==0)// TODO Auto-generated method stub
-		{
+		log.error("actId: " + actId);
+		
+		if(actId==0){
 			renderRequest.setAttribute(WebKeys.PORTLET_CONFIGURATOR_VISIBILITY, Boolean.FALSE);
-		}
-		else
-		{
-			LearningActivity activity;
+		}else{
 			try {
-
 				//auditing
 				ThemeDisplay themeDisplay = (ThemeDisplay) renderRequest.getAttribute(WebKeys.THEME_DISPLAY);
 				
-				activity = LearningActivityLocalServiceUtil.getLearningActivity(actId);
+				LearningActivity activity = LearningActivityLocalServiceUtil.getLearningActivity(actId);
 				long typeId=activity.getTypeId();
 
-				if(typeId==2)
-				{
-					super.render(renderRequest, renderResponse);
-				}
-				else
-				{
+				log.error("typeId: " + typeId);
+				
+				if(typeId==2){
+					Course course = CourseLocalServiceUtil.getCourseByGroupCreatedId(activity.getGroupId());
+					boolean hasPermissionAccessCourseFinished = LiferaylmsUtil.hasPermissionAccessCourseFinished(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(), course.getCourseId(), themeDisplay.getUserId());
+					boolean hasAccessLock = CourseLocalServiceUtil.canAccessLock(themeDisplay.getScopeGroupId(), themeDisplay.getUser());
+
+					log.error("hasPermissionAccessCourseFinished: " + hasPermissionAccessCourseFinished);
+					log.error("hasAccessLock: " + hasAccessLock);
+					log.error("activity.getExtracontent(): " + activity.getExtracontent());
+					
+					if(activity.canAccess(true, themeDisplay.getUser(), themeDisplay.getPermissionChecker(), hasAccessLock, course, hasPermissionAccessCourseFinished) && 
+							Validator.isNotNull(activity.getExtracontent())){
+						renderRequest.setAttribute("activity", activity);
+						renderRequest.setAttribute("hasPermissionAccessCourseFinished", hasPermissionAccessCourseFinished);
+						
+						try {
+							Document document = SAXReaderUtil.read(activity.getExtracontent());
+
+							Element root=document.getRootElement();
+							
+							//Comprobamos si es necesario ver un porcetanje del video para aprobar
+							boolean isDefaultScore = (activity.getPasspuntuation() == 0);
+							renderRequest.setAttribute("isDefaultScore", isDefaultScore);
+							
+							//Si hemos hecho un intento anteriormente y necesitamos ver un porcentaje especifico para aprobar posicionamos el video donde se quedó
+							double videoPosition=0;
+							int oldScore=0;
+							int plays=0;
+
+							if (!isDefaultScore){
+								LearningActivityTry lastLearningActivityTry = null;
+								
+								if(!hasPermissionAccessCourseFinished){
+									lastLearningActivityTry =LearningActivityTryLocalServiceUtil.getLastLearningActivityTryByActivityAndUser(actId,themeDisplay.getUserId());
+								}
+								if (lastLearningActivityTry != null){
+									//Poner posición del video.
+									String xml = lastLearningActivityTry.getTryResultData();
+									
+									if(!xml.equals("")){
+
+										Document documentTry = SAXReaderUtil.read(xml);
+										Element rootElement = documentTry.getRootElement();
+										Element positionElement = rootElement.element("position");						
+										videoPosition =  Double.parseDouble(positionElement.getText());
+										
+										Element playsElement = rootElement.element("plays");	
+										plays =  Integer.parseInt(playsElement.getText());
+
+										Element scoreElement = rootElement.element("score");	
+										oldScore =  Integer.parseInt(scoreElement.getText());			
+									}		
+								}
+							}
+							
+							renderRequest.setAttribute("videoPosition", videoPosition);
+							renderRequest.setAttribute("oldScore", oldScore);
+							renderRequest.setAttribute("plays", plays);
+							
+							//Comprobamos si el usuario ha pasado el curso y lo enviamos para recargar los portlets al terminar
+							boolean userPassed = LearningActivityResultLocalServiceUtil.userPassed(actId,themeDisplay.getUserId());
+							renderRequest.setAttribute("userPassed", userPassed);
+							
+							//Tratamos el video si tiene
+							Element video=root.element("video");
+							if(video!=null){
+								boolean isYoutubeIframe = false;
+								boolean isVimeoIframe = false;
+								boolean isDLFileEntry = false;
+								
+								//Comprobamos si es vimeo o youtube
+								if(video.attributeValue("id","").equals("")){
+									String videoIframeCode= video.getText();
+									isYoutubeIframe = ((videoIframeCode.indexOf("iframe")>-1) &&  (videoIframeCode.indexOf("youtube")>-1));
+									isVimeoIframe = ((videoIframeCode.indexOf("iframe")>-1) &&  (videoIframeCode.indexOf("vimeo")>-1));
+									
+									boolean videoControlDisabled = false;
+									Element videoControl=root.element("video-control");
+									if(videoControl!=null){
+										videoControlDisabled = Boolean.parseBoolean(videoControl.getText());
+									}
+									String videoCode= video.getText();
+									if (isYoutubeIframe){
+										int delimitador = videoCode.indexOf("iframe") + "iframe".length();
+										String partePrimera = videoCode.substring(0, delimitador);
+										String parteSegunda = videoCode.substring(delimitador, videoCode.length());
+										String parteTercera = parteSegunda.substring(parteSegunda.indexOf("src=\""));
+										
+										String[] split = parteTercera.split("\"");
+										String src = split[1];
+										String parametros = ((src.indexOf("?")> -1) ? "&enablejsapi=1" : "?enablejsapi=1");
+										if (videoControlDisabled && !userPassed){
+											parametros += "&controls=0";
+										}
+										if (videoPosition > 0 && oldScore<100){
+											DecimalFormat df = new DecimalFormat("#####");
+											parametros += "&start="+df.format(videoPosition);
+										}
+										parteSegunda = parteSegunda.replace(src, src.concat(parametros));
+										StringBuilder tag  = new StringBuilder();
+										tag.append(partePrimera);
+										tag.append(" id=\"youtube-video\"");
+										tag.append(parteSegunda);
+										videoCode = tag.toString();
+									}
+									if (isVimeoIframe){
+								
+										int delimitador = videoCode.indexOf("iframe") + "iframe".length();
+										String partePrimera = videoCode.substring(0, delimitador);
+										String parteSegunda = videoCode.substring(delimitador, videoCode.length());
+										String parteTercera = parteSegunda.substring(parteSegunda.indexOf("src=\""));
+										
+										String[] split = parteTercera.split("\"");
+										String src = split[1];
+										String parametros = "?api=1&amp;player_id=player_1";
+										if(videoControlDisabled && !userPassed){
+											parametros += "&background=1&loop=0&mute=0";
+										}
+										parteSegunda = parteSegunda.replace(src, src.concat(parametros));
+										StringBuilder tag  = new StringBuilder();
+										tag.append(partePrimera);
+										tag.append(" id=\"player_1\"");
+										tag.append(parteSegunda);
+										videoCode = tag.toString();
+										
+										int seekTo = 0;
+										if (videoPosition > 0 && oldScore<100){
+											DecimalFormat df = new DecimalFormat("#####");
+											seekTo = Integer.parseInt(df.format(videoPosition));
+										}
+										renderRequest.setAttribute("seekTo", seekTo);
+									} 
+									
+									renderRequest.setAttribute("video", videoCode);
+									
+								}else{
+									//Es un fileEntryId
+									AssetEntry videoAsset= AssetEntryLocalServiceUtil.getAssetEntry(Long.parseLong(video.attributeValue("id")));
+									DLFileEntry videofile=DLFileEntryLocalServiceUtil.getDLFileEntry(videoAsset.getClassPK());
+									DLFileVersion videofileVersion = videofile.getFileVersion();
+									String videoURL=themeDisplay.getPortalURL() + themeDisplay.getPathContext() + "/documents/" + videofileVersion.getGroupId() + StringPool.SLASH + videofileVersion.getFolderId() + StringPool.SLASH + HttpUtil.encodeURL(HtmlUtil.unescape(videofileVersion.getTitle()));
+
+									isDLFileEntry = true;
+									renderRequest.setAttribute("video", videoURL);
+								}
+								
+								renderRequest.setAttribute("isYoutubeIframe", isYoutubeIframe);
+								renderRequest.setAttribute("isVimeoIframe", isVimeoIframe);
+								renderRequest.setAttribute("isDLFileEntry", isDLFileEntry);
+							}
+							
+							//Creamos el nuevo intento al usuario
+							ServiceContext serviceContext = ServiceContextFactory.getInstance(LearningActivityTry.class.getName(), renderRequest);
+
+							LearningActivityTry learningTry =LearningActivityTryLocalServiceUtil.createLearningActivityTry(actId,serviceContext);
+							renderRequest.setAttribute("latId", learningTry.getLatId());
+							//Si no hace falta nota para aprobar ya lo aprobamos
+							if(isDefaultScore){
+								learningTry.setEndDate(new Date());
+								learningTry.setResult(100);
+								LearningActivityTryLocalServiceUtil.updateLearningActivityTry(learningTry);	
+							}
+							
+							//Documentos anexos al recurso externo
+							
+							Element documento=null;
+							int i = 0;
+							List<FileVersion> listDocuments = new ArrayList<FileVersion>();
+							do{
+								String documentt = "document";
+								if(i>0){
+									documentt = documentt+(i-1);
+								}
+							
+								documento=root.element(documentt);
+								if(documento!=null){
+									if(!documento.attributeValue("id","").equals("")){
+										try{	
+											AssetEntry docAsset= AssetEntryLocalServiceUtil.getAssetEntry(Long.parseLong(documento.attributeValue("id")));
+											FileEntry fileEntry=DLAppLocalServiceUtil.getFileEntry(docAsset.getClassPK());
+											FileVersion fileVersion = fileEntry.getFileVersion();
+											
+											DLUtil.getPreviewURL(fileEntry, fileVersion, themeDisplay, "");
+											
+											listDocuments.add(fileVersion);
+											
+										}catch(NoSuchEntryException nsee){
+											nsee.printStackTrace();
+										}
+									}
+								}
+								i++;
+							}while(documento!=null);
+							
+							renderRequest.setAttribute("listDocuments", listDocuments);
+						} catch (DocumentException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						
+						
+						super.render(renderRequest, renderResponse);
+					}else{
+						renderRequest.setAttribute(WebKeys.PORTLET_CONFIGURATOR_VISIBILITY, Boolean.FALSE);
+					}
+				}else{
 					renderRequest.setAttribute(WebKeys.PORTLET_CONFIGURATOR_VISIBILITY, Boolean.FALSE);
 				}
 			} catch (PortalException e) {
+				e.printStackTrace();
 			} catch (SystemException e) {
+				e.printStackTrace();
 			}			
 		}
 	}

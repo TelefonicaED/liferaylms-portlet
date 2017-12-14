@@ -456,12 +456,7 @@ public class EvaluationActivity extends MVCPortlet implements MessageListener{
 			rootElement.addElement("firedDate").setText(_dateFormat.format(new Date()));
 			learningActivity.setExtracontent(document.formattedString());
 			LearningActivityLocalServiceUtil.updateLearningActivity(learningActivity);
-			
-			/*
-				Message message = new Message();
-				message.put("actId", learningActivity.getActId());
-				MessageBusUtil.sendMessage("liferay/lms/evaluationActivity", message);
-			*/
+
 			evaluate(learningActivity.getActId());
 		//}
 		

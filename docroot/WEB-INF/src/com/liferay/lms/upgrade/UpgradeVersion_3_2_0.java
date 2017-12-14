@@ -196,7 +196,6 @@ public class UpgradeVersion_3_2_0 extends UpgradeProcess {
 	    	}	  
 	    }
 	    
-	    
 	    log.warn("--- SETTING ACCESS PERMISSION TO MODULES ");
 	    List<Module> modules = ModuleLocalServiceUtil.getModules(QueryUtil.ALL_POS, QueryUtil.ALL_POS);
 		for(Module module : modules){

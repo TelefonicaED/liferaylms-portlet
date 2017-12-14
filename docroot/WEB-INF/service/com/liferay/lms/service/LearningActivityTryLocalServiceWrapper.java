@@ -416,6 +416,14 @@ public class LearningActivityTryLocalServiceWrapper
 			companyId, courseGropupCreatedId, _students, teamId);
 	}
 
+	public com.liferay.lms.model.LearningActivityTry update(long latId,
+		int score, double position, int plays)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _learningActivityTryLocalService.update(latId, score, position,
+			plays);
+	}
+
 	/**
 	 * @deprecated Renamed to {@link #getWrappedService}
 	 */

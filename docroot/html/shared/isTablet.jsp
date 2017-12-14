@@ -1,4 +1,3 @@
-
 <%@page import="com.liferay.portal.kernel.util.ParamUtil"%>
 <%
 Boolean isInitTablet = ParamUtil.getBoolean(request, "isTablet", false);

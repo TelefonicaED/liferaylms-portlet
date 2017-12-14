@@ -14,6 +14,7 @@
 
 package com.liferay.lms.service.impl;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -22,6 +23,7 @@ import java.util.List;
 import org.jfree.util.Log;
 
 import com.liferay.lms.NoSuchLearningActivityException;
+import com.liferay.lms.NoSuchLearningActivityTryException;
 import com.liferay.lms.auditing.AuditConstants;
 import com.liferay.lms.auditing.AuditingLogFactory;
 import com.liferay.lms.model.LearningActivity;
@@ -31,6 +33,7 @@ import com.liferay.lms.model.ModuleResult;
 import com.liferay.lms.service.ClpSerializer;
 import com.liferay.lms.service.LearningActivityLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityResultLocalServiceUtil;
+import com.liferay.lms.service.LearningActivityTryLocalServiceUtil;
 import com.liferay.lms.service.ModuleResultLocalServiceUtil;
 import com.liferay.lms.service.base.LearningActivityTryLocalServiceBaseImpl;
 import com.liferay.lms.service.persistence.LearningActivityTryFinderUtil;
@@ -40,6 +43,7 @@ import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.jsonwebservice.JSONWebService;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.DocumentException;
@@ -420,6 +424,38 @@ public class LearningActivityTryLocalServiceImpl
 		
 		return LearningActivityTryFinderUtil.triesPerUserOnlyStudents(actId, companyId, courseGropupCreatedId, _students, teamId);
 	}
+	
+	public LearningActivityTry update(long latId, int score, double position, int plays) throws SystemException, PortalException {
 
+		System.out.println("update: " + latId);
+		
+		LearningActivityTry lat=learningActivityTryPersistence.fetchByPrimaryKey(latId);
+		
+		lat.setResult(score);
+		
+		try {			
+			Element resultadoXML=SAXReaderUtil.createElement("result");
+			Document resultadoXMLDoc=SAXReaderUtil.createDocument(resultadoXML);
+			Element positionXML=SAXReaderUtil.createElement("position");
+			positionXML.setText(String.valueOf(position));		
+			resultadoXML.add(positionXML);
+			Element scoreXML=SAXReaderUtil.createElement("score");
+			scoreXML.setText(String.valueOf(score));		
+			resultadoXML.add(scoreXML);
+			Element playsXML=SAXReaderUtil.createElement("plays");
+			playsXML.setText(String.valueOf(plays));		
+			resultadoXML.add(playsXML);		
+			lat.setTryResultData(resultadoXMLDoc.formattedString());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		lat.setEndDate(new Date());
+		
+		lat = learningActivityTryLocalService.updateLearningActivityTry(lat);
+		
+		return lat;
+	}
 
 }

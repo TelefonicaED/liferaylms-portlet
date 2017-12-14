@@ -85,6 +85,13 @@ public class LearningActivityTryServiceUtil {
 		return getService().getLearningActivityTries(actId, login);
 	}
 
+	public static com.liferay.lms.model.LearningActivityTry update(long latId,
+		int score, double position, int plays)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getService().update(latId, score, position, plays);
+	}
+
 	public static void clearService() {
 		_service = null;
 	}

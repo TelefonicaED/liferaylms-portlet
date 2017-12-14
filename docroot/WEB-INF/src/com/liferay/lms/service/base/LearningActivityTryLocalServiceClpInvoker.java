@@ -209,6 +209,10 @@ public class LearningActivityTryLocalServiceClpInvoker {
 		_methodParameterTypes184 = new String[] {
 				"long", "long", "long", "java.util.List", "long"
 			};
+
+		_methodName185 = "update";
+
+		_methodParameterTypes185 = new String[] { "long", "int", "double", "int" };
 	}
 
 	public Object invokeMethod(String name, String[] parameterTypes,
@@ -432,6 +436,14 @@ public class LearningActivityTryLocalServiceClpInvoker {
 				((Long)arguments[4]).longValue());
 		}
 
+		if (_methodName185.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes185, parameterTypes)) {
+			return LearningActivityTryLocalServiceUtil.update(((Long)arguments[0]).longValue(),
+				((Integer)arguments[1]).intValue(),
+				((Double)arguments[2]).doubleValue(),
+				((Integer)arguments[3]).intValue());
+		}
+
 		throw new UnsupportedOperationException();
 	}
 
@@ -513,4 +525,6 @@ public class LearningActivityTryLocalServiceClpInvoker {
 	private String[] _methodParameterTypes183;
 	private String _methodName184;
 	private String[] _methodParameterTypes184;
+	private String _methodName185;
+	private String[] _methodParameterTypes185;
 }
