@@ -51,6 +51,10 @@ import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.portal.model.Company;
+import com.liferay.portal.model.Image;
+import com.liferay.portal.service.CompanyLocalServiceUtil;
+import com.liferay.portal.service.ImageLocalServiceUtil;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.util.bridges.mvc.MVCPortlet;
@@ -61,7 +65,6 @@ import com.lowagie.text.Element;
 import com.lowagie.text.Font;
 import com.lowagie.text.FontFactory;
 import com.lowagie.text.HeaderFooter;
-import com.lowagie.text.Image;
 import com.lowagie.text.PageSize;
 import com.lowagie.text.Paragraph;
 import com.lowagie.text.Rectangle;
@@ -148,7 +151,7 @@ public class UserProgress extends MVCPortlet {
 		
 		PdfPTable tbHeader = new PdfPTable(1);
 		tbHeader.setWidthPercentage(100);
-	    PdfPCell cellHeaderImg = new PdfPCell(getLogoImg(request, themeDisplay));
+	    PdfPCell cellHeaderImg = new PdfPCell(com.lowagie.text.Image.getInstance(getLogoImg(request, themeDisplay).getTextObj()));
 	    cellHeaderImg.setBorder(PdfCell.NO_BORDER);
 	    cellHeaderImg.setHorizontalAlignment(Element.ALIGN_LEFT);
 	    tbHeader.addCell(cellHeaderImg);
@@ -404,21 +407,22 @@ public class UserProgress extends MVCPortlet {
 
 	
 	private Image getLogoImg(HttpServletRequest request, ThemeDisplay themeDisplay){
-		// Imagen corporativa
-        Image image = null;
-		try { 
-			image = Image.getInstance( request.getRequestURL().toString().replace(request.getRequestURI(),"") + themeDisplay.getCompanyLogo());
-			image.setAlignment(Image.LEFT);
-			image.scaleToFit(800,34);
-			//image.scalePercent(100);
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (BadElementException e) {
+		Image image = null;
+		try {
+			Company company = CompanyLocalServiceUtil.fetchCompany(themeDisplay.getCompanyId());
+		
+			
+			if(company!=null) {
+				long logoId = company.getLogoId();
+				if(logoId!=0) {
+					image = ImageLocalServiceUtil.fetchImage(logoId);
+					
+				}
+			}
+		} catch (SystemException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
 		return image;
 	}
 }
