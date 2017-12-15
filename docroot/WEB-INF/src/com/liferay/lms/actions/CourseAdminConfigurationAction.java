@@ -1,7 +1,5 @@
 package com.liferay.lms.actions;
 
-import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.List;
 
 import javax.portlet.ActionRequest;
@@ -12,6 +10,8 @@ import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 
 import com.liferay.lms.model.Course;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.ConfigurationAction;
 import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.util.Constants;
@@ -27,7 +27,7 @@ import com.liferay.portlet.expando.service.ExpandoColumnLocalServiceUtil;
 
 public class CourseAdminConfigurationAction implements ConfigurationAction {
 	public static final String JSP = "/html/courseadmin/config/edit.jsp";
-
+	private static Log log = LogFactoryUtil.getLog(CourseAdminConfigurationAction.class);
 	public String render(PortletConfig config, RenderRequest renderRequest, RenderResponse renderResponse) throws Exception 
 	{
 		return JSP; 
@@ -97,10 +97,8 @@ public class CourseAdminConfigurationAction implements ConfigurationAction {
 			String expandoName="";
 			for (ExpandoColumn expandoCourse : expandosColumnCourse) {
 				expandoName = StringUtil.upperCaseFirstLetter(expandoCourse.getName());
-				if(ParamUtil.getBoolean(actionRequest, "show" + expandoName,	false)){
-					System.out.println("SAVE: show" + expandoName+ "   VALUE:  "+actionRequest.getParameter("show" + expandoName));
-					portletPreferences.setValue("show" + expandoName, actionRequest.getParameter("show" + expandoName));
-				}
+				log.debug("SAVE: show" + expandoName+ "   VALUE:  "+actionRequest.getParameter("show" + expandoName));
+				portletPreferences.setValue("show" + expandoName, actionRequest.getParameter("show" + expandoName));
 			}	
 		}
 		
