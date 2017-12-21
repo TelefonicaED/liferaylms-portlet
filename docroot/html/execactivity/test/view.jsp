@@ -167,6 +167,7 @@ if(isTablet){%>
 					if(learningTry == null && !hasPermissionAccessCourseFinished){
 						ServiceContext serviceContext = ServiceContextFactory.getInstance(LearningActivityTry.class.getName(), renderRequest);
 						learningTry =LearningActivityTryLocalServiceUtil.createLearningActivityTry(actId,serviceContext);
+						
 					}else if(!hasPermissionAccessCourseFinished){
 						activityTimestamp = GetterUtil.getLong(LearningActivityLocalServiceUtil.getExtraContentValue(activity.getActId(),"timeStamp"));
 						timestamp=activityTimestamp*1000 - (new Date().getTime() - learningTry.getStartDate().getTime());

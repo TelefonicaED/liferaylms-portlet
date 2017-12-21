@@ -395,12 +395,12 @@
 			<action-key>PERMISSIONS</action-key>
 			<action-key>UPDATE</action-key>
 			<action-key>VIEW</action-key>
-			<action-key>ACCESS</action-key>
 			<action-key>ADD_LACT</action-key>
 			<action-key>ADD_DISCUSSION</action-key>				
 			<action-key>UPDATE_DISCUSSION</action-key>
             <action-key>DELETE_DISCUSSION</action-key>
 			<action-key>SOFT_PERMISSIONS</action-key>
+			<action-key>ACCESS</action-key>
 		</supports>
 		<site-member-defaults>
 			<action-key>VIEW</action-key>
