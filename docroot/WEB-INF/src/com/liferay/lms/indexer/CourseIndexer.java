@@ -12,6 +12,7 @@ import javax.portlet.PortletURL;
 
 import com.liferay.lms.model.Course;
 import com.liferay.lms.service.CourseLocalServiceUtil;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.search.BaseIndexer;
@@ -26,6 +27,9 @@ import com.liferay.portal.kernel.search.Summary;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.LocalizationUtil;
+import com.liferay.portal.kernel.util.PropsUtil;
+import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
@@ -33,6 +37,7 @@ import com.liferay.portal.model.Group;
 import com.liferay.portal.model.User;
 import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.UserLocalServiceUtil;
+import com.liferay.portal.util.PortalUtil;
 import com.liferay.portlet.asset.model.AssetCategory;
 import com.liferay.portlet.asset.model.AssetEntry;
 import com.liferay.portlet.asset.service.AssetCategoryLocalServiceUtil;
@@ -192,13 +197,22 @@ public class CourseIndexer extends BaseIndexer {
 		document.addKeyword(Field.ENTRY_CLASS_NAME, Course.class.getName());
 		document.addKeyword(Field.ENTRY_CLASS_PK, entryId);
 		document.addKeyword(Field.STATUS, entry.getClosed() ? WorkflowConstants.STATUS_INACTIVE : WorkflowConstants.STATUS_APPROVED);
-		String[] assetCategoryTitles = new String[assetCategoryIds.length];
-		for (int i=0; i<assetCategoryIds.length;i++){
-			AssetCategory categoria = AssetCategoryLocalServiceUtil.getCategory(assetCategoryIds[i]);
-			assetCategoryTitles[i]=categoria.getName();
+		
+		Locale[] locales = LanguageUtil.getAvailableLocales();
+		String[] assetCategoryTitles = null;
+		AssetCategory categoria=null;
+		for (Locale locale : locales) {
+			assetCategoryTitles = new String[assetCategoryIds.length];
+			for (int i=0; i<assetCategoryIds.length;i++){
+				categoria = AssetCategoryLocalServiceUtil.getCategory(assetCategoryIds[i]);
+				assetCategoryTitles[i]=categoria.getTitle(locale);
+			}
+	
+			document.addKeyword("assetCategoryTitles".concat(StringPool.UNDERLINE).concat(LanguageUtil.getLanguageId(locale)), assetCategoryTitles);
 		}
-
-		document.addKeyword("assetCategoryTitles", assetCategoryTitles);
+		locales=null;
+		assetCategoryTitles=null;
+		
 		ExpandoBridgeIndexerUtil.addAttributes(document, expandoBridge);
 		
 		Map<String, Field> values = document.getFields();
@@ -209,6 +223,7 @@ public class CourseIndexer extends BaseIndexer {
 		if(log.isDebugEnabled())log.debug("return Document");
 		return document;
 	}
+	
 	
 	@Override
 	protected Summary doGetSummary(Document document, Locale locale, String snippet,
