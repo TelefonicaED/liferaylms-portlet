@@ -295,7 +295,7 @@ public class OfflineActivity extends MVCPortlet {
 	public void setGrades(ActionRequest request,	ActionResponse response){
 
 		ThemeDisplay themeDisplay  =(ThemeDisplay)request.getAttribute(WebKeys.THEME_DISPLAY);
-
+		int curValue = ParamUtil.getInteger(request, "curValue");
 		boolean correct=true;
 		long actId = ParamUtil.getLong(request,"actId"); 
 		long studentId = ParamUtil.getLong(request,"studentId");		
@@ -313,7 +313,7 @@ public class OfflineActivity extends MVCPortlet {
 
 		response.setRenderParameter("gradeFilter", gradeFilter);
 		response.setRenderParameter("criteria", criteria);		
-
+		response.setRenderParameter("curValue", String.valueOf(curValue));
 		CalificationType ct = null;
 		double result=0;
 		try {
