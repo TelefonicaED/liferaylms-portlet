@@ -19,7 +19,6 @@
 <%@include file="/init.jsp" %>
 <%@page import="java.net.URLEncoder"%>
 <%@page import="javax.portlet.PortletPreferences"%>
-<%@page import="com.liferay.util.LiferayViewUtil"%>
 <%@page import="com.liferay.util.JavaScriptUtil"%>
 
 <div id="caja_inscripcion">

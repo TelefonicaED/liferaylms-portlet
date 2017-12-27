@@ -38,19 +38,7 @@ public class moduleValidator {
 		if (Validator.isNull(module.getTitle(request.getLocale(), true))) {
 			errors.add("module-title-required");
 		}
-	
-		//Field description
-	
-		/* La descripcion se hace opcional */
-		/*
-		if(!validateDescription(props, ParamUtil.getString(request, "description"))){
-		    errors.add("error");
-		}
-		
-		if (Validator.isNull(module.getDescription(request.getLocale(), true))) {
-			errors.add("module-description-required");
-		}
-		*/
+
 		//Field order
 			
 		//Date validation

@@ -9,7 +9,6 @@
 <%@page import="com.liferay.lms.model.TestQuestion"%>
 <%@page import="com.liferay.lms.service.LearningActivityLocalServiceUtil"%>
 <%@page import="com.liferay.lms.model.LearningActivity"%>
-<%@page import="com.liferay.util.JavaScriptUtil"%>
 <%@page import="javax.portlet.PortletRequest"%>
 <%@page import="com.liferay.portal.kernel.util.JavaConstants"%>
 <%@page import="com.liferay.util.JavaScriptUtil"%>

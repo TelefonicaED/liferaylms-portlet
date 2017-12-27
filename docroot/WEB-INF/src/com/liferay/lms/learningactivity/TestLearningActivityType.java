@@ -1,19 +1,11 @@
 package com.liferay.lms.learningactivity;
 
-import java.io.IOException;
-import java.util.Date;
-
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
 
 import com.liferay.lms.asset.TestAssetRenderer;
-import com.liferay.lms.model.Course;
 import com.liferay.lms.model.LearningActivity;
-import com.liferay.lms.model.Module;
 import com.liferay.lms.service.ClpSerializer;
-import com.liferay.lms.service.CourseLocalServiceUtil;
-import com.liferay.lms.service.LearningActivityLocalServiceUtil;
-import com.liferay.lms.service.ModuleLocalServiceUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.servlet.SessionErrors;
@@ -27,14 +19,12 @@ import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.xml.Document;
-import com.liferay.portal.kernel.xml.DocumentException;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
 import com.liferay.portal.model.PortletConstants;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portlet.asset.model.AssetRenderer;
-import com.tls.lms.util.LiferaylmsUtil;
 
 public class TestLearningActivityType extends BaseLearningActivityType 
 {

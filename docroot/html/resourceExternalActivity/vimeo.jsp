@@ -1,41 +1,33 @@
-<script src="/liferaylms-portlet/js/froogaloop.min.js"></script>
+<script src="https://player.vimeo.com/api/player.js"></script>
 
 <script>
 	document.addEventListener('DOMContentLoaded', function() { 		
 		var iframe = document.getElementById('player_1');
-		var player = $f(iframe);
+		var player = new Vimeo.Player(iframe);
+		
 		var plays = parseInt('${plays}');
 		var duration = 0;
 		var currentTime = 0;
 		var seekTo = parseInt('${seekTo}');
 		var finished = false;
-		console.log("plays: " + plays);
 		
-		player.addEvent('ready', function() {
+		player.ready().then(function() {
 			console.log("ready ");
-			player.api('getDuration', function(dur) {
+			player.getDuration().then(function(dur) {
 				duration = dur;
-			});		
+			});	
 			
-		    player.addEvent('pause', onPause);
-			player.addEvent('finish', onFinish);
-			player.addEvent('play', onPlay);
-			if (seekTo > 0)
-				player.api('seekTo', seekTo);
-			
+			if (seekTo > 0){
+				player.setCurrentTime(seekTo);
+			}
 		});
-		
-		function onPause() {
-			
-		}
 		   
-		function onPlay() {
+		player.on('play',function(data) {
 			finished = false;
 			plays++;
-		}	
+		});	
 		
-		function onFinish() {	
-			console.log("finish vimeo");
+		player.on('ended',function(data) {
 			
 			var serviceParameterTypes = [
 			     	'long',
@@ -73,7 +65,7 @@
 		var unloadEvent = function (e) {
 			console.log("unload event vimeo");  
 			if(!finished){
-				player.api('getCurrentTime', function(time) {
+				player.getCurrentTime().then(function(time) {
 					currentTime = time;
 						
 					var isDefaultScore = '${isDefaultScore}' == 'true';

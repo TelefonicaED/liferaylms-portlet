@@ -855,20 +855,7 @@ public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int e
 	}
 	
 	public Course getCourseByGroupCreatedId(long groupCreatedId) throws SystemException{
-		
-		ClassLoader classLoader = (ClassLoader) PortletBeanLocatorUtil.locate(ClpSerializer.getServletContextName(), "portletClassLoader"); 
-		DynamicQuery consulta = DynamicQueryFactoryUtil.forClass(Course.class, classLoader)
-				.add(PropertyFactoryUtil.forName("groupCreatedId").eq(groupCreatedId));
-	
-		List<Course> list = (List<Course>)coursePersistence.findWithDynamicQuery(consulta);
-		
-		if(!list.isEmpty() && list.size()>0){
-			return list.get(0);
-		}
-
-		return null;
-		
-		//return coursePersistence.fetchByGroupCreatedId(groupCreatedId);
+		return coursePersistence.fetchByGroupCreatedId(groupCreatedId);
 	}
 	
 	@SuppressWarnings("unchecked")
