@@ -20,6 +20,7 @@
 <%@page import="com.liferay.lms.model.LearningActivity"%>
 <%@page import="com.liferay.portal.kernel.xml.Element"%>
 <%@page import="com.liferay.portal.kernel.xml.SAXReaderUtil"%>
+<%@page import="com.liferay.portal.util.comparator.UserLastNameComparator"%>
 
 <%@page import="com.liferay.portal.kernel.util.PropsUtil"%>
 <%@include file="/init.jsp" %>
@@ -144,7 +145,7 @@ LearningActivity activity = LearningActivityLocalServiceUtil.getLearningActivity
 //List<User> listaUsuarioTotal = UserLocalServiceUtil.getGroupUsers(course.getGroupCreatedId());
 LinkedHashMap<String, Object> params = new LinkedHashMap<String, Object>();
 params.put("usersGroups", new Long(course.getGroupCreatedId())); 
-OrderByComparator comparator = null;
+OrderByComparator comparator = new UserLastNameComparator(true);
 boolean andOperator = true;
 
 PortletURL portletURL = renderResponse.createRenderURL();
