@@ -13,6 +13,7 @@
 
 LearningActivityResult result = null;
 LearningActivity activity = null;
+int curValue = ParamUtil.get(renderRequest, "curValue", 0);
 
 if((renderRequest.getParameter("actId")!=null)&&(renderRequest.getParameter("studentId")!=null))
 {
@@ -30,6 +31,7 @@ CalificationType ct = new CalificationTypeRegistry().getCalificationType(CourseL
 <portlet:actionURL name="setGrades" var="updateGradesURL" windowState="<%= LiferayWindowState.NORMAL.toString() %>">
 	<portlet:param name="gradeFilter" value="<%=gradeFilter %>" />
 	<portlet:param name="criteria" value="<%=criteria %>" />
+	<portlet:param name="curValue" value="<%=String.valueOf(curValue) %>" />
 </portlet:actionURL>
 
 <aui:form  name="fn_grades" method="post" action="${updateGradesURL}"  >

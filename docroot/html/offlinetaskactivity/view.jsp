@@ -44,7 +44,8 @@ CalificationType ct = new CalificationTypeRegistry().getCalificationType(CourseL
 <%
 	LmsPrefs prefs=LmsPrefsLocalServiceUtil.getLmsPrefs(themeDisplay.getCompanyId());
 	long actId = ParamUtil.getLong(request,"actId",0);
-	
+	int curValue = ParamUtil.getInteger(request,"curValue",1);
+	System.out.println("CUR VALUE "+curValue);
 	if(actId==0)
 	{
 		renderRequest.setAttribute(WebKeys.PORTLET_CONFIGURATOR_VISIBILITY, Boolean.FALSE);
@@ -79,7 +80,7 @@ CalificationType ct = new CalificationTypeRegistry().getCalificationType(CourseL
 			        </portlet:renderURL>
 			        
 					<portlet:renderURL var="viewUrlPopGrades" windowState="<%= LiferayWindowState.POP_UP.toString() %>">   
-						<portlet:param name="actId" value="<%=String.valueOf(activity.getActId()) %>" />      
+						<portlet:param name="actId" value="<%=String.valueOf(activity.getActId()) %>" />          
 			            <portlet:param name="jspPage" value="/html/offlinetaskactivity/popups/grades.jsp" />           
 			        </portlet:renderURL>
 
@@ -142,7 +143,7 @@ CalificationType ct = new CalificationTypeRegistry().getCalificationType(CourseL
 								renderUrl.setParameter('jspPage', '/html/offlinetaskactivity/popups/grades.jsp');
 								renderUrl.setParameter('gradeFilter', '<%= ParamUtil.getString(renderRequest, "gradeFilter","") %>');
 								renderUrl.setParameter('criteria', '<%=ParamUtil.getString(renderRequest, "criteria","") %>');
-								
+							    renderUrl.setParameter('curValue', <%= String.valueOf(curValue) %> )	
 								window.<portlet:namespace />popupGrades = new A.Dialog({
 									id:'<portlet:namespace />showPopupGrades',
 						            title: '<%=LanguageUtil.format(pageContext, "offlinetaskactivity.set.grades", new Object[]{""})%>',
@@ -205,6 +206,7 @@ CalificationType ct = new CalificationTypeRegistry().getCalificationType(CourseL
 						PortletURL portletURL = renderResponse.createRenderURL();
 						portletURL.setParameter("jspPage","/html/offlinetaskactivity/view.jsp");
 						portletURL.setParameter("criteria", criteria); 
+						portletURL.setParameter("cur", String.valueOf(curValue));
 						portletURL.setParameter("gradeFilter", gradeFilter);
 					
 					%>
@@ -232,7 +234,7 @@ CalificationType ct = new CalificationTypeRegistry().getCalificationType(CourseL
 					</aui:form>
 					
 					
-					<liferay-ui:search-container iteratorURL="<%=portletURL%>" emptyResultsMessage="there-are-no-results" delta="10" deltaConfigurable="true">
+					<liferay-ui:search-container iteratorURL="<%=portletURL%>" curParam="curValue" emptyResultsMessage="there-are-no-results" delta="10" deltaConfigurable="true">
 
 				   	<liferay-ui:search-container-results>
 						<%

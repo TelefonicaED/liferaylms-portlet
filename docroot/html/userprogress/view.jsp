@@ -22,18 +22,20 @@
 	String returnurl=ParamUtil.getString(request,"returnurl","");
 	User usuario=UserLocalServiceUtil.getUser(userId);
 	String title = LanguageUtil.get(pageContext,"results") +" "+ usuario.getFullName();
+	boolean showExport = (renderRequest.getPreferences().getValue("showExport", "false")).compareTo("true") == 0;
 %>
 
 <liferay-ui:header title="<%= title %>" backURL="<%=returnurl %>"></liferay-ui:header>
 
 <%-- Exportar --%>
-<div class="aui-tab-back">
-<liferay-ui:icon-menu align="right" cssClass='lfr-toolbar-button add-button' direction="down" extended="<%= false %>"  message="export" showWhenSingleIcon="<%= false %>">
-	<liferay-portlet:resourceURL var="exportCourseStatus" />
-	<liferay-ui:icon image="export" url='<%=exportCourseStatus%>' label="dates"/>
-</liferay-ui:icon-menu>
-</div>
-
+<c:if test="<%=showExport %>">
+	<div class="aui-tab-back">
+		<liferay-ui:icon-menu align="right" cssClass='lfr-toolbar-button add-button' direction="down" extended="<%= false %>"  message="export" showWhenSingleIcon="<%= false %>">
+			<liferay-portlet:resourceURL var="exportCourseStatus" />
+			<liferay-ui:icon image="export" url='<%=exportCourseStatus%>' label="dates"/>
+		</liferay-ui:icon-menu>
+	</div>
+</c:if>
 <liferay-ui:panel-container >
 <%
 	java.util.List<Module> modules = ModuleLocalServiceUtil.findAllInGroup(themeDisplay.getScopeGroupId());
