@@ -45,7 +45,7 @@ CalificationType ct = new CalificationTypeRegistry().getCalificationType(CourseL
 	LmsPrefs prefs=LmsPrefsLocalServiceUtil.getLmsPrefs(themeDisplay.getCompanyId());
 	long actId = ParamUtil.getLong(request,"actId",0);
 	int curValue = ParamUtil.getInteger(request,"curValue",1);
-	System.out.println("CUR VALUE "+curValue);
+
 	if(actId==0)
 	{
 		renderRequest.setAttribute(WebKeys.PORTLET_CONFIGURATOR_VISIBILITY, Boolean.FALSE);
