@@ -20,8 +20,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
-import org.jfree.util.Log;
-
 import com.liferay.lms.NoSuchLearningActivityException;
 import com.liferay.lms.NoSuchLearningActivityTryException;
 import com.liferay.lms.auditing.AuditConstants;
@@ -244,7 +242,6 @@ public class LearningActivityTryLocalServiceImpl
 		   lastTry=activities.get(0);
 			for(LearningActivityTry lat:activities){
 				if(lat.getEndDate() == null){
-					Log.debug("::CERRANDO EL LearningActivityTry:"+lat.getLatId());
 					lat.setEndDate(lat.getStartDate());
 					super.updateLearningActivityTry(lat, false);
 				}

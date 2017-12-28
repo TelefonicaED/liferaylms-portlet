@@ -2,12 +2,12 @@
 <classpath>
 	<classpathentry kind="src" path="docroot/WEB-INF/src"/>
 	<classpathentry kind="src" path="docroot/WEB-INF/service"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER">
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jdk1.7">
 		<attributes>
 			<attribute name="owner.project.facets" value="java"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="con" path="org.eclipse.jst.server.core.container/com.liferay.ide.eclipse.server.tomcat.runtimeClasspathProvider/Liferay v6.1 CE (Tomcat 7)">
+	<classpathentry kind="con" path="org.eclipse.jst.server.core.container/com.liferay.ide.eclipse.server.tomcat.runtimeClasspathProvider/Liferay v6.1 CE (Tomcat 7) (2)">
 		<attributes>
 			<attribute name="owner.project.facets" value="jst.web"/>
 		</attributes>
@@ -18,9 +18,14 @@
 			<attribute name="org.eclipse.jst.component.nondependency" value=""/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="C:/Virginia/Liferay/liferay-plugins-sdk-6.1.1/portlets/certificaciones-portlet/docroot/WEB-INF/lib/opencsv-2.3.jar"/>
 	<classpathentry kind="lib" path="docroot/WEB-INF/lib/jsoup-1.7.2.jar"/>
-	<classpathentry kind="lib" path="docroot/WEB-INF/lib/opencsv-2.3.jar"/>
-	<classpathentry kind="lib" path="docroot/WEB-INF/lib/iText-2.0.8.jar"/>
-	<classpathentry kind="lib" path="docroot/WEB-INF/lib/jfreechart-1.0.19.jar"/>
+	<classpathentry kind="lib" path="C:/Virginia/Liferay/liferay-plugins-sdk-6.1.1/portlets/weCorp-portlet/docroot/WEB-INF/lib/flying-saucer-pdf-9.0.7.jar"/>
+	<classpathentry kind="lib" path="C:/Virginia/Liferay/liferay-plugins-sdk-6.1.1/portlets/weCorp-portlet/docroot/WEB-INF/lib/iText-2.1.7.js2.jar"/>
+	<classpathentry kind="lib" path="C:/Virginia/Liferay/liferay-portal-6.1.1/tomcat-7.0.27/webapps/ROOT/WEB-INF/lib/jfreechart.jar">
+		<attributes>
+			<attribute name="javadoc_location" value=""/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="output" path="docroot/WEB-INF/classes"/>
 </classpath>
