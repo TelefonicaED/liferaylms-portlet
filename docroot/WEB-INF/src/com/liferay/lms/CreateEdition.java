@@ -318,9 +318,7 @@ public class CreateEdition extends CourseCopyUtil implements MessageListener {
 					}
 				}
 				
-				if(canBeLinked){
-					newLearnActivity.setLinkedActivityId(activity.getActId());
-				}
+			
 				//TODO Cuando esté preparado la parte de linkar no habrá que copiar todo
 				//else{
 					newLearnActivity.setExtracontent(activity.getExtracontent());
@@ -334,6 +332,13 @@ public class CreateEdition extends CourseCopyUtil implements MessageListener {
 				
 				nuevaLarn=LearningActivityLocalServiceUtil.addLearningActivity(newLearnActivity,serviceContext);
 
+				
+				if(canBeLinked){
+					nuevaLarn.setLinkedActivityId(activity.getActId());
+				}
+				nuevaLarn.setUuid(activity.getUuid());
+				
+				
 				log.debug("ACTIVITY EXTRA CONTENT BEFORE "+ newLearnActivity.getExtracontent());
 				
 				log.debug("Learning Activity : " + activity.getTitle(Locale.getDefault())+ " ("+activity.getActId()+", " + LanguageUtil.get(Locale.getDefault(),learningActivityTypeRegistry.getLearningActivityType(activity.getTypeId()).getName())+")");
