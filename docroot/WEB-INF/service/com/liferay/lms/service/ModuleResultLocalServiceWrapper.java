@@ -271,6 +271,17 @@ public class ModuleResultLocalServiceWrapper implements ModuleResultLocalService
 	}
 
 	/**
+	* Get all module results of the module given.
+	*
+	* @param moduleId Id of the module
+	* @return List of module results of the module.
+	*/
+	public java.util.List<com.liferay.lms.model.ModuleResult> getByModuleId(
+		long moduleId) {
+		return _moduleResultLocalService.getByModuleId(moduleId);
+	}
+
+	/**
 	* No deberÃ¯Â¿Â½a haber nunca mÃ¯Â¿Â½s de un result para el mismo usuario y modulo.
 	* Se hace para eliminar los duplicados.
 	*

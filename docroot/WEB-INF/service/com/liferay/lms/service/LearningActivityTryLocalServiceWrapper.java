@@ -297,6 +297,17 @@ public class LearningActivityTryLocalServiceWrapper
 			userId);
 	}
 
+	/**
+	* Get all learning activity tries of the activity given
+	*
+	* @param actId The id of the activity
+	* @return List of learning activity tries
+	*/
+	public java.util.List<com.liferay.lms.model.LearningActivityTry> getLearningActivityTriesByActId(
+		long actId) {
+		return _learningActivityTryLocalService.getLearningActivityTriesByActId(actId);
+	}
+
 	public com.liferay.lms.model.LearningActivityTry createLearningActivityTry(
 		long actId, com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException,

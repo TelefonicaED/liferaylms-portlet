@@ -296,6 +296,17 @@ public class LearningActivityTryLocalServiceUtil {
 		return getService().getLearningActivityTryByActUser(actId, userId);
 	}
 
+	/**
+	* Get all learning activity tries of the activity given
+	*
+	* @param actId The id of the activity
+	* @return List of learning activity tries
+	*/
+	public static java.util.List<com.liferay.lms.model.LearningActivityTry> getLearningActivityTriesByActId(
+		long actId) {
+		return getService().getLearningActivityTriesByActId(actId);
+	}
+
 	public static com.liferay.lms.model.LearningActivityTry createLearningActivityTry(
 		long actId, com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException,

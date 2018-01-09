@@ -264,6 +264,16 @@ public interface LearningActivityTryLocalService extends BaseLocalService,
 		long actId, long userId)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
+	/**
+	* Get all learning activity tries of the activity given
+	*
+	* @param actId The id of the activity
+	* @return List of learning activity tries
+	*/
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.util.List<com.liferay.lms.model.LearningActivityTry> getLearningActivityTriesByActId(
+		long actId);
+
 	public com.liferay.lms.model.LearningActivityTry createLearningActivityTry(
 		long actId, com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException,
