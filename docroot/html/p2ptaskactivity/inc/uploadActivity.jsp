@@ -152,13 +152,12 @@ Liferay.provide(
 			
 			//Start opening popUp			
 			if(A.one('#<portlet:namespace />p2pconfirmation')) {
-				window.<portlet:namespace />p2pconfirmationTitle = A.one('#<portlet:namespace />p2pconfirmation h1').html();
 				window.<portlet:namespace />p2pconfirmationBody = A.one('#<portlet:namespace />p2pconfirmation').html();
 				A.one('#<portlet:namespace />p2pconfirmation').remove();
 			}
 			window.<portlet:namespace />p2pconfirmation = new A.Dialog({
 				id:'<portlet:namespace />showp2pconfirmation',
-				title: window.<portlet:namespace />p2pconfirmationTitle,
+				title: Liferay.Language.get('p2ptask-upload-confirmation'),
 	            bodyContent: window.<portlet:namespace />p2pconfirmationBody,
 	            centered: true,
 	            modal: true,
@@ -223,14 +222,16 @@ Liferay.provide(
 </script>
 
 <!-- Start PopUp confirmation -->
-<div id="<%= renderResponse.getNamespace() %>p2pconfirmation" style="display:none">
-	<h1><liferay-ui:message key="p2ptask-upload-confirmation" /></h1>
-	<br />
-	<p><span class="label"><liferay-ui:message key="p2ptask-file-name" />:</span> <span id="contentFile"></span></p>
+<div id="<%= renderResponse.getNamespace() %>p2pconfirmation" style="display:none;">
 	<div class="contDesc">
-		<p><span class="label"><liferay-ui:message key="p2ptask-description-task" />:</span> <span id="contentDescription"></span></p>
-		<p><liferay-ui:message key="p2ptask-description-task-confirmation-message" /></p>
+	<p><span class="label"><liferay-ui:message key="p2ptask-file-name" />:</span></p> <p><span id="contentFile"></span></p>
 	</div>
+	<br />
+	<div class="contDesc">
+		<p><span class="label"><liferay-ui:message key="p2ptask-description-task" />:</span></p> <p><span id="contentDescription"></span></p>
+	</div>
+	<br /><br />
+	<p><liferay-ui:message key="p2ptask-description-task-confirmation-message" /></p>
 	<div class="buttons">
 		<input type="button" onclick="<%= renderResponse.getNamespace() %>closeConfirmation()" class="button simplemodal-close" value="<liferay-ui:message key="cancel" />" />
 		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
