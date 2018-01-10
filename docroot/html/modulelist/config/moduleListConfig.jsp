@@ -21,6 +21,7 @@
 	boolean showModuleEndDate = (preferences.getValue("showModuleEndDate", "true")).compareTo("true") == 0;
 	boolean allowEditionMode = (preferences.getValue("allowEditionMode", "false")).compareTo("true") == 0;
 	boolean allowAccessWhenFinishedButNotClosed = (preferences.getValue("allowAccessWhenFinishedButNotClosed", "false")).compareTo("true") == 0;
+	boolean dragAndDrop = Boolean.parseBoolean(preferences.getValue("dragAndDrop", "true"));
 %>
 
 <liferay-portlet:actionURL var="saveConfigurationURL"  portletConfiguration="true"/>
@@ -35,6 +36,7 @@
 	<aui:input type="checkbox" name="showModuleEndDate" label="modulelist.showModuleEndDate" value="<%=showModuleEndDate %>" checked="<%=showModuleEndDate %>"/>
 	<aui:input type="checkbox" name="allowEditionMode" label="modulelist.allowEditionMode" value="<%=allowEditionMode %>" checked="<%=allowEditionMode %>"/>
 	<aui:input type="checkbox" name="allowAccessWhenFinishedButNotClosed" label="modulelist.allowAccessWhenFinishedButNotClosed" value="<%=allowAccessWhenFinishedButNotClosed %>" checked="<%=allowAccessWhenFinishedButNotClosed %>"/>
+	<aui:input type="checkbox" name="dragAndDrop" label="modulelist.dragAndDrop" value="<%=dragAndDrop %>" checked="<%=dragAndDrop %>"/>
 	<aui:button-row>
 		<aui:button type="submit" value="save" />
 	</aui:button-row>

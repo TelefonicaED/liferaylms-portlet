@@ -783,6 +783,10 @@
 				<name>numerateModules</name>
 				<value>true</value>
 			</preference>
+			<preference>
+				<name>dragAndDrop</name>
+				<value>true</value>
+			</preference>
 		</portlet-preferences>
 		<security-role-ref>
 			<role-name>administrator</role-name>
