@@ -146,6 +146,21 @@ public class LearningActivityTryLocalServiceImpl
 		return learningActivityTryPersistence.findByact_u(actId, userId);
 	}
 	
+	/**
+	 * Get all learning activity tries of the activity given
+	 * @param actId The id of the activity
+	 * @return List of learning activity tries
+	 */
+	public List<LearningActivityTry> getLearningActivityTriesByActId (long actId) {
+		List<LearningActivityTry> learningActivityTries = new ArrayList<LearningActivityTry>();
+		try{
+			learningActivityTries = learningActivityTryPersistence.findByact(actId);
+		}catch(SystemException e){
+			e.printStackTrace();
+		}
+		return learningActivityTries;
+	}
+	
 	@Override
 	public LearningActivityTry updateLearningActivityTry(LearningActivityTry learningActivityTry, boolean merge)throws SystemException{
 		try{

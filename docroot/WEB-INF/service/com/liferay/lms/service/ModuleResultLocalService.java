@@ -249,6 +249,16 @@ public interface ModuleResultLocalService extends BaseLocalService,
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	/**
+	* Get all module results of the module given.
+	*
+	* @param moduleId Id of the module
+	* @return List of module results of the module.
+	*/
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.util.List<com.liferay.lms.model.ModuleResult> getByModuleId(
+		long moduleId);
+
+	/**
 	* No deberï¿½a haber nunca mï¿½s de un result para el mismo usuario y modulo.
 	* Se hace para eliminar los duplicados.
 	*

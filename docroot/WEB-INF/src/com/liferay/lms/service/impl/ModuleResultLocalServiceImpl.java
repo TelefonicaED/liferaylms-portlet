@@ -81,7 +81,24 @@ public class ModuleResultLocalServiceImpl extends ModuleResultLocalServiceBaseIm
 		ModuleResult moduleResult = moduleResultPersistence.fetchBymu(userId, moduleId);
 		return moduleResult;	
 	}
+	
+	/**
+	 * Get all module results of the module given.
+	 * @param moduleId Id of the module
+	 * @return List of module results of the module.
+	 */
+	public List<ModuleResult>  getByModuleId(long moduleId)  {
 
+		List<ModuleResult> moduleResults = new ArrayList<ModuleResult>();
+		try{
+			moduleResults = moduleResultPersistence.findBym(moduleId);
+		}catch(SystemException e){
+			e.printStackTrace();
+		}
+		return moduleResults;	
+	}
+
+	
 	/**
 	 * No deber�a haber nunca m�s de un result para el mismo usuario y modulo.
 	 * Se hace para eliminar los duplicados.
