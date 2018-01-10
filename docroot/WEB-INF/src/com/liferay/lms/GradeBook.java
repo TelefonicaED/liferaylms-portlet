@@ -9,6 +9,8 @@ import java.util.List;
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
 import javax.portlet.PortletException;
+import javax.portlet.PortletRequestDispatcher;
+import javax.portlet.PortletURL;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 import javax.portlet.ResourceRequest;
@@ -31,8 +33,10 @@ import com.liferay.lms.service.LearningActivityServiceUtil;
 import com.liferay.lms.service.LearningActivityTryLocalServiceUtil;
 import com.liferay.lms.service.LmsPrefsLocalServiceUtil;
 import com.liferay.lms.service.ModuleLocalServiceUtil;
+import com.liferay.lms.util.displayterms.UserDisplayTerms;
 import com.liferay.portal.kernel.dao.orm.CustomSQLParam;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
+import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.NestableException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
@@ -48,6 +52,7 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.model.Team;
 import com.liferay.portal.model.User;
 import com.liferay.portal.service.RoleLocalServiceUtil;
@@ -56,6 +61,7 @@ import com.liferay.portal.service.TeamLocalServiceUtil;
 import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.comparator.UserFirstNameComparator;
+import com.liferay.portal.util.comparator.UserLastNameComparator;
 import com.liferay.util.bridges.mvc.MVCPortlet;
 
 /**
@@ -63,7 +69,135 @@ import com.liferay.util.bridges.mvc.MVCPortlet;
  */
 public class GradeBook extends MVCPortlet {
 	
+	private String viewJSP = null;
+	private String userDetailsJSP = null;
+	
+	public void init() throws PortletException {	
+		viewJSP = getInitParameter("view-template");
+		userDetailsJSP = getInitParameter("user-details-template");
+	}
+	
 	private static Log log = LogFactoryUtil.getLog(GradeBook.class);
+	
+	public void doView(RenderRequest renderRequest, RenderResponse renderResponse) throws IOException, PortletException {
+		String jsp = renderRequest.getParameter("view");
+		log.debug("view:"+jsp);
+
+		PortletURL renderURL = renderResponse.createRenderURL();
+		renderRequest.setAttribute("renderURL", renderURL.toString());
+		
+		super.doView(renderRequest, renderResponse);
+		
+		if (jsp == null || "".equals(jsp) || "view-template".equals(jsp)) {
+			showViewDefault(renderRequest, renderResponse);
+		}else if ("user-details".equals(jsp)) {
+			showViewUserDetails(renderRequest, renderResponse);
+		}
+	}
+	
+	private void showViewDefault(RenderRequest renderRequest, RenderResponse renderResponse) throws IOException, PortletException {
+		
+		ThemeDisplay themeDisplay = (ThemeDisplay) renderRequest.getAttribute(WebKeys.THEME_DISPLAY);
+		
+		UserDisplayTerms userDisplayTerms = new UserDisplayTerms(renderRequest);
+		
+		List<Team> userTeams = null;
+		try {
+			userTeams = TeamLocalServiceUtil.getUserTeams(themeDisplay.getUserId(), themeDisplay.getScopeGroupId());
+		} catch (SystemException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		Team theTeam=null;
+		boolean hasNullTeam=false;
+		try {
+			if(userDisplayTerms.getTeamId()>0 && (TeamLocalServiceUtil.hasUserTeam(themeDisplay.getUserId(), userDisplayTerms.getTeamId())||userTeams.size()==0)){		
+				theTeam=TeamLocalServiceUtil.fetchTeam(userDisplayTerms.getTeamId());	
+			}else{
+				if(userTeams!=null&& userTeams.size()>0){
+					theTeam=userTeams.get(0);	
+					userDisplayTerms.setTeamId(theTeam.getTeamId());
+				}
+			}
+		} catch (SystemException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		if(userTeams == null || userTeams.size()==0){
+			hasNullTeam=true;
+			try {
+				userTeams=TeamLocalServiceUtil.getGroupTeams(themeDisplay.getScopeGroupId());
+			} catch (SystemException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		renderRequest.setAttribute("hasNullTeam", hasNullTeam);
+		renderRequest.setAttribute("teams", userTeams);
+		renderRequest.setAttribute("theTeam", theTeam);
+		
+		try {
+			List<Module> modules = ModuleLocalServiceUtil.findAllInGroup(themeDisplay.getScopeGroupId());
+			renderRequest.setAttribute("modules", modules);
+		} catch (SystemException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+		//Buscamos los usuario
+		
+		PortletURL iteratorURL = renderResponse.createRenderURL();
+		iteratorURL.setParameter("teamId", Long.toString(userDisplayTerms.getTeamId()));
+		iteratorURL.setParameter("firstName", userDisplayTerms.getFirstName());
+		iteratorURL.setParameter("lastName", userDisplayTerms.getLastName());
+		iteratorURL.setParameter("screenName", userDisplayTerms.getScreenName());
+		iteratorURL.setParameter("emailAddress", userDisplayTerms.getEmailAddress());
+		
+		SearchContainer<User> searchContainer = new SearchContainer<User>(renderRequest, null, null, SearchContainer.DEFAULT_CUR_PARAM,
+				10, iteratorURL, 
+				null, "there-are-no-users");
+
+		try {
+			Course course = CourseLocalServiceUtil.getCourseByGroupCreatedId(themeDisplay.getScopeGroupId());
+			List<User> results = CourseLocalServiceUtil.getStudents(course.getCourseId(), themeDisplay.getCompanyId(), userDisplayTerms.getScreenName(), userDisplayTerms.getFirstName(), 
+					userDisplayTerms.getLastName(), userDisplayTerms.getEmailAddress(), WorkflowConstants.STATUS_APPROVED, userDisplayTerms.getTeamId(), true, searchContainer.getStart(),
+					searchContainer.getEnd(), new UserLastNameComparator());
+
+			int total = CourseLocalServiceUtil.countStudents(course.getCourseId(), themeDisplay.getCompanyId(), userDisplayTerms.getScreenName(), userDisplayTerms.getFirstName(), 
+					userDisplayTerms.getLastName(), userDisplayTerms.getEmailAddress(), WorkflowConstants.STATUS_APPROVED, userDisplayTerms.getTeamId(), true);
+			
+			searchContainer.setResults(results);
+			searchContainer.setTotal(total);
+		} catch (SystemException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+
+		 
+		renderRequest.setAttribute("displayTerms", userDisplayTerms);
+		renderRequest.setAttribute("searchContainer", searchContainer);
+		
+		try {
+			CalificationType ct = new CalificationTypeRegistry().getCalificationType(CourseLocalServiceUtil.getCourseByGroupCreatedId(themeDisplay.getScopeGroupId()).getCalificationType());
+			renderRequest.setAttribute("ct", ct);
+		} catch (SystemException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		include(this.viewJSP, renderRequest, renderResponse);
+	}	
+	
+	private void showViewUserDetails(RenderRequest renderRequest, RenderResponse renderResponse) throws IOException, PortletException {
+		
+		ThemeDisplay themeDisplay = (ThemeDisplay) renderRequest.getAttribute(WebKeys.THEME_DISPLAY);
+		
+		include(this.userDetailsJSP, renderRequest, renderResponse);
+	}	
 	
 	@Override
 	public void serveResource(ResourceRequest resourceRequest,
@@ -325,6 +459,15 @@ public class GradeBook extends MVCPortlet {
 		
 		
 		super.doDispatch(renderRequest, renderResponse);
+	}
+	
+	protected void include(String path, RenderRequest renderRequest, RenderResponse renderResponse) throws IOException, PortletException {
+
+		PortletRequestDispatcher portletRequestDispatcher = getPortletContext().getRequestDispatcher(path);
+
+		if (portletRequestDispatcher == null) {} else {
+			portletRequestDispatcher.include(renderRequest, renderResponse);
+		}
 	}
 
 }

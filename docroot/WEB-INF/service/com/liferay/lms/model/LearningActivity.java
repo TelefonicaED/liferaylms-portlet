@@ -75,4 +75,6 @@ public interface LearningActivity extends LearningActivityModel, PersistedModel 
 		com.liferay.portal.security.permission.PermissionChecker permissionChecker,
 		boolean canAccessLock, com.liferay.lms.model.Course course,
 		boolean hasPermissionAccessCourseFinished);
+
+	public com.liferay.lms.learningactivity.LearningActivityType getLearningActivityType();
 }

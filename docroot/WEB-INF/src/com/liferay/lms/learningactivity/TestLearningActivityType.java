@@ -274,4 +274,9 @@ public class TestLearningActivityType extends BaseLearningActivityType
 		return true;
 	}
 	
+	@Override
+	public boolean canBeSeenResults(){
+		return true;
+	}
+	
 }

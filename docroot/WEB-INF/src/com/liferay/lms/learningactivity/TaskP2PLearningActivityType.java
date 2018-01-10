@@ -275,5 +275,10 @@ public class TaskP2PLearningActivityType extends BaseLearningActivityType {
 	public boolean canBeLinked(){
 		return false;
 	}
+	
+	@Override
+	public boolean canBeSeenResults(){
+		return true;
+	}
 }
 

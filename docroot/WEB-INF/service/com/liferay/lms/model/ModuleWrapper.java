@@ -796,6 +796,13 @@ public class ModuleWrapper implements Module, ModelWrapper<Module> {
 		return _module.isLocked(userId);
 	}
 
+	public java.util.List<com.liferay.lms.model.LearningActivity> getListVisiblesLearningActivities(
+		long companyId,
+		com.liferay.portal.security.permission.PermissionChecker permissionChecker) {
+		return _module.getListVisiblesLearningActivities(companyId,
+			permissionChecker);
+	}
+
 	/**
 	 * @deprecated Renamed to {@link #getWrappedModel}
 	 */

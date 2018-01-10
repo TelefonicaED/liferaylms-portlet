@@ -69,6 +69,10 @@ public class UserDisplayTerms extends DisplayTerms{
 		return teamId;
 	}
 	
+	public void setTeamId(long teamId){
+		this.teamId = teamId;
+	}
+	
 	public boolean isActive() {
 		if (status == WorkflowConstants.STATUS_APPROVED) {
 			return true;

@@ -18,6 +18,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import com.liferay.lms.learningactivity.LearningActivityType;
+import com.liferay.lms.learningactivity.LearningActivityTypeRegistry;
 import com.liferay.lms.learningactivity.descriptionfilter.DescriptionFilterRegistry;
 import com.liferay.lms.model.Course;
 import com.liferay.lms.model.LearningActivity;
@@ -299,4 +301,9 @@ public class LearningActivityImpl extends LearningActivityBaseImpl {
 		}
 		return false;		
 	}
+	
+	public LearningActivityType getLearningActivityType(){
+		return new LearningActivityTypeRegistry().getLearningActivityType(getTypeId());
+	}
+	
 }

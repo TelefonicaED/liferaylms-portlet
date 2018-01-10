@@ -519,6 +519,12 @@ public class ModuleClp extends BaseModelImpl<Module> implements Module {
 		throw new UnsupportedOperationException();
 	}
 
+	public java.util.List<com.liferay.lms.model.LearningActivity> getListVisiblesLearningActivities(
+		long companyId,
+		com.liferay.portal.security.permission.PermissionChecker permissionChecker) {
+		throw new UnsupportedOperationException();
+	}
+
 	public boolean isLocked(long userId) {
 		throw new UnsupportedOperationException();
 	}

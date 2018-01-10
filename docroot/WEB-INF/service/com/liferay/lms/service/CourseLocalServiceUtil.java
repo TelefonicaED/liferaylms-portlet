@@ -538,13 +538,13 @@ public class CourseLocalServiceUtil {
 
 	public static int getStudentsFromCourseCount(long courseId, long teamId,
 		java.lang.String firstName, java.lang.String lastName,
-		java.lang.String screeName, java.lang.String emailAddress,
+		java.lang.String screenName, java.lang.String emailAddress,
 		boolean andComparator)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		return getService()
 				   .getStudentsFromCourseCount(courseId, teamId, firstName,
-			lastName, screeName, emailAddress, andComparator);
+			lastName, screenName, emailAddress, andComparator);
 	}
 
 	public static java.util.List<com.liferay.portal.model.User> getStudentsFromCourse(
@@ -574,6 +574,15 @@ public class CourseLocalServiceUtil {
 				   .getStudentsFromCourse(companyId, courseGroupCreatedId,
 			start, end, teamId, firstName, lastName, screenName, emailAddress,
 			andOperator);
+	}
+
+	public static int getStudentsFromCourseCount(long companyId,
+		long courseGroupCreatedId, long teamId, java.lang.String firstName,
+		java.lang.String lastName, java.lang.String screenName,
+		java.lang.String emailAddress, boolean andOperator) {
+		return getService()
+				   .getStudentsFromCourseCount(companyId, courseGroupCreatedId,
+			teamId, firstName, lastName, screenName, emailAddress, andOperator);
 	}
 
 	public static java.util.List<com.liferay.portal.model.User> getTeachersFromCourse(
@@ -704,6 +713,27 @@ public class CourseLocalServiceUtil {
 		return getService()
 				   .countStudents(courseId, companyId, screenName, firstName,
 			lastName, emailAddress, andOperator);
+	}
+
+	public static java.util.List<com.liferay.portal.model.User> getStudents(
+		long courseId, long companyId, java.lang.String screenName,
+		java.lang.String firstName, java.lang.String lastName,
+		java.lang.String emailAddress, int status, long teamId,
+		boolean andOperator, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator comparator) {
+		return getService()
+				   .getStudents(courseId, companyId, screenName, firstName,
+			lastName, emailAddress, status, teamId, andOperator, start, end,
+			comparator);
+	}
+
+	public static int countStudents(long courseId, long companyId,
+		java.lang.String screenName, java.lang.String firstName,
+		java.lang.String lastName, java.lang.String emailAddress, int status,
+		long teamId, boolean andOperator) {
+		return getService()
+				   .countStudents(courseId, companyId, screenName, firstName,
+			lastName, emailAddress, status, teamId, andOperator);
 	}
 
 	public static int countStudentsStatus(long courseId, long companyId,

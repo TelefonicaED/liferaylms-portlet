@@ -9,6 +9,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 
 import com.liferay.lms.model.CourseResult;
@@ -82,7 +83,7 @@ public class LiferaylmsUtil {
 			res2 = new ArrayList<LearningActivity>();
 			res2.addAll(res);
 			Role siteMemberRole = RoleLocalServiceUtil.getRole(themeDisplay.getCompanyId(), RoleConstants.SITE_MEMBER);
-			for(java.util.ListIterator<LearningActivity> itr = res2.listIterator(); itr.hasNext();){
+			for(ListIterator<LearningActivity> itr = res2.listIterator(); itr.hasNext();){
 				LearningActivity activity = itr.next();
 				try {
 					if(!ResourcePermissionLocalServiceUtil.hasResourcePermission(activity.getCompanyId(), LearningActivity.class.getName(), 

@@ -271,4 +271,8 @@ public abstract class BaseLearningActivityType implements LearningActivityType, 
 		return sb.toString();
 	}
 	
+	public boolean canBeSeenResults(){
+		return false;
+	}
+	
 }

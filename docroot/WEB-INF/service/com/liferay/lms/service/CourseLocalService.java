@@ -438,7 +438,7 @@ public interface CourseLocalService extends BaseLocalService,
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public int getStudentsFromCourseCount(long courseId, long teamId,
 		java.lang.String firstName, java.lang.String lastName,
-		java.lang.String screeName, java.lang.String emailAddress,
+		java.lang.String screenName, java.lang.String emailAddress,
 		boolean andComparator)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
@@ -461,6 +461,12 @@ public interface CourseLocalService extends BaseLocalService,
 		long teamId, java.lang.String firstName, java.lang.String lastName,
 		java.lang.String screenName, java.lang.String emailAddress,
 		boolean andOperator);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public int getStudentsFromCourseCount(long companyId,
+		long courseGroupCreatedId, long teamId, java.lang.String firstName,
+		java.lang.String lastName, java.lang.String screenName,
+		java.lang.String emailAddress, boolean andOperator);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.util.List<com.liferay.portal.model.User> getTeachersFromCourse(
@@ -544,6 +550,19 @@ public interface CourseLocalService extends BaseLocalService,
 		java.lang.String screenName, java.lang.String firstName,
 		java.lang.String lastName, java.lang.String emailAddress,
 		boolean andOperator);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.util.List<com.liferay.portal.model.User> getStudents(
+		long courseId, long companyId, java.lang.String screenName,
+		java.lang.String firstName, java.lang.String lastName,
+		java.lang.String emailAddress, int status, long teamId,
+		boolean andOperator, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator comparator);
+
+	public int countStudents(long courseId, long companyId,
+		java.lang.String screenName, java.lang.String firstName,
+		java.lang.String lastName, java.lang.String emailAddress, int status,
+		long teamId, boolean andOperator);
 
 	public int countStudentsStatus(long courseId, long companyId,
 		java.lang.String screenName, java.lang.String firstName,

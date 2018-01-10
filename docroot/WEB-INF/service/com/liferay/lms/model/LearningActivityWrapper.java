@@ -1260,6 +1260,10 @@ public class LearningActivityWrapper implements LearningActivity,
 			hasPermissionAccessCourseFinished);
 	}
 
+	public com.liferay.lms.learningactivity.LearningActivityType getLearningActivityType() {
+		return _learningActivity.getLearningActivityType();
+	}
+
 	/**
 	 * @deprecated Renamed to {@link #getWrappedModel}
 	 */

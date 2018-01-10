@@ -21,14 +21,13 @@
 		userId=themeDisplay.getUserId();
 	}
 
-	String returnurl=ParamUtil.getString(request,"returnurl","");
 	User usuario=UserLocalServiceUtil.getUser(userId);
 	String title = LanguageUtil.get(pageContext,"results") +" "+ usuario.getFullName();
 	
 	CalificationType ct = new CalificationTypeRegistry().getCalificationType(CourseLocalServiceUtil.getCourseByGroupCreatedId(themeDisplay.getScopeGroupId()).getCalificationType());
 %>
 
-<liferay-ui:header title="<%= title %>" backURL="<%=returnurl %>"></liferay-ui:header>
+<liferay-ui:header title="<%= title %>" backURL="${renderURL}"></liferay-ui:header>
 <liferay-ui:panel-container >
 <%
 	java.util.List<Module> modules = ModuleLocalServiceUtil.findAllInGroup(themeDisplay.getScopeGroupId());
@@ -37,7 +36,7 @@
 	{
 %>
 		<liferay-ui:panel id="<%=Long.toString(theModule.getModuleId()) %>" title="<%=theModule.getTitle(themeDisplay.getLocale()) %>" collapsible="true" extended="true" defaultState="<%=(fila==0)?\"open\":\"collapsed\" %>">
-		<liferay-ui:search-container  emptyResultsMessage="there-are-no-results" delta="50" deltaConfigurable="false">
+		<liferay-ui:search-container  emptyResultsMessage="there-are-no-results" delta="50" deltaConfigurable="false" iteratorURL="<%=iteratorURL %>" >
 	<liferay-ui:search-container-results>
 	<% 
 	List<LearningActivity> activities=LearningActivityServiceUtil.getLearningActivitiesOfModule(theModule.getModuleId());

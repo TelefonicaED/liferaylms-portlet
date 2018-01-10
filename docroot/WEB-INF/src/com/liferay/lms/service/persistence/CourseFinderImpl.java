@@ -160,6 +160,8 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			CourseFinder.class.getName() + ".countOpenOrRestrictedCoursesByParentId";
 	public static final String GET_DISTINCT_COURSE_GROUPS = 
 			CourseFinder.class.getName() + ".getDistinctCourseGroups";
+	public static final String INNER_JOIN_TEAM = 
+			CourseFinder.class.getName() + ".innerJoinTeam";
 	
 	
 	public List<Course> findByT_S_C_T_T(String freeText, int status, long[] categories, long[] tags, String templates, long companyId, long groupId, long userId, String language, boolean isAdmin, boolean searchParentCourses, boolean andOperator, int start, int end){
@@ -463,7 +465,8 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 	    return 0;
 	}
 	
-	public List<User> findStudents(long courseId, long companyId, String screenName, String firstName, String lastName, String emailAddress,boolean andOperator, int start, int end,OrderByComparator obc){
+	public List<User> findStudents(long courseId, long companyId, String screenName, String firstName, String lastName, String emailAddress, int status, long teamId, boolean andOperator, 
+				int start, int end,OrderByComparator obc){
 		Session session = null;
 		boolean whereClause = false;
 		try{
@@ -474,11 +477,19 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 				log.debug("firstName:"+firstName);
 				log.debug("lastName:"+lastName);
 				log.debug("emailAddress:"+emailAddress);
+				log.debug("start: " + start);
+				log.debug("end: " + end);
 			}
 			
 			
 			session = openSessionLiferay();
 			String sql = CustomSQLUtil.get(FIND_STUDENTS);
+			
+			if(teamId > 0){
+				sql = sql.replace("[$JOINTEAM$]", CustomSQLUtil.get(INNER_JOIN_TEAM));
+			}else{
+				sql = sql.replace("[$JOINTEAM$]", "");
+			}
 			
 			if(Validator.isNotNull(screenName)){
 				sql = sql.replace("[$WHERESCREENNAME$]", CustomSQLUtil.get(WHERE_SCREEN_NAME));
@@ -545,8 +556,11 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			QueryPos qPos = QueryPos.getInstance(q);
 			qPos.add(teacherRoleId);
 			qPos.add(editorRoleId);
+			if(teamId > 0){
+				qPos.add(teamId);
+			}
 			qPos.add(courseId);
-			qPos.add(WorkflowConstants.STATUS_APPROVED);
+			qPos.add(status);
 			
 			if(Validator.isNotNull(screenName)){
 				qPos.add(screenName);
@@ -586,7 +600,7 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 	    return new ArrayList<User>();
 	}
 	
-	public int countStudents(long courseId, long companyId, String screenName, String firstName, String lastName, String emailAddress, int status,boolean andOperator){
+	public int countStudents(long courseId, long companyId, String screenName, String firstName, String lastName, String emailAddress, int status, long teamId, boolean andOperator){
 		Session session = null;
 		boolean whereClause = false;
 		try{
@@ -602,6 +616,11 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			
 			String sql = CustomSQLUtil.get(COUNT_STUDENTS);
 			
+			if(teamId > 0){
+				sql = sql.replace("[$JOINTEAM$]", CustomSQLUtil.get(INNER_JOIN_TEAM));
+			}else{
+				sql = sql.replace("[$JOINTEAM$]", "");
+			}
 
 			if(Validator.isNotNull(screenName)){
 				sql = sql.replace("[$WHERESCREENNAME$]", CustomSQLUtil.get(WHERE_SCREEN_NAME));
@@ -655,6 +674,9 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			QueryPos qPos = QueryPos.getInstance(q);
 			qPos.add(teacherRoleId);
 			qPos.add(editorRoleId);
+			if(teamId > 0){
+				qPos.add(teamId);
+			}
 			qPos.add(courseId);
 			qPos.add(status);
 			qPos.add(status);

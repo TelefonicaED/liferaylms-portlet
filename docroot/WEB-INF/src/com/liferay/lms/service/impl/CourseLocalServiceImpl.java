@@ -36,7 +36,6 @@ import com.liferay.lms.model.LmsPrefs;
 import com.liferay.lms.model.Module;
 import com.liferay.lms.model.Schedule;
 import com.liferay.lms.model.UserCompetence;
-import com.liferay.lms.service.ClpSerializer;
 import com.liferay.lms.service.CourseCompetenceLocalServiceUtil;
 import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.lms.service.LmsPrefsLocalServiceUtil;
@@ -45,7 +44,6 @@ import com.liferay.lms.service.UserCompetenceLocalServiceUtil;
 import com.liferay.lms.service.base.CourseLocalServiceBaseImpl;
 import com.liferay.lms.service.persistence.CourseFinderUtil;
 import com.liferay.lms.views.CourseResultView;
-import com.liferay.portal.kernel.bean.PortletBeanLocatorUtil;
 import com.liferay.portal.kernel.dao.orm.CustomSQLParam;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
@@ -139,28 +137,26 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 	
 	
 	final String DEGREE  = "\\u00B0";
-	private static final int DEFAULT_EVALUATIONS = 3;
 	
 	Log log = LogFactoryUtil.getLog(CourseLocalServiceImpl.class);
 	
-	public java.util.List<Course> getCoursesOfGroup(long groupId) throws SystemException
-	{
+	public java.util.List<Course> getCoursesOfGroup(long groupId) throws SystemException{
 		return coursePersistence.findByGroupId(groupId);
 	}
-	public java.util.List<Course> getOpenCoursesOfGroup(long groupId) throws SystemException
-	{
+	
+	public java.util.List<Course> getOpenCoursesOfGroup(long groupId) throws SystemException{
 		return coursePersistence.findByGroupId(groupId);
 	}
-	public java.util.List<Course> getCourses(long companyId) throws SystemException
-	{
+	
+	public java.util.List<Course> getCourses(long companyId) throws SystemException{
 		return coursePersistence.findByCompanyId(companyId);
 	}
-	public long countByGroupId(long groupId) throws SystemException
-	{
+	
+	public long countByGroupId(long groupId) throws SystemException{
 		return coursePersistence.countByGroupId(groupId);
 	}
-	public Course fetchByGroupCreatedId(long groupId) throws SystemException
-	{
+	
+	public Course fetchByGroupCreatedId(long groupId) throws SystemException{
 		return coursePersistence.fetchByGroupCreatedId(groupId);
 	}
 	
@@ -170,20 +166,15 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 		return addCourse(title, description, summary, friendlyURL, locale, createDate, startDate, endDate, layoutSetPrototypeId, typesite, 0, calificationType, maxUsers, serviceContext,isFromClone);
 	}
 	
-	public List<Course> getUserCourses(long userId) throws PortalException, SystemException
-	{
+	public List<Course> getUserCourses(long userId) throws PortalException, SystemException{
 		
 		User usuario= userLocalService.getUser(userId);
 		List<Group> groups= GroupLocalServiceUtil.getUserGroups(usuario.getUserId());
 		List<Course> results=new java.util.ArrayList<Course>();
 
-		for(Group groupCourse:groups)
-		{
-			
-			
+		for(Group groupCourse:groups){
 			Course course=courseLocalService.fetchByGroupCreatedId(groupCourse.getGroupId());
-			if(course!=null)
-			{
+			if(course!=null){
 				results.add(course);
 			}
 		}
@@ -192,17 +183,12 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 	}
 	
 	
-	public List<Course> getOpenedUserCourses(long userId) throws PortalException, SystemException
-	{		
+	public List<Course> getOpenedUserCourses(long userId) throws PortalException, SystemException{		
 		 return courseFinder.getExistingUserCourses(userId,-1,-1);
-
 	}
 	
-	
-	public List<Course> getOpenedUserCourses(long userId, int start, int end) throws PortalException, SystemException
-	{
+	public List<Course> getOpenedUserCourses(long userId, int start, int end) throws PortalException, SystemException{
 		 return courseFinder.getExistingUserCourses(userId,start,end);
-
 	}
 	
 	public List<Course> getPublicCoursesByCompanyId(Long companyId){
@@ -237,35 +223,35 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 	
 
 
-public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int end){
+	public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int end){
+		
+		Long classNameId = ClassNameLocalServiceUtil.getClassNameId(Course.class.getName());
+		
+		if(classNameId!=null){
+			try {
+				DynamicQuery dq = DynamicQueryFactoryUtil.forClass(AssetEntry.class);
+				dq.add(PropertyFactoryUtil.forName("companyId").eq(companyId));
+				dq.add(PropertyFactoryUtil.forName("classNameId").eq(classNameId));
+				dq.add(PropertyFactoryUtil.forName("visible").eq(true));
+				dq.setProjection(ProjectionFactoryUtil.distinct(ProjectionFactoryUtil.property("classPK")));
+				List<Long> results = (List<Long>)assetEntryLocalService.dynamicQuery(dq,start, end);
 	
-	Long classNameId = ClassNameLocalServiceUtil.getClassNameId(Course.class.getName());
-	
-	if(classNameId!=null){
-		try {
-			DynamicQuery dq = DynamicQueryFactoryUtil.forClass(AssetEntry.class);
-			dq.add(PropertyFactoryUtil.forName("companyId").eq(companyId));
-			dq.add(PropertyFactoryUtil.forName("classNameId").eq(classNameId));
-			dq.add(PropertyFactoryUtil.forName("visible").eq(true));
-			dq.setProjection(ProjectionFactoryUtil.distinct(ProjectionFactoryUtil.property("classPK")));
-			List<Long> results = (List<Long>)assetEntryLocalService.dynamicQuery(dq,start, end);
-
-			List<Course> courses = new ArrayList<Course>();
-			for(Long courseId : results){
-				Course course = coursePersistence.fetchByPrimaryKey(courseId);
-				if(course!=null)
-					courses.add(course);
+				List<Course> courses = new ArrayList<Course>();
+				for(Long courseId : results){
+					Course course = coursePersistence.fetchByPrimaryKey(courseId);
+					if(course!=null)
+						courses.add(course);
+				}
+				
+				return courses;
+				
+			} catch (SystemException e) {
+				if(log.isDebugEnabled())e.printStackTrace();
 			}
-			
-			return courses;
-			
-		} catch (SystemException e) {
-			if(log.isDebugEnabled())e.printStackTrace();
 		}
+		
+		return null;
 	}
-	
-	return null;
-}
 
 
 	public Course addCourse (String title, String description,String summary,String friendlyURL, Locale locale,
@@ -521,29 +507,14 @@ public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int e
 			throws SystemException, 
 			PortalException {
 		
-				Course course = this.addCourse(title, description, description, friendlyURL, locale, createDate, startDate, endDate, serviceContext, calificationType);
-				
-				//auditing
-				AuditingLogFactory.audit(course.getCompanyId(), course.getGroupId(), Course.class.getName(), course.getCourseId(), serviceContext.getUserId(), AuditConstants.ADD, null);
-				
-				return course;
-			}
-	
-	private static User getAdministratorUser(long companyId) throws PortalException, SystemException
-	{
-		// El nombre del rol "Administrator" no puede cambiar a trav�s del UI, es un caso excepcional de s�lo lectura
-		// Sin embargo pueden haber varios administradores (con el rol "Administrator"),
-		// hacemos lo siguiente: devolvemos el que tenga userName "test" y as� tenderemos
-		// a devolver siempre el mismo, si no hay un administrador "test" (pues puede cambiarse) devolvemos el primero.
-		long adminRoleId = RoleLocalServiceUtil.getRole(companyId, "Administrator").getRoleId();
-		List<User> adminList = UserLocalServiceUtil.getRoleUsers(adminRoleId);
-		for(User user : adminList)
-		{
-			if (user.getScreenName().equals("test"))
-				return user;
-		}
-		return adminList.get(0); // Devolvemos el primero.
+		Course course = this.addCourse(title, description, description, friendlyURL, locale, createDate, startDate, endDate, serviceContext, calificationType);
+		
+		//auditing
+		AuditingLogFactory.audit(course.getCompanyId(), course.getGroupId(), Course.class.getName(), course.getCourseId(), serviceContext.getUserId(), AuditConstants.ADD, null);
+		
+		return course;
 	}
+	
 	
 	@SuppressWarnings("unused")
 	private static LayoutSetPrototype fetchLayoutSetPrototypeByDescription(String description,long companyId) throws SystemException,PortalException
@@ -560,8 +531,7 @@ public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int e
 		return lspRes;
 	}	
 	
-	private void importLayouts(long userId,Group grupo,LayoutSetPrototype lsProto) throws PortalException, SystemException
-	{
+	private void importLayouts(long userId,Group grupo,LayoutSetPrototype lsProto) throws PortalException, SystemException{
 			LayoutSet ls = lsProto.getLayoutSet();	
 			
 			Map<String, String[]> parameterMap =getLayoutSetPrototypeParameters();
@@ -582,8 +552,8 @@ public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int e
 		FileUtil.delete(fileIni);
 		
 	}
-	private static Map<String, String[]> getLayoutSetPrototypeParameters() 
-	{
+	
+	private static Map<String, String[]> getLayoutSetPrototypeParameters() {
 		Map<String, String[]> parameterMap = new LinkedHashMap<String, String[]>();
         
 		parameterMap.put(
@@ -599,9 +569,6 @@ public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int e
 		parameterMap.put(
 			PortletDataHandlerKeys.DELETE_MISSING_LAYOUTS,
 			new String[] {Boolean.TRUE.toString()});
-//		parameterMap.put(
-//				PortletDataHandlerKeys.LAYOUT_SET_PROTOTYPE_LINK_ENABLED,
-//				new String[] {Boolean.FALSE.toString()});
 		parameterMap.put(
 				PortletDataHandlerKeys.LAYOUT_SET_SETTINGS,
 				new String[] {Boolean.TRUE.toString()});
@@ -644,9 +611,9 @@ public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int e
 			PortletDataHandlerKeys.USER_PERMISSIONS,
 			new String[] {Boolean.FALSE.toString()});
 		return parameterMap;
-	}	
-	public void setVisible(long courseId,boolean visible) throws PortalException, SystemException
-	{
+	}
+	
+	public void setVisible(long courseId,boolean visible) throws PortalException, SystemException{
 	    assetEntryLocalService.updateVisible(Course.class.getName(), courseId, visible);
 	}
 	
@@ -677,65 +644,64 @@ public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int e
 			ServiceContext serviceContext, boolean visible, boolean allowDuplicateName)
 			throws SystemException, PortalException {
 		
+	
+		int numberUsers = UserLocalServiceUtil.getGroupUsersCount(course.getGroupCreatedId());
+		if(course.getMaxusers()>0&&numberUsers>course.getMaxusers()){
+			if(log.isDebugEnabled()){
+				log.debug("Throws exception max users violated");
+			}
+			throw new PortalException("maxUsers "+numberUsers);
+		}
+	
+		course.setModifiedDate(new java.util.Date(System.currentTimeMillis()));
+		course.setExpandoBridgeAttributes(serviceContext);
+		Locale locale=new Locale(serviceContext.getLanguageId());
+		coursePersistence.update(course, true);
+		long userId=serviceContext.getUserId();
+		Group theGroup=GroupLocalServiceUtil.getGroup(course.getGroupCreatedId());
+		String groupName = course.getTitle(locale,true);
+		if(allowDuplicateName){
+			if(GroupLocalServiceUtil.fetchGroup(course.getCompanyId(), groupName)!=null){
+				groupName = course.getTitle(locale,true)+" ("+course.getCourseId()+")";
+			}
+		}
 		
-			int numberUsers = UserLocalServiceUtil.getGroupUsersCount(course.getGroupCreatedId());
-			if(course.getMaxusers()>0&&numberUsers>course.getMaxusers()){
-				if(log.isDebugEnabled()){
-					log.debug("Throws exception max users violated");
-				}
-				throw new PortalException("maxUsers "+numberUsers);
-			}
+		theGroup.setName(groupName);
+		theGroup.setDescription(summary);
 		
-			course.setModifiedDate(new java.util.Date(System.currentTimeMillis()));
-			course.setExpandoBridgeAttributes(serviceContext);
-			Locale locale=new Locale(serviceContext.getLanguageId());
-			coursePersistence.update(course, true);
-			long userId=serviceContext.getUserId();
-			Group theGroup=GroupLocalServiceUtil.getGroup(course.getGroupCreatedId());
-			String groupName = course.getTitle(locale,true);
-			if(allowDuplicateName){
-				if(GroupLocalServiceUtil.fetchGroup(course.getCompanyId(), groupName)!=null){
-					groupName = course.getTitle(locale,true)+" ("+course.getCourseId()+")";
-				}
+		int type=GroupConstants.TYPE_SITE_OPEN;
+		try{
+			if (serviceContext.getAttribute("type") != null) {
+				type = Integer.valueOf(serviceContext.getAttribute("type").toString());
 			}
-			
-			theGroup.setName(groupName);
-			theGroup.setDescription(summary);
-			
-			int type=GroupConstants.TYPE_SITE_OPEN;
-			try{
-				if (serviceContext.getAttribute("type") != null) {
-					type = Integer.valueOf(serviceContext.getAttribute("type").toString());
-				}
-			}catch(NumberFormatException nfe){				
-			}
-			
-			theGroup.setType(type);
-			groupLocalService.updateGroup(theGroup);
+		}catch(NumberFormatException nfe){				
+		}
+		
+		theGroup.setType(type);
+		groupLocalService.updateGroup(theGroup);
 
-			CourseEval courseEval = new CourseEvalRegistry().getCourseEval(course.getCourseEvalId());
-			if(courseEval!=null) {
-				courseEval.setExtraContent(course, Constants.UPDATE, serviceContext);
-			}
-			AssetEntry previousEntry=assetEntryLocalService.getEntry(Course.class.getName(), course.getCourseId());
-			
-			AssetEntry assetEntry=assetEntryLocalService.updateEntry(
-					userId, course.getGroupId(), Course.class.getName(),
-					course.getCourseId(), course.getUuid(),0, serviceContext.getAssetCategoryIds(),
-				serviceContext.getAssetTagNames(), visible, null, null,
-					new java.util.Date(System.currentTimeMillis()), null,
-					ContentTypes.TEXT_HTML, course.getTitle(), course.getDescription(locale), summary, null, null, 0, 0,
-					null, false);
-            
-			assetLinkLocalService.updateLinks(
-					userId, assetEntry.getEntryId(), serviceContext.getAssetLinkEntryIds(),
-					AssetLinkConstants.TYPE_RELATED);
-			//auditing
-			AuditingLogFactory.audit(course.getCompanyId(), course.getGroupId(), Course.class.getName(), course.getCourseId(), serviceContext.getUserId(), AuditConstants.UPDATE, null);
-			
-			return course;
+		CourseEval courseEval = new CourseEvalRegistry().getCourseEval(course.getCourseEvalId());
+		if(courseEval!=null) {
+			courseEval.setExtraContent(course, Constants.UPDATE, serviceContext);
+		}
 		
-			}
+		AssetEntry assetEntry=assetEntryLocalService.updateEntry(
+				userId, course.getGroupId(), Course.class.getName(),
+				course.getCourseId(), course.getUuid(),0, serviceContext.getAssetCategoryIds(),
+			serviceContext.getAssetTagNames(), visible, null, null,
+				new java.util.Date(System.currentTimeMillis()), null,
+				ContentTypes.TEXT_HTML, course.getTitle(), course.getDescription(locale), summary, null, null, 0, 0,
+				null, false);
+        
+		assetLinkLocalService.updateLinks(
+				userId, assetEntry.getEntryId(), serviceContext.getAssetLinkEntryIds(),
+				AssetLinkConstants.TYPE_RELATED);
+		//auditing
+		AuditingLogFactory.audit(course.getCompanyId(), course.getGroupId(), Course.class.getName(), course.getCourseId(), serviceContext.getUserId(), AuditConstants.UPDATE, null);
+		
+		return course;
+		
+	}
 			
 	@Indexable(type=IndexableType.REINDEX)
 	public Course closeCourse(long courseId) throws SystemException,
@@ -890,48 +856,11 @@ public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int e
 		return getStudentsFromCourseCount(courseId, 0,null,null,null,null,true);
 	}
 	
-	public int getStudentsFromCourseCount(long courseId, long teamId, String firstName, String lastName, String screeName, String emailAddress, boolean andComparator) throws SystemException, PortalException{
-		Course course = CourseLocalServiceUtil.getCourse(courseId);		
-		int value = 0;
-		LmsPrefs prefs;
-		try {
-			prefs = LmsPrefsLocalServiceUtil.getLmsPrefs(course.getCompanyId());
-			
-			long teacherRoleId=RoleLocalServiceUtil.getRole(prefs.getTeacherRole()).getRoleId();
-			long editorRoleId=RoleLocalServiceUtil.getRole(prefs.getEditorRole()).getRoleId();
-			
-			LinkedHashMap<String,Object> params=new LinkedHashMap<String,Object>();			
-
-			params.put("notInCourseRoleTeacherRoleId", new CustomSQLParam("WHERE User_.userId NOT IN "
-		              + " (SELECT UserGroupRole.userId " + "  FROM UserGroupRole "
-		              + "  WHERE  (UserGroupRole.groupId = ?) AND (UserGroupRole.roleId = ?))", new Long[] {
-		            		  course.getGroupCreatedId(), teacherRoleId }));
-			
-			params.put("notInCourseRoleEditorRoleId", new CustomSQLParam("WHERE User_.userId NOT IN "
-		              + " (SELECT UserGroupRole.userId " + "  FROM UserGroupRole "
-		              + "  WHERE  (UserGroupRole.groupId = ?) AND (UserGroupRole.roleId = ?))", new Long[] {
-		            		  course.getGroupCreatedId(), editorRoleId }));
-			
-			 params.put("InCourseRoleStu", new CustomSQLParam("WHERE User_.userId  IN "
-		              + " (SELECT Users_Groups.userId " + "  FROM Users_Groups "
-		              + "  WHERE  (Users_Groups.groupId = ?))", new Long[] {
-		            		  course.getGroupCreatedId() }));
-			 if(teamId > 0 ){
-				 params.put("usersTeams", teamId);	 
-			 }
-			
-			 
-			value =  UserLocalServiceUtil.searchCount(prefs.getCompanyId(), firstName, null, 
-					lastName, screeName, emailAddress, WorkflowConstants.STATUS_APPROVED, params, true);
-			
-		} catch (PortalException e) {
-			e.printStackTrace();
-		} catch (SystemException e) {
-			e.printStackTrace();
-		}
+	public int getStudentsFromCourseCount(long courseId, long teamId, String firstName, String lastName, String screenName, String emailAddress, boolean andComparator) throws SystemException, PortalException{
 		
+		Course course = CourseLocalServiceUtil.getCourse(courseId);	
 		
-		return value;
+		return courseFinder.countStudents(courseId, course.getCompanyId(), screenName, firstName, lastName, emailAddress, WorkflowConstants.STATUS_APPROVED, teamId, andComparator);
 	}
 	
 	public List<User> getStudentsFromCourse(Course course) {		
@@ -939,21 +868,7 @@ public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int e
 	}
 	
 	public List<User> getStudentsFromCourse(long companyId, long courseGroupCreatedId) {
-		List<User> students = null;
-		//List<User> usersExcluded = new ArrayList<User>();
-		
-		try {
-			LinkedHashMap<String,Object> userParams = getUserParamsStudent(companyId, courseGroupCreatedId);
-			
-			students = UserLocalServiceUtil.search(companyId, null, null, 
-					null, null, null, 0, userParams, true, QueryUtil.ALL_POS, QueryUtil.ALL_POS,  new UserLastNameComparator(true));
-			
-		} catch (SystemException e) {
-			e.printStackTrace();
-			students = new ArrayList<User>();
-		}
-		
-		return students;
+		return getStudentsFromCourse(companyId, courseGroupCreatedId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, 0, null, null, null, null, true);
 	}
 	
 	public List<User> getStudentsFromCourse(long companyId, long courseGroupCreatedId, long teamId){
@@ -962,78 +877,32 @@ public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int e
 
 	}
 	
-	
-	
-	
-	
 	public List<User> getStudentsFromCourse(long companyId, long courseGroupCreatedId, int start, int end,long teamId, String firstName, String lastName, String screenName, String emailAddress, boolean andOperator) {
-		List<User> students = new ArrayList<User>();
-		//List<User> usersExcluded = new ArrayList<User>();
 		
 		try {
-			
-			
-			LinkedHashMap<String,Object> params= getUserParamsStudent(companyId, courseGroupCreatedId);
+			Course course = CourseLocalServiceUtil.getCourseByGroupCreatedId(courseGroupCreatedId);
+			return courseFinder.findStudents(course.getCourseId(), companyId, screenName, firstName, lastName, emailAddress, WorkflowConstants.STATUS_APPROVED, teamId, andOperator, start, end, new UserLastNameComparator(true));
 
-			
-			 if(teamId > 0 ){
-				 params.put("usersTeams", teamId);	 
-			 }
-			
-			students = UserLocalServiceUtil.search(companyId, firstName, null, 
-					lastName, screenName, emailAddress, WorkflowConstants.STATUS_APPROVED, params, andOperator, start, end,  new UserLastNameComparator(true));
-			
 		} catch (SystemException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
+			return null;
 		}
 		
-		return students;
-	}
-	
-	
-	
-	
-	
-	
-	
-	private LinkedHashMap<String,Object> getUserParamsStudent(long companyId, long courseGroupCreatedId){
-		try {
-			LmsPrefs prefs = LmsPrefsLocalServiceUtil.getLmsPrefs(companyId);
-			
-			long teacherRoleId=RoleLocalServiceUtil.getRole(prefs.getTeacherRole()).getRoleId();
-			long editorRoleId=RoleLocalServiceUtil.getRole(prefs.getEditorRole()).getRoleId();
-			
-			LinkedHashMap<String,Object> params=new LinkedHashMap<String,Object>();			
 
-			params.put("notInCourseRoleTeacherRoleId", new CustomSQLParam("WHERE User_.userId NOT IN "
-		              + " (SELECT UserGroupRole.userId " + "  FROM UserGroupRole "
-		              + "  WHERE  (UserGroupRole.groupId = ?) AND (UserGroupRole.roleId = ?))", new Long[] {
-		            		  courseGroupCreatedId, teacherRoleId }));
-			
-			params.put("notInCourseRoleEditorRoleId", new CustomSQLParam("WHERE User_.userId NOT IN "
-		              + " (SELECT UserGroupRole.userId " + "  FROM UserGroupRole "
-		              + "  WHERE  (UserGroupRole.groupId = ?) AND (UserGroupRole.roleId = ?))", new Long[] {
-		            		  courseGroupCreatedId, editorRoleId }));
-			
-			 params.put("InCourseRoleStu", new CustomSQLParam("WHERE User_.userId  IN "
-		              + " (SELECT Users_Groups.userId " + "  FROM Users_Groups "
-		              + "  WHERE  (Users_Groups.groupId = ?))", new Long[] {
-		            		  courseGroupCreatedId }));
-			 
-			 params.put("isActive", new CustomSQLParam("WHERE User_.status =0",null));
-			 
-			 return params;
-		} catch (PortalException e) {
-			e.printStackTrace();
-			return null;
-		} catch (SystemException e) {
-			e.printStackTrace();
-			return null;
-		}	 
 	}
 	
-	
+	public int getStudentsFromCourseCount(long companyId, long courseGroupCreatedId, long teamId, String firstName, String lastName, String screenName, String emailAddress, boolean andOperator) {
 		
+		try {
+			Course course = CourseLocalServiceUtil.getCourseByGroupCreatedId(courseGroupCreatedId);
+			return courseFinder.countStudents(course.getCourseId(), companyId, screenName, firstName, lastName, emailAddress, WorkflowConstants.STATUS_APPROVED, teamId, andOperator);
+		} catch (SystemException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+			return 0;
+		}
+	}	
 	
 	public List<User> getTeachersFromCourse(long courseId) {
 		List<User> users = new ArrayList<User>();
@@ -1194,15 +1063,23 @@ public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int e
 	}
 	
 	public List<User> getStudents(long courseId, long companyId, String screenName, String firstName, String lastName, String emailAddress, boolean andOperator, int start, int end,OrderByComparator comparator){
-		return CourseFinderUtil.findStudents(courseId, companyId, screenName,firstName, lastName, emailAddress, andOperator, start, end, comparator);
+		return CourseFinderUtil.findStudents(courseId, companyId, screenName,firstName, lastName, emailAddress, WorkflowConstants.STATUS_APPROVED, 0, andOperator, start, end, comparator);
 	}
 	
 	public int countStudents(long courseId, long companyId, String screenName, String firstName, String lastName, String emailAddress,boolean andOperator){
-		return CourseFinderUtil.countStudents(courseId, companyId, screenName,firstName, lastName, emailAddress, WorkflowConstants.STATUS_APPROVED, andOperator);
+		return CourseFinderUtil.countStudents(courseId, companyId, screenName,firstName, lastName, emailAddress, WorkflowConstants.STATUS_APPROVED, 0, andOperator);
+	}
+	
+	public List<User> getStudents(long courseId, long companyId, String screenName, String firstName, String lastName, String emailAddress, int status, long teamId, boolean andOperator, int start, int end,OrderByComparator comparator){
+		return CourseFinderUtil.findStudents(courseId, companyId, screenName,firstName, lastName, emailAddress, status, teamId, andOperator, start, end, comparator);
+	}
+	
+	public int countStudents(long courseId, long companyId, String screenName, String firstName, String lastName, String emailAddress, int status, long teamId,boolean andOperator){
+		return CourseFinderUtil.countStudents(courseId, companyId, screenName,firstName, lastName, emailAddress, status, teamId, andOperator);
 	}
 	
 	public int countStudentsStatus(long courseId, long companyId, String screenName, String firstName, String lastName, String emailAddress, int status, boolean andOperator){
-		return CourseFinderUtil.countStudents(courseId, companyId, screenName,firstName, lastName, emailAddress, status, andOperator);
+		return CourseFinderUtil.countStudents(courseId, companyId, screenName,firstName, lastName, emailAddress, status, 0, andOperator);
 	}
 	
 	public List<Course> getCoursesCatalogByTitleCategoriesTags(String freeText, long[] categories, long[] tags, long companyId, long groupId, long userId, String language, int start, int end){
@@ -1315,7 +1192,7 @@ public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int e
 	}
 	
 	
-	public java.util.List<Course> getCoursesParents(long groupId) throws SystemException
+	public List<Course> getCoursesParents(long groupId) throws SystemException
 	{
 		return coursePersistence.filterFindByGroupIdParentCourseId(groupId, 0);
 	}
