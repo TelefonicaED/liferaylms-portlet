@@ -97,8 +97,8 @@ CalificationType ct = new CalificationTypeRegistry().getCalificationType(CourseL
 						            title: '<liferay-message key="offlinetaskactivity.import.grades" />',
 							    	centered: true,
 						            modal: true,
-						            width: 550,
-						            height: 320,
+						            width: 650,
+						            height: 600,
 						            after: {   
 							          	close: function(event){ 
 							          		document.getElementById('<portlet:namespace />studentsearch').submit();
