@@ -471,7 +471,7 @@ if(course!=null){
 		CourseEval courseEval = null;
 		if(courseEvalIds.size()>1){%>
 			<aui:select name="courseEvalId" label="course-correction-method" helpMessage="<%=LanguageUtil.get(pageContext,\"course-correction-method-help\")%>" 
-						onChange="<%=\"javascript:AUI().use('aui-io-request','aui-parse-content','querystring',function(A){ \"+
+						onChange="<%=\"javascript:\"+renderResponse.getNamespace()+\"changeEvaluationMethod(this.value);AUI().use('aui-io-request','aui-parse-content','querystring',function(A){ \"+
 								\"	var courseCombo = document.getElementById('\"+renderResponse.getNamespace()+\"courseEvalId'), \"+
 								\"		currentCourseEvalId = courseCombo.options[courseCombo.selectedIndex].value, \"+
 								\"		params = {}, \"+
@@ -988,6 +988,17 @@ if(course!=null){
 			div.style.display='none';
 		}
 	}
+	
+	function <portlet:namespace />changeEvaluationMethod(courseEvalId){
+		<%if(course!=null){	%>
+			var currentCourseEval = <%=course.getCourseEvalId()%>;
+			if(courseEvalId!=currentCourseEval){
+				alert('<%=LanguageUtil.get(locale, "courseadmin.change-evaluation-method-alert")%>');	
+			}
+			
+		<%}	%>
+	}
+	
 	function <portlet:namespace />changeGoodbye(){
 		var div = document.getElementById("containerGoodbyeMsg");
 		if(div.style.display&&div.style.display=='none'){

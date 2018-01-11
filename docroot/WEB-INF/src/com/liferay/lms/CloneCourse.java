@@ -15,6 +15,7 @@ import com.liferay.lms.model.CourseCompetence;
 import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.model.LmsPrefs;
 import com.liferay.lms.model.Module;
+import com.liferay.lms.model.impl.ModuleImpl;
 import com.liferay.lms.service.CourseCompetenceLocalServiceUtil;
 import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityLocalServiceUtil;
@@ -298,42 +299,40 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 			
 
 			try {
-				newModule = ModuleLocalServiceUtil.createModule(CounterLocalServiceUtil.increment(Module.class.getName()));
-				correlationModules.put(module.getModuleId(), newModule.getModuleId());
-				
+				newModule = new ModuleImpl();
 				if(module.getPrecedence()!=0){
 					modulesDependencesList.put(module.getModuleId(),module.getPrecedence());
 				}
-
 				if(this.childCourse)
 				{
 					newModule.setUuid(module.getUuid());
 				}
-				
 				newModule.setTitle(module.getTitle());
 				newModule.setDescription(module.getDescription());
 				newModule.setGroupId(newCourse.getGroupId());
-				
 				newModule.setCompanyId(newCourse.getCompanyId());
 				newModule.setGroupId(newCourse.getGroupCreatedId());
 				newModule.setUserId(newCourse.getUserId());
-				newModule.setOrdern(newModule.getModuleId());
+				
 				newModule.setAllowedTime(module.getAllowedTime());
-				
-				//Icono
 				newModule.setIcon(module.getIcon());
-				
-			
 				newModule.setStartDate(startDate);
 				newModule.setEndDate(endDate);
+				newModule = ModuleLocalServiceUtil.addmodule(newModule);
 				
+				correlationModules.put(module.getModuleId(), newModule.getModuleId());
 				newModule.setDescription(descriptionFilesClone(module.getDescription(),newCourse.getGroupCreatedId(), newModule.getModuleId(),themeDisplay.getUserId()));
-				
-				ModuleLocalServiceUtil.addModule(newModule);
+				newModule.setOrdern(newModule.getModuleId());
+				newModule.setUuid(module.getUuid());
+				ModuleLocalServiceUtil.updateModule(newModule);
 				if(log.isDebugEnabled()){
 					log.debug("\n    Module : " + module.getTitle(Locale.getDefault()) +"("+module.getModuleId()+")");
 					log.debug("    + Module : " + newModule.getTitle(Locale.getDefault()) +"("+newModule.getModuleId()+")" );
 				}
+				
+				
+			
+				
 			} catch (Exception e) {
 				e.printStackTrace();
 				continue;
