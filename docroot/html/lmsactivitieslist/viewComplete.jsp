@@ -138,19 +138,25 @@ if(moduleEditing) idModuleUl = "myModule";
 			
 			LearningActivityTypeRegistry learningActivityTypeRegistry = new LearningActivityTypeRegistry();
 			AssetRendererFactory assetRendererFactory = AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(LearningActivity.class.getName());
-			
+		
 			//FIN DE NECESARIO PARA LISTA DE ACTIVIDADES
-			
+			long numActivities = 0;
 			for(Module theModule:theModules){
-				themeId++;%>
+				themeId++;
+				numActivities = LearningActivityLocalServiceUtil.countLearningActivitiesOfModule(theModule.getModuleId());
+				moduleActuallyIsLocked = theModule.isLocked(themeDisplay.getUserId());
+				%>
 				
-				<li class='option-none  <%=theModule.getModuleId() == moduleId ? "option-less":"" %>' id="<portlet:namespace/><%=theModule.getModuleId()%>">
+				<li class='option-none  <%=theModule.getModuleId() == moduleId ? "option-less selected":"" %> <%=numActivities > 0 ? " module-with-activities ":" module-without-activities "  %><%= (!hasPermissionAccessCourseFinished && moduleActuallyIsLocked) ? " locked ":""%>' id="<portlet:namespace/><%=theModule.getModuleId()%>">
 					
-					<%if(theModule.getModuleId() == moduleId){%>
+					
+					<%
+					if(!hasPermissionAccessCourseFinished && moduleActuallyIsLocked){%>
+						<span class="locked"></span>
+					<%} else {%>
 						<span class="desplegar"></span>
 					<%}
 					
-					moduleActuallyIsLocked = theModule.isLocked(themeDisplay.getUserId());
 					
 					if(accessLock || (!courseIsLocked && !moduleActuallyIsLocked) || actionEditing || hasPermissionAccessCourseFinished){
 						
@@ -165,13 +171,7 @@ if(moduleEditing) idModuleUl = "myModule";
 					    
 						<a href="<%="?"+goToModuleRelativeURL.getQuery()%>" >
 						
-							<%if(theModule.getModuleId() != moduleId){
-								if(!hasPermissionAccessCourseFinished && moduleActuallyIsLocked){%>
-									<span class="locked"></span>
-								<%} else {%>
-									<span class="desplegar"></span>
-								<%}
-							}%>
+							
 							
 							<%= (numerateModules)?
 									LanguageUtil.format(pageContext, "moduleTitle.chapter", new Object[]{themeId,theModule.getTitle(themeDisplay.getLocale())}):
@@ -194,9 +194,8 @@ if(moduleEditing) idModuleUl = "myModule";
 							done=moduleResult.getResult();
 						}%>
 						
-						<span class="locked"></span><%=(numerateModules)?
-															LanguageUtil.format(pageContext, "moduleTitle.chapter", new Object[]{themeId,theModule.getTitle(themeDisplay.getLocale())}):
-																theModule.getTitle(themeDisplay.getLocale())  %> <span class="module-percent"><%=done %>%</span>
+						<span><%=(numerateModules)?LanguageUtil.format(pageContext, "moduleTitle.chapter", new Object[]{themeId,theModule.getTitle(themeDisplay.getLocale())}):
+																theModule.getTitle(themeDisplay.getLocale())  %></span> <span class="module-percent"><%=done %>%</span>
 					<%}%>
 					
 				</li>
