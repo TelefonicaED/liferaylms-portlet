@@ -6,14 +6,12 @@ import com.liferay.lms.auditing.AuditConstants;
 import com.liferay.lms.auditing.AuditingLogFactory;
 import com.liferay.lms.model.Course;
 import com.liferay.lms.service.CourseLocalServiceUtil;
-import com.liferay.mail.service.MailServiceUtil;
 import com.liferay.portal.ModelListenerException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.mail.MailMessage;
 import com.liferay.portal.kernel.messaging.Message;
 import com.liferay.portal.kernel.messaging.MessageBusException;
 import com.liferay.portal.kernel.messaging.MessageBusUtil;
@@ -67,7 +65,6 @@ public class GroupListener extends BaseModelListener<Group> {
 						String fromAddress = PrefsPropsUtil.getString(course.getCompanyId(),
 								PropsKeys.ADMIN_EMAIL_FROM_ADDRESS);
 				    	String emailTo = user.getEmailAddress();
-				    	String nameTo = user.getFullName();
 
 						try{
 
@@ -90,8 +87,8 @@ public class GroupListener extends BaseModelListener<Group> {
 					    	}
 					    	String body = StringUtil.replace(
 				    			course.getWelcomeMsg(),
-				    			new String[] {"[$FROM_ADDRESS$]", "[$FROM_NAME$]", "[$PAGE_URL$]","[$PORTAL_URL$]","[$TO_ADDRESS$]","[$TO_NAME$]","[$USER_SCREENNAME$]"},
-				    			new String[] {fromAddress, fromName, urlcourse, url, user.getEmailAddress(), user.getFullName(),user.getScreenName()});
+				    			new String[] {"[$FROM_ADDRESS$]", "[$FROM_NAME$]", "[$PAGE_URL$]","[$PORTAL_URL$]","[$TO_ADDRESS$]","[$TO_NAME$]","[$USER_SCREENNAME$]","[$TITLE_COURSE$]"},
+				    			new String[] {fromAddress, fromName, urlcourse, url, user.getEmailAddress(), user.getFullName(),user.getScreenName(),course.getTitle(user.getLocale())});
 				    	
 							if(log.isDebugEnabled()){
 								log.debug(from);
@@ -202,8 +199,8 @@ public class GroupListener extends BaseModelListener<Group> {
 					    	}
 					    	String body = StringUtil.replace(
 				    			course.getGoodbyeMsg(),
-				    			new String[] {"[$FROM_ADDRESS$]", "[$FROM_NAME$]", "[$PAGE_URL$]","[$PORTAL_URL$]","[$TO_ADDRESS$]","[$TO_NAME$]","[$USER_SCREENNAME$]"},
-				    			new String[] {fromAddress, fromName, urlcourse, url, user.getEmailAddress(), user.getFullName(),user.getScreenName()});
+				    			new String[] {"[$FROM_ADDRESS$]", "[$FROM_NAME$]", "[$PAGE_URL$]","[$PORTAL_URL$]","[$TO_ADDRESS$]","[$TO_NAME$]","[$USER_SCREENNAME$]","[$TITLE_COURSE$]"},
+				    			new String[] {fromAddress, fromName, urlcourse, url, user.getEmailAddress(), user.getFullName(),user.getScreenName(),course.getTitle(user.getLocale())});
 				    	
 					    	
 							if(log.isDebugEnabled()){
@@ -212,8 +209,6 @@ public class GroupListener extends BaseModelListener<Group> {
 								log.debug(subject);
 								log.debug(body);
 							}
-							//MailMessage mailm = new MailMessage(from, to, subject, body, true);
-							//MailServiceUtil.sendEmail(mailm);
 							
 							//Envio el correo (Preparado para cuando se quiera mandar al mailing)
 							Message message=new Message();

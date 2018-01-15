@@ -831,6 +831,12 @@ if(course!=null){
 								<%= themeDisplay.getURLPortal()+"/web"+((course!=null&&course.getFriendlyURL()!=null)?course.getFriendlyURL():StringPool.BLANK) %>
 							</dd>
 							<dt>
+								[$TITLE_COURSE$]
+							</dt>
+							<dd>
+								<%=(course!=null?course.getTitle(themeDislay.getLocale()):StringPool.BLANK %>
+							</dd>
+							<dt>
 								[$FROM_ADDRESS$]
 							</dt>
 							<dd>
@@ -913,6 +919,12 @@ if(course!=null){
 							</dt>
 							<dd>
 								<%= themeDisplay.getURLPortal()+"/web"+((course!=null&&course.getFriendlyURL()!=null)?course.getFriendlyURL():StringPool.BLANK) %>
+							</dd>
+							<dt>
+								[$TITLE_COURSE$]
+							</dt>
+							<dd>
+								<%=(course!=null?course.getTitle(themeDislay.getLocale()):StringPool.BLANK %>
 							</dd>
 							<dt>
 								[$FROM_ADDRESS$]

@@ -384,10 +384,7 @@ public class ModuleResultLocalServiceImpl extends ModuleResultLocalServiceBaseIm
 			moduleResult= getAndCreateIfNotExists( userId,  moduleId,lactr.getStartDate());
 			log.debug("****Modulo "+learningActivity.getModuleId() );
 			log.debug("****REsult End Date "+lactr.getEndDate());
-			if (learningActivity.getModuleId() > 0 && /*
-													 * learningActivity.
-													 * getWeightinmodule()>0 &&
-													 */lactr.getEndDate()!=null) 
+			if (learningActivity.getModuleId() > 0 && lactr.getEndDate()!=null) 
 			{
 				log.debug("****Recalculamos Modulo");
 				calculateModuleResult(moduleResult);
