@@ -704,7 +704,7 @@ Liferay.provide(
 			<script type="text/javascript">
 		        function <portlet:namespace />initEditor() 
 		        { 
-		            return decodeURI("<%= UnicodeFormatter.toString(description) %>"); 
+		            return decodeURI('<%= UnicodeFormatter.toString(description.replace("%","%25")) %>'); 
 		        }
 		    </script>
 		</aui:field-wrapper>
