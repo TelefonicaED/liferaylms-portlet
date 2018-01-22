@@ -834,7 +834,7 @@ if(course!=null){
 								[$TITLE_COURSE$]
 							</dt>
 							<dd>
-								<%=(course!=null?course.getTitle(themeDislay.getLocale()):StringPool.BLANK %>
+								<%=(course!=null?course.getTitle(themeDisplay.getLocale()):StringPool.BLANK) %>
 							</dd>
 							<dt>
 								[$FROM_ADDRESS$]
@@ -924,7 +924,7 @@ if(course!=null){
 								[$TITLE_COURSE$]
 							</dt>
 							<dd>
-								<%=(course!=null?course.getTitle(themeDislay.getLocale()):StringPool.BLANK %>
+								<%=(course!=null?course.getTitle(themeDisplay.getLocale()):StringPool.BLANK) %>
 							</dd>
 							<dt>
 								[$FROM_ADDRESS$]

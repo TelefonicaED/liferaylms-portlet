@@ -463,7 +463,6 @@ public class LearningActivityLocalServiceImpl extends LearningActivityLocalServi
 				}
 			}
 		}
-		
 	
 		return larn;
 	}

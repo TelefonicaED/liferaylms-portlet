@@ -49,11 +49,11 @@ public class FillblankQuestionType extends BaseQuestionType {
 	}
 	
 	public String getURLEdit(){
-		return "/html/execactivity/test/admin/editAnswerFillblank.jsp";
+		return "/html/questions/admin/editAnswerFillblank.jsp";
 	}
 	
 	public String getURLNew(){
-		return "/html/execactivity/test/admin/popups/fillblank.jsp";
+		return "/html/questions/admin/popups/fillblank.jsp";
 	}
 	
 	public long correct(ActionRequest actionRequest, long questionId){

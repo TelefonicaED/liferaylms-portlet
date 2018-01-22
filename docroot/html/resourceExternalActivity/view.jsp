@@ -65,6 +65,9 @@ if(isLinkTabletResourceExternal){
 		<c:if test="${isVimeoIframe}">			
 			<%@ include file="/html/resourceExternalActivity/vimeo.jsp" %>			
 		</c:if>
+		<c:forEach items="${listQuestions }" var="question">
+		
+		</c:forEach>
 	</c:when>
 	<c:otherwise>
 		<script>

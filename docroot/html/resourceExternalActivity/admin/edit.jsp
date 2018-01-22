@@ -1,3 +1,5 @@
+<%@page import="com.liferay.lms.model.TestQuestion"%>
+<%@page import="com.liferay.lms.service.TestQuestionLocalServiceUtil"%>
 <%@page import="javax.portlet.PortletSession"%>
 <%@page import="java.util.Enumeration"%>
 <%@page import="com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil"%>
@@ -111,6 +113,46 @@
 		<aui:input name="youtubecode" type="textarea" rows="6" cols="45" label="youtube-code" value="<%=youtubecode %>" ignoreRequestValue="true" helpMessage="<%=LanguageUtil.get(pageContext,\"youtube-code-help\")%>"></aui:input>
 	<%} %>
   	<aui:input label="resourceexternalactivity.videocontrol.disabled" name="videoControl" type="checkbox" value="<%= defaultValueCheckBox %>" />
+  	
+  	<%if(Validator.isNotNull(youtubecode) && learningActivity != null){
+  		List<TestQuestion> listQuestions = TestQuestionLocalServiceUtil.getQuestions(learningActivity.getActId());
+  		if(listQuestions != null && listQuestions.size() > 0){
+  			Element root = null;
+  			if((learningActivity.getExtracontent()!=null)&&(learningActivity.getExtracontent().trim().length()!=0))	{
+				Document document = SAXReaderUtil.read(learningActivity.getExtracontent());
+				root=document.getRootElement();
+			}%>
+  			<table class="taglib-search-container">
+  				<thead>
+  					<tr class="portlet-section-header results-header">
+  						<th class="col-1 col-text first">
+  							<liferay-ui:message key="question" />
+  						</th>
+  						<th class="col-2 col-second">
+  							<liferay-ui:message key="second" />
+  						</th>
+  					</tr>
+  				</thead>
+  				<tbody>
+  					<% Element second = null;
+  					for(TestQuestion question: listQuestions){ 
+  						if(root != null){
+  							second = root.element("second_" + question.getQuestionId());
+  						}%>
+  						<tr class="portlet-section-body results-row">
+  							<td class="align-left col-text"><%=question.getText() %></td>
+  							<td class="align-middle">
+  								<aui:input name="second_<%=question.getQuestionId() %>" label="" value='<%=second != null ? second.getText() : "0" %>'>
+  									<aui:validator name="number"/>
+  								</aui:input>
+  							</td>
+  						</tr>
+  					<%} %>
+  				</tbody>
+  			</table>
+  	<%	}
+  	} %>
+  	
 </aui:field-wrapper>
 <script type="text/javascript">
 	function deleteFile(id){

@@ -5,6 +5,35 @@
 		var iframe = document.getElementById('player_1');
 		var player = new Vimeo.Player(iframe);
 		
+</script>
+
+<c:forEach items="${questions }" var="questionElement">
+	<script>
+		player.addCuePoints('${questionElement.text}',{
+			questionId: '${questionElement.name}'
+		}).then(function(id){
+			console.log(id);
+			//player.pause();
+		}).catch(function(error){
+			switch(error.name){
+				case 'UnsupportedError':
+		            // cue points are not supported with the current player or browser
+		            break;
+	
+		        case 'RangeError':
+		            // the time was less than 0 or greater than the video’s duration
+		            break;
+	
+		        default:
+		            // some other error occurred
+		            break;
+			}
+		});
+	</script>
+</c:forEach>
+
+<script>
+		
 		var plays = parseInt('${plays}');
 		var duration = 0;
 		var currentTime = 0;

@@ -37,5 +37,6 @@ public interface QuestionType
 	public int getDefaultAnswersNo();
 	public boolean isInline();
 	public boolean isPartialCorrectAvailable();
+	public boolean getPenalize();
 		
 }

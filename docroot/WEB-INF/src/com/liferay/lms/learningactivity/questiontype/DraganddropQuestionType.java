@@ -47,11 +47,11 @@ public class DraganddropQuestionType extends BaseQuestionType {
 	}
 
 	public String getURLEdit(){
-		return "/html/execactivity/test/admin/editAnswerOptions.jsp";
+		return "/html/questions/admin/editAnswerOptions.jsp";
 	}
 	
 	public String getURLNew(){
-		return "/html/execactivity/test/admin/popups/options.jsp";
+		return "/html/questions/admin/popups/options.jsp";
 	}
 
 	public long correct(ActionRequest actionRequest, long questionId){

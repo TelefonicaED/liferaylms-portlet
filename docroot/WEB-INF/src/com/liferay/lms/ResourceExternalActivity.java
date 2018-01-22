@@ -54,14 +54,13 @@ import com.liferay.portlet.documentlibrary.model.DLFileVersion;
 import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.service.DLFileEntryLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.util.DLUtil;
-import com.liferay.util.bridges.mvc.MVCPortlet;
 import com.tls.lms.util.LiferaylmsUtil;
 import com.tls.util.liferay.patch.PortalClassInvokerPatched;
 
 /**
  * Portlet implementation class ResourceActivity
  */
-public class ResourceExternalActivity extends MVCPortlet {
+public class ResourceExternalActivity extends QuestionsAdmin {
 	
 	private static Log log = LogFactoryUtil.getLog(ResourceExternalActivity.class);
 	

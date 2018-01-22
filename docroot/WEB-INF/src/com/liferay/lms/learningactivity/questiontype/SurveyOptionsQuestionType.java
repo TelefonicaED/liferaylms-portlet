@@ -33,11 +33,11 @@ public class SurveyOptionsQuestionType extends OptionsQuestionType {
 	}
 	
 	public String getURLEdit(){
-		return "/html/surveyactivity/admin/editAnswerOptions.jsp";
+		return "/html/questions/admin/editSurveyAnswerOptions.jsp";
 	}
 	
 	public String getURLNew(){
-		return "/html/surveyactivity/admin/popups/surveyoptions.jsp";
+		return "/html/questions/admin/popups/surveyoptions.jsp";
 	}
 	
 	protected boolean isQuestionCorrect(int correctAnswers, int correctAnswered, int incorrectAnswered){
@@ -50,6 +50,10 @@ public class SurveyOptionsQuestionType extends OptionsQuestionType {
 	
 	public int getDefaultAnswersNo(){
 		return GetterUtil.getInteger(PropsUtil.get("lms.defaultAnswersNo.surveyoptions"), 2);
+	}
+	
+	public boolean getPenalize(){
+		return false;
 	}
 	
 }

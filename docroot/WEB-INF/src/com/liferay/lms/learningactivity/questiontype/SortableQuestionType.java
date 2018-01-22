@@ -47,11 +47,11 @@ public class SortableQuestionType extends BaseQuestionType {
 	}
 	
 	public String getURLEdit(){
-		return "/html/execactivity/test/admin/editAnswerSortable.jsp";
+		return "/html/questions/admin/editAnswerSortable.jsp";
 	}
 	
 	public String getURLNew(){
-		return "/html/execactivity/test/admin/popups/sortable.jsp";
+		return "/html/questions/admin/popups/sortable.jsp";
 	}
 	
 	public long correct(ActionRequest actionRequest, long questionId){

@@ -15,11 +15,16 @@
 <%@ include file="/init.jsp" %>
 
 <%
+
 	long userId=ParamUtil.getLong(request,"userId",0);
 	if(userId==0)
 	{
 		userId=themeDisplay.getUserId();
 	}
+	
+	PortletURL iteratorURL = renderResponse.createRenderURL();
+	iteratorURL.setParameter("userId", String.valueOf(userId));
+	iteratorURL.setParameter("view", "user-details");
 
 	User usuario=UserLocalServiceUtil.getUser(userId);
 	String title = LanguageUtil.get(pageContext,"results") +" "+ usuario.getFullName();

@@ -422,5 +422,11 @@ public class QuestionTypeClp implements QuestionType {
 		// TODO Auto-generated method stub
 		return false;
 	}
+	
+	@Override
+	public boolean getPenalize() {
+		// TODO Auto-generated method stub
+		return true;
+	}
 
 }

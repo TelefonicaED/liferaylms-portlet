@@ -49,11 +49,11 @@ public class FreetextQuestionType extends BaseQuestionType {
 	}
 
 	public String getURLEdit(){
-		return "/html/execactivity/test/admin/editAnswerFreetext.jsp";
+		return "/html/questions/admin/editAnswerFreetext.jsp";
 	}
 	
 	public String getURLNew(){
-		return "/html/execactivity/test/admin/popups/freetext.jsp";
+		return "/html/questions/admin/popups/freetext.jsp";
 	}
 
 	public long correct(ActionRequest actionRequest, long questionId){

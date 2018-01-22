@@ -87,7 +87,7 @@ public abstract class BaseQuestionType implements QuestionType, Serializable {
 	
 	@Override
 	public String getURLBack(){
-		return "/html/execactivity/test/admin/editquestions.jsp";
+		return "/html/questions/admin/editquestions.jsp";
 	}
 	
 	@Override
@@ -217,6 +217,10 @@ public abstract class BaseQuestionType implements QuestionType, Serializable {
 
 	public boolean isPartialCorrectAvailable() {
 		return false;
+	}
+	
+	public boolean getPenalize(){
+		return true;
 	}
 	
 }
