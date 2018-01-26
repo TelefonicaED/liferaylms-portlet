@@ -20,6 +20,10 @@
 	{
 		userId=themeDisplay.getUserId();
 	}
+	
+	PortletURL iteratorURL = renderResponse.createRenderURL();
+	iteratorURL.setParameter("userId", String.valueOf(userId));
+	iteratorURL.setParameter("view", "user-details");
 
 	User usuario=UserLocalServiceUtil.getUser(userId);
 	String title = LanguageUtil.get(pageContext,"results") +" "+ usuario.getFullName();
