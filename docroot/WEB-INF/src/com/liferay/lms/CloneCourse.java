@@ -84,7 +84,6 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 	
 	boolean cloneForum;
 	
-	private Boolean childCourse; 	
 	public CloneCourse(long groupId, String newCourseName, ThemeDisplay themeDisplay, Date startDate, Date endDate, boolean cloneForum, ServiceContext serviceContext) {
 		super();
 		this.groupId = groupId;
@@ -113,7 +112,6 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 			this.endDate 	= (Date)message.get("endDate");
 			this.serviceContext = (ServiceContext)message.get("serviceContext");
 			this.themeDisplay = (ThemeDisplay)message.get("themeDisplay");
-			this.childCourse =(Boolean)message.get("childCourse");
 			this.visible = message.getBoolean("visible");
 			this.includeTeacher = message.getBoolean("includeTeacher");
 			this.cloneForum = message.getBoolean("cloneForum");
@@ -193,42 +191,36 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 		newCourse.setExpandoBridgeAttributes(serviceContext);
 		
 		newCourse.getExpandoBridge().setAttributes(course.getExpandoBridge().getAttributes());
-		//Course newCourse = CourseLocalServiceUtil.addCourse(newCourseName, course.getDescription(), "", "", themeDisplay.getLocale(), today, today, today, layoutSetPrototypeId, serviceContext);
-		if(this.childCourse)
+	
+		List<CourseCompetence> courseCompetences= CourseCompetenceLocalServiceUtil.findBycourseId(course.getCourseId(), false);
+		for(CourseCompetence courseCompetence:courseCompetences)
 		{
-			List<CourseCompetence> courseCompetences= CourseCompetenceLocalServiceUtil.findBycourseId(course.getCourseId(), false);
-			for(CourseCompetence courseCompetence:courseCompetences)
-			{
-				long courseCompetenceId = CounterLocalServiceUtil.increment(CourseCompetence.class.getName());
-				CourseCompetence cc = CourseCompetenceLocalServiceUtil.createCourseCompetence(courseCompetenceId);
-				cc.setCourseId(newCourse.getCourseId());
-				cc.setCompetenceId(courseCompetence.getCompetenceId());
-				cc.setCachedModel(courseCompetence.getCondition());
-				cc.setCondition(courseCompetence.getCondition());
-				CourseCompetenceLocalServiceUtil.updateCourseCompetence(cc, true);
-			}
-			courseCompetences= CourseCompetenceLocalServiceUtil.findBycourseId(course.getCourseId(), true);
-			CourseCompetence cc=null;
-			for(CourseCompetence courseCompetence:courseCompetences){
-				
-				long courseCompetenceId = CounterLocalServiceUtil.increment(CourseCompetence.class.getName());
-				cc = CourseCompetenceLocalServiceUtil.createCourseCompetence(courseCompetenceId);
-				cc.setCourseId(newCourse.getCourseId());
-				cc.setCompetenceId(courseCompetence.getCompetenceId());
-				cc.setCachedModel(courseCompetence.getCondition());
-				cc.setCondition(courseCompetence.getCondition());
-				CourseCompetenceLocalServiceUtil.updateCourseCompetence(cc, true);
-			}
+			long courseCompetenceId = CounterLocalServiceUtil.increment(CourseCompetence.class.getName());
+			CourseCompetence cc = CourseCompetenceLocalServiceUtil.createCourseCompetence(courseCompetenceId);
+			cc.setCourseId(newCourse.getCourseId());
+			cc.setCompetenceId(courseCompetence.getCompetenceId());
+			cc.setCachedModel(courseCompetence.getCondition());
+			cc.setCondition(courseCompetence.getCondition());
+			CourseCompetenceLocalServiceUtil.updateCourseCompetence(cc, true);
 		}
+		courseCompetences= CourseCompetenceLocalServiceUtil.findBycourseId(course.getCourseId(), true);
+		CourseCompetence cc=null;
+		for(CourseCompetence courseCompetence:courseCompetences){
+			
+			long courseCompetenceId = CounterLocalServiceUtil.increment(CourseCompetence.class.getName());
+			cc = CourseCompetenceLocalServiceUtil.createCourseCompetence(courseCompetenceId);
+			cc.setCourseId(newCourse.getCourseId());
+			cc.setCompetenceId(courseCompetence.getCompetenceId());
+			cc.setCachedModel(courseCompetence.getCondition());
+			cc.setCondition(courseCompetence.getCondition());
+			CourseCompetenceLocalServiceUtil.updateCourseCompetence(cc, true);
+		}
+	
 		Group newGroup = GroupLocalServiceUtil.getGroup(newCourse.getGroupCreatedId());
 		serviceContext.setScopeGroupId(newCourse.getGroupCreatedId());
 		
-		if(this.childCourse)
-		{
-			log.debug("hijo de: "+Long.toString(course.getCourseId()));
-			newCourse.setParentCourseId(course.getCourseId());
-			CourseLocalServiceUtil.setVisible(newCourse.getCourseId(), false);
-		}
+		newCourse.setParentCourseId(course.getParentCourseId());
+		
 		
 		Role siteMemberRole = RoleLocalServiceUtil.getRole(themeDisplay.getCompanyId(), RoleConstants.SITE_MEMBER);
 		
@@ -303,10 +295,7 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 				if(module.getPrecedence()!=0){
 					modulesDependencesList.put(module.getModuleId(),module.getPrecedence());
 				}
-				if(this.childCourse)
-				{
-					newModule.setUuid(module.getUuid());
-				}
+			
 				newModule.setTitle(module.getTitle());
 				newModule.setDescription(module.getDescription());
 				newModule.setGroupId(newCourse.getGroupId());
@@ -345,10 +334,7 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 				nuevaLarn = null;
 				try {
 					newLearnActivity = LearningActivityLocalServiceUtil.createLearningActivity(CounterLocalServiceUtil.increment(LearningActivity.class.getName()));
-					if(this.childCourse)
-					{
-						newLearnActivity.setUuid(activity.getUuid());
-					}
+					
 					newLearnActivity.setTitle(activity.getTitle());
 					newLearnActivity.setDescription(activity.getDescription());
 					newLearnActivity.setTypeId(activity.getTypeId());

@@ -716,7 +716,6 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 		long groupId  = ParamUtil.getLong(actionRequest, "groupId", 0);
 	
 		String newCourseName  = ParamUtil.getString(actionRequest, "newCourseName", "New course cloned");
-		boolean childCourse=ParamUtil.getBoolean(actionRequest, "childCourse",false);
 		boolean cloneForum = ParamUtil.getBoolean(actionRequest, "cloneForum");
 		int startMonth = 	ParamUtil.getInteger(actionRequest, "startMon");
 		int startYear = 	ParamUtil.getInteger(actionRequest, "startYear");
@@ -773,7 +772,6 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 				message.put("themeDisplay",themeDisplay);
 				message.put("startDate",startDate);
 				message.put("endDate",endDate);
-				message.put("childCourse", childCourse);
 				message.put("serviceContext",serviceContext);
 				message.put("visible",visible);
 				message.put("cloneForum", cloneForum);
