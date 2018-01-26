@@ -113,7 +113,7 @@ if(permissionChecker.hasPermission(themeDisplay.getScopeGroupId(),  Course.class
 		<portlet:param name="groupId" value="<%=String.valueOf(myCourse.getGroupCreatedId()) %>" />
 		<portlet:param name="view" value="clone" />
 	</portlet:renderURL>
-	<liferay-ui:icon image="copy" message="courseadmin.adminactions.clone" url="<%=cloneURL%>" />	
+	<liferay-ui:icon image="copy" message="<%=(myCourse.getParentCourseId()>0) ? \"courseadmin.adminactions.clone-edition\" :  \"courseadmin.adminactions.clone\"  %>" url="<%=cloneURL%>" />	
 	<%}%>
 	
 	<%-- Cerrar Curso --%>

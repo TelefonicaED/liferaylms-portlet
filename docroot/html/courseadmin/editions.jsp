@@ -69,7 +69,7 @@ if( permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), "com.liferay
 		Group groupsel= GroupLocalServiceUtil.getGroup(course.getGroupCreatedId());
 		Layout initCourseLayout = LayoutLocalServiceUtil.fetchFirstLayout(course.getGroupCreatedId(), false, 0);
 		%>
-		<liferay-ui:search-container-column-text name="course">
+		<liferay-ui:search-container-column-text name="edition">
 
 		<c:choose>
 		

@@ -262,9 +262,9 @@ if(course!=null){
 	<%
 }
 %>
-
+<liferay-ui:header title="<%= course != null ? course.getTitle(themeDisplay.getLocale()) : \"new-course\" %>" backURL="<%=backURL %>"></liferay-ui:header>
 <c:if test="<%=course != null && course.getParentCourseId()<=0%>">
-	<div class="aui-tab-back">
+	<aui:fieldset>
 		<liferay-ui:icon-menu>
 			<%-- Ir al curso --%>
 			<%if(showGo && groupsel != null && permissionChecker.hasPermission(course.getGroupId(), Course.class.getName(),course.getCourseId(), ActionKeys.VIEW) && 
@@ -351,7 +351,7 @@ if(course!=null){
 			<%}%>
 			
 		</liferay-ui:icon-menu>
-	</div>
+	</aui:fieldset>
 </c:if>
 
 <aui:form name="fm" action="<%=savecourseURL%>"  method="post" enctype="multipart/form-data">
@@ -360,17 +360,19 @@ if(course!=null){
 	<aui:input name="backURL" type="hidden" value="<%= backURL %>" />
 	<aui:input name="referringPortletResource" type="hidden" value="<%= referringPortletResource %>" />
 	<aui:input name="courseId" type="hidden" value="<%=courseId %>"/>
+
 	<span class="aui-field-content" > 
-		 <label class="aui-field-label" for="<%=renderResponse.getNamespace()+"title"+StringPool.UNDERLINE+LanguageUtil.getLanguageId(LocaleUtil.getDefault()) %>"> 
-		 	<liferay-ui:message key="title" /> 
-		 </label> 
+		 
 		 <span class="aui-field-element " > 
-		  <liferay-ui:input-localized 
-			   cssClass="<%=renderResponse.getNamespace()+\"localized lfr-input-text\"%>" 
-			   name="title"
-			   defaultLanguageId="<%=LanguageUtil.getLanguageId(LocaleUtil.getDefault()) %>"
-			   xml="<%=courseTitle %>"
-			   maxLength="<%=maxLengthTitle %>"/>
+			 <label class="aui-field-label" for="<%=renderResponse.getNamespace()+"title"+StringPool.UNDERLINE+LanguageUtil.getLanguageId(LocaleUtil.getDefault()) %>"> 
+			 	<liferay-ui:message key="title" /> 
+			 </label> 
+			  <liferay-ui:input-localized 
+				   cssClass="<%=renderResponse.getNamespace()+\"localized lfr-input-text\"%>" 
+				   name="title" 
+				   defaultLanguageId="<%=LanguageUtil.getLanguageId(LocaleUtil.getDefault()) %>"
+				   xml="<%=courseTitle %>"
+				   maxLength="<%=maxLengthTitle %>"/>
 		 </span> 
 	</span>
 	
