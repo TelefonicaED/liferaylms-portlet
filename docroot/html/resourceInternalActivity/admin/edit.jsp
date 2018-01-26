@@ -86,7 +86,9 @@ function <portlet:namespace />goToSearchResource(){
 	var languageId = '<%= themeDisplay.getLanguageId()%>';
 	var description = $('#<portlet:namespace />description').val();
 	 description = description.replace(/&nbsp;/g, ' ').replace(/#/g,'%23').replace(/&/g,'%26');
-	url +='&<portlet:namespace/>title='+$('#<portlet:namespace />title_'+languageId).val();
+	var title = $('#<portlet:namespace />title_'+languageId).val();
+	title = title.replace(/#/g,'%23').replace(/&/g,'%26');
+	url +='&<portlet:namespace/>title='+title;
 	url += '&<portlet:namespace/>description='+encodeURI(description);
 		
 	location.href=url;

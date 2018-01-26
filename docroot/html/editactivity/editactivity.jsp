@@ -148,6 +148,7 @@ if (course!=null){
 //title = ParamUtil.getString(request, "title", null);
 description = ParamUtil.getString(request, "description", "");
 String title = ParamUtil.getString(request, "title", "");
+title = title.replace("%23", "#").replace("%26","&").replace("%25", "%");
 %>
 
 <%
