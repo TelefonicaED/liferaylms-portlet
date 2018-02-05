@@ -386,12 +386,6 @@ public class ResourceExternalLearningActivityType extends BaseLearningActivityTy
 					teamElement.setText(Long.toString(teamId));
 					rootElement.add(teamElement);
 				}
-			}
-			try {
-				learningActivity.setExtracontent(document.formattedString());
-			} catch (IOException e) {
-				if(log.isDebugEnabled())e.printStackTrace();
-				if(log.isErrorEnabled())log.error(e.getMessage());
 			}	
 			
 			//Guardamos los segundos de las preguntas
@@ -403,19 +397,33 @@ public class ResourceExternalLearningActivityType extends BaseLearningActivityTy
 				e.printStackTrace();
 			}
 			if(listQuestions != null && listQuestions.size() > 0){
+				System.out.println("listQuestions: " + listQuestions.size());
 				int second = 0;
 				Element questionElement = null;
 				for(TestQuestion question: listQuestions){
-					second = ParamUtil.getInteger(uploadRequest, "question_" + question.getQuestionId());
+					second = ParamUtil.getInteger(uploadRequest, "second_" + question.getQuestionId(), 0);
+					System.out.println("question: " + question.getQuestionId() + " - second: " + second);
 					questionElement = rootElement.element("question_" + question.getQuestionId());
 					if(questionElement != null){
 						questionElement.detach();
 						rootElement.remove(questionElement);
 					}
-					questionElement = SAXReaderUtil.createElement("question_" + question.getQuestionId());
-					questionElement.setText(String.valueOf(second));
-					rootElement.add(questionElement);
+					if(second > 0){
+						System.out.println("añandiendo un nodo");
+						questionElement = SAXReaderUtil.createElement("question_" + question.getQuestionId());
+						questionElement.setText(String.valueOf(second));
+						rootElement.add(questionElement);
+					}
 				}
+				
+				System.out.println("rootElement " + rootElement);
+			}
+			
+			try {
+				learningActivity.setExtracontent(document.formattedString());
+			} catch (IOException e) {
+				if(log.isDebugEnabled())e.printStackTrace();
+				if(log.isErrorEnabled())log.error(e.getMessage());
 			}
 		}
 		

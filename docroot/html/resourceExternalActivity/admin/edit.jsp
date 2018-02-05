@@ -137,12 +137,13 @@
   					<% Element second = null;
   					for(TestQuestion question: listQuestions){ 
   						if(root != null){
-  							second = root.element("second_" + question.getQuestionId());
+  							second = root.element("question_" + question.getQuestionId());
   						}%>
   						<tr class="portlet-section-body results-row">
   							<td class="align-left col-text"><%=question.getText() %></td>
   							<td class="align-middle">
-  								<aui:input name="second_<%=question.getQuestionId() %>" label="" value='<%=second != null ? second.getText() : "0" %>'>
+  								<c:set var="questionId" value="<%=question.getQuestionId()%>" />
+  								<aui:input name="second_${questionId }" label="" value='<%=second != null ? second.getText() : "0" %>'>
   									<aui:validator name="number"/>
   								</aui:input>
   							</td>

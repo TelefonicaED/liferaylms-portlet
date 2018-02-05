@@ -65,6 +65,18 @@
 		}						
 	}
   }
+  
+  //Añadimos los puntos donde se cargaran las preguntas
+</script>
+
+<c:forEach items="${timeQuestions }" var="timeQuestion">
+	<script>
+		
+	</script>
+</c:forEach>
+
+<script >
+
   var unloadEvent = function (e) {
 	  if(!finished){
 		console.log("unloadEvent youtube");

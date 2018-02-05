@@ -4,6 +4,7 @@
 <%@ include file="/init-min.jsp" %>
 
 <script src="/liferaylms-portlet/js/service.js" type="text/javascript"></script>
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/mediaelement@4.2.7/build/mediaelementplayer.min.css">
 
 <jsp:useBean id="listDocuments" type="java.util.List<com.liferay.portal.kernel.repository.model.FileVersion>" scope="request"/>
 
@@ -55,21 +56,13 @@ if(isLinkTabletResourceExternal){
 			  window.addEventListener("beforeunload", unloadEvent);	
 		</script>
 	</c:when>
-	<c:when test="${isYoutubeIframe || isVimeoIframe }">
+	<c:when test="${not empty mimeType }">
+		<%@ include file="/html/resourceExternalActivity/mediaelement.jsp" %>
+	</c:when>
+	<c:otherwise>
 		<div class="video">
 			${video}
 		</div>
-		<c:if test="${isYoutubeIframe}">
-			<%@ include file="/html/resourceExternalActivity/youtube.jsp" %>		
-		</c:if>	
-		<c:if test="${isVimeoIframe}">			
-			<%@ include file="/html/resourceExternalActivity/vimeo.jsp" %>			
-		</c:if>
-		<c:forEach items="${listQuestions }" var="question">
-		
-		</c:forEach>
-	</c:when>
-	<c:otherwise>
 		<script>
 			var unloadEvent = function (e) {
 				console.log("unloadEvent otherwise");

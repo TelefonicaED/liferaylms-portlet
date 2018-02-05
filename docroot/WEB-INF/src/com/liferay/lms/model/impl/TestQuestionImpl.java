@@ -14,6 +14,10 @@
 
 package com.liferay.lms.model.impl;
 
+import com.liferay.lms.learningactivity.questiontype.QuestionType;
+import com.liferay.lms.learningactivity.questiontype.QuestionTypeRegistry;
+import com.liferay.portal.kernel.exception.SystemException;
+
 /**
  * The extended model implementation for the TestQuestion service. Represents a row in the &quot;Lms_TestQuestion&quot; database table, with each column mapped to a property of this class.
  *
@@ -31,4 +35,17 @@ public class TestQuestionImpl extends TestQuestionBaseImpl {
 	 */
 	public TestQuestionImpl() {
 	}
+	
+	public QuestionType getTestQuestionType(){
+		QuestionType qt = null;
+		try {
+			qt = new QuestionTypeRegistry().getQuestionType(getQuestionType());
+		} catch (SystemException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return qt;
+	}
+	
 }
