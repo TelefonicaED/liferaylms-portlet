@@ -2,6 +2,7 @@ package com.liferay.lms.lar;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Date;
@@ -45,10 +46,15 @@ public class ImportUtil {
 			return res;
 		}
 			
-		String target 		= "/documents/"+oldFile.getRepositoryId()+"/"+oldFile.getFolderId()+"/"+URLEncoder.encode(oldFile.getTitle())+"/"+oldFile.getUuid();
-		String replacement 	= "/documents/"+newFile.getRepositoryId()+"/"+newFile.getFolderId()+"/"+URLEncoder.encode(newFile.getTitle())+"/"+newFile.getUuid();
+		try {
+			String target = "/documents/"+oldFile.getRepositoryId()+"/"+oldFile.getFolderId()+"/"+URLEncoder.encode(oldFile.getTitle(), "UTF-8")+"/"+oldFile.getUuid();
+			String replacement 	= "/documents/"+newFile.getRepositoryId()+"/"+newFile.getFolderId()+"/"+URLEncoder.encode(newFile.getTitle(), "UTF-8")+"/"+newFile.getUuid();
+			res = description.replace(target, replacement);
 
-		res = description.replace(target, replacement);
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		if(res.equals(description)){
 			log.info("   :: description         : " + description );

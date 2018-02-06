@@ -97,7 +97,6 @@ public class ModuleDataHandlerImpl extends BasePortletDataHandler {
 			
 			log.info("  Course: "+ group.getName()+ ", groupId: " + repositoryId);
 			
-			LearningActivityTypeRegistry learningActivityTypeRegistry = new LearningActivityTypeRegistry();
 			List<Module> modules = ModuleLocalServiceUtil.findAllInGroup(groupId);
 	
 			for(Module module:modules){
