@@ -531,7 +531,7 @@
 				c.closed = 0 
 				AND (SELECT MAX(mo.endDate) FROM lms_module mo WHERE mo.groupId = c.groupCreatedId) > '[$DATENOW$]' 
 				AND (r.crId IS NULL OR r.allowFinishDate IS NULL OR r.allowFinishDate > '[$DATENOW$]')
-				AND c.groupId = ?
+				AND (c.groupId = ? OR ? <= 0)
 			GROUP By 
 				c.courseId
 		]]>
@@ -552,7 +552,7 @@
 				c.closed = 0 
 				AND (SELECT MAX(mo.endDate) FROM lms_module mo WHERE mo.groupId = c.groupCreatedId) > '[$DATENOW$]' 
 				AND (r.crId IS NULL OR r.allowFinishDate IS NULL OR r.allowFinishDate > '[$DATENOW$]')
-				AND c.groupId = ?
+				AND (c.groupId = ? OR ? <= 0)
 			GROUP By 
 				c.courseId
 		]]>

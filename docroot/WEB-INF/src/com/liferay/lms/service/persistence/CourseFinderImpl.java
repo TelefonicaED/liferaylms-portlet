@@ -1143,6 +1143,7 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			qPos.add(userId);
 			qPos.add(userId);
 			qPos.add(groupId);
+			qPos.add(groupId);
 			
 			Iterator<Object[]> itr =  q.iterate();
 							
@@ -1300,6 +1301,7 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			QueryPos qPos = QueryPos.getInstance(q);
 			qPos.add(userId);
 			qPos.add(userId);
+			qPos.add(groupId);
 			qPos.add(groupId);
 			
 			Iterator<Long> itr = q.iterate();
