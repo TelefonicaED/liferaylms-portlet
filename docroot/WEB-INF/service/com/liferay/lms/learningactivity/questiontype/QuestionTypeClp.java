@@ -3,7 +3,7 @@ package com.liferay.lms.learningactivity.questiontype;
 import java.lang.reflect.Method;
 import java.util.Locale;
 
-import javax.portlet.ActionRequest;
+import javax.portlet.PortletRequest;
 
 import com.liferay.lms.learningactivity.LearningActivityType;
 import com.liferay.lms.model.LearningActivity;
@@ -202,11 +202,11 @@ public class QuestionTypeClp implements QuestionType {
 		}
 	}
 	
-	public long correct(ActionRequest actionRequest, long questionId){
+	public long correct(PortletRequest actionRequest, long questionId){
 		Object returnObj = null;
 
 		try {
-			Method method = QuestionType.class.getMethod("correct", ActionRequest.class, long.class);
+			Method method = QuestionType.class.getMethod("correct", PortletRequest.class, long.class);
 			returnObj = clp.invoke(new MethodHandler(method, actionRequest, questionId));
 		}
 		catch (Throwable t) {
@@ -246,11 +246,11 @@ public class QuestionTypeClp implements QuestionType {
 		return ((String)returnObj);
 	}
 	
-	public Element getResults(ActionRequest actionRequest, long questionId){
+	public Element getResults(PortletRequest actionRequest, long questionId){
 		Object returnObj = null;
 
 		try {
-			Method method = QuestionType.class.getMethod("getResults", ActionRequest.class, long.class);
+			Method method = QuestionType.class.getMethod("getResults", PortletRequest.class, long.class);
 			returnObj = clp.invoke(new MethodHandler(method, actionRequest, questionId));
 		}
 		catch (Throwable t) {
@@ -427,6 +427,28 @@ public class QuestionTypeClp implements QuestionType {
 	public boolean getPenalize() {
 		// TODO Auto-generated method stub
 		return true;
+	}
+	
+	public long correct(Element element, long questionId){
+		Object returnObj = null;
+
+		try {
+			Method method = QuestionType.class.getMethod("correct", Element.class, long.class);
+			returnObj = clp.invoke(new MethodHandler(method, element, questionId));
+		}
+		catch (Throwable t) {
+			t = ClpSerializer.translateThrowable(t);
+
+			if (t instanceof RuntimeException) {
+				throw (RuntimeException)t;
+			}
+			else {
+				throw new RuntimeException(t.getClass().getName() +
+					" is not a valid exception");
+			}
+		}
+
+		return ((Long)returnObj);
 	}
 
 }

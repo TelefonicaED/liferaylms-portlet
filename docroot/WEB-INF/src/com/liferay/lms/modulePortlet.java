@@ -278,7 +278,6 @@ public class modulePortlet extends MVCPortlet {
 			log.debug("*******moduleId:"+moduleId);
 			
 			Module module = ModuleLocalServiceUtil.getModule(moduleId);
-			//System.out.println("Paso por aqui: "+moduleId);
 			String title = module.getTitle();
 			long allowedTime = module.getAllowedTime();	
 			long hourDuration = allowedTime / 3600000;
@@ -583,7 +582,6 @@ public class modulePortlet extends MVCPortlet {
 	}
 
 	private void editmodulePopUp(RenderRequest request, RenderResponse renderResponse) {
-		//System.out.println("editmodulePopUp");
 		long key = ParamUtil.getLong(request, "resourcePrimKey");
 		if (Validator.isNotNull(key)) {
 			request.setAttribute("moduleId",key);
@@ -633,7 +631,6 @@ public class modulePortlet extends MVCPortlet {
 		
 		log.debug("**********updatemodule***********");
 		
-		//System.out.println("dentro de updatemodule");
 		Module module = moduleFromRequest(request);
 		ArrayList<String> errors = moduleValidator.validatemodule(module, request);
 		ThemeDisplay themeDisplay = (ThemeDisplay) request

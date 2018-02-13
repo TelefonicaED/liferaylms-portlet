@@ -6,7 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
-import javax.portlet.ActionRequest;
+import javax.portlet.PortletRequest;
 
 import com.liferay.lms.model.TestAnswer;
 import com.liferay.lms.model.TestQuestion;
@@ -18,6 +18,8 @@ import com.liferay.lms.service.TestQuestionLocalServiceUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PropsUtil;
@@ -29,6 +31,8 @@ import com.liferay.portal.theme.ThemeDisplay;
 public class SortableQuestionType extends BaseQuestionType {
 
 	private static final long serialVersionUID = 1L;
+	
+	private static Log log = LogFactoryUtil.getLog(SortableQuestionType.class);
 		
 	public long getTypeId(){
 		return 5;
@@ -54,18 +58,51 @@ public class SortableQuestionType extends BaseQuestionType {
 		return "/html/questions/admin/popups/sortable.jsp";
 	}
 	
-	public long correct(ActionRequest actionRequest, long questionId){
-		List<TestAnswer> testAnswers = new ArrayList<TestAnswer>();
-		try {
-			testAnswers.addAll(TestAnswerLocalServiceUtil.getTestAnswersByQuestionId(questionId));
-		} catch (SystemException e) {
-			e.printStackTrace();
-		}
+	public long correct(PortletRequest portletRequest, long questionId){
 
 		List<Long> answersId = new ArrayList<Long>();
-		long[] answers = ParamUtil.getLongValues(actionRequest, "question_"+questionId+"_ans");
+		long[] answers = ParamUtil.getLongValues(portletRequest, "question_"+questionId+"_ans");
 		for(long id:answers){
 			answersId.add(id);
+		}
+
+		List<TestAnswer> testAnswers = null;
+		try{
+			testAnswers = TestAnswerLocalServiceUtil.getTestAnswersByQuestionId(questionId);
+		} catch (SystemException e) {
+			e.printStackTrace();
+			testAnswers = new ArrayList<TestAnswer>();
+		}
+		
+		if(!isCorrect(answersId, testAnswers)){
+			return INCORRECT;
+		}else{
+			return CORRECT;
+		}
+	}
+	
+	@Override
+	public long correct(Element element, long questionId){
+
+		log.debug("element: " + element.asXML());
+		
+		Iterator<Element> iteratorAnswers = element.elementIterator("answer");
+		List<Long> answersId = new ArrayList<Long>();
+		
+		Element elementAnswer = null;
+		
+		while(iteratorAnswers.hasNext()) {
+			elementAnswer = iteratorAnswers.next();
+			log.debug("elementAnswer: " + elementAnswer.asXML());
+			answersId.add(Long.parseLong(elementAnswer.attributeValue("id")));
+		}
+		
+		List<TestAnswer> testAnswers = null;
+		try{
+			testAnswers = TestAnswerLocalServiceUtil.getTestAnswersByQuestionId(questionId);
+		} catch (SystemException e) {
+			e.printStackTrace();
+			testAnswers = new ArrayList<TestAnswer>();
 		}
 
 		if(!isCorrect(answersId, testAnswers)){
@@ -76,8 +113,9 @@ public class SortableQuestionType extends BaseQuestionType {
 	}
 	
 	protected boolean isCorrect(List<Long> answersId, List<TestAnswer> testAnswers){
-		for(int i=0;i<testAnswers.size();i++) 
+		for(int i=0;i<testAnswers.size();i++){ 
 			if(answersId.get(i) == -1 || answersId.get(i) != testAnswers.get(i).getAnswerId())	return false;
+		}
 		return true;
 	}
 	
@@ -85,7 +123,7 @@ public class SortableQuestionType extends BaseQuestionType {
 		return getHtml(document,questionId,false,themeDisplay);
 	}
 	
-	public Element getResults(ActionRequest actionRequest, long questionId){
+	public Element getResults(PortletRequest portletRequest, long questionId){
 		List<TestAnswer> testAnswers = new ArrayList<TestAnswer>();
 		try {
 			testAnswers.addAll(TestAnswerLocalServiceUtil.getTestAnswersByQuestionId(questionId));
@@ -94,7 +132,7 @@ public class SortableQuestionType extends BaseQuestionType {
 		}
 
 		List<Long> answersId = new ArrayList<Long>();
-		long[] answers = ParamUtil.getLongValues(actionRequest, "question_"+questionId+"_ans");
+		long[] answers = ParamUtil.getLongValues(portletRequest, "question_"+questionId+"_ans");
 		for(long id:answers){
 			answersId.add(id);
 		}
@@ -102,7 +140,7 @@ public class SortableQuestionType extends BaseQuestionType {
 		Element questionXML=SAXReaderUtil.createElement("question");
 		questionXML.addAttribute("id", Long.toString(questionId));
 		
-		long currentQuestionId = ParamUtil.getLong(actionRequest, "currentQuestionId");
+		long currentQuestionId = ParamUtil.getLong(portletRequest, "currentQuestionId");
 		if (currentQuestionId == questionId) {
 			questionXML.addAttribute("current", "true");
 		}

@@ -2,13 +2,17 @@ package com.liferay.lms.learningactivity;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
 
 import com.liferay.lms.asset.ResourceExternalAssetRenderer;
+import com.liferay.lms.learningactivity.questiontype.QuestionType;
+import com.liferay.lms.learningactivity.questiontype.QuestionTypeRegistry;
 import com.liferay.lms.model.LearningActivity;
+import com.liferay.lms.model.LearningActivityTry;
 import com.liferay.lms.model.TestQuestion;
 import com.liferay.lms.service.ClpSerializer;
 import com.liferay.lms.service.TestQuestionLocalServiceUtil;
@@ -51,10 +55,17 @@ public class ResourceExternalLearningActivityType extends BaseLearningActivityTy
 	
 	public final static int DEFAULT_FILENUMBER = 5;
 	
+	public final static long TYPE_ID = 2;
+	
 	public static String DOCUMENTLIBRARY_MAINFOLDER = "ResourceUploads";
 	public static String PORTLET_ID = 
 			PortalUtil.getJsSafePortletId(
 					"resourceExternalActivity" + PortletConstants.WAR_SEPARATOR + ClpSerializer.getServletContextName());
+	
+	public final static int CORRECT_VIDEO = 1;
+	public final static int CORRECT_QUESTIONS = 2;
+	
+	public final static long DEFAULT_SCORE = 0;
 	
 	@Override
 	public boolean gradebook() {
@@ -64,12 +75,13 @@ public class ResourceExternalLearningActivityType extends BaseLearningActivityTy
 
 	@Override
 	public long getDefaultScore() {
-		return 0;
+		return DEFAULT_SCORE;
 	}
 	
+	//Se modifica para añadirlo en la parte de específica y poder controlar los literales y la posición
 	@Override
 	public boolean isScoreConfigurable() {
-		return true;
+		return false;
 	}
 
 	@Override
@@ -88,7 +100,7 @@ public class ResourceExternalLearningActivityType extends BaseLearningActivityTy
 
 	@Override
 	public long getTypeId() {
-		return 2;
+		return TYPE_ID;
 	}
 	
 	@Override
@@ -397,27 +409,34 @@ public class ResourceExternalLearningActivityType extends BaseLearningActivityTy
 				e.printStackTrace();
 			}
 			if(listQuestions != null && listQuestions.size() > 0){
-				System.out.println("listQuestions: " + listQuestions.size());
 				int second = 0;
 				Element questionElement = null;
 				for(TestQuestion question: listQuestions){
 					second = ParamUtil.getInteger(uploadRequest, "second_" + question.getQuestionId(), 0);
-					System.out.println("question: " + question.getQuestionId() + " - second: " + second);
+
 					questionElement = rootElement.element("question_" + question.getQuestionId());
 					if(questionElement != null){
 						questionElement.detach();
 						rootElement.remove(questionElement);
 					}
 					if(second > 0){
-						System.out.println("añandiendo un nodo");
 						questionElement = SAXReaderUtil.createElement("question_" + question.getQuestionId());
 						questionElement.setText(String.valueOf(second));
 						rootElement.add(questionElement);
 					}
 				}
-				
-				System.out.println("rootElement " + rootElement);
 			}
+			
+			int correctMode = ParamUtil.getInteger(uploadRequest, "correctMode", CORRECT_VIDEO);
+			Element correctModeElement=rootElement.element("correctMode");
+			if(correctModeElement!=null){
+				correctModeElement.detach();
+				rootElement.remove(correctModeElement);
+			}
+			
+			correctModeElement = SAXReaderUtil.createElement("correctMode");
+			correctModeElement.setText(String.valueOf(correctMode));
+			rootElement.add(correctModeElement);
 			
 			try {
 				learningActivity.setExtracontent(document.formattedString());
@@ -478,4 +497,139 @@ public class ResourceExternalLearningActivityType extends BaseLearningActivityTy
 	public boolean canBeLinked(){
 		return false;
 	}
+	
+	
+	/**
+	 * Si tiene preguntas se calcula el 50% por ver el video y el 50% por responder correctamente a las preguntas
+	 * Si no necesita porcentaje del video para aprobarlo, se da como aprobado con cualquier porcentaje del video
+	 * @param activity actividad
+	 * @param latId
+	 * @param score int en este caso es el porcentaje del video visualizado
+	 * @return score final
+	 */
+	@Override
+	public long calculateResult(LearningActivity activity, LearningActivityTry lat){
+		long score = 0;
+		
+		try {
+			
+			Document documentActivity = SAXReaderUtil.read(activity.getExtracontent());
+			Element rootActivity=documentActivity.getRootElement();
+				
+			Document documentTry = SAXReaderUtil.read(lat.getTryResultData());
+			Element rootTry = documentTry.getRootElement();
+			
+			score = rootTry.element("score") != null ? Long.parseLong(rootTry.element("score").getText()) :  lat.getResult();
+			log.debug("score del try: " + score);
+			
+			//Comprobamos el tipo de corrección
+			Element correctModeElement = rootActivity.element("correctMode");
+			int correctMode = CORRECT_VIDEO;
+			if(correctModeElement != null){
+				correctMode = Integer.parseInt(correctModeElement.getText());
+			}
+			
+			//Comprobamos si es necesario ver un porcetanje del video para aprobar
+			boolean isDefaultScore = (activity.getPasspuntuation() == 0);
+			
+			log.debug("isDefaultScore: " + isDefaultScore);
+			
+			if(correctMode == CORRECT_QUESTIONS){
+			
+				Element video=rootActivity.element("video");
+				if(video!=null){
+					
+					List<TestQuestion> listQuestions = TestQuestionLocalServiceUtil.getQuestions(activity.getActId());
+					
+					if(listQuestions != null && listQuestions.size() > 0){
+						log.debug("tiene preguntas: " + listQuestions.size());
+						Element element = null;
+						int correctAnswers = 0;
+						int penalizedAnswers = 0;
+						int numQuestions = 0;
+						
+						Iterator<Element> questionIterator = null;
+						boolean finded = false;
+						
+						long correct = 0;
+						
+						Element questionSecond = null;
+						
+						for(TestQuestion question: listQuestions){
+							
+							try{
+								
+								questionSecond = rootActivity.element("question_" + question.getQuestionId());
+
+								if(questionSecond != null){
+									log.debug("esta pregunta tiene segundo: " + questionSecond.getText());
+									numQuestions++;
+									
+									element = null;
+									questionIterator = rootTry != null ? rootTry.elementIterator("question") : null;
+									
+									if(questionIterator != null){
+										
+										finded = false;
+										while(!finded && questionIterator.hasNext()){
+											element = questionIterator.next();
+											if(Long.parseLong(element.attributeValue("id")) == question.getQuestionId()){
+												finded = true;
+											}else{
+												element = null;
+											}
+										}
+										
+										if(element != null){
+											QuestionType qt = new QuestionTypeRegistry().getQuestionType(question.getQuestionType());
+											correct = qt.correct(element, question.getQuestionId());
+											log.debug("correct: " + correct);
+											if(correct > 0) {
+												correctAnswers += correct ;
+											}else if(question.isPenalize()){
+												penalizedAnswers++;
+											}
+										}else{
+											log.debug("no ha respondido a la pregunta: " + question.getQuestionId());
+										}
+									
+									}else{
+										log.debug("no ha respondido a ninguna pregunta " );
+									}
+								}
+							}catch(Exception e){
+								e.printStackTrace();
+							}
+						}
+						
+						log.debug("numQuestions: " + numQuestions);
+						log.debug("correctAnswers: " + correctAnswers);
+						log.debug("penalizedAnswers: " + penalizedAnswers);
+						
+						if(numQuestions > 0){
+							score = (correctAnswers - penalizedAnswers)/numQuestions;
+							log.debug("scoreQuestions: " + score);
+						}
+						
+					}
+				}
+			}else if(correctMode == CORRECT_VIDEO && isDefaultScore){
+				score = 100;
+			}
+		} catch (DocumentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SystemException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
+		log.debug("score: " + score);
+		return score;
+	}
+	
+	@Override
+	public String getMesageEditDetails() {
+		return "resource-external-activity.editquestions";
+	}
+	
 }

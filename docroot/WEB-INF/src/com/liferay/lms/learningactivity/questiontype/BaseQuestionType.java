@@ -5,13 +5,12 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Locale;
 
-import javax.portlet.ActionRequest;
+import javax.portlet.PortletRequest;
 
 import org.apache.commons.io.IOUtils;
 
 import com.liferay.lms.lar.ExportUtil;
 import com.liferay.lms.lar.ImportUtil;
-import com.liferay.lms.lar.ModuleDataHandlerImpl;
 import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.model.TestAnswer;
 import com.liferay.lms.model.TestQuestion;
@@ -99,9 +98,9 @@ public abstract class BaseQuestionType implements QuestionType, Serializable {
 	}
 	
 	@Override
-	public long correct(ActionRequest actionRequest, long questionId){
+	public long correct(PortletRequest portletRequest, long questionId){
 		return -1;
-	}
+	} 
 	
 	@Override
 	public String getHtmlView(long questionId, ThemeDisplay themeDisplay, Document document){
@@ -109,7 +108,7 @@ public abstract class BaseQuestionType implements QuestionType, Serializable {
 	}
 	
 	@Override
-	public Element getResults(ActionRequest actionRequest, long questionId){
+	public Element getResults(PortletRequest portletRequest, long questionId){
 		return null;
 	}
 	
@@ -128,7 +127,6 @@ public abstract class BaseQuestionType implements QuestionType, Serializable {
 			context.addZipEntry(patha, answer);
 			
 			//Exportar los ficheros que tiene la descripcion de la respuesta
-			ModuleDataHandlerImpl m = new ModuleDataHandlerImpl();
 			ExportUtil.descriptionFileParserDescriptionToLar("<root><Description>"+answer.getAnswer()+"</Description></root>", activity.getGroupId(), activity.getModuleId(), context, entryElementa);	
 		}
 	}
@@ -143,7 +141,6 @@ public abstract class BaseQuestionType implements QuestionType, Serializable {
 			//Si tenemos ficheros en las descripciones de las respuestas.
 			for (Element actElementFile : aElement.elements("descriptionfile")) {
 				FileEntry oldFile = (FileEntry)context.getZipEntryAsObject(actElementFile.attributeValue("path"));
-				ModuleDataHandlerImpl m = new ModuleDataHandlerImpl();
 				FileEntry newFile;
 				long folderId=0;
 				String description = "";
@@ -222,5 +219,10 @@ public abstract class BaseQuestionType implements QuestionType, Serializable {
 	public boolean getPenalize(){
 		return true;
 	}
+	
+	@Override
+	public long correct(Element element, long questionId){
+		return -1;
+	} 
 	
 }

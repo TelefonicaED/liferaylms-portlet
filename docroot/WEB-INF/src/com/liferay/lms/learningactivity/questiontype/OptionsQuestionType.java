@@ -6,7 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
-import javax.portlet.ActionRequest;
+import javax.portlet.PortletRequest;
 
 import com.liferay.lms.model.TestAnswer;
 import com.liferay.lms.model.TestQuestion;
@@ -67,10 +67,34 @@ public class OptionsQuestionType extends BaseQuestionType {
 		return "/html/questions/admin/popups/options.jsp";
 	}
 
-	public long correct(ActionRequest actionRequest, long questionId){
-		long[] answersId= ParamUtil.getLongValues(actionRequest, "question_"+questionId);
+	public long correct(PortletRequest portletRequest, long questionId){
+		long[] answersId= ParamUtil.getLongValues(portletRequest, "question_"+questionId);
 		List<Long> arrayAnswersId = new ArrayList<Long>();
 		for(long answerId:answersId) arrayAnswersId.add(answerId);
+
+		return correct(questionId, arrayAnswersId);
+		
+	}
+	
+	@Override
+	public long correct(Element element, long questionId){
+		
+		Iterator<Element> iteratorAnswers = element.elementIterator("answer");
+		List<Long> arrayAnswersId = new ArrayList<Long>();
+		
+		Element elementAnswer = null;
+		
+		while(iteratorAnswers.hasNext()) {
+			elementAnswer = iteratorAnswers.next();
+			arrayAnswersId.add(Long.parseLong(elementAnswer.attributeValue("id")));
+		}
+		
+		
+		return correct(questionId, arrayAnswersId);
+
+	}
+	
+	private long correct(long questionId, List<Long> arrayAnswersId){
 		List<TestAnswer> testAnswers = new ArrayList<TestAnswer>();
 		try {
 			testAnswers = TestAnswerLocalServiceUtil.getTestAnswersByQuestionId(questionId);
@@ -79,10 +103,16 @@ public class OptionsQuestionType extends BaseQuestionType {
 		}
 		int correctAnswers=0, correctAnswered=0, incorrectAnswered=0;
 		for(TestAnswer answer:testAnswers){
+			log.debug("comprobamos la respuesta: " + answer.getAnswerId());
 			if(isCorrect(answer)){
+				log.debug("es la correcta");
 				correctAnswers++;
-				if(arrayAnswersId.contains(answer.getAnswerId())) correctAnswered++;
-			}else if(arrayAnswersId.contains(answer.getAnswerId())) incorrectAnswered++;
+				if(arrayAnswersId.contains(answer.getAnswerId())){ 
+					correctAnswered++;
+				}
+			}else if(arrayAnswersId.contains(answer.getAnswerId())){ 
+				incorrectAnswered++;
+			}
 		}
 		boolean partialCorrection = false;
 		try{
@@ -99,15 +129,18 @@ public class OptionsQuestionType extends BaseQuestionType {
 		if(partialCorrection){
 			return correctAnswered*100/correctAnswers;
 		}else{
+			log.debug("correctAnswers: " + correctAnswers);
+			log.debug("correctAnswered: " + correctAnswered);
+			log.debug("incorrectAnswered: " + incorrectAnswered);
 			if(isQuestionCorrect(correctAnswers, correctAnswered, incorrectAnswered)){
 				return CORRECT;
 			}
 			else{
 				return INCORRECT;
 			}
-		}
-		
+		}		
 	}
+	
 	
 	protected boolean isQuestionCorrect(int correctAnswers, int correctAnswered, int incorrectAnswered){
 		return correctAnswered>0 && incorrectAnswered==0;
@@ -121,8 +154,8 @@ public class OptionsQuestionType extends BaseQuestionType {
 		return getHtml(document, questionId, false, 0, themeDisplay);
 	}
 
-	public Element getResults(ActionRequest actionRequest, long questionId){
-		long[] answersId= ParamUtil.getLongValues(actionRequest, "question_"+questionId);
+	public Element getResults(PortletRequest portletRequest, long questionId){
+		long[] answersId= ParamUtil.getLongValues(portletRequest, "question_"+questionId);
 
 		List<Long> arrayAnswersId = new ArrayList<Long>();
 		for(long answerId:answersId) arrayAnswersId.add(answerId);
@@ -130,7 +163,7 @@ public class OptionsQuestionType extends BaseQuestionType {
 		Element questionXML=SAXReaderUtil.createElement("question");
 		questionXML.addAttribute("id", Long.toString(questionId));
 
-		long currentQuestionId = ParamUtil.getLong(actionRequest, "currentQuestionId");
+		long currentQuestionId = ParamUtil.getLong(portletRequest, "currentQuestionId");
 		if (currentQuestionId == questionId) {
 			questionXML.addAttribute("current", "true");
 		}
@@ -151,6 +184,7 @@ public class OptionsQuestionType extends BaseQuestionType {
 		String timestamp="";
 		boolean isCombo = false;
 		String onclick = "";
+		String javascript = "";
 		try {
 			TestQuestion question = TestQuestionLocalServiceUtil.fetchTestQuestion(questionId);
 			if( Validator.equals(actId, 0) ){
@@ -184,7 +218,31 @@ public class OptionsQuestionType extends BaseQuestionType {
 			}
 			for(TestAnswer answer:testAnswers){
 				if(inputType.equals("checkbox")){
+					String maxNumberOfCheck = PropsUtil.get("lms.question.multiple.maxnumbercheck");
+					if(StringPool.NULL.equals(maxNumberOfCheck)){
+						maxNumberOfCheck = "0";
+					}
 					onclick = "onclick=\""+namespace+"checkMaxNumberOfChecks('"+question.getQuestionId()+"','"+numAnswer+"')\"";
+					javascript += "<script type=\"text/javascript\"> var numberOfChecks = 0; "
+							+ "function " + namespace + "checkMaxNumberOfChecks(idQ,idA){"
+							+ "		var A = AUI();"
+							+ "		if(A.one('#" + namespace + "question_'+idQ+'_'+idA+':checked')){"
+							+ "			numberOfChecks++;"
+							+ "			if(numberOfChecks==" + maxNumberOfCheck + "){ "
+							+ "				A.all('div.answer input[type=\"checkbox\"]').setAttribute('disabled','disabled');"
+							+ "				var inputs = A.all('div.answer input[type=\"checkbox\"]:checked');"
+							+ "				inputs.each(function(input){"
+							+ "					input.removeAttribute('disabled');"
+							+ "				});"
+							+ "			}"
+							+ " 	}else{"
+							+ "			if(numberOfChecks==" + maxNumberOfCheck + "){"
+							+ "			A.all('div.answer input[type=\"checkbox\"]').removeAttribute('disabled');"
+							+ "		}"
+							+ "		numberOfChecks--;"
+							+ "	}"
+							+ "}"
+							+ "</script>";
 				}
 				String correct="", checked="", showCorrectAnswer="false";
 				disabled = "";
@@ -281,7 +339,7 @@ public class OptionsQuestionType extends BaseQuestionType {
 		} catch (SystemException e) {
 			e.printStackTrace();
 		}
-		return html;
+		return html+javascript;
 	}
 
 	@Override

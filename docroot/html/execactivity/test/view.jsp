@@ -46,7 +46,7 @@ if(isTablet){%>
 
 	<script src="//code.jquery.com/jquery-1.7.2.min.js" type="text/javascript"></script> 
 	<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js" type="text/javascript"></script>
-	<script src="/liferaylms-portlet/js/jquery.ui.touch-punch.min.js" type="text/javascript"></script> 
+	<script src="/liferaylms-portlet/js/jquery.ui.touch-punch.min.js" type="text/javascript"/> 
 	<script src="/liferaylms-portlet/js/mouse.js" type="text/javascript"></script> 
 	
 		<script>
@@ -609,50 +609,6 @@ if(isTablet){%>
 						<aui:form name="formulario" action="<%=!hasPermissionAccessCourseFinished ? correctURL : correctAccessFinishedURL %>" method="post" onSubmit="javascript:return false;">
 						
 						<%
-							String maxNumberOfCheck = PropsUtil.get("lms.question.multiple.maxnumbercheck");
-							if(StringPool.NULL.equals(maxNumberOfCheck)){
-								maxNumberOfCheck = "0";
-							}
-						%>
-						
-							<!-- De momento se comenta la numeración -->
-							<!-- 			<script type="text/javascript"> -->
-							<!--  				AUI().ready(function(A) { -->
-							<!--  					//Numeramos las preguntas -->
-							<!--  					var preguntas = A.all(".questiontext > p"); -->
-							<!--  					var numPregunta = 1; -->
-												
-							<!--  					preguntas.each(function(node){ -->
-							<!--  						node.html(numPregunta + ') ' + node.html()); -->
-							<!--  						numPregunta++; -->
-							<!--  					}); -->
-							<!--  				}); -->
-							<!-- 			</script> -->
-							
-							
-							<script type="text/javascript">
-								var numberOfChecks = 0;
-								function <portlet:namespace />checkMaxNumberOfChecks(idQ,idA){
-									var A = AUI();
-									if(A.one('#<portlet:namespace />question_'+idQ+'_'+idA+':checked')){
-										numberOfChecks++;
-										if(numberOfChecks==<%=maxNumberOfCheck%>){
-											A.all('div.answer input[type="checkbox"]').setAttribute('disabled','disabled');
-											var inputs = A.all('div.answer input[type="checkbox"]:checked');
-											inputs.each(function(input){
-												input.removeAttribute('disabled');
-											});
-										}
-									}else{
-										if(numberOfChecks==<%=maxNumberOfCheck%>){
-											A.all('div.answer input[type="checkbox"]').removeAttribute('disabled');
-										}
-										numberOfChecks--;
-									}
-								}
-							</script>
-			
-							<%
 							long random = 0;
 							if(!hasPermissionAccessCourseFinished){
 								random = GetterUtil.getLong(LearningActivityLocalServiceUtil.getExtraContentValue(activity.getActId(),"random"));

@@ -4,9 +4,10 @@
 
 <c:forEach items="${listQuestions }" var="question">
 	<c:set var="questionType" value="${question.testQuestionType }" />
-	<div class="aui-helper-hidden" id="${renderResponse.namespace}question_${question.questionId}">
-		<aui:form name="${renderResponse.namespace}questionform_${question.questionId}">
-			<aui:input name="questionId" value="${question.questionId }" />
+	<div class="aui-helper-hidden" id="${renderResponse.namespace}question_${question.questionId}">	
+		<aui:form name="questionform_${question.questionId}">
+			<aui:input name="questionId" value="${question.questionId }" type="hidden"/>
+			<aui:input name="latId" value="${latId}" type="hidden"/>
 			${questionType.getHtmlView(question.questionId, themeDisplay, null) }
 			<aui:button value="save" onClick="javascript:${renderResponse.namespace}answerQuestion(${question.questionId })" />
 		</aui:form>
@@ -23,36 +24,12 @@
  <script src="https://cdn.jsdelivr.net/npm/mediaelement@4.2.7/build/renderers/twitch.min.js"></script>
  <script src="https://cdn.jsdelivr.net/npm/mediaelement@4.2.7/build/renderers/vimeo.min.js"></script>
  
- <portlet:resourceURL var="saveQuestionURL" />
+ <portlet:resourceURL var="saveQuestionURL" id="saveQuestion"/>
  
  <script>
- 	function <portlet:namespace/>answerQuestion(questionId){
- 		//Cogemos la respuesta
- 		var divQuestion = document.getElementById('<portlet:namespace/>question_' + questionId).firstElementChild;
- 		boolean validationCorrect = <portlet:namespace/>questionValidation(divQuestion);
- 		if(validationCorrect){
- 			answerQuestion = true;
- 			$.ajax({
- 				dataType: 'json',
- 				url: '${saveQuestionURL}',
- 			    cache:false,
- 				data: $("#<portlet:namespace />questionform_" + questionId).serialize(),
- 				success: function(data){			
- 					if(data){
- 						if(data.correct != ''){
-							player.play();
- 						}	
- 					}
- 				},
- 				error: function(){
- 					
- 				}
- 			});
- 		}else{
- 			//Mostramos los mensajes que sean
- 		}
- 	}
  	
+ 	var player;
+ 
      document.addEventListener('DOMContentLoaded', function() {
     	 
     	 
@@ -60,7 +37,7 @@
   	 	var plays = 0;
   	 	var finished = false;
 
-	 	var player = new MediaElement("playervideo", {
+	 	player = new MediaElement("playervideo", {
 	    	pluginPath: 'https://cdn.jsdelivr.net/npm/mediaelement@4.2.7/build/',
 	        shimScriptAccess: 'always',
 	        success: function (media, node) {
@@ -76,50 +53,28 @@
 		player.addEventListener('play', function () {
 			finished = false;
 			plays++;
-			if(!answerQuestion){
-				alert("<liferay-ui:message key='resourceexternalactivity.play-answer-question' />");
-				player.pause();
-			}
+			$('[id*^=<portlet:namespace/>question_]').addClass("aui-helper-hidden");
 		});	
 			
 		player.addEventListener('ended',function() {
 			
 			var duration = player.getDuration();
 			
-			var serviceParameterTypes = [
-			     	'long',
-			     	'int',
-			     	'double',
-			    	'int'
-			];
-			
-			var message = Liferay.Service.Lms.LearningActivityTry.update(
-				{
-					latId: '${latId}',
-					score: 100,
-					position: duration,
-					plays: plays,
-					serviceParameterTypes: JSON.stringify(serviceParameterTypes)
+			<portlet:namespace/>finishTry(100,duration,plays);	
+
+			// Process Success - A LearningActivityResult returned
+			finished = true;	
+			Liferay.Portlet.refresh('#p_p_id_activityNavigator_WAR_liferaylmsportlet_');
+			Liferay.Portlet.refresh('#p_p_id_lmsactivitieslist_WAR_liferaylmsportlet_');
+			player.setControls(true);
+			if('${isVimeoIframe}' == 'true'){
+				var src = 	document.getElementById("playervideo_vimeo_iframe").src;
+				var index = src.indexOf("background");
+				if(index > 0){
+					src = src.substring(0,index-1);
+					document.getElementById("playervideo_vimeo_iframe").src = src;
 				}
-			);
-			      	
-			var exception = message.exception;
-			            
-			if (!exception) {
-				// Process Success - A LearningActivityResult returned
-				finished = true;	
-				Liferay.Portlet.refresh('#p_p_id_activityNavigator_WAR_liferaylmsportlet_');
-				Liferay.Portlet.refresh('#p_p_id_lmsactivitieslist_WAR_liferaylmsportlet_');
-				player.setControls(true);
-				if('${isVimeoIframe}' == 'true'){
-					var src = 	document.getElementById("playervideo_vimeo_iframe").src;
-					var index = src.indexOf("background");
-					if(index > 0){
-						src = src.substring(0,index-1);
-						document.getElementById("playervideo_vimeo_iframe").src = src;
-					}
-				}
-			}									
+			}								
 		});
 		
 		//Creamos el array para las preguntas
@@ -138,7 +93,7 @@
 			
 			player.addEventListener('timeupdate', function() {
 				console.log("timeupdate");
-				if(indexQuestion < maxQuestions && nextQuestion[1] < player.currentTime){
+				if(indexQuestion < maxQuestions && nextQuestion[1] < player.currentTime && (nextQuestion[1] > (player.currentTime - 2))){
 					player.pause();
 					$('#<portlet:namespace/>question_' + nextQuestion[0]).removeClass("aui-helper-hidden");
 					indexQuestion++;
@@ -146,6 +101,8 @@
 						nextQuestion = questions[indexQuestion];
 					}
 					answerQuestion = false;
+				}else if(indexQuestion < maxQuestions && nextQuestion[1] < player.currentTime){
+					indexQuestion++;
 				}
 			});
 		}
@@ -164,27 +121,7 @@
 				var score = 100;														
 				if (!isDefaultScore) score = Math.round((currentTime/duration)*100);
 				//debugger;
-				var serviceParameterTypes = [
-			     	'long',
-			     	'int',
-			     	'double',
-			    	'int'
-			    ];
-				var message = Liferay.Service.Lms.LearningActivityTry.update(
-					{
-						latId: '${latId}',
-						score: score,
-						position: positionToSave,
-						plays: plays,
-						serviceParameterTypes: JSON.stringify(serviceParameterTypes)
-					}
-				);
-				
-				var exception = message.exception;
-						
-				if (!exception) {
-					// Process Success - A LearningActivityResult returned
-				}														
+				<portlet:namespace/>finishTry(score, positionToSave,plays);													
 			  
 			}
 		};
@@ -192,6 +129,40 @@
 		window.addEventListener("beforeunload", unloadEvent);
 		
 	});
-	
-	</script>	
+     
+ 	function <portlet:namespace/>answerQuestion(questionId){
+ 		//Cogemos la respuesta
+ 		console.log("guardamos respuesta");
+ 		var A = AUI();
+ 		var divQuestionId = $('.question',$('#_resourceExternalActivity_WAR_liferaylmsportlet_question_'+questionId)).attr("id");
+ 		var divQuestion = A.one('#' + divQuestionId);
+ 		var validationCorrect = <portlet:namespace/>questionValidation(divQuestion);
+ 		if (typeof validQuestion == 'undefined') {
+ 			validationCorrect = <portlet:namespace />questionValidation(divQuestion);
+    	}
+ 		if(validationCorrect){
+ 			answerQuestion = true;
+ 			$.ajax({
+ 				dataType: 'json',
+ 				url: '${saveQuestionURL}',
+ 			    cache:false,
+ 				data: $("#<portlet:namespace />questionform_" + questionId).serialize(),
+ 				success: function(data){			
+ 					if(data){
+ 						if(data.correct){
+ 							$('#_resourceExternalActivity_WAR_liferaylmsportlet_question_'+questionId).remove();
+							player.play();
+ 						}	
+ 					}
+ 				},
+ 				error: function(){
+ 					
+ 				}
+ 			});
+ 		}else{
+ 			//Mostramos los mensajes que sean
+ 		}
+ 	}
+
+</script>	
 	

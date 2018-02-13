@@ -169,9 +169,4 @@ public class LearningActivityTryServiceImpl
 		}
 		return null;
 	}
-	
-	public LearningActivityTry update(long latId, int score, double position, int plays) throws SystemException, PortalException {
-		return learningActivityTryLocalService.update(latId, score, position, plays);
-	}
-	
 }

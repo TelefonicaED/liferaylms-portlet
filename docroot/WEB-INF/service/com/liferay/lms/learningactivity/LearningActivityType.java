@@ -7,6 +7,7 @@ import javax.portlet.ActionResponse;
 import javax.portlet.PortletResponse;
 
 import com.liferay.lms.model.LearningActivity;
+import com.liferay.lms.model.LearningActivityTry;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.lar.PortletDataContext;
@@ -52,4 +53,5 @@ public interface LearningActivityType extends InvokableService
 	public String addZipEntry(LearningActivity actividad, Long assetEntryId, PortletDataContext context, Element entryElementLoc) throws PortalException, SystemException;
 	public boolean canBeLinked();
 	public boolean canBeSeenResults();
+	public long calculateResult(LearningActivity learningActivity, LearningActivityTry lat);
 }

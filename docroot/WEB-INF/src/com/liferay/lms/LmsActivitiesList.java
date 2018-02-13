@@ -304,8 +304,7 @@ public class LmsActivitiesList extends MVCPortlet {
 		}
 				
 		long tries = ParamUtil.getLong(uploadRequest, "tries", 0);
-		int passpuntuation = ParamUtil.getInteger(uploadRequest, "passpuntuation", 0);
-		java.util.Date ahora = new java.util.Date(System.currentTimeMillis());
+		Date ahora = new java.util.Date(System.currentTimeMillis());
 		
 		//validating
 		Enumeration<String> parNams= uploadRequest.getParameterNames();
@@ -330,12 +329,7 @@ public class LmsActivitiesList extends MVCPortlet {
 			SessionErrors.add(actionRequest, "activity-title-required");
 			return;
 		}
-		/* La descripcion es opcional */
-		/*
-		if (Validator.isNull(HtmlUtil.extractText(description))) {
-			SessionErrors.add(actionRequest, "description-required");
-		}
-		*/
+		
 		if(Validator.equals(moduleId, 0))
 		{
 			SessionErrors.add(actionRequest, "module-required");
@@ -368,6 +362,8 @@ public class LmsActivitiesList extends MVCPortlet {
 			actionResponse.setRenderParameters(uploadRequest.getParameterMap());
 			return;
 		}
+		
+		int passpuntuation = ParamUtil.getInteger(uploadRequest, "passpuntuation", (int)learningActivityType.getDefaultScore());
 		
 		
 		if (actId == 0){

@@ -87,48 +87,6 @@ AUI().ready('node','aui-io-request','aui-parse-content','aui-sortable',function(
 		}
 	);
 });
-<%--
-var prueba = A.one('tbody#<portlet:namespace/>questionContainer');
-new A.Sortable(
-		{
-			container: A.one('tbody#<portlet:namespace />questionContainer'),
-		    nodes: 'tr.results-row',
-            after: {   
-            	'drag:end': function(event){ 
-            		
-				    var node = event.target.get('node'),
-			            prev = node.previous(),
-			            next = node.next(),
-			            movedPageId = parseInt(node.get('id').substr(<%="question-".length()%>),0),
-		            	prevPageId = 0,
-		            	nextPageId = 0;
-
-			        if(prev){
-			          prevPageId = parseInt(prev.get('id').substr(<%="question-".length()%>),0);
-				    }
-
-			        if(next){
-			          nextPageId = parseInt(next.get('id').substr(<%="question-".length()%>),0);
-				    }
-			
-					A.io.request('<%=moveQuestionURL %>', {  
-						data: {
-				            <portlet:namespace />pageId: movedPageId,
-				            <portlet:namespace />prevPageId: prevPageId,
-				            <portlet:namespace />nextPageId: nextPageId
-				        },
-					    dataType : 'html', 
-					  on: {  
-				  		success: function() {  
-							 Liferay.Portlet.refresh(A.one('#p_p_id<portlet:namespace />'),{'p_t_lifecycle':0,'<%=renderResponse.getNamespace()+WebKeys.PORTLET_CONFIGURATOR_VISIBILITY %>':'<%=StringPool.TRUE %>'});
-				        } 
-					   }  
-					});    
-            	}              
-            }
-		}
-	);
-});	--%>
 </script>
  
 <liferay-ui:search-container emptyResultsMessage="there-are-no-questions"

@@ -76,6 +76,7 @@
 		<icon>/icon.png</icon>
 		<instanceable>false</instanceable>
 		<header-portlet-css>/css/main.css</header-portlet-css>
+		<header-portlet-javascript>/js/test.js</header-portlet-javascript>
 		<footer-portlet-javascript>/js/main.js</footer-portlet-javascript>
 		<css-class-wrapper>resourceExternalActivity-portlet</css-class-wrapper>
 		<add-default-resource>true</add-default-resource>
