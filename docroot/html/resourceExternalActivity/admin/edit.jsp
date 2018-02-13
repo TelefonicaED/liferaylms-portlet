@@ -61,7 +61,7 @@
 		}catch(Exception e){}
 	}
 %>
-
+ 
 <%
 	SimpleDateFormat sdf = new SimpleDateFormat("HH:mm dd/MM/yyy",themeDisplay.getLocale());
 	sdf.setTimeZone(themeDisplay.getTimeZone());
@@ -118,7 +118,10 @@
 	}
 	
 	if(LearningActivityLocalServiceUtil.canBeEdited(learningActivity, user.getUserId())) readonly=false;
-	List<TestQuestion> listQuestions = TestQuestionLocalServiceUtil.getQuestions(learningActivity.getActId());
+	List<TestQuestion> listQuestions = null;
+	if(learningActivity != null && learningActivity.getActId() > 0 ){
+		listQuestions = TestQuestionLocalServiceUtil.getQuestions(learningActivity.getActId());
+	}
 	
 	String passpuntuationLabelProperty = "resourceexternalactivity.passpuntuation";
 	String passpunctuationHelpProperty= "resourceexternalactivity.passpuntuation.help";
@@ -130,7 +133,7 @@
 %>
 
 
-	<%if(learningActivity != null && listQuestions != null && listQuestions.size() > 0){%>
+	<%if(learningActivity != null && learningActivity.getActId() > 0 && listQuestions != null && listQuestions.size() > 0){%>
 		<aui:field-wrapper label="course-correction-method">
 			<%if(readonly) {%>
 				<aui:input type="radio" readonly="<%=readonly %>" name="correctMode" value="<%=ResourceExternalLearningActivityType.CORRECT_VIDEO %>" label="resource-external-activity.correct-video" checked="<%=ResourceExternalLearningActivityType.CORRECT_VIDEO == correctMode %>"/>
@@ -201,6 +204,7 @@
   								<c:set var="questionId" value="<%=question.getQuestionId()%>" />
   								<aui:input name="second_${questionId }" label="" value='<%=second != null ? second.getText() : "0" %>'>
   									<aui:validator name="number"/>
+  									<aui:validator name="min" errorMessage="editActivity.passpuntuation.range">-1</aui:validator>
   								</aui:input>
   							</td>
   						</tr>
