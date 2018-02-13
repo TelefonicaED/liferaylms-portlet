@@ -440,10 +440,7 @@ public class GradeBook extends MVCPortlet {
 		
 		LearningActivityResult learningActivityResult = LearningActivityResultLocalServiceUtil.getByActIdAndUserId(learningActivityTry.getActId(), learningActivityTry.getUserId());
 		if(learningActivityResult.getResult() != learningActivityTry.getResult()) {
-			LearningActivity learningActivity = LearningActivityLocalServiceUtil.getLearningActivity(learningActivityTry.getActId());
-			learningActivityResult.setResult(learningActivityTry.getResult());
-			learningActivityResult.setPassed(learningActivityTry.getResult()>=learningActivity.getPasspuntuation());
-			LearningActivityResultLocalServiceUtil.updateLearningActivityResult(learningActivityResult);
+			LearningActivityResultLocalServiceUtil.update(learningActivityTry);
 		}
 	}
 	
