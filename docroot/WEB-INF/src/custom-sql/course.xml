@@ -153,6 +153,7 @@
 			[$JOINASSETTAGS$]
 			[$JOINTEMPLATES$]
 			[$JOINRESOURCEPERMISSION$]
+			[$JOINCUSTOMATTRIBUTE$]
 			WHERE 
 			( 
 				c.companyId = ? OR ? = 0 
@@ -183,6 +184,7 @@
 			[$JOINASSETTAGS$]
 			[$JOINTEMPLATES$]
 			[$JOINRESOURCEPERMISSION$]
+			[$JOINCUSTOMATTRIBUTE$]
 			WHERE 
 			( 
 				c.companyId = ? OR ? = 0 
@@ -622,6 +624,17 @@
 				lms_course c 
 					ON g.groupId = c.groupId
 			WHERE g.companyId = ?
+		]]>
+	</sql>
+	<sql id="com.liferay.lms.service.persistence.CourseFinder.innerCustomAttribute">
+		<![CDATA[
+			INNER JOIN 
+				expandovalue ev 
+					ON ev.companyId = c.companyId 
+						AND ev.tableId = ?
+						AND ev.columnId = ?
+						AND ev.classPK = c.courseId
+						AND ev.data_ = ?		
 		]]>
 	</sql>
 </custom-sql>

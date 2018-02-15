@@ -81,6 +81,7 @@ import com.liferay.portal.kernel.servlet.HttpHeaders;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.upload.UploadPortletRequest;
+import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -121,6 +122,7 @@ import com.liferay.portlet.announcements.EntryDisplayDateException;
 import com.liferay.portlet.asset.AssetCategoryException;
 import com.liferay.portlet.asset.model.AssetVocabulary;
 import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
+import com.liferay.portlet.asset.service.AssetTagLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.model.DLFolder;
 import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
 import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
@@ -1535,6 +1537,12 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 			JSONArray usersJSONArray = JSONFactoryUtil.createJSONArray();
 			
 			String courseTitle = ParamUtil.getString(request, "courseTitle");
+			long courseId = ParamUtil.getLong(request, "courseId");
+			long selectedGroupId = ParamUtil.get(request,"selectedGroupId",-1);
+			int state = ParamUtil.getInteger(request, "state",WorkflowConstants.STATUS_APPROVED);
+			long columnId = ParamUtil.getLong(request, "columnId");
+			String expandoValue = ParamUtil.getString(request, "expando_" + columnId, "");
+			long[] catIds=ParamUtil.getLongValues(request, "categoryIds");
 
 			boolean isAdmin = false;
 			try {
@@ -1547,8 +1555,92 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 				e.printStackTrace();
 			}
 			
-			List<Course> listCourse = CourseLocalServiceUtil.getParentCoursesByTitleStatusCategoriesTagsTemplates(courseTitle, -1, null, null, getCourseTemplates(request.getPreferences(), themeDisplay.getCompanyId()), themeDisplay.getCompanyId(), 
-					themeDisplay.getScopeGroupId(), themeDisplay.getUserId(), themeDisplay.getLanguageId(), isAdmin, true, -1, -1);
+			boolean searchOnlyCourseParents = courseId == 0;
+			
+			Enumeration<String> pnames =request.getParameterNames();
+			ArrayList<String> tparams = new ArrayList<String>();
+			ArrayList<Long> assetCategoryIds = new ArrayList<Long>();
+
+			while(pnames.hasMoreElements()){
+				String name = pnames.nextElement();
+				if(name.length()>16&&name.substring(0,16).equals("assetCategoryIds")){
+					tparams.add(name);
+					String value = request.getParameter(name);
+					String[] values = value.split(",");
+					for(String valuet : values){
+						try{
+							assetCategoryIds.add(Long.parseLong(valuet));
+						}catch(Exception e){
+						}
+					}
+					
+				}
+			}
+
+			StringBuffer sb = new StringBuffer();
+			for(long cateId : assetCategoryIds){
+				sb.append(cateId);
+				sb.append(",");
+			}
+
+			if((catIds==null||catIds.length<=0)&&(assetCategoryIds!=null&&assetCategoryIds.size()>0)){
+				catIds = new long[assetCategoryIds.size()];
+				for(int i=0;i<assetCategoryIds.size();i++){
+					catIds[i] = assetCategoryIds.get(i);
+				}
+			}
+			
+			long[] categoryIds = ArrayUtil.toArray(assetCategoryIds.toArray(new Long[assetCategoryIds.size()]));
+			
+			long groupId = themeDisplay.getScopeGroupId();
+			if(selectedGroupId>-1){
+				groupId = selectedGroupId;
+			}
+			
+			int closed = -1;
+			if(state!=WorkflowConstants.STATUS_ANY){
+				if(state==WorkflowConstants.STATUS_APPROVED){
+					closed = 0;
+				}
+				else if(state==WorkflowConstants.STATUS_INACTIVE){
+					closed = 1;
+				}
+			}
+			
+			String[] tagsSel = null;
+			long[] tagsSelIds = null;
+			try {
+				ServiceContext sc = ServiceContextFactory.getInstance(request);
+				tagsSel = sc.getAssetTagNames();
+
+				if(tagsSel != null){
+					long[] groups = new long[]{themeDisplay.getScopeGroupId()};
+					tagsSelIds = AssetTagLocalServiceUtil.getTagIds(groups, tagsSel);
+				}
+			} catch (PortalException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} catch (SystemException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			
+			String templates = getCourseTemplates(request.getPreferences(), themeDisplay.getCompanyId());
+			
+			log.debug("courseTitle: " + courseTitle);
+			log.debug("closed: " + closed);
+			log.debug("categoryIds: " + categoryIds);
+			log.debug("tagsSelIds: " + tagsSelIds);
+			log.debug("templates: " + templates);
+			log.debug("columnId: " + columnId);
+			log.debug("expandoValue: " + expandoValue);
+			log.debug("courseId: " + courseId);
+			log.debug("themeDisplay.getCompanyId(): " + themeDisplay.getCompanyId());
+			log.debug("groupId: " + groupId);
+			log.debug("isAdmin: " + isAdmin);
+			
+			List<Course> listCourse = CourseLocalServiceUtil.searchCourses(courseTitle, closed, categoryIds, tagsSelIds, templates, columnId, expandoValue, courseId,
+					themeDisplay.getCompanyId(), groupId, themeDisplay.getUserId(), themeDisplay.getLanguageId(), isAdmin, true, true, -1, -1);
 			
 			JSONObject userJSON = null;
 

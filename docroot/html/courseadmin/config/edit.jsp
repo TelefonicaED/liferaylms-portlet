@@ -1,3 +1,4 @@
+<%@page import="com.liferay.portlet.expando.model.ExpandoTableConstants"%>
 <%@page import="com.liferay.portal.kernel.util.DateUtil"%>
 <%@page import="com.liferay.portlet.expando.model.ExpandoColumnConstants"%>
 <%@page import="com.liferay.lms.model.Course"%>
@@ -59,10 +60,13 @@
 	
 	int tipoImport = Integer.parseInt(preferences.getValue("tipoImport", "1"));
 	boolean hasImportById = (tipoImport != 2);
-
+	
+	boolean expandos = Boolean.parseBoolean(preferences.getValue("showExpandos", "false"));
+	boolean expandosEdition = Boolean.parseBoolean(preferences.getValue("showExpandosEdition", "false"));
+	List<ExpandoColumn> listExpandos = ExpandoColumnLocalServiceUtil.getColumns(themeDisplay.getCompanyId(), Course.class.getName(), ExpandoTableConstants.DEFAULT_TABLE_NAME);
 %>
 
-<liferay-portlet:actionURL var="saveConfigurationURL"  portletConfiguration="true"/>
+<liferay-portlet:actionURL var="saveConfigurationURL"  portletConfiguration="true"/> 
 <aui:form action="<%=saveConfigurationURL %>" >
 	<aui:input type="hidden" name="<%=Constants.CMD %>" value="<%=Constants.UPDATE %>" />
 		
@@ -70,6 +74,28 @@
 		<aui:input type="checkbox" name="showSearchTags" label="courseadmin.config.showSearchTags" value="<%=showSearchTags %>" checked="<%=showSearchTags %>"/>
 		<aui:input type="checkbox" name="showGroupFilter" label="courseadmin.config.show-group-filter" value="<%=showGroupFilter %>" checked="<%=showGroupFilter %>"/>
 		<aui:input type="checkbox" helpMessage="help-available-categories" label="available-categories" name="categories" value="<%=preferences.getValue(\"categories\", StringPool.TRUE) %>" ignoreRequestValue="true"/>
+		
+		<aui:input type="checkbox" name="showExpandos" label="custom-attributes" value="<%=expandos %>" checked="<%=expandos %>" 
+			onchange="javascript:${renderResponse.getNamespace()}changeCustomAttributes()"/>
+	
+		<div class='lfr-panel lfr-collapsible lfr-panel-basic <%=expandos ? "" : "aui-helper-hidden" %>' id="${renderResponse.getNamespace()}selectCustomAttributes">
+			<%for(ExpandoColumn expandoColumn: listExpandos){
+				boolean checked = Boolean.parseBoolean(preferences.getValue("showExpando_" + expandoColumn.getColumnId(), "false"));
+				String nameExpando = "showExpando_" + expandoColumn.getColumnId();%>
+				<aui:input type="checkbox" name="<%=nameExpando%>" label="<%=expandoColumn.getName() %>" value="<%=checked %>" checked="<%=checked %>" />
+			<%} %>
+		</div>
+		
+		<aui:input type="checkbox" name="showExpandosEdition" label="custom-attributes-edition" value="<%=expandosEdition %>" checked="<%=expandosEdition %>" 
+			onchange="javascript:${renderResponse.getNamespace()}changeCustomAttributesEdition()"/>
+	
+		<div class='lfr-panel lfr-collapsible lfr-panel-basic <%=expandosEdition ? "" : "aui-helper-hidden" %>' id="${renderResponse.getNamespace()}selectCustomAttributesEdition">
+			<%for(ExpandoColumn expandoColumn: listExpandos){
+				boolean checked = Boolean.parseBoolean(preferences.getValue("showExpandoEdition_" + expandoColumn.getColumnId(), "false"));
+				String nameExpando = "showExpandoEdition_" + expandoColumn.getColumnId();%>
+				<aui:input type="checkbox" name="<%=nameExpando%>" label="<%=expandoColumn.getName() %>" value="<%=checked %>" checked="<%=checked %>" />
+			<%} %>
+		</div>
 	</aui:field-wrapper>
 	
 	<aui:field-wrapper label="course-fields" >
@@ -129,7 +155,7 @@
 						showExpandoDateFormat = true;
 					%>
 					<aui:input type="checkbox" 
-						label="<%=LanguageUtil.get(portletConfig, themeDisplay.getLocale(), \"show\") + StringPool.SPACE +  expandoName%>"
+						label="<%=LanguageUtil.get(portletConfig, themeDisplay.getLocale(), \"show\") + StringPool.SPACE +  LanguageUtil.get(portletConfig, themeDisplay.getLocale(), expandoName)%>"
 						name="<%=\"show\"+ expandoName %>" 
 						value="<%=show %>" checked="<%=show %>"/>
 					<%
@@ -176,13 +202,8 @@ String[] lspist=LmsPrefsLocalServiceUtil.getLmsPrefsIni(themeDisplay.getCompanyI
 			<%
 		}
 		%>
-		
-		 
 			<aui:input type="checkbox" name="filterByTemplates" label="courseadmin.config.filter-by-template" value="<%=filterByTemplates %>" checked="<%=filterByTemplates %>"/>
 		</aui:field-wrapper>
-		
-		
-
 	<aui:field-wrapper  label="modulenavigation.Mode" >
 		<aui:input type="checkbox" name="showOnlyOrganizationUsers" label="modulenavigation.organizationMode" value="<%=showOnlyOrganizationUsers %>" checked="<%=showOnlyOrganizationUsers %>"/>
 	</aui:field-wrapper>
@@ -192,3 +213,23 @@ String[] lspist=LmsPrefsLocalServiceUtil.getLmsPrefsIni(themeDisplay.getCompanyI
 	</aui:button-row>
 	
 </aui:form>
+
+<script>
+	function <portlet:namespace />changeCustomAttributes(){
+		var checked = document.getElementById('_86_showExpandos').value;
+		if(checked == 'true'){
+			document.getElementById('<portlet:namespace />selectCustomAttributes').className = "lfr-panel lfr-collapsible lfr-panel-basic";
+		}else{
+			document.getElementById('<portlet:namespace />selectCustomAttributes').className = "lfr-panel lfr-collapsible lfr-panel-basic aui-helper-hidden";
+		}
+	}
+	
+	function <portlet:namespace />changeCustomAttributesEdition(){
+		var checked = document.getElementById('_86_showExpandosEdition').value;
+		if(checked == 'true'){
+			document.getElementById('<portlet:namespace />selectCustomAttributesEdition').className = "lfr-panel lfr-collapsible lfr-panel-basic";
+		}else{
+			document.getElementById('<portlet:namespace />selectCustomAttributesEdition').className = "lfr-panel lfr-collapsible lfr-panel-basic aui-helper-hidden";
+		}
+	}
+</script>

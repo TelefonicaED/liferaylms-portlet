@@ -65,6 +65,7 @@ import com.liferay.portal.util.PortalUtil;
 import com.liferay.portlet.announcements.EntryDisplayDateException;
 import com.liferay.portlet.asset.service.AssetTagLocalServiceUtil;
 import com.liferay.portlet.expando.model.ExpandoColumn;
+import com.liferay.portlet.expando.model.ExpandoTableConstants;
 import com.liferay.portlet.expando.service.ExpandoColumnLocalServiceUtil;
 import com.tls.lms.util.LiferaylmsUtil;
 
@@ -163,209 +164,7 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 	
 	private void showViewDefault(RenderRequest renderRequest,RenderResponse renderResponse) throws IOException, PortletException{
 		
-		ThemeDisplay themeDisplay = (ThemeDisplay)renderRequest.getAttribute(WebKeys.THEME_DISPLAY);
-		
-		String search = ParamUtil.getString(renderRequest, "search","");
-		String freetext = ParamUtil.getString(renderRequest, "freetext","");
-		String tags = ParamUtil.getString(renderRequest, "tags","");
-		int state = ParamUtil.getInteger(renderRequest, "state",WorkflowConstants.STATUS_APPROVED);
-		long selectedGroupId = ParamUtil.get(renderRequest,"selectedGroupId",-1);
-		long catId=ParamUtil.getLong(renderRequest, "categoryId",0);
-		
-		//*****************************************Cogemos los tags************************************//
-		String[] tagsSel = null;
-		long[] tagsSelIds = null;
-		try {
-			ServiceContext sc = ServiceContextFactory.getInstance(renderRequest);
-			tagsSel = sc.getAssetTagNames();
-
-			if(tagsSel != null){
-				long[] groups = new long[]{themeDisplay.getScopeGroupId()};
-				tagsSelIds = AssetTagLocalServiceUtil.getTagIds(groups, tagsSel);
-			}
-		} catch (PortalException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		} catch (SystemException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-
-		//*****************************************Si se muestra el filtro de grupos, cogemos los grupos*****//
-		if(Boolean.parseBoolean(renderRequest.getPreferences().getValue("showGroupFilter", "false"))){
-			List<Group> courseGroups = CourseLocalServiceUtil.getDistinctCourseGroups(themeDisplay.getCompanyId());
-			renderRequest.setAttribute("listGroups", courseGroups);
-			renderRequest.setAttribute("selectedGroupId", selectedGroupId);
-		}
-		
-		
-		//*****************************************Cogemos las categorias************************************//
-		Enumeration<String> pnames =renderRequest.getParameterNames();
-		ArrayList<String> tparams = new ArrayList<String>();
-		ArrayList<Long> assetCategoryIds = new ArrayList<Long>();
-		
-
-
-		while(pnames.hasMoreElements()){
-			String name = pnames.nextElement();
-			if(name.length()>16&&name.substring(0,16).equals("assetCategoryIds")){
-				tparams.add(name);
-				String value = renderRequest.getParameter(name);
-				String[] values = value.split(",");
-				for(String valuet : values){
-					try{
-						assetCategoryIds.add(Long.parseLong(valuet));
-					}catch(Exception e){
-					}
-				}
-				
-			}
-		}
-		
-		//***************************Si estás buscando te guarda los parámetros en la sesión, si no estás buscando te los coge de la sesión****************************//
-
-		PortletSession portletSession = renderRequest.getPortletSession();
-		if(ParamUtil.getString(renderRequest, "search").equals("search")){
-			portletSession.setAttribute("freetext", freetext);
-			portletSession.setAttribute("state", state);
-			portletSession.setAttribute("assetCategoryIds", assetCategoryIds);
-			portletSession.setAttribute("assetTagIds", tagsSelIds);
-
-		}else{
-			try{
-				String freetextTemp = (String)portletSession.getAttribute("freetext");
-				if(freetextTemp!=null){
-					freetext = freetextTemp;
-				}
-			}catch(Exception e){
-				log.debug(e);
-			}
-			try{
-				ArrayList<Long> assetCategoryIdsTemp = (ArrayList<Long>)portletSession.getAttribute("assetCategoryIds");
-				if(assetCategoryIdsTemp!=null){
-					assetCategoryIds = assetCategoryIdsTemp;
-				}
-			}catch(Exception e){
-				log.debug(e);
-			}
-			try{
-				Integer stateTemp = (Integer)portletSession.getAttribute("state");
-				if(stateTemp!=null){
-					state = stateTemp;
-				}
-			}catch(Exception e){}
-		}
-				
-		long[] catIds=ParamUtil.getLongValues(renderRequest, "categoryIds");
-
-		StringBuffer sb = new StringBuffer();
-		for(long cateId : assetCategoryIds){
-			sb.append(cateId);
-			sb.append(",");
-		}
-		String catIdsText = sb.toString();
-
-		if((catIds==null||catIds.length<=0)&&(assetCategoryIds!=null&&assetCategoryIds.size()>0)){
-			catIds = new long[assetCategoryIds.size()];
-			for(int i=0;i<assetCategoryIds.size();i++){
-				catIds[i] = assetCategoryIds.get(i);
-			}
-		}
-		
-		
-		//***********************  COGEMOS LAS PLANTILLAS ********************/
-		
-		// Templates
-		String templates = getCourseTemplates(renderRequest.getPreferences(), themeDisplay.getCompanyId());
-		
-		PortletURL portletURL = renderResponse.createRenderURL();
-		portletURL.setParameter("javax.portlet.action","doView");
-		portletURL.setParameter("freetext",freetext);
-		portletURL.setParameter("selectedGroupId", String.valueOf(selectedGroupId));
-		portletURL.setParameter("state",String.valueOf(state));
-
-		pnames =renderRequest.getParameterNames();
-		while(pnames.hasMoreElements()){
-			String name = pnames.nextElement();
-			if(name.length()>16&&name.substring(0,16).equals("assetCategoryIds")){
-				portletURL.setParameter(name,renderRequest.getParameter(name));
-			}
-		}
-		for(String param : tparams){
-			portletURL.setParameter(param,renderRequest.getParameter(param));
-		}
-		portletURL.setParameter("search","search");
-		
-		long[] categoryIds = ArrayUtil.toArray(assetCategoryIds.toArray(new Long[assetCategoryIds.size()]));
-		
-		int closed = -1;
-		if(state!=WorkflowConstants.STATUS_ANY){
-			if(state==WorkflowConstants.STATUS_APPROVED){
-				closed = 0;
-			}
-			else if(state==WorkflowConstants.STATUS_INACTIVE){
-				closed = 1;
-			}
-		}
-		
-		boolean isAdmin = false;
-		try {
-			isAdmin = RoleLocalServiceUtil.hasUserRole(themeDisplay.getUserId(), RoleLocalServiceUtil.getRole(themeDisplay.getCompanyId(), RoleConstants.ADMINISTRATOR).getRoleId());
-		} catch (SystemException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (PortalException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		long groupId = themeDisplay.getScopeGroupId();
-		log.debug("SELECTED GROUP ID " + selectedGroupId);
-		if(selectedGroupId>-1){
-			groupId = selectedGroupId;
-		}
-		
-		SearchContainer<Course> searchContainer = new SearchContainer<Course>(renderRequest, null, null, SearchContainer.DEFAULT_CUR_PARAM, 
-				SearchContainer.DEFAULT_DELTA, portletURL, 
-				null, "there-are-no-courses");
-
-		searchContainer.setResults(CourseLocalServiceUtil.getParentCoursesByTitleStatusCategoriesTagsTemplates(freetext, closed, categoryIds, tagsSelIds, templates, themeDisplay.getCompanyId(), 
-				groupId, themeDisplay.getUserId(), themeDisplay.getLanguageId(), isAdmin, true, searchContainer.getStart(), searchContainer.getEnd()));
-		searchContainer.setTotal(CourseLocalServiceUtil.countParentCoursesByTitleStatusCategoriesTagsTemplates(freetext, closed, categoryIds, tagsSelIds, templates, themeDisplay.getCompanyId(), 
-				groupId, themeDisplay.getUserId(), themeDisplay.getLanguageId(), isAdmin, true));
-		
-		renderRequest.setAttribute("searchContainer", searchContainer);
-		renderRequest.setAttribute("catIds", catIds);
-		renderRequest.setAttribute("noAssetCategoryIds", assetCategoryIds == null || assetCategoryIds.size() == 0);
-		renderRequest.setAttribute("catId", catId);
-		renderRequest.setAttribute("search", search);
-		renderRequest.setAttribute("freetext", freetext);
-		renderRequest.setAttribute("tags", tags);
-		renderRequest.setAttribute("state", state);
-		renderRequest.setAttribute("catIdsText", catIdsText);
-		renderRequest.setAttribute("STATUS_APPROVED", WorkflowConstants.STATUS_APPROVED);
-		renderRequest.setAttribute("STATUS_INACTIVE", WorkflowConstants.STATUS_INACTIVE);
-		renderRequest.setAttribute("STATUS_ANY", WorkflowConstants.STATUS_ANY);
-		
-		
-		try {
-			List<ExpandoColumn> expandosColumnUser = ExpandoColumnLocalServiceUtil.getDefaultTableColumns(themeDisplay.getCompanyId(), ClassNameLocalServiceUtil.getClassNameId(Course.class));
-			List<String> expandoNames = new ArrayList<String>();
-			if(Validator.isNotNull(expandosColumnUser) && expandosColumnUser.size()>0) {
-				String expandoName="";
-				for (ExpandoColumn expandoUser : expandosColumnUser) {
-					expandoName = StringUtil.upperCaseFirstLetter(expandoUser.getName());
-					if(((renderRequest.getPreferences().getValue("show" + expandoName, "false")).compareTo("true") == 0)) {
-						expandoNames.add(expandoName);
-					}
-				}	
-			}
-		
-			renderRequest.setAttribute("expandoNames", expandoNames);
-		} catch (SystemException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		searchCourses(renderRequest, renderResponse);
 		
 		include(this.viewJSP, renderRequest, renderResponse);
 	}
@@ -374,20 +173,20 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 		
 		ThemeDisplay themeDisplay = (ThemeDisplay)renderRequest.getAttribute(WebKeys.THEME_DISPLAY);
 		
+		PortletURL backURL = renderResponse.createRenderURL();
+		renderRequest.setAttribute("backURL", backURL);
+		
 		include(this.editCourseJSP, renderRequest, renderResponse);
 	}
 	
 	private void showViewEditions(RenderRequest renderRequest,RenderResponse renderResponse) throws IOException, PortletException{
 		
 		ThemeDisplay themeDisplay = (ThemeDisplay)renderRequest.getAttribute(WebKeys.THEME_DISPLAY);
+		
+		searchCourses(renderRequest, renderResponse);
+		
 		long courseId = ParamUtil.getLong(renderRequest, "courseId");
-		String name = ParamUtil.getString(renderRequest, "name");
-		PortletURL portletURL = renderResponse.createRenderURL();
-		portletURL.setParameter("javax.portlet.action","doView");
-		portletURL.setParameter("courseId", String.valueOf(courseId));
-		portletURL.setParameter("view", "editions");
-		portletURL.setParameter("name", name);
-		renderRequest.setAttribute("courseId", courseId);
+		
 		Course course;
 		try {
 			course = CourseLocalServiceUtil.fetchCourse(courseId);
@@ -400,57 +199,15 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 		}
 		
 		PortletURL backURL = renderResponse.createRenderURL();
-		backURL.setParameter("javax.portlet.action","doView");
 		renderRequest.setAttribute("backURL", backURL);
-		
-		SearchContainer<Course> searchContainer = new SearchContainer<Course>(renderRequest, null, null, SearchContainer.DEFAULT_CUR_PARAM, 
-				SearchContainer.DEFAULT_DELTA, portletURL, 
-				null, "there-are-no-editions");
-
-		
-		boolean isAdmin = false;
-		try {
-			isAdmin = RoleLocalServiceUtil.hasUserRole(themeDisplay.getUserId(), RoleLocalServiceUtil.getRole(themeDisplay.getCompanyId(), RoleConstants.ADMINISTRATOR).getRoleId());
-		} catch (SystemException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (PortalException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		searchContainer.setResults(CourseLocalServiceUtil.getChildCoursesByTitle(name, courseId, WorkflowConstants.STATUS_ANY, themeDisplay.getCompanyId(), 0, themeDisplay.getUserId(),themeDisplay.getLanguageId() , isAdmin , true, searchContainer.getStart(), searchContainer.getEnd()));
-		searchContainer.setTotal(CourseLocalServiceUtil.countChildCoursesByTitle(name, courseId, WorkflowConstants.STATUS_ANY, themeDisplay.getCompanyId(), 0, themeDisplay.getUserId(),themeDisplay.getLanguageId() , isAdmin , true));
-		
-		
-		renderRequest.setAttribute("searchContainer", searchContainer);
-		
-		try {
-			List<ExpandoColumn> expandosColumnUser = ExpandoColumnLocalServiceUtil.getDefaultTableColumns(themeDisplay.getCompanyId(), ClassNameLocalServiceUtil.getClassNameId(Course.class));
-			List<String> expandoNames = new ArrayList<String>();
-			if(Validator.isNotNull(expandosColumnUser) && expandosColumnUser.size()>0) {
-				String expandoName="";
-				for (ExpandoColumn expandoUser : expandosColumnUser) {
-					expandoName = StringUtil.upperCaseFirstLetter(expandoUser.getName());
-					if(((renderRequest.getPreferences().getValue("show" + expandoName, "false")).compareTo("true") == 0)) {
-						expandoNames.add(expandoName);
-					}
-				}	
-			}
-		
-			renderRequest.setAttribute("expandoNames", expandoNames);
-		} catch (SystemException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
 		
 		renderRequest.setAttribute("showInscriptionDate", Boolean.parseBoolean(renderRequest.getPreferences().getValue("inscriptionDateColumn", "true")));
 		renderRequest.setAttribute("showExecutionDate", Boolean.parseBoolean(renderRequest.getPreferences().getValue("executionDateColumn", "true")));
+		renderRequest.setAttribute("view", "editions");
+		renderRequest.setAttribute("courseId", courseId);
 		
 		include(this.editionsJSP, renderRequest, renderResponse);
 	}
-
 	
 	private void showViewNewEdition(RenderRequest renderRequest,RenderResponse renderResponse) throws IOException, PortletException{
 		
@@ -618,6 +375,261 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 		ThemeDisplay themeDisplay = (ThemeDisplay)renderRequest.getAttribute(WebKeys.THEME_DISPLAY);
 		
 		include(this.cloneJSP, renderRequest, renderResponse);
+	}
+	
+	private void searchCourses(RenderRequest renderRequest,RenderResponse renderResponse){
+		
+		ThemeDisplay themeDisplay = (ThemeDisplay)renderRequest.getAttribute(WebKeys.THEME_DISPLAY);
+		
+		long courseId = ParamUtil.getLong(renderRequest, "courseId", 0);
+		String search = ParamUtil.getString(renderRequest, "search","");
+		String freetext = ParamUtil.getString(renderRequest, "freetext","");
+		String tags = ParamUtil.getString(renderRequest, "tags","");
+		int state = ParamUtil.getInteger(renderRequest, "state",WorkflowConstants.STATUS_APPROVED);
+		long selectedGroupId = ParamUtil.get(renderRequest,"selectedGroupId",-1);
+		long catId=ParamUtil.getLong(renderRequest, "categoryId",0);
+		long columnId = ParamUtil.getLong(renderRequest, "columnId");
+		String expandoValue = ParamUtil.getString(renderRequest, "expando_" + columnId, "");
+		
+		//*****************************************Cogemos los tags************************************//
+		String[] tagsSel = null;
+		long[] tagsSelIds = null;
+		try {
+			ServiceContext sc = ServiceContextFactory.getInstance(renderRequest);
+			tagsSel = sc.getAssetTagNames();
+
+			if(tagsSel != null){
+				long[] groups = new long[]{themeDisplay.getScopeGroupId()};
+				tagsSelIds = AssetTagLocalServiceUtil.getTagIds(groups, tagsSel);
+			}
+		} catch (PortalException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (SystemException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+
+		//*****************************************Si se muestra el filtro de grupos, cogemos los grupos*****//
+		if(Boolean.parseBoolean(renderRequest.getPreferences().getValue("showGroupFilter", "false"))){
+			List<Group> courseGroups = CourseLocalServiceUtil.getDistinctCourseGroups(themeDisplay.getCompanyId());
+			renderRequest.setAttribute("listGroups", courseGroups);
+			renderRequest.setAttribute("selectedGroupId", selectedGroupId);
+		}
+		
+		
+		//*****************************************Cogemos las categorias************************************//
+		Enumeration<String> pnames =renderRequest.getParameterNames();
+		ArrayList<String> tparams = new ArrayList<String>();
+		ArrayList<Long> assetCategoryIds = new ArrayList<Long>();
+		
+
+
+		while(pnames.hasMoreElements()){
+			String name = pnames.nextElement();
+			if(name.length()>16&&name.substring(0,16).equals("assetCategoryIds")){
+				tparams.add(name);
+				String value = renderRequest.getParameter(name);
+				String[] values = value.split(",");
+				for(String valuet : values){
+					try{
+						assetCategoryIds.add(Long.parseLong(valuet));
+					}catch(Exception e){
+					}
+				}
+				
+			}
+		}
+		
+		//***************************Si estás buscando te guarda los parámetros en la sesión, si no estás buscando te los coge de la sesión****************************//
+
+		PortletSession portletSession = renderRequest.getPortletSession();
+		String prefix = "";
+		if(courseId > 0){
+			prefix = String.valueOf(courseId);
+		}
+		if(ParamUtil.getString(renderRequest, "search").equals("search")){
+			portletSession.setAttribute(prefix+"freetext", freetext);
+			portletSession.setAttribute(prefix+"state", state);
+			portletSession.setAttribute(prefix+"assetCategoryIds", assetCategoryIds);
+			portletSession.setAttribute(prefix+"assetTagIds", tagsSelIds);
+			portletSession.setAttribute(prefix+"columnId", columnId);
+			portletSession.setAttribute(prefix+"column_" + columnId, expandoValue);
+
+		}else{
+			try{
+				String freetextTemp = (String)portletSession.getAttribute(prefix+"freetext");
+				if(freetextTemp!=null){
+					freetext = freetextTemp;
+				}
+			}catch(Exception e){
+				log.debug(e);
+			}
+			try{
+				ArrayList<Long> assetCategoryIdsTemp = (ArrayList<Long>)portletSession.getAttribute(prefix+"assetCategoryIds");
+				if(assetCategoryIdsTemp!=null){
+					assetCategoryIds = assetCategoryIdsTemp;
+				}
+			}catch(Exception e){
+				log.debug(e);
+			}
+			try{
+				Integer stateTemp = (Integer)portletSession.getAttribute(prefix+"state");
+				if(stateTemp!=null){
+					state = stateTemp;
+				}
+			}catch(Exception e){}
+			try{
+				Long columnIdTemp = (Long)portletSession.getAttribute(prefix+"columnId");
+				if(columnIdTemp != null){
+					columnId = columnIdTemp;
+					String expandoValueTemp = (String)portletSession.getAttribute(prefix+"column_" + columnId);
+					if(expandoValueTemp != null){
+						expandoValue = expandoValueTemp;
+					}
+				}
+			}catch(Exception e){}
+		}
+				
+		long[] catIds=ParamUtil.getLongValues(renderRequest, "categoryIds");
+
+		StringBuffer sb = new StringBuffer();
+		for(long cateId : assetCategoryIds){
+			sb.append(cateId);
+			sb.append(",");
+		}
+		String catIdsText = sb.toString();
+
+		if((catIds==null||catIds.length<=0)&&(assetCategoryIds!=null&&assetCategoryIds.size()>0)){
+			catIds = new long[assetCategoryIds.size()];
+			for(int i=0;i<assetCategoryIds.size();i++){
+				catIds[i] = assetCategoryIds.get(i);
+			}
+		}
+		
+		
+		//***********************  COGEMOS LAS PLANTILLAS ********************/
+		
+		// Templates
+		String templates = getCourseTemplates(renderRequest.getPreferences(), themeDisplay.getCompanyId());
+		
+		PortletURL portletURL = renderResponse.createRenderURL();
+		portletURL.setParameter("javax.portlet.action","doView");
+		portletURL.setParameter("freetext",freetext);
+		portletURL.setParameter("selectedGroupId", String.valueOf(selectedGroupId));
+		portletURL.setParameter("state",String.valueOf(state));
+
+		pnames =renderRequest.getParameterNames();
+		while(pnames.hasMoreElements()){
+			String name = pnames.nextElement();
+			if(name.length()>16&&name.substring(0,16).equals("assetCategoryIds")){
+				portletURL.setParameter(name,renderRequest.getParameter(name));
+			}
+		}
+		for(String param : tparams){
+			portletURL.setParameter(param,renderRequest.getParameter(param));
+		}
+		portletURL.setParameter("search","search");
+		portletURL.setParameter("columnId", String.valueOf(columnId));
+		portletURL.setParameter("expandoValue", expandoValue);
+		if(courseId > 0){
+			portletURL.setParameter("courseId", String.valueOf(courseId));
+			portletURL.setParameter("view", "editions");
+		}
+		
+		long[] categoryIds = ArrayUtil.toArray(assetCategoryIds.toArray(new Long[assetCategoryIds.size()]));
+		
+		int closed = -1;
+		if(state!=WorkflowConstants.STATUS_ANY){
+			if(state==WorkflowConstants.STATUS_APPROVED){
+				closed = 0;
+			}
+			else if(state==WorkflowConstants.STATUS_INACTIVE){
+				closed = 1;
+			}
+		}
+		
+		boolean isAdmin = false;
+		try {
+			isAdmin = RoleLocalServiceUtil.hasUserRole(themeDisplay.getUserId(), RoleLocalServiceUtil.getRole(themeDisplay.getCompanyId(), RoleConstants.ADMINISTRATOR).getRoleId());
+		} catch (SystemException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (PortalException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		long groupId = themeDisplay.getScopeGroupId();
+		log.debug("SELECTED GROUP ID " + selectedGroupId);
+		if(selectedGroupId>-1){
+			groupId = selectedGroupId;
+		}
+		
+		String emptyResultsMessage = "there-are-no-courses";
+		if(courseId > 0){
+			emptyResultsMessage = "there-are-no-editions";
+		}
+		
+		SearchContainer<Course> searchContainer = new SearchContainer<Course>(renderRequest, null, null, SearchContainer.DEFAULT_CUR_PARAM, 
+				SearchContainer.DEFAULT_DELTA, portletURL, 
+				null, emptyResultsMessage);
+		
+		log.debug("freetext: " + freetext);
+		log.debug("closed: " + closed);
+		log.debug("categoryIds: " + categoryIds);
+		log.debug("tagsSelIds: " + tagsSelIds);
+		log.debug("templates: " + templates);
+		log.debug("columnId: " + columnId);
+		log.debug("expandoValue: " + expandoValue);
+		log.debug("courseId: " + courseId);
+		log.debug("themeDisplay.getCompanyId(): " + themeDisplay.getCompanyId());
+		log.debug("groupId: " + groupId);
+		log.debug("isAdmin: " + isAdmin);
+		
+		searchContainer.setResults(CourseLocalServiceUtil.searchCourses(freetext, closed, categoryIds, tagsSelIds, templates, columnId, expandoValue, courseId,
+				themeDisplay.getCompanyId(), groupId, themeDisplay.getUserId(), themeDisplay.getLanguageId(), isAdmin, true, true, searchContainer.getStart(), searchContainer.getEnd()));
+		searchContainer.setTotal(CourseLocalServiceUtil.countCourses(freetext, closed, categoryIds, tagsSelIds, templates, columnId, expandoValue, courseId,
+				themeDisplay.getCompanyId(), groupId, themeDisplay.getUserId(), themeDisplay.getLanguageId(), isAdmin, true, true));
+		
+		renderRequest.setAttribute("searchContainer", searchContainer);
+		renderRequest.setAttribute("catIds", catIds);
+		renderRequest.setAttribute("noAssetCategoryIds", assetCategoryIds == null || assetCategoryIds.size() == 0);
+		renderRequest.setAttribute("catId", catId);
+		renderRequest.setAttribute("search", search);
+		renderRequest.setAttribute("freetext", freetext);
+		renderRequest.setAttribute("tags", tags);
+		renderRequest.setAttribute("state", state);
+		renderRequest.setAttribute("catIdsText", catIdsText);
+		renderRequest.setAttribute("columnId", columnId);
+		renderRequest.setAttribute("expandoValue", expandoValue);
+		renderRequest.setAttribute("STATUS_APPROVED", WorkflowConstants.STATUS_APPROVED);
+		renderRequest.setAttribute("STATUS_INACTIVE", WorkflowConstants.STATUS_INACTIVE);
+		renderRequest.setAttribute("STATUS_ANY", WorkflowConstants.STATUS_ANY);
+		if(Boolean.parseBoolean(renderRequest.getPreferences().getValue("showExpandos", "false"))){
+			List<ExpandoColumn> listExpandos = null;
+			try {
+				listExpandos = ExpandoColumnLocalServiceUtil.getColumns(themeDisplay.getCompanyId(), Course.class.getName(), ExpandoTableConstants.DEFAULT_TABLE_NAME);
+			} catch (SystemException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			renderRequest.setAttribute("listExpandos", listExpandos);
+			
+			//Creamos la lista para las columnas
+			List<ExpandoColumn> expandoNames = new ArrayList<ExpandoColumn>();
+			if(Validator.isNotNull(listExpandos) && listExpandos.size()>0) {
+				String expandoName="";
+				for (ExpandoColumn expandoUser : listExpandos) {
+					expandoName = StringUtil.upperCaseFirstLetter(expandoUser.getName());
+					if(((renderRequest.getPreferences().getValue("show" + expandoName, "false")).compareTo("true") == 0)) {
+						expandoNames.add(expandoUser);
+					}
+				}	
+			}
+		
+			renderRequest.setAttribute("expandoNames", expandoNames);
+		}
 	}
 	
 	

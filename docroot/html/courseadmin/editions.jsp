@@ -33,26 +33,7 @@ if( permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), "com.liferay
 }
 %>
 
-<portlet:renderURL var="searchURL">	
-	<portlet:param name="view" value="editions"></portlet:param>
-		<portlet:param name="courseId" value="${courseId}"></portlet:param>
-		
-</portlet:renderURL>
-
-<div class="admin-course-search-form">
-	<aui:form action="${searchURL}" method="post" name="search">
-		<aui:fieldset cssClass="checkBoxes">
-			<aui:input name="search" type="hidden" value="search" />
-			<aui:input inlineField="true" name="name" type="text" value="${name}">
-				<aui:validator name="maxLength">150</aui:validator>
-			</aui:input>
-			<aui:button type="submit" value="search"></aui:button>
-		</aui:fieldset>
-	</aui:form>
-</div>
-
-
-
+<%@ include file="/html/courseadmin/coursesearchform.jsp" %>
 
 <liferay-ui:search-container 
 	searchContainer="${searchContainer}"
@@ -86,8 +67,8 @@ if( permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), "com.liferay
 		
 		<c:if test="${not empty expandoNames}">
 			<c:forEach items="${expandoNames}" var="expName">
-				<liferay-ui:search-container-column-text name="${expName}">
-					<liferay-ui:custom-attribute classPK="${course.courseId}" name="${expName}" 
+				<liferay-ui:search-container-column-text name="${expName.getDisplayName(themeDisplay.locale)}">
+					<liferay-ui:custom-attribute classPK="${course.courseId}" name="${expName.name}" 
 								className="<%= Course.class.getName() %>" editable="false" label="false" >
 					</liferay-ui:custom-attribute>
 				</liferay-ui:search-container-column-text>

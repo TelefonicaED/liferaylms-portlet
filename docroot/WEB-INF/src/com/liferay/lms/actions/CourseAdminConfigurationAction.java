@@ -88,6 +88,8 @@ public class CourseAdminConfigurationAction implements ConfigurationAction {
 		
 		portletPreferences.setValue	("tipoImport", ParamUtil.getString(actionRequest, "tipoImport", ""));
 		
+		portletPreferences.setValue("showExpandos", Boolean.toString(ParamUtil.getBoolean(actionRequest, "showExpandos", false)));
+		
 		
 		//Campos personalizados a mostrar en la tabla
 		// Expandos dinamicos
@@ -95,10 +97,16 @@ public class CourseAdminConfigurationAction implements ConfigurationAction {
 		List<ExpandoColumn> expandosColumnCourse = ExpandoColumnLocalServiceUtil.getDefaultTableColumns(themeDisplay.getCompanyId(), ClassNameLocalServiceUtil.getClassNameId(Course.class));
 		if(Validator.isNotNull(expandosColumnCourse) && expandosColumnCourse.size()>0) {
 			String expandoName="";
+			String nameExpando = "";
+			String nameExpandoEdition = "";
 			for (ExpandoColumn expandoCourse : expandosColumnCourse) {
 				expandoName = StringUtil.upperCaseFirstLetter(expandoCourse.getName());
+				nameExpando = "showExpando_" + expandoCourse.getColumnId();
+				nameExpandoEdition = "showExpandoEdition_" + expandoCourse.getColumnId();
 				log.debug("SAVE: show" + expandoName+ "   VALUE:  "+actionRequest.getParameter("show" + expandoName));
 				portletPreferences.setValue("show" + expandoName, actionRequest.getParameter("show" + expandoName));
+				portletPreferences.setValue(nameExpando, actionRequest.getParameter(nameExpando));
+				portletPreferences.setValue(nameExpandoEdition, actionRequest.getParameter(nameExpandoEdition));
 			}	
 		}
 		

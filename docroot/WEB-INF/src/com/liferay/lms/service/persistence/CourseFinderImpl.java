@@ -49,6 +49,8 @@ import com.liferay.portal.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.util.DLUtil;
+import com.liferay.portlet.expando.model.ExpandoColumn;
+import com.liferay.portlet.expando.service.ExpandoColumnLocalServiceUtil;
 import com.liferay.util.dao.orm.CustomSQLUtil;
 
 public class CourseFinderImpl extends BasePersistenceImpl<Course> implements CourseFinder{
@@ -163,14 +165,18 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 	public static final String INNER_JOIN_TEAM = 
 			CourseFinder.class.getName() + ".innerJoinTeam";
 	
+	public static final String INNER_JOIN_CUSTOM_ATTRIBUTE =
+			CourseFinder.class.getName() + ".innerCustomAttribute";
 	
-	public List<Course> findByT_S_C_T_T(String freeText, int status, long[] categories, long[] tags, String templates, long companyId, long groupId, long userId, String language, boolean isAdmin, boolean searchParentCourses, boolean andOperator, int start, int end){
-		return findByT_S_C_T_T(freeText, -1, status, categories, tags, templates, companyId, groupId, userId, language, isAdmin, searchParentCourses, andOperator, start, end);
+	
+	public List<Course> findByT_S_C_T_T(String freeText, int status, long[] categories, long[] tags, String templates, long columnId, String expandoValue, long companyId, long groupId, long userId, String language, boolean isAdmin, boolean searchParentCourses, boolean andOperator, int start, int end){
+		return findByT_S_C_T_T(freeText, -1, status, categories, tags, templates, columnId, expandoValue, companyId, groupId, userId, language, isAdmin, searchParentCourses, andOperator, start, end);
 	}
 	
 	
 	@SuppressWarnings("unchecked")
-	public List<Course> findByT_S_C_T_T(String freeText, long parentCourseId, int status, long[] categories, long[] tags, String templates, long companyId, long groupId, long userId, String language, boolean isAdmin, boolean searchParentCourses, boolean andOperator, int start, int end){
+	public List<Course> findByT_S_C_T_T(String freeText, long parentCourseId, int status, long[] categories, long[] tags, String templates, long columnId, 
+			String expandoValue, long companyId, long groupId, long userId, String language, boolean isAdmin, boolean searchParentCourses, boolean andOperator, int start, int end){
 		Session session = null;
 		
 		try{
@@ -197,6 +203,8 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			sql = replaceResourcePermission(sql, isAdmin, companyId, userId);
 			
 			sql = replaceSearchParentCourse(sql, searchParentCourses,parentCourseId);
+			
+			sql = replaceCustomAttribute(sql, columnId, expandoValue);
 
 			if(start < 0 && end < 0){
 				sql = sql.replace("LIMIT [$START$], [$END$]", "");
@@ -216,6 +224,8 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			SQLQuery q = session.createSQLQuery(sql);
 			q.addEntity("Lms_Course", CourseImpl.class);
 			QueryPos qPos = QueryPos.getInstance(q);
+			setJoinCustomAttribute(qPos, columnId, expandoValue);
+			
 			qPos.add(companyId);
 			qPos.add(companyId);
 			qPos.add(groupId);
@@ -394,11 +404,12 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 		return sql.replace("[$LANGUAGE$]", language);
 	}
 
-	public int countByT_S_C_T_T(String freeText, int status, long[] categories, long[] tags, String templates, long companyId, long groupId, long userId, String language, boolean isAdmin, boolean searchParentCourses, boolean andOperator){
-		return countByT_S_C_T_T(freeText, -1, status, categories, tags, templates, companyId, groupId, userId, language, isAdmin, searchParentCourses, andOperator);
+	public int countByT_S_C_T_T(String freeText, int status, long[] categories, long[] tags, String templates, long columnId, String expandoValue, long companyId, long groupId, long userId, String language, boolean isAdmin, boolean searchParentCourses, boolean andOperator){
+		return countByT_S_C_T_T(freeText, -1, status, categories, tags, templates, columnId, expandoValue, companyId, groupId, userId, language, isAdmin, searchParentCourses, andOperator);
 	}
 	
-	public int countByT_S_C_T_T(String freeText, long parentCourseId, int status, long[] categories, long[] tags, String templates, long companyId, long groupId, long userId, String language, boolean isAdmin, boolean searchParentCourses, boolean andOperator){
+	public int countByT_S_C_T_T(String freeText, long parentCourseId, int status, long[] categories, long[] tags, String templates, long columnId, String expandoValue, 
+			long companyId, long groupId, long userId, String language, boolean isAdmin, boolean searchParentCourses, boolean andOperator){
 		Session session = null;
 		
 		try{
@@ -425,6 +436,8 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			
 			sql = replaceSearchParentCourse(sql, searchParentCourses, parentCourseId);
 			
+			sql = replaceCustomAttribute(sql, columnId, expandoValue);
+			
 			if(log.isDebugEnabled()){
 				log.debug("sql: " + sql);
 				log.debug("companyId: " + companyId);
@@ -437,6 +450,8 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			q.addScalar(COUNT_COLUMN_NAME, Type.LONG);
 			
 			QueryPos qPos = QueryPos.getInstance(q);
+			setJoinCustomAttribute(qPos, columnId, expandoValue);
+			
 			qPos.add(companyId);
 			qPos.add(companyId);
 			qPos.add(groupId);
@@ -1390,6 +1405,33 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 		return 0;
 	}
 	
+	private String replaceCustomAttribute(String sql, long columnId, String expandoValue) {
+		if(columnId > 0 && Validator.isNotNull(expandoValue)){
+			sql = sql.replace("[$JOINCUSTOMATTRIBUTE$]", CustomSQLUtil.get(INNER_JOIN_CUSTOM_ATTRIBUTE));
+		}else{
+			sql = sql.replace("[$JOINCUSTOMATTRIBUTE$]", "");
+		}
+		return sql;
+	}
+	
+	protected void setJoinCustomAttribute(
+			QueryPos qPos, long columnId, String expandoValue){
+		if(columnId > 0 && Validator.isNotNull(expandoValue)){
+			try {
+				ExpandoColumn expandoColumn = ExpandoColumnLocalServiceUtil.getColumn(columnId);
+				qPos.add(expandoColumn.getTableId());
+				qPos.add(columnId);
+				qPos.add(expandoValue);
+			} catch (PortalException | SystemException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				qPos.add(0);
+				qPos.add(0);
+				qPos.add("");
+			}
+
+		}
+	}
 	
 	public List<Group> getDistinctCourseGroups(long companyId){
 		Session session = null;

@@ -56,13 +56,17 @@ if(catIds!=null&&catIds.length>0)
 
 %>
 
-<portlet:renderURL var="searchURL"/>
+<portlet:renderURL var="searchURL">
+	<portlet:param name="view" value="${view }"></portlet:param>
+	<portlet:param name="courseId" value="${courseId}"></portlet:param>	
+</portlet:renderURL>
 
 <div class="admin-course-search-form">
-	<aui:form action="${searchURL}" method="post" name="search">
+	<aui:form action="${searchURL}" method="post" name="searchCourses">
+		<aui:input name="courseId" value="${courseId }" type="hidden" />
 		<aui:fieldset cssClass="checkBoxes">
 			<aui:input name="search" type="hidden" value="search" />
-			<aui:input inlineField="true" name="freetext" type="text" value="${freetext}">
+			<aui:input inlineField="true" name="freetext" type="text" value="${freetext}" >
 				<aui:validator name="maxLength">150</aui:validator>
 			</aui:input>
 			<aui:select inlineField="true" name="state">
@@ -71,9 +75,8 @@ if(catIds!=null&&catIds.length>0)
 				<aui:option label="any-status" selected="${state == STATUS_ANY}" value="${STATUS_ANY}" />
 			</aui:select>
 						
-			<aui:button type="submit" value="search"></aui:button>
 		</aui:fieldset>
-		<c:if test="${renderRequest.preferences.getValue('showGroupFilter', 'false') }">
+		<c:if test="${renderRequest.preferences.getValue('showGroupFilter', 'false') && not empty courseId}">
 			<aui:select name="selectedGroupId" label="courseadmin.search.select-group">
 					<aui:option label="" value="0"/>
 					<c:forEach items="${listGroups}"  var="courseGroup">
@@ -97,6 +100,49 @@ if(catIds!=null&&catIds.length>0)
 				</aui:fieldset>
 			</liferay-ui:panel>
 		</c:if>
+		<c:if test="${(renderRequest.preferences.getValue('showExpandos', 'false') && (empty courseId || courseId == 0)) ||
+						(renderRequest.preferences.getValue('showExpandosEdition', 'false') && courseId > 0) }">
+			<liferay-ui:panel id="panel_expando" title="custom-attributes" collapsible="true" defaultState="closed">
+				<aui:fieldset cssClass="checkBoxes">
+					<aui:input name="columnId" value="${columnId }" type="hidden"/>
+
+					<c:forEach items="${listExpandos }" var="expando">
+						<c:set var="expandoProperty" value="showExpando_${expando.columnId }" />
+						<c:if test="${courseId > 0 }">
+							<c:set var="expandoProperty" value="showExpandoEdition_${expando.columnId }" />
+						</c:if>
+						<c:if test="${renderRequest.preferences.getValue(expandoProperty, 'false')}">
+							<aui:input name="expando_${expando.columnId }" id="expando_${expando.columnId }" value="${columnId == expando.columnId ? expandoValue : '' }" label="${expando.name }" 
+								onkeypress="javascript:${renderResponse.getNamespace()}disabledExpandos('${expando.columnId}')" onchange="javascript:${renderResponse.getNamespace()}disabledExpandos('${expando.columnId}')"/>
+						</c:if>	
+					</c:forEach>
+					
+					<script>
+						function <portlet:namespace />disabledExpandos(columnId){
+							var columnValue = $('#<portlet:namespace />expando_' + columnId);
+							if(columnValue.val() != ''){
+								//Deshabilitamos el resto de input de expandos
+								$('[id^="<portlet:namespace />expando_"]').each(function(){
+									if($(this).attr('id') != '<portlet:namespace />expando_' + columnId){
+										$(this).attr('disabled', true);
+									}
+								});
+								document.<portlet:namespace />searchCourses.<portlet:namespace />columnId.value=columnId;
+							}else{
+								$('[id^="<portlet:namespace />expando_"]').each(function(){
+									$(this).attr('disabled', false);
+								});
+								document.<portlet:namespace />searchCourses.<portlet:namespace />columnId.value=0;
+							}
+						}
+						<c:if test="${columnId>0}">
+							<portlet:namespace />disabledExpandos('${columnId}');
+						</c:if>
+					</script>
+				</aui:fieldset>
+			</liferay-ui:panel>
+		</c:if>
+		<aui:button type="submit" value="search"></aui:button>
 	</aui:form>
 </div>
 	
@@ -117,11 +163,13 @@ if(catIds!=null&&catIds.length>0)
 			minQueryLength: 4,
 			source:function(){
 				var inputValue=A.one("#<portlet:namespace />freetext").get('value');
+				var stateValue=A.one('#<portlet:namespace />state').get('value');
 				var myAjaxRequest=A.io.request('${getCourses }',{
 					dataType: 'json',
 					method:'POST',
 					data:{
 						<portlet:namespace />courseTitle:inputValue,
+						<portlet:namespace />status:stateValue
 					},
 					autoLoad:false,
 					sync:false,
