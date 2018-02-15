@@ -148,6 +148,7 @@ if (course!=null){
 //title = ParamUtil.getString(request, "title", null);
 description = ParamUtil.getString(request, "description", "");
 String title = ParamUtil.getString(request, "title", "");
+title = title.replace("%23", "#").replace("%26","&").replace("%25", "%");
 %>
 
 <%
@@ -704,7 +705,7 @@ Liferay.provide(
 			<script type="text/javascript">
 		        function <portlet:namespace />initEditor() 
 		        { 
-		            return decodeURI("<%= UnicodeFormatter.toString(description) %>"); 
+		        	return decodeURI('<%= UnicodeFormatter.toString(description.replace("%26","&").replace("%23","#").replace("%","%25")) %>');
 		        }
 		    </script>
 		</aui:field-wrapper>
