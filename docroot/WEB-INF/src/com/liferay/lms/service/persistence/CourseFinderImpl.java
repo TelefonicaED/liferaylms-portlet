@@ -464,8 +464,6 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 				log.debug("isAdmin: " + isAdmin);
 				log.debug("searchParentCourses: " + searchParentCourses);
 				log.debug("andOperator: " + andOperator);
-				log.debug("start: " + start);
-				log.debug("end: " + end);
 			}
 			
 			SQLQuery q = session.createSQLQuery(sql);
