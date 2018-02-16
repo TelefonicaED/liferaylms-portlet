@@ -1441,6 +1441,7 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 				ExpandoColumn expandoColumn = ExpandoColumnLocalServiceUtil.getColumn(columnId);
 				qPos.add(expandoColumn.getTableId());
 				qPos.add(columnId);
+				expandoValue = "%" + expandoValue + "%";
 				qPos.add(expandoValue);
 			} catch (PortalException | SystemException e) {
 				// TODO Auto-generated catch block

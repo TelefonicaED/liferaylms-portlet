@@ -634,7 +634,7 @@
 						AND ev.tableId = ?
 						AND ev.columnId = ?
 						AND ev.classPK = c.courseId
-						AND ev.data_ = ?		
+						AND ev.data_ LIKE ?		
 		]]>
 	</sql>
 </custom-sql>

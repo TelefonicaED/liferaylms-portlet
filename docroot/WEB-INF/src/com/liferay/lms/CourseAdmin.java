@@ -389,7 +389,7 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 		long selectedGroupId = ParamUtil.get(renderRequest,"selectedGroupId",-1);
 		long catId=ParamUtil.getLong(renderRequest, "categoryId",0);
 		long columnId = ParamUtil.getLong(renderRequest, "columnId");
-		String expandoValue = ParamUtil.getString(renderRequest, "expando_" + columnId, "");
+		String expandoValue = ParamUtil.getString(renderRequest, "expandoValue", "");
 		
 		//*****************************************Cogemos los tags************************************//
 		String[] tagsSel = null;
@@ -454,7 +454,7 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 			portletSession.setAttribute(prefix+"assetCategoryIds", assetCategoryIds);
 			portletSession.setAttribute(prefix+"assetTagIds", tagsSelIds);
 			portletSession.setAttribute(prefix+"columnId", columnId);
-			portletSession.setAttribute(prefix+"column_" + columnId, expandoValue);
+			portletSession.setAttribute(prefix+"expandoValue",expandoValue);
 
 		}else{
 			try{
@@ -483,7 +483,7 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 				Long columnIdTemp = (Long)portletSession.getAttribute(prefix+"columnId");
 				if(columnIdTemp != null){
 					columnId = columnIdTemp;
-					String expandoValueTemp = (String)portletSession.getAttribute(prefix+"column_" + columnId);
+					String expandoValueTemp = (String)portletSession.getAttribute(prefix+"expandoValue");
 					if(expandoValueTemp != null){
 						expandoValue = expandoValueTemp;
 					}

@@ -104,40 +104,23 @@ if(catIds!=null&&catIds.length>0)
 						(renderRequest.preferences.getValue('showExpandosEdition', 'false') && courseId > 0) }">
 			<liferay-ui:panel id="panel_expando" title="custom-attributes" collapsible="true" defaultState="closed">
 				<aui:fieldset cssClass="checkBoxes">
-					<aui:input name="columnId" value="${columnId }" type="hidden"/>
-
-					<c:forEach items="${listExpandos }" var="expando">
-						<c:set var="expandoProperty" value="showExpando_${expando.columnId }" />
-						<c:if test="${courseId > 0 }">
-							<c:set var="expandoProperty" value="showExpandoEdition_${expando.columnId }" />
-						</c:if>
-						<c:if test="${renderRequest.preferences.getValue(expandoProperty, 'false')}">
-							<aui:input name="expando_${expando.columnId }" id="expando_${expando.columnId }" value="${columnId == expando.columnId ? expandoValue : '' }" label="${expando.name }" 
-								onkeypress="javascript:${renderResponse.getNamespace()}disabledExpandos('${expando.columnId}')" onchange="javascript:${renderResponse.getNamespace()}disabledExpandos('${expando.columnId}')"/>
-						</c:if>	
-					</c:forEach>
-					
+					<aui:select label="custom-attributes" name="columnId" onChange="javascript:${renderResponse.getNamespace()}changeExpando();">
+						<aui:option value="0" label=""/>
+						<c:forEach items="${listExpandos }" var="expando">
+							<c:set var="expandoProperty" value="showExpando_${expando.columnId }" />
+							<c:if test="${courseId > 0 }">
+								<c:set var="expandoProperty" value="showExpandoEdition_${expando.columnId }" />
+							</c:if>
+							<c:if test="${renderRequest.preferences.getValue(expandoProperty, 'false')}">
+								<aui:option value="${expando.columnId }" label="${expando.name }"/>
+							</c:if>	
+						</c:forEach>
+					</aui:select>
+					<aui:input name="expandoValue" value="${expandoValue }" label=""/>
 					<script>
-						function <portlet:namespace />disabledExpandos(columnId){
-							var columnValue = $('#<portlet:namespace />expando_' + columnId);
-							if(columnValue.val() != ''){
-								//Deshabilitamos el resto de input de expandos
-								$('[id^="<portlet:namespace />expando_"]').each(function(){
-									if($(this).attr('id') != '<portlet:namespace />expando_' + columnId){
-										$(this).attr('disabled', true);
-									}
-								});
-								document.<portlet:namespace />searchCourses.<portlet:namespace />columnId.value=columnId;
-							}else{
-								$('[id^="<portlet:namespace />expando_"]').each(function(){
-									$(this).attr('disabled', false);
-								});
-								document.<portlet:namespace />searchCourses.<portlet:namespace />columnId.value=0;
-							}
-						}
-						<c:if test="${columnId>0}">
-							<portlet:namespace />disabledExpandos('${columnId}');
-						</c:if>
+					function <portlet:namespace />changeExpando(){
+						var columnValue = $('#<portlet:namespace />expandoValue').val("");
+					}
 					</script>
 				</aui:fieldset>
 			</liferay-ui:panel>
