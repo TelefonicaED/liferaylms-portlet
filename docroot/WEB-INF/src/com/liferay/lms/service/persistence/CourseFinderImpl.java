@@ -215,10 +215,21 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			
 			if(log.isDebugEnabled()){
 				log.debug("sql: " + sql);
+				log.debug("freeText: " + freeText);
+				log.debug("parentCourseId: " + parentCourseId);
+				log.debug("status: " + status);
+				log.debug("templates: " + templates);
+				log.debug("columnId: " + columnId);
+				log.debug("expandoValue: " + expandoValue);
 				log.debug("companyId: " + companyId);
 				log.debug("groupId: " + groupId);
-				log.debug("freeText: " + freeText);
+				log.debug("userId: " + userId);
+				log.debug("language: " + language);
+				log.debug("isAdmin: " + isAdmin);
+				log.debug("searchParentCourses: " + searchParentCourses);
 				log.debug("andOperator: " + andOperator);
+				log.debug("start: " + start);
+				log.debug("end: " + end);
 			}
 			
 			SQLQuery q = session.createSQLQuery(sql);
@@ -440,10 +451,21 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			
 			if(log.isDebugEnabled()){
 				log.debug("sql: " + sql);
+				log.debug("freeText: " + freeText);
+				log.debug("parentCourseId: " + parentCourseId);
+				log.debug("status: " + status);
+				log.debug("templates: " + templates);
+				log.debug("columnId: " + columnId);
+				log.debug("expandoValue: " + expandoValue);
 				log.debug("companyId: " + companyId);
 				log.debug("groupId: " + groupId);
-				log.debug("freeText: " + freeText);
+				log.debug("userId: " + userId);
+				log.debug("language: " + language);
+				log.debug("isAdmin: " + isAdmin);
+				log.debug("searchParentCourses: " + searchParentCourses);
 				log.debug("andOperator: " + andOperator);
+				log.debug("start: " + start);
+				log.debug("end: " + end);
 			}
 			
 			SQLQuery q = session.createSQLQuery(sql);
