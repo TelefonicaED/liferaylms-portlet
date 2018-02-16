@@ -5,4 +5,5 @@
 	<sql file="custom-sql/learningactivity.xml" />
 	<sql file="custom-sql/learningactivityresult.xml" />
 	<sql file="custom-sql/courseresult.xml" />
+	<sql file="custom-sql/p2pactivity.xml" />
 </custom-sql>

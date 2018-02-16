@@ -46,6 +46,7 @@
 	<bean id="com.liferay.lms.service.persistence.ModuleResultFinder" class="com.liferay.lms.service.persistence.ModuleResultFinderImpl" parent="basePersistence" />
 	<bean id="com.liferay.lms.service.P2pActivityLocalService" class="com.liferay.lms.service.impl.P2pActivityLocalServiceImpl" />
 	<bean id="com.liferay.lms.service.persistence.P2pActivityPersistence" class="com.liferay.lms.service.persistence.P2pActivityPersistenceImpl" parent="basePersistence" />
+	<bean id="com.liferay.lms.service.persistence.P2pActivityFinder" class="com.liferay.lms.service.persistence.P2pActivityFinderImpl" parent="basePersistence" />
 	<bean id="com.liferay.lms.service.P2pActivityCorrectionsLocalService" class="com.liferay.lms.service.impl.P2pActivityCorrectionsLocalServiceImpl" />
 	<bean id="com.liferay.lms.service.persistence.P2pActivityCorrectionsPersistence" class="com.liferay.lms.service.persistence.P2pActivityCorrectionsPersistenceImpl" parent="basePersistence" />
 	<bean id="com.liferay.lms.service.ScheduleLocalService" class="com.liferay.lms.service.impl.ScheduleLocalServiceImpl" />

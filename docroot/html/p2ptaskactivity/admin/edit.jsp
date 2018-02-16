@@ -1,3 +1,5 @@
+<%@page import="com.liferay.portal.kernel.util.PrefsPropsUtil"%>
+<%@page import="com.liferay.lms.util.LmsConstant"%>
 <%@page import="com.liferay.portal.kernel.util.PropsUtil"%>
 <%@page import="com.liferay.lms.service.LearningActivityTryLocalServiceUtil"%>
 <%@page import="com.liferay.lms.model.LearningActivityTry"%>
@@ -20,6 +22,15 @@
 
 
 <%
+
+	boolean teamAssignationAllowed = PrefsPropsUtil.getBoolean(themeDisplay.getCompanyId(), LmsConstant.P2P_TEAM_ASSIGNATIONS_PROPERTY,false);
+	System.out.println("TEAM ASSIGANTION ALLOWED PREFSPROPS "+teamAssignationAllowed);
+	if(!teamAssignationAllowed){
+		if(PropsUtil.get(LmsConstant.P2P_TEAM_ASSIGNATIONS_PROPERTY)!=null){
+			teamAssignationAllowed=Boolean.parseBoolean(PropsUtil.get(LmsConstant.P2P_TEAM_ASSIGNATIONS_PROPERTY));
+		}
+	}
+	System.out.println("TEAM ASSIGANTION ALLOWED PROPS "+teamAssignationAllowed);
 	long moduleId=ParamUtil.getLong(renderRequest,"resModuleId",0);
 
 	boolean anonimous=false;
@@ -60,7 +71,6 @@
 		fileOptional = StringPool.TRUE.equals(LearningActivityLocalServiceUtil.getExtraContentValue(learningActivity.getActId(),"fileoptional"));
 		email_anonimous = StringPool.TRUE.equals(LearningActivityLocalServiceUtil.getExtraContentValue(learningActivity.getActId(),"email_anonimous"));
 		askForP2PActivities = StringPool.TRUE.equals(LearningActivityLocalServiceUtil.getExtraContentValue(learningActivity.getActId(),"askforp2pactivities"));
-		
 		String numEvaStr = LearningActivityLocalServiceUtil.getExtraContentValue(learningActivity.getActId(),"validaciones");
 		numEvaluaciones = numEvaStr.equals("") ? TaskP2PLearningActivityType.DEFAULT_VALIDATION_NUMBER : Long.parseLong(numEvaStr);
 		fileOptional = StringPool.TRUE .equals(LearningActivityLocalServiceUtil .getExtraContentValue( learningActivity.getActId(), "fileoptional"));
@@ -208,7 +218,18 @@ function <portlet:namespace />addText(){
 //-->
 </script>
 
-
+<%
+if(teamAssignationAllowed){
+	boolean assignationType = false;
+	assignationType = "team".equals(LearningActivityLocalServiceUtil.getExtraContentValue(learningActivity.getActId(),"assignationType"));
+%>
+	<aui:field-wrapper name="p2ptaskactivity.edit.select-assignation-type" >
+		<aui:input inlineLabel="right" name="assignationType" type="radio" value="course" label="p2ptaskactivity.edit.course-assignation" checked="<%= !assignationType %>" />
+		<aui:input inlineLabel="left"  name="assignationType" type="radio" value="team" label="p2ptaskactivity.edit.team-assignation"  checked="<%= assignationType %>"/>
+	</aui:field-wrapper>
+<%
+}
+%>
 <aui:input type="checkbox" name="anonimous" label="p2ptaskactivity.edit.anonimous" checked="<%=anonimous %>" ignoreRequestValue="true"/>
 <aui:input type="checkbox" name="result" label="test.result" checked="<%=result %>" disabled="<%=disabled %>" ignoreRequestValue="true"/>	
 <aui:input type="checkbox" name="fileoptional" label="p2ptaskactivity.edit.fileoptional" checked="<%=fileOptional%>" disabled="<%=disabled%>" ignoreRequestValue="true" />	

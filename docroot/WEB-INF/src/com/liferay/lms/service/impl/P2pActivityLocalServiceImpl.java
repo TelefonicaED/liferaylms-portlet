@@ -30,7 +30,9 @@ import com.liferay.lms.service.LearningActivityLocalServiceUtil;
 import com.liferay.lms.service.P2pActivityCorrectionsLocalServiceUtil;
 import com.liferay.lms.service.P2pActivityLocalServiceUtil;
 import com.liferay.lms.service.base.P2pActivityLocalServiceBaseImpl;
+import com.liferay.lms.service.persistence.P2pActivityFinderUtil;
 import com.liferay.lms.service.persistence.P2pActivityUtil;
+import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.bean.PortletBeanLocatorUtil;
 import com.liferay.portal.kernel.dao.orm.Criterion;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
@@ -42,9 +44,14 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.model.Team;
 import com.liferay.portal.model.User;
+import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceContextThreadLocal;
+import com.liferay.portal.service.TeamLocalService;
+import com.liferay.portal.service.TeamLocalServiceUtil;
+import com.liferay.portal.service.UserLocalService;
 import com.liferay.portal.service.UserLocalServiceUtil;
 
 /**
@@ -67,6 +74,12 @@ import com.liferay.portal.service.UserLocalServiceUtil;
  * @see com.liferay.lms.service.P2pActivityLocalServiceUtil
  */
 public class P2pActivityLocalServiceImpl extends P2pActivityLocalServiceBaseImpl {
+	
+	@BeanReference(type = TeamLocalService.class)
+	protected TeamLocalService teamLocalService;
+	
+	private static Log log = LogFactoryUtil.getLog(P2pActivityLocalServiceImpl.class);
+	
 	
 	public P2pActivity findByActIdAndUserId(long actId, long userId)
 			throws SystemException {
@@ -295,16 +308,59 @@ public class P2pActivityLocalServiceImpl extends P2pActivityLocalServiceBaseImpl
 	
 	@SuppressWarnings("unchecked")
 	public List<P2pActivity> getP2pActivitiesToCorrect(long actId, long p2pActivityId, int numValidaciones) throws SystemException, PortalException{
+		return getP2pActivitiesToCorrect(actId, p2pActivityId, numValidaciones, false);
+	}
+	
+	@SuppressWarnings("unchecked")
+	/**
+	 * Obtiene las actividades para realizar las correcciones de las actividades P2P
+	 *  
+	 * @param actId Id de la learningActivity de la p2p
+	 * @param p2pActivityId Id de la entrega de la p2p
+	 * @param numValidaciones Numero de validaciones configuradas en la actividad
+	 * @param courseAssignation Si la asignación es por equipo o por curso.
+	 * @return Listado de las asignaciones que hay que realizar
+	 * @throws SystemException Si hay algún error
+	 * @throws PortalException Si hay algún error
+	 */
+	public List<P2pActivity> getP2pActivitiesToCorrect(long actId, long p2pActivityId, int numValidaciones, boolean teamAssignation) throws SystemException, PortalException{
 		List<P2pActivity> res = new ArrayList<P2pActivity>();
 		
-		//Seleccionamos las actividades p2p entre ayer y antes de ayer.
-		ClassLoader classLoader = (ClassLoader) PortletBeanLocatorUtil.locate(ClpSerializer.getServletContextName(), "portletClassLoader");
-		DynamicQuery consulta = DynamicQueryFactoryUtil.forClass(P2pActivity.class, classLoader)
-				.add(PropertyFactoryUtil.forName("actId").eq(actId))
-				.add(PropertyFactoryUtil.forName("p2pActivityId").ne(p2pActivityId))
-				.addOrder(OrderFactoryUtil.getOrderFactory().asc("countCorrections"));
-	
-		List<P2pActivity> activities = p2pActivityPersistence.findWithDynamicQuery(consulta,0,numValidaciones);
+		LearningActivity la = learningActivityPersistence.fetchByPrimaryKey(actId);
+		P2pActivity p2pActivity = p2pActivityPersistence.fetchByPrimaryKey(p2pActivityId);
+		
+		List<P2pActivity> activities = null;
+		if(p2pActivity!=null && la!=null){
+			if(teamAssignation){
+				List<Team> groupTeams = null;
+				try{
+					groupTeams = TeamLocalServiceUtil.getGroupTeams(la.getGroupId());
+				}catch(SystemException e){
+					log.debug(e);
+				}
+				//Si hay equipos, realizamos las asignaciones por equipos. Si no hay equipos, por grupo.
+				if(groupTeams!=null && groupTeams.size()>0){
+					List<Team> userTeams = teamLocalService.getUserTeams(p2pActivity.getUserId(), la.getGroupId());
+					if(userTeams!=null && userTeams.size()>0){
+						//Caso de asignacion por equipos.
+						log.debug("******* USER ID "+p2pActivity.getUserId()  + " -->  ASIGNACIÓN POR EQUIPOS ");
+						activities =P2pActivityFinderUtil.findByTeam(actId, p2pActivityId, userTeams, 0, numValidaciones);
+						
+					}else{
+						//Caso de asignación suelta entre miembros sueltos del curso (sin equipos)
+						log.debug("******* USER ID "+p2pActivity.getUserId()  + " -->  ASIGNACIÓN POR USUARIOS SUELTOS ");
+						activities = P2pActivityFinderUtil.findByUserWithoutTeamActivities(actId, p2pActivityId, la.getGroupId(), 0, numValidaciones);
+					}
+				}else{
+					log.debug("******* USER ID "+p2pActivity.getUserId()  + " -->  ASIGNACIÓN POR GRUPO (CURSO SIN EQUIPOS)");
+					activities = P2pActivityFinderUtil.findByGroup(actId, p2pActivityId, 0, numValidaciones);
+				}
+			}else{
+				log.debug("******* USER ID "+p2pActivity.getUserId()  + " -->  ASIGNACIÓN POR GRUPO ");
+				activities = P2pActivityFinderUtil.findByGroup(actId, p2pActivityId, 0, numValidaciones);
+			}
+		}
+			
 		
 		//Si no es null ni esta vacia, la asignamos para devolver, sino devolveremos vacia.
 		if(activities!=null && !activities.isEmpty()){
@@ -314,7 +370,7 @@ public class P2pActivityLocalServiceImpl extends P2pActivityLocalServiceBaseImpl
 				AuditingLogFactory.audit(serviceContext.getCompanyId(), serviceContext.getScopeGroupId(), P2pActivity.class.getName(), 
 						actId, serviceContext.getUserId(), AuditConstants.GET, null);
 			}else{
-				LearningActivity la = learningActivityPersistence.fetchByPrimaryKey(actId);
+				
 				if(la!=null){
 					AuditingLogFactory.audit(la.getCompanyId(), la.getGroupId(), P2pActivity.class.getName(), 
 							actId, la.getUserId(), AuditConstants.GET, null);
@@ -483,5 +539,17 @@ public class P2pActivityLocalServiceImpl extends P2pActivityLocalServiceBaseImpl
 			return null;
 		}
 	}
+	
+	
+	public List<P2pActivity> getP2pActivitiesByAssignationsCompleted(boolean assignationsCompleted){
+		List<P2pActivity> p2pActivities = new ArrayList<P2pActivity>();
+		try{
+			p2pActivities = p2pActivityPersistence.findByasignationsCompleted(assignationsCompleted);
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		return p2pActivities;
+	}
+	
 	private static Log _log = LogFactoryUtil.getLog(P2pActivity.class);
 }

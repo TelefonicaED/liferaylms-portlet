@@ -155,6 +155,29 @@ public class P2pActivityPersistenceImpl extends BasePersistenceImpl<P2pActivity>
 			P2pActivityModelImpl.FINDER_CACHE_ENABLED, Long.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUserId",
 			new String[] { Long.class.getName() });
+	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_BY_ASIGNATIONSCOMPLETED =
+		new FinderPath(P2pActivityModelImpl.ENTITY_CACHE_ENABLED,
+			P2pActivityModelImpl.FINDER_CACHE_ENABLED, P2pActivityImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION,
+			"findByasignationsCompleted",
+			new String[] {
+				Boolean.class.getName(),
+				
+			"java.lang.Integer", "java.lang.Integer",
+				"com.liferay.portal.kernel.util.OrderByComparator"
+			});
+	public static final FinderPath FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_ASIGNATIONSCOMPLETED =
+		new FinderPath(P2pActivityModelImpl.ENTITY_CACHE_ENABLED,
+			P2pActivityModelImpl.FINDER_CACHE_ENABLED, P2pActivityImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION,
+			"findByasignationsCompleted",
+			new String[] { Boolean.class.getName() },
+			P2pActivityModelImpl.ASIGNATIONSCOMPLETED_COLUMN_BITMASK);
+	public static final FinderPath FINDER_PATH_COUNT_BY_ASIGNATIONSCOMPLETED = new FinderPath(P2pActivityModelImpl.ENTITY_CACHE_ENABLED,
+			P2pActivityModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION,
+			"countByasignationsCompleted",
+			new String[] { Boolean.class.getName() });
 	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_ALL = new FinderPath(P2pActivityModelImpl.ENTITY_CACHE_ENABLED,
 			P2pActivityModelImpl.FINDER_CACHE_ENABLED, P2pActivityImpl.class,
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findAll", new String[0]);
@@ -453,6 +476,27 @@ public class P2pActivityPersistenceImpl extends BasePersistenceImpl<P2pActivity>
 
 				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_USERID, args);
 				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_USERID,
+					args);
+			}
+
+			if ((p2pActivityModelImpl.getColumnBitmask() &
+					FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_ASIGNATIONSCOMPLETED.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] {
+						Boolean.valueOf(p2pActivityModelImpl.getOriginalAsignationsCompleted())
+					};
+
+				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_ASIGNATIONSCOMPLETED,
+					args);
+				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_ASIGNATIONSCOMPLETED,
+					args);
+
+				args = new Object[] {
+						Boolean.valueOf(p2pActivityModelImpl.getAsignationsCompleted())
+					};
+
+				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_ASIGNATIONSCOMPLETED,
+					args);
+				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_ASIGNATIONSCOMPLETED,
 					args);
 			}
 		}
@@ -2156,6 +2200,398 @@ public class P2pActivityPersistenceImpl extends BasePersistenceImpl<P2pActivity>
 	}
 
 	/**
+	 * Returns all the p2p activities where asignationsCompleted = &#63;.
+	 *
+	 * @param asignationsCompleted the asignations completed
+	 * @return the matching p2p activities
+	 * @throws SystemException if a system exception occurred
+	 */
+	public List<P2pActivity> findByasignationsCompleted(
+		boolean asignationsCompleted) throws SystemException {
+		return findByasignationsCompleted(asignationsCompleted,
+			QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+	}
+
+	/**
+	 * Returns a range of all the p2p activities where asignationsCompleted = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	 * </p>
+	 *
+	 * @param asignationsCompleted the asignations completed
+	 * @param start the lower bound of the range of p2p activities
+	 * @param end the upper bound of the range of p2p activities (not inclusive)
+	 * @return the range of matching p2p activities
+	 * @throws SystemException if a system exception occurred
+	 */
+	public List<P2pActivity> findByasignationsCompleted(
+		boolean asignationsCompleted, int start, int end)
+		throws SystemException {
+		return findByasignationsCompleted(asignationsCompleted, start, end, null);
+	}
+
+	/**
+	 * Returns an ordered range of all the p2p activities where asignationsCompleted = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	 * </p>
+	 *
+	 * @param asignationsCompleted the asignations completed
+	 * @param start the lower bound of the range of p2p activities
+	 * @param end the upper bound of the range of p2p activities (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @return the ordered range of matching p2p activities
+	 * @throws SystemException if a system exception occurred
+	 */
+	public List<P2pActivity> findByasignationsCompleted(
+		boolean asignationsCompleted, int start, int end,
+		OrderByComparator orderByComparator) throws SystemException {
+		FinderPath finderPath = null;
+		Object[] finderArgs = null;
+
+		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
+				(orderByComparator == null)) {
+			finderPath = FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_ASIGNATIONSCOMPLETED;
+			finderArgs = new Object[] { asignationsCompleted };
+		}
+		else {
+			finderPath = FINDER_PATH_WITH_PAGINATION_FIND_BY_ASIGNATIONSCOMPLETED;
+			finderArgs = new Object[] {
+					asignationsCompleted,
+					
+					start, end, orderByComparator
+				};
+		}
+
+		List<P2pActivity> list = (List<P2pActivity>)FinderCacheUtil.getResult(finderPath,
+				finderArgs, this);
+
+		if ((list != null) && !list.isEmpty()) {
+			for (P2pActivity p2pActivity : list) {
+				if ((asignationsCompleted != p2pActivity.getAsignationsCompleted())) {
+					list = null;
+
+					break;
+				}
+			}
+		}
+
+		if (list == null) {
+			StringBundler query = null;
+
+			if (orderByComparator != null) {
+				query = new StringBundler(3 +
+						(orderByComparator.getOrderByFields().length * 3));
+			}
+			else {
+				query = new StringBundler(3);
+			}
+
+			query.append(_SQL_SELECT_P2PACTIVITY_WHERE);
+
+			query.append(_FINDER_COLUMN_ASIGNATIONSCOMPLETED_ASIGNATIONSCOMPLETED_2);
+
+			if (orderByComparator != null) {
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
+			}
+
+			else {
+				query.append(P2pActivityModelImpl.ORDER_BY_JPQL);
+			}
+
+			String sql = query.toString();
+
+			Session session = null;
+
+			try {
+				session = openSession();
+
+				Query q = session.createQuery(sql);
+
+				QueryPos qPos = QueryPos.getInstance(q);
+
+				qPos.add(asignationsCompleted);
+
+				list = (List<P2pActivity>)QueryUtil.list(q, getDialect(),
+						start, end);
+			}
+			catch (Exception e) {
+				throw processException(e);
+			}
+			finally {
+				if (list == null) {
+					FinderCacheUtil.removeResult(finderPath, finderArgs);
+				}
+				else {
+					cacheResult(list);
+
+					FinderCacheUtil.putResult(finderPath, finderArgs, list);
+				}
+
+				closeSession(session);
+			}
+		}
+
+		return list;
+	}
+
+	/**
+	 * Returns the first p2p activity in the ordered set where asignationsCompleted = &#63;.
+	 *
+	 * @param asignationsCompleted the asignations completed
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the first matching p2p activity
+	 * @throws com.liferay.lms.NoSuchP2pActivityException if a matching p2p activity could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	public P2pActivity findByasignationsCompleted_First(
+		boolean asignationsCompleted, OrderByComparator orderByComparator)
+		throws NoSuchP2pActivityException, SystemException {
+		P2pActivity p2pActivity = fetchByasignationsCompleted_First(asignationsCompleted,
+				orderByComparator);
+
+		if (p2pActivity != null) {
+			return p2pActivity;
+		}
+
+		StringBundler msg = new StringBundler(4);
+
+		msg.append(_NO_SUCH_ENTITY_WITH_KEY);
+
+		msg.append("asignationsCompleted=");
+		msg.append(asignationsCompleted);
+
+		msg.append(StringPool.CLOSE_CURLY_BRACE);
+
+		throw new NoSuchP2pActivityException(msg.toString());
+	}
+
+	/**
+	 * Returns the first p2p activity in the ordered set where asignationsCompleted = &#63;.
+	 *
+	 * @param asignationsCompleted the asignations completed
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the first matching p2p activity, or <code>null</code> if a matching p2p activity could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	public P2pActivity fetchByasignationsCompleted_First(
+		boolean asignationsCompleted, OrderByComparator orderByComparator)
+		throws SystemException {
+		List<P2pActivity> list = findByasignationsCompleted(asignationsCompleted,
+				0, 1, orderByComparator);
+
+		if (!list.isEmpty()) {
+			return list.get(0);
+		}
+
+		return null;
+	}
+
+	/**
+	 * Returns the last p2p activity in the ordered set where asignationsCompleted = &#63;.
+	 *
+	 * @param asignationsCompleted the asignations completed
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the last matching p2p activity
+	 * @throws com.liferay.lms.NoSuchP2pActivityException if a matching p2p activity could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	public P2pActivity findByasignationsCompleted_Last(
+		boolean asignationsCompleted, OrderByComparator orderByComparator)
+		throws NoSuchP2pActivityException, SystemException {
+		P2pActivity p2pActivity = fetchByasignationsCompleted_Last(asignationsCompleted,
+				orderByComparator);
+
+		if (p2pActivity != null) {
+			return p2pActivity;
+		}
+
+		StringBundler msg = new StringBundler(4);
+
+		msg.append(_NO_SUCH_ENTITY_WITH_KEY);
+
+		msg.append("asignationsCompleted=");
+		msg.append(asignationsCompleted);
+
+		msg.append(StringPool.CLOSE_CURLY_BRACE);
+
+		throw new NoSuchP2pActivityException(msg.toString());
+	}
+
+	/**
+	 * Returns the last p2p activity in the ordered set where asignationsCompleted = &#63;.
+	 *
+	 * @param asignationsCompleted the asignations completed
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the last matching p2p activity, or <code>null</code> if a matching p2p activity could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	public P2pActivity fetchByasignationsCompleted_Last(
+		boolean asignationsCompleted, OrderByComparator orderByComparator)
+		throws SystemException {
+		int count = countByasignationsCompleted(asignationsCompleted);
+
+		List<P2pActivity> list = findByasignationsCompleted(asignationsCompleted,
+				count - 1, count, orderByComparator);
+
+		if (!list.isEmpty()) {
+			return list.get(0);
+		}
+
+		return null;
+	}
+
+	/**
+	 * Returns the p2p activities before and after the current p2p activity in the ordered set where asignationsCompleted = &#63;.
+	 *
+	 * @param p2pActivityId the primary key of the current p2p activity
+	 * @param asignationsCompleted the asignations completed
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the previous, current, and next p2p activity
+	 * @throws com.liferay.lms.NoSuchP2pActivityException if a p2p activity with the primary key could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	public P2pActivity[] findByasignationsCompleted_PrevAndNext(
+		long p2pActivityId, boolean asignationsCompleted,
+		OrderByComparator orderByComparator)
+		throws NoSuchP2pActivityException, SystemException {
+		P2pActivity p2pActivity = findByPrimaryKey(p2pActivityId);
+
+		Session session = null;
+
+		try {
+			session = openSession();
+
+			P2pActivity[] array = new P2pActivityImpl[3];
+
+			array[0] = getByasignationsCompleted_PrevAndNext(session,
+					p2pActivity, asignationsCompleted, orderByComparator, true);
+
+			array[1] = p2pActivity;
+
+			array[2] = getByasignationsCompleted_PrevAndNext(session,
+					p2pActivity, asignationsCompleted, orderByComparator, false);
+
+			return array;
+		}
+		catch (Exception e) {
+			throw processException(e);
+		}
+		finally {
+			closeSession(session);
+		}
+	}
+
+	protected P2pActivity getByasignationsCompleted_PrevAndNext(
+		Session session, P2pActivity p2pActivity, boolean asignationsCompleted,
+		OrderByComparator orderByComparator, boolean previous) {
+		StringBundler query = null;
+
+		if (orderByComparator != null) {
+			query = new StringBundler(6 +
+					(orderByComparator.getOrderByFields().length * 6));
+		}
+		else {
+			query = new StringBundler(3);
+		}
+
+		query.append(_SQL_SELECT_P2PACTIVITY_WHERE);
+
+		query.append(_FINDER_COLUMN_ASIGNATIONSCOMPLETED_ASIGNATIONSCOMPLETED_2);
+
+		if (orderByComparator != null) {
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+
+			if (orderByConditionFields.length > 0) {
+				query.append(WHERE_AND);
+			}
+
+			for (int i = 0; i < orderByConditionFields.length; i++) {
+				query.append(_ORDER_BY_ENTITY_ALIAS);
+				query.append(orderByConditionFields[i]);
+
+				if ((i + 1) < orderByConditionFields.length) {
+					if (orderByComparator.isAscending() ^ previous) {
+						query.append(WHERE_GREATER_THAN_HAS_NEXT);
+					}
+					else {
+						query.append(WHERE_LESSER_THAN_HAS_NEXT);
+					}
+				}
+				else {
+					if (orderByComparator.isAscending() ^ previous) {
+						query.append(WHERE_GREATER_THAN);
+					}
+					else {
+						query.append(WHERE_LESSER_THAN);
+					}
+				}
+			}
+
+			query.append(ORDER_BY_CLAUSE);
+
+			String[] orderByFields = orderByComparator.getOrderByFields();
+
+			for (int i = 0; i < orderByFields.length; i++) {
+				query.append(_ORDER_BY_ENTITY_ALIAS);
+				query.append(orderByFields[i]);
+
+				if ((i + 1) < orderByFields.length) {
+					if (orderByComparator.isAscending() ^ previous) {
+						query.append(ORDER_BY_ASC_HAS_NEXT);
+					}
+					else {
+						query.append(ORDER_BY_DESC_HAS_NEXT);
+					}
+				}
+				else {
+					if (orderByComparator.isAscending() ^ previous) {
+						query.append(ORDER_BY_ASC);
+					}
+					else {
+						query.append(ORDER_BY_DESC);
+					}
+				}
+			}
+		}
+
+		else {
+			query.append(P2pActivityModelImpl.ORDER_BY_JPQL);
+		}
+
+		String sql = query.toString();
+
+		Query q = session.createQuery(sql);
+
+		q.setFirstResult(0);
+		q.setMaxResults(2);
+
+		QueryPos qPos = QueryPos.getInstance(q);
+
+		qPos.add(asignationsCompleted);
+
+		if (orderByComparator != null) {
+			Object[] values = orderByComparator.getOrderByConditionValues(p2pActivity);
+
+			for (Object value : values) {
+				qPos.add(value);
+			}
+		}
+
+		List<P2pActivity> list = q.list();
+
+		if (list.size() == 2) {
+			return list.get(1);
+		}
+		else {
+			return null;
+		}
+	}
+
+	/**
 	 * Returns all the p2p activities.
 	 *
 	 * @return the p2p activities
@@ -2316,6 +2752,20 @@ public class P2pActivityPersistenceImpl extends BasePersistenceImpl<P2pActivity>
 	 */
 	public void removeByUserId(long userId) throws SystemException {
 		for (P2pActivity p2pActivity : findByUserId(userId)) {
+			remove(p2pActivity);
+		}
+	}
+
+	/**
+	 * Removes all the p2p activities where asignationsCompleted = &#63; from the database.
+	 *
+	 * @param asignationsCompleted the asignations completed
+	 * @throws SystemException if a system exception occurred
+	 */
+	public void removeByasignationsCompleted(boolean asignationsCompleted)
+		throws SystemException {
+		for (P2pActivity p2pActivity : findByasignationsCompleted(
+				asignationsCompleted)) {
 			remove(p2pActivity);
 		}
 	}
@@ -2562,6 +3012,60 @@ public class P2pActivityPersistenceImpl extends BasePersistenceImpl<P2pActivity>
 	}
 
 	/**
+	 * Returns the number of p2p activities where asignationsCompleted = &#63;.
+	 *
+	 * @param asignationsCompleted the asignations completed
+	 * @return the number of matching p2p activities
+	 * @throws SystemException if a system exception occurred
+	 */
+	public int countByasignationsCompleted(boolean asignationsCompleted)
+		throws SystemException {
+		Object[] finderArgs = new Object[] { asignationsCompleted };
+
+		Long count = (Long)FinderCacheUtil.getResult(FINDER_PATH_COUNT_BY_ASIGNATIONSCOMPLETED,
+				finderArgs, this);
+
+		if (count == null) {
+			StringBundler query = new StringBundler(2);
+
+			query.append(_SQL_COUNT_P2PACTIVITY_WHERE);
+
+			query.append(_FINDER_COLUMN_ASIGNATIONSCOMPLETED_ASIGNATIONSCOMPLETED_2);
+
+			String sql = query.toString();
+
+			Session session = null;
+
+			try {
+				session = openSession();
+
+				Query q = session.createQuery(sql);
+
+				QueryPos qPos = QueryPos.getInstance(q);
+
+				qPos.add(asignationsCompleted);
+
+				count = (Long)q.uniqueResult();
+			}
+			catch (Exception e) {
+				throw processException(e);
+			}
+			finally {
+				if (count == null) {
+					count = Long.valueOf(0);
+				}
+
+				FinderCacheUtil.putResult(FINDER_PATH_COUNT_BY_ASIGNATIONSCOMPLETED,
+					finderArgs, count);
+
+				closeSession(session);
+			}
+		}
+
+		return count.intValue();
+	}
+
+	/**
 	 * Returns the number of p2p activities.
 	 *
 	 * @return the number of p2p activities
@@ -2687,6 +3191,8 @@ public class P2pActivityPersistenceImpl extends BasePersistenceImpl<P2pActivity>
 	private static final String _FINDER_COLUMN_ACTIDANDUSERID_USERID_2 = "p2pActivity.userId = ?";
 	private static final String _FINDER_COLUMN_ACTID_ACTID_2 = "p2pActivity.actId = ?";
 	private static final String _FINDER_COLUMN_USERID_USERID_2 = "p2pActivity.userId = ?";
+	private static final String _FINDER_COLUMN_ASIGNATIONSCOMPLETED_ASIGNATIONSCOMPLETED_2 =
+		"p2pActivity.asignationsCompleted = ?";
 	private static final String _ORDER_BY_ENTITY_ALIAS = "p2pActivity.";
 	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY = "No P2pActivity exists with the primary key ";
 	private static final String _NO_SUCH_ENTITY_WITH_KEY = "No P2pActivity exists with the key {";

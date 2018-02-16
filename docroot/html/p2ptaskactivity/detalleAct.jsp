@@ -1,3 +1,6 @@
+<%@page import="com.liferay.portal.kernel.json.JSONObject"%>
+<%@page import="com.liferay.portal.kernel.json.JSONFactoryUtil"%>
+<%@page import="com.liferay.portal.kernel.json.JSONArray"%>
 <%@page import="com.liferay.portal.kernel.servlet.BrowserSnifferUtil"%>
 <%@page import="com.liferay.lms.service.impl.LearningActivityLocalServiceImpl"%>
 <%@page import="java.text.SimpleDateFormat"%>
@@ -237,7 +240,42 @@ if(actId!=0)
 							<div class="degradade">
 								<div class="subtitle"><liferay-ui:message key="p2ptask-valoration" /> :</div>
 								<div class="container-textarea">
-									<%=description %>
+									<%
+							
+								if(myP2PActivity!=null){
+									JSONArray jArrayDes = null;
+									try{
+										jArrayDes = JSONFactoryUtil.createJSONArray(description);
+									}catch(Exception e){}
+								
+									if(jArrayDes!=null&&jArrayDes.length()>0){
+										%><div class="p2pResponse">
+										<ul><%
+										for(int i=0;i<jArrayDes.length();i++){
+											JSONObject jsonObjectDes = jArrayDes.getJSONObject(i);
+											String valoration = null;
+											if(jsonObjectDes!=null)
+												valoration = jsonObjectDes.getString("text"+i);
+											
+												String question = LearningActivityLocalServiceUtil.getExtraContentValue(actId, "text"+i);
+												
+											%>
+												<li>
+													<div class="p2pQuestion"><%=question!=null?question:StringPool.BLANK %></div>
+													<div class="p2pCorrect"><%=valoration!=null?valoration:StringPool.BLANK %></div>
+												</li>
+											<%
+										}%></ul></div><%
+										
+									}else{
+										%><%=description %><%
+									}
+								}
+							%>
+									
+									
+									
+									
 								</div>
 								<%
 								if(myP2PActiCor.getFileEntryId()!=0){
@@ -331,7 +369,38 @@ if(actId!=0)
 				</span>
 					<div class="collapsable" style="padding-left:10px">
 						<div class="container-textarea">
-							<%=correctionText %>
+							<%  if(myp2pActivity!=null){
+									JSONArray jArrayDes = null;
+									try{
+										jArrayDes = JSONFactoryUtil.createJSONArray(correctionText);
+									}catch(Exception e){}
+								
+									if(jArrayDes!=null&&jArrayDes.length()>0){
+										%><div class="p2pResponse">
+											<div class="p2pAnswer"><%=myp2pActivity.getDescription()%></div>
+										<ul><%
+										for(int i=0;i<jArrayDes.length();i++){
+											JSONObject jsonObjectDes = jArrayDes.getJSONObject(i);
+											String valoration = null;
+											if(jsonObjectDes!=null)
+												valoration = jsonObjectDes.getString("text"+i);
+											
+												String question = LearningActivityLocalServiceUtil.getExtraContentValue(actId, "text"+i);
+												
+											%>
+												<li>
+													<div class="p2pQuestion"><%=question!=null?question:StringPool.BLANK %></div>
+													<div class="p2pCorrect"><%=valoration!=null?valoration:StringPool.BLANK %></div>
+												</li>
+											<%
+										}%></ul></div><%
+										
+									}else{
+										String description = myP2PActCor.getDescription();
+										%><%=description %><%
+									}
+								}
+							%>
 						</div>
 						<%if(dlfile!=null){%>
 						<div class="doc_descarga">

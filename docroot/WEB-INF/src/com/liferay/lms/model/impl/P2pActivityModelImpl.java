@@ -88,8 +88,9 @@ public class P2pActivityModelImpl extends BaseModelImpl<P2pActivity>
 				"value.object.column.bitmask.enabled.com.liferay.lms.model.P2pActivity"),
 			true);
 	public static long ACTID_COLUMN_BITMASK = 1L;
-	public static long USERID_COLUMN_BITMASK = 2L;
-	public static long UUID_COLUMN_BITMASK = 4L;
+	public static long ASIGNATIONSCOMPLETED_COLUMN_BITMASK = 2L;
+	public static long USERID_COLUMN_BITMASK = 4L;
+	public static long UUID_COLUMN_BITMASK = 8L;
 	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(com.liferay.util.service.ServiceProps.get(
 				"lock.expiration.time.com.liferay.lms.model.P2pActivity"));
 
@@ -322,7 +323,19 @@ public class P2pActivityModelImpl extends BaseModelImpl<P2pActivity>
 	}
 
 	public void setAsignationsCompleted(boolean asignationsCompleted) {
+		_columnBitmask |= ASIGNATIONSCOMPLETED_COLUMN_BITMASK;
+
+		if (!_setOriginalAsignationsCompleted) {
+			_setOriginalAsignationsCompleted = true;
+
+			_originalAsignationsCompleted = _asignationsCompleted;
+		}
+
 		_asignationsCompleted = asignationsCompleted;
+	}
+
+	public boolean getOriginalAsignationsCompleted() {
+		return _originalAsignationsCompleted;
 	}
 
 	public long getColumnBitmask() {
@@ -449,6 +462,10 @@ public class P2pActivityModelImpl extends BaseModelImpl<P2pActivity>
 		p2pActivityModelImpl._originalUserId = p2pActivityModelImpl._userId;
 
 		p2pActivityModelImpl._setOriginalUserId = false;
+
+		p2pActivityModelImpl._originalAsignationsCompleted = p2pActivityModelImpl._asignationsCompleted;
+
+		p2pActivityModelImpl._setOriginalAsignationsCompleted = false;
 
 		p2pActivityModelImpl._columnBitmask = 0;
 	}
@@ -592,6 +609,8 @@ public class P2pActivityModelImpl extends BaseModelImpl<P2pActivity>
 	private String _description;
 	private Date _date;
 	private boolean _asignationsCompleted;
+	private boolean _originalAsignationsCompleted;
+	private boolean _setOriginalAsignationsCompleted;
 	private long _columnBitmask;
 	private P2pActivity _escapedModelProxy;
 }

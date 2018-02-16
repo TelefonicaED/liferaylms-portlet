@@ -1,0 +1,38 @@
+<custom-sql>
+
+	<sql id="com.liferay.lms.service.persistence.P2pActivityFinder.findByTeam">
+		<![CDATA[   			
+			SELECT pa.*
+			FROM 
+				lms_p2pactivity pa
+			INNER JOIN users_teams ut ON ut.userId = pa.userId AND ut.teamId IN [$TEAMS$]
+			WHERE pa.actId = ? AND
+			pa.p2pActivityId <> ? 
+			ORDER BY pa.countCorrections ASC
+			LIMIT [$START$], [$END$];
+		]]>
+	</sql>
+	<sql id="com.liferay.lms.service.persistence.P2pActivityFinder.findByGroup">
+		<![CDATA[   			
+			SELECT pa.*
+			FROM lms_p2pactivity pa
+			WHERE pa.actId = ? AND
+			pa.p2pActivityId <> ? 
+			ORDER BY pa.countCorrections ASC
+			LIMIT [$START$], [$END$];
+		]]>
+	</sql>
+	<sql id="com.liferay.lms.service.persistence.P2pActivityFinder.findByUserWithoutTeamActivities">
+		<![CDATA[   			
+			SELECT pa.*
+			FROM lms_p2pactivity pa
+			INNER JOIN users_groups ug ON ug.userId = pa.userId AND  ug.groupId = ? 
+		    AND ug.userId NOT IN (SELECT ut.userId FROM users_teams ut 
+			INNER JOIN team t ON t.teamId = ut.teamId AND t.groupId = ?)
+			WHERE pa.actId = ? AND
+			pa.p2pActivityId <> ? 
+			ORDER BY pa.countCorrections ASC
+			LIMIT [$START$], [$END$];
+		]]>
+	</sql>
+</custom-sql>

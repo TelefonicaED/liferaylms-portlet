@@ -90,6 +90,7 @@ create unique index IX_A378B6D1 on Lms_ModuleResult (userId, moduleId);
 
 create index IX_A70D5A07 on Lms_P2pActivity (actId);
 create index IX_90AFBB41 on Lms_P2pActivity (actId, userId);
+create index IX_E2E22C19 on Lms_P2pActivity (asignationsCompleted);
 create index IX_8F36C430 on Lms_P2pActivity (userId);
 create index IX_E73266FE on Lms_P2pActivity (uuid_);
 

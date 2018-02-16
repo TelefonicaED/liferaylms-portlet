@@ -1,3 +1,7 @@
+<%@page import="com.liferay.portal.model.Team"%>
+<%@page import="com.liferay.portal.kernel.exception.SystemException"%>
+<%@page import="com.liferay.portal.service.TeamLocalServiceUtil"%>
+<%@page import="com.liferay.portal.kernel.dao.orm.CustomSQLParam"%>
 <%@page import="java.text.SimpleDateFormat"%>
 <%@page import="com.liferay.lms.service.P2pActivityCorrectionsLocalServiceUtil"%>
 <%@page import="com.liferay.portal.kernel.workflow.WorkflowConstants"%>
@@ -49,6 +53,29 @@
 		
 				LinkedHashMap<String,Object> params = new LinkedHashMap<String,Object>();
 				params.put("usersGroups", new Long(themeDisplay.getScopeGroupId()));
+				
+				//Si el tutor pertenece a uno o más equipos, sólo se muestran los usuarios de los equipos
+				
+				List<Team> userTeams = null;
+				try {
+					userTeams=TeamLocalServiceUtil.getUserTeams(themeDisplay.getUserId(), themeDisplay.getScopeGroupId());
+				} catch (SystemException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			
+				if(userTeams != null && userTeams.size() > 0){
+					String teamIds = "";
+					for(int i = 0; i < userTeams.size();i++){
+						teamIds += userTeams.get(i).getTeamId() + ",";
+					}
+					if(teamIds.length() > 0){
+						teamIds = teamIds.substring(0, teamIds.length()-1);
+					}
+					
+					params.put("userTeamIds", new CustomSQLParam("INNER JOIN users_teams ON user_.userId = users_teams.userId "
+							+ "WHERE users_teams.teamId IN (" + teamIds + ")", null));
+				}
 				
 				OrderByComparator obc = null;
 				

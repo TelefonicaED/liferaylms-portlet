@@ -16,6 +16,7 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.messaging.Message;
 import com.liferay.portal.kernel.messaging.MessageListener;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.User;
 
 public class P2PAssignations implements MessageListener {
@@ -94,17 +95,7 @@ public class P2PAssignations implements MessageListener {
 		//Obtener la lista de actividades p2p de todos los usuarios.
 		List<P2pActivity> activities = null;
 		
-		//Seleccionamos las actividades p2p entre ayer y antes de ayer.
-		DynamicQuery consulta = DynamicQueryFactoryUtil.forClass(P2pActivity.class)
-				.add(PropertyFactoryUtil.forName("asignationsCompleted").eq(false));
-		
-		try {
-			activities = (List<P2pActivity>)P2pActivityLocalServiceUtil.dynamicQuery(consulta);
-		} catch (SystemException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		
+		activities = P2pActivityLocalServiceUtil.getP2pActivitiesByAssignationsCompleted(false);
 		if(activities != null){
 			//Recorrer todas las activities.
 			for(P2pActivity activity:activities){
@@ -120,6 +111,8 @@ public class P2PAssignations implements MessageListener {
 		int activityAsignations = 0;	
 		//Obtener las validaciones que tiene que tener la actividad.
 		int numAsigns = 3;
+		boolean teamAssignation = false;
+		//Get assignation Number
 		try {
 			String validations = LearningActivityLocalServiceUtil.getExtraContentValue(actId,"validaciones");
 			numAsigns = Integer.valueOf(validations);
@@ -130,14 +123,31 @@ public class P2PAssignations implements MessageListener {
 			e.printStackTrace();
 		}
 		
+		
+		
+		//Get assignation type
+		try {
+			String assignationType = LearningActivityLocalServiceUtil.getExtraContentValue(actId,"assignationType");
+			if(Validator.isNotNull(assignationType)){
+				teamAssignation = "team".equals(assignationType);
+			}
+		} catch (SystemException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		
+		
 		//Obtenemos las asignaciones que ya est�n realidas.
 		try {
 			activityAsignations =P2pActivityCorrectionsLocalServiceUtil.getNumCorrectionsAsignToUser(activity.getActId(),activity.getUserId());
 		
-			//Si la actividad no tiene asignadas todas las tareas que tiene que correguir.
+			//Si la actividad no tiene asignadas todas las tareas que tiene que corregir.
 			if( activityAsignations < numAsigns && !activity.isAsignationsCompleted()){
 
-				List<P2pActivity> activitiesToAsign = P2pActivityLocalServiceUtil.getP2pActivitiesToCorrect(actId, activity.getP2pActivityId(), numAsigns - activityAsignations);
+				List<P2pActivity> activitiesToAsign = P2pActivityLocalServiceUtil.getP2pActivitiesToCorrect(actId, activity.getP2pActivityId(), numAsigns - activityAsignations, teamAssignation);
 
 				if(log.isDebugEnabled()){
 					log.debug("P2P assign corrections to activity::"+activity.getActId()+"::"+activity.getUserId());

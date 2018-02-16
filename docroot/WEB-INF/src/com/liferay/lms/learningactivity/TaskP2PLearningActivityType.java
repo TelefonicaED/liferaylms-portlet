@@ -118,6 +118,17 @@ public class TaskP2PLearningActivityType extends BaseLearningActivityType {
 			
 			if(P2pActivityLocalServiceUtil.countByActId(learningActivity.getActId())==0){
 			
+				//Assignation type team members or course members
+				Element assignationType=rootElement.element("assignationType");
+				if(assignationType!=null){
+					assignationType.detach();
+					rootElement.remove(assignationType);
+				}
+				assignationType = SAXReaderUtil.createElement("assignationType");
+				assignationType.setText(ParamUtil.get(uploadRequest,"assignationType","course"));		
+				rootElement.add(assignationType);	
+				
+				//Anonimous P2P
 				Element anonimous=rootElement.element("anonimous");
 				if(anonimous!=null)
 				{

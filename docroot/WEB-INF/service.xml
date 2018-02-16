@@ -140,6 +140,9 @@
 		</finder>
 		<finder name="UserId" return-type="Collection">
 			<finder-column name="userId" />
+		</finder>	
+		<finder name="asignationsCompleted"  return-type="Collection">
+			<finder-column name="asignationsCompleted"  />
 		</finder>			
 	</entity>
 	
