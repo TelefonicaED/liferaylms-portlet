@@ -145,6 +145,8 @@ if(moduleEditing) idModuleUl = "myModule";
 				themeId++;
 				numActivities = LearningActivityLocalServiceUtil.countLearningActivitiesOfModule(theModule.getModuleId());
 				moduleActuallyIsLocked = theModule.isLocked(themeDisplay.getUserId());
+				if(permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), Module.class.getName(), theModule.getModuleId(), ActionKeys.VIEW) ||
+						permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), Module.class.getName(), theModule.getModuleId(), ActionKeys.ACCESS)){
 				%>
 				
 				<li class='option-none  <%=theModule.getModuleId() == moduleId ? "option-less selected":"" %> <%=numActivities > 0 ? " module-with-activities ":" module-without-activities "  %><%= (!hasPermissionAccessCourseFinished && moduleActuallyIsLocked) ? " locked ":""%>' id="<portlet:namespace/><%=theModule.getModuleId()%>">
@@ -199,7 +201,8 @@ if(moduleEditing) idModuleUl = "myModule";
 					<%}%>
 					
 				</li>
-			<%}%>
+			<% }
+			}%>
 		<%}else{
 			if(course==null){
 				
