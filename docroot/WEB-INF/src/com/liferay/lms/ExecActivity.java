@@ -326,6 +326,8 @@ public class ExecActivity extends QuestionsAdmin {
 
 				if(typeId==0 || (typeId == 4 && actionEditingDetails))
 				{
+					log.debug("editamos los detalles");
+					renderRequest.setAttribute("showOrderQuestions", true);
 					super.render(renderRequest, renderResponse);
 				}
 				else

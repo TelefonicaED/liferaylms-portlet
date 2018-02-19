@@ -204,7 +204,7 @@
   								<c:set var="questionId" value="<%=question.getQuestionId()%>" />
   								<aui:input name="second_${questionId }" label="" value='<%=second != null ? second.getText() : "0" %>'>
   									<aui:validator name="number"/>
-  									<aui:validator name="min" errorMessage="editActivity.passpuntuation.range">-1</aui:validator>
+  									<aui:validator name="min">"0"</aui:validator>
   								</aui:input>
   							</td>
   						</tr>

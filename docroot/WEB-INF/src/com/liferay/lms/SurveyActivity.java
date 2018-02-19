@@ -297,6 +297,7 @@ public class SurveyActivity extends QuestionsAdmin  {
 						include(viewJSP, renderRequest, renderResponse);
 						
 					}else{
+						renderRequest.setAttribute("showOrderQuestions", true);
 						super.render(renderRequest, renderResponse);
 					}
 					
@@ -317,7 +318,7 @@ public class SurveyActivity extends QuestionsAdmin  {
 
 		String action = ParamUtil.getString(request, "action");
 		long actId = ParamUtil.getLong(request, "resId",0); 
-
+		
 		if (action.equals("stadisticsReport")){
 			String filePath = ParamUtil.getString(request, "file", null);
 			String fileName =  ParamUtil.getString(request, "fileName");
@@ -384,6 +385,8 @@ public class SurveyActivity extends QuestionsAdmin  {
 				out.flush();
 				out.close();
 			}
+		}else{
+			super.serveResource(request, response);
 		}
 	}
 

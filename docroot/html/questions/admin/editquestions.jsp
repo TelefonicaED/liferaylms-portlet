@@ -262,7 +262,8 @@
 <aui:button-row cssClass="buttons_content">
 <%
 	List<TestQuestion> lista = TestQuestionLocalServiceUtil.getQuestions(learningActivity.getActId());
-	if(lista.size()>=2){ %>	
+	Boolean showOrderQuestions = (Boolean)request.getAttribute("showOrderQuestions");
+	if(lista.size()>=2 && (showOrderQuestions != null && showOrderQuestions)){ %>	
 
 		<liferay-portlet:renderURL var="orderURL" >
 			<liferay-portlet:param name="mvcPath" value="/html/questions/admin/orderQuestions.jsp" />

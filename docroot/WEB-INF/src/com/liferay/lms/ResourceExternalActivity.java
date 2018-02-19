@@ -427,10 +427,10 @@ public class ResourceExternalActivity extends QuestionsAdmin {
 	public void serveResource(ResourceRequest resourceRequest, ResourceResponse resourceResponse) throws IOException,
 			PortletException {
 		
-		resourceResponse.setContentType("application/json");
-		JSONObject oreturned = JSONFactoryUtil.createJSONObject();
-		
 		if(resourceRequest.getResourceID() != null && resourceRequest.getResourceID().equals("finishTry")){
+			
+			resourceResponse.setContentType("application/json");
+			JSONObject oreturned = JSONFactoryUtil.createJSONObject();
 			
 			long latId = ParamUtil.getLong(resourceRequest, "latId");
 			long score = ParamUtil.getLong(resourceRequest, "score");
@@ -519,8 +519,20 @@ public class ResourceExternalActivity extends QuestionsAdmin {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
+			try {
+				PrintWriter out = resourceResponse.getWriter();
+				out.print(oreturned.toString());
+				out.flush();
+				out.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			
 		}else if(resourceRequest.getResourceID() != null && resourceRequest.getResourceID().equals("saveQuestion")){
+			
+			resourceResponse.setContentType("application/json");
+			JSONObject oreturned = JSONFactoryUtil.createJSONObject();
 			
 			long questionId = ParamUtil.getLong(resourceRequest, "questionId", 0);
 			long latId = ParamUtil.getLong(resourceRequest, "latId", 0);
@@ -564,15 +576,17 @@ public class ResourceExternalActivity extends QuestionsAdmin {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
-		}
-		try {
-			PrintWriter out = resourceResponse.getWriter();
-			out.print(oreturned.toString());
-			out.flush();
-			out.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			try {
+				PrintWriter out = resourceResponse.getWriter();
+				out.print(oreturned.toString());
+				out.flush();
+				out.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}else{
+			super.serveResource(resourceRequest, resourceResponse);
 		}
 	}
 
