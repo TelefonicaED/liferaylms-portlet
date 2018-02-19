@@ -26,6 +26,27 @@
 			<transient name="userUuid" />
 		</attributes>
 	</mapped-superclass>
+	<mapped-superclass class="com.liferay.lms.model.impl.AsynchronousProcessAuditModelImpl">
+		<attributes>
+			<id name="asynchronousProcessAuditId" />
+			<basic name="classNameId" />
+			<basic name="classPK" />
+			<basic name="userId" />
+			<basic name="createDate">
+				<temporal>TIMESTAMP</temporal>
+			</basic>
+			<basic name="endDate">
+				<temporal>TIMESTAMP</temporal>
+			</basic>
+			<basic name="status" />
+			<basic name="statusMessage" />
+			<transient name="className" />
+			<transient name="modelAttributes" />
+			<transient name="primaryKey" />
+			<transient name="primaryKeyObj" />
+			<transient name="userUuid" />
+		</attributes>
+	</mapped-superclass>
 	<mapped-superclass class="com.liferay.lms.model.impl.AuditEntryModelImpl">
 		<attributes>
 			<id name="auditId" />
@@ -530,6 +551,10 @@
 	</mapped-superclass>
 	<entity class="com.liferay.lms.model.impl.ActivityTriesDeletedImpl" name="ActivityTriesDeleted">
 		<table name="Lms_ActivityTriesDeleted" />
+		<attributes />
+	</entity>
+	<entity class="com.liferay.lms.model.impl.AsynchronousProcessAuditImpl" name="AsynchronousProcessAudit">
+		<table name="Lms_AsynchronousProcessAudit" />
 		<attributes />
 	</entity>
 	<entity class="com.liferay.lms.model.impl.AuditEntryImpl" name="AuditEntry">

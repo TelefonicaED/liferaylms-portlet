@@ -795,6 +795,17 @@
     	<column name="competenceId" type="long" primary="true" />
     	<column name="downloadDate" type="Date" />
     </entity>
+     <entity name="AsynchronousProcessAudit" local-service="true" remote-service="false">
+    	<column name="asynchronousProcessAuditId" type="long" primary="true"></column>
+    	<column name="classNameId" type="long"></column>
+		<column name="classPK" type="long"></column>
+    	<column name="userId" type="long"></column>
+    	<column name="createDate" type="Date"></column> 
+    	<column name="endDate" type="Date"></column>
+    	<column name="status" type="int" />
+    	<column name="statusMessage" type="String"/>
+    </entity>
+    
     <exceptions>
 		<exception>NoSuchModule</exception>
 	</exceptions>
