@@ -186,6 +186,10 @@
 				
 				themeId++;
 				moduleIsLocked = theModule.isLocked(themeDisplay.getUserId());
+				
+				if(permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), Module.class.getName(), theModule.getModuleId(), ActionKeys.VIEW) ||
+						permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), Module.class.getName(), theModule.getModuleId(), ActionKeys.ACCESS)){
+				
 %>
 				<script type="text/javascript">
 				  AUI().ready('event', 'node','aui-base','aui-dialog','aui-dialog-iframe','anim','json',function(A) {
@@ -423,7 +427,8 @@
 %>
 					</td>
 				</tr>
-<%		}%>
+<%		}	
+	}%>
   </table>
 </div>
 
