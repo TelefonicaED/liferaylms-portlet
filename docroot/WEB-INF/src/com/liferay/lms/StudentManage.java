@@ -1,7 +1,6 @@
 package com.liferay.lms;
 
 import java.io.IOException;
-import java.util.LinkedHashMap;
 import java.util.List;
 
 import javax.portlet.PortletException;
@@ -11,28 +10,18 @@ import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 
 import com.liferay.lms.model.Course;
-import com.liferay.lms.model.LmsPrefs;
 import com.liferay.lms.service.CourseLocalServiceUtil;
-import com.liferay.lms.service.LmsPrefsLocalServiceUtil;
 import com.liferay.lms.util.searchcontainer.UserSearchContainer;
 import com.liferay.lms.util.searchterms.UserSearchTerms;
-import com.liferay.portal.kernel.dao.orm.CustomSQLParam;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.util.OrderByComparator;
-import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
-import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.model.Team;
-import com.liferay.portal.model.User;
-import com.liferay.portal.service.RoleLocalServiceUtil;
 import com.liferay.portal.service.TeamLocalServiceUtil;
-import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.theme.ThemeDisplay;
-import com.liferay.portal.util.comparator.UserLastNameComparator;
 import com.liferay.util.bridges.mvc.MVCPortlet;
 
 

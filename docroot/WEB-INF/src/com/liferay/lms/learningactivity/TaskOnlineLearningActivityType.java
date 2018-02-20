@@ -156,4 +156,9 @@ public class TaskOnlineLearningActivityType extends BaseLearningActivityType {
 	public boolean canBeLinked(){
 		return false;
 	}
+	
+	@Override
+	public boolean canBeSeenResults(){
+		return true;
+	}
 }

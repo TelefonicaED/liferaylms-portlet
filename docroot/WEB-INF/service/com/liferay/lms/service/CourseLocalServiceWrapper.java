@@ -691,6 +691,26 @@ public class CourseLocalServiceWrapper implements CourseLocalService,
 			screenName, firstName, lastName, emailAddress, status, andOperator);
 	}
 
+	public java.util.List<com.liferay.portal.model.User> getStudents(
+		long courseId, long companyId, java.lang.String screenName,
+		java.lang.String firstName, java.lang.String lastName,
+		java.lang.String emailAddress, int status, long teamId,
+		boolean andOperator, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator comparator) {
+		return _courseLocalService.getStudents(courseId, companyId, screenName,
+			firstName, lastName, emailAddress, status, teamId, andOperator,
+			start, end, comparator);
+	}
+
+	public int countStudents(long courseId, long companyId,
+		java.lang.String screenName, java.lang.String firstName,
+		java.lang.String lastName, java.lang.String emailAddress, int status,
+		long teamId, boolean andOperator) {
+		return _courseLocalService.countStudents(courseId, companyId,
+			screenName, firstName, lastName, emailAddress, status, teamId,
+			andOperator);
+	}
+
 	public java.util.List<com.liferay.lms.model.Course> getCoursesCatalogByTitleCategoriesTags(
 		java.lang.String freeText, long[] categories, long[] tags,
 		long companyId, long groupId, long userId, java.lang.String language,

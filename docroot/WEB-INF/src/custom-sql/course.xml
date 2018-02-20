@@ -410,8 +410,9 @@
 			LEFT JOIN 
 				usergrouprole urE 
 					ON ug.userId = urE.userId AND urE.groupId = ug.groupId AND urE.roleId = ?
+			[$JOINTEAM$]
 			WHERE 
-				ur.userId IS NULL AND urE.userId IS NULL AND co.courseId = ? AND u.status = ?
+				ur.userId IS NULL AND urE.userId IS NULL AND co.courseId = ? AND (u.status = ? OR ? = ?)
 				AND 
 				(
 					[$WHEREFIRSTNAME$]
@@ -442,6 +443,7 @@
 			LEFT JOIN 
 				usergrouprole urE 
 					ON ug.userId = urE.userId AND urE.groupId = ug.groupId AND urE.roleId = ?
+			[$JOINTEAM$]
 			WHERE 
 				ur.userId IS NULL AND urE.userId IS NULL AND co.courseId = ? AND (u.status = ? OR ? = ?)
 				AND 
@@ -478,6 +480,12 @@
 	<sql id="com.liferay.lms.service.persistence.CourseFinder.whereParentCourseNull">
 		<![CDATA[
 			AND (c.parentCourseId = 0 OR c.parentCourseId IS NULL) 
+		]]>
+	</sql>
+	
+	<sql id="com.liferay.lms.service.persistence.CourseFinder.innerJoinTeam">
+		<![CDATA[
+			INNER JOIN users_teams ON users_teams.userId = u.userId AND users_teams.teamId = ?
 		]]>
 	</sql>
 	

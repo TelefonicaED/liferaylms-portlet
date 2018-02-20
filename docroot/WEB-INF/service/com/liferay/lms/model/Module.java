@@ -36,4 +36,8 @@ public interface Module extends ModuleModel, PersistedModel {
 			com.liferay.portal.kernel.exception.SystemException;
 
 	public boolean isLocked(long userId);
+
+	public java.util.List<com.liferay.lms.model.LearningActivity> getListVisiblesLearningActivities(
+		long companyId,
+		com.liferay.portal.security.permission.PermissionChecker permissionChecker);
 }

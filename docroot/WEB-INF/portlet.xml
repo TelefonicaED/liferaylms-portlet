@@ -121,8 +121,12 @@
 		<display-name>GradeBook</display-name>
 		<portlet-class>com.liferay.lms.GradeBook</portlet-class>
 		<init-param>
-			<name>view-jsp</name>
+			<name>view-template</name>
 			<value>/html/gradebook/view.jsp</value>
+		</init-param>
+		<init-param>
+			<name>user-details-template</name>
+			<value>/html/gradebook/userdetails.jsp</value>
 		</init-param>
 		<expiration-cache>0</expiration-cache>
 		<supports>

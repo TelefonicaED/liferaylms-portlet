@@ -551,6 +551,19 @@ public interface CourseLocalService extends BaseLocalService,
 		boolean andOperator);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.util.List<com.liferay.portal.model.User> getStudents(
+		long courseId, long companyId, java.lang.String screenName,
+		java.lang.String firstName, java.lang.String lastName,
+		java.lang.String emailAddress, int status, long teamId,
+		boolean andOperator, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator comparator);
+
+	public int countStudents(long courseId, long companyId,
+		java.lang.String screenName, java.lang.String firstName,
+		java.lang.String lastName, java.lang.String emailAddress, int status,
+		long teamId, boolean andOperator);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.util.List<com.liferay.lms.model.Course> getCoursesCatalogByTitleCategoriesTags(
 		java.lang.String freeText, long[] categories, long[] tags,
 		long companyId, long groupId, long userId, java.lang.String language,

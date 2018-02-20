@@ -719,11 +719,11 @@ public class LearningActivityClp extends BaseModelImpl<LearningActivity>
 		throw new UnsupportedOperationException();
 	}
 
-	public boolean isLocked(com.liferay.portal.model.User user) {
+	public com.liferay.lms.model.Module getModule() {
 		throw new UnsupportedOperationException();
 	}
 
-	public com.liferay.lms.model.Module getModule() {
+	public boolean isLocked(com.liferay.portal.model.User user) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -735,16 +735,20 @@ public class LearningActivityClp extends BaseModelImpl<LearningActivity>
 		throw new UnsupportedOperationException();
 	}
 
+	public boolean isLocked(long userId) {
+		throw new UnsupportedOperationException();
+	}
+
+	public com.liferay.lms.learningactivity.LearningActivityType getLearningActivityType() {
+		throw new UnsupportedOperationException();
+	}
+
 	public boolean isNullEndDate() {
 		throw new UnsupportedOperationException();
 	}
 
 	public boolean isLocked(com.liferay.portal.model.User user,
 		com.liferay.portal.security.permission.PermissionChecker permissionChecker) {
-		throw new UnsupportedOperationException();
-	}
-
-	public boolean isLocked(long userId) {
 		throw new UnsupportedOperationException();
 	}
 
