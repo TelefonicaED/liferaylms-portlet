@@ -28,12 +28,7 @@
 	
 	LearningActivity learningActivity = LearningActivityLocalServiceUtil.getLearningActivity(actId);
 	request.setAttribute("activity", learningActivity);
-	/*
-	PortletURL backUrl = renderResponse.createRenderURL();
-	backUrl.setParameter("resId", String.valueOf(learningActivity.getActId()));
-	backUrl.setParameter("jspPage", "/html/execactivity/test/admin/editquestions.jsp");
-	backUrl.setParameter("actionEditingDetails",StringPool.TRUE);
-	*/
+
 	request.setAttribute("backUrl", backUrl.toString());
 	
 	
