@@ -1,3 +1,6 @@
+<%@page import="com.liferay.portal.model.CompanyConstants"%>
+<%@page import="com.liferay.portal.service.CompanyLocalServiceUtil"%>
+<%@page import="com.liferay.portal.model.Company"%>
 <%@page import="com.liferay.lms.service.ClpSerializer"%>
 <%@page import="com.liferay.lms.model.TestQuestion"%>
 <%@page import="com.liferay.lms.service.TestQuestionLocalServiceUtil"%>
@@ -8,6 +11,9 @@
 <%@page import="java.util.List"%>
 <%@page import="java.io.FileNotFoundException"%>
 <%@ include file="/init.jsp" %>
+
+
+
 <%
 
 LearningActivity learnact=null;
@@ -21,9 +27,34 @@ else
 	learnact=LearningActivityLocalServiceUtil.getLearningActivity(ParamUtil.getLong(request,"actId"));
 }
 
-String urlExample = "<a href=\"/"+ ClpSerializer.getServletContextName()+"/html/offlinetaskactivity/examples/ImportGrades.csv\">"+LanguageUtil.get(themeDisplay.getLocale(),"example")+"</a>";
+
+String authType = null;
+String message ="";
+if (Validator.isNotNull(company)) {
+	authType = company.getAuthType();
+}
+						
+if (CompanyConstants.AUTH_TYPE_EA.compareToIgnoreCase(authType) == 0) {
+	//Caso para el emailAddress
+	message = LanguageUtil.format(themeDisplay.getLocale(), "offlinetaskactivity.importuser.help", LanguageUtil.get(themeDisplay.getLocale(), "email"));
+	
+} else if (CompanyConstants.AUTH_TYPE_SN.compareToIgnoreCase(authType) == 0) {
+	//Caso para el screenName
+	message = LanguageUtil.format(themeDisplay.getLocale(), "offlinetaskactivity.importuser.help", LanguageUtil.get(themeDisplay.getLocale(), "screen-name"));
+	
+} else {
+	//Caso para el userId
+	message = LanguageUtil.format(themeDisplay.getLocale(), "offlinetaskactivity.importuser.help", LanguageUtil.get(themeDisplay.getLocale(), "user-id"));				
+}								
+	
+
 
 %>
+<liferay-portlet:resourceURL var="importGradesExampleURL" >
+	<portlet:param name="action" value="importGradesExample"/>
+	<portlet:param name="resId" value="<%=String.valueOf(learnact.getActId()) %>"/>
+</liferay-portlet:resourceURL>
+
 
 <portlet:renderURL var="importGradesURL"  windowState="<%= LiferayWindowState.POP_UP.toString() %>">
 	<portlet:param name="actId" value="<%=String.valueOf(learnact.getActId()) %>" /> 
@@ -34,17 +65,19 @@ String urlExample = "<a href=\"/"+ ClpSerializer.getServletContextName()+"/html/
 <liferay-ui:header title="offlinetaskactivity.file"></liferay-ui:header>
 
 <liferay-ui:panel id="importuserrole_help" title="help" extended="closed">
-	<%=LanguageUtil.get(themeDisplay.getLocale(),"offlinetaskactivity.importuser.help") %>
+	
+
+	<%=message %>
 </liferay-ui:panel>
 
 <span>
-	<%=LanguageUtil.get(pageContext,"courseadmin.importuserrole.download") +" "+ urlExample%>
+	<aui:a href="${exportGradesExampleURL}"><liferay-ui:message key="courseadmin.importuserrole.download"/> <liferay-ui:message key="example"/></aui:a>
 </span>
 
 <iframe name="<portlet:namespace />import_frame" src="" id="<portlet:namespace />import_frame" style="display:none;" onload="<portlet:namespace />doImportGrades();" ></iframe>
 <aui:form name="fm" action="<%=importGradesURL%>"  method="post" enctype="multipart/form-data" target='<%=renderResponse.getNamespace() +"import_frame" %>' >
 	<aui:fieldset>
-		<aui:field-wrapper label="offlinetaskactivity.file"  helpMessage="offlinetaskactivity.file.help">
+		<aui:field-wrapper label="offlinetaskactivity.file"  helpMessage="<%=message %>">
 	    			<aui:input inlineLabel="left" inlineField="true"
 					  	name="fileName" label="" id="fileName" type="file" value="" />
 		</aui:field-wrapper>

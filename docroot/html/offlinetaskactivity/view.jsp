@@ -45,7 +45,12 @@ CalificationType ct = new CalificationTypeRegistry().getCalificationType(CourseL
 	LmsPrefs prefs=LmsPrefsLocalServiceUtil.getLmsPrefs(themeDisplay.getCompanyId());
 	long actId = ParamUtil.getLong(request,"actId",0);
 	int curValue = ParamUtil.getInteger(request,"curValue",1);
+	String criteria = request.getParameter("criteria");
+	String gradeFilter = request.getParameter("gradeFilter");
 
+	if (criteria == null) criteria = "";	
+	if (gradeFilter == null) gradeFilter = "";	
+	
 	if(actId==0)
 	{
 		renderRequest.setAttribute(WebKeys.PORTLET_CONFIGURATOR_VISIBILITY, Boolean.FALSE);
@@ -181,6 +186,8 @@ CalificationType ct = new CalificationTypeRegistry().getCalificationType(CourseL
 								<liferay-portlet:resourceURL var="exportURL" >
 									<portlet:param name="action" value="export"/>
 									<portlet:param name="resId" value="<%=String.valueOf(activity.getActId()) %>"/>
+									<portlet:param name="gradeFilter" value="<%=gradeFilter %>"/>
+									<portlet:param name="criteria" value="<%=criteria %>"/>
 								</liferay-portlet:resourceURL>
 								<liferay-ui:icon image="export" label="<%= true %>" message="offlinetaskactivity.csv.export" method="get" url="<%=exportURL%>" />
 							</div>
@@ -196,13 +203,7 @@ CalificationType ct = new CalificationTypeRegistry().getCalificationType(CourseL
 					<div class="description"><%=activity.getDescriptionFiltered(themeDisplay.getLocale(),true) %></div>
 					
 					
-					<% if((PermissionCheckerFactoryUtil.create(themeDisplay.getUser())).hasPermission(themeDisplay.getScopeGroupId(), "com.liferay.lms.model", themeDisplay.getScopeGroupId(), "VIEW_RESULTS")){ 
-						String criteria = request.getParameter("criteria");
-						String gradeFilter = request.getParameter("gradeFilter");
-	
-						if (criteria == null) criteria = "";	
-						if (gradeFilter == null) gradeFilter = "";	
-						
+					<% if(isTeacher){ 
 						PortletURL portletURL = renderResponse.createRenderURL();
 						portletURL.setParameter("jspPage","/html/offlinetaskactivity/view.jsp");
 						portletURL.setParameter("criteria", criteria); 
@@ -238,65 +239,19 @@ CalificationType ct = new CalificationTypeRegistry().getCalificationType(CourseL
 
 				   	<liferay-ui:search-container-results>
 						<%
-							String middleName = null;
-					
-							LinkedHashMap<String,Object> params = new LinkedHashMap<String,Object>();
-							
-							params.put("usersGroups", new Long(themeDisplay.getScopeGroupId()));
-							 params.put("notInCourseRoleTeach", new CustomSQLParam("WHERE User_.userId NOT IN "
-						              + " (SELECT UserGroupRole.userId " + "  FROM UserGroupRole "
-						              + "  WHERE  (UserGroupRole.groupId = ?) AND (UserGroupRole.roleId = ?))", new Long[] {
-						              themeDisplay.getScopeGroupId(),
-						              RoleLocalServiceUtil.getRole(prefs.getTeacherRole()).getRoleId() }));
-							 
-							 params.put("notInCourseRoleEdit", new CustomSQLParam("WHERE User_.userId NOT IN "
-						              + " (SELECT UserGroupRole.userId " + "  FROM UserGroupRole "
-						              + "  WHERE  (UserGroupRole.groupId = ?) AND (UserGroupRole.roleId = ?))", new Long[] {
-						            		  themeDisplay.getScopeGroupId(),
-						              RoleLocalServiceUtil.getRole(prefs.getEditorRole()).getRoleId() }));
-							if(gradeFilter.equals("passed")) {
-								params.put("passed",new CustomSQLParam(OfflineActivity.ACTIVITY_RESULT_PASSED_SQL,actId));
-							}
-							else {
-								if(gradeFilter.equals("failed")) {
-									params.put("failed",new CustomSQLParam(OfflineActivity.ACTIVITY_RESULT_FAIL_SQL,actId));
-								} else {
-									if (gradeFilter.equals("nocalification")) {
-										params.put("nocalification",new CustomSQLParam(OfflineActivity.ACTIVITY_RESULT_NO_CALIFICATION_SQL,actId));
-									}
-								}
-							}
-																				
-							OrderByComparator obc = new UserFirstNameComparator(true);
-							
-							if(!StringPool.BLANK.equals(LearningActivityLocalServiceUtil.getExtraContentValue(actId,"team"))){
-								String teamId = LearningActivityLocalServiceUtil.getExtraContentValue(actId,"team");
-								Team team = TeamLocalServiceUtil.getTeam(Long.parseLong(teamId));
-								params.put("usersTeams", team.getTeamId());
-							}
-							//if ((GetterUtil.getInteger(PropsUtil.get(PropsKeys.PERMISSIONS_USER_CHECK_ALGORITHM))==6)&&(!ResourceBlockLocalServiceUtil.isSupported("com.liferay.lms.model"))){		
-							//	
-							//	params.put("notTeacher",new CustomSQLParam(OfflineActivity.NOT_TEACHER_SQL,themeDisplay.getScopeGroupId()));
-							//	List<User> userListPage = UserLocalServiceUtil.search(themeDisplay.getCompanyId(), criteria, WorkflowConstants.STATUS_ANY, params, searchContainer.getStart(), searchContainer.getEnd(), obc);
-							//	int userCount = UserLocalServiceUtil.searchCount(themeDisplay.getCompanyId(), criteria,  WorkflowConstants.STATUS_ANY, params);
-							//	pageContext.setAttribute("results", userListPage);
-							//	pageContext.setAttribute("total", userCount);
-							//
-							//}
-							//else{
 						
-								List<User> userListsOfCourse = UserLocalServiceUtil.search(themeDisplay.getCompanyId(), criteria, WorkflowConstants.STATUS_ANY, params, QueryUtil.ALL_POS, QueryUtil.ALL_POS, obc);
-								List<User> userLists =  new ArrayList<User>(userListsOfCourse.size());
-								
-								for(User userOfCourse:userListsOfCourse){							
-									if(!PermissionCheckerFactoryUtil.create(userOfCourse).hasPermission(themeDisplay.getScopeGroupId(), "com.liferay.lms.model",themeDisplay.getScopeGroupId(), "VIEW_RESULTS")){
-										userLists.add(userOfCourse);
-									}
-								}	
-								
-								pageContext.setAttribute("results", ListUtil.subList(userLists, searchContainer.getStart(), searchContainer.getEnd()));
-							    pageContext.setAttribute("total", userLists.size());	
-							//}
+							List<User> userListsOfCourse = OfflineActivity.getCalificationUsers(themeDisplay, actId, criteria, gradeFilter);
+							List<User> userLists =  new ArrayList<User>(userListsOfCourse.size());
+							
+							for(User userOfCourse:userListsOfCourse){							
+								if(!PermissionCheckerFactoryUtil.create(userOfCourse).hasPermission(themeDisplay.getScopeGroupId(), "com.liferay.lms.model",themeDisplay.getScopeGroupId(), "VIEW_RESULTS")){
+									userLists.add(userOfCourse);
+								}
+							}	
+							
+							pageContext.setAttribute("results", ListUtil.subList(userLists, searchContainer.getStart(), searchContainer.getEnd()));
+						    pageContext.setAttribute("total", userLists.size());	
+							
 						%>
 					</liferay-ui:search-container-results>
 					
