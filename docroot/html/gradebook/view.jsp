@@ -41,9 +41,9 @@
 				</liferay-portlet:renderURL>
 				
 				<div class="table-overflow table-absolute">
-					<liferay-ui:search-container searchContainer="${searchContainer}"  iteratorURL="${searchContainer.iteratorURL}" >
+					<liferay-ui:search-container searchContainer="${searchContainers.get(fila)}"  iteratorURL="${searchContainers.get(fila).iteratorURL}" >
 					
-						<liferay-ui:search-container-results results="${searchContainer.results}" total="${searchContainer.total}" />
+						<liferay-ui:search-container-results results="${searchContainers.get(fila).results}" total="${searchContainers.get(fila).total}" />
 					
 						<liferay-ui:search-container-row className="com.liferay.portal.model.User" keyProperty="userId" modelVar="userSearch">
 							<liferay-portlet:renderURL var="userDetailsURL">
@@ -79,10 +79,10 @@
 									</c:if>
 									
 									<c:choose>
-										<c:when test="${learningActivityResult.passed }">
+										<c:when test="${not empty learningActivityResult && learningActivityResult.passed }">
 											<liferay-ui:icon image="checked" message="passed"/>
 										</c:when>
-										<c:when test="${not empty learningActivityResult.endDate && !learningActivityResult.passed }">
+										<c:when test="${not empty learningActivityResult && not empty learningActivityResult.endDate && !learningActivityResult.passed }">
 											<liferay-ui:icon image="close" message="not-passed"/>
 										</c:when>
 										<c:when test="${not empty learningActivityResult }">
