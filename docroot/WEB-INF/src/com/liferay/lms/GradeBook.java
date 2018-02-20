@@ -2,6 +2,7 @@ package com.liferay.lms;
 
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -137,16 +138,7 @@ public class GradeBook extends MVCPortlet {
 		renderRequest.setAttribute("hasNullTeam", hasNullTeam);
 		renderRequest.setAttribute("teams", userTeams);
 		renderRequest.setAttribute("theTeam", theTeam);
-		
-		try {
-			List<Module> modules = ModuleLocalServiceUtil.findAllInGroup(themeDisplay.getScopeGroupId());
-			renderRequest.setAttribute("modules", modules);
-		} catch (SystemException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		
+			
 		//Buscamos los usuario
 		
 		PortletURL iteratorURL = renderResponse.createRenderURL();
@@ -159,14 +151,16 @@ public class GradeBook extends MVCPortlet {
 		SearchContainer<User> searchContainer = new SearchContainer<User>(renderRequest, null, null, SearchContainer.DEFAULT_CUR_PARAM,
 				10, iteratorURL, 
 				null, "there-are-no-users");
-
+		
+		List<User> results = null;
+		int total = 0;
 		try {
 			Course course = CourseLocalServiceUtil.getCourseByGroupCreatedId(themeDisplay.getScopeGroupId());
-			List<User> results = CourseLocalServiceUtil.getStudents(course.getCourseId(), themeDisplay.getCompanyId(), userDisplayTerms.getScreenName(), userDisplayTerms.getFirstName(), 
+			results = CourseLocalServiceUtil.getStudents(course.getCourseId(), themeDisplay.getCompanyId(), userDisplayTerms.getScreenName(), userDisplayTerms.getFirstName(), 
 					userDisplayTerms.getLastName(), userDisplayTerms.getEmailAddress(), WorkflowConstants.STATUS_APPROVED, userDisplayTerms.getTeamId(), true, searchContainer.getStart(),
-					searchContainer.getEnd(), new UserLastNameComparator());
+					searchContainer.getEnd(), new UserLastNameComparator(true));
 
-			int total = CourseLocalServiceUtil.countStudents(course.getCourseId(), themeDisplay.getCompanyId(), userDisplayTerms.getScreenName(), userDisplayTerms.getFirstName(), 
+			total = CourseLocalServiceUtil.countStudents(course.getCourseId(), themeDisplay.getCompanyId(), userDisplayTerms.getScreenName(), userDisplayTerms.getFirstName(), 
 					userDisplayTerms.getLastName(), userDisplayTerms.getEmailAddress(), WorkflowConstants.STATUS_APPROVED, userDisplayTerms.getTeamId(), true);
 			
 			searchContainer.setResults(results);
@@ -176,10 +170,35 @@ public class GradeBook extends MVCPortlet {
 			e1.printStackTrace();
 		}
 		
+		List<SearchContainer<User>> searchContainers = new ArrayList<SearchContainer<User>>();
+		
+		try {
+			List<Module> modules = ModuleLocalServiceUtil.findAllInGroup(themeDisplay.getScopeGroupId());
+			
+			SearchContainer<User> searchContainerList = null;
+			
+			for(Module module: modules){
+				if(searchContainerList != null){
+					searchContainerList = new SearchContainer<User>(renderRequest, null, null, SearchContainer.DEFAULT_CUR_PARAM,
+							10, iteratorURL, 
+							null, "there-are-no-users");
+					searchContainerList.setResults(results);
+					searchContainerList.setTotal(total);
+				}else{
+					searchContainerList = searchContainer;
+				}
+				searchContainerList.setId("search_"+module.getModuleId());
+				searchContainers.add(searchContainerList);
+			}
+			renderRequest.setAttribute("modules", modules);
+		} catch (SystemException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 		 
 		renderRequest.setAttribute("displayTerms", userDisplayTerms);
-		renderRequest.setAttribute("searchContainer", searchContainer);
+		renderRequest.setAttribute("searchContainers", searchContainers);
 		
 		try {
 			CalificationType ct = new CalificationTypeRegistry().getCalificationType(CourseLocalServiceUtil.getCourseByGroupCreatedId(themeDisplay.getScopeGroupId()).getCalificationType());

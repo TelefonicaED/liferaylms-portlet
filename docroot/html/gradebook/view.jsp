@@ -8,16 +8,13 @@
 <jsp:useBean id="ct" type="com.liferay.lms.learningactivity.calificationtype.CalificationType" scope="request"/>
 
 <liferay-ui:error key="result-bad-format" message="<%=LanguageUtil.format(themeDisplay.getLocale(), \"result.must-be-between\", new Object[]{ct.getMinValue(themeDisplay.getScopeGroupId()),ct.getMaxValue(themeDisplay.getScopeGroupId())})%>" />
-
 <liferay-ui:error key="grades.bad-updating" message="offlinetaskactivity.grades.bad-updating" />
 <liferay-ui:success key="grades.updating" message="offlinetaskactivity.correct.saved" />
-
 <liferay-ui:panel-container > 
 		
 	<aui:form name="fm" action="${renderURL}" method="post">
 	
 		<%@ include file="/html/search/userSearch.jsp" %>
-
 		<aui:button-row>
 			<aui:button name="searchUsers" value="search" type="submit" />
 		</aui:button-row>
@@ -26,7 +23,6 @@
 	<c:if test="${not empty team }">
 		<liferay-ui:header title="${team.name}" showBackURL="false" localizeTitle="false"/>
 	</c:if>
-
 	<c:if test="${not empty modules }">
 		<c:set var="fila" value="0"/>
 		
@@ -45,9 +41,9 @@
 				</liferay-portlet:renderURL>
 				
 				<div class="table-overflow table-absolute">
-					<liferay-ui:search-container searchContainer="${searchContainer}"  iteratorURL="${searchContainer.iteratorURL}" >
+					<liferay-ui:search-container searchContainer="${searchContainers.get(fila)}"  iteratorURL="${searchContainers.get(fila).iteratorURL}" >
 					
-						<liferay-ui:search-container-results results="${searchContainer.results}" total="${searchContainer.total}" />
+						<liferay-ui:search-container-results results="${searchContainers.get(fila).results}" total="${searchContainers.get(fila).total}" />
 					
 						<liferay-ui:search-container-row className="com.liferay.portal.model.User" keyProperty="userId" modelVar="userSearch">
 							<liferay-portlet:renderURL var="userDetailsURL">
@@ -83,17 +79,16 @@
 									</c:if>
 									
 									<c:choose>
-										<c:when test="${learningActivityResult.passed }">
+										<c:when test="${not empty learningActivityResult && learningActivityResult.passed }">
 											<liferay-ui:icon image="checked" message="passed"/>
 										</c:when>
-										<c:when test="${not empty learningActivityResult.endDate && !learningActivityResult.passed }">
+										<c:when test="${not empty learningActivityResult && not empty learningActivityResult.endDate && !learningActivityResult.passed }">
 											<liferay-ui:icon image="close" message="not-passed"/>
 										</c:when>
 										<c:when test="${not empty learningActivityResult }">
 											<liferay-ui:icon image="unchecked" message="unchecked"/>
 										</c:when>
 									</c:choose>
-
 									<c:if test="${not empty learningActivityResult && permissionChecker.hasPermission(themeDisplay.scopeGroupId, 'com.liferay.lms.model', themeDisplay.scopeGroupId, 'VIEW_RESULTS') }">
 										<c:if test="${not empty learningActivityResult.endDate }">
 											<liferay-ui:icon image="edit" url='javascript:${renderResponse.namespace}showPopupGrades("${userSearch.userId }","${learningActivity.actId}");' />
@@ -115,7 +110,6 @@
 		</c:forEach>
 	</c:if>
 </liferay-ui:panel-container>
-
 <script type="text/javascript">
 	function <portlet:namespace />showPopupActivity(studentId, actId, actType) {
 		
@@ -128,7 +122,6 @@
 			renderUrl.setParameter('studentId', studentId);
 			renderUrl.setParameter('actType', actType);
 			renderUrl.setParameter('jspPage', url);
-
 			window.<portlet:namespace />popupActivity = new A.Dialog({
 				id:'<portlet:namespace />showPopupActivity',
 	            title: Liferay.Language.get("coursestats.modulestats.activity"),
@@ -155,7 +148,6 @@
 	}
 	
 	function <portlet:namespace />showPopupGrades(studentId, actId) {
-
 		AUI().use('aui-dialog','liferay-portlet-url', function(A){
 			var renderUrl = Liferay.PortletURL.createRenderURL();							
 			renderUrl.setWindowState('<%= LiferayWindowState.EXCLUSIVE.toString() %>');
@@ -163,7 +155,6 @@
 			renderUrl.setParameter('actId', actId);
 			renderUrl.setParameter('studentId', studentId);
 			renderUrl.setParameter('jspPage', '/html/gradebook/popups/grades.jsp');
-
 			window.<portlet:namespace />popupGrades = new A.Dialog({
 				id:'<portlet:namespace />showPopupGrades',
 	            title: Liferay.Language.get("offlinetaskactivity.set.grades"),
@@ -183,5 +174,4 @@
 	    	window.<portlet:namespace />popupGrades.close();
 	    });
 	}
-
 </script>
