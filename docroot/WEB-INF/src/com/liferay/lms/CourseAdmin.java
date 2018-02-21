@@ -48,13 +48,14 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.model.Group;
+import com.liferay.portal.model.LayoutSet;
 import com.liferay.portal.model.LayoutSetPrototype;
 import com.liferay.portal.model.RoleConstants;
 import com.liferay.portal.model.User;
 import com.liferay.portal.security.permission.ActionKeys;
-import com.liferay.portal.service.ClassNameLocalServiceUtil;
 import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.LayoutServiceUtil;
+import com.liferay.portal.service.LayoutSetLocalServiceUtil;
 import com.liferay.portal.service.LayoutSetPrototypeLocalServiceUtil;
 import com.liferay.portal.service.RoleLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
@@ -346,6 +347,13 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 			renderRequest.setAttribute("endExecutionMin", endMin);
 			
 			
+			long parentLspId = 0;
+			LayoutSet layoutSet = LayoutSetLocalServiceUtil.getLayoutSet(course.getGroupCreatedId(), false);
+			if(layoutSet != null){
+				parentLspId = layoutSet.getLayoutSetPrototypeId();
+			}
+			
+			renderRequest.setAttribute("parentLspId", parentLspId);
 			
 		}catch(Exception e){
 			e.printStackTrace();

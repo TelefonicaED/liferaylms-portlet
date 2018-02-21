@@ -1,3 +1,7 @@
+<%@page import="com.liferay.portal.service.LayoutSetLocalServiceUtil"%>
+<%@page import="com.liferay.portal.model.LayoutSet"%>
+<%@page import="com.liferay.portal.kernel.exception.SystemException"%>
+<%@page import="com.liferay.portal.kernel.exception.PortalException"%>
 <%@page import="com.liferay.portal.kernel.util.PropsKeys"%>
 <%@page import="com.liferay.portal.kernel.util.PrefsPropsUtil"%>
 <%@page import="com.liferay.portal.kernel.util.LocaleUtil"%>
@@ -55,10 +59,7 @@ String courseDiplomaError = ParamUtil.getString(request, "courseDiplomaError");
 %>
 <liferay-ui:error key="calificationTypeExtraContentError" message="<%=calificationTypeExtraContentError %>" />
 <liferay-ui:error key="courseDiplomaError" message="<%=courseDiplomaError %>" />
-
-
 	<%
-
 	String maxLengthTitle = GetterUtil.getString( ModelHintsUtil.getHints(Group.class.getName(), "name").get("max-length"),"");
 	String courseTitle = "";
 	
@@ -113,6 +114,7 @@ String referringPortletResource = ParamUtil.getString(request, "referringPortlet
 long courseId=ParamUtil.getLong(request, "courseId",0);
 Course course=null;
 boolean isCourseChild = false;
+long templateParent = 0;
 if(request.getAttribute("course")!=null){
 	course=(Course)request.getAttribute("course");
 }
@@ -585,7 +587,7 @@ if(course!=null){
 				{
 					LayoutSetPrototype lsp=LayoutSetPrototypeLocalServiceUtil.getLayoutSetPrototype(Long.parseLong(lspis));
 					%>
-					<aui:option value="<%=lsp.getLayoutSetPrototypeId() %>" ><%=lsp.getName(themeDisplay.getLocale()) %></aui:option>
+					<aui:option value="<%=lsp.getLayoutSetPrototypeId() %>" selected="<%=templateParent == lsp.getLayoutSetPrototypeId() %>"><%=lsp.getName(themeDisplay.getLocale()) %></aui:option>
 					<%
 				}
 				%>
