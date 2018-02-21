@@ -28,11 +28,9 @@ else
 }
 
 
-String authType = null;
+String authType = themeDisplay.getCompany().getAuthType();
 String message ="";
-if (Validator.isNotNull(company)) {
-	authType = company.getAuthType();
-}
+
 						
 if (CompanyConstants.AUTH_TYPE_EA.compareToIgnoreCase(authType) == 0) {
 	//Caso para el emailAddress
@@ -52,7 +50,6 @@ if (CompanyConstants.AUTH_TYPE_EA.compareToIgnoreCase(authType) == 0) {
 %>
 <liferay-portlet:resourceURL var="importGradesExampleURL" >
 	<portlet:param name="action" value="importGradesExample"/>
-	<portlet:param name="resId" value="<%=String.valueOf(learnact.getActId()) %>"/>
 </liferay-portlet:resourceURL>
 
 
@@ -65,13 +62,11 @@ if (CompanyConstants.AUTH_TYPE_EA.compareToIgnoreCase(authType) == 0) {
 <liferay-ui:header title="offlinetaskactivity.file"></liferay-ui:header>
 
 <liferay-ui:panel id="importuserrole_help" title="help" extended="closed">
-	
-
 	<%=message %>
 </liferay-ui:panel>
 
 <span>
-	<aui:a href="${exportGradesExampleURL}"><liferay-ui:message key="courseadmin.importuserrole.download"/> <liferay-ui:message key="example"/></aui:a>
+	<aui:a href="${importGradesExampleURL}"><liferay-ui:message key="courseadmin.importuserrole.download"/> <liferay-ui:message key="example"/></aui:a>
 </span>
 
 <iframe name="<portlet:namespace />import_frame" src="" id="<portlet:namespace />import_frame" style="display:none;" onload="<portlet:namespace />doImportGrades();" ></iframe>

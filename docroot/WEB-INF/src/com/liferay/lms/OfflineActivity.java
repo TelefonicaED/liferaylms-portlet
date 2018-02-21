@@ -138,9 +138,17 @@ public class OfflineActivity extends MVCPortlet {
 				CSVWriter writer = new CSVWriter(new OutputStreamWriter(resourceResponse.getPortletOutputStream(),StringPool.UTF8),CharPool.SEMICOLON);
 				String[] cabeceras = new String[6];
 
+				String authType = themeDisplay.getCompany().getAuthType();
 
 				//En esta columna vamos a tener el nombre del usuario.
-				cabeceras[0]= LanguageUtil.get(getPortletConfig(), themeDisplay.getLocale(), "onlinetaskactivity.export.user");
+				if (CompanyConstants.AUTH_TYPE_EA.compareToIgnoreCase(authType) == 0) {
+					cabeceras[0]= LanguageUtil.get(getPortletConfig(), themeDisplay.getLocale(), "email");
+				} else if (CompanyConstants.AUTH_TYPE_SN.compareToIgnoreCase(authType) == 0) {
+					cabeceras[0]= LanguageUtil.get(getPortletConfig(), themeDisplay.getLocale(), "screen-name");
+				} else {
+					cabeceras[0]= LanguageUtil.get(getPortletConfig(), themeDisplay.getLocale(), "user-id");
+				}
+				
 				cabeceras[1]= LanguageUtil.get(getPortletConfig(), themeDisplay.getLocale(), "name");
 				cabeceras[2]= LanguageUtil.get(getPortletConfig(), themeDisplay.getLocale(), "last-name");
 				cabeceras[3]= LanguageUtil.get(getPortletConfig(), themeDisplay.getLocale(), "onlinetaskactivity.export.date");
@@ -158,11 +166,6 @@ public class OfflineActivity extends MVCPortlet {
 					if(user!=null){
 						try{
 							//Obtenemos el método de login para exportar el usuario.
-							String authType = null;
-							Company company = CompanyLocalServiceUtil.getCompany(themeDisplay.getCompanyId());
-							if (Validator.isNotNull(company)) {
-								authType = company.getAuthType();
-							}
 													
 							if (CompanyConstants.AUTH_TYPE_EA.compareToIgnoreCase(authType) == 0) {
 								//Caso para el emailAddress
@@ -224,13 +227,22 @@ public class OfflineActivity extends MVCPortlet {
 				resourceResponse.getPortletOutputStream().write(b);
 	
 				CSVWriter writer = new CSVWriter(new OutputStreamWriter(resourceResponse.getPortletOutputStream(),StringPool.UTF8),CharPool.SEMICOLON);
-				String[] cabeceras = new String[4];
+				String[] cabeceras = new String[6];
 	
 	
 				//En esta columna vamos a tener el nombre del usuario.
-				cabeceras[0]= LanguageUtil.get(getPortletConfig(), themeDisplay.getLocale(), "onlinetaskactivity.export.user");
+				String authType = themeDisplay.getCompany().getAuthType();
+
+				//En esta columna vamos a tener el nombre del usuario.
+				if (CompanyConstants.AUTH_TYPE_EA.compareToIgnoreCase(authType) == 0) {
+					cabeceras[0]= LanguageUtil.get(getPortletConfig(), themeDisplay.getLocale(), "email");
+				} else if (CompanyConstants.AUTH_TYPE_SN.compareToIgnoreCase(authType) == 0) {
+					cabeceras[0]= LanguageUtil.get(getPortletConfig(), themeDisplay.getLocale(), "screen-name");
+				} else {
+					cabeceras[0]= LanguageUtil.get(getPortletConfig(), themeDisplay.getLocale(), "user-id");
+				}
 				cabeceras[1]= LanguageUtil.get(getPortletConfig(), themeDisplay.getLocale(), "name");
-				cabeceras[2]= LanguageUtil.get(getPortletConfig(), themeDisplay.getLocale(), "surname");
+				cabeceras[2]= LanguageUtil.get(getPortletConfig(), themeDisplay.getLocale(), "last-name");
 				cabeceras[3]= LanguageUtil.get(getPortletConfig(), themeDisplay.getLocale(), "onlinetaskactivity.export.date");
 				cabeceras[4]= LanguageUtil.get(getPortletConfig(), themeDisplay.getLocale(), "onlinetaskactivity.export.result");
 				cabeceras[5]= LanguageUtil.get(getPortletConfig(), themeDisplay.getLocale(), "onlinetaskactivity.export.comment");
@@ -238,17 +250,12 @@ public class OfflineActivity extends MVCPortlet {
 				writer.writeNext(cabeceras);
 				
 				//Array con los resultados de los intentos.
-				String[] resultados = new String[4];
+				String[] resultados = new String[6];
 				//En la primera columna del csv introducidos el nombre del estudiante.
 				User user = UserLocalServiceUtil.fetchUser(themeDisplay.getUserId());
 				if(user!=null){
 					try{
 						//Obtenemos el método de login para exportar el usuario.
-						String authType = null;
-						Company company = CompanyLocalServiceUtil.getCompany(themeDisplay.getCompanyId());
-						if (Validator.isNotNull(company)) {
-							authType = company.getAuthType();
-						}
 														
 						if (CompanyConstants.AUTH_TYPE_EA.compareToIgnoreCase(authType) == 0) {
 							//Caso para el emailAddress
