@@ -295,7 +295,6 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 				if(module.getPrecedence()!=0){
 					modulesDependencesList.put(module.getModuleId(),module.getPrecedence());
 				}
-			
 				newModule.setTitle(module.getTitle());
 				newModule.setDescription(module.getDescription());
 				newModule.setGroupId(newCourse.getGroupId());

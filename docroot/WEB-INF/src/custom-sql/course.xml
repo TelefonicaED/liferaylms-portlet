@@ -414,7 +414,7 @@
 					ON ug.userId = urE.userId AND urE.groupId = ug.groupId AND urE.roleId = ?
 			[$JOINTEAM$]
 			WHERE 
-				ur.userId IS NULL AND urE.userId IS NULL AND co.courseId = ? AND u.status = ?
+				ur.userId IS NULL AND urE.userId IS NULL AND co.courseId = ? AND (u.status = ? OR ? = ?)
 				AND 
 				(
 					[$WHEREFIRSTNAME$]
@@ -541,7 +541,7 @@
 				c.closed = 0 
 				AND (SELECT MAX(mo.endDate) FROM lms_module mo WHERE mo.groupId = c.groupCreatedId) > '[$DATENOW$]' 
 				AND (r.crId IS NULL OR r.allowFinishDate IS NULL OR r.allowFinishDate > '[$DATENOW$]')
-				AND c.groupId = ?
+				AND (c.groupId = ? OR ? <= 0)
 			GROUP By 
 				c.courseId
 		]]>
@@ -562,7 +562,7 @@
 				c.closed = 0 
 				AND (SELECT MAX(mo.endDate) FROM lms_module mo WHERE mo.groupId = c.groupCreatedId) > '[$DATENOW$]' 
 				AND (r.crId IS NULL OR r.allowFinishDate IS NULL OR r.allowFinishDate > '[$DATENOW$]')
-				AND c.groupId = ?
+				AND (c.groupId = ? OR ? <= 0)
 			GROUP By 
 				c.courseId
 		]]>

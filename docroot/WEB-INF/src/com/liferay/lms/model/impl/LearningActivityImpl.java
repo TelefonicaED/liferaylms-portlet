@@ -305,5 +305,4 @@ public class LearningActivityImpl extends LearningActivityBaseImpl {
 	public LearningActivityType getLearningActivityType(){
 		return new LearningActivityTypeRegistry().getLearningActivityType(getTypeId());
 	}
-	
 }

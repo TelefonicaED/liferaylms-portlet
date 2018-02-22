@@ -705,8 +705,7 @@ Liferay.provide(
 			<script type="text/javascript">
 		        function <portlet:namespace />initEditor() 
 		        { 
-		        	 return decodeURI('<%= UnicodeFormatter.toString(description.replace("%26","&").replace("%23","#").replace("%","%25")) %>');
-		        }
+					return decodeURI('<%= UnicodeFormatter.toString(description.replace("%26","&").replace("%23","#").replace("%","%25")) %>');		        }
 		    </script>
 		</aui:field-wrapper>
 		<div id="<portlet:namespace />descriptionError" class="<%=(SessionErrors.contains(renderRequest, "description-required"))?

@@ -193,58 +193,72 @@ public abstract class BaseLearningActivityType implements LearningActivityType, 
 	
 	@Override
 	public String addZipEntry(LearningActivity actividad, Long assetEntryId,PortletDataContext context, Element entryElementLoc)
-			throws PortalException, SystemException {
+			throws PortalException, SystemException	{
 		
-		AssetEntry docAsset= AssetEntryLocalServiceUtil.getAssetEntry(assetEntryId);
-		
-		log.info("mimeType: " + docAsset.getMimeType());
-		DLFileEntry docfile=DLFileEntryLocalServiceUtil.getDLFileEntry(docAsset.getClassPK());
-		
-		log.info("docFile: " + docfile.getFileEntryId());
-		String extension = "";
-		if(!docfile.getTitle().endsWith(docfile.getExtension()) && docfile.getExtension().equals("")){
-			if(docfile.getMimeType().equals("image/jpeg")){
-				extension= ".jpg";
-			}else if(docfile.getMimeType().equals("image/png")){
-				extension= ".png";
-			}else if(docfile.getMimeType().equals("video/mpeg")){
-				extension= ".mpeg";
-			}else if(docfile.getMimeType().equals("application/pdf")){
-				extension= ".pdf";
-			}else{
-				String ext[] = extension.split("/");
-				if(ext.length>1){
-					extension = ext[1];
+		AssetEntry docAsset;
+		try {
+			docAsset = AssetEntryLocalServiceUtil.getAssetEntry(assetEntryId);
+	
+			
+			log.info("mimeType: " + docAsset.getMimeType());
+			DLFileEntry docfile=DLFileEntryLocalServiceUtil.getDLFileEntry(docAsset.getClassPK());
+			
+			log.info("docFile: " + docfile.getFileEntryId());
+			String extension = "";
+			if(!docfile.getTitle().endsWith(docfile.getExtension()) && docfile.getExtension().equals("")){
+				if(docfile.getMimeType().equals("image/jpeg")){
+					extension= ".jpg";
+				}else if(docfile.getMimeType().equals("image/png")){
+					extension= ".png";
+				}else if(docfile.getMimeType().equals("video/mpeg")){
+					extension= ".mpeg";
+				}else if(docfile.getMimeType().equals("application/pdf")){
+					extension= ".pdf";
+				}else{
+					String ext[] = extension.split("/");
+					if(ext.length>1){
+						extension = ext[1];
+					}
 				}
+			}else if(!docfile.getTitle().endsWith(docfile.getExtension()) && !docfile.getExtension().equals("")){
+				extension="."+docfile.getExtension();
 			}
-		}else if(!docfile.getTitle().endsWith(docfile.getExtension()) && !docfile.getExtension().equals("")){
-			extension="."+docfile.getExtension();
+	
+			log.info("file Title: " + docfile.getTitle());
+			String title = changeSpecialCharacter(docfile.getTitle());
+			title += extension;
+			log.info("title: " + title);
+			
+			String pathqu = getEntryPath(context, docfile);
+			String pathFile = getFilePath(context, docfile,actividad.getActId());
+			Element entryElementfe= entryElementLoc.addElement("dlfileentry");
+			entryElementfe.addAttribute("path", pathqu);
+			entryElementfe.addAttribute("file", pathFile+title);
+			context.addZipEntry(pathqu, docfile);
+			
+			log.info("pathqu: " + pathqu);
+			log.info("pathFile: " + pathFile);
+	
+			//Guardar el fichero en el zip.
+			InputStream input = DLFileEntryLocalServiceUtil.getFileAsStream(docfile.getUserId(), docfile.getFileEntryId(), docfile.getVersion());
+	
+			context.addZipEntry(getFilePath(context, docfile,actividad.getActId())+title, input);
+			
+			String txt = (actividad.getTypeId() == 2) ? "external":"internal";
+			log.info("    - Resource "+ txt + ": " + title);
+	
+			return null;
+		
+		
+		} catch (PortalException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return e.getMessage();
+		} catch (SystemException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return e.getMessage();
 		}
-
-		log.info("file Title: " + docfile.getTitle());
-		String title = changeSpecialCharacter(docfile.getTitle());
-		title += extension;
-		log.info("title: " + title);
-		
-		String pathqu = getEntryPath(context, docfile);
-		String pathFile = getFilePath(context, docfile,actividad.getActId());
-		Element entryElementfe= entryElementLoc.addElement("dlfileentry");
-		entryElementfe.addAttribute("path", pathqu);
-		entryElementfe.addAttribute("file", pathFile+title);
-		context.addZipEntry(pathqu, docfile);
-		
-		log.info("pathqu: " + pathqu);
-		log.info("pathFile: " + pathFile);
-
-		//Guardar el fichero en el zip.
-		InputStream input = DLFileEntryLocalServiceUtil.getFileAsStream(docfile.getUserId(), docfile.getFileEntryId(), docfile.getVersion());
-
-		context.addZipEntry(getFilePath(context, docfile,actividad.getActId())+title, input);
-		
-		String txt = (actividad.getTypeId() == 2) ? "external":"internal";
-		log.info("    - Resource "+ txt + ": " + title);
-
-		return null;
 	}
 	
 	private static String changeSpecialCharacter(String str) {

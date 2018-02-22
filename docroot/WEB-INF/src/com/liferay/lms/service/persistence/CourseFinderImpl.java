@@ -182,7 +182,7 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 		try{
 			
 			if(freeText != null && freeText.length() > 0)
-				freeText = "%" + freeText + "%";
+				freeText = "%" + freeText.replace("'", "\\'") + "%";
 			
 			session = openSession();
 			
@@ -277,7 +277,6 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 	
 	
 	private String replaceWhereTitleDescriptionCategoriesTags(String sql, String freeText, int status, long[] categories, long[] tags, boolean andOperator) {
-		
 		if(andOperator && ((freeText != null && !freeText.equals("")) || status != -1 || (categories != null && categories.length > 0) || (tags != null && tags.length > 0))){
 			sql = sql.replace("[$WHERETITLEDESCRIPTIONCATEGORIESTAGSAND$]", CustomSQLUtil.get(WHERE_TITLE_DESCRIPTION_CATEGORIES_TAGS_AND));
 			sql = sql.replace("[$FREETEXT$]", String.valueOf(freeText));
@@ -500,8 +499,9 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 	    return 0;
 	}
 	
-	public List<User> findStudents(long courseId, long companyId, String screenName, String firstName, String lastName, String emailAddress, int status, long teamId, boolean andOperator, 
-				int start, int end,OrderByComparator obc){
+
+	public List<User> findStudents(long courseId, long companyId, String screenName, String firstName, String lastName, String emailAddress, int status, long teamId,boolean andOperator, 
+			int start, int end,OrderByComparator obc){
 		Session session = null;
 		boolean whereClause = false;
 		try{
@@ -595,7 +595,10 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 				qPos.add(teamId);
 			}
 			qPos.add(courseId);
+
 			qPos.add(status);
+			qPos.add(status);
+			qPos.add(WorkflowConstants.STATUS_ANY);
 			
 			if(Validator.isNotNull(screenName)){
 				qPos.add(screenName);
@@ -635,7 +638,8 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 	    return new ArrayList<User>();
 	}
 	
-	public int countStudents(long courseId, long companyId, String screenName, String firstName, String lastName, String emailAddress, int status, long teamId, boolean andOperator){
+	public int countStudents(long courseId, long companyId, String screenName, String firstName, String lastName, String emailAddress, int status, long teamId,
+			boolean andOperator){
 		Session session = null;
 		boolean whereClause = false;
 		try{
@@ -1200,6 +1204,7 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			qPos.add(userId);
 			qPos.add(userId);
 			qPos.add(groupId);
+			qPos.add(groupId);
 			
 			Iterator<Object[]> itr =  q.iterate();
 							
@@ -1357,6 +1362,7 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			QueryPos qPos = QueryPos.getInstance(q);
 			qPos.add(userId);
 			qPos.add(userId);
+			qPos.add(groupId);
 			qPos.add(groupId);
 			
 			Iterator<Long> itr = q.iterate();

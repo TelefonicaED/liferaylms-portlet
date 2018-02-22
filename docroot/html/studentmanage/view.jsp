@@ -1,7 +1,6 @@
 <%@page import="com.liferay.lms.learningactivity.calificationtype.CalificationTypeRegistry"%>
 <%@page import="com.liferay.lms.learningactivity.calificationtype.CalificationType"%>
 <%@page import="com.liferay.lms.service.impl.CourseResultLocalServiceImpl"%>
-<%@page import="com.liferay.portal.util.comparator.UserLastNameComparator"%>
 <%@page import="com.liferay.portal.util.comparator.UserFirstNameComparator"%>
 <%@page import="com.liferay.portal.kernel.dao.orm.CustomSQLParam"%>
 <%@page import="com.liferay.portal.model.RoleConstants"%>
