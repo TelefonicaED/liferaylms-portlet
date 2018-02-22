@@ -6,7 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
-import javax.portlet.ActionRequest;
+import javax.portlet.PortletRequest;
 
 import org.jsoup.Jsoup;
 
@@ -49,14 +49,14 @@ public class FillblankQuestionType extends BaseQuestionType {
 	}
 	
 	public String getURLEdit(){
-		return "/html/execactivity/test/admin/editAnswerFillblank.jsp";
+		return "/html/questions/admin/editAnswerFillblank.jsp";
 	}
 	
 	public String getURLNew(){
-		return "/html/execactivity/test/admin/popups/fillblank.jsp";
+		return "/html/questions/admin/popups/fillblank.jsp";
 	}
 	
-	public long correct(ActionRequest actionRequest, long questionId){
+	public long correct(PortletRequest portletRequest, long questionId){
 		List<TestAnswer> testAnswers = new ArrayList<TestAnswer>();
 		try {
 			testAnswers = TestAnswerLocalServiceUtil.getTestAnswersByQuestionId(questionId);
@@ -74,7 +74,7 @@ public class FillblankQuestionType extends BaseQuestionType {
 			List<String> sols = getQuestionSols(solution.getAnswer());
 			int i=0;
 			for(String sol:sols){
-				String answer= ParamUtil.getString(actionRequest, "question_"+questionId+"_"+i, "").replace(",", "");
+				String answer= ParamUtil.getString(portletRequest, "question_"+questionId+"_"+i, "").replace(",", "");
 				if(isCorrect(sol, answer)){
 					log.debug("CORRECT "+i);
 					correctAnswers++;
@@ -95,6 +95,48 @@ public class FillblankQuestionType extends BaseQuestionType {
 		}
 	
 		return INCORRECT;
+	}
+	
+	@Override
+	public long correct(Element element, long questionId){
+		List<TestAnswer> testAnswers = new ArrayList<TestAnswer>();
+		try {
+			testAnswers = TestAnswerLocalServiceUtil.getTestAnswersByQuestionId(questionId);
+		} catch (SystemException e) {
+			e.printStackTrace();
+		}
+		
+		TestAnswer solution = null;
+		if(testAnswers!=null && testAnswers.size()>0)
+			solution = testAnswers.get(0);
+		
+		if(solution!=null){
+			int correctAnswers=0;
+			
+			List<String> sols = getQuestionSols(solution.getAnswer());
+			String[] answers = element.element("answer").getText().split(",");
+			
+			for(int i = 0; i < sols.size(); i++){
+				if(isCorrect(sols.get(i), answers[i])){
+					log.debug("CORRECT "+i);
+					correctAnswers++;
+				}
+				i++;
+			}
+			if(sols.size()>0){
+				double puntuation = correctAnswers*100.0/sols.size(); 
+				log.debug("----PUNTUATION "+puntuation);
+				return Math.round(puntuation);
+			}
+			
+			if(correctAnswers==sols.size()){
+				return CORRECT;
+			}else{
+				return INCORRECT;
+			}
+		}
+	
+		return INCORRECT;		
 	}
 
 	private List<String> getQuestionSols(String textAnswer) {
@@ -178,7 +220,7 @@ public class FillblankQuestionType extends BaseQuestionType {
 		return false;
 	}
 	
-	public Element getResults(ActionRequest actionRequest, long questionId){
+	public Element getResults(PortletRequest portletRequest, long questionId){
 		List<TestAnswer> testAnswers = new ArrayList<TestAnswer>();
 		try {
 			testAnswers = TestAnswerLocalServiceUtil.getTestAnswersByQuestionId(questionId);
@@ -196,14 +238,14 @@ public class FillblankQuestionType extends BaseQuestionType {
 			int i = getQuestionSols(solution.getAnswer()).size();
 			for(int k=0; k<i; k++){
 				if(answer!="") answer+=",";
-				answer+= ParamUtil.getString(actionRequest, "question_"+questionId+"_"+k, "").replace(",", ""); //Quito la , de la respuesta del usaurio
+				answer+= ParamUtil.getString(portletRequest, "question_"+questionId+"_"+k, "").replace(",", ""); //Quito la , de la respuesta del usaurio
 			}
 		}
     	
 		Element questionXML=SAXReaderUtil.createElement("question");
 		questionXML.addAttribute("id", Long.toString(questionId));
 		
-		long currentQuestionId = ParamUtil.getLong(actionRequest, "currentQuestionId");
+		long currentQuestionId = ParamUtil.getLong(portletRequest, "currentQuestionId");
 		if (currentQuestionId == questionId) {
 			questionXML.addAttribute("current", "true");
 		}

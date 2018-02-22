@@ -15,8 +15,8 @@ QuestionType qt =new QuestionTypeRegistry().getQuestionType(question.getQuestion
 %>
 
 <liferay-ui:icon-menu showArrow="true" align="right" showWhenSingleIcon="false">
-	<liferay-portlet:renderURL var="editURL" portletName="execactivity_WAR_liferaylmsportlet">
-	<liferay-portlet:param name="jspPage" value="/html/execactivity/test/admin/editQuestion.jsp"/>
+	<liferay-portlet:renderURL var="editURL">
+	<liferay-portlet:param name="jspPage" value="/html/questions/admin/editQuestion.jsp"/>
 	<liferay-portlet:param name="questionId" value="<%=primKey %>" />
 	<liferay-portlet:param name="resId" value="<%= actId %>" />
 	<liferay-portlet:param name="actionEditingDetails" value="<%= StringPool.TRUE %>" />

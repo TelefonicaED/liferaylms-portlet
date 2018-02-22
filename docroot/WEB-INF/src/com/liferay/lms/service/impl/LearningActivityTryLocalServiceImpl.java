@@ -24,6 +24,9 @@ import com.liferay.lms.NoSuchLearningActivityException;
 import com.liferay.lms.NoSuchLearningActivityTryException;
 import com.liferay.lms.auditing.AuditConstants;
 import com.liferay.lms.auditing.AuditingLogFactory;
+import com.liferay.lms.learningactivity.LearningActivityType;
+import com.liferay.lms.learningactivity.LearningActivityTypeRegistry;
+import com.liferay.lms.learningactivity.questiontype.OptionsQuestionType;
 import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.model.LearningActivityResult;
 import com.liferay.lms.model.LearningActivityTry;
@@ -42,6 +45,8 @@ import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.jsonwebservice.JSONWebService;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.DocumentException;
@@ -76,6 +81,8 @@ import com.liferay.portal.service.UserLocalServiceUtil;
  */
 public class LearningActivityTryLocalServiceImpl
 	extends LearningActivityTryLocalServiceBaseImpl {
+	
+	private static Log log = LogFactoryUtil.getLog(LearningActivityTryLocalServiceImpl.class);
 	
 	public LearningActivityTry softUpdateLearningActivityTry(LearningActivityTry learningActivityTry) throws SystemException {		
 		
@@ -439,7 +446,7 @@ public class LearningActivityTryLocalServiceImpl
 	
 	public LearningActivityTry update(long latId, int score, double position, int plays) throws SystemException, PortalException {
 
-		System.out.println("update: " + latId);
+		log.debug("update: " + latId);
 		
 		LearningActivityTry lat=learningActivityTryPersistence.fetchByPrimaryKey(latId);
 		

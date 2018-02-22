@@ -215,6 +215,8 @@ public class GradeBook extends MVCPortlet {
 		
 		ThemeDisplay themeDisplay = (ThemeDisplay) renderRequest.getAttribute(WebKeys.THEME_DISPLAY);
 		
+		
+		
 		include(this.userDetailsJSP, renderRequest, renderResponse);
 	}	
 	

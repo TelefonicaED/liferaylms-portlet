@@ -3,6 +3,7 @@
 <deployment xmlns="http://xml.apache.org/axis/wsdd/" xmlns:java="http://xml.apache.org/axis/wsdd/providers/java">
 	<service name="Plugin_Lms_LearningActivityTryService" provider="java:RPC" style="rpc" use="encoded">
 		<arrayMapping xmlns:ns="urn:http.service.lms.liferay.com" xmlns:cmp-ns="http://model.lms.liferay.com" qname="ns:ArrayOf_tns2_LearningActivityTrySoap" type="java:com.liferay.lms.model.LearningActivityTrySoap[]" innerType="cmp-ns:LearningActivityTrySoap" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"></arrayMapping>
+		<arrayMapping xmlns:ns="urn:http.service.lms.liferay.com" xmlns:cmp-ns="http://www.w3.org/2001/XMLSchema" qname="ns:ArrayOf_xsd_anyType" type="java:java.lang.Object[]" innerType="cmp-ns:anyType" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"></arrayMapping>
 		<typeMapping xmlns:ns="http://model.lms.liferay.com" qname="ns:LearningActivityTrySoap" type="java:com.liferay.lms.model.LearningActivityTrySoap" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"></typeMapping>
 		<operation xmlns:operNS="urn:http.service.lms.liferay.com" xmlns:rtns="http://model.lms.liferay.com" name="createLearningActivityTry" qname="operNS:createLearningActivityTry" returnQName="createLearningActivityTryReturn" returnType="rtns:LearningActivityTrySoap" soapAction="">
 			<parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="actId" type="tns:long"></parameter>
@@ -19,13 +20,18 @@
 			<parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="actId" type="tns:long"></parameter>
 			<parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="login" type="tns:string"></parameter>
 		</operation>
+		<operation xmlns:operNS="urn:http.service.lms.liferay.com" xmlns:rtns="http://model.lms.liferay.com" name="updateCorrect" qname="operNS:updateCorrect" returnQName="updateCorrectReturn" returnType="rtns:LearningActivityTrySoap" soapAction="">
+			<parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="latId" type="tns:long"></parameter>
+			<parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="typeId" type="tns:int"></parameter>
+			<parameter xmlns:tns="urn:http.service.lms.liferay.com" qname="params" type="tns:ArrayOf_xsd_anyType"></parameter>
+		</operation>
 		<operation xmlns:operNS="urn:http.service.lms.liferay.com" xmlns:rtns="http://model.lms.liferay.com" name="update" qname="operNS:update" returnQName="updateReturn" returnType="rtns:LearningActivityTrySoap" soapAction="">
 			<parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="latId" type="tns:long"></parameter>
 			<parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="score" type="tns:int"></parameter>
 			<parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="position" type="tns:double"></parameter>
 			<parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="plays" type="tns:int"></parameter>
 		</operation>
-		<parameter name="allowedMethods" value="createLearningActivityTry getLearningActivityTries update" />
+		<parameter name="allowedMethods" value="createLearningActivityTry getLearningActivityTries update updateCorrect" />
 		<parameter name="className" value="com.liferay.lms.service.http.LearningActivityTryServiceSoap" />
 		<parameter name="schemaUnqualified" value="http://model.lms.liferay.com,urn:http.service.lms.liferay.com" />
 		<parameter name="typeMappingVersion" value="1.2" />

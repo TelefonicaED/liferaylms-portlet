@@ -1,3 +1,6 @@
+<%@page import="com.liferay.portal.kernel.servlet.SessionErrors"%>
+<%@page import="com.liferay.lms.model.TestQuestion"%>
+<%@page import="com.liferay.lms.service.TestQuestionLocalServiceUtil"%>
 <%@page import="javax.portlet.PortletSession"%>
 <%@page import="java.util.Enumeration"%>
 <%@page import="com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil"%>
@@ -58,7 +61,7 @@
 		}catch(Exception e){}
 	}
 %>
-
+ 
 <%
 	SimpleDateFormat sdf = new SimpleDateFormat("HH:mm dd/MM/yyy",themeDisplay.getLocale());
 	sdf.setTimeZone(themeDisplay.getTimeZone());
@@ -66,6 +69,7 @@
 	String youtubecode=StringPool.BLANK;
 	LearningActivity learningActivity=null;
 	boolean readonly = true;
+	int correctMode = ResourceExternalLearningActivityType.CORRECT_VIDEO;
 
 	List<AssetEntry> elements = new ArrayList<AssetEntry>(); 
 		
@@ -98,19 +102,118 @@
 				}
 				i++;
 			}while(documento!=null);
+			Element correctModeElement = root.element("correctMode");
+			if(correctModeElement != null){
+				correctMode = Integer.parseInt(correctModeElement.getText());
+			}
+		}
+	}
+	
+	long score = Long.parseLong(ParamUtil.getString(request, "passpuntuation","0"));
+	if(score==0){
+		score=Long.valueOf(ResourceExternalLearningActivityType.DEFAULT_SCORE);
+		if(learningActivity!=null){
+			score=learningActivity.getPasspuntuation();
 		}
 	}
 	
 	if(LearningActivityLocalServiceUtil.canBeEdited(learningActivity, user.getUserId())) readonly=false;
+	List<TestQuestion> listQuestions = null;
+	if(learningActivity != null && learningActivity.getActId() > 0 ){
+		listQuestions = TestQuestionLocalServiceUtil.getQuestions(learningActivity.getActId());
+	}
 	
+	String passpuntuationLabelProperty = "resourceexternalactivity.passpuntuation";
+	String passpunctuationHelpProperty= "resourceexternalactivity.passpuntuation.help";
+	
+	if(listQuestions != null && listQuestions.size() > 0){
+		passpuntuationLabelProperty = "resourceexternalactivity.questions-video.passpuntuation";
+		passpunctuationHelpProperty= "resourceexternalactivity.questions-video.passpuntuation.help";
+	}
 %>
-<aui:field-wrapper label="video" >
-	<%if(readonly) {%>
+
+
+	<%if(learningActivity != null && learningActivity.getActId() > 0 && listQuestions != null && listQuestions.size() > 0){%>
+		<aui:field-wrapper label="course-correction-method">
+			<%if(readonly) {%>
+				<aui:input type="radio" readonly="<%=readonly %>" name="correctMode" value="<%=ResourceExternalLearningActivityType.CORRECT_VIDEO %>" label="resource-external-activity.correct-video" checked="<%=ResourceExternalLearningActivityType.CORRECT_VIDEO == correctMode %>"/>
+				<aui:input type="radio" readonly="<%=readonly %>" name="correctMode" value="<%=ResourceExternalLearningActivityType.CORRECT_QUESTIONS %>" label="resource-external-activity.correct-questions" checked="<%=ResourceExternalLearningActivityType.CORRECT_QUESTIONS == correctMode %>"/>
+			<%} else{ %>
+				<aui:input type="radio" name="correctMode" value="<%=ResourceExternalLearningActivityType.CORRECT_VIDEO %>" label="resource-external-activity.correct-video" checked="<%=ResourceExternalLearningActivityType.CORRECT_VIDEO == correctMode %>"/>
+				<aui:input type="radio" name="correctMode" value="<%=ResourceExternalLearningActivityType.CORRECT_QUESTIONS %>" label="resource-external-activity.correct-questions" checked="<%=ResourceExternalLearningActivityType.CORRECT_QUESTIONS == correctMode %>"/>
+			<%} %>
+		</aui:field-wrapper>
+	<%} %>
+	
+	<aui:input size="5" name="passpuntuation" label="<%=passpuntuationLabelProperty %>" type="number" value="<%=score %>" disabled="<%=readonly %>" helpMessage="<%=LanguageUtil.get(pageContext, passpunctuationHelpProperty)%>">
+		<aui:validator name="min" errorMessage="editActivity.passpuntuation.range">-1</aui:validator>
+		<aui:validator name="max" errorMessage="editActivity.passpuntuation.range">101</aui:validator>
+	</aui:input>
+	<% if (readonly) { %>
+		<input name="<portlet:namespace />passpuntuation" type="hidden" value="<%=score %>" />
+	<% } %>
+	
+	<div id="<portlet:namespace />passpuntuationError" class="<%=((SessionErrors.contains(renderRequest, "editActivity.passpuntuation.required"))||
+														      (SessionErrors.contains(renderRequest, "editActivity.passpuntuation.number"))||
+														      (SessionErrors.contains(renderRequest, "editActivity.passpuntuation.range")))?
+	  														      "portlet-msg-error":StringPool.BLANK %>">
+	  	<%=(SessionErrors.contains(renderRequest, "editActivity.passpuntuation.required"))?
+	  			LanguageUtil.get(pageContext,"editActivity.passpuntuation.required"):
+				   (SessionErrors.contains(renderRequest, "editActivity.passpuntuation.number"))?
+			    		LanguageUtil.get(pageContext,"editActivity.passpuntuation.number"):
+				   (SessionErrors.contains(renderRequest, "editActivity.passpuntuation.range"))?
+			    		LanguageUtil.get(pageContext,"editActivity.passpuntuation.range"):StringPool.BLANK %>
+	</div>
+<aui:field-wrapper label="video" >	
+	<%if(readonly){%>
 		<aui:input readonly="<%=readonly %>" name="youtubecode" type="textarea" rows="6" cols="45" label="youtube-code" value="<%=youtubecode %>" ignoreRequestValue="true" helpMessage="<%=LanguageUtil.get(pageContext,\"youtube-code-help\")%>"></aui:input>
-	<%}else{ %>
+	<% }else{ %>
 		<aui:input name="youtubecode" type="textarea" rows="6" cols="45" label="youtube-code" value="<%=youtubecode %>" ignoreRequestValue="true" helpMessage="<%=LanguageUtil.get(pageContext,\"youtube-code-help\")%>"></aui:input>
 	<%} %>
+	
   	<aui:input label="resourceexternalactivity.videocontrol.disabled" name="videoControl" type="checkbox" value="<%= defaultValueCheckBox %>" />
+  	
+  	<%if(Validator.isNotNull(youtubecode) && learningActivity != null){
+  		
+  		if(listQuestions != null && listQuestions.size() > 0){
+  			Element root = null;
+  			if((learningActivity.getExtracontent()!=null)&&(learningActivity.getExtracontent().trim().length()!=0))	{
+				Document document = SAXReaderUtil.read(learningActivity.getExtracontent());
+				root=document.getRootElement();
+			}%>
+  			<table class="taglib-search-container">
+  				<thead>
+  					<tr class="portlet-section-header results-header">
+  						<th class="col-1 col-text first">
+  							<liferay-ui:message key="question" />
+  						</th>
+  						<th class="col-2 col-second">
+  							<liferay-ui:message key="second" />
+  						</th>
+  					</tr>
+  				</thead>
+  				<tbody>
+  					<% Element second = null;
+  					for(TestQuestion question: listQuestions){ 
+  						if(root != null){
+  							second = root.element("question_" + question.getQuestionId());
+  						}%>
+  						<tr class="portlet-section-body results-row">
+  							<td class="align-left col-text"><%=question.getText() %></td>
+  							<td class="align-middle">
+  								<c:set var="questionId" value="<%=question.getQuestionId()%>" />
+  								<aui:input name="second_${questionId }" label="" value='<%=second != null ? second.getText() : "0" %>'>
+  									<aui:validator name="number"/>
+  									<aui:validator name="min">"0"</aui:validator>
+  								</aui:input>
+  							</td>
+  						</tr>
+  					<%} %>
+  				</tbody>
+  			</table>
+  	<%	}
+  	} %>
+  	
 </aui:field-wrapper>
 <script type="text/javascript">
 	function deleteFile(id){

@@ -10,6 +10,7 @@ import javax.portlet.PortletResponse;
 
 import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.model.LearningActivityResult;
+import com.liferay.lms.model.LearningActivityTry;
 import com.liferay.lms.service.LearningActivityResultLocalServiceUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
@@ -287,6 +288,10 @@ public abstract class BaseLearningActivityType implements LearningActivityType, 
 	
 	public boolean canBeSeenResults(){
 		return false;
+	}
+	
+	public long calculateResult(LearningActivity learningActivity, LearningActivityTry lat){
+		return lat.getResult();
 	}
 	
 }

@@ -1,3 +1,5 @@
+<%@page import="com.liferay.lms.learningactivity.LearningActivityTypeRegistry"%>
+<%@page import="com.liferay.lms.learningactivity.LearningActivityType"%>
 <%@page import="com.liferay.portal.kernel.portlet.LiferayPortletResponse"%>
 <%@page import="com.liferay.portal.kernel.portlet.LiferayPortletRequest"%>
 <%@page import="com.liferay.portlet.asset.model.AssetRenderer"%>
@@ -29,10 +31,6 @@
 <%@page import="com.liferay.lms.service.CourseLocalServiceUtil"%>
 <%@page import="com.liferay.portal.kernel.util.ListUtil"%>
 <%@ include file="/init.jsp" %>
-
-<portlet:actionURL var="setBankTestURL" name="setBankTest" >
-	<portlet:param name="editing" value="<%=StringPool.TRUE %>"/>
-</portlet:actionURL>
 
 <%
 	LearningActivity learningActivity = LearningActivityLocalServiceUtil.getLearningActivity(ParamUtil.getLong(request,"resId"));
@@ -73,17 +71,11 @@
 	TestQuestionLocalServiceUtil.checkWeights(learningActivity.getActId());
 	
 %>
-<liferay-util:include page="/html/execactivity/test/admin/editHeader.jsp" servletContext="<%=this.getServletContext() %>" />
+<liferay-util:include page="/html/questions/admin/editHeader.jsp" servletContext="<%=this.getServletContext() %>" />
 
 <script type="text/javascript">
-<!--
-AUI().ready(function(A) {
-	A.one('div.taglib-header > h1.header-title').scrollIntoView();
-	//A.one("#<portlet:namespace/>TabsBack").scrollIntoView();
-});
-//-->
 			
-Liferay.provide(
+	Liferay.provide(
         window,
         '<portlet:namespace />newQuestion',
         function(typeId) {
@@ -95,7 +87,7 @@ Liferay.provide(
 			<% } %>
 			
 			renderUrl.setPortletId('<%=themeDisplay.getPortletDisplay().getId()%>');
-			renderUrl.setParameter('jspPage','/html/execactivity/test/admin/editQuestion.jsp');
+			renderUrl.setParameter('jspPage','/html/questions/admin/editQuestion.jsp');
 			renderUrl.setParameter('questionTypeId', typeId);
 			renderUrl.setParameter('message', Liferay.Language.get('execactivity.editquestions.newquestion'));
 			renderUrl.setParameter('actionEditingDetails', true);
@@ -110,51 +102,56 @@ Liferay.provide(
 <div class="container-toolbar">
 	<liferay-ui:icon-menu  align="left" direction="down" extended="false" showWhenSingleIcon="false" message="execativity.editquestions.newquestion" cssClass="bt_new" showArrow="true" >
 	</liferay-ui:icon-menu>
-	<script type="text/javascript">
-		function modifyIsBank(value) {
-			var A = AUI();
-			if (value==='true'){
-				A.all('#<portlet:namespace />normal-questions').hide();
-				A.one('#<portlet:namespace />banks-questions').setStyle('display', 'block');
-				A.one('.portlet-msg-info').setStyle('display', 'none');
-			}else{
-				A.all('#<portlet:namespace />normal-questions').show();
-				A.one('#<portlet:namespace />banks-questions').setStyle('display', 'none');
-				A.one('.portlet-msg-info').setStyle('display', 'block');
-			}
-		}
-	</script>
+	
 	<%
-		Course course = CourseLocalServiceUtil.fetchByGroupCreatedId(themeDisplay.getScopeGroupId());
-		boolean isCourse = true;
-		if (course==null){
-			isCourse = false;
-		}
-		boolean useBank = StringPool.TRUE.equals(LearningActivityLocalServiceUtil.getExtraContentValue(learningActivity.getActId(),"isBank"));
 		boolean isMultiple = StringPool.TRUE.equals(LearningActivityLocalServiceUtil.getExtraContentValue(learningActivity.getActId(),"isMultiple"));
-		String CategoryIds = LearningActivityLocalServiceUtil.getExtraContentValue(learningActivity.getActId(),"categoriesId");
+		LearningActivityType activityType = new LearningActivityTypeRegistry().getLearningActivityType(learningActivity.getTypeId());
 		long searchGroupId = themeDisplay.getCompanyGroupId();
-		if(isCourse){
-			searchGroupId = course.getGroupId();
-		}
+		boolean allowsBank = activityType.allowsBank();
+		if(allowsBank){
+			Course course = CourseLocalServiceUtil.fetchByGroupCreatedId(themeDisplay.getScopeGroupId());
+			boolean isCourse = true;
+			if (course==null){
+				isCourse = false;
+			}
+			boolean useBank = StringPool.TRUE.equals(LearningActivityLocalServiceUtil.getExtraContentValue(learningActivity.getActId(),"isBank"));
+			
+			if(isCourse){
+				searchGroupId = course.getGroupId();
+			}
 	%>
-	<c:if test="<%=isCourse%>">
-		<div class="banks-support">
-			<aui:select id="banks-support" cssClass="banks-support" name="banks-support" label="execativity.editquestions.banksquestions" onChange="modifyIsBank(this.value)">
-				<aui:option value="false" selected="<%=!useBank %>"><liferay-ui:message key='editactivity.mandatory.no'/></aui:option>
-				<aui:option value="true" selected="<%=useBank %>"><liferay-ui:message key='editactivity.mandatory.yes'/></aui:option>
-			</aui:select>
-		</div>
-		<c:if test="<%=useBank%>">
-			<script>
-				AUI().ready(function(A) {
-					A.all('#<portlet:namespace />normal-questions').hide();
-					A.one('#<portlet:namespace />banks-questions').setStyle('display', 'block');
-					A.one('.portlet-msg-info').setStyle('display', 'none');
-				});
-			</script>
-		</c:if>
-	</c:if>
+			<c:if test="<%=isCourse%>">
+				<script type="text/javascript">
+					function modifyIsBank(value) {
+						var A = AUI();
+						if (value==='true'){
+							A.all('#<portlet:namespace />normal-questions').hide();
+							A.one('#<portlet:namespace />banks-questions').setStyle('display', 'block');
+							A.one('.portlet-msg-info').setStyle('display', 'none');
+						}else{
+							A.all('#<portlet:namespace />normal-questions').show();
+							A.one('#<portlet:namespace />banks-questions').setStyle('display', 'none');
+							A.one('.portlet-msg-info').setStyle('display', 'block');
+						}
+					}
+				</script>
+				<div class="banks-support">
+					<aui:select id="banks-support" cssClass="banks-support" name="banks-support" label="execativity.editquestions.banksquestions" onChange="modifyIsBank(this.value)">
+						<aui:option value="false" selected="<%=!useBank %>"><liferay-ui:message key='editactivity.mandatory.no'/></aui:option>
+						<aui:option value="true" selected="<%=useBank %>"><liferay-ui:message key='editactivity.mandatory.yes'/></aui:option>
+					</aui:select>
+				</div>
+				<c:if test="<%=useBank%>">
+					<script>
+						AUI().ready(function(A) {
+							A.all('#<portlet:namespace />normal-questions').hide();
+							A.one('#<portlet:namespace />banks-questions').setStyle('display', 'block');
+							A.one('.portlet-msg-info').setStyle('display', 'none');
+						});
+					</script>
+				</c:if>
+			</c:if>
+		<%} %>
 	<div id="<portlet:namespace />normal-questions">
 		<liferay-ui:icon-menu  align="left" direction="down" extended="false" showWhenSingleIcon="false" message="execativity.editquestions.newquestion" cssClass="bt_new" showArrow="true">
 		<%
@@ -177,7 +174,7 @@ Liferay.provide(
 			<portlet:renderURL var="importquestionsURL">
 				<portlet:param name="resId" value="<%=String.valueOf(learningActivity.getActId()) %>" />
 				<portlet:param name="actionEditingDetails" value="<%=StringPool.TRUE %>"></portlet:param>	
-				<portlet:param name="jspPage" value="/html/execactivity/test/admin/importquestions.jsp"></portlet:param>
+				<portlet:param name="jspPage" value="/html/questions/admin/importquestions.jsp"></portlet:param>
 			</portlet:renderURL>
 			<liferay-ui:icon image="add" label="<%= true %>" message="execativity.editquestions.importquestions" url='<%= importquestionsURL %>'/>
 			
@@ -194,19 +191,27 @@ Liferay.provide(
 			<liferay-ui:icon image="export" label="<%= true %>" message="execativity.editquestions.exportXml" method="get" url="<%=exportXmlURL%>" />
 		</liferay-ui:icon-menu>
 	</div>
-	<div id="<portlet:namespace />banks-questions" style="display:none">
-		<aui:form name='fm' action="<%=setBankTestURL%>" method='post'>
-			<aui:input name="redirect" type="hidden" value="<%=currentURL %>" />
-			<aui:input name="is-bank" type="hidden" value="true"/>
-			<aui:input name="actId" type="hidden" value="<%=Long.toString(learningActivity.getActId()) %>"/>
-			<aui:field-wrapper label="execativity.editquestions.banks.categoryselections" helpMessage="execativity.editquestions.banks.categoryselections">
-				<%@ include file="/html/execactivity/test/admin/catselector.jspf" %>
-			</aui:field-wrapper>
-			<aui:input id="<portlet:namespace />banks-multipleselections" name="banks-multipleselections" checked="<%=isMultiple %>" type="checkbox" 
-				label="execativity.editquestions.banks.multipleselections" helpMessage="execativity.editquestions.banks.multipleselections.helpmessage"  ignoreRequestValue="true" />
-			<aui:button type="submit" value="courseadmin.importuserrole.save"/>
-		</aui:form>
-	</div>
+	
+	<c:if test="<%=allowsBank %>">
+		<%String CategoryIds = LearningActivityLocalServiceUtil.getExtraContentValue(learningActivity.getActId(),"categoriesId"); %>
+		<div id="<portlet:namespace />banks-questions" style="display:none">
+		
+			<portlet:actionURL var="setBankTestURL" name="setBankTest" >
+				<portlet:param name="editing" value="<%=StringPool.TRUE %>"/>
+			</portlet:actionURL>
+			<aui:form name='fm' action="<%=setBankTestURL%>" method='post'>
+				<aui:input name="redirect" type="hidden" value="<%=currentURL %>" />
+				<aui:input name="is-bank" type="hidden" value="true"/>
+				<aui:input name="actId" type="hidden" value="<%=Long.toString(learningActivity.getActId()) %>"/>
+				<aui:field-wrapper label="execativity.editquestions.banks.categoryselections" helpMessage="execativity.editquestions.banks.categoryselections">
+					<%@ include file="/html/questions/admin/catselector.jspf" %>
+				</aui:field-wrapper>
+				<aui:input id="<portlet:namespace />banks-multipleselections" name="banks-multipleselections" checked="<%=isMultiple %>" type="checkbox" 
+					label="execativity.editquestions.banks.multipleselections" helpMessage="execativity.editquestions.banks.multipleselections.helpmessage"  ignoreRequestValue="true" />
+				<aui:button type="submit" value="courseadmin.importuserrole.save"/>
+			</aui:form>
+		</div>
+	</c:if>
 </div>
 <%
 	PortletURL editQuestionsURL = renderResponse.createRenderURL();
@@ -234,13 +239,6 @@ Liferay.provide(
 				searchContainer.getEnd()));
 		pageContext.setAttribute("total", listaTotal.size());
 	%>
-		<%--
-		  DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(TestQuestion.class).add(PropertyFactoryUtil.forName("actId").eq(learningActivity.getActId()));
-		  pageContext.setAttribute("results", TestQuestionLocalServiceUtil.dynamicQuery(dynamicQuery,searchContainer.getStart(),
-				searchContainer.getEnd()));
-		  pageContext.setAttribute("total", (int)TestQuestionLocalServiceUtil.dynamicQueryCount(
-				  DynamicQueryFactoryUtil.forClass(TestQuestion.class).add(PropertyFactoryUtil.forName("actId").eq(learningActivity.getActId()))));
-		--%>
 		</liferay-ui:search-container-results>
 		<liferay-ui:search-container-row className="com.liferay.lms.model.TestQuestion" keyProperty="questionId" modelVar="activity">
 			<liferay-ui:search-container-column-text name="text">
@@ -251,7 +249,7 @@ Liferay.provide(
 			<liferay-ui:search-container-column-text name="questionType">
 				<%=(new QuestionTypeRegistry().getQuestionType(activity.getQuestionType())).getTitle(themeDisplay.getLocale()) %>
 			</liferay-ui:search-container-column-text>
-			<liferay-ui:search-container-column-jsp path="/html/execactivity/test/admin/admin_actions.jsp" align="right"/>
+			<liferay-ui:search-container-column-jsp path="/html/questions/admin/admin_actions.jsp" align="right"/>
 		</liferay-ui:search-container-row>
 		<liferay-ui:search-iterator />
 	</liferay-ui:search-container>
@@ -264,10 +262,11 @@ Liferay.provide(
 <aui:button-row cssClass="buttons_content">
 <%
 	List<TestQuestion> lista = TestQuestionLocalServiceUtil.getQuestions(learningActivity.getActId());
-	if(lista.size()>=2){ %>	
+	Boolean showOrderQuestions = (Boolean)request.getAttribute("showOrderQuestions");
+	if(lista.size()>=2 && (showOrderQuestions != null && showOrderQuestions)){ %>	
 
 		<liferay-portlet:renderURL var="orderURL" >
-			<liferay-portlet:param name="mvcPath" value="/html/execactivity/test/admin/orderQuestions.jsp" />
+			<liferay-portlet:param name="mvcPath" value="/html/questions/admin/orderQuestions.jsp" />
 			<liferay-portlet:param name="resId" value="<%=String.valueOf(learningActivity.getActId()) %>" />
 			<liferay-portlet:param name="actionEditingDetails" value="<%=StringPool.TRUE %>" />
 			<liferay-portlet:param name="backUrl" value="<%= currentURL %>"/>
@@ -276,5 +275,5 @@ Liferay.provide(
 <%
 	} 
 %>
-	<liferay-util:include page="/html/execactivity/test/admin/editFooter.jsp" servletContext="<%=this.getServletContext() %>" />
+	<liferay-util:include page="/html/questions/admin/editFooter.jsp" servletContext="<%=this.getServletContext() %>" />
 </aui:button-row>

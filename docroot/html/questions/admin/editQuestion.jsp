@@ -42,7 +42,7 @@
 			allowedTypesList = ListUtil.fromArray(allowedTypes);
 		}
 		
-		if (!allowedTypesList.isEmpty() && !allowedTypesList.contains(String.valueOf(question.getQuestionType()))) {
+		if (!allowedTypesList.isEmpty() && !allowedTypesList.contains(String.valueOf(question.getQuestionType())) && question.getQuestionType() != 7) {
 			typeId = Long.valueOf(allowedTypes[0]);
 			question.setQuestionType(typeId);
 			question = TestQuestionLocalServiceUtil.updateTestQuestion(question);
@@ -51,7 +51,7 @@
 	}
 	
 %>
-<liferay-util:include page="/html/execactivity/test/admin/editHeader.jsp" servletContext="<%=this.getServletContext() %>" />
+<liferay-util:include page="/html/questions/admin/editHeader.jsp" servletContext="<%=this.getServletContext() %>" />
 
 <portlet:actionURL var="editQuestionURL" name="editQuestion" />
 <aui:form name="qfm" action="<%=editQuestionURL %>" method="post" onSubmit="javascript:return false;">
@@ -95,7 +95,7 @@
 					<aui:option selected="<%=formatType.equals(PropsUtil.get(\"lms.question.formattype.normal\")) %>" value="<%=PropsUtil.get(\"lms.question.formattype.normal\")%>">
 						<liferay-ui:message key="exectactivity.editquestions.formattype.vertical" />
 					</aui:option>
-					<aui:option selected="<%=formatType.equals(PropsUtil.get(\"lms.question.formattype.horizontal\")) %>" value="<%=PropsUtil.get(\"lms.question.formattype.horizontal\") %>">
+					<aui:option selected="<%=formatType.equals(PropsUtil.get(\"lms.question.formattype.horizontal\")) || typeId == 7%>" value="<%=PropsUtil.get(\"lms.question.formattype.horizontal\") %>">
 						<liferay-ui:message key="exectactivity.editquestions.formattype.horizontal" />
 					</aui:option>
 					<aui:option selected="<%=formatType.equals(PropsUtil.get(\"lms.question.formattype.combo\")) %>" value="<%=PropsUtil.get(\"lms.question.formattype.combo\") %>">
@@ -153,7 +153,9 @@
 			    </script>
 	    </aui:field-wrapper>
 	    
-	    <aui:input name="penalize" label="question.penalize" type="checkbox" checked="<%=question!=null?question.isPenalize():false%>"/>
+	    <c:if test="<%=qt.getPenalize() %>">
+	   		<aui:input name="penalize" label="question.penalize" type="checkbox" checked="<%=question!=null?question.isPenalize():false%>"/>
+	    </c:if>
 	    
 	</aui:field-wrapper>
 	
@@ -313,16 +315,16 @@
 			    			
 			    			switch(typeId){
 			    				
-			    			case 0:
-			    				var radioChecked = (A.one('input[name=<portlet:namespace/>correct_new]:checked'));
-	    						if(radioChecked==null){
-	    							valid = false;
-	    							correctVal = false;
-	    						}	else{
-	    							trueCounter++;
-	    							correctVal = true;
-	    						}
-			    			break;
+				    			case 0:
+				    				var radioChecked = (A.one('input[name=<portlet:namespace/>correct_new]:checked'));
+		    						if(radioChecked==null){
+		    							valid = false;
+		    							correctVal = false;
+		    						}	else{
+		    							trueCounter++;
+		    							correctVal = true;
+		    						}
+				    			break;
 			    			
 			    				case 1:
 			    				
@@ -345,19 +347,29 @@
 			    					valid = true;
 		    						correctVal = true;
 		    						trueCounter++;
-			    				
-			    				
 			    				break;
-			    				
-			    				
-			    				
-			    				
 			    				case 5:
 			    					valid = true;
 		    						correctVal = false;
 		    						trueCounter++;
 			    				break;
-			    			
+			    				
+			    				case 6:
+			    					correct = A.one('input[name=<portlet:namespace />correct_'+id+'Checkbox]');
+					    			correctVal = (correct != null && correct._node.checked);
+					    			if (correct == null) {
+					    				correct = A.one('input[name=<portlet:namespace />correct_'+id+']');
+					    				correctVal = (correct != null && correct.val() === 'true');
+					    			}
+					    			trueCounter++;
+			    				case 7:
+			    					correct = A.one('input[name=<portlet:namespace />correct_'+id+'Checkbox]');
+					    			correctVal = (correct != null && correct._node.checked);
+					    			if (correct == null) {
+					    				correct = A.one('input[name=<portlet:namespace />correct_'+id+']');
+					    				correctVal = (correct != null && correct.val() === 'true');
+					    			}
+					    			trueCounter++;
 			    				default:
 			    					correct = A.one('input[name=<portlet:namespace />correct_'+id+'Checkbox]');
 			    				correctVal = (correct != null && correct._node.checked);
@@ -370,10 +382,6 @@
 		    					break;
 			    			
 			    			}
-			    			
-			    			
-			    			
-			    			
 			    			
 			    			var otherFieldsWithValue = (feedbackCorrect != null && feedbackCorrect.val() !="") || 
 			    										(feedbackNoCorrect != null && feedbackNoCorrect.val() != "") || 
@@ -421,13 +429,6 @@
 		    		}
 		    	);
 		    }
-		
-		AUI().ready('aui-base',
-		   	function() {
-		    	<portlet:namespace />checkAddAnswerButtonVisibility();
-		    	<portlet:namespace />checkMinAnswersNo();
-		   	}
-		);
 	</script>
 
 	<%
@@ -446,7 +447,15 @@
 		</div>
 		<div class="buttons_content">
 		<aui:button type="submit" onClick='<%= "return validateFields(event);" %>'/>
-		<liferay-util:include page="/html/execactivity/test/admin/editFooter.jsp" servletContext="<%=this.getServletContext() %>" />
+		<liferay-util:include page="/html/questions/admin/editFooter.jsp" servletContext="<%=this.getServletContext() %>" />
 		</div>
 	</aui:button-row>
 </aui:form>
+<script >
+	AUI().ready('aui-base',
+	   	function() {
+	    	<portlet:namespace />checkAddAnswerButtonVisibility();
+	    	<portlet:namespace />checkMinAnswersNo();
+	   	}
+	);
+</script>

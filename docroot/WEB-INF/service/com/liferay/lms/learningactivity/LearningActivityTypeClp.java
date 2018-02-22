@@ -10,6 +10,7 @@ import javax.portlet.PortletResponse;
 
 import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.model.LearningActivityClp;
+import com.liferay.lms.model.LearningActivityTry;
 import com.liferay.lms.service.ClpSerializer;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
@@ -844,6 +845,33 @@ public class LearningActivityTypeClp implements LearningActivityType {
 		}
 		return null;
 		
+	}
+	
+	@Override
+	public long calculateResult(LearningActivity learningActivity, LearningActivityTry lat){
+		
+		Object returnObj = null;
+
+		try {
+			ClassLoader classLoader = clp.getClassLoader();
+			Class learningActivityClass = Class.forName(LearningActivity.class.getName(),true, classLoader);
+			Class learningActivityTryClass = Class.forName(LearningActivityTry.class.getName(),true, classLoader);
+			MethodKey especificValidationsMethod = new MethodKey(clp.getClassName(), "calculateResult", learningActivityClass, learningActivityTryClass);		    
+			returnObj = clp.invoke(new MethodHandler(especificValidationsMethod, lat));
+		}
+		catch (Throwable t) {
+			t = ClpSerializer.translateThrowable(t);
+
+			if (t instanceof RuntimeException) {
+				throw (RuntimeException)t;
+			}
+			else {
+				t.printStackTrace();
+				throw new RuntimeException(t.getClass().getName() +
+					" is not a valid exception");
+			}
+		}
+		return ((Long)returnObj).longValue();	
 	}
 
 }

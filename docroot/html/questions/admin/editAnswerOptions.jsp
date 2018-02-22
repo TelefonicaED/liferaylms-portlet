@@ -23,7 +23,7 @@
 <span class="solution">
 <% 
 	long questionId = ParamUtil.getLong(request,"questionId", 0);
-	long typeId = ParamUtil.getLong(request,"typeId", -1);
+	long typeId = ParamUtil.getLong(request,"questionTypeId", -1);
 
 	TestQuestion question = null;
 	if(questionId != 0){

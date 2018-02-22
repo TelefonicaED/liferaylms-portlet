@@ -793,10 +793,6 @@ Liferay.provide(
 			}
 			String passpuntuationLabelProperty = "passpuntuation";
 			String passpunctuationHelpProperty= "editActivity.passpuntuation.help";
-			if (larntype.getTypeId() == 2){
-				passpuntuationLabelProperty = "resourceexternalactivity.passpuntuation";
-				passpunctuationHelpProperty= "resourceexternalactivity.passpuntuation.help";
-			}
 		%>
 		<aui:input size="5" name="passpuntuation" label="<%=passpuntuationLabelProperty %>" type="number" value="<%=Long.toString(score) %>" disabled="<%=disabled %>" helpMessage="<%=LanguageUtil.get(pageContext, passpunctuationHelpProperty)%>">
 			<aui:validator name="min" errorMessage="editActivity.passpuntuation.range">-1</aui:validator>
@@ -817,12 +813,6 @@ Liferay.provide(
    		    		LanguageUtil.get(pageContext,"editActivity.passpuntuation.range"):StringPool.BLANK %>
 	    </div>
 		<%
-		}
-		else
-		{
-			%>
-			<aui:input type="hidden" name="passpuntuation" value="<%=larntype.getDefaultScore() %>" />
-			<% 
 		}
 		%>
 		

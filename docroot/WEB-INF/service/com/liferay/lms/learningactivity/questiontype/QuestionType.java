@@ -2,7 +2,7 @@ package com.liferay.lms.learningactivity.questiontype;
 
 import java.util.Locale;
 
-import javax.portlet.ActionRequest;
+import javax.portlet.PortletRequest;
 
 import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.service.TestAnswerLocalService;
@@ -25,9 +25,9 @@ public interface QuestionType
 	public String getURLNew();
 	public String getURLBack();
 	public void delete(long questionId) throws PortalException, SystemException;
-	public long correct(ActionRequest actionRequest, long questionId);
+	public long correct(PortletRequest portletRequest, long questionId);
 	public String getHtmlView(long questionId, ThemeDisplay themeDisplay, Document document);
-	public Element getResults(ActionRequest actionRequest, long questionId);
+	public Element getResults(PortletRequest portletRequest, long questionId);
 	public String getHtmlFeedback(Document document, long questionId, long actId, ThemeDisplay themeDisplay);
 	public void exportQuestionAnswers(PortletDataContext context, Element root, long questionId, LearningActivity activity) throws PortalException, SystemException;
 	public void importQuestionAnswers(PortletDataContext context, Element entryElement, long questionId, long userId, ServiceContext serviceContext) throws SystemException, PortalException;
@@ -37,5 +37,7 @@ public interface QuestionType
 	public int getDefaultAnswersNo();
 	public boolean isInline();
 	public boolean isPartialCorrectAvailable();
+	public boolean getPenalize();
+	public long correct(Element element, long questionId);
 		
 }

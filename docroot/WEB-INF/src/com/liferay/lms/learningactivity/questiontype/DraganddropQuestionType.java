@@ -4,9 +4,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Locale;
 
-import javax.portlet.ActionRequest;
+import javax.portlet.PortletRequest;
 
 import com.liferay.lms.model.TestAnswer;
 import com.liferay.lms.model.TestQuestion;
@@ -47,14 +48,14 @@ public class DraganddropQuestionType extends BaseQuestionType {
 	}
 
 	public String getURLEdit(){
-		return "/html/execactivity/test/admin/editAnswerOptions.jsp";
+		return "/html/questions/admin/editAnswerOptions.jsp";
 	}
 	
 	public String getURLNew(){
-		return "/html/execactivity/test/admin/popups/options.jsp";
+		return "/html/questions/admin/popups/options.jsp";
 	}
 
-	public long correct(ActionRequest actionRequest, long questionId){
+	public long correct(PortletRequest portletRequest, long questionId){
 		List<TestAnswer> testAnswers = new ArrayList<TestAnswer>();
 		try {
 			testAnswers.addAll(TestAnswerLocalServiceUtil.getTestAnswersByQuestionId(questionId));
@@ -70,7 +71,37 @@ public class DraganddropQuestionType extends BaseQuestionType {
 
 		List<Long> answersId = new ArrayList<Long>();
 		for(int i=0;i<testAnswers.size();i++){
-			answersId.add(ParamUtil.getLong(actionRequest, "question_"+questionId+"_"+i+"hidden"));
+			answersId.add(ParamUtil.getLong(portletRequest, "question_"+questionId+"_"+i+"hidden"));
+		}
+
+		if(!isCorrect(answersId, testAnswers)){
+			return INCORRECT;
+		}else{
+			return CORRECT;
+		}
+	}
+	
+	@Override
+	public long correct(Element element, long questionId){
+		List<TestAnswer> testAnswers = new ArrayList<TestAnswer>();
+		try {
+			testAnswers.addAll(TestAnswerLocalServiceUtil.getTestAnswersByQuestionId(questionId));
+		} catch (SystemException e) {
+			e.printStackTrace();
+		}
+
+		//me quedo solo con un array con la solucion
+		for(ListIterator<TestAnswer> itr = testAnswers.listIterator(); itr.hasNext();){
+			TestAnswer tanswer = itr.next();
+			if(!tanswer.isIsCorrect()) itr.remove();
+		}
+
+		List<Long> answersId = new ArrayList<Long>();
+		Element elementAnswer = null;
+		for(int i=0;i<testAnswers.size();i++){
+			elementAnswer = element.elementByID(String.valueOf(testAnswers.get(i).getAnswerId()));
+			if(elementAnswer != null)
+				answersId.add(testAnswers.get(i).getAnswerId());
 		}
 
 		if(!isCorrect(answersId, testAnswers)){
@@ -81,10 +112,6 @@ public class DraganddropQuestionType extends BaseQuestionType {
 	}
 
 	protected boolean isCorrect(List<Long> answersId, List<TestAnswer> testAnswers){
-		/*
-		 * Ticket #111189 - Error en corrección de preguntas de tipo Arrastrar
-		 * Unicamente las daba por validas si estaban en el mismo orden de respuesta.
-		 */
 		boolean result = Boolean.TRUE;
 		if (testAnswers.size() == answersId.size()) {
 			// El numero de respuestas ha de coincidir
@@ -103,7 +130,7 @@ public class DraganddropQuestionType extends BaseQuestionType {
 		return getHtml(document, questionId, false, themeDisplay);
 	}
 
-	public Element getResults(ActionRequest actionRequest, long questionId){
+	public Element getResults(PortletRequest portletRequest, long questionId){
 		List<TestAnswer> testAnswers = new ArrayList<TestAnswer>();
 		try {
 			testAnswers.addAll(TestAnswerLocalServiceUtil.getTestAnswersByQuestionId(questionId));
@@ -119,13 +146,13 @@ public class DraganddropQuestionType extends BaseQuestionType {
 
 		List<Long> answersId = new ArrayList<Long>();
 		for(int i=0;i<testAnswers.size();i++){
-			answersId.add(ParamUtil.getLong(actionRequest, "question_"+questionId+"_"+i+"hidden"));
+			answersId.add(ParamUtil.getLong(portletRequest, "question_"+questionId+"_"+i+"hidden"));
 		}
 
 		Element questionXML=SAXReaderUtil.createElement("question");
 		questionXML.addAttribute("id", Long.toString(questionId));
 		
-		long currentQuestionId = ParamUtil.getLong(actionRequest, "currentQuestionId");
+		long currentQuestionId = ParamUtil.getLong(portletRequest, "currentQuestionId");
 		if (currentQuestionId == questionId) {
 			questionXML.addAttribute("current", "true");
 		}
@@ -251,10 +278,6 @@ public class DraganddropQuestionType extends BaseQuestionType {
 
 			if(feedback) {
 				html += "<div class=\"content_answer\">" + leftCol + rightCol + "</div>";
-//				if (!"".equals(feedMessage)) {
-//					//html += "<div class=\"questionFeedback\">" + feedMessage + "</div>";
-//					html += feedMessage;
-//				}
 			}
 			else html += leftCol + rightCol;
 			html+=	"</div>";

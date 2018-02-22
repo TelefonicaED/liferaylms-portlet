@@ -5,6 +5,10 @@
 		var iframe = document.getElementById('player_1');
 		var player = new Vimeo.Player(iframe);
 		
+</script>
+
+<script>
+		
 		var plays = parseInt('${plays}');
 		var duration = 0;
 		var currentTime = 0;

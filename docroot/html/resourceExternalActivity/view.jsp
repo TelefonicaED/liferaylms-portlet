@@ -3,7 +3,8 @@
 <%@page import="com.liferay.portlet.documentlibrary.util.DLUtil"%>
 <%@ include file="/init-min.jsp" %>
 
-<script src="/liferaylms-portlet/js/service.js" type="text/javascript"></script>
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/mediaelement@4.2.7/build/mediaelementplayer.min.css">
+
 
 <jsp:useBean id="listDocuments" type="java.util.List<com.liferay.portal.kernel.repository.model.FileVersion>" scope="request"/>
 
@@ -22,6 +23,8 @@ if(isLinkTabletResourceExternal){
 
 <div class="description">${activity.getDescriptionFiltered(themeDisplay.locale,true)}</div>
 
+ <portlet:resourceURL var="finishTryURL" id="finishTry" />
+
 <c:choose>
 	<c:when test="${isDLFileEntry }">
 		<div class="video">
@@ -33,61 +36,22 @@ if(isLinkTabletResourceExternal){
 		<script>
 			var unloadEvent = function (e) {
 				console.log("unloadEvent video dlfileentry ");
-				var serviceParameterTypes = [
-			     	'long',
-			     	'int',
-			     	'double',
-			    	'int'
-			    ];
-				
-				var message = Liferay.Service.Lms.LearningActivityTry.update(
-					{
-						latId: '${latId}',
-						score: 100,
-						position: 0,
-						plays: 0,
-						serviceParameterTypes: JSON.stringify(serviceParameterTypes)
-					}
-				);
-				var exception = message.exception;											
-					
+				<portlet:namespace/>finishTry(100,0,0);												
 			  };
 			  window.addEventListener("beforeunload", unloadEvent);	
 		</script>
 	</c:when>
-	<c:when test="${isYoutubeIframe || isVimeoIframe }">
+	<c:when test="${not empty mimeType }">
+		<%@ include file="/html/resourceExternalActivity/mediaelement.jsp" %>
+	</c:when>
+	<c:otherwise>
 		<div class="video">
 			${video}
 		</div>
-		<c:if test="${isYoutubeIframe}">
-			<%@ include file="/html/resourceExternalActivity/youtube.jsp" %>		
-		</c:if>	
-		<c:if test="${isVimeoIframe}">			
-			<%@ include file="/html/resourceExternalActivity/vimeo.jsp" %>			
-		</c:if>
-	</c:when>
-	<c:otherwise>
 		<script>
 			var unloadEvent = function (e) {
 				console.log("unloadEvent otherwise");
-				var serviceParameterTypes = [
-			     	'long',
-			     	'int',
-			     	'double',
-			    	'int'
-			    ];
-				
-				var message = Liferay.Service.Lms.LearningActivityTry.update(
-					{
-						latId: '${latId}',
-						score: 100,
-						position: 0,
-						plays: 0,
-						serviceParameterTypes: JSON.stringify(serviceParameterTypes)
-					}
-				);
-				var exception = message.exception;												
-					
+				<portlet:namespace/>finishTry(100,0,0);												
 			  };
 			  window.addEventListener("beforeunload", unloadEvent);	
 		</script>
@@ -108,3 +72,22 @@ if(isLinkTabletResourceExternal){
 		</div>
 	</c:if>
 </div>
+
+<script>
+	function <portlet:namespace/>finishTry(score,position,plays){
+		$.ajax({
+				dataType: 'json',
+				url: '${finishTryURL}',
+			    cache:false,
+				data: {
+					actId: '${activity.actId}',
+					latId: '${latId}',
+					score: score,
+					position: position,
+					plays: plays
+				},
+				success: function(data){},
+				error: function(){}
+			});
+	}
+</script>

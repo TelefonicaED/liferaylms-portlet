@@ -6,7 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
-import javax.portlet.ActionRequest;
+import javax.portlet.PortletRequest;
 
 import com.liferay.lms.model.TestAnswer;
 import com.liferay.lms.model.TestQuestion;
@@ -49,15 +49,36 @@ public class FreetextQuestionType extends BaseQuestionType {
 	}
 
 	public String getURLEdit(){
-		return "/html/execactivity/test/admin/editAnswerFreetext.jsp";
+		return "/html/questions/admin/editAnswerFreetext.jsp";
 	}
 	
 	public String getURLNew(){
-		return "/html/execactivity/test/admin/popups/freetext.jsp";
+		return "/html/questions/admin/popups/freetext.jsp";
 	}
 
-	public long correct(ActionRequest actionRequest, long questionId){
-		String answer= ParamUtil.getString(actionRequest, "question_"+questionId, "");
+	public long correct(PortletRequest portletRequest, long questionId){
+		String answer= ParamUtil.getString(portletRequest, "question_"+questionId, "");
+		List<TestAnswer> testAnswers = new ArrayList<TestAnswer>();
+		try {
+			testAnswers = TestAnswerLocalServiceUtil.getTestAnswersByQuestionId(questionId);
+		} catch (SystemException e) {
+			e.printStackTrace();
+		}
+
+		if(testAnswers!=null && testAnswers.size()>0){
+			TestAnswer solution = testAnswers.get(0);
+			if (isCorrect(solution, answer)){
+				return CORRECT;
+			}else{
+				return INCORRECT;
+			}
+		}
+		return INCORRECT;
+	}
+	
+	@Override
+	public long correct(Element element, long questionId){
+		String answer= element.element("answer").getText();
 		List<TestAnswer> testAnswers = new ArrayList<TestAnswer>();
 		try {
 			testAnswers = TestAnswerLocalServiceUtil.getTestAnswersByQuestionId(questionId);
@@ -90,13 +111,13 @@ public class FreetextQuestionType extends BaseQuestionType {
 		return getHtml(document, questionId, false, themeDisplay);
 	}
 
-	public Element getResults(ActionRequest actionRequest, long questionId){
-		String answer= ParamUtil.getString(actionRequest, "question_"+questionId, "");
+	public Element getResults(PortletRequest portletRequest, long questionId){
+		String answer= ParamUtil.getString(portletRequest, "question_"+questionId, "");
 
 		Element questionXML=SAXReaderUtil.createElement("question");
 		questionXML.addAttribute("id", Long.toString(questionId));
 
-		long currentQuestionId = ParamUtil.getLong(actionRequest, "currentQuestionId");
+		long currentQuestionId = ParamUtil.getLong(portletRequest, "currentQuestionId");
 		if (currentQuestionId == questionId) {
 			questionXML.addAttribute("current", "true");
 		}
