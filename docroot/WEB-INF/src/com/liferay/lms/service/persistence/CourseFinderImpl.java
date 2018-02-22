@@ -176,7 +176,7 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 		try{
 			
 			if(freeText != null && freeText.length() > 0)
-				freeText = "%" + freeText + "%";
+				freeText = "%" + freeText.replace("'", "\\'") + "%";
 			
 			session = openSession();
 			
@@ -256,7 +256,6 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 	
 	
 	private String replaceWhereTitleDescriptionCategoriesTags(String sql, String freeText, int status, long[] categories, long[] tags, boolean andOperator) {
-		
 		if(andOperator && ((freeText != null && !freeText.equals("")) || status != -1 || (categories != null && categories.length > 0) || (tags != null && tags.length > 0))){
 			sql = sql.replace("[$WHERETITLEDESCRIPTIONCATEGORIESTAGSAND$]", CustomSQLUtil.get(WHERE_TITLE_DESCRIPTION_CATEGORIES_TAGS_AND));
 			sql = sql.replace("[$FREETEXT$]", String.valueOf(freeText));
