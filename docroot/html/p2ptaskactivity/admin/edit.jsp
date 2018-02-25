@@ -24,13 +24,11 @@
 <%
 
 	boolean teamAssignationAllowed = PrefsPropsUtil.getBoolean(themeDisplay.getCompanyId(), LmsConstant.P2P_TEAM_ASSIGNATIONS_PROPERTY,false);
-	System.out.println("TEAM ASSIGANTION ALLOWED PREFSPROPS "+teamAssignationAllowed);
 	if(!teamAssignationAllowed){
 		if(PropsUtil.get(LmsConstant.P2P_TEAM_ASSIGNATIONS_PROPERTY)!=null){
 			teamAssignationAllowed=Boolean.parseBoolean(PropsUtil.get(LmsConstant.P2P_TEAM_ASSIGNATIONS_PROPERTY));
 		}
 	}
-	System.out.println("TEAM ASSIGANTION ALLOWED PROPS "+teamAssignationAllowed);
 	long moduleId=ParamUtil.getLong(renderRequest,"resModuleId",0);
 
 	boolean anonimous=false;
