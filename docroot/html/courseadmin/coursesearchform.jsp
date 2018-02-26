@@ -76,7 +76,7 @@ if(catIds!=null&&catIds.length>0)
 			</aui:select>
 						
 		</aui:fieldset>
-		<c:if test="${renderRequest.preferences.getValue('showGroupFilter', 'false') && not empty courseId}">
+		<c:if test="${renderRequest.preferences.getValue('showGroupFilter', 'false') && (empty courseId || courseId == 0)}">
 			<aui:select name="selectedGroupId" label="courseadmin.search.select-group">
 					<aui:option label="" value="0"/>
 					<c:forEach items="${listGroups}"  var="courseGroup">
