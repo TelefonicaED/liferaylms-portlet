@@ -64,7 +64,7 @@
 					document.getElementById("player_1").src = src;
 				}
 			}									
-		}
+		});
 		
 		var unloadEvent = function (e) {
 			console.log("unload event vimeo");  

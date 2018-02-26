@@ -638,6 +638,26 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 		
 			renderRequest.setAttribute("expandoNames", expandoNames);
 		}
+		
+		//Creamos la lista de columnas a mostrar en la tabla
+		try {
+			List<ExpandoColumn> expandosColumn = ExpandoColumnLocalServiceUtil.getColumns(themeDisplay.getCompanyId(), Course.class.getName(), ExpandoTableConstants.DEFAULT_TABLE_NAME);
+			List<String> expandoNames = new ArrayList<String>();
+			if(Validator.isNotNull(expandosColumn) && expandosColumn.size()>0) {
+				String expandoName="";
+				for (ExpandoColumn expandoUser : expandosColumn) {
+					expandoName = StringUtil.upperCaseFirstLetter(expandoUser.getName());
+					if(((renderRequest.getPreferences().getValue("show" + expandoName, "false")).compareTo("true") == 0)) {
+						expandoNames.add(expandoName);
+					}
+				}	
+			}
+		
+			renderRequest.setAttribute("expandoColumnNames", expandoNames);
+		} catch (SystemException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	

@@ -1,18 +1,20 @@
-<div class="video">
-	<video width="600" height="338" id="playervideo" ${controls } preload="none" src="${video}"  type="${mimeType }"></video>
-</div>
-
-<c:forEach items="${listQuestions }" var="question">
-	<c:set var="questionType" value="${question.testQuestionType }" />
-	<div class="aui-helper-hidden" id="${renderResponse.namespace}question_${question.questionId}">	
-		<aui:form name="questionform_${question.questionId}">
-			<aui:input name="questionId" value="${question.questionId }" type="hidden"/>
-			<aui:input name="latId" value="${latId}" type="hidden"/>
-			${questionType.getHtmlView(question.questionId, themeDisplay, null) }
-			<aui:button value="save" onClick="javascript:${renderResponse.namespace}answerQuestion(${question.questionId })" />
-		</aui:form>
+<div class="contentQuestionVideo">
+	<div class="video">
+		<video width="600" height="338" id="playervideo" ${controls } preload="none" src="${video}"  type="${mimeType }"></video>
 	</div>
-</c:forEach>
+	
+	<c:forEach items="${listQuestions }" var="question">
+		<c:set var="questionType" value="${question.testQuestionType }" />
+		<div class="aui-helper-hidden questionVideo" id="${renderResponse.namespace}question_${question.questionId}">	
+			<aui:form name="questionform_${question.questionId}">
+				<aui:input name="questionId" value="${question.questionId }" type="hidden"/>
+				<aui:input name="latId" value="${latId}" type="hidden"/>
+				${questionType.getHtmlView(question.questionId, themeDisplay, null) }
+				<aui:button value="save" onClick="javascript:${renderResponse.namespace}answerQuestion(${question.questionId })" />
+			</aui:form>
+		</div>
+	</c:forEach>
+</div>
 
 <%@ include file="/html/questions/validations.jsp" %>
 
