@@ -36,7 +36,6 @@ import com.liferay.lms.model.LmsPrefs;
 import com.liferay.lms.model.Module;
 import com.liferay.lms.model.Schedule;
 import com.liferay.lms.model.UserCompetence;
-import com.liferay.lms.service.ClpSerializer;
 import com.liferay.lms.service.CourseCompetenceLocalServiceUtil;
 import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.lms.service.LmsPrefsLocalServiceUtil;
@@ -44,8 +43,8 @@ import com.liferay.lms.service.ModuleLocalServiceUtil;
 import com.liferay.lms.service.UserCompetenceLocalServiceUtil;
 import com.liferay.lms.service.base.CourseLocalServiceBaseImpl;
 import com.liferay.lms.service.persistence.CourseFinderUtil;
+import com.liferay.lms.util.CourseParams;
 import com.liferay.lms.views.CourseResultView;
-import com.liferay.portal.kernel.bean.PortletBeanLocatorUtil;
 import com.liferay.portal.kernel.dao.orm.CustomSQLParam;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
@@ -68,6 +67,7 @@ import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.FriendlyURLNormalizerUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
 import com.liferay.portal.kernel.util.PropsUtil;
@@ -1161,36 +1161,118 @@ public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int e
 		return users;
 	}
 	
-	public List<Course> getByTitleStatusCategoriesTags(String freeText, int status, long[] categories, long[] tags, long companyId, long groupId, long userId, String language, boolean isAdmin, boolean andOperator, int start, int end){
-		return CourseFinderUtil.findByT_S_C_T_T(freeText, status, categories, tags,null, companyId, groupId, userId, language, isAdmin, false, andOperator, start, end);
+	public List<Course> getByTitleStatusCategoriesTags(String freeText, int status, long[] categories, long[] tags, long companyId, long groupId, long userId, 
+			String language, boolean isAdmin, boolean andOperator, int start, int end){
+		LinkedHashMap<String, Object> params = new LinkedHashMap<String, Object>();
+		if(tags != null && tags.length > 0){
+			params.put(CourseParams.PARAM_TAGS, tags);
+		}
+		if(categories != null && categories.length > 0){
+			params.put(CourseParams.PARAM_OR_CATEGORIES, categories);
+		}
+		params.put(CourseParams.PARAM_SEARCH_PARENT_AND_CHILD_COURSES, true);
+		if(!isAdmin){
+			params.put(CourseParams.PARAM_PERMISSIONS_ADMIN, userId);
+		}
+		return CourseFinderUtil.findByKeywords(companyId, freeText, language, status, 0, groupId, params, start, end, null);
 	}
 	
 	public int countByTitleStatusCategoriesTags(String freeText, int status, long[] categories, long[] tags, long companyId, long groupId, long userId, String language, boolean isAdmin, boolean andOperator){
-		return CourseFinderUtil.countByT_S_C_T_T(freeText, status, categories, tags, null, companyId, groupId, userId, language, isAdmin, false, andOperator);
+		LinkedHashMap<String, Object> params = new LinkedHashMap<String, Object>();
+		if(tags != null && tags.length > 0){
+			params.put(CourseParams.PARAM_TAGS, tags);
+		}
+		if(categories != null && categories.length > 0){
+			params.put(CourseParams.PARAM_OR_CATEGORIES, categories);
+		}
+		params.put(CourseParams.PARAM_SEARCH_PARENT_AND_CHILD_COURSES, true);
+		if(!isAdmin){
+			params.put(CourseParams.PARAM_PERMISSIONS_ADMIN, userId);
+		}
+		return CourseFinderUtil.countByKeywords(companyId, freeText, language, status, 0, groupId, params);
 	}
 	
 	public List<Course> getParentCoursesByTitleStatusCategoriesTags(String freeText, int status, long[] categories, long[] tags, long companyId, long groupId, long userId, String language, boolean isAdmin, boolean andOperator, int start, int end){
-		return CourseFinderUtil.findByT_S_C_T_T(freeText, status, categories, tags, null, companyId, groupId, userId, language, isAdmin, true, andOperator, start, end);
+		LinkedHashMap<String, Object> params = new LinkedHashMap<String, Object>();
+		if(tags != null && tags.length > 0){
+			params.put(CourseParams.PARAM_TAGS, tags);
+		}
+		if(categories != null && categories.length > 0){
+			params.put(CourseParams.PARAM_OR_CATEGORIES, categories);
+		}
+		if(!isAdmin){
+			params.put(CourseParams.PARAM_PERMISSIONS_ADMIN, userId);
+		}
+		return CourseFinderUtil.findByKeywords(companyId, freeText, language, status, 0, groupId, params, start, end, null);
 	}
 	
-	public int countParentCoursesByTitleStatusCategoriesTags(String freeText, int status, long[] categories, long[] tags, long companyId, long groupId, long userId, String language, boolean isAdmin, boolean andOperator){
-		return CourseFinderUtil.countByT_S_C_T_T(freeText, status, categories, tags, null, companyId, groupId, userId, language, isAdmin, true, andOperator);
+	public int countParentCoursesByTitleStatusCategoriesTags(String freeText, int status, long[] categories, long[] tags, long companyId, long groupId, long userId, String language, 
+			boolean isAdmin, boolean andOperator){
+		
+		LinkedHashMap<String, Object> params = new LinkedHashMap<String, Object>();
+		if(tags != null && tags.length > 0){
+			params.put(CourseParams.PARAM_TAGS, tags);
+		}
+		if(categories != null && categories.length > 0){
+			params.put(CourseParams.PARAM_OR_CATEGORIES, categories);
+		}
+		if(!isAdmin){
+			params.put(CourseParams.PARAM_PERMISSIONS_ADMIN, userId);
+		}
+		return CourseFinderUtil.countByKeywords(companyId, freeText, language, status, 0, groupId, params);
 	}
 	
-	public List<Course> getParentCoursesByTitleStatusCategoriesTagsTemplates(String freeText, int status, long[] categories, long[] tags, String templates, long companyId, long groupId, long userId, String language, boolean isAdmin, boolean andOperator, int start, int end){
-		return CourseFinderUtil.findByT_S_C_T_T(freeText, status, categories, tags, templates, companyId, groupId, userId, language, isAdmin, true, andOperator, start, end);
+	public List<Course> getParentCoursesByTitleStatusCategoriesTagsTemplates(String freeText, int status, long[] categories, long[] tags, String templates, long companyId, 
+			long groupId, long userId, String language, boolean isAdmin, boolean andOperator, int start, int end){
+		LinkedHashMap<String, Object> params = new LinkedHashMap<String, Object>();
+		if(tags != null && tags.length > 0){
+			params.put(CourseParams.PARAM_TAGS, tags);
+		}
+		if(categories != null && categories.length > 0){
+			params.put(CourseParams.PARAM_OR_CATEGORIES, categories);
+		}
+		if(templates != null && templates.length() > 0){
+			params.put(CourseParams.PARAM_TEMPLATES, templates);
+		}
+		if(!isAdmin){
+			params.put(CourseParams.PARAM_PERMISSIONS_ADMIN, userId);
+		}
+		return CourseFinderUtil.findByKeywords(companyId, freeText, language, status, 0, groupId, params, start, end, null);
 	}
 	
-	public int countParentCoursesByTitleStatusCategoriesTagsTemplates(String freeText, int status, long[] categories, long[] tags, String templates, long companyId, long groupId, long userId, String language, boolean isAdmin, boolean andOperator){
-		return CourseFinderUtil.countByT_S_C_T_T(freeText, status, categories, tags, templates, companyId, groupId, userId, language, isAdmin, true, andOperator);
+	public int countParentCoursesByTitleStatusCategoriesTagsTemplates(String freeText, int status, long[] categories, long[] tags, String templates, long companyId, 
+			long groupId, long userId, String language, boolean isAdmin, boolean andOperator){
+		LinkedHashMap<String, Object> params = new LinkedHashMap<String, Object>();
+		if(tags != null && tags.length > 0){
+			params.put(CourseParams.PARAM_TAGS, tags);
+		}
+		if(categories != null && categories.length > 0){
+			params.put(CourseParams.PARAM_OR_CATEGORIES, categories);
+		}
+		if(templates != null && templates.length() > 0){
+			params.put(CourseParams.PARAM_TEMPLATES, templates);
+		}
+		if(!isAdmin){
+			params.put(CourseParams.PARAM_PERMISSIONS_ADMIN, userId);
+		}
+		return CourseFinderUtil.countByKeywords(companyId, freeText, language, status, 0, groupId, params);
 	}
 	
-	public List<Course> getChildCoursesByTitle(String freeText, long parentCourseId, int status, long companyId, long groupId, long userId, String language, boolean isAdmin, boolean andOperator, int start, int end){
-		return CourseFinderUtil.findByT_S_C_T_T(freeText, parentCourseId, status, null, null, null, companyId, groupId, userId, language, isAdmin, true, andOperator, start, end);
+	public List<Course> getChildCoursesByTitle(String freeText, long parentCourseId, int status, long companyId, long groupId, long userId, String language, boolean isAdmin, 
+			boolean andOperator, int start, int end){
+		LinkedHashMap<String, Object> params = new LinkedHashMap<String, Object>();
+		if(!isAdmin){
+			params.put(CourseParams.PARAM_PERMISSIONS_ADMIN, userId);
+		}
+		return CourseFinderUtil.findByKeywords(companyId, freeText, language, status, parentCourseId, groupId, params, start, end, null);
 	}
 	
 	public int countChildCoursesByTitle(String freeText, long parentCourseId, int status, long companyId, long groupId, long userId, String language, boolean isAdmin, boolean andOperator){
-		return CourseFinderUtil.countByT_S_C_T_T(freeText, parentCourseId, status, null, null, null, companyId, groupId, userId, language, isAdmin, true, andOperator);
+		LinkedHashMap<String, Object> params = new LinkedHashMap<String, Object>();
+		if(!isAdmin){
+			params.put(CourseParams.PARAM_PERMISSIONS_ADMIN, userId);
+		}
+		return CourseFinderUtil.countByKeywords(companyId, freeText, language, status, parentCourseId, groupId, params);
 	}
 	
 	public List<User> getStudents(long courseId, long companyId, String screenName, String firstName, String lastName, String emailAddress, boolean andOperator, int start, int end,OrderByComparator comparator){
@@ -1214,22 +1296,29 @@ public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int e
 	}
 	
 	public List<Course> getCoursesCatalogByTitleCategoriesTags(String freeText, long[] categories, long[] tags, long companyId, long groupId, long userId, String language, int start, int end){
-		return CourseFinderUtil.findByCatalog(freeText, categories, tags, companyId, groupId, userId, language, start, end);
+		LinkedHashMap<String, Object> params = new LinkedHashMap<String, Object>();
+		if(tags != null && tags.length > 0){
+			params.put(CourseParams.PARAM_TAGS, tags);
+		}
+		if(categories != null && categories.length > 0){
+			params.put(CourseParams.PARAM_CATEGORIES, categories);
+		}
+		params.put(CourseParams.PARAM_PERMISSIONS_VIEW, null);
+		params.put(CourseParams.PARAM_VISIBLE, true);
+		return CourseFinderUtil.findByKeywords(companyId, freeText, language, WorkflowConstants.STATUS_APPROVED, 0, groupId, params, start, end, null);
 	}
 	
 	public int countCoursesCatalogByTitleCategoriesTags(String freeText, long[] categories, long[] tags, long companyId, long groupId, long userId, String language){
-		return CourseFinderUtil.countByCatalog(freeText, categories, tags, companyId, groupId, userId, language);
-	}
-	
-	public List<Long> getCatalogCoursesAssetTags(String freeText, long[] categories, long companyId, long groupId, long userId, String language){
-		return CourseFinderUtil.findCourseTags(freeText, categories, companyId, groupId, userId, language);
-	}
-	public HashMap<Long, Long> countCategoryCourses(String freeText, long[] categories, long[] tags, long companyId, long groupId, long userId, String language){
-		return CourseFinderUtil.countCategoryCourses(freeText, categories, tags, companyId, groupId, userId, language);
-	}
-	
-	public HashMap<Long, Long> countTagCourses(String freeText, long[] categories, long[] tags, long companyId, long groupId, long userId, String language){
-		return CourseFinderUtil.countTagCourses(freeText, categories, tags, companyId, groupId, userId, language);
+		LinkedHashMap<String, Object> params = new LinkedHashMap<String, Object>();
+		if(tags != null && tags.length > 0){
+			params.put(CourseParams.PARAM_TAGS, tags);
+		}
+		if(categories != null && categories.length > 0){
+			params.put(CourseParams.PARAM_CATEGORIES, categories);
+		}
+		params.put(CourseParams.PARAM_PERMISSIONS_VIEW, null);
+		params.put(CourseParams.PARAM_VISIBLE, true);
+		return CourseFinderUtil.countByKeywords(companyId, freeText, language, WorkflowConstants.STATUS_APPROVED, 0, groupId, params);
 	}
 	
 	public List<CourseResultView> getMyCourses(long groupId, long userId, ThemeDisplay themeDisplay, String orderByColumn, String orderByType, int start, int end){
@@ -1291,10 +1380,15 @@ public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int e
 		return childCourses;
 	}
 	
+	@Deprecated
 	public List<Course> getOpenOrRestrictedChildCourses(long courseId) {
 		List<Course> childCourses = new ArrayList<Course>();
 		try{
-			childCourses = courseFinder.getOpenOrRestrictedChildCourses(courseId, QueryUtil.ALL_POS, QueryUtil.ALL_POS);
+			LinkedHashMap<String, Object> params = new LinkedHashMap<String, Object>();
+			int[] types = {GroupConstants.TYPE_SITE_OPEN, GroupConstants.TYPE_SITE_RESTRICTED};
+			params.put(CourseParams.PARAM_TYPE, types);
+			Locale locale = LocaleUtil.getDefault();
+			childCourses = courseFinder.findByKeywords(0, null, locale.getDisplayLanguage(), WorkflowConstants.STATUS_APPROVED, courseId, 0, params, -1, -1, null);
 		}catch(Exception e){
 			e.printStackTrace();
 		}
@@ -1312,10 +1406,15 @@ public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int e
 		return childCoursesCount;
 	}
 	
+	@Deprecated
 	public int countOpenOrRestrictedChildCourses(long courseId) {
 		int childCoursesCount = 0;
 		try{
-			childCoursesCount = courseFinder.countOpenOrRestrictedChildCourses(courseId);	
+			LinkedHashMap<String, Object> params = new LinkedHashMap<String, Object>();
+			int[] types = {GroupConstants.TYPE_SITE_OPEN, GroupConstants.TYPE_SITE_RESTRICTED};
+			params.put(CourseParams.PARAM_TYPE, types);
+			Locale locale = LocaleUtil.getDefault();
+			childCoursesCount = courseFinder.countByKeywords(0, null, locale.getDisplayName(), WorkflowConstants.STATUS_APPROVED, courseId, 0, params);
 		}catch(Exception e){
 			e.printStackTrace();
 		}

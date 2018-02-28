@@ -3,7 +3,6 @@ package com.liferay.lms.portlet;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import javax.portlet.PortletException;
@@ -171,24 +170,6 @@ public class CatalogCourses extends MVCPortlet {
 			
 			renderRequest.setAttribute("tagIds", StringUtil.merge(tagAuxIds,","));
 			
-			try {
-				List<AssetTag> listAssetTag = new ArrayList<AssetTag>();
-				List<Long> tags = CourseLocalServiceUtil.getCatalogCoursesAssetTags(freeText, categoryAuxIds, themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(), themeDisplay.getUserId(), themeDisplay.getLanguageId());
-				
-				HashMap<Long, Long> tagCourses =  CourseLocalServiceUtil.countTagCourses(freeText, categoryAuxIds, tagAuxIds, themeDisplay.getCompanyId(),themeDisplay.getScopeGroupId(), themeDisplay.getUserId(), themeDisplay.getLanguageId());
-				
-				renderRequest.setAttribute("tagCourses", tagCourses);
-				
-				for(Long tag : tags){
-					listAssetTag.add(AssetTagLocalServiceUtil.fetchAssetTag(tag));
-				}
-								
-				renderRequest.setAttribute("listAssetTag", listAssetTag);
-			} catch (SystemException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			
 			List<AssetTag> listTagsSelected = new ArrayList<AssetTag>();
 			for(long tagAuxId: tagAuxIds){
 				try {
@@ -209,12 +190,6 @@ public class CatalogCourses extends MVCPortlet {
 		
 		searchContainer.setResults(listCourse);
 		searchContainer.setTotal(total);
-			
-		if(showVocabularies){
-			HashMap<Long, Long> categoryCourses =  CourseLocalServiceUtil.countCategoryCourses(freeText, categoryAuxIds, tagAuxIds, themeDisplay.getCompanyId(),themeDisplay.getScopeGroupId(), themeDisplay.getUserId(), themeDisplay.getLanguageId());
-			renderRequest.setAttribute("categoryCourses", categoryCourses);
-		}
-		
 		
 		renderRequest.setAttribute("searchContainer", searchContainer);
 		

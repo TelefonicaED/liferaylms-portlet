@@ -117,11 +117,13 @@ if(catIds!=null&&catIds.length>0)
 			minQueryLength: 4,
 			source:function(){
 				var inputValue=A.one("#<portlet:namespace />freetext").get('value');
+				var stateValue=A.one('#<portlet:namespace />state').get('value');
 				var myAjaxRequest=A.io.request('${getCourses }',{
 					dataType: 'json',
 					method:'POST',
 					data:{
 						<portlet:namespace />courseTitle:inputValue,
+						<portlet:namespace />status:stateValue
 					},
 					autoLoad:false,
 					sync:false,

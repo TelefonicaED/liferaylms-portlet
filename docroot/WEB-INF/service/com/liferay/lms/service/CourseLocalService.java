@@ -574,19 +574,6 @@ public interface CourseLocalService extends BaseLocalService,
 		long companyId, long groupId, long userId, java.lang.String language);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public java.util.List<java.lang.Long> getCatalogCoursesAssetTags(
-		java.lang.String freeText, long[] categories, long companyId,
-		long groupId, long userId, java.lang.String language);
-
-	public java.util.HashMap<java.lang.Long, java.lang.Long> countCategoryCourses(
-		java.lang.String freeText, long[] categories, long[] tags,
-		long companyId, long groupId, long userId, java.lang.String language);
-
-	public java.util.HashMap<java.lang.Long, java.lang.Long> countTagCourses(
-		java.lang.String freeText, long[] categories, long[] tags,
-		long companyId, long groupId, long userId, java.lang.String language);
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.util.List<com.liferay.lms.views.CourseResultView> getMyCourses(
 		long groupId, long userId,
 		com.liferay.portal.theme.ThemeDisplay themeDisplay,

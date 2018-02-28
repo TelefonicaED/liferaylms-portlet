@@ -753,30 +753,6 @@ public class CourseLocalServiceUtil {
 			categories, tags, companyId, groupId, userId, language);
 	}
 
-	public static java.util.List<java.lang.Long> getCatalogCoursesAssetTags(
-		java.lang.String freeText, long[] categories, long companyId,
-		long groupId, long userId, java.lang.String language) {
-		return getService()
-				   .getCatalogCoursesAssetTags(freeText, categories, companyId,
-			groupId, userId, language);
-	}
-
-	public static java.util.HashMap<java.lang.Long, java.lang.Long> countCategoryCourses(
-		java.lang.String freeText, long[] categories, long[] tags,
-		long companyId, long groupId, long userId, java.lang.String language) {
-		return getService()
-				   .countCategoryCourses(freeText, categories, tags, companyId,
-			groupId, userId, language);
-	}
-
-	public static java.util.HashMap<java.lang.Long, java.lang.Long> countTagCourses(
-		java.lang.String freeText, long[] categories, long[] tags,
-		long companyId, long groupId, long userId, java.lang.String language) {
-		return getService()
-				   .countTagCourses(freeText, categories, tags, companyId,
-			groupId, userId, language);
-	}
-
 	public static java.util.List<com.liferay.lms.views.CourseResultView> getMyCourses(
 		long groupId, long userId,
 		com.liferay.portal.theme.ThemeDisplay themeDisplay,

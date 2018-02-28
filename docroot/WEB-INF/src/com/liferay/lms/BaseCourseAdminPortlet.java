@@ -1535,6 +1535,7 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 			JSONArray usersJSONArray = JSONFactoryUtil.createJSONArray();
 			
 			String courseTitle = ParamUtil.getString(request, "courseTitle");
+			int status = ParamUtil.getInteger(request, "status", WorkflowConstants.STATUS_ANY);
 
 			boolean isAdmin = false;
 			try {
@@ -1547,7 +1548,7 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 				e.printStackTrace();
 			}
 			
-			List<Course> listCourse = CourseLocalServiceUtil.getParentCoursesByTitleStatusCategoriesTagsTemplates(courseTitle, -1, null, null, getCourseTemplates(request.getPreferences(), themeDisplay.getCompanyId()), themeDisplay.getCompanyId(), 
+			List<Course> listCourse = CourseLocalServiceUtil.getParentCoursesByTitleStatusCategoriesTagsTemplates(courseTitle, status, null, null, getCourseTemplates(request.getPreferences(), themeDisplay.getCompanyId()), themeDisplay.getCompanyId(), 
 					themeDisplay.getScopeGroupId(), themeDisplay.getUserId(), themeDisplay.getLanguageId(), isAdmin, true, -1, -1);
 			
 			JSONObject userJSON = null;
