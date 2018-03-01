@@ -32,7 +32,6 @@ import javax.xml.namespace.QName;
 import org.apache.commons.lang.StringUtils;
 
 import com.liferay.lms.asset.LearningActivityAssetRendererFactory;
-import com.liferay.lms.asset.LearningActivityBaseAssetRenderer;
 import com.liferay.lms.auditing.AuditConstants;
 import com.liferay.lms.auditing.AuditingLogFactory;
 import com.liferay.lms.events.ThemeIdEvent;
@@ -52,9 +51,6 @@ import com.liferay.lms.service.ModuleLocalServiceUtil;
 import com.liferay.lms.service.P2pActivityCorrectionsLocalServiceUtil;
 import com.liferay.lms.service.P2pActivityLocalServiceUtil;
 import com.liferay.portal.NoSuchLayoutException;
-import com.liferay.portal.kernel.cache.Lifecycle;
-import com.liferay.portal.kernel.cache.ThreadLocalCache;
-import com.liferay.portal.kernel.cache.ThreadLocalCacheManager;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
@@ -732,7 +728,7 @@ public class LmsActivitiesList extends MVCPortlet {
 		long actId = ParamUtil.getLong(request, "actId");
 		String action = ParamUtil.getString(request, "action");
 
-		log.error("Act ID "+actId);
+		log.debug("Act ID "+actId);
 		PermissionChecker permissionChecker=themeDisplay.getPermissionChecker();
 		JSONObject oreturned = JSONFactoryUtil.createJSONObject();	
 		boolean changed=false;
@@ -750,8 +746,7 @@ public class LmsActivitiesList extends MVCPortlet {
 					}else if(action.equals("up")){
 						LearningActivityLocalServiceUtil.goUpLearningActivity(actId, themeDisplay.getUserId());
 						changed=true;
-					}
-					
+					}	
 				}								
 			}catch(Exception e){
 				e.printStackTrace();
@@ -765,10 +760,7 @@ public class LmsActivitiesList extends MVCPortlet {
 			out.flush();
 			out.close();
 		}
-		
-	}
-	
-	
+	}	
 	
 	public void moveActivity(ActionRequest actionRequest, ActionResponse actionResponse) throws Exception {
 		

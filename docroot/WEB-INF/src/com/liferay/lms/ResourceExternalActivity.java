@@ -169,7 +169,7 @@ public class ResourceExternalActivity extends QuestionsAdmin {
 			actId=ParamUtil.getLong(renderRequest, "actId", 0);
 		}
 
-		log.error("actId: " + actId);
+		log.debug("actId: " + actId);
 		
 		if(actId==0){
 			renderRequest.setAttribute(WebKeys.PORTLET_CONFIGURATOR_VISIBILITY, Boolean.FALSE);
@@ -181,16 +181,16 @@ public class ResourceExternalActivity extends QuestionsAdmin {
 				LearningActivity activity = LearningActivityLocalServiceUtil.getLearningActivity(actId);
 				long typeId=activity.getTypeId();
 
-				log.error("typeId: " + typeId);
+				log.debug("typeId: " + typeId);
 				
 				if(typeId==2){
 					Course course = CourseLocalServiceUtil.getCourseByGroupCreatedId(activity.getGroupId());
 					boolean hasPermissionAccessCourseFinished = LiferaylmsUtil.hasPermissionAccessCourseFinished(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(), course.getCourseId(), themeDisplay.getUserId());
 					boolean hasAccessLock = CourseLocalServiceUtil.canAccessLock(themeDisplay.getScopeGroupId(), themeDisplay.getUser());
 
-					log.error("hasPermissionAccessCourseFinished: " + hasPermissionAccessCourseFinished);
-					log.error("hasAccessLock: " + hasAccessLock);
-					log.error("activity.getExtracontent(): " + activity.getExtracontent());
+					log.debug("hasPermissionAccessCourseFinished: " + hasPermissionAccessCourseFinished);
+					log.debug("hasAccessLock: " + hasAccessLock);
+					log.debug("activity.getExtracontent(): " + activity.getExtracontent());
 					
 					if(activity.canAccess(true, themeDisplay.getUser(), themeDisplay.getPermissionChecker(), hasAccessLock, course, hasPermissionAccessCourseFinished) && 
 							Validator.isNotNull(activity.getExtracontent())){

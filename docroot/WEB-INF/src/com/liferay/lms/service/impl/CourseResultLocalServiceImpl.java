@@ -82,6 +82,7 @@ public class CourseResultLocalServiceImpl
 		return results;
 	}
 	
+	@Deprecated
 	public CourseResult getByUserAndCourse(long courseId,long userId) throws SystemException{
 		return courseResultPersistence.fetchByuc(userId, courseId);
 	}

@@ -1,502 +1,4 @@
 <custom-sql>
-<!-- Query para la administración de cursos cuando eres administrador-->
-
-	<sql id="com.liferay.lms.service.persistence.CourseFinder.countAssetCategoryCourses">
-		<![CDATA[   			
-			SELECT 
-				act.categoryId as categoryId, COUNT(DISTINCT c.courseId) AS COUNT_VALUE
-			FROM 
-				lms_course c
-			INNER JOIN group_ 
-				ON c.groupCreatedId = group_.groupId 
-			[$JOINASSET$] 
-			INNER JOIN 
-				assetentries_assetcategories aac 
-					ON aac.entryId = ae.entryId
-			INNER JOIN assetcategory act 
-				ON aac.categoryId =  act.categoryId   		
-			[$JOINASSETCATEGORIES$] 
-			[$JOINASSETTAGS$]			
-			[$JOINRESOURCEPERMISSION$]
-			WHERE 
-			( 
-				c.companyId = ? OR ? = 0 
-			) 
-			AND 
-			( 
-				c.groupId = ? OR ? = 0 
-			)
-			AND
-			(
-				((? = '') AND (? = -1) )
-				OR 
-				(? = true AND  
-						(? = '' OR IF (ExtractValue(c.title, '//Title[@language-id=\"[$LANGUAGE$]\"]' )='', ExtractValue(c.title, '//root[@default-locale]//Title'), ExtractValue(c.title, '//Title[@language-id=\"[$LANGUAGE$]\"]' )) LIKE ? OR
-						 IF (ExtractValue(c.description, '//Description[@language-id=\"[$LANGUAGE$]\"]' )='', ExtractValue(c.description, '//root[@default-locale]//Description' ), ExtractValue(c.description, '//Description[@language-id=\"[$LANGUAGE$]\"]' )) LIKE ?) AND 
-						(? = -1 OR ? = c.closed) 
-						[$WHEREANDASSETCATEGORY$]
-						[$WHEREANDASSETTAG$]
-				) 
-				OR 
-				(? = false AND 
-					(IF (ExtractValue(c.title, '//Title[@language-id=\"[$LANGUAGE$]\"]' )='', ExtractValue(c.title,  '//root[@default-locale]//Title' ), ExtractValue(c.title, '//Title[@language-id=\"[$LANGUAGE$]\"]' )) LIKE ? OR 
-					IF (ExtractValue(c.description, '//Description[@language-id=\"[$LANGUAGE$]\"]' )='', ExtractValue(c.description, '//root[@default-locale]//Description' ), ExtractValue(c.description, '//Description[@language-id=\"[$LANGUAGE$]\"]' )) LIKE ? 
-					OR ? = c.closed [$WHEREORASSETCATEGORY$] [$WHEREORASSETTAG$]) 
-				) 
-			) 
-			[$WHERERESOURCEPERMISSION$] 
-			GROUP BY act.categoryId
-		]]>
-	</sql>
-	<sql id="com.liferay.lms.service.persistence.CourseFinder.countAssetTagCourses">
-		<![CDATA[   			
-			SELECT 
-				att.tagId as tagId, COUNT(DISTINCT c.courseId) AS COUNT_VALUE
-			FROM 
-				lms_course c
-			INNER JOIN group_ 
-				ON c.groupCreatedId = group_.groupId 
-			[$JOINASSET$] 
-			[$JOINASSETCATEGORIES$] 
-			INNER JOIN 
-				assetentries_assettags aat 
-					ON aat.entryId = ae.entryId 
-			[$JOINASSETTAGS$]
-			INNER JOIN assettag att 
-				ON aat.tagId =  att.tagId 
-			[$JOINRESOURCEPERMISSION$]
-			WHERE 
-			( 
-				c.companyId = ? OR ? = 0 
-			) 
-			AND 
-			( 
-				c.groupId = ? OR ? = 0 
-			)
-			AND
-			(
-				((? = '') AND (? = -1) )
-				OR 
-				(? = true AND  
-						(? = '' OR IF (ExtractValue(c.title, '//Title[@language-id=\"[$LANGUAGE$]\"]' )='', ExtractValue(c.title, '//root[@default-locale]//Title'), ExtractValue(c.title, '//Title[@language-id=\"[$LANGUAGE$]\"]' )) LIKE ? OR
-						 IF (ExtractValue(c.description, '//Description[@language-id=\"[$LANGUAGE$]\"]' )='', ExtractValue(c.description, '//root[@default-locale]//Description' ), ExtractValue(c.description, '//Description[@language-id=\"[$LANGUAGE$]\"]' )) LIKE ?) AND 
-						(? = -1 OR ? = c.closed) 
-						[$WHEREANDASSETCATEGORY$]
-						[$WHEREANDASSETTAG$]
-				) 
-				OR 
-				(? = false AND 
-					(IF (ExtractValue(c.title, '//Title[@language-id=\"[$LANGUAGE$]\"]' )='', ExtractValue(c.title,  '//root[@default-locale]//Title' ), ExtractValue(c.title, '//Title[@language-id=\"[$LANGUAGE$]\"]' )) LIKE ? OR 
-					IF (ExtractValue(c.description, '//Description[@language-id=\"[$LANGUAGE$]\"]' )='', ExtractValue(c.description, '//root[@default-locale]//Description' ), ExtractValue(c.description, '//Description[@language-id=\"[$LANGUAGE$]\"]' )) LIKE ? 
-					OR ? = c.closed [$WHEREORASSETCATEGORY$] [$WHEREORASSETTAG$]) 
-				) 
-			) 
-			[$WHERERESOURCEPERMISSION$] 
-			GROUP BY att.tagId
-		]]>
-	</sql>
-	<sql id="com.liferay.lms.service.persistence.CourseFinder.findCoursesAssetTagsByT_S">
-		<![CDATA[   			
-			SELECT 
-				DISTINCT att.tagId as tagId
-			FROM 
-				lms_course c
-			INNER JOIN group_ 
-				ON c.groupCreatedId = group_.groupId 
-			[$JOINASSET$] 
-			INNER JOIN assetentries_assettags ast 
-				ON ae.entryId = ast.entryId     
-			INNER JOIN assettag att 
-				ON ast.tagId =  att.tagId 
-			[$JOINASSETCATEGORIES$] 
-			[$JOINRESOURCEPERMISSION$]
-			WHERE 
-			( 
-				c.companyId = ? OR ? = 0 
-			) 
-			AND 
-			( 
-				c.groupId = ? OR ? = 0 
-			)
-			AND
-			(
-				((? = '') AND (? = -1) )
-				OR 
-				(? = true AND  
-						(? = '' OR IF (ExtractValue(c.title, '//Title[@language-id=\"[$LANGUAGE$]\"]' )='', ExtractValue(c.title, '//root[@default-locale]//Title'), ExtractValue(c.title, '//Title[@language-id=\"[$LANGUAGE$]\"]' )) LIKE ? OR 
-						IF (ExtractValue(c.description, '//Description[@language-id=\"[$LANGUAGE$]\"]' )='', ExtractValue(c.description,  '//root[@default-locale]//Description'  ), ExtractValue(c.description, '//Description[@language-id=\"[$LANGUAGE$]\"]' ))  LIKE ?) AND 
-						(? = -1 OR ? = c.closed) 
-						[$WHEREANDASSETCATEGORY$]
-				) 
-				OR 
-				(? = false AND 
-					(IF (ExtractValue(c.title, '//Title[@language-id=\"[$LANGUAGE$]\"]' )='', ExtractValue(c.title,  '//root[@default-locale]//Title' ), ExtractValue(c.title, '//Title[@language-id=\"[$LANGUAGE$]\"]' )) LIKE ? OR 
-					IF (ExtractValue(c.description, '//Description[@language-id=\"[$LANGUAGE$]\"]' )='', ExtractValue(c.description, '//root[@default-locale]//Description' ), ExtractValue(c.description, '//Description[@language-id=\"[$LANGUAGE$]\"]' )) LIKE ? OR
-					 ? = c.closed [$WHEREORASSETCATEGORY$]) 
-				) 
-			) 
-			[$WHERERESOURCEPERMISSION$] 
-			ORDER BY IF (ExtractValue(c.title, '//Title[@language-id=\"[$LANGUAGE$]\"]' )='', ExtractValue(c.title,  '//root[@default-locale]//Title' ), ExtractValue(c.title, '//Title[@language-id=\"[$LANGUAGE$]\"]' ))
-		]]>
-	</sql>
-	
-	<sql id="com.liferay.lms.service.persistence.CourseFinder.findAdministratorByT_S">
-		<![CDATA[   			
-			SELECT 
-				DISTINCT c.*
-			FROM 
-				lms_course c
-			INNER JOIN group_ 
-				ON c.groupCreatedId = group_.groupId 
-			[$JOINASSET$] 
-			[$JOINASSETCATEGORIES$] 
-			[$JOINASSETTAGS$]
-			[$JOINTEMPLATES$]
-			[$JOINRESOURCEPERMISSION$]
-			[$JOINCUSTOMATTRIBUTE$]
-			WHERE 
-			( 
-				c.companyId = ? OR ? = 0 
-			) 
-			AND 
-			( 
-				c.groupId = ? OR ? = 0 
-			)
-			[$WHEREPARENTCOURSE$]
-			[$WHERETITLEDESCRIPTIONCATEGORIESTAGSAND$]
-			[$WHERETITLEDESCRIPTIONCATEGORIESTAGSOR$]
-			[$WHERERESOURCEPERMISSION$] 
-			ORDER BY IF (ExtractValue(c.title, '//Title[@language-id=\"[$LANGUAGE$]\"]' )='', ExtractValue(c.title,  '//root[@default-locale]//Title' ), ExtractValue(c.title, '//Title[@language-id=\"[$LANGUAGE$]\"]' ))
-			LIMIT [$START$], [$END$]
-		]]>
-	</sql>
-	
-		<sql id="com.liferay.lms.service.persistence.CourseFinder.countAdministratorByT_S">
-		<![CDATA[   			
-			SELECT 
-				COUNT(DISTINCT c.courseId) AS COUNT_VALUE
-			FROM 
-				lms_course c
-			INNER JOIN group_
-				ON c.groupCreatedId = group_.groupId 
-			[$JOINASSET$] 
-			[$JOINASSETCATEGORIES$] 
-			[$JOINASSETTAGS$]
-			[$JOINTEMPLATES$]
-			[$JOINRESOURCEPERMISSION$]
-			[$JOINCUSTOMATTRIBUTE$]
-			WHERE 
-			( 
-				c.companyId = ? OR ? = 0 
-			) 
-			AND 
-			( 
-				c.groupId = ? OR ? = 0 
-			)
-			[$WHEREPARENTCOURSE$]
-			[$WHERETITLEDESCRIPTIONCATEGORIESTAGSAND$]
-			[$WHERETITLEDESCRIPTIONCATEGORIESTAGSOR$]
-			[$WHERERESOURCEPERMISSION$]
-		]]>
-	</sql>
-	
-	<sql id="com.liferay.lms.service.persistence.CourseFinder.joinC_ByAssetEntry">
-		<![CDATA[
-			INNER JOIN 
-				assetentry ae 
-					ON ae.classNameId = [$CLASSNAMECOURSEID$] 
-						AND ae.classPK = c.courseId
-		]]>
-	</sql>
-	<sql id="com.liferay.lms.service.persistence.CourseFinder.joinC_ByAssetCategory">
-		<![CDATA[
-			INNER JOIN 
-				assetentries_assetcategories aac[$i$] 
-					ON aac[$i$].entryId = ae.entryId
-		]]>
-	</sql>
-	<sql id="com.liferay.lms.service.persistence.CourseFinder.joinC_ByAssetTag">
-		<![CDATA[
-			INNER JOIN 
-				assetentries_assettags aat[$i$] 
-					ON aat[$i$].entryId = ae.entryId 
-		]]>
-	</sql>
-	
-	
-	<sql id="com.liferay.lms.service.persistence.CourseFinder.joinC_ByTemplates">
-		<![CDATA[
-			INNER JOIN 
-				 layoutset l 
-				 	ON l.groupId = c.groupCreatedId 
-				 	AND l.layoutSetPrototypeUuid IN ([$TEMPLATES$])
-		]]>
-	</sql>
-	
-	
-	<sql id="com.liferay.lms.service.persistence.CourseFinder.joinC_ByResourcePermission">
-		<![CDATA[
-			INNER JOIN 
-				resourcepermission rp 
-					ON rp.name = 'com.liferay.lms.model.Course' 
-						AND rp.companyId = [$COMPANYID$] 
-						AND ((primKey = c.courseId AND scope = 4) OR (primKey = [$COMPANYID$] AND scope = 1)) 
-						AND (actionIds & [$ACTIONPUBLISH$] || actionIds & [$ACTIONCOURSEEDITOR$] || actionIds & [$ACTIONASSIGN_MEMBERS$] || actionIds & [$ACTIONDELETE$]
-							|| actionIds & [$ACTIONPERMISSION$] || actionIds & [$ACTIONUPDATE$])
-			LEFT JOIN 
-				users_roles ur 
-					ON rp.roleId = ur.roleId 
-						AND ur.roleId 
-						AND ur.userId = [$USERID$]
-			LEFT JOIN 
-				usergrouprole ug 
-					ON ug.groupId = c.groupCreatedId 
-						AND ug.roleId = rp.roleId 
-						AND ug.userId = [$USERID$]
-			LEFT JOIN 
-				groups_roles gr 
-					ON gr.roleId = rp.roleId
-			LEFT JOIN 
-				group_ g 
-					ON gr.groupId = g.groupId
-			LEFT JOIN 
-				users_usergroups uug 
-					ON uug.userGroupId 
-						= g.classPK AND g.classNameId = [$CLASSNAMEIDUSERGROUP$]
-						AND uug.userId = [$USERID$]
-			LEFT JOIN 
-				users_orgs uo 
-					ON uo.organizationId = g.classPK 
-						AND g.classNameId = [$CLASSNAMEIDORGANIZATION$] 
-						AND uo.userId = [$USERID$]
-			LEFT JOIN 
-				users_groups ug2 
-					ON ug2.groupId = g.classPK 
-						AND g.classNameId = [$CLASSNAMEIDGROUP$] 
-						AND ug2.userId = [$USERID$]
-			LEFT JOIN 
-				usergrouprole ugrC 
-					ON ugrC.groupId = c.groupCreatedId 
-						AND ugrC.userId = [$USERID$] AND ugrC.roleId IN ([$ROLEEDITOR$],[$ROLETEACHER$])
-		]]>
-	</sql>
-	<sql id="com.liferay.lms.service.persistence.CourseFinder.joinC_ByResourcePermissionView">
-		<![CDATA[
-			INNER JOIN 
-				resourcepermission rp 
-					ON rp.name = 'com.liferay.lms.model.Course' 
-						AND rp.companyId = [$COMPANYID$] 
-						AND ((primKey = c.courseId AND scope = 4) OR (primKey = [$COMPANYID$] AND scope = 1)) 
-						AND (actionIds & [$ACTIONVIEW$] )
-			LEFT JOIN 
-				users_roles ur 
-					ON rp.roleId = ur.roleId 
-						AND ur.roleId 
-						AND ur.userId = [$USERID$]
-			LEFT JOIN 
-				usergrouprole ug 
-					ON ug.groupId = c.groupId 
-						AND ug.roleId = rp.roleId 
-						AND ug.userId = [$USERID$]
-			LEFT JOIN 
-				groups_roles gr 
-					ON gr.roleId = rp.roleId
-			LEFT JOIN 
-				group_ g 
-					ON gr.groupId = g.groupId
-			LEFT JOIN 
-				users_usergroups uug 
-					ON uug.userGroupId 
-						AND g.classPK AND g.classNameId = [$CLASSNAMEIDUSERGROUP$]
-						AND uug.userId = [$USERID$]
-			LEFT JOIN 
-				users_orgs uo 
-					ON uo.organizationId = g.classPK 
-						AND g.classNameId = [$CLASSNAMEIDORGANIZATION$] 
-						AND uo.userId = [$USERID$]
-			LEFT JOIN 
-				users_groups ug2 
-					ON ug2.groupId = g.classPK 
-						AND g.classNameId = [$CLASSNAMEIDGROUP$] 
-						AND ug2.userId = [$USERID$]
-			LEFT JOIN 
-				users_groups ugroup 
-					ON ugroup.groupId = c.groupId 
-						AND ugroup.userId = [$USERID$]
-		]]>
-	</sql>
-	<sql id="com.liferay.lms.service.persistence.CourseFinder.whereC_ByResourcePermission">
-		<![CDATA[
-			AND 
-			( 
-				ur.userId IS NOT NULL OR ug.userId IS NOT NULL OR uug.userGroupId IS NOT NULL OR uo.userId IS NOT NULL OR ug2.userId IS NOT NULL OR ugrC.userId IS NOT NULL
-			)
-		]]>
-	</sql>
-	<sql id="com.liferay.lms.service.persistence.CourseFinder.whereC_ByResourcePermissionView">
-		<![CDATA[
-			AND 
-			( 
-				ur.userId IS NOT NULL OR ug.userId IS NOT NULL OR uug.userGroupId IS NOT NULL OR uo.userId IS NOT NULL OR ug2.userId IS NOT NULL OR (rp.roleId = [$ROLEMEMBER$] AND ugroup.userId IS NOT NULL) OR rp.roleId = [$ROLEGUEST$]
-			)
-		]]>
-	</sql>
-	<sql id="com.liferay.lms.service.persistence.CourseFinder.whereC_BytTitleDescriptionCategoriesTagsAND">
-		<![CDATA[
-			AND
-			(
-				('[$FREETEXT$]' = '' OR IF (ExtractValue(c.title, '//Title[@language-id=\"[$LANGUAGE$]\"]' )='', ExtractValue(c.title, '//root[@default-locale]//Title'), ExtractValue(c.title, '//Title[@language-id=\"[$LANGUAGE$]\"]' )) LIKE '[$FREETEXT$]' OR
-				IF (ExtractValue(c.description, '//Description[@language-id=\"[$LANGUAGE$]\"]' )='', ExtractValue(c.description, '//root[@default-locale]//Description' ), ExtractValue(c.description, '//Description[@language-id=\"[$LANGUAGE$]\"]' )) LIKE '[$FREETEXT$]') AND 
-				([$STATUS$] = -1 OR [$STATUS$] = c.closed) 
-				[$WHEREANDASSETCATEGORY$]
-				[$WHEREANDASSETTAG$]
-			) 
-		]]>
-	</sql>
-	<sql id="com.liferay.lms.service.persistence.CourseFinder.whereC_BytTitleDescriptionCategoriesTagsOR">
-		<![CDATA[
-			AND
-			(
-				(IF (ExtractValue(c.title, '//Title[@language-id=\"[$LANGUAGE$]\"]' )='', ExtractValue(c.title,  '//root[@default-locale]//Title' ), ExtractValue(c.title, '//Title[@language-id=\"[$LANGUAGE$]\"]' )) LIKE '[$FREETEXT$]' OR 
-				IF (ExtractValue(c.description, '//Description[@language-id=\"[$LANGUAGE$]\"]' )='', ExtractValue(c.description, '//root[@default-locale]//Description' ), ExtractValue(c.description, '//Description[@language-id=\"[$LANGUAGE$]\"]' )) LIKE '[$FREETEXT$]' 
-				OR [$STATUS$] = c.closed [$WHEREORASSETCATEGORY$] [$WHEREORASSETTAG$])  
-			) 
-		]]>
-	</sql>
-	<sql id="com.liferay.lms.service.persistence.CourseFinder.whereC_ByAndAssetCategory">
-		<![CDATA[
-			AND aac[$i$].categoryId = ([$CATEGORYIDS$])
-		]]>
-	</sql>
-	<sql id="com.liferay.lms.service.persistence.CourseFinder.whereC_ByAndAssetTag">
-		<![CDATA[
-			AND aat[$i$].tagId = ([$TAGIDS$])
-		]]>
-	</sql>
-	<sql id="com.liferay.lms.service.persistence.CourseFinder.whereC_ByAndAssetTagIn">
-		<![CDATA[
-			AND aat[$i$].tagId IN ([$TAGIDS$])
-		]]>
-	</sql>
-	<sql id="com.liferay.lms.service.persistence.CourseFinder.whereC_ByOrAssetCategory">
-		<![CDATA[
-			OR aac0.categoryId IN ([$CATEGORYIDS$])
-		]]>
-	</sql>
-	<sql id="com.liferay.lms.service.persistence.CourseFinder.whereC_ByOrAssetTag">
-		<![CDATA[
-			OR aat0.tagId IN ([$TAGIDS$])
-		]]>
-	</sql>
-	<sql id="com.liferay.lms.service.persistence.CourseFinder.whereC_Catalog">
-		<![CDATA[
-			AND ae.visible = 1
-		]]>
-	</sql>
-	
-	<sql id="com.liferay.lms.service.persistence.CourseFinder.findStudents">
-		<![CDATA[   			
-			SELECT 
-				DISTINCT u.*
-			FROM 
-				lms_course co 
-			INNER JOIN 
-				users_groups ug 
-					ON co.groupCreatedId = ug.groupId
-			INNER JOIN 
-				user_ u 
-					ON u.userId = ug.userId
-			LEFT JOIN 
-				usergrouprole ur 
-					ON ug.userId = ur.userId AND ur.groupId = ug.groupId AND ur.roleId= ?
-			LEFT JOIN 
-				usergrouprole urE 
-					ON ug.userId = urE.userId AND urE.groupId = ug.groupId AND urE.roleId = ?
-			[$JOINTEAM$]
-			WHERE 
-				ur.userId IS NULL AND urE.userId IS NULL AND co.courseId = ? AND (u.status = ? OR ? = ?)
-				AND 
-				(
-					[$WHEREFIRSTNAME$]
-					[$WHERELASTNAME$]
-					[$WHERESCREENNAME$]
-					[$WHEREEMAILADDRESS$]
-					[$DEFAULT$]
-					
-				)
-			ORDER BY [$ORDERBY$]
-		]]>
-	</sql>
-	<sql id="com.liferay.lms.service.persistence.CourseFinder.countStudents">
-		<![CDATA[   			
-			SELECT 
-				COUNT(DISTINCT u.userId) AS COUNT_VALUE
-			FROM 
-				lms_course co 
-			INNER JOIN 
-				users_groups ug 
-					ON co.groupCreatedId = ug.groupId
-			INNER JOIN 
-				user_ u 
-					ON u.userId = ug.userId
-			LEFT JOIN 
-				usergrouprole ur 
-					ON ug.userId = ur.userId AND ur.groupId = ug.groupId AND ur.roleId= ?
-			LEFT JOIN 
-				usergrouprole urE 
-					ON ug.userId = urE.userId AND urE.groupId = ug.groupId AND urE.roleId = ?
-			[$JOINTEAM$]
-			WHERE 
-				ur.userId IS NULL AND urE.userId IS NULL AND co.courseId = ? AND (u.status = ? OR ? = ?)
-				AND 
-				(
-					[$WHEREFIRSTNAME$]
-					[$WHERELASTNAME$]
-					[$WHERESCREENNAME$]
-					[$WHEREEMAILADDRESS$]
-					[$DEFAULT$]
-				)
-		]]>
-	</sql>
-	<sql id="com.liferay.lms.service.persistence.CourseFinder.whereFistName">
-		<![CDATA[
-			(u.firstName LIKE ?) [$AND_OR_CONNECTOR$]
-		]]>
-	</sql>
-	<sql id="com.liferay.lms.service.persistence.CourseFinder.whereLastName">
-		<![CDATA[
-			(u.lastName LIKE ?) [$AND_OR_CONNECTOR$]
-		]]>
-	</sql>
-	<sql id="com.liferay.lms.service.persistence.CourseFinder.whereScreenName">
-		<![CDATA[
-			(u.screenName LIKE ?) [$AND_OR_CONNECTOR$]
-		]]>
-	</sql>
-	<sql id="com.liferay.lms.service.persistence.CourseFinder.whereEmailAddress">
-		<![CDATA[
-			(u.emailAddress LIKE ?) [$AND_OR_CONNECTOR$]
-		]]>
-	</sql>
-	
-	<sql id="com.liferay.lms.service.persistence.CourseFinder.whereParentCourseNull">
-		<![CDATA[
-			AND (c.parentCourseId = 0 OR c.parentCourseId IS NULL) 
-		]]>
-	</sql>
-	
-	<sql id="com.liferay.lms.service.persistence.CourseFinder.innerJoinTeam">
-		<![CDATA[
-			INNER JOIN users_teams ON users_teams.userId = u.userId AND users_teams.teamId = ?
-		]]>
-	</sql>
-	
-	<sql id="com.liferay.lms.service.persistence.CourseFinder.whereParentCourse">
-		<![CDATA[
-			AND (c.parentCourseId = ?) 
-		]]>
-	</sql>
-	
 	<sql id="com.liferay.lms.service.persistence.CourseFinder.hasUserTries">
 		<![CDATA[   			
 			SELECT 
@@ -505,12 +7,12 @@
 				SELECT 
 					IF(lar.latId IS NOT NULL, COUNT(1), 0) AS numTriesUser, la.actId, la.tries
 				FROM 
-					lms_course c
+					Lms_course c
 				INNER JOIN 
-					lms_learningactivity la 
+					Lms_learningactivity la 
 						ON c.groupCreatedId = la.groupId
 				LEFT JOIN 
-					lms_learningactivitytry lar 
+					Lms_learningactivitytry lar 
 						ON la.actId = lar.actId AND lar.userId = ?
 				WHERE 
 					c.courseId =  ?
@@ -530,16 +32,16 @@
 				CASE WHEN r.crId IS NULL THEN '0' WHEN r.passedDate IS NULL THEN '1' WHEN r.passedDate IS NOT NULL AND r.passed = 0 THEN '2' WHEN r.passed = 1 AND r.passedDate IS NOT NULL THEN '3' ELSE '0' END AS statusUser,
 				CASE WHEN r.crId IS NULL THEN 0 ELSE r.result END AS result, c.icon, c.groupCreatedId, c.friendlyURL
 			FROM 
-				lms_course c
+				Lms_course c
 			INNER JOIN 
 				users_groups u 
 					ON c.groupCreatedId = u.groupId AND u.userId = ?
 			LEFT OUTER JOIN 
-				lms_courseresult r 
+				Lms_courseresult r 
 					ON c.courseId = r.courseId AND r.userId = ?
 			WHERE 
 				c.closed = 0 
-				AND (SELECT MAX(mo.endDate) FROM lms_module mo WHERE mo.groupId = c.groupCreatedId) > '[$DATENOW$]' 
+				AND (SELECT MAX(mo.endDate) FROM Lms_module mo WHERE mo.groupId = c.groupCreatedId) > '[$DATENOW$]' 
 				AND (r.crId IS NULL OR r.allowFinishDate IS NULL OR r.allowFinishDate > '[$DATENOW$]')
 				AND (c.groupId = ? OR ? <= 0)
 			GROUP By 
@@ -551,16 +53,16 @@
 			SELECT 
 				COUNT(1) AS total
 			FROM 
-				lms_course c
+				Lms_course c
 			INNER JOIN 
 				users_groups u 
 					ON c.groupCreatedId = u.groupId AND u.userId = ?
 			LEFT OUTER JOIN 
-				lms_courseresult r 
+				Lms_courseresult r 
 					ON c.courseId = r.courseId AND r.userId = ?
 			WHERE 
 				c.closed = 0 
-				AND (SELECT MAX(mo.endDate) FROM lms_module mo WHERE mo.groupId = c.groupCreatedId) > '[$DATENOW$]' 
+				AND (SELECT MAX(mo.endDate) FROM Lms_module mo WHERE mo.groupId = c.groupCreatedId) > '[$DATENOW$]' 
 				AND (r.crId IS NULL OR r.allowFinishDate IS NULL OR r.allowFinishDate > '[$DATENOW$]')
 				AND (c.groupId = ? OR ? <= 0)
 			GROUP By 
@@ -572,7 +74,7 @@
 			SELECT 
 				c.*
 			FROM 
-				lms_course c
+				Lms_course c
 			INNER JOIN 
 				users_groups u 
 					ON c.groupCreatedId = u.groupId AND u.userId = ?
@@ -583,37 +85,6 @@
 			LIMIT [$START$], [$END$]
 		]]>
 	</sql>
-	<sql id="com.liferay.lms.service.persistence.CourseFinder.getOpenOrRestrictedCoursesByParentId">
-		<![CDATA[   		
-			SELECT 
-				c.*
-			FROM 
-				lms_course c
-			INNER JOIN 
-				group_ g 
-					ON c.groupCreatedId = g.groupId
-			WHERE 
-				c.parentCourseId = ? AND
-				c.closed = 0 AND
-				(g.type_ = ? OR g.type_ = ?)
- 			LIMIT [$START$], [$END$]
-		]]>
-	</sql>
-	<sql id="com.liferay.lms.service.persistence.CourseFinder.countOpenOrRestrictedCoursesByParentId">
-		<![CDATA[   		
-			SELECT 
-				COUNT(DISTINCT c.courseId) AS COUNT_VALUE
-			FROM 
-				lms_course c
-			INNER JOIN 
-				group_ g 
-					ON c.groupCreatedId = g.groupId
-			WHERE 
-				c.parentCourseId = ? AND
-				c.closed = 0 AND
-				(g.type_ = ? OR g.type_ = ?)
-		]]>
-	</sql>
 	<sql id="com.liferay.lms.service.persistence.CourseFinder.getDistinctCourseGroups">
 		<![CDATA[   		
 			SELECT 
@@ -621,20 +92,164 @@
 			FROM 
 				group_ g
 			INNER JOIN 
-				lms_course c 
+				Lms_course c 
 					ON g.groupId = c.groupId
 			WHERE g.companyId = ?
 		]]>
 	</sql>
-	<sql id="com.liferay.lms.service.persistence.CourseFinder.innerCustomAttribute">
+	<!-- Query para la búsqueda de cursos-->
+	
+	<sql id="com.liferay.lms.service.persistence.CourseFinder.findByC_T_D_S_PC_G">
+		<![CDATA[
+			SELECT
+				DISTINCT Lms_Course.*
+			FROM
+				Lms_Course
+			INNER JOIN group_ 
+				ON Lms_Course.groupCreatedId = group_.groupId
+			[$JOIN$]
+			WHERE
+				[$WHERE$]
+				(Lms_Course.companyId = ? || ? = 0)
+		]]>
+	</sql>
+	<sql id="com.liferay.lms.service.persistence.CourseFinder.countC_T_D_S_PC_G">
+		<![CDATA[
+			SELECT
+				COUNT(DISTINCT Lms_Course.courseId) AS COUNT_VALUE
+			FROM
+				Lms_Course
+			INNER JOIN group_ 
+				ON Lms_Course.groupCreatedId = group_.groupId
+			[$JOIN$]
+			WHERE
+				[$WHERE$]
+				(Lms_Course.companyId = ? || ? = 0) 
+		]]>
+	</sql>
+	<sql id="com.liferay.lms.service.persistence.CourseFinder.whereTitleDescription">
+		WHERE 
+		(
+			(IF (ExtractValue(Lms_Course.title, '//Title[@language-id=\"[$LANGUAGE$]\"]' )='', ExtractValue(Lms_Course.title, '//root[@default-locale]//Title'), ExtractValue(Lms_Course.title, '//Title[@language-id=\"[$LANGUAGE$]\"]' )) LIKE ? [$AND_OR_NULL_CHECK$]) [$AND_OR_CONNECTOR$]
+			(IF (ExtractValue(Lms_Course.description, '//Description[@language-id=\"[$LANGUAGE$]\"]' )='', ExtractValue(Lms_Course.description, '//root[@default-locale]//Description' ), ExtractValue(Lms_Course.description, '//Description[@language-id=\"[$LANGUAGE$]\"]' )) LIKE ? [$AND_OR_NULL_CHECK$])
+		) 
+	</sql>
+	<sql id="com.liferay.lms.service.persistence.CourseFinder.whereGroupId">
+		WHERE
+			(Lms_Course.groupId = ?)
+	</sql>
+	<sql id="com.liferay.lms.service.persistence.CourseFinder.whereStatus">
+		WHERE
+			(Lms_Course.closed = ?)
+	</sql>
+	<sql id="com.liferay.lms.service.persistence.CourseFinder.whereParentCourseId">
+		WHERE
+			(Lms_Course.parentCourseId = ? OR (0 = ? AND Lms_Course.parentCourseId IS NULL))
+	</sql>
+	<sql id="com.liferay.lms.service.persistence.CourseFinder.joinC_ByAssetEntry">
+		<![CDATA[
+			INNER JOIN 
+				assetentry ae 
+					ON ae.classNameId = [$CLASSNAMEID$]
+						AND ae.classPK = Lms_Course.courseId
+		]]>
+	</sql>
+	<sql id="com.liferay.lms.service.persistence.CourseFinder.joinC_ByAssetCategory">
+		<![CDATA[
+			INNER JOIN 
+				assetentries_assetcategories aac[$i$] 
+					ON aac[$i$].entryId = ae.entryId AND aac[$i$].categoryId IN ([$CATEGORYIDS$])
+		]]>
+	</sql>
+	<sql id="com.liferay.lms.service.persistence.CourseFinder.joinC_ByAssetTag">
+		<![CDATA[
+			INNER JOIN 
+				assetentries_assettags aat[$i$] 
+					ON aat[$i$].entryId = ae.entryId AND aat[$i$].tagId IN ([$TAGIDS$])	
+		]]>
+	</sql>
+	
+	<sql id="com.liferay.lms.service.persistence.CourseFinder.joinC_ByTemplates">
+		<![CDATA[
+			INNER JOIN 
+				 layoutset 
+				 	ON layoutset.groupId = Lms_Course.groupCreatedId 
+			WHERE
+				layoutset.layoutSetPrototypeUuid IN ([$TEMPLATES$])
+		]]>
+	</sql>
+	
+	<sql id="com.liferay.lms.service.persistence.CourseFinder.joinC_ByResourcePermission">
+		<![CDATA[
+			INNER JOIN 
+				resourcepermission rp 
+					ON rp.name = 'com.liferay.lms.model.Course' 
+						AND rp.companyId = [$COMPANYID$] 
+						AND ((primKey = Lms_Course.courseId AND scope = 4) OR (primKey = [$COMPANYID$] AND scope = 1)) 
+						AND (actionIds & [$ACTIONPUBLISH$] || actionIds & [$ACTIONCOURSEEDITOR$] || actionIds & [$ACTIONASSIGN_MEMBERS$] || actionIds & [$ACTIONDELETE$]
+							|| actionIds & [$ACTIONPERMISSION$] || actionIds & [$ACTIONUPDATE$])
+			LEFT JOIN 
+				users_roles urperm 
+					ON rp.roleId = urperm.roleId 
+						AND urperm.roleId 
+						AND urperm.userId = [$USERID$]
+			LEFT JOIN 
+				usergrouprole ugperm 
+					ON ugperm.groupId = Lms_Course.groupCreatedId 
+						AND ugperm.roleId = rp.roleId 
+						AND ugperm.userId = [$USERID$]
+			LEFT JOIN 
+				groups_roles grperm 
+					ON grperm.roleId = rp.roleId
+			LEFT JOIN 
+				group_ gperm 
+					ON grperm.groupId = gperm.groupId
+			LEFT JOIN 
+				users_usergroups uugperm 
+					ON uugperm.userGroupId 
+						= gperm.classPK AND gperm.classNameId = [$CLASSNAMEIDUSERGROUP$]
+						AND uugperm.userId = [$USERID$]
+			LEFT JOIN 
+				users_orgs uoperm 
+					ON uoperm.organizationId = gperm.classPK 
+						AND gperm.classNameId = [$CLASSNAMEIDORGANIZATION$] 
+						AND uoperm.userId = [$USERID$]
+			LEFT JOIN 
+				users_groups ugperm2 
+					ON ugperm2.groupId = gperm.classPK 
+						AND gperm.classNameId = [$CLASSNAMEIDGROUP$] 
+						AND ugperm2.userId = [$USERID$]
+			LEFT JOIN 
+				usergrouprole ugrpermC 
+					ON ugrpermC.groupId = Lms_Course.groupCreatedId 
+						AND ugrpermC.userId = [$USERID$] AND ugrpermC.roleId IN ([$ROLEEDITOR$],[$ROLETEACHER$])
+			WHERE
+				(urperm.userId IS NOT NULL OR ugperm.userId IS NOT NULL OR uugperm.userGroupId IS NOT NULL OR uoperm.userId IS NOT NULL OR ugperm2.userId IS NOT NULL OR ugrpermC.userId IS NOT NULL)
+		]]>
+	</sql>
+	<sql id="com.liferay.lms.service.persistence.CourseFinder.whereVisible">
+		<![CDATA[
+			WHERE (ae.visible = ?)
+		]]>
+	</sql>
+	<sql id="com.liferay.lms.service.persistence.CourseFinder.whereType">
+		<![CDATA[
+			INNER JOIN 
+				group_ gtype 
+					ON Lms_Course.groupCreatedId = gtype.groupId
+			WHERE
+				(gtype.type_ IN [$TYPE$])
+		]]>
+	</sql>
+	<sql id="com.liferay.lms.service.persistence.CourseFinder.joinCustomAttribute">
 		<![CDATA[
 			INNER JOIN 
 				expandovalue ev 
-					ON ev.companyId = c.companyId 
-						AND ev.tableId = ?
-						AND ev.columnId = ?
-						AND ev.classPK = c.courseId
-						AND ev.data_ LIKE ?		
+					ON ev.companyId = Lms_Course.companyId 
+						AND ev.classPK = Lms_Course.courseId
+			WHERE
+				(ev.data_ LIKE ? AND ev.tableId = ?	AND ev.columnId = ?)
 		]]>
 	</sql>
+
 </custom-sql>

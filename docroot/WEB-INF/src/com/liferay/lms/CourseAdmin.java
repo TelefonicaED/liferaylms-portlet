@@ -6,6 +6,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.TimeZone;
 
@@ -22,6 +23,7 @@ import com.liferay.lms.model.LmsPrefs;
 import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.lms.service.CourseServiceUtil;
 import com.liferay.lms.service.LmsPrefsLocalServiceUtil;
+import com.liferay.lms.util.CourseParams;
 import com.liferay.portal.LARFileException;
 import com.liferay.portal.LARTypeException;
 import com.liferay.portal.LayoutImportException;
@@ -559,7 +561,13 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 		
 		boolean isAdmin = false;
 		try {
-			isAdmin = RoleLocalServiceUtil.hasUserRole(themeDisplay.getUserId(), RoleLocalServiceUtil.getRole(themeDisplay.getCompanyId(), RoleConstants.ADMINISTRATOR).getRoleId());
+			isAdmin = RoleLocalServiceUtil.hasUserRole(themeDisplay.getUserId(), RoleLocalServiceUtil.getRole(themeDisplay.getCompanyId(), RoleConstants.ADMINISTRATOR).getRoleId())
+					|| themeDisplay.getPermissionChecker().hasPermission(themeDisplay.getScopeGroupId(), Course.class.getName(), 0, ActionKeys.UPDATE)
+					|| themeDisplay.getPermissionChecker().hasPermission(themeDisplay.getScopeGroupId(), Course.class.getName(), 0, ActionKeys.DELETE)
+					|| themeDisplay.getPermissionChecker().hasPermission(themeDisplay.getScopeGroupId(), Course.class.getName(), 0, ActionKeys.PERMISSIONS)
+					|| themeDisplay.getPermissionChecker().hasPermission(themeDisplay.getScopeGroupId(), Course.class.getName(), 0, "PUBLISH")
+					|| themeDisplay.getPermissionChecker().hasPermission(themeDisplay.getScopeGroupId(), Course.class.getName(), 0, "COURSEEDITOR")
+					|| themeDisplay.getPermissionChecker().hasPermission(themeDisplay.getScopeGroupId(), Course.class.getName(), 0, "ASSIGN_MEMBERS");
 		} catch (SystemException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -595,10 +603,27 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 		log.debug("groupId: " + groupId);
 		log.debug("isAdmin: " + isAdmin);
 		
-		searchContainer.setResults(CourseLocalServiceUtil.searchCourses(freetext, closed, categoryIds, tagsSelIds, templates, columnId, expandoValue, courseId,
-				themeDisplay.getCompanyId(), groupId, themeDisplay.getUserId(), themeDisplay.getLanguageId(), isAdmin, true, true, searchContainer.getStart(), searchContainer.getEnd()));
-		searchContainer.setTotal(CourseLocalServiceUtil.countCourses(freetext, closed, categoryIds, tagsSelIds, templates, columnId, expandoValue, courseId,
-				themeDisplay.getCompanyId(), groupId, themeDisplay.getUserId(), themeDisplay.getLanguageId(), isAdmin, true, true));
+		LinkedHashMap<String, Object> params = new LinkedHashMap<String, Object>();
+		if(categoryIds != null && categoryIds.length > 0){
+			params.put(CourseParams.PARAM_OR_CATEGORIES, categoryIds);
+		}
+		if(tagsSelIds != null && tagsSelIds.length > 0){
+			params.put(CourseParams.PARAM_TAGS, tagsSelIds);
+		}
+		if(templates != null && templates.length() > 0){
+			params.put(CourseParams.PARAM_TEMPLATES, templates);
+		}
+		if(columnId > 0){
+			Object[] expandoValues = {columnId, expandoValue};
+			params.put(CourseParams.PARAM_CUSTOM_ATTRIBUTE, expandoValues);
+		}
+		if(!isAdmin){
+			params.put(CourseParams.PARAM_PERMISSIONS_ADMIN, themeDisplay.getUserId());
+		}
+		
+		searchContainer.setResults(CourseLocalServiceUtil.searchCourses(themeDisplay.getCompanyId(), freetext, themeDisplay.getLanguageId(), state, courseId, groupId, params, 
+				searchContainer.getStart(), searchContainer.getEnd(), null));
+		searchContainer.setTotal(CourseLocalServiceUtil.countCourses(themeDisplay.getCompanyId(), freetext, themeDisplay.getLanguageId(), state, courseId, groupId, params));
 		
 		renderRequest.setAttribute("searchContainer", searchContainer);
 		renderRequest.setAttribute("catIds", catIds);
@@ -642,13 +667,13 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 		//Creamos la lista de columnas a mostrar en la tabla
 		try {
 			List<ExpandoColumn> expandosColumn = ExpandoColumnLocalServiceUtil.getColumns(themeDisplay.getCompanyId(), Course.class.getName(), ExpandoTableConstants.DEFAULT_TABLE_NAME);
-			List<String> expandoNames = new ArrayList<String>();
+			List<ExpandoColumn> expandoNames = new ArrayList<ExpandoColumn>();
 			if(Validator.isNotNull(expandosColumn) && expandosColumn.size()>0) {
 				String expandoName="";
 				for (ExpandoColumn expandoUser : expandosColumn) {
 					expandoName = StringUtil.upperCaseFirstLetter(expandoUser.getName());
 					if(((renderRequest.getPreferences().getValue("show" + expandoName, "false")).compareTo("true") == 0)) {
-						expandoNames.add(expandoName);
+						expandoNames.add(expandoUser);
 					}
 				}	
 			}

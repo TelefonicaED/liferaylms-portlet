@@ -135,9 +135,8 @@ if(catIds!=null&&catIds.length>0)
 <aui:script>
 	AUI().use('autocomplete-list','aui-base','aui-io-request','autocomplete-filters','autocomplete-highlighters',function (A) {
 		var testData;
-		new A.AutoCompleteList({
+		var autoComplete = new A.AutoCompleteList({
 			enableCache: 'true',
-			activateFirstItem: 'false',
 			inputNode: '#<portlet:namespace />freetext',
 			resultTextLocator:'courseTitle',
 			render: 'true',
@@ -147,12 +146,26 @@ if(catIds!=null&&catIds.length>0)
 			source:function(){
 				var inputValue=A.one("#<portlet:namespace />freetext").get('value');
 				var stateValue=A.one('#<portlet:namespace />state').get('value');
+				var groupId = 0;
+				var columnId = 0;
+				var expandoValue = null;
+				if("${renderRequest.preferences.getValue('showGroupFilter', 'false') && (empty courseId || courseId == 0)}" == "true"){
+					groupId = A.one('#<portlet:namespace />selectedGroupId').get('value');
+				}
+				if("${(renderRequest.preferences.getValue('showExpandos', 'false') && (empty courseId || courseId == 0)) ||(renderRequest.preferences.getValue('showExpandosEdition', 'false') && courseId > 0) }" == "true"){
+					columnId = A.one('#<portlet:namespace />columnId').get('value');
+					expandoValue = A.one('#<portlet:namespace />expandoValue').get('value');
+				}
+				
 				var myAjaxRequest=A.io.request('${getCourses }',{
 					dataType: 'json',
 					method:'POST',
 					data:{
 						<portlet:namespace />courseTitle:inputValue,
-						<portlet:namespace />status:stateValue
+						<portlet:namespace />status:stateValue,
+						<portlet:namespace />selectedGroupId:groupId,
+						<portlet:namespace />columnId:columnId,
+						<portlet:namespace />expandoValue:expandoValue
 					},
 					autoLoad:false,
 					sync:false,
@@ -163,9 +176,17 @@ if(catIds!=null&&catIds.length>0)
 						}
 					}
 				});
+				console.log("ejecutamos");
 				myAjaxRequest.start();
+				console.log("ejecutado");
 				return testData;
 			},
+			on: {
+				select: function(event) {
+					A.one("#<portlet:namespace />freetext").set('value', event.result.raw.courseTitle);
+					$('#<portlet:namespace />searchCourses').submit();
+				}
+			}
 		});
 	});
 	
