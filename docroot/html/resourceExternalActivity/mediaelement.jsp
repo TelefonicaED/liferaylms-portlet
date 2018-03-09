@@ -54,8 +54,10 @@
 		
 		player.addEventListener('play', function () {
 			finished = false;
+			if(plays > 0){
+				$('[id*^=<portlet:namespace/>question_]').addClass("aui-helper-hidden");
+			}
 			plays++;
-			$('[id*^=<portlet:namespace/>question_]').addClass("aui-helper-hidden");
 		});	
 			
 		player.addEventListener('ended',function() {

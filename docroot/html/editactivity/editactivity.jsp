@@ -262,7 +262,9 @@ if(learnact!=null)
 }else{
 	learnact = new LearningActivityImpl();
 	learnact.setTitle(title, themeDisplay.getLocale());
-	
+	Long defaultScore = larntype.getDefaultScore();
+	learnact.setPasspuntuation(defaultScore.intValue());
+	learnact.setTries(larntype.getDefaultTries());
 	%>
 	<aui:model-context  bean="<%= learnact %>"  model="<%= LearningActivity.class %>" />
 	<%

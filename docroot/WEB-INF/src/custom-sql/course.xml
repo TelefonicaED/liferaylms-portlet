@@ -234,11 +234,8 @@
 	</sql>
 	<sql id="com.liferay.lms.service.persistence.CourseFinder.whereType">
 		<![CDATA[
-			INNER JOIN 
-				group_ gtype 
-					ON Lms_Course.groupCreatedId = gtype.groupId
 			WHERE
-				(gtype.type_ IN [$TYPE$])
+				(group_.type_ IN ([$TYPE$]))
 		]]>
 	</sql>
 	<sql id="com.liferay.lms.service.persistence.CourseFinder.joinCustomAttribute">

@@ -861,8 +861,8 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 	public int getStudentsFromCourseCount(long courseId, long teamId, String firstName, String lastName, String screenName, String emailAddress, boolean andComparator) throws SystemException, PortalException{
 		
 		Course course = CourseLocalServiceUtil.getCourse(courseId);	
-		
-		return courseFinder.countStudents(courseId, course.getCompanyId(), screenName, firstName, lastName, emailAddress, WorkflowConstants.STATUS_APPROVED, teamId, andComparator);
+		long[] teamIds = {teamId};
+		return courseFinder.countStudents(courseId, course.getCompanyId(), screenName, firstName, lastName, emailAddress, WorkflowConstants.STATUS_APPROVED, teamIds, andComparator);
 	}
 	
 	public List<User> getStudentsFromCourse(Course course) {		
@@ -882,8 +882,9 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 	public List<User> getStudentsFromCourse(long companyId, long courseGroupCreatedId, int start, int end,long teamId, String firstName, String lastName, String screenName, String emailAddress, boolean andOperator) {
 		
 		try {
+			long[] teamIds = {teamId};
 			Course course = CourseLocalServiceUtil.getCourseByGroupCreatedId(courseGroupCreatedId);
-			return courseFinder.findStudents(course.getCourseId(), companyId, screenName, firstName, lastName, emailAddress, WorkflowConstants.STATUS_APPROVED, teamId, andOperator, start, end, new UserLastNameComparator(true));
+			return courseFinder.findStudents(course.getCourseId(), companyId, screenName, firstName, lastName, emailAddress, WorkflowConstants.STATUS_APPROVED, teamIds, andOperator, start, end, new UserLastNameComparator(true));
 
 		} catch (SystemException e) {
 			// TODO Auto-generated catch block
@@ -898,7 +899,8 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 		
 		try {
 			Course course = CourseLocalServiceUtil.getCourseByGroupCreatedId(courseGroupCreatedId);
-			return courseFinder.countStudents(course.getCourseId(), companyId, screenName, firstName, lastName, emailAddress, WorkflowConstants.STATUS_APPROVED, teamId, andOperator);
+			long[] teamIds = {teamId};
+			return courseFinder.countStudents(course.getCourseId(), companyId, screenName, firstName, lastName, emailAddress, WorkflowConstants.STATUS_APPROVED, teamIds, andOperator);
 		} catch (SystemException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
@@ -1178,24 +1180,34 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 		return courseFinder.countByKeywords(companyId, freeText, language, status, parentCourseId, groupId, params);
 	}
 	
+	public List<User> getStudents(long courseId, long companyId, String screenName, String firstName, String lastName, String emailAddress, long[] teamIds, boolean andOperator, int start, int end,OrderByComparator comparator){
+		return courseFinder.findStudents(courseId, companyId, screenName,firstName, lastName, emailAddress, WorkflowConstants.STATUS_APPROVED, teamIds, andOperator, start, end, comparator);
+	}
+	
+	public int countStudents(long courseId, long companyId, String screenName, String firstName, String lastName, String emailAddress, long[] teamIds, boolean andOperator){
+		return courseFinder.countStudents(courseId, companyId, screenName,firstName, lastName, emailAddress, WorkflowConstants.STATUS_APPROVED, teamIds, andOperator);
+	}
+	
 	public List<User> getStudents(long courseId, long companyId, String screenName, String firstName, String lastName, String emailAddress, boolean andOperator, int start, int end,OrderByComparator comparator){
-		return courseFinder.findStudents(courseId, companyId, screenName,firstName, lastName, emailAddress, WorkflowConstants.STATUS_APPROVED, 0, andOperator, start, end, comparator);
+		return courseFinder.findStudents(courseId, companyId, screenName,firstName, lastName, emailAddress, WorkflowConstants.STATUS_APPROVED, null, andOperator, start, end, comparator);
 	}
 	
 	public int countStudents(long courseId, long companyId, String screenName, String firstName, String lastName, String emailAddress,boolean andOperator){
-		return courseFinder.countStudents(courseId, companyId, screenName,firstName, lastName, emailAddress, WorkflowConstants.STATUS_APPROVED, 0, andOperator);
+		return courseFinder.countStudents(courseId, companyId, screenName,firstName, lastName, emailAddress, WorkflowConstants.STATUS_APPROVED, null, andOperator);
 	}
 	
 	public List<User> getStudents(long courseId, long companyId, String screenName, String firstName, String lastName, String emailAddress, int status, long teamId, boolean andOperator, int start, int end,OrderByComparator comparator){
-		return courseFinder.findStudents(courseId, companyId, screenName,firstName, lastName, emailAddress, status, teamId, andOperator, start, end, comparator);
+		long[] teamIds = {teamId};
+		return courseFinder.findStudents(courseId, companyId, screenName,firstName, lastName, emailAddress, status, teamIds, andOperator, start, end, comparator);
 	}
 	
 	public int countStudents(long courseId, long companyId, String screenName, String firstName, String lastName, String emailAddress, int status, long teamId,boolean andOperator){
-		return courseFinder.countStudents(courseId, companyId, screenName,firstName, lastName, emailAddress, status, teamId, andOperator);
+		long[] teamIds = {teamId};
+		return courseFinder.countStudents(courseId, companyId, screenName,firstName, lastName, emailAddress, status, teamIds, andOperator);
 	}
 	
 	public int countStudentsStatus(long courseId, long companyId, String screenName, String firstName, String lastName, String emailAddress, int status, boolean andOperator){
-		return courseFinder.countStudents(courseId, companyId, screenName,firstName, lastName, emailAddress, status, 0, andOperator);
+		return courseFinder.countStudents(courseId, companyId, screenName,firstName, lastName, emailAddress, status, null, andOperator);
 	}
 	
 	public List<Course> getCoursesCatalogByTitleCategoriesTags(String freeText, long[] categories, long[] tags, long companyId, long groupId, long userId, String language, int start, int end){
