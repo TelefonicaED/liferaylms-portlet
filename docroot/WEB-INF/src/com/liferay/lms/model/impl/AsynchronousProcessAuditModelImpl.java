@@ -17,9 +17,14 @@ package com.liferay.lms.model.impl;
 import com.liferay.lms.model.AsynchronousProcessAudit;
 import com.liferay.lms.model.AsynchronousProcessAuditModel;
 
+import com.liferay.portal.LocaleException;
 import com.liferay.portal.kernel.bean.AutoEscapeBeanHandler;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.json.JSON;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
@@ -38,6 +43,7 @@ import java.sql.Types;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -63,6 +69,8 @@ public class AsynchronousProcessAuditModelImpl extends BaseModelImpl<Asynchronou
 	public static final String TABLE_NAME = "Lms_AsynchronousProcessAudit";
 	public static final Object[][] TABLE_COLUMNS = {
 			{ "asynchronousProcessAuditId", Types.BIGINT },
+			{ "companyId", Types.BIGINT },
+			{ "type_", Types.VARCHAR },
 			{ "classNameId", Types.BIGINT },
 			{ "classPK", Types.BIGINT },
 			{ "userId", Types.BIGINT },
@@ -71,7 +79,7 @@ public class AsynchronousProcessAuditModelImpl extends BaseModelImpl<Asynchronou
 			{ "status", Types.INTEGER },
 			{ "statusMessage", Types.VARCHAR }
 		};
-	public static final String TABLE_SQL_CREATE = "create table Lms_AsynchronousProcessAudit (asynchronousProcessAuditId LONG not null primary key,classNameId LONG,classPK LONG,userId LONG,createDate DATE null,endDate DATE null,status INTEGER,statusMessage VARCHAR(75) null)";
+	public static final String TABLE_SQL_CREATE = "create table Lms_AsynchronousProcessAudit (asynchronousProcessAuditId LONG not null primary key,companyId LONG,type_ VARCHAR(75) null,classNameId LONG,classPK LONG,userId LONG,createDate DATE null,endDate DATE null,status INTEGER,statusMessage STRING null)";
 	public static final String TABLE_SQL_DROP = "drop table Lms_AsynchronousProcessAudit";
 	public static final String DATA_SOURCE = "liferayDataSource";
 	public static final String SESSION_FACTORY = "liferaySessionFactory";
@@ -119,6 +127,8 @@ public class AsynchronousProcessAuditModelImpl extends BaseModelImpl<Asynchronou
 
 		attributes.put("asynchronousProcessAuditId",
 			getAsynchronousProcessAuditId());
+		attributes.put("companyId", getCompanyId());
+		attributes.put("type", getType());
 		attributes.put("classNameId", getClassNameId());
 		attributes.put("classPK", getClassPK());
 		attributes.put("userId", getUserId());
@@ -137,6 +147,18 @@ public class AsynchronousProcessAuditModelImpl extends BaseModelImpl<Asynchronou
 
 		if (asynchronousProcessAuditId != null) {
 			setAsynchronousProcessAuditId(asynchronousProcessAuditId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
+		}
+
+		String type = (String)attributes.get("type");
+
+		if (type != null) {
+			setType(type);
 		}
 
 		Long classNameId = (Long)attributes.get("classNameId");
@@ -188,6 +210,27 @@ public class AsynchronousProcessAuditModelImpl extends BaseModelImpl<Asynchronou
 
 	public void setAsynchronousProcessAuditId(long asynchronousProcessAuditId) {
 		_asynchronousProcessAuditId = asynchronousProcessAuditId;
+	}
+
+	public long getCompanyId() {
+		return _companyId;
+	}
+
+	public void setCompanyId(long companyId) {
+		_companyId = companyId;
+	}
+
+	public String getType() {
+		if (_type == null) {
+			return StringPool.BLANK;
+		}
+		else {
+			return _type;
+		}
+	}
+
+	public void setType(String type) {
+		_type = type;
 	}
 
 	public String getClassName() {
@@ -273,13 +316,92 @@ public class AsynchronousProcessAuditModelImpl extends BaseModelImpl<Asynchronou
 		}
 	}
 
+	public String getStatusMessage(Locale locale) {
+		String languageId = LocaleUtil.toLanguageId(locale);
+
+		return getStatusMessage(languageId);
+	}
+
+	public String getStatusMessage(Locale locale, boolean useDefault) {
+		String languageId = LocaleUtil.toLanguageId(locale);
+
+		return getStatusMessage(languageId, useDefault);
+	}
+
+	public String getStatusMessage(String languageId) {
+		return LocalizationUtil.getLocalization(getStatusMessage(), languageId);
+	}
+
+	public String getStatusMessage(String languageId, boolean useDefault) {
+		return LocalizationUtil.getLocalization(getStatusMessage(), languageId,
+			useDefault);
+	}
+
+	public String getStatusMessageCurrentLanguageId() {
+		return _statusMessageCurrentLanguageId;
+	}
+
+	@JSON
+	public String getStatusMessageCurrentValue() {
+		Locale locale = getLocale(_statusMessageCurrentLanguageId);
+
+		return getStatusMessage(locale);
+	}
+
+	public Map<Locale, String> getStatusMessageMap() {
+		return LocalizationUtil.getLocalizationMap(getStatusMessage());
+	}
+
 	public void setStatusMessage(String statusMessage) {
 		_statusMessage = statusMessage;
 	}
 
+	public void setStatusMessage(String statusMessage, Locale locale) {
+		setStatusMessage(statusMessage, locale, LocaleUtil.getDefault());
+	}
+
+	public void setStatusMessage(String statusMessage, Locale locale,
+		Locale defaultLocale) {
+		String languageId = LocaleUtil.toLanguageId(locale);
+		String defaultLanguageId = LocaleUtil.toLanguageId(defaultLocale);
+
+		if (Validator.isNotNull(statusMessage)) {
+			setStatusMessage(LocalizationUtil.updateLocalization(
+					getStatusMessage(), "StatusMessage", statusMessage,
+					languageId, defaultLanguageId));
+		}
+		else {
+			setStatusMessage(LocalizationUtil.removeLocalization(
+					getStatusMessage(), "StatusMessage", languageId));
+		}
+	}
+
+	public void setStatusMessageCurrentLanguageId(String languageId) {
+		_statusMessageCurrentLanguageId = languageId;
+	}
+
+	public void setStatusMessageMap(Map<Locale, String> statusMessageMap) {
+		setStatusMessageMap(statusMessageMap, LocaleUtil.getDefault());
+	}
+
+	public void setStatusMessageMap(Map<Locale, String> statusMessageMap,
+		Locale defaultLocale) {
+		if (statusMessageMap == null) {
+			return;
+		}
+
+		Locale[] locales = LanguageUtil.getAvailableLocales();
+
+		for (Locale locale : locales) {
+			String statusMessage = statusMessageMap.get(locale);
+
+			setStatusMessage(statusMessage, locale, defaultLocale);
+		}
+	}
+
 	@Override
 	public ExpandoBridge getExpandoBridge() {
-		return ExpandoBridgeFactoryUtil.getExpandoBridge(0,
+		return ExpandoBridgeFactoryUtil.getExpandoBridge(getCompanyId(),
 			AsynchronousProcessAudit.class.getName(), getPrimaryKey());
 	}
 
@@ -288,6 +410,13 @@ public class AsynchronousProcessAuditModelImpl extends BaseModelImpl<Asynchronou
 		ExpandoBridge expandoBridge = getExpandoBridge();
 
 		expandoBridge.setAttributes(serviceContext);
+	}
+
+	@SuppressWarnings("unused")
+	public void prepareLocalizedFieldsForImport(Locale defaultImportLocale)
+		throws LocaleException {
+		setStatusMessage(getStatusMessage(defaultImportLocale),
+			defaultImportLocale, defaultImportLocale);
 	}
 
 	@Override
@@ -306,6 +435,8 @@ public class AsynchronousProcessAuditModelImpl extends BaseModelImpl<Asynchronou
 		AsynchronousProcessAuditImpl asynchronousProcessAuditImpl = new AsynchronousProcessAuditImpl();
 
 		asynchronousProcessAuditImpl.setAsynchronousProcessAuditId(getAsynchronousProcessAuditId());
+		asynchronousProcessAuditImpl.setCompanyId(getCompanyId());
+		asynchronousProcessAuditImpl.setType(getType());
 		asynchronousProcessAuditImpl.setClassNameId(getClassNameId());
 		asynchronousProcessAuditImpl.setClassPK(getClassPK());
 		asynchronousProcessAuditImpl.setUserId(getUserId());
@@ -373,6 +504,16 @@ public class AsynchronousProcessAuditModelImpl extends BaseModelImpl<Asynchronou
 
 		asynchronousProcessAuditCacheModel.asynchronousProcessAuditId = getAsynchronousProcessAuditId();
 
+		asynchronousProcessAuditCacheModel.companyId = getCompanyId();
+
+		asynchronousProcessAuditCacheModel.type = getType();
+
+		String type = asynchronousProcessAuditCacheModel.type;
+
+		if ((type != null) && (type.length() == 0)) {
+			asynchronousProcessAuditCacheModel.type = null;
+		}
+
 		asynchronousProcessAuditCacheModel.classNameId = getClassNameId();
 
 		asynchronousProcessAuditCacheModel.classPK = getClassPK();
@@ -412,10 +553,14 @@ public class AsynchronousProcessAuditModelImpl extends BaseModelImpl<Asynchronou
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(17);
+		StringBundler sb = new StringBundler(21);
 
 		sb.append("{asynchronousProcessAuditId=");
 		sb.append(getAsynchronousProcessAuditId());
+		sb.append(", companyId=");
+		sb.append(getCompanyId());
+		sb.append(", type=");
+		sb.append(getType());
 		sb.append(", classNameId=");
 		sb.append(getClassNameId());
 		sb.append(", classPK=");
@@ -436,7 +581,7 @@ public class AsynchronousProcessAuditModelImpl extends BaseModelImpl<Asynchronou
 	}
 
 	public String toXmlString() {
-		StringBundler sb = new StringBundler(28);
+		StringBundler sb = new StringBundler(34);
 
 		sb.append("<model><model-name>");
 		sb.append("com.liferay.lms.model.AsynchronousProcessAudit");
@@ -445,6 +590,14 @@ public class AsynchronousProcessAuditModelImpl extends BaseModelImpl<Asynchronou
 		sb.append(
 			"<column><column-name>asynchronousProcessAuditId</column-name><column-value><![CDATA[");
 		sb.append(getAsynchronousProcessAuditId());
+		sb.append("]]></column-value></column>");
+		sb.append(
+			"<column><column-name>companyId</column-name><column-value><![CDATA[");
+		sb.append(getCompanyId());
+		sb.append("]]></column-value></column>");
+		sb.append(
+			"<column><column-name>type</column-name><column-value><![CDATA[");
+		sb.append(getType());
 		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>classNameId</column-name><column-value><![CDATA[");
@@ -485,6 +638,8 @@ public class AsynchronousProcessAuditModelImpl extends BaseModelImpl<Asynchronou
 			AsynchronousProcessAudit.class
 		};
 	private long _asynchronousProcessAuditId;
+	private long _companyId;
+	private String _type;
 	private long _classNameId;
 	private long _classPK;
 	private long _userId;
@@ -493,5 +648,6 @@ public class AsynchronousProcessAuditModelImpl extends BaseModelImpl<Asynchronou
 	private Date _endDate;
 	private int _status;
 	private String _statusMessage;
+	private String _statusMessageCurrentLanguageId;
 	private AsynchronousProcessAudit _escapedModelProxy;
 }

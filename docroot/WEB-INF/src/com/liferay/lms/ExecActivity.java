@@ -134,7 +134,7 @@ public class ExecActivity extends MVCPortlet{
 			}
 
 			long random = GetterUtil.getLong(LearningActivityLocalServiceUtil.getExtraContentValue(actId,"random"));
-			long score=isPartial ? 0 : correctanswers/((random!=0 && random<questionIds.length)?random:questionIds.length);
+			long score=isPartial ? 0 : (correctanswers-penalizedAnswers)/((random!=0 && random<questionIds.length)?random:questionIds.length);
 			if(score < 0)score = 0;
 			
 			LearningActivityResult learningActivityResult = LearningActivityResultLocalServiceUtil.getByActIdAndUserId(actId, PortalUtil.getUserId(actionRequest));

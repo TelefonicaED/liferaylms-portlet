@@ -313,6 +313,8 @@ public class AsynchronousProcessAuditPersistenceImpl extends BasePersistenceImpl
 		asynchronousProcessAuditImpl.setPrimaryKey(asynchronousProcessAudit.getPrimaryKey());
 
 		asynchronousProcessAuditImpl.setAsynchronousProcessAuditId(asynchronousProcessAudit.getAsynchronousProcessAuditId());
+		asynchronousProcessAuditImpl.setCompanyId(asynchronousProcessAudit.getCompanyId());
+		asynchronousProcessAuditImpl.setType(asynchronousProcessAudit.getType());
 		asynchronousProcessAuditImpl.setClassNameId(asynchronousProcessAudit.getClassNameId());
 		asynchronousProcessAuditImpl.setClassPK(asynchronousProcessAudit.getClassPK());
 		asynchronousProcessAuditImpl.setUserId(asynchronousProcessAudit.getUserId());

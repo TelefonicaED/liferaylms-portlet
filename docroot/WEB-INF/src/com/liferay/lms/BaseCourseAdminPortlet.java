@@ -44,10 +44,12 @@ import com.liferay.lms.learningactivity.calificationtype.CalificationType;
 import com.liferay.lms.learningactivity.calificationtype.CalificationTypeRegistry;
 import com.liferay.lms.learningactivity.courseeval.CourseEval;
 import com.liferay.lms.learningactivity.courseeval.CourseEvalRegistry;
+import com.liferay.lms.model.AsynchronousProcessAudit;
 import com.liferay.lms.model.Course;
 import com.liferay.lms.model.CourseCompetence;
 import com.liferay.lms.model.CourseResult;
 import com.liferay.lms.model.LmsPrefs;
+import com.liferay.lms.service.AsynchronousProcessAuditLocalServiceUtil;
 import com.liferay.lms.service.CourseCompetenceLocalServiceUtil;
 import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.lms.service.CourseResultLocalServiceUtil;
@@ -1362,7 +1364,9 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 								jsonObject.put("status", "generating");
 								jsonObject.put("key", newKey);
 							} else if (Validator.isNull(key) && MultiVMPoolUtil.get("exportCourseCache", key) == null) { // Pide exportacion y no hay ninguna en curso
-								Message message = new Message();
+								AsynchronousProcessAudit process = AsynchronousProcessAuditLocalServiceUtil.addAsynchronousProcessAudit(themeDisplay.getCompanyId(), themeDisplay.getUserId(), Course.class.getName(), "liferay/lms/courseExport");
+								Message message=new Message();
+								message.put("asynchronousProcessAuditId", process.getAsynchronousProcessAuditId());
 								message.put("groupId", groupId);
 								message.put("fileName", fileName);
 								message.put("key", key);

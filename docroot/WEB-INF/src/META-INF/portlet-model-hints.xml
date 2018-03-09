@@ -12,13 +12,15 @@
 	</model>
 	<model name="com.liferay.lms.model.AsynchronousProcessAudit">
 		<field name="asynchronousProcessAuditId" type="long" />
+		<field name="companyId" type="long" />
+		<field name="type" type="String" />
 		<field name="classNameId" type="long" />
 		<field name="classPK" type="long" />
 		<field name="userId" type="long" />
 		<field name="createDate" type="Date" />
 		<field name="endDate" type="Date" />
 		<field name="status" type="int" />
-		<field name="statusMessage" type="String" />
+		<field name="statusMessage" type="String" localized="true" />
 	</model>
 	<model name="com.liferay.lms.model.AuditEntry">
 		<field name="auditId" type="long" />

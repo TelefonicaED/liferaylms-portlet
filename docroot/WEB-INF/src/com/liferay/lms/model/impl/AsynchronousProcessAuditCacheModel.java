@@ -35,10 +35,14 @@ public class AsynchronousProcessAuditCacheModel implements CacheModel<Asynchrono
 	Serializable {
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(17);
+		StringBundler sb = new StringBundler(21);
 
 		sb.append("{asynchronousProcessAuditId=");
 		sb.append(asynchronousProcessAuditId);
+		sb.append(", companyId=");
+		sb.append(companyId);
+		sb.append(", type=");
+		sb.append(type);
 		sb.append(", classNameId=");
 		sb.append(classNameId);
 		sb.append(", classPK=");
@@ -62,6 +66,15 @@ public class AsynchronousProcessAuditCacheModel implements CacheModel<Asynchrono
 		AsynchronousProcessAuditImpl asynchronousProcessAuditImpl = new AsynchronousProcessAuditImpl();
 
 		asynchronousProcessAuditImpl.setAsynchronousProcessAuditId(asynchronousProcessAuditId);
+		asynchronousProcessAuditImpl.setCompanyId(companyId);
+
+		if (type == null) {
+			asynchronousProcessAuditImpl.setType(StringPool.BLANK);
+		}
+		else {
+			asynchronousProcessAuditImpl.setType(type);
+		}
+
 		asynchronousProcessAuditImpl.setClassNameId(classNameId);
 		asynchronousProcessAuditImpl.setClassPK(classPK);
 		asynchronousProcessAuditImpl.setUserId(userId);
@@ -95,6 +108,8 @@ public class AsynchronousProcessAuditCacheModel implements CacheModel<Asynchrono
 	}
 
 	public long asynchronousProcessAuditId;
+	public long companyId;
+	public String type;
 	public long classNameId;
 	public long classPK;
 	public long userId;

@@ -1,8 +1,14 @@
 package com.liferay.lms;
 
 import java.io.File;
+import java.util.Date;
 import java.util.List;
 
+import com.liferay.lms.model.AsynchronousProcessAudit;
+import com.liferay.lms.model.Course;
+import com.liferay.lms.service.AsynchronousProcessAuditLocalServiceUtil;
+import com.liferay.lms.service.CourseLocalServiceUtil;
+import com.liferay.lms.util.LmsConstant;
 import com.liferay.portal.kernel.cache.MultiVMPoolUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -32,7 +38,10 @@ public class ExportCourse implements MessageListener {
 	String key;
 	ThemeDisplay themeDisplay;
 	ServiceContext serviceContext;
-		
+	AsynchronousProcessAudit process = null;
+	String statusMessage ="";
+	boolean error= false;
+	
 	public ExportCourse(long groupId, String fileName, String key, ThemeDisplay themeDisplay, ServiceContext serviceContext) {
 		super();
 		this.groupId = groupId;
@@ -52,6 +61,19 @@ public class ExportCourse implements MessageListener {
 	public void receive(Message message) throws MessageListenerException {
 		
 		try {
+			
+			long processId = message.getLong("asynchronousProcessAuditId");
+			
+			process = AsynchronousProcessAuditLocalServiceUtil.fetchAsynchronousProcessAudit(processId);
+			process = AsynchronousProcessAuditLocalServiceUtil.updateProcessStatus(process, null, LmsConstant.STATUS_IN_PROGRESS, "");
+			statusMessage ="";
+			error = false;
+			Course course = CourseLocalServiceUtil.fetchByGroupCreatedId(groupId);
+			if(course!=null){
+				process.setClassPK(course.getCourseId());
+				process = AsynchronousProcessAuditLocalServiceUtil.updateAsynchronousProcessAudit(process);
+			}
+			
 			this.groupId	= message.getLong("groupId");
 			this.fileName = message.getString("fileName");
 			this.key = message.getString(key);
@@ -75,6 +97,15 @@ public class ExportCourse implements MessageListener {
 			
 		} catch (Exception e) {
 			e.printStackTrace();
+			error = true;
+			statusMessage = e.getMessage() +"\n";
+		}
+		
+		Date endDate = new Date();
+		if(!error){
+			AsynchronousProcessAuditLocalServiceUtil.updateProcessStatus(process, endDate, LmsConstant.STATUS_FINISH, "asynchronous-proccess-audit.status-ok");
+		}else{
+			AsynchronousProcessAuditLocalServiceUtil.updateProcessStatus(process, endDate, LmsConstant.STATUS_ERROR, statusMessage);
 		}
 	}
 	

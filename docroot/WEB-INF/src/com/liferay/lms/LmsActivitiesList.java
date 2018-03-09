@@ -12,8 +12,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
-import javax.portlet.WindowStateException;
 
+import javax.portlet.WindowStateException;
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
 import javax.portlet.EventRequest;
@@ -39,11 +39,14 @@ import com.liferay.lms.events.ThemeIdEvent;
 import com.liferay.lms.learningactivity.LearningActivityType;
 import com.liferay.lms.learningactivity.LearningActivityTypeRegistry;
 import com.liferay.lms.learningactivity.ResourceExternalLearningActivityType;
+import com.liferay.lms.model.AsynchronousProcessAudit;
+import com.liferay.lms.model.Course;
 import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.model.Module;
 import com.liferay.lms.model.P2pActivity;
 import com.liferay.lms.model.P2pActivityCorrections;
 import com.liferay.lms.service.ActivityTriesDeletedLocalServiceUtil;
+import com.liferay.lms.service.AsynchronousProcessAuditLocalServiceUtil;
 import com.liferay.lms.service.ClpSerializer;
 import com.liferay.lms.service.LearningActivityLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityServiceUtil;
@@ -1028,7 +1031,11 @@ public class LmsActivitiesList extends MVCPortlet {
 
 		LearningActivity la = LearningActivityLocalServiceUtil.getLearningActivity(actId);
 		if(la!=null){
+			
+			AsynchronousProcessAudit process = AsynchronousProcessAuditLocalServiceUtil.addAsynchronousProcessAudit(themeDisplay.getCompanyId(), themeDisplay.getUserId(), LearningActivity.class.getName(), "liferay/lms/cleanTriesAllUsers");
+			
 			Message message=new Message();
+			message.put("asynchronousProcessAuditId", process.getAsynchronousProcessAuditId());
 			message.put("learningActivity",la);
 			message.put("userc",themeDisplay.getUser());
 			message.put("activityTriesDeleted", ActivityTriesDeletedLocalServiceUtil.addActivityTriesDeleted(la.getGroupId(), la.getActId(), themeDisplay.getUserId()));
@@ -1065,7 +1072,10 @@ public class LmsActivitiesList extends MVCPortlet {
 			e.printStackTrace();
 		}
 		if(la!=null){
+			AsynchronousProcessAudit process = AsynchronousProcessAuditLocalServiceUtil.addAsynchronousProcessAudit(themeDisplay.getCompanyId(), themeDisplay.getUserId(), LearningActivity.class.getName(), "liferay/lms/cleanTriesAllUsers");
 			Message message=new Message();
+			message.put("asynchronousProcessAuditId", process.getAsynchronousProcessAuditId());
+			
 			message.put("learningActivity",la);
 			message.put("userc",themeDisplay.getUser());
 			message.put("activityTriesDeleted", ActivityTriesDeletedLocalServiceUtil.addActivityTriesDeleted(la.getGroupId(), la.getActId(), themeDisplay.getUserId()));
@@ -1097,7 +1107,11 @@ public class LmsActivitiesList extends MVCPortlet {
 		User user = UserLocalServiceUtil.getUser(userId);
 		
 		if(la!=null&&user!=null){
+			
+			AsynchronousProcessAudit process = AsynchronousProcessAuditLocalServiceUtil.addAsynchronousProcessAudit(themeDisplay.getCompanyId(), themeDisplay.getUserId(), LearningActivity.class.getName(), "liferay/lms/cleanTriesUser");
 			Message message=new Message();
+			message.put("asynchronousProcessAuditId", process.getAsynchronousProcessAuditId());
+			
 			message.put("learningActivity",la);
 			message.put("user",user);
 			message.put("userc",themeDisplay.getUser());

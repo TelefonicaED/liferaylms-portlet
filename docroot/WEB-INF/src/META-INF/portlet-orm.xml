@@ -29,6 +29,10 @@
 	<mapped-superclass class="com.liferay.lms.model.impl.AsynchronousProcessAuditModelImpl">
 		<attributes>
 			<id name="asynchronousProcessAuditId" />
+			<basic name="companyId" />
+			<basic name="type">
+				<column name="TYPE_" />
+			</basic>
 			<basic name="classNameId" />
 			<basic name="classPK" />
 			<basic name="userId" />
@@ -44,6 +48,8 @@
 			<transient name="modelAttributes" />
 			<transient name="primaryKey" />
 			<transient name="primaryKeyObj" />
+			<transient name="statusMessageCurrentLanguageId" />
+			<transient name="statusMessageMap" />
 			<transient name="userUuid" />
 		</attributes>
 	</mapped-superclass>

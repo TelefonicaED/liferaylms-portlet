@@ -19,13 +19,15 @@ create table Lms_ActivityTriesDeleted (
 
 create table Lms_AsynchronousProcessAudit (
 	asynchronousProcessAuditId LONG not null primary key,
+	companyId LONG,
+	type_ VARCHAR(75) null,
 	classNameId LONG,
 	classPK LONG,
 	userId LONG,
 	createDate DATE null,
 	endDate DATE null,
 	status INTEGER,
-	statusMessage VARCHAR(75) null
+	statusMessage STRING null
 );
 
 create table Lms_AuditEntry (

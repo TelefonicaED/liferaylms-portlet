@@ -19,8 +19,6 @@ import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 import javax.portlet.WindowState;
 
-import com.liferay.lms.auditing.AuditConstants;
-import com.liferay.lms.auditing.AuditingLogFactory;
 import com.liferay.lms.learningactivity.TaskEvaluationLearningActivityType;
 import com.liferay.lms.learningactivity.calificationtype.CalificationType;
 import com.liferay.lms.learningactivity.calificationtype.CalificationTypeRegistry;
@@ -108,7 +106,6 @@ public class EvaluationActivity extends MVCPortlet implements MessageListener{
 	@SuppressWarnings("unchecked")
 	public void receive(Message message) throws MessageListenerException {
 		long actId = message.getLong("actId");
-		
 		if(actId!=0){
 			try {
 				evaluate(actId);
@@ -137,6 +134,8 @@ public class EvaluationActivity extends MVCPortlet implements MessageListener{
 			}
 
 		}
+		
+		
 		
 	}	
 
@@ -451,7 +450,7 @@ public class EvaluationActivity extends MVCPortlet implements MessageListener{
 		Document document = SAXReaderUtil.read(learningActivity.getExtracontent());
 		Element rootElement = document.getRootElement();
 		
-		Element firedDateElement = rootElement.element("firedDate");
+		//Element firedDateElement = rootElement.element("firedDate");
 		//if(firedDateElement==null){
 			rootElement.addElement("firedDate").setText(_dateFormat.format(new Date()));
 			learningActivity.setExtracontent(document.formattedString());
@@ -681,7 +680,7 @@ public class EvaluationActivity extends MVCPortlet implements MessageListener{
 					activity = LearningActivityLocalServiceUtil.getLearningActivity(actId);
 
 					//auditing
-					ThemeDisplay themeDisplay = (ThemeDisplay) renderRequest.getAttribute(WebKeys.THEME_DISPLAY);
+					//ThemeDisplay themeDisplay = (ThemeDisplay) renderRequest.getAttribute(WebKeys.THEME_DISPLAY);
 					
 					long typeId=activity.getTypeId();
 					

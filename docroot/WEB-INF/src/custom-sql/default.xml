@@ -6,4 +6,5 @@
 	<sql file="custom-sql/learningactivityresult.xml" />
 	<sql file="custom-sql/courseresult.xml" />
 	<sql file="custom-sql/p2pactivity.xml" />
+	<sql file="custom-sql/asynchronousprocessaudit.xml"/>
 </custom-sql>
