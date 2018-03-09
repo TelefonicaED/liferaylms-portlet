@@ -10,17 +10,20 @@ import java.util.Locale;
 
 import com.liferay.counter.service.CounterLocalServiceUtil;
 import com.liferay.lms.learningactivity.LearningActivityTypeRegistry;
+import com.liferay.lms.model.AsynchronousProcessAudit;
 import com.liferay.lms.model.Course;
 import com.liferay.lms.model.CourseCompetence;
 import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.model.LmsPrefs;
 import com.liferay.lms.model.Module;
 import com.liferay.lms.model.impl.ModuleImpl;
+import com.liferay.lms.service.AsynchronousProcessAuditLocalServiceUtil;
 import com.liferay.lms.service.CourseCompetenceLocalServiceUtil;
 import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityLocalServiceUtil;
 import com.liferay.lms.service.LmsPrefsLocalServiceUtil;
 import com.liferay.lms.service.ModuleLocalServiceUtil;
+import com.liferay.lms.util.LmsConstant;
 import com.liferay.portal.DuplicateGroupException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
@@ -81,6 +84,9 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 	
 	boolean visible;
 	boolean includeTeacher;
+	AsynchronousProcessAudit process = null;
+	String statusMessage ="";
+	boolean error= false;
 	
 	boolean cloneForum;
 	
@@ -105,6 +111,13 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 	public void receive(Message message) throws MessageListenerException {
 		
 		try {
+			
+			long processId = message.getLong("asynchronousProcessAuditId");
+			
+			process = AsynchronousProcessAuditLocalServiceUtil.fetchAsynchronousProcessAudit(processId);
+			process = AsynchronousProcessAuditLocalServiceUtil.updateProcessStatus(process, null, LmsConstant.STATUS_IN_PROGRESS, "");
+			statusMessage ="";
+			error = false;
 			
 			this.groupId	= message.getLong("groupId");
 			this.newCourseName = message.getString("newCourseName");
@@ -183,8 +196,11 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 			newCourse.setGoodbyeSubject(course.getGoodbyeSubject());
 			newCourse.setCourseEvalId(course.getCourseEvalId());
 			
+			process.setClassPK(newCourse.getCourseId());
+			process = AsynchronousProcessAuditLocalServiceUtil.updateAsynchronousProcessAudit(process);
 		} catch(DuplicateGroupException e){
 			if(log.isDebugEnabled())e.printStackTrace();
+			process = AsynchronousProcessAuditLocalServiceUtil.updateProcessStatus(process, new Date(), LmsConstant.STATUS_ERROR, e.getMessage());
 			throw new DuplicateGroupException();
 		}
 	
@@ -240,6 +256,8 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 			
 		}catch(Exception e){
 			if(log.isDebugEnabled())e.printStackTrace();
+			error=true;
+			statusMessage += e.getMessage() + "\n";
 		}
 		
 		newCourse.setUserId(themeDisplay.getUserId());
@@ -323,6 +341,8 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 				
 			} catch (Exception e) {
 				e.printStackTrace();
+				error=true;
+				statusMessage += e.getMessage() + "\n";
 				continue;
 			}
 			
@@ -396,6 +416,8 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 					}
 				} catch (Exception e) {
 					e.printStackTrace();
+					error=true;
+					statusMessage += e.getMessage() + "\n";
 					continue;
 				}
 
@@ -477,6 +499,12 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 		String[] args = {newCourse.getTitle(themeDisplay.getLocale()), dateFormat.format(startDate), dateFormat.format(endDate)};
 		
 		sendNotification(LanguageUtil.get(themeDisplay.getLocale(),"courseadmin.clone.confirmation.title"), LanguageUtil.format(themeDisplay.getLocale(),"courseadmin.clone.confirmation.message", args), themeDisplay.getPortalURL()+"/web/"+newGroup.getFriendlyURL(), "Avisos", 1);
+		Date endDate = new Date();
+		if(!error){
+			AsynchronousProcessAuditLocalServiceUtil.updateProcessStatus(process, endDate, LmsConstant.STATUS_FINISH, "asynchronous-proccess-audit.status-ok");
+		}else{
+			AsynchronousProcessAuditLocalServiceUtil.updateProcessStatus(process, endDate, LmsConstant.STATUS_ERROR, statusMessage);
+		}
 	
 	}
 	

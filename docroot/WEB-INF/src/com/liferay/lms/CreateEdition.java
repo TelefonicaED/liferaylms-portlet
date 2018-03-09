@@ -8,13 +8,16 @@ import java.util.Locale;
 
 import com.liferay.counter.service.CounterLocalServiceUtil;
 import com.liferay.lms.learningactivity.LearningActivityTypeRegistry;
+import com.liferay.lms.model.AsynchronousProcessAudit;
 import com.liferay.lms.model.Course;
 import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.model.Module;
 import com.liferay.lms.model.impl.ModuleImpl;
+import com.liferay.lms.service.AsynchronousProcessAuditLocalServiceUtil;
 import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityLocalServiceUtil;
 import com.liferay.lms.service.ModuleLocalServiceUtil;
+import com.liferay.lms.util.LmsConstant;
 import com.liferay.portal.DuplicateGroupException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
@@ -60,6 +63,10 @@ public class CreateEdition extends CourseCopyUtil implements MessageListener {
 	private Date startExecutionDate;
 	private Date endExecutionDate;
 	
+	AsynchronousProcessAudit process = null;
+	String statusMessage ="";
+	boolean error= false;
+	
 	public CreateEdition(long groupId, String newEditionName, ThemeDisplay themeDisplay, Date startDate, Date endDate, long parentCourseId, ServiceContext serviceContext) {
 		super();
 		this.newEditionName = newEditionName;
@@ -80,6 +87,12 @@ public class CreateEdition extends CourseCopyUtil implements MessageListener {
 	public void receive(Message message) throws MessageListenerException {
 		
 		try {
+			long processId = message.getLong("asynchronousProcessAuditId");
+			
+			process = AsynchronousProcessAuditLocalServiceUtil.fetchAsynchronousProcessAudit(processId);
+			process = AsynchronousProcessAuditLocalServiceUtil.updateProcessStatus(process, null, LmsConstant.STATUS_IN_PROGRESS, "");
+			statusMessage ="";
+			error = false;
 			
 			this.newEditionName = message.getString("newEditionName");
 			this.startDate 	= (Date)message.get("startDate");
@@ -172,8 +185,12 @@ public class CreateEdition extends CourseCopyUtil implements MessageListener {
 			newCourse.setCourseEvalId(course.getCourseEvalId());
 			newCourse.setIsLinked(isLinked);
 			
+			process.setClassPK(newCourse.getCourseId());
+			process = AsynchronousProcessAuditLocalServiceUtil.updateAsynchronousProcessAudit(process);
+			
 		} catch(DuplicateGroupException e){
 			if(log.isDebugEnabled())e.printStackTrace();
+			process = AsynchronousProcessAuditLocalServiceUtil.updateProcessStatus(process, new Date(), LmsConstant.STATUS_ERROR, e.getMessage());
 			throw new DuplicateGroupException();
 		}
 		newCourse.setExpandoBridgeAttributes(serviceContext);
@@ -200,6 +217,8 @@ public class CreateEdition extends CourseCopyUtil implements MessageListener {
 			
 		}catch(Exception e){
 			if(log.isDebugEnabled())e.printStackTrace();
+			error=true;
+			statusMessage += e.getMessage() + "\n";
 		}
 		newCourse.setUserId(themeDisplay.getUserId());
 
@@ -212,6 +231,12 @@ public class CreateEdition extends CourseCopyUtil implements MessageListener {
 		
 		//Create modules and activities
 		createModulesAndActivities(newCourse, siteMemberRole, group.getGroupId());
+		Date endDate = new Date();
+		if(!error){
+			AsynchronousProcessAuditLocalServiceUtil.updateProcessStatus(process, endDate, LmsConstant.STATUS_FINISH, "asynchronous-proccess-audit.status-ok");
+		}else{
+			AsynchronousProcessAuditLocalServiceUtil.updateProcessStatus(process, endDate, LmsConstant.STATUS_ERROR, statusMessage);
+		}
 		
 		//Create Tags and Categories
 		
@@ -263,6 +288,7 @@ public class CreateEdition extends CourseCopyUtil implements MessageListener {
 				if(log.isDebugEnabled()){
 					log.debug("\n    Module : " + module.getTitle(Locale.getDefault()) +"("+module.getModuleId()+")");
 					log.debug("    + Module : " + newModule.getTitle(Locale.getDefault()) +"("+newModule.getModuleId()+")" );
+					
 				}
 				
 				createLearningActivities(module, newModule, siteMemberRole, learningActivityTypeRegistry, pending, correlationActivities, activities, newLearnActivity, nuevaLarn, evaluations);
@@ -270,6 +296,8 @@ public class CreateEdition extends CourseCopyUtil implements MessageListener {
 				
 			} catch (Exception e) {
 				e.printStackTrace();
+				error=true;
+				statusMessage += e.getMessage() + "\n";
 				continue;
 			}
 			
@@ -374,6 +402,8 @@ public class CreateEdition extends CourseCopyUtil implements MessageListener {
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
+				error=true;
+				statusMessage += e.getMessage() + "\n";
 				continue;
 			}
 

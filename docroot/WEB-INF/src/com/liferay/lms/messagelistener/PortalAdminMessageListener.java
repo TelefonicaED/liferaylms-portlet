@@ -1,15 +1,18 @@
 package com.liferay.lms.messagelistener;
 
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import com.liferay.lms.model.AsynchronousProcessAudit;
 import com.liferay.lms.model.Course;
 import com.liferay.lms.model.CourseResult;
 import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.model.LearningActivityResult;
 import com.liferay.lms.model.Module;
 import com.liferay.lms.model.ModuleResult;
+import com.liferay.lms.service.AsynchronousProcessAuditLocalServiceUtil;
 import com.liferay.lms.service.ClpSerializer;
 import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.lms.service.CourseResultLocalServiceUtil;
@@ -17,6 +20,7 @@ import com.liferay.lms.service.LearningActivityLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityResultLocalServiceUtil;
 import com.liferay.lms.service.ModuleLocalServiceUtil;
 import com.liferay.lms.service.ModuleResultLocalServiceUtil;
+import com.liferay.lms.util.LmsConstant;
 import com.liferay.portal.kernel.bean.PortletBeanLocatorUtil;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
@@ -51,21 +55,25 @@ public class PortalAdminMessageListener implements MessageListener {
 	protected void updateModulePassedDate(Message message) throws Exception {
 		
 		boolean updateDB = message.getBoolean("updateDB");
+		long processId = message.getLong("asynchronousProcessAuditId");
+		boolean error= false;
+		AsynchronousProcessAudit process = AsynchronousProcessAuditLocalServiceUtil.fetchAsynchronousProcessAudit(processId);
+		process = AsynchronousProcessAuditLocalServiceUtil.updateProcessStatus(process, null, LmsConstant.STATUS_IN_PROGRESS, "");
 		
 		String trace = "updateModulePassedDate ";
 		int conta = 0;
+		String errorMessage ="";
 		Calendar start = Calendar.getInstance();
 
 		ClassLoader classLoader = (ClassLoader) PortletBeanLocatorUtil.locate(ClpSerializer.getServletContextName(),"portletClassLoader");
 		
-		//Obtenemos todos los moduleResult que no tengan la fecha en que se aprobaron y estén aprobados.
+		//Obtenemos todos los moduleResult que no tengan la fecha en que se aprobaron y estï¿½n aprobados.
 		DynamicQuery dq = DynamicQueryFactoryUtil.forClass(ModuleResult.class,classLoader)
 				.add(PropertyFactoryUtil.forName("passed").eq(true))
 				.add(PropertyFactoryUtil.forName("passedDate").isNull())
 				.addOrder(PropertyFactoryUtil.forName("userId").asc());
 		
 		List<ModuleResult> modules = LearningActivityLocalServiceUtil.dynamicQuery(dq);
-		
 		log.info("\n\n ## START ## "+start.getTime()+"\nModules result passed without passedDate : " + modules.size() +", Update DB: "+ updateDB );
 		trace += start.getTime()+", Update DB: "+ updateDB+"\n";
 		
@@ -76,10 +84,14 @@ public class PortalAdminMessageListener implements MessageListener {
 			try {
 				user = UserLocalServiceUtil.getUserById(moduleResult.getUserId());
 				userName = user.getFullName();
-			} catch (Exception e1) {/*e1.printStackTrace();*/}
+			} catch (Exception e1) {
+				e1.printStackTrace();
+				errorMessage += e1.getMessage()+"\n";
+				error=true;
+			}
 			log.info("\n ModuleResult: moduleId: " + moduleResult.getModuleId() + ", passedDate: " + moduleResult.getPassedDate() + ", " + userName +" (" + moduleResult.getUserId()+")");
 		
-			//Obtenemos las actividades que tiene el módulo
+			//Obtenemos las actividades que tiene el mï¿½dulo
 			DynamicQuery dqa = DynamicQueryFactoryUtil.forClass(LearningActivity.class,classLoader)
 					.add(PropertyFactoryUtil.forName("moduleId").eq(moduleResult.getModuleId()))
 					.add(PropertyFactoryUtil.forName("weightinmodule").eq((long)1))
@@ -134,7 +146,11 @@ public class PortalAdminMessageListener implements MessageListener {
 							log.info("       No course result");
 						}
 												
-					} catch (Exception e) { e.printStackTrace();}
+					} catch (Exception e) { 
+						e.printStackTrace();
+						errorMessage += e.getMessage()+"\n";
+						error=true;
+					}
 
 					//Traza para el fichero
 					
@@ -161,8 +177,15 @@ public class PortalAdminMessageListener implements MessageListener {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
+			errorMessage += e.getMessage()+"\n";
+			error=true;
 		}
-		
+		Date endDate = new Date();
+		if(!error){
+			AsynchronousProcessAuditLocalServiceUtil.updateProcessStatus(process, endDate, LmsConstant.STATUS_FINISH, "asynchronous-proccess-audit.status-ok");
+		}else{
+			AsynchronousProcessAuditLocalServiceUtil.updateProcessStatus(process, endDate, LmsConstant.STATUS_ERROR, errorMessage);
+		}
 	}
 		
 }

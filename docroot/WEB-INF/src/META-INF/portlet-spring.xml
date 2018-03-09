@@ -3,6 +3,9 @@
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" default-destroy-method="destroy" default-init-method="afterPropertiesSet" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 	<bean id="com.liferay.lms.service.ActivityTriesDeletedLocalService" class="com.liferay.lms.service.impl.ActivityTriesDeletedLocalServiceImpl" />
 	<bean id="com.liferay.lms.service.persistence.ActivityTriesDeletedPersistence" class="com.liferay.lms.service.persistence.ActivityTriesDeletedPersistenceImpl" parent="basePersistence" />
+	<bean id="com.liferay.lms.service.AsynchronousProcessAuditLocalService" class="com.liferay.lms.service.impl.AsynchronousProcessAuditLocalServiceImpl" />
+	<bean id="com.liferay.lms.service.persistence.AsynchronousProcessAuditPersistence" class="com.liferay.lms.service.persistence.AsynchronousProcessAuditPersistenceImpl" parent="basePersistence" />
+	<bean id="com.liferay.lms.service.persistence.AsynchronousProcessAuditFinder" class="com.liferay.lms.service.persistence.AsynchronousProcessAuditFinderImpl" parent="basePersistence" />
 	<bean id="com.liferay.lms.service.AuditEntryLocalService" class="com.liferay.lms.service.impl.AuditEntryLocalServiceImpl" />
 	<bean id="com.liferay.lms.service.persistence.AuditEntryPersistence" class="com.liferay.lms.service.persistence.AuditEntryPersistenceImpl" parent="basePersistence" />
 	<bean id="com.liferay.lms.service.AuditLoggerLocalService" class="com.liferay.lms.service.impl.AuditLoggerLocalServiceImpl" />
