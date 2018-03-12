@@ -15,6 +15,7 @@ import javax.portlet.ActionRequest;
 import org.apache.commons.fileupload.FileItem;
 
 import com.liferay.lms.model.Module;
+import com.liferay.lms.util.LmsConstant;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.repository.model.FileEntry;
@@ -42,10 +43,9 @@ import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
 public class moduleUpload {
 
 	public static String HIDDEN = "HIDDEN";
-	public static String SEPARATOR = "_";
 
-	public static String IMAGEGALLERY_REQUESTFOLDER = HIDDEN+SEPARATOR+"folderIGId";
-	public static String DOCUMENTLIBRARY_REQUESTFOLDER = HIDDEN+SEPARATOR+"folderDLId";
+	public static String IMAGEGALLERY_REQUESTFOLDER = HIDDEN+LmsConstant.SEPARATOR+"folderIGId";
+	public static String DOCUMENTLIBRARY_REQUESTFOLDER = HIDDEN+LmsConstant.SEPARATOR+"folderDLId";
 
 	public static String IMAGEFILE = "IMAGEFILE";
 	public static String IMAGEGALLERY_MAINFOLDER = "PortletUploads";
@@ -55,10 +55,6 @@ public class moduleUpload {
 	public static String IMAGE_DELETE = "DELETEIMAGE";
 
 	public static String DOCUMENTFILE = "DOCUMENTFILE";
-	public static String DOCUMENTLIBRARY_MAINFOLDER = "PortletUploads";
-	public static String DOCUMENTLIBRARY_PORTLETFOLDER = "module";
-	public static String DOCUMENTLIBRARY_MAINFOLDER_DESCRIPTION = "Portlet Document Uploads";
-	public static String DOCUMENTLIBRARY_PORTLETFOLDER_DESCRIPTION = "";
 	public static String DOCUMENT_DELETE = "DELETEDOCUMENT";
 
 	private Long igFolderId = 0L;
@@ -117,12 +113,12 @@ public class moduleUpload {
 
 		for(FileItem item : files) {
 			String formField = item.getFieldName();
-			String strType = formField.substring(formField.lastIndexOf(SEPARATOR)+1);
+			String strType = formField.substring(formField.lastIndexOf(LmsConstant.SEPARATOR)+1);
 			if(strType.equalsIgnoreCase(IMAGEFILE)){
 				formField = getFieldFromAttribute(extractSufix(IMAGEFILE,formField));
 				if(deleteds.get(formField)!=null) {
 					if(hiddens!=null) {
-						Long prevImage = (Long)hiddens.get(HIDDEN+SEPARATOR+formField);
+						Long prevImage = (Long)hiddens.get(HIDDEN+LmsConstant.SEPARATOR+formField);
 						if((prevImage!=null)&&(prevImage!=0L)) {
 							DLAppLocalServiceUtil.deleteFileEntry(prevImage);
 						}
@@ -140,7 +136,7 @@ public class moduleUpload {
 					callSetMethod(formField,module,igImage.getFileEntryId());
 					//Check possible previous values
 					if(hiddens!=null){
-						Long prevImage = (Long)hiddens.get(HIDDEN+SEPARATOR+formField);
+						Long prevImage = (Long)hiddens.get(HIDDEN+LmsConstant.SEPARATOR+formField);
 						if((prevImage!=null) && (prevImage!=0L)){
 							//Delete previous image
 							DLAppLocalServiceUtil.deleteFileEntry(prevImage);
@@ -149,9 +145,9 @@ public class moduleUpload {
 				} else {
 					//See hidden value, possible edit
 					if(hiddens!=null){
-						Long prevImage = (Long)hiddens.get(HIDDEN+SEPARATOR+formField);
+						Long prevImage = (Long)hiddens.get(HIDDEN+LmsConstant.SEPARATOR+formField);
 						if((prevImage!=null)&&(prevImage!=0L)){
-							callSetMethod(formField,module,(Long)hiddens.get(HIDDEN+SEPARATOR+formField));
+							callSetMethod(formField,module,(Long)hiddens.get(HIDDEN+LmsConstant.SEPARATOR+formField));
 						}
 					}
 
@@ -159,7 +155,7 @@ public class moduleUpload {
 			}else if(strType.equalsIgnoreCase(DOCUMENTFILE)) {
 				formField = getFieldFromAttribute(extractSufix(DOCUMENTFILE,formField));
 				if(deleteds.get(formField)!=null){
-					Long prevDocument = (Long)hiddens.get(HIDDEN+SEPARATOR+formField);
+					Long prevDocument = (Long)hiddens.get(HIDDEN+LmsConstant.SEPARATOR+formField);
 					if((prevDocument!=null)&&(prevDocument!=0L)) {
 						DLAppLocalServiceUtil.deleteFileEntry(prevDocument);
 					}
@@ -175,7 +171,7 @@ public class moduleUpload {
 					callSetMethod(formField,module,dlDocument.getFileEntryId());
 					//Check possible previous values
 					if(hiddens!=null){
-						Long prevDocument = (Long)hiddens.get(HIDDEN+SEPARATOR+formField);
+						Long prevDocument = (Long)hiddens.get(HIDDEN+LmsConstant.SEPARATOR+formField);
 						if((prevDocument!=null)&&(prevDocument!=0L)){
 							//Delete previous document
 							DLAppLocalServiceUtil.deleteFileEntry(prevDocument);
@@ -184,9 +180,9 @@ public class moduleUpload {
 				} else {
 					//See hidden value, possible edit
 					if(hiddens!=null){
-						Long prevDocument = (Long)hiddens.get(HIDDEN+SEPARATOR+formField);
+						Long prevDocument = (Long)hiddens.get(HIDDEN+LmsConstant.SEPARATOR+formField);
 						if((prevDocument!=null)&&(prevDocument!=0L)) {
-							callSetMethod(formField,module,(Long)hiddens.get(HIDDEN+SEPARATOR+formField));
+							callSetMethod(formField,module,(Long)hiddens.get(HIDDEN+LmsConstant.SEPARATOR+formField));
 						}
 					}
 				}
@@ -291,7 +287,7 @@ public class moduleUpload {
         if(igPortletFolderFound){
         	SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
         	Date date = new Date();
-        	String igRecordFolderName=dateFormat.format(date)+SEPARATOR+userId;
+        	String igRecordFolderName=dateFormat.format(date)+LmsConstant.SEPARATOR+userId;
         	Folder newImageRecordFolder = DLAppLocalServiceUtil.addFolder(userId, repositoryId, igPortletFolderId,igRecordFolderName, "", serviceContext);
         	igRecordFolderId = newImageRecordFolder.getFolderId();
         }
@@ -321,11 +317,11 @@ public class moduleUpload {
         //Get main folder
         try {
         	//Get main folder
-        	Folder dlFolderMain = DLAppLocalServiceUtil.getFolder(respositoryId,0,DOCUMENTLIBRARY_MAINFOLDER);
+        	Folder dlFolderMain = DLAppLocalServiceUtil.getFolder(respositoryId,0,LmsConstant.DOCUMENTLIBRARY_MAINFOLDER);
         	dlMainFolderId = dlFolderMain.getFolderId();
         	dlMainFolderFound = true;
         	//Get portlet folder
-        	Folder dlFolderPortlet = DLAppLocalServiceUtil.getFolder(respositoryId,dlMainFolderId,DOCUMENTLIBRARY_PORTLETFOLDER);
+        	Folder dlFolderPortlet = DLAppLocalServiceUtil.getFolder(respositoryId,dlMainFolderId,LmsConstant.DOCUMENTLIBRARY_PORTLETFOLDER);
         	dlPortletFolderId = dlFolderPortlet.getFolderId();
         	dlPortletFolderFound = true;
         } catch (Exception ex){
@@ -337,7 +333,7 @@ public class moduleUpload {
         //Create main folder if not exist
         if(!dlMainFolderFound){
 
-        	Folder newDocumentMainFolder = DLAppLocalServiceUtil.addFolder(defaultuser.getUserId(), respositoryId, 0, DOCUMENTLIBRARY_MAINFOLDER, DOCUMENTLIBRARY_MAINFOLDER_DESCRIPTION, serviceContext);
+        	Folder newDocumentMainFolder = DLAppLocalServiceUtil.addFolder(defaultuser.getUserId(), respositoryId, 0, LmsConstant.DOCUMENTLIBRARY_MAINFOLDER, LmsConstant.DOCUMENTLIBRARY_MAINFOLDER_DESCRIPTION, serviceContext);
 			
         	String[] communityPermissions = new String[]{ActionKeys.VIEW,ActionKeys.ADD_FOLDER,ActionKeys.ADD_DOCUMENT};
         	Map<Long, String[]> roleIdsToActionIds = new HashMap<Long, String[]>();
@@ -364,7 +360,7 @@ public class moduleUpload {
         if(dlMainFolderFound && !dlPortletFolderFound){
         	
     		
-        	Folder newDocumentPortletFolder = DLAppLocalServiceUtil.addFolder(defaultuser.getUserId(), respositoryId, dlMainFolderId , DOCUMENTLIBRARY_PORTLETFOLDER, DOCUMENTLIBRARY_PORTLETFOLDER_DESCRIPTION, serviceContext);
+        	Folder newDocumentPortletFolder = DLAppLocalServiceUtil.addFolder(defaultuser.getUserId(), respositoryId, dlMainFolderId , LmsConstant.DOCUMENTLIBRARY_PORTLETFOLDER, LmsConstant.DOCUMENTLIBRARY_PORTLETFOLDER_DESCRIPTION, serviceContext);
 			
         	String[] communityPermissions = new String[]{ActionKeys.VIEW,ActionKeys.ADD_FOLDER,ActionKeys.ADD_DOCUMENT};
         	Map<Long, String[]> roleIdsToActionIds = new HashMap<Long, String[]>();
@@ -392,7 +388,7 @@ public class moduleUpload {
         if(dlPortletFolderFound){
         	SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
         	Date date = new Date();
-        	String dlRecordFolderName = dateFormat.format(date)+SEPARATOR+userId;
+        	String dlRecordFolderName = dateFormat.format(date)+LmsConstant.SEPARATOR+userId;
         	Folder newDocumentRecordFolder = DLAppLocalServiceUtil.addFolder(userId, respositoryId, dlPortletFolderId, dlRecordFolderName, dlRecordFolderName, serviceContext);
 			
         	String[] communityPermissions = new String[]{ActionKeys.VIEW};
@@ -445,6 +441,6 @@ public class moduleUpload {
 	 * @return
 	 */
 	private String getFieldFromAttribute(String attribute){
-		return attribute.substring(attribute.lastIndexOf(SEPARATOR)+1);
+		return attribute.substring(attribute.lastIndexOf(LmsConstant.SEPARATOR)+1);
 	}
 }

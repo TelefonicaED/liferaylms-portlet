@@ -861,7 +861,11 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 	public int getStudentsFromCourseCount(long courseId, long teamId, String firstName, String lastName, String screenName, String emailAddress, boolean andComparator) throws SystemException, PortalException{
 		
 		Course course = CourseLocalServiceUtil.getCourse(courseId);	
-		long[] teamIds = {teamId};
+		long[] teamIds = null;
+		if(teamId > 0){
+			teamIds = new long[1];
+			teamIds[0] = teamId;
+		}
 		return courseFinder.countStudents(courseId, course.getCompanyId(), screenName, firstName, lastName, emailAddress, WorkflowConstants.STATUS_APPROVED, teamIds, andComparator);
 	}
 	
@@ -882,7 +886,11 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 	public List<User> getStudentsFromCourse(long companyId, long courseGroupCreatedId, int start, int end,long teamId, String firstName, String lastName, String screenName, String emailAddress, boolean andOperator) {
 		
 		try {
-			long[] teamIds = {teamId};
+			long[] teamIds = null;
+			if(teamId > 0){
+				teamIds = new long[1];
+				teamIds[0] = teamId;
+			}
 			Course course = CourseLocalServiceUtil.getCourseByGroupCreatedId(courseGroupCreatedId);
 			return courseFinder.findStudents(course.getCourseId(), companyId, screenName, firstName, lastName, emailAddress, WorkflowConstants.STATUS_APPROVED, teamIds, andOperator, start, end, new UserLastNameComparator(true));
 
@@ -899,7 +907,11 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 		
 		try {
 			Course course = CourseLocalServiceUtil.getCourseByGroupCreatedId(courseGroupCreatedId);
-			long[] teamIds = {teamId};
+			long[] teamIds = null;
+			if(teamId > 0){
+				teamIds = new long[1];
+				teamIds[0] = teamId;
+			}
 			return courseFinder.countStudents(course.getCourseId(), companyId, screenName, firstName, lastName, emailAddress, WorkflowConstants.STATUS_APPROVED, teamIds, andOperator);
 		} catch (SystemException e1) {
 			// TODO Auto-generated catch block
@@ -1197,12 +1209,20 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 	}
 	
 	public List<User> getStudents(long courseId, long companyId, String screenName, String firstName, String lastName, String emailAddress, int status, long teamId, boolean andOperator, int start, int end,OrderByComparator comparator){
-		long[] teamIds = {teamId};
+		long[] teamIds = null;
+		if(teamId > 0){
+			teamIds = new long[1];
+			teamIds[0] = teamId;
+		}
 		return courseFinder.findStudents(courseId, companyId, screenName,firstName, lastName, emailAddress, status, teamIds, andOperator, start, end, comparator);
 	}
 	
 	public int countStudents(long courseId, long companyId, String screenName, String firstName, String lastName, String emailAddress, int status, long teamId,boolean andOperator){
-		long[] teamIds = {teamId};
+		long[] teamIds = null;
+		if(teamId > 0){
+			teamIds = new long[1];
+			teamIds[0] = teamId;
+		}
 		return courseFinder.countStudents(courseId, companyId, screenName,firstName, lastName, emailAddress, status, teamIds, andOperator);
 	}
 	

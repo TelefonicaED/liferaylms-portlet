@@ -25,6 +25,7 @@ import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityResultLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityTryLocalServiceUtil;
+import com.liferay.lms.util.LmsConstant;
 import com.liferay.portal.kernel.exception.NestableException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
@@ -322,11 +323,11 @@ public class OnlineActivity extends MVCPortlet {
 		//Get main folder
 		try {
 			//Get main folder
-			Folder folderMain = DLAppLocalServiceUtil.getFolder(repositoryId,DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,moduleUpload.DOCUMENTLIBRARY_MAINFOLDER);
+			Folder folderMain = DLAppLocalServiceUtil.getFolder(repositoryId,DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,LmsConstant.DOCUMENTLIBRARY_MAINFOLDER);
 			dlMainFolderId = folderMain.getFolderId();
 			dlMainFolderFound = true;
 			//Get portlet folder
-			Folder dlFolderPortlet = DLAppLocalServiceUtil.getFolder(repositoryId,dlMainFolderId,moduleUpload.DOCUMENTLIBRARY_PORTLETFOLDER);
+			Folder dlFolderPortlet = DLAppLocalServiceUtil.getFolder(repositoryId,dlMainFolderId,LmsConstant.DOCUMENTLIBRARY_PORTLETFOLDER);
 			dlPortletFolderId = dlFolderPortlet.getFolderId();
 			dlPortletFolderFound = true;
 		} catch (Exception ex){
@@ -338,14 +339,14 @@ public class OnlineActivity extends MVCPortlet {
 
 		//Create main folder if not exist
 		if(!dlMainFolderFound){
-			Folder newDocumentMainFolder = DLAppLocalServiceUtil.addFolder(userId, repositoryId, DLFolderConstants.DEFAULT_PARENT_FOLDER_ID, moduleUpload.DOCUMENTLIBRARY_MAINFOLDER, moduleUpload.DOCUMENTLIBRARY_MAINFOLDER_DESCRIPTION, serviceContext);
+			Folder newDocumentMainFolder = DLAppLocalServiceUtil.addFolder(userId, repositoryId, DLFolderConstants.DEFAULT_PARENT_FOLDER_ID, LmsConstant.DOCUMENTLIBRARY_MAINFOLDER, LmsConstant.DOCUMENTLIBRARY_MAINFOLDER_DESCRIPTION, serviceContext);
 			//DLFolderLocalServiceUtil.addFolderResources(newDocumentMainFolder, true, false);
 			dlMainFolderId = newDocumentMainFolder.getFolderId();
 			dlMainFolderFound = true;
 		}
 		//Create portlet folder if not exist
 		if(dlMainFolderFound && !dlPortletFolderFound){
-			Folder newDocumentPortletFolder = DLAppLocalServiceUtil.addFolder(userId, repositoryId, dlMainFolderId , moduleUpload.DOCUMENTLIBRARY_PORTLETFOLDER, moduleUpload.DOCUMENTLIBRARY_PORTLETFOLDER_DESCRIPTION, serviceContext);
+			Folder newDocumentPortletFolder = DLAppLocalServiceUtil.addFolder(userId, repositoryId, dlMainFolderId , LmsConstant.DOCUMENTLIBRARY_PORTLETFOLDER, LmsConstant.DOCUMENTLIBRARY_PORTLETFOLDER_DESCRIPTION, serviceContext);
 			//DLFolderLocalServiceUtil.addFolderResources(newDocumentPortletFolder, true, false);
 			dlPortletFolderFound = true;
 			dlPortletFolderId = newDocumentPortletFolder.getFolderId();
@@ -355,7 +356,7 @@ public class OnlineActivity extends MVCPortlet {
 		if(dlPortletFolderFound){
 			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
 			Date date = new Date();
-			String dlRecordFolderName = dateFormat.format(date)+moduleUpload.SEPARATOR+userId;
+			String dlRecordFolderName = dateFormat.format(date)+LmsConstant.SEPARATOR+userId;
 			Folder newDocumentRecordFolder = DLAppLocalServiceUtil.addFolder(userId, repositoryId, dlPortletFolderId, dlRecordFolderName, dlRecordFolderName, serviceContext);
 			//DLFolderLocalServiceUtil.addFolderResources(newDocumentRecordFolder, true, false);
 			dlRecordFolderId = newDocumentRecordFolder.getFolderId();
