@@ -1629,6 +1629,8 @@ public class ActivityTriesDeletedPersistenceImpl extends BasePersistenceImpl<Act
 
 	@BeanReference(type = ActivityTriesDeletedPersistence.class)
 	protected ActivityTriesDeletedPersistence activityTriesDeletedPersistence;
+	@BeanReference(type = AsynchronousProcessAuditPersistence.class)
+	protected AsynchronousProcessAuditPersistence asynchronousProcessAuditPersistence;
 	@BeanReference(type = AuditEntryPersistence.class)
 	protected AuditEntryPersistence auditEntryPersistence;
 	@BeanReference(type = CheckP2pMailingPersistence.class)

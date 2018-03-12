@@ -18,8 +18,10 @@ import javax.portlet.PortletURL;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 
+import com.liferay.lms.model.AsynchronousProcessAudit;
 import com.liferay.lms.model.Course;
 import com.liferay.lms.model.LmsPrefs;
+import com.liferay.lms.service.AsynchronousProcessAuditLocalServiceUtil;
 import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.lms.service.CourseServiceUtil;
 import com.liferay.lms.service.LmsPrefsLocalServiceUtil;
@@ -831,7 +833,12 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 				SessionErrors.add(actionRequest, "courseadmin.clone.error.duplicateName");
 				errors = true;
 			} else {
+				
+				
+				AsynchronousProcessAudit process = AsynchronousProcessAuditLocalServiceUtil.addAsynchronousProcessAudit(themeDisplay.getCompanyId(), themeDisplay.getUserId(), Course.class.getName(), "liferay/lms/courseClone");
+				
 				Message message=new Message();
+				message.put("asynchronousProcessAuditId", process.getAsynchronousProcessAuditId());
 				message.put("groupId",groupId);
 				message.put("newCourseName",newCourseName);
 				message.put("themeDisplay",themeDisplay);
@@ -945,7 +952,11 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 					SessionErrors.add(actionRequest, "duplicate-friendly-url");
 					errors = true;
 				}else{
+					
+					AsynchronousProcessAudit process = AsynchronousProcessAuditLocalServiceUtil.addAsynchronousProcessAudit(themeDisplay.getCompanyId(), themeDisplay.getUserId(), Course.class.getName(), "liferay/lms/createEdition");
+					
 					Message message=new Message();
+					message.put("asynchronousProcessAuditId", process.getAsynchronousProcessAuditId());
 					message.put("parentCourseId", parentCourseId);
 					message.put("newEditionName",newEditionName);
 					message.put("themeDisplay",themeDisplay);
@@ -988,8 +999,11 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 			log.debug("groupId:"+groupId);
 			log.debug("fileName:"+fileName);
 		}
+
+		AsynchronousProcessAudit process = AsynchronousProcessAuditLocalServiceUtil.addAsynchronousProcessAudit(themeDisplay.getCompanyId(), themeDisplay.getUserId(), Course.class.getName(), "liferay/lms/courseExport");
 		
-		Message message = new Message();
+		Message message=new Message();
+		message.put("asynchronousProcessAuditId", process.getAsynchronousProcessAuditId());
 		message.put("groupId", groupId);
 		message.put("fileName", fileName);
 		message.put("themeDisplay", themeDisplay);
