@@ -180,7 +180,7 @@ public class QuestionsAdmin extends MVCPortlet{
 		if(questionType==1)
 		{
 			//MultioptionsQuestionType
-			String opt = ParamUtil.get(actionRequest, "multiplecorrection", "vacio...");
+			String opt = ParamUtil.get(actionRequest, "multiplecorrection", StringPool.BLANK);
 			log.debug("MultioptionsQuestionType value: " + opt);
 			penalize = opt.equalsIgnoreCase("penalize");
 			partialCorrection = String.valueOf(!penalize);
