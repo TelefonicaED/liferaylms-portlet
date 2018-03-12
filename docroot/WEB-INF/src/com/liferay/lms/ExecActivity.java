@@ -78,22 +78,29 @@ public class ExecActivity extends QuestionsAdmin {
 
 			long[] questionIds = ParamUtil.getLongValues(actionRequest, "question");
 
-
+			long correctValue = 0L;
 			for (long questionId : questionIds) {
 				TestQuestion question = TestQuestionLocalServiceUtil.fetchTestQuestion(questionId);
 				QuestionType qt = new QuestionTypeRegistry().getQuestionType(question.getQuestionType());
 				if(!isPartial){
-					if(qt.correct(actionRequest, questionId)>0) {
-						correctanswers += qt.correct(actionRequest, questionId) ;
+					correctValue = qt.correct(actionRequest, questionId); 
+					if(correctValue>0) {
+						correctanswers += correctValue;
 					}else if(question.isPenalize()){
-						penalizedAnswers++;
+						penalizedAnswers+=correctValue;
 					}
 				}
 				resultadosXML.add(qt.getResults(actionRequest, questionId));								
 			}
 
 			long random = GetterUtil.getLong(LearningActivityLocalServiceUtil.getExtraContentValue(actId,"random"));
-			long score=isPartial ? 0 : correctanswers/((random!=0 && random<questionIds.length)?random:questionIds.length);
+			if(log.isDebugEnabled())
+				log.debug(String.format("\n\tisPartial: %s\n\tcorrectanswers: %s\n\tpenalizedAnswers: %s\n\trandom: %s\n\tquestionIds.length: %s", isPartial, correctanswers, penalizedAnswers, random, questionIds.length));
+			// penalizedAnswers tiene valor negativo, por eso se suma a correctanswers
+			long score=isPartial ? 0 : ((correctanswers+penalizedAnswers)/((random!=0 && random<questionIds.length)?random:questionIds.length));
+			if(log.isDebugEnabled())
+				log.debug("Score: " + score);
+				
 			if(score < 0)score = 0;
 			
 			LearningActivityResult learningActivityResult = LearningActivityResultLocalServiceUtil.getByActIdAndUserId(actId, PortalUtil.getUserId(actionRequest));

@@ -8,6 +8,8 @@ import java.util.Locale;
 
 import javax.portlet.PortletRequest;
 
+import sun.security.util.PendingException;
+
 import com.liferay.lms.model.TestAnswer;
 import com.liferay.lms.model.TestQuestion;
 import com.liferay.lms.service.LearningActivityLocalServiceUtil;
@@ -95,6 +97,8 @@ public class OptionsQuestionType extends BaseQuestionType {
 	}
 	
 	private long correct(long questionId, List<Long> arrayAnswersId){
+		long retVal = 0L;
+		
 		List<TestAnswer> testAnswers = new ArrayList<TestAnswer>();
 		try {
 			testAnswers = TestAnswerLocalServiceUtil.getTestAnswersByQuestionId(questionId);
@@ -116,7 +120,11 @@ public class OptionsQuestionType extends BaseQuestionType {
 		}
 		boolean partialCorrection = false;
 		try{
-			Document document = SAXReaderUtil.read(TestQuestionLocalServiceUtil.fetchTestQuestion(questionId).getExtracontent());
+			String extraContent = TestQuestionLocalServiceUtil.fetchTestQuestion(questionId).getExtracontent();
+			if(log.isDebugEnabled())
+				log.debug("Question " + questionId + " extracontent: " + extraContent);
+				
+			Document document = SAXReaderUtil.read(extraContent);
 			Element rootElement = document.getRootElement();
 			partialCorrection = StringPool.TRUE.equals(rootElement.element("partialcorrection").getData());
 		}catch(NullPointerException e){
@@ -127,18 +135,20 @@ public class OptionsQuestionType extends BaseQuestionType {
 			partialCorrection = false;
 		}
 		if(partialCorrection){
-			return correctAnswered*100/correctAnswers;
+			retVal = correctAnswered*100/correctAnswers;
 		}else{
 			log.debug("correctAnswers: " + correctAnswers);
 			log.debug("correctAnswered: " + correctAnswered);
 			log.debug("incorrectAnswered: " + incorrectAnswered);
 			if(isQuestionCorrect(correctAnswers, correctAnswered, incorrectAnswered)){
-				return CORRECT;
+				retVal = CORRECT;
 			}
 			else{
-				return INCORRECT;
+				retVal = getPenalize() ? -CORRECT : INCORRECT;
 			}
-		}		
+		}
+		
+		return retVal;
 	}
 	
 	
