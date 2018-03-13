@@ -101,43 +101,6 @@ public class GradeBook extends MVCPortlet {
 		ThemeDisplay themeDisplay = (ThemeDisplay) renderRequest.getAttribute(WebKeys.THEME_DISPLAY);
 		
 		UserDisplayTerms userDisplayTerms = new UserDisplayTerms(renderRequest);
-		
-		List<Team> userTeams = null;
-		try {
-			userTeams = TeamLocalServiceUtil.getUserTeams(themeDisplay.getUserId(), themeDisplay.getScopeGroupId());
-		} catch (SystemException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		Team theTeam=null;
-		boolean hasNullTeam=false;
-		try {
-			if(userDisplayTerms.getTeamId()>0 && (TeamLocalServiceUtil.hasUserTeam(themeDisplay.getUserId(), userDisplayTerms.getTeamId())||userTeams.size()==0)){		
-				theTeam=TeamLocalServiceUtil.fetchTeam(userDisplayTerms.getTeamId());	
-			}else{
-				if(userTeams!=null&& userTeams.size()>0){
-					theTeam=userTeams.get(0);	
-					userDisplayTerms.setTeamId(theTeam.getTeamId());
-				}
-			}
-		} catch (SystemException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		if(userTeams == null || userTeams.size()==0){
-			hasNullTeam=true;
-			try {
-				userTeams=TeamLocalServiceUtil.getGroupTeams(themeDisplay.getScopeGroupId());
-			} catch (SystemException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-		
-		renderRequest.setAttribute("hasNullTeam", hasNullTeam);
-		renderRequest.setAttribute("teams", userTeams);
-		renderRequest.setAttribute("theTeam", theTeam);
 			
 		//Buscamos los usuario
 		

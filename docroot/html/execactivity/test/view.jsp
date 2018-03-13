@@ -69,9 +69,6 @@ if(isTablet){%>
 				newScript.src = "/liferaylms-portlet/js/test.js";
 				document.getElementsByTagName("head")[0].appendChild(newScript);
 			}
-		
-		
-		
 		}, 1000);
 		
 			

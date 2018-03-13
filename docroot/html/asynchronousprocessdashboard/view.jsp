@@ -39,61 +39,65 @@
 		</aui:column>
 	</aui:layout>
 </aui:form>
-<liferay-ui:search-container searchContainer="${searchContainer}"
-	iteratorURL="${searchContainer.iteratorURL}">
-	<liferay-ui:search-container-results total="${searchContainer.total }"
-		results="${searchContainer.results }" />
 
-	<liferay-ui:search-container-row
-		className="com.liferay.lms.model.AsynchronousProcessAudit"
-		keyProperty="asynchronousProcessAuditId" modelVar="asynchronousProccessAudit">
-
-	<liferay-ui:search-container-column-text name="status">
-		<c:if test="${asynchronousProccessAudit.status eq 0}">
-			<span class="status-not-started"></span>
-		</c:if>
+<div class="table-overflow table-absolute">
 		
-		<c:if test="${asynchronousProccessAudit.status eq 1}">
-			<span class="status-started"></span>
-		</c:if>
-		<c:if test="${asynchronousProccessAudit.status eq 2}">
-			<span class="status-ok"></span>
-		</c:if>
-		<c:if test="${asynchronousProccessAudit.status eq 3}">
-			<span class="status-error"></span>
-		</c:if>
-	</liferay-ui:search-container-column-text>
-	<liferay-ui:search-container-column-text name="type">
-		${asynchronousProccessAudit.type}
-	</liferay-ui:search-container-column-text>
-	<liferay-ui:search-container-column-text name="className">
-		${asynchronousProccessAudit.className}
-	</liferay-ui:search-container-column-text>
-	<liferay-ui:search-container-column-text name="id">
-		${asynchronousProccessAudit.classPK}
-	</liferay-ui:search-container-column-text>
-	<liferay-ui:search-container-column-text name="startDate">
-		<c:if test="${not empty asynchronousProccessAudit.createDate}">
-			<%=dateFormatDateTime.format(asynchronousProccessAudit.getCreateDate()) %> 
-		</c:if>
-	</liferay-ui:search-container-column-text>
-	<liferay-ui:search-container-column-text name="endDate">
-		<c:if test="${not empty asynchronousProccessAudit.endDate}">
-			<%=dateFormatDateTime.format(asynchronousProccessAudit.getEndDate())%>
-		</c:if>
-	</liferay-ui:search-container-column-text>
+	<liferay-ui:search-container searchContainer="${searchContainer}"
+		iteratorURL="${searchContainer.iteratorURL}">
+		<liferay-ui:search-container-results total="${searchContainer.total }"
+			results="${searchContainer.results }" />
 	
-	<liferay-ui:search-container-column-text name="message">
-		<c:choose>
-			<c:when test="${asynchronousProccessAudit.status eq 0}">
-				<liferay-ui:message key="asynchronous-process-audit.process-not-started"/>
-			</c:when>
-			<c:otherwise>
-				<liferay-ui:message key="${asynchronousProccessAudit.statusMessage}"/>
-			</c:otherwise>
-		</c:choose>
-	</liferay-ui:search-container-column-text>
-		</liferay-ui:search-container-row>
-	<liferay-ui:search-iterator />
-
-</liferay-ui:search-container>
+		<liferay-ui:search-container-row
+			className="com.liferay.lms.model.AsynchronousProcessAudit"
+			keyProperty="asynchronousProcessAuditId" modelVar="asynchronousProccessAudit">
+	
+		<liferay-ui:search-container-column-text name="status">
+			<c:if test="${asynchronousProccessAudit.status eq 0}">
+				<span class="status-not-started"></span>
+			</c:if>
+			
+			<c:if test="${asynchronousProccessAudit.status eq 1}">
+				<span class="status-started"></span>
+			</c:if>
+			<c:if test="${asynchronousProccessAudit.status eq 2}">
+				<span class="status-ok"></span>
+			</c:if>
+			<c:if test="${asynchronousProccessAudit.status eq 3}">
+				<span class="status-error"></span>
+			</c:if>
+		</liferay-ui:search-container-column-text>
+		<liferay-ui:search-container-column-text name="type">
+			${asynchronousProccessAudit.type}
+		</liferay-ui:search-container-column-text>
+		<liferay-ui:search-container-column-text name="className">
+			${asynchronousProccessAudit.className}
+		</liferay-ui:search-container-column-text>
+		<liferay-ui:search-container-column-text name="id">
+			${asynchronousProccessAudit.classPK}
+		</liferay-ui:search-container-column-text>
+		<liferay-ui:search-container-column-text name="startDate">
+			<c:if test="${not empty asynchronousProccessAudit.createDate}">
+				<%=dateFormatDateTime.format(asynchronousProccessAudit.getCreateDate()) %> 
+			</c:if>
+		</liferay-ui:search-container-column-text>
+		<liferay-ui:search-container-column-text name="endDate">
+			<c:if test="${not empty asynchronousProccessAudit.endDate}">
+				<%=dateFormatDateTime.format(asynchronousProccessAudit.getEndDate())%>
+			</c:if>
+		</liferay-ui:search-container-column-text>
+		
+		<liferay-ui:search-container-column-text name="message">
+			<c:choose>
+				<c:when test="${asynchronousProccessAudit.status eq 0}">
+					<liferay-ui:message key="asynchronous-process-audit.process-not-started"/>
+				</c:when>
+				<c:otherwise>
+					<liferay-ui:message key="${asynchronousProccessAudit.statusMessage}"/>
+				</c:otherwise>
+			</c:choose>
+		</liferay-ui:search-container-column-text>
+			</liferay-ui:search-container-row>
+		<liferay-ui:search-iterator />
+	
+	</liferay-ui:search-container>
+</div>

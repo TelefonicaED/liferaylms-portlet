@@ -1,12 +1,19 @@
 package com.liferay.lms.util.displayterms;
 
+import java.util.List;
+
 import javax.portlet.PortletRequest;
 
 import com.liferay.portal.kernel.dao.search.DisplayTerms;
+import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
+import com.liferay.portal.model.Team;
+import com.liferay.portal.service.TeamLocalServiceUtil;
+import com.liferay.portal.theme.ThemeDisplay;
 
 public class UserDisplayTerms extends DisplayTerms{
 
@@ -26,6 +33,8 @@ public class UserDisplayTerms extends DisplayTerms{
 	
 	public UserDisplayTerms(PortletRequest portletRequest) {
 		super(portletRequest);
+		
+		ThemeDisplay themeDisplay = (ThemeDisplay) portletRequest.getAttribute(WebKeys.THEME_DISPLAY);
 
 		String statusString = ParamUtil.getString(portletRequest, STATUS);
 
@@ -38,6 +47,37 @@ public class UserDisplayTerms extends DisplayTerms{
 		lastName = ParamUtil.getString(portletRequest, LAST_NAME);
 		screenName = ParamUtil.getString(portletRequest, SCREEN_NAME);
 		keywords = ParamUtil.getString(portletRequest, KEYWORDS);
+		teamId = ParamUtil.getLong(portletRequest, TEAM);
+		
+		try {
+			userTeams = TeamLocalServiceUtil.getUserTeams(themeDisplay.getUserId(), themeDisplay.getScopeGroupId());
+		} catch (SystemException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		try {
+			if(getTeamId()>0 && (TeamLocalServiceUtil.hasUserTeam(themeDisplay.getUserId(), getTeamId())||userTeams.size()==0)){		
+				team=TeamLocalServiceUtil.fetchTeam(getTeamId());	
+			}else{
+				if(userTeams!=null&& userTeams.size()>0){
+					team=userTeams.get(0);	
+					setTeamId(team.getTeamId());
+				}
+			}
+		} catch (SystemException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		if(userTeams == null || userTeams.size()==0){
+			hasNullTeam=true;
+			try {
+				userTeams=TeamLocalServiceUtil.getGroupTeams(themeDisplay.getScopeGroupId());
+			} catch (SystemException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 	}
 
 	public String getEmailAddress() {
@@ -114,6 +154,30 @@ public class UserDisplayTerms extends DisplayTerms{
 		return KEYWORDS;
 	}
 
+	public boolean isHasNullTeam() {
+		return hasNullTeam;
+	}
+
+	public void setHasNullTeam(boolean hasNullTeam) {
+		this.hasNullTeam = hasNullTeam;
+	}
+	
+	public List<Team> getUserTeams(){
+		return userTeams;
+	}
+	
+	public void setUserTeams(List<Team> userTeams){
+		this.userTeams = userTeams;
+	}
+	
+	public Team getTeam(){
+		return team;
+	}
+	
+	public void setTeam(Team team){
+		this.team = team;
+	}
+
 	protected String emailAddress;
 	protected String firstName;
 	protected String lastName;
@@ -121,4 +185,7 @@ public class UserDisplayTerms extends DisplayTerms{
 	protected String keywords;
 	protected int status;
 	protected long teamId;
+	protected boolean hasNullTeam;
+	protected List<Team> userTeams;
+	protected Team team;
 }
