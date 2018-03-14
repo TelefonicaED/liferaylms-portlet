@@ -6,7 +6,7 @@
 </portlet:renderURL>
 <aui:form action="${searchURL}" method="post" name="search">
 	<aui:layout>
-		<aui:column columnWidth="24">
+		<aui:column columnWidth="20">
 			<aui:select name="className" label="type" cssClass="type-selector">
 				<aui:option label="" value="" selected="${empty className}" />
 				<c:forEach items="${classnames}" var="classNameValue">
@@ -51,7 +51,7 @@
 			className="com.liferay.lms.model.AsynchronousProcessAudit"
 			keyProperty="asynchronousProcessAuditId" modelVar="asynchronousProccessAudit">
 	
-		<liferay-ui:search-container-column-text name="status">
+		<liferay-ui:search-container-column-text name="type">
 			<c:if test="${asynchronousProccessAudit.status eq 0}">
 				<span class="status-not-started"></span>
 			</c:if>
@@ -65,8 +65,6 @@
 			<c:if test="${asynchronousProccessAudit.status eq 3}">
 				<span class="status-error"></span>
 			</c:if>
-		</liferay-ui:search-container-column-text>
-		<liferay-ui:search-container-column-text name="type">
 			${asynchronousProccessAudit.type}
 		</liferay-ui:search-container-column-text>
 		<liferay-ui:search-container-column-text name="className">
