@@ -85,7 +85,7 @@
 	</sql>
 	<sql id="com.liferay.lms.service.persistence.CourseFinder.innerJoinTeam">
 		<![CDATA[
-			INNER JOIN users_teams ON users_teams.userId = u.userId AND users_teams.teamId = ?
+			INNER JOIN users_teams ON users_teams.userId = u.userId AND users_teams.teamId IN ([$TEAMIDS$])
 		]]>
 	</sql>
 </custom-sql>

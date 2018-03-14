@@ -29,15 +29,13 @@ import com.liferay.lms.auditing.AuditConstants;
 import com.liferay.lms.auditing.AuditingLogFactory;
 import com.liferay.lms.learningactivity.LearningActivityType;
 import com.liferay.lms.learningactivity.LearningActivityTypeRegistry;
-import com.liferay.lms.model.Course;
 import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.model.Module;
 import com.liferay.lms.model.impl.ModuleImpl;
-import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityServiceUtil;
 import com.liferay.lms.service.ModuleLocalServiceUtil;
-import com.liferay.portal.kernel.cache.MultiVMPoolUtil;
+import com.liferay.lms.util.LmsConstant;
 import com.liferay.portal.kernel.exception.NestableException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
@@ -65,7 +63,6 @@ import com.liferay.portal.kernel.xml.DocumentException;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceContextFactory;
-import com.liferay.portal.service.ServiceContextThreadLocal;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portlet.documentlibrary.model.DLFileEntry;
@@ -81,14 +78,6 @@ import com.tls.util.liferay.patch.MethodKeyPatched;
  * Portlet implementation class module
  */
 public class modulePortlet extends MVCPortlet {
-
-
-
-	public static String SEPARATOR = "_";
-	public static String IMAGEGALLERY_MAINFOLDER = "icons";
-	public static String IMAGEGALLERY_PORTLETFOLDER = "module";
-	public static String IMAGEGALLERY_MAINFOLDER_DESCRIPTION = "Module Image Uploads";
-	public static String IMAGEGALLERY_PORTLETFOLDER_DESCRIPTION = "";
 
 	private ServiceContext sc;
 
@@ -125,7 +114,6 @@ public class modulePortlet extends MVCPortlet {
 
 	public void doView(RenderRequest renderRequest,
 			RenderResponse renderResponse) throws IOException, PortletException {
-		ThemeDisplay themeDisplay = (ThemeDisplay) renderRequest.getAttribute(WebKeys.THEME_DISPLAY);
 
 		if(renderRequest.getWindowState().equals(LiferayWindowState.POP_UP)){
 			String popUpAction = ParamUtil.getString(renderRequest, "popUpAction");
@@ -440,8 +428,6 @@ public class modulePortlet extends MVCPortlet {
 
 		if (errors.isEmpty()) {
 			try {
-				ServiceContext serviceContext = ServiceContextFactory.getInstance(
-						Module.class.getName(), request);
 				//module.setExpandoBridgeAttributes(serviceContext);
 				Module modcreated = ModuleLocalServiceUtil.addmodule(module);
 
@@ -488,8 +474,6 @@ public class modulePortlet extends MVCPortlet {
 
 		Module module = moduleFromRequest(request);
 		ArrayList<String> errors = moduleValidator.validatemodule(module, request);
-		ThemeDisplay themeDisplay = (ThemeDisplay) request
-				.getAttribute(WebKeys.THEME_DISPLAY);
 
 
 		if (errors.isEmpty()) {
@@ -541,7 +525,6 @@ public class modulePortlet extends MVCPortlet {
 
 		ThemeDisplay themeDisplay = (ThemeDisplay) actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
 		long userIdAction = themeDisplay.getUserId();
-		String portletId = PortalUtil.getPortletId(actionRequest);
 		long moduleId = ParamUtil.getLong(actionRequest, "resourcePrimKey",0);
 
 		if(moduleId>0)
@@ -554,7 +537,6 @@ public class modulePortlet extends MVCPortlet {
 			throws Exception {
 
 		ThemeDisplay themeDisplay = (ThemeDisplay) actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
-		String portletId = PortalUtil.getPortletId(actionRequest);
 		long userIdAction = themeDisplay.getUserId();
 		long moduleId = ParamUtil.getLong(actionRequest, "resourcePrimKey",0);
 
@@ -820,7 +802,6 @@ public class modulePortlet extends MVCPortlet {
 		module.setPrecedence(precedence);
 
 		String fileName = request.getFileName("fileName");
-		String title = fileName;// + " uploaded by " + user.getFullName();
 		File file = request.getFile("fileName");
 
 		long fileMaxSize = 1024 * 1024;
@@ -942,11 +923,11 @@ public class modulePortlet extends MVCPortlet {
 		boolean igPortletFolderFound = false;
 		try {
 			//Get the main folder
-			Folder igMainFolder = DLAppLocalServiceUtil.getFolder(repositoryId,DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,IMAGEGALLERY_MAINFOLDER);
+			Folder igMainFolder = DLAppLocalServiceUtil.getFolder(repositoryId,DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,LmsConstant.IMAGEGALLERY_MAINFOLDER);
 			igMainFolderId = igMainFolder.getFolderId();
 			igMainFolderFound = true;
 			//Get the portlet folder
-			DLFolder igPortletFolder = DLFolderLocalServiceUtil.getFolder(repositoryId,igMainFolderId,IMAGEGALLERY_PORTLETFOLDER);
+			DLFolder igPortletFolder = DLFolderLocalServiceUtil.getFolder(repositoryId,igMainFolderId,LmsConstant.IMAGEGALLERY_PORTLETFOLDER);
 			igPortletFolderId = igPortletFolder.getFolderId();
 			igPortletFolderFound = true;
 		} catch (Exception ex) {
@@ -959,13 +940,13 @@ public class modulePortlet extends MVCPortlet {
 
 		//Create main folder if not exist
 		if(!igMainFolderFound) {
-			Folder newImageMainFolder=DLAppLocalServiceUtil.addFolder(userId, repositoryId, 0, IMAGEGALLERY_MAINFOLDER, IMAGEGALLERY_MAINFOLDER_DESCRIPTION, serviceContext);
+			Folder newImageMainFolder=DLAppLocalServiceUtil.addFolder(userId, repositoryId, 0, LmsConstant.IMAGEGALLERY_MAINFOLDER, LmsConstant.IMAGEGALLERY_MAINFOLDER_DESCRIPTION, serviceContext);
 			igMainFolderId = newImageMainFolder.getFolderId();
 			igMainFolderFound = true;
 		}
 		//Create portlet folder if not exist
 		if(igMainFolderFound && !igPortletFolderFound){
-			Folder newImagePortletFolder = DLAppLocalServiceUtil.addFolder(userId, repositoryId, igMainFolderId, IMAGEGALLERY_PORTLETFOLDER, IMAGEGALLERY_PORTLETFOLDER_DESCRIPTION, serviceContext);	    	
+			Folder newImagePortletFolder = DLAppLocalServiceUtil.addFolder(userId, repositoryId, igMainFolderId, LmsConstant.IMAGEGALLERY_PORTLETFOLDER, LmsConstant.IMAGEGALLERY_PORTLETFOLDER_DESCRIPTION, serviceContext);	    	
 			igPortletFolderFound = true;
 			igPortletFolderId = newImagePortletFolder.getFolderId();
 		}
@@ -973,7 +954,7 @@ public class modulePortlet extends MVCPortlet {
 		if(igPortletFolderFound){
 			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
 			Date date = new Date();
-			String igRecordFolderName=dateFormat.format(date)+SEPARATOR+userId;
+			String igRecordFolderName=dateFormat.format(date)+LmsConstant.SEPARATOR+userId;
 			Folder newImageRecordFolder = DLAppLocalServiceUtil.addFolder(userId,repositoryId, igPortletFolderId,igRecordFolderName, igRecordFolderName, serviceContext);
 			igRecordFolderId = newImageRecordFolder.getFolderId();
 		}

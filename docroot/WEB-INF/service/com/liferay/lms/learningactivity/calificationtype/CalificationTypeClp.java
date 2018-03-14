@@ -325,6 +325,7 @@ public class CalificationTypeClp implements CalificationType {
 			returnObj = clp.invoke("getMinValue",	new Object[] {});
 		}
 		catch (Throwable t) {
+			t.printStackTrace();
 			t = ClpSerializer.translateThrowable(t);
 
 			if (t instanceof RuntimeException) {

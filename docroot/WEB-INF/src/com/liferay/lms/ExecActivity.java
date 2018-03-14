@@ -94,13 +94,14 @@ public class ExecActivity extends QuestionsAdmin {
 			}
 
 			long random = GetterUtil.getLong(LearningActivityLocalServiceUtil.getExtraContentValue(actId,"random"));
+
 			if(log.isDebugEnabled())
 				log.debug(String.format("\n\tisPartial: %s\n\tcorrectanswers: %s\n\tpenalizedAnswers: %s\n\trandom: %s\n\tquestionIds.length: %s", isPartial, correctanswers, penalizedAnswers, random, questionIds.length));
 			// penalizedAnswers tiene valor negativo, por eso se suma a correctanswers
 			long score=isPartial ? 0 : ((correctanswers+penalizedAnswers)/((random!=0 && random<questionIds.length)?random:questionIds.length));
 			if(log.isDebugEnabled())
 				log.debug("Score: " + score);
-				
+
 			if(score < 0)score = 0;
 			
 			LearningActivityResult learningActivityResult = LearningActivityResultLocalServiceUtil.getByActIdAndUserId(actId, PortalUtil.getUserId(actionRequest));

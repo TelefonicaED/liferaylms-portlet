@@ -733,7 +733,7 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 	}
 	
 
-	public List<User> findStudents(long courseId, long companyId, String screenName, String firstName, String lastName, String emailAddress, int status, long teamId,boolean andOperator, 
+	public List<User> findStudents(long courseId, long companyId, String screenName, String firstName, String lastName, String emailAddress, int status, long[] teamIds,boolean andOperator, 
 			int start, int end,OrderByComparator obc){
 		Session session = null;
 		boolean whereClause = false;
@@ -753,8 +753,16 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			session = openSessionLiferay();
 			String sql = CustomSQLUtil.get(FIND_STUDENTS);
 			
-			if(teamId > 0){
-				sql = sql.replace("[$JOINTEAM$]", CustomSQLUtil.get(INNER_JOIN_TEAM));
+			if(teamIds != null && teamIds.length > 0){
+				sql = StringUtil.replace(sql, "[$JOINTEAM$]", CustomSQLUtil.get(INNER_JOIN_TEAM));
+				String teams = "";
+				for(int i = 0; i < teamIds.length;i++){
+					teams += teamIds[i] + ",";
+				}
+				if(teams.length() > 0){
+					teams = teams.substring(0, teams.length()-1);
+				}
+				sql = StringUtil.replace(sql, "[$TEAMIDS$]", teams);
 			}else{
 				sql = sql.replace("[$JOINTEAM$]", "");
 			}
@@ -824,9 +832,6 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			QueryPos qPos = QueryPos.getInstance(q);
 			qPos.add(teacherRoleId);
 			qPos.add(editorRoleId);
-			if(teamId > 0){
-				qPos.add(teamId);
-			}
 			qPos.add(courseId);
 
 			qPos.add(status);
@@ -871,7 +876,7 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 	    return new ArrayList<User>();
 	}
 	
-	public int countStudents(long courseId, long companyId, String screenName, String firstName, String lastName, String emailAddress, int status, long teamId,
+	public int countStudents(long courseId, long companyId, String screenName, String firstName, String lastName, String emailAddress, int status, long[] teamIds,
 			boolean andOperator){
 		Session session = null;
 		boolean whereClause = false;
@@ -888,8 +893,16 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			
 			String sql = CustomSQLUtil.get(COUNT_STUDENTS);
 			
-			if(teamId > 0){
-				sql = sql.replace("[$JOINTEAM$]", CustomSQLUtil.get(INNER_JOIN_TEAM));
+			if(teamIds != null && teamIds.length > 0){
+				sql = StringUtil.replace(sql, "[$JOINTEAM$]", CustomSQLUtil.get(INNER_JOIN_TEAM));
+				String teams = "";
+				for(int i = 0; i < teamIds.length;i++){
+					teams += teamIds[i] + ",";
+				}
+				if(teams.length() > 0){
+					teams = teams.substring(0, teams.length()-1);
+				}
+				sql = StringUtil.replace(sql, "[$TEAMIDS$]", teams);
 			}else{
 				sql = sql.replace("[$JOINTEAM$]", "");
 			}
@@ -946,9 +959,6 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			QueryPos qPos = QueryPos.getInstance(q);
 			qPos.add(teacherRoleId);
 			qPos.add(editorRoleId);
-			if(teamId > 0){
-				qPos.add(teamId);
-			}
 			qPos.add(courseId);
 			qPos.add(status);
 			qPos.add(status);

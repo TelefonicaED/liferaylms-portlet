@@ -94,6 +94,7 @@ public class EvaluationAvgPortlet extends MVCPortlet implements MessageListener{
 	@Override
 	public void receive(Message message) throws MessageListenerException {
 		long courseId = message.getLong("courseId");
+		
 		if(courseId!=0){
 			try {
 				Course course = CourseLocalServiceUtil.getCourse(courseId);
@@ -104,8 +105,11 @@ public class EvaluationAvgPortlet extends MVCPortlet implements MessageListener{
 	
 			} catch (NestableException e) {
 				_log.error("Error during average evaluation: "+courseId, e);
+				
 			}
 		}
+		
+		
 		
 	}
 	

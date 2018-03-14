@@ -10,11 +10,13 @@ import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
 import javax.portlet.ProcessAction;
 
+import com.liferay.lms.model.AsynchronousProcessAudit;
 import com.liferay.lms.model.Course;
 import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.model.ModuleResult;
 import com.liferay.lms.model.P2pActivity;
 import com.liferay.lms.portlet.p2p.P2PActivityPortlet;
+import com.liferay.lms.service.AsynchronousProcessAuditLocalServiceUtil;
 import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityLocalServiceUtil;
 import com.liferay.lms.service.ModuleResultLocalServiceUtil;
@@ -481,12 +483,12 @@ public class PortalAdmin extends MVCPortlet {
 	public void updateModulePassedDate (ActionRequest request, ActionResponse response) throws Exception {
 
 		boolean updateBD = ParamUtil.getBoolean(request, "updateBD", false);
-		
+		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(WebKeys.THEME_DISPLAY);
 		Message message=new Message();
-		
+		AsynchronousProcessAudit process = AsynchronousProcessAuditLocalServiceUtil.addAsynchronousProcessAudit(themeDisplay.getCompanyId(), themeDisplay.getUserId(), null, "liferay/lms/portalAdmin");
+		message.put("asynchronousProcessAuditId", process.getAsynchronousProcessAuditId());
 		message.put("updateBD",updateBD);
 		message.put("action","updateModulePassedDate");
-		
 		MessageBusUtil.sendMessage("liferay/lms/portalAdmin", message);
 		
 	}

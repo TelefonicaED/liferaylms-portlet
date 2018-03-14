@@ -54,8 +54,10 @@
 		
 		player.addEventListener('play', function () {
 			finished = false;
+			if(plays > 0){
+				$('[id*^=<portlet:namespace/>question_]').addClass("aui-helper-hidden");
+			}
 			plays++;
-			$('[id*^=<portlet:namespace/>question_]').addClass("aui-helper-hidden");
 		});	
 			
 		player.addEventListener('ended',function() {
@@ -83,7 +85,10 @@
 		var questions = [];
 		<c:forEach items="${timeQuestions }" var="question">
 			var question = ["${question.key}","${question.value}"];
-			questions.push(question);
+			if(parseInt("${question.value}") >= currentTime){
+				questions.push(question);
+			}
+			
 		</c:forEach>
 		
 		questions.sort(function(a, b){return a[1]-b[1]});

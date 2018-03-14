@@ -1,12 +1,10 @@
-package com.tls.lms.util;
+package com.liferay.lms.util;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import javax.portlet.PortletRequest;
 
-import com.liferay.lms.modulePortlet;
-import com.liferay.lms.moduleUpload;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.repository.model.Folder;
@@ -42,7 +40,7 @@ public class DLFolderUtil {
 		
 		//Buscamos la carpeta por defecto
 		try {
-			dlFolderMain = DLFolderLocalServiceUtil.getFolder(groupId,DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,modulePortlet.IMAGEGALLERY_MAINFOLDER);
+			dlFolderMain = DLFolderLocalServiceUtil.getFolder(groupId,DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,LmsConstant.IMAGEGALLERY_MAINFOLDER);
 		} catch (PortalException e) {
 			// TODO Auto-generated catch block
 		} catch (SystemException e) {
@@ -50,11 +48,11 @@ public class DLFolderUtil {
 		}
 		
 		if(dlFolderMain == null){
-			dlFolderMain = DLFolderLocalServiceUtil.addFolder(userId, groupId, groupId, false, DLFolderConstants.DEFAULT_PARENT_FOLDER_ID, modulePortlet.IMAGEGALLERY_MAINFOLDER, modulePortlet.IMAGEGALLERY_MAINFOLDER_DESCRIPTION, serviceContext);
+			dlFolderMain = DLFolderLocalServiceUtil.addFolder(userId, groupId, groupId, false, DLFolderConstants.DEFAULT_PARENT_FOLDER_ID, LmsConstant.IMAGEGALLERY_MAINFOLDER, LmsConstant.IMAGEGALLERY_MAINFOLDER_DESCRIPTION, serviceContext);
 		}
 		
 		try {
-			dlFolderModule = DLFolderLocalServiceUtil.getFolder(groupId,dlFolderMain.getFolderId(),modulePortlet.IMAGEGALLERY_PORTLETFOLDER);
+			dlFolderModule = DLFolderLocalServiceUtil.getFolder(groupId,dlFolderMain.getFolderId(),LmsConstant.IMAGEGALLERY_PORTLETFOLDER);
 		} catch (PortalException e) {
 			// TODO Auto-generated catch block
 		} catch (SystemException e) {
@@ -62,13 +60,13 @@ public class DLFolderUtil {
 		}
 		
 		if(dlFolderModule == null){
-			dlFolderModule = DLFolderLocalServiceUtil.addFolder(userId, groupId, groupId, false, dlFolderMain.getFolderId(), modulePortlet.IMAGEGALLERY_PORTLETFOLDER, modulePortlet.IMAGEGALLERY_PORTLETFOLDER_DESCRIPTION, serviceContext);
+			dlFolderModule = DLFolderLocalServiceUtil.addFolder(userId, groupId, groupId, false, dlFolderMain.getFolderId(), LmsConstant.IMAGEGALLERY_PORTLETFOLDER, LmsConstant.IMAGEGALLERY_PORTLETFOLDER_DESCRIPTION, serviceContext);
 		}
 		
 
     	SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
     	Date date = new Date();
-    	String igRecordFolderName=dateFormat.format(date)+modulePortlet.SEPARATOR+userId;
+    	String igRecordFolderName=dateFormat.format(date)+LmsConstant.SEPARATOR+userId;
     	DLFolder dlFolderImage = null;
     	try{
     		dlFolderImage = DLFolderLocalServiceUtil.addFolder(userId,groupId, groupId, false, dlFolderModule.getFolderId(),igRecordFolderName, igRecordFolderName, serviceContext);
@@ -89,7 +87,7 @@ public class DLFolderUtil {
 	 * @throws PortalException
 	 * @throws SystemException
 	 */
-	public static DLFolder createDLFoldersForLearningActivity(Long userId, Long groupId, ServiceContext serviceContext) throws PortalException, SystemException{
+	public static DLFolder createDLFoldersForLearningActivity(long userId, long groupId, ServiceContext serviceContext) throws PortalException, SystemException{
 		
 		DLFolder mainFolder = null;
 
@@ -113,11 +111,28 @@ public class DLFolderUtil {
         return mainFolder;
 	}
 	
-	public static long createDLFoldersP2P(Long userId,Long repositoryId,PortletRequest portletRequest) throws PortalException, SystemException{
+	public static long createDLFoldersP2P(long userId,long repositoryId,PortletRequest portletRequest) throws PortalException, SystemException{
+
+		long dlRecordFolderId = 0;
+		
+		long dlPortletFolderId = createDLFolderModule(userId,repositoryId,portletRequest);
+        //Create this record folder
+        if(dlPortletFolderId > 0){
+        	SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+        	Date date = new Date();
+        	String dlRecordFolderName = dateFormat.format(date)+LmsConstant.SEPARATOR+userId;
+        	ServiceContext serviceContext= ServiceContextFactory.getInstance( DLFolder.class.getName(), portletRequest);
+        	Folder newDocumentRecordFolder = DLAppLocalServiceUtil.addFolder(userId, repositoryId, dlPortletFolderId, dlRecordFolderName, dlRecordFolderName, serviceContext);
+        	dlRecordFolderId = newDocumentRecordFolder.getFolderId();
+        }
+        return dlRecordFolderId;
+	}
+	
+	public static long createDLFolderModule(long userId,long repositoryId,PortletRequest portletRequest) throws PortalException, SystemException{
 		//Variables for folder ids
-		Long dlMainFolderId = 0L;
-		Long dlPortletFolderId = 0L;
-		Long dlRecordFolderId = 0L;
+		long dlMainFolderId = 0;
+		long dlPortletFolderId = 0;
+		
 		//Search for folder in Document Library
         boolean dlMainFolderFound = false;
         boolean dlPortletFolderFound = false;
@@ -126,11 +141,11 @@ public class DLFolderUtil {
         //Get main folder
         try {
         	//Get main folder
-        	dlFolderMain = DLAppLocalServiceUtil.getFolder(repositoryId,DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,moduleUpload.DOCUMENTLIBRARY_MAINFOLDER);
+        	dlFolderMain = DLAppLocalServiceUtil.getFolder(repositoryId,DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,LmsConstant.DOCUMENTLIBRARY_MAINFOLDER);
         	dlMainFolderId = dlFolderMain.getFolderId();
         	dlMainFolderFound = true;
         	//Get portlet folder
-        	Folder dlFolderPortlet = DLAppLocalServiceUtil.getFolder(repositoryId,dlMainFolderId,moduleUpload.DOCUMENTLIBRARY_PORTLETFOLDER);
+        	Folder dlFolderPortlet = DLAppLocalServiceUtil.getFolder(repositoryId,dlMainFolderId,LmsConstant.DOCUMENTLIBRARY_PORTLETFOLDER);
         	dlPortletFolderId = dlFolderPortlet.getFolderId();
         	dlPortletFolderFound = true;
         } catch (Exception ex){
@@ -143,26 +158,18 @@ public class DLFolderUtil {
         
         //Create main folder if not exist
         if(!dlMainFolderFound || dlFolderMain==null){
-        	Folder newDocumentMainFolder = DLAppLocalServiceUtil.addFolder(userId, repositoryId, DLFolderConstants.DEFAULT_PARENT_FOLDER_ID, moduleUpload.DOCUMENTLIBRARY_MAINFOLDER, moduleUpload.DOCUMENTLIBRARY_MAINFOLDER_DESCRIPTION, serviceContext);
+        	Folder newDocumentMainFolder = DLAppLocalServiceUtil.addFolder(userId, repositoryId, DLFolderConstants.DEFAULT_PARENT_FOLDER_ID, LmsConstant.DOCUMENTLIBRARY_MAINFOLDER, LmsConstant.DOCUMENTLIBRARY_MAINFOLDER_DESCRIPTION, serviceContext);
         	dlMainFolderId = newDocumentMainFolder.getFolderId();
         	dlMainFolderFound = true;
         }
         //Create portlet folder if not exist
         if(dlMainFolderFound && !dlPortletFolderFound){
-        	Folder newDocumentPortletFolder = DLAppLocalServiceUtil.addFolder(userId, repositoryId, dlMainFolderId , moduleUpload.DOCUMENTLIBRARY_PORTLETFOLDER, moduleUpload.DOCUMENTLIBRARY_PORTLETFOLDER_DESCRIPTION, serviceContext);
+        	Folder newDocumentPortletFolder = DLAppLocalServiceUtil.addFolder(userId, repositoryId, dlMainFolderId , LmsConstant.DOCUMENTLIBRARY_PORTLETFOLDER, LmsConstant.DOCUMENTLIBRARY_PORTLETFOLDER_DESCRIPTION, serviceContext);
         	dlPortletFolderFound = true;
             dlPortletFolderId = newDocumentPortletFolder.getFolderId();
         }
-
-        //Create this record folder
-        if(dlPortletFolderFound){
-        	SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
-        	Date date = new Date();
-        	String dlRecordFolderName = dateFormat.format(date)+moduleUpload.SEPARATOR+userId;
-        	Folder newDocumentRecordFolder = DLAppLocalServiceUtil.addFolder(userId, repositoryId, dlPortletFolderId, dlRecordFolderName, dlRecordFolderName, serviceContext);
-        	dlRecordFolderId = newDocumentRecordFolder.getFolderId();
-        }
-        return dlRecordFolderId;
+        
+        return dlPortletFolderId;
 	}
 
 }

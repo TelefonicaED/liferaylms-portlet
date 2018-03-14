@@ -1,10 +1,12 @@
 package com.liferay.lms.lar;
 
 import java.io.InputStream;
+
 import org.apache.commons.io.IOUtils;
 
 import com.liferay.lms.model.Module;
 import com.liferay.lms.service.ModuleLocalServiceUtil;
+import com.liferay.lms.util.DLFolderUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.lar.PortletDataContext;
@@ -18,7 +20,6 @@ import com.liferay.portal.service.ServiceContext;
 import com.liferay.portlet.documentlibrary.DuplicateFileException;
 import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
 import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
-import com.tls.lms.util.DLFolderUtil;
 
 public class ModuleImport {
 	

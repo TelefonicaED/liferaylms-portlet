@@ -46,6 +46,7 @@ import com.liferay.portal.kernel.dao.orm.ProjectionFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.User;
 import com.liferay.portal.security.permission.ActionKeys;
@@ -548,6 +549,16 @@ public class CourseResultLocalServiceImpl
 					}
 				}
 			}
+		}
+	}
+	
+	public List<CourseResult> getCourseResultByCourseId(long courseId, int start, int end, OrderByComparator orderByComparator){
+		try {
+			return courseResultPersistence.findByCourseId(courseId, start, end, orderByComparator);
+		} catch (SystemException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
 		}
 	}
 }

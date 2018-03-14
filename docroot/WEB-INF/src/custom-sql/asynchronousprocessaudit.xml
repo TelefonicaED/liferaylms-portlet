@@ -1,0 +1,38 @@
+<custom-sql>
+<!-- Query para la administración de cursos cuando eres administrador-->
+
+	<sql id="com.liferay.lms.service.persistence.AsynchronousProcessAuditFinder.getDistinctTypes">
+		<![CDATA[   			
+			SELECT asy.type_
+			FROM lms_asynchronousprocessaudit asy
+			WHERE asy.companyId = ?
+			GROUP BY asy.type_
+		]]>
+	</sql>
+	
+	<sql id="com.liferay.lms.service.persistence.AsynchronousProcessAuditFinder.getByCompanyIdClassNameAndDate">
+		<![CDATA[   			
+			SELECT *
+			FROM lms_asynchronousprocessaudit asy
+			WHERE asy.companyId = ?
+			AND asy.type_ = ? 
+			AND asy.createDate > '[$STARTDATE$]' 
+			AND asy.createDate <= '[$ENDDATE$]'
+			AND 1 = 1
+			ORDER BY type_ DESC, asy.createDate DESC
+			LIMIT [$START$], [$END$]
+		]]>
+	</sql>
+	
+		<sql id="com.liferay.lms.service.persistence.AsynchronousProcessAuditFinder.countByCompanyIdClassNameAndDate">
+		<![CDATA[   			
+			SELECT COUNT(*) as COUNT_VALUE
+			FROM lms_asynchronousprocessaudit asy
+			WHERE asy.companyId = ? 
+			AND asy.type_ = ? 
+			AND asy.createDate > '[$STARTDATE$]' 
+			AND asy.createDate <= '[$ENDDATE$]'
+			AND 1 = 1
+		]]>
+	</sql>
+</custom-sql>

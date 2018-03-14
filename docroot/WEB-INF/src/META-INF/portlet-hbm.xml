@@ -3,6 +3,7 @@
 
 <hibernate-mapping default-lazy="false" auto-import="false">
 	<import class="com.liferay.lms.model.ActivityTriesDeleted" />
+	<import class="com.liferay.lms.model.AsynchronousProcessAudit" />
 	<import class="com.liferay.lms.model.AuditEntry" />
 	<import class="com.liferay.lms.model.AuditLogger" />
 	<import class="com.liferay.lms.model.CheckP2pMailing" />
@@ -35,6 +36,21 @@
 		<property name="startDate" type="org.hibernate.type.TimestampType" />
 		<property name="endDate" type="org.hibernate.type.TimestampType" />
 		<property name="status" type="com.liferay.portal.dao.orm.hibernate.IntegerType" />
+	</class>
+	<class name="com.liferay.lms.model.impl.AsynchronousProcessAuditImpl" table="Lms_AsynchronousProcessAudit">
+		<cache usage="read-write" />
+		<id name="asynchronousProcessAuditId" type="long">
+			<generator class="assigned" />
+		</id>
+		<property name="companyId" type="com.liferay.portal.dao.orm.hibernate.LongType" />
+		<property name="type" type="com.liferay.portal.dao.orm.hibernate.StringType" column="type_" />
+		<property name="classNameId" type="com.liferay.portal.dao.orm.hibernate.LongType" />
+		<property name="classPK" type="com.liferay.portal.dao.orm.hibernate.LongType" />
+		<property name="userId" type="com.liferay.portal.dao.orm.hibernate.LongType" />
+		<property name="createDate" type="org.hibernate.type.TimestampType" />
+		<property name="endDate" type="org.hibernate.type.TimestampType" />
+		<property name="status" type="com.liferay.portal.dao.orm.hibernate.IntegerType" />
+		<property name="statusMessage" type="com.liferay.portal.dao.orm.hibernate.StringType" />
 	</class>
 	<class name="com.liferay.lms.model.impl.AuditEntryImpl" table="Lms_AuditEntry">
 		<cache usage="read-write" />

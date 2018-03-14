@@ -223,7 +223,7 @@ if(teamAssignationAllowed){
 %>
 	<aui:field-wrapper name="p2ptaskactivity.edit.select-assignation-type" >
 		<aui:input inlineLabel="right" name="assignationType" type="radio" value="course" label="p2ptaskactivity.edit.course-assignation" checked="<%= !assignationType %>" />
-		<aui:input inlineLabel="left"  name="assignationType" type="radio" value="team" label="p2ptaskactivity.edit.team-assignation"  checked="<%= assignationType %>"/>
+		<aui:input inlineLabel="right"  name="assignationType" type="radio" value="team" label="p2ptaskactivity.edit.team-assignation"  checked="<%= assignationType %>"/>
 	</aui:field-wrapper>
 <%
 }
