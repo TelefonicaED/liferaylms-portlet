@@ -1,3 +1,4 @@
+<%@page import="java.text.SimpleDateFormat"%>
 <%@page import="com.liferay.portal.model.Team"%>
 <%@page import="com.liferay.portal.service.TeamLocalServiceUtil"%>
 <%@page import="com.liferay.lms.service.ScheduleLocalServiceUtil"%>
@@ -350,25 +351,33 @@
 %>
 						<td class="date">
 <%
+SimpleDateFormat sdf = new SimpleDateFormat("dd MMM HH:mm",themeDisplay.getLocale());
 							if(startDate!=null &&today.before(startDate)){
 								if(showModuleStartDate){
+																		
+									Long dateOffSet  = startDate.getTime()  + themeDisplay.getTimeZone().getRawOffset(); 					
 %>
 									<liferay-ui:message key="fecha-inicio"/><br />
-									<%=	dateFormatDate.format(startDate)%>
+									<%=	sdf.format(new Date(dateOffSet))%>
+									<%--=	dateFormatDate.format(new Date(dateOffSet))--%>
 <%
 								}
 							}else{
 								if(endDate!=null&&today.before(endDate)){
 									if(showModuleStartDate){
+										Long dateOffSet  = startDate.getTime()  + themeDisplay.getTimeZone().getRawOffset();
 %>
 										<liferay-ui:message key="fecha-inicio"/><br />
-										<%=	dateFormatDateTime.format(startDate)%><br />
+										<%=	sdf.format(new Date(dateOffSet))%>
+										<%--=	dateFormatDateTime.format(new Date(dateOffSet))--%><br />
 <%
 									}
 									if(showModuleEndDate){
+										Long dateOffSet  = endDate.getTime()  + themeDisplay.getTimeZone().getRawOffset();
 %>
 										<liferay-ui:message key="fecha-fin"/><br />
-										<%=	dateFormatDateTime.format(endDate)%>
+										<%=	sdf.format(new Date(dateOffSet))%>
+										<%--=	dateFormatDateTime.format(new Date(dateOffSet))--%>
 <%
 									}
 								}
