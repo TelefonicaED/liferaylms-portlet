@@ -240,7 +240,7 @@ function validate(){
 	 <liferay-ui:error key="error-file-size" message="error-file-size" />
 	 
 	<c:if test="${showicon}">
-		<aui:field-wrapper label="icon">
+		<div style="margin: -0.5em;">
 			<%if(module.getIcon()>0){
 				try {
 					FileEntry fileEntry = DLAppLocalServiceUtil.getFileEntry(module.getIcon());
@@ -252,12 +252,14 @@ function validate(){
 				<%}catch(Exception e){}
 	        }%>
 	        <aui:column>
-				<aui:input inlineLabel="left" inlineField="true" name="fileName" label="" id="fileName" type="file" value="" />
+				<aui:input name="fileName" label="icon" id="fileName" type="file" value="" >
+					<aui:validator name="acceptFiles">'jpg, jpeg, png, gif'</aui:validator>
+				</aui:input>
 				<c:if test="<%=module.getIcon()>0 %>">
 					<aui:input type="checkbox" label="delete" name="deleteAdditionalFile" value="false" inlineLabel="left"/>
 				</c:if>
 			</aui:column>
-		</aui:field-wrapper>
+		</div>
 	</c:if>
 	
 	<liferay-ui:error key="module-icon-required" message="module-icon-required" />
