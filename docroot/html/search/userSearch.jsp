@@ -13,7 +13,7 @@
 				<aui:option label="" value="0"/>
 			</c:if>
 			<c:forEach items="${displayTerms.userTeams}" var="team">
-				<aui:option  value="${displayTerms.team.teamId}" label="${displayTerms.team.name}" selected="${displayTerms.team.teamId == displayTerms.teamId}"></aui:option>
+				<aui:option  value="${team.teamId}" label="${team.name}" selected="${team.teamId == displayTerms.teamId}"></aui:option>
 			</c:forEach>
 		</aui:select>
 	</div>
