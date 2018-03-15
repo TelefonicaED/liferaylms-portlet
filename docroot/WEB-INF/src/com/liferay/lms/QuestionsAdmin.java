@@ -173,14 +173,30 @@ public class QuestionsAdmin extends MVCPortlet{
 		long actid = ParamUtil.getLong(actionRequest, "resId");
 		long questionType = ParamUtil.getLong(actionRequest, "typeId", -1);
 		String questionText = ParamUtil.get(actionRequest, "text", "");
-		boolean penalize = ParamUtil.getBoolean(actionRequest, "penalize");
+		
+		boolean penalize = false;
+		String partialCorrection = StringPool.BLANK;
+		
+		if(questionType==1)
+		{
+			//MultioptionsQuestionType
+			String opt = ParamUtil.get(actionRequest, "multiplecorrection", StringPool.BLANK);
+			log.debug("MultioptionsQuestionType value: " + opt);
+			penalize = opt.equalsIgnoreCase("penalize");
+			partialCorrection = String.valueOf(!penalize);
+		}
+		else{
+			penalize = ParamUtil.getBoolean(actionRequest, "penalize");
+			partialCorrection = ParamUtil.getString(actionRequest, "partialcorrection", "false");
+		}
+		
+		
 		
 		log.debug("***questionId:"+questionId);
 		log.debug("***penalize:"+penalize);
 		
 		String backUrl = ParamUtil.get(actionRequest, "backUrl", "");
 		String formatType = ParamUtil.getString(actionRequest, "formattype", PropsUtil.get("lms.question.formattype.normal")); 
-		String partialCorrection = ParamUtil.getString(actionRequest, "partialcorrection", "false");
 		Document document = null;
 		Element rootElement = null;
 		

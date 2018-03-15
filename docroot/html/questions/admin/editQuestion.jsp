@@ -109,23 +109,8 @@
 	<%
 			}
 		}
-		if(qt.isPartialCorrectAvailable()){
-			boolean partialCorrection = false;
-			try{
-				Document document = SAXReaderUtil.read(question.getExtracontent());
-				Element rootElement = document.getRootElement();
-				partialCorrection = StringPool.TRUE.equals(rootElement.element("partialcorrection").getData());
-			}catch(NullPointerException e){
-				partialCorrection = false;
-			}catch(DocumentException e){
-				partialCorrection = false;
-			}
 	%>
-			<aui:input type="checkbox" label="execactivity.editquestions.partialcorrection" helpMessage="execactivity.editquestions.partialcorrection.helpmessage" name="partialcorrection" 
-					checked="<%=partialCorrection %>" last="true" inlineLabel="true" inlineField="true"/>
-	<%
-		}
-	%>
+
 	<aui:field-wrapper label="">
 		<div id="<portlet:namespace />questionError" class="aui-helper-hidden portlet-msg-error">
 			<liferay-ui:message key="execactivity.editquestions.newquestion.error.text.required"/>
@@ -153,8 +138,28 @@
 			    </script>
 	    </aui:field-wrapper>
 	    
-	    <c:if test="<%=qt.getPenalize() %>">
-	   		<aui:input name="penalize" label="question.penalize" type="checkbox" checked="<%=question!=null?question.isPenalize():false%>"/>
+	    <%
+		if(qt.isPartialCorrectAvailable()){
+			boolean partialCorrection = false;
+			try{
+				Document document = SAXReaderUtil.read(question.getExtracontent());
+				Element rootElement = document.getRootElement();
+				partialCorrection = StringPool.TRUE.equals(rootElement.element("partialcorrection").getData());
+			}catch(NullPointerException e){
+				partialCorrection = false;
+			}catch(DocumentException e){
+				partialCorrection = false;
+			}
+		%>
+				<aui:input type="radio" label="execactivity.editquestions.partialcorrection" helpMessage="execactivity.editquestions.partialcorrection.helpmessage" name="multiplecorrection" 
+						checked="<%=partialCorrection %>" last="true" inlineLabel="true" inlineField="true" value="partialcorrection"/>
+				<aui:input name="multiplecorrection" label="question.penalize" type="radio" checked="<%=question!=null?question.isPenalize():false%>" value="penalize"/>
+		<%
+			}
+		%>
+	    
+	    <c:if test="<%=qt.getPenalize() && !qt.isPartialCorrectAvailable()%>">
+		    	<aui:input name="penalize" label="question.penalize" type="checkbox" checked="<%=question!=null?question.isPenalize():false%>"/>
 	    </c:if>
 	    
 	</aui:field-wrapper>

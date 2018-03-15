@@ -701,7 +701,7 @@ if(isTablet){%>
 			
 							if (questions.size() > 0){
 								if (questionsPerPage == 0) { %>
-								<aui:button type="button" value="submit" onClick='<%=renderResponse.getNamespace() + "submitForm(event, null);" %>' ></aui:button>
+								<aui:button type="button" value="send" onClick='<%=renderResponse.getNamespace() + "submitForm(event, null);" %>' ></aui:button>
 							<% } else { %>
 							
 							<div id="testactivity-navigator" class="taglib-page-iterator">
@@ -728,7 +728,7 @@ if(isTablet){%>
 							<% if (showNext) { %>
 								<aui:button type="button" value="execactivity.editActivity.questionsPerPage.next" onClick='<%=renderResponse.getNamespace() + "submitForm(event, \'forward\');" %>' ></aui:button>
 							<% } else { %>
-								<aui:button type="button" value="submit" onClick='<%=renderResponse.getNamespace() + "submitForm(event, null);" %>' ></aui:button>
+								<aui:button type="button" value="send" onClick='<%=renderResponse.getNamespace() + "submitForm(event, null);" %>' ></aui:button>
 							<% } %>
 							</div>
 							</div>
@@ -763,7 +763,7 @@ if(isTablet){%>
 						<liferay-ui:message key="execActivity.bad.password" />
 					</div>
 					<% } %>
-					<aui:button type="submit" />
+					<aui:button type="send" />
 					
 				</aui:form>
 			<%	
