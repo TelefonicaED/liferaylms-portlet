@@ -509,7 +509,7 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			String key = entry.getKey();
 
 			Object value = entry.getValue();
-			
+						
 			log.debug("setJoin: " + key + " - " + value);
 			
 			if(key.equals(CourseParams.PARAM_CUSTOM_ATTRIBUTE)){
@@ -544,7 +544,7 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			}
 			else if(!key.equals(CourseParams.PARAM_CATEGORIES) && !key.equals(CourseParams.PARAM_TAGS) &&
 					!key.equals(CourseParams.PARAM_OR_TAGS) && !key.equals(CourseParams.PARAM_OR_CATEGORIES) &&
-					!key.equals(CourseParams.PARAM_PERMISSIONS_ADMIN)){
+					!key.equals(CourseParams.PARAM_PERMISSIONS_ADMIN) && !key.equals(CourseParams.PARAM_SEARCH_PARENT_AND_CHILD_COURSES)){
 				if (value instanceof Long) {
 					Long valueLong = (Long)value;
 	
