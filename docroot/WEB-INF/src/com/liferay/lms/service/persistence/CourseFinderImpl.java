@@ -438,10 +438,10 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 
 		if (key.equals(CourseParams.PARAM_TEMPLATES)) {
 			join = CustomSQLUtil.get(JOIN_BY_TEMPLATES);
-			if(value instanceof Long){
+			if(value instanceof String){
 				join = StringUtil.replace(join, "IN ([$TEMPLATES$])", "= " + value);
-			}else if(value instanceof long[]){
-				long[] ids = (long[])value;
+			}else if(value instanceof String[]){
+				String[] ids = (String[])value;
 				String idsPos = StringPool.BLANK;
 				for(int i = 0; i < ids.length; i++){
 					idsPos += "?,";
@@ -520,7 +520,7 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			String key = entry.getKey();
 
 			Object value = entry.getValue();
-			
+						
 			log.debug("setJoin: " + key + " - " + value);
 			
 			if(key.equals(CourseParams.PARAM_CUSTOM_ATTRIBUTE)){
@@ -552,9 +552,10 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 						log.debug("*****QPOS****** " + key + ": " + element);
 					}
 				}
+			
 			}else if(!key.equals(CourseParams.PARAM_CATEGORIES) && !key.equals(CourseParams.PARAM_TAGS) &&
 					!key.equals(CourseParams.PARAM_AND_TAGS) && !key.equals(CourseParams.PARAM_AND_CATEGORIES) &&
-					!key.equals(CourseParams.PARAM_PERMISSIONS_ADMIN)){
+					!key.equals(CourseParams.PARAM_PERMISSIONS_ADMIN) && !key.equals(CourseParams.PARAM_SEARCH_PARENT_AND_CHILD_COURSES)){
 				if (value instanceof Long) {
 					Long valueLong = (Long)value;
 	

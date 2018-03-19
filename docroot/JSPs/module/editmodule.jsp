@@ -240,7 +240,7 @@ function validate(){
 	 <liferay-ui:error key="error-file-size" message="error-file-size" />
 	 
 	<c:if test="${showicon}">
-		<div style="margin: -0.5em;">
+		<div class="anti-column">
 			<%if(module.getIcon()>0){
 				try {
 					FileEntry fileEntry = DLAppLocalServiceUtil.getFileEntry(module.getIcon());

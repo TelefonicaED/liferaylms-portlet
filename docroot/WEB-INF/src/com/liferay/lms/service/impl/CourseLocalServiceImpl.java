@@ -1085,7 +1085,7 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 			params.put(CourseParams.PARAM_TAGS, tags);
 		}
 		if(categories != null && categories.length > 0){
-			params.put(CourseParams.PARAM_OR_CATEGORIES, categories);
+			params.put(CourseParams.PARAM_AND_CATEGORIES, categories);
 		}
 		params.put(CourseParams.PARAM_SEARCH_PARENT_AND_CHILD_COURSES, true);
 		if(!isAdmin){
@@ -1100,7 +1100,7 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 			params.put(CourseParams.PARAM_TAGS, tags);
 		}
 		if(categories != null && categories.length > 0){
-			params.put(CourseParams.PARAM_OR_CATEGORIES, categories);
+			params.put(CourseParams.PARAM_AND_CATEGORIES, categories);
 		}
 		params.put(CourseParams.PARAM_SEARCH_PARENT_AND_CHILD_COURSES, true);
 		if(!isAdmin){
@@ -1115,7 +1115,7 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 			params.put(CourseParams.PARAM_TAGS, tags);
 		}
 		if(categories != null && categories.length > 0){
-			params.put(CourseParams.PARAM_OR_CATEGORIES, categories);
+			params.put(CourseParams.PARAM_AND_CATEGORIES, categories);
 		}
 		if(!isAdmin){
 			params.put(CourseParams.PARAM_PERMISSIONS_ADMIN, userId);
@@ -1131,7 +1131,7 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 			params.put(CourseParams.PARAM_TAGS, tags);
 		}
 		if(categories != null && categories.length > 0){
-			params.put(CourseParams.PARAM_OR_CATEGORIES, categories);
+			params.put(CourseParams.PARAM_AND_CATEGORIES, categories);
 		}
 		if(!isAdmin){
 			params.put(CourseParams.PARAM_PERMISSIONS_ADMIN, userId);
@@ -1146,7 +1146,7 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 			params.put(CourseParams.PARAM_TAGS, tags);
 		}
 		if(categories != null && categories.length > 0){
-			params.put(CourseParams.PARAM_OR_CATEGORIES, categories);
+			params.put(CourseParams.PARAM_AND_CATEGORIES, categories);
 		}
 		if(templates != null && templates.length() > 0){
 			params.put(CourseParams.PARAM_TEMPLATES, templates);
@@ -1164,7 +1164,7 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 			params.put(CourseParams.PARAM_TAGS, tags);
 		}
 		if(categories != null && categories.length > 0){
-			params.put(CourseParams.PARAM_OR_CATEGORIES, categories);
+			params.put(CourseParams.PARAM_AND_CATEGORIES, categories);
 		}
 		if(templates != null && templates.length() > 0){
 			params.put(CourseParams.PARAM_TEMPLATES, templates);

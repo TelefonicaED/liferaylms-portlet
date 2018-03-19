@@ -523,7 +523,7 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 		//***********************  COGEMOS LAS PLANTILLAS ********************/
 		
 		// Templates
-		String templates = getCourseTemplates(renderRequest.getPreferences(), themeDisplay.getCompanyId());
+		String[] templates = getCourseTemplates(renderRequest.getPreferences(), themeDisplay.getCompanyId());
 		
 		PortletURL portletURL = renderResponse.createRenderURL();
 		portletURL.setParameter("javax.portlet.action","doView");
@@ -607,12 +607,12 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 		
 		LinkedHashMap<String, Object> params = new LinkedHashMap<String, Object>();
 		if(categoryIds != null && categoryIds.length > 0){
-			params.put(CourseParams.PARAM_OR_CATEGORIES, categoryIds);
+			params.put(CourseParams.PARAM_AND_CATEGORIES, categoryIds);
 		}
 		if(tagsSelIds != null && tagsSelIds.length > 0){
 			params.put(CourseParams.PARAM_TAGS, tagsSelIds);
 		}
-		if(templates != null && templates.length() > 0){
+		if(templates != null && templates.length > 0){
 			params.put(CourseParams.PARAM_TEMPLATES, templates);
 		}
 		if(columnId > 0){

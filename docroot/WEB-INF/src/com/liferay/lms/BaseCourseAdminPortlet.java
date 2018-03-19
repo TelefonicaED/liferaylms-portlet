@@ -1582,7 +1582,7 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 				}
 			}
 			
-			String templates = getCourseTemplates(request.getPreferences(), themeDisplay.getCompanyId());
+			String[] templates = getCourseTemplates(request.getPreferences(), themeDisplay.getCompanyId());
 			
 			log.debug("courseTitle: " + courseTitle);
 			log.debug("closed: " + closed);
@@ -1595,7 +1595,7 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 			log.debug("isAdmin: " + isAdmin);
 			
 			LinkedHashMap<String, Object> params = new LinkedHashMap<String, Object>();
-			if(templates != null && templates.length() > 0){
+			if(templates != null && templates.length > 0){
 				params.put(CourseParams.PARAM_TEMPLATES, templates);
 			}
 			if(columnId > 0){
@@ -1625,15 +1625,14 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 	}
 	
 	
-	protected String getCourseTemplates(PortletPreferences preferences, long companyId){
+	protected String[] getCourseTemplates(PortletPreferences preferences, long companyId){
 
 		// Templates
-		String templates = null;
+		String[] templates = null;
 		boolean filterByTemplates = GetterUtil.getBoolean(preferences.getValue("filterByTemplates", StringPool.FALSE),false);
 		log.debug("Filtrando por plantillas "+filterByTemplates);
 		if(filterByTemplates){
 			try {  
-				templates = "";
 				String[] layusprsel=null;
 				if(preferences.getValue("courseTemplates", null)!=null&&preferences.getValue("courseTemplates", null).length()>0){
 					layusprsel=preferences.getValue("courseTemplates", "").split(",");
@@ -1643,13 +1642,11 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 					layusprsel = LmsPrefsLocalServiceUtil.getLmsPrefsIni(companyId).getLmsTemplates().split(",");
 				}
 				if(layusprsel!=null &&layusprsel.length>0){
+					templates = new String[layusprsel.length];
 					LayoutSetPrototype layoutSetPrototype = null;
 					for (int i=0; i<layusprsel.length; i++) {
 						layoutSetPrototype = LayoutSetPrototypeLocalServiceUtil.fetchLayoutSetPrototype(Long.parseLong(layusprsel[i]));
-						templates += "'" + layoutSetPrototype.getUuid() + "'";
-						if (i<(layusprsel.length-1)){
-							templates += ", ";
-						}	
+						templates[i] = layoutSetPrototype.getUuid();
 				    }
 			   }
 			} catch (Exception e1) {
