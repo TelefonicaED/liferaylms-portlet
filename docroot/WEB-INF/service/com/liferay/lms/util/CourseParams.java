@@ -13,11 +13,11 @@ public class CourseParams {
 	/**
 	 * Categorías del curso
 	 */
-	public static final String PARAM_OR_CATEGORIES = "orCategories";
+	public static final String PARAM_AND_CATEGORIES = "andCategories";
 	/**
 	 * Tags del curso
 	 */
-	public static final String PARAM_OR_TAGS = "orTags";
+	public static final String PARAM_AND_TAGS = "andTags";
 	/**
 	 * Plantillas del curso
 	 */

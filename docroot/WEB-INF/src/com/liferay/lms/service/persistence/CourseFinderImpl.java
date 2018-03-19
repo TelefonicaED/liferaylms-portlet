@@ -270,7 +270,7 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 		StringBundler sb = new StringBundler(params.size());
 		
 		if(params.containsKey(CourseParams.PARAM_CATEGORIES) || params.containsKey(CourseParams.PARAM_TAGS) ||
-				params.containsKey(CourseParams.PARAM_OR_CATEGORIES) || params.containsKey(CourseParams.PARAM_OR_TAGS)
+				params.containsKey(CourseParams.PARAM_AND_CATEGORIES) || params.containsKey(CourseParams.PARAM_AND_TAGS)
 				|| params.containsKey(CourseParams.PARAM_VISIBLE)){
 			String join = CustomSQLUtil.get(JOIN_BY_ASSET_ENTRY);
 			long classNameId = ClassNameLocalServiceUtil.getClassNameId(Course.class.getName());
@@ -364,7 +364,7 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 		else if (key.equals(CourseParams.PARAM_CUSTOM_ATTRIBUTE)) {
 			join = CustomSQLUtil.get(JOIN_BY_CUSTOM_ATTRIBUTE);
 		}
-		else if(key.equals(CourseParams.PARAM_OR_TAGS)){
+		else if(key.equals(CourseParams.PARAM_AND_TAGS)){
 			if (value instanceof Long){
 				join += CustomSQLUtil.get(JOIN_BY_ASSET_TAG);
 				join = StringUtil.replace(join, "[$i$]", "");
@@ -379,7 +379,7 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 				}
 			}
 		}
-		else if(key.equals(CourseParams.PARAM_OR_CATEGORIES)){
+		else if(key.equals(CourseParams.PARAM_AND_CATEGORIES)){
 			if (value instanceof Long){
 				join += CustomSQLUtil.get(JOIN_BY_ASSET_CATEGORY);
 				join = StringUtil.replace(join, "[$i$]", "");
@@ -438,6 +438,17 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 
 		if (key.equals(CourseParams.PARAM_TEMPLATES)) {
 			join = CustomSQLUtil.get(JOIN_BY_TEMPLATES);
+			if(value instanceof Long){
+				join = StringUtil.replace(join, "IN ([$TEMPLATES$])", "= " + value);
+			}else if(value instanceof long[]){
+				long[] ids = (long[])value;
+				String idsPos = StringPool.BLANK;
+				for(int i = 0; i < ids.length; i++){
+					idsPos += "?,";
+				}
+				if(idsPos.length() > 0) idsPos = idsPos.substring(0, idsPos.length()-1);
+				join = StringUtil.replace(join, "[$TEMPLATES$]", idsPos);
+			}
 		}
 		else if (key.equals(CourseParams.PARAM_PERMISSIONS_ADMIN)) {
 			join = CustomSQLUtil.get(JOIN_BY_RESOURCE_PERMISSION);
@@ -541,9 +552,8 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 						log.debug("*****QPOS****** " + key + ": " + element);
 					}
 				}
-			}
-			else if(!key.equals(CourseParams.PARAM_CATEGORIES) && !key.equals(CourseParams.PARAM_TAGS) &&
-					!key.equals(CourseParams.PARAM_OR_TAGS) && !key.equals(CourseParams.PARAM_OR_CATEGORIES) &&
+			}else if(!key.equals(CourseParams.PARAM_CATEGORIES) && !key.equals(CourseParams.PARAM_TAGS) &&
+					!key.equals(CourseParams.PARAM_AND_TAGS) && !key.equals(CourseParams.PARAM_AND_CATEGORIES) &&
 					!key.equals(CourseParams.PARAM_PERMISSIONS_ADMIN)){
 				if (value instanceof Long) {
 					Long valueLong = (Long)value;
