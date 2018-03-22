@@ -79,6 +79,9 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 	public static final String JOIN_BY_RESOURCE_PERMISSION =
 		    CourseFinder.class.getName() +
 		        ".joinC_ByResourcePermission";
+	public static final String JOIN_BY_RESOURCE_PERMISSION_VIEW =
+			CourseFinder.class.getName() + 
+				".joinC_ByResourcePermissionView";
 	public static final String JOIN_BY_CUSTOM_ATTRIBUTE = 
 			CourseFinder.class.getName() + 
 				".joinCustomAttribute";
@@ -212,15 +215,6 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			sql = sb.toString();
 			
 			sql = CustomSQLUtil.replaceAndOperator(sql, andOperator);
-			
-			if (params.containsKey(CourseParams.PARAM_PERMISSIONS_VIEW)) {
-				sql = InlineSQLHelperUtil.replacePermissionCheck(
-					sql, Course.class.getName(),
-					"Lms_Course.courseId", groupId);
-
-				sql = StringUtil.replace(
-					sql, "(companyId", "(Lms_Course.companyId");
-			}
 			
 			SQLQuery q = session.createSQLQuery(sql);
 
@@ -360,6 +354,19 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			join = StringUtil.replace(join, "[$CLASSNAMEIDGROUP$]", String.valueOf(ClassNameLocalServiceUtil.getClassNameId(Group.class)));
 			join = StringUtil.replace(join, "[$ROLEEDITOR$]", String.valueOf(prefs.getEditorRole()));
 			join = StringUtil.replace(join, "[$ROLETEACHER$]", String.valueOf(prefs.getTeacherRole()));
+		}else if(key.equals(CourseParams.PARAM_PERMISSIONS_VIEW)){
+			Long userId = (Long)value;
+			join = CustomSQLUtil.get(JOIN_BY_RESOURCE_PERMISSION);
+			LmsPrefs prefs=LmsPrefsLocalServiceUtil.getLmsPrefs(companyId);
+			join = StringUtil.replace(join, "[$JOINRESOURCEPERMISSION$]", CustomSQLUtil.get(JOIN_BY_RESOURCE_PERMISSION_VIEW));
+			join = StringUtil.replace(join, "[$COMPANYID$]", String.valueOf(companyId));
+			join = StringUtil.replace(join, "[$ACTIONVIEW$]", String.valueOf(ResourceActionLocalServiceUtil.getResourceAction(Course.class.getName(), ActionKeys.VIEW).getBitwiseValue()));
+			join = StringUtil.replace(join, "[$USERID$]", String.valueOf(userId));
+			join = StringUtil.replace(join, "[$CLASSNAMEIDUSERGROUP$]", String.valueOf(ClassNameLocalServiceUtil.getClassNameId(UserGroup.class)));
+			join = StringUtil.replace(join, "[$CLASSNAMEIDORGANIZATION$]", String.valueOf(ClassNameLocalServiceUtil.getClassNameId(Organization.class)));
+			join = StringUtil.replace(join, "[$CLASSNAMEIDGROUP$]", String.valueOf(ClassNameLocalServiceUtil.getClassNameId(Group.class)));
+			join = StringUtil.replace(join, "[$ROLEEDITOR$]", String.valueOf(prefs.getEditorRole()));
+			join = StringUtil.replace(join, "[$ROLETEACHER$]", String.valueOf(prefs.getTeacherRole()));
 		}
 		else if (key.equals(CourseParams.PARAM_CUSTOM_ATTRIBUTE)) {
 			join = CustomSQLUtil.get(JOIN_BY_CUSTOM_ATTRIBUTE);
@@ -452,6 +459,8 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 		}
 		else if (key.equals(CourseParams.PARAM_PERMISSIONS_ADMIN)) {
 			join = CustomSQLUtil.get(JOIN_BY_RESOURCE_PERMISSION);
+		}else if(key.equals(CourseParams.PARAM_PERMISSIONS_VIEW)){
+			join = CustomSQLUtil.get(JOIN_BY_RESOURCE_PERMISSION_VIEW);
 		}
 		else if (key.equals(CourseParams.PARAM_CUSTOM_ATTRIBUTE)) {
 			join = CustomSQLUtil.get(JOIN_BY_CUSTOM_ATTRIBUTE);
@@ -555,7 +564,8 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			
 			}else if(!key.equals(CourseParams.PARAM_CATEGORIES) && !key.equals(CourseParams.PARAM_TAGS) &&
 					!key.equals(CourseParams.PARAM_AND_TAGS) && !key.equals(CourseParams.PARAM_AND_CATEGORIES) &&
-					!key.equals(CourseParams.PARAM_PERMISSIONS_ADMIN) && !key.equals(CourseParams.PARAM_SEARCH_PARENT_AND_CHILD_COURSES)){
+					!key.equals(CourseParams.PARAM_PERMISSIONS_ADMIN) && !key.equals(CourseParams.PARAM_SEARCH_PARENT_AND_CHILD_COURSES)
+					&& !key.equals(CourseParams.PARAM_PERMISSIONS_VIEW)){
 				if (value instanceof Long) {
 					Long valueLong = (Long)value;
 	
@@ -687,15 +697,6 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			sql = sb.toString();
 			
 			sql = CustomSQLUtil.replaceAndOperator(sql, andOperator);
-			
-			if (params.containsKey(CourseParams.PARAM_PERMISSIONS_VIEW)) {
-				sql = InlineSQLHelperUtil.replacePermissionCheck(
-					sql, Course.class.getName(),
-					"lms_Course.courseId", groupId);
-
-				sql = StringUtil.replace(
-					sql, "(companyId", "(lms_Course.companyId");
-			}
 			
 			SQLQuery q = session.createSQLQuery(sql);
 

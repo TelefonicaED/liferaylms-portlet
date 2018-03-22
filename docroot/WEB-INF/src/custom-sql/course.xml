@@ -227,6 +227,53 @@
 				(urperm.userId IS NOT NULL OR ugperm.userId IS NOT NULL OR uugperm.userGroupId IS NOT NULL OR uoperm.userId IS NOT NULL OR ugperm2.userId IS NOT NULL OR ugrpermC.userId IS NOT NULL)
 		]]>
 	</sql>
+	<sql id="com.liferay.lms.service.persistence.CourseFinder.joinC_ByResourcePermissionView">
+		<![CDATA[
+			INNER JOIN 
+				resourcepermission rp 
+					ON rp.name = 'com.liferay.lms.model.Course' 
+						AND rp.companyId = [$COMPANYID$] 
+						AND ((primKey = Lms_Course.courseId AND scope = 4) OR (primKey = [$COMPANYID$] AND scope = 1)) 
+						AND (actionIds & [$ACTIONVIEW$])
+			LEFT JOIN 
+				users_roles urperm 
+					ON rp.roleId = urperm.roleId 
+						AND urperm.roleId 
+						AND urperm.userId = [$USERID$]
+			LEFT JOIN 
+				usergrouprole ugperm 
+					ON ugperm.groupId = Lms_Course.groupCreatedId 
+						AND ugperm.roleId = rp.roleId 
+						AND ugperm.userId = [$USERID$]
+			LEFT JOIN 
+				groups_roles grperm 
+					ON grperm.roleId = rp.roleId
+			LEFT JOIN 
+				group_ gperm 
+					ON grperm.groupId = gperm.groupId
+			LEFT JOIN 
+				users_usergroups uugperm 
+					ON uugperm.userGroupId 
+						= gperm.classPK AND gperm.classNameId = [$CLASSNAMEIDUSERGROUP$]
+						AND uugperm.userId = [$USERID$]
+			LEFT JOIN 
+				users_orgs uoperm 
+					ON uoperm.organizationId = gperm.classPK 
+						AND gperm.classNameId = [$CLASSNAMEIDORGANIZATION$] 
+						AND uoperm.userId = [$USERID$]
+			LEFT JOIN 
+				users_groups ugperm2 
+					ON ugperm2.groupId = gperm.classPK 
+						AND gperm.classNameId = [$CLASSNAMEIDGROUP$] 
+						AND ugperm2.userId = [$USERID$]
+			LEFT JOIN 
+				usergrouprole ugrpermC 
+					ON ugrpermC.groupId = Lms_Course.groupCreatedId 
+						AND ugrpermC.userId = [$USERID$] AND ugrpermC.roleId IN ([$ROLEEDITOR$],[$ROLETEACHER$])
+			WHERE
+				(urperm.userId IS NOT NULL OR ugperm.userId IS NOT NULL OR uugperm.userGroupId IS NOT NULL OR uoperm.userId IS NOT NULL OR ugperm2.userId IS NOT NULL OR ugrpermC.userId IS NOT NULL)
+		]]>
+	</sql>
 	<sql id="com.liferay.lms.service.persistence.CourseFinder.whereVisible">
 		<![CDATA[
 			WHERE (ae.visible = ?)
