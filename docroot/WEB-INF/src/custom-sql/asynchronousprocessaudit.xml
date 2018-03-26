@@ -19,7 +19,7 @@
 			AND asy.createDate > '[$STARTDATE$]' 
 			AND asy.createDate <= '[$ENDDATE$]'
 			AND 1 = 1
-			ORDER BY type_ DESC, asy.createDate DESC
+			ORDER BY asy.createDate DESC
 			LIMIT [$START$], [$END$]
 		]]>
 	</sql>
