@@ -3,17 +3,18 @@
 <%@page import="com.liferay.portal.util.comparator.*"%>
 <%@include file="/init.jsp" %>
 
-<div class="student_search">
-	<liferay-portlet:renderURL var="renderURL" />
+
 	<c:if test="${showSearcher}">
-		<aui:form action="${renderURL}" name="searchFm">
-			<liferay-ui:search-form page="/html/shared/usersSearchform.jsp"
-				searchContainer="${searchContainer}"
-				servletContext="<%= this.getServletConfig().getServletContext() %>">
-			</liferay-ui:search-form>
-		</aui:form>
+		<div class="col-sm-12">
+			<aui:form name="searchFm" method="post" action="${renderURL }">
+				<%@ include file="/html/search/userSearch.jsp" %>
+				<div class="search-user last">
+					<aui:button value="search" type="submit"/>
+				</div>
+			</aui:form>
+		</div>
 	</c:if>
-	
+<div class="student_search">	
 	<liferay-ui:search-container
 			searchContainer="${searchContainer}" 
 			iteratorURL="${searchContainer.iteratorURL}">
