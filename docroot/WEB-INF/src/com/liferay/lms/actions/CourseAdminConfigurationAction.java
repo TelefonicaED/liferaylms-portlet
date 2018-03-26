@@ -89,7 +89,7 @@ public class CourseAdminConfigurationAction implements ConfigurationAction {
 		portletPreferences.setValue	("tipoImport", ParamUtil.getString(actionRequest, "tipoImport", ""));
 		
 		portletPreferences.setValue("showExpandos", Boolean.toString(ParamUtil.getBoolean(actionRequest, "showExpandos", false)));
-		
+		portletPreferences.setValue("showExpandosEdition", Boolean.toString(ParamUtil.getBoolean(actionRequest, "showExpandosEdition", false)));
 		
 		//Campos personalizados a mostrar en la tabla
 		// Expandos dinamicos
