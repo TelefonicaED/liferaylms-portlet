@@ -1,3 +1,4 @@
+<%@page import="com.tls.lms.util.LiferaylmsUtil"%>
 <%@page import="java.text.SimpleDateFormat"%>
 <%@page import="com.liferay.portal.model.Team"%>
 <%@page import="com.liferay.portal.service.TeamLocalServiceUtil"%>
@@ -173,6 +174,7 @@
 			boolean courseIsLocked = course.isLocked(themeDisplay.getUser(), permissionChecker);
 			boolean canAccessLock = permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), "com.liferay.lms.model", themeDisplay.getScopeGroupId() , "ACCESSLOCK");
 			boolean courseEditing = (permissionChecker.hasPermission(course.getGroupCreatedId(), Course.class.getName(), course.getCourseId() , ActionKeys.UPDATE))?true:false;
+			boolean hasPermissionAccessCourseFinished = LiferaylmsUtil.hasPermissionAccessCourseFinished(themeDisplay.getCompanyId(), course.getGroupCreatedId(), course.getCourseId(), themeDisplay.getUserId());
 			
 			for(Module theModule:theModules){
 				Date startDate;
@@ -399,7 +401,7 @@ SimpleDateFormat sdf = new SimpleDateFormat("dd MMM HH:mm",themeDisplay.getLocal
 
 							<div class="access"><liferay-ui:message key="starting-soon"/><!-- En LMS esta etiqueta es vacía --></div>
 <%
-						}else if((moduleIsLocked || courseIsLocked) && !canAccessLock){
+						}else if((moduleIsLocked || courseIsLocked) && !canAccessLock && !hasPermissionAccessCourseFinished){
 							if(UserLocalServiceUtil.hasGroupUser(themeDisplay.getScopeGroupId(),themeDisplay.getUserId())){
 %>								
 								<script type="text/javascript">
@@ -408,7 +410,7 @@ SimpleDateFormat sdf = new SimpleDateFormat("dd MMM HH:mm",themeDisplay.getLocal
 								<div class="access"><liferay-ui:message key="module-closed"/><!-- En LMS esta etiqueta es vacía --></div>
 <%
 							}
-						}else if((!moduleIsLocked && !courseIsLocked) || canAccessLock){
+						}else if((!moduleIsLocked && !courseIsLocked) || canAccessLock || hasPermissionAccessCourseFinished){
 							if(allowEditionMode && moduleEditing){
 								%>
 								<script type="text/javascript">
