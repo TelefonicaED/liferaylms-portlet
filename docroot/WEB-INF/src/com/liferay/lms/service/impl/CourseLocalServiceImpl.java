@@ -193,6 +193,10 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 		 return courseFinder.getExistingUserCourses(userId,start,end);
 	}
 	
+	public int countOpenedUserCourses(long userId) throws PortalException, SystemException{
+		 return courseFinder.countExistingUserCourses(userId);
+	}
+	
 	public List<Course> getPublicCoursesByCompanyId(Long companyId){
 		
 		Long classNameId = ClassNameLocalServiceUtil.getClassNameId(Course.class.getName());

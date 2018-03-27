@@ -130,6 +130,9 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 	public static final String EXISTING_USER_COURSES =
 			 CourseFinder.class.getName() +
 				".getExistingUserCourses";
+	public static final String COUNT_EXISTING_USER_COURSES =
+			 CourseFinder.class.getName() +
+				".countExistingUserCourses";
 	public static final String GET_DISTINCT_COURSE_GROUPS = 
 			CourseFinder.class.getName() + ".getDistinctCourseGroups";
 
@@ -1180,9 +1183,57 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 		return listExistingCourses;
 	}	
 	
+	
+	public int countExistingUserCourses(long userId){
+		Session session = null;
+		int countValue = 0;
+		try{
+			
+			session = openSession();
+			
+			String sql = CustomSQLUtil.get(COUNT_EXISTING_USER_COURSES);
+			
+			
+			if(log.isDebugEnabled()){
+				log.debug("sql: " + sql);
+				log.debug("userId: " + userId);
+			}
+			
+			SQLQuery q = session.createSQLQuery(sql);
+			
+			QueryPos qPos = QueryPos.getInstance(q);
+			qPos.add(userId);
+			
+			Iterator<Long> itr = q.iterate();
+
+			
+			if (itr.hasNext()) {
+				Object count = itr.next();
+				
+				if (count != null) {
+					if(count instanceof Long){
+						countValue = ((Long)count).intValue();
+					}else if(count instanceof BigInteger){
+						countValue = ((BigInteger)count).intValue();
+					}else if(count instanceof Integer){
+						countValue = (Integer)count;
+					}
+					
+				}
+			}
+			
+		} catch (Exception e) {
+	       e.printStackTrace();
+	    } finally {
+	        closeSession(session);
+	    }
+	
+		return countValue;
+	}
+	
 	public int countMyCourses(long groupId, long userId, ThemeDisplay themeDisplay){
 		Session session = null;
-
+		int countValue = 0;
 		try{
 			
 			session = openSession();
@@ -1210,15 +1261,21 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			
 			Iterator<Long> itr = q.iterate();
 
+			
 			if (itr.hasNext()) {
-				Long count = itr.next();
-
+				Object count = itr.next();
+				
 				if (count != null) {
-					return count.intValue();
+					if(count instanceof Long){
+						countValue = ((Long)count).intValue();
+					}else if(count instanceof BigInteger){
+						countValue = ((BigInteger)count).intValue();
+					}else if(count instanceof Integer){
+						countValue = (Integer)count;
+					}
+					
 				}
 			}
-			
-			
 			
 		} catch (Exception e) {
 	       e.printStackTrace();
@@ -1226,7 +1283,7 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 	        closeSession(session);
 	    }
 	
-		return 0;
+		return countValue;
 	}
 	
 	protected void setJoinCustomAttribute(

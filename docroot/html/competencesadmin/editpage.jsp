@@ -30,6 +30,7 @@
 <portlet:renderURL var="cancelURL">
 			</portlet:renderURL>
 <portlet:actionURL var="savePagesURL" name="savePages" />	
+<liferay-ui:header backURL="<%=cancelURL%>" showBackURL="<%=Boolean.TRUE%>" title="" />
 <aui:form name="fm" action="<%=savePagesURL%>"  method="post">
 <aui:input name="pages" value="<%=pages %>"/>
 

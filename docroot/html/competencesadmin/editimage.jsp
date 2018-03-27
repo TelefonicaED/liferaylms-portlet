@@ -6,7 +6,10 @@ String competenceImageURL=CompetenceLocalServiceUtil.getBGImageURL(themeDisplay.
 %>
 <portlet:renderURL var="cancelURL">
 			</portlet:renderURL>
-<portlet:actionURL var="saveImageURL" name="saveImage" />			
+<portlet:actionURL var="saveImageURL" name="saveImage" />	
+
+<liferay-ui:header backURL="<%=cancelURL%>" showBackURL="<%=Boolean.TRUE%>" title="" />
+		
 <aui:form name="fm" action="<%=saveImageURL%>"  method="post" enctype="multipart/form-data">
 <aui:input type="hidden" name="grupId" value="<%=themeDisplay.getScopeGroupId() %>"/>
 <aui:input name="fileName" label="image" id="fileName" type="file" value="" >

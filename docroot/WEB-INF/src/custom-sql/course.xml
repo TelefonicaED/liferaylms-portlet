@@ -85,6 +85,19 @@
 			LIMIT [$START$], [$END$]
 		]]>
 	</sql>
+	<sql id="com.liferay.lms.service.persistence.CourseFinder.countExistingUserCourses">
+		<![CDATA[   		
+			SELECT 
+				COUNT(c.courseId) as COUNT_VALUE
+			FROM 
+				Lms_course c
+			INNER JOIN 
+				users_groups u 
+					ON c.groupCreatedId = u.groupId AND u.userId = ?
+			WHERE 
+				c.closed = 0 
+		]]>
+	</sql>
 	<sql id="com.liferay.lms.service.persistence.CourseFinder.getDistinctCourseGroups">
 		<![CDATA[   		
 			SELECT 

@@ -30,7 +30,7 @@
 			<liferay-ui:panel id="${module.moduleId }" title="${module.getTitle(themeDisplay.locale) }" collapsible="true" extended="true" defaultState="${fila == 0 ? 'open' : 'collapsed' }">
 				<liferay-portlet:resourceURL var="exportURL" >
 					<portlet:param name="action" value="export"/>
-					<portlet:param name="moduleId" value="${moduel.moduleId }"/>
+					<portlet:param name="moduleId" value="${module.moduleId }"/>
 					<portlet:param name="teamId" value="${teamId }" />
 				</liferay-portlet:resourceURL>
 				
