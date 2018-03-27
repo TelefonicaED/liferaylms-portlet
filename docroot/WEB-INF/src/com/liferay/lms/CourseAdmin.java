@@ -642,50 +642,32 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 		renderRequest.setAttribute("STATUS_APPROVED", WorkflowConstants.STATUS_APPROVED);
 		renderRequest.setAttribute("STATUS_INACTIVE", WorkflowConstants.STATUS_INACTIVE);
 		renderRequest.setAttribute("STATUS_ANY", WorkflowConstants.STATUS_ANY);
-		if(Boolean.parseBoolean(renderRequest.getPreferences().getValue("showExpandos", "false"))){
-			List<ExpandoColumn> listExpandos = null;
-			try {
-				listExpandos = ExpandoColumnLocalServiceUtil.getColumns(themeDisplay.getCompanyId(), Course.class.getName(), ExpandoTableConstants.DEFAULT_TABLE_NAME);
-			} catch (SystemException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			renderRequest.setAttribute("listExpandos", listExpandos);
-			
-			//Creamos la lista para las columnas
-			List<ExpandoColumn> expandoNames = new ArrayList<ExpandoColumn>();
-			if(Validator.isNotNull(listExpandos) && listExpandos.size()>0) {
-				String expandoName="";
-				for (ExpandoColumn expandoUser : listExpandos) {
-					expandoName = StringUtil.upperCaseFirstLetter(expandoUser.getName());
-					if(((renderRequest.getPreferences().getValue("show" + expandoName, "false")).compareTo("true") == 0)) {
-						expandoNames.add(expandoUser);
-					}
-				}	
-			}
 		
-			renderRequest.setAttribute("expandoNames", expandoNames);
-		}
-		
-		//Creamos la lista de columnas a mostrar en la tabla
+		List<ExpandoColumn> listExpandos = null;
 		try {
-			List<ExpandoColumn> expandosColumn = ExpandoColumnLocalServiceUtil.getColumns(themeDisplay.getCompanyId(), Course.class.getName(), ExpandoTableConstants.DEFAULT_TABLE_NAME);
-			List<ExpandoColumn> expandoNames = new ArrayList<ExpandoColumn>();
-			if(Validator.isNotNull(expandosColumn) && expandosColumn.size()>0) {
-				String expandoName="";
-				for (ExpandoColumn expandoUser : expandosColumn) {
-					expandoName = StringUtil.upperCaseFirstLetter(expandoUser.getName());
-					if(((renderRequest.getPreferences().getValue("show" + expandoName, "false")).compareTo("true") == 0)) {
-						expandoNames.add(expandoUser);
-					}
-				}	
-			}
-		
-			renderRequest.setAttribute("expandoColumnNames", expandoNames);
+			listExpandos = ExpandoColumnLocalServiceUtil.getColumns(themeDisplay.getCompanyId(), Course.class.getName(), ExpandoTableConstants.DEFAULT_TABLE_NAME);
 		} catch (SystemException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+		if(Boolean.parseBoolean(renderRequest.getPreferences().getValue("showExpandos", "false")) || Boolean.parseBoolean(renderRequest.getPreferences().getValue("showExpandosEdition", "false"))){
+			renderRequest.setAttribute("listExpandos", listExpandos);
+		}
+		
+		//Creamos la lista para las columnas
+		List<ExpandoColumn> expandoNames = new ArrayList<ExpandoColumn>();
+		if(Validator.isNotNull(listExpandos) && listExpandos.size()>0) {
+			String expandoName="";
+			for (ExpandoColumn expandoUser : listExpandos) {
+				expandoName = StringUtil.upperCaseFirstLetter(expandoUser.getName());
+				if(((renderRequest.getPreferences().getValue("show" + expandoName, "false")).compareTo("true") == 0)) {
+					expandoNames.add(expandoUser);
+				}
+			}	
+		}
+	
+		renderRequest.setAttribute("expandoNames", expandoNames);
 	}
 	
 	

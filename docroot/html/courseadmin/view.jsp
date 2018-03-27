@@ -58,8 +58,8 @@
 				</c:choose>
 			</liferay-ui:search-container-column-text>
 			
-			<c:if test="${not empty expandoColumnNames}">
-				<c:forEach items="${expandoColumnNames}" var="expName">
+			<c:if test="${not empty expandoNames}">
+				<c:forEach items="${expandoNames}" var="expName">
 					<liferay-ui:search-container-column-text name="${expName.getDisplayName(themeDisplay.locale)}">
 						<liferay-ui:custom-attribute classPK="${course.courseId}" name="${expName.name}" 
 									className="<%= Course.class.getName() %>" editable="false" label="false" >
