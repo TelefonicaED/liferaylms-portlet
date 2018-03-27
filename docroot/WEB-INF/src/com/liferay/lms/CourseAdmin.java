@@ -426,6 +426,7 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 		if(Boolean.parseBoolean(renderRequest.getPreferences().getValue("showGroupFilter", "false"))){
 			List<Group> courseGroups = CourseLocalServiceUtil.getDistinctCourseGroups(themeDisplay.getCompanyId());
 			renderRequest.setAttribute("listGroups", courseGroups);
+			selectedGroupId = selectedGroupId == -1 ? 0 : selectedGroupId;
 			renderRequest.setAttribute("selectedGroupId", selectedGroupId);
 		}
 		

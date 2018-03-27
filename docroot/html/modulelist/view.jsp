@@ -425,7 +425,7 @@ SimpleDateFormat sdf = new SimpleDateFormat("dd MMM HH:mm",themeDisplay.getLocal
 								</script>
 								<div class="access"><a href="<%=gotoModuleURL.toString() %>"><liferay-ui:message key="module-finissed" /></a></div>
 <%
-							}else { 
+							}else {
 %>
 								<script type="text/javascript">
 									<portlet:namespace/>changeRowStyle(<portlet:namespace/><%=theModule.getModuleId()%>,'module-access');
