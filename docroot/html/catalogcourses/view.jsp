@@ -141,7 +141,7 @@
 							</span> 
 							<div class="asset-entry-content"> 
 								<div class="asset-resource-image"> 
-									<img class="courselogo" src="${course.getImageURL(themeDisplay) }"> 
+									<img class="courselogo" src="${course.getImageURL(themeDisplay) }" alt="<%= course.getTitle(themeDisplay.getLocale()) %>"> 
 								</div> 
 								<c:set var="descripton" value="${course.group.description }" />
 								<c:if test="${fn:length(description) > 200 }">

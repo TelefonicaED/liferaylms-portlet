@@ -276,7 +276,7 @@
                                     FileEntry image=DLAppLocalServiceUtil.getFileEntry(entryId);
                                     if(image!=null){
     %>
-                                        <img src="<%= DLUtil.getPreviewURL(image, image.getFileVersion(), themeDisplay, "&imageThumbnail=1") %>" />
+                                        <img src="<%= DLUtil.getPreviewURL(image, image.getFileVersion(), themeDisplay, "&imageThumbnail=1") %>" alt="<%=theModule.getTitle(themeDisplay.getLocale())%>"/>
     <%
                                     }    
                                 }catch(Exception e){
