@@ -903,8 +903,6 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 			e.printStackTrace();
 			return null;
 		}
-		
-
 	}
 	
 	public int getStudentsFromCourseCount(long companyId, long courseGroupCreatedId, long teamId, String firstName, String lastName, String screenName, String emailAddress, boolean andOperator) {

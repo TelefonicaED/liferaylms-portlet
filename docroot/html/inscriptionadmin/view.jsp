@@ -8,7 +8,7 @@
 <liferay-ui:message key="inscription.petition" />: ${searchContainer.total}  <liferay-ui:message key="inscription.totalUsers" />: ${numberUsers}${maxUsers}
 <%SimpleDateFormat sdf = new SimpleDateFormat("hh:mm dd/MM/yyyy"); %>
 
-<c:if test="${searchContainer.total}>0">
+<c:if test="${searchContainer.total > 0}">
 	<liferay-ui:search-container  searchContainer="${searchContainer}" iteratorURL="${searchContainer.iteratorURL}">
 		<liferay-ui:search-container-results results="${searchContainer.results}" total="${searchContainer.total}"/>
 		<liferay-ui:search-container-row
