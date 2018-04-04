@@ -4,16 +4,21 @@ import java.util.List;
 
 import javax.portlet.PortletRequest;
 
+import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.portal.kernel.dao.search.DisplayTerms;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.model.Team;
+import com.liferay.portal.model.User;
 import com.liferay.portal.service.TeamLocalServiceUtil;
 import com.liferay.portal.theme.ThemeDisplay;
+import com.liferay.portal.util.comparator.UserLastNameComparator;
 
 public class UserDisplayTerms extends DisplayTerms{
 
@@ -31,10 +36,27 @@ public class UserDisplayTerms extends DisplayTerms{
 
 	public static final String TEAM = "team";
 	
+	protected String emailAddress;
+	protected String firstName;
+	protected String lastName;
+	protected String screenName;
+	protected String keywords;
+	protected int status;
+	protected long teamId;
+	protected boolean hasNullTeam;
+	protected List<Team> userTeams;
+	protected Team team;
+	protected boolean showScreenName;
+	protected boolean showEmailAddress;
+	private long companyId;
+	
+	private static Log log = LogFactoryUtil.getLog(UserDisplayTerms.class);
+	
 	public UserDisplayTerms(PortletRequest portletRequest) {
 		super(portletRequest);
 		
 		ThemeDisplay themeDisplay = (ThemeDisplay) portletRequest.getAttribute(WebKeys.THEME_DISPLAY);
+		this.companyId = themeDisplay.getCompanyId();
 
 		String statusString = ParamUtil.getString(portletRequest, STATUS);
 
@@ -78,6 +100,9 @@ public class UserDisplayTerms extends DisplayTerms{
 				e.printStackTrace();
 			}
 		}
+		
+		this.showEmailAddress = true;
+		this.showScreenName = true;
 	}
 
 	public String getEmailAddress() {
@@ -178,14 +203,129 @@ public class UserDisplayTerms extends DisplayTerms{
 		this.team = team;
 	}
 
-	protected String emailAddress;
-	protected String firstName;
-	protected String lastName;
-	protected String screenName;
-	protected String keywords;
-	protected int status;
-	protected long teamId;
-	protected boolean hasNullTeam;
-	protected List<Team> userTeams;
-	protected Team team;
+	public boolean isShowScreenName() {
+		return showScreenName;
+	}
+
+	public void setShowScreenName(boolean showScreenName) {
+		this.showScreenName = showScreenName;
+	}
+
+	public boolean isShowEmailAddress() {
+		return showEmailAddress;
+	}
+
+	public void setShowEmailAddress(boolean showEmailAddress) {
+		this.showEmailAddress = showEmailAddress;
+	}
+	
+	private long[] getTeamIds(){
+		long[] teamIds = null;
+		if(teamId > 0){
+			teamIds = new long[1];
+			teamIds[0] = teamId;
+		}
+		return teamIds;
+	}
+	
+	@Override
+	public boolean isAndOperator(){
+		if(isAdvancedSearch()){
+			return andOperator;
+		}else{
+			boolean andOperator = false;
+			if(Validator.isNull(getKeywords())){
+				andOperator = true;
+			}
+			return andOperator;
+		}
+	}
+	
+	public List<User> getStudents(long courseId, int start, int end){
+		List<User> listStudents = null;
+		
+		if(isAdvancedSearch()){				
+			listStudents = CourseLocalServiceUtil.getStudentsFromCourse(courseId, companyId, getScreenName(), getFirstName(), getLastName(), getEmailAddress(), 
+													WorkflowConstants.STATUS_APPROVED, getTeamIds(), isAndOperator(), start, end, new UserLastNameComparator(true));
+		}else{
+			listStudents = CourseLocalServiceUtil.getStudentsFromCourse(courseId, companyId, getKeywords(), getKeywords(), getKeywords(), getKeywords(), 
+					WorkflowConstants.STATUS_APPROVED, getTeamIds(), isAndOperator(), start, end, new UserLastNameComparator(true));
+			
+		}
+		return listStudents;
+	}
+	
+	public int countStudents(long courseId){
+		int numStudents = 0;
+		
+		if(isAdvancedSearch()){			
+
+			numStudents = CourseLocalServiceUtil.countStudentsFromCourse(courseId, companyId, getScreenName(), getFirstName(), getLastName(), getEmailAddress(), 
+					WorkflowConstants.STATUS_APPROVED,	getTeamIds(), isAndOperator());
+		}else{
+			numStudents = CourseLocalServiceUtil.countStudentsFromCourse(courseId, companyId, getKeywords(), getKeywords(), getKeywords(), getKeywords(),
+					WorkflowConstants.STATUS_APPROVED, getTeamIds(), isAndOperator());
+		}
+		
+		return numStudents;
+	}
+	
+	public List<User> getTeachers(long courseId, int start, int end){
+		List<User> listTeachers = null;
+		
+		if(isAdvancedSearch()){				
+			listTeachers = CourseLocalServiceUtil.getTeachersFromCourse(courseId, companyId, getScreenName(), getFirstName(), getLastName(), getEmailAddress(), 
+													WorkflowConstants.STATUS_APPROVED, getTeamIds(), isAndOperator(), start, end, new UserLastNameComparator(true));
+		}else{
+			listTeachers = CourseLocalServiceUtil.getTeachersFromCourse(courseId, companyId, getKeywords(), getKeywords(), getKeywords(), getKeywords(), 
+					WorkflowConstants.STATUS_APPROVED, getTeamIds(), isAndOperator(), start, end, new UserLastNameComparator(true));
+			
+		}
+		return listTeachers;
+	}
+	
+	public int countTeachers(long courseId){
+		int numTeachers = 0;
+		
+		if(isAdvancedSearch()){			
+
+			numTeachers = CourseLocalServiceUtil.countTeachersFromCourse(courseId, companyId, getScreenName(), getFirstName(), getLastName(), getEmailAddress(), 
+					WorkflowConstants.STATUS_APPROVED,	getTeamIds(), isAndOperator());
+		}else{
+			numTeachers = CourseLocalServiceUtil.countTeachersFromCourse(courseId, companyId, getKeywords(), getKeywords(), getKeywords(), getKeywords(),
+					WorkflowConstants.STATUS_APPROVED, getTeamIds(), isAndOperator());
+		}
+		
+		return numTeachers;
+	}
+	
+	public List<User> getEditors(long courseId, int start, int end){
+		List<User> listEditors = null;
+		
+		if(isAdvancedSearch()){				
+			listEditors = CourseLocalServiceUtil.getEditorsFromCourse(courseId, companyId, getScreenName(), getFirstName(), getLastName(), getEmailAddress(), 
+													WorkflowConstants.STATUS_APPROVED, getTeamIds(), isAndOperator(), start, end, new UserLastNameComparator(true));
+		}else{
+			listEditors = CourseLocalServiceUtil.getEditorsFromCourse(courseId, companyId, getKeywords(), getKeywords(), getKeywords(), getKeywords(), 
+					WorkflowConstants.STATUS_APPROVED, getTeamIds(), isAndOperator(), start, end, new UserLastNameComparator(true));
+			
+		}
+		return listEditors;
+	}
+	
+	public int countEditors(long courseId){
+		int numEditors = 0;
+		
+		if(isAdvancedSearch()){			
+
+			numEditors = CourseLocalServiceUtil.countEditorsFromCourse(courseId, companyId, getScreenName(), getFirstName(), getLastName(), getEmailAddress(), 
+					WorkflowConstants.STATUS_APPROVED,	getTeamIds(), isAndOperator());
+		}else{
+			numEditors = CourseLocalServiceUtil.countEditorsFromCourse(courseId, companyId, getKeywords(), getKeywords(), getKeywords(), getKeywords(),
+					WorkflowConstants.STATUS_APPROVED, getTeamIds(), isAndOperator());
+		}
+		
+		return numEditors;
+	}
+
 }

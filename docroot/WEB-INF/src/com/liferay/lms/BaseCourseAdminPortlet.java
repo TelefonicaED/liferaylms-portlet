@@ -12,7 +12,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Enumeration;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -55,8 +54,8 @@ import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.lms.service.CourseResultLocalServiceUtil;
 import com.liferay.lms.service.LmsPrefsLocalServiceUtil;
 import com.liferay.lms.util.CourseParams;
+import com.liferay.lms.util.displayterms.UserDisplayTerms;
 import com.liferay.lms.util.searchcontainer.UserSearchContainer;
-import com.liferay.lms.util.searchterms.UserSearchTerms;
 import com.liferay.portal.DuplicateGroupException;
 import com.liferay.portal.kernel.cache.MultiVMPoolUtil;
 import com.liferay.portal.kernel.cluster.ClusterExecutorUtil;
@@ -78,18 +77,14 @@ import com.liferay.portal.kernel.messaging.Message;
 import com.liferay.portal.kernel.messaging.MessageBusUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.Folder;
-import com.liferay.portal.kernel.search.Indexer;
-import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.servlet.HttpHeaders;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.upload.UploadPortletRequest;
-import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
@@ -114,7 +109,6 @@ import com.liferay.portal.security.permission.PermissionCheckerFactoryUtil;
 import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.LayoutSetPrototypeLocalServiceUtil;
 import com.liferay.portal.service.OrganizationLocalServiceUtil;
-import com.liferay.portal.service.ResourcePermissionLocalServiceUtil;
 import com.liferay.portal.service.RoleLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceContextFactory;
@@ -126,12 +120,10 @@ import com.liferay.portlet.announcements.EntryDisplayDateException;
 import com.liferay.portlet.asset.AssetCategoryException;
 import com.liferay.portlet.asset.model.AssetVocabulary;
 import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
-import com.liferay.portlet.asset.service.AssetTagLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.model.DLFolder;
 import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
 import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.service.DLFolderLocalServiceUtil;
-import com.liferay.portlet.usersadmin.util.UsersAdminUtil;
 import com.liferay.util.LmsLocaleUtil;
 import com.liferay.util.bridges.mvc.MVCPortlet;
 
@@ -161,28 +153,20 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 		String students = LanguageUtil.get(themeDisplay.getLocale(),"courseadmin.adminactions.students");
 		String tabs1 = ParamUtil.getString(renderRequest, "tabs1", students);
 		
-		String lastName =  ParamUtil.getString(renderRequest, "lastName");
-		String emailAddress = ParamUtil.getString(renderRequest, "emailAddress");
-		String firstName = ParamUtil.getString(renderRequest, "firstName");
-		String screenName = ParamUtil.getString(renderRequest, "screenName");
-		
 		long courseId=ParamUtil.getLong(renderRequest, "courseId",0);
 		UserSearchContainer searchContainer = new UserSearchContainer(renderRequest, renderResponse.createRenderURL());	
 		
-		
-		UserSearchTerms searchTerms = (UserSearchTerms) searchContainer.getSearchTerms();
+		UserDisplayTerms displayTerms = (UserDisplayTerms) searchContainer.getDisplayTerms();
 		String redirectOfEdit = ParamUtil.getString(renderRequest, "redirectOfEdit");
 		try{		
 			List<User> users = null; 
 			int total = 0;		
-			OrderByComparator obc =  UsersAdminUtil.getUserOrderByComparator(
-					"first-name,middle-name,last-name", "asc");		
+			
 			LmsPrefs prefs=LmsPrefsLocalServiceUtil.getLmsPrefs(themeDisplay.getCompanyId());
 			String teacherName=RoleLocalServiceUtil.getRole(prefs.getTeacherRole()).getTitle(themeDisplay.getLocale());
 			String editorName=RoleLocalServiceUtil.getRole(prefs.getEditorRole()).getTitle(themeDisplay.getLocale());
 			String tab=StringPool.BLANK;
 			
-			LinkedHashMap<String, Object> userParams = new LinkedHashMap<String, Object>();
 			Role commmanager=RoleLocalServiceUtil.getRole(themeDisplay.getCompanyId(), RoleConstants.SITE_MEMBER);
 			Course course=CourseLocalServiceUtil.getCourse(courseId);
 			
@@ -208,55 +192,18 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 				log.debug("END "+searchContainer.getEnd());
 				log.debug("createdGroupId "+createdGroupId);
 				log.debug("roleId "+roleId);
-				log.debug("IS ADVANCED SEARCH "+searchTerms.isAdvancedSearch());
+				log.debug("IS ADVANCED SEARCH "+displayTerms.isAdvancedSearch());
 			}
 			
-			if(roleId!=commmanager.getRoleId()){
-				
-				userParams.put("usersGroups", createdGroupId);
-				userParams.put("userGroupRole", new Long[]{createdGroupId, roleId});
-				
-				
-				if(searchTerms.isAdvancedSearch()){	
-					if(log.isDebugEnabled()){
-						log.debug("firstName 1:"+searchTerms.getFirstName());
-						log.debug("lastName 1:"+searchTerms.getLastName());
-						log.debug("screenName 1:"+searchTerms.getScreenName());
-						log.debug("emailAddress 1:"+searchTerms.getEmailAddress());
-					}
-					users = UserLocalServiceUtil.search(themeDisplay.getCompanyId(), firstName, StringPool.BLANK, 
-							lastName, screenName, emailAddress, WorkflowConstants.STATUS_APPROVED, userParams, searchTerms.isAndOperator(), 
-							searchContainer.getStart(), searchContainer.getEnd(), obc);
-					total = UserLocalServiceUtil.searchCount(themeDisplay.getCompanyId(), firstName, StringPool.BLANK,
-							lastName, screenName, emailAddress, WorkflowConstants.STATUS_APPROVED, userParams, searchTerms.isAndOperator());
-				}else{
-					if(log.isDebugEnabled()){
-						log.debug("Keywords 1:"+searchTerms.getKeywords());
-						log.debug("userParams length "+userParams.keySet().size());
-						log.debug("COMPANY ID "+themeDisplay.getCompanyId());
-					}
-					users = UserLocalServiceUtil.search(themeDisplay.getCompanyId(), searchTerms.getKeywords(), WorkflowConstants.STATUS_APPROVED, userParams, searchContainer.getStart(), searchContainer.getEnd(),obc);
-					total = UserLocalServiceUtil.searchCount(themeDisplay.getCompanyId(), searchTerms.getKeywords(), WorkflowConstants.STATUS_APPROVED, userParams);
-				}
-				
-				
-				
-			}else{
-				if(searchTerms.isAdvancedSearch()){	
-					if(log.isDebugEnabled()){
-						log.debug("firstName:"+searchTerms.getFirstName());
-						log.debug("lastName:"+searchTerms.getLastName());
-						log.debug("screenName:"+searchTerms.getScreenName());
-						log.debug("emailAddress:"+searchTerms.getEmailAddress());
-					}
-					users = CourseLocalServiceUtil.getStudents(courseId, themeDisplay.getCompanyId(),  screenName, firstName, lastName, emailAddress, searchTerms.isAndOperator(),searchContainer.getStart(), searchContainer.getEnd(),obc);
-					total = CourseLocalServiceUtil.countStudents(courseId, themeDisplay.getCompanyId(), screenName, firstName, lastName, emailAddress,searchTerms.isAndOperator());	
-				}else{
-					if(log.isDebugEnabled())log.debug("Keywords:"+searchTerms.getKeywords());
-					users = CourseLocalServiceUtil.getStudents(courseId, themeDisplay.getCompanyId(), searchTerms.getKeywords(), searchTerms.getKeywords(),searchTerms.getKeywords(),searchTerms.getKeywords(),false,searchContainer.getStart(), searchContainer.getEnd(),obc);
-					total = CourseLocalServiceUtil.countStudents(courseId, themeDisplay.getCompanyId(), searchTerms.getKeywords(), searchTerms.getKeywords(),searchTerms.getKeywords(),searchTerms.getKeywords(),false);	
-				}	
-				
+			if(roleId==commmanager.getRoleId()){
+				users = displayTerms.getStudents(courseId, searchContainer.getStart(), searchContainer.getEnd());
+				total = displayTerms.countStudents(courseId);
+			}else if(roleId == prefs.getTeacherRole()){
+				users = displayTerms.getTeachers(courseId, searchContainer.getStart(), searchContainer.getEnd());
+				total = displayTerms.countTeachers(courseId);
+			}else if(roleId == prefs.getEditorRole()){
+				users = displayTerms.getEditors(courseId, searchContainer.getStart(), searchContainer.getEnd());
+				total = displayTerms.countEditors(courseId);
 			}
 			if(log.isDebugEnabled()){
 				log.debug("Users "+users.size() );
@@ -291,8 +238,7 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 			renderRequest.setAttribute("backToEdit", backToEdit);
 			renderRequest.setAttribute("redirectOfEdit", redirectOfEdit);
 			renderRequest.setAttribute("createdGroupId", createdGroupId);
-			renderRequest.setAttribute("showEmail", true);
-			renderRequest.setAttribute("showScreenName", true);
+			renderRequest.setAttribute("displayTerms", displayTerms);
 			
 			PortletURL searchURL = renderResponse.createRenderURL();
 			searchURL.setParameter("view", "role-members-tab");
@@ -316,28 +262,20 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 	
 	protected void showViewCompetenceTab(RenderRequest renderRequest,RenderResponse renderResponse) throws IOException, PortletException{
 		
-		ThemeDisplay themeDisplay = (ThemeDisplay)renderRequest.getAttribute(WebKeys.THEME_DISPLAY);
-		
 		include(this.competenceTabJSP, renderRequest, renderResponse);
 	}
 	
 	protected void showViewImportUsers(RenderRequest renderRequest,RenderResponse renderResponse) throws IOException, PortletException{
-		
-		ThemeDisplay themeDisplay = (ThemeDisplay)renderRequest.getAttribute(WebKeys.THEME_DISPLAY);
 		
 		include(this.importUsersJSP, renderRequest, renderResponse);
 	}
 	
 	protected void showViewUsersResults(RenderRequest renderRequest,RenderResponse renderResponse) throws IOException, PortletException{
 		
-		ThemeDisplay themeDisplay = (ThemeDisplay)renderRequest.getAttribute(WebKeys.THEME_DISPLAY);
-		
 		include(this.usersResultsJSP, renderRequest, renderResponse);
 	}
 	
 	protected void showViewCompetenceResults(RenderRequest renderRequest,RenderResponse renderResponse) throws IOException, PortletException{
-		
-		ThemeDisplay themeDisplay = (ThemeDisplay)renderRequest.getAttribute(WebKeys.THEME_DISPLAY);
 		
 		include(this.competenceResultsJSP, renderRequest, renderResponse);
 	}

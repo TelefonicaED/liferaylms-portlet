@@ -854,110 +854,6 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 		return coursePersistence.findByCompanyId(companyId);
 	}
 	
-	public int getStudentsFromCourseCount(long courseId) throws SystemException, PortalException{
-		return getStudentsFromCourseCount(courseId, 0);
-		
-	}
-	public int getStudentsFromCourseCount(long courseId, long teamId) throws SystemException, PortalException{
-		return getStudentsFromCourseCount(courseId, 0,null,null,null,null,true);
-	}
-	
-	public int getStudentsFromCourseCount(long courseId, long teamId, String firstName, String lastName, String screenName, String emailAddress, boolean andComparator) throws SystemException, PortalException{
-		
-		Course course = CourseLocalServiceUtil.getCourse(courseId);	
-		long[] teamIds = null;
-		if(teamId > 0){
-			teamIds = new long[1];
-			teamIds[0] = teamId;
-		}
-		return courseFinder.countStudents(courseId, course.getCompanyId(), screenName, firstName, lastName, emailAddress, WorkflowConstants.STATUS_APPROVED, teamIds, andComparator);
-	}
-	
-	public List<User> getStudentsFromCourse(Course course) {		
-		return getStudentsFromCourse(course.getCompanyId(), course.getGroupCreatedId());
-	}
-	
-	public List<User> getStudentsFromCourse(long companyId, long courseGroupCreatedId) {
-		return getStudentsFromCourse(companyId, courseGroupCreatedId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, 0, null, null, null, null, true);
-	}
-	
-	public List<User> getStudentsFromCourse(long companyId, long courseGroupCreatedId, long teamId){
-		
-		return getStudentsFromCourse(companyId, courseGroupCreatedId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, teamId, null, null, null, null, true);
-
-	}
-	
-	public List<User> getStudentsFromCourse(long companyId, long courseGroupCreatedId, int start, int end,long teamId, String firstName, String lastName, String screenName, String emailAddress, boolean andOperator) {
-		
-		try {
-			long[] teamIds = null;
-			if(teamId > 0){
-				teamIds = new long[1];
-				teamIds[0] = teamId;
-			}
-			Course course = CourseLocalServiceUtil.getCourseByGroupCreatedId(courseGroupCreatedId);
-			return courseFinder.findStudents(course.getCourseId(), companyId, screenName, firstName, lastName, emailAddress, WorkflowConstants.STATUS_APPROVED, teamIds, andOperator, start, end, new UserLastNameComparator(true));
-
-		} catch (SystemException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return null;
-		}
-	}
-	
-	public int getStudentsFromCourseCount(long companyId, long courseGroupCreatedId, long teamId, String firstName, String lastName, String screenName, String emailAddress, boolean andOperator) {
-		
-		try {
-			Course course = CourseLocalServiceUtil.getCourseByGroupCreatedId(courseGroupCreatedId);
-			long[] teamIds = null;
-			if(teamId > 0){
-				teamIds = new long[1];
-				teamIds[0] = teamId;
-			}
-			return courseFinder.countStudents(course.getCourseId(), companyId, screenName, firstName, lastName, emailAddress, WorkflowConstants.STATUS_APPROVED, teamIds, andOperator);
-		} catch (SystemException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-			return 0;
-		}
-	}	
-	
-	public List<User> getTeachersFromCourse(long courseId) {
-		List<User> users = new ArrayList<User>();
-		try{
-			
-			Course course = courseLocalService.fetchCourse(courseId);
-						
-			LmsPrefs prefs = LmsPrefsLocalServiceUtil.getLmsPrefs(course.getCompanyId());
-			long teacherRoleId=RoleLocalServiceUtil.getRole(prefs.getTeacherRole()).getRoleId();
-			return getTeachersFromCourse(course, teacherRoleId);
-		}catch(Exception e){
-			e.printStackTrace();
-		}
-		
-		return users;
-		
-	}
-	
-	public List<User> getTeachersFromCourse(Course course, long teacherRoleId) {
-		List<User> users = new ArrayList<User>();
-		try{
-						
-			LinkedHashMap<String, Object> userParams = new LinkedHashMap<String, Object>();
-			userParams.put("usersGroups", course.getGroupCreatedId());
-			userParams.put("userGroupRole", new Long[]{course.getGroupCreatedId(), teacherRoleId});
-			
-			users = UserLocalServiceUtil.search(course.getCompanyId(), "", 
-					WorkflowConstants.STATUS_APPROVED, userParams, 
-					QueryUtil.ALL_POS, QueryUtil.ALL_POS,(OrderByComparator)null);
-		}catch(Exception e){
-			e.printStackTrace();
-		}
-		
-		return users;
-		
-	}
-	
 	public long[] getTeachersAndEditorsIdsFromCourse(Course course){
 		long[] userIds = null;
 		
@@ -992,60 +888,6 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 		}
 		
 		return userIds;
-	}
-	
-	/**
-	 * Devuelve los profesores de un curso teniendo en cuenta si el usuario pertenece a algún equipo, si pertenece
-	 * a algún equipo, devuelve los profesores de ese equipo. Si no los equipos a los que pertenece no tienen ningún
-	 * profesor o no pertenece a ningún equipo devuelve todos los profesores del curso
-	 * @param course
-	 * @param teacherRoleId
-	 * @param userId
-	 * @return List<User> Lista de usuarios profesores
-	 */
-	public List<User> getTeachersFromCourseTeams(Course course, long teacherRoleId, long userId){
-		List<User> users = null;
-		try{
-			
-			//Primero comprobamos si el usuario pertenece a algún equipo
-			List<Team> userTeams = null;
-			try {
-				userTeams=TeamLocalServiceUtil.getUserTeams(userId, course.getGroupCreatedId());
-			} catch (SystemException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			
-			if(userTeams != null && userTeams.size() > 0){
-				log.debug("CourseTeachers::Pedimos los profesores de los equipos");
-				String teamIds = "";
-				for(int i = 0; i < userTeams.size();i++){
-					teamIds += userTeams.get(i).getTeamId() + ",";
-				}
-				if(teamIds.length() > 0) teamIds = teamIds.substring(0, teamIds.length()-1);
-				
-				LinkedHashMap<String, Object> userParams = new LinkedHashMap<String, Object>();
-				userParams.put("usersGroups", course.getGroupCreatedId());
-				userParams.put("userGroupRole", new Long[]{course.getGroupCreatedId(), teacherRoleId});
-				userParams.put("userTeamIds", new CustomSQLParam("INNER JOIN users_teams ON user_.userId = users_teams.userId "
-						+ "WHERE users_teams.teamId IN (" + teamIds + ")", null));
-				
-				users = UserLocalServiceUtil.search(course.getCompanyId(), "", 
-						WorkflowConstants.STATUS_APPROVED, userParams, 
-						QueryUtil.ALL_POS, QueryUtil.ALL_POS,(OrderByComparator)null);
-			}
-			 
-			if(users == null){
-				log.debug("CourseTeachers::Pedimos los profesores");
-				users = CourseLocalServiceUtil.getTeachersFromCourse(course, teacherRoleId);
-			}
-						
-
-		}catch(Exception e){
-			e.printStackTrace();
-		}
-		
-		return users;
 	}
 	
 	/**
@@ -1192,44 +1034,6 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 			params.put(CourseParams.PARAM_PERMISSIONS_ADMIN, userId);
 		}
 		return courseFinder.countByKeywords(companyId, freeText, language, status, parentCourseId, groupId, params);
-	}
-	
-	public List<User> getStudents(long courseId, long companyId, String screenName, String firstName, String lastName, String emailAddress, long[] teamIds, boolean andOperator, int start, int end,OrderByComparator comparator){
-		return courseFinder.findStudents(courseId, companyId, screenName,firstName, lastName, emailAddress, WorkflowConstants.STATUS_APPROVED, teamIds, andOperator, start, end, comparator);
-	}
-	
-	public int countStudents(long courseId, long companyId, String screenName, String firstName, String lastName, String emailAddress, long[] teamIds, boolean andOperator){
-		return courseFinder.countStudents(courseId, companyId, screenName,firstName, lastName, emailAddress, WorkflowConstants.STATUS_APPROVED, teamIds, andOperator);
-	}
-	
-	public List<User> getStudents(long courseId, long companyId, String screenName, String firstName, String lastName, String emailAddress, boolean andOperator, int start, int end,OrderByComparator comparator){
-		return courseFinder.findStudents(courseId, companyId, screenName,firstName, lastName, emailAddress, WorkflowConstants.STATUS_APPROVED, null, andOperator, start, end, comparator);
-	}
-	
-	public int countStudents(long courseId, long companyId, String screenName, String firstName, String lastName, String emailAddress,boolean andOperator){
-		return courseFinder.countStudents(courseId, companyId, screenName,firstName, lastName, emailAddress, WorkflowConstants.STATUS_APPROVED, null, andOperator);
-	}
-	
-	public List<User> getStudents(long courseId, long companyId, String screenName, String firstName, String lastName, String emailAddress, int status, long teamId, boolean andOperator, int start, int end,OrderByComparator comparator){
-		long[] teamIds = null;
-		if(teamId > 0){
-			teamIds = new long[1];
-			teamIds[0] = teamId;
-		}
-		return courseFinder.findStudents(courseId, companyId, screenName,firstName, lastName, emailAddress, status, teamIds, andOperator, start, end, comparator);
-	}
-	
-	public int countStudents(long courseId, long companyId, String screenName, String firstName, String lastName, String emailAddress, int status, long teamId,boolean andOperator){
-		long[] teamIds = null;
-		if(teamId > 0){
-			teamIds = new long[1];
-			teamIds[0] = teamId;
-		}
-		return courseFinder.countStudents(courseId, companyId, screenName,firstName, lastName, emailAddress, status, teamIds, andOperator);
-	}
-	
-	public int countStudentsStatus(long courseId, long companyId, String screenName, String firstName, String lastName, String emailAddress, int status, boolean andOperator){
-		return courseFinder.countStudents(courseId, companyId, screenName,firstName, lastName, emailAddress, status, null, andOperator);
 	}
 	
 	public List<Course> getCoursesCatalogByTitleCategoriesTags(String freeText, long[] categories, long[] tags, long companyId, long groupId, long userId, String language, int start, int end){
@@ -1711,9 +1515,320 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 		return courseFinder.getDistinctCourseGroups(companyId);
 	}
 	
+	/*******************************************************************************************************************************/
+	/*******************************************************************************************************************************/
+	/*******************************************************************************************************************************/
+	/*******************************************************************************************************************************/
+	/*****************************************METODOS PARA BÚSQUEDA DE EDITORES*****************************************************/
+	/*******************************************************************************************************************************/
+	/*******************************************************************************************************************************/
+	/*******************************************************************************************************************************/
+	/*******************************************************************************************************************************/
+	
+	/**
+	 * Usar este método para la búsqueda de editores de un curso
+	 * @param courseId id del curso
+	 * @param companyId id de company
+	 * @param screenName nombre de usuario
+	 * @param firstName nombre
+	 * @param lastName apellido
+	 * @param emailAddress direccion de correo
+	 * @param status estado del usuario (WorkflowConstants)
+	 * @param teamIds array de long con los ids de los equipos
+	 * @param andOperator true si queremos que coincidan screenname, firstname, lastname y emailaddress, false en caso contrario
+	 * @param start inicio de la lista
+	 * @param end fin de la lista
+	 * @param obc orden de la lista
+	 * @return List<User> estudiantes del curso
+	 */
+	public List<User> getEditorsFromCourse(long courseId, long companyId, String screenName, String firstName, String lastName, String emailAddress, int status, long[] teamIds, boolean andOperator, 
+									int start, int end, OrderByComparator obc){
+		return courseFinder.findEditors(courseId, companyId, screenName, firstName, lastName, emailAddress, status, teamIds, andOperator, start, end, obc);
+	}
+	
+	/**
+	 * Usar este método para contar los editores de un curso
+	 * @param courseId id del curso
+	 * @param companyId id de company
+	 * @param screenName nombre de usuario
+	 * @param firstName nombre
+	 * @param lastName apellido
+	 * @param emailAddress direccion de correo
+	 * @param status estado del usuario (WorkflowConstants)
+	 * @param teamIds array de long con los ids de los equipos
+	 * @param andOperator true si queremos que coincidan screenname, firstname, lastname y emailaddress, false en caso contrario
+	 * @return
+	 */
+	public int countEditorsFromCourse(long courseId, long companyId, String screenName, String firstName, String lastName, String emailAddress, int status, long[] teamIds, boolean andOperator){
+		return courseFinder.countEditors(courseId, companyId, screenName, firstName, lastName, emailAddress, status, teamIds, andOperator);
+	}
+	
+	/*******************************************************************************************************************************/
+	/*******************************************************************************************************************************/
+	/*******************************************************************************************************************************/
+	/*******************************************************************************************************************************/
+	/***************************************METODOS PARA BÚSQUEDA DE PROFESORES****************************************************/
+	/*******************************************************************************************************************************/
+	/*******************************************************************************************************************************/
+	/*******************************************************************************************************************************/
+	/*******************************************************************************************************************************/
+	
+	/**
+	 * Usar este método para la búsqueda de profesores de un curso
+	 * @param courseId id del curso
+	 * @param companyId id de company
+	 * @param screenName nombre de usuario
+	 * @param firstName nombre
+	 * @param lastName apellido
+	 * @param emailAddress direccion de correo
+	 * @param status estado del usuario (WorkflowConstants)
+	 * @param teamIds array de long con los ids de los equipos
+	 * @param andOperator true si queremos que coincidan screenname, firstname, lastname y emailaddress, false en caso contrario
+	 * @param start inicio de la lista
+	 * @param end fin de la lista
+	 * @param obc orden de la lista
+	 * @return List<User> estudiantes del curso
+	 */
+	public List<User> getTeachersFromCourse(long courseId, long companyId, String screenName, String firstName, String lastName, String emailAddress, int status, long[] teamIds, boolean andOperator, 
+									int start, int end, OrderByComparator obc){
+		return courseFinder.findTeachers(courseId, companyId, screenName, firstName, lastName, emailAddress, status, teamIds, andOperator, start, end, obc);
+	}
+	
+	/**
+	 * Usar este método para contar los profesores de un curso
+	 * @param courseId id del curso
+	 * @param companyId id de company
+	 * @param screenName nombre de usuario
+	 * @param firstName nombre
+	 * @param lastName apellido
+	 * @param emailAddress direccion de correo
+	 * @param status estado del usuario (WorkflowConstants)
+	 * @param teamIds array de long con los ids de los equipos
+	 * @param andOperator true si queremos que coincidan screenname, firstname, lastname y emailaddress, false en caso contrario
+	 * @return
+	 */
+	public int countTeachersFromCourse(long courseId, long companyId, String screenName, String firstName, String lastName, String emailAddress, int status, long[] teamIds, boolean andOperator){
+		return courseFinder.countTeachers(courseId, companyId, screenName, firstName, lastName, emailAddress, status, teamIds, andOperator);
+	}
+	
+	public List<User> getTeachersFromCourse(long courseId) {
+		List<User> users = null;
+		try{
+			
+			Course course = courseLocalService.fetchCourse(courseId);
+						
+			users = courseFinder.findTeachers(courseId, course.getCompanyId(), null, null, null, null, WorkflowConstants.STATUS_APPROVED, null, false, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		
+		return users;
+		
+	}
+	
+	@Deprecated
+	public List<User> getTeachersFromCourse(Course course, long teacherRoleId) {
+		return courseFinder.findTeachers(course.getCourseId(), course.getCompanyId(), null, null, null, null, WorkflowConstants.STATUS_APPROVED, null, false, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+	}
+	
+	
+	@Deprecated
+	public List<User> getTeachersFromCourseTeams(Course course, long teacherRoleId, long userId){
+		List<User> users = null;
+		try{
+			
+			//Primero comprobamos si el usuario pertenece a algún equipo
+			List<Team> userTeams = null;
+			try {
+				userTeams=TeamLocalServiceUtil.getUserTeams(userId, course.getGroupCreatedId());
+			} catch (SystemException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			if(userTeams != null && userTeams.size() > 0){
+				log.debug("CourseTeachers::Pedimos los profesores de los equipos");
+				String teamIds = "";
+				for(int i = 0; i < userTeams.size();i++){
+					teamIds += userTeams.get(i).getTeamId() + ",";
+				}
+				if(teamIds.length() > 0) teamIds = teamIds.substring(0, teamIds.length()-1);
+				
+				LinkedHashMap<String, Object> userParams = new LinkedHashMap<String, Object>();
+				userParams.put("usersGroups", course.getGroupCreatedId());
+				userParams.put("userGroupRole", new Long[]{course.getGroupCreatedId(), teacherRoleId});
+				userParams.put("userTeamIds", new CustomSQLParam("INNER JOIN users_teams ON user_.userId = users_teams.userId "
+						+ "WHERE users_teams.teamId IN (" + teamIds + ")", null));
+				
+				users = UserLocalServiceUtil.search(course.getCompanyId(), "", 
+						WorkflowConstants.STATUS_APPROVED, userParams, 
+						QueryUtil.ALL_POS, QueryUtil.ALL_POS,(OrderByComparator)null);
+			}
+			 
+			if(users == null){
+				log.debug("CourseTeachers::Pedimos los profesores");
+				users = CourseLocalServiceUtil.getTeachersFromCourse(course, teacherRoleId);
+			}
+						
+
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		
+		return users;
+	}
+	
+	/*******************************************************************************************************************************/
+	/*******************************************************************************************************************************/
+	/*******************************************************************************************************************************/
+	/*******************************************************************************************************************************/
+	/***************************************METODOS PARA BÚSQUEDA DE ESTUDIANTES****************************************************/
+	/*******************************************************************************************************************************/
+	/*******************************************************************************************************************************/
+	/*******************************************************************************************************************************/
+	/*******************************************************************************************************************************/
+	
+	/**
+	 * Usar este método para la búsqueda de estudiantes de un curso
+	 * @param courseId id del curso
+	 * @param companyId id de company
+	 * @param screenName nombre de usuario
+	 * @param firstName nombre
+	 * @param lastName apellido
+	 * @param emailAddress direccion de correo
+	 * @param status estado del usuario (WorkflowConstants)
+	 * @param teamIds array de long con los ids de los equipos
+	 * @param andOperator true si queremos que coincidan screenname, firstname, lastname y emailaddress, false en caso contrario
+	 * @param start inicio de la lista
+	 * @param end fin de la lista
+	 * @param obc orden de la lista
+	 * @return List<User> estudiantes del curso
+	 */
+	public List<User> getStudentsFromCourse(long courseId, long companyId, String screenName, String firstName, String lastName, String emailAddress, int status, long[] teamIds, boolean andOperator, 
+									int start, int end, OrderByComparator obc){
+		return courseFinder.findStudents(courseId, companyId, screenName, firstName, lastName, emailAddress, status, teamIds, andOperator, start, end, obc);
+	}
+	
+	/**
+	 * Usar este método para contar los estudiantes de un curso
+	 * @param courseId id del curso
+	 * @param companyId id de company
+	 * @param screenName nombre de usuario
+	 * @param firstName nombre
+	 * @param lastName apellido
+	 * @param emailAddress direccion de correo
+	 * @param status estado del usuario (WorkflowConstants)
+	 * @param teamIds array de long con los ids de los equipos
+	 * @param andOperator true si queremos que coincidan screenname, firstname, lastname y emailaddress, false en caso contrario
+	 * @return
+	 */
+	public int countStudentsFromCourse(long courseId, long companyId, String screenName, String firstName, String lastName, String emailAddress, int status, long[] teamIds, boolean andOperator){
+		return courseFinder.countStudents(courseId, companyId, screenName, firstName, lastName, emailAddress, status, teamIds, andOperator);
+	}
+	
+	public int getStudentsFromCourseCount(long courseId) throws SystemException, PortalException{
+		return getStudentsFromCourseCount(courseId, 0);
+		
+	}
+	public int getStudentsFromCourseCount(long courseId, long teamId) throws SystemException, PortalException{
+		return getStudentsFromCourseCount(courseId, 0,null,null,null,null,true);
+	}
+	
+	public int getStudentsFromCourseCount(long courseId, long teamId, String firstName, String lastName, String screenName, String emailAddress, boolean andComparator) throws SystemException, PortalException{
+		
+		Course course = CourseLocalServiceUtil.getCourse(courseId);	
+		long[] teamIds = null;
+		if(teamId > 0){
+			teamIds = new long[1];
+			teamIds[0] = teamId;
+		}
+		return countStudentsFromCourse(courseId, course.getCompanyId(), screenName, firstName, lastName, emailAddress, WorkflowConstants.STATUS_APPROVED, teamIds, andComparator);
+	}
+	
+	public List<User> getStudentsFromCourse(Course course) {		
+		return getStudentsFromCourse(course.getCompanyId(), course.getGroupCreatedId());
+	}
+	
+	public List<User> getStudentsFromCourse(long companyId, long courseGroupCreatedId) {
+		return getStudentsFromCourse(companyId, courseGroupCreatedId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, 0, null, null, null, null, true);
+	}
+	
+	public List<User> getStudentsFromCourse(long companyId, long courseGroupCreatedId, long teamId){
+		
+		return getStudentsFromCourse(companyId, courseGroupCreatedId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, teamId, null, null, null, null, true);
+
+	}
+	
+	public List<User> getStudentsFromCourse(long companyId, long courseGroupCreatedId, int start, int end,long teamId, String firstName, String lastName, String screenName, String emailAddress, boolean andOperator) {
+		
+		try {
+			long[] teamIds = null;
+			if(teamId > 0){
+				teamIds = new long[1];
+				teamIds[0] = teamId;
+			}
+			Course course = CourseLocalServiceUtil.getCourseByGroupCreatedId(courseGroupCreatedId);
+			return getStudentsFromCourse(course.getCourseId(), companyId, screenName, firstName, lastName, emailAddress, WorkflowConstants.STATUS_APPROVED, teamIds, andOperator, start, end, new UserLastNameComparator(true));
+
+		} catch (SystemException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	public int getStudentsFromCourseCount(long companyId, long courseGroupCreatedId, long teamId, String firstName, String lastName, String screenName, String emailAddress, boolean andOperator) {
+		
+		try {
+			Course course = CourseLocalServiceUtil.getCourseByGroupCreatedId(courseGroupCreatedId);
+			long[] teamIds = null;
+			if(teamId > 0){
+				teamIds = new long[1];
+				teamIds[0] = teamId;
+			}
+			return countStudentsFromCourse(course.getCourseId(), companyId, screenName, firstName, lastName, emailAddress, WorkflowConstants.STATUS_APPROVED, teamIds, andOperator);
+		} catch (SystemException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+			return 0;
+		}
+	}
+	
+	public List<User> getStudents(long courseId, long companyId, String screenName, String firstName, String lastName, String emailAddress, long[] teamIds, boolean andOperator, int start, int end,OrderByComparator comparator){
+		return getStudentsFromCourse(courseId, companyId, screenName,firstName, lastName, emailAddress, WorkflowConstants.STATUS_APPROVED, teamIds, andOperator, start, end, comparator);
+	}
+	
+	public int countStudents(long courseId, long companyId, String screenName, String firstName, String lastName, String emailAddress, long[] teamIds, boolean andOperator){
+		return countStudentsFromCourse(courseId, companyId, screenName,firstName, lastName, emailAddress, WorkflowConstants.STATUS_APPROVED, teamIds, andOperator);
+	}
+	
+	public List<User> getStudents(long courseId, long companyId, String screenName, String firstName, String lastName, String emailAddress, boolean andOperator, int start, int end,OrderByComparator comparator){
+		return getStudentsFromCourse(courseId, companyId, screenName,firstName, lastName, emailAddress, WorkflowConstants.STATUS_APPROVED, null, andOperator, start, end, comparator);
+	}
+	
+	public int countStudents(long courseId, long companyId, String screenName, String firstName, String lastName, String emailAddress,boolean andOperator){
+		return countStudentsFromCourse(courseId, companyId, screenName,firstName, lastName, emailAddress, WorkflowConstants.STATUS_APPROVED, null, andOperator);
+	}
+	
+	public List<User> getStudents(long courseId, long companyId, String screenName, String firstName, String lastName, String emailAddress, int status, long teamId, boolean andOperator, int start, int end,OrderByComparator comparator){
+		long[] teamIds = null;
+		if(teamId > 0){
+			teamIds = new long[1];
+			teamIds[0] = teamId;
+		}
+		return getStudentsFromCourse(courseId, companyId, screenName,firstName, lastName, emailAddress, status, teamIds, andOperator, start, end, comparator);
+	}
+	
+	public int countStudents(long courseId, long companyId, String screenName, String firstName, String lastName, String emailAddress, int status, long teamId,boolean andOperator){
+		long[] teamIds = null;
+		if(teamId > 0){
+			teamIds = new long[1];
+			teamIds[0] = teamId;
+		}
+		return countStudentsFromCourse(courseId, companyId, screenName,firstName, lastName, emailAddress, status, teamIds, andOperator);
+	}
+	
+	public int countStudentsStatus(long courseId, long companyId, String screenName, String firstName, String lastName, String emailAddress, int status, boolean andOperator){
+		return countStudentsFromCourse(courseId, companyId, screenName,firstName, lastName, emailAddress, status, null, andOperator);
+	}
 }
-
-
-
-
-
