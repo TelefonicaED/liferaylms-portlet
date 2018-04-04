@@ -15,7 +15,7 @@
 			<c:choose>
 				<c:when test="${not empty courseResult.course.logoURL }">
 					<a href="${url }" class="course-title">
-						<img src="${courseResult.course.logoURL }">
+						<img src="${courseResult.course.logoURL }" alt="${courseResult.course.title }">
 						${courseResult.course.title }
 					</a>
 				</c:when>

@@ -247,7 +247,7 @@ function validate(){
 	        %>
 			<aui:column>    
 	        	<liferay-ui:message key="actual-image"  /><br/>
-	            	<img class="courselogo" src="<%= DLUtil.getPreviewURL(fileEntry, fileEntry.getFileVersion(), themeDisplay, "&imageThumbnail=1") %>">
+	            	<img class="courselogo" src="<%= DLUtil.getPreviewURL(fileEntry, fileEntry.getFileVersion(), themeDisplay, "&imageThumbnail=1") %>" alt="<%= module.getTitle(themeDisplay.getLocale()) %>">
 	        </aui:column>    
 				<%}catch(Exception e){}
 	        }%>

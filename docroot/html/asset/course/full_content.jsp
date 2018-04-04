@@ -21,7 +21,7 @@ if (Validator.isNotNull(course.getIcon())) {
 	long logoId = course.getIcon();
 	FileEntry fileEntry = DLAppLocalServiceUtil.getFileEntry(logoId);
 	%>
-	<img class="courselogo" src="<%= DLUtil.getPreviewURL(fileEntry, fileEntry.getFileVersion(), themeDisplay, StringPool.BLANK) %>" />
+	<img class="courselogo" src="<%= DLUtil.getPreviewURL(fileEntry, fileEntry.getFileVersion(), themeDisplay, StringPool.BLANK) %>" alt="<%= course.getTitle(themeDisplay.getLocale()) %>"/>
 	
 	<%
 } 
@@ -32,7 +32,7 @@ else
 	{
 		long logoId = generatedGroup.getPublicLayoutSet().getLogoId();
 		%>
-		<img class="courselogo" src="/image/layout_set_logo?img_id=<%=logoId%>" />
+		<img class="courselogo" src="/image/layout_set_logo?img_id=<%=logoId%>" alt="<%= course.getTitle(themeDisplay.getLocale()) %>"/>
 		
 		<%
 	}
@@ -43,6 +43,7 @@ else
 							image='<%= "../file_system/large/course" %>'
 							label="<%= false %>"
 							message=""	
+							alt="<%= course.getTitle(themeDisplay.getLocale()) %>"
 						/>
 		<%
 	}
