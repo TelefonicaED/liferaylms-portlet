@@ -2,6 +2,7 @@ package com.liferay.lms;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -13,16 +14,23 @@ import java.util.TimeZone;
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
 import javax.portlet.PortletException;
+import javax.portlet.PortletPreferences;
 import javax.portlet.PortletSession;
 import javax.portlet.PortletURL;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
+import javax.portlet.ResourceRequest;
+import javax.portlet.ResourceResponse;
+
+import au.com.bytecode.opencsv.CSVWriter;
 
 import com.liferay.lms.model.AsynchronousProcessAudit;
 import com.liferay.lms.model.Course;
+import com.liferay.lms.model.CourseResult;
 import com.liferay.lms.model.LmsPrefs;
 import com.liferay.lms.service.AsynchronousProcessAuditLocalServiceUtil;
 import com.liferay.lms.service.CourseLocalServiceUtil;
+import com.liferay.lms.service.CourseResultLocalServiceUtil;
 import com.liferay.lms.service.CourseServiceUtil;
 import com.liferay.lms.service.LmsPrefsLocalServiceUtil;
 import com.liferay.lms.util.CourseParams;
@@ -39,24 +47,33 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.messaging.Message;
 import com.liferay.portal.kernel.messaging.MessageBusUtil;
+import com.liferay.portal.kernel.servlet.HttpHeaders;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.upload.UploadPortletRequest;
 import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.kernel.util.CharPool;
+import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
+import com.liferay.portal.model.Company;
+import com.liferay.portal.model.CompanyConstants;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.LayoutSet;
 import com.liferay.portal.model.LayoutSetPrototype;
+import com.liferay.portal.model.Role;
 import com.liferay.portal.model.RoleConstants;
 import com.liferay.portal.model.User;
+import com.liferay.portal.model.UserGroupRole;
 import com.liferay.portal.security.permission.ActionKeys;
+import com.liferay.portal.service.CompanyLocalServiceUtil;
 import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.LayoutServiceUtil;
 import com.liferay.portal.service.LayoutSetLocalServiceUtil;
@@ -64,6 +81,7 @@ import com.liferay.portal.service.LayoutSetPrototypeLocalServiceUtil;
 import com.liferay.portal.service.RoleLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceContextFactory;
+import com.liferay.portal.service.UserGroupRoleLocalServiceUtil;
 import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
@@ -1011,6 +1029,162 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 		}
 		if (Validator.isNotNull(redirect)) {
 			actionResponse.sendRedirect(redirect);
+		}
+	}
+	
+	public void serverResource(ResourceRequest request, ResourceResponse response) throws PortletException, IOException{
+		String action = ParamUtil.getString(request, "action");
+		ThemeDisplay themeDisplay = (ThemeDisplay) request.getAttribute(WebKeys.THEME_DISPLAY);
+		
+		if(action.equals("export")){
+						
+			Role commmanager = null;
+			LmsPrefs prefs = null;
+			try {
+				commmanager = RoleLocalServiceUtil.getRole(themeDisplay.getCompanyId(), RoleConstants.SITE_MEMBER);
+				prefs=LmsPrefsLocalServiceUtil.getLmsPrefs(themeDisplay.getCompanyId());
+			} catch (PortalException e) {
+				if(log.isDebugEnabled()){
+					e.printStackTrace();
+				}
+			} catch (SystemException e) {
+				if(log.isDebugEnabled()){
+					e.printStackTrace();
+				}
+			}
+			
+			
+			long groupId = ParamUtil.getLong(request, "groupId",0);
+			long roleId = ParamUtil.getLong(request, "roleId",0);
+			
+			List<User> users = new ArrayList<User>();
+			
+			if(roleId!=commmanager.getRoleId())
+			{
+				List<UserGroupRole> ugrs = null;
+				try {
+					ugrs = UserGroupRoleLocalServiceUtil.getUserGroupRolesByGroupAndRole(groupId, roleId);
+				} catch (SystemException e) {
+					if(log.isDebugEnabled()){
+						e.printStackTrace();
+					}
+				}
+
+				users=new java.util.ArrayList<User>();
+				
+				if(ugrs!=null){
+					for(UserGroupRole ugr:ugrs)
+					{
+						try {
+							users.add(ugr.getUser());
+						} catch (PortalException e) {
+							if(log.isDebugEnabled()){
+								e.printStackTrace();
+							}
+						} catch (SystemException e) {
+							if(log.isDebugEnabled()){
+								e.printStackTrace();
+							}
+						}
+					}
+				}
+			}else{
+				java.util.List<User> userst = null;
+				try {
+					userst = UserLocalServiceUtil.getGroupUsers(groupId);
+				} catch (SystemException e) {
+					if(log.isDebugEnabled()){
+						e.printStackTrace();
+					}
+				}
+				
+				if(userst!=null){
+					for(User usert:userst){
+						List<UserGroupRole> userGroupRoles = null;
+						try {
+							userGroupRoles = UserGroupRoleLocalServiceUtil.getUserGroupRoles(usert.getUserId(),groupId);
+						} catch (SystemException e) {
+							if(log.isDebugEnabled()){
+								e.printStackTrace();
+							}
+						}
+						boolean remove =false;
+						if(userGroupRoles!=null){
+							for(UserGroupRole ugr:userGroupRoles){
+								if(ugr.getRoleId()==prefs.getEditorRole()||ugr.getRoleId()==prefs.getTeacherRole()){
+									remove = true;
+									break;
+								}
+							}
+							if(!remove){
+								users.add(usert);
+							}
+						}
+					}
+				}
+			}
+			
+			response.setCharacterEncoding("UTF-8");
+			response.setContentType(ContentTypes.TEXT_CSV_UTF8);
+			response.addProperty(HttpHeaders.CONTENT_DISPOSITION,"attachment; fileName=users.csv");
+			
+			byte b[] = { (byte) 0xEF, (byte) 0xBB, (byte) 0xBF };
+
+			response.getPortletOutputStream().write(b);
+			
+			CSVWriter writer = new CSVWriter(new OutputStreamWriter(
+					response.getPortletOutputStream(), StringPool.UTF8),CharPool.SEMICOLON);
+			
+			String authType = PropsUtil.get(PropsKeys.COMPANY_SECURITY_AUTH_TYPE);
+			try {
+				Company company = CompanyLocalServiceUtil.getCompany(themeDisplay.getCompanyId());
+				if (Validator.isNotNull(company)) {
+					authType = company.getAuthType();
+				}
+			} catch (PortalException e) {
+				log.error("Se ha producido un error al obtener el tipo de login de usuario (authType) para companyId=" + companyId, e);
+			} catch (SystemException e) {
+				log.error("Se ha producido un error al obtener el tipo de login de usuario (authType) para companyId=" + companyId, e);
+			}
+			
+			if (CompanyConstants.AUTH_TYPE_SN.equalsIgnoreCase(authType)) {
+				
+			}
+			
+			String[] cabecera = {hasImportById ? "Id.Usuario" : "Nombre Usuario",
+								"Nombre","Fecha Inicio" ,"Fecha Fin"};
+			writer.writeNext(cabecera);
+			
+		    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		   
+		    Long courseId = ParamUtil.getLong(request, "courseId");
+			CourseResult courseResult = null;
+			String fechaIni,fechaFin = new String();
+			for(User user:users){			
+				try {
+					courseResult=CourseResultLocalServiceUtil.getCourseResultByCourseAndUser(courseId, user.getUserId());
+				} catch (SystemException e) {
+					if(log.isDebugEnabled())e.printStackTrace();
+				}
+				
+				fechaIni = (courseResult!=null&&courseResult.getAllowStartDate() != null)?sdf.format(courseResult.getAllowStartDate()):StringPool.BLANK;
+				fechaFin = (courseResult!=null&&courseResult.getAllowFinishDate() != null)?sdf.format(courseResult.getAllowFinishDate()):StringPool.BLANK;
+	
+				String[] resultados = { hasImportById ?
+											String.valueOf(user.getUserId()) : 	// Exportaci�n por userId
+											user.getScreenName(), 				// Exportaci�n por screenName
+										user.getFullName(),
+										fechaIni, fechaFin
+				  };
+				writer.writeNext(resultados);
+			}
+
+			writer.flush();
+			writer.close();
+			response.getPortletOutputStream().flush();
+			response.getPortletOutputStream().close();
+		}else{
+			super.serveResource(request, response);
 		}
 	}
 

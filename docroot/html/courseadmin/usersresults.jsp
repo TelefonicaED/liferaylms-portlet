@@ -306,32 +306,32 @@ if(backToEdit) {
 		                                                "  FROM UserGroupRole "+
 		                                                "  WHERE  (UserGroupRole.groupId = ?) AND (UserGroupRole.roleId = ?))",new Long[]{course.getGroupCreatedId(),roleId}));
 
-		boolean showOnlyOrganizationUsers = preferences.getValue("showOnlyOrganizationUsers", "false").equals("true");
-		List <User> userListPage = new LinkedList<User>();
-		
-		if (showOnlyOrganizationUsers) {
-			if (organization != null) {
-				params.put("usersOrgs", organization.getOrganizationId());
-			} else {
-				
-				long[] organizationsOfUserList = themeDisplay.getUser().getOrganizationIds();
-				String organizationIds = "";
-				for(long organizationId: organizationsOfUserList){
-					organizationIds += organizationId + ",";
-				}
-				if(organizationIds.length() > 0) organizationIds = organizationIds.substring(0, organizationIds.length()-1);
-				if(organizationIds.length() == 0)
-					organizationIds = "-1";
-					
-				params.put("multipleOrgs",new CustomSQLParam("WHERE User_.userId IN (SELECT users_orgs.userId FROM users_orgs WHERE users_orgs.organizationId IN (?)) ",organizationIds));
+	boolean showOnlyOrganizationUsers = preferences.getValue("showOnlyOrganizationUsers", "false").equals("true");
+	List <User> userListPage = new LinkedList<User>();
+	
+	if (showOnlyOrganizationUsers) {
+		if (organization != null) {
+			params.put("usersOrgs", organization.getOrganizationId());
+		} else {
+			
+			long[] organizationsOfUserList = themeDisplay.getUser().getOrganizationIds();
+			String organizationIds = "";
+			for(long organizationId: organizationsOfUserList){
+				organizationIds += organizationId + ",";
 			}
-
+			if(organizationIds.length() > 0) organizationIds = organizationIds.substring(0, organizationIds.length()-1);
+			if(organizationIds.length() == 0)
+				organizationIds = "-1";
+				
+			params.put("multipleOrgs",new CustomSQLParam("WHERE User_.userId IN (SELECT users_orgs.userId FROM users_orgs WHERE users_orgs.organizationId IN (?)) ",organizationIds));
 		}
-		userListPage = UserLocalServiceUtil.search(themeDisplay.getCompanyId(), firstName, middleName, lastName, screenName, emailAddress, 0, params, andSearch, searchContainer.getStart(), searchContainer.getEnd(), obc);
-		int userCount =  UserLocalServiceUtil.searchCount(themeDisplay.getCompanyId(), firstName, middleName, lastName, screenName, emailAddress, 0, params, andSearch);
-		
-		pageContext.setAttribute("results", userListPage);
-	    pageContext.setAttribute("total", userCount);
+
+	}
+	userListPage = UserLocalServiceUtil.search(themeDisplay.getCompanyId(), firstName, middleName, lastName, screenName, emailAddress, 0, params, andSearch, searchContainer.getStart(), searchContainer.getEnd(), obc);
+	int userCount =  UserLocalServiceUtil.searchCount(themeDisplay.getCompanyId(), firstName, middleName, lastName, screenName, emailAddress, 0, params, andSearch);
+	
+	pageContext.setAttribute("results", userListPage);
+    pageContext.setAttribute("total", userCount);
 
 	%>
 		<input type="hidden" id="allSelected" value="false" />

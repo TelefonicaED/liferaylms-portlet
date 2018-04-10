@@ -86,8 +86,6 @@ public class CourseAdminConfigurationAction implements ConfigurationAction {
 
 		portletPreferences.setValue("filterByTemplates",	Boolean.toString(ParamUtil.getBoolean(actionRequest, "filterByTemplates",	false)));
 		
-		portletPreferences.setValue	("tipoImport", ParamUtil.getString(actionRequest, "tipoImport", ""));
-		
 		portletPreferences.setValue("showExpandos", Boolean.toString(ParamUtil.getBoolean(actionRequest, "showExpandos", false)));
 		portletPreferences.setValue("showExpandosEdition", Boolean.toString(ParamUtil.getBoolean(actionRequest, "showExpandosEdition", false)));
 		
