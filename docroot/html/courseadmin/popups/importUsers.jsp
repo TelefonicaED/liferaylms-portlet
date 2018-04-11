@@ -1,3 +1,7 @@
+<%@page import="java.util.Iterator"%>
+<%@page import="com.liferay.portal.model.CompanyConstants"%>
+<%@page import="com.liferay.portal.kernel.util.PropsKeys"%>
+<%@page import="com.liferay.portal.kernel.util.PropsUtil"%>
 <%@page import="com.liferay.portlet.PortletPreferencesFactoryUtil"%>
 <%@page import="javax.portlet.PortletPreferences"%>
 <%@page import="com.liferay.lms.service.ClpSerializer"%>
@@ -20,15 +24,32 @@
 	else{
 		preferences = renderRequest.getPreferences();
 	}
+	
+	String authType = PropsUtil.get(PropsKeys.COMPANY_SECURITY_AUTH_TYPE);
+	try {
+		if (Validator.isNotNull(company)) {
+			authType = company.getAuthType();
+		}
+	} catch (Exception e) {
+		e.printStackTrace();
+	}
 
 	String urlExample = "<a href=\"/"+ ClpSerializer.getServletContextName();
 	
-	if(Integer.parseInt(preferences.getValue("tipoImport", "1")) == 1){
-		urlExample += "/html/courseadmin/examples/ImportCourseUsersByUserId.csv\">"+LanguageUtil.get(themeDisplay.getLocale(),"example")+"</a>";
-	}else{
+	if (CompanyConstants.AUTH_TYPE_SN.equalsIgnoreCase(authType)) {
 		urlExample += "/html/courseadmin/examples/ImportCourseUsersByName.csv\">"+LanguageUtil.get(themeDisplay.getLocale(),"example")+"</a>";
+	}else if(CompanyConstants.AUTH_TYPE_EA.equalsIgnoreCase(authType)){
+		urlExample += "/html/courseadmin/examples/ImportCourseUsersByEmailAddress.csv\">"+LanguageUtil.get(themeDisplay.getLocale(),"example")+"</a>";
+	}else{
+		urlExample += "/html/courseadmin/examples/ImportCourseUsersByUserId.csv\">"+LanguageUtil.get(themeDisplay.getLocale(),"example")+"</a>";
 	}
-
+	
+	Iterator<String> iterator = SessionMessages.iterator(renderRequest);
+	System.out.println("size: " + SessionMessages.size(renderRequest) + " - " + SessionMessages.contains(renderRequest, "courseadmin.importuserrole.csv.saved"));
+	while(iterator.hasNext()){
+		String key = iterator.next();
+		System.out.println("key: " + key);
+	}
 %>
 
 <portlet:renderURL var="importUsersURL"  windowState="<%= LiferayWindowState.EXCLUSIVE.toString() %>">
@@ -40,6 +61,13 @@
 
 <liferay-ui:header title="courseadmin.importuserrole"></liferay-ui:header>
 
+<liferay-ui:success key="courseadmin.importuserrole.csv.saved" message="courseadmin.importuserrole.csv.saved"></liferay-ui:success>
+
+<c:if test='<%= SessionMessages.contains(renderRequest, "courseadmin.importuserrole.csv.saved") %>'>
+	<div class="portlet-msg-success"> 
+		<liferay-ui:message key="hello" />
+	</div>
+</c:if>
 <liferay-ui:panel id="importuserrole_help" title="help" extended="closed">
 	<%if(Integer.parseInt(preferences.getValue("tipoImport", "1")) == 1){ %>
 		<%=LanguageUtil.get(themeDisplay.getLocale(),"courseadmin.importuserrole.help") %>
@@ -79,7 +107,6 @@
 </aui:form>
 <% } %>
 	<div id="<portlet:namespace />uploadMessages" >
-		<liferay-ui:success key="courseadmin.importuserrole.csv.saved" message="courseadmin.importuserrole.csv.saved" />
 		<liferay-ui:error key="courseadmin.importuserrole.csv.fileRequired" message="courseadmin.importuserrole.csv.fileRequired" />
 		<liferay-ui:error key="courseadmin.importuserrole.csv.badFormat" message="courseadmin.importuserrole.csv.badFormat" />
 		<liferay-ui:error key="courseadmin.importuserrole.csv.badFormat.size" message="courseadmin.importuserrole.csv.badFormat.size" />

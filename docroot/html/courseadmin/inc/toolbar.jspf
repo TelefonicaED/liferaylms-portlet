@@ -1,13 +1,13 @@
 <liferay-portlet:actionURL name="removeAll" var="removeAllURL">
-		<portlet:param name="view" value="role-members-tab" /> 
-		<liferay-portlet:param name="courseId" value="${courseId}"></liferay-portlet:param>
-		<liferay-portlet:param name="roleId" value="${roleId}"></liferay-portlet:param>
-		<liferay-portlet:param name="tabs1" value="${tab}"></liferay-portlet:param>
-		<portlet:param name="backToEdit" value="${backToEdit}" />
-		<c:if test="${backToEdit}">
-			<portlet:param name="redirectOfEdit" value="${redirectOfEdit}"/>
-		</c:if>
-	</liferay-portlet:actionURL>
+	<portlet:param name="view" value="role-members-tab" /> 
+	<liferay-portlet:param name="courseId" value="${courseId}"></liferay-portlet:param>
+	<liferay-portlet:param name="roleId" value="${roleId}"></liferay-portlet:param>
+	<liferay-portlet:param name="tabs1" value="${tab}"></liferay-portlet:param>
+	<portlet:param name="backToEdit" value="${backToEdit}" />
+	<c:if test="${backToEdit}">
+		<portlet:param name="redirectOfEdit" value="${redirectOfEdit}"/>
+	</c:if>
+</liferay-portlet:actionURL>
 	
 
 <script type="text/javascript">
@@ -52,7 +52,7 @@
 	<div>
 		<liferay-portlet:resourceURL var="exportURL" >
 			<portlet:param name="action" value="export"/>
-			<portlet:param name="groupId" value="${createdGroupId}"/>
+			<portlet:param name="courseId" value="${courseId}"/>
 			<portlet:param name="roleId" value="${roleId}"/>
 		</liferay-portlet:resourceURL>
 		<liferay-ui:icon 

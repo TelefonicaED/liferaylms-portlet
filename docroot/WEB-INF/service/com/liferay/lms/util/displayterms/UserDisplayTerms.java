@@ -58,11 +58,7 @@ public class UserDisplayTerms extends DisplayTerms{
 		ThemeDisplay themeDisplay = (ThemeDisplay) portletRequest.getAttribute(WebKeys.THEME_DISPLAY);
 		this.companyId = themeDisplay.getCompanyId();
 
-		String statusString = ParamUtil.getString(portletRequest, STATUS);
-
-		if (Validator.isNotNull(statusString)) {
-			status = GetterUtil.getInteger(statusString);
-		}
+		status = ParamUtil.getInteger(portletRequest, STATUS, WorkflowConstants.STATUS_APPROVED);
 
 		emailAddress = ParamUtil.getString(portletRequest, EMAIL_ADDRESS);
 		firstName = ParamUtil.getString(portletRequest, FIRST_NAME);
@@ -246,10 +242,10 @@ public class UserDisplayTerms extends DisplayTerms{
 		
 		if(isAdvancedSearch()){				
 			listStudents = CourseLocalServiceUtil.getStudentsFromCourse(courseId, companyId, getScreenName(), getFirstName(), getLastName(), getEmailAddress(), 
-													WorkflowConstants.STATUS_APPROVED, getTeamIds(), isAndOperator(), start, end, new UserLastNameComparator(true));
+													status, getTeamIds(), isAndOperator(), start, end, new UserLastNameComparator(true));
 		}else{
 			listStudents = CourseLocalServiceUtil.getStudentsFromCourse(courseId, companyId, getKeywords(), getKeywords(), getKeywords(), getKeywords(), 
-					WorkflowConstants.STATUS_APPROVED, getTeamIds(), isAndOperator(), start, end, new UserLastNameComparator(true));
+					status, getTeamIds(), isAndOperator(), start, end, new UserLastNameComparator(true));
 			
 		}
 		return listStudents;
@@ -261,10 +257,10 @@ public class UserDisplayTerms extends DisplayTerms{
 		if(isAdvancedSearch()){			
 
 			numStudents = CourseLocalServiceUtil.countStudentsFromCourse(courseId, companyId, getScreenName(), getFirstName(), getLastName(), getEmailAddress(), 
-					WorkflowConstants.STATUS_APPROVED,	getTeamIds(), isAndOperator());
+					status,	getTeamIds(), isAndOperator());
 		}else{
 			numStudents = CourseLocalServiceUtil.countStudentsFromCourse(courseId, companyId, getKeywords(), getKeywords(), getKeywords(), getKeywords(),
-					WorkflowConstants.STATUS_APPROVED, getTeamIds(), isAndOperator());
+					status, getTeamIds(), isAndOperator());
 		}
 		
 		return numStudents;
@@ -275,10 +271,10 @@ public class UserDisplayTerms extends DisplayTerms{
 		
 		if(isAdvancedSearch()){				
 			listTeachers = CourseLocalServiceUtil.getTeachersFromCourse(courseId, companyId, getScreenName(), getFirstName(), getLastName(), getEmailAddress(), 
-													WorkflowConstants.STATUS_APPROVED, getTeamIds(), isAndOperator(), start, end, new UserLastNameComparator(true));
+					status, getTeamIds(), isAndOperator(), start, end, new UserLastNameComparator(true));
 		}else{
 			listTeachers = CourseLocalServiceUtil.getTeachersFromCourse(courseId, companyId, getKeywords(), getKeywords(), getKeywords(), getKeywords(), 
-					WorkflowConstants.STATUS_APPROVED, getTeamIds(), isAndOperator(), start, end, new UserLastNameComparator(true));
+					status, getTeamIds(), isAndOperator(), start, end, new UserLastNameComparator(true));
 			
 		}
 		return listTeachers;
@@ -290,10 +286,10 @@ public class UserDisplayTerms extends DisplayTerms{
 		if(isAdvancedSearch()){			
 
 			numTeachers = CourseLocalServiceUtil.countTeachersFromCourse(courseId, companyId, getScreenName(), getFirstName(), getLastName(), getEmailAddress(), 
-					WorkflowConstants.STATUS_APPROVED,	getTeamIds(), isAndOperator());
+					status,	getTeamIds(), isAndOperator());
 		}else{
 			numTeachers = CourseLocalServiceUtil.countTeachersFromCourse(courseId, companyId, getKeywords(), getKeywords(), getKeywords(), getKeywords(),
-					WorkflowConstants.STATUS_APPROVED, getTeamIds(), isAndOperator());
+					status, getTeamIds(), isAndOperator());
 		}
 		
 		return numTeachers;
@@ -304,10 +300,10 @@ public class UserDisplayTerms extends DisplayTerms{
 		
 		if(isAdvancedSearch()){				
 			listEditors = CourseLocalServiceUtil.getEditorsFromCourse(courseId, companyId, getScreenName(), getFirstName(), getLastName(), getEmailAddress(), 
-													WorkflowConstants.STATUS_APPROVED, getTeamIds(), isAndOperator(), start, end, new UserLastNameComparator(true));
+					status, getTeamIds(), isAndOperator(), start, end, new UserLastNameComparator(true));
 		}else{
 			listEditors = CourseLocalServiceUtil.getEditorsFromCourse(courseId, companyId, getKeywords(), getKeywords(), getKeywords(), getKeywords(), 
-					WorkflowConstants.STATUS_APPROVED, getTeamIds(), isAndOperator(), start, end, new UserLastNameComparator(true));
+					status, getTeamIds(), isAndOperator(), start, end, new UserLastNameComparator(true));
 			
 		}
 		return listEditors;
@@ -319,10 +315,10 @@ public class UserDisplayTerms extends DisplayTerms{
 		if(isAdvancedSearch()){			
 
 			numEditors = CourseLocalServiceUtil.countEditorsFromCourse(courseId, companyId, getScreenName(), getFirstName(), getLastName(), getEmailAddress(), 
-					WorkflowConstants.STATUS_APPROVED,	getTeamIds(), isAndOperator());
+					status,	getTeamIds(), isAndOperator());
 		}else{
 			numEditors = CourseLocalServiceUtil.countEditorsFromCourse(courseId, companyId, getKeywords(), getKeywords(), getKeywords(), getKeywords(),
-					WorkflowConstants.STATUS_APPROVED, getTeamIds(), isAndOperator());
+					status, getTeamIds(), isAndOperator());
 		}
 		
 		return numEditors;
