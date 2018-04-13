@@ -113,7 +113,7 @@ public class StartupAction extends SimpleAction {
 	{
 		boolean exists = false;
 		long layoutSetPrototypeId = 0;
-		String course = LanguageUtil.get(LocaleUtil.getDefault(), "model.resource.com.liferay.lms.model.Course");
+		String course = LanguageUtil.get(LocaleUtil.getDefault(), "course");
 		if(_log.isDebugEnabled())
 			_log.debug("locale default: " + LocaleUtil.getDefault() + " course: " + course);
 		for(LayoutSetPrototype lay:LayoutSetPrototypeLocalServiceUtil.getLayoutSetPrototypes(0, LayoutSetPrototypeLocalServiceUtil.getLayoutSetPrototypesCount())){
