@@ -114,7 +114,7 @@ public class LearningActivityTryLocalServiceImpl
 		LearningActivity larn=LearningActivityLocalServiceUtil.getLearningActivity(actId);
 		for(LearningActivityTry userTry:userTries)
 		{
-			this.deleteLearningActivityTry(userTry.getLatId());
+			learningActivityTryLocalService.deleteLearningActivityTry(userTry.getLatId());
 			
 			//auditing
 			ServiceContext serviceContext = ServiceContextThreadLocal.getServiceContext();
@@ -138,11 +138,11 @@ public class LearningActivityTryLocalServiceImpl
 			learningActivityResultLocalService.updateLearningActivityResult(res);
 			if(larn.getWeightinmodule()>0)
 			{
-				ModuleResult mr=ModuleResultLocalServiceUtil.getByModuleAndUser(larn.getModuleId(), userId);
+				ModuleResult mr=moduleResultLocalService.getByModuleAndUser(larn.getModuleId(), userId);
 				if(mr!=null)
 				{
 					mr.setPassed(false);
-					ModuleResultLocalServiceUtil.updateModuleResult(mr);
+					moduleResultLocalService.updateModuleResult(mr);
 				}
 			}
 		}
