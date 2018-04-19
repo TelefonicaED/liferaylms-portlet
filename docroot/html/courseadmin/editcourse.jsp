@@ -565,41 +565,40 @@ if(course!=null){
 				<liferay-util:param name="courseEvalId" value="<%=String.valueOf(courseEval.getTypeId())%>" />
 			</liferay-util:include>
 		</div>
-	<%	if(course==null)
+	<%	
+		String[] layusprsel=null;
+		if(renderRequest.getPreferences().getValue("courseTemplates", null)!=null&&renderRequest.getPreferences().getValue("courseTemplates", null).length()>0)
 		{
-			String[] layusprsel=null;
-			if(renderRequest.getPreferences().getValue("courseTemplates", null)!=null&&renderRequest.getPreferences().getValue("courseTemplates", null).length()>0)
-			{
-					layusprsel=renderRequest.getPreferences().getValue("courseTemplates", "").split(",");
-			}
-	
-			String[] lspist=LmsPrefsLocalServiceUtil.getLmsPrefsIni(themeDisplay.getCompanyId()).getLmsTemplates().split(",");
-			if(layusprsel!=null &&layusprsel.length>0)
-			{
-				lspist=layusprsel;
-	
-			}
-			if(lspist.length>1){
-			%>
-				<aui:select name="courseTemplate" label="course-template">
-				<%
-				for(String lspis:lspist)
-				{
-					LayoutSetPrototype lsp=LayoutSetPrototypeLocalServiceUtil.getLayoutSetPrototype(Long.parseLong(lspis));
-					%>
-					<aui:option value="<%=lsp.getLayoutSetPrototypeId() %>" selected="<%=templateParent == lsp.getLayoutSetPrototypeId() %>"><%=lsp.getName(themeDisplay.getLocale()) %></aui:option>
-					<%
-				}
-				%>
-				</aui:select>
-			<%
-			}
-			else{
-				LayoutSetPrototype lsp=LayoutSetPrototypeLocalServiceUtil.getLayoutSetPrototype(Long.parseLong(lspist[0]));
-			%>
-				<aui:input name="courseTemplate" value="<%=lsp.getLayoutSetPrototypeId()%>" type="hidden"/>
-			<%}
+				layusprsel=renderRequest.getPreferences().getValue("courseTemplates", "").split(",");
 		}
+
+		String[] lspist=LmsPrefsLocalServiceUtil.getLmsPrefsIni(themeDisplay.getCompanyId()).getLmsTemplates().split(",");
+		if(layusprsel!=null &&layusprsel.length>0)
+		{
+			lspist=layusprsel;
+
+		}
+		if(lspist.length>1){
+		%>
+			<aui:select name="courseTemplate" label="course-template" disabled="<%=(course==null)?false:true %>">
+			<%
+			for(String lspis:lspist)
+			{
+				LayoutSetPrototype lsp=LayoutSetPrototypeLocalServiceUtil.getLayoutSetPrototype(Long.parseLong(lspis));
+				%>
+				<aui:option value="<%=lsp.getLayoutSetPrototypeId() %>" selected="<%=templateParent == lsp.getLayoutSetPrototypeId() %>"><%=lsp.getName(themeDisplay.getLocale()) %></aui:option>
+				<%
+			}
+			%>
+			</aui:select>
+		<%
+		}
+		else{
+			LayoutSetPrototype lsp=LayoutSetPrototypeLocalServiceUtil.getLayoutSetPrototype(Long.parseLong(lspist[0]));
+		%>
+			<aui:input name="courseTemplate" value="<%=lsp.getLayoutSetPrototypeId()%>" type="hidden"/>
+		<%}
+		
 		List <Long> califications = ListUtil.toList(StringUtil.split(LmsPrefsLocalServiceUtil.getLmsPrefsIni(themeDisplay.getCompanyId()).getScoretranslators(),",",0L));	
 		CalificationTypeRegistry cal = new CalificationTypeRegistry();
 		if(califications.size()>1){

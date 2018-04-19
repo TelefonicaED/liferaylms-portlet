@@ -1069,9 +1069,7 @@ Liferay.provide(
 	AUI().ready(function(A) {
 		
 		var title = $("#portlet_editactivity_WAR_liferaylmsportlet").find(".portlet-title-text").text();
-		
 		title += " (<%= LanguageUtil.get(locale,typeName) %>)";
-		
 		$("#portlet_editactivity_WAR_liferaylmsportlet").find(".portlet-title-text").text(title);
 	});
 
