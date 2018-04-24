@@ -274,6 +274,7 @@ public class ResourceExternalActivity extends QuestionsAdmin {
 									renderRequest.setAttribute("currentTime", seekTo);
 									
 									String videoCode= video.getText();
+									log.debug("videoCode: " + videoCode);
 									
 									if(videoCode.indexOf("src=") > 0){
 										try{
@@ -287,11 +288,15 @@ public class ResourceExternalActivity extends QuestionsAdmin {
 										}
 									}
 									
+									log.debug("videoCode: " + videoCode);
+									if(videoCode.indexOf("?") >= 0){
+										videoCode = videoCode.substring(0, videoCode.indexOf("?"));
+									}
 									if(isVimeoIframe){
 										
-										String parametros = "?api=1&amp;player_id=player_1";
+										String parametros = "";
 										if(videoControlDisabled && !userPassed){
-											parametros += "&background=1&loop=0&mute=0";
+											parametros += "?background=1&loop=0&mute=0";
 										}
 										videoCode += parametros;
 										log.debug("videoCode: " + videoCode);
