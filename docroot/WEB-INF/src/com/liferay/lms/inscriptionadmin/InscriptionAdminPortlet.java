@@ -64,7 +64,7 @@ public class InscriptionAdminPortlet extends MVCPortlet {
 				return;
 			}else{
 				maxUsers = course.getMaxusers();
-				numberUsers = UserLocalServiceUtil.getGroupUsersCount(themeDisplay.getScopeGroupId());
+				numberUsers = CourseLocalServiceUtil.countStudents(course.getCourseId(), course.getCompanyId(), null, null, null, null, false);
 			}
 		} catch (SystemException e) {
 			if(log.isDebugEnabled()){
