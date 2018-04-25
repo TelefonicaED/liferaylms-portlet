@@ -195,6 +195,8 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 			newCourse.setGoodbyeMsg(course.getGoodbyeMsg());
 			newCourse.setGoodbyeSubject(course.getGoodbyeSubject());
 			newCourse.setCourseEvalId(course.getCourseEvalId());
+			newCourse.setExecutionStartDate(startDate);
+			newCourse.setExecutionEndDate(endDate);
 			
 			process.setClassPK(newCourse.getCourseId());
 			process = AsynchronousProcessAuditLocalServiceUtil.updateAsynchronousProcessAudit(process);
