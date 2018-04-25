@@ -12,10 +12,8 @@ import javax.portlet.PortletURL;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 
-import com.liferay.lms.CourseStats;
 import com.liferay.lms.model.AsynchronousProcessAudit;
 import com.liferay.lms.service.AsynchronousProcessAuditLocalServiceUtil;
-import com.liferay.lms.util.LmsConstant;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -35,7 +33,7 @@ public class AsynchronousProcessDashboard extends MVCPortlet {
 		viewJSP = getInitParameter("view-jsp");
 	}
 
-	private static Log log = LogFactoryUtil.getLog(CourseStats.class);
+	private static Log log = LogFactoryUtil.getLog(AsynchronousProcessDashboard.class);
 	
 	public void doView(RenderRequest renderRequest, RenderResponse renderResponse) throws IOException, PortletException {
 		ThemeDisplay themeDisplay = (ThemeDisplay)renderRequest.getAttribute(WebKeys.THEME_DISPLAY);
