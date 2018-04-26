@@ -76,6 +76,7 @@ public class QuestionsAdmin extends MVCPortlet{
 	
 	HashMap<Long, TestAnswer> answersMap = new HashMap<Long, TestAnswer>(); 
 	
+	
 	@SuppressWarnings("unchecked")
 	public void moveQuestion(ActionRequest actionRequest, ActionResponse actionResponse) throws Exception {
 		
@@ -177,19 +178,12 @@ public class QuestionsAdmin extends MVCPortlet{
 		boolean penalize = false;
 		String partialCorrection = StringPool.BLANK;
 		
-		if(questionType==1)
-		{
-			//MultioptionsQuestionType
-			String opt = ParamUtil.get(actionRequest, "multiplecorrection", StringPool.BLANK);
-			log.debug("MultioptionsQuestionType value: " + opt);
-			penalize = opt.equalsIgnoreCase("penalize");
-			partialCorrection = String.valueOf(!penalize);
+		penalize = ParamUtil.getBoolean(actionRequest, "penalize");
+		log.debug("***penalize:"+penalize);
+		partialCorrection = ParamUtil.getString(actionRequest, "partialcorrection", "false");
+		if(Boolean.parseBoolean(partialCorrection)){
+			penalize = false;
 		}
-		else{
-			penalize = ParamUtil.getBoolean(actionRequest, "penalize");
-			partialCorrection = ParamUtil.getString(actionRequest, "partialcorrection", "false");
-		}
-		
 		
 		
 		log.debug("***questionId:"+questionId);

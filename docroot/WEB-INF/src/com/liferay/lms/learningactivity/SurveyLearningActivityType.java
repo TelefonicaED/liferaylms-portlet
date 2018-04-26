@@ -28,6 +28,10 @@ public class SurveyLearningActivityType extends BaseLearningActivityType {
 			PortalUtil.getJsSafePortletId(
 					"surveyactivity" + PortletConstants.WAR_SEPARATOR + ClpSerializer.getServletContextName());
 	
+
+	public final static long TYPE_ID = 4;
+	
+	
 	@Override
 	public AssetRenderer getAssetRenderer(LearningActivity larn) throws SystemException, PortalException {
 		return new SurveyAssetRenderer(larn,this);
