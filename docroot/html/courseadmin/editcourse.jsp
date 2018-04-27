@@ -367,14 +367,14 @@ if(course!=null){
 		 
 		 <span class="aui-field-element " > 
 			 <label class="aui-field-label" for="<%=renderResponse.getNamespace()+"title"+StringPool.UNDERLINE+LanguageUtil.getLanguageId(LocaleUtil.getDefault()) %>"> 
-			 	<liferay-ui:message key="title" /> 
+			 	<liferay-ui:message key="title.required" /> 
 			 </label> 
-			  <liferay-ui:input-localized 
+			  <liferay-ui:input-localized
 				   cssClass="<%=renderResponse.getNamespace()+\"localized lfr-input-text\"%>" 
 				   name="title" 
 				   defaultLanguageId="<%=LanguageUtil.getLanguageId(LocaleUtil.getDefault()) %>"
 				   xml="<%=courseTitle %>"
-				   maxLength="<%=maxLengthTitle %>"/>
+				   maxLength="<%=maxLengthTitle %>" required="true"/>
 		 </span> 
 	</span>
 	
