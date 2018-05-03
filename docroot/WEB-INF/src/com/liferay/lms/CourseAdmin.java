@@ -55,6 +55,9 @@ import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.FileUtil;
+import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.kernel.util.OrderByComparatorFactory;
+import com.liferay.portal.kernel.util.OrderByComparatorFactoryUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
@@ -85,11 +88,14 @@ import com.liferay.portal.service.UserGroupRoleLocalServiceUtil;
 import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
+import com.liferay.portal.util.PortletKeys;
 import com.liferay.portlet.announcements.EntryDisplayDateException;
 import com.liferay.portlet.asset.service.AssetTagLocalServiceUtil;
 import com.liferay.portlet.expando.model.ExpandoColumn;
 import com.liferay.portlet.expando.model.ExpandoTableConstants;
 import com.liferay.portlet.expando.service.ExpandoColumnLocalServiceUtil;
+import com.tls.lms.util.CourseOrderByCreationDate;
+import com.tls.lms.util.CourseOrderByTitle;
 import com.tls.lms.util.LiferaylmsUtil;
 
 /**
@@ -642,8 +648,28 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 			params.put(CourseParams.PARAM_PERMISSIONS_ADMIN, themeDisplay.getUserId());
 		}
 		
+		String orderByCol = ParamUtil.getString(renderRequest, "orderByCol");
+		String orderByType = ParamUtil.getString(renderRequest, "orderByType");
+		
+		if (Validator.isNull(orderByCol) ||
+			Validator.isNull(orderByType)){
+			orderByCol = "title";
+			orderByType = "asc";
+		}
+		
+		OrderByComparator obc = null;
+		if(Validator.isNotNull(orderByCol) && orderByCol.equals("title")){
+			obc = new CourseOrderByTitle(themeDisplay, orderByType.equals("asc"));
+		}else if(Validator.isNotNull(orderByCol) && orderByCol.equals("createDate")){
+			obc = new CourseOrderByCreationDate(orderByType.equals("asc"));
+		}
+		
+		searchContainer.setOrderByCol(orderByCol);
+		searchContainer.setOrderByType(orderByType);
+		searchContainer.setOrderByComparator(obc);
+		
 		searchContainer.setResults(CourseLocalServiceUtil.searchCourses(themeDisplay.getCompanyId(), freetext, themeDisplay.getLanguageId(), state, courseId, groupId, params, 
-				searchContainer.getStart(), searchContainer.getEnd(), null));
+				searchContainer.getStart(), searchContainer.getEnd(), searchContainer.getOrderByComparator()));
 		searchContainer.setTotal(CourseLocalServiceUtil.countCourses(themeDisplay.getCompanyId(), freetext, themeDisplay.getLanguageId(), state, courseId, groupId, params));
 		
 		renderRequest.setAttribute("searchContainer", searchContainer);

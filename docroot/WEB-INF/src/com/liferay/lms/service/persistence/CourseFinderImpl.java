@@ -211,14 +211,25 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			sb.append(replaceJoinAndWhere(sql, params, languageId, companyId));
 			sb.append(StringPool.CLOSE_PARENTHESIS);
 
+			String orderBy = "";
 			if (obc != null) {
-				sb.append(" ORDER BY ");
-				sb.append(obc.toString());
+				log.debug("obc: " + obc.getOrderBy());
+				if(Validator.isNull(obc.getOrderBy()) || "title".equals(obc.getOrderBy())){
+					log.debug("obc desc: " + obc.isAscending());
+					orderBy = " ORDER BY IF (ExtractValue(lms_Course.title, '//Title[@language-id=\"[$LANGUAGE$]\"]' )='', ExtractValue(lms_Course.title,  '//root[@default-locale]//Title' ), ExtractValue(lms_Course.title, '//Title[@language-id=\"[$LANGUAGE$]\"]' )) ";
+					if(!obc.isAscending()) orderBy += " DESC ";
+					orderBy = StringUtil.replace(orderBy, "[$LANGUAGE$]", languageId);
+				}else{
+					log.debug("obc: " + obc.toString());
+					orderBy = "ORDER BY " + obc.toString();
+				}
 			}else{
-				String orderBy = " ORDER BY IF (ExtractValue(lms_Course.title, '//Title[@language-id=\"[$LANGUAGE$]\"]' )='', ExtractValue(lms_Course.title,  '//root[@default-locale]//Title' ), ExtractValue(lms_Course.title, '//Title[@language-id=\"[$LANGUAGE$]\"]' )) ";
+				log.debug("obc null ");
+				orderBy = " ORDER BY IF (ExtractValue(lms_Course.title, '//Title[@language-id=\"[$LANGUAGE$]\"]' )='', ExtractValue(lms_Course.title,  '//root[@default-locale]//Title' ), ExtractValue(lms_Course.title, '//Title[@language-id=\"[$LANGUAGE$]\"]' )) ";
 				orderBy = StringUtil.replace(orderBy, "[$LANGUAGE$]", languageId);
-				sb.append(orderBy);
 			}
+			log.debug("order by");
+			sb.append(orderBy);
 
 			sql = sb.toString();
 			
