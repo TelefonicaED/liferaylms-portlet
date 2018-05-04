@@ -174,8 +174,7 @@
 		<%
 			}
 		
-		if(!(question.isPenalize()&&!partialCorrection)){
-		%>
+		if(qt.isPartialCorrectAvailable() && question!=null && !(question.isPenalize()&&!partialCorrection)){		%>
 			<script type="text/javascript">
 				AUI().ready('aui-base',
 				   	function() {
