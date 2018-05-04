@@ -206,6 +206,7 @@ public abstract class BaseLearningActivityType implements LearningActivityType, 
 			
 			log.info("docFile: " + docfile.getFileEntryId());
 			String extension = "";
+			String title = docfile.getTitle();
 			if(!docfile.getTitle().endsWith(docfile.getExtension()) && docfile.getExtension().equals("")){
 				if(docfile.getMimeType().equals("image/jpeg")){
 					extension= ".jpg";
@@ -223,10 +224,13 @@ public abstract class BaseLearningActivityType implements LearningActivityType, 
 				}
 			}else if(!docfile.getTitle().endsWith(docfile.getExtension()) && !docfile.getExtension().equals("")){
 				extension="."+docfile.getExtension();
+			}else if(docfile.getTitle().endsWith(docfile.getExtension())){
+				extension="."+docfile.getExtension();
+				title = title.substring(0, title.indexOf(docfile.getExtension())-1);
 			}
 	
-			log.info("file Title: " + docfile.getTitle());
-			String title = changeSpecialCharacter(docfile.getTitle());
+			log.info("file Title: " + title);
+			title = changeSpecialCharacter(title);
 			title += extension;
 			log.info("title: " + title);
 			
@@ -264,7 +268,7 @@ public abstract class BaseLearningActivityType implements LearningActivityType, 
 	
 	private static String changeSpecialCharacter(String str) {
 	    
-		str = str.replaceAll("[^a-zA-Z0-9]", "");
+		str = str.replaceAll("[^a-zA-Z0-9.]", "");
 	    return str;
 	}
 	
