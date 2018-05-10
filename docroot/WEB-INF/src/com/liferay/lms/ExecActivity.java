@@ -305,7 +305,7 @@ public class ExecActivity extends QuestionsAdmin {
 	public void render(RenderRequest renderRequest, RenderResponse renderResponse) throws PortletException, IOException {
 		long actId=0;
 		boolean actionEditingDetails = ParamUtil.getBoolean(renderRequest, "actionEditingDetails", false);
-
+		renderResponse.setProperty("clear-request-parameters",StringPool.TRUE);
 		if(actionEditingDetails){
 
 			actId=ParamUtil.getLong(renderRequest, "resId", 0);

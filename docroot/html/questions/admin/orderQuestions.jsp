@@ -18,14 +18,7 @@ String backUrl = ParamUtil.getString(request, "backUrl", currentURL);
 LearningActivity learningActivity = LearningActivityLocalServiceUtil.getLearningActivity(ParamUtil.getLong(request,"resId"));
 request.setAttribute("activity", learningActivity);
 
-/*
-LiferayPortletURL backUrl = PortletURLFactoryUtil.create(request, PortalUtil.getJsSafePortletId("lmsactivitieslist"+
-		PortletConstants.WAR_SEPARATOR+portletConfig.getPortletContext().getPortletContextName()), themeDisplay.getPlid(), PortletRequest.RENDER_PHASE);
-backUrl.setWindowState(LiferayWindowState.POP_UP);
-backUrl.setParameter("resId", String.valueOf(learningActivity.getActId()));	
-backUrl.setParameter("resModuleId", String.valueOf(learningActivity.getModuleId()));
-backUrl.setParameter("jspPage", "/html/execactivity/test/admin/editquestions.jsp");
-*/
+
 request.setAttribute("backUrl", backUrl.toString());
 PortletURL orderQuestionsURL = renderResponse.createRenderURL();
 orderQuestionsURL.setParameter("jspPage","/html/execactivity/test/admin/orderQuestions.jsp");

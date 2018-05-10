@@ -215,7 +215,7 @@
 </div>
 <%
 	PortletURL editQuestionsURL = renderResponse.createRenderURL();
-	editQuestionsURL.setParameter("jspPage","/html/execactivity/test/admin/editquestions.jsp");
+	editQuestionsURL.setParameter("jspPage","/html/questions/admin/editquestions.jsp");
 	editQuestionsURL.setParameter("resId",Long.toString(learningActivity.getActId()));
 	editQuestionsURL.setParameter("actionEditingDetails",StringPool.TRUE);
 %>

@@ -1,4 +1,3 @@
-
 package com.liferay.lms;
 
 import java.io.IOException;
@@ -289,7 +288,7 @@ public class ResourceExternalActivity extends QuestionsAdmin {
 									}
 									
 									log.debug("videoCode: " + videoCode);
-									if(videoCode.indexOf("?") >= 0){
+									if(isVimeoIframe && videoCode.indexOf("?") >= 0){
 										videoCode = videoCode.substring(0, videoCode.indexOf("?"));
 									}
 									if(isVimeoIframe){
