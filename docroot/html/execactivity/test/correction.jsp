@@ -102,7 +102,7 @@ function <portlet:namespace />showPopupGrades(studentId, actId) {
 		renderUrl.setPortletId('<%=portletDisplay.getId()%>');
 		renderUrl.setParameter('actId', actId);
 		renderUrl.setParameter('studentId', studentId);
-		renderUrl.setParameter('jspPage', '/html/execactivity/test/admin/popups/grades.jsp');
+		renderUrl.setParameter('jspPage', '/html/questions/admin/popups/grades.jsp');
 
 		renderUrl.setParameter('first-name', '<%=firstName%>');
 		renderUrl.setParameter('last-name', '<%=lastName%>');
