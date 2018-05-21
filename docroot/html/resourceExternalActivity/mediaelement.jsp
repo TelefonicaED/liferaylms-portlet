@@ -141,7 +141,7 @@
  		//Cogemos la respuesta
  		console.log("guardamos respuesta");
  		var A = AUI();
- 		var divQuestionId = $('.question',$('#_resourceExternalActivity_WAR_liferaylmsportlet_question_'+questionId)).attr("id");
+ 		var divQuestionId = $('.question',$('#<portlet:namespace />question_'+questionId)).attr("id");
  		var divQuestion = A.one('#' + divQuestionId);
  		var validationCorrect = <portlet:namespace/>questionValidation(divQuestion);
  		if (typeof validQuestion == 'undefined') {
@@ -157,7 +157,7 @@
  				success: function(data){			
  					if(data){
  						if(data.correct){
- 							$('#_resourceExternalActivity_WAR_liferaylmsportlet_question_'+questionId).remove();
+ 							$('#<portlet:namespace />question_'+questionId).remove();
 							player.play();
  						}	
  					}
