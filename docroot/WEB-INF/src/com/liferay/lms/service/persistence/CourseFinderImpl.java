@@ -1,6 +1,7 @@
 package com.liferay.lms.service.persistence;
 
 import java.math.BigInteger;
+import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -1216,7 +1217,7 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 		return false;
 	}
 	
-	public List<CourseResultView> getMyCourses(long groupId, long userId, ThemeDisplay themeDisplay, String orderByColumn, String orderByType, int start, int end){
+	public List<CourseResultView> getMyCourses(long groupId, long userId, LinkedHashMap<String, Object> params, ThemeDisplay themeDisplay, String orderByColumn, String orderByType, int start, int end){
 		Session session = null;
 		List<CourseResultView> listMyCourses = new ArrayList<CourseResultView>();
 		
@@ -1226,6 +1227,14 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			
 			String sql = CustomSQLUtil.get(MY_COURSES);
 			
+			StringBundler sb = new StringBundler();
+
+			sb.append(StringPool.OPEN_PARENTHESIS);
+			sb.append(replaceJoinAndWhere(sql, params, themeDisplay.getLanguageId(), themeDisplay.getCompanyId()));
+			sb.append(StringPool.CLOSE_PARENTHESIS);
+			
+			sql = sb.toString();
+			
 			sql = replaceLanguage(sql, themeDisplay.getLanguageId());
 					
 			SimpleDateFormat parseDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -1234,13 +1243,27 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			sql = sql.replace("[$DATENOW$]", date);
 			
 			if(Validator.isNull(orderByColumn)){
-				orderByColumn = "c.courseId";
+				orderByColumn = "Lms_Course.courseId";
 			}
 			
-			sql += " ORDER BY " + orderByColumn + " " + orderByType;
+			if(Validator.isNotNull(orderByColumn)){
+				if(orderByColumn.startsWith("c.")){
+					orderByColumn = StringUtil.replaceFirst(orderByColumn, "c.", "Lms_Course.");
+				}
+				if(orderByColumn.contains(" c.")){
+					orderByColumn = StringUtil.replaceFirst(orderByColumn, " c.", " Lms_Course.");
+				}
+				if(orderByColumn.contains("(c.")){
+					orderByColumn = StringUtil.replaceFirst(orderByColumn, "(c.", "(Lms_Course.");
+				}
+				if(orderByColumn.contains(",c.")){
+					orderByColumn = StringUtil.replaceFirst(orderByColumn, ",c.", ",Lms_Course.");
+				}
+				sql += " ORDER BY " + orderByColumn + " " + orderByType;
+			}
 			
 			if(start >= 0 && end >= 0){
-				sql += " LIMIT " + start + "," + end;
+				sql += " LIMIT " + start + "," + (end-start);
 			}
 		
 			if(log.isDebugEnabled()){
@@ -1264,6 +1287,7 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			CourseView courseView = null;
 			long result = 0;
 			int statusUser = 0;
+			String url = null;
 			while (itr.hasNext()) {
 				myCourse = itr.next();
 
@@ -1280,7 +1304,14 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 						courseView.setLogoURL("/image/layout_set_logo?img_id=" + groupCourse.getPublicLayoutSet().getLogoId());
 					}	
 				}
-				courseView.setUrl(themeDisplay.getPortalURL()+"/"+themeDisplay.getLocale().getLanguage()+"/web" + (String)myCourse[7]);
+				
+				url = themeDisplay.getPortalURL()+"/"+themeDisplay.getLocale().getLanguage()+"/web" + (String)myCourse[7];
+			     
+			    if(themeDisplay.isImpersonated()){
+			    	String doAsUserId = "?doAsUserId=".concat(URLEncoder.encode(themeDisplay.getDoAsUserId(),"UTF-8"));
+			    	url+=doAsUserId; 
+			    }
+			    courseView.setUrl(url);
 				result = ((BigInteger)myCourse[4]).longValue();
 				statusUser = Integer.parseInt((String)myCourse[3]);
 				courseResultView = new CourseResultView(courseView, result, statusUser);
@@ -1390,7 +1421,7 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 		return countValue;
 	}
 	
-	public int countMyCourses(long groupId, long userId, ThemeDisplay themeDisplay){
+	public int countMyCourses(long groupId, long userId, LinkedHashMap<String, Object> params, ThemeDisplay themeDisplay){
 		Session session = null;
 		int countValue = 0;
 		try{
@@ -1398,6 +1429,14 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			session = openSession();
 			
 			String sql = CustomSQLUtil.get(COUNT_MY_COURSES);
+			
+			StringBundler sb = new StringBundler();
+
+			sb.append(StringPool.OPEN_PARENTHESIS);
+			sb.append(replaceJoinAndWhere(sql, params, themeDisplay.getLanguageId(), themeDisplay.getCompanyId()));
+			sb.append(StringPool.CLOSE_PARENTHESIS);
+			
+			sql = sb.toString();
 			
 			SimpleDateFormat parseDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 			String date = parseDate.format(new Date());
@@ -1420,7 +1459,6 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			
 			Iterator<Long> itr = q.iterate();
 
-			
 			if (itr.hasNext()) {
 				Object count = itr.next();
 				

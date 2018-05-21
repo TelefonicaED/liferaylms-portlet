@@ -1063,11 +1063,19 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 	}
 	
 	public List<CourseResultView> getMyCourses(long groupId, long userId, ThemeDisplay themeDisplay, String orderByColumn, String orderByType, int start, int end){
-		return CourseFinderUtil.getMyCourses(groupId, userId, themeDisplay, orderByColumn, orderByType, start, end);
+		return CourseFinderUtil.getMyCourses(groupId, userId, null, themeDisplay, orderByColumn, orderByType, start, end);
 	}
 	
 	public int countMyCourses(long groupId, long userId, ThemeDisplay themeDisplay){
-		return CourseFinderUtil.countMyCourses(groupId, userId, themeDisplay);
+		return CourseFinderUtil.countMyCourses(groupId, userId, null, themeDisplay);
+	}
+	
+	public List<CourseResultView> getMyCourses(long groupId, long userId, LinkedHashMap<String, Object> params, ThemeDisplay themeDisplay, String orderByColumn, String orderByType, int start, int end){
+		return CourseFinderUtil.getMyCourses(groupId, userId, params, themeDisplay, orderByColumn, orderByType, start, end);
+	}
+	
+	public int countMyCourses(long groupId, long userId, LinkedHashMap<String, Object> params, ThemeDisplay themeDisplay){
+		return CourseFinderUtil.countMyCourses(groupId, userId, params, themeDisplay);
 	}
 	
 	public boolean hasUserTries(long courseId, long userId){

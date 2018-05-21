@@ -110,17 +110,10 @@ else
 					AssetRenderer assetRenderer= AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(entry.getClassName()).getAssetRenderer(entry.getClassPK());
 					String path = assetRenderer.render(renderRequest, renderResponse, AssetRenderer.TEMPLATE_FULL_CONTENT);
 					
-					if(permissionChecker.hasPermission(entry.getGroupId(), entry.getClassName(), entry.getClassPK(), ActionKeys.VIEW))
-					{ %>
+					%>
 						<liferay-util:include  page="<%= path %>" portletId="<%= assetRendererFactory.getPortletId() %>" />
 					<%
-					}else{
-						%>
-						<div class="portlet-msg-error">
-							<liferay-ui:message key="you-do-not-have-permission-to-access-the-requested-resource"/>
-						</div>
-						<%
-					}
+					
 				}
 			}
 		}
