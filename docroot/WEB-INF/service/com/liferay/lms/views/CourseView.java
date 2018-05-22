@@ -1,5 +1,6 @@
 package com.liferay.lms.views;
 
+import java.util.Date;
 import java.util.List;
 
 import com.liferay.lms.model.Course;
@@ -28,6 +29,8 @@ public class CourseView {
 	private String url = null;
 	private boolean closed;
 	private long groupId;
+	private Date executionStartDate;
+	private Date executionEndDate;
 	
 	public CourseView(Course course, ThemeDisplay themeDisplay){
 		setCourseId(course.getCourseId());
@@ -59,6 +62,8 @@ public class CourseView {
 
 		setClosed(course.isClosed());
 		setGroupId(course.getGroupCreatedId());
+		setExecutionStartDate(course.getExecutionStartDate());
+		setExecutionEndDate(course.getExecutionEndDate());
 	}
 	
 	public CourseView(long courseId, String title, long groupId){
@@ -124,6 +129,22 @@ public class CourseView {
 			e.printStackTrace();
 			return null;
 		} 
+	}
+
+	public Date getExecutionStartDate() {
+		return executionStartDate;
+	}
+
+	public void setExecutionStartDate(Date executionStartDate) {
+		this.executionStartDate = executionStartDate;
+	}
+
+	public Date getExecutionEndDate() {
+		return executionEndDate;
+	}
+
+	public void setExecutionEndDate(Date executionEndDate) {
+		this.executionEndDate = executionEndDate;
 	}
 
 }
