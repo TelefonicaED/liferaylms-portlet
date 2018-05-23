@@ -1312,6 +1312,8 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			    	url+=doAsUserId; 
 			    }
 			    courseView.setUrl(url);
+			    courseView.setExecutionStartDate((Date)myCourse[8]);
+			    courseView.setExecutionEndDate((Date)myCourse[9]);
 				result = ((BigInteger)myCourse[4]).longValue();
 				statusUser = Integer.parseInt((String)myCourse[3]);
 				courseResultView = new CourseResultView(courseView, result, statusUser);
