@@ -145,7 +145,14 @@ LearningActivity activity = LearningActivityLocalServiceUtil.getLearningActivity
 //List<User> listaUsuarioTotal = UserLocalServiceUtil.getGroupUsers(course.getGroupCreatedId());
 LinkedHashMap<String, Object> params = new LinkedHashMap<String, Object>();
 params.put("usersGroups", new Long(course.getGroupCreatedId())); 
-OrderByComparator comparator = new UserLastNameComparator(true);
+OrderByComparator comparator = null;
+PortletPreferences portalPreferences = PortalPreferencesLocalServiceUtil.getPreferences(themeDisplay.getCompanyId(), themeDisplay.getCompanyId(), 1);
+if(Boolean.parseBoolean(portalPreferences.getValue("users.first.last.name", "false"))){
+	obc = new UserLastNameComparator(true);
+}else{
+	obc = new UserFirstNameComparator(true);
+}
+
 boolean andOperator = true;
 
 PortletURL portletURL = renderResponse.createRenderURL();

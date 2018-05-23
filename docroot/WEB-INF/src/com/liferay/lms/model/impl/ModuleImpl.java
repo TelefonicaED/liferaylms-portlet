@@ -175,4 +175,14 @@ public class ModuleImpl extends ModuleBaseImpl {
 			return null;
 		}
 	}
+	
+	public List<LearningActivity> getListLearningActivities(){
+		try {
+			return LearningActivityServiceUtil.getLearningActivitiesOfModule(getModuleId());
+		} catch (SystemException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}
+	}
 }

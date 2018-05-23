@@ -40,6 +40,8 @@ public class TaskP2PLearningActivityType extends BaseLearningActivityType {
 
 	private static Log log = LogFactoryUtil.getLog(TaskP2PLearningActivityType.class);
 	
+	public final static long TYPE_ID = 3;
+	
 	public static final int DEFAULT_VALIDATION_NUMBER = 3;
 	
 	public static String PORTLET_ID = 
@@ -62,7 +64,7 @@ public class TaskP2PLearningActivityType extends BaseLearningActivityType {
 
 	@Override
 	public long getTypeId() {
-		return 3;
+		return TYPE_ID;
 	}
 	@Override
 	public long getDefaultTries() {

@@ -26,6 +26,7 @@ import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.model.Module;
 import com.liferay.lms.model.Schedule;
 import com.liferay.lms.service.CourseLocalServiceUtil;
+import com.liferay.lms.service.LearningActivityLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityResultLocalServiceUtil;
 import com.liferay.lms.service.ModuleLocalServiceUtil;
 import com.liferay.lms.service.ScheduleLocalServiceUtil;
@@ -304,5 +305,15 @@ public class LearningActivityImpl extends LearningActivityBaseImpl {
 	
 	public LearningActivityType getLearningActivityType(){
 		return new LearningActivityTypeRegistry().getLearningActivityType(getTypeId());
+	}
+	
+	public String getExtraContentValue(String key){
+		try {
+			return LearningActivityLocalServiceUtil.getExtraContentValue(this, key, null);
+		} catch (SystemException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}
 	}
 }

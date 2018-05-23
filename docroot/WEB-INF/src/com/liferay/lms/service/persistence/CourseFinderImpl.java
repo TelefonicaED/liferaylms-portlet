@@ -10,6 +10,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.portlet.PortletPreferences;
+
 import com.liferay.lms.model.Course;
 import com.liferay.lms.model.LmsPrefs;
 import com.liferay.lms.model.impl.CourseImpl;
@@ -45,6 +47,7 @@ import com.liferay.portal.model.UserGroup;
 import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.service.ClassNameLocalServiceUtil;
 import com.liferay.portal.service.GroupLocalServiceUtil;
+import com.liferay.portal.service.PortalPreferencesLocalServiceUtil;
 import com.liferay.portal.service.ResourceActionLocalServiceUtil;
 import com.liferay.portal.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.theme.ThemeDisplay;
@@ -500,9 +503,7 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 				}
 				if(typePos.length() > 0) typePos = typePos.substring(0, typePos.length()-1);
 				join = StringUtil.replace(join, "[$TYPE$]", typePos);
-			}
-			
-					
+			}		
 		}
 		else if (key.equals(PARAM_TITLE_DESCRIPTION)) {
 			join = CustomSQLUtil.get(WHERE_TITLE_DESCRIPTION);
@@ -788,7 +789,7 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			
 			sql = CustomSQLUtil.replaceAndOperator(sql, andOperator);
 			
-			sql = replaceOrderUser(sql, obc);
+			sql = replaceOrderUser(sql, obc, companyId);
 			
 			if(start >= 0 && end >= 0){
 				sql += " LIMIT " + start + ", " + (end-start);
@@ -955,7 +956,7 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			
 			sql = CustomSQLUtil.replaceAndOperator(sql, andOperator);
 			
-			sql = replaceOrderUser(sql, obc);
+			sql = replaceOrderUser(sql, obc, companyId);
 			
 			if(start >= 0 && end >= 0){
 				sql += " LIMIT " + start + ", " + (end-start);
@@ -1106,11 +1107,22 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 	}
 
 
-	private String replaceOrderUser(String sql, OrderByComparator obc) {
+	private String replaceOrderUser(String sql, OrderByComparator obc, long companyId) {
 		if (obc != null && obc.getOrderBy() != null && !obc.getOrderBy().equals("")) {
 			sql = sql.replace("[$ORDERBY$]", obc.toString());
 		}else{
-			sql = sql.replace("[$ORDERBY$]", "u.lastName, u.firstName, u.middleName ");
+			try {
+				PortletPreferences prefs = PortalPreferencesLocalServiceUtil.getPreferences(companyId, companyId, 1);
+				if(Boolean.parseBoolean(prefs.getValue("users.first.last.name", "false"))){
+					sql = sql.replace("[$ORDERBY$]", "u.lastName, u.firstName, u.middleName ");
+				}else{
+					sql = sql.replace("[$ORDERBY$]", "u.firstName, u.middleName, u.lastName ");
+				}
+			} catch (SystemException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				sql = sql.replace("[$ORDERBY$]", "u.lastName, u.firstName, u.middleName ");
+			}
 		}
 		
 		return sql;
