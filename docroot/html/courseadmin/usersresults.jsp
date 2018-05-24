@@ -229,7 +229,7 @@
 			
 		<liferay-ui:search-container-row className="com.liferay.portal.model.User" 	keyProperty="userId" 	modelVar="userToAdd">
 		<liferay-ui:search-container-column-text>
-			<liferay-ui:user-display userId="${courseUser.userId}"></liferay-ui:user-display>
+			<liferay-ui:user-display userId="${userToAdd.userId}"></liferay-ui:user-display>
 		</liferay-ui:search-container-column-text>
 		<liferay-ui:search-container-column-text name="screen-name"	property="screenName">
 		</liferay-ui:search-container-column-text>

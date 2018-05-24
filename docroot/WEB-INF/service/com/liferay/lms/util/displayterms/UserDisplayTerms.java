@@ -10,7 +10,6 @@ import com.liferay.portal.kernel.dao.search.DisplayTerms;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -290,8 +289,10 @@ public class UserDisplayTerms extends DisplayTerms{
 			PortletPreferences portalPreferences = PortalPreferencesLocalServiceUtil.getPreferences(companyId, companyId, 1);
 			if(Boolean.parseBoolean(portalPreferences.getValue("users.first.last.name", "false"))){
 				obc = new UserLastNameComparator(true);
+				log.debug("order by last name");
 			}else{
 				obc = new UserFirstNameComparator(true);
+				log.debug("order by first name");
 			}
 		} catch (SystemException e) {
 			// TODO Auto-generated catch block
