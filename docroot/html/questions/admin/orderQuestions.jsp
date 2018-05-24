@@ -21,7 +21,7 @@ request.setAttribute("activity", learningActivity);
 
 request.setAttribute("backUrl", backUrl.toString());
 PortletURL orderQuestionsURL = renderResponse.createRenderURL();
-orderQuestionsURL.setParameter("jspPage","/html/execactivity/test/admin/orderQuestions.jsp");
+orderQuestionsURL.setParameter("jspPage","/html/questions/admin/orderQuestions.jsp");
 orderQuestionsURL.setParameter("resId",Long.toString(learningActivity.getActId()));
 orderQuestionsURL.setParameter("actionEditingDetails",StringPool.TRUE);
 String orderByCol =  (String)request.getAttribute("orderByCol");
@@ -31,7 +31,7 @@ String orderByType = (String)request.getAttribute("orderByType");
 if(orderByType==null)
 	orderByType="asc";
 %>
-<liferay-util:include page="/html/execactivity/test/admin/editHeader.jsp" servletContext="<%=this.getServletContext() %>" />
+<liferay-util:include page="/html/questions/admin/editHeader.jsp" servletContext="<%=this.getServletContext() %>" />
 
 <liferay-portlet:actionURL name="moveQuestion" var="moveQuestionURL" windowState="<%= LiferayWindowState.EXCLUSIVE.toString()%>" />
 
