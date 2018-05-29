@@ -59,10 +59,13 @@ public class DateEditor extends MVCPortlet {
 		try {			
 			Course course = CourseLocalServiceUtil.fetchByGroupCreatedId(themeDisplay.getScopeGroupId());	
 			
-			List<Module> modules = ModuleLocalServiceUtil.findAllInGroup(course.getGroupCreatedId());
+			if(course != null){
+				List<Module> modules = ModuleLocalServiceUtil.findAllInGroup(course.getGroupCreatedId());
+				
+				renderRequest.setAttribute("course", course);
+				renderRequest.setAttribute("listModules", modules);
+			}
 			
-			renderRequest.setAttribute("course", course);
-			renderRequest.setAttribute("listModules", modules);
 						
 		} catch (SystemException e) {
 			log.error(e);
