@@ -353,32 +353,29 @@
 %>
 						<td class="date">
 <%
-SimpleDateFormat sdf = new SimpleDateFormat("dd MMM HH:mm",themeDisplay.getLocale());
+							SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/YYYY HH:mm",themeDisplay.getLocale());
+							sdf.setTimeZone(themeDisplay.getTimeZone());
 							if(startDate!=null &&today.before(startDate)){
 								if(showModuleStartDate){
-																		
-									Long dateOffSet  = startDate.getTime()  + themeDisplay.getTimeZone().getRawOffset(); 					
 %>
 									<liferay-ui:message key="fecha-inicio"/><br />
-									<%=	sdf.format(new Date(dateOffSet))%>
+									<%=	sdf.format(startDate)%>
 									<%--=	dateFormatDate.format(new Date(dateOffSet))--%>
 <%
 								}
 							}else{
 								if(endDate!=null&&today.before(endDate)){
 									if(showModuleStartDate){
-										Long dateOffSet  = startDate.getTime()  + themeDisplay.getTimeZone().getRawOffset();
 %>
 										<liferay-ui:message key="fecha-inicio"/><br />
-										<%=	sdf.format(new Date(dateOffSet))%>
+										<%=	sdf.format(startDate)%>
 										<%--=	dateFormatDateTime.format(new Date(dateOffSet))--%><br />
 <%
 									}
 									if(showModuleEndDate){
-										Long dateOffSet  = endDate.getTime()  + themeDisplay.getTimeZone().getRawOffset();
 %>
 										<liferay-ui:message key="fecha-fin"/><br />
-										<%=	sdf.format(new Date(dateOffSet))%>
+										<%=	sdf.format(endDate)%>
 										<%--=	dateFormatDateTime.format(new Date(dateOffSet))--%>
 <%
 									}
