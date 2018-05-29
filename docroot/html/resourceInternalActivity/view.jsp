@@ -1,3 +1,5 @@
+<%@page import="com.liferay.lms.util.LmsConstant"%>
+<%@page import="com.liferay.portal.kernel.util.StringBundler"%>
 <%@page import="com.tls.lms.util.LiferaylmsUtil"%>
 <%@page import="com.liferay.lms.service.CourseLocalServiceUtil"%>
 <%@page import="com.liferay.lms.model.Course"%>
@@ -94,16 +96,38 @@ else
 				}
 			}
 			if(learnact.getExtracontent()!=null &&!learnact.getExtracontent().trim().equals("") ){
-				
 				long entryId = GetterUtil.getLong(LearningActivityLocalServiceUtil.getExtraContentValue(learnact.getActId(),"assetEntry"),0);
 				
 				if(entryId!=0){
-					AssetEntry entry=AssetEntryLocalServiceUtil.getEntry(entryId);
-					AssetRendererFactory assetRendererFactory=AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(entry.getClassName());			
-					AssetRenderer assetRenderer= AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(entry.getClassName()).getAssetRenderer(entry.getClassPK());
-					String path = assetRenderer.render(renderRequest, renderResponse, AssetRenderer.TEMPLATE_FULL_CONTENT); %>
-					<liferay-util:include  page="<%= path %>" portletId="<%= assetRendererFactory.getPortletId() %>" />
-				<%}
+					AssetEntry entry=AssetEntryLocalServiceUtil.fetchEntry(entryId);
+					if(entry!=null){
+						String portlet = PropsUtil.get(LmsConstant.DOCUMENTLIBRARY_PORTLET_KEY);
+						String portletPage = PropsUtil.get(LmsConstant.DOCUMENTLIBRARY_PAGE_KEY);
+						if(Validator.isNotNull(portlet) && Validator.isNotNull(portletPage) && entry.getClassName().equals(DLFileEntry.class.getName())){
+							%>
+							<liferay-util:include page="<%=portletPage%>" portletId="<%=portlet%>">
+								<liferay-util:param value="<%=String.valueOf(entry.getClassPK())%>" name="entryId" />
+							</liferay-util:include>
+							<%
+					
+						}else{
+							AssetRendererFactory assetRendererFactory=AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(entry.getClassName());			
+							AssetRenderer assetRenderer= AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(entry.getClassName()).getAssetRenderer(entry.getClassPK());
+							String path = assetRenderer.render(renderRequest, renderResponse, AssetRenderer.TEMPLATE_FULL_CONTENT); 
+							if(permissionChecker.hasPermission(entry.getGroupId(), entry.getClassName(), entry.getClassPK(), ActionKeys.VIEW)){ %>
+								<liferay-util:include  page="<%= path %>" portletId="<%= assetRendererFactory.getPortletId() %>" />
+							<%}else{%>
+								<div class="portlet-msg-error">
+									<liferay-ui:message key="you-do-not-have-permission-to-access-the-requested-resource"/>
+								</div>
+							<%}	
+						}
+					}else{%>
+						<div class="portlet-msg-error">
+								<liferay-ui:message key="the-requested-resource-was-not-found"/>
+						</div>
+					<%}
+				}
 			}
 		}
 	}
