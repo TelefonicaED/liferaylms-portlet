@@ -1,3 +1,6 @@
+<%@page import="com.liferay.portal.kernel.exception.SystemException"%>
+<%@page import="com.liferay.portal.kernel.util.PrefsPropsUtil"%>
+<%@page import="com.liferay.lms.util.LmsConstant"%>
 <%@page import="java.util.HashSet"%>
 <%@page import="java.util.Set"%>
 <%@page import="java.util.Collections"%>
@@ -22,13 +25,17 @@
 <%@ include file="/init.jsp"%>
 <%
 LmsPrefs prefs=LmsPrefsLocalServiceUtil.getLmsPrefsIni(themeDisplay.getCompanyId());
-if(prefs!=null)
-{
+if(prefs!=null){
 	long editorRoleId=prefs.getEditorRole();
 	Role editor=RoleLocalServiceUtil.getRole(editorRoleId);
 	long teacherRoleId=prefs.getTeacherRole();
 	Role teacher=RoleLocalServiceUtil.getRole(teacherRoleId);
-	
+	boolean linkResources = false;
+	try {
+		linkResources = PrefsPropsUtil.getBoolean(themeDisplay.getCompanyId(), LmsConstant.RESOURCE_INTERNAL_DOCUMENT_LINKED);
+	} catch (SystemException e) {
+		e.printStackTrace();
+	}			
 	List<Long> layoutSetTemplateIds = ListUtil.toList(StringUtil.split(prefs.getLmsTemplates(),",",0L));
 	List<Long> activityids = ListUtil.toList(StringUtil.split(prefs.getActivities(), ",", 0L));
 	List<Long> courseEvalIds = ListUtil.toList(StringUtil.split(prefs.getCourseevals(),",",0L));
@@ -167,8 +174,11 @@ for(CalificationType calificationType :calificationTypeRegistry.getCalificationT
 
 	<aui:input type="checkbox" name="viewCoursesFinished"
 	label="view-courses-finished" checked="<%=prefs.getViewCoursesFinished()%>" value="<%=prefs.getViewCoursesFinished()%>" />
-
+	<aui:input type="checkbox" name="linkResources"
+		label="link-internal-resources" checked="<%=linkResources%>" value="<%=linkResources%>" />
 </aui:field-wrapper>
+
+
 
 
 <aui:field-wrapper>

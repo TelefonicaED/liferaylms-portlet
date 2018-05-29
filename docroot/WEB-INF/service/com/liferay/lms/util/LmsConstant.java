@@ -19,4 +19,9 @@ public class LmsConstant {
 	public static String DOCUMENTLIBRARY_PORTLETFOLDER = "module";
 	public static String DOCUMENTLIBRARY_MAINFOLDER_DESCRIPTION = "Portlet Document Uploads";
 	public static String DOCUMENTLIBRARY_PORTLETFOLDER_DESCRIPTION = "";
+	
+	public static String DOCUMENTLIBRARY_PORTLET_KEY = "lms.document.library.viewer.portlet";
+	public static String DOCUMENTLIBRARY_PAGE_KEY = "lms.document.library.viewer.page";
+
+	public static String RESOURCE_INTERNAL_DOCUMENT_LINKED = "lms.resource.internal.linked";
 }
