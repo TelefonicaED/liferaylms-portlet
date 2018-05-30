@@ -872,40 +872,6 @@
 			<role-name>user</role-name>
 		</security-role-ref>
 	</portlet>
-
-	<portlet>
-		<portlet-name>coursetoolsmanage</portlet-name>
-		<display-name>CourseToolsManage</display-name>
-		<portlet-class>com.liferay.lms.CourseToolsManage</portlet-class>
-		<init-param>
-			<name>view-jsp</name>
-			<value>/html/coursetoolsmanage/view.jsp</value>
-		</init-param>
-		<expiration-cache>0</expiration-cache>
-		<supports>
-			<mime-type>text/html</mime-type>
-			<portlet-mode>view</portlet-mode>
-		</supports>
-		<resource-bundle>content/coursetoolsmanage/Language</resource-bundle>
-		<portlet-info>
-			<title>CourseToolsManage</title>
-			<short-title>CourseToolsManage</short-title>
-			<keywords></keywords>
-		</portlet-info>
-		<security-role-ref>
-			<role-name>administrator</role-name>
-		</security-role-ref>
-		<security-role-ref>
-			<role-name>guest</role-name>
-		</security-role-ref>
-		<security-role-ref>
-			<role-name>power-user</role-name>
-		</security-role-ref>
-		<security-role-ref>
-			<role-name>user</role-name>
-		</security-role-ref>
-	</portlet>
-
 	<portlet>
 		<portlet-name>courseadmin</portlet-name>
 		<display-name>CourseAdmin</display-name>
