@@ -41,7 +41,6 @@ import com.liferay.mail.service.MailServiceUtil;
 import com.liferay.portal.kernel.exception.NestableException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.json.JSON;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
@@ -63,9 +62,7 @@ import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
-import com.liferay.portal.model.Group;
 import com.liferay.portal.model.User;
-import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceContextFactory;
 import com.liferay.portal.service.UserLocalServiceUtil;
@@ -784,8 +781,6 @@ public class P2PActivityPortlet extends MVCPortlet {
 			if(email_anonimousString.equals("true")){
 				email_anonimous =  true;
 			}			
-			Group group = GroupLocalServiceUtil.getGroup(activity.getGroupId());
-			
 			Course course= CourseLocalServiceUtil.getCourseByGroupCreatedId(activity.getGroupId());
 			
 			Module module = ModuleLocalServiceUtil.getModule(activity.getModuleId());
@@ -804,7 +799,7 @@ public class P2PActivityPortlet extends MVCPortlet {
 //			}
 			_log.debug("***portalUrl:"+portalUrl);
 			
-					
+			long modulesOfCourse = 0;				
 			if(course != null){
 				courseTitle = course.getTitle(user.getLocale());
 				courseFriendlyUrl = portalUrl + pathPublic + course.getFriendlyURL();
@@ -812,6 +807,7 @@ public class P2PActivityPortlet extends MVCPortlet {
 				courseFriendlyUrl += "&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&p_r_p_564233524_actId="+actId;
 				courseFriendlyUrl += "&p_r_p_564233524_moduleId="+activity.getModuleId();
 				_log.debug("URL "+ courseFriendlyUrl);
+				modulesOfCourse = ModuleLocalServiceUtil.countByGroupId(course.getGroupCreatedId());
 			}
 							
 			String messageArgs[]= {activityTitle, moduleTitle, courseTitle, courseFriendlyUrl};
@@ -827,6 +823,9 @@ public class P2PActivityPortlet extends MVCPortlet {
 			//Body
 			String title  			 = LanguageUtil.format(user.getLocale(), "p2ptaskactivity.mail.valoration.recieved.body.title",   titleArgs); 
 			String message  		 = LanguageUtil.format(user.getLocale(), "p2ptaskactivity.mail.valoration.recieved.body.message", messageArgs);
+			if(modulesOfCourse<=1){
+				message  		 = LanguageUtil.format(user.getLocale(), "p2ptaskactivity.mail.valoration.recieved.body.message-simple", new String[]{activityTitle, courseTitle, courseFriendlyUrl});
+			}
 			String usercorrection    = LanguageUtil.format(user.getLocale(), "p2ptaskactivity.mail.valoration.recieved.body.usercorrection", userArgs); 
 			String resultcorrection  = LanguageUtil.format(user.getLocale(), "p2ptaskactivity.mail.valoration.recieved.body.result",  resultArgs); 			
 			String end  			 = LanguageUtil.get(user.getLocale(), 	"p2ptaskactivity.mail.valoration.recieved.body.end"); 
@@ -917,7 +916,6 @@ public class P2PActivityPortlet extends MVCPortlet {
 		{
 			LearningActivity activity = LearningActivityLocalServiceUtil.getLearningActivity(actId);
 			
-			Group group = GroupLocalServiceUtil.getGroup(activity.getGroupId());
 			
 			Course course= CourseLocalServiceUtil.getCourseByGroupCreatedId(activity.getGroupId());
 			
@@ -937,7 +935,7 @@ public class P2PActivityPortlet extends MVCPortlet {
 //			}
 			_log.debug("***portalUrl:"+portalUrl);
 			
-					
+			long modulesOfCourse = 0;		
 			if(course != null){
 				courseTitle = course.getTitle(user.getLocale());
 				courseFriendlyUrl = portalUrl + pathPublic + course.getFriendlyURL();
@@ -945,9 +943,12 @@ public class P2PActivityPortlet extends MVCPortlet {
 				courseFriendlyUrl += "&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&p_r_p_564233524_actId="+actId;
 				courseFriendlyUrl += "&p_r_p_564233524_moduleId="+activity.getModuleId();
 				_log.debug("URL "+ courseFriendlyUrl);
+				modulesOfCourse = ModuleLocalServiceUtil.countByGroupId(course.getGroupCreatedId());
+				
+				
 			}
-			
 			String messageArgs[]= {activityTitle, moduleTitle, courseTitle, courseFriendlyUrl};
+			
 			String titleArgs[]= {String.valueOf(user.getFullName())};
 			
 			//Nuevos campos del email
@@ -956,6 +957,9 @@ public class P2PActivityPortlet extends MVCPortlet {
 			String subject = LanguageUtil.get(user.getLocale(), "p2ptaskactivity.mail.sendactivity.mail.subject"); 
 			String title = LanguageUtil.format(user.getLocale(), "p2ptaskactivity.mail.sendactivity.mail.title", titleArgs);
 			String body = title +"<br /><br />"+ LanguageUtil.format(user.getLocale(), "p2ptaskactivity.mail.sendactivity.mail.message", messageArgs);
+			if(modulesOfCourse<=1){
+				body = title +"<br /><br />"+ LanguageUtil.format(user.getLocale(), "p2ptaskactivity.mail.sendactivity.mail.message-simple", new String[]{activityTitle, courseTitle, courseFriendlyUrl});
+			}
 			
 			String firmaPortal  = PrefsPropsUtil.getString(themeDisplay.getCompanyId(),"firma.email.admin");
 			// JOD
