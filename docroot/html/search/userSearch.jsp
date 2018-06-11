@@ -11,14 +11,16 @@
 	</c:if>
 </div>
 <c:if test="${not empty displayTerms.userTeams }">
-	<div class="search-user">
-		<aui:select cssClass="col-md-3" name="${displayTerms.getTEAM() }" label="team">
-			<c:if test="${displayTerms.hasNullTeam }">
-				<aui:option label="" value="0"/>
-			</c:if>
-			<c:forEach items="${displayTerms.userTeams}" var="team">
-				<aui:option  value="${team.teamId}" label="${team.name}" selected="${team.teamId == displayTerms.teamId}"></aui:option>
-			</c:forEach>
-		</aui:select>
+	<div class="search-user col-md-12">
+		<div class="col-md-3">
+			<aui:select name="${displayTerms.getTEAM() }" label="team">
+				<c:if test="${displayTerms.hasNullTeam }">
+					<aui:option label="" value="0"/>
+				</c:if>
+				<c:forEach items="${displayTerms.userTeams}" var="team">
+					<aui:option  value="${team.teamId}" label="${team.name}" selected="${team.teamId == displayTerms.teamId}"></aui:option>
+				</c:forEach>
+			</aui:select>
+		</div>
 	</div>
 </c:if>

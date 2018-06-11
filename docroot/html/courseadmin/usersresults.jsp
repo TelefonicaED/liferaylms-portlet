@@ -1,3 +1,4 @@
+<%@page import="org.apache.commons.lang.StringEscapeUtils"%>
 <%@page import="com.liferay.lms.util.searchcontainer.UserSearchContainer"%>
 <%@page import="java.util.LinkedList"%>
 <%@page import="java.util.Iterator"%>
@@ -238,7 +239,7 @@
 			name="email-address"	property="emailAddress"	/>
 		
 		<liferay-ui:search-container-column-text>
-				<a id="<portlet:namespace />addUser_${userToAdd.getUserId()}" onClick="<portlet:namespace />addUser(<%=userToAdd.getUserId() %>, '<%=userToAdd.getFullName() %>', false)" style="Cursor:pointer;" >
+				<a id="<portlet:namespace />addUser_${userToAdd.getUserId()}" onClick="<portlet:namespace />addUser(<%=userToAdd.getUserId() %>, '<%=StringEscapeUtils.escapeJavaScript(userToAdd.getFullName()) %>', false)" style="Cursor:pointer;" >
 				<liferay-ui:message key="select" /></a>
 				<a id="<portlet:namespace />deleteUser_${userToAdd.getUserId()}" class="aui-helper-hidden" onClick="<portlet:namespace />deleteUser(<%=userToAdd.getUserId() %>, false)" style="Cursor:pointer;" >
 				<liferay-ui:message key="unselect" /></a>	
