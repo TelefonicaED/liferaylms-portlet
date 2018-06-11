@@ -1,7 +1,8 @@
 <script>
 	window.onload=function(){
-		$( ".itime" ).datepicker({ dateFormat: 'dd-mm-yy' });
-		console.log("se a�ade evento cambio");
+		
+		$(".itime" ).datepicker();
+		
 		$(".itime, .ihour").change(function(event) {
 			
 			$(this).css("background","none repeat scroll 0 0 #F5A9A9");

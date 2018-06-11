@@ -1,6 +1,36 @@
 <%@ include file="/init-min.jsp" %>
 <%@ include file="/js/dateeditor.jsp" %>
 
+<c:choose>
+	<c:when test="${themeDisplay.locale.language.equals('ca')}">
+		<script src="/liferaylms-portlet/js/datepicker/datepicker-ca.js"></script>
+	</c:when>
+	<c:when test="${themeDisplay.locale.language.equals('de')}">
+		<script src="/liferaylms-portlet/js/datepicker/datepicker-de.js"></script>
+	</c:when>
+	<c:when test="${themeDisplay.locale.language.equals('es')}">
+		<script src="/liferaylms-portlet/js/datepicker/datepicker-es.js"></script>
+	</c:when>
+	<c:when test="${themeDisplay.locale.language.equals('eu')}">
+		<script src="/liferaylms-portlet/js/datepicker/datepicker-eu.js"></script>
+	</c:when>
+	<c:when test="${themeDisplay.locale.language.equals('gl')}">
+		<script src="/liferaylms-portlet/js/datepicker/datepicker-gl.js"></script>
+	</c:when>
+	<c:when test="${themeDisplay.locale.language.equals('it')}">
+		<script src="/liferaylms-portlet/js/datepicker/datepicker-it.js"></script>
+	</c:when>
+	<c:when test="${themeDisplay.locale.language.equals('pt')}">
+		<script src="/liferaylms-portlet/js/datepicker/datepicker-pt.js"></script>
+	</c:when>
+	<c:when test="${themeDisplay.locale.language.equals('tr')}">
+		<script src="/liferaylms-portlet/js/datepicker/datepicker-tr.js"></script>
+	</c:when>
+	<c:when test="${themeDisplay.locale.language.equals('zh')}">
+		<script src="/liferaylms-portlet/js/datepicker/datepicker-zh.js"></script>
+	</c:when>
+</c:choose>
+
 <div id="maineditsyllabus" class="syllabuscont row">	
 	<div class="col-md-12">
 		<div class="col-md-12">
