@@ -976,11 +976,18 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 				}
 				
 				//Cambiamos la FriendlyURL del curso y del grupo (solo al editar)
+				log.debug("new friendlyURL: "+friendlyURL);
+				log.debug("actual course friendlyURL: "+course.getFriendlyURL());
 				if(Validator.isNotNull(friendlyURL)){
 					try{
-						GroupLocalServiceUtil.updateFriendlyURL(course.getGroupCreatedId(), friendlyURL);
+						Group newFriendly = GroupLocalServiceUtil.updateFriendlyURL(course.getGroupCreatedId(), friendlyURL);
+						if(newFriendly != null)
+							log.debug("new group friendlyURL: "+newFriendly.getFriendlyURL());
+						else log.debug("group null. FriendlyURL not established.");
+						GroupLocalServiceUtil.updateGroup(newFriendly);
 						course.setFriendlyURL(friendlyURL);
 					}catch(Exception e){
+						e.printStackTrace();
 						SessionErrors.add(actionRequest, "friendly-url-error");
 						actionResponse.setRenderParameter("courseId", String.valueOf(courseId));
 						actionResponse.setRenderParameter("jspPage","/html/courseadmin/editcourse.jsp");
