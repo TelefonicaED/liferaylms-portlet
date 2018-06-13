@@ -666,9 +666,17 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 		course.setModifiedDate(new java.util.Date(System.currentTimeMillis()));
 		course.setExpandoBridgeAttributes(serviceContext);
 		Locale locale=new Locale(serviceContext.getLanguageId());
+		
+		Group theGroup=GroupLocalServiceUtil.getGroup(course.getGroupCreatedId());
+		try{
+			theGroup = GroupLocalServiceUtil.updateFriendlyURL(theGroup.getGroupId(), course.getFriendlyURL());
+		}catch(Exception e){
+			throw new PortalException("friendlyURL");
+		}
+		
 		coursePersistence.update(course, true);
 		long userId=serviceContext.getUserId();
-		Group theGroup=GroupLocalServiceUtil.getGroup(course.getGroupCreatedId());
+		
 		String groupName = course.getTitle(locale,true);
 		if(allowDuplicateName){
 			if(GroupLocalServiceUtil.fetchGroup(course.getCompanyId(), groupName)!=null){
@@ -684,7 +692,8 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 			if (serviceContext.getAttribute("type") != null) {
 				type = Integer.valueOf(serviceContext.getAttribute("type").toString());
 			}
-		}catch(NumberFormatException nfe){				
+		}catch(NumberFormatException nfe){	
+			log.debug(nfe);
 		}
 		
 		theGroup.setType(type);
