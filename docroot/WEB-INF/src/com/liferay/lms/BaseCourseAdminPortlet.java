@@ -849,6 +849,7 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 				course.setEndDate(stopDate);
 				course.setCalificationType(courseCalificationType);
 				course.setMaxusers(maxusers);
+				if(Validator.isNotNull(friendlyURL))course.setFriendlyURL(friendlyURL);
 				serviceContext.setAttribute("type", String.valueOf(type));
 				/*
 				 * Se llama más abajo
@@ -975,21 +976,6 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 					}
 				}
 				
-				//Cambiamos la FriendlyURL del curso y del grupo (solo al editar)
-				if(Validator.isNotNull(friendlyURL)){
-					try{
-						GroupLocalServiceUtil.updateFriendlyURL(course.getGroupCreatedId(), friendlyURL);
-						course.setFriendlyURL(friendlyURL);
-					}catch(Exception e){
-						SessionErrors.add(actionRequest, "friendly-url-error");
-						actionResponse.setRenderParameter("courseId", String.valueOf(courseId));
-						actionResponse.setRenderParameter("jspPage","/html/courseadmin/editcourse.jsp");
-						return;
-					}
-				}
-				
-				
-				
 				try{
 					serviceContext.setAttribute("type", String.valueOf(type));
 					PermissionChecker permissionChecker = PermissionCheckerFactoryUtil
@@ -1007,6 +993,11 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 					if(pe.getMessage().startsWith("maxUsers ")){
 						SessionErrors.add(actionRequest, "evaluationtaskactivity.error.systemError");
 						actionResponse.setRenderParameter("maxUsersError", String.valueOf(LanguageUtil.format(themeDisplay.getLocale(),"max-users-violated", pe.getMessage().replaceAll("maxUsers ", StringPool.BLANK))));
+						actionResponse.setRenderParameter("courseId", String.valueOf(courseId));
+						actionResponse.setRenderParameter("jspPage","/html/courseadmin/editcourse.jsp");
+						return;
+					}else if(pe.getMessage().startsWith("friendlyURL")){
+						SessionErrors.add(actionRequest, "friendly-url-error");
 						actionResponse.setRenderParameter("courseId", String.valueOf(courseId));
 						actionResponse.setRenderParameter("jspPage","/html/courseadmin/editcourse.jsp");
 						return;
