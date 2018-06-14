@@ -220,9 +220,9 @@ function validate(){
 	</aui:field-wrapper>
 	<%
 	Course course = CourseLocalServiceUtil.getCourseByGroupCreatedId(themeDisplay.getScopeGroupId()); 
-	SimpleDateFormat formatDateHour = new SimpleDateFormat("dd MMMM yyyy HH:mm");
+	SimpleDateFormat formatDateHour = new SimpleDateFormat("dd/MM/yyyy HH:mm");
 	formatDateHour.setTimeZone(themeDisplay.getTimeZone());	
-	Object  [] arg =  new Object[]{formatDateHour.format(course.getExecutionStartDate())};%>
+	Object  [] arg =  new Object[]{(course.getExecutionStartDate()!=null)?formatDateHour.format(course.getExecutionStartDate()):"-"};%>
 	<liferay-ui:message key="course-start-date"  arguments="<%=arg %>" />
 	<liferay-ui:error key="module-startDate-required" message="module-startDate-required" />
 	<liferay-ui:error key="module-startDate-before-course-startDate" message="module-startDate-before-course-startDate" />
@@ -234,7 +234,7 @@ function validate(){
 			hourParam="endDateHora" hourValue="<%=Integer.valueOf(endDateHora) %>" minuteValue="<%=Integer.valueOf(endDateMinuto) %>"></liferay-ui:input-time>
 	</aui:field-wrapper>
 	<%
-	Object  [] arg2 =  new Object[]{formatDateHour.format(course.getExecutionEndDate())};%>
+	Object  [] arg2 =  new Object[]{(course.getExecutionEndDate() != null)?formatDateHour.format(course.getExecutionEndDate()):"-"};%>
 	<liferay-ui:message key="course-end-date"  arguments="<%=arg2 %>" />
 	<liferay-ui:error key="module-endDate-required" message="module-endDate-required" />
 	<liferay-ui:error key="module-startDate-before-endDate" message="module-startDate-before-endDate" />
