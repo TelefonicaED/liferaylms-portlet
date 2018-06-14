@@ -1,3 +1,5 @@
+<%@page import="com.liferay.lms.service.CourseLocalServiceUtil"%>
+<%@page import="com.liferay.lms.model.Course"%>
 <%@page import="com.liferay.portlet.documentlibrary.model.DLFileVersion"%>
 <%@page import="com.liferay.portlet.documentlibrary.model.DLFileEntry"%>
 <%@page import="com.liferay.portlet.documentlibrary.service.DLFileEntryLocalServiceUtil"%>
@@ -216,24 +218,32 @@ function validate(){
 		<liferay-ui:input-time minuteParam="startDateMinuto" amPmParam="startAMPM"  
 			hourParam="startDateHora" hourValue="<%=Integer.valueOf(startDateHora) %>" minuteValue="<%=Integer.valueOf(startDateMinuto) %>"></liferay-ui:input-time>
 	</aui:field-wrapper>
+	<%
+	Course course = CourseLocalServiceUtil.getCourseByGroupCreatedId(themeDisplay.getScopeGroupId()); 
+	SimpleDateFormat formatDateHour = new SimpleDateFormat("dd MMMM yyyy HH:mm");
+	formatDateHour.setTimeZone(themeDisplay.getTimeZone());	
+	Object  [] arg =  new Object[]{formatDateHour.format(course.getExecutionStartDate())};%>
+	<liferay-ui:message key="course-start-date"  arguments="<%=arg %>" />
 	<liferay-ui:error key="module-startDate-required" message="module-startDate-required" />
+	<liferay-ui:error key="module-startDate-before-course-startDate" message="module-startDate-before-course-startDate" />
+	
 	<aui:field-wrapper label="end-date">
 		<liferay-ui:input-date  yearRangeEnd="<%=LiferaylmsUtil.defaultEndYear %>" yearRangeStart="<%=LiferaylmsUtil.defaultStartYear %>" dayParam="endDateDia" dayValue="<%= Integer.valueOf(endDateDia) %>" monthParam="endDateMes" monthValue="<%= Integer.valueOf(endDateMes)-1 %>" yearParam="endDateAno" yearValue="<%= Integer.valueOf(endDateAno) %>"  yearNullable="false" 
 				 dayNullable="false" monthNullable="false" ></liferay-ui:input-date>
 		<liferay-ui:input-time minuteParam="endDateMinuto" amPmParam="startAMPM" 
 			hourParam="endDateHora" hourValue="<%=Integer.valueOf(endDateHora) %>" minuteValue="<%=Integer.valueOf(endDateMinuto) %>"></liferay-ui:input-time>
 	</aui:field-wrapper>
+	<%
+	Object  [] arg2 =  new Object[]{formatDateHour.format(course.getExecutionEndDate())};%>
+	<liferay-ui:message key="course-end-date"  arguments="<%=arg2 %>" />
+	<liferay-ui:error key="module-endDate-required" message="module-endDate-required" />
+	<liferay-ui:error key="module-startDate-before-endDate" message="module-startDate-before-endDate" />
+	<liferay-ui:error key="module-endDate-after-course-endDate" message="module-endDate-after-course-endDate" />
+	
 	<aui:field-wrapper label="allowed-time">
 		<liferay-ui:input-time minuteParam="allowedDateMinuto" amPmParam="allowedDateAMPM"	hourParam="allowedDateHora" hourValue="<%=Integer.valueOf(allowedDateHora) %>" minuteValue="<%=Integer.valueOf(allowedDateMinuto) %>"></liferay-ui:input-time>
 	</aui:field-wrapper>
-	<liferay-ui:error key="module-endDate-required" message="module-endDate-required" />
-	<liferay-ui:error key="module-startDate-before-endDate" message="module-startDate-before-endDate" />
-    
-    
-    
-    
-    
-    
+	
 	<aui:input type="hidden" name="icon" />
 	<br />
 	 
