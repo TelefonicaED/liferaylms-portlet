@@ -125,6 +125,12 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 	public static final String WHERE_EMAIL_ADDRESS =
 		    CourseFinder.class.getName() +
 		        ".whereEmailAddress";	
+	public static final String WHERE_USER_SEARCH = 
+			CourseFinder.class.getName() + 
+				".whereUserSearch";
+	public static final String WHERE_USER_STATUS = 
+			CourseFinder.class.getName() + 
+				".whereUserStatus";
 	public static final String INNER_JOIN_TEAM = 
 			CourseFinder.class.getName() + ".innerJoinTeam";
 	public static final String HAS_USER_TRIES =
@@ -811,9 +817,9 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			qPos.add(editorRoleId);
 			qPos.add(courseId);
 
-			qPos.add(status);
-			qPos.add(status);
-			qPos.add(WorkflowConstants.STATUS_ANY);
+			if(status != WorkflowConstants.STATUS_ANY){
+				qPos.add(status);
+			}
 			
 			qPos = replaceQPosJoinWhereUser(qPos, screenName, firstName, lastName, emailAddress);
 					
@@ -860,6 +866,8 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			
 			sql = CustomSQLUtil.replaceAndOperator(sql, andOperator);
 			
+			log.debug("sql: " + sql);
+			
 			SQLQuery q = session.createSQLQuery(sql);
 			q.addScalar(COUNT_COLUMN_NAME, Type.LONG);
 			
@@ -872,9 +880,9 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			qPos.add(teacherRoleId);
 			qPos.add(editorRoleId);
 			qPos.add(courseId);
-			qPos.add(status);
-			qPos.add(status);
-			qPos.add(WorkflowConstants.STATUS_ANY);
+			if(status != WorkflowConstants.STATUS_ANY){
+				qPos.add(status);
+			}
 			
 			qPos = replaceQPosJoinWhereUser(qPos, screenName, firstName, lastName, emailAddress);
 			
@@ -972,9 +980,9 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			qPos.add(roleId);
 			qPos.add(courseId);
 
-			qPos.add(status);
-			qPos.add(status);
-			qPos.add(WorkflowConstants.STATUS_ANY);
+			if(status != WorkflowConstants.STATUS_ANY){
+				qPos.add(status);
+			}
 			
 			qPos = replaceQPosJoinWhereUser(qPos, screenName, firstName, lastName, emailAddress);	
 			
@@ -1060,9 +1068,9 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			QueryPos qPos = QueryPos.getInstance(q);
 			qPos.add(roleId);
 			qPos.add(courseId);
-			qPos.add(status);
-			qPos.add(status);
-			qPos.add(WorkflowConstants.STATUS_ANY);
+			if(status != WorkflowConstants.STATUS_ANY){
+				qPos.add(status);
+			}
 			
 			qPos = replaceQPosJoinWhereUser(qPos, screenName, firstName, lastName, emailAddress);
 			
@@ -1146,39 +1154,45 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			sql = sql.replace("[$JOINTEAM$]", "");
 		}
 		
+		String sqlWhere = CustomSQLUtil.get(WHERE_USER_SEARCH);
 		if(Validator.isNotNull(screenName)){
-			sql = sql.replace("[$WHERESCREENNAME$]", CustomSQLUtil.get(WHERE_SCREEN_NAME));
+			sqlWhere = sqlWhere.replace("[$WHERESCREENNAME$]", CustomSQLUtil.get(WHERE_SCREEN_NAME));
 			whereClause=true;
 		}else{
-			sql = sql.replace("[$WHERESCREENNAME$]", "");
+			sqlWhere = sqlWhere.replace("[$WHERESCREENNAME$]", "");
 		}
 		if(Validator.isNotNull(firstName)){
-			sql = sql.replace("[$WHEREFIRSTNAME$]", CustomSQLUtil.get(WHERE_FIRST_NAME));
+			sqlWhere = sqlWhere.replace("[$WHEREFIRSTNAME$]", CustomSQLUtil.get(WHERE_FIRST_NAME));
 			whereClause=true;
 		}else{
-			sql = sql.replace("[$WHEREFIRSTNAME$]", "");
+			sqlWhere = sqlWhere.replace("[$WHEREFIRSTNAME$]", "");
 		}
 		if(Validator.isNotNull(lastName)){
-			sql = sql.replace("[$WHERELASTNAME$]", CustomSQLUtil.get(WHERE_LAST_NAME));
+			sqlWhere = sqlWhere.replace("[$WHERELASTNAME$]", CustomSQLUtil.get(WHERE_LAST_NAME));
 			whereClause=true;
 		}else{
-			sql = sql.replace("[$WHERELASTNAME$]", "");
+			sqlWhere = sqlWhere.replace("[$WHERELASTNAME$]", "");
 		}
 		if(Validator.isNotNull(emailAddress)){
-			sql = sql.replace("[$WHEREEMAILADDRESS$]", CustomSQLUtil.get(WHERE_EMAIL_ADDRESS));
+			sqlWhere = sqlWhere.replace("[$WHEREEMAILADDRESS$]", CustomSQLUtil.get(WHERE_EMAIL_ADDRESS));
 			whereClause=true;
 		}else{
-			sql = sql.replace("[$WHEREEMAILADDRESS$]", "");
+			sqlWhere = sqlWhere.replace("[$WHEREEMAILADDRESS$]", "");
 		}
-		
-		if(andOperator){
-			sql = sql.replace("[$DEFAULT$]", " 1 = 1 ");
+		if(status != WorkflowConstants.STATUS_ANY){
+			sql = StringUtil.replace(sql, "[$WHERESTATUS$]", CustomSQLUtil.get(WHERE_USER_STATUS));
 		}else{
-			if(whereClause){
-				sql = sql.replace("[$DEFAULT$]", " 1 = 0 ");	
-			}else{
-				sql = sql.replace("[$DEFAULT$]", " 1 = 1 ");
-			}
+			sql = StringUtil.replace(sql, "[$WHERESTATUS$]", "");
+		}
+
+		if(whereClause && !andOperator){
+			sqlWhere = sqlWhere.replace("[$DEFAULT$]", " 1 = 0 ");	
+			sql = StringUtil.replace(sql, "[$WHERESEARCH$]", sqlWhere);
+		}else if(whereClause && andOperator){
+			sqlWhere = sqlWhere.replace("[$DEFAULT$]", " 1 = 1 ");	
+			sql = StringUtil.replace(sql, "[$WHERESEARCH$]", sqlWhere);
+		}else{
+			sql = StringUtil.replace(sql, "[$WHERESEARCH$]", "");
 		}
 		
 		return sql;

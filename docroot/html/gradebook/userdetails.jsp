@@ -66,7 +66,7 @@
 					LearningActivityResult learningActivityResult=LearningActivityResultLocalServiceUtil.getByActIdAndUserId(learningActivity.getActId(), usuario.getUserId());
 					score=(learningActivityResult!=null)?ct.translate(themeDisplay.getLocale(), learningActivity.getGroupId(), learningActivityResult.getResult()):"";
 					
-					comments=learningActivityResult.getComments();
+					comments=UnicodeFormatter.toString(learningActivityResult.getComments());
 					if(learningActivityResult.getEndDate()!=null){
 							status="not-passed"	;
 					}

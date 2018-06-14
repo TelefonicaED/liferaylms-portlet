@@ -1,3 +1,4 @@
+<%@page import="com.liferay.portal.kernel.util.UnicodeFormatter"%>
 <%@page import="com.liferay.lms.service.CourseLocalServiceUtil"%>
 <%@page import="com.liferay.lms.learningactivity.calificationtype.CalificationTypeRegistry"%>
 <%@page import="com.liferay.lms.learningactivity.calificationtype.CalificationType"%>
@@ -162,10 +163,18 @@ if(!ownGrade){
 				}
 			</aui:validator>
 	    </aui:input>
-
-		<aui:input type="textarea" cols="75" rows="6" helpMessage="<%=LanguageUtil.get(pageContext, \"onlinetaskactivity.grades.commentsMessage\")%>" maxLength="1000" name="comments" label="onlinetaskactivity.comments" value='<%=((result!=null)&&(result.getComments()!=null))?result.getComments():"" %>'>
-			<aui:validator name="range">[0, 1000]</aui:validator>
-		</aui:input>
+		<aui:field-wrapper label="onlinetaskactivity.comments" name="comments" helpMessage="<%=LanguageUtil.get(pageContext, \"onlinetaskactivity.grades.commentsMessage\")%>">
+			<script type="text/javascript">
+				function <portlet:namespace />onChangeComments(val) {
+			    	var A = AUI();
+					A.one('#<portlet:namespace />comments').set('value',val);
+	        	}
+			</script>
+			<liferay-ui:input-editor name="comments" width="100%" onChangeMethod="onChangeComments" initMethod="initEditorComments" />
+			<script type="text/javascript">
+    		    function <portlet:namespace />initEditorComments() { return "<%=((result!=null)&&(result.getComments()!=null))?UnicodeFormatter.toString(result.getComments()):"" %>"; }
+    		</script>
+		</aui:field-wrapper>
 	</aui:fieldset>
 	<aui:button-row>
 		<aui:button name="Save" value="save" type="submit"/>
