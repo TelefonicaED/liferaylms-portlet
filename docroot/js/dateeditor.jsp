@@ -20,7 +20,7 @@
 					return;
 				}
 			}else if($(this).hasClass('itime')){
-				var time = /^([0-9]{1,2})\-([0-9]{1,2})\-([0-9]{4})$/;
+				var time = /^([0-9]{1,2})\/([0-9]{1,2})\/([0-9]{4})$/;
 				if(time.test($(this).val())){
 		    		$(this).css("background","none repeat scroll 0 0 #BCF5A9");
 		    		$(this).addClass("modif");

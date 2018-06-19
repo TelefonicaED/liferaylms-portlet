@@ -38,7 +38,7 @@ public class DateEditor extends MVCPortlet {
 	private static Log log = LogFactoryUtil.getLog(DateEditor.class);
 	
 	private SimpleDateFormat sdfP2p =  new SimpleDateFormat("yyyy-MM-dd kk:mm:ss");
-	private SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+	private SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 	
 	private static final String P2P_DATEUPLOAD = "dateupload";
 	
@@ -71,7 +71,7 @@ public class DateEditor extends MVCPortlet {
 			log.error(e);
 		}		
 		
-		SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy",themeDisplay.getLocale());
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy",themeDisplay.getLocale());
 		dateFormat.setTimeZone(themeDisplay.getTimeZone());
 		SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", themeDisplay.getLocale());
 		timeFormat.setTimeZone(themeDisplay.getTimeZone());
