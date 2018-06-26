@@ -12,7 +12,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Enumeration;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -55,8 +54,8 @@ import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.lms.service.CourseResultLocalServiceUtil;
 import com.liferay.lms.service.LmsPrefsLocalServiceUtil;
 import com.liferay.lms.util.CourseParams;
+import com.liferay.lms.util.displayterms.UserDisplayTerms;
 import com.liferay.lms.util.searchcontainer.UserSearchContainer;
-import com.liferay.lms.util.searchterms.UserSearchTerms;
 import com.liferay.portal.DuplicateGroupException;
 import com.liferay.portal.kernel.cache.MultiVMPoolUtil;
 import com.liferay.portal.kernel.cluster.ClusterExecutorUtil;
@@ -65,6 +64,7 @@ import com.liferay.portal.kernel.dao.orm.CustomSQLParam;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
+import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.NestableException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
@@ -78,18 +78,14 @@ import com.liferay.portal.kernel.messaging.Message;
 import com.liferay.portal.kernel.messaging.MessageBusUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.Folder;
-import com.liferay.portal.kernel.search.Indexer;
-import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.servlet.HttpHeaders;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.upload.UploadPortletRequest;
-import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
@@ -100,6 +96,8 @@ import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
+import com.liferay.portal.model.Company;
+import com.liferay.portal.model.CompanyConstants;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.GroupConstants;
 import com.liferay.portal.model.LayoutSetPrototype;
@@ -111,10 +109,11 @@ import com.liferay.portal.model.UserGroupRole;
 import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.security.permission.PermissionCheckerFactoryUtil;
+import com.liferay.portal.service.CompanyLocalServiceUtil;
 import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.LayoutSetPrototypeLocalServiceUtil;
 import com.liferay.portal.service.OrganizationLocalServiceUtil;
-import com.liferay.portal.service.ResourcePermissionLocalServiceUtil;
+import com.liferay.portal.service.PortalPreferencesLocalServiceUtil;
 import com.liferay.portal.service.RoleLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceContextFactory;
@@ -122,16 +121,17 @@ import com.liferay.portal.service.UserGroupRoleLocalServiceUtil;
 import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
+import com.liferay.portal.util.comparator.UserFirstNameComparator;
+import com.liferay.portal.util.comparator.UserLastNameComparator;
+import com.liferay.portlet.PortletPreferencesFactoryUtil;
 import com.liferay.portlet.announcements.EntryDisplayDateException;
 import com.liferay.portlet.asset.AssetCategoryException;
 import com.liferay.portlet.asset.model.AssetVocabulary;
 import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
-import com.liferay.portlet.asset.service.AssetTagLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.model.DLFolder;
 import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
 import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.service.DLFolderLocalServiceUtil;
-import com.liferay.portlet.usersadmin.util.UsersAdminUtil;
 import com.liferay.util.LmsLocaleUtil;
 import com.liferay.util.bridges.mvc.MVCPortlet;
 
@@ -161,28 +161,20 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 		String students = LanguageUtil.get(themeDisplay.getLocale(),"courseadmin.adminactions.students");
 		String tabs1 = ParamUtil.getString(renderRequest, "tabs1", students);
 		
-		String lastName =  ParamUtil.getString(renderRequest, "lastName");
-		String emailAddress = ParamUtil.getString(renderRequest, "emailAddress");
-		String firstName = ParamUtil.getString(renderRequest, "firstName");
-		String screenName = ParamUtil.getString(renderRequest, "screenName");
-		
 		long courseId=ParamUtil.getLong(renderRequest, "courseId",0);
 		UserSearchContainer searchContainer = new UserSearchContainer(renderRequest, renderResponse.createRenderURL());	
 		
-		
-		UserSearchTerms searchTerms = (UserSearchTerms) searchContainer.getSearchTerms();
+		UserDisplayTerms displayTerms = (UserDisplayTerms) searchContainer.getDisplayTerms();
 		String redirectOfEdit = ParamUtil.getString(renderRequest, "redirectOfEdit");
 		try{		
 			List<User> users = null; 
 			int total = 0;		
-			OrderByComparator obc =  UsersAdminUtil.getUserOrderByComparator(
-					"first-name,middle-name,last-name", "asc");		
+			
 			LmsPrefs prefs=LmsPrefsLocalServiceUtil.getLmsPrefs(themeDisplay.getCompanyId());
 			String teacherName=RoleLocalServiceUtil.getRole(prefs.getTeacherRole()).getTitle(themeDisplay.getLocale());
 			String editorName=RoleLocalServiceUtil.getRole(prefs.getEditorRole()).getTitle(themeDisplay.getLocale());
 			String tab=StringPool.BLANK;
 			
-			LinkedHashMap<String, Object> userParams = new LinkedHashMap<String, Object>();
 			Role commmanager=RoleLocalServiceUtil.getRole(themeDisplay.getCompanyId(), RoleConstants.SITE_MEMBER);
 			Course course=CourseLocalServiceUtil.getCourse(courseId);
 			
@@ -208,55 +200,18 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 				log.debug("END "+searchContainer.getEnd());
 				log.debug("createdGroupId "+createdGroupId);
 				log.debug("roleId "+roleId);
-				log.debug("IS ADVANCED SEARCH "+searchTerms.isAdvancedSearch());
+				log.debug("IS ADVANCED SEARCH "+displayTerms.isAdvancedSearch());
 			}
 			
-			if(roleId!=commmanager.getRoleId()){
-				
-				userParams.put("usersGroups", createdGroupId);
-				userParams.put("userGroupRole", new Long[]{createdGroupId, roleId});
-				
-				
-				if(searchTerms.isAdvancedSearch()){	
-					if(log.isDebugEnabled()){
-						log.debug("firstName 1:"+searchTerms.getFirstName());
-						log.debug("lastName 1:"+searchTerms.getLastName());
-						log.debug("screenName 1:"+searchTerms.getScreenName());
-						log.debug("emailAddress 1:"+searchTerms.getEmailAddress());
-					}
-					users = UserLocalServiceUtil.search(themeDisplay.getCompanyId(), firstName, StringPool.BLANK, 
-							lastName, screenName, emailAddress, WorkflowConstants.STATUS_APPROVED, userParams, searchTerms.isAndOperator(), 
-							searchContainer.getStart(), searchContainer.getEnd(), obc);
-					total = UserLocalServiceUtil.searchCount(themeDisplay.getCompanyId(), firstName, StringPool.BLANK,
-							lastName, screenName, emailAddress, WorkflowConstants.STATUS_APPROVED, userParams, searchTerms.isAndOperator());
-				}else{
-					if(log.isDebugEnabled()){
-						log.debug("Keywords 1:"+searchTerms.getKeywords());
-						log.debug("userParams length "+userParams.keySet().size());
-						log.debug("COMPANY ID "+themeDisplay.getCompanyId());
-					}
-					users = UserLocalServiceUtil.search(themeDisplay.getCompanyId(), searchTerms.getKeywords(), WorkflowConstants.STATUS_APPROVED, userParams, searchContainer.getStart(), searchContainer.getEnd(),obc);
-					total = UserLocalServiceUtil.searchCount(themeDisplay.getCompanyId(), searchTerms.getKeywords(), WorkflowConstants.STATUS_APPROVED, userParams);
-				}
-				
-				
-				
-			}else{
-				if(searchTerms.isAdvancedSearch()){	
-					if(log.isDebugEnabled()){
-						log.debug("firstName:"+searchTerms.getFirstName());
-						log.debug("lastName:"+searchTerms.getLastName());
-						log.debug("screenName:"+searchTerms.getScreenName());
-						log.debug("emailAddress:"+searchTerms.getEmailAddress());
-					}
-					users = CourseLocalServiceUtil.getStudents(courseId, themeDisplay.getCompanyId(),  screenName, firstName, lastName, emailAddress, searchTerms.isAndOperator(),searchContainer.getStart(), searchContainer.getEnd(),obc);
-					total = CourseLocalServiceUtil.countStudents(courseId, themeDisplay.getCompanyId(), screenName, firstName, lastName, emailAddress,searchTerms.isAndOperator());	
-				}else{
-					if(log.isDebugEnabled())log.debug("Keywords:"+searchTerms.getKeywords());
-					users = CourseLocalServiceUtil.getStudents(courseId, themeDisplay.getCompanyId(), searchTerms.getKeywords(), searchTerms.getKeywords(),searchTerms.getKeywords(),searchTerms.getKeywords(),false,searchContainer.getStart(), searchContainer.getEnd(),obc);
-					total = CourseLocalServiceUtil.countStudents(courseId, themeDisplay.getCompanyId(), searchTerms.getKeywords(), searchTerms.getKeywords(),searchTerms.getKeywords(),searchTerms.getKeywords(),false);	
-				}	
-				
+			if(roleId==commmanager.getRoleId()){
+				users = displayTerms.getStudents(courseId, searchContainer.getStart(), searchContainer.getEnd());
+				total = displayTerms.countStudents(courseId);
+			}else if(roleId == prefs.getTeacherRole()){
+				users = displayTerms.getTeachers(courseId, searchContainer.getStart(), searchContainer.getEnd());
+				total = displayTerms.countTeachers(courseId);
+			}else if(roleId == prefs.getEditorRole()){
+				users = displayTerms.getEditors(courseId, searchContainer.getStart(), searchContainer.getEnd());
+				total = displayTerms.countEditors(courseId);
 			}
 			if(log.isDebugEnabled()){
 				log.debug("Users "+users.size() );
@@ -291,8 +246,7 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 			renderRequest.setAttribute("backToEdit", backToEdit);
 			renderRequest.setAttribute("redirectOfEdit", redirectOfEdit);
 			renderRequest.setAttribute("createdGroupId", createdGroupId);
-			renderRequest.setAttribute("showEmail", true);
-			renderRequest.setAttribute("showScreenName", true);
+			renderRequest.setAttribute("displayTerms", displayTerms);
 			
 			PortletURL searchURL = renderResponse.createRenderURL();
 			searchURL.setParameter("view", "role-members-tab");
@@ -316,28 +270,212 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 	
 	protected void showViewCompetenceTab(RenderRequest renderRequest,RenderResponse renderResponse) throws IOException, PortletException{
 		
-		ThemeDisplay themeDisplay = (ThemeDisplay)renderRequest.getAttribute(WebKeys.THEME_DISPLAY);
-		
 		include(this.competenceTabJSP, renderRequest, renderResponse);
 	}
 	
 	protected void showViewImportUsers(RenderRequest renderRequest,RenderResponse renderResponse) throws IOException, PortletException{
-		
-		ThemeDisplay themeDisplay = (ThemeDisplay)renderRequest.getAttribute(WebKeys.THEME_DISPLAY);
 		
 		include(this.importUsersJSP, renderRequest, renderResponse);
 	}
 	
 	protected void showViewUsersResults(RenderRequest renderRequest,RenderResponse renderResponse) throws IOException, PortletException{
 		
-		ThemeDisplay themeDisplay = (ThemeDisplay)renderRequest.getAttribute(WebKeys.THEME_DISPLAY);
+		
+		PortletPreferences preferences = null;
+		String portletResource = ParamUtil.getString(renderRequest, "portletResource");
+		ThemeDisplay themeDisplay = (ThemeDisplay) renderRequest.getAttribute(WebKeys.THEME_DISPLAY);
+		UserSearchContainer searchContainer = new UserSearchContainer(renderRequest, renderResponse.createRenderURL());	
+		UserDisplayTerms displayTerms = (UserDisplayTerms) searchContainer.getDisplayTerms();
+		
+		try{
+			if (Validator.isNotNull(portletResource)) {
+				preferences = PortletPreferencesFactoryUtil.getPortletSetup(renderRequest, portletResource);
+			}else{
+				preferences = renderRequest.getPreferences();
+			}
+			
+			long courseId=ParamUtil.getLong(renderRequest, "courseId",0);
+			long roleId=ParamUtil.getLong(renderRequest, "roleId",0);
+			Role role=RoleLocalServiceUtil.fetchRole(roleId);
+			String tab="";
+			
+			Course course=CourseLocalServiceUtil.getCourse(courseId);
+			boolean backToEdit = ParamUtil.getBoolean(renderRequest, "backToEdit");
+			String redirectOfEdit = ParamUtil.getString(renderRequest, "redirectOfEdit");
+			String firstName = ParamUtil.getString(renderRequest,"firstName");
+			String lastName = ParamUtil.getString(renderRequest,"lastName");
+			String screenName = ParamUtil.getString(renderRequest,"screenName");	
+			String emailAddress = ParamUtil.getString(renderRequest,"emailAddress");
+			String keywords = ParamUtil.getString(renderRequest, "keywords");
+			boolean andSearch = ParamUtil.getBoolean(renderRequest,"andSearch",true);
+			long team = ParamUtil.getLong(renderRequest, "team");
+
+			LmsPrefs prefs=LmsPrefsLocalServiceUtil.getLmsPrefs(themeDisplay.getCompanyId());
+			Role commmanager=RoleLocalServiceUtil.getRole(themeDisplay.getCompanyId(), RoleConstants.SITE_MEMBER) ;
+			String teacherName=RoleLocalServiceUtil.getRole(prefs.getTeacherRole()).getTitle(themeDisplay.getLocale());
+			String editorName=RoleLocalServiceUtil.getRole(prefs.getEditorRole()).getTitle(themeDisplay.getLocale());
+			
+			if(roleId==commmanager.getRoleId()){
+				tab =  LanguageUtil.get(themeDisplay.getLocale(),"courseadmin.adminactions.students");
+			}else if(roleId==prefs.getEditorRole()){
+				tab = editorName;
+			}else{
+				tab = teacherName;
+			}
+			
+			log.debug("TAB "+tab);
+
+			PortletURL portletURL = renderResponse.createRenderURL();
+			portletURL.setParameter("view","users-results");
+			//portletURL.setParameter("paginator","true");	
+			portletURL.setParameter("firstName", firstName); 
+			portletURL.setParameter("lastName", lastName);
+			portletURL.setParameter("screenName", screenName);
+			portletURL.setParameter("emailAddress", emailAddress);
+			portletURL.setParameter("keywords", keywords);
+			portletURL.setParameter("andSearch",Boolean.toString(andSearch));
+			portletURL.setParameter("courseId",Long.toString(courseId));
+			portletURL.setParameter("roleId",Long.toString(roleId));
+			portletURL.setParameter("backToEdit",Boolean.toString(backToEdit));
+			portletURL.setParameter("advancedSearch", String.valueOf(displayTerms.isAdvancedSearch()));
+			if(backToEdit) {
+				portletURL.setParameter("backToEdit",redirectOfEdit);
+			}
+			
+			if(log.isDebugEnabled()){
+				log.debug("START "+searchContainer.getStart());
+				log.debug("END "+searchContainer.getEnd());
+				log.debug("FIRST NAME "+firstName);
+				log.debug("LAST NAME "+lastName);
+				log.debug("SCREEN NAME "+screenName);
+				log.debug("EMAIL ADDRESS "+emailAddress);
+				log.debug("roleId "+roleId);
+				log.debug("TEAM "+team);
+				log.debug("IS ADVANCED SEARCH "+displayTerms.isAdvancedSearch());
+			}
+			
+			
+			
+			
+			/**RESULTS*/
+			LinkedHashMap<String,Object> params=new LinkedHashMap<String,Object>();			
+			
+			OrderByComparator obc = null;
+			PortletPreferences portletPreferences = PortalPreferencesLocalServiceUtil.getPreferences(themeDisplay.getCompanyId(), themeDisplay.getCompanyId(), 1);
+			if(Boolean.parseBoolean(portletPreferences.getValue("users.first.last.name", "false"))){
+				obc = new UserLastNameComparator(true);
+			}else{
+				obc = new UserFirstNameComparator(true);
+			}
+		
+			
+			
+			if (!tab.equals(LanguageUtil.get(themeDisplay.getLocale(), "courseadmin.adminactions.students"))) {
+				log.debug("NO ES ESTUDIANTE "+tab);
+				params.put("notInCourseRoleStu", new CustomSQLParam("WHERE User_.userId NOT IN "
+	              + " (SELECT UserGroupRole.userId " + "  FROM UserGroupRole "
+	              + "  WHERE  (UserGroupRole.groupId = ?) AND (UserGroupRole.roleId = ?))", new Long[] {
+	              course.getGroupCreatedId(), commmanager.getRoleId() }));
+	           }
+		
+			if(tab.equals(LanguageUtil.get(themeDisplay.getLocale(), "courseadmin.adminactions.students"))) {
+				log.debug("ESTUDIANTE "+tab);
+				 params.put("notInCourseRoleTeach", new CustomSQLParam("WHERE User_.userId NOT IN "
+			              + " (SELECT UserGroupRole.userId " + "  FROM UserGroupRole "
+			              + "  WHERE  (UserGroupRole.groupId = ?) AND (UserGroupRole.roleId = ?))", new Long[] {
+			              course.getGroupCreatedId(),
+			              RoleLocalServiceUtil.getRole(prefs.getTeacherRole()).getRoleId() }));
+				 
+				 params.put("notInCourseRoleEdit", new CustomSQLParam("WHERE User_.userId NOT IN "
+			              + " (SELECT UserGroupRole.userId " + "  FROM UserGroupRole "
+			              + "  WHERE  (UserGroupRole.groupId = ?) AND (UserGroupRole.roleId = ?))", new Long[] {
+			              course.getGroupCreatedId(),
+			              RoleLocalServiceUtil.getRole(prefs.getEditorRole()).getRoleId() }));
+			 
+			 
+			}
+			
+			params.put("notInCourseRole",new CustomSQLParam("WHERE User_.userId NOT IN "+
+			                                 " (SELECT UserGroupRole.userId "+
+			                                 "  FROM UserGroupRole "+
+			                                 "  WHERE  (UserGroupRole.groupId = ?) AND (UserGroupRole.roleId = ?))",new Long[]{course.getGroupCreatedId(),roleId}));
+			
+			
+			if(team>0){
+				params.put("usersTeams",team);
+			}
+			
+			
+			boolean showOnlyOrganizationUsers = preferences.getValue("showOnlyOrganizationUsers", "false").equals("true");
+			log.debug("MODO ORGANIZACION "+showOnlyOrganizationUsers);
+			if (showOnlyOrganizationUsers) {
+				Organization organization = null;
+				if (themeDisplay.getScopeGroup()!=null && themeDisplay.getScopeGroup().isOrganization()) {
+					organization = OrganizationLocalServiceUtil.getOrganization(themeDisplay.getScopeGroup().getClassPK());
+				}
+				if (organization != null) {
+					params.put("usersOrgs", organization.getOrganizationId());
+				} else {
+					long[] organizationsOfUserList = themeDisplay.getUser().getOrganizationIds();
+					String organizationIds = "";
+					for(long organizationId: organizationsOfUserList){
+						organizationIds += organizationId + ",";
+					}
+					if(organizationIds.length() > 0) organizationIds = organizationIds.substring(0, organizationIds.length()-1);
+					if(organizationIds.length() == 0)
+						organizationIds = "-1";
+						
+					params.put("multipleOrgs",new CustomSQLParam("WHERE User_.userId IN (SELECT users_orgs.userId FROM users_orgs WHERE users_orgs.organizationId IN (?)) ",organizationIds));
+				}
+	
+			}
+			
+			int total=0;
+			List<User> users = new ArrayList<User>();
+			
+			if(displayTerms.isAdvancedSearch()){
+				users = UserLocalServiceUtil.search(themeDisplay.getCompanyId(), firstName, null, lastName, screenName, emailAddress, WorkflowConstants.STATUS_APPROVED, params, andSearch, searchContainer.getStart(), searchContainer.getEnd(), obc);
+				total =  UserLocalServiceUtil.searchCount(themeDisplay.getCompanyId(), firstName, null, lastName, screenName, emailAddress, WorkflowConstants.STATUS_APPROVED, params, andSearch);
+			}else{
+				users = UserLocalServiceUtil.search(themeDisplay.getCompanyId(), keywords, 0, params, searchContainer.getStart(), searchContainer.getEnd(), obc);
+				total =  UserLocalServiceUtil.searchCount(themeDisplay.getCompanyId(), keywords, WorkflowConstants.STATUS_APPROVED, params);
+			}
+			log.debug("SHOW SCREEN NAME "+displayTerms.isShowScreenName());
+			log.debug("SHOW EMAIL ADDRESS "+displayTerms.isShowEmailAddress());
+			log.debug("TOTAL "+total);
+			searchContainer.setTotal(total);
+			searchContainer.setResults(users);
+			
+			searchContainer.getIteratorURL().setParameter("courseId",Long.toString(courseId));
+			searchContainer.getIteratorURL().setParameter("roleId",Long.toString(roleId));
+			searchContainer.getIteratorURL().setParameter("backToEdit",Boolean.toString(backToEdit));
+			searchContainer.getIteratorURL().setParameter("view","users-results");
+			if(backToEdit) {
+				searchContainer.getIteratorURL().setParameter("backToEdit",redirectOfEdit);
+			}
+			
+		
+		/***************/
+			
+			
+			renderRequest.setAttribute("searchContainer", searchContainer);
+			renderRequest.setAttribute("displayTerms", displayTerms);
+			renderRequest.setAttribute("roleId", roleId);
+			renderRequest.setAttribute("tab", tab);
+			renderRequest.setAttribute("backToEdit", backToEdit);
+			renderRequest.setAttribute("redirectOfEdit", redirectOfEdit);
+			renderRequest.setAttribute("course", course);
+			renderRequest.setAttribute("role", role);
+			
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+				
 		
 		include(this.usersResultsJSP, renderRequest, renderResponse);
 	}
 	
 	protected void showViewCompetenceResults(RenderRequest renderRequest,RenderResponse renderResponse) throws IOException, PortletException{
-		
-		ThemeDisplay themeDisplay = (ThemeDisplay)renderRequest.getAttribute(WebKeys.THEME_DISPLAY);
 		
 		include(this.competenceResultsJSP, renderRequest, renderResponse);
 	}
@@ -711,6 +849,7 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 				course.setEndDate(stopDate);
 				course.setCalificationType(courseCalificationType);
 				course.setMaxusers(maxusers);
+				if(Validator.isNotNull(friendlyURL))course.setFriendlyURL(friendlyURL);
 				serviceContext.setAttribute("type", String.valueOf(type));
 				/*
 				 * Se llama más abajo
@@ -837,21 +976,6 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 					}
 				}
 				
-				//Cambiamos la FriendlyURL del curso y del grupo (solo al editar)
-				if(Validator.isNotNull(friendlyURL)){
-					try{
-						GroupLocalServiceUtil.updateFriendlyURL(course.getGroupCreatedId(), friendlyURL);
-						course.setFriendlyURL(friendlyURL);
-					}catch(Exception e){
-						SessionErrors.add(actionRequest, "friendly-url-error");
-						actionResponse.setRenderParameter("courseId", String.valueOf(courseId));
-						actionResponse.setRenderParameter("jspPage","/html/courseadmin/editcourse.jsp");
-						return;
-					}
-				}
-				
-				
-				
 				try{
 					serviceContext.setAttribute("type", String.valueOf(type));
 					PermissionChecker permissionChecker = PermissionCheckerFactoryUtil
@@ -869,6 +993,11 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 					if(pe.getMessage().startsWith("maxUsers ")){
 						SessionErrors.add(actionRequest, "evaluationtaskactivity.error.systemError");
 						actionResponse.setRenderParameter("maxUsersError", String.valueOf(LanguageUtil.format(themeDisplay.getLocale(),"max-users-violated", pe.getMessage().replaceAll("maxUsers ", StringPool.BLANK))));
+						actionResponse.setRenderParameter("courseId", String.valueOf(courseId));
+						actionResponse.setRenderParameter("jspPage","/html/courseadmin/editcourse.jsp");
+						return;
+					}else if(pe.getMessage().startsWith("friendlyURL")){
+						SessionErrors.add(actionRequest, "friendly-url-error");
 						actionResponse.setRenderParameter("courseId", String.valueOf(courseId));
 						actionResponse.setRenderParameter("jspPage","/html/courseadmin/editcourse.jsp");
 						return;
@@ -1130,11 +1259,6 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 
 		List<String> errors = new ArrayList<String>();
 		List<Long> users = new ArrayList<Long>();
-		
-		//Comprobamos el tipo de importaci�n
-		PortletPreferences prefs = portletRequest.getPreferences();
-		int tipoImport = Integer.parseInt(prefs.getValue("tipoImport", "1"));
-		boolean hasImportById = (tipoImport != 2);
 
 		if(fileName==null || StringPool.BLANK.equals(fileName)){
 			SessionErrors.add(portletRequest, "courseadmin.importuserrole.csv.fileRequired");
@@ -1167,47 +1291,60 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 					Calendar cal = Calendar.getInstance();
 					Date allowStartDate;
 					Date allowFinishDate;
-
+					
+					//Comprobamos el tipo de importaci�n
+					String authType = PropsUtil.get(PropsKeys.COMPANY_SECURITY_AUTH_TYPE);
+					try {
+						Company company = CompanyLocalServiceUtil.getCompany(themeDisplay.getCompanyId());
+						if (Validator.isNotNull(company)) {
+							authType = company.getAuthType();
+						}
+					} catch (PortalException e) {
+						log.error("Se ha producido un error al obtener el tipo de login de usuario (authType) para companyId=" + themeDisplay.getCompanyId(), e);
+					} catch (SystemException e) {
+						log.error("Se ha producido un error al obtener el tipo de login de usuario (authType) para companyId=" + themeDisplay.getCompanyId(), e);
+					}
+					
+					
 					while ((currLine = reader.readNext()) != null) {
 
 						if(currLine.length > 0 && (line++ > 0)) {
 							//Comprobamos errores
 							if(Validator.isNull(currLine[0])){
-								errors.add(LanguageUtil.format(
+								if (CompanyConstants.AUTH_TYPE_SN.equalsIgnoreCase(authType)) {
+									errors.add(LanguageUtil.format(
 											getPortletConfig(),
 											themeDisplay.getLocale(),
-											hasImportById ? 
-													"courseadmin.importuserrole.csvError.user-id-bad-format" :	//Importaci�n por userId
-													"courseadmin.importuserrole.csvError.user-name-bad-format", //Importaci�n por screenName
+											"courseadmin.importuserrole.csvError.user-name-bad-format", //Importaci�n por screenName
 											new Object[] { line }, false));
-							}
-							//Importaci�n por userId debe ser un n�mero
-							else if(hasImportById && !Validator.isNumber(currLine[0])){
-								errors.add( LanguageUtil.format(getPortletConfig(),
+								}else if(CompanyConstants.AUTH_TYPE_EA.equalsIgnoreCase(authType)){
+									errors.add(LanguageUtil.format(
+											getPortletConfig(),
 											themeDisplay.getLocale(),
-											"courseadmin.importuserrole.csvError.user-id-bad-format", 
+											"courseadmin.importuserrole.csvError.email-address-bad-format", //Importaci�n por screenName
 											new Object[] { line }, false));
+								}else{
+									errors.add(LanguageUtil.format(
+											getPortletConfig(),
+											themeDisplay.getLocale(),
+											"courseadmin.importuserrole.csvError.user-id-bad-format", //Importaci�n por screenName
+											new Object[] { line }, false));
+								}
 							}else{
 								
 								String userIdStr = currLine[0];
 								
 								if (!userIdStr.equals(StringPool.BLANK)){
-		
-									long userId=0;
-									String screenName = "";
 									
 									try {
 										User user = null;
-										
-										//Importacion por userId
-										if (hasImportById){
-											userId = Long.parseLong(userIdStr.trim());
-											user = UserLocalServiceUtil.getUser(userId);
-										}
-										//Importaci�n por screenName
-										else{
-											screenName = userIdStr.trim();
-											user = UserLocalServiceUtil.getUserByScreenName(companyId, screenName);
+										if(log.isDebugEnabled())log.debug("Identificador:: " + userIdStr);
+										if (CompanyConstants.AUTH_TYPE_SN.equalsIgnoreCase(authType)) {
+											user = UserLocalServiceUtil.getUserByScreenName(themeDisplay.getCompanyId(), userIdStr.trim());
+										}else if(CompanyConstants.AUTH_TYPE_EA.equalsIgnoreCase(authType)){
+											user = UserLocalServiceUtil.getUserByEmailAddress(themeDisplay.getCompanyId(), userIdStr.trim());
+										}else{
+											user = UserLocalServiceUtil.getUser(Long.parseLong(userIdStr.trim()));
 										}
 										
 										if(user != null){
@@ -1219,8 +1356,8 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 											users.add(user.getUserId());
 											
 											UserGroupRoleLocalServiceUtil.addUserGroupRoles(new long[] { user.getUserId() }, course.getGroupCreatedId(), roleId);
-											String allowStartDateStr = currLine[2];
-											String allowEndDateStr = currLine[3];
+											String allowStartDateStr = currLine[3];
+											String allowEndDateStr = currLine[4];
 											
 											if(allowStartDateStr.trim().length() >0){
 												try{
@@ -1280,14 +1417,15 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 															(getPortletConfig(),
 															 themeDisplay.getLocale(),
 															 "courseadmin.importuserrole.csvError.user-id-not-found", 
-															 new Object[] { hasImportById ? userId : screenName }, 
+															 new Object[] { userIdStr.trim()}, 
 															 false));
 										}
 									} catch (NumberFormatException e) {
 										errors.add(LanguageUtil.format(getPortletConfig(),themeDisplay.getLocale(),"courseadmin.importuserrole.csvError.user-id-bad-format", new Object[] { line }, false));
 									} catch (PortalException e) {
-										errors.add(LanguageUtil.format(getPortletConfig(),themeDisplay.getLocale(),"courseadmin.importuserrole.csvError.user-id-not-found",	new Object[] { hasImportById ? userId : screenName }, false));
+										errors.add(LanguageUtil.format(getPortletConfig(),themeDisplay.getLocale(),"courseadmin.importuserrole.csvError.user-id-not-found",	new Object[] { userIdStr.trim() }, false));
 									} catch (Exception e){
+										e.printStackTrace();
 										errors.add(LanguageUtil.get(getPortletConfig(), themeDisplay.getLocale(),"courseadmin.importuserrole.csvError"));
 									}
 								}
@@ -1310,6 +1448,7 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 						UserGroupRoleLocalServiceUtil.addUserGroupRoles(new long[] { user }, course.getGroupCreatedId(), roleId);
 					}
 					SessionMessages.add(portletRequest, "courseadmin.importuserrole.csv.saved");
+					log.debug("correcto");
 				}
 				else {
 					SessionErrors.add(portletRequest, "courseadmin.importuserrole.csvErrors",errors);
@@ -1403,13 +1542,8 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 				writer.write(jsonObject.toString());
 			}
 
-		} 
-		else if(action.equals("export")){
-			// Comprobamos el tipo de importaci�n
-			PortletPreferences preferences = request.getPreferences();
-			int tipoImport = Integer.parseInt(preferences.getValue("tipoImport", "1"));
-			boolean hasImportById = (tipoImport != 2);
-						
+		} else if(action.equals("export")){
+			
 			Role commmanager = null;
 			LmsPrefs prefs = null;
 			try {
@@ -1426,74 +1560,19 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 			}
 			
 			
-			long groupId = ParamUtil.getLong(request, "groupId",0);
+			long courseId = ParamUtil.getLong(request, "courseId",0);
 			long roleId = ParamUtil.getLong(request, "roleId",0);
 			
 			List<User> users = new ArrayList<User>();
 			
-			if(roleId!=commmanager.getRoleId())
-			{
-				List<UserGroupRole> ugrs = null;
-				try {
-					ugrs = UserGroupRoleLocalServiceUtil.getUserGroupRolesByGroupAndRole(groupId, roleId);
-				} catch (SystemException e) {
-					if(log.isDebugEnabled()){
-						e.printStackTrace();
-					}
-				}
-
-				users=new java.util.ArrayList<User>();
-				
-				if(ugrs!=null){
-					for(UserGroupRole ugr:ugrs)
-					{
-						try {
-							users.add(ugr.getUser());
-						} catch (PortalException e) {
-							if(log.isDebugEnabled()){
-								e.printStackTrace();
-							}
-						} catch (SystemException e) {
-							if(log.isDebugEnabled()){
-								e.printStackTrace();
-							}
-						}
-					}
-				}
-			}else{
-				java.util.List<User> userst = null;
-				try {
-					userst = UserLocalServiceUtil.getGroupUsers(groupId);
-				} catch (SystemException e) {
-					if(log.isDebugEnabled()){
-						e.printStackTrace();
-					}
-				}
-				
-				if(userst!=null){
-					for(User usert:userst){
-						List<UserGroupRole> userGroupRoles = null;
-						try {
-							userGroupRoles = UserGroupRoleLocalServiceUtil.getUserGroupRoles(usert.getUserId(),groupId);
-						} catch (SystemException e) {
-							if(log.isDebugEnabled()){
-								e.printStackTrace();
-							}
-						}
-						boolean remove =false;
-						if(userGroupRoles!=null){
-							for(UserGroupRole ugr:userGroupRoles){
-								if(ugr.getRoleId()==prefs.getEditorRole()||ugr.getRoleId()==prefs.getTeacherRole()){
-									remove = true;
-									break;
-								}
-							}
-							if(!remove){
-								users.add(usert);
-							}
-						}
-					}
-				}
+			UserDisplayTerms displayTerms = new UserDisplayTerms(request);
+			
+			if(roleId==commmanager.getRoleId()){
+				users = displayTerms.getStudents(courseId, QueryUtil.ALL_POS, QueryUtil.ALL_POS);
+			}else if(roleId == prefs.getTeacherRole()){
+				users = displayTerms.getTeachers(courseId, QueryUtil.ALL_POS, QueryUtil.ALL_POS);
+			}else if(roleId == prefs.getEditorRole()){
+				users = displayTerms.getEditors(courseId, QueryUtil.ALL_POS, QueryUtil.ALL_POS);
 			}
 			
 			response.setCharacterEncoding("UTF-8");
@@ -1501,21 +1580,46 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 			response.addProperty(HttpHeaders.CONTENT_DISPOSITION,"attachment; fileName=users.csv");
 			
 			byte b[] = { (byte) 0xEF, (byte) 0xBB, (byte) 0xBF };
-
+			
 			response.getPortletOutputStream().write(b);
 			
 			CSVWriter writer = new CSVWriter(new OutputStreamWriter(
 					response.getPortletOutputStream(), StringPool.UTF8),CharPool.SEMICOLON);
 			
-			String[] cabecera = {hasImportById ? "Id.Usuario" : "Nombre Usuario",
-								"Nombre","Fecha Inicio" ,"Fecha Fin"};
-			writer.writeNext(cabecera);
+			String authType = PropsUtil.get(PropsKeys.COMPANY_SECURITY_AUTH_TYPE);
+			try {
+				Company company = CompanyLocalServiceUtil.getCompany(themeDisplay.getCompanyId());
+				if (Validator.isNotNull(company)) {
+					authType = company.getAuthType();
+				}
+			} catch (PortalException e) {
+				log.error("Se ha producido un error al obtener el tipo de login de usuario (authType) para companyId=" + themeDisplay.getCompanyId(), e);
+			} catch (SystemException e) {
+				log.error("Se ha producido un error al obtener el tipo de login de usuario (authType) para companyId=" + themeDisplay.getCompanyId(), e);
+			}
 			
-		    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-		   
-		    Long courseId = ParamUtil.getLong(request, "courseId");
+			String[] header = new String[5];
+			
+			if (CompanyConstants.AUTH_TYPE_SN.equalsIgnoreCase(authType)) {
+				header[0] = LanguageUtil.get(themeDisplay.getLocale(), "screen-name");
+			}else if(CompanyConstants.AUTH_TYPE_EA.equalsIgnoreCase(authType)){
+				header[0] = LanguageUtil.get(themeDisplay.getLocale(), "email-address");
+			}else{
+				header[0] = LanguageUtil.get(themeDisplay.getLocale(), "user-id");
+			}
+			
+			header[1] = LanguageUtil.get(themeDisplay.getLocale(), "first-name");
+			header[2] = LanguageUtil.get(themeDisplay.getLocale(), "last-name");
+			header[3] = LanguageUtil.get(themeDisplay.getLocale(), "start-date");
+			header[4] = LanguageUtil.get(themeDisplay.getLocale(), "end-date");
+			
+			writer.writeNext(header);
+			
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+			
 			CourseResult courseResult = null;
 			String fechaIni,fechaFin = new String();
+			
 			for(User user:users){			
 				try {
 					courseResult=CourseResultLocalServiceUtil.getCourseResultByCourseAndUser(courseId, user.getUserId());
@@ -1525,16 +1629,25 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 				
 				fechaIni = (courseResult!=null&&courseResult.getAllowStartDate() != null)?sdf.format(courseResult.getAllowStartDate()):StringPool.BLANK;
 				fechaFin = (courseResult!=null&&courseResult.getAllowFinishDate() != null)?sdf.format(courseResult.getAllowFinishDate()):StringPool.BLANK;
-	
-				String[] resultados = { hasImportById ?
-											String.valueOf(user.getUserId()) : 	// Exportaci�n por userId
-											user.getScreenName(), 				// Exportaci�n por screenName
-										user.getFullName(),
-										fechaIni, fechaFin
-				  };
-				writer.writeNext(resultados);
+			
+				String[] result = new String[5];
+				
+				if (CompanyConstants.AUTH_TYPE_SN.equalsIgnoreCase(authType)) {
+					result[0] = user.getScreenName();
+				}else if(CompanyConstants.AUTH_TYPE_EA.equalsIgnoreCase(authType)){
+					result[0] = user.getEmailAddress();
+				}else{
+					result[0] = String.valueOf(user.getUserId());
+				}
+				
+				result[1] = user.getFirstName();
+				result[2] = user.getLastName();
+				result[3] = fechaIni;
+				result[4] = fechaFin;
+			
+				writer.writeNext(result);
 			}
-
+			
 			writer.flush();
 			writer.close();
 			response.getPortletOutputStream().flush();
@@ -1782,11 +1895,26 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 		long editorRoleId=RoleLocalServiceUtil.getRole(prefs.getEditorRole()).getRoleId();
 		long commmanagerId = RoleLocalServiceUtil.getRole(course.getCompanyId(), RoleConstants.SITE_MEMBER).getRoleId() ;
 		
-		String firstName = ParamUtil.getString(actionRequest, "firstName");
-		String lastName = ParamUtil.getString(actionRequest, "lastName");
-		String screenName = ParamUtil.getString(actionRequest, "screenName");
-		String emailAddress = ParamUtil.getString(actionRequest, "emailAddress");
-		boolean andSearch = ParamUtil.getBoolean(actionRequest, "andSearch");
+		String firstName = ParamUtil.getString(actionRequest, "addAllUsersFirstName");
+		String lastName = ParamUtil.getString(actionRequest, "addAllUsersLastName");
+		String screenName = ParamUtil.getString(actionRequest, "addAllUsersScreenName");
+		String emailAddress = ParamUtil.getString(actionRequest, "addAllUsersEmailAddress");
+		boolean andSearch = ParamUtil.getBoolean(actionRequest, "addAllUsersAndSearch");
+		boolean advancedSearch = ParamUtil.getBoolean(actionRequest, "addAllUsersAdvancedSearch");
+		String keywords = ParamUtil.getString(actionRequest, "addAllUsersKeywords");
+		long team = ParamUtil.getLong(actionRequest, "addAllUsersTeam",0);
+		
+		
+		if(log.isDebugEnabled()){
+			log.debug("--First Name "+firstName);
+			log.debug("--Last Name "+lastName);
+			log.debug("--Screen Name "+screenName);
+			log.debug("--Email Address "+emailAddress);
+			log.debug("--AndSearch "+andSearch);
+			log.debug("--AdvancedSearch "+advancedSearch);
+			log.debug("--Keywords "+keywords);
+			log.debug("--Team "+team);
+		}
 		
 		LinkedHashMap<String,Object> params=new LinkedHashMap<String,Object>();			
 			
@@ -1814,6 +1942,10 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 			                              "  FROM UserGroupRole "+
 			                              "  WHERE  (UserGroupRole.groupId = ?) AND (UserGroupRole.roleId = ?))",new Long[]{course.getGroupCreatedId(),roleId}));
 
+		if(team>0){
+			params.put("usersTeams",team);
+		}
+		
 		boolean showOnlyOrganizationUsers = actionRequest.getPreferences().getValue("showOnlyOrganizationUsers", "false").equals("true");
 			
 		if (showOnlyOrganizationUsers) {
@@ -1842,9 +1974,16 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 
 		}
 		OrderByComparator obc = null;
-		List <User> listUser = UserLocalServiceUtil.search(themeDisplay.getCompanyId(), firstName, null, lastName, screenName, emailAddress, 0, params, andSearch, -1, -1, obc);
+		List <User> userList = new ArrayList<User>();  //UserLocalServiceUtil.search(themeDisplay.getCompanyId(), firstName, null, lastName, screenName, emailAddress, 0, params, andSearch, -1, -1, obc);
+		if(advancedSearch){
+			userList = UserLocalServiceUtil.search(themeDisplay.getCompanyId(), firstName, null, lastName, screenName, emailAddress, WorkflowConstants.STATUS_APPROVED, params, andSearch, WorkflowConstants.STATUS_ANY, WorkflowConstants.STATUS_ANY, obc);
+		}else{
+			userList = UserLocalServiceUtil.search(themeDisplay.getCompanyId(), keywords, 0, params, WorkflowConstants.STATUS_ANY, WorkflowConstants.STATUS_ANY, obc);
+		}
+
+		log.debug("USER LIST SIZE "+userList.size());
 		
-		for (User user : listUser) {
+		for (User user : userList) {
 			if (!GroupLocalServiceUtil.hasUserGroup(user.getUserId(), course.getGroupCreatedId())) {
 				GroupLocalServiceUtil.addUserGroups(user.getUserId(),	new long[] { course.getGroupCreatedId() });
 			//The application only send one mail at listener

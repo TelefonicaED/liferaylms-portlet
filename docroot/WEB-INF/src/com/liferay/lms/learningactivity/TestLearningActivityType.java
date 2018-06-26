@@ -1,13 +1,24 @@
 package com.liferay.lms.learningactivity;
 
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
 
 import com.liferay.lms.asset.TestAssetRenderer;
+import com.liferay.lms.learningactivity.questiontype.QuestionType;
+import com.liferay.lms.learningactivity.questiontype.QuestionTypeRegistry;
 import com.liferay.lms.model.LearningActivity;
+import com.liferay.lms.model.LearningActivityTry;
+import com.liferay.lms.model.TestQuestion;
 import com.liferay.lms.service.ClpSerializer;
+import com.liferay.lms.service.TestQuestionLocalServiceUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.upload.UploadRequest;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -19,6 +30,7 @@ import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.xml.Document;
+import com.liferay.portal.kernel.xml.DocumentException;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
 import com.liferay.portal.model.PortletConstants;
@@ -28,6 +40,9 @@ import com.liferay.portlet.asset.model.AssetRenderer;
 
 public class TestLearningActivityType extends BaseLearningActivityType 
 {
+	
+	private static Log log = LogFactoryUtil.getLog(TestLearningActivityType.class);
+	public final static long TYPE_ID = 0;
 	public static String PORTLET_ID = 
 			PortalUtil.getJsSafePortletId(
 					"execactivity" + PortletConstants.WAR_SEPARATOR + ClpSerializer.getServletContextName());
@@ -38,6 +53,94 @@ public class TestLearningActivityType extends BaseLearningActivityType
 	}
 
 
+	/**
+	 * Si tiene preguntas se calcula el 50% por ver el video y el 50% por responder correctamente a las preguntas
+	 * Si no necesita porcentaje del video para aprobarlo, se da como aprobado con cualquier porcentaje del video
+	 * @param activity actividad
+	 * @param latId
+	 * @param score int en este caso es el porcentaje del video visualizado
+	 * @return score final
+	 */
+	@Override
+	public long calculateResult(LearningActivity activity, LearningActivityTry lat){
+		long score = 0;
+		
+		try {
+			
+			log.debug("LAT DATA "+lat.getTryResultData());
+			Document documentTry = SAXReaderUtil.read(lat.getTryResultData());
+			Element rootTry = documentTry.getRootElement();
+			
+			score = lat.getResult();
+			log.debug("score del try: " + score);
+			List<TestQuestion> listQuestions = TestQuestionLocalServiceUtil.getQuestions(activity.getActId());
+					
+			if(listQuestions != null && listQuestions.size() > 0){
+				log.debug("tiene preguntas: " + listQuestions.size());
+				Element element = null;
+				int correctAnswers = 0;
+				int penalizedAnswers = 0;
+				int numQuestions = 0;
+				Iterator<Element> questionIterator = null;
+				long correct = 0;
+				HashMap<Long, TestQuestion> questions = new HashMap<Long, TestQuestion>();
+				
+				
+				questionIterator = rootTry != null ? rootTry.elementIterator("question") : null;
+				if(questionIterator!=null){
+					TestQuestion xmlQuestion =null;
+					QuestionType qt;
+					for(TestQuestion question :listQuestions){
+						questions.put(question.getQuestionId(),question);
+					}
+					while(questionIterator.hasNext()){
+						try{
+							element = questionIterator.next();
+							if(element != null){
+								xmlQuestion = questions.get(Long.parseLong(element.attributeValue("id")));
+								if(Validator.isNotNull(xmlQuestion)){
+									numQuestions++;
+									qt = new QuestionTypeRegistry().getQuestionType(xmlQuestion.getQuestionType());
+									correct = qt.correct(element, xmlQuestion.getQuestionId());
+									log.debug("correct: " + correct);
+									if(correct > 0) {
+										correctAnswers += correct ;
+									}else if(xmlQuestion.isPenalize()){
+										penalizedAnswers+=correct;
+									}
+								}
+							}
+						
+						}catch(Exception e){
+							e.printStackTrace();
+						}
+					}
+				
+					log.debug("numQuestions: " + numQuestions);
+					log.debug("correctAnswers: " + correctAnswers);
+					log.debug("penalizedAnswers: " + penalizedAnswers);
+					
+					if(numQuestions > 0){
+						score = (correctAnswers + penalizedAnswers)/numQuestions;
+						log.debug("scoreQuestions: " + score);
+					}
+						
+					
+				}
+			}
+			
+		} catch (DocumentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SystemException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
+		log.debug("score: " + score);
+		return score;
+	}
+	
+	
 	@Override
 	public boolean isScoreConfigurable() {
 		return true;

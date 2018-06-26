@@ -1,282 +1,212 @@
+<%@ include file="/init-min.jsp" %>
+<%@ include file="/js/dateeditor.jsp" %>
 
-<%@page import="com.liferay.lms.views.ModuleView"%>
-<%@page import="java.util.GregorianCalendar"%>
-<%@page import="com.tls.lms.util.LiferaylmsUtil"%>
-<%@page import="java.util.Calendar"%>
+<c:choose>
+	<c:when test="${themeDisplay.locale.language.equals('ca')}">
+		<script src="/liferaylms-portlet/js/datepicker/datepicker-ca.js"></script>
+	</c:when>
+	<c:when test="${themeDisplay.locale.language.equals('de')}">
+		<script src="/liferaylms-portlet/js/datepicker/datepicker-de.js"></script>
+	</c:when>
+	<c:when test="${themeDisplay.locale.language.equals('es')}">
+		<script src="/liferaylms-portlet/js/datepicker/datepicker-es.js"></script>
+	</c:when>
+	<c:when test="${themeDisplay.locale.language.equals('eu')}">
+		<script src="/liferaylms-portlet/js/datepicker/datepicker-eu.js"></script>
+	</c:when>
+	<c:when test="${themeDisplay.locale.language.equals('gl')}">
+		<script src="/liferaylms-portlet/js/datepicker/datepicker-gl.js"></script>
+	</c:when>
+	<c:when test="${themeDisplay.locale.language.equals('it')}">
+		<script src="/liferaylms-portlet/js/datepicker/datepicker-it.js"></script>
+	</c:when>
+	<c:when test="${themeDisplay.locale.language.equals('pt')}">
+		<script src="/liferaylms-portlet/js/datepicker/datepicker-pt.js"></script>
+	</c:when>
+	<c:when test="${themeDisplay.locale.language.equals('tr')}">
+		<script src="/liferaylms-portlet/js/datepicker/datepicker-tr.js"></script>
+	</c:when>
+	<c:when test="${themeDisplay.locale.language.equals('zh')}">
+		<script src="/liferaylms-portlet/js/datepicker/datepicker-zh.js"></script>
+	</c:when>
+</c:choose>
 
-<%@ include file="/init.jsp"%>
-
-<portlet:actionURL name="submitChangeDate" var="submitChangeDate" />
-<liferay-ui:success key="dates-updated-correctly"
-	message="date-editor.dates-updated-correctly" />
-<liferay-ui:error key="error-updating-dates"
-	message="date-editor.error-updating-dates" />
-
-<aui:form name="dateEditorFm" method="POST" action="${submitChangeDate}">
-
-	<div id="maindateeditor" class="dateeditorcont">
-		<c:forEach var="module" items="${listModules}">
-			<h2>${module.moduleName}</h2>
-			<aui:input name="module_${module.moduleId}" type="text" label="" value="" cssClass="aui-helper-hidden">
-				<aui:validator name="custom" errorMessage="please-enter-a-start-date-that-comes-before-the-end-date">
-				function (val, fieldNode, ruleValue) {
-			          	
-			          	var moduleId = ${module.moduleId};
-			          						          	
-			          	var startDateYear = $('#<portlet:namespace />modInitYear_'+moduleId).val();
-			          	var startDateMonth = $('#<portlet:namespace />modInitMonth_'+moduleId).val();
-			          	var startDateDay = $('#<portlet:namespace />modInitDay_'+moduleId).val();
-						var startDateHour = $('select[name=<portlet:namespace />modInitHour_'+moduleId+']').val();
-						var startDateMinute = $('select[name=<portlet:namespace />modInitMinute_'+moduleId+']').val();
-						
-						
-						var endDateYear = $('#<portlet:namespace />modEndYear_'+moduleId).val();
-						var endDateMonth = $('#<portlet:namespace />modEndMonth_'+moduleId).val();
-						var endDateDay = $('#<portlet:namespace />modEndDay_'+moduleId).val();
-						var endDateHour = $('select[name=<portlet:namespace />modEndHour_'+moduleId+']').val();
-						var endDateMinute = $('select[name=<portlet:namespace />modEndMinute_'+moduleId+']').val();
-						
-						
-						var start = new Date(startDateYear,startDateMonth,startDateDay,startDateHour,startDateMinute);
-						var end = new Date(endDateYear,endDateMonth,endDateDay,endDateHour,endDateMinute);
-						
-						if(start.getTime()>end.getTime()){
-								$('#<portlet:namespace/>moduleErrorMessage_'+moduleId).removeClass('aui-helper-hidden');
-								return false;
-						}
-						if(!$('#<portlet:namespace/>moduleErrorMessage_'+moduleId).hasClass('aui-helper-hidden')){
-							$('#<portlet:namespace/>moduleErrorMessage_'+moduleId).addClass('aui-helper-hidden');
-						}							
-						
-						return true;
-			        }
-			        </aui:validator>
-			</aui:input>
-			<aui:fieldset column="first">
-				<liferay-ui:message key="start-date" />
-				<aui:field-wrapper>
-					<liferay-ui:input-date
-						yearRangeEnd="<%=LiferaylmsUtil.defaultEndYear %>"
-						yearRangeStart="<%=LiferaylmsUtil.defaultStartYear %>"
-						yearValue="${module.startYear}" monthValue="${module.startMonth}"
-						dayValue="${module.startDay}"
-						yearParam="modInitYear_${module.moduleId}"
-						monthParam="modInitMonth_${module.moduleId}"
-						dayParam="modInitDay_${module.moduleId}" />
-					<liferay-ui:input-time
-						minuteParam="modInitMinute_${module.moduleId}"
-						amPmParam="startAMPM" hourParam="modInitHour_${module.moduleId}"
-						hourValue="${module.startHour}"
-						minuteValue="${module.startMinute}" />
-				</aui:field-wrapper>
-				
-			</aui:fieldset>
-			<aui:fieldset column="last">
-				<liferay-ui:message key="end-date" />
-				<aui:field-wrapper>
-					<liferay-ui:input-date
-						yearRangeEnd="<%=LiferaylmsUtil.defaultEndYear %>"
-						yearRangeStart="<%=LiferaylmsUtil.defaultStartYear %>"
-						yearValue="${module.endYear}" monthValue="${module.endMonth}"
-						dayValue="${module.endDay}"
-						yearParam="modEndYear_${module.moduleId}"
-						monthParam="modEndMonth_${module.moduleId}"
-						dayParam="modEndDay_${module.moduleId}">
-					</liferay-ui:input-date>
-					<liferay-ui:input-time
-						minuteParam="modEndMinute_${module.moduleId}"
-						amPmParam="startAMPM" hourParam="modEndHour_${module.moduleId}"
-						hourValue="${module.endHour}" minuteValue="${module.endMinute}">
-					</liferay-ui:input-time>	
-				</aui:field-wrapper>
-				<aui:fieldset id="moduleErrorMessage_${module.moduleId}" cssClass="aui-helper-hidden">
-					<span class="aui-form-validator-error-container">
-						<span class="aui-form-validator-stack-error">
-							<liferay-ui:message key="please-enter-a-start-date-that-comes-before-the-end-date"></liferay-ui:message>
-						</span>
-					</span>
-				</aui:fieldset>		
-			</aui:fieldset>
-			<c:forEach var="act" items="${module.activities}">
-				<h6>${act.title}</h6>
-				<!-- Fecha inicio Actividad  -->
-				<aui:input name="act_${act.actId}" type="text" label="" value="" cssClass="aui-helper-hidden">
-					<aui:validator name="custom" errorMessage="please-enter-a-start-date-that-comes-before-the-end-date">
-					function (val, fieldNode, ruleValue) {
-				          	
-				          	var moduleId = ${module.moduleId};
-				          	var actId= ${act.actId};
-				          		          	
-				          	var startDateYear = $('#<portlet:namespace />modInitYear_'+moduleId).val();
-				          	var startDateMonth = $('#<portlet:namespace />modInitMonth_'+moduleId).val();
-				          	var startDateDay = $('#<portlet:namespace />modInitDay_'+moduleId).val();
-							var startDateHour = $('select[name=<portlet:namespace />modInitHour_'+moduleId+']').val();
-							var startDateMinute = $('select[name=<portlet:namespace />modInitMinute_'+moduleId+']').val();
-							
-							
-							var endDateYear = $('#<portlet:namespace />modEndYear_'+moduleId).val();
-							var endDateMonth = $('#<portlet:namespace />modEndMonth_'+moduleId).val();
-							var endDateDay = $('#<portlet:namespace />modEndDay_'+moduleId).val();
-							var endDateHour = $('select[name=<portlet:namespace />modEndHour_'+moduleId+']').val();
-							var endDateMinute = $('select[name=<portlet:namespace />modEndMinute_'+moduleId+']').val();
-							
-							
-							
-							var moduleStart = new Date(startDateYear,startDateMonth,startDateDay,startDateHour,startDateMinute);
-							var moduleEnd = new Date(endDateYear,endDateMonth,endDateDay,endDateHour,endDateMinute);
-							
-							startDateYear = $('#<portlet:namespace />actInitYear_'+actId).val();
-				          	startDateMonth = $('#<portlet:namespace />actInitMonth_'+actId).val();
-				          	startDateDay = $('#<portlet:namespace />actInitDay_'+actId).val();
-							startDateHour = $('select[name=<portlet:namespace />actInitHour_'+actId+']').val();
-							startDateMinute = $('select[name=<portlet:namespace />actInitMinute_'+actId+']').val();
-							
-							endDateYear = $('#<portlet:namespace />actEndYear_'+actId).val();
-							endDateMonth = $('#<portlet:namespace />actEndMonth_'+actId).val();
-							endDateDay = $('#<portlet:namespace />actEndDay_'+actId).val();
-							endDateHour = $('select[name=<portlet:namespace />actEndHour_'+actId+']').val();
-							endDateMinute = $('select[name=<portlet:namespace />actEndMinute_'+actId+']').val();
-							
-										
-							var start = new Date(startDateYear,startDateMonth,startDateDay,startDateHour,startDateMinute);
-							var end = new Date(endDateYear,endDateMonth,endDateDay,endDateHour,endDateMinute);
-									
-							
-							if(start.getTime()>end.getTime()){
-									$('#<portlet:namespace/>activityErrorMessage_'+actId).removeClass('aui-helper-hidden');
-									return false;
-							}
-							if(end.getTime() > moduleEnd.getTime() || start.getTime() < moduleStart.getTime()){
-								$('#<portlet:namespace/>activityErrorModuleMessage_'+actId).removeClass('aui-helper-hidden');
-								return false;
-							}
-							if(!$('#<portlet:namespace/>activityErrorMessage_'+actId).hasClass('aui-helper-hidden')){
-								$('#<portlet:namespace/>activityErrorMessage_'+actId).addClass('aui-helper-hidden');
-							}
-							if(!$('#<portlet:namespace/>activityErrorModuleMessage_'+actId).hasClass('aui-helper-hidden')){
-								$('#<portlet:namespace/>activityErrorModuleMessage_'+actId).addClass('aui-helper-hidden');
-							}
-							return true;
-				        }
-				        </aui:validator>
-				</aui:input>
-				
-				<aui:fieldset column="first">
-					<liferay-ui:message key="start-date" />
-					<aui:field-wrapper>
-						<liferay-ui:input-date
-							yearRangeEnd="<%=LiferaylmsUtil.defaultEndYear %>"
-							yearRangeStart="<%=LiferaylmsUtil.defaultStartYear %>"
-							yearValue="${act.startYear}" monthValue="${act.startMonth}"
-							dayValue="${act.startDay}" yearParam="actInitYear_${act.actId}"
-							monthParam="actInitMonth_${act.actId}"
-							dayParam="actInitDay_${act.actId}" />
-						<liferay-ui:input-time minuteParam="actInitMinute_${act.actId}"
-							amPmParam="startAMPM" hourParam="actInitHour_${act.actId}"
-							hourValue="${act.startHour}" minuteValue="${act.startMinute}" />
-					</aui:field-wrapper>
-				</aui:fieldset>
-				<aui:fieldset column="last">
-					<!-- Fecha fin Actividad -->
-					<liferay-ui:message key="end-date" />
-					<aui:field-wrapper>
-						<liferay-ui:input-date
-							yearRangeEnd="<%=LiferaylmsUtil.defaultEndYear %>"
-							yearRangeStart="<%=LiferaylmsUtil.defaultStartYear %>"
-							yearValue="${act.endYear}" monthValue="${act.endMonth}"
-							dayValue="${act.endDay}" yearParam="actEndYear_${act.actId}"
-							monthParam="actEndMonth_${act.actId}"
-							dayParam="actEndDay_${act.actId}" />
-						<liferay-ui:input-time minuteParam="actEndMinute_${act.actId}"
-							amPmParam="startAMPM" hourParam="actEndHour_${act.actId}"
-							hourValue="${act.endHour}" minuteValue="${act.endMinute}" />
-					</aui:field-wrapper>
-				</aui:fieldset>
-				<aui:fieldset id="activityErrorMessage_${act.actId}" cssClass="aui-helper-hidden">
-					<span class="aui-form-validator-error-container">
-						<span class="aui-form-validator-stack-error">
-							<liferay-ui:message key="please-enter-a-start-date-that-comes-before-the-end-date"></liferay-ui:message>
-						</span>
-					</span>
-				</aui:fieldset>	
-				<aui:fieldset id="activityErrorModuleMessage_${act.actId}" cssClass="aui-helper-hidden">
-					<span class="aui-form-validator-error-container">
-						<span class="aui-form-validator-stack-error">
-							<liferay-ui:message key="date-editor.please-enter-date-in-module-range"></liferay-ui:message>
-						</span>
-					</span>
-				</aui:fieldset>	
-				<c:if test="${act.p2pActivity}">
-					<aui:fieldset>
-						<!-- Actividad P2P -->
-						<liferay-ui:message key="p2ptaskactivity.edit.dateUpload" />
-						<aui:input name="act_${act.actId}" type="text" label="" value="" cssClass="aui-helper-hidden">
-							<aui:validator name="custom" errorMessage="please-enter-a-start-date-that-comes-before-the-end-date">
-							function (val, fieldNode, ruleValue) {
-				          	
-					           	var actId= ${act.actId};
-					          		          	
-					          	var startDateYear = $('#<portlet:namespace />actInitYear_'+actId).val();
-					          	var startDateMonth = $('#<portlet:namespace />actInitMonth_'+actId).val();
-					          	var startDateDay = $('#<portlet:namespace />actInitDay_'+actId).val();
-								var startDateHour = $('select[name=<portlet:namespace />actInitHour_'+actId+']').val();
-								var startDateMinute = $('select[name=<portlet:namespace />actInitMinute_'+actId+']').val();
+<div id="maineditsyllabus" class="syllabuscont row">	
+	<div class="col-md-12">
+		<div class="col-md-12">
+			<h1>${course.getTitle(themeDisplay.locale)}</h1>
+		</div>	
+		<div class="row">
+			<div class="col-md-4"></div>
+			<div class="col-md-4 aui-field-wrapper-content">
+				<div class="aui-field-wrapper-content">
+					<label class="aui-field-label"><liferay-ui:message key="course-admin.start-execution-date" /></label>
+					<div class="aui-datepicker aui-datepicker-display">
+						<div class="aui-datepicker-content aui-datepicker-display-content">
+							<div class="aui-datepicker-select-wrapper">
+								<input class="itime coursemx coursem" type="text" id="fcin${course.courseId}" name="fcin${course.courseId}" value="${dateFormat.format(course.executionStartDate)}" />
+							</div>
+						</div>
+					</div>
+					<div class="lfr-input-time">
+						<input class="ihour coursemy coursem" type="text" id="tcin${course.courseId}" name="tcin${course.courseId}" value="${timeFormat.format(course.executionStartDate)}" />
+					</div>
+				</div>
+			</div>
+			<div class="col-md-4 aui-field-wrapper-content">
+				<div class="aui-field-wrapper-content">
+					<label class="aui-field-label"><liferay-ui:message key="course-admin.end-execution-date" /></label>
+					<div class="aui-datepicker aui-datepicker-display">
+						<div class="aui-datepicker-content aui-datepicker-display-content">
+							<div class="aui-datepicker-select-wrapper">
+								<input class="itime courselh coursel" type="text" id="fcou${course.courseId}" name="fcou${course.courseId}" value="${dateFormat.format(course.executionEndDate)}" />
+							</div>
+						</div>
+					</div>
+					<div class="lfr-input-time">
+						<input class="ihour courselt coursel" type="text" id="tcou${course.courseId}" name="tcou${course.courseId}" value="${timeFormat.format(course.executionEndDate)}" />
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<c:forEach var="module" items="${listModules}">		
+			<liferay-ui:panel-container extended="true" id="panel_container_${module.moduleId}">
+				<div class="row">
+					<div class="col-md-12">
+						<liferay-ui:panel title="${module.getTitle(themeDisplay.locale)}" defaultState="closed" collapsible="true" id="panel_${module.moduleId}">					
+							<div id="item${item.moduleId}" class="row">
+								<div class="row">
+									<div class="col-md-12">
+										<h2>${module.getTitle(themeDisplay.locale)}</h2>
+									</div>
+								</div>
+								<div class="row">
+									<span class="hour col-md-12">
+										<div class="col-md-4"></div>
+										<div class="col-md-4  aui-field-wrapper-content">
+											<div class="aui-field-wrapper-content">
+												<label class="aui-field-label"><liferay-ui:message key="start-date" /></label>
+												<div class="aui-datepicker aui-datepicker-display">
+													<div class="aui-datepicker-content aui-datepicker-display-content">
+														<div class="aui-datepicker-select-wrapper">
+															<input class="itime modalmx modalm" type="text" id="fmin${module.moduleId}" name="fmin${module.moduleId}" value="${dateFormat.format(module.startDate)}" />
+														</div>
+													</div>
+												</div>
+												<div class="lfr-input-time">
+													<input class="ihour modalmy modalm" type="text" id="tmin${module.moduleId}" name="tmin${module.moduleId}" value="${timeFormat.format(module.startDate)}" />
+												</div>
+											</div>
+										</div>
+										<div class="col-md-4  aui-field-wrapper-content">
+											<div class="aui-field-wrapper-content">
+												<label class="aui-field-label"><liferay-ui:message key="end-date" /></label>
+												<div class="aui-datepicker aui-datepicker-display">
+													<div class="aui-datepicker-content aui-datepicker-display-content">
+														<div class="aui-datepicker-select-wrapper">
+															<input class="itime modallh modall" type="text" id="fmou${module.moduleId}" name="fmou${module.moduleId}" value="${dateFormat.format(module.endDate)}" />
+														</div>
+													</div>
+												</div>
+												<div class="lfr-input-time">	
+													<input class="ihour modallt modall" type="text" id="tmou${module.moduleId}" name="tmou${module.moduleId}" value="${timeFormat.format(module.endDate)}" />
+												</div>
+											</div>
+										</div>
+									</span>
+								</div>
 								
-								var updateDateYear = $('#<portlet:namespace />actUpdateYear_'+actId).val();
-								var updateDateMonth = $('#<portlet:namespace />actUpdateMonth_'+actId).val();
-								var updateDateDay = $('#<portlet:namespace />actUpdateDay_'+actId).val();
-								var updateDateHour = $('select[name=<portlet:namespace />actUpdateHour_'+actId+']').val();
-								var updateDateMinute = $('select[name=<portlet:namespace />actUpdateMinute_'+actId+']').val();
-								
-								var endDateYear = $('#<portlet:namespace />actEndYear_'+actId).val();
-								var endDateMonth = $('#<portlet:namespace />actEndMonth_'+actId).val();
-								var endDateDay = $('#<portlet:namespace />actEndDay_'+actId).val();
-								var endDateHour = $('select[name=<portlet:namespace />actEndHour_'+actId+']').val();
-								var endDateMinute = $('select[name=<portlet:namespace />actEndMinute_'+actId+']').val();
-											
-								var start = new Date(startDateYear,startDateMonth,startDateDay,startDateHour,startDateMinute);
-								var update = new Date(updateDateYear,updateDateMonth,updateDateDay,updateDateHour,updateDateMinute);
-								var end = new Date(endDateYear,endDateMonth,endDateDay,endDateHour,endDateMinute);
-								
-								if(start.getTime()>update.getTime() || end.getTime()< update.getTime()){
-									$('#<portlet:namespace/>activityUpdateErrorMessage_'+actId).removeClass('aui-helper-hidden');
-										return false;
-								}
-								if(!$('#<portlet:namespace/>activityUpdateErrorMessage_'+actId).hasClass('aui-helper-hidden')){
-									$('#<portlet:namespace/>activityUpdateErrorMessage_'+actId).addClass('aui-helper-hidden');
-								}
-								return true;
-					        }
-				        </aui:validator>
-					</aui:input>
-						<aui:field-wrapper>
-							<liferay-ui:input-date
-								yearRangeEnd="<%=LiferaylmsUtil.defaultEndYear %>"
-								yearRangeStart="<%=LiferaylmsUtil.defaultStartYear %>"
-								yearValue="${act.uploadYear}" monthValue="${act.uploadMonth}"
-								dayValue="${act.uploadDay}"
-								yearParam="actUpdateYear_${act.actId}"
-								monthParam="actUpdateMonth_${act.actId}"
-								dayParam="actUpdateDay_${act.actId}" />
-							<liferay-ui:input-time minuteParam="actUpdateMinute_${act.actId}"
-								amPmParam="startAMPM" hourParam="actUpdateHour_${act.actId}"
-								hourValue="${act.uploadHour}" minuteValue="${act.uploadMinute}" />
-						</aui:field-wrapper>
-					</aui:fieldset>
-					<aui:fieldset id="activityUpdateErrorMessage_${act.actId}" cssClass="aui-helper-hidden">
-					<span class="aui-form-validator-error-container">
-						<span class="aui-form-validator-stack-error">
-							<liferay-ui:message key="date-editor.please-enter-an-update-date-in-range"></liferay-ui:message>
-						</span>
-					</span>
-				</aui:fieldset>	
-				</c:if>
-			</c:forEach>
+								<c:forEach var="act" items="${module.listLearningActivities}">
+									<c:choose> 
+										<c:when test="${act.weightinmodule == 1}">
+											<div class="mandatory leyend"></div>
+										</c:when>
+										<c:otherwise>
+											<div class="leyend"></div>
+										</c:otherwise>
+									</c:choose>
+									<h3>${act.getTitle(themeDisplay.locale)}</h3>
+									<div class="row">
+										<span class="hour col-md-12">
+											<div class="col-md-4  aui-field-wrapper-content">
+												<c:if test="${act.typeId == typeP2P}">		
+													<c:set var="dateupload" value='${act.getExtraContentValue("dateupload") }' />
+													<c:if test="${not empty dateupload }">
+														<c:set var="p2pDate" value="${dateFormat.format(p2pFormat.parse(dateupload))}" />
+														<c:set var="p2pTime" value="${timeFormat.format(p2pFormat.parse(dateupload))}" />
+													</c:if>
+													<div class="aui-field-wrapper-content">
+														<label class="aui-field-label"><liferay-ui:message key="p2ptaskactivity.edit.dateUpload" /></label>
+														<div class="aui-datepicker aui-datepicker-display">
+															<div class="aui-datepicker-content aui-datepicker-display-content">
+																<div class="aui-datepicker-select-wrapper">
+																	<input class="itime" type="text" id="fact${act.actId}" name="fact${act.actId}" value='${p2pDate}' />
+																</div>
+															</div>
+														</div>
+														<div class="lfr-input-time">	
+															<input class="ihour" type="text" id="tact${act.actId}" name="tact${act.actId}" value="${p2pTime}" />
+														</div>
+													</div>	
+												</c:if>
+											</div>
+											<div class="col-md-4  aui-field-wrapper-content">
+												<div class="aui-field-wrapper-content">
+													<label class="aui-field-label"><liferay-ui:message key="start-date" /></label>
+													<div class="aui-datepicker aui-datepicker-display">
+														<div class="aui-datepicker-content aui-datepicker-display-content">
+															<div class="aui-datepicker-select-wrapper">
+																<input class="itime castalmx" id="fain${act.actId}" name="fain${act.actId}" type="text" value="${not empty act.startdate ? dateFormat.format(act.startdate): ''}" />
+															</div>
+														</div>
+													</div>
+													<div class="lfr-input-time">	
+														<input class="ihour castalmy" id="tain${act.actId}" name="tain${act.actId}" type="text" value="${not empty act.startdate ? timeFormat.format(act.startdate): ''}" />
+													</div>
+												</div>
+											</div>
+											<div class="col-md-4  aui-field-wrapper-content">
+												<div class="aui-field-wrapper-content">
+													<label class="aui-field-label"><liferay-ui:message key="end-date" /></label>
+													<div class="aui-datepicker aui-datepicker-display">
+														<div class="aui-datepicker-content aui-datepicker-display-content">
+															<div class="aui-datepicker-select-wrapper">
+																<input class="itime castallh" id="faou${act.actId}" name="faou${act.actId}" type="text" value="${not empty act.enddate ? dateFormat.format(act.enddate): ''}" />
+															</div>
+														</div>
+													</div>
+													<div class="lfr-input-time">	
+														<input class="ihour castallt" id="taou${act.actId}" name="taou${act.actId}" type="text" value="${not empty act.enddate ? timeFormat.format(act.enddate): ''}" />
+													</div>
+												</div>
+											</div>
+										</span>	
+									</div>			
+								</c:forEach>				
+							</div>
+						</liferay-ui:panel>
+					</div>
+				</div>
+			</liferay-ui:panel-container>
 		</c:forEach>
+	
+		<aui:button onClick="javascript:${renderResponse.getNamespace()}submitFormDateEditor()" value="confirm" />
+		
+		<portlet:actionURL name="submit" var="submit" />
+		<aui:form name="dform" action="${submit}" method="POST">
+		</aui:form>
 	</div>
+</div>
 
-	<aui:button-row>
-		<aui:button type="submit" value="save" />
-	</aui:button-row>
-
-</aui:form>
+<script>
+	function <portlet:namespace />submitFormDateEditor(){
+		if(confirm(Liferay.Language.get("date-editor.confirm-submit"))){
+			$("#maineditsyllabus").find(".modif").each(function(index) {
+				$("#<portlet:namespace />dform").append("<input type='hidden' name='"+$(this).attr('id')+"' id='"+$(this).attr('id')+"' value='"+$(this).val()+"'>");
+			});
+			$("#<portlet:namespace />dform").submit();
+		}
+		return false;
+	}
+</script>

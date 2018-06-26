@@ -65,10 +65,10 @@
 			<c:if test="${asynchronousProccessAudit.status eq 3}">
 				<span class="status-error"></span>
 			</c:if>
-			${asynchronousProccessAudit.type}
+			<liferay-ui:message key="${asynchronousProccessAudit.type}"/>
 		</liferay-ui:search-container-column-text>
 		<liferay-ui:search-container-column-text name="className">
-			${asynchronousProccessAudit.className}
+			<liferay-ui:message key="${asynchronousProccessAudit.className}"/> 
 		</liferay-ui:search-container-column-text>
 		<liferay-ui:search-container-column-text name="id">
 			${asynchronousProccessAudit.classPK}

@@ -7,7 +7,7 @@
 		<liferay-ui:search-container-column-text title="course">
 			<div class="course">
 				<c:if test="${not empty courseResult.course.logoURL}">
-					<img src="${courseResult.course.logoURL }">
+					<img src="${courseResult.course.logoURL }" alt="${courseResult.course.title}">
 				</c:if>
 				<c:choose>
 					<c:when test="${prefs.viewCoursesFinished && !courseResult.course.closed}">

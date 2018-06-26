@@ -20,7 +20,6 @@
 		<portlet id="modulelist"></portlet>
 		<portlet id="inscriptioncommunity"></portlet>
 		<portlet id="mycourses"></portlet>
-		<portlet id="coursetoolsmanage"></portlet>
 		<portlet id="courseadmin"></portlet>
 		<portlet id="editactivity"></portlet>
 		<portlet id="coursestats"></portlet>

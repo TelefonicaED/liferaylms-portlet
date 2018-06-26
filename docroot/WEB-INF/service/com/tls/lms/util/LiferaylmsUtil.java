@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 
+import com.liferay.lms.model.Course;
 import com.liferay.lms.model.CourseResult;
 import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.model.LmsPrefs;
@@ -146,6 +147,8 @@ public class LiferaylmsUtil {
 	 * 	Check del lmsprefs a true
 	 *  &&
 	 *  (
+	 *  	fecha ejecución de curso pasada
+	 *  	||
 	 *  	fechas de los módulos cerradas (si están abiertas se está haciendo de forma normal)
 	 *  	||
 	 *  	allowFinishDate < ahora (la fecha de fin permitida tiene que haber pasado para entrar sólo en modo observador)
@@ -177,6 +180,26 @@ public class LiferaylmsUtil {
 		log.debug(":::hasPermissionAccessCourseFinished:::lmsPrefs viewCoursesFinished: " + lmsPrefs.getViewCoursesFinished());
 		
 		Date now = new Date();
+		
+		Course course = null;
+		try {
+			course = CourseLocalServiceUtil.getCourse(courseId);
+		} catch (PortalException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (SystemException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+		if(log.isDebugEnabled() && course != null){
+			log.debug(":::hasPermissionAccessCourseFinished:::executionEndDate: " + course.getExecutionEndDate());
+		}
+		
+		if(course != null && course.getExecutionEndDate() != null && now.after(course.getExecutionEndDate())){
+			return true;
+		}
+		
 		Date lastModuleDate = null;
 		
 		//Ahora comprobamos si se cumple alguna de las otras tres condiciones
@@ -192,10 +215,6 @@ public class LiferaylmsUtil {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		
-		
-		
 		
 		//Si hay equipos 
 		try {

@@ -29,6 +29,8 @@ import com.liferay.lms.service.ModuleLocalServiceUtil;
 import com.liferay.lms.service.ScheduleLocalServiceUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.model.ResourceConstants;
 import com.liferay.portal.model.Role;
 import com.liferay.portal.model.RoleConstants;
@@ -57,20 +59,29 @@ public class ModuleImpl extends ModuleBaseImpl {
 	 *
 	 * Never reference this class directly. All methods that expect a module model instance should use the {@link com.liferay.lms.model.Module} interface instead.
 	 */
+	private static Log log = LogFactoryUtil.getLog(ModuleImpl.class);
+	
 	public ModuleImpl() {
 	}
 	public Module getParentModule() throws SystemException, PortalException
 	{
-		Course course=CourseLocalServiceUtil.getCourseByGroupCreatedId(this.getGroupId());
-		if(course!=null)
-		{
-			Course parentCourse=course.getParentCourse();
-			if(parentCourse!=null)
+		
+		Module module = null;
+		try{
+			Course course=CourseLocalServiceUtil.getCourseByGroupCreatedId(this.getGroupId());
+			if(course!=null)
 			{
-				return ModuleLocalServiceUtil.getModuleByUuidAndGroupId(this.getUuid(), parentCourse.getGroupCreatedId());
+				Course parentCourse=course.getParentCourse();
+				if(parentCourse!=null)
+				{
+					module = ModuleLocalServiceUtil.getModuleByUuidAndGroupId(this.getUuid(), parentCourse.getGroupCreatedId());
+				}
 			}
+		}catch(Exception e){
+			log.error(e.getMessage());
+			log.debug(e);
 		}
-		return null;
+		return module;
 	}
 	
 	public boolean isLocked(long userId){
@@ -161,6 +172,16 @@ public class ModuleImpl extends ModuleBaseImpl {
 		} catch (PortalException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
+			return null;
+		}
+	}
+	
+	public List<LearningActivity> getListLearningActivities(){
+		try {
+			return LearningActivityServiceUtil.getLearningActivitiesOfModule(getModuleId());
+		} catch (SystemException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 			return null;
 		}
 	}

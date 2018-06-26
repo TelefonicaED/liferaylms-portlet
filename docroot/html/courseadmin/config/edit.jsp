@@ -58,9 +58,6 @@
 	boolean filterByTemplates = preferences.getValue("filterByTemplates","false").equals("true");
 	boolean showGroupFilter = preferences.getValue("showGroupFilter", "false").equals("true");
 	
-	int tipoImport = Integer.parseInt(preferences.getValue("tipoImport", "1"));
-	boolean hasImportById = (tipoImport != 2);
-	
 	boolean expandos = Boolean.parseBoolean(preferences.getValue("showExpandos", "false"));
 	boolean expandosEdition = Boolean.parseBoolean(preferences.getValue("showExpandosEdition", "false"));
 	List<ExpandoColumn> listExpandos = ExpandoColumnLocalServiceUtil.getColumns(themeDisplay.getCompanyId(), Course.class.getName(), ExpandoTableConstants.DEFAULT_TABLE_NAME);
@@ -135,7 +132,7 @@
 	
 		<aui:input type="checkbox"  label="courseadmin.config.inscription-date-column" name="inscriptionDateColumn" value="<%=preferences.getValue(\"inscriptionDateColumn\", StringPool.TRUE) %>" ignoreRequestValue="true"/>
 		<aui:input type="checkbox"  label="courseadmin.config.execution-date-column" name="executionDateColumn" value="<%=preferences.getValue(\"executionDateColumn\", StringPool.TRUE) %>" ignoreRequestValue="true"/>
-		
+		<aui:input type="checkbox"  label="courseadmin.config.create-date-column" name="createDateColumn" value="<%=preferences.getValue(\"createDateColumn\", StringPool.FALSE) %>" ignoreRequestValue="true"/>
 	
 	<%
 		
@@ -171,11 +168,6 @@
 			e.printStackTrace();
 		}%>	
 	
-	</aui:field-wrapper>
-	
-	<aui:field-wrapper label="courseadmin.config.import.export">
-		<aui:input name="tipoImport" type="radio" value="1" label="courseadmin.config.import.export.by.id" checked="<%= hasImportById %>"/>
-		<aui:input name="tipoImport" type="radio" value="2" label="courseadmin.config.import.export.by.name" checked="<%= !hasImportById %>"/>
 	</aui:field-wrapper>
 	
 	<aui:field-wrapper label="calendar" >

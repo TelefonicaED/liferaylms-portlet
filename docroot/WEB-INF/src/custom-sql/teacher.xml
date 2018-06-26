@@ -1,0 +1,47 @@
+<custom-sql>
+	<sql id="com.liferay.lms.service.persistence.CourseFinder.findTeachers">
+		<![CDATA[   			
+			SELECT 
+				DISTINCT u.*
+			FROM 
+				user_ u
+			INNER JOIN 
+				users_groups ug 
+					ON u.userId = ug.userId
+			INNER JOIN 
+				lms_course co 
+					ON co.groupCreatedId = ug.groupId
+			INNER JOIN 
+				usergrouprole ur 
+					ON ug.userId = ur.userId AND ur.groupId = ug.groupId AND ur.roleId= ?
+			[$JOINTEAM$]
+			WHERE 
+				co.courseId = ? 
+				[$WHERESTATUS$]
+				[$WHERESEARCH$]
+			ORDER BY [$ORDERBY$]
+		]]>
+	</sql>
+	<sql id="com.liferay.lms.service.persistence.CourseFinder.countTeachers">
+		<![CDATA[   			
+			SELECT 
+				COUNT(DISTINCT u.userId) AS COUNT_VALUE
+			FROM 
+				user_ u
+			INNER JOIN 
+				users_groups ug 
+					ON u.userId = ug.userId
+			INNER JOIN 
+				lms_course co 
+					ON co.groupCreatedId = ug.groupId
+			INNER JOIN 
+				usergrouprole ur 
+					ON ug.userId = ur.userId AND ur.groupId = ug.groupId AND ur.roleId= ?
+			[$JOINTEAM$]
+			WHERE 
+				co.courseId = ? 
+				[$WHERESTATUS$]
+				[$WHERESEARCH$]
+		]]>
+	</sql>
+</custom-sql>

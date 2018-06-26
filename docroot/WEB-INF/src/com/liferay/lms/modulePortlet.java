@@ -29,9 +29,11 @@ import com.liferay.lms.auditing.AuditConstants;
 import com.liferay.lms.auditing.AuditingLogFactory;
 import com.liferay.lms.learningactivity.LearningActivityType;
 import com.liferay.lms.learningactivity.LearningActivityTypeRegistry;
+import com.liferay.lms.model.Course;
 import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.model.Module;
 import com.liferay.lms.model.impl.ModuleImpl;
+import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityServiceUtil;
 import com.liferay.lms.service.ModuleLocalServiceUtil;
@@ -235,7 +237,7 @@ public class modulePortlet extends MVCPortlet {
 		formatHora.setTimeZone(themeDisplay.getTimeZone());		
 		SimpleDateFormat formatMinuto = new SimpleDateFormat("mm");
 		formatMinuto.setTimeZone(themeDisplay.getTimeZone());		
-
+		Course course = CourseLocalServiceUtil.getCourseByGroupCreatedId(themeDisplay.getScopeGroupId());
 		LiferayPortletResponse liferayPortletResponse=(LiferayPortletResponse)renderResponse;
 		PortletURL editmoduleURL = null;
 
@@ -279,11 +281,13 @@ public class modulePortlet extends MVCPortlet {
 			renderRequest.setAttribute("icon", icon);
 			
 			if(module.getStartDate()==null){
-				module.setStartDate(new java.util.Date(System.currentTimeMillis()));
+				if(course.getExecutionStartDate()==null)module.setStartDate(new java.util.Date(System.currentTimeMillis()));
+				else module.setStartDate(course.getExecutionStartDate());
 			}
 			
 			if(module.getEndDate()==null){
-				module.setEndDate(new java.util.Date(System.currentTimeMillis()+1000*84000*365));
+				if(course.getExecutionEndDate()==null)module.setEndDate(new java.util.Date(System.currentTimeMillis()+1000*84000*365));
+				else module.setEndDate(course.getExecutionEndDate());
 			}
 			
 			renderRequest.setAttribute("startDateDia", formatDia.format(module.getStartDate()));
@@ -341,11 +345,13 @@ public class modulePortlet extends MVCPortlet {
 				blankmodule.setDescription("");
 				blankmodule.setOrdern(0);
 				blankmodule.setIcon(0);
-				Calendar calendar = Calendar.getInstance();
-				calendar.setTimeZone(themeDisplay.getTimeZone());
-				calendar.set(Calendar.HOUR_OF_DAY, 0);
-				calendar.set(Calendar.MINUTE, 0);
-				blankmodule.setStartDate(calendar.getTime());
+				if(course.getExecutionStartDate()==null){
+					Calendar calendar = Calendar.getInstance();
+					calendar.setTimeZone(themeDisplay.getTimeZone());
+					calendar.set(Calendar.HOUR_OF_DAY, 0);
+					calendar.set(Calendar.MINUTE, 0);
+					blankmodule.setStartDate(calendar.getTime());
+				}else blankmodule.setStartDate(course.getExecutionStartDate());
 				long allowedTime = blankmodule.getAllowedTime();	
 				long hourDuration = allowedTime / 3600000;
 				long minuteDuration = (allowedTime % 3600000) / 60000;
@@ -356,11 +362,14 @@ public class modulePortlet extends MVCPortlet {
 				renderRequest.setAttribute("startDateMinuto", formatMinuto.format(blankmodule.getStartDate()));
 				String startDate = dateToJsp(renderRequest, blankmodule.getStartDate());
 				renderRequest.setAttribute("startDate", startDate);
-				calendar = Calendar.getInstance();
-				calendar.setTimeZone(themeDisplay.getTimeZone());
-				calendar.set(Calendar.HOUR_OF_DAY, 23);
-				calendar.set(Calendar.MINUTE, 59);
-				blankmodule.setEndDate(calendar.getTime());
+				if(course.getExecutionEndDate()==null){
+					Calendar calendar = Calendar.getInstance();
+					calendar = Calendar.getInstance();
+					calendar.setTimeZone(themeDisplay.getTimeZone());
+					calendar.set(Calendar.HOUR_OF_DAY, 23);
+					calendar.set(Calendar.MINUTE, 59);
+					blankmodule.setEndDate(calendar.getTime());
+				}else blankmodule.setEndDate(course.getExecutionEndDate());
 				renderRequest.setAttribute("endDateDia", formatDia.format(blankmodule.getEndDate()));
 				renderRequest.setAttribute("endDateMes", formatMes.format(blankmodule.getEndDate()));
 				renderRequest.setAttribute("endDateAno", formatAno.format(blankmodule.getEndDate()));
@@ -775,6 +784,7 @@ public class modulePortlet extends MVCPortlet {
 		calendar.set(Calendar.HOUR_OF_DAY,startDateHora);
 		calendar.set(Calendar.MINUTE,startDateMinuto);
 		calendar.set(Calendar.SECOND,0);
+		calendar.set(Calendar.MILLISECOND,0);
 		module.setStartDate(calendar.getTime());
 
 		int endDateAno = ParamUtil.getInteger(request, "endDateAno");
@@ -788,6 +798,7 @@ public class modulePortlet extends MVCPortlet {
 		calendar.set(Calendar.HOUR_OF_DAY,endDateHora);
 		calendar.set(Calendar.MINUTE,endDateMinuto);
 		calendar.set(Calendar.SECOND,0);
+		calendar.set(Calendar.MILLISECOND,0);
 		module.setEndDate(calendar.getTime());
 
 		try {

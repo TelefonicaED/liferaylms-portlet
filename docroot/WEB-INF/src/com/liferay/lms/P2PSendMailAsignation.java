@@ -15,7 +15,7 @@ import com.liferay.portal.kernel.util.PropsKeys;
 public class P2PSendMailAsignation {
 	
 	private static Log log = LogFactoryUtil.getLog(P2PSendMailAsignation.class);
-	public static void sendMail(String emailTo, String nameTo, String content[], long companyId, Locale userLocale) {
+	public static void sendMail(String emailTo, String nameTo, String bodyMessage, long companyId, Locale userLocale) {
 		
 		try{
 			InternetAddress to = new InternetAddress(emailTo, nameTo);
@@ -24,7 +24,6 @@ public class P2PSendMailAsignation {
 			String subject= LanguageUtil.get(userLocale, "p2ptaskactivity.mail.subject");
 			
 			String bodyTitle   = LanguageUtil.format(userLocale, "p2ptaskactivity.mail.body.title", nameTo);
-			String bodyMessage = LanguageUtil.format(userLocale, "p2ptaskactivity.mail.body.message", content);
 			String bodyEnd     = LanguageUtil.get(userLocale, "p2ptaskactivity.mail.body.end");
 			
 			String body = bodyTitle +"\n\n"+ bodyMessage +"\n\n"+ bodyEnd +"\n\n"+ portal+"\n";
