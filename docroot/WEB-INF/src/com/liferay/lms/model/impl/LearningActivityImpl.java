@@ -182,7 +182,6 @@ public class LearningActivityImpl extends LearningActivityBaseImpl {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-
 				}			
 			}
 		} catch (SystemException e) {
