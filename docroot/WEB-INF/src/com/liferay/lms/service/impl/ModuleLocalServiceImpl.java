@@ -486,7 +486,7 @@ public class ModuleLocalServiceImpl extends ModuleLocalServiceBaseImpl {
 				}
 				else
 				{
-					finished = false;
+					return false;
 				}
 			}
 		}
