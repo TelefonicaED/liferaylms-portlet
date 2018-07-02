@@ -213,22 +213,9 @@ public class LearningActivityTryLocalServiceImpl
 	
 	@SuppressWarnings("unchecked")
 	public List<User> getUsersByLearningActivity(long actId) throws SystemException, PortalException
-	{ 			
-		List<User> users = new ArrayList<User>();
-		
-		ClassLoader classLoader = (ClassLoader) PortletBeanLocatorUtil.locate(ClpSerializer.getServletContextName(), "portletClassLoader");
-		DynamicQuery consulta = DynamicQueryFactoryUtil.forClass(LearningActivityTry.class, classLoader)
-					.add(PropertyFactoryUtil.forName("actId").eq(new Long(actId)));
-					
-		List<LearningActivityTry> activities = (List<LearningActivityTry>)learningActivityTryPersistence.findWithDynamicQuery(consulta);
-
-		for(LearningActivityTry activity:activities){
-			Long uId = activity.getUserId();
-			User u = UserLocalServiceUtil.getUserById(uId.longValue());
-			if(u!=null && !users.contains(u))
-				users.add(u);
-		}
-		return users;		
+	{ 	
+		System.out.println("PASA POR USUARIOS");
+		return LearningActivityTryFinderUtil.getUsersByActId(actId);	
 	}
 	
 	@SuppressWarnings("unchecked")
