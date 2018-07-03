@@ -88,8 +88,6 @@ public class LearningActivityTryFinderImpl extends BasePersistenceImpl<LearningA
 			if(log.isDebugEnabled()){
 				log.debug("sql: " + sql);
 			}
-			log.error("QUERY NAME: "+FIND_USERS_BY_ACT_ID);
-			log.error("sql: " + sql);
 			SQLQuery q = session.createSQLQuery(sql);
 			q.addEntity("User_",PortalClassLoaderUtil.getClassLoader().loadClass("com.liferay.portal.model.impl.UserImpl"));
 			

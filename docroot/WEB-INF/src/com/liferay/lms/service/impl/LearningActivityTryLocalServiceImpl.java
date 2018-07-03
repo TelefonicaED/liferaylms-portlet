@@ -214,7 +214,6 @@ public class LearningActivityTryLocalServiceImpl
 	@SuppressWarnings("unchecked")
 	public List<User> getUsersByLearningActivity(long actId) throws SystemException, PortalException
 	{ 	
-		System.out.println("PASA POR USUARIOS");
 		return LearningActivityTryFinderUtil.getUsersByActId(actId);	
 	}
 	
