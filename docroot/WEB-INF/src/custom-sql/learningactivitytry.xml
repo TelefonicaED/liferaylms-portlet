@@ -1,0 +1,11 @@
+<custom-sql>
+	<sql id="com.liferay.lms.service.persistence.LearningActivityTryFinder.findUsersByActId">
+		<![CDATA[   			
+			SELECT u.*
+			FROM lms_learningactivitytry lat
+			INNER JOIN user_ u ON lat.userId = u.userId
+			WHERE lat.actId = ?
+			GROUP BY lat.userId; 
+		]]>
+	</sql>
+</custom-sql>

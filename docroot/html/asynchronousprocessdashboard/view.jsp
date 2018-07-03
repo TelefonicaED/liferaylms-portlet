@@ -67,7 +67,7 @@
 			</c:if>
 			<liferay-ui:message key="${asynchronousProccessAudit.type}"/>
 		</liferay-ui:search-container-column-text>
-		<liferay-ui:search-container-column-text name="className">
+		<liferay-ui:search-container-column-text name="class">
 			<liferay-ui:message key="${asynchronousProccessAudit.className}"/> 
 		</liferay-ui:search-container-column-text>
 		<liferay-ui:search-container-column-text name="id">
