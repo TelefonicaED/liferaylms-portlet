@@ -106,26 +106,21 @@ function validate(){
 	var start = new Date(startDateAno,startDateMes,startDateDia,startDateHora,startDateMinuto);
 	var end = new Date(endDateAno,endDateMes,endDateDia,endDateHora,endDateMinuto);
 	
-	if(start.getTime()>=end.getTime()){
-		alert("<liferay-ui:message key="please-enter-a-start-date-that-comes-before-the-end-date" />");
-		return;
-	}else{
-		var form = document.getElementById('<portlet:namespace />addmodule');
-		var inputsform = form.getElementsByTagName("input");
-		var selector = document.getElementById('dpcqlanguageSelector');
-		if(selector){
-			var parents = selector.getElementsByClassName("lfr-form-row");
-			for (var i=0; i < parents.length; i++){
-				if(!parents[i].className.match(/.*hidden.*/)){
-					var inputs = parents[i].getElementsByTagName("input");
-					for (var j=0; j < inputs.length; j++){
-						var input = document.createElement('input');
-					    input.type = 'hidden';
-					    input.name = inputs[j].name;
-					    input.id = inputs[j].id;
-					    input.value = inputs[j].value;
-					    form.appendChild(input);
-					}
+	var form = document.getElementById('<portlet:namespace />addmodule');
+	var inputsform = form.getElementsByTagName("input");
+	var selector = document.getElementById('dpcqlanguageSelector');
+	if(selector){
+		var parents = selector.getElementsByClassName("lfr-form-row");
+		for (var i=0; i < parents.length; i++){
+			if(!parents[i].className.match(/.*hidden.*/)){
+				var inputs = parents[i].getElementsByTagName("input");
+				for (var j=0; j < inputs.length; j++){
+					var input = document.createElement('input');
+				    input.type = 'hidden';
+				    input.name = inputs[j].name;
+				    input.id = inputs[j].id;
+				    input.value = inputs[j].value;
+				    form.appendChild(input);
 				}
 			}
 		}
