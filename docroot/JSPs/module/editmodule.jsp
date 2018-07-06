@@ -38,7 +38,6 @@
 <jsp:useBean id="allowedDateMinuto" class="java.lang.String" scope="request" />
 
 <portlet:defineObjects />
-
 <script type="text/javascript">
 <!--
 AUI().ready('node-base' ,'aui-form-validator', 'aui-overlay-context-panel', 'widget-locale', function(A) {
@@ -89,6 +88,31 @@ AUI().ready('node-base' ,'aui-form-validator', 'aui-overlay-context-panel', 'wid
 	});
 });
 
+function <portlet:namespace />setStartDateState(){
+  	AUI().use('node',function(A) {
+   	var enabled = document.getElementById('<portlet:namespace />startdate-enabledCheckbox').checked; 
+  		if(enabled) {
+  			A.all("#<portlet:namespace />startDate").one(".aui-datepicker-button-wrapper").show();
+  			A.all("#<portlet:namespace />startDate").one("#<portlet:namespace />startDateSpan").removeClass('aui-helper-hidden');
+  		}else {
+  			A.all("#<portlet:namespace />startDate").one(".aui-datepicker-button-wrapper").hide();
+  			A.all("#<portlet:namespace />startDate").one("#<portlet:namespace />startDateSpan").addClass('aui-helper-hidden');
+  		}
+  	});
+}
+function <portlet:namespace />setEndDateState(){
+  	AUI().use('node',function(A) {
+   	var enabled = document.getElementById('<portlet:namespace />enddate-enabledCheckbox').checked; 
+  		if(enabled) {
+  			A.all("#<portlet:namespace />endDate").one(".aui-datepicker-button-wrapper").show();
+  			A.all("#<portlet:namespace />endDate").one("#<portlet:namespace />endDateSpan").removeClass('aui-helper-hidden');
+  		}else {
+  			A.all("#<portlet:namespace />endDate").one(".aui-datepicker-button-wrapper").hide();
+  			A.all("#<portlet:namespace />endDate").one("#<portlet:namespace />endDateSpan").addClass('aui-helper-hidden');
+  		}
+  	});
+}
+
 function validate(){
 	var startDateDia = document.getElementById('<portlet:namespace />startDateDia').value;
 	var startDateMes = document.getElementById('<portlet:namespace />startDateMes').value;
@@ -129,6 +153,8 @@ function validate(){
 		document.getElementById('<portlet:namespace />addmodule').submit();
 	}
 }
+
+
 
 //-->
 </script>
@@ -204,39 +230,47 @@ function validate(){
     			LanguageUtil.get(pageContext,"module-description-required"):StringPool.BLANK %>
     </div>
     
-    <aui:field-wrapper label="start-date">
-		<liferay-ui:input-date  yearRangeEnd="<%=LiferaylmsUtil.defaultEndYear %>" yearRangeStart="<%=LiferaylmsUtil.defaultStartYear %>"
-		 dayParam="startDateDia" dayValue="<%= Integer.valueOf(startDateDia) %>"
-		  monthParam="startDateMes" monthValue="<%= Integer.valueOf(startDateMes)-1 %>"
-		   yearParam="startDateAno" yearValue="<%= Integer.valueOf(startDateAno) %>"  yearNullable="false" 
-				 dayNullable="false" monthNullable="false" ></liferay-ui:input-date>
-		<liferay-ui:input-time minuteParam="startDateMinuto" amPmParam="startAMPM"  
-			hourParam="startDateHora" hourValue="<%=Integer.valueOf(startDateHora) %>" minuteValue="<%=Integer.valueOf(startDateMinuto) %>"></liferay-ui:input-time>
-	</aui:field-wrapper>
-	<%
-	Course course = CourseLocalServiceUtil.getCourseByGroupCreatedId(themeDisplay.getScopeGroupId()); 
-	SimpleDateFormat formatDateHour = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-	formatDateHour.setTimeZone(themeDisplay.getTimeZone());	
-	Object  [] arg =  new Object[]{(course.getExecutionStartDate()!=null)?formatDateHour.format(course.getExecutionStartDate()):"-"};%>
-	<liferay-ui:message key="course-start-date"  arguments="<%=arg %>" />
+    <div id="${renderResponse.getNamespace()}startDate">
+   	 <aui:field-wrapper label="start-date">
+    		<aui:input id="startdate-enabled" name="startdate-enabled" type="checkbox" checked="${enableChangeStartDate }" label="module.edit.start-date" onClick="${renderResponse.getNamespace()}setStartDateState();" helpMessage="module.edit.start-date.help"  ignoreRequestValue="true" />
+	    	<div id="${renderResponse.getNamespace()}startDateSpan" class="${enableChangeStartDate ? '' : 'aui-helper-hidden'}">
+				<liferay-ui:input-date  yearRangeEnd="<%=LiferaylmsUtil.defaultEndYear %>" yearRangeStart="<%=LiferaylmsUtil.defaultStartYear %>"
+					dayParam="startDateDia" dayValue="${startDateDia }"
+					monthParam="startDateMes" monthValue="${startDateMes-1 }"
+					yearParam="startDateAno" yearValue="${startDateAno }"  yearNullable="false" 
+						 dayNullable="false" monthNullable="false" ></liferay-ui:input-date>
+				<liferay-ui:input-time minuteParam="startDateMinuto" amPmParam="startAMPM"  
+					hourParam="startDateHora" hourValue="${startDateHora }" minuteValue="${startDateMinuto }"></liferay-ui:input-time>
+			</div>
+		</aui:field-wrapper>
+	</div>
+	
+	<liferay-ui:message key="course-start-date"  arguments="${courseExecutionStartDateString }" />
 	<liferay-ui:error key="module-startDate-required" message="module-startDate-required" />
 	<liferay-ui:error key="module-startDate-before-course-startDate" message="module-startDate-before-course-startDate" />
 	
-	<aui:field-wrapper label="end-date">
-		<liferay-ui:input-date  yearRangeEnd="<%=LiferaylmsUtil.defaultEndYear %>" yearRangeStart="<%=LiferaylmsUtil.defaultStartYear %>" dayParam="endDateDia" dayValue="<%= Integer.valueOf(endDateDia) %>" monthParam="endDateMes" monthValue="<%= Integer.valueOf(endDateMes)-1 %>" yearParam="endDateAno" yearValue="<%= Integer.valueOf(endDateAno) %>"  yearNullable="false" 
-				 dayNullable="false" monthNullable="false" ></liferay-ui:input-date>
-		<liferay-ui:input-time minuteParam="endDateMinuto" amPmParam="startAMPM" 
-			hourParam="endDateHora" hourValue="<%=Integer.valueOf(endDateHora) %>" minuteValue="<%=Integer.valueOf(endDateMinuto) %>"></liferay-ui:input-time>
-	</aui:field-wrapper>
-	<%
-	Object  [] arg2 =  new Object[]{(course.getExecutionEndDate() != null)?formatDateHour.format(course.getExecutionEndDate()):"-"};%>
-	<liferay-ui:message key="course-end-date"  arguments="<%=arg2 %>" />
+	<div id="${renderResponse.getNamespace() }endDate">
+		<aui:field-wrapper label="end-date">
+			<aui:input id="enddate-enabled" name="enddate-enabled" type="checkbox" checked="${enableChangeEndDate }" label="module.edit.end-date" onClick="${renderResponse.getNamespace()}setEndDateState();" helpMessage="module.edit.end-date.help"  ignoreRequestValue="true" />
+			<div id="${renderResponse.getNamespace()}endDateSpan" class="${enableChangeEndDate ? '' : 'aui-helper-hidden'}">
+				<liferay-ui:input-date  yearRangeEnd="<%=LiferaylmsUtil.defaultEndYear %>" yearRangeStart="<%=LiferaylmsUtil.defaultStartYear %>" 
+					dayParam="endDateDia" dayValue="${endDateDia }" 
+					monthParam="endDateMes" monthValue="${endDateMes-1 }" 
+					yearParam="endDateAno" yearValue="${endDateAno }"  yearNullable="false" 
+					 	dayNullable="false" monthNullable="false" ></liferay-ui:input-date>
+				<liferay-ui:input-time minuteParam="endDateMinuto" amPmParam="endAMPM" 
+					hourParam="endDateHora" hourValue="${endDateHora }" minuteValue="${endDateMinuto }"></liferay-ui:input-time>
+			</div>
+		</aui:field-wrapper>
+	</div>
+
+	<liferay-ui:message key="course-end-date"  arguments="${courseExecutionEndDateString }" />
 	<liferay-ui:error key="module-endDate-required" message="module-endDate-required" />
 	<liferay-ui:error key="module-startDate-before-endDate" message="module-startDate-before-endDate" />
 	<liferay-ui:error key="module-endDate-after-course-endDate" message="module-endDate-after-course-endDate" />
 	
 	<aui:field-wrapper label="allowed-time">
-		<liferay-ui:input-time minuteParam="allowedDateMinuto" amPmParam="allowedDateAMPM"	hourParam="allowedDateHora" hourValue="<%=Integer.valueOf(allowedDateHora) %>" minuteValue="<%=Integer.valueOf(allowedDateMinuto) %>"></liferay-ui:input-time>
+		<liferay-ui:input-time minuteParam="allowedDateMinuto" amPmParam="allowedDateAMPM"	hourParam="allowedDateHora" hourValue="${allowedDateHora }" minuteValue="${allowedDateMinuto }"></liferay-ui:input-time>
 	</aui:field-wrapper>
 	
 	<aui:input type="hidden" name="icon" />
