@@ -839,10 +839,10 @@ public class modulePortlet extends MVCPortlet {
 		if(Validator.isNull(moduleStartDate) || Validator.isNull(moduleEndDate)){
 			Course course = CourseLocalServiceUtil.getCourseByGroupCreatedId(themeDisplay.getScopeGroupId());
 			if(Validator.isNull(moduleStartDate)) {
-				moduleStartDate = Validator.isNotNull(course.getExecutionStartDate()) ?  course.getExecutionStartDate() : new java.util.Date(System.currentTimeMillis());
+				moduleStartDate = Validator.isNotNull(course.getExecutionStartDate()) ?  course.getExecutionStartDate() : new Date(System.currentTimeMillis());
 			}
 			if(Validator.isNull(moduleEndDate)) {
-				moduleEndDate = Validator.isNotNull(course.getExecutionEndDate()) ?  course.getExecutionEndDate() : new java.util.Date(System.currentTimeMillis()+1000*84000*365);
+				moduleEndDate = Validator.isNotNull(course.getExecutionEndDate()) ?  course.getExecutionEndDate() : new Date(System.currentTimeMillis()+1000*84000*365);
 			}
 		}
 		module.setStartDate(moduleStartDate);
