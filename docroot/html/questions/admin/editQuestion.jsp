@@ -278,8 +278,14 @@
 	 				var list = A.all('.solution > div');
 	 				var numNodes = list.size();
 	 				var maxNodes = parseInt(<%=maxAnswersNo%>);
-	 				if(numNodes >= maxNodes) A.all('#addAnswerButton').addClass("aui-helper-hidden");
-	 				else  A.all('#addAnswerButton').removeClass("aui-helper-hidden");
+	 				if(maxNodes!=1){
+	 					if(numNodes >= maxNodes) A.all('#addAnswerButton').addClass("aui-helper-hidden");
+		 				else  A.all('#addAnswerButton').removeClass("aui-helper-hidden");
+	 				} else {
+	 					if(A.all('#addAnswerButton') != null ){
+	 						A.all('#addAnswerButton').remove();
+	 					}
+	 				}
 	  			}
 	 		);
 		}
