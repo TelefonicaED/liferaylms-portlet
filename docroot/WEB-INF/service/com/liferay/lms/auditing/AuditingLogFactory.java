@@ -1,10 +1,16 @@
 package com.liferay.lms.auditing;
 
+import sun.misc.ClassLoaderUtil;
+
+import com.liferay.lms.learningactivity.courseeval.CourseEvalClp;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.portlet.PortletClassLoaderUtil;
+import com.liferay.portal.kernel.util.ClassLoaderProxy;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.PropsUtil;
+import com.liferay.portal.kernel.util.Validator;
 
 public class AuditingLogFactory 
 {
@@ -16,11 +22,39 @@ public class AuditingLogFactory
 		if(auditLog==null)
 		{
 			Class<?> clase= null;
-			if(PropsUtil.get("audit.implementation")!=null){
-				clase=Class.forName(PropsUtil.get("audit.implementation"));
-			}else{
-				clase=Class.forName("com.liferay.lms.auditing.NullAuditingLog");
+			if(PropsUtil.get("audit.implementation.portletId")!=null)
+			{
+				String className=PropsUtil.get("audit.implementation");
+				String portletId=PropsUtil.get("audit.implementation.portletId");
+				if (Validator.isNull(portletId)) 
+				{
+					return null;
+				}
+				ClassLoaderProxy classLoaderProxy = new ClassLoaderProxy(Class.forName(className, true, 
+						PortletClassLoaderUtil.getClassLoader(portletId)).newInstance(), className, 
+						PortletClassLoaderUtil.getClassLoader(portletId));
+				auditLog=new AuditingLogClp(classLoaderProxy);
+				System.out.println("auditing with defined:"+className);
+				return auditLog;
+			
 			}
+			if(PropsUtil.get("audit.implementation")!=null)
+			{
+				try 
+				{
+					clase=Class.forName(PropsUtil.get("audit.implementation"));
+				}
+				catch (ClassNotFoundException e) 
+				{
+					
+						
+				}
+			}
+				else{
+				clase=Class.forName("com.liferay.lms.auditing.AuditingLogDB");
+				System.out.println("auditing with:"+clase);
+			}
+			
 			auditLog=(AuditingLog)clase.newInstance();
 		}
 		return auditLog;
