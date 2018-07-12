@@ -49,7 +49,7 @@
 	boolean showModuleEndDate = (preferences.getValue("showModuleEndDate", "true")).compareTo("true") == 0;
 	boolean allowEditionMode = (preferences.getValue("allowEditionMode", "false")).compareTo("true") == 0;
 	boolean allowAccessWhenFinishedButNotClosed = (preferences.getValue("allowAccessWhenFinishedButNotClosed", "false")).compareTo("true") == 0;
-	
+	boolean showActivities = Boolean.parseBoolean(preferences.getValue("showActivities", "false"));
 
 	Course course=CourseLocalServiceUtil.fetchByGroupCreatedId(themeDisplay.getScopeGroupId());
 	
@@ -175,8 +175,10 @@
 			boolean canAccessLock = permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), "com.liferay.lms.model", themeDisplay.getScopeGroupId() , "ACCESSLOCK");
 			boolean courseEditing = (permissionChecker.hasPermission(course.getGroupCreatedId(), Course.class.getName(), course.getCourseId() , ActionKeys.UPDATE))?true:false;
 			boolean hasPermissionAccessCourseFinished = LiferaylmsUtil.hasPermissionAccessCourseFinished(themeDisplay.getCompanyId(), course.getGroupCreatedId(), course.getCourseId(), themeDisplay.getUserId());
+			int numTd;
 			
 			for(Module theModule:theModules){
+				numTd = 2;
 				Date startDate;
 				Date endDate;
 				if(existSchedule){
@@ -248,6 +250,7 @@
 					if(showLockedModulesIcon){
 						boolean showLock = (courseEditing || moduleEditing || canAccessLock)?true:false;
 						if(showLock){ 
+							numTd++;
 %>
 							<td class="icon">
 <%
@@ -267,6 +270,7 @@
 					}
 
 					if(showModuleIcon){
+						numTd++;
 %>
 						<td class="icon">
 <% 
@@ -333,6 +337,7 @@
 					
 <%
 					if(showPercentDone){
+						numTd++;
 %>
 						<td class="percent">
 <%
@@ -350,6 +355,7 @@
 					}
 
 					if(showModuleStartDate || showModuleEndDate ){
+						numTd++;
 %>
 						<td class="date">
 <%
@@ -435,6 +441,30 @@
 %>
 					</td>
 				</tr>
+				
+		<%if(showActivities){
+			List<LearningActivity> moduleActivities = theModule.getListLearningActivities();
+		%>
+			
+			<tr class="activity-list-row"><td colspan="<%=numTd%>">
+				<liferay-ui:panel-container extended="false" id="<%=\"panel_container_\" + theModule.getModuleId()%>">
+					<liferay-ui:panel title="modulelist.activity-list-title" id="<%=\"panel_\" + theModule.getModuleId()%>" defaultState="closed" collapsible="true">
+						<%
+						int i=1;
+						for(LearningActivity activity:moduleActivities){%>
+							<div class="activity-row">
+								<span class="col-1"><%=i%></span>
+								<span class="col-2"><%=activity.getTitle(locale) %></span>
+							</div>
+						<%i++;
+						}
+						%>
+					</liferay-ui:panel>
+				</liferay-ui:panel-container>
+	
+			</td></tr>
+		<%}%>		
+				
 <%		}	
 	}%>
   </table>
