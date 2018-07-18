@@ -48,6 +48,7 @@ public class ModuleListAction implements ConfigurationAction {
 		prefs.setValue("allowEditionMode", actionRequest.getParameter("allowEditionMode"));
 		prefs.setValue("allowAccessWhenFinishedButNotClosed", actionRequest.getParameter("allowAccessWhenFinishedButNotClosed"));
 		prefs.setValue("dragAndDrop", actionRequest.getParameter("dragAndDrop"));
+		prefs.setValue("showActivities", actionRequest.getParameter("showActivities"));
 		
 		prefs.store();
 		SessionMessages.add(actionRequest,portletConfig.getPortletName() + ".doConfigure");
