@@ -1212,8 +1212,7 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 				
 			}
 			
-			actionResponse.setRenderParameters(actionRequest.getParameterMap());
-		}else{
+		}
 			long[] users = UserLocalServiceUtil.getGroupUserIds(course.getGroupCreatedId());
 			
 			for(long user : users){
@@ -1239,7 +1238,7 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 				}
 			}
 			//GroupLocalServiceUtil.unsetUserGroups(userGroupRole.getUserId(), new long[] { course.getGroupCreatedId() });
-		}
+		
 
 		actionResponse.setRenderParameters(actionRequest.getParameterMap());
 	}
