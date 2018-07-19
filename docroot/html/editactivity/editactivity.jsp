@@ -795,25 +795,25 @@ Liferay.provide(
 			}
 			String passpuntuationLabelProperty = "passpuntuation";
 			String passpunctuationHelpProperty= "editActivity.passpuntuation.help";
-		%>
-		<aui:input size="5" name="passpuntuation" label="<%=passpuntuationLabelProperty %>" type="number" value="<%=Long.toString(score) %>" disabled="<%=disabled %>" helpMessage="<%=LanguageUtil.get(pageContext, passpunctuationHelpProperty)%>">
-			<aui:validator name="min" errorMessage="editActivity.passpuntuation.range">-1</aui:validator>
-			<aui:validator name="max" errorMessage="editActivity.passpuntuation.range">101</aui:validator>
-		</aui:input>
-		<% if (disabled) { %>
-		<input name="<portlet:namespace />passpuntuation" type="hidden" value="<%=Long.toString(score) %>" />
-		<% } %>
-  		<div id="<portlet:namespace />passpuntuationError" class="<%=((SessionErrors.contains(renderRequest, "editActivity.passpuntuation.required"))||
-																      (SessionErrors.contains(renderRequest, "editActivity.passpuntuation.number"))||
-																      (SessionErrors.contains(renderRequest, "editActivity.passpuntuation.range")))?
-	    														      "portlet-msg-error":StringPool.BLANK %>">
-	    	<%=(SessionErrors.contains(renderRequest, "editActivity.passpuntuation.required"))?
-	    			LanguageUtil.get(pageContext,"editActivity.passpuntuation.required"):
-   			   (SessionErrors.contains(renderRequest, "editActivity.passpuntuation.number"))?
-   		    		LanguageUtil.get(pageContext,"editActivity.passpuntuation.number"):
-   			   (SessionErrors.contains(renderRequest, "editActivity.passpuntuation.range"))?
-   		    		LanguageUtil.get(pageContext,"editActivity.passpuntuation.range"):StringPool.BLANK %>
-	    </div>
+			%>
+			<aui:input size="5" name="passpuntuation" label="<%=passpuntuationLabelProperty %>" type="number" value="<%=Long.toString(score) %>" disabled="<%=disabled %>" helpMessage="<%=LanguageUtil.get(pageContext, passpunctuationHelpProperty)%>">
+				<aui:validator name="min" errorMessage="editActivity.passpuntuation.range">0</aui:validator>
+				<aui:validator name="max" errorMessage="editActivity.passpuntuation.range">100</aui:validator>
+			</aui:input>
+			<% if (disabled) { %>
+				<input name="<portlet:namespace />passpuntuation" type="hidden" value="<%=Long.toString(score) %>" />
+			<% } %>
+	  		<div id="<portlet:namespace />passpuntuationError" class="<%=((SessionErrors.contains(renderRequest, "editActivity.passpuntuation.required"))||
+																	      (SessionErrors.contains(renderRequest, "editActivity.passpuntuation.number"))||
+																	      (SessionErrors.contains(renderRequest, "editActivity.passpuntuation.range")))?
+		    														      "portlet-msg-error":StringPool.BLANK %>">
+		    	<%=(SessionErrors.contains(renderRequest, "editActivity.passpuntuation.required"))?
+		    			LanguageUtil.get(pageContext,"editActivity.passpuntuation.required"):
+	   			   (SessionErrors.contains(renderRequest, "editActivity.passpuntuation.number"))?
+	   		    		LanguageUtil.get(pageContext,"editActivity.passpuntuation.number"):
+	   			   (SessionErrors.contains(renderRequest, "editActivity.passpuntuation.range"))?
+	   		    		LanguageUtil.get(pageContext,"editActivity.passpuntuation.range"):StringPool.BLANK %>
+		    </div>
 		<%
 		}
 		%>
