@@ -50,9 +50,8 @@
 					searchContainer="${searchContainer}"
 					iteratorURL="${searchContainer.iteratorURL}" >
 				
-				
 					<liferay-ui:search-form
-						page="/html/shared/usersSearchform.jsp"
+						page="/html/search/usersSearchform.jsp"
 						searchContainer="${searchContainer}"
 			            servletContext="<%= this.getServletConfig().getServletContext() %>"
 			        />

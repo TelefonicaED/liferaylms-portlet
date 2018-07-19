@@ -8,7 +8,6 @@ import javax.portlet.PortletRequestDispatcher;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 
-import com.liferay.lms.model.Module;
 import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.lms.views.CourseResultView;
 import com.liferay.portal.kernel.log.Log;
@@ -40,7 +39,7 @@ public class MyCourses extends MVCPortlet {
 		
 		//ordenamos la lista
 		if (courseOrder == 0){
-			orderByColumn = "c.courseId";
+			orderByColumn = "Lms_Course.courseId";
 			orderByType = "ASC";
 		}else if (courseOrder == 1){
 			orderByColumn = "courseTitle";
@@ -49,10 +48,10 @@ public class MyCourses extends MVCPortlet {
 			orderByColumn = "courseTitle";
 			orderByType = "DESC";
 		}else if (courseOrder == 3){
-			orderByColumn = "(SELECT MIN(mo.startDate) FROM lms_module mo WHERE mo.groupId = c.groupCreatedId)";
+			orderByColumn = "Lms_Course.executionStartDate";
 			orderByType = "ASC";
 		}else if (courseOrder == 4){
-			orderByColumn = "(SELECT MAX(mo.endDate) FROM lms_module mo WHERE mo.groupId = c.groupCreatedId)";
+			orderByColumn = " Lms_Course.executionEndDate";
 			orderByType = "ASC";
 		}
 		

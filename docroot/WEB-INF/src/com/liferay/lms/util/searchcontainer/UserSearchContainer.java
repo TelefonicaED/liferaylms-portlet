@@ -1,7 +1,6 @@
 package com.liferay.lms.util.searchcontainer;
 
 import com.liferay.lms.util.displayterms.UserDisplayTerms;
-import com.liferay.lms.util.searchterms.UserSearchTerms;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -54,7 +53,7 @@ public class UserSearchContainer extends SearchContainer<User> {
 
 		super(
 			portletRequest, new UserDisplayTerms(portletRequest),
-			new UserSearchTerms(portletRequest), curParam, DEFAULT_DELTA,
+			null, curParam, DEFAULT_DELTA,
 			iteratorURL, headerNames, EMPTY_RESULTS_MESSAGE);
 
 		PortletConfig portletConfig =
@@ -62,13 +61,11 @@ public class UserSearchContainer extends SearchContainer<User> {
 				JavaConstants.JAVAX_PORTLET_CONFIG);
 
 		UserDisplayTerms displayTerms = (UserDisplayTerms)getDisplayTerms();
-		UserSearchTerms searchTerms = (UserSearchTerms)getSearchTerms();
 
 		String portletName = portletConfig.getPortletName();
 
 		if (!portletName.equals(PortletKeys.USERS_ADMIN)) {
 			displayTerms.setStatus(WorkflowConstants.STATUS_APPROVED);
-			searchTerms.setStatus(WorkflowConstants.STATUS_APPROVED);
 		}
 
 

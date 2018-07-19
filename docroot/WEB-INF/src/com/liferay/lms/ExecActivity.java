@@ -3,11 +3,17 @@ package com.liferay.lms;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
+
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
 import javax.portlet.PortletException;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
+
+import com.liferay.lms.learningactivity.LearningActivityType;
+import com.liferay.lms.learningactivity.LearningActivityTypeRegistry;
+import com.liferay.lms.learningactivity.ResourceExternalLearningActivityType;
+import com.liferay.lms.learningactivity.TestLearningActivityType;
 import com.liferay.lms.learningactivity.calificationtype.CalificationType;
 import com.liferay.lms.learningactivity.calificationtype.CalificationTypeRegistry;
 import com.liferay.lms.learningactivity.questiontype.QuestionType;
@@ -78,37 +84,31 @@ public class ExecActivity extends QuestionsAdmin {
 
 			long[] questionIds = ParamUtil.getLongValues(actionRequest, "question");
 
-			long correctValue = 0L;
 			for (long questionId : questionIds) {
 				TestQuestion question = TestQuestionLocalServiceUtil.fetchTestQuestion(questionId);
 				QuestionType qt = new QuestionTypeRegistry().getQuestionType(question.getQuestionType());
-				if(!isPartial){
-					correctValue = qt.correct(actionRequest, questionId); 
-					if(correctValue>0) {
-						correctanswers += correctValue;
-					}else if(question.isPenalize()){
-						penalizedAnswers+=correctValue;
-					}
-				}
 				resultadosXML.add(qt.getResults(actionRequest, questionId));								
 			}
 
-			long random = GetterUtil.getLong(LearningActivityLocalServiceUtil.getExtraContentValue(actId,"random"));
-
+			LearningActivityType lat = new LearningActivityTypeRegistry().getLearningActivityType(TestLearningActivityType.TYPE_ID);
+			
 			if(log.isDebugEnabled())
-				log.debug(String.format("\n\tisPartial: %s\n\tcorrectanswers: %s\n\tpenalizedAnswers: %s\n\trandom: %s\n\tquestionIds.length: %s", isPartial, correctanswers, penalizedAnswers, random, questionIds.length));
+				log.debug(String.format("\n\tisPartial: %s\n\tcorrectanswers: %s\n\tpenalizedAnswers: %s\n\tquestionIds.length: %s", isPartial, correctanswers, penalizedAnswers, questionIds.length));
 			// penalizedAnswers tiene valor negativo, por eso se suma a correctanswers
-			long score=isPartial ? 0 : ((correctanswers+penalizedAnswers)/((random!=0 && random<questionIds.length)?random:questionIds.length));
-			if(log.isDebugEnabled())
-				log.debug("Score: " + score);
-
-			if(score < 0)score = 0;
+			
 			
 			LearningActivityResult learningActivityResult = LearningActivityResultLocalServiceUtil.getByActIdAndUserId(actId, PortalUtil.getUserId(actionRequest));
 			long oldResult=-1;
 			if(learningActivityResult!=null) oldResult=learningActivityResult.getResult();
 
 			larntry.setTryResultData(resultadosXMLDoc.formattedString());
+			
+			long score=isPartial ? 0 : lat.calculateResult(LearningActivityLocalServiceUtil.fetchLearningActivity(larntry.getActId()), larntry) ;
+			if(log.isDebugEnabled())
+				log.debug("Score: " + score);
+
+			if(score < 0)score = 0;
+			
 			if (!isPartial) {
 				larntry.setResult(score);
 				larntry.setEndDate(new java.util.Date(System.currentTimeMillis()));
@@ -305,7 +305,7 @@ public class ExecActivity extends QuestionsAdmin {
 	public void render(RenderRequest renderRequest, RenderResponse renderResponse) throws PortletException, IOException {
 		long actId=0;
 		boolean actionEditingDetails = ParamUtil.getBoolean(renderRequest, "actionEditingDetails", false);
-
+		renderResponse.setProperty("clear-request-parameters",StringPool.TRUE);
 		if(actionEditingDetails){
 
 			actId=ParamUtil.getLong(renderRequest, "resId", 0);

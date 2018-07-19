@@ -13,17 +13,18 @@ import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.model.LmsPrefs;
 import com.liferay.lms.model.Module;
 import com.liferay.lms.service.LmsPrefsLocalServiceUtil;
-import com.liferay.lms.util.LmsConstant;
 import com.liferay.portal.kernel.events.ActionException;
 import com.liferay.portal.kernel.events.SimpleAction;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.lar.PortletDataHandlerKeys;
 import com.liferay.portal.kernel.lar.UserIdStrategy;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
-import com.liferay.portal.model.Group;
 import com.liferay.portal.model.LayoutSetPrototype;
 import com.liferay.portal.model.ResourceAction;
 import com.liferay.portal.model.ResourceConstants;
@@ -56,6 +57,8 @@ public class StartupAction extends SimpleAction {
 	public Role courseEditor;
 	public Role courseCreator;
 	public LayoutSetPrototype layoutSetPrototype;
+	private Log _log = LogFactoryUtil.getLog(StartupAction.class); 
+	
 	@Override
 	public void run(String[] ids) throws ActionException {
 		try {
@@ -110,8 +113,11 @@ public class StartupAction extends SimpleAction {
 	{
 		boolean exists = false;
 		long layoutSetPrototypeId = 0;
+		String course = LanguageUtil.get(LocaleUtil.getDefault(), "course");
+		if(_log.isDebugEnabled())
+			_log.debug("locale default: " + LocaleUtil.getDefault() + " course: " + course);
 		for(LayoutSetPrototype lay:LayoutSetPrototypeLocalServiceUtil.getLayoutSetPrototypes(0, LayoutSetPrototypeLocalServiceUtil.getLayoutSetPrototypesCount())){
-			if(lay.getCompanyId() == companyId && "course".equals(lay.getName(LocaleUtil.getDefault()))) {
+			if( lay.getCompanyId() == companyId && course.equalsIgnoreCase(lay.getName(LocaleUtil.getDefault())) ) {
 				exists=true;
 				layoutSetPrototypeId = lay.getLayoutSetPrototypeId();
 			}
@@ -120,7 +126,14 @@ public class StartupAction extends SimpleAction {
 		if(!exists){
 			long defaultUserId = UserLocalServiceUtil.getDefaultUserId(companyId);
 			Map<Locale, String> nameMap = new HashMap<Locale, String>();
-			nameMap.put(LocaleUtil.getDefault(), "course");
+			Locale[] langsAvailables = LanguageUtil.getAvailableLocales();
+			_log.debug("avalilables locales: " + langsAvailables.length);
+			for(Locale lang : langsAvailables){
+				if(_log.isDebugEnabled())
+					_log.debug(String.format("Language: %s text: %s", lang, LanguageUtil.get(lang, "model.resource.com.liferay.lms.model.Course")));
+				
+				nameMap.put(lang, LanguageUtil.get(lang, "model.resource.com.liferay.lms.model.Course"));
+			}
 			layoutSetPrototype = LayoutSetPrototypeLocalServiceUtil.addLayoutSetPrototype(defaultUserId, companyId, nameMap, "course", true,true,new ServiceContext());
 			InputStream larStream=this.getClass().getClassLoader().getResourceAsStream("/course.lar");
 			LayoutLocalServiceUtil.importLayouts(defaultUserId,layoutSetPrototype.getGroup().getGroupId() , 

@@ -1,3 +1,5 @@
+<%@page import="com.liferay.lms.util.LmsConstant"%>
+<%@page import="com.liferay.portal.kernel.util.StringBundler"%>
 <%@page import="com.tls.lms.util.LiferaylmsUtil"%>
 <%@page import="com.liferay.lms.service.CourseLocalServiceUtil"%>
 <%@page import="com.liferay.lms.model.Course"%>
@@ -62,21 +64,15 @@ else
 		<div class="description"><%=learnact.getDescriptionFiltered(themeDisplay.getLocale(),true) %></div>	
 	<%
 	
-	if(learnact.getTypeId()!=7 )
-	{
-		
+	if(learnact.getTypeId()!=ResourceInternalLearningActivityType.TYPE_ID){
 		renderRequest.setAttribute(WebKeys.PORTLET_CONFIGURATOR_VISIBILITY, Boolean.FALSE);
-	}
-	else
-	{
+	}else{
 		Course course = CourseLocalServiceUtil.getCourseByGroupCreatedId(learnact.getGroupId());
 		boolean hasPermissionAccessCourseFinished = LiferaylmsUtil.hasPermissionAccessCourseFinished(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(), course.getCourseId(), themeDisplay.getUserId());
 		boolean hasAccessLock = CourseLocalServiceUtil.canAccessLock(themeDisplay.getScopeGroupId(), user);
 		
 		if(learnact.canAccess(true, themeDisplay.getUser(), themeDisplay.getPermissionChecker(), hasAccessLock, course, hasPermissionAccessCourseFinished)){
-		
-			if(!hasPermissionAccessCourseFinished && !LearningActivityResultLocalServiceUtil.userPassed(actId,themeDisplay.getUserId()))
-			{
+		   if(!hasPermissionAccessCourseFinished && !LearningActivityResultLocalServiceUtil.userPassed(actId,themeDisplay.getUserId())){
 				if(!permissionChecker.hasPermission(learnact.getGroupId(), LearningActivity.class.getName(), actId, ActionKeys.UPDATE) ||
 						!permissionChecker.hasOwnerPermission(learnact.getCompanyId(), LearningActivity.class.getName(), actId, learnact.getUserId(), ActionKeys.UPDATE)){
 					ServiceContext serviceContext = ServiceContextFactory.getInstance(LearningActivityTry.class.getName(), renderRequest);
@@ -88,10 +84,10 @@ else
 					
 					%>
 					<script type="text/javascript">
-					document.addEventListener( "DOMContentLoaded", function(){
-						Liferay.Portlet.refresh('#p_p_id_activityNavigator_WAR_liferaylmsportlet_');
-						Liferay.Portlet.refresh('#p_p_id_lmsactivitieslist_WAR_liferaylmsportlet_');
-					}, false );
+						document.addEventListener( "DOMContentLoaded", function(){
+							Liferay.Portlet.refresh('#p_p_id_activityNavigator_WAR_liferaylmsportlet_');
+							Liferay.Portlet.refresh('#p_p_id_lmsactivitieslist_WAR_liferaylmsportlet_');
+						}, false );
 	
 					
 					
@@ -99,28 +95,38 @@ else
 					<%
 				}
 			}
-			if(learnact.getExtracontent()!=null &&!learnact.getExtracontent().trim().equals("") )
-			{
-				
+			if(learnact.getExtracontent()!=null &&!learnact.getExtracontent().trim().equals("") ){
 				long entryId = GetterUtil.getLong(LearningActivityLocalServiceUtil.getExtraContentValue(learnact.getActId(),"assetEntry"),0);
 				
 				if(entryId!=0){
-					AssetEntry entry=AssetEntryLocalServiceUtil.getEntry(entryId);
-					AssetRendererFactory assetRendererFactory=AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(entry.getClassName());			
-					AssetRenderer assetRenderer= AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(entry.getClassName()).getAssetRenderer(entry.getClassPK());
-					String path = assetRenderer.render(renderRequest, renderResponse, AssetRenderer.TEMPLATE_FULL_CONTENT);
+					AssetEntry entry=AssetEntryLocalServiceUtil.fetchEntry(entryId);
+					if(entry!=null){
+						String portlet = PropsUtil.get(LmsConstant.DOCUMENTLIBRARY_PORTLET_KEY);
+						String portletPage = PropsUtil.get(LmsConstant.DOCUMENTLIBRARY_PAGE_KEY);
+						if(Validator.isNotNull(portlet) && Validator.isNotNull(portletPage) && entry.getClassName().equals(DLFileEntry.class.getName())){
+							%>
+							<liferay-util:include page="<%=portletPage%>" portletId="<%=portlet%>">
+								<liferay-util:param value="<%=String.valueOf(entry.getClassPK())%>" name="entryId" />
+							</liferay-util:include>
+							<%
 					
-					if(permissionChecker.hasPermission(entry.getGroupId(), entry.getClassName(), entry.getClassPK(), ActionKeys.VIEW))
-					{ %>
-						<liferay-util:include  page="<%= path %>" portletId="<%= assetRendererFactory.getPortletId() %>" />
-					<%
-					}else{
-						%>
+						}else{
+							AssetRendererFactory assetRendererFactory=AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(entry.getClassName());			
+							AssetRenderer assetRenderer= AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(entry.getClassName()).getAssetRenderer(entry.getClassPK());
+							String path = assetRenderer.render(renderRequest, renderResponse, AssetRenderer.TEMPLATE_FULL_CONTENT); 
+							if(permissionChecker.hasPermission(entry.getGroupId(), entry.getClassName(), entry.getClassPK(), ActionKeys.VIEW)){ %>
+								<liferay-util:include  page="<%= path %>" portletId="<%= assetRendererFactory.getPortletId() %>" />
+							<%}else{%>
+								<div class="portlet-msg-error">
+									<liferay-ui:message key="you-do-not-have-permission-to-access-the-requested-resource"/>
+								</div>
+							<%}	
+						}
+					}else{%>
 						<div class="portlet-msg-error">
-							<liferay-ui:message key="you-do-not-have-permission-to-access-the-requested-resource"/>
+								<liferay-ui:message key="the-requested-resource-was-not-found"/>
 						</div>
-						<%
-					}
+					<%}
 				}
 			}
 		}

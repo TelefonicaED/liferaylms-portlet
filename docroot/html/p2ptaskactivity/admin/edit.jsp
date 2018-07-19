@@ -288,8 +288,7 @@ if(teamAssignationAllowed){
 						<input id="aui_3_4_0_1_2020" class="aui-field-input aui-field-input-text aui-form-validator-valid" type="text" value="<%=value %>" name="text<%=i %>">
 					</span>
 					<%if(!disabled){ %>
-						<img class="icon" src="/html/themes/control_panel/images/common/remove.png" style="cursor: pointer;" onclick="this.parentNode.parentNode.removeChild(this.parentNode);">
-					<%} %>
+						<img class="icon" alt="" src="/html/themes/control_panel/images/common/remove.png" style="cursor: pointer;" onclick="this.parentNode.parentNode.removeChild(this.parentNode);">					<%} %>
 				</span>
 				<%
 			}

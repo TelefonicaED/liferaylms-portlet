@@ -76,8 +76,6 @@ else
 	AssetEntryQuery query=new AssetEntryQuery();
 	query.setClassName(className);
 	query.setGroupIds(groupIds);
-	query.setStart(searchContainer.getStart());
-	query.setEnd(searchContainer.getEnd());
 	query.setEnablePermissions(true);
 	query.setExcludeZeroViewCount(false);
 	if(serviceContext.getAssetCategoryIds()!=null)
@@ -86,6 +84,8 @@ else
 	}
 	query.setVisible(true);
 	total = AssetEntryServiceUtil.getEntriesCount(query);
+	query.setStart(searchContainer.getStart());
+	query.setEnd(searchContainer.getEnd());
 	results = AssetEntryServiceUtil.getEntries(query);
 }
 

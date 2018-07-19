@@ -114,7 +114,7 @@ public class LearningActivityTryLocalServiceImpl
 		LearningActivity larn=LearningActivityLocalServiceUtil.getLearningActivity(actId);
 		for(LearningActivityTry userTry:userTries)
 		{
-			this.deleteLearningActivityTry(userTry.getLatId());
+			learningActivityTryLocalService.deleteLearningActivityTry(userTry.getLatId());
 			
 			//auditing
 			ServiceContext serviceContext = ServiceContextThreadLocal.getServiceContext();
@@ -138,11 +138,11 @@ public class LearningActivityTryLocalServiceImpl
 			learningActivityResultLocalService.updateLearningActivityResult(res);
 			if(larn.getWeightinmodule()>0)
 			{
-				ModuleResult mr=ModuleResultLocalServiceUtil.getByModuleAndUser(larn.getModuleId(), userId);
+				ModuleResult mr=moduleResultLocalService.getByModuleAndUser(larn.getModuleId(), userId);
 				if(mr!=null)
 				{
 					mr.setPassed(false);
-					ModuleResultLocalServiceUtil.updateModuleResult(mr);
+					moduleResultLocalService.updateModuleResult(mr);
 				}
 			}
 		}
@@ -213,22 +213,8 @@ public class LearningActivityTryLocalServiceImpl
 	
 	@SuppressWarnings("unchecked")
 	public List<User> getUsersByLearningActivity(long actId) throws SystemException, PortalException
-	{ 			
-		List<User> users = new ArrayList<User>();
-		
-		ClassLoader classLoader = (ClassLoader) PortletBeanLocatorUtil.locate(ClpSerializer.getServletContextName(), "portletClassLoader");
-		DynamicQuery consulta = DynamicQueryFactoryUtil.forClass(LearningActivityTry.class, classLoader)
-					.add(PropertyFactoryUtil.forName("actId").eq(new Long(actId)));
-					
-		List<LearningActivityTry> activities = (List<LearningActivityTry>)learningActivityTryPersistence.findWithDynamicQuery(consulta);
-
-		for(LearningActivityTry activity:activities){
-			Long uId = activity.getUserId();
-			User u = UserLocalServiceUtil.getUserById(uId.longValue());
-			if(u!=null && !users.contains(u))
-				users.add(u);
-		}
-		return users;		
+	{ 	
+		return LearningActivityTryFinderUtil.getUsersByActId(actId);	
 	}
 	
 	@SuppressWarnings("unchecked")

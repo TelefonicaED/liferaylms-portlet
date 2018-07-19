@@ -4,13 +4,13 @@
 			SELECT 
 				DISTINCT u.*
 			FROM 
-				lms_course co 
+				user_ u
 			INNER JOIN 
 				users_groups ug 
-					ON co.groupCreatedId = ug.groupId
-			INNER JOIN 
-				user_ u 
 					ON u.userId = ug.userId
+			INNER JOIN 
+				lms_course co 
+					ON co.groupCreatedId = ug.groupId
 			LEFT JOIN 
 				usergrouprole ur 
 					ON ug.userId = ur.userId AND ur.groupId = ug.groupId AND ur.roleId= ?
@@ -19,17 +19,15 @@
 					ON ug.userId = urE.userId AND urE.groupId = ug.groupId AND urE.roleId = ?
 			[$JOINTEAM$]
 			WHERE 
-				ur.userId IS NULL AND urE.userId IS NULL AND co.courseId = ? AND (u.status = ? OR ? = ?)
-				AND 
-				(
-					[$WHEREFIRSTNAME$]
-					[$WHERELASTNAME$]
-					[$WHERESCREENNAME$]
-					[$WHEREEMAILADDRESS$]
-					[$DEFAULT$]
-					
-				)
+				ur.userId IS NULL AND urE.userId IS NULL AND co.courseId = ?
+				[$WHERESTATUS$]
+				[$WHERESEARCH$]
 			ORDER BY [$ORDERBY$]
+		]]>
+	</sql>
+	<sql id="com.liferay.lms.service.persistence.CourseFinder.whereUserStatus">
+		<![CDATA[   			
+			AND u.status = ?
 		]]>
 	</sql>
 	<sql id="com.liferay.lms.service.persistence.CourseFinder.countStudents">
@@ -37,13 +35,13 @@
 			SELECT 
 				COUNT(DISTINCT u.userId) AS COUNT_VALUE
 			FROM 
-				lms_course co 
+				user_ u
 			INNER JOIN 
 				users_groups ug 
-					ON co.groupCreatedId = ug.groupId
-			INNER JOIN 
-				user_ u 
 					ON u.userId = ug.userId
+			INNER JOIN 
+				lms_course co 
+					ON co.groupCreatedId = ug.groupId
 			LEFT JOIN 
 				usergrouprole ur 
 					ON ug.userId = ur.userId AND ur.groupId = ug.groupId AND ur.roleId= ?
@@ -52,8 +50,14 @@
 					ON ug.userId = urE.userId AND urE.groupId = ug.groupId AND urE.roleId = ?
 			[$JOINTEAM$]
 			WHERE 
-				ur.userId IS NULL AND urE.userId IS NULL AND co.courseId = ? AND (u.status = ? OR ? = ?)
-				AND 
+				ur.userId IS NULL AND urE.userId IS NULL AND co.courseId = ?
+				[$WHERESTATUS$]
+				[$WHERESEARCH$]
+		]]>
+	</sql>
+	<sql id="com.liferay.lms.service.persistence.CourseFinder.whereUserSearch">
+		<![CDATA[ 
+			AND 
 				(
 					[$WHEREFIRSTNAME$]
 					[$WHERELASTNAME$]
@@ -68,6 +72,7 @@
 			(u.firstName LIKE ?) [$AND_OR_CONNECTOR$]
 		]]>
 	</sql>
+	
 	<sql id="com.liferay.lms.service.persistence.CourseFinder.whereLastName">
 		<![CDATA[
 			(u.lastName LIKE ?) [$AND_OR_CONNECTOR$]

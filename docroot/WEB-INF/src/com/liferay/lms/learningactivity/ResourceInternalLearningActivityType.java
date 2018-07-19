@@ -1,7 +1,6 @@
 package com.liferay.lms.learningactivity;
 
 import java.io.IOException;
-import java.util.Locale;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
@@ -11,6 +10,7 @@ import javax.portlet.PortletResponse;
 import com.liferay.lms.asset.ResourceInternalAssetRenderer;
 import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.service.ClpSerializer;
+import com.liferay.lms.util.LmsConstant;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.repository.model.FileEntry;
@@ -18,6 +18,7 @@ import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.upload.UploadRequest;
 import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.PrefsPropsUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.xml.Document;
@@ -45,10 +46,11 @@ import com.tls.lms.util.LiferaylmsUtil;
 
 public class ResourceInternalLearningActivityType extends BaseLearningActivityType 
 {
-
+	private static final long serialVersionUID = 4839623540644256683L;
 	public static String PORTLET_ID = 
 			PortalUtil.getJsSafePortletId(
 					"resourceInternalActivity" + PortletConstants.WAR_SEPARATOR + ClpSerializer.getServletContextName());
+	public final static long TYPE_ID = 7;
 	
 	@Override
 	public boolean gradebook() {
@@ -100,71 +102,67 @@ public class ResourceInternalLearningActivityType extends BaseLearningActivityTy
 		String assetId = ParamUtil.getString(uploadRequest,"assetEntryId","0");
 		String team = ParamUtil.getString(uploadRequest, "team","0");
 		long teamId = 0;
+		ThemeDisplay themeDisplay = (ThemeDisplay) uploadRequest.getAttribute(WebKeys.THEME_DISPLAY);
 		if(!team.equalsIgnoreCase("0")){
 			teamId = Long.parseLong(team);
 		}
-		
-		try{
-			PortletRequest actionRequest = (PortletRequest)uploadRequest.getAttribute(JavaConstants.JAVAX_PORTLET_REQUEST);
-			ThemeDisplay themeDisplay = (ThemeDisplay) uploadRequest.getAttribute(WebKeys.THEME_DISPLAY);
-			ServiceContext serviceContext = ServiceContextFactory.getInstance(LearningActivity.class.getName(), actionRequest);
-
-			//Obtengo el assetEntry y compruebo si es un recurso de tipo Documento y Multimedia comprobando
-			//si existe un elemento DLFileEntry con id=assetEntry.getClassPK
-			AssetEntry docAsset= AssetEntryLocalServiceUtil.getAssetEntry(Long.valueOf(assetId));
-			FileEntry docfile=DLAppLocalServiceUtil.getFileEntry(docAsset.getClassPK());
-			if(docfile != null){
-				//Creo un directorio propio de la actividad o lo recupero si ya existe.
-				Folder folder = createFoldersForLearningActivity(themeDisplay.getUserId(), themeDisplay.getScopeGroupId(), learningActivity.getActId(), learningActivity.getTitle(themeDisplay.getLocale()), serviceContext);
-				FileEntry newFile = null;
-				//Recupero el archivo asociado a la actividad si ya existia y lo limpio para crear el nuevo
-				//This block of code should be removed 
-				/*java.util.List<FileEntry> files = DLAppLocalServiceUtil.getFileEntries(themeDisplay.getScopeGroupId(), folder.getFolderId());
-				
-				if(files != null && files.size()>0){
-					int i=0;
-					for(FileEntry file:files){
-						if(i==0)
-							newFile = DLAppLocalServiceUtil.updateFileEntry(themeDisplay.getUserId(), file.getFileEntryId(), docfile.getTitle()+StringPool.PERIOD+docfile.getExtension(), docfile.getMimeType(), docfile.getTitle(), docfile.getDescription(), "", false, docfile.getContentStream(),docfile.getSize(), serviceContext);
-						else DLAppLocalServiceUtil.deleteFileEntry(file.getFileEntryId());
-					}
-				}else*/
-
-				boolean created = false;	
-				int counter = 0;
-				while(!created){
-					try{
-						if(counter==0){
-							newFile = DLAppLocalServiceUtil.addFileEntry(themeDisplay.getUserId(), themeDisplay.getScopeGroupId(), folder.getFolderId(), docfile.getTitle()+StringPool.PERIOD+docfile.getExtension(), docfile.getMimeType(), docfile.getTitle(), docfile.getDescription(), "", docfile.getContentStream(), docfile.getSize(), serviceContext);
-						}else{
-							newFile = DLAppLocalServiceUtil.addFileEntry(themeDisplay.getUserId(), themeDisplay.getScopeGroupId(), folder.getFolderId(), docfile.getTitle()+counter+StringPool.PERIOD+docfile.getExtension(), docfile.getMimeType(), docfile.getTitle()+counter, docfile.getDescription(), "", docfile.getContentStream(), docfile.getSize(), serviceContext);
-						}
-						created = true;
-					}catch (DuplicateFileException e){
-						counter++;
-					}
-				}
-								
-				//Recupero el asset asociado al nuevo archivo local del curso.
-				AssetEntry newAsset = AssetEntryLocalServiceUtil.getEntry(docAsset.getClassName(), newFile.getFileEntryId());
-				//Actualizo el extraContentTmp para que apunte al recurso local y no al global
-				assetId = Long.toString(newAsset.getEntryId());
-
-				//Actualizo los permisos del recurso.
-				Role siteMemberRole = RoleLocalServiceUtil.getRole(themeDisplay.getCompanyId(), RoleConstants.SITE_MEMBER);
-				String[] actIds = {ActionKeys.VIEW};
-				try {
-					LiferaylmsUtil.setPermission(themeDisplay, DLFolder.class.getName(), siteMemberRole, actIds, folder.getFolderId());
-					LiferaylmsUtil.setPermission(themeDisplay, DLFileEntry.class.getName(), siteMemberRole, actIds, newFile.getFileEntryId());
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-
-				ImageProcessorUtil.generateImages(newFile.getLatestFileVersion());
-			}
-		}catch(Exception e){
+		boolean linkResources = false;
+		try {
+			linkResources = PrefsPropsUtil.getBoolean(themeDisplay.getCompanyId(), LmsConstant.RESOURCE_INTERNAL_DOCUMENT_LINKED);
+		} catch (SystemException e) {
 			e.printStackTrace();
+		}	
+		
+		if(!linkResources){
+			try{
+				PortletRequest actionRequest = (PortletRequest)uploadRequest.getAttribute(JavaConstants.JAVAX_PORTLET_REQUEST);
+				ServiceContext serviceContext = ServiceContextFactory.getInstance(LearningActivity.class.getName(), actionRequest);
+
+				//Obtengo el assetEntry y compruebo si es un recurso de tipo Documento y Multimedia comprobando
+				//si existe un elemento DLFileEntry con id=assetEntry.getClassPK
+				AssetEntry docAsset= AssetEntryLocalServiceUtil.getAssetEntry(Long.valueOf(assetId));
+				FileEntry docfile=DLAppLocalServiceUtil.getFileEntry(docAsset.getClassPK());
+				if(docfile != null){
+					//Creo un directorio propio de la actividad o lo recupero si ya existe.
+					Folder folder = createFoldersForLearningActivity(themeDisplay.getUserId(), themeDisplay.getScopeGroupId(), learningActivity.getActId(), learningActivity.getTitle(themeDisplay.getLocale()), serviceContext);
+					FileEntry newFile = null;
+					boolean created = false;	
+					int counter = 0;
+					while(!created){
+						try{
+							if(counter==0){
+								newFile = DLAppLocalServiceUtil.addFileEntry(themeDisplay.getUserId(), themeDisplay.getScopeGroupId(), folder.getFolderId(), docfile.getTitle()+StringPool.PERIOD+docfile.getExtension(), docfile.getMimeType(), docfile.getTitle(), docfile.getDescription(), "", docfile.getContentStream(), docfile.getSize(), serviceContext);
+							}else{
+								newFile = DLAppLocalServiceUtil.addFileEntry(themeDisplay.getUserId(), themeDisplay.getScopeGroupId(), folder.getFolderId(), docfile.getTitle()+counter+StringPool.PERIOD+docfile.getExtension(), docfile.getMimeType(), docfile.getTitle()+counter, docfile.getDescription(), "", docfile.getContentStream(), docfile.getSize(), serviceContext);
+							}
+							created = true;
+						}catch (DuplicateFileException e){
+							counter++;
+						}
+					}
+									
+					//Recupero el asset asociado al nuevo archivo local del curso.
+					AssetEntry newAsset = AssetEntryLocalServiceUtil.getEntry(docAsset.getClassName(), newFile.getFileEntryId());
+					//Actualizo el extraContentTmp para que apunte al recurso local y no al global
+					assetId = Long.toString(newAsset.getEntryId());
+
+					//Actualizo los permisos del recurso.
+					Role siteMemberRole = RoleLocalServiceUtil.getRole(themeDisplay.getCompanyId(), RoleConstants.SITE_MEMBER);
+					String[] actIds = {ActionKeys.VIEW};
+					try {
+						LiferaylmsUtil.setPermission(themeDisplay, DLFolder.class.getName(), siteMemberRole, actIds, folder.getFolderId());
+						LiferaylmsUtil.setPermission(themeDisplay, DLFileEntry.class.getName(), siteMemberRole, actIds, newFile.getFileEntryId());
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+
+					ImageProcessorUtil.generateImages(newFile.getLatestFileVersion());
+				}
+			}catch(Exception e){
+				e.printStackTrace();
+			}
 		}
+		
 		
 		Document document = null;
 		Element rootElement = null;

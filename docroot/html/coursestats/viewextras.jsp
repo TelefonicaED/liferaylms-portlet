@@ -112,7 +112,7 @@ AUI().ready('aui-aria', 'aui-overlay-context-panel', 'aui-overlay-manager', func
 
 
 
-	<img id="<portlet:namespace/>trigger_<%= Long.toString(learningActivity.getActId()) %>" src="${themeDisplay.pathThemeImages}/custom/icono_mas.png"/>
+	<img id="<portlet:namespace/>trigger_<%= Long.toString(learningActivity.getActId()) %>" src="${themeDisplay.pathThemeImages}/custom/icono_mas.png" alt=""/>
 <div id="<portlet:namespace/>panel_<%= Long.toString(learningActivity.getActId()) %>" class="lfr-panel-container"></div>
 
 <%  }

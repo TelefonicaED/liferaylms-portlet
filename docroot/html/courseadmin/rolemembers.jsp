@@ -64,7 +64,7 @@ AUI().use(function(A)
  		delta="10" deltaConfigurable="true">
 
 
-		<liferay-ui:search-form page="/html/shared/usersSearchform.jsp"
+		<liferay-ui:search-form page="/html/search/usersSearchform.jsp"
 			searchContainer="${searchContainer}"
 			servletContext="<%= this.getServletConfig().getServletContext() %>" />
 

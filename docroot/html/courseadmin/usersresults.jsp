@@ -1,3 +1,5 @@
+<%@page import="org.apache.commons.lang.StringEscapeUtils"%>
+<%@page import="com.liferay.lms.util.searchcontainer.UserSearchContainer"%>
 <%@page import="java.util.LinkedList"%>
 <%@page import="java.util.Iterator"%>
 <%@page import="com.liferay.portlet.PortletPreferencesFactoryUtil"%>
@@ -21,58 +23,6 @@
 <%@page import="com.liferay.portal.kernel.util.ListUtil" %>
 <%@page import="com.liferay.portal.kernel.util.HttpUtil" %>
 <%@page import="com.liferay.portal.kernel.dao.orm.QueryUtil" %>
-
-<%
-PortletPreferences preferences = null;
-String portletResource = ParamUtil.getString(request, "portletResource");
-
-if (Validator.isNotNull(portletResource)) {
-preferences = PortletPreferencesFactoryUtil.getPortletSetup(request, portletResource);
-}else{
-preferences = renderRequest.getPreferences();
-}
-long courseId=ParamUtil.getLong(request, "courseId",0);
-long roleId=ParamUtil.getLong(request, "roleId",0);
-Role role=RoleLocalServiceUtil.fetchRole(roleId);
-
-Course course=CourseLocalServiceUtil.getCourse(courseId);
-boolean backToEdit = ParamUtil.getBoolean(request, "backToEdit");
-String redirectOfEdit = ParamUtil.getString(request, "redirectOfEdit");
-String firstName = ParamUtil.getString(request,"firstName");
-String lastName = ParamUtil.getString(request,"lastName");
-String screenName = ParamUtil.getString(request,"screenName");	
-String emailAddress = ParamUtil.getString(request,"emailAddress");
-boolean andSearch = ParamUtil.getBoolean(request,"andSearch",true);
-
-LmsPrefs prefs=LmsPrefsLocalServiceUtil.getLmsPrefs(themeDisplay.getCompanyId());
-Role commmanager=RoleLocalServiceUtil.getRole(themeDisplay.getCompanyId(), RoleConstants.SITE_MEMBER) ;
-String teacherName=RoleLocalServiceUtil.getRole(prefs.getTeacherRole()).getTitle(locale);
-String editorName=RoleLocalServiceUtil.getRole(prefs.getEditorRole()).getTitle(locale);
-String tab="";
-if(roleId==commmanager.getRoleId()){
-	tab =  LanguageUtil.get(pageContext,"courseadmin.adminactions.students");
-}else if(roleId==prefs.getEditorRole()){
-	tab = editorName;
-}else{
-	tab = teacherName;
-}
-
-PortletURL portletURL = renderResponse.createRenderURL();
-portletURL.setParameter("view","users-results");
-//portletURL.setParameter("paginator","true");	
-portletURL.setParameter("firstName", firstName); 
-portletURL.setParameter("lastName", lastName);
-portletURL.setParameter("screenName", screenName);
-portletURL.setParameter("emailAddress", emailAddress);
-portletURL.setParameter("andSearch",Boolean.toString(andSearch));
-portletURL.setParameter("courseId",Long.toString(courseId));
-portletURL.setParameter("roleId",Long.toString(roleId));
-portletURL.setParameter("backToEdit",Boolean.toString(backToEdit));
-if(backToEdit) {
-	portletURL.setParameter("backToEdit",redirectOfEdit);
-}
-
-%>
 
 
 <script type="text/javascript">
@@ -98,6 +48,7 @@ if(backToEdit) {
 	
 	}, '' ,{requires:['model-list']});
 	
+	
 	function <portlet:namespace />addUser(userId, userName, todos){
 		AUI().use('node-base','<portlet:namespace />user-model', function(A) {
 			var existingUser=window.<portlet:namespace />selectedUsers.getById(userId);
@@ -111,7 +62,6 @@ if(backToEdit) {
 			var selectedUsers = '';
 			window.<portlet:namespace />selectedUsers.each(function(value){selectedUsers+=value.get('name'); });
 			if(todos) {
-				/* A.one('#<portlet:namespace />selected_users').setContent("TODOS"); */
 				A.one('#<portlet:namespace />selected_users').setContent('<li class="yui3-widget aui-component aui-textboxlistentry aui-textboxlistentry-focused" tabindex="0"><span class="aui-textboxlistentry-content"><span class="aui-textboxlistentry-text">&nbsp;&nbsp;&nbsp;&nbsp;Todos</span></span></li>');
 			} else {
 				A.one('#<portlet:namespace />selected_users').setContent(selectedUsers);
@@ -138,6 +88,7 @@ if(backToEdit) {
 			}
 		});			
 	}
+	
 	
 	function <portlet:namespace />deleteUser(userId,todos){
 		AUI().use('node-base','<portlet:namespace />user-model', function(A) {
@@ -216,200 +167,91 @@ if(backToEdit) {
 
 <liferay-portlet:renderURL var="backURL" >
 	<portlet:param name="view" value="role-members-tab" />
-	<portlet:param name="courseId" value="<%=Long.toString(courseId) %>" />
-	<portlet:param name="roleId" value="<%=Long.toString(roleId) %>" />
-	<portlet:param name="tabs1" value="<%=tab %>" />
-	<portlet:param name="backToEdit" value="<%=Boolean.toString(backToEdit) %>" />
-	<c:if test="<%=backToEdit %>">
-		<portlet:param name="redirectOfEdit" value='<%=redirectOfEdit %>'/>
+	<portlet:param name="courseId" value="${course.courseId}" />
+	<portlet:param name="roleId" value="${roleId }" />
+	<portlet:param name="tabs1" value="${tab}" />
+	<portlet:param name="backToEdit" value="${backToEdit}" />
+	<c:if test="${backToEdit}">
+		<portlet:param name="redirectOfEdit" value="${redirectOfEdit}"/>
 	</c:if>
 </liferay-portlet:renderURL>
-<liferay-ui:header title="<%=course.getTitle(themeDisplay.getLocale()) %>" backURL="<%=backURL %>"></liferay-ui:header>
-<% 
-	if(role!=null){
-%>
 
-<h2><%=role.getTitle(themeDisplay.getLocale()) %></h2>
 
-<% 
-	}
-%>
-<jsp:include page="/html/courseadmin/search_form.jsp" />
+<liferay-ui:header title="${course.getTitle(themeDisplay.getLocale())}" backURL="${backURL }"></liferay-ui:header>
 
-<div id="<portlet:namespace />student_search">
+<c:if test="${not empty role}">
+	<h2>${role.getTitle(themeDisplay.getLocale())}</h2>
+</c:if>
 
-	<liferay-ui:search-container iteratorURL="<%=portletURL%>" emptyResultsMessage="there-are-no-results" delta="10" deltaConfigurable="true"  >
+<liferay-portlet:renderURL var="searchURL" >
+	<portlet:param name="view" value="users-results" />
+	<portlet:param name="courseId" value="${course.courseId}" />
+	<portlet:param name="roleId" value="${roleId }" />
+	<portlet:param name="tabs1" value="${tab}" />
+	<portlet:param name="backToEdit" value="${backToEdit}" />
+	<c:if test="${backToEdit}">
+		<portlet:param name="redirectOfEdit" value="${redirectOfEdit}"/>
+	</c:if>
+</liferay-portlet:renderURL>
+
+<liferay-portlet:actionURL name="addAllUsers" var="addAllUsersURL">
+			<liferay-portlet:param name="view" value="role-members-tab"/>
+			<liferay-portlet:param name="courseId" value="${course.courseId }"/>
+			<liferay-portlet:param name="roleId" value="${roleId }"/>
+			<liferay-portlet:param name="tabs1" value="${tab}"/>
+			<liferay-portlet:param name="backToEdit" value="${backToEdit}" />
+			<c:if test="${backToEdit}">
+				<liferay-portlet:param name="redirectOfEdit" value='${redirectOfEdit}'/>
+			</c:if>
+</liferay-portlet:actionURL>
+
+
+
+<aui:form name="fm" action="${searchURL }" method="POST">
+	<liferay-ui:search-container searchContainer="${searchContainer}" id="usersSearchContainerSearchContainer"
+		iteratorURL="${searchContainer.iteratorURL}" emptyResultsMessage="there-are-no-users"
+ 		delta="10" deltaConfigurable="true">
 	
-	   	<liferay-ui:search-container-results>
-	   	
-	   	
-	<%
-		String middleName = null;
 	
-		if (Validator.isNull(firstName)) {
-			firstName = null;
-		}
-		else {
-			firstName = addWildcards(firstName);
-		}
-		
-		if (Validator.isNull(lastName)) {
-			lastName = null;
-		}
-		else {
-			lastName = addWildcards(lastName);
-		}
-		
-		if (Validator.isNull(screenName)) {
-			screenName = null;
-		}
-		else {
-			screenName = addWildcards(screenName);
-		}
-		
-		if (Validator.isNull(emailAddress)) {
-			emailAddress = null;
-		}
-		else {
-			emailAddress = addWildcards(emailAddress);
-		}
-		
-	LinkedHashMap<String,Object> params=new LinkedHashMap<String,Object>();			
-		
-	OrderByComparator obc = new UserFirstNameComparator(true);
 	
-	if (!tab.equals(LanguageUtil.get(pageContext, "courseadmin.adminactions.students"))) {
-            params.put("notInCourseRoleStu", new CustomSQLParam("WHERE User_.userId NOT IN "
-              + " (SELECT UserGroupRole.userId " + "  FROM UserGroupRole "
-              + "  WHERE  (UserGroupRole.groupId = ?) AND (UserGroupRole.roleId = ?))", new Long[] {
-              course.getGroupCreatedId(), commmanager.getRoleId() }));
-           }
-	
-	if(tab.equals(LanguageUtil.get(pageContext, "courseadmin.adminactions.students"))) {
-		 params.put("notInCourseRoleTeach", new CustomSQLParam("WHERE User_.userId NOT IN "
-	              + " (SELECT UserGroupRole.userId " + "  FROM UserGroupRole "
-	              + "  WHERE  (UserGroupRole.groupId = ?) AND (UserGroupRole.roleId = ?))", new Long[] {
-	              course.getGroupCreatedId(),
-	              RoleLocalServiceUtil.getRole(prefs.getTeacherRole()).getRoleId() }));
-		 
-		 params.put("notInCourseRoleEdit", new CustomSQLParam("WHERE User_.userId NOT IN "
-	              + " (SELECT UserGroupRole.userId " + "  FROM UserGroupRole "
-	              + "  WHERE  (UserGroupRole.groupId = ?) AND (UserGroupRole.roleId = ?))", new Long[] {
-	              course.getGroupCreatedId(),
-	              RoleLocalServiceUtil.getRole(prefs.getEditorRole()).getRoleId() }));
-		 
-		 
-	}
-		
-	params.put("notInCourseRole",new CustomSQLParam("WHERE User_.userId NOT IN "+
-		                                                " (SELECT UserGroupRole.userId "+
-		                                                "  FROM UserGroupRole "+
-		                                                "  WHERE  (UserGroupRole.groupId = ?) AND (UserGroupRole.roleId = ?))",new Long[]{course.getGroupCreatedId(),roleId}));
+		<liferay-ui:search-form page="/html/search/usersSearchform.jsp"
+			searchContainer="${searchContainer}"
+			servletContext="<%= this.getServletConfig().getServletContext() %>" />
 
-		boolean showOnlyOrganizationUsers = preferences.getValue("showOnlyOrganizationUsers", "false").equals("true");
-		List <User> userListPage = new LinkedList<User>();
-		
-		if (showOnlyOrganizationUsers) {
-			if (organization != null) {
-				params.put("usersOrgs", organization.getOrganizationId());
-			} else {
-				
-				long[] organizationsOfUserList = themeDisplay.getUser().getOrganizationIds();
-				String organizationIds = "";
-				for(long organizationId: organizationsOfUserList){
-					organizationIds += organizationId + ",";
-				}
-				if(organizationIds.length() > 0) organizationIds = organizationIds.substring(0, organizationIds.length()-1);
-				if(organizationIds.length() == 0)
-					organizationIds = "-1";
-					
-				params.put("multipleOrgs",new CustomSQLParam("WHERE User_.userId IN (SELECT users_orgs.userId FROM users_orgs WHERE users_orgs.organizationId IN (?)) ",organizationIds));
-			}
-
-		}
-		userListPage = UserLocalServiceUtil.search(themeDisplay.getCompanyId(), firstName, middleName, lastName, screenName, emailAddress, 0, params, andSearch, searchContainer.getStart(), searchContainer.getEnd(), obc);
-		int userCount =  UserLocalServiceUtil.searchCount(themeDisplay.getCompanyId(), firstName, middleName, lastName, screenName, emailAddress, 0, params, andSearch);
-		
-		pageContext.setAttribute("results", userListPage);
-	    pageContext.setAttribute("total", userCount);
-
-	%>
-		<input type="hidden" id="allSelected" value="false" />
-		</liferay-ui:search-container-results>
-		
 		<div class="container-buttons">
 			<aui:button name="buttonAddAll" value="courseadmin.add-all-users" onClick="${renderResponse.getNamespace()}addAllUsers();"/>
 		</div> 
-		<script type="text/javascript">
-			AUI().ready(
-			  'aui-tooltip',
-			  function(A) {
-			    new A.Tooltip(
-			      {
-			        bodyContent: Liferay.Language.get("courseadmin.tooltip.add-all-users"),
-			        trigger: '#<portlet:namespace />buttonAddAll'
-			      }
-			    ).render();
-			  }
-			);
+
+		<liferay-ui:search-container-results total="${searchContainer.total }"
+			results="${searchContainer.results }" >
+			<input type="hidden" id="allSelected" value="false" />
+		</liferay-ui:search-container-results>
 			
-			function <portlet:namespace />addAllUsers(){
-				document.<portlet:namespace />addAllUserFm.<portlet:namespace />firstName.value = document.<portlet:namespace />busqusu.<portlet:namespace />firstName.value;
-				document.<portlet:namespace />addAllUserFm.<portlet:namespace />lastName.value = document.<portlet:namespace />busqusu.<portlet:namespace />lastName.value;
-				document.<portlet:namespace />addAllUserFm.<portlet:namespace />screenName.value = document.<portlet:namespace />busqusu.<portlet:namespace />screenName.value;
-				document.<portlet:namespace />addAllUserFm.<portlet:namespace />emailAddress.value = document.<portlet:namespace />busqusu.<portlet:namespace />emailAddress.value;
-				document.<portlet:namespace />addAllUserFm.<portlet:namespace />andSearch.value = document.<portlet:namespace />busqusu.<portlet:namespace />andSearch.value;
-				document.<portlet:namespace />addAllUserFm.submit();
-			}
-		</script>
-		
-		<liferay-portlet:actionURL name="addAllUsers" var="addAllUsersURL">
-			<liferay-portlet:param name="view" value="role-members-tab"/>
-			<liferay-portlet:param name="courseId" value="<%=Long.toString(courseId) %>"/>
-			<liferay-portlet:param name="roleId" value="<%=Long.toString(roleId) %>"/>
-			<liferay-portlet:param name="tabs1" value="<%=tab %>"/>
-			<liferay-portlet:param name="backToEdit" value="<%=Boolean.toString(backToEdit) %>" />
-			<c:if test="<%=backToEdit %>">
-				<liferay-portlet:param name="redirectOfEdit" value='<%=redirectOfEdit %>'/>
-			</c:if>
-		</liferay-portlet:actionURL>
-		
-		<aui:form action="${addAllUsersURL}" name="addAllUserFm" method="POST">
-			<aui:input type="hidden" name="firstName" value="" />
-			<aui:input type="hidden" name="lastName" value="" />
-			<aui:input type="hidden" name="screenName" value="" />
-			<aui:input type="hidden" name="emailAddress" value="" />
-			<aui:input type="hidden" name="andSearch" value="" />
-		</aui:form>
-		
-		<liferay-ui:search-container-row className="com.liferay.portal.model.User"
-	     		keyProperty="userId"
-	     		modelVar="user">
-	     		
-			<liferay-ui:search-container-column-text name="user">
-				<liferay-ui:user-display userId="<%=user.getUserId() %>"></liferay-ui:user-display>
-			</liferay-ui:search-container-column-text> 
 			
-			<liferay-ui:search-container-column-text
-				name="screen-name"
-				property="screenName">
-			</liferay-ui:search-container-column-text>
-			
-			<liferay-ui:search-container-column-text
-				name="email-address"
-				property="emailAddress"
-			/>
-			<liferay-ui:search-container-column-text>
-				<a id="<portlet:namespace />addUser_<%=user.getUserId() %>" onClick="<portlet:namespace />addUser(<%=user.getUserId() %>, '<%=user.getFullName() %>', false)" style="Cursor:pointer;" >
+		<liferay-ui:search-container-row className="com.liferay.portal.model.User" 	keyProperty="userId" 	modelVar="userToAdd">
+		<liferay-ui:search-container-column-text>
+			<liferay-ui:user-display userId="${userToAdd.userId}"></liferay-ui:user-display>
+		</liferay-ui:search-container-column-text>
+		<liferay-ui:search-container-column-text name="screen-name"	property="screenName">
+		</liferay-ui:search-container-column-text>
+		
+		<liferay-ui:search-container-column-text
+			name="email-address"	property="emailAddress"	/>
+		
+		<liferay-ui:search-container-column-text>
+				<a id="<portlet:namespace />addUser_${userToAdd.getUserId()}" onClick="<portlet:namespace />addUser(<%=userToAdd.getUserId() %>, '<%=StringEscapeUtils.escapeJavaScript(userToAdd.getFullName()) %>', false)" style="Cursor:pointer;" >
 				<liferay-ui:message key="select" /></a>
-				<a id="<portlet:namespace />deleteUser_<%=user.getUserId() %>" class="aui-helper-hidden" onClick="<portlet:namespace />deleteUser(<%=user.getUserId() %>, false)" style="Cursor:pointer;" >
+				<a id="<portlet:namespace />deleteUser_${userToAdd.getUserId()}" class="aui-helper-hidden" onClick="<portlet:namespace />deleteUser(<%=userToAdd.getUserId() %>, false)" style="Cursor:pointer;" >
 				<liferay-ui:message key="unselect" /></a>	
-			</liferay-ui:search-container-column-text>
+		</liferay-ui:search-container-column-text>
 			
-		</liferay-ui:search-container-row>
-	 	<liferay-ui:search-iterator />	 	
-	 	<script type="text/javascript">
+	</liferay-ui:search-container-row>
+	<liferay-ui:search-iterator />
+	
+	<script type="text/javascript">
 			<!--
+			
+			
 				function <portlet:namespace />ajaxMode<%= searchContainer.getId(request, renderResponse.getNamespace()) %>SearchContainer(A) {
 					
 					
@@ -480,17 +322,61 @@ if(backToEdit) {
 				AUI().ready('aui-io-request','querystring-parse','aui-parse-content',<portlet:namespace />ajaxMode<%= searchContainer.getId(request, renderResponse.getNamespace()) %>SearchContainer);
 			//-->
 			</script>
+	
+	
+	
+	
 	</liferay-ui:search-container>
+</aui:form>
+
+
+<aui:form name="addAllUserFm" action="${addAllUsersURL }" method="POST">
+	<aui:input name="addAllUsersScreenName" value="" type="hidden"/>
+	<aui:input name="addAllUsersFirstName" value="" type="hidden"/>
+	<aui:input name="addAllUsersLastName" value="" type="hidden"/>
+	<aui:input name="addAllUsersEmailAddress" value="" type="hidden"/>
+	<aui:input name="addAllUsersAdvancedSearch" value="" type="hidden"/>
+	<aui:input name="addAllUsersAndSearch" value="" type="hidden"/>
+	<aui:input name="addAllUsersKeywords" value="" type="hidden"/>
+	<aui:input name="addAllUsersTeam" value="" type="hidden"/>
+</aui:form>
+
+
+		<script type="text/javascript">
+			AUI().ready(
+			  'aui-tooltip',
+			  function(A) {
+			    new A.Tooltip(
+			      {
+			        bodyContent: Liferay.Language.get("courseadmin.tooltip.add-all-users"),
+			        trigger: '#<portlet:namespace />buttonAddAll'
+			      }
+			    ).render();
+			  }
+			);
+			
+			function <portlet:namespace />addAllUsers(){
+				$('#<portlet:namespace />addAllUsersFirstName').val($('#<portlet:namespace />firstName').val());
+				$('#<portlet:namespace />addAllUsersLastName').val($('#<portlet:namespace />lastName').val());
+				$('#<portlet:namespace />addAllUsersScreenName').val($('#<portlet:namespace />screenName').val());
+				$('#<portlet:namespace />addAllUsersEmailAddress').val($('#<portlet:namespace />emailAddress').val());
+				$('#<portlet:namespace />addAllUsersAndSearch').val($('#<portlet:namespace />andOperator').val());
+				$('#<portlet:namespace />addAllUsersTeam').val($('#<portlet:namespace />team').val());
+				$('#<portlet:namespace />addAllUsersKeywords').val(document.getElementsByName("<portlet:namespace />keywords")[0].value);
+				$('#<portlet:namespace />addAllUsersAdvancedSearch').val(document.getElementsByName("<portlet:namespace />advancedSearch")[0].value);
+				document.<portlet:namespace />addAllUserFm.submit();
+			}
+		</script>
 	
 	<liferay-portlet:actionURL name="addUserRole" var="addUserRoleURL">
 		<liferay-portlet:param name="view" value="role-members-tab"/>
-		<liferay-portlet:param name="courseId" value="<%=Long.toString(courseId) %>"/>
+		<liferay-portlet:param name="courseId" value="${course.courseId}"/>
 		<liferay-portlet:param name="userId" value="<%=Long.toString(user.getUserId()) %>"/>
-		<liferay-portlet:param name="roleId" value="<%=Long.toString(roleId) %>"/>
-		<liferay-portlet:param name="tabs1" value="<%=tab %>"/>
-		<liferay-portlet:param name="backToEdit" value="<%=Boolean.toString(backToEdit) %>" />
-		<c:if test="<%=backToEdit %>">
-			<liferay-portlet:param name="redirectOfEdit" value='<%=redirectOfEdit %>'/>
+		<liferay-portlet:param name="roleId" value="${roleId }"/>
+		<liferay-portlet:param name="tabs1" value="${tab }"/>
+		<liferay-portlet:param name="backToEdit" value="${backToEdit }" />
+		<c:if test="${backToEdit }">
+			<liferay-portlet:param name="redirectOfEdit" value='${redirectOfEdit }'/>
 		</c:if>
 	</liferay-portlet:actionURL>
 	
@@ -507,13 +393,3 @@ if(backToEdit) {
 		</aui:form>
 	</div>
 </div>
-<%!
-	public static String addWildcards(String value)
-	{
-		if (value == null) return null;
-		if (value.length() == 1) return "%" + value + "%";
-		if (value.charAt(0) != '%') value = "%" + value;
-		if (value.charAt(value.length() - 1) != '%') value = value + "%";
-		return value;
-	}
-%>

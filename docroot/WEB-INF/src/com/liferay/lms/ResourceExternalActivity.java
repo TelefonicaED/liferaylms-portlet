@@ -1,4 +1,3 @@
-
 package com.liferay.lms;
 
 import java.io.IOException;
@@ -97,65 +96,7 @@ public class ResourceExternalActivity extends QuestionsAdmin {
 		actionResponse.setRenderParameter("resId", Long.toString(actId));
 	}
 
-	public void addfiles(ActionRequest actionRequest, ActionResponse actionResponse)
-			throws Exception {
-
-		ThemeDisplay themeDisplay = (ThemeDisplay) actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
-		UploadPortletRequest request = PortalUtil.getUploadPortletRequest(actionRequest);
-
-		String jspPage = ParamUtil.getString(actionRequest, "jspPage");
-		long actId = ParamUtil.getLong(actionRequest, "resId", 0);
-		String description = request.getParameter("description");
-		String youtubecode=ParamUtil.getString(request,"youtubecode","");
-		boolean videoControlEnabled=ParamUtil.getBoolean(request,"videoControl");
-		LearningActivity larn = LearningActivityServiceUtil.getLearningActivity(actId);
-		String extraContent=larn.getExtracontent();
-		Document document = SAXReaderUtil.createDocument();
-		Element rootElement = document.addElement("multimediaentry");
-		if(extraContent!=null &&!"".equals(extraContent)&&!Validator.isNumber(extraContent))
-		{
-			document=SAXReaderUtil.read(extraContent);
-			rootElement =document.getRootElement();
-		}
-
-		if(!"".equals(youtubecode))
-		{
-			Element video=rootElement.element("video");
-			if(video!=null)
-			{
-				video.detach();
-				rootElement.remove(video);
-			}
-			video = SAXReaderUtil.createElement("video");
-			video.setText(youtubecode);		
-			rootElement.add(video);
-		}
-		
-		Element videoControl=rootElement.element("video-control");
-		if(videoControl!=null)
-		{
-			videoControl.detach();
-			rootElement.remove(videoControl);
-		}
-		
-		videoControl = SAXReaderUtil.createElement("video-control");
-		videoControl.setText(String.valueOf(videoControlEnabled));		
-		rootElement.add(videoControl);
-		
-		larn.setExtracontent(document.formattedString());
-		larn.setDescription( description,themeDisplay.getLocale());
-		//LearningActivityServiceUtil.modLearningActivity(larn, serviceContext);
-
-		LearningActivityServiceUtil.modLearningActivity(larn);
-		//auditing
-		AuditingLogFactory.audit(larn.getCompanyId(), larn.getGroupId(), LearningActivity.class.getName(), larn.getPrimaryKey(), themeDisplay.getUserId(), AuditConstants.UPDATE, null);
-		
-		SessionMessages.add(actionRequest, "activity-saved-successfully");
-		actionResponse.setRenderParameter("jspPage", jspPage);
-		actionResponse.setRenderParameter("actionEditingDetails", "true");	
-		actionResponse.setRenderParameter("resId", Long.toString(actId));
-	}
-
+	
 	@Override
 	public void render(RenderRequest renderRequest, RenderResponse renderResponse)
 			throws PortletException, IOException {
@@ -274,6 +215,7 @@ public class ResourceExternalActivity extends QuestionsAdmin {
 									renderRequest.setAttribute("currentTime", seekTo);
 									
 									String videoCode= video.getText();
+									log.debug("videoCode: " + videoCode);
 									
 									if(videoCode.indexOf("src=") > 0){
 										try{
@@ -287,11 +229,15 @@ public class ResourceExternalActivity extends QuestionsAdmin {
 										}
 									}
 									
+									log.debug("videoCode: " + videoCode);
+									if(isVimeoIframe && videoCode.indexOf("?") >= 0){
+										videoCode = videoCode.substring(0, videoCode.indexOf("?"));
+									}
 									if(isVimeoIframe){
 										
-										String parametros = "?api=1&amp;player_id=player_1";
+										String parametros = "";
 										if(videoControlDisabled && !userPassed){
-											parametros += "&background=1&loop=0&mute=0";
+											parametros += "?background=1&loop=0&mute=0";
 										}
 										videoCode += parametros;
 										log.debug("videoCode: " + videoCode);

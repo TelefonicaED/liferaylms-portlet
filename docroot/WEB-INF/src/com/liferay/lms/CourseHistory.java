@@ -57,12 +57,13 @@ public class CourseHistory extends MVCPortlet
 			CourseResult courseResult = null;
 			Date finishDate=null;
 			Date lastModuleDate=null;
+			Date now = new Date();
 			
 			for(Group groupCourse:groups){
 				
 				course = CourseLocalServiceUtil.fetchByGroupCreatedId(groupCourse.getGroupId());
 				
-				if(course!=null && course.isClosed()){
+				if(course!=null && (course.isClosed() || now.after(course.getExecutionEndDate()))){
 					courseResult=CourseResultLocalServiceUtil.getByUserAndCourse(course.getCourseId(), themeDisplay.getUserId());
 					courses.add(new CourseResultView(course, courseResult, themeDisplay));
 				} else if (course!= null){
