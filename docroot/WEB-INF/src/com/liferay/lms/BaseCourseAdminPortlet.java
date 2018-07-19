@@ -162,11 +162,15 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 		String tabs1 = ParamUtil.getString(renderRequest, "tabs1", students);
 		
 		long courseId=ParamUtil.getLong(renderRequest, "courseId",0);
-		UserSearchContainer searchContainer = new UserSearchContainer(renderRequest, renderResponse.createRenderURL());	
 		
-		UserDisplayTerms displayTerms = (UserDisplayTerms) searchContainer.getDisplayTerms();
-		String redirectOfEdit = ParamUtil.getString(renderRequest, "redirectOfEdit");
-		try{		
+		try {
+			Course course = CourseLocalServiceUtil.getCourse(courseId);
+
+			UserDisplayTerms displayTerms = new UserDisplayTerms(renderRequest, course.getGroupCreatedId());
+			UserSearchContainer searchContainer = new UserSearchContainer(renderRequest, renderResponse.createRenderURL(), displayTerms);	
+			
+			String redirectOfEdit = ParamUtil.getString(renderRequest, "redirectOfEdit");
+			
 			List<User> users = null; 
 			int total = 0;		
 			
@@ -176,7 +180,7 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 			String tab=StringPool.BLANK;
 			
 			Role commmanager=RoleLocalServiceUtil.getRole(themeDisplay.getCompanyId(), RoleConstants.SITE_MEMBER);
-			Course course=CourseLocalServiceUtil.getCourse(courseId);
+			
 			
 			if(roleId!=0){
 				if(roleId==commmanager.getRoleId()){

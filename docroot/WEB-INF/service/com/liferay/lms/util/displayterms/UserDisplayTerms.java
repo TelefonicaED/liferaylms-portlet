@@ -10,6 +10,7 @@ import com.liferay.portal.kernel.dao.search.DisplayTerms;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -55,11 +56,18 @@ public class UserDisplayTerms extends DisplayTerms{
 	
 	private static Log log = LogFactoryUtil.getLog(UserDisplayTerms.class);
 	
-	public UserDisplayTerms(PortletRequest portletRequest) {
+	public UserDisplayTerms(PortletRequest portletRequest) {		
+		this(portletRequest, -1);
+	}
+	
+	public UserDisplayTerms(PortletRequest portletRequest, long groupId) {
 		super(portletRequest);
 		
 		ThemeDisplay themeDisplay = (ThemeDisplay) portletRequest.getAttribute(WebKeys.THEME_DISPLAY);
 		this.companyId = themeDisplay.getCompanyId();
+		if(groupId == -1){
+			groupId = themeDisplay.getScopeGroupId();
+		}
 
 		status = ParamUtil.getInteger(portletRequest, STATUS, WorkflowConstants.STATUS_APPROVED);
 
@@ -71,7 +79,7 @@ public class UserDisplayTerms extends DisplayTerms{
 		teamId = ParamUtil.getLong(portletRequest, TEAM);
 		
 		try {
-			userTeams = TeamLocalServiceUtil.getUserTeams(themeDisplay.getUserId(), themeDisplay.getScopeGroupId());
+			userTeams = TeamLocalServiceUtil.getUserTeams(themeDisplay.getUserId(), groupId);
 		} catch (SystemException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -93,7 +101,7 @@ public class UserDisplayTerms extends DisplayTerms{
 		if(userTeams == null || userTeams.size()==0){
 			hasNullTeam=true;
 			try {
-				userTeams=TeamLocalServiceUtil.getGroupTeams(themeDisplay.getScopeGroupId());
+				userTeams=TeamLocalServiceUtil.getGroupTeams(groupId);
 			} catch (SystemException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
