@@ -35,9 +35,9 @@ else
 <aui:form name="fm" action="<%=importQuestionsURL%>"  method="post" enctype="multipart/form-data">
 	<aui:fieldset>
 		<aui:field-wrapper label="file" helpMessage="execativity.editquestions.importquestions.fileHelp">
-	    			<aui:input inlineLabel="left" inlineField="true"
+	    	<aui:input inlineLabel="left" inlineField="true"
 					  	name="fileName" label="" id="fileName" type="file" value="" />
-				</aui:field-wrapper>
+		</aui:field-wrapper>
 	</aui:fieldset>
 	<aui:button-row>
 		<aui:button type="submit" value="upload"></aui:button>

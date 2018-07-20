@@ -797,8 +797,15 @@ Liferay.provide(
 			String passpunctuationHelpProperty= "editActivity.passpuntuation.help";
 			%>
 			<aui:input size="5" name="passpuntuation" label="<%=passpuntuationLabelProperty %>" type="number" value="<%=Long.toString(score) %>" disabled="<%=disabled %>" helpMessage="<%=LanguageUtil.get(pageContext, passpunctuationHelpProperty)%>">
-				<aui:validator name="min" errorMessage="editActivity.passpuntuation.range">0</aui:validator>
-				<aui:validator name="max" errorMessage="editActivity.passpuntuation.range">100</aui:validator>
+				<aui:validator name="custom" errorMessage="editActivity.passpuntuation.range">
+					function(val,fieldNode,ruleValue){
+						var result = false;
+						if(val >= 0 && val <= 100){
+							result = true;
+						}
+						return result;
+					}
+				</aui:validator>
 			</aui:input>
 			<% if (disabled) { %>
 				<input name="<portlet:namespace />passpuntuation" type="hidden" value="<%=Long.toString(score) %>" />
