@@ -1,3 +1,5 @@
+<%@page import="com.liferay.portal.service.PortalPreferencesLocalServiceUtil"%>
+<%@page import="javax.portlet.PortletPreferences"%>
 <%@page import="com.liferay.portal.util.comparator.UserFirstNameComparator"%>
 <%@page import="com.liferay.lms.learningactivity.calificationtype.CalificationType"%>
 <%@page import="com.liferay.lms.learningactivity.calificationtype.CalificationTypeRegistry"%>
@@ -146,7 +148,7 @@ LearningActivity activity = LearningActivityLocalServiceUtil.getLearningActivity
 //List<User> listaUsuarioTotal = UserLocalServiceUtil.getGroupUsers(course.getGroupCreatedId());
 LinkedHashMap<String, Object> params = new LinkedHashMap<String, Object>();
 params.put("usersGroups", new Long(course.getGroupCreatedId())); 
-OrderByComparator comparator = null;
+OrderByComparator obc = null;
 PortletPreferences portalPreferences = PortalPreferencesLocalServiceUtil.getPreferences(themeDisplay.getCompanyId(), themeDisplay.getCompanyId(), 1);
 if(Boolean.parseBoolean(portalPreferences.getValue("users.first.last.name", "false"))){
 	obc = new UserLastNameComparator(true);
@@ -170,7 +172,7 @@ SearchContainer<User> userSearchContainer = new SearchContainer<User>(renderRequ
 		null,  LanguageUtil.get(pageContext, "no-results"));
 
 List<User> users = UserLocalServiceUtil.search(themeDisplay.getCompanyId(), firstName,"", lastName,screenName, emailAddress, 
-		-1, params, andOperator, userSearchContainer.getStart(),userSearchContainer.getEnd(), comparator);
+		-1, params, andOperator, userSearchContainer.getStart(),userSearchContainer.getEnd(), obc);
 
 int totalUsers = UserLocalServiceUtil.searchCount(themeDisplay.getCompanyId(), firstName,"", lastName,screenName, emailAddress, 
 		-1, params, andOperator);
