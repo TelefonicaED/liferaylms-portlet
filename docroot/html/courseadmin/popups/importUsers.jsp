@@ -55,7 +55,7 @@
 
 <liferay-ui:header title="courseadmin.importuserrole"></liferay-ui:header>
 
-<liferay-ui:success key="courseadmin.importuserrole.csv.saved" message="courseadmin.importuserrole.csv.saved"></liferay-ui:success>
+
 
 <c:if test='<%= SessionMessages.contains(renderRequest, "courseadmin.importuserrole.csv.saved") %>'>
 	<div class="portlet-msg-success"> 
@@ -109,7 +109,11 @@
 		<liferay-ui:error key="courseadmin.importuserrole.csv.fileRequired" message="courseadmin.importuserrole.csv.fileRequired" />
 		<liferay-ui:error key="courseadmin.importuserrole.csv.badFormat" message="courseadmin.importuserrole.csv.badFormat" />
 		<liferay-ui:error key="courseadmin.importuserrole.csv.badFormat.size" message="courseadmin.importuserrole.csv.badFormat.size" />
-		<% if(SessionErrors.contains(renderRequest, "courseadmin.importuserrole.csvErrors")) {%>
+		<liferay-ui:success key="courseadmin.importuserrole.csv.saved" message="courseadmin.importuserrole.csv.saved"/>
+		<% 
+			SessionMessages.contains(renderRequest, "courseadmin.importuserrole.csv.saved");
+		
+		if(SessionErrors.contains(renderRequest, "courseadmin.importuserrole.csvErrors")) {%>
 		<div class="portlet-msg-error">
 			<% List<String> errors = (List<String>)SessionErrors.get(renderRequest, "courseadmin.importuserrole.csvErrors");
 			   if(errors.size()==1) {
