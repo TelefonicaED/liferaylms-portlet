@@ -113,7 +113,6 @@ if ((actionEditing && hasPermissionAddLact) ||
 					<span class="result"> <%=result%> %</span>
 				<%}
 			}
-			
 			if (actionEditing&&Validator.isNotNull(learningActivityType)){
 				boolean hasPermissionUpdate = permissionChecker.hasPermission(activity.getGroupId(),LearningActivity.class.getName(),activity.getActId(), ActionKeys.UPDATE)
 												|| permissionChecker.hasOwnerPermission(activity.getCompanyId(),LearningActivity.class.getName(),activity.getActId(),activity.getUserId(), ActionKeys.UPDATE);
@@ -121,7 +120,8 @@ if ((actionEditing && hasPermissionAddLact) ||
 												|| permissionChecker.hasOwnerPermission(activity.getCompanyId(),LearningActivity.class.getName(),activity.getActId(),activity.getUserId(), ActionKeys.DELETE);
 				boolean hasPermissionPermissions = permissionChecker.hasPermission(activity.getGroupId(),LearningActivity.class.getName(),activity.getActId(),ActionKeys.PERMISSIONS);
 				boolean hasPermissionSoftPermissions = permissionChecker.hasPermission(activity.getGroupId(),LearningActivity.class.getName(),activity.getActId(),"SOFT_PERMISSIONS");
-				boolean hasPermissionViewResults = permissionChecker.hasPermission(activity.getGroupId(),LearningActivity.class.getName(),activity.getActId(),"VIEW_RESULTS");
+				boolean hasPermissionViewResults = permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), "com.liferay.lms.model",themeDisplay.getScopeGroupId(), "VIEW_RESULTS");
+				
 				boolean hasPermissionChangeAllVisibility = permissionChecker.hasPermission(activity.getGroupId(),LearningActivity.class.getName(),activity.getActId(),"CHANGE_ALL_VISIBILITY");
 				boolean hasPermissionChangeVisibility = permissionChecker.hasPermission(activity.getGroupId(),LearningActivity.class.getName(),activity.getActId(),"CHANGE_VISIBILITY");
 				if(hasPermissionUpdate || hasPermissionDelete || hasPermissionPermissions || hasPermissionSoftPermissions || hasPermissionViewResults || hasPermissionChangeAllVisibility

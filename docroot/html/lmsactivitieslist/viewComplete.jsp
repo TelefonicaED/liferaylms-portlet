@@ -102,7 +102,7 @@ if(moduleEditing) idModuleUl = "myModule";
 					break;
 			}
 			
-			actionEditing = actionEditing && moduleEditing;
+			//actionEditing = actionEditing && moduleEditing;
 			
 			boolean hasPermissionAccessCourseFinished = LiferaylmsUtil.hasPermissionAccessCourseFinished(themeDisplay.getCompanyId(), course.getGroupCreatedId(), course.getCourseId(), themeDisplay.getUserId());
 			
@@ -180,7 +180,7 @@ if(moduleEditing) idModuleUl = "myModule";
 										theModule.getTitle(themeDisplay.getLocale()) %>
 						</a>
 						
-						<%if(actionEditing){%>
+						<%if(actionEditing && moduleEditing){%>
 							<div class="iconsedit"><%@ include file="/JSPs/module/edit_actions.jspf" %></div>
 						<%}
 						if((theModule.getModuleId()==moduleId)&&(ParamUtil.getBoolean(renderRequest, "viewCurrentModule",true))){%>
