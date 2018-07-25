@@ -43,15 +43,7 @@ public class ModuleDescriptionPortlet extends MVCPortlet {
 	@Override
 	public void doView(RenderRequest renderRequest,
 			RenderResponse renderResponse) throws IOException, PortletException {
-		ThemeDisplay themeDisplay = (ThemeDisplay) renderRequest.getAttribute(WebKeys.THEME_DISPLAY);
-  	   long moduleId=ParamUtil.getLong(renderRequest, "moduleId",0L);
-		try {
-			AuditingLogFactory.audit(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(), ModuleDescriptionPortlet.class.getName(),moduleId, themeDisplay.getUserId(), AuditConstants.VIEW, null);
-		} catch (SystemException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
+	
 		
 		boolean actionEditingDetails = ParamUtil.getBoolean(renderRequest, "actionEditingDetails", false);
 		boolean actionEditingActivity = ParamUtil.getBoolean(renderRequest, "actionEditingActivity", false);
