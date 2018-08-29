@@ -497,11 +497,11 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 			List<Course> editions = CourseLocalServiceUtil.getChildCourses(courseId);
 			for(Course edition : editions){
 				CourseLocalServiceUtil.deleteCourse(edition.getCourseId());
-				AuditingLogFactory.audit(serviceContext.getCompanyId(), serviceContext.getScopeGroupId(), Course.class.getName(), edition.getCourseId(), serviceContext.getUserId(), AuditConstants.CLOSE, null);
+				AuditingLogFactory.audit(serviceContext.getCompanyId(), serviceContext.getScopeGroupId(), Course.class.getName(), edition.getCourseId(), serviceContext.getUserId(), AuditConstants.DELETE, null);
 			}
 			
 			CourseLocalServiceUtil.deleteCourse(courseId);
-			AuditingLogFactory.audit(serviceContext.getCompanyId(), serviceContext.getScopeGroupId(), Course.class.getName(), courseId, serviceContext.getUserId(), AuditConstants.CLOSE, null);
+			AuditingLogFactory.audit(serviceContext.getCompanyId(), serviceContext.getScopeGroupId(), Course.class.getName(), courseId, serviceContext.getUserId(), AuditConstants.DELETE, null);
 			
 			
 		}
@@ -518,11 +518,8 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 			List<Course> editions = CourseLocalServiceUtil.getChildCourses(courseId);
 			for(Course edition : editions){
 				CourseLocalServiceUtil.closeCourse(edition.getCourseId());
-				AuditingLogFactory.audit(serviceContext.getCompanyId(), serviceContext.getScopeGroupId(), Course.class.getName(), edition.getCourseId(), serviceContext.getUserId(), AuditConstants.CLOSE, null);
 			}
-			
 			CourseLocalServiceUtil.closeCourse(courseId);
-			AuditingLogFactory.audit(serviceContext.getCompanyId(), serviceContext.getScopeGroupId(), Course.class.getName(), courseId, serviceContext.getUserId(), AuditConstants.CLOSE, null);
 		}
 	}
 	
@@ -1207,11 +1204,11 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 				
 				if(roleId == teacherRoleId){
 					AuditingLogFactory.audit(course.getCompanyId(), course.getGroupCreatedId(), Course.class.getName(), 
-							course.getCourseId(),userGroupRole.getUserId(), AuditConstants.UNREGISTER, "COURSE_EDITOR_REMOVE");
+							course.getCourseId(),userGroupRole.getUserId(), AuditConstants.UNREGISTER, "COURSE_TUTOR_REMOVE");
 				}
 				if(roleId == editorRoleId){
 					AuditingLogFactory.audit(course.getCompanyId(), course.getGroupCreatedId(), Course.class.getName(), 
-							course.getCourseId(),userGroupRole.getUserId(), AuditConstants.UNREGISTER, "COURSE_TUTOR_REMOVE");
+							course.getCourseId(),userGroupRole.getUserId(), AuditConstants.UNREGISTER, "COURSE_EDITOR_REMOVE");
 				}
 				
 			}
@@ -1228,18 +1225,7 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 					if(log.isDebugEnabled())log.debug("deleted!");
 					GroupLocalServiceUtil.unsetUserGroups(user,new long[] { course.getGroupCreatedId() });
 				}
-				/*for(UserGroupRole userGroupRole:userGroupRoles){
-					if(log.isDebugEnabled())log.debug("Role::"+userGroupRole.getRoleId());
-				}*/
 				
-				if(roleId == teacherRoleId){
-					AuditingLogFactory.audit(course.getCompanyId(), course.getGroupCreatedId(), Course.class.getName(), 
-							course.getCourseId(),user, AuditConstants.UNREGISTER, "COURSE_EDITOR_REMOVE");
-				}
-				if(roleId == editorRoleId){
-					AuditingLogFactory.audit(course.getCompanyId(), course.getGroupCreatedId(), Course.class.getName(), 
-							course.getCourseId(),user, AuditConstants.UNREGISTER, "COURSE_TUTOR_REMOVE");
-				}
 			}
 			//GroupLocalServiceUtil.unsetUserGroups(userGroupRole.getUserId(), new long[] { course.getGroupCreatedId() });
 		
@@ -1817,7 +1803,7 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 		if(cc!=null){
 
 			//auditing
-			AuditingLogFactory.audit(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(), Course.class.getName(), courseId, themeDisplay.getUserId(), AuditConstants.CLOSE, null);
+			AuditingLogFactory.audit(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(), CourseCompetence.class.getName(), cc.getPrimaryKey(), themeDisplay.getUserId(), AuditConstants.DELETE, "Compentence: "+String.valueOf(competenceId)+" Course: "+String.valueOf(courseId));
 			
 			try{
 				CourseCompetenceLocalServiceUtil. deleteCourseCompetence(cc.getPrimaryKey());

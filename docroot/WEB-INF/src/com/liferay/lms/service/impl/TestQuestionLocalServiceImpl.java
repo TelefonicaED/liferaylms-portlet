@@ -244,7 +244,7 @@ public class TestQuestionLocalServiceImpl extends TestQuestionLocalServiceBaseIm
 				larn = learningActivityLocalService.getLearningActivity(theQuestion.getActId());
 				//auditing
 				AuditingLogFactory.audit(larn.getCompanyId(), larn.getGroupId(), TestQuestion.class.getName(), 
-						testQuestionId, larn.getUserId(), AuditConstants.UPDATE, null);
+						testQuestionId, larn.getUserId(), AuditConstants.UPDATE, "GO_UP_TEST_QUESTION");
 
 			} catch (PortalException e) {
 			}	
@@ -273,7 +273,7 @@ public class TestQuestionLocalServiceImpl extends TestQuestionLocalServiceBaseIm
 				larn = learningActivityLocalService.getLearningActivity(theTestQuestion.getActId());
 				//auditing
 				AuditingLogFactory.audit(larn.getCompanyId(), larn.getGroupId(), TestQuestion.class.getName(), 
-						testQuestionId, larn.getUserId(), AuditConstants.UPDATE, null);
+						testQuestionId, larn.getUserId(), AuditConstants.UPDATE, "GO_DOWN_TEST_QUESTION");
 
 			} catch (PortalException e) {
 			}

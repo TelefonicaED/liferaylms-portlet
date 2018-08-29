@@ -505,10 +505,7 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 		Course course = addCourse (title, description,summary,friendlyURL, locale,
 				createDate,startDate,endDate,layoutSetPrototypeId,GroupConstants.TYPE_SITE_PRIVATE,
 				 serviceContext, calificationType,0,false);
-
-		//auditing
-		AuditingLogFactory.audit(course.getCompanyId(), course.getGroupId(), Course.class.getName(), course.getCourseId(), serviceContext.getUserId(), AuditConstants.ADD, null);
-		return course;
+	return course;
 	}
 
 	@Indexable(type=IndexableType.REINDEX)
@@ -520,9 +517,7 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 		
 		Course course = this.addCourse(title, description, description, friendlyURL, locale, createDate, startDate, endDate, serviceContext, calificationType);
 		
-		//auditing
-		AuditingLogFactory.audit(course.getCompanyId(), course.getGroupId(), Course.class.getName(), course.getCourseId(), serviceContext.getUserId(), AuditConstants.ADD, null);
-		
+	
 		return course;
 	}
 	

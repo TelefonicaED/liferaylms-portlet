@@ -1,63 +1,71 @@
 package com.liferay.lms.auditing;
 
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
 
 
+
+import com.liferay.lms.service.ClpSerializer;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.PortletClassLoaderUtil;
 import com.liferay.portal.kernel.util.ClassLoaderProxy;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.PrefsPropsUtil;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.model.PortletConstants;
+import com.liferay.portal.util.PortalUtil;
 
 public class AuditingLogFactory 
 {
 	static Log log = LogFactoryUtil.getLog(AuditingLogFactory.class);
-	
-	static AuditingLog auditLog;
-	public static AuditingLog getAuditLog() throws ClassNotFoundException, InstantiationException, IllegalAccessException
+	protected static final String LMS_ACTIVITIES_LIST_PORTLET_ID =  PortalUtil.getJsSafePortletId("lmsactivitieslist"+PortletConstants.WAR_SEPARATOR+ClpSerializer.getServletContextName());
+
+	static List<AuditingLog> auditLogs = new ArrayList<AuditingLog>();
+	public static List<AuditingLog> getAuditLogs() throws ClassNotFoundException, InstantiationException, IllegalAccessException
 	{
-		if(auditLog==null)
-		{
+		if(auditLogs.size()>0){
 			Class<?> clase= null;
-			if(PropsUtil.get("audit.implementation.portletId")!=null)
-			{
-				String className=PropsUtil.get("audit.implementation");
-				String portletId=PropsUtil.get("audit.implementation.portletId");
-				if (Validator.isNull(portletId)) 
-				{
-					return null;
+			try{
+				Properties properties = PrefsPropsUtil.getProperties("audit.implementation", true);// PropsUtil.getProperties("audit.implementation", true);
+				log.debug("properties size: " + properties.size());
+				log.debug("properties size: " + properties.size());
+				for (Object key:properties.keySet()) {
+					log.debug("key: " + key.toString());
+					String className=properties.getProperty(key.toString());
+					log.debug("type: " + className);
+					String [] context = ((String) key).split("\\.");
+					String classContent = LMS_ACTIVITIES_LIST_PORTLET_ID;
+					log.debug("Context "+context.length);
+					if (Validator.isNotNull(context) && context.length > 1) {
+						classContent = context[1];
+					}
+				
+					ClassLoaderProxy classLoaderProxy = new ClassLoaderProxy(Class.forName(className, true, 
+							PortletClassLoaderUtil.getClassLoader(classContent)).newInstance(), className, 
+							PortletClassLoaderUtil.getClassLoader(classContent));
+					AuditingLog auditLog=new AuditingLogClp(classLoaderProxy);
+					log.debug("auditing with defined:"+className);
+					auditLogs.add(auditLog);
+				
 				}
-				ClassLoaderProxy classLoaderProxy = new ClassLoaderProxy(Class.forName(className, true, 
-						PortletClassLoaderUtil.getClassLoader(portletId)).newInstance(), className, 
-						PortletClassLoaderUtil.getClassLoader(portletId));
-				auditLog=new AuditingLogClp(classLoaderProxy);
-				System.out.println("auditing with defined:"+className);
-				return auditLog;
+				
+			}catch(SystemException e){
+				e.printStackTrace();
+			}
 			
-			}
-			if(PropsUtil.get("audit.implementation")!=null)
-			{
-				try 
-				{
-					clase=Class.forName(PropsUtil.get("audit.implementation"));
-				}
-				catch (ClassNotFoundException e) 
-				{
-					
-						
-				}
-			}
-				else{
+			
+			if(auditLogs.size()<=0){
 				clase=Class.forName("com.liferay.lms.auditing.AuditingLogDB");
-				System.out.println("auditing with:"+clase);
+				auditLogs.add((AuditingLog)clase.newInstance());
 			}
 			
-			auditLog=(AuditingLog)clase.newInstance();
 		}
-		return auditLog;
+		return auditLogs;
 	}
 	
 	public static void audit(long companyId, long groupId, String className,long classPK,
@@ -67,12 +75,23 @@ public class AuditingLogFactory
 				userId, action, extraData);
 	}
 	
+	
+	public static void resetAuditLogs() throws SystemException {
+		auditLogs = new ArrayList<AuditingLog>();
+	}
+	
+	
 	public static void audit(long companyId, long groupId, String className,long classPK,long associationClassPK, 
 			long userId, String action, String extraData)
 			throws SystemException {
 		try{
 			if(log.isDebugEnabled())log.debug("audit:"+className+"::"+classPK);
-			getAuditLog().audit(companyId, groupId, className, classPK, associationClassPK, userId, action, extraData);
+			List<AuditingLog> auditLogs = getAuditLogs();
+			for(AuditingLog auditLog : auditLogs){
+				log.debug("AUDIT LOG "+auditLog.toString());
+				auditLog.audit(companyId, groupId, className, classPK, associationClassPK, userId, action, extraData);
+			}
+			
 		}catch(ClassNotFoundException cnfe){
 			if(log.isDebugEnabled())cnfe.printStackTrace();
 		}catch(IllegalAccessException iae){

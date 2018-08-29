@@ -318,7 +318,7 @@ public void asignCorrectionsToP2PActivities(long actId, long p2pActivityId,int n
 				LearningActivity la = learningActivityPersistence.fetchByPrimaryKey(actId);
 				if(la!=null){
 					AuditingLogFactory.audit(la.getCompanyId(), la.getGroupId(), P2pActivityCorrections.class.getName(), 
-							actId, la.getUserId(), AuditConstants.GET, null);
+							actId, la.getUserId(), AuditConstants.UPDATE, null);
 				}
 			}
 
