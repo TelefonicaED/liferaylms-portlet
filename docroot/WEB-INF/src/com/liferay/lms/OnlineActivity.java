@@ -276,7 +276,7 @@ public class OnlineActivity extends MVCPortlet {
 						|| file.getName().endsWith(".exe")
 						|| file.getName().endsWith(".msi") ){
 
-					SessionErrors.add(actionRequest, "onlineActivity.not.allowed.file.type");
+					SessionErrors.add(actionRequest, "onlineActivity-error-file-type");
 					actionResponse.setRenderParameter("text", text);
 					actionRequest.setAttribute("actId", actId);
 					return;
