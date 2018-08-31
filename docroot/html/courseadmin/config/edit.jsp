@@ -132,7 +132,7 @@
 	
 		<aui:input type="checkbox"  label="courseadmin.config.inscription-date-column" name="inscriptionDateColumn" value="<%=preferences.getValue(\"inscriptionDateColumn\", StringPool.TRUE) %>" ignoreRequestValue="true"/>
 		<aui:input type="checkbox"  label="courseadmin.config.execution-date-column" name="executionDateColumn" value="<%=preferences.getValue(\"executionDateColumn\", StringPool.TRUE) %>" ignoreRequestValue="true"/>
-		
+		<aui:input type="checkbox"  label="courseadmin.config.create-date-column" name="createDateColumn" value="<%=preferences.getValue(\"createDateColumn\", StringPool.FALSE) %>" ignoreRequestValue="true"/>
 	
 	<%
 		

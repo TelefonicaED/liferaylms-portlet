@@ -46,21 +46,31 @@ public class UserSearchContainer extends SearchContainer<User> {
 	public UserSearchContainer(PortletRequest portletRequest, PortletURL iteratorURL) {
 		this(portletRequest, DEFAULT_CUR_PARAM, iteratorURL);
 	}
+	
+	public UserSearchContainer(PortletRequest portletRequest, PortletURL iteratorURL, UserDisplayTerms displayTerms) {
+		this(portletRequest, DEFAULT_CUR_PARAM, iteratorURL, displayTerms);
+	}
+	
+	public UserSearchContainer(
+			PortletRequest portletRequest, String curParam,
+			PortletURL iteratorURL) {
+
+			this(portletRequest, curParam, iteratorURL, new UserDisplayTerms(portletRequest));
+			
+		}
 
 	public UserSearchContainer(
 		PortletRequest portletRequest, String curParam,
-		PortletURL iteratorURL) {
+		PortletURL iteratorURL, UserDisplayTerms displayTerms) {
 
 		super(
-			portletRequest, new UserDisplayTerms(portletRequest),
+			portletRequest, displayTerms,
 			null, curParam, DEFAULT_DELTA,
 			iteratorURL, headerNames, EMPTY_RESULTS_MESSAGE);
 
 		PortletConfig portletConfig =
 			(PortletConfig)portletRequest.getAttribute(
 				JavaConstants.JAVAX_PORTLET_CONFIG);
-
-		UserDisplayTerms displayTerms = (UserDisplayTerms)getDisplayTerms();
 
 		String portletName = portletConfig.getPortletName();
 

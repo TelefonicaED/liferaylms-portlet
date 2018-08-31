@@ -140,22 +140,20 @@ public class LearningActivityResultLocalServiceImpl	extends LearningActivityResu
 		if(recalculateActivity){
 			learningActivityResultPersistence.update(learningActivityResult, false);
 			moduleResultLocalService.update(learningActivityResult);
-		}		
-
-
-		//auditing
-		ServiceContext serviceContext = ServiceContextThreadLocal.getServiceContext();
-		if(serviceContext!=null){
-			AuditingLogFactory.audit(serviceContext.getCompanyId(), serviceContext.getScopeGroupId(), LearningActivityResult.class.getName(), 
-					learningActivityResult.getPrimaryKey(), learningActivityTry.getUserId(), AuditConstants.UPDATE, null);
-		}else{
-			LearningActivity la = learningActivityPersistence.fetchByPrimaryKey(actId);
-			if(la!=null){
-				AuditingLogFactory.audit(la.getCompanyId(), la.getGroupId(), LearningActivityResult.class.getName(), 
+			
+			//auditing
+			ServiceContext serviceContext = ServiceContextThreadLocal.getServiceContext();
+			if(serviceContext!=null){
+				AuditingLogFactory.audit(serviceContext.getCompanyId(), serviceContext.getScopeGroupId(), LearningActivityResult.class.getName(), 
 						learningActivityResult.getPrimaryKey(), learningActivityTry.getUserId(), AuditConstants.UPDATE, null);
+			}else{
+				LearningActivity la = learningActivityPersistence.fetchByPrimaryKey(actId);
+				if(la!=null){
+					AuditingLogFactory.audit(la.getCompanyId(), la.getGroupId(), LearningActivityResult.class.getName(), 
+							learningActivityResult.getPrimaryKey(), learningActivityTry.getUserId(), AuditConstants.UPDATE, null);
+				}
 			}
 		}
-
 		return learningActivityResult;
 
 	}

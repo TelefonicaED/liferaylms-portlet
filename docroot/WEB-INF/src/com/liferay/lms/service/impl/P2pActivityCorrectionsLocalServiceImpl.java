@@ -27,6 +27,7 @@ import com.liferay.lms.auditing.AuditConstants;
 import com.liferay.lms.auditing.AuditingLogFactory;
 import com.liferay.lms.model.Course;
 import com.liferay.lms.model.LearningActivity;
+import com.liferay.lms.model.Module;
 import com.liferay.lms.model.P2pActivity;
 import com.liferay.lms.model.P2pActivityCorrections;
 import com.liferay.lms.service.ClpSerializer;
@@ -44,6 +45,7 @@ import com.liferay.portal.kernel.dao.orm.OrderFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
@@ -255,8 +257,6 @@ public class P2pActivityCorrectionsLocalServiceImpl
 			numAsigns = Integer.valueOf(validations);
 		} catch (Exception e) {}
 		
-		LearningActivity learning = null;
-		
 		for(User user : usersList){		
 			asigned = P2pActivityCorrectionsLocalServiceUtil.getNumCorrectionsAsignToP2P(p2pActId);
 			
@@ -281,8 +281,6 @@ public class P2pActivityCorrectionsLocalServiceImpl
 					P2pActivity activity = P2pActivityLocalServiceUtil.getP2pActivity(p2pActId);
 					activity.setCountCorrections(activity.getCountCorrections()+1);
 					P2pActivityLocalServiceUtil.updateP2pActivity(activity);
-					
-					learning = LearningActivityLocalServiceUtil.getLearningActivity(activity.getActId());
 				} catch (PortalException e) {}
 				
 				asigned++;
@@ -320,7 +318,7 @@ public void asignCorrectionsToP2PActivities(long actId, long p2pActivityId,int n
 				LearningActivity la = learningActivityPersistence.fetchByPrimaryKey(actId);
 				if(la!=null){
 					AuditingLogFactory.audit(la.getCompanyId(), la.getGroupId(), P2pActivityCorrections.class.getName(), 
-							actId, la.getUserId(), AuditConstants.GET, null);
+							actId, la.getUserId(), AuditConstants.UPDATE, null);
 				}
 			}
 
@@ -340,56 +338,55 @@ public void asignCorrectionsToP2PActivities(long actId, long p2pActivityId,int n
 			if(!LearningActivityLocalServiceUtil.islocked(actId, p2pActivity.getUserId())){
 
 				try {
-					LearningActivity learn = LearningActivityLocalServiceUtil.getLearningActivity(actId);
 					User user = UserLocalServiceUtil.getUser(p2pActivity.getUserId());
 					
-					Group group = GroupLocalServiceUtil.getGroup(learn.getGroupId());
-					Company company = CompanyLocalServiceUtil.getCompany(group.getCompanyId());
-					
-					Course course= CourseLocalServiceUtil.getCourseByGroupCreatedId(learn.getGroupId());
-					
-					com.liferay.lms.model.Module module = ModuleLocalServiceUtil.getModule(learn.getModuleId());
-					String courseFriendlyUrl = "";
-					String courseTitle = "";
-					String activityTitle = learn.getTitle(user.getLocale());
-					String moduleTitle =  module.getTitle(user.getLocale());
-					
-					
-					// QUITAR EL PUERTO
-					String portalUrl = serviceContext.getPortalURL();
-					String[] urls = portalUrl.split(":");
-					portalUrl = urls[0] + ":" +urls[1];				
-//					if(urls.length > 2){ // http:prueba.es:8080
-//						portalUrl += urls[1];
-//					}
-					log.debug("***portalUrl:"+portalUrl);
-					
-					//String portalUrl = PortalUtil.getPortalURL(company.getVirtualHostname(), PortalUtil.getPortalPort(), false);
-					String pathPublic = PortalUtil.getPathFriendlyURLPublic();
-					
-					if(course != null){
-						courseFriendlyUrl = portalUrl + pathPublic + course.getFriendlyURL();
-						courseTitle = course.getTitle(user.getLocale());
-						courseFriendlyUrl += "/reto?p_p_id=p2ptaskactivity_WAR_liferaylmsportlet";
-						courseFriendlyUrl += "&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&p_r_p_564233524_actId="+learn.getActId();
-						courseFriendlyUrl += "&p_r_p_564233524_moduleId="+learn.getModuleId();
-						log.debug("URL "+ courseFriendlyUrl);
-						
-						
-					
-						
-					
-					}
-					
-					String[] params={activityTitle, moduleTitle, courseTitle, courseFriendlyUrl};
 					boolean deregisterMail = false;
 					if(user.getExpandoBridge().getAttribute(LiferaylmsUtil.DEREGISTER_USER_EXPANDO,false)!=null){
 						deregisterMail = (Boolean)user.getExpandoBridge().getAttribute(LiferaylmsUtil.DEREGISTER_USER_EXPANDO,false);
 					}
 					
 					if(!deregisterMail){
+						LearningActivity learn = LearningActivityLocalServiceUtil.getLearningActivity(actId);
+						Course course= CourseLocalServiceUtil.getCourseByGroupCreatedId(learn.getGroupId());
+						
+						Module module = ModuleLocalServiceUtil.getModule(learn.getModuleId());
+						String courseFriendlyUrl = "";
+						String courseTitle = "";
+						String activityTitle = learn.getTitle(user.getLocale());
+						String moduleTitle =  module.getTitle(user.getLocale());
+						
+						
+						// QUITAR EL PUERTO
+						String portalUrl = serviceContext.getPortalURL();
+						String[] urls = portalUrl.split(":");
+						portalUrl = urls[0] + ":" +urls[1];				
+//						if(urls.length > 2){ // http:prueba.es:8080
+//							portalUrl += urls[1];
+//						}
+						log.debug("***portalUrl:"+portalUrl);
+						
+						//String portalUrl = PortalUtil.getPortalURL(company.getVirtualHostname(), PortalUtil.getPortalPort(), false);
+						String pathPublic = PortalUtil.getPathFriendlyURLPublic();
+						long modulesOfCourse = 0;	
+						if(course != null){
+							courseFriendlyUrl = portalUrl + pathPublic + course.getFriendlyURL();
+							courseTitle = course.getTitle(user.getLocale());
+							courseFriendlyUrl += "/reto?p_p_id=p2ptaskactivity_WAR_liferaylmsportlet";
+							courseFriendlyUrl += "&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&p_r_p_564233524_actId="+learn.getActId();
+							courseFriendlyUrl += "&p_r_p_564233524_moduleId="+learn.getModuleId();
+							log.debug("URL "+ courseFriendlyUrl);
+							modulesOfCourse = ModuleLocalServiceUtil.countByGroupId(course.getGroupCreatedId());
+						}
+						
+						String[] params={activityTitle, moduleTitle, courseTitle, courseFriendlyUrl};
+						String bodyMessage = LanguageUtil.format(user.getLocale(), "p2ptaskactivity.mail.body.message", params);
+						if(modulesOfCourse<=1){
+							bodyMessage =LanguageUtil.format(user.getLocale(), "p2ptaskactivity.mail.body.message-simple", new String[]{activityTitle, courseTitle, courseFriendlyUrl});
+						}
+						
+						
 						log.debug("Enviar los emails.");
-						P2PSendMailAsignation.sendMail(user.getEmailAddress(), user.getFullName(), params, user.getCompanyId(), user.getLocale());
+						P2PSendMailAsignation.sendMail(user.getEmailAddress(), user.getFullName(), bodyMessage, user.getCompanyId(), user.getLocale());
 					}
 		
 				} catch (Exception e) {

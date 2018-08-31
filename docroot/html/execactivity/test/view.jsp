@@ -142,12 +142,6 @@ if(isTablet){%>
 	    		|| improving 
 	    		|| hasPermissionAccessCourseFinished){
 			    		boolean useBank = StringPool.TRUE.equals(LearningActivityLocalServiceUtil.getExtraContentValue(actId, "isBank"));
-				%>
-	    		<h2 class="description-title"><%=activity.getTitle(themeDisplay.getLocale()) %></h2>
-				<div class="description">
-					<%=activity.getDescriptionFiltered(themeDisplay.getLocale(),true) %>
-				</div>
-				<%
 				
 				
 				String navigateParam = ParamUtil.getString(renderRequest, "navigate");
@@ -178,8 +172,12 @@ if(isTablet){%>
 							<liferay-util:param value="<%=Long.toString(activity.getActId()) %>" name="actId"/>
 						</liferay-util:include>  	
 <%
-					}else{	
-						List<TestQuestion> questions =  new ArrayList<TestQuestion>();
+					}else{	%>
+						<h2 class="description-title"><%=activity.getTitle(themeDisplay.getLocale()) %></h2>
+						<div class="description">
+							<%=activity.getDescriptionFiltered(themeDisplay.getLocale(),true) %>
+						</div>
+						<%List<TestQuestion> questions =  new ArrayList<TestQuestion>();
 						questions = ListUtil.copy(TestQuestionLocalServiceUtil.getQuestions(actId));
 						
 						if (useBank){
@@ -763,7 +761,7 @@ if(isTablet){%>
 						<liferay-ui:message key="execActivity.bad.password" />
 					</div>
 					<% } %>
-					<aui:button type="send" />
+					<aui:button value="send" type="submit"/>
 					
 				</aui:form>
 			<%	

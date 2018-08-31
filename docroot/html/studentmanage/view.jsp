@@ -50,7 +50,6 @@
 					searchContainer="${searchContainer}"
 					iteratorURL="${searchContainer.iteratorURL}" >
 				
-				
 					<liferay-ui:search-form
 						page="/html/search/usersSearchform.jsp"
 						searchContainer="${searchContainer}"

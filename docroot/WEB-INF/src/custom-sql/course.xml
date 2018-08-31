@@ -26,26 +26,29 @@
 	<sql id="com.liferay.lms.service.persistence.CourseFinder.myCourses">
 		<![CDATA[   		
 			SELECT 
-				c.courseId, 
+				Lms_Course.courseId, 
 				u.userId, 
-				IF(EXTRACTVALUE(c.title, '//Title[@language-id=\"[$LANGUAGE$]\"]') != '', EXTRACTVALUE(c.title, '//Title[@language-id=\"[$LANGUAGE$]\"]'), IF(EXTRACTVALUE(c.title, '//root[@default-locale]//Title') != '', EXTRACTVALUE(c.title, '//root[@default-locale]//Title'), c.title )) AS courseTitle,
+				IF(EXTRACTVALUE(Lms_Course.title, '//Title[@language-id=\"[$LANGUAGE$]\"]') != '', EXTRACTVALUE(Lms_Course.title, '//Title[@language-id=\"[$LANGUAGE$]\"]'), IF(EXTRACTVALUE(Lms_Course.title, '//root[@default-locale]//Title') != '', EXTRACTVALUE(Lms_Course.title, '//root[@default-locale]//Title'), Lms_Course.title )) AS courseTitle,
 				CASE WHEN r.crId IS NULL THEN '0' WHEN r.passedDate IS NULL THEN '1' WHEN r.passedDate IS NOT NULL AND r.passed = 0 THEN '2' WHEN r.passed = 1 AND r.passedDate IS NOT NULL THEN '3' ELSE '0' END AS statusUser,
-				CASE WHEN r.crId IS NULL THEN 0 ELSE r.result END AS result, c.icon, c.groupCreatedId, c.friendlyURL
+				CASE WHEN r.crId IS NULL THEN 0 ELSE r.result END AS result, Lms_Course.icon, Lms_Course.groupCreatedId, Lms_Course.friendlyURL,
+				Lms_Course.executionStartDate, Lms_Course.executionEndDate
 			FROM 
-				Lms_course c
+				Lms_course
 			INNER JOIN 
 				users_groups u 
-					ON c.groupCreatedId = u.groupId AND u.userId = ?
+					ON Lms_Course.groupCreatedId = u.groupId AND u.userId = ?
 			LEFT OUTER JOIN 
 				Lms_courseresult r 
-					ON c.courseId = r.courseId AND r.userId = ?
+					ON Lms_Course.courseId = r.courseId AND r.userId = ?
+			[$JOIN$]
 			WHERE 
-				c.closed = 0 
-				AND (SELECT MAX(mo.endDate) FROM Lms_module mo WHERE mo.groupId = c.groupCreatedId) > '[$DATENOW$]' 
+				[$WHERE$]
+				Lms_Course.closed = 0 
+				AND Lms_Course.executionEndDate > '[$DATENOW$]'
 				AND (r.crId IS NULL OR r.allowFinishDate IS NULL OR r.allowFinishDate > '[$DATENOW$]')
-				AND (c.groupId = ? OR ? <= 0)
+				AND (Lms_Course.groupId = ? OR ? <= 0)
 			GROUP By 
-				c.courseId
+				Lms_Course.courseId
 		]]>
 	</sql>
 	<sql id="com.liferay.lms.service.persistence.CourseFinder.countMyCourses">
@@ -53,20 +56,20 @@
 			SELECT 
 				COUNT(1) AS total
 			FROM 
-				Lms_course c
+				Lms_course
 			INNER JOIN 
 				users_groups u 
-					ON c.groupCreatedId = u.groupId AND u.userId = ?
+					ON Lms_Course.groupCreatedId = u.groupId AND u.userId = ?
 			LEFT OUTER JOIN 
 				Lms_courseresult r 
-					ON c.courseId = r.courseId AND r.userId = ?
+					ON Lms_Course.courseId = r.courseId AND r.userId = ?
+			[$JOIN$]
 			WHERE 
-				c.closed = 0 
-				AND (SELECT MAX(mo.endDate) FROM Lms_module mo WHERE mo.groupId = c.groupCreatedId) > '[$DATENOW$]' 
+				[$WHERE$]
+				Lms_Course.closed = 0 
+				AND Lms_Course.executionEndDate > '[$DATENOW$]'
 				AND (r.crId IS NULL OR r.allowFinishDate IS NULL OR r.allowFinishDate > '[$DATENOW$]')
-				AND (c.groupId = ? OR ? <= 0)
-			GROUP By 
-				c.courseId
+				AND (Lms_Course.groupId = ? OR ? <= 0)
 		]]>
 	</sql>
 	<sql id="com.liferay.lms.service.persistence.CourseFinder.getExistingUserCourses">

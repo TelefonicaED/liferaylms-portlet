@@ -1,3 +1,4 @@
+<%@page import="org.apache.velocity.tools.generic.DateTool"%>
 <%@page import="java.util.HashMap"%>
 <%@page import="java.util.Map"%>
 <%@page import="com.liferay.util.VelocityUtil"%>
@@ -55,6 +56,7 @@ if(!"".equals(abstractVelocityTemplate))
 	}
 	variables.put("iconURL",iconURL);
 	variables.put("communityGroup",communityGroup);
+	variables.put("date", new DateTool());
 	variables.put("themeDisplay",themeDisplay);
 	
 	String htmlResult = StringPool.BLANK;

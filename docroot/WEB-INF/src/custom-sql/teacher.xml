@@ -4,28 +4,21 @@
 			SELECT 
 				DISTINCT u.*
 			FROM 
-				lms_course co 
+				user_ u
 			INNER JOIN 
 				users_groups ug 
-					ON co.groupCreatedId = ug.groupId
-			INNER JOIN 
-				user_ u 
 					ON u.userId = ug.userId
+			INNER JOIN 
+				lms_course co 
+					ON co.groupCreatedId = ug.groupId
 			INNER JOIN 
 				usergrouprole ur 
 					ON ug.userId = ur.userId AND ur.groupId = ug.groupId AND ur.roleId= ?
 			[$JOINTEAM$]
 			WHERE 
-				co.courseId = ? AND (u.status = ? OR ? = ?)
-				AND 
-				(
-					[$WHEREFIRSTNAME$]
-					[$WHERELASTNAME$]
-					[$WHERESCREENNAME$]
-					[$WHEREEMAILADDRESS$]
-					[$DEFAULT$]
-					
-				)
+				co.courseId = ? 
+				[$WHERESTATUS$]
+				[$WHERESEARCH$]
 			ORDER BY [$ORDERBY$]
 		]]>
 	</sql>
@@ -34,27 +27,21 @@
 			SELECT 
 				COUNT(DISTINCT u.userId) AS COUNT_VALUE
 			FROM 
-				lms_course co 
+				user_ u
 			INNER JOIN 
 				users_groups ug 
-					ON co.groupCreatedId = ug.groupId
-			INNER JOIN 
-				user_ u 
 					ON u.userId = ug.userId
+			INNER JOIN 
+				lms_course co 
+					ON co.groupCreatedId = ug.groupId
 			INNER JOIN 
 				usergrouprole ur 
 					ON ug.userId = ur.userId AND ur.groupId = ug.groupId AND ur.roleId= ?
 			[$JOINTEAM$]
 			WHERE 
-				co.courseId = ? AND (u.status = ? OR ? = ?)
-				AND 
-				(
-					[$WHEREFIRSTNAME$]
-					[$WHERELASTNAME$]
-					[$WHERESCREENNAME$]
-					[$WHEREEMAILADDRESS$]
-					[$DEFAULT$]
-				)
+				co.courseId = ? 
+				[$WHERESTATUS$]
+				[$WHERESEARCH$]
 		]]>
 	</sql>
 </custom-sql>

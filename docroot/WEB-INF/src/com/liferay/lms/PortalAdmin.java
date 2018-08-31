@@ -10,6 +10,7 @@ import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
 import javax.portlet.ProcessAction;
 
+import com.liferay.lms.auditing.AuditingLogFactory;
 import com.liferay.lms.model.AsynchronousProcessAudit;
 import com.liferay.lms.model.Course;
 import com.liferay.lms.model.LearningActivity;
@@ -26,6 +27,7 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.messaging.Message;
 import com.liferay.portal.kernel.messaging.MessageBusUtil;
+import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -72,6 +74,15 @@ public class PortalAdmin extends MVCPortlet {
 		
 		P2PAssignations asignations = new P2PAssignations();
 		asignations.asignCorrectionsToP2PActivities();
+	}
+	public void resetAuditImplamentations (ActionRequest request, ActionResponse response) throws Exception {
+		try{
+			AuditingLogFactory.resetAuditLogs();
+			SessionMessages.add(request, "portaladmin.success-reset-audit");
+		}catch(Exception e){
+			SessionErrors.add(request, "portaladmin.error-reset-audit");
+			e.printStackTrace();
+		}
 	}
 	
 	public void updateResultP2PActivities (ActionRequest request, ActionResponse response) throws Exception {

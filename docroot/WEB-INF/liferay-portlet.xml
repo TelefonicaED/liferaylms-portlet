@@ -196,16 +196,6 @@
 		<footer-portlet-javascript>/js/tree.js</footer-portlet-javascript>
 		<css-class-wrapper>mycourses-portlet</css-class-wrapper>
 	</portlet>
-	
-	<portlet>
-		<portlet-name>coursetoolsmanage</portlet-name>
-		<icon>/icon.png</icon>
-		<instanceable>false</instanceable>
-		<header-portlet-css>/css/main.css</header-portlet-css>
-		<footer-portlet-javascript>/js/main.js</footer-portlet-javascript>
-		<css-class-wrapper>coursetoolsmanage-portlet</css-class-wrapper>
-	</portlet>
-	
 	<portlet>
 		<portlet-name>courseadmin</portlet-name>
 		<icon>/icon.png</icon>
@@ -647,9 +637,6 @@
 		<icon>/icon.png</icon>
 		<instanceable>false</instanceable>
 		<header-portlet-css>/css/main.css</header-portlet-css>
-		<footer-portlet-javascript>
-			/js/main.js
-		</footer-portlet-javascript>
 		<css-class-wrapper>dateeditor-portlet</css-class-wrapper>
 	</portlet>
 	<portlet>

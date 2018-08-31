@@ -43,13 +43,7 @@
 	}else{
 		urlExample += "/html/courseadmin/examples/ImportCourseUsersByUserId.csv\">"+LanguageUtil.get(themeDisplay.getLocale(),"example")+"</a>";
 	}
-	
-	Iterator<String> iterator = SessionMessages.iterator(renderRequest);
-	System.out.println("size: " + SessionMessages.size(renderRequest) + " - " + SessionMessages.contains(renderRequest, "courseadmin.importuserrole.csv.saved"));
-	while(iterator.hasNext()){
-		String key = iterator.next();
-		System.out.println("key: " + key);
-	}
+
 %>
 
 <portlet:renderURL var="importUsersURL"  windowState="<%= LiferayWindowState.EXCLUSIVE.toString() %>">
@@ -61,7 +55,7 @@
 
 <liferay-ui:header title="courseadmin.importuserrole"></liferay-ui:header>
 
-<liferay-ui:success key="courseadmin.importuserrole.csv.saved" message="courseadmin.importuserrole.csv.saved"></liferay-ui:success>
+
 
 <c:if test='<%= SessionMessages.contains(renderRequest, "courseadmin.importuserrole.csv.saved") %>'>
 	<div class="portlet-msg-success"> 
@@ -69,11 +63,16 @@
 	</div>
 </c:if>
 <liferay-ui:panel id="importuserrole_help" title="help" extended="closed">
-	<%if(Integer.parseInt(preferences.getValue("tipoImport", "1")) == 1){ %>
-		<%=LanguageUtil.get(themeDisplay.getLocale(),"courseadmin.importuserrole.help") %>
-	<%}else{ %>
-		<%=LanguageUtil.get(themeDisplay.getLocale(),"courseadmin.importuserrole.help.name") %>
-	<%}%>
+	<%
+	String[] arguments = new String[1];
+	if (CompanyConstants.AUTH_TYPE_SN.equalsIgnoreCase(authType)) {
+		arguments[0] = LanguageUtil.get(themeDisplay.getLocale(), "screen-name");	
+	}else if(CompanyConstants.AUTH_TYPE_EA.equalsIgnoreCase(authType)){
+		arguments[0] = LanguageUtil.get(themeDisplay.getLocale(), "email-address");
+	}else{
+		arguments[0] = LanguageUtil.get(themeDisplay.getLocale(), "user-id");
+	}%>		
+	<%=LanguageUtil.format(themeDisplay.getLocale(),"courseadmin.importuserrole.help",arguments) %>
 </liferay-ui:panel>
 
 <span>
@@ -110,7 +109,11 @@
 		<liferay-ui:error key="courseadmin.importuserrole.csv.fileRequired" message="courseadmin.importuserrole.csv.fileRequired" />
 		<liferay-ui:error key="courseadmin.importuserrole.csv.badFormat" message="courseadmin.importuserrole.csv.badFormat" />
 		<liferay-ui:error key="courseadmin.importuserrole.csv.badFormat.size" message="courseadmin.importuserrole.csv.badFormat.size" />
-		<% if(SessionErrors.contains(renderRequest, "courseadmin.importuserrole.csvErrors")) {%>
+		<liferay-ui:success key="courseadmin.importuserrole.csv.saved" message="courseadmin.importuserrole.csv.saved"/>
+		<% 
+			SessionMessages.contains(renderRequest, "courseadmin.importuserrole.csv.saved");
+		
+		if(SessionErrors.contains(renderRequest, "courseadmin.importuserrole.csvErrors")) {%>
 		<div class="portlet-msg-error">
 			<% List<String> errors = (List<String>)SessionErrors.get(renderRequest, "courseadmin.importuserrole.csvErrors");
 			   if(errors.size()==1) {

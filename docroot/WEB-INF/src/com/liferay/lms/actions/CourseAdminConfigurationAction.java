@@ -78,6 +78,7 @@ public class CourseAdminConfigurationAction implements ConfigurationAction {
 
 		portletPreferences.setValue("inscriptionDateColumn",Boolean.toString(ParamUtil.getBoolean(actionRequest, "inscriptionDateColumn",	true)));
 		portletPreferences.setValue("executionDateColumn",Boolean.toString(ParamUtil.getBoolean(actionRequest, "executionDateColumn",	true)));
+		portletPreferences.setValue("createDateColumn",Boolean.toString(ParamUtil.getBoolean(actionRequest, "createDateColumn",	false)));
 		portletPreferences.setValue("allowDuplicateName",Boolean.toString(ParamUtil.getBoolean(actionRequest, "allowDuplicateName",	false)));
 		
 		portletPreferences.setValue("showIconCourse",Boolean.toString(ParamUtil.getBoolean(actionRequest, "showIconCourse",	true)));

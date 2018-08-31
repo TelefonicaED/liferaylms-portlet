@@ -93,6 +93,10 @@ for(Layout l:layoutForPortletName){
 
 %>
 
+<liferay-ui:success key="portaladmin.success-reset-audit" message="portaladmin.success-reset-audit" />
+<liferay-ui:error key="portaladmin.error-reset-audit" message="portaladmin.error-reset-audit" />
+
+
 <h3><%= "Build date: "	+ date.toString() %></h3>
 <h3><%= "Build number: "+ prop.getProperty("build.number","") %></h3>
 <h3><%= "Auto upgrade: "+ prop.getProperty("build.auto.upgrade","") %></h3>
@@ -109,6 +113,17 @@ for(Layout l:layoutForPortletName){
 	<div class="action">
 		<portlet:actionURL name="asignP2pActivity" var="asignP2pActivityURL" />
 		<liferay-ui:icon image="assign" label="<%=true %>" message="p2ptaskactivity.edit.asignp2p" url='<%= asignP2pActivityURL %>'/>
+	</div>
+	
+	
+	<div class="action">
+		<h4><liferay-ui:message key="portaladmin.reset-audit-implementations" /></h4>
+		<portlet:actionURL name="resetAuditImplamentations" var="resetAuditImplamentationsURL" />
+		<aui:form action="${resetAuditImplamentationsURL}" name="resetAuditImplamentationsFm" >
+		<aui:button-row>
+			<aui:button type="submit" value="reset" name="reset" class="submit"/>
+		</aui:button-row>
+		</aui:form>
 	</div>
 	
 	<div class="action">

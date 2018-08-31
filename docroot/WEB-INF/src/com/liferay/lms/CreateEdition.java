@@ -276,8 +276,8 @@ public class CreateEdition extends CourseCopyUtil implements MessageListener {
 				
 				newModule.setAllowedTime(module.getAllowedTime());
 				newModule.setIcon(module.getIcon());
-				newModule.setStartDate(startDate);
-				newModule.setEndDate(endDate);
+				newModule.setStartDate(startExecutionDate);
+				newModule.setEndDate(endExecutionDate);
 				newModule = ModuleLocalServiceUtil.addmodule(newModule);
 				
 				correlationModules.put(module.getModuleId(), newModule.getModuleId());

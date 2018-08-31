@@ -1,3 +1,4 @@
+<%@page import="com.liferay.portal.kernel.util.UnicodeFormatter"%>
 <%@page import="com.liferay.lms.service.CourseLocalServiceUtil"%>
 <%@page import="com.liferay.lms.learningactivity.calificationtype.CalificationTypeRegistry"%>
 <%@page import="com.liferay.lms.learningactivity.calificationtype.CalificationType"%>
@@ -66,7 +67,7 @@
 					LearningActivityResult learningActivityResult=LearningActivityResultLocalServiceUtil.getByActIdAndUserId(learningActivity.getActId(), usuario.getUserId());
 					score=(learningActivityResult!=null)?ct.translate(themeDisplay.getLocale(), learningActivity.getGroupId(), learningActivityResult.getResult()):"";
 					
-					comments=learningActivityResult.getComments();
+					comments=UnicodeFormatter.toString(learningActivityResult.getComments());
 					if(learningActivityResult.getEndDate()!=null){
 							status="not-passed"	;
 					}

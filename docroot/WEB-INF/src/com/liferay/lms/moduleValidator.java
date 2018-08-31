@@ -10,18 +10,17 @@ import java.util.Properties;
 
 import javax.portlet.PortletRequest;
 
+import com.liferay.lms.model.Course;
 import com.liferay.lms.model.Module;
+import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.repository.model.FileEntry;
-import com.liferay.portal.kernel.servlet.SessionErrors;
-import com.liferay.portal.kernel.upload.UploadPortletRequest;
-import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PrefsPropsUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.service.ImageLocalServiceUtil;
-import com.liferay.portal.util.PortalUtil;
+import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
 
 public class moduleValidator {
@@ -32,7 +31,7 @@ public class moduleValidator {
 		ClassLoader classLoader = moduleValidator.class.getClassLoader();
 		InputStream is = classLoader.getResourceAsStream("regexp.properties");
 		props.load(is);
-
+		ThemeDisplay themeDisplay = (ThemeDisplay) request.getAttribute(WebKeys.THEME_DISPLAY);
 
 		//Field title
 		if (Validator.isNull(module.getTitle(request.getLocale(), true))) {
@@ -50,6 +49,24 @@ public class moduleValidator {
 		if (!validateFileSize(props, module.getIcon())){
 			errors.add("error-file-size");			
 		}
+		
+		
+		try {
+			Course course = CourseLocalServiceUtil.getCourseByGroupCreatedId(themeDisplay.getScopeGroupId());
+			//moduleStartDate vs courseExecutionStartDate
+			if(module.getStartDate().before(course.getExecutionStartDate())){
+				errors.add("module-startDate-before-course-startDate");
+			}
+			
+			//moduleEndDate vs courseExecutionEndDate
+			if(module.getEndDate().after(course.getExecutionEndDate())){
+				errors.add("module-endDate-after-course-endDate");
+			}
+			
+		} catch (SystemException e) {
+			e.printStackTrace();
+		}
+		
 
 		return errors;
 	}

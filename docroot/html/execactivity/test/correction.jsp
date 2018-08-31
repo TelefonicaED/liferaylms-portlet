@@ -1,3 +1,6 @@
+<%@page import="com.liferay.portal.service.PortalPreferencesLocalServiceUtil"%>
+<%@page import="javax.portlet.PortletPreferences"%>
+<%@page import="com.liferay.portal.util.comparator.UserFirstNameComparator"%>
 <%@page import="com.liferay.lms.learningactivity.calificationtype.CalificationType"%>
 <%@page import="com.liferay.lms.learningactivity.calificationtype.CalificationTypeRegistry"%>
 <%@page import="com.liferay.portal.kernel.util.OrderByComparator"%>
@@ -39,7 +42,7 @@ String emailAddress = ParamUtil.getString(request, "email-address","");
 
 <liferay-ui:error key="grades.bad-updating" message="offlinetaskactivity.grades.bad-updating" />
 <liferay-ui:success key="grades.updating" message="offlinetaskactivity.correct.saved" />
-
+ 
 
 <aui:script>
 Liferay.provide(
@@ -102,7 +105,7 @@ function <portlet:namespace />showPopupGrades(studentId, actId) {
 		renderUrl.setPortletId('<%=portletDisplay.getId()%>');
 		renderUrl.setParameter('actId', actId);
 		renderUrl.setParameter('studentId', studentId);
-		renderUrl.setParameter('jspPage', '/html/execactivity/test/admin/popups/grades.jsp');
+		renderUrl.setParameter('jspPage', '/html/questions/admin/popups/grades.jsp');
 
 		renderUrl.setParameter('first-name', '<%=firstName%>');
 		renderUrl.setParameter('last-name', '<%=lastName%>');
@@ -145,7 +148,14 @@ LearningActivity activity = LearningActivityLocalServiceUtil.getLearningActivity
 //List<User> listaUsuarioTotal = UserLocalServiceUtil.getGroupUsers(course.getGroupCreatedId());
 LinkedHashMap<String, Object> params = new LinkedHashMap<String, Object>();
 params.put("usersGroups", new Long(course.getGroupCreatedId())); 
-OrderByComparator comparator = new UserLastNameComparator(true);
+OrderByComparator obc = null;
+PortletPreferences portalPreferences = PortalPreferencesLocalServiceUtil.getPreferences(themeDisplay.getCompanyId(), themeDisplay.getCompanyId(), 1);
+if(Boolean.parseBoolean(portalPreferences.getValue("users.first.last.name", "false"))){
+	obc = new UserLastNameComparator(true);
+}else{
+	obc = new UserFirstNameComparator(true);
+}
+
 boolean andOperator = true;
 
 PortletURL portletURL = renderResponse.createRenderURL();
@@ -162,7 +172,7 @@ SearchContainer<User> userSearchContainer = new SearchContainer<User>(renderRequ
 		null,  LanguageUtil.get(pageContext, "no-results"));
 
 List<User> users = UserLocalServiceUtil.search(themeDisplay.getCompanyId(), firstName,"", lastName,screenName, emailAddress, 
-		-1, params, andOperator, userSearchContainer.getStart(),userSearchContainer.getEnd(), comparator);
+		-1, params, andOperator, userSearchContainer.getStart(),userSearchContainer.getEnd(), obc);
 
 int totalUsers = UserLocalServiceUtil.searchCount(themeDisplay.getCompanyId(), firstName,"", lastName,screenName, emailAddress, 
 		-1, params, andOperator);

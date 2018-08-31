@@ -49,8 +49,7 @@
 	boolean showModuleEndDate = (preferences.getValue("showModuleEndDate", "true")).compareTo("true") == 0;
 	boolean allowEditionMode = (preferences.getValue("allowEditionMode", "false")).compareTo("true") == 0;
 	boolean allowAccessWhenFinishedButNotClosed = (preferences.getValue("allowAccessWhenFinishedButNotClosed", "false")).compareTo("true") == 0;
-	
-
+	boolean showActivities = Boolean.parseBoolean(preferences.getValue("showActivities", "false"));
 	Course course=CourseLocalServiceUtil.fetchByGroupCreatedId(themeDisplay.getScopeGroupId());
 	
 	Date startSchDate = null;
@@ -140,7 +139,6 @@
 				);
 			  });	
 		}
-
 	</script>
 </c:if>
 <%
@@ -154,12 +152,10 @@
 %>
 	<div id="myContainer">
 	<script type="text/javascript">
-
 		function <portlet:namespace/>changeRowStyle(id, cssClass){
 			var trId = '#'+id;
 			$(id).addClass(cssClass);
 		}
-
 	</script>
 	<table class="coursemodule <%="course-status-".concat(String.valueOf(course.getStatus()))%>" id="<%=idModuleTable%>">
 <%
@@ -175,8 +171,10 @@
 			boolean canAccessLock = permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), "com.liferay.lms.model", themeDisplay.getScopeGroupId() , "ACCESSLOCK");
 			boolean courseEditing = (permissionChecker.hasPermission(course.getGroupCreatedId(), Course.class.getName(), course.getCourseId() , ActionKeys.UPDATE))?true:false;
 			boolean hasPermissionAccessCourseFinished = LiferaylmsUtil.hasPermissionAccessCourseFinished(themeDisplay.getCompanyId(), course.getGroupCreatedId(), course.getCourseId(), themeDisplay.getUserId());
+			int numTd;
 			
 			for(Module theModule:theModules){
+				numTd = 2;
 				Date startDate;
 				Date endDate;
 				if(existSchedule){
@@ -199,9 +197,7 @@
 						
 						A.one(window).on('message', 
 							function(event){
-
 								var html5Event=event._event;
-
 								if(A.Lang.isString(html5Event.data)){
 									html5Event={data:JSON.parse(html5Event.data)};
 								}
@@ -216,13 +212,11 @@
 										if(moduleTitlePortlet!=null) {
 											Liferay.Portlet.refresh(moduleTitlePortlet);
 										}
-
 										var moduleDescriptionPortlet=A.one('#p_p_id<%=PortalUtil.getJsSafePortletId(StringPool.UNDERLINE+"moduleDescription"+
 												PortletConstants.WAR_SEPARATOR+portletConfig.getPortletContext().getPortletContextName())+StringPool.UNDERLINE %>');
 										if(moduleDescriptionPortlet!=null) {
 											Liferay.Portlet.refresh(moduleDescriptionPortlet);
 										}
-
 										var activityNavigatorPortlet=A.one('#p_p_id<%=PortalUtil.getJsSafePortletId(StringPool.UNDERLINE+"activityNavigator"+
 												PortletConstants.WAR_SEPARATOR+portletConfig.getPortletContext().getPortletContextName())+StringPool.UNDERLINE %>');
 										if(activityNavigatorPortlet!=null) {
@@ -231,16 +225,13 @@
 									<% if(theModule.getModuleId()!=0){ %>
 										}
 									<%}%>
-
 									Liferay.Portlet.refresh(A.one('#p_p_id<portlet:namespace />'));	
 					  
 								}
 								else if(html5Event.data.name=='closeModule'){
 									A.DialogManager.closeByChild('#editModule');
 								}
-
 							});
-
 					});
 				</script>
 				<tr id="<portlet:namespace/><%=theModule.getModuleId()%>">
@@ -248,6 +239,7 @@
 					if(showLockedModulesIcon){
 						boolean showLock = (courseEditing || moduleEditing || canAccessLock)?true:false;
 						if(showLock){ 
+							numTd++;
 %>
 							<td class="icon">
 <%
@@ -265,8 +257,8 @@
 <%
 						}
 					}
-
 					if(showModuleIcon){
+						numTd++;
 %>
 						<td class="icon">
 <% 
@@ -333,6 +325,7 @@
 					
 <%
 					if(showPercentDone){
+						numTd++;
 %>
 						<td class="percent">
 <%
@@ -348,37 +341,34 @@
 						</td>
 <%
 					}
-
 					if(showModuleStartDate || showModuleEndDate ){
+						numTd++;
 %>
 						<td class="date">
 <%
-SimpleDateFormat sdf = new SimpleDateFormat("dd MMM HH:mm",themeDisplay.getLocale());
+							SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/YYYY HH:mm",themeDisplay.getLocale());
+							sdf.setTimeZone(themeDisplay.getTimeZone());
 							if(startDate!=null &&today.before(startDate)){
 								if(showModuleStartDate){
-																		
-									Long dateOffSet  = startDate.getTime()  + themeDisplay.getTimeZone().getRawOffset(); 					
 %>
 									<liferay-ui:message key="fecha-inicio"/><br />
-									<%=	sdf.format(new Date(dateOffSet))%>
+									<%=	sdf.format(startDate)%>
 									<%--=	dateFormatDate.format(new Date(dateOffSet))--%>
 <%
 								}
 							}else{
 								if(endDate!=null&&today.before(endDate)){
 									if(showModuleStartDate){
-										Long dateOffSet  = startDate.getTime()  + themeDisplay.getTimeZone().getRawOffset();
 %>
 										<liferay-ui:message key="fecha-inicio"/><br />
-										<%=	sdf.format(new Date(dateOffSet))%>
+										<%=	sdf.format(startDate)%>
 										<%--=	dateFormatDateTime.format(new Date(dateOffSet))--%><br />
 <%
 									}
 									if(showModuleEndDate){
-										Long dateOffSet  = endDate.getTime()  + themeDisplay.getTimeZone().getRawOffset();
 %>
 										<liferay-ui:message key="fecha-fin"/><br />
-										<%=	sdf.format(new Date(dateOffSet))%>
+										<%=	sdf.format(endDate)%>
 										<%--=	dateFormatDateTime.format(new Date(dateOffSet))--%>
 <%
 									}
@@ -438,19 +428,39 @@ SimpleDateFormat sdf = new SimpleDateFormat("dd MMM HH:mm",themeDisplay.getLocal
 %>
 					</td>
 				</tr>
+				
+		<%if(showActivities){
+			List<LearningActivity> moduleActivities = theModule.getListLearningActivities();
+		%>
+			
+			<tr class="activity-list-row"><td colspan="<%=numTd%>">
+				<liferay-ui:panel-container extended="false" id="<%=\"panel_container_\" + theModule.getModuleId()%>">
+					<liferay-ui:panel title="modulelist.activity-list-title" id="<%=\"panel_\" + theModule.getModuleId()%>" defaultState="closed" collapsible="true">
+						<%
+						int i=1;
+						for(LearningActivity activity:moduleActivities){%>
+							<div class="activity-row">
+								<span class="col-1"><%=i%></span>
+								<span class="col-2"><%=activity.getTitle(locale) %></span>
+							</div>
+						<%i++;
+						}
+						%>
+					</liferay-ui:panel>
+				</liferay-ui:panel-container>
+	
+			</td></tr>
+		<%}%>		
+				
 <%		}	
 	}%>
   </table>
 </div>
-
 <script type="text/javascript">
-
 function <portlet:namespace/>changeRowStyle(id, cssClass){
 	$('#'+id).addClass(cssClass);
 }
-
 </script>
-
 <%}else{
 	renderRequest.setAttribute(WebKeys.PORTLET_CONFIGURATOR_VISIBILITY, Boolean.FALSE);
 }%>

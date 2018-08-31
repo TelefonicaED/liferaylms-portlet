@@ -58,8 +58,6 @@ public class StudentManage extends MVCPortlet {
 
 		UserSearchContainer searchContainer = new UserSearchContainer(renderRequest, renderResponse.createRenderURL());		
 		UserDisplayTerms displayTerms = (UserDisplayTerms) searchContainer.getDisplayTerms();
-		displayTerms.setShowEmailAddress(Boolean.parseBoolean(renderRequest.getPreferences().getValue("showEmailAddress", StringPool.TRUE)));
-		displayTerms.setShowScreenName(Boolean.parseBoolean(renderRequest.getPreferences().getValue("showScreenName", StringPool.TRUE)));
 		
 		Course course=CourseLocalServiceUtil.getCourseByGroupCreatedId(themeDisplay.getScopeGroupId());
 		renderRequest.setAttribute("course", course);
@@ -82,6 +80,8 @@ public class StudentManage extends MVCPortlet {
 		PortletURL returnURL = renderResponse.createRenderURL();
 		searchURL.setParameter("view", "");
 		renderRequest.setAttribute("returnURL", returnURL.toString());
+		
+		renderRequest.setAttribute("displayTerms", displayTerms);
 		
 		log.debug("Total: "+searchContainer.getTotal());
 		log.debug("usersInPage: "+searchContainer.getResults().size());

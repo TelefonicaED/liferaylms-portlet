@@ -18,17 +18,10 @@ String backUrl = ParamUtil.getString(request, "backUrl", currentURL);
 LearningActivity learningActivity = LearningActivityLocalServiceUtil.getLearningActivity(ParamUtil.getLong(request,"resId"));
 request.setAttribute("activity", learningActivity);
 
-/*
-LiferayPortletURL backUrl = PortletURLFactoryUtil.create(request, PortalUtil.getJsSafePortletId("lmsactivitieslist"+
-		PortletConstants.WAR_SEPARATOR+portletConfig.getPortletContext().getPortletContextName()), themeDisplay.getPlid(), PortletRequest.RENDER_PHASE);
-backUrl.setWindowState(LiferayWindowState.POP_UP);
-backUrl.setParameter("resId", String.valueOf(learningActivity.getActId()));	
-backUrl.setParameter("resModuleId", String.valueOf(learningActivity.getModuleId()));
-backUrl.setParameter("jspPage", "/html/execactivity/test/admin/editquestions.jsp");
-*/
+
 request.setAttribute("backUrl", backUrl.toString());
 PortletURL orderQuestionsURL = renderResponse.createRenderURL();
-orderQuestionsURL.setParameter("jspPage","/html/execactivity/test/admin/orderQuestions.jsp");
+orderQuestionsURL.setParameter("jspPage","/html/questions/admin/orderQuestions.jsp");
 orderQuestionsURL.setParameter("resId",Long.toString(learningActivity.getActId()));
 orderQuestionsURL.setParameter("actionEditingDetails",StringPool.TRUE);
 String orderByCol =  (String)request.getAttribute("orderByCol");
@@ -38,7 +31,7 @@ String orderByType = (String)request.getAttribute("orderByType");
 if(orderByType==null)
 	orderByType="asc";
 %>
-<liferay-util:include page="/html/execactivity/test/admin/editHeader.jsp" servletContext="<%=this.getServletContext() %>" />
+<liferay-util:include page="/html/questions/admin/editHeader.jsp" servletContext="<%=this.getServletContext() %>" />
 
 <liferay-portlet:actionURL name="moveQuestion" var="moveQuestionURL" windowState="<%= LiferayWindowState.EXCLUSIVE.toString()%>" />
 
@@ -163,48 +156,3 @@ AUI().ready('node','aui-io-request','aui-parse-content','aui-sortable',function(
 		</liferay-ui:search-container-row>
 	<liferay-ui:search-iterator />
 </liferay-ui:search-container>
-
-<%-- 
-<table>
-	<thead>
-		<tr class="portlet-section-header results-header">
-			<th class="col-1 col-text-first"><liferay-ui:message key="name" /></th>
-			<th class="col-2 col-questiontype"><liferay-ui:message key="questiontype" /></th> 
-			<th class="col-3 col-weight last"><liferay-ui:message key="weight" /></th> 
-		</tr>
-	</thead>
-	<tbody id="<portlet:namespace/>questionContainer">
-		<%
-		int i=0; 
-		List listaAux = (List)request.getAttribute("listaAux");
-		if(listaAux==null){
-			listaAux = (List<TestQuestion>)TestQuestionLocalServiceUtil.getQuestions(learningActivity.getActId());
-		}
-		List<TestQuestion>listaTotal = ListUtil.copy(listaAux);
-		BeanComparator beanComparator = new BeanComparator(orderByCol);
-		if(orderByType.equals("asc")){
-			Collections.sort(listaTotal, beanComparator);
-		 }
-		else {
-			Collections.sort(listaTotal, Collections.reverseOrder(beanComparator));
-		 }
-		QuestionTypeRegistry qtr = new QuestionTypeRegistry();
-		for(TestQuestion tq : listaTotal){
-		%>
-		<tr class='<%=((i%2==0)?"portlet-section-body":"portlet-section-alternate") + " results-row" %>' id='<%="question-"+tq.getQuestionId()%>'> 
-			<td class="align-left col-1 col-text first valign-middle" colspan="1">
-				<p><%=tq.getText()%></p>
-			</td>
-			<td class="align-left col-2 col-questiontype valign-middle" colspan="1">
-				<p><%=qtr.getQuestionType(tq.getQuestionType()).getTitle(locale) %></p>
-			</td>
-			<td class="align-left col-3 col-weight last sort-column valign-middle" colspan="1">
-				<p><%=tq.getWeigth()%></p>
-			</td>
-		</tr>
-		<%
-			i++;
-		} %>
-	</tbody>	
-</table>
---%>
