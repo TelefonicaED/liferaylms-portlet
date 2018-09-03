@@ -140,7 +140,8 @@ if(course != null || courseId > 0){
 	countGroup = CompetenceServiceUtil.getCountCompetencesOfGroup(course.getGroupCreatedId());
 	countParentGroup = CompetenceServiceUtil.getCountCompetencesOfGroup(course.getGroupId());
 	count = countGroup + countParentGroup;
-
+	templateParent = LayoutSetLocalServiceUtil.getLayoutSet(course.getGroupCreatedId(), false).getLayoutSetPrototypeId();
+	
 	groupsel = GroupLocalServiceUtil.getGroup(course.getGroupCreatedId());
 }
 
