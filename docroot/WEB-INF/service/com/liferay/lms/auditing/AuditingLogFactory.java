@@ -28,23 +28,28 @@ public class AuditingLogFactory
 	static List<AuditingLog> auditLogs = new ArrayList<AuditingLog>();
 	public static List<AuditingLog> getAuditLogs() throws ClassNotFoundException, InstantiationException, IllegalAccessException
 	{
-		if(auditLogs.size()>0){
+		if(auditLogs.size()<=0){
 			Class<?> clase= null;
 			try{
 				Properties properties = PrefsPropsUtil.getProperties("audit.implementation", true);// PropsUtil.getProperties("audit.implementation", true);
-				log.debug("properties size: " + properties.size());
-				log.debug("properties size: " + properties.size());
+				log.debug("pref props properties size: " + properties.size());
+				log.debug("pref props properties size: " + properties.size());
+				if(properties.size()<=0){
+					properties = PropsUtil.getProperties("audit.implementation", true);
+					log.debug("props properties size: " + properties.size());
+					log.debug("props properties size: " + properties.size());
+				}
 				for (Object key:properties.keySet()) {
 					log.debug("key: " + key.toString());
 					String className=properties.getProperty(key.toString());
 					log.debug("type: " + className);
 					String [] context = ((String) key).split("\\.");
 					String classContent = LMS_ACTIVITIES_LIST_PORTLET_ID;
-					log.debug("Context "+context.length);
+					log.debug("Context length "+context.length);
 					if (Validator.isNotNull(context) && context.length > 1) {
 						classContent = context[1];
 					}
-				
+					log.debug("classContent: "+classContent);
 					ClassLoaderProxy classLoaderProxy = new ClassLoaderProxy(Class.forName(className, true, 
 							PortletClassLoaderUtil.getClassLoader(classContent)).newInstance(), className, 
 							PortletClassLoaderUtil.getClassLoader(classContent));
@@ -77,7 +82,9 @@ public class AuditingLogFactory
 	
 	
 	public static void resetAuditLogs() throws SystemException {
+		log.debug("Reseting auditLogs "+auditLogs.size());
 		auditLogs = new ArrayList<AuditingLog>();
+		log.debug("Audit Logs RESETED "+auditLogs.size());
 	}
 	
 	
