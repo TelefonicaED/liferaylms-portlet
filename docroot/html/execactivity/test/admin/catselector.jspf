@@ -92,10 +92,11 @@ private long[] _filterCategoryIds(long vocabularyId, long[] categoryIds) throws 
 	List<Long> filteredCategoryIds = new ArrayList<Long>();
 
 	for (long categoryId : categoryIds) {
-		AssetCategory category = AssetCategoryLocalServiceUtil.getCategory(categoryId);
-
-		if (category.getVocabularyId() == vocabularyId) {
-			filteredCategoryIds.add(category.getCategoryId());
+		AssetCategory category = AssetCategoryLocalServiceUtil.fetchAssetCategory(categoryId);
+		if (Validator.isNotNull(category) ){
+			if (category.getVocabularyId() == vocabularyId) {
+				filteredCategoryIds.add(category.getCategoryId());
+			}
 		}
 	}
 
