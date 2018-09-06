@@ -761,7 +761,7 @@ if(isTablet){%>
 						<liferay-ui:message key="execActivity.bad.password" />
 					</div>
 					<% } %>
-					<aui:button type="send" />
+					<aui:button value="send" type="submit"/>
 					
 				</aui:form>
 			<%	

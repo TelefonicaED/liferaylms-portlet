@@ -427,10 +427,12 @@ public class LmsActivitiesList extends MVCPortlet {
 				ResourceConstants.SCOPE_INDIVIDUAL,	Long.toString(tmp.getActId()),siteMemberRole.getRoleId(), ActionKeys.VIEW);	
 			}
 			else{
-				Team t = TeamLocalServiceUtil.getTeam(teamId);
-				Role teamMemberRole = RoleLocalServiceUtil.getTeamRole(t.getCompanyId(), t.getTeamId());
-				ResourcePermissionLocalServiceUtil.removeResourcePermission(t.getCompanyId(), LearningActivity.class.getName(), 
-				ResourceConstants.SCOPE_INDIVIDUAL,	Long.toString(tmp.getActId()),teamMemberRole.getRoleId(), ActionKeys.VIEW);	
+				Team t = TeamLocalServiceUtil.fetchTeam(teamId);
+				if(t!=null){
+					Role teamMemberRole = RoleLocalServiceUtil.getTeamRole(t.getCompanyId(), t.getTeamId());
+					ResourcePermissionLocalServiceUtil.removeResourcePermission(t.getCompanyId(), LearningActivity.class.getName(), 
+					ResourceConstants.SCOPE_INDIVIDUAL,	Long.toString(tmp.getActId()),teamMemberRole.getRoleId(), ActionKeys.VIEW);
+				}	
 			}
 			
 			
@@ -718,7 +720,7 @@ public class LmsActivitiesList extends MVCPortlet {
 				LearningActivityLocalServiceUtil.updateLearningActivity(precedence);
 			}
 		}
-		LearningActivityServiceUtil.deleteLearningactivity(larn.getActId());
+		LearningActivityLocalServiceUtil.deleteLearningactivity(larn.getActId());
 		//auditing
 		AuditingLogFactory.audit(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(), LearningActivity.class.getName(), larn.getActId(), themeDisplay.getUserId(), AuditConstants.DELETE, null);
 		

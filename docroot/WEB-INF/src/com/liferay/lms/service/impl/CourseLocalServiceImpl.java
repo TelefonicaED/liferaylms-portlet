@@ -110,6 +110,7 @@ import com.liferay.portal.util.comparator.UserLastNameComparator;
 import com.liferay.portlet.asset.model.AssetEntry;
 import com.liferay.portlet.asset.model.AssetLinkConstants;
 import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
+import com.liferay.portlet.asset.service.persistence.AssetEntryQuery;
 import com.liferay.portlet.social.model.SocialActivityCounterDefinition;
 import com.liferay.portlet.social.model.SocialActivityDefinition;
 import com.liferay.portlet.social.model.SocialActivitySetting;
@@ -504,10 +505,7 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 		Course course = addCourse (title, description,summary,friendlyURL, locale,
 				createDate,startDate,endDate,layoutSetPrototypeId,GroupConstants.TYPE_SITE_PRIVATE,
 				 serviceContext, calificationType,0,false);
-
-		//auditing
-		AuditingLogFactory.audit(course.getCompanyId(), course.getGroupId(), Course.class.getName(), course.getCourseId(), serviceContext.getUserId(), AuditConstants.ADD, null);
-		return course;
+	return course;
 	}
 
 	@Indexable(type=IndexableType.REINDEX)
@@ -519,9 +517,7 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 		
 		Course course = this.addCourse(title, description, description, friendlyURL, locale, createDate, startDate, endDate, serviceContext, calificationType);
 		
-		//auditing
-		AuditingLogFactory.audit(course.getCompanyId(), course.getGroupId(), Course.class.getName(), course.getCourseId(), serviceContext.getUserId(), AuditConstants.ADD, null);
-		
+	
 		return course;
 	}
 	
@@ -1858,5 +1854,28 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 	
 	public int countStudentsStatus(long courseId, long companyId, String screenName, String firstName, String lastName, String emailAddress, int status, boolean andOperator){
 		return countStudentsFromCourse(courseId, companyId, screenName,firstName, lastName, emailAddress, status, null, andOperator);
+	}
+	
+	public List<AssetEntry> getMostRecentCourseEntries(long groupId, String orderBy, String orderByType,int start, int end){
+		List<AssetEntry> results = new ArrayList<AssetEntry>();
+		try {
+			AssetEntryQuery query =new AssetEntryQuery();
+			query.setClassName(Course.class.getName());
+			long[] groupIds=new long[1];
+			groupIds[0]=groupId;
+			query.setGroupIds(groupIds);
+			query.setExcludeZeroViewCount(false);
+			query.setEnablePermissions(true);
+			query.setOrderByCol1(orderBy);
+			query.setOrderByType1(orderByType);
+			query.setStart(start);
+			query.setEnd(end);
+			results = AssetEntryLocalServiceUtil.getEntries(query);
+		} catch (SystemException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return results;
 	}
 }
