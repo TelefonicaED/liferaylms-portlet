@@ -99,19 +99,19 @@
 				<liferay-portlet:renderURL var="viewGradeURL">
 				<liferay-portlet:param name="jspPage" value="/html/gradebook/userdetails.jsp"></liferay-portlet:param>
 				<liferay-portlet:param name="userId" value="${usr.userId}"></liferay-portlet:param>
-				<liferay-portlet:param name="returnurl" value="${returnURL}"></liferay-portlet:param>
+				<liferay-portlet:param name="returnURL" value="${returnURL }"></liferay-portlet:param>
 				</liferay-portlet:renderURL>
 				
 				<liferay-portlet:renderURL var="viewactivityURL">
 				<liferay-portlet:param name="jspPage" value="/html/studentmanage/lastsocialactivity.jsp"></liferay-portlet:param>
 				<liferay-portlet:param name="userId" value="${usr.userId}"></liferay-portlet:param>
-				<liferay-portlet:param name="returnurl" value="${returnURL}"></liferay-portlet:param>	
+				<liferay-portlet:param name="returnURL" value="${returnURL }"></liferay-portlet:param>	
 				</liferay-portlet:renderURL>
 				
 				<liferay-portlet:renderURL var="viewtriesURL">
 				<liferay-portlet:param name="jspPage" value="/html/studentmanage/lastactivitytries.jsp"></liferay-portlet:param>
 				<liferay-portlet:param name="userId" value="${usr.userId}"></liferay-portlet:param>
-				<liferay-portlet:param name="returnurl" value="${returnURL}"></liferay-portlet:param>	
+				<liferay-portlet:param name="returnURL" value="${returnURL }"></liferay-portlet:param>	
 				</liferay-portlet:renderURL>
 				
 				<liferay-ui:icon-menu>
