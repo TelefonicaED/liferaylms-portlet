@@ -58,6 +58,19 @@
 				</c:choose>
 			</liferay-ui:search-container-column-text>
 			
+			<c:if test="${!hideExecutionDateCourseColumn }">
+				<liferay-ui:search-container-column-text name="course-admin.start-execution-date">
+					<c:if test="<%=CourseLocalServiceUtil.countChildCourses(course.getCourseId())<1 %>">
+						<fmt:formatDate type="both" dateStyle="short" timeStyle="short" value="${course.executionStartDate }" />
+					</c:if>
+				</liferay-ui:search-container-column-text>
+				<liferay-ui:search-container-column-text name="course-admin.end-execution-date">
+					<c:if test="<%=CourseLocalServiceUtil.countChildCourses(course.getCourseId())<1 %>">
+						<fmt:formatDate type="both" dateStyle="short" timeStyle="short" value="${course.executionEndDate }" />
+					</c:if>
+				</liferay-ui:search-container-column-text>
+			</c:if>
+			
 			<c:if test="${not empty expandoNames}">
 				<c:forEach items="${expandoNames}" var="expName">
 					<liferay-ui:search-container-column-text name="${expName.getDisplayName(themeDisplay.locale)}">
