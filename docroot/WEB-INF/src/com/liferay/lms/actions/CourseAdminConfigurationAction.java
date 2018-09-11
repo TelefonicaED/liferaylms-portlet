@@ -48,6 +48,7 @@ public class CourseAdminConfigurationAction implements ConfigurationAction {
 		
 		portletPreferences.setValue("showInscriptionDate",Boolean.toString(ParamUtil.getBoolean(actionRequest, "inscriptionDate",true)));
 		portletPreferences.setValue("showExecutionDate",Boolean.toString(ParamUtil.getBoolean(actionRequest, "executionDate",true)));
+		portletPreferences.setValue("hideExecutionDateCourse", Boolean.toString(ParamUtil.getBoolean(actionRequest, "executionDateCourse", false)));
 		portletPreferences.setValue("categories",Boolean.toString(ParamUtil.getBoolean(actionRequest, "categories",true)));
 		portletPreferences.setValue("showcatalog",Boolean.toString(ParamUtil.getBoolean(actionRequest, "showcatalog",true)));
 		portletPreferences.setValue("courseTemplates",	StringUtil.merge(actionRequest.getParameterMap().get( "courseTemplates")));
@@ -78,6 +79,7 @@ public class CourseAdminConfigurationAction implements ConfigurationAction {
 
 		portletPreferences.setValue("inscriptionDateColumn",Boolean.toString(ParamUtil.getBoolean(actionRequest, "inscriptionDateColumn",	true)));
 		portletPreferences.setValue("executionDateColumn",Boolean.toString(ParamUtil.getBoolean(actionRequest, "executionDateColumn",	true)));
+		portletPreferences.setValue("executionDateCourseColumn",  Boolean.toString(ParamUtil.getBoolean(actionRequest, "executionDateCourseColumn", false)));
 		portletPreferences.setValue("createDateColumn",Boolean.toString(ParamUtil.getBoolean(actionRequest, "createDateColumn",	false)));
 		portletPreferences.setValue("allowDuplicateName",Boolean.toString(ParamUtil.getBoolean(actionRequest, "allowDuplicateName",	false)));
 		
