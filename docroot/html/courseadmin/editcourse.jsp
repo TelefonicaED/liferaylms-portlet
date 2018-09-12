@@ -462,11 +462,9 @@ if(course!=null){
 		<aui:input type="textarea" cols="100" rows="4" name="summary" label="summary" value="<%=summary %>"/>
 	</c:if>
 	
-	<c:if test="<%=!isCourseChild%>">
-		<div id="<portlet:namespace/>diplomaContent">
-			<%@include file="/html/courseadmin/inc/specificContent.jsp" %>
-		</div>
-	</c:if>
+	<div id="<portlet:namespace/>diplomaContent">
+		<%@include file="/html/courseadmin/inc/specificContent.jsp" %>
+	</div>
 	
 	
 		<%
