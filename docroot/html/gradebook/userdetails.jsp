@@ -14,7 +14,6 @@
 <%@page import="com.liferay.lms.service.LearningActivityServiceUtil"%>
 <%@page import="com.liferay.lms.model.LearningActivity"%>
 <%@ include file="/init.jsp" %>
-
 <%
 
 	long userId=ParamUtil.getLong(request,"userId",0);
@@ -31,9 +30,10 @@
 	String title = LanguageUtil.get(pageContext,"results") +" "+ usuario.getFullName();
 	
 	CalificationType ct = new CalificationTypeRegistry().getCalificationType(CourseLocalServiceUtil.getCourseByGroupCreatedId(themeDisplay.getScopeGroupId()).getCalificationType());
+	
+	String returnURL = ParamUtil.getString(request,"returnURL","");
 %>
-
-<liferay-ui:header title="<%= title %>" backURL="${renderURL}"></liferay-ui:header>
+<liferay-ui:header title="" backURL="<%=returnURL %>" showBackURL="<%=Boolean.TRUE %>"></liferay-ui:header>
 <liferay-ui:panel-container >
 <%
 	java.util.List<Module> modules = ModuleLocalServiceUtil.findAllInGroup(themeDisplay.getScopeGroupId());
