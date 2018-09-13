@@ -143,7 +143,7 @@ if( permissionChecker.hasPermission(themeDisplay.getScopeGroupId(),  Course.clas
 	<liferay-ui:icon src="<%= themeDisplay.getPathThemeImages() + \"/dock/my_places_private.png\" %>" message="open-course" url="<%=openURL.toString() %>" />
 <%} %>
 <portlet:actionURL name="deleteCourse" var="deleteURL">
-<portlet:param name="courseId" value="<%= primKey %>" />
+	<portlet:param name="courseId" value="<%= primKey %>" />
 </portlet:actionURL>
 
 <%-- Eliminar Curso --%>
