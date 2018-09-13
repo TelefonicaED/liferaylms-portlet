@@ -73,7 +73,7 @@
 					if(learningActivityResult!=null){
 						divisor = LearningActivityResultLocalServiceUtil.getCalificationTypeSuffix(themeDisplay.getLocale(), learningActivityResult.getResult(), learningActivity.getGroupId());
 					}
-					comments=learningActivityResult.getComments();
+					comments=HtmlUtil.stripHtml(learningActivityResult.getComments());
 					if(learningActivityResult.getEndDate()!=null){
 							status="not-passed"	;
 					}
