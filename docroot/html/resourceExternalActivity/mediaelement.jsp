@@ -13,6 +13,10 @@
 				<aui:button value="save" onClick="javascript:${renderResponse.namespace}answerQuestion(${question.questionId })" />
 			</aui:form>
 		</div>
+		<div class="aui-helper-hidden questionVideo" id="${renderResponse.namespace}feedback_${question.questionId}">
+			<div id="${renderResponse.namespace}feedback_content_${question.questionId}"></div>	
+			<aui:button value="continue" onClick="javascript:${renderResponse.namespace}continueQuestion(${question.questionId })" />
+		</div>
 	</c:forEach>
 </div>
 
@@ -53,11 +57,18 @@
 		}
 		
 		player.addEventListener('play', function () {
+			if(!$('#<portlet:namespace/>videoQuestionFeedback').hasClass("aui-helper-hidden")){
+				$('#<portlet:namespace/>videoQuestionFeedback').addClass("aui-helper-hidden")
+			}	
+			$('#<portlet:namespace/>videoQuestionFeedback').html("");
 			finished = false;
 			if(plays > 0){
 				$('[id*^=<portlet:namespace/>question_]').addClass("aui-helper-hidden");
 			}
 			plays++;
+			
+			
+			
 		});	
 			
 		player.addEventListener('ended',function() {
@@ -78,7 +89,9 @@
 					src = src.substring(0,index-1);
 					document.getElementById("playervideo_vimeo_iframe").src = src;
 				}
-			}								
+			}
+			
+			
 		});
 		
 		//Creamos el array para las preguntas
@@ -99,7 +112,6 @@
 			var nextQuestion = questions[indexQuestion];
 			
 			player.addEventListener('timeupdate', function() {
-				console.log("timeupdate");
 				if(indexQuestion < maxQuestions && nextQuestion[1] < player.currentTime && (nextQuestion[1] > (player.currentTime - 2))){
 					player.pause();
 					$('#<portlet:namespace/>question_' + nextQuestion[0]).removeClass("aui-helper-hidden");
@@ -158,7 +170,15 @@
  					if(data){
  						if(data.correct){
  							$('#<portlet:namespace />question_'+questionId).remove();
-							player.play();
+ 							if(data.questionFeedback){
+ 								$('#<portlet:namespace />feedback_'+questionId).removeClass("aui-helper-hidden");
+ 	 							$('#<portlet:namespace />feedback_content_'+questionId).html(data.feedback);	
+ 							}else{
+ 								$('#<portlet:namespace />feedback_'+questionId).remove();
+ 								player.play();
+ 							}
+ 							
+							
  						}	
  					}
  				},
@@ -169,6 +189,13 @@
  		}else{
  			//Mostramos los mensajes que sean
  		}
+ 	}
+ 	
+ 	
+ 	function <portlet:namespace/>continueQuestion(questionId){
+ 		//Cogemos la respuesta
+ 		$('#<portlet:namespace />feedback_'+questionId).remove();
+		player.play();
  	}
 
 </script>	

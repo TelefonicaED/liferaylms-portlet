@@ -1,3 +1,6 @@
+<%@page import="java.util.regex.Pattern"%>
+<%@page import="java.util.regex.Matcher"%>
+<%@page import="java.util.Hashtable"%>
 <%@page import="com.liferay.portal.kernel.servlet.SessionErrors"%>
 <%@page import="com.liferay.lms.model.TestQuestion"%>
 <%@page import="com.liferay.lms.service.TestQuestionLocalServiceUtil"%>
@@ -70,7 +73,8 @@
 	LearningActivity learningActivity=null;
 	boolean readonly = true;
 	int correctMode = ResourceExternalLearningActivityType.CORRECT_VIDEO;
-
+	boolean finalFeedback = false;
+	boolean questionFeedback = false;
 	List<AssetEntry> elements = new ArrayList<AssetEntry>(); 
 		
 	if(request.getAttribute("activity")!=null) {
@@ -105,6 +109,16 @@
 			Element correctModeElement = root.element("correctMode");
 			if(correctModeElement != null){
 				correctMode = Integer.parseInt(correctModeElement.getText());
+			}
+			
+			Element finalFeedbackElement = root.element("finalFeedback");
+			if(finalFeedbackElement != null){
+				finalFeedback = Boolean.parseBoolean(finalFeedbackElement.getText());
+			}
+			
+			Element questionFeedbackElement = root.element("questionFeedback");
+			if(questionFeedbackElement != null){
+				questionFeedback = Boolean.parseBoolean(questionFeedbackElement.getText());
 			}
 		}
 	}
@@ -180,8 +194,234 @@
   			if((learningActivity.getExtracontent()!=null)&&(learningActivity.getExtracontent().trim().length()!=0))	{
 				Document document = SAXReaderUtil.read(learningActivity.getExtracontent());
 				root=document.getRootElement();
-			}%>
-  			<table class="taglib-search-container">
+			
+			
+			
+				
+				
+				
+				
+				
+				
+				
+				
+				//Tratamos el video si tiene
+				Element video=root.element("video");
+				if(video!=null){
+					boolean isVimeoIframe = false;
+					boolean isDLFileEntry = false;
+					
+					//Comprobamos si es vimeo o youtube
+					if(video.attributeValue("id","").equals("")){
+						String videoIframeCode= video.getText();
+						isVimeoIframe = ((videoIframeCode.indexOf("iframe")>-1) &&  (videoIframeCode.indexOf("vimeo")>-1));
+						
+						boolean videoControlDisabled = false;
+						Element videoControl=root.element("video-control");
+						if(videoControl!=null){
+							videoControlDisabled = Boolean.parseBoolean(videoControl.getText());
+						}
+						
+						
+						String videoCode= video.getText();
+						
+						if(videoCode.indexOf("src=") > 0){
+							try{
+								Matcher matcher = Pattern.compile("src=\"([^\"]+)\"").matcher(videoCode);
+								matcher.find();
+								videoCode = matcher.group(1);
+							}catch (IllegalStateException e){
+								Matcher matcher = Pattern.compile("src=\'([^\']+)\'").matcher(videoCode);
+								matcher.find();
+								videoCode = matcher.group(1);
+							}
+						}
+						
+						if(isVimeoIframe && videoCode.indexOf("?") >= 0){
+							videoCode = videoCode.substring(0, videoCode.indexOf("?"));
+						}
+						
+						
+						String mimeType = "video/";
+						if(videoCode.contains("vimeo.com")){
+							mimeType += "vimeo";
+						}else if(videoCode.contains("youtu")){
+							mimeType += "youtube";
+						}else if(videoCode.contains(".mp4")){
+							mimeType += "mp4";
+						}else if(videoCode.contains(".wmv")){
+							mimeType += "wmv";
+						}else if(videoCode.contains(".ogv")){
+							mimeType += "ogg";
+						}else if(videoCode.contains(".webm")){
+							mimeType += "webm";
+						}else if(videoCode.contains(".flv")){
+							mimeType += "flv";
+						}else if(videoCode.contains(".mp4")){
+							mimeType += "mp4";
+						}
+						
+						
+						//Ahora pasamos los tiempos de las preguntas
+						Hashtable<Long, Integer> timeQuestions = new Hashtable<Long, Integer>();
+						Element element = null;
+						for(TestQuestion question: listQuestions){
+							try{
+								element = root.element("question_" + question.getQuestionId());
+								if(element != null){
+									timeQuestions.put(question.getQuestionId(), Integer.parseInt(element.getText()));
+								}
+							}catch(Exception e){
+								e.printStackTrace();
+							}
+						}
+						%>
+						
+						<c:set var="controls" value="controls"/>
+						<c:set var="currentTime" value="0"/>
+						<c:set var="mimeType" value="<%=mimeType %>"/>
+						<c:set var="video" value="<%=videoCode %>"/>
+						<c:set var="listQuestions" value="<%=listQuestions %>"/>
+						<c:set var="timeQuestions" value="<%=timeQuestions %>"/>
+						
+						
+						<%
+						/*renderRequest.setAttribute("controls", "controls");
+						renderRequest.setAttribute("currentTime", 0);
+						renderRequest.setAttribute("mimeType", "video/" + mimeType);
+						renderRequest.setAttribute("video", videoCode);
+						
+						renderRequest.setAttribute("listQuestions", listQuestions);
+						
+						
+						
+						renderRequest.setAttribute("timeQuestions", timeQuestions);*/
+					}
+					
+					renderRequest.setAttribute("isYoutubeIframe", true);
+					renderRequest.setAttribute("isVimeoIframe", isVimeoIframe);
+					renderRequest.setAttribute("isDLFileEntry", isDLFileEntry);
+				}%>
+
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/mediaelement@4.2.7/build/mediaelementplayer.min.css">
+
+
+	
+	
+<div class="contentQuestionVideo">
+	<div class="video">
+		<video  id="playervideo" width="600" height="338" autoplay="autoplay" src="${video}"  type="${mimeType }"></video>
+	</div>
+	
+	<c:forEach items="${listQuestions }" var="question">
+		<c:set var="questionType" value="${question.testQuestionType }" />
+		<div class="aui-helper-hidden questionVideo" id="${renderResponse.namespace}question_video_${question.questionId}">	
+			${questionType.getHtmlView(question.questionId, themeDisplay, null) }
+			<aui:button value="continue" onClick="javascript:${renderResponse.namespace}continueQuestion(${question.questionId })" />
+		</div>
+		</c:forEach>
+</div>
+	
+	
+	
+
+ <!-- JS -->
+ <script src="https://cdn.jsdelivr.net/npm/mediaelement@4.2.7/build/mediaelement-and-player.min.js"></script>
+ <script src="https://cdn.jsdelivr.net/npm/mediaelement@4.2.7/build/renderers/dailymotion.min.js"></script>
+ <script src="https://cdn.jsdelivr.net/npm/mediaelement@4.2.7/build/renderers/facebook.min.js"></script>
+ <script src="https://cdn.jsdelivr.net/npm/mediaelement@4.2.7/build/renderers/soundcloud.min.js"></script>
+ <script src="https://cdn.jsdelivr.net/npm/mediaelement@4.2.7/build/renderers/twitch.min.js"></script>
+ <script src="https://cdn.jsdelivr.net/npm/mediaelement@4.2.7/build/renderers/vimeo.min.js"></script>
+ 
+ <script src="/liferaylms-portlet/js/media-element-marker.js"></script>
+<script>
+ 	
+ 	var player;
+ 	
+ 	document.addEventListener('DOMContentLoaded', function() {   
+
+		//Creamos el array para las preguntas
+		var questions = [];
+		<c:forEach items="${timeQuestions }" var="question">
+			var question = ["${question.key}","${question.value}"];
+			questions.push(question);
+		</c:forEach>
+		
+		questions.sort(function(a, b){return a[1]-b[1]});
+ 		
+ 		$('#playervideo').mediaelementplayer({
+     	    features: ['playpause','current','progress','duration','markers'], //Adding the feature 'markers' enables this plugin
+     		pluginPath: 'https://cdn.jsdelivr.net/npm/mediaelement@4.2.7/build/',
+     		markerColor: '#FCD730', // Optional : Specify the color of the marker
+     		markers:questions, // Specify marker times in seconds 
+     		markerCallback:function(media,time,currentMarker){ // Callback function invoked when a marker position is reached
+     	
+     		   
+     		  media.pause();
+				$('#<portlet:namespace/>question_video_' + currentMarker).removeClass("aui-helper-hidden");
+     		
+     		},
+     	    success: function (media) {
+     	    	player = media;
+     	    }
+     				
+     				
+     	}); 
+
+     	     	
+     	$(".mejs__playpause-button").remove();
+     }); 
+     
+   
+     
+ 	function <portlet:namespace/>continueQuestion(questionId){
+ 		//Cogemos la respuesta
+ 		console.log("continuamos respuesta");
+ 		var A = AUI();
+ 		var divQuestionId = $('.question',$('#<portlet:namespace />question_video_'+questionId)).attr("id");
+ 		var divQuestion = A.one('#' + divQuestionId);
+ 		$('#<portlet:namespace />question_video_'+questionId).remove();
+		player.play();
+ 		
+ 	}
+    
+ 	function <portlet:namespace/>changeTime(questionId,second){
+ 		console.log("Question Id "+questionId);
+ 		console.log("Second "+second);
+ 		player.pause();
+ 		//Borramos el marcador
+ 		$('#marker-'+questionId).remove();
+ 		//Creamos marcador nuevo
+ 		 $('.mejs__time-total').append('<span class="mejs-time-marker" id="marker-'+questionId+'"></span>');
+ 		//Maquetamos el marcador
+ 		if (Math.floor(second) <= player.getDuration() && Math.floor(second) >= 0) {
+                    left = 100 * Math.floor(second) / player.getDuration();
+                    $('#marker-'+questionId).css({
+                        "width": "2px",
+                        "height": "10px",
+                        "left": left+"%",
+                        "position": "absolute",
+                        "background": "#FCD730"
+                    });
+                }
+ 		//Posicionamos el video en el segundo.
+ 		player.setCurrentTime(second);
+ 		console.log("finish");
+ 		
+ 	}
+</script>				
+			
+  			<%}
+				%>
+				
+				
+		
+			
+			
+			
+			
+		
+		<table class="taglib-search-container">
   				<thead>
   					<tr class="portlet-section-header results-header">
   						<th class="col-1 col-text first">
@@ -199,10 +439,10 @@
   							second = root.element("question_" + question.getQuestionId());
   						}%>
   						<tr class="portlet-section-body results-row">
-  							<td class="align-left col-text"><%=question.getText() %></td>
+  							<td class="align-left col-text"><span id="${renderResponse.getNamespace()}question_<%=question.getQuestionId()%>"><%=question.getText() %></td>
   							<td class="align-middle">
   								<c:set var="questionId" value="<%=question.getQuestionId()%>" />
-  								<aui:input name="second_${questionId }" label="" value='<%=second != null ? second.getText() : "0" %>'>
+  								<aui:input name="second_${questionId }" label="" value='<%=second != null ? second.getText() : "0" %>'  onChange="${renderResponse.getNamespace()}changeTime('${questionId}',this.value);">
   									<aui:validator name="number"/>
   									<aui:validator name="min">"0"</aui:validator>
   								</aui:input>
@@ -211,7 +451,14 @@
   					<%} %>
   				</tbody>
   			</table>
-  	<%	}
+  			<%if(readonly) {%>
+    			<aui:input  readonly="<%=readonly %>"  label="resourceexternalactivity.question-feedback" name="questionFeedback" type="checkbox" value="<%= questionFeedback %>" />
+			    <aui:input  readonly="<%=readonly %>"  label="resourceexternalactivity.final-feedback" name="finalFeedback" type="checkbox" value="<%= finalFeedback %>" />
+			<%}else{ %>
+				<aui:input  label="resourceexternalactivity.question-feedback" name="questionFeedback" type="checkbox" value="<%= questionFeedback %>" />
+				<aui:input  label="resourceexternalactivity.final-feedback" name="finalFeedback" type="checkbox" value="<%= finalFeedback %>" />
+			<%} 
+  		}
   	} %>
   	
 </aui:field-wrapper>
@@ -277,7 +524,6 @@
 			if(i>0){
 				append = append+(i-1);
 			}
-			
 		%>
 			<div id="file<%=append%>" class="row_file">
 				<% 	AssetEntry aEntry = elements.get(i);

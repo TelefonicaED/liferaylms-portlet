@@ -6,6 +6,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -40,12 +41,14 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.upload.UploadPortletRequest;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -372,7 +375,7 @@ public class ResourceExternalActivity extends QuestionsAdmin {
 	@Override
 	public void serveResource(ResourceRequest resourceRequest, ResourceResponse resourceResponse) throws IOException,
 			PortletException {
-		
+		ThemeDisplay themeDisplay = (ThemeDisplay) resourceRequest.getAttribute(WebKeys.THEME_DISPLAY);
 		if(resourceRequest.getResourceID() != null && resourceRequest.getResourceID().equals("finishTry")){
 			
 			resourceResponse.setContentType("application/json");
@@ -383,7 +386,7 @@ public class ResourceExternalActivity extends QuestionsAdmin {
 			double position = ParamUtil.getDouble(resourceRequest, "position");
 			int plays = ParamUtil.getInteger(resourceRequest, "plays");
 			long actId = ParamUtil.getLong(resourceRequest, "actId");
-			
+			int correctMode = ResourceExternalLearningActivityType.CORRECT_VIDEO;
 			log.debug("***updateCorrect*** " + latId + " - " + score + " - " + position + " - " + plays);
 			
 			try {
@@ -427,6 +430,12 @@ public class ResourceExternalActivity extends QuestionsAdmin {
 						playsElement.setText(String.valueOf(plays));	
 						
 						activityTry.setTryResultData(documentTry.formattedString());
+						
+						
+						
+						
+						
+						
 					} catch (DocumentException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -458,13 +467,63 @@ public class ResourceExternalActivity extends QuestionsAdmin {
 				activityTry.setResult(result);
 				
 				activityTry = LearningActivityTryLocalServiceUtil.updateLearningActivityTry(activityTry);
+				
+				correctMode = Integer.parseInt(LearningActivityLocalServiceUtil.getExtraContentValue(actId, "correctMode"));
+				log.error("CORRECT MODE "+correctMode);
+				if(correctMode == ResourceExternalLearningActivityType.CORRECT_QUESTIONS){
+					log.error("--correctQUESTIONS!" );
+					String feedback = "<p>"+ LanguageUtil.get(themeDisplay.getLocale(), "evaluationtaskactivity.result.youresult") +" "+result+"</p>";
+					List<TestQuestion> questions=null;
+					if( StringPool.TRUE.equals(LearningActivityLocalServiceUtil.getExtraContentValue(actId, "isBank")) ){
+						String tryResultData = activityTry.getTryResultData();
+						Document docQuestions = SAXReaderUtil.read(tryResultData);
+						List<Element> xmlQuestions = docQuestions.getRootElement().elements("question");
+						String questionIdString = xmlQuestions.get(0).attributeValue("id");
+						Long questionId = Long.valueOf(questionIdString);
+						TestQuestion testQuestion = TestQuestionLocalServiceUtil.getTestQuestion(questionId);
+						questions = TestQuestionLocalServiceUtil.getQuestions(testQuestion.getActId());
+					}else{
+						if( GetterUtil.getLong(LearningActivityLocalServiceUtil.getExtraContentValue(actId,"random"))==0)
+							questions=TestQuestionLocalServiceUtil.getQuestions(activity.getActId());
+						else{
+							questions= new ArrayList<TestQuestion>();
+							Iterator<Element> nodeItr = SAXReaderUtil.read(activityTry.getTryResultData()).getRootElement().elementIterator();
+							TestQuestion question=null;
+							while(nodeItr.hasNext()) {
+								Element element = nodeItr.next();				
+								 if("question".equals(element.getName())) {
+									 question=TestQuestionLocalServiceUtil.fetchTestQuestion(Long.valueOf(element.attributeValue("id")));
+									 if(question != null){
+										 questions.add(question); 
+									 }		        	 
+								 }
+							}	
+						}
+					}
+
+					
+					for(TestQuestion question:questions){
+						QuestionType qt = new QuestionTypeRegistry().getQuestionType(question.getQuestionType());
+						qt.setLocale(themeDisplay.getLocale());
+						feedback+=qt.getHtmlFeedback(SAXReaderUtil.read(activityTry.getTryResultData()), question.getQuestionId(), activity.getActId(), themeDisplay);
+					}
+					oreturned.put("questionCorrection",true);
+					oreturned.put("finalFeedback", Boolean.parseBoolean(LearningActivityLocalServiceUtil.getExtraContentValue(activity.getActId(), "finalFeedback","false")));
+					oreturned.put("feedback", feedback);
+				}else{
+					oreturned.put("questionCorrection",false);
+				}
+				
 			} catch (PortalException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			} catch (SystemException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
+			} catch(DocumentException e){
+				e.printStackTrace();
 			}
+			
 			try {
 				PrintWriter out = resourceResponse.getWriter();
 				out.print(oreturned.toString());
@@ -512,7 +571,8 @@ public class ResourceExternalActivity extends QuestionsAdmin {
 				lat.setTryResultData(resultXMLDoc.formattedString());
 				
 				LearningActivityTryLocalServiceUtil.updateLearningActivityTry(lat);
-				
+				oreturned.put("questionFeedback", Boolean.parseBoolean(LearningActivityLocalServiceUtil.getExtraContentValue(lat.getActId(), "questionFeedback","false")));
+				oreturned.put("feedback", qt.getHtmlFeedback(resultXMLDoc, questionId, lat.getActId(), themeDisplay));
 				oreturned.put("correct", true);
 				
 			} catch (PortalException e1) {
