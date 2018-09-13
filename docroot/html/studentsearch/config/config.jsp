@@ -1,3 +1,4 @@
+<%@page import="com.liferay.lms.StudentSearch"%>
 <%@page import="com.liferay.portal.service.RoleLocalServiceUtil"%>
 <%@page import="javax.portlet.PortletPreferences"%>
 <%@page import="com.liferay.portlet.PortletPreferencesFactoryUtil"%>
@@ -35,8 +36,7 @@ if (Validator.isNotNull(portletResource)) {
 }
 
 boolean showSearcher = GetterUtil.getBoolean(preferences.getValue("showSearcher", StringPool.TRUE));
-boolean showScreenName = GetterUtil.getBoolean(preferences.getValue("showScreenName", StringPool.TRUE));
-boolean showEmail = GetterUtil.getBoolean(preferences.getValue("showEmail", StringPool.FALSE));
+int showResultsType = GetterUtil.getInteger(preferences.getValue("showResultsType", String.valueOf(StudentSearch.VIEW_TYPE_FULL_NAME)));
 
 %>
 
@@ -48,10 +48,11 @@ boolean showEmail = GetterUtil.getBoolean(preferences.getValue("showEmail", Stri
 		<aui:input name="preferences--showSearcher--" type="checkbox" value="<%= showSearcher %>" label="show-searcher"/>	
 	</aui:fieldset>	
 	
-	<h4><liferay-ui:message key="searcher"></liferay-ui:message> </h4>
+	<h4><liferay-ui:message key="results"></liferay-ui:message> </h4>
 	<aui:fieldset>
-		<aui:input name="preferences--showScreenName--" type="checkbox" value="<%= showScreenName %>" label="show-screen-name"/>
-		<aui:input name="preferences--showEmail--" type="checkbox" value="<%= showEmail %>" label="show-email"/>
+		<aui:input name="preferences--showResultsType--" type="radio" value="<%=StudentSearch.VIEW_TYPE_FULL_NAME %>" label="show-full-name" checked="<%=(StudentSearch.VIEW_TYPE_FULL_NAME == showResultsType)  %>"/>
+		<aui:input name="preferences--showResultsType--" type="radio" value="<%=StudentSearch.VIEW_TYPE_EMAIL_ADDRESS %>" label="show-email" checked="<%=(StudentSearch.VIEW_TYPE_EMAIL_ADDRESS == showResultsType)%>"/>
+		<aui:input name="preferences--showResultsType--" type="radio" value="<%=StudentSearch.VIEW_TYPE_SCREEN_NAME %>" label="show-screen-name" checked="<%=(StudentSearch.VIEW_TYPE_SCREEN_NAME == showResultsType)%>"/>
 	</aui:fieldset>
 	
 	<aui:button-row>

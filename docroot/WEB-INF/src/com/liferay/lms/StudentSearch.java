@@ -34,6 +34,11 @@ import com.liferay.util.bridges.mvc.MVCPortlet;
  */
 public class StudentSearch extends MVCPortlet {
  
+	public static final int VIEW_TYPE_FULL_NAME = 1;
+	public static final int VIEW_TYPE_SCREEN_NAME = 2;
+	public static final int VIEW_TYPE_EMAIL_ADDRESS = 3;
+	
+	
 	private String viewJSP = null;
 
 	public void init() throws PortletException {	
@@ -46,10 +51,10 @@ public class StudentSearch extends MVCPortlet {
 		log.debug(":: VIEW STUDENT SEARCH "+this.viewJSP);
 		PortletPreferences preferences = renderRequest.getPreferences();
 		boolean showSearcher = GetterUtil.getBoolean(preferences.getValue("showSearcher", StringPool.TRUE));
-			
+		int showViewResults = GetterUtil.getInteger(preferences.getValue("showResultsType", String.valueOf(VIEW_TYPE_FULL_NAME)));
 		ThemeDisplay themeDisplay = (ThemeDisplay) renderRequest.getAttribute(WebKeys.THEME_DISPLAY);
 		UserDisplayTerms userDisplayTerms = new UserDisplayTerms(renderRequest);
-				
+		
 		//Buscamos los usuario
 		PortletURL iteratorURL = renderResponse.createRenderURL();
 		iteratorURL.setParameter("teamId", Long.toString(userDisplayTerms.getTeamId()));
@@ -91,6 +96,7 @@ public class StudentSearch extends MVCPortlet {
 		renderRequest.setAttribute("displayTerms", userDisplayTerms);
 		renderRequest.setAttribute("searchContainer", searchContainer);
 		renderRequest.setAttribute("showSearcher", showSearcher);
+		renderRequest.setAttribute("showViewResults", showViewResults);
 		this.include(this.viewJSP, renderRequest, renderResponse);
 		
 	}
