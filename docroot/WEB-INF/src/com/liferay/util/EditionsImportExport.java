@@ -244,19 +244,15 @@ public class EditionsImportExport {
 		long courseId = ParamUtil.getLong(request, "courseId", 0);
 		String freetext = ParamUtil.getString(request, "freetext", StringPool.BLANK);
 		int state = ParamUtil.getInteger(request, "state" ,WorkflowConstants.STATUS_APPROVED);
-		long selectedGroupId = ParamUtil.get(request,"selectedGroupId",-1);
 		long columnId = ParamUtil.getLong(request, "columnId");
 		String expandoValue = ParamUtil.getString(request, "expandoValue", "");
 		if(log.isDebugEnabled()){
 			log.debug(" ::exportReportEditions:: courseId :: " + courseId);
 			log.debug(" ::exportReportEditions:: freetext :: " + freetext);
 			log.debug(" ::exportReportEditions:: state :: " + state);
-			log.debug(" ::exportReportEditions:: selectedGroupId :: " + selectedGroupId);
 			log.debug(" ::exportReportEditions:: columnId :: " + columnId);
 			log.debug(" ::exportReportEditions:: expandoValue :: " + expandoValue);
 		}
-		
-		long groupId = (selectedGroupId>-1) ? selectedGroupId : themeDisplay.getScopeGroupId();
 		
 		ArrayList<Long> assetCategoryIds = new ArrayList<Long>();
 		Enumeration<String> pnames =request.getParameterNames();
@@ -343,7 +339,8 @@ public class EditionsImportExport {
 			obc = new CourseOrderByCreationDate(orderByType.equals("asc"));
 		}
 		
-		return CourseLocalServiceUtil.searchCourses(themeDisplay.getCompanyId(), freetext, themeDisplay.getLanguageId(), state, courseId, groupId, params, 
+		//Para las ediciones groupId = 0
+		return CourseLocalServiceUtil.searchCourses(themeDisplay.getCompanyId(), freetext, themeDisplay.getLanguageId(), state, courseId, 0, params, 
 				-1,-1, obc);
 	}
 	
