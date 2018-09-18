@@ -1,7 +1,6 @@
 package com.liferay.lms.learningactivity.courseeval;
 
 import java.io.IOException;
-import java.util.Date;
 import java.util.Locale;
 
 import javax.portlet.PortletResponse;

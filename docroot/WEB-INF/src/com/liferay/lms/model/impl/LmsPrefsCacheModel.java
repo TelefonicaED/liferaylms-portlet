@@ -32,7 +32,7 @@ import java.io.Serializable;
 public class LmsPrefsCacheModel implements CacheModel<LmsPrefs>, Serializable {
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(25);
+		StringBundler sb = new StringBundler(27);
 
 		sb.append("{companyId=");
 		sb.append(companyId);
@@ -48,6 +48,8 @@ public class LmsPrefsCacheModel implements CacheModel<LmsPrefs>, Serializable {
 		sb.append(courseevals);
 		sb.append(", scoretranslators=");
 		sb.append(scoretranslators);
+		sb.append(", inscriptionTypes=");
+		sb.append(inscriptionTypes);
 		sb.append(", usersResults=");
 		sb.append(usersResults);
 		sb.append(", debugScorm=");
@@ -98,6 +100,13 @@ public class LmsPrefsCacheModel implements CacheModel<LmsPrefs>, Serializable {
 			lmsPrefsImpl.setScoretranslators(scoretranslators);
 		}
 
+		if (inscriptionTypes == null) {
+			lmsPrefsImpl.setInscriptionTypes(StringPool.BLANK);
+		}
+		else {
+			lmsPrefsImpl.setInscriptionTypes(inscriptionTypes);
+		}
+
 		lmsPrefsImpl.setUsersResults(usersResults);
 		lmsPrefsImpl.setDebugScorm(debugScorm);
 		lmsPrefsImpl.setHasAPILicence(hasAPILicence);
@@ -116,6 +125,7 @@ public class LmsPrefsCacheModel implements CacheModel<LmsPrefs>, Serializable {
 	public String activities;
 	public String courseevals;
 	public String scoretranslators;
+	public String inscriptionTypes;
 	public long usersResults;
 	public boolean debugScorm;
 	public boolean hasAPILicence;

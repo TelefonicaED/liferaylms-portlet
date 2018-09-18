@@ -900,6 +900,7 @@ public class CoursePersistenceImpl extends BasePersistenceImpl<Course>
 		courseImpl.setClosed(course.isClosed());
 		courseImpl.setMaxusers(course.getMaxusers());
 		courseImpl.setCalificationType(course.getCalificationType());
+		courseImpl.setInscriptionType(course.getInscriptionType());
 		courseImpl.setWelcome(course.isWelcome());
 		courseImpl.setWelcomeMsg(course.getWelcomeMsg());
 		courseImpl.setWelcomeSubject(course.getWelcomeSubject());

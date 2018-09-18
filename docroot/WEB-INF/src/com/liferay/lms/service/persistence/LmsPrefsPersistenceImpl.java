@@ -306,6 +306,7 @@ public class LmsPrefsPersistenceImpl extends BasePersistenceImpl<LmsPrefs>
 		lmsPrefsImpl.setActivities(lmsPrefs.getActivities());
 		lmsPrefsImpl.setCourseevals(lmsPrefs.getCourseevals());
 		lmsPrefsImpl.setScoretranslators(lmsPrefs.getScoretranslators());
+		lmsPrefsImpl.setInscriptionTypes(lmsPrefs.getInscriptionTypes());
 		lmsPrefsImpl.setUsersResults(lmsPrefs.getUsersResults());
 		lmsPrefsImpl.setDebugScorm(lmsPrefs.isDebugScorm());
 		lmsPrefsImpl.setHasAPILicence(lmsPrefs.isHasAPILicence());

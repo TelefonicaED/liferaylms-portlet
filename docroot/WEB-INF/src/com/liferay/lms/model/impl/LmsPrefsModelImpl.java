@@ -65,13 +65,14 @@ public class LmsPrefsModelImpl extends BaseModelImpl<LmsPrefs>
 			{ "activities", Types.VARCHAR },
 			{ "courseevals", Types.VARCHAR },
 			{ "scoretranslators", Types.VARCHAR },
+			{ "inscriptionTypes", Types.VARCHAR },
 			{ "usersResults", Types.BIGINT },
 			{ "debugScorm", Types.BOOLEAN },
 			{ "hasAPILicence", Types.BOOLEAN },
 			{ "showHideActivity", Types.BOOLEAN },
 			{ "viewCoursesFinished", Types.BOOLEAN }
 		};
-	public static final String TABLE_SQL_CREATE = "create table Lms_LmsPrefs (companyId LONG not null primary key,teacherRole LONG,editorRole LONG,lmsTemplates VARCHAR(75) null,activities VARCHAR(75) null,courseevals VARCHAR(75) null,scoretranslators VARCHAR(75) null,usersResults LONG,debugScorm BOOLEAN,hasAPILicence BOOLEAN,showHideActivity BOOLEAN,viewCoursesFinished BOOLEAN)";
+	public static final String TABLE_SQL_CREATE = "create table Lms_LmsPrefs (companyId LONG not null primary key,teacherRole LONG,editorRole LONG,lmsTemplates VARCHAR(75) null,activities VARCHAR(75) null,courseevals VARCHAR(75) null,scoretranslators VARCHAR(75) null,inscriptionTypes VARCHAR(75) null,usersResults LONG,debugScorm BOOLEAN,hasAPILicence BOOLEAN,showHideActivity BOOLEAN,viewCoursesFinished BOOLEAN)";
 	public static final String TABLE_SQL_DROP = "drop table Lms_LmsPrefs";
 	public static final String DATA_SOURCE = "liferayDataSource";
 	public static final String SESSION_FACTORY = "liferaySessionFactory";
@@ -124,6 +125,7 @@ public class LmsPrefsModelImpl extends BaseModelImpl<LmsPrefs>
 		attributes.put("activities", getActivities());
 		attributes.put("courseevals", getCourseevals());
 		attributes.put("scoretranslators", getScoretranslators());
+		attributes.put("inscriptionTypes", getInscriptionTypes());
 		attributes.put("usersResults", getUsersResults());
 		attributes.put("debugScorm", getDebugScorm());
 		attributes.put("hasAPILicence", getHasAPILicence());
@@ -175,6 +177,12 @@ public class LmsPrefsModelImpl extends BaseModelImpl<LmsPrefs>
 
 		if (scoretranslators != null) {
 			setScoretranslators(scoretranslators);
+		}
+
+		String inscriptionTypes = (String)attributes.get("inscriptionTypes");
+
+		if (inscriptionTypes != null) {
+			setInscriptionTypes(inscriptionTypes);
 		}
 
 		Long usersResults = (Long)attributes.get("usersResults");
@@ -285,6 +293,19 @@ public class LmsPrefsModelImpl extends BaseModelImpl<LmsPrefs>
 		_scoretranslators = scoretranslators;
 	}
 
+	public String getInscriptionTypes() {
+		if (_inscriptionTypes == null) {
+			return StringPool.BLANK;
+		}
+		else {
+			return _inscriptionTypes;
+		}
+	}
+
+	public void setInscriptionTypes(String inscriptionTypes) {
+		_inscriptionTypes = inscriptionTypes;
+	}
+
 	public long getUsersResults() {
 		return _usersResults;
 	}
@@ -376,6 +397,7 @@ public class LmsPrefsModelImpl extends BaseModelImpl<LmsPrefs>
 		lmsPrefsImpl.setActivities(getActivities());
 		lmsPrefsImpl.setCourseevals(getCourseevals());
 		lmsPrefsImpl.setScoretranslators(getScoretranslators());
+		lmsPrefsImpl.setInscriptionTypes(getInscriptionTypes());
 		lmsPrefsImpl.setUsersResults(getUsersResults());
 		lmsPrefsImpl.setDebugScorm(getDebugScorm());
 		lmsPrefsImpl.setHasAPILicence(getHasAPILicence());
@@ -477,6 +499,14 @@ public class LmsPrefsModelImpl extends BaseModelImpl<LmsPrefs>
 			lmsPrefsCacheModel.scoretranslators = null;
 		}
 
+		lmsPrefsCacheModel.inscriptionTypes = getInscriptionTypes();
+
+		String inscriptionTypes = lmsPrefsCacheModel.inscriptionTypes;
+
+		if ((inscriptionTypes != null) && (inscriptionTypes.length() == 0)) {
+			lmsPrefsCacheModel.inscriptionTypes = null;
+		}
+
 		lmsPrefsCacheModel.usersResults = getUsersResults();
 
 		lmsPrefsCacheModel.debugScorm = getDebugScorm();
@@ -492,7 +522,7 @@ public class LmsPrefsModelImpl extends BaseModelImpl<LmsPrefs>
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(25);
+		StringBundler sb = new StringBundler(27);
 
 		sb.append("{companyId=");
 		sb.append(getCompanyId());
@@ -508,6 +538,8 @@ public class LmsPrefsModelImpl extends BaseModelImpl<LmsPrefs>
 		sb.append(getCourseevals());
 		sb.append(", scoretranslators=");
 		sb.append(getScoretranslators());
+		sb.append(", inscriptionTypes=");
+		sb.append(getInscriptionTypes());
 		sb.append(", usersResults=");
 		sb.append(getUsersResults());
 		sb.append(", debugScorm=");
@@ -524,7 +556,7 @@ public class LmsPrefsModelImpl extends BaseModelImpl<LmsPrefs>
 	}
 
 	public String toXmlString() {
-		StringBundler sb = new StringBundler(40);
+		StringBundler sb = new StringBundler(43);
 
 		sb.append("<model><model-name>");
 		sb.append("com.liferay.lms.model.LmsPrefs");
@@ -557,6 +589,10 @@ public class LmsPrefsModelImpl extends BaseModelImpl<LmsPrefs>
 		sb.append(
 			"<column><column-name>scoretranslators</column-name><column-value><![CDATA[");
 		sb.append(getScoretranslators());
+		sb.append("]]></column-value></column>");
+		sb.append(
+			"<column><column-name>inscriptionTypes</column-name><column-value><![CDATA[");
+		sb.append(getInscriptionTypes());
 		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>usersResults</column-name><column-value><![CDATA[");
@@ -595,6 +631,7 @@ public class LmsPrefsModelImpl extends BaseModelImpl<LmsPrefs>
 	private String _activities;
 	private String _courseevals;
 	private String _scoretranslators;
+	private String _inscriptionTypes;
 	private long _usersResults;
 	private boolean _debugScorm;
 	private boolean _hasAPILicence;
