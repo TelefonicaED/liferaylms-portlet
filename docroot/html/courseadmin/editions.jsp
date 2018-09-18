@@ -29,6 +29,21 @@ if( permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), "com.liferay
 		/>
 	</div>
 	
+		<div class="float-r" id="${renderResponse.getNamespace()}importExportEditionsActionsDiv">
+		<liferay-ui:icon-menu message="course-admin.editions.import-export" showExpanded="false" showWhenSingleIcon="true">
+		 <c:set var="actionURL" value="${exportEditionsURL }" />
+			 <liferay-ui:icon 
+			 	message="export"
+				image="download"
+			 	url="${actionURL }" />
+		<c:set var="actionURL" value="javascript:${renderResponse.getNamespace()}importExportEditions();" />
+			<liferay-ui:icon
+				message="import"
+				image="add_instance"
+				url="${actionURL  }" />
+		</liferay-ui:icon-menu>
+	</div>
+	
 	<%
 }
 %>
@@ -144,3 +159,5 @@ if( permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), "com.liferay
 
 </liferay-ui:search-container>
 </div>
+
+<%@ include file="/html/courseadmin/editionsimportexport.jsp" %>

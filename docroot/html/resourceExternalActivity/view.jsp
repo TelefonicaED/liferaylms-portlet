@@ -71,6 +71,10 @@ if(isLinkTabletResourceExternal){
 			<%} %>
 		</div>
 	</c:if>
+	
+	<div class="container-activity isFeedback aui-helper-hidden" id="${renderResponse.getNamespace()}videoQuestionFeedback">
+	</div>
+	
 </div>
 
 <script>
@@ -86,8 +90,22 @@ if(isLinkTabletResourceExternal){
 					position: position,
 					plays: plays
 				},
-				success: function(data){},
-				error: function(){}
+				success: function(data){
+					
+					if(data.questionCorrection){
+						if(data.finalFeedback){
+							$('#<portlet:namespace/>videoQuestionFeedback').removeClass("aui-helper-hidden");
+							$('#<portlet:namespace/>videoQuestionFeedback').html(data.feedback);	
+						}
+					}
+					
+				},
+				error: function(){
+					console.log("ERROR");
+				}
 			});
 	}
 </script>
+
+
+

@@ -19,6 +19,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import com.liferay.lms.auditing.AuditConstants;
+import com.liferay.lms.auditing.AuditingLogFactory;
 import com.liferay.lms.course.diploma.CourseDiploma;
 import com.liferay.lms.course.diploma.CourseDiplomaRegistry;
 import com.liferay.lms.learningactivity.calificationtype.CalificationType;
@@ -36,6 +38,8 @@ import com.liferay.lms.model.ModuleResult;
 import com.liferay.lms.model.UserCompetence;
 import com.liferay.lms.service.ClpSerializer;
 import com.liferay.lms.service.CourseLocalServiceUtil;
+import com.liferay.lms.service.CourseResultLocalServiceUtil;
+import com.liferay.lms.service.CourseResultServiceUtil;
 import com.liferay.lms.service.base.CourseResultLocalServiceBaseImpl;
 import com.liferay.lms.service.persistence.CourseResultFinderUtil;
 import com.liferay.portal.kernel.bean.PortletBeanLocatorUtil;
@@ -432,6 +436,7 @@ public class CourseResultLocalServiceImpl
 		courseResult.setPassedDate(null);
 		courseResult.setStartDate(new Date());
 		courseResultPersistence.update(courseResult, false);
+		
 
 		return courseResult;
 	}
@@ -453,7 +458,32 @@ public class CourseResultLocalServiceImpl
 	}
 	
 	public void update(CourseResult cresult) throws SystemException{
+		if(cresult.getPassedDate()!=null)
+		{
+			CourseResult previousCR=courseResultLocalService.getCourseResultByCourseAndUser(cresult.getCourseId(), cresult.getUserId());
+			if(previousCR==null || previousCR.getPassedDate()==null)
+			{
+				Course course;
+				try {
+					course = courseLocalService.getCourse(cresult.getCourseId());
+
+
+				String action=AuditConstants.FAILED;
+				if(cresult.getPassed())
+				{
+					action=AuditConstants.PASSED;
+				}
+				AuditingLogFactory.audit(course.getCompanyId(), course.getGroupCreatedId(), Course.class.getName(), 
+						cresult.getCourseId(), cresult.getUserId(), action, Long.toString(cresult.getResult()));
+				} catch (PortalException e) {
+					// TODO Auto-generated catch block
+					throw new SystemException(e);
+				}
+			}
+		
+		}
 		if(cresult.getPassed()){
+			
 			List<CourseCompetence> competences = courseCompetencePersistence.findBycourseId(cresult.getCourseId(), false);
 		
 			for(CourseCompetence cc: competences){

@@ -150,8 +150,6 @@ public class LearningActivityLocalServiceImpl extends LearningActivityLocalServi
 		retorno.setWeightinmodule(learningActivity.getWeightinmodule());
 		learningActivityPersistence.update(retorno, true);
 
-		//auditing
-		AuditingLogFactory.audit(retorno.getCompanyId(), retorno.getGroupId(), LearningActivity.class.getName(), retorno.getPrimaryKey(), serviceContext.getUserId(), AuditConstants.ADD, null);
 		boolean isNotificationActivated = PrefsPropsUtil.getBoolean(retorno.getCompanyId(), "lms.notifications.active");
 		if(isNotificationActivated && learningActivity.getTypeId()!=8){
 			List<User> listaUsuarios = userService.getGroupUsers(retorno.getGroupId());

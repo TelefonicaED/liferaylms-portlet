@@ -124,6 +124,7 @@ public class modulePortlet extends MVCPortlet {
 				try {
 					addmodulePopUp(renderRequest,renderResponse);
 				} catch (NestableException e) {
+					e.printStackTrace();
 				} 
 
 			}
@@ -132,6 +133,7 @@ public class modulePortlet extends MVCPortlet {
 				try {
 					updatemodulePopUp(renderRequest,renderResponse);
 				} catch (NestableException e) {
+					e.printStackTrace();
 				} 		
 
 			}
@@ -214,6 +216,8 @@ public class modulePortlet extends MVCPortlet {
 		PortletURL moduleFilterURL = renderResponse.createRenderURL();
 		moduleFilterURL.setParameter("javax.portlet.action", "doView");
 		renderRequest.setAttribute("moduleFilterURL", moduleFilterURL.toString());
+		
+		log.debug("viewjsp:: " + viewJSP);
 
 		include(viewJSP, renderRequest, renderResponse);
 	}
@@ -240,6 +244,16 @@ public class modulePortlet extends MVCPortlet {
 		Course course = CourseLocalServiceUtil.getCourseByGroupCreatedId(themeDisplay.getScopeGroupId());
 		LiferayPortletResponse liferayPortletResponse=(LiferayPortletResponse)renderResponse;
 		PortletURL editmoduleURL = null;
+		
+		SimpleDateFormat formatDateCourse = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+		formatDateCourse.setTimeZone(themeDisplay.getTimeZone());	
+		String courseExecutionStartDateString = formatDateCourse.format(course.getExecutionStartDate());
+		String courseExecutionEndDateString = formatDateCourse.format(course.getExecutionEndDate());
+		renderRequest.setAttribute("courseExecutionStartDateString", courseExecutionStartDateString);
+		renderRequest.setAttribute("courseExecutionEndDateString", courseExecutionEndDateString);
+		
+		boolean enableChangeStartDate = Boolean.FALSE;
+		boolean enableChangeEndDate = Boolean.FALSE;
 
 		if(isPopUp){
 			editmoduleURL = liferayPortletResponse.createRenderURL();
@@ -290,6 +304,9 @@ public class modulePortlet extends MVCPortlet {
 				else module.setEndDate(course.getExecutionEndDate());
 			}
 			
+			enableChangeStartDate = course.getExecutionStartDate().before(module.getStartDate());
+			enableChangeEndDate = course.getExecutionEndDate().after(module.getEndDate());
+			
 			renderRequest.setAttribute("startDateDia", formatDia.format(module.getStartDate()));
 			renderRequest.setAttribute("startDateMes", formatMes.format(module.getStartDate()));
 			renderRequest.setAttribute("startDateAno", formatAno.format(module.getStartDate()));
@@ -321,6 +338,10 @@ public class modulePortlet extends MVCPortlet {
 				long allowedTime = errormodule.getAllowedTime();	
 				long hourDuration = allowedTime / 3600000;
 				long minuteDuration = (allowedTime % 3600000) / 60000;
+				
+				enableChangeStartDate = course.getExecutionStartDate().before(errormodule.getStartDate());
+				enableChangeEndDate = course.getExecutionEndDate().after(errormodule.getEndDate());
+				
 				renderRequest.setAttribute("module", errormodule);
 				renderRequest.setAttribute("startDateDia", formatDia.format(errormodule.getStartDate()));
 				renderRequest.setAttribute("startDateMes", formatMes.format(errormodule.getStartDate()));
@@ -355,6 +376,7 @@ public class modulePortlet extends MVCPortlet {
 				long allowedTime = blankmodule.getAllowedTime();	
 				long hourDuration = allowedTime / 3600000;
 				long minuteDuration = (allowedTime % 3600000) / 60000;
+				
 				renderRequest.setAttribute("startDateDia", formatDia.format(blankmodule.getStartDate()));
 				renderRequest.setAttribute("startDateMes", formatMes.format(blankmodule.getStartDate()));
 				renderRequest.setAttribute("startDateAno", formatAno.format(blankmodule.getStartDate()));
@@ -381,10 +403,11 @@ public class modulePortlet extends MVCPortlet {
 				renderRequest.setAttribute("endDate", endDate);
 				renderRequest.setAttribute("module", blankmodule);
 			}
-
 		}
 
-
+		renderRequest.setAttribute("enableChangeStartDate", enableChangeStartDate);
+		renderRequest.setAttribute("enableChangeEndDate", enableChangeEndDate);
+		
 		renderRequest.setAttribute("editmoduleURL", editmoduleURL.toString());
 		renderRequest.setAttribute("showicon", ("false".equals(PropsUtil.get("module.show.icon")))?false:true);
 		
@@ -610,7 +633,7 @@ public class modulePortlet extends MVCPortlet {
 				LearningActivityLocalServiceUtil.updateLearningActivity(precedence);
 			}
 		}
-		LearningActivityServiceUtil.deleteLearningactivity(larn.getActId());
+		LearningActivityLocalServiceUtil.deleteLearningactivity(larn.getActId());
 		//auditing
 		AuditingLogFactory.audit(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(), LearningActivity.class.getName(), larn.getActId(), themeDisplay.getUserId(), AuditConstants.DELETE, null);
 
@@ -769,37 +792,61 @@ public class modulePortlet extends MVCPortlet {
 			module.setIcon(ParamUtil.getLong(request, "icon"));
 		} catch (Exception nfe) {
 		}
-
-		int startDateAno = ParamUtil.getInteger(request, "startDateAno");
-		int startDateMes = ParamUtil.getInteger(request, "startDateMes");
-		int startDateDia = ParamUtil.getInteger(request, "startDateDia");
-		int startDateHora = ParamUtil.getInteger(request, "startDateHora");
-		int startDateMinuto = ParamUtil.getInteger(request, "startDateMinuto");
+		
 		long precedence=ParamUtil.getLong(request, "precedence");
 		long allowedDateHora = ParamUtil.getLong(request, "allowedDateHora",0);
 		long allowedDateMinuto = ParamUtil.getLong(request, "allowedDateMinuto",0);
 		module.setAllowedTime((allowedDateHora*3600000+allowedDateMinuto*60000));
-		Calendar calendar = Calendar.getInstance(themeDisplay.getTimeZone());
-		calendar.set(startDateAno, startDateMes, startDateDia);
-		calendar.set(Calendar.HOUR_OF_DAY,startDateHora);
-		calendar.set(Calendar.MINUTE,startDateMinuto);
-		calendar.set(Calendar.SECOND,0);
-		calendar.set(Calendar.MILLISECOND,0);
-		module.setStartDate(calendar.getTime());
-
-		int endDateAno = ParamUtil.getInteger(request, "endDateAno");
-		int endDateMes = ParamUtil.getInteger(request, "endDateMes");
-		int endDateDia = ParamUtil.getInteger(request, "endDateDia");
-		int endDateHora = ParamUtil.getInteger(request, "endDateHora");
-		int endDateMinuto = ParamUtil.getInteger(request, "endDateMinuto");
-
-		calendar = Calendar.getInstance(themeDisplay.getTimeZone());
-		calendar.set(endDateAno, endDateMes, endDateDia);
-		calendar.set(Calendar.HOUR_OF_DAY,endDateHora);
-		calendar.set(Calendar.MINUTE,endDateMinuto);
-		calendar.set(Calendar.SECOND,0);
-		calendar.set(Calendar.MILLISECOND,0);
-		module.setEndDate(calendar.getTime());
+		
+		Date moduleStartDate = null;
+		Date moduleEndDate = null;
+		boolean startDateEnabled = ParamUtil.getBoolean(request, "startdate-enabled", Boolean.FALSE);
+		boolean endDateEnabled = ParamUtil.getBoolean(request, "enddate-enabled", Boolean.FALSE);
+		if(startDateEnabled || endDateEnabled) {
+			Calendar calendar = Calendar.getInstance(themeDisplay.getTimeZone());
+			if(startDateEnabled){
+				int startDateAno = ParamUtil.getInteger(request, "startDateAno");
+				int startDateMes = ParamUtil.getInteger(request, "startDateMes");
+				int startDateDia = ParamUtil.getInteger(request, "startDateDia");
+				int startDateHora = ParamUtil.getInteger(request, "startDateHora");
+				int startDateMinuto = ParamUtil.getInteger(request, "startDateMinuto");
+				int startAMPM = ParamUtil.getInteger(request, "startAMPM");
+				startDateHora = (startAMPM>0) ? startDateHora+12 : startDateHora;
+				calendar.set(startDateAno, startDateMes, startDateDia);
+				calendar.set(Calendar.HOUR_OF_DAY,startDateHora);
+				calendar.set(Calendar.MINUTE,startDateMinuto);
+				calendar.set(Calendar.SECOND,0);
+				calendar.set(Calendar.MILLISECOND,0);
+				moduleStartDate = calendar.getTime();
+			}
+			if(endDateEnabled){
+				int endDateAno = ParamUtil.getInteger(request, "endDateAno");
+				int endDateMes = ParamUtil.getInteger(request, "endDateMes");
+				int endDateDia = ParamUtil.getInteger(request, "endDateDia");
+				int endDateHora = ParamUtil.getInteger(request, "endDateHora");
+				int endDateMinuto = ParamUtil.getInteger(request, "endDateMinuto");
+				int endAMPM = ParamUtil.getInteger(request, "endAMPM");
+				endDateHora = (endAMPM>0) ? endDateHora+12 : endDateHora;
+				calendar = Calendar.getInstance(themeDisplay.getTimeZone());
+				calendar.set(endDateAno, endDateMes, endDateDia);
+				calendar.set(Calendar.HOUR_OF_DAY,endDateHora);
+				calendar.set(Calendar.MINUTE,endDateMinuto);
+				calendar.set(Calendar.SECOND,0);
+				calendar.set(Calendar.MILLISECOND,0);
+				moduleEndDate = calendar.getTime();
+			}
+		}
+		if(Validator.isNull(moduleStartDate) || Validator.isNull(moduleEndDate)){
+			Course course = CourseLocalServiceUtil.getCourseByGroupCreatedId(themeDisplay.getScopeGroupId());
+			if(Validator.isNull(moduleStartDate)) {
+				moduleStartDate = Validator.isNotNull(course.getExecutionStartDate()) ?  course.getExecutionStartDate() : new Date(System.currentTimeMillis());
+			}
+			if(Validator.isNull(moduleEndDate)) {
+				moduleEndDate = Validator.isNotNull(course.getExecutionEndDate()) ?  course.getExecutionEndDate() : new Date(System.currentTimeMillis()+1000*84000*365);
+			}
+		}
+		module.setStartDate(moduleStartDate);
+		module.setEndDate(moduleEndDate);
 
 		try {
 			module.setPrimaryKey(ParamUtil.getLong(request,"resourcePrimKey"));

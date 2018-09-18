@@ -526,6 +526,7 @@
         <column name="closed" type="boolean"></column>
         <column name="maxusers" type="long"></column>
         <column name="calificationType" type="long"></column>
+        <column name="inscriptionType" type="long" />
 		<column name="welcome" type="boolean"/>
 		<column name="welcomeMsg" type="String"/>
 		<column name="welcomeSubject" type="String"/>
@@ -691,6 +692,7 @@
         <column name="activities" type="String"></column>
         <column name="courseevals" type="String"></column>
         <column name="scoretranslators" type="String"></column>
+        <column name="inscriptionTypes" type="String" />
         <column name="usersResults" type="long"></column>
         <column name="debugScorm" type="boolean"></column>
         <column name="hasAPILicence" type="boolean"></column>

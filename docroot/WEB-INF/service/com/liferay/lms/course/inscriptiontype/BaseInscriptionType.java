@@ -1,0 +1,59 @@
+package com.liferay.lms.course.inscriptiontype;
+
+import java.io.Serializable;
+import java.util.Locale;
+
+import javax.portlet.PortletResponse;
+
+import com.liferay.lms.model.Course;
+import com.liferay.lms.service.CourseLocalServiceUtil;
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.upload.UploadRequest;
+import com.liferay.portal.service.ServiceContext;
+
+public class BaseInscriptionType implements InscriptionType, Serializable {
+	
+	public static final long TYPE = 0;
+	
+	public long getTypeId(){
+		return TYPE;
+	}
+	
+	public String getDescription(Locale locale){
+		return "";
+	}
+	
+	public String getSpecificContentPage(){
+		return "";
+	}
+	
+	public String setExtraContent(UploadRequest uploadRequest,PortletResponse portletResponse,Course course){
+		return "";
+	}
+	
+	public String getPortletId(){
+		return "";
+	}
+	
+	@Override
+	public String enrollUser(long courseId, long userId, long teamId, ServiceContext serviceContext) throws PortalException, SystemException {
+		return CourseLocalServiceUtil.addStudentToCourseByUserId(courseId, userId, teamId, serviceContext);
+	}
+	
+	@Override
+	public boolean unsubscribeUser(Course course, long userId) throws PortalException, SystemException{
+		return CourseLocalServiceUtil.unsubscribeUser(course, userId);
+	}
+
+	@Override
+	public String getTitle(Locale locale) {
+		return LanguageUtil.get(locale, "inscription-type.title");
+	}
+
+	@Override
+	public boolean canUnsubscribe() {
+		return true;
+	}
+}

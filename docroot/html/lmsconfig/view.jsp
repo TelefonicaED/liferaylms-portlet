@@ -1,3 +1,5 @@
+<%@page import="com.liferay.lms.course.inscriptiontype.InscriptionType"%>
+<%@page import="com.liferay.lms.course.inscriptiontype.InscriptionTypeRegistry"%>
 <%@page import="com.liferay.portal.kernel.exception.SystemException"%>
 <%@page import="com.liferay.portal.kernel.util.PrefsPropsUtil"%>
 <%@page import="com.liferay.lms.util.LmsConstant"%>
@@ -40,6 +42,7 @@ if(prefs!=null){
 	List<Long> activityids = ListUtil.toList(StringUtil.split(prefs.getActivities(), ",", 0L));
 	List<Long> courseEvalIds = ListUtil.toList(StringUtil.split(prefs.getCourseevals(),",",0L));
 	List <Long> calificationTypeIds = ListUtil.toList(StringUtil.split(prefs.getScoretranslators(),",",0L));	
+	List<Long> inscriptionTypeIds = ListUtil.toList(StringUtil.split(prefs.getInscriptionTypes(),",",0L));
 %>
 
 <liferay-ui:success message="your-request-completed-successfully" key="ok" />
@@ -159,6 +162,25 @@ for(CalificationType calificationType :calificationTypeRegistry.getCalificationT
 %>
 </aui:field-wrapper>
 
+<liferay-ui:header title="inscription-type" />
+<aui:field-wrapper>
+<%
+InscriptionTypeRegistry inscriptionTypeRegistry = new InscriptionTypeRegistry();
+for(InscriptionType inscriptionType :inscriptionTypeRegistry.getInscriptionTypes()){
+	boolean checked=false;
+	String writechecked="false";
+	if(inscriptionTypeIds!=null &&inscriptionTypeIds.size()>0 && ArrayUtils.contains(inscriptionTypeIds.toArray(), inscriptionType.getTypeId())){
+		checked=true;
+		writechecked="true";
+	}
+	%>
+	
+	<aui:input type="checkbox" name="inscriptionTypes" 
+	label="<%=LanguageUtil.get(locale, inscriptionType.getTitle(locale))  %>" checked="<%=checked %>" value="<%=inscriptionType.getTypeId()%>" />
+	<%
+}
+%>
+</aui:field-wrapper>
 
 <liferay-ui:header title="show-hide-activity" />
 <aui:field-wrapper>

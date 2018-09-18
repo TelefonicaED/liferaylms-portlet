@@ -1,8 +1,12 @@
+<%@page import="com.liferay.lms.StudentSearch"%>
 <%@page import="com.liferay.portal.kernel.workflow.WorkflowConstants"%>
 <%@page import="com.liferay.portal.kernel.util.OrderByComparator"%>
 <%@page import="com.liferay.portal.util.comparator.*"%>
 <%@include file="/init.jsp" %>
 
+<c:set var="showScreenName" value="<%=StudentSearch.VIEW_TYPE_SCREEN_NAME %>"/>
+<c:set var="showFullName" value="<%=StudentSearch.VIEW_TYPE_FULL_NAME %>"/>
+<c:set var="showEmailAddress" value="<%=StudentSearch.VIEW_TYPE_EMAIL_ADDRESS %>"/>
 
 	<c:if test="${showSearcher}">
 		<div class="col-sm-12">
@@ -24,7 +28,21 @@
 			
 			<liferay-ui:search-container-row modelVar="student" keyProperty="userId" className="com.liferay.portal.model.User" >
 				<liferay-ui:search-container-column-text name="students"  title="students" orderable="false">
-				 	<liferay-ui:user-display userId="${student.userId}" />
+				 	<c:choose>
+				 		<c:when test="${showFullName eq  showViewResults}">
+				 			<liferay-ui:user-display userId="${student.userId}" />
+				 		</c:when>
+				 		<c:otherwise>
+				 			<c:choose>
+				 				<c:when test="${showScreenName eq showViewResults}">
+				 					<liferay-ui:user-display userName="${student.screenName}" userId="${student.userId}"/>
+				 				</c:when>
+				 				<c:otherwise>
+				 					<liferay-ui:user-display userName="${student.emailAddress}" userId="${student.userId}"/>
+				 				</c:otherwise>
+				 			</c:choose>
+				 		</c:otherwise>
+				 	</c:choose>
 				</liferay-ui:search-container-column-text>
 			</liferay-ui:search-container-row>		
 			<liferay-ui:search-iterator />

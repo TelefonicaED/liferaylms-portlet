@@ -39,6 +39,8 @@ import com.liferay.lms.auditing.AuditConstants;
 import com.liferay.lms.auditing.AuditingLogFactory;
 import com.liferay.lms.course.diploma.CourseDiploma;
 import com.liferay.lms.course.diploma.CourseDiplomaRegistry;
+import com.liferay.lms.course.inscriptiontype.InscriptionType;
+import com.liferay.lms.course.inscriptiontype.InscriptionTypeRegistry;
 import com.liferay.lms.learningactivity.calificationtype.CalificationType;
 import com.liferay.lms.learningactivity.calificationtype.CalificationTypeRegistry;
 import com.liferay.lms.learningactivity.courseeval.CourseEval;
@@ -497,11 +499,11 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 			List<Course> editions = CourseLocalServiceUtil.getChildCourses(courseId);
 			for(Course edition : editions){
 				CourseLocalServiceUtil.deleteCourse(edition.getCourseId());
-				AuditingLogFactory.audit(serviceContext.getCompanyId(), serviceContext.getScopeGroupId(), Course.class.getName(), edition.getCourseId(), serviceContext.getUserId(), AuditConstants.CLOSE, null);
+				AuditingLogFactory.audit(serviceContext.getCompanyId(), serviceContext.getScopeGroupId(), Course.class.getName(), edition.getCourseId(), serviceContext.getUserId(), AuditConstants.DELETE, null);
 			}
 			
 			CourseLocalServiceUtil.deleteCourse(courseId);
-			AuditingLogFactory.audit(serviceContext.getCompanyId(), serviceContext.getScopeGroupId(), Course.class.getName(), courseId, serviceContext.getUserId(), AuditConstants.CLOSE, null);
+			AuditingLogFactory.audit(serviceContext.getCompanyId(), serviceContext.getScopeGroupId(), Course.class.getName(), courseId, serviceContext.getUserId(), AuditConstants.DELETE, null);
 			
 			
 		}
@@ -518,11 +520,8 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 			List<Course> editions = CourseLocalServiceUtil.getChildCourses(courseId);
 			for(Course edition : editions){
 				CourseLocalServiceUtil.closeCourse(edition.getCourseId());
-				AuditingLogFactory.audit(serviceContext.getCompanyId(), serviceContext.getScopeGroupId(), Course.class.getName(), edition.getCourseId(), serviceContext.getUserId(), AuditConstants.CLOSE, null);
 			}
-			
 			CourseLocalServiceUtil.closeCourse(courseId);
-			AuditingLogFactory.audit(serviceContext.getCompanyId(), serviceContext.getScopeGroupId(), Course.class.getName(), courseId, serviceContext.getUserId(), AuditConstants.CLOSE, null);
 		}
 	}
 	
@@ -586,6 +585,7 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 		String fileName = uploadRequest.getFileName("fileName");
 		long courseTemplateId=ParamUtil.getLong(uploadRequest,"courseTemplate",0);
 		long courseCalificationType=ParamUtil.getLong(uploadRequest,"calificationType",0);
+		long inscriptionType = ParamUtil.getLong(uploadRequest, "inscriptionType", 0);
 		String friendlyURL = ParamUtil.getString(uploadRequest, "friendlyURL",
 				StringPool.BLANK);
 		int startMonth = ParamUtil.getInteger(uploadRequest, "startMon");
@@ -796,6 +796,7 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 						titleMap, description, summary, friendlyURL,
 						themeDisplay.getLocale(), ahora, startDate, stopDate, startExecutionDate.getTime(), stopExecutionDate.getTime() , courseTemplateId,type,courseEvalId,
 						courseCalificationType,maxusers,serviceContext,false);
+				course.setInscriptionType(inscriptionType);
 				try{
 				LmsPrefs prefs=LmsPrefsLocalServiceUtil.getLmsPrefs(course.getCompanyId());
 				//Añadimos como miembro del sitio web
@@ -852,6 +853,7 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 				course.setStartDate(startDate); 
 				course.setEndDate(stopDate);
 				course.setCalificationType(courseCalificationType);
+				course.setInscriptionType(inscriptionType);
 				course.setMaxusers(maxusers);
 				if(Validator.isNotNull(friendlyURL))course.setFriendlyURL(friendlyURL);
 				serviceContext.setAttribute("type", String.valueOf(type));
@@ -963,7 +965,15 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 					actionResponse.setRenderParameter("calificationTypeExtraContentError", calificationTypeExtraContentError);
 				}
 				
-
+				InscriptionTypeRegistry inscriptionRegistry = new InscriptionTypeRegistry();
+				InscriptionType itype = inscriptionRegistry.getInscriptionType(course.getInscriptionType());
+				String inscriptionTypeExtraContentError = itype.setExtraContent(uploadRequest, actionResponse, course);
+				log.debug("****inscriptionTypeExtraContentError:"+inscriptionTypeExtraContentError);
+				
+				if(inscriptionTypeExtraContentError != null){
+					SessionErrors.add(actionRequest, "inscriptionTypeExtraContentError");
+					actionResponse.setRenderParameter("inscriptionTypeExtraContentError", inscriptionTypeExtraContentError);
+				}
 				
 				//Update especific content of diploma (if exists)
 				CourseDiplomaRegistry cdr = new CourseDiplomaRegistry();
@@ -1207,11 +1217,11 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 				
 				if(roleId == teacherRoleId){
 					AuditingLogFactory.audit(course.getCompanyId(), course.getGroupCreatedId(), Course.class.getName(), 
-							course.getCourseId(),userGroupRole.getUserId(), AuditConstants.UNREGISTER, "COURSE_EDITOR_REMOVE");
+							course.getCourseId(),userGroupRole.getUserId(), AuditConstants.UNREGISTER, "COURSE_TUTOR_REMOVE");
 				}
 				if(roleId == editorRoleId){
 					AuditingLogFactory.audit(course.getCompanyId(), course.getGroupCreatedId(), Course.class.getName(), 
-							course.getCourseId(),userGroupRole.getUserId(), AuditConstants.UNREGISTER, "COURSE_TUTOR_REMOVE");
+							course.getCourseId(),userGroupRole.getUserId(), AuditConstants.UNREGISTER, "COURSE_EDITOR_REMOVE");
 				}
 				
 			}
@@ -1228,18 +1238,7 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 					if(log.isDebugEnabled())log.debug("deleted!");
 					GroupLocalServiceUtil.unsetUserGroups(user,new long[] { course.getGroupCreatedId() });
 				}
-				/*for(UserGroupRole userGroupRole:userGroupRoles){
-					if(log.isDebugEnabled())log.debug("Role::"+userGroupRole.getRoleId());
-				}*/
 				
-				if(roleId == teacherRoleId){
-					AuditingLogFactory.audit(course.getCompanyId(), course.getGroupCreatedId(), Course.class.getName(), 
-							course.getCourseId(),user, AuditConstants.UNREGISTER, "COURSE_EDITOR_REMOVE");
-				}
-				if(roleId == editorRoleId){
-					AuditingLogFactory.audit(course.getCompanyId(), course.getGroupCreatedId(), Course.class.getName(), 
-							course.getCourseId(),user, AuditConstants.UNREGISTER, "COURSE_TUTOR_REMOVE");
-				}
 			}
 			//GroupLocalServiceUtil.unsetUserGroups(userGroupRole.getUserId(), new long[] { course.getGroupCreatedId() });
 		
@@ -1741,7 +1740,7 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 	}
 	
 	
-	protected String[] getCourseTemplates(PortletPreferences preferences, long companyId){
+	public static String[] getCourseTemplates(PortletPreferences preferences, long companyId){
 
 		// Templates
 		String[] templates = null;
@@ -1817,7 +1816,7 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 		if(cc!=null){
 
 			//auditing
-			AuditingLogFactory.audit(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(), Course.class.getName(), courseId, themeDisplay.getUserId(), AuditConstants.CLOSE, null);
+			AuditingLogFactory.audit(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(), CourseCompetence.class.getName(), cc.getPrimaryKey(), themeDisplay.getUserId(), AuditConstants.DELETE, "Compentence: "+String.valueOf(competenceId)+" Course: "+String.valueOf(courseId));
 			
 			try{
 				CourseCompetenceLocalServiceUtil. deleteCourseCompetence(cc.getPrimaryKey());

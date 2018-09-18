@@ -1,6 +1,5 @@
 package com.liferay.lms.portlet.inscriptioncommunity;
 
-import java.util.Date;
 import java.util.List;
 
 import javax.mail.internet.InternetAddress;
@@ -9,6 +8,8 @@ import javax.portlet.ActionResponse;
 import javax.portlet.ProcessAction;
 
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.lms.course.inscriptiontype.InscriptionType;
+import com.liferay.lms.course.inscriptiontype.InscriptionTypeRegistry;
 import com.liferay.lms.model.Course;
 import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.mail.service.MailServiceUtil;
@@ -25,7 +26,6 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.GroupConstants;
-import com.liferay.portal.model.Team;
 import com.liferay.portal.model.User;
 import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.security.permission.PermissionChecker;
@@ -34,7 +34,6 @@ import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.MembershipRequestLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceContextFactory;
-import com.liferay.portal.service.TeamLocalServiceUtil;
 import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portlet.social.service.SocialActivityLocalServiceUtil;
@@ -175,7 +174,9 @@ public class CommunityInscription extends MVCPortlet {
     	
     	ServiceContext serviceContext=ServiceContextFactory.getInstance(request);
     	
-    	String result = CourseLocalServiceUtil.addStudentToCourseByUserId(course.getCourseId(), userId, teamId, serviceContext);
+    	InscriptionType inscriptionType = new InscriptionTypeRegistry().getInscriptionType(course.getInscriptionType());
+    	
+    	String result = inscriptionType.enrollUser(course.getCourseId(), userId, teamId, serviceContext);
     	
     	if(!result.equalsIgnoreCase("ok")){
     		if(result.equalsIgnoreCase("error-complete-course")){
@@ -201,48 +202,12 @@ public class CommunityInscription extends MVCPortlet {
 		
 		Course course = CourseLocalServiceUtil.getCourseByGroupCreatedId(groupId[0]);
 
+		InscriptionType inscriptionType = new InscriptionTypeRegistry().getInscriptionType(course.getInscriptionType());
 		
-		try{
-			List<Team> teams = TeamLocalServiceUtil.getUserTeams(userId, course.getGroupCreatedId());
-			if(teams!=null && teams.size()>0){
-				long[] userIds = new long[1];
-				userIds[0] = userId;
-				for(Team team : teams){
-					if(UserLocalServiceUtil.hasTeamUser(team.getTeamId(), userId)){
-						UserLocalServiceUtil.unsetTeamUsers(team.getTeamId(), userIds);
-					}
-				}
-			}
-		}catch(Exception e){
-			e.printStackTrace();
-		}
-		
-    	log.debug("COURSE GROUP ID "+course.getGroupCreatedId());
-    	log.debug("THEME DISPLAY GROUP "+groupId[0]);
-		if (GroupLocalServiceUtil.hasUserGroup(userId, course.getGroupCreatedId())) {
-			GroupLocalServiceUtil.unsetUserGroups(userId, groupId);
 
-			//auditing -> GroupListener
-	    	
-			//AuditingLogFactory.audit(themeDisplay.getCompanyId(), course.getGroupCreatedId(), Course.class.getName(), 
-			//		course.getCourseId(), themeDisplay.getUserId(), AuditConstants.UNREGISTER, null);
-			SocialActivityLocalServiceUtil.addActivity(userId, course.getGroupId(), Course.class.getName(), course.getCourseId(), com.liferay.portlet.social.model.SocialActivityConstants.TYPE_UNSUBSCRIBE, "", course.getUserId());
-			
-			if(log.isDebugEnabled()){
-				// Informamos de que lo ha dejado.
-				Date hoy = new Date();
-				String userName = ""+userId;
-				String groupName = ""+groupId[0];
-				try {
-					userName = userId + "[" + UserLocalServiceUtil.getUser(userId).getFullName() + "]";
-					groupName = groupId[0] + "[" + GroupLocalServiceUtil.getGroup(groupId[0]).getName() + "]";
-				}
-				catch (Exception e) {}
-				
-				log.debug("DESINSCRIBIR: "+userName +" se ha desincrito de la comunidad "+groupName+" el "+hoy.toString());
-			}
-			
-		}else{			
+		boolean result = inscriptionType.unsubscribeUser(course, userId);
+
+		if(!result){
 			SessionErrors.add(request, "inscription-error-already-disenrolled");
 		}
 	}

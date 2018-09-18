@@ -1,3 +1,5 @@
+<%@page import="com.liferay.lms.course.inscriptiontype.InscriptionType"%>
+<%@page import="com.liferay.lms.course.inscriptiontype.InscriptionTypeRegistry"%>
 <%@page import="com.liferay.portal.service.LayoutSetLocalServiceUtil"%>
 <%@page import="com.liferay.portal.model.LayoutSet"%>
 <%@page import="com.liferay.portal.kernel.exception.SystemException"%>
@@ -55,9 +57,12 @@
 
 <%
 String calificationTypeExtraContentError = ParamUtil.getString(request, "calificationTypeExtraContentError");
+String inscriptionTypeExtraContentError = ParamUtil.getString(request, "inscriptionTypeExtraContentError");
 String courseDiplomaError = ParamUtil.getString(request, "courseDiplomaError");
 %>
 <liferay-ui:error key="calificationTypeExtraContentError" message="<%=calificationTypeExtraContentError %>" />
+<liferay-ui:error key="inscriptionTypeExtraContentError" message="<%=inscriptionTypeExtraContentError %>" />
+
 <liferay-ui:error key="courseDiplomaError" message="<%=courseDiplomaError %>" />
 	<%
 	String maxLengthTitle = GetterUtil.getString( ModelHintsUtil.getHints(Group.class.getName(), "name").get("max-length"),"");
@@ -140,7 +145,8 @@ if(course != null || courseId > 0){
 	countGroup = CompetenceServiceUtil.getCountCompetencesOfGroup(course.getGroupCreatedId());
 	countParentGroup = CompetenceServiceUtil.getCountCompetencesOfGroup(course.getGroupId());
 	count = countGroup + countParentGroup;
-
+	templateParent = LayoutSetLocalServiceUtil.getLayoutSet(course.getGroupCreatedId(), false).getLayoutSetPrototypeId();
+	
 	groupsel = GroupLocalServiceUtil.getGroup(course.getGroupCreatedId());
 }
 
@@ -462,11 +468,9 @@ if(course!=null){
 		<aui:input type="textarea" cols="100" rows="4" name="summary" label="summary" value="<%=summary %>"/>
 	</c:if>
 	
-	<c:if test="<%=!isCourseChild%>">
-		<div id="<portlet:namespace/>diplomaContent">
-			<%@include file="/html/courseadmin/inc/specificContent.jsp" %>
-		</div>
-	</c:if>
+	<div id="<portlet:namespace/>diplomaContent">
+		<%@include file="/html/courseadmin/inc/specificContent.jsp" %>
+	</div>
 	
 	
 		<%
@@ -665,8 +669,73 @@ if(course!=null){
 					</div>
 				<%
 			}
-		}%>
-	<% 
+		}
+		List <Long> inscriptions = ListUtil.toList(StringUtil.split(LmsPrefsLocalServiceUtil.getLmsPrefsIni(themeDisplay.getCompanyId()).getInscriptionTypes(),",",0L));	
+		InscriptionTypeRegistry inscription = new InscriptionTypeRegistry();
+		if(inscriptions.size()>1){%>
+			<aui:select name="inscriptionType" label="inscription-type" onchange="${renderResponse.getNamespace()}changeInscriptionType(this.value)">			
+			<%
+			for(Long ins:inscriptions){
+				boolean selected = false;
+				InscriptionType itype = inscription.getInscriptionType(ins);
+				if((course == null && PropsUtil.get("lms.inscription.default.type").equals(String.valueOf(ins))) || (course != null && ins == course.getInscriptionType()))
+					selected = true;
+				%>
+					<aui:option value="<%=String.valueOf(ins)%>"  selected="<%=selected %>"><liferay-ui:message key="<%=itype.getTitle(themeDisplay.getLocale()) %>" /></aui:option>
+				<%
+			}
+			%>
+			</aui:select>
+				
+			<%	
+			for(Long ins:inscriptions){
+				boolean selected = false;
+				InscriptionType itype = inscription.getInscriptionType(ins);
+				if(Validator.isNotNull(itype.getSpecificContentPage())){%>
+					<div class="<%if(course == null || ins != course.getInscriptionType()){%>aui-helper-hidden<%}%> especific_content_page_inscription" id="${renderResponse.getNamespace()}especific_content_page_inscription_<%=itype.getTypeId()%>">
+						<liferay-util:include page="<%=itype.getSpecificContentPage() %>" servletContext="<%=getServletContext() %>" portletId="<%=itype.getPortletId() %>">
+							<%if(course != null){ %>
+								<liferay-util:param name="groupId" value="<%=Long.toString(course.getGroupCreatedId()) %>" />
+							<%} %>	
+						</liferay-util:include>	
+					</div>
+				<%
+				}
+			}
+			%>	
+				<script>
+				function <portlet:namespace />changeInscriptionType(typeId){
+					$(".especific_content_page_inscription").addClass("aui-helper-hidden");
+					$("#<portlet:namespace />especific_content_page_inscription_"+typeId).removeClass("aui-helper-hidden");
+				}
+				</script>
+				
+			<%
+		}else{
+			
+			InscriptionType itype = null;
+			try{
+				if(inscriptions.size()>0){
+					itype =inscription.getInscriptionType(inscriptions.get(0));
+				}
+			}catch(Exception e){}
+			%>
+			<aui:input name="inscriptionType" value="<%=itype==null?\"0\":itype.getTypeId()%>" type="hidden"/>
+			
+			<%
+			if(Validator.isNotNull(itype.getSpecificContentPage())){%>
+					<div class="especific_content_page_inscription" id="${renderResponse.getNamespace()}especific_content_page_inscription_<%=itype.getTypeId()%>">
+						<liferay-util:include page="<%=itype.getSpecificContentPage() %>" servletContext="<%=getServletContext() %>" portletId="<%=itype.getPortletId() %>">
+							<%if(course != null){ 
+								%>
+								<liferay-util:param name="groupId" value="<%=Long.toString(course.getGroupCreatedId()) %>" />
+							<%} %>
+						</liferay-util:include>		
+					</div>
+				<%
+			}
+		}
+
 	boolean showInscriptionDate = GetterUtil.getBoolean(renderRequest.getPreferences().getValues("showInscriptionDate", new String[]{StringPool.TRUE})[0],true);
 	boolean showExecutionDate = GetterUtil.getBoolean(renderRequest.getPreferences().getValues("showExecutionDate", new String[]{StringPool.TRUE})[0],true);
 	int defaultStartYear = LiferaylmsUtil.defaultStartYear;

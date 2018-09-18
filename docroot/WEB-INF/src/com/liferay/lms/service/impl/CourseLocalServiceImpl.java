@@ -64,6 +64,7 @@ import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
+import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.FileUtil;
@@ -505,10 +506,7 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 		Course course = addCourse (title, description,summary,friendlyURL, locale,
 				createDate,startDate,endDate,layoutSetPrototypeId,GroupConstants.TYPE_SITE_PRIVATE,
 				 serviceContext, calificationType,0,false);
-
-		//auditing
-		AuditingLogFactory.audit(course.getCompanyId(), course.getGroupId(), Course.class.getName(), course.getCourseId(), serviceContext.getUserId(), AuditConstants.ADD, null);
-		return course;
+	return course;
 	}
 
 	@Indexable(type=IndexableType.REINDEX)
@@ -520,9 +518,7 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 		
 		Course course = this.addCourse(title, description, description, friendlyURL, locale, createDate, startDate, endDate, serviceContext, calificationType);
 		
-		//auditing
-		AuditingLogFactory.audit(course.getCompanyId(), course.getGroupId(), Course.class.getName(), course.getCourseId(), serviceContext.getUserId(), AuditConstants.ADD, null);
-		
+	
 		return course;
 	}
 	
@@ -1882,5 +1878,51 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 		}
 		
 		return results;
+	}
+	
+	public boolean unsubscribeUser(Course course, long userId) throws SystemException, PortalException {
+
+		try{
+			List<Team> teams = TeamLocalServiceUtil.getUserTeams(userId, course.getGroupCreatedId());
+			if(teams!=null && teams.size()>0){
+				long[] userIds = new long[1];
+				userIds[0] = userId;
+				for(Team team : teams){
+					if(UserLocalServiceUtil.hasTeamUser(team.getTeamId(), userId)){
+						UserLocalServiceUtil.unsetTeamUsers(team.getTeamId(), userIds);
+					}
+				}
+			}
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		
+    	log.debug("COURSE GROUP ID "+course.getGroupCreatedId());
+    	long[] groupId = new long[1];
+    	groupId[0] = course.getGroupCreatedId();
+		if (GroupLocalServiceUtil.hasUserGroup(userId, course.getGroupCreatedId())) {
+			GroupLocalServiceUtil.unsetUserGroups(userId, groupId);
+
+			SocialActivityLocalServiceUtil.addActivity(userId, course.getGroupId(), Course.class.getName(), course.getCourseId(), com.liferay.portlet.social.model.SocialActivityConstants.TYPE_UNSUBSCRIBE, "", course.getUserId());
+			
+			if(log.isDebugEnabled()){
+				// Informamos de que lo ha dejado.
+				Date hoy = new Date();
+				String userName = ""+userId;
+				String groupName = ""+groupId[0];
+				try {
+					userName = userId + "[" + UserLocalServiceUtil.getUser(userId).getFullName() + "]";
+					groupName = groupId[0] + "[" + GroupLocalServiceUtil.getGroup(groupId[0]).getName() + "]";
+				}
+				catch (Exception e) {}
+				
+				log.debug("DESINSCRIBIR: "+userName +" se ha desincrito de la comunidad "+groupName+" el "+hoy.toString());
+			}
+			
+			return true;
+			
+		}else{	
+			return false;
+		}
 	}
 }

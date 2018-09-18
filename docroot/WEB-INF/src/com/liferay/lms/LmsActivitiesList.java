@@ -720,7 +720,7 @@ public class LmsActivitiesList extends MVCPortlet {
 				LearningActivityLocalServiceUtil.updateLearningActivity(precedence);
 			}
 		}
-		LearningActivityServiceUtil.deleteLearningactivity(larn.getActId());
+		LearningActivityLocalServiceUtil.deleteLearningactivity(larn.getActId());
 		//auditing
 		AuditingLogFactory.audit(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(), LearningActivity.class.getName(), larn.getActId(), themeDisplay.getUserId(), AuditConstants.DELETE, null);
 		

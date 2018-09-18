@@ -89,7 +89,7 @@ public class LearningActivityServiceImpl extends LearningActivityServiceBaseImpl
 
 			//auditing
 			if(lernact!=null){
-				AuditingLogFactory.audit(lernact.getCompanyId(), lernact.getGroupId(), Course.class.getName(), lernact.getPrimaryKey(), lernact.getUserId(), AuditConstants.DELETE, null);
+				AuditingLogFactory.audit(lernact.getCompanyId(), lernact.getGroupId(), LearningActivity.class.getName(), lernact.getPrimaryKey(), lernact.getUserId(), AuditConstants.DELETE, null);
 				SocialActivityLocalServiceUtil.addActivity(getUserId(), lernact.getGroupId(), LearningActivity.class.getName(), lernact.getActId(), com.liferay.lms.social.LearningActivityKeys.DELETE_ENTRY, "", lernact.getUserId());
 				
 			}

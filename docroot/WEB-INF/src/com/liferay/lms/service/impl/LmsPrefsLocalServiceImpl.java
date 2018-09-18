@@ -14,7 +14,11 @@
 
 package com.liferay.lms.service.impl;
 
+import java.util.List;
+
 import com.liferay.lms.NoSuchPrefsException;
+import com.liferay.lms.course.inscriptiontype.InscriptionType;
+import com.liferay.lms.course.inscriptiontype.InscriptionTypeRegistry;
 import com.liferay.lms.hook.events.StartupAction;
 import com.liferay.lms.learningactivity.LearningActivityType;
 import com.liferay.lms.learningactivity.LearningActivityTypeRegistry;
@@ -74,6 +78,7 @@ public class LmsPrefsLocalServiceImpl extends LmsPrefsLocalServiceBaseImpl
 				setActivities(lmsPrefs);
 				setScoreTranslators(lmsPrefs);
 				setCourseEvals(lmsPrefs);
+				setInscriptionTypes(lmsPrefs);
 			} catch (PortalException e) 
 			{
 				throw new SystemException(e);
@@ -155,5 +160,14 @@ public class LmsPrefsLocalServiceImpl extends LmsPrefsLocalServiceBaseImpl
 		}
 	}
 	
-	
+	private void setInscriptionTypes(LmsPrefs lmsPrefs) throws SystemException {
+		if(lmsPrefs.getInscriptionTypes()==null || lmsPrefs.getInscriptionTypes().length()==0){
+			InscriptionTypeRegistry inscriptionTypeRegistry = new InscriptionTypeRegistry();
+			List<InscriptionType> inscriptionTypes = inscriptionTypeRegistry.getInscriptionTypes();
+			Long[]inscriptionTypeIds = new Long[inscriptionTypes.size()];
+			for(int i=0;i<inscriptionTypes.size();i++){
+				inscriptionTypeIds[i]=inscriptionTypes.get(i).getTypeId();
+			}
+		}
+	}
 }

@@ -32,8 +32,10 @@
 	else{
 %>
 	<div class="container-activity isFeedback">
-<%
+<%	
+		Course course = CourseLocalServiceUtil.fetchByGroupCreatedId(themeDisplay.getScopeGroupId());
 		boolean hasFreeQuestion = false;
+		boolean hasPermissionAccessCourseFinished = LiferaylmsUtil.hasPermissionAccessCourseFinished(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(), course.getCourseId(), themeDisplay.getUserId());
 
 		LearningActivity learningActivity=(LearningActivity)request.getAttribute("learningActivity");
 		if(learningActivity==null){
@@ -42,23 +44,25 @@
 		LearningActivity bankActivity = learningActivity;
 		boolean useBank = StringPool.TRUE.equals(LearningActivityLocalServiceUtil.getExtraContentValue(learningActivity.getActId(), "isBank"));
 		LearningActivityTry larntry=(LearningActivityTry)request.getAttribute("larntry");
-		if(larntry==null) larntry=LearningActivityTryLocalServiceUtil.getLearningActivityTry(ParamUtil.getLong(request,"latId" ));
-		
-		if(larntry.getActId() == learningActivity.getActId()){
-			request.setAttribute("larntry",larntry);
-		}else{
-			larntry=LearningActivityTryLocalServiceUtil.getLastLearningActivityTryByActivityAndUser(ParamUtil.getLong(request,"actId",0 ), learningActivity.getUserId());
-			request.setAttribute("larntry",larntry);
-		}
-		
-		if( useBank && Validator.isNotNull(larntry) && Validator.isXml(larntry.getTryResultData()) ){
-			String tryResultData = larntry.getTryResultData();
-			Document docQuestions = SAXReaderUtil.read(tryResultData);
-			List<Element> xmlQuestions = docQuestions.getRootElement().elements("question");
-			String questionIdString = xmlQuestions.get(0).attributeValue("id");
-			Long questionId = Long.valueOf(questionIdString);
-			TestQuestion testQuestion = TestQuestionLocalServiceUtil.getTestQuestion(questionId);
-			bankActivity = LearningActivityLocalServiceUtil.getLearningActivity(testQuestion.getActId());
+		if(!hasPermissionAccessCourseFinished){
+			if(larntry==null) larntry=LearningActivityTryLocalServiceUtil.getLearningActivityTry(ParamUtil.getLong(request,"latId" ));
+			
+			if(larntry.getActId() == learningActivity.getActId()){
+				request.setAttribute("larntry",larntry);
+			}else{
+				larntry=LearningActivityTryLocalServiceUtil.getLastLearningActivityTryByActivityAndUser(ParamUtil.getLong(request,"actId",0 ), learningActivity.getUserId());
+				request.setAttribute("larntry",larntry);
+			}
+			
+			if( useBank && Validator.isNotNull(larntry) && Validator.isXml(larntry.getTryResultData()) ){
+				String tryResultData = larntry.getTryResultData();
+				Document docQuestions = SAXReaderUtil.read(tryResultData);
+				List<Element> xmlQuestions = docQuestions.getRootElement().elements("question");
+				String questionIdString = xmlQuestions.get(0).attributeValue("id");
+				Long questionId = Long.valueOf(questionIdString);
+				TestQuestion testQuestion = TestQuestionLocalServiceUtil.getTestQuestion(questionId);
+				bankActivity = LearningActivityLocalServiceUtil.getLearningActivity(testQuestion.getActId());
+			}
 		}
 %>
 		<h2 class="description-title"><%=bankActivity.getTitle(themeDisplay.getLocale()) %></h2>
@@ -81,11 +85,11 @@
 		}
 		
 		boolean isTeacher=permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), "com.liferay.lms.model",themeDisplay.getScopeGroupId(), "VIEW_RESULTS");
-		Course course = CourseLocalServiceUtil.fetchByGroupCreatedId(themeDisplay.getScopeGroupId());
+	
 		
 		CalificationType ct = new CalificationTypeRegistry().getCalificationType(course.getCalificationType());
 		
-		boolean hasPermissionAccessCourseFinished = LiferaylmsUtil.hasPermissionAccessCourseFinished(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(), course.getCourseId(), themeDisplay.getUserId());
+	
 	
 		
 		long tries = 0;

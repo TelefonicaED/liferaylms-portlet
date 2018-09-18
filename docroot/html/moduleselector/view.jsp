@@ -46,7 +46,7 @@
 				<aui:field-wrapper label="<%=(numerateModules)?LanguageUtil.format(pageContext, \"moduleTitle.chapter\", new Object[]{1,moduleTitle}):moduleTitle%>"/>
 			</c:when>
 			<c:otherwise>
-				<aui:select name="moduleSelect" inlineLabel="true" label="" cssClass="modules_selector_list">
+				<aui:select name="moduleSelect" inlineLabel="true" label="" cssClass="modules_selector_list" onChange="<%=\"AUI().use(function(A){ location.href = A.one('#\"+renderResponse.getNamespace()+\"moduleSelect > :selected').val(); });\" %>">
 				<%
 					int themeId=1;
 					long moduleId = ParamUtil.getLong(request, "moduleId", modules.get(0).getModuleId());
@@ -64,13 +64,12 @@
 					%>
 						<aui:option selected="<%= module.getModuleId()==moduleId %>" 
 							label="<%=(numerateModules)?LanguageUtil.format(pageContext, \"moduleTitle.chapter\", new Object[]{themeId++,moduleTitle}):moduleTitle%>" 
-							value="<%=gotoModuleURL.toString() %>" />
+							value="<%=gotoModuleURL.toString() %>"  />
 						
 					<%
 					}
 				%>
 				</aui:select>
-				<aui:button name="go" value="go" onClick="<%=\"AUI().use(function(A){ location.href = A.one('#\"+renderResponse.getNamespace()+\"moduleSelect > :selected').val(); });\" %>"/>
 			</c:otherwise>
 		</c:choose>
 	</c:if>

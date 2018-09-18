@@ -92,14 +92,14 @@ if(permissionChecker.hasPermission(themeDisplay.getScopeGroupId(),  Course.class
 </c:if>
 
 <%-- Exportar curso --%>
-	<%if(showExport && permissionChecker.hasPermission(themeDisplay.getScopeGroupId(),  Course.class.getName(),primKey,ActionKeys.UPDATE) && myCourse.getParentCourseId()<=0){%>	
+	<%if(showExport && permissionChecker.hasPermission(themeDisplay.getScopeGroupId(),  Course.class.getName(),primKey,ActionKeys.UPDATE)){%>	
 	<portlet:renderURL var="exportURL">
 		<portlet:param name="groupId" value="<%=String.valueOf(myCourse.getGroupCreatedId()) %>" />
 		<portlet:param name="view" value="export" />
 	</portlet:renderURL>
 	<liferay-ui:icon image="download" message="courseadmin.adminactions.export" url="<%=exportURL %>" />			
 	<%}%>
-	<%if(showImport && permissionChecker.hasPermission(themeDisplay.getScopeGroupId(),  Course.class.getName(),primKey,ActionKeys.UPDATE) && myCourse.getParentCourseId()<=0){%>	
+	<%if(showImport && permissionChecker.hasPermission(themeDisplay.getScopeGroupId(),  Course.class.getName(),primKey,ActionKeys.UPDATE)){%>	
 	<portlet:renderURL var="importURL">
 		<portlet:param name="groupId" value="<%=String.valueOf(myCourse.getGroupCreatedId()) %>" />
 		<portlet:param name="view" value="import" />
@@ -143,7 +143,7 @@ if( permissionChecker.hasPermission(themeDisplay.getScopeGroupId(),  Course.clas
 	<liferay-ui:icon src="<%= themeDisplay.getPathThemeImages() + \"/dock/my_places_private.png\" %>" message="open-course" url="<%=openURL.toString() %>" />
 <%} %>
 <portlet:actionURL name="deleteCourse" var="deleteURL">
-<portlet:param name="courseId" value="<%= primKey %>" />
+	<portlet:param name="courseId" value="<%= primKey %>" />
 </portlet:actionURL>
 
 <%-- Eliminar Curso --%>
