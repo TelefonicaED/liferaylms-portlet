@@ -39,6 +39,8 @@ import com.liferay.lms.auditing.AuditConstants;
 import com.liferay.lms.auditing.AuditingLogFactory;
 import com.liferay.lms.course.diploma.CourseDiploma;
 import com.liferay.lms.course.diploma.CourseDiplomaRegistry;
+import com.liferay.lms.course.inscriptiontype.InscriptionType;
+import com.liferay.lms.course.inscriptiontype.InscriptionTypeRegistry;
 import com.liferay.lms.learningactivity.calificationtype.CalificationType;
 import com.liferay.lms.learningactivity.calificationtype.CalificationTypeRegistry;
 import com.liferay.lms.learningactivity.courseeval.CourseEval;
@@ -583,6 +585,7 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 		String fileName = uploadRequest.getFileName("fileName");
 		long courseTemplateId=ParamUtil.getLong(uploadRequest,"courseTemplate",0);
 		long courseCalificationType=ParamUtil.getLong(uploadRequest,"calificationType",0);
+		long inscriptionType = ParamUtil.getLong(uploadRequest, "inscriptionType", 0);
 		String friendlyURL = ParamUtil.getString(uploadRequest, "friendlyURL",
 				StringPool.BLANK);
 		int startMonth = ParamUtil.getInteger(uploadRequest, "startMon");
@@ -793,6 +796,7 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 						titleMap, description, summary, friendlyURL,
 						themeDisplay.getLocale(), ahora, startDate, stopDate, startExecutionDate.getTime(), stopExecutionDate.getTime() , courseTemplateId,type,courseEvalId,
 						courseCalificationType,maxusers,serviceContext,false);
+				course.setInscriptionType(inscriptionType);
 				try{
 				LmsPrefs prefs=LmsPrefsLocalServiceUtil.getLmsPrefs(course.getCompanyId());
 				//Añadimos como miembro del sitio web
@@ -849,6 +853,7 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 				course.setStartDate(startDate); 
 				course.setEndDate(stopDate);
 				course.setCalificationType(courseCalificationType);
+				course.setInscriptionType(inscriptionType);
 				course.setMaxusers(maxusers);
 				if(Validator.isNotNull(friendlyURL))course.setFriendlyURL(friendlyURL);
 				serviceContext.setAttribute("type", String.valueOf(type));
@@ -960,7 +965,15 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 					actionResponse.setRenderParameter("calificationTypeExtraContentError", calificationTypeExtraContentError);
 				}
 				
-
+				InscriptionTypeRegistry inscriptionRegistry = new InscriptionTypeRegistry();
+				InscriptionType itype = inscriptionRegistry.getInscriptionType(course.getInscriptionType());
+				String inscriptionTypeExtraContentError = itype.setExtraContent(uploadRequest, actionResponse, course);
+				log.debug("****inscriptionTypeExtraContentError:"+inscriptionTypeExtraContentError);
+				
+				if(inscriptionTypeExtraContentError != null){
+					SessionErrors.add(actionRequest, "inscriptionTypeExtraContentError");
+					actionResponse.setRenderParameter("inscriptionTypeExtraContentError", inscriptionTypeExtraContentError);
+				}
 				
 				//Update especific content of diploma (if exists)
 				CourseDiplomaRegistry cdr = new CourseDiplomaRegistry();

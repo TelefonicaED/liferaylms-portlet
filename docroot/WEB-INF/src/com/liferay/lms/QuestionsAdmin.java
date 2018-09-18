@@ -1,6 +1,10 @@
 package com.liferay.lms;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -19,6 +23,16 @@ import javax.portlet.ResourceResponse;
 import javax.portlet.WindowState;
 
 import org.apache.commons.beanutils.BeanComparator;
+import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFCellStyle;
+import org.apache.poi.hssf.usermodel.HSSFFont;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.jsoup.Jsoup;
 
 import au.com.bytecode.opencsv.CSVWriter;
@@ -43,11 +57,13 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.servlet.HttpHeaders;
+import com.liferay.portal.kernel.servlet.ServletResponseUtil;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.upload.UploadPortletRequest;
 import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.ContentTypes;
+import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -73,6 +89,15 @@ public class QuestionsAdmin extends MVCPortlet{
 	private static Log log = LogFactoryUtil.getLog(QuestionsAdmin.class);
 	
 	public static final Pattern DOCUMENT_EXCEPTION_MATCHER = Pattern.compile("Error on line (\\d+) of document ([^ ]+) : (.*)");
+	public static final String TIMES_NEW_ROMAN = "Times New Roman";
+	public static final int COLUMN_INDEX_QUESTION_TITLE = 0;
+	public static final int COLUMN_INDEX_QUESTION_TYPE = 1;
+	public static final int COLUMN_INDEX_QUESTION_PENALIZE = 2;
+	public static final int COLUMN_INDEX_ANSWER_TITLE = 3;
+	public static final int COLUMN_INDEX_ANSWER_IS_CORRECT = 4;
+	public static final int COLUMN_INDEX_ANSWER_FEEDBACK_CORRECT = 5;
+	public static final int COLUMN_INDEX_ANSWER_FEEDBACK_INCORRECT = 6;
+	
 	
 	HashMap<Long, TestAnswer> answersMap = new HashMap<Long, TestAnswer>(); 
 	
@@ -408,6 +433,7 @@ public class QuestionsAdmin extends MVCPortlet{
 		String action = ParamUtil.getString(request, "action");
 		long actId = ParamUtil.getLong(request, "resId",0);
 		response.setCharacterEncoding(StringPool.UTF8);
+		
 		try {
 			if(action.equals("exportResultsCsv")){
 				response.addProperty(HttpHeaders.CONTENT_DISPOSITION,"attachment; fileName=data.csv");
@@ -531,6 +557,15 @@ public class QuestionsAdmin extends MVCPortlet{
 				printWriter.write(quizXMLDoc.formattedString());
 				printWriter.flush();
 				printWriter.close();
+			}else if(action.equals("exportExcel")){
+				ThemeDisplay themeDisplay = (ThemeDisplay) request.getAttribute(WebKeys.THEME_DISPLAY);
+				String name = LanguageUtil.get(themeDisplay.getLocale(), "questions")+".xls";
+				File file = exportExcelQuestions(themeDisplay, actId);
+				ServletResponseUtil.sendFile(PortalUtil.getHttpServletRequest(request),
+						 PortalUtil.getHttpServletResponse(response),
+						 name,
+						 FileUtil.getBytes(file), 
+						 ContentTypes.APPLICATION_VND_MS_EXCEL);
 			}
 		
 			response.getPortletOutputStream().flush();
@@ -635,6 +670,217 @@ public class QuestionsAdmin extends MVCPortlet{
 
 		actionResponse.setRenderParameter("actionEditingDetails", StringPool.TRUE);
 		actionResponse.setRenderParameter("resId", Long.toString(actId));	
+	}
+	
+	
+	public void importExcelQuestions(ActionRequest actionRequest, ActionResponse actionResponse) throws PortletException, IOException {
+		
+		UploadPortletRequest uploadRequest = PortalUtil.getUploadPortletRequest(actionRequest);
+		long actId = ParamUtil.getLong(actionRequest, "resId",0);
+
+		String fileName = uploadRequest.getFileName("fileName");
+		InputStream excelFile = uploadRequest.getFileAsStream("fileName");
+		if(fileName==null || StringPool.BLANK.equals(fileName)){
+			SessionErrors.add(actionRequest, "surveyactivity.csverror.fileRequired");
+			actionResponse.setRenderParameter("jspPage", "/html/questions/admin/importQuestionsExcel.jsp");
+		}else{ 
+			String contentType = uploadRequest.getContentType("fileName");	
+			if (!ContentTypes.APPLICATION_VND_MS_EXCEL.equals(contentType)) {
+				SessionErrors.add(actionRequest, "surveyactivity.csvError.bad-format");	
+				actionResponse.setRenderParameter("jspPage", "/html/questions/admin/importQuestionsExcel.jsp");
+			}else{
+				Workbook workbook = null;
+				try{
+					workbook = new HSSFWorkbook(excelFile);
+				}catch(Exception e){//Excel 2007
+					workbook = new XSSFWorkbook(excelFile);
+					
+				}			
+
+				//Cogemos la primera hoja
+				Sheet worksheet = workbook.getSheetAt(0);
+				int fila = 0;
+				String questionTitle, feedbackCorrect, feedbackIncorrect;
+				int questionType;
+				boolean allCorrect=true;
+				boolean questionPenalize;
+				String answerTitle;
+				boolean answerIsCorrect;
+				boolean firstLine = true;
+				Row row = worksheet.getRow(fila);
+				TestQuestion question =null;
+				while(row != null){
+					//La primera linea es la cabecera
+					try{
+						if(!firstLine){
+							try{	
+								questionTitle = row.getCell(COLUMN_INDEX_QUESTION_TITLE).getStringCellValue();
+								answerTitle = row.getCell(COLUMN_INDEX_ANSWER_TITLE).getStringCellValue();
+								answerIsCorrect = Boolean.parseBoolean(row.getCell(COLUMN_INDEX_ANSWER_IS_CORRECT).getStringCellValue());
+								feedbackCorrect =  row.getCell(COLUMN_INDEX_ANSWER_FEEDBACK_CORRECT).getStringCellValue();
+								feedbackIncorrect = row.getCell(COLUMN_INDEX_ANSWER_FEEDBACK_INCORRECT).getStringCellValue();
+								if(questionTitle!=null && Validator.isNotNull(questionTitle.trim())){
+									questionType = Integer.valueOf(row.getCell(COLUMN_INDEX_QUESTION_TYPE).getStringCellValue());
+									questionPenalize = Boolean.parseBoolean(row.getCell(COLUMN_INDEX_QUESTION_PENALIZE).getStringCellValue());
+									//Es pregunta con respuesta
+									if (log.isDebugEnabled()) log.debug("Line: " + fila + " ***********Es pregunta con respuesta************");
+									if (log.isDebugEnabled()) log.debug("Line: " + fila + " Titulo pregunta: " + questionTitle);					
+									if (log.isDebugEnabled()) log.debug("Line: " + fila + " Tipo: " + questionType);
+									if (log.isDebugEnabled()) log.debug("Line: " + fila + " Penalize: " + questionPenalize);
+									if (log.isDebugEnabled()) log.debug("Line: " + fila + " Titulo respuesta: " + answerTitle);
+									if (log.isDebugEnabled()) log.debug("Line: " + fila + " Es correcta: " + answerIsCorrect);
+									
+									//Creamos la pregunta.
+									question =TestQuestionLocalServiceUtil.addQuestion(actId, questionTitle, questionType);
+									question.setPenalize(questionPenalize);
+									question = TestQuestionLocalServiceUtil.updateTestQuestion(question);
+									//Creamos la respuesta 
+									TestAnswerLocalServiceUtil.addTestAnswer(question.getQuestionId(), answerTitle, feedbackCorrect, feedbackIncorrect, answerIsCorrect);
+									
+									
+									
+								}else{	//Es solo respuesta
+									if (log.isDebugEnabled()) log.debug("Line: " + fila + " ***********Es solo respuesta************");
+									if (log.isDebugEnabled()) log.debug("Line: " + fila + " Titulo respuesta: " + answerTitle);
+									if (log.isDebugEnabled()) log.debug("Line: " + fila + " Es correcta: " + answerIsCorrect);
+									if(feedbackCorrect!=null && feedbackCorrect.length()>1000){
+										feedbackCorrect = feedbackCorrect.substring(0, 999);
+									}
+									
+									if(feedbackIncorrect!=null && feedbackIncorrect.length()>1000){
+										feedbackIncorrect = feedbackIncorrect.substring(0, 999);
+									}
+									if(question!=null){
+										 TestAnswerLocalServiceUtil.addTestAnswer(question.getQuestionId(), answerTitle, feedbackCorrect, feedbackIncorrect, answerIsCorrect);
+									}
+								}
+							}catch(Exception e){
+								log.error(e.getMessage());
+								log.debug(e);
+								log.error("FILA "+fila);
+								SessionErrors.add(actionRequest, "surveyactivity.csvError.bad-question",fila);
+								actionResponse.setRenderParameter("jspPage", "/html/questions/admin/importQuestionsExcel.jsp");
+								allCorrect=false;
+							}
+						}else{
+							firstLine = false;
+						}
+						fila++;
+						row = worksheet.getRow(fila);
+					}catch(Exception e){
+						e.printStackTrace();
+						SessionErrors.add(actionRequest, "surveyactivity.csvError.bad-format-line",fila);
+						actionResponse.setRenderParameter("jspPage", "/html/questions/admin/importQuestionsExcel.jsp");
+						allCorrect=false;
+						e.printStackTrace();	
+					}
+				
+				}	
+			
+				if(allCorrect){
+					System.out.println("ALL CORRECT!!!");
+					actionResponse.setRenderParameter("jspPage", "/html/questions/admin/editquestions.jsp");
+					SessionMessages.add(actionRequest, "questions-added-successfully");
+				}
+
+			}
+				
+		}
+			
+		if (!SessionErrors.isEmpty(actionRequest)){
+			actionResponse.setRenderParameter("jspPage", "/html/questions/admin/importQuestionsExcel.jsp");
+		}
+			
+		actionResponse.setRenderParameter("actionEditingDetails", StringPool.TRUE);
+		actionResponse.setRenderParameter("resId", Long.toString(actId));
+	}
+				
+	private File exportExcelQuestions(ThemeDisplay themeDisplay, long actId) throws PortletException, IOException {
+		
+		log.debug("::ARRANCAMOS HILO USERS EXPORT EXCEL:::"); 
+		int rowNumber = 1;
+		// Presenta en pantalla informacion sobre este hilo en particular
+		File file = FileUtil.createTempFile("xls");
+		try {
+			
+			FileOutputStream bw = null;
+			try {
+				bw = new FileOutputStream(file);
+			} 
+			catch (FileNotFoundException e1) {
+				e1.printStackTrace();
+			}
+			String [] headers = {"title","type","penalize","answer","correct","feedbackCorrect","feedbackNoCorrect"} ;
+			String [] headersTitle = new String [headers.length];
+			int i = 0;
+			for(String header : headers) {
+				headersTitle[i++] = LanguageUtil.get(themeDisplay.getLocale(), header, header);
+				log.debug("hearder: " + header);
+			}
+
+			HSSFWorkbook workbook = new HSSFWorkbook();
+		    HSSFSheet sheet = workbook.createSheet(LanguageUtil.get(themeDisplay.getLocale(), "questions", "questions"));
+		    
+		    HSSFFont font = workbook.createFont();
+		    font.setFontName(TIMES_NEW_ROMAN);
+		    font.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);
+		    HSSFCellStyle style = workbook.createCellStyle();
+		    style.setFont(font);
+
+		    exportExcelLine(headersTitle, sheet.createRow(0), style);
+
+		    font = workbook.createFont();
+		    font.setFontName(TIMES_NEW_ROMAN);
+		    style = workbook.createCellStyle();
+		    style.setFont(font);
+		    String[] questionLine = new String[headers.length];
+		    
+			for(TestQuestion question: TestQuestionLocalServiceUtil.getQuestions(actId)){
+				questionLine[COLUMN_INDEX_QUESTION_TITLE]=question.getText();
+				questionLine[COLUMN_INDEX_QUESTION_TYPE]=String.valueOf(question.getQuestionType());
+				questionLine[COLUMN_INDEX_QUESTION_PENALIZE]= String.valueOf(question.getPenalize());
+				i=0;
+				for(TestAnswer answer: TestAnswerLocalServiceUtil.getTestAnswersByQuestionId(question.getQuestionId())){
+					questionLine[COLUMN_INDEX_ANSWER_TITLE]=answer.getAnswer();
+					questionLine[COLUMN_INDEX_ANSWER_IS_CORRECT]=String.valueOf(answer.isIsCorrect());
+					questionLine[COLUMN_INDEX_ANSWER_FEEDBACK_CORRECT]=answer.getFeedbackCorrect();
+					questionLine[COLUMN_INDEX_ANSWER_FEEDBACK_INCORRECT]=answer.getFeedbacknocorrect();
+					
+					exportExcelLine(questionLine, sheet.createRow(rowNumber++), style);
+					
+					if(questionLine[COLUMN_INDEX_QUESTION_TITLE]!="" || questionLine[COLUMN_INDEX_QUESTION_TYPE]!=""|| questionLine[COLUMN_INDEX_QUESTION_PENALIZE]!= ""){
+						questionLine[COLUMN_INDEX_QUESTION_TITLE]="";
+						questionLine[COLUMN_INDEX_QUESTION_TYPE]="";
+						questionLine[COLUMN_INDEX_QUESTION_PENALIZE]= "";
+					}
+				}
+				
+			}
+			workbook.write(bw);
+			
+			try {
+				bw.close();
+			} 
+		  	catch (IOException e) {
+				e.printStackTrace();
+			}						
+		
+		}catch (Exception e) {
+			e.printStackTrace();
+		} 
+		
+		return file;
+
+	}
+	
+	
+	private void exportExcelLine(String[] line,HSSFRow row,HSSFCellStyle style){
+		int columnNumer = 0;
+		for (String column : line) {
+			HSSFCell cell = row.createCell(columnNumer++, HSSFCell.CELL_TYPE_STRING);
+			cell.setCellStyle(style);
+			cell.setCellValue(column);
+		}
 	}
 	
 	public void setBankTest(ActionRequest actionRequest, ActionResponse actionResponse) throws Exception{

@@ -55,13 +55,6 @@
 
 <liferay-ui:header title="courseadmin.importuserrole"></liferay-ui:header>
 
-
-
-<c:if test='<%= SessionMessages.contains(renderRequest, "courseadmin.importuserrole.csv.saved") %>'>
-	<div class="portlet-msg-success"> 
-		<liferay-ui:message key="hello" />
-	</div>
-</c:if>
 <liferay-ui:panel id="importuserrole_help" title="help" extended="closed">
 	<%
 	String[] arguments = new String[1];

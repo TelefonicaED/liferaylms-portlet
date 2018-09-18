@@ -125,6 +125,7 @@
 		<property name="closed" type="com.liferay.portal.dao.orm.hibernate.BooleanType" />
 		<property name="maxusers" type="com.liferay.portal.dao.orm.hibernate.LongType" />
 		<property name="calificationType" type="com.liferay.portal.dao.orm.hibernate.LongType" />
+		<property name="inscriptionType" type="com.liferay.portal.dao.orm.hibernate.LongType" />
 		<property name="welcome" type="com.liferay.portal.dao.orm.hibernate.BooleanType" />
 		<property name="welcomeMsg" type="com.liferay.portal.dao.orm.hibernate.StringType" />
 		<property name="welcomeSubject" type="com.liferay.portal.dao.orm.hibernate.StringType" />
@@ -233,6 +234,7 @@
 		<property name="activities" type="com.liferay.portal.dao.orm.hibernate.StringType" />
 		<property name="courseevals" type="com.liferay.portal.dao.orm.hibernate.StringType" />
 		<property name="scoretranslators" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="inscriptionTypes" type="com.liferay.portal.dao.orm.hibernate.StringType" />
 		<property name="usersResults" type="com.liferay.portal.dao.orm.hibernate.LongType" />
 		<property name="debugScorm" type="com.liferay.portal.dao.orm.hibernate.BooleanType" />
 		<property name="hasAPILicence" type="com.liferay.portal.dao.orm.hibernate.BooleanType" />

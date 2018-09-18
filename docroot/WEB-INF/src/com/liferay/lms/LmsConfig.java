@@ -26,8 +26,7 @@ import com.liferay.util.bridges.mvc.MVCPortlet;
 public class LmsConfig extends MVCPortlet {
 	
 	
-	public void changeSettings(ActionRequest request , ActionResponse response) throws Exception
-	{
+	public void changeSettings(ActionRequest request , ActionResponse response) throws Exception{
 		
 		String redirect = ParamUtil.get(request, "redirect", "");
 		
@@ -35,6 +34,7 @@ public class LmsConfig extends MVCPortlet {
 		String activitytypes=StringUtil.merge(request.getParameterMap().get( "activitiesCheckbox"));
 		String calificationTypes=StringUtil.merge(request.getParameterMap().get( "calificationTypesCheckbox"));
 		String courseEvalsTypes=StringUtil.merge(request.getParameterMap().get( "courseEvalsCheckbox"));
+		String inscriptionTypes=StringUtil.merge(request.getParameterMap().get( "inscriptionTypesCheckbox"));
 		ThemeDisplay themeDisplay  =(ThemeDisplay)request.getAttribute(WebKeys.THEME_DISPLAY);
 		
 		boolean hasAPILicence = ParamUtil.getBoolean(request, "hasAPILicence");
@@ -48,6 +48,7 @@ public class LmsConfig extends MVCPortlet {
 		prefs.setActivities(activitytypes);
 		prefs.setCourseevals(courseEvalsTypes);
 		prefs.setScoretranslators(calificationTypes);
+		prefs.setInscriptionTypes(inscriptionTypes);
 		prefs.setHasAPILicence(hasAPILicence);
 		prefs.setShowHideActivity(showHideActivity);
 		prefs.setViewCoursesFinished(viewCoursesFinished);

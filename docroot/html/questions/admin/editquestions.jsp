@@ -71,6 +71,8 @@
 	TestQuestionLocalServiceUtil.checkWeights(learningActivity.getActId());
 	
 %>
+
+<liferay-ui:success key="questions-added-successfully" message="questions.questions-added-successfully" />
 <liferay-util:include page="/html/questions/admin/editHeader.jsp" servletContext="<%=this.getServletContext() %>" />
 
 <script type="text/javascript">
@@ -176,8 +178,19 @@
 				<portlet:param name="actionEditingDetails" value="<%=StringPool.TRUE %>"></portlet:param>	
 				<portlet:param name="jspPage" value="/html/questions/admin/importquestions.jsp"></portlet:param>
 			</portlet:renderURL>
-			<liferay-ui:icon image="add" label="<%= true %>" message="execativity.editquestions.importquestions" url='<%= importquestionsURL %>'/>
+			<liferay-ui:icon image="add" label="<%= true %>" message="surveyactivity.editquestions.importquestions.xml" url='<%= importquestionsURL %>'/>
 			
+			<portlet:renderURL var="importQuestionsExcelURL">
+			<portlet:param name="resId" value="<%=String.valueOf(learningActivity.getActId()) %>" />
+			<portlet:param name="actionEditingDetails" value="<%=StringPool.TRUE %>"></portlet:param>	
+			<portlet:param name="jspPage" value="/html/questions/admin/importQuestionsExcel.jsp"></portlet:param>
+			</portlet:renderURL>
+			<liferay-ui:icon
+			image="add"
+			label="<%= true %>"
+			message="surveyactivity.editquestions.importquestions"
+			url='<%= importQuestionsExcelURL %>'
+			/>
 			<liferay-portlet:resourceURL var="exportResultsCsvURL" >
 				<portlet:param name="action" value="exportResultsCsv"/>
 				<portlet:param name="resId" value="<%=Long.toString(learningActivity.getActId()) %>"/>
@@ -189,6 +202,12 @@
 				<portlet:param name="resId" value="<%=Long.toString(learningActivity.getActId()) %>"/>
 			</liferay-portlet:resourceURL>
 			<liferay-ui:icon image="export" label="<%= true %>" message="execativity.editquestions.exportXml" method="get" url="<%=exportXmlURL%>" />
+			
+			<liferay-portlet:resourceURL var="exportExcelURL" >
+				<portlet:param name="action" value="exportExcel"/>
+				<portlet:param name="resId" value="<%=Long.toString(learningActivity.getActId()) %>"/>
+			</liferay-portlet:resourceURL>
+			<liferay-ui:icon image="export" label="<%= true %>" message="execativity.editquestions.exportExcel" method="get" url="${exportExcelURL }" />
 		</liferay-ui:icon-menu>
 	</div>
 	

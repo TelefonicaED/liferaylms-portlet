@@ -1,3 +1,5 @@
+<%@page import="com.liferay.lms.course.inscriptiontype.InscriptionTypeRegistry"%>
+<%@page import="com.liferay.lms.course.inscriptiontype.InscriptionType"%>
 <%@page import="com.liferay.lms.service.ScheduleLocalServiceUtil"%>
 <%@page import="com.liferay.lms.service.ScheduleLocalService"%>
 <%@page import="com.liferay.lms.model.Schedule"%>
@@ -37,7 +39,8 @@
 			
 			<%if(GroupLocalServiceUtil.hasUserGroup(themeDisplay.getUserId(),themeDisplay.getScopeGroupId())){ 
 				Date now = new Date();
-				if(course.getStartDate().after(now)||course.getEndDate().before(now)||!permissionChecker.hasPermission(course.getGroupId(),  Course.class.getName(),course.getCourseId(),"REGISTER")){%>
+				InscriptionType inscriptionType = new InscriptionTypeRegistry().getInscriptionType(course.getInscriptionType());
+				if(!inscriptionType.canUnsubscribe() || course.getStartDate().after(now)||course.getEndDate().before(now)||!permissionChecker.hasPermission(course.getGroupId(),  Course.class.getName(),course.getCourseId(),"REGISTER")){%>
 					<div class="mensaje_marcado"><liferay-ui:message key="inscripcion.inscrito" /></div>
 				<%} else {
 					CourseResult courseResult = CourseResultLocalServiceUtil.getByUserAndCourse(course.getCourseId(), themeDisplay.getUserId()); 

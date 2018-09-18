@@ -160,6 +160,7 @@
 			<basic name="closed" />
 			<basic name="maxusers" />
 			<basic name="calificationType" />
+			<basic name="inscriptionType" />
 			<basic name="welcome" />
 			<basic name="welcomeMsg" />
 			<basic name="welcomeSubject" />
@@ -340,6 +341,7 @@
 			<basic name="activities" />
 			<basic name="courseevals" />
 			<basic name="scoretranslators" />
+			<basic name="inscriptionTypes" />
 			<basic name="usersResults" />
 			<basic name="debugScorm" />
 			<basic name="hasAPILicence" />

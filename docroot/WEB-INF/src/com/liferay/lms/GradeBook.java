@@ -198,7 +198,7 @@ public class GradeBook extends MVCPortlet {
 			PortletException {
 		String action = ParamUtil.getString(resourceRequest, "action");
 		long moduleId = ParamUtil.getLong(resourceRequest, "moduleId",0);
-		long teamId=ParamUtil.getLong(resourceRequest, "teamId",0);
+		long teamId=ParamUtil.getLong(resourceRequest, "team",0);
 		ThemeDisplay themeDisplay  =(ThemeDisplay)resourceRequest.getAttribute(WebKeys.THEME_DISPLAY);
 		if(action.equals("export")){
 			
