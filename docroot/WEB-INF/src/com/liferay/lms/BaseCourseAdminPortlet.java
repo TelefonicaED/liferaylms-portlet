@@ -1740,7 +1740,7 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 	}
 	
 	
-	protected String[] getCourseTemplates(PortletPreferences preferences, long companyId){
+	public static String[] getCourseTemplates(PortletPreferences preferences, long companyId){
 
 		// Templates
 		String[] templates = null;
