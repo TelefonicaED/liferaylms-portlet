@@ -467,12 +467,13 @@ public class ResourceExternalActivity extends QuestionsAdmin {
 				activityTry.setResult(result);
 				
 				activityTry = LearningActivityTryLocalServiceUtil.updateLearningActivityTry(activityTry);
-				
-				correctMode = Integer.parseInt(LearningActivityLocalServiceUtil.getExtraContentValue(actId, "correctMode"));
-				log.error("CORRECT MODE "+correctMode);
+				if(Validator.isNotNull(LearningActivityLocalServiceUtil.getExtraContentValue(actId, "correctMode"))){
+					correctMode = Integer.parseInt(LearningActivityLocalServiceUtil.getExtraContentValue(actId, "correctMode"));
+				}
+				log.debug("CORRECT MODE "+correctMode);
 				if(correctMode == ResourceExternalLearningActivityType.CORRECT_QUESTIONS){
-					log.error("--correctQUESTIONS!" );
-					String feedback = "<p>"+ LanguageUtil.get(themeDisplay.getLocale(), "evaluationtaskactivity.result.youresult") +" "+result+"</p>";
+					log.debug("--correctQUESTIONS!" );
+					String feedback = "<span class=\"result-activity\">"+ LanguageUtil.get(themeDisplay.getLocale(), "evaluationtaskactivity.result.youresult") +" <strong>"+result+"</strong></span>";
 					List<TestQuestion> questions=null;
 					if( StringPool.TRUE.equals(LearningActivityLocalServiceUtil.getExtraContentValue(actId, "isBank")) ){
 						String tryResultData = activityTry.getTryResultData();
@@ -503,9 +504,13 @@ public class ResourceExternalActivity extends QuestionsAdmin {
 
 					
 					for(TestQuestion question:questions){
-						QuestionType qt = new QuestionTypeRegistry().getQuestionType(question.getQuestionType());
-						qt.setLocale(themeDisplay.getLocale());
-						feedback+=qt.getHtmlFeedback(SAXReaderUtil.read(activityTry.getTryResultData()), question.getQuestionId(), activity.getActId(), themeDisplay);
+						try{
+							QuestionType qt = new QuestionTypeRegistry().getQuestionType(question.getQuestionType());
+							qt.setLocale(themeDisplay.getLocale());
+							feedback+=qt.getHtmlFeedback(SAXReaderUtil.read(activityTry.getTryResultData()), question.getQuestionId(), activity.getActId(), themeDisplay);
+						}catch(Exception e){
+							e.printStackTrace();
+						}
 					}
 					oreturned.put("questionCorrection",true);
 					oreturned.put("finalFeedback", Boolean.parseBoolean(LearningActivityLocalServiceUtil.getExtraContentValue(activity.getActId(), "finalFeedback","false")));

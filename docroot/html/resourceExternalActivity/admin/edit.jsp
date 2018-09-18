@@ -195,15 +195,6 @@
 				Document document = SAXReaderUtil.read(learningActivity.getExtracontent());
 				root=document.getRootElement();
 			
-			
-			
-				
-				
-				
-				
-				
-				
-				
 				
 				//Tratamos el video si tiene
 				Element video=root.element("video");
@@ -239,11 +230,14 @@
 						
 						if(isVimeoIframe && videoCode.indexOf("?") >= 0){
 							videoCode = videoCode.substring(0, videoCode.indexOf("?"));
+							
 						}
+						
 						
 						
 						String mimeType = "video/";
 						if(videoCode.contains("vimeo.com")){
+							videoCode += "?background=1&loop=0&mute=0";	
 							mimeType += "vimeo";
 						}else if(videoCode.contains("youtu")){
 							mimeType += "youtube";
@@ -286,16 +280,7 @@
 						
 						
 						<%
-						/*renderRequest.setAttribute("controls", "controls");
-						renderRequest.setAttribute("currentTime", 0);
-						renderRequest.setAttribute("mimeType", "video/" + mimeType);
-						renderRequest.setAttribute("video", videoCode);
-						
-						renderRequest.setAttribute("listQuestions", listQuestions);
-						
-						
-						
-						renderRequest.setAttribute("timeQuestions", timeQuestions);*/
+				
 					}
 					
 					renderRequest.setAttribute("isYoutubeIframe", true);
@@ -350,7 +335,7 @@
 		questions.sort(function(a, b){return a[1]-b[1]});
  		
  		$('#playervideo').mediaelementplayer({
-     	    features: ['playpause','current','progress','duration','markers'], //Adding the feature 'markers' enables this plugin
+     	    features: ['playpause','current','progress','duration','markers','volume'], //Adding the feature 'markers' enables this plugin
      		pluginPath: 'https://cdn.jsdelivr.net/npm/mediaelement@4.2.7/build/',
      		markerColor: '#FCD730', // Optional : Specify the color of the marker
      		markers:questions, // Specify marker times in seconds 
@@ -376,7 +361,7 @@
      
  	function <portlet:namespace/>continueQuestion(questionId){
  		//Cogemos la respuesta
- 		console.log("continuamos respuesta");
+ 		//console.log("continuamos respuesta");
  		var A = AUI();
  		var divQuestionId = $('.question',$('#<portlet:namespace />question_video_'+questionId)).attr("id");
  		var divQuestion = A.one('#' + divQuestionId);
@@ -386,27 +371,40 @@
  	}
     
  	function <portlet:namespace/>changeTime(questionId,second){
- 		console.log("Question Id "+questionId);
- 		console.log("Second "+second);
- 		player.pause();
- 		//Borramos el marcador
- 		$('#marker-'+questionId).remove();
- 		//Creamos marcador nuevo
- 		 $('.mejs__time-total').append('<span class="mejs-time-marker" id="marker-'+questionId+'"></span>');
- 		//Maquetamos el marcador
- 		if (Math.floor(second) <= player.getDuration() && Math.floor(second) >= 0) {
-                    left = 100 * Math.floor(second) / player.getDuration();
-                    $('#marker-'+questionId).css({
-                        "width": "2px",
-                        "height": "10px",
-                        "left": left+"%",
-                        "position": "absolute",
-                        "background": "#FCD730"
-                    });
-                }
- 		//Posicionamos el video en el segundo.
- 		player.setCurrentTime(second);
- 		console.log("finish");
+ 		if(second>player.duration || second<0){
+ 			alert(Liferay.Language.get("resourceexternalactivity.error.seconds"));
+ 		}else{
+ 			//Borramos el marcador
+ 	 		$('#marker-'+questionId).remove();
+ 	 		//Creamos marcador nuevo
+ 	 		 $('.mejs__time-total').append('<span class="mejs-time-marker" id="marker-'+questionId+'"></span>');
+ 	 		//Maquetamos el marcador
+ 	 		if (Math.floor(second) <= player.getDuration() && Math.floor(second) >= 0) {
+ 	                    left = 100 * Math.floor(second) / player.getDuration();
+ 	                    $('#marker-'+questionId).css({
+ 	                        "width": "2px",
+ 	                        "height": "10px",
+ 	                        "left": left+"%",
+ 	                        "position": "absolute",
+ 	                        "background": "#FCD730"
+ 	                    });
+ 	                }
+ 	 		
+ 	 		for (i = 0; i < player.options.markers.length; ++i) {
+ 	          if(player.options.markers[i][0]==questionId){
+ 	        	  player.options.markers[i][1]=second;
+ 	          }
+ 	        }
+ 	 		
+ 	 		//Pausamos el video
+ 	 		player.pause();
+ 	 		//Posicionamos el video en el segundo.
+ 	 		player.setCurrentTime(second);
+ 	 		//console.log("finish");
+ 	 		
+ 	 			
+ 		}
+ 		
  		
  	}
 </script>				

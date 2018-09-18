@@ -17,7 +17,7 @@
                 currentMarker = -1,
                 lastPlayPos = -1, //Track backward seek
                 lastMarkerCallBack = -1; //Prevents successive firing of callbacks
-            console.log("CREATING MARKERS");
+           
             for (i = 0; i < player.options.markers.length; ++i) {
                 $('.mejs__time-total').append('<span class="mejs-time-marker" id="marker-'+player.options.markers[i][0]+'"></span>');
             }
