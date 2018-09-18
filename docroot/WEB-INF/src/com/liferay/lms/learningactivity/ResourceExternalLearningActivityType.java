@@ -426,7 +426,7 @@ public class ResourceExternalLearningActivityType extends BaseLearningActivityTy
 					}
 				}
 			}
-			
+			//CORRECT MODE
 			int correctMode = ParamUtil.getInteger(uploadRequest, "correctMode", CORRECT_VIDEO);
 			Element correctModeElement=rootElement.element("correctMode");
 			if(correctModeElement!=null){
@@ -437,6 +437,28 @@ public class ResourceExternalLearningActivityType extends BaseLearningActivityTy
 			correctModeElement = SAXReaderUtil.createElement("correctMode");
 			correctModeElement.setText(String.valueOf(correctMode));
 			rootElement.add(correctModeElement);
+			
+			//FINAL FEEDBACK
+			boolean finalFeedback = ParamUtil.getBoolean(uploadRequest, "finalFeedback", false);
+			Element finalFeedbackElement=rootElement.element("finalFeedback");
+			if(finalFeedbackElement!=null){
+				finalFeedbackElement.detach();
+				rootElement.remove(finalFeedbackElement);
+			}
+			finalFeedbackElement = SAXReaderUtil.createElement("finalFeedback");
+			finalFeedbackElement.setText(String.valueOf(finalFeedback));
+			rootElement.add(finalFeedbackElement);
+						
+			//QUESTION FEEDBACK
+			boolean questionFeedback = ParamUtil.getBoolean(uploadRequest, "questionFeedback", false);
+			Element questionFeedbackElement=rootElement.element("questionFeedback");
+			if(questionFeedbackElement!=null){
+				questionFeedbackElement.detach();
+				rootElement.remove(questionFeedbackElement);
+			}
+			questionFeedbackElement = SAXReaderUtil.createElement("questionFeedback");
+			questionFeedbackElement.setText(String.valueOf(questionFeedback));
+			rootElement.add(questionFeedbackElement);
 			
 			try {
 				learningActivity.setExtracontent(document.formattedString());

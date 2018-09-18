@@ -1,34 +1,51 @@
 <div class="contentQuestionVideo">
 	<div class="video">
-		<video width="600" height="338" id="playervideo" ${controls } preload="none" src="${video}"  type="${mimeType }"></video>
+		<video width="600" height="338" id="playervideo" ${controls }
+			preload="none" src="${video}" type="${mimeType }"></video>
 	</div>
-	
+
 	<c:forEach items="${listQuestions }" var="question">
 		<c:set var="questionType" value="${question.testQuestionType }" />
-		<div class="aui-helper-hidden questionVideo" id="${renderResponse.namespace}question_${question.questionId}">	
+		<div class="aui-helper-hidden questionVideo"
+			id="${renderResponse.namespace}question_${question.questionId}">
 			<aui:form name="questionform_${question.questionId}">
-				<aui:input name="questionId" value="${question.questionId }" type="hidden"/>
-				<aui:input name="latId" value="${latId}" type="hidden"/>
+				<aui:input name="questionId" value="${question.questionId }"
+					type="hidden" />
+				<aui:input name="latId" value="${latId}" type="hidden" />
 				${questionType.getHtmlView(question.questionId, themeDisplay, null) }
-				<aui:button value="save" onClick="javascript:${renderResponse.namespace}answerQuestion(${question.questionId })" />
+				<aui:button value="save"
+					onClick="javascript:${renderResponse.namespace}answerQuestion(${question.questionId })" />
 			</aui:form>
+		</div>
+		<div class="aui-helper-hidden questionVideo"
+			id="${renderResponse.namespace}feedback_${question.questionId}">
+			<div
+				id="${renderResponse.namespace}feedback_content_${question.questionId}"></div>
+			<aui:button value="continue"
+				onClick="javascript:${renderResponse.namespace}continueQuestion(${question.questionId })" />
 		</div>
 	</c:forEach>
 </div>
 
-<%@ include file="/html/questions/validations.jsp" %>
+<%@ include file="/html/questions/validations.jsp"%>
 
- <!-- JS -->
- <script src="https://cdn.jsdelivr.net/npm/mediaelement@4.2.7/build/mediaelement-and-player.min.js"></script>
- <script src="https://cdn.jsdelivr.net/npm/mediaelement@4.2.7/build/renderers/dailymotion.min.js"></script>
- <script src="https://cdn.jsdelivr.net/npm/mediaelement@4.2.7/build/renderers/facebook.min.js"></script>
- <script src="https://cdn.jsdelivr.net/npm/mediaelement@4.2.7/build/renderers/soundcloud.min.js"></script>
- <script src="https://cdn.jsdelivr.net/npm/mediaelement@4.2.7/build/renderers/twitch.min.js"></script>
- <script src="https://cdn.jsdelivr.net/npm/mediaelement@4.2.7/build/renderers/vimeo.min.js"></script>
- 
- <portlet:resourceURL var="saveQuestionURL" id="saveQuestion"/>
- 
- <script>
+<!-- JS -->
+<script
+	src="https://cdn.jsdelivr.net/npm/mediaelement@4.2.7/build/mediaelement-and-player.min.js"></script>
+<script
+	src="https://cdn.jsdelivr.net/npm/mediaelement@4.2.7/build/renderers/dailymotion.min.js"></script>
+<script
+	src="https://cdn.jsdelivr.net/npm/mediaelement@4.2.7/build/renderers/facebook.min.js"></script>
+<script
+	src="https://cdn.jsdelivr.net/npm/mediaelement@4.2.7/build/renderers/soundcloud.min.js"></script>
+<script
+	src="https://cdn.jsdelivr.net/npm/mediaelement@4.2.7/build/renderers/twitch.min.js"></script>
+<script
+	src="https://cdn.jsdelivr.net/npm/mediaelement@4.2.7/build/renderers/vimeo.min.js"></script>
+
+<portlet:resourceURL var="saveQuestionURL" id="saveQuestion" />
+
+<script>
  	
  	var player;
  
@@ -43,7 +60,7 @@
 	    	pluginPath: 'https://cdn.jsdelivr.net/npm/mediaelement@4.2.7/build/',
 	        shimScriptAccess: 'always',
 	        success: function (media, node) {
-
+				
 	        }
 	    });
 	
@@ -53,11 +70,20 @@
 		}
 		
 		player.addEventListener('play', function () {
+			if(!$('#<portlet:namespace/>videoQuestionFeedback').hasClass("aui-helper-hidden")){
+				$('#<portlet:namespace/>videoQuestionFeedback').addClass("aui-helper-hidden")
+			}	
+			$('#<portlet:namespace/>videoQuestionFeedback').html("");
 			finished = false;
 			if(plays > 0){
-				$('[id*^=<portlet:namespace/>question_]').addClass("aui-helper-hidden");
+				if($('[id*^=<portlet:namespace/>question_]')!=null){
+					$('[id*^=<portlet:namespace/>question_]').addClass("aui-helper-hidden");	
+				}
 			}
 			plays++;
+			
+			
+			
 		});	
 			
 		player.addEventListener('ended',function() {
@@ -78,7 +104,9 @@
 					src = src.substring(0,index-1);
 					document.getElementById("playervideo_vimeo_iframe").src = src;
 				}
-			}								
+			}
+			
+			
 		});
 		
 		//Creamos el array para las preguntas
@@ -99,7 +127,6 @@
 			var nextQuestion = questions[indexQuestion];
 			
 			player.addEventListener('timeupdate', function() {
-				console.log("timeupdate");
 				if(indexQuestion < maxQuestions && nextQuestion[1] < player.currentTime && (nextQuestion[1] > (player.currentTime - 2))){
 					player.pause();
 					$('#<portlet:namespace/>question_' + nextQuestion[0]).removeClass("aui-helper-hidden");
@@ -115,7 +142,7 @@
 		}
 			
 		var unloadEvent = function (e) {
-			console.log("unload event vimeo");  
+			//console.log("unload event vimeo");  
 			if(!finished){
 				var duration = player.getDuration();
 				currentTime = player.getCurrentTime();
@@ -139,7 +166,7 @@
      
  	function <portlet:namespace/>answerQuestion(questionId){
  		//Cogemos la respuesta
- 		console.log("guardamos respuesta");
+ 		//console.log("guardamos respuesta");
  		var A = AUI();
  		var divQuestionId = $('.question',$('#<portlet:namespace />question_'+questionId)).attr("id");
  		var divQuestion = A.one('#' + divQuestionId);
@@ -158,7 +185,15 @@
  					if(data){
  						if(data.correct){
  							$('#<portlet:namespace />question_'+questionId).remove();
-							player.play();
+ 							if(data.questionFeedback){
+ 								$('#<portlet:namespace />feedback_'+questionId).removeClass("aui-helper-hidden");
+ 	 							$('#<portlet:namespace />feedback_content_'+questionId).html(data.feedback);	
+ 							}else{
+ 								$('#<portlet:namespace />feedback_'+questionId).remove();
+ 								player.play();
+ 							}
+ 							
+							
  						}	
  					}
  				},
@@ -170,6 +205,12 @@
  			//Mostramos los mensajes que sean
  		}
  	}
+ 	
+ 	
+ 	function <portlet:namespace/>continueQuestion(questionId){
+ 		//Cogemos la respuesta
+ 		$('#<portlet:namespace />feedback_'+questionId).remove();
+		player.play();
+ 	}
 
-</script>	
-	
+</script>
