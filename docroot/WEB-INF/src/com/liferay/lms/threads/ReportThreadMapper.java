@@ -92,6 +92,6 @@ public class ReportThreadMapper {
 		return importThreads.get(uuid).getCountRegistered();
 	}
 	public static boolean getResult(String uuid){
-		return importThreads.get(uuid).getTotalLines()==importThreads.get(uuid).getCountRegistered();
+		return importThreads.get(uuid).getTotalLines()-1==importThreads.get(uuid).getCountRegistered();
 	}
 }
