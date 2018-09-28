@@ -35,7 +35,7 @@ if( permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), "com.liferay
 			 <liferay-ui:icon 
 			 	message="export"
 				image="download"
-			 	url="${actionURL }" />
+			 	url="${exportEditionsURL }" />
 		<c:set var="actionURL" value="javascript:${renderResponse.getNamespace()}importExportEditions();" />
 			<liferay-ui:icon
 				message="import"

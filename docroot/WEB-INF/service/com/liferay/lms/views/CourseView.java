@@ -146,5 +146,10 @@ public class CourseView {
 	public void setExecutionEndDate(Date executionEndDate) {
 		this.executionEndDate = executionEndDate;
 	}
+	
+	public boolean isInExecutionPeriod(){
+		Date now = new Date();
+		return now.after(getExecutionStartDate()) && now.before(getExecutionEndDate());
+	}
 
 }

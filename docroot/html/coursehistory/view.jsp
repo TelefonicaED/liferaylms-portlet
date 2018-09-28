@@ -10,7 +10,7 @@
 					<img src="${courseResult.course.logoURL }" alt="${courseResult.course.title}">
 				</c:if>
 				<c:choose>
-					<c:when test="${prefs.viewCoursesFinished && !courseResult.course.closed}">
+					<c:when test="${(prefs.viewCoursesFinished && !courseResult.course.closed) || (courseResult.course.inExecutionPeriod && !courseResult.course.closed)}">
 						<a href="${courseResult.course.url}">${courseResult.course.title}</a>
 					</c:when>
 					<c:otherwise>

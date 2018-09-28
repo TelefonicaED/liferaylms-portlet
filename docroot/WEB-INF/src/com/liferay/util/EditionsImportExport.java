@@ -194,45 +194,60 @@ public class EditionsImportExport {
 			log.debug(" ::exportReportEditions:: listCourses OK :: " + Validator.isNotNull(listCourses));
 		
 		File file = FileUtil.createTempFile("csv");
+		byte b[] = { (byte) 0xEF, (byte) 0xBB, (byte) 0xBF };
 		try(
 			FileOutputStream bw = new FileOutputStream(file);
-			CSVWriter writer = new CSVWriter(new OutputStreamWriter(bw, StringPool.UTF8), CharPool.SEMICOLON);
 		){
-			byte b[] = {(byte) 0xEF, (byte) 0xBB, (byte) 0xBF };
 			bw.write(b);
-			
-			//Cabecera
-			String [] headers = new String[6];
-			headers[0] = LanguageUtil.get(themeDisplay.getLocale(), "course-admin.new-edition-name");
-			headers[1] = LanguageUtil.get(themeDisplay.getLocale(), "courseadmin.friendly-url");
-			headers[2] = LanguageUtil.get(themeDisplay.getLocale(), "course-admin.start-inscription-date");
-			headers[3] = LanguageUtil.get(themeDisplay.getLocale(), "course-admin.end-inscription-date");
-			headers[4] = LanguageUtil.get(themeDisplay.getLocale(), "start-execution-date");
-			headers[5] = LanguageUtil.get(themeDisplay.getLocale(), "end-execution-date");
-			writer.writeNext(headers);
-			
-			if(Validator.isNotNull(listCourses) && !listCourses.isEmpty()){
-				DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm");
-				//Valores
-				String [] values = new String[headers.length];
-				for(Course course:listCourses){
-					values = new String[headers.length];
-					values[0] = course.getTitle(themeDisplay.getLocale());
-					values[1] = course.getFriendlyURL();
-					values[2] = df.format(course.getStartDate());
-					values[3] = df.format(course.getEndDate());
-					values[4] = df.format(course.getExecutionStartDate());
-					values[5] = df.format(course.getExecutionEndDate());
-					writer.writeNext(values);
+			try(CSVWriter writer = new CSVWriter(new OutputStreamWriter(bw, StringPool.UTF8), CharPool.SEMICOLON)){
+				//Cabecera
+				String [] headers = new String[6];
+				headers[0] = LanguageUtil.get(themeDisplay.getLocale(), "course-admin.new-edition-name");
+				headers[1] = LanguageUtil.get(themeDisplay.getLocale(), "courseadmin.friendly-url");
+				headers[2] = LanguageUtil.get(themeDisplay.getLocale(), "course-admin.start-inscription-date");
+				headers[3] = LanguageUtil.get(themeDisplay.getLocale(), "course-admin.end-inscription-date");
+				headers[4] = LanguageUtil.get(themeDisplay.getLocale(), "start-execution-date");
+				headers[5] = LanguageUtil.get(themeDisplay.getLocale(), "end-execution-date");
+				writer.writeNext(headers);
+				
+				if(Validator.isNotNull(listCourses) && !listCourses.isEmpty()){
+					DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm");
+					//Valores
+					String [] values = new String[headers.length];
+					for(Course course:listCourses){
+						values = new String[headers.length];
+						values[0] = course.getTitle(themeDisplay.getLocale());
+						values[1] = course.getFriendlyURL();
+						values[2] = df.format(course.getStartDate());
+						values[3] = df.format(course.getEndDate());
+						values[4] = df.format(course.getExecutionStartDate());
+						values[5] = df.format(course.getExecutionEndDate());
+						writer.writeNext(values);
+					}
 				}
+				
+		        
+		        response.setContentType("application/csv");
+		        response.setContentLength((int)file.length());
+		        
+		        response.addProperty(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + LanguageUtil.get(themeDisplay.getLocale(), "course-admin.editions.import-export.csv.file-name")+ ".csv");
+		        
+		        OutputStream out = response.getPortletOutputStream();
+				
+				byte[] byteBuffer = new byte[4096];
+		        DataInputStream in = new DataInputStream(new FileInputStream(file));
+		        int length   = 0;		
+		        // reads the file's bytes and writes them to the response stream
+		        while ((in != null) && ((length = in.read(byteBuffer)) != -1)){
+		        	out.write(byteBuffer,0,length);
+		        }		
+				
+				out.flush();
+				out.close();
+				in.close();
+			}catch (IOException e) {
+				e.printStackTrace();
 			}
-			
-	        InputStream in = new FileInputStream(file);
-	        HttpServletResponse httpRes = PortalUtil.getHttpServletResponse(response);
-	        HttpServletRequest httpReq = PortalUtil.getHttpServletRequest(request);
-	        ServletResponseUtil.sendFile(httpReq,httpRes, LanguageUtil.get(themeDisplay.getLocale(), "course-admin.editions.import-export.csv.file-name") + ".csv", in, ContentTypes.TEXT_CSV_UTF8);
-	        in.close();
-	        
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {

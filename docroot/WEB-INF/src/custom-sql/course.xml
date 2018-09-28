@@ -47,6 +47,7 @@
 				AND Lms_Course.executionEndDate > '[$DATENOW$]'
 				AND (r.crId IS NULL OR r.allowFinishDate IS NULL OR r.allowFinishDate > '[$DATENOW$]')
 				AND (Lms_Course.groupId = ? OR ? <= 0)
+				AND (r.passedDate IS NULL)
 			GROUP By 
 				Lms_Course.courseId
 		]]>
@@ -70,6 +71,7 @@
 				AND Lms_Course.executionEndDate > '[$DATENOW$]'
 				AND (r.crId IS NULL OR r.allowFinishDate IS NULL OR r.allowFinishDate > '[$DATENOW$]')
 				AND (Lms_Course.groupId = ? OR ? <= 0)
+				AND (r.passedDate IS NULL)
 		]]>
 	</sql>
 	<sql id="com.liferay.lms.service.persistence.CourseFinder.getExistingUserCourses">

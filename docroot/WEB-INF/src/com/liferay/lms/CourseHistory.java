@@ -13,11 +13,9 @@ import javax.portlet.RenderResponse;
 import com.liferay.lms.model.Course;
 import com.liferay.lms.model.CourseResult;
 import com.liferay.lms.model.LmsPrefs;
-import com.liferay.lms.model.Module;
 import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.lms.service.CourseResultLocalServiceUtil;
 import com.liferay.lms.service.LmsPrefsLocalServiceUtil;
-import com.liferay.lms.service.ModuleLocalServiceUtil;
 import com.liferay.lms.views.CourseResultView;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -53,10 +51,8 @@ public class CourseHistory extends MVCPortlet
 			List<Group> groups = GroupLocalServiceUtil.getUserGroups(themeDisplay.getUserId());
 			
 			Course course = null;
-			Group groupsel = null;
 			CourseResult courseResult = null;
 			Date finishDate=null;
-			Date lastModuleDate=null;
 			Date now = new Date();
 			
 			for(Group groupCourse:groups){
@@ -67,7 +63,6 @@ public class CourseHistory extends MVCPortlet
 					courseResult=CourseResultLocalServiceUtil.getByUserAndCourse(course.getCourseId(), themeDisplay.getUserId());
 					courses.add(new CourseResultView(course, courseResult, themeDisplay));
 				} else if (course!= null){
-					groupsel= GroupLocalServiceUtil.getGroup(course.getGroupCreatedId());	
 			     	courseResult=CourseResultLocalServiceUtil.getByUserAndCourse(course.getCourseId(), themeDisplay.getUserId());
 
 					finishDate=null;
@@ -75,23 +70,15 @@ public class CourseHistory extends MVCPortlet
 						finishDate=courseResult.getAllowFinishDate();
 					}
 					
-					lastModuleDate=null;
-					for(Module module:ModuleLocalServiceUtil.findAllInGroup(groupsel.getGroupId())){
-						if(lastModuleDate==null){
-							lastModuleDate=module.getEndDate();
-						} else if(module.getEndDate()!=null && lastModuleDate.before(module.getEndDate())){
-							lastModuleDate=module.getEndDate();
-						}
-					}
 					if(finishDate==null){
-						finishDate=lastModuleDate;
-					} else {
-						if(lastModuleDate!=null && lastModuleDate.before(finishDate)){
-							finishDate=lastModuleDate;
-						}
+						finishDate=course.getExecutionEndDate();
 					}
 					
 					if(finishDate!=null && finishDate.before(new Date())){				
+						courses.add(new CourseResultView(course, courseResult, themeDisplay));
+					}
+					
+					if(courseResult != null && courseResult.getPassedDate() != null){
 						courses.add(new CourseResultView(course, courseResult, themeDisplay));
 					}
 				}
@@ -116,6 +103,8 @@ public class CourseHistory extends MVCPortlet
 			searchContainer.setTotal(courses.size());
 			
 			renderRequest.setAttribute("searchContainer", searchContainer);
+			
+			renderRequest.setAttribute("now", new Date());
 			
 			//Mandamos las preferencias para saber si podemos enlazar al curso
 			try {
