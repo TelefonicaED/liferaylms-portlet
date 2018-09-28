@@ -30,7 +30,7 @@ public class BaseInscriptionType implements InscriptionType, Serializable {
 	}
 	
 	public String setExtraContent(UploadRequest uploadRequest,PortletResponse portletResponse,Course course){
-		return "";
+		return null;
 	}
 	
 	public String getPortletId(){
