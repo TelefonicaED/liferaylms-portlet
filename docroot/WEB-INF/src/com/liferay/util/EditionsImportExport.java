@@ -76,7 +76,7 @@ public class EditionsImportExport {
 			log.debug(":::generateImportReport:::contentType::text/csv");
 			
 			File file = new File(fileName);
-			int length   = 0;			 
+			int length = 0;			 
 			
 			String nameFile = "result";
 			
@@ -161,7 +161,7 @@ public class EditionsImportExport {
 			values[0] = LanguageUtil.get(themeDisplay.getLocale(), "course-admin.new-edition-name.example");
 			values[1] = LanguageUtil.get(themeDisplay.getLocale(), "courseadmin.friendly-url.example");
 			values[2] = LanguageUtil.get(themeDisplay.getLocale(), "course-admin.start-inscription-date.example");
-			values[3] = LanguageUtil.get(themeDisplay.getLocale(), "course-admin.end-inscription-date.example");
+			values[3] = LanguageUtil.get(themeDisplay.getLocale(), "course-admin.end-inscription-date.example")  ;
 			values[4] = LanguageUtil.get(themeDisplay.getLocale(), "start-execution-date.example");
 			values[5] = LanguageUtil.get(themeDisplay.getLocale(), "end-execution-date.example");
 			writer.writeNext(values);
