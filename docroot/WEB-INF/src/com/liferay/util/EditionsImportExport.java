@@ -45,6 +45,7 @@ import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
@@ -136,48 +137,50 @@ public class EditionsImportExport {
 	public static void generateEditionsExampleFile(ResourceRequest request, ResourceResponse response, ThemeDisplay themeDisplay) {
 		if(log.isDebugEnabled()) log.debug(" ::generateEditionsExampleFile:: " + request.getResourceID());
 		
-		File file = FileUtil.createTempFile("csv");
 		
+		File file = FileUtil.createTempFile("csv");
+		byte b[] = { (byte) 0xEF, (byte) 0xBB, (byte) 0xBF };
 		try(
 			FileOutputStream bw = new FileOutputStream(file);
-			CSVWriter writer = new CSVWriter(new OutputStreamWriter(bw, StringPool.UTF8), CharPool.SEMICOLON);
-			){
-			
-			byte b[] = {(byte) 0xEF, (byte) 0xBB, (byte) 0xBF };
+		){
 			bw.write(b);
-			
-			//Cabeceras de ejemplo
-			String [] headers = new String[6];
-			headers[0] = LanguageUtil.get(themeDisplay.getLocale(), "course-admin.new-edition-name");
-			headers[1] = LanguageUtil.get(themeDisplay.getLocale(), "courseadmin.friendly-url");
-			headers[2] = LanguageUtil.get(themeDisplay.getLocale(), "course-admin.start-inscription-date");
-			headers[3] = LanguageUtil.get(themeDisplay.getLocale(), "course-admin.end-inscription-date");
-			headers[4] = LanguageUtil.get(themeDisplay.getLocale(), "start-execution-date");
-			headers[5] = LanguageUtil.get(themeDisplay.getLocale(), "end-execution-date");
-			writer.writeNext(headers);
-			
-			//Valores de ejemplo
-			String [] values = new String[headers.length];
-			values[0] = LanguageUtil.get(themeDisplay.getLocale(), "course-admin.new-edition-name.example");
-			values[1] = LanguageUtil.get(themeDisplay.getLocale(), "courseadmin.friendly-url.example");
-			values[2] = LanguageUtil.get(themeDisplay.getLocale(), "course-admin.start-inscription-date.example");
-			values[3] = LanguageUtil.get(themeDisplay.getLocale(), "course-admin.end-inscription-date.example");
-			values[4] = LanguageUtil.get(themeDisplay.getLocale(), "start-execution-date.example");
-			values[5] = LanguageUtil.get(themeDisplay.getLocale(), "end-execution-date.example");
-			writer.writeNext(values);
-			values[0] = LanguageUtil.get(themeDisplay.getLocale(), "course-admin.new-edition-name.example");
-			values[1] = LanguageUtil.get(themeDisplay.getLocale(), "courseadmin.friendly-url.example");
-			values[2] = LanguageUtil.get(themeDisplay.getLocale(), "course-admin.start-inscription-date.example");
-			values[3] = LanguageUtil.get(themeDisplay.getLocale(), "course-admin.end-inscription-date.example");
-			values[4] = LanguageUtil.get(themeDisplay.getLocale(), "start-execution-date.example");
-			values[5] = LanguageUtil.get(themeDisplay.getLocale(), "end-execution-date.example");
-			writer.writeNext(values);
-			
-	        InputStream in = new FileInputStream(file);
-	        HttpServletResponse httpRes = PortalUtil.getHttpServletResponse(response);
-	        HttpServletRequest httpReq = PortalUtil.getHttpServletRequest(request);
-	        ServletResponseUtil.sendFile(httpReq,httpRes, LanguageUtil.get(themeDisplay.getLocale(), "course-admin.editions.import-export.example-file") + ".csv", in, ContentTypes.TEXT_CSV_UTF8);
-	        in.close();
+			bw.write("sep=;\n".getBytes());
+			try(CSVWriter writer = new CSVWriter(new OutputStreamWriter(bw, StringPool.UTF8), CharPool.SEMICOLON)){
+				//Cabeceras de ejemplo
+				String [] headers = new String[6];
+				headers[0] = LanguageUtil.get(themeDisplay.getLocale(), "course-admin.new-edition-name");
+				headers[1] = LanguageUtil.get(themeDisplay.getLocale(), "courseadmin.friendly-url");
+				headers[2] = LanguageUtil.get(themeDisplay.getLocale(), "course-admin.start-inscription-date");
+				headers[3] = LanguageUtil.get(themeDisplay.getLocale(), "course-admin.end-inscription-date");
+				headers[4] = LanguageUtil.get(themeDisplay.getLocale(), "start-execution-date");
+				headers[5] = LanguageUtil.get(themeDisplay.getLocale(), "end-execution-date");
+				writer.writeNext(headers);
+				
+				//Valores de ejemplo
+				String [] values = new String[headers.length];
+				values[0] = LanguageUtil.get(themeDisplay.getLocale(), "course-admin.new-edition-name.example");
+				values[1] = LanguageUtil.get(themeDisplay.getLocale(), "courseadmin.friendly-url.example");
+				values[2] = LanguageUtil.get(themeDisplay.getLocale(), "course-admin.start-inscription-date.example");
+				values[3] = LanguageUtil.get(themeDisplay.getLocale(), "course-admin.end-inscription-date.example");
+				values[4] = LanguageUtil.get(themeDisplay.getLocale(), "start-execution-date.example");
+				values[5] = LanguageUtil.get(themeDisplay.getLocale(), "end-execution-date.example");
+				writer.writeNext(values);
+				values[0] = LanguageUtil.get(themeDisplay.getLocale(), "course-admin.new-edition-name.example");
+				values[1] = LanguageUtil.get(themeDisplay.getLocale(), "courseadmin.friendly-url.example");
+				values[2] = LanguageUtil.get(themeDisplay.getLocale(), "course-admin.start-inscription-date.example");
+				values[3] = LanguageUtil.get(themeDisplay.getLocale(), "course-admin.end-inscription-date.example");
+				values[4] = LanguageUtil.get(themeDisplay.getLocale(), "start-execution-date.example");
+				values[5] = LanguageUtil.get(themeDisplay.getLocale(), "end-execution-date.example");
+				writer.writeNext(values);
+				
+		        InputStream in = new FileInputStream(file);
+		        HttpServletResponse httpRes = PortalUtil.getHttpServletResponse(response);
+		        HttpServletRequest httpReq = PortalUtil.getHttpServletRequest(request);
+		        ServletResponseUtil.sendFile(httpReq,httpRes, LanguageUtil.get(themeDisplay.getLocale(), "course-admin.editions.import-export.example-file") + ".csv", in, ContentTypes.TEXT_CSV_UTF8);
+		        in.close();
+			}catch (IOException e) {
+				e.printStackTrace();
+			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -199,6 +202,7 @@ public class EditionsImportExport {
 			FileOutputStream bw = new FileOutputStream(file);
 		){
 			bw.write(b);
+			bw.write("sep=;\n".getBytes());
 			try(CSVWriter writer = new CSVWriter(new OutputStreamWriter(bw, StringPool.UTF8), CharPool.SEMICOLON)){
 				//Cabecera
 				String [] headers = new String[6];

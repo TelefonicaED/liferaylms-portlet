@@ -105,12 +105,17 @@ public class ImportEditionsThread extends ReportThread{
 							}
 							progress = ((line-1)*100)/totalLines;
 						}else{
-							isFirstLine = Boolean.FALSE;
-							isCorrectHeader = checkLength(strLine, bw);
-							if(!isCorrectHeader){
-								bw.append("ERROR: " + LanguageUtil.get(themeDisplay.getLocale(), "course-admin.editions.import-export.error.header-incorrect"));
-								if(log.isDebugEnabled())
-									log.debug(" :: importEdition :: ERROR INCORRECT HEADER LENGTH ");
+							if(!strLine[0].startsWith("sep=")){
+								isFirstLine = Boolean.FALSE;
+								isCorrectHeader = checkLength(strLine, bw);
+								if(!isCorrectHeader){
+									bw.append("ERROR: " + LanguageUtil.get(themeDisplay.getLocale(), "course-admin.editions.import-export.error.header-incorrect"));
+									if(log.isDebugEnabled())
+										log.debug(" :: importEdition :: ERROR INCORRECT HEADER LENGTH ");
+								}
+								
+							}else{
+								log.info("--SEPARATOR "+strLine[0]);
 							}
 						}
 						line++;
