@@ -115,6 +115,7 @@ public class ImportEditionsThread extends ReportThread{
 								}
 								
 							}else{
+								totalLines = totalLines -1;
 								log.info("--SEPARATOR "+strLine[0]);
 							}
 						}

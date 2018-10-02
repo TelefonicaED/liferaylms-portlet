@@ -561,11 +561,18 @@ public class QuestionsAdmin extends MVCPortlet{
 				ThemeDisplay themeDisplay = (ThemeDisplay) request.getAttribute(WebKeys.THEME_DISPLAY);
 				String name = LanguageUtil.get(themeDisplay.getLocale(), "questions")+".xls";
 				File file = exportExcelQuestions(themeDisplay, actId);
+				response.setContentType( ContentTypes.APPLICATION_VND_MS_EXCEL);
+				response.setContentLength((int)file.length());
+				response.addProperty(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + name);
 				ServletResponseUtil.sendFile(PortalUtil.getHttpServletRequest(request),
 						 PortalUtil.getHttpServletResponse(response),
 						 name,
 						 FileUtil.getBytes(file), 
 						 ContentTypes.APPLICATION_VND_MS_EXCEL);
+				
+				
+				
+				
 			}
 		
 			response.getPortletOutputStream().flush();

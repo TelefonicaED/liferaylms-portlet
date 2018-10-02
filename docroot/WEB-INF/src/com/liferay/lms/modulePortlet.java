@@ -247,8 +247,8 @@ public class modulePortlet extends MVCPortlet {
 		
 		SimpleDateFormat formatDateCourse = new SimpleDateFormat("dd/MM/yyyy HH:mm");
 		formatDateCourse.setTimeZone(themeDisplay.getTimeZone());	
-		String courseExecutionStartDateString = formatDateCourse.format(course.getExecutionStartDate());
-		String courseExecutionEndDateString = formatDateCourse.format(course.getExecutionEndDate());
+		Object[] courseExecutionStartDateString = {formatDateCourse.format(course.getExecutionStartDate())};
+		Object[] courseExecutionEndDateString = {formatDateCourse.format(course.getExecutionEndDate())};
 		renderRequest.setAttribute("courseExecutionStartDateString", courseExecutionStartDateString);
 		renderRequest.setAttribute("courseExecutionEndDateString", courseExecutionEndDateString);
 		
