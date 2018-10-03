@@ -1,4 +1,5 @@
 
+<%@page import="java.text.SimpleDateFormat"%>
 <%@page import="com.liferay.lms.learningactivity.calificationtype.CalificationType"%>
 <%@page import="com.liferay.lms.learningactivity.calificationtype.CalificationTypeRegistry"%>
 <%@page import="com.liferay.portal.security.permission.PermissionChecker"%>
@@ -296,6 +297,18 @@ else
 				<liferay-ui:search-container-row className="com.liferay.portal.model.User" keyProperty="userId" modelVar="usuario">
 				<liferay-ui:search-container-column-text name="name">
 					<liferay-ui:user-display userId="<%=usuario.getUserId() %>"></liferay-ui:user-display>
+				</liferay-ui:search-container-column-text>
+				<liferay-ui:search-container-column-text name="Fecha de entrega">
+					<% 
+					   String dateFormated = "";
+					   LearningActivityTry lATry = LearningActivityTryLocalServiceUtil.getLastLearningActivityTryByActivityAndUser(actId, usuario.getUserId());
+					   if((lATry!=null)&&(lATry.getStartDate()!=null)) {
+						   SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+						   dateFormat.setTimeZone(timeZone);
+						   dateFormated = (lATry.getStartDate()!=null)?dateFormat.format(lATry.getStartDate()):"";
+					   }
+					%>
+					<c:out value="<%=dateFormated%>"/>
 				</liferay-ui:search-container-column-text>
 				<liferay-ui:search-container-column-text name="calification">
 					<% LearningActivityResult learningActivityResult = LearningActivityResultLocalServiceUtil.getByActIdAndUserId(actId, usuario.getUserId()); 

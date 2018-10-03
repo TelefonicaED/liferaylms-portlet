@@ -1,3 +1,4 @@
+<%@page import="com.liferay.lms.course.inscriptiontype.UserDaysInscriptionType"%>
 <%@page import="com.liferay.portal.kernel.util.PrefsPropsUtil"%>
 <%@ include file="/init.jsp" %>
 
@@ -10,7 +11,6 @@ if(groupId > 0){
 %>
 
 <aui:input type="text" name="inscriptionDays" label="inscription.days" value="<%=days %>" >
-	<aui:validator name="required"/>
 	<aui:validator name="number"/>
-	<aui:validator name="min">0</aui:validator>
+	<aui:validator name="min">'0'</aui:validator>
 </aui:input>

@@ -60,14 +60,20 @@
 			
 			<c:if test="${!hideExecutionDateCourseColumn }">
 				<liferay-ui:search-container-column-text name="course-admin.start-execution-date">
-					<c:if test="<%=CourseLocalServiceUtil.countChildCourses(course.getCourseId())<1 %>">
-						<fmt:formatDate type="both" dateStyle="short" timeStyle="short" value="${course.executionStartDate }" />
-					</c:if>
+					<c:choose>
+						<c:when test="<%=CourseLocalServiceUtil.countChildCourses(course.getCourseId())<1 %>">
+							<fmt:formatDate type="both" dateStyle="short" timeStyle="short" value="${course.executionStartDate }" />
+						</c:when>
+						<c:otherwise>-</c:otherwise>
+					</c:choose>
 				</liferay-ui:search-container-column-text>
 				<liferay-ui:search-container-column-text name="course-admin.end-execution-date">
-					<c:if test="<%=CourseLocalServiceUtil.countChildCourses(course.getCourseId())<1 %>">
-						<fmt:formatDate type="both" dateStyle="short" timeStyle="short" value="${course.executionEndDate }" />
-					</c:if>
+					<c:choose>
+						<c:when test="<%=CourseLocalServiceUtil.countChildCourses(course.getCourseId())<1 %>">
+							<fmt:formatDate type="both" dateStyle="short" timeStyle="short" value="${course.executionEndDate }" />
+						</c:when>
+						<c:otherwise>-</c:otherwise>
+					</c:choose>
 				</liferay-ui:search-container-column-text>
 			</c:if>
 			

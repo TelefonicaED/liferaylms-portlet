@@ -438,12 +438,15 @@
 					<liferay-ui:panel title="modulelist.activity-list-title" id="<%=\"panel_\" + theModule.getModuleId()%>" defaultState="closed" collapsible="true">
 						<%
 						int i=1;
-						for(LearningActivity activity:moduleActivities){%>
+						for(LearningActivity activity:moduleActivities){
+							if (permissionChecker.hasPermission(activity.getGroupId(),LearningActivity.class.getName(),	activity.getActId(), ActionKeys.VIEW)){%>
 							<div class="activity-row">
 								<span class="col-1"><%=i%></span>
 								<span class="col-2"><%=activity.getTitle(locale) %></span>
 							</div>
-						<%i++;
+						<% i++;
+							}
+						
 						}
 						%>
 					</liferay-ui:panel>

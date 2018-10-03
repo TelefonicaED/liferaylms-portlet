@@ -970,9 +970,12 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 				String inscriptionTypeExtraContentError = itype.setExtraContent(uploadRequest, actionResponse, course);
 				log.debug("****inscriptionTypeExtraContentError:"+inscriptionTypeExtraContentError);
 				
-				if(inscriptionTypeExtraContentError != null){
+				if(Validator.isNotNull(inscriptionTypeExtraContentError)){
 					SessionErrors.add(actionRequest, "inscriptionTypeExtraContentError");
 					actionResponse.setRenderParameter("inscriptionTypeExtraContentError", inscriptionTypeExtraContentError);
+					actionResponse.setRenderParameter("courseId", String.valueOf(courseId));
+					actionResponse.setRenderParameter("jspPage","/html/courseadmin/editcourse.jsp");
+					return;
 				}
 				
 				//Update especific content of diploma (if exists)

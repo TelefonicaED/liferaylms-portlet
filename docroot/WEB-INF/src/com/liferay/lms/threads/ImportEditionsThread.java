@@ -69,19 +69,19 @@ public class ImportEditionsThread extends ReportThread{
 			){
 			
 			lineReader.skip(Long.MAX_VALUE);
-			totalLines = lineReader.getLineNumber()+1;
+			totalLines = lineReader.getLineNumber();
 			lineReader.close();
 			
 			if(log.isDebugEnabled())
 				log.debug(":: countRows :: " + totalLines);
 			if(totalLines<1){
-				bw.append("ERROR: " + LanguageUtil.get(themeDisplay.getLocale(), "course-admin.editions.import-export.error-no-lines"));
+				bw.append("ERROR: " + LanguageUtil.get(themeDisplay.getLocale(), "course-admin.editions.import-export.error-no-lines") + "\n");
 				if(log.isDebugEnabled())
 					log.debug(" :: ERROR:: NO LINES");
 			} else {
 				Course course = CourseLocalServiceUtil.getCourse(parentCourseId);
 				if(Validator.isNull(course)){
-					bw.append("ERROR: " + LanguageUtil.get(themeDisplay.getLocale(), "course-admin.editions.import-export.error-no-parent-course"));
+					bw.append("ERROR: " + LanguageUtil.get(themeDisplay.getLocale(), "course-admin.editions.import-export.error-no-parent-course") + "\n");
 					if(log.isDebugEnabled())
 						log.debug(" :: importEdition :: ERROR PARENT COURSE NOT FOUND");
 				} else {
@@ -105,12 +105,18 @@ public class ImportEditionsThread extends ReportThread{
 							}
 							progress = ((line-1)*100)/totalLines;
 						}else{
-							isFirstLine = Boolean.FALSE;
-							isCorrectHeader = checkLength(strLine, bw);
-							if(!isCorrectHeader){
-								bw.append("ERROR: " + LanguageUtil.get(themeDisplay.getLocale(), "course-admin.editions.import-export.error.header-incorrect"));
-								if(log.isDebugEnabled())
-									log.debug(" :: importEdition :: ERROR INCORRECT HEADER LENGTH ");
+							if(!strLine[0].startsWith("sep=")){
+								isFirstLine = Boolean.FALSE;
+								isCorrectHeader = checkLength(strLine, bw);
+								if(!isCorrectHeader){
+								bw.append("ERROR: " + LanguageUtil.get(themeDisplay.getLocale(), "course-admin.editions.import-export.error.header-incorrect") + "\n");
+									if(log.isDebugEnabled())
+										log.debug(" :: importEdition :: ERROR INCORRECT HEADER LENGTH ");
+								}
+								
+							}else{
+								totalLines = totalLines -1;
+								log.info("--SEPARATOR "+strLine[0]);
 							}
 						}
 						line++;
@@ -119,7 +125,7 @@ public class ImportEditionsThread extends ReportThread{
 			}
 			int numEditions = totalLines-1;
 			bw.append(LanguageUtil.get(themeDisplay.getLocale(), "course-admin.editions.import-export.imported-editions") + ": " + countRegistered + " \n");
-			bw.append(LanguageUtil.get(themeDisplay.getLocale(), "course-admin.editions.import-export.total-editions") + ": " + numEditions );
+			bw.append(LanguageUtil.get(themeDisplay.getLocale(), "course-admin.editions.import-export.total-editions") + ": " + numEditions  + "\n");
 			bw.close();
 			fileName = file.getAbsolutePath();
 		}catch (Exception e) {

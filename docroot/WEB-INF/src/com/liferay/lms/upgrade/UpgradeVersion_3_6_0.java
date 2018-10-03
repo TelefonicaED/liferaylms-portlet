@@ -63,6 +63,21 @@ public class UpgradeVersion_3_6_0 extends UpgradeProcess {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}	
+		
+		String updatePrefs = "UPDATE `lms_lmsprefs` SET `inscriptionTypes`='0';";
+		
+		//Execute SQL Queries
+		log.warn("Update table prefs ");
+		
+		try {
+			db.runSQL(updatePrefs);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}	
 
 	}
 	
