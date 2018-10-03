@@ -245,7 +245,7 @@ function validate(){
 		</aui:field-wrapper>
 	</div>
 	
-	<liferay-ui:message key="course-start-date"  arguments="${courseExecutionStartDateString }" />
+	${courseExecutionStartDateString }
 	<liferay-ui:error key="module-startDate-required" message="module-startDate-required" />
 	<liferay-ui:error key="module-startDate-before-course-startDate" message="module-startDate-before-course-startDate" />
 	
@@ -264,7 +264,7 @@ function validate(){
 		</aui:field-wrapper>
 	</div>
 
-	<liferay-ui:message key="course-end-date"  arguments="${courseExecutionEndDateString }" />
+	${courseExecutionEndDateString }
 	<liferay-ui:error key="module-endDate-required" message="module-endDate-required" />
 	<liferay-ui:error key="module-startDate-before-endDate" message="module-startDate-before-endDate" />
 	<liferay-ui:error key="module-endDate-after-course-endDate" message="module-endDate-after-course-endDate" />
