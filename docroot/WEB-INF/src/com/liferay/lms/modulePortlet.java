@@ -41,6 +41,7 @@ import com.liferay.lms.util.LmsConstant;
 import com.liferay.portal.kernel.exception.NestableException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
@@ -246,11 +247,11 @@ public class modulePortlet extends MVCPortlet {
 		PortletURL editmoduleURL = null;
 		
 		SimpleDateFormat formatDateCourse = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-		formatDateCourse.setTimeZone(themeDisplay.getTimeZone());	
-		Object[] courseExecutionStartDateString = {formatDateCourse.format(course.getExecutionStartDate())};
-		Object[] courseExecutionEndDateString = {formatDateCourse.format(course.getExecutionEndDate())};
-		renderRequest.setAttribute("courseExecutionStartDateString", courseExecutionStartDateString);
-		renderRequest.setAttribute("courseExecutionEndDateString", courseExecutionEndDateString);
+		formatDateCourse.setTimeZone(themeDisplay.getTimeZone());
+		
+		
+		renderRequest.setAttribute("courseExecutionStartDateString", LanguageUtil.format(themeDisplay.getLocale(), "course-start-date", formatDateCourse.format(course.getExecutionStartDate())));
+		renderRequest.setAttribute("courseExecutionEndDateString",  LanguageUtil.format(themeDisplay.getLocale(), "course-end-date", formatDateCourse.format(course.getExecutionEndDate())));
 		
 		boolean enableChangeStartDate = Boolean.FALSE;
 		boolean enableChangeEndDate = Boolean.FALSE;
