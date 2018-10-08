@@ -46,6 +46,10 @@
 	list-style-type: none;
 }
 
+.contentQuestionVideo .questionVideo {
+     max-width: 780px;
+}
+
 #background {
 	position: absolute;
 	top: 0;
