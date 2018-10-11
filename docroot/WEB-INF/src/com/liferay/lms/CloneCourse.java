@@ -35,6 +35,7 @@ import com.liferay.portal.kernel.messaging.MessageBusUtil;
 import com.liferay.portal.kernel.messaging.MessageListener;
 import com.liferay.portal.kernel.messaging.MessageListenerException;
 import com.liferay.portal.kernel.repository.model.FileEntry;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.DocumentException;
 import com.liferay.portal.kernel.xml.Element;
@@ -91,8 +92,9 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 	
 	boolean cloneForum;
 	boolean cloneDocuments;
+	boolean cloneActivityClassificationTypes;
 	
-	public CloneCourse(long groupId, String newCourseName, ThemeDisplay themeDisplay, Date startDate, Date endDate, boolean cloneForum, boolean cloneDocuments, ServiceContext serviceContext) {
+	public CloneCourse(long groupId, String newCourseName, ThemeDisplay themeDisplay, Date startDate, Date endDate, boolean cloneForum, boolean cloneDocuments, boolean cloneActivityClassificationTypes, ServiceContext serviceContext) {
 		super();
 		this.groupId = groupId;
 		this.newCourseName = newCourseName;
@@ -101,6 +103,7 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 		this.endDate = endDate;
 		this.cloneForum = cloneForum;
 		this.cloneDocuments = cloneDocuments;
+		this.cloneActivityClassificationTypes = cloneActivityClassificationTypes;
 		this.serviceContext = serviceContext;
 	}
 	
@@ -132,6 +135,7 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 			this.includeTeacher = message.getBoolean("includeTeacher");
 			this.cloneForum = message.getBoolean("cloneForum");
 			this.cloneDocuments = message.getBoolean("cloneDocuments");
+			this.cloneActivityClassificationTypes = message.getBoolean("cloneActivityClassificationTypes");
 			Role adminRole = RoleLocalServiceUtil.getRole(themeDisplay.getCompanyId(),"Administrator");
 			List<User> adminUsers = UserLocalServiceUtil.getRoleUsers(adminRole.getRoleId());
 			 
@@ -343,9 +347,6 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 					log.debug("    + Module : " + newModule.getTitle(Locale.getDefault()) +"("+newModule.getModuleId()+")" );
 				}
 				
-				
-			
-				
 			} catch (Exception e) {
 				e.printStackTrace();
 				error=true;
@@ -389,8 +390,6 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 					newLearnActivity.setStartdate(startDate);
 					newLearnActivity.setEnddate(endDate);
 					
-			
-
 					newLearnActivity.setDescription(descriptionFilesClone(activity.getDescription(),newModule.getGroupId(), newLearnActivity.getActId(),themeDisplay.getUserId()));
 		
 					nuevaLarn=LearningActivityLocalServiceUtil.addLearningActivity(newLearnActivity,serviceContext);
@@ -400,7 +399,6 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 					}
 					
 					cloneActivityFile(activity, nuevaLarn, themeDisplay.getUserId(), serviceContext);
-					
 					
 					long actId = nuevaLarn.getActId();
 					correlationActivities.put(activity.getActId(), actId);
@@ -421,6 +419,18 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 					if(actPending){
 						pending.put(actId, activity.getPrecedence());
 					}
+					
+					if(this.cloneActivityClassificationTypes){
+						//---Clonar los tipos de actividad
+						AssetEntry activityType = AssetEntryLocalServiceUtil.fetchEntry(LearningActivity.class.getName(), activity.getActId());
+						if(log.isDebugEnabled())
+							log.debug(":::Clone activity classification types::: Activity " + activity.getActId());
+						if(Validator.isNotNull(activityType)){
+							AssetEntryLocalServiceUtil.updateEntry(nuevaLarn.getUserId(), nuevaLarn.getGroupId(), LearningActivity.class.getName(), 
+									nuevaLarn.getActId(), activityType.getCategoryIds(), activityType.getTagNames());
+						}
+					}
+					
 				} catch (Exception e) {
 					e.printStackTrace();
 					error=true;
