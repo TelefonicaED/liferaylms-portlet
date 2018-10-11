@@ -31,6 +31,7 @@ import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.messaging.Message;
+import com.liferay.portal.kernel.messaging.MessageBusUtil;
 import com.liferay.portal.kernel.messaging.MessageListener;
 import com.liferay.portal.kernel.messaging.MessageListenerException;
 import com.liferay.portal.kernel.repository.model.FileEntry;
@@ -89,8 +90,9 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 	boolean error= false;
 	
 	boolean cloneForum;
+	boolean cloneDocuments;
 	
-	public CloneCourse(long groupId, String newCourseName, ThemeDisplay themeDisplay, Date startDate, Date endDate, boolean cloneForum, ServiceContext serviceContext) {
+	public CloneCourse(long groupId, String newCourseName, ThemeDisplay themeDisplay, Date startDate, Date endDate, boolean cloneForum, boolean cloneDocuments, ServiceContext serviceContext) {
 		super();
 		this.groupId = groupId;
 		this.newCourseName = newCourseName;
@@ -98,6 +100,7 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 		this.startDate = startDate;
 		this.endDate = endDate;
 		this.cloneForum = cloneForum;
+		this.cloneDocuments = cloneDocuments;
 		this.serviceContext = serviceContext;
 	}
 	
@@ -128,6 +131,7 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 			this.visible = message.getBoolean("visible");
 			this.includeTeacher = message.getBoolean("includeTeacher");
 			this.cloneForum = message.getBoolean("cloneForum");
+			this.cloneDocuments = message.getBoolean("cloneDocuments");
 			Role adminRole = RoleLocalServiceUtil.getRole(themeDisplay.getCompanyId(),"Administrator");
 			List<User> adminUsers = UserLocalServiceUtil.getRoleUsers(adminRole.getRoleId());
 			 
@@ -492,6 +496,21 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 			//---------------------------------------------------------------------
 			
 		}
+		
+		if(this.cloneDocuments){
+			//-----Clonar la documentación del curso
+			if(log.isDebugEnabled())
+				log.debug(":: Clone course :: Clone docs ::");
+			
+			//Enviar mensaje al documents-portlet
+			Message messageCloneDocuments = new Message();
+			messageCloneDocuments.put("groupId", groupId);
+			messageCloneDocuments.put("newGroupId", newCourse.getGroupCreatedId());
+			messageCloneDocuments.put("userId", themeDisplay.getUserId());
+			messageCloneDocuments.put("companyId", themeDisplay.getCompanyId());
+			MessageBusUtil.sendMessage("liferay/cloneDocuments", messageCloneDocuments);
+		}
+		
 		if(log.isDebugEnabled()){
 			log.debug(" ENDS!");
 		}
