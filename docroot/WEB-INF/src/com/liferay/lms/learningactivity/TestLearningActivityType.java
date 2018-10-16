@@ -178,6 +178,10 @@ public class TestLearningActivityType extends BaseLearningActivityType
 		return "learningactivity.test";
 	}
 
+	@Override
+	public String getClassName(){
+		return getClass().getCanonicalName();
+	}
 
 	@Override
 	public long getTypeId() {

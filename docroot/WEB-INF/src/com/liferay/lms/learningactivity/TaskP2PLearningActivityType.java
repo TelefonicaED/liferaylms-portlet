@@ -61,6 +61,11 @@ public class TaskP2PLearningActivityType extends BaseLearningActivityType {
 	public String getName() {
 		return "learningactivity.p2p";
 	}
+	
+	@Override
+	public String getClassName(){
+		return getClass().getCanonicalName();
+	}
 
 	@Override
 	public long getTypeId() {

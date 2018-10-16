@@ -46,6 +46,11 @@ public class TaskOnlineLearningActivityType extends BaseLearningActivityType {
 	}
 	
 	@Override
+	public String getClassName(){
+		return getClass().getCanonicalName();
+	}
+	
+	@Override
 	public boolean isScoreConfigurable() {
 		return true;
 	}
