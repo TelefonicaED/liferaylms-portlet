@@ -52,7 +52,7 @@ public class TaskEvaluationLearningActivityType extends BaseLearningActivityType
 	
 	@Override
 	public String getClassName() {
-		return getClass().getCanonicalName();
+		return getClass().getName();
 	}
 	
 	

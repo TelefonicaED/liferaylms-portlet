@@ -180,7 +180,7 @@ public class TestLearningActivityType extends BaseLearningActivityType
 
 	@Override
 	public String getClassName(){
-		return getClass().getCanonicalName();
+		return getClass().getName();
 	}
 
 	@Override

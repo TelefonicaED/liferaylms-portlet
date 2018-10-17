@@ -72,7 +72,7 @@ public class ResourceInternalLearningActivityType extends BaseLearningActivityTy
 	
 	@Override
 	public String getClassName(){
-		return getClass().getCanonicalName();
+		return getClass().getName();
 	}
 
 

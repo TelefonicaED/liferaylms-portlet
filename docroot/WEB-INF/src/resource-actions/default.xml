@@ -534,7 +534,6 @@
 			<site-member-defaults />
 			<guest-defaults />
 			<guest-unsupported>
-				<action-key>ACTION_VIEW</action-key>
 				<action-key>ADD_ACTIVITY</action-key>
 			</guest-unsupported>
 		</permissions>
@@ -551,7 +550,6 @@
 			<site-member-defaults />
 			<guest-defaults />
 			<guest-unsupported>
-				<action-key>ACTION_VIEW</action-key>
 				<action-key>ADD_ACTIVITY</action-key>
 			</guest-unsupported>
 		</permissions>
@@ -568,7 +566,6 @@
 			<site-member-defaults />
 			<guest-defaults />
 			<guest-unsupported>
-				<action-key>ACTION_VIEW</action-key>
 				<action-key>ADD_ACTIVITY</action-key>
 			</guest-unsupported>
 		</permissions>
@@ -585,7 +582,6 @@
 			<site-member-defaults />
 			<guest-defaults />
 			<guest-unsupported>
-				<action-key>ACTION_VIEW</action-key>
 				<action-key>ADD_ACTIVITY</action-key>
 			</guest-unsupported>
 		</permissions>
@@ -602,7 +598,6 @@
 			<site-member-defaults />
 			<guest-defaults />
 			<guest-unsupported>
-				<action-key>ACTION_VIEW</action-key>
 				<action-key>ADD_ACTIVITY</action-key>
 			</guest-unsupported>
 		</permissions>
@@ -619,7 +614,6 @@
 			<site-member-defaults />
 			<guest-defaults />
 			<guest-unsupported>
-				<action-key>ACTION_VIEW</action-key>
 				<action-key>ADD_ACTIVITY</action-key>
 			</guest-unsupported>
 		</permissions>
@@ -636,7 +630,6 @@
 			<site-member-defaults />
 			<guest-defaults />
 			<guest-unsupported>
-				<action-key>ACTION_VIEW</action-key>
 				<action-key>ADD_ACTIVITY</action-key>
 			</guest-unsupported>
 		</permissions>
@@ -653,7 +646,6 @@
 			<site-member-defaults />
 			<guest-defaults />
 			<guest-unsupported>
-				<action-key>ACTION_VIEW</action-key>
 				<action-key>ADD_ACTIVITY</action-key>
 			</guest-unsupported>
 		</permissions>

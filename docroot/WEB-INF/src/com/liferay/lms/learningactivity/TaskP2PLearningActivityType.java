@@ -64,7 +64,7 @@ public class TaskP2PLearningActivityType extends BaseLearningActivityType {
 	
 	@Override
 	public String getClassName(){
-		return getClass().getCanonicalName();
+		return getClass().getName();
 	}
 
 	@Override
