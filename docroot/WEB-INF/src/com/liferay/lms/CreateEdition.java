@@ -276,8 +276,10 @@ public class CreateEdition extends CourseCopyUtil implements MessageListener {
 				
 				newModule.setAllowedTime(module.getAllowedTime());
 				newModule.setIcon(module.getIcon());
-				newModule.setStartDate(startExecutionDate);
-				newModule.setEndDate(endExecutionDate);
+				if(module.getStartDate() != null)
+					newModule.setStartDate(startExecutionDate);
+				if(module.getEndDate() != null)
+					newModule.setEndDate(endExecutionDate);
 				newModule = ModuleLocalServiceUtil.addmodule(newModule);
 				
 				correlationModules.put(module.getModuleId(), newModule.getModuleId());
@@ -340,8 +342,10 @@ public class CreateEdition extends CourseCopyUtil implements MessageListener {
 				newLearnActivity.setWeightinmodule(activity.getWeightinmodule());
 				newLearnActivity.setGroupId(newModule.getGroupId());
 				newLearnActivity.setModuleId(newModule.getModuleId());
-				newLearnActivity.setStartdate(startDate);
-				newLearnActivity.setEnddate(endDate);
+				if(activity.getStartdate() != null)
+					newLearnActivity.setStartdate(startExecutionDate);
+				if(activity.getEnddate() != null)
+					newLearnActivity.setEnddate(endExecutionDate);
 				boolean actPending = false;
 				if(activity.getPrecedence()>0){
 					if(correlationActivities.get(activity.getPrecedence())==null){
