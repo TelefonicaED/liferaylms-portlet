@@ -49,6 +49,8 @@ if ((actionEditing && hasPermissionAddLact) ||
 	String editing=null;
 	LearningActivityType learningActivityType = null;
 	
+	boolean courseLocked = course.isLocked(themeDisplay.getUser(), themeDisplay.getPermissionChecker());
+	
 	for (LearningActivity activity : activities) {
 		title = activity.getTitle(themeDisplay.getLocale());				
 		type= String.valueOf(activity.getTypeId());
@@ -86,7 +88,7 @@ if ((actionEditing && hasPermissionAddLact) ||
 		learningActivityType = learningActivityTypeRegistry.getLearningActivityType(activity.getTypeId());
 		if (permissionChecker.hasPermission(activity.getGroupId(),LearningActivity.class.getName(),	activity.getActId(), ActionKeys.VIEW)){
 
-			if((Validator.isNotNull(learningActivityType))&&
+			if(!courseLocked && (Validator.isNotNull(learningActivityType))&&
 				(accessLock || hasPermissionAccessCourseFinished || !activity.isLocked(themeDisplay.getUser(), themeDisplay.getPermissionChecker())  
 					||(permissionChecker.hasPermission(activity.getGroupId(), LearningActivity.class.getName(), activity.getActId(), ActionKeys.UPDATE) && actionEditing))){%>
 
