@@ -1144,6 +1144,8 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 		} else if (request.getResourceID() != null && request.getResourceID().equals("importEditionsExample")){
 			EditionsImportExport.generateEditionsExampleFile(request, response, themeDisplay);
 		}
+		
+		super.serveResource(request, response);
 	}
 	
 }
