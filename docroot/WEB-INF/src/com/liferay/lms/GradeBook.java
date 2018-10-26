@@ -107,7 +107,7 @@ public class GradeBook extends MVCPortlet {
 		//Buscamos los usuario
 		
 		PortletURL iteratorURL = renderResponse.createRenderURL();
-		iteratorURL.setParameter("teamId", Long.toString(userDisplayTerms.getTeamId()));
+		iteratorURL.setParameter("team", Long.toString(userDisplayTerms.getTeamId()));
 		iteratorURL.setParameter("firstName", userDisplayTerms.getFirstName());
 		iteratorURL.setParameter("lastName", userDisplayTerms.getLastName());
 		iteratorURL.setParameter("screenName", userDisplayTerms.getScreenName());
@@ -198,7 +198,7 @@ public class GradeBook extends MVCPortlet {
 			PortletException {
 		String action = ParamUtil.getString(resourceRequest, "action");
 		long moduleId = ParamUtil.getLong(resourceRequest, "moduleId",0);
-		long teamId=ParamUtil.getLong(resourceRequest, "teamId",0);
+		long teamId=ParamUtil.getLong(resourceRequest, "team",0);
 		ThemeDisplay themeDisplay  =(ThemeDisplay)resourceRequest.getAttribute(WebKeys.THEME_DISPLAY);
 		if(action.equals("export")){
 			
