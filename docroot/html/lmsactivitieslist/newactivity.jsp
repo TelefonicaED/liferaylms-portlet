@@ -78,7 +78,7 @@ AUI().ready(
 			if(ResourceActionLocalServiceUtil.fetchResourceAction(learningActivityType.getClassName(), "ADD_ACTIVITY")!=null){
 				hasPermission = permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), learningActivityType.getClassName(), themeDisplay.getScopeGroupId(), "ADD_ACTIVITY");
 			}
-			if(hasPermission && learningActivityType.getTypeId()!=9 && learningActivityType.getTypeId()!=2&&learningActivityType.getTypeId()!=7){
+			if(hasPermission && learningActivityType.getTypeId()!=9 && learningActivityType.getTypeId()!=2 && learningActivityType.getTypeId()!=7){
 
 %>	
 	<liferay-portlet:renderURL var="newactivityURLAux">

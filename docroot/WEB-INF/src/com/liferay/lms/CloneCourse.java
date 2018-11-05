@@ -31,7 +31,6 @@ import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.messaging.Message;
-import com.liferay.portal.kernel.messaging.MessageBusUtil;
 import com.liferay.portal.kernel.messaging.MessageListener;
 import com.liferay.portal.kernel.messaging.MessageListenerException;
 import com.liferay.portal.kernel.repository.model.FileEntry;
@@ -65,7 +64,12 @@ import com.liferay.portlet.announcements.service.AnnouncementsEntryServiceUtil;
 import com.liferay.portlet.announcements.service.AnnouncementsFlagLocalServiceUtil;
 import com.liferay.portlet.asset.model.AssetEntry;
 import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
+import com.liferay.portlet.documentlibrary.model.DLFileEntry;
+import com.liferay.portlet.documentlibrary.model.DLFolder;
+import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
 import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
+import com.liferay.portlet.documentlibrary.service.DLAppServiceUtil;
+import com.liferay.portlet.documentlibrary.service.DLFileEntryLocalServiceUtil;
 import com.liferay.portlet.messageboards.model.MBCategory;
 import com.liferay.portlet.messageboards.service.MBCategoryLocalServiceUtil;
 import com.liferay.util.CourseCopyUtil;
@@ -512,13 +516,11 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 			if(log.isDebugEnabled())
 				log.debug(":: Clone course :: Clone docs ::");
 			
-			//Enviar mensaje al documents-portlet
-			Message messageCloneDocuments = new Message();
-			messageCloneDocuments.put("groupId", groupId);
-			messageCloneDocuments.put("newGroupId", newCourse.getGroupCreatedId());
-			messageCloneDocuments.put("userId", themeDisplay.getUserId());
-			messageCloneDocuments.put("companyId", themeDisplay.getCompanyId());
-			MessageBusUtil.sendMessage("liferay/cloneDocuments", messageCloneDocuments);
+			long newCourseGroupId = newCourse.getGroupCreatedId();
+			long repositoryId = DLFolderConstants.getDataRepositoryId(groupId, DLFolderConstants.DEFAULT_PARENT_FOLDER_ID);
+			long newRepositoryId = DLFolderConstants.getDataRepositoryId(newCourseGroupId, DLFolderConstants.DEFAULT_PARENT_FOLDER_ID);
+			duplicateFoldersAndFileEntriesInsideFolder(Boolean.TRUE, themeDisplay.getUserId(), typeSite, themeDisplay.getCompanyId(), DLFolderConstants.DEFAULT_PARENT_FOLDER_ID, repositoryId, newCourseGroupId, DLFolderConstants.DEFAULT_PARENT_FOLDER_ID, newRepositoryId, serviceContext);
+			
 		}
 		
 		if(log.isDebugEnabled()){
