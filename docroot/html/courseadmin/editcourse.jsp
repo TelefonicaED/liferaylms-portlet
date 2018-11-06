@@ -670,7 +670,25 @@ if(course!=null){
 				<%
 			}
 		}
-		List <Long> inscriptions = ListUtil.toList(StringUtil.split(LmsPrefsLocalServiceUtil.getLmsPrefsIni(themeDisplay.getCompanyId()).getInscriptionTypes(),",",0L));	
+
+	boolean showInscriptionDate = GetterUtil.getBoolean(renderRequest.getPreferences().getValues("showInscriptionDate", new String[]{StringPool.TRUE})[0],true);
+	boolean showExecutionDate = GetterUtil.getBoolean(renderRequest.getPreferences().getValues("showExecutionDate", new String[]{StringPool.TRUE})[0],true);
+	int defaultStartYear = LiferaylmsUtil.defaultStartYear;
+	if(course!=null && course.getStartDate()!=null){
+		Calendar defaultStartDate = Calendar.getInstance();
+		defaultStartDate.setTime(course.getStartDate());
+		if(defaultStartYear>defaultStartDate.get(Calendar.YEAR)){
+			defaultStartYear = defaultStartDate.get(Calendar.YEAR) - 10;
+		}
+			
+	}
+	
+	%>
+	
+	<liferay-ui:panel-container extended="false"  persistState="false">
+   	  <liferay-ui:panel title="lms-inscription-configuration" collapsible="true" defaultState="closed" cssClass="<%=(showInscriptionDate||showMaxUsers)?StringPool.BLANK:\"aui-helper-hidden\" %>">
+   	  		<%
+   	  	List <Long> inscriptions = ListUtil.toList(StringUtil.split(LmsPrefsLocalServiceUtil.getLmsPrefsIni(themeDisplay.getCompanyId()).getInscriptionTypes(),",",0L));	
 		InscriptionTypeRegistry inscription = new InscriptionTypeRegistry();
 		if(inscriptions.size()>1){%>
 			<aui:select name="inscriptionType" label="inscription-type" onchange="${renderResponse.getNamespace()}changeInscriptionType(this.value)">			
@@ -709,7 +727,6 @@ if(course!=null){
 					$("#<portlet:namespace />especific_content_page_inscription_"+typeId).removeClass("aui-helper-hidden");
 				}
 				</script>
-				
 			<%
 		}else{
 			
@@ -734,25 +751,7 @@ if(course!=null){
 					</div>
 				<%
 			}
-		}
-
-	boolean showInscriptionDate = GetterUtil.getBoolean(renderRequest.getPreferences().getValues("showInscriptionDate", new String[]{StringPool.TRUE})[0],true);
-	boolean showExecutionDate = GetterUtil.getBoolean(renderRequest.getPreferences().getValues("showExecutionDate", new String[]{StringPool.TRUE})[0],true);
-	int defaultStartYear = LiferaylmsUtil.defaultStartYear;
-	if(course!=null && course.getStartDate()!=null){
-		Calendar defaultStartDate = Calendar.getInstance();
-		defaultStartDate.setTime(course.getStartDate());
-		if(defaultStartYear>defaultStartDate.get(Calendar.YEAR)){
-			defaultStartYear = defaultStartDate.get(Calendar.YEAR) - 10;
-		}
-			
-	}
-	
-	%>
-	
-<liferay-ui:panel-container extended="false"  persistState="false">
-   	  
-   	  <liferay-ui:panel title="lms-inscription-configuration" collapsible="true" defaultState="closed" cssClass="<%=(showInscriptionDate||showMaxUsers)?StringPool.BLANK:\"aui-helper-hidden\" %>">
+		}%>
 		<aui:field-wrapper name="inscriptionDate" label="start-inscription-date" cssClass="<%=(showInscriptionDate)?StringPool.BLANK:\"aui-helper-hidden\" %>">
 			<aui:input type="hidden" name="inscriptionDate"/>
 			<liferay-ui:input-date yearRangeEnd="<%=LiferaylmsUtil.defaultEndYear %>" yearRangeStart="<%=defaultStartYear %>"  dayParam="startDay" monthParam="startMon"

@@ -100,6 +100,7 @@
 
 		boolean hasPermissionAccessCourseFinished = LiferaylmsUtil.hasPermissionAccessCourseFinished(themeDisplay.getCompanyId(), course.getGroupCreatedId(), course.getCourseId(), themeDisplay.getUserId());
 		boolean accessLock = CourseLocalServiceUtil.canAccessLock(themeDisplay.getScopeGroupId(), themeDisplay.getUser());
+		
 		Module theModule = currentModule;
 %>	
 		<div class="lms-desplegable" style="overflow: hidden;" >	

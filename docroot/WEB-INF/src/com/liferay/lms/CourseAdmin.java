@@ -835,6 +835,8 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 	
 		String newCourseName  = ParamUtil.getString(actionRequest, "newCourseName", "New course cloned");
 		boolean cloneForum = ParamUtil.getBoolean(actionRequest, "cloneForum");
+		boolean cloneDocuments = ParamUtil.getBoolean(actionRequest, "cloneDocuments");
+		boolean cloneActivityClassificationTypes = ParamUtil.getBoolean(actionRequest, "cloneActivityClassificationTypes");
 		int startMonth = 	ParamUtil.getInteger(actionRequest, "startMon");
 		int startYear = 	ParamUtil.getInteger(actionRequest, "startYear");
 		int startDay = 		ParamUtil.getInteger(actionRequest, "startDay");
@@ -898,6 +900,8 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 				message.put("serviceContext",serviceContext);
 				message.put("visible",visible);
 				message.put("cloneForum", cloneForum);
+				message.put("cloneDocuments", cloneDocuments);
+				message.put("cloneActivityClassificationTypes", cloneActivityClassificationTypes);
 				MessageBusUtil.sendMessage("liferay/lms/courseClone", message);
 				SessionMessages.add(actionRequest, "courseadmin.clone.confirmation.success");
 			}
@@ -1140,6 +1144,8 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 		} else if (request.getResourceID() != null && request.getResourceID().equals("importEditionsExample")){
 			EditionsImportExport.generateEditionsExampleFile(request, response, themeDisplay);
 		}
+		
+		super.serveResource(request, response);
 	}
 	
 }

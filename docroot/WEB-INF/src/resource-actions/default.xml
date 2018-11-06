@@ -521,4 +521,134 @@
 			</guest-unsupported>
 		</permissions>
 	</model-resource>
+	
+	<model-resource>
+		<model-name>com.liferay.lms.learningactivity.ResourceExternalLearningActivityType</model-name>
+		<portlet-ref>
+			<portlet-name>resourceExternalActivity</portlet-name>
+		</portlet-ref>
+		<permissions>
+			<supports>
+				<action-key>ADD_ACTIVITY</action-key>
+			</supports>
+			<site-member-defaults />
+			<guest-defaults />
+			<guest-unsupported>
+				<action-key>ADD_ACTIVITY</action-key>
+			</guest-unsupported>
+		</permissions>
+	</model-resource>
+	<model-resource>
+		<model-name>com.liferay.lms.learningactivity.ResourceInternalLearningActivityType</model-name>
+		<portlet-ref>
+			<portlet-name>resourceInternalActivity</portlet-name>
+		</portlet-ref>
+		<permissions>
+			<supports>
+				<action-key>ADD_ACTIVITY</action-key>
+			</supports>
+			<site-member-defaults />
+			<guest-defaults />
+			<guest-unsupported>
+				<action-key>ADD_ACTIVITY</action-key>
+			</guest-unsupported>
+		</permissions>
+	</model-resource>
+	<model-resource>
+		<model-name>com.liferay.lms.learningactivity.SurveyLearningActivityType</model-name>
+		<portlet-ref>
+			<portlet-name>surveyactivity</portlet-name>
+		</portlet-ref>
+		<permissions>
+			<supports>
+				<action-key>ADD_ACTIVITY</action-key>
+			</supports>
+			<site-member-defaults />
+			<guest-defaults />
+			<guest-unsupported>
+				<action-key>ADD_ACTIVITY</action-key>
+			</guest-unsupported>
+		</permissions>
+	</model-resource>
+	<model-resource>
+		<model-name>com.liferay.lms.learningactivity.TaskEvaluationLearningActivityType</model-name>
+		<portlet-ref>
+			<portlet-name>evaluationtaskactivity</portlet-name>
+		</portlet-ref>
+		<permissions>
+			<supports>
+				<action-key>ADD_ACTIVITY</action-key>
+			</supports>
+			<site-member-defaults />
+			<guest-defaults />
+			<guest-unsupported>
+				<action-key>ADD_ACTIVITY</action-key>
+			</guest-unsupported>
+		</permissions>
+	</model-resource>
+	<model-resource>
+		<model-name>com.liferay.lms.learningactivity.TaskOfflineLearningActivityType</model-name>
+		<portlet-ref>
+			<portlet-name>offlinetaskactivity</portlet-name>
+		</portlet-ref>
+		<permissions>
+			<supports>
+				<action-key>ADD_ACTIVITY</action-key>
+			</supports>
+			<site-member-defaults />
+			<guest-defaults />
+			<guest-unsupported>
+				<action-key>ADD_ACTIVITY</action-key>
+			</guest-unsupported>
+		</permissions>
+	</model-resource>
+	<model-resource>
+		<model-name>com.liferay.lms.learningactivity.TaskOnlineLearningActivityType</model-name>
+		<portlet-ref>
+			<portlet-name>onlinetaskactivity</portlet-name>
+		</portlet-ref>
+		<permissions>
+			<supports>
+				<action-key>ADD_ACTIVITY</action-key>
+			</supports>
+			<site-member-defaults />
+			<guest-defaults />
+			<guest-unsupported>
+				<action-key>ADD_ACTIVITY</action-key>
+			</guest-unsupported>
+		</permissions>
+	</model-resource>
+	<model-resource>
+		<model-name>com.liferay.lms.learningactivity.TaskP2PLearningActivityType</model-name>
+		<portlet-ref>
+			<portlet-name>p2ptaskactivity</portlet-name>
+		</portlet-ref>
+		<permissions>
+			<supports>
+				<action-key>ADD_ACTIVITY</action-key>
+			</supports>
+			<site-member-defaults />
+			<guest-defaults />
+			<guest-unsupported>
+				<action-key>ADD_ACTIVITY</action-key>
+			</guest-unsupported>
+		</permissions>
+	</model-resource>
+	<model-resource>
+		<model-name>com.liferay.lms.learningactivity.TestLearningActivityType</model-name>
+		<portlet-ref>
+			<portlet-name>execactivity</portlet-name>
+		</portlet-ref>
+		<permissions>
+			<supports>
+				<action-key>ADD_ACTIVITY</action-key>
+			</supports>
+			<site-member-defaults />
+			<guest-defaults />
+			<guest-unsupported>
+				<action-key>ADD_ACTIVITY</action-key>
+			</guest-unsupported>
+		</permissions>
+	</model-resource>
+	
 </resource-action-mapping>

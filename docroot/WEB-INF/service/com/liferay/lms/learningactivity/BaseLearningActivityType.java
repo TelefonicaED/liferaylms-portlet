@@ -169,6 +169,10 @@ public abstract class BaseLearningActivityType implements LearningActivityType, 
 		// TODO Auto-generated method stub
 		return null;
 	}
+	
+	public String getClassName() {
+		return getClass().getName();
+	}
 
 	@Override
 	public AssetRenderer getAssetRenderer(LearningActivity larn)

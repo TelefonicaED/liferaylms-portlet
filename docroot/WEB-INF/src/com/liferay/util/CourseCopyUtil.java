@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 
@@ -29,14 +30,19 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.DocumentException;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
+import com.liferay.portal.model.Resource;
 import com.liferay.portal.model.ResourceConstants;
+import com.liferay.portal.model.ResourcePermission;
 import com.liferay.portal.model.Role;
 import com.liferay.portal.model.RoleConstants;
 import com.liferay.portal.security.permission.ActionKeys;
+import com.liferay.portal.service.ResourceBlockLocalServiceUtil;
+import com.liferay.portal.service.ResourceLocalServiceUtil;
 import com.liferay.portal.service.ResourcePermissionLocalServiceUtil;
 import com.liferay.portal.service.RoleLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
@@ -48,6 +54,7 @@ import com.liferay.portlet.documentlibrary.model.DLFileEntry;
 import com.liferay.portlet.documentlibrary.model.DLFolder;
 import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
 import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
+import com.liferay.portlet.documentlibrary.service.DLAppServiceUtil;
 import com.liferay.portlet.documentlibrary.service.DLFileEntryLocalServiceUtil;
 
 public class CourseCopyUtil {
@@ -648,4 +655,237 @@ public class CourseCopyUtil {
 		return assetEntryId;
 	}
 	
+	
+	/**
+	 * Clonar documentos del curso de forma recursiva
+	 */
+	
+	public boolean duplicateFoldersAndFileEntriesInsideFolder(boolean cloneDocumentsOk, long userId, long groupId, long companyId, long parentFolderId, long repositoryId, long newGroupId, long newParentFolderId, long newRepositoryId, ServiceContext serviceContext){
+		if(cloneDocumentsOk){
+			//Listado de archivos del curso que se va a duplicar
+			List<FileEntry> listFiles = null;
+			//Listado de carpetas del curso que se va a duplicar
+			List<Folder> listFolders = null;
+			try {
+				listFiles = DLAppServiceUtil.getFileEntries(repositoryId, parentFolderId);
+				listFolders = DLAppServiceUtil.getFolders(repositoryId, parentFolderId);
+			} catch (PortalException | SystemException e) {
+				e.printStackTrace();
+			}
+			if(log.isDebugEnabled()){
+				log.debug("::cloneDocuments:: listFiles :: " + Validator.isNotNull(listFiles));
+				log.debug("::cloneDocuments:: listFolders :: " + Validator.isNotNull(listFolders));
+				if(Validator.isNotNull(listFiles))
+					log.debug("::cloneDocuments:: listFiles.size :: " + listFiles.size());
+				if(Validator.isNotNull(listFolders))
+					log.debug("::cloneDocuments:: listFolders.size :: " + listFolders.size());
+			}
+			if(Validator.isNotNull(listFiles) && listFiles.size()>0){
+				//Clonar archivos
+				if(log.isDebugEnabled())
+					log.debug("::cloneDocuments:: clone file entries:::");
+				InputStream is = null;
+				FileEntry newFileEntry = null;
+				for(FileEntry fileEntry:listFiles){
+					newFileEntry = null;
+					//Comprobar si el archivo ya existe
+					try {
+						newFileEntry = DLAppLocalServiceUtil.getFileEntry(newGroupId, newParentFolderId, fileEntry.getTitle());
+					} catch (PortalException | SystemException e) {
+						if(log.isDebugEnabled())
+							log.debug("::cloneDocuments:: clone file entries::: newFileEntry does not exist :: " + e.getMessage());
+					}
+					if(Validator.isNull(newFileEntry)){
+						try {
+							//Añadir archivo si no existía
+							is = DLFileEntryLocalServiceUtil.getFileAsStream(userId, fileEntry.getFileEntryId(), fileEntry.getVersion());
+							newFileEntry = DLAppLocalServiceUtil.addFileEntry(userId, newRepositoryId, newParentFolderId, fileEntry.getTitle(), fileEntry.getMimeType(), fileEntry.getTitle(), fileEntry.getDescription(), null, is, fileEntry.getSize(), serviceContext);
+						} catch (PortalException | SystemException e) {
+							cloneDocumentsOk = Boolean.FALSE;
+							e.printStackTrace();
+						}
+					}
+					if(Validator.isNotNull(newFileEntry)){
+						//Copiar permisos del curso actual al curso clonado
+						copyPermissionsEntries(String.valueOf(newFileEntry.getFileEntryId()), String.valueOf(fileEntry.getFileEntryId()), DLFileEntry.class.getName(), newGroupId, companyId);
+					}
+				}
+			}
+			if(Validator.isNotNull(listFolders) && listFolders.size()>0){
+				//Clonar carpetas
+				if(log.isDebugEnabled())
+					log.debug(":::clone folders:::");
+				Folder newFolder = null;
+				for(Folder folder:listFolders){
+					newFolder = null;
+					//Comprobar si la carpeta ya existe
+					try {
+						newFolder = DLAppLocalServiceUtil.getFolder(newRepositoryId, newParentFolderId, folder.getName());
+					} catch (PortalException | SystemException e) {
+						if(log.isDebugEnabled())
+							log.debug("::cloneDocuments:: clone file entries::: newFolder does not exist :: " + e.getMessage());
+					}
+					if(Validator.isNull(newFolder)){
+						try {
+							//Añadir carpeta
+							newFolder = DLAppLocalServiceUtil.addFolder(userId, newRepositoryId, newParentFolderId, folder.getName(), folder.getDescription(), serviceContext);
+						} catch (PortalException | SystemException e) {
+							cloneDocumentsOk = Boolean.FALSE;
+							e.printStackTrace();
+						}
+					}
+					if(Validator.isNotNull(newFolder)){
+						//Copiar permisos del curso actual al curso clonado
+						copyPermissionsEntries(String.valueOf(newFolder.getFolderId()), String.valueOf(folder.getFolderId()), DLFolder.class.getName(), newGroupId, companyId);
+						//Se vuelve a llamar a la misma función para que duplique los archivos y carpetas que haya dentro de la carpeta que se acaba de clonar
+						cloneDocumentsOk = duplicateFoldersAndFileEntriesInsideFolder(cloneDocumentsOk, userId, groupId, companyId, folder.getFolderId(), repositoryId, newGroupId, newFolder.getFolderId(), newRepositoryId, serviceContext);
+					}
+				}
+			}
+		} else {
+			if(log.isDebugEnabled())
+				log.debug("::cloneDocuments:: ERROR IN PREVIOUS ITERATION :: ");
+		}
+		return cloneDocumentsOk;
+	}
+	
+	/**
+	 * Copiar permisos desde entryId a newEntryId (ya sea una carpeta o un fileEntry)
+	 * @param newEntryId
+	 * @param entryId
+	 * @param className
+	 * @param newGroupId
+	 * @param companyId
+	 */
+	private static void copyPermissionsEntries(String newEntryId, String entryId, String className, long newGroupId,  long companyId){
+		if(log.isDebugEnabled()){
+			log.debug("::cloneDocuments:: copyPermissions:: newEntryId :: " + newEntryId);
+			log.debug("::cloneDocuments:: copyPermissions:: entryId :: " + entryId);
+			log.debug("::cloneDocuments:: copyPermissions:: className :: " + className);
+			log.debug("::cloneDocuments:: copyPermissions:: newGroupId :: " + newGroupId);
+			log.debug("::cloneDocuments:: copyPermissions:: companyId :: " + companyId);
+		}
+		try {
+			List<ResourcePermission> listResourcePermission = ResourcePermissionLocalServiceUtil.getResourcePermissions(companyId, className, ResourceConstants.SCOPE_INDIVIDUAL, entryId);
+			if(log.isDebugEnabled())
+				log.debug("::copyPermissions:: listResourcePermission OK :: " + Validator.isNotNull(listResourcePermission));
+			if(Validator.isNotNull(listResourcePermission)){
+				String[] actionIds = null;
+				for(ResourcePermission resourcePermission: listResourcePermission){
+					if(log.isDebugEnabled())
+						log.debug("rol: " + resourcePermission.getRoleId());
+					//Se distingue entre folder y fileEntry porque no tienen los mismos permisos
+					if(className.equals(DLFolder.class.getName())){
+						actionIds = checkFolderPermission(entryId, resourcePermission, companyId);
+					}else if(className.equals(DLFileEntry.class.getName())){
+						actionIds = checkFileEntryPermission(entryId, resourcePermission, companyId);
+					}
+					setPermission(companyId, newGroupId, className, resourcePermission.getRoleId(), actionIds, newEntryId);
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	private static String[] checkFolderPermission(String entryId, ResourcePermission resourcePermission, long companyId) throws PortalException, SystemException{
+		String[] actionIds = new String[8];
+		int i = 0;
+		if(ResourcePermissionLocalServiceUtil.hasResourcePermission(companyId, DLFolder.class.getName(), ResourceConstants.SCOPE_INDIVIDUAL, entryId, resourcePermission.getRoleId(), ActionKeys.ACCESS)){
+			actionIds[i++] = ActionKeys.ACCESS;
+			if(log.isDebugEnabled())
+				log.debug("::cloneDocuments:copyPermissions:: actionId[" + i + "] " + ActionKeys.ACCESS);
+		}
+		if(ResourcePermissionLocalServiceUtil.hasResourcePermission(companyId, DLFolder.class.getName(), ResourceConstants.SCOPE_INDIVIDUAL, entryId, resourcePermission.getRoleId(), ActionKeys.ADD_DOCUMENT)){
+			actionIds[i++] = ActionKeys.ADD_DOCUMENT;
+			if(log.isDebugEnabled())
+				log.debug("::cloneDocuments:copyPermissions:: actionId[" + i + "] " + ActionKeys.ADD_DOCUMENT);
+		}
+		if(ResourcePermissionLocalServiceUtil.hasResourcePermission(companyId, DLFolder.class.getName(), ResourceConstants.SCOPE_INDIVIDUAL, entryId, resourcePermission.getRoleId(), ActionKeys.ADD_SHORTCUT)){
+			actionIds[i++] = ActionKeys.ADD_SHORTCUT;
+			if(log.isDebugEnabled())
+				log.debug("::cloneDocuments:copyPermissions:: actionId[" + i + "] " + ActionKeys.ADD_SHORTCUT);
+		}
+		if(ResourcePermissionLocalServiceUtil.hasResourcePermission(companyId, DLFolder.class.getName(), ResourceConstants.SCOPE_INDIVIDUAL, entryId, resourcePermission.getRoleId(), ActionKeys.ADD_SUBFOLDER)){
+			actionIds[i++] = ActionKeys.ADD_SUBFOLDER;
+			if(log.isDebugEnabled())
+				log.debug("::cloneDocuments:copyPermissions:: actionId[" + i + "] " + ActionKeys.ADD_SUBFOLDER);
+		}
+		if(ResourcePermissionLocalServiceUtil.hasResourcePermission(companyId, DLFolder.class.getName(), ResourceConstants.SCOPE_INDIVIDUAL, entryId, resourcePermission.getRoleId(), ActionKeys.DELETE)){
+			actionIds[i++] = ActionKeys.DELETE;
+			if(log.isDebugEnabled())
+				log.debug("::cloneDocuments:copyPermissions:: actionId[" + i + "] " + ActionKeys.DELETE);
+		}
+		if(ResourcePermissionLocalServiceUtil.hasResourcePermission(companyId, DLFolder.class.getName(), ResourceConstants.SCOPE_INDIVIDUAL, entryId, resourcePermission.getRoleId(), ActionKeys.PERMISSIONS)){
+			actionIds[i++] = ActionKeys.PERMISSIONS;
+			if(log.isDebugEnabled())
+				log.debug("::cloneDocuments:copyPermissions:: actionId[" + i + "] " + ActionKeys.PERMISSIONS);
+		}
+		if(ResourcePermissionLocalServiceUtil.hasResourcePermission(companyId, DLFolder.class.getName(), ResourceConstants.SCOPE_INDIVIDUAL, entryId, resourcePermission.getRoleId(), ActionKeys.UPDATE)){
+			actionIds[i++] = ActionKeys.UPDATE;
+			if(log.isDebugEnabled())
+				log.debug("::cloneDocuments:copyPermissions:: actionId[" + i + "] " + ActionKeys.UPDATE);
+		}
+		if(ResourcePermissionLocalServiceUtil.hasResourcePermission(companyId, DLFolder.class.getName(), ResourceConstants.SCOPE_INDIVIDUAL, entryId, resourcePermission.getRoleId(), ActionKeys.VIEW)){
+			actionIds[i++] = ActionKeys.VIEW;
+			if(log.isDebugEnabled())
+				log.debug("::cloneDocuments:copyPermissions:: actionId[" + i + "] " + ActionKeys.VIEW);
+		}
+		return actionIds;
+	}
+	private static String[] checkFileEntryPermission(String entryId, ResourcePermission resourcePermission, long companyId) throws PortalException, SystemException{
+		String[] actionIds = new String[7];
+		int i = 0;
+		if(ResourcePermissionLocalServiceUtil.hasResourcePermission(companyId, DLFileEntry.class.getName(), ResourceConstants.SCOPE_INDIVIDUAL, entryId, resourcePermission.getRoleId(), ActionKeys.ADD_DISCUSSION)){
+			actionIds[i++] = ActionKeys.ADD_DISCUSSION;
+			if(log.isDebugEnabled())
+				log.debug("::cloneDocuments:copyPermissions:: actionId[" + i + "] " + ActionKeys.ADD_DISCUSSION);
+		}
+		if(ResourcePermissionLocalServiceUtil.hasResourcePermission(companyId, DLFileEntry.class.getName(), ResourceConstants.SCOPE_INDIVIDUAL, entryId, resourcePermission.getRoleId(), ActionKeys.DELETE)){
+			actionIds[i++] = ActionKeys.DELETE;
+			if(log.isDebugEnabled())
+				log.debug("::cloneDocuments:copyPermissions:: actionId[" + i + "] " + ActionKeys.DELETE);
+		}
+		if(ResourcePermissionLocalServiceUtil.hasResourcePermission(companyId, DLFileEntry.class.getName(), ResourceConstants.SCOPE_INDIVIDUAL, entryId, resourcePermission.getRoleId(), ActionKeys.DELETE_DISCUSSION)){
+			actionIds[i++] = ActionKeys.DELETE_DISCUSSION;
+			if(log.isDebugEnabled())
+				log.debug("::cloneDocuments:copyPermissions:: actionId[" + i + "] " + ActionKeys.DELETE_DISCUSSION);
+		}
+		if(ResourcePermissionLocalServiceUtil.hasResourcePermission(companyId, DLFileEntry.class.getName(), ResourceConstants.SCOPE_INDIVIDUAL, entryId, resourcePermission.getRoleId(), ActionKeys.PERMISSIONS)){
+			actionIds[i++] = ActionKeys.PERMISSIONS;
+			if(log.isDebugEnabled())
+				log.debug("::cloneDocuments:copyPermissions:: actionId[" + i + "] " + ActionKeys.PERMISSIONS);
+		}
+		if(ResourcePermissionLocalServiceUtil.hasResourcePermission(companyId, DLFileEntry.class.getName(), ResourceConstants.SCOPE_INDIVIDUAL, entryId, resourcePermission.getRoleId(), ActionKeys.UPDATE)){
+			actionIds[i++] = ActionKeys.UPDATE;
+			if(log.isDebugEnabled())
+				log.debug("::cloneDocuments:copyPermissions:: actionId[" + i + "] " + ActionKeys.UPDATE);
+		}
+		if(ResourcePermissionLocalServiceUtil.hasResourcePermission(companyId, DLFileEntry.class.getName(), ResourceConstants.SCOPE_INDIVIDUAL, entryId, resourcePermission.getRoleId(), ActionKeys.UPDATE_DISCUSSION)){
+			actionIds[i++] = ActionKeys.UPDATE_DISCUSSION;
+			if(log.isDebugEnabled())
+				log.debug("::cloneDocuments:copyPermissions:: actionId[" + i + "] " + ActionKeys.UPDATE_DISCUSSION);
+		}
+		if(ResourcePermissionLocalServiceUtil.hasResourcePermission(companyId, DLFileEntry.class.getName(), ResourceConstants.SCOPE_INDIVIDUAL, entryId, resourcePermission.getRoleId(), ActionKeys.VIEW)){
+			actionIds[i++] = ActionKeys.VIEW;
+			if(log.isDebugEnabled())
+				log.debug("::cloneDocuments:copyPermissions:: actionId[" + i + "] " + ActionKeys.VIEW);
+		}
+		return actionIds;
+	}
+	private static void setPermission(long companyId, long groupId, String classname, long roleId, String[] actionIds, String primaryKey) throws Exception{
+		Resource resource =  ResourceLocalServiceUtil.getResource(companyId, classname, ResourceConstants.SCOPE_INDIVIDUAL, primaryKey);
+		if(ResourceBlockLocalServiceUtil.isSupported(classname)){
+			Map<Long, String[]> roleIdsToActionIds = new HashMap<Long, String[]>();
+			roleIdsToActionIds.put(roleId, actionIds);
+			ResourceBlockLocalServiceUtil.setIndividualScopePermissions(
+					companyId, groupId, resource.getName(),
+					Long.parseLong(primaryKey), roleIdsToActionIds);
+		}else{
+			Map<Long, String[]> roleIdsToActionIds = new HashMap<Long, String[]>();
+			roleIdsToActionIds.put(roleId, actionIds);
+			ResourcePermissionLocalServiceUtil.setResourcePermissions(
+					companyId, resource.getName(), ResourceConstants.SCOPE_INDIVIDUAL,
+					primaryKey, roleIdsToActionIds);
+		}
+	}
 }

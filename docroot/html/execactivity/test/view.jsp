@@ -40,13 +40,19 @@
 
 <%@ include file="/init.jsp" %>
 
+<script>
+window.onbeforeunload = function() { 
+    return Liferay.Language.get("execativity.test.try.confirm.close"); 
+}
+</script>
+
 <% 
 Boolean isTablet = ParamUtil.getBoolean(renderRequest, "isTablet", false);
 if(isTablet){%>
 
 	<script src="//code.jquery.com/jquery-1.7.2.min.js" type="text/javascript"></script> 
 	<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js" type="text/javascript"></script>
-	<script src="/liferaylms-portlet/js/jquery.ui.touch-punch.min.js" type="text/javascript"/> 
+	<script src="/liferaylms-portlet/js/jquery.ui.touch-punch.min.js" type="text/javascript"></script>
 	<script src="/liferaylms-portlet/js/mouse.js" type="text/javascript"></script> 
 	
 		<script>
@@ -71,7 +77,6 @@ if(isTablet){%>
 			}
 		}, 1000);
 		
-			
 		</script>
 		
 <%}%>

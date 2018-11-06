@@ -54,4 +54,5 @@ public interface LearningActivityType extends InvokableService
 	public boolean canBeLinked();
 	public boolean canBeSeenResults();
 	public long calculateResult(LearningActivity learningActivity, LearningActivityTry lat);
+	public String getClassName();
 }

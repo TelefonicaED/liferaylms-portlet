@@ -45,6 +45,11 @@ public class TaskOfflineLearningActivityType extends BaseLearningActivityType {
 		
 		return "learningactivity.offline";
 	}
+	
+	@Override
+	public String getClassName(){
+		return getClass().getName();
+	}
 
 	@Override
 	public boolean isScoreConfigurable() {
