@@ -184,9 +184,15 @@ if(isTablet){%>
 						</div>
 						<%
 						boolean onlyPreview = Boolean.valueOf(LearningActivityLocalServiceUtil.getExtraContentValue(actId, "showOnlyPreview", "false"));
-						if(onlyPreview){
+						boolean goToQuestions = Boolean.valueOf(ParamUtil.getString(renderRequest, "goToQuestions", "false"));
+						if(onlyPreview && !goToQuestions){
 							%>
-							PREVISUALIZACION
+							<portlet:renderURL var="goToTestURL">
+								<portlet:param name="actId" value="<%=Long.toString(actId) %>" ></portlet:param>
+								<portlet:param name="goToQuestions" value="true"></portlet:param>
+								<portlet:param name="jspPage" value="/html/execactivity/test/view.jsp" />
+							</portlet:renderURL> 
+							<div class="left"><aui:button type="button" value="execactivity.test.go-to-test" onClick="${goToTestURL}" /></div>
 							<%
 						} else {
 				
