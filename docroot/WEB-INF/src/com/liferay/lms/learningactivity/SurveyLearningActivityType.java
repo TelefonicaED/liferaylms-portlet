@@ -42,6 +42,11 @@ public class SurveyLearningActivityType extends BaseLearningActivityType {
 		
 		return "learningactivity.survey";
 	}
+	
+	@Override
+	public String getClassName(){
+		return getClass().getName();
+	}
 
 	@Override
 	public long getTypeId() {

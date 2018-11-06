@@ -1,3 +1,7 @@
+<%@page import="com.liferay.portal.service.ResourceActionLocalServiceUtil"%>
+<%@page import="com.liferay.portal.service.ResourcePermissionLocalServiceUtil"%>
+<%@page import="com.liferay.portal.security.permission.PermissionCheckerFactoryUtil"%>
+<%@page import="com.liferay.portal.security.permission.PermissionChecker"%>
 <%@page import="com.liferay.lms.service.LmsPrefsLocalServiceUtil"%>
 <%@page import="com.liferay.portal.kernel.util.ArrayUtil"%>
 <%@page import="com.liferay.lms.learningactivity.LearningActivityType"%>
@@ -35,7 +39,12 @@ AUI().ready(
 		if(learningActivityType != null && !ArrayUtil.contains(invisibleTypes, learningActivityType.getTypeId()) && 
 				((course==null && learningActivityType.allowsBank()) || course!=null ) ){
 			
-			if(learningActivityType.getTypeId()==9||learningActivityType.getTypeId()==2||learningActivityType.getTypeId()==7){
+			boolean hasPermission = true;
+			if(ResourceActionLocalServiceUtil.fetchResourceAction(learningActivityType.getClassName(), "ADD_ACTIVITY")!=null){
+				hasPermission = permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), learningActivityType.getClassName(), themeDisplay.getScopeGroupId(), "ADD_ACTIVITY");
+			}
+			
+			if(hasPermission && (learningActivityType.getTypeId()==9||learningActivityType.getTypeId()==2||learningActivityType.getTypeId()==7)){
 
 				%>	
 					<liferay-portlet:renderURL var="newactivityURL">
@@ -65,8 +74,11 @@ AUI().ready(
 	{
 		if(learningActivityType != null && !ArrayUtil.contains(invisibleTypes, learningActivityType.getTypeId())
 				&& (course==null && learningActivityType.allowsBank() || course!=null )) {
-			
-			if(learningActivityType.getTypeId()!=9 && learningActivityType.getTypeId()!=2&&learningActivityType.getTypeId()!=7){
+			boolean hasPermission = true;
+			if(ResourceActionLocalServiceUtil.fetchResourceAction(learningActivityType.getClassName(), "ADD_ACTIVITY")!=null){
+				hasPermission = permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), learningActivityType.getClassName(), themeDisplay.getScopeGroupId(), "ADD_ACTIVITY");
+			}
+			if(hasPermission && learningActivityType.getTypeId()!=9 && learningActivityType.getTypeId()!=2 && learningActivityType.getTypeId()!=7){
 
 %>	
 	<liferay-portlet:renderURL var="newactivityURLAux">

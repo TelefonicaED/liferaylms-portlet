@@ -251,6 +251,26 @@ public class LearningActivityTypeClp implements LearningActivityType {
 		return ((String)returnObj);
 	}
 	
+	public String getClassName() {
+		Object returnObj = null;
+
+		try {
+			returnObj = clp.invoke("getClassName", new Object[] {});
+		}
+		catch (Throwable t) {
+			t = ClpSerializer.translateThrowable(t);
+
+			if (t instanceof RuntimeException) {
+				throw (RuntimeException)t;
+			}
+			else {
+				throw new RuntimeException(t.getClass().getName() +
+					" is not a valid exception");
+			}
+		}
+		return ((String)returnObj);
+	}
+	
 	private Object translateLearningActivity(LearningActivity larn) {
 		Object larnObj = null;
 		try {
