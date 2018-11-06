@@ -685,7 +685,9 @@ if(course!=null){
 	
 	%>
 	
-<liferay-ui:panel-container extended="false"  persistState="false">
+	<liferay-ui:panel-container extended="false"  persistState="false">
+   	  <liferay-ui:panel title="lms-inscription-configuration" collapsible="true" defaultState="closed" cssClass="<%=(showInscriptionDate||showMaxUsers)?StringPool.BLANK:\"aui-helper-hidden\" %>">
+   	  		<%
    	  	List <Long> inscriptions = ListUtil.toList(StringUtil.split(LmsPrefsLocalServiceUtil.getLmsPrefsIni(themeDisplay.getCompanyId()).getInscriptionTypes(),",",0L));	
 		InscriptionTypeRegistry inscription = new InscriptionTypeRegistry();
 		if(inscriptions.size()>1){%>
@@ -725,7 +727,6 @@ if(course!=null){
 					$("#<portlet:namespace />especific_content_page_inscription_"+typeId).removeClass("aui-helper-hidden");
 				}
 				</script>
-				
 			<%
 		}else{
 			
@@ -750,8 +751,7 @@ if(course!=null){
 					</div>
 				<%
 			}
-		}
-   	  <liferay-ui:panel title="lms-inscription-configuration" collapsible="true" defaultState="closed" cssClass="<%=(showInscriptionDate||showMaxUsers)?StringPool.BLANK:\"aui-helper-hidden\" %>">
+		}%>
 		<aui:field-wrapper name="inscriptionDate" label="start-inscription-date" cssClass="<%=(showInscriptionDate)?StringPool.BLANK:\"aui-helper-hidden\" %>">
 			<aui:input type="hidden" name="inscriptionDate"/>
 			<liferay-ui:input-date yearRangeEnd="<%=LiferaylmsUtil.defaultEndYear %>" yearRangeStart="<%=defaultStartYear %>"  dayParam="startDay" monthParam="startMon"
