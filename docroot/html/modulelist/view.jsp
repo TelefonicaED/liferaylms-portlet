@@ -350,26 +350,32 @@
 							sdf.setTimeZone(themeDisplay.getTimeZone());
 							if(startDate!=null &&today.before(startDate)){
 								if(showModuleStartDate){
-%>
-									<liferay-ui:message key="fecha-inicio"/><br />
-									<%=	sdf.format(startDate)%>
-									<%--=	dateFormatDate.format(new Date(dateOffSet))--%>
+%>									
+									<p>
+										<span class="date-title-module"><liferay-ui:message key="fecha-inicio"/></span>:
+										<span class="date-module"><%=	sdf.format(startDate)%></span>
+										<%--=	dateFormatDate.format(new Date(dateOffSet))--%>
+									</p>
 <%
 								}
 							}else{
 								if(endDate!=null&&today.before(endDate)){
 									if(showModuleStartDate){
 %>
-										<liferay-ui:message key="fecha-inicio"/><br />
-										<%=	sdf.format(startDate)%>
+										<p>
+											<span class="date-title-module"><liferay-ui:message key="fecha-inicio"/></span>:
+											<span class="date-module"><%=sdf.format(startDate)%></span>
 										<%--=	dateFormatDateTime.format(new Date(dateOffSet))--%><br />
-<%
+										</p>
+<%										
 									}
 									if(showModuleEndDate){
 %>
-										<liferay-ui:message key="fecha-fin"/><br />
-										<%=	sdf.format(endDate)%>
+										<p>
+											<span class="date-title-module"><liferay-ui:message key="fecha-fin"/></span>:
+											<span class="date-module"><%=sdf.format(endDate)%></span>
 										<%--=	dateFormatDateTime.format(new Date(dateOffSet))--%>
+										</p>
 <%
 									}
 								}
