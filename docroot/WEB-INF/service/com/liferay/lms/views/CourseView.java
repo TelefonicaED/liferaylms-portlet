@@ -16,6 +16,8 @@ import com.liferay.portal.model.Layout;
 import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.LayoutLocalServiceUtil;
 import com.liferay.portal.theme.ThemeDisplay;
+import com.liferay.portlet.asset.model.AssetEntry;
+import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.util.DLUtil;
 
@@ -31,10 +33,19 @@ public class CourseView {
 	private long groupId;
 	private Date executionStartDate;
 	private Date executionEndDate;
+	private String summary;
 	
 	public CourseView(Course course, ThemeDisplay themeDisplay){
 		setCourseId(course.getCourseId());
 		setTitle(course.getTitle(themeDisplay.getLocale()));
+		AssetEntry assetEntry = null;
+		try {
+			assetEntry = AssetEntryLocalServiceUtil.fetchEntry(Course.class.getName(), course.getCourseId());
+		} catch (SystemException e) {
+			if(log.isDebugEnabled())
+				log.debug(e.getMessage());
+		}
+		setSummary((Validator.isNotNull(assetEntry))?assetEntry.getSummary():StringPool.BLANK);
 		try {
 			if(Validator.isNotNull(course.getIcon())){
 				log.debug("Tiene icono el curso");
@@ -71,6 +82,11 @@ public class CourseView {
 		setTitle(title);
 		setClosed(false);
 		setGroupId(groupId);
+	}
+	
+	public CourseView(long courseId, String title, long groupId, String summary){
+		this(courseId, title, groupId);
+		setSummary(summary);
 	}
 	
 	public String getUrl() {
@@ -150,6 +166,14 @@ public class CourseView {
 	public boolean isInExecutionPeriod(){
 		Date now = new Date();
 		return now.after(getExecutionStartDate()) && now.before(getExecutionEndDate());
+	}
+	
+	public String getSummary(){
+		return summary;
+	}
+	
+	public void setSummary(String summary){
+		this.summary = summary;
 	}
 
 }
