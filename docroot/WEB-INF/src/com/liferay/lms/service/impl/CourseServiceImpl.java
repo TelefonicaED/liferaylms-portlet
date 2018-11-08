@@ -16,7 +16,6 @@ package com.liferay.lms.service.impl;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.LinkedHashMap;
 import java.util.List;
 
 import com.liferay.lms.auditing.AuditConstants;
@@ -31,7 +30,6 @@ import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.ProjectionFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
-import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.jsonwebservice.JSONWebService;
@@ -40,10 +38,8 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.util.ArrayUtil;
-import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.GroupConstants;
 import com.liferay.portal.model.Role;
@@ -545,65 +541,6 @@ public class CourseServiceImpl extends CourseServiceBaseImpl {
 		}
 		return null;
 	}
-
-
-
-/*
-	@JSONWebService
-	public List<User> getTeachersFromCourse(long courseId) {
-		List<User> users = new ArrayList<User>();
-		try{
-			
-			Course course = courseLocalService.fetchCourse(courseId);
-			if (getPermissionChecker() == null
-					|| course == null
-					|| !(getPermissionChecker().hasPermission(course.getGroupId(), Course.class.getName(),
-							course.getCourseId(), "VIEW") || getPermissionChecker()
-							.hasOwnerPermission(course.getCompanyId(), Course.class.getName(), course.getCourseId(),
-									course.getUserId(), "VIEW"))) {
-				return users;
-			}
-	
-			
-			LinkedHashMap<String, Object> userParams = new LinkedHashMap<String, Object>();
-			LmsPrefs prefs;			
-			prefs = LmsPrefsLocalServiceUtil.getLmsPrefs(course.getCompanyId());
-			long teacherRoleId=RoleLocalServiceUtil.getRole(prefs.getTeacherRole()).getRoleId();
-			userParams.put("usersGroups", course.getGroupCreatedId());
-			userParams.put("userGroupRole", new Long[]{course.getGroupCreatedId(), teacherRoleId});
-			
-			users = UserLocalServiceUtil.search(course.getCompanyId(), "", 
-					WorkflowConstants.STATUS_APPROVED, userParams, 
-					QueryUtil.ALL_POS, QueryUtil.ALL_POS,(OrderByComparator)null);
-		}catch(Exception e){
-			e.printStackTrace();
-		}
-		
-		return users;
-		
-	}
-	
-	@JSONWebService(mode = JSONWebServiceMode.IGNORE)
-	public List<User> getStudentsFromCourse(long courseId) throws Exception {
-		List<User> users = new ArrayList<User>();
-		try{
-			
-			Course course = courseLocalService.fetchCourse(courseId);
-			if (getPermissionChecker() == null
-					|| course == null
-					|| !(getPermissionChecker().hasPermission(course.getGroupId(), Course.class.getName(),
-							course.getCourseId(), "VIEW") || getPermissionChecker()
-							.hasOwnerPermission(course.getCompanyId(), Course.class.getName(), course.getCourseId(),
-									course.getUserId(), "VIEW"))) {
-				return users;
-			}
-			
-			users=courseLocalService.getStudentsFromCourse(course);
-		}catch(Exception e){
-			e.printStackTrace();
-		}
-		return users;
-	}*/
 	
 	@JSONWebService
 	public int getStudentsFromCourseCount(long courseId){
@@ -675,53 +612,4 @@ public class CourseServiceImpl extends CourseServiceBaseImpl {
 		return null;
 	}
 
-/*
-	private  void sendMail(Course course, User user){
-		
-			if(course.isWelcome()&&user!=null&&course!=null){
-			if(course.getWelcomeMsg()!=null&&course.getWelcomeMsg()!=null&&!StringPool.BLANK.equals(course.getWelcomeMsg())){
-				
-				try{
-					String emailTo = user.getEmailAddress();
-					String nameTo = user.getFullName();
-					InternetAddress to = new InternetAddress(emailTo, nameTo);
-					String screenName = user.getScreenName();
-					String fromName = PrefsPropsUtil.getString(course.getCompanyId(),
-						PropsKeys.ADMIN_EMAIL_FROM_NAME);
-					String fromAddress = PrefsPropsUtil.getString(course.getCompanyId(),
-						PropsKeys.ADMIN_EMAIL_FROM_ADDRESS);
-					InternetAddress from = new InternetAddress(fromAddress, fromName);
-					
-					Company company = null;
-					try {
-						company = CompanyLocalServiceUtil.getCompany(course.getCompanyId());
-					} catch (PortalException e) {
-						if(log.isErrorEnabled())log.error(e.getMessage());
-						if(log.isDebugEnabled())e.printStackTrace();
-					}
-					
-					if(company!=null){
-						String url = PortalUtil.getPortalURL(company.getVirtualHostname(), 80, false);
-						String urlcourse = url+"/web"+course.getFriendlyURL();
-						
-						String subject = LanguageUtil.format(user.getLocale(),"welcome-subject", new String[]{course.getTitle(user.getLocale())});
-				    	String body = StringUtil.replace(
-				    			course.getWelcomeMsg(),
-				    			new String[] {"[$FROM_ADDRESS$]", "[$FROM_NAME$]", "[$PAGE_URL$]","[$PORTAL_URL$]","[$TO_ADDRESS$]","[$TO_NAME$]","[$SCREEN_NAME$]"},
-				    			new String[] {fromAddress, fromName, urlcourse, url, emailTo, nameTo,screenName});
-				    	
-						MailMessage mailm = new MailMessage(from, to, subject, body, true);
-						MailServiceUtil.sendEmail(mailm);
-					}
-					
-				}catch(UnsupportedEncodingException e){
-					if(log.isErrorEnabled())log.error(e.getMessage());
-					if(log.isDebugEnabled())e.printStackTrace();
-				}catch(SystemException e){
-					if(log.isErrorEnabled())log.error(e.getMessage());
-					if(log.isDebugEnabled())e.printStackTrace();
-				}
-			}
-		}
-	}*/
 }
