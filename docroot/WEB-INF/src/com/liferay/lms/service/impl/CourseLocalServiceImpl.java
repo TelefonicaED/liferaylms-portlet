@@ -40,6 +40,7 @@ import com.liferay.lms.model.Schedule;
 import com.liferay.lms.model.UserCompetence;
 import com.liferay.lms.service.CourseCompetenceLocalServiceUtil;
 import com.liferay.lms.service.CourseLocalServiceUtil;
+import com.liferay.lms.service.CourseResultLocalServiceUtil;
 import com.liferay.lms.service.LmsPrefsLocalServiceUtil;
 import com.liferay.lms.service.ModuleLocalServiceUtil;
 import com.liferay.lms.service.UserCompetenceLocalServiceUtil;
@@ -69,6 +70,7 @@ import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.FriendlyURLNormalizerUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
@@ -92,6 +94,7 @@ import com.liferay.portal.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.security.permission.PermissionCheckerFactoryUtil;
 import com.liferay.portal.service.ClassNameLocalServiceUtil;
+import com.liferay.portal.service.CompanyLocalServiceUtil;
 import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.LayoutSetPrototypeLocalServiceUtil;
 import com.liferay.portal.service.MembershipRequestLocalServiceUtil;
@@ -1924,4 +1927,71 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 			return false;
 		}
 	}
+	
+	public List<CourseResultView> getFinishedCoursesOfUser(long userId, int start, int end){
+		List<CourseResultView> courses = new ArrayList<CourseResultView>();
+		
+		User user = null;
+		List<Group> groups = new ArrayList<Group>();
+		
+		try {
+			user = UserLocalServiceUtil.getUser(userId);
+			groups = GroupLocalServiceUtil.getUserGroups(userId);
+			
+		} catch (PortalException | SystemException e) {
+			e.printStackTrace();
+		}
+		
+		if(Validator.isNotNull(user) && Validator.isNotNull(groups) && groups.size()>0){
+			
+			Course course = null;
+			CourseResult courseResult = null;
+			Date finishDate = null;
+			Date now = new Date();
+			
+			try {
+				ThemeDisplay themeDisplay = new ThemeDisplay();
+				themeDisplay.setUser(user);
+				themeDisplay.setRealUser(user);
+				themeDisplay.setCompany(CompanyLocalServiceUtil.getCompany(user.getCompanyId()));
+				themeDisplay.setLanguageId(user.getLanguageId());
+				themeDisplay.setLocale(user.getLocale());
+				
+				for(Group groupCourse:groups){
+					
+					course = CourseLocalServiceUtil.fetchByGroupCreatedId(groupCourse.getGroupId());
+					
+					if(Validator.isNotNull(course)){
+						if(course.isClosed() || now.after(course.getExecutionEndDate())){
+							courseResult = CourseResultLocalServiceUtil.getByUserAndCourse(course.getCourseId(), userId);
+							courses.add(new CourseResultView(course, courseResult, themeDisplay));
+						} else {
+					     	courseResult=CourseResultLocalServiceUtil.getByUserAndCourse(course.getCourseId(), userId);
+					     	
+							finishDate = null;
+							if(Validator.isNotNull(courseResult) && Validator.isNotNull(courseResult.getAllowFinishDate())){
+								finishDate=courseResult.getAllowFinishDate();
+							}
+							if(Validator.isNull(finishDate)){
+								finishDate=course.getExecutionEndDate();
+							}
+							
+							if((Validator.isNotNull(finishDate) && finishDate.before(new Date())) || (Validator.isNotNull(courseResult) && Validator.isNotNull(courseResult.getPassedDate()))){				
+								courses.add(new CourseResultView(course, courseResult, themeDisplay));
+							}
+						}
+					}
+
+				}
+			} catch (PortalException | SystemException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		if(Validator.isNotNull(courses) && courses.size()>0){
+			courses = ListUtil.subList(courses, start, end);
+		}
+		return courses;
+	}
+	
 }
