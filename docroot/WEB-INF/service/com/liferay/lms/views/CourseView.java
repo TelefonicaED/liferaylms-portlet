@@ -42,8 +42,7 @@ public class CourseView {
 		try {
 			assetEntry = AssetEntryLocalServiceUtil.fetchEntry(Course.class.getName(), course.getCourseId());
 		} catch (SystemException e) {
-			if(log.isDebugEnabled())
-				log.debug(e.getMessage());
+			e.printStackTrace();
 		}
 		setSummary((Validator.isNotNull(assetEntry))?assetEntry.getSummary():StringPool.BLANK);
 		try {

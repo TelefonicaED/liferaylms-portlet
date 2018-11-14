@@ -74,11 +74,7 @@ public class CourseHistory extends MVCPortlet
 						finishDate=course.getExecutionEndDate();
 					}
 					
-					if(finishDate!=null && finishDate.before(new Date())){				
-						courses.add(new CourseResultView(course, courseResult, themeDisplay));
-					}
-					
-					if(courseResult != null && courseResult.getPassedDate() != null){
+					if((finishDate!=null && finishDate.before(new Date())) || (courseResult != null && courseResult.getPassedDate() != null)){				
 						courses.add(new CourseResultView(course, courseResult, themeDisplay));
 					}
 				}

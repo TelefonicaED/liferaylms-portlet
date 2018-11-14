@@ -1961,29 +1961,27 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 					
 					course = CourseLocalServiceUtil.fetchByGroupCreatedId(groupCourse.getGroupId());
 					
-					if(Validator.isNotNull(course) && (course.isClosed() || now.after(course.getExecutionEndDate()))){
-						courseResult = CourseResultLocalServiceUtil.getByUserAndCourse(course.getCourseId(), userId);
-						courses.add(new CourseResultView(course, courseResult, themeDisplay));
-					} else if (Validator.isNotNull(course)){
-				     	courseResult=CourseResultLocalServiceUtil.getByUserAndCourse(course.getCourseId(), userId);
-
-						finishDate = null;
-						if(Validator.isNotNull(courseResult) && Validator.isNotNull(courseResult.getAllowFinishDate())){
-							finishDate=courseResult.getAllowFinishDate();
-						}
-						
-						if(Validator.isNull(finishDate)){
-							finishDate=course.getExecutionEndDate();
-						}
-						
-						if(Validator.isNotNull(finishDate) && finishDate.before(new Date())){				
+					if(Validator.isNotNull(course)){
+						if(course.isClosed() || now.after(course.getExecutionEndDate())){
+							courseResult = CourseResultLocalServiceUtil.getByUserAndCourse(course.getCourseId(), userId);
 							courses.add(new CourseResultView(course, courseResult, themeDisplay));
-						}
-						
-						if(Validator.isNotNull(courseResult) && Validator.isNotNull(courseResult.getPassedDate())){
-							courses.add(new CourseResultView(course, courseResult, themeDisplay));
+						} else {
+					     	courseResult=CourseResultLocalServiceUtil.getByUserAndCourse(course.getCourseId(), userId);
+					     	
+							finishDate = null;
+							if(Validator.isNotNull(courseResult) && Validator.isNotNull(courseResult.getAllowFinishDate())){
+								finishDate=courseResult.getAllowFinishDate();
+							}
+							if(Validator.isNull(finishDate)){
+								finishDate=course.getExecutionEndDate();
+							}
+							
+							if((Validator.isNotNull(finishDate) && finishDate.before(new Date())) || (Validator.isNotNull(courseResult) && Validator.isNotNull(courseResult.getPassedDate()))){				
+								courses.add(new CourseResultView(course, courseResult, themeDisplay));
+							}
 						}
 					}
+
 				}
 			} catch (PortalException | SystemException e) {
 				e.printStackTrace();
