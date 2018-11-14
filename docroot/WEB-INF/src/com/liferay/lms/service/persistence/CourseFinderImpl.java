@@ -1273,6 +1273,9 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 				orderByColumn = "Lms_Course.courseId";
 			}
 			
+			if(Validator.isNull(orderByType))
+				orderByType = "";
+			
 			if(Validator.isNotNull(orderByColumn)){
 				if(orderByColumn.startsWith("c.")){
 					orderByColumn = StringUtil.replaceFirst(orderByColumn, "c.", "Lms_Course.");
@@ -1318,7 +1321,7 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			while (itr.hasNext()) {
 				myCourse = itr.next();
 
-				courseView = new CourseView(((BigInteger)myCourse[0]).longValue(), (String)myCourse[2], ((BigInteger)myCourse[6]).longValue());
+				courseView = new CourseView(((BigInteger)myCourse[0]).longValue(), (String)myCourse[2], ((BigInteger)myCourse[6]).longValue(), (String)myCourse[10]);
 				if(Validator.isNotNull(myCourse[5])){
 					try{
 						FileEntry fileEntry = DLAppLocalServiceUtil.getFileEntry(((BigInteger)myCourse[5]).longValue());
