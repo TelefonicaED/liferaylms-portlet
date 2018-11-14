@@ -1,5 +1,6 @@
 package com.liferay.lms.learningactivity.questiontype;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -19,9 +20,12 @@ import com.liferay.lms.service.TestQuestionLocalServiceUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PropsUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
@@ -31,6 +35,7 @@ public class DraganddropQuestionType extends BaseQuestionType {
 
 	private static final long serialVersionUID = 1L;
 
+	private static Log log = LogFactoryUtil.getLog(DraganddropQuestionType.class);
 	public long getTypeId(){
 		return 4;
 	}
@@ -97,13 +102,22 @@ public class DraganddropQuestionType extends BaseQuestionType {
 		}
 
 		List<Long> answersId = new ArrayList<Long>();
-		Element elementAnswer = null;
 		for(int i=0;i<testAnswers.size();i++){
-			elementAnswer = element.elementByID(String.valueOf(testAnswers.get(i).getAnswerId()));
-			if(elementAnswer != null)
-				answersId.add(testAnswers.get(i).getAnswerId());
+			log.debug("TEST ANSWER ID "+testAnswers.get(i).getAnswerId());
+			Iterator<Element> itElements = element.elements("answer").iterator();
+			boolean idExist = false;
+			while(!idExist && itElements.hasNext()){
+				Element questionElement = itElements.next();
+				idExist = questionElement.attributeValue("id").equals(String.valueOf(testAnswers.get(i).getAnswerId()));
+				log.debug("ID ELEMENT "+questionElement.attributeValue("id"));
+				log.debug("ID ANSWER "+testAnswers.get(i).getAnswerId());
+				log.debug("ID EXIST "+idExist);
+				if(idExist){
+					answersId.add(testAnswers.get(i).getAnswerId());
+				}
+			}
 		}
-
+		
 		if(!isCorrect(answersId, testAnswers)){
 			return INCORRECT;
 		}else{
