@@ -1,10 +1,14 @@
 package com.liferay.lms.upgrade;
 
 
+import java.io.IOException;
+import java.sql.SQLException;
 import java.util.List;
 
 import com.liferay.lms.model.LmsPrefs;
 import com.liferay.lms.service.LmsPrefsLocalServiceUtil;
+import com.liferay.portal.kernel.dao.db.DB;
+import com.liferay.portal.kernel.dao.db.DBFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
@@ -26,6 +30,40 @@ public class UpgradeVersion_3_7_0 extends UpgradeProcess {
 	protected void doUpgrade() throws Exception {
 		log.info("Actualizando version a 3.7");
 
+		
+		/*********************************************************************************************/
+		/*****************   ALTER TABLE LMS_COURSE -->> DENIED INSCRIPTION MESSAGE   **************/
+		/*********************************************************************************************/
+		
+		 String alterCourseDeniedInscription = "ALTER TABLE `lms_course` "+
+				 	"ADD COLUMN `deniedInscription` TINYINT(4) NULL DEFAULT NULL AFTER `welcomeSubject`;";
+		 
+		 String alterCourseDeniedInscriptionSubject = "ALTER TABLE `lms_course` "+
+				 	"ADD COLUMN `deniedInscriptionSubject` VARCHAR(75) NULL DEFAULT NULL AFTER `deniedInscription`;";
+		
+		 String alterCourseDeniedInscriptionMsg = "ALTER TABLE `lms_course` "+
+				 	"ADD COLUMN `deniedInscriptionMsg` LONGTEXT NULL AFTER `deniedInscriptionSubject`;";
+		 
+		//Execute SQL Queries
+		DB db = DBFactoryUtil.getDB();
+		log.info("Alter table lms_course -->> Add deniedDescription");
+		try {
+			db.runSQL(alterCourseDeniedInscription);
+		} catch (IOException | SQLException e) {
+			e.printStackTrace();
+		} 	
+		log.info("Alter table lms_course -->> Add deniedDescriptionSubject");
+		try {
+			db.runSQL(alterCourseDeniedInscriptionSubject);
+		} catch (IOException | SQLException e) {
+			e.printStackTrace();
+		} 
+		log.info("Alter table lms_course -->> Add deniedInscriptionMsg");
+		try {
+			db.runSQL(alterCourseDeniedInscriptionMsg);
+		} catch (IOException | SQLException e) {
+			e.printStackTrace();
+		} 
 		
 		/*********************************************************************************************/
 		/*****************AÑADIMOS PERMISOS AÑADIR ACTIVIDAD AL EDITOR DE CURSOS**************/
@@ -86,6 +124,5 @@ public class UpgradeVersion_3_7_0 extends UpgradeProcess {
 			}
 		}
 	}
-	
 	
 }

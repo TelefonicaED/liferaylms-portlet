@@ -204,6 +204,9 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 			newCourse.setWelcome(course.getWelcome());
 			newCourse.setWelcomeMsg(course.getWelcomeMsg());
 			newCourse.setWelcomeSubject(course.getWelcomeSubject());
+			newCourse.setDeniedInscription(course.isDeniedInscription());
+			newCourse.setDeniedInscriptionSubject(course.getDeniedInscriptionSubject());
+			newCourse.setDeniedInscriptionMsg(course.getDeniedInscriptionMsg());
 			newCourse.setGoodbye(course.getGoodbye());
 			newCourse.setGoodbyeMsg(course.getGoodbyeMsg());
 			newCourse.setGoodbyeSubject(course.getGoodbyeSubject());

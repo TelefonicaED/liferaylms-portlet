@@ -106,6 +106,12 @@
 			<hint name="max-length">500000</hint>
 		</field>
 		<field name="welcomeSubject" type="String" />
+		<field name="deniedInscription" type="boolean" />
+		<field name="deniedInscriptionMsg" type="String">
+			<hint name="display-width">1024</hint>
+			<hint name="max-length">500000</hint>
+		</field>
+		<field name="deniedInscriptionSubject" type="String" />
 		<field name="goodbye" type="boolean" />
 		<field name="goodbyeMsg" type="String">
 			<hint name="display-width">1024</hint>

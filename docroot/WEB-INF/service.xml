@@ -530,7 +530,9 @@
 		<column name="welcome" type="boolean"/>
 		<column name="welcomeMsg" type="String"/>
 		<column name="welcomeSubject" type="String"/>
-		
+		<column name="deniedInscription" type="boolean"/>
+		<column name="deniedInscriptionMsg" type="String"/>
+		<column name="deniedInscriptionSubject" type="String"/>
 		<column name="goodbye" type="boolean"/>
 		<column name="goodbyeMsg" type="String"/>
 		<column name="goodbyeSubject" type="String"/>
