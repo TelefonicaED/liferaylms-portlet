@@ -83,7 +83,7 @@ public class CourseResultView {
 					}
 				}
 			} catch (Exception e) {
-				
+				e.printStackTrace();
 			}
 		}
 		setCompetenceIdList(competenceIdList);
@@ -128,5 +128,5 @@ public class CourseResultView {
 	public void setCompetenceIdList(List<Long> competenceIdList) {
 		this.competenceIdList = competenceIdList;
 	}
-	
+
 }

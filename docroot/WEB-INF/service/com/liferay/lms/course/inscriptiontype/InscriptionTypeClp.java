@@ -208,8 +208,25 @@ public class InscriptionTypeClp implements InscriptionType {
 	@Override
 	public String setExtraContent(UploadRequest uploadRequest,
 			PortletResponse portletResponse, Course course) {
-		// TODO Auto-generated method stub
-		return null;
+		Object returnObj = null;
+
+		try {
+			MethodKey getExpecificContentPageMethod = new MethodKey(clp.getClassName(), "setExtraContent", UploadRequest.class, PortletResponse.class, Course.class); 
+			returnObj = clp.invoke(new MethodHandler(getExpecificContentPageMethod, uploadRequest, portletResponse, course));
+		}
+		catch (Throwable t) {
+			t = ClpSerializer.translateThrowable(t);
+
+			if (t instanceof RuntimeException) {
+				throw (RuntimeException)t;
+			}
+			else {
+				throw new RuntimeException(t.getClass().getName() +
+					" is not a valid exception");
+			}
+		}
+
+		return ((String)returnObj);
 	}
 	
 	

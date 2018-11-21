@@ -142,9 +142,9 @@ public class CalificationTypeClp implements CalificationType {
 	public String getSuffix(long groupId){
 		Object returnObj = null;
 
-		try {
-			MethodKey getSuffixMethod = new MethodKey(clp.getClassName(), "getSuffix"); 
-			returnObj = clp.invoke(new MethodHandler(getSuffixMethod));
+		try { 
+			MethodKey getNameMethod = new MethodKey(clp.getClassName(), "getSuffix", long.class);
+			returnObj = clp.invoke(new MethodHandler(getNameMethod, groupId));
 		}
 		catch (Throwable t) {
 			t = ClpSerializer.translateThrowable(t);
@@ -188,7 +188,7 @@ public class CalificationTypeClp implements CalificationType {
 		Object returnObj = null;
 
 		try {
-			MethodKey translateMethod = new MethodKey(clp.getClassName(), "translate", Locale.class, double.class); 
+			MethodKey translateMethod = new MethodKey(clp.getClassName(), "translate", Locale.class, CourseResult.class); 
 			returnObj = clp.invoke(new MethodHandler(translateMethod, locale, result));
 		}
 		catch (Throwable t) {
@@ -211,7 +211,7 @@ public class CalificationTypeClp implements CalificationType {
 		Object returnObj = null;
 
 		try {
-			MethodKey translateMethod = new MethodKey(clp.getClassName(), "translate", Locale.class, double.class); 
+			MethodKey translateMethod = new MethodKey(clp.getClassName(), "translate", Locale.class, LearningActivityResult.class); 
 			returnObj = clp.invoke(new MethodHandler(translateMethod, locale, result));
 		}
 		catch (Throwable t) {
@@ -233,7 +233,7 @@ public class CalificationTypeClp implements CalificationType {
 		Object returnObj = null;
 
 		try {
-			MethodKey translateMethod = new MethodKey(clp.getClassName(), "translate", Locale.class, double.class); 
+			MethodKey translateMethod = new MethodKey(clp.getClassName(), "translate", Locale.class, ModuleResult.class); 
 			returnObj = clp.invoke(new MethodHandler(translateMethod, locale, result));
 		}
 		catch (Throwable t) {
@@ -255,8 +255,8 @@ public class CalificationTypeClp implements CalificationType {
 		Object returnObj = null;
 
 		try {
-			MethodKey translateMethod = new MethodKey(clp.getClassName(), "translate", Locale.class, double.class); 
-			returnObj = clp.invoke(new MethodHandler(translateMethod, locale, result));
+			MethodKey translateMethod = new MethodKey(clp.getClassName(), "translate", Locale.class, long.class, double.class); 
+			returnObj = clp.invoke(new MethodHandler(translateMethod, locale, groupId, result));
 		}
 		catch (Throwable t) {
 			t = ClpSerializer.translateThrowable(t);
@@ -278,7 +278,8 @@ public class CalificationTypeClp implements CalificationType {
 		Object returnObj = null;
 
 		try {
-			returnObj = clp.invoke("toBase100",	new Object[] {});
+			MethodKey translateMethod = new MethodKey(clp.getClassName(), "toBase100", double.class); 
+			returnObj = clp.invoke(new MethodHandler(translateMethod, result));
 		}
 		catch (Throwable t) {
 			t = ClpSerializer.translateThrowable(t);
@@ -300,7 +301,8 @@ public class CalificationTypeClp implements CalificationType {
 		Object returnObj = null;
 
 		try {
-			returnObj = clp.invoke("toBase100",	new Object[] {});
+			MethodKey translateMethod = new MethodKey(clp.getClassName(), "toBase100", long.class, double.class); 
+			returnObj = clp.invoke(new MethodHandler(translateMethod, groupId, result));
 		}
 		catch (Throwable t) {
 			t = ClpSerializer.translateThrowable(t);
@@ -322,7 +324,8 @@ public class CalificationTypeClp implements CalificationType {
 		Object returnObj = null;
 
 		try {
-			returnObj = clp.invoke("getMinValue",	new Object[] {});
+			MethodKey getNameMethod = new MethodKey(clp.getClassName(), "getMinValue", long.class);
+			returnObj = clp.invoke(new MethodHandler(getNameMethod, groupId));
 		}
 		catch (Throwable t) {
 			t.printStackTrace();
@@ -345,7 +348,8 @@ public class CalificationTypeClp implements CalificationType {
 		Object returnObj = null;
 
 		try {
-			returnObj = clp.invoke("getMaxValue",	new Object[] {});
+			MethodKey getNameMethod = new MethodKey(clp.getClassName(), "getMaxValue", long.class);
+			returnObj = clp.invoke(new MethodHandler(getNameMethod, groupId));
 		}
 		catch (Throwable t) {
 			t = ClpSerializer.translateThrowable(t);
@@ -386,10 +390,26 @@ public class CalificationTypeClp implements CalificationType {
 	}
 
 	@Override
-	public String setExtraContent(UploadRequest uploadRequest,
-			PortletResponse portletResponse, Course course) {
-		// TODO Auto-generated method stub
-		return null;
+	public String setExtraContent(UploadRequest uploadRequest, PortletResponse portletResponse, Course course) {
+		Object returnObj = null;
+
+		try {
+			MethodKey getExpecificContentPageMethod = new MethodKey(clp.getClassName(), "setExtraContent", UploadRequest.class, PortletResponse.class, Course.class); 
+			returnObj = clp.invoke(new MethodHandler(getExpecificContentPageMethod, uploadRequest, portletResponse, course));
+		}
+		catch (Throwable t) {
+			t = ClpSerializer.translateThrowable(t);
+
+			if (t instanceof RuntimeException) {
+				throw (RuntimeException)t;
+			}
+			else {
+				throw new RuntimeException(t.getClass().getName() +
+					" is not a valid exception");
+			}
+		}
+
+		return ((String)returnObj);
 	}
 	
 	
