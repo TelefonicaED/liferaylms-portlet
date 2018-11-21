@@ -904,6 +904,9 @@ public class CoursePersistenceImpl extends BasePersistenceImpl<Course>
 		courseImpl.setWelcome(course.isWelcome());
 		courseImpl.setWelcomeMsg(course.getWelcomeMsg());
 		courseImpl.setWelcomeSubject(course.getWelcomeSubject());
+		courseImpl.setDeniedInscription(course.isDeniedInscription());
+		courseImpl.setDeniedInscriptionMsg(course.getDeniedInscriptionMsg());
+		courseImpl.setDeniedInscriptionSubject(course.getDeniedInscriptionSubject());
 		courseImpl.setGoodbye(course.isGoodbye());
 		courseImpl.setGoodbyeMsg(course.getGoodbyeMsg());
 		courseImpl.setGoodbyeSubject(course.getGoodbyeSubject());

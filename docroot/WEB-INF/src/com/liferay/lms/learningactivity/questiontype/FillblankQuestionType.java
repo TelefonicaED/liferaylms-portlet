@@ -121,6 +121,7 @@ public class FillblankQuestionType extends BaseQuestionType {
 					log.debug("CORRECT "+i);
 					correctAnswers++;
 				}
+				i++;
 			}
 			if(sols.size()>0){
 				double puntuation = correctAnswers*100.0/sols.size(); 

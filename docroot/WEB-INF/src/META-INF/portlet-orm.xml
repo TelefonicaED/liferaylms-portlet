@@ -164,6 +164,9 @@
 			<basic name="welcome" />
 			<basic name="welcomeMsg" />
 			<basic name="welcomeSubject" />
+			<basic name="deniedInscription" />
+			<basic name="deniedInscriptionMsg" />
+			<basic name="deniedInscriptionSubject" />
 			<basic name="goodbye" />
 			<basic name="goodbyeMsg" />
 			<basic name="goodbyeSubject" />

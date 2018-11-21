@@ -4,6 +4,8 @@
 <%@ include file="/init.jsp" %>
 
 <liferay-ui:error key="course.full" message="course.full" />
+<liferay-ui:error key="course-inscription.error.deny" message="course-inscription.error.deny" />
+<liferay-ui:success key="course-inscription.success.deny" message="course-inscription.success.deny" />
 
 <liferay-ui:message key="inscription.petition" />: ${searchContainer.total}  <liferay-ui:message key="inscription.totalUsers" />: ${numberUsers}${maxUsers}
 <%SimpleDateFormat sdf = new SimpleDateFormat("hh:mm dd/MM/yyyy"); %>

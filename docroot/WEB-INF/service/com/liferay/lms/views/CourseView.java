@@ -3,7 +3,10 @@ package com.liferay.lms.views;
 import java.util.Date;
 import java.util.List;
 
+import com.liferay.lms.learningactivity.calificationtype.CalificationType;
+import com.liferay.lms.learningactivity.calificationtype.CalificationTypeRegistry;
 import com.liferay.lms.model.Course;
+import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
@@ -34,6 +37,7 @@ public class CourseView {
 	private Date executionStartDate;
 	private Date executionEndDate;
 	private String summary;
+	private CalificationType calificationType;
 	
 	public CourseView(Course course, ThemeDisplay themeDisplay){
 		setCourseId(course.getCourseId());
@@ -60,11 +64,7 @@ public class CourseView {
 					setLogoURL("/image/layout_set_logo?img_id=" + groupCourse.getPublicLayoutSet().getLogoId());
 				}	
 			}
-		} catch (PortalException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (SystemException e) {
-			// TODO Auto-generated catch block
+		} catch (PortalException | SystemException e) {
 			e.printStackTrace();
 		}
 		
@@ -74,6 +74,7 @@ public class CourseView {
 		setGroupId(course.getGroupCreatedId());
 		setExecutionStartDate(course.getExecutionStartDate());
 		setExecutionEndDate(course.getExecutionEndDate());
+		setCalificationType(new CalificationTypeRegistry().getCalificationType(course.getCalificationType()));
 	}
 	
 	public CourseView(long courseId, String title, long groupId){
@@ -173,6 +174,23 @@ public class CourseView {
 	
 	public void setSummary(String summary){
 		this.summary = summary;
+	}
+	
+	public CalificationType getCalificationType(){
+		if(Validator.isNull(calificationType)){
+			try {
+				Course course = CourseLocalServiceUtil.fetchCourse(courseId);
+				if(Validator.isNotNull(course))
+					calificationType = new CalificationTypeRegistry().getCalificationType(course.getCalificationType());
+			} catch (SystemException e) {
+				e.printStackTrace();
+			}
+		}
+		return calificationType;
+	}
+	
+	public void setCalificationType(CalificationType calificationType){
+		this.calificationType = calificationType;
 	}
 
 }

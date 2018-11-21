@@ -25,7 +25,11 @@
 	</c:if>
 	<c:if test="${not empty modules }">
 		<c:set var="fila" value="0"/>
-		
+		<liferay-portlet:resourceURL var="exportAllURL" >
+			<portlet:param name="action" value="exportAll"/>
+			<portlet:param name="teamId" value="${teamId }" />
+		</liferay-portlet:resourceURL>
+		<liferay-ui:icon image="export" label="true" message="offlinetaskactivity.csv.export" method="get" url="${exportAllURL }" />
 		<c:forEach items="${modules }" var="module">
 			<liferay-ui:panel id="${module.moduleId }" title="${module.getTitle(themeDisplay.locale) }" collapsible="true" extended="true" defaultState="${fila == 0 ? 'open' : 'collapsed' }">
 				<liferay-portlet:resourceURL var="exportURL" >

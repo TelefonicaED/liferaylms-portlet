@@ -620,8 +620,19 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 		String goodbyeSubject = ParamUtil.getString(uploadRequest, "goodbyeSubject",StringPool.BLANK);
 		String goodbyeMsg = ParamUtil.getString(uploadRequest, "goodbyeMsg",StringPool.BLANK);
 
-		int type = ParamUtil.getInteger(uploadRequest, "type", GroupConstants.TYPE_SITE_OPEN);
+		int registrationType = ParamUtil.getInteger(uploadRequest, "registrationType", GroupConstants.TYPE_SITE_OPEN);
 		int maxusers = ParamUtil.getInteger(uploadRequest, "maxUsers");
+		
+		boolean activeDeniedInscriptionMessage = Boolean.FALSE;
+		String deniedInscriptionSubject = StringPool.BLANK;
+		String deniedInscriptionMsg = StringPool.BLANK;
+		if(registrationType==GroupConstants.TYPE_SITE_RESTRICTED){
+			activeDeniedInscriptionMessage = ParamUtil.getBoolean(uploadRequest, "deniedInscriptionMessage", Boolean.FALSE);
+			if(activeDeniedInscriptionMessage){
+				deniedInscriptionSubject = ParamUtil.getString(uploadRequest, "deniedInscriptionSubject", StringPool.BLANK);
+				deniedInscriptionMsg = ParamUtil.getString(uploadRequest, "deniedInscriptionMsg", StringPool.BLANK);
+			}
+		}
 		
 		Course course = null;
 		long courseEvalId = 0;
@@ -794,7 +805,7 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 			try{
 				course = CourseLocalServiceUtil.addCourse(
 						titleMap, description, summary, friendlyURL,
-						themeDisplay.getLocale(), ahora, startDate, stopDate, startExecutionDate.getTime(), stopExecutionDate.getTime() , courseTemplateId,type,courseEvalId,
+						themeDisplay.getLocale(), ahora, startDate, stopDate, startExecutionDate.getTime(), stopExecutionDate.getTime() , courseTemplateId,registrationType,courseEvalId,
 						courseCalificationType,maxusers,serviceContext,false);
 				course.setInscriptionType(inscriptionType);
 				try{
@@ -856,7 +867,7 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 				course.setInscriptionType(inscriptionType);
 				course.setMaxusers(maxusers);
 				if(Validator.isNotNull(friendlyURL))course.setFriendlyURL(friendlyURL);
-				serviceContext.setAttribute("type", String.valueOf(type));
+				serviceContext.setAttribute("type", String.valueOf(registrationType));
 				/*
 				 * Se llama más abajo
 				 * com.liferay.lms.service.CourseLocalServiceUtil.modCourse(course,
@@ -930,7 +941,7 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 				course.setIcon(0);
 			}
 
-			//Miramos si hay imagen en WelcomeMsg y GoobyeMsg con dominio correcto
+			//Miramos si hay imagen en WelcomeMsg, GoobyeMsg, DeniedInscriptionMsg con dominio correcto
 			String dominio = themeDisplay.getURLPortal();
 			
 			welcomeMsg = welcomeMsg.contains("img") ? 
@@ -940,11 +951,18 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 			goodbyeMsg = goodbyeMsg.contains("img") ? 
 						 goodbyeMsg.replace("src=\"/", "src=\"" + dominio + StringPool.SLASH) :  
 						 goodbyeMsg;
+						 
+			deniedInscriptionMsg = deniedInscriptionMsg.contains("img") ? 
+					deniedInscriptionMsg.replace("src=\"/", "src=\"" + dominio + StringPool.SLASH) :  
+					deniedInscriptionMsg;
 
 			course.setCourseEvalId(courseEvalId);
 			course.setWelcome(welcome);
 			course.setWelcomeSubject(welcomeSubject);
 			course.setWelcomeMsg(welcomeMsg);
+			course.setDeniedInscription(activeDeniedInscriptionMessage);
+			course.setDeniedInscriptionSubject(deniedInscriptionSubject);
+			course.setDeniedInscriptionMsg(deniedInscriptionMsg);
 			course.setGoodbye(goodbye);
 			course.setGoodbyeSubject(goodbyeSubject);
 			course.setGoodbyeMsg(goodbyeMsg);
@@ -994,7 +1012,7 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 				}
 				
 				try{
-					serviceContext.setAttribute("type", String.valueOf(type));
+					serviceContext.setAttribute("type", String.valueOf(registrationType));
 					PermissionChecker permissionChecker = PermissionCheckerFactoryUtil
 							.getPermissionCheckerFactory().create(user);
 					log.debug("Updating the course");

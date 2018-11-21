@@ -189,7 +189,7 @@ int endExecutionMin=ParamUtil.getInteger(request, "stopExecutionMin", Integer.pa
 String summary="";
 AssetEntry entry=null;
 boolean visibleencatalogo=false;
-int type = GroupConstants.TYPE_SITE_OPEN;
+int registrationType = GroupConstants.TYPE_SITE_OPEN;
 long maxUsers = 0;
 Group groupCreated = null;
 long assetEntryId=0;
@@ -220,6 +220,7 @@ boolean showCoursePermission = preferences.getValue("showCoursePermission", "tru
 
 String welcomeSubject= new String();
 String goodbyeSubject = new String();
+String deniedInscriptionSubject = new String();
 if(course!=null){
 	groupCreated = GroupLocalServiceUtil.getGroup(course.getGroupCreatedId());
 	entry=AssetEntryLocalServiceUtil.getEntry(Course.class.getName(),course.getCourseId());
@@ -255,12 +256,16 @@ if(course!=null){
 		endExecutionMin=Integer.parseInt(formatMin.format(course.getExecutionEndDate()));
 	}
 	
-	type=course.getStatus(); //TODO
 	welcomeSubject = course.getWelcomeSubject();
 	goodbyeSubject = course.getGoodbyeSubject();
+	deniedInscriptionSubject = course.getDeniedInscriptionSubject();
 	maxUsers=course.getMaxusers();
 	courseTitle = (String)course.getModelAttributes().get("title");
 	isInCourse = (course.getGroupCreatedId() == themeDisplay.getScopeGroupId());
+	
+	if(groupCreated!=null)
+		registrationType = groupCreated.getType();
+	
 	%>
 	<aui:model-context bean="<%= course %>" model="<%= Course.class %>" />
 	<%
@@ -767,10 +772,10 @@ if(course!=null){
 	
 			<c:choose>
 	      		<c:when test="<%=(!showRegistrationType)||(sites!=null&&sites.size()==1)%>">
-					<aui:input name="type" type="hidden" value="<%= sites.toArray()[0] %>" />
+					<aui:input name="registrationType" type="hidden" value="<%= sites.toArray()[0] %>" />
 	      		</c:when>
 	      		<c:otherwise>
-					<aui:select name="type" label="registration-type" helpMessage="<%=LanguageUtil.get(pageContext,\"type-method-help\")%>">
+					<aui:select name="registrationType" label="registration-type" helpMessage="<%=LanguageUtil.get(pageContext,\"type-method-help\")%>" onChange="javascript:${renderResponse.getNamespace() }changeRegistrationType(this)">
 						<c:choose>
 				    		<c:when test="<%=groupCreated==null%>">
 				      			<c:if test="<%=sites==null||(sites.size()>0&&sites.contains(GroupConstants.TYPE_SITE_OPEN)) %>">
@@ -1039,8 +1044,96 @@ if(course!=null){
 				
 			</liferay-ui:panel>
 		</c:if>
+	
+		<%
+			boolean activeDeniedInscriptionMessage =(course!=null&&course.isDeniedInscription()?true:false);  
+			String deniedInscriptionMsg = (course!=null&&course.getDeniedInscriptionMsg()!=null?course.getDeniedInscriptionMsg():"");
+		%>	
+		<div id="panelDeniedInscription" style='display:<%=groupCreated!=null && groupCreated.getType()==GroupConstants.TYPE_SITE_RESTRICTED?"block":"none"%>'>
+			<liferay-ui:panel title="denied-inscription-msg" collapsible="true" defaultState='<%=activeDeniedInscriptionMessage?"open":"closed" %>'>
+				<aui:input type="checkbox" name="deniedInscriptionMessage" label="enabled" value='<%=activeDeniedInscriptionMessage %>' onChange="javascript:${renderResponse.getNamespace() }enableDeniedInscriptionMessage();"/>
+				
+				<div id="containerDeniedInscriptionMsg" style='display:<%=activeDeniedInscriptionMessage?"block":"none"%>'>
+				
+					<aui:input name="deniedInscriptionSubject" size="100"  type="text" label="denied-inscription-subject" value="<%=deniedInscriptionSubject%>">
+						<aui:validator name="maxLength">75</aui:validator>
+					</aui:input>
+				
+					<aui:field-wrapper label="denied-inscription-msg" name="deniedInscriptionMsg">
+					
+						<script>
+							function <portlet:namespace />onChangeDeniedInscriptionMsg(val) {
+					        	var A = AUI();
+								A.one('#<portlet:namespace />deniedInscriptionMsg').set('value',val);
+					        }
+						</script>
+						<liferay-ui:input-editor toolbarSet="slimmer" name="deniedInscriptionMsg" width="100%" onChangeMethod="onChangeDeniedInscriptionMsg" initMethod="initEditorDeniedInscriptionMsg" />
+						<script>
+		    		    	function <portlet:namespace />initEditorDeniedInscriptionMsg() { return "<%= UnicodeFormatter.toString(deniedInscriptionMsg) %>"; }
+		    			</script>
+		    			
+					</aui:field-wrapper>
+					<div class="definition-of-terms">
+						<h4><liferay-ui:message key="definition-of-terms" /></h4>
+		
+						<dl>
+							<dt>
+								[$PAGE_URL$]
+							</dt>
+							<dd>
+								<%= themeDisplay.getURLPortal()+"/web"+((course!=null&&course.getFriendlyURL()!=null)?course.getFriendlyURL():StringPool.BLANK) %>
+							</dd>
+							<dt>
+								[$TITLE_COURSE$]
+							</dt>
+							<dd>
+								<%=(course!=null?course.getTitle(themeDisplay.getLocale()):StringPool.BLANK) %>
+							</dd>
+							<dt>
+								[$FROM_ADDRESS$]
+							</dt>
+							<dd>
+								<%= HtmlUtil.escape(PrefsPropsUtil.getString(themeDisplay.getCompanyId(),PropsKeys.ADMIN_EMAIL_FROM_ADDRESS)) %>
+							</dd>
+							<dt>
+								[$FROM_NAME$]
+							</dt>
+							<dd>
+								<%= HtmlUtil.escape(PrefsPropsUtil.getString(themeDisplay.getCompanyId(),PropsKeys.ADMIN_EMAIL_FROM_NAME)) %>
+							</dd>
+							<dt>
+								[$PORTAL_URL$]
+							</dt>
+							<dd>
+								<%= company.getVirtualHostname() %>
+							</dd>
+							<dt>
+								[$TO_ADDRESS$]
+							</dt>
+							<dd>
+								<liferay-ui:message key="the-address-of-the-email-recipient" />
+							</dd>
+							<dt>
+								[$TO_NAME$]
+							</dt>
+							<dd>
+								<liferay-ui:message key="the-name-of-the-email-recipient" />
+							</dd>
+							<dt>
+								[$USER_SCREENNAME$]
+							</dt>
+							<dd>
+								<liferay-ui:message key="the-user-screen-name" />
+							</dd>
+						</dl>
+					</div>
+				</div>
+				
+			</liferay-ui:panel>
+		</div>
 		
 	</liferay-ui:panel-container>
+	
 	<c:choose>
 		<c:when test="<%=isCourseChild%>">
 			<liferay-portlet:renderURL var="cancelURL">
@@ -1068,6 +1161,24 @@ if(course!=null){
 		if(div.style.display&&div.style.display=='none'){
 			div.style.display='block';
 		}else{
+			div.style.display='none';
+		}
+	}
+	
+	function <portlet:namespace />enableDeniedInscriptionMessage(){
+		var div = document.getElementById("containerDeniedInscriptionMsg");
+		if(div.style.display&&div.style.display=='none'){
+			div.style.display='block';
+		}else{
+			div.style.display='none';
+		}
+	}
+	
+	function <portlet:namespace />changeRegistrationType(registrationType){
+		var div = document.getElementById("panelDeniedInscription");
+		if(registrationType.value == <%=GroupConstants.TYPE_SITE_RESTRICTED%> && div.style.display&&div.style.display=='none'){
+			div.style.display='block';
+		} else if(div.style.display&&div.style.display=='block'){
 			div.style.display='none';
 		}
 	}
@@ -1101,5 +1212,5 @@ if(course!=null){
 	   			serviceParameterTypes: JSON.stringify(['java.lang.Long', 'java.lang.Long', 'java.lang.String'])
 	   		}
 	   	);
-	} 
+	}
 </script>

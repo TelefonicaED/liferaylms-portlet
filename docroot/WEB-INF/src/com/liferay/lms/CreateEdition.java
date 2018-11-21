@@ -177,6 +177,9 @@ public class CreateEdition extends CourseCopyUtil implements MessageListener {
 			newCourse.setWelcome(course.getWelcome());
 			newCourse.setWelcomeMsg(course.getWelcomeMsg());
 			newCourse.setWelcomeSubject(course.getWelcomeSubject());
+			newCourse.setDeniedInscription(course.isDeniedInscription());
+			newCourse.setDeniedInscriptionSubject(course.getDeniedInscriptionSubject());
+			newCourse.setDeniedInscriptionMsg(course.getDeniedInscriptionMsg());
 			newCourse.setGoodbye(course.getGoodbye());
 			newCourse.setExecutionStartDate(startExecutionDate);
 			newCourse.setExecutionEndDate(endExecutionDate);

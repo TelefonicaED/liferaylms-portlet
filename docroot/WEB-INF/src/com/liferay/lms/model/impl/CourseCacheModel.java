@@ -34,7 +34,7 @@ import java.util.Date;
 public class CourseCacheModel implements CacheModel<Course>, Serializable {
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(71);
+		StringBundler sb = new StringBundler(77);
 
 		sb.append("{uuid=");
 		sb.append(uuid);
@@ -94,6 +94,12 @@ public class CourseCacheModel implements CacheModel<Course>, Serializable {
 		sb.append(welcomeMsg);
 		sb.append(", welcomeSubject=");
 		sb.append(welcomeSubject);
+		sb.append(", deniedInscription=");
+		sb.append(deniedInscription);
+		sb.append(", deniedInscriptionMsg=");
+		sb.append(deniedInscriptionMsg);
+		sb.append(", deniedInscriptionSubject=");
+		sb.append(deniedInscriptionSubject);
 		sb.append(", goodbye=");
 		sb.append(goodbye);
 		sb.append(", goodbyeMsg=");
@@ -232,6 +238,22 @@ public class CourseCacheModel implements CacheModel<Course>, Serializable {
 			courseImpl.setWelcomeSubject(welcomeSubject);
 		}
 
+		courseImpl.setDeniedInscription(deniedInscription);
+
+		if (deniedInscriptionMsg == null) {
+			courseImpl.setDeniedInscriptionMsg(StringPool.BLANK);
+		}
+		else {
+			courseImpl.setDeniedInscriptionMsg(deniedInscriptionMsg);
+		}
+
+		if (deniedInscriptionSubject == null) {
+			courseImpl.setDeniedInscriptionSubject(StringPool.BLANK);
+		}
+		else {
+			courseImpl.setDeniedInscriptionSubject(deniedInscriptionSubject);
+		}
+
 		courseImpl.setGoodbye(goodbye);
 
 		if (goodbyeMsg == null) {
@@ -298,6 +320,9 @@ public class CourseCacheModel implements CacheModel<Course>, Serializable {
 	public boolean welcome;
 	public String welcomeMsg;
 	public String welcomeSubject;
+	public boolean deniedInscription;
+	public String deniedInscriptionMsg;
+	public String deniedInscriptionSubject;
 	public boolean goodbye;
 	public String goodbyeMsg;
 	public String goodbyeSubject;
