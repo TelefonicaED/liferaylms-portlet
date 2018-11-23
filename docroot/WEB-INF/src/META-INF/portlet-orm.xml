@@ -231,6 +231,81 @@
 			<transient name="userUuid" />
 		</attributes>
 	</mapped-superclass>
+	<mapped-superclass class="com.liferay.lms.model.impl.CourseTypeModelImpl">
+		<attributes>
+			<id name="courseTypeId" />
+			<basic name="companyId" />
+			<basic name="userId" />
+			<basic name="groupId" />
+			<basic name="userName" />
+			<basic name="createDate">
+				<temporal>TIMESTAMP</temporal>
+			</basic>
+			<basic name="modifiedDate">
+				<temporal>TIMESTAMP</temporal>
+			</basic>
+			<basic name="name" />
+			<basic name="description" />
+			<transient name="descriptionCurrentLanguageId" />
+			<transient name="descriptionMap" />
+			<transient name="modelAttributes" />
+			<transient name="nameCurrentLanguageId" />
+			<transient name="nameMap" />
+			<transient name="primaryKey" />
+			<transient name="primaryKeyObj" />
+			<transient name="userUuid" />
+		</attributes>
+	</mapped-superclass>
+	<mapped-superclass class="com.liferay.lms.model.impl.CourseTypeCalificationTypeModelImpl">
+		<attributes>
+			<id name="courseTypeCalificationTypeId" />
+			<basic name="courseTypeId" />
+			<basic name="calificationType" />
+			<transient name="modelAttributes" />
+			<transient name="primaryKey" />
+			<transient name="primaryKeyObj" />
+		</attributes>
+	</mapped-superclass>
+	<mapped-superclass class="com.liferay.lms.model.impl.CourseTypeCourseEvalModelImpl">
+		<attributes>
+			<id name="courseTypeEvalutationTypeId" />
+			<basic name="courseTypeId" />
+			<basic name="courseEvalId" />
+			<transient name="modelAttributes" />
+			<transient name="primaryKey" />
+			<transient name="primaryKeyObj" />
+		</attributes>
+	</mapped-superclass>
+	<mapped-superclass class="com.liferay.lms.model.impl.CourseTypeInscriptionTypeModelImpl">
+		<attributes>
+			<id name="courseTypeInscriptionTypeId" />
+			<basic name="courseTypeId" />
+			<basic name="inscriptionType" />
+			<transient name="modelAttributes" />
+			<transient name="primaryKey" />
+			<transient name="primaryKeyObj" />
+		</attributes>
+	</mapped-superclass>
+	<mapped-superclass class="com.liferay.lms.model.impl.CourseTypeLearningActivityModelImpl">
+		<attributes>
+			<id name="courseTypeLearningActivityId" />
+			<basic name="courseTypeId" />
+			<basic name="learningActivityTypeId" />
+			<transient name="modelAttributes" />
+			<transient name="primaryKey" />
+			<transient name="primaryKeyObj" />
+		</attributes>
+	</mapped-superclass>
+	<mapped-superclass class="com.liferay.lms.model.impl.CourseTypeTemplateModelImpl">
+		<attributes>
+			<id name="courseTypeTemplateId" />
+			<basic name="courseTypeId" />
+			<basic name="templateId" />
+			<transient name="modelAttributes" />
+			<transient name="primaryKey" />
+			<transient name="primaryKeyObj" />
+		</attributes>
+	</mapped-superclass>
 	<mapped-superclass class="com.liferay.lms.model.impl.LearningActivityModelImpl">
 		<attributes>
 			<id name="actId" />
@@ -590,6 +665,30 @@
 	</entity>
 	<entity class="com.liferay.lms.model.impl.CourseResultImpl" name="CourseResult">
 		<table name="Lms_CourseResult" />
+		<attributes />
+	</entity>
+	<entity class="com.liferay.lms.model.impl.CourseTypeImpl" name="CourseType">
+		<table name="Lms_CourseType" />
+		<attributes />
+	</entity>
+	<entity class="com.liferay.lms.model.impl.CourseTypeCalificationTypeImpl" name="CourseTypeCalificationType">
+		<table name="Lms_CourseTypeCalificationType" />
+		<attributes />
+	</entity>
+	<entity class="com.liferay.lms.model.impl.CourseTypeCourseEvalImpl" name="CourseTypeCourseEval">
+		<table name="Lms_CourseTypeCourseEval" />
+		<attributes />
+	</entity>
+	<entity class="com.liferay.lms.model.impl.CourseTypeInscriptionTypeImpl" name="CourseTypeInscriptionType">
+		<table name="Lms_CourseTypeInscriptionType" />
+		<attributes />
+	</entity>
+	<entity class="com.liferay.lms.model.impl.CourseTypeLearningActivityImpl" name="CourseTypeLearningActivity">
+		<table name="Lms_CourseTypeLearningActivity" />
+		<attributes />
+	</entity>
+	<entity class="com.liferay.lms.model.impl.CourseTypeTemplateImpl" name="CourseTypeTemplate">
+		<table name="Lms_CourseTypeTemplate" />
 		<attributes />
 	</entity>
 	<entity class="com.liferay.lms.model.impl.LearningActivityImpl" name="LearningActivity">
