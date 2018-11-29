@@ -33,7 +33,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
  * This is a local service. Methods of this service will not have security checks based on the propagated JAAS credentials because this service can only be accessed from within the same VM.
  * </p>
  *
- * @author TLS
+ * @author TED
  * @see com.liferay.lms.service.base.CourseTypeCalificationTypeLocalServiceBaseImpl
  * @see com.liferay.lms.service.CourseTypeCalificationTypeLocalServiceUtil
  */
@@ -53,5 +53,24 @@ public class CourseTypeCalificationTypeLocalServiceImpl
 	
 	public List<CourseTypeCalificationType> getByCourseTypeId(long courseTypeId) throws SystemException{
 		return courseTypeCalificationTypePersistence.findByCourseTypeId(courseTypeId);
+	}
+	
+	public CourseTypeCalificationType addCourseTypeCalificationType(long courseTypeId, long calificationTypeId) throws SystemException{
+		if(log.isDebugEnabled()){
+			log.debug("::addCourseTypeCalificationType:: courseTypeId :: " + courseTypeId);
+			log.debug("::addCourseTypeCalificationType:: calificationTypeId :: " + calificationTypeId);
+		}
+		//PK Field
+		CourseTypeCalificationType courseTypeCalificationType = courseTypeCalificationTypePersistence.create(counterLocalService.increment(CourseTypeCalificationType.class.getName()));
+		//Description fields
+		courseTypeCalificationType.setCourseTypeId(courseTypeId);
+		courseTypeCalificationType.setCalificationType(calificationTypeId);
+		courseTypeCalificationTypePersistence.update(courseTypeCalificationType, Boolean.TRUE);
+		return courseTypeCalificationType;
+	}
+	
+	public void addListCourseTypeCalificationTypes(long courseTypeId, long[] listCalificationTypeIds) throws SystemException{
+		for(long calificationTypeId:listCalificationTypeIds)
+			courseTypeCalificationTypeLocalService.addCourseTypeCalificationType(courseTypeId, calificationTypeId);
 	}
 }

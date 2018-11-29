@@ -33,7 +33,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
  * This is a local service. Methods of this service will not have security checks based on the propagated JAAS credentials because this service can only be accessed from within the same VM.
  * </p>
  *
- * @author TLS
+ * @author TED
  * @see com.liferay.lms.service.base.CourseTypeTemplateLocalServiceBaseImpl
  * @see com.liferay.lms.service.CourseTypeTemplateLocalServiceUtil
  */
@@ -53,5 +53,24 @@ public class CourseTypeTemplateLocalServiceImpl
 	
 	public List<CourseTypeTemplate> getByCourseTypeId(long courseTypeId) throws SystemException{
 		return courseTypeTemplatePersistence.findByCourseTypeId(courseTypeId);
+	}
+	
+	public CourseTypeTemplate addCourseTypeTemplate(long courseTypeId, long templateId) throws SystemException{
+		if(log.isDebugEnabled()){
+			log.debug("::addCourseTypeTemplate:: courseTypeId :: " + courseTypeId);
+			log.debug("::addCourseTypeTemplate:: templateId :: " + templateId);
+		}
+		//PK field
+		CourseTypeTemplate courseTypeTemplate =  courseTypeTemplatePersistence.create(counterLocalService.increment(CourseTypeTemplate.class.getName()));
+		//Description fields
+		courseTypeTemplate.setCourseTypeId(courseTypeId);
+		courseTypeTemplate.setTemplateId(templateId);
+		courseTypeTemplatePersistence.update(courseTypeTemplate, Boolean.TRUE);
+		return courseTypeTemplate;
+	}
+	
+	public void addListCourseTypeTemplates(long courseTypeId, long[] listTemplateIds) throws SystemException{
+		for(long templateId:listTemplateIds)
+			courseTypeTemplateLocalService.addCourseTypeTemplate(courseTypeId, templateId);
 	}
 }

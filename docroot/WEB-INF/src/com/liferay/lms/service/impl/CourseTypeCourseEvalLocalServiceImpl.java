@@ -33,7 +33,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
  * This is a local service. Methods of this service will not have security checks based on the propagated JAAS credentials because this service can only be accessed from within the same VM.
  * </p>
  *
- * @author TLS
+ * @author TED
  * @see com.liferay.lms.service.base.CourseTypeCourseEvalLocalServiceBaseImpl
  * @see com.liferay.lms.service.CourseTypeCourseEvalLocalServiceUtil
  */
@@ -53,5 +53,24 @@ public class CourseTypeCourseEvalLocalServiceImpl
 	
 	public List<CourseTypeCourseEval> getByCourseTypeId(long courseTypeId) throws SystemException{
 		return courseTypeCourseEvalPersistence.findByCourseTypeId(courseTypeId);
+	}
+	
+	public CourseTypeCourseEval addCourseTypeCourseEval(long courseTypeId, long courseEvalId) throws SystemException{
+		if(log.isDebugEnabled()){
+			log.debug("::addCourseTypeCourseEval:: courseTypeId :: " + courseTypeId);
+			log.debug("::addCourseTypeCourseEval:: courseEvalId :: " + courseEvalId);
+		}
+		//PK Field
+		CourseTypeCourseEval courseTypeCourseEval = courseTypeCourseEvalPersistence.create(counterLocalService.increment(CourseTypeCourseEval.class.getName()));
+		//Description fields
+		courseTypeCourseEval.setCourseTypeId(courseTypeId);
+		courseTypeCourseEval.setCourseEvalId(String.valueOf(courseEvalId));
+		courseTypeCourseEvalPersistence.update(courseTypeCourseEval, Boolean.TRUE);
+		return courseTypeCourseEval;
+	}
+	
+	public void addListCourseTypeCourseEvals(long courseTypeId, long[] listCourseEvalIds) throws SystemException{
+		for(long courseEvalId:listCourseEvalIds)
+			courseTypeCourseEvalLocalService.addCourseTypeCourseEval(courseTypeId, courseEvalId);
 	}
 }

@@ -51,7 +51,26 @@ public class CourseTypeInscriptionTypeLocalServiceImpl
 		return courseTypeInscriptionTypePersistence.findByCourseTypeInscriptionTypeId(courseTypeInscriptionTypeId);
 	}
 	
-	public List<CourseTypeInscriptionType> getByCourseTypeID(long courseTypeId) throws SystemException{
+	public List<CourseTypeInscriptionType> getByCourseTypeId(long courseTypeId) throws SystemException{
 		return courseTypeInscriptionTypePersistence.findByCourseTypeId(courseTypeId);
+	}
+	
+	public CourseTypeInscriptionType addCourseTypeInscriptionType(long courseTypeId, long inscriptionTypeId) throws SystemException{
+		if(log.isDebugEnabled()){
+			log.debug("::addCourseTypeInscriptionType:: courseTypeId :: " + courseTypeId);
+			log.debug("::addCourseTypeInscriptionType:: inscriptionTypeId :: " + inscriptionTypeId);
+		}
+		//PK Field
+		CourseTypeInscriptionType courseTypeInscriptionType = courseTypeInscriptionTypePersistence.create(counterLocalService.increment(CourseTypeInscriptionType.class.getName()));
+		//Description fields
+		courseTypeInscriptionType.setCourseTypeId(courseTypeId);
+		courseTypeInscriptionType.setInscriptionType(inscriptionTypeId);;
+		courseTypeInscriptionTypePersistence.update(courseTypeInscriptionType, Boolean.TRUE);
+		return courseTypeInscriptionType;
+	}
+	
+	public void addListCourseTypeInscriptionTypes(long courseTypeId, long[] listInscriptionTypeIds) throws SystemException{
+		for(long inscriptionTypeId:listInscriptionTypeIds)
+			courseTypeInscriptionTypeLocalService.addCourseTypeInscriptionType(courseTypeId, inscriptionTypeId);
 	}
 }
