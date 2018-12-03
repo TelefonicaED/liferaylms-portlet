@@ -11,6 +11,7 @@ import java.util.Map;
 import javax.portlet.PortletURL;
 
 import com.liferay.lms.model.Course;
+import com.liferay.lms.model.CourseType;
 import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;

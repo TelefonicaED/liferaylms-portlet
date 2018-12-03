@@ -2225,6 +2225,18 @@ public class UserCompetencePersistenceImpl extends BasePersistenceImpl<UserCompe
 	protected CourseCompetencePersistence courseCompetencePersistence;
 	@BeanReference(type = CourseResultPersistence.class)
 	protected CourseResultPersistence courseResultPersistence;
+	@BeanReference(type = CourseTypePersistence.class)
+	protected CourseTypePersistence courseTypePersistence;
+	@BeanReference(type = CourseTypeCalificationTypePersistence.class)
+	protected CourseTypeCalificationTypePersistence courseTypeCalificationTypePersistence;
+	@BeanReference(type = CourseTypeCourseEvalPersistence.class)
+	protected CourseTypeCourseEvalPersistence courseTypeCourseEvalPersistence;
+	@BeanReference(type = CourseTypeInscriptionTypePersistence.class)
+	protected CourseTypeInscriptionTypePersistence courseTypeInscriptionTypePersistence;
+	@BeanReference(type = CourseTypeLearningActivityPersistence.class)
+	protected CourseTypeLearningActivityPersistence courseTypeLearningActivityPersistence;
+	@BeanReference(type = CourseTypeTemplatePersistence.class)
+	protected CourseTypeTemplatePersistence courseTypeTemplatePersistence;
 	@BeanReference(type = LearningActivityPersistence.class)
 	protected LearningActivityPersistence learningActivityPersistence;
 	@BeanReference(type = LearningActivityResultPersistence.class)

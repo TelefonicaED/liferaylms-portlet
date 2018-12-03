@@ -11,6 +11,12 @@
 	<import class="com.liferay.lms.model.Course" />
 	<import class="com.liferay.lms.model.CourseCompetence" />
 	<import class="com.liferay.lms.model.CourseResult" />
+	<import class="com.liferay.lms.model.CourseType" />
+	<import class="com.liferay.lms.model.CourseTypeCalificationType" />
+	<import class="com.liferay.lms.model.CourseTypeCourseEval" />
+	<import class="com.liferay.lms.model.CourseTypeInscriptionType" />
+	<import class="com.liferay.lms.model.CourseTypeLearningActivity" />
+	<import class="com.liferay.lms.model.CourseTypeTemplate" />
 	<import class="com.liferay.lms.model.LearningActivity" />
 	<import class="com.liferay.lms.model.LearningActivityResult" />
 	<import class="com.liferay.lms.model.LearningActivityTry" />
@@ -163,6 +169,60 @@
 		<property name="allowStartDate" type="org.hibernate.type.TimestampType" />
 		<property name="allowFinishDate" type="org.hibernate.type.TimestampType" />
 		<property name="extraData" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+	</class>
+	<class name="com.liferay.lms.model.impl.CourseTypeImpl" table="Lms_CourseType">
+		<cache usage="read-write" />
+		<id name="courseTypeId" type="long">
+			<generator class="assigned" />
+		</id>
+		<property name="companyId" type="com.liferay.portal.dao.orm.hibernate.LongType" />
+		<property name="userId" type="com.liferay.portal.dao.orm.hibernate.LongType" />
+		<property name="groupId" type="com.liferay.portal.dao.orm.hibernate.LongType" />
+		<property name="userName" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="createDate" type="org.hibernate.type.TimestampType" />
+		<property name="modifiedDate" type="org.hibernate.type.TimestampType" />
+		<property name="name" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="description" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+	</class>
+	<class name="com.liferay.lms.model.impl.CourseTypeCalificationTypeImpl" table="Lms_CourseTypeCalificationType">
+		<cache usage="read-write" />
+		<id name="courseTypeCalificationTypeId" type="long">
+			<generator class="assigned" />
+		</id>
+		<property name="courseTypeId" type="com.liferay.portal.dao.orm.hibernate.LongType" />
+		<property name="calificationType" type="com.liferay.portal.dao.orm.hibernate.LongType" />
+	</class>
+	<class name="com.liferay.lms.model.impl.CourseTypeCourseEvalImpl" table="Lms_CourseTypeCourseEval">
+		<cache usage="read-write" />
+		<id name="courseTypeEvalutationTypeId" type="long">
+			<generator class="assigned" />
+		</id>
+		<property name="courseTypeId" type="com.liferay.portal.dao.orm.hibernate.LongType" />
+		<property name="courseEvalId" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+	</class>
+	<class name="com.liferay.lms.model.impl.CourseTypeInscriptionTypeImpl" table="Lms_CourseTypeInscriptionType">
+		<cache usage="read-write" />
+		<id name="courseTypeInscriptionTypeId" type="long">
+			<generator class="assigned" />
+		</id>
+		<property name="courseTypeId" type="com.liferay.portal.dao.orm.hibernate.LongType" />
+		<property name="inscriptionType" type="com.liferay.portal.dao.orm.hibernate.LongType" />
+	</class>
+	<class name="com.liferay.lms.model.impl.CourseTypeLearningActivityImpl" table="Lms_CourseTypeLearningActivity">
+		<cache usage="read-write" />
+		<id name="courseTypeLearningActivityId" type="long">
+			<generator class="assigned" />
+		</id>
+		<property name="courseTypeId" type="com.liferay.portal.dao.orm.hibernate.LongType" />
+		<property name="learningActivityTypeId" type="com.liferay.portal.dao.orm.hibernate.LongType" />
+	</class>
+	<class name="com.liferay.lms.model.impl.CourseTypeTemplateImpl" table="Lms_CourseTypeTemplate">
+		<cache usage="read-write" />
+		<id name="courseTypeTemplateId" type="long">
+			<generator class="assigned" />
+		</id>
+		<property name="courseTypeId" type="com.liferay.portal.dao.orm.hibernate.LongType" />
+		<property name="templateId" type="com.liferay.portal.dao.orm.hibernate.LongType" />
 	</class>
 	<class name="com.liferay.lms.model.impl.LearningActivityImpl" table="Lms_LearningActivity">
 		<cache usage="read-write" />

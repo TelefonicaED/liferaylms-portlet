@@ -146,6 +146,42 @@
 			<hint name="max-length">500000</hint>
 		</field>
 	</model>
+	<model name="com.liferay.lms.model.CourseType">
+		<field name="courseTypeId" type="long" />
+		<field name="companyId" type="long" />
+		<field name="userId" type="long" />
+		<field name="groupId" type="long" />
+		<field name="userName" type="String" />
+		<field name="createDate" type="Date" />
+		<field name="modifiedDate" type="Date" />
+		<field name="name" type="String" localized="true" />
+		<field name="description" type="String" localized="true" />
+	</model>
+	<model name="com.liferay.lms.model.CourseTypeCalificationType">
+		<field name="courseTypeCalificationTypeId" type="long" />
+		<field name="courseTypeId" type="long" />
+		<field name="calificationType" type="long" />
+	</model>
+	<model name="com.liferay.lms.model.CourseTypeCourseEval">
+		<field name="courseTypeEvalutationTypeId" type="long" />
+		<field name="courseTypeId" type="long" />
+		<field name="courseEvalId" type="String" />
+	</model>
+	<model name="com.liferay.lms.model.CourseTypeInscriptionType">
+		<field name="courseTypeInscriptionTypeId" type="long" />
+		<field name="courseTypeId" type="long" />
+		<field name="inscriptionType" type="long" />
+	</model>
+	<model name="com.liferay.lms.model.CourseTypeLearningActivity">
+		<field name="courseTypeLearningActivityId" type="long" />
+		<field name="courseTypeId" type="long" />
+		<field name="learningActivityTypeId" type="long" />
+	</model>
+	<model name="com.liferay.lms.model.CourseTypeTemplate">
+		<field name="courseTypeTemplateId" type="long" />
+		<field name="courseTypeId" type="long" />
+		<field name="templateId" type="long" />
+	</model>
 	<model name="com.liferay.lms.model.LearningActivity">
 		<field name="uuid" type="String" />
 		<field name="actId" type="long" />

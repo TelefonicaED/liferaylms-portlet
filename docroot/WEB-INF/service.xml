@@ -812,6 +812,103 @@
     	<column name="statusMessage" type="String" localized="true"/>
     </entity>
     
+    <entity name="CourseType"  local-service="true" remote-service="true" json-enabled="false">
+		<!-- PK fields -->
+		<column name="courseTypeId" type="long" primary="true"/>
+		<!-- Audit fields -->
+		<column name="companyId" type="long" />
+		<column name="userId" type="long" />
+		<column name="groupId" type="long" />
+		<column name="userName" type="String" />
+		<column name="createDate" type="Date" />
+		<column name="modifiedDate" type="Date" />
+		<!-- Description fields  -->
+		<column name="name" type="String" localized="true"/>
+		<column name="description" type="String" localized="true"/>
+		
+		<finder name="CompanyId" return-type="Collection">
+			<finder-column name="companyId"/>
+		</finder>
+		<finder name="CourseTypeId" return-type="CourseType">
+			<finder-column name="courseTypeId"/>
+		</finder>
+	</entity>
+	
+	<entity name="CourseTypeLearningActivity"  local-service="true" remote-service="true" json-enabled="false">
+		<!-- PK fields -->
+		<column name="courseTypeLearningActivityId" type="long" primary="true"/>
+		<!-- Description fields -->
+		<column name="courseTypeId" type="long"/>
+		<column name="learningActivityTypeId" type="long"/>
+		
+		<finder name="CourseTypeLearningActivityId" return-type="CourseTypeLearningActivity">
+			<finder-column name="courseTypeLearningActivityId"/>
+		</finder>
+		<finder name="CourseTypeId" return-type="Collection">
+			<finder-column name="courseTypeId"/>
+		</finder>
+	</entity>
+	
+	<entity name="CourseTypeCourseEval" local-service="true" remote-service="true" json-enabled="false">
+		<!-- PK fields -->
+		<column name="courseTypeEvalutationTypeId" type="long" primary="true"/>
+		<!-- Description fields -->
+		<column name="courseTypeId" type="long"/>
+		<column name="courseEvalId" type="String"/>
+		
+		<finder name="CourseTypeCourseEvalId" return-type="CourseTypeCourseEval">
+			<finder-column name="courseTypeEvalutationTypeId"/>
+		</finder>
+		<finder name="CourseTypeId" return-type="Collection">
+			<finder-column name="courseTypeId"/>
+		</finder>
+	</entity>
+	
+	<entity name="CourseTypeCalificationType" local-service="true" remote-service="true" json-enabled="false">
+		<!-- PK fields -->
+		<column name="courseTypeCalificationTypeId" type="long" primary="true"/>
+		<!-- Description fields -->
+		<column name="courseTypeId" type="long"/>
+		<column name="calificationType" type="long"/>
+		
+		<finder name="CourseTypeCalificationTypeId" return-type="CourseTypeCalificationType">
+			<finder-column name="courseTypeCalificationTypeId"/>
+		</finder>
+		<finder name="CourseTypeId" return-type="Collection">
+			<finder-column name="courseTypeId"/>
+		</finder>
+	</entity>
+	
+	<entity name="CourseTypeInscriptionType" local-service="true" remote-service="true" json-enabled="false">
+		<!-- PK fields -->
+		<column name="courseTypeInscriptionTypeId" type="long" primary="true"/>
+		<!-- Description fields -->
+		<column name="courseTypeId" type="long"/>
+		<column name="inscriptionType" type="long"/>
+				
+		<finder name="CourseTypeInscriptionTypeId" return-type="CourseTypeInscriptionType">
+			<finder-column name="courseTypeInscriptionTypeId"/>
+		</finder>
+		<finder name="CourseTypeId" return-type="Collection">
+			<finder-column name="courseTypeId"/>
+		</finder>
+	</entity>
+	
+	<entity name="CourseTypeTemplate" local-service="true" remote-service="true" json-enabled="false">
+		<!-- PK fields -->
+		<column name="courseTypeTemplateId" type="long" primary="true"/>
+		<!-- Description fields -->
+		<column name="courseTypeId" type="long"/>
+		<column name="templateId" type="long"/>
+						
+		<finder name="CourseTypeTemplateId" return-type="CourseTypeTemplate">
+			<finder-column name="courseTypeTemplateId"/>
+		</finder>
+		<finder name="CourseTypeId" return-type="Collection">
+			<finder-column name="courseTypeId"/>
+		</finder>
+	</entity>
+    
     <exceptions>
 		<exception>NoSuchModule</exception>
 	</exceptions>
