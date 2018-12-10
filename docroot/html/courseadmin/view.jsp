@@ -4,6 +4,7 @@
 <%@page import="com.liferay.portlet.asset.model.AssetCategory"%>
 <%@page import="com.liferay.lms.service.CourseLocalServiceUtil"%>
 <%@page import="com.liferay.lms.model.Course"%>
+<%@page import="com.liferay.lms.service.CourseTypeLocalServiceUtil"%>
 <%@ include file="/init.jsp" %>
 
 <div class="portlet-toolbar search-form">
@@ -11,9 +12,13 @@
 		
 	<%
 	if( permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), "com.liferay.lms.coursemodel",themeDisplay.getScopeGroupId(),"ADD_COURSE")){
+		String viewParam = "edit-course";
+		if(CourseTypeLocalServiceUtil.getCourseTypesCount()>0)
+			viewParam = "course-types";
 		%>
+		
 		<portlet:renderURL var="newactivityURL">
-			<portlet:param name="view" value="edit-course"></portlet:param>
+			<portlet:param name="view" value="<%= viewParam %>"></portlet:param>
 			<portlet:param name="redirect" value="<%= currentURL %>"></portlet:param>
 		</portlet:renderURL>
 		<div class="newitem2">
@@ -21,10 +26,9 @@
 				image="add"
 				label="true"
 				message="new-course"
-				url='${newactivityURL}'
+				url='${newactivityURL }'
 			/>
 		</div>
-		
 		<%
 	}
 	%>

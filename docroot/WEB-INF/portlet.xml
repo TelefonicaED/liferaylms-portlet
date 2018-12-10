@@ -881,6 +881,10 @@
 			<value>/html/courseadmin/view.jsp</value>
 		</init-param>
 		<init-param>
+			<name>course-types-template</name>
+			<value>/html/courseadmin/coursetypes.jsp</value>
+		</init-param>
+		<init-param>
 			<name>edit-course-template</name>
 			<value>/html/courseadmin/editcourse.jsp</value>
 		</init-param>

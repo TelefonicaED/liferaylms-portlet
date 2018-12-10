@@ -1,0 +1,11 @@
+<custom-sql>
+	<sql id="com.liferay.lms.service.persistence.CourseTypeFinder.countCourses">
+		<![CDATA[   			
+			SELECT COUNT(1)
+				FROM assetentry entry
+					INNER JOIN className_ classname ON classname.classNameId = entry.classNameId
+						WHERE classname.value = "com.liferay.lms.model.Course"
+							AND entry.classTypeId = ?
+		]]>
+	</sql>
+</custom-sql>

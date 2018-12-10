@@ -79,9 +79,10 @@ public class CourseTypeModelImpl extends BaseModelImpl<CourseType>
 			{ "createDate", Types.TIMESTAMP },
 			{ "modifiedDate", Types.TIMESTAMP },
 			{ "name", Types.VARCHAR },
-			{ "description", Types.VARCHAR }
+			{ "description", Types.VARCHAR },
+			{ "iconId", Types.BIGINT }
 		};
-	public static final String TABLE_SQL_CREATE = "create table Lms_CourseType (courseTypeId LONG not null primary key,companyId LONG,userId LONG,groupId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,name STRING null,description STRING null)";
+	public static final String TABLE_SQL_CREATE = "create table Lms_CourseType (courseTypeId LONG not null primary key,companyId LONG,userId LONG,groupId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,name STRING null,description STRING null,iconId LONG)";
 	public static final String TABLE_SQL_DROP = "drop table Lms_CourseType";
 	public static final String DATA_SOURCE = "liferayDataSource";
 	public static final String SESSION_FACTORY = "liferaySessionFactory";
@@ -120,6 +121,7 @@ public class CourseTypeModelImpl extends BaseModelImpl<CourseType>
 		model.setModifiedDate(soapModel.getModifiedDate());
 		model.setName(soapModel.getName());
 		model.setDescription(soapModel.getDescription());
+		model.setIconId(soapModel.getIconId());
 
 		return model;
 	}
@@ -187,6 +189,7 @@ public class CourseTypeModelImpl extends BaseModelImpl<CourseType>
 		attributes.put("modifiedDate", getModifiedDate());
 		attributes.put("name", getName());
 		attributes.put("description", getDescription());
+		attributes.put("iconId", getIconId());
 
 		return attributes;
 	}
@@ -245,6 +248,12 @@ public class CourseTypeModelImpl extends BaseModelImpl<CourseType>
 
 		if (description != null) {
 			setDescription(description);
+		}
+
+		Long iconId = (Long)attributes.get("iconId");
+
+		if (iconId != null) {
+			setIconId(iconId);
 		}
 	}
 
@@ -522,6 +531,14 @@ public class CourseTypeModelImpl extends BaseModelImpl<CourseType>
 		}
 	}
 
+	public long getIconId() {
+		return _iconId;
+	}
+
+	public void setIconId(long iconId) {
+		_iconId = iconId;
+	}
+
 	public long getColumnBitmask() {
 		return _columnBitmask;
 	}
@@ -572,6 +589,7 @@ public class CourseTypeModelImpl extends BaseModelImpl<CourseType>
 		courseTypeImpl.setModifiedDate(getModifiedDate());
 		courseTypeImpl.setName(getName());
 		courseTypeImpl.setDescription(getDescription());
+		courseTypeImpl.setIconId(getIconId());
 
 		courseTypeImpl.resetOriginalValues();
 
@@ -691,12 +709,14 @@ public class CourseTypeModelImpl extends BaseModelImpl<CourseType>
 			courseTypeCacheModel.description = null;
 		}
 
+		courseTypeCacheModel.iconId = getIconId();
+
 		return courseTypeCacheModel;
 	}
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(19);
+		StringBundler sb = new StringBundler(21);
 
 		sb.append("{courseTypeId=");
 		sb.append(getCourseTypeId());
@@ -716,13 +736,15 @@ public class CourseTypeModelImpl extends BaseModelImpl<CourseType>
 		sb.append(getName());
 		sb.append(", description=");
 		sb.append(getDescription());
+		sb.append(", iconId=");
+		sb.append(getIconId());
 		sb.append("}");
 
 		return sb.toString();
 	}
 
 	public String toXmlString() {
-		StringBundler sb = new StringBundler(31);
+		StringBundler sb = new StringBundler(34);
 
 		sb.append("<model><model-name>");
 		sb.append("com.liferay.lms.model.CourseType");
@@ -764,6 +786,10 @@ public class CourseTypeModelImpl extends BaseModelImpl<CourseType>
 			"<column><column-name>description</column-name><column-value><![CDATA[");
 		sb.append(getDescription());
 		sb.append("]]></column-value></column>");
+		sb.append(
+			"<column><column-name>iconId</column-name><column-value><![CDATA[");
+		sb.append(getIconId());
+		sb.append("]]></column-value></column>");
 
 		sb.append("</model>");
 
@@ -790,6 +816,7 @@ public class CourseTypeModelImpl extends BaseModelImpl<CourseType>
 	private String _nameCurrentLanguageId;
 	private String _description;
 	private String _descriptionCurrentLanguageId;
+	private long _iconId;
 	private long _columnBitmask;
 	private CourseType _escapedModelProxy;
 }

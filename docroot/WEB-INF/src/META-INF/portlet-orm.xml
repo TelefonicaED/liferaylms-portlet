@@ -246,6 +246,7 @@
 			</basic>
 			<basic name="name" />
 			<basic name="description" />
+			<basic name="iconId" />
 			<transient name="descriptionCurrentLanguageId" />
 			<transient name="descriptionMap" />
 			<transient name="modelAttributes" />

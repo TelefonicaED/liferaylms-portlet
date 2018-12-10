@@ -35,7 +35,7 @@ public class CourseTypeCacheModel implements CacheModel<CourseType>,
 	Serializable {
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(19);
+		StringBundler sb = new StringBundler(21);
 
 		sb.append("{courseTypeId=");
 		sb.append(courseTypeId);
@@ -55,6 +55,8 @@ public class CourseTypeCacheModel implements CacheModel<CourseType>,
 		sb.append(name);
 		sb.append(", description=");
 		sb.append(description);
+		sb.append(", iconId=");
+		sb.append(iconId);
 		sb.append("}");
 
 		return sb.toString();
@@ -103,6 +105,8 @@ public class CourseTypeCacheModel implements CacheModel<CourseType>,
 			courseTypeImpl.setDescription(description);
 		}
 
+		courseTypeImpl.setIconId(iconId);
+
 		courseTypeImpl.resetOriginalValues();
 
 		return courseTypeImpl;
@@ -117,4 +121,5 @@ public class CourseTypeCacheModel implements CacheModel<CourseType>,
 	public long modifiedDate;
 	public String name;
 	public String description;
+	public long iconId;
 }

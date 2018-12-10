@@ -7,7 +7,11 @@ import javax.portlet.PortletRequest;
 
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.repository.model.Folder;
+import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceContextFactory;
 import com.liferay.portlet.documentlibrary.DuplicateFolderNameException;
@@ -17,6 +21,8 @@ import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.service.DLFolderLocalServiceUtil;
 
 public class DLFolderUtil {
+	
+	private static Log log = LogFactoryUtil.getLog(DLFolderUtil.class);
 	
 	public static String DOCUMENTLIBRARY_MAINFOLDER = "ResourceUploads";
 	
@@ -170,6 +176,53 @@ public class DLFolderUtil {
         }
         
         return dlPortletFolderId;
+	}
+	
+	/**
+	 * Método para crear las carpetas de los iconos de los tipos de curso
+	 * @param userId
+	 * @param groupId
+	 * @param serviceContext
+	 * @return id de la carpeta donde se subirán las imágenes
+	 * @throws PortalException
+	 * @throws SystemException
+	 */
+	public static long createDLFolderIconImageCourseType(long userId, long groupId, long repositoryId, ServiceContext serviceContext) throws PortalException, SystemException {
+		
+		DLFolder dlFolderMain = null;
+		DLFolder dlFolderCourseType= null;
+		
+		//Se busca carpeta por defecto
+		try {
+			dlFolderMain = DLFolderLocalServiceUtil.getFolder(groupId, DLFolderConstants.DEFAULT_PARENT_FOLDER_ID, LmsConstant.COURSETYPE_ICON_MAINFOLDER);
+		} catch (PortalException | SystemException e) {
+			log.debug("Default folder not found:: " + e.getMessage());
+		}
+		
+		//Si no se encuentra carpeta por defecto se crea
+		if(Validator.isNull(dlFolderMain))
+			dlFolderMain = DLFolderLocalServiceUtil.addFolder(userId, groupId, repositoryId, false, DLFolderConstants.DEFAULT_PARENT_FOLDER_ID, LmsConstant.COURSETYPE_ICON_MAINFOLDER, LmsConstant.COURSETYPE_ICON_MAINFOLDER_DESCRIPTION, serviceContext);
+		
+		try {
+			dlFolderCourseType = DLFolderLocalServiceUtil.getFolder(groupId, dlFolderMain.getFolderId(), LmsConstant.COURSETYPE_ICON_PORTLETFOLDER);
+		} catch (PortalException | SystemException e) {
+			log.debug("Default folder not found:: " + e.getMessage());
+		} 
+		
+		if(Validator.isNull(dlFolderCourseType))
+			dlFolderCourseType = DLFolderLocalServiceUtil.addFolder(userId, groupId, repositoryId, false, dlFolderMain.getFolderId(), LmsConstant.COURSETYPE_ICON_PORTLETFOLDER, LmsConstant.COURSETYPE_ICON_PORTLETFOLDER_DESCRIPTION, serviceContext);
+
+    	SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+    	Date date = new Date();
+    	String igRecordFolderName = dateFormat.format(date) + StringPool.UNDERLINE + userId;
+    	DLFolder dlFolderImage = null;
+    	try{
+    		dlFolderImage = DLFolderLocalServiceUtil.addFolder(userId, groupId, repositoryId, false, dlFolderCourseType.getFolderId(), igRecordFolderName, igRecordFolderName, serviceContext);
+    	}catch (DuplicateFolderNameException e){
+    		dlFolderImage = DLFolderLocalServiceUtil.getFolder(groupId, dlFolderCourseType.getFolderId(), igRecordFolderName);
+    	}
+		
+		return dlFolderImage.getFolderId();
 	}
 
 }

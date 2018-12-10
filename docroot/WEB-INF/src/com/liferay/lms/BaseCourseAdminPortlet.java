@@ -35,6 +35,7 @@ import au.com.bytecode.opencsv.CSVReader;
 import au.com.bytecode.opencsv.CSVWriter;
 
 import com.liferay.counter.service.CounterLocalServiceUtil;
+import com.liferay.lms.asset.CourseAssetRendererFactory;
 import com.liferay.lms.auditing.AuditConstants;
 import com.liferay.lms.auditing.AuditingLogFactory;
 import com.liferay.lms.course.diploma.CourseDiploma;
@@ -128,6 +129,8 @@ import com.liferay.portal.util.comparator.UserLastNameComparator;
 import com.liferay.portlet.PortletPreferencesFactoryUtil;
 import com.liferay.portlet.announcements.EntryDisplayDateException;
 import com.liferay.portlet.asset.AssetCategoryException;
+import com.liferay.portlet.asset.AssetRendererFactoryRegistryUtil;
+import com.liferay.portlet.asset.model.AssetEntry;
 import com.liferay.portlet.asset.model.AssetVocabulary;
 import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.model.DLFolder;
@@ -548,6 +551,12 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 		}
 		
 		long courseId = ParamUtil.getLong(uploadRequest, "courseId", 0);
+		long courseTypeId = ParamUtil.getLong(uploadRequest, "courseTypeId", 0);
+		
+		if(log.isDebugEnabled()){
+			log.debug("::saveCourse:: courseId :: " + courseId);
+			log.debug("::saveCourse:: courseTypeId :: " + courseTypeId);
+		}
 
 		ThemeDisplay themeDisplay = (ThemeDisplay) actionRequest
 				.getAttribute(WebKeys.THEME_DISPLAY);
@@ -558,13 +567,11 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 		Locale localeDefault = null;
 		try {
 			localeDefault = themeDisplay.getCompany().getLocale();
-		} catch (PortalException e2) {
-			// TODO Auto-generated catch block
-			e2.printStackTrace();
+		} catch (PortalException e) {
+			e.printStackTrace();
 			localeDefault = LocaleUtil.getDefault();
-		} catch (SystemException e2) {
-			// TODO Auto-generated catch block
-			e2.printStackTrace();
+		} catch (SystemException e) {
+			e.printStackTrace();
 			localeDefault = LocaleUtil.getDefault();
 		}
 		
@@ -806,20 +813,21 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 				course = CourseLocalServiceUtil.addCourse(
 						titleMap, description, summary, friendlyURL,
 						themeDisplay.getLocale(), ahora, startDate, stopDate, startExecutionDate.getTime(), stopExecutionDate.getTime() , courseTemplateId,registrationType,courseEvalId,
-						courseCalificationType,maxusers,serviceContext,false);
+						courseCalificationType,maxusers,serviceContext,false, courseTypeId);
 				course.setInscriptionType(inscriptionType);
+				
 				try{
-				LmsPrefs prefs=LmsPrefsLocalServiceUtil.getLmsPrefs(course.getCompanyId());
-				//Añadimos como miembro del sitio web
-				GroupLocalServiceUtil.addUserGroups(themeDisplay.getUserId(), new long[] {course.getGroupCreatedId()});
-				
-				//Añadimos el rol de editor del curso cuando lo crea
-				Long editorRoleId=RoleLocalServiceUtil.getRole(prefs.getEditorRole()).getRoleId();
-				
-				UserGroupRoleLocalServiceUtil.addUserGroupRoles(new long[] { themeDisplay.getUserId() }, course.getGroupCreatedId(), editorRoleId);
-
-				AuditingLogFactory.audit(course.getCompanyId(), course.getGroupCreatedId(), Course.class.getName(), 
-						course.getCourseId(),themeDisplay.getUserId(), AuditConstants.REGISTER, "COURSE_EDITOR_ADD");
+					LmsPrefs prefs=LmsPrefsLocalServiceUtil.getLmsPrefs(course.getCompanyId());
+					//Añadimos como miembro del sitio web
+					GroupLocalServiceUtil.addUserGroups(themeDisplay.getUserId(), new long[] {course.getGroupCreatedId()});
+					
+					//Añadimos el rol de editor del curso cuando lo crea
+					Long editorRoleId=RoleLocalServiceUtil.getRole(prefs.getEditorRole()).getRoleId();
+					
+					UserGroupRoleLocalServiceUtil.addUserGroupRoles(new long[] { themeDisplay.getUserId() }, course.getGroupCreatedId(), editorRoleId);
+	
+					AuditingLogFactory.audit(course.getCompanyId(), course.getGroupCreatedId(), Course.class.getName(), 
+							course.getCourseId(),themeDisplay.getUserId(), AuditConstants.REGISTER, "COURSE_EDITOR_ADD");
 				} catch(Exception e){
 					e.printStackTrace();
 				}
@@ -1020,9 +1028,9 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 					if (permissionChecker.hasPermission(themeDisplay.getScopeGroupId(),
 							Course.class.getName(), 0, "PUBLISH")) {
 						log.debug("With publish permission, setting visible to "+visible);
-						CourseLocalServiceUtil.modCourse(course,summary,serviceContext, visible, allowDuplicateName);
+						CourseLocalServiceUtil.modCourse(course,summary, courseTypeId, serviceContext, visible, allowDuplicateName);
 					}else{
-						CourseLocalServiceUtil.modCourse(course,summary,serviceContext, true, allowDuplicateName);
+						CourseLocalServiceUtil.modCourse(course,summary, courseTypeId, serviceContext, true, allowDuplicateName);
 					}
 				}catch(PortalException pe){ 
 					if(pe.getMessage().startsWith("maxUsers ")){

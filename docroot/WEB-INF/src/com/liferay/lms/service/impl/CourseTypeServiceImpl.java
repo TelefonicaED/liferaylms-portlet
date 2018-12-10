@@ -15,6 +15,7 @@
 package com.liferay.lms.service.impl;
 
 import com.liferay.lms.service.base.CourseTypeServiceBaseImpl;
+import com.liferay.lms.service.persistence.CourseTypeFinderUtil;
 
 /**
  * The implementation of the course type remote service.
