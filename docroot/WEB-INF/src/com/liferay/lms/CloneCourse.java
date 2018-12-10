@@ -197,8 +197,11 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 		int typeSite = GroupLocalServiceUtil.getGroup(course.getGroupCreatedId()).getType();
 		Course newCourse = null;  
 		String summary = null;
+		long courseTypeId = 0;
 		try{
-			summary = AssetEntryLocalServiceUtil.getEntry(Course.class.getName(),course.getCourseId()).getSummary(themeDisplay.getLocale());
+			AssetEntry entry = AssetEntryLocalServiceUtil.getEntry(Course.class.getName(), course.getCourseId());
+			summary = entry.getSummary(themeDisplay.getLocale());
+			courseTypeId = entry.getClassTypeId();
 			newCourse = CourseLocalServiceUtil.addCourse(newCourseName, course.getDescription(themeDisplay.getLocale()),summary
 					, "", themeDisplay.getLocale(), today, startDate, endDate, layoutSetPrototypeId, typeSite, serviceContext, course.getCalificationType(), (int)course.getMaxusers(),true);
 			newCourse.setWelcome(course.getWelcome());
@@ -262,12 +265,13 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 		newCourse.setIcon(course.getIcon());
 		
 		try{
-			newCourse = CourseLocalServiceUtil.modCourse(newCourse, serviceContext);
+			newCourse = CourseLocalServiceUtil.modCourse(newCourse, courseTypeId, serviceContext);
 			
-			AssetEntry entry = AssetEntryLocalServiceUtil.getEntry(Course.class.getName(),newCourse.getCourseId());
-			entry.setVisible(visible);
-			entry.setSummary(summary);
-			AssetEntryLocalServiceUtil.updateAssetEntry(entry);
+			AssetEntry newEntry = AssetEntryLocalServiceUtil.getEntry(Course.class.getName(),newCourse.getCourseId());
+			newEntry.setVisible(visible);
+			newEntry.setSummary(summary);
+			newEntry.setClassTypeId(courseTypeId);
+			AssetEntryLocalServiceUtil.updateAssetEntry(newEntry);
 			newGroup.setName(newCourse.getTitle(themeDisplay.getLocale(), true));
 			newGroup.setDescription(summary);
 			GroupLocalServiceUtil.updateGroup(newGroup);

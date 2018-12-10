@@ -1,11 +1,15 @@
 package com.liferay.lms.portlet;
 
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import javax.imageio.ImageIO;
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
 import javax.portlet.PortletException;
@@ -14,7 +18,6 @@ import javax.portlet.PortletURL;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 
-import com.liferay.lms.NoSuchCourseTypeException;
 import com.liferay.lms.course.inscriptiontype.InscriptionType;
 import com.liferay.lms.course.inscriptiontype.InscriptionTypeRegistry;
 import com.liferay.lms.learningactivity.LearningActivityType;
@@ -26,22 +29,33 @@ import com.liferay.lms.learningactivity.courseeval.CourseEvalRegistry;
 import com.liferay.lms.model.CourseType;
 import com.liferay.lms.service.CourseTypeLocalServiceUtil;
 import com.liferay.lms.service.LmsPrefsLocalServiceUtil;
+import com.liferay.lms.util.DLFolderUtil;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.SessionMessages;
+import com.liferay.portal.kernel.upload.UploadPortletRequest;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
-import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.model.LayoutSetPrototype;
 import com.liferay.portal.service.LayoutSetPrototypeLocalServiceUtil;
+import com.liferay.portal.service.ServiceContext;
+import com.liferay.portal.service.ServiceContextFactory;
 import com.liferay.portal.theme.ThemeDisplay;
+import com.liferay.portal.util.PortalUtil;
+import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
+import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
+import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
 import com.liferay.util.bridges.mvc.MVCPortlet;
 
 /**
@@ -53,6 +67,11 @@ public class CourseTypeAdmin extends MVCPortlet {
 	
 	protected String viewJSP;
 	protected String editJSP;
+	
+	public static String IMAGEGALLERY_MAINFOLDER = "icons";
+	public static String IMAGEGALLERY_PORTLETFOLDER = "coursetype";
+	public static String IMAGEGALLERY_MAINFOLDER_DESCRIPTION = "Course Type Image Uploads";
+	public static String IMAGEGALLERY_PORTLETFOLDER_DESCRIPTION = StringPool.BLANK;	
 	
 	public void init() throws PortletException {	
 		viewJSP = getInitParameter("view-template");
@@ -189,80 +208,118 @@ public class CourseTypeAdmin extends MVCPortlet {
 	}
 	
 	//----ACTION
-	public void editCourseType(ActionRequest request, ActionResponse response) throws IOException, PortletException{
-		ThemeDisplay themeDisplay = (ThemeDisplay) request.getAttribute(WebKeys.THEME_DISPLAY);
-		
-		long courseTypeId = ParamUtil.getLong(request, "courseTypeId", 0);
-		
-		if(log.isDebugEnabled())
-			log.debug(" ::editCourseType:: courseTypeId :: " + courseTypeId);
-		
-		if(courseTypeId != 0){
-			//Editando un tipo de curso existente
-			CourseType courseType = null;
-			try {
-				courseType = CourseTypeLocalServiceUtil.getByCourseTypeId(courseTypeId);
-				request.setAttribute("courseType", courseType);
-			} catch (NoSuchCourseTypeException | SystemException e) {
-				e.printStackTrace();
-				SessionErrors.add(request, "coursetypeadmin.error.coursetype-not-found");
-			}
-		} 
-	}
-	
-	public void saveCourseType(ActionRequest request, ActionResponse response) throws IOException, PortletException{
+	public void saveCourseType(ActionRequest request, ActionResponse response) {
 		if(log.isDebugEnabled())
 			log.debug(" ::saveCourseType:: ");
+		
+		boolean saveOk = Boolean.TRUE;
+		
 		ThemeDisplay themeDisplay = (ThemeDisplay) request.getAttribute(WebKeys.THEME_DISPLAY);
 		
-		long courseTypeId = ParamUtil.getLong(request, "courseTypeId", 0);
-		Map<Locale,String> courseTypeName =  LocalizationUtil.getLocalizationMap(request, "courseTypeName");
-		Map<Locale,String> courseTypeDescription =  LocalizationUtil.getLocalizationMap(request, "courseTypeDescription");
-		long[] templateIds = ParamUtil.getLongValues(request, "templateIds", new long[] {});
-		long[] courseEvalTypeIds = ParamUtil.getLongValues(request, "courseEvalIds", new long[] {});
-		long[] learningActivityTypeIds = ParamUtil.getLongValues(request, "learningActivityTypeIds", new long[] {});
-		long[] inscriptionTypeIds = ParamUtil.getLongValues(request, "inscriptionTypeIds", new long[] {});
-		long[] calificationTypeIds = ParamUtil.getLongValues(request, "calificationTypeIds", new long[] {});
+		UploadPortletRequest uploadRequest = PortalUtil.getUploadPortletRequest(request);
+		
+		long courseTypeId = ParamUtil.getLong(uploadRequest, "courseTypeId", 0);
+		
+		Locale[] locales = LanguageUtil.getAvailableLocales();
+		String courseTypeNameLocale = StringPool.BLANK;
+		Map<Locale,String> courseTypeName = new HashMap<Locale, String>();
+		String courseTypeDescriptionLocale = StringPool.BLANK;
+		Map<Locale,String> courseTypeDescription = new HashMap<Locale, String>();
+		for(int i=0; i<locales.length ; i++){
+			courseTypeNameLocale = ParamUtil.getString(uploadRequest, "courseTypeName_"+LanguageUtil.getLanguageId(locales[i]), StringPool.BLANK);
+			courseTypeName.put(locales[i], courseTypeNameLocale);
+			courseTypeDescriptionLocale = ParamUtil.getString(uploadRequest, "courseTypeDescription_"+LanguageUtil.getLanguageId(locales[i]), StringPool.BLANK);
+			courseTypeDescription.put(locales[i], courseTypeDescriptionLocale);
+		}
+		
+		long[] templateIds = ParamUtil.getLongValues(uploadRequest, "templateIds", new long[] {});
+		long[] courseEvalTypeIds = ParamUtil.getLongValues(uploadRequest, "courseEvalIds", new long[] {});
+		long[] learningActivityTypeIds = ParamUtil.getLongValues(uploadRequest, "learningActivityTypeIds", new long[] {});
+		long[] inscriptionTypeIds = ParamUtil.getLongValues(uploadRequest, "inscriptionTypeIds", new long[] {});
+		long[] calificationTypeIds = ParamUtil.getLongValues(uploadRequest, "calificationTypeIds", new long[] {});
+		File iconCourseTypeFile = uploadRequest.getFile("iconCourseTypeFile");
+		String iconCourseTypeFileName = GetterUtil.getString(uploadRequest.getFileName("iconCourseTypeFile"), StringPool.BLANK);
+		boolean deleteIcon = ParamUtil.getBoolean(uploadRequest, "deleteIcon", Boolean.FALSE);
 		
 		if(log.isDebugEnabled()){
 			log.debug(" ::saveCourseType:: courseTypeId :: " + courseTypeId);
 			log.debug(" ::saveCourseType:: courseTypeName :: " + courseTypeName);
 			log.debug(" ::saveCourseType:: courseTypeDescription :: " + courseTypeDescription);
-			log.debug(" ::saveCourseType:: templateIds :: " + templateIds.length);
-			log.debug(" ::saveCourseType:: courseEvalTypeIds :: " + courseEvalTypeIds.length);
-			log.debug(" ::saveCourseType:: learningActivityTypeIds :: " + learningActivityTypeIds.length);
-			log.debug(" ::saveCourseType:: inscriptionTypeIds :: " + inscriptionTypeIds.length);
-			log.debug(" ::saveCourseType:: calificationTypeIds :: " + calificationTypeIds.length);
+			log.debug(" ::saveCourseType:: templateIds.length :: " + templateIds.length);
+			log.debug(" ::saveCourseType:: courseEvalTypeIds.length :: " + courseEvalTypeIds.length);
+			log.debug(" ::saveCourseType:: learningActivityTypeIds.length :: " + learningActivityTypeIds.length);
+			log.debug(" ::saveCourseType:: inscriptionTypeIds.length :: " + inscriptionTypeIds.length);
+			log.debug(" ::saveCourseType:: calificationTypeIds.length :: " + calificationTypeIds.length);
+			log.debug(" ::saveCourseType:: iconCourseTypeFileName :: " + iconCourseTypeFileName);
+			log.debug(" ::saveCourseType:: deleteIcon :: " + deleteIcon);
 		}
 		
-		CourseType newCourseType = null;
+		long iconImageId = -1;
+		if(!iconCourseTypeFileName.equals(StringPool.BLANK)){
+			if(!validateIconFileSize(iconCourseTypeFile)){
+				SessionErrors.add(request, "coursetypeadmin.error-file-size");
+				saveOk = Boolean.FALSE;
+			} else if(!validateIconImageSize(iconCourseTypeFile)){
+				SessionErrors.add(request, "coursetypeadmin.error-image-size");
+				saveOk = Boolean.FALSE;
+			} else {
+				try {
+					ServiceContext serviceContext = ServiceContextFactory.getInstance(CourseType.class.getName(), uploadRequest);
+					serviceContext.setScopeGroupId(themeDisplay.getScopeGroupId());
+					serviceContext.setAddGroupPermissions(Boolean.TRUE);
+					serviceContext.setAddGuestPermissions(Boolean.TRUE);
+					String contentType = uploadRequest.getContentType("iconCourseTypeFile");
+					long repositoryId = DLFolderConstants.getDataRepositoryId(themeDisplay.getScopeGroupId(), DLFolderConstants.DEFAULT_PARENT_FOLDER_ID);
+					long iconCourseTypeFolderId = DLFolderUtil.createDLFolderIconImageCourseType(themeDisplay.getUserId(), themeDisplay.getScopeGroupId(), repositoryId, serviceContext);					FileEntry iconImageFileEntry = DLAppLocalServiceUtil.addFileEntry(themeDisplay.getUserId(),
+							repositoryId, iconCourseTypeFolderId, iconCourseTypeFileName, contentType, iconCourseTypeFileName, StringPool.BLANK, StringPool.BLANK, iconCourseTypeFile, serviceContext);
+					iconImageId = iconImageFileEntry.getFileEntryId();
+					
+				} catch (PortalException | SystemException e) {
+					SessionErrors.add(request, "coursetypeadmin.error-uploading-icon-image");
+					saveOk = Boolean.FALSE;
+				}
+			}
+		}
 		
-		if(courseTypeId == 0){
-			//Añadir nuevo tipo de curso
-			try {
-				newCourseType = CourseTypeLocalServiceUtil.addCourseType(themeDisplay.getCompanyId(), themeDisplay.getUserId(), themeDisplay.getScopeGroupId(), courseTypeName, courseTypeDescription,
-						templateIds, courseEvalTypeIds, learningActivityTypeIds, inscriptionTypeIds, calificationTypeIds);
-			} catch (SystemException e) {
-				e.printStackTrace();
-				newCourseType = null;
-			}
+		if(saveOk){
+			CourseType newCourseType = null;
+			
+			if(courseTypeId == 0){
+				//Añadir nuevo tipo de curso
+				try {
+					newCourseType = CourseTypeLocalServiceUtil.addCourseType(themeDisplay.getCompanyId(), themeDisplay.getUserId(), themeDisplay.getScopeGroupId(), courseTypeName, courseTypeDescription,
+							templateIds, courseEvalTypeIds, learningActivityTypeIds, inscriptionTypeIds, calificationTypeIds, iconImageId);
+				} catch (SystemException e) {
+					saveOk = Boolean.FALSE;
+					e.printStackTrace();
+				}
 				
-			if(Validator.isNotNull(newCourseType))
-				SessionMessages.add(request, "coursetypeadmin.success.add-new-coursetype");
-			else
-				SessionErrors.add(request, "coursetypeadmin.error.add-new-coursetype");
-		} else {
-			try {
-				newCourseType = CourseTypeLocalServiceUtil.updateCourseType(courseTypeId, courseTypeName, courseTypeDescription, 
-						templateIds, courseEvalTypeIds, learningActivityTypeIds, inscriptionTypeIds, calificationTypeIds);
-			} catch (SystemException e) {
-				e.printStackTrace();
-				newCourseType = null;
+				if(saveOk)
+					SessionMessages.add(request, "coursetypeadmin.success.add-new-coursetype");
+				else
+					SessionErrors.add(request, "coursetypeadmin.error.add-new-coursetype");
+				
+			} else {
+				//Actualizar tipo de curso ya existente
+				try {
+					newCourseType = CourseTypeLocalServiceUtil.updateCourseType(courseTypeId, courseTypeName, courseTypeDescription, 
+							templateIds, courseEvalTypeIds, learningActivityTypeIds, inscriptionTypeIds, calificationTypeIds, iconImageId, deleteIcon);
+				} catch (SystemException e) {
+					saveOk = Boolean.FALSE;
+					e.printStackTrace();
+				}
+				
+				if(saveOk)
+					SessionMessages.add(request, "coursetypeadmin.success.update-coursetype");
+				else
+					SessionErrors.add(request, "coursetypeadmin.error.update-coursetype");
+
 			}
-			if(Validator.isNotNull(newCourseType))
-				SessionMessages.add(request, "coursetypeadmin.success.update-coursetype");
-			else
-				SessionErrors.add(request, "coursetypeadmin.error.update-coursetype");
+		}
+		
+		if(!saveOk){
+			response.setRenderParameter("courseTypeId", String.valueOf(courseTypeId));
+			response.setRenderParameter("view", "edit");
 		}
 	}
 	
@@ -286,5 +343,24 @@ public class CourseTypeAdmin extends MVCPortlet {
 		else
 			SessionErrors.add(request, "coursetypeadmin.error.delete");
 		
+	}
+	
+	/////////////////
+	private boolean validateIconFileSize(File iconCourseTypeFile){
+		//Max 75k
+		return iconCourseTypeFile.length()/1204<=75;
+	}
+	private boolean validateIconImageSize(File iconCourseTypeFile){
+		//100x100px
+		boolean imageSizeOk = Boolean.FALSE;
+		try {
+			BufferedImage image = ImageIO.read(iconCourseTypeFile);
+			int width = image.getWidth();
+			int length = image.getHeight();
+			imageSizeOk = width == 100 && length == 100;
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return imageSizeOk;
 	}
 }

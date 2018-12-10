@@ -5,9 +5,7 @@
 <liferay-ui:error key="coursetypeadmin.error.delete" message="coursetypeadmin.error.delete" />
 <liferay-ui:error key="coursetypeadmin.error.coursetype-not-found" message="coursetypeadmin.error.coursetype-not-found" />
 <liferay-ui:success key="coursetypeadmin.success.add-new-coursetype" message="coursetypeadmin.success.add-new-coursetype" />
-<liferay-ui:error key="coursetypeadmin.error.add-new-coursetype" message="coursetypeadmin.error.add-new-coursetype" />
 <liferay-ui:success key="coursetypeadmin.success.update-coursetype" message="coursetypeadmin.success.update-coursetype" />
-<liferay-ui:error key="coursetypeadmin.error.update-coursetype" message="coursetypeadmin.error.update-coursetype" />
 
 <aui:button-row>
 	<aui:button type="button" value="coursetypeadmin.new-coursetype" onClick="${editCourseTypeURL }"/>
@@ -38,10 +36,12 @@
 					 <liferay-ui:icon 
  						image="edit" 
  					 	url="${actionURL}" /> 
-				<c:set var="actionURL" value="javascript:${renderResponse.getNamespace()}deleteCourseType('${courseType.courseTypeId }');"/> 
- 				   <liferay-ui:icon 
- 						image="delete" 
- 						url="${actionURL}" /> 
+ 				<c:if test="${!courseType.hasCourses() }">
+					<c:set var="actionURL" value="javascript:${renderResponse.getNamespace()}deleteCourseType('${courseType.courseTypeId }');"/> 
+	 				   <liferay-ui:icon 
+	 						image="delete" 
+	 						url="${actionURL}" /> 
+ 				</c:if>
  			</liferay-ui:icon-menu> 
 		</liferay-ui:search-container-column-text>
 		

@@ -402,6 +402,7 @@ public class CourseTypePersistenceImpl extends BasePersistenceImpl<CourseType>
 		courseTypeImpl.setModifiedDate(courseType.getModifiedDate());
 		courseTypeImpl.setName(courseType.getName());
 		courseTypeImpl.setDescription(courseType.getDescription());
+		courseTypeImpl.setIconId(courseType.getIconId());
 
 		return courseTypeImpl;
 	}

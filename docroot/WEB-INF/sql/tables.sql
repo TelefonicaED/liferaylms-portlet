@@ -140,7 +140,8 @@ create table Lms_CourseType (
 	createDate DATE null,
 	modifiedDate DATE null,
 	name STRING null,
-	description STRING null
+	description STRING null,
+	iconId LONG
 );
 
 create table Lms_CourseTypeCalificationType (

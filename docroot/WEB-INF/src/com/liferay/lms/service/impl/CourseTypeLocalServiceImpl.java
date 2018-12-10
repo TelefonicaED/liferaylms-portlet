@@ -22,6 +22,7 @@ import java.util.Map;
 import com.liferay.lms.NoSuchCourseTypeException;
 import com.liferay.lms.model.CourseType;
 import com.liferay.lms.service.base.CourseTypeLocalServiceBaseImpl;
+import com.liferay.lms.service.persistence.CourseTypeFinderUtil;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -52,6 +53,10 @@ public class CourseTypeLocalServiceImpl extends CourseTypeLocalServiceBaseImpl {
 	
 	Log log = LogFactoryUtil.getLog(CourseTypeLocalServiceImpl.class);
 	
+	public boolean hasCourses(long courseTypeId){
+		return CourseTypeFinderUtil.countCourses(courseTypeId)>0;
+	}
+	
 	public List<CourseType> getByCompanyId(long companyId) throws SystemException{
 		return courseTypePersistence.findByCompanyId(companyId);
 	}
@@ -61,7 +66,7 @@ public class CourseTypeLocalServiceImpl extends CourseTypeLocalServiceBaseImpl {
 	}
 	
 	public CourseType addCourseType(long companyId, long userId, long groupId, Map<Locale, String> nameMap, Map<Locale, String> descriptionMap, long[] templateIds,
-			long[] courseEvalTypeIds, long[] learningActivityTypeIds, long[] inscriptionTypeIds, long[] calificationTypeIds) throws SystemException {
+			long[] courseEvalTypeIds, long[] learningActivityTypeIds, long[] inscriptionTypeIds, long[] calificationTypeIds, long iconImageId) throws SystemException {
 		
 		if(log.isDebugEnabled()){
 			log.debug("::addCourseType:: companyId :: " + companyId);
@@ -74,6 +79,7 @@ public class CourseTypeLocalServiceImpl extends CourseTypeLocalServiceBaseImpl {
 			log.debug("::addCourseType:: learningActivityTypeIds :: " + learningActivityTypeIds.length);
 			log.debug("::addCourseType:: inscriptionTypeIds :: " + inscriptionTypeIds.length);
 			log.debug("::addCourseType:: calificationTypeIds :: " + calificationTypeIds.length);
+			log.debug("::addCourseType:: iconImageId :: " + iconImageId);
 		}
 		
 		//PK Field	
@@ -88,6 +94,10 @@ public class CourseTypeLocalServiceImpl extends CourseTypeLocalServiceBaseImpl {
 		//Description fields
 		courseType.setNameMap(nameMap);
 		courseType.setDescriptionMap(descriptionMap);
+		
+		//El icono se setea sólo si se sube imagen (no es un campo obligatorio)
+		if(Validator.isNotNull(iconImageId) && iconImageId > 0)
+			courseType.setIconId(iconImageId);
 		
 		courseTypePersistence.update(courseType, Boolean.TRUE);
 		
@@ -110,7 +120,8 @@ public class CourseTypeLocalServiceImpl extends CourseTypeLocalServiceBaseImpl {
 	}
 	
 	public CourseType updateCourseType(long courseTypeId, Map<Locale, String> nameMap, Map<Locale, String> descriptionMap, long[] templateIds,
-			long[] courseEvalTypeIds, long[] learningActivityTypeIds, long[] inscriptionTypeIds, long[] calificationTypeIds) throws SystemException{
+			long[] courseEvalTypeIds, long[] learningActivityTypeIds, long[] inscriptionTypeIds, long[] calificationTypeIds, long iconImageId,
+			boolean deleteIcon) throws SystemException{
 		
 		if(log.isDebugEnabled()){
 			log.debug("::updateCourseType:: courseTypeId :: " + courseTypeId);
@@ -122,6 +133,8 @@ public class CourseTypeLocalServiceImpl extends CourseTypeLocalServiceBaseImpl {
 			log.debug("::updateCourseType:: learningActivityTypeIds :: " + learningActivityTypeIds.length);
 			log.debug("::updateCourseType:: inscriptionTypeIds :: " + inscriptionTypeIds.length);
 			log.debug("::updateCourseType:: calificationTypeIds :: " + calificationTypeIds.length);
+			log.debug("::updateCourseType:: iconImageId :: " + iconImageId);
+			log.debug("::updateCourseType:: deleteIcon :: " + deleteIcon);
 		}
 	
 		CourseType courseType = courseTypePersistence.fetchByCourseTypeId(courseTypeId);
@@ -130,9 +143,17 @@ public class CourseTypeLocalServiceImpl extends CourseTypeLocalServiceBaseImpl {
 			
 			//Audit field
 			courseType.setModifiedDate(new Date());
+			
 			//Description fields
 			courseType.setNameMap(nameMap);
 			courseType.setDescriptionMap(descriptionMap);
+			
+			//Se comprueba si se quiere eliminar el icono
+			if(deleteIcon)
+				courseType.setIconId(0);
+			//Si no se quiere eliminar el icono se setea un nuevo icono sólo si se sube imagen (no es un campo obligatorio)
+			else if(Validator.isNotNull(iconImageId) && iconImageId > 0)
+				courseType.setIconId(iconImageId);
 			
 			//Las plantillas, métodos de evaluación, tipos de actividad, de inscripción y stmas de calificación
 			//existentes no se borran, se pueden añadir nuevos pero los que tenga no se van a borrar

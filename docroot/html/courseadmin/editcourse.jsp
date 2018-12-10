@@ -1,3 +1,5 @@
+<%@page import="com.liferay.lms.model.CourseTypeTemplate"%>
+<%@page import="com.liferay.lms.service.CourseTypeLocalServiceUtil"%>
 <%@page import="com.liferay.lms.course.inscriptiontype.InscriptionType"%>
 <%@page import="com.liferay.lms.course.inscriptiontype.InscriptionTypeRegistry"%>
 <%@page import="com.liferay.portal.service.LayoutSetLocalServiceUtil"%>
@@ -19,6 +21,7 @@
 <%@page import="com.liferay.lms.learningactivity.calificationtype.CalificationTypeRegistry"%>
 <%@page import="com.liferay.lms.learningactivity.calificationtype.CalificationType"%>
 <%@page import="java.util.Set"%>
+<%@page import="java.util.ArrayList"%>
 <%@page import="java.util.Iterator"%>
 <%@page import="com.liferay.portal.kernel.servlet.SessionErrors"%>
 <%@page import="java.util.Map"%>
@@ -38,6 +41,9 @@
 <%@page import="com.liferay.lms.service.CourseLocalServiceUtil"%>
 <%@page import="com.liferay.lms.service.CourseServiceUtil"%>
 <%@page import="com.liferay.lms.model.Course"%>
+<%@page import="com.liferay.lms.service.CourseTypeLocalServiceUtil"%>
+<%@page import="com.liferay.lms.model.CourseType"%>
+<%@page import="com.liferay.lms.model.CourseTypeTemplate"%>
 <%@page import="javax.portlet.PortletPreferences"%>
 <%@page import="com.liferay.portlet.PortletPreferencesFactoryUtil"%>
 <%@page import="com.liferay.portal.model.ModelHintsUtil"%>
@@ -185,6 +191,10 @@ int endExecutionYear=ParamUtil.getInteger(request, "stopExecutionYear", Integer.
 int endExecutionHour=ParamUtil.getInteger(request, "stopExecutionHour", Integer.parseInt(formatHour.format(today)));
 int endExecutionMin=ParamUtil.getInteger(request, "stopExecutionMin", Integer.parseInt(formatMin.format(today)));
 
+long courseTypeId = ParamUtil.getLong(request, "courseTypeId", 0);
+CourseType courseType = null;
+if(courseTypeId>0)
+	courseType = CourseTypeLocalServiceUtil.getCourseType(courseTypeId);
 
 String summary="";
 AssetEntry entry=null;
@@ -274,8 +284,12 @@ if(course!=null){
 	<aui:model-context  model="<%= Course.class %>" />
 	<%
 }
+String title = (course != null) ? course.getTitle(themeDisplay.getLocale()) :  LanguageUtil.get(themeDisplay.getLocale(),"new-course");
+if(courseType != null){
+	title = title + " (" + courseType.getName(themeDisplay.getLocale()) + ")";
+}
 %>
-<liferay-ui:header title="<%= course != null ? course.getTitle(themeDisplay.getLocale()) : \"new-course\" %>" backURL="<%=backURL %>"></liferay-ui:header>
+<liferay-ui:header title="<%= title %>" backURL="<%=backURL %>"></liferay-ui:header>
 <c:if test="<%=course != null && course.getParentCourseId()<=0%>">
 	<aui:fieldset>
 		<liferay-ui:icon-menu>
@@ -373,6 +387,7 @@ if(course!=null){
 	<aui:input name="backURL" type="hidden" value="<%= backURL %>" />
 	<aui:input name="referringPortletResource" type="hidden" value="<%= referringPortletResource %>" />
 	<aui:input name="courseId" type="hidden" value="<%=courseId %>"/>
+	<aui:input name="courseTypeId" type="hidden" value="<%=courseTypeId %>"/>
 
 	<span class="aui-field-content" > 
 		 
@@ -479,7 +494,12 @@ if(course!=null){
 	
 	
 		<%
-		List<Long> courseEvalIds = ListUtil.toList(StringUtil.split(LmsPrefsLocalServiceUtil.getLmsPrefsIni(themeDisplay.getCompanyId()).getCourseevals(),",",0L));
+		List<Long> courseEvalIds = new ArrayList<Long>();
+		if(courseType!=null){
+			courseEvalIds = courseType.getCourseEvalTypeIds();
+		}else{
+			courseEvalIds = ListUtil.toList(StringUtil.split(LmsPrefsLocalServiceUtil.getLmsPrefsIni(themeDisplay.getCompanyId()).getCourseevals(),",",0L));
+		}
 		CourseEvalRegistry cer=new CourseEvalRegistry();
 		CourseEval courseEval = null;
 		if(courseEvalIds.size()>1){%>
@@ -575,40 +595,59 @@ if(course!=null){
 			</liferay-util:include>
 		</div>
 	<%	
-		String[] layusprsel=null;
-		if(renderRequest.getPreferences().getValue("courseTemplates", null)!=null&&renderRequest.getPreferences().getValue("courseTemplates", null).length()>0)
-		{
-				layusprsel=renderRequest.getPreferences().getValue("courseTemplates", "").split(",");
-		}
-
-		String[] lspist=LmsPrefsLocalServiceUtil.getLmsPrefsIni(themeDisplay.getCompanyId()).getLmsTemplates().split(",");
-		if(layusprsel!=null &&layusprsel.length>0)
-		{
-			lspist=layusprsel;
-
-		}
-		if(lspist.length>1){
-		%>
+		if(courseType==null){
+			String[] layusprsel=null;
+			if(renderRequest.getPreferences().getValue("courseTemplates", null)!=null&&renderRequest.getPreferences().getValue("courseTemplates", null).length()>0)
+			{
+					layusprsel=renderRequest.getPreferences().getValue("courseTemplates", "").split(",");
+			}
+	
+			String[] lspist=LmsPrefsLocalServiceUtil.getLmsPrefsIni(themeDisplay.getCompanyId()).getLmsTemplates().split(",");
+			if(layusprsel!=null &&layusprsel.length>0)
+			{
+				lspist=layusprsel;
+	
+			}
+			if(lspist.length>1){
+			%>
+				<aui:select name="courseTemplate" label="course-template" disabled="<%=(course==null)?false:true %>">
+				<%
+				for(String lspis:lspist)
+				{
+					LayoutSetPrototype lsp=LayoutSetPrototypeLocalServiceUtil.getLayoutSetPrototype(Long.parseLong(lspis));
+					%>
+					<aui:option value="<%=lsp.getLayoutSetPrototypeId() %>" selected="<%=templateParent == lsp.getLayoutSetPrototypeId() %>"><%=lsp.getName(themeDisplay.getLocale()) %></aui:option>
+					<%
+				}
+				%>
+				</aui:select>
+			<%
+			}
+			else{
+				LayoutSetPrototype lsp=LayoutSetPrototypeLocalServiceUtil.getLayoutSetPrototype(Long.parseLong(lspist[0]));
+			%>
+				<aui:input name="courseTemplate" value="<%=lsp.getLayoutSetPrototypeId()%>" type="hidden"/>
+			<%}
+		} else {
+			%>
 			<aui:select name="courseTemplate" label="course-template" disabled="<%=(course==null)?false:true %>">
 			<%
-			for(String lspis:lspist)
-			{
-				LayoutSetPrototype lsp=LayoutSetPrototypeLocalServiceUtil.getLayoutSetPrototype(Long.parseLong(lspis));
+			for(LayoutSetPrototype template:courseType.getTemplates()){
 				%>
-				<aui:option value="<%=lsp.getLayoutSetPrototypeId() %>" selected="<%=templateParent == lsp.getLayoutSetPrototypeId() %>"><%=lsp.getName(themeDisplay.getLocale()) %></aui:option>
+				<aui:option value="<%=template.getLayoutSetPrototypeId() %>" selected="<%=templateParent == template.getLayoutSetPrototypeId() %>"><%=template.getName(themeDisplay.getLocale()) %></aui:option>
 				<%
 			}
 			%>
 			</aui:select>
-		<%
+			<%
 		}
-		else{
-			LayoutSetPrototype lsp=LayoutSetPrototypeLocalServiceUtil.getLayoutSetPrototype(Long.parseLong(lspist[0]));
-		%>
-			<aui:input name="courseTemplate" value="<%=lsp.getLayoutSetPrototypeId()%>" type="hidden"/>
-		<%}
 		
-		List <Long> califications = ListUtil.toList(StringUtil.split(LmsPrefsLocalServiceUtil.getLmsPrefsIni(themeDisplay.getCompanyId()).getScoretranslators(),",",0L));	
+		List <Long> califications = new ArrayList<Long>();
+		if(courseType!=null){
+			califications = courseType.getCalificationTypeIds();
+		}else{
+			califications = ListUtil.toList(StringUtil.split(LmsPrefsLocalServiceUtil.getLmsPrefsIni(themeDisplay.getCompanyId()).getScoretranslators(),",",0L));
+		}
 		CalificationTypeRegistry cal = new CalificationTypeRegistry();
 		if(califications.size()>1){
 			%>
@@ -693,7 +732,12 @@ if(course!=null){
 	<liferay-ui:panel-container extended="false"  persistState="false">
    	  <liferay-ui:panel title="lms-inscription-configuration" collapsible="true" defaultState="closed" cssClass="<%=(showInscriptionDate||showMaxUsers)?StringPool.BLANK:\"aui-helper-hidden\" %>">
    	  		<%
-   	  	List <Long> inscriptions = ListUtil.toList(StringUtil.split(LmsPrefsLocalServiceUtil.getLmsPrefsIni(themeDisplay.getCompanyId()).getInscriptionTypes(),",",0L));	
+   	  	List <Long> inscriptions = new ArrayList<Long>();
+   	  	if(courseType != null){
+   	  		inscriptions = courseType.getInscriptionTypeIds();
+   	  	} else {
+   	  		inscriptions = ListUtil.toList(StringUtil.split(LmsPrefsLocalServiceUtil.getLmsPrefsIni(themeDisplay.getCompanyId()).getInscriptionTypes(),",",0L));
+   	  	}
 		InscriptionTypeRegistry inscription = new InscriptionTypeRegistry();
 		if(inscriptions.size()>1){%>
 			<aui:select name="inscriptionType" label="inscription-type" onchange="${renderResponse.getNamespace()}changeInscriptionType(this.value)">			

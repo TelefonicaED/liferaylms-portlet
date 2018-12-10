@@ -156,6 +156,7 @@
 		<field name="modifiedDate" type="Date" />
 		<field name="name" type="String" localized="true" />
 		<field name="description" type="String" localized="true" />
+		<field name="iconId" type="long" />
 	</model>
 	<model name="com.liferay.lms.model.CourseTypeCalificationType">
 		<field name="courseTypeCalificationTypeId" type="long" />

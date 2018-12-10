@@ -288,10 +288,20 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 		return addCourse(titleMap, description, summary, friendlyURL, locale, createDate, startDate, endDate, executionStartDate, executionEndDate, 
 						layoutSetPrototypeId, typesite, CourseEvalId, calificationType, maxUsers, serviceContext, isfromClone);
 	}
-
+	
 	public Course addCourse (Map<Locale,String> titleMap, String description,String summary,String friendlyURL, Locale locale,
 			Date createDate,Date startDate,Date endDate, Date executionStartDate, Date executionEndDate, long layoutSetPrototypeId,int typesite, long CourseEvalId, long calificationType, int maxUsers,ServiceContext serviceContext,boolean isfromClone)
 			throws SystemException, PortalException {
+		return addCourse(titleMap, description, summary, friendlyURL, locale, createDate, startDate, endDate, executionStartDate, executionEndDate, layoutSetPrototypeId, typesite, CourseEvalId, calificationType, maxUsers, serviceContext, isfromClone, 0);
+	}
+
+	public Course addCourse (Map<Locale,String> titleMap, String description,String summary,String friendlyURL, Locale locale,
+			Date createDate,Date startDate,Date endDate, Date executionStartDate, Date executionEndDate, long layoutSetPrototypeId,int typesite, long CourseEvalId, long calificationType, int maxUsers,ServiceContext serviceContext,boolean isfromClone,
+			long courseTypeId)
+			throws SystemException, PortalException {
+		
+		log.debug("courseTypeId:: " + courseTypeId);
+		
 		LmsPrefs lmsPrefs=lmsPrefsLocalService.getLmsPrefsIni(serviceContext.getCompanyId());
 		long userId=serviceContext.getUserId();
 		Course course = coursePersistence.create(counterLocalService.increment(Course.class.getName()));
@@ -367,9 +377,12 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 			
 			resourceLocalService.addResources(serviceContext.getCompanyId(), serviceContext.getScopeGroupId(), userId,Course.class.getName(), course.getPrimaryKey(), false,true, true);
 			AssetEntry assetEntry=assetEntryLocalService.updateEntry(userId, course.getGroupId(), Course.class.getName(),
-					course.getCourseId(), course.getUuid(),0, serviceContext.getAssetCategoryIds(),
+					course.getCourseId(), course.getUuid(),courseTypeId, serviceContext.getAssetCategoryIds(),
 					serviceContext.getAssetTagNames(), true, executionStartDate, executionEndDate,new java.util.Date(System.currentTimeMillis()), null,
 					ContentTypes.TEXT_HTML, course.getTitle(), course.getDescription(locale), summary, null, null, 0, 0,null, false);
+			
+			log.debug("assetEntry" + assetEntry.getClassTypeId());
+			
 			assetLinkLocalService.updateLinks(
 					userId, assetEntry.getEntryId(), serviceContext.getAssetLinkEntryIds(),
 					AssetLinkConstants.TYPE_RELATED);
@@ -627,29 +640,29 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 	}
 	
 	@Indexable(type=IndexableType.REINDEX)
-	public Course modCourse (Course course,String summary, 
+	public Course modCourse (Course course,String summary, long courseTypeId,
 			ServiceContext serviceContext)
 			throws SystemException, PortalException {
-				return this.modCourse(course, summary, serviceContext, true);
+				return this.modCourse(course, summary, courseTypeId, serviceContext, true);
 			}
 
 	@Indexable(type=IndexableType.REINDEX)
-	public Course modCourse (Course course, 
+	public Course modCourse (Course course, long courseTypeId,
 			ServiceContext serviceContext)
 			throws SystemException, PortalException {
-			return this.modCourse(course, "", serviceContext,true);
+			return this.modCourse(course, "", courseTypeId, serviceContext, true);
 	}
 	
 	@Indexable(type=IndexableType.REINDEX)
-	public Course modCourse (Course course,String summary, 
+	public Course modCourse (Course course,String summary, long courseTypeId,
 			ServiceContext serviceContext, boolean visible)
 			throws SystemException, PortalException {
-		return this.modCourse(course,summary, serviceContext, visible, false);
+		return this.modCourse(course,summary, courseTypeId, serviceContext, visible, false);
 	}
 	
 	
 	@Indexable(type=IndexableType.REINDEX)
-	public Course modCourse (Course course,String summary, 
+	public Course modCourse (Course course,String summary, long courseTypeId,
 			ServiceContext serviceContext, boolean visible, boolean allowDuplicateName)
 			throws SystemException, PortalException {
 		
@@ -705,7 +718,7 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 		
 		AssetEntry assetEntry=assetEntryLocalService.updateEntry(
 				userId, course.getGroupId(), Course.class.getName(),
-				course.getCourseId(), course.getUuid(),0, serviceContext.getAssetCategoryIds(),
+				course.getCourseId(), course.getUuid(),courseTypeId, serviceContext.getAssetCategoryIds(),
 			serviceContext.getAssetTagNames(), visible, null, null,
 				new java.util.Date(System.currentTimeMillis()), null,
 				ContentTypes.TEXT_HTML, course.getTitle(), course.getDescription(locale), summary, null, null, 0, 0,
