@@ -88,8 +88,8 @@ if ((actionEditing && hasPermissionAddLact) ||
 		learningActivityType = learningActivityTypeRegistry.getLearningActivityType(activity.getTypeId());
 		if (permissionChecker.hasPermission(activity.getGroupId(),LearningActivity.class.getName(),	activity.getActId(), ActionKeys.VIEW)){
 
-			if(!courseLocked && (Validator.isNotNull(learningActivityType))&&
-				(accessLock || hasPermissionAccessCourseFinished || !activity.isLocked(themeDisplay.getUser(), themeDisplay.getPermissionChecker())  
+			if( (Validator.isNotNull(learningActivityType))&&
+					(accessLock || hasPermissionAccessCourseFinished || (!courseLocked && !activity.isLocked(themeDisplay.getUser(), themeDisplay.getPermissionChecker()))  
 					||(permissionChecker.hasPermission(activity.getGroupId(), LearningActivity.class.getName(), activity.getActId(), ActionKeys.UPDATE) && actionEditing))){%>
 
 				<li class="learningActivity <%=activityEnd%> <%=editing %> <%=status%>"  
