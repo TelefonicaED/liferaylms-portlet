@@ -381,8 +381,6 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 					serviceContext.getAssetTagNames(), true, executionStartDate, executionEndDate,new java.util.Date(System.currentTimeMillis()), null,
 					ContentTypes.TEXT_HTML, course.getTitle(), course.getDescription(locale), summary, null, null, 0, 0,null, false);
 			
-			log.debug("assetEntry" + assetEntry.getClassTypeId());
-			
 			assetLinkLocalService.updateLinks(
 					userId, assetEntry.getEntryId(), serviceContext.getAssetLinkEntryIds(),
 					AssetLinkConstants.TYPE_RELATED);
