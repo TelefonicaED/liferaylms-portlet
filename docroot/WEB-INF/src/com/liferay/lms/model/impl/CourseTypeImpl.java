@@ -80,28 +80,43 @@ public class CourseTypeImpl extends CourseTypeBaseImpl {
 		String courseTypeInfo = "<ul>";
 		courseTypeInfo += "<li>";
 		courseTypeInfo += "<strong>" + LanguageUtil.get(locale, "courseadmin.coursetype.course-templates") + "</strong>";
+		courseTypeInfo += "<p>";
 		for(LayoutSetPrototype template:getTemplates())
-			courseTypeInfo += "<p>" + template.getName(locale) + "</p>";
+			courseTypeInfo += template.getName(locale) + ",";
+		courseTypeInfo = courseTypeInfo.substring(0,courseTypeInfo.length()-1);
+		courseTypeInfo += "</p>";
 		courseTypeInfo += "</li>";
 		courseTypeInfo += "<li>";
 		courseTypeInfo += "<strong>" + LanguageUtil.get(locale, "courseadmin.coursetype.course-correction-methods") +  "</strong>";
+		courseTypeInfo += "<p>";
 		for(CourseEval courseEval:getCourseEvalTypes())
-			courseTypeInfo += "<p>" + LanguageUtil.get(locale, courseEval.getName()) + "</p>";
+			courseTypeInfo += LanguageUtil.get(locale, courseEval.getName()) + ",";
+		courseTypeInfo = courseTypeInfo.substring(0,courseTypeInfo.length()-1);
+		courseTypeInfo += "</p>";
 		courseTypeInfo += "</li>";
 		courseTypeInfo += "<li>";
 		courseTypeInfo += "<strong>" + LanguageUtil.get(locale, "courseadmin.coursetype.lms-activities") +  "</strong>";
+		courseTypeInfo += "<p>";
 		for(LearningActivityType leaningActivityType:getLearningActivityTypes())
-			courseTypeInfo += "<p>" + LanguageUtil.get(locale, leaningActivityType.getName()) + "</p>";
+			courseTypeInfo += LanguageUtil.get(locale, leaningActivityType.getName()) + ",";
+		courseTypeInfo = courseTypeInfo.substring(0,courseTypeInfo.length()-1);
+		courseTypeInfo += "</p>";
 		courseTypeInfo += "</li>";
 		courseTypeInfo += "<li>";
 		courseTypeInfo += "<strong>" + LanguageUtil.get(locale, "courseadmin.coursetype.inscription-types") + "</strong>";
+		courseTypeInfo += "<p>";
 		for(InscriptionType inscriptionType:getInscriptionTypes())
-			courseTypeInfo += "<p>" +  inscriptionType.getTitle(locale) + "</p>";
+			courseTypeInfo += inscriptionType.getTitle(locale) + ",";
+		courseTypeInfo = courseTypeInfo.substring(0,courseTypeInfo.length()-1);
+		courseTypeInfo += "</p>";
 		courseTypeInfo += "</li>";
 		courseTypeInfo += "<li>";
 		courseTypeInfo += "<strong>" +  LanguageUtil.get(locale, "courseadmin.coursetype.calification-types") + "</strong>";
+		courseTypeInfo += "<p>";
 		for(CalificationType calificationType:getCalificationTypes())
-			courseTypeInfo += "<p>" +  LanguageUtil.get(locale, calificationType.getTitle(locale)) + "</p>";
+			courseTypeInfo += LanguageUtil.get(locale, calificationType.getTitle(locale)) + ",";
+		courseTypeInfo = courseTypeInfo.substring(0,courseTypeInfo.length()-1);
+		courseTypeInfo += "</p>";
 		courseTypeInfo += "</li>";
 		courseTypeInfo+="</ul>";
 		return courseTypeInfo;

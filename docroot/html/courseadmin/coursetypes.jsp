@@ -24,7 +24,7 @@
 			<c:if test="${not empty courseType.getDescription(themeDisplay.locale) }">
 				<liferay-ui:icon-help message="${courseType.getDescription(themeDisplay.locale) }"  />
 			</c:if>
-			<a href="${newCourseURL }">
+			<a href="${newCourseURL }" class="${empty courseType.getIconCourseTypeURL(themeDisplay) ? 'default-course-type-image' : ''}">
 				${courseType.getName(themeDisplay.locale) }
 				<c:if test="${not empty courseType.getIconCourseTypeURL(themeDisplay) }">
 					<img src="${courseType.getIconCourseTypeURL(themeDisplay) }"/>
