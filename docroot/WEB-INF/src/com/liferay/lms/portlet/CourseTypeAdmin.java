@@ -270,7 +270,8 @@ public class CourseTypeAdmin extends MVCPortlet {
 					serviceContext.setAddGuestPermissions(Boolean.TRUE);
 					String contentType = uploadRequest.getContentType("iconCourseTypeFile");
 					long repositoryId = DLFolderConstants.getDataRepositoryId(themeDisplay.getScopeGroupId(), DLFolderConstants.DEFAULT_PARENT_FOLDER_ID);
-					long iconCourseTypeFolderId = DLFolderUtil.createDLFolderIconImageCourseType(themeDisplay.getUserId(), themeDisplay.getScopeGroupId(), repositoryId, serviceContext);					FileEntry iconImageFileEntry = DLAppLocalServiceUtil.addFileEntry(themeDisplay.getUserId(),
+					long iconCourseTypeFolderId = DLFolderUtil.createDLFolderIconImageCourseType(themeDisplay.getUserId(), themeDisplay.getScopeGroupId(), repositoryId, serviceContext);		
+					FileEntry iconImageFileEntry = DLAppLocalServiceUtil.addFileEntry(themeDisplay.getUserId(),
 							repositoryId, iconCourseTypeFolderId, iconCourseTypeFileName, contentType, iconCourseTypeFileName, StringPool.BLANK, StringPool.BLANK, iconCourseTypeFile, serviceContext);
 					iconImageId = iconImageFileEntry.getFileEntryId();
 					
