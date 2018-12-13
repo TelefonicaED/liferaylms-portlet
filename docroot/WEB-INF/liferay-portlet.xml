@@ -55,6 +55,8 @@
 	<portlet>
 		<portlet-name>editmodule</portlet-name>
 		<icon>/icon.png</icon>
+		<indexer-class>com.liferay.lms.indexer.ModuleIndexer</indexer-class>
+		<asset-renderer-factory>com.liferay.lms.asset.ModuleAssetRendererFactory</asset-renderer-factory>
 		<instanceable>false</instanceable>
 		<header-portlet-css>/css/main.css</header-portlet-css>
 		<footer-portlet-javascript>/js/main.js</footer-portlet-javascript>

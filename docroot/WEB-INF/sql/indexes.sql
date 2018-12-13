@@ -89,6 +89,7 @@ create index IX_BAC99850 on Lms_LearningActivityTry (actId, userId);
 create index IX_706EEA01 on Lms_LearningActivityTry (userId);
 create index IX_AC65C30D on Lms_LearningActivityTry (uuid_);
 
+create index IX_87D5C4C9 on Lms_Module (companyId);
 create index IX_306AE98B on Lms_Module (groupId);
 create index IX_3ED54339 on Lms_Module (userId);
 create index IX_E045C191 on Lms_Module (userId, groupId);

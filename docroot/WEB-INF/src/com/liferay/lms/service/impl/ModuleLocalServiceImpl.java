@@ -51,6 +51,9 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.search.Indexer;
+import com.liferay.portal.kernel.search.IndexerRegistryUtil;
+import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PropsUtil;
@@ -67,6 +70,8 @@ import com.liferay.portal.service.RoleLocalServiceUtil;
 import com.liferay.portal.service.TeamLocalServiceUtil;
 import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.util.PortalUtil;
+import com.liferay.portlet.asset.model.AssetEntry;
+import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
 import com.liferay.util.LmsLocaleUtil;
 
 /**
@@ -282,7 +287,7 @@ public class ModuleLocalServiceImpl extends ModuleLocalServiceBaseImpl {
 
 	}
 	
-	public Module addmodule (Module validmodule) throws SystemException {
+	public Module addmodule (Module validmodule) throws SystemException, PortalException {
 	    Module fileobj = modulePersistence.create(CounterLocalServiceUtil.increment(Module.class.getName()));
 
 	    fileobj.setCompanyId(validmodule.getCompanyId());
@@ -308,10 +313,6 @@ public class ModuleLocalServiceImpl extends ModuleLocalServiceBaseImpl {
 	    	Role siteMember = RoleLocalServiceUtil.fetchRole(validmodule.getCompanyId(), RoleConstants.SITE_MEMBER);
 	    	ResourcePermissionLocalServiceUtil.setResourcePermissions(validmodule.getCompanyId(), 
 	    			Module.class.getName(),ResourceConstants.SCOPE_INDIVIDUAL, String.valueOf(fileobj.getModuleId()),  siteMember.getRoleId(),  new String[]{"VIEW","ACCESS"});
-	   
-	    	
-	    	
-	    	
 	    	
 			resourceLocalService.addResources(
 					validmodule.getCompanyId(), validmodule.getGroupId(), validmodule.getUserId(),
@@ -327,6 +328,13 @@ public class ModuleLocalServiceImpl extends ModuleLocalServiceBaseImpl {
 	    fileobj = LmsLocaleUtil.checkDefaultLocale(Module.class, fileobj, "description");
 
 	    Module module = modulePersistence.update(fileobj, false);
+	    
+	    //AssetEntry
+	    AssetEntry assetEntry = assetEntryLocalService. updateEntry(module.getUserId(), module.getGroupId(), 
+	    		Module.class.getName(), module.getModuleId(), module.getUuid(), 0, null, null, true, 
+	    		module.getStartDate(), module.getEndDate(), new Date(System.currentTimeMillis()), null,
+	    		ContentTypes.TEXT_HTML, module.getTitle(), module.getDescription(), module.getDescription(),
+	    		null, null, 0, 0, null, false);
 
 		//auditing
 		AuditingLogFactory.audit(module.getCompanyId(), module.getGroupId(), Module.class.getName(), 
@@ -337,7 +345,7 @@ public class ModuleLocalServiceImpl extends ModuleLocalServiceBaseImpl {
 	
 	public Module addModule(Long companyId, Long courseId, Long userId, 
 			String title, String description,
-			Date startDate, Date endDate, Long ordern) throws SystemException {
+			Date startDate, Date endDate, Long ordern) throws SystemException, PortalException {
 		Module fileobj = modulePersistence.create(CounterLocalServiceUtil.increment(Module.class.getName()));
 
 	    fileobj.setCompanyId(companyId);
@@ -381,6 +389,13 @@ public class ModuleLocalServiceImpl extends ModuleLocalServiceBaseImpl {
 		
 	    Module module = modulePersistence.update(fileobj, false);
 	    
+	    //AssetEntry
+	    AssetEntry assetEntry = assetEntryLocalService.updateEntry(module.getUserId(), module.getGroupId(), 
+	    		Module.class.getName(), module.getModuleId(), module.getUuid(), 0, null, null, true, 
+	    		module.getStartDate(), module.getEndDate(), new Date(System.currentTimeMillis()), null,
+	    		ContentTypes.TEXT_HTML, module.getTitle(), module.getDescription(), module.getDescription(),
+	    		null, null, 0, 0, null, false);
+	    
 		//auditing
 		AuditingLogFactory.audit(module.getCompanyId(), module.getGroupId(), Module.class.getName(), 
 				fileobj.getModuleId(), module.getUserId(), AuditConstants.ADD, null);
@@ -388,9 +403,12 @@ public class ModuleLocalServiceImpl extends ModuleLocalServiceBaseImpl {
 		return module;
 	}
 
-	public void remove(Module fileobj, long userIdAction) throws SystemException {
+	public void remove(Module fileobj, long userIdAction) throws SystemException, PortalException {
 
-//		modulePersistence.remove(fileobj);
+		//Remove from lucene
+		Indexer indexer = IndexerRegistryUtil.getIndexer(Module.class);
+		indexer.delete(fileobj);
+		
 		try {
 			resourceLocalService.deleteResource(
 					fileobj.getCompanyId(), Module.class.getName(),
@@ -400,6 +418,7 @@ public class ModuleLocalServiceImpl extends ModuleLocalServiceBaseImpl {
 			if(log.isInfoEnabled())log.info(e.getMessage());
 			throw new SystemException(e);
 		}
+		assetEntryLocalService.deleteEntry(Module.class.getName(), fileobj.getModuleId());
 		modulePersistence.remove(fileobj);
 
 		//auditing
@@ -408,7 +427,7 @@ public class ModuleLocalServiceImpl extends ModuleLocalServiceBaseImpl {
 	}
 
 	@Override
-	public Module updateModule(Module module, long userIdAction) throws SystemException {
+	public Module updateModule(Module module, long userIdAction) throws SystemException, PortalException {
 		
 		module = LmsLocaleUtil.checkDefaultLocale(Module.class, module, "title");
 		module = LmsLocaleUtil.checkDefaultLocale(Module.class, module, "description");
@@ -428,6 +447,13 @@ public class ModuleLocalServiceImpl extends ModuleLocalServiceBaseImpl {
 		}
 		module = super.updateModule(module);
 		
+	    //AssetEntry
+	    AssetEntry assetEntry = assetEntryLocalService.updateEntry(module.getUserId(), module.getGroupId(), 
+	    		Module.class.getName(), module.getModuleId(), module.getUuid(), 0, null, null, true, 
+	    		module.getStartDate(), module.getEndDate(), new Date(System.currentTimeMillis()), null,
+	    		ContentTypes.TEXT_HTML, module.getTitle(), module.getDescription(), module.getDescription(),
+	    		null, null, 0, 0, null, false);
+		
 		//auditing
 		AuditingLogFactory.audit(module.getCompanyId(), module.getGroupId(), Module.class.getName(), 
 				module.getModuleId(), userIdAction, AuditConstants.UPDATE, null);
@@ -442,6 +468,17 @@ public class ModuleLocalServiceImpl extends ModuleLocalServiceBaseImpl {
 		module = LmsLocaleUtil.checkDefaultLocale(Module.class, module, "description");
 		module.setModifiedDate(new java.util.Date(System.currentTimeMillis()));
 		module = super.updateModule(module, merge);
+		
+	    //AssetEntry
+	    try {
+			AssetEntry assetEntry = assetEntryLocalService.updateEntry(module.getUserId(), module.getGroupId(), 
+					Module.class.getName(), module.getModuleId(), module.getUuid(), 0, null, null, true, 
+					module.getStartDate(), module.getEndDate(), new Date(System.currentTimeMillis()), null,
+					ContentTypes.TEXT_HTML, module.getTitle(), module.getDescription(), module.getDescription(),
+					null, null, 0, 0, null, false);
+		} catch (PortalException e) {
+			e.printStackTrace();
+		}
 
 		//auditing
 		AuditingLogFactory.audit(module.getCompanyId(), module.getGroupId(), Module.class.getName(), 
@@ -574,5 +611,9 @@ public class ModuleLocalServiceImpl extends ModuleLocalServiceBaseImpl {
 			}
 		}
 		return count;
+	}
+	
+	public List<Module> getModulesByCompanyId(long companyId) throws SystemException{
+		return modulePersistence.findByCompanyId(companyId);
 	}
 }
