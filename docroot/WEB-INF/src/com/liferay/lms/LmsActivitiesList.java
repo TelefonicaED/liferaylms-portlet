@@ -52,6 +52,7 @@ import com.liferay.lms.service.LearningActivityTryLocalServiceUtil;
 import com.liferay.lms.service.ModuleLocalServiceUtil;
 import com.liferay.lms.service.P2pActivityCorrectionsLocalServiceUtil;
 import com.liferay.lms.service.P2pActivityLocalServiceUtil;
+import com.liferay.lms.util.LmsConstant;
 import com.liferay.portal.NoSuchLayoutException;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -932,15 +933,7 @@ public class LmsActivitiesList extends MVCPortlet {
 	public void doView(RenderRequest renderRequest,
 			RenderResponse renderResponse) throws IOException, PortletException {
 
-        /*
-			ThemeDisplay themeDisplay = (ThemeDisplay)renderRequest.getAttribute(
-					WebKeys.THEME_DISPLAY);
-	
-			if((themeDisplay!=null)&&(themeDisplay.isWidget())) {
-				include("/html/lmsactivitieslist/widget/view.jsp",renderRequest,renderResponse);
-			}
-			else
-		*/
+		ThemeDisplay themeDisplay = (ThemeDisplay)renderRequest.getAttribute(WebKeys.THEME_DISPLAY);
 		
 		log.debug("******doView**********");
 			
@@ -977,7 +970,6 @@ public class LmsActivitiesList extends MVCPortlet {
 				renderRequest.getPortletSession().removeAttribute("preferencesOpen");
 			}
 			
-			renderRequest.setAttribute("showcategorization", ("false".equals(PropsUtil.get("activity.show.categorization")))?false:true);
 			include("/html/editactivity/editactivity.jsp",renderRequest,renderResponse);
 			
 		}else if(ParamUtil.getBoolean(renderRequest,"califications")){

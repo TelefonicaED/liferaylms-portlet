@@ -182,12 +182,12 @@ for(InscriptionType inscriptionType :inscriptionTypeRegistry.getInscriptionTypes
 %>
 </aui:field-wrapper>
 
-<liferay-ui:header title="show-hide-activity" />
+<liferay-ui:header title="modules-and-activities" />
 <aui:field-wrapper>
-
 	
-	<aui:input type="checkbox" name="showHideActivity"
-	label="show-hide-activity" checked="<%=prefs.getShowHideActivity()%>" value="<%=prefs.getShowHideActivity()%>" />
+	<aui:input type="checkbox" name="showModuleClassification"	label="show-module-classification" checked="<%= prefs.isShowModuleClassification() %>" />
+	<aui:input type="checkbox" name="showActivityClassification" label="show-activity-classification" checked="<%= prefs.isShowActivityClassification() %>" />
+	<aui:input type="checkbox" name="showHideActivity"	label="show-hide-activity" checked="<%=prefs.getShowHideActivity()%>" value="<%=prefs.getShowHideActivity()%>" />
 
 </aui:field-wrapper>
 

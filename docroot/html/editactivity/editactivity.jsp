@@ -1026,9 +1026,14 @@ Liferay.provide(
 		%>
 		</liferay-ui:panel>
 		<%
-		boolean showCategorization = ("false".equals(PropsUtil.get("activity.show.categorization")))?false:true;
+		boolean showActivityClassification = Boolean.TRUE;
+		try {
+			showActivityClassification = PrefsPropsUtil.getBoolean(themeDisplay.getCompanyId(), LmsConstant.SHOW_ACTIVITY_CLASSIFICATION);
+		} catch (SystemException e) {
+			e.printStackTrace();
+		}
 		%>
-		<c:if test="<%= showCategorization %>">
+		<c:if test="<%= showActivityClassification %>">
 			<c:choose>
 				<c:when test="<%=isCourse %>">
 					<liferay-ui:panel title="categorization" collapsible="true" defaultState="closed">
