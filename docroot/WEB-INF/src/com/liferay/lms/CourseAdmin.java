@@ -860,6 +860,7 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 		String newCourseName  = ParamUtil.getString(actionRequest, "newCourseName", "New course cloned");
 		boolean cloneForum = ParamUtil.getBoolean(actionRequest, "cloneForum");
 		boolean cloneDocuments = ParamUtil.getBoolean(actionRequest, "cloneDocuments");
+		boolean cloneModuleClassification = ParamUtil.getBoolean(actionRequest, "cloneModuleClassification");
 		boolean cloneActivityClassificationTypes = ParamUtil.getBoolean(actionRequest, "cloneActivityClassificationTypes");
 		int startMonth = 	ParamUtil.getInteger(actionRequest, "startMon");
 		int startYear = 	ParamUtil.getInteger(actionRequest, "startYear");
@@ -925,6 +926,7 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 				message.put("visible",visible);
 				message.put("cloneForum", cloneForum);
 				message.put("cloneDocuments", cloneDocuments);
+				message.put("cloneModuleClassification", cloneModuleClassification);
 				message.put("cloneActivityClassificationTypes", cloneActivityClassificationTypes);
 				MessageBusUtil.sendMessage("liferay/lms/courseClone", message);
 				SessionMessages.add(actionRequest, "courseadmin.clone.confirmation.success");

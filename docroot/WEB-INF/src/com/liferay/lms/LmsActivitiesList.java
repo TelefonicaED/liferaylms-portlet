@@ -52,7 +52,6 @@ import com.liferay.lms.service.LearningActivityTryLocalServiceUtil;
 import com.liferay.lms.service.ModuleLocalServiceUtil;
 import com.liferay.lms.service.P2pActivityCorrectionsLocalServiceUtil;
 import com.liferay.lms.service.P2pActivityLocalServiceUtil;
-import com.liferay.lms.util.LmsConstant;
 import com.liferay.portal.NoSuchLayoutException;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;

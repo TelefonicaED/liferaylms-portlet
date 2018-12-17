@@ -10,6 +10,7 @@ import java.util.Map;
 
 import javax.portlet.PortletURL;
 
+import com.liferay.lms.model.Course;
 import com.liferay.lms.model.Module;
 import com.liferay.lms.service.ModuleLocalServiceUtil;
 import com.liferay.portal.kernel.log.Log;
@@ -32,7 +33,9 @@ import com.liferay.portal.model.User;
 import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portlet.asset.model.AssetEntry;
+import com.liferay.portlet.asset.service.AssetCategoryLocalServiceUtil;
 import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
+import com.liferay.portlet.asset.service.AssetTagLocalServiceUtil;
 import com.liferay.portlet.expando.model.ExpandoBridge;
 import com.liferay.portlet.expando.util.ExpandoBridgeIndexerUtil;
 
@@ -108,6 +111,8 @@ public class ModuleIndexer extends BaseIndexer {
 		if(assetEntry!=null){
 			displayDate = assetEntry.getPublishDate();
 		}		
+		long[] assetCategoryIds = AssetCategoryLocalServiceUtil.getCategoryIds(Module.class.getName(), entryId);
+		String[] assetTagNames = AssetTagLocalServiceUtil.getTagNames(Module.class.getName(), entryId);
 		ExpandoBridge expandoBridge = entry.getExpandoBridge();
 
 		Document document = new DocumentImpl();
@@ -124,6 +129,8 @@ public class ModuleIndexer extends BaseIndexer {
 		document.addText(Field.USER_NAME, userName);
 		document.addLocalizedText(Field.TITLE, titleMap);
 		document.addText(Field.CONTENT, content);
+		document.addKeyword(Field.ASSET_CATEGORY_IDS, assetCategoryIds);
+		document.addKeyword(Field.ASSET_TAG_NAMES, assetTagNames);
 
 		document.addKeyword(Field.ENTRY_CLASS_NAME, Module.class.getName());
 		document.addKeyword(Field.ENTRY_CLASS_PK, entryId);

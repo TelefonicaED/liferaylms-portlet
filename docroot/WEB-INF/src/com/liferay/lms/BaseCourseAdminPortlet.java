@@ -35,7 +35,6 @@ import au.com.bytecode.opencsv.CSVReader;
 import au.com.bytecode.opencsv.CSVWriter;
 
 import com.liferay.counter.service.CounterLocalServiceUtil;
-import com.liferay.lms.asset.CourseAssetRendererFactory;
 import com.liferay.lms.auditing.AuditConstants;
 import com.liferay.lms.auditing.AuditingLogFactory;
 import com.liferay.lms.course.diploma.CourseDiploma;
@@ -129,8 +128,6 @@ import com.liferay.portal.util.comparator.UserLastNameComparator;
 import com.liferay.portlet.PortletPreferencesFactoryUtil;
 import com.liferay.portlet.announcements.EntryDisplayDateException;
 import com.liferay.portlet.asset.AssetCategoryException;
-import com.liferay.portlet.asset.AssetRendererFactoryRegistryUtil;
-import com.liferay.portlet.asset.model.AssetEntry;
 import com.liferay.portlet.asset.model.AssetVocabulary;
 import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.model.DLFolder;

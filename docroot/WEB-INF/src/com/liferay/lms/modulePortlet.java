@@ -35,7 +35,6 @@ import com.liferay.lms.model.Module;
 import com.liferay.lms.model.impl.ModuleImpl;
 import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityLocalServiceUtil;
-import com.liferay.lms.service.LearningActivityServiceUtil;
 import com.liferay.lms.service.ModuleLocalServiceUtil;
 import com.liferay.lms.util.LmsConstant;
 import com.liferay.portal.kernel.exception.NestableException;
@@ -51,6 +50,7 @@ import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.upload.UploadPortletRequest;
+import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.MethodHandler;
 import com.liferay.portal.kernel.util.MethodKey;
@@ -60,6 +60,7 @@ import com.liferay.portal.kernel.util.PrefsPropsUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.xml.DocumentException;
@@ -262,7 +263,6 @@ public class modulePortlet extends MVCPortlet {
 		}else{
 			editmoduleURL = liferayPortletResponse.createActionURL();
 		}
-		//editmoduleURL.setWindowState(LiferayWindowState.POP_UP);
 
 		String editType = ParamUtil.getString(renderRequest, "editType",(String)renderRequest.getAttribute("editType"));
 		if ("edit".equalsIgnoreCase(editType)) {
@@ -453,16 +453,41 @@ public class modulePortlet extends MVCPortlet {
 	public void addmodule(ActionRequest request, ActionResponse response) throws Exception {
 
 		log.debug("**********addmodule***********");
-		
-		Module module = moduleFromRequest(request);
+		UploadPortletRequest uploadRequest = PortalUtil.getUploadPortletRequest(request);
+		Module module = moduleFromRequest(request, uploadRequest);
 		ArrayList<String> errors = moduleValidator.validatemodule(module, request);
 		ThemeDisplay themeDisplay = (ThemeDisplay) request
 				.getAttribute(WebKeys.THEME_DISPLAY);
-
+		
 		if (errors.isEmpty()) {
 			try {
-				//module.setExpandoBridgeAttributes(serviceContext);
-				Module modcreated = ModuleLocalServiceUtil.addmodule(module);
+				ServiceContext serviceContext = ServiceContextFactory.getInstance(Module.class.getName(), request);
+				List<Long> assetCategoryIdsList = new ArrayList<Long>();
+				boolean updateAssetCategoryIds = false;
+				for (String name:Collections.list((Enumeration<String>)uploadRequest.getParameterNames())){
+					if (name.startsWith("assetCategoryIds")) {
+						updateAssetCategoryIds = true;
+						for (long assetCategoryId : StringUtil.split(
+								ParamUtil.getString(uploadRequest, name), 0L)) {
+							assetCategoryIdsList.add(assetCategoryId);
+						}
+					}
+				}
+				if (updateAssetCategoryIds) {
+					serviceContext.setAssetCategoryIds(ArrayUtil.toArray(
+							assetCategoryIdsList.toArray(
+									new Long[assetCategoryIdsList.size()])));
+				}
+				String assetTagNames = uploadRequest.getParameter("assetTagNames");
+				if (Validator.isNotNull(assetTagNames)){ 
+					serviceContext.setAssetTagNames(StringUtil.split(assetTagNames));
+				}
+				log.debug("ServiceContext:: " + Validator.isNotNull(serviceContext));
+				if(Validator.isNotNull(serviceContext)){
+					log.debug("categories:: " + serviceContext.getAssetCategoryIds());
+					log.debug("tags:: " + serviceContext.getAssetTagNames());
+				}
+				Module modcreated = ModuleLocalServiceUtil.addmodule(module, serviceContext);
 
 				//response.setRenderParameter("view", "");
 				response.setRenderParameter("editType","edit");	
@@ -503,21 +528,41 @@ public class modulePortlet extends MVCPortlet {
 
 	private void addmodulePopUp(RenderRequest request, RenderResponse response) throws IOException, PortalException, SystemException  {
 		log.debug("addmodulePopUp");
-		//ServiceContext serviceContext = ServiceContextFactory.getInstance( Module.class.getName(), request);
-
-		Module module = moduleFromRequest(request);
+		UploadPortletRequest uploadRequest = PortalUtil.getUploadPortletRequest(request);
+		Module module = moduleFromRequest(request, uploadRequest );
 		ArrayList<String> errors = moduleValidator.validatemodule(module, request);
 
 
 		if (errors.isEmpty()) {
 			try {
-
-
-				//module=ModuleLocalServiceUtil.addmodule(module,this.sc);
-				module=ModuleLocalServiceUtil.addmodule(module);
-				//ServiceContext serviceContext = ServiceContextFactory.getInstance( Module.class.getName(), request);
+				ServiceContext serviceContext = ServiceContextFactory.getInstance( Module.class.getName(), request);
+				List<Long> assetCategoryIdsList = new ArrayList<Long>();
+				boolean updateAssetCategoryIds = false;
+				for (String name:Collections.list((Enumeration<String>)uploadRequest.getParameterNames())){
+					if (name.startsWith("assetCategoryIds")) {
+						updateAssetCategoryIds = true;
+						for (long assetCategoryId : StringUtil.split(
+								ParamUtil.getString(uploadRequest, name), 0L)) {
+							assetCategoryIdsList.add(assetCategoryId);
+						}
+					}
+				}
+				if (updateAssetCategoryIds) {
+					serviceContext.setAssetCategoryIds(ArrayUtil.toArray(
+							assetCategoryIdsList.toArray(
+									new Long[assetCategoryIdsList.size()])));
+				}
+				String assetTagNames = uploadRequest.getParameter("assetTagNames");
+				if (Validator.isNotNull(assetTagNames)){ 
+					serviceContext.setAssetTagNames(StringUtil.split(assetTagNames));
+				}
+				log.debug("ServiceContext:: " + Validator.isNotNull(serviceContext));
+				if(Validator.isNotNull(serviceContext)){
+					log.debug("categories:: " + serviceContext.getAssetCategoryIds());
+					log.debug("tags:: " + serviceContext.getAssetTagNames());
+				}
+				module=ModuleLocalServiceUtil.addmodule(module, serviceContext);
 				module.setExpandoBridgeAttributes(this.sc);
-
 				ModuleLocalServiceUtil.updateModule(module);
 
 				request.setAttribute("moduleId",module.getModuleId());
@@ -645,15 +690,39 @@ public class modulePortlet extends MVCPortlet {
 	public void updatemodule(ActionRequest request, ActionResponse response) throws Exception {
 		
 		log.debug("**********updatemodule***********");
-		
-		Module module = moduleFromRequest(request);
+		UploadPortletRequest uploadRequest = PortalUtil.getUploadPortletRequest(request);
+		Module module = moduleFromRequest(request, uploadRequest);
 		ArrayList<String> errors = moduleValidator.validatemodule(module, request);
 		ThemeDisplay themeDisplay = (ThemeDisplay) request
 				.getAttribute(WebKeys.THEME_DISPLAY);
 
 		if (errors.isEmpty()) {
 			try {
-				ModuleLocalServiceUtil.updateModule(module);
+				ServiceContext  serviceContext = ServiceContextFactory.getInstance(Module.class.getName(), request);
+				List<Long> assetCategoryIdsList = new ArrayList<Long>();
+				boolean updateAssetCategoryIds = false;
+				for (String name:Collections.list((Enumeration<String>)uploadRequest.getParameterNames())){
+					if (name.startsWith("assetCategoryIds")) {
+						updateAssetCategoryIds = true;
+						for (long assetCategoryId : StringUtil.split(
+								ParamUtil.getString(uploadRequest, name), 0L)) {
+							assetCategoryIdsList.add(assetCategoryId);
+						}
+					}
+				}
+				if (updateAssetCategoryIds) {
+					serviceContext.setAssetCategoryIds(ArrayUtil.toArray(
+							assetCategoryIdsList.toArray(
+									new Long[assetCategoryIdsList.size()])));
+				}
+				String assetTagNames = uploadRequest.getParameter("assetTagNames");
+				serviceContext.setAssetTagNames(StringUtil.split(assetTagNames));
+				log.debug("ServiceContext:: " + Validator.isNotNull(serviceContext));
+				if(Validator.isNotNull(serviceContext)){
+					log.debug("categories:: " + serviceContext.getAssetCategoryIds());
+					log.debug("tags:: " + serviceContext.getAssetTagNames());
+				}
+				ModuleLocalServiceUtil.updateModule(module, serviceContext);
 				//MultiVMPoolUtil.clear();
 				response.setRenderParameter("view", "");
 				SessionMessages.add(request, "module-updated-successfully");
@@ -694,7 +763,8 @@ public class modulePortlet extends MVCPortlet {
 
 	private void updatemodulePopUp(RenderRequest request, RenderResponse response) throws PortalException, SystemException, IOException {
 		log.debug("Dentro de updatemodulePopUp");
-		Module module = moduleFromRequest(request);
+		UploadPortletRequest uploadRequest = PortalUtil.getUploadPortletRequest(request);
+		Module module = moduleFromRequest(request, uploadRequest);
 		request.setAttribute("moduleId",module.getModuleId());
 		request.setAttribute("view", "editmodule");
 		request.setAttribute("editType", "edit");
@@ -704,7 +774,31 @@ public class modulePortlet extends MVCPortlet {
 
 		if (errors.isEmpty()) {
 			try {
-				ModuleLocalServiceUtil.updateModule(module);
+				ServiceContext  serviceContext = ServiceContextFactory.getInstance(Module.class.getName(), request);
+				List<Long> assetCategoryIdsList = new ArrayList<Long>();
+				boolean updateAssetCategoryIds = false;
+				for (String name:Collections.list((Enumeration<String>)uploadRequest.getParameterNames())){
+					if (name.startsWith("assetCategoryIds")) {
+						updateAssetCategoryIds = true;
+						for (long assetCategoryId : StringUtil.split(
+								ParamUtil.getString(uploadRequest, name), 0L)) {
+							assetCategoryIdsList.add(assetCategoryId);
+						}
+					}
+				}
+				if (updateAssetCategoryIds) {
+					serviceContext.setAssetCategoryIds(ArrayUtil.toArray(
+							assetCategoryIdsList.toArray(
+									new Long[assetCategoryIdsList.size()])));
+				}
+				String assetTagNames = uploadRequest.getParameter("assetTagNames");
+				serviceContext.setAssetTagNames(StringUtil.split(assetTagNames));
+				log.debug("ServiceContext:: " + Validator.isNotNull(serviceContext));
+				if(Validator.isNotNull(serviceContext)){
+					log.debug("categories:: " + serviceContext.getAssetCategoryIds());
+					log.debug("tags:: " + serviceContext.getAssetTagNames());
+				}
+				ModuleLocalServiceUtil.updateModule(module, serviceContext);
 				//MultiVMPoolUtil.clear();
 				SessionMessages.add(request, "module-updated-successfully");
 			} catch (Exception cvex) {
@@ -752,13 +846,14 @@ public class modulePortlet extends MVCPortlet {
 		}
 	}
 
-	private Module moduleFromRequest(PortletRequest actRequest) throws PortalException, SystemException {
+	private Module moduleFromRequest(PortletRequest actRequest, UploadPortletRequest request) throws PortalException, SystemException {
 		ThemeDisplay themeDisplay = (ThemeDisplay) actRequest.getAttribute(WebKeys.THEME_DISPLAY);
-		UploadPortletRequest request = PortalUtil.getUploadPortletRequest(actRequest);
+		ServiceContext  serviceContext = ServiceContextFactory.getInstance(Module.class.getName(), actRequest);
+		
 
 		Module module = null;
 		long moduleId=ParamUtil.getLong(request, "resourcePrimKey",0);
-		ServiceContext  serviceContext = ServiceContextFactory.getInstance( Module.class.getName(), request);
+		
 		if(moduleId>0)
 		{
 			module=ModuleLocalServiceUtil.getModule(ParamUtil.getLong(request, "resourcePrimKey",0));
@@ -769,9 +864,6 @@ public class modulePortlet extends MVCPortlet {
 		{
 			module=new ModuleImpl();
 			this.sc = serviceContext;
-
-			//serviceContext = ServiceContextFactory.getInstance( Module.class.getName(), request);
-			//module.setExpandoBridgeAttributes(serviceContext);
 
 		}
 		module.setTitle(StringPool.BLANK); 
