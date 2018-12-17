@@ -21,21 +21,15 @@ import java.util.List;
 import com.liferay.counter.service.CounterLocalServiceUtil;
 import com.liferay.lms.auditing.AuditConstants;
 import com.liferay.lms.auditing.AuditingLogFactory;
-import com.liferay.lms.model.Course;
-import com.liferay.lms.model.CourseResult;
 import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.model.LearningActivityTry;
 import com.liferay.lms.model.Module;
 import com.liferay.lms.model.ModuleResult;
-import com.liferay.lms.model.Schedule;
 import com.liferay.lms.service.ClpSerializer;
-import com.liferay.lms.service.CourseResultLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityTryLocalServiceUtil;
 import com.liferay.lms.service.ModuleLocalServiceUtil;
 import com.liferay.lms.service.ModuleResultLocalServiceUtil;
-import com.liferay.lms.service.ModuleServiceUtil;
-import com.liferay.lms.service.ScheduleLocalServiceUtil;
 import com.liferay.lms.service.base.ModuleLocalServiceBaseImpl;
 import com.liferay.lms.service.persistence.ModuleUtil;
 import com.liferay.portal.kernel.bean.PortletBeanLocatorUtil;
@@ -51,22 +45,22 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.search.Indexable;
+import com.liferay.portal.kernel.search.IndexableType;
+import com.liferay.portal.kernel.search.Indexer;
+import com.liferay.portal.kernel.search.IndexerRegistryUtil;
+import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PropsUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.ResourceConstants;
 import com.liferay.portal.model.Role;
 import com.liferay.portal.model.RoleConstants;
-import com.liferay.portal.model.Team;
-import com.liferay.portal.model.User;
-import com.liferay.portal.security.permission.ActionKeys;
-import com.liferay.portal.security.permission.PermissionChecker;
-import com.liferay.portal.security.permission.PermissionCheckerFactoryUtil;
 import com.liferay.portal.service.ResourcePermissionLocalServiceUtil;
 import com.liferay.portal.service.RoleLocalServiceUtil;
-import com.liferay.portal.service.TeamLocalServiceUtil;
-import com.liferay.portal.service.UserLocalServiceUtil;
-import com.liferay.portal.util.PortalUtil;
+import com.liferay.portal.service.ServiceContext;
+import com.liferay.portlet.asset.model.AssetEntry;
 import com.liferay.util.LmsLocaleUtil;
 
 /**
@@ -202,6 +196,7 @@ public class ModuleLocalServiceImpl extends ModuleLocalServiceBaseImpl {
 		}
 	}
 
+	@Indexable(type=IndexableType.REINDEX)
 	public void goUpModule(long moduleId, long userIdAction ) throws SystemException
 	{
 		Module previusModule=getPreviusModule(moduleId);
@@ -225,6 +220,8 @@ public class ModuleLocalServiceImpl extends ModuleLocalServiceBaseImpl {
 		}
 		
 	}
+	
+	@Indexable(type=IndexableType.REINDEX)
 	public void goDownModule(long moduleId , long userIdAction) throws SystemException
 	{
 		Module nextModule=getNextModule(moduleId);
@@ -281,8 +278,15 @@ public class ModuleLocalServiceImpl extends ModuleLocalServiceBaseImpl {
 		}
 
 	}
+	@Indexable(type=IndexableType.REINDEX)
+	public Module addmodule(Module module) throws SystemException, PortalException{
+		//Al duplicar el curso o crear ediciones no se copian ni los tags ni las categorías
+		return addmodule(module, null);
+	}
 	
-	public Module addmodule (Module validmodule) throws SystemException {
+	@Indexable(type=IndexableType.REINDEX)
+	public Module addmodule (Module validmodule, ServiceContext serviceContext) throws SystemException, PortalException {
+		log.debug(":::::::::::::::addmodule::::::::::::::::::::");
 	    Module fileobj = modulePersistence.create(CounterLocalServiceUtil.increment(Module.class.getName()));
 
 	    fileobj.setCompanyId(validmodule.getCompanyId());
@@ -308,10 +312,6 @@ public class ModuleLocalServiceImpl extends ModuleLocalServiceBaseImpl {
 	    	Role siteMember = RoleLocalServiceUtil.fetchRole(validmodule.getCompanyId(), RoleConstants.SITE_MEMBER);
 	    	ResourcePermissionLocalServiceUtil.setResourcePermissions(validmodule.getCompanyId(), 
 	    			Module.class.getName(),ResourceConstants.SCOPE_INDIVIDUAL, String.valueOf(fileobj.getModuleId()),  siteMember.getRoleId(),  new String[]{"VIEW","ACCESS"});
-	   
-	    	
-	    	
-	    	
 	    	
 			resourceLocalService.addResources(
 					validmodule.getCompanyId(), validmodule.getGroupId(), validmodule.getUserId(),
@@ -327,6 +327,19 @@ public class ModuleLocalServiceImpl extends ModuleLocalServiceBaseImpl {
 	    fileobj = LmsLocaleUtil.checkDefaultLocale(Module.class, fileobj, "description");
 
 	    Module module = modulePersistence.update(fileobj, false);
+	    
+	    //AssetEntry
+	    long[] categoryIds = (Validator.isNotNull(serviceContext)) ? serviceContext.getAssetCategoryIds() : null;
+	    String[] tagNames = (Validator.isNotNull(serviceContext)) ? serviceContext.getAssetTagNames() : null;
+	    AssetEntry assetEntry = assetEntryLocalService.updateEntry(module.getUserId(), module.getGroupId(), 
+	    		Module.class.getName(), module.getModuleId(), module.getUuid(), 0, categoryIds,
+	    		tagNames, true, module.getStartDate(), module.getEndDate(),
+	    		new Date(System.currentTimeMillis()), null,	ContentTypes.TEXT_HTML, module.getTitle(),
+	    		module.getDescription(), module.getDescription(), null, null, 0, 0, null, false);
+	    
+	    //Index
+		Indexer indexer = IndexerRegistryUtil.nullSafeGetIndexer(Module.class);
+		indexer.reindex(module);
 
 		//auditing
 		AuditingLogFactory.audit(module.getCompanyId(), module.getGroupId(), Module.class.getName(), 
@@ -335,9 +348,16 @@ public class ModuleLocalServiceImpl extends ModuleLocalServiceBaseImpl {
 	    return module;
 	}
 	
+	@Indexable(type=IndexableType.REINDEX)
 	public Module addModule(Long companyId, Long courseId, Long userId, 
 			String title, String description,
-			Date startDate, Date endDate, Long ordern) throws SystemException {
+			Date startDate, Date endDate, Long ordern) throws SystemException, PortalException{
+		return addModule(companyId, courseId, userId, title, description, startDate, endDate, ordern, null);
+	}
+	@Indexable(type=IndexableType.REINDEX)
+	public Module addModule(Long companyId, Long courseId, Long userId, 
+			String title, String description,
+			Date startDate, Date endDate, Long ordern, ServiceContext serviceContext) throws SystemException, PortalException {
 		Module fileobj = modulePersistence.create(CounterLocalServiceUtil.increment(Module.class.getName()));
 
 	    fileobj.setCompanyId(companyId);
@@ -381,16 +401,33 @@ public class ModuleLocalServiceImpl extends ModuleLocalServiceBaseImpl {
 		
 	    Module module = modulePersistence.update(fileobj, false);
 	    
+	    //AssetEntry
+	    long[] categoryIds = (Validator.isNotNull(serviceContext)) ? serviceContext.getAssetCategoryIds() : null;
+	    String[] tagNames = (Validator.isNotNull(serviceContext)) ? serviceContext.getAssetTagNames() : null;
+	    AssetEntry assetEntry = assetEntryLocalService.updateEntry(module.getUserId(), module.getGroupId(), 
+	    		Module.class.getName(), module.getModuleId(), module.getUuid(), 0, categoryIds,
+	    		tagNames, true, module.getStartDate(), module.getEndDate(),
+	    		new Date(System.currentTimeMillis()), null, ContentTypes.TEXT_HTML, module.getTitle(), module.getDescription(),
+	    		module.getDescription(), null, null, 0, 0, null, false);
+	    
+	    //Index
+		Indexer indexer = IndexerRegistryUtil.nullSafeGetIndexer(Module.class);
+		indexer.reindex(module);
+	    
 		//auditing
 		AuditingLogFactory.audit(module.getCompanyId(), module.getGroupId(), Module.class.getName(), 
 				fileobj.getModuleId(), module.getUserId(), AuditConstants.ADD, null);
 		
 		return module;
 	}
-
-	public void remove(Module fileobj, long userIdAction) throws SystemException {
-
-//		modulePersistence.remove(fileobj);
+	
+	public void remove(Module fileobj, long userIdAction) throws SystemException, PortalException {
+		log.debug("::: remove module :::");
+		
+		//Remove from lucene
+		Indexer indexer = IndexerRegistryUtil.getIndexer(Module.class);
+		indexer.delete(fileobj);
+		
 		try {
 			resourceLocalService.deleteResource(
 					fileobj.getCompanyId(), Module.class.getName(),
@@ -400,15 +437,25 @@ public class ModuleLocalServiceImpl extends ModuleLocalServiceBaseImpl {
 			if(log.isInfoEnabled())log.info(e.getMessage());
 			throw new SystemException(e);
 		}
+		assetEntryLocalService.deleteEntry(Module.class.getName(), fileobj.getModuleId());
 		modulePersistence.remove(fileobj);
 
 		//auditing
 		AuditingLogFactory.audit(fileobj.getCompanyId(), fileobj.getGroupId(), Module.class.getName(), 
 				fileobj.getModuleId(), userIdAction, AuditConstants.DELETE, null);
 	}
+	
+	@Indexable(type=IndexableType.REINDEX)
+	public Module updateModule(Module module, ServiceContext serviceContext) throws PortalException, SystemException{
+		return updateModule(module, true, serviceContext);
+	}
 
-	@Override
-	public Module updateModule(Module module, long userIdAction) throws SystemException {
+	@Indexable(type=IndexableType.REINDEX)
+	public Module updateModule(Module module, long userIdAction) throws SystemException, PortalException{
+		return updateModule(module, userIdAction, null);
+	}
+	@Indexable(type=IndexableType.REINDEX)
+	public Module updateModule(Module module, long userIdAction, ServiceContext serviceContext) throws SystemException, PortalException {
 		
 		module = LmsLocaleUtil.checkDefaultLocale(Module.class, module, "title");
 		module = LmsLocaleUtil.checkDefaultLocale(Module.class, module, "description");
@@ -428,20 +475,56 @@ public class ModuleLocalServiceImpl extends ModuleLocalServiceBaseImpl {
 		}
 		module = super.updateModule(module);
 		
+	    //AssetEntry
+	    long[] categoryIds = (Validator.isNotNull(serviceContext)) ? serviceContext.getAssetCategoryIds() : null;
+	    String[] tagNames = (Validator.isNotNull(serviceContext)) ? serviceContext.getAssetTagNames() : null;
+	    AssetEntry assetEntry = assetEntryLocalService.updateEntry(module.getUserId(), module.getGroupId(), 
+	    		Module.class.getName(), module.getModuleId(), module.getUuid(), 0, categoryIds,
+	    		tagNames, true, module.getStartDate(), module.getEndDate(),
+	    		new Date(System.currentTimeMillis()), null,	ContentTypes.TEXT_HTML, module.getTitle(), module.getDescription(),
+	    		module.getDescription(), null, null, 0, 0, null, false);
+	    
+	    //Index
+		Indexer indexer = IndexerRegistryUtil.nullSafeGetIndexer(Module.class);
+		indexer.reindex(module);
+		
 		//auditing
 		AuditingLogFactory.audit(module.getCompanyId(), module.getGroupId(), Module.class.getName(), 
 				module.getModuleId(), userIdAction, AuditConstants.UPDATE, null);
 		
 		return module;
 	}
-
-	@Override
+	
+	@Indexable(type=IndexableType.REINDEX)
 	public Module updateModule(Module module, boolean merge) throws SystemException {
+		Module updatedModule = null;
+		try {
+			updatedModule = updateModule(module, merge, null);
+		} catch (PortalException e) {
+			e.printStackTrace();
+		}
+		return updatedModule;
+	}
+	@Indexable(type=IndexableType.REINDEX)
+	public Module updateModule(Module module, boolean merge, ServiceContext serviceContext) throws SystemException, PortalException {
 		
 		module = LmsLocaleUtil.checkDefaultLocale(Module.class, module, "title");
 		module = LmsLocaleUtil.checkDefaultLocale(Module.class, module, "description");
 		module.setModifiedDate(new java.util.Date(System.currentTimeMillis()));
 		module = super.updateModule(module, merge);
+		
+	    //AssetEntry
+	    long[] categoryIds = (Validator.isNotNull(serviceContext)) ? serviceContext.getAssetCategoryIds() : null;
+	    String[] tagNames = (Validator.isNotNull(serviceContext)) ? serviceContext.getAssetTagNames() : null;
+		AssetEntry assetEntry = assetEntryLocalService.updateEntry(module.getUserId(), module.getGroupId(), 
+				Module.class.getName(), module.getModuleId(), module.getUuid(), 0, categoryIds,
+				tagNames, true, module.getStartDate(), module.getEndDate(),
+				new Date(System.currentTimeMillis()), null,	ContentTypes.TEXT_HTML, module.getTitle(), module.getDescription(),
+				module.getDescription(), null, null, 0, 0, null, false);
+	    
+	    //Index
+		Indexer indexer = IndexerRegistryUtil.nullSafeGetIndexer(Module.class);
+		indexer.reindex(module);
 
 		//auditing
 		AuditingLogFactory.audit(module.getCompanyId(), module.getGroupId(), Module.class.getName(), 
@@ -574,5 +657,9 @@ public class ModuleLocalServiceImpl extends ModuleLocalServiceBaseImpl {
 			}
 		}
 		return count;
+	}
+	
+	public List<Module> getModulesByCompanyId(long companyId) throws SystemException{
+		return modulePersistence.findByCompanyId(companyId);
 	}
 }

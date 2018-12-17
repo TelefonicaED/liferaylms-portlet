@@ -37,7 +37,6 @@ import com.liferay.lms.service.CourseTypeInscriptionTypeLocalServiceUtil;
 import com.liferay.lms.service.CourseTypeLearningActivityLocalServiceUtil;
 import com.liferay.lms.service.CourseTypeLocalServiceUtil;
 import com.liferay.lms.service.CourseTypeTemplateLocalServiceUtil;
-import com.liferay.lms.service.persistence.CourseTypeFinderUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.language.LanguageUtil;
@@ -78,21 +77,48 @@ public class CourseTypeImpl extends CourseTypeBaseImpl {
 	}
 	
 	public String getInfo(Locale locale) throws SystemException, PortalException{
-		String courseTypeInfo = LanguageUtil.get(locale, "courseadmin.coursetype.available-course-templates") + "</br>";
+		String courseTypeInfo = "<ul>";
+		courseTypeInfo += "<li>";
+		courseTypeInfo += "<strong>" + LanguageUtil.get(locale, "courseadmin.coursetype.course-templates") + "</strong>";
+		courseTypeInfo += "<p>";
 		for(LayoutSetPrototype template:getTemplates())
-			courseTypeInfo += template.getName(locale) + "</br>";
-		courseTypeInfo += LanguageUtil.get(locale, "courseadmin.coursetype.available-course-correction-methods") + "</br>";
+			courseTypeInfo += template.getName(locale) + ", ";
+		courseTypeInfo = courseTypeInfo.substring(0,courseTypeInfo.length()-2);
+		courseTypeInfo += "</p>";
+		courseTypeInfo += "</li>";
+		courseTypeInfo += "<li>";
+		courseTypeInfo += "<strong>" + LanguageUtil.get(locale, "courseadmin.coursetype.course-correction-methods") +  "</strong>";
+		courseTypeInfo += "<p>";
 		for(CourseEval courseEval:getCourseEvalTypes())
-			courseTypeInfo += LanguageUtil.get(locale, courseEval.getName()) + "</br>";
-		courseTypeInfo += LanguageUtil.get(locale, "courseadmin.coursetype.available-lms-activities") + "</br>";
+			courseTypeInfo += LanguageUtil.get(locale, courseEval.getName()) + ", ";
+		courseTypeInfo = courseTypeInfo.substring(0,courseTypeInfo.length()-2);
+		courseTypeInfo += "</p>";
+		courseTypeInfo += "</li>";
+		courseTypeInfo += "<li>";
+		courseTypeInfo += "<strong>" + LanguageUtil.get(locale, "courseadmin.coursetype.lms-activities") +  "</strong>";
+		courseTypeInfo += "<p>";
 		for(LearningActivityType leaningActivityType:getLearningActivityTypes())
-			courseTypeInfo += LanguageUtil.get(locale, leaningActivityType.getName()) + "</br>";
-		courseTypeInfo += LanguageUtil.get(locale, "courseadmin.coursetype.available-inscription-types") + "</br>";
+			courseTypeInfo += LanguageUtil.get(locale, leaningActivityType.getName()) + ", ";
+		courseTypeInfo = courseTypeInfo.substring(0,courseTypeInfo.length()-2);
+		courseTypeInfo += "</p>";
+		courseTypeInfo += "</li>";
+		courseTypeInfo += "<li>";
+		courseTypeInfo += "<strong>" + LanguageUtil.get(locale, "courseadmin.coursetype.inscription-types") + "</strong>";
+		courseTypeInfo += "<p>";
 		for(InscriptionType inscriptionType:getInscriptionTypes())
-			courseTypeInfo += inscriptionType.getTitle(locale) + "</br>";
-		courseTypeInfo += LanguageUtil.get(locale, "courseadmin.coursetype.available-calification-types") + "</br>";
+			courseTypeInfo += inscriptionType.getTitle(locale) + ", ";
+		courseTypeInfo = courseTypeInfo.substring(0,courseTypeInfo.length()-2);
+		courseTypeInfo += "</p>";
+		courseTypeInfo += "</li>";
+		courseTypeInfo += "<li>";
+		courseTypeInfo += "<strong>" +  LanguageUtil.get(locale, "courseadmin.coursetype.calification-types") + "</strong>";
+		courseTypeInfo += "<p>";
 		for(CalificationType calificationType:getCalificationTypes())
-			courseTypeInfo += LanguageUtil.get(locale, calificationType.getTitle(locale)) + "</br>";
+			courseTypeInfo += LanguageUtil.get(locale, calificationType.getTitle(locale)) + ", ";
+		courseTypeInfo = courseTypeInfo.substring(0,courseTypeInfo.length()-2);
+		courseTypeInfo += "</p>";
+		courseTypeInfo += "</li>";
+		courseTypeInfo+="</ul>";
 		return courseTypeInfo;
 	}
 	

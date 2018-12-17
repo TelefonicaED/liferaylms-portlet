@@ -366,6 +366,12 @@
 			<finder-column name="userId" />
 			<finder-column name="groupId" />
 		</finder>
+		<finder name="CompanyId" return-type="Collection">
+			<finder-column name="companyId"/>
+		</finder>
+		
+		<reference package-path="com.liferay.portlet.asset" entity="AssetEntry" />
+		
 	</entity>
 	
 	<entity name="ModuleResult" local-service="true" json-enabled="false" cache-enabled="false">

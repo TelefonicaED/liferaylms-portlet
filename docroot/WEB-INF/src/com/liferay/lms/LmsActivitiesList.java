@@ -39,7 +39,6 @@ import com.liferay.lms.learningactivity.LearningActivityType;
 import com.liferay.lms.learningactivity.LearningActivityTypeRegistry;
 import com.liferay.lms.learningactivity.ResourceExternalLearningActivityType;
 import com.liferay.lms.model.AsynchronousProcessAudit;
-import com.liferay.lms.model.Course;
 import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.model.Module;
 import com.liferay.lms.model.P2pActivity;
@@ -933,15 +932,7 @@ public class LmsActivitiesList extends MVCPortlet {
 	public void doView(RenderRequest renderRequest,
 			RenderResponse renderResponse) throws IOException, PortletException {
 
-        /*
-			ThemeDisplay themeDisplay = (ThemeDisplay)renderRequest.getAttribute(
-					WebKeys.THEME_DISPLAY);
-	
-			if((themeDisplay!=null)&&(themeDisplay.isWidget())) {
-				include("/html/lmsactivitieslist/widget/view.jsp",renderRequest,renderResponse);
-			}
-			else
-		*/
+		ThemeDisplay themeDisplay = (ThemeDisplay)renderRequest.getAttribute(WebKeys.THEME_DISPLAY);
 		
 		log.debug("******doView**********");
 			
@@ -978,7 +969,6 @@ public class LmsActivitiesList extends MVCPortlet {
 				renderRequest.getPortletSession().removeAttribute("preferencesOpen");
 			}
 			
-			renderRequest.setAttribute("showcategorization", ("false".equals(PropsUtil.get("activity.show.categorization")))?false:true);
 			include("/html/editactivity/editactivity.jsp",renderRequest,renderResponse);
 			
 		}else if(ParamUtil.getBoolean(renderRequest,"califications")){

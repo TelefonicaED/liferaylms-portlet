@@ -16,6 +16,9 @@
 <%@page import="com.liferay.util.JavaScriptUtil"%>
 <%@ page import="com.liferay.lms.model.Module" %>
 <%@ page import="com.liferay.lms.service.ModuleLocalServiceUtil"%>
+<%@page import="com.liferay.portal.kernel.exception.SystemException"%>
+<%@page import="com.liferay.lms.util.LmsConstant"%>
+<%@page import="com.liferay.portal.kernel.util.PrefsPropsUtil"%>
 
 <%@include file="../init.jsp" %>
 
@@ -43,7 +46,7 @@
 AUI().ready('node-base' ,'aui-form-validator', 'aui-overlay-context-panel', 'widget-locale', function(A) {
 	
 	window.<portlet:namespace />validateActivity = new A.FormValidator({
-		boundingBox: '#<portlet:namespace />addmodule',
+		boundingBox: '#<portlet:namespace />fm',
 		validateOnBlur: true,
 		validateOnInput: true,
 		selectText: true,
@@ -130,7 +133,7 @@ function validate(){
 	var start = new Date(startDateAno,startDateMes,startDateDia,startDateHora,startDateMinuto);
 	var end = new Date(endDateAno,endDateMes,endDateDia,endDateHora,endDateMinuto);
 	
-	var form = document.getElementById('<portlet:namespace />addmodule');
+	var form = document.getElementById('<portlet:namespace />fm');
 	var inputsform = form.getElementsByTagName("input");
 	var selector = document.getElementById('dpcqlanguageSelector');
 	if(selector){
@@ -150,7 +153,7 @@ function validate(){
 		}
 	 	
 		
-		document.getElementById('<portlet:namespace />addmodule').submit();
+		document.getElementById('<portlet:namespace />fm').submit();
 	}
 }
 
@@ -193,7 +196,7 @@ function validate(){
 
 <% } %>
 
-<aui:form name="addmodule" action="<%=editmoduleURL %>" method="POST" enctype="multipart/form-data">
+<aui:form name="fm" action="<%=editmoduleURL %>" method="POST" enctype="multipart/form-data">
 	<input type="hidden" name="resourcePrimKey" value="<%=module.getPrimaryKey() %>">
 
 <%
@@ -371,6 +374,21 @@ function validate(){
 		);
 	//-->
 	</script>
+<%
+		boolean showModuleClassification = true;
+		try {
+			showModuleClassification = PrefsPropsUtil.getBoolean(themeDisplay.getCompanyId(), LmsConstant.SHOW_MODULE_CLASSIFICATION);
+		} catch (SystemException e) {
+			e.printStackTrace();
+		}
+%>
+		<c:if test="<%= showModuleClassification %>">
+			<liferay-ui:panel title="categorization" collapsible="true" defaultState="closed">
+				<aui:input name="tags" type="assetTags" />
+				<aui:input name="categories" type="assetCategories" />
+			</liferay-ui:panel>
+		</c:if>
+	
 	   
 	<aui:button-row>
 		<input type="button" value="<liferay-ui:message key="save" />" onclick="javascript:validate()" >

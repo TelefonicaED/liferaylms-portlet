@@ -51,6 +51,8 @@
 <%@page import="com.liferay.lms.model.Course"%>
 <%@page import="com.liferay.lms.service.CourseLocalServiceUtil"%>
 <%@page import="com.liferay.lms.model.LearningActivity"%>
+<%@page import="com.liferay.portal.kernel.exception.SystemException"%>
+<%@page import="com.liferay.lms.util.LmsConstant"%>
 <%@ include file="/init.jsp" %>
 <liferay-ui:success key="activity-saved-successfully" message="activity-saved-successfully" />
 <liferay-ui:error key="learningactivity.connect.error.timepassg" message="learningactivity.connect.error.timepassg"></liferay-ui:error>
@@ -1026,9 +1028,14 @@ Liferay.provide(
 		%>
 		</liferay-ui:panel>
 		<%
-		boolean showCategorization = ("false".equals(PropsUtil.get("activity.show.categorization")))?false:true;
+		boolean showActivityClassification = true;
+		try {
+			showActivityClassification = PrefsPropsUtil.getBoolean(themeDisplay.getCompanyId(), LmsConstant.SHOW_ACTIVITY_CLASSIFICATION);
+		} catch (SystemException e) {
+			e.printStackTrace();
+		}
 		%>
-		<c:if test="<%= showCategorization %>">
+		<c:if test="<%= showActivityClassification %>">
 			<c:choose>
 				<c:when test="<%=isCourse %>">
 					<liferay-ui:panel title="categorization" collapsible="true" defaultState="closed">
