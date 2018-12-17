@@ -68,5 +68,6 @@
 		<portlet id="editmodule"></portlet>
 		<portlet id="coursedetail"></portlet>
 		<portlet id="asynchronous-process-dashboard"></portlet>
+		<portlet id="course-type-admin"></portlet>
 	</category>
 </display>

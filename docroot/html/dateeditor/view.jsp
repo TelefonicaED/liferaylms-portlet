@@ -37,7 +37,6 @@
 			<h1>${course.getTitle(themeDisplay.locale)}</h1>
 		</div>	
 		<div class="row">
-			<div class="col-md-4"></div>
 			<div class="col-md-4 aui-field-wrapper-content">
 				<div class="aui-field-wrapper-content">
 					<label class="aui-field-label"><liferay-ui:message key="course-admin.start-execution-date" /></label>
@@ -83,7 +82,6 @@
 								</div>
 								<div class="row">
 									<span class="hour col-md-12">
-										<div class="col-md-4"></div>
 										<div class="col-md-4  aui-field-wrapper-content">
 											<div class="aui-field-wrapper-content">
 												<label class="aui-field-label"><liferay-ui:message key="start-date" /></label>
@@ -129,8 +127,8 @@
 									<h3>${act.getTitle(themeDisplay.locale)}</h3>
 									<div class="row">
 										<span class="hour col-md-12">
-											<div class="col-md-4  aui-field-wrapper-content">
-												<c:if test="${act.typeId == typeP2P}">		
+											<c:if test="${act.typeId == typeP2P}">
+												<div class="col-md-4  aui-field-wrapper-content">	
 													<c:set var="dateupload" value='${act.getExtraContentValue("dateupload") }' />
 													<c:if test="${not empty dateupload }">
 														<c:set var="p2pDate" value="${dateFormat.format(p2pFormat.parse(dateupload))}" />
@@ -149,8 +147,8 @@
 															<input class="ihour" type="text" id="tact${act.actId}" name="tact${act.actId}" value="${p2pTime}" />
 														</div>
 													</div>	
-												</c:if>
-											</div>
+												</div>
+											</c:if>
 											<div class="col-md-4  aui-field-wrapper-content">
 												<div class="aui-field-wrapper-content">
 													<label class="aui-field-label"><liferay-ui:message key="start-date" /></label>

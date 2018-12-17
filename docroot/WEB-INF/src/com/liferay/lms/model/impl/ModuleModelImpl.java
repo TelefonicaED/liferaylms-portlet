@@ -104,9 +104,10 @@ public class ModuleModelImpl extends BaseModelImpl<Module>
 	public static final boolean COLUMN_BITMASK_ENABLED = GetterUtil.getBoolean(com.liferay.util.service.ServiceProps.get(
 				"value.object.column.bitmask.enabled.com.liferay.lms.model.Module"),
 			true);
-	public static long GROUPID_COLUMN_BITMASK = 1L;
-	public static long USERID_COLUMN_BITMASK = 2L;
-	public static long UUID_COLUMN_BITMASK = 4L;
+	public static long COMPANYID_COLUMN_BITMASK = 1L;
+	public static long GROUPID_COLUMN_BITMASK = 2L;
+	public static long USERID_COLUMN_BITMASK = 4L;
+	public static long UUID_COLUMN_BITMASK = 8L;
 
 	/**
 	 * Converts the soap model instance into a normal model instance.
@@ -348,7 +349,19 @@ public class ModuleModelImpl extends BaseModelImpl<Module>
 	}
 
 	public void setCompanyId(long companyId) {
+		_columnBitmask |= COMPANYID_COLUMN_BITMASK;
+
+		if (!_setOriginalCompanyId) {
+			_setOriginalCompanyId = true;
+
+			_originalCompanyId = _companyId;
+		}
+
 		_companyId = companyId;
+	}
+
+	public long getOriginalCompanyId() {
+		return _originalCompanyId;
 	}
 
 	public long getGroupId() {
@@ -778,6 +791,10 @@ public class ModuleModelImpl extends BaseModelImpl<Module>
 
 		moduleModelImpl._originalUuid = moduleModelImpl._uuid;
 
+		moduleModelImpl._originalCompanyId = moduleModelImpl._companyId;
+
+		moduleModelImpl._setOriginalCompanyId = false;
+
 		moduleModelImpl._originalGroupId = moduleModelImpl._groupId;
 
 		moduleModelImpl._setOriginalGroupId = false;
@@ -1006,6 +1023,8 @@ public class ModuleModelImpl extends BaseModelImpl<Module>
 	private String _originalUuid;
 	private long _moduleId;
 	private long _companyId;
+	private long _originalCompanyId;
+	private boolean _setOriginalCompanyId;
 	private long _groupId;
 	private long _originalGroupId;
 	private boolean _setOriginalGroupId;

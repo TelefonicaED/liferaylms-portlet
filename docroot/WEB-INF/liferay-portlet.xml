@@ -55,6 +55,8 @@
 	<portlet>
 		<portlet-name>editmodule</portlet-name>
 		<icon>/icon.png</icon>
+		<indexer-class>com.liferay.lms.indexer.ModuleIndexer</indexer-class>
+		<asset-renderer-factory>com.liferay.lms.asset.ModuleAssetRendererFactory</asset-renderer-factory>
 		<instanceable>false</instanceable>
 		<header-portlet-css>/css/main.css</header-portlet-css>
 		<footer-portlet-javascript>/js/main.js</footer-portlet-javascript>
@@ -690,6 +692,17 @@
 			asynchronous-process-dashboard-portlet
 		</css-class-wrapper>
 	</portlet>
+	<portlet>
+		<portlet-name>course-type-admin</portlet-name>
+		<icon>/icon.png</icon>
+		<control-panel-entry-category>portal</control-panel-entry-category>
+		<control-panel-entry-weight>18.5</control-panel-entry-weight>
+		<instanceable>false</instanceable>
+		<header-portlet-css>/css/main.css</header-portlet-css>
+		<footer-portlet-javascript>/js/main.js</footer-portlet-javascript>
+		<css-class-wrapper>course-type-admin-portlet</css-class-wrapper>
+	</portlet>
+	
 	<role-mapper>
 		<role-name>administrator</role-name>
 		<role-link>Administrator</role-link>

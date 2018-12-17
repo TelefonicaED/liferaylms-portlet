@@ -24,4 +24,12 @@ public class LmsConstant {
 	public static String DOCUMENTLIBRARY_PAGE_KEY = "lms.document.library.viewer.page";
 
 	public static String RESOURCE_INTERNAL_DOCUMENT_LINKED = "lms.resource.internal.linked";
+	public static String SHOW_MODULE_CLASSIFICATION = "showModuleClassification";
+	public static String SHOW_ACTIVITY_CLASSIFICATION = "showActivityClassification";
+	
+	public final static String COURSETYPE_ICON_MAINFOLDER = "icons";
+	public final static String COURSETYPE_ICON_MAINFOLDER_DESCRIPTION = "Course Type Icons";
+	public final static String COURSETYPE_ICON_PORTLETFOLDER = "coursetype";
+	public final static String COURSETYPE_ICON_PORTLETFOLDER_DESCRIPTION = "";
+	
 }

@@ -629,6 +629,9 @@ public class ModuleResultLocalServiceImpl extends ModuleResultLocalServiceBaseIm
 		if(totalActivities > 0){
 			
 			result = activitiesPassed * 100 / totalActivities;
+		}else if(learnActList.size()>0 && !moduleResult.getPassed()){
+			result= 100;
+			passedDate = new Date();
 		}
 		if(result>0)
 		{

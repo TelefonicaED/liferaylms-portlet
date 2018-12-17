@@ -45,6 +45,24 @@ create index IX_8CF7C46F on Lms_CourseResult (courseId, userId);
 create index IX_583EFC25 on Lms_CourseResult (userId);
 create unique index IX_3F29EDEF on Lms_CourseResult (userId, courseId);
 
+create index IX_B3E69260 on Lms_CourseType (companyId);
+create index IX_9A6B92AC on Lms_CourseType (courseTypeId);
+
+create index IX_EB924F40 on Lms_CourseTypeCalificationType (courseTypeCalificationTypeId);
+create index IX_C2333876 on Lms_CourseTypeCalificationType (courseTypeId);
+
+create index IX_B8D93ACB on Lms_CourseTypeCourseEval (courseTypeEvalutationTypeId);
+create index IX_AAF2A5A3 on Lms_CourseTypeCourseEval (courseTypeId);
+
+create index IX_E4E5DA7A on Lms_CourseTypeInscriptionType (courseTypeId);
+create index IX_14979B52 on Lms_CourseTypeInscriptionType (courseTypeInscriptionTypeId);
+
+create index IX_B878E519 on Lms_CourseTypeLearningActivity (courseTypeId);
+create index IX_AC299F06 on Lms_CourseTypeLearningActivity (courseTypeLearningActivityId);
+
+create index IX_A40BAD46 on Lms_CourseTypeTemplate (courseTypeId);
+create index IX_5BD857E0 on Lms_CourseTypeTemplate (courseTypeTemplateId);
+
 create index IX_48E2DCF1 on Lms_LearningActivity (companyId, typeId);
 create index IX_A674914A on Lms_LearningActivity (groupId);
 create index IX_A26B5373 on Lms_LearningActivity (groupId, typeId);
@@ -71,6 +89,7 @@ create index IX_BAC99850 on Lms_LearningActivityTry (actId, userId);
 create index IX_706EEA01 on Lms_LearningActivityTry (userId);
 create index IX_AC65C30D on Lms_LearningActivityTry (uuid_);
 
+create index IX_87D5C4C9 on Lms_Module (companyId);
 create index IX_306AE98B on Lms_Module (groupId);
 create index IX_3ED54339 on Lms_Module (userId);
 create index IX_E045C191 on Lms_Module (userId, groupId);

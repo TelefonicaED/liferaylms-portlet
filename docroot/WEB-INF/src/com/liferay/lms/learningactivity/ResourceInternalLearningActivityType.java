@@ -69,6 +69,11 @@ public class ResourceInternalLearningActivityType extends BaseLearningActivityTy
 		
 		return "learningactivity.internal";
 	}
+	
+	@Override
+	public String getClassName(){
+		return getClass().getName();
+	}
 
 
 	@Override

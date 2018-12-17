@@ -40,6 +40,7 @@ import com.liferay.lms.model.Schedule;
 import com.liferay.lms.model.UserCompetence;
 import com.liferay.lms.service.CourseCompetenceLocalServiceUtil;
 import com.liferay.lms.service.CourseLocalServiceUtil;
+import com.liferay.lms.service.CourseResultLocalServiceUtil;
 import com.liferay.lms.service.LmsPrefsLocalServiceUtil;
 import com.liferay.lms.service.ModuleLocalServiceUtil;
 import com.liferay.lms.service.UserCompetenceLocalServiceUtil;
@@ -69,6 +70,7 @@ import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.FriendlyURLNormalizerUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
@@ -92,6 +94,7 @@ import com.liferay.portal.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.security.permission.PermissionCheckerFactoryUtil;
 import com.liferay.portal.service.ClassNameLocalServiceUtil;
+import com.liferay.portal.service.CompanyLocalServiceUtil;
 import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.LayoutSetPrototypeLocalServiceUtil;
 import com.liferay.portal.service.MembershipRequestLocalServiceUtil;
@@ -285,10 +288,20 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 		return addCourse(titleMap, description, summary, friendlyURL, locale, createDate, startDate, endDate, executionStartDate, executionEndDate, 
 						layoutSetPrototypeId, typesite, CourseEvalId, calificationType, maxUsers, serviceContext, isfromClone);
 	}
-
+	
 	public Course addCourse (Map<Locale,String> titleMap, String description,String summary,String friendlyURL, Locale locale,
 			Date createDate,Date startDate,Date endDate, Date executionStartDate, Date executionEndDate, long layoutSetPrototypeId,int typesite, long CourseEvalId, long calificationType, int maxUsers,ServiceContext serviceContext,boolean isfromClone)
 			throws SystemException, PortalException {
+		return addCourse(titleMap, description, summary, friendlyURL, locale, createDate, startDate, endDate, executionStartDate, executionEndDate, layoutSetPrototypeId, typesite, CourseEvalId, calificationType, maxUsers, serviceContext, isfromClone, 0);
+	}
+
+	public Course addCourse (Map<Locale,String> titleMap, String description,String summary,String friendlyURL, Locale locale,
+			Date createDate,Date startDate,Date endDate, Date executionStartDate, Date executionEndDate, long layoutSetPrototypeId,int typesite, long CourseEvalId, long calificationType, int maxUsers,ServiceContext serviceContext,boolean isfromClone,
+			long courseTypeId)
+			throws SystemException, PortalException {
+		
+		log.debug("courseTypeId:: " + courseTypeId);
+		
 		LmsPrefs lmsPrefs=lmsPrefsLocalService.getLmsPrefsIni(serviceContext.getCompanyId());
 		long userId=serviceContext.getUserId();
 		Course course = coursePersistence.create(counterLocalService.increment(Course.class.getName()));
@@ -364,9 +377,10 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 			
 			resourceLocalService.addResources(serviceContext.getCompanyId(), serviceContext.getScopeGroupId(), userId,Course.class.getName(), course.getPrimaryKey(), false,true, true);
 			AssetEntry assetEntry=assetEntryLocalService.updateEntry(userId, course.getGroupId(), Course.class.getName(),
-					course.getCourseId(), course.getUuid(),0, serviceContext.getAssetCategoryIds(),
+					course.getCourseId(), course.getUuid(),courseTypeId, serviceContext.getAssetCategoryIds(),
 					serviceContext.getAssetTagNames(), true, executionStartDate, executionEndDate,new java.util.Date(System.currentTimeMillis()), null,
 					ContentTypes.TEXT_HTML, course.getTitle(), course.getDescription(locale), summary, null, null, 0, 0,null, false);
+			
 			assetLinkLocalService.updateLinks(
 					userId, assetEntry.getEntryId(), serviceContext.getAssetLinkEntryIds(),
 					AssetLinkConstants.TYPE_RELATED);
@@ -624,29 +638,29 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 	}
 	
 	@Indexable(type=IndexableType.REINDEX)
-	public Course modCourse (Course course,String summary, 
+	public Course modCourse (Course course,String summary, long courseTypeId,
 			ServiceContext serviceContext)
 			throws SystemException, PortalException {
-				return this.modCourse(course, summary, serviceContext, true);
+				return this.modCourse(course, summary, courseTypeId, serviceContext, true);
 			}
 
 	@Indexable(type=IndexableType.REINDEX)
-	public Course modCourse (Course course, 
+	public Course modCourse (Course course, long courseTypeId,
 			ServiceContext serviceContext)
 			throws SystemException, PortalException {
-			return this.modCourse(course, "", serviceContext,true);
+			return this.modCourse(course, "", courseTypeId, serviceContext, true);
 	}
 	
 	@Indexable(type=IndexableType.REINDEX)
-	public Course modCourse (Course course,String summary, 
+	public Course modCourse (Course course,String summary, long courseTypeId,
 			ServiceContext serviceContext, boolean visible)
 			throws SystemException, PortalException {
-		return this.modCourse(course,summary, serviceContext, visible, false);
+		return this.modCourse(course,summary, courseTypeId, serviceContext, visible, false);
 	}
 	
 	
 	@Indexable(type=IndexableType.REINDEX)
-	public Course modCourse (Course course,String summary, 
+	public Course modCourse (Course course,String summary, long courseTypeId,
 			ServiceContext serviceContext, boolean visible, boolean allowDuplicateName)
 			throws SystemException, PortalException {
 		
@@ -702,7 +716,7 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 		
 		AssetEntry assetEntry=assetEntryLocalService.updateEntry(
 				userId, course.getGroupId(), Course.class.getName(),
-				course.getCourseId(), course.getUuid(),0, serviceContext.getAssetCategoryIds(),
+				course.getCourseId(), course.getUuid(),courseTypeId, serviceContext.getAssetCategoryIds(),
 			serviceContext.getAssetTagNames(), visible, null, null,
 				new java.util.Date(System.currentTimeMillis()), null,
 				ContentTypes.TEXT_HTML, course.getTitle(), course.getDescription(locale), summary, null, null, 0, 0,
@@ -1924,4 +1938,71 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 			return false;
 		}
 	}
+	
+	public List<CourseResultView> getFinishedCoursesOfUser(long userId, int start, int end){
+		List<CourseResultView> courses = new ArrayList<CourseResultView>();
+		
+		User user = null;
+		List<Group> groups = new ArrayList<Group>();
+		
+		try {
+			user = UserLocalServiceUtil.getUser(userId);
+			groups = GroupLocalServiceUtil.getUserGroups(userId);
+			
+		} catch (PortalException | SystemException e) {
+			e.printStackTrace();
+		}
+		
+		if(Validator.isNotNull(user) && Validator.isNotNull(groups) && groups.size()>0){
+			
+			Course course = null;
+			CourseResult courseResult = null;
+			Date finishDate = null;
+			Date now = new Date();
+			
+			try {
+				ThemeDisplay themeDisplay = new ThemeDisplay();
+				themeDisplay.setUser(user);
+				themeDisplay.setRealUser(user);
+				themeDisplay.setCompany(CompanyLocalServiceUtil.getCompany(user.getCompanyId()));
+				themeDisplay.setLanguageId(user.getLanguageId());
+				themeDisplay.setLocale(user.getLocale());
+				
+				for(Group groupCourse:groups){
+					
+					course = CourseLocalServiceUtil.fetchByGroupCreatedId(groupCourse.getGroupId());
+					
+					if(Validator.isNotNull(course)){
+						if(course.isClosed() || now.after(course.getExecutionEndDate())){
+							courseResult = CourseResultLocalServiceUtil.getByUserAndCourse(course.getCourseId(), userId);
+							courses.add(new CourseResultView(course, courseResult, themeDisplay));
+						} else {
+					     	courseResult=CourseResultLocalServiceUtil.getByUserAndCourse(course.getCourseId(), userId);
+					     	
+							finishDate = null;
+							if(Validator.isNotNull(courseResult) && Validator.isNotNull(courseResult.getAllowFinishDate())){
+								finishDate=courseResult.getAllowFinishDate();
+							}
+							if(Validator.isNull(finishDate)){
+								finishDate=course.getExecutionEndDate();
+							}
+							
+							if((Validator.isNotNull(finishDate) && finishDate.before(new Date())) || (Validator.isNotNull(courseResult) && Validator.isNotNull(courseResult.getPassedDate()))){				
+								courses.add(new CourseResultView(course, courseResult, themeDisplay));
+							}
+						}
+					}
+
+				}
+			} catch (PortalException | SystemException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		if(Validator.isNotNull(courses) && courses.size()>0){
+			courses = ListUtil.subList(courses, start, end);
+		}
+		return courses;
+	}
+	
 }

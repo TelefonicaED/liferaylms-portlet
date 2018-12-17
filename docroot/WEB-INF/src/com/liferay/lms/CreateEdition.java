@@ -167,9 +167,12 @@ public class CreateEdition extends CourseCopyUtil implements MessageListener {
 		//Creamos el nuevo curso para la edición 
 		Course newCourse = null;  
 		String summary = null;
+		long courseTypeId = 0;
 		
 		try{
-			summary = AssetEntryLocalServiceUtil.getEntry(Course.class.getName(),course.getCourseId()).getSummary(themeDisplay.getLocale());
+			AssetEntry entry = AssetEntryLocalServiceUtil.getEntry(Course.class.getName(), course.getCourseId());
+			summary = entry.getSummary(themeDisplay.getLocale());
+			courseTypeId = entry.getClassTypeId();
 			newCourse = CourseLocalServiceUtil.addCourse(course.getTitle(themeDisplay.getLocale())+"-"+newEditionName, course.getDescription(themeDisplay.getLocale()),summary
 					, editionFriendlyURL, themeDisplay.getLocale(), today, startDate, endDate, editionLayoutId, typeSite, serviceContext, course.getCalificationType(), (int)course.getMaxusers(),true);
 			
@@ -177,6 +180,9 @@ public class CreateEdition extends CourseCopyUtil implements MessageListener {
 			newCourse.setWelcome(course.getWelcome());
 			newCourse.setWelcomeMsg(course.getWelcomeMsg());
 			newCourse.setWelcomeSubject(course.getWelcomeSubject());
+			newCourse.setDeniedInscription(course.isDeniedInscription());
+			newCourse.setDeniedInscriptionSubject(course.getDeniedInscriptionSubject());
+			newCourse.setDeniedInscriptionMsg(course.getDeniedInscriptionMsg());
 			newCourse.setGoodbye(course.getGoodbye());
 			newCourse.setExecutionStartDate(startExecutionDate);
 			newCourse.setExecutionEndDate(endExecutionDate);
@@ -206,11 +212,12 @@ public class CreateEdition extends CourseCopyUtil implements MessageListener {
 		newCourse.setIcon(course.getIcon());
 		
 		try{
-			newCourse = CourseLocalServiceUtil.modCourse(newCourse, serviceContext);
-			AssetEntry entry = AssetEntryLocalServiceUtil.getEntry(Course.class.getName(),newCourse.getCourseId());
-			entry.setVisible(false);
-			entry.setSummary(summary);
-			AssetEntryLocalServiceUtil.updateAssetEntry(entry);
+			newCourse = CourseLocalServiceUtil.modCourse(newCourse, courseTypeId, serviceContext);
+			AssetEntry newEntry = AssetEntryLocalServiceUtil.getEntry(Course.class.getName(),newCourse.getCourseId());
+			newEntry.setVisible(false);
+			newEntry.setSummary(summary);
+			newEntry.setClassTypeId(courseTypeId);
+			AssetEntryLocalServiceUtil.updateAssetEntry(newEntry);
 			newGroup.setName(course.getTitle(themeDisplay.getLocale(),true)+"-"+newEditionName);
 			newGroup.setDescription(summary);
 			GroupLocalServiceUtil.updateGroup(newGroup);

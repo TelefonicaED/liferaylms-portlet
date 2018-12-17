@@ -40,6 +40,8 @@ public class LmsConfig extends MVCPortlet {
 		boolean hasAPILicence = ParamUtil.getBoolean(request, "hasAPILicence");
 	
 		boolean showHideActivity = ParamUtil.getBoolean(request, "showHideActivity", true);
+		boolean showModuleClassification = ParamUtil.getBoolean(request, "showModuleClassification", false);
+		boolean showActivityClassification = ParamUtil.getBoolean(request, "showActivityClassification", true);
 		boolean viewCoursesFinished = ParamUtil.getBoolean(request, "viewCoursesFinished", false);
 		boolean linkResources = ParamUtil.getBoolean(request,"linkResources");
 		
@@ -54,6 +56,8 @@ public class LmsConfig extends MVCPortlet {
 		prefs.setViewCoursesFinished(viewCoursesFinished);
 		LmsPrefsLocalServiceUtil.updateLmsPrefs(prefs);
 		savePreference(LmsConstant.RESOURCE_INTERNAL_DOCUMENT_LINKED ,String.valueOf(linkResources) , themeDisplay.getCompanyId());
+		savePreference(LmsConstant.SHOW_MODULE_CLASSIFICATION, String.valueOf(showModuleClassification), themeDisplay.getCompanyId());
+		savePreference(LmsConstant.SHOW_ACTIVITY_CLASSIFICATION, String.valueOf(showActivityClassification), themeDisplay.getCompanyId());
 		
 		if (Validator.isNotNull(redirect)) {
 			response.sendRedirect(redirect);

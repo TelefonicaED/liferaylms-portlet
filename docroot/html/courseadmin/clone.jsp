@@ -77,6 +77,10 @@
 		<aui:validator name="required" errorMessage="field.required"></aui:validator>
 	</aui:input>
     <aui:input type="checkbox"  name="cloneForum" label="courseadmin.clone.clone-forum" helpMessage="courseadmin.clone.clone-forum.help" />
+    <aui:input type="checkbox"  name="cloneDocuments" label="courseadmin.clone.clone-documents" helpMessage="courseadmin.clone.clone-documents.help" />
+    <aui:input type="checkbox"  name="cloneModuleClassification" label="courseadmin.clone.clone-module-classification" helpMessage="courseadmin.clone.clone-module-classification.help" />
+    <aui:input type="checkbox"  name="cloneActivityClassificationTypes" label="courseadmin.clone.clone-activity-classification-types" helpMessage="courseadmin.clone.clone-activity-classification-types.help" />
+    
 <div id="datesbox" style="visibility: visible">				
 	<aui:field-wrapper label="start-course-date">
 		<liferay-ui:input-date yearRangeEnd="<%=LiferaylmsUtil.defaultEndYear %>" yearRangeStart="<%=LiferaylmsUtil.defaultStartYear %>"  dayParam="startDay" monthParam="startMon"

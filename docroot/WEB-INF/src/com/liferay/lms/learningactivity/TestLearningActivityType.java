@@ -178,6 +178,10 @@ public class TestLearningActivityType extends BaseLearningActivityType
 		return "learningactivity.test";
 	}
 
+	@Override
+	public String getClassName(){
+		return getClass().getName();
+	}
 
 	@Override
 	public long getTypeId() {
@@ -282,6 +286,16 @@ public class TestLearningActivityType extends BaseLearningActivityType
 			showCorrectAnswer = SAXReaderUtil.createElement("showCorrectAnswer");
 			showCorrectAnswer.setText(Boolean.toString(ParamUtil.get(uploadRequest,"showCorrectAnswer",false)));		
 			rootElement.add(showCorrectAnswer);	
+			
+			Element showOnlyPreview = rootElement.element("showOnlyPreview");
+			if(showOnlyPreview!=null){
+				showOnlyPreview.detach();
+				rootElement.remove(showOnlyPreview);
+			}
+			showOnlyPreview = SAXReaderUtil.createElement("showOnlyPreview");
+			showOnlyPreview.setText(Boolean.toString(ParamUtil.get(uploadRequest, "showOnlyPreview", false)));
+			rootElement.add(showOnlyPreview);
+			
 			Element hideFeedback=rootElement.element("hideFeedback");
 			if(hideFeedback!=null)
 			{
@@ -301,7 +315,6 @@ public class TestLearningActivityType extends BaseLearningActivityType
 			showCorrectAnswerOnlyOnFinalTry.setText(Boolean.toString(ParamUtil.get(uploadRequest,"showCorrectAnswerOnlyOnFinalTry",false)));		
 			rootElement.add(showCorrectAnswerOnlyOnFinalTry);	
 			
-
 			Element improve=rootElement.element("improve");
 			if(improve!=null)
 			{

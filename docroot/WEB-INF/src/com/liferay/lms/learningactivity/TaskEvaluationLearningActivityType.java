@@ -50,6 +50,11 @@ public class TaskEvaluationLearningActivityType extends BaseLearningActivityType
 		return "learningactivity.evaluation";
 	}
 	
+	@Override
+	public String getClassName() {
+		return getClass().getName();
+	}
+	
 	
 	@Override
 	public boolean isScoreConfigurable() {

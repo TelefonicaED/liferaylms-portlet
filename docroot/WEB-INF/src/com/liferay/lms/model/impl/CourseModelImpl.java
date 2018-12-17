@@ -101,6 +101,9 @@ public class CourseModelImpl extends BaseModelImpl<Course>
 			{ "welcome", Types.BOOLEAN },
 			{ "welcomeMsg", Types.VARCHAR },
 			{ "welcomeSubject", Types.VARCHAR },
+			{ "deniedInscription", Types.BOOLEAN },
+			{ "deniedInscriptionMsg", Types.VARCHAR },
+			{ "deniedInscriptionSubject", Types.VARCHAR },
 			{ "goodbye", Types.BOOLEAN },
 			{ "goodbyeMsg", Types.VARCHAR },
 			{ "goodbyeSubject", Types.VARCHAR },
@@ -108,7 +111,7 @@ public class CourseModelImpl extends BaseModelImpl<Course>
 			{ "executionStartDate", Types.TIMESTAMP },
 			{ "executionEndDate", Types.TIMESTAMP }
 		};
-	public static final String TABLE_SQL_CREATE = "create table Lms_Course (uuid_ VARCHAR(75) null,courseId LONG not null primary key,parentCourseId LONG,companyId LONG,groupId LONG,userId LONG,userName VARCHAR(75) null,groupCreatedId LONG,createDate DATE null,modifiedDate DATE null,status INTEGER,statusByUserId LONG,statusByUserName VARCHAR(75) null,statusDate DATE null,title STRING null,description STRING null,friendlyURL VARCHAR(100) null,startDate DATE null,endDate DATE null,icon LONG,CourseEvalId LONG,CourseExtraData TEXT null,closed BOOLEAN,maxusers LONG,calificationType LONG,inscriptionType LONG,welcome BOOLEAN,welcomeMsg TEXT null,welcomeSubject VARCHAR(75) null,goodbye BOOLEAN,goodbyeMsg TEXT null,goodbyeSubject VARCHAR(75) null,isLinked BOOLEAN,executionStartDate DATE null,executionEndDate DATE null)";
+	public static final String TABLE_SQL_CREATE = "create table Lms_Course (uuid_ VARCHAR(75) null,courseId LONG not null primary key,parentCourseId LONG,companyId LONG,groupId LONG,userId LONG,userName VARCHAR(75) null,groupCreatedId LONG,createDate DATE null,modifiedDate DATE null,status INTEGER,statusByUserId LONG,statusByUserName VARCHAR(75) null,statusDate DATE null,title STRING null,description STRING null,friendlyURL VARCHAR(100) null,startDate DATE null,endDate DATE null,icon LONG,CourseEvalId LONG,CourseExtraData TEXT null,closed BOOLEAN,maxusers LONG,calificationType LONG,inscriptionType LONG,welcome BOOLEAN,welcomeMsg TEXT null,welcomeSubject VARCHAR(75) null,deniedInscription BOOLEAN,deniedInscriptionMsg TEXT null,deniedInscriptionSubject VARCHAR(75) null,goodbye BOOLEAN,goodbyeMsg TEXT null,goodbyeSubject VARCHAR(75) null,isLinked BOOLEAN,executionStartDate DATE null,executionEndDate DATE null)";
 	public static final String TABLE_SQL_DROP = "drop table Lms_Course";
 	public static final String ORDER_BY_JPQL = " ORDER BY course.courseId ASC";
 	public static final String ORDER_BY_SQL = " ORDER BY Lms_Course.courseId ASC";
@@ -175,6 +178,9 @@ public class CourseModelImpl extends BaseModelImpl<Course>
 		model.setWelcome(soapModel.getWelcome());
 		model.setWelcomeMsg(soapModel.getWelcomeMsg());
 		model.setWelcomeSubject(soapModel.getWelcomeSubject());
+		model.setDeniedInscription(soapModel.getDeniedInscription());
+		model.setDeniedInscriptionMsg(soapModel.getDeniedInscriptionMsg());
+		model.setDeniedInscriptionSubject(soapModel.getDeniedInscriptionSubject());
 		model.setGoodbye(soapModel.getGoodbye());
 		model.setGoodbyeMsg(soapModel.getGoodbyeMsg());
 		model.setGoodbyeSubject(soapModel.getGoodbyeSubject());
@@ -268,6 +274,9 @@ public class CourseModelImpl extends BaseModelImpl<Course>
 		attributes.put("welcome", getWelcome());
 		attributes.put("welcomeMsg", getWelcomeMsg());
 		attributes.put("welcomeSubject", getWelcomeSubject());
+		attributes.put("deniedInscription", getDeniedInscription());
+		attributes.put("deniedInscriptionMsg", getDeniedInscriptionMsg());
+		attributes.put("deniedInscriptionSubject", getDeniedInscriptionSubject());
 		attributes.put("goodbye", getGoodbye());
 		attributes.put("goodbyeMsg", getGoodbyeMsg());
 		attributes.put("goodbyeSubject", getGoodbyeSubject());
@@ -452,6 +461,26 @@ public class CourseModelImpl extends BaseModelImpl<Course>
 
 		if (welcomeSubject != null) {
 			setWelcomeSubject(welcomeSubject);
+		}
+
+		Boolean deniedInscription = (Boolean)attributes.get("deniedInscription");
+
+		if (deniedInscription != null) {
+			setDeniedInscription(deniedInscription);
+		}
+
+		String deniedInscriptionMsg = (String)attributes.get(
+				"deniedInscriptionMsg");
+
+		if (deniedInscriptionMsg != null) {
+			setDeniedInscriptionMsg(deniedInscriptionMsg);
+		}
+
+		String deniedInscriptionSubject = (String)attributes.get(
+				"deniedInscriptionSubject");
+
+		if (deniedInscriptionSubject != null) {
+			setDeniedInscriptionSubject(deniedInscriptionSubject);
 		}
 
 		Boolean goodbye = (Boolean)attributes.get("goodbye");
@@ -1040,6 +1069,44 @@ public class CourseModelImpl extends BaseModelImpl<Course>
 		_welcomeSubject = welcomeSubject;
 	}
 
+	public boolean getDeniedInscription() {
+		return _deniedInscription;
+	}
+
+	public boolean isDeniedInscription() {
+		return _deniedInscription;
+	}
+
+	public void setDeniedInscription(boolean deniedInscription) {
+		_deniedInscription = deniedInscription;
+	}
+
+	public String getDeniedInscriptionMsg() {
+		if (_deniedInscriptionMsg == null) {
+			return StringPool.BLANK;
+		}
+		else {
+			return _deniedInscriptionMsg;
+		}
+	}
+
+	public void setDeniedInscriptionMsg(String deniedInscriptionMsg) {
+		_deniedInscriptionMsg = deniedInscriptionMsg;
+	}
+
+	public String getDeniedInscriptionSubject() {
+		if (_deniedInscriptionSubject == null) {
+			return StringPool.BLANK;
+		}
+		else {
+			return _deniedInscriptionSubject;
+		}
+	}
+
+	public void setDeniedInscriptionSubject(String deniedInscriptionSubject) {
+		_deniedInscriptionSubject = deniedInscriptionSubject;
+	}
+
 	public boolean getGoodbye() {
 		return _goodbye;
 	}
@@ -1256,6 +1323,9 @@ public class CourseModelImpl extends BaseModelImpl<Course>
 		courseImpl.setWelcome(getWelcome());
 		courseImpl.setWelcomeMsg(getWelcomeMsg());
 		courseImpl.setWelcomeSubject(getWelcomeSubject());
+		courseImpl.setDeniedInscription(getDeniedInscription());
+		courseImpl.setDeniedInscriptionMsg(getDeniedInscriptionMsg());
+		courseImpl.setDeniedInscriptionSubject(getDeniedInscriptionSubject());
 		courseImpl.setGoodbye(getGoodbye());
 		courseImpl.setGoodbyeMsg(getGoodbyeMsg());
 		courseImpl.setGoodbyeSubject(getGoodbyeSubject());
@@ -1504,6 +1574,26 @@ public class CourseModelImpl extends BaseModelImpl<Course>
 			courseCacheModel.welcomeSubject = null;
 		}
 
+		courseCacheModel.deniedInscription = getDeniedInscription();
+
+		courseCacheModel.deniedInscriptionMsg = getDeniedInscriptionMsg();
+
+		String deniedInscriptionMsg = courseCacheModel.deniedInscriptionMsg;
+
+		if ((deniedInscriptionMsg != null) &&
+				(deniedInscriptionMsg.length() == 0)) {
+			courseCacheModel.deniedInscriptionMsg = null;
+		}
+
+		courseCacheModel.deniedInscriptionSubject = getDeniedInscriptionSubject();
+
+		String deniedInscriptionSubject = courseCacheModel.deniedInscriptionSubject;
+
+		if ((deniedInscriptionSubject != null) &&
+				(deniedInscriptionSubject.length() == 0)) {
+			courseCacheModel.deniedInscriptionSubject = null;
+		}
+
 		courseCacheModel.goodbye = getGoodbye();
 
 		courseCacheModel.goodbyeMsg = getGoodbyeMsg();
@@ -1547,7 +1637,7 @@ public class CourseModelImpl extends BaseModelImpl<Course>
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(71);
+		StringBundler sb = new StringBundler(77);
 
 		sb.append("{uuid=");
 		sb.append(getUuid());
@@ -1607,6 +1697,12 @@ public class CourseModelImpl extends BaseModelImpl<Course>
 		sb.append(getWelcomeMsg());
 		sb.append(", welcomeSubject=");
 		sb.append(getWelcomeSubject());
+		sb.append(", deniedInscription=");
+		sb.append(getDeniedInscription());
+		sb.append(", deniedInscriptionMsg=");
+		sb.append(getDeniedInscriptionMsg());
+		sb.append(", deniedInscriptionSubject=");
+		sb.append(getDeniedInscriptionSubject());
 		sb.append(", goodbye=");
 		sb.append(getGoodbye());
 		sb.append(", goodbyeMsg=");
@@ -1625,7 +1721,7 @@ public class CourseModelImpl extends BaseModelImpl<Course>
 	}
 
 	public String toXmlString() {
-		StringBundler sb = new StringBundler(109);
+		StringBundler sb = new StringBundler(118);
 
 		sb.append("<model><model-name>");
 		sb.append("com.liferay.lms.model.Course");
@@ -1748,6 +1844,18 @@ public class CourseModelImpl extends BaseModelImpl<Course>
 		sb.append(getWelcomeSubject());
 		sb.append("]]></column-value></column>");
 		sb.append(
+			"<column><column-name>deniedInscription</column-name><column-value><![CDATA[");
+		sb.append(getDeniedInscription());
+		sb.append("]]></column-value></column>");
+		sb.append(
+			"<column><column-name>deniedInscriptionMsg</column-name><column-value><![CDATA[");
+		sb.append(getDeniedInscriptionMsg());
+		sb.append("]]></column-value></column>");
+		sb.append(
+			"<column><column-name>deniedInscriptionSubject</column-name><column-value><![CDATA[");
+		sb.append(getDeniedInscriptionSubject());
+		sb.append("]]></column-value></column>");
+		sb.append(
 			"<column><column-name>goodbye</column-name><column-value><![CDATA[");
 		sb.append(getGoodbye());
 		sb.append("]]></column-value></column>");
@@ -1828,6 +1936,9 @@ public class CourseModelImpl extends BaseModelImpl<Course>
 	private boolean _welcome;
 	private String _welcomeMsg;
 	private String _welcomeSubject;
+	private boolean _deniedInscription;
+	private String _deniedInscriptionMsg;
+	private String _deniedInscriptionSubject;
 	private boolean _goodbye;
 	private String _goodbyeMsg;
 	private String _goodbyeSubject;

@@ -24,6 +24,7 @@
 	long hourDuration=0,minuteDuration=0,secondDuration=0;
 	boolean showCorrectAnswer= false;
 	boolean showCorrectAnswerOnlyOnFinalTry= false;
+	boolean showOnlyPreview = false;
 	boolean improve=false;
 	boolean disabled = false;
 	boolean hideFeedback=false;
@@ -47,6 +48,7 @@
 		
 		showCorrectAnswer = StringPool.TRUE.equals(LearningActivityLocalServiceUtil.getExtraContentValue(learningActivity.getActId(),"showCorrectAnswer"));
 		showCorrectAnswerOnlyOnFinalTry = StringPool.TRUE.equals(LearningActivityLocalServiceUtil.getExtraContentValue(learningActivity.getActId(),"showCorrectAnswerOnlyOnFinalTry"));
+		showOnlyPreview = StringPool.TRUE.equals(LearningActivityLocalServiceUtil.getExtraContentValue(learningActivity.getActId(),"showOnlyPreview"));	
 		improve = StringPool.TRUE.equals(LearningActivityLocalServiceUtil.getExtraContentValue(learningActivity.getActId(),"improve"));	
 		hideFeedback = StringPool.TRUE.equals(LearningActivityLocalServiceUtil.getExtraContentValue(learningActivity.getActId(),"hideFeedback"));
 		
@@ -156,6 +158,7 @@ window.<portlet:namespace />validate_execactivity={
 						A.one('#<portlet:namespace />showCorrectAnswerCheckbox').set('disabled',notEditable);
 						A.one('#<portlet:namespace />hideFeedbackCheckbox').set('disabled',notEditable);
 						A.one('#<portlet:namespace />showCorrectAnswerOnlyOnFinalTryCheckbox').set('disabled',notEditable);
+						A.one('#<portlet:namespace />showOnlyPreviewCheckbox').set('disabled',notEditable);
 						A.one('#<portlet:namespace />improveCheckbox').set('disabled',notEditable);
 	
 		      			if(notEditable) {
@@ -170,6 +173,8 @@ window.<portlet:namespace />validate_execactivity={
 							A.one('#<portlet:namespace />showCorrectAnswerCheckbox').set('checked',<%=Boolean.toString(showCorrectAnswer)%>);
 							A.one('#<portlet:namespace />showCorrectAnswerOnlyOnFinalTry').set('value','<%=Boolean.toString(showCorrectAnswerOnlyOnFinalTry)%>');
 							A.one('#<portlet:namespace />showCorrectAnswerOnlyOnFinalTryCheckbox').set('checked',<%=Boolean.toString(showCorrectAnswerOnlyOnFinalTry)%>);
+							A.one('#<portlet:namespace />showOnlyPreview').set('value','<%=Boolean.toString(showOnlyPreview)%>');
+							A.one('#<portlet:namespace />showOnlyPreviewCheckbox').set('checked',<%=Boolean.toString(showOnlyPreview)%>);
 							A.one('#<portlet:namespace />improve').set('value','<%=Boolean.toString(improve)%>');
 							A.one('#<portlet:namespace />improveCheckbox').set('checked',<%=Boolean.toString(improve)%>);
 			      		}
@@ -315,3 +320,6 @@ window.<portlet:namespace />validate_execactivity={
 		
 	<aui:input type="checkbox" name="improve" label="exectactivity.edit.improve" checked="<%=improve %>" disabled="<%=!edit %>" 
 		ignoreRequestValue="true" helpMessage="exectactivity.edit.improve.helpMessage"></aui:input>
+		
+	<aui:input type="checkbox" name="showOnlyPreview" label="exectactivity.edit.showonlypreview" checked="<%=showOnlyPreview %>" 
+		ignoreRequestValue="true" helpMessage="exectactivity.edit.showonlypreview.help"/>

@@ -1,19 +1,28 @@
 package com.liferay.lms.asset;
 
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletURL;
 
 import com.liferay.lms.model.Course;
+import com.liferay.lms.model.CourseType;
 import com.liferay.lms.service.ClpSerializer;
 import com.liferay.lms.service.CourseLocalServiceUtil;
+import com.liferay.lms.service.CourseTypeLocalServiceUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.portal.model.Group;
 import com.liferay.portal.model.PortletConstants;
-import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.security.permission.PermissionChecker;
+import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portlet.PortletURLFactoryUtil;
@@ -78,9 +87,35 @@ public class CourseAssetRendererFactory extends BaseAssetRendererFactory
 	public boolean isSelectable() {
 		return true;
 	}
-
 	
-
-
+	@Override
+	public Map<Long, String> getClassTypes(long[] groupId, Locale locale){
+		Map<Long, String> classTypes = new LinkedHashMap<Long, String>();
+		long companyId = 0;
+		if(Validator.isNotNull(groupId) && groupId.length>0){
+			Group group = null;
+			try {
+				group = GroupLocalServiceUtil.fetchGroup(groupId[0]);
+			} catch (SystemException e) {
+				e.printStackTrace();
+			}
+			if(Validator.isNotNull(group))
+				companyId = group.getCompanyId();
+		}
+		if(companyId>0){
+			List<CourseType> courseTypeList = null;
+			try {
+				courseTypeList = CourseTypeLocalServiceUtil.getByCompanyId(companyId);
+			} catch (SystemException e) {
+				e.printStackTrace();
+			}
+			if(Validator.isNotNull(courseTypeList) && courseTypeList.size()>0){
+				for(CourseType courseType:courseTypeList){
+					classTypes.put(courseType.getCourseTypeId(), courseType.getName(locale));
+				}
+			}
+		}
+		return classTypes;
+	}
 
 }

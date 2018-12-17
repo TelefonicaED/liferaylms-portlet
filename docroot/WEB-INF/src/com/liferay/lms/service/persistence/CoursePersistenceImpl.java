@@ -904,6 +904,9 @@ public class CoursePersistenceImpl extends BasePersistenceImpl<Course>
 		courseImpl.setWelcome(course.isWelcome());
 		courseImpl.setWelcomeMsg(course.getWelcomeMsg());
 		courseImpl.setWelcomeSubject(course.getWelcomeSubject());
+		courseImpl.setDeniedInscription(course.isDeniedInscription());
+		courseImpl.setDeniedInscriptionMsg(course.getDeniedInscriptionMsg());
+		courseImpl.setDeniedInscriptionSubject(course.getDeniedInscriptionSubject());
 		courseImpl.setGoodbye(course.isGoodbye());
 		courseImpl.setGoodbyeMsg(course.getGoodbyeMsg());
 		courseImpl.setGoodbyeSubject(course.getGoodbyeSubject());
@@ -8104,6 +8107,18 @@ public class CoursePersistenceImpl extends BasePersistenceImpl<Course>
 	protected CourseCompetencePersistence courseCompetencePersistence;
 	@BeanReference(type = CourseResultPersistence.class)
 	protected CourseResultPersistence courseResultPersistence;
+	@BeanReference(type = CourseTypePersistence.class)
+	protected CourseTypePersistence courseTypePersistence;
+	@BeanReference(type = CourseTypeCalificationTypePersistence.class)
+	protected CourseTypeCalificationTypePersistence courseTypeCalificationTypePersistence;
+	@BeanReference(type = CourseTypeCourseEvalPersistence.class)
+	protected CourseTypeCourseEvalPersistence courseTypeCourseEvalPersistence;
+	@BeanReference(type = CourseTypeInscriptionTypePersistence.class)
+	protected CourseTypeInscriptionTypePersistence courseTypeInscriptionTypePersistence;
+	@BeanReference(type = CourseTypeLearningActivityPersistence.class)
+	protected CourseTypeLearningActivityPersistence courseTypeLearningActivityPersistence;
+	@BeanReference(type = CourseTypeTemplatePersistence.class)
+	protected CourseTypeTemplatePersistence courseTypeTemplatePersistence;
 	@BeanReference(type = LearningActivityPersistence.class)
 	protected LearningActivityPersistence learningActivityPersistence;
 	@BeanReference(type = LearningActivityResultPersistence.class)

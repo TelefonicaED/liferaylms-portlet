@@ -1,39 +1,51 @@
 package com.liferay.lms.learningactivity;
 
-import java.io.IOException;
+import java.io.File;
 
+import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
 
 import com.liferay.lms.asset.TaskOnlineAssetRenderer;
 import com.liferay.lms.model.LearningActivity;
-import com.liferay.lms.model.LearningActivityTry;
 import com.liferay.lms.service.ClpSerializer;
-import com.liferay.lms.service.LearningActivityLocalServiceUtil;
-import com.liferay.lms.service.LearningActivityTryLocalServiceUtil;
-import com.liferay.portal.kernel.dao.orm.Criterion;
-import com.liferay.portal.kernel.dao.orm.DynamicQuery;
-import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
-import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.upload.UploadRequest;
+import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.xml.Document;
-import com.liferay.portal.kernel.xml.DocumentException;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
 import com.liferay.portal.model.PortletConstants;
+import com.liferay.portal.service.ServiceContext;
+import com.liferay.portal.service.ServiceContextFactory;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portlet.asset.model.AssetRenderer;
+import com.liferay.portlet.documentlibrary.NoSuchFileEntryException;
+import com.liferay.portlet.documentlibrary.NoSuchFolderException;
+import com.liferay.portlet.documentlibrary.model.DLFileEntry;
+import com.liferay.portlet.documentlibrary.model.DLFolder;
+import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
+import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
+import com.liferay.portlet.documentlibrary.service.DLFolderLocalServiceUtil;
 
 public class TaskOnlineLearningActivityType extends BaseLearningActivityType {
 
+	private static Log log = LogFactoryUtil.getLog(TaskOnlineLearningActivityType.class);
+	
 	public static String PORTLET_ID = 
 			PortalUtil.getJsSafePortletId(
 					"onlinetaskactivity" + PortletConstants.WAR_SEPARATOR + ClpSerializer.getServletContextName());
+	
+	public final static int DEFAULT_FILENUMBER = 5;
 	
 	@Override
 	public AssetRenderer getAssetRenderer(LearningActivity larn) throws SystemException, PortalException {
@@ -43,6 +55,11 @@ public class TaskOnlineLearningActivityType extends BaseLearningActivityType {
 	@Override
 	public String getName() {	
 		return "learningactivity.online";
+	}
+	
+	@Override
+	public String getClassName(){
+		return getClass().getName();
 	}
 	
 	@Override
@@ -56,7 +73,6 @@ public class TaskOnlineLearningActivityType extends BaseLearningActivityType {
 	}
 	@Override
 	public long getDefaultTries() {
-		// TODO Auto-generated method stub
 		return 1;
 	}	
 	@Override
@@ -75,10 +91,21 @@ public class TaskOnlineLearningActivityType extends BaseLearningActivityType {
 					throws NumberFormatException, Exception {
 
 		ThemeDisplay themeDisplay = (ThemeDisplay) uploadRequest.getAttribute(WebKeys.THEME_DISPLAY);
+		PortletRequest portletRequest = (PortletRequest)uploadRequest.getAttribute(JavaConstants.JAVAX_PORTLET_REQUEST);
 
 		String fichero = ParamUtil.getString(uploadRequest, "fichero", StringPool.FALSE);
 		String textoenr = ParamUtil.getString(uploadRequest, "textoenr", StringPool.FALSE);
 		String team = ParamUtil.getString(uploadRequest, "team","0");
+		String additionalFileName = GetterUtil.getString(uploadRequest.getFileName("additionalFile"), StringPool.BLANK);
+		Boolean deleteAdditionalFile = ParamUtil.getBoolean(uploadRequest, "deleteAdditionalFile", Boolean.FALSE);
+		if(log.isDebugEnabled()){
+			log.debug(":::setExtraContent:: fichero :: " + fichero);
+			log.debug(":::setExtraContent:: textoenr :: " + textoenr);
+			log.debug(":::setExtraContent:: team :: " + team);
+			log.debug(":::setExtraContent:: additionalFileName :: " + additionalFileName);
+			log.debug(":::setExtraContent:: deleteAdditionalFile :: " + deleteAdditionalFile);
+		}
+		
 		long teamId = 0;
 		if(!team.equalsIgnoreCase("0")){
 			teamId = Long.parseLong(team);
@@ -127,6 +154,45 @@ public class TaskOnlineLearningActivityType extends BaseLearningActivityType {
 			teamElement.setText(Long.toString(teamId));
 			rootElement.add(teamElement);
 		}
+		
+		Element additionalFileElement = rootElement.element("additionalFile");
+		if(additionalFileElement!=null){
+			additionalFileElement.detach();
+			rootElement.remove(additionalFileElement);
+		}
+		if(!deleteAdditionalFile && !StringPool.BLANK.equals(additionalFileName)){
+			File additionalFile = uploadRequest.getFile("additionalFile");
+			ServiceContext serviceContext = ServiceContextFactory.getInstance(DLFileEntry.class.getName(), portletRequest);
+			serviceContext.setScopeGroupId(themeDisplay.getScopeGroupId());
+			serviceContext.setAddGroupPermissions(true);
+			serviceContext.setAddGuestPermissions(true);
+			String contentType = uploadRequest.getContentType("additionalFile");
+			long repositoryId = DLFolderConstants.getDataRepositoryId(themeDisplay.getScopeGroupId(), DLFolderConstants.DEFAULT_PARENT_FOLDER_ID);
+			DLFolder additionalFileFolder = null;
+			try{
+				additionalFileFolder = DLFolderLocalServiceUtil.getFolder(themeDisplay.getScopeGroupId(),DLFolderConstants.DEFAULT_PARENT_FOLDER_ID, "ResourceUploads");
+			}catch (NoSuchFolderException e){
+				if(log.isDebugEnabled())
+					log.debug(e.getMessage());
+			}
+			if(Validator.isNull(additionalFileFolder))
+				additionalFileFolder = DLFolderLocalServiceUtil.addFolder(themeDisplay.getUserId(), themeDisplay.getScopeGroupId(), repositoryId, true, DLFolderConstants.DEFAULT_PARENT_FOLDER_ID, "ResourceUploads", "ResourceUploads", serviceContext);
+			FileEntry additionalFileEntry = null;
+			try{
+				additionalFileEntry = DLAppLocalServiceUtil.getFileEntry(themeDisplay.getScopeGroupId(), additionalFileFolder.getFolderId(), additionalFileName);
+			} catch (NoSuchFileEntryException e) {
+				if(log.isDebugEnabled())
+					log.debug(e.getMessage());
+			}
+			if(Validator.isNull(additionalFileEntry))
+				additionalFileEntry = DLAppLocalServiceUtil.addFileEntry(themeDisplay.getUserId(),
+					repositoryId, additionalFileFolder.getFolderId(), additionalFileName, contentType, additionalFileName, StringPool.BLANK, StringPool.BLANK, additionalFile, serviceContext);
+			long additionalFileId = additionalFileEntry.getFileEntryId();
+			additionalFileElement = SAXReaderUtil.createElement("additionalFile");
+			additionalFileElement.addText(String.valueOf(additionalFileId));
+			rootElement.add(additionalFileElement);
+		}
+		
 		learningActivity.setExtracontent(document.formattedString());
 
 		return null;
@@ -161,4 +227,5 @@ public class TaskOnlineLearningActivityType extends BaseLearningActivityType {
 	public boolean canBeSeenResults(){
 		return true;
 	}
+	
 }

@@ -53,6 +53,7 @@ import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.model.Team;
@@ -196,19 +197,26 @@ public class GradeBook extends MVCPortlet {
 	public void serveResource(ResourceRequest resourceRequest,
 			ResourceResponse resourceResponse) throws IOException,
 			PortletException {
+		ThemeDisplay themeDisplay  =(ThemeDisplay)resourceRequest.getAttribute(WebKeys.THEME_DISPLAY);
+		
 		String action = ParamUtil.getString(resourceRequest, "action");
+		long groupId = ParamUtil.getLong(resourceRequest, "groupId", 0);
 		long moduleId = ParamUtil.getLong(resourceRequest, "moduleId",0);
 		long teamId=ParamUtil.getLong(resourceRequest, "team",0);
-		ThemeDisplay themeDisplay  =(ThemeDisplay)resourceRequest.getAttribute(WebKeys.THEME_DISPLAY);
+		
+		if(log.isDebugEnabled()){
+			log.debug("Resource:: action :: " + action);
+			log.debug("Resource:: groupId :: " + groupId);
+			log.debug("Resource:: moduleId :: " + moduleId);
+			log.debug("Resource:: teamId :: " + teamId);
+		}
+		
 		if(action.equals("export")){
-			
 			try {
 				Team theTeam=null;
-				java.util.List<Team> userTeams=TeamLocalServiceUtil.getUserTeams(themeDisplay.getUserId(), themeDisplay.getScopeGroupId());
+				List<Team> userTeams=TeamLocalServiceUtil.getUserTeams(themeDisplay.getUserId(), themeDisplay.getScopeGroupId());
 				if(teamId>0 && (TeamLocalServiceUtil.hasUserTeam(themeDisplay.getUserId(), teamId)||userTeams.size()==0))
-				{		
 					theTeam=TeamLocalServiceUtil.fetchTeam(teamId);	
-				}
 				Module module = ModuleLocalServiceUtil.getModule(moduleId);
 				List<LearningActivity> learningActivities = LearningActivityServiceUtil.getLearningActivitiesOfModule(moduleId);
 
@@ -310,7 +318,121 @@ public class GradeBook extends MVCPortlet {
 				resourceResponse.getPortletOutputStream().flush();
 				resourceResponse.getPortletOutputStream().close();
 			}
-		} 
+		} else if (action.equals("exportAll")){
+			
+			try {
+				
+				Team theTeam = null;
+				List<Team> userTeams=TeamLocalServiceUtil.getUserTeams(themeDisplay.getUserId(), themeDisplay.getScopeGroupId());
+				if(teamId>0 && (TeamLocalServiceUtil.hasUserTeam(themeDisplay.getUserId(), teamId)||userTeams.size()==0))
+					theTeam=TeamLocalServiceUtil.fetchTeam(teamId);	
+				
+				//Necesario para crear el fichero csv.
+				resourceResponse.setCharacterEncoding(StringPool.UTF8);
+				resourceResponse.setContentType(ContentTypes.TEXT_CSV_UTF8);
+				resourceResponse.addProperty(HttpHeaders.CONTENT_DISPOSITION,"attachment; fileName=data_"+Long.toString(System.currentTimeMillis())+".csv");
+		        byte b[] = {(byte)0xEF, (byte)0xBB, (byte)0xBF};
+		        
+		        resourceResponse.getPortletOutputStream().write(b);
+		        
+		        CSVWriter writer = new CSVWriter(new OutputStreamWriter(resourceResponse.getPortletOutputStream(),StringPool.UTF8),CharPool.SEMICOLON);
+	
+		        //Curso
+		        Course course = CourseLocalServiceUtil.fetchByGroupCreatedId(themeDisplay.getScopeGroupId());
+		        writer.writeNext(new String[]{course.getTitle(themeDisplay.getLocale())});
+		        
+		        //Número de columnas del informe
+		        int headerSize = (int)LearningActivityLocalServiceUtil.countLearningActivitiesOfGroup(themeDisplay.getScopeGroupId())+4;
+		        
+		        //Lista de módulos
+		        List<Module> listModules = ModuleLocalServiceUtil.findAllInGroup(themeDisplay.getScopeGroupId());
+		        List<LearningActivity> listLearningActivities = new ArrayList<LearningActivity>();
+		        
+		        //Títulos de los módulos
+		        String[] moduleTitles = new String[headerSize];
+		        List<LearningActivity> listLearningActivitiesOfModule = new ArrayList<LearningActivity>();
+		        int column = 3;
+		        for(Module module:listModules){
+		        	listLearningActivitiesOfModule = LearningActivityLocalServiceUtil.getLearningActivitiesOfModule(module.getModuleId());
+		        	if(Validator.isNotNull(listLearningActivitiesOfModule) && listLearningActivitiesOfModule.size()>0){
+			        	moduleTitles[column]= module.getTitle(themeDisplay.getLocale());
+			        	column = column + listLearningActivitiesOfModule.size();
+			        	listLearningActivities.addAll(listLearningActivitiesOfModule);
+		        	}
+		        }
+		        writer.writeNext(moduleTitles);
+		        
+		        //Cabeceras
+		        String[] header = new String[headerSize];
+		        column = 0;
+		        //Usuario
+		        header[column]=LanguageUtil.get(themeDisplay.getLocale(),"user-name");
+		        header[column++]=LanguageUtil.get(themeDisplay.getLocale(),"last-name");
+		        header[column++]=LanguageUtil.get(themeDisplay.getLocale(),"screen-name");
+		        header[column++]=LanguageUtil.get(themeDisplay.getLocale(),"email");
+		        //Título de la actividad
+				for(LearningActivity learningActivity:listLearningActivities)
+					header[column++] = learningActivity.getTitle(themeDisplay.getLocale());
+		        writer.writeNext(header);
+				
+		        //Datos usuarios
+				LmsPrefs prefs=LmsPrefsLocalServiceUtil.getLmsPrefs(themeDisplay.getCompanyId());
+				LinkedHashMap userParams = new LinkedHashMap();
+				CalificationType ct = new CalificationTypeRegistry().getCalificationType(course.getCalificationType());
+				if(theTeam!=null){
+					userParams.put("usersGroups", theTeam.getGroupId());
+					userParams.put("usersTeams", theTeam.getTeamId());
+				}
+				userParams.put("usersGroups", course.getGroupCreatedId());
+				userParams.put("notInCourseRoleTeach", new CustomSQLParam("WHERE User_.userId NOT IN "
+			              + " (SELECT UserGroupRole.userId " + "  FROM UserGroupRole "
+			              + "  WHERE  (UserGroupRole.groupId = ?) AND (UserGroupRole.roleId = ?))", new Long[] {
+			            		  course.getGroupCreatedId(),
+			              RoleLocalServiceUtil.getRole(prefs.getTeacherRole()).getRoleId() }));
+
+			    userParams.put("notInCourseRoleEdit", new CustomSQLParam("WHERE User_.userId NOT IN "
+			              + " (SELECT UserGroupRole.userId " + "  FROM UserGroupRole "
+			              + "  WHERE  (UserGroupRole.groupId = ?) AND (UserGroupRole.roleId = ?))", new Long[] {
+			              course.getGroupCreatedId(),
+			              RoleLocalServiceUtil.getRole(prefs.getEditorRole()).getRoleId() }));
+
+				OrderByComparator obc = new UserFirstNameComparator(true);
+				List<User> listUsers = UserLocalServiceUtil.search(themeDisplay.getCompanyId(), "", 0, userParams, QueryUtil.ALL_POS, QueryUtil.ALL_POS, obc);	
+				
+				String[] results;
+		        for(User user:listUsers){
+		        	results = new String[headerSize];
+		        	
+		        	column=0;
+		        	results[column]=user.getFirstName();
+		        	results[column++]=user.getLastName();		        	
+		        	results[column++]=user.getScreenName();
+		        	results[column++]=user.getEmailAddress();
+
+		        	//Resultados del usuario
+			        for(LearningActivity learningActivity:listLearningActivities){
+						LearningActivityResult learningActivityResult = LearningActivityResultLocalServiceUtil.getByActIdAndUserId(learningActivity.getActId(), user.getUserId());
+						if(learningActivityResult==null) 
+							results[column++]=StringPool.BLANK;
+						else 
+							results[column++]=ct.translate(themeDisplay.getLocale(), course.getGroupCreatedId(),learningActivityResult.getResult());
+			        }
+
+			        writer.writeNext(results);
+		        }
+				
+		        writer.flush();
+				writer.close();
+				resourceResponse.getPortletOutputStream().flush();
+				resourceResponse.getPortletOutputStream().close();
+			
+			} catch (NestableException e) {
+				e.printStackTrace();
+			}finally{
+				resourceResponse.getPortletOutputStream().flush();
+				resourceResponse.getPortletOutputStream().close();
+			}
+		}
 	}
  
 	

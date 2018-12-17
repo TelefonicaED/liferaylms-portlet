@@ -1,3 +1,7 @@
+<%@page import="com.liferay.portal.service.ResourceActionLocalServiceUtil"%>
+<%@page import="com.liferay.portal.service.ResourcePermissionLocalServiceUtil"%>
+<%@page import="com.liferay.portal.security.permission.PermissionCheckerFactoryUtil"%>
+<%@page import="com.liferay.portal.security.permission.PermissionChecker"%>
 <%@page import="com.liferay.lms.service.LmsPrefsLocalServiceUtil"%>
 <%@page import="com.liferay.portal.kernel.util.ArrayUtil"%>
 <%@page import="com.liferay.lms.learningactivity.LearningActivityType"%>
@@ -5,6 +9,9 @@
 <%@page import="com.liferay.lms.learningactivity.LearningActivityTypeRegistry"%>
 <%@page import="com.liferay.lms.service.CourseLocalServiceUtil"%>
 <%@page import="com.liferay.lms.model.Course"%>
+<%@page import="com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil"%>
+<%@page import="com.liferay.lms.model.CourseType"%>
+<%@page import="com.liferay.lms.service.CourseTypeLocalServiceUtil"%>
 <%@ include file="/init.jsp"%>
 
 <script type="text/javascript">
@@ -26,6 +33,14 @@ AUI().ready(
 <h1><liferay-ui:message key="content"></liferay-ui:message> </h1>
 <%
 	Course course=CourseLocalServiceUtil.fetchByGroupCreatedId(themeDisplay.getScopeGroupId());
+	long courseTypeId = AssetEntryLocalServiceUtil.getEntry(Course.class.getName(),course.getCourseId()).getClassTypeId();
+	System.out.println("courseTypeId:: " + courseTypeId);
+	List<Long> listLearningActivityTypes = null;
+	if(courseTypeId>0){
+		CourseType courseType = CourseTypeLocalServiceUtil.getCourseType(courseTypeId);
+		listLearningActivityTypes = courseType.getLearningActivityTypeIds();
+		System.out.println(listLearningActivityTypes.size());
+	}
 	LearningActivityTypeRegistry learningActivityTypeRegistry = new LearningActivityTypeRegistry();
 	long[] invisibleTypes = StringUtil.split(PropsUtil.get("lms.learningactivity.invisibles"), StringPool.COMMA,-1L);
 	long[] orderedIds = StringUtil.split(LmsPrefsLocalServiceUtil.getLmsPrefsIni(themeDisplay.getCompanyId()).getActivities(), StringPool.COMMA, -1L);
@@ -35,7 +50,13 @@ AUI().ready(
 		if(learningActivityType != null && !ArrayUtil.contains(invisibleTypes, learningActivityType.getTypeId()) && 
 				((course==null && learningActivityType.allowsBank()) || course!=null ) ){
 			
-			if(learningActivityType.getTypeId()==9||learningActivityType.getTypeId()==2||learningActivityType.getTypeId()==7){
+			boolean hasPermission = true;
+			if(ResourceActionLocalServiceUtil.fetchResourceAction(learningActivityType.getClassName(), "ADD_ACTIVITY")!=null){
+				hasPermission = permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), learningActivityType.getClassName(), themeDisplay.getScopeGroupId(), "ADD_ACTIVITY");
+			}
+			
+			if(hasPermission && (learningActivityType.getTypeId()==9||learningActivityType.getTypeId()==2||learningActivityType.getTypeId()==7) 
+					&& (listLearningActivityTypes==null || listLearningActivityTypes.size()==0 || listLearningActivityTypes.contains(learningActivityType.getTypeId()))){
 
 				%>	
 					<liferay-portlet:renderURL var="newactivityURL">
@@ -65,8 +86,12 @@ AUI().ready(
 	{
 		if(learningActivityType != null && !ArrayUtil.contains(invisibleTypes, learningActivityType.getTypeId())
 				&& (course==null && learningActivityType.allowsBank() || course!=null )) {
-			
-			if(learningActivityType.getTypeId()!=9 && learningActivityType.getTypeId()!=2&&learningActivityType.getTypeId()!=7){
+			boolean hasPermission = true;
+			if(ResourceActionLocalServiceUtil.fetchResourceAction(learningActivityType.getClassName(), "ADD_ACTIVITY")!=null){
+				hasPermission = permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), learningActivityType.getClassName(), themeDisplay.getScopeGroupId(), "ADD_ACTIVITY");
+			}
+			if(hasPermission && learningActivityType.getTypeId()!=9 && learningActivityType.getTypeId()!=2 && learningActivityType.getTypeId()!=7
+					&& (listLearningActivityTypes==null || listLearningActivityTypes.size()==0 || listLearningActivityTypes.contains(learningActivityType.getTypeId()))){
 
 %>	
 	<liferay-portlet:renderURL var="newactivityURLAux">

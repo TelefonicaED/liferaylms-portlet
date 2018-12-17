@@ -98,6 +98,9 @@ create table Lms_Course (
 	welcome BOOLEAN,
 	welcomeMsg TEXT null,
 	welcomeSubject VARCHAR(75) null,
+	deniedInscription BOOLEAN,
+	deniedInscriptionMsg TEXT null,
+	deniedInscriptionSubject VARCHAR(75) null,
 	goodbye BOOLEAN,
 	goodbyeMsg TEXT null,
 	goodbyeSubject VARCHAR(75) null,
@@ -126,6 +129,49 @@ create table Lms_CourseResult (
 	allowStartDate DATE null,
 	allowFinishDate DATE null,
 	extraData TEXT null
+);
+
+create table Lms_CourseType (
+	courseTypeId LONG not null primary key,
+	companyId LONG,
+	userId LONG,
+	groupId LONG,
+	userName VARCHAR(75) null,
+	createDate DATE null,
+	modifiedDate DATE null,
+	name STRING null,
+	description STRING null,
+	iconId LONG
+);
+
+create table Lms_CourseTypeCalificationType (
+	courseTypeCalificationTypeId LONG not null primary key,
+	courseTypeId LONG,
+	calificationType LONG
+);
+
+create table Lms_CourseTypeCourseEval (
+	courseTypeEvalutationTypeId LONG not null primary key,
+	courseTypeId LONG,
+	courseEvalId VARCHAR(75) null
+);
+
+create table Lms_CourseTypeInscriptionType (
+	courseTypeInscriptionTypeId LONG not null primary key,
+	courseTypeId LONG,
+	inscriptionType LONG
+);
+
+create table Lms_CourseTypeLearningActivity (
+	courseTypeLearningActivityId LONG not null primary key,
+	courseTypeId LONG,
+	learningActivityTypeId LONG
+);
+
+create table Lms_CourseTypeTemplate (
+	courseTypeTemplateId LONG not null primary key,
+	courseTypeId LONG,
+	templateId LONG
 );
 
 create table Lms_LearningActivity (

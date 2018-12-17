@@ -51,6 +51,8 @@ import com.liferay.portal.service.persistence.ResourcePersistence;
 import com.liferay.portal.service.persistence.UserPersistence;
 import com.liferay.portal.service.persistence.impl.BasePersistenceImpl;
 
+import com.liferay.portlet.asset.service.persistence.AssetEntryPersistence;
+
 import java.io.Serializable;
 
 import java.util.ArrayList;
@@ -168,6 +170,26 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 			ModuleModelImpl.FINDER_CACHE_ENABLED, Long.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUserIdGroupId",
 			new String[] { Long.class.getName(), Long.class.getName() });
+	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_BY_COMPANYID =
+		new FinderPath(ModuleModelImpl.ENTITY_CACHE_ENABLED,
+			ModuleModelImpl.FINDER_CACHE_ENABLED, ModuleImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByCompanyId",
+			new String[] {
+				Long.class.getName(),
+				
+			"java.lang.Integer", "java.lang.Integer",
+				"com.liferay.portal.kernel.util.OrderByComparator"
+			});
+	public static final FinderPath FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_COMPANYID =
+		new FinderPath(ModuleModelImpl.ENTITY_CACHE_ENABLED,
+			ModuleModelImpl.FINDER_CACHE_ENABLED, ModuleImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByCompanyId",
+			new String[] { Long.class.getName() },
+			ModuleModelImpl.COMPANYID_COLUMN_BITMASK);
+	public static final FinderPath FINDER_PATH_COUNT_BY_COMPANYID = new FinderPath(ModuleModelImpl.ENTITY_CACHE_ENABLED,
+			ModuleModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByCompanyId",
+			new String[] { Long.class.getName() });
 	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_ALL = new FinderPath(ModuleModelImpl.ENTITY_CACHE_ENABLED,
 			ModuleModelImpl.FINDER_CACHE_ENABLED, ModuleImpl.class,
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findAll", new String[0]);
@@ -470,6 +492,25 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_USERIDGROUPID,
 					args);
 				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_USERIDGROUPID,
+					args);
+			}
+
+			if ((moduleModelImpl.getColumnBitmask() &
+					FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_COMPANYID.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] {
+						Long.valueOf(moduleModelImpl.getOriginalCompanyId())
+					};
+
+				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_COMPANYID,
+					args);
+				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_COMPANYID,
+					args);
+
+				args = new Object[] { Long.valueOf(moduleModelImpl.getCompanyId()) };
+
+				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_COMPANYID,
+					args);
+				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_COMPANYID,
 					args);
 			}
 		}
@@ -2995,6 +3036,384 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 	}
 
 	/**
+	 * Returns all the modules where companyId = &#63;.
+	 *
+	 * @param companyId the company ID
+	 * @return the matching modules
+	 * @throws SystemException if a system exception occurred
+	 */
+	public List<Module> findByCompanyId(long companyId)
+		throws SystemException {
+		return findByCompanyId(companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+			null);
+	}
+
+	/**
+	 * Returns a range of all the modules where companyId = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	 * </p>
+	 *
+	 * @param companyId the company ID
+	 * @param start the lower bound of the range of modules
+	 * @param end the upper bound of the range of modules (not inclusive)
+	 * @return the range of matching modules
+	 * @throws SystemException if a system exception occurred
+	 */
+	public List<Module> findByCompanyId(long companyId, int start, int end)
+		throws SystemException {
+		return findByCompanyId(companyId, start, end, null);
+	}
+
+	/**
+	 * Returns an ordered range of all the modules where companyId = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	 * </p>
+	 *
+	 * @param companyId the company ID
+	 * @param start the lower bound of the range of modules
+	 * @param end the upper bound of the range of modules (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @return the ordered range of matching modules
+	 * @throws SystemException if a system exception occurred
+	 */
+	public List<Module> findByCompanyId(long companyId, int start, int end,
+		OrderByComparator orderByComparator) throws SystemException {
+		FinderPath finderPath = null;
+		Object[] finderArgs = null;
+
+		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
+				(orderByComparator == null)) {
+			finderPath = FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_COMPANYID;
+			finderArgs = new Object[] { companyId };
+		}
+		else {
+			finderPath = FINDER_PATH_WITH_PAGINATION_FIND_BY_COMPANYID;
+			finderArgs = new Object[] { companyId, start, end, orderByComparator };
+		}
+
+		List<Module> list = (List<Module>)FinderCacheUtil.getResult(finderPath,
+				finderArgs, this);
+
+		if ((list != null) && !list.isEmpty()) {
+			for (Module module : list) {
+				if ((companyId != module.getCompanyId())) {
+					list = null;
+
+					break;
+				}
+			}
+		}
+
+		if (list == null) {
+			StringBundler query = null;
+
+			if (orderByComparator != null) {
+				query = new StringBundler(3 +
+						(orderByComparator.getOrderByFields().length * 3));
+			}
+			else {
+				query = new StringBundler(3);
+			}
+
+			query.append(_SQL_SELECT_MODULE_WHERE);
+
+			query.append(_FINDER_COLUMN_COMPANYID_COMPANYID_2);
+
+			if (orderByComparator != null) {
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
+			}
+
+			else {
+				query.append(ModuleModelImpl.ORDER_BY_JPQL);
+			}
+
+			String sql = query.toString();
+
+			Session session = null;
+
+			try {
+				session = openSession();
+
+				Query q = session.createQuery(sql);
+
+				QueryPos qPos = QueryPos.getInstance(q);
+
+				qPos.add(companyId);
+
+				list = (List<Module>)QueryUtil.list(q, getDialect(), start, end);
+			}
+			catch (Exception e) {
+				throw processException(e);
+			}
+			finally {
+				if (list == null) {
+					FinderCacheUtil.removeResult(finderPath, finderArgs);
+				}
+				else {
+					cacheResult(list);
+
+					FinderCacheUtil.putResult(finderPath, finderArgs, list);
+				}
+
+				closeSession(session);
+			}
+		}
+
+		return list;
+	}
+
+	/**
+	 * Returns the first module in the ordered set where companyId = &#63;.
+	 *
+	 * @param companyId the company ID
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the first matching module
+	 * @throws com.liferay.lms.NoSuchModuleException if a matching module could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	public Module findByCompanyId_First(long companyId,
+		OrderByComparator orderByComparator)
+		throws NoSuchModuleException, SystemException {
+		Module module = fetchByCompanyId_First(companyId, orderByComparator);
+
+		if (module != null) {
+			return module;
+		}
+
+		StringBundler msg = new StringBundler(4);
+
+		msg.append(_NO_SUCH_ENTITY_WITH_KEY);
+
+		msg.append("companyId=");
+		msg.append(companyId);
+
+		msg.append(StringPool.CLOSE_CURLY_BRACE);
+
+		throw new NoSuchModuleException(msg.toString());
+	}
+
+	/**
+	 * Returns the first module in the ordered set where companyId = &#63;.
+	 *
+	 * @param companyId the company ID
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the first matching module, or <code>null</code> if a matching module could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	public Module fetchByCompanyId_First(long companyId,
+		OrderByComparator orderByComparator) throws SystemException {
+		List<Module> list = findByCompanyId(companyId, 0, 1, orderByComparator);
+
+		if (!list.isEmpty()) {
+			return list.get(0);
+		}
+
+		return null;
+	}
+
+	/**
+	 * Returns the last module in the ordered set where companyId = &#63;.
+	 *
+	 * @param companyId the company ID
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the last matching module
+	 * @throws com.liferay.lms.NoSuchModuleException if a matching module could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	public Module findByCompanyId_Last(long companyId,
+		OrderByComparator orderByComparator)
+		throws NoSuchModuleException, SystemException {
+		Module module = fetchByCompanyId_Last(companyId, orderByComparator);
+
+		if (module != null) {
+			return module;
+		}
+
+		StringBundler msg = new StringBundler(4);
+
+		msg.append(_NO_SUCH_ENTITY_WITH_KEY);
+
+		msg.append("companyId=");
+		msg.append(companyId);
+
+		msg.append(StringPool.CLOSE_CURLY_BRACE);
+
+		throw new NoSuchModuleException(msg.toString());
+	}
+
+	/**
+	 * Returns the last module in the ordered set where companyId = &#63;.
+	 *
+	 * @param companyId the company ID
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the last matching module, or <code>null</code> if a matching module could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	public Module fetchByCompanyId_Last(long companyId,
+		OrderByComparator orderByComparator) throws SystemException {
+		int count = countByCompanyId(companyId);
+
+		List<Module> list = findByCompanyId(companyId, count - 1, count,
+				orderByComparator);
+
+		if (!list.isEmpty()) {
+			return list.get(0);
+		}
+
+		return null;
+	}
+
+	/**
+	 * Returns the modules before and after the current module in the ordered set where companyId = &#63;.
+	 *
+	 * @param moduleId the primary key of the current module
+	 * @param companyId the company ID
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the previous, current, and next module
+	 * @throws com.liferay.lms.NoSuchModuleException if a module with the primary key could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	public Module[] findByCompanyId_PrevAndNext(long moduleId, long companyId,
+		OrderByComparator orderByComparator)
+		throws NoSuchModuleException, SystemException {
+		Module module = findByPrimaryKey(moduleId);
+
+		Session session = null;
+
+		try {
+			session = openSession();
+
+			Module[] array = new ModuleImpl[3];
+
+			array[0] = getByCompanyId_PrevAndNext(session, module, companyId,
+					orderByComparator, true);
+
+			array[1] = module;
+
+			array[2] = getByCompanyId_PrevAndNext(session, module, companyId,
+					orderByComparator, false);
+
+			return array;
+		}
+		catch (Exception e) {
+			throw processException(e);
+		}
+		finally {
+			closeSession(session);
+		}
+	}
+
+	protected Module getByCompanyId_PrevAndNext(Session session, Module module,
+		long companyId, OrderByComparator orderByComparator, boolean previous) {
+		StringBundler query = null;
+
+		if (orderByComparator != null) {
+			query = new StringBundler(6 +
+					(orderByComparator.getOrderByFields().length * 6));
+		}
+		else {
+			query = new StringBundler(3);
+		}
+
+		query.append(_SQL_SELECT_MODULE_WHERE);
+
+		query.append(_FINDER_COLUMN_COMPANYID_COMPANYID_2);
+
+		if (orderByComparator != null) {
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+
+			if (orderByConditionFields.length > 0) {
+				query.append(WHERE_AND);
+			}
+
+			for (int i = 0; i < orderByConditionFields.length; i++) {
+				query.append(_ORDER_BY_ENTITY_ALIAS);
+				query.append(orderByConditionFields[i]);
+
+				if ((i + 1) < orderByConditionFields.length) {
+					if (orderByComparator.isAscending() ^ previous) {
+						query.append(WHERE_GREATER_THAN_HAS_NEXT);
+					}
+					else {
+						query.append(WHERE_LESSER_THAN_HAS_NEXT);
+					}
+				}
+				else {
+					if (orderByComparator.isAscending() ^ previous) {
+						query.append(WHERE_GREATER_THAN);
+					}
+					else {
+						query.append(WHERE_LESSER_THAN);
+					}
+				}
+			}
+
+			query.append(ORDER_BY_CLAUSE);
+
+			String[] orderByFields = orderByComparator.getOrderByFields();
+
+			for (int i = 0; i < orderByFields.length; i++) {
+				query.append(_ORDER_BY_ENTITY_ALIAS);
+				query.append(orderByFields[i]);
+
+				if ((i + 1) < orderByFields.length) {
+					if (orderByComparator.isAscending() ^ previous) {
+						query.append(ORDER_BY_ASC_HAS_NEXT);
+					}
+					else {
+						query.append(ORDER_BY_DESC_HAS_NEXT);
+					}
+				}
+				else {
+					if (orderByComparator.isAscending() ^ previous) {
+						query.append(ORDER_BY_ASC);
+					}
+					else {
+						query.append(ORDER_BY_DESC);
+					}
+				}
+			}
+		}
+
+		else {
+			query.append(ModuleModelImpl.ORDER_BY_JPQL);
+		}
+
+		String sql = query.toString();
+
+		Query q = session.createQuery(sql);
+
+		q.setFirstResult(0);
+		q.setMaxResults(2);
+
+		QueryPos qPos = QueryPos.getInstance(q);
+
+		qPos.add(companyId);
+
+		if (orderByComparator != null) {
+			Object[] values = orderByComparator.getOrderByConditionValues(module);
+
+			for (Object value : values) {
+				qPos.add(value);
+			}
+		}
+
+		List<Module> list = q.list();
+
+		if (list.size() == 2) {
+			return list.get(1);
+		}
+		else {
+			return null;
+		}
+	}
+
+	/**
 	 * Returns all the modules.
 	 *
 	 * @return the modules
@@ -3169,6 +3588,18 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 	public void removeByUserIdGroupId(long userId, long groupId)
 		throws SystemException {
 		for (Module module : findByUserIdGroupId(userId, groupId)) {
+			remove(module);
+		}
+	}
+
+	/**
+	 * Removes all the modules where companyId = &#63; from the database.
+	 *
+	 * @param companyId the company ID
+	 * @throws SystemException if a system exception occurred
+	 */
+	public void removeByCompanyId(long companyId) throws SystemException {
+		for (Module module : findByCompanyId(companyId)) {
 			remove(module);
 		}
 	}
@@ -3588,6 +4019,59 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 	}
 
 	/**
+	 * Returns the number of modules where companyId = &#63;.
+	 *
+	 * @param companyId the company ID
+	 * @return the number of matching modules
+	 * @throws SystemException if a system exception occurred
+	 */
+	public int countByCompanyId(long companyId) throws SystemException {
+		Object[] finderArgs = new Object[] { companyId };
+
+		Long count = (Long)FinderCacheUtil.getResult(FINDER_PATH_COUNT_BY_COMPANYID,
+				finderArgs, this);
+
+		if (count == null) {
+			StringBundler query = new StringBundler(2);
+
+			query.append(_SQL_COUNT_MODULE_WHERE);
+
+			query.append(_FINDER_COLUMN_COMPANYID_COMPANYID_2);
+
+			String sql = query.toString();
+
+			Session session = null;
+
+			try {
+				session = openSession();
+
+				Query q = session.createQuery(sql);
+
+				QueryPos qPos = QueryPos.getInstance(q);
+
+				qPos.add(companyId);
+
+				count = (Long)q.uniqueResult();
+			}
+			catch (Exception e) {
+				throw processException(e);
+			}
+			finally {
+				if (count == null) {
+					count = Long.valueOf(0);
+				}
+
+				FinderCacheUtil.putResult(FINDER_PATH_COUNT_BY_COMPANYID,
+					finderArgs, count);
+
+				closeSession(session);
+			}
+		}
+
+		return count.intValue();
+	}
+
+	/**
 	 * Returns the number of modules.
 	 *
 	 * @return the number of modules
@@ -3672,6 +4156,18 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 	protected CourseCompetencePersistence courseCompetencePersistence;
 	@BeanReference(type = CourseResultPersistence.class)
 	protected CourseResultPersistence courseResultPersistence;
+	@BeanReference(type = CourseTypePersistence.class)
+	protected CourseTypePersistence courseTypePersistence;
+	@BeanReference(type = CourseTypeCalificationTypePersistence.class)
+	protected CourseTypeCalificationTypePersistence courseTypeCalificationTypePersistence;
+	@BeanReference(type = CourseTypeCourseEvalPersistence.class)
+	protected CourseTypeCourseEvalPersistence courseTypeCourseEvalPersistence;
+	@BeanReference(type = CourseTypeInscriptionTypePersistence.class)
+	protected CourseTypeInscriptionTypePersistence courseTypeInscriptionTypePersistence;
+	@BeanReference(type = CourseTypeLearningActivityPersistence.class)
+	protected CourseTypeLearningActivityPersistence courseTypeLearningActivityPersistence;
+	@BeanReference(type = CourseTypeTemplatePersistence.class)
+	protected CourseTypeTemplatePersistence courseTypeTemplatePersistence;
 	@BeanReference(type = LearningActivityPersistence.class)
 	protected LearningActivityPersistence learningActivityPersistence;
 	@BeanReference(type = LearningActivityResultPersistence.class)
@@ -3704,6 +4200,8 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 	protected ResourcePersistence resourcePersistence;
 	@BeanReference(type = UserPersistence.class)
 	protected UserPersistence userPersistence;
+	@BeanReference(type = AssetEntryPersistence.class)
+	protected AssetEntryPersistence assetEntryPersistence;
 	private static final String _SQL_SELECT_MODULE = "SELECT module FROM Module module";
 	private static final String _SQL_SELECT_MODULE_WHERE = "SELECT module FROM Module module WHERE ";
 	private static final String _SQL_COUNT_MODULE = "SELECT COUNT(module) FROM Module module";
@@ -3719,6 +4217,7 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 	private static final String _FINDER_COLUMN_USERID_USERID_2 = "module.userId = ?";
 	private static final String _FINDER_COLUMN_USERIDGROUPID_USERID_2 = "module.userId = ? AND ";
 	private static final String _FINDER_COLUMN_USERIDGROUPID_GROUPID_2 = "module.groupId = ?";
+	private static final String _FINDER_COLUMN_COMPANYID_COMPANYID_2 = "module.companyId = ?";
 	private static final String _FILTER_ENTITY_TABLE_FILTER_PK_COLUMN = "module.moduleId";
 	private static final String _FILTER_SQL_SELECT_MODULE_WHERE = "SELECT DISTINCT {module.*} FROM Lms_Module module WHERE ";
 	private static final String _FILTER_SQL_SELECT_MODULE_NO_INLINE_DISTINCT_WHERE_1 =

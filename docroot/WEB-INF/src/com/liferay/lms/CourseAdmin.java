@@ -24,10 +24,12 @@ import javax.portlet.ResourceURL;
 
 import com.liferay.lms.model.AsynchronousProcessAudit;
 import com.liferay.lms.model.Course;
+import com.liferay.lms.model.CourseType;
 import com.liferay.lms.model.LmsPrefs;
 import com.liferay.lms.service.AsynchronousProcessAuditLocalServiceUtil;
 import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.lms.service.CourseServiceUtil;
+import com.liferay.lms.service.CourseTypeLocalServiceUtil;
 import com.liferay.lms.service.LmsPrefsLocalServiceUtil;
 import com.liferay.lms.threads.ImportEditionsThread;
 import com.liferay.lms.threads.ReportThreadMapper;
@@ -92,6 +94,7 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 	
 	private String viewJSP = null;
 	private String editCourseJSP = null;
+	private String courseTypesJSP = null;
 	private String exportJSP = null;
 	private String importJSP = null;
 	private String cloneJSP = null;
@@ -102,6 +105,7 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 	public void init() throws PortletException {	
 		viewJSP = getInitParameter("view-template");
 		editCourseJSP =  getInitParameter("edit-course-template");
+		courseTypesJSP = getInitParameter("course-types-template");
 		roleMembersTabJSP =  getInitParameter("role-members-tab-template");
 		exportJSP =  getInitParameter("export-template");
 		importJSP =  getInitParameter("import-template");
@@ -139,6 +143,8 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 			try {
 				if(jsp == null || "".equals(jsp)){
 					showViewDefault(renderRequest, renderResponse);
+				}else if("course-types".equals(jsp)){
+					showViewCourseTypes(renderRequest, renderResponse);
 				}else if("edit-course".equals(jsp)){
 					showViewEditCourse(renderRequest, renderResponse);
 				}else if("role-members-tab".equals(jsp)){
@@ -180,6 +186,24 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 		searchCourses(renderRequest, renderResponse);
 		
 		include(this.viewJSP, renderRequest, renderResponse);
+	}
+	
+	private void showViewCourseTypes(RenderRequest renderRequest,RenderResponse renderResponse) throws IOException, PortletException{
+		
+		ThemeDisplay themeDisplay = (ThemeDisplay)renderRequest.getAttribute(WebKeys.THEME_DISPLAY);
+		
+		PortletURL backURL = renderResponse.createRenderURL();
+		renderRequest.setAttribute("backURL", backURL);
+		
+		List<CourseType> listCourseTypes = new ArrayList<CourseType>();
+		try {
+			listCourseTypes = CourseTypeLocalServiceUtil.getCourseTypes(-1, -1);
+		} catch (SystemException e) {
+			e.printStackTrace();
+		}
+		renderRequest.setAttribute("listCourseTypes", listCourseTypes);
+		
+		include(this.courseTypesJSP, renderRequest, renderResponse);
 	}
 	
 	private void showViewEditCourse(RenderRequest renderRequest,RenderResponse renderResponse) throws IOException, PortletException{
@@ -835,6 +859,9 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 	
 		String newCourseName  = ParamUtil.getString(actionRequest, "newCourseName", "New course cloned");
 		boolean cloneForum = ParamUtil.getBoolean(actionRequest, "cloneForum");
+		boolean cloneDocuments = ParamUtil.getBoolean(actionRequest, "cloneDocuments");
+		boolean cloneModuleClassification = ParamUtil.getBoolean(actionRequest, "cloneModuleClassification");
+		boolean cloneActivityClassificationTypes = ParamUtil.getBoolean(actionRequest, "cloneActivityClassificationTypes");
 		int startMonth = 	ParamUtil.getInteger(actionRequest, "startMon");
 		int startYear = 	ParamUtil.getInteger(actionRequest, "startYear");
 		int startDay = 		ParamUtil.getInteger(actionRequest, "startDay");
@@ -898,6 +925,9 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 				message.put("serviceContext",serviceContext);
 				message.put("visible",visible);
 				message.put("cloneForum", cloneForum);
+				message.put("cloneDocuments", cloneDocuments);
+				message.put("cloneModuleClassification", cloneModuleClassification);
+				message.put("cloneActivityClassificationTypes", cloneActivityClassificationTypes);
 				MessageBusUtil.sendMessage("liferay/lms/courseClone", message);
 				SessionMessages.add(actionRequest, "courseadmin.clone.confirmation.success");
 			}

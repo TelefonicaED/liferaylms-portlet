@@ -24,6 +24,7 @@
 <%@page import="com.liferay.portal.model.Role"%>
 <%@page import="com.liferay.lms.service.LmsPrefsLocalServiceUtil"%>
 <%@page import="com.liferay.lms.model.LmsPrefs"%>
+<%@page import="com.liferay.lms.util.LmsConstant"%>
 <%@ include file="/init.jsp"%>
 <%
 LmsPrefs prefs=LmsPrefsLocalServiceUtil.getLmsPrefsIni(themeDisplay.getCompanyId());
@@ -182,12 +183,24 @@ for(InscriptionType inscriptionType :inscriptionTypeRegistry.getInscriptionTypes
 %>
 </aui:field-wrapper>
 
-<liferay-ui:header title="show-hide-activity" />
+<liferay-ui:header title="modules-and-activities" />
 <aui:field-wrapper>
 
+<%
+	boolean showActivityClassification = true;
+	boolean showModuleClassification = false;
+	try {
+		showActivityClassification = PrefsPropsUtil.getBoolean(themeDisplay.getCompanyId(), LmsConstant.SHOW_ACTIVITY_CLASSIFICATION);
+		showModuleClassification = PrefsPropsUtil.getBoolean(themeDisplay.getCompanyId(), LmsConstant.SHOW_MODULE_CLASSIFICATION);
+	} catch (SystemException e) {
+		e.printStackTrace();
+	}
+
+%>
 	
-	<aui:input type="checkbox" name="showHideActivity"
-	label="show-hide-activity" checked="<%=prefs.getShowHideActivity()%>" value="<%=prefs.getShowHideActivity()%>" />
+	<aui:input type="checkbox" name="showModuleClassification"	label="show-module-classification" checked="<%= showModuleClassification %>" />
+	<aui:input type="checkbox" name="showActivityClassification" label="show-activity-classification" checked="<%= showActivityClassification %>" />
+	<aui:input type="checkbox" name="showHideActivity"	label="show-hide-activity" checked="<%=prefs.getShowHideActivity()%>" value="<%=prefs.getShowHideActivity()%>" />
 
 </aui:field-wrapper>
 

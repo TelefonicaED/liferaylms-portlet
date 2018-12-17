@@ -1,9 +1,11 @@
 package com.liferay.lms.inscriptionadmin;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.Date;
 import java.util.List;
 
+import javax.mail.internet.InternetAddress;
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
 import javax.portlet.PortletException;
@@ -17,23 +19,35 @@ import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.messaging.Message;
+import com.liferay.portal.kernel.messaging.MessageBusUtil;
 import com.liferay.portal.kernel.servlet.SessionErrors;
+import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.PrefsPropsUtil;
+import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
-import com.liferay.portal.model.Group;
+import com.liferay.portal.model.Company;
 import com.liferay.portal.model.MembershipRequest;
 import com.liferay.portal.model.MembershipRequestConstants;
 import com.liferay.portal.model.Team;
+import com.liferay.portal.model.User;
 import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.security.permission.PermissionThreadLocal;
+import com.liferay.portal.service.CompanyLocalServiceUtil;
 import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.MembershipRequestLocalServiceUtil;
 import com.liferay.portal.service.TeamLocalServiceUtil;
 import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.theme.ThemeDisplay;
+import com.liferay.portal.util.PortalUtil;
 import com.liferay.util.bridges.mvc.MVCPortlet;
 
 /**
@@ -140,10 +154,18 @@ public class InscriptionAdminPortlet extends MVCPortlet {
 	}
 
 	@ProcessAction(name = "denied")
-	public void denied(ActionRequest request, ActionResponse response) throws SystemException{
+	public void denied(ActionRequest request, ActionResponse response) {
+		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(WebKeys.THEME_DISPLAY);
+		
+		boolean deniedOk = Boolean.TRUE;
 		long msrId = ParamUtil.getLong(request, "msrId");
+		
+		if(log.isDebugEnabled())
+			log.debug("::: Action:: Deny inscription :: msrId :: " + msrId);
+		
+		MembershipRequest msr = null;
 		try {
-			MembershipRequest msr = MembershipRequestLocalServiceUtil.getMembershipRequest(msrId);
+			msr = MembershipRequestLocalServiceUtil.getMembershipRequest(msrId);
 			List<Team> teams =  TeamLocalServiceUtil.getUserTeams(msr.getUserId(), msr.getGroupId());
 			if(teams!=null && teams.size()>0){
 				long[] userIds = new long[1];
@@ -157,16 +179,94 @@ public class InscriptionAdminPortlet extends MVCPortlet {
 			msr.setReplyDate(new Date());
 			MembershipRequestLocalServiceUtil.updateMembershipRequest(msr);
 			
-			
-		} catch (NumberFormatException e) {
-			if(log.isDebugEnabled()){
+		} catch (NumberFormatException | PortalException | SystemException e ) {
+			e.printStackTrace();
+			deniedOk = Boolean.FALSE;
+		} 
+		
+		if(deniedOk){
+			//Enviar mensaje si está habilitado
+			try{
+				Course course = CourseLocalServiceUtil.getCourseByGroupCreatedId(themeDisplay.getScopeGroupId());
+				if(Validator.isNull(course))
+					deniedOk = Boolean.FALSE;
+				else if(course.isDeniedInscription()){
+					long companyId = course.getCompanyId();
+					User user = UserLocalServiceUtil.fetchUser(msr.getUserId());
+					if(Validator.isNull(user))
+						deniedOk = Boolean.FALSE;
+					else {
+						Company company = CompanyLocalServiceUtil.getCompany(companyId);
+						if(Validator.isNull(company))
+							deniedOk = Boolean.FALSE;
+						else {
+					    	String fromName = PrefsPropsUtil.getString(companyId, PropsKeys.ADMIN_EMAIL_FROM_NAME);
+							String fromAddress = PrefsPropsUtil.getString(companyId, PropsKeys.ADMIN_EMAIL_FROM_ADDRESS);
+					    	String emailTo = user.getEmailAddress();
+					    	
+							InternetAddress from = new InternetAddress(fromAddress, fromName);
+							
+					    	String url = PortalUtil.getPortalURL(company.getVirtualHostname(), 80, false);
+					    	//QUITANDO PUERTOS
+							String[] urls = url.split(":");
+							url = urls[0] + ":" +urls[1];  	
+							log.debug("url: " + url);
+							
+					    	String urlcourse = url+"/web"+course.getFriendlyURL();
+					    	String subject = new String();
+					    
+					    	if(Validator.isNotNull(course.getDeniedInscriptionSubject())&&!StringPool.BLANK.equals(course.getDeniedInscriptionSubject())){
+						    	subject = course.getDeniedInscriptionSubject();
+					    	}else{
+						    	subject = LanguageUtil.format(user.getLocale(),"inscription-denied-subject", new String[]{course.getTitle(user.getLocale())});
+
+					    	}
+					    	String body = StringUtil.replace(
+				    			course.getDeniedInscriptionMsg(),
+				    			new String[] {"[$FROM_ADDRESS$]", "[$FROM_NAME$]", "[$PAGE_URL$]","[$PORTAL_URL$]","[$TO_ADDRESS$]","[$TO_NAME$]","[$USER_SCREENNAME$]","[$TITLE_COURSE$]"},
+				    			new String[] {fromAddress, fromName, urlcourse, url, user.getEmailAddress(), user.getFullName(),user.getScreenName(),course.getTitle(user.getLocale())});
+				    	
+							if(log.isDebugEnabled()){
+								log.debug(from);
+								log.debug(emailTo);
+								log.debug(subject);
+								log.debug(body);
+							}
+							
+							//Envio auditoria
+							Message messageAudit=new Message();
+							messageAudit.put("auditing", "TRUE");
+							messageAudit.put("groupId", course.getGroupCreatedId());
+							messageAudit.put("subject", subject);
+							messageAudit.put("body", 	body);
+							messageAudit.setResponseId("1111");
+							MessageBusUtil.sendSynchronousMessage("lms/mailing", messageAudit, 1000);
+							
+							//Envio el correo
+							Message message=new Message();
+							message.put("to", emailTo);
+							message.put("subject", 	subject);
+							message.put("body", 	body);
+							message.put("groupId", 	course.getGroupCreatedId());
+							message.put("userId",  	user.getUserId());
+							message.put("testing", 	StringPool.FALSE);
+							message.put("type", 	"COURSE_INSCRIPTION");
+							message.put("url", 		url);
+							message.put("urlcourse",urlcourse);		
+							MessageBusUtil.sendMessage("lms/mailing", message);
+						}
+					}
+				}
+			} catch (SystemException | PortalException | UnsupportedEncodingException e){
 				e.printStackTrace();
-			}
-		} catch (PortalException e) {
-			if(log.isDebugEnabled()){
-				e.printStackTrace();
-			}
+				deniedOk = Boolean.FALSE;
+			} 
 		}
+		
+		if(deniedOk)
+			SessionMessages.add(request, "course-inscription.success.deny");
+		else
+			SessionErrors.add(request, "course-inscription.error.deny");
 	}
 	
 
