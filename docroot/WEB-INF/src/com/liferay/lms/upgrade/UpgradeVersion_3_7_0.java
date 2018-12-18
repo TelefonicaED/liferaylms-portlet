@@ -6,6 +6,7 @@ import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
 
+import com.liferay.counter.service.CounterLocalServiceUtil;
 import com.liferay.lms.model.LmsPrefs;
 import com.liferay.lms.model.Module;
 import com.liferay.lms.service.LmsPrefsLocalServiceUtil;
@@ -16,6 +17,8 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.search.Indexer;
+import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.Validator;
@@ -23,6 +26,7 @@ import com.liferay.portal.model.Company;
 import com.liferay.portal.model.ResourceConstants;
 import com.liferay.portal.service.CompanyLocalServiceUtil;
 import com.liferay.portal.service.ResourcePermissionLocalServiceUtil;
+import com.liferay.portlet.asset.model.AssetEntry;
 import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
 
 public class UpgradeVersion_3_7_0 extends UpgradeProcess {
@@ -78,13 +82,25 @@ public class UpgradeVersion_3_7_0 extends UpgradeProcess {
 		/*********************************************************************************************/
 		
 		log.info("::::::::::::ASSET MODULES:::::::::::::::::::::");
-		
+		AssetEntry assetEntry =null;
+		Indexer indexer = IndexerRegistryUtil.nullSafeGetIndexer(Module.class);
 		for(Module module : ModuleLocalServiceUtil.getModules(-1, -1)){
-			AssetEntryLocalServiceUtil.updateEntry(module.getUserId(), module.getGroupId(),
-				Module.class.getName(), module.getModuleId(), module.getUuid(), 0, null, null, true,
-				module.getStartDate(), module.getEndDate(), new Date(System.currentTimeMillis()), null,
-				ContentTypes.TEXT_HTML, module.getTitle(), module.getDescription(), module.getDescription(),
-				null, null, 0, 0, null, false);
+			 assetEntry = AssetEntryLocalServiceUtil.createAssetEntry(CounterLocalServiceUtil.increment(AssetEntry.class.getName()));
+			 assetEntry.setClassName(Module.class.getName());
+			 assetEntry.setClassPK(module.getModuleId());
+			 assetEntry.setClassTypeId(0);
+			 assetEntry.setClassUuid(module.getUuid());
+			 assetEntry.setUserId(module.getUserId());
+			 assetEntry.setGroupId(module.getGroupId());
+			 assetEntry.setStartDate(module.getStartDate());
+			 assetEntry.setEndDate(module.getEndDate());
+			 assetEntry.setDescription(module.getDescription());
+			 assetEntry.setSummary(module.getDescription());
+			 assetEntry.setPublishDate(new Date(System.currentTimeMillis()));
+			 assetEntry.setMimeType(ContentTypes.TEXT_HTML);
+			 assetEntry.setTitle(module.getTitle());
+			 AssetEntryLocalServiceUtil.updateAssetEntry(assetEntry);
+			 indexer.reindex(module);
 		}
 		
 		/*********************************************************************************************/
