@@ -40,11 +40,7 @@
 
 <%@ include file="/init.jsp" %>
 
-<script>
-window.onbeforeunload = function() { 
-    return Liferay.Language.get("execativity.test.try.confirm.close"); 
-}
-</script>
+
 
 <% 
 Boolean isTablet = ParamUtil.getBoolean(renderRequest, "isTablet", false);
@@ -621,6 +617,12 @@ if(isTablet){%>
 							</script>			
 
 							<aui:form name="formulario" action="<%=!hasPermissionAccessCourseFinished ? correctURL : correctAccessFinishedURL %>" method="post" onSubmit="javascript:return false;">
+							
+								<script>
+								window.onbeforeunload = function() { 
+								    return Liferay.Language.get("execativity.test.try.confirm.close"); 
+								}
+								</script>
 							
 							<%
 								long random = 0;
