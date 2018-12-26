@@ -303,7 +303,8 @@ public class CreateEdition extends CourseCopyUtil implements MessageListener {
 				
 				//Copiar la clasificación de los módulos
 				AssetEntry entryModule = AssetEntryLocalServiceUtil.fetchEntry(Module.class.getName(), module.getModuleId());
-				AssetEntryLocalServiceUtil.updateEntry(newModule.getUserId(), newModule.getGroupId(), Module.class.getName(), 
+				if(Validator.isNotNull(entryModule))
+					AssetEntryLocalServiceUtil.updateEntry(newModule.getUserId(), newModule.getGroupId(), Module.class.getName(), 
 						newModule.getModuleId(), entryModule.getCategoryIds(), entryModule.getTagNames());
 				
 				createLearningActivities(module, newModule, siteMemberRole, learningActivityTypeRegistry, pending, correlationActivities, activities, newLearnActivity, nuevaLarn, evaluations);
