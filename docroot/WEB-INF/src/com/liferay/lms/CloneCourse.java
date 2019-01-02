@@ -96,7 +96,7 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 	boolean cloneActivityClassificationTypes;
 	
 	public CloneCourse(long groupId, String newCourseName, ThemeDisplay themeDisplay, Date startDate, Date endDate, boolean cloneForum, boolean cloneDocuments,
-			boolean acloneModuleClassification, boolean cloneActivityClassificationTypes, ServiceContext serviceContext) {
+			boolean cloneModuleClassification, boolean cloneActivityClassificationTypes, ServiceContext serviceContext) {
 		super();
 		this.groupId = groupId;
 		this.newCourseName = newCourseName;
@@ -363,7 +363,8 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 					AssetEntry assetEntryModule = AssetEntryLocalServiceUtil.fetchEntry(Module.class.getName(), module.getModuleId());
 					if(log.isDebugEnabled())
 						log.debug(":::Clone module classification::: ");
-					AssetEntryLocalServiceUtil.updateEntry(newModule.getUserId(), newModule.getGroupId(), Module.class.getName(), 
+					if(Validator.isNotNull(assetEntryModule))
+						AssetEntryLocalServiceUtil.updateEntry(newModule.getUserId(), newModule.getGroupId(), Module.class.getName(), 
 							newModule.getModuleId(), assetEntryModule.getCategoryIds(), assetEntryModule.getTagNames());
 				}
 				

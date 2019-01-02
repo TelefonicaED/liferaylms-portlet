@@ -409,6 +409,8 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 			
 			if(team>0){
 				params.put("usersTeams",team);
+			}else{
+				displayTerms.setTeamId(0);
 			}
 			
 			
@@ -462,7 +464,7 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 			
 		
 		/***************/
-			
+			displayTerms.setHasNullTeam(Boolean.TRUE);
 			
 			renderRequest.setAttribute("searchContainer", searchContainer);
 			renderRequest.setAttribute("displayTerms", displayTerms);

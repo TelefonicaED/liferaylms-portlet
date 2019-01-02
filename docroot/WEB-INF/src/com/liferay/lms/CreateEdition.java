@@ -27,6 +27,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.messaging.Message;
 import com.liferay.portal.kernel.messaging.MessageListener;
 import com.liferay.portal.kernel.messaging.MessageListenerException;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.ResourceConstants;
 import com.liferay.portal.model.Role;
@@ -300,6 +301,12 @@ public class CreateEdition extends CourseCopyUtil implements MessageListener {
 					
 				}
 				
+				//Copiar la clasificación de los módulos
+				AssetEntry entryModule = AssetEntryLocalServiceUtil.fetchEntry(Module.class.getName(), module.getModuleId());
+				if(Validator.isNotNull(entryModule))
+					AssetEntryLocalServiceUtil.updateEntry(newModule.getUserId(), newModule.getGroupId(), Module.class.getName(), 
+						newModule.getModuleId(), entryModule.getCategoryIds(), entryModule.getTagNames());
+				
 				createLearningActivities(module, newModule, siteMemberRole, learningActivityTypeRegistry, pending, correlationActivities, activities, newLearnActivity, nuevaLarn, evaluations);
 				
 				
@@ -411,6 +418,14 @@ public class CreateEdition extends CourseCopyUtil implements MessageListener {
 				if(actPending){
 					pending.put(actId, activity.getPrecedence());
 				}
+				
+				//Copiar la clasificación de la actividad
+				AssetEntry entryActivity = AssetEntryLocalServiceUtil.fetchEntry(LearningActivity.class.getName(), activity.getActId());
+				if(Validator.isNotNull(entryActivity)){
+					AssetEntryLocalServiceUtil.updateEntry(nuevaLarn.getUserId(), nuevaLarn.getGroupId(), LearningActivity.class.getName(), 
+							nuevaLarn.getActId(), entryActivity.getCategoryIds(), entryActivity.getTagNames());
+				}
+				
 			} catch (Exception e) {
 				e.printStackTrace();
 				error=true;
