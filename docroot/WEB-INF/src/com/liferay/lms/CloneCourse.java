@@ -182,7 +182,11 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 		try{
 			log.debug("  + AssetCategoryIds: "+AssetEntryLocalServiceUtil.getEntry(Course.class.getName(), course.getCourseId()).getCategoryIds().toString());
 			log.debug("  + AssetCategoryIds Service Context: "+serviceContext.getAssetCategoryIds());
+			log.debug("  + AssetTagNames: "+AssetEntryLocalServiceUtil.getEntry(Course.class.getName(), course.getCourseId()).getTagNames());
+			log.debug("  + AssetTagNames Service Context: "+serviceContext.getAssetTagNames());
+			
 			serviceContext.setAssetCategoryIds(AssetEntryLocalServiceUtil.getEntry(Course.class.getName(), course.getCourseId()).getCategoryIds());
+			serviceContext.setAssetTagNames(AssetEntryLocalServiceUtil.getEntry(Course.class.getName(), course.getCourseId()).getTagNames());
 			AssetEntryLocalServiceUtil.validate(course.getGroupCreatedId(), Course.class.getName(), serviceContext.getAssetCategoryIds(), serviceContext.getAssetTagNames());
 		}catch(Exception e){
 			serviceContext.setAssetCategoryIds(new long[]{});
