@@ -1802,23 +1802,29 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 	
 	@ProcessAction(name="activateCompetence")
 	public void activateCompetence(ActionRequest actionRequest, ActionResponse actionResponse) throws Exception {
+		log.debug("ACTIVATE COMPETENCE!!!!!");
 		Long courseId = ParamUtil.getLong(actionRequest, "courseId");
 		Long competenceId = ParamUtil.getLong(actionRequest, "competenceId");
 		Boolean condition = ParamUtil.getBoolean(actionRequest, "condition");
 		String tab = ParamUtil.getString(actionRequest, "tab");
 		ThemeDisplay themeDisplay = (ThemeDisplay) actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
 		
-		CourseCompetence cc = CourseCompetenceLocalServiceUtil.fetchByCourseCompetenceCondition(courseId, competenceId, condition);
-		
-		if(cc==null){
-			long courseCompetenceId = CounterLocalServiceUtil.increment(CourseCompetence.class.getName());
-			cc = CourseCompetenceLocalServiceUtil.createCourseCompetence(courseCompetenceId);
-			cc.setCourseId(courseId);
-			cc.setCompetenceId(competenceId);
-			cc.setCachedModel(condition);
-			cc.setCondition(condition);
-			CourseCompetenceLocalServiceUtil.updateCourseCompetence(cc, true);
+		try{
+			CourseCompetence cc = CourseCompetenceLocalServiceUtil.fetchByCourseCompetenceCondition(courseId, competenceId, condition);
+			
+			if(cc==null){
+				long courseCompetenceId = CounterLocalServiceUtil.increment(CourseCompetence.class.getName());
+				cc = CourseCompetenceLocalServiceUtil.createCourseCompetence(courseCompetenceId);
+				cc.setCourseId(courseId);
+				cc.setCompetenceId(competenceId);
+				cc.setCachedModel(condition);
+				cc.setCondition(condition);
+				CourseCompetenceLocalServiceUtil.updateCourseCompetence(cc, true);
+			}
+		}catch(Exception e){
+			e.printStackTrace();
 		}
+		
 		
 		actionResponse.setRenderParameter("jspPage","/html/courseadmin/competencetab.jsp");
 		actionResponse.setRenderParameter("courseId", String.valueOf(courseId));
