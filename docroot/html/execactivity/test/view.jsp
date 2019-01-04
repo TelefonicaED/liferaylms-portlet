@@ -147,8 +147,7 @@ if(isTablet){%>
 				
 				String navigateParam = ParamUtil.getString(renderRequest, "navigate");
 				String passwordParam = ParamUtil.getString(renderRequest, "password",StringPool.BLANK).trim();
-				String password = GetterUtil.getString(LearningActivityLocalServiceUtil.getExtraContentValue(actId, "password"),StringPool.BLANK).trim();
-						
+				String password = HtmlUtil.unescape(GetterUtil.getString(LearningActivityLocalServiceUtil.getExtraContentValue(actId, "password"),StringPool.BLANK)).trim();
 				if((Validator.isNotNull(navigateParam))||(StringPool.BLANK.equals(password))||(passwordParam.equals(password))){
 					
 					long activityTimestamp=0;
