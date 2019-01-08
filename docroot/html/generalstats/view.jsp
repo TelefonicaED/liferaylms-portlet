@@ -62,10 +62,17 @@ if(courses!=null&&courses.size()>0)
 String scourseIds=ListUtil.toString(courses,"courseId");
 %>
 <liferay-portlet:resourceURL var="exportURL" >
-				<portlet:param name="action" value="export"/>
-				<portlet:param name="courseIds" value="<%=scourseIds %>"/>
-			</liferay-portlet:resourceURL>
-			<liferay-ui:icon image="export" label="<%= true %>" message="offlinetaskactivity.csv.export" method="get" url="<%=exportURL%>" />
+	<portlet:param name="action" value="export"/>
+</liferay-portlet:resourceURL>
+<liferay-ui:icon image="export" label="<%= true %>" message="offlinetaskactivity.csv.export" url="javascript:${renderResponse.getNamespace()}submitExport();" />
+<aui:form name="fmExport" action="<%=exportURL%>" method="POST">
+	<aui:input type="hidden" name="courseIds" value="<%=scourseIds %>"/>
+</aui:form>
+<script>
+function <portlet:namespace />submitExport(){
+	$('form[name="<portlet:namespace />fmExport"]').submit();
+}
+</script>
 <%
 }
 %>

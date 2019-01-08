@@ -2,9 +2,7 @@ package com.liferay.lms;
 
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.nio.charset.Charset;
 import java.text.DecimalFormat;
-import java.util.List;
 
 import javax.portlet.PortletException;
 import javax.portlet.ResourceRequest;
@@ -13,27 +11,19 @@ import javax.portlet.ResourceResponse;
 import au.com.bytecode.opencsv.CSVWriter;
 
 import com.liferay.lms.model.Course;
-import com.liferay.lms.model.CourseResult;
-import com.liferay.lms.model.LmsPrefs;
 import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.lms.service.CourseResultLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityLocalServiceUtil;
-import com.liferay.lms.service.LmsPrefsLocalServiceUtil;
 import com.liferay.lms.service.ModuleLocalServiceUtil;
-import com.liferay.portal.kernel.exception.NestableException;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.servlet.HttpHeaders;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
-import com.liferay.portal.model.Group;
-import com.liferay.portal.model.User;
-import com.liferay.portal.model.UserGroupRole;
-import com.liferay.portal.service.GroupLocalServiceUtil;
-import com.liferay.portal.service.UserGroupRoleLocalServiceUtil;
-import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.util.bridges.mvc.MVCPortlet;
 
@@ -41,6 +31,8 @@ import com.liferay.util.bridges.mvc.MVCPortlet;
  * Portlet implementation class GeneralStats
  */
 public class GeneralStats extends MVCPortlet {
+	private static Log log = LogFactoryUtil.getLog(GeneralStats.class);
+	
 	@Override
 	public void serveResource(ResourceRequest resourceRequest,
 			ResourceResponse resourceResponse) throws IOException,
@@ -48,6 +40,12 @@ public class GeneralStats extends MVCPortlet {
 		String action = ParamUtil.getString(resourceRequest, "action");
 		long[] courseIds=ParamUtil.getLongValues(resourceRequest, "courseIds");
 		ThemeDisplay themeDisplay  =(ThemeDisplay)resourceRequest.getAttribute(WebKeys.THEME_DISPLAY);
+		
+		if(log.isDebugEnabled()){
+			log.debug("::generalstats:: action :: " + action);
+			log.debug("::generalstats:: courseIds.length :: " + courseIds.length);
+		}
+		
 		if(action.equals("export")){
 			try
 			{
@@ -110,9 +108,8 @@ public class GeneralStats extends MVCPortlet {
 			resourceResponse.getPortletOutputStream().close();
 			
 			}
-			catch(Exception e)
-			{
-				
+			catch(Exception e){
+				e.printStackTrace();
 			}
 		}
 	}
