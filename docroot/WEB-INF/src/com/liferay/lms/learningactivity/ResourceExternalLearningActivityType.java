@@ -266,6 +266,8 @@ public class ResourceExternalLearningActivityType extends BaseLearningActivityTy
 							dlDocument = DLAppLocalServiceUtil.addFileEntry(
 							          themeDisplay.getUserId(), repositoryId , folderId , uploadRequest.getFileName(param), uploadRequest.getContentType(param), 
 							          uploadRequest.getFileName(param), StringPool.BLANK, StringPool.BLANK, uploadRequest.getFile(param) , serviceContext );
+							portletRequest.getPortletSession().setAttribute("extensionfile"+i, null);
+							portletRequest.getPortletSession().setAttribute("sizefile"+i, null);
 						} catch(FileExtensionException fee){
 							if(log.isDebugEnabled())fee.printStackTrace();
 							if(log.isErrorEnabled())log.error(fee.getMessage());
@@ -315,7 +317,7 @@ public class ResourceExternalLearningActivityType extends BaseLearningActivityTy
 					
 					j++;
 				}
-
+				
 				for(Element element : elements){
 					boolean find = false;
 					for(Element celement : createelements){
