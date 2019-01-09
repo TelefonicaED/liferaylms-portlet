@@ -445,17 +445,21 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 						pending.put(actId, activity.getPrecedence());
 					}
 					
-					if(this.cloneActivityClassificationTypes){
-						//---Clonar los tipos de actividad
-						AssetEntry activityType = AssetEntryLocalServiceUtil.fetchEntry(LearningActivity.class.getName(), activity.getActId());
-						if(log.isDebugEnabled())
-							log.debug(":::Clone activity classification types::: Activity " + activity.getActId());
-						if(Validator.isNotNull(activityType)){
+					AssetEntry entryActivity = AssetEntryLocalServiceUtil.fetchEntry(LearningActivity.class.getName(), activity.getActId());
+					if(Validator.isNotNull(entryActivity)){
+						if(this.cloneActivityClassificationTypes){
+							//---Clonar la clasificación de la actividad
+							if(log.isDebugEnabled())
+								log.debug(":::Clone activity classification types::: Activity " + activity.getActId());
+							if(Validator.isNotNull(entryActivity)){
+								AssetEntryLocalServiceUtil.updateEntry(nuevaLarn.getUserId(), nuevaLarn.getGroupId(), LearningActivity.class.getName(), 
+										nuevaLarn.getActId(), entryActivity.getCategoryIds(), entryActivity.getTagNames());
+							}
+						} else {
 							AssetEntryLocalServiceUtil.updateEntry(nuevaLarn.getUserId(), nuevaLarn.getGroupId(), LearningActivity.class.getName(), 
-									nuevaLarn.getActId(), activityType.getCategoryIds(), activityType.getTagNames());
+									nuevaLarn.getActId(), null, null);
 						}
 					}
-					
 				} catch (Exception e) {
 					e.printStackTrace();
 					error=true;
