@@ -238,6 +238,7 @@ public class TaskP2PLearningActivityType extends BaseLearningActivityType {
 					
 					if(textAdd!=null){
 						Element textAddElement = SAXReaderUtil.createElement("text"+elements);
+						textAdd = (textAdd.contains("\"")) ? textAdd.replace("\"", "'") : textAdd;
 						textAddElement.setText(textAdd);
 						rootElement.add(textAddElement);
 						elements++;
