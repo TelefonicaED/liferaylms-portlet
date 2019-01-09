@@ -249,7 +249,7 @@ public class OnlineActivity extends MVCPortlet {
 
 		LearningActivity learningActivity = LearningActivityLocalServiceUtil.getLearningActivity(actId);
 		LearningActivityTryLocalServiceUtil.getTriesCountByActivityAndUser(actId, user.getUserId());
-
+		log.debug("TEXTO "+text);
 		if((learningActivity.getTries()!=0)&&(learningActivity.getTries()<=LearningActivityTryLocalServiceUtil.getTriesCountByActivityAndUser(actId, user.getUserId()))) {
 			//TODO
 			SessionErrors.add(actionRequest, "onlineActivity.max-tries");	
@@ -284,13 +284,19 @@ public class OnlineActivity extends MVCPortlet {
 
 				long repositoryId = DLFolderConstants.getDataRepositoryId(themeDisplay.getScopeGroupId(), DLFolderConstants.DEFAULT_PARENT_FOLDER_ID);
 				long folderId = createDLFolders(user.getUserId(), repositoryId, actionRequest);
-
-				//Subimos el Archivo en la Document Library
-				ServiceContext serviceContext= ServiceContextFactory.getInstance( DLFileEntry.class.getName(), actionRequest);
-				//Damos permisos al archivo para usuarios de comunidad.
-				//serviceContext.setAddGroupPermissions(true);
-				FileEntry document = DLAppLocalServiceUtil.addFileEntry(
-						themeDisplay.getUserId(), repositoryId , folderId , fileName, mimeType, fileName, StringPool.BLANK, StringPool.BLANK, file , serviceContext ) ;
+				FileEntry document;
+				try{
+					//Subimos el Archivo en la Document Library
+					ServiceContext serviceContext= ServiceContextFactory.getInstance( DLFileEntry.class.getName(), actionRequest);
+					//Damos permisos al archivo para usuarios de comunidad.
+					//serviceContext.setAddGroupPermissions(true);
+					document = DLAppLocalServiceUtil.addFileEntry(
+							themeDisplay.getUserId(), repositoryId , folderId , fileName, mimeType, fileName, StringPool.BLANK, StringPool.BLANK, file , serviceContext ) ;
+				}catch(Exception e){
+					actionResponse.setRenderParameter("text", text);
+					actionRequest.setAttribute("actId", actId);
+					throw(e);
+				}
 				LmsPrefs prefs = LmsPrefsLocalServiceUtil.fetchLmsPrefs(themeDisplay.getCompanyId());
 				try{
 					ResourcePermissionLocalServiceUtil.setResourcePermissions(themeDisplay.getCompanyId(), DLFileEntry.class.getName(), ResourceConstants.SCOPE_INDIVIDUAL, String.valueOf(document.getFileEntryId()) , prefs.getTeacherRole(), new String[]{"VIEW"});

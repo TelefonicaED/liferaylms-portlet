@@ -238,6 +238,7 @@ public class InscriptionAdminPortlet extends MVCPortlet {
 							messageAudit.put("auditing", "TRUE");
 							messageAudit.put("groupId", course.getGroupCreatedId());
 							messageAudit.put("subject", subject);
+							messageAudit.put("community", course.getTitle(user.getLocale()));
 							messageAudit.put("body", 	body);
 							messageAudit.setResponseId("1111");
 							MessageBusUtil.sendSynchronousMessage("lms/mailing", messageAudit, 1000);
@@ -249,6 +250,7 @@ public class InscriptionAdminPortlet extends MVCPortlet {
 							message.put("body", 	body);
 							message.put("groupId", 	course.getGroupCreatedId());
 							message.put("userId",  	user.getUserId());
+							message.put("community", course.getTitle(user.getLocale()));
 							message.put("testing", 	StringPool.FALSE);
 							message.put("type", 	"COURSE_INSCRIPTION");
 							message.put("url", 		url);

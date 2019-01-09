@@ -96,7 +96,7 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 	boolean cloneActivityClassificationTypes;
 	
 	public CloneCourse(long groupId, String newCourseName, ThemeDisplay themeDisplay, Date startDate, Date endDate, boolean cloneForum, boolean cloneDocuments,
-			boolean acloneModuleClassification, boolean cloneActivityClassificationTypes, ServiceContext serviceContext) {
+			boolean cloneModuleClassification, boolean cloneActivityClassificationTypes, ServiceContext serviceContext) {
 		super();
 		this.groupId = groupId;
 		this.newCourseName = newCourseName;
@@ -182,7 +182,11 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 		try{
 			log.debug("  + AssetCategoryIds: "+AssetEntryLocalServiceUtil.getEntry(Course.class.getName(), course.getCourseId()).getCategoryIds().toString());
 			log.debug("  + AssetCategoryIds Service Context: "+serviceContext.getAssetCategoryIds());
+			log.debug("  + AssetTagNames: "+AssetEntryLocalServiceUtil.getEntry(Course.class.getName(), course.getCourseId()).getTagNames());
+			log.debug("  + AssetTagNames Service Context: "+serviceContext.getAssetTagNames());
+			
 			serviceContext.setAssetCategoryIds(AssetEntryLocalServiceUtil.getEntry(Course.class.getName(), course.getCourseId()).getCategoryIds());
+			serviceContext.setAssetTagNames(AssetEntryLocalServiceUtil.getEntry(Course.class.getName(), course.getCourseId()).getTagNames());
 			AssetEntryLocalServiceUtil.validate(course.getGroupCreatedId(), Course.class.getName(), serviceContext.getAssetCategoryIds(), serviceContext.getAssetTagNames());
 		}catch(Exception e){
 			serviceContext.setAssetCategoryIds(new long[]{});
@@ -363,7 +367,8 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 					AssetEntry assetEntryModule = AssetEntryLocalServiceUtil.fetchEntry(Module.class.getName(), module.getModuleId());
 					if(log.isDebugEnabled())
 						log.debug(":::Clone module classification::: ");
-					AssetEntryLocalServiceUtil.updateEntry(newModule.getUserId(), newModule.getGroupId(), Module.class.getName(), 
+					if(Validator.isNotNull(assetEntryModule))
+						AssetEntryLocalServiceUtil.updateEntry(newModule.getUserId(), newModule.getGroupId(), Module.class.getName(), 
 							newModule.getModuleId(), assetEntryModule.getCategoryIds(), assetEntryModule.getTagNames());
 				}
 				

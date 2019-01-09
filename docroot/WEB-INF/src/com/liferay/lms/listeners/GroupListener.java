@@ -122,6 +122,7 @@ public class GroupListener extends BaseModelListener<Group> {
 							message.put("groupId", 	course.getGroupCreatedId());
 							message.put("userId",  	user.getUserId());
 							message.put("testing", 	StringPool.FALSE);
+							message.put("community", course.getTitle(user.getLocale()));
 							message.put("type", 	"COURSE_INSCRIPTION");
 							message.put("url", 		url);
 							message.put("urlcourse",urlcourse);		
@@ -219,6 +220,7 @@ public class GroupListener extends BaseModelListener<Group> {
 							message.put("groupId", 	course.getGroupCreatedId());
 							message.put("userId",  	user.getUserId());
 							message.put("testing", 	StringPool.FALSE);
+							message.put("community", course.getTitle(user.getLocale()));
 							message.put("type", 	"COURSE_INSCRIPTION");
 							message.put("url", 		url);
 							message.put("urlcourse",urlcourse);		
