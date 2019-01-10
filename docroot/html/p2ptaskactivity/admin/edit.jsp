@@ -269,9 +269,9 @@ if(teamAssignationAllowed){
 		if(learningActivity!=null&&learningActivity.getActId()>0)
 			value = LearningActivityLocalServiceUtil.getExtraContentValue(learningActivity.getActId(),"text0");
 		%>  
-			<span id="_lmsactivitieslist_WAR_liferaylmsportlet_texts0" class="aui-field-content">
-				<span id="aui_3_4_0_1_2024" class="aui-field-element">
-					<input id="aui_3_4_0_1_2020" class="aui-field-input aui-field-input-text aui-form-validator-valid" type="text" value="<%=Validator.isNotNull(value)?value:LanguageUtil.get(locale, "feedback") %>" name="text0">
+			<span id="<portlet:namespace />texts0" class="aui-field-content">
+				<span class="aui-field-element">
+					<input class="aui-field-input aui-field-input-text aui-form-validator-valid" type="text" value="<%=Validator.isNotNull(value)?value:LanguageUtil.get(locale, "feedback") %>" name="text0">
 				</span>
 			</span>
 		<%
@@ -283,9 +283,9 @@ if(teamAssignationAllowed){
 						break;
 				%>
 				<script type="text/javascript">document.getElementById("<portlet:namespace />legend").style.display='block';</script>
-				<span id="_lmsactivitieslist_WAR_liferaylmsportlet_texts<%=i %>" class="aui-field-content">
-					<span id="aui_3_4_0_1_2024" class="aui-field-element">
-						<input id="aui_3_4_0_1_2020" class="aui-field-input aui-field-input-text aui-form-validator-valid" type="text" value="<%=value %>" name="text<%=i %>">
+				<span id="<portlet:namespace />texts<%=i %>" class="aui-field-content">
+					<span class="aui-field-element">
+						<input class="aui-field-input aui-field-input-text aui-form-validator-valid" type="text" value="<%=value %>" name="text<%=i %>">
 					</span>
 					<%if(!disabled){ %>
 						<img class="icon" alt="" src="/html/themes/control_panel/images/common/remove.png" style="cursor: pointer;" onclick="this.parentNode.parentNode.removeChild(this.parentNode);">					<%} %>
