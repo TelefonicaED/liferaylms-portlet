@@ -226,6 +226,7 @@ public class TaskP2PLearningActivityType extends BaseLearningActivityType {
 				
 				int elements = 0;
 				int numQuestion = Integer.parseInt(PropsUtil.get("lms.p2p.numcustomquestion"));
+				log.debug("lms.p2p.numcustomquestion  :: " + numQuestion);
 				for(int i=0;i<numQuestion;i++){
 					Element text=rootElement.element("text"+i);
 					if(text!=null)
@@ -238,7 +239,6 @@ public class TaskP2PLearningActivityType extends BaseLearningActivityType {
 					
 					if(textAdd!=null){
 						Element textAddElement = SAXReaderUtil.createElement("text"+elements);
-						textAdd = (textAdd.contains("\"")) ? textAdd.replace("\"", "'") : textAdd;
 						textAddElement.setText(textAdd);
 						rootElement.add(textAddElement);
 						elements++;

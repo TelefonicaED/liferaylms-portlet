@@ -571,6 +571,9 @@ if(isTablet){%>
 						        	window,
 						        	'<portlet:namespace/>submitForm',
 									function(e, navigate) {
+						        		
+						        		window.onbeforeunload=function(){}
+						        		
 										var returnValue = true;
 										
 										var A = AUI();
@@ -641,11 +644,12 @@ if(isTablet){%>
 							<aui:form name="formulario" action="<%=!hasPermissionAccessCourseFinished ? correctURL : correctAccessFinishedURL %>" method="post" onSubmit="javascript:return false;">
 							
 								<script>
-								window.onbeforeunload = function() { 
-								    return Liferay.Language.get("execativity.test.try.confirm.close"); 
-								}
+								$(document).ready(function(){
+									window.onbeforeunload = function() { 
+										return Liferay.Language.get("execativity.test.try.confirm.close");
+									}
+								})
 								</script>
-							
 							<%
 								long random = 0;
 								if(!hasPermissionAccessCourseFinished){
