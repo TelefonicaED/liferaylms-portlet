@@ -99,7 +99,7 @@ if ((actionEditing && hasPermissionAddLact) ||
 					<span class="type_<%=type%>"></span>
 							
 					<a href="<%=assetRendererFactory.getAssetRenderer(activity.getActId()).
-							getURLView(liferayPortletResponse, WindowState.NORMAL).toString()%>"  ><%=title%></a>
+							getURLViewInContext(liferayPortletRequest, liferayPortletResponse, "").toString()%>"  ><%=title%></a>
 					
 			<%} else{ %>
 				<li class="learningActivity <%=activityEnd%> <%=editing %> <%=status%> locked"  <%=(status=="passed"||status=="failed" )?"title =\""+LanguageUtil.format(pageContext, "activity.result",new Object[]{resultNumberFormat.format(result)})+"\"":StringPool.BLANK %> 
