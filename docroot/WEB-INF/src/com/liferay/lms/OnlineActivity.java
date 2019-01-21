@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Iterator;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
@@ -13,8 +14,6 @@ import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 
 import com.liferay.lms.asset.LearningActivityAssetRendererFactory;
-import com.liferay.lms.auditing.AuditConstants;
-import com.liferay.lms.auditing.AuditingLogFactory;
 import com.liferay.lms.learningactivity.calificationtype.CalificationType;
 import com.liferay.lms.learningactivity.calificationtype.CalificationTypeRegistry;
 import com.liferay.lms.model.Course;
@@ -45,25 +44,23 @@ import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.xml.Document;
+import com.liferay.portal.kernel.xml.DocumentException;
 import com.liferay.portal.kernel.xml.Element;
+import com.liferay.portal.kernel.xml.Node;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
 import com.liferay.portal.model.ResourceConstants;
 import com.liferay.portal.model.User;
 import com.liferay.portal.service.ResourcePermissionLocalServiceUtil;
-import com.liferay.portal.service.RoleLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceContextFactory;
 import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
-import com.liferay.portlet.asset.model.AssetEntry;
 import com.liferay.portlet.asset.model.AssetRenderer;
-import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.model.DLFileEntry;
 import com.liferay.portlet.documentlibrary.model.DLFolder;
 import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
 import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
-import com.liferay.portlet.documentlibrary.service.DLFileEntryLocalServiceUtil;
 import com.liferay.util.bridges.mvc.MVCPortlet;
 
 
@@ -98,10 +95,6 @@ public class OnlineActivity extends MVCPortlet {
 
 	public static final String ACTIVITY_RESULT_NO_CALIFICATION_SQL = "WHERE (NOT EXISTS (SELECT 1 FROM lms_learningactivityresult " +
 			"WHERE User_.userId = lms_learningactivityresult.userId AND lms_learningactivityresult.actId = ? AND lms_learningactivityresult.endDate IS NOT NULL ))"; 
-
-
-	//public static final String ACTIVITY_RESULT_NO_CALIFICATION_SQL = "WHERE (EXISTS (SELECT 1 FROM lms_learningactivityresult " +
-	//		"WHERE User_.userId = lms_learningactivityresult.userId AND lms_learningactivityresult.endDate =lms_learningactivityresult.startDate AND lms_learningactivityresult.actId = ? ))"; 
 
 
 	public static final String TEXT_XML= "text";
@@ -203,10 +196,6 @@ public class OnlineActivity extends MVCPortlet {
 	}
 	
 	
-	
-	
-	
-	
 	private void updateLearningActivityTryAndResult(
 			LearningActivityTry learningActivityTry) throws PortalException,
 			SystemException {
@@ -238,7 +227,7 @@ public class OnlineActivity extends MVCPortlet {
 
 
 	public void setActivity(ActionRequest actionRequest,
-			ActionResponse actionResponse) throws IOException, NestableException {
+			ActionResponse actionResponse) throws IOException, NestableException, DocumentException {
 		long actId = ParamUtil.getLong(actionRequest, "actId");
 		UploadPortletRequest uploadRequest = PortalUtil.getUploadPortletRequest(actionRequest);
 		String text = ParamUtil.getString(uploadRequest, "text");
@@ -246,85 +235,115 @@ public class OnlineActivity extends MVCPortlet {
 		User user = UserLocalServiceUtil.getUser(themeDisplay.getUserId());
 		boolean isSetTextoEnr =  StringPool.TRUE.equals(LearningActivityLocalServiceUtil.getExtraContentValue(actId,"textoenr"));
 		boolean isSetFichero =  StringPool.TRUE.equals(LearningActivityLocalServiceUtil.getExtraContentValue(actId,"fichero"));
+				
+		if(log.isDebugEnabled()){
+			log.debug("::setActivity:: actId :: " + actId);
+			log.debug("::setActivity:: text :: " + text);
+			log.debug("::setActivity:: isSetTextoEnr :: " + isSetTextoEnr);
+			log.debug("::setActivity:: isSetFichero :: " + isSetFichero);
+		}
 
 		LearningActivity learningActivity = LearningActivityLocalServiceUtil.getLearningActivity(actId);
 		LearningActivityTryLocalServiceUtil.getTriesCountByActivityAndUser(actId, user.getUserId());
-		log.debug("TEXTO "+text);
-		if((learningActivity.getTries()!=0)&&(learningActivity.getTries()<=LearningActivityTryLocalServiceUtil.getTriesCountByActivityAndUser(actId, user.getUserId()))) {
-			//TODO
+		LearningActivityResult result = LearningActivityResultLocalServiceUtil.getByActIdAndUserId(actId, user.getUserId());
+		//Si el result no tiene end date es que aún no está corregida
+		if(Validator.isNotNull(result) && Validator.isNotNull(result.getEndDate()) && (learningActivity.getTries()!=0)&&(learningActivity.getTries()<=LearningActivityTryLocalServiceUtil.getTriesCountByActivityAndUser(actId, user.getUserId()))) {
 			SessionErrors.add(actionRequest, "onlineActivity.max-tries");	
-		}
-		else {
-
-			//ServiceContext serviceContext = ServiceContextFactory.getInstance(actionRequest);
-
+			if(log.isDebugEnabled())
+				log.debug("::setActivity:: MAX TRIES :: ");
+		} else {
 			Element resultadosXML=SAXReaderUtil.createElement("results");
 			Document resultadosXMLDoc=SAXReaderUtil.createDocument(resultadosXML);
+			String fileName = null;
 
 			if(isSetFichero) {
-				String fileName = uploadRequest.getFileName("fileName");
+				fileName = uploadRequest.getFileName("fileName");
+				if(log.isDebugEnabled())
+					log.debug("::setActivity:: fileName :: " + fileName);
 				File file = uploadRequest.getFile("fileName");
 				String mimeType = uploadRequest.getContentType("fileName");
-				if (Validator.isNull(fileName)) {
+				//Si no se ha subido archivo y no hay un intento previo con archivo subido
+				if ((Validator.isNull(fileName) || fileName.equals(StringPool.BLANK)) && Validator.isNull(result)) {
+					if(log.isDebugEnabled())
+						log.debug("::setActivity:: MANDATORYFILE :: ");
 					SessionErrors.add(actionRequest, "onlineActivity.mandatory.file");
 					actionRequest.setAttribute("actId", actId);
 					actionResponse.setRenderParameter("text", text);
 					return;
 				}
-				if(	file.getName().endsWith(".bat") 
-						|| file.getName().endsWith(".com")
-						|| file.getName().endsWith(".exe")
-						|| file.getName().endsWith(".msi") ){
-
-					SessionErrors.add(actionRequest, "onlineActivity-error-file-type");
-					actionResponse.setRenderParameter("text", text);
-					actionRequest.setAttribute("actId", actId);
-					return;
-				}
-
-				long repositoryId = DLFolderConstants.getDataRepositoryId(themeDisplay.getScopeGroupId(), DLFolderConstants.DEFAULT_PARENT_FOLDER_ID);
-				long folderId = createDLFolders(user.getUserId(), repositoryId, actionRequest);
-				FileEntry document;
-				try{
-					//Subimos el Archivo en la Document Library
-					ServiceContext serviceContext= ServiceContextFactory.getInstance( DLFileEntry.class.getName(), actionRequest);
-					//Damos permisos al archivo para usuarios de comunidad.
-					//serviceContext.setAddGroupPermissions(true);
-					document = DLAppLocalServiceUtil.addFileEntry(
-							themeDisplay.getUserId(), repositoryId , folderId , fileName, mimeType, fileName, StringPool.BLANK, StringPool.BLANK, file , serviceContext ) ;
-				}catch(Exception e){
-					actionResponse.setRenderParameter("text", text);
-					actionRequest.setAttribute("actId", actId);
-					throw(e);
-				}
-				LmsPrefs prefs = LmsPrefsLocalServiceUtil.fetchLmsPrefs(themeDisplay.getCompanyId());
-				try{
-					ResourcePermissionLocalServiceUtil.setResourcePermissions(themeDisplay.getCompanyId(), DLFileEntry.class.getName(), ResourceConstants.SCOPE_INDIVIDUAL, String.valueOf(document.getFileEntryId()) , prefs.getTeacherRole(), new String[]{"VIEW"});
-					ResourcePermissionLocalServiceUtil.setResourcePermissions(themeDisplay.getCompanyId(), DLFileEntry.class.getName(), ResourceConstants.SCOPE_INDIVIDUAL, String.valueOf(document.getFileEntryId()) , prefs.getEditorRole(), new String[]{"VIEW"});
-				}catch(Exception e){
-					e.printStackTrace();
-				}
-				//serviceContext.setGroupPermissions(groupPermissions);
-				Element fileXML=SAXReaderUtil.createElement(FILE_XML);
-				fileXML.addAttribute("id", Long.toString(document.getFileEntryId()));
-				resultadosXML.add(fileXML);
+				if(Validator.isNotNull(fileName)){
+					if(	file.getName().endsWith(".bat") 
+							|| file.getName().endsWith(".com")
+							|| file.getName().endsWith(".exe")
+							|| file.getName().endsWith(".msi") ){
+						
+						if(log.isDebugEnabled())
+							log.debug("::setActivity:: ERROR TYPE FILE :: ");
+						SessionErrors.add(actionRequest, "onlineActivity-error-file-type");
+						actionResponse.setRenderParameter("text", text);
+						actionRequest.setAttribute("actId", actId);
+						return;
+					}
+					long repositoryId = DLFolderConstants.getDataRepositoryId(themeDisplay.getScopeGroupId(), DLFolderConstants.DEFAULT_PARENT_FOLDER_ID);
+					long folderId = createDLFolders(user.getUserId(), repositoryId, actionRequest);
+					FileEntry document;
+					try{
+						//Subimos el Archivo en la Document Library
+						ServiceContext serviceContext= ServiceContextFactory.getInstance( DLFileEntry.class.getName(), actionRequest);
+						//Damos permisos al archivo para usuarios de comunidad.
+						//serviceContext.setAddGroupPermissions(true);
+						document = DLAppLocalServiceUtil.addFileEntry(
+								themeDisplay.getUserId(), repositoryId , folderId , fileName, mimeType, fileName, StringPool.BLANK, StringPool.BLANK, file , serviceContext ) ;
+					}catch(Exception e){
+						actionResponse.setRenderParameter("text", text);
+						actionRequest.setAttribute("actId", actId);
+						throw(e);
+					}
+					LmsPrefs prefs = LmsPrefsLocalServiceUtil.fetchLmsPrefs(themeDisplay.getCompanyId());
+					try{
+						ResourcePermissionLocalServiceUtil.setResourcePermissions(themeDisplay.getCompanyId(), DLFileEntry.class.getName(), ResourceConstants.SCOPE_INDIVIDUAL, String.valueOf(document.getFileEntryId()) , prefs.getTeacherRole(), new String[]{"VIEW"});
+						ResourcePermissionLocalServiceUtil.setResourcePermissions(themeDisplay.getCompanyId(), DLFileEntry.class.getName(), ResourceConstants.SCOPE_INDIVIDUAL, String.valueOf(document.getFileEntryId()) , prefs.getEditorRole(), new String[]{"VIEW"});
+					}catch(Exception e){
+						e.printStackTrace();
+					}
+					Element fileXML=SAXReaderUtil.createElement(FILE_XML);
+					fileXML.addAttribute("id", Long.toString(document.getFileEntryId()));
+					resultadosXML.add(fileXML);
+				} 
 			}
 
 			if(isSetTextoEnr){
 				Element richTextXML=SAXReaderUtil.createElement(RICH_TEXT_XML);
 				richTextXML.setText(text);
 				resultadosXML.add(richTextXML);				
-			}
-			else {
+			} else {
 				Element textXML=SAXReaderUtil.createElement(TEXT_XML);
 				textXML.setText(text);
 				resultadosXML.add(textXML);				
 			}
-
-			LearningActivityTry learningActivityTry =  LearningActivityTryLocalServiceUtil.createLearningActivityTry(actId,ServiceContextFactory.getInstance(actionRequest));
+			
+			LearningActivityTry learningActivityTry = null;
+			if(Validator.isNotNull(result) && Validator.isNull(result.getEndDate())){
+				//Si hay resultado sin corregir se actualiza el último try
+				learningActivityTry = LearningActivityTryLocalServiceUtil.getLastLearningActivityTryByActivityAndUser(actId, user.getUserId());
+				//Si no se ha subido un archivo nuevo vuelvo a guardar el archivo que estaba guardado previamente
+				if(isSetFichero && Validator.isNull(fileName)){
+					Iterator<Node> nodeItr = SAXReaderUtil.read(learningActivityTry.getTryResultData()).getRootElement().nodeIterator();	
+					while(nodeItr.hasNext()) {
+						Node element = nodeItr.next();
+						if(OnlineActivity.FILE_XML.equals(element.getName())) {
+							Element fileXML=SAXReaderUtil.createElement(FILE_XML);
+							fileXML.addAttribute("id", ((Element)element).attributeValue("id"));
+							resultadosXML.add(fileXML);
+						}
+					}
+				}
+			}
+			if(Validator.isNull(learningActivityTry))
+				//Si no se encuentra ningún intento previo se crea
+				learningActivityTry =  LearningActivityTryLocalServiceUtil.createLearningActivityTry(actId,ServiceContextFactory.getInstance(actionRequest));
+			
 			learningActivityTry.setTryResultData(resultadosXMLDoc.formattedString());	
-			//learningActivityTry.setEndDate(new Date());
-			//learningActivityTry.setResult(0);
 			LearningActivityTryLocalServiceUtil.updateLearningActivityTry(learningActivityTry);
 			SessionMessages.add(actionRequest, "onlinetaskactivity.updating");
 		}
@@ -388,9 +407,7 @@ public class OnlineActivity extends MVCPortlet {
 
 		actionResponse.setRenderParameters(actionRequest.getParameterMap());
 		if(ParamUtil.getLong(actionRequest, "actId", 0)==0)
-		{
 			actionResponse.setRenderParameter("jspPage", "/html/onlinetaskactivity/admin/edit.jsp");
-		}
 	}
 
 	public void editactivity(ActionRequest actionRequest, ActionResponse actionResponse) throws PortalException, SystemException, Exception {
@@ -408,43 +425,29 @@ public class OnlineActivity extends MVCPortlet {
 	@Override
 	public void render(RenderRequest renderRequest, RenderResponse renderResponse)
 			throws PortletException, IOException {
+		ThemeDisplay themeDisplay  =(ThemeDisplay)renderRequest.getAttribute(WebKeys.THEME_DISPLAY);
 		long actId=0;
-		
 		if(ParamUtil.getBoolean(renderRequest, "actionEditingDetails", false)){
-			
 			actId=ParamUtil.getLong(renderRequest, "resId", 0);
 			renderResponse.setProperty("clear-request-parameters",Boolean.TRUE.toString());
-		}
-		else{
+		}else
 			actId=ParamUtil.getLong(renderRequest, "actId", 0);
-		}
 					
-		if(actId==0)// TODO Auto-generated method stub
-		{
+		if(actId==0)
 			renderRequest.setAttribute(WebKeys.PORTLET_CONFIGURATOR_VISIBILITY, Boolean.FALSE);
-		}
-		else
-		{
-				LearningActivity activity;
-				try {
-
-					//auditing
-					ThemeDisplay themeDisplay = (ThemeDisplay) renderRequest.getAttribute(WebKeys.THEME_DISPLAY);
-					
-					activity = LearningActivityLocalServiceUtil.getLearningActivity(actId);
-					long typeId=activity.getTypeId();
-					
-					if(typeId==6)
-					{
-						super.render(renderRequest, renderResponse);
-					}
-					else
-					{
-						renderRequest.setAttribute(WebKeys.PORTLET_CONFIGURATOR_VISIBILITY, Boolean.FALSE);
-					}
-				} catch (PortalException e) {
-				} catch (SystemException e) {
-				}			
+		else {
+			LearningActivity activity;
+			try {
+				activity = LearningActivityLocalServiceUtil.getLearningActivity(actId);
+				long typeId=activity.getTypeId();
+				
+				if(typeId==6)
+					super.render(renderRequest, renderResponse);
+				else
+					renderRequest.setAttribute(WebKeys.PORTLET_CONFIGURATOR_VISIBILITY, Boolean.FALSE);
+			} catch (PortalException | SystemException e) {
+				e.printStackTrace();
+			} 		
 		}
 	}
 

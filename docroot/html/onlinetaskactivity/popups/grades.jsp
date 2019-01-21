@@ -59,7 +59,6 @@ CalificationType ct = new CalificationTypeRegistry().getCalificationType(CourseL
 
 String urlFile=null;
 String titleFile=null;
-//String iconFile=null;
 long sizeKbFile=0;
 
 String text=null;
@@ -76,9 +75,10 @@ if(lATry!=null){
 	    			urlFile = themeDisplay.getPortalURL()+"/documents/"+dlfile.getGroupId()+"/"+dlfile.getUuid(); 
 	    			titleFile = dlfile.getTitle();
 	    			sizeKbFile = dlfile.getSize()/1024;
-	    			//iconFile=DLUtil.getFileIcon(dlfile.getExtension());
         		}
-        		catch(Throwable a){}
+        		catch(Throwable a){
+        			a.printStackTrace();
+        		}
 	         }
 	         else if(OnlineActivity.RICH_TEXT_XML.equals(element.getName())) {
 	        	 richtext=element.getText();
@@ -88,8 +88,9 @@ if(lATry!=null){
 	         }	
 	    }	
 	}
-	catch(DocumentException de)
-	{}
+	catch(DocumentException de){
+		de.printStackTrace();
+	}
 }
 if(renderRequest.getParameter("studentId")!=null){
 	
