@@ -13,8 +13,6 @@ import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 
 import com.liferay.lms.asset.LearningActivityAssetRendererFactory;
-import com.liferay.lms.auditing.AuditConstants;
-import com.liferay.lms.auditing.AuditingLogFactory;
 import com.liferay.lms.learningactivity.calificationtype.CalificationType;
 import com.liferay.lms.learningactivity.calificationtype.CalificationTypeRegistry;
 import com.liferay.lms.model.Course;
@@ -50,20 +48,16 @@ import com.liferay.portal.kernel.xml.SAXReaderUtil;
 import com.liferay.portal.model.ResourceConstants;
 import com.liferay.portal.model.User;
 import com.liferay.portal.service.ResourcePermissionLocalServiceUtil;
-import com.liferay.portal.service.RoleLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceContextFactory;
 import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
-import com.liferay.portlet.asset.model.AssetEntry;
 import com.liferay.portlet.asset.model.AssetRenderer;
-import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.model.DLFileEntry;
 import com.liferay.portlet.documentlibrary.model.DLFolder;
 import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
 import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
-import com.liferay.portlet.documentlibrary.service.DLFileEntryLocalServiceUtil;
 import com.liferay.util.bridges.mvc.MVCPortlet;
 
 
@@ -98,10 +92,6 @@ public class OnlineActivity extends MVCPortlet {
 
 	public static final String ACTIVITY_RESULT_NO_CALIFICATION_SQL = "WHERE (NOT EXISTS (SELECT 1 FROM lms_learningactivityresult " +
 			"WHERE User_.userId = lms_learningactivityresult.userId AND lms_learningactivityresult.actId = ? AND lms_learningactivityresult.endDate IS NOT NULL ))"; 
-
-
-	//public static final String ACTIVITY_RESULT_NO_CALIFICATION_SQL = "WHERE (EXISTS (SELECT 1 FROM lms_learningactivityresult " +
-	//		"WHERE User_.userId = lms_learningactivityresult.userId AND lms_learningactivityresult.endDate =lms_learningactivityresult.startDate AND lms_learningactivityresult.actId = ? ))"; 
 
 
 	public static final String TEXT_XML= "text";
@@ -203,10 +193,6 @@ public class OnlineActivity extends MVCPortlet {
 	}
 	
 	
-	
-	
-	
-	
 	private void updateLearningActivityTryAndResult(
 			LearningActivityTry learningActivityTry) throws PortalException,
 			SystemException {
@@ -246,26 +232,31 @@ public class OnlineActivity extends MVCPortlet {
 		User user = UserLocalServiceUtil.getUser(themeDisplay.getUserId());
 		boolean isSetTextoEnr =  StringPool.TRUE.equals(LearningActivityLocalServiceUtil.getExtraContentValue(actId,"textoenr"));
 		boolean isSetFichero =  StringPool.TRUE.equals(LearningActivityLocalServiceUtil.getExtraContentValue(actId,"fichero"));
+				
+		if(log.isDebugEnabled()){
+			log.debug("::setActivity:: actId :: " + actId);
+			log.debug("::setActivity:: text :: " + text);
+			log.debug("::setActivity:: isSetTextoEnr :: " + isSetTextoEnr);
+			log.debug("::setActivity:: isSetFichero :: " + isSetFichero);
+		}
 
 		LearningActivity learningActivity = LearningActivityLocalServiceUtil.getLearningActivity(actId);
 		LearningActivityTryLocalServiceUtil.getTriesCountByActivityAndUser(actId, user.getUserId());
-		log.debug("TEXTO "+text);
 		if((learningActivity.getTries()!=0)&&(learningActivity.getTries()<=LearningActivityTryLocalServiceUtil.getTriesCountByActivityAndUser(actId, user.getUserId()))) {
-			//TODO
 			SessionErrors.add(actionRequest, "onlineActivity.max-tries");	
-		}
-		else {
-
-			//ServiceContext serviceContext = ServiceContextFactory.getInstance(actionRequest);
-
+		} else {
 			Element resultadosXML=SAXReaderUtil.createElement("results");
 			Document resultadosXMLDoc=SAXReaderUtil.createDocument(resultadosXML);
 
 			if(isSetFichero) {
 				String fileName = uploadRequest.getFileName("fileName");
+				if(log.isDebugEnabled())
+					log.debug("::setActivity:: fileName :: " + fileName);
 				File file = uploadRequest.getFile("fileName");
 				String mimeType = uploadRequest.getContentType("fileName");
-				if (Validator.isNull(fileName)) {
+				if (Validator.isNull(fileName) || fileName.equals(StringPool.BLANK)) {
+					if(log.isDebugEnabled())
+						log.debug("::setActivity:: MANDATORYFILE :: ");
 					SessionErrors.add(actionRequest, "onlineActivity.mandatory.file");
 					actionRequest.setAttribute("actId", actId);
 					actionResponse.setRenderParameter("text", text);
@@ -275,7 +266,9 @@ public class OnlineActivity extends MVCPortlet {
 						|| file.getName().endsWith(".com")
 						|| file.getName().endsWith(".exe")
 						|| file.getName().endsWith(".msi") ){
-
+					
+					if(log.isDebugEnabled())
+						log.debug("::setActivity:: ERROR TYPE FILE :: ");
 					SessionErrors.add(actionRequest, "onlineActivity-error-file-type");
 					actionResponse.setRenderParameter("text", text);
 					actionRequest.setAttribute("actId", actId);
@@ -323,8 +316,6 @@ public class OnlineActivity extends MVCPortlet {
 
 			LearningActivityTry learningActivityTry =  LearningActivityTryLocalServiceUtil.createLearningActivityTry(actId,ServiceContextFactory.getInstance(actionRequest));
 			learningActivityTry.setTryResultData(resultadosXMLDoc.formattedString());	
-			//learningActivityTry.setEndDate(new Date());
-			//learningActivityTry.setResult(0);
 			LearningActivityTryLocalServiceUtil.updateLearningActivityTry(learningActivityTry);
 			SessionMessages.add(actionRequest, "onlinetaskactivity.updating");
 		}
@@ -388,9 +379,7 @@ public class OnlineActivity extends MVCPortlet {
 
 		actionResponse.setRenderParameters(actionRequest.getParameterMap());
 		if(ParamUtil.getLong(actionRequest, "actId", 0)==0)
-		{
 			actionResponse.setRenderParameter("jspPage", "/html/onlinetaskactivity/admin/edit.jsp");
-		}
 	}
 
 	public void editactivity(ActionRequest actionRequest, ActionResponse actionResponse) throws PortalException, SystemException, Exception {
@@ -408,43 +397,29 @@ public class OnlineActivity extends MVCPortlet {
 	@Override
 	public void render(RenderRequest renderRequest, RenderResponse renderResponse)
 			throws PortletException, IOException {
+		ThemeDisplay themeDisplay  =(ThemeDisplay)renderRequest.getAttribute(WebKeys.THEME_DISPLAY);
 		long actId=0;
-		
 		if(ParamUtil.getBoolean(renderRequest, "actionEditingDetails", false)){
-			
 			actId=ParamUtil.getLong(renderRequest, "resId", 0);
 			renderResponse.setProperty("clear-request-parameters",Boolean.TRUE.toString());
-		}
-		else{
+		}else
 			actId=ParamUtil.getLong(renderRequest, "actId", 0);
-		}
 					
-		if(actId==0)// TODO Auto-generated method stub
-		{
+		if(actId==0)
 			renderRequest.setAttribute(WebKeys.PORTLET_CONFIGURATOR_VISIBILITY, Boolean.FALSE);
-		}
-		else
-		{
-				LearningActivity activity;
-				try {
-
-					//auditing
-					ThemeDisplay themeDisplay = (ThemeDisplay) renderRequest.getAttribute(WebKeys.THEME_DISPLAY);
-					
-					activity = LearningActivityLocalServiceUtil.getLearningActivity(actId);
-					long typeId=activity.getTypeId();
-					
-					if(typeId==6)
-					{
-						super.render(renderRequest, renderResponse);
-					}
-					else
-					{
-						renderRequest.setAttribute(WebKeys.PORTLET_CONFIGURATOR_VISIBILITY, Boolean.FALSE);
-					}
-				} catch (PortalException e) {
-				} catch (SystemException e) {
-				}			
+		else {
+			LearningActivity activity;
+			try {
+				activity = LearningActivityLocalServiceUtil.getLearningActivity(actId);
+				long typeId=activity.getTypeId();
+				
+				if(typeId==6)
+					super.render(renderRequest, renderResponse);
+				else
+					renderRequest.setAttribute(WebKeys.PORTLET_CONFIGURATOR_VISIBILITY, Boolean.FALSE);
+			} catch (PortalException | SystemException e) {
+				e.printStackTrace();
+			} 		
 		}
 	}
 
