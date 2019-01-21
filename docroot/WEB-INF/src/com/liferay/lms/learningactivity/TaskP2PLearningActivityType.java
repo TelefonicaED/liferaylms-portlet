@@ -226,6 +226,7 @@ public class TaskP2PLearningActivityType extends BaseLearningActivityType {
 				
 				int elements = 0;
 				int numQuestion = Integer.parseInt(PropsUtil.get("lms.p2p.numcustomquestion"));
+				log.debug("lms.p2p.numcustomquestion  :: " + numQuestion);
 				for(int i=0;i<numQuestion;i++){
 					Element text=rootElement.element("text"+i);
 					if(text!=null)

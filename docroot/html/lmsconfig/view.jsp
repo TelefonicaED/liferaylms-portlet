@@ -190,8 +190,8 @@ for(InscriptionType inscriptionType :inscriptionTypeRegistry.getInscriptionTypes
 	boolean showActivityClassification = true;
 	boolean showModuleClassification = false;
 	try {
-		showActivityClassification = PrefsPropsUtil.getBoolean(themeDisplay.getCompanyId(), LmsConstant.SHOW_ACTIVITY_CLASSIFICATION);
-		showModuleClassification = PrefsPropsUtil.getBoolean(themeDisplay.getCompanyId(), LmsConstant.SHOW_MODULE_CLASSIFICATION);
+		showActivityClassification = PrefsPropsUtil.getBoolean(themeDisplay.getCompanyId(), LmsConstant.SHOW_ACTIVITY_CLASSIFICATION, true);
+		showModuleClassification = PrefsPropsUtil.getBoolean(themeDisplay.getCompanyId(), LmsConstant.SHOW_MODULE_CLASSIFICATION, false);
 	} catch (SystemException e) {
 		e.printStackTrace();
 	}

@@ -239,7 +239,17 @@
 			name="email-address"	property="emailAddress"	/>
 		
 		<liferay-ui:search-container-column-text>
-				<a id="<portlet:namespace />addUser_${userToAdd.getUserId()}" onClick="<portlet:namespace />addUser(<%=userToAdd.getUserId() %>, '<%=StringEscapeUtils.escapeJavaScript(userToAdd.getFullName()) %>', false)" style="Cursor:pointer;" >
+				<%
+				String userToAddName = userToAdd.getFullName();
+				if (userToAddName.indexOf('\'') >= 0){
+					userToAddName=StringEscapeUtils.escapeJavaScript(userToAddName);          
+			    } else {
+			    	userToAddName=StringEscapeUtils.escapeHtml(userToAddName);            
+			    }
+
+				
+				%>
+				<a id="<portlet:namespace />addUser_${userToAdd.getUserId()}" onClick="<portlet:namespace />addUser(<%=userToAdd.getUserId() %>, '<%=userToAddName %>', false)" style="Cursor:pointer;" >
 				<liferay-ui:message key="select" /></a>
 				<a id="<portlet:namespace />deleteUser_${userToAdd.getUserId()}" class="aui-helper-hidden" onClick="<portlet:namespace />deleteUser(<%=userToAdd.getUserId() %>, false)" style="Cursor:pointer;" >
 				<liferay-ui:message key="unselect" /></a>	

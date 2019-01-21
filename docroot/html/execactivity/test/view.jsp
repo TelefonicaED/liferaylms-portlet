@@ -40,11 +40,7 @@
 
 <%@ include file="/init.jsp" %>
 
-<script>
-window.onbeforeunload = function() { 
-    return Liferay.Language.get("execativity.test.try.confirm.close"); 
-}
-</script>
+
 
 <% 
 Boolean isTablet = ParamUtil.getBoolean(renderRequest, "isTablet", false);
@@ -151,8 +147,7 @@ if(isTablet){%>
 				
 				String navigateParam = ParamUtil.getString(renderRequest, "navigate");
 				String passwordParam = ParamUtil.getString(renderRequest, "password",StringPool.BLANK).trim();
-				String password = GetterUtil.getString(LearningActivityLocalServiceUtil.getExtraContentValue(actId, "password"),StringPool.BLANK).trim();
-						
+				String password = HtmlUtil.unescape(GetterUtil.getString(LearningActivityLocalServiceUtil.getExtraContentValue(actId, "password"),StringPool.BLANK)).trim();
 				if((Validator.isNotNull(navigateParam))||(StringPool.BLANK.equals(password))||(passwordParam.equals(password))){
 					
 					long activityTimestamp=0;
@@ -192,6 +187,29 @@ if(isTablet){%>
 								<portlet:param name="goToQuestions" value="true"></portlet:param>
 								<portlet:param name="jspPage" value="/html/execactivity/test/view.jsp" />
 							</portlet:renderURL> 
+							
+							<%				
+							int tries = LearningActivityTryLocalServiceUtil.getTriesCountByActivityAndUser(actId, themeDisplay.getUserId());
+							Object  [] arguments =  new Object[]{tries,activity.getTries()};
+							Object  [] arguments2 =  new Object[]{activity.getPasspuntuation()};
+							%>
+							<p>
+								<liferay-ui:message key="execativity.test.try.notification" />
+							</p>
+							<%if(activity.getTries()>0){%>
+								<p class="negrita">
+									<liferay-ui:message key="execativity.test.try.count"
+										arguments="<%=arguments %>" />
+								</p>
+							<%}
+							if (activity.getPasspuntuation()>0){ %>
+								<p>
+									<liferay-ui:message key="execativity.test.try.pass.puntuation"
+										arguments="<%=arguments2 %>" />
+								</p>
+							<% }%>
+							
+							
 							<div class="left"><aui:button type="button" value="execactivity.test.go-to-test" onClick="${goToTestURL}" /></div>
 							<%
 						} else {
@@ -553,6 +571,9 @@ if(isTablet){%>
 						        	window,
 						        	'<portlet:namespace/>submitForm',
 									function(e, navigate) {
+						        		
+						        		window.onbeforeunload=function(){}
+						        		
 										var returnValue = true;
 										
 										var A = AUI();
@@ -622,6 +643,13 @@ if(isTablet){%>
 
 							<aui:form name="formulario" action="<%=!hasPermissionAccessCourseFinished ? correctURL : correctAccessFinishedURL %>" method="post" onSubmit="javascript:return false;">
 							
+								<script>
+								$(document).ready(function(){
+									window.onbeforeunload = function() { 
+										return Liferay.Language.get("execativity.test.try.confirm.close");
+									}
+								})
+								</script>
 							<%
 								long random = 0;
 								if(!hasPermissionAccessCourseFinished){
