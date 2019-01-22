@@ -251,6 +251,8 @@ public class OnlineActivity extends MVCPortlet {
 			SessionErrors.add(actionRequest, "onlineActivity.max-tries");	
 			if(log.isDebugEnabled())
 				log.debug("::setActivity:: MAX TRIES :: ");
+		if((learningActivity.getTries()!=0)&&(learningActivity.getTries()<=LearningActivityTryLocalServiceUtil.getTriesCountByActivityAndUser(actId, user.getUserId()))) {
+			SessionErrors.add(actionRequest, "onlineActivity.max-tries");	
 		} else {
 			Element resultadosXML=SAXReaderUtil.createElement("results");
 			Document resultadosXMLDoc=SAXReaderUtil.createDocument(resultadosXML);
@@ -346,8 +348,8 @@ public class OnlineActivity extends MVCPortlet {
 			learningActivityTry.setTryResultData(resultadosXMLDoc.formattedString());	
 			LearningActivityTryLocalServiceUtil.updateLearningActivityTry(learningActivityTry);
 			SessionMessages.add(actionRequest, "onlinetaskactivity.updating");
+			}
 		}
-
 	}
 
 
