@@ -347,7 +347,6 @@ public class OnlineActivity extends MVCPortlet {
 			LearningActivityTryLocalServiceUtil.updateLearningActivityTry(learningActivityTry);
 			SessionMessages.add(actionRequest, "onlinetaskactivity.updating");
 		}
-
 	}
 
 
