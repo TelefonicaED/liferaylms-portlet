@@ -60,14 +60,11 @@ CalificationType ct = new CalificationTypeRegistry().getCalificationType(CourseL
 
 <%@ include file="/html/shared/isTablet.jsp" %><%
 
-
 Boolean isLinkTabletOnlineView = ParamUtil.getBoolean(request, "isTablet", false);
 String cssLinkTabletClassOnlineView="";
 if(isLinkTabletOnlineView){
 	cssLinkTabletClassOnlineView="tablet-link";
 }
-
-
 
 long actId = ParamUtil.getLong(request,"actId",0);
 if(actId==0)
