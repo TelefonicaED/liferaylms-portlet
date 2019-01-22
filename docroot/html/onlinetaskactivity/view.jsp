@@ -48,8 +48,6 @@
 
 <%@ include file="/init.jsp" %>
 
-
-
 <%
 CalificationType ct = new CalificationTypeRegistry().getCalificationType(CourseLocalServiceUtil.getCourseByGroupCreatedId(themeDisplay.getScopeGroupId()).getCalificationType());
 
