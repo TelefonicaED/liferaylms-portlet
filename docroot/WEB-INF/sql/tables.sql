@@ -27,7 +27,8 @@ create table Lms_AsynchronousProcessAudit (
 	createDate DATE null,
 	endDate DATE null,
 	status INTEGER,
-	statusMessage STRING null
+	statusMessage STRING null,
+	extraContent VARCHAR(75) null
 );
 
 create table Lms_AuditEntry (

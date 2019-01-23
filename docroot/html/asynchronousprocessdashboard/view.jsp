@@ -1,9 +1,12 @@
 <%@page import="com.liferay.portal.service.ClassNameLocalServiceUtil"%>
-<%@ include file="/init.jsp"%>
+<%@page import="com.liferay.portal.kernel.json.JSONObject"%>
+<%@page import="com.liferay.portal.kernel.json.JSONFactoryUtil"%>
 
+<%@ include file="/init.jsp"%>
 
 <portlet:renderURL var="searchURL">
 </portlet:renderURL>
+
 <aui:form action="${searchURL}" method="post" name="search">
 	<aui:layout>
 		<aui:column columnWidth="20">
@@ -39,6 +42,9 @@
 		</aui:column>
 	</aui:layout>
 </aui:form>
+
+
+
 
 <div class="table-overflow table-absolute">
 		
@@ -94,6 +100,46 @@
 				</c:otherwise>
 			</c:choose>
 		</liferay-ui:search-container-column-text>
+		
+		
+			<c:choose>
+				<c:when test="${not empty asynchronousProccessAudit.extraContent and showExtraContent}">
+					<liferay-ui:search-container-column-text align="center" name="extraContent" >
+							<%
+							try{
+								String extraContent = asynchronousProccessAudit.getExtraContent();
+								
+								if(!extraContent.isEmpty()){
+									extraContent = extraContent.replace("\"","'");
+									JSONObject obj = JSONFactoryUtil.createJSONObject(extraContent);
+									String path = obj.getString("url");
+									String portletId = obj.getString("portletId");
+									String contentType = obj.getString("contentType");
+									String pathControl = obj.getString("pathControl");
+									String id = String.valueOf(asynchronousProccessAudit.getAsynchronousProcessAuditId());
+									%>
+									<liferay-util:include portletId="<%=portletId%>" page="<%=pathControl%>"  >
+										  <liferay-util:param name="namespace" value="<%=portletId%>" />
+										  <liferay-util:param name="path" value="<%=path%>" />
+										  <liferay-util:param name="contentType" value="<%=contentType%>" />
+										  <liferay-util:param name="id" value="<%=id%>" />
+									</liferay-util:include> 	  
+									<%	}
+							}
+							catch( Exception e){
+								%>
+								
+								<%
+							} 
+							%>
+						</liferay-ui:search-container-column-text>
+					</c:when>
+					<c:otherwise>
+						
+					</c:otherwise>
+				</c:choose>
+		
+		
 			</liferay-ui:search-container-row>
 		<liferay-ui:search-iterator />
 	
