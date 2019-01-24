@@ -349,19 +349,19 @@ public class ModuleLocalServiceImpl extends ModuleLocalServiceBaseImpl {
 	}
 	
 	@Indexable(type=IndexableType.REINDEX)
-	public Module addModule(Long companyId, Long courseId, Long userId, 
+	public Module addModule(Long companyId, Long groupId, Long userId, 
 			String title, String description,
 			Date startDate, Date endDate, Long ordern) throws SystemException, PortalException{
-		return addModule(companyId, courseId, userId, title, description, startDate, endDate, ordern, null);
+		return addModule(companyId, groupId, userId, title, description, startDate, endDate, ordern, null);
 	}
 	@Indexable(type=IndexableType.REINDEX)
-	public Module addModule(Long companyId, Long courseId, Long userId, 
+	public Module addModule(Long companyId, Long groupId, Long userId, 
 			String title, String description,
 			Date startDate, Date endDate, Long ordern, ServiceContext serviceContext) throws SystemException, PortalException {
 		Module fileobj = modulePersistence.create(CounterLocalServiceUtil.increment(Module.class.getName()));
 
 	    fileobj.setCompanyId(companyId);
-	    fileobj.setGroupId(courseId);
+	    fileobj.setGroupId(groupId);
 	    fileobj.setUserId(userId);
 	    try {
 	    	fileobj.setUserName(userLocalService.getUser(userId).getFullName());
@@ -387,7 +387,7 @@ public class ModuleLocalServiceImpl extends ModuleLocalServiceBaseImpl {
 				
 	    	
 			resourceLocalService.addResources(
-					companyId, courseId, userId,
+					companyId, groupId, userId,
 					Module.class.getName(), fileobj.getPrimaryKey(), 
 					false, true, true);
 		} catch (PortalException e) {

@@ -336,7 +336,27 @@ public class ExecActivity extends QuestionsAdmin {
 				{
 					log.debug("editamos los detalles");
 					renderRequest.setAttribute("showOrderQuestions", true);
-					super.render(renderRequest, renderResponse);
+					
+					String mvcPath = ParamUtil.getString(renderRequest, "mvcPath");
+					String jspPage = ParamUtil.getString(renderRequest, "jspPage");
+					
+					if(Validator.isNull(mvcPath) && Validator.isNull(jspPage)){
+						
+						boolean onlyPreview = Boolean.valueOf(LearningActivityLocalServiceUtil.getExtraContentValue(activity.getActId(), "showOnlyPreview", "false"));
+						long learningActivityTries = activity.getTries();
+						int userTries = LearningActivityTryLocalServiceUtil.getTriesCountByActivityAndUser(activity.getActId(), themeDisplay.getUserId());
+						boolean userHasTried = Validator.isNotNull(userTries) && userTries>0;
+						
+						if((learningActivityTries>0 && !userHasTried) || onlyPreview) {
+							include("/html/execactivity/test/preview.jsp", renderRequest, renderResponse);
+						}else{
+							log.debug("editamos los detalles");
+							super.render(renderRequest, renderResponse);
+						}
+					}else{
+						log.debug("editamos los detalles");
+						super.render(renderRequest, renderResponse);
+					}
 				}
 				else
 				{
