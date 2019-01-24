@@ -40,9 +40,8 @@
 
 <%@ include file="/init.jsp" %>
 
-
-
 <% 
+
 Boolean isTablet = ParamUtil.getBoolean(renderRequest, "isTablet", false);
 if(isTablet){%>
 
@@ -178,42 +177,7 @@ if(isTablet){%>
 							<%=activity.getDescriptionFiltered(themeDisplay.getLocale(),true) %>
 						</div>
 						<%
-						boolean onlyPreview = Boolean.valueOf(LearningActivityLocalServiceUtil.getExtraContentValue(actId, "showOnlyPreview", "false"));
-						boolean goToQuestions = Boolean.valueOf(ParamUtil.getString(renderRequest, "goToQuestions", "false"));
-						if(onlyPreview && !goToQuestions){
-							%>
-							<portlet:renderURL var="goToTestURL">
-								<portlet:param name="actId" value="<%=Long.toString(actId) %>" ></portlet:param>
-								<portlet:param name="goToQuestions" value="true"></portlet:param>
-								<portlet:param name="jspPage" value="/html/execactivity/test/view.jsp" />
-							</portlet:renderURL> 
-							
-							<%				
-							int tries = LearningActivityTryLocalServiceUtil.getTriesCountByActivityAndUser(actId, themeDisplay.getUserId());
-							Object  [] arguments =  new Object[]{tries,activity.getTries()};
-							Object  [] arguments2 =  new Object[]{activity.getPasspuntuation()};
-							%>
-							<p>
-								<liferay-ui:message key="execativity.test.try.notification" />
-							</p>
-							<%if(activity.getTries()>0){%>
-								<p class="negrita">
-									<liferay-ui:message key="execativity.test.try.count"
-										arguments="<%=arguments %>" />
-								</p>
-							<%}
-							if (activity.getPasspuntuation()>0){ %>
-								<p>
-									<liferay-ui:message key="execativity.test.try.pass.puntuation"
-										arguments="<%=arguments2 %>" />
-								</p>
-							<% }%>
-							
-							
-							<div class="left"><aui:button type="button" value="execactivity.test.go-to-test" onClick="${goToTestURL}" /></div>
-							<%
-						} else {
-				
+						
 							List<TestQuestion> questions =  new ArrayList<TestQuestion>();
 							questions = ListUtil.copy(TestQuestionLocalServiceUtil.getQuestions(actId));
 							
@@ -794,7 +758,6 @@ if(isTablet){%>
 						</aui:form>
 
 					<%
-						}
 						
 					}
 			} else{
