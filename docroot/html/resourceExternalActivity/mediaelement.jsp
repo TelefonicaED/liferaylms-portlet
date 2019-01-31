@@ -8,7 +8,7 @@
 		<c:set var="questionType" value="${question.testQuestionType }" />
 		<div class="aui-helper-hidden questionVideo"
 			id="${renderResponse.namespace}question_${question.questionId}">
-			<aui:form name="questionform_${question.questionId}">
+			<aui:form name="questionform_${question.questionId}" role="form">
 				<aui:input name="questionId" value="${question.questionId }"
 					type="hidden" />
 				<aui:input name="latId" value="${latId}" type="hidden" />

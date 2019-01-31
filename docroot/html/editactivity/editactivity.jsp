@@ -585,7 +585,7 @@ AUI().ready('node-base' ,'aui-form-validator', 'aui-overlay-context-panel', 'wid
 	);
 //-->
 </script>
-<aui:form name="fm" action="<%=saveactivityURL%>"  method="post"   onSubmit="event.preventDefault();${renderResponse.getNamespace()}validateForm();" enctype="multipart/form-data">
+<aui:form name="fm" action="<%=saveactivityURL%>"  method="post" role="form"  onSubmit="event.preventDefault();${renderResponse.getNamespace()}validateForm();" enctype="multipart/form-data">
 	<aui:fieldset>
 		<aui:input name="redirect" type="hidden" value="<%= redirect %>" />
 		<aui:input name="maxSize" type="hidden" value="<%= fileMaxSize %>" />

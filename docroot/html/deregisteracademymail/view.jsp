@@ -4,7 +4,7 @@
 
 <liferay-portlet:actionURL name="saveDeregister" var="saveDeregisterURL"/>	
 
-<aui:form action="${saveDeregisterURL}">
+<aui:form action="${saveDeregisterURL}" role="form">
 	<liferay-ui:success key="saveDeregisterOK" message="deregister-mail.save-deregister-mail-ok"/>
 	<liferay-ui:error key="saveDeregisterKO" message="deregister-mail.save-deregister-mail-error"/>
 	<aui:input name="deregister" type="checkbox" label="deregister-mail.label" value="${emailVerified}" helpMessage="deregister-mail.help"></aui:input>
