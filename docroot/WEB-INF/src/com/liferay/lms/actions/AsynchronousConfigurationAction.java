@@ -37,7 +37,19 @@ public class AsynchronousConfigurationAction implements ConfigurationAction {
 				actionRequest, ParamUtil.getString(actionRequest, "portletResource")); 
 		
 		
-		String classNameValue = StringUtil.merge(actionRequest.getParameterMap().get( "className"));
+		
+		String refreshPageEachXSeg = ParamUtil.getString(actionRequest,"refreshPageEachXSeg", "");
+		portletPreferences.setValue("refreshPageEachXSeg", refreshPageEachXSeg);
+		
+		String showAllClassName = ParamUtil.getString(actionRequest,"preferences--showAllClassName--", "");
+		portletPreferences.setValue("preferences--showAllClassName--", showAllClassName);
+		
+		String classNameValue ="";
+		if(showAllClassName.equalsIgnoreCase("true")){ 
+			classNameValue = "todos"; 
+		}else{
+			classNameValue = StringUtil.merge(actionRequest.getParameterMap().get( "className"));
+		}
 		portletPreferences.setValue("className",classNameValue);
 			
 		String onlyForUserOwner = ParamUtil.getString(actionRequest,"preferences--onlyForUserOwner--", "");

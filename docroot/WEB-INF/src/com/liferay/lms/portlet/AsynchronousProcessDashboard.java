@@ -70,9 +70,14 @@ public class AsynchronousProcessDashboard extends MVCPortlet {
 			String classNamePrefsValues = prefs.getValue("className", StringPool.BLANK);
 			String classNameValue = ParamUtil.getString(renderRequest,"className", "");
 			
+			String refreshPageEachXSeg = prefs.getValue("refreshPageEachXSeg", "true");
+			renderRequest.setAttribute("refreshPageEachXSeg", refreshPageEachXSeg);
+			boolean showAllClassName = (prefs.getValue("preferences--showAllClassName--", "true")).compareTo("true") == 0;
+			renderRequest.setAttribute("showAllClassName", showAllClassName);
+			
 			// Obtenemos todos los classname distintos para efectuar la lista; Si estan por preferencias los editamos
 			List<String> classnames = new ArrayList<String>();
-			if(!classNamePrefsValues.isEmpty()){
+			if(classNamePrefsValues != null){
 				if(classNamePrefsValues.indexOf("todos")>=0){
 					classnames =AsynchronousProcessAuditLocalServiceUtil
 							.getDistinctTypes(themeDisplay.getCompanyId());
@@ -90,19 +95,26 @@ public class AsynchronousProcessDashboard extends MVCPortlet {
 				.getDistinctTypes(themeDisplay.getCompanyId());
 			}
 			
-			if(classNameValue.equalsIgnoreCase("")){
-				classNameValue = classNamePrefsValues;
+			if(showAllClassName){
+				classNameValue = null;
+				
+			}else{
+				
+				if(classNameValue.equalsIgnoreCase("")){
+					classNameValue = classNamePrefsValues;
+				}
+				
 			}
+			
+		
+			
 			
 			long userId =0L;
 			if(onlyForUserOwner){
 				userId = themeDisplay.getUserId();
 			}
 			
-			//Para buscar por todos lo ponemos a null
-			if(classNameValue.equalsIgnoreCase("todos")){
-				classNameValue = null;
-			}
+			
 			
 			
 			renderRequest.setAttribute("classnames", classnames);

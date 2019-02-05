@@ -18,8 +18,14 @@
 	
 	boolean onlyForUserOwner = (preferences.getValue("preferences--onlyForUserOwner--", "false")).compareTo("true") == 0; 
 	boolean showExtraContent = (preferences.getValue("preferences--showExtraContent--", "false")).compareTo("true") == 0; 
-	String classNamePrefsValues = preferences.getValue("className", "todos");
-	if(classNamePrefsValues==null){ classNamePrefsValues = "todos"; }
+	String classNamePrefsValues = preferences.getValue("className", "");
+	
+	String refreshPageEachXSeg = (String)preferences.getValue("refreshPageEachXSeg", "0"); 
+	//NEW
+	boolean showAllClassName = (preferences.getValue("preferences--showAllClassName--", "false")).compareTo("true") == 0; 
+	
+	if(classNamePrefsValues==null){ classNamePrefsValues = ""; }
+	if(showAllClassName==true){ classNamePrefsValues = ""; }
 	
 	// Obtenemos todos los classname distintos para efectuar la lista;
 	List<String> classNamesList = AsynchronousProcessAuditLocalServiceUtil.getDistinctTypes(themeDisplay.getCompanyId());
@@ -33,17 +39,18 @@
 <aui:form action="<%=saveEditPreferencesURL %>" method="post" name="fm" onSubmit='<%= "event.preventDefault(); " + renderResponse.getNamespace() + "saveConfiguration();" %>'>
 
 	<aui:column columnWidth="80">
-	
-			<aui:select name="className" multiple="true" label="asynchronous.config.show-types" cssClass="type-selector" ignoreRequestValue="true">
-				<aui:option label="todos" value="todos" selected="<%= classNamePrefsValues.contains(\"todos\") %>" />
+			<aui:input type="checkbox" name="preferences--showAllClassName--" label="asynchronous-process-audit.config.show-all-class-name" value="<%=showAllClassName %>" checked="<%=showAllClassName %>"/>
+			<aui:select name="className" multiple="true" cssClass="type-selector" label="" ignoreRequestValue="true" >
 				<%for(String classe : classNamesList){ boolean selected=classNamePrefsValues.indexOf(classe) >= 0 ;%>
-					<aui:option value="<%= classe %>"  selected="<%=selected%>" ><%=selected%>-<%= classe %></aui:option>
+					<aui:option value="<%= classe %>"  selected="<%=selected%>" ><%= classe %></aui:option>
 				<%} %>
 			</aui:select>
 	
-			<aui:input type="checkbox" name="preferences--onlyForUserOwner--" label="asynchronous.config.only-owner" value="<%=onlyForUserOwner %>" checked="<%=onlyForUserOwner %>"/>
+			<aui:input type="checkbox" name="preferences--onlyForUserOwner--" label="asynchronous-process-audit.config.only-owner" value="<%=onlyForUserOwner %>" checked="<%=onlyForUserOwner %>"/>
 			
-			<aui:input type="checkbox" name="preferences--showExtraContent--" label="asynchronous.config.show-extra-content" value="<%=showExtraContent %>" checked="<%=showExtraContent %>"/>
+			<aui:input type="checkbox" name="preferences--showExtraContent--" label="asynchronous-process-audit.config.show-extra-content" value="<%=showExtraContent %>" checked="<%=showExtraContent %>"/>
+			
+			<aui:input type="number" name="refreshPageEachXSeg" label="asynchronous-process-audit.config.refresh-page-eachXSeg" value="<%=refreshPageEachXSeg %>" />
 	</aui:column>
 	
 	<aui:button-row>
@@ -60,4 +67,28 @@
 		},
 		['liferay-util-list-fields']
 	);
+AUI().ready('aui-base','event','node', function(A){
+  
+   if(A.one("#<portlet:namespace />showAllClassName")){
+   		
+   	if(A.one("#<portlet:namespace/>showAllClassNameCheckbox").attr('checked')){            
+        A.one('#<portlet:namespace />className').hide();
+     }else{              
+        A.one('#<portlet:namespace />className').show();
+     }
+   
+      A.one('#<portlet:namespace/>showAllClassNameCheckbox').on('click',function(e){ // it  requires Checkbox as prefix in AUI`enter code here`
+		        if(A.one("#<portlet:namespace/>showAllClassNameCheckbox").attr('checked')){            
+		           A.one('#<portlet:namespace />className').hide();
+		        }else{              
+		           A.one('#<portlet:namespace />className').show();
+		        }
+            });
+        }
+    });
+    
 </aui:script>
+
+	
+	 
+	

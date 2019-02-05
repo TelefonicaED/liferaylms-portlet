@@ -3,7 +3,25 @@
 <%@page import="com.liferay.portal.kernel.json.JSONFactoryUtil"%>
 
 <%@ include file="/init.jsp"%>
-
+<%
+String timeTodoRefresh = (String) renderRequest.getAttribute("refreshPageEachXSeg");
+%>
+<script>
+var timeTodoRefreshInseg = <%=timeTodoRefresh%> * 1000;
+if(timeTodoRefreshInseg!=0){
+	setTimeout(function() { refreshSearch(timeTodoRefreshInseg); }, timeTodoRefreshInseg);
+}
+function refreshSearch( timeTodoRefreshInseg ) {
+   if(timeTodoRefreshInseg > 10000){
+	   $('#<portlet:namespace />search').trigger("submit");
+	   setTimeout(function() { refreshSearch( timeTodoRefreshInseg); }, timeTodoRefreshInseg);
+   }else{
+	   $('#<portlet:namespace />search').trigger("submit");
+	   setTimeout(function() { refreshSearch( 10000); }, 10000);
+   }
+  
+}
+</script>
 <portlet:renderURL var="searchURL">
 </portlet:renderURL>
 
