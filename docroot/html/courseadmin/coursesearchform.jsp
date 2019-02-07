@@ -62,7 +62,7 @@ if(catIds!=null&&catIds.length>0)
 </portlet:renderURL>
 
 <div class="admin-course-search-form search-advanced">
-	<aui:form action="${searchURL}" method="post" name="searchCourses">
+	<aui:form action="${searchURL}" method="post" name="searchCourses" role="search">
 		<aui:input name="courseId" value="${courseId }" type="hidden" />
 		<aui:fieldset cssClass="checkBoxes">
 			<aui:input name="search" type="hidden" value="search" />

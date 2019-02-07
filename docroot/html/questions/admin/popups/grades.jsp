@@ -39,7 +39,7 @@ CalificationType ct = new CalificationTypeRegistry().getCalificationType(CourseL
 	<portlet:param name="email-address" value="<%=emailAddress %>" />    
 </portlet:actionURL>
 
-<aui:form action="<%=updateGradesURL %>" name="fn_grades" method="post" >
+<aui:form action="<%=updateGradesURL %>" name="fn_grades" method="post" role="form">
 	<aui:fieldset>
 		<aui:input type="hidden" name="studentId" value='<%=studentId2%>' />
 		<aui:input type="hidden" name="actId" value='<%=actId2%>' />

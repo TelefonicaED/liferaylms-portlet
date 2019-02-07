@@ -32,7 +32,7 @@ else
 	<portlet:param name="actionEditingDetails" value="<%=StringPool.TRUE %>" />	
 	<portlet:param name="jspPage" value="/html/questions/admin/editquestions.jsp"></portlet:param>
 </portlet:actionURL>
-<aui:form name="fm" action="<%=importQuestionsURL%>"  method="post" enctype="multipart/form-data">
+<aui:form name="fm" action="<%=importQuestionsURL%>"  method="post" enctype="multipart/form-data" role="form">
 	<aui:fieldset>
 		<aui:field-wrapper label="file" helpMessage="execativity.editquestions.importquestions.fileHelp">
 	    	<aui:input inlineLabel="left" inlineField="true"

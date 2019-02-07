@@ -18,7 +18,7 @@ boolean showCourse = GetterUtil.getBoolean(preferences.getValue("showCourse", St
 %>
 
 <liferay-portlet:actionURL portletConfiguration="true" var="configurationURL" />
-<aui:form action="<%= configurationURL %>" method="post" name="fm"  >
+<aui:form action="<%= configurationURL %>" method="post" name="fm" role="form" >
 	<aui:input name="<%= Constants.CMD %>" type="hidden" value="<%= Constants.UPDATE %>" />
 	<h4>
 		<liferay-ui:message key="general" />

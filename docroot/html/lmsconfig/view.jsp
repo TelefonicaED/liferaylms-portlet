@@ -55,7 +55,7 @@ if(prefs!=null){
 
 <liferay-portlet:actionURL name="changeSettings" var="changeSettingsURL"/>
 
-<aui:form action="<%=changeSettingsURL %>" method="POST">
+<aui:form action="<%=changeSettingsURL %>" method="POST" role="form">
 <aui:input type="hidden" name="redirect" value="<%= currentURL %>" />
 
 <liferay-ui:header title="lms-activities"/>

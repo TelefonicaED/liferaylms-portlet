@@ -159,7 +159,7 @@ String resultHelpMessage=LanguageUtil.format(pageContext, "evaluationAvg.grades.
 
 %>
 
-<aui:form  name="fn_grades" method="post" >
+<aui:form  name="fn_grades" method="post" role="form">
 	<aui:fieldset>
 		<h1><%=UserLocalServiceUtil.getUser(userId).getFullName() %></h1>
 		<aui:input type="hidden" name="userId" value='<%=renderRequest.getParameter("userId") %>' />

@@ -44,7 +44,7 @@
 
 <div class="student_search"> 
 	
-	<aui:form name="fm" action="${searchURL }" method="POST">
+	<aui:form name="fm" action="${searchURL }" method="POST" role="search"> 
 	
 		<liferay-ui:search-container
 					searchContainer="${searchContainer}"

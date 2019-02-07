@@ -32,7 +32,7 @@
 	<portlet:param name="groupId" value="<%= groupId %>" />
 </portlet:actionURL>
 	
-<aui:form name="form" action="<%=importURL%>" method="post" enctype="multipart/form-data">
+<aui:form name="form" action="<%=importURL%>" method="post" enctype="multipart/form-data" role="form">
 	
 	
 	<liferay-ui:error exception="<%= LARFileException.class %>" message="please-specify-a-lar-file-to-import" />

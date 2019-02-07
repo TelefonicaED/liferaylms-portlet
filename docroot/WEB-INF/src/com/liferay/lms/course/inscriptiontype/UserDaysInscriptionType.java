@@ -98,4 +98,9 @@ public class UserDaysInscriptionType extends BaseInscriptionType{
 		sites.add(GroupConstants.TYPE_SITE_OPEN);
 		return sites;
 	}
+	
+	@Override
+	public boolean isActive(long companyId){
+		return true;
+	}
 }

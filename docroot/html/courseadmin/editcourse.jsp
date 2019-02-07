@@ -363,7 +363,7 @@ if(courseType != null){
 	</aui:fieldset>
 </c:if>
 
-<aui:form name="fm" action="<%=savecourseURL%>"  method="post" enctype="multipart/form-data">
+<aui:form name="fm" action="<%=savecourseURL%>" role="form" method="post" enctype="multipart/form-data">
 
 	<aui:input name="redirect" type="hidden" value="<%= redirect %>" />
 	<aui:input name="backURL" type="hidden" value="<%= backURL %>" />

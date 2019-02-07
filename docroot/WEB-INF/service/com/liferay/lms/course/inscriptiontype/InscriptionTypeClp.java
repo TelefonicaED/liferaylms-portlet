@@ -258,7 +258,7 @@ public class InscriptionTypeClp implements InscriptionType {
 		Object returnObj = null;
 
 		try {
-			MethodKey isActiveMethod = new MethodKey(clp.getClassName(), "isActive", Long.class); 
+			MethodKey isActiveMethod = new MethodKey(clp.getClassName(), "isActive", long.class); 
 			returnObj = clp.invoke(new MethodHandler(isActiveMethod, companyId));
 		}
 		catch (Throwable t) {

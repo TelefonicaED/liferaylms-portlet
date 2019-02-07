@@ -32,7 +32,7 @@
 		<portlet:param name="jspPage" value="/html/p2ptaskactivity/revisions.jsp"></portlet:param>
 	</portlet:renderURL>
 
-	<aui:form name="studentsearch" action="<%=buscarURL %>" cssClass="search_lms" method="post">
+	<aui:form name="studentsearch" action="<%=buscarURL %>" role="search" cssClass="search_lms" method="post">
 		<aui:fieldset>
 			<aui:column>
 				<aui:input label="studentsearch.criteria" name="criteria" size="20" value="<%=criteria %>" />	

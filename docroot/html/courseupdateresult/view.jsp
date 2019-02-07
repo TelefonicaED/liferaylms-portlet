@@ -15,7 +15,7 @@
 
 <portlet:actionURL name="updateResult" var="updateResultURL"/>
 
-<aui:form name="form" action="<%=updateResultURL%>"  method="post">
+<aui:form name="form" action="<%=updateResultURL%>" role="form" method="post">
 	
 	<aui:select label="Course" name="courseId" >
 	

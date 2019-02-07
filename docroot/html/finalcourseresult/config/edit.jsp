@@ -22,7 +22,7 @@
 %>
 
 <liferay-portlet:actionURL var="saveConfigurationURL" portletConfiguration="true"/>
-<aui:form action="<%=saveConfigurationURL %>" >
+<aui:form action="<%=saveConfigurationURL %>" role="form">
 	<aui:input type="hidden" name="<%=Constants.CMD %>" value="<%=Constants.UPDATE %>" />
 	<aui:field-wrapper label="courseresult.mode.view" >
 		<aui:input type="radio" name="showCalificationMode" label="courseresult.mode.showAllways" value="showAllways" checked="<%=showAllways %>"/>

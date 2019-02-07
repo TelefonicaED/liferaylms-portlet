@@ -65,7 +65,7 @@ String scourseIds=ListUtil.toString(courses,"courseId");
 	<portlet:param name="action" value="export"/>
 </liferay-portlet:resourceURL>
 <liferay-ui:icon image="export" label="<%= true %>" message="offlinetaskactivity.csv.export" url="javascript:${renderResponse.getNamespace()}submitExport();" />
-<aui:form name="fmExport" action="<%=exportURL%>" method="POST">
+<aui:form name="fmExport" action="<%=exportURL%>" method="POST" role="form">
 	<aui:input type="hidden" name="courseIds" value="<%=scourseIds %>"/>
 </aui:form>
 <script>
