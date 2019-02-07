@@ -74,24 +74,6 @@ String courseDiplomaError = ParamUtil.getString(request, "courseDiplomaError");
 	String maxLengthTitle = GetterUtil.getString( ModelHintsUtil.getHints(Group.class.getName(), "name").get("max-length"),"");
 	String courseTitle = "";
 	
-	String site = PropsUtil.get("lms.site.types");
-	Set<Integer> sites = new HashSet<Integer>();
-	if(Validator.isNotNull(site)){
-		String[] ssites = site.split(",");
-		for(int i=0;i<ssites.length;i++){
-			try{
-				sites.add(Integer.valueOf(ssites[i]));
-			}catch(Exception e){
-				e.printStackTrace();
-			}
-		}
-	}
-	if (sites.isEmpty()) {
-		sites.add(GroupConstants.TYPE_SITE_OPEN);
-		sites.add(GroupConstants.TYPE_SITE_RESTRICTED);
-		sites.add(GroupConstants.TYPE_SITE_PRIVATE);
-	}
-	
 	String maxUsersError= ParamUtil.getString(request,"maxUsersError");
 	if(SessionErrors.contains(renderRequest, "newCourseErrors")) { %>
 		<div class="portlet-msg-error">
@@ -275,7 +257,6 @@ if(course!=null){
 	
 	if(groupCreated!=null)
 		registrationType = groupCreated.getType();
-	
 	%>
 	<aui:model-context bean="<%= course %>" model="<%= Course.class %>" />
 	<%
@@ -290,6 +271,7 @@ if(courseType != null){
 }
 %>
 <liferay-ui:header title="<%= title %>" backURL="<%=backURL %>"></liferay-ui:header>
+<portlet:resourceURL var="searchGroupTypesURL" id="searchGroupTypes"/>
 <c:if test="<%=course != null && course.getParentCourseId()<=0%>">
 	<aui:fieldset>
 		<liferay-ui:icon-menu>
@@ -739,16 +721,19 @@ if(courseType != null){
    	  		inscriptions = ListUtil.toList(StringUtil.split(LmsPrefsLocalServiceUtil.getLmsPrefsIni(themeDisplay.getCompanyId()).getInscriptionTypes(),",",0L));
    	  	}
 		InscriptionTypeRegistry inscription = new InscriptionTypeRegistry();
+		InscriptionType itype = null;
 		if(inscriptions.size()>1){%>
 			<aui:select name="inscriptionType" label="inscription-type" onchange="${renderResponse.getNamespace()}changeInscriptionType(this.value)">			
 			<%
 			for(Long ins:inscriptions){
 				boolean selected = false;
-				InscriptionType itype = inscription.getInscriptionType(ins);
-				if((course == null && PropsUtil.get("lms.inscription.default.type").equals(String.valueOf(ins))) || (course != null && ins == course.getInscriptionType()))
+				InscriptionType instype = inscription.getInscriptionType(ins);
+				if((course == null && PropsUtil.get("lms.inscription.default.type").equals(String.valueOf(ins))) || (course != null && ins == course.getInscriptionType())){
 					selected = true;
+					itype = instype;
+				}
 				%>
-					<aui:option value="<%=String.valueOf(ins)%>"  selected="<%=selected %>"><liferay-ui:message key="<%=itype.getTitle(themeDisplay.getLocale()) %>" /></aui:option>
+					<aui:option value="<%=String.valueOf(ins)%>"  selected="<%=selected %>"><liferay-ui:message key="<%=instype.getTitle(themeDisplay.getLocale()) %>" /></aui:option>
 				<%
 			}
 			%>
@@ -757,13 +742,14 @@ if(courseType != null){
 			<%	
 			for(Long ins:inscriptions){
 				boolean selected = false;
-				InscriptionType itype = inscription.getInscriptionType(ins);
-				if(Validator.isNotNull(itype.getSpecificContentPage())){%>
-					<div class="<%if(course == null || ins != course.getInscriptionType()){%>aui-helper-hidden<%}%> especific_content_page_inscription" id="${renderResponse.getNamespace()}especific_content_page_inscription_<%=itype.getTypeId()%>">
-						<liferay-util:include page="<%=itype.getSpecificContentPage() %>" servletContext="<%=getServletContext() %>" portletId="<%=itype.getPortletId() %>">
+				InscriptionType instype = inscription.getInscriptionType(ins);
+				if(Validator.isNotNull(instype.getSpecificContentPage())){%>
+					<div class="<%if(course == null || ins != course.getInscriptionType()){%>aui-helper-hidden<%}%> especific_content_page_inscription" id="${renderResponse.getNamespace()}especific_content_page_inscription_<%=instype.getTypeId()%>">
+						<liferay-util:include page="<%=instype.getSpecificContentPage() %>" servletContext="<%=getServletContext() %>" portletId="<%=instype.getPortletId() %>">
 							<%if(course != null){ %>
 								<liferay-util:param name="groupId" value="<%=Long.toString(course.getGroupCreatedId()) %>" />
 							<%} %>	
+							<liferay-util:param name="courseId" value="<%=Long.toString(courseId) %>" />
 						</liferay-util:include>	
 					</div>
 				<%
@@ -774,12 +760,53 @@ if(courseType != null){
 				function <portlet:namespace />changeInscriptionType(typeId){
 					$(".especific_content_page_inscription").addClass("aui-helper-hidden");
 					$("#<portlet:namespace />especific_content_page_inscription_"+typeId).removeClass("aui-helper-hidden");
+					
+					//Además cambiamos los tipos de inscripción
+						
+					$("#<portlet:namespace/>group_types").addClass("aui-helper-hidden");
+						
+					$.ajax({
+						dataType: 'json',
+						url:'${searchGroupTypesURL}',
+					    cache:false,
+					    data:{
+					    	inscriptionTypeId : typeId
+						},
+						success: function(data){
+							if(data){					
+								if(data.length>0){
+									
+									var selected = $("#<portlet:namespace/>registrationType").val();
+									
+									var options = '';								
+													
+									$.each(data, function() {		
+										options+=	'<option value="'+this.id+'" ';
+										if(selected == this.id){
+											options+=' selected ';
+										}
+										options +='>'+this.name + '</option>';
+									});		
+									
+									$("#<portlet:namespace/>registrationType").html(options);
+									
+									if("<%=showRegistrationType %>" == "true" && data.length > 1){
+										$("#<portlet:namespace/>group_types").removeClass("aui-helper-hidden");
+									}
+								}
+							}else{
+								alert("error");
+							}
+						},
+						error: function(){
+							alert("Error");
+						}
+					});
 				}
 				</script>
 			<%
 		}else{
 			
-			InscriptionType itype = null;
 			try{
 				if(inscriptions.size()>0){
 					itype =inscription.getInscriptionType(inscriptions.get(0));
@@ -813,41 +840,20 @@ if(courseType != null){
 					 yearParam="stopYear"  yearNullable="false" dayNullable="false" monthNullable="false"  yearValue="<%=endYear %>" monthValue="<%=endMonth %>" dayValue="<%=endDay %>"></liferay-ui:input-date>
 			 <liferay-ui:input-time minuteParam="stopMin" amPmParam="stopAMPM" hourParam="stopHour"  hourValue="<%=endHour %>" minuteValue="<%=endMin %>"></liferay-ui:input-time></br>
 		</aui:field-wrapper>
-	
-			<c:choose>
-	      		<c:when test="<%=(!showRegistrationType)||(sites!=null&&sites.size()==1)%>">
-					<aui:input name="registrationType" type="hidden" value="<%= sites.toArray()[0] %>" />
-	      		</c:when>
-	      		<c:otherwise>
-					<aui:select name="registrationType" label="registration-type" helpMessage="<%=LanguageUtil.get(pageContext,\"type-method-help\")%>" onChange="javascript:${renderResponse.getNamespace() }changeRegistrationType(this)">
-						<c:choose>
-				    		<c:when test="<%=groupCreated==null%>">
-				      			<c:if test="<%=sites==null||(sites.size()>0&&sites.contains(GroupConstants.TYPE_SITE_OPEN)) %>">
-									<aui:option value="<%=GroupConstants.TYPE_SITE_OPEN %>" ><liferay-ui:message key="public" /></aui:option>
-								</c:if>
-				      			<c:if test="<%=sites==null||(sites.size()>0&&sites.contains(GroupConstants.TYPE_SITE_PRIVATE)) %>">
-									<aui:option value="<%=GroupConstants.TYPE_SITE_PRIVATE %>" ><liferay-ui:message key="private" /></aui:option>
-								</c:if>
-				      			<c:if test="<%=sites==null||(sites.size()>0&&sites.contains(GroupConstants.TYPE_SITE_RESTRICTED)) %>">
-									<aui:option value="<%=GroupConstants.TYPE_SITE_RESTRICTED %>" ><liferay-ui:message key="restricted" /></aui:option>
-								</c:if>
-				      		</c:when>
-				      		<c:otherwise>
-				      			<c:if test="<%=sites==null||(sites.size()>0&&sites.contains(GroupConstants.TYPE_SITE_OPEN)) %>">
-									<aui:option value="<%=GroupConstants.TYPE_SITE_OPEN %>" selected="<%=groupCreated.getType()==GroupConstants.TYPE_SITE_OPEN %>" ><liferay-ui:message key="public" /></aui:option>
-								</c:if>
-				      			<c:if test="<%=sites==null||(sites.size()>0&&sites.contains(GroupConstants.TYPE_SITE_PRIVATE)) %>">
-									<aui:option value="<%=GroupConstants.TYPE_SITE_PRIVATE %>" selected="<%=groupCreated.getType()==GroupConstants.TYPE_SITE_PRIVATE %>" ><liferay-ui:message key="private" /></aui:option>
-								</c:if>
-				      			<c:if test="<%=sites==null||(sites.size()>0&&sites.contains(GroupConstants.TYPE_SITE_RESTRICTED)) %>">
-									<aui:option value="<%=GroupConstants.TYPE_SITE_RESTRICTED %>" selected="<%=groupCreated.getType()==GroupConstants.TYPE_SITE_RESTRICTED %>" ><liferay-ui:message key="restricted" /></aui:option>
-								</c:if>
-				      		</c:otherwise>
-						</c:choose>
-					</aui:select>
-	      		</c:otherwise>
-			</c:choose>
-			
+		<%Set<Integer> sites = itype.getGroupTypesAvailable(); %>
+		<div id="${renderResponse.getNamespace()}group_types" class='<%=(!showRegistrationType)||(sites!=null&&sites.size()==1) ? "aui-helper-hidden" : "" %>'>
+			<aui:select name="registrationType" label="registration-type" helpMessage="<%=LanguageUtil.get(pageContext,\"type-method-help\")%>" onChange="javascript:${renderResponse.getNamespace() }changeRegistrationType(this)">
+      			<c:if test="<%=sites==null||(sites.size()>0&&sites.contains(GroupConstants.TYPE_SITE_OPEN)) %>">
+					<aui:option value="<%=GroupConstants.TYPE_SITE_OPEN %>" selected="<%=groupCreated != null && groupCreated.getType()==GroupConstants.TYPE_SITE_OPEN %>" ><liferay-ui:message key="public" /></aui:option>
+				</c:if>
+      			<c:if test="<%=sites==null||(sites.size()>0&&sites.contains(GroupConstants.TYPE_SITE_PRIVATE)) %>">
+					<aui:option value="<%=GroupConstants.TYPE_SITE_PRIVATE %>" selected="<%=groupCreated != null && groupCreated.getType()==GroupConstants.TYPE_SITE_PRIVATE %>" ><liferay-ui:message key="private" /></aui:option>
+				</c:if>
+      			<c:if test="<%=sites==null||(sites.size()>0&&sites.contains(GroupConstants.TYPE_SITE_RESTRICTED)) %>">
+					<aui:option value="<%=GroupConstants.TYPE_SITE_RESTRICTED %>" selected="<%=groupCreated != null && groupCreated.getType()==GroupConstants.TYPE_SITE_RESTRICTED %>" ><liferay-ui:message key="restricted" /></aui:option>
+				</c:if>
+			</aui:select>
+		</div>	
 		<c:if test="<%=showMaxUsers %>">
 			<aui:input name="maxUsers" label="num-of-users" type="text" value="<%=maxUsers %>" helpMessage="<%=LanguageUtil.get(pageContext,\"max-users-method-help\")%>">
 				<aui:validator name="number"></aui:validator>

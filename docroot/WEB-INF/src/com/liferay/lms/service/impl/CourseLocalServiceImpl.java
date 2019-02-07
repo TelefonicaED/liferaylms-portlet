@@ -1489,7 +1489,7 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 			boolean enoughCompetences = true;
 			CourseCompetence courseCompetence = null;
 			if(userId > 0){
-				//1. Si no estÃ¡ ya inscrito
+				//1. Si no está ya inscrito
 				if(!GroupLocalServiceUtil.hasUserGroup(userId,course.getGroupCreatedId())){
 					Group group = GroupLocalServiceUtil.getGroup(course.getGroupCreatedId());
 					
@@ -1992,7 +1992,6 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 							}
 						}
 					}
-
 				}
 			} catch (PortalException | SystemException e) {
 				e.printStackTrace();
@@ -2003,6 +2002,10 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 			courses = ListUtil.subList(courses, start, end);
 		}
 		return courses;
+	}
+	
+	public List<Course> getChildsRegistredUser(long parentCourseId, long userId){
+		return courseFinder.findChildRegistredUser(parentCourseId, userId);
 	}
 	
 }
