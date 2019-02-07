@@ -10,7 +10,7 @@
 
 	<c:if test="${showSearcher}">
 		<div class="col-sm-12">
-			<aui:form name="searchFm" method="post" action="${renderURL }">
+			<aui:form name="searchFm" method="post" action="${renderURL }" role="search">
 				<%@ include file="/html/search/userSearch.jsp" %>
 				<div class="search-user last">
 					<aui:button value="search" type="submit"/>

@@ -44,7 +44,7 @@ String criteria = ParamUtil.getString(renderRequest, "criteria");
 	<portlet:param name="criteria" value="<%=criteria %>" />
 </portlet:actionURL>
 
-<aui:form  name="fn_grades" method="post"  action="${updateGradesURL}">
+<aui:form  name="fn_grades" method="post"  action="${updateGradesURL}" role="form">
 	<aui:fieldset>
 		<h1><%=UserLocalServiceUtil.getUser(userId).getFullName() %></h1>
 		<aui:input type="hidden" name="studentId" value='<%=userId %>' />

@@ -266,12 +266,12 @@
 <portlet:actionURL name="member"  var="memberURL" windowState="NORMAL"/>
 <portlet:actionURL name="inscribir"  var="inscribirURL" windowState="NORMAL"/>
 						
-<aui:form name="inscribirFm" action="${inscribirURL}">
+<aui:form name="inscribirFm" action="${inscribirURL}" role="form">
 	<aui:input name="teamId" value="" type="hidden"/>
 </aui:form>
 
 
-<aui:form name="memberFm" action="${memberURL}">
+<aui:form name="memberFm" action="${memberURL}" role="form">
 	<aui:input name="teamId" value="" type="hidden"/>
 </aui:form>
 

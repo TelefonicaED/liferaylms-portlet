@@ -76,7 +76,7 @@ if(resId > 0){
 	<liferay-portlet:param name="description" value="<%=String.valueOf(description) %>" />
 </liferay-portlet:renderURL>
 
-<aui:form name="<portlet:namespace />ressearch" action="<%=selectResource %>" method="POST">
+<aui:form name="<portlet:namespace />ressearch" action="<%=selectResource %>" method="POST" role="form">
 
 <aui:input type="hidden" name="resId" value="<%=resId%>"/>
 <aui:input type="hidden" name="resModuleId" value="<%=resModuleId %>"/>

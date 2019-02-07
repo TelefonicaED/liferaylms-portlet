@@ -831,6 +831,7 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 					e.printStackTrace();
 				}
 			}catch(PortalException pe){
+				pe.printStackTrace();;
 				if(log.isDebugEnabled())log.debug("Error:"+pe.getMessage());
 				if(pe instanceof DuplicateGroupException){
 					SessionErrors.add(actionRequest, "duplicate-course");
@@ -851,6 +852,7 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 					return;
 				}
 			}catch(SystemException pe){
+				pe.printStackTrace();
 				List<String> errors = new ArrayList<String>();
 				errors.add(LanguageUtil.format(themeDisplay.getLocale(),"max-users-violated", pe.getMessage().replaceAll("maxUsers ", StringPool.BLANK)));
 				SessionErrors.add(actionRequest, "newCourseErrors", errors);

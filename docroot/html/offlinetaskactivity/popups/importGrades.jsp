@@ -70,7 +70,7 @@ if (CompanyConstants.AUTH_TYPE_EA.compareToIgnoreCase(authType) == 0) {
 </span>
 
 <iframe name="<portlet:namespace />import_frame" src="" id="<portlet:namespace />import_frame" style="display:none;" onload="<portlet:namespace />doImportGrades();" ></iframe>
-<aui:form name="fm" action="<%=importGradesURL%>"  method="post" enctype="multipart/form-data" target='<%=renderResponse.getNamespace() +"import_frame" %>' >
+<aui:form name="fm" action="<%=importGradesURL%>"  role="form" method="post" enctype="multipart/form-data" target='<%=renderResponse.getNamespace() +"import_frame" %>' >
 	<aui:fieldset>
 		<aui:field-wrapper label="offlinetaskactivity.file"  helpMessage="<%=message %>">
 	    			<aui:input inlineLabel="left" inlineField="true"

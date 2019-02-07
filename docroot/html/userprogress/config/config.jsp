@@ -17,7 +17,7 @@
 %>
 
 <liferay-portlet:actionURL var="saveConfigurationURL" portletConfiguration="true"/>
-<aui:form action="<%=saveConfigurationURL %>" method="post" name="fm" onSubmit='<%= "event.preventDefault(); " + renderResponse.getNamespace() + "saveConfiguration();" %>'>
+<aui:form action="<%=saveConfigurationURL %>" role="form" method="post" name="fm" onSubmit='<%= "event.preventDefault(); " + renderResponse.getNamespace() + "saveConfiguration();" %>'>
 	<aui:input type="hidden" name="<%=Constants.CMD %>" value="<%=Constants.UPDATE %>" />
 	<aui:input type="checkbox" name="preferences--showExport--" label="userprogress.config.showExport" value="<%=showExport %>" checked="<%=showExport %>"/>
 	<aui:button-row>

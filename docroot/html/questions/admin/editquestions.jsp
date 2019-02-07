@@ -218,7 +218,7 @@
 			<portlet:actionURL var="setBankTestURL" name="setBankTest" >
 				<portlet:param name="editing" value="<%=StringPool.TRUE %>"/>
 			</portlet:actionURL>
-			<aui:form name='fm' action="<%=setBankTestURL%>" method='post'>
+			<aui:form name='fm' action="<%=setBankTestURL%>" method='post' role="form">
 				<aui:input name="redirect" type="hidden" value="<%=currentURL %>" />
 				<aui:input name="is-bank" type="hidden" value="true"/>
 				<aui:input name="actId" type="hidden" value="<%=Long.toString(learningActivity.getActId()) %>"/>

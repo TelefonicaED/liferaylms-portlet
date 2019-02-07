@@ -4,7 +4,7 @@
 
 <portlet:renderURL var="searchURL">
 </portlet:renderURL>
-<aui:form action="${searchURL}" method="post" name="search">
+<aui:form action="${searchURL}" method="post" name="search" role="search">
 	<aui:layout>
 		<aui:column columnWidth="20">
 			<aui:select name="className" label="type" cssClass="type-selector">
