@@ -16,7 +16,7 @@
 		<liferay-ui:error message="inscription-error-already-disenrolled" key="unsusbscribe" />
 		<liferay-ui:error message="inscription-error-max-users" key="inscription-error-max-users"/>
 		
-		<div id="caja_inscripcion container">
+		<div id="caja_inscripcion container" class="caja_inscripcion">
 			<c:choose>
 				<c:when test="${themeDisplay.isSignedIn() && registredUser}">
 					<div class="mensaje_marcado">
