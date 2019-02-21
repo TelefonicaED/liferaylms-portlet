@@ -107,7 +107,7 @@ String summary = assetEntry.getSummary(themeDisplay.getLocale());
 summary = StringUtil.shorten(summary, Integer.valueOf(abstractLength), "...");
 
 %>
-<p><%= summary %></p>
+<div class="asset-entry-summary course-summary"><%= summary %></div>
 <%
 }
 %>

@@ -1,3 +1,4 @@
+<%@page import="com.liferay.lms.service.CourseResultLocalServiceUtil"%>
 <%@page import="com.liferay.portal.kernel.util.PrefsPropsUtil"%>
 <%@page import="com.liferay.lms.service.CourseLocalServiceUtil"%>
 <%@page import="javax.portlet.PortletPreferences"%>
@@ -142,17 +143,19 @@ if( permissionChecker.hasPermission(themeDisplay.getScopeGroupId(),  Course.clas
 	</portlet:actionURL>
 	<liferay-ui:icon src="<%= themeDisplay.getPathThemeImages() + \"/dock/my_places_private.png\" %>" message="open-course" url="<%=openURL.toString() %>" />
 <%} %>
+
+
+<%-- Eliminar Curso --%>
+<%
+if( permissionChecker.hasPermission(themeDisplay.getScopeGroupId(),  Course.class.getName(),primKey,ActionKeys.DELETE)&& 
+		! myCourse.isClosed() && 
+		showDelete && 
+		CourseResultLocalServiceUtil.countFinishedOnlyStudents(myCourse.getCourseId(), myCourse.getCompanyId(), myCourse.getGroupCreatedId(), null, 0)<=0
+){
+%>
 <portlet:actionURL name="deleteCourse" var="deleteURL">
 	<portlet:param name="courseId" value="<%= primKey %>" />
 </portlet:actionURL>
-
-<%-- Eliminar Curso --%>
-
-
-<%
-if( permissionChecker.hasPermission(themeDisplay.getScopeGroupId(),  Course.class.getName(),primKey,ActionKeys.DELETE)&& ! myCourse.isClosed() && showDelete)
-{
-%>
 <liferay-ui:icon-delete url="<%=deleteURL.toString() %>" />
 <%
 }
