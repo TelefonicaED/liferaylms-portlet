@@ -102,10 +102,10 @@
 														<aui:validator name="required" errorMessage="select-edition"/>
 													</aui:input>
 													<div class="edition-dates">
-														<liferay-ui:message key="inscription-date"/>: <fmt:formatDate type="both" dateStyle="short" timeStyle="short" value="${childCourse.startDate }" /> - <fmt:formatDate type="both" dateStyle="short" timeStyle="short" value="${childCourse.endDate }" />
+														<span><liferay-ui:message key="inscription-date"/>:</span> <span><fmt:formatDate type="both" dateStyle="short" timeStyle="short" value="${childCourse.startDate }" /> - <fmt:formatDate type="both" dateStyle="short" timeStyle="short" value="${childCourse.endDate }" /></span>
 													</div>
 													<div class="edition-dates">
-														<liferay-ui:message key="execution-date"/>: <fmt:formatDate type="both" dateStyle="short" timeStyle="short" value="${childCourse.executionStartDate }" /> - <fmt:formatDate type="both" dateStyle="short" timeStyle="short" value="${childCourse.executionEndDate }" />
+														<span><liferay-ui:message key="execution-date"/>:</span> <span><fmt:formatDate type="both" dateStyle="short" timeStyle="short" value="${childCourse.executionStartDate }" /> - <fmt:formatDate type="both" dateStyle="short" timeStyle="short" value="${childCourse.executionEndDate }" /></span>
 													</div>
 													<c:if test="${not empty inscriptionException }">
 														<div class="mensaje_marcado">${fn:substringAfter(inscriptionException.message, ':')}</div>
@@ -142,7 +142,7 @@
 															<aui:validator name="required" errorMessage="select-edition"/>
 														</aui:input>
 														<div class="edition-dates">
-															<liferay-ui:message key="inscription-date"/>: <fmt:formatDate type="both" dateStyle="short" timeStyle="short" value="${schedule.startDate}" /> - <fmt:formatDate type="both" dateStyle="short" timeStyle="short" value="${schedule.endDate }" />
+															<span><liferay-ui:message key="inscription-date"/>:</span> <span><fmt:formatDate type="both" dateStyle="short" timeStyle="short" value="${schedule.startDate}" /> - <fmt:formatDate type="both" dateStyle="short" timeStyle="short" value="${schedule.endDate }" /></span>
 														</div>
 														<c:if test="${not empty inscriptionException }">
 															<div class="mensaje_marcado">${fn:substringAfter(inscriptionException.message, ':')}</div>
