@@ -1349,7 +1349,7 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 						}
 					}
 					
-					if((startDate.before(now) && endDate.after(now))){
+					if((!course.isClosed() && startDate.before(now) && endDate.after(now))){
 						//3. Control de competencias 
 						List<CourseCompetence> courseCompetences = CourseCompetenceLocalServiceUtil.findBycourseId(course.getCourseId(), true);
 						//Busco si al usuario le falta alguna competencia que es necesaria para la inscripcion al curso
