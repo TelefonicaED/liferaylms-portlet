@@ -576,8 +576,10 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 		}
 		
 		Map<Locale,String> titleMap = LmsLocaleUtil.getLocalizationMap(uploadRequest, "title");
+		if(!localeDefault.equals(themeDisplay.getLocale()))
+			titleMap.put(localeDefault, titleMap.get(themeDisplay.getLocale()));
 		
-		if(titleMap == null || Validator.isNull(titleMap.get(localeDefault))){
+		if(titleMap == null || Validator.isNull(titleMap.get(themeDisplay.getLocale()))){
 			SessionErrors.add(actionRequest, "title-required");
 			actionResponse.setRenderParameter("courseId", String.valueOf(courseId));
 			actionResponse.setRenderParameter("redirect", redirect);
