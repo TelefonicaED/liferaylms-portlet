@@ -182,7 +182,7 @@ userSearchContainer.setTotal(totalUsers);
 
 %>
 
-	<aui:form name="searchFm" action="<%=renderResponse.createRenderURL() %>" method="POST">
+	<aui:form name="searchFm" action="<%=renderResponse.createRenderURL() %>" method="POST" role="form">
 		<div class="taglib-search-toggle">
 			<div class="taglib-search-toggle-advanced">
 				<aui:input type="hidden" name="actId" value="<%=actId %>"/>

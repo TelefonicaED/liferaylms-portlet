@@ -32,4 +32,6 @@ public class LmsConstant {
 	public final static String COURSETYPE_ICON_PORTLETFOLDER = "coursetype";
 	public final static String COURSETYPE_ICON_PORTLETFOLDER_DESCRIPTION = "";
 	
+	public static final long DEFAULT_PARENT_COURSE_ID = 0;
+	
 }

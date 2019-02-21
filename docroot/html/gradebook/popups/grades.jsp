@@ -23,7 +23,7 @@ CalificationType ct = new CalificationTypeRegistry().getCalificationType(CourseL
 
 <portlet:actionURL name="setGrades" var="updateGradesURL" windowState="<%= LiferayWindowState.NORMAL.toString() %>" />
 
-<aui:form  name="fn_grades" method="post" action="${updateGradesURL}" >
+<aui:form  name="fn_grades" method="post" action="${updateGradesURL}" role="form">
 	<aui:fieldset>
 		<aui:input type="hidden" name="studentId" value='<%=studentId2%>' />
 		<aui:input type="hidden" name="actId" value='<%=actId2%>' />

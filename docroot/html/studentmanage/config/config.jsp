@@ -19,7 +19,7 @@
 %>
 
 <liferay-portlet:actionURL var="saveConfigurationURL" portletConfiguration="true"/>
-<aui:form action="<%=saveConfigurationURL %>" method="post" name="fm" onSubmit='<%= "event.preventDefault(); " + renderResponse.getNamespace() + "saveConfiguration();" %>'>
+<aui:form action="<%=saveConfigurationURL %>" method="post" role="form" name="fm" onSubmit='<%= "event.preventDefault(); " + renderResponse.getNamespace() + "saveConfiguration();" %>'>
 	<aui:input type="hidden" name="<%=Constants.CMD %>" value="<%=Constants.UPDATE %>" />
 	<aui:input type="checkbox" name="showActionSocial" label="studentsearch.config.showSociety" value="<%=showActionSocial %>" checked="<%=showActionSocial %>"/>
 	<aui:input type="checkbox" name="showActionAudit" label="studentsearch.config.showAudit" value="<%=showActionAudit %>" checked="<%=showActionAudit %>"/>

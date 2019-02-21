@@ -14,6 +14,12 @@
 
 package com.liferay.lms.model.impl;
 
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.model.Team;
+import com.liferay.portal.service.TeamLocalService;
+import com.liferay.portal.service.TeamLocalServiceUtil;
+
 /**
  * The extended model implementation for the Schedule service. Represents a row in the &quot;Lms_Schedule&quot; database table, with each column mapped to a property of this class.
  *
@@ -30,5 +36,14 @@ public class ScheduleImpl extends ScheduleBaseImpl {
 	 * Never reference this class directly. All methods that expect a schedule model instance should use the {@link com.liferay.lms.model.Schedule} interface instead.
 	 */
 	public ScheduleImpl() {
+	}
+	
+	public Team getTeam(){
+		try {
+			return TeamLocalServiceUtil.getTeam(getTeamId());
+		} catch (PortalException | SystemException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 }

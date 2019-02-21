@@ -1,294 +1,209 @@
-<%@page import="com.liferay.lms.course.inscriptiontype.InscriptionTypeRegistry"%>
-<%@page import="com.liferay.lms.course.inscriptiontype.InscriptionType"%>
-<%@page import="com.liferay.lms.service.ScheduleLocalServiceUtil"%>
-<%@page import="com.liferay.lms.service.ScheduleLocalService"%>
-<%@page import="com.liferay.lms.model.Schedule"%>
-<%@page import="com.liferay.portal.model.Team"%>
-<%@page import="com.liferay.portal.service.TeamLocalServiceUtil"%>
-<%@page import="com.liferay.lms.model.CourseResult"%>
-<%@page import="com.liferay.lms.service.CourseResultLocalServiceUtil"%>
-<%@page import="com.liferay.lms.model.Competence"%>
-<%@page import="com.liferay.lms.service.CompetenceLocalServiceUtil"%>
-<%@page import="com.liferay.lms.model.UserCompetence"%>
-<%@page import="com.liferay.lms.model.CourseCompetence"%>
-<%@page import="com.liferay.lms.service.CourseCompetenceLocalServiceUtil"%>
-<%@page import="com.liferay.lms.service.UserCompetenceLocalServiceUtil"%>
-<%@page import="com.liferay.portal.model.MembershipRequest"%>
-<%@page import="com.liferay.portal.model.MembershipRequestConstants"%>
-<%@page import="com.liferay.portal.service.MembershipRequestLocalServiceUtil"%>
-<%@page import="com.liferay.lms.model.Course"%>
-<%@page import="com.liferay.lms.service.CourseLocalServiceUtil"%>
-<%@include file="/init.jsp" %>
-<%@page import="java.net.URLEncoder"%>
-<%@page import="javax.portlet.PortletPreferences"%>
-<%@page import="com.liferay.util.JavaScriptUtil"%>
+<%@ include file="/init.jsp" %>
 
-<div id="caja_inscripcion">
+<c:choose>
+	<c:when test="${not empty inscriptionPortletName }">
+		<liferay-portlet:runtime portletName="${inscriptionPortletName }" defaultPreferences="${defaultPreferences }"/>
+	</c:when>
+	<c:otherwise>
 	
-	<%
-	Course course=CourseLocalServiceUtil.fetchByGroupCreatedId(themeDisplay.getScopeGroupId());
+		<jsp:useBean id="userCompetenceLocalServiceUtil" class="com.liferay.lms.service.UserCompetenceLocalServiceUtil"/>
+		<jsp:useBean id="competenceLocalServiceUtil" class="com.liferay.lms.service.CompetenceLocalServiceUtil"/>
+		<jsp:useBean id="membershipRequestLocalServiceUtil" class="com.liferay.portal.service.MembershipRequestLocalServiceUtil"/>
 	
-	if(course!=null && permissionChecker.hasPermission(course.getGroupId(),  Course.class.getName(),course.getCourseId(),ActionKeys.VIEW)){
-		Group groupC = GroupLocalServiceUtil.getGroup(course.getGroupCreatedId());
-		if(themeDisplay.isSignedIn()){	%>
+		<liferay-ui:success message="inscription-ok" key="inscription-ok" />
+		<liferay-ui:success message="lms.inscription.unsusbscribe.success" key="unsusbscribe" />
+		<liferay-ui:error message="inscription-error-already-enrolled" key="inscription-error-already-enrolled" />
+		<liferay-ui:error message="inscription-error-already-disenrolled" key="unsusbscribe" />
+		<liferay-ui:error message="inscription-error-max-users" key="inscription-error-max-users"/>
 		
-			<liferay-ui:error message="inscription-error-syte-restricted" key="inscription-error-syte-restricted"></liferay-ui:error>
-			<liferay-ui:error message="inscription-error-max-users" key="inscription-error-max-users"></liferay-ui:error>
-			<liferay-ui:error message="inscription-error-already-enrolled" key="inscription-error-already-enrolled"></liferay-ui:error>
-			<liferay-ui:error message="inscription-error-already-disenrolled" key="inscription-error-already-disenrolled"></liferay-ui:error>
-			
-			<%if(GroupLocalServiceUtil.hasUserGroup(themeDisplay.getUserId(),themeDisplay.getScopeGroupId())){ 
-				Date now = new Date();
-				InscriptionType inscriptionType = new InscriptionTypeRegistry().getInscriptionType(course.getInscriptionType());
-				if(!inscriptionType.canUnsubscribe() || course.getStartDate().after(now)||course.getEndDate().before(now)||!permissionChecker.hasPermission(course.getGroupId(),  Course.class.getName(),course.getCourseId(),"REGISTER")){%>
-					<div class="mensaje_marcado"><liferay-ui:message key="inscripcion.inscrito" /></div>
-				<%} else {
-					CourseResult courseResult = CourseResultLocalServiceUtil.getByUserAndCourse(course.getCourseId(), themeDisplay.getUserId()); 
-					
-					if((courseResult != null && courseResult.getPassedDate() != null) ||  (groupC.getType()!=GroupConstants.TYPE_SITE_OPEN)){%>
-						<div class="mensaje_marcado"><liferay-ui:message key="inscripcion.inscrito" /></div>	
-					<%}else{ %>
-					
-						<portlet:actionURL name="desinscribir"  var="desinscribirURL" windowState="NORMAL"/>
-						<script type="text/javascript">
-							function <portlet:namespace />enviar() {
-								if(confirm('<%=JavaScriptUtil.markupToStringLiteral(LanguageUtil.get(pageContext, "inscripcion.desinscribete.seguro")) %>')) {
-									window.location.href = "<%=desinscribirURL %>";
-								}
-							}
-						</script>
-						<div class="mensaje_marcado"><liferay-ui:message key="inscripcion.inscrito" /></div>	
-						
-						<div class="boton_inscibirse ">
-							<a href="#" onclick="javascript:<portlet:namespace />enviar();"><liferay-ui:message key="inscripcion.desinscribete" /></a>
-						</div>	
-								
-					<%}
-				}
-			} else {
-				
-				List<CourseCompetence> courseCompetences = CourseCompetenceLocalServiceUtil.findBycourseId(course.getCourseId(), true);
-					
-				boolean pass=true;
-				
-				if(courseCompetences!=null&&courseCompetences.size()>0){%>
-				
-					<div><liferay-ui:message key="competences.necessary" />:</div>
-					<ul>
-						<%for(CourseCompetence courseCompetence : courseCompetences){
-							UserCompetence uc = UserCompetenceLocalServiceUtil.findByUserIdCompetenceId(themeDisplay.getUserId(), courseCompetence.getCompetenceId());
-							if(uc!=null) {
-								Competence compet =CompetenceLocalServiceUtil.getCompetence(uc.getCompetenceId());
-								if(compet!=null) {%>
-									<li><liferay-ui:icon image="checked"/><%=compet.getTitle(themeDisplay.getLocale())%></li>
-								<%}
-							}else{
-								pass=false;
-								Competence compet =CompetenceLocalServiceUtil.getCompetence(courseCompetence.getCompetenceId());
-								if(compet!=null){%>
-									<li><liferay-ui:icon image="unchecked"/><%=compet.getTitle(themeDisplay.getLocale())%></li>
-								<%}
-							}
-						}%>
-					</ul>
-				<%}
-				
-				Date now=new Date(System.currentTimeMillis());
-						
-						
-						
-				if((course.getStartDate().before(now)&&course.getEndDate().after(now))&&permissionChecker.hasPermission(course.getGroupId(),  Course.class.getName(),course.getCourseId(),"REGISTER")){
-				
-					if((course.getMaxusers()<=0||UserLocalServiceUtil.getGroupUsersCount(course.getGroupCreatedId())<course.getMaxusers())&&groupC.getType()!=GroupConstants.TYPE_SITE_PRIVATE){
-						if(groupC.getType()==GroupConstants.TYPE_SITE_OPEN){%>
-						
-						<%if(pass){ 		
-							List<Team> teams = TeamLocalServiceUtil.getGroupTeams(course.getGroupCreatedId());
-							boolean existTeam = false;
-							boolean scheduleOpen = false;
-							for(Team team : teams){
-								Schedule sch = ScheduleLocalServiceUtil.getScheduleByTeamId(team.getTeamId());	
-								if(sch!=null){
-									existTeam = true;
-									if(sch.getStartDate().before(now)&&sch.getEndDate().after(now)){
-										scheduleOpen = true;
-										%>
-										
-										<div class="mensaje_marcado"><liferay-ui:message key="inscripcion.noinscrito" /></div>
-										<aui:fieldset>
-											<aui:column>
-												<%= team.getName() %>
-											</aui:column>
-											<aui:column>
-												<%= dateFormatDateTime.format(sch.getStartDate()) %>
-											</aui:column>
-											<aui:column>
-												<%= dateFormatDateTime.format(sch.getEndDate()) %>
-											</aui:column>
-											<aui:column>
-												<div class="boton_inscibirse ">
-													<a href="javascript:${renderResponse.getNamespace()}inscribir('<%=team.getTeamId()%>');"><liferay-ui:message key="inscripcion.inscribete" /></a>
-												</div>
-											</aui:column>
-									</aui:fieldset>
-								  <%}									
-								}
-								
-							}
-							if(!existTeam){
-							%>
-							
-							<div class="mensaje_marcado"><liferay-ui:message key="inscripcion.noinscrito" /></div>
-								<div class="boton_inscibirse ">
-									<a href="javascript:${renderResponse.getNamespace()}inscribir('0');"><liferay-ui:message key="inscripcion.inscribete" /></a>
-								</div>
-						<%
-							}else{
-								if(!scheduleOpen){
-									%>
-									<div class="mensaje_marcado">
-										<liferay-ui:message key="inscripcion.no-schedule-open"/>
+		<div id="caja_inscripcion container">
+			<c:choose>
+				<c:when test="${themeDisplay.isSignedIn() && registredUser}">
+					<div class="mensaje_marcado">
+						<liferay-ui:message key="inscripcion.inscrito" />
+					</div>
+					<c:if test="${not empty listChildCourses }">	
+						<c:forEach items="${listChildCourses }" var="childCourse">
+							<div class="mensaje_marcado">
+								<span class="edition-name">${childCourse.getTitle(locale)}</span>
+								<aui:button type="button" value="inscription.go-to-course" href="${childCourse.friendlyURL}"/>
+								<c:if test="${childCourse.canUnsubscribe(themeDisplay.userId, themeDisplay.permissionChecker) }">
+									<div class="boton_inscibirse ">
+										<a href="#" onclick="javascript:<portlet:namespace/>unsubscribe(${childCourse.courseId })"><liferay-ui:message key="inscripcion.desinscribete" /></a>
 									</div>
-									
-									<%
-								}
-							}
-						}else{ %>
-							
-						
-								<div class="boton_inscibirse ">
-									<liferay-ui:message key="competence.block" />
-								</div>
-							<%} %>
-							
-						<%}else if(groupC.getType()==GroupConstants.TYPE_SITE_RESTRICTED){
-							List<MembershipRequest> pending = MembershipRequestLocalServiceUtil.getMembershipRequests(themeDisplay.getUserId(), themeDisplay.getScopeGroupId(), MembershipRequestConstants.STATUS_PENDING);
-							
-							if(pending.size()>0){%>
-								<div class="mensaje_marcado"><liferay-ui:message key="course.pending" /></div>
-							<%}else{
-								List<MembershipRequest> denied = MembershipRequestLocalServiceUtil.getMembershipRequests(themeDisplay.getUserId(), themeDisplay.getScopeGroupId(), MembershipRequestConstants.STATUS_DENIED);
-								
-								if(denied.size()>0){%>
-									<div class="mensaje_marcado"><liferay-ui:message key="course.denied" /></div><%
-								}else{%>
-									<%if(pass){ 
-										List<Team> teams = TeamLocalServiceUtil.getGroupTeams(course.getGroupCreatedId());
-										boolean existTeam = false;
-										boolean scheduleOpen = false;
-										for(Team team : teams){
-											Schedule sch = ScheduleLocalServiceUtil.getScheduleByTeamId(team.getTeamId());	
-											if(sch!=null){
-												existTeam = true;
-												if(sch.getStartDate().before(now)&&sch.getEndDate().after(now)){
-													scheduleOpen = true;%>
-										
-										
-										<div class="mensaje_marcado"><liferay-ui:message key="inscripcion.surveillance" /></div>
-										<aui:fieldset>
-											<aui:column>
-												<%= team.getName()  %>
-											</aui:column>
-											<aui:column>
-												<%= dateFormatDateTime.format(sch.getStartDate()) %>
-											</aui:column>
-											<aui:column>
-												<%= dateFormatDateTime.format(sch.getEndDate()) %>
-											</aui:column>
-											<aui:column>
-												<div class="boton_inscibirse ">
-													<a href="javascript:${renderResponse.getNamespace()}member('<%=team.getTeamId()%>');"><liferay-ui:message key="inscripcion.request" /></a>
-												</div>
-											</aui:column>
-										</aui:fieldset>
-										<% 	
-									}									
-								}
-								
-							}
-							if(!existTeam){
-							%>
-							
-							<div class="mensaje_marcado"><liferay-ui:message key="inscripcion.surveillance" /></div>
-								<div class="boton_inscibirse ">
-									<a href="javascript:${renderResponse.getNamespace()}member('0');"><liferay-ui:message key="inscripcion.request" /></a>
-								</div>
-						<%
-							}else{
-								if(!scheduleOpen){
-									%>
-									<div class="mensaje_marcado">
-										<liferay-ui:message key="inscripcion.no-schedule-open"/>
-									</div>
-									
-									<%
-								}
-							}	
-						}else{ %>
-										<div class="mensaje_marcado ">
-											<liferay-ui:message key="competence.block" />
-										</div>
-									<%} %>
-								<%}
+								</c:if>
+							</div>
+						</c:forEach>
+					</c:if>
+					<c:if test="${not empty course}">
+						<c:if test="${course.canUnsubscribe(themeDisplay.userId, themeDisplay.permissionChecker)}">
+							<div class="boton_inscibirse ">
+								<a href="#" onclick="javascript:<portlet:namespace />unsubscribe(${course.courseId });"><liferay-ui:message key="inscripcion.desinscribete" /></a>
+							</div>
+						</c:if>
+					</c:if>
+					<aui:form action="${unsubscribeURL }" name="unsubscribeForm">
+						<aui:input name="courseId" type="hidden" value=""/>
+					</aui:form>
+					<script>
+						function <portlet:namespace />unsubscribe(courseId) {
+							if(confirm(Liferay.Language.get('inscripcion.desinscribete.seguro'))){
+								document.<portlet:namespace />unsubscribeForm.<portlet:namespace />courseId.value=courseId;
+								document.<portlet:namespace />unsubscribeForm.submit();
 							}
 						}
-					}else{
-						if(groupC.getType()==GroupConstants.TYPE_SITE_PRIVATE){
-							renderRequest.setAttribute(WebKeys.PORTLET_CONFIGURATOR_VISIBILITY, Boolean.FALSE);
-						}%>
-						
-						<div class="mensaje_marcado"><liferay-ui:message key="course.full" /></div>
-					<%}
-					
-				}else{
-					if(!permissionChecker.hasPermission(course.getGroupId(),  Course.class.getName(),course.getCourseId(),"REGISTER")){%>
-						<div class="mensaje_marcado"><liferay-ui:message key="inscripcion.permission" /></div><%
-					}else if(course.getStartDate().after(now)){%>
-						<div class="mensaje_marcado"><liferay-ui:message key="inscripcion.date" /></div><%
-					}else{%>
-						<div class="mensaje_marcado"><liferay-ui:message key="inscripcion.date.pass" /></div><%
-					}
-						
-				}
-			}
-		} else {
-			String urlRedirect= themeDisplay.getURLCurrent();%>
-			<div class="mensaje_marcado"><liferay-ui:message key="inscripcion.nologado" /></div>
-			<div class="boton_inscibirse ">
-				<a href="/c/portal/login?redirect=<%=urlRedirect%>"><liferay-ui:message key="inscripcion.registrate" /></a>
-			</div>
-		<%}
-	}else{
-		renderRequest.setAttribute(WebKeys.PORTLET_CONFIGURATOR_VISIBILITY, Boolean.FALSE);
-	}%>
-</div>
-
-<portlet:actionURL name="member"  var="memberURL" windowState="NORMAL"/>
-<portlet:actionURL name="inscribir"  var="inscribirURL" windowState="NORMAL"/>
-						
-<aui:form name="inscribirFm" action="${inscribirURL}">
-	<aui:input name="teamId" value="" type="hidden"/>
-</aui:form>
-
-
-<aui:form name="memberFm" action="${memberURL}">
-	<aui:input name="teamId" value="" type="hidden"/>
-</aui:form>
-
-
-
-<script type="text/javascript">
-
-	function <portlet:namespace />inscribir(teamId){
-		$('#<portlet:namespace />teamId').val(teamId);
-		$('#<portlet:namespace />inscribirFm').submit();
-	}
-
-
-	function <portlet:namespace />member(teamId){
-		$('#<portlet:namespace />teamId').val(teamId);
-		$('#<portlet:namespace />memberFm').submit();
-	}
-
-</script>
-
+					</script>
+				</c:when>
+				<c:when test="${themeDisplay.isSignedIn() && !registredUser}">
+					<c:set var="competencesPassed" value="${true }"/>
+					<c:if test="${not empty listCourseCompetences}">
+						<div><liferay-ui:message key="competences.necessary" />:</div>
+						<ul>
+							<c:forEach items="${listCourseCompetences}" var="courseCompetence">
+								<c:set var="userCompetence" value="${userCompetenceLocalServiceUtil.findByUserIdCompetenceId(themeDisplay.getUserId(), courseCompetence.getCompetenceId()) }" />
+								<c:set var="competence" value="${competenceLocalServiceUtil.getCompetence(courseCompetence.competenceId) }" />
+								<c:choose>
+									<c:when test="${not empty userCompetence }">
+										<c:if test="${not empty competence }">
+											<li><liferay-ui:icon image="checked"/>${competence.getTitle(themeDisplay.getLocale())}</li>
+										</c:if>
+									</c:when>
+									<c:otherwise>
+										<c:if test="${not empty competence }" >
+											<c:set var="competencesPassed" value="false" />
+											<li><liferay-ui:icon image="unchecked"/>${competence.getTitle(themeDisplay.getLocale())}</li>
+										</c:if>
+									</c:otherwise>
+								</c:choose>
+							</c:forEach>
+						</ul>
+					</c:if>
+					<!-- Si tiene pasadas las competencias, entonces se continua con la inscripción -->
+					<c:choose>
+						<c:when test="${competencesPassed}">
+							<c:choose>
+								<c:when test="${not empty listChildCourses}">
+									<h2><liferay-ui:message key="editions-available"/></h2>
+									<p><liferay-ui:message key="editions-available.select-edition"/></p>
+								<!-- Si tiene convocatorias, se buclea por los cursos hijos pero no se tiene en cuenta los equipos -->
+									<c:set var="childAvailable" value="false" />
+									<aui:form name="enrollEditionForm" action="${enrollURL}">
+										<c:forEach items="${listChildCourses}" var="childCourse">
+											<c:if test="${childCourse.isRegistrationOnDate() }">
+												<c:catch var ="inscriptionException">
+													<c:if test="${childCourse.canEnroll(themeDisplay.userId, false, themeDisplay.locale, themeDisplay.permissionChecker)}">
+														<c:set var="childAvailable" value="true" />
+													</c:if>
+												</c:catch>
+												
+												<div class="row inscription-edition">
+													<aui:input label="${childCourse.getTitle(themeDisplay.getLocale())}" type="radio" name="courseId" value="${childCourse.courseId}"
+														disabled="${not empty inscriptionException }" showRequiredLabel="false">
+														<aui:validator name="required" errorMessage="select-edition"/>
+													</aui:input>
+													<div class="edition-dates">
+														<liferay-ui:message key="inscription-date"/>: <fmt:formatDate type="both" dateStyle="short" timeStyle="short" value="${childCourse.startDate }" /> - <fmt:formatDate type="both" dateStyle="short" timeStyle="short" value="${childCourse.endDate }" />
+													</div>
+													<div class="edition-dates">
+														<liferay-ui:message key="execution-date"/>: <fmt:formatDate type="both" dateStyle="short" timeStyle="short" value="${childCourse.executionStartDate }" /> - <fmt:formatDate type="both" dateStyle="short" timeStyle="short" value="${childCourse.executionEndDate }" />
+													</div>
+													<c:if test="${not empty inscriptionException }">
+														<div class="mensaje_marcado">${fn:substringAfter(inscriptionException.message, ':')}</div>
+													</c:if>
+												</div>
+											</c:if>
+										</c:forEach>
+										<c:choose>	
+											<c:when test="${childAvailable }">
+												<div class="boton_inscibirse ">
+													<aui:button type="submit" value="inscripcion.inscribete"/>
+												</div>							
+											</c:when>
+											<c:otherwise>
+												<liferay-ui:message key="inscripcion.no-schedule-open"/>
+											</c:otherwise>
+										</c:choose>
+									</aui:form>
+								</c:when>
+								<c:otherwise>
+									<!-- Si no tiene convocatorias, se hace igual que hasta ahora, teniendo en cuenta los equipos -->
+									<c:catch var ="inscriptionException">
+										<c:if test="${course.canEnroll(themeDisplay.userId, false, themeDisplay.locale, themeDisplay.permissionChecker)}">
+											<aui:form name="enrollForm" action="${enrollURL}">
+												<aui:input name="courseId" value="${course.courseId }" type="hidden"/>
+												
+												<c:if test="${not empty schedules }">
+													<h2><liferay-ui:message key="teams-available"/></h2>
+													<p><liferay-ui:message key="teams-available.select-team"/></p>
+												</c:if>
+												<c:forEach items="${schedules}" var="schedule">
+												 	<div class="row inscription-schedule">
+														<aui:input label="${schedule.team.name}" type="radio" name="teamId" value="${schedule.teamId}" showRequiredLabel="false">
+															<aui:validator name="required" errorMessage="select-edition"/>
+														</aui:input>
+														<div class="edition-dates">
+															<liferay-ui:message key="inscription-date"/>: <fmt:formatDate type="both" dateStyle="short" timeStyle="short" value="${schedule.startDate}" /> - <fmt:formatDate type="both" dateStyle="short" timeStyle="short" value="${schedule.endDate }" />
+														</div>
+														<c:if test="${not empty inscriptionException }">
+															<div class="mensaje_marcado">${fn:substringAfter(inscriptionException.message, ':')}</div>
+														</c:if>
+													</div>
+												 </c:forEach>
+												 <c:choose>
+												 	<c:when test="${!hasTeams}">
+												 		<div class="mensaje_marcado"><liferay-ui:message key="inscripcion.noinscrito" /></div>
+														<div class="boton_inscibirse ">
+															<c:choose>
+																<c:when test="${course.group.type == TYPE_SITE_OPEN}">
+																	<aui:button type="submit" value="inscripcion.inscribete"/>
+																</c:when>
+																<c:otherwise>
+																	<aui:button type="submit" value="inscripcion.request"/>
+																</c:otherwise>
+															</c:choose>
+														</div>
+												 	</c:when>
+												 	<c:when test="${not empty schedules }">
+												 		<div class="boton_inscibirse ">
+												 			<c:choose>
+																<c:when test="${course.group.type == TYPE_SITE_OPEN}">
+																	<aui:button type="submit" value="inscripcion.inscribete"/>
+																</c:when>
+																<c:otherwise>
+																	<aui:button type="submit" value="inscripcion.request"/>
+																</c:otherwise>
+															</c:choose>
+														</div>
+												 	</c:when>
+												 	<c:otherwise>
+											 			<div class="mensaje_marcado">
+															<liferay-ui:message key="inscripcion.no-schedule-open"/>
+														</div>
+												 	</c:otherwise>
+												 </c:choose>			
+											</aui:form>
+										</c:if>
+									</c:catch>
+									<c:if test="${not empty inscriptionException }">
+										<div class="mensaje_marcado">${fn:substringAfter(inscriptionException.message, ':')}</div> 
+									</c:if>
+								</c:otherwise>
+							</c:choose>
+						</c:when>
+						<c:otherwise>
+							<div class="boton_inscibirse ">
+								<liferay-ui:message key="competence.block" />
+							</div>	
+						</c:otherwise>
+					</c:choose> 
+				</c:when>
+				<c:otherwise>
+					<div class="mensaje_marcado"><liferay-ui:message key="inscripcion.nologado" /></div>
+					<div class="boton_inscibirse ">
+						<a href="/c/portal/login?p_l_id=${themeDisplay.layout.plid }"><liferay-ui:message key="inscripcion.registrate" /></a>
+					</div>		
+				</c:otherwise>
+			</c:choose>
+		</div>
+	</c:otherwise>
+</c:choose>

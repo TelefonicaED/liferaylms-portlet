@@ -196,7 +196,7 @@ function validate(){
 
 <% } %>
 
-<aui:form name="fm" action="<%=editmoduleURL %>" method="POST" enctype="multipart/form-data">
+<aui:form name="fm" action="<%=editmoduleURL %>" method="POST" enctype="multipart/form-data" role="form">
 	<input type="hidden" name="resourcePrimKey" value="<%=module.getPrimaryKey() %>">
 
 <%

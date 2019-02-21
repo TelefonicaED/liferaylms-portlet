@@ -76,7 +76,7 @@
 	
 		
 
-<aui:form name="fm" action="<%=importQuestionsURL%>"  method="post" enctype="multipart/form-data">
+<aui:form name="fm" action="<%=importQuestionsURL%>"  method="post" enctype="multipart/form-data" role="form">
 	<aui:fieldset>
 		<aui:field-wrapper label="file" helpMessage="surveyactivity.editquestions.importquestions.fileHelp">
 	    			<aui:input inlineLabel="left" inlineField="true"

@@ -436,6 +436,12 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 			}
 			Indexer indexer = IndexerRegistryUtil.nullSafeGetIndexer(Course.class);
 			indexer.reindex(course);
+			
+			if(!isfromClone){
+				
+				moduleLocalService.addModule(course.getCompanyId(), course.getGroupCreatedId(), course.getUserId(), LanguageUtil.get(locale,"com.liferay.lms.model.module"), 
+						LanguageUtil.get(locale,"description"), executionStartDate, executionEndDate, null);
+			}
 		}catch(PortalException e){
 			if(log.isInfoEnabled()){
 				log.info("CourseLocalServiceImpl.addCourse(): " + e + "message: " + e.getMessage());
@@ -450,56 +456,6 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 			throw new PortalException(e.getMessage());
 			
 		}
-		
-		
-		// METODO METIDO POR MIGUEL
-		if(!isfromClone){
-			Module newModule;
-			try {
-				
-				
-				newModule = ModuleLocalServiceUtil.createModule(CounterLocalServiceUtil.increment(Module.class.getName()));
-				newModule.setTitle(LanguageUtil.get(locale,"com.liferay.lms.model.module"), locale);
-				newModule.setDescription(LanguageUtil.get(locale,"description"), locale);
-				newModule.setCreateDate(createDate);
-				newModule.setCompanyId(course.getCompanyId());
-				newModule.setGroupId(course.getGroupCreatedId());
-				newModule.setUserId(course.getUserId());
-				newModule.setOrdern(newModule.getModuleId());				
-				newModule.setStartDate(executionStartDate);
-				newModule.setEndDate(executionEndDate);
-				
-				
-				ModuleLocalServiceUtil.addModule(newModule);
-				
-				
-				 try {
-				    	Role siteMember = RoleLocalServiceUtil.fetchRole(newModule.getCompanyId(), RoleConstants.SITE_MEMBER);
-				    	ResourcePermissionLocalServiceUtil.setResourcePermissions(newModule.getCompanyId(), 
-				    			Module.class.getName(),ResourceConstants.SCOPE_INDIVIDUAL, String.valueOf(newModule.getModuleId()),  siteMember.getRoleId(),  new String[]{"VIEW","ACCESS"});
-				   
-				    	
-				    	
-				    	
-				    	
-						resourceLocalService.addResources(
-								newModule.getCompanyId(), newModule.getGroupId(), newModule.getUserId(),
-						Module.class.getName(), newModule.getPrimaryKey(), false,
-						true, true);
-					} catch (PortalException e) {
-						if(log.isDebugEnabled())e.printStackTrace();
-						if(log.isInfoEnabled())log.info(e.getMessage());
-						throw new SystemException(e);
-					}
-				
-				log.debug("    + Module : " + newModule.getTitle(Locale.getDefault()) +"("+newModule.getModuleId()+")" );
-				ModuleLocalServiceUtil.updateModule(newModule);
-				
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-		
 		
 		////////////////////////////
 		//auditing
@@ -1393,7 +1349,7 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 						}
 					}
 					
-					if((startDate.before(now) && endDate.after(now))){
+					if((!course.isClosed() && startDate.before(now) && endDate.after(now))){
 						//3. Control de competencias 
 						List<CourseCompetence> courseCompetences = CourseCompetenceLocalServiceUtil.findBycourseId(course.getCourseId(), true);
 						//Busco si al usuario le falta alguna competencia que es necesaria para la inscripcion al curso
@@ -1489,7 +1445,7 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 			boolean enoughCompetences = true;
 			CourseCompetence courseCompetence = null;
 			if(userId > 0){
-				//1. Si no estÃ¡ ya inscrito
+				//1. Si no está ya inscrito
 				if(!GroupLocalServiceUtil.hasUserGroup(userId,course.getGroupCreatedId())){
 					Group group = GroupLocalServiceUtil.getGroup(course.getGroupCreatedId());
 					
@@ -1992,7 +1948,6 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 							}
 						}
 					}
-
 				}
 			} catch (PortalException | SystemException e) {
 				e.printStackTrace();
@@ -2003,6 +1958,10 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 			courses = ListUtil.subList(courses, start, end);
 		}
 		return courses;
+	}
+	
+	public List<Course> getChildsRegistredUser(long parentCourseId, long userId){
+		return courseFinder.findChildRegistredUser(parentCourseId, userId);
 	}
 	
 }

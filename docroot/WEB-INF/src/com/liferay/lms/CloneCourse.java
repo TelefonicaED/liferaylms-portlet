@@ -330,6 +330,7 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 		List<Long> evaluations = new ArrayList<Long>(); 
 		LearningActivity newLearnActivity=null;
 		LearningActivity nuevaLarn = null;
+		ServiceContext larnServiceContext = null;
 		Module newModule=null;
 		for(Module module:modules){
 			
@@ -417,6 +418,10 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 					
 					newLearnActivity.setDescription(descriptionFilesClone(activity.getDescription(),newModule.getGroupId(), newLearnActivity.getActId(),themeDisplay.getUserId()));
 		
+					larnServiceContext = serviceContext;
+					//Eliminar las categorias y los tags del curso del serviceContext antes de crear la nueva actividad
+					larnServiceContext.setAssetCategoryIds(null);
+					larnServiceContext.setAssetTagNames(null);
 					nuevaLarn=LearningActivityLocalServiceUtil.addLearningActivity(newLearnActivity,serviceContext);
 					if(log.isDebugEnabled()){
 						log.debug("      Learning Activity : " + activity.getTitle(Locale.getDefault())+ " ("+activity.getActId()+", " + LanguageUtil.get(Locale.getDefault(),learningActivityTypeRegistry.getLearningActivityType(activity.getTypeId()).getName())+")");
@@ -446,16 +451,15 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 					}
 					
 					if(this.cloneActivityClassificationTypes){
-						//---Clonar los tipos de actividad
-						AssetEntry activityType = AssetEntryLocalServiceUtil.fetchEntry(LearningActivity.class.getName(), activity.getActId());
-						if(log.isDebugEnabled())
-							log.debug(":::Clone activity classification types::: Activity " + activity.getActId());
-						if(Validator.isNotNull(activityType)){
+						AssetEntry entryActivity = AssetEntryLocalServiceUtil.fetchEntry(LearningActivity.class.getName(), activity.getActId());
+						if(Validator.isNotNull(entryActivity)){
+							//---Clonar la clasificación de la actividad
+							if(log.isDebugEnabled())
+								log.debug(":::Clone activity classification types::: Activity " + activity.getActId());
 							AssetEntryLocalServiceUtil.updateEntry(nuevaLarn.getUserId(), nuevaLarn.getGroupId(), LearningActivity.class.getName(), 
-									nuevaLarn.getActId(), activityType.getCategoryIds(), activityType.getTagNames());
+										nuevaLarn.getActId(), entryActivity.getCategoryIds(), entryActivity.getTagNames());
 						}
 					}
-					
 				} catch (Exception e) {
 					e.printStackTrace();
 					error=true;
