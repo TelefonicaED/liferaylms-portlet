@@ -16,6 +16,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
@@ -833,6 +834,7 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 					e.printStackTrace();
 				}
 			}catch(PortalException pe){
+				pe.printStackTrace();;
 				if(log.isDebugEnabled())log.debug("Error:"+pe.getMessage());
 				if(pe instanceof DuplicateGroupException){
 					SessionErrors.add(actionRequest, "duplicate-course");
@@ -853,6 +855,7 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 					return;
 				}
 			}catch(SystemException pe){
+				pe.printStackTrace();
 				List<String> errors = new ArrayList<String>();
 				errors.add(LanguageUtil.format(themeDisplay.getLocale(),"max-users-violated", pe.getMessage().replaceAll("maxUsers ", StringPool.BLANK)));
 				SessionErrors.add(actionRequest, "newCourseErrors", errors);
@@ -1506,266 +1509,308 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 	public void serveResource(ResourceRequest request, ResourceResponse response)throws PortletException, IOException {
 		ThemeDisplay themeDisplay = (ThemeDisplay) request.getAttribute(WebKeys.THEME_DISPLAY);
 		
-		String action = ParamUtil.getString(request, "action");
-		
-		if(action.equals("exportCourse")){
-			JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
-			try {	
-				
-				ServiceContext serviceContext = ServiceContextFactory.getInstance(Course.class.getName(), request);				
-				long groupId  = ParamUtil.getLong(request, "groupId", 0);
-				
-				
-				if (themeDisplay.getPermissionChecker().hasPermission(groupId, Course.class.getName(), groupId, ActionKeys.UPDATE)) {
-					String fileName  = ParamUtil.getString(request, "exportFileName", "New course exported");
-					if(fileName.contains("/")){
-						fileName=fileName.replaceAll("/", "-");
+		if(request.getResourceID() != null && request.getResourceID().equals("searchGroupTypes") ){
+			long inscriptionTypeId = ParamUtil.getLong(request, "inscriptionTypeId",0);
+			log.debug("inscriptionTypeId: "+inscriptionTypeId);
+			
+			JSONArray jsonArray = JSONFactoryUtil.createJSONArray();
+
+			InscriptionTypeRegistry inscription = new InscriptionTypeRegistry();
+			InscriptionType inscriptionType = inscription.getInscriptionType(inscriptionTypeId);
+			if (inscriptionType != null) {
+				Set<Integer> groupTypeIds = inscriptionType.getGroupTypesAvailable();
+
+				for (Integer groupTypeId : groupTypeIds) {
+					JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
+					switch(groupTypeId){
+					case GroupConstants.TYPE_SITE_OPEN:
+						jsonObject.put("id", GroupConstants.TYPE_SITE_OPEN);
+						jsonObject.put("name", LanguageUtil.get(themeDisplay.getLocale(), GroupConstants.TYPE_SITE_OPEN_LABEL));
+						break;
+					case GroupConstants.TYPE_SITE_RESTRICTED:
+						jsonObject.put("id", GroupConstants.TYPE_SITE_RESTRICTED);
+						jsonObject.put("name", LanguageUtil.get(themeDisplay.getLocale(), GroupConstants.TYPE_SITE_RESTRICTED_LABEL));
+						break;
+					case GroupConstants.TYPE_SITE_PRIVATE:
+						jsonObject.put("id", GroupConstants.TYPE_SITE_PRIVATE);
+						jsonObject.put("name", LanguageUtil.get(themeDisplay.getLocale(), GroupConstants.TYPE_SITE_PRIVATE_LABEL));
+						break;
 					}
-					if(!(Validator.isNotNull(fileName)) || !(fileName.length()>0) || !(fileName.contains(".lar")) )
-						jsonObject.put("error", LanguageUtil.get(themeDisplay.getLocale(), "course.export.badformat"));
-					else{
-						ClusterNode nodo = ClusterExecutorUtil.getLocalClusterNode();
-						String clusterNodoId = nodo == null ? StringPool.DASH : nodo.getClusterNodeId();
-						
-						String key = ParamUtil.getString(request, "key", null);
-						String newKey = clusterNodoId + StringPool.UNDERLINE + themeDisplay.getCompanyId() + StringPool.UNDERLINE + groupId;
-						
-						if (!StringPool.DASH.equals(clusterNodoId) && !ClusterExecutorUtil.isClusterNodeAlive(clusterNodoId)) {
-							jsonObject.put("error", "deadnode");
-						} else {
-							if (Validator.isNull(key) && MultiVMPoolUtil.get("exportCourseCache", key) != null) { // Pide exportacion pero ya hay una en curso
-								jsonObject.put("status", "generating");
-								jsonObject.put("key", newKey);
-							} else if (Validator.isNull(key) && MultiVMPoolUtil.get("exportCourseCache", key) == null) { // Pide exportacion y no hay ninguna en curso
-								AsynchronousProcessAudit process = AsynchronousProcessAuditLocalServiceUtil.addAsynchronousProcessAudit(themeDisplay.getCompanyId(), themeDisplay.getUserId(), Course.class.getName(), "liferay/lms/courseExport");
-								Message message=new Message();
-								message.put("asynchronousProcessAuditId", process.getAsynchronousProcessAuditId());
-								message.put("groupId", groupId);
-								message.put("fileName", fileName);
-								message.put("key", key);
-								message.put("themeDisplay", themeDisplay);
-								message.put("serviceContext", serviceContext);
-								MessageBusUtil.sendMessage("liferay/lms/courseExport", message);
-								jsonObject.put("status", "generating");
-								jsonObject.put("key", newKey);
-							} else if (Validator.isNotNull(key) && MultiVMPoolUtil.get("exportCourseCache", key) == null){ // Ha pedido exportacion y ya ha acabado
-								SessionMessages.add(request, "courseadmin.export.confirmation.success");
-								jsonObject.put("status", "ready");
-								jsonObject.put("key", key);
-							} else { // Ha pedido una exportacion y aun esta trabajando
-								jsonObject.put("status", "generating");
-								jsonObject.put("key", key);
-							}
-						}
-					}
-					
-				} else {
-					jsonObject.put("error", "bad-permission");
+
+					jsonArray.put(jsonObject);
 				}
-			}catch(Exception e){
-				//log.debug(" Error: "+e.getMessage());
-				e.printStackTrace();
-				jsonObject.put("error", e.getMessage());
-			} finally {
-				response.setCharacterEncoding("UTF-8");
-				response.setContentType("application/json;charset=UTF-8");
-				
-				PrintWriter writer = response.getWriter();
-				writer.write(jsonObject.toString());
 			}
 
-		} else if(action.equals("export")){
-			
-			Role commmanager = null;
-			LmsPrefs prefs = null;
-			try {
-				commmanager = RoleLocalServiceUtil.getRole(themeDisplay.getCompanyId(), RoleConstants.SITE_MEMBER);
-				prefs=LmsPrefsLocalServiceUtil.getLmsPrefs(themeDisplay.getCompanyId());
-			} catch (PortalException e) {
-				if(log.isDebugEnabled()){
-					e.printStackTrace();
-				}
-			} catch (SystemException e) {
-				if(log.isDebugEnabled()){
-					e.printStackTrace();
-				}
-			}
-			
-			
-			long courseId = ParamUtil.getLong(request, "courseId",0);
-			long roleId = ParamUtil.getLong(request, "roleId",0);
-			
-			List<User> users = new ArrayList<User>();
-			
-			UserDisplayTerms displayTerms = new UserDisplayTerms(request);
-			
-			if(roleId==commmanager.getRoleId()){
-				users = displayTerms.getStudents(courseId, QueryUtil.ALL_POS, QueryUtil.ALL_POS);
-			}else if(roleId == prefs.getTeacherRole()){
-				users = displayTerms.getTeachers(courseId, QueryUtil.ALL_POS, QueryUtil.ALL_POS);
-			}else if(roleId == prefs.getEditorRole()){
-				users = displayTerms.getEditors(courseId, QueryUtil.ALL_POS, QueryUtil.ALL_POS);
-			}
+			log.debug("groupTypeIds: "+jsonArray.length());
 			
 			response.setCharacterEncoding("UTF-8");
-			response.setContentType(ContentTypes.TEXT_CSV_UTF8);
-			response.addProperty(HttpHeaders.CONTENT_DISPOSITION,"attachment; fileName=users.csv");
+			response.setContentType("application/json;charset=UTF-8");
+
+			PrintWriter writer = response.getWriter();
+			writer.write(jsonArray.toString());
+		}else{
 			
-			byte b[] = { (byte) 0xEF, (byte) 0xBB, (byte) 0xBF };
+			String action = ParamUtil.getString(request, "action");
 			
-			response.getPortletOutputStream().write(b);
-			
-			CSVWriter writer = new CSVWriter(new OutputStreamWriter(
-					response.getPortletOutputStream(), StringPool.UTF8),CharPool.SEMICOLON);
-			
-			String authType = PropsUtil.get(PropsKeys.COMPANY_SECURITY_AUTH_TYPE);
-			try {
-				Company company = CompanyLocalServiceUtil.getCompany(themeDisplay.getCompanyId());
-				if (Validator.isNotNull(company)) {
-					authType = company.getAuthType();
+			if(action.equals("exportCourse")){
+				JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
+				try {	
+					
+					ServiceContext serviceContext = ServiceContextFactory.getInstance(Course.class.getName(), request);				
+					long groupId  = ParamUtil.getLong(request, "groupId", 0);
+					
+					
+					if (themeDisplay.getPermissionChecker().hasPermission(groupId, Course.class.getName(), groupId, ActionKeys.UPDATE)) {
+						String fileName  = ParamUtil.getString(request, "exportFileName", "New course exported");
+						if(fileName.contains("/")){
+							fileName=fileName.replaceAll("/", "-");
+						}
+						if(!(Validator.isNotNull(fileName)) || !(fileName.length()>0) || !(fileName.contains(".lar")) )
+							jsonObject.put("error", LanguageUtil.get(themeDisplay.getLocale(), "course.export.badformat"));
+						else{
+							ClusterNode nodo = ClusterExecutorUtil.getLocalClusterNode();
+							String clusterNodoId = nodo == null ? StringPool.DASH : nodo.getClusterNodeId();
+							
+							String key = ParamUtil.getString(request, "key", null);
+							String newKey = clusterNodoId + StringPool.UNDERLINE + themeDisplay.getCompanyId() + StringPool.UNDERLINE + groupId;
+							
+							if (!StringPool.DASH.equals(clusterNodoId) && !ClusterExecutorUtil.isClusterNodeAlive(clusterNodoId)) {
+								jsonObject.put("error", "deadnode");
+							} else {
+								if (Validator.isNull(key) && MultiVMPoolUtil.get("exportCourseCache", key) != null) { // Pide exportacion pero ya hay una en curso
+									jsonObject.put("status", "generating");
+									jsonObject.put("key", newKey);
+								} else if (Validator.isNull(key) && MultiVMPoolUtil.get("exportCourseCache", key) == null) { // Pide exportacion y no hay ninguna en curso
+									AsynchronousProcessAudit process = AsynchronousProcessAuditLocalServiceUtil.addAsynchronousProcessAudit(themeDisplay.getCompanyId(), themeDisplay.getUserId(), Course.class.getName(), "liferay/lms/courseExport");
+									Message message=new Message();
+									message.put("asynchronousProcessAuditId", process.getAsynchronousProcessAuditId());
+									message.put("groupId", groupId);
+									message.put("fileName", fileName);
+									message.put("key", key);
+									message.put("themeDisplay", themeDisplay);
+									message.put("serviceContext", serviceContext);
+									MessageBusUtil.sendMessage("liferay/lms/courseExport", message);
+									jsonObject.put("status", "generating");
+									jsonObject.put("key", newKey);
+								} else if (Validator.isNotNull(key) && MultiVMPoolUtil.get("exportCourseCache", key) == null){ // Ha pedido exportacion y ya ha acabado
+									SessionMessages.add(request, "courseadmin.export.confirmation.success");
+									jsonObject.put("status", "ready");
+									jsonObject.put("key", key);
+								} else { // Ha pedido una exportacion y aun esta trabajando
+									jsonObject.put("status", "generating");
+									jsonObject.put("key", key);
+								}
+							}
+						}
+						
+					} else {
+						jsonObject.put("error", "bad-permission");
+					}
+				}catch(Exception e){
+					//log.debug(" Error: "+e.getMessage());
+					e.printStackTrace();
+					jsonObject.put("error", e.getMessage());
+				} finally {
+					response.setCharacterEncoding("UTF-8");
+					response.setContentType("application/json;charset=UTF-8");
+					
+					PrintWriter writer = response.getWriter();
+					writer.write(jsonObject.toString());
 				}
-			} catch (PortalException e) {
-				log.error("Se ha producido un error al obtener el tipo de login de usuario (authType) para companyId=" + themeDisplay.getCompanyId(), e);
-			} catch (SystemException e) {
-				log.error("Se ha producido un error al obtener el tipo de login de usuario (authType) para companyId=" + themeDisplay.getCompanyId(), e);
-			}
-			
-			String[] header = new String[5];
-			
-			if (CompanyConstants.AUTH_TYPE_SN.equalsIgnoreCase(authType)) {
-				header[0] = LanguageUtil.get(themeDisplay.getLocale(), "screen-name");
-			}else if(CompanyConstants.AUTH_TYPE_EA.equalsIgnoreCase(authType)){
-				header[0] = LanguageUtil.get(themeDisplay.getLocale(), "email-address");
-			}else{
-				header[0] = LanguageUtil.get(themeDisplay.getLocale(), "user-id");
-			}
-			
-			header[1] = LanguageUtil.get(themeDisplay.getLocale(), "first-name");
-			header[2] = LanguageUtil.get(themeDisplay.getLocale(), "last-name");
-			header[3] = LanguageUtil.get(themeDisplay.getLocale(), "start-date");
-			header[4] = LanguageUtil.get(themeDisplay.getLocale(), "end-date");
-			
-			writer.writeNext(header);
-			
-			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-			
-			CourseResult courseResult = null;
-			String fechaIni,fechaFin = new String();
-			
-			for(User user:users){			
+	
+			} else if(action.equals("export")){
+				
+				Role commmanager = null;
+				LmsPrefs prefs = null;
 				try {
-					courseResult=CourseResultLocalServiceUtil.getCourseResultByCourseAndUser(courseId, user.getUserId());
+					commmanager = RoleLocalServiceUtil.getRole(themeDisplay.getCompanyId(), RoleConstants.SITE_MEMBER);
+					prefs=LmsPrefsLocalServiceUtil.getLmsPrefs(themeDisplay.getCompanyId());
+				} catch (PortalException e) {
+					if(log.isDebugEnabled()){
+						e.printStackTrace();
+					}
 				} catch (SystemException e) {
-					if(log.isDebugEnabled())e.printStackTrace();
+					if(log.isDebugEnabled()){
+						e.printStackTrace();
+					}
 				}
 				
-				fechaIni = (courseResult!=null&&courseResult.getAllowStartDate() != null)?sdf.format(courseResult.getAllowStartDate()):StringPool.BLANK;
-				fechaFin = (courseResult!=null&&courseResult.getAllowFinishDate() != null)?sdf.format(courseResult.getAllowFinishDate()):StringPool.BLANK;
-			
-				String[] result = new String[5];
+				
+				long courseId = ParamUtil.getLong(request, "courseId",0);
+				long roleId = ParamUtil.getLong(request, "roleId",0);
+				
+				List<User> users = new ArrayList<User>();
+				
+				UserDisplayTerms displayTerms = new UserDisplayTerms(request);
+				
+				if(roleId==commmanager.getRoleId()){
+					users = displayTerms.getStudents(courseId, QueryUtil.ALL_POS, QueryUtil.ALL_POS);
+				}else if(roleId == prefs.getTeacherRole()){
+					users = displayTerms.getTeachers(courseId, QueryUtil.ALL_POS, QueryUtil.ALL_POS);
+				}else if(roleId == prefs.getEditorRole()){
+					users = displayTerms.getEditors(courseId, QueryUtil.ALL_POS, QueryUtil.ALL_POS);
+				}
+				
+				response.setCharacterEncoding("UTF-8");
+				response.setContentType(ContentTypes.TEXT_CSV_UTF8);
+				response.addProperty(HttpHeaders.CONTENT_DISPOSITION,"attachment; fileName=users.csv");
+				
+				byte b[] = { (byte) 0xEF, (byte) 0xBB, (byte) 0xBF };
+				
+				response.getPortletOutputStream().write(b);
+				
+				CSVWriter writer = new CSVWriter(new OutputStreamWriter(
+						response.getPortletOutputStream(), StringPool.UTF8),CharPool.SEMICOLON);
+				
+				String authType = PropsUtil.get(PropsKeys.COMPANY_SECURITY_AUTH_TYPE);
+				try {
+					Company company = CompanyLocalServiceUtil.getCompany(themeDisplay.getCompanyId());
+					if (Validator.isNotNull(company)) {
+						authType = company.getAuthType();
+					}
+				} catch (PortalException e) {
+					log.error("Se ha producido un error al obtener el tipo de login de usuario (authType) para companyId=" + themeDisplay.getCompanyId(), e);
+				} catch (SystemException e) {
+					log.error("Se ha producido un error al obtener el tipo de login de usuario (authType) para companyId=" + themeDisplay.getCompanyId(), e);
+				}
+				
+				String[] header = new String[5];
 				
 				if (CompanyConstants.AUTH_TYPE_SN.equalsIgnoreCase(authType)) {
-					result[0] = user.getScreenName();
+					header[0] = LanguageUtil.get(themeDisplay.getLocale(), "screen-name");
 				}else if(CompanyConstants.AUTH_TYPE_EA.equalsIgnoreCase(authType)){
-					result[0] = user.getEmailAddress();
+					header[0] = LanguageUtil.get(themeDisplay.getLocale(), "email-address");
 				}else{
-					result[0] = String.valueOf(user.getUserId());
+					header[0] = LanguageUtil.get(themeDisplay.getLocale(), "user-id");
 				}
 				
-				result[1] = user.getFirstName();
-				result[2] = user.getLastName();
-				result[3] = fechaIni;
-				result[4] = fechaFin;
-			
-				writer.writeNext(result);
-			}
-			
-			writer.flush();
-			writer.close();
-			response.getPortletOutputStream().flush();
-			response.getPortletOutputStream().close();
-		}else if(action.equals("getCourses")){
-			JSONArray usersJSONArray = JSONFactoryUtil.createJSONArray();
-			
-			String courseTitle = ParamUtil.getString(request, "courseTitle");
-			long courseId = ParamUtil.getLong(request, "courseId");
-			long selectedGroupId = ParamUtil.get(request,"selectedGroupId",-1);
-			int state = ParamUtil.getInteger(request, "state",WorkflowConstants.STATUS_APPROVED);
-			long columnId = ParamUtil.getLong(request, "columnId");
-			String expandoValue = ParamUtil.getString(request, "expandoValue");
-			
-			boolean isAdmin = false;
-			try {
-				isAdmin = RoleLocalServiceUtil.hasUserRole(themeDisplay.getUserId(), RoleLocalServiceUtil.getRole(themeDisplay.getCompanyId(), RoleConstants.ADMINISTRATOR).getRoleId())
-						|| themeDisplay.getPermissionChecker().hasPermission(themeDisplay.getScopeGroupId(), Course.class.getName(), 0, ActionKeys.UPDATE)
-						|| themeDisplay.getPermissionChecker().hasPermission(themeDisplay.getScopeGroupId(), Course.class.getName(), 0, ActionKeys.DELETE)
-						|| themeDisplay.getPermissionChecker().hasPermission(themeDisplay.getScopeGroupId(), Course.class.getName(), 0, ActionKeys.PERMISSIONS)
-						|| themeDisplay.getPermissionChecker().hasPermission(themeDisplay.getScopeGroupId(), Course.class.getName(), 0, "PUBLISH")
-						|| themeDisplay.getPermissionChecker().hasPermission(themeDisplay.getScopeGroupId(), Course.class.getName(), 0, "COURSEEDITOR")
-						|| themeDisplay.getPermissionChecker().hasPermission(themeDisplay.getScopeGroupId(), Course.class.getName(), 0, "ASSIGN_MEMBERS");
+				header[1] = LanguageUtil.get(themeDisplay.getLocale(), "first-name");
+				header[2] = LanguageUtil.get(themeDisplay.getLocale(), "last-name");
+				header[3] = LanguageUtil.get(themeDisplay.getLocale(), "start-date");
+				header[4] = LanguageUtil.get(themeDisplay.getLocale(), "end-date");
 				
-			} catch (SystemException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (PortalException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			
-			long groupId = themeDisplay.getScopeGroupId();
-			if(selectedGroupId>-1){
-				groupId = selectedGroupId;
-			}
-			
-			int closed = -1;
-			if(state!=WorkflowConstants.STATUS_ANY){
-				if(state==WorkflowConstants.STATUS_APPROVED){
-					closed = 0;
+				writer.writeNext(header);
+				
+				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+				
+				CourseResult courseResult = null;
+				String fechaIni,fechaFin = new String();
+				
+				for(User user:users){			
+					try {
+						courseResult=CourseResultLocalServiceUtil.getCourseResultByCourseAndUser(courseId, user.getUserId());
+					} catch (SystemException e) {
+						if(log.isDebugEnabled())e.printStackTrace();
+					}
+					
+					fechaIni = (courseResult!=null&&courseResult.getAllowStartDate() != null)?sdf.format(courseResult.getAllowStartDate()):StringPool.BLANK;
+					fechaFin = (courseResult!=null&&courseResult.getAllowFinishDate() != null)?sdf.format(courseResult.getAllowFinishDate()):StringPool.BLANK;
+				
+					String[] result = new String[5];
+					
+					if (CompanyConstants.AUTH_TYPE_SN.equalsIgnoreCase(authType)) {
+						result[0] = user.getScreenName();
+					}else if(CompanyConstants.AUTH_TYPE_EA.equalsIgnoreCase(authType)){
+						result[0] = user.getEmailAddress();
+					}else{
+						result[0] = String.valueOf(user.getUserId());
+					}
+					
+					result[1] = user.getFirstName();
+					result[2] = user.getLastName();
+					result[3] = fechaIni;
+					result[4] = fechaFin;
+				
+					writer.writeNext(result);
 				}
-				else if(state==WorkflowConstants.STATUS_INACTIVE){
-					closed = 1;
+				
+				writer.flush();
+				writer.close();
+				response.getPortletOutputStream().flush();
+				response.getPortletOutputStream().close();
+			}else if(action.equals("getCourses")){
+				JSONArray usersJSONArray = JSONFactoryUtil.createJSONArray();
+				
+				String courseTitle = ParamUtil.getString(request, "courseTitle");
+				long courseId = ParamUtil.getLong(request, "courseId");
+				long selectedGroupId = ParamUtil.get(request,"selectedGroupId",-1);
+				int state = ParamUtil.getInteger(request, "state",WorkflowConstants.STATUS_APPROVED);
+				long columnId = ParamUtil.getLong(request, "columnId");
+				String expandoValue = ParamUtil.getString(request, "expandoValue");
+				
+				boolean isAdmin = false;
+				try {
+					isAdmin = RoleLocalServiceUtil.hasUserRole(themeDisplay.getUserId(), RoleLocalServiceUtil.getRole(themeDisplay.getCompanyId(), RoleConstants.ADMINISTRATOR).getRoleId())
+							|| themeDisplay.getPermissionChecker().hasPermission(themeDisplay.getScopeGroupId(), Course.class.getName(), 0, ActionKeys.UPDATE)
+							|| themeDisplay.getPermissionChecker().hasPermission(themeDisplay.getScopeGroupId(), Course.class.getName(), 0, ActionKeys.DELETE)
+							|| themeDisplay.getPermissionChecker().hasPermission(themeDisplay.getScopeGroupId(), Course.class.getName(), 0, ActionKeys.PERMISSIONS)
+							|| themeDisplay.getPermissionChecker().hasPermission(themeDisplay.getScopeGroupId(), Course.class.getName(), 0, "PUBLISH")
+							|| themeDisplay.getPermissionChecker().hasPermission(themeDisplay.getScopeGroupId(), Course.class.getName(), 0, "COURSEEDITOR")
+							|| themeDisplay.getPermissionChecker().hasPermission(themeDisplay.getScopeGroupId(), Course.class.getName(), 0, "ASSIGN_MEMBERS");
+					
+				} catch (SystemException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (PortalException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
+				
+				long groupId = themeDisplay.getScopeGroupId();
+				if(selectedGroupId>-1){
+					groupId = selectedGroupId;
+				}
+				
+				int closed = -1;
+				if(state!=WorkflowConstants.STATUS_ANY){
+					if(state==WorkflowConstants.STATUS_APPROVED){
+						closed = 0;
+					}
+					else if(state==WorkflowConstants.STATUS_INACTIVE){
+						closed = 1;
+					}
+				}
+				
+				String[] templates = getCourseTemplates(request.getPreferences(), themeDisplay.getCompanyId());
+				
+				log.debug("courseTitle: " + courseTitle);
+				log.debug("closed: " + closed);
+				log.debug("templates: " + templates);
+				log.debug("columnId: " + columnId);
+				log.debug("expandoValue: " + expandoValue);
+				log.debug("courseId: " + courseId);
+				log.debug("themeDisplay.getCompanyId(): " + themeDisplay.getCompanyId());
+				log.debug("groupId: " + groupId);
+				log.debug("isAdmin: " + isAdmin);
+				
+				LinkedHashMap<String, Object> params = new LinkedHashMap<String, Object>();
+				if(templates != null && templates.length > 0){
+					params.put(CourseParams.PARAM_TEMPLATES, templates);
+				}
+				if(columnId > 0){
+					Object[] expandoValues = {columnId, expandoValue};
+					params.put(CourseParams.PARAM_CUSTOM_ATTRIBUTE, expandoValues);
+				}
+				if(!isAdmin){
+					params.put(CourseParams.PARAM_PERMISSIONS_ADMIN, themeDisplay.getUserId());
+				}
+				
+				List<Course> listCourse = CourseLocalServiceUtil.searchCourses(themeDisplay.getCompanyId(), courseTitle, themeDisplay.getLanguageId(), state, courseId, groupId, params, -1, -1, null);
+				
+				log.debug("Listado de cursos obtenido");
+				
+				JSONObject userJSON = null;
+	
+				for (Course course : listCourse) {
+					userJSON = JSONFactoryUtil.createJSONObject();
+					userJSON.put("courseTitle", course.getTitle(themeDisplay.getLocale()));
+					userJSON.put("courseDescription", course.getDescription(themeDisplay.getLocale()));
+					usersJSONArray.put(userJSON);
+				}
+	
+				PrintWriter out = response.getWriter();
+				out.println(usersJSONArray.toString());
 			}
-			
-			String[] templates = getCourseTemplates(request.getPreferences(), themeDisplay.getCompanyId());
-			
-			log.debug("courseTitle: " + courseTitle);
-			log.debug("closed: " + closed);
-			log.debug("templates: " + templates);
-			log.debug("columnId: " + columnId);
-			log.debug("expandoValue: " + expandoValue);
-			log.debug("courseId: " + courseId);
-			log.debug("themeDisplay.getCompanyId(): " + themeDisplay.getCompanyId());
-			log.debug("groupId: " + groupId);
-			log.debug("isAdmin: " + isAdmin);
-			
-			LinkedHashMap<String, Object> params = new LinkedHashMap<String, Object>();
-			if(templates != null && templates.length > 0){
-				params.put(CourseParams.PARAM_TEMPLATES, templates);
-			}
-			if(columnId > 0){
-				Object[] expandoValues = {columnId, expandoValue};
-				params.put(CourseParams.PARAM_CUSTOM_ATTRIBUTE, expandoValues);
-			}
-			if(!isAdmin){
-				params.put(CourseParams.PARAM_PERMISSIONS_ADMIN, themeDisplay.getUserId());
-			}
-			
-			List<Course> listCourse = CourseLocalServiceUtil.searchCourses(themeDisplay.getCompanyId(), courseTitle, themeDisplay.getLanguageId(), state, courseId, groupId, params, -1, -1, null);
-			
-			log.debug("Listado de cursos obtenido");
-			
-			JSONObject userJSON = null;
-
-			for (Course course : listCourse) {
-				userJSON = JSONFactoryUtil.createJSONObject();
-				userJSON.put("courseTitle", course.getTitle(themeDisplay.getLocale()));
-				userJSON.put("courseDescription", course.getDescription(themeDisplay.getLocale()));
-				usersJSONArray.put(userJSON);
-			}
-
-			PrintWriter out = response.getWriter();
-			out.println(usersJSONArray.toString());
 		}
 	}
 	

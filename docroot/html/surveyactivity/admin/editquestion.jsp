@@ -133,7 +133,7 @@ AUI().ready('node-base' ,'aui-form-validator', 'aui-overlay-context-panel', func
 </script>
 
 <portlet:actionURL var="editquestionURL" name="editquestion" />
-<aui:form name="qfm" action="<%=editquestionURL %>" method="post">
+<aui:form name="qfm" action="<%=editquestionURL %>" method="post" role="form">
 	<aui:input name="resId" type="hidden" value="<%=learningActivity.getActId() %>"></aui:input>
 	<c:if test="<%=typeId != 2 %>">
 		<aui:input name="isHorizontal" label="learningactivity.survey.horizontal" type="checkbox" value="<%=isHorizontal %>" checked="<%=isHorizontal %>"></aui:input>

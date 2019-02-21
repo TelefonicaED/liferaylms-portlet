@@ -25,7 +25,7 @@
 %>
 
 <liferay-portlet:actionURL var="saveConfigurationURL"  portletConfiguration="true"/>
-<aui:form action="<%=saveConfigurationURL %>" >
+<aui:form action="<%=saveConfigurationURL %>" role="form">
 	<aui:input type="hidden" name="<%=Constants.CMD %>" value="<%=Constants.UPDATE %>" />
 	<aui:input type="checkbox" name="showLockedModulesIcon" label="modulelist.showLockedModulesIcon" value="<%=showLockedModulesIcon %>" checked="<%=showLockedModulesIcon %>"/>
 	<aui:input type="checkbox" name="showModuleIcon" label="modulelist.showModuleIcon" value="<%=showModuleIcon %>" checked="<%=showModuleIcon %>"/>

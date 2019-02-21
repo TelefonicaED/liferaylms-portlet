@@ -1,214 +1,238 @@
 package com.liferay.lms.portlet.inscriptioncommunity;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
-import javax.mail.internet.InternetAddress;
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
+import javax.portlet.PortletException;
+import javax.portlet.PortletURL;
 import javax.portlet.ProcessAction;
+import javax.portlet.RenderRequest;
+import javax.portlet.RenderResponse;
+import javax.servlet.http.HttpServletRequest;
 
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.lms.course.inscriptiontype.InscriptionType;
 import com.liferay.lms.course.inscriptiontype.InscriptionTypeRegistry;
 import com.liferay.lms.model.Course;
+import com.liferay.lms.model.CourseCompetence;
+import com.liferay.lms.model.Schedule;
+import com.liferay.lms.service.CourseCompetenceLocalServiceUtil;
 import com.liferay.lms.service.CourseLocalServiceUtil;
-import com.liferay.mail.service.MailServiceUtil;
+import com.liferay.lms.service.ScheduleLocalServiceUtil;
+import com.liferay.lms.util.LmsConstant;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.mail.MailMessage;
 import com.liferay.portal.kernel.servlet.SessionErrors;
+import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.util.ParamUtil;
-import com.liferay.portal.kernel.util.PrefsPropsUtil;
-import com.liferay.portal.kernel.util.PropsKeys;
-import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
-import com.liferay.portal.model.Group;
 import com.liferay.portal.model.GroupConstants;
-import com.liferay.portal.model.User;
-import com.liferay.portal.security.permission.ActionKeys;
-import com.liferay.portal.security.permission.PermissionChecker;
-import com.liferay.portal.security.permission.PermissionCheckerFactoryUtil;
-import com.liferay.portal.service.GroupLocalServiceUtil;
-import com.liferay.portal.service.MembershipRequestLocalServiceUtil;
+import com.liferay.portal.model.MembershipRequestConstants;
+import com.liferay.portal.model.Team;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceContextFactory;
+import com.liferay.portal.service.TeamLocalServiceUtil;
 import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.theme.ThemeDisplay;
-import com.liferay.portlet.social.service.SocialActivityLocalServiceUtil;
+import com.liferay.portal.util.PortalUtil;
 import com.liferay.util.bridges.mvc.MVCPortlet;
 
 
 /** Portlet implementation class CommunityInscription */
 public class CommunityInscription extends MVCPortlet {
 	private static Log log = LogFactoryUtil.getLog(CommunityInscription.class);
-
-	@ProcessAction(name = "member")
-	public void member(ActionRequest request, ActionResponse response) throws SystemException{
-		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(WebKeys.THEME_DISPLAY);
-		Group group = null;
-		Course course = null;
-		int numberUsers = 0;
+	
+	@Override
+	public void doView(RenderRequest renderRequest, RenderResponse renderResponse) throws IOException, PortletException {
+		ThemeDisplay themeDisplay  =(ThemeDisplay)renderRequest.getAttribute(WebKeys.THEME_DISPLAY);
 		try {
-			group = GroupLocalServiceUtil.getGroup(themeDisplay.getScopeGroupId());
-			course = CourseLocalServiceUtil.getCourseByGroupCreatedId(themeDisplay.getScopeGroupId());
-			numberUsers = UserLocalServiceUtil.getGroupUsersCount(themeDisplay.getScopeGroupId());
-		} catch (PortalException e) {
-			if(log.isDebugEnabled()){
-				e.printStackTrace();
-			}
+			Course course= CourseLocalServiceUtil.getCourseByGroupCreatedId(themeDisplay.getScopeGroupId());
 			
-		} catch (SystemException e) {
-			if(log.isDebugEnabled()){
-				e.printStackTrace();
-			}
-		}
-    	
-    	if(group.getType()!=GroupConstants.TYPE_SITE_RESTRICTED){ 
-    		if(log.isDebugEnabled()){
-    			log.debug("Site not restricted!");
-    		}
-    		throw new SystemException("Site not restricted!");
-    	}
-    	
-    	if(course.getMaxusers()>0&&numberUsers>=course.getMaxusers()){
-    		if(log.isDebugEnabled()){
-    			log.debug("Maxusers!"); 
-    		}
-    		throw new SystemException("Maxusers!");
-    	}
-    	
-
-		try {
-			long teamId = ParamUtil.getLong(request, "teamId",0);
-	    	ServiceContext serviceContext=ServiceContextFactory.getInstance(request);
-	    	MembershipRequestLocalServiceUtil.addMembershipRequest(themeDisplay.getUserId(), themeDisplay.getScopeGroupId(), "Enroll petition", serviceContext);
-	    	SocialActivityLocalServiceUtil.addActivity(themeDisplay.getUserId(), course.getGroupId(), Course.class.getName(), course.getCourseId(), com.liferay.portlet.social.model.SocialActivityConstants.TYPE_SUBSCRIBE, "", course.getUserId());
-
-	    	if(teamId>0){
-    			long[] userIds = new long[1];
-    			userIds[0] = themeDisplay.getUserId();	
-    			if(!UserLocalServiceUtil.hasTeamUser(teamId, themeDisplay.getUserId())){
-    				UserLocalServiceUtil.addTeamUsers(teamId, userIds);	
-    			}			
-    		}
+			InscriptionTypeRegistry inscriptionTypeRegistry = new InscriptionTypeRegistry();
+			InscriptionType inscriptionType = inscriptionTypeRegistry.getInscriptionType(course.getInscriptionType());
+			renderRequest.setAttribute("inscriptionType", inscriptionType);
 			
-			List<User> allUsers = UserLocalServiceUtil.getGroupUsers(course.getGroupCreatedId());
-			
-			for(User userTmp : allUsers){
-				PermissionChecker permissionChecker;
-				try {
-					permissionChecker = PermissionCheckerFactoryUtil.create(userTmp);
-					if(log.isDebugEnabled())log.debug(userTmp.getFullName());
-					if(permissionChecker.hasPermission(course.getGroupCreatedId(),Course.class.getName(),course.getCourseId(),ActionKeys.ASSIGN_MEMBERS)){
-						if(log.isDebugEnabled())log.debug(userTmp.getFullName());
-
-				    	String fromName = PrefsPropsUtil.getString(themeDisplay.getCompanyId(),
-								PropsKeys.ADMIN_EMAIL_FROM_NAME);
-						String fromAddress = PrefsPropsUtil.getString(themeDisplay.getCompanyId(),
-								PropsKeys.ADMIN_EMAIL_FROM_ADDRESS);
-						
-						InternetAddress from = new InternetAddress(fromAddress, fromName);
-
-				    	String url = themeDisplay.getURLPortal();
-				    	String urlcourse = themeDisplay.getURLPortal()+"/web"+course.getFriendlyURL(); 
-
-				    	String emailTo = userTmp.getEmailAddress();
-				    	String nameTo = userTmp.getFullName();
-				    	InternetAddress to = new InternetAddress(emailTo, nameTo);
-						
-						String subject = LanguageUtil.format(userTmp.getLocale(),"reply-membership-request-for-x", new String[]{course.getTitle(userTmp.getLocale())});
-				    	String body = StringUtil.replace(
-				    			LanguageUtil.get(userTmp.getLocale(), "reply-membership-body"),
-				    			new String[] {"[$FROM_ADDRESS$]", "[$FROM_NAME$]", "[$PAGE_URL$]","[$PORTAL_URL$]","[$TO_ADDRESS$]","[$TO_NAME$]","[$COURSE_NAME$]"},
-				    			new String[] {fromAddress, fromName, urlcourse, url, emailTo, nameTo,course.getTitle(userTmp.getLocale())});
-				    	try{
-							if(log.isDebugEnabled()){
-								log.debug(from);
-								log.debug(to);
-								log.debug(subject);
-								log.debug(body);
-							}
-							MailMessage mailm = new MailMessage(from, to, subject, body, true);
-							MailServiceUtil.sendEmail(mailm);
-						}
-						catch(Exception ex)
-						{
-							ex.printStackTrace();
-						}
-						
+			log.debug("inscriptionTypeFactory: " + inscriptionType.getTypeId() + " - " + inscriptionType.getPortletId());
+			if(!Validator.isNull(inscriptionType.getPortletId())) {
+				StringBundler sb = new StringBundler();
+				sb.append("<portlet-preferences >");
+				sb.append("<preference>");
+				sb.append("<name>");
+				sb.append("portletSetupShowBorders");
+				sb.append("</name>");
+				sb.append("<value>");
+				sb.append("false");
+				sb.append("</value>");
+				sb.append("</preference>");
+				sb.append("</portlet-preferences>");
+				renderRequest.setAttribute("inscriptionPortletName", inscriptionType.getPortletId());
+				renderRequest.setAttribute("defaultPreferences", sb);
+			}else if(themeDisplay.isSignedIn()){
+				log.debug("usuario logado");
+				HttpServletRequest renderServletRequest = PortalUtil.getHttpServletRequest(renderRequest);
+				HttpServletRequest servletRequest = PortalUtil.getOriginalServletRequest(renderServletRequest);
+				
+				String inscriptionParam = servletRequest.getParameter("inscriptionOk");
+				log.debug("inscriptionParam: " + inscriptionParam);
+				if(Validator.isNotNull(inscriptionParam)){
+					try{
+						SessionMessages.add(renderRequest, "inscription-ok");
+					}catch(Exception e){
+						if(log.isDebugEnabled())e.printStackTrace();
 					}
-				} catch (Exception e) {
-					if(log.isDebugEnabled())e.printStackTrace();
-					if(log.isErrorEnabled())log.error(e.getMessage());
+				}
+				
+				PortletURL unsubscribeURL = renderResponse.createActionURL();
+				unsubscribeURL.setParameter("javax.portlet.action", "unsubscribe");
+				renderRequest.setAttribute("unsubscribeURL", unsubscribeURL);
+				
+				//Comprobamos si estoy inscrita en el curso o en alguna convocatoria
+				if(UserLocalServiceUtil.hasGroupUser(course.getGroupCreatedId(), themeDisplay.getUserId())) {
+					//Ya estoy inscrito, mando el curso y que estoy inscrito
+					log.debug("usuario registrado: " + course.getCourseId() );
+					renderRequest.setAttribute("registredUser", true);
+					renderRequest.setAttribute("course", course);
+				}else {
+					//Comprobamos si estoy inscrita en alguna de las hijas
+					long courseParentId = course.getCourseId();
+					log.debug("courseParentId: " + courseParentId);
+					if(course.getParentCourseId() != LmsConstant.DEFAULT_PARENT_COURSE_ID) {
+						courseParentId = course.getParentCourseId();
+					}
+					
+					renderRequest.setAttribute("TYPE_SITE_OPEN", GroupConstants.TYPE_SITE_OPEN);
+					renderRequest.setAttribute("TYPE_SITE_RESTRICTED", GroupConstants.TYPE_SITE_RESTRICTED);
+					renderRequest.setAttribute("STATUS_PENDING", MembershipRequestConstants.STATUS_PENDING);
+					renderRequest.setAttribute("STATUS_DENIED", MembershipRequestConstants.STATUS_DENIED);
+					
+					log.debug("courseParentId: " + courseParentId);
+					List<Course> listChildCourses = CourseLocalServiceUtil.getChildsRegistredUser(courseParentId, themeDisplay.getUserId());
+					if(listChildCourses != null && listChildCourses.size() > 0) {
+						log.debug("estoy inscrito en una convocatoria hija: " + listChildCourses.get(0).getCourseId());
+						//Estoy inscrita en alguna convocatoria de las hijas, mando qeu estoy inscrita y las convocatorias en las que estoy
+						renderRequest.setAttribute("registredUser", true);
+						renderRequest.setAttribute("listChildCourses", listChildCourses);
+					}else {
+						//Comprobamos los prerequisitos del curso padre (tanto si tiene convocatorias como si no)
+						List<CourseCompetence> listCourseCompetences = CourseCompetenceLocalServiceUtil.findBycourseId( 
+								course.getParentCourseId() == 0 ? course.getCourseId() : course.getParentCourseId(), true);
+						renderRequest.setAttribute("listCourseCompetences", listCourseCompetences);
+						
+						PortletURL enrollURL = renderResponse.createActionURL();
+						enrollURL.setParameter("javax.portlet.action", "enroll");
+						renderRequest.setAttribute("enrollURL", enrollURL);
+						
+						//Si es una convocatoria sabemos que no estoy inscrito en ninguna más así que paso el curso, además 
+						//no puede tener inscripción por equipos porque sólo la tienen los padre
+						if(course.getParentCourseId() != LmsConstant.DEFAULT_PARENT_COURSE_ID) {
+							log.debug("Es convocatoria hija: " + course.getCourseId());
+							renderRequest.setAttribute("course", course);
+						}else {
+							//Si es un curso padre y no tengo convocatorias hijas mando el curso, si no mando las hijas
+							//Buscamos los cursos hijos abiertos o restringidos
+							
+							listChildCourses = CourseLocalServiceUtil.getOpenOrRestrictedChildCourses(course.getCourseId());
+							
+							if(course.getParentCourseId() == LmsConstant.DEFAULT_PARENT_COURSE_ID && (listChildCourses == null || listChildCourses.size() == 0)) {
+								log.debug("Es convocatoria padre que no tiene hijos: " + course.getCourseId());
+								//Mando sólo el curso hijo
+								renderRequest.setAttribute("course", course);
+								//Si es curso padre y no tiene cursos hijos puede haber inscripción por equipos
+								List<Team> teams = TeamLocalServiceUtil.getGroupTeams(course.getGroupCreatedId());
+								List<Schedule> schedules = new ArrayList<Schedule>();
+								Schedule schedule = null;
+								Date now = new Date();
+								for(Team team : teams){
+									schedule = ScheduleLocalServiceUtil.getScheduleByTeamId(team.getTeamId());	
+									if(schedule!=null){
+										renderRequest.setAttribute("hasTeams", true);
+										log.debug("hasTeams");
+										if(schedule.getStartDate().before(now)&&schedule.getEndDate().after(now)){
+											schedules.add(schedule);
+										}	
+									}
+								}
+								renderRequest.setAttribute("schedules", schedules);
+								log.debug("schedules: " + schedules.size());	
+							}else {
+								renderRequest.setAttribute("listChildCourses", listChildCourses);
+								log.debug("childCourses: " + listChildCourses.size());
+								//Paso también el curso padre
+								renderRequest.setAttribute("course", course);
+								log.debug("course: " + course.getCourseId());
+							}
+						}
+					}
 				}
 			}
 			
-		} catch (PortalException e) {
-			if(log.isDebugEnabled()){
-				e.printStackTrace();
-			}
+			super.doView(renderRequest, renderResponse);
+		} catch (Exception e) {
+			e.printStackTrace();
+			renderRequest.setAttribute(WebKeys.PORTLET_CONFIGURATOR_VISIBILITY, Boolean.FALSE);
+		}
+	}
+
+	@ProcessAction(name = "enroll") 
+	public void enroll(ActionRequest actionRequest, ActionResponse actionResponse) throws PortalException, SystemException{
+		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
+		if (!themeDisplay.isSignedIn()) {return;}
+		
+		long courseId = ParamUtil.getLong(actionRequest, "courseId");
+		long teamId = ParamUtil.getLong(actionRequest, "teamId");
+		
+		log.debug("courseId: " + courseId);
+		log.debug("teamId: " + teamId);
+		
+		Course course = CourseLocalServiceUtil.getCourse(courseId);
+		
+		ServiceContext serviceContext = ServiceContextFactory.getInstance(Course.class.getName(), actionRequest);
+		try {
+			InscriptionTypeRegistry inscriptionTypeRegistry = new InscriptionTypeRegistry();
 			
-		}catch (SystemException e) {
-			if(log.isDebugEnabled()){
-				e.printStackTrace();
+			InscriptionType inscriptionType = inscriptionTypeRegistry.getInscriptionType(course.getInscriptionType());
+			
+			inscriptionType.enrollUser(courseId, themeDisplay.getUserId(), teamId, serviceContext);
+			if(course.getGroupCreatedId() != themeDisplay.getScopeGroupId()) {
+				//Redirijo
+				String url = themeDisplay.getPortalURL() + "/" + themeDisplay.getLocale().getLanguage() + "/web" + course.getFriendlyURL()+"?inscriptionOk=true";
+	    		log.debug("Redirect to: "+url);
+	    		actionResponse.sendRedirect(url);
 			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			SessionErrors.add(actionRequest, "error-enroll-user", e.getMessage());
 		}
 	}
 	
-	@ProcessAction(name = "inscribir") 
-	public void inscribir(ActionRequest request, ActionResponse response) throws Exception{
-
-		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(WebKeys.THEME_DISPLAY);
+	@ProcessAction(name="unsubscribe")
+	public void unsubscribe(ActionRequest actionRequest, ActionResponse actionResponse) throws PortalException, SystemException{
+		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
 		if (!themeDisplay.isSignedIn()) {return;}
-
-		long teamId = ParamUtil.getLong(request, "teamId",0);
-		long groupId = themeDisplay.getScopeGroupId();	
-    	
-    	Course course = CourseLocalServiceUtil.getCourseByGroupCreatedId(groupId);
-    	
-    	log.debug("COURSE GROUP ID "+course.getGroupCreatedId());
-    	log.debug("THEME DISPLAY GROUP "+groupId);
-    	long userId = themeDisplay.getUserId();
-    	
-    	ServiceContext serviceContext=ServiceContextFactory.getInstance(request);
-    	
-    	InscriptionType inscriptionType = new InscriptionTypeRegistry().getInscriptionType(course.getInscriptionType());
-    	
-    	String result = inscriptionType.enrollUser(course.getCourseId(), userId, teamId, serviceContext);
-    	
-    	if(!result.equalsIgnoreCase("ok")){
-    		if(result.equalsIgnoreCase("error-complete-course")){
-    			SessionErrors.add(request, "inscription-error-max-users");
-    		}else if(result.equalsIgnoreCase("error-private-course")){
-    			SessionErrors.add(request, "inscription-error-syte-restricted");
-    		}else if(result.equalsIgnoreCase("error-user-suscribed")){
-    			SessionErrors.add(request, "inscription-error-already-enrolled");
-    		}else{
-    			SessionErrors.add(request, "inscription-error");
-    		}
-    	}
-    }
-	
-	public void desinscribir(ActionRequest request, ActionResponse response) throws Exception{
-
-		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(WebKeys.THEME_DISPLAY);
-		if (!themeDisplay.isSignedIn()) {return;}
-
-		long[] groupId = new long[1];
-    	groupId[0] = themeDisplay.getScopeGroupId();						
-		long userId = themeDisplay.getUserId();
 		
-		Course course = CourseLocalServiceUtil.getCourseByGroupCreatedId(groupId[0]);
-
-		InscriptionType inscriptionType = new InscriptionTypeRegistry().getInscriptionType(course.getInscriptionType());
+		long courseId = ParamUtil.getLong(actionRequest, "courseId");
+		log.debug("InscriptionPortlet::unsubscribe::courseId::" + courseId);
 		
-
-		boolean result = inscriptionType.unsubscribeUser(course, userId);
-
-		if(!result){
-			SessionErrors.add(request, "inscription-error-already-disenrolled");
+		Course course = CourseLocalServiceUtil.getCourse(courseId);
+		
+		InscriptionTypeRegistry inscriptionTypeRegistry = new InscriptionTypeRegistry();
+		InscriptionType inscriptionType = inscriptionTypeRegistry.getInscriptionType(course.getInscriptionType());
+		
+		boolean result = inscriptionType.unsubscribeUser(course, themeDisplay.getUserId());
+		
+		log.debug("InscriptionPortlet::unsubscribe::result::" + result);
+		if(result) {
+			SessionMessages.add(actionRequest, "unsusbscribe");
+		}else{
+			SessionErrors.add(actionRequest, "unsusbscribe");
 		}
 	}
 

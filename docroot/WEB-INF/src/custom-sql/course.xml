@@ -315,5 +315,18 @@
 				(ev.data_ LIKE ? AND ev.tableId = ?	AND ev.columnId = ?)
 		]]>
 	</sql>
+	<sql id="com.liferay.lms.service.persistence.CourseFinder.findChildRegistredUser">
+		<![CDATA[
+			SELECT 
+				DISTINCT c.*
+			FROM 
+				lms_course c
+			INNER JOIN 
+				users_groups ug 
+					ON c.groupCreatedId = ug.groupId AND ug.userId = ?
+			WHERE 
+				c.parentCourseId = ? 
+		]]>
+	</sql>
 
 </custom-sql>

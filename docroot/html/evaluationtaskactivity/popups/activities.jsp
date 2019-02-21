@@ -353,7 +353,7 @@
 //-->
 </script>
 
-<aui:form name="activities">
+<aui:form name="activities" role="form">
 	<% if(showPassPuntuation) {
 	%>
 		<aui:fieldset>

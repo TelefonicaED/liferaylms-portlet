@@ -51,7 +51,7 @@
 
 </liferay-ui:search-container>
 
-<aui:form name="fmActions" action="" method="POST">
+<aui:form name="fmActions" action="" role="form" method="POST">
 	<aui:input type="hidden" name="courseTypeId" value=""/>
 </aui:form>
 

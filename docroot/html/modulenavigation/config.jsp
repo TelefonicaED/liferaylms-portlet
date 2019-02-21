@@ -19,7 +19,7 @@
 
 
 <liferay-portlet:actionURL var="saveConfigurationURL"  portletConfiguration="true"/>
-<aui:form action="<%=saveConfigurationURL %>" >
+<aui:form action="<%=saveConfigurationURL %>" role="form">
 	<aui:input type="hidden" name="<%=Constants.CMD %>" value="<%=Constants.UPDATE %>" />
 	<aui:input type="checkbox" name="showPreviousModuleButton" label="modulenavigation.showpreviousmodulebutton" value="<%=showPreviousModuleButton %>" checked="<%=showPreviousModuleButton %>"/>
 	<aui:button-row>
