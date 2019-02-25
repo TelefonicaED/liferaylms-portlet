@@ -106,7 +106,7 @@ function ignoreEnter(e) {
 }
 </script>
 	
-<aui:form name="exportForm" action="<%=exportURL%>" method="post" >
+<aui:form name="exportForm" action="<%=exportURL%>" method="post" role="form">
 
 	<liferay-ui:error key="courseadmin.delete.exported.confirmation.error" message="courseadmin.delete.exported.confirmation.error"></liferay-ui:error>
 	<liferay-ui:success key="courseadmin.delete.exported.confirmation.success" message="courseadmin.delete.exported.confirmation.success"></liferay-ui:success>

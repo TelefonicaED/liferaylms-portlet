@@ -148,7 +148,7 @@ if(!ownGrade){
 	<portlet:param name="criteria" value="<%=criteria %>" />
 </portlet:actionURL>
 
-<aui:form  name="fn_grades" method="post" action="${updateGradesURL}" >
+<aui:form  name="fn_grades" method="post" action="${updateGradesURL}" role="form">
 	<aui:fieldset>
 		<aui:input type="hidden" name="studentId" value='<%=renderRequest.getParameter("studentId") %>' />
 	    <aui:input type="text" name="result" label="offlinetaskactivity.grades" helpMessage="<%=LanguageUtil.format(pageContext, \"offlinetaskactivity.grades.resultMessage\", new Object[]{ct.translate(themeDisplay.getLocale(), themeDisplay.getScopeGroupId(), activity.getPasspuntuation())})%>" value='<%=result!=null?ct.translate(themeDisplay.getLocale(), themeDisplay.getScopeGroupId(),result.getResult()):"" %>'>

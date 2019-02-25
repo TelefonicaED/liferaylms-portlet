@@ -53,7 +53,7 @@ if(courseResult!=null)
 </portlet:actionURL>
 
 <portlet:renderURL var="cancel" />
-<aui:form name="fm" action="<%=editInscriptionDatesURL%>"  method="post">
+<aui:form name="fm" role="form" action="<%=editInscriptionDatesURL%>"  method="post">
 <aui:field-wrapper label="start-date">
 <aui:input name="courseId" type="hidden" value="<%=courseId %>" />
 <aui:input name="userId" type="hidden" value="<%=userId %>" />

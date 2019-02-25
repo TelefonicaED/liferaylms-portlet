@@ -3,6 +3,7 @@ package com.liferay.lms.upgrade;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -23,6 +24,7 @@ import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.model.Company;
 import com.liferay.portal.model.ResourceConstants;
 import com.liferay.portal.service.CompanyLocalServiceUtil;
+import com.liferay.portal.service.ResourceActionLocalServiceUtil;
 import com.liferay.portal.service.ResourcePermissionLocalServiceUtil;
 import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
 
@@ -203,6 +205,23 @@ public class UpgradeVersion_3_7_0 extends UpgradeProcess {
 		/*****************AÑADIMOS PERMISOS AÑADIR ACTIVIDAD AL EDITOR DE CURSOS**************/
 		/*********************************************************************************************/
 		
+		//Comprobamos que los permisos existan
+		try{
+			List<String> actionIds =  new ArrayList<String>();
+			actionIds.add("ADD_ACTIVITY");
+			ResourceActionLocalServiceUtil.checkResourceActions("com.liferay.lms.learningactivity.ResourceExternalLearningActivityType", actionIds);
+			ResourceActionLocalServiceUtil.checkResourceActions("com.liferay.lms.learningactivity.ResourceInternalLearningActivityType", actionIds);
+			ResourceActionLocalServiceUtil.checkResourceActions("com.liferay.lms.learningactivity.SurveyLearningActivityType", actionIds);
+			ResourceActionLocalServiceUtil.checkResourceActions("com.liferay.lms.learningactivity.TaskEvaluationLearningActivityType", actionIds);
+			ResourceActionLocalServiceUtil.checkResourceActions("com.liferay.lms.learningactivity.TaskOfflineLearningActivityType", actionIds);
+			ResourceActionLocalServiceUtil.checkResourceActions("com.liferay.lms.learningactivity.TaskOnlineLearningActivityType", actionIds);
+			ResourceActionLocalServiceUtil.checkResourceActions("com.liferay.lms.learningactivity.TaskP2PLearningActivityType", actionIds);
+			ResourceActionLocalServiceUtil.checkResourceActions("com.liferay.lms.learningactivity.TestLearningActivityType", actionIds);
+		
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+
 		List<Company> listCompanies = CompanyLocalServiceUtil.getCompanies();
 		
 		LmsPrefs lmsPrefs = null;

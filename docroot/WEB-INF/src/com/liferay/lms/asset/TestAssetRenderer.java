@@ -6,17 +6,23 @@ import javax.portlet.WindowState;
 
 import com.liferay.lms.learningactivity.TestLearningActivityType;
 import com.liferay.lms.model.LearningActivity;
+import com.liferay.lms.service.LearningActivityLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityTryLocalServiceUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portlet.PortletURLFactoryUtil;
 
+
 public class TestAssetRenderer extends LearningActivityBaseAssetRenderer {
 
+	private static Log log = LogFactoryUtil.getLog(TestAssetRenderer.class);
+	
 	public TestAssetRenderer(LearningActivity learningactivity, 
 			TestLearningActivityType testLearningActivityType)
 			throws SystemException, PortalException {
@@ -29,12 +35,28 @@ public class TestAssetRenderer extends LearningActivityBaseAssetRenderer {
 			LiferayPortletResponse liferayPortletResponse,
 			WindowState windowState) throws Exception {
 
-		if((getLearningactivity().getTries()==0)||
-		   (Validator.isNotNull(LearningActivityTryLocalServiceUtil.getLearningActivityTryNotFinishedByActUser(getLearningactivity().getActId(), userId)))) {
-			return "/html/execactivity/test/view.jsp";
+		LearningActivity learningActivity = getLearningactivity();
+		
+		boolean onlyPreview = Boolean.valueOf(LearningActivityLocalServiceUtil.getExtraContentValue(learningActivity.getActId(), "showOnlyPreview", "false"));
+		long learningActivityTries = learningActivity.getTries();
+		int userTries = LearningActivityTryLocalServiceUtil.getTriesCountByActivityAndUser(learningActivity.getActId(), userId);
+		boolean userHasTried = Validator.isNotNull(userTries) && userTries>0;
+
+		if(log.isDebugEnabled()){
+			log.debug("::getMvcPathView:: onlyPreview :: " + onlyPreview);
+			log.debug("::getMvcPathView:: learningActivityTries :: " + learningActivityTries);
+			log.debug("::getMvcPathView:: userHasTried :: " + userHasTried);
+		}
+
+		if((learningActivityTries>0 && !userHasTried) || onlyPreview) {
+			if(log.isDebugEnabled())
+				log.debug("::getMvcPathView::/html/execactivity/test/preview.jsp");
+			return "/html/execactivity/test/preview.jsp";
 		}
 		else {
-			return "/html/execactivity/test/preview.jsp";
+			if(log.isDebugEnabled())
+				log.debug("::getMvcPathView::/html/execactivity/test/view.jsp");
+			return "/html/execactivity/test/view.jsp";
 		}
 	}
 	

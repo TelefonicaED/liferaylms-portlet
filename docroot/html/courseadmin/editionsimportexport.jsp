@@ -3,7 +3,7 @@
 		<span class="close" ></span>
 		<p><liferay-ui:message key="course-admin.editions.import-export.help"/></p>
 		<a href="${importEditionsExampleURL }" ><liferay-ui:message key="course-admin.editions.import-export.download-example-file"/></a>
-		<aui:form name="importFm" action="${importEditionsURL }" method="POST" enctype="multipart/form-data"  >
+		<aui:form name="importFm" action="${importEditionsURL }" role="form" method="POST" enctype="multipart/form-data"  >
 			<aui:select name="courseTemplate" label="course-template">
 				<c:forEach items="${lspList}" var="lsp">
 					<aui:option value="${lsp.layoutSetPrototypeId}" selected="${lsp.layoutSetPrototypeId == parentLspId}">${lsp.getName(themeDisplay.getLocale())}</aui:option>

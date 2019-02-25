@@ -119,7 +119,7 @@ for(Layout l:layoutForPortletName){
 	<div class="action">
 		<h4><liferay-ui:message key="portaladmin.reset-audit-implementations" /></h4>
 		<portlet:actionURL name="resetAuditImplamentations" var="resetAuditImplamentationsURL" />
-		<aui:form action="${resetAuditImplamentationsURL}" name="resetAuditImplamentationsFm" >
+		<aui:form action="${resetAuditImplamentationsURL}" name="resetAuditImplamentationsFm" role="form">
 		<aui:button-row>
 			<aui:button type="submit" value="reset" name="reset" class="submit"/>
 		</aui:button-row>
@@ -129,7 +129,7 @@ for(Layout l:layoutForPortletName){
 	<div class="action">
 		<h4><liferay-ui:message key="portaladmin.updateModulePassedDate" /></h4>
 		<portlet:actionURL name="updateModulePassedDate" var="updateModulePassedDateURL" />
-		<aui:form action="<%=updateModulePassedDateURL %>" method="POST" name="form_mail">		
+		<aui:form action="<%=updateModulePassedDateURL %>" method="POST" name="form_mail" role="form">		
 			<aui:input name="updateBD" label="portaladmin.multimedia.updatebd" type="checkbox" helpMessage="portaladmin.updateModulePassedDate"></aui:input>
 			<aui:button-row>
 				<aui:button type="submit" value="send" label="portaladmin.updateModulePassedDate" class="submit"></aui:button>
@@ -174,7 +174,7 @@ for(Layout l:layoutForPortletName){
 	<div class="action">
 		<h4><liferay-ui:message key="cambiar nombre del portlet" /></h4>
 		<portlet:actionURL name="changePortletName" var="changePortletNameURL" />
-		<aui:form action="<%=changePortletNameURL %>" method="POST" name="form_mail">
+		<aui:form action="<%=changePortletNameURL %>" method="POST" name="form_mail" role="form">
 					
 			<aui:select name="before" label="portaladmin.portletname.before" helpMessage="portaladmin.portletname.help">
 			<%
@@ -242,7 +242,7 @@ for(Layout l:layoutForPortletName){
 	<portlet:actionURL name="updateExtraContentMultimediaActivities" var="updateExtraContentMultimediaActivitiesURL" />
 	<div class="action">
 		<h4><liferay-ui:message key="portaladmin.multimedia.updateextracontent" /></h4>
-		<aui:form action="<%=updateExtraContentMultimediaActivitiesURL %>" method="POST" name="form_mail">
+		<aui:form action="<%=updateExtraContentMultimediaActivitiesURL %>" method="POST" name="form_mail" role="form">
 			<aui:input name="updateBD" label="portaladmin.multimedia.updatebd" type="checkbox"></aui:input>
 			<aui:button-row>
 				<aui:button type="submit" value="send" label="portaladmin.multimedia.updatebd" class="submit" ></aui:button>
@@ -253,7 +253,7 @@ for(Layout l:layoutForPortletName){
 	<portlet:actionURL name="updateExtraContentScormActivities" var="updateExtraContentScormActivitiesURL" />
 	<div class="action">
 		<h4><liferay-ui:message key="portaladmin.scorm.updateextracontent" /></h4>
-		<aui:form action="<%=updateExtraContentScormActivitiesURL %>" method="POST" name="form_mail">
+		<aui:form action="<%=updateExtraContentScormActivitiesURL %>" method="POST" name="form_mail" role="form">
 			<aui:input name="updateBD" label="portaladmin.multimedia.updatebd" type="checkbox"></aui:input>
 			<aui:button-row>
 				<aui:button type="submit" value="send" label="portaladmin.multimedia.updatebd" class="submit" ></aui:button>
@@ -264,7 +264,7 @@ for(Layout l:layoutForPortletName){
 	<portlet:actionURL name="deleteRepeatedModuleResult" var="deleteRepeatedModuleResultURL" />
 	<div class="action">
 		<h4><liferay-ui:message key="portaladmin.multimedia.deleteRepeatedModuleResult" /></h4>
-		<aui:form action="<%=deleteRepeatedModuleResultURL %>" method="POST" name="form_mail">
+		<aui:form action="<%=deleteRepeatedModuleResultURL %>" method="POST" name="form_mail" role="form">
 			<aui:input name="updateBD" label="portaladmin.multimedia.updatebd" type="checkbox"></aui:input>
 			<aui:button-row>
 				<aui:button type="submit" value="update" class="submit" ></aui:button>

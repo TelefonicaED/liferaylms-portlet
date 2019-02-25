@@ -7,7 +7,7 @@ String text=ParamUtil.getString(request, "text","").trim();
 
 %>
 <div class="buscadorcursos">
-<aui:form name="searchForm" action="<%=searchURL %>" method="POST">
+<aui:form name="searchForm" action="<%=searchURL %>" method="POST" role="search">
 <aui:input name="text" label="" inlineLabel="false" value="<%=text %>"></aui:input>
 <aui:button-row>
 	<aui:button type="submit" value="search"></aui:button>

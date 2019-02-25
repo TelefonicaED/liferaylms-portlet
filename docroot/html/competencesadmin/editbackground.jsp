@@ -115,7 +115,7 @@
 	<liferay-ui:search-iterator searchContainer="${searchContainer}" paginate="<%=true%>" />
 </liferay-ui:search-container>
 			
-<aui:form name="fm" action="<%=saveBackgroundURL%>"  method="post" enctype="multipart/form-data">
+<aui:form name="fm" action="<%=saveBackgroundURL%>" role="form" method="post" enctype="multipart/form-data">
 	<aui:input type="hidden" name="groupId" value="<%=themeDisplay.getScopeGroupId() %>"/>
 	<aui:input type="hidden" name="folderId" value="<%=folder.getFolderId()%>" />
 	<aui:input name="fileName" label="image" id="fileName" type="file" value="" >

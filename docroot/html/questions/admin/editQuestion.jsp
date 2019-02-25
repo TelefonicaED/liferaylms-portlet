@@ -56,7 +56,7 @@
 <liferay-util:include page="/html/questions/admin/editHeader.jsp" servletContext="<%=this.getServletContext() %>" />
 
 <portlet:actionURL var="editQuestionURL" name="editQuestion" />
-<aui:form name="qfm" action="<%=editQuestionURL %>" method="post" onSubmit="javascript:return false;">
+<aui:form name="qfm" action="<%=editQuestionURL %>" method="post" onSubmit="javascript:return false;" role="form">
 
 	<%
 		QuestionType qt = 	new QuestionTypeRegistry().getQuestionType(typeId);

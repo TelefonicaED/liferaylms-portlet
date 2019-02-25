@@ -314,7 +314,7 @@ if(!"".equals(preferences.getValue("showSearchCategoriesGeneralStats", ""))){
 <portlet:renderURL var="searchURL">
 </portlet:renderURL>
 	<div class="admin-course-search-form">
-		<aui:form action="${searchURL}" method="post" name="search">
+		<aui:form action="${searchURL}" method="post" name="search" role="search">
 			<aui:fieldset cssClass="checkBoxes">
 				<aui:input name="search" type="hidden" value="search" />
 				<aui:input inlineField="true" name="freetext" type="text" value="<%=freetext %>">

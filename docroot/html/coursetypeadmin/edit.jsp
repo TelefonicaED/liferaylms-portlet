@@ -6,7 +6,7 @@
 <liferay-ui:error key="coursetypeadmin.error.add-new-coursetype" message="coursetypeadmin.error.add-new-coursetype" />
 <liferay-ui:error key="coursetypeadmin.error.update-coursetype" message="coursetypeadmin.error.update-coursetype" />
 
-<aui:form name="savecoursetypefm" action="${saveCourseTypeURL }"  method="post" enctype="multipart/form-data">
+<aui:form name="savecoursetypefm" action="${saveCourseTypeURL }"  method="post" role="form" enctype="multipart/form-data">
 	<aui:input type="hidden" name="courseTypeId" value="${courseType.courseTypeId }"/>
 	
 	<div>
