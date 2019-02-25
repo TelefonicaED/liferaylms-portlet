@@ -79,7 +79,7 @@ public class ExportUtil {
 			try {
 				file = DLAppLocalServiceUtil.getFileEntryByUuidAndGroupId(uuid, Long.parseLong(fileGroupId));
 				
-				String pathqu = getEntryPath(context, file);
+				String pathqu = getEntryPath(context, file.getFileEntryId());
 				String pathFile = getDescriptionModulePath(context, moduleId); 
 						
 				context.addZipEntry(pathqu, file);
@@ -126,7 +126,7 @@ public class ExportUtil {
 			try {
 				FileEntry file = DLAppLocalServiceUtil.getFileEntryByUuidAndGroupId(uuid, Long.parseLong(fileGroupId));
 
-				String pathqu = getEntryPath(context, file);
+				String pathqu = getEntryPath(context, file.getFileEntryId());
 				String pathFile = getDescriptionModulePath(context, moduleId); 
 						
 				context.addZipEntry(pathqu, file);
@@ -158,12 +158,12 @@ public class ExportUtil {
 		return sb.toString();
 	}
 	
-	private static String getEntryPath(PortletDataContext context, FileEntry file) {
+	public static String getEntryPath(PortletDataContext context, long fileEntryId) {
 		
 		StringBundler sb = new StringBundler(4);
 		sb.append(context.getPortletPath("resourceactivity_WAR_liferaylmsportlet"));
 		sb.append("/moduleentries/");
-		sb.append(file.getFileEntryId());
+		sb.append(fileEntryId);
 		sb.append(".xml");
 		return sb.toString();
 	}
@@ -184,7 +184,7 @@ public class ExportUtil {
 	
 	public static String changeSpecialCharacter(String str) {
 		String fullName = "";
-		if(str.lastIndexOf(".")>0){
+		if(str.lastIndexOf(".") > 0 && !str.endsWith(".")){
 			String name = str.substring(0, str.lastIndexOf("."));
 		    String extension = str.substring(str.lastIndexOf("."));
 		    fullName =   name.replaceAll("[^a-zA-Z0-9]", "") + extension;

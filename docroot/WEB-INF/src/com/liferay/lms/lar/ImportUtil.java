@@ -87,6 +87,9 @@ public class ImportUtil {
 				String imageName = name[name.length-1];
 				InputStream input = context.getZipEntryAsInputStream(entryElement.attributeValue("file"));
 				
+				log.debug("imageName: " + imageName);
+				log.debug("input: " + input);
+				
 				if(input != null){
 					log.info("mimeType: " + fileEntryOld.getMimeType());
 					try {								

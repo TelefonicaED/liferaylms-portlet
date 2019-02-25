@@ -8,6 +8,7 @@ import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
 import javax.portlet.PortletResponse;
 
+import com.liferay.lms.lar.ExportUtil;
 import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.model.LearningActivityResult;
 import com.liferay.lms.model.LearningActivityTry;
@@ -177,7 +178,6 @@ public abstract class BaseLearningActivityType implements LearningActivityType, 
 	@Override
 	public AssetRenderer getAssetRenderer(LearningActivity larn)
 			throws SystemException, PortalException {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -234,11 +234,11 @@ public abstract class BaseLearningActivityType implements LearningActivityType, 
 			}
 	
 			log.info("file Title: " + title);
-			title = changeSpecialCharacter(title);
+			title = ExportUtil.changeSpecialCharacter(title);
 			title += extension;
 			log.info("title: " + title);
 			
-			String pathqu = getEntryPath(context, docfile);
+			String pathqu = ExportUtil.getEntryPath(context, docfile.getFileEntryId());
 			String pathFile = getFilePath(context, docfile,actividad.getActId());
 			Element entryElementfe= entryElementLoc.addElement("dlfileentry");
 			entryElementfe.addAttribute("path", pathqu);
@@ -270,21 +270,7 @@ public abstract class BaseLearningActivityType implements LearningActivityType, 
 		}
 	}
 	
-	private static String changeSpecialCharacter(String str) {
-	    
-		str = str.replaceAll("[^a-zA-Z0-9.]", "");
-	    return str;
-	}
 	
-	private static String getEntryPath(PortletDataContext context, DLFileEntry file) {
-		
-		StringBundler sb = new StringBundler(4);
-		sb.append(context.getPortletPath("resourceactivity_WAR_liferaylmsportlet"));
-		sb.append("/moduleentries/");
-		sb.append(file.getFileEntryId());
-		sb.append(".xml");
-		return sb.toString();
-	}
 	
 	private static String getFilePath(PortletDataContext context,DLFileEntry file, long actId) {
 		
