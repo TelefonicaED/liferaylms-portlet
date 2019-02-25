@@ -73,14 +73,25 @@ public class AsynchronousProcessAuditFinderImpl extends BasePersistenceImpl<Cour
 	}
 
  	
-	public List<AsynchronousProcessAudit> getByCompanyIdClassNameIdCreateDate(long companyId, String type, Date startDate, Date endDate, int start, int end){
+	public List<AsynchronousProcessAudit> getByCompanyIdClassNameIdCreateDate(long companyId, String type,long userId, Date startDate, Date endDate, int start, int end){
 		Session session = null;
 		List<AsynchronousProcessAudit> asynchronousProcessAudits = new ArrayList<AsynchronousProcessAudit>();
 		try{
 			session = openSession();
 			String sql = CustomSQLUtil.get(GET_BY_COMPANY_CLASSNAME_CREATE_DATE);
+			//Logica para incluir select multiples en la consulta de procesos asincronos
 			if(Validator.isNull(type)){
-				sql = sql.replace("AND asy.type_ = ?", "");
+				sql = sql.replace("AND asy.type_ IN (?)", "");
+			}else{
+				if(type.indexOf(",")>=0){
+					String bffcopy="";
+					for (String s : type.split(",")) { bffcopy = bffcopy + ",?"; }
+					String sqlReplace = "AND asy.type_ IN ("+bffcopy.replaceFirst(",","")+")";
+					sql = sql.replace("AND asy.type_ IN (?)", sqlReplace);
+				}
+			}
+			if(Validator.equals(userId, 0L)){
+				sql = sql.replace("AND asy.userId = ?", "");
 			}
 			
 			if(start < 0 && end < 0){
@@ -107,6 +118,8 @@ public class AsynchronousProcessAuditFinderImpl extends BasePersistenceImpl<Cour
 			
 			
 			log.debug("SQL "+sql);
+			
+			
 			SQLQuery q = session.createSQLQuery(sql);
 			q.addEntity("Lms_AsynchronousProcessAudit", AsynchronousProcessAuditImpl.class);
 			if(log.isDebugEnabled()){
@@ -114,6 +127,7 @@ public class AsynchronousProcessAuditFinderImpl extends BasePersistenceImpl<Cour
 				if(Validator.isNotNull(type)){
 					log.debug("--TypeId: "+type);
 				}
+				log.debug("--userId "+userId);
 				log.debug("--Start Date: "+startDate);
 				log.debug("--EndDate: "+endDate);
 			}
@@ -121,11 +135,22 @@ public class AsynchronousProcessAuditFinderImpl extends BasePersistenceImpl<Cour
 			
 			qPos.add(companyId);
 			if(Validator.isNotNull(type)){
-				qPos.add(type);	
+				if(type.indexOf(",")>=0){
+					String[] split = type.split(",");
+					for (String string : split) {
+						qPos.add(string);
+					}
+				}
+				else{
+					qPos.add(type);
+				}
+			}
+			if(!Validator.equals(userId, 0L)){
+				qPos.add(userId);	
 			}
 			
-			asynchronousProcessAudits = (List<AsynchronousProcessAudit>)q.list();
 			
+			asynchronousProcessAudits = (List<AsynchronousProcessAudit>)q.list();
 			
 		} catch (Exception e) {
 	       e.printStackTrace();
@@ -138,14 +163,24 @@ public class AsynchronousProcessAuditFinderImpl extends BasePersistenceImpl<Cour
 
 	
 	
-	public int countByCompanyIdClassNameIdCreateDate(long companyId, String type, Date startDate, Date endDate){
+	public int countByCompanyIdClassNameIdCreateDate(long companyId, String type,long userId, Date startDate, Date endDate){
 		Session session = null;
 		int asynchronousProcessAudits = 0;
 		try{
 			session = openSession();
 			String sql = CustomSQLUtil.get(COUNT_BY_COMPANY_CLASSNAME_CREATE_DATE);
 			if(Validator.isNull(type)){
-				sql = sql.replace("AND asy.type_ = ?", "");
+				sql = sql.replace("AND asy.type_ IN (?)", "");
+			}else{
+				if(type.indexOf(",")>=0){
+					String bffcopy="";
+					for (String s : type.split(",")) { bffcopy = bffcopy + ",?"; }
+					String sqlReplace = "("+bffcopy.replaceFirst(",","")+")";
+					sql = sql.replace("(?)", sqlReplace);
+				}
+			}
+			if(Validator.equals(userId, 0L)){
+				sql = sql.replace("AND asy.userId = ?", "");
 			}
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 			if(Validator.isNotNull(startDate)){
@@ -177,7 +212,18 @@ public class AsynchronousProcessAuditFinderImpl extends BasePersistenceImpl<Cour
 			
 			qPos.add(companyId);
 			if(Validator.isNotNull(type)){
-				qPos.add(type);	
+				if(type.indexOf(",")>=0){
+					String[] split = type.split(",");
+					for (String string : split) {
+						qPos.add(string);
+					}
+				}
+				else{
+					qPos.add(type);
+				}
+			}
+			if(!Validator.equals(userId, 0L)){
+				qPos.add(userId);	
 			}
 			
 			Iterator<Long> itr = q.iterate();
