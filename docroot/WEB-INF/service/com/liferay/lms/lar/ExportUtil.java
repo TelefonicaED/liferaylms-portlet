@@ -13,7 +13,6 @@ import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portlet.documentlibrary.NoSuchFileEntryException;
-import com.liferay.portlet.documentlibrary.model.DLFileEntry;
 import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
 
 public class ExportUtil {
