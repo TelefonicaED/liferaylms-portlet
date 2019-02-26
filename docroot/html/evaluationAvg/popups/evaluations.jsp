@@ -292,7 +292,7 @@
 //-->
 </script>
 
-<aui:form name="evaluations">
+<aui:form name="evaluations" role="form">
 <% if(courseEval.getNeedPassPuntuation()) { 
 %>
 	<aui:fieldset>

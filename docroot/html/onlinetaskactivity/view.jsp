@@ -252,7 +252,7 @@ else
 			</portlet:renderURL>
 		
 			<h5><liferay-ui:message key="studentsearch"/></h5>
-			<aui:form name="studentsearch" action="<%=buscarURL %>" method="post">
+			<aui:form name="studentsearch" action="<%=buscarURL %>" method="post" role="search">
 				<aui:fieldset>
 					<%if(isTablet){ %>
 						<aui:input name="isTablet" type="hidden" value="true" ></aui:input>
@@ -408,7 +408,7 @@ else
 			
 			if(isTablet==false && isTeacher==false){ %>
 			
-				<aui:form name="fm" action="<%=setActivity%>"  method="post" enctype="multipart/form-data" cssClass='<%=(result!=null)?((result.getEndDate()!= null)?"aui-helper-hidden":""):""%>' >
+				<aui:form name="fm" action="<%=setActivity%>" role="form"  method="post" enctype="multipart/form-data" cssClass='<%=(result!=null)?((result.getEndDate()!= null)?"aui-helper-hidden":""):""%>' >
 					<aui:fieldset>
 					<% if(isSetTextoEnr){ %>
 					<aui:input type="hidden" name="text" value='<%= ParamUtil.getString(request,"text", StringPool.BLANK) %>'/>

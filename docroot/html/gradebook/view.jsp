@@ -12,7 +12,7 @@
 <liferay-ui:success key="grades.updating" message="offlinetaskactivity.correct.saved" />
 <liferay-ui:panel-container > 
 		
-	<aui:form name="fm" action="${renderURL}" method="post">
+	<aui:form name="fm" action="${renderURL}" method="post" role="form">
 	
 		<%@ include file="/html/search/userSearch.jsp" %>
 		<aui:button-row>

@@ -58,7 +58,7 @@ AUI().use(function(A)
 
 
 
-<aui:form name="fm" action="${searchURL }" method="POST">
+<aui:form name="fm" action="${searchURL }" method="POST" role="search">
 	<liferay-ui:search-container searchContainer="${searchContainer}"
 		iteratorURL="${searchContainer.iteratorURL}" emptyResultsMessage="there-are-no-users"
  		delta="10" deltaConfigurable="true">
@@ -115,7 +115,7 @@ AUI().use(function(A)
 				<liferay-portlet:param name="tabs1" value="${tab}"/>
 </liferay-portlet:actionURL>
 
-<aui:form name="deleteUserFm" action="${removeUserRoleURL }" method="POST">
+<aui:form name="deleteUserFm" action="${removeUserRoleURL }" role="form" method="POST">
 	<aui:input name="userId" value="" type="hidden"/>
 	<aui:input name="screenName1" value="" type="hidden"/>
 	<aui:input name="firstName1" value="" type="hidden"/>

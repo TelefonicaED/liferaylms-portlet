@@ -71,7 +71,7 @@
 	<portlet:param name="redirect" value='<%= ParamUtil.getString(request, "redirect", currentURL) %>'/>
 </portlet:actionURL>
 	
-<aui:form name="form" action="<%=cloneCourseURL%>" method="post">
+<aui:form name="form" action="<%=cloneCourseURL%>" role="form" method="post">
 
 	<aui:input type="text" name="newCourseName" value="<%=groupObj.getName()+\"_\"+Time.getShortTimestamp() %>" label="courseadmin.clone.newcoursename" size="50" helpMessage="courseadmin.clone.newcoursename.help">
 		<aui:validator name="required" errorMessage="field.required"></aui:validator>

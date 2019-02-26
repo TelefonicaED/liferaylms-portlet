@@ -117,7 +117,7 @@
 	</p>
 
 	<aui:form class="buttons_container" name="formulario"
-		action="<%=correctURL %>" method="POST">
+		action="<%=correctURL %>" method="POST" role="form">
 		<aui:button-row>
 			<aui:button class="floatr" type="submit"
 				value="<%=LanguageUtil.get(pageContext,\"execativity.test.try.start\")%>" />

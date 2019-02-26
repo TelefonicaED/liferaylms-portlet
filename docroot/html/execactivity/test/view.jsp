@@ -605,7 +605,7 @@ if(isTablet){%>
 								}
 							</script>			
 
-							<aui:form name="formulario" action="<%=!hasPermissionAccessCourseFinished ? correctURL : correctAccessFinishedURL %>" method="post" onSubmit="javascript:return false;">
+							<aui:form name="formulario" action="<%=!hasPermissionAccessCourseFinished ? correctURL : correctAccessFinishedURL %>" method="post" role="form" onSubmit="javascript:return false;">
 							
 								<script>
 								$(document).ready(function(){
@@ -767,7 +767,7 @@ if(isTablet){%>
 				}			
 				%>
 			
-				<aui:form action="<%=passwordURL%>" method="post">
+				<aui:form action="<%=passwordURL%>" method="post" role="form">
 					<aui:input type="text" name="password" label="execActivity.options.password" />
 					<% if(!StringPool.BLANK.equals(passwordParam)){ %>
 					<div class='portlet-msg-error'>

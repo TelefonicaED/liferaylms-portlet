@@ -207,7 +207,7 @@
 
 
 
-<aui:form name="fm" action="${searchURL }" method="POST">
+<aui:form name="fm" action="${searchURL }" method="POST" role="search">
 	<liferay-ui:search-container searchContainer="${searchContainer}" id="usersSearchContainerSearchContainer"
 		iteratorURL="${searchContainer.iteratorURL}" emptyResultsMessage="there-are-no-users"
  		delta="10" deltaConfigurable="true">
@@ -340,7 +340,7 @@
 </aui:form>
 
 
-<aui:form name="addAllUserFm" action="${addAllUsersURL }" method="POST">
+<aui:form name="addAllUserFm" action="${addAllUsersURL }" method="POST" role="form">
 	<aui:input name="addAllUsersScreenName" value="" type="hidden"/>
 	<aui:input name="addAllUsersFirstName" value="" type="hidden"/>
 	<aui:input name="addAllUsersLastName" value="" type="hidden"/>
@@ -391,7 +391,7 @@
 	</liferay-portlet:actionURL>
 	
 	<div class="assign-form">
-		<aui:form action="<%=addUserRoleURL %>" method="POST">
+		<aui:form action="<%=addUserRoleURL %>" method="POST" role="form">
 			<aui:input type="hidden" name="to" id="to" value="" />
 				<div class="to">
 					<liferay-ui:message key="users-to-be-added" />
