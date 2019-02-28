@@ -732,21 +732,23 @@ public class QuestionsAdmin extends MVCPortlet{
 								if(questionTitle!=null && Validator.isNotNull(questionTitle.trim())){
 									questionType = Integer.valueOf(row.getCell(COLUMN_INDEX_QUESTION_TYPE).getStringCellValue());
 									questionPenalize = Boolean.parseBoolean(row.getCell(COLUMN_INDEX_QUESTION_PENALIZE).getStringCellValue());
-									//Es pregunta con respuesta
-									if (log.isDebugEnabled()) log.debug("Line: " + fila + " ***********Es pregunta con respuesta************");
+									//Es pregunta
+									if (log.isDebugEnabled()) log.debug("Line: " + fila + " ***********Es pregunta************");
 									if (log.isDebugEnabled()) log.debug("Line: " + fila + " Titulo pregunta: " + questionTitle);					
 									if (log.isDebugEnabled()) log.debug("Line: " + fila + " Tipo: " + questionType);
 									if (log.isDebugEnabled()) log.debug("Line: " + fila + " Penalize: " + questionPenalize);
-									if (log.isDebugEnabled()) log.debug("Line: " + fila + " Titulo respuesta: " + answerTitle);
-									if (log.isDebugEnabled()) log.debug("Line: " + fila + " Es correcta: " + answerIsCorrect);
 
 									//Creamos la pregunta.
 									question =TestQuestionLocalServiceUtil.addQuestion(actId, questionTitle, questionType);
 									question.setPenalize(questionPenalize);
 									question = TestQuestionLocalServiceUtil.updateTestQuestion(question);
-									//Creamos la respuesta 
-									TestAnswerLocalServiceUtil.addTestAnswer(question.getQuestionId(), answerTitle, feedbackCorrect, feedbackIncorrect, answerIsCorrect);
-
+									if(answerTitle!=null && Validator.isNotNull(answerTitle.trim())){
+										//Si tiene respuestas, creamos la respuesta 
+										if (log.isDebugEnabled()) log.debug("Line: " + fila + " ***********Tiene respuesta************");
+										if (log.isDebugEnabled()) log.debug("Line: " + fila + " Titulo respuesta: " + answerTitle);
+										if (log.isDebugEnabled()) log.debug("Line: " + fila + " Es correcta: " + answerIsCorrect);
+										TestAnswerLocalServiceUtil.addTestAnswer(question.getQuestionId(), answerTitle, feedbackCorrect, feedbackIncorrect, answerIsCorrect);
+									}
 
 
 								}else{	//Es solo respuesta
@@ -788,7 +790,6 @@ public class QuestionsAdmin extends MVCPortlet{
 				}	
 
 				if(allCorrect){
-					System.out.println("ALL CORRECT!!!");
 					actionResponse.setRenderParameter("jspPage", "/html/questions/admin/editquestions.jsp");
 					SessionMessages.add(actionRequest, "questions-added-successfully");
 				}
@@ -844,25 +845,36 @@ public class QuestionsAdmin extends MVCPortlet{
 			style = workbook.createCellStyle();
 			style.setFont(font);
 			String[] questionLine = new String[headers.length];
+			List<TestAnswer> testAnswers = null;
 
 			for(TestQuestion question: TestQuestionLocalServiceUtil.getQuestions(actId)){
 				questionLine[COLUMN_INDEX_QUESTION_TITLE]=question.getText();
 				questionLine[COLUMN_INDEX_QUESTION_TYPE]=String.valueOf(question.getQuestionType());
 				questionLine[COLUMN_INDEX_QUESTION_PENALIZE]= String.valueOf(question.getPenalize());
 				i=0;
-				for(TestAnswer answer: TestAnswerLocalServiceUtil.getTestAnswersByQuestionId(question.getQuestionId())){
-					questionLine[COLUMN_INDEX_ANSWER_TITLE]=answer.getAnswer();
-					questionLine[COLUMN_INDEX_ANSWER_IS_CORRECT]=String.valueOf(answer.isIsCorrect());
-					questionLine[COLUMN_INDEX_ANSWER_FEEDBACK_CORRECT]=answer.getFeedbackCorrect();
-					questionLine[COLUMN_INDEX_ANSWER_FEEDBACK_INCORRECT]=answer.getFeedbacknocorrect();
-
-					exportExcelLine(questionLine, sheet.createRow(rowNumber++), style);
-
-					if(questionLine[COLUMN_INDEX_QUESTION_TITLE]!="" || questionLine[COLUMN_INDEX_QUESTION_TYPE]!=""|| questionLine[COLUMN_INDEX_QUESTION_PENALIZE]!= ""){
-						questionLine[COLUMN_INDEX_QUESTION_TITLE]="";
-						questionLine[COLUMN_INDEX_QUESTION_TYPE]="";
-						questionLine[COLUMN_INDEX_QUESTION_PENALIZE]= "";
+				testAnswers = TestAnswerLocalServiceUtil.getTestAnswersByQuestionId(question.getQuestionId());
+				
+				if(testAnswers != null && testAnswers.size() > 0){
+					for(TestAnswer answer: testAnswers){
+						questionLine[COLUMN_INDEX_ANSWER_TITLE]=answer.getAnswer();
+						questionLine[COLUMN_INDEX_ANSWER_IS_CORRECT]=String.valueOf(answer.isIsCorrect());
+						questionLine[COLUMN_INDEX_ANSWER_FEEDBACK_CORRECT]=answer.getFeedbackCorrect();
+						questionLine[COLUMN_INDEX_ANSWER_FEEDBACK_INCORRECT]=answer.getFeedbacknocorrect();
+	
+						exportExcelLine(questionLine, sheet.createRow(rowNumber++), style);
+	
+						if(questionLine[COLUMN_INDEX_QUESTION_TITLE]!="" || questionLine[COLUMN_INDEX_QUESTION_TYPE]!=""|| questionLine[COLUMN_INDEX_QUESTION_PENALIZE]!= ""){
+							questionLine[COLUMN_INDEX_QUESTION_TITLE]="";
+							questionLine[COLUMN_INDEX_QUESTION_TYPE]="";
+							questionLine[COLUMN_INDEX_QUESTION_PENALIZE]= "";
+						}
 					}
+				}else{
+					questionLine[COLUMN_INDEX_ANSWER_TITLE]="";
+					questionLine[COLUMN_INDEX_ANSWER_IS_CORRECT]="";
+					questionLine[COLUMN_INDEX_ANSWER_FEEDBACK_CORRECT]="";
+					questionLine[COLUMN_INDEX_ANSWER_FEEDBACK_INCORRECT]="";
+					exportExcelLine(questionLine, sheet.createRow(rowNumber++), style);
 				}
 
 			}
