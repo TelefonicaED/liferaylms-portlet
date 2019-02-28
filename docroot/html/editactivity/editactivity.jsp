@@ -63,6 +63,7 @@
 <liferay-ui:error key="execactivity.editActivity.random.number" message="execActivity.options.error.random"></liferay-ui:error>
 <liferay-ui:error key="general.error" message="edit.activity.general.error"></liferay-ui:error>
 <liferay-ui:error key="error-p2pActivity-inProgress" message="p2ptaskactivity.error.extraContentInProgress" />
+<liferay-ui:error key="activity.move-activity-with-result" message="activity.move-activity-with-result" />
 
 <%
 renderResponse.setProperty("clear-request-parameters", Boolean.TRUE.toString());

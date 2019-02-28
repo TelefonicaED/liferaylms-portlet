@@ -14,24 +14,10 @@
 
 package com.liferay.lms.service.impl;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
-
-import org.xml.sax.InputSource;
 
 import com.liferay.lms.NoSuchLearningActivityResultException;
 import com.liferay.lms.auditing.AuditConstants;
@@ -49,7 +35,6 @@ import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityResultLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityTryLocalServiceUtil;
-import com.liferay.lms.service.ModuleLocalServiceUtil;
 import com.liferay.lms.service.ModuleResultLocalServiceUtil;
 import com.liferay.lms.service.base.LearningActivityResultLocalServiceBaseImpl;
 import com.liferay.lms.service.persistence.LearningActivityResultFinderUtil;
@@ -60,25 +45,14 @@ import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.ProjectionFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
-import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.json.JSONArray;
-import com.liferay.portal.kernel.json.JSONFactoryUtil;
-import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.kernel.xml.Document;
-import com.liferay.portal.kernel.xml.DocumentException;
-import com.liferay.portal.kernel.xml.Element;
-import com.liferay.portal.kernel.xml.SAXReaderUtil;
 import com.liferay.portal.model.User;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceContextThreadLocal;
-import com.liferay.portlet.asset.model.AssetEntry;
-import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
 
 
 public class LearningActivityResultLocalServiceImpl	extends LearningActivityResultLocalServiceBaseImpl {
@@ -772,7 +746,9 @@ public class LearningActivityResultLocalServiceImpl	extends LearningActivityResu
 			}
 			
 			return lar;
-		} catch (NoSuchLearningActivityResultException e) {
+		} catch (NullPointerException e){
+			e.printStackTrace();
+		}catch (NoSuchLearningActivityResultException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}catch (PortalException e) {
