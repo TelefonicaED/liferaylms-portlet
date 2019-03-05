@@ -21,10 +21,7 @@
 		<field name="endDate" type="Date" />
 		<field name="status" type="int" />
 		<field name="statusMessage" type="String" localized="true" />
-		<field name="extraContent " type="String">
-			<hint name="display-width">200</hint>
-			<hint name="max-length">500000</hint>
-		</field>
+		<field name="extraContent" type="String" />
 	</model>
 	<model name="com.liferay.lms.model.AuditEntry">
 		<field name="auditId" type="long" />

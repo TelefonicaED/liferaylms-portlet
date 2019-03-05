@@ -35,7 +35,7 @@ public class AsynchronousProcessAuditCacheModel implements CacheModel<Asynchrono
 	Serializable {
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(21);
+		StringBundler sb = new StringBundler(23);
 
 		sb.append("{asynchronousProcessAuditId=");
 		sb.append(asynchronousProcessAuditId);
@@ -57,6 +57,8 @@ public class AsynchronousProcessAuditCacheModel implements CacheModel<Asynchrono
 		sb.append(status);
 		sb.append(", statusMessage=");
 		sb.append(statusMessage);
+		sb.append(", extraContent=");
+		sb.append(extraContent);
 		sb.append("}");
 
 		return sb.toString();
@@ -102,6 +104,13 @@ public class AsynchronousProcessAuditCacheModel implements CacheModel<Asynchrono
 			asynchronousProcessAuditImpl.setStatusMessage(statusMessage);
 		}
 
+		if (extraContent == null) {
+			asynchronousProcessAuditImpl.setExtraContent(StringPool.BLANK);
+		}
+		else {
+			asynchronousProcessAuditImpl.setExtraContent(extraContent);
+		}
+
 		asynchronousProcessAuditImpl.resetOriginalValues();
 
 		return asynchronousProcessAuditImpl;
@@ -117,4 +126,5 @@ public class AsynchronousProcessAuditCacheModel implements CacheModel<Asynchrono
 	public long endDate;
 	public int status;
 	public String statusMessage;
+	public String extraContent;
 }

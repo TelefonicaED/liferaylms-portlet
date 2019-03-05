@@ -12,6 +12,8 @@ import javax.portlet.PortletRequestDispatcher;
 import javax.portlet.PortletURL;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
+import javax.portlet.ResourceRequest;
+import javax.portlet.ResourceResponse;
 
 import com.liferay.lms.model.AsynchronousProcessAudit;
 import com.liferay.lms.service.AsynchronousProcessAuditLocalServiceUtil;
@@ -43,6 +45,11 @@ public class AsynchronousProcessDashboard extends MVCPortlet {
 
 	public void doView(RenderRequest renderRequest,
 			RenderResponse renderResponse) throws IOException, PortletException {
+		showProcesses(renderRequest, renderResponse, false);
+	}
+	
+	public void showProcesses(RenderRequest renderRequest,
+			RenderResponse renderResponse, boolean ajax) throws IOException, PortletException {
 			
 		ThemeDisplay themeDisplay = (ThemeDisplay) renderRequest
 				.getAttribute(WebKeys.THEME_DISPLAY);
@@ -70,52 +77,33 @@ public class AsynchronousProcessDashboard extends MVCPortlet {
 			String classNamePrefsValues = prefs.getValue("className", StringPool.BLANK);
 			String classNameValue = ParamUtil.getString(renderRequest,"className", "");
 			
-			String refreshPageEachXSeg = prefs.getValue("refreshPageEachXSeg", "true");
+			String refreshPageEachXSeg = prefs.getValue("refreshPageEachXSeg","true");
 			renderRequest.setAttribute("refreshPageEachXSeg", refreshPageEachXSeg);
 			boolean showAllClassName = (prefs.getValue("preferences--showAllClassName--", "true")).compareTo("true") == 0;
 			renderRequest.setAttribute("showAllClassName", showAllClassName);
-			
+			renderRequest.setAttribute("showTypeSearcher", true);
 			// Obtenemos todos los classname distintos para efectuar la lista; Si estan por preferencias los editamos
 			List<String> classnames = new ArrayList<String>();
-			if(classNamePrefsValues != null){
-				if(classNamePrefsValues.indexOf("todos")>=0){
-					classnames =AsynchronousProcessAuditLocalServiceUtil
-							.getDistinctTypes(themeDisplay.getCompanyId());
-				}else if(classNamePrefsValues.indexOf(",")>=0){
+			if(!showAllClassName){
+				if(classNamePrefsValues.indexOf(",")>=0){
 					   for (String typeUnit : classNamePrefsValues.split(",")) {
 						   classnames.add(typeUnit);
 					   }
-				}
-				else{
+				}else{
+					classNameValue=classNamePrefsValues;
+					renderRequest.setAttribute("showTypeSearcher", false);
 					classnames.add(classNamePrefsValues);
 				}
-			}
-			else{
+			}else{
 				classnames =AsynchronousProcessAuditLocalServiceUtil
 				.getDistinctTypes(themeDisplay.getCompanyId());
 			}
-			
-			if(showAllClassName){
-				classNameValue = null;
-				
-			}else{
-				
-				if(classNameValue.equalsIgnoreCase("")){
-					classNameValue = classNamePrefsValues;
-				}
-				
-			}
-			
-		
 			
 			
 			long userId =0L;
 			if(onlyForUserOwner){
 				userId = themeDisplay.getUserId();
 			}
-			
-			
-			
 			
 			renderRequest.setAttribute("classnames", classnames);
 	
@@ -167,7 +155,7 @@ public class AsynchronousProcessDashboard extends MVCPortlet {
 					String.valueOf(LiferaylmsUtil.defaultStartYear));
 			iteratorURL.setParameter("defaultEndtYear",
 					String.valueOf(LiferaylmsUtil.defaultEndYear));
-	
+			iteratorURL.setParameter("showExtraContent", String.valueOf(showExtraContent));
 			iteratorURL.setParameter("endDay", String.valueOf(endDay));
 			iteratorURL.setParameter("endMonth", String.valueOf(endMonth));
 			iteratorURL.setParameter("endYear", String.valueOf(endYear));
@@ -184,7 +172,7 @@ public class AsynchronousProcessDashboard extends MVCPortlet {
 					SearchContainer.DEFAULT_CUR_PARAM,
 					SearchContainer.DEFAULT_DELTA, iteratorURL, null,
 					"no-results");
-			
+		
 			
 			asynchronousProcesses = AsynchronousProcessAuditLocalServiceUtil
 					.getByCompanyIdClassNameIdCreateDate(
@@ -204,11 +192,121 @@ public class AsynchronousProcessDashboard extends MVCPortlet {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
-		this.include(this.viewJSP, renderRequest, renderResponse);
+		if(ajax){
+			include("/html/asynchronousprocessdashboard/search-container.jsp" , renderRequest, renderResponse);
+		}else{
+			this.include(this.viewJSP, renderRequest, renderResponse);
+		}
+		
 		
 	}
 	
+	public void serveResource(ResourceRequest resourceRequest,
+			ResourceResponse resourceResponse) throws IOException,
+			PortletException {
+		
+	    
+		String action = ParamUtil.getString(resourceRequest, "action");
+		log.debug("---action: "+action);
+		
+		ThemeDisplay themeDisplay = (ThemeDisplay)resourceRequest.getAttribute(WebKeys.THEME_DISPLAY);
+		
+		if(action.equals("search")){
+			String classNameValue = ParamUtil.getString(resourceRequest,"className", "");
+			List<AsynchronousProcessAudit> asynchronousProcesses = new ArrayList<AsynchronousProcessAudit>();
+			// Obtenemos las fechas para la búsqueda
+				int startDay = ParamUtil.getInteger(resourceRequest, "startDay", -1);
+				int startMonth = ParamUtil.getInteger(resourceRequest, "startMonth",
+						-1);
+				int startYear = ParamUtil
+						.getInteger(resourceRequest, "startYear", -1);
+				int endDay = ParamUtil.getInteger(resourceRequest, "endDay", -1);
+				int endMonth = ParamUtil.getInteger(resourceRequest, "endMonth", -1);
+				int endYear = ParamUtil.getInteger(resourceRequest, "endYear", -1);
+				boolean showExtraContent = ParamUtil.getBoolean(resourceRequest, "showExtraContent", false);
+				Date startDate = null;
+				if (startDay != -1 && startMonth != -1 && startYear != -1) {
+					Calendar startCalendar = Calendar.getInstance();
+					startCalendar.set(Calendar.YEAR, startYear);
+					startCalendar.set(Calendar.MONTH, startMonth);
+					startCalendar.set(Calendar.DAY_OF_MONTH, startDay);
+					startDate = startCalendar.getTime();
+				}
+		
+				Date endDate = null;
+				if (endDay != -1 && endMonth != -1 && endYear != -1) {
+					Calendar endCalDate = Calendar.getInstance();
+					endCalDate.set(Calendar.YEAR, endYear);
+					endCalDate.set(Calendar.MONTH, endMonth);
+					endCalDate.set(Calendar.DAY_OF_MONTH, endDay);
+					endDate = endCalDate.getTime();
+				}
+				
+				PortletURL iteratorURL = resourceResponse.createRenderURL();
+				iteratorURL.setParameter("startDay", String.valueOf(startDay));
+				iteratorURL.setParameter("startMonth", String.valueOf(startMonth));
+				iteratorURL.setParameter("startYear", String.valueOf(startYear));
+				iteratorURL.setParameter("defaultStartYear",
+						String.valueOf(LiferaylmsUtil.defaultStartYear));
+				iteratorURL.setParameter("defaultEndtYear",
+						String.valueOf(LiferaylmsUtil.defaultEndYear));
+				iteratorURL.setParameter("showExtraContent", String.valueOf(showExtraContent));
+				iteratorURL.setParameter("endDay", String.valueOf(endDay));
+				iteratorURL.setParameter("endMonth", String.valueOf(endMonth));
+				iteratorURL.setParameter("endYear", String.valueOf(endYear));
+		
+				iteratorURL.setParameter("className",
+						String.valueOf(classNameValue));
+				
+				
+			SearchContainer<AsynchronousProcessAudit> searchContainer = new SearchContainer<AsynchronousProcessAudit>(
+			resourceRequest, null, null,
+			SearchContainer.DEFAULT_CUR_PARAM,
+			SearchContainer.DEFAULT_DELTA, iteratorURL, null,
+			"no-results");
+				long userId =0L;
+				boolean onlyForUserOwner = true;
+				
+				if(onlyForUserOwner){
+					userId = themeDisplay.getUserId();
+				}
+			
+			asynchronousProcesses = AsynchronousProcessAuditLocalServiceUtil
+					.getByCompanyIdClassNameIdCreateDate(
+							themeDisplay.getCompanyId(), classNameValue, userId,
+							startDate, endDate, searchContainer.getStart(),
+							searchContainer.getEnd());
+			int asynchronousProcessesCount = AsynchronousProcessAuditLocalServiceUtil
+					.countByCompanyIdClassNameIdCreateDate(
+							themeDisplay.getCompanyId(), classNameValue, userId,
+							startDate, endDate);
+			searchContainer.setIteratorURL(iteratorURL);
+			searchContainer.setResults(asynchronousProcesses);
+			searchContainer.setTotal(asynchronousProcessesCount);
+	
+			resourceRequest.setAttribute("searchContainer", searchContainer);
+			
+			log.debug("************includeeeeee!!! ");
+			PortletRequestDispatcher dispatcher = getPortletContext().getRequestDispatcher( "/html/asynchronousprocessdashboard/search-container.jsp" );
+			resourceRequest.setAttribute("showExtraContent", showExtraContent);
+			resourceRequest.setAttribute("namespace", resourceResponse.getNamespace());
+			 dispatcher.include( resourceRequest, resourceResponse );
+			 
+			 super.serveResource(resourceRequest, resourceResponse);
+			
+		}
+	}
+	
+	
+
+	protected void doDispatch(RenderRequest renderRequest,
+			RenderResponse renderResponse) throws IOException, PortletException {
+		log.debug("PARAM "+ParamUtil.getString(renderRequest, "ajaxAction"));
+		if("refresh".equals(ParamUtil.getString(renderRequest, "ajaxAction"))){
+				showProcesses(renderRequest,renderResponse,true);
+		}
+		super.doDispatch(renderRequest, renderResponse);
+	}
 	
 	protected void include(String path, RenderRequest renderRequest,
 			RenderResponse renderResponse) throws IOException, PortletException {
@@ -220,5 +318,6 @@ public class AsynchronousProcessDashboard extends MVCPortlet {
 			portletRequestDispatcher.include(renderRequest, renderResponse);
 		}
 	}
-
+	
+	
 }

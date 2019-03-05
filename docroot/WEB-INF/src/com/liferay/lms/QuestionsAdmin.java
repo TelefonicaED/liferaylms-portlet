@@ -785,7 +785,7 @@ public class QuestionsAdmin extends MVCPortlet{
 				}	
 			
 				if(allCorrect){
-					System.out.println("ALL CORRECT!!!");
+					log.debug("ALL CORRECT!!!");
 					actionResponse.setRenderParameter("jspPage", "/html/questions/admin/editquestions.jsp");
 					SessionMessages.add(actionRequest, "questions-added-successfully");
 				}

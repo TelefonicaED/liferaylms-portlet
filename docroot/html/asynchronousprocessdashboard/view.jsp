@@ -6,35 +6,80 @@
 <%
 String timeTodoRefresh = (String) renderRequest.getAttribute("refreshPageEachXSeg");
 %>
+
+
+<liferay-portlet:resourceURL var="refreshURL">
+	<liferay-portlet:param name="action" value="search"/>
+	<liferay-portlet:param name="ajaxAction" value="refresh"/>
+	<liferay-portlet:param name="showExtraContent" value="${showExtraContent}"/>
+	<liferay-portlet:param name="deltaParam" value="${searchContainer.delta}"/>
+	<liferay-portlet:param name="className" value="${classNameValue}"/>
+	<liferay-portlet:param name="startYear" value="${startYear}"/>
+	<liferay-portlet:param name="startMonth" value="${startMonth}"/>
+	<liferay-portlet:param name="startDay" value="${startDay}"/>
+	<liferay-portlet:param name="endYear" value="${endYear}"/>
+	<liferay-portlet:param name="endMonth" value="${endMonth}"/>
+	<liferay-portlet:param name="endDay" value="${endDay}"/>
+	
+</liferay-portlet:resourceURL>
+
+<aui:form action="${refreshURL}" method="post" name="refreshFm" role="search">
+
+</aui:form>
+
 <script>
 var timeTodoRefreshInseg = <%=timeTodoRefresh%> * 1000;
-if(timeTodoRefreshInseg!=0){
-	setTimeout(function() { refreshSearch(timeTodoRefreshInseg); }, timeTodoRefreshInseg);
+
+if(timeTodoRefreshInseg < 10000){
+	timeTodoRefreshInseg = 10000;
 }
-function refreshSearch( timeTodoRefreshInseg ) {
-   if(timeTodoRefreshInseg > 10000){
-	   $('#<portlet:namespace />search').trigger("submit");
-	   setTimeout(function() { refreshSearch( timeTodoRefreshInseg); }, timeTodoRefreshInseg);
-   }else{
-	   $('#<portlet:namespace />search').trigger("submit");
-	   setTimeout(function() { refreshSearch( 10000); }, 10000);
-   }
-  
+setTimeout(function() { <portlet:namespace />refresh(); }, timeTodoRefreshInseg);
+ 
+function <portlet:namespace />refresh(){
+	AUI( ).use( 'aui-io-request', function( A ) {
+		var portletBody = A.one( '#p_p_id<portlet:namespace/> .portlet-content' );
+		if( portletBody == null ) {
+			portletBody = A.one( '#p_p_id<portlet:namespace/> .portlet-borderless-container' );
+		}
+		portletBody.setStyle( 'position', 'relative' );
+		A.io.request( '${refreshURL}', {
+			method: 'post',
+			form: { 
+				id: '<portlet:namespace/>refreshFm' 
+			}, 
+			on: { 
+				success: function( ) {
+					var data = this.get( 'responseData' );
+					A.one( '#<portlet:namespace/>search-results' ).html( data );
+				}
+			}
+		} );
+	} );
+	
+	setTimeout(function() { <portlet:namespace />refresh(); }, timeTodoRefreshInseg);	
+	
 }
+ 
 </script>
 <portlet:renderURL var="searchURL">
 </portlet:renderURL>
 
+
+
+
+
 <aui:form action="${searchURL}" method="post" name="search" role="search">
 	<aui:layout>
-		<aui:column columnWidth="20">
-			<aui:select name="className" label="type" cssClass="type-selector">
-				<aui:option label="" value="" selected="${empty className}" />
-				<c:forEach items="${classnames}" var="classNameValue">
-					<aui:option label="${classNameValue}" value="${classNameValue}" selected="${classNameValue eq className}" />
-				</c:forEach>
-			</aui:select>
-		</aui:column>
+		<c:if test="${showTypeSearcher}">
+			<aui:column columnWidth="20">
+				<aui:select name="className" label="type" cssClass="type-selector">
+					<aui:option label="" value="" selected="${empty className}" />
+					<c:forEach items="${classnames}" var="classNameValue">
+						<aui:option label="${classNameValue}" value="${classNameValue}" selected="${classNameValue eq className}" />
+					</c:forEach>
+				</aui:select>
+			</aui:column>
+		</c:if>
 		<aui:column columnWidth="33">
 		<aui:field-wrapper label="start-date" >
 			<liferay-ui:input-date yearRangeEnd="${defaultEndYear}" 
@@ -64,102 +109,7 @@ function refreshSearch( timeTodoRefreshInseg ) {
 
 
 
-<div class="table-overflow table-absolute">
-		
-	<liferay-ui:search-container searchContainer="${searchContainer}"
-		iteratorURL="${searchContainer.iteratorURL}">
-		<liferay-ui:search-container-results total="${searchContainer.total }"
-			results="${searchContainer.results }" />
+<div id="${renderResponse.getNamespace()}search-results" class="table-overflow table-absolute">
+		<%@ include file="/html/asynchronousprocessdashboard/search-container.jsp" %>
 	
-		<liferay-ui:search-container-row
-			className="com.liferay.lms.model.AsynchronousProcessAudit"
-			keyProperty="asynchronousProcessAuditId" modelVar="asynchronousProccessAudit">
-	
-		<liferay-ui:search-container-column-text name="type">
-			<c:if test="${asynchronousProccessAudit.status eq 0}">
-				<span class="status-not-started"></span>
-			</c:if>
-			
-			<c:if test="${asynchronousProccessAudit.status eq 1}">
-				<span class="status-started"></span>
-			</c:if>
-			<c:if test="${asynchronousProccessAudit.status eq 2}">
-				<span class="status-ok"></span>
-			</c:if>
-			<c:if test="${asynchronousProccessAudit.status eq 3}">
-				<span class="status-error"></span>
-			</c:if>
-			<liferay-ui:message key="${asynchronousProccessAudit.type}"/>
-		</liferay-ui:search-container-column-text>
-		<liferay-ui:search-container-column-text name="class">
-			<liferay-ui:message key="${asynchronousProccessAudit.className}"/> 
-		</liferay-ui:search-container-column-text>
-		<liferay-ui:search-container-column-text name="id">
-			${asynchronousProccessAudit.classPK}
-		</liferay-ui:search-container-column-text>
-		<liferay-ui:search-container-column-text name="startDate">
-			<c:if test="${not empty asynchronousProccessAudit.createDate}">
-				<%=dateFormatDateTime.format(asynchronousProccessAudit.getCreateDate()) %> 
-			</c:if>
-		</liferay-ui:search-container-column-text>
-		<liferay-ui:search-container-column-text name="endDate">
-			<c:if test="${not empty asynchronousProccessAudit.endDate}">
-				<%=dateFormatDateTime.format(asynchronousProccessAudit.getEndDate())%>
-			</c:if>
-		</liferay-ui:search-container-column-text>
-		
-		<liferay-ui:search-container-column-text name="message">
-			<c:choose>
-				<c:when test="${asynchronousProccessAudit.status eq 0}">
-					<liferay-ui:message key="asynchronous-process-audit.process-not-started"/>
-				</c:when>
-				<c:otherwise>
-					<liferay-ui:message key="${asynchronousProccessAudit.statusMessage}"/>
-				</c:otherwise>
-			</c:choose>
-		</liferay-ui:search-container-column-text>
-		
-		
-			<c:choose>
-				<c:when test="${not empty asynchronousProccessAudit.extraContent and showExtraContent}">
-					<liferay-ui:search-container-column-text align="center" name="extraContent" >
-							<%
-							try{
-								String extraContent = asynchronousProccessAudit.getExtraContent();
-								
-								if(!extraContent.isEmpty()){
-									extraContent = extraContent.replace("\"","'");
-									JSONObject obj = JSONFactoryUtil.createJSONObject(extraContent);
-									String path = obj.getString("url");
-									String portletId = obj.getString("portletId");
-									String contentType = obj.getString("contentType");
-									String pathControl = obj.getString("pathControl");
-									String id = String.valueOf(asynchronousProccessAudit.getAsynchronousProcessAuditId());
-									%>
-									<liferay-util:include portletId="<%=portletId%>" page="<%=pathControl%>"  >
-										  <liferay-util:param name="namespace" value="<%=portletId%>" />
-										  <liferay-util:param name="path" value="<%=path%>" />
-										  <liferay-util:param name="contentType" value="<%=contentType%>" />
-										  <liferay-util:param name="id" value="<%=id%>" />
-									</liferay-util:include> 	  
-									<%	}
-							}
-							catch( Exception e){
-								%>
-								
-								<%
-							} 
-							%>
-						</liferay-ui:search-container-column-text>
-					</c:when>
-					<c:otherwise>
-						
-					</c:otherwise>
-				</c:choose>
-		
-		
-			</liferay-ui:search-container-row>
-		<liferay-ui:search-iterator />
-	
-	</liferay-ui:search-container>
 </div>

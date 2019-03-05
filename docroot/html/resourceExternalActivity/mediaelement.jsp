@@ -76,8 +76,8 @@
 			$('#<portlet:namespace/>videoQuestionFeedback').html("");
 			finished = false;
 			if(plays > 0){
-				if($('[id*^=<portlet:namespace/>question_]')!=null){
-					$('[id*^=<portlet:namespace/>question_]').addClass("aui-helper-hidden");	
+				if($('[id^=<portlet:namespace/>question_]')!=null){
+					$('[id^=<portlet:namespace/>question_]').addClass("aui-helper-hidden");	
 				}
 			}
 			plays++;
