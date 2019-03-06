@@ -1,3 +1,5 @@
+<%@page import="com.liferay.lms.course.adminaction.AdminActionTypeRegistry"%>
+<%@page import="com.liferay.lms.course.adminaction.AdminActionType"%>
 <%@page import="com.liferay.lms.service.CourseResultLocalServiceUtil"%>
 <%@page import="com.liferay.portal.kernel.util.PrefsPropsUtil"%>
 <%@page import="com.liferay.lms.service.CourseLocalServiceUtil"%>
@@ -11,7 +13,7 @@
 <%@ include file="/init.jsp" %>
 <%
 ResultRow row = (ResultRow)request.getAttribute(WebKeys.SEARCH_CONTAINER_RESULT_ROW);
-	 
+SearchContainer<Course> searchContainer = (SearchContainer<Course>)request.getAttribute("liferay-ui:search:searchContainer"); 
 Course myCourse = (Course)row.getObject();
 LmsPrefs prefs=LmsPrefsLocalServiceUtil.getLmsPrefs(themeDisplay.getCompanyId());
 String name = Course.class.getName();
@@ -184,5 +186,22 @@ if( permissionChecker.hasPermission(themeDisplay.getScopeGroupId(),  Course.clas
 		<liferay-ui:icon image="tag" message="course-admin.editions" url="<%=editionsURL %>" />
 	</c:if>
 
+
+
+	<c:forEach var="action" items="${adminActionTypes}">
+	
+		 <c:if test="${action.hasPermission(themeDisplay.getUserId())}">
+		
+			<portlet:renderURL var="specificURL" >
+				<portlet:param name="jspPage" value="/html/courseadmin/inc/specific_action.jsp" />
+				<portlet:param name="courseId" value="<%=String.valueOf(myCourse.getCourseId()) %>" />
+				<portlet:param name="cur" value="<%=  String.valueOf(searchContainer.getCur()) %>" />
+				<portlet:param name="delta" value="<%=  String.valueOf(searchContainer.getDelta()) %>" />
+				<portlet:param name="portletId" value="${action.getPortletId()}" />
+			</portlet:renderURL>
+			<liferay-ui:icon image="${action.getIcon()}" message="${action.getName(locale)}"  label="true"
+				url="${specificURL}" />
+		 </c:if>
+	</c:forEach>
 
 </liferay-ui:icon-menu>
