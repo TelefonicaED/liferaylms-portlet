@@ -45,7 +45,7 @@ public class AdminActionTypeRegistry {
 						PortletClassLoaderUtil.getClassLoader(context[1])).newInstance(), type, 
 						PortletClassLoaderUtil.getClassLoader(context[1]));
 					adminActionTypes[currentAdminActionType++]=new AdminActionTypeClp(classLoaderProxy);
-					log.debug("**********************CONTEXTTTO PILLADO "+adminActionTypes[currentAdminActionType]);
+					
 				} catch (Throwable throwable) {
 					throwable.printStackTrace();
 				}
