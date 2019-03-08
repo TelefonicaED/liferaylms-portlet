@@ -97,21 +97,24 @@ public class CourseServiceImpl extends CourseServiceBaseImpl {
 	@JSONWebService
 	public Course createCourse(long groupId,String title, String description,boolean published,String summary,int evaluationmethod,int calificationType,int template,int registermethod,int maxusers, Date startregistrationdate,Date endregistrationdate) throws PortalException, SystemException
 	{
+		return createCourse(groupId, title, description, published, summary, evaluationmethod, calificationType, template, registermethod, maxusers, startregistrationdate, endregistrationdate,null,null);
+	}
+	
+	
+	@JSONWebService
+	public Course createCourse(long groupId,String title, String description,boolean published,String summary,int evaluationmethod,int calificationType,int template,int registermethod,int maxusers, Date startregistrationdate,Date endregistrationdate, Date startExecutionDate, Date endExecutionDate) throws PortalException, SystemException
+	{
 		User user=getUser();
 		
 		java.util.Date ahora=new java.util.Date(System.currentTimeMillis());
 		ServiceContext serviceContext = ServiceContextThreadLocal.getServiceContext();
 		serviceContext.setUserId(user.getUserId());
 		serviceContext.setScopeGroupId(groupId);
-		String groupName = GroupConstants.GUEST;
-		long companyId = PortalUtil.getDefaultCompanyId();
 		
 		if( getPermissionChecker().hasPermission(groupId, "com.liferay.lms.coursemodel",groupId,"ADD_COURSE"))
 		{
-			Course course = com.liferay.lms.service.CourseLocalServiceUtil.addCourse(
-					title, description, summary, StringPool.BLANK,
-					user.getLocale(), ahora, startregistrationdate, endregistrationdate,template,registermethod,evaluationmethod,
-					calificationType,maxusers,serviceContext,false);
+			Course course = CourseLocalServiceUtil.addCourse(title, description, summary,  StringPool.BLANK, user.getLocale(), ahora, startregistrationdate, endregistrationdate, startExecutionDate, endExecutionDate, template, registermethod, evaluationmethod, calificationType, maxusers, serviceContext, false);
+			
 			com.liferay.lms.service.CourseLocalServiceUtil.setVisible(course.getCourseId(), published);
 			return course;
 		}
@@ -120,6 +123,8 @@ public class CourseServiceImpl extends CourseServiceBaseImpl {
 			return null;
 		}
 	}
+	
+	
 	@JSONWebService
 	public Course createCourse(String title, String description,boolean published,String summary,int evaluationmethod,int calificationType,int template,int registermethod,int maxusers, Date startregistrationdate,Date endregistrationdate) throws PortalException, SystemException
 	{
