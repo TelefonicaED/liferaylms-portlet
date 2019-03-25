@@ -22,5 +22,6 @@ if(actionEditing) text="disable-edition";
 
 <% String redirect="self.location='"+changeEditingMode.toString()+"'"; %>
 <aui:button-row>
-	<aui:button type="submit"  value="<%=text %>" onClick="<%=redirect %>"/>
+	<img src='<%= themeDisplay.getPathThemeImages() + "/custom/icons/icon_editingmode.png"%>' >
+	<aui:button type="submit"  value="<%=text %>" alt="<%=LanguageUtil.get(themeDisplay.getLocale(), text) %>" onClick="<%=redirect %>"/>
 </aui:button-row>
