@@ -41,7 +41,7 @@ int showResultsType = GetterUtil.getInteger(preferences.getValue("showResultsTyp
 %>
 
 <liferay-portlet:actionURL portletConfiguration="true" var="configurationURL" />
-<aui:form action="<%= configurationURL %>" method="post" name="fm"  >
+<aui:form action="<%= configurationURL %>" method="post" name="fm" role="form" >
 	<aui:input name="<%= Constants.CMD %>" type="hidden" value="<%= Constants.UPDATE %>" />
 	<h4><liferay-ui:message key="general"></liferay-ui:message> </h4>
 	<aui:fieldset>

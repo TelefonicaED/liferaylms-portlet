@@ -226,7 +226,7 @@ textarea {
 						//-->
 						</script>
 						
-						<aui:form name="formulario" action="<%=correctURL %>" method="POST">
+						<aui:form name="formulario" action="<%=correctURL %>" method="POST" role="form">
 					
 					<%if(isInitTablet){%>
 				       <aui:input type="hidden" name="isTablet" value="<%= true %>"/>

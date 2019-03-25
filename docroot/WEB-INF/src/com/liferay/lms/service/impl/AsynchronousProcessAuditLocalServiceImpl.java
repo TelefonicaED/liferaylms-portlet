@@ -52,20 +52,20 @@ public class AsynchronousProcessAuditLocalServiceImpl
 	}
 	
 	
-	public List<AsynchronousProcessAudit> getByCompanyIdClassNameIdCreateDate(long companyId, String type, Date startDate, Date endDate, int start, int end){
+	public List<AsynchronousProcessAudit> getByCompanyIdClassNameIdCreateDate(long companyId, String type,long userId, Date startDate, Date endDate, int start, int end){
 		List<AsynchronousProcessAudit> asynchronousProcessAudits = new ArrayList<AsynchronousProcessAudit>();
 		try{
-			asynchronousProcessAudits = AsynchronousProcessAuditFinderUtil.getByCompanyIdClassNameIdCreateDate(companyId, type, startDate, endDate,start,end);
+			asynchronousProcessAudits = AsynchronousProcessAuditFinderUtil.getByCompanyIdClassNameIdCreateDate(companyId, type, userId, startDate, endDate,start,end);
 		}catch(Exception e){
 			e.printStackTrace();
 		}
 		return asynchronousProcessAudits;
 	}
 	
-	public int countByCompanyIdClassNameIdCreateDate(long companyId, String type, Date startDate, Date endDate){
+	public int countByCompanyIdClassNameIdCreateDate(long companyId, String type, long userId, Date startDate, Date endDate){
 		int asynchronousProcessAudits = 0;
 		try{
-			asynchronousProcessAudits = AsynchronousProcessAuditFinderUtil.countByCompanyIdClassNameIdCreateDate(companyId, type, startDate, endDate);
+			asynchronousProcessAudits = AsynchronousProcessAuditFinderUtil.countByCompanyIdClassNameIdCreateDate(companyId, type, userId, startDate, endDate);
 		}catch(Exception e){
 			e.printStackTrace();
 		}

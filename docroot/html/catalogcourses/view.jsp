@@ -2,7 +2,7 @@
 
 <jsp:useBean id="assetCategoryServiceUtil" class="com.liferay.portlet.asset.service.AssetCategoryServiceUtil"/>
 
-<aui:form action="${renderURL } " method="POST" name="fm"> 
+<aui:form action="${renderURL } " method="POST" name="fm" role="search"> 
 	<aui:input name="categoryId" value="" type="hidden"/>
 	<aui:input name="tagId" value="" type="hidden"/>
 	<aui:input name="categoryIds" value="${categoryIds }" type="hidden"/>

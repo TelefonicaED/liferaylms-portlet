@@ -16,7 +16,7 @@
 %>
 
 <liferay-portlet:actionURL var="saveConfigurationURL"  portletConfiguration="true"/>
-<aui:form action="<%=saveConfigurationURL %>" >
+<aui:form action="<%=saveConfigurationURL %>" role="form">
 	<aui:input type="hidden" name="<%=Constants.CMD %>" value="<%=Constants.UPDATE %>" />
 	<aui:input type="checkbox" name="viewAlways" label="module.viewAlways" value="<%=viewAlways %>" checked="<%=viewAlways %>"/>
 	<aui:button-row>

@@ -28,9 +28,16 @@ public class GeneralStatsConfigurationAction implements ConfigurationAction {
 		
 		PortletPreferences portletPreferences =	PortletPreferencesFactoryUtil.getPortletSetup(actionRequest, ParamUtil.getString(actionRequest, "portletResource")); 
 				
-		portletPreferences.setValue("showSearchTagsGeneralStats",		Boolean.toString(ParamUtil.getBoolean(actionRequest, "showSearchTagsGeneralStats", false)));
-		portletPreferences.setValue("showSearchCategoriesGeneralStats",	Boolean.toString(ParamUtil.getBoolean(actionRequest, "showSearchCategoriesGeneralStats", true)));
-		
+		portletPreferences.setValue("categories",		Boolean.toString(ParamUtil.getBoolean(actionRequest, "showSearchTags", false)));
+		portletPreferences.setValue("showFailed",	Boolean.toString(ParamUtil.getBoolean(actionRequest, "showFailed", false)));
+		portletPreferences.setValue("showFinished",	Boolean.toString(ParamUtil.getBoolean(actionRequest, "showFinished", true)));
+		portletPreferences.setValue("showAvgResult",	Boolean.toString(ParamUtil.getBoolean(actionRequest, "showAvgResult", true)));
+		portletPreferences.setValue("showModules",	Boolean.toString(ParamUtil.getBoolean(actionRequest, "showModules", true)));
+		portletPreferences.setValue("showActivities",	Boolean.toString(ParamUtil.getBoolean(actionRequest, "showActivities", true)));
+		portletPreferences.setValue("showPassed",	Boolean.toString(ParamUtil.getBoolean(actionRequest, "showPassed", false)));
+		portletPreferences.setValue("showInit",	Boolean.toString(ParamUtil.getBoolean(actionRequest, "showInit", true)));
+		portletPreferences.setValue("showCourseClosed",	Boolean.toString(ParamUtil.getBoolean(actionRequest, "showCourseClosed", true)));
+		portletPreferences.setValue("showRegistered",	Boolean.toString(ParamUtil.getBoolean(actionRequest, "showRegistered", true)));
 		portletPreferences.store();
 		
 		SessionMessages.add(actionRequest, portletConfig.getPortletName() + ".doConfigure"); 

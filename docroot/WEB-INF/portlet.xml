@@ -2579,8 +2579,12 @@
 			com.liferay.lms.portlet.AsynchronousProcessDashboard
 		</portlet-class>
 		<init-param>
-			<name>view-jsp</name>
+			<name>view-template</name>
 			<value>/html/asynchronousprocessdashboard/view.jsp</value>
+		</init-param>
+		<init-param>
+			<name>config-template</name>
+			<value>/html/asynchronousprocessdashboard/config/config.jsp</value>
 		</init-param>
 		<expiration-cache>0</expiration-cache>
 		<supports>

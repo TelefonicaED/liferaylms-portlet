@@ -77,9 +77,10 @@ public class AsynchronousProcessAuditModelImpl extends BaseModelImpl<Asynchronou
 			{ "createDate", Types.TIMESTAMP },
 			{ "endDate", Types.TIMESTAMP },
 			{ "status", Types.INTEGER },
-			{ "statusMessage", Types.VARCHAR }
+			{ "statusMessage", Types.VARCHAR },
+			{ "extraContent", Types.VARCHAR }
 		};
-	public static final String TABLE_SQL_CREATE = "create table Lms_AsynchronousProcessAudit (asynchronousProcessAuditId LONG not null primary key,companyId LONG,type_ VARCHAR(75) null,classNameId LONG,classPK LONG,userId LONG,createDate DATE null,endDate DATE null,status INTEGER,statusMessage STRING null)";
+	public static final String TABLE_SQL_CREATE = "create table Lms_AsynchronousProcessAudit (asynchronousProcessAuditId LONG not null primary key,companyId LONG,type_ VARCHAR(75) null,classNameId LONG,classPK LONG,userId LONG,createDate DATE null,endDate DATE null,status INTEGER,statusMessage STRING null,extraContent VARCHAR(75) null)";
 	public static final String TABLE_SQL_DROP = "drop table Lms_AsynchronousProcessAudit";
 	public static final String DATA_SOURCE = "liferayDataSource";
 	public static final String SESSION_FACTORY = "liferaySessionFactory";
@@ -136,6 +137,7 @@ public class AsynchronousProcessAuditModelImpl extends BaseModelImpl<Asynchronou
 		attributes.put("endDate", getEndDate());
 		attributes.put("status", getStatus());
 		attributes.put("statusMessage", getStatusMessage());
+		attributes.put("extraContent", getExtraContent());
 
 		return attributes;
 	}
@@ -201,6 +203,12 @@ public class AsynchronousProcessAuditModelImpl extends BaseModelImpl<Asynchronou
 
 		if (statusMessage != null) {
 			setStatusMessage(statusMessage);
+		}
+
+		String extraContent = (String)attributes.get("extraContent");
+
+		if (extraContent != null) {
+			setExtraContent(extraContent);
 		}
 	}
 
@@ -399,6 +407,19 @@ public class AsynchronousProcessAuditModelImpl extends BaseModelImpl<Asynchronou
 		}
 	}
 
+	public String getExtraContent() {
+		if (_extraContent == null) {
+			return StringPool.BLANK;
+		}
+		else {
+			return _extraContent;
+		}
+	}
+
+	public void setExtraContent(String extraContent) {
+		_extraContent = extraContent;
+	}
+
 	@Override
 	public ExpandoBridge getExpandoBridge() {
 		return ExpandoBridgeFactoryUtil.getExpandoBridge(getCompanyId(),
@@ -444,6 +465,7 @@ public class AsynchronousProcessAuditModelImpl extends BaseModelImpl<Asynchronou
 		asynchronousProcessAuditImpl.setEndDate(getEndDate());
 		asynchronousProcessAuditImpl.setStatus(getStatus());
 		asynchronousProcessAuditImpl.setStatusMessage(getStatusMessage());
+		asynchronousProcessAuditImpl.setExtraContent(getExtraContent());
 
 		asynchronousProcessAuditImpl.resetOriginalValues();
 
@@ -548,12 +570,20 @@ public class AsynchronousProcessAuditModelImpl extends BaseModelImpl<Asynchronou
 			asynchronousProcessAuditCacheModel.statusMessage = null;
 		}
 
+		asynchronousProcessAuditCacheModel.extraContent = getExtraContent();
+
+		String extraContent = asynchronousProcessAuditCacheModel.extraContent;
+
+		if ((extraContent != null) && (extraContent.length() == 0)) {
+			asynchronousProcessAuditCacheModel.extraContent = null;
+		}
+
 		return asynchronousProcessAuditCacheModel;
 	}
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(21);
+		StringBundler sb = new StringBundler(23);
 
 		sb.append("{asynchronousProcessAuditId=");
 		sb.append(getAsynchronousProcessAuditId());
@@ -575,13 +605,15 @@ public class AsynchronousProcessAuditModelImpl extends BaseModelImpl<Asynchronou
 		sb.append(getStatus());
 		sb.append(", statusMessage=");
 		sb.append(getStatusMessage());
+		sb.append(", extraContent=");
+		sb.append(getExtraContent());
 		sb.append("}");
 
 		return sb.toString();
 	}
 
 	public String toXmlString() {
-		StringBundler sb = new StringBundler(34);
+		StringBundler sb = new StringBundler(37);
 
 		sb.append("<model><model-name>");
 		sb.append("com.liferay.lms.model.AsynchronousProcessAudit");
@@ -627,6 +659,10 @@ public class AsynchronousProcessAuditModelImpl extends BaseModelImpl<Asynchronou
 			"<column><column-name>statusMessage</column-name><column-value><![CDATA[");
 		sb.append(getStatusMessage());
 		sb.append("]]></column-value></column>");
+		sb.append(
+			"<column><column-name>extraContent</column-name><column-value><![CDATA[");
+		sb.append(getExtraContent());
+		sb.append("]]></column-value></column>");
 
 		sb.append("</model>");
 
@@ -649,5 +685,6 @@ public class AsynchronousProcessAuditModelImpl extends BaseModelImpl<Asynchronou
 	private int _status;
 	private String _statusMessage;
 	private String _statusMessageCurrentLanguageId;
+	private String _extraContent;
 	private AsynchronousProcessAudit _escapedModelProxy;
 }

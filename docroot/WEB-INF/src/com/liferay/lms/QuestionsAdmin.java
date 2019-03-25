@@ -38,6 +38,9 @@ import org.jsoup.Jsoup;
 import au.com.bytecode.opencsv.CSVWriter;
 
 import com.liferay.counter.service.CounterLocalServiceUtil;
+import com.liferay.lms.learningactivity.ResourceExternalLearningActivityType;
+import com.liferay.lms.learningactivity.SurveyLearningActivityType;
+import com.liferay.lms.learningactivity.TestLearningActivityType;
 import com.liferay.lms.learningactivity.questiontype.QuestionType;
 import com.liferay.lms.learningactivity.questiontype.QuestionTypeRegistry;
 import com.liferay.lms.learningactivity.questiontype.SurveyHorizontalOptionsQuestionType;
@@ -785,7 +788,7 @@ public class QuestionsAdmin extends MVCPortlet{
 				}	
 			
 				if(allCorrect){
-					System.out.println("ALL CORRECT!!!");
+					log.debug("ALL CORRECT!!!");
 					actionResponse.setRenderParameter("jspPage", "/html/questions/admin/editquestions.jsp");
 					SessionMessages.add(actionRequest, "questions-added-successfully");
 				}
@@ -941,11 +944,12 @@ public class QuestionsAdmin extends MVCPortlet{
 		TestQuestionLocalServiceUtil.deleteTestQuestion(question.getQuestionId());
 		SessionMessages.add(actionRequest, "question-deleted-successfully");
 
-		if (learnact.getTypeId() == 0) {
+		if (learnact.getTypeId() == ResourceExternalLearningActivityType.TYPE_ID || learnact.getTypeId() == SurveyLearningActivityType.TYPE_ID || learnact.getTypeId() == TestLearningActivityType.TYPE_ID) {
 			QuestionType qt =new QuestionTypeRegistry().getQuestionType(question.getQuestionType());
 			actionResponse.setRenderParameter("actionEditingDetails", StringPool.TRUE);
 			actionResponse.setRenderParameter("resId", Long.toString(question.getActId()));
 			actionResponse.setRenderParameter("jspPage", qt.getURLBack());
+		
 		}
 	}
 	
