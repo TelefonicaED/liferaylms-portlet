@@ -93,6 +93,26 @@ public class AsynchronousProcessAuditLocalServiceImpl
 		return asynchronousProcessAudit;
 	}
 	
+	public AsynchronousProcessAudit addAsynchronousProcessAudit(long companyId, long userId, String classNameValue, long classNameId, long classPK, String type){
+		AsynchronousProcessAudit asynchronousProcessAudit = null;
+		try{
+			asynchronousProcessAudit = asynchronousProcessAuditPersistence.create(counterLocalService.increment(AsynchronousProcessAudit.class.getName()));
+			asynchronousProcessAudit.setCompanyId(companyId);
+			asynchronousProcessAudit.setType(type);
+			asynchronousProcessAudit.setUserId(userId);
+			asynchronousProcessAudit.setClassName(classNameValue);
+			asynchronousProcessAudit.setCreateDate(new Date());
+			asynchronousProcessAudit.setStatus(LmsConstant.STATUS_NOT_STARTED);
+			
+			asynchronousProcessAudit =asynchronousProcessAuditPersistence.update(asynchronousProcessAudit, true);
+			
+			
+			
+		}catch(SystemException e){
+			e.printStackTrace();
+		}
+		return asynchronousProcessAudit;
+	}
 	
 	public AsynchronousProcessAudit updateProcessStatus(AsynchronousProcessAudit asynchronousProcessAudit, Date endDate, int status, String statusMessage) {
 		try{
