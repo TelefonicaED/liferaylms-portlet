@@ -51,11 +51,6 @@ function <portlet:namespace />submitExport(){
 					 	${courseStats.failed}
 					</liferay-ui:search-container-column-text>
 				</c:if>
-				<c:if test="${renderRequest.preferences.getValue('showFailed', 'false') }">
-					<liferay-ui:search-container-column-text name="coursestats.failed"  title="coursestats.modulestats.notpass" orderable="false">
-					 	${courseStats.failed}
-					</liferay-ui:search-container-column-text>
-				</c:if>
 				<c:if test="${renderRequest.preferences.getValue('showCourseClosed', 'true') }">
 					<liferay-ui:search-container-column-text  valign="right" name="closed">
 						${courseStats.closed}
