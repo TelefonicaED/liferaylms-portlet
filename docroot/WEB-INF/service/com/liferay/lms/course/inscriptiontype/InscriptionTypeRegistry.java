@@ -88,10 +88,8 @@ public class InscriptionTypeRegistry {
 	
 	public InscriptionTypeRegistry() {
 		_inscriptionTypes =  _inscriptionTypeThreadLocal.get();
-		if((Validator.isNull(_inscriptionTypes))||
-			(_inscriptionTypes.isEmpty())||
-			(!(_inscriptionTypes.get(0) instanceof InscriptionType))) {
-				InscriptionType[] inscriptionTypes = _getInscriptionTypes();
+		if(Validator.isNull(_inscriptionTypes)|| _inscriptionTypes.isEmpty()|| !(_inscriptionTypes.get(0) instanceof InscriptionType)) {
+			InscriptionType[] inscriptionTypes = _getInscriptionTypes();
 			_inscriptionTypes=new UnmodifiableList<InscriptionType>(Arrays.asList(inscriptionTypes));
 			_inscriptionTypeThreadLocal.set(_inscriptionTypes);
 			

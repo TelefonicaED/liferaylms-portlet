@@ -44,6 +44,7 @@
 			</basic>
 			<basic name="status" />
 			<basic name="statusMessage" />
+			<basic name="extraContent" />
 			<transient name="className" />
 			<transient name="modelAttributes" />
 			<transient name="primaryKey" />

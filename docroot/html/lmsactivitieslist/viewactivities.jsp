@@ -8,7 +8,6 @@
 
 <% 
 List<LearningActivity> activities = null;
-
 if (moduleId == 0) {
 	activities = LearningActivityServiceUtil.getLearningActivitiesOfGroup(scopeGroupId);
 } else {
@@ -19,15 +18,12 @@ if (moduleId == 0) {
 		activities = LearningActivityServiceUtil.getLearningActivitiesOfModule(moduleId);
 	}
 }
-
 String activityEnd = "desactivado";
-
 if ((actionEditing && hasPermissionAddLact) ||
 		(moduleId==0 
 		&& permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), "com.liferay.lms.learningactivitymodel", themeDisplay.getScopeGroupId(), "ADD_ACTIVITY"))) {
 	
 	PortletURL urlCreateActivity = LmsActivitiesList.getURLCreateActivity(liferayPortletRequest, liferayPortletResponse, currentModule);
-
 	if(Validator.isNotNull(urlCreateActivity)){
 		
 		%>
@@ -87,7 +83,6 @@ if ((actionEditing && hasPermissionAddLact) ||
 		
 		learningActivityType = learningActivityTypeRegistry.getLearningActivityType(activity.getTypeId());
 		if (permissionChecker.hasPermission(activity.getGroupId(),LearningActivity.class.getName(),	activity.getActId(), ActionKeys.VIEW)){
-
 			if( (Validator.isNotNull(learningActivityType))&&
 				(accessLock || hasPermissionAccessCourseFinished || (!courseLocked && !activity.isLocked(themeDisplay.getUser(), themeDisplay.getPermissionChecker()))  
 					||(permissionChecker.hasPermission(activity.getGroupId(), LearningActivity.class.getName(), activity.getActId(), ActionKeys.UPDATE) && actionEditing))){%>

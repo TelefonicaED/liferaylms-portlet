@@ -816,6 +816,7 @@
     	<column name="endDate" type="Date"></column>
     	<column name="status" type="int" />
     	<column name="statusMessage" type="String" localized="true"/>
+    	<column name="extraContent" type="String" />
     </entity>
     
     <entity name="CourseType"  local-service="true" remote-service="true" json-enabled="false">

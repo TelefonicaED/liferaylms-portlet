@@ -47,6 +47,7 @@ import com.liferay.lms.service.ActivityTriesDeletedLocalServiceUtil;
 import com.liferay.lms.service.AsynchronousProcessAuditLocalServiceUtil;
 import com.liferay.lms.service.ClpSerializer;
 import com.liferay.lms.service.LearningActivityLocalServiceUtil;
+import com.liferay.lms.service.LearningActivityResultLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityServiceUtil;
 import com.liferay.lms.service.LearningActivityTryLocalServiceUtil;
 import com.liferay.lms.service.ModuleLocalServiceUtil;
@@ -410,6 +411,11 @@ public class LmsActivitiesList extends MVCPortlet {
 							LearningActivity.class.getName(), actId,tmp.getUserId(),
 							ActionKeys.UPDATE))
 			{
+				if(moduleId != tmp.getModuleId() && LearningActivityResultLocalServiceUtil.countByActId(tmp.getActId())>0)
+				{
+					SessionErrors.add(actionRequest, "activity.move-activity-with-result");
+					return;
+				}
 				
 			String extraContentTmp =  tmp.getExtracontent();	
 

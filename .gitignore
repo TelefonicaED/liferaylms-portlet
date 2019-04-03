@@ -12,3 +12,4 @@ docroot/WEB-INF/src/com/liferay/lms/service/base/
 docroot/WEB-INF/service/com/liferay/lms/model
 docroot/WEB-INF/service/com/liferay/lms/service
 docroot/WEB-INF/service/com/liferay/lms/NoSuch*.java
+docroot/WEB-INF/sql

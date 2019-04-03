@@ -15,7 +15,8 @@
 			SELECT *
 			FROM lms_asynchronousprocessaudit asy
 			WHERE asy.companyId = ?
-			AND asy.type_ = ? 
+			AND asy.type_ IN (?)
+			AND asy.userId = ?
 			AND asy.createDate > '[$STARTDATE$]' 
 			AND asy.createDate <= '[$ENDDATE$]'
 			AND 1 = 1
@@ -29,7 +30,8 @@
 			SELECT COUNT(*) as COUNT_VALUE
 			FROM lms_asynchronousprocessaudit asy
 			WHERE asy.companyId = ? 
-			AND asy.type_ = ? 
+			AND asy.type_ IN (?)
+			AND asy.userId = ?
 			AND asy.createDate > '[$STARTDATE$]' 
 			AND asy.createDate <= '[$ENDDATE$]'
 			AND 1 = 1

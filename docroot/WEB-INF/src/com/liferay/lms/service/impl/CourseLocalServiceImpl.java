@@ -1349,7 +1349,7 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 						}
 					}
 					
-					if((startDate.before(now) && endDate.after(now))){
+					if((!course.isClosed() && startDate.before(now) && endDate.after(now))){
 						//3. Control de competencias 
 						List<CourseCompetence> courseCompetences = CourseCompetenceLocalServiceUtil.findBycourseId(course.getCourseId(), true);
 						//Busco si al usuario le falta alguna competencia que es necesaria para la inscripcion al curso
@@ -1445,7 +1445,7 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 			boolean enoughCompetences = true;
 			CourseCompetence courseCompetence = null;
 			if(userId > 0){
-				//1. Si no estÃ¡ ya inscrito
+				//1. Si no está ya inscrito
 				if(!GroupLocalServiceUtil.hasUserGroup(userId,course.getGroupCreatedId())){
 					Group group = GroupLocalServiceUtil.getGroup(course.getGroupCreatedId());
 					
@@ -1948,7 +1948,6 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 							}
 						}
 					}
-
 				}
 			} catch (PortalException | SystemException e) {
 				e.printStackTrace();
@@ -1959,6 +1958,10 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 			courses = ListUtil.subList(courses, start, end);
 		}
 		return courses;
+	}
+	
+	public List<Course> getChildsRegistredUser(long parentCourseId, long userId){
+		return courseFinder.findChildRegistredUser(parentCourseId, userId);
 	}
 	
 }

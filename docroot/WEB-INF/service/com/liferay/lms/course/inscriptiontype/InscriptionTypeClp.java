@@ -1,6 +1,7 @@
 package com.liferay.lms.course.inscriptiontype;
 
 import java.util.Locale;
+import java.util.Set;
 
 import javax.portlet.PortletResponse;
 
@@ -187,7 +188,7 @@ public class InscriptionTypeClp implements InscriptionType {
 		Object returnObj = null;
 
 		try {
-			MethodKey getExpecificContentPageMethod = new MethodKey(clp.getClassName(), "getSpecificContentPage", Locale.class); 
+			MethodKey getExpecificContentPageMethod = new MethodKey(clp.getClassName(), "getSpecificContentPage"); 
 			returnObj = clp.invoke(new MethodHandler(getExpecificContentPageMethod));
 		}
 		catch (Throwable t) {
@@ -206,13 +207,12 @@ public class InscriptionTypeClp implements InscriptionType {
 	}
 
 	@Override
-	public String setExtraContent(UploadRequest uploadRequest,
-			PortletResponse portletResponse, Course course) {
+	public String setExtraContent(UploadRequest uploadRequest,PortletResponse portletResponse,Course course) {
 		Object returnObj = null;
 
 		try {
-			MethodKey getExpecificContentPageMethod = new MethodKey(clp.getClassName(), "setExtraContent", UploadRequest.class, PortletResponse.class, Course.class); 
-			returnObj = clp.invoke(new MethodHandler(getExpecificContentPageMethod, uploadRequest, portletResponse, course));
+			MethodKey setExtraContentMethod = new MethodKey(clp.getClassName(), "setExtraContent", UploadRequest.class, PortletResponse.class, Course.class); 
+			returnObj = clp.invoke(new MethodHandler(setExtraContentMethod, uploadRequest, portletResponse, course));
 		}
 		catch (Throwable t) {
 			t = ClpSerializer.translateThrowable(t);
@@ -228,7 +228,53 @@ public class InscriptionTypeClp implements InscriptionType {
 
 		return ((String)returnObj);
 	}
+
+	@Override
+	public Set<Integer> getGroupTypesAvailable() {
+		Object returnObj = null;
+
+		try {
+			MethodKey getGroupTypesAvailableMethod = new MethodKey(clp.getClassName(), "getGroupTypesAvailable"); 
+			returnObj = clp.invoke(new MethodHandler(getGroupTypesAvailableMethod));
+		}
+		catch (Throwable t) {
+			t = ClpSerializer.translateThrowable(t);
+
+			if (t instanceof RuntimeException) {
+				throw (RuntimeException)t;
+			}
+			else {
+				throw new RuntimeException(t.getClass().getName() +
+					" is not a valid exception");
+			}
+		}
+
+		return ((Set<Integer>)returnObj);
+	}
 	
+	
+	@Override
+	public boolean isActive(long companyId) {
+		Object returnObj = null;
+
+		try {
+			MethodKey isActiveMethod = new MethodKey(clp.getClassName(), "isActive", long.class); 
+			returnObj = clp.invoke(new MethodHandler(isActiveMethod, companyId));
+		}
+		catch (Throwable t) {
+			t = ClpSerializer.translateThrowable(t);
+
+			if (t instanceof RuntimeException) {
+				throw (RuntimeException)t;
+			}
+			else {
+				throw new RuntimeException(t.getClass().getName() +
+					" is not a valid exception");
+			}
+		}
+
+		return ((Boolean)returnObj);
+	}
 	
 	
 }
