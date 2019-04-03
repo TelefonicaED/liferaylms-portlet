@@ -33,6 +33,8 @@ import com.liferay.portlet.documentlibrary.DuplicateFileException;
 import com.liferay.portlet.documentlibrary.model.DLFileEntry;
 import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
 import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
+import com.liferay.portlet.documentlibrary.service.DLFileEntryLocalServiceUtil;
+import com.liferay.portlet.documentlibrary.service.persistence.DLFileEntryFinderUtil;
 
 public class ImportUtil {
 	
@@ -87,10 +89,29 @@ public class ImportUtil {
 				String imageName = name[name.length-1];
 				InputStream input = context.getZipEntryAsInputStream(entryElement.attributeValue("file"));
 				
+				log.debug("imageName: " + imageName);
+				log.debug("input: " + input);
+				
 				if(input != null){
 					log.info("mimeType: " + fileEntryOld.getMimeType());
-					try {								
-						FileEntry newFile = DLAppLocalServiceUtil.addFileEntry(userId, repositoryId , folderId , imageName, fileEntryOld.getMimeType(), fileEntryOld.getTitle(), fileEntryOld.getDescription(), StringPool.BLANK, IOUtils.toByteArray(input), serviceContext ) ;
+					try {						
+						
+						int numFiles = DLFileEntryLocalServiceUtil.getFileEntriesCount(context.getScopeGroupId(), folderId);
+						FileEntry newFile = null;
+						String fileEntryTitle = fileEntryOld.getTitle(); 
+						try{
+							newFile = DLAppLocalServiceUtil.getFileEntry(context.getScopeGroupId(), folderId,  fileEntryTitle);
+							if (newFile != null){
+								log.debug("if (newFile != null)");
+								int i = numFiles + 1;
+								fileEntryTitle = fileEntryTitle + i;
+							}
+						}catch (Exception e){
+							log.debug("Excepcion - getFileEntry - se crea el fichero");
+						}
+						log.debug("fileEntryTitle: " + fileEntryTitle);
+						newFile = DLAppLocalServiceUtil.addFileEntry(userId, repositoryId , folderId , imageName, fileEntryOld.getMimeType(), fileEntryTitle, fileEntryOld.getDescription(), StringPool.BLANK, IOUtils.toByteArray(input), serviceContext ) ;
+												
 						if(newFile != null)log.info("newFile: " + newFile.getFileEntryId());
 						return newFile;
 					} catch(DuplicateFileException dfl){

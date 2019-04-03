@@ -65,14 +65,22 @@ public class LearningActivityImport {
 			larn.setGroupId(newModule.getGroupId());
 			larn.setModuleId(newModule.getModuleId());
 	
-			LearningActivity newLarn=LearningActivityLocalServiceUtil.addLearningActivity(larn,serviceContext);
-			serviceContext.setScopeGroupId(newLarn.getGroupId());
+			//Comprobamos si la actividad ya existe para actualizarla o para crearla nueva
+			LearningActivity newLarn = null;
 			
-			//Para actividad de recurso externo
-			if(larn.getTypeId() == 2){
-				//changeExtraContentDocumentIds(newLarn, newModule, userId, context, serviceContext);
+			try{
+				newLarn = LearningActivityLocalServiceUtil.getLearningActivityByUuidAndGroupId(larn.getUuid(), newModule.getGroupId());
+			}catch(PortalException | SystemException e){
+				log.debug("La actividad no existe, la creamos");
 			}
 			
+			if(newLarn == null){
+				newLarn=LearningActivityLocalServiceUtil.addLearningActivity(larn,serviceContext);
+			}else{
+				newLarn=LearningActivityLocalServiceUtil.updateLearningActivity(newLarn, larn,serviceContext);
+			}
+
+			serviceContext.setScopeGroupId(newLarn.getGroupId());
 			
 			//Seteo de contenido propio de la actividad
 			log.debug("***IMPORT EXTRA CONTENT****");
@@ -224,41 +232,28 @@ public class LearningActivityImport {
 			Element theElement = it.next();
 			log.info("element: " + theElement.toString());
 			
-			String messageException = "";
-			//try {
-				log.info("   dlfileentry path: "+theElement.attributeValue("path"));
+			log.info("   dlfileentry path: "+theElement.attributeValue("path"));
 
-				FileEntry newFile = ImportUtil.importDLFileEntry(context, theElement, serviceContext, userId);
-				
-				AssetEntry asset = AssetEntryLocalServiceUtil.getEntry(DLFileEntry.class.getName(), newFile.getPrimaryKey());
-				
-				//Ponemos a la actividad el fichero que hemos recuperado.
-				log.info("    Extracontent : \n"+newLarn.getExtracontent());
-				if(newLarn.getTypeId() == 2){
-					log.info("TIPO EXTERNO");
-					if(countDocument < 0){
-						LearningActivityLocalServiceUtil.setExtraContentValue(newLarn.getActId(), "document", String.valueOf(asset.getEntryId()));
-					}else{
-						LearningActivityLocalServiceUtil.setExtraContentValue(newLarn.getActId(), "document" + countDocument, String.valueOf(asset.getEntryId()));
-					}
-					countDocument++;
-				}else if(newLarn.getTypeId() == 7){
-					LearningActivityLocalServiceUtil.setExtraContentValue(newLarn.getActId(), "assetEntry", String.valueOf(asset.getEntryId()));
+			FileEntry newFile = ImportUtil.importDLFileEntry(context, theElement, serviceContext, userId);
+			
+			AssetEntry asset = AssetEntryLocalServiceUtil.getEntry(DLFileEntry.class.getName(), newFile.getPrimaryKey());
+			
+			//Ponemos a la actividad el fichero que hemos recuperado.
+			log.info("    Extracontent : \n"+newLarn.getExtracontent());
+			if(newLarn.getTypeId() == 2){
+				log.info("TIPO EXTERNO");
+				if(countDocument < 0){
+					LearningActivityLocalServiceUtil.setExtraContentValue(newLarn.getActId(), "document", String.valueOf(asset.getEntryId()));
+				}else{
+					LearningActivityLocalServiceUtil.setExtraContentValue(newLarn.getActId(), "document" + countDocument, String.valueOf(asset.getEntryId()));
 				}
-				
-				Long newActId = newLarn.getActId();
-				newLarn = LearningActivityLocalServiceUtil.getLearningActivity(newActId);
-				
-		/*	}catch(FileExtensionException fee){
-				fee.printStackTrace();
-				log.info("*ERROR! dlfileentry path FileExtensionException:" + theElement.attributeValue("path")+", "+messageException +", message: "+fee.getMessage());
-			}catch(FileSizeException fse){
-				log.info("*ERROR! dlfileentry path FileSizeException:" + theElement.attributeValue("path")+messageException +", message: "+ fse.getMessage());
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				log.info("*ERROR! dlfileentry path: " + theElement.attributeValue("path")+messageException +", message: "+e.getMessage());
-			}*/
+				countDocument++;
+			}else if(newLarn.getTypeId() == 7){
+				LearningActivityLocalServiceUtil.setExtraContentValue(newLarn.getActId(), "assetEntry", String.valueOf(asset.getEntryId()));
+			}
+			
+			Long newActId = newLarn.getActId();
+			newLarn = LearningActivityLocalServiceUtil.getLearningActivity(newActId);
 
 		}	
 	}

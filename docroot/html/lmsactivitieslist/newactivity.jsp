@@ -34,12 +34,10 @@ AUI().ready(
 <%
 	Course course=CourseLocalServiceUtil.fetchByGroupCreatedId(themeDisplay.getScopeGroupId());
 	long courseTypeId = AssetEntryLocalServiceUtil.getEntry(Course.class.getName(),course.getCourseId()).getClassTypeId();
-	System.out.println("courseTypeId:: " + courseTypeId);
 	List<Long> listLearningActivityTypes = null;
 	if(courseTypeId>0){
 		CourseType courseType = CourseTypeLocalServiceUtil.getCourseType(courseTypeId);
 		listLearningActivityTypes = courseType.getLearningActivityTypeIds();
-		System.out.println(listLearningActivityTypes.size());
 	}
 	LearningActivityTypeRegistry learningActivityTypeRegistry = new LearningActivityTypeRegistry();
 	long[] invisibleTypes = StringUtil.split(PropsUtil.get("lms.learningactivity.invisibles"), StringPool.COMMA,-1L);

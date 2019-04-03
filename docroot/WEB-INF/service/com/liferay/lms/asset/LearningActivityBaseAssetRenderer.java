@@ -61,7 +61,6 @@ public abstract class LearningActivityBaseAssetRenderer extends BaseAssetRendere
 	protected static final String ACTIVITY_VIEWER_PORTLET_ID =  PortalUtil.getJsSafePortletId("activityViewer"+PortletConstants.WAR_SEPARATOR+ClpSerializer.getServletContextName());
 	public static final String LMS_EDITACTIVITY_PORTLET_ID =  PortalUtil.getJsSafePortletId("editactivity"+PortletConstants.WAR_SEPARATOR+ClpSerializer.getServletContextName());
 	
-	
 	private LearningActivity _learningactivity;
 	private String _nameKey;
 	private String _portletId;

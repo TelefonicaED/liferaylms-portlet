@@ -26,8 +26,6 @@ if(course!=null)
 {
 	searchGroupId=course.getGroupId();
 }
-//String assetTypes=PropsUtil.get("lms.internalresource.assettypes");
-//String[] allowedAssetTypes=assetTypes.split(",");
 
 Properties props = PropsUtil.getProperties("lms.internalresource.assettypes", true);
 List<String> allowedAssetTypes = new ArrayList<String>();
@@ -56,54 +54,56 @@ if(resId > 0){
 	<liferay-portlet:param name="mvcPath" value="/html/editactivity/editactivity.jsp" />
 	<liferay-portlet:param name="resId" value="<%=String.valueOf(resId) %>" />
 	<liferay-portlet:param name="resModuleId" value="<%=String.valueOf(resModuleId) %>" />
-	<liferay-portlet:param name="title" value="<%=String.valueOf(title) %>" />
-	<liferay-portlet:param name="description" value="<%=String.valueOf(description) %>" />
 	<liferay-portlet:param name="type" value="7" />
 </liferay-portlet:renderURL>
+
+<aui:form name="backForm" action="<%=backURL %>" method="POST" role="form">
+	<aui:input type="hidden" name="title" value="<%=String.valueOf(title) %>" />
+	<aui:input type="hidden" name="description" value="<%=String.valueOf(description) %>" />
+</aui:form>
 
 
 <liferay-ui:header 
 	title="<%=message %>" 
-	backURL="<%=backURL  %>"
-	localizeTitle="<%=resId <= 0 %>"
+	localizeTitle="<%=resId <= 0 %>" 
 />
-
-
 
 <liferay-portlet:renderURL var="selectResource">
 	<liferay-portlet:param name="jspPage" value="/html/resourceInternalActivity/admin/searchresults.jsp"/>
-	<liferay-portlet:param name="title" value="<%=String.valueOf(title) %>" />
-	<liferay-portlet:param name="description" value="<%=String.valueOf(description) %>" />
+
 </liferay-portlet:renderURL>
 
-<aui:form name="<portlet:namespace />ressearch" action="<%=selectResource %>" method="POST">
+<aui:form name="<portlet:namespace />ressearch" action="<%=selectResource %>" method="POST" role="form">
 
-<aui:input type="hidden" name="resId" value="<%=resId%>"/>
-<aui:input type="hidden" name="resModuleId" value="<%=resModuleId %>"/>
+	<aui:input type="hidden" name="resId" value="<%=resId%>"/>
+	<aui:input type="hidden" name="resModuleId" value="<%=resModuleId %>"/>
+	<aui:input type="hidden" name="title" value="<%=String.valueOf(title) %>" />
+	<aui:input type="hidden" name="description" value="<%=String.valueOf(description) %>" />
 
-<aui:select name="className" label="asset-type">
-<% 
-
-for(String className:allowedAssetTypes)
-{	
-	String assettypename=LanguageUtil.get(pageContext, "model.resource." + className);	
-	%>
-	<aui:option value="<%=className%>" label="<%=assettypename%>"></aui:option>
-	<%
+	<aui:select name="className" label="asset-type">
+		<% 
+		
+		for(String className:allowedAssetTypes)
+		{	
+			String assettypename=LanguageUtil.get(pageContext, "model.resource." + className);	
+			%>
+			<aui:option value="<%=className%>" label="<%=assettypename%>"></aui:option>
+			<%
+			
+		}
+		%>
+	</aui:select>
+	<aui:input name="keywords" size="20" type="text"/>
 	
-}
-%>
-</aui:select>
-<aui:input name="keywords" size="20" type="text"/>
-
-<aui:input name="groupId" type="hidden" value="<%=Long.toString(searchGroupId) %>" />
-
-<aui:field-wrapper label="categories" helpMessage="resourceInternalActivity.categories.helpmessage">
-	<%@ include file="/html/resourceInternalActivity/admin/catselector.jspf" %>
-</aui:field-wrapper>
-<aui:button-row>
-	<aui:button type="submit" value="search" />
-</aui:button-row>
+	<aui:input name="groupId" type="hidden" value="<%=Long.toString(searchGroupId) %>" />
+	
+	<aui:field-wrapper label="categories" helpMessage="resourceInternalActivity.categories.helpmessage">
+		<%@ include file="/html/resourceInternalActivity/admin/catselector.jspf" %>
+	</aui:field-wrapper>
+	<aui:button-row>
+		<aui:button type="submit" value="search" />
+		<aui:button value="cancel" onClick="javascript:$('#${renderResponse.namespace }backForm').submit();"/>
+	</aui:button-row>
 </aui:form>
 <%!
 public PortletURL getAddPortletURL(long groupId,LiferayPortletRequest liferayPortletRequest, LiferayPortletResponse liferayPortletResponse, String className) throws Exception {
@@ -148,9 +148,7 @@ public PortletURL getAddPortletURL(long groupId,LiferayPortletRequest liferayPor
 
 		
 	}
-
 	
-
 	return addPortletURL;
 }
 

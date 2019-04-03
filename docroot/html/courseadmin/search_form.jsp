@@ -11,7 +11,7 @@ long roleId=ParamUtil.getLong(request, "roleId",0);
 </liferay-portlet:renderURL>
 
 <div class="npa_search_user"> 
-<aui:form name="busqusu" action="<%=buscarURL %>" method="post">
+<aui:form name="busqusu" action="<%=buscarURL %>" role="search" method="post">
 	<aui:fieldset>
 		
 		<aui:input name="searchForm" type="hidden" value="true" />	

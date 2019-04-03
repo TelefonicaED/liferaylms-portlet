@@ -192,7 +192,7 @@
 		<aui:button onClick="javascript:${renderResponse.getNamespace()}submitFormDateEditor()" value="confirm" />
 		
 		<portlet:actionURL name="submit" var="submit" />
-		<aui:form name="dform" action="${submit}" method="POST">
+		<aui:form name="dform" action="${submit}" role="form" method="POST">
 		</aui:form>
 	</div>
 </div>

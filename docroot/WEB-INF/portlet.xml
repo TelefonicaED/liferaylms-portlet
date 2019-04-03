@@ -2189,7 +2189,14 @@
 		<supported-processing-event>
 			<qname xmlns:x="http://www.wemooc.com/">x:themeId</qname>
 		</supported-processing-event>
+		<supported-public-render-parameter>actId</supported-public-render-parameter>
 		<supported-public-render-parameter>moduleId</supported-public-render-parameter>
+		<supported-public-render-parameter>actionEditing</supported-public-render-parameter>
+
+		<supported-public-render-parameter>actionEditingActivity</supported-public-render-parameter>
+		<supported-public-render-parameter>actionEditingDetails</supported-public-render-parameter>
+		<supported-public-render-parameter>actionEditingModule</supported-public-render-parameter>	
+		<supported-public-render-parameter>actionCalifications</supported-public-render-parameter>
 	</portlet>
 	<portlet>
 		<portlet-name>activityViewer</portlet-name>
@@ -2572,8 +2579,12 @@
 			com.liferay.lms.portlet.AsynchronousProcessDashboard
 		</portlet-class>
 		<init-param>
-			<name>view-jsp</name>
+			<name>view-template</name>
 			<value>/html/asynchronousprocessdashboard/view.jsp</value>
+		</init-param>
+		<init-param>
+			<name>config-template</name>
+			<value>/html/asynchronousprocessdashboard/config/config.jsp</value>
 		</init-param>
 		<expiration-cache>0</expiration-cache>
 		<supports>

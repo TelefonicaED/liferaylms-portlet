@@ -57,10 +57,10 @@
 </portlet:actionURL>
 
 <c:if test="<%=delete&&learningActivityType.hasDeleteTries() && (listActivityTriesDeleteds == null || listActivityTriesDeleteds.size() == 0)%>">
-	<aui:form name="deleteAllFm" action="<%=deleteAllURL %>" method="POST">
+	<aui:form name="deleteAllFm" action="<%=deleteAllURL %>" method="POST" role="form">
 		<liferay-ui:icon image="close" label="true" message="com.liferay.manager.CleanLearningActivityTriesNotPassed" url="javascript:${renderResponse.getNamespace()}deleteAll();"  />
 	</aui:form>
-	<aui:form name="deleteAllTriesFm" action="<%=deleteAllTriesURL %>" method="POST">
+	<aui:form name="deleteAllTriesFm" action="<%=deleteAllTriesURL %>" method="POST" role="form">
 		<liferay-ui:icon image="close" label="true" message="com.liferay.manager.CleanLearningActivityTries" url="javascript:${renderResponse.getNamespace()}deleteAllTries();"  />
 	</aui:form>
 </c:if>
@@ -108,7 +108,7 @@ userSearchContainer.setResults(users);
 userSearchContainer.setTotal(totalUsers);
 
 %>
-	<aui:form name="searchFm" action="<%=renderResponse.createRenderURL() %>" method="POST">
+	<aui:form name="searchFm" action="<%=renderResponse.createRenderURL() %>" method="POST" role="form">
 		<div class="taglib-search-toggle">
 			<div class="taglib-search-toggle-advanced">
 				<aui:input type="hidden" name="resId" value="<%=actId %>"/>

@@ -55,7 +55,7 @@ if(prefs!=null){
 
 <liferay-portlet:actionURL name="changeSettings" var="changeSettingsURL"/>
 
-<aui:form action="<%=changeSettingsURL %>" method="POST">
+<aui:form action="<%=changeSettingsURL %>" method="POST" role="form">
 <aui:input type="hidden" name="redirect" value="<%= currentURL %>" />
 
 <liferay-ui:header title="lms-activities"/>
@@ -177,7 +177,8 @@ for(InscriptionType inscriptionType :inscriptionTypeRegistry.getInscriptionTypes
 	%>
 	
 	<aui:input type="checkbox" name="inscriptionTypes" 
-	label="<%=LanguageUtil.get(locale, inscriptionType.getTitle(locale))  %>" checked="<%=checked %>" value="<%=inscriptionType.getTypeId()%>" />
+		label="<%=LanguageUtil.get(locale, inscriptionType.getTitle(locale))  %>" checked="<%=checked %>" value="<%=inscriptionType.getTypeId()%>" 
+		disabled="<%=!inscriptionType.isActive(themeDisplay.getCompanyId()) %>"/>
 	<%
 }
 %>

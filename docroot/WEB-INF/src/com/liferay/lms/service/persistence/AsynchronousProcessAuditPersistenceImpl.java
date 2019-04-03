@@ -322,6 +322,7 @@ public class AsynchronousProcessAuditPersistenceImpl extends BasePersistenceImpl
 		asynchronousProcessAuditImpl.setEndDate(asynchronousProcessAudit.getEndDate());
 		asynchronousProcessAuditImpl.setStatus(asynchronousProcessAudit.getStatus());
 		asynchronousProcessAuditImpl.setStatusMessage(asynchronousProcessAudit.getStatusMessage());
+		asynchronousProcessAuditImpl.setExtraContent(asynchronousProcessAudit.getExtraContent());
 
 		return asynchronousProcessAuditImpl;
 	}

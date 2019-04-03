@@ -31,7 +31,7 @@ if (request.getRemoteUser() != null) {
 <portlet:actionURL name="changeDelivery" var="deliveriesURL">
 </portlet:actionURL>
 <br /><br />
-<aui:form name="delivery" action="<%=deliveriesURL.toString() %>" method="post">
+<aui:form name="delivery" action="<%=deliveriesURL.toString() %>" method="post" role="form">
 <liferay-ui:search-container>
 	<liferay-ui:search-container-results
 		results="<%= deliveries %>"

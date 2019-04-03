@@ -497,16 +497,17 @@ public class CourseResultLocalServiceImpl
 				}
 				
 			}	
-			
-			//Actualizamos los diplomas externos (si los hay)
-			CourseDiplomaRegistry cdr=new CourseDiplomaRegistry();
-			if(cdr!=null){
-				CourseDiploma courseDiploma = cdr.getCourseDiploma();
-				if(courseDiploma!=null){
-					courseDiploma.updateUserDiploma(cresult.getCrId());
-				}
-			}
 		}		
+		
+		//Actualizamos los diplomas externos (si los hay)
+		CourseDiplomaRegistry cdr=new CourseDiplomaRegistry();
+		if(cdr!=null){
+			CourseDiploma courseDiploma = cdr.getCourseDiploma();
+			if(courseDiploma!=null){
+				courseDiploma.updateUserDiploma(cresult.getCrId());
+			}
+		}
+		
 		courseResultPersistence.update(cresult, false);
 	}
 	

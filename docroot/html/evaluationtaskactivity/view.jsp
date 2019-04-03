@@ -219,7 +219,7 @@ if(actId==0){
 					</liferay-portlet:renderURL>
 					
 					<h5><liferay-ui:message key="studentsearch"/></h5>
-					<aui:form name="studentsearch" action="<%=returnurl %>" method="post">
+					<aui:form name="studentsearch" action="<%=returnurl %>" method="post" role="form">
 						<aui:fieldset>
 							<aui:column>
 								<aui:input label="studentsearch.text.criteria" name="criteria" size="25" value="<%=criteria %>" />	

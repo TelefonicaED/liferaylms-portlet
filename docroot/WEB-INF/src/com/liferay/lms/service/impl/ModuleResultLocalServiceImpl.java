@@ -383,7 +383,7 @@ public class ModuleResultLocalServiceImpl extends ModuleResultLocalServiceBaseIm
 			
 			moduleResult= getAndCreateIfNotExists( userId,  moduleId,lactr.getStartDate());
 			log.debug("****Modulo "+learningActivity.getModuleId() );
-			log.debug("****REsult End Date "+lactr.getEndDate());
+			log.debug("****Result End Date "+lactr.getEndDate());
 			if (learningActivity.getModuleId() > 0 && lactr.getEndDate()!=null) 
 			{
 				log.debug("****Recalculamos Modulo");
@@ -632,9 +632,11 @@ public class ModuleResultLocalServiceImpl extends ModuleResultLocalServiceBaseIm
 		}else if(learnActList.size()>0 && !moduleResult.getPassed()){
 			result= 100;
 			passedDate = new Date();
+		}else if(learnActList.size()>0){
+			//Se añade para el recálculo de las antiguas, que ya están aprobadas pero con un 0
+			result = 100;
 		}
-		if(result>0)
-		{
+		if(result>0){
 			//Vamos a ver si tiene un sistema de evaluaci?e m?o 
 			CourseEvalRegistry cer=new CourseEvalRegistry();
 			Course course=courseLocalService.fetchByGroupCreatedId(module.getGroupId());

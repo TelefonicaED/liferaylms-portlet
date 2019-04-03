@@ -10,7 +10,7 @@ String competenceImageURL=CompetenceLocalServiceUtil.getBGImageURL(themeDisplay.
 
 <liferay-ui:header backURL="<%=cancelURL%>" showBackURL="<%=Boolean.TRUE%>" title="" />
 		
-<aui:form name="fm" action="<%=saveImageURL%>"  method="post" enctype="multipart/form-data">
+<aui:form name="fm" action="<%=saveImageURL%>" role="form" method="post" enctype="multipart/form-data">
 <aui:input type="hidden" name="grupId" value="<%=themeDisplay.getScopeGroupId() %>"/>
 <aui:input name="fileName" label="image" id="fileName" type="file" value="" >
 				<aui:validator name="acceptFiles">'jpg, jpeg, png, gif'</aui:validator>

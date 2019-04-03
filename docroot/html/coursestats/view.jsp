@@ -10,7 +10,7 @@
 	<liferay-ui:icon cssClass='bt_importexport' label="<%= true %>" message="coursestats.csv.export" method="get" url="<%=exportURL%>" />
 
 	<c:if test="${existTeams}">
-		<aui:form name="reloadTeamFm" action="${reloadTeamURL}" method="post">
+		<aui:form name="reloadTeamFm" action="${reloadTeamURL}" method="post" role="form">
 			<aui:fieldset>
 				<aui:column>
 					<aui:select name="teamId" label="team" onChange="submit();">

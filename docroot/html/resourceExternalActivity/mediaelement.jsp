@@ -8,7 +8,7 @@
 		<c:set var="questionType" value="${question.testQuestionType }" />
 		<div class="aui-helper-hidden questionVideo"
 			id="${renderResponse.namespace}question_${question.questionId}">
-			<aui:form name="questionform_${question.questionId}">
+			<aui:form name="questionform_${question.questionId}" role="form">
 				<aui:input name="questionId" value="${question.questionId }"
 					type="hidden" />
 				<aui:input name="latId" value="${latId}" type="hidden" />
@@ -76,8 +76,8 @@
 			$('#<portlet:namespace/>videoQuestionFeedback').html("");
 			finished = false;
 			if(plays > 0){
-				if($('[id*^=<portlet:namespace/>question_]')!=null){
-					$('[id*^=<portlet:namespace/>question_]').addClass("aui-helper-hidden");	
+				if($('[id^=<portlet:namespace/>question_]')!=null){
+					$('[id^=<portlet:namespace/>question_]').addClass("aui-helper-hidden");	
 				}
 			}
 			plays++;

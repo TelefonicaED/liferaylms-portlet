@@ -23,7 +23,7 @@ else
 	<portlet:actionURL var="savePonderationURL" name="savePonderation" />
 	
 <portlet:renderURL var="cancel" />
-<aui:form name="fm" action="<%=savePonderationURL%>"  method="post">
+<aui:form name="fm" action="<%=savePonderationURL%>"  role="form" method="post">
 	<aui:input size="5" name="passpuntuation" label="passpuntuation" type="text" value="<%=Long.toString(score) %>" >
 		<aui:validator name="digits"></aui:validator>
 	</aui:input>
