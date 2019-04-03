@@ -65,14 +65,22 @@ public class LearningActivityImport {
 			larn.setGroupId(newModule.getGroupId());
 			larn.setModuleId(newModule.getModuleId());
 	
-			LearningActivity newLarn=LearningActivityLocalServiceUtil.addLearningActivity(larn,serviceContext);
-			serviceContext.setScopeGroupId(newLarn.getGroupId());
+			//Comprobamos si la actividad ya existe para actualizarla o para crearla nueva
+			LearningActivity newLarn = null;
 			
-			//Para actividad de recurso externo
-			if(larn.getTypeId() == 2){
-				//changeExtraContentDocumentIds(newLarn, newModule, userId, context, serviceContext);
+			try{
+				newLarn = LearningActivityLocalServiceUtil.getLearningActivityByUuidAndGroupId(larn.getUuid(), newModule.getGroupId());
+			}catch(PortalException | SystemException e){
+				log.debug("La actividad no existe, la creamos");
 			}
 			
+			if(newLarn == null){
+				newLarn=LearningActivityLocalServiceUtil.addLearningActivity(larn,serviceContext);
+			}else{
+				newLarn=LearningActivityLocalServiceUtil.updateLearningActivity(newLarn, larn,serviceContext);
+			}
+
+			serviceContext.setScopeGroupId(newLarn.getGroupId());
 			
 			//Seteo de contenido propio de la actividad
 			log.debug("***IMPORT EXTRA CONTENT****");

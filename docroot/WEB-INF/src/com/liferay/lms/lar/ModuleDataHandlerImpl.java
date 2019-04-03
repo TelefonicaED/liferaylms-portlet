@@ -41,6 +41,7 @@ import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
 import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
+import com.liferay.util.LmsLocaleUtil;
 
 
 public class ModuleDataHandlerImpl extends BasePortletDataHandler {
@@ -377,9 +378,21 @@ public class ModuleDataHandlerImpl extends BasePortletDataHandler {
 		
 		
 		log.info("ENTRY ELEMENT-->"+entryElement);
+		Module newModule = null;
+		
+		//Comprobamos si el módulo ya existe (por uuid) si ya existe lo actualizamos, no lo creamos de nuevo
+		try{
+			newModule = ModuleLocalServiceUtil.getModuleByUuidAndGroupId(entry.getUuid(), context.getScopeGroupId());
+		}catch(PortalException | SystemException e){
+			log.debug("Modulo no existe, lo creamos");
+		}
 		
 		//Creamos el nuevo módulo en el curso
-		Module newModule = ModuleLocalServiceUtil.addmodule(entry);
+		if(newModule == null){
+			newModule = ModuleLocalServiceUtil.addmodule(entry);
+		}else{
+			newModule = ModuleLocalServiceUtil.updateModule(newModule, entry);
+		}
 		
 		//Importamos las imagenes de los módulos
 		ModuleImport.importImageModule(context, entryElement, serviceContext, userId, newModule);

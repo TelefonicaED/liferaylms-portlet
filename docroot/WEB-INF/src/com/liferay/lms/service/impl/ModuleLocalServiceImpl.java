@@ -289,6 +289,9 @@ public class ModuleLocalServiceImpl extends ModuleLocalServiceBaseImpl {
 		log.debug(":::::::::::::::addmodule::::::::::::::::::::");
 	    Module fileobj = modulePersistence.create(CounterLocalServiceUtil.increment(Module.class.getName()));
 
+	    if(Validator.isNotNull(validmodule.getUuid())){
+	    	fileobj.setUuid(validmodule.getUuid());
+	    }
 	    fileobj.setCompanyId(validmodule.getCompanyId());
 	    fileobj.setGroupId(validmodule.getGroupId());
 	    fileobj.setUserId(validmodule.getUserId());
@@ -344,6 +347,35 @@ public class ModuleLocalServiceImpl extends ModuleLocalServiceBaseImpl {
 		//auditing
 		AuditingLogFactory.audit(module.getCompanyId(), module.getGroupId(), Module.class.getName(), 
 				validmodule.getModuleId(), module.getUserId(), AuditConstants.ADD, null);
+	    
+	    return module;
+	}
+	
+	@Indexable(type=IndexableType.REINDEX)
+	public Module updateModule (Module fileobj, Module validmodule) throws SystemException, PortalException {
+		log.debug(":::::::::::::::addmodule::::::::::::::::::::");
+
+	    fileobj.setModifiedDate(new java.util.Date(System.currentTimeMillis()));
+	    fileobj.setStartDate(validmodule.getStartDate());
+	    fileobj.setEndDate(validmodule.getEndDate());
+	    fileobj.setTitle(validmodule.getTitle());
+	    fileobj.setDescription(validmodule.getDescription());
+	    fileobj.setOrdern(fileobj.getModuleId());
+	    fileobj.setIcon(validmodule.getIcon());
+	    fileobj.setPrecedence(validmodule.getPrecedence());
+
+	    fileobj = LmsLocaleUtil.checkDefaultLocale(Module.class, fileobj, "title");
+	    fileobj = LmsLocaleUtil.checkDefaultLocale(Module.class, fileobj, "description");
+
+	    Module module = modulePersistence.update(fileobj, false);
+
+	    //Index
+		Indexer indexer = IndexerRegistryUtil.nullSafeGetIndexer(Module.class);
+		indexer.reindex(module);
+
+		//auditing
+		AuditingLogFactory.audit(module.getCompanyId(), module.getGroupId(), Module.class.getName(), 
+				validmodule.getModuleId(), module.getUserId(), AuditConstants.UPDATE, null);
 	    
 	    return module;
 	}
