@@ -1,5 +1,7 @@
+
 <%@page import="com.liferay.lms.course.adminaction.AdminActionTypeRegistry"%>
 <%@page import="com.liferay.lms.course.adminaction.AdminActionType"%>
+
 <%@page import="com.liferay.lms.service.CourseResultLocalServiceUtil"%>
 <%@page import="com.liferay.portal.kernel.util.PrefsPropsUtil"%>
 <%@page import="com.liferay.lms.service.CourseLocalServiceUtil"%>
