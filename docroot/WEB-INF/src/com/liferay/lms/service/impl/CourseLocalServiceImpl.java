@@ -150,15 +150,15 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 	
 	Log log = LogFactoryUtil.getLog(CourseLocalServiceImpl.class);
 	
-	public java.util.List<Course> getCoursesOfGroup(long groupId) throws SystemException{
+	public List<Course> getCoursesOfGroup(long groupId) throws SystemException{
 		return coursePersistence.findByGroupId(groupId);
 	}
 	
-	public java.util.List<Course> getOpenCoursesOfGroup(long groupId) throws SystemException{
+	public List<Course> getOpenCoursesOfGroup(long groupId) throws SystemException{
 		return coursePersistence.findByGroupId(groupId);
 	}
 	
-	public java.util.List<Course> getCourses(long companyId) throws SystemException{
+	public List<Course> getCourses(long companyId) throws SystemException{
 		return coursePersistence.findByCompanyId(companyId);
 	}
 	
@@ -171,7 +171,7 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 	}
 	
 	public Course addCourse (String title, String description,String summary,String friendlyURL, Locale locale,
-			java.util.Date createDate,java.util.Date startDate,java.util.Date endDate,long layoutSetPrototypeId,int typesite,ServiceContext serviceContext, long calificationType, int maxUsers,boolean isFromClone)
+			Date createDate,Date startDate,Date endDate,long layoutSetPrototypeId,int typesite,ServiceContext serviceContext, long calificationType, int maxUsers,boolean isFromClone)
 			throws SystemException, PortalException {
 		return addCourse(title, description, summary, friendlyURL, locale, createDate, startDate, endDate, layoutSetPrototypeId, typesite, 0, calificationType, maxUsers, serviceContext,isFromClone);
 	}
@@ -234,8 +234,6 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 		
 		return null;
 	}
-	
-
 
 	public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int end){
 		
@@ -269,7 +267,7 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 
 
 	public Course addCourse (String title, String description,String summary,String friendlyURL, Locale locale,
-		java.util.Date createDate,java.util.Date startDate,java.util.Date endDate,long layoutSetPrototypeId,int typesite, long CourseEvalId, long calificationType, int maxUsers,ServiceContext serviceContext,boolean isfromClone)
+		Date createDate,Date startDate,Date endDate,long layoutSetPrototypeId,int typesite, long CourseEvalId, long calificationType, int maxUsers,ServiceContext serviceContext,boolean isfromClone)
 		throws SystemException, PortalException {
 		
 		Course course = addCourse (title, description,summary,friendlyURL, locale,
@@ -466,7 +464,7 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 
 	@Indexable(type=IndexableType.REINDEX)
 	public Course addCourse (String title, String description,String summary,String friendlyURL, Locale locale,
-			java.util.Date createDate,java.util.Date startDate,java.util.Date endDate,
+			Date createDate,Date startDate,Date endDate,
 		ServiceContext serviceContext, long calificationType)
 			throws SystemException, 
 			PortalException {
@@ -480,7 +478,7 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 
 	@Indexable(type=IndexableType.REINDEX)
 	public Course addCourse (String title, String description,String friendlyURL, Locale locale,
-			java.util.Date createDate,java.util.Date startDate,java.util.Date endDate,
+			Date createDate,Date startDate,Date endDate,
 		ServiceContext serviceContext, long calificationType)
 			throws SystemException, 
 			PortalException {
@@ -1364,7 +1362,7 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 						}
 						if(enoughCompetences){
 							// 4. El mÃ¡ximo de inscripciones del curso no ha sido superado
-							if(course.getMaxusers()<=0 || UserLocalServiceUtil.getGroupUsersCount(course.getGroupCreatedId()) < course.getMaxusers()){
+							if(course.getMaxusers()<=0 || countStudentsFromCourse(courseId, course.getCompanyId(), null, null, null, null, WorkflowConstants.STATUS_APPROVED, null, true) < course.getMaxusers()){
 								if(group.getType()==GroupConstants.TYPE_SITE_OPEN){
 									Role sitemember=RoleLocalServiceUtil.getRole(course.getCompanyId(), RoleConstants.SITE_MEMBER) ;
 									

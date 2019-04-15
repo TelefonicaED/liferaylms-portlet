@@ -34,8 +34,6 @@ import com.liferay.portal.theme.ThemeDisplay;
 public class DraganddropQuestionType extends BaseQuestionType {
 
 	private static final long serialVersionUID = 1L;
-	
-	private static Log log = LogFactoryUtil.getLog(DraganddropQuestionType.class);
 
 	private static Log log = LogFactoryUtil.getLog(DraganddropQuestionType.class);
 	public long getTypeId(){
