@@ -41,6 +41,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.GroupConstants;
 import com.liferay.portal.model.MembershipRequestConstants;
@@ -369,7 +370,7 @@ public class CourseImpl extends CourseBaseImpl {
 					}
 					if(isPassed) {
 						// 4. El mÃƒÂ¡ximo de inscripciones del curso no ha sido superado
-						if(getMaxusers()<=0 || UserLocalServiceUtil.getGroupUsersCount(getGroupCreatedId()) < getMaxusers()){
+						if(getMaxusers()<=0 || CourseLocalServiceUtil.countStudentsFromCourse(this.getCourseId(), this.getCompanyId(), null, null, null, null, WorkflowConstants.STATUS_APPROVED, null, true) < getMaxusers()){
 							//5. Comprobamos el tipo de inscripciÃ³n
 							Group group = GroupLocalServiceUtil.getGroup(getGroupCreatedId());
 							if(group.getType()==GroupConstants.TYPE_SITE_OPEN){
