@@ -38,6 +38,7 @@
 	}
 	boolean showActionSocial = GetterUtil.getBoolean(preferences.getValue("showActionSocial", StringPool.FALSE),true);
 	boolean showActionAudit = GetterUtil.getBoolean(preferences.getValue("showActionAudit", StringPool.FALSE),true);
+	boolean showEmailAddress = GetterUtil.getBoolean(preferences.getValue("showEmailAddress", StringPool.FALSE), true);
 	
 	CalificationType ct = new CalificationTypeRegistry().getCalificationType(course.getCalificationType());
 %>
@@ -66,7 +67,9 @@
 			<liferay-ui:search-container-column-text name="name" >
 				<liferay-ui:user-display userId="${usr.userId}"/>
 			</liferay-ui:search-container-column-text>
-			
+			<c:if test="<%= showEmailAddress %>">
+				<liferay-ui:search-container-column-text name="email-address" property="emailAddress"/>
+			</c:if>
 			<liferay-ui:search-container-column-text name="result">
 				<%			
 				CourseResult courseResult=CourseResultLocalServiceUtil.getCourseResultByCourseAndUser(course.getCourseId(), usr.getUserId());
