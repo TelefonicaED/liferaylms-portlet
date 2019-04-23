@@ -37,7 +37,6 @@ public class DraganddropQuestionType extends BaseQuestionType {
 	
 	private static Log log = LogFactoryUtil.getLog(DraganddropQuestionType.class);
 
-	private static Log log = LogFactoryUtil.getLog(DraganddropQuestionType.class);
 	public long getTypeId(){
 		return 4;
 	}
