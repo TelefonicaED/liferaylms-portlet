@@ -306,17 +306,20 @@ public class ResourceExternalActivity extends QuestionsAdmin {
 							//Creamos el nuevo intento al usuario
 							ServiceContext serviceContext = ServiceContextFactory.getInstance(LearningActivityTry.class.getName(), renderRequest);
 
-							LearningActivityTry learningTry =LearningActivityTryLocalServiceUtil.createLearningActivityTry(actId,serviceContext);
-							if (lastLearningActivityTry != null){
-								learningTry.setTryResultData(lastLearningActivityTry.getTryResultData());
-								LearningActivityTryLocalServiceUtil.updateLearningActivityTry(learningTry);	
-							}
-							renderRequest.setAttribute("latId", learningTry.getLatId());
-							//Si no hace falta nota para aprobar ya lo aprobamos
-							if(isDefaultScore){
-								learningTry.setEndDate(new Date());
-								learningTry.setResult(100);
-								LearningActivityTryLocalServiceUtil.updateLearningActivityTry(learningTry);	
+							if(!hasPermissionAccessCourseFinished){
+								
+								LearningActivityTry learningTry =LearningActivityTryLocalServiceUtil.createLearningActivityTry(actId,serviceContext);
+								if (lastLearningActivityTry != null){
+									learningTry.setTryResultData(lastLearningActivityTry.getTryResultData());
+									LearningActivityTryLocalServiceUtil.updateLearningActivityTry(learningTry);	
+								}
+								renderRequest.setAttribute("latId", learningTry.getLatId());
+								//Si no hace falta nota para aprobar ya lo aprobamos
+								if(isDefaultScore){
+									learningTry.setEndDate(new Date());
+									learningTry.setResult(100);
+									LearningActivityTryLocalServiceUtil.updateLearningActivityTry(learningTry);	
+								}
 							}
 							
 							//Documentos anexos al recurso externo
