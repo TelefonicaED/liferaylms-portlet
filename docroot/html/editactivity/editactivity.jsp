@@ -1028,6 +1028,15 @@ Liferay.provide(
 		<%}
 		%>
 		</liferay-ui:panel>
+		
+		<liferay-ui:custom-attributes-available className="<%= LearningActivity.class.getName() %>" >
+			<liferay-ui:panel-container extended="false" persistState="false">
+		   		<liferay-ui:panel title="custom-fields" collapsible="true" defaultState="closed" >
+		    		<liferay-ui:custom-attribute-list className="<%=LearningActivity.class.getName()%>" classPK="<%=actId %>" 
+		     			editable="true" label="true" />
+		   		</liferay-ui:panel>
+		  	</liferay-ui:panel-container>
+		</liferay-ui:custom-attributes-available>
 		<%
 		boolean showActivityClassification = true;
 		try {
