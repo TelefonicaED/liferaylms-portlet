@@ -68,7 +68,7 @@ if(isLinkTabletResourceExternal){
 					<span class="upfile">
 						<a href='<%=DLUtil.getPreviewURL(documentVersion.getFileEntry(), documentVersion, themeDisplay, "")%>' class="<%=cssLinkTabletClassResourceExternal%>" target="_blank">
 							<img class="dl-file-icon" src="${themeDisplay.pathThemeImages}/file_system/small/<%=documentVersion.getIcon()%>.png" />
-							<liferay-ui:message key="resourceexternalactivity.downloadFile"  arguments='<%=new Object[]{HtmlUtil.escape(documentVersion.getTitle())} %>' />
+							<%=HtmlUtil.escape(documentVersion.getTitle()) %>
 						</a>
 					</span>
 				</div>
