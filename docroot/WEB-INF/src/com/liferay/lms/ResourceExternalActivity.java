@@ -268,24 +268,27 @@ public class ResourceExternalActivity extends QuestionsAdmin {
 									renderRequest.setAttribute("mimeType", "video/" + mimeType);
 									renderRequest.setAttribute("video", videoCode);
 									
-									List<TestQuestion> listQuestions = TestQuestionLocalServiceUtil.getQuestions(actId);
-									renderRequest.setAttribute("listQuestions", listQuestions);
-									
-									//Ahora pasamos los tiempos de las preguntas
-									Hashtable<Long, Integer> timeQuestions = new Hashtable<Long, Integer>();
-									Element element = null;
-									for(TestQuestion question: listQuestions){
-										try{
-											element = root.element("question_" + question.getQuestionId());
-											if(element != null){
-												timeQuestions.put(question.getQuestionId(), Integer.parseInt(element.getText()));
+									if(!hasPermissionAccessCourseFinished){
+										
+										List<TestQuestion> listQuestions = TestQuestionLocalServiceUtil.getQuestions(actId);
+										renderRequest.setAttribute("listQuestions", listQuestions);
+										
+										//Ahora pasamos los tiempos de las preguntas
+										Hashtable<Long, Integer> timeQuestions = new Hashtable<Long, Integer>();
+										Element element = null;
+										for(TestQuestion question: listQuestions){
+											try{
+												element = root.element("question_" + question.getQuestionId());
+												if(element != null){
+													timeQuestions.put(question.getQuestionId(), Integer.parseInt(element.getText()));
+												}
+											}catch(Exception e){
+												e.printStackTrace();
 											}
-										}catch(Exception e){
-											e.printStackTrace();
 										}
+										
+										renderRequest.setAttribute("timeQuestions", timeQuestions);
 									}
-									
-									renderRequest.setAttribute("timeQuestions", timeQuestions);
 									
 								}else{
 									//Es un fileEntryId
@@ -306,17 +309,20 @@ public class ResourceExternalActivity extends QuestionsAdmin {
 							//Creamos el nuevo intento al usuario
 							ServiceContext serviceContext = ServiceContextFactory.getInstance(LearningActivityTry.class.getName(), renderRequest);
 
-							LearningActivityTry learningTry =LearningActivityTryLocalServiceUtil.createLearningActivityTry(actId,serviceContext);
-							if (lastLearningActivityTry != null){
-								learningTry.setTryResultData(lastLearningActivityTry.getTryResultData());
-								LearningActivityTryLocalServiceUtil.updateLearningActivityTry(learningTry);	
-							}
-							renderRequest.setAttribute("latId", learningTry.getLatId());
-							//Si no hace falta nota para aprobar ya lo aprobamos
-							if(isDefaultScore){
-								learningTry.setEndDate(new Date());
-								learningTry.setResult(100);
-								LearningActivityTryLocalServiceUtil.updateLearningActivityTry(learningTry);	
+							if(!hasPermissionAccessCourseFinished){
+								
+								LearningActivityTry learningTry =LearningActivityTryLocalServiceUtil.createLearningActivityTry(actId,serviceContext);
+								if (lastLearningActivityTry != null){
+									learningTry.setTryResultData(lastLearningActivityTry.getTryResultData());
+									LearningActivityTryLocalServiceUtil.updateLearningActivityTry(learningTry);	
+								}
+								renderRequest.setAttribute("latId", learningTry.getLatId());
+								//Si no hace falta nota para aprobar ya lo aprobamos
+								if(isDefaultScore){
+									learningTry.setEndDate(new Date());
+									learningTry.setResult(100);
+									LearningActivityTryLocalServiceUtil.updateLearningActivityTry(learningTry);	
+								}
 							}
 							
 							//Documentos anexos al recurso externo

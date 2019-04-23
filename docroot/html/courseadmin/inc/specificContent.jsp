@@ -14,4 +14,8 @@ if(courseDiploma!=null){
 }
 
 %>
-<liferay-util:include page="<%=pageId %>" portletId="<%=portletId%>" />	
+<liferay-util:include page="<%=pageId %>" portletId="<%=portletId%>" >
+	<%if(course != null){ %>
+		<liferay-util:param name="courseId" value="<%=Long.toString(course.getCourseId()) %>" />
+	<%} %>	
+</liferay-util:include>

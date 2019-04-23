@@ -1976,6 +1976,10 @@
 			<name>view-template</name>
 			<value>/html/inscriptionadmin/view.jsp</value>
 		</init-param>
+		<init-param>
+			<name>config-template</name>
+			<value>/html/inscriptionadmin/config.jsp</value>
+		</init-param>
 		<expiration-cache>0</expiration-cache>
 		<supports>
 			<mime-type>text/html</mime-type>

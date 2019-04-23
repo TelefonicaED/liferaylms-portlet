@@ -143,18 +143,21 @@ function ignoreEnter(e) {
 <%
 // Get exported lars
 String[] lars = _getExportedLars(themeDisplay.getCompanyId(), GetterUtil.getLong(groupId));
+boolean permissionDelete = themeDisplay.getPermissionChecker().hasPermission(course.getGroupCreatedId(), Course.class.getName(), course.getGroupCreatedId(), ActionKeys.DELETE);
 
 for (String lar : lars) {
 	%>
 <div class="lar">
-	<span>
-		<liferay-portlet:actionURL var="deleteExportedURL" name="deleteExportedCourse">
-			<portlet:param name="groupId" value="<%=groupId %>"/>
-			<portlet:param name="fileName" value="<%= lar %>"/>
-			<portlet:param name="redirect" value="<%= currentURL %>"/>
-		</liferay-portlet:actionURL>
-		<liferay-ui:icon-delete url="<%= deleteExportedURL %>" />
-	</span>
+	<c:if test="<%=permissionDelete%>">
+		<span>
+			<liferay-portlet:actionURL var="deleteExportedURL" name="deleteExportedCourse">
+				<portlet:param name="groupId" value="<%=groupId %>"/>
+				<portlet:param name="fileName" value="<%= lar %>"/>
+				<portlet:param name="redirect" value="<%= currentURL %>"/>
+			</liferay-portlet:actionURL>
+			<liferay-ui:icon-delete url="<%= deleteExportedURL %>" />
+		</span>
+	</c:if>
 	<span>
 		<a href="/liferaylms-portlet/exports/courses/<%= themeDisplay.getCompanyId() %>/<%= groupId %>/<%= lar %>"><%= lar %></a>
 	</span>

@@ -68,6 +68,7 @@ import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.SessionMessages;
+import com.liferay.portal.kernel.upload.UploadPortletRequest;
 import com.liferay.portal.kernel.upload.UploadRequest;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.HttpUtil;
@@ -192,7 +193,7 @@ public class LmsActivitiesList extends MVCPortlet {
 		
 	}
 	public void saveActivity(ActionRequest actionRequest, ActionResponse actionResponse) throws Exception {
-		UploadRequest uploadRequest = PortalUtil.getUploadPortletRequest(actionRequest);
+		UploadPortletRequest uploadRequest = PortalUtil.getUploadPortletRequest(actionRequest);
 
 		if(log.isDebugEnabled()){
 			Enumeration<String> parNames2= uploadRequest.getParameterNames();
@@ -202,39 +203,13 @@ public class LmsActivitiesList extends MVCPortlet {
 			}
 		}
 		
-		ServiceContext serviceContext = ServiceContextFactory.getInstance(LearningActivity.class.getName(), actionRequest);
-		
-		List<Long> assetCategoryIdsList = new ArrayList<Long>();
-		boolean updateAssetCategoryIds = false;
-		
-		for (String name:Collections.list((Enumeration<String>)uploadRequest.getParameterNames())){
-			if (name.startsWith("assetCategoryIds")) {
-				updateAssetCategoryIds = true;
-				for (long assetCategoryId : StringUtil.split(
-						ParamUtil.getString(uploadRequest, name), 0L)) {
-					assetCategoryIdsList.add(assetCategoryId);
-				}
-			}
-		}
-		
-		if (updateAssetCategoryIds) {
-			serviceContext.setAssetCategoryIds(ArrayUtil.toArray(
-					assetCategoryIdsList.toArray(
-							new Long[assetCategoryIdsList.size()])));
-		}
+		ServiceContext serviceContext = ServiceContextFactory.getInstance(LearningActivity.class.getName(), uploadRequest);
 	
-		String assetTagNames = uploadRequest.getParameter("assetTagNames");
-
-		
 		long maxSize = ParamUtil.getLong(uploadRequest, "maxSize", -1);
 		
 		if(maxSize<0){
 			SessionErrors.add(actionRequest, "activity-title-required");
 			return;
-		}
-		
-		if (assetTagNames != null) {
-			serviceContext.setAssetTagNames(StringUtil.split(assetTagNames));
 		}
 		
 		ThemeDisplay themeDisplay = (ThemeDisplay) uploadRequest.getAttribute(WebKeys.THEME_DISPLAY);

@@ -23,9 +23,12 @@ import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.model.Company;
 import com.liferay.portal.model.ResourceConstants;
+import com.liferay.portal.model.Role;
+import com.liferay.portal.model.RoleConstants;
 import com.liferay.portal.service.CompanyLocalServiceUtil;
 import com.liferay.portal.service.ResourceActionLocalServiceUtil;
 import com.liferay.portal.service.ResourcePermissionLocalServiceUtil;
+import com.liferay.portal.service.RoleLocalServiceUtil;
 import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
 
 public class UpgradeVersion_3_8_0 extends UpgradeProcess {
@@ -57,6 +60,15 @@ public class UpgradeVersion_3_8_0 extends UpgradeProcess {
 		} catch (IOException | SQLException e) {
 			e.printStackTrace();
 		} 	
+		
+		//Damos el permiso de registrar al user
+		List<Company> companies = CompanyLocalServiceUtil.getCompanies();
+		Role userRole = null;
+		for(Company company: companies){
+			log.info("Asignando permiso REGISTER al User en companyId: " + company.getCompanyId());
+			userRole = RoleLocalServiceUtil.getRole(company.getCompanyId(), RoleConstants.USER);
+			ResourcePermissionLocalServiceUtil.addResourcePermission(company.getCompanyId(), "com.liferay.lms.model.Course", ResourceConstants.SCOPE_COMPANY, String.valueOf(company.getCompanyId()), userRole.getRoleId(), "REGISTER");
+		}
 		
 	}
 	

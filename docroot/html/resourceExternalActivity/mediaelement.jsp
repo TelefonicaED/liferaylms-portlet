@@ -3,7 +3,7 @@
 		<video width="600" height="338" id="playervideo" ${controls }
 			preload="none" src="${video}" type="${mimeType }"></video>
 	</div>
-
+	
 	<c:forEach items="${listQuestions }" var="question">
 		<c:set var="questionType" value="${question.testQuestionType }" />
 		<div class="aui-helper-hidden questionVideo"
@@ -85,29 +85,33 @@
 			
 			
 		});	
-			
-		player.addEventListener('ended',function() {
-			
-			var duration = player.getDuration();
-			
-			<portlet:namespace/>finishTry(100,duration,plays);	
-
-			// Process Success - A LearningActivityResult returned
-			finished = true;	
-			Liferay.Portlet.refresh('#p_p_id_activityNavigator_WAR_liferaylmsportlet_');
-			Liferay.Portlet.refresh('#p_p_id_lmsactivitieslist_WAR_liferaylmsportlet_');
-			player.setControls(true);
-			if('${isVimeoIframe}' == 'true'){
-				var src = 	document.getElementById("playervideo_vimeo_iframe").src;
-				var index = src.indexOf("background");
-				if(index > 0){
-					src = src.substring(0,index-1);
-					document.getElementById("playervideo_vimeo_iframe").src = src;
+		
+		if('${!hasPermissionAccessCourseFinished}' == 'true'){
+				
+			player.addEventListener('ended',function() {
+				
+				var duration = player.getDuration();
+				
+				<portlet:namespace/>finishTry(100,duration,plays);	
+	
+				// Process Success - A LearningActivityResult returned
+				finished = true;	
+				Liferay.Portlet.refresh('#p_p_id_activityNavigator_WAR_liferaylmsportlet_');
+				Liferay.Portlet.refresh('#p_p_id_lmsactivitieslist_WAR_liferaylmsportlet_');
+				player.setControls(true);
+				if('${isVimeoIframe}' == 'true'){
+					var src = 	document.getElementById("playervideo_vimeo_iframe").src;
+					var index = src.indexOf("background");
+					if(index > 0){
+						src = src.substring(0,index-1);
+						document.getElementById("playervideo_vimeo_iframe").src = src;
+					}
 				}
-			}
-			
-			
-		});
+				
+				
+			});
+		
+		}
 		
 		//Creamos el array para las preguntas
 		var questions = [];
@@ -141,27 +145,29 @@
 			});
 		}
 			
-		var unloadEvent = function (e) {
-			//console.log("unload event vimeo");  
-			if(!finished){
-				var duration = player.getDuration();
-				currentTime = player.getCurrentTime();
-					
-				var isDefaultScore = '${isDefaultScore}' == 'true';
-				var positionToSave = parseFloat('${videoPosition}');
-				var oldScore = parseInt('${oldScore}');
-				if (currentTime > positionToSave)
-					positionToSave = currentTime;
-				var score = 100;														
-				if (!isDefaultScore) score = Math.round((currentTime/duration)*100);
-				//debugger;
-				<portlet:namespace/>finishTry(score, positionToSave,plays);													
-			  
-			}
-		};
-		
-		window.addEventListener("beforeunload", unloadEvent);
-		
+		if('${!hasPermissionAccessCourseFinished}' == 'true'){
+			
+			var unloadEvent = function (e) {
+				//console.log("unload event vimeo");  
+				if(!finished){
+					var duration = player.getDuration();
+					currentTime = player.getCurrentTime();
+						
+					var isDefaultScore = '${isDefaultScore}' == 'true';
+					var positionToSave = parseFloat('${videoPosition}');
+					var oldScore = parseInt('${oldScore}');
+					if (currentTime > positionToSave)
+						positionToSave = currentTime;
+					var score = 100;														
+					if (!isDefaultScore) score = Math.round((currentTime/duration)*100);
+					//debugger;
+					<portlet:namespace/>finishTry(score, positionToSave,plays);													
+				  
+				}
+			};
+			
+			window.addEventListener("beforeunload", unloadEvent);
+		}
 	});
      
  	function <portlet:namespace/>answerQuestion(questionId){

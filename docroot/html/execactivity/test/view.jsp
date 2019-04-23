@@ -762,10 +762,10 @@ if(isTablet){%>
 					}
 			} else{
 				PortletURL passwordURL = renderResponse.createRenderURL();
+				passwordURL.setParameter("jspPage","/html/execactivity/test/view.jsp" );
 				if(improve) {
 					passwordURL.setParameter("improve", "true");		
-				}			
-				%>
+				}%>
 			
 				<aui:form action="<%=passwordURL%>" method="post" role="form">
 					<aui:input type="text" name="password" label="execActivity.options.password" />
