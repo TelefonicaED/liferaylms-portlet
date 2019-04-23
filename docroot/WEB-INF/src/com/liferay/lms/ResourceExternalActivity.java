@@ -268,24 +268,27 @@ public class ResourceExternalActivity extends QuestionsAdmin {
 									renderRequest.setAttribute("mimeType", "video/" + mimeType);
 									renderRequest.setAttribute("video", videoCode);
 									
-									List<TestQuestion> listQuestions = TestQuestionLocalServiceUtil.getQuestions(actId);
-									renderRequest.setAttribute("listQuestions", listQuestions);
-									
-									//Ahora pasamos los tiempos de las preguntas
-									Hashtable<Long, Integer> timeQuestions = new Hashtable<Long, Integer>();
-									Element element = null;
-									for(TestQuestion question: listQuestions){
-										try{
-											element = root.element("question_" + question.getQuestionId());
-											if(element != null){
-												timeQuestions.put(question.getQuestionId(), Integer.parseInt(element.getText()));
+									if(!hasPermissionAccessCourseFinished){
+										
+										List<TestQuestion> listQuestions = TestQuestionLocalServiceUtil.getQuestions(actId);
+										renderRequest.setAttribute("listQuestions", listQuestions);
+										
+										//Ahora pasamos los tiempos de las preguntas
+										Hashtable<Long, Integer> timeQuestions = new Hashtable<Long, Integer>();
+										Element element = null;
+										for(TestQuestion question: listQuestions){
+											try{
+												element = root.element("question_" + question.getQuestionId());
+												if(element != null){
+													timeQuestions.put(question.getQuestionId(), Integer.parseInt(element.getText()));
+												}
+											}catch(Exception e){
+												e.printStackTrace();
 											}
-										}catch(Exception e){
-											e.printStackTrace();
 										}
+										
+										renderRequest.setAttribute("timeQuestions", timeQuestions);
 									}
-									
-									renderRequest.setAttribute("timeQuestions", timeQuestions);
 									
 								}else{
 									//Es un fileEntryId
