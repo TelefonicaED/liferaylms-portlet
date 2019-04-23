@@ -82,12 +82,11 @@ if(request.getAttribute("activity")!=null){
 	learnact=(LearningActivity)request.getAttribute("activity");
 	typeId=learnact.getTypeId();
 	moduleId=learnact.getModuleId();
-}else{
-	if(actId>0)	{
-		learnact=LearningActivityLocalServiceUtil.getLearningActivity(actId);
-		typeId=learnact.getTypeId();
-		moduleId=learnact.getModuleId();
-	}
+	actId = learnact.getActId();
+}else if(actId>0)	{
+	learnact=LearningActivityLocalServiceUtil.getLearningActivity(actId);
+	typeId=learnact.getTypeId();
+	moduleId=learnact.getModuleId();
 }
 
 
