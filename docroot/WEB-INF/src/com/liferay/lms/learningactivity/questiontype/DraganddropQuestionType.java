@@ -1,5 +1,6 @@
 package com.liferay.lms.learningactivity.questiontype;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -24,6 +25,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PropsUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
@@ -35,6 +37,7 @@ public class DraganddropQuestionType extends BaseQuestionType {
 	
 	private static Log log = LogFactoryUtil.getLog(DraganddropQuestionType.class);
 
+	private static Log log = LogFactoryUtil.getLog(DraganddropQuestionType.class);
 	public long getTypeId(){
 		return 4;
 	}
@@ -116,7 +119,7 @@ public class DraganddropQuestionType extends BaseQuestionType {
 				}
 			}
 		}
-
+		
 		if(!isCorrect(answersId, testAnswers)){
 			return INCORRECT;
 		}else{
