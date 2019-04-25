@@ -358,19 +358,25 @@ public class CourseCopyUtil {
 		TestQuestion newTestQuestion= null;
 		List<TestAnswer> answers = new ArrayList<TestAnswer>();
 		TestAnswer newTestAnswer = null;
+		HashMap<Long, Long> questionIdsMap = new HashMap<Long, Long>();
+		
 		for(TestQuestion question:questions){
 			try {
 				newTestQuestion = TestQuestionLocalServiceUtil.addQuestion(newActivity.getActId(), question.getText(), question.getQuestionType());
 				String newTestDescription = descriptionFilesClone(question.getText(),newModule.getGroupId(), newTestQuestion.getActId(),userId);
 				newTestQuestion.setText(newTestDescription);
-				TestQuestionLocalServiceUtil.updateTestQuestion(newTestQuestion, true);
+				if(question.getWeight() != question.getQuestionId()){
+					newTestQuestion.setWeight(question.getWeight());
+					questionIdsMap.put(question.getQuestionId(), newTestQuestion.getQuestionId());
+				}
+				newTestQuestion = TestQuestionLocalServiceUtil.updateTestQuestion(newTestQuestion, true);
+				
 				if(log.isDebugEnabled()){
 					log.debug("      Test question : " + question.getQuestionId() );
 					log.debug("      + Test question : " + newTestQuestion.getQuestionId() );
 					log.debug("      + Test question TEXT : " + newTestDescription );
 				}
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 				continue;
 			}
@@ -394,12 +400,19 @@ public class CourseCopyUtil {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				
 			}
-
 		}
 		
+		questions = TestQuestionLocalServiceUtil.getQuestions(newActivity.getActId());
 		
+		for(TestQuestion question:questions){
+			log.debug("orden anterior de la pregunta: " + question.getWeight());
+			if(question.getWeight() > 0 && questionIdsMap.containsKey(question.getWeight())){
+				log.debug("nuevo orden: " + questionIdsMap.get(question.getWeight()));
+				question.setWeight(questionIdsMap.get(question.getWeight()));
+				TestQuestionLocalServiceUtil.updateTestQuestion(question);
+			}
+		}
 	}
 		
 	public void copyEvaluationExtraContent(List<Long> evaluations, HashMap<Long,Long> correlationActivities) throws PortalException, SystemException{
