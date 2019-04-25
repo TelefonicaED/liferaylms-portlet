@@ -532,6 +532,7 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 	public void openCourse(ActionRequest actionRequest,ActionResponse actionResponse) throws Exception {
 
 		long courseId = ParamUtil.getLong(actionRequest, "courseId", 0);
+		log.debug("::OPEN COURSE:: courseId "+courseId);
 		if (courseId > 0) {	
 			CourseLocalServiceUtil.openCourse(courseId);
 		}
