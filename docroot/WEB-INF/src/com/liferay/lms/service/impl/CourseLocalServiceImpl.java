@@ -619,7 +619,7 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 			throws SystemException, PortalException {
 		
 	
-		int numberUsers = UserLocalServiceUtil.getGroupUsersCount(course.getGroupCreatedId());
+		int numberUsers = countStudentsFromCourse(course.getCourseId(), course.getCompanyId(), null, null, null, null, WorkflowConstants.STATUS_APPROVED, null, true);
 		if(course.getMaxusers()>0&&numberUsers>course.getMaxusers()){
 			if(log.isDebugEnabled()){
 				log.debug("Throws exception max users violated");
