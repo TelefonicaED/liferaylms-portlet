@@ -422,7 +422,7 @@ public class GeneralStats extends MVCPortlet {
 		        resourceResponse.getPortletOutputStream().write(b);
 			}
 	        CSVWriter writer = new CSVWriter(new OutputStreamWriter(resourceResponse.getPortletOutputStream(),charset),';');
-	        String[] linea=new String[8];
+	        String[] linea=new String[10];
 	        linea[0]=LanguageUtil.get(themeDisplay.getLocale(),"coursestats.name");
 	        linea[1]=LanguageUtil.get(themeDisplay.getLocale(),"coursestats.registered");
 	        linea[2]=LanguageUtil.get(themeDisplay.getLocale(),"coursestats.start.student");
@@ -440,7 +440,7 @@ public class GeneralStats extends MVCPortlet {
 	        for(Course course:courses){
 	        	userExcludedIds = CourseLocalServiceUtil.getTeachersAndEditorsIdsFromCourse(course);
 	        	courseStatView = new CourseStatsView(course.getCourseId(), themeDisplay.getLocale(), 0, userExcludedIds, null, true);
-	        	linea=new String[8];
+	        	linea=new String[10];
 		        linea[0]=courseStatView.getCourseTitle();
 		    	linea[1]=Long.toString(courseStatView.getRegistered());
 				linea[2]=Long.toString(courseStatView.getStarted());
