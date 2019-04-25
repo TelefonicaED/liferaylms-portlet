@@ -1,7 +1,9 @@
 package com.liferay.lms.lar;
 
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 
@@ -113,6 +115,9 @@ public class LearningActivityImport {
 
 
 	private static void importQuestions(LearningActivity newLarn, long userId, PortletDataContext context, ServiceContext serviceContext, Element actElement) throws SystemException, PortalException {
+		//Guardamos los identificadores en un hashmap para actualizar el orden de las preguntas
+		HashMap<Long, Long> questionIdsMap = new HashMap<Long, Long>();
+		
 		for(Element qElement:actElement.elements("question")){
 			String pathq = qElement.attributeValue("path");
 				
@@ -120,6 +125,13 @@ public class LearningActivityImport {
 			question.setActId(newLarn.getActId());
 			TestQuestion nuevaQuestion=TestQuestionLocalServiceUtil.addQuestion(question.getActId(), question.getText(), question.getQuestionType());
 			
+			if(question.getWeight() != question.getQuestionId()){
+				nuevaQuestion.setWeight(question.getWeight());
+				nuevaQuestion = TestQuestionLocalServiceUtil.updateTestQuestion(nuevaQuestion);
+				questionIdsMap.put(question.getQuestionId(), nuevaQuestion.getQuestionId());
+			}
+			
+			questionIdsMap.put(question.getQuestionId(), nuevaQuestion.getQuestionId());
 			log.info("      Test Question: " + nuevaQuestion.getQuestionId() /*Jsoup.parse(nuevaQuestion.getText()).text()*/);
 			
 			//Si tenemos ficheros en las descripciones de las preguntas.
@@ -129,12 +141,21 @@ public class LearningActivityImport {
 
 				//log.info("   description : " + description );
 				nuevaQuestion.setText(description);
-				TestQuestionLocalServiceUtil.updateTestQuestion(nuevaQuestion);
+				nuevaQuestion = TestQuestionLocalServiceUtil.updateTestQuestion(nuevaQuestion);
 				
 			}
 			
 			QuestionType qt =new QuestionTypeRegistry().getQuestionType(question.getQuestionType());
 			qt.importQuestionAnswers(context, qElement, nuevaQuestion.getQuestionId(), userId, serviceContext);
+		}
+		
+		List<TestQuestion> questions = TestQuestionLocalServiceUtil.getQuestions(newLarn.getActId());
+		for(TestQuestion question: questions){
+			if(question.getWeight() > 0 && questionIdsMap.containsKey(question.getWeight())){
+				log.debug("nuevo orden: " + questionIdsMap.get(question.getWeight()));
+				question.setWeight(questionIdsMap.get(question.getWeight()));
+				TestQuestionLocalServiceUtil.updateTestQuestion(question);
+			}
 		}
 	}
 
