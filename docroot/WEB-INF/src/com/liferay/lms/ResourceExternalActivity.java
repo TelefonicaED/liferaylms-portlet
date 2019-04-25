@@ -240,7 +240,7 @@ public class ResourceExternalActivity extends QuestionsAdmin {
 										
 										String parametros = "";
 										if(videoControlDisabled && !userPassed){
-											parametros += "?background=1&loop=0&mute=0";
+											parametros += "?background=1&loop=0&mute=0&autoplay=1";
 										}
 										videoCode += parametros;
 										log.debug("videoCode: " + videoCode);
