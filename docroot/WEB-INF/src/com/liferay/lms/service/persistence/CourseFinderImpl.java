@@ -191,7 +191,7 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 				description = "%" + description + "%";
 			
 			if (params == null) {
-				params = _emptyLinkedHashMap;
+				params = new LinkedHashMap<String, Object>(0);
 			}
 			
 			if(Validator.isNotNull(title) || Validator.isNotNull(description)){
@@ -691,7 +691,7 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 				description = "%" + description + "%";
 			
 			if (params == null) {
-				params = _emptyLinkedHashMap;
+				params = new LinkedHashMap<String, Object>(0);;
 			}
 			
 			if(Validator.isNotNull(title) || Validator.isNotNull(description)){
@@ -1643,7 +1643,6 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 	private static final String PARAM_STATUS = "status";
 	private static final String PARAM_PARENT_COURSE_ID = "parentCourseId";
 
-	private LinkedHashMap<String, Object> _emptyLinkedHashMap =
-		new LinkedHashMap<String, Object>(0);
+
 	
 }
