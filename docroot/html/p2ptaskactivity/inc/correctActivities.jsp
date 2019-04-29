@@ -195,32 +195,7 @@ if(activity.getEnddate() == null){
 
 				//Se copia el atributo para no modificar el servicio
 				
-				<%
-					for(int i=0;i<numQuestion;i++){
-						String des = LearningActivityLocalServiceUtil.getExtraContentValue(actId, "text"+i);
-						if(i==0 || (des != null && des.length() > 0)){
-							if(Validator.isNull(des)){
-								des = LanguageUtil.get(themeDisplay.getLocale(), "feedback");
-							}
-				%>
-
-							var textDesc = CKEDITOR.instances[thisEditor+'_<%=i%>'].getData();
-	
-							AUI().one(selector).get(thisEditor+'_<%=i%>i').set('value',textDesc);
-	
-							AUI().one(selector).get(thisEditor+'_<%=i%>').set('value',textDesc);
-							textDesc = CKEDITOR.instances[thisEditor+'_<%=i%>'].document.getBody().getText();
-	
-	
-							
-	
-							A.one("#contentDescriptionCorrec_<%=i%>").html(textDesc);
-				<%
-						}else{
-							break;
-						}
-					}
-				%>
+				
 				
 				if(	A.one(selector).one('select[name="<portlet:namespace />resultuser"]') != null){
 					textResult = A.one(selector).one('select[name="<portlet:namespace />resultuser"]').val();
@@ -259,6 +234,35 @@ if(activity.getEnddate() == null){
 					A.one("#contentResult").html(textResult);
 				}
 				A.one("#submitCorrec").on('click', function(){<portlet:namespace />commitFormCorrection(formName);});
+				
+				
+				<%
+				for(int i=0;i<numQuestion;i++){
+					String des = LearningActivityLocalServiceUtil.getExtraContentValue(actId, "text"+i);
+					if(i==0 || (des != null && des.length() > 0)){
+						if(Validator.isNull(des)){
+							des = LanguageUtil.get(themeDisplay.getLocale(), "feedback");
+						}
+			%>
+
+						var textDesc = CKEDITOR.instances[thisEditor+'_<%=i%>'].getData();
+
+						AUI().one(selector).get(thisEditor+'_<%=i%>i').set('value',textDesc);
+
+						AUI().one(selector).get(thisEditor+'_<%=i%>').set('value',textDesc);
+						textDesc = CKEDITOR.instances[thisEditor+'_<%=i%>'].document.getBody().getText();
+
+
+						
+
+						A.one("#contentDescriptionCorrec_<%=i%>").html(textDesc);
+			<%
+					}else{
+						break;
+					}
+				}
+			%>
+				
 				
 				window.<portlet:namespace />p2pconfrmCorrec.show();
 	        },
