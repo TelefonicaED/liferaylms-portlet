@@ -115,9 +115,10 @@ public class P2PAssignations implements MessageListener {
 		//Get assignation Number
 		try {
 			String validations = LearningActivityLocalServiceUtil.getExtraContentValue(actId,"validaciones");
-			numAsigns = Integer.valueOf(validations);
+			if(Validator.isNotNull(validations)){
+				numAsigns = Integer.valueOf(validations);
+			}
 		} catch (SystemException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		} catch (Exception e) {
 			e.printStackTrace();

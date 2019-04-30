@@ -619,7 +619,7 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 			throws SystemException, PortalException {
 		
 	
-		int numberUsers = UserLocalServiceUtil.getGroupUsersCount(course.getGroupCreatedId());
+		int numberUsers = countStudentsFromCourse(course.getCourseId(), course.getCompanyId(), null, null, null, null, WorkflowConstants.STATUS_APPROVED, null, true);
 		if(course.getMaxusers()>0&&numberUsers>course.getMaxusers()){
 			if(log.isDebugEnabled()){
 				log.debug("Throws exception max users violated");
@@ -719,18 +719,19 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 	@Indexable(type=IndexableType.REINDEX)
 	public Course openCourse(long courseId) throws SystemException,
 	PortalException {
-	
-		Course course=CourseLocalServiceUtil.getCourse(courseId);
+		
+		Course course=getCourse(courseId);
+		log.debug("::OPEN COURSE "+course.getClosed());
 		if(course.getClosed()){
 			course.setClosed(false);
 			course.setModifiedDate(new Date());
-			Group courseGroup=GroupLocalServiceUtil.getGroup(course.getGroupCreatedId());
+			Group courseGroup=groupLocalService.getGroup(course.getGroupCreatedId());
 			courseGroup.setActive(true);
-			GroupLocalServiceUtil.updateGroup(courseGroup);
+			groupLocalService.updateGroup(courseGroup);
 			coursePersistence.update(course, true);	
-			AssetEntry courseAsset=AssetEntryLocalServiceUtil.getEntry(Course.class.getName(), course.getCourseId());
+			AssetEntry courseAsset=assetEntryLocalService.getEntry(Course.class.getName(), course.getCourseId());
 			courseAsset.setVisible(true);
-			AssetEntryLocalServiceUtil.updateAssetEntry(courseAsset);
+			assetEntryLocalService.updateAssetEntry(courseAsset);
 
 			CourseEval courseEval=new CourseEvalRegistry().getCourseEval(course.getCourseEvalId());
 			if(Validator.isNotNull(courseEval)) {

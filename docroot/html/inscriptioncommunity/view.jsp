@@ -26,7 +26,7 @@
 						<c:forEach items="${listChildCourses }" var="childCourse">
 							<div class="mensaje_marcado">
 								<span class="edition-name">${childCourse.getTitle(locale)}</span>
-								<aui:button type="button" value="inscription.go-to-course" href="${childCourse.friendlyURL}"/>
+								<aui:button type="button" value="inscription.go-to-course" href='/web${childCourse.friendlyURL}'/>
 								<c:if test="${childCourse.canUnsubscribe(themeDisplay.userId, themeDisplay.permissionChecker) }">
 									<div class="boton_inscibirse ">
 										<a href="#" onclick="javascript:<portlet:namespace/>unsubscribe(${childCourse.courseId })"><liferay-ui:message key="inscripcion.desinscribete" /></a>

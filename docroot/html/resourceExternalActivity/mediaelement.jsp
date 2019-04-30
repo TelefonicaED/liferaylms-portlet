@@ -29,19 +29,21 @@
 
 <%@ include file="/html/questions/validations.jsp"%>
 
+<link rel="stylesheet" type="text/css" href="/liferaylms-portlet/js/mediaelement/mediaelementplayer.css">
+
 <!-- JS -->
 <script
-	src="https://cdn.jsdelivr.net/npm/mediaelement@4.2.7/build/mediaelement-and-player.min.js"></script>
+	src="https://cdn.jsdelivr.net/npm/mediaelement@4.2.9/build/mediaelement-and-player.min.js"></script>
 <script
-	src="https://cdn.jsdelivr.net/npm/mediaelement@4.2.7/build/renderers/dailymotion.min.js"></script>
+	src="https://cdn.jsdelivr.net/npm/mediaelement@4.2.9/build/dailymotion.min.js"></script>
 <script
-	src="https://cdn.jsdelivr.net/npm/mediaelement@4.2.7/build/renderers/facebook.min.js"></script>
+	src="https://cdn.jsdelivr.net/npm/mediaelement@4.2.9/build/facebook.min.js"></script>
 <script
-	src="https://cdn.jsdelivr.net/npm/mediaelement@4.2.7/build/renderers/soundcloud.min.js"></script>
+	src="https://cdn.jsdelivr.net/npm/mediaelement@4.2.9/build/renderers/soundcloud.min.js"></script>
 <script
-	src="https://cdn.jsdelivr.net/npm/mediaelement@4.2.7/build/renderers/twitch.min.js"></script>
+	src="https://cdn.jsdelivr.net/npm/mediaelement@4.2.9/build/renderers/twitch.min.js"></script>
 <script
-	src="https://cdn.jsdelivr.net/npm/mediaelement@4.2.7/build/renderers/vimeo.min.js"></script>
+	src="/liferaylms-portlet/js/mediaelement/renderers/vimeo.js"></script>
 
 <portlet:resourceURL var="saveQuestionURL" id="saveQuestion" />
 
@@ -56,13 +58,27 @@
   	 	var plays = 0;
   	 	var finished = false;
 
-	 	player = new MediaElement("playervideo", {
-	    	pluginPath: 'https://cdn.jsdelivr.net/npm/mediaelement@4.2.7/build/',
-	        shimScriptAccess: 'always',
-	        success: function (media, node) {
-				
-	        }
-	    });
+  	 	
+  	 	if('${isVimeoIframe}' == 'true' && '${controls}' == ''){
+  	 		console.log("SIN CONTROLES");
+  	 		$('#playervideo').mediaelementplayer({
+  	     	    features: ['playpause','volume'], //Adding the feature 'markers' enables this plugin
+  	     		pluginPath: '/liferaylms-portlet/js/mediaelement/',
+  	     	    success: function (media) {
+  	     	    	player = media;
+  	     	    }
+  	     	}); 
+  	 	}else{
+  	 		console.log("CON CONTROLES");
+  	 		player = new MediaElement("playervideo", {
+  		 		pluginPath: '/liferaylms-portlet/js/mediaelement/',
+  		        shimScriptAccess: 'always',
+  		        success: function (media, node) {
+  		        	
+  		        }
+  		    });	
+  	 	}
+	 	
 	
 	    var currentTime = parseInt('${currentTime}');
 		if(currentTime > 0){
@@ -220,3 +236,7 @@
  	}
 
 </script>
+
+
+
+
