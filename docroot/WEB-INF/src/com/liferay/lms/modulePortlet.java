@@ -461,27 +461,7 @@ public class modulePortlet extends MVCPortlet {
 		
 		if (errors.isEmpty()) {
 			try {
-				ServiceContext serviceContext = ServiceContextFactory.getInstance(Module.class.getName(), request);
-				List<Long> assetCategoryIdsList = new ArrayList<Long>();
-				boolean updateAssetCategoryIds = false;
-				for (String name:Collections.list((Enumeration<String>)uploadRequest.getParameterNames())){
-					if (name.startsWith("assetCategoryIds")) {
-						updateAssetCategoryIds = true;
-						for (long assetCategoryId : StringUtil.split(
-								ParamUtil.getString(uploadRequest, name), 0L)) {
-							assetCategoryIdsList.add(assetCategoryId);
-						}
-					}
-				}
-				if (updateAssetCategoryIds) {
-					serviceContext.setAssetCategoryIds(ArrayUtil.toArray(
-							assetCategoryIdsList.toArray(
-									new Long[assetCategoryIdsList.size()])));
-				}
-				String assetTagNames = uploadRequest.getParameter("assetTagNames");
-				if (Validator.isNotNull(assetTagNames)){ 
-					serviceContext.setAssetTagNames(StringUtil.split(assetTagNames));
-				}
+				ServiceContext serviceContext = ServiceContextFactory.getInstance(Module.class.getName(), uploadRequest);
 				log.debug("ServiceContext:: " + Validator.isNotNull(serviceContext));
 				if(Validator.isNotNull(serviceContext)){
 					log.debug("categories:: " + serviceContext.getAssetCategoryIds());
@@ -698,25 +678,7 @@ public class modulePortlet extends MVCPortlet {
 
 		if (errors.isEmpty()) {
 			try {
-				ServiceContext  serviceContext = ServiceContextFactory.getInstance(Module.class.getName(), request);
-				List<Long> assetCategoryIdsList = new ArrayList<Long>();
-				boolean updateAssetCategoryIds = false;
-				for (String name:Collections.list((Enumeration<String>)uploadRequest.getParameterNames())){
-					if (name.startsWith("assetCategoryIds")) {
-						updateAssetCategoryIds = true;
-						for (long assetCategoryId : StringUtil.split(
-								ParamUtil.getString(uploadRequest, name), 0L)) {
-							assetCategoryIdsList.add(assetCategoryId);
-						}
-					}
-				}
-				if (updateAssetCategoryIds) {
-					serviceContext.setAssetCategoryIds(ArrayUtil.toArray(
-							assetCategoryIdsList.toArray(
-									new Long[assetCategoryIdsList.size()])));
-				}
-				String assetTagNames = uploadRequest.getParameter("assetTagNames");
-				serviceContext.setAssetTagNames(StringUtil.split(assetTagNames));
+				ServiceContext  serviceContext = ServiceContextFactory.getInstance(Module.class.getName(), uploadRequest);
 				log.debug("ServiceContext:: " + Validator.isNotNull(serviceContext));
 				if(Validator.isNotNull(serviceContext)){
 					log.debug("categories:: " + serviceContext.getAssetCategoryIds());
