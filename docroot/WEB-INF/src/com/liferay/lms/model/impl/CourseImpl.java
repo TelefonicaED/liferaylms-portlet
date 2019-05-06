@@ -18,26 +18,40 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import javax.el.ELException;
+
+import com.liferay.lms.InscriptionException;
+import com.liferay.lms.course.inscriptiontype.InscriptionType;
+import com.liferay.lms.course.inscriptiontype.InscriptionTypeRegistry;
 import com.liferay.lms.model.Course;
+import com.liferay.lms.model.CourseCompetence;
 import com.liferay.lms.model.CourseResult;
 import com.liferay.lms.model.Schedule;
+import com.liferay.lms.model.UserCompetence;
+import com.liferay.lms.service.CourseCompetenceLocalServiceUtil;
 import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.lms.service.CourseResultLocalServiceUtil;
 import com.liferay.lms.service.ScheduleLocalServiceUtil;
+import com.liferay.lms.service.UserCompetenceLocalServiceUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.model.Group;
+import com.liferay.portal.model.GroupConstants;
+import com.liferay.portal.model.MembershipRequestConstants;
 import com.liferay.portal.model.Team;
 import com.liferay.portal.model.User;
 import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.security.permission.PermissionCheckerFactoryUtil;
 import com.liferay.portal.service.GroupLocalServiceUtil;
+import com.liferay.portal.service.MembershipRequestLocalServiceUtil;
 import com.liferay.portal.service.TeamLocalServiceUtil;
 import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.theme.ThemeDisplay;
@@ -90,6 +104,11 @@ public class CourseImpl extends CourseBaseImpl {
 	    {
 	    	return null;
 	    }
+	}
+	
+	public boolean isRegistrationOnDate(){
+		Date now = new Date();
+		return now.before(getEndDate()) && now.after(getStartDate());
 	}
 	
 	
@@ -325,5 +344,96 @@ public class CourseImpl extends CourseBaseImpl {
         log.debug("CourseImpl::isLocked::allowdates:" + true);
 		
 		return false;
+	}
+	
+	public boolean canEnroll(long userId, boolean checkCompetences, Locale locale, PermissionChecker permissionChecker) throws PortalException, InscriptionException, SystemException {
+		log.debug("canEnroll: " + getCourseId() + " - " + userId + " - " + checkCompetences);
+		//1.Comprobamos que no estÃ© ya inscrito
+		if(!GroupLocalServiceUtil.hasUserGroup(userId, getGroupCreatedId())) {
+			Date now = new Date();
+			
+			if(permissionChecker.hasPermission(this.getGroupCreatedId(), Course.class.getName(), this.getCourseId() , "REGISTER")){
+				//2. Fecha actual dentro del periodo de inscripcion
+				if((getStartDate().before(now) && getEndDate().after(now))){
+	
+					//3.Comprobamos que se cumplan todos los prerequisitos
+					boolean isPassed = true;
+					if(checkCompetences){
+						List<CourseCompetence> listCourseCompetences = CourseCompetenceLocalServiceUtil.findBycourseId(getCourseId(), true);
+						int i = 0;
+						UserCompetence userCompentece = null; 
+						while(isPassed && listCourseCompetences.size() > i) {
+							userCompentece = UserCompetenceLocalServiceUtil.findByUserIdCompetenceId(userId, listCourseCompetences.get(i).getCompetenceId());
+							isPassed = userCompentece != null;
+							i++;
+						}
+					}
+					if(isPassed) {
+						// 4. El mÃƒÂ¡ximo de inscripciones del curso no ha sido superado
+						if(getMaxusers()<=0 || CourseLocalServiceUtil.countStudentsFromCourse(this.getCourseId(), this.getCompanyId(), null, null, null, null, WorkflowConstants.STATUS_APPROVED, null, true) < getMaxusers()){
+							//5. Comprobamos el tipo de inscripciÃ³n
+							Group group = GroupLocalServiceUtil.getGroup(getGroupCreatedId());
+							if(group.getType()==GroupConstants.TYPE_SITE_OPEN){
+								log.debug("puede inscribirse");
+								return true;
+							}else{
+								if(group.getType()==GroupConstants.TYPE_SITE_RESTRICTED){
+									if(MembershipRequestLocalServiceUtil.hasMembershipRequest(userId, group.getGroupId(), MembershipRequestConstants.STATUS_PENDING)){
+										throw new InscriptionException("status-pending", LanguageUtil.get(locale, "course.pending"));
+									}else if(MembershipRequestLocalServiceUtil.hasMembershipRequest(userId, group.getGroupId(), MembershipRequestConstants.STATUS_DENIED)){
+										throw new InscriptionException("status-denied", LanguageUtil.get(locale, "course.denied"));
+									}else{
+										log.debug("puede inscribirse");
+										return true;
+									}
+								}else{
+									if(group.getType()==GroupConstants.TYPE_SITE_PRIVATE){
+										//DeberÃ­a lanzar una excepciÃ³n indicando que es privado y que no se puede
+										log.debug("exception: " + LanguageUtil.get(locale, "inscription.error.site-private"));
+										throw new InscriptionException("site-private", LanguageUtil.get(locale, "inscription.error.site-private"));
+									}
+								}
+							}
+						}else {
+							log.debug("exception: " + LanguageUtil.get(locale, "inscription.error.max-users"));
+							throw new InscriptionException("max-users", LanguageUtil.get(locale, "inscription-error-max-users"));
+						}
+					}else {
+						//DeberÃ­a lanzar una excepciÃ³n indicando que no se cumplen los prerequisitos
+						log.debug("exception: " + LanguageUtil.get(locale, "inscription.error.competences"));
+						throw new InscriptionException("competences", LanguageUtil.get(locale, "competence.block"));
+					}
+				}else {
+					//DeberÃ­a lanzar una excepciÃ³n indicando que estÃ¡ en periodo de ejecuciÃ³n
+					log.debug("exception: " + LanguageUtil.get(locale, "inscription.error.registration-dates"));
+					throw new InscriptionException("registration-dates", LanguageUtil.get(locale, "inscripcion.date.pass"));
+				}
+			}else {
+				log.debug("exception: " + LanguageUtil.get(locale, "inscription.error.permission-register"));
+				throw new InscriptionException("permission-register", LanguageUtil.get(locale, "inscription.error.permission-register"));
+			}
+			log.debug("no puede inscribirse");
+			return false;
+		}else {
+			log.debug("no estoy inscrito");
+			return false;
+		}
+	}
+	
+	public boolean canUnsubscribe(long userId, PermissionChecker permissionChecker) throws PortalException, SystemException {
+		Date now = new Date();
+			
+		if (GroupLocalServiceUtil.hasUserGroup(userId, getGroupCreatedId()) && getStartDate().before(now) && 
+				getEndDate().after(now) && permissionChecker.hasPermission(this.getGroupCreatedId(), Course.class.getName(), this.getCourseId() , "REGISTER")) {
+			CourseResult courseResult = CourseResultLocalServiceUtil.getCourseResultByCourseAndUser(getCourseId(), userId);
+			Group group = GroupLocalServiceUtil.getGroup(getGroupCreatedId());
+
+			InscriptionTypeRegistry inscriptionTypeRegistry = new InscriptionTypeRegistry();
+			InscriptionType inscriptionType = inscriptionTypeRegistry.getInscriptionType(getInscriptionType());
+			
+			return courseResult == null || courseResult.getPassedDate() == null || (group.getType() == GroupConstants.TYPE_SITE_OPEN) && inscriptionType.canUnsubscribe();
+		}else {
+			return false;
+		}
 	}
 }

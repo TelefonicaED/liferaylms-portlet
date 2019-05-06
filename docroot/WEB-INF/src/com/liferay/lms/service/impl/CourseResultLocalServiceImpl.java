@@ -38,8 +38,6 @@ import com.liferay.lms.model.ModuleResult;
 import com.liferay.lms.model.UserCompetence;
 import com.liferay.lms.service.ClpSerializer;
 import com.liferay.lms.service.CourseLocalServiceUtil;
-import com.liferay.lms.service.CourseResultLocalServiceUtil;
-import com.liferay.lms.service.CourseResultServiceUtil;
 import com.liferay.lms.service.base.CourseResultLocalServiceBaseImpl;
 import com.liferay.lms.service.persistence.CourseResultFinderUtil;
 import com.liferay.portal.kernel.bean.PortletBeanLocatorUtil;
@@ -499,17 +497,19 @@ public class CourseResultLocalServiceImpl
 				}
 				
 			}	
-			
-			//Actualizamos los diplomas externos (si los hay)
-			CourseDiplomaRegistry cdr=new CourseDiplomaRegistry();
-			if(cdr!=null){
-				CourseDiploma courseDiploma = cdr.getCourseDiploma();
-				if(courseDiploma!=null){
-					courseDiploma.updateUserDiploma(cresult.getCrId());
-				}
-			}
 		}		
 		courseResultPersistence.update(cresult, false);
+		
+		//Actualizamos los diplomas externos (si los hay)
+		CourseDiplomaRegistry cdr=new CourseDiplomaRegistry();
+		if(cdr!=null){
+			CourseDiploma courseDiploma = cdr.getCourseDiploma();
+			if(courseDiploma!=null){
+				courseDiploma.updateUserDiploma(cresult.getCrId());
+			}
+		}
+		
+		
 	}
 	
 	public void update(ModuleResult mresult) throws PortalException, SystemException{
@@ -590,5 +590,9 @@ public class CourseResultLocalServiceImpl
 			e.printStackTrace();
 			return null;
 		}
+	}
+	
+	public long countFinishedOnlyStudents(long courseId, long companyId, long courseGropupCreatedId, List<User> _students, long teamId){
+		return CourseResultFinderUtil.countFinishedOnlyStudents(courseId, companyId, courseGropupCreatedId, _students, teamId);
 	}
 }

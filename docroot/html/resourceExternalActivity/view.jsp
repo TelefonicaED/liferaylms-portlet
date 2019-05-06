@@ -29,17 +29,19 @@ if(isLinkTabletResourceExternal){
 	<c:when test="${isDLFileEntry }">
 		<div class="video">
 			
-					<embed type="application/x-shockwave-flash" src="${request.contextPath}/flash/flvplayer/playervideo.swf" 
+				<embed type="application/x-shockwave-flash" src="${request.contextPath}/flash/flvplayer/playervideo.swf" 
 		  			width="560" height="315" style="undefined" id="cab" name="cab" bgcolor="#FFFFFF" quality="high" allowfullscreen="true" allowscriptaccess="always" wmode="transparent" menu="false" 
 		  			flashvars="file=${video}&type=flv" />
 		</div>
-		<script>
-			var unloadEvent = function (e) {
-				console.log("unloadEvent video dlfileentry ");
-				<portlet:namespace/>finishTry(100,0,0);												
-			  };
-			  window.addEventListener("beforeunload", unloadEvent);	
-		</script>
+		<c:if test="${!hasPermissionAccessCourseFinished }">
+			<script>
+				var unloadEvent = function (e) {
+					console.log("unloadEvent video dlfileentry ");
+					<portlet:namespace/>finishTry(100,0,0);												
+				  };
+				  window.addEventListener("beforeunload", unloadEvent);	
+			</script>
+		</c:if>
 	</c:when>
 	<c:when test="${not empty mimeType }">
 		<%@ include file="/html/resourceExternalActivity/mediaelement.jsp" %>
@@ -48,13 +50,15 @@ if(isLinkTabletResourceExternal){
 		<div class="video">
 			${video}
 		</div>
-		<script>
-			var unloadEvent = function (e) {
-				console.log("unloadEvent otherwise");
-				<portlet:namespace/>finishTry(100,0,0);												
-			  };
-			  window.addEventListener("beforeunload", unloadEvent);	
-		</script>
+		<c:if test="${!hasPermissionAccessCourseFinished }">
+			<script>
+				var unloadEvent = function (e) {
+					console.log("unloadEvent otherwise");
+					<portlet:namespace/>finishTry(100,0,0);												
+				  };
+				  window.addEventListener("beforeunload", unloadEvent);	
+			</script>
+		</c:if>
 	</c:otherwise>
 </c:choose>
 	<c:if test="<%=listDocuments != null && listDocuments.size() > 0%>">
@@ -64,7 +68,7 @@ if(isLinkTabletResourceExternal){
 					<span class="upfile">
 						<a href='<%=DLUtil.getPreviewURL(documentVersion.getFileEntry(), documentVersion, themeDisplay, "")%>' class="<%=cssLinkTabletClassResourceExternal%>" target="_blank">
 							<img class="dl-file-icon" src="${themeDisplay.pathThemeImages}/file_system/small/<%=documentVersion.getIcon()%>.png" />
-							<liferay-ui:message key="resourceexternalactivity.downloadFile"  arguments='<%=new Object[]{HtmlUtil.escape(documentVersion.getTitle())} %>' />
+							<%=HtmlUtil.escape(documentVersion.getTitle()) %>
 						</a>
 					</span>
 				</div>
@@ -77,35 +81,35 @@ if(isLinkTabletResourceExternal){
 	
 </div>
 
-<script>
-	function <portlet:namespace/>finishTry(score,position,plays){
-		$.ajax({
-				dataType: 'json',
-				url: '${finishTryURL}',
-			    cache:false,
-				data: {
-					actId: '${activity.actId}',
-					latId: '${latId}',
-					score: score,
-					position: position,
-					plays: plays
-				},
-				success: function(data){
-					
-					if(data.questionCorrection){
-						if(data.finalFeedback){
-							$('#<portlet:namespace/>videoQuestionFeedback').removeClass("aui-helper-hidden");
-							$('#<portlet:namespace/>videoQuestionFeedback').html(data.feedback);	
+<c:if test="${!hasPermissionAccessCourseFinished }">
+	<script>
+		function <portlet:namespace/>finishTry(score,position,plays){
+			$.ajax({
+					dataType: 'json',
+					url: '${finishTryURL}',
+				    cache:false,
+					data: {
+						actId: '${activity.actId}',
+						latId: '${latId}',
+						score: score,
+						position: position,
+						plays: plays
+					},
+					success: function(data){
+						
+						if(data.questionCorrection){
+							if(data.finalFeedback){
+								$('#<portlet:namespace/>videoQuestionFeedback').removeClass("aui-helper-hidden");
+								$('#<portlet:namespace/>videoQuestionFeedback').html(data.feedback);	
+							}
 						}
+						
+					},
+					error: function(){
+						console.log("ERROR");
 					}
-					
-				},
-				error: function(){
-					console.log("ERROR");
-				}
-			});
-	}
-</script>
-
-
+				});
+		}
+	</script>
+</c:if>
 

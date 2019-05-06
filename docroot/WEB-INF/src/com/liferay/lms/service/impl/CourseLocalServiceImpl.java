@@ -150,15 +150,15 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 	
 	Log log = LogFactoryUtil.getLog(CourseLocalServiceImpl.class);
 	
-	public java.util.List<Course> getCoursesOfGroup(long groupId) throws SystemException{
+	public List<Course> getCoursesOfGroup(long groupId) throws SystemException{
 		return coursePersistence.findByGroupId(groupId);
 	}
 	
-	public java.util.List<Course> getOpenCoursesOfGroup(long groupId) throws SystemException{
+	public List<Course> getOpenCoursesOfGroup(long groupId) throws SystemException{
 		return coursePersistence.findByGroupId(groupId);
 	}
 	
-	public java.util.List<Course> getCourses(long companyId) throws SystemException{
+	public List<Course> getCourses(long companyId) throws SystemException{
 		return coursePersistence.findByCompanyId(companyId);
 	}
 	
@@ -171,7 +171,7 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 	}
 	
 	public Course addCourse (String title, String description,String summary,String friendlyURL, Locale locale,
-			java.util.Date createDate,java.util.Date startDate,java.util.Date endDate,long layoutSetPrototypeId,int typesite,ServiceContext serviceContext, long calificationType, int maxUsers,boolean isFromClone)
+			Date createDate,Date startDate,Date endDate,long layoutSetPrototypeId,int typesite,ServiceContext serviceContext, long calificationType, int maxUsers,boolean isFromClone)
 			throws SystemException, PortalException {
 		return addCourse(title, description, summary, friendlyURL, locale, createDate, startDate, endDate, layoutSetPrototypeId, typesite, 0, calificationType, maxUsers, serviceContext,isFromClone);
 	}
@@ -234,8 +234,6 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 		
 		return null;
 	}
-	
-
 
 	public List<Course> getPublicCoursesByCompanyId(Long companyId, int start, int end){
 		
@@ -269,7 +267,7 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 
 
 	public Course addCourse (String title, String description,String summary,String friendlyURL, Locale locale,
-		java.util.Date createDate,java.util.Date startDate,java.util.Date endDate,long layoutSetPrototypeId,int typesite, long CourseEvalId, long calificationType, int maxUsers,ServiceContext serviceContext,boolean isfromClone)
+		Date createDate,Date startDate,Date endDate,long layoutSetPrototypeId,int typesite, long CourseEvalId, long calificationType, int maxUsers,ServiceContext serviceContext,boolean isfromClone)
 		throws SystemException, PortalException {
 		
 		Course course = addCourse (title, description,summary,friendlyURL, locale,
@@ -466,7 +464,7 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 
 	@Indexable(type=IndexableType.REINDEX)
 	public Course addCourse (String title, String description,String summary,String friendlyURL, Locale locale,
-			java.util.Date createDate,java.util.Date startDate,java.util.Date endDate,
+			Date createDate,Date startDate,Date endDate,
 		ServiceContext serviceContext, long calificationType)
 			throws SystemException, 
 			PortalException {
@@ -480,7 +478,7 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 
 	@Indexable(type=IndexableType.REINDEX)
 	public Course addCourse (String title, String description,String friendlyURL, Locale locale,
-			java.util.Date createDate,java.util.Date startDate,java.util.Date endDate,
+			Date createDate,Date startDate,Date endDate,
 		ServiceContext serviceContext, long calificationType)
 			throws SystemException, 
 			PortalException {
@@ -621,7 +619,7 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 			throws SystemException, PortalException {
 		
 	
-		int numberUsers = UserLocalServiceUtil.getGroupUsersCount(course.getGroupCreatedId());
+		int numberUsers = countStudentsFromCourse(course.getCourseId(), course.getCompanyId(), null, null, null, null, WorkflowConstants.STATUS_APPROVED, null, true);
 		if(course.getMaxusers()>0&&numberUsers>course.getMaxusers()){
 			if(log.isDebugEnabled()){
 				log.debug("Throws exception max users violated");
@@ -721,18 +719,19 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 	@Indexable(type=IndexableType.REINDEX)
 	public Course openCourse(long courseId) throws SystemException,
 	PortalException {
-	
-		Course course=CourseLocalServiceUtil.getCourse(courseId);
+		
+		Course course=getCourse(courseId);
+		log.debug("::OPEN COURSE "+course.getClosed());
 		if(course.getClosed()){
 			course.setClosed(false);
 			course.setModifiedDate(new Date());
-			Group courseGroup=GroupLocalServiceUtil.getGroup(course.getGroupCreatedId());
+			Group courseGroup=groupLocalService.getGroup(course.getGroupCreatedId());
 			courseGroup.setActive(true);
-			GroupLocalServiceUtil.updateGroup(courseGroup);
+			groupLocalService.updateGroup(courseGroup);
 			coursePersistence.update(course, true);	
-			AssetEntry courseAsset=AssetEntryLocalServiceUtil.getEntry(Course.class.getName(), course.getCourseId());
+			AssetEntry courseAsset=assetEntryLocalService.getEntry(Course.class.getName(), course.getCourseId());
 			courseAsset.setVisible(true);
-			AssetEntryLocalServiceUtil.updateAssetEntry(courseAsset);
+			assetEntryLocalService.updateAssetEntry(courseAsset);
 
 			CourseEval courseEval=new CourseEvalRegistry().getCourseEval(course.getCourseEvalId());
 			if(Validator.isNotNull(courseEval)) {
@@ -1349,7 +1348,7 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 						}
 					}
 					
-					if((startDate.before(now) && endDate.after(now))){
+					if((!course.isClosed() && startDate.before(now) && endDate.after(now))){
 						//3. Control de competencias 
 						List<CourseCompetence> courseCompetences = CourseCompetenceLocalServiceUtil.findBycourseId(course.getCourseId(), true);
 						//Busco si al usuario le falta alguna competencia que es necesaria para la inscripcion al curso
@@ -1364,7 +1363,7 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 						}
 						if(enoughCompetences){
 							// 4. El mÃ¡ximo de inscripciones del curso no ha sido superado
-							if(course.getMaxusers()<=0 || UserLocalServiceUtil.getGroupUsersCount(course.getGroupCreatedId()) < course.getMaxusers()){
+							if(course.getMaxusers()<=0 || countStudentsFromCourse(courseId, course.getCompanyId(), null, null, null, null, WorkflowConstants.STATUS_APPROVED, null, true) < course.getMaxusers()){
 								if(group.getType()==GroupConstants.TYPE_SITE_OPEN){
 									Role sitemember=RoleLocalServiceUtil.getRole(course.getCompanyId(), RoleConstants.SITE_MEMBER) ;
 									
@@ -1445,7 +1444,7 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 			boolean enoughCompetences = true;
 			CourseCompetence courseCompetence = null;
 			if(userId > 0){
-				//1. Si no estÃ¡ ya inscrito
+				//1. Si no está ya inscrito
 				if(!GroupLocalServiceUtil.hasUserGroup(userId,course.getGroupCreatedId())){
 					Group group = GroupLocalServiceUtil.getGroup(course.getGroupCreatedId());
 					
@@ -1948,7 +1947,6 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 							}
 						}
 					}
-
 				}
 			} catch (PortalException | SystemException e) {
 				e.printStackTrace();
@@ -1959,6 +1957,10 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 			courses = ListUtil.subList(courses, start, end);
 		}
 		return courses;
+	}
+	
+	public List<Course> getChildsRegistredUser(long parentCourseId, long userId){
+		return courseFinder.findChildRegistredUser(parentCourseId, userId);
 	}
 	
 }

@@ -1,7 +1,9 @@
 package com.liferay.lms.lar;
 
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 
@@ -65,14 +67,22 @@ public class LearningActivityImport {
 			larn.setGroupId(newModule.getGroupId());
 			larn.setModuleId(newModule.getModuleId());
 	
-			LearningActivity newLarn=LearningActivityLocalServiceUtil.addLearningActivity(larn,serviceContext);
-			serviceContext.setScopeGroupId(newLarn.getGroupId());
+			//Comprobamos si la actividad ya existe para actualizarla o para crearla nueva
+			LearningActivity newLarn = null;
 			
-			//Para actividad de recurso externo
-			if(larn.getTypeId() == 2){
-				//changeExtraContentDocumentIds(newLarn, newModule, userId, context, serviceContext);
+			try{
+				newLarn = LearningActivityLocalServiceUtil.getLearningActivityByUuidAndGroupId(larn.getUuid(), newModule.getGroupId());
+			}catch(PortalException | SystemException e){
+				log.debug("La actividad no existe, la creamos");
 			}
 			
+			if(newLarn == null){
+				newLarn=LearningActivityLocalServiceUtil.addLearningActivity(larn,serviceContext);
+			}else{
+				newLarn=LearningActivityLocalServiceUtil.updateLearningActivity(newLarn, larn,serviceContext);
+			}
+
+			serviceContext.setScopeGroupId(newLarn.getGroupId());
 			
 			//Seteo de contenido propio de la actividad
 			log.debug("***IMPORT EXTRA CONTENT****");
@@ -105,6 +115,9 @@ public class LearningActivityImport {
 
 
 	private static void importQuestions(LearningActivity newLarn, long userId, PortletDataContext context, ServiceContext serviceContext, Element actElement) throws SystemException, PortalException {
+		//Guardamos los identificadores en un hashmap para actualizar el orden de las preguntas
+		HashMap<Long, Long> questionIdsMap = new HashMap<Long, Long>();
+		
 		for(Element qElement:actElement.elements("question")){
 			String pathq = qElement.attributeValue("path");
 				
@@ -112,6 +125,13 @@ public class LearningActivityImport {
 			question.setActId(newLarn.getActId());
 			TestQuestion nuevaQuestion=TestQuestionLocalServiceUtil.addQuestion(question.getActId(), question.getText(), question.getQuestionType());
 			
+			if(question.getWeight() != question.getQuestionId()){
+				nuevaQuestion.setWeight(question.getWeight());
+				nuevaQuestion = TestQuestionLocalServiceUtil.updateTestQuestion(nuevaQuestion);
+				questionIdsMap.put(question.getQuestionId(), nuevaQuestion.getQuestionId());
+			}
+			
+			questionIdsMap.put(question.getQuestionId(), nuevaQuestion.getQuestionId());
 			log.info("      Test Question: " + nuevaQuestion.getQuestionId() /*Jsoup.parse(nuevaQuestion.getText()).text()*/);
 			
 			//Si tenemos ficheros en las descripciones de las preguntas.
@@ -121,12 +141,21 @@ public class LearningActivityImport {
 
 				//log.info("   description : " + description );
 				nuevaQuestion.setText(description);
-				TestQuestionLocalServiceUtil.updateTestQuestion(nuevaQuestion);
+				nuevaQuestion = TestQuestionLocalServiceUtil.updateTestQuestion(nuevaQuestion);
 				
 			}
 			
 			QuestionType qt =new QuestionTypeRegistry().getQuestionType(question.getQuestionType());
 			qt.importQuestionAnswers(context, qElement, nuevaQuestion.getQuestionId(), userId, serviceContext);
+		}
+		
+		List<TestQuestion> questions = TestQuestionLocalServiceUtil.getQuestions(newLarn.getActId());
+		for(TestQuestion question: questions){
+			if(question.getWeight() > 0 && questionIdsMap.containsKey(question.getWeight())){
+				log.debug("nuevo orden: " + questionIdsMap.get(question.getWeight()));
+				question.setWeight(questionIdsMap.get(question.getWeight()));
+				TestQuestionLocalServiceUtil.updateTestQuestion(question);
+			}
 		}
 	}
 
@@ -224,41 +253,28 @@ public class LearningActivityImport {
 			Element theElement = it.next();
 			log.info("element: " + theElement.toString());
 			
-			String messageException = "";
-			//try {
-				log.info("   dlfileentry path: "+theElement.attributeValue("path"));
+			log.info("   dlfileentry path: "+theElement.attributeValue("path"));
 
-				FileEntry newFile = ImportUtil.importDLFileEntry(context, theElement, serviceContext, userId);
-				
-				AssetEntry asset = AssetEntryLocalServiceUtil.getEntry(DLFileEntry.class.getName(), newFile.getPrimaryKey());
-				
-				//Ponemos a la actividad el fichero que hemos recuperado.
-				log.info("    Extracontent : \n"+newLarn.getExtracontent());
-				if(newLarn.getTypeId() == 2){
-					log.info("TIPO EXTERNO");
-					if(countDocument < 0){
-						LearningActivityLocalServiceUtil.setExtraContentValue(newLarn.getActId(), "document", String.valueOf(asset.getEntryId()));
-					}else{
-						LearningActivityLocalServiceUtil.setExtraContentValue(newLarn.getActId(), "document" + countDocument, String.valueOf(asset.getEntryId()));
-					}
-					countDocument++;
-				}else if(newLarn.getTypeId() == 7){
-					LearningActivityLocalServiceUtil.setExtraContentValue(newLarn.getActId(), "assetEntry", String.valueOf(asset.getEntryId()));
+			FileEntry newFile = ImportUtil.importDLFileEntry(context, theElement, serviceContext, userId);
+			
+			AssetEntry asset = AssetEntryLocalServiceUtil.getEntry(DLFileEntry.class.getName(), newFile.getPrimaryKey());
+			
+			//Ponemos a la actividad el fichero que hemos recuperado.
+			log.info("    Extracontent : \n"+newLarn.getExtracontent());
+			if(newLarn.getTypeId() == 2){
+				log.info("TIPO EXTERNO");
+				if(countDocument < 0){
+					LearningActivityLocalServiceUtil.setExtraContentValue(newLarn.getActId(), "document", String.valueOf(asset.getEntryId()));
+				}else{
+					LearningActivityLocalServiceUtil.setExtraContentValue(newLarn.getActId(), "document" + countDocument, String.valueOf(asset.getEntryId()));
 				}
-				
-				Long newActId = newLarn.getActId();
-				newLarn = LearningActivityLocalServiceUtil.getLearningActivity(newActId);
-				
-		/*	}catch(FileExtensionException fee){
-				fee.printStackTrace();
-				log.info("*ERROR! dlfileentry path FileExtensionException:" + theElement.attributeValue("path")+", "+messageException +", message: "+fee.getMessage());
-			}catch(FileSizeException fse){
-				log.info("*ERROR! dlfileentry path FileSizeException:" + theElement.attributeValue("path")+messageException +", message: "+ fse.getMessage());
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				log.info("*ERROR! dlfileentry path: " + theElement.attributeValue("path")+messageException +", message: "+e.getMessage());
-			}*/
+				countDocument++;
+			}else if(newLarn.getTypeId() == 7){
+				LearningActivityLocalServiceUtil.setExtraContentValue(newLarn.getActId(), "assetEntry", String.valueOf(asset.getEntryId()));
+			}
+			
+			Long newActId = newLarn.getActId();
+			newLarn = LearningActivityLocalServiceUtil.getLearningActivity(newActId);
 
 		}	
 	}

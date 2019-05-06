@@ -1,6 +1,7 @@
 package com.liferay.lms.course.inscriptiontype;
 
 import java.util.Locale;
+import java.util.Set;
 
 import javax.portlet.PortletResponse;
 
@@ -21,4 +22,6 @@ public interface InscriptionType
 	public String enrollUser(long courseId, long userId, long teamId, ServiceContext serviceContext) throws PortalException, SystemException;
 	public boolean unsubscribeUser(Course course, long userId) throws PortalException, SystemException;
 	public boolean canUnsubscribe();
+	public Set<Integer> getGroupTypesAvailable();
+	public boolean isActive(long companyId);
 }

@@ -10,6 +10,7 @@
 		<control-panel-entry-category>content</control-panel-entry-category>
 		<control-panel-entry-weight>17.5</control-panel-entry-weight>
 		<asset-renderer-factory>com.liferay.lms.asset.LearningActivityAssetRendererFactory</asset-renderer-factory>
+		<custom-attributes-display>com.liferay.lms.expando.LearningActivityCustomAttributesDisplay</custom-attributes-display>
 		<instanceable>false</instanceable>
 		<header-portlet-css>/css/main.css</header-portlet-css>
 		<footer-portlet-javascript>/js/main.js</footer-portlet-javascript>
@@ -511,6 +512,7 @@
 	<portlet>
 		<portlet-name>inscriptionadmin</portlet-name>
 		<icon>/icon.png</icon>
+		<configuration-action-class>com.liferay.portal.kernel.portlet.DefaultConfigurationAction</configuration-action-class>
 		<instanceable>false</instanceable>
 		<header-portlet-css>/css/main.css</header-portlet-css>
 		<footer-portlet-javascript>
@@ -684,6 +686,7 @@
 	<portlet>
 		<portlet-name>asynchronous-process-dashboard</portlet-name>
 		<icon>/icon.png</icon>
+		<configuration-action-class>com.liferay.lms.actions.AsynchronousConfigurationAction</configuration-action-class>
 		<header-portlet-css>/css/main.css</header-portlet-css>
 		<footer-portlet-javascript>
 			/js/main.js

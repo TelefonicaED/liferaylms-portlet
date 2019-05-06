@@ -237,7 +237,7 @@
 						
 						String mimeType = "video/";
 						if(videoCode.contains("vimeo.com")){
-							videoCode += "?background=1&loop=0&mute=0";	
+							videoCode += "?background=1&loop=0&mute=0&autoplay=1";	
 							mimeType += "vimeo";
 						}else if(videoCode.contains("youtu")){
 							mimeType += "youtube";
@@ -288,7 +288,7 @@
 					renderRequest.setAttribute("isDLFileEntry", isDLFileEntry);
 				}%>
 
-<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/mediaelement@4.2.7/build/mediaelementplayer.min.css">
+<link rel="stylesheet" type="text/css" href="/liferaylms-portlet/js/mediaelement/mediaelementplayer.min.css">
 
 
 	
@@ -311,12 +311,12 @@
 	
 
  <!-- JS -->
- <script src="https://cdn.jsdelivr.net/npm/mediaelement@4.2.7/build/mediaelement-and-player.min.js"></script>
- <script src="https://cdn.jsdelivr.net/npm/mediaelement@4.2.7/build/renderers/dailymotion.min.js"></script>
- <script src="https://cdn.jsdelivr.net/npm/mediaelement@4.2.7/build/renderers/facebook.min.js"></script>
- <script src="https://cdn.jsdelivr.net/npm/mediaelement@4.2.7/build/renderers/soundcloud.min.js"></script>
- <script src="https://cdn.jsdelivr.net/npm/mediaelement@4.2.7/build/renderers/twitch.min.js"></script>
- <script src="https://cdn.jsdelivr.net/npm/mediaelement@4.2.7/build/renderers/vimeo.min.js"></script>
+ <script src="https://cdn.jsdelivr.net/npm/mediaelement@4.2.9/build/mediaelement-and-player.min.js"></script>
+ <script src="https://cdn.jsdelivr.net/npm/mediaelement@4.2.9/build/renderers/dailymotion.min.js"></script>
+ <script src="https://cdn.jsdelivr.net/npm/mediaelement@4.2.9/build/renderers/facebook.min.js"></script>
+ <script src="https://cdn.jsdelivr.net/npm/mediaelement@4.2.9/build/renderers/soundcloud.min.js"></script>
+ <script src="https://cdn.jsdelivr.net/npm/mediaelement@4.2.9/build/renderers/twitch.min.js"></script>
+ <script src="/liferaylms-portlet/js/mediaelement/renderers/vimeo.js"></script>
  
  <script src="/liferaylms-portlet/js/media-element-marker.js"></script>
 <script>
@@ -336,7 +336,7 @@
  		
  		$('#playervideo').mediaelementplayer({
      	    features: ['playpause','current','progress','duration','markers','volume'], //Adding the feature 'markers' enables this plugin
-     		pluginPath: 'https://cdn.jsdelivr.net/npm/mediaelement@4.2.7/build/',
+     		pluginPath: 'https://cdn.jsdelivr.net/npm/mediaelement@4.2.9/build/',
      		markerColor: '#FCD730', // Optional : Specify the color of the marker
      		markers:questions, // Specify marker times in seconds 
      		markerCallback:function(media,time,currentMarker){ // Callback function invoked when a marker position is reached

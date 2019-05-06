@@ -26,18 +26,16 @@ import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.model.Module;
 import com.liferay.lms.model.Schedule;
 import com.liferay.lms.service.CourseLocalServiceUtil;
-import com.liferay.lms.service.CourseResultLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityResultLocalServiceUtil;
 import com.liferay.lms.service.ModuleLocalServiceUtil;
 import com.liferay.lms.service.ModuleResultLocalServiceUtil;
 import com.liferay.lms.service.ScheduleLocalServiceUtil;
-import com.liferay.lms.views.ActivityStatsView; 
+import com.liferay.lms.views.ActivityStatsView;
 import com.liferay.lms.views.CourseStatsView;
 import com.liferay.lms.views.ModuleStatsView;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.NestableException;
-import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
@@ -48,7 +46,6 @@ import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.WebKeys;
-import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.model.Team;
 import com.liferay.portal.model.User;
 import com.liferay.portal.service.TeamLocalServiceUtil;
@@ -125,7 +122,7 @@ public class CourseStats extends MVCPortlet {
 			}
 			log.debug("CourseStats::showViewDefault::Lista de usuarios obtenida");
 			
-			CourseStatsView courseStats = getCourseStats(course, teamId, themeDisplay.getLocale(), userExcludedIds, userIds);
+			CourseStatsView courseStats =  new CourseStatsView(course.getCourseId(), themeDisplay.getLocale(), teamId,  userExcludedIds, userIds,false);
 			
 			List<CourseStatsView> courseStatsViews = new ArrayList<CourseStatsView>();
 			courseStatsViews.add(courseStats);
@@ -255,31 +252,6 @@ public class CourseStats extends MVCPortlet {
 		return userIds;
 	}
 	
-	
-	private CourseStatsView getCourseStats (Course course, long teamId, Locale locale, long[] userExcludedIds, long[] userIds) throws PortalException, SystemException{
-		log.debug("CourseStats::getCourseStats::Obtenemos las estadísticas del curso");
-		//Se construye la vista de las estadisticas del curso
-		CourseStatsView courseStats = new CourseStatsView(course.getCourseId(), course.getTitle(locale));				
-
-		if(teamId > 0){
-			courseStats.setRegistered(userIds.length);
-			courseStats.setStarted(CourseResultLocalServiceUtil.countStudentsByCourseIdUserIdsStarted(course.getCourseId(), userIds));
-			courseStats.setFinished(CourseResultLocalServiceUtil.countStudentsByCourseIdUserIdsFinished(course.getCourseId(), userIds));
-			courseStats.setPassed(CourseResultLocalServiceUtil.countStudentsByCourseIdUserIdsPassed(course.getCourseId(), userIds));
-			courseStats.setFailed(CourseResultLocalServiceUtil.countStudentsByCourseIdUserIdsFailed(course.getCourseId(), userIds));		
-		}else{
-			courseStats.setRegistered(CourseLocalServiceUtil.countStudentsStatus(course.getCourseId(), course.getCompanyId(), null, null, null, null, WorkflowConstants.STATUS_ANY, false));
-			courseStats.setStarted(CourseResultLocalServiceUtil.countStudentsByCourseIdUserExcludedIdsStarted(course.getCourseId(), userExcludedIds));
-			courseStats.setFinished(CourseResultLocalServiceUtil.countStudentsByCourseIdUserExcludedIdsFinished(course.getCourseId(), userExcludedIds));
-			courseStats.setPassed(CourseResultLocalServiceUtil.countStudentsByCourseIdUserExcludedIdsPassed(course.getCourseId(), userExcludedIds));
-			courseStats.setFailed(CourseResultLocalServiceUtil.countStudentsByCourseIdUserExcludedIdsFailed(course.getCourseId(), userExcludedIds));
-		}
-		log.debug("CourseStats::getCourseStats::Estadísticas del curso obtenidas");
-		
-		return courseStats;
-	}
-	
-	
 	private ModuleStatsView getModuleStats(Module module, long teamId, Locale locale, TimeZone timeZone, Schedule sch, long[] userExcludedIds, long[] userIds) throws SystemException{
 		ModuleStatsView moduleStats = new ModuleStatsView(module.getModuleId(), module.getTitle(locale), timeZone);
 
@@ -356,6 +328,10 @@ public class CourseStats extends MVCPortlet {
 		boolean hasPrecedence = false;
 		if(activity.getPrecedence() > 0){
 			hasPrecedence = true;
+			LearningActivity precedence = LearningActivityLocalServiceUtil.fetchLearningActivity(activity.getPrecedence());
+			if(precedence != null){
+				activityStats.setDependency(precedence.getTitle(locale));
+			}
 		}
 		activityStats.setPrecedence(LanguageUtil.get(locale,"dependencies."+String.valueOf(hasPrecedence)));
 		activityStats.setType(LanguageUtil.get(locale,classTypes.get((long)activity.getTypeId())));
@@ -410,7 +386,7 @@ public class CourseStats extends MVCPortlet {
 				userExcludedIds = CourseLocalServiceUtil.getTeachersAndEditorsIdsFromCourse(course);
 			}
 			
-			CourseStatsView courseView  = getCourseStats(course, teamId, themeDisplay.getLocale(), userExcludedIds, userIds);
+			CourseStatsView courseView  = new CourseStatsView(course.getCourseId(), themeDisplay.getLocale(), teamId,  userExcludedIds, userIds,false); 
 			List<Module> modules = ModuleLocalServiceUtil.findAllInGroup(course.getGroupCreatedId());
 			CSVWriter writer = initCsv(resourceResponse);
 			 

@@ -1,3 +1,5 @@
+<%@page import="javax.portlet.PortletPreferences"%>
+<%@page import="com.liferay.portlet.PortletPreferencesFactoryUtil"%>
 <%@page import="java.text.SimpleDateFormat"%>
 <%@page import="com.liferay.portal.kernel.util.ListUtil"%>
 <%@page import="com.liferay.portal.model.MembershipRequest"%>
@@ -26,6 +28,13 @@
 			    value="<%= usert.getFullName() %>"
 				align="left"
 			/>
+			<c:if test='${renderRequest.preferences.getValue("showEmailAddress", "false") }'>
+				<liferay-ui:search-container-column-text
+					name="email-address"
+				    value="<%= usert.getEmailAddress()%>"
+					align="left"
+				/>
+			</c:if>
 			<liferay-ui:search-container-column-text
 				name="inscriptionadmin.date"
 			    value="<%= sdf.format(membershipRequest.getCreateDate()) %>"

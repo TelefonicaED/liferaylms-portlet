@@ -150,7 +150,8 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 				".countExistingUserCourses";
 	public static final String GET_DISTINCT_COURSE_GROUPS = 
 			CourseFinder.class.getName() + ".getDistinctCourseGroups";
-
+	public static final String FIND_CHILD_REGISTRED_USER = 
+			CourseFinder.class.getName() + ".findChildRegistredUser";
 	
 	public static final String INNER_JOIN_CUSTOM_ATTRIBUTE =
 			CourseFinder.class.getName() + ".innerCustomAttribute";
@@ -190,7 +191,7 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 				description = "%" + description + "%";
 			
 			if (params == null) {
-				params = _emptyLinkedHashMap;
+				params = new LinkedHashMap<String, Object>(0);
 			}
 			
 			if(Validator.isNotNull(title) || Validator.isNotNull(description)){
@@ -690,7 +691,7 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 				description = "%" + description + "%";
 			
 			if (params == null) {
-				params = _emptyLinkedHashMap;
+				params = new LinkedHashMap<String, Object>(0);;
 			}
 			
 			if(Validator.isNotNull(title) || Validator.isNotNull(description)){
@@ -1515,6 +1516,50 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 		return countValue;
 	}
 	
+	@SuppressWarnings("unchecked")
+	public List<Course> findChildRegistredUser(long parentCourseId, long userId){
+		
+		Session session = null;
+		List<Course> listCourse = null;
+		
+		if(log.isDebugEnabled()){
+			log.debug("CourseFinderImpl:findChildRegistredUser");
+			log.debug("parentCourseId: " + parentCourseId);
+			log.debug("userId: " + userId);
+		}
+		
+		try{
+			
+			session = openSession();
+			
+			String sql = CustomSQLUtil.get(FIND_CHILD_REGISTRED_USER);
+			log.debug("sql: " + sql);
+			
+			SQLQuery q = session.createSQLQuery(sql);
+
+			q.addEntity("Lms_Course", CourseImpl.class);
+
+			QueryPos qPos = QueryPos.getInstance(q);
+			
+			qPos.add(userId);
+			qPos.add(parentCourseId);
+			
+			if(log.isDebugEnabled()){
+				log.debug("sql: " + sql);
+			}
+			
+			listCourse = (List<Course>) QueryUtil.list(
+					q, getDialect(), QueryUtil.ALL_POS, QueryUtil.ALL_POS);
+			
+		} catch (Exception e) {
+	       e.printStackTrace();
+	    } finally {
+	        closeSession(session);
+	    }
+	
+	    return listCourse;
+	}
+	
 	protected void setJoinCustomAttribute(
 			QueryPos qPos, long columnId, String expandoValue){
 		if(columnId > 0 && Validator.isNotNull(expandoValue)){
@@ -1598,7 +1643,6 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 	private static final String PARAM_STATUS = "status";
 	private static final String PARAM_PARENT_COURSE_ID = "parentCourseId";
 
-	private LinkedHashMap<String, Object> _emptyLinkedHashMap =
-		new LinkedHashMap<String, Object>(0);
+
 	
 }

@@ -65,6 +65,7 @@ if(LearningActivityLocalServiceUtil.canBeEdited(learningActivity, user.getUserId
 		<liferay-portlet:renderURL var="buscarRecurso" >
 			<liferay-portlet:param name="mvcPath" value="/html/resourceInternalActivity/admin/searchresource.jsp" />
 			<liferay-portlet:param name="resId" value="<%=String.valueOf(resId) %>" />
+			<liferay-portlet:param name="actId" value="<%=String.valueOf(resId) %>" />
 			<liferay-portlet:param name="resModuleId" value="<%=String.valueOf(resModuleId) %>" />
 		</liferay-portlet:renderURL>
 		
@@ -82,18 +83,40 @@ if(LearningActivityLocalServiceUtil.canBeEdited(learningActivity, user.getUserId
 <script type="text/javascript">
 
 function <portlet:namespace />goToSearchResource(){
+	var form = document.createElement("form");
 	var url =  '${buscarRecurso}';
+	
+	with(form) {
+		setAttribute("name", "<portlet:namespace />formResourceInternal"); //nombre del form
+		setAttribute("action", url); // action por defecto
+		setAttribute("method", "post"); // method POST 
+	}
+	
+	var inputDescription = document.createElement("input");
+	with(inputDescription) {
+		setAttribute("name", "<portlet:namespace />description"); //nombre del input
+		setAttribute("type", "hidden"); // tipo hidden
+		setAttribute("value", ""); // valor por defecto
+	}
+	form.appendChild(inputDescription);
+	
+	var inputTitle = document.createElement("input");
+	with(inputTitle) {
+		setAttribute("name", "<portlet:namespace />title"); //nombre del input
+		setAttribute("type", "hidden"); // tipo hidden
+		setAttribute("value", ""); // valor por defecto
+	}
+	
+	form.appendChild(inputTitle);
+	
+	document.getElementsByTagName("body")[0].appendChild(form);
+	
 	var languageId = '<%= themeDisplay.getLanguageId()%>';
-	var description = $('#<portlet:namespace />description').val();
-	 description = description.replace(/&nbsp;/g, ' ').replace(/#/g,'%23').replace(/&/g,'%26');
-	var title = $('#<portlet:namespace />title_'+languageId).val();
-	title = title.replace(/#/g,'%23').replace(/&/g,'%26');
-	url +='&<portlet:namespace/>title='+title;
-	url += '&<portlet:namespace/>description='+encodeURI(description);
-		
-	location.href=url;
-		
+	
+	document.<portlet:namespace />formResourceInternal.<portlet:namespace />description.value = $('#<portlet:namespace />description').val();
+	document.<portlet:namespace />formResourceInternal.<portlet:namespace />title.value = $('#<portlet:namespace />title_'+languageId).val();
 
+	document.<portlet:namespace />formResourceInternal.submit();
 }
 
 </script>

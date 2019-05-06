@@ -63,6 +63,7 @@
 <liferay-ui:error key="execactivity.editActivity.random.number" message="execActivity.options.error.random"></liferay-ui:error>
 <liferay-ui:error key="general.error" message="edit.activity.general.error"></liferay-ui:error>
 <liferay-ui:error key="error-p2pActivity-inProgress" message="p2ptaskactivity.error.extraContentInProgress" />
+<liferay-ui:error key="activity.move-activity-with-result" message="activity.move-activity-with-result" />
 
 <%
 renderResponse.setProperty("clear-request-parameters", Boolean.TRUE.toString());
@@ -81,12 +82,11 @@ if(request.getAttribute("activity")!=null){
 	learnact=(LearningActivity)request.getAttribute("activity");
 	typeId=learnact.getTypeId();
 	moduleId=learnact.getModuleId();
-}else{
-	if(actId>0)	{
-		learnact=LearningActivityLocalServiceUtil.getLearningActivity(actId);
-		typeId=learnact.getTypeId();
-		moduleId=learnact.getModuleId();
-	}
+	actId = learnact.getActId();
+}else if(actId>0)	{
+	learnact=LearningActivityLocalServiceUtil.getLearningActivity(actId);
+	typeId=learnact.getTypeId();
+	moduleId=learnact.getModuleId();
 }
 
 
@@ -1027,6 +1027,13 @@ Liferay.provide(
 		<%}
 		%>
 		</liferay-ui:panel>
+		
+		<liferay-ui:custom-attributes-available className="<%= LearningActivity.class.getName() %>" >
+	   		<liferay-ui:panel title="custom-fields" collapsible="true" defaultState="closed" >
+	    		<liferay-ui:custom-attribute-list className="<%=LearningActivity.class.getName()%>" classPK="<%=actId %>" 
+	     			editable="true" label="true" />
+	   		</liferay-ui:panel>
+		</liferay-ui:custom-attributes-available>
 		<%
 		boolean showActivityClassification = true;
 		try {

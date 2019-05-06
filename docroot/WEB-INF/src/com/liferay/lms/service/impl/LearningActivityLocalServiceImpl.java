@@ -182,6 +182,71 @@ public class LearningActivityLocalServiceImpl extends LearningActivityLocalServi
 		
 		return retorno;
 	}
+	
+	@Override
+	public LearningActivity updateLearningActivity(LearningActivity updateActivity, LearningActivity learningActivity,ServiceContext serviceContext) throws SystemException, PortalException {
+
+		updateActivity.setTitle(learningActivity.getTitle());
+		updateActivity.setDescription(learningActivity.getDescription());
+		updateActivity.setStartdate(learningActivity.getStartdate());
+		updateActivity.setEnddate(learningActivity.getEnddate());
+		updateActivity.setTypeId(learningActivity.getTypeId());
+		updateActivity.setTries(learningActivity.getTries());
+		updateActivity.setPasspuntuation(learningActivity.getPasspuntuation());
+		updateActivity.setExtracontent(learningActivity.getExtracontent());
+		updateActivity.setFeedbackCorrect(learningActivity.getFeedbackCorrect());
+		updateActivity.setFeedbackNoCorrect(learningActivity.getFeedbackNoCorrect());
+		updateActivity.setModifiedDate(new Date(System.currentTimeMillis()));
+		updateActivity.setStatus(WorkflowConstants.STATUS_APPROVED);
+		
+		assetEntryLocalService.updateEntry(
+				serviceContext.getUserId(), updateActivity.getGroupId(), LearningActivity.class.getName(),
+				updateActivity.getActId(), updateActivity.getUuid(),updateActivity.getTypeId(), serviceContext.getAssetCategoryIds(),
+				serviceContext.getAssetTagNames(), true, null, null,
+				new java.util.Date(System.currentTimeMillis()), null,
+				ContentTypes.TEXT_HTML, 
+				updateActivity.getTitle().length()<255 ? updateActivity.getTitle():updateActivity.getTitle(Locale.getDefault()),
+						null, updateActivity.getDescription(serviceContext.getLocale()),null, null, 0, 0,
+						null, false);
+		
+		updateActivity.setPrecedence(learningActivity.getPrecedence());
+		updateActivity.setPriority(learningActivity.getPriority());
+		updateActivity.setWeightinmodule(learningActivity.getWeightinmodule());
+		learningActivityPersistence.update(updateActivity, true);
+
+		boolean isNotificationActivated = PrefsPropsUtil.getBoolean(updateActivity.getCompanyId(), "lms.notifications.active");
+		if(isNotificationActivated && learningActivity.getTypeId()!=8){
+			List<User> listaUsuarios = userService.getGroupUsers(updateActivity.getGroupId());
+			if(!listaUsuarios.isEmpty()){
+				Iterator<User> it = listaUsuarios.iterator();
+				while(it.hasNext()){
+					User u = it.next();
+					try {
+						
+						if(u.isActive() 
+								&& !(PermissionCheckerFactoryUtil.create(u)).hasPermission(updateActivity.getGroupId(), "com.liferay.lms.model", updateActivity.getGroupId(), "VIEW_RESULTS")
+								&& !updateActivity.isInactive()
+								&& !updateActivity.isExpired()
+								&& !moduleLocalService.isLocked(updateActivity.getModuleId(),u.getUserId())
+								&& !courseLocalService.getCourseByGroupCreatedId(updateActivity.getGroupId()).isInactive()
+								&& !courseLocalService.getCourseByGroupCreatedId(updateActivity.getGroupId()).isExpired()
+								&& !courseLocalService.getCourseByGroupCreatedId(updateActivity.getGroupId()).isClosed()){
+							String courseTitle = courseLocalService.getCourseByGroupCreatedId(updateActivity.getGroupId()).getTitle(u.getLocale());
+							String subject = LanguageUtil.format(u.getLocale(),"notif.modification.new.title", null);
+							String body =LanguageUtil.format(u.getLocale(),"notif.modification.new.body", new String[]{updateActivity.getTitle(u.getLocale()),courseTitle});
+							sendNotification(subject, body, "", "announcements.type.general", 1,serviceContext, updateActivity.getStartdate(), updateActivity.getEnddate(),u.getUserId());
+						}
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+		
+		return updateActivity;
+	}
+	
 	public LearningActivity addLearningActivity (String title, String description, 
 			java.util.Date createDate,java.util.Date startDate,java.util.Date endDate,
 			int typeId,long tries,int passpuntuation,long moduleId, String extracontent,
@@ -212,6 +277,7 @@ public class LearningActivityLocalServiceImpl extends LearningActivityLocalServi
 		larn.setPriority(larn.getActId());
 		larn.setFeedbackCorrect(feedbackCorrect);
 		larn.setFeedbackNoCorrect(feedbackNoCorrect);
+		larn.setExpandoBridgeAttributes(serviceContext);
 		
 		larn = LmsLocaleUtil.checkDefaultLocale(LearningActivity.class, larn, "title");
 		larn = LmsLocaleUtil.checkDefaultLocale(LearningActivity.class, larn, "description");
@@ -384,7 +450,7 @@ public class LearningActivityLocalServiceImpl extends LearningActivityLocalServi
 		return learningActivity;
 	}
 
-	public LearningActivity modLearningActivity (long actId,String title, String description, java.util.Date createDate,java.util.Date startDate,java.util.Date endDate, int typeId,long tries,int passpuntuation,long moduleId,
+	public LearningActivity modLearningActivity (long actId,String title, String description, Date createDate,Date startDate,Date endDate, int typeId,long tries,int passpuntuation,long moduleId,
 			String extracontent, String feedbackCorrect, String feedbackNoCorrect,ServiceContext serviceContext)
 					throws SystemException, 
 					PortalException {
@@ -409,6 +475,8 @@ public class LearningActivityLocalServiceImpl extends LearningActivityLocalServi
 		larn.setExtracontent(extracontent);
 		larn.setFeedbackCorrect(feedbackCorrect);
 		larn.setFeedbackNoCorrect(feedbackNoCorrect);
+		larn.setExpandoBridgeAttributes(serviceContext);
+		
 		larn = LmsLocaleUtil.checkDefaultLocale(LearningActivity.class, larn, "title");
 		larn = LmsLocaleUtil.checkDefaultLocale(LearningActivity.class, larn, "description");
 		learningActivityPersistence.update(larn, true);

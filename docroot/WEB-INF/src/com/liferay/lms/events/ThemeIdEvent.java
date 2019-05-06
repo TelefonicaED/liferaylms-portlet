@@ -9,11 +9,18 @@ public final class ThemeIdEvent implements Serializable {
 	
 	private long moduleId;
 	long themeId;
+	private long actId;
 	/**
 	 * @return the moduleId
 	 */
 	public final long getModuleId() {
 		return moduleId;
+	}
+	public long getActId() {
+		return actId;
+	}
+	public void setActId(long actId) {
+		this.actId = actId;
 	}
 	/**
 	 * @param moduleId the moduleId to set

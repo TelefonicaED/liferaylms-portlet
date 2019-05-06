@@ -2,7 +2,9 @@ package com.liferay.lms.course.inscriptiontype;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Locale;
+import java.util.Set;
 
 import javax.portlet.PortletPreferences;
 import javax.portlet.PortletResponse;
@@ -18,6 +20,7 @@ import com.liferay.portal.kernel.upload.UploadRequest;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PrefsPropsUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.model.GroupConstants;
 import com.liferay.portal.service.PortalPreferencesLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.util.PortletKeys;
@@ -49,10 +52,8 @@ public class UserDaysInscriptionType extends BaseInscriptionType{
 				PortletPreferences prefs= PortalPreferencesLocalServiceUtil.getPreferences(course.getCompanyId(), course.getGroupCreatedId(), PortletKeys.PREFS_OWNER_TYPE_COMPANY);
 	
 				if(!prefs.isReadOnly("inscription-days")){
-	
 					prefs.setValue("inscription-days", value);
 					prefs.store();
-	
 				}
 			}else{
 				return "inscription-days-required";
@@ -65,8 +66,6 @@ public class UserDaysInscriptionType extends BaseInscriptionType{
 		
 		return null;
 	}
-	
-	
 	
 	@Override
 	public String enrollUser(long courseId, long userId, long teamId, ServiceContext serviceContext) throws PortalException, SystemException {
@@ -91,5 +90,17 @@ public class UserDaysInscriptionType extends BaseInscriptionType{
 	@Override
 	public boolean canUnsubscribe() {
 		return false;
+	}
+	
+	@Override
+	public Set<Integer> getGroupTypesAvailable(){
+		Set<Integer> sites = new HashSet<Integer>();
+		sites.add(GroupConstants.TYPE_SITE_OPEN);
+		return sites;
+	}
+	
+	@Override
+	public boolean isActive(long companyId){
+		return true;
 	}
 }

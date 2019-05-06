@@ -22,6 +22,7 @@ import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
 import javax.portlet.ResourceURL;
 
+import com.liferay.lms.course.adminaction.AdminActionTypeRegistry;
 import com.liferay.lms.model.AsynchronousProcessAudit;
 import com.liferay.lms.model.Course;
 import com.liferay.lms.model.CourseType;
@@ -185,6 +186,8 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 		
 		searchCourses(renderRequest, renderResponse);
 		
+		AdminActionTypeRegistry registry =  new AdminActionTypeRegistry();
+		renderRequest.setAttribute("adminActionTypes", registry.getAdminActionTypes());
 		include(this.viewJSP, renderRequest, renderResponse);
 	}
 	
