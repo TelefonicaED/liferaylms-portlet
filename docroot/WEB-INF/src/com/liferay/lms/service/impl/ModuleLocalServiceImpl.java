@@ -325,6 +325,9 @@ public class ModuleLocalServiceImpl extends ModuleLocalServiceBaseImpl {
 
 	    fileobj = LmsLocaleUtil.checkDefaultLocale(Module.class, fileobj, "title");
 	    fileobj = LmsLocaleUtil.checkDefaultLocale(Module.class, fileobj, "description");
+	    
+	    if(serviceContext != null)
+	    	fileobj.setExpandoBridgeAttributes(serviceContext);
 
 	    Module module = modulePersistence.update(fileobj, false);
 	    
@@ -398,6 +401,9 @@ public class ModuleLocalServiceImpl extends ModuleLocalServiceBaseImpl {
 
 	    fileobj = LmsLocaleUtil.checkDefaultLocale(Module.class, fileobj, "title");
 	    fileobj = LmsLocaleUtil.checkDefaultLocale(Module.class, fileobj, "description");
+	    
+	    if(serviceContext != null)
+	    	fileobj.setExpandoBridgeAttributes(serviceContext);
 		
 	    Module module = modulePersistence.update(fileobj, false);
 	    
@@ -460,6 +466,8 @@ public class ModuleLocalServiceImpl extends ModuleLocalServiceBaseImpl {
 		module = LmsLocaleUtil.checkDefaultLocale(Module.class, module, "title");
 		module = LmsLocaleUtil.checkDefaultLocale(Module.class, module, "description");
 		module.setModifiedDate(new java.util.Date(System.currentTimeMillis()));
+		if(serviceContext != null)
+			module.setExpandoBridgeAttributes(serviceContext);
 		try {
 			if(resourceLocalService.getResource(module.getCompanyId(), Module.class.getName(), ResourceConstants.SCOPE_INDIVIDUAL,Long.toString( module.getPrimaryKey()))==null)
 					{
@@ -511,6 +519,8 @@ public class ModuleLocalServiceImpl extends ModuleLocalServiceBaseImpl {
 		module = LmsLocaleUtil.checkDefaultLocale(Module.class, module, "title");
 		module = LmsLocaleUtil.checkDefaultLocale(Module.class, module, "description");
 		module.setModifiedDate(new java.util.Date(System.currentTimeMillis()));
+		if(serviceContext != null)
+			module.setExpandoBridgeAttributes(serviceContext);
 		module = super.updateModule(module, merge);
 		
 	    //AssetEntry
