@@ -228,3 +228,12 @@
 	padding-top:60px;
 	padding-bottom:0px;	
 }
+
+
+.changeeditingmode-portlet .aui-button-holder img {
+    z-index: 3;
+    background: transparent;
+    top: 0;
+    width: 41px;
+    display: none;
+}
