@@ -288,7 +288,7 @@
 					renderRequest.setAttribute("isDLFileEntry", isDLFileEntry);
 				}%>
 
-<link rel="stylesheet" type="text/css" href="/liferaylms-portlet/js/mediaelement/mediaelementplayer.min.css">
+<link rel="stylesheet" type="text/css" href="/liferaylms-portlet/js/mediaelement/mediaelementplayer.css">
 
 
 	
