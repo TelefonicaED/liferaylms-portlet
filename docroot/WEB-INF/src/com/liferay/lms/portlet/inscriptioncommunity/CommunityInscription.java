@@ -95,10 +95,11 @@ public class CommunityInscription extends MVCPortlet {
 				unsubscribeURL.setParameter("javax.portlet.action", "unsubscribe");
 				renderRequest.setAttribute("unsubscribeURL", unsubscribeURL);
 				
-				CourseResult cr = CourseResultLocalServiceUtil.getCourseResultByCourseAndUser(course.getCourseId(), themeDisplay.getUserId());
 				boolean canUnsubscribeLocal = true;
-				if(!Boolean.parseBoolean(renderRequest.getPreferences().getValue("unsubscribeIfFinished", "true")))
+				if(!Boolean.parseBoolean(renderRequest.getPreferences().getValue("unsubscribeIfFinished", "true"))){
+					CourseResult cr = CourseResultLocalServiceUtil.getCourseResultByCourseAndUser(course.getCourseId(), themeDisplay.getUserId());
 					canUnsubscribeLocal=((cr != null)?cr.getPassedDate()==null:true);
+				}
 				renderRequest.setAttribute("canUnsubscribeLocal", canUnsubscribeLocal);
 				
 				//Comprobamos si estoy inscrita en el curso o en alguna convocatoria
