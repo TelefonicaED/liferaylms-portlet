@@ -27,7 +27,7 @@
 							<div class="mensaje_marcado">
 								<span class="edition-name">${childCourse.getTitle(locale)}</span>
 								<aui:button type="button" value="inscription.go-to-course" href='/web${childCourse.friendlyURL}'/>
-								<c:if test='${renderRequest.preferences.getValue("unsubscribeIfFinished", "true") && childCourse.canUnsubscribe(themeDisplay.userId, themeDisplay.permissionChecker) }'>
+								<c:if test='${canUnsubscribeLocal && childCourse.canUnsubscribe(themeDisplay.userId, themeDisplay.permissionChecker) }'>
 									<div class="boton_inscibirse ">
 										<a href="#" onclick="javascript:<portlet:namespace/>unsubscribe(${childCourse.courseId })"><liferay-ui:message key="inscripcion.desinscribete" /></a>
 									</div>
@@ -36,7 +36,7 @@
 						</c:forEach>
 					</c:if>
 					<c:if test="${not empty course}">
-						<c:if test='${renderRequest.preferences.getValue("unsubscribeIfFinished", "true") && course.canUnsubscribe(themeDisplay.userId, themeDisplay.permissionChecker)}'>
+						<c:if test='${canUnsubscribeLocal && course.canUnsubscribe(themeDisplay.userId, themeDisplay.permissionChecker)}'>
 							<div class="boton_inscibirse ">
 								<a href="#" onclick="javascript:<portlet:namespace />unsubscribe(${course.courseId });"><liferay-ui:message key="inscripcion.desinscribete" /></a>
 							</div>
