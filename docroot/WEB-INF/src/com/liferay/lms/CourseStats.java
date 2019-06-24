@@ -328,6 +328,10 @@ public class CourseStats extends MVCPortlet {
 		boolean hasPrecedence = false;
 		if(activity.getPrecedence() > 0){
 			hasPrecedence = true;
+			LearningActivity precedence = LearningActivityLocalServiceUtil.fetchLearningActivity(activity.getPrecedence());
+			if(precedence != null){
+				activityStats.setDependency(precedence.getTitle(locale));
+			}
 		}
 		activityStats.setPrecedence(LanguageUtil.get(locale,"dependencies."+String.valueOf(hasPrecedence)));
 		activityStats.setType(LanguageUtil.get(locale,classTypes.get((long)activity.getTypeId())));

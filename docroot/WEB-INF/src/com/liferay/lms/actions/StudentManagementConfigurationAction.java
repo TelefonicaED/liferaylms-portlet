@@ -41,6 +41,7 @@ public class StudentManagementConfigurationAction implements ConfigurationAction
 		
 		prefs.setValue("showActionSocial", actionRequest.getParameter("showActionSocial"));
 		prefs.setValue("showActionAudit", actionRequest.getParameter("showActionAudit"));
+		prefs.setValue("showEmailAddress", actionRequest.getParameter("showEmailAddress"));
 		
 		
 		prefs.store();

@@ -2,7 +2,6 @@ package com.liferay.lms;
 
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.LinkedHashMap;
@@ -22,9 +21,6 @@ import au.com.bytecode.opencsv.CSVWriter;
 
 import com.liferay.lms.model.Course;
 import com.liferay.lms.service.CourseLocalServiceUtil;
-import com.liferay.lms.service.CourseResultLocalServiceUtil;
-import com.liferay.lms.service.LearningActivityLocalServiceUtil;
-import com.liferay.lms.service.ModuleLocalServiceUtil;
 import com.liferay.lms.util.CourseParams;
 import com.liferay.lms.views.CourseStatsView;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
@@ -39,11 +35,9 @@ import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
-import com.liferay.portal.model.Group;
 import com.liferay.portal.model.RoleConstants;
 import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.service.RoleLocalServiceUtil;
@@ -51,9 +45,6 @@ import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceContextFactory;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portlet.asset.service.AssetTagLocalServiceUtil;
-import com.liferay.portlet.expando.model.ExpandoColumn;
-import com.liferay.portlet.expando.model.ExpandoTableConstants;
-import com.liferay.portlet.expando.service.ExpandoColumnLocalServiceUtil;
 import com.liferay.util.bridges.mvc.MVCPortlet;
 import com.tls.lms.util.CourseOrderByCreationDate;
 import com.tls.lms.util.CourseOrderByTitle;
@@ -422,7 +413,7 @@ public class GeneralStats extends MVCPortlet {
 		        resourceResponse.getPortletOutputStream().write(b);
 			}
 	        CSVWriter writer = new CSVWriter(new OutputStreamWriter(resourceResponse.getPortletOutputStream(),charset),';');
-	        String[] linea=new String[8];
+	        String[] linea=new String[10];
 	        linea[0]=LanguageUtil.get(themeDisplay.getLocale(),"coursestats.name");
 	        linea[1]=LanguageUtil.get(themeDisplay.getLocale(),"coursestats.registered");
 	        linea[2]=LanguageUtil.get(themeDisplay.getLocale(),"coursestats.start.student");
@@ -440,7 +431,7 @@ public class GeneralStats extends MVCPortlet {
 	        for(Course course:courses){
 	        	userExcludedIds = CourseLocalServiceUtil.getTeachersAndEditorsIdsFromCourse(course);
 	        	courseStatView = new CourseStatsView(course.getCourseId(), themeDisplay.getLocale(), 0, userExcludedIds, null, true);
-	        	linea=new String[8];
+	        	linea=new String[10];
 		        linea[0]=courseStatView.getCourseTitle();
 		    	linea[1]=Long.toString(courseStatView.getRegistered());
 				linea[2]=Long.toString(courseStatView.getStarted());

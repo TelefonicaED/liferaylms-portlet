@@ -143,7 +143,6 @@ if( permissionChecker.hasPermission(themeDisplay.getScopeGroupId(),  Course.clas
 %>
 	<portlet:actionURL name="openCourse" var="openURL">
 		<portlet:param name="courseId" value="<%= primKey %>" />
-		<portlet:param name="redirect" value='<%= ParamUtil.getString(request, "redirect", currentURL) %>'/>
 	</portlet:actionURL>
 	<liferay-ui:icon src="<%= themeDisplay.getPathThemeImages() + \"/dock/my_places_private.png\" %>" message="open-course" url="<%=openURL.toString() %>" />
 <%} %>

@@ -498,6 +498,7 @@ public class CourseResultLocalServiceImpl
 				
 			}	
 		}		
+		courseResultPersistence.update(cresult, false);
 		
 		//Actualizamos los diplomas externos (si los hay)
 		CourseDiplomaRegistry cdr=new CourseDiplomaRegistry();
@@ -508,7 +509,7 @@ public class CourseResultLocalServiceImpl
 			}
 		}
 		
-		courseResultPersistence.update(cresult, false);
+		
 	}
 	
 	public void update(ModuleResult mresult) throws PortalException, SystemException{

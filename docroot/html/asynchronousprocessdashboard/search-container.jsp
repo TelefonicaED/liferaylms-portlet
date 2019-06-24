@@ -81,5 +81,3 @@ Format dateFormat = FastDateFormatFactoryUtil.getDateTime(locale, timeZone);
 		<liferay-ui:search-iterator />
 	
 	</liferay-ui:search-container>
-
-${showExtraContent}

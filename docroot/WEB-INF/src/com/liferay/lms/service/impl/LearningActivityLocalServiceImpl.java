@@ -277,6 +277,7 @@ public class LearningActivityLocalServiceImpl extends LearningActivityLocalServi
 		larn.setPriority(larn.getActId());
 		larn.setFeedbackCorrect(feedbackCorrect);
 		larn.setFeedbackNoCorrect(feedbackNoCorrect);
+		larn.setExpandoBridgeAttributes(serviceContext);
 		
 		larn = LmsLocaleUtil.checkDefaultLocale(LearningActivity.class, larn, "title");
 		larn = LmsLocaleUtil.checkDefaultLocale(LearningActivity.class, larn, "description");
@@ -449,7 +450,7 @@ public class LearningActivityLocalServiceImpl extends LearningActivityLocalServi
 		return learningActivity;
 	}
 
-	public LearningActivity modLearningActivity (long actId,String title, String description, java.util.Date createDate,java.util.Date startDate,java.util.Date endDate, int typeId,long tries,int passpuntuation,long moduleId,
+	public LearningActivity modLearningActivity (long actId,String title, String description, Date createDate,Date startDate,Date endDate, int typeId,long tries,int passpuntuation,long moduleId,
 			String extracontent, String feedbackCorrect, String feedbackNoCorrect,ServiceContext serviceContext)
 					throws SystemException, 
 					PortalException {
@@ -474,6 +475,8 @@ public class LearningActivityLocalServiceImpl extends LearningActivityLocalServi
 		larn.setExtracontent(extracontent);
 		larn.setFeedbackCorrect(feedbackCorrect);
 		larn.setFeedbackNoCorrect(feedbackNoCorrect);
+		larn.setExpandoBridgeAttributes(serviceContext);
+		
 		larn = LmsLocaleUtil.checkDefaultLocale(LearningActivity.class, larn, "title");
 		larn = LmsLocaleUtil.checkDefaultLocale(LearningActivity.class, larn, "description");
 		learningActivityPersistence.update(larn, true);

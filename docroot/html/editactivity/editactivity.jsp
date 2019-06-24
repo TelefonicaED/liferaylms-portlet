@@ -82,12 +82,11 @@ if(request.getAttribute("activity")!=null){
 	learnact=(LearningActivity)request.getAttribute("activity");
 	typeId=learnact.getTypeId();
 	moduleId=learnact.getModuleId();
-}else{
-	if(actId>0)	{
-		learnact=LearningActivityLocalServiceUtil.getLearningActivity(actId);
-		typeId=learnact.getTypeId();
-		moduleId=learnact.getModuleId();
-	}
+	actId = learnact.getActId();
+}else if(actId>0)	{
+	learnact=LearningActivityLocalServiceUtil.getLearningActivity(actId);
+	typeId=learnact.getTypeId();
+	moduleId=learnact.getModuleId();
 }
 
 
@@ -1028,6 +1027,13 @@ Liferay.provide(
 		<%}
 		%>
 		</liferay-ui:panel>
+		
+		<liferay-ui:custom-attributes-available className="<%= LearningActivity.class.getName() %>" >
+	   		<liferay-ui:panel title="custom-fields" collapsible="true" defaultState="closed" >
+	    		<liferay-ui:custom-attribute-list className="<%=LearningActivity.class.getName()%>" classPK="<%=actId %>" 
+	     			editable="true" label="true" />
+	   		</liferay-ui:panel>
+		</liferay-ui:custom-attributes-available>
 		<%
 		boolean showActivityClassification = true;
 		try {

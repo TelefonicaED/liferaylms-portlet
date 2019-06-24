@@ -7,6 +7,7 @@ import java.util.Properties;
 
 
 
+
 import com.liferay.lms.service.ClpSerializer;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
@@ -50,13 +51,18 @@ public class AuditingLogFactory
 						classContent = context[1];
 					}
 					log.debug("classContent: "+classContent);
-					ClassLoaderProxy classLoaderProxy = new ClassLoaderProxy(Class.forName(className, true, 
-							PortletClassLoaderUtil.getClassLoader(classContent)).newInstance(), className, 
-							PortletClassLoaderUtil.getClassLoader(classContent));
-					AuditingLog auditLog=new AuditingLogClp(classLoaderProxy);
-					log.debug("auditing with defined:"+className);
-					auditLogs.add(auditLog);
-				
+					try{
+						ClassLoaderProxy classLoaderProxy = new ClassLoaderProxy(Class.forName(className, true, 
+								PortletClassLoaderUtil.getClassLoader(classContent)).newInstance(), className, 
+								PortletClassLoaderUtil.getClassLoader(classContent));
+						AuditingLog auditLog=new AuditingLogClp(classLoaderProxy);
+						log.debug("auditing with defined:"+className);
+						auditLogs.add(auditLog);
+					}catch(Exception e){
+						if(log.isDebugEnabled()){
+							e.printStackTrace();
+						}
+					}
 				}
 				
 			}catch(SystemException e){

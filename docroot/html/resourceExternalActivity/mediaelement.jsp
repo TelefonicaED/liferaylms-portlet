@@ -3,7 +3,7 @@
 		<video width="600" height="338" id="playervideo" ${controls }
 			preload="none" src="${video}" type="${mimeType }"></video>
 	</div>
-
+	
 	<c:forEach items="${listQuestions }" var="question">
 		<c:set var="questionType" value="${question.testQuestionType }" />
 		<div class="aui-helper-hidden questionVideo"
@@ -29,19 +29,21 @@
 
 <%@ include file="/html/questions/validations.jsp"%>
 
+<link rel="stylesheet" type="text/css" href="/liferaylms-portlet/js/mediaelement/mediaelementplayer.css">
+
 <!-- JS -->
 <script
-	src="https://cdn.jsdelivr.net/npm/mediaelement@4.2.7/build/mediaelement-and-player.min.js"></script>
+	src="https://cdn.jsdelivr.net/npm/mediaelement@4.2.9/build/mediaelement-and-player.min.js"></script>
 <script
-	src="https://cdn.jsdelivr.net/npm/mediaelement@4.2.7/build/renderers/dailymotion.min.js"></script>
+	src="https://cdn.jsdelivr.net/npm/mediaelement@4.2.9/build/dailymotion.min.js"></script>
 <script
-	src="https://cdn.jsdelivr.net/npm/mediaelement@4.2.7/build/renderers/facebook.min.js"></script>
+	src="https://cdn.jsdelivr.net/npm/mediaelement@4.2.9/build/facebook.min.js"></script>
 <script
-	src="https://cdn.jsdelivr.net/npm/mediaelement@4.2.7/build/renderers/soundcloud.min.js"></script>
+	src="https://cdn.jsdelivr.net/npm/mediaelement@4.2.9/build/renderers/soundcloud.min.js"></script>
 <script
-	src="https://cdn.jsdelivr.net/npm/mediaelement@4.2.7/build/renderers/twitch.min.js"></script>
+	src="https://cdn.jsdelivr.net/npm/mediaelement@4.2.9/build/renderers/twitch.min.js"></script>
 <script
-	src="https://cdn.jsdelivr.net/npm/mediaelement@4.2.7/build/renderers/vimeo.min.js"></script>
+	src="/liferaylms-portlet/js/mediaelement/renderers/vimeo.js"></script>
 
 <portlet:resourceURL var="saveQuestionURL" id="saveQuestion" />
 
@@ -56,13 +58,27 @@
   	 	var plays = 0;
   	 	var finished = false;
 
-	 	player = new MediaElement("playervideo", {
-	    	pluginPath: 'https://cdn.jsdelivr.net/npm/mediaelement@4.2.7/build/',
-	        shimScriptAccess: 'always',
-	        success: function (media, node) {
-				
-	        }
-	    });
+  	 	
+  	 	if('${isVimeoIframe}' == 'true' && '${controls}' == ''){
+  	 		console.log("SIN CONTROLES");
+  	 		$('#playervideo').mediaelementplayer({
+  	     	    features: ['playpause','volume'], //Adding the feature 'markers' enables this plugin
+  	     		pluginPath: '/liferaylms-portlet/js/mediaelement/',
+  	     	    success: function (media) {
+  	     	    	player = media;
+  	     	    }
+  	     	}); 
+  	 	}else{
+  	 		console.log("CON CONTROLES");
+  	 		player = new MediaElement("playervideo", {
+  		 		pluginPath: '/liferaylms-portlet/js/mediaelement/',
+  		        shimScriptAccess: 'always',
+  		        success: function (media, node) {
+  		        	
+  		        }
+  		    });	
+  	 	}
+	 	
 	
 	    var currentTime = parseInt('${currentTime}');
 		if(currentTime > 0){
@@ -85,29 +101,33 @@
 			
 			
 		});	
-			
-		player.addEventListener('ended',function() {
-			
-			var duration = player.getDuration();
-			
-			<portlet:namespace/>finishTry(100,duration,plays);	
-
-			// Process Success - A LearningActivityResult returned
-			finished = true;	
-			Liferay.Portlet.refresh('#p_p_id_activityNavigator_WAR_liferaylmsportlet_');
-			Liferay.Portlet.refresh('#p_p_id_lmsactivitieslist_WAR_liferaylmsportlet_');
-			player.setControls(true);
-			if('${isVimeoIframe}' == 'true'){
-				var src = 	document.getElementById("playervideo_vimeo_iframe").src;
-				var index = src.indexOf("background");
-				if(index > 0){
-					src = src.substring(0,index-1);
-					document.getElementById("playervideo_vimeo_iframe").src = src;
+		
+		if('${!hasPermissionAccessCourseFinished}' == 'true'){
+				
+			player.addEventListener('ended',function() {
+				
+				var duration = player.getDuration();
+				
+				<portlet:namespace/>finishTry(100,duration,plays);	
+	
+				// Process Success - A LearningActivityResult returned
+				finished = true;	
+				Liferay.Portlet.refresh('#p_p_id_activityNavigator_WAR_liferaylmsportlet_');
+				Liferay.Portlet.refresh('#p_p_id_lmsactivitieslist_WAR_liferaylmsportlet_');
+				player.setControls(true);
+				if('${isVimeoIframe}' == 'true'){
+					var src = 	document.getElementById("playervideo_vimeo_iframe").src;
+					var index = src.indexOf("background");
+					if(index > 0){
+						src = src.substring(0,index-1);
+						document.getElementById("playervideo_vimeo_iframe").src = src;
+					}
 				}
-			}
-			
-			
-		});
+				
+				
+			});
+		
+		}
 		
 		//Creamos el array para las preguntas
 		var questions = [];
@@ -141,27 +161,29 @@
 			});
 		}
 			
-		var unloadEvent = function (e) {
-			//console.log("unload event vimeo");  
-			if(!finished){
-				var duration = player.getDuration();
-				currentTime = player.getCurrentTime();
-					
-				var isDefaultScore = '${isDefaultScore}' == 'true';
-				var positionToSave = parseFloat('${videoPosition}');
-				var oldScore = parseInt('${oldScore}');
-				if (currentTime > positionToSave)
-					positionToSave = currentTime;
-				var score = 100;														
-				if (!isDefaultScore) score = Math.round((currentTime/duration)*100);
-				//debugger;
-				<portlet:namespace/>finishTry(score, positionToSave,plays);													
-			  
-			}
-		};
-		
-		window.addEventListener("beforeunload", unloadEvent);
-		
+		if('${!hasPermissionAccessCourseFinished}' == 'true'){
+			
+			var unloadEvent = function (e) {
+				//console.log("unload event vimeo");  
+				if(!finished){
+					var duration = player.getDuration();
+					currentTime = player.getCurrentTime();
+						
+					var isDefaultScore = '${isDefaultScore}' == 'true';
+					var positionToSave = parseFloat('${videoPosition}');
+					var oldScore = parseInt('${oldScore}');
+					if (currentTime > positionToSave)
+						positionToSave = currentTime;
+					var score = 100;														
+					if (!isDefaultScore) score = Math.round((currentTime/duration)*100);
+					//debugger;
+					<portlet:namespace/>finishTry(score, positionToSave,plays);													
+				  
+				}
+			};
+			
+			window.addEventListener("beforeunload", unloadEvent);
+		}
 	});
      
  	function <portlet:namespace/>answerQuestion(questionId){
@@ -214,3 +236,7 @@
  	}
 
 </script>
+
+
+
+

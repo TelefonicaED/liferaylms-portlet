@@ -65,6 +65,7 @@ if(LearningActivityLocalServiceUtil.canBeEdited(learningActivity, user.getUserId
 		<liferay-portlet:renderURL var="buscarRecurso" >
 			<liferay-portlet:param name="mvcPath" value="/html/resourceInternalActivity/admin/searchresource.jsp" />
 			<liferay-portlet:param name="resId" value="<%=String.valueOf(resId) %>" />
+			<liferay-portlet:param name="actId" value="<%=String.valueOf(resId) %>" />
 			<liferay-portlet:param name="resModuleId" value="<%=String.valueOf(resModuleId) %>" />
 		</liferay-portlet:renderURL>
 		
@@ -81,7 +82,7 @@ if(LearningActivityLocalServiceUtil.canBeEdited(learningActivity, user.getUserId
 
 <script type="text/javascript">
 
-$(document).ready(function(){
+function <portlet:namespace />goToSearchResource(){
 	var form = document.createElement("form");
 	var url =  '${buscarRecurso}';
 	
@@ -109,9 +110,7 @@ $(document).ready(function(){
 	form.appendChild(inputTitle);
 	
 	document.getElementsByTagName("body")[0].appendChild(form);
-});
-
-function <portlet:namespace />goToSearchResource(){
+	
 	var languageId = '<%= themeDisplay.getLanguageId()%>';
 	
 	document.<portlet:namespace />formResourceInternal.<portlet:namespace />description.value = $('#<portlet:namespace />description').val();
