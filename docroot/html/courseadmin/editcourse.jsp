@@ -218,6 +218,9 @@ if(course!=null){
 	entry=AssetEntryLocalServiceUtil.getEntry(Course.class.getName(),course.getCourseId());
 	assetEntryId=entry.getEntryId();
 	visibleencatalogo=entry.getVisible();
+	if(entry.getClassTypeId()>0){
+		courseType = CourseTypeLocalServiceUtil.fetchCourseType(entry.getClassTypeId());	
+	}
 	summary=entry.getSummary();
 	courseId=course.getCourseId();
 	description=course.getDescription(themeDisplay.getLocale());
