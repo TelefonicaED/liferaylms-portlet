@@ -11,4 +11,5 @@
 	<sql file="custom-sql/asynchronousprocessaudit.xml"/>
 	<sql file="custom-sql/learningactivitytry.xml"/>
 	<sql file="custom-sql/coursetype.xml"/>
+	<sql file="custom-sql/surveyresult.xml"/>
 </custom-sql>

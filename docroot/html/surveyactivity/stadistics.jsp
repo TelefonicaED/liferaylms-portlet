@@ -163,7 +163,8 @@
 				},
 				success: function(data){
 					if(data){
-						location.href=exportResourceURL+'&UUID='+data.UUID+'&action='+action;
+						//location.href=exportResourceURL+'&UUID='+data.UUID+'&action='+action;
+						<portlet:namespace />readThreadState(data.UUID);
 					}else{
 						alert("Error generando el archivo");
 						$('#<portlet:namespace />generating_report').addClass("aui-helper-hidden");
@@ -197,24 +198,32 @@ function <portlet:namespace />downloadReport(url){
 		$('#<portlet:namespace />generate_report').addClass("aui-helper-hidden");
 		$('#<portlet:namespace />generating_report').removeClass("aui-helper-hidden");
 		$(document).ready(function(){
-			<portlet:namespace />readThreadState();
+			<portlet:namespace />readThreadState(<%=uuid%>);
 		});
 		
-		function <portlet:namespace />readThreadState(){
+		
+	</script>
+	<%	
+		} 
+	} 
+	%>
+	
+	<script>
+		function <portlet:namespace />readThreadState(uuid){
 			$.ajax({
 				dataType: 'json',
 				url: '${stadisticsReportURL}',
 				action :  "${action}",
 			    cache:false,
 				data: {
-					UUID : '<%=uuid%>'
-				},
+					UUID : uuid
+					},
 				success: function(data){
 					if(data){						
 				    	if(!data.threadF){		
 				    		$('#<portlet:namespace />generating_report').removeClass("aui-helper-hidden");
 				    		$('#<portlet:namespace />download_report').addClass("aui-helper-hidden");
-				    		setTimeout(<portlet:namespace />readThreadState,2000);
+				    		setTimeout(<portlet:namespace />readThreadState(uuid),2000);
 				    		
 				    	}else{	
 				    		//location.href='${exportResourceURL}&file=' + data.file + '&contentType=' + data.contentType + '&UUID=' + data.UUID + '&action='+data.action;
@@ -235,8 +244,3 @@ function <portlet:namespace />downloadReport(url){
 			});		
 		}	
 	</script>
-	<%	
-		} 
-	} 
-	%>
-	

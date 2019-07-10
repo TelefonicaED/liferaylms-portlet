@@ -85,9 +85,10 @@ public class SurveyResultModelImpl extends BaseModelImpl<SurveyResult>
 			true);
 	public static long ACTID_COLUMN_BITMASK = 1L;
 	public static long ANSWERID_COLUMN_BITMASK = 2L;
-	public static long QUESTIONID_COLUMN_BITMASK = 4L;
-	public static long USERID_COLUMN_BITMASK = 8L;
-	public static long UUID_COLUMN_BITMASK = 16L;
+	public static long LATID_COLUMN_BITMASK = 4L;
+	public static long QUESTIONID_COLUMN_BITMASK = 8L;
+	public static long USERID_COLUMN_BITMASK = 16L;
+	public static long UUID_COLUMN_BITMASK = 32L;
 	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(com.liferay.util.service.ServiceProps.get(
 				"lock.expiration.time.com.liferay.lms.model.SurveyResult"));
 
@@ -239,7 +240,19 @@ public class SurveyResultModelImpl extends BaseModelImpl<SurveyResult>
 	}
 
 	public void setLatId(long latId) {
+		_columnBitmask |= LATID_COLUMN_BITMASK;
+
+		if (!_setOriginalLatId) {
+			_setOriginalLatId = true;
+
+			_originalLatId = _latId;
+		}
+
 		_latId = latId;
+	}
+
+	public long getOriginalLatId() {
+		return _originalLatId;
 	}
 
 	public long getQuestionId() {
@@ -423,6 +436,10 @@ public class SurveyResultModelImpl extends BaseModelImpl<SurveyResult>
 
 		surveyResultModelImpl._setOriginalActId = false;
 
+		surveyResultModelImpl._originalLatId = surveyResultModelImpl._latId;
+
+		surveyResultModelImpl._setOriginalLatId = false;
+
 		surveyResultModelImpl._originalQuestionId = surveyResultModelImpl._questionId;
 
 		surveyResultModelImpl._setOriginalQuestionId = false;
@@ -554,6 +571,8 @@ public class SurveyResultModelImpl extends BaseModelImpl<SurveyResult>
 	private long _originalActId;
 	private boolean _setOriginalActId;
 	private long _latId;
+	private long _originalLatId;
+	private boolean _setOriginalLatId;
 	private long _questionId;
 	private long _originalQuestionId;
 	private boolean _setOriginalQuestionId;

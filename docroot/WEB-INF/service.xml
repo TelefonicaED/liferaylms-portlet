@@ -732,6 +732,11 @@
 		<finder name="AnswerIdQuestionId"	return-type="Collection">
 			<finder-column name="answerId" />
 			<finder-column name="questionId" />
+		</finder>
+		<finder name="QuestionIdActIdLatId"	return-type="SurveyResult">
+			<finder-column name="questionId" />
+			<finder-column name="actId" />
+			<finder-column name="latId" />
 		</finder>		
 	</entity>  
 	      

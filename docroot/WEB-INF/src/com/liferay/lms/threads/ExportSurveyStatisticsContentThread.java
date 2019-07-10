@@ -24,6 +24,7 @@ import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 
 import com.liferay.lms.model.LearningActivity;
+import com.liferay.lms.model.LearningActivityTry;
 import com.liferay.lms.model.SurveyResult;
 import com.liferay.lms.model.TestQuestion;
 import com.liferay.lms.service.CourseLocalServiceUtil;
@@ -31,6 +32,8 @@ import com.liferay.lms.service.LearningActivityLocalServiceUtil;
 import com.liferay.lms.service.ModuleLocalServiceUtil;
 import com.liferay.lms.service.SurveyResultLocalServiceUtil;
 import com.liferay.lms.service.TestQuestionLocalServiceUtil;
+import com.liferay.lms.service.persistence.SurveyResultFinder;
+import com.liferay.lms.service.persistence.SurveyResultFinderUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -140,44 +143,44 @@ public class ExportSurveyStatisticsContentThread extends Thread {
 				addLabel(sheet, cabecera, columnNumber++, row, valor);
 			}
 			
-			//Reiniciamos columnas
-			columnNumber = 0;
+			
 			//Por cada pregunta, traemos sus respuestas
-			List<SurveyResult> listaRespuestas;
+		
 			
-			for(Long questionId: questionOrder)
-			{									
-				//Empezamos por la fila 1
-				rowNumber=1;
-				listaRespuestas = SurveyResultLocalServiceUtil.getSurveyResultsByQuestionIdActId(questionId, actId);
-				if(listaRespuestas!=null && listaRespuestas.size()!=0)
-				{
-					for(SurveyResult answer:listaRespuestas)
-					{
-						
-						row = sheet.getRow(rowNumber);
-						if(row==null){
-							row = sheet.createRow(rowNumber);
-						}
-						// La primera vez pintamos los valores 
-						// "Id", "Curso", "Módulo" y "Actividad"
-						if(columnNumber == 0){
-							addLabel(sheet, contenido, 0, row, String.valueOf(rowNumber));
-							addLabel(sheet, contenido, 1, row, HtmlUtil.extractText(curso));
-							addLabel(sheet, contenido, 2, row, HtmlUtil.extractText(modulo));
-							addLabel(sheet, contenido, 3, row, HtmlUtil.extractText(actividad));
-							addLabel(sheet, contenido, 4, row, HtmlUtil.extractText(answer.getFreeAnswer()));
-						}
-						else {
-							addLabel(sheet, contenido, columnNumber+numExtraCols, row, HtmlUtil.extractText(answer.getFreeAnswer()));
-						}
-						rowNumber++;
-					}
-					columnNumber++;//Columna nueva
+			
+			
+			
+			
+			//Por cada intento sacamos todas las respuestas
+			
+			List<Long> tries = SurveyResultLocalServiceUtil.getLearningActivityTriesByActId(actId);
+			SurveyResult answer = null;
+			rowNumber=1;
+			for(Long latId : tries){
+				row = sheet.getRow(rowNumber);
+				if(row==null){
+					row = sheet.createRow(rowNumber);
 				}
+				// La primera vez pintamos los valores 
+				// "Id", "Curso", "Módulo" y "Actividad"
+				addLabel(sheet, contenido, 0, row, String.valueOf(rowNumber));
+				addLabel(sheet, contenido, 1, row, HtmlUtil.extractText(curso));
+				addLabel(sheet, contenido, 2, row, HtmlUtil.extractText(modulo));
+				addLabel(sheet, contenido, 3, row, HtmlUtil.extractText(actividad));
+				//Reiniciamos columnas
+				columnNumber = 0;
+				for(Long questionId: questionOrder){
+					answer = SurveyResultLocalServiceUtil.getSurveyResultByQuestionIdActIdLatId(questionId, actId, latId);
+					
+					if(answer!=null){
+						addLabel(sheet, contenido, columnNumber+numExtraCols, row, HtmlUtil.extractText(answer.getFreeAnswer()));
+					}else{
+						addLabel(sheet, contenido, columnNumber+numExtraCols, row, "");
+					}
+					columnNumber++;
+				}
+				rowNumber++;
 			}
-			
-			
 			workbook.write(bw);
 			try {
 				bw.close();
