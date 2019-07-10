@@ -70,6 +70,7 @@ import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.FriendlyURLNormalizerUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.Http.Auth;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -689,7 +690,6 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 	@Indexable(type=IndexableType.REINDEX)
 	public Course closeCourse(long courseId) throws SystemException,
 	PortalException {
-	
 		Course course=CourseLocalServiceUtil.getCourse(courseId);
 		if(!course.getClosed()){
 			course.setClosed(true);
@@ -1158,7 +1158,7 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 	public void addStudentToCourseWithDates(long courseId,long userId,Date allowStartDate,Date allowFinishDate) throws PortalException, SystemException
 	{
 		Course course=courseLocalService.getCourse(courseId);
-		;
+		
 			User user = userLocalService.fetchUser(userId);
 			if (!GroupLocalServiceUtil.hasUserGroup(user.getUserId(), course.getGroupCreatedId())) {
 				GroupLocalServiceUtil.addUserGroups(user.getUserId(), new long[] { course.getGroupCreatedId() });
@@ -1178,8 +1178,7 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 				courseResult.setAllowFinishDate(allowFinishDate);
 				courseResultLocalService.updateCourseResult(courseResult);
 			}
-			//auditing
-			AuditingLogFactory.audit(course.getCompanyId(), course.getGroupId(), Course.class.getName(), course.getCourseId(), userId, AuditConstants.REGISTER, null);		 
+					 
 		
 	}
 
@@ -1882,7 +1881,9 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 					userName = userId + "[" + UserLocalServiceUtil.getUser(userId).getFullName() + "]";
 					groupName = groupId[0] + "[" + GroupLocalServiceUtil.getGroup(groupId[0]).getName() + "]";
 				}
-				catch (Exception e) {}
+				catch (Exception e) {
+					e.printStackTrace();
+				}
 				
 				log.debug("DESINSCRIBIR: "+userName +" se ha desincrito de la comunidad "+groupName+" el "+hoy.toString());
 			}
