@@ -58,6 +58,7 @@ public class CommunityInscription extends MVCPortlet {
 			InscriptionTypeRegistry inscriptionTypeRegistry = new InscriptionTypeRegistry();
 			InscriptionType inscriptionType = inscriptionTypeRegistry.getInscriptionType(course.getInscriptionType());
 			renderRequest.setAttribute("inscriptionType", inscriptionType);
+			renderRequest.setAttribute("inscriptionAllowedTime", inscriptionType.getAllowedTime(course.getCourseId(), themeDisplay.getUserId(), themeDisplay.getLocale()));
 			
 			log.debug("inscriptionTypeFactory: " + inscriptionType.getTypeId() + " - " + inscriptionType.getPortletId());
 			if(!Validator.isNull(inscriptionType.getPortletId())) {
