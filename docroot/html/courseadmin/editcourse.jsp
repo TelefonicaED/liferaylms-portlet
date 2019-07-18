@@ -105,7 +105,10 @@ String backURL = ParamUtil.getString(request, "backURL");
 
 String referringPortletResource = ParamUtil.getString(request, "referringPortletResource");
 long courseId=ParamUtil.getLong(request, "courseId",0);
+long parentCourseId = 0;
 Course course=null;
+Course parentCourse = null;
+String parentCourseTitle = "";
 boolean isCourseChild = false;
 long templateParent = 0;
 if(request.getAttribute("course")!=null){
@@ -115,8 +118,13 @@ else{
 	if(courseId>0){
 		course=CourseLocalServiceUtil.fetchCourse(courseId);
 		if(course!=null){
-			if(course.getParentCourseId()>0){
+			parentCourseId = course.getParentCourseId();
+			if(parentCourseId>0){
 				isCourseChild=true;
+				parentCourse = CourseLocalServiceUtil.fetchCourse(parentCourseId);
+				if(parentCourse!=null){
+					parentCourseTitle = parentCourse.getTitle(themeDisplay.getLocale());
+				}
 			}
 		}
 	}
@@ -274,6 +282,14 @@ if(courseType != null){
 }
 %>
 <liferay-ui:header title="<%= title %>" backURL="<%=backURL %>"></liferay-ui:header>
+<%
+if(isCourseChild){
+	String subTitle = LanguageUtil.get(themeDisplay.getLocale(), "course-admin.parent-course") + ":" + parentCourseTitle;
+%>
+<h1 class="header-title"><%=subTitle %></h1>
+<%
+}
+%>
 <portlet:resourceURL var="searchGroupTypesURL" id="searchGroupTypes"/>
 <c:if test="<%=course != null && course.getParentCourseId()<=0%>">
 	<aui:fieldset>
