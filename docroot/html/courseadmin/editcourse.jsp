@@ -299,6 +299,16 @@ if(isCourseChild){
 					!course.isClosed() && ( PortalUtil.isOmniadmin(themeDisplay.getUserId()) || UserLocalServiceUtil.hasGroupUser(course.getGroupCreatedId(), themeDisplay.getUserId())) && !isInCourse) {%>
 				<liferay-ui:icon image="submit" message="courseadmin.adminactions.gotocourse" target="_top" url="<%=themeDisplay.getPortalURL() +\"/\"+ response.getLocale().getLanguage() +\"/web/\"+ groupsel.getFriendlyURL()%>" />
 			<%}%>
+			<%-- Editar curso padre --%>
+			<%if(isCourseChild && permissionChecker.hasPermission(themeDisplay.getScopeGroupId(),  Course.class.getName(), parentCourseId, ActionKeys.UPDATE)&& !parentCourse.isClosed()){%>
+				<portlet:renderURL var="editParentCourseURL">
+					<portlet:param name="courseId" value="<%=String.valueOf(parentCourseId) %>" />
+					<portlet:param name="backToEdit" value="<%=StringPool.TRUE %>" />
+					<portlet:param name="redirectOfEdit" value='<%=ParamUtil.getString(request, "redirect", currentURL) %>'/>
+					<portlet:param name="view" value="edit-course" />
+				</portlet:renderURL>
+				<liferay-ui:icon image="edit" message="course-admin.edit-parent-course" url='${editParentCourseURL }' />
+			<%}%>
 			<%-- Asignar miembros --%>
 			<%if(permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), Course.class.getName(), courseId, "ASSIGN_MEMBERS") && ! course.isClosed() && showMembers){%>
 				<portlet:renderURL var="memebersURL">
