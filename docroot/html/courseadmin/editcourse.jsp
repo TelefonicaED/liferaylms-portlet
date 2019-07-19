@@ -291,7 +291,7 @@ if(isCourseChild){
 }
 %>
 <portlet:resourceURL var="searchGroupTypesURL" id="searchGroupTypes"/>
-<c:if test="<%=course != null && course.getParentCourseId()<=0%>">
+<c:if test="<%=course != null%>">
 	<aui:fieldset>
 		<liferay-ui:icon-menu>
 			<%-- Ir al curso --%>
