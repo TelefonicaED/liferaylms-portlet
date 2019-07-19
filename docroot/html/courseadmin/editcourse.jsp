@@ -365,6 +365,18 @@ if(isCourseChild){
 					<liferay-ui:icon image="permissions" message="courseadmin.adminactions.permissions" url="<%=permissionsURL %>" />
 				</c:if>	
 			<%}%>
+			
+			<%-- Ver ediciones --%>
+			<%
+			long countStudents = CourseLocalServiceUtil.getStudentsFromCourseCount(course.getCourseId());
+			boolean editionsWithoutRestrictions = GetterUtil.getBoolean(renderRequest.getPreferences().getValue("showEditionsWithoutRestrictions", StringPool.FALSE),false);
+			if(!isCourseChild && permissionChecker.hasPermission(themeDisplay.getScopeGroupId(),  Course.class.getName(),courseId,ActionKeys.UPDATE) && !course.isClosed()  && (countStudents<=0 || editionsWithoutRestrictions)){%>
+				<liferay-portlet:renderURL var="editionsURL">
+					<liferay-portlet:param name="courseId" value="<%=String.valueOf(courseId) %>"/>
+					<liferay-portlet:param name="view" value="editions"/>
+				</liferay-portlet:renderURL>
+				<liferay-ui:icon image="tag" message="course-admin.editions" url="${editionsURL }" />
+			<%}%>
 		
 			<%-- Cerrar/Abrir --%>
 			<%if(permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), Course.class.getName(), courseId, ActionKeys.UPDATE) && ! course.isClosed() && showClose && !isInCourse){%>
