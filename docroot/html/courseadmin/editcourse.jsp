@@ -284,7 +284,7 @@ if(courseType != null){
 <liferay-ui:header title="<%= title %>" backURL="<%=backURL %>"></liferay-ui:header>
 <%
 if(isCourseChild){
-	String subTitle = LanguageUtil.get(themeDisplay.getLocale(), "course-admin.parent-course") + ":" + parentCourseTitle;
+	String subTitle = LanguageUtil.get(themeDisplay.getLocale(), "course-admin.parent-course") + ": " + parentCourseTitle;
 %>
 <h1 class="header-title"><%=subTitle %></h1>
 <%

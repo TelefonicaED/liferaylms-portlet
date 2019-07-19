@@ -18,7 +18,7 @@ long parentCourseId=ParamUtil.getLong(request, "courseId",0);
 Course parentCourse = CourseLocalServiceUtil.fetchCourse(parentCourseId);
 if( permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), Course.class.getName(), parentCourseId, ActionKeys.UPDATE)&& !parentCourse.isClosed()){%>
 	
-	<div class="col-md-4">
+	<div class="col-md-2">
 		<portlet:renderURL var="editParentCourseURL">
 			<portlet:param name="view" value="edit-course" />
 			<portlet:param name="courseId" value='<%=String.valueOf(parentCourseId) %>' />
@@ -40,7 +40,7 @@ if( permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), Course.class
 <%
 if( permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), "com.liferay.lms.coursemodel",themeDisplay.getScopeGroupId(),"ADD_COURSE")){
 	%>
-		<div class="col-md-4">
+		<div class="col-md-2">
 		<portlet:renderURL var="newEditionURL">
 			<portlet:param name="view" value="new-edition"></portlet:param>
 			<portlet:param name="courseId" value="${courseId}"></portlet:param>
