@@ -812,6 +812,10 @@
 			<value>/html/inscriptioncommunity/view.jsp</value>
 		</init-param>
 		<init-param>
+			<name>config-template</name>
+			<value>/html/inscriptioncommunity/config.jsp</value>
+		</init-param>
+		<init-param>
 			<name>add-process-action-success-action</name>
 			<value>false</value>
 		</init-param>

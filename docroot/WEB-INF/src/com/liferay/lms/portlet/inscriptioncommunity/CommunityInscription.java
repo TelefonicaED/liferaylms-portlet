@@ -19,9 +19,11 @@ import com.liferay.lms.course.inscriptiontype.InscriptionType;
 import com.liferay.lms.course.inscriptiontype.InscriptionTypeRegistry;
 import com.liferay.lms.model.Course;
 import com.liferay.lms.model.CourseCompetence;
+import com.liferay.lms.model.CourseResult;
 import com.liferay.lms.model.Schedule;
 import com.liferay.lms.service.CourseCompetenceLocalServiceUtil;
 import com.liferay.lms.service.CourseLocalServiceUtil;
+import com.liferay.lms.service.CourseResultLocalServiceUtil;
 import com.liferay.lms.service.ScheduleLocalServiceUtil;
 import com.liferay.lms.util.LmsConstant;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -93,6 +95,13 @@ public class CommunityInscription extends MVCPortlet {
 				PortletURL unsubscribeURL = renderResponse.createActionURL();
 				unsubscribeURL.setParameter("javax.portlet.action", "unsubscribe");
 				renderRequest.setAttribute("unsubscribeURL", unsubscribeURL);
+				
+				boolean canUnsubscribeLocal = true;
+				if(!Boolean.parseBoolean(renderRequest.getPreferences().getValue("unsubscribeIfFinished", "true"))){
+					CourseResult cr = CourseResultLocalServiceUtil.getCourseResultByCourseAndUser(course.getCourseId(), themeDisplay.getUserId());
+					canUnsubscribeLocal=((cr != null)?cr.getPassedDate()==null:true);
+				}
+				renderRequest.setAttribute("canUnsubscribeLocal", canUnsubscribeLocal);
 				
 				//Comprobamos si estoy inscrita en el curso o en alguna convocatoria
 				if(UserLocalServiceUtil.hasGroupUser(course.getGroupCreatedId(), themeDisplay.getUserId())) {
