@@ -117,6 +117,23 @@ if( permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), "com.liferay
 			</c:forEach>
 		</c:if>
 		
+		<c:if test="${renderRequest.preferences.getValue('showFriendlyUrlColumn', 'false')}">
+			<liferay-ui:search-container-column-text name="course-admin.friendlyurl">
+				<%=course.getFriendlyURL() %>
+			</liferay-ui:search-container-column-text>
+		</c:if>
+		
+		<c:if test="${renderRequest.preferences.getValue('showParentCourseIdColumn', 'false')}">
+			<liferay-ui:search-container-column-text name="course-admin.parent-course-id">
+				<%=course.getParentCourseId() %>
+			</liferay-ui:search-container-column-text>
+		</c:if>
+		
+		<c:if test="${renderRequest.preferences.getValue('showCourseIdColumn', 'false')}">
+			<liferay-ui:search-container-column-text name="course-admin.course-id">
+				<%=course.getCourseId() %>
+			</liferay-ui:search-container-column-text>
+		</c:if>
 		
 		<c:if test="${renderRequest.preferences.getValue('showRegistrationType', 'false')}">		
 			<liferay-ui:search-container-column-text name="registration-type">
