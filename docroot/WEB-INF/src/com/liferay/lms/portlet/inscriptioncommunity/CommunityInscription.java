@@ -3,6 +3,7 @@ package com.liferay.lms.portlet.inscriptioncommunity;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.portlet.ActionRequest;
@@ -14,7 +15,6 @@ import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 import javax.servlet.http.HttpServletRequest;
 
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.lms.course.inscriptiontype.InscriptionType;
 import com.liferay.lms.course.inscriptiontype.InscriptionTypeRegistry;
 import com.liferay.lms.model.Course;
@@ -27,6 +27,7 @@ import com.liferay.lms.service.CourseResultLocalServiceUtil;
 import com.liferay.lms.service.ScheduleLocalServiceUtil;
 import com.liferay.lms.util.LmsConstant;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.servlet.SessionErrors;
@@ -97,16 +98,18 @@ public class CommunityInscription extends MVCPortlet {
 				renderRequest.setAttribute("unsubscribeURL", unsubscribeURL);
 				
 				boolean canUnsubscribeLocal = true;
-				if(!Boolean.parseBoolean(renderRequest.getPreferences().getValue("unsubscribeIfFinished", "true"))){
-					CourseResult cr = CourseResultLocalServiceUtil.getCourseResultByCourseAndUser(course.getCourseId(), themeDisplay.getUserId());
-					canUnsubscribeLocal=((cr != null)?cr.getPassedDate()==null:true);
-				}
-				renderRequest.setAttribute("canUnsubscribeLocal", canUnsubscribeLocal);
+				boolean unsubscribeIfFinished = !Boolean.parseBoolean(renderRequest.getPreferences().getValue("unsubscribeIfFinished", "true"));								
 				
 				//Comprobamos si estoy inscrita en el curso o en alguna convocatoria
 				if(UserLocalServiceUtil.hasGroupUser(course.getGroupCreatedId(), themeDisplay.getUserId())) {
 					//Ya estoy inscrito, mando el curso y que estoy inscrito
 					log.debug("usuario registrado: " + course.getCourseId() );
+					
+					if(unsubscribeIfFinished){
+					    //comprobamos si puede desinscribirse del curso
+	                    CourseResult cr = CourseResultLocalServiceUtil.getCourseResultByCourseAndUser(course.getCourseId(), themeDisplay.getUserId());
+	                    canUnsubscribeLocal=((cr != null)?cr.getPassedDate()==null:true);
+	                }
 					renderRequest.setAttribute("registredUser", true);
 					renderRequest.setAttribute("course", course);
 				}else {
@@ -127,6 +130,17 @@ public class CommunityInscription extends MVCPortlet {
 					if(listChildCourses != null && listChildCourses.size() > 0) {
 						log.debug("estoy inscrito en una convocatoria hija: " + listChildCourses.get(0).getCourseId());
 						//Estoy inscrita en alguna convocatoria de las hijas, mando qeu estoy inscrita y las convocatorias en las que estoy
+						
+						if(unsubscribeIfFinished){
+						    //comprobamos si puede desinscribirse del curso
+						    Iterator<Course> childIterator = listChildCourses.iterator();
+						    while (canUnsubscribeLocal && childIterator.hasNext()) {
+						        Course childCourse = childIterator.next();
+						        CourseResult childCr = CourseResultLocalServiceUtil.getCourseResultByCourseAndUser(childCourse.getCourseId(), themeDisplay.getUserId());
+	                            canUnsubscribeLocal=((childCr != null)?childCr.getPassedDate()==null:true);
+						    }
+		                }
+						
 						renderRequest.setAttribute("registredUser", true);
 						renderRequest.setAttribute("listChildCourses", listChildCourses);
 					}else {
@@ -180,7 +194,8 @@ public class CommunityInscription extends MVCPortlet {
 							}
 						}
 					}
-				}
+				}				
+				renderRequest.setAttribute("canUnsubscribeLocal", canUnsubscribeLocal);
 			}
 			
 			super.doView(renderRequest, renderResponse);
