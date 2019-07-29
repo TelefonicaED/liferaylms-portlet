@@ -751,7 +751,7 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 		if(Boolean.parseBoolean(renderRequest.getPreferences().getValue("showExpandos", "false")) || Boolean.parseBoolean(renderRequest.getPreferences().getValue("showExpandosEdition", "false"))){
 			renderRequest.setAttribute("listExpandos", listExpandos);
 		}
-		
+		try{
 		//Creamos la lista para las columnas
 		List<ExpandoColumn> expandoNames = new ArrayList<ExpandoColumn>();
 		if(Validator.isNotNull(listExpandos) && listExpandos.size()>0) {
@@ -763,9 +763,11 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 				}
 			}	
 		}
-	
-		renderRequest.setAttribute("expandoNames", expandoNames);
 		
+		renderRequest.setAttribute("expandoNames", expandoNames);
+		}catch(Exception e){
+			e.printStackTrace();
+		}
 		//Ocultar o no las fechas de ejecución del curso (por defecto no se ocultan)
 		renderRequest.setAttribute("hideExecutionDateCourseColumn", Boolean.parseBoolean(renderRequest.getPreferences().getValue("executionDateCourseColumn", "false")));
 	}
