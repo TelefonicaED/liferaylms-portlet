@@ -113,8 +113,8 @@ public class CourseTypeAdmin extends MVCPortlet {
 		SearchContainer<CourseType> searchContainer = new SearchContainer<CourseType>(request, null, null, SearchContainer.DEFAULT_CUR_PARAM, 
 				SearchContainer.DEFAULT_DELTA, response.createRenderURL(), null, "no-results");
 		try {
-			searchContainer.setResults(CourseTypeLocalServiceUtil.getCourseTypes(searchContainer.getStart(), searchContainer.getEnd()));
-			searchContainer.setTotal(CourseTypeLocalServiceUtil.getCourseTypesCount());
+			searchContainer.setResults(CourseTypeLocalServiceUtil.getByCompanyId(themeDisplay.getCompanyId(),searchContainer.getStart(), searchContainer.getEnd()));
+			searchContainer.setTotal(CourseTypeLocalServiceUtil.getCountByCompanyId(themeDisplay.getCompanyId()));
 		} catch (SystemException e) {
 			e.printStackTrace();
 		}
