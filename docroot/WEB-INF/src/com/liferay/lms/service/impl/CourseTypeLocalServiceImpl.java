@@ -65,7 +65,7 @@ public class CourseTypeLocalServiceImpl extends CourseTypeLocalServiceBaseImpl {
 		return courseTypePersistence.findByCompanyId(companyId, start, end);
 	}
 	
-	public int getCountByCompanyId(long companyId) throws SystemException{
+	public int countByCompanyId(long companyId) throws SystemException{
 		return courseTypePersistence.countByCompanyId(companyId);
 	}
 	
