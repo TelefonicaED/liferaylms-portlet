@@ -90,6 +90,18 @@
 					</liferay-ui:search-container-column-text>
 				</c:forEach>
 			</c:if>
+			
+			<c:if test="${renderRequest.preferences.getValue('showFriendlyUrlColumn', 'false')}">
+				<liferay-ui:search-container-column-text name="course-admin.friendlyurl">
+					<%=course.getFriendlyURL() %>
+				</liferay-ui:search-container-column-text>
+			</c:if>
+			
+			<c:if test="${renderRequest.preferences.getValue('showCourseIdColumn', 'false')}">
+				<liferay-ui:search-container-column-text name="course-admin.course-id">
+					<%=course.getCourseId() %>
+				</liferay-ui:search-container-column-text>
+			</c:if>
 				
 			<liferay-ui:search-container-column-text name="course.editions-number">
 				<liferay-portlet:renderURL var="goToEditionsURL">

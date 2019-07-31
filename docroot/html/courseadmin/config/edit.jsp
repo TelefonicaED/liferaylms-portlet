@@ -134,6 +134,9 @@
 		<aui:input type="checkbox"  label="courseadmin.config.execution-date-column" name="executionDateColumn" value="<%=preferences.getValue(\"executionDateColumn\", StringPool.TRUE) %>" ignoreRequestValue="true"/>
 		<aui:input type="checkbox"  label="courseadmin.config.create-date-column" name="createDateColumn" value="<%=preferences.getValue(\"createDateColumn\", StringPool.FALSE) %>" ignoreRequestValue="true"/>
 		<aui:input type="checkbox"  label="courseadmin.config.hide-execution-date-course-column" name="executionDateCourseColumn" value="<%=preferences.getValue(\"executionDateCourseColumn\", StringPool.FALSE) %>" ignoreRequestValue="true"/>
+		<aui:input type="checkbox"  label="courseadmin.config.show-friendly-url-column" name="showFriendlyUrlColumn" value="<%=preferences.getValue(\"showFriendlyUrlColumn\", StringPool.FALSE) %>" ignoreRequestValue="true"/>
+		<aui:input type="checkbox"  label="courseadmin.config.show-course-id-column" name="showCourseIdColumn" value="<%=preferences.getValue(\"showCourseIdColumn\", StringPool.FALSE) %>" ignoreRequestValue="true"/>
+		<aui:input type="checkbox"  label="courseadmin.config.show-parent-course-id-column" name="showParentCourseIdColumn" value="<%=preferences.getValue(\"showParentCourseIdColumn\", StringPool.FALSE) %>" ignoreRequestValue="true"/>
 	
 	<%
 		
@@ -147,13 +150,13 @@
 				%><h2><%=LanguageUtil.get(pageContext,"courseadmin.config.customfields")%></h2>
 				<%
 				for (ExpandoColumn expandoCourse : expandosColumnCourse) {
-					expandoName = StringUtil.upperCaseFirstLetter(expandoCourse.getName());
+					expandoName = expandoCourse.getName();
 					show = (preferences.getValue("show" + expandoName, "false")).compareTo("true") == 0;
 					if(ExpandoColumnConstants.DATE==expandoCourse.getType())
 						showExpandoDateFormat = true;
 					%>
 					<aui:input type="checkbox" 
-						label="<%=LanguageUtil.get(portletConfig, themeDisplay.getLocale(), \"show\") + StringPool.SPACE +  LanguageUtil.get(portletConfig, themeDisplay.getLocale(), expandoName)%>"
+						label="<%=LanguageUtil.get(portletConfig, themeDisplay.getLocale(), \"show\") + StringPool.SPACE + StringUtil.lowerCase(LanguageUtil.get(portletConfig, themeDisplay.getLocale(), expandoName))%>"
 						name="<%=\"show\"+ expandoName %>" 
 						value="<%=show %>" checked="<%=show %>"/>
 					<%
