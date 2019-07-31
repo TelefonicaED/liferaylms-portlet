@@ -200,7 +200,7 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 		
 		List<CourseType> listCourseTypes = new ArrayList<CourseType>();
 		try {
-			listCourseTypes = CourseTypeLocalServiceUtil.getCourseTypes(-1, -1);
+			listCourseTypes = CourseTypeLocalServiceUtil.getByCompanyId(themeDisplay.getCompanyId());
 		} catch (SystemException e) {
 			e.printStackTrace();
 		}
