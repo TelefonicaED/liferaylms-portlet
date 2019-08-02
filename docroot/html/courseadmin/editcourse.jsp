@@ -212,7 +212,7 @@ boolean showClone 	= preferences.getValue("showClone",  "true").equals("true");
 boolean showGo 		= preferences.getValue("showGo", 	 "true").equals("true");
 boolean showRegistrationType = preferences.getValue("showRegistrationType",  "true").equals("true");
 boolean showMaxUsers = preferences.getValue("showMaxUsers", "true").equals("true");
-
+boolean editionsWithoutRestrictions = GetterUtil.getBoolean(renderRequest.getPreferences().getValue("showEditionsWithoutRestrictions", StringPool.FALSE),false);
 
 boolean isInCourse = Boolean.FALSE;
 
@@ -310,7 +310,7 @@ if(isCourseChild){
 				<liferay-ui:icon image="edit" message="course-admin.edit-parent-course" url='${editParentCourseURL }' />
 			<%}%>
 			<%-- Asignar miembros --%>
-			<%if(permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), Course.class.getName(), courseId, "ASSIGN_MEMBERS") && ! course.isClosed() && showMembers){%>
+			<%if(permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), Course.class.getName(), courseId, "ASSIGN_MEMBERS") && ! course.isClosed() && showMembers && (!isCourseChild || editionsWithoutRestrictions)){%>
 				<portlet:renderURL var="memebersURL">
 					<portlet:param name="courseId" value="<%=String.valueOf(courseId) %>" />
 					<portlet:param name="backToEdit" value="<%=StringPool.TRUE %>" />
@@ -321,7 +321,7 @@ if(isCourseChild){
 			<%}%>
 			
 			<%-- Competencias --%>
-			<%if(count>0 && permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), Course.class.getName(), courseId,ActionKeys.UPDATE) && !course.isClosed() ){%>
+			<%if(count>0 && permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), Course.class.getName(), courseId,ActionKeys.UPDATE) && !course.isClosed() && !isCourseChild){%>
 				<portlet:renderURL var="competenceURL">
 					<portlet:param name="groupId" value="<%=String.valueOf(course.getGroupCreatedId()) %>" />
 					<portlet:param name="courseId" value="<%=String.valueOf(course.getCourseId()) %>" />
@@ -354,7 +354,7 @@ if(isCourseChild){
 					<portlet:param name="groupId" value="<%=String.valueOf(course.getGroupCreatedId()) %>" />
 					<portlet:param name="view" value="clone" />
 				</portlet:renderURL>
-				<liferay-ui:icon image="copy" message="courseadmin.adminactions.clone" url="<%=cloneURL%>" />	
+				<liferay-ui:icon image="copy" message='<%=isCourseChild ? \"courseadmin.adminactions.clone-edition\" :  \"courseadmin.adminactions.clone\"  %>' url="<%=cloneURL%>" />	
 			<%}%>	
 			
 			<%if(permissionChecker.hasPermission(course.getGroupId(), Course.class.getName(), course.getCourseId(), ActionKeys.PERMISSIONS) && ! course.isClosed() && !isInCourse){%>
@@ -369,7 +369,6 @@ if(isCourseChild){
 			<%-- Ver ediciones --%>
 			<%
 			long countStudents = CourseLocalServiceUtil.getStudentsFromCourseCount(course.getCourseId());
-			boolean editionsWithoutRestrictions = GetterUtil.getBoolean(renderRequest.getPreferences().getValue("showEditionsWithoutRestrictions", StringPool.FALSE),false);
 			if(!isCourseChild && permissionChecker.hasPermission(themeDisplay.getScopeGroupId(),  Course.class.getName(),courseId,ActionKeys.UPDATE) && !course.isClosed()  && (countStudents<=0 || editionsWithoutRestrictions)){%>
 				<liferay-portlet:renderURL var="editionsURL">
 					<liferay-portlet:param name="courseId" value="<%=String.valueOf(courseId) %>"/>
