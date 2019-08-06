@@ -18,7 +18,6 @@ if (Validator.isNotNull(portletResource)) {
 	preferences = PortletPreferencesFactoryUtil.getPortletSetup(request, portletResource);
 }
 boolean unsubscribeIfFinished = Boolean.parseBoolean(preferences.getValue("unsubscribeIfFinished",StringPool.TRUE));
-boolean checkExecutionDate = Boolean.parseBoolean(preferences.getValue("unsubscribeIfFinished",StringPool.FALSE));
 %>
 
 <liferay-portlet:actionURL portletConfiguration="true" var="configurationURL" />
@@ -27,7 +26,6 @@ boolean checkExecutionDate = Boolean.parseBoolean(preferences.getValue("unsubscr
 	<aui:input name="<%= Constants.CMD %>" type="hidden" value="<%= Constants.UPDATE %>" />
 	
 	<aui:input type="checkbox" name="preferences--unsubscribeIfFinished--" label="unsubscribe.ifFinished" value="<%=unsubscribeIfFinished %>"/>
-	<aui:input type="checkbox" name="preferences--checkExecutionDate--" label="config.checkExecutionDate" value="<%=checkExecutionDate %>"/>
 	
 	<aui:button-row>
 		<aui:button type="submit" />

@@ -33,8 +33,8 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.PrefsPropsUtil;
 import com.liferay.portal.kernel.util.StringBundler;
-import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.model.GroupConstants;
@@ -101,9 +101,15 @@ public class CommunityInscription extends MVCPortlet {
                 boolean canUnsubscribeLocal = true;
                 boolean unsubscribeIfFinished =
                     !Boolean.parseBoolean(renderRequest.getPreferences().getValue("unsubscribeIfFinished", "true"));
-                boolean checkExecutionDate =
-                    !Boolean.parseBoolean(renderRequest.getPreferences().getValue("checkExecutionDate",
-                        StringPool.FALSE));
+                
+                boolean checkExecutionDate = false;
+
+                try {
+                    checkExecutionDate =
+                        PrefsPropsUtil.getBoolean(themeDisplay.getCompanyId(), LmsConstant.CHECK_EXECUTION_DATE);
+                } catch (SystemException e) {
+                    log.error("Error buscando la propiedad " + LmsConstant.CHECK_EXECUTION_DATE);
+                }
 
                 // Comprobamos si estoy inscrita en el curso o en alguna convocatoria
                 if (UserLocalServiceUtil.hasGroupUser(course.getGroupCreatedId(), themeDisplay.getUserId())) {

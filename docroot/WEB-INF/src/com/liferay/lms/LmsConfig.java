@@ -35,6 +35,7 @@ public class LmsConfig extends MVCPortlet {
 		String calificationTypes=StringUtil.merge(request.getParameterMap().get( "calificationTypesCheckbox"));
 		String courseEvalsTypes=StringUtil.merge(request.getParameterMap().get( "courseEvalsCheckbox"));
 		String inscriptionTypes=StringUtil.merge(request.getParameterMap().get( "inscriptionTypesCheckbox"));
+		boolean checkExecutionDate = ParamUtil.getBoolean(request,"checkExecutionDate");
 		ThemeDisplay themeDisplay  =(ThemeDisplay)request.getAttribute(WebKeys.THEME_DISPLAY);
 		
 		boolean hasAPILicence = ParamUtil.getBoolean(request, "hasAPILicence");
@@ -55,6 +56,7 @@ public class LmsConfig extends MVCPortlet {
 		prefs.setShowHideActivity(showHideActivity);
 		prefs.setViewCoursesFinished(viewCoursesFinished);
 		LmsPrefsLocalServiceUtil.updateLmsPrefs(prefs);
+		savePreference(LmsConstant.CHECK_EXECUTION_DATE ,String.valueOf(checkExecutionDate) , themeDisplay.getCompanyId());
 		savePreference(LmsConstant.RESOURCE_INTERNAL_DOCUMENT_LINKED ,String.valueOf(linkResources) , themeDisplay.getCompanyId());
 		savePreference(LmsConstant.SHOW_MODULE_CLASSIFICATION, String.valueOf(showModuleClassification), themeDisplay.getCompanyId());
 		savePreference(LmsConstant.SHOW_ACTIVITY_CLASSIFICATION, String.valueOf(showActivityClassification), themeDisplay.getCompanyId());
