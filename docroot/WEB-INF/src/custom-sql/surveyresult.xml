@@ -1,0 +1,11 @@
+<custom-sql>
+	<sql id="com.liferay.lms.service.persistence.SurveyResultFinder.findTriesByActId">
+		<![CDATA[   			
+			SELECT sr.latId
+			FROM lms_surveyresult sr
+			WHERE actId = ?
+			GROUP BY sr.latId
+		]]>
+	</sql>
+	
+</custom-sql>

@@ -8,7 +8,6 @@ import java.util.Locale;
 
 import javax.portlet.PortletRequest;
 
-import sun.security.util.PendingException;
 
 import com.liferay.lms.model.TestAnswer;
 import com.liferay.lms.model.TestQuestion;

@@ -92,7 +92,11 @@
 			</c:if>
 				
 			<liferay-ui:search-container-column-text name="course.editions-number">
-				<%=CourseLocalServiceUtil.countChildCourses(course.getCourseId()) %>
+				<liferay-portlet:renderURL var="goToEditionsURL">
+					<liferay-portlet:param name="courseId" value="<%=String.valueOf(course.getCourseId()) %>"/>
+					<liferay-portlet:param name="view" value="editions"/>
+				</liferay-portlet:renderURL>
+				<a href="${goToEditionsURL}"><%=CourseLocalServiceUtil.countChildCourses(course.getCourseId()) %></a>
 			</liferay-ui:search-container-column-text>
 			
 			<c:if test="${renderRequest.preferences.getValue('showRegistrationType', 'false')}">		

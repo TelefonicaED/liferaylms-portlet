@@ -199,6 +199,22 @@ public class SurveyResultPersistenceImpl extends BasePersistenceImpl<SurveyResul
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION,
 			"countByAnswerIdQuestionId",
 			new String[] { Long.class.getName(), Long.class.getName() });
+	public static final FinderPath FINDER_PATH_FETCH_BY_QUESTIONIDACTIDLATID = new FinderPath(SurveyResultModelImpl.ENTITY_CACHE_ENABLED,
+			SurveyResultModelImpl.FINDER_CACHE_ENABLED, SurveyResultImpl.class,
+			FINDER_CLASS_NAME_ENTITY, "fetchByQuestionIdActIdLatId",
+			new String[] {
+				Long.class.getName(), Long.class.getName(), Long.class.getName()
+			},
+			SurveyResultModelImpl.QUESTIONID_COLUMN_BITMASK |
+			SurveyResultModelImpl.ACTID_COLUMN_BITMASK |
+			SurveyResultModelImpl.LATID_COLUMN_BITMASK);
+	public static final FinderPath FINDER_PATH_COUNT_BY_QUESTIONIDACTIDLATID = new FinderPath(SurveyResultModelImpl.ENTITY_CACHE_ENABLED,
+			SurveyResultModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION,
+			"countByQuestionIdActIdLatId",
+			new String[] {
+				Long.class.getName(), Long.class.getName(), Long.class.getName()
+			});
 	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_ALL = new FinderPath(SurveyResultModelImpl.ENTITY_CACHE_ENABLED,
 			SurveyResultModelImpl.FINDER_CACHE_ENABLED, SurveyResultImpl.class,
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findAll", new String[0]);
@@ -217,6 +233,13 @@ public class SurveyResultPersistenceImpl extends BasePersistenceImpl<SurveyResul
 	public void cacheResult(SurveyResult surveyResult) {
 		EntityCacheUtil.putResult(SurveyResultModelImpl.ENTITY_CACHE_ENABLED,
 			SurveyResultImpl.class, surveyResult.getPrimaryKey(), surveyResult);
+
+		FinderCacheUtil.putResult(FINDER_PATH_FETCH_BY_QUESTIONIDACTIDLATID,
+			new Object[] {
+				Long.valueOf(surveyResult.getQuestionId()),
+				Long.valueOf(surveyResult.getActId()),
+				Long.valueOf(surveyResult.getLatId())
+			}, surveyResult);
 
 		surveyResult.resetOriginalValues();
 	}
@@ -273,6 +296,8 @@ public class SurveyResultPersistenceImpl extends BasePersistenceImpl<SurveyResul
 
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+
+		clearUniqueFindersCache(surveyResult);
 	}
 
 	@Override
@@ -283,7 +308,18 @@ public class SurveyResultPersistenceImpl extends BasePersistenceImpl<SurveyResul
 		for (SurveyResult surveyResult : surveyResults) {
 			EntityCacheUtil.removeResult(SurveyResultModelImpl.ENTITY_CACHE_ENABLED,
 				SurveyResultImpl.class, surveyResult.getPrimaryKey());
+
+			clearUniqueFindersCache(surveyResult);
 		}
+	}
+
+	protected void clearUniqueFindersCache(SurveyResult surveyResult) {
+		FinderCacheUtil.removeResult(FINDER_PATH_FETCH_BY_QUESTIONIDACTIDLATID,
+			new Object[] {
+				Long.valueOf(surveyResult.getQuestionId()),
+				Long.valueOf(surveyResult.getActId()),
+				Long.valueOf(surveyResult.getLatId())
+			});
 	}
 
 	/**
@@ -547,6 +583,38 @@ public class SurveyResultPersistenceImpl extends BasePersistenceImpl<SurveyResul
 
 		EntityCacheUtil.putResult(SurveyResultModelImpl.ENTITY_CACHE_ENABLED,
 			SurveyResultImpl.class, surveyResult.getPrimaryKey(), surveyResult);
+
+		if (isNew) {
+			FinderCacheUtil.putResult(FINDER_PATH_FETCH_BY_QUESTIONIDACTIDLATID,
+				new Object[] {
+					Long.valueOf(surveyResult.getQuestionId()),
+					Long.valueOf(surveyResult.getActId()),
+					Long.valueOf(surveyResult.getLatId())
+				}, surveyResult);
+		}
+		else {
+			if ((surveyResultModelImpl.getColumnBitmask() &
+					FINDER_PATH_FETCH_BY_QUESTIONIDACTIDLATID.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] {
+						Long.valueOf(surveyResultModelImpl.getOriginalQuestionId()),
+						Long.valueOf(surveyResultModelImpl.getOriginalActId()),
+						Long.valueOf(surveyResultModelImpl.getOriginalLatId())
+					};
+
+				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_QUESTIONIDACTIDLATID,
+					args);
+
+				FinderCacheUtil.removeResult(FINDER_PATH_FETCH_BY_QUESTIONIDACTIDLATID,
+					args);
+
+				FinderCacheUtil.putResult(FINDER_PATH_FETCH_BY_QUESTIONIDACTIDLATID,
+					new Object[] {
+						Long.valueOf(surveyResult.getQuestionId()),
+						Long.valueOf(surveyResult.getActId()),
+						Long.valueOf(surveyResult.getLatId())
+					}, surveyResult);
+			}
+		}
 
 		return surveyResult;
 	}
@@ -2997,6 +3065,168 @@ public class SurveyResultPersistenceImpl extends BasePersistenceImpl<SurveyResul
 	}
 
 	/**
+	 * Returns the survey result where questionId = &#63; and actId = &#63; and latId = &#63; or throws a {@link com.liferay.lms.NoSuchSurveyResultException} if it could not be found.
+	 *
+	 * @param questionId the question ID
+	 * @param actId the act ID
+	 * @param latId the lat ID
+	 * @return the matching survey result
+	 * @throws com.liferay.lms.NoSuchSurveyResultException if a matching survey result could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	public SurveyResult findByQuestionIdActIdLatId(long questionId, long actId,
+		long latId) throws NoSuchSurveyResultException, SystemException {
+		SurveyResult surveyResult = fetchByQuestionIdActIdLatId(questionId,
+				actId, latId);
+
+		if (surveyResult == null) {
+			StringBundler msg = new StringBundler(8);
+
+			msg.append(_NO_SUCH_ENTITY_WITH_KEY);
+
+			msg.append("questionId=");
+			msg.append(questionId);
+
+			msg.append(", actId=");
+			msg.append(actId);
+
+			msg.append(", latId=");
+			msg.append(latId);
+
+			msg.append(StringPool.CLOSE_CURLY_BRACE);
+
+			if (_log.isWarnEnabled()) {
+				_log.warn(msg.toString());
+			}
+
+			throw new NoSuchSurveyResultException(msg.toString());
+		}
+
+		return surveyResult;
+	}
+
+	/**
+	 * Returns the survey result where questionId = &#63; and actId = &#63; and latId = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
+	 *
+	 * @param questionId the question ID
+	 * @param actId the act ID
+	 * @param latId the lat ID
+	 * @return the matching survey result, or <code>null</code> if a matching survey result could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	public SurveyResult fetchByQuestionIdActIdLatId(long questionId,
+		long actId, long latId) throws SystemException {
+		return fetchByQuestionIdActIdLatId(questionId, actId, latId, true);
+	}
+
+	/**
+	 * Returns the survey result where questionId = &#63; and actId = &#63; and latId = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
+	 *
+	 * @param questionId the question ID
+	 * @param actId the act ID
+	 * @param latId the lat ID
+	 * @param retrieveFromCache whether to use the finder cache
+	 * @return the matching survey result, or <code>null</code> if a matching survey result could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	public SurveyResult fetchByQuestionIdActIdLatId(long questionId,
+		long actId, long latId, boolean retrieveFromCache)
+		throws SystemException {
+		Object[] finderArgs = new Object[] { questionId, actId, latId };
+
+		Object result = null;
+
+		if (retrieveFromCache) {
+			result = FinderCacheUtil.getResult(FINDER_PATH_FETCH_BY_QUESTIONIDACTIDLATID,
+					finderArgs, this);
+		}
+
+		if (result instanceof SurveyResult) {
+			SurveyResult surveyResult = (SurveyResult)result;
+
+			if ((questionId != surveyResult.getQuestionId()) ||
+					(actId != surveyResult.getActId()) ||
+					(latId != surveyResult.getLatId())) {
+				result = null;
+			}
+		}
+
+		if (result == null) {
+			StringBundler query = new StringBundler(4);
+
+			query.append(_SQL_SELECT_SURVEYRESULT_WHERE);
+
+			query.append(_FINDER_COLUMN_QUESTIONIDACTIDLATID_QUESTIONID_2);
+
+			query.append(_FINDER_COLUMN_QUESTIONIDACTIDLATID_ACTID_2);
+
+			query.append(_FINDER_COLUMN_QUESTIONIDACTIDLATID_LATID_2);
+
+			String sql = query.toString();
+
+			Session session = null;
+
+			try {
+				session = openSession();
+
+				Query q = session.createQuery(sql);
+
+				QueryPos qPos = QueryPos.getInstance(q);
+
+				qPos.add(questionId);
+
+				qPos.add(actId);
+
+				qPos.add(latId);
+
+				List<SurveyResult> list = q.list();
+
+				result = list;
+
+				SurveyResult surveyResult = null;
+
+				if (list.isEmpty()) {
+					FinderCacheUtil.putResult(FINDER_PATH_FETCH_BY_QUESTIONIDACTIDLATID,
+						finderArgs, list);
+				}
+				else {
+					surveyResult = list.get(0);
+
+					cacheResult(surveyResult);
+
+					if ((surveyResult.getQuestionId() != questionId) ||
+							(surveyResult.getActId() != actId) ||
+							(surveyResult.getLatId() != latId)) {
+						FinderCacheUtil.putResult(FINDER_PATH_FETCH_BY_QUESTIONIDACTIDLATID,
+							finderArgs, surveyResult);
+					}
+				}
+
+				return surveyResult;
+			}
+			catch (Exception e) {
+				throw processException(e);
+			}
+			finally {
+				if (result == null) {
+					FinderCacheUtil.removeResult(FINDER_PATH_FETCH_BY_QUESTIONIDACTIDLATID,
+						finderArgs);
+				}
+
+				closeSession(session);
+			}
+		}
+		else {
+			if (result instanceof List<?>) {
+				return null;
+			}
+			else {
+				return (SurveyResult)result;
+			}
+		}
+	}
+
+	/**
 	 * Returns all the survey results.
 	 *
 	 * @return the survey results
@@ -3186,6 +3416,24 @@ public class SurveyResultPersistenceImpl extends BasePersistenceImpl<SurveyResul
 				questionId)) {
 			remove(surveyResult);
 		}
+	}
+
+	/**
+	 * Removes the survey result where questionId = &#63; and actId = &#63; and latId = &#63; from the database.
+	 *
+	 * @param questionId the question ID
+	 * @param actId the act ID
+	 * @param latId the lat ID
+	 * @return the survey result that was removed
+	 * @throws SystemException if a system exception occurred
+	 */
+	public SurveyResult removeByQuestionIdActIdLatId(long questionId,
+		long actId, long latId)
+		throws NoSuchSurveyResultException, SystemException {
+		SurveyResult surveyResult = findByQuestionIdActIdLatId(questionId,
+				actId, latId);
+
+		return remove(surveyResult);
 	}
 
 	/**
@@ -3542,6 +3790,70 @@ public class SurveyResultPersistenceImpl extends BasePersistenceImpl<SurveyResul
 	}
 
 	/**
+	 * Returns the number of survey results where questionId = &#63; and actId = &#63; and latId = &#63;.
+	 *
+	 * @param questionId the question ID
+	 * @param actId the act ID
+	 * @param latId the lat ID
+	 * @return the number of matching survey results
+	 * @throws SystemException if a system exception occurred
+	 */
+	public int countByQuestionIdActIdLatId(long questionId, long actId,
+		long latId) throws SystemException {
+		Object[] finderArgs = new Object[] { questionId, actId, latId };
+
+		Long count = (Long)FinderCacheUtil.getResult(FINDER_PATH_COUNT_BY_QUESTIONIDACTIDLATID,
+				finderArgs, this);
+
+		if (count == null) {
+			StringBundler query = new StringBundler(4);
+
+			query.append(_SQL_COUNT_SURVEYRESULT_WHERE);
+
+			query.append(_FINDER_COLUMN_QUESTIONIDACTIDLATID_QUESTIONID_2);
+
+			query.append(_FINDER_COLUMN_QUESTIONIDACTIDLATID_ACTID_2);
+
+			query.append(_FINDER_COLUMN_QUESTIONIDACTIDLATID_LATID_2);
+
+			String sql = query.toString();
+
+			Session session = null;
+
+			try {
+				session = openSession();
+
+				Query q = session.createQuery(sql);
+
+				QueryPos qPos = QueryPos.getInstance(q);
+
+				qPos.add(questionId);
+
+				qPos.add(actId);
+
+				qPos.add(latId);
+
+				count = (Long)q.uniqueResult();
+			}
+			catch (Exception e) {
+				throw processException(e);
+			}
+			finally {
+				if (count == null) {
+					count = Long.valueOf(0);
+				}
+
+				FinderCacheUtil.putResult(FINDER_PATH_COUNT_BY_QUESTIONIDACTIDLATID,
+					finderArgs, count);
+
+				closeSession(session);
+			}
+		}
+
+		return count.intValue();
+	}
+
+	/**
 	 * Returns the number of survey results.
 	 *
 	 * @return the number of survey results
@@ -3684,6 +3996,10 @@ public class SurveyResultPersistenceImpl extends BasePersistenceImpl<SurveyResul
 	private static final String _FINDER_COLUMN_QUESTIONID_QUESTIONID_2 = "surveyResult.questionId = ?";
 	private static final String _FINDER_COLUMN_ANSWERIDQUESTIONID_ANSWERID_2 = "surveyResult.answerId = ? AND ";
 	private static final String _FINDER_COLUMN_ANSWERIDQUESTIONID_QUESTIONID_2 = "surveyResult.questionId = ?";
+	private static final String _FINDER_COLUMN_QUESTIONIDACTIDLATID_QUESTIONID_2 =
+		"surveyResult.questionId = ? AND ";
+	private static final String _FINDER_COLUMN_QUESTIONIDACTIDLATID_ACTID_2 = "surveyResult.actId = ? AND ";
+	private static final String _FINDER_COLUMN_QUESTIONIDACTIDLATID_LATID_2 = "surveyResult.latId = ?";
 	private static final String _ORDER_BY_ENTITY_ALIAS = "surveyResult.";
 	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY = "No SurveyResult exists with the primary key ";
 	private static final String _NO_SUCH_ENTITY_WITH_KEY = "No SurveyResult exists with the key {";

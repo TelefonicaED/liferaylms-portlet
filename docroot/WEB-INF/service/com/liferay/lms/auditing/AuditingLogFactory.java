@@ -8,6 +8,7 @@ import java.util.Properties;
 
 
 
+
 import com.liferay.lms.service.ClpSerializer;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
@@ -100,9 +101,19 @@ public class AuditingLogFactory
 		try{
 			if(log.isDebugEnabled())log.debug("audit:"+className+"::"+classPK);
 			List<AuditingLog> auditLogs = getAuditLogs();
+			log.debug("TAMAÑO DEL LOG "+auditLogs.size());
 			for(AuditingLog auditLog : auditLogs){
-				log.debug("AUDIT LOG "+auditLog.toString());
-				auditLog.audit(companyId, groupId, className, classPK, associationClassPK, userId, action, extraData);
+				log.debug("AUDIT LOG "+auditLog.getClass().getName());
+				try{
+					auditLog.audit(companyId, groupId, className, classPK, associationClassPK, userId, action, extraData);	
+				}catch(UnsupportedOperationException ex){
+					log.error("---UNSUPORTED AUDIT!!");
+					ex.printStackTrace();
+				}catch(Exception e){
+					log.error("---EXCEPTION AUDIT!!: ");
+					e.printStackTrace();
+				}
+				log.debug("CONTINÚA POR EL AUDIT");
 			}
 			
 		}catch(ClassNotFoundException cnfe){
@@ -110,6 +121,10 @@ public class AuditingLogFactory
 		}catch(IllegalAccessException iae){
 			if(log.isDebugEnabled())iae.printStackTrace();
 		}catch(InstantiationException ie){
+			if(log.isDebugEnabled())ie.printStackTrace();
+		}catch(UnsupportedOperationException ie){
+			log.debug("UNSUPORTED OPERATION EXCEPTION ");
+			
 			if(log.isDebugEnabled())ie.printStackTrace();
 		}
 	}

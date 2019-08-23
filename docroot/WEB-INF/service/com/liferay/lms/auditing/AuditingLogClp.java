@@ -20,7 +20,10 @@ public class AuditingLogClp  implements AuditingLog{
 		try {
 			clp.invoke(new MethodHandler(methodKey, companyId,  groupId,  className,
 				 classPK,  associationClassPK,  userId,  action, extraData));
-		} catch (Throwable e) {
+		}  catch (UnsupportedOperationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}catch (Throwable e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
