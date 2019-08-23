@@ -17,8 +17,7 @@ String portletResource = ParamUtil.getString(request, "portletResource");
 if (Validator.isNotNull(portletResource)) {
 	preferences = PortletPreferencesFactoryUtil.getPortletSetup(request, portletResource);
 }
-boolean unsubscribeIfFinished = Boolean.parseBoolean(preferences.getValue("unsubscribeIfFinished",StringPool.TRUE)) ;
-
+boolean unsubscribeIfFinished = Boolean.parseBoolean(preferences.getValue("unsubscribeIfFinished",StringPool.TRUE));
 %>
 
 <liferay-portlet:actionURL portletConfiguration="true" var="configurationURL" />

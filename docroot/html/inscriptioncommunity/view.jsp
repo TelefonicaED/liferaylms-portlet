@@ -22,6 +22,11 @@
 					<div class="mensaje_marcado">
 						<liferay-ui:message key="inscripcion.inscrito" />
 					</div>
+					<c:if test="${inscriptionAllowedTime != null && not empty inscriptionAllowedTime}" >
+						<div class="message_allowed_time">
+							${inscriptionAllowedTime}
+						</div>
+					</c:if>
 					<c:if test="${not empty listChildCourses }">	
 						<c:forEach items="${listChildCourses }" var="childCourse">
 							<div class="mensaje_marcado">
@@ -152,6 +157,11 @@
 												 <c:choose>
 												 	<c:when test="${!hasTeams}">
 												 		<div class="mensaje_marcado"><liferay-ui:message key="inscripcion.noinscrito" /></div>
+														<c:if test="${inscriptionAllowedTime != null && not empty inscriptionAllowedTime}" >
+															<div class="message_allowed_time_no_inscribe">
+																${inscriptionAllowedTime}
+															</div>
+														</c:if>
 														<div class="boton_inscibirse ">
 															<c:choose>
 																<c:when test="${course.group.type == TYPE_SITE_OPEN}">

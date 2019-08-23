@@ -26,6 +26,7 @@ public class LmsConstant {
 	public static String RESOURCE_INTERNAL_DOCUMENT_LINKED = "lms.resource.internal.linked";
 	public static String SHOW_MODULE_CLASSIFICATION = "showModuleClassification";
 	public static String SHOW_ACTIVITY_CLASSIFICATION = "showActivityClassification";
+	public static String CHECK_EXECUTION_DATE = "checkExecutionDate";
 	
 	public final static String COURSETYPE_ICON_MAINFOLDER = "icons";
 	public final static String COURSETYPE_ICON_MAINFOLDER_DESCRIPTION = "Course Type Icons";

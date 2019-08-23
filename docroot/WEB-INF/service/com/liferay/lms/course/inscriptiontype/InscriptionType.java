@@ -24,4 +24,5 @@ public interface InscriptionType
 	public boolean canUnsubscribe();
 	public Set<Integer> getGroupTypesAvailable();
 	public boolean isActive(long companyId);
+	public String getAllowedTime(long courseId, long userId, Locale locale);
 }
