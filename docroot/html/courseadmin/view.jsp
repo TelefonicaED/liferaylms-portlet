@@ -13,7 +13,7 @@
 	<%
 	if( permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), "com.liferay.lms.coursemodel",themeDisplay.getScopeGroupId(),"ADD_COURSE")){
 		String viewParam = "edit-course";
-		if(CourseTypeLocalServiceUtil.getCourseTypesCount()>0)
+		if(CourseTypeLocalServiceUtil.countByCompanyId(themeDisplay.getCompanyId())>0)
 			viewParam = "course-types";
 		%>
 		
