@@ -42,8 +42,8 @@ El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 - #159903 Corregido que al cambiar de tipo de inscripción no recuperaba bien el valor (Cambio get por fetch para que lo recoja de la BBDD). 
 Eliminados imports no usados. Protegidos los expandos por si hay algún error.
 
--  #162986 Corregido error en el que se podia desinscribir en el curso de un itinerario a traves del curso padre, aunque estuviera deshabilitada la desinscripcion.
-
+- #162986 Corregido error en el que se podia desinscribir en el curso de un itinerario a traves del curso padre, aunque estuviera deshabilitada la desinscripcion.
+- #163914: Corregido desfase horario de las ediciones al ver el listado de cursos.
 
 
 ### Refactor

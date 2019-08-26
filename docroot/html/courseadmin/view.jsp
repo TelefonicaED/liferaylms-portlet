@@ -66,7 +66,7 @@
 				<liferay-ui:search-container-column-text name="course-admin.start-execution-date">
 					<c:choose>
 						<c:when test="<%=CourseLocalServiceUtil.countChildCourses(course.getCourseId())<1 %>">
-							<fmt:formatDate type="both" dateStyle="short" timeStyle="short" value="${course.executionStartDate }" />
+							<%= dateFormatDateTime.format(course.getExecutionStartDate())%>
 						</c:when>
 						<c:otherwise>-</c:otherwise>
 					</c:choose>
@@ -74,7 +74,7 @@
 				<liferay-ui:search-container-column-text name="course-admin.end-execution-date">
 					<c:choose>
 						<c:when test="<%=CourseLocalServiceUtil.countChildCourses(course.getCourseId())<1 %>">
-							<fmt:formatDate type="both" dateStyle="short" timeStyle="short" value="${course.executionEndDate }" />
+							<%= dateFormatDateTime.format(course.getExecutionEndDate())%>
 						</c:when>
 						<c:otherwise>-</c:otherwise>
 					</c:choose>
