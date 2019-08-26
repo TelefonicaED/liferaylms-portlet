@@ -22,12 +22,17 @@
 					<div class="mensaje_marcado">
 						<liferay-ui:message key="inscripcion.inscrito" />
 					</div>
+					<c:if test="${inscriptionAllowedTime != null && not empty inscriptionAllowedTime}" >
+						<div class="message_allowed_time">
+							${inscriptionAllowedTime}
+						</div>
+					</c:if>
 					<c:if test="${not empty listChildCourses }">	
 						<c:forEach items="${listChildCourses }" var="childCourse">
 							<div class="mensaje_marcado">
 								<span class="edition-name">${childCourse.getTitle(locale)}</span>
 								<aui:button type="button" value="inscription.go-to-course" href='/web${childCourse.friendlyURL}'/>
-								<c:if test="${childCourse.canUnsubscribe(themeDisplay.userId, themeDisplay.permissionChecker) }">
+								<c:if test='${canUnsubscribeLocal && childCourse.canUnsubscribe(themeDisplay.userId, themeDisplay.permissionChecker) }'>
 									<div class="boton_inscibirse ">
 										<a href="#" onclick="javascript:<portlet:namespace/>unsubscribe(${childCourse.courseId })"><liferay-ui:message key="inscripcion.desinscribete" /></a>
 									</div>
@@ -36,7 +41,7 @@
 						</c:forEach>
 					</c:if>
 					<c:if test="${not empty course}">
-						<c:if test="${course.canUnsubscribe(themeDisplay.userId, themeDisplay.permissionChecker)}">
+						<c:if test='${canUnsubscribeLocal && course.canUnsubscribe(themeDisplay.userId, themeDisplay.permissionChecker)}'>
 							<div class="boton_inscibirse ">
 								<a href="#" onclick="javascript:<portlet:namespace />unsubscribe(${course.courseId });"><liferay-ui:message key="inscripcion.desinscribete" /></a>
 							</div>
@@ -152,6 +157,11 @@
 												 <c:choose>
 												 	<c:when test="${!hasTeams}">
 												 		<div class="mensaje_marcado"><liferay-ui:message key="inscripcion.noinscrito" /></div>
+														<c:if test="${inscriptionAllowedTime != null && not empty inscriptionAllowedTime}" >
+															<div class="message_allowed_time_no_inscribe">
+																${inscriptionAllowedTime}
+															</div>
+														</c:if>
 														<div class="boton_inscibirse ">
 															<c:choose>
 																<c:when test="${course.group.type == TYPE_SITE_OPEN}">
