@@ -13,7 +13,7 @@
 	<%
 	if( permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), "com.liferay.lms.coursemodel",themeDisplay.getScopeGroupId(),"ADD_COURSE")){
 		String viewParam = "edit-course";
-		if(CourseTypeLocalServiceUtil.getCourseTypesCount()>0)
+		if(CourseTypeLocalServiceUtil.countByCompanyId(themeDisplay.getCompanyId())>0)
 			viewParam = "course-types";
 		%>
 		
@@ -66,7 +66,7 @@
 				<liferay-ui:search-container-column-text name="course-admin.start-execution-date">
 					<c:choose>
 						<c:when test="<%=CourseLocalServiceUtil.countChildCourses(course.getCourseId())<1 %>">
-							<fmt:formatDate type="both" dateStyle="short" timeStyle="short" value="${course.executionStartDate }" />
+							<%= dateFormatDateTime.format(course.getExecutionStartDate())%>
 						</c:when>
 						<c:otherwise>-</c:otherwise>
 					</c:choose>
@@ -74,7 +74,7 @@
 				<liferay-ui:search-container-column-text name="course-admin.end-execution-date">
 					<c:choose>
 						<c:when test="<%=CourseLocalServiceUtil.countChildCourses(course.getCourseId())<1 %>">
-							<fmt:formatDate type="both" dateStyle="short" timeStyle="short" value="${course.executionEndDate }" />
+							<%= dateFormatDateTime.format(course.getExecutionEndDate())%>
 						</c:when>
 						<c:otherwise>-</c:otherwise>
 					</c:choose>
@@ -89,6 +89,18 @@
 						</liferay-ui:custom-attribute>
 					</liferay-ui:search-container-column-text>
 				</c:forEach>
+			</c:if>
+			
+			<c:if test="${renderRequest.preferences.getValue('showFriendlyUrlColumn', 'false')}">
+				<liferay-ui:search-container-column-text name="course-admin.friendlyurl">
+					<%=course.getFriendlyURL() %>
+				</liferay-ui:search-container-column-text>
+			</c:if>
+			
+			<c:if test="${renderRequest.preferences.getValue('showCourseIdColumn', 'false')}">
+				<liferay-ui:search-container-column-text name="course-admin.course-id">
+					<%=course.getCourseId() %>
+				</liferay-ui:search-container-column-text>
 			</c:if>
 				
 			<liferay-ui:search-container-column-text name="course.editions-number">

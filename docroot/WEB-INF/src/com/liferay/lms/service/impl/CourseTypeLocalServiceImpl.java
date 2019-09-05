@@ -61,6 +61,14 @@ public class CourseTypeLocalServiceImpl extends CourseTypeLocalServiceBaseImpl {
 		return courseTypePersistence.findByCompanyId(companyId);
 	}
 	
+	public List<CourseType> getByCompanyId(long companyId, int start, int end) throws SystemException{
+		return courseTypePersistence.findByCompanyId(companyId, start, end);
+	}
+	
+	public int countByCompanyId(long companyId) throws SystemException{
+		return courseTypePersistence.countByCompanyId(companyId);
+	}
+	
 	public CourseType getByCourseTypeId(long courseTypeId) throws NoSuchCourseTypeException, SystemException{
 		return courseTypePersistence.findByCourseTypeId(courseTypeId);
 	}
@@ -229,5 +237,4 @@ public class CourseTypeLocalServiceImpl extends CourseTypeLocalServiceBaseImpl {
 		}
 		return courseType;
 	}
-	
 }

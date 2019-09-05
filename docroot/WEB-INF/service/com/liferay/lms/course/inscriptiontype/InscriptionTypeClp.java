@@ -275,6 +275,29 @@ public class InscriptionTypeClp implements InscriptionType {
 
 		return ((Boolean)returnObj);
 	}
+
+	@Override
+	public String getAllowedTime(long courseId, long userId, Locale locale) {
+		Object returnObj = null;
+
+		try {
+			MethodKey getAllowedTimeMethod = new MethodKey(clp.getClassName(), "getAllowedTime", long.class, long.class, Locale.class); 
+			returnObj = clp.invoke(new MethodHandler(getAllowedTimeMethod, courseId, userId, locale));
+		}
+		catch (Throwable t) {
+			t = ClpSerializer.translateThrowable(t);
+
+			if (t instanceof RuntimeException) {
+				throw (RuntimeException)t;
+			}
+			else {
+				throw new RuntimeException(t.getClass().getName() +
+					" is not a valid exception");
+			}
+		}
+
+		return ((String)returnObj);
+	}
 	
 	
 }

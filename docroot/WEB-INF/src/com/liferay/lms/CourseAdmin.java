@@ -200,7 +200,7 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 		
 		List<CourseType> listCourseTypes = new ArrayList<CourseType>();
 		try {
-			listCourseTypes = CourseTypeLocalServiceUtil.getCourseTypes(-1, -1);
+			listCourseTypes = CourseTypeLocalServiceUtil.getByCompanyId(themeDisplay.getCompanyId());
 		} catch (SystemException e) {
 			e.printStackTrace();
 		}
@@ -756,10 +756,10 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 		List<ExpandoColumn> expandoNames = new ArrayList<ExpandoColumn>();
 		if(Validator.isNotNull(listExpandos) && listExpandos.size()>0) {
 			String expandoName="";
-			for (ExpandoColumn expandoUser : listExpandos) {
-				expandoName = StringUtil.upperCaseFirstLetter(expandoUser.getName());
+			for (ExpandoColumn expandoCourse : listExpandos) {
+				expandoName = expandoCourse.getName();
 				if(((renderRequest.getPreferences().getValue("show" + expandoName, "false")).compareTo("true") == 0)) {
-					expandoNames.add(expandoUser);
+					expandoNames.add(expandoCourse);
 				}
 			}	
 		}

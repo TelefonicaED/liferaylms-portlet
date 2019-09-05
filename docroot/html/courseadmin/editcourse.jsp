@@ -105,7 +105,10 @@ String backURL = ParamUtil.getString(request, "backURL");
 
 String referringPortletResource = ParamUtil.getString(request, "referringPortletResource");
 long courseId=ParamUtil.getLong(request, "courseId",0);
+long parentCourseId = 0;
 Course course=null;
+Course parentCourse = null;
+String parentCourseTitle = "";
 boolean isCourseChild = false;
 long templateParent = 0;
 if(request.getAttribute("course")!=null){
@@ -115,8 +118,13 @@ else{
 	if(courseId>0){
 		course=CourseLocalServiceUtil.fetchCourse(courseId);
 		if(course!=null){
-			if(course.getParentCourseId()>0){
+			parentCourseId = course.getParentCourseId();
+			if(parentCourseId>0){
 				isCourseChild=true;
+				parentCourse = CourseLocalServiceUtil.fetchCourse(parentCourseId);
+				if(parentCourse!=null){
+					parentCourseTitle = parentCourse.getTitle(themeDisplay.getLocale());
+				}
 			}
 		}
 	}
@@ -204,7 +212,7 @@ boolean showClone 	= preferences.getValue("showClone",  "true").equals("true");
 boolean showGo 		= preferences.getValue("showGo", 	 "true").equals("true");
 boolean showRegistrationType = preferences.getValue("showRegistrationType",  "true").equals("true");
 boolean showMaxUsers = preferences.getValue("showMaxUsers", "true").equals("true");
-
+boolean editionsWithoutRestrictions = GetterUtil.getBoolean(renderRequest.getPreferences().getValue("showEditionsWithoutRestrictions", StringPool.FALSE),false);
 
 boolean isInCourse = Boolean.FALSE;
 
@@ -274,8 +282,16 @@ if(courseType != null){
 }
 %>
 <liferay-ui:header title="<%= title %>" backURL="<%=backURL %>"></liferay-ui:header>
+<%
+if(isCourseChild){
+	String subTitle = LanguageUtil.get(themeDisplay.getLocale(), "course-admin.parent-course") + ": " + parentCourseTitle;
+%>
+<h1 class="header-title"><%=subTitle %></h1>
+<%
+}
+%>
 <portlet:resourceURL var="searchGroupTypesURL" id="searchGroupTypes"/>
-<c:if test="<%=course != null && course.getParentCourseId()<=0%>">
+<c:if test="<%=course != null%>">
 	<aui:fieldset>
 		<liferay-ui:icon-menu>
 			<%-- Ir al curso --%>
@@ -283,8 +299,18 @@ if(courseType != null){
 					!course.isClosed() && ( PortalUtil.isOmniadmin(themeDisplay.getUserId()) || UserLocalServiceUtil.hasGroupUser(course.getGroupCreatedId(), themeDisplay.getUserId())) && !isInCourse) {%>
 				<liferay-ui:icon image="submit" message="courseadmin.adminactions.gotocourse" target="_top" url="<%=themeDisplay.getPortalURL() +\"/\"+ response.getLocale().getLanguage() +\"/web/\"+ groupsel.getFriendlyURL()%>" />
 			<%}%>
+			<%-- Editar curso padre --%>
+			<%if(isCourseChild && permissionChecker.hasPermission(themeDisplay.getScopeGroupId(),  Course.class.getName(), parentCourseId, ActionKeys.UPDATE)&& !parentCourse.isClosed()){%>
+				<portlet:renderURL var="editParentCourseURL">
+					<portlet:param name="courseId" value="<%=String.valueOf(parentCourseId) %>" />
+					<portlet:param name="backToEdit" value="<%=StringPool.TRUE %>" />
+					<portlet:param name="redirectOfEdit" value='<%=ParamUtil.getString(request, "redirect", currentURL) %>'/>
+					<portlet:param name="view" value="edit-course" />
+				</portlet:renderURL>
+				<liferay-ui:icon image="edit" message="course-admin.edit-parent-course" url='${editParentCourseURL }' />
+			<%}%>
 			<%-- Asignar miembros --%>
-			<%if(permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), Course.class.getName(), courseId, "ASSIGN_MEMBERS") && ! course.isClosed() && showMembers){%>
+			<%if(permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), Course.class.getName(), courseId, "ASSIGN_MEMBERS") && ! course.isClosed() && showMembers && (!isCourseChild || editionsWithoutRestrictions)){%>
 				<portlet:renderURL var="memebersURL">
 					<portlet:param name="courseId" value="<%=String.valueOf(courseId) %>" />
 					<portlet:param name="backToEdit" value="<%=StringPool.TRUE %>" />
@@ -295,7 +321,7 @@ if(courseType != null){
 			<%}%>
 			
 			<%-- Competencias --%>
-			<%if(count>0 && permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), Course.class.getName(), courseId,ActionKeys.UPDATE) && !course.isClosed() ){%>
+			<%if(count>0 && permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), Course.class.getName(), courseId,ActionKeys.UPDATE) && !course.isClosed() && !isCourseChild){%>
 				<portlet:renderURL var="competenceURL">
 					<portlet:param name="groupId" value="<%=String.valueOf(course.getGroupCreatedId()) %>" />
 					<portlet:param name="courseId" value="<%=String.valueOf(course.getCourseId()) %>" />
@@ -328,7 +354,7 @@ if(courseType != null){
 					<portlet:param name="groupId" value="<%=String.valueOf(course.getGroupCreatedId()) %>" />
 					<portlet:param name="view" value="clone" />
 				</portlet:renderURL>
-				<liferay-ui:icon image="copy" message="courseadmin.adminactions.clone" url="<%=cloneURL%>" />	
+				<liferay-ui:icon image="copy" message='<%=isCourseChild ? \"courseadmin.adminactions.clone-edition\" :  \"courseadmin.adminactions.clone\"  %>' url="<%=cloneURL%>" />	
 			<%}%>	
 			
 			<%if(permissionChecker.hasPermission(course.getGroupId(), Course.class.getName(), course.getCourseId(), ActionKeys.PERMISSIONS) && ! course.isClosed() && !isInCourse){%>
@@ -338,6 +364,17 @@ if(courseType != null){
 						resourcePrimKey="<%= String.valueOf(course.getCourseId()) %>" var="permissionsURL" />
 					<liferay-ui:icon image="permissions" message="courseadmin.adminactions.permissions" url="<%=permissionsURL %>" />
 				</c:if>	
+			<%}%>
+			
+			<%-- Ver ediciones --%>
+			<%
+			long countStudents = CourseLocalServiceUtil.getStudentsFromCourseCount(course.getCourseId());
+			if(!isCourseChild && permissionChecker.hasPermission(themeDisplay.getScopeGroupId(),  Course.class.getName(),courseId,ActionKeys.UPDATE) && !course.isClosed()  && (countStudents<=0 || editionsWithoutRestrictions)){%>
+				<liferay-portlet:renderURL var="editionsURL">
+					<liferay-portlet:param name="courseId" value="<%=String.valueOf(courseId) %>"/>
+					<liferay-portlet:param name="view" value="editions"/>
+				</liferay-portlet:renderURL>
+				<liferay-ui:icon image="tag" message="course-admin.editions" url="${editionsURL }" />
 			<%}%>
 		
 			<%-- Cerrar/Abrir --%>

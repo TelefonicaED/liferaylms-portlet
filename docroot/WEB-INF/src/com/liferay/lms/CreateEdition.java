@@ -182,6 +182,7 @@ public class CreateEdition extends CourseCopyUtil implements MessageListener {
 			newCourse = CourseLocalServiceUtil.addCourse(course.getTitle(themeDisplay.getLocale())+"-"+newEditionName, course.getDescription(themeDisplay.getLocale()),summary
 					, editionFriendlyURL, themeDisplay.getLocale(), today, startDate, endDate, editionLayoutId, typeSite, serviceContext, course.getCalificationType(), (int)course.getMaxusers(),true);
 			
+			newCourse.setGroupId(themeDisplay.getScopeGroupId());
 			newCourse.setTitle(newEditionName, themeDisplay.getLocale());
 			newCourse.setWelcome(course.getWelcome());
 			newCourse.setWelcomeMsg(course.getWelcomeMsg());

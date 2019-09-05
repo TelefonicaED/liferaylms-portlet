@@ -34,8 +34,10 @@ if(prefs!=null){
 	long teacherRoleId=prefs.getTeacherRole();
 	Role teacher=RoleLocalServiceUtil.getRole(teacherRoleId);
 	boolean linkResources = false;
+	boolean checkExecutionDate = false;
 	try {
 		linkResources = PrefsPropsUtil.getBoolean(themeDisplay.getCompanyId(), LmsConstant.RESOURCE_INTERNAL_DOCUMENT_LINKED);
+		checkExecutionDate = PrefsPropsUtil.getBoolean(themeDisplay.getCompanyId(), LmsConstant.CHECK_EXECUTION_DATE);
 	} catch (SystemException e) {
 		e.printStackTrace();
 	}			
@@ -44,6 +46,7 @@ if(prefs!=null){
 	List<Long> courseEvalIds = ListUtil.toList(StringUtil.split(prefs.getCourseevals(),",",0L));
 	List <Long> calificationTypeIds = ListUtil.toList(StringUtil.split(prefs.getScoretranslators(),",",0L));	
 	List<Long> inscriptionTypeIds = ListUtil.toList(StringUtil.split(prefs.getInscriptionTypes(),",",0L));
+
 %>
 
 <liferay-ui:success message="your-request-completed-successfully" key="ok" />
@@ -182,6 +185,11 @@ for(InscriptionType inscriptionType :inscriptionTypeRegistry.getInscriptionTypes
 	<%
 }
 %>
+</aui:field-wrapper>
+
+<liferay-ui:header title="inscription-configuration" />
+<aui:field-wrapper>
+	<aui:input type="checkbox" name="checkExecutionDate" label="config.checkExecutionDate" value="<%=checkExecutionDate %>"/>
 </aui:field-wrapper>
 
 <liferay-ui:header title="modules-and-activities" />

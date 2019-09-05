@@ -12,23 +12,50 @@
 			backURL="${backURL}"
 			title="${editionsTitle}"/>
 
+<div class="container">			
+<%
+long parentCourseId=ParamUtil.getLong(request, "courseId",0);
+Course parentCourse = CourseLocalServiceUtil.fetchCourse(parentCourseId);
+if( permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), Course.class.getName(), parentCourseId, ActionKeys.UPDATE)&& !parentCourse.isClosed()){%>
+	
+	<div class="col-md-2">
+		<portlet:renderURL var="editParentCourseURL">
+			<portlet:param name="view" value="edit-course" />
+			<portlet:param name="courseId" value='<%=String.valueOf(parentCourseId) %>' />
+			<portlet:param name="redirect" value='<%=currentURL %>'/>
+		</portlet:renderURL>
+		
+		<div class="newitem2">
+			<liferay-ui:icon
+				image="edit"
+				label="true"
+				message="course-admin.edit-parent-course"
+				url='${editParentCourseURL}'
+			/>
+		</div>
+	</div>
+	
+<%}%>
+
 <%
 if( permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), "com.liferay.lms.coursemodel",themeDisplay.getScopeGroupId(),"ADD_COURSE")){
 	%>
-	<portlet:renderURL var="newEditionURL">
-		<portlet:param name="view" value="new-edition"></portlet:param>
-		<portlet:param name="courseId" value="${courseId}"></portlet:param>
-		
-	</portlet:renderURL>
-	<div class="newitem2">
-		<liferay-ui:icon
-			image="add"
-			label="true"
-			message="course-admin.new-edition"
-			url='${newEditionURL}'
-		/>
+		<div class="col-md-2">
+		<portlet:renderURL var="newEditionURL">
+			<portlet:param name="view" value="new-edition"></portlet:param>
+			<portlet:param name="courseId" value="${courseId}"></portlet:param>
+			
+		</portlet:renderURL>
+		<div class="newitem2">
+			<liferay-ui:icon
+				image="add"
+				label="true"
+				message="course-admin.new-edition"
+				url='${newEditionURL}'
+			/>
+		</div>
 	</div>
-	
+</div>	
 		<div class="float-r" id="${renderResponse.getNamespace()}importExportEditionsActionsDiv">
 		<liferay-ui:icon-menu message="course-admin.editions.import-export" showExpanded="false" showWhenSingleIcon="true">
 		 <c:set var="actionURL" value="${exportEditionsURL }" />
@@ -90,6 +117,23 @@ if( permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), "com.liferay
 			</c:forEach>
 		</c:if>
 		
+		<c:if test="${renderRequest.preferences.getValue('showFriendlyUrlColumn', 'false')}">
+			<liferay-ui:search-container-column-text name="course-admin.friendlyurl">
+				<%=course.getFriendlyURL() %>
+			</liferay-ui:search-container-column-text>
+		</c:if>
+		
+		<c:if test="${renderRequest.preferences.getValue('showParentCourseIdColumn', 'false')}">
+			<liferay-ui:search-container-column-text name="course-admin.parent-course-id">
+				<%=course.getParentCourseId() %>
+			</liferay-ui:search-container-column-text>
+		</c:if>
+		
+		<c:if test="${renderRequest.preferences.getValue('showCourseIdColumn', 'false')}">
+			<liferay-ui:search-container-column-text name="course-admin.course-id">
+				<%=course.getCourseId() %>
+			</liferay-ui:search-container-column-text>
+		</c:if>
 		
 		<c:if test="${renderRequest.preferences.getValue('showRegistrationType', 'false')}">		
 			<liferay-ui:search-container-column-text name="registration-type">

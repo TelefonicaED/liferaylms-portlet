@@ -88,4 +88,10 @@ public class BaseInscriptionType implements InscriptionType, Serializable {
 	public boolean isActive(long companyId){
 		return true;
 	}
+
+	@Override
+	public String getAllowedTime(long courseId, long userId, Locale locale) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
