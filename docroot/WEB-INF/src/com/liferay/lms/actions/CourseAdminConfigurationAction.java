@@ -104,7 +104,7 @@ public class CourseAdminConfigurationAction implements ConfigurationAction {
 			String nameExpando = "";
 			String nameExpandoEdition = "";
 			for (ExpandoColumn expandoCourse : expandosColumnCourse) {
-				expandoName = StringUtil.upperCaseFirstLetter(expandoCourse.getName());
+				expandoName = expandoCourse.getName();
 				nameExpando = "showExpando_" + expandoCourse.getColumnId();
 				nameExpandoEdition = "showExpandoEdition_" + expandoCourse.getColumnId();
 				log.debug("SAVE: show" + expandoName+ "   VALUE:  "+actionRequest.getParameter("show" + expandoName));
@@ -113,7 +113,6 @@ public class CourseAdminConfigurationAction implements ConfigurationAction {
 				portletPreferences.setValue(nameExpandoEdition, actionRequest.getParameter(nameExpandoEdition));
 			}	
 		}
-		
 		
 		portletPreferences.store();
 		SessionMessages.add( 
