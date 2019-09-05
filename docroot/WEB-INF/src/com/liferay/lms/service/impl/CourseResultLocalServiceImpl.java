@@ -27,6 +27,7 @@ import com.liferay.lms.learningactivity.calificationtype.CalificationType;
 import com.liferay.lms.learningactivity.calificationtype.CalificationTypeRegistry;
 import com.liferay.lms.learningactivity.courseeval.CourseEval;
 import com.liferay.lms.learningactivity.courseeval.CourseEvalRegistry;
+import com.liferay.lms.model.Competence;
 import com.liferay.lms.model.Course;
 import com.liferay.lms.model.CourseCompetence;
 import com.liferay.lms.model.CourseResult;
@@ -178,7 +179,7 @@ public class CourseResultLocalServiceImpl
 	}
 	
 	/**
-	 * @deprecated ESTE LO VAMOS A DEPRECAR, HABRÍA QUE LLAMAR AL MÉTODO countStudentsByCourseId o countStudentsByCourseIdUserIdsStarted 
+	 * @deprecated ESTE LO VAMOS A DEPRECAR, HABR�A QUE LLAMAR AL MÉTODO countStudentsByCourseId o countStudentsByCourseIdUserIdsStarted 
 	 * Cuenta los estudiantes que han iniciado el curso
 	 * @param course curso del que quiero los usuarios
 	 * @param students lista de estudiantes, si se pasa a null se obtienen dentro de la función
@@ -481,22 +482,15 @@ public class CourseResultLocalServiceImpl
 		
 		}
 		if(cresult.getPassed()){
+			Course course = courseLocalService.fetchCourse(cresult.getCourseId());
+			associateCompetencesToUser(courseCompetencePersistence.findBycourseId(cresult.getCourseId(), false), cresult.getUserId());
 			
-			List<CourseCompetence> competences = courseCompetencePersistence.findBycourseId(cresult.getCourseId(), false);
-		
-			for(CourseCompetence cc: competences){
-				UserCompetence uc = userCompetencePersistence.fetchByUserIdCompetenceId(cresult.getUserId(), cc.getCompetenceId());
-								
-				if(uc==null){
-					UserCompetence userCompetence=userCompetencePersistence.create(counterLocalService.increment(UserCompetence.class.getName()));
-					userCompetence.setUserId(cresult.getUserId());
-					userCompetence.setCompetenceId(cc.getCompetenceId());
-					userCompetence.setCompDate(new Date());
-					userCompetence.setCourseId(cc.getCourseId());
-					userCompetencePersistence.update(userCompetence, false);
-				}
-				
-			}	
+			//Si tiene curso padre, asignamos las del curso padre tambi�n.
+			if(course.getParentCourseId()>0){
+				associateCompetencesToUser(courseCompetencePersistence.findBycourseId(course.getParentCourseId(), false), cresult.getUserId());
+			}
+			
+			
 		}		
 		courseResultPersistence.update(cresult, false);
 		
@@ -510,6 +504,22 @@ public class CourseResultLocalServiceImpl
 		}
 		
 		
+	}
+	
+	private void associateCompetencesToUser(List<CourseCompetence> competences, long userId) throws SystemException{
+		for(CourseCompetence cc: competences){
+			UserCompetence uc = userCompetencePersistence.fetchByUserIdCompetenceId(userId, cc.getCompetenceId());
+							
+			if(uc==null){
+				UserCompetence userCompetence=userCompetencePersistence.create(counterLocalService.increment(UserCompetence.class.getName()));
+				userCompetence.setUserId(userId);
+				userCompetence.setCompetenceId(cc.getCompetenceId());
+				userCompetence.setCompDate(new Date());
+				userCompetence.setCourseId(cc.getCourseId());
+				userCompetencePersistence.update(userCompetence, false);
+			}
+			
+		}	
 	}
 	
 	public void update(ModuleResult mresult) throws PortalException, SystemException{

@@ -698,8 +698,8 @@ public class QuestionsAdmin extends MVCPortlet{
 			actionResponse.setRenderParameter("jspPage", "/html/questions/admin/importQuestionsExcel.jsp");
 		}else{ 
 			String contentType = uploadRequest.getContentType("fileName");	
-			if (!ContentTypes.APPLICATION_VND_MS_EXCEL.equals(contentType)) {
-				SessionErrors.add(actionRequest, "surveyactivity.csvError.bad-format");	
+			if (!ContentTypes.APPLICATION_VND_MS_EXCEL.equals(contentType) && !"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet".equalsIgnoreCase(contentType) ) {
+				SessionErrors.add(actionRequest, "surveyactivity.xlsError.bad-format");	
 				actionResponse.setRenderParameter("jspPage", "/html/questions/admin/importQuestionsExcel.jsp");
 			}else{
 				Workbook workbook = null;
@@ -730,10 +730,17 @@ public class QuestionsAdmin extends MVCPortlet{
 								questionTitle = row.getCell(COLUMN_INDEX_QUESTION_TITLE).getStringCellValue();
 								answerTitle = row.getCell(COLUMN_INDEX_ANSWER_TITLE).getStringCellValue();
 								answerIsCorrect = Boolean.parseBoolean(row.getCell(COLUMN_INDEX_ANSWER_IS_CORRECT).getStringCellValue());
-								feedbackCorrect =  row.getCell(COLUMN_INDEX_ANSWER_FEEDBACK_CORRECT).getStringCellValue();
-								feedbackIncorrect = row.getCell(COLUMN_INDEX_ANSWER_FEEDBACK_INCORRECT).getStringCellValue();
+								feedbackCorrect =  (row.getCell(COLUMN_INDEX_ANSWER_FEEDBACK_CORRECT))!=null?row.getCell(COLUMN_INDEX_ANSWER_FEEDBACK_CORRECT).getStringCellValue():"";
+								feedbackIncorrect = (row.getCell(COLUMN_INDEX_ANSWER_FEEDBACK_INCORRECT))!=null?row.getCell(COLUMN_INDEX_ANSWER_FEEDBACK_INCORRECT).getStringCellValue():"";
 								if(questionTitle!=null && Validator.isNotNull(questionTitle.trim())){
-									questionType = Integer.valueOf(row.getCell(COLUMN_INDEX_QUESTION_TYPE).getStringCellValue());
+									try{
+										questionType = Integer.valueOf(row.getCell(COLUMN_INDEX_QUESTION_TYPE).getStringCellValue());
+									}catch(Exception e){
+										log.debug(e);
+										Double value = row.getCell(COLUMN_INDEX_QUESTION_TYPE).getNumericCellValue();
+										questionType = value.intValue();
+									}
+									
 									questionPenalize = Boolean.parseBoolean(row.getCell(COLUMN_INDEX_QUESTION_PENALIZE).getStringCellValue());
 									//Es pregunta
 									if (log.isDebugEnabled()) log.debug("Line: " + fila + " ***********Es pregunta************");
