@@ -296,6 +296,15 @@ public class TestLearningActivityType extends BaseLearningActivityType
 			showOnlyPreview.setText(Boolean.toString(ParamUtil.get(uploadRequest, "showOnlyPreview", false)));
 			rootElement.add(showOnlyPreview);
 			
+			Element showRandomOrderAnswers = rootElement.element("showRandomOrderAnswers");
+			if(showRandomOrderAnswers!=null){
+				showRandomOrderAnswers.detach();
+				rootElement.remove(showRandomOrderAnswers);
+			}
+			showRandomOrderAnswers = SAXReaderUtil.createElement("showRandomOrderAnswers");
+			showRandomOrderAnswers.setText(Boolean.toString(ParamUtil.get(uploadRequest, "showRandomOrderAnswers", false)));
+			rootElement.add(showRandomOrderAnswers);
+			
 			Element hideFeedback=rootElement.element("hideFeedback");
 			if(hideFeedback!=null)
 			{
