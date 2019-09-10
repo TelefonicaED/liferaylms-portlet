@@ -45,6 +45,7 @@ portletURL.setParameter("resId",String.valueOf(resId));
 		if(keywords.length()>0){
 		
 			SearchContext searchContext=SearchContextFactory.getInstance(request);
+			searchContext.setAttribute("paginationType", "regular");
 			searchContext.setAssetCategoryIds(serviceContext.getAssetCategoryIds());
 			searchContext.setUserId(themeDisplay.getUserId());
 			searchContext.setGroupIds(groupIds);
