@@ -39,7 +39,7 @@
 							parent.find('.modallh').each(function(index) {
 								var aparent =$(this);
 								if(parent.parent()){
-								    parent.parent().find('.castallh').each(function(index) {
+									parent.parent().parent().parent().find('.castallh').each(function(index) {
 								    	if($(this).val()!=aparent.val()){
 								    		$(this).val(aparent.val());
 								    		$(this).css("background","none repeat scroll 0 0 #BCF5A9");

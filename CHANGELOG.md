@@ -11,6 +11,8 @@ El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
   Si está marcado este check, no se tendrán en cuenta estos cursos y no se le mostrarán al usuario aunque está inscrito, permitiéndole matricularse a otras ediciones que estén disponibles.
 - #159785 - Nueva funcionalidad Limitacion del tiempo de estudio, se incluye en el metodo de inscripcion un nuevo campo a mostrar de días/horas para poder finalizar el curso.
 
+- #164258 - Respuestas ordenadas aleatoriamente en las actividades tipo test. Se incluye la opción en las actividades de Tipo Test que las preguntas de tipo Opciones/Multiple se puedan desordenar las respuestas.
+
 ### Updated
 
 - #162450 - Modificaciones gestión de ediciones Wecorp: Cambios en la navegación
@@ -45,6 +47,7 @@ Eliminados imports no usados. Protegidos los expandos por si hay algún error.
 - #162986 Corregido error en el que se podia desinscribir en el curso de un itinerario a traves del curso padre, aunque estuviera deshabilitada la desinscripcion.
 - #163914: Corregido desfase horario de las ediciones al ver el listado de cursos.
 
+- #165220 - Resultados de las Búsquedas en editar actividade. Problema de paginación cuando se hace búsqueda por palabras clave en la búsqueda de recursos en la actividad Recurso mediateca.
 
 ### Refactor
  
