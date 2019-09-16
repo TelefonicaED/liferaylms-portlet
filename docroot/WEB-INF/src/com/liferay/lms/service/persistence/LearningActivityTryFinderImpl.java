@@ -7,10 +7,12 @@ import java.util.List;
 
 import com.liferay.lms.model.LearningActivityTry;
 import com.liferay.lms.model.LmsPrefs;
+import com.liferay.lms.model.impl.LearningActivityTryImpl;
 import com.liferay.lms.service.LmsPrefsLocalServiceUtil;
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
 import com.liferay.portal.kernel.dao.orm.ORMException;
 import com.liferay.portal.kernel.dao.orm.QueryPos;
+import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.SQLQuery;
 import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.dao.orm.SessionFactory;
@@ -31,6 +33,9 @@ public class LearningActivityTryFinderImpl extends BasePersistenceImpl<LearningA
 	public static final String FIND_USERS_BY_ACT_ID =
 		    LearningActivityTryFinder.class.getName() +
 		        ".findUsersByActId";
+	public static final String FIND_LAST_LEARNING_ACTIVITY_TRY_CREATE_BY_USER_AND_ACT =
+			LearningActivityTryFinder.class.getName() +
+		        ".findLastLearningActivityTryCreateByUsersAndActId";
 	
 	public long triesPerUserOnlyStudents(long actId, long companyId, long courseGropupCreatedId, List<User> _students, long teamId) throws SystemException {
 		Session session = null;
@@ -104,6 +109,39 @@ public class LearningActivityTryFinderImpl extends BasePersistenceImpl<LearningA
 	    }
 	
 		return distinctUsers;
+	}
+
+	
+	public LearningActivityTry findLastLearningActivityTryCreateByUsersAndActId(long actId, long userId){
+		LearningActivityTry learningActivityTry = null;
+		Session session = null;
+		try{
+			
+			String sql = CustomSQLUtil.get(FIND_LAST_LEARNING_ACTIVITY_TRY_CREATE_BY_USER_AND_ACT);
+			
+			session = openSession();			
+			
+			log.debug("sql: " + sql);
+			
+			SQLQuery q = session.createSQLQuery(sql);
+			q.addEntity("lat", LearningActivityTryImpl.class);
+
+			QueryPos qPos = QueryPos.getInstance(q);
+			qPos.add(actId);
+			qPos.add(userId);
+			
+			List<LearningActivityTry> latList = (List<LearningActivityTry>) QueryUtil.list(q, getDialect(), 0, 1);
+			if (!latList.isEmpty()) {
+				learningActivityTry = latList.get(0);
+			}
+			
+		} catch (Exception e) {
+	       e.printStackTrace();
+	    } finally {
+	        closeSession(session);
+	    }
+	
+	    return learningActivityTry;
 	}
 	
 	private SessionFactory getPortalSessionFactory() {
