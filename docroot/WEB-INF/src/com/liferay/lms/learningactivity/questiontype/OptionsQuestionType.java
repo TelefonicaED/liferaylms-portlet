@@ -441,24 +441,20 @@ public class OptionsQuestionType extends BaseQuestionType {
 		List<TestAnswer> testAnswersList = TestAnswerLocalServiceUtil.getTestAnswersByQuestionId(questionId);
 		boolean showRandomOrderAnswers = StringPool.TRUE.equals(LearningActivityLocalServiceUtil.getExtraContentValue(actId, "showRandomOrderAnswers"));
 		if (showRandomOrderAnswers) {
-			try {
-				LearningActivityTry userLastLAT = LearningActivityTryLocalServiceUtil.getLastLearningActivityTryByActivityAndUser(actId, userId);
-				if (Validator.isNotNull(userLastLAT)) {
-					long userSeed = userLastLAT.getLatId() + userId + questionId;
-					Random userRandom = new Random(userSeed);
-					log.debug("actId=" + actId + ", latId=" + userLastLAT.getLatId() + ", userId=" + userId + ", questionId=" + questionId + ", userSeed=" + userSeed);
-					List<TestAnswer> userTestAnswersList = new ArrayList<TestAnswer>();
-					while (userTestAnswersList.size() < testAnswersList.size()) {
-						int index = userRandom.nextInt(testAnswersList.size());
-						TestAnswer testAnswer = testAnswersList.get(index);
-						if (!userTestAnswersList.contains(testAnswer)) {
-							userTestAnswersList.add(testAnswer);
-						}
+			LearningActivityTry userLastLAT = LearningActivityTryLocalServiceUtil.findLastLearningActivityTryCreateByUsersAndActId(actId, userId);
+			if (Validator.isNotNull(userLastLAT)) {
+				long userSeed = userLastLAT.getLatId() + userId + questionId;
+				Random userRandom = new Random(userSeed);
+				log.debug("actId=" + actId + ", latId=" + userLastLAT.getLatId() + ", userId=" + userId + ", questionId=" + questionId + ", userSeed=" + userSeed);
+				List<TestAnswer> userTestAnswersList = new ArrayList<TestAnswer>();
+				while (userTestAnswersList.size() < testAnswersList.size()) {
+					int index = userRandom.nextInt(testAnswersList.size());
+					TestAnswer testAnswer = testAnswersList.get(index);
+					if (!userTestAnswersList.contains(testAnswer)) {
+						userTestAnswersList.add(testAnswer);
 					}
-					testAnswersList = userTestAnswersList;
 				}
-			} catch (PortalException e) {
-				// Devuelve las preguntas en el orden guardado
+				testAnswersList = userTestAnswersList;
 			}
 		}
 		

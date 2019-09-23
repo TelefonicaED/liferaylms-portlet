@@ -8,4 +8,17 @@
 			GROUP BY lat.userId; 
 		]]>
 	</sql>
+	<sql id="com.liferay.lms.service.persistence.LearningActivityTryFinder.findLastLearningActivityTryCreateByUsersAndActId">
+		<![CDATA[   			
+			SELECT 
+				lat.*
+			FROM 
+				lms_learningactivitytry AS lat
+			WHERE 
+				lat.actId = ? 
+				AND lat.userId = ?
+			ORDER BY
+				lat.startDate DESC
+		]]>
+	</sql>
 </custom-sql>
