@@ -2,8 +2,13 @@
 Todos los cambios de este proyecto estarán documentados en este archivo.
 
 El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
+## [3.9.1](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v3.9.1)
 
-## [3.9.0]
+### Fixed
+
+- #166068: Se conserva el id del tipo de curso cuando se actualiza un curso.
+
+## [3.9.0](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v3.9.0)
 
 ### Added
 
