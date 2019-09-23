@@ -129,6 +129,7 @@ import com.liferay.portal.util.comparator.UserLastNameComparator;
 import com.liferay.portlet.PortletPreferencesFactoryUtil;
 import com.liferay.portlet.announcements.EntryDisplayDateException;
 import com.liferay.portlet.asset.AssetCategoryException;
+import com.liferay.portlet.asset.model.AssetEntry;
 import com.liferay.portlet.asset.model.AssetVocabulary;
 import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.model.DLFolder;
@@ -1030,12 +1031,18 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 							.getPermissionCheckerFactory().create(user);
 					log.debug("Updating the course");
 					boolean allowDuplicateName =  actionRequest.getPreferences().getValue("allowDuplicateName", "false").equals("true");
+					AssetEntry assetEntry= AssetEntryLocalServiceUtil.fetchEntry(Course.class.getName(), course.getCourseId());
+					long classTypeId = 0;
+					if(assetEntry!=null){
+						classTypeId =  assetEntry.getClassTypeId();
+					}
 					if (permissionChecker.hasPermission(themeDisplay.getScopeGroupId(),
 							Course.class.getName(), 0, "PUBLISH")) {
 						log.debug("With publish permission, setting visible to "+visible);
-						CourseLocalServiceUtil.modCourse(course,summary, courseTypeId, serviceContext, visible, allowDuplicateName);
+						
+						CourseLocalServiceUtil.modCourse(course,summary, classTypeId, serviceContext, visible, allowDuplicateName);
 					}else{
-						CourseLocalServiceUtil.modCourse(course,summary, courseTypeId, serviceContext, true, allowDuplicateName);
+						CourseLocalServiceUtil.modCourse(course,summary, classTypeId, serviceContext, true, allowDuplicateName);
 					}
 				}catch(PortalException pe){ 
 					if(pe.getMessage().startsWith("maxUsers ")){
