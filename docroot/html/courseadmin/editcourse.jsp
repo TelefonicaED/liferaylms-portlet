@@ -723,7 +723,7 @@ if(isCourseChild){
 			<aui:input name="calificationType" value="<%=ctype==null?\"0\":ctype.getTypeId()%>" type="hidden"/>
 			
 			<%
-			if(Validator.isNotNull(ctype.getExpecificContentPage())){%>
+			if(Validator.isNotNull(ctype)&&Validator.isNotNull(ctype.getExpecificContentPage())){%>
 					<div class="especific_content_page" id="${renderResponse.getNamespace()}especific_content_page_<%=ctype.getTypeId()%>">
 						<liferay-util:include page="<%=ctype.getExpecificContentPage() %>" servletContext="<%=getServletContext() %>">
 							<%if(course != null){ 
@@ -762,7 +762,8 @@ if(isCourseChild){
    	  	}
 		InscriptionTypeRegistry inscription = new InscriptionTypeRegistry();
 		InscriptionType itype = null;
-		if(inscriptions.size()>1){%>
+
+		if(Validator.isNotNull(inscriptions)&&inscriptions.size()>1){%>
 			<aui:select name="inscriptionType" label="inscription-type" onchange="${renderResponse.getNamespace()}changeInscriptionType(this.value)">			
 			<%
 			for(Long ins:inscriptions){
@@ -801,7 +802,7 @@ if(isCourseChild){
 					$(".especific_content_page_inscription").addClass("aui-helper-hidden");
 					$("#<portlet:namespace />especific_content_page_inscription_"+typeId).removeClass("aui-helper-hidden");
 					
-					//Además cambiamos los tipos de inscripción
+					//Ademï¿½s cambiamos los tipos de inscripciï¿½n
 						
 					$("#<portlet:namespace/>group_types").addClass("aui-helper-hidden");
 						
@@ -854,9 +855,8 @@ if(isCourseChild){
 			}catch(Exception e){}
 			%>
 			<aui:input name="inscriptionType" value="<%=itype==null?\"0\":itype.getTypeId()%>" type="hidden"/>
-			
 			<%
-			if(Validator.isNotNull(itype.getSpecificContentPage())){%>
+			if(Validator.isNotNull(itype)&&Validator.isNotNull(itype.getSpecificContentPage())){%>
 					<div class="especific_content_page_inscription" id="${renderResponse.getNamespace()}especific_content_page_inscription_<%=itype.getTypeId()%>">
 						<liferay-util:include page="<%=itype.getSpecificContentPage() %>" servletContext="<%=getServletContext() %>" portletId="<%=itype.getPortletId() %>">
 							<%if(course != null){ 
