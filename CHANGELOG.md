@@ -7,6 +7,7 @@ El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 ### Fixed
 
 - #163617: Se elimina la barra después de web en la acción de ir al curso
+- #164214: Se establece correctamente el texto en la importación de preguntas.
 
 ## [3.9.1](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v3.9.1)
 

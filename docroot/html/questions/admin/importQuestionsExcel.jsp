@@ -50,6 +50,8 @@
 				allowedTypesList = ListUtil.fromArray(allowedTypes);
 			}
 			%>
+			<aui:fieldset>
+			<liferay-ui:message key="surveyactivity.editquestions.importquestions.question-type"/>
 			<ul>
 			<%
 			for(QuestionType qt:qtypes){
@@ -62,18 +64,12 @@
 				}
 			}%>
 			</ul>
+			</aui:fieldset>
 </liferay-ui:panel>
 
 <span>
 	<%=LanguageUtil.get(pageContext,"surveyactivity.editquestions.importquestions.download") +" "+ urlExample%>
-</span>
-
-
-	
-	<aui:fieldset>
-		<liferay-ui:message key="surveyactivity.editquestions.importquestions.question-type"/>
-	</aui:fieldset>
-	
+</span>	
 		
 
 <aui:form name="fm" action="<%=importQuestionsURL%>"  method="post" enctype="multipart/form-data" role="form">
