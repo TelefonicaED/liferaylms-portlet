@@ -27,6 +27,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.messaging.Message;
 import com.liferay.portal.kernel.messaging.MessageListener;
 import com.liferay.portal.kernel.messaging.MessageListenerException;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.ResourceConstants;
@@ -225,7 +226,9 @@ public class CreateEdition extends CourseCopyUtil implements MessageListener {
 			newEntry.setSummary(summary);
 			newEntry.setClassTypeId(courseTypeId);
 			AssetEntryLocalServiceUtil.updateAssetEntry(newEntry);
-			newGroup.setName(course.getTitle(themeDisplay.getLocale(),true)+"-"+newEditionName);
+			String groupName =  course.getTitle(themeDisplay.getLocale(),true)+"-"+newEditionName;
+			groupName = groupName.substring(0, 148);
+			newGroup.setName(groupName);
 			newGroup.setDescription(summary);
 			GroupLocalServiceUtil.updateGroup(newGroup);
 			
