@@ -214,10 +214,13 @@ String welcomeSubject= new String();
 String goodbyeSubject = new String();
 String deniedInscriptionSubject = new String();
 if(course!=null){
-	groupCreated = GroupLocalServiceUtil.getGroup(course.getGroupCreatedId());
+	groupCreated = GroupLocalServiceUtil.fetchGroup(course.getGroupCreatedId());
 	entry=AssetEntryLocalServiceUtil.getEntry(Course.class.getName(),course.getCourseId());
 	assetEntryId=entry.getEntryId();
 	visibleencatalogo=entry.getVisible();
+	if(entry.getClassTypeId()>0){
+		courseType = CourseTypeLocalServiceUtil.fetchCourseType(entry.getClassTypeId());	
+	}
 	summary=entry.getSummary();
 	courseId=course.getCourseId();
 	description=course.getDescription(themeDisplay.getLocale());

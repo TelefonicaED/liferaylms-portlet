@@ -17,11 +17,16 @@ package com.liferay.lms.service.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+
+
+import com.liferay.lms.NoSuchSurveyResultException;
 import com.liferay.lms.model.SurveyResult;
 import com.liferay.lms.service.base.SurveyResultLocalServiceBaseImpl;
 import com.liferay.lms.service.persistence.SurveyResultFinderUtil;
 import com.liferay.lms.service.persistence.SurveyResultUtil;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 
 
 /**
@@ -45,6 +50,8 @@ import com.liferay.portal.kernel.exception.SystemException;
  */
 public class SurveyResultLocalServiceImpl
 	extends SurveyResultLocalServiceBaseImpl {
+	
+	private static Log log = LogFactoryUtil.getLog(SurveyResultLocalServiceImpl.class);
 	
 	public List<SurveyResult> getByUserId(long userId){ 
 		List<SurveyResult> results = new ArrayList<SurveyResult>();
@@ -74,6 +81,27 @@ public class SurveyResultLocalServiceImpl
 	
 	
 	
+	public SurveyResult getSurveyResultByQuestionIdActIdLatId(long questionId, long actId, long latId) { 
+		SurveyResult result = null;
+		try{
+			result = SurveyResultUtil.findByQuestionIdActIdLatId(questionId, actId, latId);
+		}catch(SystemException e){
+			e.printStackTrace();
+		} catch (NoSuchSurveyResultException e) {
+			log.info(e.getMessage());
+		}
+		return result;
+	}
+	
+	public List<Long> getLearningActivityTriesByActId(long actId){
+		List<Long> tries = new ArrayList<Long>();
+		try{
+			tries = SurveyResultFinderUtil.getTriesByActId(actId);
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		return tries;
+	}
 	
 	public double getPercentageByQuestionIdAndAnswerId(long questionId, long answerId, long total) throws SystemException
 	{ 
