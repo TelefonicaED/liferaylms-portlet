@@ -9,7 +9,7 @@ El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 - #163617: Se elimina la barra después de web en la acción de ir al curso
 - #164214: Se establece correctamente el texto en la importación de preguntas.
 - #162383: Se trunca el nombre del grupo a 150 caracteres para que no de problemas en la creación de la edición.
-
+- #166052: Protegido cuando la celda es nula. Eliminación de segundo mensaje de error. Establecidos a xls y xlsx los tipos aceptados.
 
 ## [3.9.1](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v3.9.1)
 

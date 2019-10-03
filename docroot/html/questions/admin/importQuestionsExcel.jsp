@@ -76,7 +76,7 @@
 	<aui:fieldset>
 		<aui:field-wrapper label="file" helpMessage="surveyactivity.editquestions.importquestions.fileHelp">
 	    			<aui:input inlineLabel="left" inlineField="true"
-					  	name="fileName" label="" id="fileName" type="file" value="" />
+					  	name="fileName" label="" id="fileName" type="file" value=""  accept="xls|xlsx" />
 				</aui:field-wrapper>
 	</aui:fieldset>
 	<aui:button-row>
@@ -86,9 +86,6 @@
 </aui:form>
 
 <liferay-ui:error key="surveyactivity.csvError.empty-file" message="surveyactivity.csvError.empty-file" />
-<liferay-ui:error key="surveyactivity.csvError.bad-format" message="surveyactivity.csvError.bad-format" />
-<liferay-ui:error key="surveyactivity.csvError.bad-question" message="surveyactivity.csvError.bad-question" />
-<liferay-ui:error key="surveyactivity.csvError.bad-answer" message="surveyactivity.csvError.bad-answer" />
 
 <% if(SessionErrors.contains(renderRequest, "surveyactivity.csvError.bad-format-line")) { %>
 <div class="portlet-msg-error">
