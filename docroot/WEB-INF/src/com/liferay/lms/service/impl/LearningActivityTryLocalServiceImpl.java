@@ -462,5 +462,11 @@ public class LearningActivityTryLocalServiceImpl
 		
 		return lat;
 	}
+	
+	public LearningActivityTry findLastLearningActivityTryCreateByUsersAndActId(long actId, long userId) {
+		
+		return learningActivityTryFinder.findLastLearningActivityTryCreateByUsersAndActId(actId, userId);
+		
+	}
 
 }

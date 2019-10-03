@@ -1,6 +1,7 @@
 package com.liferay.lms;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -698,104 +699,143 @@ public class QuestionsAdmin extends MVCPortlet{
 			actionResponse.setRenderParameter("jspPage", "/html/questions/admin/importQuestionsExcel.jsp");
 		}else{ 
 			String contentType = uploadRequest.getContentType("fileName");	
-			if (!ContentTypes.APPLICATION_VND_MS_EXCEL.equals(contentType)) {
-				SessionErrors.add(actionRequest, "surveyactivity.csvError.bad-format");	
+			if (!ContentTypes.APPLICATION_VND_MS_EXCEL.equals(contentType) && !"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet".equalsIgnoreCase(contentType) ) {
+				SessionErrors.add(actionRequest, "surveyactivity.xlsError.bad-format");	
 				actionResponse.setRenderParameter("jspPage", "/html/questions/admin/importQuestionsExcel.jsp");
 			}else{
 				Workbook workbook = null;
-				try{
-					workbook = new HSSFWorkbook(excelFile);
-				}catch(Exception e){//Excel 2007
-					workbook = new XSSFWorkbook(excelFile);
-
-				}			
-
-				//Cogemos la primera hoja
-				Sheet worksheet = workbook.getSheetAt(0);
-				int fila = 0;
-				String questionTitle, feedbackCorrect, feedbackIncorrect;
-				int questionType;
-				boolean allCorrect=true;
-				boolean questionPenalize;
-				String answerTitle;
-				boolean answerIsCorrect;
-				boolean firstLine = true;
-				Row row = worksheet.getRow(fila);
-				TestQuestion question =null;
-				while(row != null){
-					//La primera linea es la cabecera
+				if(ContentTypes.APPLICATION_VND_MS_EXCEL.equals(contentType)){
 					try{
-						if(!firstLine){
-							try{	
-								questionTitle = row.getCell(COLUMN_INDEX_QUESTION_TITLE).getStringCellValue();
-								answerTitle = row.getCell(COLUMN_INDEX_ANSWER_TITLE).getStringCellValue();
-								answerIsCorrect = Boolean.parseBoolean(row.getCell(COLUMN_INDEX_ANSWER_IS_CORRECT).getStringCellValue());
-								feedbackCorrect =  row.getCell(COLUMN_INDEX_ANSWER_FEEDBACK_CORRECT).getStringCellValue();
-								feedbackIncorrect = row.getCell(COLUMN_INDEX_ANSWER_FEEDBACK_INCORRECT).getStringCellValue();
-								if(questionTitle!=null && Validator.isNotNull(questionTitle.trim())){
-									questionType = Integer.valueOf(row.getCell(COLUMN_INDEX_QUESTION_TYPE).getStringCellValue());
-									questionPenalize = Boolean.parseBoolean(row.getCell(COLUMN_INDEX_QUESTION_PENALIZE).getStringCellValue());
-									//Es pregunta
-									if (log.isDebugEnabled()) log.debug("Line: " + fila + " ***********Es pregunta************");
-									if (log.isDebugEnabled()) log.debug("Line: " + fila + " Titulo pregunta: " + questionTitle);					
-									if (log.isDebugEnabled()) log.debug("Line: " + fila + " Tipo: " + questionType);
-									if (log.isDebugEnabled()) log.debug("Line: " + fila + " Penalize: " + questionPenalize);
+						workbook = new HSSFWorkbook(excelFile);
+					}catch(Exception e){//Excel 2007
+						e.printStackTrace();
 
-									//Creamos la pregunta.
-									question =TestQuestionLocalServiceUtil.addQuestion(actId, questionTitle, questionType);
-									question.setPenalize(questionPenalize);
-									question = TestQuestionLocalServiceUtil.updateTestQuestion(question);
-									if(answerTitle!=null && Validator.isNotNull(answerTitle.trim())){
-										//Si tiene respuestas, creamos la respuesta 
-										if (log.isDebugEnabled()) log.debug("Line: " + fila + " ***********Tiene respuesta************");
+					}		
+				}else {
+					File file = uploadRequest.getFile("fileName");
+					try{
+						workbook = new XSSFWorkbook(new FileInputStream(file));
+					}catch(Exception e){//Excel 2007
+						e.printStackTrace();
+
+					}		
+				}
+				if(workbook!=null){
+					//Cogemos la primera hoja
+					Sheet worksheet = workbook.getSheetAt(0);
+					int fila = 0;
+					String questionTitle, feedbackCorrect, feedbackIncorrect;
+					int questionType;
+					boolean allCorrect=true;
+					boolean questionPenalize;
+					String answerTitle;
+					boolean answerIsCorrect;
+					boolean firstLine = true;
+					Row row = worksheet.getRow(fila);
+					TestQuestion question =null;
+					while(row != null){
+						//La primera linea es la cabecera
+						try{
+							if(!firstLine){
+								try{	
+									questionTitle = row.getCell(COLUMN_INDEX_QUESTION_TITLE).getStringCellValue();
+									answerTitle = row.getCell(COLUMN_INDEX_ANSWER_TITLE).getStringCellValue();
+									answerIsCorrect = Boolean.parseBoolean(row.getCell(COLUMN_INDEX_ANSWER_IS_CORRECT).getStringCellValue());
+									feedbackCorrect =  (row.getCell(COLUMN_INDEX_ANSWER_FEEDBACK_CORRECT))!=null?row.getCell(COLUMN_INDEX_ANSWER_FEEDBACK_CORRECT).getStringCellValue():"";
+									feedbackIncorrect = (row.getCell(COLUMN_INDEX_ANSWER_FEEDBACK_INCORRECT))!=null?row.getCell(COLUMN_INDEX_ANSWER_FEEDBACK_INCORRECT).getStringCellValue():"";
+									if(questionTitle!=null && Validator.isNotNull(questionTitle.trim())){
+										try{
+											questionType = Integer.valueOf(row.getCell(COLUMN_INDEX_QUESTION_TYPE).getStringCellValue());
+										}catch(Exception e){
+											log.debug(e);
+											Double value = row.getCell(COLUMN_INDEX_QUESTION_TYPE).getNumericCellValue();
+											questionType = value.intValue();
+										}
+										
+										questionPenalize = Boolean.parseBoolean(row.getCell(COLUMN_INDEX_QUESTION_PENALIZE).getStringCellValue());
+										//Es pregunta
+										if (log.isDebugEnabled()) log.debug("Line: " + fila + " ***********Es pregunta************");
+										if (log.isDebugEnabled()) log.debug("Line: " + fila + " Titulo pregunta: " + questionTitle);					
+										if (log.isDebugEnabled()) log.debug("Line: " + fila + " Tipo: " + questionType);
+										if (log.isDebugEnabled()) log.debug("Line: " + fila + " Penalize: " + questionPenalize);
+
+										//Creamos la pregunta.
+										question =TestQuestionLocalServiceUtil.addQuestion(actId, questionTitle, questionType);
+										question.setPenalize(questionPenalize);
+										question = TestQuestionLocalServiceUtil.updateTestQuestion(question);
+										if(answerTitle!=null && Validator.isNotNull(answerTitle.trim())){
+											//Si tiene respuestas, creamos la respuesta 
+											if (log.isDebugEnabled()) log.debug("Line: " + fila + " ***********Tiene respuesta************");
+											if (log.isDebugEnabled()) log.debug("Line: " + fila + " Titulo respuesta: " + answerTitle);
+											if (log.isDebugEnabled()) log.debug("Line: " + fila + " Es correcta: " + answerIsCorrect);
+											if (log.isDebugEnabled()) log.debug("Line: " + fila + " Feedback correcta: " + feedbackCorrect);
+											if (log.isDebugEnabled()) log.debug("Line: " + fila + " Feedback incorrecta: " + feedbackIncorrect);
+											if(feedbackCorrect==null || feedbackCorrect.trim().isEmpty()){
+												feedbackCorrect = feedbackIncorrect;
+											}
+											if(feedbackIncorrect==null || feedbackIncorrect.trim().isEmpty()){
+												feedbackIncorrect = feedbackCorrect;
+											}
+											TestAnswerLocalServiceUtil.addTestAnswer(question.getQuestionId(), answerTitle, feedbackCorrect, feedbackIncorrect, answerIsCorrect);
+										}
+
+
+									}else{	//Es solo respuesta
+										if (log.isDebugEnabled()) log.debug("Line: " + fila + " ***********Es solo respuesta************");
 										if (log.isDebugEnabled()) log.debug("Line: " + fila + " Titulo respuesta: " + answerTitle);
 										if (log.isDebugEnabled()) log.debug("Line: " + fila + " Es correcta: " + answerIsCorrect);
-										TestAnswerLocalServiceUtil.addTestAnswer(question.getQuestionId(), answerTitle, feedbackCorrect, feedbackIncorrect, answerIsCorrect);
-									}
+										if(feedbackCorrect!=null && feedbackCorrect.length()>1000){
+											feedbackCorrect = feedbackCorrect.substring(0, 999);
+										}
 
-
-								}else{	//Es solo respuesta
-									if (log.isDebugEnabled()) log.debug("Line: " + fila + " ***********Es solo respuesta************");
-									if (log.isDebugEnabled()) log.debug("Line: " + fila + " Titulo respuesta: " + answerTitle);
-									if (log.isDebugEnabled()) log.debug("Line: " + fila + " Es correcta: " + answerIsCorrect);
-									if(feedbackCorrect!=null && feedbackCorrect.length()>1000){
-										feedbackCorrect = feedbackCorrect.substring(0, 999);
+										if(feedbackIncorrect!=null && feedbackIncorrect.length()>1000){
+											feedbackIncorrect = feedbackIncorrect.substring(0, 999);
+										}
+										
+										if (log.isDebugEnabled()) log.debug("Line: " + fila + " Feedback correcta: " + feedbackCorrect);
+										if (log.isDebugEnabled()) log.debug("Line: " + fila + " Feedback incorrecta: " + feedbackIncorrect);
+										if(feedbackCorrect==null || feedbackCorrect.trim().isEmpty()){
+											feedbackCorrect = feedbackIncorrect;
+										}
+										if(feedbackIncorrect==null || feedbackIncorrect.trim().isEmpty()){
+											feedbackIncorrect = feedbackCorrect;
+										}
+										
+										if(question!=null){
+											TestAnswerLocalServiceUtil.addTestAnswer(question.getQuestionId(), answerTitle, feedbackCorrect, feedbackIncorrect, answerIsCorrect);
+										}
 									}
-
-									if(feedbackIncorrect!=null && feedbackIncorrect.length()>1000){
-										feedbackIncorrect = feedbackIncorrect.substring(0, 999);
-									}
-									if(question!=null){
-										TestAnswerLocalServiceUtil.addTestAnswer(question.getQuestionId(), answerTitle, feedbackCorrect, feedbackIncorrect, answerIsCorrect);
-									}
+								}catch(Exception e){
+									log.error(e.getMessage());
+									log.debug(e);
+									log.error("FILA "+fila);
+									SessionErrors.add(actionRequest, "surveyactivity.csvError.bad-question",fila);
+									actionResponse.setRenderParameter("jspPage", "/html/questions/admin/importQuestionsExcel.jsp");
+									allCorrect=false;
 								}
-							}catch(Exception e){
-								log.error(e.getMessage());
-								log.debug(e);
-								log.error("FILA "+fila);
-								SessionErrors.add(actionRequest, "surveyactivity.csvError.bad-question",fila);
-								actionResponse.setRenderParameter("jspPage", "/html/questions/admin/importQuestionsExcel.jsp");
-								allCorrect=false;
+							}else{
+								firstLine = false;
 							}
-						}else{
-							firstLine = false;
+							fila++;
+							row = worksheet.getRow(fila);
+						}catch(Exception e){
+							e.printStackTrace();
+							SessionErrors.add(actionRequest, "surveyactivity.csvError.bad-format-line",fila);
+							actionResponse.setRenderParameter("jspPage", "/html/questions/admin/importQuestionsExcel.jsp");
+							allCorrect=false;
+							e.printStackTrace();	
 						}
-						fila++;
-						row = worksheet.getRow(fila);
-					}catch(Exception e){
-						e.printStackTrace();
-						SessionErrors.add(actionRequest, "surveyactivity.csvError.bad-format-line",fila);
-						actionResponse.setRenderParameter("jspPage", "/html/questions/admin/importQuestionsExcel.jsp");
-						allCorrect=false;
-						e.printStackTrace();	
+
+					}	
+
+					if(allCorrect){
+						log.debug("ALL CORRECT!!!");
+						actionResponse.setRenderParameter("jspPage", "/html/questions/admin/editquestions.jsp");
+						SessionMessages.add(actionRequest, "questions-added-successfully");
 					}
-
-				}	
-
-				if(allCorrect){
-					log.debug("ALL CORRECT!!!");
-					actionResponse.setRenderParameter("jspPage", "/html/questions/admin/editquestions.jsp");
-					SessionMessages.add(actionRequest, "questions-added-successfully");
+				}else{
+					SessionErrors.add(actionRequest, "surveyactivity.xlsError.bad-format");	
+					actionResponse.setRenderParameter("jspPage", "/html/questions/admin/importQuestionsExcel.jsp");
 				}
 
 			}

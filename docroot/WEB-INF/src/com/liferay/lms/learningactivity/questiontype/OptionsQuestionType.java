@@ -1,14 +1,15 @@
 package com.liferay.lms.learningactivity.questiontype;
 
-import java.util.Date;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Random;
 
 import javax.portlet.PortletRequest;
 
-
+import com.liferay.lms.model.LearningActivityTry;
 import com.liferay.lms.model.TestAnswer;
 import com.liferay.lms.model.TestQuestion;
 import com.liferay.lms.service.LearningActivityLocalServiceUtil;
@@ -216,7 +217,8 @@ public class OptionsQuestionType extends BaseQuestionType {
 				}
 			}
 			List<TestAnswer> answersSelected=getAnswersSelected(document, questionId);
-			List<TestAnswer> testAnswers= TestAnswerLocalServiceUtil.getTestAnswersByQuestionId(question.getQuestionId());
+//			List<TestAnswer> testAnswers = TestAnswerLocalServiceUtil.getTestAnswersByQuestionId(question.getQuestionId());
+			List<TestAnswer> testAnswers = getUserTestAnswersByQuestionId(question.getQuestionId(), themeDisplay.getUserId(), actId);
 			int correctAnswers=0, correctAnswered=0, incorrectAnswered=0;
 			if(feedback) feedMessage = "";
 			boolean notAnswers = true;
@@ -432,6 +434,32 @@ public class OptionsQuestionType extends BaseQuestionType {
 	}
 	public int getDefaultAnswersNo(){
 		return GetterUtil.getInteger(PropsUtil.get("lms.defaultAnswersNo.options"), 2);
+	}
+
+	private List<TestAnswer> getUserTestAnswersByQuestionId(long questionId, long userId, long actId) throws SystemException {
+		
+		List<TestAnswer> testAnswersList = TestAnswerLocalServiceUtil.getTestAnswersByQuestionId(questionId);
+		boolean showRandomOrderAnswers = StringPool.TRUE.equals(LearningActivityLocalServiceUtil.getExtraContentValue(actId, "showRandomOrderAnswers"));
+		if (showRandomOrderAnswers) {
+			LearningActivityTry userLastLAT = LearningActivityTryLocalServiceUtil.findLastLearningActivityTryCreateByUsersAndActId(actId, userId);
+			if (Validator.isNotNull(userLastLAT)) {
+				long userSeed = userLastLAT.getLatId() + userId + questionId;
+				Random userRandom = new Random(userSeed);
+				log.debug("actId=" + actId + ", latId=" + userLastLAT.getLatId() + ", userId=" + userId + ", questionId=" + questionId + ", userSeed=" + userSeed);
+				List<TestAnswer> userTestAnswersList = new ArrayList<TestAnswer>();
+				while (userTestAnswersList.size() < testAnswersList.size()) {
+					int index = userRandom.nextInt(testAnswersList.size());
+					TestAnswer testAnswer = testAnswersList.get(index);
+					if (!userTestAnswersList.contains(testAnswer)) {
+						userTestAnswersList.add(testAnswer);
+					}
+				}
+				testAnswersList = userTestAnswersList;
+			}
+		}
+		
+		return testAnswersList;
+		
 	}
 
 }

@@ -88,6 +88,10 @@ public class CourseAdminConfigurationAction implements ConfigurationAction {
 
 		portletPreferences.setValue("filterByTemplates",	Boolean.toString(ParamUtil.getBoolean(actionRequest, "filterByTemplates",	false)));
 		
+		portletPreferences.setValue("showFriendlyUrlColumn",	Boolean.toString(ParamUtil.getBoolean(actionRequest, "showFriendlyUrlColumn",	false)));
+		portletPreferences.setValue("showCourseIdColumn",	Boolean.toString(ParamUtil.getBoolean(actionRequest, "showCourseIdColumn",	false)));
+		portletPreferences.setValue("showParentCourseIdColumn",	Boolean.toString(ParamUtil.getBoolean(actionRequest, "showParentCourseIdColumn",	false)));
+		
 		portletPreferences.setValue("showExpandos", Boolean.toString(ParamUtil.getBoolean(actionRequest, "showExpandos", false)));
 		portletPreferences.setValue("showExpandosEdition", Boolean.toString(ParamUtil.getBoolean(actionRequest, "showExpandosEdition", false)));
 		
@@ -100,7 +104,7 @@ public class CourseAdminConfigurationAction implements ConfigurationAction {
 			String nameExpando = "";
 			String nameExpandoEdition = "";
 			for (ExpandoColumn expandoCourse : expandosColumnCourse) {
-				expandoName = StringUtil.upperCaseFirstLetter(expandoCourse.getName());
+				expandoName = expandoCourse.getName();
 				nameExpando = "showExpando_" + expandoCourse.getColumnId();
 				nameExpandoEdition = "showExpandoEdition_" + expandoCourse.getColumnId();
 				log.debug("SAVE: show" + expandoName+ "   VALUE:  "+actionRequest.getParameter("show" + expandoName));
@@ -109,7 +113,6 @@ public class CourseAdminConfigurationAction implements ConfigurationAction {
 				portletPreferences.setValue(nameExpandoEdition, actionRequest.getParameter(nameExpandoEdition));
 			}	
 		}
-		
 		
 		portletPreferences.store();
 		SessionMessages.add( 

@@ -25,6 +25,7 @@
 	boolean showCorrectAnswer= false;
 	boolean showCorrectAnswerOnlyOnFinalTry= false;
 	boolean showOnlyPreview = false;
+	boolean showRandomOrderAnswers = false;
 	boolean improve=false;
 	boolean disabled = false;
 	boolean hideFeedback=false;
@@ -48,7 +49,8 @@
 		
 		showCorrectAnswer = StringPool.TRUE.equals(LearningActivityLocalServiceUtil.getExtraContentValue(learningActivity.getActId(),"showCorrectAnswer"));
 		showCorrectAnswerOnlyOnFinalTry = StringPool.TRUE.equals(LearningActivityLocalServiceUtil.getExtraContentValue(learningActivity.getActId(),"showCorrectAnswerOnlyOnFinalTry"));
-		showOnlyPreview = StringPool.TRUE.equals(LearningActivityLocalServiceUtil.getExtraContentValue(learningActivity.getActId(),"showOnlyPreview"));	
+		showOnlyPreview = StringPool.TRUE.equals(LearningActivityLocalServiceUtil.getExtraContentValue(learningActivity.getActId(),"showOnlyPreview"));
+		showRandomOrderAnswers = StringPool.TRUE.equals(LearningActivityLocalServiceUtil.getExtraContentValue(learningActivity.getActId(),"showRandomOrderAnswers"));
 		improve = StringPool.TRUE.equals(LearningActivityLocalServiceUtil.getExtraContentValue(learningActivity.getActId(),"improve"));	
 		hideFeedback = StringPool.TRUE.equals(LearningActivityLocalServiceUtil.getExtraContentValue(learningActivity.getActId(),"hideFeedback"));
 		
@@ -323,3 +325,6 @@ window.<portlet:namespace />validate_execactivity={
 		
 	<aui:input type="checkbox" name="showOnlyPreview" label="exectactivity.edit.showonlypreview" checked="<%=showOnlyPreview %>" 
 		ignoreRequestValue="true" helpMessage="exectactivity.edit.showonlypreview.help"/>
+		
+	<aui:input type="checkbox" name="showRandomOrderAnswers" label="exectactivity.edit.showrandomorderanswers" checked="<%=showRandomOrderAnswers %>" 
+		ignoreRequestValue="true" helpMessage="exectactivity.edit.showrandomorderanswers.help"/>
