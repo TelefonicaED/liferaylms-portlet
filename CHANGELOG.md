@@ -2,6 +2,12 @@
 Todos los cambios de este proyecto estarán documentados en este archivo.
 
 El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
+## [4.0.0](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v3.9.1)
+
+### Fixed
+
+- #163617: Se elimina la barra después de web en la acción de ir al curso
+
 ## [3.9.1](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v3.9.1)
 
 ### Fixed
