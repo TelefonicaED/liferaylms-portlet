@@ -389,8 +389,19 @@ public class CreateEdition extends CourseCopyUtil implements MessageListener {
 					newLearnActivity.setDescription(descriptionFilesClone(activity.getDescription(),newModule.getGroupId(), newLearnActivity.getActId(),themeDisplay.getUserId()));
 				//}
 				
+				ServiceContext larnServiceContext = serviceContext;
+				larnServiceContext = serviceContext;
+
+
+				AssetEntry entryActivity = AssetEntryLocalServiceUtil.fetchEntry(LearningActivity.class.getName(), activity.getActId());
+				if(Validator.isNotNull(entryActivity)){
+					
+					larnServiceContext.setAssetCategoryIds(entryActivity.getCategoryIds());
+					larnServiceContext.setAssetTagNames(entryActivity.getTagNames());
+					larnServiceContext.setExpandoBridgeAttributes(entryActivity.getExpandoBridge().getAttributes(false));
+				}
 				
-				nuevaLarn=LearningActivityLocalServiceUtil.addLearningActivity(newLearnActivity,serviceContext);
+				nuevaLarn=LearningActivityLocalServiceUtil.addLearningActivity(newLearnActivity,larnServiceContext);
 				
 				
 				if(canBeLinked){
@@ -428,12 +439,7 @@ public class CreateEdition extends CourseCopyUtil implements MessageListener {
 					pending.put(actId, activity.getPrecedence());
 				}
 				
-				//Copiar la clasificación de la actividad
-				AssetEntry entryActivity = AssetEntryLocalServiceUtil.fetchEntry(LearningActivity.class.getName(), activity.getActId());
-				if(Validator.isNotNull(entryActivity)){
-					AssetEntryLocalServiceUtil.updateEntry(nuevaLarn.getUserId(), nuevaLarn.getGroupId(), LearningActivity.class.getName(), 
-							nuevaLarn.getActId(), entryActivity.getCategoryIds(), entryActivity.getTagNames());
-				}
+				
 				
 			} catch (Exception e) {
 				e.printStackTrace();
