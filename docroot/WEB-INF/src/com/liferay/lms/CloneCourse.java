@@ -420,9 +420,21 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 		
 					larnServiceContext = serviceContext;
 					//Eliminar las categorias y los tags del curso del serviceContext antes de crear la nueva actividad
-					larnServiceContext.setAssetCategoryIds(null);
-					larnServiceContext.setAssetTagNames(null);
-					nuevaLarn=LearningActivityLocalServiceUtil.addLearningActivity(newLearnActivity,serviceContext);
+					if(this.cloneActivityClassificationTypes){
+						AssetEntry entryActivity = AssetEntryLocalServiceUtil.fetchEntry(LearningActivity.class.getName(), activity.getActId());
+						if(Validator.isNotNull(entryActivity)){
+							
+							larnServiceContext.setAssetCategoryIds(entryActivity.getCategoryIds());
+							larnServiceContext.setAssetTagNames(entryActivity.getTagNames());
+							larnServiceContext.setExpandoBridgeAttributes(entryActivity.getExpandoBridge().getAttributes(false));
+							//---Clonar la clasificación de la actividad
+							if(log.isDebugEnabled())
+								log.debug(":::Clone activity classification types::: Activity " + activity.getActId());
+							
+						}
+					}
+					
+					nuevaLarn=LearningActivityLocalServiceUtil.addLearningActivity(newLearnActivity,larnServiceContext);
 					if(log.isDebugEnabled()){
 						log.debug("      Learning Activity : " + activity.getTitle(Locale.getDefault())+ " ("+activity.getActId()+", " + LanguageUtil.get(Locale.getDefault(),learningActivityTypeRegistry.getLearningActivityType(activity.getTypeId()).getName())+")");
 						log.debug("      + Learning Activity : " + nuevaLarn.getTitle(Locale.getDefault())+ " ("+nuevaLarn.getActId()+", " + LanguageUtil.get(Locale.getDefault(),learningActivityTypeRegistry.getLearningActivityType(nuevaLarn.getTypeId()).getName())+")");
