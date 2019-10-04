@@ -152,7 +152,14 @@ if(!ownGrade){
 <aui:form  name="fn_grades" method="post" action="${updateGradesURL}" role="form">
 	<aui:fieldset>
 		<aui:input type="hidden" name="studentId" value='<%=renderRequest.getParameter("studentId") %>' />
-	    <aui:input type="text" name="result" label="offlinetaskactivity.grades" helpMessage="<%=LanguageUtil.format(pageContext, \"offlinetaskactivity.grades.resultMessage\", new Object[]{ct.translate(themeDisplay.getLocale(), themeDisplay.getScopeGroupId(), activity.getPasspuntuation())})%>" value='<%=result!=null?ct.translate(themeDisplay.getLocale(), themeDisplay.getScopeGroupId(),result.getResult()):"" %>'>
+		<%
+		String resultValue = "";
+		if(result!=null && (result.getResult()>0 || result.getEndDate()!=null)){
+			resultValue = ct.translate(themeDisplay.getLocale(), themeDisplay.getScopeGroupId(),result.getResult());%>
+		}
+		
+	    <aui:input type="text" name="result"  label="offlinetaskactivity.grades" helpMessage="<%=LanguageUtil.format(pageContext, \"offlinetaskactivity.grades.resultMessage\", new Object[]{ct.translate(themeDisplay.getLocale(), themeDisplay.getScopeGroupId(), activity.getPasspuntuation())})%>" value='<%=resultValue%>'>
+	    	<aui:validator name="required"/>
 	    	<aui:validator name="number"></aui:validator>
 	    	<aui:validator  name="custom"  errorMessage="<%=LanguageUtil.format(themeDisplay.getLocale(), \"result.must-be-between\", new Object[]{ct.getMinValue(themeDisplay.getScopeGroupId()),ct.getMaxValue(themeDisplay.getScopeGroupId())})%>"  >
 				function (val, fieldNode, ruleValue) {

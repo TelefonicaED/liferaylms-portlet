@@ -14,6 +14,8 @@ import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 
 import com.liferay.lms.asset.LearningActivityAssetRendererFactory;
+import com.liferay.lms.auditing.AuditConstants;
+import com.liferay.lms.auditing.AuditingLogFactory;
 import com.liferay.lms.learningactivity.calificationtype.CalificationType;
 import com.liferay.lms.learningactivity.calificationtype.CalificationTypeRegistry;
 import com.liferay.lms.model.Course;
@@ -183,11 +185,12 @@ public class OnlineActivity extends MVCPortlet {
 		if(correct) {
 			try {
 				LearningActivityTry  learningActivityTry =  LearningActivityTryLocalServiceUtil.getLastLearningActivityTryByActivityAndUser(actId, studentId);
+				long oldResult = learningActivityTry.getResult();
 				learningActivityTry.setEndDate(new Date());
 				learningActivityTry.setResult(ct.toBase100(themeDisplay.getScopeGroupId(),result));
 				learningActivityTry.setComments(comments);
 				updateLearningActivityTryAndResult(learningActivityTry);
-				
+				AuditingLogFactory.audit(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(), LearningActivityTry.class.getName(), learningActivityTry.getLatId(), themeDisplay.getUserId(), AuditConstants.CORRECT, "Nota: "+oldResult+"->"+ct.toBase100(themeDisplay.getScopeGroupId(),result));
 				SessionMessages.add(request, "grades.updating");
 			} catch (NestableException e) {
 				SessionErrors.add(request, "grades.bad-updating");

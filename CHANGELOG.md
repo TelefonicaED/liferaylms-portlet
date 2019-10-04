@@ -10,6 +10,7 @@ El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 - #164214: Se establece correctamente el texto en la importación de preguntas.
 - #162383: Se trunca el nombre del grupo a 150 caracteres para que no de problemas en la creación de la edición.
 - #166052: Protegido cuando la celda es nula. Eliminación de segundo mensaje de error. Establecidos a xls y xlsx los tipos aceptados.
+- #154930: Se modifica la actividad de desarrollo para que audite la corrección y se obligue a meter nota con los comentarios para evitar fallos.
 
 ## [3.9.1](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v3.9.1)
 
