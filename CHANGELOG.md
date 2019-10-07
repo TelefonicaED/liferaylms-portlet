@@ -7,7 +7,7 @@ El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 ### Fixed
 
 - #163617: Se elimina la barra después de web en la acción de ir al curso
-- #164214: Se establece correctamente el texto en la importación de preguntas.
+- #164214: Se establece correctamente el texto en la importación de preguntas. 
 - #162383: Se trunca el nombre del grupo a 150 caracteres para que no de problemas en la creación de la edición.
 - #166052: Protegido cuando la celda es nula. Eliminación de segundo mensaje de error. Establecidos a xls y xlsx los tipos aceptados.
 - #154930: Se modifica la actividad de desarrollo para que audite la corrección y se obligue a meter nota con los comentarios para evitar fallos.
@@ -15,6 +15,8 @@ El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 - #163768: Se establecen las categorías de las actividades al duplicar antes de ser creadas para evitar errores con categorias obligatorias.163768
 - #167390: Se copian los campos personalizados de las actividades al crear la edición.
 - #163688: Se actualizan los estilos para los tipos de cursos sin el tema de wecorp.
+- #167409: Creación de un nuevo método para duplicar lo específico de cada actividad. Implementación para los recursos externos.
+- #167628: Cambiada la visualización de los comentarios de la actividad de desarrollo en el gradebook.
 
 ## [3.9.1](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v3.9.1)
 
