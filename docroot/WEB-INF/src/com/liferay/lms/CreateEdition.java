@@ -27,6 +27,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.messaging.Message;
 import com.liferay.portal.kernel.messaging.MessageListener;
 import com.liferay.portal.kernel.messaging.MessageListenerException;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.ResourceConstants;
@@ -170,7 +171,7 @@ public class CreateEdition extends CourseCopyUtil implements MessageListener {
 		int typeSite = group.getType();
 		
 		
-		//Creamos el nuevo curso para la edición 
+		//Creamos el nuevo curso para la ediciÃ³n 
 		Course newCourse = null;  
 		String summary = null;
 		long courseTypeId = 0;
@@ -225,7 +226,9 @@ public class CreateEdition extends CourseCopyUtil implements MessageListener {
 			newEntry.setSummary(summary);
 			newEntry.setClassTypeId(courseTypeId);
 			AssetEntryLocalServiceUtil.updateAssetEntry(newEntry);
-			newGroup.setName(course.getTitle(themeDisplay.getLocale(),true)+"-"+newEditionName);
+			String groupName =  course.getTitle(themeDisplay.getLocale(),true)+"-"+newEditionName;
+			groupName = groupName.substring(0, 148);
+			newGroup.setName(groupName);
 			newGroup.setDescription(summary);
 			GroupLocalServiceUtil.updateGroup(newGroup);
 			
@@ -307,7 +310,7 @@ public class CreateEdition extends CourseCopyUtil implements MessageListener {
 					
 				}
 				
-				//Copiar la clasificación de los módulos
+				//Copiar la clasificaciÃ³n de los mÃ³dulos
 				AssetEntry entryModule = AssetEntryLocalServiceUtil.fetchEntry(Module.class.getName(), module.getModuleId());
 				if(Validator.isNotNull(entryModule))
 					AssetEntryLocalServiceUtil.updateEntry(newModule.getUserId(), newModule.getGroupId(), Module.class.getName(), 
@@ -376,7 +379,7 @@ public class CreateEdition extends CourseCopyUtil implements MessageListener {
 				}
 				
 			
-				//TODO Cuando esté preparado la parte de linkar no habrá que copiar todo
+				//TODO Cuando estÃ© preparado la parte de linkar no habrÃ¡ que copiar todo
 				//else{
 					newLearnActivity.setExtracontent(activity.getExtracontent());
 					newLearnActivity.setTitle(activity.getTitle());
@@ -386,9 +389,22 @@ public class CreateEdition extends CourseCopyUtil implements MessageListener {
 					newLearnActivity.setDescription(descriptionFilesClone(activity.getDescription(),newModule.getGroupId(), newLearnActivity.getActId(),themeDisplay.getUserId()));
 				//}
 				
+				ServiceContext larnServiceContext = serviceContext;
+	
+
+
+				AssetEntry entryActivity = AssetEntryLocalServiceUtil.fetchEntry(LearningActivity.class.getName(), activity.getActId());
+				if(Validator.isNotNull(entryActivity)){
+					
+					larnServiceContext.setAssetCategoryIds(entryActivity.getCategoryIds());
+					larnServiceContext.setAssetTagNames(entryActivity.getTagNames());
+					larnServiceContext.setExpandoBridgeAttributes(activity.getExpandoBridge().getAttributes());
+			
+				}
 				
-				nuevaLarn=LearningActivityLocalServiceUtil.addLearningActivity(newLearnActivity,serviceContext);
-				
+				nuevaLarn=LearningActivityLocalServiceUtil.addLearningActivity(newLearnActivity,larnServiceContext);
+				nuevaLarn.setExpandoBridgeAttributes(larnServiceContext);
+				nuevaLarn.getExpandoBridge().setAttributes(activity.getExpandoBridge().getAttributes());
 				
 				if(canBeLinked){
 					nuevaLarn.setLinkedActivityId(activity.getActId());
@@ -425,12 +441,7 @@ public class CreateEdition extends CourseCopyUtil implements MessageListener {
 					pending.put(actId, activity.getPrecedence());
 				}
 				
-				//Copiar la clasificación de la actividad
-				AssetEntry entryActivity = AssetEntryLocalServiceUtil.fetchEntry(LearningActivity.class.getName(), activity.getActId());
-				if(Validator.isNotNull(entryActivity)){
-					AssetEntryLocalServiceUtil.updateEntry(nuevaLarn.getUserId(), nuevaLarn.getGroupId(), LearningActivity.class.getName(), 
-							nuevaLarn.getActId(), entryActivity.getCategoryIds(), entryActivity.getTagNames());
-				}
+				
 				
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -440,7 +451,7 @@ public class CreateEdition extends CourseCopyUtil implements MessageListener {
 			}
 
 			
-			//TODO Descomentar cuando esté implementado las actividades linkadas.
+			//TODO Descomentar cuando estÃ© implementado las actividades linkadas.
 			//if(!canBeLinked){
 			createTestQuestionsAndAnswers(activity, nuevaLarn, newModule, themeDisplay.getUserId());
 		
