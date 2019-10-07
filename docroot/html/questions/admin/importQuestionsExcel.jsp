@@ -76,7 +76,9 @@
 	<aui:fieldset>
 		<aui:field-wrapper label="file" helpMessage="surveyactivity.editquestions.importquestions.fileHelp">
 	    			<aui:input inlineLabel="left" inlineField="true"
-					  	name="fileName" label="" id="fileName" type="file" value=""  accept="xls|xlsx" />
+					  	name="fileName" label="" id="fileName" type="file" value="">
+					  	<aui:validator name="acceptFiles">'xls, xlsx'</aui:validator>
+					 </aui:input>
 				</aui:field-wrapper>
 	</aui:fieldset>
 	<aui:button-row>
