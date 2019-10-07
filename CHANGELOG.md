@@ -2,6 +2,14 @@
 Todos los cambios de este proyecto estarán documentados en este archivo.
 
 El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
+
+
+## [3.9.2](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v3.9.2)
+
+### Fixed
+
+- #167390: Se copia en la creación de las ediciones los campos personalizados de las actividades
+
 ## [3.9.1](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v3.9.1)
 
 ### Fixed
