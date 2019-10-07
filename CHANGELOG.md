@@ -14,6 +14,7 @@ El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 - #161331: Se actualiza el número de usuarios para solo tener en cuenta a los estudiantes al aceptar una petición de registro.
 - #163768: Se establecen las categorías de las actividades al duplicar antes de ser creadas para evitar errores con categorias obligatorias.163768
 - #167390: Se copian los campos personalizados de las actividades al crear la edición.
+- #163688: Se actualizan los estilos para los tipos de cursos sin el tema de wecorp.
 
 ## [3.9.1](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v3.9.1)
 
