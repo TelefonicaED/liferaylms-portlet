@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Locale;
 
 import com.liferay.counter.service.CounterLocalServiceUtil;
+import com.liferay.lms.learningactivity.LearningActivityType;
 import com.liferay.lms.learningactivity.LearningActivityTypeRegistry;
 import com.liferay.lms.model.AsynchronousProcessAudit;
 import com.liferay.lms.model.Course;
@@ -481,6 +482,8 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 
 				createTestQuestionsAndAnswers(activity, nuevaLarn, newModule, themeDisplay.getUserId());
 				
+				LearningActivityType lat = new LearningActivityTypeRegistry().getLearningActivityType(activity.getTypeId());
+				lat.copyActivity(activity, nuevaLarn, serviceContext);
 				
 			}
 			LearningActivity la =null;

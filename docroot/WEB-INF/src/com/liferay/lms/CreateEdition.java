@@ -7,7 +7,9 @@ import java.util.List;
 import java.util.Locale;
 
 import com.liferay.counter.service.CounterLocalServiceUtil;
+import com.liferay.lms.learningactivity.LearningActivityType;
 import com.liferay.lms.learningactivity.LearningActivityTypeRegistry;
+import com.liferay.lms.learningactivity.TestLearningActivityType;
 import com.liferay.lms.model.AsynchronousProcessAudit;
 import com.liferay.lms.model.Course;
 import com.liferay.lms.model.LearningActivity;
@@ -390,7 +392,7 @@ public class CreateEdition extends CourseCopyUtil implements MessageListener {
 				//}
 				
 				ServiceContext larnServiceContext = serviceContext;
-				larnServiceContext = serviceContext;
+	
 
 
 				AssetEntry entryActivity = AssetEntryLocalServiceUtil.fetchEntry(LearningActivity.class.getName(), activity.getActId());
@@ -398,11 +400,13 @@ public class CreateEdition extends CourseCopyUtil implements MessageListener {
 					
 					larnServiceContext.setAssetCategoryIds(entryActivity.getCategoryIds());
 					larnServiceContext.setAssetTagNames(entryActivity.getTagNames());
-					larnServiceContext.setExpandoBridgeAttributes(entryActivity.getExpandoBridge().getAttributes(false));
+					larnServiceContext.setExpandoBridgeAttributes(activity.getExpandoBridge().getAttributes());
+			
 				}
 				
 				nuevaLarn=LearningActivityLocalServiceUtil.addLearningActivity(newLearnActivity,larnServiceContext);
-				
+				nuevaLarn.setExpandoBridgeAttributes(larnServiceContext);
+				nuevaLarn.getExpandoBridge().setAttributes(activity.getExpandoBridge().getAttributes());
 				
 				if(canBeLinked){
 					nuevaLarn.setLinkedActivityId(activity.getActId());
@@ -454,10 +458,12 @@ public class CreateEdition extends CourseCopyUtil implements MessageListener {
 			createTestQuestionsAndAnswers(activity, nuevaLarn, newModule, themeDisplay.getUserId());
 		
 		
-		
+			LearningActivityType lat = new LearningActivityTypeRegistry().getLearningActivityType(activity.getTypeId());
+			lat.copyActivity(activity, nuevaLarn, serviceContext);
 		}
 		
-		
+	
+		 
 		
 		//Set the precedences
 		if(pending.size()>0){
