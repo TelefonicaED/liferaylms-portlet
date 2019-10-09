@@ -17,6 +17,7 @@ El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 - #163688: Se actualizan los estilos para los tipos de cursos sin el tema de wecorp.
 - #167409: Creación de un nuevo método para duplicar lo específico de cada actividad. Implementación para los recursos externos.
 - #167628: Cambiada la visualización de los comentarios de la actividad de desarrollo en el gradebook.
+- #107687: Se ordena por peso en la visualización de resultados de los tests y en las correcciones.
 
 ## [3.9.1](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v3.9.1)
 
