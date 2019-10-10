@@ -1038,21 +1038,27 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 	}
 	
 	public List<CourseResultView> getMyCourses(long groupId, long userId, ThemeDisplay themeDisplay, String orderByColumn, String orderByType, int start, int end){
-		return CourseFinderUtil.getMyCourses(groupId, userId, null, themeDisplay, orderByColumn, orderByType, start, end);
+		return CourseFinderUtil.getMyCourses(groupId, userId, false, null, themeDisplay, orderByColumn, orderByType, start, end);
 	}
 	
 	public int countMyCourses(long groupId, long userId, ThemeDisplay themeDisplay){
-		return CourseFinderUtil.countMyCourses(groupId, userId, null, themeDisplay);
+		return CourseFinderUtil.countMyCourses(groupId, userId, false, null, themeDisplay);
 	}
 	
 	public List<CourseResultView> getMyCourses(long groupId, long userId, LinkedHashMap<String, Object> params, ThemeDisplay themeDisplay, String orderByColumn, String orderByType, int start, int end){
-		return CourseFinderUtil.getMyCourses(groupId, userId, params, themeDisplay, orderByColumn, orderByType, start, end);
+		return CourseFinderUtil.getMyCourses(groupId, userId, false, params, themeDisplay, orderByColumn, orderByType, start, end);
 	}
 	
 	public int countMyCourses(long groupId, long userId, LinkedHashMap<String, Object> params, ThemeDisplay themeDisplay){
-		return CourseFinderUtil.countMyCourses(groupId, userId, params, themeDisplay);
-	}
-	
+		return CourseFinderUtil.countMyCourses(groupId, userId, false, params, themeDisplay);
+	}  
+    public List<CourseResultView> getMyCourses(long groupId, long userId,boolean showFinished, LinkedHashMap<String, Object> params, ThemeDisplay themeDisplay, String orderByColumn, String orderByType, int start, int end){
+        return CourseFinderUtil.getMyCourses(groupId, userId, showFinished, params, themeDisplay, orderByColumn, orderByType, start, end);
+    }
+    
+    public int countMyCourses(long groupId, long userId,boolean showFinished, LinkedHashMap<String, Object> params, ThemeDisplay themeDisplay){
+        return CourseFinderUtil.countMyCourses(groupId, userId, showFinished, params, themeDisplay);
+    }	
 	public boolean hasUserTries(long courseId, long userId){
 		return CourseFinderUtil.hasUserTries(courseId, userId);
 	}
