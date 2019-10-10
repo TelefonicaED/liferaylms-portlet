@@ -12,6 +12,7 @@ import java.util.Map;
 
 import javax.portlet.PortletPreferences;
 
+import com.liferay.lms.learningactivity.calificationtype.CalificationTypeRegistry;
 import com.liferay.lms.model.Course;
 import com.liferay.lms.model.LmsPrefs;
 import com.liferay.lms.model.impl.CourseImpl;
@@ -103,9 +104,12 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 	public static final String WHERE_COURSETYPE = 
         CourseFinder.class.getName() + 
             ".whereCourseType";	
-	public static final String WHERE_PASSED_IS_NULL = 
+	public static final String WHERE_PASSED_DATE_IS_NULL = 
         CourseFinder.class.getName() + 
-            ".wherePassedIsNull";
+            ".wherePassedDateIsNull";
+	public static final String WHERE_PASSED_DATE_NOT_NULL = 
+	        CourseFinder.class.getName() + 
+	            ".wherePassedDateNotNull";
 	public static final String WHERE_VISIBLE = 
 			CourseFinder.class.getName() + 
 				".whereVisible";
@@ -137,6 +141,12 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 	public static final String WHERE_USER_STATUS = 
 			CourseFinder.class.getName() + 
 				".whereUserStatus";
+	public static final String WHERE_COURSES_IN_PROGRESS = 
+			CourseFinder.class.getName() +
+				".coursesInProgress";
+	public static final String WHERE_COURSES_FINISHED = 
+			CourseFinder.class.getName() + 
+				".coursesFinished";
 	public static final String INNER_JOIN_TEAM = 
 			CourseFinder.class.getName() + ".innerJoinTeam";
 	public static final String HAS_USER_TRIES =
@@ -1265,129 +1275,151 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 		return false;
 	}
 	
-	public List<CourseResultView> getMyCourses(long groupId, long userId, boolean showFinished, LinkedHashMap<String, Object> params, ThemeDisplay themeDisplay, String orderByColumn, String orderByType, int start, int end){
+	public List<CourseResultView> getMyCourses(long groupId, long userId, boolean coursesInProgress, boolean coursesCompleted, boolean coursesExpired, 
+			LinkedHashMap<String, Object> params, ThemeDisplay themeDisplay, String orderByColumn, String orderByType, int start, int end){
+		
 		Session session = null;
 		List<CourseResultView> listMyCourses = new ArrayList<CourseResultView>();
 		
-		try{
-			
-			session = openSession();
-			
-			String sql = CustomSQLUtil.get(MY_COURSES);
-			
-			StringBundler sb = new StringBundler();
-
-			sb.append(StringPool.OPEN_PARENTHESIS);
-			sb.append(replaceJoinAndWhere(sql, params, themeDisplay.getLanguageId(), themeDisplay.getCompanyId()));
-			sb.append(StringPool.CLOSE_PARENTHESIS);
-			
-			sql = sb.toString();
-			
-			sql = replaceLanguage(sql, themeDisplay.getLanguageId());
-			
-			String passed = StringPool.BLANK;			
-			if (!showFinished) {
-			    passed = CustomSQLUtil.get(WHERE_PASSED_IS_NULL);
-			}
-			sql = sql.replace("[$PASSED$]", passed);
-					
-			SimpleDateFormat parseDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-			String date = parseDate.format(new Date());
-			
-			sql = sql.replace("[$DATENOW$]", date);
-			
-			if(Validator.isNull(orderByColumn)){
-				orderByColumn = "Lms_Course.courseId";
-			}
-			
-			if(Validator.isNull(orderByType))
-				orderByType = "";
-			
-			if(Validator.isNotNull(orderByColumn)){
-				if(orderByColumn.startsWith("c.")){
-					orderByColumn = StringUtil.replaceFirst(orderByColumn, "c.", "Lms_Course.");
-				}
-				if(orderByColumn.contains(" c.")){
-					orderByColumn = StringUtil.replaceFirst(orderByColumn, " c.", " Lms_Course.");
-				}
-				if(orderByColumn.contains("(c.")){
-					orderByColumn = StringUtil.replaceFirst(orderByColumn, "(c.", "(Lms_Course.");
-				}
-				if(orderByColumn.contains(",c.")){
-					orderByColumn = StringUtil.replaceFirst(orderByColumn, ",c.", ",Lms_Course.");
-				}
-				sql += " ORDER BY " + orderByColumn + " " + orderByType;
-			}
-			
-			if(start >= 0 && end >= 0){
-				sql += " LIMIT " + start + "," + (end-start);
-			}
+		if(coursesInProgress || coursesCompleted || coursesExpired){
 		
-			if(log.isDebugEnabled()){
-				log.debug("sql: " + sql);
-				log.debug("groupId: " + groupId);
-				log.debug("userId: " + userId);
-			}
-			
-			SQLQuery q = session.createSQLQuery(sql);
-			
-			QueryPos qPos = QueryPos.getInstance(q);
-			qPos.add(userId);
-			qPos.add(userId);
-			
-			setJoin(qPos, params);
-			
-			qPos.add(groupId);
-			qPos.add(groupId);
-			
-			Iterator<Object[]> itr =  q.iterate();
-							
-			Object[] myCourse = null;
-			CourseResultView courseResultView = null;
-			CourseView courseView = null;
-			long result = 0;
-			int statusUser = 0;
-			String url = null;
-			while (itr.hasNext()) {
-				myCourse = itr.next();
-
-				courseView = new CourseView(((BigInteger)myCourse[0]).longValue(), (String)myCourse[2], ((BigInteger)myCourse[6]).longValue(), (String)myCourse[10]);
-				if(Validator.isNotNull(myCourse[5])){
-					try{
-						FileEntry fileEntry = DLAppLocalServiceUtil.getFileEntry(((BigInteger)myCourse[5]).longValue());
-						courseView.setLogoURL(DLUtil.getPreviewURL(fileEntry, fileEntry.getFileVersion(), themeDisplay, StringPool.BLANK) );
-					}catch(Exception e){}
-				}else{
-					Group groupCourse= GroupLocalServiceUtil.getGroup(((BigInteger)myCourse[6]).longValue());
-					if(groupCourse.getPublicLayoutSet().getLogo()){
-						log.debug("Lo tiene el group");
-						courseView.setLogoURL("/image/layout_set_logo?img_id=" + groupCourse.getPublicLayoutSet().getLogoId());
-					}	
+			try{
+				
+				session = openSession();
+				
+				String sql = CustomSQLUtil.get(MY_COURSES);
+				
+				StringBundler sb = new StringBundler();
+	
+				sb.append(StringPool.OPEN_PARENTHESIS);
+				sb.append(replaceJoinAndWhere(sql, params, themeDisplay.getLanguageId(), themeDisplay.getCompanyId()));
+				sb.append(StringPool.CLOSE_PARENTHESIS);
+				
+				sql = sb.toString();
+				
+				sql = replaceLanguage(sql, themeDisplay.getLanguageId());
+				
+				String filterCourses = StringPool.BLANK;
+				
+				if(coursesInProgress && !coursesCompleted && !coursesExpired) {
+					filterCourses += " AND " + CustomSQLUtil.get(WHERE_PASSED_DATE_IS_NULL);
+				}
+				if((coursesInProgress || coursesCompleted) && !coursesExpired) {
+					filterCourses += " AND " + CustomSQLUtil.get(WHERE_COURSES_IN_PROGRESS);
+				}
+				if(coursesCompleted && !coursesInProgress && !coursesExpired) {
+					filterCourses += " AND " + CustomSQLUtil.get(WHERE_PASSED_DATE_NOT_NULL);
+				}
+				if(coursesExpired && !coursesInProgress && !coursesCompleted) {
+					filterCourses += " AND " + CustomSQLUtil.get(WHERE_COURSES_FINISHED);
+				}
+				if(!coursesInProgress && coursesCompleted && coursesExpired) {
+					filterCourses += " AND (" + CustomSQLUtil.get(WHERE_PASSED_DATE_NOT_NULL) + " OR " + CustomSQLUtil.get(WHERE_COURSES_FINISHED) + ")";
 				}
 				
-				url = themeDisplay.getPortalURL()+"/"+themeDisplay.getLocale().getLanguage()+"/web" + (String)myCourse[7];
-			     
-			    if(themeDisplay.isImpersonated()){
-			    	String doAsUserId = "?doAsUserId=".concat(URLEncoder.encode(themeDisplay.getDoAsUserId(),"UTF-8"));
-			    	url+=doAsUserId; 
-			    }
-			    courseView.setUrl(url);
-			    courseView.setExecutionStartDate((Date)myCourse[8]);
-			    courseView.setExecutionEndDate((Date)myCourse[9]);
-				result = ((BigInteger)myCourse[4]).longValue();
-				statusUser = Integer.parseInt((String)myCourse[3]);
-				courseResultView = new CourseResultView(courseView, result, statusUser);
+				sql = sql.replace("[$FILTER_COURSES$]", filterCourses);
+						
+				SimpleDateFormat parseDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+				String date = parseDate.format(new Date());
 				
-				listMyCourses.add(courseResultView);
-			}
+				sql = sql.replace("[$DATENOW$]", date);
+				
+				if(Validator.isNull(orderByColumn)){
+					orderByColumn = "Lms_Course.courseId";
+				}
+				
+				if(Validator.isNull(orderByType))
+					orderByType = "";
+				
+				if(Validator.isNotNull(orderByColumn)){
+					if(orderByColumn.startsWith("c.")){
+						orderByColumn = StringUtil.replaceFirst(orderByColumn, "c.", "Lms_Course.");
+					}
+					if(orderByColumn.contains(" c.")){
+						orderByColumn = StringUtil.replaceFirst(orderByColumn, " c.", " Lms_Course.");
+					}
+					if(orderByColumn.contains("(c.")){
+						orderByColumn = StringUtil.replaceFirst(orderByColumn, "(c.", "(Lms_Course.");
+					}
+					if(orderByColumn.contains(",c.")){
+						orderByColumn = StringUtil.replaceFirst(orderByColumn, ",c.", ",Lms_Course.");
+					}
+					sql += " ORDER BY " + orderByColumn + " " + orderByType;
+				}
+				
+				if(start >= 0 && end >= 0){
+					sql += " LIMIT " + start + "," + (end-start);
+				}
 			
-			
-			
-		} catch (Exception e) {
-	       e.printStackTrace();
-	    } finally {
-	        closeSession(session);
-	    }
+				if(log.isDebugEnabled()){
+					log.debug("sql: " + sql);
+					log.debug("groupId: " + groupId);
+					log.debug("userId: " + userId);
+				}
+				
+				SQLQuery q = session.createSQLQuery(sql);
+				
+				QueryPos qPos = QueryPos.getInstance(q);
+				qPos.add(userId);
+				qPos.add(userId);
+				
+				setJoin(qPos, params);
+				
+				qPos.add(groupId);
+				qPos.add(groupId);
+				
+				Iterator<Object[]> itr =  q.iterate();
+								
+				Object[] myCourse = null;
+				CourseResultView courseResultView = null;
+				CourseView courseView = null;
+				long result = 0;
+				int statusUser = 0;
+				String url = null;
+				Date passedDate = null;
+				
+				while (itr.hasNext()) {
+					myCourse = itr.next();
+	
+					courseView = new CourseView(((BigInteger)myCourse[0]).longValue(), (String)myCourse[2], ((BigInteger)myCourse[6]).longValue(), (String)myCourse[10]);
+					if(Validator.isNotNull(myCourse[5])){
+						try{
+							FileEntry fileEntry = DLAppLocalServiceUtil.getFileEntry(((BigInteger)myCourse[5]).longValue());
+							courseView.setLogoURL(DLUtil.getPreviewURL(fileEntry, fileEntry.getFileVersion(), themeDisplay, StringPool.BLANK) );
+						}catch(Exception e){}
+					}else{
+						Group groupCourse= GroupLocalServiceUtil.getGroup(((BigInteger)myCourse[6]).longValue());
+						if(groupCourse.getPublicLayoutSet().getLogo()){
+							log.debug("Lo tiene el group");
+							courseView.setLogoURL("/image/layout_set_logo?img_id=" + groupCourse.getPublicLayoutSet().getLogoId());
+						}	
+					}
+					
+					url = themeDisplay.getPortalURL()+"/"+themeDisplay.getLocale().getLanguage()+"/web" + (String)myCourse[7];
+				     
+				    if(themeDisplay.isImpersonated()){
+				    	String doAsUserId = "?doAsUserId=".concat(URLEncoder.encode(themeDisplay.getDoAsUserId(),"UTF-8"));
+				    	url+=doAsUserId; 
+				    }
+				    courseView.setUrl(url);
+				    courseView.setExecutionStartDate((Date)myCourse[8]);
+				    courseView.setExecutionEndDate((Date)myCourse[9]);
+					result = ((BigInteger)myCourse[4]).longValue();
+					statusUser = Integer.parseInt((String)myCourse[3]);
+					passedDate = (Date)myCourse[11];
+					courseResultView = new CourseResultView(courseView, result, statusUser, passedDate);
+					
+					listMyCourses.add(courseResultView);
+				}
+				
+				
+				
+			} catch (Exception e) {
+		       e.printStackTrace();
+		    } finally {
+		        closeSession(session);
+		    }
+		}
 	
 		return listMyCourses;
 	}
@@ -1483,7 +1515,9 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 		return countValue;
 	}
 	
-	public int countMyCourses(long groupId, long userId, boolean showFinished, LinkedHashMap<String, Object> params, ThemeDisplay themeDisplay){
+	public int countMyCourses(long groupId, long userId, boolean coursesInProgress, boolean coursesCompleted, boolean coursesExpired, 
+			LinkedHashMap<String, Object> params){
+		
 		Session session = null;
 		int countValue = 0;
 		try{
@@ -1495,16 +1529,30 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			StringBundler sb = new StringBundler();
 
 			sb.append(StringPool.OPEN_PARENTHESIS);
-			sb.append(replaceJoinAndWhere(sql, params, themeDisplay.getLanguageId(), themeDisplay.getCompanyId()));
+			sb.append(replaceJoinAndWhere(sql, params, null, 0));
 			sb.append(StringPool.CLOSE_PARENTHESIS);
 			
 			sql = sb.toString();
 			
-			String passed = StringPool.BLANK;            
-            if (!showFinished) {
-                passed = CustomSQLUtil.get(WHERE_PASSED_IS_NULL);
-            }
-            sql = sql.replace("[$PASSED$]", passed);
+			String filterCourses = StringPool.BLANK;
+			
+			if(coursesInProgress && !coursesCompleted && !coursesExpired) {
+				filterCourses += " AND " + CustomSQLUtil.get(WHERE_PASSED_DATE_IS_NULL);
+			}
+			if((coursesInProgress || coursesCompleted) && !coursesExpired) {
+				filterCourses += " AND " + CustomSQLUtil.get(WHERE_COURSES_IN_PROGRESS);
+			}
+			if(coursesCompleted && !coursesInProgress && !coursesExpired) {
+				filterCourses += " AND " + CustomSQLUtil.get(WHERE_PASSED_DATE_NOT_NULL);
+			}
+			if(coursesExpired && !coursesInProgress && !coursesCompleted) {
+				filterCourses += " AND " + CustomSQLUtil.get(WHERE_COURSES_FINISHED);
+			}
+			if(!coursesInProgress && coursesCompleted && coursesExpired) {
+				filterCourses += " AND (" + CustomSQLUtil.get(WHERE_PASSED_DATE_NOT_NULL) + " OR " + CustomSQLUtil.get(WHERE_COURSES_FINISHED) + ")";
+			}
+			
+			sql = sql.replace("[$FILTER_COURSES$]", filterCourses);
 			
 			SimpleDateFormat parseDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 			String date = parseDate.format(new Date());

@@ -31,7 +31,7 @@
 				IF(EXTRACTVALUE(Lms_Course.title, '//Title[@language-id=\"[$LANGUAGE$]\"]') != '', EXTRACTVALUE(Lms_Course.title, '//Title[@language-id=\"[$LANGUAGE$]\"]'), IF(EXTRACTVALUE(Lms_Course.title, '//root[@default-locale]//Title') != '', EXTRACTVALUE(Lms_Course.title, '//root[@default-locale]//Title'), Lms_Course.title )) AS courseTitle,
 				CASE WHEN r.crId IS NULL THEN '0' WHEN r.passedDate IS NULL THEN '1' WHEN r.passedDate IS NOT NULL AND r.passed = 0 THEN '2' WHEN r.passed = 1 AND r.passedDate IS NOT NULL THEN '3' ELSE '0' END AS statusUser,
 				CASE WHEN r.crId IS NULL THEN 0 ELSE r.result END AS result, Lms_Course.icon, Lms_Course.groupCreatedId, Lms_Course.friendlyURL,
-				Lms_Course.executionStartDate, Lms_Course.executionEndDate, asset.summary
+				Lms_Course.executionStartDate, Lms_Course.executionEndDate, asset.summary, r.passedDate
 			FROM 
 				Lms_course
 			INNER JOIN classname_ classname ON classname.value='com.liferay.lms.model.Course'
@@ -45,11 +45,8 @@
 			[$JOIN$]
 			WHERE 
 				[$WHERE$]
-				Lms_Course.closed = 0 
-				AND Lms_Course.executionEndDate > '[$DATENOW$]'
-				AND (r.crId IS NULL OR r.allowFinishDate IS NULL OR r.allowFinishDate > '[$DATENOW$]')
-				AND (Lms_Course.groupId = ? OR ? <= 0)
-				[$PASSED$]
+				(Lms_Course.groupId = ? OR ? <= 0)
+				[$FILTER_COURSES$]
 			GROUP By 
 				Lms_Course.courseId
 		]]>
@@ -69,11 +66,22 @@
 			[$JOIN$]
 			WHERE 
 				[$WHERE$]
-				Lms_Course.closed = 0 
+				(Lms_Course.groupId = ? OR ? <= 0)
+				[$FILTER_COURSES$]
+		]]>
+	</sql>
+	<sql id="com.liferay.lms.service.persistence.CourseFinder.coursesInProgress">
+		<![CDATA[
+			Lms_Course.closed = 0 
 				AND Lms_Course.executionEndDate > '[$DATENOW$]'
-				AND (r.crId IS NULL OR r.allowFinishDate IS NULL OR r.allowFinishDate > '[$DATENOW$]')
-				AND (Lms_Course.groupId = ? OR ? <= 0)
-				[$PASSED$]
+				AND (r.crId IS NULL OR r.allowFinishDate IS NULL OR r.allowFinishDate > '[$DATENOW$]') 
+		]]>
+	</sql>
+	<sql id="com.liferay.lms.service.persistence.CourseFinder.coursesFinished">
+		<![CDATA[
+		 (Lms_Course.closed = 1 
+					OR Lms_Course.executionEndDate < '[$DATENOW$]' 
+					OR r.allowFinishDate < '[$DATENOW$]' )
 		]]>
 	</sql>
 	<sql id="com.liferay.lms.service.persistence.CourseFinder.getExistingUserCourses">
@@ -310,9 +318,14 @@
 				(group_.type_ IN ([$TYPE$]))
 		]]>
 	</sql>
-	<sql id="com.liferay.lms.service.persistence.CourseFinder.wherePassedIsNull">
+	<sql id="com.liferay.lms.service.persistence.CourseFinder.wherePassedDateIsNull">
 		<![CDATA[
-			AND (r.passedDate IS NULL)
+			(r.passedDate IS NULL)
+		]]>
+	</sql>	
+	<sql id="com.liferay.lms.service.persistence.CourseFinder.wherePassedDateNotNull">
+		<![CDATA[
+			(r.passedDate IS NOT NULL)
 		]]>
 	</sql>	
 	<sql id="com.liferay.lms.service.persistence.CourseFinder.joinCustomAttribute">
