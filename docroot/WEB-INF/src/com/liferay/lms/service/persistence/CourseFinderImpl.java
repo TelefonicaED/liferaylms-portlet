@@ -100,6 +100,12 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 	public static final String COUNT_TEACHERS = 
 			CourseFinder.class.getName() +
 				".countTeachers";
+	public static final String WHERE_COURSETYPE = 
+        CourseFinder.class.getName() + 
+            ".whereCourseType";	
+	public static final String WHERE_PASSED_IS_NULL = 
+        CourseFinder.class.getName() + 
+            ".wherePassedIsNull";
 	public static final String WHERE_VISIBLE = 
 			CourseFinder.class.getName() + 
 				".whereVisible";
@@ -295,7 +301,7 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 		
 		if(params.containsKey(CourseParams.PARAM_CATEGORIES) || params.containsKey(CourseParams.PARAM_TAGS) ||
 				params.containsKey(CourseParams.PARAM_AND_CATEGORIES) || params.containsKey(CourseParams.PARAM_AND_TAGS)
-				|| params.containsKey(CourseParams.PARAM_VISIBLE)){
+				|| params.containsKey(CourseParams.PARAM_COURSETYPE) || params.containsKey(CourseParams.PARAM_VISIBLE)){
 			String join = CustomSQLUtil.get(JOIN_BY_ASSET_ENTRY);
 			long classNameId = ClassNameLocalServiceUtil.getClassNameId(Course.class.getName());
 			join = StringUtil.replace(join, "[$CLASSNAMEID$]", String.valueOf(classNameId));
@@ -498,6 +504,20 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 		else if (key.equals(CourseParams.PARAM_VISIBLE)) {
 			join = CustomSQLUtil.get(WHERE_VISIBLE);
 		}
+		else if (key.equals(CourseParams.PARAM_COURSETYPE)) {
+            join = CustomSQLUtil.get(WHERE_COURSETYPE);
+            if(value instanceof Integer){
+                join = StringUtil.replace(join, "IN [$TYPE$]", "= ?");
+            }else if(value instanceof int[]){
+                int[] types = (int[])value;
+                String typePos = StringPool.BLANK;
+                for(long type: types){
+                    typePos += "?,";
+                }
+                if(typePos.length() > 0) typePos = typePos.substring(0, typePos.length()-1);
+                join = StringUtil.replace(join, "[$TYPE$]", typePos);
+            }
+        }
 		else if (key.equals(CourseParams.PARAM_TYPE)) {
 			join = CustomSQLUtil.get(WHERE_TYPE);
 			if(value instanceof Integer){
@@ -1245,7 +1265,7 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 		return false;
 	}
 	
-	public List<CourseResultView> getMyCourses(long groupId, long userId, LinkedHashMap<String, Object> params, ThemeDisplay themeDisplay, String orderByColumn, String orderByType, int start, int end){
+	public List<CourseResultView> getMyCourses(long groupId, long userId, boolean showFinished, LinkedHashMap<String, Object> params, ThemeDisplay themeDisplay, String orderByColumn, String orderByType, int start, int end){
 		Session session = null;
 		List<CourseResultView> listMyCourses = new ArrayList<CourseResultView>();
 		
@@ -1264,6 +1284,12 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			sql = sb.toString();
 			
 			sql = replaceLanguage(sql, themeDisplay.getLanguageId());
+			
+			String passed = StringPool.BLANK;			
+			if (!showFinished) {
+			    passed = CustomSQLUtil.get(WHERE_PASSED_IS_NULL);
+			}
+			sql = sql.replace("[$PASSED$]", passed);
 					
 			SimpleDateFormat parseDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 			String date = parseDate.format(new Date());
@@ -1308,6 +1334,9 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			QueryPos qPos = QueryPos.getInstance(q);
 			qPos.add(userId);
 			qPos.add(userId);
+			
+			setJoin(qPos, params);
+			
 			qPos.add(groupId);
 			qPos.add(groupId);
 			
@@ -1454,7 +1483,7 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 		return countValue;
 	}
 	
-	public int countMyCourses(long groupId, long userId, LinkedHashMap<String, Object> params, ThemeDisplay themeDisplay){
+	public int countMyCourses(long groupId, long userId, boolean showFinished, LinkedHashMap<String, Object> params, ThemeDisplay themeDisplay){
 		Session session = null;
 		int countValue = 0;
 		try{
@@ -1471,6 +1500,12 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			
 			sql = sb.toString();
 			
+			String passed = StringPool.BLANK;            
+            if (!showFinished) {
+                passed = CustomSQLUtil.get(WHERE_PASSED_IS_NULL);
+            }
+            sql = sql.replace("[$PASSED$]", passed);
+			
 			SimpleDateFormat parseDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 			String date = parseDate.format(new Date());
 			
@@ -1486,7 +1521,8 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			
 			QueryPos qPos = QueryPos.getInstance(q);
 			qPos.add(userId);
-			qPos.add(userId);
+			qPos.add(userId);			
+			setJoin(qPos, params);			
 			qPos.add(groupId);
 			qPos.add(groupId);
 			
