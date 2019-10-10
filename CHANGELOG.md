@@ -5,6 +5,10 @@ El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 
 ## [4.0.0](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v4.0.0)
 
+### Added
+
+- #167833 Añadidos los servicios countActiveByCompanyIdClassNameIdClassPK y getActiveByCompanyIdClassNameIdClassPK para ver los procesos que están actualmente en curso para una acción.
+
 ### Updated
 
 - #167994 Unificación del servicio de mis cursos para usar el mismo finder para mis cursos y mis cursos finalizados. Se modifica el resgistry de los métodos de calificación para que busque siempre los métodos de calificación que están dentro del LMS en su contexto, independientemente de donde se llamen.

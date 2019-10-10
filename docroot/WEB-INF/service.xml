@@ -822,6 +822,13 @@
     	<column name="status" type="int" />
     	<column name="statusMessage" type="String" localized="true"/>
     	<column name="extraContent" type="String" />
+    	
+    	<finder name="CompanyIdClassNameIdClassPKStatus" return-type="Collection">
+			<finder-column name="companyId"/>
+			<finder-column name="classNameId"/>
+			<finder-column name="classPK"/>
+			<finder-column name="status"/>
+		</finder>
     </entity>
     
     <entity name="CourseType"  local-service="true" remote-service="true" json-enabled="false">

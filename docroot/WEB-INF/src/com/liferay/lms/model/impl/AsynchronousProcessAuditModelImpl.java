@@ -91,7 +91,13 @@ public class AsynchronousProcessAuditModelImpl extends BaseModelImpl<Asynchronou
 	public static final boolean FINDER_CACHE_ENABLED = GetterUtil.getBoolean(com.liferay.util.service.ServiceProps.get(
 				"value.object.finder.cache.enabled.com.liferay.lms.model.AsynchronousProcessAudit"),
 			true);
-	public static final boolean COLUMN_BITMASK_ENABLED = false;
+	public static final boolean COLUMN_BITMASK_ENABLED = GetterUtil.getBoolean(com.liferay.util.service.ServiceProps.get(
+				"value.object.column.bitmask.enabled.com.liferay.lms.model.AsynchronousProcessAudit"),
+			true);
+	public static long CLASSNAMEID_COLUMN_BITMASK = 1L;
+	public static long CLASSPK_COLUMN_BITMASK = 2L;
+	public static long COMPANYID_COLUMN_BITMASK = 4L;
+	public static long STATUS_COLUMN_BITMASK = 8L;
 	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(com.liferay.util.service.ServiceProps.get(
 				"lock.expiration.time.com.liferay.lms.model.AsynchronousProcessAudit"));
 
@@ -225,7 +231,19 @@ public class AsynchronousProcessAuditModelImpl extends BaseModelImpl<Asynchronou
 	}
 
 	public void setCompanyId(long companyId) {
+		_columnBitmask |= COMPANYID_COLUMN_BITMASK;
+
+		if (!_setOriginalCompanyId) {
+			_setOriginalCompanyId = true;
+
+			_originalCompanyId = _companyId;
+		}
+
 		_companyId = companyId;
+	}
+
+	public long getOriginalCompanyId() {
+		return _originalCompanyId;
 	}
 
 	public String getType() {
@@ -264,7 +282,19 @@ public class AsynchronousProcessAuditModelImpl extends BaseModelImpl<Asynchronou
 	}
 
 	public void setClassNameId(long classNameId) {
+		_columnBitmask |= CLASSNAMEID_COLUMN_BITMASK;
+
+		if (!_setOriginalClassNameId) {
+			_setOriginalClassNameId = true;
+
+			_originalClassNameId = _classNameId;
+		}
+
 		_classNameId = classNameId;
+	}
+
+	public long getOriginalClassNameId() {
+		return _originalClassNameId;
 	}
 
 	public long getClassPK() {
@@ -272,7 +302,19 @@ public class AsynchronousProcessAuditModelImpl extends BaseModelImpl<Asynchronou
 	}
 
 	public void setClassPK(long classPK) {
+		_columnBitmask |= CLASSPK_COLUMN_BITMASK;
+
+		if (!_setOriginalClassPK) {
+			_setOriginalClassPK = true;
+
+			_originalClassPK = _classPK;
+		}
+
 		_classPK = classPK;
+	}
+
+	public long getOriginalClassPK() {
+		return _originalClassPK;
 	}
 
 	public long getUserId() {
@@ -312,7 +354,19 @@ public class AsynchronousProcessAuditModelImpl extends BaseModelImpl<Asynchronou
 	}
 
 	public void setStatus(int status) {
+		_columnBitmask |= STATUS_COLUMN_BITMASK;
+
+		if (!_setOriginalStatus) {
+			_setOriginalStatus = true;
+
+			_originalStatus = _status;
+		}
+
 		_status = status;
+	}
+
+	public int getOriginalStatus() {
+		return _originalStatus;
 	}
 
 	public String getStatusMessage() {
@@ -420,6 +474,10 @@ public class AsynchronousProcessAuditModelImpl extends BaseModelImpl<Asynchronou
 		_extraContent = extraContent;
 	}
 
+	public long getColumnBitmask() {
+		return _columnBitmask;
+	}
+
 	@Override
 	public ExpandoBridge getExpandoBridge() {
 		return ExpandoBridgeFactoryUtil.getExpandoBridge(getCompanyId(),
@@ -518,6 +576,25 @@ public class AsynchronousProcessAuditModelImpl extends BaseModelImpl<Asynchronou
 
 	@Override
 	public void resetOriginalValues() {
+		AsynchronousProcessAuditModelImpl asynchronousProcessAuditModelImpl = this;
+
+		asynchronousProcessAuditModelImpl._originalCompanyId = asynchronousProcessAuditModelImpl._companyId;
+
+		asynchronousProcessAuditModelImpl._setOriginalCompanyId = false;
+
+		asynchronousProcessAuditModelImpl._originalClassNameId = asynchronousProcessAuditModelImpl._classNameId;
+
+		asynchronousProcessAuditModelImpl._setOriginalClassNameId = false;
+
+		asynchronousProcessAuditModelImpl._originalClassPK = asynchronousProcessAuditModelImpl._classPK;
+
+		asynchronousProcessAuditModelImpl._setOriginalClassPK = false;
+
+		asynchronousProcessAuditModelImpl._originalStatus = asynchronousProcessAuditModelImpl._status;
+
+		asynchronousProcessAuditModelImpl._setOriginalStatus = false;
+
+		asynchronousProcessAuditModelImpl._columnBitmask = 0;
 	}
 
 	@Override
@@ -675,16 +752,25 @@ public class AsynchronousProcessAuditModelImpl extends BaseModelImpl<Asynchronou
 		};
 	private long _asynchronousProcessAuditId;
 	private long _companyId;
+	private long _originalCompanyId;
+	private boolean _setOriginalCompanyId;
 	private String _type;
 	private long _classNameId;
+	private long _originalClassNameId;
+	private boolean _setOriginalClassNameId;
 	private long _classPK;
+	private long _originalClassPK;
+	private boolean _setOriginalClassPK;
 	private long _userId;
 	private String _userUuid;
 	private Date _createDate;
 	private Date _endDate;
 	private int _status;
+	private int _originalStatus;
+	private boolean _setOriginalStatus;
 	private String _statusMessage;
 	private String _statusMessageCurrentLanguageId;
 	private String _extraContent;
+	private long _columnBitmask;
 	private AsynchronousProcessAudit _escapedModelProxy;
 }
