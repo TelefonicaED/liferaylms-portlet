@@ -110,63 +110,64 @@ public class UserDaysInscriptionType extends BaseInscriptionType{
 
 	@Override
 	public String getAllowedTime(long courseId, long userId, Locale locale) {
+	    log.debug("*******getAllowedTime**********");
 		String message = StringPool.BLANK;
 		try {
 			CourseResult courseResult = CourseResultLocalServiceUtil.getCourseResultByCourseAndUser(courseId, userId);
-			Course course = CourseLocalServiceUtil.fetchCourse(courseId);		
-			
-			boolean isSubscribed = GroupLocalServiceUtil.hasUserGroup(userId, course.getGroupCreatedId());			
-			if (isSubscribed) {			    
-			    if (Validator.isNotNull(courseResult) && Validator.isNotNull(courseResult.getAllowFinishDate())) {
-	                
-	                Date allowFinishDate = courseResult.getAllowFinishDate();
-	                Date nowDate = new Date();
-	                
-	                long time = allowFinishDate.getTime() - nowDate.getTime();
-	                
-	                if (time > 0) {
-	                    long daysCount = time / (24 * 60 * 60 * 1000);
-	                    if (daysCount == 0) {
-	                        long hoursCount = time / (60 * 60 * 1000);
-	                        if (hoursCount > 1) {
-	                            message = LanguageUtil.format(locale, "inscriptioncommunity.allowed-time-hours", hoursCount);
-	                        }
-	                        else {
-	                            message = LanguageUtil.format(locale, "inscriptioncommunity.allowed-time-hour", hoursCount);
-	                        }                       
-	                    } else {
-	                        if (daysCount > 1) {
-	                            message = LanguageUtil.format(locale, "inscriptioncommunity.allowed-time-days", daysCount);
-	                        }
-	                        else {
-	                            message = LanguageUtil.format(locale, "inscriptioncommunity.allowed-time-day", daysCount);
-	                        }                       
-	                    }
-	                } else {
-	                    // Ya finalizo el tiempo, si no ha aprobado => Opcion inscribir
-	                    message = LanguageUtil.get(locale, "inscriptioncommunity.allowed-time-finish");
-	                }
-	                
-	            }
-			    else {
-			        // no ha empezado el curso
-	                
-	                if (Validator.isNotNull(course)) {
-	                    int days = PrefsPropsUtil.getInteger(course.getGroupCreatedId(), "inscription-days");
-	                    message = LanguageUtil.format(locale, "inscriptioncommunity.allowed-time-not-started", days);
-	                }			        
-			    }			    
+			Course course = CourseLocalServiceUtil.fetchCourse(courseId);			
+			boolean isSubscribed = GroupLocalServiceUtil.hasUserGroup(userId, course.getGroupCreatedId());		
+			log.debug("isSubscribed: " + isSubscribed);
+			if (isSubscribed) {
+			    if (Validator.isNotNull(courseResult)) {
+			        log.debug("passed: " + courseResult.isPassed());
+			        log.debug("allowFinishDate: " + courseResult.getAllowFinishDate());
+			        if (Validator.isNull(courseResult.getPassedDate()) && Validator.isNotNull(courseResult.getAllowFinishDate())) {
+			            log.debug("started");
+			            Date allowFinishDate = courseResult.getAllowFinishDate();
+                        Date nowDate = new Date();
+                        
+                        long time = allowFinishDate.getTime() - nowDate.getTime();
+                        
+                        if (time > 0) {
+                            long daysCount = time / (24 * 60 * 60 * 1000);
+                            if (daysCount == 0) {
+                                long hoursCount = time / (60 * 60 * 1000);
+                                if (hoursCount > 1) {
+                                    message = LanguageUtil.format(locale, "inscriptioncommunity.allowed-time-hours", hoursCount);
+                                }
+                                else {
+                                    message = LanguageUtil.format(locale, "inscriptioncommunity.allowed-time-hour", hoursCount);
+                                }                       
+                            } else {
+                                if (daysCount > 1) {
+                                    message = LanguageUtil.format(locale, "inscriptioncommunity.allowed-time-days", daysCount);
+                                }
+                                else {
+                                    message = LanguageUtil.format(locale, "inscriptioncommunity.allowed-time-day", daysCount);
+                                }                       
+                            }
+                        } else {
+                            // Ya finalizo el tiempo, si no ha aprobado => Opcion inscribir
+                            message = LanguageUtil.get(locale, "inscriptioncommunity.allowed-time-finish");
+                        }
+			        }
+			    } else {
+			        log.debug("not-started");
+                    // no ha empezado el curso                  
+                    if (Validator.isNotNull(course)) {
+                        int days = PrefsPropsUtil.getInteger(course.getGroupCreatedId(), "inscription-days");
+                        message = LanguageUtil.format(locale, "inscriptioncommunity.allowed-time-not-started", days);
+                    }                   
+                }			    
 			} else {				
 				// Aun no esta inscrito en el curso
 				if (Validator.isNotNull(course)) {
 					int days = PrefsPropsUtil.getInteger(course.getGroupCreatedId(), "inscription-days");
 					message = LanguageUtil.format(locale, "inscriptioncommunity.allowed-time-info", days);
 				}
-				
-			}
-			
+			}		
 		} catch (SystemException e) {
-			e.printStackTrace();
+			log.error(e);
 		}
 		
 		return message;

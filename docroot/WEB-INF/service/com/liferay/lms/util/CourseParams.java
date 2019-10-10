@@ -39,6 +39,10 @@ public class CourseParams {
 	 */
 	public static final String PARAM_PERMISSIONS_VIEW = "permissionsView";
 	/**
+     * Filtrar con el tipo de curso
+     */
+    public static final String PARAM_COURSETYPE = "courseType";
+	/**
 	 * Filtrar con el tipo de registro
 	 */
 	public static final String PARAM_TYPE = "type";
