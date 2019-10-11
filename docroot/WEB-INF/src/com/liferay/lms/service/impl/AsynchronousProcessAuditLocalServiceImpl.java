@@ -24,6 +24,7 @@ import com.liferay.lms.service.persistence.AsynchronousProcessAuditFinderUtil;
 import com.liferay.lms.util.LmsConstant;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
+import com.liferay.portal.service.ClassNameLocalServiceUtil;
 
 /**
  * The implementation of the asynchronous process audit local service.
@@ -121,8 +122,14 @@ public class AsynchronousProcessAuditLocalServiceImpl
 			asynchronousProcessAudit.setCompanyId(companyId);
 			asynchronousProcessAudit.setType(type);
 			asynchronousProcessAudit.setUserId(userId);
-			asynchronousProcessAudit.setClassName(classNameValue);
+			if(ClassNameLocalServiceUtil.fetchClassName(classNameValue)!=null){
+				asynchronousProcessAudit.setClassName(classNameValue);
+			}else{
+				asynchronousProcessAudit.setClassNameId(classNameId);
+			}
+			
 			asynchronousProcessAudit.setCreateDate(new Date());
+			asynchronousProcessAudit.setClassPK(classPK);
 			asynchronousProcessAudit.setStatus(LmsConstant.STATUS_NOT_STARTED);
 			
 			asynchronousProcessAudit =asynchronousProcessAuditPersistence.update(asynchronousProcessAudit, true);
