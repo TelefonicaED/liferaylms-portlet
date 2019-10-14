@@ -9,6 +9,8 @@ import javax.portlet.PortletPreferences;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 
+import com.liferay.lms.course.adminaction.AdminActionType;
+import com.liferay.lms.course.adminaction.AdminActionTypeRegistry;
 import com.liferay.lms.model.Course;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -94,6 +96,23 @@ public class CourseAdminConfigurationAction implements ConfigurationAction {
 		
 		portletPreferences.setValue("showExpandos", Boolean.toString(ParamUtil.getBoolean(actionRequest, "showExpandos", false)));
 		portletPreferences.setValue("showExpandosEdition", Boolean.toString(ParamUtil.getBoolean(actionRequest, "showExpandosEdition", false)));
+		
+		//Mostrar acciones dinámicas
+		try{
+			AdminActionTypeRegistry registry =  new AdminActionTypeRegistry();
+			 List<AdminActionType> types =  registry.getAdminActionTypes();
+			 if(types!=null&& types.size()>0){
+				for(AdminActionType type : types){
+					portletPreferences.setValue("show"+type.getTypeId(), Boolean.toString(ParamUtil.getBoolean(actionRequest, "show"+type.getTypeId(), true)));
+				
+				}
+			 }
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		
+		
+		
 		
 		//Campos personalizados a mostrar en la tabla
 		// Expandos dinamicos

@@ -1,3 +1,5 @@
+<%@page import="com.liferay.lms.course.adminaction.AdminActionType"%>
+<%@page import="com.liferay.lms.course.adminaction.AdminActionTypeRegistry"%>
 <%@page import="com.liferay.portlet.expando.model.ExpandoTableConstants"%>
 <%@page import="com.liferay.portal.kernel.util.DateUtil"%>
 <%@page import="com.liferay.portlet.expando.model.ExpandoColumnConstants"%>
@@ -115,6 +117,23 @@
 		<aui:input type="checkbox" name="showExport" label="courseadmin.config.showExport"	value="<%=showExport %>" checked="<%=showExport %>"/>
 		<aui:input type="checkbox" name="showImport" label="courseadmin.config.showImport" 	value="<%=showImport %>" checked="<%=showImport %>"/>
 		<aui:input type="checkbox" name="showClone" label="courseadmin.config.showClone" 	value="<%=showClone %>" checked="<%=showClone %>"/>
+		
+		<% 	    AdminActionTypeRegistry registry =  new AdminActionTypeRegistry();
+				List<AdminActionType> types =  registry.getAdminActionTypes();
+				if(types!=null&& types.size()>0){
+					boolean showType = false;
+					String typeName= null;
+					for(AdminActionType type : types){
+						showType = preferences.getValue("show"+type.getTypeId(), "true").equals("true");
+						typeName = "show"+type.getTypeId();
+						%>
+						<aui:input type="checkbox" name="<%=typeName %>" label="<%=type.getName(themeDisplay.getLocale()) %>" value="<%=showType %>" checked="<%=showType %>"/>
+						<%
+					}
+				}
+		%>
+		
+		
 		
 		<aui:input type="checkbox" name="showResume" 		label="courseadmin.config.showResume" 		value="<%=showResume %>" checked="<%=showResume %>"/>
 		<aui:input type="checkbox" name="showDescription" 	label="courseadmin.config.showDescription" 	value="<%=showDescription %>" checked="<%=showDescription %>"/>

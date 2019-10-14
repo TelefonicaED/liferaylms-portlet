@@ -8,6 +8,7 @@ El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 ### Added
 
 - #167833 Añadidos los servicios countActiveByCompanyIdClassNameIdClassPK y getActiveByCompanyIdClassNameIdClassPK para ver los procesos que están actualmente en curso para una acción.
+- #167536 Añadida configuración para ocultar las opciones dinámicas. Se pasan las preferencias al portlet destino para poder utilizarlas.
 
 ### Updated
 
