@@ -180,7 +180,7 @@
 <liferay-ui:header title="${course.getTitle(themeDisplay.getLocale())}" backURL="${backURL }"></liferay-ui:header>
 
 <c:if test="${not empty role}">
-	<h2>${role.getTitle(themeDisplay.getLocale())}</h2>
+	<h2>${tab}</h2>
 </c:if>
 
 <liferay-portlet:renderURL var="searchURL" >

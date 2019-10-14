@@ -29,6 +29,7 @@ El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 - #167628 Cambiada la visualización de los comentarios de la actividad de desarrollo en el gradebook.
 - #107687 Se ordena por peso en la visualización de resultados de los tests y en las correcciones.
 - #160565 Se visualiza correctamente la pregunta combo en las encuestas.
+- #167642 Se establece el literal estudiantes en vez de site member.
 
 ## [3.9.1](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v3.9.1)
 
