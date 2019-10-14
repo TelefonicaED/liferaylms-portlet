@@ -1,3 +1,6 @@
+<%@page import="java.util.Collections"%>
+<%@page import="org.apache.commons.beanutils.BeanComparator"%>
+<%@page import="com.liferay.portal.kernel.util.ListUtil"%>
 <%@page import="com.liferay.lms.learningactivity.calificationtype.CalificationTypeRegistry"%>
 <%@page import="com.liferay.lms.learningactivity.calificationtype.CalificationType"%>
 <%@page import="com.tls.lms.util.LiferaylmsUtil"%>
