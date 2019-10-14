@@ -73,6 +73,7 @@
 %>
 
 <liferay-ui:success key="questions-added-successfully" message="questions.questions-added-successfully" />
+<liferay-ui:success key="question-deleted-successfully" message="question-deleted-successfully" />
 <liferay-util:include page="/html/questions/admin/editHeader.jsp" servletContext="<%=this.getServletContext() %>" />
 
 <script type="text/javascript">

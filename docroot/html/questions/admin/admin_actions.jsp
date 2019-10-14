@@ -29,7 +29,6 @@ QuestionType qt =new QuestionTypeRegistry().getQuestionType(question.getQuestion
 <liferay-portlet:actionURL name="deletequestion" var="deleteURL">
 	<liferay-portlet:param name="questionId" value="<%= primKey %>" />
 	<liferay-portlet:param name="resId" value="<%= actId %>" />
-	<liferay-portlet:param name="backUrl" value="<%= currentURL %>"/>
 </liferay-portlet:actionURL>
 	<liferay-ui:icon-delete url="<%=deleteURL.toString() %>" />
 </liferay-ui:icon-menu>
