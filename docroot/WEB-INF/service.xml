@@ -810,7 +810,7 @@
     	<column name="competenceId" type="long" primary="true" />
     	<column name="downloadDate" type="Date" />
     </entity>
-     <entity name="AsynchronousProcessAudit" local-service="true" remote-service="false">
+     <entity name="AsynchronousProcessAudit" local-service="true" remote-service="false" cache-enabled="false">
     	<column name="asynchronousProcessAuditId" type="long" primary="true"></column>
     	<column name="companyId" type="long"></column>
     	<column name="type" type="String"></column>
