@@ -97,8 +97,10 @@ public class CourseTypeImpl extends CourseTypeBaseImpl {
 		courseTypeInfo += "<li>";
 		courseTypeInfo += "<strong>" + LanguageUtil.get(locale, "courseadmin.coursetype.lms-activities") +  "</strong>";
 		courseTypeInfo += "<p>";
-		for(LearningActivityType leaningActivityType:getLearningActivityTypes())
+		for(LearningActivityType leaningActivityType:getLearningActivityTypes()){
 			courseTypeInfo += LanguageUtil.get(locale, leaningActivityType.getName()) + ", ";
+		}
+			
 		courseTypeInfo = courseTypeInfo.substring(0,courseTypeInfo.length()-2);
 		courseTypeInfo += "</p>";
 		courseTypeInfo += "</li>";
@@ -173,8 +175,11 @@ public class CourseTypeImpl extends CourseTypeBaseImpl {
 	public List<LearningActivityType> getLearningActivityTypes() throws SystemException{
 		List<LearningActivityType> listLearningActivityTypes = new ArrayList<LearningActivityType>();
 		LearningActivityTypeRegistry learningActivityTypeRegistry = new LearningActivityTypeRegistry();
-		for(long learningActivityTypeId:getLearningActivityTypeIds())
-			listLearningActivityTypes.add(learningActivityTypeRegistry.getLearningActivityType(learningActivityTypeId));
+		for(long learningActivityTypeId:getLearningActivityTypeIds()){
+			if(learningActivityTypeRegistry.getLearningActivityType(learningActivityTypeId)!=null){
+				listLearningActivityTypes.add(learningActivityTypeRegistry.getLearningActivityType(learningActivityTypeId));
+			}
+		}		
 		return listLearningActivityTypes;
 	}
 	
