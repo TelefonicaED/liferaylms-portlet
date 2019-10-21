@@ -30,6 +30,8 @@ sb.append("</name>");
 sb.append("<value>");
 sb.append(String.valueOf(portletPreferencesId));
 sb.append("</value>");
+sb.append("</preference>");
+sb.append("<preference>");
 sb.append("<name>");
 sb.append("portletSetupShowBorders");
 sb.append("</name>");
@@ -39,9 +41,8 @@ sb.append("</value>");
 sb.append("</preference>");
 sb.append("</portlet-preferences>");
 %>
+<c:set var="courseId" value ="<%=courseId %>"/>
+<c:set var="delta" value ="<%=delta %>"/>
+<c:set var="cur" value ="<%=cur %>"/>
 
-
-<liferay-portlet:runtime portletName="<%=portletId%>" queryString="courseId=${courseId}&cur=<%=cur %>&delta=<%=delta %>" defaultPreferences="<%=sb.toString() %>"/>
-
-
-
+<liferay-portlet:runtime portletName="<%=portletId%>" queryString="courseId=${courseId}&coursesCur=${cur}&coursesDelta=${delta}" defaultPreferences="<%=sb.toString() %>"/>
