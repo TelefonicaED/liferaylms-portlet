@@ -35,6 +35,7 @@ El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 - #167642 Se establece el literal estudiantes en vez de site member.
 - #164518 Se deja de concatenar la URL en el borrado de preguntas. Se establece el mensaje success.
 - #167845 Se establece el literal y la descripción de la actividad en la previsualización
+- #160872 Se exportan e importan correctamente los permisos de módulos y actividades en la importación de cursos.
 
 ## [3.9.1](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v3.9.1)
 

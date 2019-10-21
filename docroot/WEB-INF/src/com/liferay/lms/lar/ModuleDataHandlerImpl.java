@@ -209,7 +209,7 @@ public class ModuleDataHandlerImpl extends BasePortletDataHandler {
 			log.debug("--------------learningactivity path:"+pathlo);
 			
 			
-			context.addPermissions(Module.class, entry.getModuleId());
+			context.addPermissions(LearningActivity.class, actividad.getActId());
 			
 			if (context.getBooleanParameter(_NAMESPACE, "categories")) {
 				context.addAssetCategories(LearningActivity.class, actividad.getActId());
@@ -324,6 +324,7 @@ public class ModuleDataHandlerImpl extends BasePortletDataHandler {
 					entryOld=entry.getModuleId();
 					newModuleId = importEntry(context,entryElement, entry, relationActivities, hashLearningActivityType);
 					relationModule.put(entryOld, newModuleId);
+					context.importPermissions("com.liferay.lms.model.module", entryOld,newModuleId);
 				} else{
 					log.info("repetidooooo el modulo "+entry.getModuleId());
 				}	
@@ -416,6 +417,7 @@ public class ModuleDataHandlerImpl extends BasePortletDataHandler {
 				newActId = LearningActivityImport.importLearningActivity(context, entryElement, serviceContext, userId, newModule, actElement, larn);
 				//Comprobamos que podamos crear una actividad de ese tipo
 				relationActivities.put(larn.getActId(), newActId);
+				context.importPermissions("com.liferay.lms.model.LearningActivity", larn.getActId(), newActId);
 			}else{
 				log.info("actividad incorrecta: " + larn.getTypeId());
 				throw new NoLearningActivityTypeActiveException("No existe el tipo de actividad: "  + larn.getTypeId());

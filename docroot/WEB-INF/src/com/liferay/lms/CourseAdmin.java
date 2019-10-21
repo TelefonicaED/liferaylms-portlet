@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.TimeZone;
 import java.util.UUID;
 
@@ -58,7 +59,6 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
@@ -823,8 +823,19 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 				throw new LARFileException("Import file does not exist");
 			}
 			String portletId = (String) actionRequest.getAttribute(WebKeys.PORTLET_ID);
-			LayoutServiceUtil.importPortletInfo(themeDisplay.getLayout().getPlid(), groupId,portletId, uploadRequest.getParameterMap(), file);
+			
+
+			Map<String,String[]> parameterMap = uploadRequest.getParameterMap();
+			
+			parameterMap.put(PortletDataHandlerKeys.PERMISSIONS, new String[]{"true"}); 
+			parameterMap.put(PortletDataHandlerKeys.USER_PERMISSIONS,  new String[]{"true"});
+			
+			LayoutServiceUtil.importPortletInfo(themeDisplay.getLayout().getPlid(), groupId,portletId, parameterMap, file);
+			
+					
 			addSuccessMessage(actionRequest, actionResponse);
+			
+			
 			
 			/* Si esta seleccionado el modo de borrar tenemos que progpagar borrado de icono de la clase*/
 			
@@ -1179,5 +1190,7 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 		super.serveResource(request, response);
 	}
 	
+	
+
 }
 

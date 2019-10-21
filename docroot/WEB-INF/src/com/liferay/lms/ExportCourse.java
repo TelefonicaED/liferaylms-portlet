@@ -3,6 +3,7 @@ package com.liferay.lms;
 import java.io.File;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import com.liferay.lms.model.AsynchronousProcessAudit;
 import com.liferay.lms.model.Course;
@@ -10,12 +11,14 @@ import com.liferay.lms.service.AsynchronousProcessAuditLocalServiceUtil;
 import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.lms.util.LmsConstant;
 import com.liferay.portal.kernel.cache.MultiVMPoolUtil;
+import com.liferay.portal.kernel.lar.PortletDataHandlerKeys;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.messaging.Message;
 import com.liferay.portal.kernel.messaging.MessageListener;
 import com.liferay.portal.kernel.messaging.MessageListenerException;
 import com.liferay.portal.kernel.util.FileUtil;
+import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.SystemProperties;
 import com.liferay.portal.model.Role;
 import com.liferay.portal.model.User;
@@ -113,7 +116,10 @@ public class ExportCourse implements MessageListener {
 		log.debug("::EXPORT COURSE::");
 		log.debug("fileName:"+fileName);
 		
-		File source = LayoutLocalServiceUtil.exportPortletInfoAsFile(themeDisplay.getLayout().getPlid(), groupId, themeDisplay.getPortletDisplay().getId(), serviceContext.getRequest().getParameterMap(), null, null);
+		Map<String,String[]> parameterMap = serviceContext.getRequest().getParameterMap();
+		
+		parameterMap.put(PortletDataHandlerKeys.PERMISSIONS, new String[]{"true"}); 
+		File source = LayoutLocalServiceUtil.exportPortletInfoAsFile(themeDisplay.getLayout().getPlid(), groupId, themeDisplay.getPortletDisplay().getId(), parameterMap, null, null);
 		
 		File parentDestination = new File(SystemProperties.get("liferay.home")+"/data/lms_exports/courses/"+themeDisplay.getCompanyId()+"/"+groupId);
 		
