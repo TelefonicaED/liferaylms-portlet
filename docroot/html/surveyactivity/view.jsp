@@ -1,3 +1,8 @@
+<%@page import="com.liferay.portal.kernel.xml.DocumentException"%>
+<%@page import="com.liferay.portal.kernel.util.PropsUtil"%>
+<%@page import="com.liferay.portal.kernel.xml.Document"%>
+<%@page import="com.liferay.portal.kernel.xml.Element"%>
+<%@page import="com.liferay.portal.kernel.xml.SAXReaderUtil"%>
 <%@page import="com.liferay.util.JavaScriptUtil"%>
 <%@page import="java.util.Collections"%>
 <%@page import="org.apache.commons.beanutils.BeanComparator"%>
@@ -122,6 +127,15 @@ textarea {
 									var questionValidators = {
 										questiontype_options : function(question) {
 											return (question.all('div.answer input[type="radio"]:checked').size() > 0);
+										},
+										questiontype_combo : function(question) {
+											var result = true;
+											$('.select').each(function( index ) {
+												  if(this.value == null || this.value == ''|| this.value == ' '){
+													  result = false;
+												  }
+											});
+											return result;
 										}
 									};
 									
@@ -232,26 +246,57 @@ textarea {
 				       <aui:input type="hidden" name="isTablet" value="<%= true %>"/>
 				      <%}
 					
-					
+					String cssClass="";
+					boolean isCombo = false;
+					String formatType = "0";
+					boolean enableOrder = false;
+				
 					for(TestQuestion question:questions){
-						
+							isCombo = false;
 							if( question.getQuestionType() != 7 && question.getQuestionType() != 2 ){
-						%>
-								<div class="question questiontype_options">
-								<div class="questiontext"><%=question.getText() %></div>
-								<%
-								List<TestAnswer> testAnswers= TestAnswerLocalServiceUtil.getTestAnswersByQuestionId(question.getQuestionId());
-								for(TestAnswer answer:testAnswers)
-								{
-								%>
-									<div class="answer"><aui:input id='<%="question_"+question.getQuestionId()%>' type="radio" name='<%="question_"+question.getQuestionId()%>' value="<%=answer.getAnswerId() %>" label="<%=answer.getAnswer() %>"/>
-									</div>
-								<%
+								enableOrder =  StringPool.TRUE.equals(PropsUtil.get("lms.learningactivity.testoption.editformat"));
+								if(question.getExtracontent()!=null && !question.getExtracontent().trim().isEmpty()){
+									try{
+										Document xml = SAXReaderUtil.read(question.getExtracontent());
+										Element ele = xml.getRootElement();
+										formatType = (String) ele.element("formattype").getData();
+										if ( enableOrder && formatType.equals(PropsUtil.get("lms.question.formattype.combo")) ){
+											isCombo=true;
+										}
+									}catch(DocumentException e){
+										e.printStackTrace();
+									}
 								}
-								%>
-								</div>
-								<%
-							} else if( question.getQuestionType() == 7) { %>
+								if(isCombo){%>
+									<div class="question questiontype_combo">
+								<%}else{%>
+									<div class="question questiontype_options">
+								<%}%>
+									<div class="questiontext"><%=question.getText() %></div>
+									<%
+								if(isCombo){%>
+									<select class="answer select" id='<%="question_"+question.getQuestionId()%>' name='<%="question_"+question.getQuestionId()%>' >
+										<option class="selected" value=""><liferay-ui:message key="select"/></option>
+							<%
+								}
+									List<TestAnswer> testAnswers= TestAnswerLocalServiceUtil.getTestAnswersByQuestionId(question.getQuestionId());
+									for(TestAnswer answer:testAnswers){
+										if(isCombo){%>
+											<option  value="<%=answer.getAnswerId()%>"> <%=answer.getAnswer() %></option>
+										<%}else{
+											%>
+											<div class="answer"><aui:input id='<%="question_"+question.getQuestionId()%>' type="radio" name='<%="question_"+question.getQuestionId()%>' value="<%=answer.getAnswerId() %>" label="<%=answer.getAnswer() %>"/>
+											</div>
+										<%
+										}
+									}
+									if(isCombo){%>
+										</select>
+									
+									<%}%>
+									
+									  </div>
+							<%} else if( question.getQuestionType() == 7) { %>
 								<div class="horizontalquestion">
 									<div class="question questiontype_options">
 										<div class="questiontext"><%=question.getText() %>

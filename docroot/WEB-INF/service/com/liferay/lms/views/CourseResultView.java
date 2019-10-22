@@ -1,8 +1,10 @@
 package com.liferay.lms.views;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
+import com.liferay.lms.learningactivity.calificationtype.CalificationTypeRegistry;
 import com.liferay.lms.model.Competence;
 import com.liferay.lms.model.Course;
 import com.liferay.lms.model.CourseCompetence;
@@ -24,12 +26,14 @@ public class CourseResultView {
 	private long result;
 	private int statusUser;
 	private List<Long> competenceIdList;
+	private Date passedDate;
 	
 	public CourseResultView(Course course, CourseResult courseResult, ThemeDisplay themeDisplay){
 		setCourse(new CourseView(course, themeDisplay));
 		if(courseResult != null){
 			setPassed(courseResult.isPassed());
 			setResult(courseResult.getResult());
+			setPassedDate(courseResult.getPassedDate());
 			List<Long> competenceIdList = new ArrayList<Long>();
 			if (courseResult.isPassed()) {
 				// Obtener las competencias asignadas al superar el curso
@@ -59,11 +63,12 @@ public class CourseResultView {
 		}
 	}
 	
-	public CourseResultView(CourseView courseView, long result, int statusUser){
+	public CourseResultView(CourseView courseView, long result, int statusUser, Date passedDate){
 		setCourse(courseView);
 		setResult(result);
 		setStatusUser(statusUser);
 		setPassed(statusUser == STATUS_PASSED);
+		setPassedDate(passedDate);
 
 		List<Long> competenceIdList = new ArrayList<Long>();
 		if (statusUser == STATUS_PASSED) {
@@ -87,6 +92,10 @@ public class CourseResultView {
 			}
 		}
 		setCompetenceIdList(competenceIdList);
+	}
+	
+	public CourseResultView(CourseView courseView, long result, int statusUser){
+		this(courseView, result, statusUser, null);
 	}
 	
 	public CourseView getCourse() {
@@ -127,6 +136,14 @@ public class CourseResultView {
 
 	public void setCompetenceIdList(List<Long> competenceIdList) {
 		this.competenceIdList = competenceIdList;
+	}
+
+	public Date getPassedDate() {
+		return passedDate;
+	}
+
+	public void setPassedDate(Date passedDate) {
+		this.passedDate = passedDate;
 	}
 
 }

@@ -1,7 +1,6 @@
 package com.liferay.lms;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -10,11 +9,8 @@ import javax.portlet.PortletRequestDispatcher;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 
-import com.liferay.lms.model.Course;
-import com.liferay.lms.model.CourseResult;
 import com.liferay.lms.model.LmsPrefs;
 import com.liferay.lms.service.CourseLocalServiceUtil;
-import com.liferay.lms.service.CourseResultLocalServiceUtil;
 import com.liferay.lms.service.LmsPrefsLocalServiceUtil;
 import com.liferay.lms.views.CourseResultView;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
@@ -22,10 +18,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.WebKeys;
-import com.liferay.portal.model.Group;
-import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.util.bridges.mvc.MVCPortlet;
 
@@ -46,57 +39,19 @@ public class CourseHistory extends MVCPortlet
 		
 		ThemeDisplay themeDisplay = (ThemeDisplay)renderRequest.getAttribute(WebKeys.THEME_DISPLAY);
 		
-		List<CourseResultView> courses = new ArrayList<CourseResultView>();
-		try {
-			List<Group> groups = GroupLocalServiceUtil.getUserGroups(themeDisplay.getUserId());
-			
-			Course course = null;
-			CourseResult courseResult = null;
-			Date finishDate=null;
-			Date now = new Date();
-			
-			for(Group groupCourse:groups){
-				
-				course = CourseLocalServiceUtil.fetchByGroupCreatedId(groupCourse.getGroupId());
-				
-				if(course!=null && (course.isClosed() || now.after(course.getExecutionEndDate()))){
-					courseResult=CourseResultLocalServiceUtil.getByUserAndCourse(course.getCourseId(), themeDisplay.getUserId());
-					courses.add(new CourseResultView(course, courseResult, themeDisplay));
-				} else if (course!= null){
-			     	courseResult=CourseResultLocalServiceUtil.getByUserAndCourse(course.getCourseId(), themeDisplay.getUserId());
-
-					finishDate=null;
-					if(courseResult!=null && courseResult.getAllowFinishDate()!=null){
-						finishDate=courseResult.getAllowFinishDate();
-					}
-					
-					if(finishDate==null){
-						finishDate=course.getExecutionEndDate();
-					}
-					
-					if((finishDate!=null && finishDate.before(new Date())) || (courseResult != null && courseResult.getPassedDate() != null)){				
-						courses.add(new CourseResultView(course, courseResult, themeDisplay));
-					}
-				}
-				
-			}
-		} catch (PortalException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (SystemException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		int countCourses = CourseLocalServiceUtil.countFinishedCoursesOfUser(0, themeDisplay.getUserId());
 		
-		if(courses.size()>0){
-			
-			log.debug("CourseHistory::total de cursos: " + courses.size());
+		if(countCourses>0){
 			
 			SearchContainer<CourseResultView> searchContainer = new SearchContainer<CourseResultView>(renderRequest, null, null, SearchContainer.DEFAULT_CUR_PARAM, 
 					10, renderResponse.createRenderURL(), null, "there-are-no-courses");
 			
-			searchContainer.setResults(ListUtil.subList(courses, searchContainer.getStart(), searchContainer.getEnd()));
-			searchContainer.setTotal(courses.size());
+			List<CourseResultView> courses = CourseLocalServiceUtil.getFinishedCoursesOfUser(0, themeDisplay.getUserId(), themeDisplay, null, null, searchContainer.getStart(), searchContainer.getEnd());
+			
+			log.debug("CourseHistory::total de cursos: " + courses.size());
+			
+			searchContainer.setResults(courses);
+			searchContainer.setTotal(countCourses);
 			
 			renderRequest.setAttribute("searchContainer", searchContainer);
 			
@@ -113,7 +68,6 @@ public class CourseHistory extends MVCPortlet
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			
 		}else{
 			log.debug("CourseHistory::no hay cursos");
 			renderRequest.setAttribute(WebKeys.PORTLET_CONFIGURATOR_VISIBILITY, Boolean.FALSE);

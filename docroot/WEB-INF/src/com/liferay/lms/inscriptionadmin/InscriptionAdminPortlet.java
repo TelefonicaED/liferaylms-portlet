@@ -123,7 +123,7 @@ public class InscriptionAdminPortlet extends MVCPortlet {
 			MembershipRequest msr = MembershipRequestLocalServiceUtil.getMembershipRequest(msrId);
 
 	    	Course course = CourseLocalServiceUtil.getCourseByGroupCreatedId(msr.getGroupId());
-	    	int numberUsers = UserLocalServiceUtil.getGroupUsersCount(msr.getGroupId());
+	    	int numberUsers = CourseLocalServiceUtil.countStudents(course.getCourseId(), course.getCompanyId(), null, null, null, null, false);
 	    	
 	    	if(course.getMaxusers()>0&&numberUsers>=course.getMaxusers()){
 	    		SessionErrors.add(request, "course.full"); 

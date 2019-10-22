@@ -738,9 +738,9 @@ public class QuestionsAdmin extends MVCPortlet{
 						try{
 							if(!firstLine){
 								try{	
-									questionTitle = row.getCell(COLUMN_INDEX_QUESTION_TITLE).getStringCellValue();
-									answerTitle = row.getCell(COLUMN_INDEX_ANSWER_TITLE).getStringCellValue();
-									answerIsCorrect = Boolean.parseBoolean(row.getCell(COLUMN_INDEX_ANSWER_IS_CORRECT).getStringCellValue());
+									questionTitle = (row.getCell(COLUMN_INDEX_QUESTION_TITLE))!=null?row.getCell(COLUMN_INDEX_QUESTION_TITLE).getStringCellValue():"";
+									answerTitle = (row.getCell(COLUMN_INDEX_ANSWER_TITLE))!=null?row.getCell(COLUMN_INDEX_ANSWER_TITLE).getStringCellValue():"";
+									answerIsCorrect = Boolean.parseBoolean((row.getCell(COLUMN_INDEX_ANSWER_TITLE))!=null?row.getCell(COLUMN_INDEX_ANSWER_IS_CORRECT).getStringCellValue():"false");
 									feedbackCorrect =  (row.getCell(COLUMN_INDEX_ANSWER_FEEDBACK_CORRECT))!=null?row.getCell(COLUMN_INDEX_ANSWER_FEEDBACK_CORRECT).getStringCellValue():"";
 									feedbackIncorrect = (row.getCell(COLUMN_INDEX_ANSWER_FEEDBACK_INCORRECT))!=null?row.getCell(COLUMN_INDEX_ANSWER_FEEDBACK_INCORRECT).getStringCellValue():"";
 									if(questionTitle!=null && Validator.isNotNull(questionTitle.trim())){
@@ -781,28 +781,30 @@ public class QuestionsAdmin extends MVCPortlet{
 
 
 									}else{	//Es solo respuesta
-										if (log.isDebugEnabled()) log.debug("Line: " + fila + " ***********Es solo respuesta************");
-										if (log.isDebugEnabled()) log.debug("Line: " + fila + " Titulo respuesta: " + answerTitle);
-										if (log.isDebugEnabled()) log.debug("Line: " + fila + " Es correcta: " + answerIsCorrect);
-										if(feedbackCorrect!=null && feedbackCorrect.length()>1000){
-											feedbackCorrect = feedbackCorrect.substring(0, 999);
-										}
-
-										if(feedbackIncorrect!=null && feedbackIncorrect.length()>1000){
-											feedbackIncorrect = feedbackIncorrect.substring(0, 999);
-										}
-										
-										if (log.isDebugEnabled()) log.debug("Line: " + fila + " Feedback correcta: " + feedbackCorrect);
-										if (log.isDebugEnabled()) log.debug("Line: " + fila + " Feedback incorrecta: " + feedbackIncorrect);
-										if(feedbackCorrect==null || feedbackCorrect.trim().isEmpty()){
-											feedbackCorrect = feedbackIncorrect;
-										}
-										if(feedbackIncorrect==null || feedbackIncorrect.trim().isEmpty()){
-											feedbackIncorrect = feedbackCorrect;
-										}
-										
-										if(question!=null){
-											TestAnswerLocalServiceUtil.addTestAnswer(question.getQuestionId(), answerTitle, feedbackCorrect, feedbackIncorrect, answerIsCorrect);
+										if(answerTitle!=null && Validator.isNotNull(answerTitle.trim())){
+											if (log.isDebugEnabled()) log.debug("Line: " + fila + " ***********Es solo respuesta************");
+											if (log.isDebugEnabled()) log.debug("Line: " + fila + " Titulo respuesta: " + answerTitle);
+											if (log.isDebugEnabled()) log.debug("Line: " + fila + " Es correcta: " + answerIsCorrect);
+											if(feedbackCorrect!=null && feedbackCorrect.length()>1000){
+												feedbackCorrect = feedbackCorrect.substring(0, 999);
+											}
+	
+											if(feedbackIncorrect!=null && feedbackIncorrect.length()>1000){
+												feedbackIncorrect = feedbackIncorrect.substring(0, 999);
+											}
+											
+											if (log.isDebugEnabled()) log.debug("Line: " + fila + " Feedback correcta: " + feedbackCorrect);
+											if (log.isDebugEnabled()) log.debug("Line: " + fila + " Feedback incorrecta: " + feedbackIncorrect);
+											if(feedbackCorrect==null || feedbackCorrect.trim().isEmpty()){
+												feedbackCorrect = feedbackIncorrect;
+											}
+											if(feedbackIncorrect==null || feedbackIncorrect.trim().isEmpty()){
+												feedbackIncorrect = feedbackCorrect;
+											}
+											
+											if(question!=null){
+												TestAnswerLocalServiceUtil.addTestAnswer(question.getQuestionId(), answerTitle, feedbackCorrect, feedbackIncorrect, answerIsCorrect);
+											}
 										}
 									}
 								}catch(Exception e){

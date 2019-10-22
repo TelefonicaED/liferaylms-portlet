@@ -26,7 +26,7 @@ public class CalificationTypeRegistry {
 		for (Object key:properties.keySet()) {
 			String type=properties.getProperty(key.toString());
 			try {	
-				CalificationType calificationType = (CalificationType)getPortletClassLoader().loadClass(type).newInstance();
+				CalificationType calificationType = (CalificationType)getPortletClassLoaderLMS().loadClass(type).newInstance();
 				calificationTypes[currentCalificationType++]=calificationType;
 			} catch (ClassNotFoundException e) {
 				try {
@@ -61,6 +61,15 @@ public class CalificationTypeRegistry {
 	}
 	
 	private static ClassLoader _portletClassLoader;
+	
+	
+	private static ClassLoader getPortletClassLoaderLMS() {
+		if(_portletClassLoader==null) {
+			_portletClassLoader=PortletClassLoaderUtil.getClassLoader(LMS_ACTIVITIES_LIST_PORTLET_ID);
+		}
+		return _portletClassLoader;
+	}
+	
 	private static ClassLoader getPortletClassLoader() {
 		if(_portletClassLoader==null) {
 			ClassLoader currentClassLoader = Thread.currentThread().getContextClassLoader();

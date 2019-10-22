@@ -297,7 +297,7 @@ if(isCourseChild){
 			<%-- Ir al curso --%>
 			<%if(showGo && groupsel != null && permissionChecker.hasPermission(course.getGroupId(), Course.class.getName(),course.getCourseId(), ActionKeys.VIEW) && 
 					!course.isClosed() && ( PortalUtil.isOmniadmin(themeDisplay.getUserId()) || UserLocalServiceUtil.hasGroupUser(course.getGroupCreatedId(), themeDisplay.getUserId())) && !isInCourse) {%>
-				<liferay-ui:icon image="submit" message="courseadmin.adminactions.gotocourse" target="_top" url="<%=themeDisplay.getPortalURL() +\"/\"+ response.getLocale().getLanguage() +\"/web/\"+ groupsel.getFriendlyURL()%>" />
+				<liferay-ui:icon image="submit" message="courseadmin.adminactions.gotocourse" target="_top" url="<%=themeDisplay.getPortalURL() +\"/\"+ response.getLocale().getLanguage() +\"/web\"+ groupsel.getFriendlyURL()%>" />
 			<%}%>
 			<%-- Editar curso padre --%>
 			<%if(isCourseChild && permissionChecker.hasPermission(themeDisplay.getScopeGroupId(),  Course.class.getName(), parentCourseId, ActionKeys.UPDATE)&& !parentCourse.isClosed()){%>

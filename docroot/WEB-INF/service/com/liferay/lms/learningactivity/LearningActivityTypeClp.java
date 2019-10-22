@@ -894,4 +894,38 @@ public class LearningActivityTypeClp implements LearningActivityType {
 		return ((Long)returnObj).longValue();	
 	}
 
+	
+	public void copyActivity(LearningActivity oldActivity, LearningActivity newActivity, ServiceContext serviceContext){
+
+		try {
+			ClassLoader classLoader = clp.getClassLoader();
+			Class learningActivityClass = Class.forName(LearningActivity.class.getName(),true, classLoader);
+			
+			
+
+			MethodKey copyActivityMethod = new MethodKey(clp.getClassName(), "copyActivity", learningActivityClass, learningActivityClass, ServiceContext.class);    
+			Object oldActivityObj = translateLearningActivity(oldActivity);
+			Object newActivityObj = translateLearningActivity(newActivity);
+			clp.invoke(new MethodHandler(copyActivityMethod, oldActivityObj, newActivityObj, serviceContext));
+			ClassLoaderProxy classLoaderProxy = new ClassLoaderProxy(oldActivityObj, clp.getClassLoader());
+			oldActivity.setModelAttributes((Map<String, Object>) classLoaderProxy.invoke("getModelAttributes", new Object[]{}));
+			classLoaderProxy = new ClassLoaderProxy(newActivityObj, clp.getClassLoader());
+			newActivity.setModelAttributes((Map<String, Object>) classLoaderProxy.invoke("getModelAttributes", new Object[]{}));
+			
+		}
+		catch (Throwable t) {
+			t = ClpSerializer.translateThrowable(t);
+
+			if (t instanceof RuntimeException) {
+				throw (RuntimeException)t;
+			}
+			else {
+				t.printStackTrace();
+				throw new RuntimeException(t.getClass().getName() +
+					" is not a valid exception");
+			}
+		}
+
+	}
+	
 }

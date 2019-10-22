@@ -15,6 +15,7 @@ import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.model.LearningActivityTry;
 import com.liferay.lms.model.TestQuestion;
 import com.liferay.lms.service.ClpSerializer;
+import com.liferay.lms.service.LearningActivityLocalServiceUtil;
 import com.liferay.lms.service.TestQuestionLocalServiceUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
@@ -661,4 +662,48 @@ public class ResourceExternalLearningActivityType extends BaseLearningActivityTy
 		return "resource-external-activity.editquestions";
 	}
 	
+	@Override
+	public void copyActivity(LearningActivity oldActivity, LearningActivity newActivity, ServiceContext serviceContext){
+		log.debug("--->COPY ACTIVITY");
+		try {
+			List<TestQuestion> oldQuestions = TestQuestionLocalServiceUtil.getQuestions(oldActivity.getActId());
+			List<TestQuestion> newQuestions = TestQuestionLocalServiceUtil.getQuestions(newActivity.getActId());
+			if(oldQuestions!=null && oldQuestions.size()>0){
+				if((newActivity.getExtracontent()!=null)&&(newActivity.getExtracontent().trim().length()!=0))	{
+					Document document = SAXReaderUtil.read(newActivity.getExtracontent());
+					Element root=document.getRootElement();
+					Element questionElement = null;
+					int second = 0;
+					for(int i=0; i<oldQuestions.size();i++){
+						second = 0;
+						if(root != null){
+							questionElement = root.element("question_" + oldQuestions.get(i).getQuestionId());
+  							if(questionElement!=null){
+  								 second = Integer.valueOf(questionElement.getText());
+  							
+  								if(questionElement != null){
+  									questionElement.detach();
+  									root.remove(questionElement);
+  								}
+  								if(second > 0){
+  									questionElement = SAXReaderUtil.createElement("question_" + newQuestions.get(i).getQuestionId());
+  									questionElement.setText(String.valueOf(second));
+  									root.add(questionElement);
+  								}
+  							}
+  						}
+					}
+					
+					newActivity.setExtracontent(document.formattedString());
+					LearningActivityLocalServiceUtil.updateLearningActivity(newActivity);
+				}
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		
+		
+	}
 }

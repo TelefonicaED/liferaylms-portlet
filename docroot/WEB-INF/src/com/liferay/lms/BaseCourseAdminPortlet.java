@@ -1235,7 +1235,6 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 		Long teacherRoleId=RoleLocalServiceUtil.getRole(prefs.getTeacherRole()).getRoleId();
 		Long editorRoleId=RoleLocalServiceUtil.getRole(prefs.getEditorRole()).getRoleId();
 		
-		UserLocalServiceUtil.getRoleUserIds(roleId);
 		ThemeDisplay themeDisplay = (ThemeDisplay) actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
 		Role commmanager = RoleLocalServiceUtil.getRole(themeDisplay.getCompanyId(), RoleConstants.SITE_MEMBER);
 

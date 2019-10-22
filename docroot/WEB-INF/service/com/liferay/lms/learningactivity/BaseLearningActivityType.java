@@ -288,4 +288,8 @@ public abstract class BaseLearningActivityType implements LearningActivityType, 
 		return lat.getResult();
 	}
 	
+	@Override
+	public void copyActivity(LearningActivity oldActivity, LearningActivity newActivity, ServiceContext serviceContext){
+		
+	}
 }

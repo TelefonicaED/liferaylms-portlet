@@ -26,6 +26,7 @@ import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
 import com.liferay.portal.kernel.dao.orm.FinderCacheUtil;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
 import com.liferay.portal.kernel.dao.orm.Query;
+import com.liferay.portal.kernel.dao.orm.QueryPos;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.exception.SystemException;
@@ -37,6 +38,7 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.model.CacheModel;
 import com.liferay.portal.model.ModelListener;
@@ -75,6 +77,42 @@ public class AsynchronousProcessAuditPersistenceImpl extends BasePersistenceImpl
 		".List1";
 	public static final String FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION = FINDER_CLASS_NAME_ENTITY +
 		".List2";
+	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_BY_COMPANYIDCLASSNAMEIDCLASSPKSTATUS =
+		new FinderPath(AsynchronousProcessAuditModelImpl.ENTITY_CACHE_ENABLED,
+			AsynchronousProcessAuditModelImpl.FINDER_CACHE_ENABLED,
+			AsynchronousProcessAuditImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION,
+			"findByCompanyIdClassNameIdClassPKStatus",
+			new String[] {
+				Long.class.getName(), Long.class.getName(), Long.class.getName(),
+				Integer.class.getName(),
+				
+			"java.lang.Integer", "java.lang.Integer",
+				"com.liferay.portal.kernel.util.OrderByComparator"
+			});
+	public static final FinderPath FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_COMPANYIDCLASSNAMEIDCLASSPKSTATUS =
+		new FinderPath(AsynchronousProcessAuditModelImpl.ENTITY_CACHE_ENABLED,
+			AsynchronousProcessAuditModelImpl.FINDER_CACHE_ENABLED,
+			AsynchronousProcessAuditImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION,
+			"findByCompanyIdClassNameIdClassPKStatus",
+			new String[] {
+				Long.class.getName(), Long.class.getName(), Long.class.getName(),
+				Integer.class.getName()
+			},
+			AsynchronousProcessAuditModelImpl.COMPANYID_COLUMN_BITMASK |
+			AsynchronousProcessAuditModelImpl.CLASSNAMEID_COLUMN_BITMASK |
+			AsynchronousProcessAuditModelImpl.CLASSPK_COLUMN_BITMASK |
+			AsynchronousProcessAuditModelImpl.STATUS_COLUMN_BITMASK);
+	public static final FinderPath FINDER_PATH_COUNT_BY_COMPANYIDCLASSNAMEIDCLASSPKSTATUS =
+		new FinderPath(AsynchronousProcessAuditModelImpl.ENTITY_CACHE_ENABLED,
+			AsynchronousProcessAuditModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION,
+			"countByCompanyIdClassNameIdClassPKStatus",
+			new String[] {
+				Long.class.getName(), Long.class.getName(), Long.class.getName(),
+				Integer.class.getName()
+			});
 	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_ALL = new FinderPath(AsynchronousProcessAuditModelImpl.ENTITY_CACHE_ENABLED,
 			AsynchronousProcessAuditModelImpl.FINDER_CACHE_ENABLED,
 			AsynchronousProcessAuditImpl.class,
@@ -272,6 +310,8 @@ public class AsynchronousProcessAuditPersistenceImpl extends BasePersistenceImpl
 
 		boolean isNew = asynchronousProcessAudit.isNew();
 
+		AsynchronousProcessAuditModelImpl asynchronousProcessAuditModelImpl = (AsynchronousProcessAuditModelImpl)asynchronousProcessAudit;
+
 		Session session = null;
 
 		try {
@@ -290,8 +330,37 @@ public class AsynchronousProcessAuditPersistenceImpl extends BasePersistenceImpl
 
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 
-		if (isNew) {
+		if (isNew || !AsynchronousProcessAuditModelImpl.COLUMN_BITMASK_ENABLED) {
 			FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+		}
+
+		else {
+			if ((asynchronousProcessAuditModelImpl.getColumnBitmask() &
+					FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_COMPANYIDCLASSNAMEIDCLASSPKSTATUS.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] {
+						Long.valueOf(asynchronousProcessAuditModelImpl.getOriginalCompanyId()),
+						Long.valueOf(asynchronousProcessAuditModelImpl.getOriginalClassNameId()),
+						Long.valueOf(asynchronousProcessAuditModelImpl.getOriginalClassPK()),
+						Integer.valueOf(asynchronousProcessAuditModelImpl.getOriginalStatus())
+					};
+
+				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_COMPANYIDCLASSNAMEIDCLASSPKSTATUS,
+					args);
+				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_COMPANYIDCLASSNAMEIDCLASSPKSTATUS,
+					args);
+
+				args = new Object[] {
+						Long.valueOf(asynchronousProcessAuditModelImpl.getCompanyId()),
+						Long.valueOf(asynchronousProcessAuditModelImpl.getClassNameId()),
+						Long.valueOf(asynchronousProcessAuditModelImpl.getClassPK()),
+						Integer.valueOf(asynchronousProcessAuditModelImpl.getStatus())
+					};
+
+				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_COMPANYIDCLASSNAMEIDCLASSPKSTATUS,
+					args);
+				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_COMPANYIDCLASSNAMEIDCLASSPKSTATUS,
+					args);
+			}
 		}
 
 		EntityCacheUtil.putResult(AsynchronousProcessAuditModelImpl.ENTITY_CACHE_ENABLED,
@@ -431,6 +500,468 @@ public class AsynchronousProcessAuditPersistenceImpl extends BasePersistenceImpl
 	}
 
 	/**
+	 * Returns all the asynchronous process audits where companyId = &#63; and classNameId = &#63; and classPK = &#63; and status = &#63;.
+	 *
+	 * @param companyId the company ID
+	 * @param classNameId the class name ID
+	 * @param classPK the class p k
+	 * @param status the status
+	 * @return the matching asynchronous process audits
+	 * @throws SystemException if a system exception occurred
+	 */
+	public List<AsynchronousProcessAudit> findByCompanyIdClassNameIdClassPKStatus(
+		long companyId, long classNameId, long classPK, int status)
+		throws SystemException {
+		return findByCompanyIdClassNameIdClassPKStatus(companyId, classNameId,
+			classPK, status, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+	}
+
+	/**
+	 * Returns a range of all the asynchronous process audits where companyId = &#63; and classNameId = &#63; and classPK = &#63; and status = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	 * </p>
+	 *
+	 * @param companyId the company ID
+	 * @param classNameId the class name ID
+	 * @param classPK the class p k
+	 * @param status the status
+	 * @param start the lower bound of the range of asynchronous process audits
+	 * @param end the upper bound of the range of asynchronous process audits (not inclusive)
+	 * @return the range of matching asynchronous process audits
+	 * @throws SystemException if a system exception occurred
+	 */
+	public List<AsynchronousProcessAudit> findByCompanyIdClassNameIdClassPKStatus(
+		long companyId, long classNameId, long classPK, int status, int start,
+		int end) throws SystemException {
+		return findByCompanyIdClassNameIdClassPKStatus(companyId, classNameId,
+			classPK, status, start, end, null);
+	}
+
+	/**
+	 * Returns an ordered range of all the asynchronous process audits where companyId = &#63; and classNameId = &#63; and classPK = &#63; and status = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	 * </p>
+	 *
+	 * @param companyId the company ID
+	 * @param classNameId the class name ID
+	 * @param classPK the class p k
+	 * @param status the status
+	 * @param start the lower bound of the range of asynchronous process audits
+	 * @param end the upper bound of the range of asynchronous process audits (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @return the ordered range of matching asynchronous process audits
+	 * @throws SystemException if a system exception occurred
+	 */
+	public List<AsynchronousProcessAudit> findByCompanyIdClassNameIdClassPKStatus(
+		long companyId, long classNameId, long classPK, int status, int start,
+		int end, OrderByComparator orderByComparator) throws SystemException {
+		FinderPath finderPath = null;
+		Object[] finderArgs = null;
+
+		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
+				(orderByComparator == null)) {
+			finderPath = FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_COMPANYIDCLASSNAMEIDCLASSPKSTATUS;
+			finderArgs = new Object[] { companyId, classNameId, classPK, status };
+		}
+		else {
+			finderPath = FINDER_PATH_WITH_PAGINATION_FIND_BY_COMPANYIDCLASSNAMEIDCLASSPKSTATUS;
+			finderArgs = new Object[] {
+					companyId, classNameId, classPK, status,
+					
+					start, end, orderByComparator
+				};
+		}
+
+		List<AsynchronousProcessAudit> list = (List<AsynchronousProcessAudit>)FinderCacheUtil.getResult(finderPath,
+				finderArgs, this);
+
+		if ((list != null) && !list.isEmpty()) {
+			for (AsynchronousProcessAudit asynchronousProcessAudit : list) {
+				if ((companyId != asynchronousProcessAudit.getCompanyId()) ||
+						(classNameId != asynchronousProcessAudit.getClassNameId()) ||
+						(classPK != asynchronousProcessAudit.getClassPK()) ||
+						(status != asynchronousProcessAudit.getStatus())) {
+					list = null;
+
+					break;
+				}
+			}
+		}
+
+		if (list == null) {
+			StringBundler query = null;
+
+			if (orderByComparator != null) {
+				query = new StringBundler(6 +
+						(orderByComparator.getOrderByFields().length * 3));
+			}
+			else {
+				query = new StringBundler(5);
+			}
+
+			query.append(_SQL_SELECT_ASYNCHRONOUSPROCESSAUDIT_WHERE);
+
+			query.append(_FINDER_COLUMN_COMPANYIDCLASSNAMEIDCLASSPKSTATUS_COMPANYID_2);
+
+			query.append(_FINDER_COLUMN_COMPANYIDCLASSNAMEIDCLASSPKSTATUS_CLASSNAMEID_2);
+
+			query.append(_FINDER_COLUMN_COMPANYIDCLASSNAMEIDCLASSPKSTATUS_CLASSPK_2);
+
+			query.append(_FINDER_COLUMN_COMPANYIDCLASSNAMEIDCLASSPKSTATUS_STATUS_2);
+
+			if (orderByComparator != null) {
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
+			}
+
+			String sql = query.toString();
+
+			Session session = null;
+
+			try {
+				session = openSession();
+
+				Query q = session.createQuery(sql);
+
+				QueryPos qPos = QueryPos.getInstance(q);
+
+				qPos.add(companyId);
+
+				qPos.add(classNameId);
+
+				qPos.add(classPK);
+
+				qPos.add(status);
+
+				list = (List<AsynchronousProcessAudit>)QueryUtil.list(q,
+						getDialect(), start, end);
+			}
+			catch (Exception e) {
+				throw processException(e);
+			}
+			finally {
+				if (list == null) {
+					FinderCacheUtil.removeResult(finderPath, finderArgs);
+				}
+				else {
+					cacheResult(list);
+
+					FinderCacheUtil.putResult(finderPath, finderArgs, list);
+				}
+
+				closeSession(session);
+			}
+		}
+
+		return list;
+	}
+
+	/**
+	 * Returns the first asynchronous process audit in the ordered set where companyId = &#63; and classNameId = &#63; and classPK = &#63; and status = &#63;.
+	 *
+	 * @param companyId the company ID
+	 * @param classNameId the class name ID
+	 * @param classPK the class p k
+	 * @param status the status
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the first matching asynchronous process audit
+	 * @throws com.liferay.lms.NoSuchAsynchronousProcessAuditException if a matching asynchronous process audit could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	public AsynchronousProcessAudit findByCompanyIdClassNameIdClassPKStatus_First(
+		long companyId, long classNameId, long classPK, int status,
+		OrderByComparator orderByComparator)
+		throws NoSuchAsynchronousProcessAuditException, SystemException {
+		AsynchronousProcessAudit asynchronousProcessAudit = fetchByCompanyIdClassNameIdClassPKStatus_First(companyId,
+				classNameId, classPK, status, orderByComparator);
+
+		if (asynchronousProcessAudit != null) {
+			return asynchronousProcessAudit;
+		}
+
+		StringBundler msg = new StringBundler(10);
+
+		msg.append(_NO_SUCH_ENTITY_WITH_KEY);
+
+		msg.append("companyId=");
+		msg.append(companyId);
+
+		msg.append(", classNameId=");
+		msg.append(classNameId);
+
+		msg.append(", classPK=");
+		msg.append(classPK);
+
+		msg.append(", status=");
+		msg.append(status);
+
+		msg.append(StringPool.CLOSE_CURLY_BRACE);
+
+		throw new NoSuchAsynchronousProcessAuditException(msg.toString());
+	}
+
+	/**
+	 * Returns the first asynchronous process audit in the ordered set where companyId = &#63; and classNameId = &#63; and classPK = &#63; and status = &#63;.
+	 *
+	 * @param companyId the company ID
+	 * @param classNameId the class name ID
+	 * @param classPK the class p k
+	 * @param status the status
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the first matching asynchronous process audit, or <code>null</code> if a matching asynchronous process audit could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	public AsynchronousProcessAudit fetchByCompanyIdClassNameIdClassPKStatus_First(
+		long companyId, long classNameId, long classPK, int status,
+		OrderByComparator orderByComparator) throws SystemException {
+		List<AsynchronousProcessAudit> list = findByCompanyIdClassNameIdClassPKStatus(companyId,
+				classNameId, classPK, status, 0, 1, orderByComparator);
+
+		if (!list.isEmpty()) {
+			return list.get(0);
+		}
+
+		return null;
+	}
+
+	/**
+	 * Returns the last asynchronous process audit in the ordered set where companyId = &#63; and classNameId = &#63; and classPK = &#63; and status = &#63;.
+	 *
+	 * @param companyId the company ID
+	 * @param classNameId the class name ID
+	 * @param classPK the class p k
+	 * @param status the status
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the last matching asynchronous process audit
+	 * @throws com.liferay.lms.NoSuchAsynchronousProcessAuditException if a matching asynchronous process audit could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	public AsynchronousProcessAudit findByCompanyIdClassNameIdClassPKStatus_Last(
+		long companyId, long classNameId, long classPK, int status,
+		OrderByComparator orderByComparator)
+		throws NoSuchAsynchronousProcessAuditException, SystemException {
+		AsynchronousProcessAudit asynchronousProcessAudit = fetchByCompanyIdClassNameIdClassPKStatus_Last(companyId,
+				classNameId, classPK, status, orderByComparator);
+
+		if (asynchronousProcessAudit != null) {
+			return asynchronousProcessAudit;
+		}
+
+		StringBundler msg = new StringBundler(10);
+
+		msg.append(_NO_SUCH_ENTITY_WITH_KEY);
+
+		msg.append("companyId=");
+		msg.append(companyId);
+
+		msg.append(", classNameId=");
+		msg.append(classNameId);
+
+		msg.append(", classPK=");
+		msg.append(classPK);
+
+		msg.append(", status=");
+		msg.append(status);
+
+		msg.append(StringPool.CLOSE_CURLY_BRACE);
+
+		throw new NoSuchAsynchronousProcessAuditException(msg.toString());
+	}
+
+	/**
+	 * Returns the last asynchronous process audit in the ordered set where companyId = &#63; and classNameId = &#63; and classPK = &#63; and status = &#63;.
+	 *
+	 * @param companyId the company ID
+	 * @param classNameId the class name ID
+	 * @param classPK the class p k
+	 * @param status the status
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the last matching asynchronous process audit, or <code>null</code> if a matching asynchronous process audit could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	public AsynchronousProcessAudit fetchByCompanyIdClassNameIdClassPKStatus_Last(
+		long companyId, long classNameId, long classPK, int status,
+		OrderByComparator orderByComparator) throws SystemException {
+		int count = countByCompanyIdClassNameIdClassPKStatus(companyId,
+				classNameId, classPK, status);
+
+		List<AsynchronousProcessAudit> list = findByCompanyIdClassNameIdClassPKStatus(companyId,
+				classNameId, classPK, status, count - 1, count,
+				orderByComparator);
+
+		if (!list.isEmpty()) {
+			return list.get(0);
+		}
+
+		return null;
+	}
+
+	/**
+	 * Returns the asynchronous process audits before and after the current asynchronous process audit in the ordered set where companyId = &#63; and classNameId = &#63; and classPK = &#63; and status = &#63;.
+	 *
+	 * @param asynchronousProcessAuditId the primary key of the current asynchronous process audit
+	 * @param companyId the company ID
+	 * @param classNameId the class name ID
+	 * @param classPK the class p k
+	 * @param status the status
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the previous, current, and next asynchronous process audit
+	 * @throws com.liferay.lms.NoSuchAsynchronousProcessAuditException if a asynchronous process audit with the primary key could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	public AsynchronousProcessAudit[] findByCompanyIdClassNameIdClassPKStatus_PrevAndNext(
+		long asynchronousProcessAuditId, long companyId, long classNameId,
+		long classPK, int status, OrderByComparator orderByComparator)
+		throws NoSuchAsynchronousProcessAuditException, SystemException {
+		AsynchronousProcessAudit asynchronousProcessAudit = findByPrimaryKey(asynchronousProcessAuditId);
+
+		Session session = null;
+
+		try {
+			session = openSession();
+
+			AsynchronousProcessAudit[] array = new AsynchronousProcessAuditImpl[3];
+
+			array[0] = getByCompanyIdClassNameIdClassPKStatus_PrevAndNext(session,
+					asynchronousProcessAudit, companyId, classNameId, classPK,
+					status, orderByComparator, true);
+
+			array[1] = asynchronousProcessAudit;
+
+			array[2] = getByCompanyIdClassNameIdClassPKStatus_PrevAndNext(session,
+					asynchronousProcessAudit, companyId, classNameId, classPK,
+					status, orderByComparator, false);
+
+			return array;
+		}
+		catch (Exception e) {
+			throw processException(e);
+		}
+		finally {
+			closeSession(session);
+		}
+	}
+
+	protected AsynchronousProcessAudit getByCompanyIdClassNameIdClassPKStatus_PrevAndNext(
+		Session session, AsynchronousProcessAudit asynchronousProcessAudit,
+		long companyId, long classNameId, long classPK, int status,
+		OrderByComparator orderByComparator, boolean previous) {
+		StringBundler query = null;
+
+		if (orderByComparator != null) {
+			query = new StringBundler(6 +
+					(orderByComparator.getOrderByFields().length * 6));
+		}
+		else {
+			query = new StringBundler(3);
+		}
+
+		query.append(_SQL_SELECT_ASYNCHRONOUSPROCESSAUDIT_WHERE);
+
+		query.append(_FINDER_COLUMN_COMPANYIDCLASSNAMEIDCLASSPKSTATUS_COMPANYID_2);
+
+		query.append(_FINDER_COLUMN_COMPANYIDCLASSNAMEIDCLASSPKSTATUS_CLASSNAMEID_2);
+
+		query.append(_FINDER_COLUMN_COMPANYIDCLASSNAMEIDCLASSPKSTATUS_CLASSPK_2);
+
+		query.append(_FINDER_COLUMN_COMPANYIDCLASSNAMEIDCLASSPKSTATUS_STATUS_2);
+
+		if (orderByComparator != null) {
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+
+			if (orderByConditionFields.length > 0) {
+				query.append(WHERE_AND);
+			}
+
+			for (int i = 0; i < orderByConditionFields.length; i++) {
+				query.append(_ORDER_BY_ENTITY_ALIAS);
+				query.append(orderByConditionFields[i]);
+
+				if ((i + 1) < orderByConditionFields.length) {
+					if (orderByComparator.isAscending() ^ previous) {
+						query.append(WHERE_GREATER_THAN_HAS_NEXT);
+					}
+					else {
+						query.append(WHERE_LESSER_THAN_HAS_NEXT);
+					}
+				}
+				else {
+					if (orderByComparator.isAscending() ^ previous) {
+						query.append(WHERE_GREATER_THAN);
+					}
+					else {
+						query.append(WHERE_LESSER_THAN);
+					}
+				}
+			}
+
+			query.append(ORDER_BY_CLAUSE);
+
+			String[] orderByFields = orderByComparator.getOrderByFields();
+
+			for (int i = 0; i < orderByFields.length; i++) {
+				query.append(_ORDER_BY_ENTITY_ALIAS);
+				query.append(orderByFields[i]);
+
+				if ((i + 1) < orderByFields.length) {
+					if (orderByComparator.isAscending() ^ previous) {
+						query.append(ORDER_BY_ASC_HAS_NEXT);
+					}
+					else {
+						query.append(ORDER_BY_DESC_HAS_NEXT);
+					}
+				}
+				else {
+					if (orderByComparator.isAscending() ^ previous) {
+						query.append(ORDER_BY_ASC);
+					}
+					else {
+						query.append(ORDER_BY_DESC);
+					}
+				}
+			}
+		}
+
+		String sql = query.toString();
+
+		Query q = session.createQuery(sql);
+
+		q.setFirstResult(0);
+		q.setMaxResults(2);
+
+		QueryPos qPos = QueryPos.getInstance(q);
+
+		qPos.add(companyId);
+
+		qPos.add(classNameId);
+
+		qPos.add(classPK);
+
+		qPos.add(status);
+
+		if (orderByComparator != null) {
+			Object[] values = orderByComparator.getOrderByConditionValues(asynchronousProcessAudit);
+
+			for (Object value : values) {
+				qPos.add(value);
+			}
+		}
+
+		List<AsynchronousProcessAudit> list = q.list();
+
+		if (list.size() == 2) {
+			return list.get(1);
+		}
+		else {
+			return null;
+		}
+	}
+
+	/**
 	 * Returns all the asynchronous process audits.
 	 *
 	 * @return the asynchronous process audits
@@ -546,6 +1077,23 @@ public class AsynchronousProcessAuditPersistenceImpl extends BasePersistenceImpl
 	}
 
 	/**
+	 * Removes all the asynchronous process audits where companyId = &#63; and classNameId = &#63; and classPK = &#63; and status = &#63; from the database.
+	 *
+	 * @param companyId the company ID
+	 * @param classNameId the class name ID
+	 * @param classPK the class p k
+	 * @param status the status
+	 * @throws SystemException if a system exception occurred
+	 */
+	public void removeByCompanyIdClassNameIdClassPKStatus(long companyId,
+		long classNameId, long classPK, int status) throws SystemException {
+		for (AsynchronousProcessAudit asynchronousProcessAudit : findByCompanyIdClassNameIdClassPKStatus(
+				companyId, classNameId, classPK, status)) {
+			remove(asynchronousProcessAudit);
+		}
+	}
+
+	/**
 	 * Removes all the asynchronous process audits from the database.
 	 *
 	 * @throws SystemException if a system exception occurred
@@ -554,6 +1102,77 @@ public class AsynchronousProcessAuditPersistenceImpl extends BasePersistenceImpl
 		for (AsynchronousProcessAudit asynchronousProcessAudit : findAll()) {
 			remove(asynchronousProcessAudit);
 		}
+	}
+
+	/**
+	 * Returns the number of asynchronous process audits where companyId = &#63; and classNameId = &#63; and classPK = &#63; and status = &#63;.
+	 *
+	 * @param companyId the company ID
+	 * @param classNameId the class name ID
+	 * @param classPK the class p k
+	 * @param status the status
+	 * @return the number of matching asynchronous process audits
+	 * @throws SystemException if a system exception occurred
+	 */
+	public int countByCompanyIdClassNameIdClassPKStatus(long companyId,
+		long classNameId, long classPK, int status) throws SystemException {
+		Object[] finderArgs = new Object[] {
+				companyId, classNameId, classPK, status
+			};
+
+		Long count = (Long)FinderCacheUtil.getResult(FINDER_PATH_COUNT_BY_COMPANYIDCLASSNAMEIDCLASSPKSTATUS,
+				finderArgs, this);
+
+		if (count == null) {
+			StringBundler query = new StringBundler(5);
+
+			query.append(_SQL_COUNT_ASYNCHRONOUSPROCESSAUDIT_WHERE);
+
+			query.append(_FINDER_COLUMN_COMPANYIDCLASSNAMEIDCLASSPKSTATUS_COMPANYID_2);
+
+			query.append(_FINDER_COLUMN_COMPANYIDCLASSNAMEIDCLASSPKSTATUS_CLASSNAMEID_2);
+
+			query.append(_FINDER_COLUMN_COMPANYIDCLASSNAMEIDCLASSPKSTATUS_CLASSPK_2);
+
+			query.append(_FINDER_COLUMN_COMPANYIDCLASSNAMEIDCLASSPKSTATUS_STATUS_2);
+
+			String sql = query.toString();
+
+			Session session = null;
+
+			try {
+				session = openSession();
+
+				Query q = session.createQuery(sql);
+
+				QueryPos qPos = QueryPos.getInstance(q);
+
+				qPos.add(companyId);
+
+				qPos.add(classNameId);
+
+				qPos.add(classPK);
+
+				qPos.add(status);
+
+				count = (Long)q.uniqueResult();
+			}
+			catch (Exception e) {
+				throw processException(e);
+			}
+			finally {
+				if (count == null) {
+					count = Long.valueOf(0);
+				}
+
+				FinderCacheUtil.putResult(FINDER_PATH_COUNT_BY_COMPANYIDCLASSNAMEIDCLASSPKSTATUS,
+					finderArgs, count);
+
+				closeSession(session);
+			}
+		}
+
+		return count.intValue();
 	}
 
 	/**
@@ -686,9 +1305,20 @@ public class AsynchronousProcessAuditPersistenceImpl extends BasePersistenceImpl
 	@BeanReference(type = UserPersistence.class)
 	protected UserPersistence userPersistence;
 	private static final String _SQL_SELECT_ASYNCHRONOUSPROCESSAUDIT = "SELECT asynchronousProcessAudit FROM AsynchronousProcessAudit asynchronousProcessAudit";
+	private static final String _SQL_SELECT_ASYNCHRONOUSPROCESSAUDIT_WHERE = "SELECT asynchronousProcessAudit FROM AsynchronousProcessAudit asynchronousProcessAudit WHERE ";
 	private static final String _SQL_COUNT_ASYNCHRONOUSPROCESSAUDIT = "SELECT COUNT(asynchronousProcessAudit) FROM AsynchronousProcessAudit asynchronousProcessAudit";
+	private static final String _SQL_COUNT_ASYNCHRONOUSPROCESSAUDIT_WHERE = "SELECT COUNT(asynchronousProcessAudit) FROM AsynchronousProcessAudit asynchronousProcessAudit WHERE ";
+	private static final String _FINDER_COLUMN_COMPANYIDCLASSNAMEIDCLASSPKSTATUS_COMPANYID_2 =
+		"asynchronousProcessAudit.companyId = ? AND ";
+	private static final String _FINDER_COLUMN_COMPANYIDCLASSNAMEIDCLASSPKSTATUS_CLASSNAMEID_2 =
+		"asynchronousProcessAudit.classNameId = ? AND ";
+	private static final String _FINDER_COLUMN_COMPANYIDCLASSNAMEIDCLASSPKSTATUS_CLASSPK_2 =
+		"asynchronousProcessAudit.classPK = ? AND ";
+	private static final String _FINDER_COLUMN_COMPANYIDCLASSNAMEIDCLASSPKSTATUS_STATUS_2 =
+		"asynchronousProcessAudit.status = ?";
 	private static final String _ORDER_BY_ENTITY_ALIAS = "asynchronousProcessAudit.";
 	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY = "No AsynchronousProcessAudit exists with the primary key ";
+	private static final String _NO_SUCH_ENTITY_WITH_KEY = "No AsynchronousProcessAudit exists with the key {";
 	private static final boolean _HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE = GetterUtil.getBoolean(PropsUtil.get(
 				PropsKeys.HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE));
 	private static Log _log = LogFactoryUtil.getLog(AsynchronousProcessAuditPersistenceImpl.class);

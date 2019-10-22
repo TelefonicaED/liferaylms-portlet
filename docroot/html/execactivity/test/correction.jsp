@@ -221,7 +221,10 @@ userSearchContainer.setTotal(totalUsers);
 			List<TestQuestion> questionList = null;
 			LearningActivityTry larntry = LearningActivityTryLocalServiceUtil.getLastLearningActivityTryByActivityAndUser(actId, u.getUserId());
 			if (GetterUtil.getLong(LearningActivityLocalServiceUtil.getExtraContentValue(actId,"random"))==0){
-				questionList=TestQuestionLocalServiceUtil.getQuestions(actId);
+				questionList=ListUtil.copy(TestQuestionLocalServiceUtil.getQuestions(actId));
+				BeanComparator beanComparator = new BeanComparator("weight");
+				Collections.sort(questionList, beanComparator);
+				
 			}
 			else{
 				questionList= new ArrayList<TestQuestion>();

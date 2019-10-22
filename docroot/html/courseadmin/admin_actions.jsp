@@ -190,8 +190,10 @@ if( permissionChecker.hasPermission(themeDisplay.getScopeGroupId(),  Course.clas
 
 
 	<c:forEach var="action" items="${adminActionTypes}">
-	
-		 <c:if test="${action.hasPermission(themeDisplay.getUserId())}">
+		<c:set var="preferences" value="<%=preferences %>" />
+		<c:set var="myVar" value="show${action.getTypeId()}" />
+		
+		 <c:if test="${action.hasPermission(themeDisplay.getUserId()) and preferences.getValue(myVar, 'true').equals('true')}">
 		
 			<portlet:renderURL var="specificURL" >
 				<portlet:param name="jspPage" value="/html/courseadmin/inc/specific_action.jsp" />

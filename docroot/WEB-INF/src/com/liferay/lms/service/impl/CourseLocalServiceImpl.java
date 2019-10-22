@@ -28,6 +28,7 @@ import javax.portlet.PortletPreferences;
 
 import com.liferay.lms.auditing.AuditConstants;
 import com.liferay.lms.auditing.AuditingLogFactory;
+import com.liferay.lms.learningactivity.calificationtype.CalificationTypeRegistry;
 import com.liferay.lms.learningactivity.courseeval.CourseEval;
 import com.liferay.lms.learningactivity.courseeval.CourseEvalRegistry;
 import com.liferay.lms.model.Course;
@@ -1038,21 +1039,27 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 	}
 	
 	public List<CourseResultView> getMyCourses(long groupId, long userId, ThemeDisplay themeDisplay, String orderByColumn, String orderByType, int start, int end){
-		return CourseFinderUtil.getMyCourses(groupId, userId, null, themeDisplay, orderByColumn, orderByType, start, end);
+		return CourseFinderUtil.getMyCourses(groupId, userId, true, false, false, null, themeDisplay, orderByColumn, orderByType, start, end);
 	}
 	
 	public int countMyCourses(long groupId, long userId, ThemeDisplay themeDisplay){
-		return CourseFinderUtil.countMyCourses(groupId, userId, null, themeDisplay);
+		return CourseFinderUtil.countMyCourses(groupId, userId, true, false, false, null);
 	}
 	
 	public List<CourseResultView> getMyCourses(long groupId, long userId, LinkedHashMap<String, Object> params, ThemeDisplay themeDisplay, String orderByColumn, String orderByType, int start, int end){
-		return CourseFinderUtil.getMyCourses(groupId, userId, params, themeDisplay, orderByColumn, orderByType, start, end);
+		return CourseFinderUtil.getMyCourses(groupId, userId, true, false, false, params, themeDisplay, orderByColumn, orderByType, start, end);
 	}
 	
 	public int countMyCourses(long groupId, long userId, LinkedHashMap<String, Object> params, ThemeDisplay themeDisplay){
-		return CourseFinderUtil.countMyCourses(groupId, userId, params, themeDisplay);
-	}
-	
+		return CourseFinderUtil.countMyCourses(groupId, userId, true, false, false, params);
+	}  
+    public List<CourseResultView> getMyCourses(long groupId, long userId,boolean showFinished, LinkedHashMap<String, Object> params, ThemeDisplay themeDisplay, String orderByColumn, String orderByType, int start, int end){
+        return CourseFinderUtil.getMyCourses(groupId, userId, true, showFinished, false, params, themeDisplay, orderByColumn, orderByType, start, end);
+    }
+    
+    public int countMyCourses(long groupId, long userId,boolean showFinished, LinkedHashMap<String, Object> params, ThemeDisplay themeDisplay){
+        return CourseFinderUtil.countMyCourses(groupId, userId, true, showFinished, false, params);
+    }	
 	public boolean hasUserTries(long courseId, long userId){
 		return CourseFinderUtil.hasUserTries(courseId, userId);
 	}
@@ -1892,7 +1899,19 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 		}
 	}
 	
+	public int countFinishedCoursesOfUser(long groupId, long userId){
+		return courseFinder.countMyCourses(groupId, userId, false, true, true, null);
+	}
+	
+	public List<CourseResultView> getFinishedCoursesOfUser(long groupId, long userId, ThemeDisplay themeDisplay, String orderByColumn, String orderByType, int start, int end){
+		return courseFinder.getMyCourses(groupId, userId, false, true, true, null, themeDisplay, orderByColumn, orderByType, start, end);
+	}
+	/**
+	 * @deprecated Usar la función getFinishedCoursesOfUser(long groupId, long userId, ThemeDisplay themeDisplay, String orderByColumn, String orderByType, int start, int end)
+	 */
+	@Deprecated
 	public List<CourseResultView> getFinishedCoursesOfUser(long userId, int start, int end){
+		
 		List<CourseResultView> courses = new ArrayList<CourseResultView>();
 		
 		User user = null;

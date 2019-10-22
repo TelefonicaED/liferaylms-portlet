@@ -2,11 +2,48 @@
 Todos los cambios de este proyecto estarán documentados en este archivo.
 
 El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
+
+## [4.0.0](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v4.0.0)
+
+### Added
+
+- #167833 Añadidos los servicios countActiveByCompanyIdClassNameIdClassPK y getActiveByCompanyIdClassNameIdClassPK para ver los procesos que están actualmente en curso para una acción.
+- #167536 Añadida configuración para ocultar las opciones dinámicas. Se pasan las preferencias al portlet destino para poder utilizarlas.
+- #168060: Ampliación del portlet de "mis cursos" de wecorp. Nuevos servicios
+
+### Updated
+
+- #167994 Unificación del servicio de mis cursos para usar el mismo finder para mis cursos y mis cursos finalizados. Se modifica el resgistry de los métodos de calificación para que busque siempre los métodos de calificación que están dentro del LMS en su contexto, independientemente de donde se llamen.
+- #167833: Añadido cache a false para los servicios de los procesos asíncronos.
+- #167536: Se mandan las preferencias, el cur y el delta al portlet embebido en las acciones de administración dinámicas
+- #168795: Protegido para evitar nullpointerexception en los tipos de cursos.
+
+
+### Fixed
+
+- #163617 Se elimina la barra después de web en la acción de ir al curso
+- #164214 Se establece correctamente el texto en la importación de preguntas. 
+- #162383 Se trunca el nombre del grupo a 150 caracteres para que no de problemas en la creación de la edición.
+- #166052 Protegido cuando la celda es nula. Eliminación de segundo mensaje de error. Establecidos a xls y xlsx los tipos aceptados.
+- #154930 Se modifica la actividad de desarrollo para que audite la corrección y se obligue a meter nota con los comentarios para evitar fallos.
+- #161331 Se actualiza el número de usuarios para solo tener en cuenta a los estudiantes al aceptar una petición de registro.
+- #163768 Se establecen las categorías de las actividades al duplicar antes de ser creadas para evitar errores con categorias obligatorias.163768
+- #167390 Se copian los campos personalizados de las actividades al crear la edición.
+- #163688 Se actualizan los estilos para los tipos de cursos sin el tema de wecorp.
+- #167409 Creación de un nuevo método para duplicar lo específico de cada actividad. Implementación para los recursos externos.
+- #167628 Cambiada la visualización de los comentarios de la actividad de desarrollo en el gradebook.
+- #107687 Se ordena por peso en la visualización de resultados de los tests y en las correcciones.
+- #160565 Se visualiza correctamente la pregunta combo en las encuestas.
+- #167642 Se establece el literal estudiantes en vez de site member.
+- #164518 Se deja de concatenar la URL en el borrado de preguntas. Se establece el mensaje success.
+- #167845 Se establece el literal y la descripción de la actividad en la previsualización
+- #160872 Se exportan e importan correctamente los permisos de módulos y actividades en la importación de cursos.
+
 ## [3.9.1](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v3.9.1)
 
 ### Fixed
 
-- #166068: Se conserva el id del tipo de curso cuando se actualiza un curso.
+- #166068 Se conserva el id del tipo de curso cuando se actualiza un curso.
 
 ## [3.9.0](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v3.9.0)
 
@@ -20,39 +57,39 @@ El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 
 ### Updated
 
-- #162450 - Modificaciones gestión de ediciones Wecorp: Cambios en la navegación
-			- En el botón "Acciones" que se muestra al editar un curso padre se ha añadido la opción de "Ver ediciones"
-			- En el botón de acciones de la vista de "Editar una edición" se ha añadido "Editar curso padre"
-			- Se muestra el botón de "Acciones" que aparece al editar un curso padre en la vista de editar una edición
-			- Al editar una edición, debajo del nombre de la edición, se muestra: "Curso padre: Nombre del curso padre".
-			- En el listado de ediciones de un curso se ha añadido el botón "Editar curso padre".
-			- Se añaden nuevos campos a mostrar en los listados de cursos y ediciones
-- #160445: Cambios para la auditoría, añadidas trazas y capturas de excepciones y quitada la auditoría de asociar usuario ya que está duplicada.
-- #160557: Cambio en el informe de resultados de las encuestas. El funcionamiento ahora es una fila por respuesta de usuario, dejando blancos si no ha contestado.
+- #162450 Modificaciones gestión de ediciones Wecorp: Cambios en la navegación
+	- En el botón "Acciones" que se muestra al editar un curso padre se ha añadido la opción de "Ver ediciones"
+	- En el botón de acciones de la vista de "Editar una edición" se ha añadido "Editar curso padre"
+	- Se muestra el botón de "Acciones" que aparece al editar un curso padre en la vista de editar una edición
+	- Al editar una edición, debajo del nombre de la edición, se muestra: "Curso padre: Nombre del curso padre".
+	- En el listado de ediciones de un curso se ha añadido el botón "Editar curso padre".
+	- Se añaden nuevos campos a mostrar en los listados de cursos y ediciones
+- #160445 Cambios para la auditoría, añadidas trazas y capturas de excepciones y quitada la auditoría de asociar usuario ya que está duplicada.
+- #160557 Cambio en el informe de resultados de las encuestas. El funcionamiento ahora es una fila por respuesta de usuario, dejando blancos si no ha contestado.
 - #160445 Añadido enlace para ir a las ediciones desde la lista de cursos. Añadido el tipo de curso para la edición.
-- #147332: Cambiado literal de la ayuda de elegir equipo.
-- #147332: Cambiado el literal de ayuda de los equipos en editar actividad
+- #147332 Cambiado literal de la ayuda de elegir equipo.
+- #147332 Cambiado el literal de ayuda de los equipos en editar actividad
 - #159623 [Portlet inscripción] - No permitir desinscribrir a los usuarios cuando han finalizado el curso
-  Se incluye la condición de finalización del curso.
-  Se actualizan idiomas para no perder codificaciones necesarias para catalán.
-  Se incluye mediante configuración del portlet, estando por defecto permitido.
+	- Se incluye la condición de finalización del curso.
+	- Se actualizan idiomas para no perder codificaciones necesarias para catalán.
+	- Se incluye mediante configuración del portlet, estando por defecto permitido.
   
 - #162986 La funcionalidad de filtrar las ediciones cuyo tiempo de ejecución sea posterior a la fecha actual se configura desde la configuración del LMS en vez de la configuración del  portlet de inscripción.
 - #159785 Se comprueba también que el usuario esté registrado en el curso a la hora de mostrar el texto de los días/horas para poder finalizar el curso.
 
 ### Fixed
 
-- #162450 - Modificaciones gestión de ediciones Wecorp: Cambios en la navegación. Comprobación de permisos en acciones
+- #162450 Modificaciones gestión de ediciones Wecorp: Cambios en la navegación. Comprobación de permisos en acciones
 
-- #162971 - Visualización incorrecta del listado de ediciones de un curso cuando el theme del portal no es Wecorp. Añadidos los estilos de generic-pop-up al propio portlet
+- #162971 Visualización incorrecta del listado de ediciones de un curso cuando el theme del portal no es Wecorp. Añadidos los estilos de generic-pop-up al propio portlet
 
 - #159903 Corregido que al cambiar de tipo de inscripción no recuperaba bien el valor (Cambio get por fetch para que lo recoja de la BBDD). 
 Eliminados imports no usados. Protegidos los expandos por si hay algún error.
 
 - #162986 Corregido error en el que se podia desinscribir en el curso de un itinerario a traves del curso padre, aunque estuviera deshabilitada la desinscripcion.
-- #163914: Corregido desfase horario de las ediciones al ver el listado de cursos.
+- #163914 Corregido desfase horario de las ediciones al ver el listado de cursos.
 
-- #165220 - Resultados de las Búsquedas en editar actividade. Problema de paginación cuando se hace búsqueda por palabras clave en la búsqueda de recursos en la actividad Recurso mediateca.
+- #165220 Resultados de las Búsquedas en editar actividade. Problema de paginación cuando se hace búsqueda por palabras clave en la búsqueda de recursos en la actividad Recurso mediateca.
 
 ### Refactor
  
@@ -70,13 +107,13 @@ Eliminados imports no usados. Protegidos los expandos por si hay algún error.
 
 ### Fixed 
 
-- #161546 - Corrección en la importación masiva de ediciones, había un error al guardar el groupId de las ediciones.
+- #161546 Corrección en la importación masiva de ediciones, había un error al guardar el groupId de las ediciones.
 
 ## [3.8.1](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v3.8.1)
 
 ### Added
 
-- #158723: Accesibilidad, añadidos estilos en el portlet para linkar correctamente imagen cambiada por accesibilidad que estaba en el tema.
+- #158723 Accesibilidad, añadidos estilos en el portlet para linkar correctamente imagen cambiada por accesibilidad que estaba en el tema.
 
 ### Fixed 
 

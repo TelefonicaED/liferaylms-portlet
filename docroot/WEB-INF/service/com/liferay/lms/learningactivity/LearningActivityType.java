@@ -55,4 +55,5 @@ public interface LearningActivityType extends InvokableService
 	public boolean canBeSeenResults();
 	public long calculateResult(LearningActivity learningActivity, LearningActivityTry lat);
 	public String getClassName();
+	public void copyActivity(LearningActivity oldActivity, LearningActivity newActivity, ServiceContext serviceContext);
 }

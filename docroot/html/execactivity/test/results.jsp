@@ -1,3 +1,6 @@
+<%@page import="java.util.Collections"%>
+<%@page import="org.apache.commons.beanutils.BeanComparator"%>
+<%@page import="com.liferay.portal.kernel.util.ListUtil"%>
 <%@page import="com.liferay.lms.learningactivity.calificationtype.CalificationTypeRegistry"%>
 <%@page import="com.liferay.lms.learningactivity.calificationtype.CalificationType"%>
 <%@page import="com.tls.lms.util.LiferaylmsUtil"%>
@@ -191,9 +194,11 @@
 				questions = TestQuestionLocalServiceUtil.getQuestions(bankActivity.getActId());
 			}else{
 				if( GetterUtil.getLong(LearningActivityLocalServiceUtil.getExtraContentValue(actId,"random"))==0 
-						|| hasPermissionAccessCourseFinished )
-					questions=TestQuestionLocalServiceUtil.getQuestions(learningActivity.getActId());
-				else{
+						|| hasPermissionAccessCourseFinished ){
+					questions=ListUtil.copy(TestQuestionLocalServiceUtil.getQuestions(learningActivity.getActId()));
+					BeanComparator beanComparator = new BeanComparator("weight");
+					Collections.sort(questions, beanComparator);
+				}else{
 					questions= new ArrayList<TestQuestion>();
 					Iterator<Element> nodeItr = SAXReaderUtil.read(tryResultData).getRootElement().elementIterator();
 					TestQuestion question=null;

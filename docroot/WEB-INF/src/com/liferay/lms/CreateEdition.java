@@ -7,7 +7,9 @@ import java.util.List;
 import java.util.Locale;
 
 import com.liferay.counter.service.CounterLocalServiceUtil;
+import com.liferay.lms.learningactivity.LearningActivityType;
 import com.liferay.lms.learningactivity.LearningActivityTypeRegistry;
+import com.liferay.lms.learningactivity.TestLearningActivityType;
 import com.liferay.lms.model.AsynchronousProcessAudit;
 import com.liferay.lms.model.Course;
 import com.liferay.lms.model.LearningActivity;
@@ -27,6 +29,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.messaging.Message;
 import com.liferay.portal.kernel.messaging.MessageListener;
 import com.liferay.portal.kernel.messaging.MessageListenerException;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.ResourceConstants;
@@ -225,7 +228,9 @@ public class CreateEdition extends CourseCopyUtil implements MessageListener {
 			newEntry.setSummary(summary);
 			newEntry.setClassTypeId(courseTypeId);
 			AssetEntryLocalServiceUtil.updateAssetEntry(newEntry);
-			newGroup.setName(course.getTitle(themeDisplay.getLocale(),true)+"-"+newEditionName);
+			String groupName =  course.getTitle(themeDisplay.getLocale(),true)+"-"+newEditionName;
+			groupName = groupName.substring(0, 148);
+			newGroup.setName(groupName);
 			newGroup.setDescription(summary);
 			GroupLocalServiceUtil.updateGroup(newGroup);
 			
@@ -386,9 +391,22 @@ public class CreateEdition extends CourseCopyUtil implements MessageListener {
 					newLearnActivity.setDescription(descriptionFilesClone(activity.getDescription(),newModule.getGroupId(), newLearnActivity.getActId(),themeDisplay.getUserId()));
 				//}
 				
+				ServiceContext larnServiceContext = serviceContext;
+	
+
+
+				AssetEntry entryActivity = AssetEntryLocalServiceUtil.fetchEntry(LearningActivity.class.getName(), activity.getActId());
+				if(Validator.isNotNull(entryActivity)){
+					
+					larnServiceContext.setAssetCategoryIds(entryActivity.getCategoryIds());
+					larnServiceContext.setAssetTagNames(entryActivity.getTagNames());
+					larnServiceContext.setExpandoBridgeAttributes(activity.getExpandoBridge().getAttributes());
+			
+				}
 				
-				nuevaLarn=LearningActivityLocalServiceUtil.addLearningActivity(newLearnActivity,serviceContext);
-				
+				nuevaLarn=LearningActivityLocalServiceUtil.addLearningActivity(newLearnActivity,larnServiceContext);
+				nuevaLarn.setExpandoBridgeAttributes(larnServiceContext);
+				nuevaLarn.getExpandoBridge().setAttributes(activity.getExpandoBridge().getAttributes());
 				
 				if(canBeLinked){
 					nuevaLarn.setLinkedActivityId(activity.getActId());
@@ -425,12 +443,7 @@ public class CreateEdition extends CourseCopyUtil implements MessageListener {
 					pending.put(actId, activity.getPrecedence());
 				}
 				
-				//Copiar la clasificación de la actividad
-				AssetEntry entryActivity = AssetEntryLocalServiceUtil.fetchEntry(LearningActivity.class.getName(), activity.getActId());
-				if(Validator.isNotNull(entryActivity)){
-					AssetEntryLocalServiceUtil.updateEntry(nuevaLarn.getUserId(), nuevaLarn.getGroupId(), LearningActivity.class.getName(), 
-							nuevaLarn.getActId(), entryActivity.getCategoryIds(), entryActivity.getTagNames());
-				}
+				
 				
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -445,10 +458,12 @@ public class CreateEdition extends CourseCopyUtil implements MessageListener {
 			createTestQuestionsAndAnswers(activity, nuevaLarn, newModule, themeDisplay.getUserId());
 		
 		
-		
+			LearningActivityType lat = new LearningActivityTypeRegistry().getLearningActivityType(activity.getTypeId());
+			lat.copyActivity(activity, nuevaLarn, serviceContext);
 		}
 		
-		
+	
+		 
 		
 		//Set the precedences
 		if(pending.size()>0){

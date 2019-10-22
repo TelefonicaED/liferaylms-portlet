@@ -345,3 +345,7 @@
 .float-r {
     float: right;
 }
+
+.courseadmin-portlet .taglib-header {
+    float: none;
+}

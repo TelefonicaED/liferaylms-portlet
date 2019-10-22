@@ -99,6 +99,10 @@
 				} 
 %>
 
+	<div class="description">
+				<%=activity.getDescriptionFiltered(themeDisplay.getLocale(),true) %>
+	</div>
+
 
 	<portlet:renderURL var="correctURL">
 		<portlet:param name="actId" value="<%=Long.toString(actId) %>"></portlet:param>
