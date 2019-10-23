@@ -151,14 +151,7 @@ public class UserDaysInscriptionType extends BaseInscriptionType{
                             message = LanguageUtil.get(locale, "inscriptioncommunity.allowed-time-finish");
                         }
 			        }
-			    } else {
-			        log.debug("not-started");
-                    // no ha empezado el curso                  
-                    if (Validator.isNotNull(course)) {
-                        int days = PrefsPropsUtil.getInteger(course.getGroupCreatedId(), "inscription-days");
-                        message = LanguageUtil.format(locale, "inscriptioncommunity.allowed-time-not-started", days);
-                    }                   
-                }			    
+			    }
 			} else {				
 				// Aun no esta inscrito en el curso
 				if (Validator.isNotNull(course)) {
