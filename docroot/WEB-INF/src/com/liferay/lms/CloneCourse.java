@@ -270,7 +270,7 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 		newCourse.setIcon(course.getIcon());
 		
 		try{
-			newCourse = CourseLocalServiceUtil.modCourse(newCourse, courseTypeId, serviceContext);
+			newCourse = CourseLocalServiceUtil.modCourse(newCourse, summary, courseTypeId, serviceContext, visible);
 			
 			AssetEntry newEntry = AssetEntryLocalServiceUtil.getEntry(Course.class.getName(),newCourse.getCourseId());
 			newEntry.setVisible(visible);
