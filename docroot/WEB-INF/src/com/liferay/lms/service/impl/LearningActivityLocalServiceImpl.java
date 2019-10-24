@@ -31,6 +31,7 @@ import com.liferay.lms.auditing.AuditingLogFactory;
 import com.liferay.lms.learningactivity.LearningActivityType;
 import com.liferay.lms.learningactivity.LearningActivityTypeRegistry;
 import com.liferay.lms.model.LearningActivity;
+import com.liferay.lms.model.LearningActivityResult;
 import com.liferay.lms.model.Module;
 import com.liferay.lms.service.LearningActivityLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityTryLocalServiceUtil;
@@ -102,6 +103,18 @@ public class LearningActivityLocalServiceImpl extends LearningActivityLocalServi
 		   LearningActivityType lat=new LearningActivityTypeRegistry().getLearningActivityType(larn.getTypeId());
 		   return lat.isDone(larn, userId);
     }
+    
+	public long countMandatoryLearningActivitiesPassedByModuleIdUserId(long moduleId, long userId) throws SystemException, PortalException{
+		long count = 0;
+		List<Long>  listLearningActivityIds = getMandatoryLearningActivityIdsOfModule(moduleId);
+		for(long actId:listLearningActivityIds){
+			LearningActivityResult lar = learningActivityResultLocalService.getByActIdAndUserId(actId, userId);
+			if(Validator.isNotNull(lar) && lar.isPassed()){
+				count++;
+			}
+		}
+		return count;
+	}
     
     /**
 	 * Se mira si la actividad está bloqueada, NO SE TIENE EN CUENTA NI EL CURSO NI EL MÓDULO, 
@@ -586,6 +599,9 @@ public class LearningActivityLocalServiceImpl extends LearningActivityLocalServi
 	{
 		return LearningActivityUtil.countBym(moduleId);
 	}
+	public long countMandatoryLearningActivitiesOfModule(long moduleId) throws SystemException{
+		return LearningActivityUtil.countByModuleId_Weightinmodule(moduleId, 0);
+	}
 	public java.util.List<LearningActivity> getLearningActivitiesOfGroupAndType(long groupId,int typeId) throws SystemException
 	{
 		return learningActivityPersistence.findByg_t(groupId, typeId);
@@ -618,6 +634,16 @@ public class LearningActivityLocalServiceImpl extends LearningActivityLocalServi
 		}
 		return result;
 	}
+	
+	public List<Long> getMandatoryLearningActivityIdsOfModule(long moduleId) throws SystemException{
+		List<Long> result = new ArrayList<Long>();
+		List<LearningActivity> learningActivityList = learningActivityPersistence.findByModuleId_Weightinmodule(moduleId, 0);
+		for(LearningActivity la:learningActivityList){
+			result.add(la.getActId());
+		}
+		return result;
+	}
+	
 	public void deleteLearningactivity (LearningActivity lernact) throws SystemException,
 	PortalException {
 		long companyId = lernact.getCompanyId();

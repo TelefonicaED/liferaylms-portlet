@@ -9,6 +9,7 @@ El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 
 - #167833 Añadidos los servicios countActiveByCompanyIdClassNameIdClassPK y getActiveByCompanyIdClassNameIdClassPK para ver los procesos que están actualmente en curso para una acción.
 - #167536 Añadida configuración para ocultar las opciones dinámicas. Se pasan las preferencias al portlet destino para poder utilizarlas.
+- #168060: Ampliación del portlet de "mis cursos" de wecorp. Nuevos servicios
 
 ### Updated
 
@@ -16,6 +17,7 @@ El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 - #167833: Añadido cache a false para los servicios de los procesos asíncronos.
 - #167536: Se mandan las preferencias, el cur y el delta al portlet embebido en las acciones de administración dinámicas
 - #168795: Protegido para evitar nullpointerexception en los tipos de cursos.
+
 
 ### Fixed
 
