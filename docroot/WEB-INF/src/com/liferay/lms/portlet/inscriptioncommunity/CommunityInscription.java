@@ -125,7 +125,7 @@ public class CommunityInscription extends MVCPortlet {
                         boolean finishedCourse = ((cr != null) ? cr.getPassedDate() == null : true);
                         boolean outOfTime = ((cr != null) ? now.after(cr.getAllowFinishDate()) : true);
                         
-                        canUnsubscribeLocal = finishedCourse && outOfTime;
+                        canUnsubscribeLocal = finishedCourse && !outOfTime;
                         
                     }
                     renderRequest.setAttribute("registredUser", true);
