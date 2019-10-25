@@ -124,32 +124,10 @@ public class UserDaysInscriptionType extends BaseInscriptionType{
 			        if (Validator.isNull(courseResult.getPassedDate()) && Validator.isNotNull(courseResult.getAllowFinishDate())) {
 			            log.debug("started");
 			            Date allowFinishDate = courseResult.getAllowFinishDate();
-                        Date nowDate = new Date();
-                        
-                        long time = allowFinishDate.getTime() - nowDate.getTime();
-                        
-                        if (time > 0) {
-                            long daysCount = time / (24 * 60 * 60 * 1000);
-                            if (daysCount == 0) {
-                                long hoursCount = time / (60 * 60 * 1000);
-                                if (hoursCount > 1) {
-                                    message = LanguageUtil.format(locale, "inscriptioncommunity.allowed-time-hours", hoursCount);
-                                }
-                                else {
-                                    message = LanguageUtil.format(locale, "inscriptioncommunity.allowed-time-hour", hoursCount);
-                                }                       
-                            } else {
-                                if (daysCount > 1) {
-                                    message = LanguageUtil.format(locale, "inscriptioncommunity.allowed-time-days", daysCount);
-                                }
-                                else {
-                                    message = LanguageUtil.format(locale, "inscriptioncommunity.allowed-time-day", daysCount);
-                                }                       
-                            }
-                        } else {
-                            // Ya finalizo el tiempo, si no ha aprobado => Opcion inscribir
-                            message = LanguageUtil.get(locale, "inscriptioncommunity.allowed-time-finish");
-                        }
+                        Date nowDate = new Date();                        
+                        long time = allowFinishDate.getTime() - nowDate.getTime();  
+                        log.debug("time: " + time);
+                        message = getAllowedTimeMessage(time, locale);
 			        }
 			    }
 			} else {				
@@ -165,4 +143,63 @@ public class UserDaysInscriptionType extends BaseInscriptionType{
 		
 		return message;
 	}
+
+    /**
+     * Obtiene el texto para mostrar el tiempo restante del usuario
+     * 
+     * @param time tiempo restante en milisegundos
+     * @param locale locale del mensaje a mostrar
+     * @return string con el mensaje
+     */
+    private String getAllowedTimeMessage(long time, Locale locale)
+    {
+        String message = StringPool.BLANK;
+        if (time <= 0) {
+            return LanguageUtil.get(locale, "inscriptioncommunity.allowed-time-finish");
+        }        
+        
+        long daysCount = time / (24 * 60 * 60 * 1000);
+        long hoursCount = time / (60 * 60 * 1000) - daysCount * 24;
+        long minutesCount = time / (60 * 1000) - daysCount * 24 *60 - hoursCount * 60;
+        
+        if (daysCount > 0 && hoursCount > 12) {
+            daysCount++;
+        }
+        
+        log.debug("daysCount: " + daysCount);
+        log.debug("hoursCount: " + hoursCount);
+        log.debug("minutesCount: " + minutesCount);
+        
+        if (daysCount == 0) {
+            message = getHourMessage( hoursCount,minutesCount,locale);
+        } else if (daysCount > 1) {
+            message = LanguageUtil.format(locale, "inscriptioncommunity.allowed-time-days", daysCount);
+        } else { // queda 1 dia
+            message = LanguageUtil.format(locale, "inscriptioncommunity.allowed-time-day", daysCount);
+        }
+         
+        return message;
+    }
+
+    /**
+     * Obtiene el texto para mostrar el tiempo restante del usuario cuando le queda menos de un dia
+     * 
+     * @param hoursCount horas restantes
+     * @param minutesCount minutos restantes
+     * @param locale locale del mensaje a mostrar
+     * @return string con el mensaje
+     */
+    private String getHourMessage(long hoursCount, long minutesCount, Locale locale)
+    {
+        String message = StringPool.BLANK;
+        if (hoursCount > 0) {
+            message = LanguageUtil.format(locale, "inscriptioncommunity.allowed-time-hours", hoursCount);
+        } else if (minutesCount > 1) {
+            message = LanguageUtil.format(locale, "inscriptioncommunity.allowed-time-minutes", minutesCount);
+        } else {
+            message = LanguageUtil.format(locale, "inscriptioncommunity.allowed-time-minute", minutesCount);
+        }
+
+        return message;
+    }
 }
