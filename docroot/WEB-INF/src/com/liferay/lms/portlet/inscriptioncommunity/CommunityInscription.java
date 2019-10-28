@@ -121,7 +121,12 @@ public class CommunityInscription extends MVCPortlet {
                         CourseResult cr =
                             CourseResultLocalServiceUtil.getCourseResultByCourseAndUser(course.getCourseId(),
                                 themeDisplay.getUserId());
-                        canUnsubscribeLocal = ((cr != null) ? cr.getPassedDate() == null : true);
+                        Date now = new Date();
+                        boolean finishedCourse = ((cr != null) ? cr.getPassedDate() == null : true);
+                        boolean outOfTime = ((cr != null) ? now.after(cr.getAllowFinishDate()) : true);
+                        
+                        canUnsubscribeLocal = finishedCourse && !outOfTime;
+                        
                     }
                     renderRequest.setAttribute("registredUser", true);
                     renderRequest.setAttribute("course", course);
