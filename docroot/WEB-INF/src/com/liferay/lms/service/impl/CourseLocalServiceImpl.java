@@ -364,8 +364,13 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 			
 			course = LmsLocaleUtil.checkDefaultLocale(Course.class, course, "description");
 			//creating group
+			String groupName = title;
+			if(title.length()>148){
+				groupName = title.substring(0, 148);
+			}
+			
 			Group group = groupLocalService.addGroup(userLocalService.getDefaultUser(serviceContext.getCompanyId()).getUserId(),
-					null, 0, title,summary,typesite,friendlyURL,true,true,serviceContext);
+					null, 0, groupName,summary,typesite,friendlyURL,true,true,serviceContext);
 			course.setGroupCreatedId(group.getGroupId());
 			course.setFriendlyURL(group.getFriendlyURL());
 			course.setIsLinked(false);
