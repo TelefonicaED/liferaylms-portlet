@@ -134,9 +134,6 @@ public class ModuleDataHandlerImpl extends BasePortletDataHandler {
 		Group group = GroupLocalServiceUtil.getGroup(context.getScopeGroupId());
 		log.info(" Course: "+ group.getName());
 		
-		
-		context.addPermissions("com.liferay.lms.model.module", context.getScopeGroupId());
-		
 		Document document = SAXReaderUtil.createDocument();
 	
 		Element rootElement = document.addElement("moduledata");
@@ -294,7 +291,6 @@ public class ModuleDataHandlerImpl extends BasePortletDataHandler {
 	protected PortletPreferences doImportData(PortletDataContext context, String portletId, PortletPreferences preferences, String data) throws Exception {
 		
 		
-		context.importPermissions("com.liferay.lms.model.module", context.getSourceGroupId(),context.getScopeGroupId());
 		log.info("\n-----------------------------\ndoImport1Data STARTS12");
 		
 		
@@ -324,7 +320,7 @@ public class ModuleDataHandlerImpl extends BasePortletDataHandler {
 					entryOld=entry.getModuleId();
 					newModuleId = importEntry(context,entryElement, entry, relationActivities, hashLearningActivityType);
 					relationModule.put(entryOld, newModuleId);
-					context.importPermissions("com.liferay.lms.model.module", entryOld,newModuleId);
+					context.importPermissions(Module.class.getName(), entryOld,newModuleId);
 				} else{
 					log.info("repetidooooo el modulo "+entry.getModuleId());
 				}	

@@ -155,8 +155,8 @@ if(!ownGrade){
 		<%
 		String resultValue = "";
 		if(result!=null && (result.getResult()>0 || result.getEndDate()!=null)){
-			resultValue = ct.translate(themeDisplay.getLocale(), themeDisplay.getScopeGroupId(),result.getResult());%>
-		}
+			resultValue = ct.translate(themeDisplay.getLocale(), themeDisplay.getScopeGroupId(),result.getResult());
+		}%>
 		
 	    <aui:input type="text" name="result"  label="offlinetaskactivity.grades" helpMessage="<%=LanguageUtil.format(pageContext, \"offlinetaskactivity.grades.resultMessage\", new Object[]{ct.translate(themeDisplay.getLocale(), themeDisplay.getScopeGroupId(), activity.getPasspuntuation())})%>" value='<%=resultValue%>'>
 	    	<aui:validator name="required"/>
@@ -191,8 +191,7 @@ if(!ownGrade){
 
 </aui:form>
 
-<% } 
-   else {%>
+<% }else {%>
 	<aui:button-row>
 		<button name="Close" value="close" onclick="<portlet:namespace />doClosePopupGrades();" type="button"><liferay-ui:message key="close" /></button>
 	</aui:button-row>
