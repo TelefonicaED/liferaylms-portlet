@@ -652,6 +652,9 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 			}
 		}
 		
+		if(groupName.length()>148){
+			groupName = groupName.substring(0, 148);
+		}
 		theGroup.setName(groupName);
 		theGroup.setDescription(summary);
 		

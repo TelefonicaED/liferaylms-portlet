@@ -816,7 +816,6 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 				log.debug("emailAddress:"+emailAddress);
 				log.debug("start: " + start);
 				log.debug("end: " + end);
-				log.debug("order: " + obc != null ? obc.toString() : "null");
 			}
 			
 			
