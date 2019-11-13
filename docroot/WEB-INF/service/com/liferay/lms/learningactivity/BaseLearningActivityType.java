@@ -289,6 +289,11 @@ public abstract class BaseLearningActivityType implements LearningActivityType, 
 	}
 	
 	@Override
+	public boolean isPassed(LearningActivity learningActivity, LearningActivityTry lat){
+		return lat.getResult() >= learningActivity.getPasspuntuation();
+	}
+	
+	@Override
 	public void copyActivity(LearningActivity oldActivity, LearningActivity newActivity, ServiceContext serviceContext){
 		
 	}

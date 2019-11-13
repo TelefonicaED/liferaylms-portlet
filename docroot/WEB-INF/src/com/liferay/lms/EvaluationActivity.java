@@ -19,6 +19,8 @@ import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 import javax.portlet.WindowState;
 
+import com.liferay.lms.learningactivity.LearningActivityType;
+import com.liferay.lms.learningactivity.LearningActivityTypeRegistry;
 import com.liferay.lms.learningactivity.TaskEvaluationLearningActivityType;
 import com.liferay.lms.learningactivity.calificationtype.CalificationType;
 import com.liferay.lms.learningactivity.calificationtype.CalificationTypeRegistry;
@@ -170,7 +172,9 @@ public class EvaluationActivity extends MVCPortlet implements MessageListener{
 		if(learningActivityResult.getResult() != learningActivityTry.getResult()) {
 			LearningActivity learningActivity = LearningActivityLocalServiceUtil.getLearningActivity(learningActivityTry.getActId());
 			learningActivityResult.setResult(learningActivityTry.getResult());
-			learningActivityResult.setPassed(learningActivityTry.getResult()>=learningActivity.getPasspuntuation());
+			LearningActivityTypeRegistry registry = new LearningActivityTypeRegistry();
+			LearningActivityType learningActivityType = registry.getLearningActivityType(learningActivity.getTypeId());
+			learningActivityResult.setPassed(learningActivityType.isPassed(learningActivity, learningActivityTry));
 			learningActivityResult.setComments(learningActivityTry.getComments());
 			LearningActivityResultLocalServiceUtil.updateLearningActivityResult(learningActivityResult);
 		}

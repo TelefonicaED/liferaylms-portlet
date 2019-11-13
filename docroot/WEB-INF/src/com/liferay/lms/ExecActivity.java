@@ -454,7 +454,9 @@ public class ExecActivity extends QuestionsAdmin {
 		if(learningActivityResult.getResult() != learningActivityTry.getResult()) {
 			LearningActivity learningActivity = LearningActivityLocalServiceUtil.getLearningActivity(learningActivityTry.getActId());
 			learningActivityResult.setResult(learningActivityTry.getResult());
-			learningActivityResult.setPassed(learningActivityTry.getResult()>=learningActivity.getPasspuntuation());
+			LearningActivityTypeRegistry registry = new LearningActivityTypeRegistry();
+			LearningActivityType learningActivityType = registry.getLearningActivityType(learningActivity.getTypeId());
+			learningActivityResult.setPassed(learningActivityType.isPassed(learningActivity, learningActivityTry));
 			LearningActivityResultLocalServiceUtil.updateLearningActivityResult(learningActivityResult);
 		}
 	}
