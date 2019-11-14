@@ -1,3 +1,5 @@
+<%@page import="java.util.Collections"%>
+<%@page import="org.apache.commons.beanutils.BeanComparator"%>
 <%@page import="com.liferay.portal.service.PortalPreferencesLocalServiceUtil"%>
 <%@page import="javax.portlet.PortletPreferences"%>
 <%@page import="com.liferay.portal.util.comparator.UserFirstNameComparator"%>

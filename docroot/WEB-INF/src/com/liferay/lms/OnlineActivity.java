@@ -16,6 +16,8 @@ import javax.portlet.RenderResponse;
 import com.liferay.lms.asset.LearningActivityAssetRendererFactory;
 import com.liferay.lms.auditing.AuditConstants;
 import com.liferay.lms.auditing.AuditingLogFactory;
+import com.liferay.lms.learningactivity.LearningActivityType;
+import com.liferay.lms.learningactivity.LearningActivityTypeRegistry;
 import com.liferay.lms.learningactivity.calificationtype.CalificationType;
 import com.liferay.lms.learningactivity.calificationtype.CalificationTypeRegistry;
 import com.liferay.lms.model.Course;
@@ -208,7 +210,9 @@ public class OnlineActivity extends MVCPortlet {
 		if(learningActivityResult.getResult() != learningActivityTry.getResult()) {
 			LearningActivity learningActivity = LearningActivityLocalServiceUtil.getLearningActivity(learningActivityTry.getActId());
 			learningActivityResult.setResult(learningActivityTry.getResult());
-			learningActivityResult.setPassed(learningActivityTry.getResult()>=learningActivity.getPasspuntuation());
+			LearningActivityTypeRegistry registry = new LearningActivityTypeRegistry();
+			LearningActivityType learningActivityType = registry.getLearningActivityType(learningActivity.getTypeId());
+			learningActivityResult.setPassed(learningActivityType.isPassed(learningActivity, learningActivityTry));
 			LearningActivityResultLocalServiceUtil.updateLearningActivityResult(learningActivityResult);
 		}
 	}

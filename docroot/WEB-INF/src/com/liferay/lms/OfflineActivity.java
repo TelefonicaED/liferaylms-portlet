@@ -24,6 +24,8 @@ import javax.portlet.ResourceResponse;
 import au.com.bytecode.opencsv.CSVReader;
 import au.com.bytecode.opencsv.CSVWriter;
 
+import com.liferay.lms.learningactivity.LearningActivityType;
+import com.liferay.lms.learningactivity.LearningActivityTypeRegistry;
 import com.liferay.lms.learningactivity.calificationtype.CalificationType;
 import com.liferay.lms.learningactivity.calificationtype.CalificationTypeRegistry;
 import com.liferay.lms.model.Course;
@@ -576,7 +578,9 @@ public class OfflineActivity extends MVCPortlet {
 		if(learningActivityResult.getResult() != learningActivityTry.getResult()) {
 			LearningActivity learningActivity = LearningActivityLocalServiceUtil.getLearningActivity(learningActivityTry.getActId());
 			learningActivityResult.setResult(learningActivityTry.getResult());
-			learningActivityResult.setPassed(learningActivityTry.getResult()>=learningActivity.getPasspuntuation());
+			LearningActivityTypeRegistry registry = new LearningActivityTypeRegistry();
+			LearningActivityType learningActivityType = registry.getLearningActivityType(learningActivity.getTypeId());
+			learningActivityResult.setPassed(learningActivityType.isPassed(learningActivity, learningActivityTry));
 			LearningActivityResultLocalServiceUtil.updateLearningActivityResult(learningActivityResult);
 		}
 	}
