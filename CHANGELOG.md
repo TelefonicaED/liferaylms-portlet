@@ -9,6 +9,10 @@ El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 
 - #170072 Se añaden mensajes asíncronos al finalizar el clonado de curso y la creación de la edición para acciones a posteriori desde proyectos.
 
+### Fixed
+
+- #170041 Cambiado el formato de fechas al de liferay debido a un bug en el SimpleDateFormat.
+
 ### Deleted
 
 - #161554 Se elimina el hook del search container
