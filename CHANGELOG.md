@@ -5,6 +5,10 @@ El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 
 ## [4.1.0](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v4.1.0)
 
+### Added
+
+- #170072 Se añaden mensajes asíncronos al finalizar el clonado de curso y la creación de la edición para acciones a posteriori desde proyectos.
+
 ### Deleted
 
 - #161554 Se elimina el hook del search container

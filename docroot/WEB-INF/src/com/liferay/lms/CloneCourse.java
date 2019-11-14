@@ -32,6 +32,7 @@ import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.messaging.Message;
+import com.liferay.portal.kernel.messaging.MessageBusUtil;
 import com.liferay.portal.kernel.messaging.MessageListener;
 import com.liferay.portal.kernel.messaging.MessageListenerException;
 import com.liferay.portal.kernel.repository.model.FileEntry;
@@ -149,6 +150,8 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 			PermissionThreadLocal.setPermissionChecker(permissionChecker);
 		
 			doCloneCourse();
+			
+			
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -579,6 +582,12 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 		}else{
 			AsynchronousProcessAuditLocalServiceUtil.updateProcessStatus(process, endDate, LmsConstant.STATUS_ERROR, statusMessage);
 		}
+		
+		log.debug("Enviando mensaje liferay/lms/courseClonePostAction con newCourseId "+newCourse.getCourseId() + " y originCourseId "+course.getCourseId());
+		Message postActionMessage=new Message();
+		postActionMessage.put("originCourseId", course.getCourseId());
+		postActionMessage.put("newCourseId", newCourse.getCourseId());
+		MessageBusUtil.sendMessage("liferay/lms/courseClonePostAction", postActionMessage);
 	
 	}
 	
