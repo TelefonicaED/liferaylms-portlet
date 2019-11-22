@@ -30,7 +30,7 @@ lms.module.courtesytime.miliseconds=5000
 Dejar el war en deploy
 Dejar el jar en lib/ext
 
-##Extensión de funcionalidad
+## Extensión de funcionalidad
 
 Permite la extensión de:
 
@@ -39,8 +39,28 @@ Permite la extensión de:
 - Sistemas de calificación
 - Métodos de inscripción
 - Preguntas de test
-- Acciones en la administración de cursos
 - Diplomas
+
+### Acciones en la administración de cursos
+
+Se ha establecido una interfaz para extender las acciones del curso en la administración de cursos con la interfaz AdminActionType.
+Para implementar una nueva acción hay que añadir lo siguiente:
+
+1. Añadir la siguiente línea en el portal.properties de tu portlet:
+
+> lms.admin.action.type.portlet_WAR_nombreportlet.typeId=com.ted.xxx.ClaseImplementa
+> portlet.add.default.resource.check.whitelist=portlet_WAR_nombreportlet
+
+2. Implementar la interfaz AdminActionType.
+3. En el liferay-portlet de tu portlet, tienes que añadir esta propiedad al portlet que va a ser embebido:
+
+> <use-default-template>false</use-default-template>
+
+4. Añadir en el portal-ext.properties las siguientes propiedades:
+
+> portlet.add.default.resource.check.enabled=true
+
+5. Añadir en el archivo [admin-course-action.md](admin-course-action.md) el identificador
 
 ## Compilación
 

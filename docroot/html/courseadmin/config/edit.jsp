@@ -49,6 +49,7 @@
 	boolean showGo 		= preferences.getValue("showGo", 	 "true").equals("true");
 	boolean showPermission = preferences.getValue("showPermission", "true").equals("true");
 	boolean showSearchTags = preferences.getValue("showSearchTags", "false").equals("true");
+	boolean showDiplomaContent = preferences.getValue("showDiplomaContent", "true").equals("true");
 	boolean showWelcomeMsg = preferences.getValue("showWelcomeMsg", "true").equals("true");
 	boolean showGoodbyeMsg = preferences.getValue("showGoodbyeMsg", "true").equals("true");
 	boolean showOnlyOrganizationUsers = preferences.getValue("showOnlyOrganizationUsers", "false").equals("true");
@@ -141,6 +142,7 @@
 		
 		<aui:input type="checkbox" name="showGo" 		 label="courseadmin.config.showGo" 			value="<%=showGo %>" checked="<%=showGo %>"/>
 		<aui:input type="checkbox" name="showPermission" label="courseadmin.config.showPermission" 	value="<%=showPermission %>" checked="<%=showPermission %>"/>
+		<aui:input type="checkbox" name="showDiplomaContent" label="courseadmin.config.showDiplomaContent" 	value="<%=showDiplomaContent %>" checked="<%=showDiplomaContent %>"/>
 		<aui:input type="checkbox" name="showWelcomeMsg" label="courseadmin.config.showWelcomeMsg" 	value="<%=showWelcomeMsg %>" checked="<%=showWelcomeMsg %>"/>
 		<aui:input type="checkbox" name="showGoodbyeMsg" label="courseadmin.config.showGoodbyeMsg" 	value="<%=showGoodbyeMsg %>" checked="<%=showGoodbyeMsg %>"/>
 	</aui:field-wrapper>
@@ -158,7 +160,6 @@
 		<aui:input type="checkbox"  label="courseadmin.config.show-parent-course-id-column" name="showParentCourseIdColumn" value="<%=preferences.getValue(\"showParentCourseIdColumn\", StringPool.FALSE) %>" ignoreRequestValue="true"/>
 	
 	<%
-		
 		try{
 		
 			List<ExpandoColumn> expandosColumnCourse = ExpandoColumnLocalServiceUtil.getDefaultTableColumns(themeDisplay.getCompanyId(), ClassNameLocalServiceUtil.getClassNameId(Course.class));

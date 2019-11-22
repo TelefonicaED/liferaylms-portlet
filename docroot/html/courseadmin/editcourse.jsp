@@ -398,6 +398,22 @@ if(isCourseChild){
 				</portlet:actionURL>
 				<liferay-ui:icon-delete url="<%=deleteURL.toString() %>" />
 			<%}%>
+			<c:forEach var="action" items="${adminActionTypes}">
+				<c:set var="preferences" value="<%=preferences %>" />
+				<c:set var="myVar" value="show${action.getTypeId()}" />
+				
+				 <c:if test="${action.hasPermission(themeDisplay.getUserId()) and preferences.getValue(myVar, 'true').equals('true')}">
+				
+					<portlet:renderURL var="specificURL" >
+						<portlet:param name="jspPage" value="/html/courseadmin/inc/specific_action.jsp" />
+						<portlet:param name="courseId" value="<%=String.valueOf(courseId) %>" />
+						<portlet:param name="portletId" value="${action.getPortletId()}" />
+						<portlet:param name="backURL" value="<%=themeDisplay.getURLCurrent() %>" />
+					</portlet:renderURL>
+					<liferay-ui:icon image="${action.getIcon()}" message="${action.getName(locale)}"  label="true"
+						url="${specificURL}" />
+				 </c:if>
+			</c:forEach>
 			
 		</liferay-ui:icon-menu>
 	</aui:fieldset>
@@ -509,11 +525,11 @@ if(isCourseChild){
 	<c:if test="${renderRequest.preferences.getValue('showResume', 'true') }">
 		<aui:input type="textarea" cols="100" rows="4" name="summary" label="summary" value="<%=summary %>"/>
 	</c:if>
-	
-	<div id="<portlet:namespace/>diplomaContent">
-		<%@include file="/html/courseadmin/inc/specificContent.jsp" %>
-	</div>
-	
+	<c:if test="${renderRequest.preferences.getValue('showDiplomaContent', 'true') }">
+		<div id="<portlet:namespace/>diplomaContent">
+			<%@include file="/html/courseadmin/inc/specificContent.jsp" %>
+		</div>
+	</c:if>
 	
 		<%
 		List<Long> courseEvalIds = new ArrayList<Long>();
