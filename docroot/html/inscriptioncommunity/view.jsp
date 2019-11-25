@@ -107,10 +107,10 @@
 														<aui:validator name="required" errorMessage="select-edition"/>
 													</aui:input>
 													<div class="edition-dates">
-														<span><liferay-ui:message key="inscription-date"/>:</span> <span><fmt:formatDate type="both" dateStyle="short" timeStyle="short" value="${childCourse.startDate }" /> - <fmt:formatDate type="both" dateStyle="short" timeStyle="short" value="${childCourse.endDate }" /></span>
+														<span><liferay-ui:message key="inscription-date"/>:</span> <span><fmt:formatDate timeZone="${themeDisplay.timeZone }" type="both" dateStyle="short" timeStyle="short" value="${childCourse.startDate }" /> - <fmt:formatDate timeZone="${themeDisplay.timeZone }" type="both" dateStyle="short" timeStyle="short" value="${childCourse.endDate }" /></span>
 													</div>
 													<div class="edition-dates">
-														<span><liferay-ui:message key="execution-date"/>:</span> <span><fmt:formatDate type="both" dateStyle="short" timeStyle="short" value="${childCourse.executionStartDate }" /> - <fmt:formatDate type="both" dateStyle="short" timeStyle="short" value="${childCourse.executionEndDate }" /></span>
+														<span><liferay-ui:message key="inscription-community.execution-date"/>:</span> <span><fmt:formatDate timeZone="${themeDisplay.timeZone }" type="both" dateStyle="short" timeStyle="short" value="${childCourse.executionStartDate }" /> - <fmt:formatDate type="both" timeZone="${themeDisplay.timeZone }" dateStyle="short" timeStyle="short" value="${childCourse.executionEndDate }" /></span>
 													</div>
 													<c:if test="${not empty inscriptionException }">
 														<div class="mensaje_marcado">${fn:substringAfter(inscriptionException.message, ':')}</div>
