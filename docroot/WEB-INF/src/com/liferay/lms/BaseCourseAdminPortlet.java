@@ -506,8 +506,9 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 				AuditingLogFactory.audit(serviceContext.getCompanyId(), serviceContext.getScopeGroupId(), Course.class.getName(), edition.getCourseId(), serviceContext.getUserId(), AuditConstants.DELETE, null);
 			}
 			
-			CourseLocalServiceUtil.deleteCourse(courseId);
 			AuditingLogFactory.audit(serviceContext.getCompanyId(), serviceContext.getScopeGroupId(), Course.class.getName(), courseId, serviceContext.getUserId(), AuditConstants.DELETE, null);
+			
+			CourseLocalServiceUtil.deleteCourse(courseId);
 			
 			
 		}

@@ -761,11 +761,11 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 		
 		
 		if (startDate != null){
-			params.put(CourseParams.PARAM_EXECUTION_START_DATE, String.valueOf(startDate.getTimeInMillis()) );
+			params.put(CourseParams.PARAM_EXECUTION_START_DATE, startDate.getTime());
 		}
 		
 		if (endDate != null){
-			params.put(CourseParams.PARAM_EXECUTION_END_DATE, String.valueOf(endDate.getTimeInMillis()));
+			params.put(CourseParams.PARAM_EXECUTION_END_DATE, endDate.getTime());
 		}
 		
 		String orderByCol = ParamUtil.getString(renderRequest, "orderByCol");
