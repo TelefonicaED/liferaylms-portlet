@@ -170,6 +170,16 @@
 		WHERE
 			(Lms_Course.closed = ?)
 	</sql>
+	
+	<sql id="com.liferay.lms.service.persistence.CourseFinder.whereExecutionStartDate">
+		WHERE
+			(1000*UNIX_TIMESTAMP(Lms_Course.executionStartDate) [$EXECUTION_START_DATE$])
+	</sql>
+	<sql id="com.liferay.lms.service.persistence.CourseFinder.whereExecutionEndDate">
+		WHERE
+			(1000*UNIX_TIMESTAMP(Lms_Course.executionEndDate) [$EXECUTION_END_DATE$])
+	</sql>
+	
 	<sql id="com.liferay.lms.service.persistence.CourseFinder.whereParentCourseId">
 		WHERE
 			(Lms_Course.parentCourseId = ? OR (0 = ? AND Lms_Course.parentCourseId IS NULL))

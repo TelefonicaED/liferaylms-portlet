@@ -22,6 +22,7 @@ El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 - #167833 Añadidos los servicios countActiveByCompanyIdClassNameIdClassPK y getActiveByCompanyIdClassNameIdClassPK para ver los procesos que están actualmente en curso para una acción.
 - #167536 Añadida configuración para ocultar las opciones dinámicas. Se pasan las preferencias al portlet destino para poder utilizarlas.
 - #168060: Ampliación del portlet de "mis cursos" de wecorp. Nuevos servicios
+- #165787: En la gestión de cursos en Admin->Cursos se ha añadido en la configuración la posibilidad de habilitar los filtros de fechas de ejecución  para realizar las búsquedas de cursos, buscará los cursos cuya fecha de inicio de ejecución sea mayor que la fecha de inicio seleccionada y/o cuya fecha de fin de ejecución sea menor a la fecha de fin seleccionada.
 
 ### Updated
 

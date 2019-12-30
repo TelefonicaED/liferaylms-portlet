@@ -61,6 +61,8 @@
 	boolean filterByTemplates = preferences.getValue("filterByTemplates","false").equals("true");
 	boolean showGroupFilter = preferences.getValue("showGroupFilter", "false").equals("true");
 	
+	boolean executionDates = Boolean.parseBoolean(preferences.getValue("executionDates",  "false"));
+	
 	boolean expandos = Boolean.parseBoolean(preferences.getValue("showExpandos", "false"));
 	boolean expandosEdition = Boolean.parseBoolean(preferences.getValue("showExpandosEdition", "false"));
 	List<ExpandoColumn> listExpandos = ExpandoColumnLocalServiceUtil.getColumns(themeDisplay.getCompanyId(), Course.class.getName(), ExpandoTableConstants.DEFAULT_TABLE_NAME);
@@ -74,6 +76,8 @@
 		<aui:input type="checkbox" name="showSearchTags" label="courseadmin.config.showSearchTags" value="<%=showSearchTags %>" checked="<%=showSearchTags %>"/>
 		<aui:input type="checkbox" name="showGroupFilter" label="courseadmin.config.show-group-filter" value="<%=showGroupFilter %>" checked="<%=showGroupFilter %>"/>
 		<aui:input type="checkbox" helpMessage="help-available-categories" label="available-categories" name="categories" value="<%=preferences.getValue(\"categories\", StringPool.TRUE) %>" ignoreRequestValue="true"/>
+		
+		<aui:input type="checkbox" helpMessage="help-available-execution-course-dates" label="available-execution-course-dates" name="executionDates" checked="<%=executionDates %>" ignoreRequestValue="true"/> 
 		
 		<aui:input type="checkbox" name="showExpandos" label="custom-attributes" value="<%=expandos %>" checked="<%=expandos %>" 
 			onchange="javascript:${renderResponse.getNamespace()}changeCustomAttributes()"/>

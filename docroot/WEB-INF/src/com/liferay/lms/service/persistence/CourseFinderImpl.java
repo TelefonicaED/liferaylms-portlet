@@ -121,6 +121,10 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			CourseFinder.class.getName() + ".whereGroupId";
 	public static final String WHERE_STATUS = 
 			CourseFinder.class.getName() + ".whereStatus";
+	public static final String WHERE_EXECUTION_START_DATE = 
+			CourseFinder.class.getName() + ".whereExecutionStartDate";
+	public static final String WHERE_EXECUTION_END_DATE = 
+			CourseFinder.class.getName() + ".whereExecutionEndDate";
 	public static final String WHERE_PARENT_COURSE_ID = 
 			CourseFinder.class.getName() + ".whereParentCourseId";
 	public static final String WHERE_SCREEN_NAME =
@@ -228,8 +232,16 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 				params.put(PARAM_GROUP_ID, groupId);
 			}
 			
+			if(!params.containsKey(CourseParams.PARAM_EXECUTION_START_DATE)){
+				params.put(PARAM_EXECUTION_START_DATE, "");
+			}
+			if(!params.containsKey(CourseParams.PARAM_EXECUTION_END_DATE)){
+				params.put(PARAM_EXECUTION_END_DATE, "");
+			}
+			
 			session = openSession();
 			
+			log.debug("FIND_BY_C_T_D_S_PC_G: " + FIND_BY_C_T_D_S_PC_G);
 			String sql = CustomSQLUtil.get(FIND_BY_C_T_D_S_PC_G);
 			
 			StringBundler sb = new StringBundler();
@@ -248,7 +260,7 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 					orderBy = StringUtil.replace(orderBy, "[$LANGUAGE$]", languageId);
 				}else{
 					log.debug("obc: " + obc.toString());
-					orderBy = "ORDER BY " + obc.toString();
+					orderBy = " ORDER BY " + obc.toString();
 				}
 			}else{
 				log.debug("obc null ");
@@ -261,6 +273,8 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			sql = sb.toString();
 			
 			sql = CustomSQLUtil.replaceAndOperator(sql, andOperator);
+			
+			log.debug("************** sql: " + sql);
 			
 			SQLQuery q = session.createSQLQuery(sql);
 
@@ -296,8 +310,12 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 	protected String replaceJoinAndWhere(
 		String sql, LinkedHashMap<String, Object> params, String languageId, long companyId) throws PortalException, SystemException {
 
+		log.debug("1 replaceJoinAndWhere - sql: " + sql);
+		
 		sql = StringUtil.replace(sql, "[$JOIN$]", getJoin(params, companyId));
 		sql = StringUtil.replace(sql, "[$WHERE$]", getWhere(params, languageId));
+		
+		log.debug("2 replaceJoinAndWhere - sql: " + sql);
 
 		return sql;
 	}
@@ -306,6 +324,8 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 		if ((params == null) || params.isEmpty()) {
 			return StringPool.BLANK;
 		}
+		
+		log.debug("getJoin 1");
 		
 		StringBundler sb = new StringBundler(params.size());
 		
@@ -326,11 +346,18 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			String key = entry.getKey();
 
 			Object value = entry.getValue();
+			
+			log.debug("getJoin 2 - key: " + key + " - value: " + value);
 
-			sb.append(getJoin(key, value, companyId));
+			if ((key.equals(CourseParams.PARAM_EXECUTION_START_DATE) || key.equals(CourseParams.PARAM_EXECUTION_END_DATE))  
+					&& value != null && !"".equals(value)){
+				sb.append(getJoin(key, value, companyId));
+			}
 
 		}
 
+		log.debug("getJoin - sb.toString: " + sb.toString());
+		
 		return sb.toString();
 	}
 	
@@ -481,6 +508,9 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			sb.append(getWhere(key, value, languageId));
 		}
 
+		
+		log.debug("getWhere - sb.toString: "  + sb.toString());
+		
 		return sb.toString();
 	}
 
@@ -552,6 +582,18 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 		else if (key.equals(PARAM_STATUS)) {
 			join = CustomSQLUtil.get(WHERE_STATUS);
 		}
+		else if (key.equals(PARAM_EXECUTION_START_DATE)) {
+			if (value != null && !"".equals(value)){
+				join = CustomSQLUtil.get(WHERE_EXECUTION_START_DATE);	
+				join = StringUtil.replace(join, "[$EXECUTION_START_DATE$]", "> " + String.valueOf(value));
+			}
+		}
+		else if (key.equals(PARAM_EXECUTION_END_DATE)) {
+			if (value != null && !"".equals(value)){
+				join = CustomSQLUtil.get(WHERE_EXECUTION_END_DATE);
+				join = StringUtil.replace(join, "[$EXECUTION_END_DATE$]", "< " + String.valueOf(value));
+			}
+		}
 		else if (key.equals(PARAM_PARENT_COURSE_ID)) {
 			join = CustomSQLUtil.get(WHERE_PARENT_COURSE_ID);
 		}
@@ -608,6 +650,16 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 				qPos.add(valueLong);
 				log.debug("*****QPOS****** Parent Course Id: " + valueLong);
 				log.debug("*****QPOS****** Parent Course Id: " + valueLong);
+			}else if(key.equals(PARAM_EXECUTION_START_DATE)){
+				String sValue = (String)value;
+				if (sValue != null && !"".equals(sValue)){
+					log.debug("*****QPOS****** Execution Start Date: " + sValue);
+				}
+			}else if(key.equals(PARAM_EXECUTION_END_DATE)){
+				String sValue = (String)value;
+				if (sValue != null && !"".equals(sValue)){
+					log.debug("*****QPOS****** Execution End Date: " + sValue);
+				}
 			}else if(key.equals(PARAM_TITLE_DESCRIPTION)){
 				String[] valueArray = (String[])value;
 				
@@ -1725,6 +1777,8 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 	private static final String PARAM_GROUP_ID = "groupId";
 	private static final String PARAM_STATUS = "status";
 	private static final String PARAM_PARENT_COURSE_ID = "parentCourseId";
+	private static final String PARAM_EXECUTION_START_DATE = "executionStartDate";
+	private static final String PARAM_EXECUTION_END_DATE = "executionEndDate";
 
 
 	
