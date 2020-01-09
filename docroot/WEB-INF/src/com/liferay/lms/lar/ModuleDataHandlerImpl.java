@@ -30,6 +30,7 @@ import com.liferay.portal.kernel.lar.PortletDataHandlerControl;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.xml.Document;
@@ -39,6 +40,9 @@ import com.liferay.portal.kernel.xml.SAXReaderUtil;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
+import com.liferay.portlet.asset.model.AssetEntry;
+import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
+import com.liferay.portlet.documentlibrary.model.DLFileEntry;
 import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
 import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
 import com.liferay.util.LmsLocaleUtil;
@@ -229,13 +233,19 @@ public class ModuleDataHandlerImpl extends BasePortletDataHandler {
 			ExportUtil.descriptionFileParserDescriptionToLar(actividad.getDescription(), actividad.getGroupId(), actividad.getModuleId(), context, entryElementLoc);		
 		
 			//Exportar las imagenes de los resources.
-			if(actividad.getTypeId() == 2 || actividad.getTypeId() == 7|| actividad.getTypeId() == 9 ){
+			if(actividad.getTypeId() == 2 || actividad.getTypeId() == 7|| actividad.getTypeId() == 9 || actividad.getTypeId() == 6){
 				List<String> img = new LinkedList<String>();
 				if(actividad.getTypeId() == 2){
 					img = LearningActivityLocalServiceUtil.getExtraContentValues(actividad.getActId(), "document");
 				}else if(actividad.getTypeId() == 7 || actividad.getTypeId() == 9){
 					log.info("ENTRO CON "+actividad.getTypeId());
 					img.add(LearningActivityLocalServiceUtil.getExtraContentValue(actividad.getActId(), "assetEntry"));
+				}else if(actividad.getTypeId() == 6){
+					long additionalFileId = GetterUtil.getLong(LearningActivityLocalServiceUtil.getExtraContentValue(actividad.getActId(),"additionalFile"), 0);
+					if(additionalFileId>0){
+						AssetEntry assetEntry = AssetEntryLocalServiceUtil.getEntry(DLFileEntry.class.getName(), additionalFileId);
+						img.add(String.valueOf(assetEntry.getEntryId()));
+					}
 				}
 				
 				try {
