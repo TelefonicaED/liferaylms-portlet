@@ -238,8 +238,6 @@ public class CourseServiceImpl extends CourseServiceBaseImpl {
 
 				//auditing
 				AuditingLogFactory.audit(course.getCompanyId(), course.getGroupId(), Course.class.getName(), course.getCourseId(), serviceContext.getUserId(), AuditConstants.REGISTER, null);
-				
-			 
 			}
 		}
 	}

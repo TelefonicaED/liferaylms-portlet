@@ -111,6 +111,7 @@ Course parentCourse = null;
 String parentCourseTitle = "";
 boolean isCourseChild = false;
 long templateParent = 0;
+boolean showMessageDenied = false;
 if(request.getAttribute("course")!=null){
 	course=(Course)request.getAttribute("course");
 }
@@ -418,6 +419,124 @@ if(isCourseChild){
 		</liferay-ui:icon-menu>
 	</aui:fieldset>
 </c:if>
+<script>
+	var <portlet:namespace />showMessageDenied = <%=showMessageDenied%>;
+	
+	function <portlet:namespace />changeWelcome(){
+		var div = document.getElementById("containerWelcomeMsg");
+		if(div.style.display&&div.style.display=='none'){
+			div.style.display='block';
+		}else{
+			div.style.display='none';
+		}
+	}
+	
+	function <portlet:namespace />enableDeniedInscriptionMessage(){
+		var div = document.getElementById("containerDeniedInscriptionMsg");
+		if(div.style.display&&div.style.display=='none'){
+			div.style.display='block';
+		}else{
+			div.style.display='none';
+		}
+	}
+	
+	function <portlet:namespace />changeRegistrationType(registrationType){
+		if(<portlet:namespace />showMessageDenied){
+			var div = document.getElementById("panelDeniedInscription");
+			if(registrationType.value == <%=GroupConstants.TYPE_SITE_RESTRICTED%> && div.style.display&&div.style.display=='none'){
+				div.style.display='block';
+			} else if(div.style.display&&div.style.display=='block'){
+				div.style.display='none';
+			}
+		}	
+	}
+	
+	function <portlet:namespace />changeEvaluationMethod(courseEvalId){
+		<%if(course!=null){	%>
+			var currentCourseEval = <%=course.getCourseEvalId()%>;
+			if(courseEvalId!=currentCourseEval){
+				alert('<%=LanguageUtil.get(locale, "courseadmin.change-evaluation-method-alert")%>');	
+			}
+			
+		<%}	%>
+	}
+	
+	function <portlet:namespace />changeGoodbye(){
+		var div = document.getElementById("containerGoodbyeMsg");
+		if(div.style.display&&div.style.display=='none'){
+			div.style.display='block';
+		}else{
+			div.style.display='none';
+		}
+	}
+	
+	function <portlet:namespace />checkduplicate(val, field){
+		var courseId = document.getElementById('<portlet:namespace />courseId').value;
+	   	return !Liferay.Service.Lms.Course.existsCourseName(
+	   		{
+	   			companyId: themeDisplay.getCompanyId(),
+	   			courseId: (courseId > 0 ? courseId : null),
+	   			groupName: val,
+	   			serviceParameterTypes: JSON.stringify(['java.lang.Long', 'java.lang.Long', 'java.lang.String'])
+	   		}
+	   	);
+	}
+	
+	function <portlet:namespace />changeInscriptionType(typeId){
+		$(".especific_content_page_inscription").addClass("aui-helper-hidden");
+		$("#<portlet:namespace />especific_content_page_inscription_"+typeId).removeClass("aui-helper-hidden");
+			
+		$("#<portlet:namespace/>group_types").addClass("aui-helper-hidden");
+			
+		$.ajax({
+			dataType: 'json',
+			url:'${searchGroupTypesURL}',
+		    cache:false,
+		    data:{
+		    	inscriptionTypeId : typeId
+			},
+			success: function(data){
+				if(data){					
+					if(data.groupTypeIds.length>0){
+						
+						<portlet:namespace />showMessageDenied = data.showMessageDenied;
+						
+						var selected = $("#<portlet:namespace/>registrationType").val();
+						
+						var options = '';
+						var option = 0;
+						$.each(data.groupTypeIds, function() {		
+							options+=	'<option value="'+this.id+'" ';
+							if(selected == this.id){
+								options+=' selected ';
+								option = this.id;
+							}
+							options +='>'+this.name + '</option>';
+						});		
+						
+						$("#<portlet:namespace/>registrationType").html(options);
+						
+						if("<%=showRegistrationType %>" == "true" && data.groupTypeIds.length > 1){
+							$("#<portlet:namespace/>group_types").removeClass("aui-helper-hidden");
+						}
+						if(data.showMessageDenied == false){
+							var div = document.getElementById("panelDeniedInscription");
+							div.style.display='none';
+						}else if(option == <%=GroupConstants.TYPE_SITE_RESTRICTED%>){
+							var div = document.getElementById("panelDeniedInscription");
+							div.style.display='block';
+						}
+					}
+				}else{
+					alert("error");
+				}
+			},
+			error: function(){
+				alert("Error");
+			}
+		});
+	}
+</script>
 
 <aui:form name="fm" action="<%=savecourseURL%>" role="form" method="post" enctype="multipart/form-data">
 
@@ -786,6 +905,7 @@ if(isCourseChild){
 				InscriptionType instype = inscription.getInscriptionType(ins);
 				if((course == null && PropsUtil.get("lms.inscription.default.type").equals(String.valueOf(ins))) || (course != null && ins == course.getInscriptionType())){
 					selected = true;
+					showMessageDenied = instype.showMessageDenied();
 					itype = instype;
 				}
 				%>
@@ -812,54 +932,7 @@ if(isCourseChild){
 				}
 			}
 			%>	
-				<script>
-				function <portlet:namespace />changeInscriptionType(typeId){
-					$(".especific_content_page_inscription").addClass("aui-helper-hidden");
-					$("#<portlet:namespace />especific_content_page_inscription_"+typeId).removeClass("aui-helper-hidden");
-					
-					//Además cambiamos los tipos de inscripción
-						
-					$("#<portlet:namespace/>group_types").addClass("aui-helper-hidden");
-						
-					$.ajax({
-						dataType: 'json',
-						url:'${searchGroupTypesURL}',
-					    cache:false,
-					    data:{
-					    	inscriptionTypeId : typeId
-						},
-						success: function(data){
-							if(data){					
-								if(data.length>0){
-									
-									var selected = $("#<portlet:namespace/>registrationType").val();
-									
-									var options = '';								
-													
-									$.each(data, function() {		
-										options+=	'<option value="'+this.id+'" ';
-										if(selected == this.id){
-											options+=' selected ';
-										}
-										options +='>'+this.name + '</option>';
-									});		
-									
-									$("#<portlet:namespace/>registrationType").html(options);
-									
-									if("<%=showRegistrationType %>" == "true" && data.length > 1){
-										$("#<portlet:namespace/>group_types").removeClass("aui-helper-hidden");
-									}
-								}
-							}else{
-								alert("error");
-							}
-						},
-						error: function(){
-							alert("Error");
-						}
-					});
-				}
-				</script>
+				
 			<%
 		}else{
 			
@@ -1155,7 +1228,7 @@ if(isCourseChild){
 			boolean activeDeniedInscriptionMessage =(course!=null&&course.isDeniedInscription()?true:false);  
 			String deniedInscriptionMsg = (course!=null&&course.getDeniedInscriptionMsg()!=null?course.getDeniedInscriptionMsg():"");
 		%>	
-		<div id="panelDeniedInscription" style='display:<%=groupCreated!=null && groupCreated.getType()==GroupConstants.TYPE_SITE_RESTRICTED?"block":"none"%>'>
+		<div id="panelDeniedInscription" style='display:<%=groupCreated!=null && groupCreated.getType()==GroupConstants.TYPE_SITE_RESTRICTED&&showMessageDenied?"block":"none"%>'>
 			<liferay-ui:panel title="denied-inscription-msg" collapsible="true" defaultState='<%=activeDeniedInscriptionMessage?"open":"closed" %>'>
 				<aui:input type="checkbox" name="deniedInscriptionMessage" label="enabled" value='<%=activeDeniedInscriptionMessage %>' onChange="javascript:${renderResponse.getNamespace() }enableDeniedInscriptionMessage();"/>
 				
@@ -1260,63 +1333,3 @@ if(isCourseChild){
 
 <% themeDisplay.setIncludeServiceJs(true); %>
 <script src="/liferaylms-portlet/js/service.js" type="text/javascript"></script>
-
-<script type="text/javascript">
-	function <portlet:namespace />changeWelcome(){
-		var div = document.getElementById("containerWelcomeMsg");
-		if(div.style.display&&div.style.display=='none'){
-			div.style.display='block';
-		}else{
-			div.style.display='none';
-		}
-	}
-	
-	function <portlet:namespace />enableDeniedInscriptionMessage(){
-		var div = document.getElementById("containerDeniedInscriptionMsg");
-		if(div.style.display&&div.style.display=='none'){
-			div.style.display='block';
-		}else{
-			div.style.display='none';
-		}
-	}
-	
-	function <portlet:namespace />changeRegistrationType(registrationType){
-		var div = document.getElementById("panelDeniedInscription");
-		if(registrationType.value == <%=GroupConstants.TYPE_SITE_RESTRICTED%> && div.style.display&&div.style.display=='none'){
-			div.style.display='block';
-		} else if(div.style.display&&div.style.display=='block'){
-			div.style.display='none';
-		}
-	}
-	
-	function <portlet:namespace />changeEvaluationMethod(courseEvalId){
-		<%if(course!=null){	%>
-			var currentCourseEval = <%=course.getCourseEvalId()%>;
-			if(courseEvalId!=currentCourseEval){
-				alert('<%=LanguageUtil.get(locale, "courseadmin.change-evaluation-method-alert")%>');	
-			}
-			
-		<%}	%>
-	}
-	
-	function <portlet:namespace />changeGoodbye(){
-		var div = document.getElementById("containerGoodbyeMsg");
-		if(div.style.display&&div.style.display=='none'){
-			div.style.display='block';
-		}else{
-			div.style.display='none';
-		}
-	}
-	
-	function <portlet:namespace />checkduplicate(val, field){
-		var courseId = document.getElementById('<portlet:namespace />courseId').value;
-	   	return !Liferay.Service.Lms.Course.existsCourseName(
-	   		{
-	   			companyId: themeDisplay.getCompanyId(),
-	   			courseId: (courseId > 0 ? courseId : null),
-	   			groupName: val,
-	   			serviceParameterTypes: JSON.stringify(['java.lang.Long', 'java.lang.Long', 'java.lang.String'])
-	   		}
-	   	);
-	}
-</script>

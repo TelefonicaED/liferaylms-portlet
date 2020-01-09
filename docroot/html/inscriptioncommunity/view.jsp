@@ -96,7 +96,7 @@
 										<c:forEach items="${listChildCourses}" var="childCourse">
 											<c:if test="${childCourse.isRegistrationOnDate() }">
 												<c:catch var ="inscriptionException">
-													<c:if test="${childCourse.canEnroll(themeDisplay.userId, false, themeDisplay.locale, themeDisplay.permissionChecker)}">
+													<c:if test="${childCourse.inscription.canEnrollUser(childCourse,themeDisplay.userId, false, themeDisplay.locale, themeDisplay.permissionChecker)}">
 														<c:set var="childAvailable" value="true" />
 													</c:if>
 												</c:catch>
@@ -133,7 +133,7 @@
 								<c:otherwise>
 									<!-- Si no tiene convocatorias, se hace igual que hasta ahora, teniendo en cuenta los equipos -->
 									<c:catch var ="inscriptionException">
-										<c:if test="${course.canEnroll(themeDisplay.userId, false, themeDisplay.locale, themeDisplay.permissionChecker)}">
+										<c:if test="${course.inscription.canEnrollUser(course,themeDisplay.userId, false, themeDisplay.locale, themeDisplay.permissionChecker)}">
 											<aui:form name="enrollForm" action="${enrollURL}">
 												<aui:input name="courseId" value="${course.courseId }" type="hidden"/>
 												

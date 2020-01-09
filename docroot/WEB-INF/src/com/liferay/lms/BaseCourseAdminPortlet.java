@@ -1553,9 +1553,13 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 			
 			response.setCharacterEncoding("UTF-8");
 			response.setContentType("application/json;charset=UTF-8");
+			
+			JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
+			jsonObject.put("groupTypeIds", jsonArray);
+			jsonObject.put("showMessageDenied", inscriptionType.showMessageDenied());
 
 			PrintWriter writer = response.getWriter();
-			writer.write(jsonArray.toString());
+			writer.write(jsonObject.toString());
 		}else{
 			
 			String action = ParamUtil.getString(request, "action");

@@ -28,7 +28,6 @@ import javax.portlet.PortletPreferences;
 
 import com.liferay.lms.auditing.AuditConstants;
 import com.liferay.lms.auditing.AuditingLogFactory;
-import com.liferay.lms.learningactivity.calificationtype.CalificationTypeRegistry;
 import com.liferay.lms.learningactivity.courseeval.CourseEval;
 import com.liferay.lms.learningactivity.courseeval.CourseEvalRegistry;
 import com.liferay.lms.model.Course;
@@ -1171,25 +1170,25 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 	{
 		Course course=courseLocalService.getCourse(courseId);
 		
-			User user = userLocalService.fetchUser(userId);
-			if (!GroupLocalServiceUtil.hasUserGroup(user.getUserId(), course.getGroupCreatedId())) {
-				GroupLocalServiceUtil.addUserGroups(user.getUserId(), new long[] { course.getGroupCreatedId() });
-				//sendEmail(user,course);
-			}
-			
-			UserGroupRoleLocalServiceUtil.addUserGroupRoles(new long[] { user.getUserId() },
-					course.getGroupCreatedId(), RoleLocalServiceUtil.getRole(user.getCompanyId(), RoleConstants.SITE_MEMBER).getRoleId());
-			CourseResult courseResult=courseResultLocalService.getCourseResultByCourseAndUser(courseId, user.getUserId());
-			if(courseResult==null)
-			{
-				courseResultLocalService.create(courseId, user.getUserId(), allowStartDate, allowFinishDate);
-			}
-			else
-			{
-				courseResult.setAllowStartDate(allowStartDate);
-				courseResult.setAllowFinishDate(allowFinishDate);
-				courseResultLocalService.updateCourseResult(courseResult);
-			}
+		User user = userLocalService.fetchUser(userId);
+		if (!GroupLocalServiceUtil.hasUserGroup(user.getUserId(), course.getGroupCreatedId())) {
+			GroupLocalServiceUtil.addUserGroups(user.getUserId(), new long[] { course.getGroupCreatedId() });
+			//sendEmail(user,course);
+		}
+		
+		UserGroupRoleLocalServiceUtil.addUserGroupRoles(new long[] { user.getUserId() },
+				course.getGroupCreatedId(), RoleLocalServiceUtil.getRole(user.getCompanyId(), RoleConstants.SITE_MEMBER).getRoleId());
+		CourseResult courseResult=courseResultLocalService.getCourseResultByCourseAndUser(courseId, user.getUserId());
+		if(courseResult==null)
+		{
+			courseResultLocalService.create(courseId, user.getUserId(), allowStartDate, allowFinishDate);
+		}
+		else
+		{
+			courseResult.setAllowStartDate(allowStartDate);
+			courseResult.setAllowFinishDate(allowFinishDate);
+			courseResultLocalService.updateCourseResult(courseResult);
+		}
 					 
 		
 	}
@@ -1376,7 +1375,7 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 							// 4. El mÃ¡ximo de inscripciones del curso no ha sido superado
 							if(course.getMaxusers()<=0 || countStudentsFromCourse(courseId, course.getCompanyId(), null, null, null, null, WorkflowConstants.STATUS_APPROVED, null, true) < course.getMaxusers()){
 								if(group.getType()==GroupConstants.TYPE_SITE_OPEN){
-									Role sitemember=RoleLocalServiceUtil.getRole(course.getCompanyId(), RoleConstants.SITE_MEMBER) ;
+									
 									
 									if(teamId>0){
 				            			long[] userIds = new long[1];
@@ -1385,12 +1384,7 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 				            				UserLocalServiceUtil.addTeamUsers(teamId, userIds);	
 				            			}			
 				            		}
-									
-									GroupLocalServiceUtil.addUserGroups(userId, new long[]{group.getGroupId()});
-									UserGroupRoleLocalServiceUtil.addUserGroupRoles(new long[] { userId }, group.getGroupId(), sitemember.getRoleId());
-									SocialActivityLocalServiceUtil.addActivity(userId, group.getGroupId(), Group.class.getName(), group.getGroupId(), com.liferay.portlet.social.model.SocialActivityConstants.TYPE_SUBSCRIBE, "", userId);
-									User u = UserLocalServiceUtil.getUser(userId);
-									log.debug("Inscribimos usuario con id: " + u.getUserId() + " (" + u.getScreenName() + ")" + " en la comunidad con id: " + group.getGroupId() + " (" + group.getName() + ")");
+									addStudentToCourse(course, userId);
 								}else{
 									if(group.getType()==GroupConstants.TYPE_SITE_RESTRICTED){
 										if(!MembershipRequestLocalServiceUtil.hasMembershipRequest(userId, group.getGroupId(), MembershipRequestConstants.STATUS_PENDING)){
@@ -1435,6 +1429,18 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 			e.printStackTrace();
 		}
 		return result;
+	}
+	
+	public void addStudentToCourse(Course course, long userId) throws PortalException, SystemException{
+		Role sitemember=RoleLocalServiceUtil.getRole(course.getCompanyId(), RoleConstants.SITE_MEMBER) ;
+		
+		GroupLocalServiceUtil.addUserGroups(userId, new long[]{course.getGroupCreatedId()});
+		UserGroupRoleLocalServiceUtil.addUserGroupRoles(new long[] { userId }, course.getGroupCreatedId(), sitemember.getRoleId());
+		SocialActivityLocalServiceUtil.addActivity(userId, course.getGroupCreatedId(), Group.class.getName(), course.getGroupCreatedId(), com.liferay.portlet.social.model.SocialActivityConstants.TYPE_SUBSCRIBE, "", userId);
+		if(log.isDebugEnabled()){
+			User u = UserLocalServiceUtil.getUser(userId);
+			log.debug("Inscribimos usuario con id: " + u.getUserId() + " (" + u.getScreenName() + ")" + " en la comunidad con id: " + course.getGroupCreatedId() + " (" + course.getTitle() + ")");
+		}
 	}
 	
 	
