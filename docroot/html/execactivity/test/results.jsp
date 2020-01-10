@@ -132,9 +132,6 @@
 				<jsp:include page="/html/shared/popResult.jsp" />
 				<%
 			}				//}
-				%>
-							<h2><%=learningActivity.getTitle(themeDisplay.getLocale()) %></h2>
-				<% 
 		}
 		%>
 		

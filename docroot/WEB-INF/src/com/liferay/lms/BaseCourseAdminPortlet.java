@@ -508,17 +508,17 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 			
 			AuditingLogFactory.audit(serviceContext.getCompanyId(), serviceContext.getScopeGroupId(), Course.class.getName(), courseId, serviceContext.getUserId(), AuditConstants.DELETE, null);
 			
-			CourseLocalServiceUtil.deleteCourse(courseId);
+			Course course = CourseLocalServiceUtil.deleteCourse(courseId);
 			
-			
+			if(course.getParentCourseId() > 0){
+				actionResponse.setRenderParameter("courseId", String.valueOf(course.getParentCourseId()));
+				actionResponse.setRenderParameter("view", "editions");
+			}
 		}
 	}
 	public void closeCourse(ActionRequest actionRequest, ActionResponse actionResponse) throws Exception {
 
 		log.debug("******CloseCourse**********");
-
-		
-		ServiceContext serviceContext = ServiceContextFactory.getInstance(Course.class.getName(), actionRequest);
 
 		long courseId = ParamUtil.getLong(actionRequest, "courseId", 0);
 		if (courseId > 0) {	
@@ -526,7 +526,11 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 			for(Course edition : editions){
 				CourseLocalServiceUtil.closeCourse(edition.getCourseId());
 			}
-			CourseLocalServiceUtil.closeCourse(courseId);
+			Course course = CourseLocalServiceUtil.closeCourse(courseId);
+			if(course.getParentCourseId() > 0){
+				actionResponse.setRenderParameter("courseId", String.valueOf(course.getParentCourseId()));
+				actionResponse.setRenderParameter("view", "editions");
+			}
 		}
 	}
 	
@@ -536,7 +540,11 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 		long courseId = ParamUtil.getLong(actionRequest, "courseId", 0);
 		log.debug("::OPEN COURSE:: courseId "+courseId);
 		if (courseId > 0) {	
-			CourseLocalServiceUtil.openCourse(courseId);
+			Course course = CourseLocalServiceUtil.openCourse(courseId);
+			if(course.getParentCourseId() > 0){
+				actionResponse.setRenderParameter("courseId", String.valueOf(course.getParentCourseId()));
+				actionResponse.setRenderParameter("view", "editions");
+			}
 		}
 	}
 	
@@ -1206,9 +1214,6 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 		for (long userId : to) {
 			if (!GroupLocalServiceUtil.hasUserGroup(userId, course.getGroupCreatedId())) {
 				GroupLocalServiceUtil.addUserGroups(userId,	new long[] { course.getGroupCreatedId() });
-			//The application only send one mail at listener
-			//User user = UserLocalServiceUtil.getUser(userId);
-			//sendEmail(user, course);
 			}
 			UserGroupRoleLocalServiceUtil.addUserGroupRoles(new long[] { userId }, course.getGroupCreatedId(), roleId);
 			

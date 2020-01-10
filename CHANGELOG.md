@@ -9,9 +9,13 @@ El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 
 - #170072 Se añaden mensajes asíncronos al finalizar el clonado de curso y la creación de la edición para acciones a posteriori desde proyectos.
 - #168113 Se añaden parámetros para embeber las acciones específicas
+
 ### Fixed
 
-- #170041 Cambiado el formato de fechas al de liferay debido a un bug en el SimpleDateFormat.### Deleted
+- #170041 Cambiado el formato de fechas al de liferay debido a un bug en el SimpleDateFormat.
+- #170849 Se mantiene en la vista de ediciones cuando abres cieras o eliminas una
+
+### Deleted
 
 - #161554 Se elimina el hook del search container
 
@@ -21,15 +25,15 @@ El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 
 - #167833 Añadidos los servicios countActiveByCompanyIdClassNameIdClassPK y getActiveByCompanyIdClassNameIdClassPK para ver los procesos que están actualmente en curso para una acción.
 - #167536 Añadida configuración para ocultar las opciones dinámicas. Se pasan las preferencias al portlet destino para poder utilizarlas.
-- #168060: Ampliación del portlet de "mis cursos" de wecorp. Nuevos servicios
-- #165787: En la gestión de cursos en Admin->Cursos se ha añadido en la configuración la posibilidad de habilitar los filtros de fechas de ejecución  para realizar las búsquedas de cursos, buscará los cursos cuya fecha de inicio de ejecución sea mayor que la fecha de inicio seleccionada y/o cuya fecha de fin de ejecución sea menor a la fecha de fin seleccionada.
+- #168060 Ampliación del portlet de "mis cursos" de wecorp. Nuevos servicios
+- #165787 En la gestión de cursos en Admin->Cursos se ha añadido en la configuración la posibilidad de habilitar los filtros de fechas de ejecución  para realizar las búsquedas de cursos, buscará los cursos cuya fecha de inicio de ejecución sea mayor que la fecha de inicio seleccionada y/o cuya fecha de fin de ejecución sea menor a la fecha de fin seleccionada.
 
 ### Updated
 
 - #167994 Unificación del servicio de mis cursos para usar el mismo finder para mis cursos y mis cursos finalizados. Se modifica el resgistry de los métodos de calificación para que busque siempre los métodos de calificación que están dentro del LMS en su contexto, independientemente de donde se llamen.
-- #167833: Añadido cache a false para los servicios de los procesos asíncronos.
-- #167536: Se mandan las preferencias, el cur y el delta al portlet embebido en las acciones de administración dinámicas
-- #168795: Protegido para evitar nullpointerexception en los tipos de cursos.
+- #167833 Añadido cache a false para los servicios de los procesos asíncronos.
+- #167536 Se mandan las preferencias, el cur y el delta al portlet embebido en las acciones de administración dinámicas
+- #168795 Protegido para evitar nullpointerexception en los tipos de cursos.
 
 
 ### Fixed
@@ -65,9 +69,9 @@ El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 
 - #162986 Se ha añadido una configuración nueva al portlet de inscripción para que tenga en cuenta solo las ediciones cuyo tiempo de ejecución sea posterior a la fecha actual. 
   Si está marcado este check, no se tendrán en cuenta estos cursos y no se le mostrarán al usuario aunque está inscrito, permitiéndole matricularse a otras ediciones que estén disponibles.
-- #159785 - Nueva funcionalidad Limitacion del tiempo de estudio, se incluye en el metodo de inscripcion un nuevo campo a mostrar de días/horas para poder finalizar el curso.
+- #159785 Nueva funcionalidad Limitacion del tiempo de estudio, se incluye en el metodo de inscripcion un nuevo campo a mostrar de días/horas para poder finalizar el curso.
 
-- #164258 - Respuestas ordenadas aleatoriamente en las actividades tipo test. Se incluye la opción en las actividades de Tipo Test que las preguntas de tipo Opciones/Multiple se puedan desordenar las respuestas.
+- #164258 Respuestas ordenadas aleatoriamente en las actividades tipo test. Se incluye la opción en las actividades de Tipo Test que las preguntas de tipo Opciones/Multiple se puedan desordenar las respuestas.
 
 ### Updated
 
@@ -109,8 +113,6 @@ Eliminados imports no usados. Protegidos los expandos por si hay algún error.
  
 - #159623 Meter inicialización courseResult en if para mejora de rendimiento
 
-
-
 ## [3.8.3](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v3.8.3)
 
 ### Fixed 
@@ -131,7 +133,7 @@ Eliminados imports no usados. Protegidos los expandos por si hay algún error.
 
 ### Fixed 
 
-- #157508: Link correcto al css del mediaelementplayer.
+- #157508 Link correcto al css del mediaelementplayer.
 
 ## [3.8.0]
 

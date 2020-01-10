@@ -702,7 +702,7 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 			Group courseGroup=GroupLocalServiceUtil.getGroup(course.getGroupCreatedId());
 			courseGroup.setActive(false);
 			GroupLocalServiceUtil.updateGroup(courseGroup);
-			coursePersistence.update(course, true);		
+			course = coursePersistence.update(course, true);		
 			AssetEntry courseAsset=AssetEntryLocalServiceUtil.getEntry(Course.class.getName(), course.getCourseId());
 			courseAsset.setVisible(false);
 			AssetEntryLocalServiceUtil.updateAssetEntry(courseAsset);
@@ -725,7 +725,7 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 	public Course openCourse(long courseId) throws SystemException,
 	PortalException {
 		
-		Course course=getCourse(courseId);
+		Course course=coursePersistence.findByPrimaryKey(courseId);
 		log.debug("::OPEN COURSE "+course.getClosed());
 		if(course.getClosed()){
 			course.setClosed(false);
@@ -733,7 +733,7 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 			Group courseGroup=groupLocalService.getGroup(course.getGroupCreatedId());
 			courseGroup.setActive(true);
 			groupLocalService.updateGroup(courseGroup);
-			coursePersistence.update(course, true);	
+			course = coursePersistence.update(course, true);	
 			AssetEntry courseAsset=assetEntryLocalService.getEntry(Course.class.getName(), course.getCourseId());
 			courseAsset.setVisible(true);
 			assetEntryLocalService.updateAssetEntry(courseAsset);
@@ -778,18 +778,14 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 		} catch (Exception e) {e.printStackTrace();}
 	
 		
-		try {
-			coursePersistence.remove(course);
-		} catch (Exception e) {e.printStackTrace();}
-		return null;
+		course = coursePersistence.remove(course);
+		
+		return course;
 	}
 
 	@Indexable(type = IndexableType.DELETE)
 	public Course deleteCourse(long courseId) throws SystemException,PortalException {
-		try {
-			this.deleteCourse(CourseLocalServiceUtil.getCourse(courseId));
-		} catch (Exception e) {e.printStackTrace();}
-		return null;
+		return deleteCourse(coursePersistence.findByPrimaryKey(courseId));
 	}
 	
 	//Siguiendo el indice IX_5DE0BE11 de la tabla group_

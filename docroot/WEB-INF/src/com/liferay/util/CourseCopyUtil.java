@@ -306,7 +306,6 @@ public class CourseCopyUtil {
 			}
 		}
 		
-				
 		String changed = (!res.equals(description))?" changed":" not changed";
 		
 		log.debug("   + Description file : " + newFile.getTitle() +" (" + newFile.getMimeType() + ")" + changed);
