@@ -14,16 +14,15 @@
 <%@ include file="/init.jsp" %>
 
 <%
-	long userId=ParamUtil.getLong(request,"userId",0);
-	if(userId==0)
-	{
-		userId=themeDisplay.getUserId();
-	}
+long userId=ParamUtil.getLong(request,"userId",0);
+if(userId==0){
+	userId=themeDisplay.getUserId();
+}
 
-	String returnurl=ParamUtil.getString(request,"returnurl","");
-	User usuario=UserLocalServiceUtil.getUser(userId);
-	String title = LanguageUtil.get(pageContext,"results") +" "+ usuario.getFullName();
-	boolean showExport = (renderRequest.getPreferences().getValue("showExport", "false")).compareTo("true") == 0;
+String returnurl=ParamUtil.getString(request,"returnurl","");
+User usuario=UserLocalServiceUtil.getUser(userId);
+String title = LanguageUtil.get(pageContext,"results") +" "+ usuario.getFullName();
+boolean showExport = (renderRequest.getPreferences().getValue("showExport", "false")).compareTo("true") == 0;
 %>
 
 <liferay-ui:header title="<%= title %>" backURL="<%=returnurl %>"></liferay-ui:header>
@@ -37,78 +36,77 @@
 		</liferay-ui:icon-menu>
 	</div>
 </c:if>
+
 <liferay-ui:panel-container >
-<%
-	java.util.List<Module> modules = ModuleLocalServiceUtil.findAllInGroup(themeDisplay.getScopeGroupId());
+	<%
+	List<Module> modules = ModuleLocalServiceUtil.findAllInGroup(themeDisplay.getScopeGroupId());
 	int fila = 0;
-	for(Module theModule:modules)
-	{
-%>
-		<liferay-ui:panel id="<%=Long.toString(theModule.getModuleId()) %>" title="<%=theModule.getTitle(themeDisplay.getLocale()) %>" collapsible="true" extended="true" defaultState="<%=(fila==0)?\"open\":\"collapsed\" %>">
-		<liferay-ui:search-container  emptyResultsMessage="there-are-no-results" delta="50" deltaConfigurable="false">
-	<liferay-ui:search-container-results>
-	<% 
-	List<LearningActivity> activities=LearningActivityServiceUtil.getLearningActivitiesOfModule(theModule.getModuleId());
-	List<LearningActivity> activitiesFiltered = new LinkedList<LearningActivity>();
-	for(LearningActivity act : activities){
-		if (permissionChecker.hasPermission(act.getGroupId(),LearningActivity.class.getName(),	act.getActId(), ActionKeys.VIEW))
-			activitiesFiltered.add(act);
-	}
-	
-		pageContext.setAttribute("results", activitiesFiltered);
-    		pageContext.setAttribute("total", activitiesFiltered.size());
-	%>
-	</liferay-ui:search-container-results>
-	<liferay-ui:search-container-row className="com.liferay.lms.model.LearningActivity" keyProperty="actId" modelVar="learningActivity">
-	<%
-				String score= "-";
-				String status="not-started";	
-				String comments =" ";
+	for(Module theModule:modules){
+		if(permissionChecker.hasPermission(theModule.getGroupId(),Module.class.getName(),theModule.getModuleId(), ActionKeys.VIEW)){ %>
+			<liferay-ui:panel id="<%=Long.toString(theModule.getModuleId()) %>" title="<%=theModule.getTitle(themeDisplay.getLocale()) %>" collapsible="true" extended="true" defaultState="<%=(fila==0)?\"open\":\"collapsed\" %>">
+				<liferay-ui:search-container  emptyResultsMessage="there-are-no-results" delta="50" deltaConfigurable="false">
+					<liferay-ui:search-container-results>
+						<% 
+						List<LearningActivity> activities=LearningActivityServiceUtil.getLearningActivitiesOfModule(theModule.getModuleId());
+						List<LearningActivity> activitiesFiltered = new LinkedList<LearningActivity>();
+						for(LearningActivity act : activities){
+							if (permissionChecker.hasPermission(act.getGroupId(),LearningActivity.class.getName(),	act.getActId(), ActionKeys.VIEW))
+								activitiesFiltered.add(act);
+						}
+						
+						pageContext.setAttribute("results", activitiesFiltered);
+					    pageContext.setAttribute("total", activitiesFiltered.size());
+						%>
+					</liferay-ui:search-container-results>
+					<liferay-ui:search-container-row className="com.liferay.lms.model.LearningActivity" keyProperty="actId" modelVar="learningActivity">
+						<%
+						String score= "-";
+						String status="not-started";	
+						String comments =" ";
+						
+						String divisor ="";
+						if(LearningActivityResultLocalServiceUtil.existsLearningActivityResult(learningActivity.getActId(), usuario.getUserId())){
+							status="started";
+							LearningActivityResult learningActivityResult=LearningActivityResultLocalServiceUtil.getByActIdAndUserId(learningActivity.getActId(), usuario.getUserId());
+							score=(learningActivityResult!=null)?LearningActivityResultLocalServiceUtil.translateResult(themeDisplay.getLocale(), learningActivityResult.getResult(), learningActivity.getGroupId()):"";
+							if(learningActivityResult!=null){
+								divisor = LearningActivityResultLocalServiceUtil.getCalificationTypeSuffix(themeDisplay.getLocale(), learningActivityResult.getResult(), learningActivity.getGroupId());
+							}
+							comments=HtmlUtil.stripHtml(learningActivityResult.getComments());
+							if(learningActivityResult.getEndDate()!=null){
+									status="not-passed"	;
+							}
+							if(learningActivityResult.isPassed()){
+								status="passed"	;
+							}
+						}
+						%>
+						<liferay-ui:search-container-column-text cssClass="number-column" name = "activity">
+							<%=learningActivity.getTitle(themeDisplay.getLocale()) %>
+						</liferay-ui:search-container-column-text>
+						<liferay-ui:search-container-column-text cssClass="number-column" name = "result" align="center">
+							<%=(score.trim().equalsIgnoreCase("-")) ? score:  score + divisor%>
+						</liferay-ui:search-container-column-text>
+						<liferay-ui:search-container-column-text cssClass="number-column" name = "status" align="center">
 				
-				String divisor ="";
-				if(LearningActivityResultLocalServiceUtil.existsLearningActivityResult(learningActivity.getActId(), usuario.getUserId())){
-					status="started";
-					LearningActivityResult learningActivityResult=LearningActivityResultLocalServiceUtil.getByActIdAndUserId(learningActivity.getActId(), usuario.getUserId());
-					score=(learningActivityResult!=null)?LearningActivityResultLocalServiceUtil.translateResult(themeDisplay.getLocale(), learningActivityResult.getResult(), learningActivity.getGroupId()):"";
-					if(learningActivityResult!=null){
-						divisor = LearningActivityResultLocalServiceUtil.getCalificationTypeSuffix(themeDisplay.getLocale(), learningActivityResult.getResult(), learningActivity.getGroupId());
-					}
-					comments=HtmlUtil.stripHtml(learningActivityResult.getComments());
-					if(learningActivityResult.getEndDate()!=null){
-							status="not-passed"	;
-					}
-					if(learningActivityResult.isPassed()){
-						status="passed"	;
-					}
-				}
-				%>
-			<liferay-ui:search-container-column-text cssClass="number-column" name = "activity">
-				<%=learningActivity.getTitle(themeDisplay.getLocale()) %>
-			</liferay-ui:search-container-column-text>
-			<liferay-ui:search-container-column-text cssClass="number-column" name = "result" align="center">
-				<%=(score.trim().equalsIgnoreCase("-")) ? score:  score + divisor%>
-			</liferay-ui:search-container-column-text>
-			<liferay-ui:search-container-column-text cssClass="number-column" name = "status" align="center">
-	
-				<%if(status.equals("passed")){%>
-					<liferay-ui:icon image="checked" message="passed"></liferay-ui:icon>
-				<%}
-				if(status.equals("not-passed")){%>
-					<liferay-ui:icon image="close" message="not-passed"></liferay-ui:icon>
-				<%}
-				if(status.equals("started")){%>
-					<liferay-ui:icon image="unchecked" message="unchecked"></liferay-ui:icon>
-				<%}%>
-			</liferay-ui:search-container-column-text>
-			<liferay-ui:search-container-column-text cssClass="number-column" name = "comments">
-				<%=HtmlUtil.escape(comments) %>
-			</liferay-ui:search-container-column-text>
-</liferay-ui:search-container-row>
-<liferay-ui:search-iterator></liferay-ui:search-iterator>
-</liferay-ui:search-container>
-	
-	</liferay-ui:panel>
-	<%
-	fila++;
+							<%if(status.equals("passed")){%>
+								<liferay-ui:icon image="checked" message="passed"></liferay-ui:icon>
+							<%}
+							if(status.equals("not-passed")){%>
+								<liferay-ui:icon image="close" message="not-passed"></liferay-ui:icon>
+							<%}
+							if(status.equals("started")){%>
+								<liferay-ui:icon image="unchecked" message="unchecked"></liferay-ui:icon>
+							<%}%>
+						</liferay-ui:search-container-column-text>
+						<liferay-ui:search-container-column-text cssClass="number-column" name = "comments">
+							<%=HtmlUtil.escape(comments) %>
+						</liferay-ui:search-container-column-text>
+					</liferay-ui:search-container-row>
+					<liferay-ui:search-iterator></liferay-ui:search-iterator>
+				</liferay-ui:search-container>
+			</liferay-ui:panel>
+			<%fila++;
+		}
 	}%>
 </liferay-ui:panel-container>
