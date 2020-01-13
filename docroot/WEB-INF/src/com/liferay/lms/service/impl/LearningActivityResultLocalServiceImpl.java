@@ -75,7 +75,7 @@ public class LearningActivityResultLocalServiceImpl	extends LearningActivityResu
 		boolean recalculateActivity = recalculateRequired;
 		log.debug("****LAR "+learningActivityResult);
 		if(learningActivityResult==null){	
-			learningActivityResult=
+			learningActivityResult =
 					learningActivityResultPersistence.create(counterLocalService.increment(
 							LearningActivityResult.class.getName()));
 			learningActivityResult.setStartDate(learningActivityTry.getStartDate());

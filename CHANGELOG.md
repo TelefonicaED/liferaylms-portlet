@@ -14,6 +14,7 @@ El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 
 - #170041 Cambiado el formato de fechas al de liferay debido a un bug en el SimpleDateFormat.
 - #170849 Se mantiene en la vista de ediciones cuando abres cieras o eliminas una
+- #172627 No se pone fecha fin a los resultados de las actividades de evaluación hasta que no se publica
 
 ### Deleted
 
@@ -34,7 +35,6 @@ El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 - #167833 Añadido cache a false para los servicios de los procesos asíncronos.
 - #167536 Se mandan las preferencias, el cur y el delta al portlet embebido en las acciones de administración dinámicas
 - #168795 Protegido para evitar nullpointerexception en los tipos de cursos.
-
 
 ### Fixed
 
