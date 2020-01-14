@@ -5,7 +5,9 @@ import javax.mail.internet.InternetAddress;
 import com.liferay.lms.auditing.AuditConstants;
 import com.liferay.lms.auditing.AuditingLogFactory;
 import com.liferay.lms.model.Course;
+import com.liferay.lms.model.LmsPrefs;
 import com.liferay.lms.service.CourseLocalServiceUtil;
+import com.liferay.lms.service.LmsPrefsLocalServiceUtil;
 import com.liferay.portal.ModelListenerException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
@@ -27,6 +29,7 @@ import com.liferay.portal.model.Group;
 import com.liferay.portal.model.User;
 import com.liferay.portal.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.service.CompanyLocalServiceUtil;
+import com.liferay.portal.service.UserGroupRoleLocalServiceUtil;
 import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.util.PortalUtil;
 
@@ -58,7 +61,16 @@ public class GroupListener extends BaseModelListener<Group> {
 					} catch (PortalException e) {
 					}
 					
-					if(user!=null&&company!=null){
+					//Comprobamos que no sea tutor o editor para no enviar el correo
+					LmsPrefs lmsPrefs = null;
+					try {
+						lmsPrefs = LmsPrefsLocalServiceUtil.getLmsPrefs(course.getCompanyId());
+					} catch (PortalException e1) {
+						e1.printStackTrace();
+					}
+					
+					if(user!=null&&company!=null && (lmsPrefs == null || ((lmsPrefs.getTeacherRole() == 0 || !UserGroupRoleLocalServiceUtil.hasUserGroupRole(userId, groupId, lmsPrefs.getTeacherRole()))
+							&& (lmsPrefs.getEditorRole() == 0 || !UserGroupRoleLocalServiceUtil.hasUserGroupRole(userId, groupId, lmsPrefs.getEditorRole()))))){
 
 				    	String fromName = PrefsPropsUtil.getString(course.getCompanyId(),
 								PropsKeys.ADMIN_EMAIL_FROM_NAME);

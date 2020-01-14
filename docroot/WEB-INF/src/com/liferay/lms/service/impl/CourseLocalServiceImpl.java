@@ -1167,20 +1167,17 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 		Course course=courseLocalService.getCourse(courseId);
 		
 		User user = userLocalService.fetchUser(userId);
-		if (!GroupLocalServiceUtil.hasUserGroup(user.getUserId(), course.getGroupCreatedId())) {
-			GroupLocalServiceUtil.addUserGroups(user.getUserId(), new long[] { course.getGroupCreatedId() });
-			//sendEmail(user,course);
-		}
-		
 		UserGroupRoleLocalServiceUtil.addUserGroupRoles(new long[] { user.getUserId() },
 				course.getGroupCreatedId(), RoleLocalServiceUtil.getRole(user.getCompanyId(), RoleConstants.SITE_MEMBER).getRoleId());
-		CourseResult courseResult=courseResultLocalService.getCourseResultByCourseAndUser(courseId, user.getUserId());
-		if(courseResult==null)
-		{
-			courseResultLocalService.create(courseId, user.getUserId(), allowStartDate, allowFinishDate);
+		
+		if (!GroupLocalServiceUtil.hasUserGroup(user.getUserId(), course.getGroupCreatedId())) {
+			GroupLocalServiceUtil.addUserGroups(user.getUserId(), new long[] { course.getGroupCreatedId() });
 		}
-		else
-		{
+		
+		CourseResult courseResult=courseResultLocalService.getCourseResultByCourseAndUser(courseId, user.getUserId());
+		if(courseResult==null){
+			courseResultLocalService.create(courseId, user.getUserId(), allowStartDate, allowFinishDate);
+		}else{
 			courseResult.setAllowStartDate(allowStartDate);
 			courseResult.setAllowFinishDate(allowFinishDate);
 			courseResultLocalService.updateCourseResult(courseResult);
@@ -1430,8 +1427,8 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 	public void addStudentToCourse(Course course, long userId) throws PortalException, SystemException{
 		Role sitemember=RoleLocalServiceUtil.getRole(course.getCompanyId(), RoleConstants.SITE_MEMBER) ;
 		
-		GroupLocalServiceUtil.addUserGroups(userId, new long[]{course.getGroupCreatedId()});
 		UserGroupRoleLocalServiceUtil.addUserGroupRoles(new long[] { userId }, course.getGroupCreatedId(), sitemember.getRoleId());
+		GroupLocalServiceUtil.addUserGroups(userId, new long[]{course.getGroupCreatedId()});
 		SocialActivityLocalServiceUtil.addActivity(userId, course.getGroupCreatedId(), Group.class.getName(), course.getGroupCreatedId(), com.liferay.portlet.social.model.SocialActivityConstants.TYPE_SUBSCRIBE, "", userId);
 		if(log.isDebugEnabled()){
 			User u = UserLocalServiceUtil.getUser(userId);
