@@ -114,8 +114,6 @@ public class ExecActivity extends QuestionsAdmin {
 				larntry.setEndDate(new java.util.Date(System.currentTimeMillis()));
 			}
 
-			LearningActivityTryLocalServiceUtil.updateLearningActivityTry(larntry);
-
 			actionResponse.setRenderParameters(actionRequest.getParameterMap());
 
 			if (isPartial) {
@@ -125,6 +123,7 @@ public class ExecActivity extends QuestionsAdmin {
 			} else {
 				actionResponse.setRenderParameter("oldResult", Long.toString(oldResult));
 				actionResponse.setRenderParameter("correction", Boolean.toString(true));
+				actionResponse.setRenderParameter("score", String.valueOf(learningActivityResult.getResult() > score ? learningActivityResult.getResult():score));
 				if(isTablet)actionResponse.setRenderParameter("isTablet", Boolean.toString(true));
 				actionResponse.setRenderParameter("jspPage", "/html/execactivity/test/results.jsp");
 			}
