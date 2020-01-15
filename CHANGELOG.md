@@ -9,6 +9,7 @@ El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 
 - #170072 Se añaden mensajes asíncronos al finalizar el clonado de curso y la creación de la edición para acciones a posteriori desde proyectos.
 - #168113 Se añaden parámetros para embeber las acciones específicas
+- #173883 Se añade un mensaje cuando estás en las actividades en modo lectura
 
 ### Updated
 
