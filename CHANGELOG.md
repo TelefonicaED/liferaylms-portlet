@@ -13,12 +13,14 @@ El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 ### Updated
 
 - #172729 Se cambia el orden de asociación a curso para añadir primero el rol y de esta forma no se envíe el correo de bienvenida o despedida a los tutores y editores
+- #166015 Se muestra la actividad de evaluación en modo consulta
 
 ### Fixed
 
 - #170041 Cambiado el formato de fechas al de liferay debido a un bug en el SimpleDateFormat.
 - #170849 Se mantiene en la vista de ediciones cuando abres cieras o eliminas una
 - #172627 No se pone fecha fin a los resultados de las actividades de evaluación hasta que no se publica
+- #163474 Cuando el test es la última actividad y al corregirlo ya estás en modo observador no se mostraba la nota
 
 ### Deleted
 
