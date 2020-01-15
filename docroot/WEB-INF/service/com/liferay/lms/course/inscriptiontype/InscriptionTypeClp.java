@@ -5,6 +5,7 @@ import java.util.Set;
 
 import javax.portlet.PortletResponse;
 
+import com.liferay.lms.InscriptionException;
 import com.liferay.lms.model.Course;
 import com.liferay.lms.service.ClpSerializer;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -13,6 +14,7 @@ import com.liferay.portal.kernel.upload.UploadRequest;
 import com.liferay.portal.kernel.util.ClassLoaderProxy;
 import com.liferay.portal.kernel.util.MethodHandler;
 import com.liferay.portal.kernel.util.MethodKey;
+import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.service.ServiceContext;
 
 public class InscriptionTypeClp implements InscriptionType {
@@ -116,6 +118,58 @@ public class InscriptionTypeClp implements InscriptionType {
 
 		return ((String)returnObj);
 	}
+	
+	public boolean usePortletDefaultRegistration() {
+		Object returnObj = null;
+
+		try {
+			MethodKey getSuffixMethod = new MethodKey(clp.getClassName(), "usePortletDefaultRegistration"); 
+			returnObj = clp.invoke(new MethodHandler(getSuffixMethod));
+		}
+		catch (Throwable t) {
+			t = ClpSerializer.translateThrowable(t);
+
+			if (t instanceof RuntimeException) {
+				throw (RuntimeException)t;
+			}
+			else {
+				throw new RuntimeException(t.getClass().getName() +
+					" is not a valid exception");
+			}
+		}
+
+		return ((Boolean)returnObj);
+	}
+	
+	public boolean canEnrollUser(Course course, long userId, boolean checkCompetences, Locale locale, 
+			PermissionChecker permissionChecker) throws InscriptionException, PortalException, SystemException {
+		Object returnObj = null;
+
+		try {
+			MethodKey translateMethod = new MethodKey(clp.getClassName(), "canEnrollUser", Course.class, 
+						long.class, boolean.class, Locale.class, PermissionChecker.class); 
+			returnObj = clp.invoke(new MethodHandler(translateMethod, course, userId, checkCompetences,
+					locale, permissionChecker));
+		} catch (Throwable t) {
+			t.printStackTrace();
+			t = ClpSerializer.translateThrowable(t);
+			if(t instanceof InscriptionException){
+				throw (InscriptionException) t;
+			}else if(t instanceof PortalException){
+				throw (PortalException)t;
+			}else if(t instanceof SystemException){
+				throw (SystemException)t;
+			}
+			else if (t instanceof RuntimeException) {
+				throw (RuntimeException)t;
+			}else {
+				throw new RuntimeException(t.getClass().getName() +
+					" is not a valid exception");
+			}
+		}
+
+		return ((Boolean)returnObj);
+	}
 
 	public String enrollUser(long courseId, long userId, long teamId, ServiceContext serviceContext) throws PortalException, SystemException {
 		Object returnObj = null;
@@ -126,8 +180,15 @@ public class InscriptionTypeClp implements InscriptionType {
 		}
 		catch (Throwable t) {
 			t = ClpSerializer.translateThrowable(t);
-
-			if (t instanceof RuntimeException) {
+			
+			if(t instanceof InscriptionException){
+				throw (InscriptionException) t;
+			}else if(t instanceof PortalException){
+				throw (PortalException)t;
+			}else if(t instanceof SystemException){
+				throw (SystemException)t;
+			}
+			else if (t instanceof RuntimeException) {
 				throw (RuntimeException)t;
 			}
 			else {
@@ -149,7 +210,13 @@ public class InscriptionTypeClp implements InscriptionType {
 		catch (Throwable t) {
 			t = ClpSerializer.translateThrowable(t);
 
-			if (t instanceof RuntimeException) {
+			if(t instanceof InscriptionException){
+				throw (InscriptionException) t;
+			}else if(t instanceof PortalException){
+				throw (PortalException)t;
+			}else if(t instanceof SystemException){
+				throw (SystemException)t;
+			}else if (t instanceof RuntimeException) {
 				throw (RuntimeException)t;
 			}
 			else {
@@ -275,6 +342,30 @@ public class InscriptionTypeClp implements InscriptionType {
 
 		return ((Boolean)returnObj);
 	}
+	
+	@Override
+	public boolean showMessageDenied() {
+		Object returnObj = null;
+
+		try {
+			MethodKey showMessageDeniedMethod = new MethodKey(clp.getClassName(), "showMessageDenied"); 
+			returnObj = clp.invoke(new MethodHandler(showMessageDeniedMethod));
+		}
+		catch (Throwable t) {
+			t = ClpSerializer.translateThrowable(t);
+
+			if (t instanceof RuntimeException) {
+				throw (RuntimeException)t;
+			}
+			else {
+				throw new RuntimeException(t.getClass().getName() +
+					" is not a valid exception");
+			}
+		}
+
+		return ((Boolean)returnObj);
+	}
+
 
 	@Override
 	public String getAllowedTime(long courseId, long userId, Locale locale) {

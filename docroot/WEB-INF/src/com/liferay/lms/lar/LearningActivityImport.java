@@ -271,6 +271,8 @@ public class LearningActivityImport {
 				countDocument++;
 			}else if(newLarn.getTypeId() == 7){
 				LearningActivityLocalServiceUtil.setExtraContentValue(newLarn.getActId(), "assetEntry", String.valueOf(asset.getEntryId()));
+			}else if(newLarn.getTypeId() == 6){
+				LearningActivityLocalServiceUtil.setExtraContentValue(newLarn.getActId(), "additionalFile", String.valueOf(asset.getClassPK()));
 			}
 			
 			Long newActId = newLarn.getActId();

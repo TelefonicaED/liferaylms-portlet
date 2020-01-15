@@ -50,4 +50,14 @@ public class CourseParams {
 	 * Filtrar con un expando del curso
 	 */
 	public static final String PARAM_CUSTOM_ATTRIBUTE = "customAttribute";
+	
+	/**
+	 * Filtrar por la fecha de inicio de ejecución del curso
+	 */
+	public static final String PARAM_EXECUTION_START_DATE = "executionStartDate";
+	/**
+	 * Filtrar por la fecha de fin de ejecución del curso
+	 */
+	public static final String PARAM_EXECUTION_END_DATE = "executionEndDate";
+	
 }

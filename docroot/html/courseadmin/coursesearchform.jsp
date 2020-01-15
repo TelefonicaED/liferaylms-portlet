@@ -1,10 +1,14 @@
 <!-- <h1 class="taglib-categorization-filter entry-title"> -->
+<%@page import="com.liferay.portal.kernel.language.LanguageUtil"%>
+<%@page import="com.liferay.portal.kernel.util.UnicodeFormatter"%>
 <%@page import="com.liferay.portal.kernel.util.ArrayUtil"%>
 <%@page import="com.liferay.portal.kernel.util.StringUtil"%>
 <%@page import="com.liferay.portlet.asset.service.AssetCategoryLocalServiceUtil"%>
 <%@page import="com.liferay.portlet.asset.model.AssetCategory"%>
 <%@page import="com.liferay.portal.kernel.util.ParamUtil"%>
 <%@page import="com.liferay.lms.model.Course"%>
+
+<%@page import="java.util.Calendar"%>
 
 <%
 
@@ -62,7 +66,8 @@ if(catIds!=null&&catIds.length>0)
 </portlet:renderURL>
 
 <div class="admin-course-search-form search-advanced">
-	<aui:form action="${searchURL}" method="post" name="searchCourses" role="search">
+	<aui:form action="${searchURL}" method="post" id="searchCourses" name="searchCourses" role="search">
+	<%--<aui:form action="${searchURL}" method="post" name="searchCourses" role="search">--%>
 		<aui:input name="courseId" value="${courseId }" type="hidden" />
 		<aui:fieldset cssClass="checkBoxes">
 			<aui:input name="search" type="hidden" value="search" />
@@ -76,6 +81,58 @@ if(catIds!=null&&catIds.length>0)
 			</aui:select>
 						
 		</aui:fieldset>
+		
+		<c:if test="${renderRequest.preferences.getValue('executionDates', 'false') }">
+			<aui:fieldset cssClass="executionDates" >
+				<div class="startDatePnl">
+					<aui:input helpMessage="help.course-admin.start-execution-date" name="startDateFilter" label="course-admin.start-execution-date" type="checkbox" onChange="javascript:showStartDate('startDateFilterCheckbox');"/>
+					<div id="startDateFilterDiv" class="aui-helper-hidden">
+						<aui:field-wrapper>
+							<liferay-ui:input-date
+						           monthParam="dateMonthStart"
+						           monthNullable="<%=Boolean.FALSE%>"
+						           monthValue="${dateMonthStart}"
+						           dayNullable="<%=Boolean.FALSE%>"
+						           dayParam="dateDayStart"
+						           dayValue="${dateDayStart}"
+						           yearParam="dateYearStart"
+						           yearNullable="<%=Boolean.FALSE%>"
+						           yearValue="${dateYearStart}"
+						           yearRangeStart="${yearRangeStart}"
+						           yearRangeEnd="${yearRangeEnd}"
+						         	cssClass="date-input"
+						         	firstDayOfWeek="${firstDayOfWeek}"
+						      	/>	
+						</aui:field-wrapper>
+					</div>
+				</div>
+				
+				<div class="endDatePnl">
+					<aui:input helpMessage="help.course-admin.end-execution-date" name="endDateFilter" label="course-admin.end-execution-date" type="checkbox" onChange="javascript:showEndDate('endDateFilterCheckbox');"/>	
+				    <div id="endDateFilterDiv" class="aui-helper-hidden">
+				     	<aui:field-wrapper>			
+							<liferay-ui:input-date
+					           monthParam="dateMonthEnd"
+					           monthNullable="<%=Boolean.FALSE%>"
+					           monthValue="${dateMonthEnd}"
+					           dayNullable="<%=Boolean.FALSE%>"
+					           dayParam="dateDayEnd"
+					           dayValue="${dateDayEnd}"
+					           yearParam="dateYearEnd"
+					           yearNullable="<%=Boolean.FALSE%>"
+					           yearValue="${dateYearEnd}"
+					           yearRangeStart="${yearRangeStart}"
+					           yearRangeEnd="${yearRangeEnd}"
+					         	cssClass="date-input"
+					         	firstDayOfWeek="${firstDayOfWeek}"
+					      	/>	
+						</aui:field-wrapper>
+					</div>
+				</div>	
+			</aui:fieldset>
+		</c:if>
+		
+		
 		<c:if test="${renderRequest.preferences.getValue('showGroupFilter', 'false') && (empty courseId || courseId == 0)}">
 			<aui:select name="selectedGroupId" label="courseadmin.search.select-group">
 					<aui:option label="" value="0"/>
@@ -125,7 +182,15 @@ if(catIds!=null&&catIds.length>0)
 				</aui:fieldset>
 			</liferay-ui:panel>
 		</c:if>
-		<aui:button type="submit" value="search"></aui:button>
+		
+		<c:choose>
+		    <c:when test="${renderRequest.preferences.getValue('executionDates', 'false') }">
+		      <aui:button type="submit" value="search" onClick="checkDates()"></aui:button>
+		    </c:when>    
+		    <c:otherwise>
+		        <aui:button type="submit" value="search"></aui:button> 
+		    </c:otherwise>
+		</c:choose>
 	</aui:form>
 </div>
 	
@@ -133,6 +198,45 @@ if(catIds!=null&&catIds.length>0)
 	<portlet:param name="action" value="getCourses" />
 </portlet:resourceURL>
 <aui:script>
+
+
+function checkDates(){
+ 	var cb1 = document.getElementById("<portlet:namespace/>startDateFilterCheckbox");
+ 	var cb2 = document.getElementById("<portlet:namespace/>endDateFilterCheckbox");
+ 	if (!cb1.checked && !cb2.checked){
+ 		document.<portlet:namespace/>searchCourses.submit();
+ 	}else{ 	
+		if ((cb1 != null && cb1.checked) || (cb2 != null && cb2.checked)) {
+			document.<portlet:namespace/>searchCourses.submit();
+		}
+	}
+}
+
+
+function showStartDate(id){
+	var namespace = "<portlet:namespace/>";
+ 	var cb = document.getElementById(namespace+id);
+	if( cb != null && cb.checked) {
+    	$('#startDateFilterDiv').removeClass('aui-helper-hidden');
+	}else{
+		$('#startDateFilterDiv').addClass('aui-helper-hidden');
+	}
+}
+
+function showEndDate(id){
+	var namespace = "<portlet:namespace/>";
+ 	var cb = document.getElementById(namespace+id);
+	if(cb != null && cb.checked) {
+    	$('#endDateFilterDiv').removeClass('aui-helper-hidden');
+	}else{
+		$('#endDateFilterDiv').addClass('aui-helper-hidden');
+	}
+}
+
+showStartDate('startDateFilterCheckbox');
+showEndDate('endDateFilterCheckbox');
+
+
 	AUI().use('autocomplete-list','aui-base','aui-io-request','autocomplete-filters','autocomplete-highlighters',function (A) {
 		var testData;
 		var autoComplete = new A.AutoCompleteList({
@@ -191,3 +295,4 @@ if(catIds!=null&&catIds.length>0)
 	});
 	
 </aui:script>
+

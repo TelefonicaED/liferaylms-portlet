@@ -32,6 +32,7 @@ import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.messaging.Message;
+import com.liferay.portal.kernel.messaging.MessageBusUtil;
 import com.liferay.portal.kernel.messaging.MessageListener;
 import com.liferay.portal.kernel.messaging.MessageListenerException;
 import com.liferay.portal.kernel.repository.model.FileEntry;
@@ -149,6 +150,8 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 			PermissionThreadLocal.setPermissionChecker(permissionChecker);
 		
 			doCloneCourse();
+			
+			
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -299,17 +302,14 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 		 */
 		if(includeTeacher){
 			log.debug(includeTeacher);
-			if (!GroupLocalServiceUtil.hasUserGroup(themeDisplay.getUserId(), newCourse.getGroupCreatedId())) {
-					GroupLocalServiceUtil.addUserGroups(themeDisplay.getUserId(),	new long[] { newCourse.getGroupCreatedId() });
-				//The application only send one mail at listener
-				//User user = UserLocalServiceUtil.getUser(userId);
-				//sendEmail(user, course);
-				}
 			LmsPrefs lmsPrefs=LmsPrefsLocalServiceUtil.getLmsPrefs(themeDisplay.getCompanyId());
 
 			long teacherRoleId=RoleLocalServiceUtil.getRole(lmsPrefs.getEditorRole()).getRoleId();
-				UserGroupRoleLocalServiceUtil.addUserGroupRoles(new long[] { themeDisplay.getUserId() }, newCourse.getGroupCreatedId(), teacherRoleId);
-				
+			UserGroupRoleLocalServiceUtil.addUserGroupRoles(new long[] { themeDisplay.getUserId() }, newCourse.getGroupCreatedId(), teacherRoleId);
+			
+			if (!GroupLocalServiceUtil.hasUserGroup(themeDisplay.getUserId(), newCourse.getGroupCreatedId())) {
+					GroupLocalServiceUtil.addUserGroups(themeDisplay.getUserId(),	new long[] { newCourse.getGroupCreatedId() });
+				}	
 		}
 		
 		
@@ -579,6 +579,12 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 		}else{
 			AsynchronousProcessAuditLocalServiceUtil.updateProcessStatus(process, endDate, LmsConstant.STATUS_ERROR, statusMessage);
 		}
+		
+		log.debug("Enviando mensaje liferay/lms/courseClonePostAction con newCourseId "+newCourse.getCourseId() + " y originCourseId "+course.getCourseId());
+		Message postActionMessage=new Message();
+		postActionMessage.put("originCourseId", course.getCourseId());
+		postActionMessage.put("newCourseId", newCourse.getCourseId());
+		MessageBusUtil.sendMessage("liferay/lms/courseClonePostAction", postActionMessage);
 	
 	}
 	

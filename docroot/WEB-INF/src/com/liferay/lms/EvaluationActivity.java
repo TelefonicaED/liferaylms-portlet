@@ -19,6 +19,9 @@ import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 import javax.portlet.WindowState;
 
+import com.liferay.counter.service.CounterLocalServiceUtil;
+import com.liferay.lms.learningactivity.LearningActivityType;
+import com.liferay.lms.learningactivity.LearningActivityTypeRegistry;
 import com.liferay.lms.learningactivity.TaskEvaluationLearningActivityType;
 import com.liferay.lms.learningactivity.calificationtype.CalificationType;
 import com.liferay.lms.learningactivity.calificationtype.CalificationTypeRegistry;
@@ -30,6 +33,8 @@ import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityResultLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityTryLocalServiceUtil;
+import com.liferay.lms.service.ModuleLocalServiceUtil;
+import com.liferay.lms.service.ModuleResultLocalServiceUtil;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.ProjectionFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
@@ -59,7 +64,6 @@ import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.DocumentException;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
-import com.liferay.portal.model.ResourceConstants;
 import com.liferay.portal.model.User;
 import com.liferay.portal.security.permission.PermissionCheckerFactoryUtil;
 import com.liferay.portal.service.ServiceContext;
@@ -78,58 +82,53 @@ public class EvaluationActivity extends MVCPortlet implements MessageListener{
 	private static DateFormat _dateFormat = DateFormatFactoryUtil.getSimpleDateFormat(
 			"yyyy-MM-dd'T'HH:mm:sszzz",Locale.US);
 	
-	public static final String NOT_TEACHER_SQL = "WHERE User_.userId NOT IN "+
-			 "( SELECT Usergrouprole.userId "+
-			 "    FROM Usergrouprole "+ 
-			 "   INNER JOIN Resourcepermission ON Usergrouprole.roleId = Resourcepermission.roleId "+
-			 "   INNER JOIN Resourceaction ON Resourcepermission.name = Resourceaction.name "+
-			 "	   					      AND (BITAND(CAST_LONG(ResourcePermission.actionIds), CAST_LONG(ResourceAction.bitwiseValue)) != 0)"+
-			 "   WHERE Resourcepermission.scope="+ResourceConstants.SCOPE_GROUP_TEMPLATE+
-			 "     AND Resourceaction.actionId = 'VIEW_RESULTS' "+
-			 "     AND Resourceaction.name='com.liferay.lms.model' "+
-			 "     AND Usergrouprole.groupid=? ) ";
-
-	public static final String COURSE_RESULT_PASSED_SQL = "WHERE (EXISTS (SELECT 1 FROM lms_learningactivityresult " +
-			"WHERE User_.userId = lms_courseresult.userId " +
-			" AND lms_courseresult.passed > 0 AND lms_courseresult.courseId = ? ))"; 
-
-	public static final String COURSE_RESULT_FAIL_SQL = "WHERE (EXISTS (SELECT 1 FROM lms_learningactivityresult " +
-			"WHERE User_.userId = lms_courseresult.userId " +
-			" AND lms_courseresult.passed = 0 AND lms_courseresult.courseId = ? ))"; 
-
-	public static final String COURSE_RESULT_NO_CALIFICATION_SQL = "WHERE (NOT EXISTS (SELECT 1 FROM lms_learningactivityresult " +
-			"WHERE User_.userId = lms_courseresult.userId AND lms_courseresult.courseId = ? ))"; 
-	
-	private static Log _log = LogFactoryUtil.getLog(EvaluationActivity.class);
-	
 	@Override
-	@SuppressWarnings("unchecked")
 	public void receive(Message message) throws MessageListenerException {
 		long actId = message.getLong("actId");
 		if(actId!=0){
 			try {
-				evaluate(actId);
+				Element publishdDateElement = null;
+				try{
+					LearningActivity learningActivity = LearningActivityLocalServiceUtil.getLearningActivity(actId);
+					Document document=SAXReaderUtil.read(learningActivity.getExtracontent());
+					Element rootElement =document.getRootElement();
+					publishdDateElement = rootElement.element("publishDate");
+				}catch(Exception e){
+					e.printStackTrace();
+				}
+				if(publishdDateElement == null){
+					evaluate(actId, false);
+				}
 			} catch (Exception e) {
-				_log.error("Error during evaluation: "+actId, e);
+				log.error("Error during evaluation: "+actId, e);
 			}
 		}
 		else{
 			// Scheduler trigger this execution. We must evaluate all activities.
-			_log.debug("## Running EvaluationActivity cron ##");
+			log.debug("## Running EvaluationActivity cron ##");
 			try {
 				
-				for (LearningActivity learningActivity : (List<LearningActivity>)LearningActivityLocalServiceUtil.dynamicQuery(
-						DynamicQueryFactoryUtil.forClass(LearningActivity.class).
-						add(PropertyFactoryUtil.forName("typeId").eq((int)new TaskEvaluationLearningActivityType().getTypeId())))) {
+				List<LearningActivity> learningActivities = LearningActivityLocalServiceUtil.getLearningActivitiesByType((int)TaskEvaluationLearningActivityType.TYPE_ID);
+				Element publishdDateElement = null;
+				for (LearningActivity learningActivity : learningActivities){
 					try {
-						evaluate(learningActivity.getActId());
+						try{
+							Document document=SAXReaderUtil.read(learningActivity.getExtracontent());
+							Element rootElement =document.getRootElement();
+							publishdDateElement = rootElement.element("publishDate");
+						}catch(Exception e){
+							e.printStackTrace();
+						}
+						if(publishdDateElement == null){
+							evaluate(learningActivity.getActId(), false);
+						}
 					} catch (Exception e) {
-						_log.error("Error during evaluation: "+actId, e);
+						log.error("Error during evaluation: "+actId, e);
 						e.printStackTrace();
 					}					
 				}
 			} catch (SystemException e) {
-				_log.error("Error during evaluation job ");
+				log.error("Error during evaluation job ");
 				e.printStackTrace();
 			}
 
@@ -161,18 +160,22 @@ public class EvaluationActivity extends MVCPortlet implements MessageListener{
 		return mean + (correction/sumWeight);
 	}
 	
-	private void updateLearningActivityTryAndResult(
-			LearningActivityTry learningActivityTry) throws PortalException,
+	private void updateLearningActivityTryAndResult(LearningActivityTry learningActivityTry, boolean finishScore) throws PortalException,
 			SystemException {
 		LearningActivityTryLocalServiceUtil.updateLearningActivityTry(learningActivityTry);
 		
 		LearningActivityResult learningActivityResult = LearningActivityResultLocalServiceUtil.getByActIdAndUserId(learningActivityTry.getActId(), learningActivityTry.getUserId());
-		if(learningActivityResult.getResult() != learningActivityTry.getResult()) {
-			LearningActivity learningActivity = LearningActivityLocalServiceUtil.getLearningActivity(learningActivityTry.getActId());
-			learningActivityResult.setResult(learningActivityTry.getResult());
-			learningActivityResult.setPassed(learningActivityTry.getResult()>=learningActivity.getPasspuntuation());
-			learningActivityResult.setComments(learningActivityTry.getComments());
-			LearningActivityResultLocalServiceUtil.updateLearningActivityResult(learningActivityResult);
+		
+		LearningActivity learningActivity = LearningActivityLocalServiceUtil.getLearningActivity(learningActivityTry.getActId());
+		learningActivityResult.setResult(learningActivityTry.getResult());
+		LearningActivityTypeRegistry registry = new LearningActivityTypeRegistry();
+		LearningActivityType learningActivityType = registry.getLearningActivityType(learningActivity.getTypeId());
+		learningActivityResult.setPassed(learningActivityType.isPassed(learningActivity, learningActivityTry));
+		learningActivityResult.setComments(learningActivityTry.getComments());
+		learningActivityResult = LearningActivityResultLocalServiceUtil.updateLearningActivityResult(learningActivityResult);
+		
+		if(finishScore){
+			ModuleResultLocalServiceUtil.update(learningActivityResult);
 		}
 	}
 	
@@ -218,7 +221,7 @@ public class EvaluationActivity extends MVCPortlet implements MessageListener{
 		return activities;
 	}
 		
-	private void evaluate(long actId)
+	private void evaluate(long actId, boolean finishScore)
 			throws Exception {
 		
 		LearningActivity learningActivity = LearningActivityLocalServiceUtil.getLearningActivity(actId);
@@ -230,7 +233,7 @@ public class EvaluationActivity extends MVCPortlet implements MessageListener{
 			if(activities.size()!=0){
 				for(User user:UserLocalServiceUtil.getGroupUsers(learningActivity.getGroupId())) {
 					if(!PermissionCheckerFactoryUtil.create(user).hasPermission(learningActivity.getGroupId(), "com.liferay.lms.model",learningActivity.getGroupId(), "VIEW_RESULTS")){
-						evaluateUser(actId, user.getUserId(), activities);	
+						evaluateUser(actId, user.getUserId(), activities, finishScore);	
 					}
 				}
 			}
@@ -240,7 +243,7 @@ public class EvaluationActivity extends MVCPortlet implements MessageListener{
 		}	
 	}
 
-	private void evaluateUser(long actId, long userId,Map<Long, Long> activities) throws SystemException {
+	private void evaluateUser(long actId, long userId,Map<Long, Long> activities, boolean finishScore) throws SystemException {
 		{
 			double[] values = new double[activities.size()];
 			double[] weights = new double[activities.size()];
@@ -265,13 +268,15 @@ public class EvaluationActivity extends MVCPortlet implements MessageListener{
 					serviceContext.setUserId(userId);
 					learningActivityTry =  LearningActivityTryLocalServiceUtil.createLearningActivityTry(actId,serviceContext);
 				}
-				learningActivityTry.setEndDate(new Date());
+				if(finishScore){
+					learningActivityTry.setEndDate(new Date());
+				}
 				learningActivityTry.setResult((long)calculateMean(values, weights));
 				learningActivityTry.setComments(StringPool.BLANK);
-				updateLearningActivityTryAndResult(learningActivityTry);
+				updateLearningActivityTryAndResult(learningActivityTry, finishScore);
 				
 			} catch (NestableException e) {
-				_log.error("Error updating evaluation: "+actId+" result of user: "+userId, e);
+				log.error("Error updating evaluation: "+actId+" result of user: "+userId, e);
 			}						
 		
 		}
@@ -450,14 +455,11 @@ public class EvaluationActivity extends MVCPortlet implements MessageListener{
 		Document document = SAXReaderUtil.read(learningActivity.getExtracontent());
 		Element rootElement = document.getRootElement();
 		
-		//Element firedDateElement = rootElement.element("firedDate");
-		//if(firedDateElement==null){
-			rootElement.addElement("firedDate").setText(_dateFormat.format(new Date()));
-			learningActivity.setExtracontent(document.formattedString());
-			LearningActivityLocalServiceUtil.updateLearningActivity(learningActivity);
+		rootElement.addElement("firedDate").setText(_dateFormat.format(new Date()));
+		learningActivity.setExtracontent(document.formattedString());
+		LearningActivityLocalServiceUtil.updateLearningActivity(learningActivity);
 
-			evaluate(learningActivity.getActId());
-		//}
+		evaluate(learningActivity.getActId(), false);
 		
 		PortletURL viewPortletURL = ((LiferayPortletResponse)actionResponse).createRenderURL();
 		viewPortletURL.setParameter("jspPage","/html/evaluationtaskactivity/view.jsp"); 
@@ -483,7 +485,13 @@ public class EvaluationActivity extends MVCPortlet implements MessageListener{
 		}
 		learningActivity.setExtracontent(document.formattedString());
 		LearningActivityLocalServiceUtil.updateLearningActivity(learningActivity);
-
+		
+		List<LearningActivityTry> learningActivityTries = LearningActivityTryLocalServiceUtil.getLearningActivityTriesByActId(learningActivity.getActId());
+		for(LearningActivityTry learningActivityTry: learningActivityTries){
+			learningActivityTry.setEndDate(new Date());
+			LearningActivityTryLocalServiceUtil.updateLearningActivityTry(learningActivityTry);
+			LearningActivityResultLocalServiceUtil.update(learningActivityTry, true);
+		}
 		
 		PortletURL viewPortletURL = ((LiferayPortletResponse)actionResponse).createRenderURL();
 		viewPortletURL.setParameter("jspPage","/html/evaluationtaskactivity/view.jsp");
@@ -505,7 +513,7 @@ public class EvaluationActivity extends MVCPortlet implements MessageListener{
 		}
 		else{
 			LearningActivity learningActivity = LearningActivityLocalServiceUtil.getLearningActivity(ParamUtil.getLong(actionRequest, "actId"));
-			evaluateUser(learningActivity.getActId(), userId, getLearningActivities(learningActivity));		
+			evaluateUser(learningActivity.getActId(), userId, getLearningActivities(learningActivity), false);		
 			SessionMessages.add(actionRequest, "evaluationtaskactivity.reCalculate.ok");
 		}
 
@@ -523,7 +531,7 @@ public class EvaluationActivity extends MVCPortlet implements MessageListener{
 	
 	
 	
-	public void setGrades(ActionRequest request,	ActionResponse response){
+	public void setGrades(ActionRequest request, ActionResponse response){
 		
 		ThemeDisplay themeDisplay  =(ThemeDisplay)request.getAttribute(WebKeys.THEME_DISPLAY);
 		
@@ -575,10 +583,26 @@ public class EvaluationActivity extends MVCPortlet implements MessageListener{
 					serviceContext.setUserId(studentId);
 					learningActivityTry =  LearningActivityTryLocalServiceUtil.createLearningActivityTry(actId,serviceContext);
 				}
-				learningActivityTry.setEndDate(new Date());
+				
 				learningActivityTry.setResult(ct.toBase100(themeDisplay.getScopeGroupId(),result));
 				learningActivityTry.setComments(comments);
-				updateLearningActivityTryAndResult(learningActivityTry);
+				
+				
+				Element publishdDateElement = null;
+				try{
+					LearningActivity learningActivity = LearningActivityLocalServiceUtil.getLearningActivity(actId);
+					Document document=SAXReaderUtil.read(learningActivity.getExtracontent());
+					Element rootElement =document.getRootElement();
+					publishdDateElement = rootElement.element("publishDate");
+				}catch(Exception e){
+					e.printStackTrace();
+				}
+				
+				if(publishdDateElement != null){
+					learningActivityTry.setEndDate(new Date());
+				}
+				
+				updateLearningActivityTryAndResult(learningActivityTry, publishdDateElement != null);
 				
 				SessionMessages.add(request, "grades.updating");
 			} catch (NestableException e) {
@@ -586,74 +610,6 @@ public class EvaluationActivity extends MVCPortlet implements MessageListener{
 			}
 		}
 	}
-	
-	
-	
-	/*	
-	
-	
-	public void setGrade(ActionRequest actionRequest,ActionResponse actionResponse) throws Exception{
-		
-		ThemeDisplay themeDisplay = (ThemeDisplay) actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
-    	try {
-    		List<String> errors = new ArrayList<String>();
-    		
-    		long actId = ParamUtil.getLong(actionRequest,"actId"); 
-        	if(actId==0){        		
-        		errors.add(LanguageUtil.get(getPortletConfig(), themeDisplay.getLocale(), "evaluationtaskactivity.error.noActIdParam"));
-        	}
-        	
-        	long userId = ParamUtil.getLong(actionRequest, "userId");
-        	if(userId==0){        		
-        		errors.add(LanguageUtil.get(getPortletConfig(), themeDisplay.getLocale(), "evaluationtaskactivity.error.noUserIdParam"));
-        	}
-        	
-    		long result = ParamUtil.getLong(actionRequest, "result");
-        	if((result<0)||(result>100)){
-        		errors.add(LanguageUtil.get(getPortletConfig(), themeDisplay.getLocale(), "evaluationtaskactivity.error.resultNumberRange"));
-        	}
-        	
-    		String comments = ParamUtil.getString(actionRequest, "comments");
-        	
-        	if(errors.size()!=0){
-        		actionResponse.setRenderParameter("responseCode",StringPool.ASCII_TABLE[48]); //0    		
-        		actionResponse.setRenderParameter("message",errors.toArray(new String[errors.size()]));  
-        		return;
-        	}
-        	
-        	
-			LearningActivityTry  learningActivityTry =  LearningActivityTryLocalServiceUtil.getLastLearningActivityTryByActivityAndUser(actId, userId);
-        	if(learningActivityTry==null){
-        		actionResponse.setRenderParameter("responseCode",StringPool.ASCII_TABLE[48]); //0    		
-        		actionResponse.setRenderParameter("message",new String[]{LanguageUtil.get(getPortletConfig(), themeDisplay.getLocale(), "evaluationtaskactivity.error.noLearningActivityTry")});  
-        		return;
-        	}
-
-			learningActivityTry.setEndDate(new Date());
-			learningActivityTry.setResult(result);
-			learningActivityTry.setComments(comments);
-			updateLearningActivityTryAndResult(learningActivityTry);
-    		actionResponse.setRenderParameter("responseCode",StringPool.ASCII_TABLE[49]); //1    		
-    		actionResponse.setRenderParameter("message",new String[]{LanguageUtil.get(getPortletConfig(), themeDisplay.getLocale(), "evaluationtaskactivity.grade.updating")});  
-    		
-    	} catch (Exception e) {	
-    		actionResponse.setRenderParameter("responseCode",StringPool.ASCII_TABLE[48]); //0    		
-    		actionResponse.setRenderParameter("message",new String[]{LanguageUtil.get(getPortletConfig(), themeDisplay.getLocale(), "evaluationtaskactivity.error.systemError")});  
-    		e.printStackTrace();
-    		} finally{
-    		String returnToFullPageURL = actionRequest.getParameter("returnToFullPageURL");
-    		if(Validator.isNotNull(returnToFullPageURL)) {
-    			actionResponse.setRenderParameter("returnToFullPageURL", returnToFullPageURL);
-    		}
-    		
-	    	actionResponse.setRenderParameter("jspPage","/html/evaluationtaskactivity/popups/activitiesResult.jsp");   	
-	    	actionResponse.setRenderParameter(WebKeys.PORTLET_CONFIGURATOR_VISIBILITY,StringPool.TRUE);
-    	}
-
-	}
-	
-	
-	*/
 	
 	@Override
 	public void render(RenderRequest renderRequest, RenderResponse renderResponse)
@@ -680,7 +636,6 @@ public class EvaluationActivity extends MVCPortlet implements MessageListener{
 					activity = LearningActivityLocalServiceUtil.getLearningActivity(actId);
 
 					//auditing
-					//ThemeDisplay themeDisplay = (ThemeDisplay) renderRequest.getAttribute(WebKeys.THEME_DISPLAY);
 					
 					long typeId=activity.getTypeId();
 					

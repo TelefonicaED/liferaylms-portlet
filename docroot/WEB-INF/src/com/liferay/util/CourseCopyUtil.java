@@ -29,6 +29,7 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.Folder;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.xml.Document;
@@ -305,7 +306,6 @@ public class CourseCopyUtil {
 			}
 		}
 		
-				
 		String changed = (!res.equals(description))?" changed":" not changed";
 		
 		log.debug("   + Description file : " + newFile.getTitle() +" (" + newFile.getMimeType() + ")" + changed);
@@ -487,6 +487,12 @@ public class CourseCopyUtil {
 				entryIdStr = LearningActivityLocalServiceUtil.getExtraContentValue(actOld.getActId(), "document");
 			}else if(actOld.getTypeId() == 7){
 				entryIdStr = LearningActivityLocalServiceUtil.getExtraContentValue(actOld.getActId(), "assetEntry");
+			}else if(actOld.getTypeId() == 6){
+				long additionalFileId = GetterUtil.getLong(LearningActivityLocalServiceUtil.getExtraContentValue(actOld.getActId(),"additionalFile"), 0);
+				if(additionalFileId>0){
+					AssetEntry assetEntry = AssetEntryLocalServiceUtil.getEntry(DLFileEntry.class.getName(), additionalFileId);
+					entryIdStr = String.valueOf(assetEntry.getEntryId());
+				}
 			}
 			if(!entryIdStr.equals("")){
 				
@@ -609,6 +615,9 @@ public class CourseCopyUtil {
 					AssetEntryLocalServiceUtil.updateAssetEntry(newEntry);
 					LearningActivityLocalServiceUtil.setExtraContentValue(actNew.getActId(), "assetEntry", String.valueOf(newEntryId));
 					
+				}else if(actNew.getTypeId() == 6){
+					AssetEntry entry =  AssetEntryLocalServiceUtil.getAssetEntry(entryId);
+					LearningActivityLocalServiceUtil.setExtraContentValue(actNew.getActId(), "additionalFile", String.valueOf(entry.getClassPK()));
 				}
 				
 			}
@@ -619,6 +628,8 @@ public class CourseCopyUtil {
 		}
 		
 	}
+	
+
 	
 	private long cloneFile(long entryId, LearningActivity actNew, long userId, ServiceContext serviceContext){
 		

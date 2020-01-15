@@ -27,6 +27,7 @@ import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.messaging.Message;
+import com.liferay.portal.kernel.messaging.MessageBusUtil;
 import com.liferay.portal.kernel.messaging.MessageListener;
 import com.liferay.portal.kernel.messaging.MessageListenerException;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -258,6 +259,12 @@ public class CreateEdition extends CourseCopyUtil implements MessageListener {
 		}
 		
 		//Create Tags and Categories
+		
+		log.debug("Enviando mensaje liferay/lms/createEditionPostAction con editionCourseId "+newCourse.getCourseId() + " y parentCourseId "+course.getCourseId());
+		Message postActionMessage=new Message();
+		postActionMessage.put("parentCourseId", course.getCourseId());
+		postActionMessage.put("editionCourseId", newCourse.getCourseId());
+		MessageBusUtil.sendMessage("liferay/lms/createEditionPostAction", postActionMessage);
 		
 		log.debug(" ENDS!");
 	}

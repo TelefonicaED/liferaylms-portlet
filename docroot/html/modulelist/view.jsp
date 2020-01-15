@@ -364,7 +364,7 @@
 %>
 										<p>
 											<span class="date-title-module"><liferay-ui:message key="fecha-inicio"/></span>:
-											<span class="date-module"><%=sdf.format(startDate)%></span>
+											<span class="date-module"><%= dateFormatDateTime.format(startDate)%></span>
 										<%--=	dateFormatDateTime.format(new Date(dateOffSet))--%><br />
 										</p>
 <%										
@@ -373,7 +373,7 @@
 %>
 										<p>
 											<span class="date-title-module"><liferay-ui:message key="fecha-fin"/></span>:
-											<span class="date-module"><%=sdf.format(endDate)%></span>
+											<span class="date-module"><%=dateFormatDateTime.format(endDate)%></span>
 										<%--=	dateFormatDateTime.format(new Date(dateOffSet))--%>
 										</p>
 <%
