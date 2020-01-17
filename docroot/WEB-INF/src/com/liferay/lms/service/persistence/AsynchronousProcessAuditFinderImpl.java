@@ -1,23 +1,14 @@
 package com.liferay.lms.service.persistence;
 
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.commons.lang.ArrayUtils;
-
 import com.liferay.lms.model.AsynchronousProcessAudit;
-import com.liferay.lms.model.Course;
-import com.liferay.lms.model.CourseResult;
-import com.liferay.lms.model.LmsPrefs;
 import com.liferay.lms.model.impl.AsynchronousProcessAuditImpl;
-import com.liferay.lms.model.impl.CourseImpl;
-import com.liferay.lms.service.LmsPrefsLocalServiceUtil;
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
 import com.liferay.util.dao.orm.CustomSQLUtil;
 import com.liferay.portal.kernel.dao.orm.ORMException;
@@ -26,18 +17,13 @@ import com.liferay.portal.kernel.dao.orm.SQLQuery;
 import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.dao.orm.SessionFactory;
 import com.liferay.portal.kernel.dao.orm.Type;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.model.ClassName;
-import com.liferay.portal.model.GroupConstants;
-import com.liferay.portal.model.User;
-import com.liferay.portal.service.RoleLocalServiceUtil;
 import com.liferay.portal.service.persistence.impl.BasePersistenceImpl;
 
-public class AsynchronousProcessAuditFinderImpl extends BasePersistenceImpl<CourseResult> implements AsynchronousProcessAuditFinder{
+public class AsynchronousProcessAuditFinderImpl extends BasePersistenceImpl<AsynchronousProcessAudit> implements AsynchronousProcessAuditFinder{
 	
 	Log log = LogFactoryUtil.getLog(AsynchronousProcessAuditFinderImpl.class);
 	
