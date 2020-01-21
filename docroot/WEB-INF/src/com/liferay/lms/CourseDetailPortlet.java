@@ -6,6 +6,7 @@ import javax.portlet.PortletException;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 
+import com.liferay.lms.course.adminaction.AdminActionTypeRegistry;
 import com.liferay.lms.model.Course;
 import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.portal.kernel.exception.SystemException;
@@ -87,6 +88,10 @@ public class CourseDetailPortlet extends BaseCourseAdminPortlet {
 		}
 		
 		if (Validator.isNotNull(course)) {
+			
+			AdminActionTypeRegistry registry =  new AdminActionTypeRegistry();
+			renderRequest.setAttribute("adminActionTypes", registry.getAdminActionTypes());
+			
 			renderRequest.setAttribute("course", course);
 		}
 		
