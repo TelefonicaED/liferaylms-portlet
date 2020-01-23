@@ -296,8 +296,13 @@ public class TaskP2PLearningActivityType extends BaseLearningActivityType {
 	}
 	
 	@Override
+	@Deprecated
 	public boolean canBeSeenResults(){
 		return true;
+	}
+	
+	public String getSpecificResultsPage(){
+		return "/html/gradebook/popups/taskp2pResult.jsp";
 	}
 }
 

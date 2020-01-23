@@ -105,6 +105,27 @@ public class LearningActivityTypeClp implements LearningActivityType {
 		return ((Long)returnObj).longValue();
 	}
 	
+	public String getSpecificResultsPage(){
+		Object returnObj = null;
+
+		try {
+			returnObj = clp.invoke("getSpecificResultsPage", new Object[] {});
+		}
+		catch (Throwable t) {
+			t = ClpSerializer.translateThrowable(t);
+
+			if (t instanceof RuntimeException) {
+				throw (RuntimeException)t;
+			}
+			else {
+				throw new RuntimeException(t.getClass().getName() +
+					" is not a valid exception");
+			}
+		}
+
+		return ((String)returnObj);
+	}
+	
 	public String getDefaultFeedbackCorrect() {
 		Object returnObj = null;
 
@@ -783,6 +804,7 @@ public class LearningActivityTypeClp implements LearningActivityType {
 	}
 
 	@Override
+	@Deprecated
 	public boolean canBeSeenResults() {
 		Object returnObj = null;
 		try {

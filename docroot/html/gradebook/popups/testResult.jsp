@@ -28,10 +28,7 @@
 <%
 long actId = ParamUtil.getLong(request,"actId",0 );
 
-if(actId == 0){
-	
-
-} else {
+if(actId != 0){
 	
 	long userId = ParamUtil.getLong(request,"studentId",0 );
 
