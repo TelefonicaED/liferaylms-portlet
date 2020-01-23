@@ -1,10 +1,14 @@
+<%@page import="com.liferay.lms.learningactivity.LearningActivityType"%>
+<%@page import="com.liferay.lms.learningactivity.LearningActivityTypeRegistry"%>
 <%@ include file="/init.jsp" %>
 <%  Integer actType = ParamUtil.getInteger(request,"actType");
 
-if(actType == 0){ %> <!-- Test -->
-	<jsp:include page="/html/gradebook/popups/testResult.jsp" />
-<%} else if(actType == 3){%> <!-- Taskp2p -->
-	<jsp:include page="/html/gradebook/popups/taskp2pResult.jsp" />
-<%} else if(actType == 6){%> <!-- Online -->
-	<jsp:include page="/html/gradebook/popups/onlineResult.jsp" />
-<%}%>
+LearningActivityTypeRegistry learningActivityTypeRegistry = new LearningActivityTypeRegistry();
+LearningActivityType learningActivityType = learningActivityTypeRegistry.getLearningActivityType(actType);
+
+%> 
+
+<liferay-util:include portletId="<%=learningActivityType.getPortletId() %>" page="<%=learningActivityType.getSpecificResultsPage() %>"  >
+	  <liferay-util:param name="studentId" value='<%=String.valueOf(ParamUtil.getLong(request, "studentId")) %>' />
+	  <liferay-util:param name="actId" value='<%=String.valueOf(ParamUtil.getLong(request, "actId")) %>' />
+</liferay-util:include> 	

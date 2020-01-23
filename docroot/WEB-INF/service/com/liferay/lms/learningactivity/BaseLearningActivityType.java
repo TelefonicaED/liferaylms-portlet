@@ -280,6 +280,7 @@ public abstract class BaseLearningActivityType implements LearningActivityType, 
 		return sb.toString();
 	}
 	
+	@Deprecated
 	public boolean canBeSeenResults(){
 		return false;
 	}
@@ -296,5 +297,10 @@ public abstract class BaseLearningActivityType implements LearningActivityType, 
 	@Override
 	public void copyActivity(LearningActivity oldActivity, LearningActivity newActivity, ServiceContext serviceContext){
 		
+	}
+	
+	@Override
+	public String getSpecificResultsPage(){
+		return null;
 	}
 }
