@@ -80,6 +80,8 @@ import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portlet.announcements.EntryDisplayDateException;
+import com.liferay.portlet.asset.model.AssetEntry;
+import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
 import com.liferay.portlet.asset.service.AssetTagLocalServiceUtil;
 import com.liferay.portlet.expando.model.ExpandoColumn;
 import com.liferay.portlet.expando.model.ExpandoTableConstants;
@@ -236,6 +238,17 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 			course = CourseLocalServiceUtil.fetchCourse(courseId);
 			if(course!=null){
 				String editionsTitle =LanguageUtil.format(themeDisplay.getLocale(), "course-admin.edition-title-x", course.getTitle(themeDisplay.getLocale()));
+				
+				Group groupCreated = GroupLocalServiceUtil.fetchGroup(course.getGroupCreatedId());
+				if(Validator.isNotNull(groupCreated)){
+					AssetEntry entry = AssetEntryLocalServiceUtil.getEntry(Course.class.getName(), courseId);
+					CourseType courseType = Validator.isNotNull(entry) ? CourseTypeLocalServiceUtil.fetchCourseType(entry.getClassTypeId()) : null;
+					if(Validator.isNotNull(courseType)){
+						editionsTitle += StringPool.SPACE + StringPool.OPEN_PARENTHESIS + courseType.getName(themeDisplay.getLocale()) + StringPool.CLOSE_PARENTHESIS;
+						renderRequest.setAttribute("courseTypeId", courseType.getCourseTypeId());
+					}
+				}
+				
 				renderRequest.setAttribute("editionsTitle", editionsTitle);
 			}
 			
@@ -310,7 +323,13 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 		TimeZone timeZone = themeDisplay.getTimeZone();
 		
 		long courseId = ParamUtil.getLong(renderRequest, "courseId", 0);
-		log.debug("CourseId "+courseId);
+		long courseTypeId = ParamUtil.getLong(renderRequest, "courseTypeId", 0);
+		
+		if(log.isDebugEnabled()){
+			log.debug("CourseId "+courseId);
+			log.debug("::courseTypeId:: " + courseTypeId);
+		}
+		
 		try{
 			Course course = CourseLocalServiceUtil.fetchCourse(courseId);
 			if(course!=null){
@@ -326,6 +345,13 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 				renderRequest.setAttribute("courseId", courseId);
 				
 				String editionsTitle =LanguageUtil.format(themeDisplay.getLocale(), "course-admin.new-edition-x", course.getTitle(themeDisplay.getLocale()));
+				if(courseTypeId>0){
+					CourseType courseType = CourseTypeLocalServiceUtil.fetchCourseType(courseTypeId);
+					if(Validator.isNotNull(courseType)){
+						editionsTitle += StringPool.SPACE + StringPool.OPEN_PARENTHESIS + courseType.getName(themeDisplay.getLocale()) + StringPool.CLOSE_PARENTHESIS;
+						renderRequest.setAttribute("courseTypeId", courseTypeId);
+					}
+				}
 				renderRequest.setAttribute("editionTitle", editionsTitle);
 				renderRequest.setAttribute("editionFriendlyURL", course.getFriendlyURL()+"-"+newCourseName.replace(" ", "-"));
 				

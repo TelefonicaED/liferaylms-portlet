@@ -1427,8 +1427,12 @@
 		<display-name>CourseRatings</display-name>
 		<portlet-class>com.liferay.lms.CourseRatings</portlet-class>
 		<init-param>
-			<name>view-jsp</name>
+			<name>view-template</name>
 			<value>/html/courseratings/view.jsp</value>
+		</init-param>
+		<init-param>
+			<name>config-template</name>
+			<value>/html/courseratings/config.jsp</value>
 		</init-param>
 		<expiration-cache>0</expiration-cache>
 		<supports>
