@@ -15,6 +15,7 @@ El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 
 - #172729 Se cambia el orden de asociación a curso para añadir primero el rol y de esta forma no se envíe el correo de bienvenida o despedida a los tutores y editores
 - #166015 Se muestra la actividad de evaluación en modo consulta
+- #174290 Se añade por interfaz el jsp para mostrar los resultados de una actividad en el gradebook
 
 ### Fixed
 
