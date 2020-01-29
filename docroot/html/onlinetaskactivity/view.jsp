@@ -92,6 +92,7 @@ else
 			portletURL.setParameter("jspPage","/html/onlinetaskactivity/view.jsp");
 			portletURL.setParameter("criteria", criteria); 
 			portletURL.setParameter("gradeFilter", gradeFilter);
+			portletURL.setParameter("actId", String.valueOf(actId));
 			
 			LearningActivityResult result = LearningActivityResultLocalServiceUtil.getByActIdAndUserId(actId, themeDisplay.getUserId());
 			
