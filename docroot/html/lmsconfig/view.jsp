@@ -189,6 +189,15 @@ if(prefs!=null){
 	
 	<liferay-ui:header title="inscription-configuration" />
 	<aui:field-wrapper>
+	<%boolean showButtonInscriptionAll = true;
+	boolean showButtonUnsubscribeAll = true;
+	try {
+		showButtonInscriptionAll = PrefsPropsUtil.getBoolean(themeDisplay.getCompanyId(), LmsConstant.SHOW_BUTTON_INSCRIPTION_ALL, true);
+		showButtonUnsubscribeAll = PrefsPropsUtil.getBoolean(themeDisplay.getCompanyId(), LmsConstant.SHOW_BUTTON_UNSUBSCRIBE_ALL, true);
+	} catch (SystemException e) {
+		e.printStackTrace();
+	}
+	%>
 		<aui:input type="checkbox" name="checkExecutionDate" label="config.checkExecutionDate" value="<%=checkExecutionDate %>"/>
 	</aui:field-wrapper>
 	

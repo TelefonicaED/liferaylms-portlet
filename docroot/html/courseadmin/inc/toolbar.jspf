@@ -1,3 +1,5 @@
+<%@page import="com.liferay.lms.util.LmsConstant"%>
+<%@page import="com.liferay.portal.kernel.util.PrefsPropsUtil"%>
 <liferay-portlet:actionURL name="removeAll" var="removeAllURL">
 	<portlet:param name="view" value="role-members-tab" /> 
 	<liferay-portlet:param name="courseId" value="${courseId}"></liferay-portlet:param>
@@ -55,13 +57,15 @@
 			url="<%= adduserURL %>"
 		/>
 	</div>
-	<div class="bt_removeuser">
-		<liferay-ui:icon 
-			message="delete-all-users"
-			label="true"
-			url="javascript:areyousure();"
-		/>
-	</div>
+	<c:if test="<%=PrefsPropsUtil.getBoolean(themeDisplay.getCompanyId(), LmsConstant.SHOW_BUTTON_UNSUBSCRIBE_ALL, true) %>">
+		<div class="bt_removeuser">
+			<liferay-ui:icon 
+				message="delete-all-users"
+				label="true"
+				url="javascript:areyousure();"
+			/>
+		</div>
+	</c:if>
 <liferay-ui:icon-menu cssClass='bt_importexport' direction="down" extended="<%= false %>"  message="export-import" showWhenSingleIcon="<%= false %>">
 	<div>
 		<liferay-portlet:resourceURL var="exportURL" >

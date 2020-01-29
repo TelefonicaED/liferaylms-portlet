@@ -47,6 +47,8 @@ public class LmsConfig extends MVCPortlet {
 		boolean linkResources = ParamUtil.getBoolean(request,"linkResources");
 		boolean sendMailToEditors = ParamUtil.getBoolean(request, "sendMailToEditors");
 		boolean sendMailToTutors = ParamUtil.getBoolean(request, "sendMailToTutors");
+		boolean showButtonInscriptionAll = ParamUtil.getBoolean(request, "showButtonInscriptionAll");
+		boolean showButtonUnsubscribeAll = ParamUtil.getBoolean(request, "showButtonUnsubscribeAll");
 		
 		LmsPrefs prefs=LmsPrefsLocalServiceUtil.getLmsPrefsIni(themeDisplay.getCompanyId());
 		prefs.setLmsTemplates(sitetemplates);
@@ -64,6 +66,8 @@ public class LmsConfig extends MVCPortlet {
 		savePreference(LmsConstant.SHOW_ACTIVITY_CLASSIFICATION, String.valueOf(showActivityClassification), themeDisplay.getCompanyId());
 		savePreference(LmsConstant.SEND_MAIL_TO_EDITORS, String.valueOf(sendMailToEditors), themeDisplay.getCompanyId());
 		savePreference(LmsConstant.SEND_MAIL_TO_TUTORS, String.valueOf(sendMailToTutors), themeDisplay.getCompanyId());
+		savePreference(LmsConstant.SHOW_BUTTON_INSCRIPTION_ALL, String.valueOf(showButtonInscriptionAll), themeDisplay.getCompanyId());
+		savePreference(LmsConstant.SHOW_BUTTON_UNSUBSCRIBE_ALL, String.valueOf(showButtonUnsubscribeAll), themeDisplay.getCompanyId());
 		
 		if (Validator.isNotNull(redirect)) {
 			response.sendRedirect(redirect);

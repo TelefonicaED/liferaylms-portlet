@@ -72,9 +72,9 @@ public class GroupListener extends BaseModelListener<Group> {
 						e1.printStackTrace();
 					}
 					
-					boolean tutorRole = lmsPrefs == null && lmsPrefs.getTeacherRole() > 0 
+					boolean tutorRole = lmsPrefs != null && lmsPrefs.getTeacherRole() > 0 
 							&& UserGroupRoleLocalServiceUtil.hasUserGroupRole(userId, groupId, lmsPrefs.getTeacherRole());
-					boolean editorRole = lmsPrefs == null && lmsPrefs.getTeacherRole() > 0 
+					boolean editorRole = lmsPrefs != null && lmsPrefs.getTeacherRole() > 0 
 							&& UserGroupRoleLocalServiceUtil.hasUserGroupRole(userId, groupId, lmsPrefs.getEditorRole());
 					
 					if(user!=null && company!=null && (lmsPrefs == null || 
