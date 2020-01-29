@@ -47,194 +47,199 @@ if(prefs!=null){
 	List <Long> calificationTypeIds = ListUtil.toList(StringUtil.split(prefs.getScoretranslators(),",",0L));	
 	List<Long> inscriptionTypeIds = ListUtil.toList(StringUtil.split(prefs.getInscriptionTypes(),",",0L));
 
-%>
-
-<liferay-ui:success message="your-request-completed-successfully" key="ok" />
-<liferay-ui:success message="lms-configuration.upgrade-ok" key="upgrade-ok" />
-<c:if test="${not empty counter}">
-	<div class="portlet-msg-success"><liferay-ui:message key="groups-changed" arguments="<%=new String[]{request.getParameter(\"counter\")} %>" /></div>
-</c:if>
-
-
-<liferay-portlet:actionURL name="changeSettings" var="changeSettingsURL"/>
-
-<aui:form action="<%=changeSettingsURL %>" method="POST" role="form">
-<aui:input type="hidden" name="redirect" value="<%= currentURL %>" />
-
-<liferay-ui:header title="lms-activities"/>
-<ul id="lms-sortable-activities-contentor">
-<%
-
-LearningActivityTypeRegistry learningActivityTypeRegistry = new LearningActivityTypeRegistry();
-List<LearningActivityType> learningActivityTypes = learningActivityTypeRegistry.getLearningActivityTypes();
-LearningActivityType [] learningActivityTypesCopy = new LearningActivityType[learningActivityTypes.size()];
-Set<Long> learningActivityTypeIds = new HashSet<Long>();
-Map<Long, Integer> mapaLats = new HashMap<Long, Integer>();
-
-for (LearningActivityType learningActivityType : learningActivityTypes) {
-	learningActivityTypeIds.add(learningActivityType.getTypeId());
-}
-
-int index = 0;
-for (Long curActId : activityids)
-{
-	if (learningActivityTypeIds.contains(curActId)) {
-		mapaLats.put(curActId, index++);
-	}
-}
-
-for (LearningActivityType learningActivityType : learningActivityTypes) {
-	Integer orderInt = mapaLats.get(learningActivityType.getTypeId());
-	if (orderInt != null) {
-		learningActivityTypesCopy[orderInt] = learningActivityType;
-	} else {
-		learningActivityTypesCopy[index++] = learningActivityType;
-	}
-}
-
-for (LearningActivityType learningActivityType : learningActivityTypesCopy) {
 	%>
-	<li class="lms-sortable-activities">
-		<aui:input type="checkbox" name="activities" label="<%= learningActivityType.getName() %>" checked="<%= (mapaLats.containsKey(learningActivityType.getTypeId())) %>" value="<%= learningActivityType.getTypeId() %>" />
-	</li>
+	
+	<liferay-ui:success message="your-request-completed-successfully" key="ok" />
+	<liferay-ui:success message="lms-configuration.upgrade-ok" key="upgrade-ok" />
+	<c:if test="${not empty counter}">
+		<div class="portlet-msg-success"><liferay-ui:message key="groups-changed" arguments="<%=new String[]{request.getParameter(\"counter\")} %>" /></div>
+	</c:if>
+	
+	
+	<liferay-portlet:actionURL name="changeSettings" var="changeSettingsURL"/>
+	
+	<aui:form action="<%=changeSettingsURL %>" method="POST" role="form">
+	<aui:input type="hidden" name="redirect" value="<%= currentURL %>" />
+	
+	<liferay-ui:header title="lms-activities"/>
+	<ul id="lms-sortable-activities-contentor">
 	<%
-}
-%>
-</ul>
-
-<liferay-ui:header title="allowed-site-templates" />
-<aui:field-wrapper>
-<%
-
-for(LayoutSetPrototype layoutsetproto:LayoutSetPrototypeLocalServiceUtil.search(themeDisplay.getCompanyId(),true,0, 1000000,null))
-{
-	boolean checked=false;
-	if(ArrayUtils.contains(layoutSetTemplateIds.toArray(), layoutsetproto.getLayoutSetPrototypeId()))
+	
+	LearningActivityTypeRegistry learningActivityTypeRegistry = new LearningActivityTypeRegistry();
+	List<LearningActivityType> learningActivityTypes = learningActivityTypeRegistry.getLearningActivityTypes();
+	LearningActivityType [] learningActivityTypesCopy = new LearningActivityType[learningActivityTypes.size()];
+	Set<Long> learningActivityTypeIds = new HashSet<Long>();
+	Map<Long, Integer> mapaLats = new HashMap<Long, Integer>();
+	
+	for (LearningActivityType learningActivityType : learningActivityTypes) {
+		learningActivityTypeIds.add(learningActivityType.getTypeId());
+	}
+	
+	int index = 0;
+	for (Long curActId : activityids)
 	{
-		checked=true;
+		if (learningActivityTypeIds.contains(curActId)) {
+			mapaLats.put(curActId, index++);
+		}
+	}
+	
+	for (LearningActivityType learningActivityType : learningActivityTypes) {
+		Integer orderInt = mapaLats.get(learningActivityType.getTypeId());
+		if (orderInt != null) {
+			learningActivityTypesCopy[orderInt] = learningActivityType;
+		} else {
+			learningActivityTypesCopy[index++] = learningActivityType;
+		}
+	}
+	
+	for (LearningActivityType learningActivityType : learningActivityTypesCopy) {
+		%>
+		<li class="lms-sortable-activities">
+			<aui:input type="checkbox" name="activities" label="<%= learningActivityType.getName() %>" checked="<%= (mapaLats.containsKey(learningActivityType.getTypeId())) %>" value="<%= learningActivityType.getTypeId() %>" />
+		</li>
+		<%
 	}
 	%>
+	</ul>
 	
-	<aui:input type="checkbox" name="lmsTemplates" 
-	label="<%=layoutsetproto.getName(themeDisplay.getLocale())  %>" checked="<%=checked %>" value="<%=layoutsetproto.getLayoutSetPrototypeId()%>" />
+	<liferay-ui:header title="allowed-site-templates" />
+	<aui:field-wrapper>
 	<%
-}
-%>
-</aui:field-wrapper>
-
-<liferay-ui:header title="course-correction-method" />
-<aui:field-wrapper>
-<%
-CourseEvalRegistry courseEvalRegistry = new CourseEvalRegistry();
-for(CourseEval courseEval:courseEvalRegistry.getCourseEvals())
-{
-	boolean checked=false;
-	String writechecked="false";
-	if(courseEvalIds!=null &&courseEvalIds.size()>0 && ArrayUtil.contains(courseEvalIds.toArray(), courseEval.getTypeId()))
+	
+	for(LayoutSetPrototype layoutsetproto:LayoutSetPrototypeLocalServiceUtil.search(themeDisplay.getCompanyId(),true,0, 1000000,null))
 	{
-		checked=true;
-		writechecked="true";
+		boolean checked=false;
+		if(ArrayUtils.contains(layoutSetTemplateIds.toArray(), layoutsetproto.getLayoutSetPrototypeId()))
+		{
+			checked=true;
+		}
+		%>
+		
+		<aui:input type="checkbox" name="lmsTemplates" 
+		label="<%=layoutsetproto.getName(themeDisplay.getLocale())  %>" checked="<%=checked %>" value="<%=layoutsetproto.getLayoutSetPrototypeId()%>" />
+		<%
 	}
 	%>
+	</aui:field-wrapper>
 	
-	<aui:input type="checkbox" name="courseEvals" 
-	label="<%=courseEval.getName()  %>" checked="<%=checked %>" value="<%=courseEval.getTypeId()%>" />
+	<liferay-ui:header title="course-correction-method" />
+	<aui:field-wrapper>
 	<%
-}
-%>
-</aui:field-wrapper>
-
-<liferay-ui:header title="calificationType" />
-<aui:field-wrapper>
-<%
-CalificationTypeRegistry calificationTypeRegistry = new CalificationTypeRegistry();
-for(CalificationType calificationType :calificationTypeRegistry.getCalificationTypes())
-{
-	boolean checked=false;
-	String writechecked="false";
-	if(calificationTypeIds!=null &&calificationTypeIds.size()>0 && ArrayUtils.contains(calificationTypeIds.toArray(), calificationType.getTypeId()))
+	CourseEvalRegistry courseEvalRegistry = new CourseEvalRegistry();
+	for(CourseEval courseEval:courseEvalRegistry.getCourseEvals())
 	{
-		checked=true;
-		writechecked="true";
+		boolean checked=false;
+		String writechecked="false";
+		if(courseEvalIds!=null &&courseEvalIds.size()>0 && ArrayUtil.contains(courseEvalIds.toArray(), courseEval.getTypeId()))
+		{
+			checked=true;
+			writechecked="true";
+		}
+		%>
+		
+		<aui:input type="checkbox" name="courseEvals" 
+		label="<%=courseEval.getName()  %>" checked="<%=checked %>" value="<%=courseEval.getTypeId()%>" />
+		<%
 	}
 	%>
+	</aui:field-wrapper>
 	
-	<aui:input type="checkbox" name="calificationTypes" 
-	label="<%=LanguageUtil.get(locale, calificationType.getTitle(locale))  %>" checked="<%=checked %>" value="<%=calificationType.getTypeId()%>" />
+	<liferay-ui:header title="calificationType" />
+	<aui:field-wrapper>
 	<%
-}
-%>
-</aui:field-wrapper>
-
-<liferay-ui:header title="inscription-type" />
-<aui:field-wrapper>
-<%
-InscriptionTypeRegistry inscriptionTypeRegistry = new InscriptionTypeRegistry();
-for(InscriptionType inscriptionType :inscriptionTypeRegistry.getInscriptionTypes()){
-	boolean checked=false;
-	String writechecked="false";
-	if(inscriptionTypeIds!=null &&inscriptionTypeIds.size()>0 && ArrayUtils.contains(inscriptionTypeIds.toArray(), inscriptionType.getTypeId())){
-		checked=true;
-		writechecked="true";
+	CalificationTypeRegistry calificationTypeRegistry = new CalificationTypeRegistry();
+	for(CalificationType calificationType :calificationTypeRegistry.getCalificationTypes())
+	{
+		boolean checked=false;
+		String writechecked="false";
+		if(calificationTypeIds!=null &&calificationTypeIds.size()>0 && ArrayUtils.contains(calificationTypeIds.toArray(), calificationType.getTypeId()))
+		{
+			checked=true;
+			writechecked="true";
+		}
+		%>
+		
+		<aui:input type="checkbox" name="calificationTypes" 
+		label="<%=LanguageUtil.get(locale, calificationType.getTitle(locale))  %>" checked="<%=checked %>" value="<%=calificationType.getTypeId()%>" />
+		<%
 	}
 	%>
+	</aui:field-wrapper>
 	
-	<aui:input type="checkbox" name="inscriptionTypes" 
-		label="<%=LanguageUtil.get(locale, inscriptionType.getTitle(locale))  %>" checked="<%=checked %>" value="<%=inscriptionType.getTypeId()%>" 
-		disabled="<%=!inscriptionType.isActive(themeDisplay.getCompanyId()) %>"/>
+	<liferay-ui:header title="inscription-type" />
+	<aui:field-wrapper>
 	<%
-}
-%>
-</aui:field-wrapper>
-
-<liferay-ui:header title="inscription-configuration" />
-<aui:field-wrapper>
-	<aui:input type="checkbox" name="checkExecutionDate" label="config.checkExecutionDate" value="<%=checkExecutionDate %>"/>
-</aui:field-wrapper>
-
-<liferay-ui:header title="modules-and-activities" />
-<aui:field-wrapper>
-
-<%
-	boolean showActivityClassification = true;
-	boolean showModuleClassification = false;
-	try {
-		showActivityClassification = PrefsPropsUtil.getBoolean(themeDisplay.getCompanyId(), LmsConstant.SHOW_ACTIVITY_CLASSIFICATION, true);
-		showModuleClassification = PrefsPropsUtil.getBoolean(themeDisplay.getCompanyId(), LmsConstant.SHOW_MODULE_CLASSIFICATION, false);
-	} catch (SystemException e) {
-		e.printStackTrace();
+	InscriptionTypeRegistry inscriptionTypeRegistry = new InscriptionTypeRegistry();
+	for(InscriptionType inscriptionType :inscriptionTypeRegistry.getInscriptionTypes()){
+		boolean checked=false;
+		String writechecked="false";
+		if(inscriptionTypeIds!=null &&inscriptionTypeIds.size()>0 && ArrayUtils.contains(inscriptionTypeIds.toArray(), inscriptionType.getTypeId())){
+			checked=true;
+			writechecked="true";
+		}
+		%>
+		
+		<aui:input type="checkbox" name="inscriptionTypes" 
+			label="<%=LanguageUtil.get(locale, inscriptionType.getTitle(locale))  %>" checked="<%=checked %>" value="<%=inscriptionType.getTypeId()%>" 
+			disabled="<%=!inscriptionType.isActive(themeDisplay.getCompanyId()) %>"/>
+		<%
 	}
-
-%>
+	%>
+	</aui:field-wrapper>
 	
-	<aui:input type="checkbox" name="showModuleClassification"	label="show-module-classification" checked="<%= showModuleClassification %>" />
-	<aui:input type="checkbox" name="showActivityClassification" label="show-activity-classification" checked="<%= showActivityClassification %>" />
-	<aui:input type="checkbox" name="showHideActivity"	label="show-hide-activity" checked="<%=prefs.getShowHideActivity()%>" value="<%=prefs.getShowHideActivity()%>" />
+	<liferay-ui:header title="inscription-configuration" />
+	<aui:field-wrapper>
+		<aui:input type="checkbox" name="checkExecutionDate" label="config.checkExecutionDate" value="<%=checkExecutionDate %>"/>
+	</aui:field-wrapper>
+	
+	<liferay-ui:header title="modules-and-activities" />
+	<aui:field-wrapper>
+	
+	<%
+		boolean showActivityClassification = true;
+		boolean showModuleClassification = false;
+		try {
+			showActivityClassification = PrefsPropsUtil.getBoolean(themeDisplay.getCompanyId(), LmsConstant.SHOW_ACTIVITY_CLASSIFICATION, true);
+			showModuleClassification = PrefsPropsUtil.getBoolean(themeDisplay.getCompanyId(), LmsConstant.SHOW_MODULE_CLASSIFICATION, false);
+		} catch (SystemException e) {
+			e.printStackTrace();
+		}
+	
+	%>
+		
+		<aui:input type="checkbox" name="showModuleClassification"	label="show-module-classification" checked="<%= showModuleClassification %>" />
+		<aui:input type="checkbox" name="showActivityClassification" label="show-activity-classification" checked="<%= showActivityClassification %>" />
+		<aui:input type="checkbox" name="showHideActivity"	label="show-hide-activity" checked="<%=prefs.getShowHideActivity()%>" value="<%=prefs.getShowHideActivity()%>" />
+	
+	</aui:field-wrapper>
+	
+	<liferay-ui:header title="configuration-courses" />
+	<aui:field-wrapper>
+		<%boolean sendMailToEditors = true;
+		boolean sendMailToTutors = true;
+		try {
+			sendMailToEditors = PrefsPropsUtil.getBoolean(themeDisplay.getCompanyId(), LmsConstant.SEND_MAIL_TO_EDITORS, true);
+			sendMailToTutors = PrefsPropsUtil.getBoolean(themeDisplay.getCompanyId(), LmsConstant.SEND_MAIL_TO_TUTORS, true);
+		} catch (SystemException e) {
+			e.printStackTrace();
+		}
+		%>
+	
+		<aui:input type="checkbox" name="viewCoursesFinished"
+		label="view-courses-finished" checked="<%=prefs.getViewCoursesFinished()%>" value="<%=prefs.getViewCoursesFinished()%>" />
+		<aui:input type="checkbox" name="linkResources"
+			label="link-internal-resources" checked="<%=linkResources%>" value="<%=linkResources%>" />
+		<aui:input type="checkbox" name="sendMailToEditors"	label="lms-prefs.send-mail-to-editors" checked="<%= sendMailToEditors %>" />
+		<aui:input type="checkbox" name="sendMailToTutors"	label="lms-prefs.send-mail-to-tutors" checked="<%= sendMailToTutors %>" />
+		
+	</aui:field-wrapper>
 
-</aui:field-wrapper>
-
-<liferay-ui:header title="configuration-courses" />
-<aui:field-wrapper>
-
-	<aui:input type="checkbox" name="viewCoursesFinished"
-	label="view-courses-finished" checked="<%=prefs.getViewCoursesFinished()%>" value="<%=prefs.getViewCoursesFinished()%>" />
-	<aui:input type="checkbox" name="linkResources"
-		label="link-internal-resources" checked="<%=linkResources%>" value="<%=linkResources%>" />
-</aui:field-wrapper>
-
-
-
-
-<aui:field-wrapper>
-	<aui:button type="submit" value="save" />
-</aui:field-wrapper>
-
-</aui:form>
-
-
-
-
-<%
+	<aui:field-wrapper>
+		<aui:button type="submit" value="save" />
+	</aui:field-wrapper>
+	
+	</aui:form>
+	<%
 }
 %>
 

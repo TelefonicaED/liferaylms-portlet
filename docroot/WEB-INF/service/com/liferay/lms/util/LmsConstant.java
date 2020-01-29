@@ -27,6 +27,8 @@ public class LmsConstant {
 	public static String SHOW_MODULE_CLASSIFICATION = "showModuleClassification";
 	public static String SHOW_ACTIVITY_CLASSIFICATION = "showActivityClassification";
 	public static String CHECK_EXECUTION_DATE = "checkExecutionDate";
+	public static String SEND_MAIL_TO_EDITORS = "sendMailToEditors";
+	public static String SEND_MAIL_TO_TUTORS = "sendMailToTutors";
 	
 	public final static String COURSETYPE_ICON_MAINFOLDER = "icons";
 	public final static String COURSETYPE_ICON_MAINFOLDER_DESCRIPTION = "Course Type Icons";
