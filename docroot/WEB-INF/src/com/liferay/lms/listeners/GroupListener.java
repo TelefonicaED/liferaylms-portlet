@@ -8,6 +8,7 @@ import com.liferay.lms.model.Course;
 import com.liferay.lms.model.LmsPrefs;
 import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.lms.service.LmsPrefsLocalServiceUtil;
+import com.liferay.lms.util.LmsConstant;
 import com.liferay.portal.ModelListenerException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
@@ -26,9 +27,11 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.BaseModelListener;
 import com.liferay.portal.model.Company;
 import com.liferay.portal.model.Group;
+import com.liferay.portal.model.Role;
 import com.liferay.portal.model.User;
 import com.liferay.portal.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.service.CompanyLocalServiceUtil;
+import com.liferay.portal.service.RoleLocalServiceUtil;
 import com.liferay.portal.service.UserGroupRoleLocalServiceUtil;
 import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.util.PortalUtil;
@@ -69,8 +72,14 @@ public class GroupListener extends BaseModelListener<Group> {
 						e1.printStackTrace();
 					}
 					
-					if(user!=null&&company!=null && (lmsPrefs == null || ((lmsPrefs.getTeacherRole() == 0 || !UserGroupRoleLocalServiceUtil.hasUserGroupRole(userId, groupId, lmsPrefs.getTeacherRole()))
-							&& (lmsPrefs.getEditorRole() == 0 || !UserGroupRoleLocalServiceUtil.hasUserGroupRole(userId, groupId, lmsPrefs.getEditorRole()))))){
+					boolean tutorRole = lmsPrefs != null && lmsPrefs.getTeacherRole() > 0 
+							&& UserGroupRoleLocalServiceUtil.hasUserGroupRole(userId, groupId, lmsPrefs.getTeacherRole());
+					boolean editorRole = lmsPrefs != null && lmsPrefs.getTeacherRole() > 0 
+							&& UserGroupRoleLocalServiceUtil.hasUserGroupRole(userId, groupId, lmsPrefs.getEditorRole());
+					
+					if(user!=null && company!=null && (lmsPrefs == null || 
+							((!tutorRole || PrefsPropsUtil.getBoolean(company.getCompanyId(), LmsConstant.SEND_MAIL_TO_TUTORS, true))
+							&& (!editorRole || PrefsPropsUtil.getBoolean(company.getCompanyId(), LmsConstant.SEND_MAIL_TO_EDITORS, true))))){
 
 				    	String fromName = PrefsPropsUtil.getString(course.getCompanyId(),
 								PropsKeys.ADMIN_EMAIL_FROM_NAME);
@@ -97,10 +106,20 @@ public class GroupListener extends BaseModelListener<Group> {
 						    	subject = LanguageUtil.format(user.getLocale(),"welcome-subject", new String[]{course.getTitle(user.getLocale())});
 
 					    	}
+					    	
+					    	String userRole = LanguageUtil.get(user.getLocale(), "courseadmin.adminactions.students");
+					    	if(tutorRole){
+					    		Role role = RoleLocalServiceUtil.getRole(lmsPrefs.getTeacherRole());
+					    		userRole = role.getTitle(user.getLocale());
+					    	}else if(editorRole){
+					    		Role role = RoleLocalServiceUtil.getRole(lmsPrefs.getEditorRole());
+					    		userRole = role.getTitle(user.getLocale());
+					    	}
+					    	
 					    	String body = StringUtil.replace(
 				    			course.getWelcomeMsg(),
-				    			new String[] {"[$FROM_ADDRESS$]", "[$FROM_NAME$]", "[$PAGE_URL$]","[$PORTAL_URL$]","[$TO_ADDRESS$]","[$TO_NAME$]","[$USER_SCREENNAME$]","[$TITLE_COURSE$]"},
-				    			new String[] {fromAddress, fromName, urlcourse, url, user.getEmailAddress(), user.getFullName(),user.getScreenName(),course.getTitle(user.getLocale())});
+				    			new String[] {"[$FROM_ADDRESS$]", "[$FROM_NAME$]", "[$PAGE_URL$]","[$PORTAL_URL$]","[$TO_ADDRESS$]","[$TO_NAME$]","[$USER_SCREENNAME$]","[$TITLE_COURSE$]","[$ROLE$]"},
+				    			new String[] {fromAddress, fromName, urlcourse, url, user.getEmailAddress(), user.getFullName(),user.getScreenName(),course.getTitle(user.getLocale()), userRole});
 				    	
 							if(log.isDebugEnabled()){
 								log.debug(from);
