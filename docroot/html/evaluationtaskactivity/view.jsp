@@ -1,3 +1,4 @@
+<%@page import="com.liferay.lms.EvaluationActivity"%>
 <%@page import="com.tls.lms.util.LiferaylmsUtil"%>
 <%@page import="com.liferay.lms.learningactivity.calificationtype.CalificationTypeRegistry"%>
 <%@page import="com.liferay.lms.learningactivity.calificationtype.CalificationType"%>
@@ -29,14 +30,11 @@
 
 <%
 CalificationType ct = new CalificationTypeRegistry().getCalificationType(CourseLocalServiceUtil.getCourseByGroupCreatedId(themeDisplay.getScopeGroupId()).getCalificationType());
-
 %>
 
 <liferay-ui:error key="result-bad-format" message="<%=LanguageUtil.format(themeDisplay.getLocale(), \"result.must-be-between\", new Object[]{ct.getMinValue(themeDisplay.getScopeGroupId()),ct.getMaxValue(themeDisplay.getScopeGroupId())})%>" />
 <liferay-ui:error key="grades.bad-updating" message="offlinetaskactivity.grades.bad-updating" />
 <liferay-ui:success key="grades.updating" message="offlinetaskactivity.correct.saved" />
-
-
 
 <%
 long actId = ParamUtil.getLong(request,"actId",0);
@@ -250,14 +248,14 @@ if(actId==0){
 							params.put("usersGroups", new Long(themeDisplay.getScopeGroupId()));
 													
 							if(gradeFilter.equals("passed")) {
-								params.put("passed",new CustomSQLParam(EvaluationAvgPortlet.COURSE_RESULT_PASSED_SQL,course.getCourseId()));
+								params.put("passed",new CustomSQLParam(EvaluationActivity.LEARNING_ACTIVITY_RESULT_PASSED_SQL,actId));
 							}else{
 								if(gradeFilter.equals("failed")) {
-									params.put("failed",new CustomSQLParam(EvaluationAvgPortlet.COURSE_RESULT_FAIL_SQL,course.getCourseId()));
+									params.put("failed",new CustomSQLParam(EvaluationActivity.LEARNING_ACTIVITY_RESULT_FAIL_SQL,actId));
 								}else{
 									if (gradeFilter.equals("nocalification")) {
-										params.put("nocalification",new CustomSQLParam(EvaluationAvgPortlet.COURSE_RESULT_NO_CALIFICATION_SQL,course.getCourseId()));
-									}
+										params.put("nocalification",new CustomSQLParam(EvaluationActivity.LEARNING_ACTIVITY_RESULT_NO_CALIFICATION_SQL,actId));
+									} 
 								}
 							}
 								
@@ -356,6 +354,14 @@ if(actId==0){
 											</a>
 										</p>
 										</div>
+									<%}else if(hasPublishDate && learningActivityResult.getEndDate() == null){%>
+										<portlet:actionURL name="publishLearningActivitiyResult" var="publishLearningActivitiyResultURL" >
+							        		<portlet:param name="actId" value="<%=Long.toString(actId) %>"/>
+							        		<portlet:param name="userId" value="<%=Long.toString(usuario.getUserId()) %>"/>
+							        		<portlet:param name="criteria" value="<%=ParamUtil.getString(renderRequest, \"criteria\",\"\") %>"/>
+											<portlet:param name="gradeFilter" value="<%=ParamUtil.getString(renderRequest, \"gradeFilter\",\"\") %>"/>
+							        	</portlet:actionURL>
+										<aui:button value="publish" onClick="${publishLearningActivitiyResultURL}"/>
 									<%}else if(hasPublishDate && (!learningActivityResult.getComments().trim().equals(""))){%>
 										<p class="see-more">
 											<a onClick="AUI().use('aui-dialog', function(A) {
@@ -378,8 +384,16 @@ if(actId==0){
 											</a>
 										</p>
 									<%} 
-				               	}else{
-									%><liferay-ui:message key="evaluationtaskactivity.student.without.qualification" /><% 
+				               	}else{%><liferay-ui:message key="evaluationtaskactivity.student.without.qualification" />	
+								<% if(hasPublishDate){%>
+									<portlet:actionURL name="calcualteLearningActivitiyResult" var="calcualteLearningActivitiyResultURL" >
+						        		<portlet:param name="actId" value="<%=Long.toString(actId) %>"/>
+						        		<portlet:param name="userId" value="<%=Long.toString(usuario.getUserId()) %>"/>
+						        		<portlet:param name="criteria" value="<%=ParamUtil.getString(renderRequest, \"criteria\",\"\") %>"/>
+										<portlet:param name="gradeFilter" value="<%=ParamUtil.getString(renderRequest, \"gradeFilter\",\"\") %>"/>
+						        	</portlet:actionURL>
+										<aui:button value="calculate" onClick="${calcualteLearningActivitiyResultURL}"/>
+									<%}
 								}%>
 							</liferay-ui:search-container-column-text>
 						</liferay-ui:search-container-row>
