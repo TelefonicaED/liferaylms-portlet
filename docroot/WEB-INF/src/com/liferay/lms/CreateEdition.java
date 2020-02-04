@@ -370,6 +370,8 @@ public class CreateEdition extends CourseCopyUtil implements MessageListener {
 				newLearnActivity = LearningActivityLocalServiceUtil.createLearningActivity(CounterLocalServiceUtil.increment(LearningActivity.class.getName()));
 				newLearnActivity.setUuid(activity.getUuid());
 				newLearnActivity.setTypeId(activity.getTypeId());
+				newLearnActivity.setFeedbackCorrect(activity.getFeedbackCorrect());
+				newLearnActivity.setFeedbackNoCorrect(activity.getFeedbackNoCorrect());
 				newLearnActivity.setPriority(newLearnActivity.getActId());
 				newLearnActivity.setWeightinmodule(activity.getWeightinmodule());
 				newLearnActivity.setGroupId(newModule.getGroupId());
