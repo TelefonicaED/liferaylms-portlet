@@ -4,38 +4,6 @@ Todos los cambios de este proyecto estarán documentados en este archivo.
 El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 
 
-## [4.2.0](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v4.2.0)
-
-### Added
-
-- #167661 Se añade la posiblidad de publicar notas individuales después de publicar la general en las actividades de evaluación
-
-## [4.1.0](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v4.1.0)
-
-### Added
-
-- #170072 Se añaden mensajes asíncronos al finalizar el clonado de curso y la creación de la edición para acciones a posteriori desde proyectos.
-- #168113 Se añaden parámetros para embeber las acciones específicas
-- #173883 Se añade un mensaje cuando estás en las actividades en modo lectura
-- #158614 Parámetro rol en los mensajes de bienvenido y baja del curso
-
-### Updated
-
-- #172729 Se cambia el orden de asociación a curso para añadir primero el rol y de esta forma no se envíe el correo de bienvenida o despedida a los tutores y editores
-- #166015 Se muestra la actividad de evaluación en modo consulta
-- #174290 Se añade por interfaz el jsp para mostrar los resultados de una actividad en el gradebook
-
-### Fixed
-
-- #170041 Cambiado el formato de fechas al de liferay debido a un bug en el SimpleDateFormat.
-- #170849 Se mantiene en la vista de ediciones cuando abres cieras o eliminas una
-- #172627 No se pone fecha fin a los resultados de las actividades de evaluación hasta que no se publica
-- #163474 Cuando el test es la última actividad y al corregirlo ya estás en modo observador no se mostraba la nota
-
-### Deleted
-
-- #161554 Se elimina el hook del search container
-
 ## [4.0.1](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v4.0.1)
 
 ### Fixed
