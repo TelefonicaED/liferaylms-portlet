@@ -1202,11 +1202,8 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 
 		long courseId = ParamUtil.getLong(actionRequest, "courseId", 0);
 		long roleId = ParamUtil.getLong(actionRequest, "roleId", 0);
-//		long userId = ParamUtil.getLong(actionRequest, "userId", 0);
 		// Multiusuario
 		long[] to = ParamUtil.getLongValues(actionRequest, "to");
-//		long[] userIds=new long[1];
-//		userIds[0]=ParamUtil.getLong(actionRequest, "userId");
 		Course course = CourseLocalServiceUtil.getCourse(courseId);
 		
 		LmsPrefs prefs=LmsPrefsLocalServiceUtil.getLmsPrefs(course.getCompanyId());
@@ -1214,10 +1211,11 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 		Long editorRoleId=RoleLocalServiceUtil.getRole(prefs.getEditorRole()).getRoleId();
 		
 		for (long userId : to) {
+			UserGroupRoleLocalServiceUtil.addUserGroupRoles(new long[] { userId }, course.getGroupCreatedId(), roleId);
+			
 			if (!GroupLocalServiceUtil.hasUserGroup(userId, course.getGroupCreatedId())) {
 				GroupLocalServiceUtil.addUserGroups(userId,	new long[] { course.getGroupCreatedId() });
 			}
-			UserGroupRoleLocalServiceUtil.addUserGroupRoles(new long[] { userId }, course.getGroupCreatedId(), roleId);
 			
 			if(roleId == teacherRoleId){
 				AuditingLogFactory.audit(course.getCompanyId(), course.getGroupCreatedId(), Course.class.getName(), 
