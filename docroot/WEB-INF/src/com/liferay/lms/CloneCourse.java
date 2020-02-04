@@ -331,7 +331,6 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 		List<Long> evaluations = new ArrayList<Long>(); 
 		LearningActivity newLearnActivity=null;
 		LearningActivity nuevaLarn = null;
-		ServiceContext larnServiceContext = null;
 		Module newModule=null;
 		for(Module module:modules){
 			
@@ -394,6 +393,8 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 					newLearnActivity.setTypeId(activity.getTypeId());
 					//Cuando es tipo Evaluación no hay que llevarse el extracontent
 					newLearnActivity.setExtracontent(activity.getExtracontent());
+					newLearnActivity.setFeedbackCorrect(activity.getFeedbackCorrect());
+					newLearnActivity.setFeedbackNoCorrect(activity.getFeedbackNoCorrect());
 					
 					
 					newLearnActivity.setTries(activity.getTries());
@@ -419,7 +420,7 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 					
 					newLearnActivity.setDescription(descriptionFilesClone(activity.getDescription(),newModule.getGroupId(), newLearnActivity.getActId(),themeDisplay.getUserId()));
 		
-					larnServiceContext = serviceContext;
+					ServiceContext larnServiceContext = serviceContext;
 					//Eliminar las categorias y los tags del curso del serviceContext antes de crear la nueva actividad
 					if(this.cloneActivityClassificationTypes){
 						AssetEntry entryActivity = AssetEntryLocalServiceUtil.fetchEntry(LearningActivity.class.getName(), activity.getActId());
@@ -427,7 +428,8 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 							
 							larnServiceContext.setAssetCategoryIds(entryActivity.getCategoryIds());
 							larnServiceContext.setAssetTagNames(entryActivity.getTagNames());
-							larnServiceContext.setExpandoBridgeAttributes(entryActivity.getExpandoBridge().getAttributes(false));
+							larnServiceContext.setExpandoBridgeAttributes(activity.getExpandoBridge().getAttributes());
+					
 							//---Clonar la clasificación de la actividad
 							if(log.isDebugEnabled())
 								log.debug(":::Clone activity classification types::: Activity " + activity.getActId());
@@ -436,6 +438,9 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 					}
 					
 					nuevaLarn=LearningActivityLocalServiceUtil.addLearningActivity(newLearnActivity,larnServiceContext);
+					nuevaLarn.setExpandoBridgeAttributes(larnServiceContext);
+					nuevaLarn.getExpandoBridge().setAttributes(activity.getExpandoBridge().getAttributes());
+					
 					if(log.isDebugEnabled()){
 						log.debug("      Learning Activity : " + activity.getTitle(Locale.getDefault())+ " ("+activity.getActId()+", " + LanguageUtil.get(Locale.getDefault(),learningActivityTypeRegistry.getLearningActivityType(activity.getTypeId()).getName())+")");
 						log.debug("      + Learning Activity : " + nuevaLarn.getTitle(Locale.getDefault())+ " ("+nuevaLarn.getActId()+", " + LanguageUtil.get(Locale.getDefault(),learningActivityTypeRegistry.getLearningActivityType(nuevaLarn.getTypeId()).getName())+")");

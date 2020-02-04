@@ -101,7 +101,7 @@ public class QuestionsAdmin extends MVCPortlet{
 	public static final int COLUMN_INDEX_ANSWER_IS_CORRECT = 4;
 	public static final int COLUMN_INDEX_ANSWER_FEEDBACK_CORRECT = 5;
 	public static final int COLUMN_INDEX_ANSWER_FEEDBACK_INCORRECT = 6;
-
+	public static final int COLUMN_INDEX_QUESTION_EXTRA_CONTENT = 7;
 
 	HashMap<Long, TestAnswer> answersMap = new HashMap<Long, TestAnswer>(); 
 
@@ -729,6 +729,7 @@ public class QuestionsAdmin extends MVCPortlet{
 					boolean allCorrect=true;
 					boolean questionPenalize;
 					String answerTitle;
+					String extraContent;
 					boolean answerIsCorrect;
 					boolean firstLine = true;
 					Row row = worksheet.getRow(fila);
@@ -743,6 +744,7 @@ public class QuestionsAdmin extends MVCPortlet{
 									answerIsCorrect = Boolean.parseBoolean((row.getCell(COLUMN_INDEX_ANSWER_TITLE))!=null?row.getCell(COLUMN_INDEX_ANSWER_IS_CORRECT).getStringCellValue():"false");
 									feedbackCorrect =  (row.getCell(COLUMN_INDEX_ANSWER_FEEDBACK_CORRECT))!=null?row.getCell(COLUMN_INDEX_ANSWER_FEEDBACK_CORRECT).getStringCellValue():"";
 									feedbackIncorrect = (row.getCell(COLUMN_INDEX_ANSWER_FEEDBACK_INCORRECT))!=null?row.getCell(COLUMN_INDEX_ANSWER_FEEDBACK_INCORRECT).getStringCellValue():"";
+									extraContent = (row.getCell(COLUMN_INDEX_QUESTION_EXTRA_CONTENT))!=null?row.getCell(COLUMN_INDEX_QUESTION_EXTRA_CONTENT).getStringCellValue():"";
 									if(questionTitle!=null && Validator.isNotNull(questionTitle.trim())){
 										try{
 											questionType = Integer.valueOf(row.getCell(COLUMN_INDEX_QUESTION_TYPE).getStringCellValue());
@@ -758,10 +760,12 @@ public class QuestionsAdmin extends MVCPortlet{
 										if (log.isDebugEnabled()) log.debug("Line: " + fila + " Titulo pregunta: " + questionTitle);					
 										if (log.isDebugEnabled()) log.debug("Line: " + fila + " Tipo: " + questionType);
 										if (log.isDebugEnabled()) log.debug("Line: " + fila + " Penalize: " + questionPenalize);
+										if (log.isDebugEnabled()) log.debug("Line: " + fila + " Extra content: " + extraContent);
 
 										//Creamos la pregunta.
 										question =TestQuestionLocalServiceUtil.addQuestion(actId, questionTitle, questionType);
 										question.setPenalize(questionPenalize);
+										question.setExtracontent(extraContent);
 										question = TestQuestionLocalServiceUtil.updateTestQuestion(question);
 										if(answerTitle!=null && Validator.isNotNull(answerTitle.trim())){
 											//Si tiene respuestas, creamos la respuesta 
@@ -867,7 +871,7 @@ public class QuestionsAdmin extends MVCPortlet{
 			catch (FileNotFoundException e1) {
 				e1.printStackTrace();
 			}
-			String [] headers = {"title","type","penalize","answer","correct","feedbackCorrect","feedbackNoCorrect"} ;
+			String [] headers = {"title","type","penalize","answer","correct","feedbackCorrect","feedbackNoCorrect","extracontent"} ;
 			String [] headersTitle = new String [headers.length];
 			int i = 0;
 			for(String header : headers) {
@@ -892,11 +896,15 @@ public class QuestionsAdmin extends MVCPortlet{
 			style.setFont(font);
 			String[] questionLine = new String[headers.length];
 			List<TestAnswer> testAnswers = null;
-
-			for(TestQuestion question: TestQuestionLocalServiceUtil.getQuestions(actId)){
+			List<TestQuestion> questions = TestQuestionLocalServiceUtil.getQuestions(actId);
+			BeanComparator beanComparator = new BeanComparator("weight");
+			Collections.sort(questions, beanComparator);
+			
+			for(TestQuestion question: questions){
 				questionLine[COLUMN_INDEX_QUESTION_TITLE]=question.getText();
 				questionLine[COLUMN_INDEX_QUESTION_TYPE]=String.valueOf(question.getQuestionType());
 				questionLine[COLUMN_INDEX_QUESTION_PENALIZE]= String.valueOf(question.getPenalize());
+				questionLine[COLUMN_INDEX_QUESTION_EXTRA_CONTENT]= question.getExtracontent();
 				i=0;
 				testAnswers = TestAnswerLocalServiceUtil.getTestAnswersByQuestionId(question.getQuestionId());
 				
@@ -913,6 +921,7 @@ public class QuestionsAdmin extends MVCPortlet{
 							questionLine[COLUMN_INDEX_QUESTION_TITLE]="";
 							questionLine[COLUMN_INDEX_QUESTION_TYPE]="";
 							questionLine[COLUMN_INDEX_QUESTION_PENALIZE]= "";
+							questionLine[COLUMN_INDEX_QUESTION_EXTRA_CONTENT]= "";
 						}
 					}
 				}else{
