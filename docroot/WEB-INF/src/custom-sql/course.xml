@@ -163,16 +163,35 @@
 		) 
 	</sql>
 	<sql id="com.liferay.lms.service.persistence.CourseFinder.whereGroupId">
-		WHERE
-			(Lms_Course.groupId = ?)
+		<![CDATA[
+			WHERE
+				(Lms_Course.groupId = ?)
+		]]>
 	</sql>
 	<sql id="com.liferay.lms.service.persistence.CourseFinder.whereStatus">
-		WHERE
-			(Lms_Course.closed = ?)
+		<![CDATA[
+			WHERE
+				(Lms_Course.closed = ?)
+		]]>
 	</sql>
+	<sql id="com.liferay.lms.service.persistence.CourseFinder.whereExecutionStartDate">
+		<![CDATA[
+			WHERE
+				(Lms_Course.executionStartDate >= '[$EXECUTION_START_DATE$]')
+		]]>
+	</sql>
+	<sql id="com.liferay.lms.service.persistence.CourseFinder.whereExecutionEndDate">
+		<![CDATA[
+			WHERE
+				(Lms_Course.executionEndDate <= '[$EXECUTION_END_DATE$]')
+		]]>
+	</sql>
+	
 	<sql id="com.liferay.lms.service.persistence.CourseFinder.whereParentCourseId">
-		WHERE
-			(Lms_Course.parentCourseId = ? OR (0 = ? AND Lms_Course.parentCourseId IS NULL))
+		<![CDATA[
+			WHERE
+				(Lms_Course.parentCourseId = ? OR (0 = ? AND Lms_Course.parentCourseId IS NULL))
+		]]>
 	</sql>
 	<sql id="com.liferay.lms.service.persistence.CourseFinder.joinC_ByAssetEntry">
 		<![CDATA[

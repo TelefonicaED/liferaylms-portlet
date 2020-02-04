@@ -100,6 +100,7 @@
 		long score = 0;
 		long scoreTry = 0;
 		String tryResultData = null;
+		boolean userPassed=false;
 		
 		if(!hasPermissionAccessCourseFinished){
 			request.setAttribute("hasFreeQuestion", hasFreeQuestion);	
@@ -114,8 +115,9 @@
 			score = ParamUtil.getLong(request, "score", 0);
 			scoreTry = score;
 			tryResultData = ParamUtil.getString(request, "tryResultData", "");
+			userPassed=learningActivity.getPasspuntuation()<=scoreTry;
 		}
-		boolean userPassed=false;
+		
 		boolean hideFeedback = StringPool.TRUE.equals(LearningActivityLocalServiceUtil.getExtraContentValue(learningActivity.getActId(),"hideFeedback"));
 		
 		boolean comesFromCorrection = ParamUtil.get(request, "correction", false);
@@ -132,9 +134,6 @@
 				<jsp:include page="/html/shared/popResult.jsp" />
 				<%
 			}				//}
-				%>
-							<h2><%=learningActivity.getTitle(themeDisplay.getLocale()) %></h2>
-				<% 
 		}
 		%>
 		

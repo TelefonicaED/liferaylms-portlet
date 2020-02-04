@@ -400,8 +400,12 @@ public class TestLearningActivityType extends BaseLearningActivityType
 	}
 	
 	@Override
+	@Deprecated
 	public boolean canBeSeenResults(){
 		return true;
 	}
 	
+	public String getSpecificResultsPage(){
+		return "/html/gradebook/popups/testResult.jsp";
+	}
 }

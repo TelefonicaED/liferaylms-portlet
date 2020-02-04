@@ -227,19 +227,14 @@ public class CourseServiceImpl extends CourseServiceBaseImpl {
 		if(course!=null && user!=null){
 			if(getPermissionChecker().hasPermission(course.getGroupId(),  Course.class.getName(),courseId,"ASSIGN_MEMBERS")&& ! course.isClosed())
 			{
-				
-				if (!GroupLocalServiceUtil.hasUserGroup(user.getUserId(), course.getGroupCreatedId())) {
-					GroupLocalServiceUtil.addUserGroups(user.getUserId(), new long[] { course.getGroupCreatedId() });
-					//sendEmail(user,course);
-				}
-				
 				UserGroupRoleLocalServiceUtil.addUserGroupRoles(new long[] { user.getUserId() },
 						course.getGroupCreatedId(), RoleLocalServiceUtil.getRole(serviceContext.getCompanyId(), RoleConstants.SITE_MEMBER).getRoleId());
+				if (!GroupLocalServiceUtil.hasUserGroup(user.getUserId(), course.getGroupCreatedId())) {
+					GroupLocalServiceUtil.addUserGroups(user.getUserId(), new long[] { course.getGroupCreatedId() });
+				}
 
 				//auditing
 				AuditingLogFactory.audit(course.getCompanyId(), course.getGroupId(), Course.class.getName(), course.getCourseId(), serviceContext.getUserId(), AuditConstants.REGISTER, null);
-				
-			 
 			}
 		}
 	}
@@ -251,13 +246,14 @@ public class CourseServiceImpl extends CourseServiceBaseImpl {
 		if(getPermissionChecker().hasPermission(course.getGroupId(),  Course.class.getName(),courseId,"ASSIGN_MEMBERS")&& ! course.isClosed())
 		{
 			User user = userLocalService.getUserByScreenName(serviceContext.getCompanyId(), login);
+			UserGroupRoleLocalServiceUtil.addUserGroupRoles(new long[] { user.getUserId() },
+					course.getGroupCreatedId(), RoleLocalServiceUtil.getRole(serviceContext.getCompanyId(), RoleConstants.SITE_MEMBER).getRoleId());
+			
 			if (!GroupLocalServiceUtil.hasUserGroup(user.getUserId(), course.getGroupCreatedId())) {
 				GroupLocalServiceUtil.addUserGroups(user.getUserId(), new long[] { course.getGroupCreatedId() });
 				//sendEmail(user,course);
 			}
 			
-			UserGroupRoleLocalServiceUtil.addUserGroupRoles(new long[] { user.getUserId() },
-					course.getGroupCreatedId(), RoleLocalServiceUtil.getRole(serviceContext.getCompanyId(), RoleConstants.SITE_MEMBER).getRoleId());
 			CourseResult courseResult=courseResultLocalService.getCourseResultByCourseAndUser(courseId, user.getUserId());
 			if(courseResult==null)
 			{
@@ -315,12 +311,13 @@ public class CourseServiceImpl extends CourseServiceBaseImpl {
 		{
 		
 			User user = UserLocalServiceUtil.getUserByScreenName(serviceContext.getCompanyId(), login);
+			UserGroupRoleLocalServiceUtil.addUserGroupRoles(new long[] { user.getUserId() },
+					course.getGroupCreatedId(), LmsPrefsLocalServiceUtil.getLmsPrefs(serviceContext.getCompanyId()).getTeacherRole());
+			
 			if (!GroupLocalServiceUtil.hasUserGroup(user.getUserId(), course.getGroupCreatedId())) {
 				GroupLocalServiceUtil.addUserGroups(user.getUserId(), new long[] { course.getGroupCreatedId() });
 				//sendEmail(user,course);
 			}
-			UserGroupRoleLocalServiceUtil.addUserGroupRoles(new long[] { user.getUserId() },
-					course.getGroupCreatedId(), LmsPrefsLocalServiceUtil.getLmsPrefs(serviceContext.getCompanyId()).getTeacherRole());
 
 			//auditing
 			AuditingLogFactory.audit(course.getCompanyId(), course.getGroupId(), Course.class.getName(), course.getCourseId(), serviceContext.getUserId(), AuditConstants.REGISTER, null);
@@ -337,12 +334,13 @@ public class CourseServiceImpl extends CourseServiceBaseImpl {
 		{
 		
 			User user = UserLocalServiceUtil.getUserByScreenName(serviceContext.getCompanyId(), login);
+			UserGroupRoleLocalServiceUtil.addUserGroupRoles(new long[] { user.getUserId() },
+					course.getGroupCreatedId(), LmsPrefsLocalServiceUtil.getLmsPrefs(serviceContext.getCompanyId()).getEditorRole());
+			
 			if (!GroupLocalServiceUtil.hasUserGroup(user.getUserId(), course.getGroupCreatedId())) {
 				GroupLocalServiceUtil.addUserGroups(user.getUserId(), new long[] { course.getGroupCreatedId() });
 				//sendEmail(user,course);
 			}
-			UserGroupRoleLocalServiceUtil.addUserGroupRoles(new long[] { user.getUserId() },
-					course.getGroupCreatedId(), LmsPrefsLocalServiceUtil.getLmsPrefs(serviceContext.getCompanyId()).getEditorRole());
 
 			//auditing
 			AuditingLogFactory.audit(course.getCompanyId(), course.getGroupId(), Course.class.getName(), course.getCourseId(), serviceContext.getUserId(), AuditConstants.REGISTER, null);

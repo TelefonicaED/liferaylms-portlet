@@ -40,9 +40,14 @@ sb.append("false");
 sb.append("</value>");
 sb.append("</preference>");
 sb.append("</portlet-preferences>");
-%>
-<c:set var="courseId" value ="<%=courseId %>"/>
-<c:set var="delta" value ="<%=delta %>"/>
-<c:set var="cur" value ="<%=cur %>"/>
 
-<liferay-portlet:runtime portletName="<%=portletId%>" queryString="courseId=${courseId}&coursesCur=${cur}&coursesDelta=${delta}" defaultPreferences="<%=sb.toString() %>"/>
+System.out.println("backURL: " + renderRequest.getParameter("backURL"));
+
+String queryString = "courseId=" + courseId + "&coursesCur=" + cur + "&coursesDelta=" + delta + "&classNameId=" + PortalUtil.getClassNameId(Course.class) + "&classPK=" + courseId
++ "&backURL=" + renderRequest.getParameter("backURL");
+
+%>
+
+<liferay-portlet:runtime portletName="<%=portletId%>" 
+	queryString="<%=queryString %>"
+	defaultPreferences="<%=sb.toString() %>"/>

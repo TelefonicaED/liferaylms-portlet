@@ -506,18 +506,19 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 				AuditingLogFactory.audit(serviceContext.getCompanyId(), serviceContext.getScopeGroupId(), Course.class.getName(), edition.getCourseId(), serviceContext.getUserId(), AuditConstants.DELETE, null);
 			}
 			
-			CourseLocalServiceUtil.deleteCourse(courseId);
 			AuditingLogFactory.audit(serviceContext.getCompanyId(), serviceContext.getScopeGroupId(), Course.class.getName(), courseId, serviceContext.getUserId(), AuditConstants.DELETE, null);
 			
+			Course course = CourseLocalServiceUtil.deleteCourse(courseId);
 			
+			if(course.getParentCourseId() > 0){
+				actionResponse.setRenderParameter("courseId", String.valueOf(course.getParentCourseId()));
+				actionResponse.setRenderParameter("view", "editions");
+			}
 		}
 	}
 	public void closeCourse(ActionRequest actionRequest, ActionResponse actionResponse) throws Exception {
 
 		log.debug("******CloseCourse**********");
-
-		
-		ServiceContext serviceContext = ServiceContextFactory.getInstance(Course.class.getName(), actionRequest);
 
 		long courseId = ParamUtil.getLong(actionRequest, "courseId", 0);
 		if (courseId > 0) {	
@@ -525,7 +526,11 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 			for(Course edition : editions){
 				CourseLocalServiceUtil.closeCourse(edition.getCourseId());
 			}
-			CourseLocalServiceUtil.closeCourse(courseId);
+			Course course = CourseLocalServiceUtil.closeCourse(courseId);
+			if(course.getParentCourseId() > 0){
+				actionResponse.setRenderParameter("courseId", String.valueOf(course.getParentCourseId()));
+				actionResponse.setRenderParameter("view", "editions");
+			}
 		}
 	}
 	
@@ -535,7 +540,11 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 		long courseId = ParamUtil.getLong(actionRequest, "courseId", 0);
 		log.debug("::OPEN COURSE:: courseId "+courseId);
 		if (courseId > 0) {	
-			CourseLocalServiceUtil.openCourse(courseId);
+			Course course = CourseLocalServiceUtil.openCourse(courseId);
+			if(course.getParentCourseId() > 0){
+				actionResponse.setRenderParameter("courseId", String.valueOf(course.getParentCourseId()));
+				actionResponse.setRenderParameter("view", "editions");
+			}
 		}
 	}
 	
@@ -823,12 +832,12 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 				try{
 					LmsPrefs prefs=LmsPrefsLocalServiceUtil.getLmsPrefs(course.getCompanyId());
 					//Añadimos como miembro del sitio web
-					GroupLocalServiceUtil.addUserGroups(themeDisplay.getUserId(), new long[] {course.getGroupCreatedId()});
-					
 					//Añadimos el rol de editor del curso cuando lo crea
 					Long editorRoleId=RoleLocalServiceUtil.getRole(prefs.getEditorRole()).getRoleId();
 					
 					UserGroupRoleLocalServiceUtil.addUserGroupRoles(new long[] { themeDisplay.getUserId() }, course.getGroupCreatedId(), editorRoleId);
+					
+					GroupLocalServiceUtil.addUserGroups(themeDisplay.getUserId(), new long[] {course.getGroupCreatedId()});
 	
 					AuditingLogFactory.audit(course.getCompanyId(), course.getGroupCreatedId(), Course.class.getName(), 
 							course.getCourseId(),themeDisplay.getUserId(), AuditConstants.REGISTER, "COURSE_EDITOR_ADD");
@@ -1133,8 +1142,7 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 		
 		Course course = CourseLocalServiceUtil.getCourse(courseId);
 		if (roleId != siteMember.getRoleId()) {
-			UserGroupRoleLocalServiceUtil.deleteUserGroupRoles(
-					userId,course.getGroupCreatedId(),new long[]{roleId,siteOwner.getRoleId()});
+			
 			List<UserGroupRole> userGroupRoles = UserGroupRoleLocalServiceUtil.getUserGroupRoles(userId,course.getGroupCreatedId());
 			if((userGroupRoles.isEmpty())||
 				((userGroupRoles.size()==1)&&
@@ -1142,6 +1150,9 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 				GroupLocalServiceUtil.unsetUserGroups(userId,
 						new long[] { course.getGroupCreatedId() });
 			}
+			
+			UserGroupRoleLocalServiceUtil.deleteUserGroupRoles(
+					userId,course.getGroupCreatedId(),new long[]{roleId,siteOwner.getRoleId()});
 		
 			
 		} else {
@@ -1205,9 +1216,6 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 		for (long userId : to) {
 			if (!GroupLocalServiceUtil.hasUserGroup(userId, course.getGroupCreatedId())) {
 				GroupLocalServiceUtil.addUserGroups(userId,	new long[] { course.getGroupCreatedId() });
-			//The application only send one mail at listener
-			//User user = UserLocalServiceUtil.getUser(userId);
-			//sendEmail(user, course);
 			}
 			UserGroupRoleLocalServiceUtil.addUserGroupRoles(new long[] { userId }, course.getGroupCreatedId(), roleId);
 			
@@ -1239,6 +1247,19 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 		Role commmanager = RoleLocalServiceUtil.getRole(themeDisplay.getCompanyId(), RoleConstants.SITE_MEMBER);
 
 		if(log.isDebugEnabled())log.debug("removeAllquery");
+		long[] users = UserLocalServiceUtil.getGroupUserIds(course.getGroupCreatedId());
+		
+		for(long user : users){
+			List<UserGroupRole> userGroupRoles = UserGroupRoleLocalServiceUtil.getUserGroupRoles(user, course.getGroupCreatedId());
+
+			if(log.isDebugEnabled())log.debug("User::"+user);
+			if((userGroupRoles.size()==0)||(userGroupRoles.size()==1&&userGroupRoles.get(0).getRoleId()==roleId)){
+				if(log.isDebugEnabled())log.debug("deleted!");
+				GroupLocalServiceUtil.unsetUserGroups(user,new long[] { course.getGroupCreatedId() });
+			}
+			
+		}
+		
 		if (roleId != commmanager.getRoleId()) {
 			DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(UserGroupRole.class,PortalClassLoaderUtil.getClassLoader());
 			dynamicQuery.add(PropertyFactoryUtil.forName("primaryKey.roleId").eq(roleId));
@@ -1267,20 +1288,6 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 			}
 			
 		}
-			long[] users = UserLocalServiceUtil.getGroupUserIds(course.getGroupCreatedId());
-			
-			for(long user : users){
-				List<UserGroupRole> userGroupRoles = UserGroupRoleLocalServiceUtil.getUserGroupRoles(user, course.getGroupCreatedId());
-				//List<Role> roles = RoleLocalServiceUtil.getUserGroupGroupRoles(user, course.getGroupCreatedId());
-				
-				if(log.isDebugEnabled())log.debug("User::"+user);
-				if((userGroupRoles.size()==0)||(userGroupRoles.size()==1&&userGroupRoles.get(0).getRoleId()==roleId)){
-					if(log.isDebugEnabled())log.debug("deleted!");
-					GroupLocalServiceUtil.unsetUserGroups(user,new long[] { course.getGroupCreatedId() });
-				}
-				
-			}
-			//GroupLocalServiceUtil.unsetUserGroups(userGroupRole.getUserId(), new long[] { course.getGroupCreatedId() });
 		
 
 		actionResponse.setRenderParameters(actionRequest.getParameterMap());
@@ -1391,13 +1398,14 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 										
 										if(user != null){
 											if(log.isDebugEnabled())log.debug("User Name:: " + user.getFullName() );
+											UserGroupRoleLocalServiceUtil.addUserGroupRoles(new long[] { user.getUserId() }, course.getGroupCreatedId(), roleId);
+
 											if(!GroupLocalServiceUtil.hasUserGroup(user.getUserId(), course.getGroupCreatedId())){
 												GroupLocalServiceUtil.addUserGroups(user.getUserId(), new long[] { course.getGroupCreatedId() });
 											}
 		
 											users.add(user.getUserId());
 											
-											UserGroupRoleLocalServiceUtil.addUserGroupRoles(new long[] { user.getUserId() }, course.getGroupCreatedId(), roleId);
 											String allowStartDateStr = currLine[3];
 											String allowEndDateStr = currLine[4];
 											
@@ -1552,9 +1560,13 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 			
 			response.setCharacterEncoding("UTF-8");
 			response.setContentType("application/json;charset=UTF-8");
+			
+			JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
+			jsonObject.put("groupTypeIds", jsonArray);
+			jsonObject.put("showMessageDenied", inscriptionType.showMessageDenied());
 
 			PrintWriter writer = response.getWriter();
-			writer.write(jsonArray.toString());
+			writer.write(jsonObject.toString());
 		}else{
 			
 			String action = ParamUtil.getString(request, "action");
@@ -2074,13 +2086,11 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 		log.debug("USER LIST SIZE "+userList.size());
 		
 		for (User user : userList) {
+			UserGroupRoleLocalServiceUtil.addUserGroupRoles(new long[] { user.getUserId() }, course.getGroupCreatedId(), roleId);
 			if (!GroupLocalServiceUtil.hasUserGroup(user.getUserId(), course.getGroupCreatedId())) {
 				GroupLocalServiceUtil.addUserGroups(user.getUserId(),	new long[] { course.getGroupCreatedId() });
-			//The application only send one mail at listener
-			//User user = UserLocalServiceUtil.getUser(userId);
-			//sendEmail(user, course);
 			}
-			UserGroupRoleLocalServiceUtil.addUserGroupRoles(new long[] { user.getUserId() }, course.getGroupCreatedId(), roleId);
+			
 			
 			if(roleId == teacherRoleId){
 				AuditingLogFactory.audit(course.getCompanyId(), course.getGroupCreatedId(), Course.class.getName(), 

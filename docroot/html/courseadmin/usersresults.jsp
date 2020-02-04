@@ -1,3 +1,5 @@
+<%@page import="com.liferay.lms.util.LmsConstant"%>
+<%@page import="com.liferay.portal.kernel.util.PrefsPropsUtil"%>
 <%@page import="org.apache.commons.lang.StringEscapeUtils"%>
 <%@page import="com.liferay.lms.util.searchcontainer.UserSearchContainer"%>
 <%@page import="java.util.LinkedList"%>
@@ -23,8 +25,6 @@
 <%@page import="com.liferay.portal.kernel.util.ListUtil" %>
 <%@page import="com.liferay.portal.kernel.util.HttpUtil" %>
 <%@page import="com.liferay.portal.kernel.dao.orm.QueryUtil" %>
-
-
 <script type="text/javascript">
 
 
@@ -217,11 +217,11 @@
 		<liferay-ui:search-form page="/html/search/usersSearchform.jsp"
 			searchContainer="${searchContainer}"
 			servletContext="<%= this.getServletConfig().getServletContext() %>" />
-
-		<div class="container-buttons">
-			<aui:button name="buttonAddAll" value="courseadmin.add-all-users" onClick="${renderResponse.getNamespace()}addAllUsers();"/>
-		</div> 
-
+		<c:if test="<%=PrefsPropsUtil.getBoolean(themeDisplay.getCompanyId(), LmsConstant.SHOW_BUTTON_INSCRIPTION_ALL, true) %>">
+			<div class="container-buttons">
+				<aui:button name="buttonAddAll" value="courseadmin.add-all-users" onClick="${renderResponse.getNamespace()}addAllUsers();"/>
+			</div> 
+		</c:if>
 		<liferay-ui:search-container-results total="${searchContainer.total }"
 			results="${searchContainer.results }" >
 			<input type="hidden" id="allSelected" value="false" />
@@ -366,15 +366,17 @@
 			);
 			
 			function <portlet:namespace />addAllUsers(){
-				$('#<portlet:namespace />addAllUsersFirstName').val($('#<portlet:namespace />firstName').val());
-				$('#<portlet:namespace />addAllUsersLastName').val($('#<portlet:namespace />lastName').val());
-				$('#<portlet:namespace />addAllUsersScreenName').val($('#<portlet:namespace />screenName').val());
-				$('#<portlet:namespace />addAllUsersEmailAddress').val($('#<portlet:namespace />emailAddress').val());
-				$('#<portlet:namespace />addAllUsersAndSearch').val($('#<portlet:namespace />andOperator').val());
-				$('#<portlet:namespace />addAllUsersTeam').val($('#<portlet:namespace />team').val());
-				$('#<portlet:namespace />addAllUsersKeywords').val(document.getElementsByName("<portlet:namespace />keywords")[0].value);
-				$('#<portlet:namespace />addAllUsersAdvancedSearch').val(document.getElementsByName("<portlet:namespace />advancedSearch")[0].value);
-				document.<portlet:namespace />addAllUserFm.submit();
+				if(confirm(Liferay.Language.get("are-you-sure-you-want-to-permanently-delete-the-selected-users"))){
+					$('#<portlet:namespace />addAllUsersFirstName').val($('#<portlet:namespace />firstName').val());
+					$('#<portlet:namespace />addAllUsersLastName').val($('#<portlet:namespace />lastName').val());
+					$('#<portlet:namespace />addAllUsersScreenName').val($('#<portlet:namespace />screenName').val());
+					$('#<portlet:namespace />addAllUsersEmailAddress').val($('#<portlet:namespace />emailAddress').val());
+					$('#<portlet:namespace />addAllUsersAndSearch').val($('#<portlet:namespace />andOperator').val());
+					$('#<portlet:namespace />addAllUsersTeam').val($('#<portlet:namespace />team').val());
+					$('#<portlet:namespace />addAllUsersKeywords').val(document.getElementsByName("<portlet:namespace />keywords")[0].value);
+					$('#<portlet:namespace />addAllUsersAdvancedSearch').val(document.getElementsByName("<portlet:namespace />advancedSearch")[0].value);
+					document.<portlet:namespace />addAllUserFm.submit();
+				}
 			}
 		</script>
 	

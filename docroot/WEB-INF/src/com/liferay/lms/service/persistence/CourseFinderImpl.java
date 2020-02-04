@@ -12,7 +12,6 @@ import java.util.Map;
 
 import javax.portlet.PortletPreferences;
 
-import com.liferay.lms.learningactivity.calificationtype.CalificationTypeRegistry;
 import com.liferay.lms.model.Course;
 import com.liferay.lms.model.LmsPrefs;
 import com.liferay.lms.model.impl.CourseImpl;
@@ -121,6 +120,10 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			CourseFinder.class.getName() + ".whereGroupId";
 	public static final String WHERE_STATUS = 
 			CourseFinder.class.getName() + ".whereStatus";
+	public static final String WHERE_EXECUTION_START_DATE = 
+			CourseFinder.class.getName() + ".whereExecutionStartDate";
+	public static final String WHERE_EXECUTION_END_DATE = 
+			CourseFinder.class.getName() + ".whereExecutionEndDate";
 	public static final String WHERE_PARENT_COURSE_ID = 
 			CourseFinder.class.getName() + ".whereParentCourseId";
 	public static final String WHERE_SCREEN_NAME =
@@ -230,6 +233,7 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			
 			session = openSession();
 			
+			log.debug("FIND_BY_C_T_D_S_PC_G: " + FIND_BY_C_T_D_S_PC_G);
 			String sql = CustomSQLUtil.get(FIND_BY_C_T_D_S_PC_G);
 			
 			StringBundler sb = new StringBundler();
@@ -248,7 +252,7 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 					orderBy = StringUtil.replace(orderBy, "[$LANGUAGE$]", languageId);
 				}else{
 					log.debug("obc: " + obc.toString());
-					orderBy = "ORDER BY " + obc.toString();
+					orderBy = " ORDER BY " + obc.toString();
 				}
 			}else{
 				log.debug("obc null ");
@@ -261,6 +265,8 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			sql = sb.toString();
 			
 			sql = CustomSQLUtil.replaceAndOperator(sql, andOperator);
+			
+			log.debug("************** sql: " + sql);
 			
 			SQLQuery q = session.createSQLQuery(sql);
 
@@ -296,8 +302,12 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 	protected String replaceJoinAndWhere(
 		String sql, LinkedHashMap<String, Object> params, String languageId, long companyId) throws PortalException, SystemException {
 
+		log.debug("1 replaceJoinAndWhere - sql: " + sql);
+		
 		sql = StringUtil.replace(sql, "[$JOIN$]", getJoin(params, companyId));
 		sql = StringUtil.replace(sql, "[$WHERE$]", getWhere(params, languageId));
+		
+		log.debug("2 replaceJoinAndWhere - sql: " + sql);
 
 		return sql;
 	}
@@ -330,7 +340,7 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			sb.append(getJoin(key, value, companyId));
 
 		}
-
+		
 		return sb.toString();
 	}
 	
@@ -481,6 +491,9 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			sb.append(getWhere(key, value, languageId));
 		}
 
+		
+		log.debug("getWhere - sb.toString: "  + sb.toString());
+		
 		return sb.toString();
 	}
 
@@ -551,6 +564,24 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 		}
 		else if (key.equals(PARAM_STATUS)) {
 			join = CustomSQLUtil.get(WHERE_STATUS);
+		}
+		else if (key.equals(CourseParams.PARAM_EXECUTION_START_DATE)) {
+			if (value instanceof Date){
+				Date executionStartDate = (Date)value;
+				SimpleDateFormat parseDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+				String date = parseDate.format(executionStartDate);
+				join = CustomSQLUtil.get(WHERE_EXECUTION_START_DATE);	
+				join = StringUtil.replace(join, "[$EXECUTION_START_DATE$]", date);
+			}
+		}
+		else if (key.equals(CourseParams.PARAM_EXECUTION_END_DATE)) {
+			if (value instanceof Date){
+				Date executionEndDate = (Date)value;
+				SimpleDateFormat parseDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+				String date = parseDate.format(executionEndDate);
+				join = CustomSQLUtil.get(WHERE_EXECUTION_END_DATE);
+				join = StringUtil.replace(join, "[$EXECUTION_END_DATE$]", date);
+			}
 		}
 		else if (key.equals(PARAM_PARENT_COURSE_ID)) {
 			join = CustomSQLUtil.get(WHERE_PARENT_COURSE_ID);
@@ -1726,6 +1757,4 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 	private static final String PARAM_STATUS = "status";
 	private static final String PARAM_PARENT_COURSE_ID = "parentCourseId";
 
-
-	
 }

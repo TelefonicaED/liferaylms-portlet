@@ -49,6 +49,7 @@
 	boolean showGo 		= preferences.getValue("showGo", 	 "true").equals("true");
 	boolean showPermission = preferences.getValue("showPermission", "true").equals("true");
 	boolean showSearchTags = preferences.getValue("showSearchTags", "false").equals("true");
+	boolean showDiplomaContent = preferences.getValue("showDiplomaContent", "true").equals("true");
 	boolean showWelcomeMsg = preferences.getValue("showWelcomeMsg", "true").equals("true");
 	boolean showGoodbyeMsg = preferences.getValue("showGoodbyeMsg", "true").equals("true");
 	boolean showOnlyOrganizationUsers = preferences.getValue("showOnlyOrganizationUsers", "false").equals("true");
@@ -59,6 +60,8 @@
 	boolean showEditionsWithoutRestrictions = preferences.getValue("showEditionsWithoutRestrictions","false").equals("true");
 	boolean filterByTemplates = preferences.getValue("filterByTemplates","false").equals("true");
 	boolean showGroupFilter = preferences.getValue("showGroupFilter", "false").equals("true");
+	
+	boolean executionDates = Boolean.parseBoolean(preferences.getValue("executionDates",  "false"));
 	
 	boolean expandos = Boolean.parseBoolean(preferences.getValue("showExpandos", "false"));
 	boolean expandosEdition = Boolean.parseBoolean(preferences.getValue("showExpandosEdition", "false"));
@@ -73,6 +76,8 @@
 		<aui:input type="checkbox" name="showSearchTags" label="courseadmin.config.showSearchTags" value="<%=showSearchTags %>" checked="<%=showSearchTags %>"/>
 		<aui:input type="checkbox" name="showGroupFilter" label="courseadmin.config.show-group-filter" value="<%=showGroupFilter %>" checked="<%=showGroupFilter %>"/>
 		<aui:input type="checkbox" helpMessage="help-available-categories" label="available-categories" name="categories" value="<%=preferences.getValue(\"categories\", StringPool.TRUE) %>" ignoreRequestValue="true"/>
+		
+		<aui:input type="checkbox" helpMessage="help-available-execution-course-dates" label="available-execution-course-dates" name="executionDates" checked="<%=executionDates %>" ignoreRequestValue="true"/> 
 		
 		<aui:input type="checkbox" name="showExpandos" label="custom-attributes" value="<%=expandos %>" checked="<%=expandos %>" 
 			onchange="javascript:${renderResponse.getNamespace()}changeCustomAttributes()"/>
@@ -141,6 +146,7 @@
 		
 		<aui:input type="checkbox" name="showGo" 		 label="courseadmin.config.showGo" 			value="<%=showGo %>" checked="<%=showGo %>"/>
 		<aui:input type="checkbox" name="showPermission" label="courseadmin.config.showPermission" 	value="<%=showPermission %>" checked="<%=showPermission %>"/>
+		<aui:input type="checkbox" name="showDiplomaContent" label="courseadmin.config.showDiplomaContent" 	value="<%=showDiplomaContent %>" checked="<%=showDiplomaContent %>"/>
 		<aui:input type="checkbox" name="showWelcomeMsg" label="courseadmin.config.showWelcomeMsg" 	value="<%=showWelcomeMsg %>" checked="<%=showWelcomeMsg %>"/>
 		<aui:input type="checkbox" name="showGoodbyeMsg" label="courseadmin.config.showGoodbyeMsg" 	value="<%=showGoodbyeMsg %>" checked="<%=showGoodbyeMsg %>"/>
 	</aui:field-wrapper>
@@ -158,7 +164,6 @@
 		<aui:input type="checkbox"  label="courseadmin.config.show-parent-course-id-column" name="showParentCourseIdColumn" value="<%=preferences.getValue(\"showParentCourseIdColumn\", StringPool.FALSE) %>" ignoreRequestValue="true"/>
 	
 	<%
-		
 		try{
 		
 			List<ExpandoColumn> expandosColumnCourse = ExpandoColumnLocalServiceUtil.getDefaultTableColumns(themeDisplay.getCompanyId(), ClassNameLocalServiceUtil.getClassNameId(Course.class));

@@ -51,6 +51,9 @@ public class CourseAdminConfigurationAction implements ConfigurationAction {
 		portletPreferences.setValue("showInscriptionDate",Boolean.toString(ParamUtil.getBoolean(actionRequest, "inscriptionDate",true)));
 		portletPreferences.setValue("showExecutionDate",Boolean.toString(ParamUtil.getBoolean(actionRequest, "executionDate",true)));
 		portletPreferences.setValue("categories",Boolean.toString(ParamUtil.getBoolean(actionRequest, "categories",true)));
+		
+		portletPreferences.setValue("executionDates",Boolean.toString(ParamUtil.getBoolean(actionRequest, "executionDates",true)));
+		
 		portletPreferences.setValue("showcatalog",Boolean.toString(ParamUtil.getBoolean(actionRequest, "showcatalog",true)));
 		portletPreferences.setValue("courseTemplates",	StringUtil.merge(actionRequest.getParameterMap().get( "courseTemplates")));
 		portletPreferences.setValue("showCourseCatalogForEditions",Boolean.toString(ParamUtil.getBoolean(actionRequest, "showCourseCatalogForEditions",	false)));
@@ -71,6 +74,7 @@ public class CourseAdminConfigurationAction implements ConfigurationAction {
 		portletPreferences.setValue("showDescription",Boolean.toString(ParamUtil.getBoolean(actionRequest, "showDescription",	false)));
 
 		portletPreferences.setValue("showSearchTags",Boolean.toString(ParamUtil.getBoolean(actionRequest, "showSearchTags",	false)));
+		portletPreferences.setValue("showDiplomaContent",Boolean.toString(ParamUtil.getBoolean(actionRequest, "showDiplomaContent",	true)));
 		portletPreferences.setValue("showWelcomeMsg",Boolean.toString(ParamUtil.getBoolean(actionRequest, "showWelcomeMsg",	true)));
 		portletPreferences.setValue("showGoodbyeMsg",Boolean.toString(ParamUtil.getBoolean(actionRequest, "showGoodbyeMsg",	true)));
 
@@ -97,7 +101,7 @@ public class CourseAdminConfigurationAction implements ConfigurationAction {
 		portletPreferences.setValue("showExpandos", Boolean.toString(ParamUtil.getBoolean(actionRequest, "showExpandos", false)));
 		portletPreferences.setValue("showExpandosEdition", Boolean.toString(ParamUtil.getBoolean(actionRequest, "showExpandosEdition", false)));
 		
-		//Mostrar acciones dinámicas
+		//Mostrar acciones dinï¿½micas
 		try{
 			AdminActionTypeRegistry registry =  new AdminActionTypeRegistry();
 			 List<AdminActionType> types =  registry.getAdminActionTypes();

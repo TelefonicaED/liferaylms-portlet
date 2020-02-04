@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.LinkedHashMap;
@@ -79,6 +80,8 @@ import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portlet.announcements.EntryDisplayDateException;
+import com.liferay.portlet.asset.model.AssetEntry;
+import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
 import com.liferay.portlet.asset.service.AssetTagLocalServiceUtil;
 import com.liferay.portlet.expando.model.ExpandoColumn;
 import com.liferay.portlet.expando.model.ExpandoTableConstants;
@@ -213,6 +216,9 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 		
 		ThemeDisplay themeDisplay = (ThemeDisplay)renderRequest.getAttribute(WebKeys.THEME_DISPLAY);
 		
+		AdminActionTypeRegistry registry =  new AdminActionTypeRegistry();
+		renderRequest.setAttribute("adminActionTypes", registry.getAdminActionTypes());
+		
 		PortletURL backURL = renderResponse.createRenderURL();
 		renderRequest.setAttribute("backURL", backURL);
 		
@@ -232,6 +238,17 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 			course = CourseLocalServiceUtil.fetchCourse(courseId);
 			if(course!=null){
 				String editionsTitle =LanguageUtil.format(themeDisplay.getLocale(), "course-admin.edition-title-x", course.getTitle(themeDisplay.getLocale()));
+				
+				Group groupCreated = GroupLocalServiceUtil.fetchGroup(course.getGroupCreatedId());
+				if(Validator.isNotNull(groupCreated)){
+					AssetEntry entry = AssetEntryLocalServiceUtil.getEntry(Course.class.getName(), courseId);
+					CourseType courseType = Validator.isNotNull(entry) ? CourseTypeLocalServiceUtil.fetchCourseType(entry.getClassTypeId()) : null;
+					if(Validator.isNotNull(courseType)){
+						editionsTitle += StringPool.SPACE + StringPool.OPEN_PARENTHESIS + courseType.getName(themeDisplay.getLocale()) + StringPool.CLOSE_PARENTHESIS;
+						renderRequest.setAttribute("courseTypeId", courseType.getCourseTypeId());
+					}
+				}
+				
 				renderRequest.setAttribute("editionsTitle", editionsTitle);
 			}
 			
@@ -306,7 +323,13 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 		TimeZone timeZone = themeDisplay.getTimeZone();
 		
 		long courseId = ParamUtil.getLong(renderRequest, "courseId", 0);
-		log.debug("CourseId "+courseId);
+		long courseTypeId = ParamUtil.getLong(renderRequest, "courseTypeId", 0);
+		
+		if(log.isDebugEnabled()){
+			log.debug("CourseId "+courseId);
+			log.debug("::courseTypeId:: " + courseTypeId);
+		}
+		
 		try{
 			Course course = CourseLocalServiceUtil.fetchCourse(courseId);
 			if(course!=null){
@@ -322,6 +345,13 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 				renderRequest.setAttribute("courseId", courseId);
 				
 				String editionsTitle =LanguageUtil.format(themeDisplay.getLocale(), "course-admin.new-edition-x", course.getTitle(themeDisplay.getLocale()));
+				if(courseTypeId>0){
+					CourseType courseType = CourseTypeLocalServiceUtil.fetchCourseType(courseTypeId);
+					if(Validator.isNotNull(courseType)){
+						editionsTitle += StringPool.SPACE + StringPool.OPEN_PARENTHESIS + courseType.getName(themeDisplay.getLocale()) + StringPool.CLOSE_PARENTHESIS;
+						renderRequest.setAttribute("courseTypeId", courseTypeId);
+					}
+				}
 				renderRequest.setAttribute("editionTitle", editionsTitle);
 				renderRequest.setAttribute("editionFriendlyURL", course.getFriendlyURL()+"-"+newCourseName.replace(" ", "-"));
 				
@@ -486,6 +516,40 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 		long columnId = ParamUtil.getLong(renderRequest, "columnId");
 		String expandoValue = ParamUtil.getString(renderRequest, "expandoValue", "");
 		
+		int dateMonthStart = ParamUtil.getInteger(renderRequest, "dateMonthStart",Calendar.getInstance().get(Calendar.MONTH));
+		int dateDayStart = ParamUtil.getInteger(renderRequest, "dateDayStart",Calendar.getInstance().get(Calendar.DAY_OF_MONTH));
+		int dateYearStart = ParamUtil.getInteger(renderRequest, "dateYearStart",Calendar.getInstance().get(Calendar.YEAR));
+		int dateMonthEnd = ParamUtil.getInteger(renderRequest, "dateMonthEnd",Calendar.getInstance().get(Calendar.MONTH));
+		int dateDayEnd = ParamUtil.getInteger(renderRequest, "dateDayEnd",Calendar.getInstance().get(Calendar.DAY_OF_MONTH));
+		int dateYearEnd = ParamUtil.getInteger(renderRequest, "dateYearEnd",Calendar.getInstance().get(Calendar.YEAR));
+		boolean startDateFilter = ParamUtil.getBoolean(renderRequest, "startDateFilter",false);
+		boolean endDateFilter = ParamUtil.getBoolean(renderRequest, "endDateFilter",false);
+
+		Calendar startDate = Calendar.getInstance();
+		if(startDateFilter){
+			startDate.set(Calendar.YEAR, dateYearStart);
+			startDate.set(Calendar.MONTH, dateMonthStart);
+			startDate.set(Calendar.DAY_OF_MONTH, dateDayStart);
+			startDate.set(Calendar.HOUR, 0);
+			startDate.set(Calendar.MINUTE, 0);
+			startDate.set(Calendar.SECOND, 0);
+		}else{
+			startDate = null;
+		}
+
+		Calendar endDate = Calendar.getInstance();
+		if(endDateFilter){
+			endDate.set(Calendar.YEAR, dateYearEnd);
+			endDate.set(Calendar.MONTH, dateMonthEnd);
+			endDate.set(Calendar.DAY_OF_MONTH, dateDayEnd);
+			endDate.set(Calendar.HOUR, 23);
+			endDate.set(Calendar.MINUTE, 59);
+			endDate.set(Calendar.SECOND, 59);
+		}else{
+			endDate = null;
+		}
+		
+		
 		//*****************************************Cogemos los tags************************************//
 		String[] tagsSel = null;
 		long[] tagsSelIds = null;
@@ -548,6 +612,15 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 			portletSession.setAttribute(prefix+"assetTagIds", tagsSelIds);
 			portletSession.setAttribute(prefix+"columnId", columnId);
 			portletSession.setAttribute(prefix+"expandoValue",expandoValue);
+			
+			portletSession.setAttribute(prefix+"dateMonthStart", dateMonthStart);
+			portletSession.setAttribute(prefix+"dateDayStart", dateDayStart);
+			portletSession.setAttribute(prefix+"dateYearStart", dateYearStart);
+			portletSession.setAttribute(prefix+"dateMonthEnd", dateMonthEnd);
+			portletSession.setAttribute(prefix+"dateDayEnd", dateDayEnd);
+			portletSession.setAttribute(prefix+"dateYearEnd", dateYearEnd);
+			portletSession.setAttribute(prefix+"startDateFilter", startDateFilter);
+			portletSession.setAttribute(prefix+"endDateFilter", endDateFilter);
 
 		}else{
 			try{
@@ -611,6 +684,16 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 		portletURL.setParameter("freetext",freetext);
 		portletURL.setParameter("selectedGroupId", String.valueOf(selectedGroupId));
 		portletURL.setParameter("state",String.valueOf(state));
+		
+		portletURL.setParameter(prefix+"dateMonthStart", String.valueOf(dateMonthStart));
+		portletURL.setParameter(prefix+"dateDayStart", String.valueOf(dateDayStart));
+		portletURL.setParameter(prefix+"dateYearStart", String.valueOf(dateYearStart));
+		portletURL.setParameter(prefix+"dateMonthEnd", String.valueOf(dateMonthEnd));
+		portletURL.setParameter(prefix+"dateDayEnd", String.valueOf(dateDayEnd));
+		portletURL.setParameter(prefix+"dateYearEnd", String.valueOf(dateYearEnd));
+		portletURL.setParameter(prefix+"startDateFilter", String.valueOf(startDateFilter));
+		portletURL.setParameter(prefix+"endDateFilter", String.valueOf(endDateFilter));
+	
 
 		pnames =renderRequest.getParameterNames();
 		while(pnames.hasMoreElements()){
@@ -702,6 +785,15 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 			params.put(CourseParams.PARAM_PERMISSIONS_ADMIN, themeDisplay.getUserId());
 		}
 		
+		
+		if (startDate != null){
+			params.put(CourseParams.PARAM_EXECUTION_START_DATE, startDate.getTime());
+		}
+		
+		if (endDate != null){
+			params.put(CourseParams.PARAM_EXECUTION_END_DATE, endDate.getTime());
+		}
+		
 		String orderByCol = ParamUtil.getString(renderRequest, "orderByCol");
 		String orderByType = ParamUtil.getString(renderRequest, "orderByType");
 		
@@ -740,6 +832,17 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 		renderRequest.setAttribute("STATUS_APPROVED", WorkflowConstants.STATUS_APPROVED);
 		renderRequest.setAttribute("STATUS_INACTIVE", WorkflowConstants.STATUS_INACTIVE);
 		renderRequest.setAttribute("STATUS_ANY", WorkflowConstants.STATUS_ANY);
+		
+		renderRequest.setAttribute("yearRangeStart", Calendar.getInstance().get(Calendar.YEAR)-10);
+		renderRequest.setAttribute("yearRangeEnd", Calendar.getInstance().get(Calendar.YEAR)+10);
+		renderRequest.setAttribute("dateMonthStart", dateMonthStart);
+		renderRequest.setAttribute("dateDayStart", dateDayStart);
+		renderRequest.setAttribute("dateYearStart", dateYearStart);
+		renderRequest.setAttribute("dateMonthEnd", dateMonthEnd);
+		renderRequest.setAttribute("dateDayEnd", dateDayEnd);
+		renderRequest.setAttribute("dateYearEnd", dateYearEnd);
+		renderRequest.setAttribute("startDateFilter", startDateFilter);
+		renderRequest.setAttribute("endDateFilter", endDateFilter);
 		
 		List<ExpandoColumn> listExpandos = null;
 		try {

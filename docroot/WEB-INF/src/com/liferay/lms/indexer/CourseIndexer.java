@@ -140,6 +140,7 @@ public class CourseIndexer extends BaseIndexer {
 		Date endDate = entry.getEndDate();
 		Date executionStartDate = entry.getExecutionStartDate();
 		Date executionEndDate = entry.getExecutionEndDate();
+		long parentCourseId = entry.getParentCourseId();
 		
 		AssetEntry assetEntry= null;
 		try{
@@ -190,6 +191,7 @@ public class CourseIndexer extends BaseIndexer {
 		document.addKeyword(Field.ASSET_CATEGORY_IDS, assetCategoryIds);
 		document.addKeyword(Field.ASSET_TAG_NAMES, assetTagNames);
 		document.addKeyword("statusCourse", entry.getStatus());
+		document.addKeyword("parentCourseId", parentCourseId);
 
 		document.addKeyword(Field.ENTRY_CLASS_NAME, Course.class.getName());
 		document.addKeyword(Field.ENTRY_CLASS_PK, entryId);

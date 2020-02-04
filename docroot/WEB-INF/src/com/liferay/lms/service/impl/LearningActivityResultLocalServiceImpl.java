@@ -22,6 +22,8 @@ import java.util.Locale;
 import com.liferay.lms.NoSuchLearningActivityResultException;
 import com.liferay.lms.auditing.AuditConstants;
 import com.liferay.lms.auditing.AuditingLogFactory;
+import com.liferay.lms.learningactivity.LearningActivityType;
+import com.liferay.lms.learningactivity.LearningActivityTypeRegistry;
 import com.liferay.lms.learningactivity.calificationtype.CalificationType;
 import com.liferay.lms.learningactivity.calificationtype.CalificationTypeRegistry;
 import com.liferay.lms.model.Course;
@@ -61,15 +63,19 @@ public class LearningActivityResultLocalServiceImpl	extends LearningActivityResu
 
 
 	public LearningActivityResult update(LearningActivityTry learningActivityTry) throws SystemException, PortalException{
+		return update(learningActivityTry, false);
+	}
+		
+	public LearningActivityResult update(LearningActivityTry learningActivityTry, boolean recalculateRequired) throws SystemException, PortalException{
 
 		long actId=learningActivityTry.getActId();
 		long userId=learningActivityTry.getUserId();
 		LearningActivityResult learningActivityResult=getByActIdAndUserId(actId, userId);
 		LearningActivity learningActivity=learningActivityLocalService.getLearningActivity(actId);
-		boolean recalculateActivity = false;
+		boolean recalculateActivity = recalculateRequired;
 		log.debug("****LAR "+learningActivityResult);
 		if(learningActivityResult==null){	
-			learningActivityResult=
+			learningActivityResult =
 					learningActivityResultPersistence.create(counterLocalService.increment(
 							LearningActivityResult.class.getName()));
 			learningActivityResult.setStartDate(learningActivityTry.getStartDate());
@@ -96,7 +102,9 @@ public class LearningActivityResultLocalServiceImpl	extends LearningActivityResu
 			}
 
 			if(!learningActivityResult.getPassed()){
-				if(learningActivityTry.getResult()>=learningActivity.getPasspuntuation()){
+				LearningActivityTypeRegistry registry = new LearningActivityTypeRegistry();
+				LearningActivityType learningActivityType = registry.getLearningActivityType(learningActivity.getTypeId());
+				if(learningActivityType.isPassed(learningActivity, learningActivityTry)){
 					learningActivityResult.setEndDate(learningActivityTry.getEndDate());
 					learningActivityResult.setPassed(true);	
 					recalculateActivity= true;	

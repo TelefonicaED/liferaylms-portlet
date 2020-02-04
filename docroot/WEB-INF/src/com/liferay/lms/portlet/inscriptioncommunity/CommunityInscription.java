@@ -65,7 +65,7 @@ public class CommunityInscription extends MVCPortlet {
 			renderRequest.setAttribute("inscriptionAllowedTime", inscriptionType.getAllowedTime(course.getCourseId(), themeDisplay.getUserId(), themeDisplay.getLocale()));
 
             log.debug("inscriptionTypeFactory: " + inscriptionType.getTypeId() + " - " + inscriptionType.getPortletId());
-            if (!Validator.isNull(inscriptionType.getPortletId())) {
+            if (!inscriptionType.usePortletDefaultRegistration()) {
                 StringBundler sb = new StringBundler();
                 sb.append("<portlet-preferences >");
                 sb.append("<preference>");

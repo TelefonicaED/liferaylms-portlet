@@ -23,6 +23,7 @@ import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 import javax.portlet.ValidatorException;
 import javax.portlet.filter.RenderResponseWrapper;
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
@@ -34,14 +35,17 @@ import com.liferay.lms.auditing.AuditConstants;
 import com.liferay.lms.auditing.AuditingLogFactory;
 import com.liferay.lms.learningactivity.LearningActivityType;
 import com.liferay.lms.learningactivity.LearningActivityTypeRegistry;
+import com.liferay.lms.model.Course;
 import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.service.ClpSerializer;
+import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityLocalServiceUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.io.WriterOutputStream;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.servlet.StringServletResponse;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -70,6 +74,7 @@ import com.liferay.portlet.PortletQNameUtil;
 import com.liferay.portlet.social.model.SocialActivityConstants;
 import com.liferay.portlet.social.service.SocialActivityLocalServiceUtil;
 import com.liferay.util.bridges.mvc.MVCPortlet;
+import com.tls.lms.util.LiferaylmsUtil;
 
 /**
  * Portlet implementation class ActivityViewer
@@ -251,9 +256,12 @@ public class ActivityViewer extends MVCPortlet {
 							pageTopStringBundler.append(renderResponseWrapper.toString());
 						}
 					}
+					
+					Course course = CourseLocalServiceUtil.getCourseByGroupCreatedId(themeDisplay.getScopeGroupId());
+					boolean hasPermissionAccessCourseFinished = LiferaylmsUtil.hasPermissionAccessCourseFinished(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(), course.getCourseId(), themeDisplay.getUserId());
 
 					String activityContent = renderPortlet(renderRequest, renderResponse, 
-							themeDisplay, themeDisplay.getScopeGroupId(), portlet, isWidget, true);
+							themeDisplay, themeDisplay.getScopeGroupId(), portlet, isWidget, true, hasPermissionAccessCourseFinished);
 
 					renderResponse.setContentType(ContentTypes.TEXT_HTML_UTF8);
 					renderResponse.getWriter().print(activityContent);	
@@ -339,10 +347,16 @@ public class ActivityViewer extends MVCPortlet {
 								pageTopStringBundler.append(renderResponseWrapper.toString());
 							}
 						}
+						
+						//Si estoy en modo consulta incluyo el jsp
+						Course course = CourseLocalServiceUtil.getCourseByGroupCreatedId(learningActivity.getGroupId());
+						boolean hasPermissionAccessCourseFinished = LiferaylmsUtil.hasPermissionAccessCourseFinished(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(), course.getCourseId(), themeDisplay.getUserId());
+						log.debug("hasPermissionAccessCourseFinished: " + hasPermissionAccessCourseFinished);
+						
 						AuditingLogFactory.audit(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(), LearningActivity.class.getName(),actId, themeDisplay.getUserId(), AuditConstants.VIEW, Long.toString(learningActivityType.getTypeId()));
 
 						String activityContent = renderPortlet(renderRequest, renderResponse, 
-								themeDisplay, themeDisplay.getScopeGroupId(), portlet, isWidget, true);
+								themeDisplay, themeDisplay.getScopeGroupId(), portlet, isWidget, true, hasPermissionAccessCourseFinished);
 						SocialActivityLocalServiceUtil.addActivity(
 								learningActivity.getUserId(), learningActivity.getGroupId(),
 								LearningActivity.class.getName(), learningActivity.getActId(),
@@ -369,12 +383,14 @@ public class ActivityViewer extends MVCPortlet {
 	/**
 	 * Renders the given portlet as a runtime portlet and returns the portlet's HTML.
 	 * Based on http://www.devatwork.nl/2011/07/liferay-embedding-portlets-in-your-portlet/
+	 * @param hasPermissionAccessCourseFinished 
 	 * @throws PortalException 
+	 * @throws PortletException 
 	 */
 	@SuppressWarnings("unchecked")
 	public String renderPortlet(final RenderRequest request, final RenderResponse response,final ThemeDisplay themeDisplay,
-			final long scopeGroup, final Portlet portlet,final boolean copyNonNamespaceParameters,final boolean copyPublicParameters) 
-					throws SystemException, IOException, ServletException, ValidatorException, PortalException {
+			final long scopeGroup, final Portlet portlet,final boolean copyNonNamespaceParameters,final boolean copyPublicParameters, boolean hasPermissionAccessCourseFinished) 
+					throws SystemException, IOException, ServletException, PortalException, PortletException {
 		// Get servlet request / response
 		HttpServletRequest renderServletRequest = PortalUtil.getHttpServletRequest(request);
 		HttpSession renderServletSession = renderServletRequest.getSession();
@@ -510,7 +526,39 @@ public class ActivityViewer extends MVCPortlet {
 				servletRequest.setAttribute(JavaConstants.JAVAX_PORTLET_RESPONSE, response);
 				servletRequest.setAttribute(JavaConstants.JAVAX_PORTLET_CONFIG, PortletConfigFactoryUtil.create(portlet, servletContext));
 				servletRequest.setAttribute("PORTLET_CONTENT", portletBody);
+				
+				log.debug("servletContext: " + servletContext.getContextPath());
+				log.debug("otro servletContext: " + ((ServletContext)renderServletRequest.getAttribute(WebKeys.CTX)).getContextPath());
+
+				String permissionCourseFinished = "";
+				if(hasPermissionAccessCourseFinished){
+					RenderResponseWrapper renderResponseWrapper = new RenderResponseWrapper(response) {
+						private final StringWriter stringWriter = new StringWriter();
+
+						@Override
+						public PrintWriter getWriter() throws IOException {
+							return new PrintWriter(stringWriter);
+						}
+
+						@Override
+						public OutputStream getPortletOutputStream()
+								throws IOException {
+							return new WriterOutputStream(stringWriter);
+						}
+
+						@Override
+						public String toString() {
+							return stringWriter.toString();
+						}
+
+					};
+					include("/html/activityViewer/access_course_finished.jsp", request, renderResponseWrapper);
+
+					permissionCourseFinished = renderResponseWrapper.toString();
+				}
+				
 				result = portletHeader+
+						permissionCourseFinished+
 						PortalUtil.renderPage(servletContext, servletRequest, servletResponse, "/html/common/themes/portlet.jsp",false)+
 						portletQueue;
 			}

@@ -52,8 +52,11 @@ public interface LearningActivityType extends InvokableService
 	public String importExtraContent(LearningActivity newLarn, Long userId, PortletDataContext context, ServiceContext serviceContext, Element actElement) throws PortalException, IOException, DocumentException, SystemException;
 	public String addZipEntry(LearningActivity actividad, Long assetEntryId, PortletDataContext context, Element entryElementLoc) throws PortalException, SystemException;
 	public boolean canBeLinked();
+	@Deprecated
 	public boolean canBeSeenResults();
+	public String getSpecificResultsPage();
 	public long calculateResult(LearningActivity learningActivity, LearningActivityTry lat);
+	public boolean isPassed(LearningActivity learningActivity, LearningActivityTry lat);
 	public String getClassName();
 	public void copyActivity(LearningActivity oldActivity, LearningActivity newActivity, ServiceContext serviceContext);
 }

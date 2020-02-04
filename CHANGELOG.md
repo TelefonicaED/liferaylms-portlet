@@ -3,6 +3,39 @@ Todos los cambios de este proyecto estarán documentados en este archivo.
 
 El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 
+
+## [4.2.0](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v4.2.0)
+
+### Added
+
+- #167661 Se añade la posiblidad de publicar notas individuales después de publicar la general en las actividades de evaluación
+
+## [4.1.0](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v4.1.0)
+
+### Added
+
+- #170072 Se añaden mensajes asíncronos al finalizar el clonado de curso y la creación de la edición para acciones a posteriori desde proyectos.
+- #168113 Se añaden parámetros para embeber las acciones específicas
+- #173883 Se añade un mensaje cuando estás en las actividades en modo lectura
+- #158614 Parámetro rol en los mensajes de bienvenido y baja del curso
+
+### Updated
+
+- #172729 Se cambia el orden de asociación a curso para añadir primero el rol y de esta forma no se envíe el correo de bienvenida o despedida a los tutores y editores
+- #166015 Se muestra la actividad de evaluación en modo consulta
+- #174290 Se añade por interfaz el jsp para mostrar los resultados de una actividad en el gradebook
+
+### Fixed
+
+- #170041 Cambiado el formato de fechas al de liferay debido a un bug en el SimpleDateFormat.
+- #170849 Se mantiene en la vista de ediciones cuando abres cieras o eliminas una
+- #172627 No se pone fecha fin a los resultados de las actividades de evaluación hasta que no se publica
+- #163474 Cuando el test es la última actividad y al corregirlo ya estás en modo observador no se mostraba la nota
+
+### Deleted
+
+- #161554 Se elimina el hook del search container
+
 ## [4.0.1](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v4.0.1)
 
 ### Fixed
@@ -10,21 +43,22 @@ El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 - #172634 Se heredan los campos personalizados de las actividades al duplicar curso.
 - #172535 Corrección de las preguntas tipo encuesta al exportar, duplicar y crear ediciones
 
+
 ## [4.0.0](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v4.0.0)
 
 ### Added
 
 - #167833 Añadidos los servicios countActiveByCompanyIdClassNameIdClassPK y getActiveByCompanyIdClassNameIdClassPK para ver los procesos que están actualmente en curso para una acción.
 - #167536 Añadida configuración para ocultar las opciones dinámicas. Se pasan las preferencias al portlet destino para poder utilizarlas.
-- #168060: Ampliación del portlet de "mis cursos" de wecorp. Nuevos servicios
+- #168060 Ampliación del portlet de "mis cursos" de wecorp. Nuevos servicios
+- #165787 En la gestión de cursos en Admin->Cursos se ha añadido en la configuración la posibilidad de habilitar los filtros de fechas de ejecución  para realizar las búsquedas de cursos, buscará los cursos cuya fecha de inicio de ejecución sea mayor que la fecha de inicio seleccionada y/o cuya fecha de fin de ejecución sea menor a la fecha de fin seleccionada.
 
 ### Updated
 
 - #167994 Unificación del servicio de mis cursos para usar el mismo finder para mis cursos y mis cursos finalizados. Se modifica el resgistry de los métodos de calificación para que busque siempre los métodos de calificación que están dentro del LMS en su contexto, independientemente de donde se llamen.
-- #167833: Añadido cache a false para los servicios de los procesos asíncronos.
-- #167536: Se mandan las preferencias, el cur y el delta al portlet embebido en las acciones de administración dinámicas
-- #168795: Protegido para evitar nullpointerexception en los tipos de cursos.
-
+- #167833 Añadido cache a false para los servicios de los procesos asíncronos.
+- #167536 Se mandan las preferencias, el cur y el delta al portlet embebido en las acciones de administración dinámicas
+- #168795 Protegido para evitar nullpointerexception en los tipos de cursos.
 
 ### Fixed
 
@@ -59,9 +93,8 @@ El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 
 - #162986 Se ha añadido una configuración nueva al portlet de inscripción para que tenga en cuenta solo las ediciones cuyo tiempo de ejecución sea posterior a la fecha actual. 
   Si está marcado este check, no se tendrán en cuenta estos cursos y no se le mostrarán al usuario aunque está inscrito, permitiéndole matricularse a otras ediciones que estén disponibles.
-- #159785 - Nueva funcionalidad Limitacion del tiempo de estudio, se incluye en el metodo de inscripcion un nuevo campo a mostrar de días/horas para poder finalizar el curso.
-
-- #164258 - Respuestas ordenadas aleatoriamente en las actividades tipo test. Se incluye la opción en las actividades de Tipo Test que las preguntas de tipo Opciones/Multiple se puedan desordenar las respuestas.
+- #159785 Nueva funcionalidad Limitacion del tiempo de estudio, se incluye en el metodo de inscripcion un nuevo campo a mostrar de días/horas para poder finalizar el curso.
+- #164258 Respuestas ordenadas aleatoriamente en las actividades tipo test. Se incluye la opción en las actividades de Tipo Test que las preguntas de tipo Opciones/Multiple se puedan desordenar las respuestas.
 
 ### Updated
 
@@ -81,29 +114,22 @@ El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 	- Se incluye la condición de finalización del curso.
 	- Se actualizan idiomas para no perder codificaciones necesarias para catalán.
 	- Se incluye mediante configuración del portlet, estando por defecto permitido.
-  
 - #162986 La funcionalidad de filtrar las ediciones cuyo tiempo de ejecución sea posterior a la fecha actual se configura desde la configuración del LMS en vez de la configuración del  portlet de inscripción.
 - #159785 Se comprueba también que el usuario esté registrado en el curso a la hora de mostrar el texto de los días/horas para poder finalizar el curso.
 
 ### Fixed
 
 - #162450 Modificaciones gestión de ediciones Wecorp: Cambios en la navegación. Comprobación de permisos en acciones
-
 - #162971 Visualización incorrecta del listado de ediciones de un curso cuando el theme del portal no es Wecorp. Añadidos los estilos de generic-pop-up al propio portlet
-
 - #159903 Corregido que al cambiar de tipo de inscripción no recuperaba bien el valor (Cambio get por fetch para que lo recoja de la BBDD). 
 Eliminados imports no usados. Protegidos los expandos por si hay algún error.
-
 - #162986 Corregido error en el que se podia desinscribir en el curso de un itinerario a traves del curso padre, aunque estuviera deshabilitada la desinscripcion.
 - #163914 Corregido desfase horario de las ediciones al ver el listado de cursos.
-
 - #165220 Resultados de las Búsquedas en editar actividade. Problema de paginación cuando se hace búsqueda por palabras clave en la búsqueda de recursos en la actividad Recurso mediateca.
 
 ### Refactor
  
 - #159623 Meter inicialización courseResult en if para mejora de rendimiento
-
-
 
 ## [3.8.3](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v3.8.3)
 
@@ -125,113 +151,64 @@ Eliminados imports no usados. Protegidos los expandos por si hay algún error.
 
 ### Fixed 
 
-- #157508: Link correcto al css del mediaelementplayer.
+- #157508 Link correcto al css del mediaelementplayer.
 
 ## [3.8.0]
 
 ### Added(https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v3.8.0)
 
 - #157779 Añadidos expandos para actividades
-
 - #157161 y #157162 Añadir columna opcional de email a los portlets de gestión de inscripciones y gestión de estudiantes
-
 - #154289 Añadidos campos y configuración al portlet de procesos asíncronos para los informes por batch
-
 - #151700 Añadida traducción cuando no tienes permisos para inscribirte en el curso
-
 - #153195 Nueva funcionalidad en Actividad Tipo Test de exportar preguntas en formato Excel no contempla todos los formatos de preguntas.
-
 - #138277 El alumno y el tutor deben poder eliminar el archivo de la actividad de desarrollo
-
 - #153714 Servicio borrado learningactivityresult NullPointer. Se incluye catch para el nullPointer. Además, se incluye funcionalidad para no permitir mover actividad de módulo si hay intentos sobre la misma.
-
 - #154291 Añadida interfaz y desarrollo para realizar acciones genéricas para la administración de cursos
-
 - #155181 Añadido servicio para añadir curso con fechas de ejecución
-
 - #153200 Añadido el mecanismo para inscorporar portlet propios al método de inscripción.
-
-
 
 ### Changed
 
 - #158014 Se controla que si es en las activdiades P2P el valor numValidations del extraData es vacío no intente convertirlo a número.
-
 - #151694 Cambios para que no guarde la búsqueda del usuario anterior. Corregidos fallos de sas en el css del mediaelement
-
 - #154429 Quitamos el texto de descargar documetno en los adjuntos de las actividades de recurso externo
-
 - #157865 Se actualiza el orden de las preguntas en el duplicado de cursos y en la importación
-
 - #152030 Se comprueba si el curso está cerrado cuando se inscribe por servicio
-
 - #157265 Al editar la ficha del curso miramos el número de inscritos sin contar los tutores y editores.
-
 - #157804  No se van a mostrar las preguntas en el modo observador en la actividad de recurso externo
-
 - #155029 Se modifica la importación para que las actividades y los módulos se importen con el mismo uuid, de esta forma, cuando se importan varias veces, no se duplican los módulos y las actividades si no que se sobreescriben.
-
 - #157195 No se muestra el icono de borrar el lar en la exportación si no tienes permiso para borrar cursos, ya que es el que se controla en back cuando le das.
-
 - #154985 En la edición de recurso interno se pasan los parámetros de descripción y título por post. Queda pendiente que en la búsqueda de recursos al paginar se pierden.
-
 - #152552 Establecido el role a los formularios en todo el componente para accesibilidad.
-
 - #153797 Se mueve la clase ExportUtil al service.
-
 - #139242 Modificar la url para que desde la lista de actividades salga el preview de la actividad test.
-
 - #154058 Cambio para que cuando no hay actividades obligatorias en un módulo se recálcule con el 100%
-
 - #151340 Refactorización de todo el portlet de estadísticas generales
-
 - #137425 Modificaciones buscador facetas para el buscador de cursos
-
 - #102776 No se puede borrar un curso si hay estudiantes que lo han terminado
-
 - #154466 Se modifica para que siempre se llame a los diplomas externos, no sólo con el CourseResult pasado
-
 - #153457 Cambios para maquetación: añadida clase genérica a portlet de inscripción y  Span para separar fechas
-
 - #144540 Idioma en la creación de cursos, cambio para que coja por defecto el del usuario.
-
-
 
 ### Fixed
 
 - #140958 Corregidos problemas en auditoría cuando no encuentra un componente en el Registro de las clases de log
             Descomentada línea de auditoría que se comentó por error. No se estaba auditando en el lms_auditentry
-
 - #158119 Cambio para resolver la incidencia con la valoración de P2P que no actualiza bien el popup
-
 - #157814 Si antes se había cerrado un curso y volvias a reabrir, al terminar volvía a hacer la acción anterior de cerrar por el parámetro redirect que se ha eliminado.
-
 - #157886 Enlace a edición de curso corregido desde el curso padre
-
 - #158463 No se guardan los expandos de los módulos
-
 - #157958 Corrección al exportar estadísticas generales
-
 - #157508 Corrección para visualizar los videos de vimeo sin controles.
-
 - #157748 Corrección sobre las tests con contraseña
-
 - #157169 La columna de actividad precedente salía vacía en las estadísticas del curso.
-
 - #157581 Desde la ficha del curso no se estaba pasando el courseId al include de los diplomas, por lo que no le estaba llegando y no aparecían seleccionados.
-
 - #147490 Solucionado el problema al corregir las preguntas de rellenar huecos y arrastrar
-
 - #157185 Modificación del javascript de buscar recurso en actividad de recurso interno para que funcione en ie
-
 - #146325 Cambiado el componente de navegación por módulos para que se comporte correctamente.
-
 - #157265 El número máximo de usuarios en un curso sólo debe contar a los estudiantes
-
 - #155029 Corregido error al importar un lar de un curso sin borrar lo anterior, resuelta la excepción DuplicateFileException
-
 - #153797 Corrección de la incidencia cuando los archivos que se exportan llevaban un punto al final.
-
 - #143338 Corrección de preview test y asset de módulo al crear curso.
-
 - #151635 Actividad de tipo test, corrección al exportar respuestas de usuarios a CSV

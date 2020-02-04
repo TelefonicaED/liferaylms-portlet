@@ -597,15 +597,11 @@ public class ModuleResultLocalServiceImpl extends ModuleResultLocalServiceBaseIm
 				totalActivities++;
 				
 				LearningActivityResult result = LearningActivityResultLocalServiceUtil.getByActIdAndUserId(activity.getActId(), moduleResult.getUserId());
-
-				if(result != null && result.isPassed())
-				{
+				if(result != null && result.isPassed()){
 					
 					activitiesPassed++;
-					if(result.getEndDate()!=null)
-					{
-						if(passedDate.before(result.getEndDate()))
-						{
+					if(result.getEndDate()!=null){
+						if(passedDate.before(result.getEndDate())){
 							passedDate=result.getEndDate();
 						}
 					}
@@ -656,16 +652,13 @@ public class ModuleResultLocalServiceImpl extends ModuleResultLocalServiceBaseIm
 		log.debug("PassedModule "+passedModule);
 		log.debug("Module Result passed "+moduleResult.getPassed());
 		
-		if(moduleResult.getResult() <= result || (passedModule&&!moduleResult.getPassed()))
-		{	
+		if(moduleResult.getResult() <= result || (passedModule&&!moduleResult.getPassed())){	
 			
 			log.debug("Actualizamos curso");
 			moduleResult.setResult(result);
-			if(moduleResult.getPassed()==false)
-			{
+			if(!moduleResult.getPassed()){
 				moduleResult.setPassed(passedModule);
-				if(passedModule==true)
-				{
+				if(passedModule){
 					moduleResult.setPassedDate(passedDate);
 				}
 			}

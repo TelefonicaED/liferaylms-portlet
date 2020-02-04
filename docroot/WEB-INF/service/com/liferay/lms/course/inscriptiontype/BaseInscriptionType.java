@@ -7,6 +7,7 @@ import java.util.Set;
 
 import javax.portlet.PortletResponse;
 
+import com.liferay.lms.InscriptionException;
 import com.liferay.lms.model.Course;
 import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -16,6 +17,7 @@ import com.liferay.portal.kernel.upload.UploadRequest;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.GroupConstants;
+import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.service.ServiceContext;
 
 public class BaseInscriptionType implements InscriptionType, Serializable {
@@ -40,6 +42,15 @@ public class BaseInscriptionType implements InscriptionType, Serializable {
 	
 	public String getPortletId(){
 		return null;
+	}
+	
+	public boolean usePortletDefaultRegistration() {
+		return getPortletId() == null;
+	}
+	
+	@Override
+	public boolean canEnrollUser(Course course, long userId, boolean checkCompetences, Locale locale,PermissionChecker permissionChecker) throws InscriptionException, PortalException, SystemException{
+		return course.canEnroll(userId, checkCompetences, locale, permissionChecker);
 	}
 	
 	@Override
@@ -93,5 +104,10 @@ public class BaseInscriptionType implements InscriptionType, Serializable {
 	public String getAllowedTime(long courseId, long userId, Locale locale) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+	
+	@Override
+	public boolean showMessageDenied(){
+		return true;
 	}
 }

@@ -98,7 +98,7 @@
 											<liferay-ui:icon image="edit" url='javascript:${renderResponse.namespace}showPopupGrades("${userSearch.userId }","${learningActivity.actId}");' />
 										</c:if>
 										<c:set var="learningActivityType" value="${learningActivity.getLearningActivityType() }" />
-										<c:if test="${learningActivityType.canBeSeenResults() }">
+										<c:if test="${not empty learningActivityType.specificResultsPage }">
 											<liferay-ui:icon image="view" url='javascript:${renderResponse.namespace}showPopupActivity("${userSearch.userId }","${learningActivity.actId}","${learningActivity.typeId}");'/>
 										</c:if>
 									</c:if>

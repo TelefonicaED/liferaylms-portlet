@@ -96,7 +96,7 @@
 										<c:forEach items="${listChildCourses}" var="childCourse">
 											<c:if test="${childCourse.isRegistrationOnDate() }">
 												<c:catch var ="inscriptionException">
-													<c:if test="${childCourse.canEnroll(themeDisplay.userId, false, themeDisplay.locale, themeDisplay.permissionChecker)}">
+													<c:if test="${childCourse.inscription.canEnrollUser(childCourse,themeDisplay.userId, false, themeDisplay.locale, themeDisplay.permissionChecker)}">
 														<c:set var="childAvailable" value="true" />
 													</c:if>
 												</c:catch>
@@ -107,10 +107,10 @@
 														<aui:validator name="required" errorMessage="select-edition"/>
 													</aui:input>
 													<div class="edition-dates">
-														<span><liferay-ui:message key="inscription-date"/>:</span> <span><fmt:formatDate type="both" dateStyle="short" timeStyle="short" value="${childCourse.startDate }" /> - <fmt:formatDate type="both" dateStyle="short" timeStyle="short" value="${childCourse.endDate }" /></span>
+														<span><liferay-ui:message key="inscription-date"/>:</span> <span><fmt:formatDate timeZone="${themeDisplay.timeZone }" type="both" dateStyle="short" timeStyle="short" value="${childCourse.startDate }" /> - <fmt:formatDate timeZone="${themeDisplay.timeZone }" type="both" dateStyle="short" timeStyle="short" value="${childCourse.endDate }" /></span>
 													</div>
 													<div class="edition-dates">
-														<span><liferay-ui:message key="execution-date"/>:</span> <span><fmt:formatDate type="both" dateStyle="short" timeStyle="short" value="${childCourse.executionStartDate }" /> - <fmt:formatDate type="both" dateStyle="short" timeStyle="short" value="${childCourse.executionEndDate }" /></span>
+														<span><liferay-ui:message key="inscription-community.execution-date"/>:</span> <span><fmt:formatDate timeZone="${themeDisplay.timeZone }" type="both" dateStyle="short" timeStyle="short" value="${childCourse.executionStartDate }" /> - <fmt:formatDate type="both" timeZone="${themeDisplay.timeZone }" dateStyle="short" timeStyle="short" value="${childCourse.executionEndDate }" /></span>
 													</div>
 													<c:if test="${not empty inscriptionException }">
 														<div class="mensaje_marcado">${fn:substringAfter(inscriptionException.message, ':')}</div>
@@ -133,7 +133,7 @@
 								<c:otherwise>
 									<!-- Si no tiene convocatorias, se hace igual que hasta ahora, teniendo en cuenta los equipos -->
 									<c:catch var ="inscriptionException">
-										<c:if test="${course.canEnroll(themeDisplay.userId, false, themeDisplay.locale, themeDisplay.permissionChecker)}">
+										<c:if test="${course.inscription.canEnrollUser(course,themeDisplay.userId, false, themeDisplay.locale, themeDisplay.permissionChecker)}">
 											<aui:form name="enrollForm" action="${enrollURL}">
 												<aui:input name="courseId" value="${course.courseId }" type="hidden"/>
 												

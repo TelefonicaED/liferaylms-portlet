@@ -436,4 +436,9 @@ public class CourseImpl extends CourseBaseImpl {
 			return false;
 		}
 	}
+	
+	public InscriptionType getInscription(){
+		InscriptionTypeRegistry inscriptionTypeRegistry = new InscriptionTypeRegistry();
+		return inscriptionTypeRegistry.getInscriptionType(getInscriptionType());
+	}
 }

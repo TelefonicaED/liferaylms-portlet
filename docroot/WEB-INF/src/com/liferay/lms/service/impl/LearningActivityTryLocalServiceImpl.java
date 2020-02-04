@@ -183,8 +183,6 @@ public class LearningActivityTryLocalServiceImpl
 		}
 	}
 
-
-	
 	public LearningActivityTry createLearningActivityTry(long actId,ServiceContext serviceContext) throws SystemException, PortalException
 	{
 		LearningActivity learningActivity = learningActivityPersistence.fetchByPrimaryKey(actId);

@@ -22,6 +22,7 @@ if( permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), Course.class
 		<portlet:renderURL var="editParentCourseURL">
 			<portlet:param name="view" value="edit-course" />
 			<portlet:param name="courseId" value='<%=String.valueOf(parentCourseId) %>' />
+			<portlet:param name="courseTypeId" value="${courseTypeId }"></portlet:param>
 			<portlet:param name="redirect" value='<%=currentURL %>'/>
 		</portlet:renderURL>
 		
@@ -44,6 +45,7 @@ if( permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), "com.liferay
 		<portlet:renderURL var="newEditionURL">
 			<portlet:param name="view" value="new-edition"></portlet:param>
 			<portlet:param name="courseId" value="${courseId}"></portlet:param>
+			<portlet:param name="courseTypeId" value="${courseTypeId }"></portlet:param>
 			
 		</portlet:renderURL>
 		<div class="newitem2">

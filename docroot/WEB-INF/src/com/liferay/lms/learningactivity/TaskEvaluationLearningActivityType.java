@@ -34,6 +34,8 @@ public class TaskEvaluationLearningActivityType extends BaseLearningActivityType
 			PortalUtil.getJsSafePortletId(
 					"evaluationtaskactivity" + PortletConstants.WAR_SEPARATOR + ClpSerializer.getServletContextName());
 	
+	public static long TYPE_ID = 8;
+	
 	@Override
 	public AssetRenderer getAssetRenderer(LearningActivity larn) throws SystemException, PortalException {
 		return new TaskEvaluationAssetRenderer(larn,this);
@@ -63,7 +65,7 @@ public class TaskEvaluationLearningActivityType extends BaseLearningActivityType
 
 	@Override
 	public long getTypeId() {
-		return 8;
+		return TYPE_ID;
 	}
 	
 	@Override
@@ -79,6 +81,11 @@ public class TaskEvaluationLearningActivityType extends BaseLearningActivityType
 	@Override
 	public boolean canBeLinked(){
 		return false;
+	}
+	
+	@Override
+	public long getDefaultTries() {
+		return 1;
 	}
 	
 	@Override
