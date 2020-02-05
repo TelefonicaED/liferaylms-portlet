@@ -3,6 +3,7 @@ Todos los cambios de este proyecto estarán documentados en este archivo.
 
 El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 
+
 ## [4.2.0](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v4.2.0)
 
 ### Added
@@ -38,6 +39,14 @@ El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 ### Deleted
 
 - #161554 Se elimina el hook del search container
+
+## [4.0.1](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v4.0.1)
+
+### Fixed
+
+- #172634 Se heredan los campos personalizados de las actividades al duplicar curso.
+- #172535 Corrección de las preguntas tipo encuesta al exportar, duplicar y crear ediciones
+
 
 ## [4.0.0](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v4.0.0)
 
