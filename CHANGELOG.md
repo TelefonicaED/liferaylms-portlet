@@ -9,6 +9,10 @@ El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 
 - #167661 Se añade la posiblidad de publicar notas individuales después de publicar la general en las actividades de evaluación
 
+### Updated
+
+- #167661 Cambio de literal en actividad de evaluación
+
 ## [4.1.0](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v4.1.0)
 
 ### Added
