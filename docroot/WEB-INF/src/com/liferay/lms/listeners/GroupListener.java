@@ -74,12 +74,18 @@ public class GroupListener extends BaseModelListener<Group> {
 					
 					boolean tutorRole = lmsPrefs != null && lmsPrefs.getTeacherRole() > 0 
 							&& UserGroupRoleLocalServiceUtil.hasUserGroupRole(userId, groupId, lmsPrefs.getTeacherRole());
-					boolean editorRole = lmsPrefs != null && lmsPrefs.getTeacherRole() > 0 
+					boolean editorRole = lmsPrefs != null && lmsPrefs.getEditorRole() > 0 
 							&& UserGroupRoleLocalServiceUtil.hasUserGroupRole(userId, groupId, lmsPrefs.getEditorRole());
 					
-					if(user!=null && company!=null && (lmsPrefs == null || 
-							((!tutorRole || PrefsPropsUtil.getBoolean(company.getCompanyId(), LmsConstant.SEND_MAIL_TO_TUTORS, true))
-							&& (!editorRole || PrefsPropsUtil.getBoolean(company.getCompanyId(), LmsConstant.SEND_MAIL_TO_EDITORS, true))))){
+					if(log.isDebugEnabled())log.debug("tutorRole: " + tutorRole);
+					if(log.isDebugEnabled())log.debug("editorRole: " + editorRole);
+					
+					if(log.isDebugEnabled())log.debug("preferencia tutorRole: " + PrefsPropsUtil.getBoolean(company.getCompanyId(), LmsConstant.SEND_MAIL_TO_TUTORS, true));
+					if(log.isDebugEnabled())log.debug("preferencia editorRole: " + PrefsPropsUtil.getBoolean(company.getCompanyId(), LmsConstant.SEND_MAIL_TO_EDITORS, true));
+					
+					if(user!=null && company!=null && ((!tutorRole && !editorRole) 
+							|| (tutorRole && PrefsPropsUtil.getBoolean(company.getCompanyId(), LmsConstant.SEND_MAIL_TO_TUTORS, true)
+							|| (editorRole && PrefsPropsUtil.getBoolean(company.getCompanyId(), LmsConstant.SEND_MAIL_TO_EDITORS, true))))){
 
 				    	String fromName = PrefsPropsUtil.getString(course.getCompanyId(),
 								PropsKeys.ADMIN_EMAIL_FROM_NAME);
@@ -201,7 +207,28 @@ public class GroupListener extends BaseModelListener<Group> {
 					} catch (PortalException e) {
 					}
 					
-					if(user!=null&&company!=null){
+					LmsPrefs lmsPrefs = null;
+					try {
+						lmsPrefs = LmsPrefsLocalServiceUtil.getLmsPrefs(course.getCompanyId());
+					} catch (PortalException e1) {
+						e1.printStackTrace();
+					}
+					
+					boolean tutorRole = lmsPrefs != null && lmsPrefs.getTeacherRole() > 0 
+							&& UserGroupRoleLocalServiceUtil.hasUserGroupRole(userId, groupId, lmsPrefs.getTeacherRole());
+					boolean editorRole = lmsPrefs != null && lmsPrefs.getEditorRole() > 0 
+							&& UserGroupRoleLocalServiceUtil.hasUserGroupRole(userId, groupId, lmsPrefs.getEditorRole());
+					
+					if(log.isDebugEnabled())log.debug("tutorRole: " + tutorRole);
+					if(log.isDebugEnabled())log.debug("editorRole: " + editorRole);
+					
+					if(log.isDebugEnabled())log.debug("preferencia tutorRole: " + PrefsPropsUtil.getBoolean(company.getCompanyId(), LmsConstant.SEND_MAIL_TO_TUTORS, true));
+					if(log.isDebugEnabled())log.debug("preferencia editorRole: " + PrefsPropsUtil.getBoolean(company.getCompanyId(), LmsConstant.SEND_MAIL_TO_EDITORS, true));
+					
+					
+					if(user!=null&&company!=null && ((!tutorRole && !editorRole) 
+							|| (tutorRole && PrefsPropsUtil.getBoolean(company.getCompanyId(), LmsConstant.SEND_MAIL_TO_TUTORS, true)
+							|| (editorRole && PrefsPropsUtil.getBoolean(company.getCompanyId(), LmsConstant.SEND_MAIL_TO_EDITORS, true))))){
 
 				    	String fromName = PrefsPropsUtil.getString(course.getCompanyId(),
 								PropsKeys.ADMIN_EMAIL_FROM_NAME);

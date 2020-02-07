@@ -369,6 +369,7 @@ public class CourseCopyUtil {
 					newTestQuestion.setWeight(question.getWeight());
 					questionIdsMap.put(question.getQuestionId(), newTestQuestion.getQuestionId());
 				}
+				newTestQuestion.setExtracontent(question.getExtracontent());
 				newTestQuestion = TestQuestionLocalServiceUtil.updateTestQuestion(newTestQuestion, true);
 				
 				if(log.isDebugEnabled()){
@@ -388,7 +389,8 @@ public class CourseCopyUtil {
 					newTestAnswer.setActId(newActivity.getActId());
 					newTestAnswer.setQuestionId(newTestQuestion.getQuestionId());
 					newTestAnswer.setAnswer(descriptionFilesClone(answer.getAnswer(),newModule.getGroupId(), newTestAnswer.getActId(),userId));
-					
+					newTestAnswer.setFeedbackCorrect(answer.getFeedbackCorrect());
+					newTestAnswer.setFeedbacknocorrect(answer.getFeedbacknocorrect());
 					TestAnswerLocalServiceUtil.updateTestAnswer(newTestAnswer, true);
 					if(log.isDebugEnabled()){
 						log.debug("        Test answer : " + answer.getAnswerId());
