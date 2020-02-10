@@ -199,6 +199,8 @@ if(prefs!=null){
 	}
 	%>
 		<aui:input type="checkbox" name="checkExecutionDate" label="config.checkExecutionDate" value="<%=checkExecutionDate %>"/>
+		<aui:input type="checkbox" name="showButtonInscriptionAll"	label="lms-prefs.show-button-inscription-all" checked="<%= showButtonInscriptionAll %>" />
+		<aui:input type="checkbox" name="showButtonUnsubscribeAll"	label="lms-prefs.show-button-unsubscribe-all" checked="<%= showButtonUnsubscribeAll %>" />
 	</aui:field-wrapper>
 	
 	<liferay-ui:header title="modules-and-activities" />
@@ -219,7 +221,6 @@ if(prefs!=null){
 		<aui:input type="checkbox" name="showModuleClassification"	label="show-module-classification" checked="<%= showModuleClassification %>" />
 		<aui:input type="checkbox" name="showActivityClassification" label="show-activity-classification" checked="<%= showActivityClassification %>" />
 		<aui:input type="checkbox" name="showHideActivity"	label="show-hide-activity" checked="<%=prefs.getShowHideActivity()%>" value="<%=prefs.getShowHideActivity()%>" />
-	
 	</aui:field-wrapper>
 	
 	<liferay-ui:header title="configuration-courses" />
