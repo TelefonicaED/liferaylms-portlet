@@ -24,9 +24,29 @@
 <%
 	String groupId = request.getParameter("groupId");
 	Course course = CourseLocalServiceUtil.getCourseByGroupCreatedId(Long.parseLong(groupId));
+	
+	boolean isCourseChild = false;
+	if(course!=null){
+		if(course.getParentCourseId()>0){
+			isCourseChild=true;
+		}
+	}	
 %>
-<liferay-portlet:renderURL var="backURL"></liferay-portlet:renderURL>
-<liferay-ui:header title="<%= course != null ? course.getTitle(themeDisplay.getLocale()) : \"course\" %>" backURL="<%=backURL %>"></liferay-ui:header>
+
+<c:choose>
+		<c:when test="<%=isCourseChild%>">
+			<liferay-portlet:renderURL var="backURL">
+				<liferay-portlet:param name="view" value="editions"/>
+				<liferay-portlet:param name="courseId" value="<%=String.valueOf(course.getParentCourseId())%>"/>
+			</liferay-portlet:renderURL>
+		</c:when>
+		<c:otherwise>
+			<liferay-portlet:renderURL var="backURL"/>
+		</c:otherwise>
+	</c:choose>
+	
+
+<liferay-ui:header title="<%= course != null ? course.getTitle(themeDisplay.getLocale()) : \"course\" %>" backURL="${backURL}"></liferay-ui:header>
 
 <portlet:actionURL name="importCourse" var="importURL">
 	<portlet:param name="groupId" value="<%= groupId %>" />
