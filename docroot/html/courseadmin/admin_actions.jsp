@@ -174,6 +174,7 @@ if( permissionChecker.hasPermission(themeDisplay.getScopeGroupId(),  Course.clas
 			modelResourceDescription="<%= myCourse.getTitle(themeDisplay.getLocale()) %>"
 			resourcePrimKey="<%= String.valueOf(myCourse.getCourseId()) %>"
 			var="permissionsURL"
+			windowState="<%=LiferayWindowState.EXCLUSIVE.toString() %>"
 		/>
 	<liferay-ui:icon image="permissions" message="courseadmin.adminactions.permissions" url="<%=permissionsURL %>" />
 	<%}%>
