@@ -408,4 +408,8 @@ public class TestLearningActivityType extends BaseLearningActivityType
 	public String getSpecificResultsPage(){
 		return "/html/gradebook/popups/testResult.jsp";
 	}
+	
+	public boolean canExportUserAnswers(){
+		return true;
+	}
 }

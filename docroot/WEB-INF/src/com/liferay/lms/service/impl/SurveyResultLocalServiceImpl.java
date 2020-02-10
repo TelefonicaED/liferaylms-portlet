@@ -19,6 +19,7 @@ import java.util.List;
 
 
 
+
 import com.liferay.lms.NoSuchSurveyResultException;
 import com.liferay.lms.model.SurveyResult;
 import com.liferay.lms.service.base.SurveyResultLocalServiceBaseImpl;
@@ -27,6 +28,7 @@ import com.liferay.lms.service.persistence.SurveyResultUtil;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.model.User;
 
 
 /**
@@ -66,6 +68,11 @@ public class SurveyResultLocalServiceImpl
 	public List<SurveyResult> getSurveyResultByActId(long actId) throws SystemException{ 
 		
 		return SurveyResultUtil.findByActId(actId);
+	}
+	
+	
+	public long countStartedOnlyStudents(long actId, long companyId, long courseGroupCreatedId, List<User> students){
+		return surveyResultFinder.countStartedOnlyStudents(actId, companyId, courseGroupCreatedId, students);
 	}
 	
 	public List<SurveyResult> getSurveyResultsByQuestionIdActId(long questionId, long actId) { 

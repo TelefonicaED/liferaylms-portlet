@@ -18,7 +18,7 @@ import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portlet.asset.model.AssetRenderer;
 
-public class SurveyLearningActivityType extends BaseLearningActivityType {
+public class SurveyLearningActivityType extends QuestionLearningActivityType {
 
 	/**
 	 * 
@@ -125,4 +125,7 @@ public class SurveyLearningActivityType extends BaseLearningActivityType {
 		return true;
 	}
 	
+	public boolean canExportUserAnswers(){
+		return false;
+	}
 }
