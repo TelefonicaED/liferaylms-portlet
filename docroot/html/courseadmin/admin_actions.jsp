@@ -180,15 +180,13 @@ if( permissionChecker.hasPermission(themeDisplay.getScopeGroupId(),  Course.clas
 	<%}%>
 </c:if>
 
-<c:if test="<%=permissionChecker.hasPermission(themeDisplay.getScopeGroupId(),  Course.class.getName(),primKey,ActionKeys.UPDATE) && ! myCourse.isClosed() && myCourse.getParentCourseId()<=0 && (countStudents<=0 || editionsWithoutRestrictions)%>">
+<c:if test="<%=permissionChecker.hasPermission(themeDisplay.getScopeGroupId(),  Course.class.getName(),primKey,ActionKeys.UPDATE) && ! myCourse.isClosed() && myCourse.getGroupCreatedId() != themeDisplay.getScopeGroupId() && myCourse.getParentCourseId()<=0 && (countStudents<=0 || editionsWithoutRestrictions)%>">
 	<liferay-portlet:renderURL var="editionsURL">
 		<liferay-portlet:param name="courseId" value="<%=String.valueOf(myCourse.getCourseId()) %>"/>
 		<liferay-portlet:param name="view" value="editions"/>
 	</liferay-portlet:renderURL>
 	<liferay-ui:icon image="tag" message="course-admin.editions" url="<%=editionsURL %>" />
 </c:if>
-
-
 
 <c:forEach var="action" items="${adminActionTypes}">
 	<c:set var="preferences" value="<%=preferences %>" />
