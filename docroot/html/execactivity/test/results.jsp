@@ -50,7 +50,7 @@
 		if(!hasPermissionAccessCourseFinished){
 			if(larntry==null) larntry=LearningActivityTryLocalServiceUtil.getLearningActivityTry(ParamUtil.getLong(request,"latId" ));
 			
-			if(larntry.getActId() == learningActivity.getActId()){
+			if(larntry != null && larntry.getActId() == learningActivity.getActId()){
 				request.setAttribute("larntry",larntry);
 			}else{
 				larntry=LearningActivityTryLocalServiceUtil.getLastLearningActivityTryByActivityAndUser(ParamUtil.getLong(request,"actId",0 ), learningActivity.getUserId());
@@ -89,11 +89,7 @@
 		
 		boolean isTeacher=permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), "com.liferay.lms.model",themeDisplay.getScopeGroupId(), "VIEW_RESULTS");
 	
-		
 		CalificationType ct = new CalificationTypeRegistry().getCalificationType(course.getCalificationType());
-		
-	
-	
 		
 		long tries = 0;
 		long userTries = 0;
@@ -114,9 +110,20 @@
 		}else{
 			score = ParamUtil.getLong(request, "score", 0);
 			scoreTry = score;
-			tryResultData = ParamUtil.getString(request, "tryResultData", "");
+			tryResultData = ParamUtil.getString(request, "tryResultData", null);
+			if(Validator.isNull(tryResultData)){
+				if(larntry == null){
+					larntry = LearningActivityTryLocalServiceUtil.getLastLearningActivityTryByActivityAndUser(learningActivity.getActId(), themeDisplay.getUserId());
+				}
+				tryResultData = larntry != null ? larntry.getTryResultData():"";
+				score = larntry != null ? larntry.getResult(): score;
+			}
 			userPassed=learningActivity.getPasspuntuation()<=scoreTry;
 		}
+		System.out.println("hasPermissionAccessCourseFinished: " + hasPermissionAccessCourseFinished);
+		System.out.println("tryResultData: " + tryResultData);
+		System.out.println("score: " + score);
+		System.out.println("scoreTry: " + scoreTry);
 		
 		boolean hideFeedback = StringPool.TRUE.equals(LearningActivityLocalServiceUtil.getExtraContentValue(learningActivity.getActId(),"hideFeedback"));
 		
@@ -183,41 +190,43 @@
 		}
 		if(!hideFeedback)
 		{
-%>
-			<p class="negrita"><liferay-ui:message key="your-answers" /></p>
-<%
-			long actId = learningActivity.getActId();
-			long userId = themeDisplay.getUserId();
-			List<TestQuestion> questions=null;
-			if( StringPool.TRUE.equals(LearningActivityLocalServiceUtil.getExtraContentValue(actId, "isBank")) ){
-				questions = TestQuestionLocalServiceUtil.getQuestions(bankActivity.getActId());
-			}else{
-				if( GetterUtil.getLong(LearningActivityLocalServiceUtil.getExtraContentValue(actId,"random"))==0 
-						|| hasPermissionAccessCourseFinished ){
-					questions=ListUtil.copy(TestQuestionLocalServiceUtil.getQuestions(learningActivity.getActId()));
-					BeanComparator beanComparator = new BeanComparator("weight");
-					Collections.sort(questions, beanComparator);
+			if(Validator.isNotNull(tryResultData)){
+	%>
+				<p class="negrita"><liferay-ui:message key="your-answers" /></p>
+	<%
+				long actId = learningActivity.getActId();
+				long userId = themeDisplay.getUserId();
+				List<TestQuestion> questions=null;
+				if( StringPool.TRUE.equals(LearningActivityLocalServiceUtil.getExtraContentValue(actId, "isBank")) ){
+					questions = TestQuestionLocalServiceUtil.getQuestions(bankActivity.getActId());
 				}else{
-					questions= new ArrayList<TestQuestion>();
-					Iterator<Element> nodeItr = SAXReaderUtil.read(tryResultData).getRootElement().elementIterator();
-					TestQuestion question=null;
-					while(nodeItr.hasNext()) {
-						Element element = nodeItr.next();				
-						 if("question".equals(element.getName())) {
-							 question=TestQuestionLocalServiceUtil.fetchTestQuestion(Long.valueOf(element.attributeValue("id")));
-							 if(question != null){
-								 questions.add(question); 
-							 }		        	 
-						 }
-					}	
+					if( GetterUtil.getLong(LearningActivityLocalServiceUtil.getExtraContentValue(actId,"random"))==0 
+							|| hasPermissionAccessCourseFinished ){
+						questions=ListUtil.copy(TestQuestionLocalServiceUtil.getQuestions(learningActivity.getActId()));
+						BeanComparator beanComparator = new BeanComparator("weight");
+						Collections.sort(questions, beanComparator);
+					}else{
+						questions= new ArrayList<TestQuestion>();
+						Iterator<Element> nodeItr = SAXReaderUtil.read(tryResultData).getRootElement().elementIterator();
+						TestQuestion question=null;
+						while(nodeItr.hasNext()) {
+							Element element = nodeItr.next();				
+							 if("question".equals(element.getName())) {
+								 question=TestQuestionLocalServiceUtil.fetchTestQuestion(Long.valueOf(element.attributeValue("id")));
+								 if(question != null){
+									 questions.add(question); 
+								 }		        	 
+							 }
+						}	
+					}
 				}
-			}
 
 			
-			for(TestQuestion question:questions){
-				QuestionType qt = new QuestionTypeRegistry().getQuestionType(question.getQuestionType());
-				qt.setLocale(themeDisplay.getLocale());
-				%><%=qt.getHtmlFeedback(SAXReaderUtil.read(tryResultData), question.getQuestionId(), learningActivity.getActId(), themeDisplay)%><%
+				for(TestQuestion question:questions){
+					QuestionType qt = new QuestionTypeRegistry().getQuestionType(question.getQuestionType());
+					qt.setLocale(themeDisplay.getLocale());
+					%><%=qt.getHtmlFeedback(SAXReaderUtil.read(tryResultData), question.getQuestionId(), learningActivity.getActId(), themeDisplay)%><%
+				}
 			}
 		}
 		if(tries==0 || userTries < tries ||permissionChecker.hasPermission(learningActivity.getGroupId(),LearningActivity.class.getName(),learningActivity.getActId(), ActionKeys.UPDATE)) {

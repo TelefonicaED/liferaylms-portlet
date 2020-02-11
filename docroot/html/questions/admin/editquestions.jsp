@@ -1,3 +1,4 @@
+<%@page import="com.liferay.lms.learningactivity.QuestionLearningActivityType"%>
 <%@page import="com.liferay.lms.learningactivity.LearningActivityTypeRegistry"%>
 <%@page import="com.liferay.lms.learningactivity.LearningActivityType"%>
 <%@page import="com.liferay.portal.kernel.portlet.LiferayPortletResponse"%>
@@ -109,6 +110,7 @@
 	<%
 		boolean isMultiple = StringPool.TRUE.equals(LearningActivityLocalServiceUtil.getExtraContentValue(learningActivity.getActId(),"isMultiple"));
 		LearningActivityType activityType = new LearningActivityTypeRegistry().getLearningActivityType(learningActivity.getTypeId());
+		QuestionLearningActivityType questionLearningActivityType = (QuestionLearningActivityType)activityType;
 		long searchGroupId = themeDisplay.getCompanyGroupId();
 		boolean allowsBank = activityType.allowsBank();
 		if(allowsBank){
@@ -192,12 +194,17 @@
 			message="surveyactivity.editquestions.importquestions"
 			url='<%= importQuestionsExcelURL %>'
 			/>
+			
+			<%
+			if(questionLearningActivityType.canExportUserAnswers()){
+			%>
+			
 			<liferay-portlet:resourceURL var="exportResultsCsvURL" >
 				<portlet:param name="action" value="exportResultsCsv"/>
 				<portlet:param name="resId" value="<%=Long.toString(learningActivity.getActId()) %>"/>
 			</liferay-portlet:resourceURL>
 			<liferay-ui:icon image="export" label="<%= true %>" message="execativity.editquestions.exportcsv" method="get" url="<%=exportResultsCsvURL%>" />
-			
+			<%} %>
 			<liferay-portlet:resourceURL var="exportXmlURL" >
 				<portlet:param name="action" value="exportXml"/>
 				<portlet:param name="resId" value="<%=Long.toString(learningActivity.getActId()) %>"/>

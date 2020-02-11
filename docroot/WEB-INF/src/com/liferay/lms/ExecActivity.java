@@ -12,7 +12,6 @@ import javax.portlet.RenderResponse;
 
 import com.liferay.lms.learningactivity.LearningActivityType;
 import com.liferay.lms.learningactivity.LearningActivityTypeRegistry;
-import com.liferay.lms.learningactivity.ResourceExternalLearningActivityType;
 import com.liferay.lms.learningactivity.TestLearningActivityType;
 import com.liferay.lms.learningactivity.calificationtype.CalificationType;
 import com.liferay.lms.learningactivity.calificationtype.CalificationTypeRegistry;
@@ -37,7 +36,6 @@ import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.SessionMessages;
-import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringPool;
@@ -113,6 +111,8 @@ public class ExecActivity extends QuestionsAdmin {
 				larntry.setResult(score);
 				larntry.setEndDate(new java.util.Date(System.currentTimeMillis()));
 			}
+			
+			LearningActivityTryLocalServiceUtil.updateLearningActivityTry(larntry);
 
 			actionResponse.setRenderParameters(actionRequest.getParameterMap());
 
@@ -124,6 +124,7 @@ public class ExecActivity extends QuestionsAdmin {
 				actionResponse.setRenderParameter("oldResult", Long.toString(oldResult));
 				actionResponse.setRenderParameter("correction", Boolean.toString(true));
 				actionResponse.setRenderParameter("score", String.valueOf(learningActivityResult.getResult() > score ? learningActivityResult.getResult():score));
+				actionResponse.setRenderParameter("tryResultData", resultadosXMLDoc.formattedString());
 				if(isTablet)actionResponse.setRenderParameter("isTablet", Boolean.toString(true));
 				actionResponse.setRenderParameter("jspPage", "/html/execactivity/test/results.jsp");
 			}

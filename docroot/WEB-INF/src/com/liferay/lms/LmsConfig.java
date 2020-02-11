@@ -47,8 +47,8 @@ public class LmsConfig extends MVCPortlet {
 		boolean linkResources = ParamUtil.getBoolean(request,"linkResources");
 		boolean sendMailToEditors = ParamUtil.getBoolean(request, "sendMailToEditors");
 		boolean sendMailToTutors = ParamUtil.getBoolean(request, "sendMailToTutors");
-		boolean showButtonInscriptionAll = ParamUtil.getBoolean(request, "showButtonInscriptionAll");
-		boolean showButtonUnsubscribeAll = ParamUtil.getBoolean(request, "showButtonUnsubscribeAll");
+		boolean showButtonInscriptionAll = ParamUtil.getBoolean(request, "showButtonInscriptionAll", true);
+		boolean showButtonUnsubscribeAll = ParamUtil.getBoolean(request, "showButtonUnsubscribeAll", true);
 		
 		LmsPrefs prefs=LmsPrefsLocalServiceUtil.getLmsPrefsIni(themeDisplay.getCompanyId());
 		prefs.setLmsTemplates(sitetemplates);

@@ -76,7 +76,7 @@
 			String percent;
 			DecimalFormat df = new DecimalFormat("###.##");;
 			String texto;
-			long participants = LearningActivityResultLocalServiceUtil.countFinishedOnlyStudents(actId, themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId()); //LearningActivityResultLocalServiceUtil.countByActId(actId);
+			long participants = SurveyResultLocalServiceUtil.countStartedOnlyStudents(actId, themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(), null);
 			Course course = CourseLocalServiceUtil.getCourseByGroupCreatedId(learningActivity.getGroupId());
 			long courseUsers = CourseLocalServiceUtil.getStudentsFromCourseCount(course.getCourseId());
 			double passPercent =  ((double)participants/(double)courseUsers)*100;

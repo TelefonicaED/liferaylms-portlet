@@ -122,6 +122,8 @@ public class GroupListener extends BaseModelListener<Group> {
 					    		userRole = role.getTitle(user.getLocale());
 					    	}
 					    	
+					    	subject = StringUtil.replace(subject, "[$ROLE$]", userRole);
+					    	
 					    	String body = StringUtil.replace(
 				    			course.getWelcomeMsg(),
 				    			new String[] {"[$FROM_ADDRESS$]", "[$FROM_NAME$]", "[$PAGE_URL$]","[$PORTAL_URL$]","[$TO_ADDRESS$]","[$TO_NAME$]","[$USER_SCREENNAME$]","[$TITLE_COURSE$]","[$ROLE$]"},
@@ -256,10 +258,22 @@ public class GroupListener extends BaseModelListener<Group> {
 						    	subject = LanguageUtil.format(user.getLocale(),"goodbye-subject", new String[]{course.getTitle(user.getLocale())});
 
 					    	}
+					    	
+					    	String userRole = LanguageUtil.get(user.getLocale(), "courseadmin.adminactions.students");
+					    	if(tutorRole){
+					    		Role role = RoleLocalServiceUtil.getRole(lmsPrefs.getTeacherRole());
+					    		userRole = role.getTitle(user.getLocale());
+					    	}else if(editorRole){
+					    		Role role = RoleLocalServiceUtil.getRole(lmsPrefs.getEditorRole());
+					    		userRole = role.getTitle(user.getLocale());
+					    	}
+					    	
+					    	subject = StringUtil.replace(subject, "[$ROLE$]", userRole);
+					    	
 					    	String body = StringUtil.replace(
 				    			course.getGoodbyeMsg(),
-				    			new String[] {"[$FROM_ADDRESS$]", "[$FROM_NAME$]", "[$PAGE_URL$]","[$PORTAL_URL$]","[$TO_ADDRESS$]","[$TO_NAME$]","[$USER_SCREENNAME$]","[$TITLE_COURSE$]"},
-				    			new String[] {fromAddress, fromName, urlcourse, url, user.getEmailAddress(), user.getFullName(),user.getScreenName(),course.getTitle(user.getLocale())});
+				    			new String[] {"[$FROM_ADDRESS$]", "[$FROM_NAME$]", "[$PAGE_URL$]","[$PORTAL_URL$]","[$TO_ADDRESS$]","[$TO_NAME$]","[$USER_SCREENNAME$]","[$TITLE_COURSE$]","[$ROLE$]"},
+				    			new String[] {fromAddress, fromName, urlcourse, url, user.getEmailAddress(), user.getFullName(),user.getScreenName(),course.getTitle(user.getLocale()), userRole});
 				    	
 					    	
 							if(log.isDebugEnabled()){
