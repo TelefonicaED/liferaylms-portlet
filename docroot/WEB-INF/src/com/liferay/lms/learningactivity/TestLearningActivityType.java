@@ -38,7 +38,7 @@ import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portlet.asset.model.AssetRenderer;
 
-public class TestLearningActivityType extends BaseLearningActivityType 
+public class TestLearningActivityType extends QuestionLearningActivityType 
 {
 	
 	private static Log log = LogFactoryUtil.getLog(TestLearningActivityType.class);
