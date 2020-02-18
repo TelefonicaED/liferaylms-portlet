@@ -104,8 +104,6 @@ textarea {
 					
 					if(!userPassed || permissionChecker.hasPermission(activity.getGroupId(),LearningActivity.class.getName(), activity.getActId(), ActionKeys.UPDATE)){
 						ServiceContext serviceContext = ServiceContextFactory.getInstance(LearningActivityTry.class.getName(), renderRequest);
-						
-						LearningActivityTry learningTry =LearningActivityTryLocalServiceUtil.createLearningActivityTry(actId,serviceContext);
 						List<TestQuestion> questiones=TestQuestionLocalServiceUtil.getQuestions(actId);
 						List<TestQuestion> questions = ListUtil.copy(questiones);
 						BeanComparator beanComparator = new BeanComparator("weight");
@@ -114,7 +112,6 @@ textarea {
 					%>
 						<portlet:actionURL name="correct" var="correctURL">
 							<portlet:param name="actId" value="<%=Long.toString(actId) %>"></portlet:param>
-							<portlet:param name="latId" value="<%=Long.toString(learningTry.getLatId()) %>"></portlet:param>
 						</portlet:actionURL>
 																	
 						<script type="text/javascript">
