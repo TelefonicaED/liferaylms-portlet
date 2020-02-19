@@ -422,11 +422,12 @@ public class CourseImpl extends CourseBaseImpl {
 	
 	public boolean canUnsubscribe(long userId, PermissionChecker permissionChecker) throws PortalException, SystemException {
 		Date now = new Date();
+		
+		Group group = getGroup();
 			
-		if (GroupLocalServiceUtil.hasUserGroup(userId, getGroupCreatedId()) && getStartDate().before(now) && 
+		if (group.getType() != GroupConstants.TYPE_SITE_PRIVATE && GroupLocalServiceUtil.hasUserGroup(userId, getGroupCreatedId()) && getStartDate().before(now) && 
 				getEndDate().after(now) && permissionChecker.hasPermission(this.getGroupCreatedId(), Course.class.getName(), this.getCourseId() , "REGISTER")) {
 			CourseResult courseResult = CourseResultLocalServiceUtil.getCourseResultByCourseAndUser(getCourseId(), userId);
-			Group group = GroupLocalServiceUtil.getGroup(getGroupCreatedId());
 
 			InscriptionTypeRegistry inscriptionTypeRegistry = new InscriptionTypeRegistry();
 			InscriptionType inscriptionType = inscriptionTypeRegistry.getInscriptionType(getInscriptionType());
