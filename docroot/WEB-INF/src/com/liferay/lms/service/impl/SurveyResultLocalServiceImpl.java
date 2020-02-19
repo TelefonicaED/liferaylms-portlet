@@ -186,7 +186,15 @@ public class SurveyResultLocalServiceImpl
 		return SurveyResultFinderUtil.countStudentsByQuestionId(questionId, companyId, courseGropupCreatedId);
 	}
 	
+	public long countByQuestionId(long questionId) throws SystemException{
+		return surveyResultPersistence.countByQuestionId(questionId);
+	}
+	
 	public long countStudentsByQuestionIdAndAnswerId(long questionId, long answerId, long companyId, long courseGropupCreatedId){
 		return SurveyResultFinderUtil.countStudentsByQuestionIdAndAnswerId(questionId, answerId, companyId, courseGropupCreatedId);
 	}
-}
+
+
+	public long countByQuestionIdAndAnswerId(long questionId, long answerId) throws SystemException{
+		return surveyResultPersistence.countByAnswerIdQuestionId(answerId, questionId);
+	}}

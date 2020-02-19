@@ -95,6 +95,10 @@ public class CourseResultLocalServiceImpl
 		return courseResultPersistence.countByc(courseId, passed);
 	}
 	
+	public long countByCourseId(long courseId) throws SystemException{
+		return courseResultPersistence.countByCourseId(courseId);
+	}
+	
 	public long countByUserId(long userId) throws SystemException{
 		return courseResultPersistence.countByUserId(userId);
 	}

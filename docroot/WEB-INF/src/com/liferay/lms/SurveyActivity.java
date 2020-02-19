@@ -48,6 +48,8 @@ import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
+import com.liferay.portal.service.ServiceContext;
+import com.liferay.portal.service.ServiceContextFactory;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portlet.asset.AssetRendererFactoryRegistryUtil;
 import com.liferay.portlet.asset.model.AssetRenderer;
@@ -70,7 +72,6 @@ public class SurveyActivity extends QuestionsAdmin  {
 	
 	public void doView(RenderRequest renderRequest,
 			RenderResponse renderResponse) throws IOException, PortletException {
-		log.debug("STARTED ACTIVITYaaaaaaa "+ParamUtil.getBoolean(renderRequest, "activityStarted", false));
 		if(ParamUtil.getBoolean(renderRequest, "activityStarted", false)){
 			String jsp = renderRequest.getParameter("view");
 			if(log.isDebugEnabled())log.debug("VIEW "+jsp);
@@ -97,7 +98,6 @@ public class SurveyActivity extends QuestionsAdmin  {
 	public void correct(ActionRequest actionRequest,ActionResponse actionResponse)throws Exception {		
 
 		int score = 100;
-		long latId=ParamUtil.getLong(actionRequest,"latId" );
 		long actId=ParamUtil.getLong(actionRequest,"actId",0 );
 
 		boolean isTablet = ParamUtil.getBoolean(actionRequest,"isTablet" );
@@ -107,8 +107,9 @@ public class SurveyActivity extends QuestionsAdmin  {
 		Enumeration<String> params=actionRequest.getParameterNames();
 		java.util.Hashtable<TestQuestion, TestAnswer> resultados=new java.util.Hashtable<TestQuestion, TestAnswer>();
 		java.util.Hashtable<TestQuestion, String> respuestaLibre = new java.util.Hashtable<TestQuestion, String>();
-
-		LearningActivityTry larntry=LearningActivityTryLocalServiceUtil.getLearningActivityTry(latId);
+		ServiceContext serviceContext = ServiceContextFactory.getInstance(LearningActivityTry.class.getName(), actionRequest);
+		LearningActivityTry learningTry =LearningActivityTryLocalServiceUtil.createLearningActivityTry(actId, serviceContext);
+		LearningActivityTry larntry=LearningActivityTryLocalServiceUtil.getLearningActivityTry(learningTry.getLatId());
 
 		//Comprobar si el usuario se dejo alguna encuesta abierta
 		if (larntry.getEndDate() == null )
@@ -140,7 +141,7 @@ public class SurveyActivity extends QuestionsAdmin  {
 								resultados.put(question, t);						
 								//Guardar la encuesta para las estadisticas.
 								surveyResult.setActId(actId);
-								surveyResult.setLatId(latId);
+								surveyResult.setLatId(learningTry.getLatId());
 								surveyResult.setQuestionId(questionId);
 								surveyResult.setAnswerId(Long.valueOf(t.getAnswerId()));
 								surveyResult.setUserId(themeDisplay.getUserId());
@@ -151,7 +152,7 @@ public class SurveyActivity extends QuestionsAdmin  {
 						}
 					} else {
 						surveyResult.setActId(actId);
-						surveyResult.setLatId(latId);
+						surveyResult.setLatId(learningTry.getLatId());
 						surveyResult.setQuestionId(questionId);
 						surveyResult.setAnswerId(0);// PARA TEXTO LIBRE EL answerId = 0
 						surveyResult.setUserId(themeDisplay.getUserId());
