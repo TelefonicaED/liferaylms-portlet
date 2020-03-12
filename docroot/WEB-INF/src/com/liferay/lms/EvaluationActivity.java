@@ -82,6 +82,17 @@ public class EvaluationActivity extends MVCPortlet implements MessageListener{
 	private static DateFormat _dateFormat = DateFormatFactoryUtil.getSimpleDateFormat(
 			"yyyy-MM-dd'T'HH:mm:sszzz",Locale.US);
 	
+	public static final String LEARNING_ACTIVITY_RESULT_PASSED_SQL = "WHERE (EXISTS (SELECT 1 FROM lms_learningactivityresult " +
+			"WHERE User_.userId = lms_learningactivityresult.userId " +
+			" AND lms_learningactivityresult.endData IS NOT NULL AND lms_learningactivityresult.passed > 0 AND lms_learningactivityresult.actId = ? ))"; 
+
+	public static final String LEARNING_ACTIVITY_RESULT_FAIL_SQL = "WHERE (EXISTS (SELECT 1 FROM lms_learningactivityresult " +
+			"WHERE User_.userId = lms_learningactivityresult.userId " +
+			" AND lms_learningactivityresult.endDate IS NOT NULL AND lms_learningactivityresult.passed = 0 AND lms_learningactivityresult.actId = ? ))"; 
+
+	public static final String LEARNING_ACTIVITY_RESULT_NO_CALIFICATION_SQL = "WHERE (NOT EXISTS (SELECT 1 FROM lms_learningactivityresult " +
+			"WHERE User_.userId = lms_learningactivityresult.userId AND lms_learningactivityresult.actId = ? AND lms_learningactivityresult.endDate IS NOT NULL))"; 
+	
 	@Override
 	public void receive(Message message) throws MessageListenerException {
 		long actId = message.getLong("actId");
@@ -133,10 +144,54 @@ public class EvaluationActivity extends MVCPortlet implements MessageListener{
 			}
 
 		}
-		
-		
-		
 	}	
+	
+	public void calcualteLearningActivitiyResult(ActionRequest actionRequest,ActionResponse actionResponse) throws PortalException, SystemException, DocumentException{
+
+    	ThemeDisplay themeDisplay = (ThemeDisplay) actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
+    	
+    	String gradeFilter = ParamUtil.getString(actionRequest, "gradeFilter");
+		String criteria = ParamUtil.getString(actionRequest, "criteria");
+
+		log.debug("gradeFilter: "+gradeFilter);
+		log.debug("criteria: "+criteria);
+		
+		actionResponse.setRenderParameter("gradeFilter", gradeFilter);
+		actionResponse.setRenderParameter("criteria", criteria);	
+		
+		long userId = ParamUtil.getLong(actionRequest, "userId");
+		long actId = ParamUtil.getLong(actionRequest, "actId");
+		
+		if(userId==0){
+			SessionErrors.add(actionRequest, "evaluationtaskactivity.reCalculate.userId");			
+		}
+		else{
+			LearningActivity learningActivity = LearningActivityLocalServiceUtil.getLearningActivity(actId);
+			evaluateUser(actId, userId, getLearningActivities(learningActivity), false);		
+			SessionMessages.add(actionRequest, "evaluationtaskactivity.reCalculate.ok");
+		}
+	}
+	
+	public void publishLearningActivitiyResult(ActionRequest actionRequest,ActionResponse actionResponse) throws PortalException, SystemException, DocumentException{
+
+   	
+    	String gradeFilter = ParamUtil.getString(actionRequest, "gradeFilter");
+		String criteria = ParamUtil.getString(actionRequest, "criteria");
+
+		log.debug("gradeFilter: "+gradeFilter);
+		log.debug("criteria: "+criteria);
+		
+		actionResponse.setRenderParameter("gradeFilter", gradeFilter);
+		actionResponse.setRenderParameter("criteria", criteria);	
+		
+		long userId = ParamUtil.getLong(actionRequest, "userId");
+		long actId = ParamUtil.getLong(actionRequest, "actId");
+		
+		LearningActivityTry learningActivityTry = LearningActivityTryLocalServiceUtil.getLastLearningActivityTryByActivityAndUser(actId, userId);
+		learningActivityTry.setEndDate(new Date());
+		LearningActivityTryLocalServiceUtil.updateLearningActivityTry(learningActivityTry);
+		LearningActivityResultLocalServiceUtil.update(learningActivityTry, true);
+	}
 
 	private double calculateMean(double[] values, double[] weights) {
 		int i;
