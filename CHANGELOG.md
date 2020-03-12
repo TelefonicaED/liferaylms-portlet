@@ -14,6 +14,10 @@ El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 
 - #167661 Cambio de literal en actividad de evaluación
 
+### Fixed
+
+- #176579 Corrección al eliminar turores y editores de un curso
+
 ## [4.1.0](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v4.1.0)
 
 ### Added

@@ -1144,9 +1144,7 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 		if (roleId != siteMember.getRoleId()) {
 			
 			List<UserGroupRole> userGroupRoles = UserGroupRoleLocalServiceUtil.getUserGroupRoles(userId,course.getGroupCreatedId());
-			if((userGroupRoles.isEmpty())||
-				((userGroupRoles.size()==1)&&
-				 (siteMember.getRoleId()==userGroupRoles.get(0).getRoleId()))){
+			if(userGroupRoles.isEmpty() || userGroupRoles.size() == 1 || (userGroupRoles.size()== 2 && (siteMember.getRoleId()==userGroupRoles.get(0).getRoleId() || siteMember.getRoleId() == userGroupRoles.get(1).getRoleId()))){
 				GroupLocalServiceUtil.unsetUserGroups(userId,
 						new long[] { course.getGroupCreatedId() });
 			}
