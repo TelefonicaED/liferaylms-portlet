@@ -17,6 +17,7 @@ El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 ### Fixed
 
 - #176579 Corrección al eliminar turores y editores de un curso
+- #175947 Corrección en tabla de procesos asíncronos cuando configuras solo un tipo
 
 ## [4.1.0](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v4.1.0)
 

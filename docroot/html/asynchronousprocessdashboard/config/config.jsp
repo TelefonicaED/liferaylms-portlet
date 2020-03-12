@@ -40,7 +40,7 @@
 
 	<aui:column columnWidth="80">
 			<aui:input type="checkbox" name="preferences--showAllClassName--" label="asynchronous-process-audit.config.show-all-class-name" value="<%=showAllClassName %>" checked="<%=showAllClassName %>"/>
-			<aui:select name="className" multiple="true" cssClass="type-selector" label="" ignoreRequestValue="true" >
+			<aui:select name="className" cssClass="type-selector" label="" ignoreRequestValue="true" >
 				<%for(String classe : classNamesList){ boolean selected=classNamePrefsValues.indexOf(classe) >= 0 ;%>
 					<aui:option value="<%= classe %>"  selected="<%=selected%>" ><%= classe %></aui:option>
 				<%} %>
