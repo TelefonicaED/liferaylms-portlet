@@ -370,7 +370,7 @@ if(isCourseChild){
 			<%-- Ver ediciones --%>
 			<%
 			long countStudents = CourseLocalServiceUtil.getStudentsFromCourseCount(course.getCourseId());
-			if(!isCourseChild && permissionChecker.hasPermission(themeDisplay.getScopeGroupId(),  Course.class.getName(),courseId,ActionKeys.UPDATE) && !course.isClosed()  && (countStudents<=0 || editionsWithoutRestrictions)){%>
+			if(!isCourseChild && permissionChecker.hasPermission(themeDisplay.getScopeGroupId(),  Course.class.getName(),courseId,ActionKeys.UPDATE) && !course.isClosed() &&  !isInCourse  && (countStudents<=0 || editionsWithoutRestrictions)){%>
 				<liferay-portlet:renderURL var="editionsURL">
 					<liferay-portlet:param name="courseId" value="<%=String.valueOf(courseId) %>"/>
 					<liferay-portlet:param name="view" value="editions"/>
@@ -1222,6 +1222,12 @@ if(isCourseChild){
 							</dt>
 							<dd>
 								<liferay-ui:message key="the-user-screen-name" />
+							</dd>
+							<dt>
+								[$ROLE$]
+							</dt>
+							<dd>
+								<liferay-ui:message key="course-admin.welcome-message.user" />
 							</dd>
 						</dl>
 					</div>

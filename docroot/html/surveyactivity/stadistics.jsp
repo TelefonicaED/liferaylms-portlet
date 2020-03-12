@@ -1,3 +1,4 @@
+<%@page import="com.liferay.lms.service.CourseResultLocalServiceUtil"%>
 <%@page import="com.liferay.lms.service.CourseLocalServiceUtil"%>
 <%@page import="com.liferay.lms.service.ModuleLocalServiceUtil"%>
 <%@page import="com.liferay.lms.model.Module"%>
@@ -76,9 +77,9 @@
 			String percent;
 			DecimalFormat df = new DecimalFormat("###.##");;
 			String texto;
-			long participants = LearningActivityResultLocalServiceUtil.countFinishedOnlyStudents(actId, themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId()); //LearningActivityResultLocalServiceUtil.countByActId(actId);
+			long participants = LearningActivityResultLocalServiceUtil.countByActId(actId);
 			Course course = CourseLocalServiceUtil.getCourseByGroupCreatedId(learningActivity.getGroupId());
-			long courseUsers = CourseLocalServiceUtil.getStudentsFromCourseCount(course.getCourseId());
+			long courseUsers = CourseResultLocalServiceUtil.countByCourseId(course.getCourseId());
 			double passPercent =  ((double)participants/(double)courseUsers)*100;
 			percent  = df.format(passPercent);
 			%>
@@ -95,7 +96,7 @@
 		
 			<% 
 			for(TestQuestion question:questions){
-				total = SurveyResultLocalServiceUtil.countStudentsByQuestionId(question.getQuestionId(), themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId());
+				total = SurveyResultLocalServiceUtil.countByQuestionId(question.getQuestionId());
 			%>
 			<div class="question">
 				<div  class="questiontext">
@@ -109,7 +110,7 @@
 					for(TestAnswer answer:testAnswers){
 						textoAux = HtmlUtil.extractText(answer.getAnswer());
 						texto = textoAux.length() > 50 ? textoAux.substring(0,50)+"..." : textoAux;
-						totalAnswer = SurveyResultLocalServiceUtil.countStudentsByQuestionIdAndAnswerId(question.getQuestionId(), answer.getAnswerId(), themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId());
+						totalAnswer = SurveyResultLocalServiceUtil.countByQuestionIdAndAnswerId(question.getQuestionId(), answer.getAnswerId());
 						//percent = df.format(SurveyResultLocalServiceUtil.getPercentageByQuestionIdAndAnswerId(question.getQuestionId(), answer.getAnswerId(), total));
 						if(total>0){
 							percent = df.format(100*(double)totalAnswer/(double)total);	

@@ -366,7 +366,7 @@
 			);
 			
 			function <portlet:namespace />addAllUsers(){
-				if(confirm(Liferay.Language.get("are-you-sure-you-want-to-permanently-delete-the-selected-users"))){
+				if(confirm(Liferay.Language.get("are-you-sure-you-want-to-permanently-add-the-selected-users"))){
 					$('#<portlet:namespace />addAllUsersFirstName').val($('#<portlet:namespace />firstName').val());
 					$('#<portlet:namespace />addAllUsersLastName').val($('#<portlet:namespace />lastName').val());
 					$('#<portlet:namespace />addAllUsersScreenName').val($('#<portlet:namespace />screenName').val());

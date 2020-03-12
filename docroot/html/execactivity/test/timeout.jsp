@@ -30,11 +30,13 @@
 	
 	if(activityTimestamp !=0){ 
 		long timestamp=0;
-		if(learnactTry.getEndDate()!=null) {
+		if(learnactTry != null && learnactTry.getEndDate()!=null) {
 		    timestamp=activityTimestamp*1000 - (learnactTry.getEndDate().getTime() - learnactTry.getStartDate().getTime());				
 		}
-		else {
+		else if(learnactTry != null){
 		    timestamp=activityTimestamp*1000 - (new Date().getTime() - learnactTry.getStartDate().getTime());			
+		}else{
+			timestamp = activityTimestamp;
 		}
 				
 	  if(timestamp<0) {  

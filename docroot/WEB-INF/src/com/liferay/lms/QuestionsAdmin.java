@@ -103,7 +103,6 @@ public class QuestionsAdmin extends MVCPortlet{
 	public static final int COLUMN_INDEX_ANSWER_FEEDBACK_INCORRECT = 6;
 	public static final int COLUMN_INDEX_QUESTION_EXTRA_CONTENT = 7;
 
-
 	HashMap<Long, TestAnswer> answersMap = new HashMap<Long, TestAnswer>(); 
 
 

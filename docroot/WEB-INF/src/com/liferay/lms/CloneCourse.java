@@ -418,7 +418,7 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 					
 					newLearnActivity.setDescription(descriptionFilesClone(activity.getDescription(),newModule.getGroupId(), newLearnActivity.getActId(),themeDisplay.getUserId()));
 					ServiceContext larnServiceContext = serviceContext;
-					
+
 					//Eliminar las categorias y los tags del curso del serviceContext antes de crear la nueva actividad
 					if(this.cloneActivityClassificationTypes){
 						
@@ -429,18 +429,17 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 							larnServiceContext.setAssetTagNames(entryActivity.getTagNames());
 							larnServiceContext.setExpandoBridgeAttributes(activity.getExpandoBridge().getAttributes());
 					
+							//---Clonar la clasificación de la actividad
+							if(log.isDebugEnabled())
+								log.debug(":::Clone activity classification types::: Activity " + activity.getActId());
 						}
-						
-						//---Clonar la clasificación de la actividad
-						if(log.isDebugEnabled())
-							log.debug(":::Clone activity classification types::: Activity " + activity.getActId());
-							
-						
-					}
+          }	
+
 					
 					nuevaLarn=LearningActivityLocalServiceUtil.addLearningActivity(newLearnActivity,larnServiceContext);
 					nuevaLarn.setExpandoBridgeAttributes(larnServiceContext);
 					nuevaLarn.getExpandoBridge().setAttributes(activity.getExpandoBridge().getAttributes());
+
 					if(log.isDebugEnabled()){
 						log.debug("      Learning Activity : " + activity.getTitle(Locale.getDefault())+ " ("+activity.getActId()+", " + LanguageUtil.get(Locale.getDefault(),learningActivityTypeRegistry.getLearningActivityType(activity.getTypeId()).getName())+")");
 						log.debug("      + Learning Activity : " + nuevaLarn.getTitle(Locale.getDefault())+ " ("+nuevaLarn.getActId()+", " + LanguageUtil.get(Locale.getDefault(),learningActivityTypeRegistry.getLearningActivityType(nuevaLarn.getTypeId()).getName())+")");
