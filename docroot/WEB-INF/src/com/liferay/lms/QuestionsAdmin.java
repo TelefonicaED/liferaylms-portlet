@@ -121,7 +121,7 @@ public class QuestionsAdmin extends MVCPortlet{
 				TestQuestionLocalServiceUtil.moveQuestion(questionId, prevQuestionId, nextQuestionId);
 			}
 		}
-
+		
 		String orderByCol = ParamUtil.getString(actionRequest, "orderByCol");
 		if(orderByCol==null || orderByCol=="")
 			orderByCol = "weight";
@@ -739,8 +739,18 @@ public class QuestionsAdmin extends MVCPortlet{
 						try{
 							if(!firstLine){
 								try{	
-									questionTitle = (row.getCell(COLUMN_INDEX_QUESTION_TITLE))!=null?row.getCell(COLUMN_INDEX_QUESTION_TITLE).getStringCellValue():"";
-									answerTitle = (row.getCell(COLUMN_INDEX_ANSWER_TITLE))!=null?row.getCell(COLUMN_INDEX_ANSWER_TITLE).getStringCellValue():"";
+									try{
+										questionTitle = (row.getCell(COLUMN_INDEX_QUESTION_TITLE))!=null?row.getCell(COLUMN_INDEX_QUESTION_TITLE).getStringCellValue():"";
+									} catch (Exception e){
+										log.debug(e);
+										questionTitle = String.valueOf(row.getCell(COLUMN_INDEX_QUESTION_TITLE).getNumericCellValue());
+									}
+									try{
+										answerTitle = (row.getCell(COLUMN_INDEX_ANSWER_TITLE))!=null?row.getCell(COLUMN_INDEX_ANSWER_TITLE).getStringCellValue():"";
+									} catch (Exception e){
+										log.debug(e);
+										answerTitle = String.valueOf(row.getCell(COLUMN_INDEX_ANSWER_TITLE).getNumericCellValue());
+									}
 									answerIsCorrect = Boolean.parseBoolean((row.getCell(COLUMN_INDEX_ANSWER_TITLE))!=null?row.getCell(COLUMN_INDEX_ANSWER_IS_CORRECT).getStringCellValue():"false");
 									feedbackCorrect =  (row.getCell(COLUMN_INDEX_ANSWER_FEEDBACK_CORRECT))!=null?row.getCell(COLUMN_INDEX_ANSWER_FEEDBACK_CORRECT).getStringCellValue():"";
 									feedbackIncorrect = (row.getCell(COLUMN_INDEX_ANSWER_FEEDBACK_INCORRECT))!=null?row.getCell(COLUMN_INDEX_ANSWER_FEEDBACK_INCORRECT).getStringCellValue():"";

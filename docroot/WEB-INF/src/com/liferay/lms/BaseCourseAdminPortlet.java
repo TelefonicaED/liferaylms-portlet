@@ -561,6 +561,8 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 			if(log.isDebugEnabled())e1.printStackTrace();
 		}
 		
+		
+		
 		long courseId = ParamUtil.getLong(uploadRequest, "courseId", 0);
 		long courseTypeId = ParamUtil.getLong(uploadRequest, "courseTypeId", 0);
 		

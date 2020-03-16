@@ -29,7 +29,6 @@
 	
 	// Obtenemos todos los classname distintos para efectuar la lista;
 	List<String> classNamesList = AsynchronousProcessAuditLocalServiceUtil.getDistinctTypes(themeDisplay.getCompanyId());
-	
 %>
 
 <liferay-ui:error key="sucess" message="sucess" />
