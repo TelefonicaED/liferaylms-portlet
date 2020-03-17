@@ -13,6 +13,7 @@ El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 ### Updated
 
 - #167661 Cambio de literal en actividad de evaluación
+- #177082 Permiso de módulo por defecto al scope group
 
 ### Fixed
 
