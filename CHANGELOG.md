@@ -13,13 +13,15 @@ El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 ### Updated
 
 - #167661 Cambio de literal en actividad de evaluación
-- #177082 Permiso de módulo por defecto al scope group
+- #177082 Permiso de módulo por defecto al scope group y no se ponen fechas al módulo por defecto
 
 ### Fixed
 
 - #176579 Corrección al eliminar turores y editores de un curso
 - #175947 Corrección en tabla de procesos asíncronos cuando configuras solo un tipo
 - #176560 Si la respuesta de las preguntas en la importación son númericos se importan
+- #168038 Ya no se sobreescribe el título del curso en el idioma por defecto cuando estás en otro idioma
+- #177114 Los módulos aparecían bloqueados cuando no tenáin fecha
 
 ## [4.1.0](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v4.1.0)
 

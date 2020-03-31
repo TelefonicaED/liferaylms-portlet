@@ -29,7 +29,7 @@
 	boolean hasPermissionAccessCourseFinished = LiferaylmsUtil.hasPermissionAccessCourseFinished(themeDisplay.getCompanyId(), course.getGroupCreatedId(), course.getCourseId(), themeDisplay.getUserId());
 	
 	for(Module module:allModules) {
-		boolean canAccess = (Validator.isNull(module.getStartDate()))?true:!module.getStartDate().after(now);
+		boolean canAccess = module.isLocked(themeDisplay.getUserId());
 		boolean moduleEditing = permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), Module.class.getName(), themeDisplay.getScopeGroupId(), ActionKeys.UPDATE);
 		if(hasPermissionAccessCourseFinished || (actionEditing&&moduleEditing)||(canAccess&&(canAccessLock||!ModuleLocalServiceUtil.isLocked(module.getModuleId(),themeDisplay.getUserId())))) {
 			modules.add(module);

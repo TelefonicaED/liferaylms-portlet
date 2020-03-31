@@ -104,13 +104,13 @@ public class PonderatedCourseEval extends BaseCourseEval {
 	public boolean updateCourse(Course course, long userId) throws SystemException{
 
 		CourseResult courseResult=CourseResultLocalServiceUtil.getByUserAndCourse(course.getCourseId(), userId);
-		//.fetchByuc(mresult.getUserId(), course.getCourseId());
+
 		if(courseResult==null){
-			courseResult=CourseResultLocalServiceUtil.create(course.getCourseId(), userId);
+			courseResult = CourseResultLocalServiceUtil.addCourseResult(0, course.getCourseId(), userId);
 		}
 
 		if(courseResult.getStartDate() == null){
-			courseResult.setStartDate(new Date());
+			courseResult = CourseResultLocalServiceUtil.initializeCourseResult(courseResult);
 		}
 		
 		try {

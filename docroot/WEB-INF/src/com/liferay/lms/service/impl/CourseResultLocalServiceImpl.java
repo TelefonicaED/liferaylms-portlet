@@ -53,6 +53,7 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.User;
 import com.liferay.portal.security.permission.ActionKeys;
+import com.liferay.portal.service.ServiceContext;
 
 /**
  * The implementation of the course result local service.
@@ -84,6 +85,56 @@ public class CourseResultLocalServiceImpl
 			e.printStackTrace();
 		}
 		return results;
+	}
+	
+	/**
+	 * Crear un courseresult para el alumno cuando se inscribe
+	 * @param userId identificador del usuario que está inscribiendo
+	 * @param courseId identificador del curso
+	 * @param studentId usuario que se inscribe en el curso
+	 * @param serviceContext
+	 * @return
+	 * @throws SystemException 
+	 * @throws PortalException 
+	 */
+	@Override
+	public CourseResult addCourseResult(long userModifiedId, long courseId, long studentId) throws SystemException {
+		return addCourseResult(userModifiedId, courseId, studentId, null, null);
+	}
+	
+	/**
+	 * Crear un courseresult para el alumno cuando se inscribe
+	 * @param userId identificador del usuario que está inscribiendo
+	 * @param courseId identificador del curso
+	 * @param studentId usuario que se inscribe en el curso
+	 * @param serviceContext
+	 * @return
+	 * @throws SystemException 
+	 * @throws PortalException 
+	 */
+	@Override
+	public CourseResult addCourseResult(long userModifiedId, long courseId, long studentId, Date allowStartDate, Date allowEndDate) throws SystemException {
+		CourseResult courseResult = null;
+		
+		courseResult = courseResultPersistence.create(counterLocalService.increment(CourseResult.class.getName()));
+		courseResult.setCourseId(courseId);
+		courseResult.setUserId(studentId);
+		courseResult.setResult(0);
+		courseResult.setRegistrationDate(new Date());
+		courseResult.setPassed(false);
+		courseResult.setAllowStartDate(allowStartDate);
+		courseResult.setAllowFinishDate(allowEndDate);
+		try {
+			Course course = courseLocalService.getCourse(courseId);
+			courseResult.setCompanyId(course.getCompanyId());
+		} catch (PortalException e) {
+			e.printStackTrace();
+		}
+		courseResult.setUserModifiedId(userModifiedId);
+		
+		courseResultPersistence.update(courseResult, true);
+		
+		return courseResult;
 	}
 	
 	@Deprecated
@@ -183,7 +234,7 @@ public class CourseResultLocalServiceImpl
 	}
 	
 	/**
-	 * @deprecated ESTE LO VAMOS A DEPRECAR, HABR�A QUE LLAMAR AL MÉTODO countStudentsByCourseId o countStudentsByCourseIdUserIdsStarted 
+	 * @deprecated ESTE LO VAMOS A DEPRECAR, HABR�A QUE LLAMAR AL MÉTODO countStudentsByCourseId o countStudentsByCourseIdUserIdsStarted 
 	 * Cuenta los estudiantes que han iniciado el curso
 	 * @param course curso del que quiero los usuarios
 	 * @param students lista de estudiantes, si se pasa a null se obtienen dentro de la función
@@ -428,34 +479,47 @@ public class CourseResultLocalServiceImpl
 		return CourseResultFinderUtil.avgResultByCourseId(courseId, passed, null, userExcludedIds);
 	}
 	
-	public CourseResult create(long courseId, long userId) throws SystemException
-	{
-
-		CourseResult courseResult=courseResultPersistence.create(counterLocalService.increment(CourseResult.class.getName()));
-		courseResult.setUserId(userId);
-		courseResult.setCourseId(courseId);
-		courseResult.setResult(0);
-		courseResult.setPassed(false);
-		courseResult.setPassedDate(null);
+	/**
+	 * Inicializa el courseresult cuando un usuario lo ha comenzado
+	 * @param courseResult
+	 * @return
+	 * @throws SystemException
+	 */
+	@Override
+	public CourseResult initializeCourseResult(CourseResult courseResult) throws SystemException{
 		courseResult.setStartDate(new Date());
-		courseResultPersistence.update(courseResult, false);
+		courseResult = courseResultPersistence.update(courseResult, false);
 		
-
 		return courseResult;
 	}
-	public CourseResult create(long courseId, long userId,Date allowStartDate,Date allowFinishDate) throws SystemException
-	{
-
-		CourseResult courseResult=courseResultPersistence.create(counterLocalService.increment(CourseResult.class.getName()));
-		courseResult.setUserId(userId);
-		courseResult.setCourseId(courseId);
-		courseResult.setResult(0);
-		courseResult.setPassed(false);
-		courseResult.setPassedDate(null);
-		courseResult.setAllowStartDate(allowStartDate);
-		courseResult.setAllowFinishDate(allowFinishDate);
+	
+	/**
+	 * Te crea el courseresult inicializando startDate
+	 * @param courseId id del curso
+	 * @param userId id del estudiante
+	 */
+	@Deprecated
+	public CourseResult create(long courseId, long userId) throws SystemException {
+		CourseResult courseResult = addCourseResult(0, courseId, userId);
 		courseResult.setStartDate(new Date());
-		courseResultPersistence.update(courseResult, false);
+		courseResult = courseResultPersistence.update(courseResult, false);
+		
+		return courseResult;
+	}
+	
+	/**
+	 * Te crea el courseresult inicializando startDate
+	 * @param courseId id del curso
+	 * @param userId id del estudiante
+	 * @param allowStartDate fecha de inicio para el alumno permitida
+	 * @param allowFinishDate fecha de fin para el alumno permitida
+	 */
+	@Deprecated
+	public CourseResult create(long courseId, long userId,Date allowStartDate,Date allowFinishDate) throws SystemException{
+
+		CourseResult courseResult = addCourseResult(0, courseId, userId, allowStartDate, allowFinishDate);
+		courseResult.setStartDate(new Date());
+		courseResult = courseResultPersistence.update(courseResult, false);
 
 		return courseResult;
 	}
@@ -489,7 +553,7 @@ public class CourseResultLocalServiceImpl
 			Course course = courseLocalService.fetchCourse(cresult.getCourseId());
 			associateCompetencesToUser(courseCompetencePersistence.findBycourseId(cresult.getCourseId(), false), cresult.getUserId());
 			
-			//Si tiene curso padre, asignamos las del curso padre tambi�n.
+			//Si tiene curso padre, asignamos las del curso padre tambi�n.
 			if(course.getParentCourseId()>0){
 				associateCompetencesToUser(courseCompetencePersistence.findBycourseId(course.getParentCourseId(), false), cresult.getUserId());
 			}

@@ -35,7 +35,7 @@ public class CourseResultCacheModel implements CacheModel<CourseResult>,
 	Serializable {
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(23);
+		StringBundler sb = new StringBundler(29);
 
 		sb.append("{crId=");
 		sb.append(crId);
@@ -49,6 +49,8 @@ public class CourseResultCacheModel implements CacheModel<CourseResult>,
 		sb.append(userId);
 		sb.append(", passed=");
 		sb.append(passed);
+		sb.append(", registrationDate=");
+		sb.append(registrationDate);
 		sb.append(", startDate=");
 		sb.append(startDate);
 		sb.append(", passedDate=");
@@ -59,6 +61,10 @@ public class CourseResultCacheModel implements CacheModel<CourseResult>,
 		sb.append(allowFinishDate);
 		sb.append(", extraData=");
 		sb.append(extraData);
+		sb.append(", companyId=");
+		sb.append(companyId);
+		sb.append(", userModifiedId=");
+		sb.append(userModifiedId);
 		sb.append("}");
 
 		return sb.toString();
@@ -80,6 +86,13 @@ public class CourseResultCacheModel implements CacheModel<CourseResult>,
 
 		courseResultImpl.setUserId(userId);
 		courseResultImpl.setPassed(passed);
+
+		if (registrationDate == Long.MIN_VALUE) {
+			courseResultImpl.setRegistrationDate(null);
+		}
+		else {
+			courseResultImpl.setRegistrationDate(new Date(registrationDate));
+		}
 
 		if (startDate == Long.MIN_VALUE) {
 			courseResultImpl.setStartDate(null);
@@ -116,6 +129,9 @@ public class CourseResultCacheModel implements CacheModel<CourseResult>,
 			courseResultImpl.setExtraData(extraData);
 		}
 
+		courseResultImpl.setCompanyId(companyId);
+		courseResultImpl.setUserModifiedId(userModifiedId);
+
 		courseResultImpl.resetOriginalValues();
 
 		return courseResultImpl;
@@ -127,9 +143,12 @@ public class CourseResultCacheModel implements CacheModel<CourseResult>,
 	public String comments;
 	public long userId;
 	public boolean passed;
+	public long registrationDate;
 	public long startDate;
 	public long passedDate;
 	public long allowStartDate;
 	public long allowFinishDate;
 	public String extraData;
+	public long companyId;
+	public long userModifiedId;
 }
