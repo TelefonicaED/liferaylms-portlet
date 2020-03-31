@@ -17,12 +17,16 @@ public class UpgradeVersion_4_2_0 extends UpgradeProcess {
 	}
 	
 	protected void doUpgrade() throws Exception {
-		log.info("Actualizando version a 4.1.0");
+		log.info("Actualizando version a 4.2.0");
 
-		String updateCourseResult = "ALTER TABLE `lms_courseresult` ADD COLUMN `registrationDate` DATETIME NULL AFTER `passed`;";
 	
-		DB db = DBFactoryUtil.getDB();
-		log.info("Alter table lms_courseresult -->> Add registrationDate");
+		DB db = DBFactoryUtil.getDB();	
+		
+		String updateCourseResult = "ALTER TABLE `lms_courseresult` ADD COLUMN `registrationDate` DATETIME NULL AFTER `passed`, "
+				+ "ADD COLUMN `companyId` BIGINT(20) NULL AFTER `extraData`, "
+				+ "ADD COLUMN `userModifiedId` BIGINT(20) NULL AFTER `companyId`;";
+		
+		log.info("Alter table lms_courseresult -->> Add companyId, userModifiedId");
 		try {
 			db.runSQL(updateCourseResult);
 		} catch (IOException | SQLException e) {
