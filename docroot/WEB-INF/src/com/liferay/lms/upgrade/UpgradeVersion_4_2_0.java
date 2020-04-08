@@ -15,7 +15,8 @@ public class UpgradeVersion_4_2_0 extends UpgradeProcess {
 	public int getThreshold() {
 		return 420;
 	}
-		protected void doUpgrade() throws Exception {
+	
+	protected void doUpgrade() throws Exception {
 		log.info("Actualizando version a 4.2.0");
 
 	

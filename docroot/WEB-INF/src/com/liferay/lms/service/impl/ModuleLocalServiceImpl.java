@@ -579,46 +579,35 @@ public class ModuleLocalServiceImpl extends ModuleLocalServiceBaseImpl {
 		return moduleResult!=null && moduleResult.getPassed();
 	}
 	
-	public boolean isUserFinished(long moduleId,long userId) throws SystemException, PortalException
-	{
-		if(isUserPassed(moduleId, userId))
-		{
+	public boolean isUserFinished(long moduleId,long userId) throws SystemException, PortalException {
+		if(isUserPassed(moduleId, userId)) {
 			return true;
 		}
-		if(userTimeFinished(moduleId, userId))
-		{
+		if(userTimeFinished(moduleId, userId)){
 			return true;
 		}
 		List<LearningActivity> activities = LearningActivityLocalServiceUtil.getLearningActivitiesOfModule(moduleId);
 		boolean finished = false;
-		for(LearningActivity activity : activities)
-		{	
-			if(activity.getWeightinmodule()!=0)
-			{
+		for(LearningActivity activity : activities){	
+			if(activity.getWeightinmodule()!=0){
 				LearningActivityTry activityTry = LearningActivityTryLocalServiceUtil.getLastLearningActivityTryByActivityAndUser(activity.getActId(), userId);
-				if(activityTry!=null)
-				{
-					if(activityTry.getEndUserDate()!=null)
-					{
+				if(activityTry!=null){
+					if(activityTry.getEndUserDate()!=null){
 						finished = true;
-					}
-					else
-					{
+					} else {
 						return false;
 					}
-				}
-				else
-				{
+				} else {
 					return false;
 				}
 			}
 		}
-		if(finished)
-		{
+		if(finished) {
 			return true;
 		}
 		return false;
 	}
+	
 	public boolean userTimeFinished(long moduleId,long userId) throws SystemException, PortalException
 	{
 		Module theModule=ModuleLocalServiceUtil.getModule(moduleId);

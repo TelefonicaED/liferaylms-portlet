@@ -9,6 +9,7 @@ El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 ### Added
 
 - #167661 Se añade la posiblidad de publicar notas individuales después de publicar la general en las actividades de evaluación
+- #176051 Se añade modo de visualización para columna grande en el portlet de inscripción
 
 ### Updated
 

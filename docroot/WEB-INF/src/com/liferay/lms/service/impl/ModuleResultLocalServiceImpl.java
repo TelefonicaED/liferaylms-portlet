@@ -644,7 +644,7 @@ public class ModuleResultLocalServiceImpl extends ModuleResultLocalServiceBaseIm
 			}
 		}
 		
-		//S�lo actualizamos si cambia el resultado.
+		//Solo actualizamos si cambia el resultado.
 		
 		log.debug("Vamos a ver si actualizamos...");
 		log.debug("Module result "+moduleResult.getResult());
