@@ -14,20 +14,28 @@
 
 package com.liferay.lms.service.impl;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import javax.portlet.PortletPreferences;
+import javax.portlet.ReadOnlyException;
+import javax.portlet.ValidatorException;
+
 import com.liferay.lms.NoSuchCourseTypeException;
 import com.liferay.lms.model.CourseType;
 import com.liferay.lms.service.base.CourseTypeLocalServiceBaseImpl;
 import com.liferay.lms.service.persistence.CourseTypeFinderUtil;
+import com.liferay.lms.util.LmsConstant;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.service.PortalPreferencesLocalServiceUtil;
 import com.liferay.portal.service.UserLocalServiceUtil;
 
 /**
@@ -74,7 +82,8 @@ public class CourseTypeLocalServiceImpl extends CourseTypeLocalServiceBaseImpl {
 	}
 	
 	public CourseType addCourseType(long companyId, long userId, long groupId, Map<Locale, String> nameMap, Map<Locale, String> descriptionMap, long[] templateIds,
-			long[] courseEvalTypeIds, long[] learningActivityTypeIds, long[] inscriptionTypeIds, long[] calificationTypeIds, long iconImageId) throws SystemException {
+			long[] editionTemplateIds, long[] courseEvalTypeIds, long[] learningActivityTypeIds, long[] inscriptionTypeIds, long[] calificationTypeIds, 
+			long iconImageId) throws SystemException {
 		
 		if(log.isDebugEnabled()){
 			log.debug("::addCourseType:: companyId :: " + companyId);
@@ -83,6 +92,7 @@ public class CourseTypeLocalServiceImpl extends CourseTypeLocalServiceBaseImpl {
 			log.debug("::addCourseType:: nameMap :: " + nameMap);
 			log.debug("::addCourseType:: descriptionMap :: " + descriptionMap);
 			log.debug("::addCourseType:: templateIds :: " + templateIds.length);
+			log.debug("::addCourseType:: editionTemplateIds :: " + editionTemplateIds.length);
 			log.debug("::addCourseType:: courseEvalTypeIds :: " + courseEvalTypeIds.length);
 			log.debug("::addCourseType:: learningActivityTypeIds :: " + learningActivityTypeIds.length);
 			log.debug("::addCourseType:: inscriptionTypeIds :: " + inscriptionTypeIds.length);
@@ -90,8 +100,9 @@ public class CourseTypeLocalServiceImpl extends CourseTypeLocalServiceBaseImpl {
 			log.debug("::addCourseType:: iconImageId :: " + iconImageId);
 		}
 		
-		//PK Field	
-		CourseType courseType = courseTypePersistence.create(counterLocalService.increment(CourseType.class.getName()));
+		//PK Field
+		long courseTypeId = counterLocalService.increment(CourseType.class.getName());
+		CourseType courseType = courseTypePersistence.create(courseTypeId);
 		//Audit fields
 		courseType.setCompanyId(companyId);
 		courseType.setUserId(userId);
@@ -112,6 +123,9 @@ public class CourseTypeLocalServiceImpl extends CourseTypeLocalServiceBaseImpl {
 		//Añadir plantillas de site
 		if(Validator.isNotNull(templateIds)  && templateIds.length>0)
 			courseTypeTemplateLocalService.addListCourseTypeTemplates(courseType.getCourseTypeId(), templateIds);
+		if(Validator.isNotNull(templateIds)  && templateIds.length>0){
+			savePreference(LmsConstant.EDITION_TEMPLATE_IDS + "." + courseTypeId, StringUtil.merge(editionTemplateIds, ","), companyId);
+		}
 		//Añadir métodos de evaluación
 		if(Validator.isNotNull(courseEvalTypeIds)  && courseEvalTypeIds.length>0)
 			courseTypeCourseEvalLocalService.addListCourseTypeCourseEvals(courseType.getCourseTypeId(), courseEvalTypeIds);
@@ -128,8 +142,8 @@ public class CourseTypeLocalServiceImpl extends CourseTypeLocalServiceBaseImpl {
 	}
 	
 	public CourseType updateCourseType(long courseTypeId, Map<Locale, String> nameMap, Map<Locale, String> descriptionMap, long[] templateIds,
-			long[] courseEvalTypeIds, long[] learningActivityTypeIds, long[] inscriptionTypeIds, long[] calificationTypeIds, long iconImageId,
-			boolean deleteIcon) throws SystemException{
+			long[] editionTemplateIds, long[] courseEvalTypeIds, long[] learningActivityTypeIds, long[] inscriptionTypeIds, long[] calificationTypeIds, 
+			long iconImageId, boolean deleteIcon) throws SystemException{
 		
 		if(log.isDebugEnabled()){
 			log.debug("::updateCourseType:: courseTypeId :: " + courseTypeId);
@@ -137,6 +151,7 @@ public class CourseTypeLocalServiceImpl extends CourseTypeLocalServiceBaseImpl {
 			log.debug("::updateCourseType:: descriptionMap :: " + descriptionMap);
 			log.debug("::updateCourseType:: nameMap :: " + nameMap);
 			log.debug("::updateCourseType:: templateIds :: " + templateIds.length);
+			log.debug("::updateCourseType:: editionTemplateIds :: " + editionTemplateIds.length);
 			log.debug("::updateCourseType:: courseEvalTypeIds :: " + courseEvalTypeIds.length);
 			log.debug("::updateCourseType:: learningActivityTypeIds :: " + learningActivityTypeIds.length);
 			log.debug("::updateCourseType:: inscriptionTypeIds :: " + inscriptionTypeIds.length);
@@ -173,6 +188,10 @@ public class CourseTypeLocalServiceImpl extends CourseTypeLocalServiceBaseImpl {
 					if(!listTemplatesIdsOfCourseType.contains(templateIds[i]))
 						courseTypeTemplateLocalService.addCourseTypeTemplate(courseType.getCourseTypeId(), templateIds[i]);
 				}
+			}
+			
+			if(Validator.isNotNull(templateIds)  && templateIds.length>0){
+				savePreference(LmsConstant.EDITION_TEMPLATE_IDS + "." + courseTypeId, StringUtil.merge(editionTemplateIds, ","), courseType.getCompanyId());
 			}
 				
 			//Métodos de evaluación
@@ -236,5 +255,34 @@ public class CourseTypeLocalServiceImpl extends CourseTypeLocalServiceBaseImpl {
 			courseType = courseTypePersistence.remove(courseTypeId);
 		}
 		return courseType;
+	}
+	
+	private boolean savePreference(String key,String value, long companyId) throws SystemException {
+		
+		PortletPreferences prefs= PortalPreferencesLocalServiceUtil.getPreferences(companyId, companyId, 1);
+		boolean error = false;
+		if(!"".equals(key)&&!prefs.isReadOnly(key))
+		{
+			try {
+				prefs.setValue(key, value);
+			} catch (ReadOnlyException e) {
+				e.printStackTrace();
+				error=true;
+			}
+			try {
+				prefs.store();
+			} catch (ValidatorException e) {
+				e.printStackTrace();
+				error=true;
+			} catch (IOException e) {
+				e.printStackTrace();
+				error=true;
+			}
+		}
+		else
+		{
+			error=true;
+		}
+		return error;
 	}
 }

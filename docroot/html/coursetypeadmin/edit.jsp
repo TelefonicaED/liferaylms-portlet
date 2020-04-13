@@ -39,6 +39,17 @@
 				</aui:option>
 			</c:forEach>
 		</aui:select>
+		<aui:select required="true" label="edition-template" name="editionTemplateIds" multiple="true"  ignoreRequestValue="true">
+			<c:set var="editionTemplateIds" value="${courseType.editionTemplateIds }"/>
+			<c:forEach items="${listTemplates }" var="template">
+				<aui:option 
+					value="${template.layoutSetPrototypeId }" 
+					selected="${not empty editionTemplateIds and editionTemplateIds.contains(template.layoutSetPrototypeId ) }"
+					disabled="${not empty editionTemplateIds and editionTemplateIds.contains(template.layoutSetPrototypeId ) }">
+						${template.getName(themeDisplay.locale) }
+				</aui:option>
+			</c:forEach>
+		</aui:select>
 		
 		<aui:select required="true" label="course-correction-method" name="courseEvalIds" multiple="true"  helpMessage="${not empty courseType.courseEvalTypeIds ? 'coursetypeadmin.coursetype-has-course-eval-types.only-add' : ''}" ignoreRequestValue="true">
 			<c:forEach items="${listCourseEvals }" var="courseEval">

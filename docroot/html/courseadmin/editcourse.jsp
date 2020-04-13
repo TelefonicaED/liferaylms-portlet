@@ -785,7 +785,7 @@ if(isCourseChild){
 			%>
 				<aui:input name="courseTemplate" value="<%=lsp.getLayoutSetPrototypeId()%>" type="hidden"/>
 			<%}
-		} else {
+		} else if(!isCourseChild){
 			%>
 			<aui:select name="courseTemplate" label="course-template" disabled="<%=(course==null)?false:true %>">
 			<%
@@ -797,7 +797,18 @@ if(isCourseChild){
 			%>
 			</aui:select>
 			<%
-		}
+		}else{%>
+			<aui:select name="courseTemplate" label="course-template" disabled="<%=(course==null)?false:true %>">
+			<%
+			List<Long> editionTemplateIds = courseType.getEditionTemplateIds();
+			for(LayoutSetPrototype template:courseType.getTemplates()){
+				%>
+				<aui:option value="<%=template.getLayoutSetPrototypeId() %>" selected="<%=templateParent == template.getLayoutSetPrototypeId() %>"><%=template.getName(themeDisplay.getLocale()) %></aui:option>
+				<%
+			}
+			%>
+			</aui:select>
+		<%}
 		
 		List <Long> califications = new ArrayList<Long>();
 		if(courseType!=null){
