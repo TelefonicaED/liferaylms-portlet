@@ -609,11 +609,17 @@
 		<column name="comments" type="String"></column>
 		<column name="userId" type="long" primary="false"></column>
 		<column name="passed" type="boolean"></column>
+		<column name="registrationDate" type="Date" />
 		<column name="startDate" type="Date" />
 		<column name="passedDate" type="Date" convert-null="true"/>
 		<column name="allowStartDate" type="Date"/>
 		<column name="allowFinishDate" type="Date"/>
         <column name="extraData" type="String"></column>
+        
+        <!-- Audit fields -->
+        <column name="companyId" type="long" />
+		<column name="userModifiedId" type="long" />
+        
 		<finder name="uc" return-type="CourseResult" unique="true">
 			<finder-column name="userId" />
 			<finder-column name="courseId" />

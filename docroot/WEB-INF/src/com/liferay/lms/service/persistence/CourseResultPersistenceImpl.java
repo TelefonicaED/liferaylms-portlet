@@ -804,11 +804,14 @@ public class CourseResultPersistenceImpl extends BasePersistenceImpl<CourseResul
 		courseResultImpl.setComments(courseResult.getComments());
 		courseResultImpl.setUserId(courseResult.getUserId());
 		courseResultImpl.setPassed(courseResult.isPassed());
+		courseResultImpl.setRegistrationDate(courseResult.getRegistrationDate());
 		courseResultImpl.setStartDate(courseResult.getStartDate());
 		courseResultImpl.setPassedDate(courseResult.getPassedDate());
 		courseResultImpl.setAllowStartDate(courseResult.getAllowStartDate());
 		courseResultImpl.setAllowFinishDate(courseResult.getAllowFinishDate());
 		courseResultImpl.setExtraData(courseResult.getExtraData());
+		courseResultImpl.setCompanyId(courseResult.getCompanyId());
+		courseResultImpl.setUserModifiedId(courseResult.getUserModifiedId());
 
 		return courseResultImpl;
 	}

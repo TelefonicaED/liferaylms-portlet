@@ -48,13 +48,13 @@ public class MandatoryAvgCourseEval extends BaseCourseEval {
 		CourseResult courseResult=CourseResultLocalServiceUtil.getByUserAndCourse(course.getCourseId(), userId);
 
 		if(courseResult==null){
-			courseResult=CourseResultLocalServiceUtil.create(course.getCourseId(), userId);
+			courseResult=CourseResultLocalServiceUtil.addCourseResult(0, course.getCourseId(), userId);
 			//auditing
 			AuditingLogFactory.audit(course.getCompanyId(), course.getGroupId(), CourseResult.class.getName(), courseResult.getPrimaryKey(), userId, AuditConstants.CREATE, null);
 		}
 
 		if(courseResult.getStartDate() == null){
-			courseResult.setStartDate(new Date());
+			courseResult = CourseResultLocalServiceUtil.initializeCourseResult(courseResult);
 		}
 		
 		boolean passed=true;

@@ -139,6 +139,7 @@
 		</field>
 		<field name="userId" type="long" />
 		<field name="passed" type="boolean" />
+		<field name="registrationDate" type="Date" />
 		<field name="startDate" type="Date" />
 		<field name="passedDate" type="Date" />
 		<field name="allowStartDate" type="Date" />
@@ -146,6 +147,8 @@
 		<field name="extraData" type="String">
 			<hint name="max-length">500000</hint>
 		</field>
+		<field name="companyId" type="long" />
+		<field name="userModifiedId" type="long" />
 	</model>
 	<model name="com.liferay.lms.model.CourseType">
 		<field name="courseTypeId" type="long" />

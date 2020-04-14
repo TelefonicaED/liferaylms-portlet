@@ -561,6 +561,8 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 			if(log.isDebugEnabled())e1.printStackTrace();
 		}
 		
+		
+		
 		long courseId = ParamUtil.getLong(uploadRequest, "courseId", 0);
 		long courseTypeId = ParamUtil.getLong(uploadRequest, "courseTypeId", 0);
 		
@@ -578,16 +580,13 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 		Locale localeDefault = null;
 		try {
 			localeDefault = themeDisplay.getCompany().getLocale();
-		} catch (PortalException e) {
-			e.printStackTrace();
-			localeDefault = LocaleUtil.getDefault();
-		} catch (SystemException e) {
+		} catch (PortalException | SystemException e) {
 			e.printStackTrace();
 			localeDefault = LocaleUtil.getDefault();
 		}
 		
 		Map<Locale,String> titleMap = LmsLocaleUtil.getLocalizationMap(uploadRequest, "title");
-		if(!localeDefault.equals(themeDisplay.getLocale()))
+		if(!localeDefault.equals(themeDisplay.getLocale()) && Validator.isNull(titleMap.get(localeDefault)))
 			titleMap.put(localeDefault, titleMap.get(themeDisplay.getLocale()));
 		
 		if(titleMap == null || Validator.isNull(titleMap.get(themeDisplay.getLocale()))){
@@ -1144,9 +1143,7 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 		if (roleId != siteMember.getRoleId()) {
 			
 			List<UserGroupRole> userGroupRoles = UserGroupRoleLocalServiceUtil.getUserGroupRoles(userId,course.getGroupCreatedId());
-			if((userGroupRoles.isEmpty())||
-				((userGroupRoles.size()==1)&&
-				 (siteMember.getRoleId()==userGroupRoles.get(0).getRoleId()))){
+			if(userGroupRoles.isEmpty() || userGroupRoles.size() == 1 || (userGroupRoles.size()== 2 && (siteMember.getRoleId()==userGroupRoles.get(0).getRoleId() || siteMember.getRoleId() == userGroupRoles.get(1).getRoleId()))){
 				GroupLocalServiceUtil.unsetUserGroups(userId,
 						new long[] { course.getGroupCreatedId() });
 			}
@@ -1299,7 +1296,6 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 
 		UploadPortletRequest request = PortalUtil.getUploadPortletRequest(portletRequest);
 		long courseId = ParamUtil.getLong(portletRequest, "courseId", 0);
-		long companyId= themeDisplay.getCompanyId();
 		long roleId = ParamUtil.getLong(portletRequest, "roleId", 0);
 		String fileName = request.getFileName("fileName");
 		Course course = CourseLocalServiceUtil.getCourse(courseId);
@@ -1439,22 +1435,11 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 												
 												CourseResult courseResult=CourseResultLocalServiceUtil.getCourseResultByCourseAndUser(courseId, user.getUserId());
 												if(courseResult==null){
-													courseResult=CourseResultLocalServiceUtil.createCourseResult(CounterLocalServiceUtil.increment(CourseResult.class.getName()));
-													courseResult.setUserId(user.getUserId());
-													courseResult.setCourseId(courseId);
-													courseResult.setResult(0);
-													courseResult.setPassed(false);
-													courseResult.setPassedDate(null);
-													courseResult.setAllowStartDate(allowStartDate);
-													courseResult.setAllowFinishDate(allowFinishDate);
-													courseResult.setStartDate(allowStartDate);
-													CourseResultLocalServiceUtil.addCourseResult(courseResult);
+													courseResult = CourseResultLocalServiceUtil.addCourseResult(themeDisplay.getUserId(), courseId, user.getUserId(), allowStartDate, allowFinishDate);
 												}else{
 													courseResult.setAllowStartDate(allowStartDate);
 													courseResult.setAllowFinishDate(allowFinishDate);
-													if(courseResult.getStartDate()==null){
-														courseResult.setStartDate(allowStartDate);
-													}
+
 													CourseResultLocalServiceUtil.updateCourseResult(courseResult);
 												}
 																								

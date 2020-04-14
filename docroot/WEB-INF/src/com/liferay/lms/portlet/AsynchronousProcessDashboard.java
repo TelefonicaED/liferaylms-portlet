@@ -18,6 +18,8 @@ import javax.portlet.ResourceResponse;
 import com.liferay.lms.model.AsynchronousProcessAudit;
 import com.liferay.lms.service.AsynchronousProcessAuditLocalServiceUtil;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -215,61 +217,82 @@ public class AsynchronousProcessDashboard extends MVCPortlet {
 			String classNameValue = ParamUtil.getString(resourceRequest,"className", "");
 			List<AsynchronousProcessAudit> asynchronousProcesses = new ArrayList<AsynchronousProcessAudit>();
 			// Obtenemos las fechas para la búsqueda
-				int startDay = ParamUtil.getInteger(resourceRequest, "startDay", -1);
-				int startMonth = ParamUtil.getInteger(resourceRequest, "startMonth",
-						-1);
-				int startYear = ParamUtil
-						.getInteger(resourceRequest, "startYear", -1);
-				int endDay = ParamUtil.getInteger(resourceRequest, "endDay", -1);
-				int endMonth = ParamUtil.getInteger(resourceRequest, "endMonth", -1);
-				int endYear = ParamUtil.getInteger(resourceRequest, "endYear", -1);
-				boolean showExtraContent = ParamUtil.getBoolean(resourceRequest, "showExtraContent", false);
-				Date startDate = null;
-				if (startDay != -1 && startMonth != -1 && startYear != -1) {
-					Calendar startCalendar = Calendar.getInstance();
-					startCalendar.set(Calendar.YEAR, startYear);
-					startCalendar.set(Calendar.MONTH, startMonth);
-					startCalendar.set(Calendar.DAY_OF_MONTH, startDay);
-					startDate = startCalendar.getTime();
-				}
-		
-				Date endDate = null;
-				if (endDay != -1 && endMonth != -1 && endYear != -1) {
-					Calendar endCalDate = Calendar.getInstance();
-					endCalDate.set(Calendar.YEAR, endYear);
-					endCalDate.set(Calendar.MONTH, endMonth);
-					endCalDate.set(Calendar.DAY_OF_MONTH, endDay);
-					endDate = endCalDate.getTime();
-				}
-				
-				PortletURL iteratorURL = resourceResponse.createRenderURL();
-				iteratorURL.setParameter("startDay", String.valueOf(startDay));
-				iteratorURL.setParameter("startMonth", String.valueOf(startMonth));
-				iteratorURL.setParameter("startYear", String.valueOf(startYear));
-				iteratorURL.setParameter("defaultStartYear",
-						String.valueOf(LiferaylmsUtil.defaultStartYear));
-				iteratorURL.setParameter("defaultEndtYear",
-						String.valueOf(LiferaylmsUtil.defaultEndYear));
-				iteratorURL.setParameter("showExtraContent", String.valueOf(showExtraContent));
-				iteratorURL.setParameter("endDay", String.valueOf(endDay));
-				iteratorURL.setParameter("endMonth", String.valueOf(endMonth));
-				iteratorURL.setParameter("endYear", String.valueOf(endYear));
-		
-				iteratorURL.setParameter("className",
-						String.valueOf(classNameValue));
+			int startDay = ParamUtil.getInteger(resourceRequest, "startDay", -1);
+			int startMonth = ParamUtil.getInteger(resourceRequest, "startMonth",
+					-1);
+			int startYear = ParamUtil
+					.getInteger(resourceRequest, "startYear", -1);
+			int endDay = ParamUtil.getInteger(resourceRequest, "endDay", -1);
+			int endMonth = ParamUtil.getInteger(resourceRequest, "endMonth", -1);
+			int endYear = ParamUtil.getInteger(resourceRequest, "endYear", -1);
+			boolean showExtraContent = ParamUtil.getBoolean(resourceRequest, "showExtraContent", false);
+			Date startDate = null;
+			if (startDay != -1 && startMonth != -1 && startYear != -1) {
+				Calendar startCalendar = Calendar.getInstance();
+				startCalendar.set(Calendar.YEAR, startYear);
+				startCalendar.set(Calendar.MONTH, startMonth);
+				startCalendar.set(Calendar.DAY_OF_MONTH, startDay);
+				startDate = startCalendar.getTime();
+			}
+	
+			Date endDate = null;
+			if (endDay != -1 && endMonth != -1 && endYear != -1) {
+				Calendar endCalDate = Calendar.getInstance();
+				endCalDate.set(Calendar.YEAR, endYear);
+				endCalDate.set(Calendar.MONTH, endMonth);
+				endCalDate.set(Calendar.DAY_OF_MONTH, endDay);
+				endDate = endCalDate.getTime();
+			}
+			
+			PortletURL iteratorURL = resourceResponse.createRenderURL();
+			iteratorURL.setParameter("startDay", String.valueOf(startDay));
+			iteratorURL.setParameter("startMonth", String.valueOf(startMonth));
+			iteratorURL.setParameter("startYear", String.valueOf(startYear));
+			iteratorURL.setParameter("defaultStartYear",
+					String.valueOf(LiferaylmsUtil.defaultStartYear));
+			iteratorURL.setParameter("defaultEndtYear",
+					String.valueOf(LiferaylmsUtil.defaultEndYear));
+			iteratorURL.setParameter("showExtraContent", String.valueOf(showExtraContent));
+			iteratorURL.setParameter("endDay", String.valueOf(endDay));
+			iteratorURL.setParameter("endMonth", String.valueOf(endMonth));
+			iteratorURL.setParameter("endYear", String.valueOf(endYear));
+	
+			iteratorURL.setParameter("className",
+					String.valueOf(classNameValue));
 				
 				
 			SearchContainer<AsynchronousProcessAudit> searchContainer = new SearchContainer<AsynchronousProcessAudit>(
-			resourceRequest, null, null,
-			SearchContainer.DEFAULT_CUR_PARAM,
-			SearchContainer.DEFAULT_DELTA, iteratorURL, null,
-			"no-results");
-				long userId =0L;
-				boolean onlyForUserOwner = true;
-				
-				if(onlyForUserOwner){
-					userId = themeDisplay.getUserId();
+				resourceRequest, null, null,
+				SearchContainer.DEFAULT_CUR_PARAM,
+				SearchContainer.DEFAULT_DELTA, iteratorURL, null,
+				"no-results");
+			long userId =0L;
+			boolean onlyForUserOwner = true;
+			
+			if(onlyForUserOwner){
+				userId = themeDisplay.getUserId();
+			}
+			
+			if(Validator.isNull(classNameValue)){
+				PortletPreferences prefs;
+				String portletResource = ParamUtil.getString(resourceRequest, "portletResource");	
+				if (Validator.isNotNull(portletResource)){
+					try {
+						prefs = PortletPreferencesFactoryUtil.getPortletSetup(resourceRequest, portletResource);
+					} catch (PortalException | SystemException e) {
+						e.printStackTrace();
+						prefs = resourceRequest.getPreferences();
+					}
+				} else {
+					prefs = resourceRequest.getPreferences();
 				}
+				boolean showAllClassName = (prefs.getValue("preferences--showAllClassName--", "true")).compareTo("true") == 0;
+				// Obtenemos todos los classname distintos para efectuar la lista; Si estan por preferencias los editamos
+				if(!showAllClassName){
+					String classNamePrefsValues = prefs.getValue("className", StringPool.BLANK);
+					classNameValue=classNamePrefsValues;
+				}
+			}
 			
 			asynchronousProcesses = AsynchronousProcessAuditLocalServiceUtil
 					.getByCompanyIdClassNameIdCreateDate(

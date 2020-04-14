@@ -93,6 +93,13 @@
 								<!-- Si tiene convocatorias, se buclea por los cursos hijos pero no se tiene en cuenta los equipos -->
 									<c:set var="childAvailable" value="false" />
 									<aui:form name="enrollEditionForm" action="${enrollURL}">
+										<c:if test='${renderRequest.preferences.getValue("modeMd", "false") == "true" }'>
+											<div class="row inscription-edition">
+												<div class="col-md-4"><liferay-ui:message key="edition"/></div>
+												<div class="col-md-3 edition-dates"><liferay-ui:message key="inscription-community.edition.inscription-date"/></div>
+												<div class="col-md-3 edition-dates"><liferay-ui:message key="inscription-community.execution-date"/></div>
+											</div>
+										</c:if>
 										<c:forEach items="${listChildCourses}" var="childCourse">
 											<c:if test="${childCourse.isRegistrationOnDate() }">
 												<c:catch var ="inscriptionException">
@@ -102,18 +109,46 @@
 												</c:catch>
 												
 												<div class="row inscription-edition">
-													<aui:input label="${childCourse.getTitle(themeDisplay.getLocale())}" type="radio" name="courseId" value="${childCourse.courseId}"
-														disabled="${not empty inscriptionException }" showRequiredLabel="false">
-														<aui:validator name="required" errorMessage="select-edition"/>
-													</aui:input>
-													<div class="edition-dates">
-														<span><liferay-ui:message key="inscription-date"/>:</span> <span><fmt:formatDate timeZone="${themeDisplay.timeZone }" type="both" dateStyle="short" timeStyle="short" value="${childCourse.startDate }" /> - <fmt:formatDate timeZone="${themeDisplay.timeZone }" type="both" dateStyle="short" timeStyle="short" value="${childCourse.endDate }" /></span>
+													<div class='${renderRequest.preferences.getValue("modeMd", "false") ? "col-md-4 col-sm-12": "col-md-12 col-sm-12" }'>
+														<aui:input label="${childCourse.getTitle(themeDisplay.getLocale())}" type="radio" name="courseId" value="${childCourse.courseId}"
+															disabled="${not empty inscriptionException }" showRequiredLabel="false">
+															<aui:validator name="required" errorMessage="select-edition"/>
+														</aui:input>
 													</div>
-													<div class="edition-dates">
-														<span><liferay-ui:message key="inscription-community.execution-date"/>:</span> <span><fmt:formatDate timeZone="${themeDisplay.timeZone }" type="both" dateStyle="short" timeStyle="short" value="${childCourse.executionStartDate }" /> - <fmt:formatDate type="both" timeZone="${themeDisplay.timeZone }" dateStyle="short" timeStyle="short" value="${childCourse.executionEndDate }" /></span>
+													<div class='${renderRequest.preferences.getValue("modeMd", "false") ? "col-md-3 col-sm-12 edition-dates": "col-md-12 col-sm-12 edition-dates"}'>
+														<c:choose>
+															<c:when test='${!renderRequest.preferences.getValue("modeMd", "false") }'>
+																<span ><liferay-ui:message key="inscription-community.edition.inscription-date"/>:</span>
+															</c:when>
+															<c:otherwise>
+																<span></span>
+															</c:otherwise> 
+														</c:choose>
+														<span class="start-date-registration">
+															<fmt:formatDate timeZone="${themeDisplay.timeZone }" type="both" dateStyle="short" timeStyle="short" value="${childCourse.startDate }" /> - 
+														</span>
+														<span class="end-date-registration">
+															<fmt:formatDate timeZone="${themeDisplay.timeZone }" type="both" dateStyle="short" timeStyle="short" value="${childCourse.endDate }" />
+														</span>
+													</div>
+													<div class='${renderRequest.preferences.getValue("modeMd", "false") ? "col-md-3 col-sm-12 edition-dates": "col-md-12 col-sm-12 edition-dates"}'>
+														<c:choose>
+															<c:when test='${!renderRequest.preferences.getValue("modeMd", "false") }'>
+																<span ><liferay-ui:message key="inscription-community.execution-date"/>:</span>
+															</c:when>
+															<c:otherwise>
+																<span></span>
+															</c:otherwise> 
+														</c:choose>
+														<span class="start-date-execution">
+															<fmt:formatDate timeZone="${themeDisplay.timeZone }" type="both" dateStyle="short" timeStyle="short" value="${childCourse.executionStartDate }" /> - 
+														</span>
+														<span class="end-date-execution">
+															<fmt:formatDate type="both" timeZone="${themeDisplay.timeZone }" dateStyle="short" timeStyle="short" value="${childCourse.executionEndDate }" />
+														</span>
 													</div>
 													<c:if test="${not empty inscriptionException }">
-														<div class="mensaje_marcado">${fn:substringAfter(inscriptionException.message, ':')}</div>
+														<div class="mensaje_marcado col-sm-12 col-md-1">${fn:substringAfter(inscriptionException.message, ':')}</div>
 													</c:if>
 												</div>
 											</c:if>
