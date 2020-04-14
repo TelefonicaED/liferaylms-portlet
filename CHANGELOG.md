@@ -3,6 +3,13 @@ Todos los cambios de este proyecto estarán documentados en este archivo.
 
 El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 
+## [4.1.1](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v4.1.1)
+
+### Fixed
+
+- #178231 Se comprueba dentro del método de evaluación ponderado si la actividad ha sido marcada como requerida de aprobar en la configuración de las ponderaciones.
+
+
 ## [4.1.0](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v4.1.0)
 
 ### Added

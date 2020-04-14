@@ -121,6 +121,7 @@ public class PonderatedCourseEval extends BaseCourseEval {
 			long result=0;
 			long weight=0;
 			List<LearningActivity> learningActivities=LearningActivityLocalServiceUtil.getMandatoryLearningActivitiesOfGroup(course.getGroupCreatedId());
+			List<Long> requiredActivities = getRequiredActivities(course);
 			
 			//Guardo los resultados de las actividades del usuario en el curso en un hashmap para no tener que acceder a bbdd por cada uno de ellos
 			List<LearningActivityResult> lresult = LearningActivityResultLocalServiceUtil.getMandatoryByGroupIdUserId(course.getGroupCreatedId(), userId);
@@ -146,7 +147,7 @@ public class PonderatedCourseEval extends BaseCourseEval {
 				
 				if(learningActivityResult != null){					
 					if(learningActivityResult.getEndDate()!=null){						
-						if(!learningActivityResult.isPassed()){
+						if(!learningActivityResult.isPassed() && requiredActivities.contains(act.getActId())){
 							passed=false;
 							if(act.getTries() > 0){
 								long  userTries = LearningActivityTryLocalServiceUtil.getLearningActivityTryByActUserCount(act.getActId(), userId);
