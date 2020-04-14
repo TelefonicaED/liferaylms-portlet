@@ -24,6 +24,14 @@ El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 - #168038 Ya no se sobreescribe el título del curso en el idioma por defecto cuando estás en otro idioma
 - #177114 Los módulos aparecían bloqueados cuando no tenáin fecha
 
+
+## [4.1.1](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v4.1.1)
+
+### Fixed
+
+- #178231 Se comprueba dentro del método de evaluación ponderado si la actividad ha sido marcada como requerida de aprobar en la configuración de las ponderaciones.
+
+
 ## [4.1.0](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v4.1.0)
 
 ### Added
