@@ -97,18 +97,17 @@
 		long scoreTry = 0;
 		String tryResultData = null;
 		boolean userPassed=false;
-		
+		LearningActivityResult result = LearningActivityResultLocalServiceUtil.getByActIdAndUserId(learningActivity.getActId(), themeDisplay.getUserId());
 		if(!hasPermissionAccessCourseFinished){
 			request.setAttribute("hasFreeQuestion", hasFreeQuestion);	
 			tries = learningActivity.getTries();
 			userTries = Long.valueOf(LearningActivityTryLocalServiceUtil.getTriesCountByActivityAndUser(learningActivity.getActId(),themeDisplay.getUserId()));
 		
-			LearningActivityResult result = LearningActivityResultLocalServiceUtil.getByActIdAndUserId(learningActivity.getActId(), themeDisplay.getUserId());
 			score = result.getResult();
 			scoreTry = larntry.getResult();
 			tryResultData = larntry.getTryResultData();
 		}else{
-			score = ParamUtil.getLong(request, "score", 0);
+			score = ParamUtil.getLong(request, "score", result.getResult());
 			scoreTry = score;
 			tryResultData = ParamUtil.getString(request, "tryResultData", null);
 			if(Validator.isNull(tryResultData)){
@@ -200,8 +199,7 @@
 				if( StringPool.TRUE.equals(LearningActivityLocalServiceUtil.getExtraContentValue(actId, "isBank")) ){
 					questions = TestQuestionLocalServiceUtil.getQuestions(bankActivity.getActId());
 				}else{
-					if( GetterUtil.getLong(LearningActivityLocalServiceUtil.getExtraContentValue(actId,"random"))==0 
-							|| hasPermissionAccessCourseFinished ){
+					if( GetterUtil.getLong(LearningActivityLocalServiceUtil.getExtraContentValue(actId,"random"))==0 ){
 						questions=ListUtil.copy(TestQuestionLocalServiceUtil.getQuestions(learningActivity.getActId()));
 						BeanComparator beanComparator = new BeanComparator("weight");
 						Collections.sort(questions, beanComparator);
@@ -229,7 +227,7 @@
 				}
 			}
 		}
-		if(tries==0 || userTries < tries ||permissionChecker.hasPermission(learningActivity.getGroupId(),LearningActivity.class.getName(),learningActivity.getActId(), ActionKeys.UPDATE)) {
+		if(!hasPermissionAccessCourseFinished && (tries==0 || userTries < tries ||permissionChecker.hasPermission(learningActivity.getGroupId(),LearningActivity.class.getName(),learningActivity.getActId(), ActionKeys.UPDATE))) {
 			if(!LearningActivityResultLocalServiceUtil.userPassed(learningActivity.getActId(),themeDisplay.getUserId())){
 				if(tries>0){	
 %>

@@ -128,7 +128,7 @@ if(isTablet){%>
 			
 			boolean improve =ParamUtil.getBoolean(request, "improve",false);
 					
-			if(!improve && LearningActivityResultLocalServiceUtil.userPassed(actId,themeDisplay.getUserId()) && !hasPermissionAccessCourseFinished){
+			if(!improve && LearningActivityResultLocalServiceUtil.userPassed(actId,themeDisplay.getUserId()) || hasPermissionAccessCourseFinished){
 				request.setAttribute("learningActivity",activity);
 				request.setAttribute("larntry",LearningActivityTryLocalServiceUtil.getLastLearningActivityTryByActivityAndUser(actId, userId));
 %>
@@ -615,10 +615,8 @@ if(isTablet){%>
 								})
 								</script>
 							<%
-								long random = 0;
-								if(!hasPermissionAccessCourseFinished){
-									random = GetterUtil.getLong(LearningActivityLocalServiceUtil.getExtraContentValue(activity.getActId(),"random"));
-								}
+								long random = GetterUtil.getLong(LearningActivityLocalServiceUtil.getExtraContentValue(activity.getActId(),"random"));
+								
 								long currentQuestionId = 0;
 								if (learningTry != null && Validator.isXml(learningTry.getTryResultData())) {
 									String tryResultData = learningTry.getTryResultData();
@@ -732,7 +730,8 @@ if(isTablet){%>
 											<% } %>
 										</div>
 									</div>
-								<% } %>
+								<% } 
+								if(!hasPermissionAccessCourseFinished){%>
 								<div id="testactivity-navigator-next">
 								<% if (showNext) { %>
 									<aui:button type="button" value="execactivity.editActivity.questionsPerPage.next" onClick='<%=renderResponse.getNamespace() + "submitForm(event, \'forward\');" %>' ></aui:button>
@@ -740,6 +739,7 @@ if(isTablet){%>
 									<aui:button type="button" value="send" onClick='<%=renderResponse.getNamespace() + "submitForm(event, null);" %>' ></aui:button>
 								<% } %>
 								</div>
+								<%} %>
 								</div>
 								
 								<% } %>
