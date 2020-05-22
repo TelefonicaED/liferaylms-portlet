@@ -26,6 +26,13 @@ El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 - #181637 Corrección al editar preguntas de los recursos externos.
 
 
+## [4.1.2](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v4.1.2)
+
+### Fixed
+
+- #177149 Corregido el modo observador en los tests, solo muestra el feedback de lo que has realizado.
+
+
 ## [4.1.1](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v4.1.1)
 
 ### Fixed

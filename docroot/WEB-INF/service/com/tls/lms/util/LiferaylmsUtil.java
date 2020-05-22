@@ -272,7 +272,7 @@ public class LiferaylmsUtil {
 		
 		log.debug(":::hasPermissionAccessCourseFinished:::courseResult passedDate: " + courseResult.getPassedDate());
 		
-		if((courseResult.getPassedDate() != null && !courseResult.isPassed())){
+		if(courseResult.getPassedDate() != null){
 			log.debug(":::hasPermissionAccessCourseFinished:::has suspendido el curso ");
 			return true;
 		}
