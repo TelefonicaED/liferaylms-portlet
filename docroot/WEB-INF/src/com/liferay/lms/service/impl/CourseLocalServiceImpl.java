@@ -441,7 +441,7 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 			if(!isfromClone){
 				
 				moduleLocalService.addModule(course.getCompanyId(), course.getGroupCreatedId(), course.getUserId(), LanguageUtil.get(locale,"com.liferay.lms.model.module"), 
-						LanguageUtil.get(locale,"description"), executionStartDate, executionEndDate, null);
+						LanguageUtil.get(locale,"description"), null, null, null);
 			}
 		}catch(PortalException e){
 			if(log.isInfoEnabled()){

@@ -56,11 +56,11 @@ public class CompleteModulesCourseEval extends BaseCourseEval {
 
 		// Si el resultado del curso del usuario es null, es porque el usuario no ha iniciado aún el curso en cuestión.
 		if(courseResult==null) {
-			courseResult = CourseResultLocalServiceUtil.create(courseId, userId);
+			courseResult = CourseResultLocalServiceUtil.addCourseResult(0, courseId, userId);
 		}
 
 		if(courseResult.getStartDate() == null){
-			courseResult.setStartDate(new Date());
+			courseResult = CourseResultLocalServiceUtil.initializeCourseResult(courseResult);
 		}
 		
 		// Se obtienen todos los módulos del curso.
@@ -156,45 +156,39 @@ public class CompleteModulesCourseEval extends BaseCourseEval {
 		
 			for(User userOfCourse:UserLocalServiceUtil.getGroupUsers(course.getGroupCreatedId())){
 				if(!PermissionCheckerFactoryUtil.create(userOfCourse).hasPermission(course.getGroupCreatedId(), "com.liferay.lms.model",course.getGroupCreatedId(), "VIEW_RESULTS")){
-			
-				CourseResult courseResult=CourseResultLocalServiceUtil.getByUserAndCourse(course.getCourseId(), userOfCourse.getUserId());
-				if(courseResult==null)
-				{
-					courseResult=CourseResultLocalServiceUtil.create(course.getCourseId(), userOfCourse.getUserId());
-					courseResult.setStartDate(new Date());
-				}
 				
+					CourseResult courseResult=CourseResultLocalServiceUtil.getByUserAndCourse(course.getCourseId(), userOfCourse.getUserId());
+					if(courseResult==null){
+						courseResult=CourseResultLocalServiceUtil.addCourseResult(0, course.getCourseId(), userOfCourse.getUserId());
+					}
+					
+					if(courseResult.getStartDate() == null){
+						courseResult = CourseResultLocalServiceUtil.initializeCourseResult(courseResult);
+					}
+					
+					boolean passed=true;
+					long cuantospasados=0;
+					for(Module thmodule:modules) {
+						if(!ModuleLocalServiceUtil.isUserPassed(thmodule.getModuleId(), userOfCourse.getUserId())) {
+							passed=false;	
+						} else {
+							cuantospasados++;
+						}
+					}
+					long result=0;
+					if(modules.size()>0) {
+						result=100*cuantospasados/modules.size();
+					}
+				
+					courseResult.setResult(result);
 	
-				
-				boolean passed=true;
-				long cuantospasados=0;
-				for(Module thmodule:modules)
-				{
-					if(!ModuleLocalServiceUtil.isUserPassed(thmodule.getModuleId(), userOfCourse.getUserId()))
-					{
-						passed=false;
-						
+					if(courseResult.getPassed()!=passed) {
+						courseResult.setPassedDate(new Date());
 					}
-					else
-					{
-						cuantospasados++;
-					}
-				}
-				long result=0;
-				if(modules.size()>0)
-				{
-					result=100*cuantospasados/modules.size();
-				}
-			
-				courseResult.setResult(result);
-
-				if(courseResult.getPassed()!=passed) {
-					courseResult.setPassedDate(new Date());
-				}
-				courseResult.setPassed(passed);
-
-				CourseResultLocalServiceUtil.update(courseResult);
-				
+					courseResult.setPassed(passed);
+	
+					CourseResultLocalServiceUtil.update(courseResult);
+					
 				}				
 			}
 		} catch (Exception e) {

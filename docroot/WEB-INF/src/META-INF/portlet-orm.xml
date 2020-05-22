@@ -213,6 +213,9 @@
 			<basic name="comments" />
 			<basic name="userId" />
 			<basic name="passed" />
+			<basic name="registrationDate">
+				<temporal>TIMESTAMP</temporal>
+			</basic>
 			<basic name="startDate">
 				<temporal>TIMESTAMP</temporal>
 			</basic>
@@ -226,6 +229,8 @@
 				<temporal>TIMESTAMP</temporal>
 			</basic>
 			<basic name="extraData" />
+			<basic name="companyId" />
+			<basic name="userModifiedId" />
 			<transient name="modelAttributes" />
 			<transient name="primaryKey" />
 			<transient name="primaryKeyObj" />

@@ -31,6 +31,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.ResourceConstants;
 import com.liferay.portal.model.Role;
 import com.liferay.portal.model.RoleConstants;
@@ -61,8 +62,24 @@ public class ModuleImpl extends ModuleBaseImpl {
 	 */
 	private static Log log = LogFactoryUtil.getLog(ModuleImpl.class);
 	
+	private Course course = null;
+	
 	public ModuleImpl() {
 	}
+	
+	@Override
+	public Course getCourse(){
+		if(course == null){
+			try {
+				course = CourseLocalServiceUtil.getCourseByGroupCreatedId(getGroupId());
+			} catch (SystemException e) {
+				e.printStackTrace();
+			} 
+		}
+		
+		return course;
+	}
+	
 	public Module getParentModule() throws SystemException, PortalException
 	{
 		
@@ -128,7 +145,7 @@ public class ModuleImpl extends ModuleBaseImpl {
 		
 		
 		
-		if(!((endDate!=null&&endDate.after(now)) &&(startDate!=null&&startDate.before(now)))){
+		if((startDate != null && startDate.after(now) || (endDate != null && endDate.before(now)))){
 			return true;
 		}
 		
@@ -173,6 +190,65 @@ public class ModuleImpl extends ModuleBaseImpl {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 			return null;
+		}
+	}
+	
+	@Override
+	public Date getStartDate() {
+		Date startDate = super.getStartDate();
+		if(Validator.isNull(startDate)) {
+			Course course = getCourse();
+			if(Validator.isNotNull(course)) {
+				return course.getExecutionStartDate();
+			}
+			return null;
+		}
+		else {
+			return startDate;
+		}
+	}
+
+	@Override
+	public boolean isNullStartDate() {
+		if(super.getStartDate()==null){
+			return true;
+		}
+		
+		Course course = getCourse();
+		if(Validator.isNotNull(course)) {
+			return course.getExecutionStartDate().equals(super.getStartDate());
+		}else{
+			return true;
+		}
+	}
+
+	@Override
+	public Date getEndDate() {
+		Date endDate = super.getEndDate();
+		if(Validator.isNull(endDate)) {			
+			Course course = getCourse();
+			if(Validator.isNotNull(course)) {
+				return course.getExecutionEndDate();
+			}
+
+			return null;
+		}
+		else {
+			return endDate;
+		}
+	}
+
+	@Override
+	public boolean isNullEndDate() {
+		if(super.getEndDate()==null){
+			return true;
+		}
+		
+		Course course = getCourse();
+		if(Validator.isNotNull(course)) {
+			return course.getExecutionEndDate().equals(super.getEndDate());
+		}else{
+			return true;
 		}
 	}
 	

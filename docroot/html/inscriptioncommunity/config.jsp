@@ -18,6 +18,7 @@ if (Validator.isNotNull(portletResource)) {
 	preferences = PortletPreferencesFactoryUtil.getPortletSetup(request, portletResource);
 }
 boolean unsubscribeIfFinished = Boolean.parseBoolean(preferences.getValue("unsubscribeIfFinished",StringPool.TRUE));
+boolean modeMd = Boolean.parseBoolean(preferences.getValue("modeMd",StringPool.FALSE));
 %>
 
 <liferay-portlet:actionURL portletConfiguration="true" var="configurationURL" />
@@ -26,6 +27,7 @@ boolean unsubscribeIfFinished = Boolean.parseBoolean(preferences.getValue("unsub
 	<aui:input name="<%= Constants.CMD %>" type="hidden" value="<%= Constants.UPDATE %>" />
 	
 	<aui:input type="checkbox" name="preferences--unsubscribeIfFinished--" label="unsubscribe.ifFinished" value="<%=unsubscribeIfFinished %>"/>
+	<aui:input type="checkbox" name="preferences--modeMd--" label="inscription.config.mode-md" value="<%=modeMd %>"/>
 	
 	<aui:button-row>
 		<aui:button type="submit" />

@@ -53,7 +53,6 @@ import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceContextFactory;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
-import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
 import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
 import com.liferay.util.bridges.mvc.MVCPortlet;
@@ -86,7 +85,6 @@ public class CourseTypeAdmin extends MVCPortlet {
 	}
 	
 	public void doView(RenderRequest request, RenderResponse response) throws IOException, PortletException{
-		ThemeDisplay themeDisplay = (ThemeDisplay) request.getAttribute(WebKeys.THEME_DISPLAY);
 		String jsp = (String) request.getParameter("view");
 		if(log.isDebugEnabled())
 			log.debug("DOVIEW:: " + jsp);
@@ -233,6 +231,7 @@ public class CourseTypeAdmin extends MVCPortlet {
 		}
 		
 		long[] templateIds = ParamUtil.getLongValues(uploadRequest, "templateIds", new long[] {});
+		long[] editionTemplateIds = ParamUtil.getLongValues(uploadRequest, "editionTemplateIds", new long[] {});
 		long[] courseEvalTypeIds = ParamUtil.getLongValues(uploadRequest, "courseEvalIds", new long[] {});
 		long[] learningActivityTypeIds = ParamUtil.getLongValues(uploadRequest, "learningActivityTypeIds", new long[] {});
 		long[] inscriptionTypeIds = ParamUtil.getLongValues(uploadRequest, "inscriptionTypeIds", new long[] {});
@@ -246,6 +245,7 @@ public class CourseTypeAdmin extends MVCPortlet {
 			log.debug(" ::saveCourseType:: courseTypeName :: " + courseTypeName);
 			log.debug(" ::saveCourseType:: courseTypeDescription :: " + courseTypeDescription);
 			log.debug(" ::saveCourseType:: templateIds.length :: " + templateIds.length);
+			log.debug(" ::saveCourseType:: editionTemplateIds.length :: " + editionTemplateIds.length);
 			log.debug(" ::saveCourseType:: courseEvalTypeIds.length :: " + courseEvalTypeIds.length);
 			log.debug(" ::saveCourseType:: learningActivityTypeIds.length :: " + learningActivityTypeIds.length);
 			log.debug(" ::saveCourseType:: inscriptionTypeIds.length :: " + inscriptionTypeIds.length);
@@ -283,13 +283,13 @@ public class CourseTypeAdmin extends MVCPortlet {
 		}
 		
 		if(saveOk){
-			CourseType newCourseType = null;
 			
 			if(courseTypeId == 0){
 				//Añadir nuevo tipo de curso
 				try {
-					newCourseType = CourseTypeLocalServiceUtil.addCourseType(themeDisplay.getCompanyId(), themeDisplay.getUserId(), themeDisplay.getScopeGroupId(), courseTypeName, courseTypeDescription,
-							templateIds, courseEvalTypeIds, learningActivityTypeIds, inscriptionTypeIds, calificationTypeIds, iconImageId);
+					CourseTypeLocalServiceUtil.addCourseType(themeDisplay.getCompanyId(), themeDisplay.getUserId(), themeDisplay.getScopeGroupId(), 
+							courseTypeName, courseTypeDescription, templateIds, editionTemplateIds, courseEvalTypeIds, learningActivityTypeIds, 
+							inscriptionTypeIds, calificationTypeIds, iconImageId);
 				} catch (SystemException e) {
 					saveOk = Boolean.FALSE;
 					e.printStackTrace();
@@ -303,8 +303,8 @@ public class CourseTypeAdmin extends MVCPortlet {
 			} else {
 				//Actualizar tipo de curso ya existente
 				try {
-					newCourseType = CourseTypeLocalServiceUtil.updateCourseType(courseTypeId, courseTypeName, courseTypeDescription, 
-							templateIds, courseEvalTypeIds, learningActivityTypeIds, inscriptionTypeIds, calificationTypeIds, iconImageId, deleteIcon);
+					CourseTypeLocalServiceUtil.updateCourseType(courseTypeId, courseTypeName, courseTypeDescription, 
+							templateIds, editionTemplateIds, courseEvalTypeIds, learningActivityTypeIds, inscriptionTypeIds, calificationTypeIds, iconImageId, deleteIcon);
 				} catch (SystemException e) {
 					saveOk = Boolean.FALSE;
 					e.printStackTrace();
@@ -325,8 +325,7 @@ public class CourseTypeAdmin extends MVCPortlet {
 	}
 	
 	public void deleteCourseType(ActionRequest request, ActionResponse response) throws IOException, PortletException{
-		ThemeDisplay themeDisplay = (ThemeDisplay) request.getAttribute(WebKeys.THEME_DISPLAY);
-		
+
 		long courseTypeId = ParamUtil.getLong(request, "courseTypeId", 0);
 		
 		if(log.isDebugEnabled())

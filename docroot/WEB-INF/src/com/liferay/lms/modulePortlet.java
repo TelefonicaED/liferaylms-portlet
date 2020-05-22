@@ -254,8 +254,6 @@ public class modulePortlet extends MVCPortlet {
 		renderRequest.setAttribute("courseExecutionStartDateString", LanguageUtil.format(themeDisplay.getLocale(), "course-start-date", formatDateCourse.format(course.getExecutionStartDate())));
 		renderRequest.setAttribute("courseExecutionEndDateString",  LanguageUtil.format(themeDisplay.getLocale(), "course-end-date", formatDateCourse.format(course.getExecutionEndDate())));
 		
-		boolean enableChangeStartDate = Boolean.FALSE;
-		boolean enableChangeEndDate = Boolean.FALSE;
 
 		if(isPopUp){
 			editmoduleURL = liferayPortletResponse.createRenderURL();
@@ -305,9 +303,6 @@ public class modulePortlet extends MVCPortlet {
 				else module.setEndDate(course.getExecutionEndDate());
 			}
 			
-			enableChangeStartDate = course.getExecutionStartDate().before(module.getStartDate());
-			enableChangeEndDate = course.getExecutionEndDate().after(module.getEndDate());
-			
 			renderRequest.setAttribute("startDateDia", formatDia.format(module.getStartDate()));
 			renderRequest.setAttribute("startDateMes", formatMes.format(module.getStartDate()));
 			renderRequest.setAttribute("startDateAno", formatAno.format(module.getStartDate()));
@@ -339,9 +334,6 @@ public class modulePortlet extends MVCPortlet {
 				long allowedTime = errormodule.getAllowedTime();	
 				long hourDuration = allowedTime / 3600000;
 				long minuteDuration = (allowedTime % 3600000) / 60000;
-				
-				enableChangeStartDate = course.getExecutionStartDate().before(errormodule.getStartDate());
-				enableChangeEndDate = course.getExecutionEndDate().after(errormodule.getEndDate());
 				
 				renderRequest.setAttribute("module", errormodule);
 				renderRequest.setAttribute("startDateDia", formatDia.format(errormodule.getStartDate()));
@@ -405,9 +397,6 @@ public class modulePortlet extends MVCPortlet {
 				renderRequest.setAttribute("module", blankmodule);
 			}
 		}
-
-		renderRequest.setAttribute("enableChangeStartDate", enableChangeStartDate);
-		renderRequest.setAttribute("enableChangeEndDate", enableChangeEndDate);
 		
 		renderRequest.setAttribute("editmoduleURL", editmoduleURL.toString());
 		renderRequest.setAttribute("showicon", ("false".equals(PropsUtil.get("module.show.icon")))?false:true);

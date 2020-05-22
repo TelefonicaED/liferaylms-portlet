@@ -235,8 +235,8 @@ function validate(){
     
     <div id="${renderResponse.getNamespace()}startDate">
    	 <aui:field-wrapper label="start-date">
-    		<aui:input id="startdate-enabled" name="startdate-enabled" type="checkbox" checked="${enableChangeStartDate }" label="module.edit.start-date" onClick="${renderResponse.getNamespace()}setStartDateState();" helpMessage="module.edit.start-date.help"  ignoreRequestValue="true" />
-	    	<div id="${renderResponse.getNamespace()}startDateSpan" class="${enableChangeStartDate ? '' : 'aui-helper-hidden'}">
+    		<aui:input id="startdate-enabled" name="startdate-enabled" type="checkbox" checked="${!module.isNullStartDate() }" label="module.edit.start-date" onClick="${renderResponse.getNamespace()}setStartDateState();" helpMessage="module.edit.start-date.help"  ignoreRequestValue="true" />
+	    	<div id="${renderResponse.getNamespace()}startDateSpan" class="${!module.isNullStartDate() ? '' : 'aui-helper-hidden'}">
 				<liferay-ui:input-date  yearRangeEnd="<%=LiferaylmsUtil.defaultEndYear %>" yearRangeStart="<%=LiferaylmsUtil.defaultStartYear %>"
 					dayParam="startDateDia" dayValue="${startDateDia }"
 					monthParam="startDateMes" monthValue="${startDateMes-1 }"
@@ -254,8 +254,8 @@ function validate(){
 	
 	<div id="${renderResponse.getNamespace() }endDate">
 		<aui:field-wrapper label="end-date">
-			<aui:input id="enddate-enabled" name="enddate-enabled" type="checkbox" checked="${enableChangeEndDate }" label="module.edit.end-date" onClick="${renderResponse.getNamespace()}setEndDateState();" helpMessage="module.edit.end-date.help"  ignoreRequestValue="true" />
-			<div id="${renderResponse.getNamespace()}endDateSpan" class="${enableChangeEndDate ? '' : 'aui-helper-hidden'}">
+			<aui:input id="enddate-enabled" name="enddate-enabled" type="checkbox" checked="${!module.isNullEndDate() }" label="module.edit.end-date" onClick="${renderResponse.getNamespace()}setEndDateState();" helpMessage="module.edit.end-date.help"  ignoreRequestValue="true" />
+			<div id="${renderResponse.getNamespace()}endDateSpan" class="${!module.isNullEndDate() ? '' : 'aui-helper-hidden'}">
 				<liferay-ui:input-date  yearRangeEnd="<%=LiferaylmsUtil.defaultEndYear %>" yearRangeStart="<%=LiferaylmsUtil.defaultStartYear %>" 
 					dayParam="endDateDia" dayValue="${endDateDia }" 
 					monthParam="endDateMes" monthValue="${endDateMes-1 }" 

@@ -37,12 +37,14 @@ import com.liferay.lms.service.CourseTypeInscriptionTypeLocalServiceUtil;
 import com.liferay.lms.service.CourseTypeLearningActivityLocalServiceUtil;
 import com.liferay.lms.service.CourseTypeLocalServiceUtil;
 import com.liferay.lms.service.CourseTypeTemplateLocalServiceUtil;
+import com.liferay.lms.util.LmsConstant;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
+import com.liferay.portal.kernel.util.PrefsPropsUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.LayoutSetPrototype;
@@ -141,6 +143,19 @@ public class CourseTypeImpl extends CourseTypeBaseImpl {
 		for (CourseTypeTemplate courseTypeTemplate:CourseTypeTemplateLocalServiceUtil.getByCourseTypeId(getCourseTypeId()))
 			courseTemplateIds.add(courseTypeTemplate.getTemplateId());
 		return courseTemplateIds;
+	}
+	
+	public List<Long> getEditionTemplateIds() throws SystemException{
+		List<Long> editionTemplateIds = new ArrayList<Long>();
+		String[] templateIds = PrefsPropsUtil.getStringArray(getCompanyId(), LmsConstant.EDITION_TEMPLATE_IDS + "." + getCourseTypeId(), ",");
+		for (String editionTemplate:templateIds){
+			try{
+				editionTemplateIds.add(Long.parseLong(editionTemplate));
+			}catch(NumberFormatException e){
+				log.debug(e);
+			}
+		}
+		return editionTemplateIds;
 	}
 	
 	public List<LayoutSetPrototype> getTemplates() throws SystemException, PortalException{

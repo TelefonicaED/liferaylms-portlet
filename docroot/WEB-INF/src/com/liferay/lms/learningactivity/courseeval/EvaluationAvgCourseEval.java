@@ -127,9 +127,12 @@ public class EvaluationAvgCourseEval extends BaseCourseEval {
 		}
 		
 		CourseResult courseResult=CourseResultLocalServiceUtil.getByUserAndCourse(course.getCourseId(), userId);
-		if(courseResult==null)
-		{
-			courseResult=CourseResultLocalServiceUtil.create(course.getCourseId(), userId);
+		if(courseResult==null){
+			courseResult = CourseResultLocalServiceUtil.addCourseResult(0, course.getCourseId(), userId);
+		}
+		
+		if(courseResult.getStartDate() == null){
+			courseResult = CourseResultLocalServiceUtil.initializeCourseResult(courseResult);
 		}
 		
 		if(courseResult.getStartDate() == null){

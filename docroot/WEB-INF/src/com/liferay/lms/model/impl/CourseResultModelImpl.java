@@ -70,13 +70,16 @@ public class CourseResultModelImpl extends BaseModelImpl<CourseResult>
 			{ "comments", Types.VARCHAR },
 			{ "userId", Types.BIGINT },
 			{ "passed", Types.BOOLEAN },
+			{ "registrationDate", Types.TIMESTAMP },
 			{ "startDate", Types.TIMESTAMP },
 			{ "passedDate", Types.TIMESTAMP },
 			{ "allowStartDate", Types.TIMESTAMP },
 			{ "allowFinishDate", Types.TIMESTAMP },
-			{ "extraData", Types.VARCHAR }
+			{ "extraData", Types.VARCHAR },
+			{ "companyId", Types.BIGINT },
+			{ "userModifiedId", Types.BIGINT }
 		};
-	public static final String TABLE_SQL_CREATE = "create table Lms_CourseResult (crId LONG not null primary key,courseId LONG,result LONG,comments TEXT null,userId LONG,passed BOOLEAN,startDate DATE null,passedDate DATE null,allowStartDate DATE null,allowFinishDate DATE null,extraData TEXT null)";
+	public static final String TABLE_SQL_CREATE = "create table Lms_CourseResult (crId LONG not null primary key,courseId LONG,result LONG,comments TEXT null,userId LONG,passed BOOLEAN,registrationDate DATE null,startDate DATE null,passedDate DATE null,allowStartDate DATE null,allowFinishDate DATE null,extraData TEXT null,companyId LONG,userModifiedId LONG)";
 	public static final String TABLE_SQL_DROP = "drop table Lms_CourseResult";
 	public static final String DATA_SOURCE = "liferayDataSource";
 	public static final String SESSION_FACTORY = "liferaySessionFactory";
@@ -114,11 +117,14 @@ public class CourseResultModelImpl extends BaseModelImpl<CourseResult>
 		model.setComments(soapModel.getComments());
 		model.setUserId(soapModel.getUserId());
 		model.setPassed(soapModel.getPassed());
+		model.setRegistrationDate(soapModel.getRegistrationDate());
 		model.setStartDate(soapModel.getStartDate());
 		model.setPassedDate(soapModel.getPassedDate());
 		model.setAllowStartDate(soapModel.getAllowStartDate());
 		model.setAllowFinishDate(soapModel.getAllowFinishDate());
 		model.setExtraData(soapModel.getExtraData());
+		model.setCompanyId(soapModel.getCompanyId());
+		model.setUserModifiedId(soapModel.getUserModifiedId());
 
 		return model;
 	}
@@ -183,11 +189,14 @@ public class CourseResultModelImpl extends BaseModelImpl<CourseResult>
 		attributes.put("comments", getComments());
 		attributes.put("userId", getUserId());
 		attributes.put("passed", getPassed());
+		attributes.put("registrationDate", getRegistrationDate());
 		attributes.put("startDate", getStartDate());
 		attributes.put("passedDate", getPassedDate());
 		attributes.put("allowStartDate", getAllowStartDate());
 		attributes.put("allowFinishDate", getAllowFinishDate());
 		attributes.put("extraData", getExtraData());
+		attributes.put("companyId", getCompanyId());
+		attributes.put("userModifiedId", getUserModifiedId());
 
 		return attributes;
 	}
@@ -230,6 +239,12 @@ public class CourseResultModelImpl extends BaseModelImpl<CourseResult>
 			setPassed(passed);
 		}
 
+		Date registrationDate = (Date)attributes.get("registrationDate");
+
+		if (registrationDate != null) {
+			setRegistrationDate(registrationDate);
+		}
+
 		Date startDate = (Date)attributes.get("startDate");
 
 		if (startDate != null) {
@@ -258,6 +273,18 @@ public class CourseResultModelImpl extends BaseModelImpl<CourseResult>
 
 		if (extraData != null) {
 			setExtraData(extraData);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
+		}
+
+		Long userModifiedId = (Long)attributes.get("userModifiedId");
+
+		if (userModifiedId != null) {
+			setUserModifiedId(userModifiedId);
 		}
 	}
 
@@ -362,6 +389,14 @@ public class CourseResultModelImpl extends BaseModelImpl<CourseResult>
 		return _originalPassed;
 	}
 
+	public Date getRegistrationDate() {
+		return _registrationDate;
+	}
+
+	public void setRegistrationDate(Date registrationDate) {
+		_registrationDate = registrationDate;
+	}
+
 	public Date getStartDate() {
 		return _startDate;
 	}
@@ -417,13 +452,29 @@ public class CourseResultModelImpl extends BaseModelImpl<CourseResult>
 		_extraData = extraData;
 	}
 
+	public long getCompanyId() {
+		return _companyId;
+	}
+
+	public void setCompanyId(long companyId) {
+		_companyId = companyId;
+	}
+
+	public long getUserModifiedId() {
+		return _userModifiedId;
+	}
+
+	public void setUserModifiedId(long userModifiedId) {
+		_userModifiedId = userModifiedId;
+	}
+
 	public long getColumnBitmask() {
 		return _columnBitmask;
 	}
 
 	@Override
 	public ExpandoBridge getExpandoBridge() {
-		return ExpandoBridgeFactoryUtil.getExpandoBridge(0,
+		return ExpandoBridgeFactoryUtil.getExpandoBridge(getCompanyId(),
 			CourseResult.class.getName(), getPrimaryKey());
 	}
 
@@ -455,11 +506,14 @@ public class CourseResultModelImpl extends BaseModelImpl<CourseResult>
 		courseResultImpl.setComments(getComments());
 		courseResultImpl.setUserId(getUserId());
 		courseResultImpl.setPassed(getPassed());
+		courseResultImpl.setRegistrationDate(getRegistrationDate());
 		courseResultImpl.setStartDate(getStartDate());
 		courseResultImpl.setPassedDate(getPassedDate());
 		courseResultImpl.setAllowStartDate(getAllowStartDate());
 		courseResultImpl.setAllowFinishDate(getAllowFinishDate());
 		courseResultImpl.setExtraData(getExtraData());
+		courseResultImpl.setCompanyId(getCompanyId());
+		courseResultImpl.setUserModifiedId(getUserModifiedId());
 
 		courseResultImpl.resetOriginalValues();
 
@@ -553,6 +607,15 @@ public class CourseResultModelImpl extends BaseModelImpl<CourseResult>
 
 		courseResultCacheModel.passed = getPassed();
 
+		Date registrationDate = getRegistrationDate();
+
+		if (registrationDate != null) {
+			courseResultCacheModel.registrationDate = registrationDate.getTime();
+		}
+		else {
+			courseResultCacheModel.registrationDate = Long.MIN_VALUE;
+		}
+
 		Date startDate = getStartDate();
 
 		if (startDate != null) {
@@ -597,12 +660,16 @@ public class CourseResultModelImpl extends BaseModelImpl<CourseResult>
 			courseResultCacheModel.extraData = null;
 		}
 
+		courseResultCacheModel.companyId = getCompanyId();
+
+		courseResultCacheModel.userModifiedId = getUserModifiedId();
+
 		return courseResultCacheModel;
 	}
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(23);
+		StringBundler sb = new StringBundler(29);
 
 		sb.append("{crId=");
 		sb.append(getCrId());
@@ -616,6 +683,8 @@ public class CourseResultModelImpl extends BaseModelImpl<CourseResult>
 		sb.append(getUserId());
 		sb.append(", passed=");
 		sb.append(getPassed());
+		sb.append(", registrationDate=");
+		sb.append(getRegistrationDate());
 		sb.append(", startDate=");
 		sb.append(getStartDate());
 		sb.append(", passedDate=");
@@ -626,13 +695,17 @@ public class CourseResultModelImpl extends BaseModelImpl<CourseResult>
 		sb.append(getAllowFinishDate());
 		sb.append(", extraData=");
 		sb.append(getExtraData());
+		sb.append(", companyId=");
+		sb.append(getCompanyId());
+		sb.append(", userModifiedId=");
+		sb.append(getUserModifiedId());
 		sb.append("}");
 
 		return sb.toString();
 	}
 
 	public String toXmlString() {
-		StringBundler sb = new StringBundler(37);
+		StringBundler sb = new StringBundler(46);
 
 		sb.append("<model><model-name>");
 		sb.append("com.liferay.lms.model.CourseResult");
@@ -663,6 +736,10 @@ public class CourseResultModelImpl extends BaseModelImpl<CourseResult>
 		sb.append(getPassed());
 		sb.append("]]></column-value></column>");
 		sb.append(
+			"<column><column-name>registrationDate</column-name><column-value><![CDATA[");
+		sb.append(getRegistrationDate());
+		sb.append("]]></column-value></column>");
+		sb.append(
 			"<column><column-name>startDate</column-name><column-value><![CDATA[");
 		sb.append(getStartDate());
 		sb.append("]]></column-value></column>");
@@ -681,6 +758,14 @@ public class CourseResultModelImpl extends BaseModelImpl<CourseResult>
 		sb.append(
 			"<column><column-name>extraData</column-name><column-value><![CDATA[");
 		sb.append(getExtraData());
+		sb.append("]]></column-value></column>");
+		sb.append(
+			"<column><column-name>companyId</column-name><column-value><![CDATA[");
+		sb.append(getCompanyId());
+		sb.append("]]></column-value></column>");
+		sb.append(
+			"<column><column-name>userModifiedId</column-name><column-value><![CDATA[");
+		sb.append(getUserModifiedId());
 		sb.append("]]></column-value></column>");
 
 		sb.append("</model>");
@@ -705,12 +790,15 @@ public class CourseResultModelImpl extends BaseModelImpl<CourseResult>
 	private boolean _passed;
 	private boolean _originalPassed;
 	private boolean _setOriginalPassed;
+	private Date _registrationDate;
 	private Date _startDate;
 	private Date _passedDate;
 	private Date _originalPassedDate;
 	private Date _allowStartDate;
 	private Date _allowFinishDate;
 	private String _extraData;
+	private long _companyId;
+	private long _userModifiedId;
 	private long _columnBitmask;
 	private CourseResult _escapedModelProxy;
 }

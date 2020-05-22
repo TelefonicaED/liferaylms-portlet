@@ -7,6 +7,7 @@ import com.liferay.lms.auditing.AuditingLogFactory;
 import com.liferay.lms.model.Course;
 import com.liferay.lms.model.LmsPrefs;
 import com.liferay.lms.service.CourseLocalServiceUtil;
+import com.liferay.lms.service.CourseResultLocalServiceUtil;
 import com.liferay.lms.service.LmsPrefsLocalServiceUtil;
 import com.liferay.lms.util.LmsConstant;
 import com.liferay.portal.ModelListenerException;
@@ -83,6 +84,13 @@ public class GroupListener extends BaseModelListener<Group> {
 					if(log.isDebugEnabled())log.debug("preferencia tutorRole: " + PrefsPropsUtil.getBoolean(company.getCompanyId(), LmsConstant.SEND_MAIL_TO_TUTORS, true));
 					if(log.isDebugEnabled())log.debug("preferencia editorRole: " + PrefsPropsUtil.getBoolean(company.getCompanyId(), LmsConstant.SEND_MAIL_TO_EDITORS, true));
 					
+					//Si no es tutor o editor, es alumno, así que creamos el courseresult
+					if(!tutorRole && !editorRole){
+						if(CourseResultLocalServiceUtil.getCourseResultByCourseAndUser(course.getCourseId(), userId) == null) {
+							CourseResultLocalServiceUtil.addCourseResult(PrincipalThreadLocal.getUserId(), course.getCourseId(), userId);
+						}
+					}
+					
 					if(user!=null && company!=null && ((!tutorRole && !editorRole) 
 							|| (tutorRole && PrefsPropsUtil.getBoolean(company.getCompanyId(), LmsConstant.SEND_MAIL_TO_TUTORS, true)
 							|| (editorRole && PrefsPropsUtil.getBoolean(company.getCompanyId(), LmsConstant.SEND_MAIL_TO_EDITORS, true))))){
@@ -100,7 +108,7 @@ public class GroupListener extends BaseModelListener<Group> {
 					    	String url = PortalUtil.getPortalURL(company.getVirtualHostname(), 80, false);
 					    	//QUITANDO PUERTOS
 							String[] urls = url.split(":");
-							url = urls[0] + ":" +urls[1];  // http:prueba.es:8080		
+							url = urls[0] + ":" +urls[1];  
 							log.debug("url: " + url);
 							
 					    	String urlcourse = url+"/web"+course.getFriendlyURL();

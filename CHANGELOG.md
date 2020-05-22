@@ -3,11 +3,35 @@ Todos los cambios de este proyecto estarán documentados en este archivo.
 
 El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 
+
+## [4.2.0](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v4.2.0)
+
+### Added
+
+- #167661 Se añade la posiblidad de publicar notas individuales después de publicar la general en las actividades de evaluación
+- #176051 Se añade modo de visualización para columna grande en el portlet de inscripción
+
+### Updated
+
+- #167661 Cambio de literal en actividad de evaluación
+- #177082 Permiso de módulo por defecto al scope group y no se ponen fechas al módulo por defecto
+
+### Fixed
+
+- #176579 Corrección al eliminar turores y editores de un curso
+- #175947 Corrección en tabla de procesos asíncronos cuando configuras solo un tipo
+- #176560 Si la respuesta de las preguntas en la importación son númericos se importan
+- #168038 Ya no se sobreescribe el título del curso en el idioma por defecto cuando estás en otro idioma
+- #177114 Los módulos aparecían bloqueados cuando no tenáin fecha
+- #181637 Corrección al editar preguntas de los recursos externos.
+
+
 ## [4.1.2](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v4.1.2)
 
 ### Fixed
 
 - #177149 Corregido el modo observador en los tests, solo muestra el feedback de lo que has realizado.
+
 
 ## [4.1.1](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v4.1.1)
 
@@ -42,15 +66,12 @@ El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 
 - #161554 Se elimina el hook del search container
 
-
 ## [4.0.1](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v4.0.1)
 
 ### Fixed
 
 - #172634 Se heredan los campos personalizados de las actividades al duplicar curso.
 - #172535 Corrección de las preguntas tipo encuesta al exportar, duplicar y crear ediciones
-
-
 
 ## [4.0.0](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v4.0.0)
 
