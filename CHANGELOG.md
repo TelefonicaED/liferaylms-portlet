@@ -23,6 +23,7 @@ El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 - #176560 Si la respuesta de las preguntas en la importación son númericos se importan
 - #168038 Ya no se sobreescribe el título del curso en el idioma por defecto cuando estás en otro idioma
 - #177114 Los módulos aparecían bloqueados cuando no tenáin fecha
+- #181637 Corrección al editar preguntas de los recursos externos.
 
 
 ## [4.1.1](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v4.1.1)

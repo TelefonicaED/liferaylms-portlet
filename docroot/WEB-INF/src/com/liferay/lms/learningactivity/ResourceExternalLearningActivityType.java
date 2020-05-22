@@ -48,7 +48,7 @@ import com.liferay.portlet.documentlibrary.model.DLFolder;
 import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
 import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
 
-public class ResourceExternalLearningActivityType extends BaseLearningActivityType 
+public class ResourceExternalLearningActivityType extends QuestionLearningActivityType  
 {
 	private static final long serialVersionUID = 346346367722124L;
 
@@ -705,5 +705,9 @@ public class ResourceExternalLearningActivityType extends BaseLearningActivityTy
 		
 		
 		
+	}
+	
+	public boolean canExportUserAnswers(){
+		return true;
 	}
 }
