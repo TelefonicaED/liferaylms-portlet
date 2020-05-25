@@ -70,6 +70,7 @@ public class CourseTypeImpl extends CourseTypeBaseImpl {
 	 */
 	
 	private static Log log = LogFactoryUtil.getLog(CourseTypeImpl.class);
+	private List<Long> editionTemplateIds = null;
 	
 	public CourseTypeImpl() {
 	}
@@ -146,13 +147,16 @@ public class CourseTypeImpl extends CourseTypeBaseImpl {
 	}
 	
 	public List<Long> getEditionTemplateIds() throws SystemException{
-		List<Long> editionTemplateIds = new ArrayList<Long>();
-		String[] templateIds = PrefsPropsUtil.getStringArray(getCompanyId(), LmsConstant.EDITION_TEMPLATE_IDS + "." + getCourseTypeId(), ",");
-		for (String editionTemplate:templateIds){
-			try{
-				editionTemplateIds.add(Long.parseLong(editionTemplate));
-			}catch(NumberFormatException e){
-				log.debug(e);
+		
+		if(editionTemplateIds == null){
+			editionTemplateIds = new ArrayList<Long>();
+			String[] templateIds = PrefsPropsUtil.getStringArray(getCompanyId(), LmsConstant.EDITION_TEMPLATE_IDS + "." + getCourseTypeId(), ",");
+			for (String editionTemplate:templateIds){
+				try{
+					editionTemplateIds.add(Long.parseLong(editionTemplate));
+				}catch(NumberFormatException e){
+					log.debug(e);
+				}
 			}
 		}
 		return editionTemplateIds;

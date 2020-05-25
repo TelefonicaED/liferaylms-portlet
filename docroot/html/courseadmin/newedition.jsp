@@ -21,6 +21,7 @@
 	
 <aui:form name="fm" action="${createEditionURL}" method="post" role="form">
 	<aui:input name="parentCourseId" value="${courseId}" type="hidden"/>
+	<aui:input name="courseTypeId" value="${courseTypeId}" type="hidden"/>
 	<aui:input type="text" name="newCourseName" value="${newCourseName}" label="course-admin.new-edition-name" size="75">
 		<aui:validator name="required" errorMessage="field.required"></aui:validator>
 	</aui:input>

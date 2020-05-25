@@ -801,7 +801,9 @@ if(isCourseChild){
 			<aui:select name="courseTemplate" label="course-template" disabled="<%=(course==null)?false:true %>">
 			<%
 			List<Long> editionTemplateIds = courseType.getEditionTemplateIds();
-			for(LayoutSetPrototype template:courseType.getTemplates()){
+			LayoutSetPrototype template = null;
+			for(Long templateId:editionTemplateIds){
+				template = LayoutSetPrototypeLocalServiceUtil.getLayoutSetPrototype(templateId);
 				%>
 				<aui:option value="<%=template.getLayoutSetPrototypeId() %>" selected="<%=templateParent == template.getLayoutSetPrototypeId() %>"><%=template.getName(themeDisplay.getLocale()) %></aui:option>
 				<%
