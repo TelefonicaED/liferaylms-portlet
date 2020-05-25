@@ -32,6 +32,8 @@ import com.liferay.lms.util.LmsConstant;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.util.ListUtil;
+import com.liferay.portal.kernel.util.PrefsPropsUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -124,6 +126,7 @@ public class CourseTypeLocalServiceImpl extends CourseTypeLocalServiceBaseImpl {
 		if(Validator.isNotNull(templateIds)  && templateIds.length>0)
 			courseTypeTemplateLocalService.addListCourseTypeTemplates(courseType.getCourseTypeId(), templateIds);
 		if(Validator.isNotNull(templateIds)  && templateIds.length>0){
+			//No puedo eliminar las anteriores, asi que las añado
 			savePreference(LmsConstant.EDITION_TEMPLATE_IDS + "." + courseTypeId, StringUtil.merge(editionTemplateIds, ","), companyId);
 		}
 		//Añadir métodos de evaluación
@@ -190,10 +193,17 @@ public class CourseTypeLocalServiceImpl extends CourseTypeLocalServiceBaseImpl {
 				}
 			}
 			
-			if(Validator.isNotNull(templateIds)  && templateIds.length>0){
-				savePreference(LmsConstant.EDITION_TEMPLATE_IDS + "." + courseTypeId, StringUtil.merge(editionTemplateIds, ","), courseType.getCompanyId());
+			if(Validator.isNotNull(editionTemplateIds)  && editionTemplateIds.length>0){
+				String[] oldTemplateIds = PrefsPropsUtil.getStringArray(courseType.getCompanyId(), LmsConstant.EDITION_TEMPLATE_IDS + "." + courseTypeId, ",");
+				List<Long> listEditionTemplateIds = ListUtil.toList(editionTemplateIds);
+				for(String oldTemplateId: oldTemplateIds){
+					if(!listEditionTemplateIds.contains(Long.parseLong(oldTemplateId))){
+						listEditionTemplateIds.add(Long.parseLong(oldTemplateId));
+					}
+				}
+				savePreference(LmsConstant.EDITION_TEMPLATE_IDS + "." + courseTypeId, StringUtil.merge(listEditionTemplateIds, ","), courseType.getCompanyId());
 			}
-				
+			
 			//Métodos de evaluación
 			if(Validator.isNotNull(courseEvalTypeIds)  && courseEvalTypeIds.length>0){
 				List<Long> listEvalTypesIdsOfCourseType = courseType.getCourseEvalTypeIds();

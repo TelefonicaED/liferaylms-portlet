@@ -345,44 +345,65 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 				renderRequest.setAttribute("courseId", courseId);
 				
 				String editionsTitle =LanguageUtil.format(themeDisplay.getLocale(), "course-admin.new-edition-x", course.getTitle(themeDisplay.getLocale()));
+				
+				List<LayoutSetPrototype> prototypeList = null;
+				
 				if(courseTypeId>0){
 					CourseType courseType = CourseTypeLocalServiceUtil.fetchCourseType(courseTypeId);
 					if(Validator.isNotNull(courseType)){
 						editionsTitle += StringPool.SPACE + StringPool.OPEN_PARENTHESIS + courseType.getName(themeDisplay.getLocale()) + StringPool.CLOSE_PARENTHESIS;
 						renderRequest.setAttribute("courseTypeId", courseTypeId);
+						
+						List<Long> editionTemplateIds = courseType.getEditionTemplateIds();
+						LayoutSetPrototype template = null;
+						if(editionTemplateIds != null && editionTemplateIds.size() > 0){
+							prototypeList = new ArrayList<LayoutSetPrototype>();
+							for(Long templateId:editionTemplateIds){
+								template = LayoutSetPrototypeLocalServiceUtil.getLayoutSetPrototype(templateId);
+								
+								prototypeList.add(template);
+							}
+						}
 					}
 				}
-				renderRequest.setAttribute("editionTitle", editionsTitle);
-				renderRequest.setAttribute("editionFriendlyURL", course.getFriendlyURL()+"-"+newCourseName.replace(" ", "-"));
 				
-				String[] layusprsel=null;
-				if(renderRequest.getPreferences().getValue("courseTemplates", null)!=null&&renderRequest.getPreferences().getValue("courseTemplates", null).length()>0)
-				{
-						layusprsel=renderRequest.getPreferences().getValue("courseTemplates", "").split(",");
-				}
-				String[] lspList=LmsPrefsLocalServiceUtil.getLmsPrefsIni(themeDisplay.getCompanyId()).getLmsTemplates().split(",");
-				if(layusprsel!=null && layusprsel.length>0)
-				{
-					lspList=layusprsel;
-
-				}
-				if(lspList.length>1){
-					List<LayoutSetPrototype> prototypeList = new ArrayList<LayoutSetPrototype>();
+				if(prototypeList == null || prototypeList.size() == 0){
+				
+					String[] layusprsel=null;
+					if(renderRequest.getPreferences().getValue("courseTemplates", null)!=null&&renderRequest.getPreferences().getValue("courseTemplates", null).length()>0)
+					{
+							layusprsel=renderRequest.getPreferences().getValue("courseTemplates", "").split(",");
+					}
+					String[] lspList=LmsPrefsLocalServiceUtil.getLmsPrefsIni(themeDisplay.getCompanyId()).getLmsTemplates().split(",");
+					if(layusprsel!=null && layusprsel.length>0)
+					{
+						lspList=layusprsel;
+	
+					}
+					
+					prototypeList = new ArrayList<LayoutSetPrototype>();
 					for(String lspId: lspList){
 						prototypeList.add(LayoutSetPrototypeLocalServiceUtil.getLayoutSetPrototype(Long.parseLong(lspId)));
 						
 					}
 					
+				}
+				renderRequest.setAttribute("editionTitle", editionsTitle);
+				renderRequest.setAttribute("editionFriendlyURL", course.getFriendlyURL()+"-"+newCourseName.replace(" ", "-"));
+				
+				
+				if(prototypeList.size()>1){
 					long parentCourseLspId = GroupLocalServiceUtil.fetchGroup(course.getGroupCreatedId()).getPublicLayoutSet().getLayoutSetPrototypeId();
 					renderRequest.setAttribute("lspList", prototypeList);
 					renderRequest.setAttribute("parentCourseLspId", parentCourseLspId);
 					renderRequest.setAttribute("viewTemplateSelector", true);
 				}else{
-					LayoutSetPrototype lsp=LayoutSetPrototypeLocalServiceUtil.getLayoutSetPrototype(Long.parseLong(lspList[0]));
+					LayoutSetPrototype lsp=LayoutSetPrototypeLocalServiceUtil.getLayoutSetPrototype(prototypeList.get(0).getLayoutSetPrototypeId());
 					renderRequest.setAttribute("lspId", lsp.getLayoutSetPrototypeId());
 					renderRequest.setAttribute("viewTemplateSelector", false);
 				}
 			}
+			
 			
 			SimpleDateFormat formatDay = new SimpleDateFormat("dd");
 			formatDay.setTimeZone(timeZone);
@@ -464,6 +485,8 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 			renderRequest.setAttribute("endExecutionYear", endYear);
 			renderRequest.setAttribute("endExecutionHour", endHour);
 			renderRequest.setAttribute("endExecutionMin", endMin);
+			
+			renderRequest.setAttribute("courseTypeId", courseTypeId);
 			
 			
 			long parentLspId = 0;
@@ -1074,9 +1097,7 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 		String friendlyURL = ParamUtil.getString(actionRequest, "editionFriendlyURL");
 		String newEditionName  = ParamUtil.getString(actionRequest, "newCourseName", "New edition");
 		long editionLayoutId = ParamUtil.getLong(actionRequest, "courseTemplate");
-		
-		
-		
+
 		//Inscription Date
 		int startMonth = 	ParamUtil.getInteger(actionRequest, "startMon");
 		int startYear = 	ParamUtil.getInteger(actionRequest, "startYear");
@@ -1174,10 +1195,10 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 			}
 		}
 		
-		
 		if(errors){
 			actionResponse.setRenderParameter("view", "new-edition");
 			actionResponse.setRenderParameter("courseId", String.valueOf(parentCourseId));
+			actionResponse.setRenderParameter("courseTypeId", ParamUtil.getString(actionRequest, "courseTypeId"));
 		}else{
 			SessionMessages.add(actionRequest, "course-admin.confirmation.new-edition-success");
 			actionResponse.setRenderParameter("courseId", String.valueOf(parentCourseId));
