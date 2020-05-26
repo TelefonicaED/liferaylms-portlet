@@ -236,7 +236,14 @@ if(prefs!=null){
 		%>
 	
 		<aui:input type="checkbox" name="viewCoursesFinished"
-		label="view-courses-finished" checked="<%=prefs.getViewCoursesFinished()%>" value="<%=prefs.getViewCoursesFinished()%>" />
+			label="view-courses-finished" checked="<%=prefs.getViewCoursesFinished()%>" value="<%=prefs.getViewCoursesFinished()%>" 
+			onClick="javascript:${renderResponse.namespace}changeViewCoursesFinished()"/>
+			<div class='<%=prefs.getViewCoursesFinished() ? "" : "aui-helper-hidden" %>' id='<%=renderResponse.getNamespace() + "viewCourseFinishedTypeDiv" %>'>
+				<aui:input id="viewCoursesFinishedAll" name="viewCourseFinishedType" value="<%=LmsConstant.VIEW_COURSE_FINISHED_TYPE_ALL %>"
+				 	type="radio" label="view-courses-finished.all" checked="<%=LmsConstant.VIEW_COURSE_FINISHED_TYPE_ALL == prefs.getViewCoursesFinishedType() %>"/>
+				<aui:input id="viewCoursesFinishedPassed" name="viewCourseFinishedType" value="<%=LmsConstant.VIEW_COURSE_FINISHED_TYPE_PASSED %>" 
+					type="radio" label="view-courses-finished.passed" checked="<%=LmsConstant.VIEW_COURSE_FINISHED_TYPE_PASSED == prefs.getViewCoursesFinishedType() %>"/>
+			</div>
 		<aui:input type="checkbox" name="linkResources"
 			label="link-internal-resources" checked="<%=linkResources%>" value="<%=linkResources%>" />
 		<aui:input type="checkbox" name="sendMailToEditors"	label="lms-prefs.send-mail-to-editors" checked="<%= sendMailToEditors %>" />
@@ -264,5 +271,13 @@ if(prefs!=null){
 	            }
 	        );
 	    }
-	);	
+	);
+	function <portlet:namespace/>changeViewCoursesFinished(){
+		var checked = document.getElementById('<portlet:namespace/>viewCourseFinishedType').value;
+		if(checked == 'true'){
+			document.getElementById('<portlet:namespace />viewCourseFinishedTypeDiv').className = "";
+		}else{
+			document.getElementById('<portlet:namespace />viewCourseFinishedTypeDiv').className = "aui-helper-hidden";
+		}
+	}
 </script>

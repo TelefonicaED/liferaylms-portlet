@@ -14,6 +14,10 @@
 
 package com.liferay.lms.model.impl;
 
+import com.liferay.lms.util.LmsConstant;
+import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.util.PrefsPropsUtil;
+
 /**
  * The extended model implementation for the LmsPrefs service. Represents a row in the &quot;Lms_LmsPrefs&quot; database table, with each column mapped to a property of this class.
  *
@@ -30,5 +34,16 @@ public class LmsPrefsImpl extends LmsPrefsBaseImpl {
 	 * Never reference this class directly. All methods that expect a lms prefs model instance should use the {@link com.liferay.lms.model.LmsPrefs} interface instead.
 	 */
 	public LmsPrefsImpl() {
+	}
+	
+	public int getViewCoursesFinishedType() {
+		int type = LmsConstant.VIEW_COURSE_FINISHED_TYPE_DEFAULT;
+		try {
+			type = PrefsPropsUtil.getInteger(getCompanyId(), LmsConstant.PREFS_VIEW_COURSE_FINISHED_TYPE);
+		} catch (SystemException e) {
+			e.printStackTrace();
+		}
+		
+		return type;
 	}
 }

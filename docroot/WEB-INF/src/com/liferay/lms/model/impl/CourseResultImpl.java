@@ -20,6 +20,9 @@ import com.liferay.lms.learningactivity.calificationtype.CalificationType;
 import com.liferay.lms.learningactivity.calificationtype.CalificationTypeRegistry;
 import com.liferay.lms.model.Course;
 import com.liferay.lms.service.CourseLocalServiceUtil;
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.exception.SystemException;
+import com.tls.lms.util.LiferaylmsUtil;
 
 
 public class CourseResultImpl extends CourseResultBaseImpl {
@@ -69,5 +72,10 @@ public class CourseResultImpl extends CourseResultBaseImpl {
 			translatedResult = ct.translate(locale,groupId,getResult())+ct.getSuffix(groupId);
 		}		
 		return translatedResult;
+	}
+	
+	public boolean hasPermissionAccessCourseFinished() throws PortalException, SystemException{
+		Course course = CourseLocalServiceUtil.getCourse(getCourseId());
+		return LiferaylmsUtil.hasPermissionAccessCourseFinished(getCompanyId(), course.getGroupCreatedId(), getCourseId(), getUserId());
 	}
 }
