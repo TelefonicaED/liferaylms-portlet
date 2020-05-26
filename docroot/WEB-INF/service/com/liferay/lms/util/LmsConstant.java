@@ -40,4 +40,8 @@ public class LmsConstant {
 	
 	public static final long DEFAULT_PARENT_COURSE_ID = 0;
 	
+	public final static String PREFS_VIEW_COURSE_FINISHED_TYPE = "viewCourseFinishedType";
+	public final static int VIEW_COURSE_FINISHED_TYPE_ALL = 0;
+	public final static int VIEW_COURSE_FINISHED_TYPE_PASSED = 1;
+	public final static int VIEW_COURSE_FINISHED_TYPE_DEFAULT = VIEW_COURSE_FINISHED_TYPE_ALL;
 }

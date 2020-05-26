@@ -1204,7 +1204,6 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 			actionResponse.setRenderParameter("courseId", String.valueOf(parentCourseId));
 			actionResponse.setRenderParameter("view", "editions");
 		}
-		
 	}
 	
 	

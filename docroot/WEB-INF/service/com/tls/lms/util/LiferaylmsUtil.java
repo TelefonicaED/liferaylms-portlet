@@ -23,6 +23,7 @@ import com.liferay.lms.service.CourseResultLocalServiceUtil;
 import com.liferay.lms.service.LmsPrefsLocalServiceUtil;
 import com.liferay.lms.service.ModuleLocalServiceUtil;
 import com.liferay.lms.service.ScheduleLocalServiceUtil;
+import com.liferay.lms.util.LmsConstant;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
@@ -179,6 +180,17 @@ public class LiferaylmsUtil {
 		
 		log.debug(":::hasPermissionAccessCourseFinished:::lmsPrefs viewCoursesFinished: " + lmsPrefs.getViewCoursesFinished());
 		
+		CourseResult courseResult = null;
+		try {
+			courseResult = CourseResultLocalServiceUtil.getCourseResultByCourseAndUser(courseId, userId);
+		} catch (SystemException e) {
+			e.printStackTrace();
+		}
+		
+		if(lmsPrefs.getViewCoursesFinishedType() == LmsConstant.VIEW_COURSE_FINISHED_TYPE_PASSED && (courseResult == null || (!courseResult.isPassed() && courseResult.getPassedDate() != null))){
+			return false;
+		}
+		
 		Date now = new Date();
 		
 		Course course = null;
@@ -249,13 +261,6 @@ public class LiferaylmsUtil {
 		}
 		
 		//Ahora comprobamos la condición de allowFinishDate
-		CourseResult courseResult = null;
-		try {
-			courseResult = CourseResultLocalServiceUtil.getByUserAndCourse(courseId, userId);
-		} catch (SystemException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 		if(courseResult != null){
 			log.debug(":::hasPermissionAccessCourseFinished:::courseResult allowFinishDate: " + courseResult.getAllowFinishDate());
 		}

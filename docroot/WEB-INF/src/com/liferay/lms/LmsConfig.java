@@ -44,6 +44,7 @@ public class LmsConfig extends MVCPortlet {
 		boolean showModuleClassification = ParamUtil.getBoolean(request, "showModuleClassification", false);
 		boolean showActivityClassification = ParamUtil.getBoolean(request, "showActivityClassification", true);
 		boolean viewCoursesFinished = ParamUtil.getBoolean(request, "viewCoursesFinished", false);
+		int viewCourseFinishedType = ParamUtil.getInteger(request, "viewCourseFinishedType", LmsConstant.VIEW_COURSE_FINISHED_TYPE_DEFAULT);
 		boolean linkResources = ParamUtil.getBoolean(request,"linkResources");
 		boolean sendMailToEditors = ParamUtil.getBoolean(request, "sendMailToEditors");
 		boolean sendMailToTutors = ParamUtil.getBoolean(request, "sendMailToTutors");
@@ -68,6 +69,7 @@ public class LmsConfig extends MVCPortlet {
 		savePreference(LmsConstant.SEND_MAIL_TO_TUTORS, String.valueOf(sendMailToTutors), themeDisplay.getCompanyId());
 		savePreference(LmsConstant.SHOW_BUTTON_INSCRIPTION_ALL, String.valueOf(showButtonInscriptionAll), themeDisplay.getCompanyId());
 		savePreference(LmsConstant.SHOW_BUTTON_UNSUBSCRIBE_ALL, String.valueOf(showButtonUnsubscribeAll), themeDisplay.getCompanyId());
+		savePreference(LmsConstant.PREFS_VIEW_COURSE_FINISHED_TYPE, String.valueOf(viewCourseFinishedType), themeDisplay.getCompanyId());
 		
 		if (Validator.isNotNull(redirect)) {
 			response.sendRedirect(redirect);
