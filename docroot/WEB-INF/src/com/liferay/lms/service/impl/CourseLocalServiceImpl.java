@@ -300,7 +300,8 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 		
 		LmsPrefs lmsPrefs=lmsPrefsLocalService.getLmsPrefsIni(serviceContext.getCompanyId());
 		long userId=serviceContext.getUserId();
-		Course course = coursePersistence.create(counterLocalService.increment(Course.class.getName()));
+		long courseId = counterLocalService.increment(Course.class.getName());
+		Course course = coursePersistence.create(courseId);
 		String title = null;
 		if(titleMap.containsKey(locale)){
 			title = titleMap.get(locale);
@@ -364,9 +365,18 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 			course = LmsLocaleUtil.checkDefaultLocale(Course.class, course, "description");
 			//creating group
 			String groupName = title;
-			if(title.length()>148){
-				groupName = title.substring(0, 148);
+			if(GroupLocalServiceUtil.fetchGroup(course.getCompanyId(), groupName)!=null){
+				if(groupName.length()>130){
+					groupName = groupName.substring(0, 130);
+				}
+				groupName = course.getTitle(locale,true)+" ("+courseId+")";
 			}
+			
+			if(groupName.length()>148){
+				groupName = groupName.substring(0, 148);
+			}
+			
+			System.out.println("groupName: " + groupName);
 			
 			Group group = groupLocalService.addGroup(userLocalService.getDefaultUser(serviceContext.getCompanyId()).getUserId(),
 					null, 0, groupName,summary,typesite,friendlyURL,true,true,serviceContext);
@@ -647,6 +657,9 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 		String groupName = course.getTitle(locale,true);
 		if(allowDuplicateName){
 			if(GroupLocalServiceUtil.fetchGroup(course.getCompanyId(), groupName)!=null){
+				if(groupName.length()>130){
+					groupName = groupName.substring(0, 130);
+				}
 				groupName = course.getTitle(locale,true)+" ("+course.getCourseId()+")";
 			}
 		}
