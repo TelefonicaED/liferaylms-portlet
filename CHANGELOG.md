@@ -10,6 +10,11 @@ El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 
 - #167661 Se añade la posiblidad de publicar notas individuales después de publicar la general en las actividades de evaluación
 - #176051 Se añade modo de visualización para columna grande en el portlet de inscripción
+- #176473 Se exportan todos los resultados de los test de un usuario independientemente del tipo de pregunta
+
+### Deleted
+
+- #176473 En la exportación de resultados del usuario para los test se elimina el id de las preguntas y respuestas
 
 ### Updated
 

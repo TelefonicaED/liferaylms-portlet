@@ -71,6 +71,7 @@ import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -80,9 +81,12 @@ import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.DocumentException;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
+import com.liferay.portal.model.Company;
+import com.liferay.portal.model.CompanyConstants;
 import com.liferay.portal.model.User;
 import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.security.permission.PermissionChecker;
+import com.liferay.portal.service.CompanyLocalServiceUtil;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
@@ -440,6 +444,8 @@ public class QuestionsAdmin extends MVCPortlet{
 
 		try {
 			if(action.equals("exportResultsCsv")){
+				ThemeDisplay themeDisplay = (ThemeDisplay) request.getAttribute(WebKeys.THEME_DISPLAY);
+				
 				response.addProperty(HttpHeaders.CONTENT_DISPOSITION,"attachment; fileName=data.csv");
 				response.setContentType(ContentTypes.TEXT_CSV_UTF8);
 				byte b[] = {(byte)0xEF, (byte)0xBB, (byte)0xBF};
@@ -451,39 +457,56 @@ public class QuestionsAdmin extends MVCPortlet{
 				List<TestQuestion> questions = ListUtil.copy(questiones);
 				BeanComparator beanComparator = new BeanComparator("weight");
 				Collections.sort(questions, beanComparator);
-				List<TestQuestion> questionsTitle = new ArrayList<TestQuestion>();
-				for(TestQuestion question:questions){
-					if(question.getQuestionType() == 0) questionsTitle.add(question);
-				}
+				
 				//Anadimos x columnas para mostrar otros datos que no sean las preguntas como nombre de usuario, fecha, etc.
 				int numExtraCols = 3;
-				String[] cabeceras = new String[questionsTitle.size()+numExtraCols];
+				String[] cabeceras = new String[questions.size()+numExtraCols];
 
 				//Guardamos el orden en que obtenemos las preguntas de la base de datos para poner las preguntas en el mismo orden.
-				Long []questionOrder = new Long[questionsTitle.size()];
+				Long []questionOrder = new Long[questions.size()];
 
 				//En las columnas extra ponemos la cabecera
-				cabeceras[0]="User";
-				cabeceras[1]="UserId";
-				cabeceras[2]="Date";
+				cabeceras[0] = LanguageUtil.get(themeDisplay.getLocale(), "full-name");
+				//Comprobamos el tipo de importaci�n
+				String authType = PropsUtil.get(PropsKeys.COMPANY_SECURITY_AUTH_TYPE);
+				try {
+					Company company = CompanyLocalServiceUtil.getCompany(themeDisplay.getCompanyId());
+					if (Validator.isNotNull(company)) {
+						authType = company.getAuthType();
+					}
+				} catch (PortalException e) {
+					log.error("Se ha producido un error al obtener el tipo de login de usuario (authType) para companyId=" + themeDisplay.getCompanyId(), e);
+				} catch (SystemException e) {
+					log.error("Se ha producido un error al obtener el tipo de login de usuario (authType) para companyId=" + themeDisplay.getCompanyId(), e);
+				}
+				if (CompanyConstants.AUTH_TYPE_SN.equalsIgnoreCase(authType)) {
+					cabeceras[1] = LanguageUtil.get(themeDisplay.getLocale(), "screen-name");
+				}else if(CompanyConstants.AUTH_TYPE_EA.equalsIgnoreCase(authType)){
+					cabeceras[1] = LanguageUtil.get(themeDisplay.getLocale(), "email-address");
+				}else{
+					cabeceras[1] = LanguageUtil.get(themeDisplay.getLocale(), "user-id");
+				}
 
-				for(int i=numExtraCols;i<questionsTitle.size()+numExtraCols;i++){
-					cabeceras[i]=formatString(questionsTitle.get(i-numExtraCols).getText())+" ("+questionsTitle.get(i-numExtraCols).getQuestionId()+")";
-					questionOrder[i-numExtraCols]=questionsTitle.get(i-numExtraCols).getQuestionId();
+				cabeceras[2] = LanguageUtil.get(themeDisplay.getLocale(), "date");
+
+				for(int i=numExtraCols;i<questions.size()+numExtraCols;i++){
+					cabeceras[i]=formatString(questions.get(i-numExtraCols).getText());
+					questionOrder[i-numExtraCols]=questions.get(i-numExtraCols).getQuestionId();
 				}
 				writer.writeNext(cabeceras);
 
 				//Partiremos del usuario para crear el csv para que sea mas facil ver los intentos.
 				List<User> users = LearningActivityTryLocalServiceUtil.getUsersByLearningActivity(actId);
+				
+				int numColumUser = 0;
 
 				for(User user:users){
-
+					numColumUser = 0;
 					//Para cada usuario obtenemos los intentos para la learning activity.
 					List<LearningActivityTry> activities = LearningActivityTryLocalServiceUtil.getLearningActivityTryByActUser(actId, user.getUserId());
-					List<Long> answersIds = new ArrayList<Long>();
 
 					for(LearningActivityTry activity:activities){
-
+						numColumUser = 0;
 						String xml = activity.getTryResultData();
 
 						//Leemos el xml que contiene lo que ha respondido el estudiante.
@@ -491,25 +514,24 @@ public class QuestionsAdmin extends MVCPortlet{
 
 							Document document = SAXReaderUtil.read(xml);
 							Element rootElement = document.getRootElement();
-
+							
+							HashMap<Long, List<Object>> answers = new HashMap<Long, List<Object>>();
+							
 							//Obtenemos las respuestas que hay introducido.
+							long questionId =  0;
+							List<Object> answersList = null;
 							for(Element question:rootElement.elements("question")){
-								try{
-									TestQuestion q = TestQuestionLocalServiceUtil.getTestQuestion(Long.valueOf(question.attributeValue("id")));	        		
-
-									if(q.getQuestionType() == 0){
-
-										for(Element answerElement:question.elements("answer")){
-											//Guardamos el id de la respuesta para posteriormente obtener su texto.
-											if(Validator.isNumber(answerElement.attributeValue("id"))){
-												answersIds.add(Long.valueOf(answerElement.attributeValue("id")));
-											}
-										}
+								questionId = Long.valueOf(question.attributeValue("id"));
+								answersList = new ArrayList<Object>();
+								for(Element answerElement:question.elements("answer")){
+									//Guardamos el id de la respuesta para posteriormente obtener su texto.
+									if(Validator.isNumber(answerElement.attributeValue("id"))){
+										answersList.add(Long.valueOf(answerElement.attributeValue("id")));
+									}else{
+										answersList.add(answerElement.getText());
 									}
-								}catch(NoSuchTestQuestionException e){
-									if(log.isErrorEnabled()) log.error("En la actividad de tipo test "+activity.getActId()+" no se puede exportar la respuesta del usuario "+user.getUserId()+" para la pregunta "+question.attributeValue("id")+" porque ésta fue eliminada.");
 								}
-
+								answers.put(questionId, answersList);
 							}
 
 							//Array con los resultados de los intentos.
@@ -517,18 +539,40 @@ public class QuestionsAdmin extends MVCPortlet{
 
 							//Introducimos los datos de las columnas extra
 							resultados[0]=user.getFullName();
-							resultados[1] = String.valueOf(user.getUserId());
+							
+							if (CompanyConstants.AUTH_TYPE_SN.equalsIgnoreCase(authType)) {
+								resultados[1] = user.getScreenName();
+							}else if(CompanyConstants.AUTH_TYPE_EA.equalsIgnoreCase(authType)){
+								resultados[1] = user.getEmailAddress();
+							}else{
+								resultados[1] = String.valueOf(user.getUserId());
+							}
+							
 							resultados[2] = String.valueOf(activity.getEndDate());
+							
+							int numAnswer = 0;
 
 							for(int i=numExtraCols;i <questionOrder.length+numExtraCols ; i++){
 								//Si no tenemos respuesta para la pregunta, guardamos ""
 								resultados[i] = "-";
-
-								for(int j=0;j <answersIds.size() ; j++){
-									//Cuando la respuesta se corresponda con la pregunta que corresponde.
-									if(Long.valueOf(getQuestionIdByAnswerId(answersIds.get(j))).compareTo(Long.valueOf(questionOrder[i-numExtraCols])) == 0){
-										//Guardamos la respuesta en el array de resultados
-										resultados[i]=getAnswerTextByAnswerId(answersIds.get(j));
+								numAnswer = 0;
+								if(answers.containsKey(questionOrder[i-numExtraCols])){
+									answersList = answers.get(questionOrder[i-numExtraCols]);
+									for(Object answer: answersList){
+										if(answer instanceof Long){
+											if(numAnswer == 0){
+												resultados[i] = (answersList.size() > 1 ? "- " : "") + getAnswerTextByAnswerId((Long)answer);
+											}else{
+												resultados[i]+= "\n"+ (answersList.size() > 1 ? "- " : "") + getAnswerTextByAnswerId((Long)answer);
+											}
+										}else if(answer instanceof String){
+											if(numAnswer == 0){
+												resultados[i] = (answersList.size() > 1 ? "- " : "") + (String)answer;
+											}else{
+												resultados[i]+= "\n"+ (answersList.size() > 1 ? "- " : "") + (String)answer;
+											}
+										}
+										numAnswer++;
 									}
 								}
 
@@ -620,7 +664,7 @@ public class QuestionsAdmin extends MVCPortlet{
 			answersMap.put(answerId, answer);
 		}
 
-		return formatString(answersMap.get(answerId).getAnswer())+" ("+answersMap.get(answerId).getAnswerId()+")";
+		return formatString(answersMap.get(answerId).getAnswer());
 	}
 
 	private Long getQuestionIdByAnswerId(Long answerId) throws PortalException, SystemException{
