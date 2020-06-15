@@ -652,10 +652,7 @@ public class EvaluationActivity extends MVCPortlet implements MessageListener{
 				}catch(Exception e){
 					e.printStackTrace();
 				}
-				
-				if(publishdDateElement != null){
-					learningActivityTry.setEndDate(new Date());
-				}
+
 				
 				updateLearningActivityTryAndResult(learningActivityTry, publishdDateElement != null);
 				

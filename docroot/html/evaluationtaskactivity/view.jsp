@@ -283,16 +283,16 @@ if(actId==0){
 								if(learningActivityResult!=null) {	   
 									%>
 									<div class="floatl">
-									<%
-									if(learningActivityResult.getPassed()){
-										%><liferay-ui:message key="evaluationtaskactivity.student.passed"  arguments="<%=new Object[]{ct.translate(themeDisplay.getLocale(), themeDisplay.getScopeGroupId(), learningActivityResult.getResult())} %>" /><%
-									}else {
-										%><liferay-ui:message key="evaluationtaskactivity.student.failed"  arguments="<%=new Object[]{ct.translate(themeDisplay.getLocale(), themeDisplay.getScopeGroupId(), learningActivityResult.getResult()),ct.translate(themeDisplay.getLocale(), themeDisplay.getScopeGroupId(), learningActivity.getPasspuntuation())} %>" /><%
-									}
-									%>
+										<%
+										if(learningActivityResult.getPassed()){
+											%><liferay-ui:message key="evaluationtaskactivity.student.passed"  arguments="<%=new Object[]{ct.translate(themeDisplay.getLocale(), themeDisplay.getScopeGroupId(), learningActivityResult.getResult())} %>" /><%
+										}else {
+											%><liferay-ui:message key="evaluationtaskactivity.student.failed"  arguments="<%=new Object[]{ct.translate(themeDisplay.getLocale(), themeDisplay.getScopeGroupId(), learningActivityResult.getResult()),ct.translate(themeDisplay.getLocale(), themeDisplay.getScopeGroupId(), learningActivity.getPasspuntuation())} %>" /><%
+										}
+										%>
 									</div>
 									<%
-									if(!hasPublishDate) {%>
+									if(!hasPublishDate || (hasPublishDate && learningActivityResult.getEndDate() == null)) {%>
 										<portlet:actionURL name="reCalculate" var="reCalculateURL">
 									   		<portlet:param name="userId" value="<%=Long.toString(usuario.getUserId()) %>"/>
 							        		<c:if test="<%=Validator.isNotNull(returnToFullPageURL) %>" >
@@ -354,14 +354,15 @@ if(actId==0){
 											</a>
 										</p>
 										</div>
-									<%}else if(hasPublishDate && learningActivityResult.getEndDate() == null){%>
-										<portlet:actionURL name="publishLearningActivitiyResult" var="publishLearningActivitiyResultURL" >
-							        		<portlet:param name="actId" value="<%=Long.toString(actId) %>"/>
-							        		<portlet:param name="userId" value="<%=Long.toString(usuario.getUserId()) %>"/>
-							        		<portlet:param name="criteria" value="<%=ParamUtil.getString(renderRequest, \"criteria\",\"\") %>"/>
-											<portlet:param name="gradeFilter" value="<%=ParamUtil.getString(renderRequest, \"gradeFilter\",\"\") %>"/>
-							        	</portlet:actionURL>
-										<aui:button value="publish" onClick="${publishLearningActivitiyResultURL}"/>
+										<c:if test="<%=hasPublishDate && learningActivityResult.getEndDate() == null %>">
+											<portlet:actionURL name="publishLearningActivitiyResult" var="publishLearningActivitiyResultURL" >
+								        		<portlet:param name="actId" value="<%=Long.toString(actId) %>"/>
+								        		<portlet:param name="userId" value="<%=Long.toString(usuario.getUserId()) %>"/>
+								        		<portlet:param name="criteria" value="<%=ParamUtil.getString(renderRequest, \"criteria\",\"\") %>"/>
+												<portlet:param name="gradeFilter" value="<%=ParamUtil.getString(renderRequest, \"gradeFilter\",\"\") %>"/>
+								        	</portlet:actionURL>
+											<aui:button value="publish" onClick="${publishLearningActivitiyResultURL}"/>
+										</c:if>
 									<%}else if(hasPublishDate && (!learningActivityResult.getComments().trim().equals(""))){%>
 										<p class="see-more">
 											<a onClick="AUI().use('aui-dialog', function(A) {
@@ -385,13 +386,13 @@ if(actId==0){
 										</p>
 									<%} 
 				               	}else{%><liferay-ui:message key="evaluationtaskactivity.student.without.qualification" />	
-								<% if(hasPublishDate){%>
-									<portlet:actionURL name="calcualteLearningActivitiyResult" var="calcualteLearningActivitiyResultURL" >
-						        		<portlet:param name="actId" value="<%=Long.toString(actId) %>"/>
-						        		<portlet:param name="userId" value="<%=Long.toString(usuario.getUserId()) %>"/>
-						        		<portlet:param name="criteria" value="<%=ParamUtil.getString(renderRequest, \"criteria\",\"\") %>"/>
-										<portlet:param name="gradeFilter" value="<%=ParamUtil.getString(renderRequest, \"gradeFilter\",\"\") %>"/>
-						        	</portlet:actionURL>
+								<% if(hasPublishDate || hasFiredDate){%>
+										<portlet:actionURL name="calcualteLearningActivitiyResult" var="calcualteLearningActivitiyResultURL" >
+							        		<portlet:param name="actId" value="<%=Long.toString(actId) %>"/>
+							        		<portlet:param name="userId" value="<%=Long.toString(usuario.getUserId()) %>"/>
+							        		<portlet:param name="criteria" value="<%=ParamUtil.getString(renderRequest, \"criteria\",\"\") %>"/>
+											<portlet:param name="gradeFilter" value="<%=ParamUtil.getString(renderRequest, \"gradeFilter\",\"\") %>"/>
+							        	</portlet:actionURL>
 										<aui:button value="calculate" onClick="${calcualteLearningActivitiyResultURL}"/>
 									<%}
 								}%>
