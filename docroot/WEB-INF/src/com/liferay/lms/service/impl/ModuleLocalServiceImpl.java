@@ -314,7 +314,7 @@ public class ModuleLocalServiceImpl extends ModuleLocalServiceBaseImpl {
 	    try {
 	    	Role siteMember = RoleLocalServiceUtil.fetchRole(validmodule.getCompanyId(), RoleConstants.SITE_MEMBER);
 	    	ResourcePermissionLocalServiceUtil.setResourcePermissions(validmodule.getCompanyId(), 
-	    			Module.class.getName(),ResourceConstants.SCOPE_INDIVIDUAL, String.valueOf(fileobj.getModuleId()),  siteMember.getRoleId(),  new String[]{"VIEW","ACCESS"});
+	    			Module.class.getName(),ResourceConstants.SCOPE_GROUP, String.valueOf(fileobj.getModuleId()),  siteMember.getRoleId(),  new String[]{"VIEW","ACCESS"});
 	    	
 			resourceLocalService.addResources(
 					validmodule.getCompanyId(), validmodule.getGroupId(), validmodule.getUserId(),
