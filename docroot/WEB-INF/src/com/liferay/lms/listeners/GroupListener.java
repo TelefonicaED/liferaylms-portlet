@@ -55,45 +55,43 @@ public class GroupListener extends BaseModelListener<Group> {
 				AuditingLogFactory.audit(course.getCompanyId(), course.getGroupCreatedId(), Course.class.getName(), 
 						course.getCourseId(), userId, PrincipalThreadLocal.getUserId(), AuditConstants.REGISTER, null);
 				
+				//Comprobamos que no sea tutor o editor para no enviar el correo
+				LmsPrefs lmsPrefs = null;
+				try {
+					lmsPrefs = LmsPrefsLocalServiceUtil.getLmsPrefs(course.getCompanyId());
+				} catch (PortalException e1) {
+					e1.printStackTrace();
+				}
+				
+				boolean tutorRole = lmsPrefs != null && lmsPrefs.getTeacherRole() > 0 
+						&& UserGroupRoleLocalServiceUtil.hasUserGroupRole(userId, groupId, lmsPrefs.getTeacherRole());
+				boolean editorRole = lmsPrefs != null && lmsPrefs.getEditorRole() > 0 
+						&& UserGroupRoleLocalServiceUtil.hasUserGroupRole(userId, groupId, lmsPrefs.getEditorRole());
+				
+				if(log.isDebugEnabled())log.debug("tutorRole: " + tutorRole);
+				if(log.isDebugEnabled())log.debug("editorRole: " + editorRole);
+				
+				if(log.isDebugEnabled())log.debug("preferencia tutorRole: " + PrefsPropsUtil.getBoolean(course.getCompanyId(), LmsConstant.SEND_MAIL_TO_TUTORS, true));
+				if(log.isDebugEnabled())log.debug("preferencia editorRole: " + PrefsPropsUtil.getBoolean(course.getCompanyId(), LmsConstant.SEND_MAIL_TO_EDITORS, true));
+				
+				//Si no es tutor o editor, es alumno, así que creamos el courseresult
+				if(!tutorRole && !editorRole){
+					if(CourseResultLocalServiceUtil.getCourseResultByCourseAndUser(course.getCourseId(), userId) == null) {
+						CourseResultLocalServiceUtil.addCourseResult(PrincipalThreadLocal.getUserId(), course.getCourseId(), userId);
+					}
+				}
+				
 				if(course!=null&&course.isWelcome()&&course.getWelcomeMsg()!=null&&!StringPool.BLANK.equals(course.getWelcomeMsg())){
 					
 					User user = null;
-					Company company = null;
 					try {
 						user = UserLocalServiceUtil.getUser(userId);
-						company = CompanyLocalServiceUtil.getCompany(course.getCompanyId());
 					} catch (PortalException e) {
 					}
 					
-					//Comprobamos que no sea tutor o editor para no enviar el correo
-					LmsPrefs lmsPrefs = null;
-					try {
-						lmsPrefs = LmsPrefsLocalServiceUtil.getLmsPrefs(course.getCompanyId());
-					} catch (PortalException e1) {
-						e1.printStackTrace();
-					}
-					
-					boolean tutorRole = lmsPrefs != null && lmsPrefs.getTeacherRole() > 0 
-							&& UserGroupRoleLocalServiceUtil.hasUserGroupRole(userId, groupId, lmsPrefs.getTeacherRole());
-					boolean editorRole = lmsPrefs != null && lmsPrefs.getEditorRole() > 0 
-							&& UserGroupRoleLocalServiceUtil.hasUserGroupRole(userId, groupId, lmsPrefs.getEditorRole());
-					
-					if(log.isDebugEnabled())log.debug("tutorRole: " + tutorRole);
-					if(log.isDebugEnabled())log.debug("editorRole: " + editorRole);
-					
-					if(log.isDebugEnabled())log.debug("preferencia tutorRole: " + PrefsPropsUtil.getBoolean(company.getCompanyId(), LmsConstant.SEND_MAIL_TO_TUTORS, true));
-					if(log.isDebugEnabled())log.debug("preferencia editorRole: " + PrefsPropsUtil.getBoolean(company.getCompanyId(), LmsConstant.SEND_MAIL_TO_EDITORS, true));
-					
-					//Si no es tutor o editor, es alumno, así que creamos el courseresult
-					if(!tutorRole && !editorRole){
-						if(CourseResultLocalServiceUtil.getCourseResultByCourseAndUser(course.getCourseId(), userId) == null) {
-							CourseResultLocalServiceUtil.addCourseResult(PrincipalThreadLocal.getUserId(), course.getCourseId(), userId);
-						}
-					}
-					
-					if(user!=null && company!=null && ((!tutorRole && !editorRole) 
-							|| (tutorRole && PrefsPropsUtil.getBoolean(company.getCompanyId(), LmsConstant.SEND_MAIL_TO_TUTORS, true)
-							|| (editorRole && PrefsPropsUtil.getBoolean(company.getCompanyId(), LmsConstant.SEND_MAIL_TO_EDITORS, true))))){
+					if(user!=null && ((!tutorRole && !editorRole) 
+							|| (tutorRole && PrefsPropsUtil.getBoolean(course.getCompanyId(), LmsConstant.SEND_MAIL_TO_TUTORS, true)
+							|| (editorRole && PrefsPropsUtil.getBoolean(course.getCompanyId(), LmsConstant.SEND_MAIL_TO_EDITORS, true))))){
 
 				    	String fromName = PrefsPropsUtil.getString(course.getCompanyId(),
 								PropsKeys.ADMIN_EMAIL_FROM_NAME);
@@ -104,6 +102,8 @@ public class GroupListener extends BaseModelListener<Group> {
 						try{
 
 							InternetAddress from = new InternetAddress(fromAddress, fromName);
+							
+							Company company = CompanyLocalServiceUtil.getCompany(course.getCompanyId());
 							
 					    	String url = PortalUtil.getPortalURL(company.getVirtualHostname(), 80, false);
 					    	//QUITANDO PUERTOS
