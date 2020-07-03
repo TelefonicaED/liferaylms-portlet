@@ -432,7 +432,7 @@ public class CourseImpl extends CourseBaseImpl {
 			InscriptionTypeRegistry inscriptionTypeRegistry = new InscriptionTypeRegistry();
 			InscriptionType inscriptionType = inscriptionTypeRegistry.getInscriptionType(getInscriptionType());
 			
-			return (courseResult == null || courseResult.getPassedDate() == null || (group.getType() == GroupConstants.TYPE_SITE_OPEN)) && inscriptionType.canUnsubscribe();
+			return inscriptionType.canUnsubscribe() && (courseResult == null || courseResult.getPassedDate() == null || (group.getType() == GroupConstants.TYPE_SITE_OPEN));
 		}else {
 			return false;
 		}
