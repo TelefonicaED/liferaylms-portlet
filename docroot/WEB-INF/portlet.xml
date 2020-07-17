@@ -852,6 +852,10 @@
 			<name>view-template</name>
 			<value>/html/mycourses/view.jsp</value>
 		</init-param>
+		<init-param>
+			<name>config-template</name>
+			<value>/html/mycourses/config/edit.jsp</value>
+		</init-param>
 		<expiration-cache>0</expiration-cache>
 		<supports>
 			<mime-type>text/html</mime-type>

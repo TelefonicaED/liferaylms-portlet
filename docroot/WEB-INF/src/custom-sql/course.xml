@@ -31,7 +31,7 @@
 				IF(EXTRACTVALUE(Lms_Course.title, '//Title[@language-id=\"[$LANGUAGE$]\"]') != '', EXTRACTVALUE(Lms_Course.title, '//Title[@language-id=\"[$LANGUAGE$]\"]'), IF(EXTRACTVALUE(Lms_Course.title, '//root[@default-locale]//Title') != '', EXTRACTVALUE(Lms_Course.title, '//root[@default-locale]//Title'), Lms_Course.title )) AS courseTitle,
 				CASE WHEN r.crId IS NULL THEN '0' WHEN r.passedDate IS NULL THEN '1' WHEN r.passedDate IS NOT NULL AND r.passed = 0 THEN '2' WHEN r.passed = 1 AND r.passedDate IS NOT NULL THEN '3' ELSE '0' END AS statusUser,
 				CASE WHEN r.crId IS NULL THEN 0 ELSE r.result END AS result, Lms_Course.icon, Lms_Course.groupCreatedId, Lms_Course.friendlyURL,
-				Lms_Course.executionStartDate, Lms_Course.executionEndDate, asset.summary, r.passedDate
+				Lms_Course.executionStartDate, Lms_Course.executionEndDate, asset.summary, r.passedDate, r.registrationDate
 			FROM 
 				Lms_course
 			INNER JOIN classname_ classname ON classname.value='com.liferay.lms.model.Course'
