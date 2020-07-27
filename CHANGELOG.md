@@ -3,6 +3,12 @@ Todos los cambios de este proyecto estarán documentados en este archivo.
 
 El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 
+## [4.2.1](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v4.2.1)
+
+### Fixed
+
+- #168477: Corrección sobre los cursos finalizados de wemooc.
+
 
 ## [4.2.0](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v4.2.0)
 

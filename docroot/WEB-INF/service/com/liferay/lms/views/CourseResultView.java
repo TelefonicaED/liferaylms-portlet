@@ -11,8 +11,11 @@ import com.liferay.lms.model.CourseCompetence;
 import com.liferay.lms.model.CourseResult;
 import com.liferay.lms.service.CompetenceLocalServiceUtil;
 import com.liferay.lms.service.CourseCompetenceLocalServiceUtil;
+import com.liferay.lms.service.CourseLocalServiceUtil;
+import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.theme.ThemeDisplay;
+import com.tls.lms.util.LiferaylmsUtil;
 
 public class CourseResultView {
 	
@@ -27,6 +30,7 @@ public class CourseResultView {
 	private int statusUser;
 	private List<Long> competenceIdList;
 	private Date passedDate;
+	private boolean hasPermissionAccessCourseFinished = false;
 	
 	public CourseResultView(Course course, CourseResult courseResult, ThemeDisplay themeDisplay){
 		setCourse(new CourseView(course, themeDisplay));
@@ -56,14 +60,17 @@ public class CourseResultView {
 				}
 			}
 			setCompetenceIdList(competenceIdList);
+			setHasPermissionAccessCourseFinished(LiferaylmsUtil.hasPermissionAccessCourseFinished(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(), course.getCourseId(), themeDisplay.getUserId()));
 		}else{
 			setPassed(false);
 			setResult(0);
 			setCompetenceIdList(new ArrayList<Long>());
 		}
 	}
-	
 	public CourseResultView(CourseView courseView, long result, int statusUser, Date passedDate){
+		this(courseView, result, statusUser, passedDate, 0);
+	}
+	public CourseResultView(CourseView courseView, long result, int statusUser, Date passedDate, long userId){
 		setCourse(courseView);
 		setResult(result);
 		setStatusUser(statusUser);
@@ -92,6 +99,15 @@ public class CourseResultView {
 			}
 		}
 		setCompetenceIdList(competenceIdList);
+		try {
+			Course course = CourseLocalServiceUtil.fetchCourse(courseView.getCourseId());
+			if(course!=null && userId>0){
+				setHasPermissionAccessCourseFinished(LiferaylmsUtil.hasPermissionAccessCourseFinished(course.getCompanyId(), course.getGroupId(), course.getCourseId(), userId));
+			}
+		} catch (SystemException e) {
+			e.printStackTrace();
+		}
+		
 	}
 	
 	public CourseResultView(CourseView courseView, long result, int statusUser){
@@ -146,4 +162,14 @@ public class CourseResultView {
 		this.passedDate = passedDate;
 	}
 
+	public boolean isHasPermissionAccessCourseFinished() {
+		return hasPermissionAccessCourseFinished;
+	}
+
+	public void setHasPermissionAccessCourseFinished(
+			boolean hasPermissionAccessCourseFinished) {
+		this.hasPermissionAccessCourseFinished = hasPermissionAccessCourseFinished;
+	}
+
+	
 }
