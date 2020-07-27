@@ -766,10 +766,7 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 					"/html/courseadmin/editcourse.jsp");
 			return;
 		}
-		
-		
-		
-		
+
 		Date ahora = new Date(System.currentTimeMillis());
 		
 		boolean requiredCourseIcon = GetterUtil.getBoolean(PropsUtil.get("lms.course.icon.required"), false);

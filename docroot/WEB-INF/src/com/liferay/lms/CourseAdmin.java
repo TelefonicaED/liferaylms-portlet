@@ -389,7 +389,9 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 					
 				}
 				renderRequest.setAttribute("editionTitle", editionsTitle);
-				renderRequest.setAttribute("editionFriendlyURL", course.getFriendlyURL()+"-"+newCourseName.replace(" ", "-"));
+				String friendlyURL = course.getFriendlyURL()+"-"+newCourseName.replace(" ", "-");
+				friendlyURL = StringPool.SLASH+friendlyURL.replaceAll("[^a-zA-Z0-9_-]+", "");
+				renderRequest.setAttribute("editionFriendlyURL", friendlyURL);
 				
 				
 				if(prototypeList.size()>1){
@@ -1153,45 +1155,30 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 			errors = true;
 		}
 		
-		Group group = null;
-		try{
-			group = GroupLocalServiceUtil.getGroup(themeDisplay.getCompanyId(), newEditionName);
-		}catch(NoSuchGroupException e){
-			group = null;
-			if(log.isDebugEnabled()){
-				e.printStackTrace();
-			}
-		}
 		if(!errors){
-			if(group != null) {
-				SessionErrors.add(actionRequest, "duplicate-name");
+			Group group=GroupLocalServiceUtil.fetchFriendlyURLGroup(themeDisplay.getCompanyId(), friendlyURL);
+			if(group!=null){
+				SessionErrors.add(actionRequest, "duplicate-friendly-url");
 				errors = true;
-			} else {
-				group=GroupLocalServiceUtil.fetchFriendlyURLGroup(themeDisplay.getCompanyId(), friendlyURL);
-				if(group!=null){
-					SessionErrors.add(actionRequest, "duplicate-friendly-url");
-					errors = true;
-				}else{
-					
-					AsynchronousProcessAudit process = AsynchronousProcessAuditLocalServiceUtil.addAsynchronousProcessAudit(themeDisplay.getCompanyId(), themeDisplay.getUserId(), Course.class.getName(), "liferay/lms/createEdition");
-					
-					Message message=new Message();
-					message.put("asynchronousProcessAuditId", process.getAsynchronousProcessAuditId());
-					message.put("parentCourseId", parentCourseId);
-					message.put("newEditionName",newEditionName);
-					message.put("themeDisplay",themeDisplay);
-					message.put("startDate",startDate);
-					message.put("endDate",endDate);
-					message.put("startExecutionDate",startExecutionDate);
-					message.put("endExecutionDate",endExecutionDate);
-					message.put("editionFriendlyURL",friendlyURL);
-					message.put("isLinked",isLinked);
-					message.put("serviceContext",serviceContext);
-					message.put("editionLayoutId", editionLayoutId);
-					MessageBusUtil.sendMessage("liferay/lms/createEdition", message);
-			
-				}
-						
+			}else{
+				
+				AsynchronousProcessAudit process = AsynchronousProcessAuditLocalServiceUtil.addAsynchronousProcessAudit(themeDisplay.getCompanyId(), themeDisplay.getUserId(), Course.class.getName(), "liferay/lms/createEdition");
+				
+				Message message=new Message();
+				message.put("asynchronousProcessAuditId", process.getAsynchronousProcessAuditId());
+				message.put("parentCourseId", parentCourseId);
+				message.put("newEditionName",newEditionName);
+				message.put("themeDisplay",themeDisplay);
+				message.put("startDate",startDate);
+				message.put("endDate",endDate);
+				message.put("startExecutionDate",startExecutionDate);
+				message.put("endExecutionDate",endExecutionDate);
+				message.put("editionFriendlyURL",friendlyURL);
+				message.put("isLinked",isLinked);
+				message.put("serviceContext",serviceContext);
+				message.put("editionLayoutId", editionLayoutId);
+				MessageBusUtil.sendMessage("liferay/lms/createEdition", message);
+		
 			}
 		}
 		

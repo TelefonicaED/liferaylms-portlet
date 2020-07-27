@@ -86,8 +86,6 @@ public class CreateEdition extends CourseCopyUtil implements MessageListener {
 	public CreateEdition() {
 	}
 	
-	
-	
 	@Override
 	public void receive(Message message) throws MessageListenerException {
 		
@@ -137,13 +135,10 @@ public class CreateEdition extends CourseCopyUtil implements MessageListener {
 			log.debug(" Course to create edition\n........................." + parentCourseId);
 			log.debug(" New edition name\n........................." + newEditionName);
 			log.debug("  + Parent course: "+course.getTitle(themeDisplay.getLocale()));
-		 
 		}
-		
 		
 		Date today=new Date(System.currentTimeMillis());
 
-		
 		//Plantilla
 		
 		if(editionLayoutId<=0){
@@ -152,9 +147,7 @@ public class CreateEdition extends CourseCopyUtil implements MessageListener {
 		if(log.isDebugEnabled()){
 			log.debug("  + layoutSetPrototypeId: "+editionLayoutId);
 		}
-		
-	
-		
+
 		//Tags y categorias
 		try{
 			AssetEntryLocalServiceUtil.validate(course.getGroupCreatedId(), Course.class.getName(), serviceContext.getAssetCategoryIds(), serviceContext.getAssetTagNames());
@@ -183,8 +176,8 @@ public class CreateEdition extends CourseCopyUtil implements MessageListener {
 			AssetEntry entry = AssetEntryLocalServiceUtil.getEntry(Course.class.getName(), course.getCourseId());
 			summary = entry.getSummary(themeDisplay.getLocale());
 			courseTypeId = entry.getClassTypeId();
-			newCourse = CourseLocalServiceUtil.addCourse(course.getTitle(themeDisplay.getLocale())+"-"+newEditionName, course.getDescription(themeDisplay.getLocale()),summary
-					, editionFriendlyURL, themeDisplay.getLocale(), today, startDate, endDate, editionLayoutId, typeSite, serviceContext, course.getCalificationType(), (int)course.getMaxusers(),true);
+			newCourse = CourseLocalServiceUtil.addCourse(course.getTitle(themeDisplay.getLocale())+"-"+newEditionName, course.getDescription(themeDisplay.getLocale()),
+					summary, editionFriendlyURL, themeDisplay.getLocale(), today, startDate, endDate, editionLayoutId, typeSite, serviceContext, course.getCalificationType(), (int)course.getMaxusers(),true);
 			
 			newCourse.setGroupId(themeDisplay.getScopeGroupId());
 			newCourse.setTitle(newEditionName, themeDisplay.getLocale());
@@ -213,9 +206,7 @@ public class CreateEdition extends CourseCopyUtil implements MessageListener {
 		newCourse.setExpandoBridgeAttributes(serviceContext);
 		newCourse.getExpandoBridge().setAttributes(course.getExpandoBridge().getAttributes());
 		newCourse.setParentCourseId(parentCourseId);
-		
-	
-		Group newGroup = GroupLocalServiceUtil.getGroup(newCourse.getGroupCreatedId());
+
 		serviceContext.setScopeGroupId(newCourse.getGroupCreatedId());
 
 		
@@ -229,11 +220,6 @@ public class CreateEdition extends CourseCopyUtil implements MessageListener {
 			newEntry.setSummary(summary);
 			newEntry.setClassTypeId(courseTypeId);
 			AssetEntryLocalServiceUtil.updateAssetEntry(newEntry);
-			String groupName =  course.getTitle(themeDisplay.getLocale(),true)+"-"+newEditionName;
-			groupName = groupName.substring(0, 148);
-			newGroup.setName(groupName);
-			newGroup.setDescription(summary);
-			GroupLocalServiceUtil.updateGroup(newGroup);
 			
 		}catch(Exception e){
 			if(log.isDebugEnabled())e.printStackTrace();
