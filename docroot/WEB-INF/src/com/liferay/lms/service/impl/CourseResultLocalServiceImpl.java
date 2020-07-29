@@ -40,6 +40,7 @@ import com.liferay.lms.service.ClpSerializer;
 import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.lms.service.base.CourseResultLocalServiceBaseImpl;
 import com.liferay.lms.service.persistence.CourseResultFinderUtil;
+import com.liferay.lms.util.CourseParams;
 import com.liferay.portal.kernel.bean.PortletBeanLocatorUtil;
 import com.liferay.portal.kernel.dao.orm.Criterion;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
@@ -50,6 +51,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.model.User;
 import com.liferay.portal.security.permission.ActionKeys;
 
@@ -168,9 +170,22 @@ public class CourseResultLocalServiceImpl
 	 * @param passed si queremos los aprobados o suspensos
 	 * @param userExcludedIds id de la company de la actividad
 	 * @return media de resultado de usuarios para una actividad
+	 * @deprecated
 	 */
+	@Deprecated
 	public double avgResultByCourseIdUserExcludedIds(long courseId, boolean passed, long[] userExcludedIds) throws SystemException{
-		return CourseResultFinderUtil.avgResultByCourseId(courseId, passed, null, userExcludedIds);
+		return CourseResultFinderUtil.avgResultByCourseIdStudents(courseId, passed);
+	}
+	
+	/**
+	 * Devuelve la media de resultado de usuarios para un curso
+	 * @param courseId id del curso
+	 * @param includeEditions si contar las notas de las ediciones también
+	 * @param userExcludedIds id de la company de la actividad
+	 * @return media de resultado de usuarios para una actividad
+	 */
+	public double avgResultByCourseIdStudents(long courseId, boolean includeEditions) throws SystemException{
+		return CourseResultFinderUtil.avgResultByCourseIdStudents(courseId, includeEditions);
 	}
 	
 	/**
@@ -180,10 +195,8 @@ public class CourseResultLocalServiceImpl
 	 * @param passed si queremos de los aprobados o suspendos
 	 * @return media de resultado de usuarios para una actividad
 	 */
-	public Double avgStudentsResult(Course course, boolean passed) throws SystemException{
-		long[] userExcludedIds = CourseLocalServiceUtil.getTeachersAndEditorsIdsFromCourse(course);
-		 
-		return CourseResultFinderUtil.avgResultByCourseId(course.getCourseId(), passed, null, userExcludedIds);
+	public Double avgStudentsResult(Course course, boolean passed) throws SystemException{	 
+		return CourseResultFinderUtil.avgResultByCourseIdStudents(course.getCourseId(), passed);
 	}
 	
 	public long countByCourseId(long courseId) throws SystemException{
@@ -379,6 +392,61 @@ public class CourseResultLocalServiceImpl
 		}
 	}
 	
+	/**
+	 * Devuelve el número de estudiantes que han comenzado un curso, esta función está pensada para pasar una lista de estudiantes filtrada
+	 * (por ejemplo para los equipos) para pedir de todos los estudiantes usar countStudentsByCourseIdUserExcludedIdsStarted
+	 * @param courseId id del curso del que quiero contar estudiantes
+	 * @param teamId id del equipo
+	 * @return número de estudiantes que han iniciado el curso
+	 * @throws SystemException
+	 */
+	public int countStudentsByCourseIdTeamIdStarted(long courseId, long companyId, long[] teamIds, boolean includeEditions) throws SystemException{
+		return courseLocalService.countStudentsFromCourse(courseId, companyId, null, null, null, null, WorkflowConstants.STATUS_ANY, teamIds, 
+				false, includeEditions, CourseParams.STUDENTS_TYPE_STARTED);
+	}
+	
+	/**
+	 * Cuenta los estudiantes que han finalizado el curso, esta función está pensada para pasar una lista de estudiantes filtrada
+	 * (por ejemplo para los equipos) para pedir de todos los estudiantes usar countStudentsByCourseIdUserExcludedIdsFinished
+	 * @param courseId id del curso del que quiero contar los estudiantes
+	 * @param teamId id del equipo
+	 * @return número de usuarios que han finalizado el curso
+	 * @throws SystemException
+	 */
+	
+	public int countStudentsByCourseIdTeamIdFinished(long courseId, long companyId, long[] teamIds, boolean includeEditions) throws SystemException{
+		return courseLocalService.countStudentsFromCourse(courseId, companyId, null, null, null, null, WorkflowConstants.STATUS_ANY, teamIds, 
+				false, includeEditions, CourseParams.STUDENTS_TYPE_FINISHED);
+	}
+	
+	/**
+	 * Cuenta los estudiantes que han finalizado el curso y lo hayan aprobado, esta función está pensada para pasar una lista de estudiantes filtrada
+	 * (por ejemplo para los equipos) para pedir de todos los estudiantes usar countStudentsByCourseIdUserExcludedIdsPassed
+	 * @param courseId id del curso del que quiero contar los estudiantes
+	 * @param teamId id del equipo
+	 * @return número de estudiantes que han aprobado el curso
+	 * @throws SystemException
+	 */
+	
+	public int countStudentsByCourseIdTeamIdPassed(long courseId, long companyId, long[] teamIds, boolean includeEditions) throws SystemException{
+		return courseLocalService.countStudentsFromCourse(courseId, companyId, null, null, null, null, WorkflowConstants.STATUS_ANY, teamIds, 
+				false, includeEditions, CourseParams.STUDENTS_TYPE_PASSED);
+	}
+	
+	/**
+	 * Cuenta los estudiantes que han finalizado el curso y lo hayan suspendido, esta función está pensada para pasar una lista de estudiantes filtrada
+	 * (por ejemplo para los equipos) para pedir de todos los estudiantes usar countStudentsByCourseIdUserExcludedIdsFailed
+	 * @param courseId id del curso del que quiero contar los estudiantes
+	 * @param teamId id del equipo
+	 * @return número de estudiantes que han finalizado el curso y lo han suspendido
+	 * @throws SystemException
+	 */
+	
+	public int countStudentsByCourseIdTeamIdFailed(long courseId, long companyId, long[] teamIds, boolean includeEditions) throws SystemException{
+		return courseLocalService.countStudentsFromCourse(courseId, companyId, null, null, null, null, WorkflowConstants.STATUS_ANY, teamIds, 
+				false, includeEditions, CourseParams.STUDENTS_TYPE_FAILED);
+	}
+	
 	public List<CourseResult> getByUserId(long userId){
 		List<CourseResult> results = new ArrayList<CourseResult>();
 		try {
@@ -544,21 +612,7 @@ public class CourseResultLocalServiceImpl
 	 */
 	@Deprecated
 	public Double avgStudentsResult(Course course, List<User> _students, boolean passed) throws SystemException{
-		List<User> students = null;
-		// Se prepara el metodo para recibir un Listado de estudiantes especificos,, por ejemplo que pertenezcan a alguna organizacion. Sino, se trabaja con todos los estudiantes del curso.
-		if(Validator.isNotNull(_students) && _students.size() > 0)
-			students = _students;
-		else
-			students = CourseLocalServiceUtil.getStudentsFromCourse(course.getCompanyId(), course.getGroupCreatedId());
-	
-		if(students != null && students.size() > 0){
-			long[] userIds = new long[students.size()];
-			for(int i = 0; i < students.size(); i++){
-				userIds[i] = students.get(i).getUserId();
-			}
-			return CourseResultFinderUtil.avgResultByCourseId(course.getCourseId(), passed, userIds, null);
-		}
-		return new Double(0);
+		return CourseResultFinderUtil.avgResultByCourseIdStudents(course.getCourseId(), passed);
 	}
 	
 	/**

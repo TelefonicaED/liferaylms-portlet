@@ -1715,7 +1715,25 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 	 */
 	public List<User> getStudentsFromCourse(long courseId, long companyId, String screenName, String firstName, String lastName, String emailAddress, int status, long[] teamIds, boolean andOperator, 
 									int start, int end, OrderByComparator obc){
-		return courseFinder.findStudents(courseId, companyId, screenName, firstName, lastName, emailAddress, status, teamIds, andOperator, start, end, obc);
+		return courseFinder.findStudents(courseId, companyId, screenName, firstName, lastName, emailAddress, status, teamIds, andOperator, false, CourseParams.STUDENTS_TYPE_ALL, start, end, obc);
+	}
+	
+	/**
+	 * Usar este método para contar los estudiantes de un curso
+	 * @param courseId id del curso
+	 * @param companyId id de company
+	 * @param screenName nombre de usuario
+	 * @param firstName nombre
+	 * @param lastName apellido
+	 * @param emailAddress direccion de correo
+	 * @param status estado del usuario (WorkflowConstants)
+	 * @param teamIds array de long con los ids de los equipos
+	 * @param andOperator true si queremos que coincidan screenname, firstname, lastname y emailaddress, false en caso contrario
+	 * @return
+	 */
+	public int countStudentsFromCourse(long courseId, long companyId, String screenName, String firstName, String lastName, String emailAddress, 
+			int status, long[] teamIds, boolean andOperator, boolean includeEditions, int type){
+		return courseFinder.countStudents(courseId, companyId, screenName, firstName, lastName, emailAddress, status, teamIds, andOperator, includeEditions, type);
 	}
 	
 	/**
@@ -1732,7 +1750,7 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 	 * @return
 	 */
 	public int countStudentsFromCourse(long courseId, long companyId, String screenName, String firstName, String lastName, String emailAddress, int status, long[] teamIds, boolean andOperator){
-		return courseFinder.countStudents(courseId, companyId, screenName, firstName, lastName, emailAddress, status, teamIds, andOperator);
+		return countStudentsFromCourse(courseId, companyId, screenName, firstName, lastName, emailAddress, status, teamIds, andOperator, false, CourseParams.STUDENTS_TYPE_ALL);
 	}
 	
 	public int getStudentsFromCourseCount(long courseId) throws SystemException, PortalException{

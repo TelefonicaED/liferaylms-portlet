@@ -35,10 +35,14 @@ public interface LearningActivityType extends InvokableService
 	public String getUrlIcon();
 	public String getDescription();
 	public boolean gradebook();
-	String getMesageEditDetails();
+	public String getMesageEditDetails();
 	public boolean hasEditDetails();
 	public boolean hasDeleteTries();
 	public boolean hasMandatoryDates();
+	/**
+	 * @deprecated
+	 */
+	@Deprecated
 	public boolean isDone(LearningActivity learningActivity,long userId) throws SystemException, PortalException;
 	public boolean allowsBank();
 	public boolean allowsDeleteBank();
@@ -48,11 +52,14 @@ public interface LearningActivityType extends InvokableService
 	public void afterInsertOrUpdate(UploadRequest uploadRequest,PortletResponse portletResponse,LearningActivity learningActivity) throws PortalException,SystemException;
 	public String getPortletId();
 	public void deleteResources(ActionRequest actionRequest,ActionResponse actionResponse,LearningActivity larn) throws PortalException,SystemException,DocumentException,IOException;
+	/**
+	 * @deprecated
+	 */
+	@Deprecated
 	public boolean isAutoCorrect();
 	public String importExtraContent(LearningActivity newLarn, Long userId, PortletDataContext context, ServiceContext serviceContext, Element actElement) throws PortalException, IOException, DocumentException, SystemException;
 	public String addZipEntry(LearningActivity actividad, Long assetEntryId, PortletDataContext context, Element entryElementLoc) throws PortalException, SystemException;
 	public boolean canBeLinked();
-	@Deprecated
 	public boolean canBeSeenResults();
 	public String getSpecificResultsPage();
 	public long calculateResult(LearningActivity learningActivity, LearningActivityTry lat);

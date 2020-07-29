@@ -17,9 +17,11 @@
 			LEFT JOIN 
 				usergrouprole urE 
 					ON ug.userId = urE.userId AND urE.groupId = ug.groupId AND urE.roleId = ?
+			[$JOINCOURSERESULT$]
 			[$JOINTEAM$]
 			WHERE 
-				ur.userId IS NULL AND urE.userId IS NULL AND co.courseId = ?
+				ur.userId IS NULL AND urE.userId IS NULL 
+				[$WHERECOURSEOREDITIONS$]
 				[$WHERESTATUS$]
 				[$WHERESEARCH$]
 			ORDER BY [$ORDERBY$]
@@ -48,11 +50,43 @@
 			LEFT JOIN 
 				usergrouprole urE 
 					ON ug.userId = urE.userId AND urE.groupId = ug.groupId AND urE.roleId = ?
+			[$JOINCOURSERESULT$]
 			[$JOINTEAM$]
 			WHERE 
-				ur.userId IS NULL AND urE.userId IS NULL AND co.courseId = ?
+				ur.userId IS NULL AND urE.userId IS NULL 
+				[$WHERECOURSEOREDITIONS$]
 				[$WHERESTATUS$]
 				[$WHERESEARCH$]
+		]]>
+	</sql>
+	<sql id="com.liferay.lms.service.persistence.CourseFinder.whereCourseId">
+		<![CDATA[ 
+			AND co.courseId = ?
+		]]>
+	</sql>
+	<sql id="com.liferay.lms.service.persistence.CourseFinder.whereEditions">
+		<![CDATA[ 
+			AND (co.courseId = ? OR co.parentCourseId = ?)
+		]]>
+	</sql>
+	<sql id="com.liferay.lms.service.persistence.CourseFinder.innerStarted">
+		<![CDATA[ 
+			INNER JOIN lms_courseresult cr ON co.courseId = cr.courseId AND cr.userId = u.userId AND cr.startDate IS NOT NULL
+		]]>
+	</sql>
+	<sql id="com.liferay.lms.service.persistence.CourseFinder.innerFinished">
+		<![CDATA[ 
+			INNER JOIN lms_courseresult cr ON co.courseId = cr.courseId AND cr.userId = u.userId AND cr.passedDate IS NOT NULL
+		]]>
+	</sql>
+	<sql id="com.liferay.lms.service.persistence.CourseFinder.innerPassed">
+		<![CDATA[ 
+			INNER JOIN lms_courseresult cr ON co.courseId = cr.courseId AND cr.userId = u.userId AND cr.passedDate IS NOT NULL AND cr.passed = true
+		]]>
+	</sql>
+	<sql id="com.liferay.lms.service.persistence.CourseFinder.innerFailed">
+		<![CDATA[ 
+			INNER JOIN lms_courseresult cr ON co.courseId = cr.courseId AND cr.userId = u.userId AND cr.passedDate IS NOT NULL AND cr.passed = false
 		]]>
 	</sql>
 	<sql id="com.liferay.lms.service.persistence.CourseFinder.whereUserSearch">

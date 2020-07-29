@@ -1,31 +1,50 @@
-
 <%@ include file="/init.jsp" %>
 
+<c:if test="${course.courseId > 0 }">
+	<liferay-ui:header
+			backURL="${backURL}"
+			title="${course.getTitle(themeDisplay.locale)}"/>
+</c:if>
+
 <div class="portlet-toolbar search-form">
-<%@ include file="/html/courseadmin/coursesearchform.jsp" %>
-
-<liferay-ui:icon image="export" label="<%= true %>" message="offlinetaskactivity.csv.export" url="javascript:${renderResponse.getNamespace()}submitExport();" />
-<aui:form name="fmExport" action="${exportReportURL}" method="POST" role="form">
-</aui:form>
-<script>
-function <portlet:namespace />submitExport(){
-	$('form[name="<portlet:namespace />fmExport"]').submit();
-}
-</script>
-
-
-<liferay-ui:search-container
+	<%@ include file="/html/courseadmin/coursesearchform.jsp" %>
+	
+	<liferay-ui:icon image="export" label="<%= true %>" message="offlinetaskactivity.csv.export" url="javascript:${renderResponse.getNamespace()}submitExport();" />
+	<aui:form name="fmExport" action="${exportReportURL}" method="POST" role="form">
+	</aui:form>
+	<script>
+	function <portlet:namespace />submitExport(){
+		$('form[name="<portlet:namespace />fmExport"]').submit();
+	}
+	</script>
+	
+	<liferay-ui:search-container
 			id="courseSearchContainer"
 			searchContainer="${searchContainer}" 
 			iteratorURL="${searchContainer.iteratorURL}">
 			<liferay-ui:search-container-results 
 				total="${searchContainer.total }" 
 				results="${searchContainer.results }"/>
-			
 			<liferay-ui:search-container-row modelVar="courseStats"  keyProperty="courseId" className="com.liferay.lms.views.CourseStatsView" >
 				<liferay-ui:search-container-column-text name="title" cssClass="${courseStats.cssClosed}"  title="title" orderable="false">
-				 	${courseStats.courseTitle}
+					<c:choose>
+						<c:when test="${courseStats.numEditions > 0}">
+							<liferay-portlet:renderURL var="goToEditionsURL">
+								<liferay-portlet:param name="courseId" value="${courseStats.courseId }"/>
+								<liferay-portlet:param name="view" value="editions"/>
+							</liferay-portlet:renderURL>
+						 	<a href="${goToEditionsURL}">${courseStats.courseTitle}</a>
+						 	</c:when>
+					 	<c:otherwise>
+					 		${courseStats.courseTitle}
+					 	</c:otherwise>
+				 	</c:choose>
 				</liferay-ui:search-container-column-text>
+				<c:if test="${empty course && renderRequest.preferences.getValue('showEditions', 'true') }">
+					<liferay-ui:search-container-column-text name="course.editions-number"  title="course.editions-number" orderable="false" >
+					 	${courseStats.numEditions}
+					</liferay-ui:search-container-column-text>
+				</c:if>
 				<c:if test="${renderRequest.preferences.getValue('showRegistered', 'true') }">
 					<liferay-ui:search-container-column-text name="coursestats.registered"  title="coursestats.registered" orderable="false">
 					 	${courseStats.registered}

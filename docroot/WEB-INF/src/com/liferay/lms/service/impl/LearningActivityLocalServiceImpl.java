@@ -606,6 +606,11 @@ public class LearningActivityLocalServiceImpl extends LearningActivityLocalServi
 	{
 		return learningActivityPersistence.findByg_t(groupId, typeId);
 	}
+	
+	public int countLearningActivitiesOfGroupAndType(long groupId,int typeId) throws SystemException {
+		return learningActivityPersistence.countByg_t(groupId, typeId);
+	}
+	
 	public java.util.List<LearningActivity> getLearningActivitiesByType(long companyId,int typeId) throws SystemException
 	{
 		return learningActivityPersistence.findByCompanyIdTypeId(companyId, typeId);
@@ -867,6 +872,7 @@ public class LearningActivityLocalServiceImpl extends LearningActivityLocalServi
 			saveHashMapToXMLExtraContent(actId, hashMap);
 
 		} catch (PortalException e) {
+			e.printStackTrace();
 		}
 	}
 

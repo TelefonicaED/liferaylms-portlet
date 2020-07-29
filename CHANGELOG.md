@@ -3,6 +3,16 @@ Todos los cambios de este proyecto estarán documentados en este archivo.
 
 El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 
+## [4.3.0](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v4.3.0)
+
+### Added
+
+- #184759 En las estadítsticas, se puede pinchar sobre los cursos con ediciones para ver los datos concretos de esa edición
+
+### Updated
+
+- #184759 Se modifican las estadísticas para que saquen la suma de todas las ediciones.
+
 ## [4.2.1](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v4.2.1)
 
 ### Fixed

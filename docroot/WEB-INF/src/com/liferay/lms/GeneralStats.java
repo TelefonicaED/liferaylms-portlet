@@ -263,6 +263,20 @@ public class GeneralStats extends MVCPortlet {
 			params.put(CourseParams.PARAM_PERMISSIONS_ADMIN, themeDisplay.getUserId());
 		}
 		
+		if(courseId > 0){
+			try {
+				Course course = CourseLocalServiceUtil.getCourse(courseId);
+				PortletURL backURL = renderResponse.createRenderURL();
+				backURL.setParameter("courseId", "");
+				backURL.setParameter("view", "");
+				
+				renderRequest.setAttribute("course", course);
+				renderRequest.setAttribute("backURL", backURL);
+			} catch (PortalException | SystemException e) {
+				e.printStackTrace();
+			}
+		}
+		
 		String orderByCol = ParamUtil.getString(renderRequest, "orderByCol");
 		String orderByType = ParamUtil.getString(renderRequest, "orderByType");
 		
@@ -286,10 +300,8 @@ public class GeneralStats extends MVCPortlet {
 				searchContainer.getStart(), searchContainer.getEnd(), searchContainer.getOrderByComparator());
 		List<CourseStatsView> courseStats = new ArrayList<CourseStatsView>();
 		CourseStatsView courseStatView=null;
-		long[] userExcludedIds;
 		for(Course course:courses){
-			userExcludedIds = CourseLocalServiceUtil.getTeachersAndEditorsIdsFromCourse(course);
-			courseStatView =  new CourseStatsView(course.getCourseId(),themeDisplay.getLocale(), 0, userExcludedIds, null,true);
+			courseStatView =  new CourseStatsView(themeDisplay.getCompanyId(), course.getCourseId(),themeDisplay.getLocale(), 0, true);
 			courseStats.add(courseStatView);
 		}
 		searchContainer.setResults(courseStats);
@@ -304,6 +316,7 @@ public class GeneralStats extends MVCPortlet {
 		renderRequest.setAttribute("tags", tags);
 		renderRequest.setAttribute("state", state);
 		renderRequest.setAttribute("catIdsText", catIdsText);
+		renderRequest.setAttribute("courseId", courseId);
 	
 		renderRequest.setAttribute("STATUS_APPROVED", WorkflowConstants.STATUS_APPROVED);
 		renderRequest.setAttribute("STATUS_INACTIVE", WorkflowConstants.STATUS_INACTIVE);
@@ -426,11 +439,9 @@ public class GeneralStats extends MVCPortlet {
 	        linea[9]=LanguageUtil.get(themeDisplay.getLocale(),"coursestats.activitiescounter");
 	        
 	        writer.writeNext(linea);
-	        long[] userExcludedIds = null;
 	        CourseStatsView courseStatView = null;
 	        for(Course course:courses){
-	        	userExcludedIds = CourseLocalServiceUtil.getTeachersAndEditorsIdsFromCourse(course);
-	        	courseStatView = new CourseStatsView(course.getCourseId(), themeDisplay.getLocale(), 0, userExcludedIds, null, true);
+	        	courseStatView = new CourseStatsView(themeDisplay.getCompanyId(), course.getCourseId(), themeDisplay.getLocale(), 0, true);
 	        	linea=new String[10];
 		        linea[0]=courseStatView.getCourseTitle();
 		    	linea[1]=Long.toString(courseStatView.getRegistered());

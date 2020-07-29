@@ -2062,7 +2062,7 @@
 		</init-param>
 		<init-param>
 			<name>config-template</name>
-			<value>/html/generalstats/config.jsp</value>
+			<value>/html/generalstats/config/config.jsp</value>
 		</init-param>
 		<expiration-cache>0</expiration-cache>
 		<supports>
