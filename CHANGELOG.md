@@ -13,6 +13,11 @@ El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 
 - #184759 Se modifican las estadísticas para que saquen la suma de todas las ediciones.
 
+### Fixed
+
+- #182374 Se modifica cuándo se pone la fecha fin de un módulo porque cuando suspendías las actividades no te la rellenaba. 
+- #182374 Modificación en los métodos de evaluación para que no compruebe si quedan intentos, solo mire la fecha de fin de la actividad.
+
 ## [4.2.1](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v4.2.1)
 
 ### Fixed

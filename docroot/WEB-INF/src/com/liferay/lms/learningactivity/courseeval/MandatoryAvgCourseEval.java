@@ -83,12 +83,7 @@ public class MandatoryAvgCourseEval extends BaseCourseEval {
 				if(learningActivityResult.getEndDate()!=null){
 					if(!learningActivityResult.isPassed()){
 						passed = false;
-						if(activity.getTries() > 0){
-							long  userTries = LearningActivityTryLocalServiceUtil.getLearningActivityTryByActUserCount(activity.getActId(), userId);
-							if(userTries >= activity.getTries()){
-								isFailed=true;
-							}
-						}
+						isFailed=true;
 					}
 				}else{
 					passed=false;					
