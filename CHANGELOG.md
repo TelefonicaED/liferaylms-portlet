@@ -12,6 +12,7 @@ El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 ### Updated
 
 - #184759 Se modifican las estadísticas para que saquen la suma de todas las ediciones.
+- #182359 Se modifica el editor de fechas para tener en cuenta todas las fechas nulas tanto de módulos como de actividades
 
 ### Fixed
 
