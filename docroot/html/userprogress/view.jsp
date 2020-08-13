@@ -1,3 +1,8 @@
+<%@page import="com.liferay.lms.learningactivity.calificationtype.CalificationType"%>
+<%@page import="com.liferay.lms.learningactivity.calificationtype.CalificationTypeRegistry"%>
+<%@page import="com.liferay.lms.model.Course"%>
+<%@page import="com.liferay.lms.service.CourseResultLocalServiceUtil"%>
+<%@page import="com.liferay.lms.model.CourseResult"%>
 <%@page import="com.liferay.portal.kernel.util.UnicodeFormatter"%>
 <%@page import="java.util.LinkedList"%>
 <%@page import="com.liferay.lms.service.ModuleResultLocalServiceUtil"%>
@@ -14,19 +19,44 @@
 <%@ include file="/init.jsp" %>
 
 <%
+String returnurl=ParamUtil.getString(request,"returnurl","");
+String title = null;
 long userId=ParamUtil.getLong(request,"userId",0);
 if(userId==0){
 	userId=themeDisplay.getUserId();
+}else{
+	User usuario=UserLocalServiceUtil.getUser(userId);
+	title = LanguageUtil.get(pageContext,"results") +" "+ usuario.getFullName();
 }
 
-String returnurl=ParamUtil.getString(request,"returnurl","");
-User usuario=UserLocalServiceUtil.getUser(userId);
-String title = LanguageUtil.get(pageContext,"results") +" "+ usuario.getFullName();
 boolean showExport = (renderRequest.getPreferences().getValue("showExport", "false")).compareTo("true") == 0;
+Course course = CourseLocalServiceUtil.getCourseByGroupCreatedId(themeDisplay.getScopeGroupId());
+
+CourseResult courseResult = CourseResultLocalServiceUtil.getCourseResultByCourseAndUser(course.getCourseId(), userId);
+
+String status = "not-started";
+if(courseResult != null && courseResult.getStartDate() != null && courseResult.getPassedDate() == null){
+	status = "started";
+}else if(courseResult != null && courseResult.getPassedDate() != null && !courseResult.isPassed()){
+	status = "not-passed";
+}else if(courseResult != null && courseResult.getPassedDate() != null && courseResult.isPassed()){
+	status = "passed";
+}
+
+status = LanguageUtil.get(themeDisplay.getLocale(), status);
+
+String result = "result.pending";
+if(courseResult != null && courseResult.getPassedDate() != null){
+	CalificationType calificationType = new CalificationTypeRegistry().getCalificationType(course.getCourseEvalId());
+	result = calificationType.translate(themeDisplay.getLocale(), courseResult);
+}else{
+	result = LanguageUtil.get(themeDisplay.getLocale(), result);
+}
 %>
 
-<liferay-ui:header title="<%= title %>" backURL="<%=returnurl %>"></liferay-ui:header>
-
+<c:if test="<%=title != null %>">
+	<liferay-ui:header title="<%= title %>" backURL="<%=returnurl %>"></liferay-ui:header>
+</c:if>
 <%-- Exportar --%>
 <c:if test="<%=showExport %>">
 	<div class="aui-tab-back">
@@ -37,13 +67,23 @@ boolean showExport = (renderRequest.getPreferences().getValue("showExport", "fal
 	</div>
 </c:if>
 
+<div class="wrap-text">
+    <span><strong><liferay-ui:message key="user-progress.calification"/></strong></span>
+    <span><%=result %></span>
+</div>
+<div class="wrap-text">
+    <span><strong><liferay-ui:message key="user-progress.status"/></strong></span>
+    <span><%=status %></span>
+</div>
+
 <liferay-ui:panel-container >
 	<%
 	List<Module> modules = ModuleLocalServiceUtil.findAllInGroup(themeDisplay.getScopeGroupId());
 	int fila = 0;
 	for(Module theModule:modules){
 		if(permissionChecker.hasPermission(theModule.getGroupId(),Module.class.getName(),theModule.getModuleId(), ActionKeys.VIEW)){ %>
-			<liferay-ui:panel id="<%=Long.toString(theModule.getModuleId()) %>" title="<%=theModule.getTitle(themeDisplay.getLocale()) %>" collapsible="true" extended="true" defaultState="<%=(fila==0)?\"open\":\"collapsed\" %>">
+			<liferay-ui:panel id="<%=Long.toString(theModule.getModuleId()) %>" 
+				title="<%=theModule.getTitle(themeDisplay.getLocale()) %>" collapsible="true" extended="true" defaultState="<%=(fila==0)?\"open\":\"collapsed\" %>">
 				<liferay-ui:search-container  emptyResultsMessage="there-are-no-results" delta="50" deltaConfigurable="false">
 					<liferay-ui:search-container-results>
 						<% 
@@ -61,13 +101,13 @@ boolean showExport = (renderRequest.getPreferences().getValue("showExport", "fal
 					<liferay-ui:search-container-row className="com.liferay.lms.model.LearningActivity" keyProperty="actId" modelVar="learningActivity">
 						<%
 						String score= "-";
-						String status="not-started";	
+						status="not-started";	
 						String comments =" ";
 						
 						String divisor ="";
-						if(LearningActivityResultLocalServiceUtil.existsLearningActivityResult(learningActivity.getActId(), usuario.getUserId())){
+						if(LearningActivityResultLocalServiceUtil.existsLearningActivityResult(learningActivity.getActId(), userId)){
 							status="started";
-							LearningActivityResult learningActivityResult=LearningActivityResultLocalServiceUtil.getByActIdAndUserId(learningActivity.getActId(), usuario.getUserId());
+							LearningActivityResult learningActivityResult=LearningActivityResultLocalServiceUtil.getByActIdAndUserId(learningActivity.getActId(), userId);
 							score=(learningActivityResult!=null)?LearningActivityResultLocalServiceUtil.translateResult(themeDisplay.getLocale(), learningActivityResult.getResult(), learningActivity.getGroupId()):"";
 							if(learningActivityResult!=null){
 								divisor = LearningActivityResultLocalServiceUtil.getCalificationTypeSuffix(themeDisplay.getLocale(), learningActivityResult.getResult(), learningActivity.getGroupId());

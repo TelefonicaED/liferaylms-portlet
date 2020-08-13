@@ -8,6 +8,7 @@ El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 ### Added
 
 - #184759 En las estadítsticas, se puede pinchar sobre los cursos con ediciones para ver los datos concretos de esa edición
+- #185783 Se muestra la nota del curso en el portlet de notas
 
 ### Updated
 
