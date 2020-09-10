@@ -86,35 +86,37 @@ public class LearningActivityResultLocalServiceImpl	extends LearningActivityResu
 		}
 		log.debug("****END DATE "+learningActivityTry.getEndDate());
 		if(learningActivityTry.getEndDate()!=null){
-			
-			long cuantosTryLlevo=LearningActivityTryLocalServiceUtil.getTriesCountByActivityAndUser(actId, userId);
-			log.debug("****Cuantos try llevo "+cuantosTryLlevo);
-			if(learningActivity.getTries()>0&&cuantosTryLlevo>=learningActivity.getTries()){
-				learningActivityResult.setEndDate(learningActivityTry.getEndDate());
-				recalculateActivity= true;
-				log.debug("****Recalculamos 1");
-			}
 
 			if(learningActivityTry.getResult()>learningActivityResult.getResult()){			
 				learningActivityResult.setResult(learningActivityTry.getResult());
 				recalculateActivity= true;
-				log.debug("****Recalculamos 2");
+				log.debug("****Recalculamos 1");
 			}
 
 			if(!learningActivityResult.getPassed()){
 				LearningActivityTypeRegistry registry = new LearningActivityTypeRegistry();
 				LearningActivityType learningActivityType = registry.getLearningActivityType(learningActivity.getTypeId());
 				if(learningActivityType.isPassed(learningActivity, learningActivityTry)){
-					learningActivityResult.setEndDate(learningActivityTry.getEndDate());
 					learningActivityResult.setPassed(true);	
 					recalculateActivity= true;	
-					log.debug("****Recalculamos 3");
+					log.debug("****Recalculamos 2");
 				}
 			}	
 			if(Validator.isNotNull(learningActivityTry.getComments())&&!learningActivityTry.getComments().equals(learningActivityResult.getComments())){
 				learningActivityResult.setComments(learningActivityTry.getComments());
 				recalculateActivity= true;
-				log.debug("****Recalculamos 4");
+				log.debug("****Recalculamos 3");
+			}
+			
+			if(learningActivityResult.getEndDate() == null){
+				LearningActivityTypeRegistry registry = new LearningActivityTypeRegistry();
+				LearningActivityType learningActivityType = registry.getLearningActivityType(learningActivity.getTypeId());
+				
+				if(learningActivityType.isFinished(learningActivity, learningActivityResult)){
+					learningActivityResult.setEndDate(learningActivityTry.getEndDate());
+					recalculateActivity= true;
+					log.debug("****Recalculamos 4");
+				}
 			}
 		}
 		
@@ -934,5 +936,26 @@ public class LearningActivityResultLocalServiceImpl	extends LearningActivityResu
 		dq.setProjection(ProjectionFactoryUtil.max("endDate"));
 		
 		return (Date)(learningActivityResultPersistence.findWithDynamicQuery(dq).get(0));
+	}
+	
+	public List<LearningActivityResult> getByActIdPassedEndDateNull(long actId, boolean passed) throws SystemException{
+		return learningActivityResultPersistence.findByActIdPassedEndDateNull(actId, passed);
+	}
+	
+	public LearningActivityResult finishResult(long actId, long userId){
+		LearningActivityResult learningActivityResult = null;
+		try {
+			learningActivityResult = learningActivityResultPersistence.fetchByact_user(actId, userId);
+			LearningActivityTry learningActivityTry = learningActivityTryLocalService.getLastLearningActivityTryByActivityAndUser(actId, userId);
+			if(learningActivityTry != null){
+				learningActivityResult.setEndDate(learningActivityTry.getEndDate());
+				learningActivityResultPersistence.update(learningActivityResult, true);
+				moduleResultLocalService.update(learningActivityResult);
+			}
+		} catch (SystemException | PortalException e) {
+			e.printStackTrace();
+		}
+		
+		return learningActivityResult;
 	}
 }

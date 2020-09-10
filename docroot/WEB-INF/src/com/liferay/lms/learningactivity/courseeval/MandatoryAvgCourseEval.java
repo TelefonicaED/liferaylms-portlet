@@ -176,6 +176,7 @@ public class MandatoryAvgCourseEval extends BaseCourseEval {
 	@Override
 	@SuppressWarnings("unchecked")
 	public void onCloseCourse(Course course) throws SystemException {
+		super.onCloseCourse(course);
 		for(CourseResult courseResult:
 			(List<CourseResult>)CourseResultLocalServiceUtil.dynamicQuery(
 				CourseResultLocalServiceUtil.dynamicQuery().

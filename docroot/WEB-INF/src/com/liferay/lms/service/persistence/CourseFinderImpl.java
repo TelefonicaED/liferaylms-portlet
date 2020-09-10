@@ -1489,7 +1489,7 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 					result = ((BigInteger)myCourse[4]).longValue();
 					statusUser = Integer.parseInt((String)myCourse[3]);
 					passedDate = (Date)myCourse[11];
-					courseResultView = new CourseResultView(courseView, result, statusUser, passedDate);
+					courseResultView = new CourseResultView(courseView, result, statusUser, passedDate, userId);
 					
 					listMyCourses.add(courseResultView);
 				}

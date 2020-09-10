@@ -18,8 +18,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-import javax.el.ELException;
-
 import com.liferay.lms.InscriptionException;
 import com.liferay.lms.course.inscriptiontype.InscriptionType;
 import com.liferay.lms.course.inscriptiontype.InscriptionTypeRegistry;
@@ -331,7 +329,6 @@ public class CourseImpl extends CourseBaseImpl {
 		try {
 			courseResult = CourseResultLocalServiceUtil.getByUserAndCourse(this.getCourseId(), user.getUserId());
 		} catch (SystemException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -340,6 +337,15 @@ public class CourseImpl extends CourseBaseImpl {
         	log.debug("CourseImpl::isLocked::allowdates::endDate:" + courseResult.getAllowFinishDate());
 			return true;
 		}
+        
+        if(courseResult.getPassedDate() != null && !courseResult.isPassed()){
+        	return true;
+        }
+        
+        //Tenemos que mirar si he aprobado, si me quedan intentos
+        if(courseResult.getPassedDate() != null && courseResult.isPassed() && !CourseLocalServiceUtil.hasUserTries(this.getCourseId(), user.getUserId())){
+        	return true;
+        }
         
         log.debug("CourseImpl::isLocked::allowdates:" + true);
 		

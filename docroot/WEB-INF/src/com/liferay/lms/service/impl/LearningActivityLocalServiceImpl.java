@@ -313,7 +313,8 @@ public class LearningActivityLocalServiceImpl extends LearningActivityLocalServi
 				LearningActivity.class.getName(), larn.getActId(),
 				0, StringPool.BLANK, 0);
 		//auditing
-		AuditingLogFactory.audit(larn.getCompanyId(), larn.getGroupId(), LearningActivity.class.getName(), larn.getPrimaryKey(), serviceContext.getUserId(), AuditConstants.ADD, null);
+		AuditingLogFactory.audit(larn.getCompanyId(), larn.getGroupId(), LearningActivity.class.getName(), larn.getPrimaryKey(), 
+				serviceContext.getUserId(), AuditConstants.ADD, null);
 
 		
 		boolean isNotificationActivated = PrefsPropsUtil.getBoolean(larn.getCompanyId(), "lms.notifications.active");

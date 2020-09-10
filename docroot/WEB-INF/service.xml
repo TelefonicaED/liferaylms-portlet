@@ -328,6 +328,10 @@
 			<finder-column name="actId" />
 			<finder-column name="userId" arrayable-operator="OR" comparator="="></finder-column>
 		</finder>
+		<finder name="ActIdPassedEndDateNull" return-type="Collection" where="endDate IS null">
+			<finder-column name="actId" />
+			<finder-column name="passed" />
+		</finder>
 	</entity>
 	
 	<entity name="Module" local-service="true" remote-service="true" uuid="true" json-enabled="false">

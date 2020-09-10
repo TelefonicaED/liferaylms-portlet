@@ -32,6 +32,7 @@ public class LmsConstant {
 	public static String SHOW_BUTTON_INSCRIPTION_ALL = "showButtonInscriptionAll";
 	public static String SHOW_BUTTON_UNSUBSCRIBE_ALL = "showButtonUnsubscribeAll";
 	public static String EDITION_TEMPLATE_IDS = "lms.editions.template-ids";
+	public static String PREFS_SHOW_OPTION_TEST = "lms.test.show-option-finished";
 	
 	public final static String COURSETYPE_ICON_MAINFOLDER = "icons";
 	public final static String COURSETYPE_ICON_MAINFOLDER_DESCRIPTION = "Course Type Icons";

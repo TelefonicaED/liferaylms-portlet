@@ -353,7 +353,8 @@ public class ActivityViewer extends MVCPortlet {
 						boolean hasPermissionAccessCourseFinished = LiferaylmsUtil.hasPermissionAccessCourseFinished(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(), course.getCourseId(), themeDisplay.getUserId());
 						log.debug("hasPermissionAccessCourseFinished: " + hasPermissionAccessCourseFinished);
 						
-						AuditingLogFactory.audit(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(), LearningActivity.class.getName(),actId, themeDisplay.getUserId(), AuditConstants.VIEW, Long.toString(learningActivityType.getTypeId()));
+						AuditingLogFactory.audit(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(), LearningActivity.class.getName(),
+								actId, themeDisplay.getUserId(), AuditConstants.VIEW, Long.toString(learningActivityType.getTypeId()));
 
 						String activityContent = renderPortlet(renderRequest, renderResponse, 
 								themeDisplay, themeDisplay.getScopeGroupId(), portlet, isWidget, true, hasPermissionAccessCourseFinished);

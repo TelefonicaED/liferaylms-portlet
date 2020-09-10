@@ -21,6 +21,14 @@
 	<portlet>
 		<portlet-name>execactivity</portlet-name>
 		<icon>/icon.png</icon>
+		<scheduler-entry>
+			<scheduler-event-listener-class>com.liferay.lms.scheduler.TestActivityFinished</scheduler-event-listener-class>
+			<trigger>
+				<cron>
+					<cron-trigger-value>0 15 2 * * ?</cron-trigger-value>
+				</cron>
+			</trigger>
+		</scheduler-entry> 
 		<instanceable>false</instanceable>
 		<header-portlet-css>/css/main.css</header-portlet-css>
 		<header-portlet-javascript>/js/main.js</header-portlet-javascript>

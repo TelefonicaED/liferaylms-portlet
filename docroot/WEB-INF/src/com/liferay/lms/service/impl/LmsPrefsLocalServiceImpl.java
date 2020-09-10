@@ -16,7 +16,6 @@ package com.liferay.lms.service.impl;
 
 import java.util.List;
 
-import com.liferay.lms.NoSuchPrefsException;
 import com.liferay.lms.course.inscriptiontype.InscriptionType;
 import com.liferay.lms.course.inscriptiontype.InscriptionTypeRegistry;
 import com.liferay.lms.hook.events.StartupAction;

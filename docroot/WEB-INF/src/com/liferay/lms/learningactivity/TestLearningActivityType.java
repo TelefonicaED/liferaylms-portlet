@@ -11,9 +11,14 @@ import com.liferay.lms.asset.TestAssetRenderer;
 import com.liferay.lms.learningactivity.questiontype.QuestionType;
 import com.liferay.lms.learningactivity.questiontype.QuestionTypeRegistry;
 import com.liferay.lms.model.LearningActivity;
+import com.liferay.lms.model.LearningActivityResult;
 import com.liferay.lms.model.LearningActivityTry;
 import com.liferay.lms.model.TestQuestion;
 import com.liferay.lms.service.ClpSerializer;
+import com.liferay.lms.service.LearningActivityLocalServiceUtil;
+import com.liferay.lms.service.LearningActivityResultLocalServiceUtil;
+import com.liferay.lms.service.LearningActivityTryLocalServiceUtil;
+import com.liferay.lms.service.ModuleResultLocalServiceUtil;
 import com.liferay.lms.service.TestQuestionLocalServiceUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
@@ -411,5 +416,39 @@ public class TestLearningActivityType extends QuestionLearningActivityType
 	
 	public boolean canExportUserAnswers(){
 		return true;
+	}
+	
+	public boolean isFinished(LearningActivity learningActivity, LearningActivityResult learningActivityResult) throws PortalException, SystemException{
+		boolean finished = false;
+		System.out.println("isFinished");
+		if(learningActivityResult.getEndDate() != null){
+			System.out.println("result tiene fecha fin");
+			finished = true;
+		}else if(learningActivityResult.isPassed() && !Boolean.parseBoolean(LearningActivityLocalServiceUtil.getExtraContentValue(learningActivity, "improve", "false"))){
+			System.out.println("está aprobado y no está marcado el check de mejorar nota");
+			finished = true;
+		}else {
+			long cuantosTryLlevo=LearningActivityTryLocalServiceUtil.getTriesCountByActivityAndUser(learningActivityResult.getActId(), learningActivityResult.getUserId());
+			finished = learningActivity.getTries()>0&&cuantosTryLlevo>=learningActivity.getTries();
+			System.out.println("no me quedan intentos");
+		}
+		return finished;
+	}
+	
+	@Override
+	public void onCloseCourse(LearningActivity activity) throws SystemException, PortalException {	
+		if(Boolean.parseBoolean(LearningActivityLocalServiceUtil.getExtraContentValue(activity, "improve", "false"))){
+			//Pedimos los aprobados sin fecha fin para cerrarlo
+			LearningActivityTry learningActivityTry = null;
+			List<LearningActivityResult> activityResults = LearningActivityResultLocalServiceUtil.getByActIdPassedEndDateNull(activity.getActId(), true);
+			for(LearningActivityResult activityResult :activityResults){
+				learningActivityTry = LearningActivityTryLocalServiceUtil.getLastLearningActivityTryByActivityAndUser(activityResult.getActId(), activityResult.getUserId());
+				if(learningActivityTry != null){
+					activityResult.setEndDate(learningActivityTry.getEndDate());
+					LearningActivityResultLocalServiceUtil.updateLearningActivityResult(activityResult);
+					ModuleResultLocalServiceUtil.update(activityResult);
+				}
+			}
+		}
 	}
 }
