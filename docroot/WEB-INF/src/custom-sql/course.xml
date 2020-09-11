@@ -5,17 +5,20 @@
 				IF(COUNT(1) > 0,true,false) AS hasActWithTries
 			FROM (
 				SELECT 
-					IF(lar.latId IS NOT NULL, COUNT(1), 0) AS numTriesUser, la.actId, la.tries
+					IF(lat.latId IS NOT NULL, COUNT(1), 0) AS numTriesUser, la.actId, la.tries, la.improve
 				FROM 
 					Lms_course c
 				INNER JOIN 
 					Lms_learningactivity la 
 						ON c.groupCreatedId = la.groupId
 				LEFT JOIN 
-					Lms_learningactivitytry lar 
-						ON la.actId = lar.actId AND lar.userId = ?
+					Lms_learningactivitytry lat 
+						ON la.actId = lat.actId AND lat.userId = ?
+				LEFT JOIN
+					lms_learningactivityresult lar
+						ON lar.actId = la.actId AND lar.userId = lat.userId
 				WHERE 
-					c.courseId =  ?
+					c.courseId =  ? AND (lar.endDate IS NULL OR (lar.passed = TRUE AND la.improve = true))
 				GROUP BY 
 					la.actId
 			) AS TABLA

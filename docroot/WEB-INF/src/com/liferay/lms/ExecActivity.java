@@ -219,7 +219,7 @@ public class ExecActivity extends QuestionsAdmin {
 		LearningActivityResult lar = LearningActivityResultLocalServiceUtil.getByActIdAndUserId(activity.getActId(), themeDisplay.getUserId());
 		boolean showPopUpFinishedResult = lar != null && lar.getEndDate() == null 
 				&& PrefsPropsUtil.getBoolean(themeDisplay.getCompanyId(), LmsConstant.PREFS_SHOW_OPTION_TEST, false) 
-				&& Boolean.parseBoolean(LearningActivityLocalServiceUtil.getExtraContentValue(activity, "improve", "false"));
+				&& activity.isImprove();
 		
 		renderRequest.setAttribute("learningActivity",activity);
 		renderRequest.setAttribute("larntry",lat);
@@ -429,12 +429,6 @@ public class ExecActivity extends QuestionsAdmin {
 			LearningActivityLocalServiceUtil.setExtraContentValue(actId, "showCorrectAnswerOnlyOnFinalTry", "true");
 		}else if(showCorrectAnswerOnlyOnFinalTry.equals("false")){
 			LearningActivityLocalServiceUtil.setExtraContentValue(actId, "showCorrectAnswerOnlyOnFinalTry", "false");
-		}
-
-		if(improve.equals("true")) {
-			LearningActivityLocalServiceUtil.setExtraContentValue(actId, "improve", "true");
-		}else if(improve.equals("false")) {
-			LearningActivityLocalServiceUtil.setExtraContentValue(actId, "improve", "false");
 		}
 
 		if(questionsPerPage == 0) {

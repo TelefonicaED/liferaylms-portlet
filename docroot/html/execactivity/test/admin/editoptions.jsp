@@ -51,7 +51,7 @@
 		showCorrectAnswerOnlyOnFinalTry = StringPool.TRUE.equals(LearningActivityLocalServiceUtil.getExtraContentValue(learningActivity.getActId(),"showCorrectAnswerOnlyOnFinalTry"));
 		showOnlyPreview = StringPool.TRUE.equals(LearningActivityLocalServiceUtil.getExtraContentValue(learningActivity.getActId(),"showOnlyPreview"));
 		showRandomOrderAnswers = StringPool.TRUE.equals(LearningActivityLocalServiceUtil.getExtraContentValue(learningActivity.getActId(),"showRandomOrderAnswers"));
-		improve = StringPool.TRUE.equals(LearningActivityLocalServiceUtil.getExtraContentValue(learningActivity.getActId(),"improve"));	
+		improve = learningActivity.isImprove();	
 		hideFeedback = StringPool.TRUE.equals(LearningActivityLocalServiceUtil.getExtraContentValue(learningActivity.getActId(),"hideFeedback"));
 		
 		moduleId=learningActivity.getModuleId();

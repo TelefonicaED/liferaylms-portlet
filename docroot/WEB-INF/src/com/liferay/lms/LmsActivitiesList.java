@@ -230,10 +230,9 @@ public class LmsActivitiesList extends MVCPortlet {
 		long weightinmodule=ParamUtil.getLong(uploadRequest, "weightinmodule", 0);
 		boolean commentsActivated=ParamUtil.getBoolean(uploadRequest, "commentsActivated", false);
 		long precedence=ParamUtil.getLong(uploadRequest, "precedence", 0);
-		
+		boolean improve = ParamUtil.getBoolean(uploadRequest, "improve", false);
 		
 		//String title = actionRequest.getParameter("title");
-		
 		
 		String description = uploadRequest.getParameter("description");
 		int type = ParamUtil.getInteger(uploadRequest, "type", -1);
@@ -427,6 +426,7 @@ public class LmsActivitiesList extends MVCPortlet {
 		larn.setWeightinmodule(weightinmodule);
 		larn.setCommentsActivated(commentsActivated);
 		larn.setPrecedence(precedence);		
+		larn.setImprove(improve);
 		Enumeration<String> parNames= uploadRequest.getParameterNames();
 		
 		while(parNames.hasMoreElements()){

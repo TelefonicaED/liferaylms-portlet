@@ -329,16 +329,6 @@ public class TestLearningActivityType extends QuestionLearningActivityType
 			showCorrectAnswerOnlyOnFinalTry.setText(Boolean.toString(ParamUtil.get(uploadRequest,"showCorrectAnswerOnlyOnFinalTry",false)));		
 			rootElement.add(showCorrectAnswerOnlyOnFinalTry);	
 			
-			Element improve=rootElement.element("improve");
-			if(improve!=null)
-			{
-				improve.detach();
-				rootElement.remove(improve);
-			}
-			improve = SAXReaderUtil.createElement("improve");
-			improve.setText(Boolean.toString(ParamUtil.get(uploadRequest,"improve",false)));		
-			rootElement.add(improve);
-			
 			Element enableorder=rootElement.element("enableorder");
 			if(enableorder!=null)
 			{
@@ -424,7 +414,7 @@ public class TestLearningActivityType extends QuestionLearningActivityType
 		if(learningActivityResult.getEndDate() != null){
 			System.out.println("result tiene fecha fin");
 			finished = true;
-		}else if(learningActivityResult.isPassed() && !Boolean.parseBoolean(LearningActivityLocalServiceUtil.getExtraContentValue(learningActivity, "improve", "false"))){
+		}else if(learningActivityResult.isPassed() && !learningActivity.isImprove()){
 			System.out.println("está aprobado y no está marcado el check de mejorar nota");
 			finished = true;
 		}else {
@@ -437,7 +427,7 @@ public class TestLearningActivityType extends QuestionLearningActivityType
 	
 	@Override
 	public void onCloseCourse(LearningActivity activity) throws SystemException, PortalException {	
-		if(Boolean.parseBoolean(LearningActivityLocalServiceUtil.getExtraContentValue(activity, "improve", "false"))){
+		if(activity.isImprove()){
 			//Pedimos los aprobados sin fecha fin para cerrarlo
 			LearningActivityTry learningActivityTry = null;
 			List<LearningActivityResult> activityResults = LearningActivityResultLocalServiceUtil.getByActIdPassedEndDateNull(activity.getActId(), true);

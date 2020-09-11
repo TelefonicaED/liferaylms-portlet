@@ -35,7 +35,7 @@ if(learningActivity==null){
 }
 
 LearningActivityResult lar = LearningActivityResultLocalServiceUtil.getByActIdAndUserId(learningActivity.getActId(), themeDisplay.getUserId());
-boolean showPopUpFinishedResult = lar != null && lar.getEndDate() == null && Boolean.parseBoolean(LearningActivityLocalServiceUtil.getExtraContentValue(learningActivity, "improve", "false"));
+boolean showPopUpFinishedResult = lar != null && lar.getEndDate() == null && learningActivity.isImprove();
 
 System.out.println("showPopUpFinishedResult: " + showPopUpFinishedResult);
 

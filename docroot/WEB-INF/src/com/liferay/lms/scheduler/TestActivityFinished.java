@@ -47,7 +47,7 @@ public class TestActivityFinished implements MessageListener {
 					for(Course course: courses){
 						activities = LearningActivityLocalServiceUtil.getLearningActivitiesOfGroupAndType(course.getGroupCreatedId(),(int) TestLearningActivityType.TYPE_ID);
 						for(LearningActivity activity: activities){
-							if(Boolean.parseBoolean(LearningActivityLocalServiceUtil.getExtraContentValue(activity, "improve", "false"))){
+							if(activity.isImprove()){
 								//Pedimos los aprobados sin fecha fin para cerrarlo
 								activityResults = LearningActivityResultLocalServiceUtil.getByActIdPassedEndDateNull(activity.getActId(), true);
 								for(LearningActivityResult activityResult :activityResults){

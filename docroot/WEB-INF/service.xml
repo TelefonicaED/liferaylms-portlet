@@ -43,6 +43,7 @@
 		<column name="weightinmodule" type="long"></column>
 		<column name="commentsActivated" type="boolean"></column>
 		<column name="linkedActivityId" type="long"></column>
+		<column name="improve" type="boolean"></column>
 		
 		<!-- Order -->
 		<order by="asc">
