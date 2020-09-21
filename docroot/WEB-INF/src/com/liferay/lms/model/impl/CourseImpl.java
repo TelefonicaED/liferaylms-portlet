@@ -338,12 +338,12 @@ public class CourseImpl extends CourseBaseImpl {
 			return true;
 		}
         
-        if(courseResult.getPassedDate() != null && !courseResult.isPassed()){
+        if(courseResult != null && courseResult.getPassedDate() != null && !courseResult.isPassed()){
         	return true;
         }
         
         //Tenemos que mirar si he aprobado, si me quedan intentos
-        if(courseResult.getPassedDate() != null && courseResult.isPassed() && !CourseLocalServiceUtil.hasUserTries(this.getCourseId(), user.getUserId())){
+        if(courseResult != null && courseResult.getPassedDate() != null && courseResult.isPassed() && !CourseLocalServiceUtil.hasUserTries(this.getCourseId(), user.getUserId())){
         	return true;
         }
         
