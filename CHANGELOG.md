@@ -5,6 +5,12 @@ El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 
 ## [4.3.0](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v4.3.0)
 
+### Fixed
+
+- #183348 Las ediciones no heredan el tipo de inscripción ni el diploma del curso padre (faltan diplomas)
+- #186955 Visibilidad o no visibilidad de las actividades no se hereda del curso a las ediciones
+- #186905 URLs de ediciones borradas, ya no salen url que ya existan para las ediciones
+
 ### Added
 
 - #184759 En las estadítsticas, se puede pinchar sobre los cursos con ediciones para ver los datos concretos de esa edición
