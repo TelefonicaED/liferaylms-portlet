@@ -53,6 +53,12 @@ public class MyCourses extends MVCPortlet {
 		}else if (courseOrder == 4){
 			orderByColumn = " Lms_Course.executionEndDate";
 			orderByType = "ASC";
+		}else if(courseOrder == 5){
+			orderByColumn = "r.registrationDate";
+			orderByType = "ASC";
+		}else if(courseOrder == 6){
+			orderByColumn = "r.registrationDate";
+			orderByType = "DESC";
 		}
 		
 		List<CourseResultView> listMyCourses = CourseLocalServiceUtil.getMyCourses(themeDisplay.getScopeGroupId(), themeDisplay.getUserId(), themeDisplay, orderByColumn, orderByType, -1, -1);	

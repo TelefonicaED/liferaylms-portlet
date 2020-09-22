@@ -21,6 +21,14 @@
 	<portlet>
 		<portlet-name>execactivity</portlet-name>
 		<icon>/icon.png</icon>
+		<scheduler-entry>
+			<scheduler-event-listener-class>com.liferay.lms.scheduler.TestActivityFinished</scheduler-event-listener-class>
+			<trigger>
+				<cron>
+					<cron-trigger-value>0 15 2 * * ?</cron-trigger-value>
+				</cron>
+			</trigger>
+		</scheduler-entry> 
 		<instanceable>false</instanceable>
 		<header-portlet-css>/css/main.css</header-portlet-css>
 		<header-portlet-javascript>/js/main.js</header-portlet-javascript>
@@ -193,7 +201,7 @@
 	<portlet>
 		<portlet-name>mycourses</portlet-name>
 		<icon>/icon.png</icon>
-		<configuration-action-class>com.liferay.lms.actions.MyCoursesConfigurationAction</configuration-action-class>
+		<configuration-action-class>com.liferay.portal.kernel.portlet.DefaultConfigurationAction</configuration-action-class>
 		<instanceable>false</instanceable>
 		<header-portlet-css>/css/main.css</header-portlet-css>
 		<footer-portlet-javascript>/js/main.js</footer-portlet-javascript>
@@ -537,7 +545,7 @@
 	<portlet>
 		<portlet-name>generalstats</portlet-name>
 		<icon>/icon.png</icon>
-		<configuration-action-class>com.liferay.lms.actions.GeneralStatsConfigurationAction</configuration-action-class>
+		<configuration-action-class>com.liferay.portal.kernel.portlet.DefaultConfigurationAction</configuration-action-class>
 		<control-panel-entry-category>
 			content
 		</control-panel-entry-category>

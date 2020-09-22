@@ -586,6 +586,7 @@ public class ModuleResultLocalServiceImpl extends ModuleResultLocalServiceBaseIm
 		List<LearningActivity> learnActList = LearningActivityLocalServiceUtil.getLearningActivitiesOfModule(moduleResult.getModuleId());
 		Module module=moduleLocalService.getModule(moduleResult.getModuleId());
 		boolean passedModule = true;
+		boolean finishModule = true;
 		long totalActivities = 0;
 		long activitiesPassed = 0;
         Date passedDate=new Date(0);
@@ -597,19 +598,16 @@ public class ModuleResultLocalServiceImpl extends ModuleResultLocalServiceBaseIm
 				totalActivities++;
 				
 				LearningActivityResult result = LearningActivityResultLocalServiceUtil.getByActIdAndUserId(activity.getActId(), moduleResult.getUserId());
-				if(result != null && result.isPassed()){
-					
-					activitiesPassed++;
-					if(result.getEndDate()!=null){
-						if(passedDate.before(result.getEndDate())){
-							passedDate=result.getEndDate();
-						}
+				if(result != null && Validator.isNotNull(result.getEndDate())){
+					if(result.isPassed()){
+						activitiesPassed++;
 					}
-					 
+					if(passedDate.before(result.getEndDate())){
+						passedDate=result.getEndDate();
+					}
 				} else {
-					
+					finishModule = false;
 					passedModule = false;
-					
 				}
 				
 			}
@@ -652,13 +650,13 @@ public class ModuleResultLocalServiceImpl extends ModuleResultLocalServiceBaseIm
 		log.debug("PassedModule "+passedModule);
 		log.debug("Module Result passed "+moduleResult.getPassed());
 		
-		if(moduleResult.getResult() <= result || (passedModule&&!moduleResult.getPassed())){	
+		if(moduleResult.getResult() <= result || (passedModule&&!moduleResult.getPassed()) || (finishModule && Validator.isNull(moduleResult.getPassedDate())) ){	
 			
 			log.debug("Actualizamos curso");
 			moduleResult.setResult(result);
 			if(!moduleResult.getPassed()){
 				moduleResult.setPassed(passedModule);
-				if(passedModule){
+				if(finishModule && Validator.isNull(moduleResult.getPassedDate())){
 					moduleResult.setPassedDate(passedDate);
 				}
 			}

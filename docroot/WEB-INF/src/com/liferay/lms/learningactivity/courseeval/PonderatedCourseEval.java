@@ -3,23 +3,19 @@ package com.liferay.lms.learningactivity.courseeval;
 import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
-import com.liferay.lms.auditing.AuditConstants;
-import com.liferay.lms.auditing.AuditingLogFactory;
 import com.liferay.lms.model.Course;
 import com.liferay.lms.model.CourseResult;
 import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.model.LearningActivityResult;
-import com.liferay.lms.model.Module;
 import com.liferay.lms.model.ModuleResult;
 import com.liferay.lms.service.CourseResultLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityResultLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityTryLocalServiceUtil;
-import com.liferay.lms.service.ModuleLocalServiceUtil;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
@@ -37,73 +33,64 @@ import com.liferay.portal.service.UserLocalServiceUtil;
 public class PonderatedCourseEval extends BaseCourseEval {
 
 	@Override
-	public void updateCourse(Course course, ModuleResult mresult) throws SystemException 
-	{				
+	public void updateCourse(Course course, ModuleResult mresult) throws SystemException {				
 		updateCourse(course, mresult.getUserId());				
 	}
-	public static long getScore(Course course) throws DocumentException, PortalException, SystemException
-	{
+	
+	public static long getScore(Course course) throws DocumentException, PortalException, SystemException {
 		long score=0;
 		String extraData=course.getCourseExtraData();
-		if(extraData!=null &&extraData.startsWith("<?xml"))
-		{
-		Document document = SAXReaderUtil.read(extraData);
-		Element rootElement=document.getRootElement();
-		Element scoreElement=rootElement.element("score");
-		if(scoreElement!=null)
-		{
-			score=Long.valueOf(scoreElement.attributeValue("value"));
-		}
+		if(extraData!=null &&extraData.startsWith("<?xml")){
+			Document document = SAXReaderUtil.read(extraData);
+			Element rootElement=document.getRootElement();
+			Element scoreElement=rootElement.element("score");
+			if(scoreElement!=null){
+				score=Long.valueOf(scoreElement.attributeValue("value"));
+			}
 		}
 		return score;
 	}
-	public static java.util.List<Long> getRequiredActivities(Course course) throws DocumentException, PortalException, SystemException
-	{
-		java.util.List<Long> result=new java.util.ArrayList<Long>();
+	
+	public static List<Long> getRequiredActivities(Course course) throws DocumentException, PortalException, SystemException{
+		List<Long> result=new java.util.ArrayList<Long>();
 		String extraData=course.getCourseExtraData();
-		if(extraData!=null &&extraData.startsWith("<?xml"))
-		{
-		Document document = SAXReaderUtil.read(extraData);
-		Element rootElement=document.getRootElement();
-		java.util.List<Element> reqElements=rootElement.elements("required");
-		for(Element reqElement:reqElements)
-		{
-			long actId=Long.parseLong(reqElement.attributeValue("actId"));
-			LearningActivity larn=LearningActivityLocalServiceUtil.fetchLearningActivity(actId);
-			if(larn!=null&& larn.getGroupId()==course.getGroupCreatedId()&& larn.getWeightinmodule()>0)
-			{
-				result.add(actId);
+		if(extraData!=null &&extraData.startsWith("<?xml")){
+			Document document = SAXReaderUtil.read(extraData);
+			Element rootElement=document.getRootElement();
+			java.util.List<Element> reqElements=rootElement.elements("required");
+			for(Element reqElement:reqElements){
+				long actId=Long.parseLong(reqElement.attributeValue("actId"));
+				LearningActivity larn=LearningActivityLocalServiceUtil.fetchLearningActivity(actId);
+				if(larn!=null&& larn.getGroupId()==course.getGroupCreatedId()&& larn.getWeightinmodule()>0){
+					result.add(actId);
+				}
 			}
-		}
 		}
 		return result;
 	}
-	public static java.util.Map<Long, Long> getActivitiesWeight(Course course) throws PortalException, SystemException, DocumentException
-	{
-		java.util.Map<Long, Long> result =new java.util.HashMap<Long, Long>();
+	public static Map<Long, Long> getActivitiesWeight(Course course) throws PortalException, SystemException, DocumentException{
+		Map<Long, Long> result = new HashMap<Long, Long>();
 		String extraData=course.getCourseExtraData();
-		if(extraData!=null &&extraData.startsWith("<?xml"))
-		{
-		Document document = SAXReaderUtil.read(extraData);
-		Element rootElement=document.getRootElement();
-		java.util.List<Element> reqElements=rootElement.elements("weight");
-		for(Element reqElement:reqElements)
-		{
-			long actId=Long.parseLong(reqElement.attributeValue("actId"));
-			long ponderation=Long.parseLong(reqElement.attributeValue("ponderation"));
-			LearningActivity larn=LearningActivityLocalServiceUtil.fetchLearningActivity(actId);
-			if(larn!=null&& larn.getGroupId()==course.getGroupCreatedId()&& larn.getWeightinmodule()>0)
-			{
-				result.put(actId,ponderation);
+		if(extraData!=null &&extraData.startsWith("<?xml")){
+			Document document = SAXReaderUtil.read(extraData);
+			Element rootElement=document.getRootElement();
+			List<Element> reqElements=rootElement.elements("weight");
+			for(Element reqElement:reqElements){
+				long actId=Long.parseLong(reqElement.attributeValue("actId"));
+				long ponderation=Long.parseLong(reqElement.attributeValue("ponderation"));
+				LearningActivity larn=LearningActivityLocalServiceUtil.fetchLearningActivity(actId);
+				if(larn!=null&& larn.getGroupId()==course.getGroupCreatedId()&& larn.getWeightinmodule()>0){
+					result.put(actId,ponderation);
+				}
 			}
-		}
 		}
 		return result;
 	}
+	
 	@Override
 	public boolean updateCourse(Course course, long userId) throws SystemException{
 
-		CourseResult courseResult=CourseResultLocalServiceUtil.getByUserAndCourse(course.getCourseId(), userId);
+		CourseResult courseResult=CourseResultLocalServiceUtil.getCourseResultByCourseAndUser(course.getCourseId(), userId);
 
 		if(courseResult==null){
 			courseResult = CourseResultLocalServiceUtil.addCourseResult(0, course.getCourseId(), userId);
@@ -114,13 +101,13 @@ public class PonderatedCourseEval extends BaseCourseEval {
 		}
 		
 		try {
-			java.util.Map<Long,Long> weights=PonderatedCourseEval.getActivitiesWeight(course);
-			long score=PonderatedCourseEval.getScore(course);
+			Map<Long,Long> weights = getActivitiesWeight(course);
+			long score = getScore(course);
 
 			boolean passed=true;
 			long result=0;
 			long weight=0;
-			List<LearningActivity> learningActivities=LearningActivityLocalServiceUtil.getMandatoryLearningActivitiesOfGroup(course.getGroupCreatedId());
+			List<LearningActivity> learningActivities = LearningActivityLocalServiceUtil.getMandatoryLearningActivitiesOfGroup(course.getGroupCreatedId());
 			List<Long> requiredActivities = getRequiredActivities(course);
 			
 			//Guardo los resultados de las actividades del usuario en el curso en un hashmap para no tener que acceder a bbdd por cada uno de ellos
@@ -173,8 +160,6 @@ public class PonderatedCourseEval extends BaseCourseEval {
 				weight+=weights.get(act.getActId());
 			}
 
-			
-			
 			if(result>0&&weight>0){
 				result=result/weight;
 			}
@@ -182,7 +167,6 @@ public class PonderatedCourseEval extends BaseCourseEval {
 			if(result<score){
 				passed=false;
 			}
-						
 
 			if(!hasTries && !passed){
 				isFailed = true;
@@ -274,6 +258,7 @@ public class PonderatedCourseEval extends BaseCourseEval {
 	@Override
 	@SuppressWarnings("unchecked")
 	public void onCloseCourse(Course course) throws SystemException {
+		super.onCloseCourse(course);
 		for(CourseResult courseResult:
 			(List<CourseResult>)CourseResultLocalServiceUtil.dynamicQuery(
 				CourseResultLocalServiceUtil.dynamicQuery().

@@ -27,6 +27,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.util.bridges.mvc.MVCPortlet;
@@ -90,356 +91,146 @@ public class DateEditor extends MVCPortlet {
 		
 	
 	@ProcessAction(name = "submit")
-	public void submit(ActionRequest request, ActionResponse response) {
-		log.debug("Action::submit");		
+	public void submit(ActionRequest request, ActionResponse response) throws SystemException {
+		log.debug("Action::submit");
 		
-		Enumeration<String> parNames = request.getParameterNames();
-		while (parNames.hasMoreElements()) {			
-			String name = parNames.nextElement();
-			log.debug("ForParam::"+name);
+		ThemeDisplay themeDisplay = (ThemeDisplay) request.getAttribute(WebKeys.THEME_DISPLAY);
+		
+		Course course = CourseLocalServiceUtil.getCourseByGroupCreatedId(themeDisplay.getScopeGroupId());
+		
+		Calendar calendar = Calendar.getInstance(themeDisplay.getTimeZone(), themeDisplay.getLocale());
+		
+		//FECHA DE INICIO DE EJECUCIÓN DE CURSO
+		Date date = ParamUtil.getDate(request, "fcin" + course.getCourseId(), sdf);
+		String time = ParamUtil.getString(request, "tcin" + course.getCourseId());
+		calendar.setTime(date);
+		String[] hours = time.split(":");
+		if(hours.length==2){
+			calendar.set(Calendar.HOUR_OF_DAY,Integer.valueOf(hours[0]));
+			calendar.set(Calendar.MINUTE,Integer.valueOf(hours[1]));
+		}
+		course.setExecutionStartDate(calendar.getTime());
+		
+		//FECHA DE FIN DE EJECUCIÓN DE CURSO
+		date = ParamUtil.getDate(request, "fcou" + course.getCourseId(), sdf);
+		time = ParamUtil.getString(request, "tcou" + course.getCourseId());
+		calendar.setTime(date);
+		hours = time.split(":");
+		if(hours.length==2){
+			calendar.set(Calendar.HOUR_OF_DAY,Integer.valueOf(hours[0]));
+			calendar.set(Calendar.MINUTE,Integer.valueOf(hours[1]));
+		}
+		course.setExecutionEndDate(calendar.getTime());
+		
+		CourseLocalServiceUtil.updateCourse(course);
+		
+		List<Module> modules = ModuleLocalServiceUtil.findAllInGroup(themeDisplay.getScopeGroupId());
+		
+		for(Module module: modules){
 			
-			if(name.matches("(\\D{4})\\d+")){
-				log.debug("ForParam::ok!");
-				
-				long id =  0;
-				try{
-					id = Long.parseLong(name.substring(4,name.length()));
-					
-					String key = name.substring(0,4);
-					
-					switch (key) {
-					case "fmin":
-						log.debug("ForParam::fecha min");	
-						setModuleDate(name, id, request, true);	
-						break;
-					case "fmou":
-						log.debug("ForParam::fecha mou");
-						setModuleDate(name, id, request, false);
-						break;
-					case "tmin":
-						log.debug("ForParam::tiempo min");
-						setModuleTime(name, id, request, true);
-						break;
-					case "tmou":
-						log.debug("ForParam::tiempo mou");
-						setModuleTime(name, id, request, false);
-						break;
-					case "fact":
-						log.debug("ForParam::fecha act");
-						setP2PUploadDate(name, id, request);			
-						break;
-					case "tact":
-						log.debug("ForParam::tiempo act");
-						setP2PUploadTime(name, id, request);			
-						break;
-					case "fain":
-						log.debug("ForParam::fain");
-						setActivityDate(name, id, request, true);
-						break;
-					case "faou":
-						log.debug("ForParam::faou");
-						setActivityDate(name, id, request, false);
-						break;
-					case "tain":
-						log.debug("ForParam::tain");
-						setActivityTime(name, id, request, true);
-						break;
-					case "taou":
-						log.debug("ForParam::taou");
-						setActivityTime(name, id, request, false);
-						break;
-					case "fcin":
-						log.debug("ForParam::fecha cin");	
-						setCourseDate(name, request, true);	
-						break;
-					case "fcou":
-						log.debug("ForParam::fecha cou");
-						setCourseDate(name, request, false);
-						break;
-					case "tcin":
-						log.debug("ForParam::tiempo cin");
-						setCourseTime(name, request, true);
-						break;
-					case "tcou":
-						log.debug("ForParam::tiempo cou");
-						setCourseTime(name, request, false);
-						break;
-					default:
-						break;
-					}
-					
-				}catch(NumberFormatException nfe){
-					return;
+			//Primero miramos si está el check
+			if(ParamUtil.getBoolean(request, "startDateEnabled" + module.getModuleId() + "_")){
+				date = ParamUtil.getDate(request, "fmin" + module.getModuleId(), sdf);
+				time = ParamUtil.getString(request, "tmin" + module.getModuleId());
+				calendar.setTime(date);
+				hours = time.split(":");
+				if(hours.length==2){
+					calendar.set(Calendar.HOUR_OF_DAY,Integer.valueOf(hours[0]));
+					calendar.set(Calendar.MINUTE,Integer.valueOf(hours[1]));
 				}
 				
-			}
-		}
-	}
-	
-	private void setCourseDate(String name, ActionRequest request, boolean isStartDate){
-		ThemeDisplay themeDisplay = (ThemeDisplay) request.getAttribute(WebKeys.THEME_DISPLAY);
-		
-		try {
-			Course course = CourseLocalServiceUtil.fetchByGroupCreatedId(themeDisplay.getScopeGroupId());	
-			Date date = (isStartDate) ? course.getExecutionStartDate() : course.getExecutionEndDate();			
-			String sDate = request.getParameter(name);		
-			Date bDate = sdf.parse(sDate);
-			
-			Calendar gc = Calendar.getInstance(themeDisplay.getTimeZone());
-			Calendar gcBase = Calendar.getInstance(themeDisplay.getTimeZone());
-			gc.setTime(date);
-			gcBase.setTime(bDate);
-			gc.set(Calendar.DAY_OF_MONTH, gcBase.get(Calendar.DAY_OF_MONTH));
-			gc.set(Calendar.MONTH, gcBase.get(Calendar.MONTH));
-			gc.set(Calendar.YEAR, gcBase.get(Calendar.YEAR));
-			
-			if (isStartDate){
-				course.setExecutionStartDate(gc.getTime());
-			}else{
-				course.setExecutionEndDate(gc.getTime());
-			}
-			CourseLocalServiceUtil.updateCourse(course);
-		} catch (SystemException | ParseException e) {
-			log.error(e);
-		}
-	}
-	
-	private void setCourseTime(String name, ActionRequest request, boolean isStartTime){		
-		ThemeDisplay themeDisplay = (ThemeDisplay) request.getAttribute(WebKeys.THEME_DISPLAY);
-		
-		try {
-			Course course = CourseLocalServiceUtil.fetchByGroupCreatedId(themeDisplay.getScopeGroupId());	
-			Date date = (isStartTime) ? course.getExecutionStartDate() : course.getExecutionEndDate();
-			String sHour = request.getParameter(name);
-			
-			Calendar gc = Calendar.getInstance(themeDisplay.getTimeZone());
-			Calendar gcBase = Calendar.getInstance(themeDisplay.getTimeZone());
-			gc.setTime(date);
-			
-			String[] data = sHour.split(":");
-			if(data.length==2){
-				gcBase.set(Calendar.HOUR_OF_DAY,Integer.valueOf(data[0]));
-				gcBase.set(Calendar.MINUTE,Integer.valueOf(data[1]));
-			}
-			
-			gc.set(Calendar.HOUR_OF_DAY, gcBase.get(Calendar.HOUR_OF_DAY));
-			gc.set(Calendar.MINUTE, gcBase.get(Calendar.MINUTE));
-			
-					
-			if (isStartTime){
-				course.setExecutionStartDate(gc.getTime());
-			}else{
-				course.setExecutionEndDate(gc.getTime());
-			}
-			CourseLocalServiceUtil.updateCourse(course);
-								
-		} catch (SystemException e) {
-			log.error(e);
-		}
-	}
-		
-	private void setModuleDate(String name, long id, ActionRequest request, boolean isStartDate){		
-		ThemeDisplay themeDisplay = (ThemeDisplay) request.getAttribute(WebKeys.THEME_DISPLAY);
-			
-		try {
-			Module module = ModuleLocalServiceUtil.getModule(id);
-			Date date = (isStartDate) ? module.getStartDate() : module.getEndDate();			
-			String sDate = request.getParameter(name);		
-			Date bDate = sdf.parse(sDate);
-			
-			Calendar gc = Calendar.getInstance(themeDisplay.getTimeZone());
-			Calendar gcBase = Calendar.getInstance(themeDisplay.getTimeZone());
-			gc.setTime(date);
-			gcBase.setTime(bDate);
-			gc.set(Calendar.DAY_OF_MONTH, gcBase.get(Calendar.DAY_OF_MONTH));
-			gc.set(Calendar.MONTH, gcBase.get(Calendar.MONTH));
-			gc.set(Calendar.YEAR, gcBase.get(Calendar.YEAR));
-			
-			if (isStartDate){
-				module.setStartDate(gc.getTime());
-			}else{
-				module.setEndDate(gc.getTime());
-			}
-			ModuleLocalServiceUtil.updateModule(module);
-		} catch (PortalException | SystemException | ParseException e) {
-			log.error(e);
-		}
-	}
-		
-	private void setModuleTime(String name, long id, ActionRequest request, boolean isStartTime){		
-		ThemeDisplay themeDisplay = (ThemeDisplay) request.getAttribute(WebKeys.THEME_DISPLAY);
-		
-		try {
-			Module module = ModuleLocalServiceUtil.getModule(id);
-			Date date = (isStartTime) ? module.getStartDate() : module.getEndDate();
-			String sHour = request.getParameter(name);
-			
-			Calendar gc = Calendar.getInstance(themeDisplay.getTimeZone());
-			Calendar gcBase = Calendar.getInstance(themeDisplay.getTimeZone());
-			gc.setTime(date);
-			
-			String[] data = sHour.split(":");
-			if(data.length==2){
-				gcBase.set(Calendar.HOUR_OF_DAY,Integer.valueOf(data[0]));
-				gcBase.set(Calendar.MINUTE,Integer.valueOf(data[1]));
-			}
-			
-			gc.set(Calendar.HOUR_OF_DAY, gcBase.get(Calendar.HOUR_OF_DAY));
-			gc.set(Calendar.MINUTE, gcBase.get(Calendar.MINUTE));
-			
-			if (isStartTime){
-				module.setStartDate(gc.getTime());
-			}else{
-				module.setEndDate(gc.getTime());
-			}
-			ModuleLocalServiceUtil.updateModule(module);
-								
-		} catch (PortalException | SystemException e) {
-			log.error(e);
-		}
-	}
-	
-	private void setP2PUploadDate(String name, long id, ActionRequest request){
-		ThemeDisplay themeDisplay = (ThemeDisplay) request.getAttribute(WebKeys.THEME_DISPLAY);
-		
-		try{
-			String suDate = LearningActivityLocalServiceUtil.getExtraContentValue(id, P2P_DATEUPLOAD);
-			Date date = null;
-			Date bDate = null;
-			if(suDate!=null){
-				try{
-					date = sdfP2p.parse(suDate);
-				}catch(ParseException e){
-					date = new Date();
+				if(calendar.getTime().compareTo(course.getExecutionStartDate()) == 0){
+					module.setStartDate(null);
+				}else{
+					module.setStartDate(calendar.getTime());
 				}
+			}else{
+				module.setStartDate(null);
 			}
-			String sDate = request.getParameter(name);
-			bDate = sdf.parse(sDate);
-	
-			Calendar gc = Calendar.getInstance(themeDisplay.getTimeZone());
-			Calendar gcBase = Calendar.getInstance(themeDisplay.getTimeZone());
 			
-			gc.setTime(date);
-			gcBase.setTime(bDate);
-					
-			gc.set(Calendar.DAY_OF_MONTH, gcBase.get(Calendar.DAY_OF_MONTH));
-			gc.set(Calendar.MONTH, gcBase.get(Calendar.MONTH));
-			gc.set(Calendar.YEAR, gcBase.get(Calendar.YEAR));			
-			
-			LearningActivityLocalServiceUtil.setExtraContentValue(id, P2P_DATEUPLOAD, sdfP2p.format(gc.getTime()));		
-		}catch(SystemException | ParseException e){
-			log.error(e);
-		}
-	}
-	
-	private void setP2PUploadTime(String name, long id, ActionRequest request){
-		ThemeDisplay themeDisplay = (ThemeDisplay) request.getAttribute(WebKeys.THEME_DISPLAY);
-		
-		try {
-			String suDate = LearningActivityLocalServiceUtil.getExtraContentValue(id, P2P_DATEUPLOAD);
-			Date date = null;			
-			if(suDate!=null){
-				try{
-					date = sdfP2p.parse(suDate);
-				}catch(ParseException e){
-					date = new Date();
+			//Primero miramos si está el check
+			if(ParamUtil.getBoolean(request, "endDateEnabled" + module.getModuleId() + "_")){
+				date = ParamUtil.getDate(request, "fmou" + module.getModuleId(), sdf);
+				time = ParamUtil.getString(request, "tmou" + module.getModuleId());
+				calendar.setTime(date);
+				hours = time.split(":");
+				if(hours.length==2){
+					calendar.set(Calendar.HOUR_OF_DAY,Integer.valueOf(hours[0]));
+					calendar.set(Calendar.MINUTE,Integer.valueOf(hours[1]));
 				}
-			}
-	
-			Calendar gc = Calendar.getInstance(themeDisplay.getTimeZone());
-			
-			gc.setTime(date);
-	
-			String sHour = request.getParameter(name);
-			
-			String[] data = sHour.split(":");
-			if(data.length==2){
-				gc.set(Calendar.HOUR_OF_DAY,Integer.valueOf(data[0]));
-				gc.set(Calendar.MINUTE,Integer.valueOf(data[1]));
+				
+				if(calendar.getTime().compareTo(course.getExecutionEndDate()) == 0){
+					module.setEndDate(null);
+				}else{
+					module.setEndDate(calendar.getTime());
+				}
+			}else{
+				module.setEndDate(null);
 			}
 			
-			LearningActivityLocalServiceUtil.setExtraContentValue(id, P2P_DATEUPLOAD, sdfP2p.format(gc.getTime()));
-		} catch (SystemException e) {
-			log.error(e);
+			ModuleLocalServiceUtil.updateModule(module);
 		}
-	}
-	
-	
-	private void setActivityDate(String name, long id, ActionRequest request, boolean isStartDate){	
-		ThemeDisplay themeDisplay = (ThemeDisplay) request.getAttribute(WebKeys.THEME_DISPLAY);
 		
-		try {
-			LearningActivity activity = LearningActivityLocalServiceUtil.getLearningActivity(id);
-			Date date = (isStartDate) ? activity.getStartdate() : activity.getEnddate();
-			String sDate = request.getParameter(name);
-			log.debug("sDate::"+ sDate);
-			Date bDate = sdf.parse(sDate);
-			log.debug("bDate::"+ bDate.toString());
-	
-			Calendar gc = Calendar.getInstance(themeDisplay.getTimeZone());
-			Calendar gcBase = Calendar.getInstance(themeDisplay.getTimeZone());
-			if(date!=null){
-				gc.setTime(date);
-			}
-			
-			gcBase.setTime(bDate);
-			gc.set(Calendar.DAY_OF_MONTH, gcBase.get(Calendar.DAY_OF_MONTH));
-			gc.set(Calendar.MONTH, gcBase.get(Calendar.MONTH));
-			gc.set(Calendar.YEAR, gcBase.get(Calendar.YEAR));
-			
-			log.debug("DAY_OF_MONTH::"+ gcBase.get(Calendar.DAY_OF_MONTH));
-			log.debug("MONTH::"+ gcBase.get(Calendar.MONTH));
-			log.debug("YEAR::"+ gcBase.get(Calendar.YEAR));
-			
-			if(isStartDate){
-				activity.setStartdate(gc.getTime());
-			}else{
-				activity.setEnddate(gc.getTime());
-			}
-			LearningActivityLocalServiceUtil.updateLearningActivity(activity);
-									
-		} catch (SystemException | PortalException | ParseException e) {
-			log.error(e);
-		} 
-	}
-	
-	
-	private void setActivityTime(String name, long id, ActionRequest request, boolean isStartTime){	
-		ThemeDisplay themeDisplay = (ThemeDisplay) request.getAttribute(WebKeys.THEME_DISPLAY);
+		List<LearningActivity> activities = LearningActivityLocalServiceUtil.getLearningActivitiesOfGroup(themeDisplay.getScopeGroupId());
 		
-		try {
-			LearningActivity activity = LearningActivityLocalServiceUtil.getLearningActivity(id);
-			Date date = (isStartTime) ? activity.getStartdate() : activity.getEnddate();
-			String sHour = request.getParameter(name);			
-	
-			Calendar gc = Calendar.getInstance(themeDisplay.getTimeZone());
-			Calendar gcBase = Calendar.getInstance(themeDisplay.getTimeZone());
-			if(date!=null){
-				gc.setTime(date);
-			}
-			
-			String[] data = sHour.split(":");
-			if(data.length==2){
-				gcBase.set(Calendar.HOUR_OF_DAY,Integer.valueOf(data[0]));
-				gcBase.set(Calendar.MINUTE,Integer.valueOf(data[1]));
-			}
-			
-			gc.set(Calendar.HOUR_OF_DAY, gcBase.get(Calendar.HOUR_OF_DAY));
-			gc.set(Calendar.MINUTE, gcBase.get(Calendar.MINUTE));
-			
-			if(isStartTime){
-				activity.setStartdate(gc.getTime());
+		for(LearningActivity activity: activities){
+			//Primero miramos si está el check
+			if(ParamUtil.getBoolean(request, "startDateActivityEnabled_" + activity.getModuleId() + "_" + activity.getActId() + "_")){
+				date = ParamUtil.getDate(request, "fain" + activity.getActId(), sdf);
+				time = ParamUtil.getString(request, "tain" + activity.getActId());
+				calendar.setTime(date);
+				hours = time.split(":");
+				if(hours.length==2){
+					calendar.set(Calendar.HOUR_OF_DAY,Integer.valueOf(hours[0]));
+					calendar.set(Calendar.MINUTE,Integer.valueOf(hours[1]));
+				}
+				
+				if(calendar.getTime().compareTo(course.getExecutionStartDate()) == 0){
+					activity.setStartdate(null);
+				}else{
+					activity.setStartdate(calendar.getTime());
+				}
 			}else{
-				activity.setEnddate(gc.getTime());
+				activity.setStartdate(null);
+			}
+			
+			//Primero miramos si está el check
+			if(ParamUtil.getBoolean(request, "endDateActivityEnabled_" + activity.getModuleId() + "_" + activity.getActId() + "_")){
+				date = ParamUtil.getDate(request, "faou" + activity.getActId(), sdf);
+				time = ParamUtil.getString(request, "taou" + activity.getActId());
+				calendar.setTime(date);
+				hours = time.split(":");
+				if(hours.length==2){
+					calendar.set(Calendar.HOUR_OF_DAY,Integer.valueOf(hours[0]));
+					calendar.set(Calendar.MINUTE,Integer.valueOf(hours[1]));
+				}
+				
+				if(calendar.getTime().compareTo(course.getExecutionEndDate()) == 0){
+					activity.setEnddate(null);
+				}else{
+					activity.setEnddate(calendar.getTime());
+				}
+			}else{
+				activity.setEnddate(null);
 			}
 			
 			LearningActivityLocalServiceUtil.updateLearningActivity(activity);
-								
-		} catch (PortalException | SystemException e) {
-			log.error(e);
+			
+			if(activity.getTypeId() == TaskP2PLearningActivityType.TYPE_ID){
+				
+				date = ParamUtil.getDate(request, "fact" + activity.getActId(), sdf);
+				time = ParamUtil.getString(request, "tact" + activity.getActId());
+				calendar.setTime(date);
+				hours = time.split(":");
+				if(hours.length==2){
+					calendar.set(Calendar.HOUR_OF_DAY,Integer.valueOf(hours[0]));
+					calendar.set(Calendar.MINUTE,Integer.valueOf(hours[1]));
+				}
+
+				LearningActivityLocalServiceUtil.setExtraContentValue(activity.getActId(), P2P_DATEUPLOAD, sdfP2p.format(calendar.getTime()));	
+			}
 		}
-	}	
-	
+	}
 	
 	@Override
 	protected void include(String path, RenderRequest renderRequest,

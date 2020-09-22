@@ -83,12 +83,7 @@ public class MandatoryAvgCourseEval extends BaseCourseEval {
 				if(learningActivityResult.getEndDate()!=null){
 					if(!learningActivityResult.isPassed()){
 						passed = false;
-						if(activity.getTries() > 0){
-							long  userTries = LearningActivityTryLocalServiceUtil.getLearningActivityTryByActUserCount(activity.getActId(), userId);
-							if(userTries >= activity.getTries()){
-								isFailed=true;
-							}
-						}
+						isFailed=true;
 					}
 				}else{
 					passed=false;					
@@ -181,6 +176,7 @@ public class MandatoryAvgCourseEval extends BaseCourseEval {
 	@Override
 	@SuppressWarnings("unchecked")
 	public void onCloseCourse(Course course) throws SystemException {
+		super.onCloseCourse(course);
 		for(CourseResult courseResult:
 			(List<CourseResult>)CourseResultLocalServiceUtil.dynamicQuery(
 				CourseResultLocalServiceUtil.dynamicQuery().

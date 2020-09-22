@@ -5,17 +5,20 @@
 				IF(COUNT(1) > 0,true,false) AS hasActWithTries
 			FROM (
 				SELECT 
-					IF(lar.latId IS NOT NULL, COUNT(1), 0) AS numTriesUser, la.actId, la.tries
+					IF(lat.latId IS NOT NULL, COUNT(1), 0) AS numTriesUser, la.actId, la.tries, la.improve
 				FROM 
 					Lms_course c
 				INNER JOIN 
 					Lms_learningactivity la 
 						ON c.groupCreatedId = la.groupId
 				LEFT JOIN 
-					Lms_learningactivitytry lar 
-						ON la.actId = lar.actId AND lar.userId = ?
+					Lms_learningactivitytry lat 
+						ON la.actId = lat.actId AND lat.userId = ?
+				LEFT JOIN
+					lms_learningactivityresult lar
+						ON lar.actId = la.actId AND lar.userId = lat.userId
 				WHERE 
-					c.courseId =  ?
+					c.courseId =  ? AND (lar.endDate IS NULL OR (lar.passed = TRUE AND la.improve = true))
 				GROUP BY 
 					la.actId
 			) AS TABLA
@@ -31,7 +34,7 @@
 				IF(EXTRACTVALUE(Lms_Course.title, '//Title[@language-id=\"[$LANGUAGE$]\"]') != '', EXTRACTVALUE(Lms_Course.title, '//Title[@language-id=\"[$LANGUAGE$]\"]'), IF(EXTRACTVALUE(Lms_Course.title, '//root[@default-locale]//Title') != '', EXTRACTVALUE(Lms_Course.title, '//root[@default-locale]//Title'), Lms_Course.title )) AS courseTitle,
 				CASE WHEN r.crId IS NULL THEN '0' WHEN r.passedDate IS NULL THEN '1' WHEN r.passedDate IS NOT NULL AND r.passed = 0 THEN '2' WHEN r.passed = 1 AND r.passedDate IS NOT NULL THEN '3' ELSE '0' END AS statusUser,
 				CASE WHEN r.crId IS NULL THEN 0 ELSE r.result END AS result, Lms_Course.icon, Lms_Course.groupCreatedId, Lms_Course.friendlyURL,
-				Lms_Course.executionStartDate, Lms_Course.executionEndDate, asset.summary, r.passedDate
+				Lms_Course.executionStartDate, Lms_Course.executionEndDate, asset.summary, r.passedDate, r.registrationDate
 			FROM 
 				Lms_course
 			INNER JOIN classname_ classname ON classname.value='com.liferay.lms.model.Course'

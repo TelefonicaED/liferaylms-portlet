@@ -63,6 +63,10 @@ public class LearningActivityResultServiceImpl	extends LearningActivityResultSer
 		return learningActivityResultLocalService.userPassed(actId, user.getUserId());
 	}
 	
+	public LearningActivityResult finishResult(long actId, long userId){
+		return learningActivityResultLocalService.finishResult(actId, userId);
+	}
+	
 	public LearningActivityResult update(long latId, long result, String tryResultData) throws PortalException, SystemException
 	{
 		User user=this.getUser();

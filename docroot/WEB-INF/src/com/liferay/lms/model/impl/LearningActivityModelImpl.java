@@ -99,9 +99,10 @@ public class LearningActivityModelImpl extends BaseModelImpl<LearningActivity>
 			{ "feedbackNoCorrect", Types.VARCHAR },
 			{ "weightinmodule", Types.BIGINT },
 			{ "commentsActivated", Types.BOOLEAN },
-			{ "linkedActivityId", Types.BIGINT }
+			{ "linkedActivityId", Types.BIGINT },
+			{ "improve", Types.BOOLEAN }
 		};
-	public static final String TABLE_SQL_CREATE = "create table Lms_LearningActivity (uuid_ VARCHAR(75) null,actId LONG not null primary key,companyId LONG,userId LONG,groupId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,status INTEGER,statusByUserId LONG,statusByUserName VARCHAR(75) null,statusDate DATE null,title STRING null,description STRING null,typeId INTEGER,startdate DATE null,enddate DATE null,precedence LONG,tries LONG,passpuntuation INTEGER,priority LONG,moduleId LONG,extracontent TEXT null,feedbackCorrect VARCHAR(1000) null,feedbackNoCorrect VARCHAR(1000) null,weightinmodule LONG,commentsActivated BOOLEAN,linkedActivityId LONG)";
+	public static final String TABLE_SQL_CREATE = "create table Lms_LearningActivity (uuid_ VARCHAR(75) null,actId LONG not null primary key,companyId LONG,userId LONG,groupId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,status INTEGER,statusByUserId LONG,statusByUserName VARCHAR(75) null,statusDate DATE null,title STRING null,description STRING null,typeId INTEGER,startdate DATE null,enddate DATE null,precedence LONG,tries LONG,passpuntuation INTEGER,priority LONG,moduleId LONG,extracontent TEXT null,feedbackCorrect VARCHAR(1000) null,feedbackNoCorrect VARCHAR(1000) null,weightinmodule LONG,commentsActivated BOOLEAN,linkedActivityId LONG,improve BOOLEAN)";
 	public static final String TABLE_SQL_DROP = "drop table Lms_LearningActivity";
 	public static final String ORDER_BY_JPQL = " ORDER BY learningActivity.moduleId ASC, learningActivity.priority ASC";
 	public static final String ORDER_BY_SQL = " ORDER BY Lms_LearningActivity.moduleId ASC, Lms_LearningActivity.priority ASC";
@@ -167,6 +168,7 @@ public class LearningActivityModelImpl extends BaseModelImpl<LearningActivity>
 		model.setWeightinmodule(soapModel.getWeightinmodule());
 		model.setCommentsActivated(soapModel.getCommentsActivated());
 		model.setLinkedActivityId(soapModel.getLinkedActivityId());
+		model.setImprove(soapModel.getImprove());
 
 		return model;
 	}
@@ -254,6 +256,7 @@ public class LearningActivityModelImpl extends BaseModelImpl<LearningActivity>
 		attributes.put("weightinmodule", getWeightinmodule());
 		attributes.put("commentsActivated", getCommentsActivated());
 		attributes.put("linkedActivityId", getLinkedActivityId());
+		attributes.put("improve", getImprove());
 
 		return attributes;
 	}
@@ -426,6 +429,12 @@ public class LearningActivityModelImpl extends BaseModelImpl<LearningActivity>
 
 		if (linkedActivityId != null) {
 			setLinkedActivityId(linkedActivityId);
+		}
+
+		Boolean improve = (Boolean)attributes.get("improve");
+
+		if (improve != null) {
+			setImprove(improve);
 		}
 	}
 
@@ -961,6 +970,18 @@ public class LearningActivityModelImpl extends BaseModelImpl<LearningActivity>
 		_linkedActivityId = linkedActivityId;
 	}
 
+	public boolean getImprove() {
+		return _improve;
+	}
+
+	public boolean isImprove() {
+		return _improve;
+	}
+
+	public void setImprove(boolean improve) {
+		_improve = improve;
+	}
+
 	/**
 	 * @deprecated {@link #isApproved}
 	 */
@@ -1110,6 +1131,7 @@ public class LearningActivityModelImpl extends BaseModelImpl<LearningActivity>
 		learningActivityImpl.setWeightinmodule(getWeightinmodule());
 		learningActivityImpl.setCommentsActivated(getCommentsActivated());
 		learningActivityImpl.setLinkedActivityId(getLinkedActivityId());
+		learningActivityImpl.setImprove(getImprove());
 
 		learningActivityImpl.resetOriginalValues();
 
@@ -1360,12 +1382,14 @@ public class LearningActivityModelImpl extends BaseModelImpl<LearningActivity>
 
 		learningActivityCacheModel.linkedActivityId = getLinkedActivityId();
 
+		learningActivityCacheModel.improve = getImprove();
+
 		return learningActivityCacheModel;
 	}
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(57);
+		StringBundler sb = new StringBundler(59);
 
 		sb.append("{uuid=");
 		sb.append(getUuid());
@@ -1423,13 +1447,15 @@ public class LearningActivityModelImpl extends BaseModelImpl<LearningActivity>
 		sb.append(getCommentsActivated());
 		sb.append(", linkedActivityId=");
 		sb.append(getLinkedActivityId());
+		sb.append(", improve=");
+		sb.append(getImprove());
 		sb.append("}");
 
 		return sb.toString();
 	}
 
 	public String toXmlString() {
-		StringBundler sb = new StringBundler(88);
+		StringBundler sb = new StringBundler(91);
 
 		sb.append("<model><model-name>");
 		sb.append("com.liferay.lms.model.LearningActivity");
@@ -1547,6 +1573,10 @@ public class LearningActivityModelImpl extends BaseModelImpl<LearningActivity>
 			"<column><column-name>linkedActivityId</column-name><column-value><![CDATA[");
 		sb.append(getLinkedActivityId());
 		sb.append("]]></column-value></column>");
+		sb.append(
+			"<column><column-name>improve</column-name><column-value><![CDATA[");
+		sb.append(getImprove());
+		sb.append("]]></column-value></column>");
 
 		sb.append("</model>");
 
@@ -1604,6 +1634,7 @@ public class LearningActivityModelImpl extends BaseModelImpl<LearningActivity>
 	private boolean _setOriginalWeightinmodule;
 	private boolean _commentsActivated;
 	private long _linkedActivityId;
+	private boolean _improve;
 	private long _columnBitmask;
 	private LearningActivity _escapedModelProxy;
 }

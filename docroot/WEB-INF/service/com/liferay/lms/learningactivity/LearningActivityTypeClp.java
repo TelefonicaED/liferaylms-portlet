@@ -10,6 +10,8 @@ import javax.portlet.PortletResponse;
 
 import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.model.LearningActivityClp;
+import com.liferay.lms.model.LearningActivityResult;
+import com.liferay.lms.model.LearningActivityResultClp;
 import com.liferay.lms.model.LearningActivityTry;
 import com.liferay.lms.model.LearningActivityTryClp;
 import com.liferay.lms.service.ClpSerializer;
@@ -293,6 +295,8 @@ public class LearningActivityTypeClp implements LearningActivityType {
 		return ((String)returnObj);
 	}
 	
+	
+	
 	private Object translateLearningActivity(LearningActivity larn) {
 		Object larnObj = null;
 		try {
@@ -326,6 +330,33 @@ public class LearningActivityTypeClp implements LearningActivityType {
 			larnObj = Class.forName(LearningActivityTryClp.class.getName(), true, clp.getClassLoader()).newInstance();
 			
 			ClassLoaderProxy clp2 = new ClassLoaderProxy(larnObj, LearningActivityTryClp.class.getName(), clp.getClassLoader());
+			clp2.invoke("setModelAttributes", new Object[] {larn.getModelAttributes()});
+		} catch(ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch (InstantiationException e) {
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+		} catch (Throwable t) {
+			t = ClpSerializer.translateThrowable(t);
+
+			if (t instanceof RuntimeException) {
+				throw (RuntimeException)t;
+			}
+			else {
+				throw new RuntimeException(t.getClass().getName() +
+					" is not a valid exception");
+			}
+		}
+		return larnObj;
+	}
+	
+	private Object translateLearningActivityResult(LearningActivityResult larn) {
+		Object larnObj = null;
+		try {
+			larnObj = Class.forName(LearningActivityResultClp.class.getName(), true, clp.getClassLoader()).newInstance();
+			
+			ClassLoaderProxy clp2 = new ClassLoaderProxy(larnObj, LearningActivityResultClp.class.getName(), clp.getClassLoader());
 			clp2.invoke("setModelAttributes", new Object[] {larn.getModelAttributes()});
 		} catch(ClassNotFoundException e) {
 			e.printStackTrace();
@@ -918,6 +949,29 @@ public class LearningActivityTypeClp implements LearningActivityType {
 	}
 	
 	@Override
+	public void onCloseCourse(LearningActivity activity) throws SystemException, PortalException {
+
+		try {
+			ClassLoader classLoader = clp.getClassLoader();
+			Class learningActivityClass = Class.forName(LearningActivity.class.getName(),true, classLoader);
+			MethodKey onCloseCourse = new MethodKey(clp.getClassName(), "onCloseCourse", learningActivityClass);		    
+			clp.invoke(new MethodHandler(onCloseCourse, activity));
+		}
+		catch (Throwable t) {
+			t = ClpSerializer.translateThrowable(t);
+
+			if (t instanceof RuntimeException) {
+				throw (RuntimeException)t;
+			}
+			else {
+				t.printStackTrace();
+				throw new RuntimeException(t.getClass().getName() +
+					" is not a valid exception");
+			}
+		}
+	}
+	
+	@Override
 	public long calculateResult(LearningActivity learningActivity, LearningActivityTry lat){
 		
 		Object returnObj = null;
@@ -956,6 +1010,36 @@ public class LearningActivityTypeClp implements LearningActivityType {
 			MethodKey especificValidationsMethod = new MethodKey(clp.getClassName(), "isPassed", learningActivityClass, learningActivityTryClass);
 			Object learningActivityObj = translateLearningActivity(learningActivity);
 			Object latObj = translateLearningActivityTry(lat);
+			
+			returnObj = clp.invoke(new MethodHandler(especificValidationsMethod, learningActivityObj, latObj));
+		}
+		catch (Throwable t) {
+			t = ClpSerializer.translateThrowable(t);
+
+			if (t instanceof RuntimeException) {
+				throw (RuntimeException)t;
+			}
+			else {
+				t.printStackTrace();
+				throw new RuntimeException(t.getClass().getName() +
+					" is not a valid exception");
+			}
+		}
+		return ((Boolean)returnObj).booleanValue();	
+	}
+	
+	@Override
+	public boolean isFinished(LearningActivity learningActivity, LearningActivityResult learningActivityResult) throws PortalException, SystemException{
+		Object returnObj = null;
+
+		try {
+			ClassLoader classLoader = clp.getClassLoader();
+			Class learningActivityClass = Class.forName(LearningActivity.class.getName(),true, classLoader);
+			Class learningActivityResultClass = Class.forName(LearningActivityResult.class.getName(),true, classLoader);
+			
+			MethodKey especificValidationsMethod = new MethodKey(clp.getClassName(), "isFinished", learningActivityClass, learningActivityResultClass);
+			Object learningActivityObj = translateLearningActivity(learningActivity);
+			Object latObj = translateLearningActivityResult(learningActivityResult);
 			
 			returnObj = clp.invoke(new MethodHandler(especificValidationsMethod, learningActivityObj, latObj));
 		}
