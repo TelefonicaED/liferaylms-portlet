@@ -1,3 +1,5 @@
+<%@page import="com.liferay.lms.util.LmsConstant"%>
+<%@page import="com.liferay.portal.service.permission.UserPermissionUtil"%>
 <%@ include file="/init.jsp" %>
 
  
@@ -6,6 +8,8 @@
 <jsp:useBean id="LearningActivityLocalServiceUtil" class="com.liferay.lms.service.LearningActivityLocalServiceUtil"/>
 
 <jsp:useBean id="ct" type="com.liferay.lms.learningactivity.calificationtype.CalificationType" scope="request"/>
+
+<%System.out.println(UserPermissionUtil.contains(themeDisplay.getPermissionChecker(), 10196, "VIEW_USER_EXTENDED"));%>
 
 <liferay-ui:error key="result-bad-format" message="<%=LanguageUtil.format(themeDisplay.getLocale(), \"result.must-be-between\", new Object[]{ct.getMinValue(themeDisplay.getScopeGroupId()),ct.getMaxValue(themeDisplay.getScopeGroupId())})%>" />
 <liferay-ui:error key="grades.bad-updating" message="offlinetaskactivity.grades.bad-updating" />

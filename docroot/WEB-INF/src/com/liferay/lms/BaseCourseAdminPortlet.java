@@ -57,6 +57,8 @@ import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.lms.service.CourseResultLocalServiceUtil;
 import com.liferay.lms.service.LmsPrefsLocalServiceUtil;
 import com.liferay.lms.util.CourseParams;
+import com.liferay.lms.util.LmsConstant;
+import com.liferay.lms.util.LmsPrefsPropsValues;
 import com.liferay.lms.util.displayterms.UserDisplayTerms;
 import com.liferay.lms.util.searchcontainer.UserSearchContainer;
 import com.liferay.portal.DuplicateGroupException;
@@ -122,6 +124,7 @@ import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceContextFactory;
 import com.liferay.portal.service.UserGroupRoleLocalServiceUtil;
 import com.liferay.portal.service.UserLocalServiceUtil;
+import com.liferay.portal.service.permission.PortalPermissionUtil;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.comparator.UserFirstNameComparator;
@@ -266,6 +269,9 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 			PortletURL returnURL = renderResponse.createRenderURL();
 			returnURL.setParameter("view", "");
 			renderRequest.setAttribute("returnURL", returnURL.toString());
+			
+			renderRequest.setAttribute("usersExtendedData", !LmsPrefsPropsValues.getUsersExtendedData(themeDisplay.getCompanyId()) || PortalPermissionUtil.contains(
+		        		themeDisplay.getPermissionChecker(), LmsConstant.ACTION_VIEW_USER_EXTENDED));
 		
 		}catch(SystemException e){
 			e.printStackTrace();
@@ -361,10 +367,7 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 				log.debug("TEAM "+team);
 				log.debug("IS ADVANCED SEARCH "+displayTerms.isAdvancedSearch());
 			}
-			
-			
-			
-			
+
 			/**RESULTS*/
 			LinkedHashMap<String,Object> params=new LinkedHashMap<String,Object>();			
 			
@@ -1348,6 +1351,9 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 						log.error("Se ha producido un error al obtener el tipo de login de usuario (authType) para companyId=" + themeDisplay.getCompanyId(), e);
 					}
 					
+					int posDate = !LmsPrefsPropsValues.getUsersExtendedData(themeDisplay.getCompanyId()) || PortalPermissionUtil.contains(
+			        		themeDisplay.getPermissionChecker(), LmsConstant.ACTION_VIEW_USER_EXTENDED) ? 3:1;
+					
 					
 					while ((currLine = reader.readNext()) != null) {
 
@@ -1400,8 +1406,8 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 		
 											users.add(user.getUserId());
 											
-											String allowStartDateStr = currLine[3];
-											String allowEndDateStr = currLine[4];
+											String allowStartDateStr = currLine[posDate];
+											String allowEndDateStr = currLine[posDate+1];
 											
 											if(allowStartDateStr.trim().length() >0){
 												try{
@@ -1676,20 +1682,32 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 					log.error("Se ha producido un error al obtener el tipo de login de usuario (authType) para companyId=" + themeDisplay.getCompanyId(), e);
 				}
 				
-				String[] header = new String[5];
+				int numColums = !LmsPrefsPropsValues.getUsersExtendedData(themeDisplay.getCompanyId()) || PortalPermissionUtil.contains(
+		        		themeDisplay.getPermissionChecker(), LmsConstant.ACTION_VIEW_USER_EXTENDED) ? 5 : 3;
 				
-				if (CompanyConstants.AUTH_TYPE_SN.equalsIgnoreCase(authType)) {
-					header[0] = LanguageUtil.get(themeDisplay.getLocale(), "screen-name");
-				}else if(CompanyConstants.AUTH_TYPE_EA.equalsIgnoreCase(authType)){
-					header[0] = LanguageUtil.get(themeDisplay.getLocale(), "email-address");
+				String[] header = new String[numColums];
+				
+				int column = 0;
+				
+				if(!LmsPrefsPropsValues.getUsersExtendedData(themeDisplay.getCompanyId()) || PortalPermissionUtil.contains(
+		        		themeDisplay.getPermissionChecker(), LmsConstant.ACTION_VIEW_USER_EXTENDED)){
+					
+					if (CompanyConstants.AUTH_TYPE_SN.equalsIgnoreCase(authType)) {
+						header[column++] = LanguageUtil.get(themeDisplay.getLocale(), "screen-name");
+					}else if(CompanyConstants.AUTH_TYPE_EA.equalsIgnoreCase(authType)){
+						header[column++] = LanguageUtil.get(themeDisplay.getLocale(), "email-address");
+					}else{
+						header[column++] = LanguageUtil.get(themeDisplay.getLocale(), "user-id");
+					}
+					
+					header[column++] = LanguageUtil.get(themeDisplay.getLocale(), "first-name");
+					header[column++] = LanguageUtil.get(themeDisplay.getLocale(), "last-name");
 				}else{
-					header[0] = LanguageUtil.get(themeDisplay.getLocale(), "user-id");
+					header[column++] = LanguageUtil.get(themeDisplay.getLocale(), "screen-name");
 				}
 				
-				header[1] = LanguageUtil.get(themeDisplay.getLocale(), "first-name");
-				header[2] = LanguageUtil.get(themeDisplay.getLocale(), "last-name");
-				header[3] = LanguageUtil.get(themeDisplay.getLocale(), "start-date");
-				header[4] = LanguageUtil.get(themeDisplay.getLocale(), "end-date");
+				header[column++] = LanguageUtil.get(themeDisplay.getLocale(), "start-date");
+				header[column++] = LanguageUtil.get(themeDisplay.getLocale(), "end-date");
 				
 				writer.writeNext(header);
 				
@@ -1708,20 +1726,28 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 					fechaIni = (courseResult!=null&&courseResult.getAllowStartDate() != null)?sdf.format(courseResult.getAllowStartDate()):StringPool.BLANK;
 					fechaFin = (courseResult!=null&&courseResult.getAllowFinishDate() != null)?sdf.format(courseResult.getAllowFinishDate()):StringPool.BLANK;
 				
-					String[] result = new String[5];
+					String[] result = new String[numColums];
 					
-					if (CompanyConstants.AUTH_TYPE_SN.equalsIgnoreCase(authType)) {
-						result[0] = user.getScreenName();
-					}else if(CompanyConstants.AUTH_TYPE_EA.equalsIgnoreCase(authType)){
-						result[0] = user.getEmailAddress();
+					column = 0;
+					
+					if(!LmsPrefsPropsValues.getUsersExtendedData(themeDisplay.getCompanyId()) || PortalPermissionUtil.contains(
+			        		themeDisplay.getPermissionChecker(), LmsConstant.ACTION_VIEW_USER_EXTENDED)){
+						
+						if (CompanyConstants.AUTH_TYPE_SN.equalsIgnoreCase(authType)) {
+							result[column++] = user.getScreenName();
+						}else if(CompanyConstants.AUTH_TYPE_EA.equalsIgnoreCase(authType)){
+							result[column++] = user.getEmailAddress();
+						}else{
+							result[column++] = String.valueOf(user.getUserId());
+						}
+						
+						result[column++] = user.getFirstName();
+						result[column++] = user.getLastName();
 					}else{
-						result[0] = String.valueOf(user.getUserId());
+						result[column++] = user.getScreenName();
 					}
-					
-					result[1] = user.getFirstName();
-					result[2] = user.getLastName();
-					result[3] = fechaIni;
-					result[4] = fechaFin;
+					result[column++] = fechaIni;
+					result[column++] = fechaFin;
 				
 					writer.writeNext(result);
 				}
