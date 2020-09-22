@@ -6,11 +6,12 @@ import javax.portlet.PortletPreferences;
 import javax.portlet.PortletRequest;
 
 import com.liferay.lms.service.CourseLocalServiceUtil;
+import com.liferay.lms.util.LmsConstant;
+import com.liferay.lms.util.LmsPrefsPropsValues;
 import com.liferay.portal.kernel.dao.search.DisplayTerms;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -18,8 +19,11 @@ import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.model.Team;
 import com.liferay.portal.model.User;
+import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.service.PortalPreferencesLocalServiceUtil;
 import com.liferay.portal.service.TeamLocalServiceUtil;
+import com.liferay.portal.service.permission.PortalPermissionUtil;
+import com.liferay.portal.service.permission.UserPermissionUtil;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.comparator.UserFirstNameComparator;
 import com.liferay.portal.util.comparator.UserLastNameComparator;
@@ -52,6 +56,7 @@ public class UserDisplayTerms extends DisplayTerms{
 	protected Team team;
 	protected boolean showScreenName;
 	protected boolean showEmailAddress;
+	protected boolean showUserName;
 	private long companyId;
 	
 	private static Log log = LogFactoryUtil.getLog(UserDisplayTerms.class);
@@ -108,8 +113,18 @@ public class UserDisplayTerms extends DisplayTerms{
 			}
 		}
 		
-		this.showEmailAddress = true;
-		this.showScreenName = true;
+		
+		if(LmsPrefsPropsValues.getUsersExtendedData(themeDisplay.getCompanyId()) && !PortalPermissionUtil.contains(
+				themeDisplay.getPermissionChecker(), LmsConstant.ACTION_VIEW_USER_EXTENDED)){
+			//Comprobamos que tenga permiso el usuario
+			this.showEmailAddress = false;
+			this.showScreenName = true;
+			this.showUserName = false;
+		}else{
+			this.showEmailAddress = true;
+			this.showScreenName = true;
+			this.showUserName = true;
+		}
 	}
 
 	public String getEmailAddress() {
@@ -352,6 +367,14 @@ public class UserDisplayTerms extends DisplayTerms{
 		}
 		
 		return numEditors;
+	}
+
+	public boolean isShowUserName() {
+		return showUserName;
+	}
+
+	public void setShowUserName(boolean showUserName) {
+		this.showUserName = showUserName;
 	}
 
 }

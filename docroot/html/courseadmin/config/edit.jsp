@@ -138,8 +138,6 @@
 				}
 		%>
 		
-		
-		
 		<aui:input type="checkbox" name="showResume" 		label="courseadmin.config.showResume" 		value="<%=showResume %>" checked="<%=showResume %>"/>
 		<aui:input type="checkbox" name="showDescription" 	label="courseadmin.config.showDescription" 	value="<%=showDescription %>" checked="<%=showDescription %>"/>
 		<aui:input type="checkbox" name="showIconCourse" 	label="courseadmin.config.showIconCourse" 	value="<%=showIconCourse %>" checked="<%=showIconCourse %>"/>
