@@ -292,7 +292,8 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 	}
 
 	public Course addCourse (Map<Locale,String> titleMap, String description,String summary,String friendlyURL, Locale locale,
-			Date createDate,Date startDate,Date endDate, Date executionStartDate, Date executionEndDate, long layoutSetPrototypeId,int typesite, long CourseEvalId, long calificationType, int maxUsers,ServiceContext serviceContext,boolean isfromClone,
+			Date createDate,Date startDate,Date endDate, Date executionStartDate, Date executionEndDate, long layoutSetPrototypeId,int typesite, 
+			long CourseEvalId, long calificationType, int maxUsers,ServiceContext serviceContext,boolean isfromClone,
 			long courseTypeId)
 			throws SystemException, PortalException {
 		
@@ -300,7 +301,8 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 		
 		LmsPrefs lmsPrefs=lmsPrefsLocalService.getLmsPrefsIni(serviceContext.getCompanyId());
 		long userId=serviceContext.getUserId();
-		Course course = coursePersistence.create(counterLocalService.increment(Course.class.getName()));
+		long courseId = counterLocalService.increment(Course.class.getName());
+		Course course = coursePersistence.create(courseId);
 		String title = null;
 		if(titleMap.containsKey(locale)){
 			title = titleMap.get(locale);
@@ -364,9 +366,18 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 			course = LmsLocaleUtil.checkDefaultLocale(Course.class, course, "description");
 			//creating group
 			String groupName = title;
-			if(title.length()>148){
-				groupName = title.substring(0, 148);
+			if(GroupLocalServiceUtil.fetchGroup(course.getCompanyId(), groupName)!=null){
+				if(groupName.length()>130){
+					groupName = groupName.substring(0, 130);
+				}
+				groupName = course.getTitle(locale,true)+" ("+courseId+")";
 			}
+			
+			if(groupName.length()>148){
+				groupName = groupName.substring(0, 148);
+			}
+			
+			System.out.println("groupName: " + groupName);
 			
 			Group group = groupLocalService.addGroup(userLocalService.getDefaultUser(serviceContext.getCompanyId()).getUserId(),
 					null, 0, groupName,summary,typesite,friendlyURL,true,true,serviceContext);
@@ -647,6 +658,9 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 		String groupName = course.getTitle(locale,true);
 		if(allowDuplicateName){
 			if(GroupLocalServiceUtil.fetchGroup(course.getCompanyId(), groupName)!=null){
+				if(groupName.length()>130){
+					groupName = groupName.substring(0, 130);
+				}
 				groupName = course.getTitle(locale,true)+" ("+course.getCourseId()+")";
 			}
 		}
@@ -1702,7 +1716,25 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 	 */
 	public List<User> getStudentsFromCourse(long courseId, long companyId, String screenName, String firstName, String lastName, String emailAddress, int status, long[] teamIds, boolean andOperator, 
 									int start, int end, OrderByComparator obc){
-		return courseFinder.findStudents(courseId, companyId, screenName, firstName, lastName, emailAddress, status, teamIds, andOperator, start, end, obc);
+		return courseFinder.findStudents(courseId, companyId, screenName, firstName, lastName, emailAddress, status, teamIds, andOperator, false, CourseParams.STUDENTS_TYPE_ALL, start, end, obc);
+	}
+	
+	/**
+	 * Usar este método para contar los estudiantes de un curso
+	 * @param courseId id del curso
+	 * @param companyId id de company
+	 * @param screenName nombre de usuario
+	 * @param firstName nombre
+	 * @param lastName apellido
+	 * @param emailAddress direccion de correo
+	 * @param status estado del usuario (WorkflowConstants)
+	 * @param teamIds array de long con los ids de los equipos
+	 * @param andOperator true si queremos que coincidan screenname, firstname, lastname y emailaddress, false en caso contrario
+	 * @return
+	 */
+	public int countStudentsFromCourse(long courseId, long companyId, String screenName, String firstName, String lastName, String emailAddress, 
+			int status, long[] teamIds, boolean andOperator, boolean includeEditions, int type){
+		return courseFinder.countStudents(courseId, companyId, screenName, firstName, lastName, emailAddress, status, teamIds, andOperator, includeEditions, type);
 	}
 	
 	/**
@@ -1719,7 +1751,7 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 	 * @return
 	 */
 	public int countStudentsFromCourse(long courseId, long companyId, String screenName, String firstName, String lastName, String emailAddress, int status, long[] teamIds, boolean andOperator){
-		return courseFinder.countStudents(courseId, companyId, screenName, firstName, lastName, emailAddress, status, teamIds, andOperator);
+		return countStudentsFromCourse(courseId, companyId, screenName, firstName, lastName, emailAddress, status, teamIds, andOperator, false, CourseParams.STUDENTS_TYPE_ALL);
 	}
 	
 	public int getStudentsFromCourseCount(long courseId) throws SystemException, PortalException{

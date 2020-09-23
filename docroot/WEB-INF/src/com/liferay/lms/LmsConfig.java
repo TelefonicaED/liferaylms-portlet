@@ -25,7 +25,6 @@ import com.liferay.util.bridges.mvc.MVCPortlet;
  */
 public class LmsConfig extends MVCPortlet {
 	
-	
 	public void changeSettings(ActionRequest request , ActionResponse response) throws Exception{
 		
 		String redirect = ParamUtil.get(request, "redirect", "");
@@ -50,6 +49,7 @@ public class LmsConfig extends MVCPortlet {
 		boolean sendMailToTutors = ParamUtil.getBoolean(request, "sendMailToTutors");
 		boolean showButtonInscriptionAll = ParamUtil.getBoolean(request, "showButtonInscriptionAll", true);
 		boolean showButtonUnsubscribeAll = ParamUtil.getBoolean(request, "showButtonUnsubscribeAll", true);
+		boolean showOptionTest = ParamUtil.getBoolean(request, "showOptionTest", false);
 		
 		LmsPrefs prefs=LmsPrefsLocalServiceUtil.getLmsPrefsIni(themeDisplay.getCompanyId());
 		prefs.setLmsTemplates(sitetemplates);
@@ -70,6 +70,7 @@ public class LmsConfig extends MVCPortlet {
 		savePreference(LmsConstant.SHOW_BUTTON_INSCRIPTION_ALL, String.valueOf(showButtonInscriptionAll), themeDisplay.getCompanyId());
 		savePreference(LmsConstant.SHOW_BUTTON_UNSUBSCRIBE_ALL, String.valueOf(showButtonUnsubscribeAll), themeDisplay.getCompanyId());
 		savePreference(LmsConstant.PREFS_VIEW_COURSE_FINISHED_TYPE, String.valueOf(viewCourseFinishedType), themeDisplay.getCompanyId());
+		savePreference(LmsConstant.PREFS_SHOW_OPTION_TEST, String.valueOf(showOptionTest), themeDisplay.getCompanyId());
 		
 		if (Validator.isNotNull(redirect)) {
 			response.sendRedirect(redirect);

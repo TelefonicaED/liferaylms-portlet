@@ -769,10 +769,7 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 					"/html/courseadmin/editcourse.jsp");
 			return;
 		}
-		
-		
-		
-		
+
 		Date ahora = new Date(System.currentTimeMillis());
 		
 		boolean requiredCourseIcon = GetterUtil.getBoolean(PropsUtil.get("lms.course.icon.required"), false);
@@ -1643,13 +1640,19 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 					}
 				}
 				
-				
 				long courseId = ParamUtil.getLong(request, "courseId",0);
 				long roleId = ParamUtil.getLong(request, "roleId",0);
 				
+				Course course = null;
+				try {
+					course = CourseLocalServiceUtil.getCourse(courseId);
+				} catch (PortalException | SystemException e1) {
+					e1.printStackTrace();
+				}
+				
 				List<User> users = new ArrayList<User>();
 				
-				UserDisplayTerms displayTerms = new UserDisplayTerms(request);
+				UserDisplayTerms displayTerms = new UserDisplayTerms(request, course != null ? course.getGroupCreatedId(): themeDisplay.getScopeGroupId());
 				
 				if(roleId==commmanager.getRoleId()){
 					users = displayTerms.getStudents(courseId, QueryUtil.ALL_POS, QueryUtil.ALL_POS);

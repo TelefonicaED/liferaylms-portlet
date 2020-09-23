@@ -1,9 +1,15 @@
 package com.liferay.lms.learningactivity.courseeval;
 
+import java.util.List;
+
 import javax.portlet.PortletResponse;
 
+import com.liferay.lms.learningactivity.LearningActivityType;
+import com.liferay.lms.learningactivity.LearningActivityTypeRegistry;
 import com.liferay.lms.model.Course;
+import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.service.ClpSerializer;
+import com.liferay.lms.service.LearningActivityLocalServiceUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.upload.UploadRequest;
@@ -52,6 +58,17 @@ public abstract class BaseCourseEval implements CourseEval {
 	
 	@Override
 	public void onCloseCourse(Course course) throws SystemException {
+		List<LearningActivity> activities = LearningActivityLocalServiceUtil.getLearningActivitiesOfGroup(course.getGroupCreatedId());
+		LearningActivityTypeRegistry activityTypeRegistry = new LearningActivityTypeRegistry();
+		LearningActivityType learningActivityType = null;
+		for(LearningActivity activity: activities){
+			learningActivityType = activityTypeRegistry.getLearningActivityType(activity.getTypeId());
+			try {
+				learningActivityType.onCloseCourse(activity);
+			} catch (PortalException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 }

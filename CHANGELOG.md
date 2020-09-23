@@ -3,12 +3,41 @@ Todos los cambios de este proyecto estarán documentados en este archivo.
 
 El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 
+## [4.3.0](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v4.3.0)
+
+### Fixed
+
+- #183348 Las ediciones no heredan el tipo de inscripción ni el diploma del curso padre (faltan diplomas)
+- #186955 Visibilidad o no visibilidad de las actividades no se hereda del curso a las ediciones
+- #186905 URLs de ediciones borradas, ya no salen url que ya existan para las ediciones
+
+### Added
+
+- #184759 En las estadítsticas, se puede pinchar sobre los cursos con ediciones para ver los datos concretos de esa edición
+- #185783 Se muestra la nota del curso en el portlet de notas
+
+### Updated
+
+- #184759 Se modifican las estadísticas para que saquen la suma de todas las ediciones.
+- #182359 Se modifica el editor de fechas para tener en cuenta todas las fechas nulas tanto de módulos como de actividades
+
+### Fixed
+
+- #182374 Se modifica cuándo se pone la fecha fin de un módulo porque cuando suspendías las actividades no te la rellenaba. 
+- #182374 Modificación en los métodos de evaluación para que no compruebe si quedan intentos, solo mire la fecha de fin de la actividad.
+
 ## [4.2.1](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v4.2.1)
 
 ### Fixed
 
 - #168477: Corrección sobre los cursos finalizados de wemooc.
 
+
+## [4.3.0](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v4.3.0)
+
+### Fixed
+
+- #179229 Se corrigen las comprobaciones de url y nombre al crear ediciones
 
 ## [4.2.0](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v4.2.0)
 

@@ -126,6 +126,18 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			CourseFinder.class.getName() + ".whereExecutionEndDate";
 	public static final String WHERE_PARENT_COURSE_ID = 
 			CourseFinder.class.getName() + ".whereParentCourseId";
+	public static final String WHERE_COURSE_ID = 
+			CourseFinder.class.getName() + ".whereCourseId";
+	public static final String WHERE_EDITIONS = 
+			CourseFinder.class.getName() + ".whereEditions";
+	public static final String INNER_STARTED = 
+			CourseFinder.class.getName() + ".innerStarted";
+	public static final String INNER_FINISHED = 
+			CourseFinder.class.getName() + ".innerFinished";
+	public static final String INNER_PASSED = 
+			CourseFinder.class.getName() + ".innerPassed";
+	public static final String INNER_FAILED = 
+			CourseFinder.class.getName() + ".innerFailed";
 	public static final String WHERE_SCREEN_NAME =
 		    CourseFinder.class.getName() +
 		        ".whereScreenName";
@@ -834,7 +846,8 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 	}
 	
 
-	public List<User> findStudents(long courseId, long companyId, String screenName, String firstName, String lastName, String emailAddress, int status, long[] teamIds,boolean andOperator, 
+	public List<User> findStudents(long courseId, long companyId, String screenName, String firstName, String lastName, 
+			String emailAddress, int status, long[] teamIds,boolean andOperator, boolean includeEditions, int type,
 			int start, int end,OrderByComparator obc){
 		Session session = null;
 		try{
@@ -853,6 +866,8 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			session = openSessionLiferay();
 			String sql = CustomSQLUtil.get(FIND_STUDENTS);
 			
+			sql = replaceCourseResultType(sql, type);
+			sql = replaceCourseOrEditions(sql, includeEditions);
 			sql = replaceJoinWhereUser(sql, screenName, firstName, lastName, emailAddress, status, teamIds, andOperator);
 			
 			sql = CustomSQLUtil.replaceAndOperator(sql, andOperator);
@@ -877,6 +892,9 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			qPos.add(teacherRoleId);
 			qPos.add(editorRoleId);
 			qPos.add(courseId);
+			if(includeEditions){
+				qPos.add(courseId);
+			}
 
 			if(status != WorkflowConstants.STATUS_ANY){
 				qPos.add(status);
@@ -907,8 +925,8 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 	    return new ArrayList<User>();
 	}
 	
-	public int countStudents(long courseId, long companyId, String screenName, String firstName, String lastName, String emailAddress, int status, long[] teamIds,
-			boolean andOperator){
+	public int countStudents(long courseId, long companyId, String screenName, String firstName, String lastName, String emailAddress, 
+			int status, long[] teamIds, boolean andOperator, boolean includeEditions, int type){
 		Session session = null;
 		try{
 			
@@ -923,6 +941,8 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			
 			String sql = CustomSQLUtil.get(COUNT_STUDENTS);
 			
+			sql = replaceCourseResultType(sql, type);
+			sql = replaceCourseOrEditions(sql, includeEditions);
 			sql = replaceJoinWhereUser(sql, screenName, firstName, lastName, emailAddress, status, teamIds, andOperator);
 			
 			sql = CustomSQLUtil.replaceAndOperator(sql, andOperator);
@@ -941,6 +961,9 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			qPos.add(teacherRoleId);
 			qPos.add(editorRoleId);
 			qPos.add(courseId);
+			if(includeEditions){
+				qPos.add(courseId);
+			}
 			if(status != WorkflowConstants.STATUS_ANY){
 				qPos.add(status);
 			}
@@ -1198,6 +1221,35 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 		return sql;
 	}
 
+	private String replaceCourseOrEditions(String sql, boolean includeEditions){
+		String sqlCourse = null;
+		if(!includeEditions){
+			sqlCourse = CustomSQLUtil.get(WHERE_COURSE_ID);
+		}else{
+			sqlCourse = CustomSQLUtil.get(WHERE_EDITIONS);
+		}
+		sql = StringUtil.replace(sql, "[$WHERECOURSEOREDITIONS$]", sqlCourse);
+		
+		return sql;
+	}
+	
+	private String replaceCourseResultType(String sql, int type){
+		String sqlCourseResult = null;
+		if(type == CourseParams.STUDENTS_TYPE_ALL){
+			sqlCourseResult = "";
+		}else if(type == CourseParams.STUDENTS_TYPE_STARTED){
+			sqlCourseResult = CustomSQLUtil.get(INNER_STARTED);
+		}else if(type == CourseParams.STUDENTS_TYPE_FINISHED){
+			sqlCourseResult = CustomSQLUtil.get(INNER_FINISHED);
+		}else if(type == CourseParams.STUDENTS_TYPE_PASSED){
+			sqlCourseResult = CustomSQLUtil.get(INNER_PASSED);
+		}else if(type == CourseParams.STUDENTS_TYPE_FAILED){
+			sqlCourseResult = CustomSQLUtil.get(INNER_FAILED);
+		}
+		sql = StringUtil.replace(sql, "[$JOINCOURSERESULT$]", sqlCourseResult);
+		
+		return sql;
+	}
 
 	private String replaceJoinWhereUser(String sql, String screenName, String firstName, String lastName, String emailAddress, int status, long[] teamIds, boolean andOperator){
 		boolean whereClause = false;
@@ -1437,7 +1489,7 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 					result = ((BigInteger)myCourse[4]).longValue();
 					statusUser = Integer.parseInt((String)myCourse[3]);
 					passedDate = (Date)myCourse[11];
-					courseResultView = new CourseResultView(courseView, result, statusUser, passedDate);
+					courseResultView = new CourseResultView(courseView, result, statusUser, passedDate, userId);
 					
 					listMyCourses.add(courseResultView);
 				}

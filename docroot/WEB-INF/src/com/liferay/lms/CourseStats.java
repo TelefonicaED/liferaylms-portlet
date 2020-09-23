@@ -122,7 +122,8 @@ public class CourseStats extends MVCPortlet {
 			}
 			log.debug("CourseStats::showViewDefault::Lista de usuarios obtenida");
 			
-			CourseStatsView courseStats =  new CourseStatsView(course.getCourseId(), themeDisplay.getLocale(), teamId,  userExcludedIds, userIds,false);
+			CourseStatsView courseStats =  new CourseStatsView(themeDisplay.getCompanyId(), course.getCourseId(), themeDisplay.getLocale(), 
+					teamId, false);
 			
 			List<CourseStatsView> courseStatsViews = new ArrayList<CourseStatsView>();
 			courseStatsViews.add(courseStats);
@@ -386,7 +387,7 @@ public class CourseStats extends MVCPortlet {
 				userExcludedIds = CourseLocalServiceUtil.getTeachersAndEditorsIdsFromCourse(course);
 			}
 			
-			CourseStatsView courseView  = new CourseStatsView(course.getCourseId(), themeDisplay.getLocale(), teamId,  userExcludedIds, userIds,false); 
+			CourseStatsView courseView  = new CourseStatsView(themeDisplay.getCompanyId(), course.getCourseId(), themeDisplay.getLocale(), teamId, false); 
 			List<Module> modules = ModuleLocalServiceUtil.findAllInGroup(course.getGroupCreatedId());
 			CSVWriter writer = initCsv(resourceResponse);
 			 

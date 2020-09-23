@@ -60,4 +60,14 @@ public class CourseParams {
 	 */
 	public static final String PARAM_EXECUTION_END_DATE = "executionEndDate";
 	
+	public static final int STUDENTS_TYPE_ALL = 0;
+	
+	public static final int STUDENTS_TYPE_STARTED = 1;
+	
+	public static final int STUDENTS_TYPE_FINISHED = 2;
+	
+	public static final int STUDENTS_TYPE_PASSED = 3;
+	
+	public static final int STUDENTS_TYPE_FAILED = 4;
+	
 }

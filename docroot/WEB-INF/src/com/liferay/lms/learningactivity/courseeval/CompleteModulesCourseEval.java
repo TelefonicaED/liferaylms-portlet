@@ -109,17 +109,7 @@ public class CompleteModulesCourseEval extends BaseCourseEval {
 			if(lar != null) {
 				log.debug("--- LAR "+lar.isPassed());
 				if (!lar.isPassed() && Validator.isNotNull(lar.getEndDate())) {
-					numTriesCurrentAct = activity.getTries();
-					// Si la actividad no tiene un número ilimitado de intentos (numTriesCurrentAct = 0) y el usuario ya ha hecho todos los intentos disponibles se marca el curso como "Suspenso" (isFailed). 
-					if(numTriesCurrentAct != 0) {						
-						numTriesDone = LearningActivityTryLocalServiceUtil.getLearningActivityTryByActUserCount(currentActId, userId);					
-						log.debug("-- NUM TRIES CURRENT ACT "+numTriesCurrentAct);
-						log.debug("-- NUM TRIES DONE "+numTriesDone);
-						if (numTriesCurrentAct <= numTriesDone) {
-							isFailed = true;
-						}
-					}
-					
+					isFailed = true;
 					passed = false;
 				} else if(!lar.isPassed()){
 					passed = false;
@@ -248,6 +238,7 @@ public class CompleteModulesCourseEval extends BaseCourseEval {
 	@Override
 	@SuppressWarnings("unchecked")
 	public void onCloseCourse(Course course) throws SystemException {
+		super.onCloseCourse(course);
 		for(CourseResult courseResult:
 			(List<CourseResult>)CourseResultLocalServiceUtil.dynamicQuery(
 				CourseResultLocalServiceUtil.dynamicQuery().

@@ -313,7 +313,8 @@ public class LearningActivityLocalServiceImpl extends LearningActivityLocalServi
 				LearningActivity.class.getName(), larn.getActId(),
 				0, StringPool.BLANK, 0);
 		//auditing
-		AuditingLogFactory.audit(larn.getCompanyId(), larn.getGroupId(), LearningActivity.class.getName(), larn.getPrimaryKey(), serviceContext.getUserId(), AuditConstants.ADD, null);
+		AuditingLogFactory.audit(larn.getCompanyId(), larn.getGroupId(), LearningActivity.class.getName(), larn.getPrimaryKey(), 
+				serviceContext.getUserId(), AuditConstants.ADD, null);
 
 		
 		boolean isNotificationActivated = PrefsPropsUtil.getBoolean(larn.getCompanyId(), "lms.notifications.active");
@@ -606,6 +607,11 @@ public class LearningActivityLocalServiceImpl extends LearningActivityLocalServi
 	{
 		return learningActivityPersistence.findByg_t(groupId, typeId);
 	}
+	
+	public int countLearningActivitiesOfGroupAndType(long groupId,int typeId) throws SystemException {
+		return learningActivityPersistence.countByg_t(groupId, typeId);
+	}
+	
 	public java.util.List<LearningActivity> getLearningActivitiesByType(long companyId,int typeId) throws SystemException
 	{
 		return learningActivityPersistence.findByCompanyIdTypeId(companyId, typeId);
@@ -867,6 +873,7 @@ public class LearningActivityLocalServiceImpl extends LearningActivityLocalServi
 			saveHashMapToXMLExtraContent(actId, hashMap);
 
 		} catch (PortalException e) {
+			e.printStackTrace();
 		}
 	}
 

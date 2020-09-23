@@ -110,10 +110,10 @@
 		<portlet:param name="jspPage" value="/html/execactivity/test/view.jsp" />
 	</portlet:renderURL>
 	<%
-				List<TestQuestion> questions=TestQuestionLocalServiceUtil.getQuestions(actId);
+	List<TestQuestion> questions=TestQuestionLocalServiceUtil.getQuestions(actId);
 	
 	if (questions.size()>0 ){
-		if(tries< activity.getTries() || activity.getTries() == 0){
+		if(tries< activity.getTries() || activity.getTries() == 0 || permissionChecker.hasPermission(activity.getGroupId(),LearningActivity.class.getName(),activity.getActId(), ActionKeys.UPDATE)){
 %>
 
 	<p class="color_tercero textcenter negrita">
@@ -134,8 +134,8 @@
 		<liferay-ui:message key="execativity.test.no.question" />
 	</p>
 	<% 
-				}
-			}else if(typeId==0 && permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), "com.liferay.lms.model",themeDisplay.getScopeGroupId(),"ACCESSLOCK")){	
+	}
+}else if(typeId==0 && permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), "com.liferay.lms.model",themeDisplay.getScopeGroupId(),"ACCESSLOCK")){	
 %>
 	<h2><%=activity.getTitle(themeDisplay.getLocale()) %></h2>
 	<liferay-util:include page="/html/execactivity/test/view.jsp"

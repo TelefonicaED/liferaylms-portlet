@@ -7,6 +7,10 @@ import java.util.List;
 import java.util.Locale;
 
 import com.liferay.counter.service.CounterLocalServiceUtil;
+import com.liferay.lms.course.diploma.CourseDiploma;
+import com.liferay.lms.course.diploma.CourseDiplomaRegistry;
+import com.liferay.lms.course.inscriptiontype.InscriptionType;
+import com.liferay.lms.course.inscriptiontype.InscriptionTypeRegistry;
 import com.liferay.lms.learningactivity.LearningActivityType;
 import com.liferay.lms.learningactivity.LearningActivityTypeRegistry;
 import com.liferay.lms.learningactivity.TestLearningActivityType;
@@ -30,6 +34,7 @@ import com.liferay.portal.kernel.messaging.Message;
 import com.liferay.portal.kernel.messaging.MessageBusUtil;
 import com.liferay.portal.kernel.messaging.MessageListener;
 import com.liferay.portal.kernel.messaging.MessageListenerException;
+import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.Group;
@@ -42,6 +47,7 @@ import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.security.permission.PermissionCheckerFactoryUtil;
 import com.liferay.portal.security.permission.PermissionThreadLocal;
+import com.liferay.portal.service.ClassNameLocalServiceUtil;
 import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.ResourcePermissionLocalServiceUtil;
 import com.liferay.portal.service.RoleLocalServiceUtil;
@@ -51,6 +57,7 @@ import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portlet.asset.model.AssetEntry;
 import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
 import com.liferay.util.CourseCopyUtil;
+
 
 public class CreateEdition extends CourseCopyUtil implements MessageListener {
 	private static Log log = LogFactoryUtil.getLog(CreateEdition.class);
@@ -132,18 +139,16 @@ public class CreateEdition extends CourseCopyUtil implements MessageListener {
 		Course course = CourseLocalServiceUtil.fetchCourse(parentCourseId);
 	
 		Group group = GroupLocalServiceUtil.getGroup(course.getGroupCreatedId());
-		
+
 		if(log.isDebugEnabled()){
 			log.debug(" Course to create edition\n........................." + parentCourseId);
 			log.debug(" New edition name\n........................." + newEditionName);
 			log.debug("  + Parent course: "+course.getTitle(themeDisplay.getLocale()));
 		 
 		}
-		
-		
+	
 		Date today=new Date(System.currentTimeMillis());
 
-		
 		//Plantilla
 		
 		if(editionLayoutId<=0){
@@ -152,9 +157,7 @@ public class CreateEdition extends CourseCopyUtil implements MessageListener {
 		if(log.isDebugEnabled()){
 			log.debug("  + layoutSetPrototypeId: "+editionLayoutId);
 		}
-		
-	
-		
+
 		//Tags y categorias
 		try{
 			AssetEntryLocalServiceUtil.validate(course.getGroupCreatedId(), Course.class.getName(), serviceContext.getAssetCategoryIds(), serviceContext.getAssetTagNames());
@@ -173,8 +176,7 @@ public class CreateEdition extends CourseCopyUtil implements MessageListener {
 		//Tipo del grupo
 		int typeSite = group.getType();
 		
-		
-		//Creamos el nuevo curso para la edición 
+		//Creamos el nuevo curso para la ediciÃ³n 
 		Course newCourse = null;  
 		String summary = null;
 		long courseTypeId = 0;
@@ -182,9 +184,10 @@ public class CreateEdition extends CourseCopyUtil implements MessageListener {
 		try{
 			AssetEntry entry = AssetEntryLocalServiceUtil.getEntry(Course.class.getName(), course.getCourseId());
 			summary = entry.getSummary(themeDisplay.getLocale());
-			courseTypeId = entry.getClassTypeId();
-			newCourse = CourseLocalServiceUtil.addCourse(course.getTitle(themeDisplay.getLocale())+"-"+newEditionName, course.getDescription(themeDisplay.getLocale()),summary
-					, editionFriendlyURL, themeDisplay.getLocale(), today, startDate, endDate, editionLayoutId, typeSite, serviceContext, course.getCalificationType(), (int)course.getMaxusers(),true);
+			courseTypeId = entry.getClassTypeId();			
+			newCourse = CourseLocalServiceUtil.addCourse(course.getTitle(themeDisplay.getLocale())+"-"+newEditionName, course.getDescription(themeDisplay.getLocale()),
+					summary, editionFriendlyURL, themeDisplay.getLocale(), today, startDate, endDate, editionLayoutId, typeSite, serviceContext, 
+					course.getCalificationType(), (int)course.getMaxusers(),true);
 			
 			newCourse.setGroupId(themeDisplay.getScopeGroupId());
 			newCourse.setTitle(newEditionName, themeDisplay.getLocale());
@@ -206,19 +209,18 @@ public class CreateEdition extends CourseCopyUtil implements MessageListener {
 			process = AsynchronousProcessAuditLocalServiceUtil.updateAsynchronousProcessAudit(process);
 			
 		} catch(DuplicateGroupException e){
-			if(log.isDebugEnabled())e.printStackTrace();
+			e.printStackTrace();
 			process = AsynchronousProcessAuditLocalServiceUtil.updateProcessStatus(process, new Date(), LmsConstant.STATUS_ERROR, e.getMessage());
 			throw new DuplicateGroupException();
 		}
 		newCourse.setExpandoBridgeAttributes(serviceContext);
 		newCourse.getExpandoBridge().setAttributes(course.getExpandoBridge().getAttributes());
 		newCourse.setParentCourseId(parentCourseId);
-		
+		newCourse.setUserId(themeDisplay.getUserId());
 	
 		Group newGroup = GroupLocalServiceUtil.getGroup(newCourse.getGroupCreatedId());
 		serviceContext.setScopeGroupId(newCourse.getGroupCreatedId());
-
-		
+		      
 		Role siteMemberRole = RoleLocalServiceUtil.getRole(themeDisplay.getCompanyId(), RoleConstants.SITE_MEMBER);
 		newCourse.setIcon(course.getIcon());
 		
@@ -229,18 +231,29 @@ public class CreateEdition extends CourseCopyUtil implements MessageListener {
 			newEntry.setSummary(summary);
 			newEntry.setClassTypeId(courseTypeId);
 			AssetEntryLocalServiceUtil.updateAssetEntry(newEntry);
-			String groupName =  course.getTitle(themeDisplay.getLocale(),true)+"-"+newEditionName;
-			groupName = groupName.substring(0, 148);
-			newGroup.setName(groupName);
-			newGroup.setDescription(summary);
+			newGroup.setType(typeSite); 
 			GroupLocalServiceUtil.updateGroup(newGroup);
-			
 		}catch(Exception e){
-			if(log.isDebugEnabled())e.printStackTrace();
+			e.printStackTrace();
 			error=true;
 			statusMessage += e.getMessage() + "\n";
 		}
-		newCourse.setUserId(themeDisplay.getUserId());
+		
+		//Update especific content of diploma (if exists)
+		CourseDiplomaRegistry cdr = new CourseDiplomaRegistry();
+		if(cdr!=null){
+			CourseDiploma courseDiploma = cdr.getCourseDiploma();
+			if(courseDiploma!=null){
+				
+				String courseDiplomaError = courseDiploma.copyCourseDiploma(course.getCourseId(), newCourse.getCourseId());
+				log.debug("****CourseDiplomaError:"+courseDiplomaError);
+				
+				if(Validator.isNotNull(courseDiplomaError)){
+					statusMessage += courseDiplomaError + "\n";
+					error = true;
+				}
+			}
+		}
 
 		if(log.isDebugEnabled()){
 			log.debug("-----------------------\n  Creating edition from: "+  group.getName());
@@ -264,8 +277,7 @@ public class CreateEdition extends CourseCopyUtil implements MessageListener {
 		Message postActionMessage=new Message();
 		postActionMessage.put("parentCourseId", course.getCourseId());
 		postActionMessage.put("editionCourseId", newCourse.getCourseId());
-		MessageBusUtil.sendMessage("liferay/lms/createEditionPostAction", postActionMessage);
-		
+		MessageBusUtil.sendMessage("liferay/lms/createEditionPostAction", postActionMessage);					
 		log.debug(" ENDS!");
 	}
 	
@@ -319,7 +331,7 @@ public class CreateEdition extends CourseCopyUtil implements MessageListener {
 					
 				}
 				
-				//Copiar la clasificación de los módulos
+				//Copiar la clasificaciÃ³n de los mÃ³dulos
 				AssetEntry entryModule = AssetEntryLocalServiceUtil.fetchEntry(Module.class.getName(), module.getModuleId());
 				if(Validator.isNotNull(entryModule))
 					AssetEntryLocalServiceUtil.updateEntry(newModule.getUserId(), newModule.getGroupId(), Module.class.getName(), 
@@ -363,8 +375,7 @@ public class CreateEdition extends CourseCopyUtil implements MessageListener {
 		boolean canBeLinked = false;
 		activities = LearningActivityLocalServiceUtil.getLearningActivitiesOfModule(parentModule.getModuleId());
 		for(LearningActivity activity:activities){
-			try {
-				
+			try {				
 				canBeLinked = learningActivityTypeRegistry.getLearningActivityType(activity.getTypeId()).canBeLinked();
 				//Fill common columns
 				newLearnActivity = LearningActivityLocalServiceUtil.createLearningActivity(CounterLocalServiceUtil.increment(LearningActivity.class.getName()));
@@ -390,7 +401,7 @@ public class CreateEdition extends CourseCopyUtil implements MessageListener {
 				}
 				
 			
-				//TODO Cuando esté preparado la parte de linkar no habrá que copiar todo
+				//TODO Cuando estÃ© preparado la parte de linkar no habrÃ¡ que copiar todo
 				//else{
 					newLearnActivity.setExtracontent(activity.getExtracontent());
 					newLearnActivity.setTitle(activity.getTitle());
@@ -435,13 +446,16 @@ public class CreateEdition extends CourseCopyUtil implements MessageListener {
 				
 				long actId = nuevaLarn.getActId();
 				correlationActivities.put(activity.getActId(), actId);
+				boolean visibleParent = ResourcePermissionLocalServiceUtil.hasResourcePermission(siteMemberRole.getCompanyId(), LearningActivity.class.getName(), 
+						ResourceConstants.SCOPE_INDIVIDUAL,	Long.toString(activity.getActId()),siteMemberRole.getRoleId(), ActionKeys.VIEW);			
 				
-				boolean visible = ResourcePermissionLocalServiceUtil.hasResourcePermission(siteMemberRole.getCompanyId(), LearningActivity.class.getName(), 
-						ResourceConstants.SCOPE_INDIVIDUAL,	Long.toString(actId),siteMemberRole.getRoleId(), ActionKeys.VIEW);
-				
-				if(!visible) {
+				if(visibleParent){
 					ResourcePermissionLocalServiceUtil.setResourcePermissions(siteMemberRole.getCompanyId(), LearningActivity.class.getName(), 
 							ResourceConstants.SCOPE_INDIVIDUAL,	Long.toString(actId),siteMemberRole.getRoleId(), new String[] {ActionKeys.VIEW});
+					
+				}else{
+					ResourcePermissionLocalServiceUtil.removeResourcePermission(siteMemberRole.getCompanyId(), LearningActivity.class.getName(), 
+							ResourceConstants.SCOPE_INDIVIDUAL,	Long.toString(actId),siteMemberRole.getRoleId(), ActionKeys.VIEW);
 				}
 				
 				if(nuevaLarn.getTypeId() == 8){
@@ -462,7 +476,7 @@ public class CreateEdition extends CourseCopyUtil implements MessageListener {
 			}
 
 			
-			//TODO Descomentar cuando esté implementado las actividades linkadas.
+			//TODO Descomentar cuando estÃ© implementado las actividades linkadas.
 			//if(!canBeLinked){
 			createTestQuestionsAndAnswers(activity, nuevaLarn, newModule, themeDisplay.getUserId());
 		

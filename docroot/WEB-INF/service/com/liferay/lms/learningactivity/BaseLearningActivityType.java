@@ -13,6 +13,7 @@ import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.model.LearningActivityResult;
 import com.liferay.lms.model.LearningActivityTry;
 import com.liferay.lms.service.LearningActivityResultLocalServiceUtil;
+import com.liferay.lms.service.LearningActivityTryLocalServiceUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.lar.PortletDataContext;
@@ -37,6 +38,11 @@ public abstract class BaseLearningActivityType implements LearningActivityType, 
 	@Override
 	public String getMesageEditDetails() {
 		return "edit-activity-details";
+	}
+	
+	@Override
+	public void onCloseCourse(LearningActivity activity) throws SystemException, PortalException {
+		
 	}
 
 	@Override
@@ -301,5 +307,18 @@ public abstract class BaseLearningActivityType implements LearningActivityType, 
 	@Override
 	public String getSpecificResultsPage(){
 		return null;
+	}
+	
+	public boolean isFinished(LearningActivity learningActivity, LearningActivityResult learningActivityResult) throws PortalException, SystemException{
+		boolean finished = false;
+		if(learningActivityResult.getEndDate() != null){
+			finished = true;
+		}else if(learningActivityResult.isPassed()){
+			finished = true;
+		}else{
+			long cuantosTryLlevo=LearningActivityTryLocalServiceUtil.getTriesCountByActivityAndUser(learningActivityResult.getActId(), learningActivityResult.getUserId());
+			finished = learningActivity.getTries()>0&&cuantosTryLlevo>=learningActivity.getTries();
+		}
+		return finished;
 	}
 }

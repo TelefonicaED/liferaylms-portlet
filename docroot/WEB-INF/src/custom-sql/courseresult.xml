@@ -3,24 +3,26 @@
 
 	<sql id="com.liferay.lms.service.persistence.CourseResultFinder.avgResultCourseId">
 		<![CDATA[   			
-			SELECT 
-				SUM(cr.result) / COUNT(1) AS avgResult
+			SELECT SUM(cr.result) / COUNT(1) AS avgResult
 			FROM 
-				lms_courseresult cr
-			WHERE 
-				cr.courseId = ? 
-				AND cr.passedDate IS NOT NULL 
-				AND cr.passed = ?
+				user_ u
+			INNER JOIN 
+				users_groups ug ON u.userId = ug.userId
+			INNER JOIN 
+				lms_course co ON co.groupCreatedId = ug.groupId
+			INNER JOIN 
+				lms_courseresult cr ON cr.courseId = co.courseId AND cr.userId = u.userId AND cr.passedDate IS NOT NULL
+			[$WHERECOURSEOREDITIONS$]
 		]]>
 	</sql>
-	<sql id="com.liferay.lms.service.persistence.CourseResultFinder.whereByUserExcludedIds">
-		<![CDATA[
-			AND cr.userId NOT IN ([$USEREXCLUDEDIDS$]) 
+	<sql id="com.liferay.lms.service.persistence.CourseResultFinder.whereCourseId">
+		<![CDATA[ 
+			WHERE co.courseId = ?
 		]]>
 	</sql>
-	<sql id="com.liferay.lms.service.persistence.CourseResultFinder.whereByUserIds">
-		<![CDATA[
-			AND cr.userId IN ([$USERIDS$]) 
+	<sql id="com.liferay.lms.service.persistence.CourseResultFinder.whereEditions">
+		<![CDATA[ 
+			WHERE (co.courseId = ? OR co.parentCourseId = ?)
 		]]>
 	</sql>
 </custom-sql>

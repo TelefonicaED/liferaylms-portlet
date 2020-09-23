@@ -38,8 +38,10 @@ public class CourseView {
 	private Date executionEndDate;
 	private String summary;
 	private CalificationType calificationType;
+	private Course course;
 	
 	public CourseView(Course course, ThemeDisplay themeDisplay){
+		setCourse(course);
 		setCourseId(course.getCourseId());
 		setTitle(course.getTitle(themeDisplay.getLocale()));
 		AssetEntry assetEntry = null;
@@ -79,6 +81,13 @@ public class CourseView {
 	
 	public CourseView(long courseId, String title, long groupId){
 		setCourseId(courseId);
+		try {
+			Course course = CourseLocalServiceUtil.getCourse(courseId);
+			setCourse(course);
+		} catch (PortalException | SystemException e) {
+			e.printStackTrace();
+		}
+		
 		setTitle(title);
 		setClosed(false);
 		setGroupId(groupId);
@@ -191,6 +200,14 @@ public class CourseView {
 	
 	public void setCalificationType(CalificationType calificationType){
 		this.calificationType = calificationType;
+	}
+
+	public Course getCourse() {
+		return course;
+	}
+
+	public void setCourse(Course course) {
+		this.course = course;
 	}
 
 }

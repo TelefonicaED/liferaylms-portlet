@@ -187,7 +187,8 @@ public class LiferaylmsUtil {
 			e.printStackTrace();
 		}
 		
-		if(lmsPrefs.getViewCoursesFinishedType() == LmsConstant.VIEW_COURSE_FINISHED_TYPE_PASSED && (courseResult == null || (!courseResult.isPassed() && courseResult.getPassedDate() != null))){
+		if(lmsPrefs.getViewCoursesFinishedType() == LmsConstant.VIEW_COURSE_FINISHED_TYPE_PASSED 
+				&& (courseResult == null || !courseResult.isPassed())){
 			return false;
 		}
 		
@@ -206,6 +207,12 @@ public class LiferaylmsUtil {
 		
 		if(log.isDebugEnabled() && course != null){
 			log.debug(":::hasPermissionAccessCourseFinished:::executionEndDate: " + course.getExecutionEndDate());
+		}
+		
+		
+		//El curso no puede estar cerrado
+		if(course != null && course.isClosed()){
+			return false;
 		}
 		
 		if(course != null && course.getExecutionEndDate() != null && now.after(course.getExecutionEndDate())){
@@ -277,7 +284,7 @@ public class LiferaylmsUtil {
 		
 		log.debug(":::hasPermissionAccessCourseFinished:::courseResult passedDate: " + courseResult.getPassedDate());
 		
-		if(courseResult.getPassedDate() != null){
+		if(courseResult.getPassedDate() != null && !courseResult.isPassed()){
 			log.debug(":::hasPermissionAccessCourseFinished:::has suspendido el curso ");
 			return true;
 		}
