@@ -89,6 +89,29 @@ public class CourseDiplomaClp implements CourseDiploma {
 	}
 	
 	@Override
+	public String copyCourseDiploma(long oldCourseId, long newCourseId) throws Exception{
+		Object returnObj = null;
+		try {
+			MethodKey getNameMethod = new MethodKey(clp.getClassName(), "copyCourseDiploma", long.class,  long.class);
+			returnObj = clp.invoke(new MethodHandler(getNameMethod,oldCourseId, newCourseId));
+		}
+		catch (Throwable t) {
+			t = ClpSerializer.translateThrowable(t);
+
+			if (t instanceof RuntimeException) {
+				throw (RuntimeException)t;
+			}
+			else {
+				throw new RuntimeException(t.getClass().getName() +
+					" is not a valid exception");
+			}
+		}
+
+		return ((String)returnObj);
+		
+	}
+	
+	@Override
 	public String updateUserDiploma(Long courseResutlId){
 		Object returnObj = null;
 		try {

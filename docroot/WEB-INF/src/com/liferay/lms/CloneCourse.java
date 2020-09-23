@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Locale;
 
 import com.liferay.counter.service.CounterLocalServiceUtil;
+import com.liferay.lms.course.diploma.CourseDiploma;
+import com.liferay.lms.course.diploma.CourseDiplomaRegistry;
 import com.liferay.lms.learningactivity.LearningActivityType;
 import com.liferay.lms.learningactivity.LearningActivityTypeRegistry;
 import com.liferay.lms.model.AsynchronousProcessAudit;
@@ -295,6 +297,22 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 			log.debug("-----------------------\n  From course: "+  group.getName());
 			log.debug("  + to course: "+  newCourse.getTitle(Locale.getDefault()) +", GroupCreatedId: "+newCourse.getGroupCreatedId()+", GroupId: "+newCourse.getGroupId());
 			
+		}
+		
+		//Update especific content of diploma (if exists)
+		CourseDiplomaRegistry cdr = new CourseDiplomaRegistry();
+		if(cdr!=null){
+			CourseDiploma courseDiploma = cdr.getCourseDiploma();
+			if(courseDiploma!=null){
+				
+				String courseDiplomaError = courseDiploma.copyCourseDiploma(course.getCourseId(), newCourse.getCourseId());
+				log.debug("****CourseDiplomaError:"+courseDiplomaError);
+				
+				if(Validator.isNotNull(courseDiplomaError)){
+					statusMessage += courseDiplomaError + "\n";
+					error = true;
+				}
+			}
 		}
 		
 		/**

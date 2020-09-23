@@ -292,7 +292,8 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 	}
 
 	public Course addCourse (Map<Locale,String> titleMap, String description,String summary,String friendlyURL, Locale locale,
-			Date createDate,Date startDate,Date endDate, Date executionStartDate, Date executionEndDate, long layoutSetPrototypeId,int typesite, long CourseEvalId, long calificationType, int maxUsers,ServiceContext serviceContext,boolean isfromClone,
+			Date createDate,Date startDate,Date endDate, Date executionStartDate, Date executionEndDate, long layoutSetPrototypeId,int typesite, 
+			long CourseEvalId, long calificationType, int maxUsers,ServiceContext serviceContext,boolean isfromClone,
 			long courseTypeId)
 			throws SystemException, PortalException {
 		
