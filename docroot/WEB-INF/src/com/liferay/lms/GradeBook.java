@@ -249,7 +249,7 @@ public class GradeBook extends MVCPortlet {
 		        int column=0;
 		        if(!LmsPrefsPropsValues.getUsersExtendedData(themeDisplay.getCompanyId()) || PortalPermissionUtil.contains(
 		        		themeDisplay.getPermissionChecker(), LmsConstant.ACTION_VIEW_USER_EXTENDED)){
-		        	cabeceras[column++]=LanguageUtil.get(themeDisplay.getLocale(),"user-name");
+		        	cabeceras[column++]=LanguageUtil.get(themeDisplay.getLocale(),"first-name");
 			        cabeceras[column++]=LanguageUtil.get(themeDisplay.getLocale(),"last-name");
 			        cabeceras[column++]=LanguageUtil.get(themeDisplay.getLocale(),"screen-name");
 			        cabeceras[column++]=LanguageUtil.get(themeDisplay.getLocale(),"email");
@@ -387,7 +387,7 @@ public class GradeBook extends MVCPortlet {
 		        //Usuario
 		        if(!LmsPrefsPropsValues.getUsersExtendedData(themeDisplay.getCompanyId()) || PortalPermissionUtil.contains(
 		        		themeDisplay.getPermissionChecker(), LmsConstant.ACTION_VIEW_USER_EXTENDED)){
-		        	header[column++]=LanguageUtil.get(themeDisplay.getLocale(),"user-name");
+		        	header[column++]=LanguageUtil.get(themeDisplay.getLocale(),"first-name");
 			        header[column++]=LanguageUtil.get(themeDisplay.getLocale(),"last-name");
 			        header[column++]=LanguageUtil.get(themeDisplay.getLocale(),"screen-name");
 			        header[column++]=LanguageUtil.get(themeDisplay.getLocale(),"email");
