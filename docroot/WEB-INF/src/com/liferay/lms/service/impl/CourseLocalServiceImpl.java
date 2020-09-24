@@ -377,7 +377,7 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 				groupName = groupName.substring(0, 148);
 			}
 			
-			System.out.println("groupName: " + groupName);
+			log.debug("groupName: " + groupName);
 			
 			Group group = groupLocalService.addGroup(userLocalService.getDefaultUser(serviceContext.getCompanyId()).getUserId(),
 					null, 0, groupName,summary,typesite,friendlyURL,true,true,serviceContext);

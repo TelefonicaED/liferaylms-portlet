@@ -41,8 +41,6 @@ sb.append("</value>");
 sb.append("</preference>");
 sb.append("</portlet-preferences>");
 
-System.out.println("backURL: " + renderRequest.getParameter("backURL"));
-
 String queryString = "courseId=" + courseId + "&coursesCur=" + cur + "&coursesDelta=" + delta + "&classNameId=" + PortalUtil.getClassNameId(Course.class) + "&classPK=" + courseId
 + "&backURL=" + renderRequest.getParameter("backURL");
 

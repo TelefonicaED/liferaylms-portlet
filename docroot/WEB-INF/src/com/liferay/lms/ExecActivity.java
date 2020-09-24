@@ -128,11 +128,11 @@ public class ExecActivity extends QuestionsAdmin {
 				
 				if(activity.canAccess(true, themeDisplay.getUser(), themeDisplay.getPermissionChecker(), hasAccessLock, course, hasPermissionAccessCourseFinished)){
 					//Comprobamos si la actividad tiene fecha de fin
-					System.out.println("actId: " + actId);
+					log.debug("actId: " + actId);
 					LearningActivityResult learningActivityResult = LearningActivityResultLocalServiceUtil.getByActIdAndUserId(actId, themeDisplay.getUserId());
 					
 					if(learningActivityResult != null && learningActivityResult.getEndDate() != null){
-						System.out.println("uno");
+						log.debug("uno");
 						showViewResults(renderRequest, renderResponse, activity);
 					}else{
 					
@@ -151,7 +151,7 @@ public class ExecActivity extends QuestionsAdmin {
 						}
 						
 						if(!improve && LearningActivityResultLocalServiceUtil.userPassed(actId,themeDisplay.getUserId()) || hasPermissionAccessCourseFinished){
-							System.out.println("dos");
+							log.debug("dos");
 							showViewResults(renderRequest, renderResponse,activity);
 						}else if (LearningActivityTryLocalServiceUtil.canUserDoANewTry(actId, themeDisplay.getUserId()) 
 								//|| permissionChecker.hasPermission(activity.getGroupId(), LearningActivity.class.getName(),actId, ActionKeys.UPDATE)
@@ -172,13 +172,13 @@ public class ExecActivity extends QuestionsAdmin {
 								showViewExam(renderRequest, renderResponse);
 							}
 						}else {
-							System.out.println("tres");
+							log.debug("tres");
 							showViewResults(renderRequest, renderResponse, activity);
 						}
 					
 					}
 				}else {
-					System.out.println("no puedes acceder");
+					log.debug("no puedes acceder");
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -200,17 +200,17 @@ public class ExecActivity extends QuestionsAdmin {
 	}
 	
 	private void showViewPreview(RenderRequest renderRequest,RenderResponse renderResponse) throws IOException, PortletException{
-		System.out.println("preview");
+		log.debug("preview");
 		include(previewJSP, renderRequest, renderResponse);
 	}
 	
 	private void showViewExam(RenderRequest renderRequest,RenderResponse renderResponse) throws IOException, PortletException{
-		System.out.println("exam");
+		log.debug("exam");
 		include(viewJSP, renderRequest, renderResponse);
 	}
 	
 	private void showViewResults(RenderRequest renderRequest,RenderResponse renderResponse, LearningActivity activity) throws IOException, PortletException, PortalException, SystemException{
-		System.out.println("results");
+		log.debug("results");
 		
 		ThemeDisplay themeDisplay  =(ThemeDisplay)renderRequest.getAttribute(WebKeys.THEME_DISPLAY);
 		

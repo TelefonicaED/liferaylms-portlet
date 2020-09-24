@@ -9,8 +9,6 @@
 
 <jsp:useBean id="ct" type="com.liferay.lms.learningactivity.calificationtype.CalificationType" scope="request"/>
 
-<%System.out.println(UserPermissionUtil.contains(themeDisplay.getPermissionChecker(), 10196, "VIEW_USER_EXTENDED"));%>
-
 <liferay-ui:error key="result-bad-format" message="<%=LanguageUtil.format(themeDisplay.getLocale(), \"result.must-be-between\", new Object[]{ct.getMinValue(themeDisplay.getScopeGroupId()),ct.getMaxValue(themeDisplay.getScopeGroupId())})%>" />
 <liferay-ui:error key="grades.bad-updating" message="offlinetaskactivity.grades.bad-updating" />
 <liferay-ui:success key="grades.updating" message="offlinetaskactivity.correct.saved" />
