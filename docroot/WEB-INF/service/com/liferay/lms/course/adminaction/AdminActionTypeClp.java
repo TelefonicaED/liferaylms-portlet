@@ -1,19 +1,12 @@
 package com.liferay.lms.course.adminaction;
 
 import java.util.Locale;
-import java.util.Set;
-
-import javax.portlet.PortletResponse;
 
 import com.liferay.lms.model.Course;
 import com.liferay.lms.service.ClpSerializer;
-import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.upload.UploadRequest;
 import com.liferay.portal.kernel.util.ClassLoaderProxy;
 import com.liferay.portal.kernel.util.MethodHandler;
 import com.liferay.portal.kernel.util.MethodKey;
-import com.liferay.portal.service.ServiceContext;
 
 public class AdminActionTypeClp implements AdminActionType {
 
@@ -165,7 +158,49 @@ public class AdminActionTypeClp implements AdminActionType {
 		return ((String)returnObj);
 	}
 	
+	public boolean showInCourse(Course course, long userId){
+		Object returnObj = null;
+
+		try {
+			MethodKey getTitleMethod = new MethodKey(clp.getClassName(), "showInCourse", Course.class, long.class);
+			returnObj = clp.invoke(new MethodHandler(getTitleMethod, course, userId));
+		}
+		catch (Throwable t) {
+			t = ClpSerializer.translateThrowable(t);
+
+			if (t instanceof RuntimeException) {
+				throw (RuntimeException)t;
+			}
+			else {
+				throw new RuntimeException(t.getClass().getName() +
+					" is not a valid exception");
+			}
+		}
+
+		return ((Boolean)returnObj).booleanValue();
+	}
 	
+	public boolean showInEdition(Course course, long userId){
+		Object returnObj = null;
+
+		try {
+			MethodKey getTitleMethod = new MethodKey(clp.getClassName(), "showInEdition", Course.class, long.class);
+			returnObj = clp.invoke(new MethodHandler(getTitleMethod, course, userId));
+		}
+		catch (Throwable t) {
+			t = ClpSerializer.translateThrowable(t);
+
+			if (t instanceof RuntimeException) {
+				throw (RuntimeException)t;
+			}
+			else {
+				throw new RuntimeException(t.getClass().getName() +
+					" is not a valid exception");
+			}
+		}
+
+		return ((Boolean)returnObj).booleanValue();
+	}
 	
 	
 }
