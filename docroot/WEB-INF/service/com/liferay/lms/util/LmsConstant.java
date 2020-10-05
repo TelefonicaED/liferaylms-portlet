@@ -46,6 +46,8 @@ public class LmsConstant {
 	public final static int VIEW_COURSE_FINISHED_TYPE_PASSED = 1;
 	public final static int VIEW_COURSE_FINISHED_TYPE_DEFAULT = VIEW_COURSE_FINISHED_TYPE_ALL;
 	
+	public final static String PREFS_ACCESS_COURSE_EXECUTION_DATES = "lms.course.access.execution.dates";
+	
 	public final static String PREFS_USERS_EXTENDED_DATA = "users.view.extended.data";
 	public final static boolean PREFS_USERS_EXTENDED_DATA_DEFAULT = false;
 	public final static String ACTION_VIEW_USER_EXTENDED = "VIEW_USER_EXTENDED";
