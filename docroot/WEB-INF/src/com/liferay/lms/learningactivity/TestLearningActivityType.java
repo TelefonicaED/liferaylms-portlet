@@ -410,17 +410,17 @@ public class TestLearningActivityType extends QuestionLearningActivityType
 	
 	public boolean isFinished(LearningActivity learningActivity, LearningActivityResult learningActivityResult) throws PortalException, SystemException{
 		boolean finished = false;
-		System.out.println("isFinished");
+		log.debug("isFinished");
 		if(learningActivityResult.getEndDate() != null){
-			System.out.println("result tiene fecha fin");
+			log.debug("result tiene fecha fin");
 			finished = true;
 		}else if(learningActivityResult.isPassed() && !learningActivity.isImprove()){
-			System.out.println("está aprobado y no está marcado el check de mejorar nota");
+			log.debug("está aprobado y no está marcado el check de mejorar nota");
 			finished = true;
 		}else {
 			long cuantosTryLlevo=LearningActivityTryLocalServiceUtil.getTriesCountByActivityAndUser(learningActivityResult.getActId(), learningActivityResult.getUserId());
 			finished = learningActivity.getTries()>0&&cuantosTryLlevo>=learningActivity.getTries();
-			System.out.println("no me quedan intentos");
+			log.debug("no me quedan intentos");
 		}
 		return finished;
 	}

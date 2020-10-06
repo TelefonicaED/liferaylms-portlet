@@ -1,3 +1,5 @@
+<%@page import="com.liferay.lms.util.LmsConstant"%>
+<%@page import="com.liferay.portal.service.permission.UserPermissionUtil"%>
 <%@ include file="/init.jsp" %>
 
  

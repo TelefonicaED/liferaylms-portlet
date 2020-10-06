@@ -18,6 +18,11 @@ public abstract class BaseCourseDiploma implements CourseDiploma, Serializable {
 	}
 	
 	@Override
+	public String copyCourseDiploma(long oldCourseId, long newCourseId) throws Exception{
+		return "";
+	}
+	
+	@Override
 	public String getPortletId(){
 		return "";
 	}
