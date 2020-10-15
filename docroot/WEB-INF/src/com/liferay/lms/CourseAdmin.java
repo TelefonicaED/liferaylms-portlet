@@ -340,17 +340,28 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 				log.debug("CourseId "+course);
 				renderRequest.setAttribute("course", course);
 				
-				
 				String newCourseName;
 				int newCourseEditionNumber = CourseLocalServiceUtil.countChildCourses(course.getCourseId())+1;
 				newCourseName = LanguageUtil.get(themeDisplay.getLocale(), "courseadmin.edition")+" "+newCourseEditionNumber;
-				String newCourseURL;
+				String newCourseURL;				
+			        String courseURL; 		
+			        String editionURL;
+			        courseURL = FriendlyURLNormalizerUtil.normalize(course.getFriendlyURL());	
+			        editionURL = FriendlyURLNormalizerUtil.normalize(newCourseName);						      
 				newCourseURL = FriendlyURLNormalizerUtil.normalize(course.getFriendlyURL()+" "+newCourseName);
+				if(courseURL.length() + editionURL.length()  > 100){										
+					newCourseURL = FriendlyURLNormalizerUtil.normalize(course.getFriendlyURL().substring(0,100-newCourseName.length())+" "+newCourseName);
+				}
 				Group groupURL = null;
 				groupURL=GroupLocalServiceUtil.fetchFriendlyURLGroup(themeDisplay.getCompanyId(), newCourseURL);
 				while(groupURL != null){					
-                        newCourseName = LanguageUtil.get(themeDisplay.getLocale(), "courseadmin.edition")+" "+newCourseEditionNumber;
-						newCourseURL = FriendlyURLNormalizerUtil.normalize(course.getFriendlyURL()+" "+newCourseName);
+                                newCourseName = LanguageUtil.get(themeDisplay.getLocale(), "courseadmin.edition")+" "+newCourseEditionNumber;
+                                courseURL = FriendlyURLNormalizerUtil.normalize(course.getFriendlyURL());	
+        			editionURL = FriendlyURLNormalizerUtil.normalize(newCourseName);	
+                                newCourseURL = FriendlyURLNormalizerUtil.normalize(course.getFriendlyURL()+" "+newCourseName);
+						if(courseURL.length() + editionURL.length()  > 100){										
+							newCourseURL = FriendlyURLNormalizerUtil.normalize(course.getFriendlyURL().substring(0,100-newCourseName.length())+" "+newCourseName);
+						}
 						groupURL=GroupLocalServiceUtil.fetchFriendlyURLGroup(themeDisplay.getCompanyId(), newCourseURL);
 						newCourseEditionNumber++;							
 						

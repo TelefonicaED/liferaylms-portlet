@@ -25,7 +25,9 @@
 	<aui:input type="text" name="newCourseName" value="${newCourseName}" label="course-admin.new-edition-name" size="75">
 		<aui:validator name="required" errorMessage="field.required"></aui:validator>
 	</aui:input>
-	<aui:input name="editionFriendlyURL" label="courseadmin.friendly-url" value="${editionFriendlyURL}" />
+	<aui:input name="editionFriendlyURL" label="courseadmin.friendly-url" value="${editionFriendlyURL}">
+	<aui:validator name="maxLength" errorMessage="field.urlmax">100</aui:validator>
+	</aui:input>
     <div id="datesbox">				
 		<aui:field-wrapper label="course-admin.start-inscription-date">
 			<liferay-ui:input-date yearRangeEnd="${defaultEndYear}" yearRangeStart="${defaultStartYear}"  dayParam="startDay" monthParam="startMon"
