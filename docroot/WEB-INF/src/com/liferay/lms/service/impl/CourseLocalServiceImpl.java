@@ -366,6 +366,11 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 			course = LmsLocaleUtil.checkDefaultLocale(Course.class, course, "description");
 			//creating group
 			String groupName = title;
+			
+			if(groupName.length()>148){
+				groupName = groupName.substring(0, 148);
+			}
+			
 			if(GroupLocalServiceUtil.fetchGroup(course.getCompanyId(), groupName)!=null){
 				if(groupName.length()>130){
 					groupName = groupName.substring(0, 130);
