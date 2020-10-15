@@ -235,7 +235,13 @@ if(prefs!=null){
 		} catch (SystemException e) {
 			e.printStackTrace();
 		}
+		boolean accessCoursesExecutionDate = PrefsPropsUtil.getBoolean(themeDisplay.getCompanyId(), LmsConstant.PREFS_ACCESS_COURSE_EXECUTION_DATES, false);
+		
 		%>
+	
+		<aui:input type="checkbox" name="accessCoursesExecutionDate" label="lms-prefs.access-courses-execution-date" 
+			checked="<%= accessCoursesExecutionDate %>" helpMessage="lms-prefs.access-courses-execution-date.help-message"/>
+	
 	
 		<aui:input type="checkbox" name="viewCoursesFinished"
 			label="view-courses-finished" checked="<%=prefs.getViewCoursesFinished()%>" value="<%=prefs.getViewCoursesFinished()%>" 

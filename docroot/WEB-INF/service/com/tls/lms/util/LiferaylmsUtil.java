@@ -28,6 +28,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.util.PrefsPropsUtil;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.model.Resource;
 import com.liferay.portal.model.ResourceConstants;
@@ -219,6 +220,11 @@ public class LiferaylmsUtil {
 			return true;
 		}
 		
+		//Comprobamos si no tengo el modo de acceso a los cursos en ejecución
+		if(hasPermissionAccessCoursesExecution(course)){
+			return false;
+		}
+		
 		Date lastModuleDate = null;
 		
 		//Ahora comprobamos si se cumple alguna de las otras tres condiciones
@@ -284,12 +290,12 @@ public class LiferaylmsUtil {
 		
 		log.debug(":::hasPermissionAccessCourseFinished:::courseResult passedDate: " + courseResult.getPassedDate());
 		
-		if(courseResult.getPassedDate() != null && !courseResult.isPassed()){
+		if(courseResult.getPassedDate() != null){
 			log.debug(":::hasPermissionAccessCourseFinished:::has suspendido el curso ");
 			return true;
 		}
 		
-		return !CourseLocalServiceUtil.hasUserTries(courseId, userId);
+		return false;
 	}
 	
 	public static void saveStringToFile(String fileName, String text){
@@ -319,5 +325,15 @@ public class LiferaylmsUtil {
 			e.printStackTrace();
 		}
 		
+	}
+	
+	public static boolean hasPermissionAccessCoursesExecution(Course course){
+		Date now = new Date();
+		try {
+			return course.getExecutionStartDate().before(now) && course.getExecutionEndDate().after(now) && PrefsPropsUtil.getBoolean(course.getCompanyId(), LmsConstant.PREFS_ACCESS_COURSE_EXECUTION_DATES, false);
+		} catch (SystemException e) {
+			e.printStackTrace();
+			return false;
+		}
 	}
 }

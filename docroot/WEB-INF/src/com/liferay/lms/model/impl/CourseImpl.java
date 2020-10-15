@@ -61,6 +61,7 @@ import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.util.DLUtil;
 import com.liferay.portlet.ratings.model.RatingsStats;
 import com.liferay.portlet.ratings.service.RatingsStatsLocalServiceUtil;
+import com.tls.lms.util.LiferaylmsUtil;
 
 /**
  * The extended model implementation for the Course service. Represents a row in the &quot;Lms_Course&quot; database table, with each column mapped to a property of this class.
@@ -338,12 +339,11 @@ public class CourseImpl extends CourseBaseImpl {
 			return true;
 		}
         
-        if(courseResult != null && courseResult.getPassedDate() != null && !courseResult.isPassed()){
-        	return true;
+        if(LiferaylmsUtil.hasPermissionAccessCoursesExecution(this)){
+        	return false;
         }
         
-        //Tenemos que mirar si he aprobado, si me quedan intentos
-        if(courseResult != null && courseResult.getPassedDate() != null && courseResult.isPassed() && !CourseLocalServiceUtil.hasUserTries(this.getCourseId(), user.getUserId())){
+        if(courseResult != null && courseResult.getPassedDate() != null){
         	return true;
         }
         
