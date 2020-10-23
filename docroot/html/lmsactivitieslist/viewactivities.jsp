@@ -38,7 +38,6 @@ if ((actionEditing && hasPermissionAddLact) ||
 	<%String status = null;
 	long result = -1;
 	long tries = -1;
-	long userTried = -1;
 	String type = null;
 	String title = null;
 	LearningActivityResult learningActivityResult = null;
@@ -62,10 +61,9 @@ if ((actionEditing && hasPermissionAddLact) ||
 			
 			status="started";
 			if(learningActivityResult.getEndDate()!=null){
-				userTried = LearningActivityTryLocalServiceUtil.getTriesCountByActivityAndUser(activity.getActId(),themeDisplay.getUserId());
 				if (learningActivityResult.isPassed()) {
 					status = "passed";
-				} else if ((userTried >= tries && tries > 0) && (!learningActivityResult.isPassed())) {
+				} else {
 					status = "failed";
 				}							
 			}
