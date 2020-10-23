@@ -7,7 +7,7 @@
 	<c:forEach items="${listQuestions }" var="question">
 		<c:set var="questionType" value="${question.testQuestionType }" />
 		<div class="aui-helper-hidden questionVideo"
-			id="${renderResponse.namespace}question_${question.questionId}">
+			id="${renderResponse.namespace}question_div_${question.questionId}">
 			<aui:form name="questionform_${question.questionId}" role="form">
 				<aui:input name="questionId" value="${question.questionId }"
 					type="hidden" />
@@ -92,8 +92,8 @@
 			$('#<portlet:namespace/>videoQuestionFeedback').html("");
 			finished = false;
 			if(plays > 0){
-				if($('[id^=<portlet:namespace/>question_]')!=null){
-					$('[id^=<portlet:namespace/>question_]').addClass("aui-helper-hidden");	
+				if($('[id^=<portlet:namespace/>question_div_]')!=null){
+					$('[id^=<portlet:namespace/>question_div_]').addClass("aui-helper-hidden");	
 				}
 			}
 			plays++;
@@ -149,7 +149,7 @@
 			player.addEventListener('timeupdate', function() {
 				if(indexQuestion < maxQuestions && nextQuestion[1] < player.currentTime && (nextQuestion[1] > (player.currentTime - 2))){
 					player.pause();
-					$('#<portlet:namespace/>question_' + nextQuestion[0]).removeClass("aui-helper-hidden");
+					$('#<portlet:namespace/>question_div_' + nextQuestion[0]).removeClass("aui-helper-hidden");
 					indexQuestion++;
 					if(indexQuestion < maxQuestions){
 						nextQuestion = questions[indexQuestion];
@@ -190,7 +190,7 @@
  		//Cogemos la respuesta
  		//console.log("guardamos respuesta");
  		var A = AUI();
- 		var divQuestionId = $('.question',$('#<portlet:namespace />question_'+questionId)).attr("id");
+ 		var divQuestionId = $('.question',$('#<portlet:namespace />question_div_'+questionId)).attr("id");
  		var divQuestion = A.one('#' + divQuestionId);
  		var validationCorrect = <portlet:namespace/>questionValidation(divQuestion);
  		if (typeof validQuestion == 'undefined') {
@@ -206,7 +206,7 @@
  				success: function(data){			
  					if(data){
  						if(data.correct){
- 							$('#<portlet:namespace />question_'+questionId).remove();
+ 							$('#<portlet:namespace />question_div_'+questionId).remove();
  							if(data.questionFeedback){
  								$('#<portlet:namespace />feedback_'+questionId).removeClass("aui-helper-hidden");
  	 							$('#<portlet:namespace />feedback_content_'+questionId).html(data.feedback);	

@@ -93,7 +93,7 @@ AUI().use(function(A)
 			</c:if>
 			
 			</c:if>
-			<liferay-ui:icon-delete url="javascript:${renderResponse.getNamespace()}deleteUser('${searchContainer.cur}','${courseUser.userId}','${searchContainer.displayTerms.getScreenName() }','${searchContainer.displayTerms.getFirstName() }','${searchContainer.displayTerms.getLastName() }', '${searchContainer.displayTerms.getEmailAddress() }', '${searchContainer.displayTerms.isAdvancedSearch() }','${searchContainer.displayTerms.isAndOperator() }','${searchContainer.displayTerms.getKeywords()}');" label="delete"></liferay-ui:icon-delete>
+			<liferay-ui:icon-delete url="javascript:${renderResponse.getNamespace()}deleteUser('${searchContainer.cur}','${courseUser.userId}','${searchContainer.displayTerms.getScreenName() }','${searchContainer.displayTerms.getFirstName() }','${searchContainer.displayTerms.getLastName() }', '${searchContainer.displayTerms.getEmailAddress() }', '${searchContainer.displayTerms.isAdvancedSearch() }','${searchContainer.displayTerms.isAndOperator() }','${searchContainer.displayTerms.getKeywords()}');" label="delete" confirmation="course-admin.are-you-sure-delete-user"></liferay-ui:icon-delete>
 			</liferay-ui:icon-menu>
 		</liferay-ui:search-container-column-text>
 	</liferay-ui:search-container-row>
