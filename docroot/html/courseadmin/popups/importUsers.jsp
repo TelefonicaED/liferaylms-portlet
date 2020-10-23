@@ -1,3 +1,6 @@
+<%@page import="com.liferay.portal.service.permission.PortalPermissionUtil"%>
+<%@page import="com.liferay.lms.util.LmsConstant"%>
+<%@page import="com.liferay.lms.util.LmsPrefsPropsValues"%>
 <%@page import="java.util.Iterator"%>
 <%@page import="com.liferay.portal.model.CompanyConstants"%>
 <%@page import="com.liferay.portal.kernel.util.PropsKeys"%>
@@ -56,15 +59,24 @@
 <liferay-ui:header title="courseadmin.importuserrole"></liferay-ui:header>
 
 <liferay-ui:panel id="importuserrole_help" title="help" extended="closed">
-	<%
+	<%String columns = "";
+	
 	String[] arguments = new String[1];
 	if (CompanyConstants.AUTH_TYPE_SN.equalsIgnoreCase(authType)) {
-		arguments[0] = LanguageUtil.get(themeDisplay.getLocale(), "screen-name");	
+		columns = "\"" + LanguageUtil.get(themeDisplay.getLocale(), "screen-name") + "\"";	
 	}else if(CompanyConstants.AUTH_TYPE_EA.equalsIgnoreCase(authType)){
-		arguments[0] = LanguageUtil.get(themeDisplay.getLocale(), "email-address");
+		columns = "\"" + LanguageUtil.get(themeDisplay.getLocale(), "email-address") + "\"";
 	}else{
-		arguments[0] = LanguageUtil.get(themeDisplay.getLocale(), "user-id");
-	}%>		
+		columns = "\"" + LanguageUtil.get(themeDisplay.getLocale(), "user-id") + "\"";
+	}
+	
+	if(!LmsPrefsPropsValues.getUsersExtendedData(themeDisplay.getCompanyId()) || PortalPermissionUtil.contains(
+    		themeDisplay.getPermissionChecker(), LmsConstant.ACTION_VIEW_USER_EXTENDED)){
+		columns += ";\"" + LanguageUtil.get(themeDisplay.getLocale(), "first-name") + "\";\"" + 
+				LanguageUtil.get(themeDisplay.getLocale(), "last-name") + "\"";
+	}
+	arguments[0] = columns;
+	%>		
 	<%=LanguageUtil.format(themeDisplay.getLocale(),"courseadmin.importuserrole.help",arguments) %>
 </liferay-ui:panel>
 

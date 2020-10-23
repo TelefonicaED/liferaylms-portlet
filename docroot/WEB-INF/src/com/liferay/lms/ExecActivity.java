@@ -7,6 +7,7 @@ import java.util.List;
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
 import javax.portlet.PortletException;
+import javax.portlet.PortletRequestDispatcher;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 
@@ -26,7 +27,10 @@ import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityResultLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityTryLocalServiceUtil;
+import com.liferay.lms.service.ModuleLocalServiceUtil;
+import com.liferay.lms.service.ModuleResultLocalServiceUtil;
 import com.liferay.lms.service.TestQuestionLocalServiceUtil;
+import com.liferay.lms.util.LmsConstant;
 import com.liferay.portal.kernel.exception.NestableException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
@@ -38,6 +42,7 @@ import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.PrefsPropsUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -50,13 +55,199 @@ import com.liferay.portal.util.PortalUtil;
 import com.liferay.portlet.asset.AssetRendererFactoryRegistryUtil;
 import com.liferay.portlet.asset.model.AssetRenderer;
 import com.liferay.portlet.asset.model.AssetRendererFactory;
+import com.tls.lms.util.LiferaylmsUtil;
 
 /**
  * Portlet implementation class ExecActivity
  */
 public class ExecActivity extends QuestionsAdmin {
 	
+	private String viewJSP = null;
+	private String resultsJSP = null;
+	private String previewJSP = null;
 	private static Log log = LogFactoryUtil.getLog(ExecActivity.class);
+	
+	public void init() throws PortletException {	
+		viewJSP = getInitParameter("view-template");
+		resultsJSP = getInitParameter("results-template");
+		previewJSP = getInitParameter("preview-template");
+	}
+	
+	@Override
+	public void render(RenderRequest renderRequest, RenderResponse renderResponse) throws PortletException, IOException {
+		long actId=0;
+		boolean actionEditingDetails = ParamUtil.getBoolean(renderRequest, "actionEditingDetails", false);
+		
+		renderResponse.setProperty("clear-request-parameters",StringPool.TRUE);
+		
+		if(actionEditingDetails){
+			actId=ParamUtil.getLong(renderRequest, "resId", 0);
+		} else{
+			actId=ParamUtil.getLong(renderRequest, "actId", 0);
+		}
+
+		if(actId==0){
+			renderRequest.setAttribute(WebKeys.PORTLET_CONFIGURATOR_VISIBILITY, Boolean.FALSE);
+		} else {
+			
+			try {
+				LearningActivity activity = LearningActivityLocalServiceUtil.getLearningActivity(actId);
+			
+				long typeId = activity.getTypeId();
+	
+				if(typeId==0){
+					log.debug("editamos los detalles");
+					renderRequest.setAttribute("showOrderQuestions", true);
+					
+					super.render(renderRequest, renderResponse);
+				} else {
+					renderRequest.setAttribute(WebKeys.PORTLET_CONFIGURATOR_VISIBILITY, Boolean.FALSE);
+				}
+			} catch (PortalException | SystemException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	@Override
+	public void doView(RenderRequest renderRequest,RenderResponse renderResponse) throws IOException, PortletException {
+		
+		String jsp = renderRequest.getParameter("view");
+		
+		if(jsp == null || "".equals(jsp)){
+			
+			long actId=ParamUtil.getLong(renderRequest, "actId", ParamUtil.getLong(renderRequest, "resId", 0));
+			
+			try {
+				LearningActivity activity = LearningActivityLocalServiceUtil.getLearningActivity(actId);
+				
+				ThemeDisplay themeDisplay  =(ThemeDisplay)renderRequest.getAttribute(WebKeys.THEME_DISPLAY);
+				boolean hasAccessLock = CourseLocalServiceUtil.canAccessLock(themeDisplay.getScopeGroupId(), themeDisplay.getUser());
+				Course course = CourseLocalServiceUtil.getCourseByGroupCreatedId(themeDisplay.getScopeGroupId());
+				boolean hasPermissionAccessCourseFinished = LiferaylmsUtil.hasPermissionAccessCourseFinished(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(), course.getCourseId(), themeDisplay.getUserId());
+				
+				if(activity.canAccess(true, themeDisplay.getUser(), themeDisplay.getPermissionChecker(), hasAccessLock, course, hasPermissionAccessCourseFinished)){
+					//Comprobamos si la actividad tiene fecha de fin
+					log.debug("actId: " + actId);
+					LearningActivityResult learningActivityResult = LearningActivityResultLocalServiceUtil.getByActIdAndUserId(actId, themeDisplay.getUserId());
+					
+					if(learningActivityResult != null && learningActivityResult.getEndDate() != null){
+						log.debug("uno");
+						showViewResults(renderRequest, renderResponse, activity);
+					}else{
+					
+						boolean improve =ParamUtil.getBoolean(renderRequest, "improve",false);
+		
+						boolean improving = false;
+						LearningActivityResult result = LearningActivityResultLocalServiceUtil.getByActIdAndUserId(actId, themeDisplay.getUserId());
+							
+						if(result != null){
+							int done =  LearningActivityTryLocalServiceUtil.getTriesCountByActivityAndUser(actId,themeDisplay.getUserId());
+							LearningActivity act=LearningActivityLocalServiceUtil.getLearningActivity(actId);
+							
+							if(result.getResult() < 100 && !activity.isLocked(themeDisplay.getUserId()) && LearningActivityResultLocalServiceUtil.userPassed(actId, themeDisplay.getUserId()) && (done < act.getTries() || act.getTries() == 0)){
+								improving = true;
+							}
+						}
+						
+						if(!improve && LearningActivityResultLocalServiceUtil.userPassed(actId,themeDisplay.getUserId()) || hasPermissionAccessCourseFinished){
+							log.debug("dos");
+							showViewResults(renderRequest, renderResponse,activity);
+						}else if (LearningActivityTryLocalServiceUtil.canUserDoANewTry(actId, themeDisplay.getUserId()) 
+								//|| permissionChecker.hasPermission(activity.getGroupId(), LearningActivity.class.getName(),actId, ActionKeys.UPDATE)
+								//|| permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), "com.liferay.lms.model",themeDisplay.getScopeGroupId(),"ACCESSLOCK")
+							  		|| improving 
+							  		|| hasPermissionAccessCourseFinished){
+								
+							boolean onlyPreview = Boolean.valueOf(LearningActivityLocalServiceUtil.getExtraContentValue(activity.getActId(), "showOnlyPreview", "false"));
+							long learningActivityTries = activity.getTries();
+							int userTries = LearningActivityTryLocalServiceUtil.getTriesCountByActivityAndUser(activity.getActId(), themeDisplay.getUserId());
+							boolean userHasTried = Validator.isNotNull(userTries) && userTries>0;
+							
+							if((learningActivityTries>0 && !userHasTried) || onlyPreview) {
+								log.debug("preview");
+								showViewPreview(renderRequest, renderResponse);
+							}else{
+								log.debug("editamos los detalles");
+								showViewExam(renderRequest, renderResponse);
+							}
+						}else {
+							log.debug("tres");
+							showViewResults(renderRequest, renderResponse, activity);
+						}
+					
+					}
+				}else {
+					log.debug("no puedes acceder");
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}else if("exam".equals(jsp)){
+			showViewExam(renderRequest, renderResponse);
+		}else if("preview".equals(jsp)){
+			showViewPreview(renderRequest, renderResponse);
+		}else if("results".equals(jsp)){
+			long actId=ParamUtil.getLong(renderRequest, "actId", ParamUtil.getLong(renderRequest, "resId", 0));
+			
+			try {
+				LearningActivity activity = LearningActivityLocalServiceUtil.getLearningActivity(actId);
+				showViewResults(renderRequest, renderResponse, activity);
+			} catch (PortalException | SystemException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	private void showViewPreview(RenderRequest renderRequest,RenderResponse renderResponse) throws IOException, PortletException{
+		log.debug("preview");
+		include(previewJSP, renderRequest, renderResponse);
+	}
+	
+	private void showViewExam(RenderRequest renderRequest,RenderResponse renderResponse) throws IOException, PortletException{
+		log.debug("exam");
+		include(viewJSP, renderRequest, renderResponse);
+	}
+	
+	private void showViewResults(RenderRequest renderRequest,RenderResponse renderResponse, LearningActivity activity) throws IOException, PortletException, PortalException, SystemException{
+		log.debug("results");
+		
+		ThemeDisplay themeDisplay  =(ThemeDisplay)renderRequest.getAttribute(WebKeys.THEME_DISPLAY);
+		
+		LearningActivityTry lat = LearningActivityTryLocalServiceUtil.getLastLearningActivityTryByActivityAndUser(activity.getActId(), themeDisplay.getUserId());
+		
+		LearningActivityResult lar = LearningActivityResultLocalServiceUtil.getByActIdAndUserId(activity.getActId(), themeDisplay.getUserId());
+		boolean showPopUpFinishedResult = lar != null && lar.getEndDate() == null 
+				&& PrefsPropsUtil.getBoolean(themeDisplay.getCompanyId(), LmsConstant.PREFS_SHOW_OPTION_TEST, false) 
+				&& activity.isImprove();
+		
+		renderRequest.setAttribute("learningActivity",activity);
+		renderRequest.setAttribute("larntry",lat);
+		renderRequest.setAttribute("actId",activity.getActId());
+		renderRequest.setAttribute("showPopUpFinishedResult", showPopUpFinishedResult);
+		
+		include(resultsJSP, renderRequest, renderResponse);
+	}
+	
+	public void finishedResult(ActionRequest actionRequest, ActionResponse actionResponse) throws SystemException, PortalException{
+		ThemeDisplay themeDisplay  =(ThemeDisplay)actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
+		
+		long actId = ParamUtil.getLong(actionRequest, "actId");
+		
+		LearningActivityResult lar = LearningActivityResultLocalServiceUtil.getByActIdAndUserId(actId, themeDisplay.getUserId());
+		
+		LearningActivityTry lat = LearningActivityTryLocalServiceUtil.getLastLearningActivityTryByActivityAndUser(actId, themeDisplay.getUserId());
+		
+		lar.setEndDate(lat.getEndDate());
+		
+		LearningActivityResultLocalServiceUtil.updateLearningActivityResult(lar);
+		
+		//Recalculamos
+		ModuleResultLocalServiceUtil.update(lar);
+		
+		actionResponse.setRenderParameter("view", "results");
+		actionResponse.setRenderParameter("actId", String.valueOf(actId));
+	}
 
 	public void correct	(ActionRequest actionRequest,ActionResponse actionResponse)	throws Exception {
 
@@ -119,19 +310,19 @@ public class ExecActivity extends QuestionsAdmin {
 			if (isPartial) {
 				actionResponse.setRenderParameter("improve", ParamUtil.getString(actionRequest, "improve", Boolean.FALSE.toString()));
 				if(isTablet)actionResponse.setRenderParameter("isTablet", Boolean.toString(true));
-				actionResponse.setRenderParameter("jspPage", "/html/execactivity/test/view.jsp");
+				actionResponse.setRenderParameter("view", "test");
 			} else {
 				actionResponse.setRenderParameter("oldResult", Long.toString(oldResult));
 				actionResponse.setRenderParameter("correction", Boolean.toString(true));
 				actionResponse.setRenderParameter("score", String.valueOf(learningActivityResult.getResult() > score ? learningActivityResult.getResult():score));
 				actionResponse.setRenderParameter("tryResultData", resultadosXMLDoc.formattedString());
 				if(isTablet)actionResponse.setRenderParameter("isTablet", Boolean.toString(true));
-				actionResponse.setRenderParameter("jspPage", "/html/execactivity/test/results.jsp");
+				actionResponse.setRenderParameter("view", "results");
 			}
 		}else{
 			actionResponse.setRenderParameters(actionRequest.getParameterMap());
 			actionRequest.setAttribute("actId", actId);
-			actionResponse.setRenderParameter("jspPage", "/html/execactivity/test/preview.jsp");
+			actionResponse.setRenderParameter("view", "preview");
 		}						
 
 	}
@@ -187,7 +378,7 @@ public class ExecActivity extends QuestionsAdmin {
 		}
 		
 		actionResponse.setRenderParameter("score", String.valueOf(score));
-		actionResponse.setRenderParameter("jspPage", "/html/execactivity/test/results.jsp");					
+		actionResponse.setRenderParameter("view", "results");					
 
 	}
 
@@ -238,12 +429,6 @@ public class ExecActivity extends QuestionsAdmin {
 			LearningActivityLocalServiceUtil.setExtraContentValue(actId, "showCorrectAnswerOnlyOnFinalTry", "true");
 		}else if(showCorrectAnswerOnlyOnFinalTry.equals("false")){
 			LearningActivityLocalServiceUtil.setExtraContentValue(actId, "showCorrectAnswerOnlyOnFinalTry", "false");
-		}
-
-		if(improve.equals("true")) {
-			LearningActivityLocalServiceUtil.setExtraContentValue(actId, "improve", "true");
-		}else if(improve.equals("false")) {
-			LearningActivityLocalServiceUtil.setExtraContentValue(actId, "improve", "false");
 		}
 
 		if(questionsPerPage == 0) {
@@ -299,73 +484,6 @@ public class ExecActivity extends QuestionsAdmin {
 			actionResponse.sendRedirect(urlEdit);
 		}
 		SessionMessages.add(actionRequest, "asset-renderer-not-defined");
-	}
-
-	@Override
-	public void render(RenderRequest renderRequest, RenderResponse renderResponse) throws PortletException, IOException {
-		long actId=0;
-		boolean actionEditingDetails = ParamUtil.getBoolean(renderRequest, "actionEditingDetails", false);
-		renderResponse.setProperty("clear-request-parameters",StringPool.TRUE);
-		if(actionEditingDetails){
-
-			actId=ParamUtil.getLong(renderRequest, "resId", 0);
-			renderResponse.setProperty("clear-request-parameters",Boolean.TRUE.toString());
-		}
-		else{
-			actId=ParamUtil.getLong(renderRequest, "actId", 0);
-
-		}
-		renderResponse.setProperty("clear-request-parameters",Boolean.TRUE.toString());
-
-		if(actId==0)// TODO Auto-generated method stub
-		{
-			renderRequest.setAttribute(WebKeys.PORTLET_CONFIGURATOR_VISIBILITY, Boolean.FALSE);
-		}
-		else
-		{
-			LearningActivity activity;
-			try {
-
-				//auditing
-				ThemeDisplay themeDisplay = (ThemeDisplay) renderRequest.getAttribute(WebKeys.THEME_DISPLAY);
-			
-				activity = LearningActivityLocalServiceUtil.getLearningActivity(actId);
-				long typeId = activity.getTypeId();
-
-				if(typeId==0 || (typeId == 4 && actionEditingDetails))
-				{
-					log.debug("editamos los detalles");
-					renderRequest.setAttribute("showOrderQuestions", true);
-					
-					String mvcPath = ParamUtil.getString(renderRequest, "mvcPath");
-					String jspPage = ParamUtil.getString(renderRequest, "jspPage");
-					
-					if(Validator.isNull(mvcPath) && Validator.isNull(jspPage)){
-						
-						boolean onlyPreview = Boolean.valueOf(LearningActivityLocalServiceUtil.getExtraContentValue(activity.getActId(), "showOnlyPreview", "false"));
-						long learningActivityTries = activity.getTries();
-						int userTries = LearningActivityTryLocalServiceUtil.getTriesCountByActivityAndUser(activity.getActId(), themeDisplay.getUserId());
-						boolean userHasTried = Validator.isNotNull(userTries) && userTries>0;
-						
-						if((learningActivityTries>0 && !userHasTried) || onlyPreview) {
-							include("/html/execactivity/test/preview.jsp", renderRequest, renderResponse);
-						}else{
-							log.debug("editamos los detalles");
-							super.render(renderRequest, renderResponse);
-						}
-					}else{
-						log.debug("editamos los detalles");
-						super.render(renderRequest, renderResponse);
-					}
-				}
-				else
-				{
-					renderRequest.setAttribute(WebKeys.PORTLET_CONFIGURATOR_VISIBILITY, Boolean.FALSE);
-				}
-			} catch (PortalException e) {
-			} catch (SystemException e) {
-			}			
-		}
 	}
 	
 	public void setGrades(ActionRequest request, ActionResponse response) throws IOException, PortletException, SystemException {
@@ -458,6 +576,15 @@ public class ExecActivity extends QuestionsAdmin {
 			LearningActivityType learningActivityType = registry.getLearningActivityType(learningActivity.getTypeId());
 			learningActivityResult.setPassed(learningActivityType.isPassed(learningActivity, learningActivityTry));
 			LearningActivityResultLocalServiceUtil.updateLearningActivityResult(learningActivityResult);
+		}
+	}
+	
+	protected void include(String path, RenderRequest renderRequest,RenderResponse renderResponse) throws IOException, PortletException {
+
+		PortletRequestDispatcher portletRequestDispatcher = getPortletContext().getRequestDispatcher(path);
+
+		if (portletRequestDispatcher != null) {
+			portletRequestDispatcher.include(renderRequest, renderResponse);
 		}
 	}
 }

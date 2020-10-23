@@ -6,7 +6,9 @@ import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
 import javax.portlet.PortletResponse;
 
+import com.liferay.lms.model.Course;
 import com.liferay.lms.model.LearningActivity;
+import com.liferay.lms.model.LearningActivityResult;
 import com.liferay.lms.model.LearningActivityTry;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
@@ -64,6 +66,9 @@ public interface LearningActivityType extends InvokableService
 	public String getSpecificResultsPage();
 	public long calculateResult(LearningActivity learningActivity, LearningActivityTry lat);
 	public boolean isPassed(LearningActivity learningActivity, LearningActivityTry lat);
+	public boolean isFinished(LearningActivity learningActivity, LearningActivityResult learningActivityResult) throws PortalException, SystemException;
 	public String getClassName();
 	public void copyActivity(LearningActivity oldActivity, LearningActivity newActivity, ServiceContext serviceContext);
+	
+	public void onCloseCourse(LearningActivity activity) throws SystemException, PortalException;
 }

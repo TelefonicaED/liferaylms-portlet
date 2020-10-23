@@ -55,6 +55,7 @@ import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.upload.UploadPortletRequest;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FileUtil;
+import com.liferay.portal.kernel.util.FriendlyURLNormalizerUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -339,8 +340,36 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 				log.debug("CourseId "+course);
 				renderRequest.setAttribute("course", course);
 				
+				String newCourseName;
+				int newCourseEditionNumber = CourseLocalServiceUtil.countChildCourses(course.getCourseId())+1;
+				newCourseName = LanguageUtil.get(themeDisplay.getLocale(), "courseadmin.edition")+" "+newCourseEditionNumber;
+				String newCourseURL;				
+			        String courseURL; 		
+			        String editionURL;
+			        courseURL = FriendlyURLNormalizerUtil.normalize(course.getFriendlyURL());	
+			        editionURL = FriendlyURLNormalizerUtil.normalize(newCourseName);						      
+				newCourseURL = FriendlyURLNormalizerUtil.normalize(course.getFriendlyURL()+" "+newCourseName);
+				if(courseURL.length() + editionURL.length()  > 100){										
+					newCourseURL = FriendlyURLNormalizerUtil.normalize(course.getFriendlyURL().substring(0,100-newCourseName.length())+" "+newCourseName);
+				}
+				Group groupURL = null;
+				groupURL=GroupLocalServiceUtil.fetchFriendlyURLGroup(themeDisplay.getCompanyId(), newCourseURL);
+				while(groupURL != null){					
+                                newCourseName = LanguageUtil.get(themeDisplay.getLocale(), "courseadmin.edition")+" "+newCourseEditionNumber;
+                                courseURL = FriendlyURLNormalizerUtil.normalize(course.getFriendlyURL());	
+        			editionURL = FriendlyURLNormalizerUtil.normalize(newCourseName);	
+                                newCourseURL = FriendlyURLNormalizerUtil.normalize(course.getFriendlyURL()+" "+newCourseName);
+						if(courseURL.length() + editionURL.length()  > 100){										
+							newCourseURL = FriendlyURLNormalizerUtil.normalize(course.getFriendlyURL().substring(0,100-newCourseName.length())+" "+newCourseName);
+						}
+						groupURL=GroupLocalServiceUtil.fetchFriendlyURLGroup(themeDisplay.getCompanyId(), newCourseURL);
+						newCourseEditionNumber++;							
+						
+					}
+									
+					
+				renderRequest.setAttribute("editionFriendlyURL", newCourseURL);
 				
-				String newCourseName = LanguageUtil.get(themeDisplay.getLocale(), "courseadmin.edition")+" "+(CourseLocalServiceUtil.countChildCourses(course.getCourseId())+1);
 				renderRequest.setAttribute("newCourseName", newCourseName);
 				renderRequest.setAttribute("courseId", courseId);
 				
@@ -389,9 +418,8 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 					
 				}
 				renderRequest.setAttribute("editionTitle", editionsTitle);
-				String friendlyURL = course.getFriendlyURL()+"-"+newCourseName.replace(" ", "-");
-				friendlyURL = StringPool.SLASH+friendlyURL.replaceAll("[^a-zA-Z0-9_-]+", "");
-				renderRequest.setAttribute("editionFriendlyURL", friendlyURL);
+				
+				//renderRequest.setAttribute("editionFriendlyURL", course.getFriendlyURL()+"-"+newCourseName.replace(" ", "-"));
 				
 				
 				if(prototypeList.size()>1){
@@ -623,7 +651,7 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 			}
 		}
 		
-		//***************************Si estás buscando te guarda los parámetros en la sesión, si no estás buscando te los coge de la sesión****************************//
+		//***************************Si estÃ¡s buscando te guarda los parÃ¡metros en la sesiÃ³n, si no estÃ¡s buscando te los coge de la sesiÃ³n****************************//
 
 		PortletSession portletSession = renderRequest.getPortletSession();
 		String prefix = "";
@@ -896,7 +924,7 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 		}catch(Exception e){
 			e.printStackTrace();
 		}
-		//Ocultar o no las fechas de ejecución del curso (por defecto no se ocultan)
+		//Ocultar o no las fechas de ejecuciÃ³n del curso (por defecto no se ocultan)
 		renderRequest.setAttribute("hideExecutionDateCourseColumn", Boolean.parseBoolean(renderRequest.getPreferences().getValue("executionDateCourseColumn", "false")));
 	}
 
@@ -1155,30 +1183,45 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 			errors = true;
 		}
 		
+		Group group = null;
+		try{
+			group = GroupLocalServiceUtil.getGroup(themeDisplay.getCompanyId(), newEditionName);
+		}catch(NoSuchGroupException e){
+			group = null;
+			if(log.isDebugEnabled()){
+				e.printStackTrace();
+			}
+		}
 		if(!errors){
-			Group group=GroupLocalServiceUtil.fetchFriendlyURLGroup(themeDisplay.getCompanyId(), friendlyURL);
-			if(group!=null){
-				SessionErrors.add(actionRequest, "duplicate-friendly-url");
+			if(group != null) {
+				SessionErrors.add(actionRequest, "duplicate-name");
 				errors = true;
-			}else{
-				
-				AsynchronousProcessAudit process = AsynchronousProcessAuditLocalServiceUtil.addAsynchronousProcessAudit(themeDisplay.getCompanyId(), themeDisplay.getUserId(), Course.class.getName(), "liferay/lms/createEdition");
-				
-				Message message=new Message();
-				message.put("asynchronousProcessAuditId", process.getAsynchronousProcessAuditId());
-				message.put("parentCourseId", parentCourseId);
-				message.put("newEditionName",newEditionName);
-				message.put("themeDisplay",themeDisplay);
-				message.put("startDate",startDate);
-				message.put("endDate",endDate);
-				message.put("startExecutionDate",startExecutionDate);
-				message.put("endExecutionDate",endExecutionDate);
-				message.put("editionFriendlyURL",friendlyURL);
-				message.put("isLinked",isLinked);
-				message.put("serviceContext",serviceContext);
-				message.put("editionLayoutId", editionLayoutId);
-				MessageBusUtil.sendMessage("liferay/lms/createEdition", message);
-		
+			} else {
+				group=GroupLocalServiceUtil.fetchFriendlyURLGroup(themeDisplay.getCompanyId(), friendlyURL);
+				if(group!=null){
+					SessionErrors.add(actionRequest, "duplicate-friendly-url");
+					errors = true;
+				}else{
+					
+					AsynchronousProcessAudit process = AsynchronousProcessAuditLocalServiceUtil.addAsynchronousProcessAudit(themeDisplay.getCompanyId(), themeDisplay.getUserId(), Course.class.getName(), "liferay/lms/createEdition");
+					
+					Message message=new Message();
+					message.put("asynchronousProcessAuditId", process.getAsynchronousProcessAuditId());
+					message.put("parentCourseId", parentCourseId);
+					message.put("newEditionName",newEditionName);
+					message.put("themeDisplay",themeDisplay);
+					message.put("startDate",startDate);
+					message.put("endDate",endDate);
+					message.put("startExecutionDate",startExecutionDate);
+					message.put("endExecutionDate",endExecutionDate);
+					message.put("editionFriendlyURL",friendlyURL);
+					message.put("isLinked",isLinked);
+					message.put("serviceContext",serviceContext);
+					message.put("editionLayoutId", editionLayoutId);
+					MessageBusUtil.sendMessage("liferay/lms/createEdition", message);
+			
+				}
+						
 			}
 		}
 		
@@ -1237,7 +1280,7 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 		}
 	}
 	
-	//--Importación ediciones
+	//--ImportaciÃ³n ediciones
 	public void importEditions(ActionRequest request, ActionResponse response) throws PortalException, SystemException  {
 		if(log.isDebugEnabled())log.debug(" ::importEditions:: ");
 		

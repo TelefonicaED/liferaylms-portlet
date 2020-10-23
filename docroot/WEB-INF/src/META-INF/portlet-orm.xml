@@ -355,6 +355,7 @@
 			<basic name="weightinmodule" />
 			<basic name="commentsActivated" />
 			<basic name="linkedActivityId" />
+			<basic name="improve" />
 			<transient name="descriptionCurrentLanguageId" />
 			<transient name="descriptionMap" />
 			<transient name="modelAttributes" />

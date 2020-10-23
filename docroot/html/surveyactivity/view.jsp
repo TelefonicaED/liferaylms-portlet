@@ -69,8 +69,8 @@ textarea {
 		
 		LearningActivity activity=LearningActivityLocalServiceUtil.getLearningActivity(actId);
 		if(activity.getTypeId() == 4){
-			
-			if(activity.canAccess(false, themeDisplay.getUser(), themeDisplay.getPermissionChecker())){
+			if(activity.canAccess(true, themeDisplay.getUser(), themeDisplay.getPermissionChecker())){
+				
 				boolean isEvaluationSurvey = activity.getTitle(themeDisplay.getLocale())
 						.equalsIgnoreCase(LanguageUtil.get(pageContext, "surveyactivity.evaluation.title"));
 		

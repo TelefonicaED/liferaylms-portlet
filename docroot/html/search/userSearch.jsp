@@ -1,8 +1,10 @@
 <%@ include file="/init-min.jsp" %>
 
 <div class="search-user search-row">
-	<aui:input cssClass="col-md-3" name="${displayTerms.getFIRST_NAME() }" label="first-name" size="20" value="${displayTerms.firstName}" />
-	<aui:input cssClass="col-md-3" name="${displayTerms.getLAST_NAME() }" label="last-name" size="20" value="${displayTerms.lastName}" />
+	<c:if test="${displayTerms.showUserName}">
+		<aui:input cssClass="col-md-3" name="${displayTerms.getFIRST_NAME() }" label="first-name" size="20" value="${displayTerms.firstName}" />
+		<aui:input cssClass="col-md-3" name="${displayTerms.getLAST_NAME() }" label="last-name" size="20" value="${displayTerms.lastName}" />
+	</c:if>
 	<c:if test="${displayTerms.showScreenName}">
 		<aui:input cssClass="col-md-3" name="${displayTerms.getSCREEN_NAME() }" label="screen-name" size="20" value="${displayTerms.screenName }" />
 	</c:if>

@@ -73,8 +73,16 @@
 			<value>false</value>
 		</init-param>
 		<init-param>
-			<name>view-jsp</name>
+			<name>view-template</name>
 			<value>/html/execactivity/test/view.jsp</value>
+		</init-param>
+		<init-param>
+			<name>preview-template</name>
+			<value>/html/execactivity/test/preview.jsp</value>
+		</init-param>
+		<init-param>
+			<name>results-template</name>
+			<value>/html/execactivity/test/results.jsp</value>
 		</init-param>
 		<init-param>
 			<name>add-process-action-success-action</name>

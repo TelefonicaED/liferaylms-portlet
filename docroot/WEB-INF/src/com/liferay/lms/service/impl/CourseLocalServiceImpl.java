@@ -292,7 +292,8 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 	}
 
 	public Course addCourse (Map<Locale,String> titleMap, String description,String summary,String friendlyURL, Locale locale,
-			Date createDate,Date startDate,Date endDate, Date executionStartDate, Date executionEndDate, long layoutSetPrototypeId,int typesite, long CourseEvalId, long calificationType, int maxUsers,ServiceContext serviceContext,boolean isfromClone,
+			Date createDate,Date startDate,Date endDate, Date executionStartDate, Date executionEndDate, long layoutSetPrototypeId,int typesite, 
+			long CourseEvalId, long calificationType, int maxUsers,ServiceContext serviceContext,boolean isfromClone,
 			long courseTypeId)
 			throws SystemException, PortalException {
 		
@@ -365,6 +366,11 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 			course = LmsLocaleUtil.checkDefaultLocale(Course.class, course, "description");
 			//creating group
 			String groupName = title;
+			
+			if(groupName.length()>148){
+				groupName = groupName.substring(0, 148);
+			}
+			
 			if(GroupLocalServiceUtil.fetchGroup(course.getCompanyId(), groupName)!=null){
 				if(groupName.length()>130){
 					groupName = groupName.substring(0, 130);
@@ -376,7 +382,7 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 				groupName = groupName.substring(0, 148);
 			}
 			
-			System.out.println("groupName: " + groupName);
+			log.debug("groupName: " + groupName);
 			
 			Group group = groupLocalService.addGroup(userLocalService.getDefaultUser(serviceContext.getCompanyId()).getUserId(),
 					null, 0, groupName,summary,typesite,friendlyURL,true,true,serviceContext);

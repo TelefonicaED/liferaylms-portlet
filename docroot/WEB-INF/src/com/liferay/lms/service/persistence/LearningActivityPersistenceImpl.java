@@ -798,6 +798,7 @@ public class LearningActivityPersistenceImpl extends BasePersistenceImpl<Learnin
 		learningActivityImpl.setWeightinmodule(learningActivity.getWeightinmodule());
 		learningActivityImpl.setCommentsActivated(learningActivity.isCommentsActivated());
 		learningActivityImpl.setLinkedActivityId(learningActivity.getLinkedActivityId());
+		learningActivityImpl.setImprove(learningActivity.isImprove());
 
 		return learningActivityImpl;
 	}

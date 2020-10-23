@@ -35,6 +35,8 @@ import com.liferay.lms.service.LearningActivityServiceUtil;
 import com.liferay.lms.service.LearningActivityTryLocalServiceUtil;
 import com.liferay.lms.service.LmsPrefsLocalServiceUtil;
 import com.liferay.lms.service.ModuleLocalServiceUtil;
+import com.liferay.lms.util.LmsConstant;
+import com.liferay.lms.util.LmsPrefsPropsValues;
 import com.liferay.lms.util.displayterms.UserDisplayTerms;
 import com.liferay.portal.kernel.dao.orm.CustomSQLParam;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
@@ -63,6 +65,7 @@ import com.liferay.portal.service.RoleLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.TeamLocalServiceUtil;
 import com.liferay.portal.service.UserLocalServiceUtil;
+import com.liferay.portal.service.permission.PortalPermissionUtil;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.comparator.UserFirstNameComparator;
 import com.liferay.portal.util.comparator.UserLastNameComparator;
@@ -238,13 +241,22 @@ public class GradeBook extends MVCPortlet {
 		        //Módulo
 		        writer.writeNext(new String[]{module.getTitle(themeDisplay.getLocale())});
 		        
-		        String[] cabeceras = new String[learningActivities.size()+4];
+		        int numColums = !LmsPrefsPropsValues.getUsersExtendedData(themeDisplay.getCompanyId()) || PortalPermissionUtil.contains(
+		        		themeDisplay.getPermissionChecker(), LmsConstant.ACTION_VIEW_USER_EXTENDED) ? 4 : 1;
 		        
-		        int column=4;
-		        cabeceras[0]=LanguageUtil.get(themeDisplay.getLocale(),"user-name");
-		        cabeceras[1]=LanguageUtil.get(themeDisplay.getLocale(),"last-name");
-		        cabeceras[2]=LanguageUtil.get(themeDisplay.getLocale(),"screen-name");
-		        cabeceras[3]=LanguageUtil.get(themeDisplay.getLocale(),"email");
+		        String[] cabeceras = new String[learningActivities.size()+numColums];
+		        
+		        int column=0;
+		        if(!LmsPrefsPropsValues.getUsersExtendedData(themeDisplay.getCompanyId()) || PortalPermissionUtil.contains(
+		        		themeDisplay.getPermissionChecker(), LmsConstant.ACTION_VIEW_USER_EXTENDED)){
+		        	cabeceras[column++]=LanguageUtil.get(themeDisplay.getLocale(),"first-name");
+			        cabeceras[column++]=LanguageUtil.get(themeDisplay.getLocale(),"last-name");
+			        cabeceras[column++]=LanguageUtil.get(themeDisplay.getLocale(),"screen-name");
+			        cabeceras[column++]=LanguageUtil.get(themeDisplay.getLocale(),"email");
+		        }else{
+		        	cabeceras[column++]=LanguageUtil.get(themeDisplay.getLocale(),"screen-name");
+		        }
+		        
 		        
 		        for(LearningActivity learningActivity:learningActivities){
 		        	cabeceras[column++]=learningActivity.getTitle(themeDisplay.getLocale());
@@ -286,11 +298,16 @@ public class GradeBook extends MVCPortlet {
 		        for(User usuario:usus){
 		        	String[] resultados = new String[learningActivities.size()+4];
 		        	
-		        	column=4;
-		        	resultados[0]=usuario.getFirstName();
-		        	resultados[1]=usuario.getLastName();		        	
-		        	resultados[2]=usuario.getScreenName();
-		        	resultados[3]=usuario.getEmailAddress();
+		        	column=0;
+		        	if(!LmsPrefsPropsValues.getUsersExtendedData(themeDisplay.getCompanyId()) || PortalPermissionUtil.contains(
+			        		themeDisplay.getPermissionChecker(), LmsConstant.ACTION_VIEW_USER_EXTENDED)){
+			        	resultados[column++]=usuario.getFirstName();
+			        	resultados[column++]=usuario.getLastName();		        	
+			        	resultados[column++]=usuario.getScreenName();
+			        	resultados[column++]=usuario.getEmailAddress();
+		        	}else{
+		        		resultados[column++]=usuario.getScreenName();
+		        	}
 		        	
 
 			        for(LearningActivity learningActivity:learningActivities){
@@ -342,7 +359,9 @@ public class GradeBook extends MVCPortlet {
 		        writer.writeNext(new String[]{course.getTitle(themeDisplay.getLocale())});
 		        
 		        //Número de columnas del informe
-		        int headerSize = (int)LearningActivityLocalServiceUtil.countLearningActivitiesOfGroup(themeDisplay.getScopeGroupId())+4;
+		        int numColums = !LmsPrefsPropsValues.getUsersExtendedData(themeDisplay.getCompanyId()) || PortalPermissionUtil.contains(
+		        		themeDisplay.getPermissionChecker(), LmsConstant.ACTION_VIEW_USER_EXTENDED) ? 4 : 1;
+		        int headerSize = (int)LearningActivityLocalServiceUtil.countLearningActivitiesOfGroup(themeDisplay.getScopeGroupId())+numColums;
 		        
 		        //Lista de módulos
 		        List<Module> listModules = ModuleLocalServiceUtil.findAllInGroup(themeDisplay.getScopeGroupId());
@@ -366,10 +385,16 @@ public class GradeBook extends MVCPortlet {
 		        String[] header = new String[headerSize];
 		        column = 0;
 		        //Usuario
-		        header[column]=LanguageUtil.get(themeDisplay.getLocale(),"user-name");
-		        header[column++]=LanguageUtil.get(themeDisplay.getLocale(),"last-name");
-		        header[column++]=LanguageUtil.get(themeDisplay.getLocale(),"screen-name");
-		        header[column++]=LanguageUtil.get(themeDisplay.getLocale(),"email");
+		        if(!LmsPrefsPropsValues.getUsersExtendedData(themeDisplay.getCompanyId()) || PortalPermissionUtil.contains(
+		        		themeDisplay.getPermissionChecker(), LmsConstant.ACTION_VIEW_USER_EXTENDED)){
+		        	header[column++]=LanguageUtil.get(themeDisplay.getLocale(),"first-name");
+			        header[column++]=LanguageUtil.get(themeDisplay.getLocale(),"last-name");
+			        header[column++]=LanguageUtil.get(themeDisplay.getLocale(),"screen-name");
+			        header[column++]=LanguageUtil.get(themeDisplay.getLocale(),"email");
+		        }else{
+		        	header[column++]=LanguageUtil.get(themeDisplay.getLocale(),"screen-name");
+		        }
+		        
 		        //Título de la actividad
 				for(LearningActivity learningActivity:listLearningActivities)
 					header[column++] = learningActivity.getTitle(themeDisplay.getLocale());
@@ -404,10 +429,15 @@ public class GradeBook extends MVCPortlet {
 		        	results = new String[headerSize];
 		        	
 		        	column=0;
-		        	results[column]=user.getFirstName();
-		        	results[column++]=user.getLastName();		        	
-		        	results[column++]=user.getScreenName();
-		        	results[column++]=user.getEmailAddress();
+		        	if(!LmsPrefsPropsValues.getUsersExtendedData(themeDisplay.getCompanyId()) || PortalPermissionUtil.contains(
+			        		themeDisplay.getPermissionChecker(), LmsConstant.ACTION_VIEW_USER_EXTENDED)){
+			        	results[column++]=user.getFirstName();
+			        	results[column++]=user.getLastName();		        	
+			        	results[column++]=user.getScreenName();
+			        	results[column++]=user.getEmailAddress();
+		        	}else{
+		        		results[column++]=user.getScreenName();
+		        	}
 
 		        	//Resultados del usuario
 			        for(LearningActivity learningActivity:listLearningActivities){

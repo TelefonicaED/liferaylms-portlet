@@ -35,9 +35,11 @@ if(prefs!=null){
 	Role teacher=RoleLocalServiceUtil.getRole(teacherRoleId);
 	boolean linkResources = false;
 	boolean checkExecutionDate = false;
+	boolean showOptionTest = false;
 	try {
 		linkResources = PrefsPropsUtil.getBoolean(themeDisplay.getCompanyId(), LmsConstant.RESOURCE_INTERNAL_DOCUMENT_LINKED);
 		checkExecutionDate = PrefsPropsUtil.getBoolean(themeDisplay.getCompanyId(), LmsConstant.CHECK_EXECUTION_DATE);
+		showOptionTest = PrefsPropsUtil.getBoolean(themeDisplay.getCompanyId(), LmsConstant.PREFS_SHOW_OPTION_TEST);
 	} catch (SystemException e) {
 		e.printStackTrace();
 	}			
@@ -215,12 +217,12 @@ if(prefs!=null){
 		} catch (SystemException e) {
 			e.printStackTrace();
 		}
-	
 	%>
 		
 		<aui:input type="checkbox" name="showModuleClassification"	label="show-module-classification" checked="<%= showModuleClassification %>" />
 		<aui:input type="checkbox" name="showActivityClassification" label="show-activity-classification" checked="<%= showActivityClassification %>" />
 		<aui:input type="checkbox" name="showHideActivity"	label="show-hide-activity" checked="<%=prefs.getShowHideActivity()%>" value="<%=prefs.getShowHideActivity()%>" />
+		<aui:input type="checkbox" name="showOptionTest" label="lms.prefs.test.show-option-test" helpMessage="lms.prefs.test.show-option-test.help-message" checked="<%=showOptionTest %>" value="<%=showOptionTest %>" />
 	</aui:field-wrapper>
 	
 	<liferay-ui:header title="configuration-courses" />
@@ -233,7 +235,13 @@ if(prefs!=null){
 		} catch (SystemException e) {
 			e.printStackTrace();
 		}
+		boolean accessCoursesExecutionDate = PrefsPropsUtil.getBoolean(themeDisplay.getCompanyId(), LmsConstant.PREFS_ACCESS_COURSE_EXECUTION_DATES, false);
+		
 		%>
+	
+		<aui:input type="checkbox" name="accessCoursesExecutionDate" label="lms-prefs.access-courses-execution-date" 
+			checked="<%= accessCoursesExecutionDate %>" helpMessage="lms-prefs.access-courses-execution-date.help-message"/>
+	
 	
 		<aui:input type="checkbox" name="viewCoursesFinished"
 			label="view-courses-finished" checked="<%=prefs.getViewCoursesFinished()%>" value="<%=prefs.getViewCoursesFinished()%>" 

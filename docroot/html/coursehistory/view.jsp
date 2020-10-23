@@ -8,9 +8,9 @@
 			<div class="course">
 				<c:if test="${not empty courseResult.course.logoURL}">
 					<img src="${courseResult.course.logoURL }" alt="${courseResult.course.title}">
-				</c:if>
+				</c:if>	
 				<c:choose>
-					<c:when test="${(courseResult.hasPermissionAccessCourseFinished && !courseResult.course.closed) || (courseResult.course.inExecutionPeriod && !courseResult.course.closed)}">
+					<c:when test="${courseResult.hasPermissionAccessCourseFinished || !courseResult.getCourse().getCourse().isLocked(themeDisplay.user, themeDisplay.permissionChecker)}">
 						<a href="${courseResult.course.url}">${courseResult.course.title}</a>
 					</c:when>
 					<c:otherwise>
@@ -24,10 +24,7 @@
 		 	<c:if test="${courseResult.passed}">
 				<liferay-ui:icon image="checked" alt="passed"/>
 			</c:if>
-		
 		</liferay-ui:search-container-column-text>
 	</liferay-ui:search-container-row>
 	<liferay-ui:search-iterator />
- 
 </liferay-ui:search-container>
-

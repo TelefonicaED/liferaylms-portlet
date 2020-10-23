@@ -52,12 +52,6 @@ AUI().use(function(A)
 }
 --></script>
 
-
-
-
-
-
-
 <aui:form name="fm" action="${searchURL }" method="POST" role="search">
 	<liferay-ui:search-container searchContainer="${searchContainer}"
 		iteratorURL="${searchContainer.iteratorURL}" emptyResultsMessage="there-are-no-users"
@@ -76,11 +70,13 @@ AUI().use(function(A)
 		<liferay-ui:search-container-column-text>
 			<liferay-ui:user-display userId="${courseUser.userId}"></liferay-ui:user-display>
 		</liferay-ui:search-container-column-text>
-		<liferay-ui:search-container-column-text name="screen-name"	property="screenName">
-		</liferay-ui:search-container-column-text>
-		
-		<liferay-ui:search-container-column-text
-			name="email-address"	property="emailAddress"	/>
+		<c:if test="${usersExtendedData }">
+			<liferay-ui:search-container-column-text name="screen-name"	property="screenName">
+			</liferay-ui:search-container-column-text>
+			
+			<liferay-ui:search-container-column-text
+				name="email-address"	property="emailAddress"	/>
+		</c:if>
 		<liferay-ui:search-container-column-text>
 			
 			<liferay-ui:icon-menu>

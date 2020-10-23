@@ -18,8 +18,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-import javax.el.ELException;
-
 import com.liferay.lms.InscriptionException;
 import com.liferay.lms.course.inscriptiontype.InscriptionType;
 import com.liferay.lms.course.inscriptiontype.InscriptionTypeRegistry;
@@ -63,6 +61,7 @@ import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.util.DLUtil;
 import com.liferay.portlet.ratings.model.RatingsStats;
 import com.liferay.portlet.ratings.service.RatingsStatsLocalServiceUtil;
+import com.tls.lms.util.LiferaylmsUtil;
 
 /**
  * The extended model implementation for the Course service. Represents a row in the &quot;Lms_Course&quot; database table, with each column mapped to a property of this class.
@@ -331,7 +330,6 @@ public class CourseImpl extends CourseBaseImpl {
 		try {
 			courseResult = CourseResultLocalServiceUtil.getByUserAndCourse(this.getCourseId(), user.getUserId());
 		} catch (SystemException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -340,6 +338,14 @@ public class CourseImpl extends CourseBaseImpl {
         	log.debug("CourseImpl::isLocked::allowdates::endDate:" + courseResult.getAllowFinishDate());
 			return true;
 		}
+        
+        if(LiferaylmsUtil.hasPermissionAccessCoursesExecution(this)){
+        	return false;
+        }
+        
+        if(courseResult != null && courseResult.getPassedDate() != null){
+        	return true;
+        }
         
         log.debug("CourseImpl::isLocked::allowdates:" + true);
 		

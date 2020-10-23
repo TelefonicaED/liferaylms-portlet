@@ -266,8 +266,7 @@ public class SurveyActivity extends QuestionsAdmin  {
 					}else{
 						renderRequest.setAttribute("showOrderQuestions", true);
 						super.render(renderRequest, renderResponse);
-					}
-					
+					}	
 				}
 				else
 				{

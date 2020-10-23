@@ -228,6 +228,7 @@
 		<field name="weightinmodule" type="long" />
 		<field name="commentsActivated" type="boolean" />
 		<field name="linkedActivityId" type="long" />
+		<field name="improve" type="boolean" />
 	</model>
 	<model name="com.liferay.lms.model.LearningActivityResult">
 		<field name="uuid" type="String" />
