@@ -33,6 +33,7 @@ import com.liferay.lms.learningactivity.courseeval.CourseEvalRegistry;
 import com.liferay.lms.model.Course;
 import com.liferay.lms.model.CourseCompetence;
 import com.liferay.lms.model.CourseResult;
+import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.model.LmsPrefs;
 import com.liferay.lms.model.Module;
 import com.liferay.lms.model.Schedule;
@@ -637,6 +638,8 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 			ServiceContext serviceContext, boolean visible, boolean allowDuplicateName)
 			throws SystemException, PortalException {
 		
+		Course courseBefore = coursePersistence.fetchByPrimaryKey(course.getPrimaryKey());
+		
 	
 		int numberUsers = countStudentsFromCourse(course.getCourseId(), course.getCompanyId(), null, null, null, null, WorkflowConstants.STATUS_APPROVED, null, true);
 		if(course.getMaxusers()>0&&numberUsers>course.getMaxusers()){
@@ -706,6 +709,40 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 				AssetLinkConstants.TYPE_RELATED);
 		//auditing
 		AuditingLogFactory.audit(course.getCompanyId(), course.getGroupId(), Course.class.getName(), course.getCourseId(), serviceContext.getUserId(), AuditConstants.UPDATE, null);
+		
+		//Modificamos las fechas de módulos y actividades si son iguales a las del curso
+		List<Module> modules = moduleLocalService.findAllInGroup(course.getGroupCreatedId());
+		boolean update = false;
+		for(Module module: modules){
+			update = false;
+			if(module.getStartDate().compareTo(courseBefore.getExecutionStartDate()) == 0){
+				module.setStartDate(course.getExecutionStartDate());
+				update = true;
+			}
+			if(module.getEndDate().compareTo(courseBefore.getExecutionEndDate()) == 0){
+				module.setEndDate(course.getExecutionEndDate());
+				update = true;
+			}
+			if(update){
+				moduleLocalService.updateModule(module);
+			}
+		}
+		
+		List<LearningActivity> activities = learningActivityLocalService.getLearningActivitiesOfGroup(course.getGroupCreatedId());
+		for(LearningActivity activity: activities){
+			update = false;
+			if(activity.getStartdate().compareTo(courseBefore.getExecutionStartDate()) == 0){
+				activity.setStartdate(course.getExecutionStartDate());
+				update = true;
+			}
+			if(activity.getEnddate().compareTo(courseBefore.getExecutionEndDate()) == 0){
+				activity.setEnddate(course.getExecutionEndDate());
+				update = true;
+			}
+			if(update){
+				learningActivityLocalService.updateLearningActivity(activity);
+			}
+		}
 		
 		return course;
 		
