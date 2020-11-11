@@ -310,7 +310,7 @@ public class ExecActivity extends QuestionsAdmin {
 			if (isPartial) {
 				actionResponse.setRenderParameter("improve", ParamUtil.getString(actionRequest, "improve", Boolean.FALSE.toString()));
 				if(isTablet)actionResponse.setRenderParameter("isTablet", Boolean.toString(true));
-				actionResponse.setRenderParameter("view", "test");
+				actionResponse.setRenderParameter("view", "exam");
 			} else {
 				actionResponse.setRenderParameter("oldResult", Long.toString(oldResult));
 				actionResponse.setRenderParameter("correction", Boolean.toString(true));
