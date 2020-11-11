@@ -6,8 +6,8 @@ El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 ## [4.3.1](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v4.3.1)
 
 ### Fixed
+- #188308 Corrección sobre los la visualización de los tests con paginación de preguntas
 
-- ##186905 URLs de ediciones borradas ( No tengan mas de 100 caracteres)
 
 ## [4.3.0](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v4.3.0)
 
