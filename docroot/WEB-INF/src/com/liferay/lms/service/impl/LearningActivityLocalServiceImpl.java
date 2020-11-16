@@ -73,6 +73,8 @@ import com.liferay.portlet.announcements.model.AnnouncementsEntry;
 import com.liferay.portlet.announcements.model.AnnouncementsFlagConstants;
 import com.liferay.portlet.announcements.service.AnnouncementsEntryServiceUtil;
 import com.liferay.portlet.announcements.service.AnnouncementsFlagLocalServiceUtil;
+import com.liferay.portlet.asset.model.AssetEntry;
+import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
 import com.liferay.portlet.social.service.SocialActivityLocalServiceUtil;
 import com.liferay.util.LmsLocaleUtil;
 
@@ -219,7 +221,7 @@ public class LearningActivityLocalServiceImpl extends LearningActivityLocalServi
 				new java.util.Date(System.currentTimeMillis()), null,
 				ContentTypes.TEXT_HTML, 
 				updateActivity.getTitle().length()<255 ? updateActivity.getTitle():updateActivity.getTitle(Locale.getDefault()),
-						null, updateActivity.getDescription(serviceContext.getLocale()),null, null, 0, 0,
+				    updateActivity.getDescription(), updateActivity.getDescription(serviceContext.getLocale()),null, null, 0, 0,
 						null, false);
 		
 		updateActivity.setPrecedence(learningActivity.getPrecedence());
@@ -305,7 +307,7 @@ public class LearningActivityLocalServiceImpl extends LearningActivityLocalServi
 				new java.util.Date(System.currentTimeMillis()), null,
 				ContentTypes.TEXT_HTML, 
 				larn.getTitle().length()<255 ? larn.getTitle():larn.getTitle(Locale.getDefault()),
-						null, larn.getDescription(serviceContext.getLocale()),null, null, 0, 0,
+				    larn.getDescription(), larn.getDescription(serviceContext.getLocale()),null, null, 0, 0,
 						null, false);
 
 		socialActivityLocalService.addUniqueActivity(
@@ -398,7 +400,7 @@ public class LearningActivityLocalServiceImpl extends LearningActivityLocalServi
 				new java.util.Date(System.currentTimeMillis()), null,
 				ContentTypes.TEXT_HTML, 
 				learningActivity.getTitle().length()<255 ? learningActivity.getTitle():learningActivity.getTitle(Locale.getDefault()),
-						null, learningActivity.getDescription(serviceContext.getLocale()),null, null, 0, 0,
+				    learningActivity.getDescription(), learningActivity.getDescription(serviceContext.getLocale()),null, null, 0, 0,
 						null, false);
 
 		socialActivityLocalService.addUniqueActivity(
@@ -501,7 +503,7 @@ public class LearningActivityLocalServiceImpl extends LearningActivityLocalServi
 					larn.getActId(), larn.getUuid(),larn.getTypeId(), serviceContext.getAssetCategoryIds(),
 					serviceContext.getAssetTagNames(), true, null, null,
 					new java.util.Date(System.currentTimeMillis()), null,
-					ContentTypes.TEXT_HTML, larn.getTitle(), null, larn.getDescription(serviceContext.getLocale()),null, null, 0, 0,
+					ContentTypes.TEXT_HTML, larn.getTitle(), larn.getDescription(), larn.getDescription(serviceContext.getLocale()),null, null, 0, 0,
 					null, false);
 			SocialActivityLocalServiceUtil.addActivity(
 					larn.getUserId(), larn.getGroupId(),
@@ -560,7 +562,7 @@ public class LearningActivityLocalServiceImpl extends LearningActivityLocalServi
 				larn.getActId(), larn.getUuid(),larn.getTypeId(), serviceContext.getAssetCategoryIds(),
 				serviceContext.getAssetTagNames(), true, null, null, 
 				new java.util.Date(System.currentTimeMillis()), null,
-				ContentTypes.TEXT_HTML, larn.getTitle(), null, larn.getDescription(),null, null, 0, 0,
+				ContentTypes.TEXT_HTML, larn.getTitle(), larn.getDescription(), larn.getDescription(),null, null, 0, 0,
 				null, false);
 		SocialActivityLocalServiceUtil.addActivity(
 				larn.getUserId(), larn.getGroupId(),
@@ -578,6 +580,17 @@ public class LearningActivityLocalServiceImpl extends LearningActivityLocalServi
 
 		larn = LmsLocaleUtil.checkDefaultLocale(LearningActivity.class, larn, "title");
 		larn = LmsLocaleUtil.checkDefaultLocale(LearningActivity.class, larn, "description");
+		
+        try {
+            AssetEntry entry = AssetEntryLocalServiceUtil.getEntry(LearningActivity.class.getName(), larn.getActId());
+            assetEntryLocalService.updateEntry(larn.getUserId(), larn.getGroupId(), LearningActivity.class.getName(),
+                larn.getActId(), larn.getUuid(), larn.getTypeId(), entry.getCategoryIds(), entry.getTagNames(), true,
+                null, null, new java.util.Date(System.currentTimeMillis()), null, ContentTypes.TEXT_HTML,
+                larn.getTitle(), larn.getDescription(), larn.getDescription(), null, null, 0, 0, null, false);
+        } catch (PortalException e) {
+            log.warn(e.getMessage());
+        }
+		
 		learningActivityPersistence.update(larn, false);
 		return larn;
 	}
@@ -1118,6 +1131,19 @@ public class LearningActivityLocalServiceImpl extends LearningActivityLocalServi
 		
 		learningActivity = LmsLocaleUtil.checkDefaultLocale(LearningActivity.class, learningActivity, "title");
 		learningActivity = LmsLocaleUtil.checkDefaultLocale(LearningActivity.class, learningActivity, "description");
+		
+        try {
+            AssetEntry entry =
+                AssetEntryLocalServiceUtil.getEntry(LearningActivity.class.getName(), learningActivity.getActId());
+            assetEntryLocalService.updateEntry(learningActivity.getUserId(), learningActivity.getGroupId(),
+                LearningActivity.class.getName(), learningActivity.getActId(), learningActivity.getUuid(),
+                learningActivity.getTypeId(), entry.getCategoryIds(), entry.getTagNames(), true, null, null,
+                new java.util.Date(System.currentTimeMillis()), null, ContentTypes.TEXT_HTML,
+                learningActivity.getTitle(), learningActivity.getDescription(), learningActivity.getDescription(),
+                null, null, 0, 0, null, false);
+        } catch (PortalException e) {
+            log.warn(e.getMessage());
+        }		
 		
 		return super.updateLearningActivity(learningActivity);
 	}
