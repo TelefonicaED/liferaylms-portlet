@@ -26,19 +26,15 @@
 				total="${searchContainer.total }" 
 				results="${searchContainer.results }"/>
 			<liferay-ui:search-container-row modelVar="courseStats"  keyProperty="courseId" className="com.liferay.lms.views.CourseStatsView" >
-				<liferay-ui:search-container-column-text name="title" cssClass="${courseStats.cssClosed}"  title="title" orderable="false">
-					<c:choose>
-						<c:when test="${courseStats.numEditions > 0}">
-							<liferay-portlet:renderURL var="goToEditionsURL">
-								<liferay-portlet:param name="courseId" value="${courseStats.courseId }"/>
-								<liferay-portlet:param name="view" value="editions"/>
-							</liferay-portlet:renderURL>
-						 	<a href="${goToEditionsURL}">${courseStats.courseTitle}</a>
-						 	</c:when>
-					 	<c:otherwise>
-					 		${courseStats.courseTitle}
-					 	</c:otherwise>
-				 	</c:choose>
+				<liferay-ui:search-container-column-text name="title" cssClass="${courseStats.cssClosed}"  title="title" orderable="false">					
+					<a href='${themeDisplay.portalURL}/${themeDisplay.locale.language}/web${courseStats.course.friendlyURL}'>${courseStats.courseTitle}</a>
+					<c:if test="${courseStats.numEditions > 0}">
+						<liferay-portlet:renderURL var="goToEditionsURL">
+							<liferay-portlet:param name="courseId" value="${courseStats.courseId }"/>
+							<liferay-portlet:param name="view" value="editions"/>
+						</liferay-portlet:renderURL>
+					 	<a href="${goToEditionsURL}"> (<liferay-ui:message key="coursestats.view-editions"/>)</a>
+				 	</c:if>					 		
 				</liferay-ui:search-container-column-text>
 				<c:if test="${empty course && renderRequest.preferences.getValue('showEditions', 'true') }">
 					<liferay-ui:search-container-column-text name="course.editions-number"  title="course.editions-number" orderable="false" >
