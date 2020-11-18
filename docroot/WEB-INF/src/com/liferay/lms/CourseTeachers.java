@@ -70,7 +70,13 @@ public class CourseTeachers extends MVCPortlet {
 			
 			List<User> listTeachers = CourseLocalServiceUtil.getTeachersFromCourseTeams(course, teacherRoleId, themeDisplay.getUserId());
 			
-			renderRequest.setAttribute("listTeachers", listTeachers);
+			if(listTeachers == null || listTeachers.size() == 0){
+				renderRequest.setAttribute(WebKeys.PORTLET_CONFIGURATOR_VISIBILITY, Boolean.FALSE);
+			}else{
+				renderRequest.setAttribute("listTeachers", listTeachers);
+			}
+			
+			
 			
 		}else{
 			renderRequest.setAttribute(WebKeys.PORTLET_CONFIGURATOR_VISIBILITY, Boolean.FALSE);
