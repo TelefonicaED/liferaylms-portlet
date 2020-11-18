@@ -230,6 +230,9 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 		
 		ThemeDisplay themeDisplay = (ThemeDisplay)renderRequest.getAttribute(WebKeys.THEME_DISPLAY);
 		
+		AdminActionTypeRegistry registry =  new AdminActionTypeRegistry();
+		renderRequest.setAttribute("adminActionTypes", registry.getAdminActionTypes());
+		
 		searchCourses(renderRequest, renderResponse);
 		
 		long courseId = ParamUtil.getLong(renderRequest, "courseId");
