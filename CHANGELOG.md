@@ -3,6 +3,13 @@ Todos los cambios de este proyecto estarán documentados en este archivo.
 
 El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 
+
+## [4.3.2](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v4.3.2)
+
+### Fixed
+
+#187773: Se manda a la creación de la edición el nombre de la edición (se mandaba el del curso concatenado) para evitar DuplicateName con el nombre del grupo.
+
 ## [4.3.1](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v4.3.1)
 
 ### Fixed
