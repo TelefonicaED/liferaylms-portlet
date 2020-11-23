@@ -1,5 +1,6 @@
 package com.liferay.lms.learningactivity;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -14,6 +15,7 @@ import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.model.LearningActivityTry;
 import com.liferay.lms.model.TestQuestion;
 import com.liferay.lms.service.ClpSerializer;
+import com.liferay.lms.service.LearningActivityLocalServiceUtil;
 import com.liferay.lms.service.TestQuestionLocalServiceUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
@@ -73,8 +75,32 @@ public class TestLearningActivityType extends QuestionLearningActivityType
 			
 			score = lat.getResult();
 			log.debug("score del try: " + score);
-			List<TestQuestion> listQuestions = TestQuestionLocalServiceUtil.getQuestions(activity.getActId());
-					
+			boolean useBank = StringPool.TRUE.equals(LearningActivityLocalServiceUtil.getExtraContentValue(activity.getActId(), "isBank"));
+
+			List<TestQuestion> listQuestions = null;
+			
+			if(useBank){
+				LearningActivity bankActivity;
+				if( Validator.isNotNull(lat) && Validator.isXml(lat.getTryResultData()) ){
+					String tryResultData = lat.getTryResultData();
+					Document docQuestions = SAXReaderUtil.read(tryResultData);
+					List<Element> xmlQuestions = docQuestions.getRootElement().elements("question");
+					String questionIdString = xmlQuestions.get(0).attributeValue("id");
+					Long questionId = Long.valueOf(questionIdString);
+					TestQuestion testQuestion = TestQuestionLocalServiceUtil.getTestQuestion(questionId);
+					bankActivity = LearningActivityLocalServiceUtil.getLearningActivity(testQuestion.getActId());
+					listQuestions = TestQuestionLocalServiceUtil.getQuestions(bankActivity.getActId());
+				}else if( !lat.getTryResultData().trim().isEmpty() ){
+					GetterUtil.getLong(lat.getTryResultData(), 0);
+					long bankActId = GetterUtil.getLong(lat.getTryResultData(), 0);
+					bankActivity = LearningActivityLocalServiceUtil.getLearningActivity(bankActId);
+					listQuestions = TestQuestionLocalServiceUtil.getQuestions(bankActivity.getActId());
+				}else{
+					listQuestions = new ArrayList<TestQuestion>();
+				}
+			}else{
+				listQuestions = TestQuestionLocalServiceUtil.getQuestions(activity.getActId());
+			}				
 			if(listQuestions != null && listQuestions.size() > 0){
 				log.debug("tiene preguntas: " + listQuestions.size());
 				Element element = null;
@@ -133,6 +159,9 @@ public class TestLearningActivityType extends QuestionLearningActivityType
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (SystemException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (PortalException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} 
