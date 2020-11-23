@@ -3,6 +3,8 @@ package com.liferay.lms.course.adminaction;
 import java.io.Serializable;
 import java.util.Locale;
 
+import com.liferay.lms.model.Course;
+
 public class BaseAdminActionType implements AdminActionType, Serializable {
 	
 	/**
@@ -33,5 +35,15 @@ public class BaseAdminActionType implements AdminActionType, Serializable {
 	
 	public String getIcon(){
 		return "";
+	}
+
+	@Override
+	public boolean showInCourse(Course course, long userId) {
+		return true;
+	}
+
+	@Override
+	public boolean showInEdition(Course course, long userId) {
+		return false;
 	}
 }

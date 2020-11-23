@@ -191,8 +191,11 @@ if( permissionChecker.hasPermission(themeDisplay.getScopeGroupId(),  Course.clas
 <c:forEach var="action" items="${adminActionTypes}">
 	<c:set var="preferences" value="<%=preferences %>" />
 	<c:set var="myVar" value="show${action.getTypeId()}" />
+	<c:set var="myCourse" value="<%=myCourse %>" />
 	
-	 <c:if test="${action.hasPermission(themeDisplay.getUserId()) and preferences.getValue(myVar, 'true').equals('true')}">
+	 <c:if test="${action.hasPermission(themeDisplay.getUserId()) and preferences.getValue(myVar, 'true').equals('true') &&
+	 				((myCourse.parentCourseId == 0 && action.showInCourse(myCourse, themeDisplay.userId)) ||
+	 				(myCourse.parentCourseId > 0 && action.showInEdition(myCourse, themeDisplay.userId)))}">
 	
 		<portlet:renderURL var="specificURL" >
 			<portlet:param name="jspPage" value="/html/courseadmin/inc/specific_action.jsp" />
