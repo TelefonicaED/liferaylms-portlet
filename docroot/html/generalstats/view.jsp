@@ -33,7 +33,7 @@
 							<liferay-portlet:param name="courseId" value="${courseStats.courseId }"/>
 							<liferay-portlet:param name="view" value="editions"/>
 						</liferay-portlet:renderURL>
-					 	<a href="${goToEditionsURL}"> (<liferay-ui:message key="coursestats.view-editions"/>)</a>
+					 	(<a href="${goToEditionsURL}"> <liferay-ui:message key="coursestats.view-editions"/></a>)
 				 	</c:if>					 		
 				</liferay-ui:search-container-column-text>
 				<c:if test="${empty course && renderRequest.preferences.getValue('showEditions', 'true') }">
