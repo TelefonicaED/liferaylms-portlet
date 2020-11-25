@@ -282,7 +282,7 @@ textarea {
 											<option  value="<%=answer.getAnswerId()%>"> <%=answer.getAnswer() %></option>
 										<%}else{
 											%>
-											<div class="answer"><aui:input id='<%="question_"+question.getQuestionId()%>' type="radio" name='<%="question_"+question.getQuestionId()%>' value="<%=answer.getAnswerId() %>" label="<%=answer.getAnswer() %>"/>
+											<div class="answer"><aui:input id='<%="question_"+question.getQuestionId() + "_" + answer.getAnswerId()%>' type="radio" name='<%="question_"+question.getQuestionId()%>' value="<%=answer.getAnswerId() %>" label="<%=answer.getAnswer() %>"/>
 											</div>
 										<%
 										}
@@ -302,7 +302,7 @@ textarea {
 											for(TestAnswer answer:testAnswers)
 											{
 											%>
-											<div class="answer"><aui:input id='<%="question_"+question.getQuestionId()%>' type="radio" name='<%="question_"+question.getQuestionId()%>'  value='<%=answer.getAnswerId() %>'  label="<%=answer.getAnswer() %>"/>
+											<div class="answer"><aui:input id='<%="question_"+question.getQuestionId() + "_" + answer.getAnswerId()%>' type="radio" name='<%="question_"+question.getQuestionId()%>'  value='<%=answer.getAnswerId() %>'  label="<%=answer.getAnswer() %>"/>
 											</div>
 											<%
 											}
