@@ -35,7 +35,7 @@ if(learningActivity==null){
 }
 
 LearningActivityResult lar = LearningActivityResultLocalServiceUtil.getByActIdAndUserId(learningActivity.getActId(), themeDisplay.getUserId());
-boolean showPopUpFinishedResult = lar != null && lar.getEndDate() == null && learningActivity.isImprove();
+boolean showPopUpFinishedResult = ParamUtil.getBoolean(renderRequest, "showPopUpFinishedResult");
 
 boolean isTeacher=permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), "com.liferay.lms.model",themeDisplay.getScopeGroupId(), "VIEW_RESULTS");
 
