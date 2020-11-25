@@ -106,7 +106,7 @@ if(showPopUpFinishedResult){%>
 	LearningActivityTry larntry=(LearningActivityTry)request.getAttribute("larntry");
 	long latId = ParamUtil.getLong(request,"latId" );
 	if(!hasPermissionAccessCourseFinished){
-		if(larntry==null) larntry=LearningActivityTryLocalServiceUtil.getLearningActivityTry(latId);
+		if(larntry==null) larntry=LearningActivityTryLocalServiceUtil.fetchLearningActivityTry(latId);
 		
 		if(larntry != null && larntry.getActId() == learningActivity.getActId()){
 			request.setAttribute("larntry",larntry);
@@ -153,16 +153,16 @@ if(showPopUpFinishedResult){%>
 	String tryResultData = null;
 	boolean userPassed=false;
 	LearningActivityResult result = LearningActivityResultLocalServiceUtil.getByActIdAndUserId(learningActivity.getActId(), themeDisplay.getUserId());
+	score = result != null ? result.getResult(): 0;
 	if(!hasPermissionAccessCourseFinished){
 		request.setAttribute("hasFreeQuestion", hasFreeQuestion);	
 		tries = learningActivity.getTries();
 		userTries = Long.valueOf(LearningActivityTryLocalServiceUtil.getTriesCountByActivityAndUser(learningActivity.getActId(),themeDisplay.getUserId()));
-	
-		score = result.getResult();
+		
 		scoreTry = latId > 0 ? (larntry != null ? larntry.getResult(): 0) : score;
 		tryResultData = larntry != null ? larntry.getTryResultData(): null;
 	}else{
-		score = ParamUtil.getLong(request, "score", result.getResult());
+		score = ParamUtil.getLong(request, "score", score);
 		scoreTry = score;
 		tryResultData = ParamUtil.getString(request, "tryResultData", null);
 		if(Validator.isNull(tryResultData)){
