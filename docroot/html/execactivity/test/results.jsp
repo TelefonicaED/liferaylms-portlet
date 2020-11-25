@@ -106,7 +106,7 @@ if(showPopUpFinishedResult){%>
 	LearningActivityTry larntry=(LearningActivityTry)request.getAttribute("larntry");
 	long latId = ParamUtil.getLong(request,"latId" );
 	if(!hasPermissionAccessCourseFinished){
-		if(larntry==null) larntry=LearningActivityTryLocalServiceUtil.getLearningActivityTry(latId);
+		if(larntry==null) larntry=LearningActivityTryLocalServiceUtil.fetchLearningActivityTry(latId);
 		
 		if(larntry != null && larntry.getActId() == learningActivity.getActId()){
 			request.setAttribute("larntry",larntry);
