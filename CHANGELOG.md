@@ -14,6 +14,7 @@ El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 #192169 Se mete un id a los input de tipo radio de la actividad de encuesta
 #192172 Se añade un enlace al curso en el portlet de estadísticas. Si el curso tiene ediciones se muestra un enlace al lado del título
 #192171 Se actualiza el título y la descripción del assetEntry de los learningActivity cuando se actualizan éstas
+#191782 Se cambian los div del progreso en la actividad de tipo test por una etiqueta progress ya que en ocasiones la barra tenía la anchura mal
 
 ## [4.3.2](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v4.3.2)
 
