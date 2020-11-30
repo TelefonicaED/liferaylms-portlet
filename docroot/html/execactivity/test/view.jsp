@@ -681,15 +681,7 @@ if((Validator.isNotNull(navigateParam))||(StringPool.BLANK.equals(password))||(p
 						if ((showPrevious || showNext) && currentPage >= 1) { %>
 							<div id="testactivity-navigator-pages">
 								<p><%= currentPage + " / " + totalPages %></p>
-								<div id="testactivity-navigator-progress">
-									<% 
-									long width_frame = 10000 / totalPages;
-									for (int i = 1; i <= totalPages; i++) {
-										boolean browsed = (i <= currentPage);
-										%>
-									<div id="testactivity-navigator-progress-frame-<%= i %>" class='testactivity-navigator-progress-frame <%= browsed ? "testactivity-navigator-progress-frame-browsed" : "testactivity-navigator-progress-frame-not-browsed" %>' style='width: <%= (width_frame / 100) + "." + (width_frame % 100) %>%'></div>
-									<% } %>
-								</div>
+								<progress id="testactivity-navigator-progress" max="<%=totalPages %>" value="<%= currentPage %>"> <%= currentPage + " / " + totalPages %> </progress>
 							</div>
 						<% } 
 						if(!hasPermissionAccessCourseFinished){%>
