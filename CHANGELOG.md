@@ -16,6 +16,15 @@ El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 #192171 Se actualiza el título y la descripción del assetEntry de los learningActivity cuando se actualizan éstas
 #191782 Se cambian los div del progreso en la actividad de tipo test por una etiqueta progress ya que en ocasiones la barra tenía la anchura mal
 
+
+## [4.3.3](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v4.3.3)
+
+### Fixed
+
+#193502: Corregido el portlets no disponible cuando el curso está aprobado o suspensoen el progreso del usuario.
+
+
+
 ## [4.3.2](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v4.3.2)
 
 ### Fixed
