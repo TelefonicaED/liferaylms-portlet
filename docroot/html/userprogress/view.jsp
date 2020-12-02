@@ -47,8 +47,16 @@ status = LanguageUtil.get(themeDisplay.getLocale(), status);
 
 String result = "result.pending";
 if(courseResult != null && courseResult.getPassedDate() != null){
-	CalificationType calificationType = new CalificationTypeRegistry().getCalificationType(course.getCourseEvalId());
-	result = calificationType.translate(themeDisplay.getLocale(), courseResult);
+	CalificationTypeRegistry cr = new CalificationTypeRegistry();
+	
+	CalificationType calificationType = cr.getCalificationType(course.getCalificationType());
+	
+	if(calificationType!=null){
+		result = calificationType.translate(themeDisplay.getLocale(), courseResult);
+	}else{
+		result = String.valueOf(courseResult.getResult());
+	}
+	
 }else{
 	result = LanguageUtil.get(themeDisplay.getLocale(), result);
 }

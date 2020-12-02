@@ -3,6 +3,11 @@ Todos los cambios de este proyecto estarán documentados en este archivo.
 
 El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 
+## [4.3.3](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v4.3.3)
+
+### Fixed
+
+#193502: Corregido el portlets no disponible cuando el curso está aprobado o suspensoen el progreso del usuario.
 
 ## [4.3.2](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v4.3.2)
 
