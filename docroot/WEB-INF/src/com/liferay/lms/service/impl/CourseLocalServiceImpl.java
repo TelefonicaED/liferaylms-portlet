@@ -1980,10 +1980,94 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 		}
 	}
 	
+    /**
+     * Cuenta los cursos del usuario que hayan finalizado, sin tener en cuenta de si lo ha completado o no
+     * 
+     * @param groupId groupId del site en el que se encuentra el curso
+     * @param userId id del usuario
+     * @return numero de cursos
+     */
+    public int countOnlyFinishedCoursesOfUser(long groupId, long userId)
+    {
+        return countOnlyFinishedCoursesOfUser(groupId, userId, null);
+    }
+
+    /**
+     * Cuenta los cursos del usuario que hayan finalizado, sin tener en cuenta de si lo ha completado o no
+     * 
+     * @param groupId groupId del site en el que se encuentra el curso
+     * @param userId id del usuario
+     * @param params filtros para los resultados
+     * @return numero de cursos
+     */
+    public int countOnlyFinishedCoursesOfUser(long groupId, long userId, LinkedHashMap<String, Object> params)
+    {
+        return courseFinder.countMyCourses(groupId, userId, false, false, true, params);
+    }
+
+    /**
+     * Devuelve los cursos del usuario que hayan finalizado, sin tener en cuenta de si lo ha completado o no
+     * 
+     * @param groupId groupId del site en el que se encuentra el curso
+     * @param userId id del usuario
+     * @param themeDisplay themeDisplay
+     * @param orderByColumn parametro de ordenacion
+     * @param orderByType parametro de ordenacion
+     * @param start parametro de paginacion
+     * @param end parametro de paginacion
+     * @return listado de cursos
+     */
+    public List<CourseResultView> getOnlyFinishedCoursesOfUser(long groupId, long userId, ThemeDisplay themeDisplay,
+        String orderByColumn, String orderByType, int start, int end)
+    {
+        return courseFinder.getMyCourses(groupId, userId, false, false, true, null, themeDisplay, orderByColumn,
+            orderByType, start, end);
+    }
+
+    /**
+     * Devuelve los cursos del usuario que hayan finalizado, sin tener en cuenta de si lo ha completado o no
+     * 
+     * @param groupId groupId del site en el que se encuentra el curso
+     * @param userId id del usuario
+     * @param params filtros para los resultados
+     * @param themeDisplay themeDisplay
+     * @param orderByColumn parametro de ordenacion
+     * @param orderByType parametro de ordenacion
+     * @param start parametro de paginacion
+     * @param end parametro de paginacion
+     * @return listado de cursos
+     */
+    public List<CourseResultView> getOnlyFinishedCoursesOfUser(long groupId, long userId,
+        LinkedHashMap<String, Object> params, ThemeDisplay themeDisplay, String orderByColumn, String orderByType,
+        int start, int end)
+    {
+        return courseFinder.getMyCourses(groupId, userId, false, false, true, params, themeDisplay, orderByColumn,
+            orderByType, start, end);
+    }
+	
+    /**
+     * Cuenta los cursos del usuario que hayan finalizado o que hayan sido completados por el
+     * 
+     * @param groupId groupId del site en el que se encuentra el curso
+     * @param userId id del usuario
+     * @return numero de cursos
+     */
 	public int countFinishedCoursesOfUser(long groupId, long userId){
 		return courseFinder.countMyCourses(groupId, userId, false, true, true, null);
 	}
 	
+    /**
+     * Devuelve los cursos del usuario que hayan finalizado o que hayan sido completados por el
+     * 
+     * @param groupId groupId del site en el que se encuentra el curso
+     * @param userId id del usuario
+     * @param themeDisplay themeDisplay
+     * @param orderByColumn parametro de ordenacion
+     * @param orderByType parametro de ordenacion
+     * @param start parametro de paginacion
+     * @param end parametro de paginacion
+     * @return listado de cursos
+     */
 	public List<CourseResultView> getFinishedCoursesOfUser(long groupId, long userId, ThemeDisplay themeDisplay, String orderByColumn, String orderByType, int start, int end){
 		return courseFinder.getMyCourses(groupId, userId, false, true, true, null, themeDisplay, orderByColumn, orderByType, start, end);
 	}

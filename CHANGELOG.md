@@ -8,8 +8,14 @@ El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 ### Fixed
 
 - #192412 Se comprueba si el LearningActivityResult es nulo a la hora de obtener la puntuación del usuario en la vista de resultados de la actividad de tipo test
+- #194142 Valores mayores que 100. Corregido que cuando el tiempo del player es mayor que la duración deje el valor 100.
+
+### Updated
+
 - #191383 Se modifica el texto que se muestra a los usuarios en la actividad de tipo test
-#194142 Valores mayores que 100. Corregido que cuando el tiempo del player es mayor que la duración deje el valor 100.
+- #191384 Se añade una configuración para mostrar los cursos completados que sigan en periodo de ejecución como "En curso" en vez de finalizados
+- #191384 Se añaden nuevos métodos para buscar los cursos de un usuario que estén finalizados (ya ha pasado su tiempo de ejecución).
+
 ### Updated
 
 - #192169 Se mete un id a los input de tipo radio de la actividad de encuesta
