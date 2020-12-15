@@ -7,29 +7,28 @@ El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 
 ### Fixed
 
-#192412 Se comprueba si el LearningActivityResult es nulo a la hora de obtener la puntuación del usuario en la vista de resultados de la actividad de tipo test
+- #192412 Se comprueba si el LearningActivityResult es nulo a la hora de obtener la puntuación del usuario en la vista de resultados de la actividad de tipo test
+- #191383 Se modifica el texto que se muestra a los usuarios en la actividad de tipo test
 #194142 Valores mayores que 100. Corregido que cuando el tiempo del player es mayor que la duración deje el valor 100.
 ### Updated
 
-#192169 Se mete un id a los input de tipo radio de la actividad de encuesta
-#192172 Se añade un enlace al curso en el portlet de estadísticas. Si el curso tiene ediciones se muestra un enlace al lado del título
-#192171 Se actualiza el título y la descripción del assetEntry de los learningActivity cuando se actualizan éstas
-#191782 Se cambian los div del progreso en la actividad de tipo test por una etiqueta progress ya que en ocasiones la barra tenía la anchura mal
+- #192169 Se mete un id a los input de tipo radio de la actividad de encuesta
+- #192172 Se añade un enlace al curso en el portlet de estadísticas. Si el curso tiene ediciones se muestra un enlace al lado del título
+- #192171 Se actualiza el título y la descripción del assetEntry de los learningActivity cuando se actualizan éstas
+- #191782 Se cambian los div del progreso en la actividad de tipo test por una etiqueta progress ya que en ocasiones la barra tenía la anchura mal
 
 
 ## [4.3.3](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v4.3.3)
 
 ### Fixed
 
-#193502: Corregido el portlets no disponible cuando el curso está aprobado o suspensoen el progreso del usuario.
-
-
+- #193502: Corregido el portlets no disponible cuando el curso está aprobado o suspensoen el progreso del usuario.
 
 ## [4.3.2](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v4.3.2)
 
 ### Fixed
 
-#187773: Se manda a la creación de la edición el nombre de la edición (se mandaba el del curso concatenado) para evitar DuplicateName con el nombre del grupo.
+- #187773: Se manda a la creación de la edición el nombre de la edición (se mandaba el del curso concatenado) para evitar DuplicateName con el nombre del grupo.
 
 ## [4.3.1](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v4.3.1)
 
