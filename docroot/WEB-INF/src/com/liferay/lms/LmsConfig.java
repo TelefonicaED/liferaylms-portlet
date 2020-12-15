@@ -44,6 +44,8 @@ public class LmsConfig extends MVCPortlet {
 		boolean showActivityClassification = ParamUtil.getBoolean(request, "showActivityClassification", true);
 		boolean viewCoursesFinished = ParamUtil.getBoolean(request, "viewCoursesFinished", false);
 		int viewCourseFinishedType = ParamUtil.getInteger(request, "viewCourseFinishedType", LmsConstant.VIEW_COURSE_FINISHED_TYPE_DEFAULT);
+		
+		boolean showCompletedOpenCoursesInProgress = ParamUtil.getBoolean(request,"showCompletedOpenCoursesInProgress");
 		boolean linkResources = ParamUtil.getBoolean(request,"linkResources");
 		boolean sendMailToEditors = ParamUtil.getBoolean(request, "sendMailToEditors");
 		boolean sendMailToTutors = ParamUtil.getBoolean(request, "sendMailToTutors");
@@ -63,6 +65,7 @@ public class LmsConfig extends MVCPortlet {
 		prefs.setViewCoursesFinished(viewCoursesFinished);
 		LmsPrefsLocalServiceUtil.updateLmsPrefs(prefs);
 		savePreference(LmsConstant.CHECK_EXECUTION_DATE ,String.valueOf(checkExecutionDate) , themeDisplay.getCompanyId());
+		savePreference(LmsConstant.SHOW_COMPLETED_OPEN_COURSES_INPROGRESS ,String.valueOf(showCompletedOpenCoursesInProgress) , themeDisplay.getCompanyId());
 		savePreference(LmsConstant.RESOURCE_INTERNAL_DOCUMENT_LINKED ,String.valueOf(linkResources) , themeDisplay.getCompanyId());
 		savePreference(LmsConstant.SHOW_MODULE_CLASSIFICATION, String.valueOf(showModuleClassification), themeDisplay.getCompanyId());
 		savePreference(LmsConstant.SHOW_ACTIVITY_CLASSIFICATION, String.valueOf(showActivityClassification), themeDisplay.getCompanyId());
