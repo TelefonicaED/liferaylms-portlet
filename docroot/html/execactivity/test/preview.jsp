@@ -79,10 +79,21 @@
 	<p>
 		<liferay-ui:message key="execativity.test.try.notification" />
 	</p>
-	<%
+<%
 				if(activity.getTries()>0){
 %>
 	<p class="negrita">
+<%
+					if(activity.isImprove()){
+%>
+						<liferay-ui:message key="execativity.test.try.improve" arguments="<%=new Object[]{activity.getTries()} %>" />&nbsp;
+<%
+					} else { 
+%>
+						<liferay-ui:message key="execativity.test.try.ntries" arguments="<%=new Object[]{activity.getTries()} %>" />&nbsp;
+<% 
+					} 
+%>
 		<liferay-ui:message key="execativity.test.try.count"
 			arguments="<%=arguments %>" />
 	</p>

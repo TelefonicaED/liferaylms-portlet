@@ -311,7 +311,7 @@ if(showPopUpFinishedResult){%>
 				if(improveStr.equals("true")){
 					if(tries>0){
 	%>
-						<p class="negrita"><liferay-ui:message key="execativity.test.try.count" arguments="<%=new Object[]{userTries,tries} %>" /></p>
+						<p class="negrita"><liferay-ui:message key="execativity.test.try.improve" arguments="<%=new Object[]{tries} %>" />&nbsp;<liferay-ui:message key="execativity.test.try.count" arguments="<%=new Object[]{userTries,tries} %>" /></p>
 						<p class="color_tercero textcenter negrita"><liferay-ui:message key="execativity.test.try.confirmation.again" /></p>
 	<%
 					}
