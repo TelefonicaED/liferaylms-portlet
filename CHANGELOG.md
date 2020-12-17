@@ -15,13 +15,11 @@ El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 - #191383 Se modifica el texto que se muestra a los usuarios en la actividad de tipo test
 - #191384 Se añade una configuración para mostrar los cursos completados que sigan en periodo de ejecución como "En curso" en vez de finalizados
 - #191384 Se añaden nuevos métodos para buscar los cursos de un usuario que estén finalizados (ya ha pasado su tiempo de ejecución).
-
-### Updated
-
 - #192169 Se mete un id a los input de tipo radio de la actividad de encuesta
 - #192172 Se añade un enlace al curso en el portlet de estadísticas. Si el curso tiene ediciones se muestra un enlace al lado del título
 - #192171 Se actualiza el título y la descripción del assetEntry de los learningActivity cuando se actualizan éstas
 - #191782 Se cambian los div del progreso en la actividad de tipo test por una etiqueta progress ya que en ocasiones la barra tenía la anchura mal
+- #192653 Se añade un segundo de retardo al refrescar los portlets activity navigator y activities list al completar un video
 
 
 ## [4.3.3](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v4.3.3)

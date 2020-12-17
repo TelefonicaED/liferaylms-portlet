@@ -112,8 +112,8 @@
 	
 				// Process Success - A LearningActivityResult returned
 				finished = true;	
-				Liferay.Portlet.refresh('#p_p_id_activityNavigator_WAR_liferaylmsportlet_');
-				Liferay.Portlet.refresh('#p_p_id_lmsactivitieslist_WAR_liferaylmsportlet_');
+				setTimeout(function(){ Liferay.Portlet.refresh('#p_p_id_activityNavigator_WAR_liferaylmsportlet_'); }, 1000);
+				setTimeout(function(){Liferay.Portlet.refresh('#p_p_id_lmsactivitieslist_WAR_liferaylmsportlet_'); }, 1000);
 				player.setControls(true);
 				if('${isVimeoIframe}' == 'true'){
 					var src = 	document.getElementById("playervideo_vimeo_iframe").src;
