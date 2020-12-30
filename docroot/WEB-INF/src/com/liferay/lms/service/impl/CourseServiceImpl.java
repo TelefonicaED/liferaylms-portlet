@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.liferay.lms.asset.LearningActivityBaseAssetRenderer;
 import com.liferay.lms.auditing.AuditConstants;
 import com.liferay.lms.auditing.AuditingLogFactory;
 import com.liferay.lms.model.Course;
@@ -42,6 +43,7 @@ import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.GroupConstants;
+import com.liferay.portal.model.Layout;
 import com.liferay.portal.model.Role;
 import com.liferay.portal.model.RoleConstants;
 import com.liferay.portal.model.User;
@@ -51,6 +53,7 @@ import com.liferay.portal.security.auth.PrincipalException;
 import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.service.ClassNameLocalServiceUtil;
 import com.liferay.portal.service.GroupLocalServiceUtil;
+import com.liferay.portal.service.LayoutServiceUtil;
 import com.liferay.portal.service.RoleLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceContextThreadLocal;
@@ -613,6 +616,38 @@ public class CourseServiceImpl extends CourseServiceBaseImpl {
 		}
 		
 		return null;
+	}
+	
+	public long getPlidActivityViewer(long groupId) throws PortalException, SystemException{
+		long plid = 0;
+		int i = 0;
+	
+		List<Layout> layouts = layoutService.getLayouts(groupId, false);
+		while(plid == 0 && i < layouts.size()){
+			
+			if(layouts.get(i).getTypeSettings().contains(LearningActivityBaseAssetRenderer.ACTIVITY_VIEWER_PORTLET_ID)){
+				plid = layouts.get(i).getPlid();
+			}
+			i++;
+		}
+		
+		return plid;
+	}
+	
+	public String getFriendlyURLTeachers(long groupId) throws PortalException, SystemException{
+		String friendlyURL = null;
+		int i = 0;
+	
+		List<Layout> layouts = layoutService.getLayouts(groupId, false);
+		while(Validator.isNull(friendlyURL) && i < layouts.size()){
+			
+			if(layouts.get(i).getTypeSettings().contains(LearningActivityBaseAssetRenderer.TEACHERS_PORTLET_ID)){
+				friendlyURL = layouts.get(i).getFriendlyURL();
+			}
+			i++;
+		}
+		
+		return friendlyURL;
 	}
 
 }

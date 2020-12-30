@@ -26,6 +26,12 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.portlet.PortletRequest;
+import javax.portlet.WindowState;
+import javax.portlet.WindowStateException;
+import javax.servlet.http.HttpServletRequest;
+
+import com.liferay.lms.asset.LearningActivityBaseAssetRenderer;
 import com.liferay.lms.auditing.AuditConstants;
 import com.liferay.lms.auditing.AuditingLogFactory;
 import com.liferay.lms.learningactivity.LearningActivityType;
@@ -45,6 +51,7 @@ import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.portlet.LiferayPortletURL;
 import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.util.ContentTypes;
@@ -69,6 +76,8 @@ import com.liferay.portal.service.ResourcePermissionLocalServiceUtil;
 import com.liferay.portal.service.RoleLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.UserLocalServiceUtil;
+import com.liferay.portal.util.PortalUtil;
+import com.liferay.portlet.PortletURLFactoryUtil;
 import com.liferay.portlet.announcements.model.AnnouncementsEntry;
 import com.liferay.portlet.announcements.model.AnnouncementsFlagConstants;
 import com.liferay.portlet.announcements.service.AnnouncementsEntryServiceUtil;
@@ -1225,4 +1234,20 @@ private void sendNotification(String title, String content, String url, String t
 		return LearningActivityFinderUtil.findByPriority(position, moduleId, companyId);
 	}
 	
+	public LiferayPortletURL getURLActivity(long actId, long layoutPlid, HttpServletRequest httpServletRequest) throws WindowStateException{
+		LiferayPortletURL  gotoActivityURL = PortletURLFactoryUtil.create(httpServletRequest,
+				PortalUtil.getJsSafePortletId(LearningActivityBaseAssetRenderer.ACTIVITY_VIEWER_PORTLET_ID), 
+				layoutPlid, PortletRequest.RENDER_PHASE);
+		gotoActivityURL.removePublicRenderParameter("actionEditingActivity");
+		gotoActivityURL.removePublicRenderParameter("actionEditingModule");
+		gotoActivityURL.removePublicRenderParameter("actionCalifications");
+		gotoActivityURL.removePublicRenderParameter("actionEditingDetails");
+		gotoActivityURL.removePublicRenderParameter("moduleId");
+		gotoActivityURL.setWindowState(WindowState.NORMAL);
+		gotoActivityURL.setParameter("actId", Long.toString(actId));
+		gotoActivityURL.setPlid(layoutPlid);
+		gotoActivityURL.setPortletId(LearningActivityBaseAssetRenderer.ACTIVITY_VIEWER_PORTLET_ID);
+		
+		return gotoActivityURL;
+	}
 }

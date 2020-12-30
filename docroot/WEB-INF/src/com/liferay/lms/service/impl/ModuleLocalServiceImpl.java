@@ -18,7 +18,14 @@ package com.liferay.lms.service.impl;
 import java.util.Date;
 import java.util.List;
 
+import javax.portlet.ActionRequest;
+import javax.portlet.PortletRequest;
+import javax.portlet.WindowState;
+import javax.portlet.WindowStateException;
+import javax.servlet.http.HttpServletRequest;
+
 import com.liferay.counter.service.CounterLocalServiceUtil;
+import com.liferay.lms.asset.LearningActivityBaseAssetRenderer;
 import com.liferay.lms.auditing.AuditConstants;
 import com.liferay.lms.auditing.AuditingLogFactory;
 import com.liferay.lms.model.LearningActivity;
@@ -45,6 +52,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.portlet.LiferayPortletURL;
 import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.search.Indexer;
@@ -54,12 +62,20 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.model.Group;
+import com.liferay.portal.model.Layout;
+import com.liferay.portal.model.PortletConstants;
 import com.liferay.portal.model.ResourceConstants;
 import com.liferay.portal.model.Role;
 import com.liferay.portal.model.RoleConstants;
+import com.liferay.portal.service.GroupLocalServiceUtil;
+import com.liferay.portal.service.LayoutLocalServiceUtil;
+import com.liferay.portal.service.LayoutServiceUtil;
 import com.liferay.portal.service.ResourcePermissionLocalServiceUtil;
 import com.liferay.portal.service.RoleLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
+import com.liferay.portal.util.PortalUtil;
+import com.liferay.portlet.PortletURLFactoryUtil;
 import com.liferay.portlet.asset.model.AssetEntry;
 import com.liferay.util.LmsLocaleUtil;
 
@@ -690,5 +706,22 @@ public class ModuleLocalServiceImpl extends ModuleLocalServiceBaseImpl {
 	
 	public List<Module> getModulesByCompanyId(long companyId) throws SystemException{
 		return modulePersistence.findByCompanyId(companyId);
+	}
+	
+	public LiferayPortletURL getURLModule(long moduleId, long layoutPlid, HttpServletRequest httpServletRequest) throws WindowStateException{
+		LiferayPortletURL  gotoModuleURL = PortletURLFactoryUtil.create(httpServletRequest,
+				PortalUtil.getJsSafePortletId(LearningActivityBaseAssetRenderer.ACTIVITY_VIEWER_PORTLET_ID), 
+				layoutPlid, PortletRequest.RENDER_PHASE);	
+		gotoModuleURL.removePublicRenderParameter("actionEditingActivity");
+		gotoModuleURL.removePublicRenderParameter("actionEditingModule");
+		gotoModuleURL.removePublicRenderParameter("actionCalifications");
+		gotoModuleURL.removePublicRenderParameter("actionEditingDetails");
+		gotoModuleURL.removePublicRenderParameter("actId");
+		gotoModuleURL.setWindowState(WindowState.NORMAL);
+		gotoModuleURL.setParameter("moduleId", Long.toString(moduleId));
+		gotoModuleURL.setPlid(layoutPlid);
+		gotoModuleURL.setPortletId(LearningActivityBaseAssetRenderer.ACTIVITY_VIEWER_PORTLET_ID);
+		
+		return gotoModuleURL;
 	}
 }

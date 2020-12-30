@@ -455,5 +455,33 @@ public class CourseServiceSoap {
 		}
 	}
 
+	public static long getPlidActivityViewer(long groupId)
+		throws RemoteException {
+		try {
+			long returnValue = CourseServiceUtil.getPlidActivityViewer(groupId);
+
+			return returnValue;
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	public static java.lang.String getFriendlyURLTeachers(long groupId)
+		throws RemoteException {
+		try {
+			java.lang.String returnValue = CourseServiceUtil.getFriendlyURLTeachers(groupId);
+
+			return returnValue;
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
 	private static Log _log = LogFactoryUtil.getLog(CourseServiceSoap.class);
 }
