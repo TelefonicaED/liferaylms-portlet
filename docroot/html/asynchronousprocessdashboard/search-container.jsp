@@ -17,66 +17,78 @@ Format dateFormat = FastDateFormatFactoryUtil.getDateTime(locale, timeZone);
 			className="com.liferay.lms.model.AsynchronousProcessAudit"
 			keyProperty="asynchronousProcessAuditId" modelVar="asynchronousProccessAudit">
 	
-		<liferay-ui:search-container-column-text name="type">
-			<c:if test="${asynchronousProccessAudit.status eq 0}">
-				<span class="status-not-started"></span>
-			</c:if>
+			<liferay-ui:search-container-column-text name="type">
+				<c:if test="${asynchronousProccessAudit.status eq 0}">
+					<span class="status-not-started"></span>
+				</c:if>
+				
+				<c:if test="${asynchronousProccessAudit.status eq 1}">
+					<span class="status-started"></span>
+				</c:if>
+				<c:if test="${asynchronousProccessAudit.status eq 2}">
+					<span class="status-ok"></span>
+				</c:if>
+				<c:if test="${asynchronousProccessAudit.status eq 3}">
+					<span class="status-error"></span>
+				</c:if>
+				<liferay-ui:message key="${asynchronousProccessAudit.type}"/>
+			</liferay-ui:search-container-column-text>
+			<liferay-ui:search-container-column-text name="class">
+				<liferay-ui:message key="${asynchronousProccessAudit.className}"/> 
+			</liferay-ui:search-container-column-text>
+			<liferay-ui:search-container-column-text name="id">
+				${asynchronousProccessAudit.classPK}
+			</liferay-ui:search-container-column-text>
 			
-			<c:if test="${asynchronousProccessAudit.status eq 1}">
-				<span class="status-started"></span>
+			<c:if test="${showScreenName}">
+				<liferay-ui:search-container-column-text name="screenName">
+					${asynchronousProccessAudit.userScreenName}
+				</liferay-ui:search-container-column-text>
 			</c:if>
-			<c:if test="${asynchronousProccessAudit.status eq 2}">
-				<span class="status-ok"></span>
-			</c:if>
-			<c:if test="${asynchronousProccessAudit.status eq 3}">
-				<span class="status-error"></span>
-			</c:if>
-			<liferay-ui:message key="${asynchronousProccessAudit.type}"/>
-		</liferay-ui:search-container-column-text>
-		<liferay-ui:search-container-column-text name="class">
-			<liferay-ui:message key="${asynchronousProccessAudit.className}"/> 
-		</liferay-ui:search-container-column-text>
-		<liferay-ui:search-container-column-text name="id">
-			${asynchronousProccessAudit.classPK}
-		</liferay-ui:search-container-column-text>
-		<liferay-ui:search-container-column-text name="startDate">
-			<c:if test="${not empty asynchronousProccessAudit.createDate}">
-				<%=dateFormat.format(asynchronousProccessAudit.getCreateDate()) %> 
-			</c:if>
-		</liferay-ui:search-container-column-text>
-		<liferay-ui:search-container-column-text name="endDate">
-			<c:if test="${not empty asynchronousProccessAudit.endDate}">
-				<%=dateFormat.format(asynchronousProccessAudit.getEndDate())%>
-			</c:if>
-		</liferay-ui:search-container-column-text>
-		
-		<liferay-ui:search-container-column-text name="message">
-			<c:choose>
-				<c:when test="${asynchronousProccessAudit.status eq 0}">
-					<liferay-ui:message key="asynchronous-process-audit.process-not-started"/>
-				</c:when>
-				<c:otherwise>
-					<liferay-ui:message key="${asynchronousProccessAudit.statusMessage}"/>
-				</c:otherwise>
-			</c:choose>
-		</liferay-ui:search-container-column-text>
+			<liferay-ui:search-container-column-text name="startDate">
+				<c:if test="${not empty asynchronousProccessAudit.createDate}">
+					<%=dateFormat.format(asynchronousProccessAudit.getCreateDate()) %> 
+				</c:if>
+			</liferay-ui:search-container-column-text>
+			<liferay-ui:search-container-column-text name="endDate">
+				<c:if test="${not empty asynchronousProccessAudit.endDate}">
+					<%=dateFormat.format(asynchronousProccessAudit.getEndDate())%>
+				</c:if>
+			</liferay-ui:search-container-column-text>
+			
+			<liferay-ui:search-container-column-text name="message">
+				<c:choose>
+					<c:when test="${asynchronousProccessAudit.status eq 0}">
+						<liferay-ui:message key="asynchronous-process-audit.process-not-started"/>
+					</c:when>
+					<c:otherwise>
+						<liferay-ui:message key="${asynchronousProccessAudit.statusMessage}"/>
+					</c:otherwise>
+				</c:choose>
+			</liferay-ui:search-container-column-text>
 			<c:if test="${showExtraContent}">
 				<liferay-ui:search-container-column-text align="center" name="extraContent" >
+				
 					<c:if test="${not empty asynchronousProccessAudit.extraContent}">
-						<jsp:useBean id="jsonFactoryUtil" class="com.liferay.portal.kernel.json.JSONFactoryUtil"/>
-									<c:set var="obj" value="${jsonFactoryUtil.createJSONObject(asynchronousProccessAudit.extraContent)}"/>
-										<liferay-util:include portletId="${obj.getString(\"portletId\")}" page="${obj.getString(\"pathControl\")}"  >
-											  <liferay-util:param name="namespace" value="${obj.getString(\"portletId\")}" />
-											  <liferay-util:param name="path" value="${obj.getString(\"url\")}" />
-											  <liferay-util:param name="contentType" value="${obj.getString(\"contentType\")}" />
-											  <liferay-util:param name="id" value="${asynchronousProccessAudit.asynchronousProcessAuditId}" />
-										</liferay-util:include> 	  
-									
-							</c:if>
-						</liferay-ui:search-container-column-text>
+						<jsp:useBean id="jsonFactoryUtil" class="com.liferay.portal.kernel.json.JSONFactoryUtil"/>						
+						<c:set var="obj" value="${jsonFactoryUtil.createJSONObject(asynchronousProccessAudit.extraContent)}"/>						
+						<c:choose>
+						<c:when test="${not empty obj.getString(\"portletId\")}">
+							<liferay-util:include portletId="${obj.getString(\"portletId\")}" page="${obj.getString(\"pathControl\")}"  >
+								  <liferay-util:param name="namespace" value="${obj.getString(\"portletId\")}" />
+								  <liferay-util:param name="path" value="${obj.getString(\"url\")}" />
+								  <liferay-util:param name="contentType" value="${obj.getString(\"contentType\")}" />
+								  <liferay-util:param name="id" value="${asynchronousProccessAudit.asynchronousProcessAuditId}" />
+							</liferay-util:include>
+						</c:when>
+						<c:when test="${not empty obj.getString(\"data\")}">
+							${obj.getString("data")}
+						</c:when>
+						</c:choose>
+						   
 					</c:if>
-		
-		
+				</liferay-ui:search-container-column-text>
+			</c:if>
 			</liferay-ui:search-container-row>
 		<liferay-ui:search-iterator />
 	

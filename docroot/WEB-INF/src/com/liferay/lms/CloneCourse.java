@@ -30,6 +30,8 @@ import com.liferay.lms.util.LmsConstant;
 import com.liferay.portal.DuplicateGroupException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
+import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -38,6 +40,7 @@ import com.liferay.portal.kernel.messaging.MessageBusUtil;
 import com.liferay.portal.kernel.messaging.MessageListener;
 import com.liferay.portal.kernel.messaging.MessageListenerException;
 import com.liferay.portal.kernel.repository.model.FileEntry;
+import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.DocumentException;
@@ -227,6 +230,19 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 			newCourse.setExecutionStartDate(startDate);
 			newCourse.setExecutionEndDate(endDate);
 			
+			StringBuilder extraContent = new StringBuilder();
+            extraContent.append(LanguageUtil.get(themeDisplay.getLocale(), "course.label"))
+                .append(StringPool.COLON).append(StringPool.SPACE)
+                .append(course.getTitle(themeDisplay.getLocale()));     
+            
+            extraContent.append("<br>").append(LanguageUtil.get(themeDisplay.getLocale(), "new-course"))
+                .append(StringPool.COLON).append(StringPool.SPACE)
+                .append(newCourse.getTitle(themeDisplay.getLocale()));
+			
+            JSONObject json =JSONFactoryUtil.createJSONObject();            
+            json.put("data", extraContent.toString());
+            
+            process.setExtraContent(json.toString());
 			process.setClassPK(newCourse.getCourseId());
 			process = AsynchronousProcessAuditLocalServiceUtil.updateAsynchronousProcessAudit(process);
 		} catch(DuplicateGroupException e){

@@ -11,6 +11,9 @@ import com.liferay.lms.service.AsynchronousProcessAuditLocalServiceUtil;
 import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.lms.util.LmsConstant;
 import com.liferay.portal.kernel.cache.MultiVMPoolUtil;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
+import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.lar.PortletDataHandlerKeys;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -18,7 +21,7 @@ import com.liferay.portal.kernel.messaging.Message;
 import com.liferay.portal.kernel.messaging.MessageListener;
 import com.liferay.portal.kernel.messaging.MessageListenerException;
 import com.liferay.portal.kernel.util.FileUtil;
-import com.liferay.portal.kernel.util.MapUtil;
+import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.SystemProperties;
 import com.liferay.portal.model.Role;
 import com.liferay.portal.model.User;
@@ -67,22 +70,35 @@ public class ExportCourse implements MessageListener {
 			
 			long processId = message.getLong("asynchronousProcessAuditId");
 			
+			this.groupId = message.getLong("groupId");
+            this.fileName = message.getString("fileName");
+            this.key = message.getString(key);
+            this.serviceContext = (ServiceContext)message.get("serviceContext");
+            this.themeDisplay = (ThemeDisplay)message.get("themeDisplay");
+			
 			process = AsynchronousProcessAuditLocalServiceUtil.fetchAsynchronousProcessAudit(processId);
 			process = AsynchronousProcessAuditLocalServiceUtil.updateProcessStatus(process, null, LmsConstant.STATUS_IN_PROGRESS, "");
 			statusMessage ="";
 			error = false;
 			Course course = CourseLocalServiceUtil.fetchByGroupCreatedId(groupId);
 			if(course!=null){
+                StringBuilder extraContent = new StringBuilder();
+                extraContent.append(LanguageUtil.get(themeDisplay.getLocale(), "course.label"))
+                    .append(StringPool.COLON).append(StringPool.SPACE)
+                    .append(course.getTitle(themeDisplay.getLocale()));
+
+                extraContent.append("<br>").append(LanguageUtil.get(themeDisplay.getLocale(), "courseadmin.importuserrole.file"))
+                    .append(StringPool.COLON).append(StringPool.SPACE)
+                    .append(fileName);
+			    
+                JSONObject json =JSONFactoryUtil.createJSONObject();            
+                json.put("data", extraContent.toString());
+                
+                process.setExtraContent(json.toString());
 				process.setClassPK(course.getCourseId());
 				process = AsynchronousProcessAuditLocalServiceUtil.updateAsynchronousProcessAudit(process);
 			}
 			
-			this.groupId	= message.getLong("groupId");
-			this.fileName = message.getString("fileName");
-			this.key = message.getString(key);
-			this.serviceContext = (ServiceContext)message.get("serviceContext");
-			this.themeDisplay = (ThemeDisplay)message.get("themeDisplay");
-		
 			Role adminRole = RoleLocalServiceUtil.getRole(themeDisplay.getCompanyId(),"Administrator");
 			List<User> adminUsers = UserLocalServiceUtil.getRoleUsers(adminRole.getRoleId());
 			 

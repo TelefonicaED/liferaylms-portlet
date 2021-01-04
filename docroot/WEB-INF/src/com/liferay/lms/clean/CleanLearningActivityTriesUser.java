@@ -5,11 +5,13 @@ import java.util.List;
 import java.util.Locale;
 
 import com.liferay.lms.model.AsynchronousProcessAudit;
+import com.liferay.lms.model.Course;
 import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.model.LearningActivityResult;
 import com.liferay.lms.model.LearningActivityTry;
 import com.liferay.lms.service.AsynchronousProcessAuditLocalServiceUtil;
 import com.liferay.lms.service.ClpSerializer;
+import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityResultLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityTryLocalServiceUtil;
 import com.liferay.lms.util.LmsConstant;
@@ -17,12 +19,16 @@ import com.liferay.portal.kernel.bean.PortletBeanLocatorUtil;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
+import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.messaging.Message;
 import com.liferay.portal.kernel.messaging.MessageBusUtil;
 import com.liferay.portal.kernel.messaging.MessageListener;
 import com.liferay.portal.kernel.messaging.MessageListenerException;
+import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.User;
 
 public class CleanLearningActivityTriesUser extends CleanLearningActivity implements MessageListener{
@@ -76,6 +82,21 @@ public class CleanLearningActivityTriesUser extends CleanLearningActivity implem
 			long processId = message.getLong("asynchronousProcessAuditId");
 			process = AsynchronousProcessAuditLocalServiceUtil.fetchAsynchronousProcessAudit(processId);
 			process = AsynchronousProcessAuditLocalServiceUtil.updateProcessStatus(process, null, LmsConstant.STATUS_IN_PROGRESS, "");
+			
+			Course course = CourseLocalServiceUtil.fetchByGroupCreatedId(la.getGroupId());
+			StringBuilder extraContent = new StringBuilder();
+            extraContent.append(LanguageUtil.get(Locale.getDefault(), "course.label"))
+                .append(StringPool.COLON).append(StringPool.SPACE)
+                .append(course.getTitle(Locale.getDefault()));     
+            
+            extraContent.append("<br>").append(LanguageUtil.get(Locale.getDefault(), "learningactivity"))
+                .append(StringPool.COLON).append(StringPool.SPACE)
+                .append(la.getTitle(Locale.getDefault()));
+			
+            JSONObject json =JSONFactoryUtil.createJSONObject();            
+            json.put("data", extraContent.toString());
+            
+            process.setExtraContent(json.toString());
 			process.setClassPK(la.getActId());
 			process = AsynchronousProcessAuditLocalServiceUtil.updateAsynchronousProcessAudit(process);
 			statusMessage ="";

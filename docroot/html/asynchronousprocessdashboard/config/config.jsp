@@ -18,6 +18,8 @@
 	
 	boolean onlyForUserOwner = (preferences.getValue("preferences--onlyForUserOwner--", "false")).compareTo("true") == 0; 
 	boolean showExtraContent = (preferences.getValue("preferences--showExtraContent--", "false")).compareTo("true") == 0; 
+	boolean showScreenName = (preferences.getValue("preferences--showScreenName--", "false")).compareTo("true") == 0; 
+	
 	String classNamePrefsValues = preferences.getValue("className", "");
 	
 	String refreshPageEachXSeg = (String)preferences.getValue("refreshPageEachXSeg", "0"); 
@@ -46,6 +48,8 @@
 			</aui:select>
 	
 			<aui:input type="checkbox" name="preferences--onlyForUserOwner--" label="asynchronous-process-audit.config.only-owner" value="<%=onlyForUserOwner %>" checked="<%=onlyForUserOwner %>"/>
+			
+			<aui:input type="checkbox" name="preferences--showScreenName--" label="asynchronous-process-audit.config.show-screenname" value="<%=showScreenName %>" checked="<%=showScreenName %>"/>
 			
 			<aui:input type="checkbox" name="preferences--showExtraContent--" label="asynchronous-process-audit.config.show-extra-content" value="<%=showExtraContent %>" checked="<%=showExtraContent %>"/>
 			
