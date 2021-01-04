@@ -8,6 +8,7 @@ import java.util.List;
 
 import javax.portlet.PortletException;
 import javax.portlet.PortletPreferences;
+import javax.portlet.PortletRequest;
 import javax.portlet.PortletRequestDispatcher;
 import javax.portlet.PortletURL;
 import javax.portlet.RenderRequest;
@@ -62,20 +63,15 @@ public class AsynchronousProcessDashboard extends MVCPortlet {
 		log.debug(":1: VIEW ASSYNCRONOUS PROCESSES DASHBOARD "
 				+ this.viewJSP);
 		
-		try {
-			
-			PortletPreferences prefs;
-			String portletResource = ParamUtil.getString(renderRequest, "portletResource");	
-			if (Validator.isNotNull(portletResource)){
-				prefs = PortletPreferencesFactoryUtil.getPortletSetup(renderRequest, portletResource);
-			} else {
-				prefs = renderRequest.getPreferences();
-			}
+		try {			
+			PortletPreferences prefs = _getPreferences(renderRequest);
 			
 			boolean onlyForUserOwner = (prefs.getValue("preferences--onlyForUserOwner--", "false")).compareTo("true") == 0;
 			renderRequest.setAttribute("onlyForUserOwner", onlyForUserOwner);
 			boolean showExtraContent = (prefs.getValue("preferences--showExtraContent--", "true")).compareTo("true") == 0;
-			renderRequest.setAttribute("showExtraContent", showExtraContent);
+            renderRequest.setAttribute("showExtraContent", showExtraContent);
+			boolean showScreenName = (prefs.getValue("preferences--showScreenName--", "true")).compareTo("true") == 0;
+			renderRequest.setAttribute("showScreenName", showScreenName);
 			String classNamePrefsValues = prefs.getValue("className", StringPool.BLANK);
 			String classNameValue = ParamUtil.getString(renderRequest,"className", "");
 			
@@ -202,7 +198,7 @@ public class AsynchronousProcessDashboard extends MVCPortlet {
 		
 		
 	}
-	
+
 	public void serveResource(ResourceRequest resourceRequest,
 			ResourceResponse resourceResponse) throws IOException,
 			PortletException {
@@ -267,25 +263,18 @@ public class AsynchronousProcessDashboard extends MVCPortlet {
 				SearchContainer.DEFAULT_DELTA, iteratorURL, null,
 				"no-results");
 			long userId =0L;
-			boolean onlyForUserOwner = true;
-			
+			PortletPreferences prefs = null;
+            try {
+                prefs = _getPreferences(resourceRequest);
+            } catch (PortalException | SystemException e) {
+                throw new PortletException("PortletPreferences not found");
+            }
+			boolean onlyForUserOwner = (prefs.getValue("preferences--onlyForUserOwner--", "false")).compareTo("true") == 0;			
 			if(onlyForUserOwner){
 				userId = themeDisplay.getUserId();
 			}
 			
-			if(Validator.isNull(classNameValue)){
-				PortletPreferences prefs;
-				String portletResource = ParamUtil.getString(resourceRequest, "portletResource");	
-				if (Validator.isNotNull(portletResource)){
-					try {
-						prefs = PortletPreferencesFactoryUtil.getPortletSetup(resourceRequest, portletResource);
-					} catch (PortalException | SystemException e) {
-						e.printStackTrace();
-						prefs = resourceRequest.getPreferences();
-					}
-				} else {
-					prefs = resourceRequest.getPreferences();
-				}
+			if(Validator.isNull(classNameValue)){				
 				boolean showAllClassName = (prefs.getValue("preferences--showAllClassName--", "true")).compareTo("true") == 0;
 				// Obtenemos todos los classname distintos para efectuar la lista; Si estan por preferencias los editamos
 				if(!showAllClassName){
@@ -342,5 +331,15 @@ public class AsynchronousProcessDashboard extends MVCPortlet {
 		}
 	}
 	
-	
+    private PortletPreferences _getPreferences(PortletRequest renderRequest) throws PortalException, SystemException
+    {
+        PortletPreferences prefs;
+        String portletResource = ParamUtil.getString(renderRequest, "portletResource"); 
+        if (Validator.isNotNull(portletResource)){
+            prefs = PortletPreferencesFactoryUtil.getPortletSetup(renderRequest, portletResource);
+        } else {
+            prefs = renderRequest.getPreferences();
+        }
+        return prefs;
+    }
 }
