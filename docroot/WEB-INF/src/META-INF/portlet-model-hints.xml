@@ -161,31 +161,14 @@
 		<field name="name" type="String" localized="true" />
 		<field name="description" type="String" localized="true" />
 		<field name="iconId" type="long" />
+		<field name="classNameId" type="long" />
+		<field name="active" type="boolean" />
 	</model>
-	<model name="com.liferay.lms.model.CourseTypeCalificationType">
-		<field name="courseTypeCalificationTypeId" type="long" />
+	<model name="com.liferay.lms.model.CourseTypeRelation">
+		<field name="courseTypeRelationId" type="long" />
 		<field name="courseTypeId" type="long" />
-		<field name="calificationType" type="long" />
-	</model>
-	<model name="com.liferay.lms.model.CourseTypeCourseEval">
-		<field name="courseTypeEvalutationTypeId" type="long" />
-		<field name="courseTypeId" type="long" />
-		<field name="courseEvalId" type="String" />
-	</model>
-	<model name="com.liferay.lms.model.CourseTypeInscriptionType">
-		<field name="courseTypeInscriptionTypeId" type="long" />
-		<field name="courseTypeId" type="long" />
-		<field name="inscriptionType" type="long" />
-	</model>
-	<model name="com.liferay.lms.model.CourseTypeLearningActivity">
-		<field name="courseTypeLearningActivityId" type="long" />
-		<field name="courseTypeId" type="long" />
-		<field name="learningActivityTypeId" type="long" />
-	</model>
-	<model name="com.liferay.lms.model.CourseTypeTemplate">
-		<field name="courseTypeTemplateId" type="long" />
-		<field name="courseTypeId" type="long" />
-		<field name="templateId" type="long" />
+		<field name="classNameId" type="long" />
+		<field name="classPK" type="long" />
 	</model>
 	<model name="com.liferay.lms.model.LearningActivity">
 		<field name="uuid" type="String" />

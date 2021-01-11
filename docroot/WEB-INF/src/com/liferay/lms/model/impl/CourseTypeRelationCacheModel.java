@@ -14,7 +14,7 @@
 
 package com.liferay.lms.model.impl;
 
-import com.liferay.lms.model.CourseTypeTemplate;
+import com.liferay.lms.model.CourseTypeRelation;
 
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.model.CacheModel;
@@ -22,42 +22,46 @@ import com.liferay.portal.model.CacheModel;
 import java.io.Serializable;
 
 /**
- * The cache model class for representing CourseTypeTemplate in entity cache.
+ * The cache model class for representing CourseTypeRelation in entity cache.
  *
  * @author TLS
- * @see CourseTypeTemplate
+ * @see CourseTypeRelation
  * @generated
  */
-public class CourseTypeTemplateCacheModel implements CacheModel<CourseTypeTemplate>,
+public class CourseTypeRelationCacheModel implements CacheModel<CourseTypeRelation>,
 	Serializable {
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(7);
+		StringBundler sb = new StringBundler(9);
 
-		sb.append("{courseTypeTemplateId=");
-		sb.append(courseTypeTemplateId);
+		sb.append("{courseTypeRelationId=");
+		sb.append(courseTypeRelationId);
 		sb.append(", courseTypeId=");
 		sb.append(courseTypeId);
-		sb.append(", templateId=");
-		sb.append(templateId);
+		sb.append(", classNameId=");
+		sb.append(classNameId);
+		sb.append(", classPK=");
+		sb.append(classPK);
 		sb.append("}");
 
 		return sb.toString();
 	}
 
-	public CourseTypeTemplate toEntityModel() {
-		CourseTypeTemplateImpl courseTypeTemplateImpl = new CourseTypeTemplateImpl();
+	public CourseTypeRelation toEntityModel() {
+		CourseTypeRelationImpl courseTypeRelationImpl = new CourseTypeRelationImpl();
 
-		courseTypeTemplateImpl.setCourseTypeTemplateId(courseTypeTemplateId);
-		courseTypeTemplateImpl.setCourseTypeId(courseTypeId);
-		courseTypeTemplateImpl.setTemplateId(templateId);
+		courseTypeRelationImpl.setCourseTypeRelationId(courseTypeRelationId);
+		courseTypeRelationImpl.setCourseTypeId(courseTypeId);
+		courseTypeRelationImpl.setClassNameId(classNameId);
+		courseTypeRelationImpl.setClassPK(classPK);
 
-		courseTypeTemplateImpl.resetOriginalValues();
+		courseTypeRelationImpl.resetOriginalValues();
 
-		return courseTypeTemplateImpl;
+		return courseTypeRelationImpl;
 	}
 
-	public long courseTypeTemplateId;
+	public long courseTypeRelationId;
 	public long courseTypeId;
-	public long templateId;
+	public long classNameId;
+	public long classPK;
 }

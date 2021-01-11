@@ -1,4 +1,3 @@
-<%@page import="com.liferay.lms.model.CourseTypeTemplate"%>
 <%@page import="com.liferay.lms.service.CourseTypeLocalServiceUtil"%>
 <%@page import="com.liferay.lms.course.inscriptiontype.InscriptionType"%>
 <%@page import="com.liferay.lms.course.inscriptiontype.InscriptionTypeRegistry"%>
@@ -43,7 +42,6 @@
 <%@page import="com.liferay.lms.model.Course"%>
 <%@page import="com.liferay.lms.service.CourseTypeLocalServiceUtil"%>
 <%@page import="com.liferay.lms.model.CourseType"%>
-<%@page import="com.liferay.lms.model.CourseTypeTemplate"%>
 <%@page import="javax.portlet.PortletPreferences"%>
 <%@page import="com.liferay.portlet.PortletPreferencesFactoryUtil"%>
 <%@page import="com.liferay.portal.model.ModelHintsUtil"%>

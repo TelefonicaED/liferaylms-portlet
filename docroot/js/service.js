@@ -50,7 +50,8 @@ Liferay.Service.registerClass(
 		getLearningActivity: true,
 		addLearningActivity: true,
 		modLearningActivity: true,
-		isLocked: true
+		isLocked: true,
+		getURLActivity: true
 	}
 );
 

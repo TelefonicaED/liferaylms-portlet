@@ -16,6 +16,9 @@ import com.liferay.lms.learningactivity.LearningActivityTypeRegistry;
 import com.liferay.lms.model.AsynchronousProcessAudit;
 import com.liferay.lms.model.Course;
 import com.liferay.lms.model.CourseCompetence;
+import com.liferay.lms.model.CourseType;
+import com.liferay.lms.model.CourseTypeFactory;
+import com.liferay.lms.model.CourseTypeI;
 import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.model.LmsPrefs;
 import com.liferay.lms.model.Module;
@@ -549,6 +552,13 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 			moduleNew.setPrecedence(modulePredecesorIdNew);
 			ModuleLocalServiceUtil.updateModule(moduleNew);
 		}
+		
+		CourseTypeFactoryRegistry courseTypeFactoryRegistry = new CourseTypeFactoryRegistry();
+		AssetEntry entry=AssetEntryLocalServiceUtil.getEntry(Course.class.getName(),newCourse.getCourseId());
+		CourseTypeFactory courseTypeFactory = courseTypeFactoryRegistry.getCourseTypeFactory(entry.getClassTypeId());
+		CourseTypeI courseType = courseTypeFactory.getCourseType(newCourse);
+		
+		courseType.copyCourse(course, serviceContext);
 		
 		if(this.cloneForum){
 			//-------------------------------------------

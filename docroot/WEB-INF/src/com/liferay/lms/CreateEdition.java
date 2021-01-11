@@ -16,6 +16,8 @@ import com.liferay.lms.learningactivity.LearningActivityTypeRegistry;
 import com.liferay.lms.learningactivity.TestLearningActivityType;
 import com.liferay.lms.model.AsynchronousProcessAudit;
 import com.liferay.lms.model.Course;
+import com.liferay.lms.model.CourseTypeFactory;
+import com.liferay.lms.model.CourseTypeI;
 import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.model.Module;
 import com.liferay.lms.model.impl.ModuleImpl;
@@ -264,6 +266,14 @@ public class CreateEdition extends CourseCopyUtil implements MessageListener {
 		
 		//Create modules and activities
 		createModulesAndActivities(newCourse, siteMemberRole, group.getGroupId());
+		
+		CourseTypeFactoryRegistry courseTypeFactoryRegistry = new CourseTypeFactoryRegistry();
+		AssetEntry entry=AssetEntryLocalServiceUtil.getEntry(Course.class.getName(),newCourse.getCourseId());
+		CourseTypeFactory courseTypeFactory = courseTypeFactoryRegistry.getCourseTypeFactory(entry.getClassTypeId());
+		CourseTypeI courseType = courseTypeFactory.getCourseType(newCourse);
+		
+		courseType.copyCourse(course, serviceContext);
+		
 		Date endDate = new Date();
 		if(!error){
 			AsynchronousProcessAuditLocalServiceUtil.updateProcessStatus(process, endDate, LmsConstant.STATUS_FINISH, "asynchronous-proccess-audit.status-ok");

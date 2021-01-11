@@ -36,11 +36,29 @@
 					 <liferay-ui:icon 
  						image="edit" 
  					 	url="${actionURL}" /> 
- 				<c:if test="${!courseType.hasCourses() }">
+ 				<c:if test="${!courseType.hasCourses() && courseType.classNameId == 0}">
 					<c:set var="actionURL" value="javascript:${renderResponse.getNamespace()}deleteCourseType('${courseType.courseTypeId }');"/> 
 	 				   <liferay-ui:icon 
 	 						image="delete" 
 	 						url="${actionURL}" /> 
+ 				</c:if>
+ 				<c:if test="${courseType.active }">
+ 					<portlet:actionURL name="saveCourseTypeActive" var="saveCourseTypeActiveURL">
+						<portlet:param name="courseTypeId" value="${courseType.courseTypeId }" />
+						<portlet:param name="active" value="false" />
+					</portlet:actionURL>
+					<liferay-ui:icon 
+	 						image="inactive" 
+	 						url="${saveCourseTypeActiveURL}" /> 
+ 				</c:if>
+ 				<c:if test="${!courseType.active }">
+ 					<portlet:actionURL name="saveCourseTypeActive" var="saveCourseTypeActiveURL">
+						<portlet:param name="courseTypeId" value="${courseType.courseTypeId }" />
+						<portlet:param name="active" value="true" />
+					</portlet:actionURL>
+					<liferay-ui:icon 
+	 						image="active" 
+	 						url="${saveCourseTypeActiveURL}" /> 
  				</c:if>
  			</liferay-ui:icon-menu> 
 		</liferay-ui:search-container-column-text>

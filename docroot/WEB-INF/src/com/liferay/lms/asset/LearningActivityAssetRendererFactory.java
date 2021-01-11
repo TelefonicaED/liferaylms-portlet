@@ -19,6 +19,7 @@ import com.liferay.lms.model.Course;
 import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.service.ClpSerializer;
 import com.liferay.lms.service.CourseLocalServiceUtil;
+import com.liferay.lms.service.CourseServiceUtil;
 import com.liferay.lms.service.LearningActivityLocalServiceUtil;
 import com.liferay.lms.service.LmsPrefsLocalServiceUtil;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
@@ -121,19 +122,14 @@ public class LearningActivityAssetRendererFactory extends BaseAssetRendererFacto
 			return GetterUtil.DEFAULT_LONG;
 		}
 
-		@SuppressWarnings("unchecked")
-		List<Layout> layouts = LayoutLocalServiceUtil.dynamicQuery(LayoutLocalServiceUtil.dynamicQuery().
-				add(PropertyFactoryUtil.forName("privateLayout").eq(false)).
-				add(PropertyFactoryUtil.forName("companyId").eq(course.getCompanyId())).
-				add(PropertyFactoryUtil.forName("groupId").eq(course.getGroupCreatedId())).
-				add(PropertyFactoryUtil.forName("friendlyURL").eq("/reto")),0,1);
-
-		if(layouts.isEmpty()) {
-			return GetterUtil.DEFAULT_LONG;
+		long plid = GetterUtil.DEFAULT_LONG;
+		try {
+			plid = CourseServiceUtil.getPlidActivityViewer(course.getGroupCreatedId());
+		} catch (PortalException e) {
+			e.printStackTrace();
 		}
-		else {
-			return layouts.get(0).getPlid();
-		}	
+
+		return plid;
 	}
 
 	public AssetRenderer getAssetRenderer(long classPK, int type)throws PortalException, SystemException {

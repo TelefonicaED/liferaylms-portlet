@@ -17,7 +17,7 @@ package com.liferay.lms.service.http;
 /**
  * <p>
  * This class provides a SOAP utility for the
- * {@link com.liferay.lms.service.CourseTypeCourseEvalServiceUtil} service utility. The
+ * {@link com.liferay.lms.service.CourseTypeRelationServiceUtil} service utility. The
  * static methods of this class calls the same methods of the service utility.
  * However, the signatures are different because it is difficult for SOAP to
  * support certain types.
@@ -26,10 +26,10 @@ package com.liferay.lms.service.http;
  * <p>
  * ServiceBuilder follows certain rules in translating the methods. For example,
  * if the method in the service utility returns a {@link java.util.List}, that
- * is translated to an array of {@link com.liferay.lms.model.CourseTypeCourseEvalSoap}.
+ * is translated to an array of {@link com.liferay.lms.model.CourseTypeRelationSoap}.
  * If the method in the service utility returns a
- * {@link com.liferay.lms.model.CourseTypeCourseEval}, that is translated to a
- * {@link com.liferay.lms.model.CourseTypeCourseEvalSoap}. Methods that SOAP cannot
+ * {@link com.liferay.lms.model.CourseTypeRelation}, that is translated to a
+ * {@link com.liferay.lms.model.CourseTypeRelationSoap}. Methods that SOAP cannot
  * safely wire are skipped.
  * </p>
  *
@@ -52,10 +52,10 @@ package com.liferay.lms.service.http;
  * </p>
  *
  * @author    TLS
- * @see       CourseTypeCourseEvalServiceHttp
- * @see       com.liferay.lms.model.CourseTypeCourseEvalSoap
- * @see       com.liferay.lms.service.CourseTypeCourseEvalServiceUtil
+ * @see       CourseTypeRelationServiceHttp
+ * @see       com.liferay.lms.model.CourseTypeRelationSoap
+ * @see       com.liferay.lms.service.CourseTypeRelationServiceUtil
  * @generated
  */
-public class CourseTypeCourseEvalServiceSoap {
+public class CourseTypeRelationServiceSoap {
 }

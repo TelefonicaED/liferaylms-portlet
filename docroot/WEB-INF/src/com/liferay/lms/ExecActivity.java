@@ -27,7 +27,6 @@ import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityResultLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityTryLocalServiceUtil;
-import com.liferay.lms.service.ModuleLocalServiceUtil;
 import com.liferay.lms.service.ModuleResultLocalServiceUtil;
 import com.liferay.lms.service.TestQuestionLocalServiceUtil;
 import com.liferay.lms.util.LmsConstant;

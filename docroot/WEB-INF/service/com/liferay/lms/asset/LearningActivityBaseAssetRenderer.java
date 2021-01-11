@@ -12,6 +12,7 @@ import javax.portlet.WindowState;
 import com.liferay.lms.learningactivity.LearningActivityType;
 import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.service.ClpSerializer;
+import com.liferay.lms.service.CourseServiceUtil;
 import com.liferay.lms.service.LearningActivityLocalServiceUtil;
 import com.liferay.portal.NoSuchLayoutException;
 import com.liferay.portal.kernel.cache.Lifecycle;
@@ -85,19 +86,9 @@ public abstract class LearningActivityBaseAssetRenderer extends BaseAssetRendere
 		_layout  = threadLocalCache.get(layoutKey);
 		
 		if(Validator.isNull(_layout)) {
-			@SuppressWarnings("unchecked")
-			List<Layout> layouts = LayoutLocalServiceUtil.dynamicQuery(LayoutLocalServiceUtil.dynamicQuery().
-					add(PropertyFactoryUtil.forName("privateLayout").eq(false)).
-					add(PropertyFactoryUtil.forName("type").eq(LayoutConstants.TYPE_PORTLET)).
-					add(PropertyFactoryUtil.forName("companyId").eq(_learningactivity.getCompanyId())).
-					add(PropertyFactoryUtil.forName("groupId").eq(_learningactivity.getGroupId())).
-					add(PropertyFactoryUtil.forName("friendlyURL").eq("/reto")), 0, 1);
-	
-			if(layouts.isEmpty()) {
-				throw new NoSuchLayoutException();			
-			}
+			long plid = CourseServiceUtil.getPlidActivityViewer(_learningactivity.getGroupId());
 			
-			_layout = layouts.get(0);
+			_layout = LayoutLocalServiceUtil.getLayout(plid);
 			threadLocalCache.put(layoutKey, _layout);
 		}
 		

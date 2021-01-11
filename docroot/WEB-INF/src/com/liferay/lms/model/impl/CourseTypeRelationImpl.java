@@ -15,20 +15,20 @@
 package com.liferay.lms.model.impl;
 
 /**
- * The extended model implementation for the CourseTypeTemplate service. Represents a row in the &quot;Lms_CourseTypeTemplate&quot; database table, with each column mapped to a property of this class.
+ * The extended model implementation for the CourseTypeRelation service. Represents a row in the &quot;Lms_CourseTypeRelation&quot; database table, with each column mapped to a property of this class.
  *
  * <p>
- * Helper methods and all application logic should be put in this class. Whenever methods are added, rerun ServiceBuilder to copy their definitions into the {@link com.liferay.lms.model.CourseTypeTemplate} interface.
+ * Helper methods and all application logic should be put in this class. Whenever methods are added, rerun ServiceBuilder to copy their definitions into the {@link com.liferay.lms.model.CourseTypeRelation} interface.
  * </p>
  *
  * @author TLS
  */
-public class CourseTypeTemplateImpl extends CourseTypeTemplateBaseImpl {
+public class CourseTypeRelationImpl extends CourseTypeRelationBaseImpl {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never reference this class directly. All methods that expect a course type template model instance should use the {@link com.liferay.lms.model.CourseTypeTemplate} interface instead.
+	 * Never reference this class directly. All methods that expect a course type relation model instance should use the {@link com.liferay.lms.model.CourseTypeRelation} interface instead.
 	 */
-	public CourseTypeTemplateImpl() {
+	public CourseTypeRelationImpl() {
 	}
 }

@@ -14,27 +14,27 @@
 
 package com.liferay.lms.service.impl;
 
-import com.liferay.lms.service.base.CourseTypeCourseEvalServiceBaseImpl;
+import com.liferay.lms.service.base.CourseTypeRelationServiceBaseImpl;
 
 /**
- * The implementation of the course type course eval remote service.
+ * The implementation of the course type relation remote service.
  *
  * <p>
- * All custom service methods should be put in this class. Whenever methods are added, rerun ServiceBuilder to copy their definitions into the {@link com.liferay.lms.service.CourseTypeCourseEvalService} interface.
+ * All custom service methods should be put in this class. Whenever methods are added, rerun ServiceBuilder to copy their definitions into the {@link com.liferay.lms.service.CourseTypeRelationService} interface.
  *
  * <p>
  * This is a remote service. Methods of this service are expected to have security checks based on the propagated JAAS credentials because this service can be accessed remotely.
  * </p>
  *
  * @author TLS
- * @see com.liferay.lms.service.base.CourseTypeCourseEvalServiceBaseImpl
- * @see com.liferay.lms.service.CourseTypeCourseEvalServiceUtil
+ * @see com.liferay.lms.service.base.CourseTypeRelationServiceBaseImpl
+ * @see com.liferay.lms.service.CourseTypeRelationServiceUtil
  */
-public class CourseTypeCourseEvalServiceImpl
-	extends CourseTypeCourseEvalServiceBaseImpl {
+public class CourseTypeRelationServiceImpl
+	extends CourseTypeRelationServiceBaseImpl {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never reference this interface directly. Always use {@link com.liferay.lms.service.CourseTypeCourseEvalServiceUtil} to access the course type course eval remote service.
+	 * Never reference this interface directly. Always use {@link com.liferay.lms.service.CourseTypeRelationServiceUtil} to access the course type relation remote service.
 	 */
 }

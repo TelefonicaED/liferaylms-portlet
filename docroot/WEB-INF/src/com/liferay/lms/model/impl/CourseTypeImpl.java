@@ -15,9 +15,13 @@
 package com.liferay.lms.model.impl;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import com.liferay.lms.CourseTypeFactoryRegistry;
 import com.liferay.lms.course.inscriptiontype.InscriptionType;
 import com.liferay.lms.course.inscriptiontype.InscriptionTypeRegistry;
 import com.liferay.lms.learningactivity.LearningActivityType;
@@ -26,17 +30,11 @@ import com.liferay.lms.learningactivity.calificationtype.CalificationType;
 import com.liferay.lms.learningactivity.calificationtype.CalificationTypeRegistry;
 import com.liferay.lms.learningactivity.courseeval.CourseEval;
 import com.liferay.lms.learningactivity.courseeval.CourseEvalRegistry;
-import com.liferay.lms.model.CourseTypeCalificationType;
-import com.liferay.lms.model.CourseTypeCourseEval;
-import com.liferay.lms.model.CourseTypeInscriptionType;
-import com.liferay.lms.model.CourseTypeLearningActivity;
-import com.liferay.lms.model.CourseTypeTemplate;
-import com.liferay.lms.service.CourseTypeCalificationTypeLocalServiceUtil;
-import com.liferay.lms.service.CourseTypeCourseEvalLocalServiceUtil;
-import com.liferay.lms.service.CourseTypeInscriptionTypeLocalServiceUtil;
-import com.liferay.lms.service.CourseTypeLearningActivityLocalServiceUtil;
+import com.liferay.lms.model.Course;
+import com.liferay.lms.model.CourseTypeFactory;
+import com.liferay.lms.model.CourseTypeRelation;
 import com.liferay.lms.service.CourseTypeLocalServiceUtil;
-import com.liferay.lms.service.CourseTypeTemplateLocalServiceUtil;
+import com.liferay.lms.service.CourseTypeRelationLocalServiceUtil;
 import com.liferay.lms.util.LmsConstant;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
@@ -44,12 +42,14 @@ import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
+import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.PrefsPropsUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.LayoutSetPrototype;
 import com.liferay.portal.service.LayoutSetPrototypeLocalServiceUtil;
 import com.liferay.portal.theme.ThemeDisplay;
+import com.liferay.portal.util.PortalUtil;
 import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.util.DLUtil;
 
@@ -70,13 +70,21 @@ public class CourseTypeImpl extends CourseTypeBaseImpl {
 	 */
 	
 	private static Log log = LogFactoryUtil.getLog(CourseTypeImpl.class);
-	private List<Long> editionTemplateIds = null;
+	private CourseTypeFactory courseTypeFactory;
 	
 	public CourseTypeImpl() {
 	}
 	
 	public boolean hasCourses(){
 		return CourseTypeLocalServiceUtil.hasCourses(getCourseTypeId());
+	}
+	
+	public CourseTypeFactory getCourseTypeFactory(){
+		if(courseTypeFactory == null){
+			CourseTypeFactoryRegistry courseTypeFactoryRegistry = new CourseTypeFactoryRegistry();
+			courseTypeFactory = courseTypeFactoryRegistry.getCourseTypeFactory(getClassNameId());
+		}
+		return courseTypeFactory;
 	}
 	
 	public String getInfo(Locale locale) throws SystemException, PortalException{
@@ -140,23 +148,44 @@ public class CourseTypeImpl extends CourseTypeBaseImpl {
 	}
 	
 	public List<Long> getCourseTemplateIds() throws SystemException{
-		List<Long> courseTemplateIds = new ArrayList<Long>();
-		for (CourseTypeTemplate courseTypeTemplate:CourseTypeTemplateLocalServiceUtil.getByCourseTypeId(getCourseTypeId()))
-			courseTemplateIds.add(courseTypeTemplate.getTemplateId());
+		List<Long> courseTemplateIds = null;
+		if(getClassNameId() == 0){
+			courseTemplateIds = new ArrayList<Long>();
+			List<CourseTypeRelation> courseTypeRelations = CourseTypeRelationLocalServiceUtil.getCourseTypeRelations(getCourseTypeId(), PortalUtil.getClassNameId(LayoutSetPrototype.class));
+			for (CourseTypeRelation courseTypeTemplate:courseTypeRelations)
+				courseTemplateIds.add(courseTypeTemplate.getClassPK());
+		}else{
+			CourseTypeFactory courseTypeFactory = getCourseTypeFactory();
+			if(courseTypeFactory.getTemplates() == null){
+				courseTemplateIds = new ArrayList<Long>();
+				List<CourseTypeRelation> courseTypeRelations = CourseTypeRelationLocalServiceUtil.getCourseTypeRelations(getCourseTypeId(), PortalUtil.getClassNameId(LayoutSetPrototype.class));
+				for (CourseTypeRelation courseTypeTemplate:courseTypeRelations)
+					courseTemplateIds.add(courseTypeTemplate.getClassPK());
+			}else{
+				courseTemplateIds = Arrays.stream(courseTypeFactory.getTemplates()).boxed().collect(Collectors.toList());
+			}
+		}
 		return courseTemplateIds;
 	}
 	
 	public List<Long> getEditionTemplateIds() throws SystemException{
-		
-		if(editionTemplateIds == null){
+		List<Long> editionTemplateIds = null;
+		if(getClassNameId() == 0){
 			editionTemplateIds = new ArrayList<Long>();
-			String[] templateIds = PrefsPropsUtil.getStringArray(getCompanyId(), LmsConstant.EDITION_TEMPLATE_IDS + "." + getCourseTypeId(), ",");
-			for (String editionTemplate:templateIds){
-				try{
-					editionTemplateIds.add(Long.parseLong(editionTemplate));
-				}catch(NumberFormatException e){
-					log.debug(e);
+			List<CourseTypeRelation> courseTypeRelations = CourseTypeRelationLocalServiceUtil.getCourseTypeRelations(getCourseTypeId(), PortalUtil.getClassNameId(Course.class));
+			for (CourseTypeRelation editionTemplate:courseTypeRelations){
+				editionTemplateIds.add(editionTemplate.getClassPK());
+			}
+		}else{
+			CourseTypeFactory courseTypeFactory = getCourseTypeFactory();
+			if(courseTypeFactory.getEditionTemplates() == null){
+				editionTemplateIds = new ArrayList<Long>();
+				List<CourseTypeRelation> courseTypeRelations = CourseTypeRelationLocalServiceUtil.getCourseTypeRelations(getCourseTypeId(), PortalUtil.getClassNameId(Course.class));
+				for (CourseTypeRelation editionTemplate:courseTypeRelations){
+					editionTemplateIds.add(editionTemplate.getClassPK());
 				}
+			}else{
+				editionTemplateIds = Arrays.stream(courseTypeFactory.getEditionTemplates()).boxed().collect(Collectors.toList());
 			}
 		}
 		return editionTemplateIds;
@@ -170,9 +199,23 @@ public class CourseTypeImpl extends CourseTypeBaseImpl {
 	}
 	
 	public List<Long> getCourseEvalTypeIds() throws SystemException{
-		List<Long> courseEvalIds = new ArrayList<Long>();
-		for(CourseTypeCourseEval courseTypeCourseEval:CourseTypeCourseEvalLocalServiceUtil.getByCourseTypeId(getCourseTypeId()))
-			courseEvalIds.add(Long.valueOf(courseTypeCourseEval.getCourseEvalId()));
+		List<Long> courseEvalIds = null;
+		if(getClassNameId() == 0){
+			courseEvalIds = new ArrayList<Long>();
+			List<CourseTypeRelation> courseTypeRelations = CourseTypeRelationLocalServiceUtil.getCourseTypeRelations(getCourseTypeId(), PortalUtil.getClassNameId(CourseEval.class));
+			for (CourseTypeRelation courseTypeTemplate:courseTypeRelations)
+				courseEvalIds.add(Long.valueOf(courseTypeTemplate.getClassPK()));
+		}else{
+			CourseTypeFactory courseTypeFactory = getCourseTypeFactory();
+			if(courseTypeFactory.getCourseEvals() == null){
+				courseEvalIds = new ArrayList<Long>();
+				List<CourseTypeRelation> courseTypeRelations = CourseTypeRelationLocalServiceUtil.getCourseTypeRelations(getCourseTypeId(), PortalUtil.getClassNameId(CourseEval.class));
+				for (CourseTypeRelation courseTypeTemplate:courseTypeRelations)
+					courseEvalIds.add(Long.valueOf(courseTypeTemplate.getClassPK()));
+			}else{
+				courseEvalIds = Arrays.stream(courseTypeFactory.getCourseEvals()).boxed().collect(Collectors.toList());
+			}
+		}
 		return courseEvalIds;
 	}
 	
@@ -185,9 +228,23 @@ public class CourseTypeImpl extends CourseTypeBaseImpl {
 	}
 	
 	public List<Long> getLearningActivityTypeIds() throws SystemException{
-		List<Long> learningActivityTypeIds = new ArrayList<Long>();
-		for(CourseTypeLearningActivity courseTypeLearningActivity:CourseTypeLearningActivityLocalServiceUtil.getByCourseTypeId(getCourseTypeId()))
-			learningActivityTypeIds.add(courseTypeLearningActivity.getLearningActivityTypeId());
+		List<Long> learningActivityTypeIds = null;
+		if(getClassNameId() == 0){
+			learningActivityTypeIds = new ArrayList<Long>();
+			List<CourseTypeRelation> courseTypeRelations = CourseTypeRelationLocalServiceUtil.getCourseTypeRelations(getCourseTypeId(), PortalUtil.getClassNameId(LearningActivityType.class));
+			for(CourseTypeRelation courseTypeLearningActivity:courseTypeRelations)
+				learningActivityTypeIds.add(courseTypeLearningActivity.getClassPK());
+		}else{
+			CourseTypeFactory courseTypeFactory = getCourseTypeFactory();
+			if(courseTypeFactory.getLearningActivities() == null){
+				learningActivityTypeIds = new ArrayList<Long>();
+				List<CourseTypeRelation> courseTypeRelations = CourseTypeRelationLocalServiceUtil.getCourseTypeRelations(getCourseTypeId(), PortalUtil.getClassNameId(LearningActivityType.class));
+				for(CourseTypeRelation courseTypeLearningActivity:courseTypeRelations)
+					learningActivityTypeIds.add(courseTypeLearningActivity.getClassPK());
+			}else{
+				learningActivityTypeIds = Arrays.stream(courseTypeFactory.getLearningActivities()).boxed().collect(Collectors.toList());
+			}
+		}
 		return learningActivityTypeIds;
 	}
 	
@@ -203,9 +260,23 @@ public class CourseTypeImpl extends CourseTypeBaseImpl {
 	}
 	
 	public List<Long> getInscriptionTypeIds() throws SystemException{
-		List<Long> inscriptionTypeIds = new ArrayList<Long>();
-		for(CourseTypeInscriptionType courseTypeInscriptionType:CourseTypeInscriptionTypeLocalServiceUtil.getByCourseTypeId(getCourseTypeId()))
-			inscriptionTypeIds.add(courseTypeInscriptionType.getInscriptionType());
+		List<Long> inscriptionTypeIds = null;
+		if(getClassNameId() == 0){
+			inscriptionTypeIds = new ArrayList<Long>();
+			List<CourseTypeRelation> courseTypeRelations = CourseTypeRelationLocalServiceUtil.getCourseTypeRelations(getCourseTypeId(), PortalUtil.getClassNameId(InscriptionType.class));
+			for(CourseTypeRelation courseTypeInscriptionType:courseTypeRelations)
+				inscriptionTypeIds.add(courseTypeInscriptionType.getClassPK());
+		}else{
+			CourseTypeFactory courseTypeFactory = getCourseTypeFactory();
+			if(courseTypeFactory.getInscriptionTypes() == null){
+				inscriptionTypeIds = new ArrayList<Long>();
+				List<CourseTypeRelation> courseTypeRelations = CourseTypeRelationLocalServiceUtil.getCourseTypeRelations(getCourseTypeId(), PortalUtil.getClassNameId(InscriptionType.class));
+				for(CourseTypeRelation courseTypeInscriptionType:courseTypeRelations)
+					inscriptionTypeIds.add(courseTypeInscriptionType.getClassPK());
+			}else{
+				inscriptionTypeIds = Arrays.stream(courseTypeFactory.getInscriptionTypes()).boxed().collect(Collectors.toList());
+			}
+		}
 		return inscriptionTypeIds;
 	}
 	
@@ -218,9 +289,23 @@ public class CourseTypeImpl extends CourseTypeBaseImpl {
 	}
 	
 	public List<Long> getCalificationTypeIds() throws SystemException{
-		List<Long> calificationTypeIds = new ArrayList<Long>();
-		for(CourseTypeCalificationType courseTypeCalificationType:CourseTypeCalificationTypeLocalServiceUtil.getByCourseTypeId(getCourseTypeId()))
-			calificationTypeIds.add(courseTypeCalificationType.getCalificationType());
+		List<Long> calificationTypeIds = null;
+		if(getClassNameId() == 0){
+			calificationTypeIds = new ArrayList<Long>();
+			List<CourseTypeRelation> courseTypeRelations = CourseTypeRelationLocalServiceUtil.getCourseTypeRelations(getCourseTypeId(), PortalUtil.getClassNameId(CalificationType.class));
+			for(CourseTypeRelation courseTypeCalificationType:courseTypeRelations)
+				calificationTypeIds.add(courseTypeCalificationType.getClassPK());
+		}else{
+			CourseTypeFactory courseTypeFactory = getCourseTypeFactory();
+			if(courseTypeFactory.getCalificationTypes() == null){
+				calificationTypeIds = new ArrayList<Long>();
+				List<CourseTypeRelation> courseTypeRelations = CourseTypeRelationLocalServiceUtil.getCourseTypeRelations(getCourseTypeId(), PortalUtil.getClassNameId(CalificationType.class));
+				for(CourseTypeRelation courseTypeCalificationType:courseTypeRelations)
+					calificationTypeIds.add(courseTypeCalificationType.getClassPK());
+			}else{
+				calificationTypeIds = Arrays.stream(courseTypeFactory.getCalificationTypes()).boxed().collect(Collectors.toList());
+			}
+		}
 		return calificationTypeIds;
 	}
 	

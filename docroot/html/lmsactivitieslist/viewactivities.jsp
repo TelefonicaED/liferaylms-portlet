@@ -25,7 +25,6 @@ if ((actionEditing && hasPermissionAddLact) ||
 	
 	PortletURL urlCreateActivity = LmsActivitiesList.getURLCreateActivity(liferayPortletRequest, liferayPortletResponse, currentModule);
 	if(Validator.isNotNull(urlCreateActivity)){
-		
 		%>
 		<liferay-ui:icon image="add" message="activity.creation" label="true" cssClass="newactivity" url="<%=urlCreateActivity.toString()%>"/>
 		<%

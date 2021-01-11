@@ -14,6 +14,9 @@
 
 package com.liferay.lms.service.impl;
 
+import javax.portlet.PortletURL;
+import javax.portlet.WindowState;
+
 import com.liferay.lms.auditing.AuditConstants;
 import com.liferay.lms.auditing.AuditingLogFactory;
 import com.liferay.lms.model.Course;
@@ -23,10 +26,13 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.jsonwebservice.JSONWebService;
 import com.liferay.portal.kernel.jsonwebservice.JSONWebServiceMode;
+import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.model.User;
 import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceContextThreadLocal;
+import com.liferay.portlet.asset.AssetRendererFactoryRegistryUtil;
+import com.liferay.portlet.asset.model.AssetRendererFactory;
 import com.liferay.portlet.social.service.SocialActivityLocalServiceUtil;
 
 /**
@@ -193,6 +199,13 @@ public class LearningActivityServiceImpl extends LearningActivityServiceBaseImpl
 	{
 		User user=this.getUser();
 		return learningActivityLocalService.islocked(actId, user.getUserId());
+	}
+	
+	public PortletURL getURLActivity(long actId, LiferayPortletResponse liferayPortletResponse) throws PortalException, SystemException, Exception{
+		AssetRendererFactory assetRendererFactory = AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(LearningActivity.class.getName());
+
+		return assetRendererFactory.getAssetRenderer(actId).
+				getURLView(liferayPortletResponse, WindowState.NORMAL);
 	}
 	
 }
