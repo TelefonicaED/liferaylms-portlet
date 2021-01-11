@@ -16,12 +16,14 @@ import com.liferay.lms.service.CourseResultLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityResultLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityTryLocalServiceUtil;
+import com.liferay.lms.util.LmsConstant;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.util.PrefsPropsUtil;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.DocumentException;
 import com.liferay.portal.kernel.xml.Element;
@@ -122,9 +124,12 @@ public class PonderatedCourseEval extends BaseCourseEval {
 			boolean hasTries = false;
 			for(LearningActivity act:learningActivities){
 
-				if(!weights.containsKey(act.getActId())){//Solo se tienen en cuenta las actividades obligatorias que tienen peso definido
-					continue;
-				}
+			    long activityWeight = 0;
+                if(weights.containsKey(act.getActId())){
+                    activityWeight=weights.get(act.getActId());
+                } else if (!PrefsPropsUtil.getBoolean(course.getCompanyId(), LmsConstant.ALLOW_WEIGHTLESS_MANDATORY_ACTIVITIES, false)) {
+                    continue;
+                }
 				
 				if(results.containsKey(act.getActId())){
 					learningActivityResult = results.get(act.getActId());
@@ -147,7 +152,7 @@ public class PonderatedCourseEval extends BaseCourseEval {
 								hasTries = true;
 							}
 						}
-						result=result+(learningActivityResult.getResult()*weights.get(act.getActId()));
+						result=result+(learningActivityResult.getResult()*activityWeight);
 
 					}else{
 						passed=false;
@@ -157,7 +162,7 @@ public class PonderatedCourseEval extends BaseCourseEval {
 					passed=false;
 					hasTries = true;
 				}
-				weight+=weights.get(act.getActId());
+				weight+=activityWeight;
 			}
 
 			if(result>0&&weight>0){
