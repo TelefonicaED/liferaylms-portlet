@@ -3,15 +3,11 @@ package com.liferay.lms;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Enumeration;
-import java.util.List;
+
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
 import javax.portlet.PortletException;
-import javax.portlet.RenderRequest;
-import javax.portlet.RenderResponse;
-import org.apache.commons.collections.ListUtils;
-import com.liferay.lms.learningactivity.courseeval.CompleteModulesCourseEval;
-import com.liferay.lms.learningactivity.courseeval.PonderatedCourseEval;
+
 import com.liferay.lms.model.Course;
 import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.portal.kernel.exception.SystemException;
@@ -58,12 +54,12 @@ public class PonderatedEvalConfPortlet extends MVCPortlet
 			if(param.startsWith("weight_"))
 			{
 				String actIds=param.substring(7);
-				long score=ParamUtil.getLong(actionRequest, param,0);
+				float score=ParamUtil.getFloat(actionRequest, param,0);
 				if(score>0)
 				{
 					Element weight=rootElement.addElement("weight");
 					weight.addAttribute("actId", actIds);
-					weight.addAttribute("ponderation",Long.toString(score));
+					weight.addAttribute("ponderation",Float.toString(score));
 				}
 			}
 		}

@@ -23,6 +23,7 @@ El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 - #182977 Cuando un usuario tiene la nota máxima no le sale el confirm de mejorar nota
 - #194392 Se permiten actividades obligatorias con peso 0 en el método de evaluación ponderado dependiendo de una configuración del lms
 - #178357 Se añaden validaciones javacript a la configuración del método de evaluación ponderado para controlar que la suma de las ponderaciones es 100
+- #178357 Se pueden ponderar con números decimales hasta dos dígitos
 
 
 ## [4.3.3](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v4.3.3)
