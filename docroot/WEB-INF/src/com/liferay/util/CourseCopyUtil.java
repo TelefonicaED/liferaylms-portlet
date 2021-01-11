@@ -91,7 +91,7 @@ public class CourseCopyUtil {
 								
 								String []uuidInfo = fileUuid.split("\\?");
 								String uuid="";
-								if(srcInfo.length > 0){
+								if(uuidInfo.length > 0){
 									uuid=uuidInfo[0];
 								}
 								
@@ -134,7 +134,7 @@ public class CourseCopyUtil {
 								
 								String []uuidInfo = fileUuid.split("\\?");
 								String uuid="";
-								if(hrefInfo.length > 0){
+								if(uuidInfo.length > 0){
 									uuid=uuidInfo[0];
 								}
 								
@@ -187,7 +187,7 @@ public class CourseCopyUtil {
 							
 							String []uuidInfo = fileUuid.split("\\?");
 							String uuid="";
-							if(srcInfo.length > 0){
+							if(uuidInfo.length > 0){
 								uuid=uuidInfo[0];
 							}
 							
@@ -230,7 +230,7 @@ public class CourseCopyUtil {
 							
 							String []uuidInfo = fileUuid.split("\\?");
 							String uuid="";
-							if(hrefInfo.length > 0){
+							if(uuidInfo.length > 0){
 								uuid=uuidInfo[0];
 							}
 							
