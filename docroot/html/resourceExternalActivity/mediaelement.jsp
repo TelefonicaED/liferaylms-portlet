@@ -177,6 +177,9 @@
 					var score = 100;														
 					if (!isDefaultScore) score = Math.round((currentTime/duration)*100);
 					//debugger;
+					if(score>100){
+					score=100;
+					}
 					<portlet:namespace/>finishTry(score, positionToSave,plays);													
 				  
 				}

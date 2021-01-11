@@ -35,7 +35,9 @@ Liferay.Service.registerClass(
 		getCoursesParents: true,
 		getChildCourses: true,
 		getStudentsFromCourseCount: true,
-		getPublicCoursesByCompanyId: true
+		getPublicCoursesByCompanyId: true,
+		getPlidActivityViewer: true,
+		getFriendlyURLTeachers: true
 	}
 );
 

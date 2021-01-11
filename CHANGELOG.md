@@ -8,7 +8,7 @@ El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 ### Fixed
 
 - #192412 Se comprueba si el LearningActivityResult es nulo a la hora de obtener la puntuación del usuario en la vista de resultados de la actividad de tipo test
-
+- #194142 Valores mayores que 100. Corregido que cuando el tiempo del player es mayor que la duración deje el valor 100.
 ### Updated
 
 - #191383 Se modifica el texto que se muestra a los usuarios en la actividad de tipo test

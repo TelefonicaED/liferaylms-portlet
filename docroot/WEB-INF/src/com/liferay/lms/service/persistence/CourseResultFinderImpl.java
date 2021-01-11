@@ -5,13 +5,17 @@ import java.math.BigInteger;
 import java.util.Iterator;
 import java.util.List;
 
+import com.liferay.lms.model.Course;
 import com.liferay.lms.model.CourseResult;
 import com.liferay.lms.model.LmsPrefs;
+import com.liferay.lms.model.impl.CourseImpl;
+import com.liferay.lms.model.impl.CourseResultImpl;
 import com.liferay.lms.service.LmsPrefsLocalServiceUtil;
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
 import com.liferay.util.dao.orm.CustomSQLUtil;
 import com.liferay.portal.kernel.dao.orm.ORMException;
 import com.liferay.portal.kernel.dao.orm.QueryPos;
+import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.SQLQuery;
 import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.dao.orm.SessionFactory;
@@ -35,7 +39,10 @@ public class CourseResultFinderImpl extends BasePersistenceImpl<CourseResult> im
 	public static final String WHERE_COURSE_ID = 
 			CourseResultFinder.class.getName() + ".whereCourseId";
 	public static final String WHERE_EDITIONS = 
-			CourseResultFinder.class.getName() + ".whereEditions";
+			CourseResultFinder.class.getName() + ".whereEditions";	
+	public static final String FIND_BY_PARENT_COURSE_ID =
+			CourseResultFinder.class.getName() +
+		        ".findCourseResultByParentCourseId";
 	
 	public double avgResultByCourseIdStudents(long courseId, boolean includeEditions){
 		Session session = null;
@@ -76,6 +83,40 @@ public class CourseResultFinderImpl extends BasePersistenceImpl<CourseResult> im
 	    }
 	
 	    return 0;
+	}
+	
+	public List<CourseResult> findCourseResultByParentCourseId(long courseParentId, long userId){
+		Session session = null;
+		List<CourseResult> courseResults = null;
+		
+		try{
+			
+			if(log.isDebugEnabled()){
+				log.debug("courseParentId:"+courseParentId);
+				log.debug("userId:"+userId);
+			}
+						
+			session = openSession();
+			
+			String sql = CustomSQLUtil.get(FIND_BY_PARENT_COURSE_ID);
+			
+			SQLQuery q = session.createSQLQuery(sql);
+			q.addEntity("Lms_CourseResult", CourseResultImpl.class);
+			
+			QueryPos qPos = QueryPos.getInstance(q);
+			qPos.add(courseParentId);
+			qPos.add(userId);
+			
+			courseResults = (List<CourseResult>) QueryUtil.list(
+					q, getDialect(), QueryUtil.ALL_POS, QueryUtil.ALL_POS);
+			
+		} catch (Exception e) {
+	       e.printStackTrace();
+	    } finally {
+	    	closeSession(session);
+	    }
+	
+	    return courseResults;
 	}
 	
 	private String replaceCourseOrEditions(String sql, boolean includeEditions){
