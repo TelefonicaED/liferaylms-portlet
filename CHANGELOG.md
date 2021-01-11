@@ -21,6 +21,7 @@ El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 - #191782 Se cambian los div del progreso en la actividad de tipo test por una etiqueta progress ya que en ocasiones la barra tenía la anchura mal
 - #192653 Se añade un segundo de retardo al refrescar los portlets activity navigator y activities list al completar un video
 - #193973 No se muestra un enlace para ir a las ediciones en lo cursos en los que no se pueden crear/editar ediciones en la columna "Nº edicionesª de la administración de cursos
+- #182977 Cuando un usuario tiene la nota máxima no le sale el confirm de mejorar nota
 
 
 ## [4.3.3](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v4.3.3)
