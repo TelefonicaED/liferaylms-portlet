@@ -31,8 +31,7 @@
 	 <div>
 		 <aui:select required="true" label="course-template" name="templateIds" multiple="true" 
 		 	helpMessage="${not empty courseType.courseTemplateIds ? 'coursetypeadmin.coursetype-has-templates.only-add' : ''}" 
-		 	ignoreRequestValue="true"
-		 	disabled="${not empty courseType && courseType.classNameId > 0 }">
+		 	ignoreRequestValue="true" >
 			<c:forEach items="${listTemplates }" var="template">
 				<aui:option 
 					value="${template.layoutSetPrototypeId }" 
@@ -42,7 +41,7 @@
 				</aui:option>
 			</c:forEach>
 		</aui:select>
-		<aui:select required="true" label="edition-template" name="editionTemplateIds" multiple="true" disabled="${not empty courseType && courseType.classNameId > 0 }" ignoreRequestValue="true">
+		<aui:select required="true" label="edition-template" name="editionTemplateIds" multiple="true" ignoreRequestValue="true">
 			<c:set var="editionTemplateIds" value="${courseType.editionTemplateIds }"/>
 			<c:forEach items="${listTemplates }" var="template">
 				<aui:option 
@@ -54,7 +53,7 @@
 			</c:forEach>
 		</aui:select>
 		
-		<aui:select required="true" label="course-correction-method" name="courseEvalIds" multiple="true" disabled="${not empty courseType && courseType.classNameId > 0 }" helpMessage="${not empty courseType.courseEvalTypeIds ? 'coursetypeadmin.coursetype-has-course-eval-types.only-add' : ''}" ignoreRequestValue="true">
+		<aui:select required="true" label="course-correction-method" name="courseEvalIds" multiple="true" helpMessage="${not empty courseType.courseEvalTypeIds ? 'coursetypeadmin.coursetype-has-course-eval-types.only-add' : ''}" ignoreRequestValue="true">
 			<c:forEach items="${listCourseEvals }" var="courseEval">
 				<aui:option
 					value="${courseEval.typeId }"
@@ -67,7 +66,7 @@
 	</div>
 	
 	<div>
-		<aui:select required="true" label="lms-activities" name="learningActivityTypeIds" multiple="true" disabled="${not empty courseType && courseType.classNameId > 0 }" helpMessage="${not empty courseType.courseEvalTypeIds ? 'coursetypeadmin.coursetype-has-learning-activity-types.only-add' : ''}" ignoreRequestValue="true">
+		<aui:select required="true" label="lms-activities" name="learningActivityTypeIds" multiple="true" helpMessage="${not empty courseType.courseEvalTypeIds ? 'coursetypeadmin.coursetype-has-learning-activity-types.only-add' : ''}" ignoreRequestValue="true">
 			<c:forEach items="${listLearningActivityTypes }" var="activityType">
 				<aui:option
 					value="${activityType.typeId }"
@@ -80,7 +79,7 @@
 	</div>
 	
 	<div>
-		<aui:select required="true" label="inscription-type" name="inscriptionTypeIds" multiple="true" disabled="${not empty courseType && courseType.classNameId > 0 }" helpMessage="${not empty courseType.inscriptionTypeIds ? 'coursetypeadmin.coursetype-has-inscription-types.only-add' : ''}" ignoreRequestValue="true">
+		<aui:select required="true" label="inscription-type" name="inscriptionTypeIds" multiple="true" helpMessage="${not empty courseType.inscriptionTypeIds ? 'coursetypeadmin.coursetype-has-inscription-types.only-add' : ''}" ignoreRequestValue="true">
 			<c:forEach items="${listInscriptionTypes }" var="inscriptionType">
 				<aui:option
 					value="${inscriptionType.typeId }"
@@ -93,7 +92,7 @@
 	</div>
 	
 	<div>
-		<aui:select required="true" label="calificationType" name="calificationTypeIds" multiple="true" disabled="${not empty courseType && courseType.classNameId > 0 }" helpMessage="${not empty courseType.calificationTypeIds ? 'coursetypeadmin.coursetype-has-calification-types.only-add' : ''}" ignoreRequestValue="true">
+		<aui:select required="true" label="calificationType" name="calificationTypeIds" multiple="true" helpMessage="${not empty courseType.calificationTypeIds ? 'coursetypeadmin.coursetype-has-calification-types.only-add' : ''}" ignoreRequestValue="true">
 			<c:forEach items="${listCalificationTypes }" var="calificationType">
 				<aui:option
 					value="${calificationType.typeId }"

@@ -10,6 +10,7 @@ import com.liferay.lms.learningactivity.calificationtype.CalificationType;
 import com.liferay.lms.learningactivity.courseeval.CourseEval;
 import com.liferay.lms.model.Course;
 import com.liferay.lms.model.CourseType;
+import com.liferay.lms.model.CourseTypeRelation;
 import com.liferay.lms.service.CourseTypeLocalServiceUtil;
 import com.liferay.lms.service.CourseTypeRelationLocalServiceUtil;
 import com.liferay.lms.util.LmsConstant;
@@ -141,9 +142,23 @@ public class UpgradeVersion_4_4_0 extends UpgradeProcess {
 		insert = "INSERT INTO lms_coursetyperelation (courseTypeId, classNameId, classNamePK) "
 				+ "SELECT courseTypeId, " + PortalUtil.getClassNameId(LayoutSetPrototype.class)+", templateId FROM lms_coursetypetemplate;";
 		
+		
+		
 		log.info("Insert table lms_coursetyperelation -->> lms_coursetypetemplate");
 		try {
 			db.runSQL(insert);
+		} catch (IOException | SQLException e) {
+			e.printStackTrace();
+		}
+		
+		String update = "UPDATE counter SET currentId = "
+				+ "(SELECT MAX(lms_coursetyperelation.courseTypeRelationId)+1 "
+				+ "FROM lms_coursetypecalificationtype) "
+				+ "WHERE NAME='" + CourseTypeRelation.class.getName() + "';";
+		
+		log.info("Update table counter");
+		try {
+			db.runSQL(update);
 		} catch (IOException | SQLException e) {
 			e.printStackTrace();
 		}
