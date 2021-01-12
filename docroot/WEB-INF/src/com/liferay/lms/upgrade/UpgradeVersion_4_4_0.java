@@ -47,7 +47,7 @@ public class UpgradeVersion_4_4_0 extends UpgradeProcess {
 			e.printStackTrace();
 		} 
 		
-		updateLearningActivity = "ALTER TABLE `lms_coursetype` ADD COLUMN `active` TINYINT(4) NULL DEFAULT FALSE AFTER `classNameId`;";
+		updateLearningActivity = "ALTER TABLE `lms_coursetype` ADD COLUMN `active_` TINYINT(4) NULL DEFAULT FALSE AFTER `classNameId`;";
 		
 		log.info("Alter table lms_coursetype -->> Add active");
 		try {
