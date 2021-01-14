@@ -4,6 +4,7 @@ package com.liferay.lms;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Enumeration;
@@ -19,13 +20,17 @@ import javax.portlet.ActionResponse;
 import javax.portlet.EventRequest;
 import javax.portlet.EventResponse;
 import javax.portlet.PortletException;
+import javax.portlet.PortletMode;
+import javax.portlet.PortletPreferences;
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletURL;
 import javax.portlet.ProcessEvent;
+import javax.portlet.ReadOnlyException;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
+import javax.portlet.ValidatorException;
 import javax.portlet.WindowState;
 import javax.xml.namespace.QName;
 
@@ -95,6 +100,7 @@ import com.liferay.portal.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.service.LayoutLocalServiceUtil;
+import com.liferay.portal.service.PortalPreferencesLocalServiceUtil;
 import com.liferay.portal.service.PortletLocalServiceUtil;
 import com.liferay.portal.service.ResourcePermissionLocalServiceUtil;
 import com.liferay.portal.service.RoleLocalServiceUtil;
@@ -112,6 +118,7 @@ import com.liferay.portlet.asset.model.AssetEntry;
 import com.liferay.portlet.asset.model.AssetRendererFactory;
 import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
 import com.liferay.util.bridges.mvc.MVCPortlet;
+import com.mysql.fabric.xmlrpc.base.Array;
 
 /**
  * Portlet implementation class LmsActivitiesList
@@ -1318,4 +1325,53 @@ public class LmsActivitiesList extends MVCPortlet {
 		return portletURL;		
 	}
 	
+	public void saveEditPreference(ActionRequest actionRequest, ActionResponse actionResponse) throws PortletException, IOException {
+		
+		
+		
+		try{
+			ThemeDisplay themeDisplay = (ThemeDisplay) actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
+			String portletId = PortalUtil.getPortletId(actionRequest);
+			String layoutId = String.valueOf(themeDisplay.getPlid());
+			PortletPreferences prefs= PortalPreferencesLocalServiceUtil.getPreferences(themeDisplay.getCompanyId(), themeDisplay.getCompanyId(), 1);
+			
+			
+			String key=layoutId+"_"+portletId+"_lmsActivitiesList";
+			String[] empty = {};
+			String[] modules = ParamUtil.getParameterValues(actionRequest,"modulesCheckbox", empty);
+
+			String modulesListStr = Arrays.toString(modules);
+			modulesListStr = modulesListStr.substring(1, modulesListStr.length()-1).replace(" ","");
+			
+			
+			if(!"".equals(key)&&!prefs.isReadOnly(key))
+			{
+				try {
+					prefs.setValue(key, modulesListStr);
+				} catch (ReadOnlyException e) {
+					e.printStackTrace();
+					SessionErrors.add(actionRequest, "problem");
+				}
+				try {
+					prefs.store();
+				} catch (ValidatorException e) {
+					e.printStackTrace();
+					SessionErrors.add(actionRequest, "problem");
+				} catch (IOException e) {
+					e.printStackTrace();
+					SessionErrors.add(actionRequest, "problem");
+				}
+			}
+			else
+			{
+				SessionErrors.add(actionRequest, "read-only");
+			}
+
+		}catch(Exception e){
+			log.error("Error guardando la preferencia",e);
+		}
+		
+		
+		actionResponse.setPortletMode(PortletMode.VIEW);// send response to View
+	}
 }
