@@ -36,6 +36,7 @@
 	
 	boolean completeMode = viewMode.compareTo("0") == 0;
 	boolean actualModuleMode = viewMode.compareTo("1") == 0;
+	boolean selectedModulesMode = viewMode.compareTo("2") == 0;
 	
 	Module currentModule = null;
 	
@@ -109,6 +110,9 @@
 	</c:if>
 	<c:if test="<%=completeMode %>"	>	
 		<%@ include file="/html/lmsactivitieslist/viewComplete.jsp"%>
+	</c:if>
+	<c:if test="<%=selectedModulesMode%>">
+		<%@ include file="/html/lmsactivitieslist/viewSelectedModules.jsp"%>
 	</c:if>
 	
 <script type="text/javascript">
