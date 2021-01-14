@@ -24,6 +24,8 @@
 		<aui:option value="0" selected="<%= selected %>"><%= LanguageUtil.get(pageContext, "lmsactivitieslist.view.complete") %></aui:option>
 		<% selected = viewMode.compareTo("1") == 0; %>
 		<aui:option value="1" selected="<%= selected %>"><%= LanguageUtil.get(pageContext, "lmsactivitieslist.view.actualModule") %></aui:option>
+		<% selected = viewMode.compareTo("2") == 0; %>
+		<aui:option value="2" selected="<%= selected %>"><%= LanguageUtil.get(pageContext, "lmsactivitieslist.view.selectedModules") %></aui:option>
 	</aui:select>
 	<br/>
 	<aui:input type="checkbox" name="numerateModules" label="modulelist.numerateModules" value="<%=numerateModules %>" checked="<%=numerateModules %>"/>
