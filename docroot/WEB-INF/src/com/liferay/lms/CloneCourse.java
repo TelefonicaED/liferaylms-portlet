@@ -239,6 +239,20 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 			newCourse.setExecutionEndDate(endDate);
 			
 			StringBuilder extraContent = new StringBuilder();
+			
+            Course parentcourse = null;
+            try {
+                parentcourse = course.getParentCourse();
+            } catch (SystemException | PortalException e) {
+                log.debug("Parent course not found");
+            }
+			
+			if(Validator.isNotNull(parentcourse) ) {
+			    extraContent.append(LanguageUtil.get(themeDisplay.getLocale(), "course-admin.parent-course"))
+	            .append(StringPool.COLON).append(StringPool.SPACE)
+	            .append(course.getParentCourse().getTitle(themeDisplay.getLocale())).append("<br>");
+			}
+			
             extraContent.append(LanguageUtil.get(themeDisplay.getLocale(), "course.label"))
                 .append(StringPool.COLON).append(StringPool.SPACE)
                 .append(course.getTitle(themeDisplay.getLocale()));     
