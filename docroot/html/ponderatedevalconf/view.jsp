@@ -7,7 +7,6 @@
 <%@page import="com.liferay.lms.service.CourseLocalServiceUtil"%>
 <%@ include file="/init.jsp" %>
 <%
-List<String> ponderationInputNames = new ArrayList<String>();
 	Course course=CourseLocalServiceUtil.fetchByGroupCreatedId(themeDisplay.getScopeGroupId());
 if (course==null || !themeDisplay.getPermissionChecker().hasPermission(themeDisplay.getScopeGroupId(),
 		"com.liferay.lms.model", themeDisplay.getScopeGroupId(), "ADD_MODULE")
@@ -26,14 +25,7 @@ else
 <portlet:renderURL var="cancel" />
 <aui:form name="fm" action="<%=savePonderationURL%>"  role="form" method="post">
 	<aui:input size="5" name="passpuntuation" label="passpuntuation" type="text" value="<%=Long.toString(score) %>" >
-		<aui:validator name="custom" errorMessage="ponderationevalconf.error.passpuntuation">
-	   		function (val, fieldNode, ruleValue) {
-	   			if(!isNaN(val)&&Number(val)>=0&&Number(val)<=100){
-	    			return true;
-	    		}
-	    		return false;
-	   		}
-		</aui:validator>
+		<aui:validator name="digits"></aui:validator>
 	</aui:input>
 	<liferay-ui:panel-container >
 		<%
@@ -64,7 +56,6 @@ else
 					String weightname="weight_"+learningActivity.getActId();
 					String weight="";
 					boolean requiredChecked=false;
-					ponderationInputNames.add(weightname);
 					if(weights.containsKey(learningActivity.getActId()))
 					{
 						weight=weights.get(learningActivity.getActId()).toString();
@@ -79,13 +70,7 @@ else
 				</liferay-ui:search-container-column-text>
 				<liferay-ui:search-container-column-text cssClass="number-column" name = "ponderated.weight">
 					<aui:input size="5" name="<%=weightname %>" value="<%=weight %>" label="">
-						<aui:validator name="maxLength">5</aui:validator>						
-						<aui:validator name="custom" errorMessage="ponderationevalconf.error.ponderation-format">
-        					function (val, fieldNode, ruleValue) {
-        						<portlet:namespace />calculatePonderated();
-            					return <portlet:namespace />isValidValue(val);
-        					}
-    					</aui:validator>
+						<aui:validator name="digits"></aui:validator>
 					</aui:input>
 				</liferay-ui:search-container-column-text>
 				<liferay-ui:search-container-column-text cssClass="number-column" name = "ponderated.mustpassed">
@@ -99,18 +84,6 @@ else
 		<%
 		}%>
 	</liferay-ui:panel-container>
-	
-		<aui:input size="5" name="sumPonderation" value="" label="ponderationevalconf.total" readonly="true" >
-		<aui:validator name="custom" errorMessage="ponderationevalconf.error.ponderation-total">
-	   		function (val, fieldNode, ruleValue) {
-	   			if(Number(val)&&Number(val)==100){
-	    			return true;
-	    		}
-	    		return false;
-	   		}
-		</aui:validator>
-	</aui:input>
-	
 	<aui:button-row>
 		<aui:button type="submit"></aui:button>							
 	</aui:button-row>
@@ -119,55 +92,3 @@ else
 	
 }
 %>
-
-
-
-<aui:script>
-	
-	$(document).ready(function(){
-		<portlet:namespace />calculatePonderated();
-		
-	});
-	
-	function <portlet:namespace />changePonderation(ponderation){
-			if(<portlet:namespace />isValidValue(ponderation.value)){
-			jQuery(".ponderationValue").html(total);
-		}
-	}
-	
-	function <portlet:namespace />isValidValue(value) {
-		if(value==""){
-			return true;
-		}
-		
-		if(isNaN(value) || Number(value)<0){
-			return false;
-		}
-		
-		if(<portlet:namespace />countDecimals(Number(value))>2){
-			return false;
-		}
-		
-		<portlet:namespace />calculatePonderated();
-		return true;
-	}
-	
-	function <portlet:namespace />countDecimals(value) {
-	    if (Math.floor(value) !== value)
-	        return value.toString().split(".")[1].length || 0;
-	    return 0;
-	}
-	
-	
-	function <portlet:namespace />calculatePonderated() {
-		ponderation = 0;
-		<%
-		for(String name:ponderationInputNames){%>
-			ponderationInput = $('input[name=<portlet:namespace /><%=name %>]').val();
-			if(Number(ponderationInput)){
-				ponderation += Number(ponderationInput);
-			}
-		<%} %>
-		$('input[name=<portlet:namespace />sumPonderation]').val(ponderation);
-	}
-</aui:script>
