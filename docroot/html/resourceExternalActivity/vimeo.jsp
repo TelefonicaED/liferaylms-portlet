@@ -54,9 +54,10 @@
 			            
 			if (!exception) {
 				// Process Success - A LearningActivityResult returned
-				finished = true;	
-				Liferay.Portlet.refresh('#p_p_id_activityNavigator_WAR_liferaylmsportlet_');
-				Liferay.Portlet.refresh('#p_p_id_lmsactivitieslist_WAR_liferaylmsportlet_');
+				setTimeout(function(){ Liferay.Portlet.refresh('#p_p_id_activityNavigator_WAR_liferaylmsportlet_'); }, 1000);
+				setTimeout(function(){Liferay.Portlet.refresh('#p_p_id_lmsactivitieslist_WAR_liferaylmsportlet_'); }, 1000);
+				finished = true;					
+				
 				var src = 	document.getElementById("player_1").src;
 				var index = src.indexOf("background");
 				if(index > 0){

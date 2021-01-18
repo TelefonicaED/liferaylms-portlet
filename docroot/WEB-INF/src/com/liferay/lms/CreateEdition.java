@@ -9,11 +9,8 @@ import java.util.Locale;
 import com.liferay.counter.service.CounterLocalServiceUtil;
 import com.liferay.lms.course.diploma.CourseDiploma;
 import com.liferay.lms.course.diploma.CourseDiplomaRegistry;
-import com.liferay.lms.course.inscriptiontype.InscriptionType;
-import com.liferay.lms.course.inscriptiontype.InscriptionTypeRegistry;
 import com.liferay.lms.learningactivity.LearningActivityType;
 import com.liferay.lms.learningactivity.LearningActivityTypeRegistry;
-import com.liferay.lms.learningactivity.TestLearningActivityType;
 import com.liferay.lms.model.AsynchronousProcessAudit;
 import com.liferay.lms.model.Course;
 import com.liferay.lms.model.LearningActivity;
@@ -27,6 +24,8 @@ import com.liferay.lms.util.LmsConstant;
 import com.liferay.portal.DuplicateGroupException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
+import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -34,8 +33,7 @@ import com.liferay.portal.kernel.messaging.Message;
 import com.liferay.portal.kernel.messaging.MessageBusUtil;
 import com.liferay.portal.kernel.messaging.MessageListener;
 import com.liferay.portal.kernel.messaging.MessageListenerException;
-import com.liferay.portal.kernel.servlet.SessionErrors;
-import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.ResourceConstants;
@@ -47,7 +45,6 @@ import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.security.permission.PermissionCheckerFactoryUtil;
 import com.liferay.portal.security.permission.PermissionThreadLocal;
-import com.liferay.portal.service.ClassNameLocalServiceUtil;
 import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.ResourcePermissionLocalServiceUtil;
 import com.liferay.portal.service.RoleLocalServiceUtil;
@@ -205,6 +202,20 @@ public class CreateEdition extends CourseCopyUtil implements MessageListener {
 			newCourse.setCourseEvalId(course.getCourseEvalId());
 			newCourse.setIsLinked(isLinked);
 			
+			StringBuilder extraContent = new StringBuilder();
+			extraContent.append(LanguageUtil.get(themeDisplay.getLocale(), "course-admin.parent-course"))
+                .append(StringPool.COLON).append(StringPool.SPACE)
+                .append(course.getTitle(themeDisplay.getLocale()));		
+            
+            extraContent.append("<br>").append(LanguageUtil.get(themeDisplay.getLocale(), "courseadmin.edition"))
+                .append(StringPool.COLON).append(StringPool.SPACE)
+                .append(newCourse.getTitle(themeDisplay.getLocale()));
+            
+            
+            JSONObject json =JSONFactoryUtil.createJSONObject();            
+            json.put("data", extraContent.toString());
+            
+            process.setExtraContent(json.toString());
 			process.setClassPK(newCourse.getCourseId());
 			process = AsynchronousProcessAuditLocalServiceUtil.updateAsynchronousProcessAudit(process);
 			

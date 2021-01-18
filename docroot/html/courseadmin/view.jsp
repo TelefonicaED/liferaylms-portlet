@@ -31,10 +31,16 @@
 		</div>
 		<%
 	}
+	
+	
 	%>
 	<liferay-ui:success key="courseadmin.clone.confirmation.success" message="courseadmin.clone.confirmation.success" />
 	<liferay-ui:success key="import-course-ok" message="courseadmin.import-course-ok" />
 	<liferay-ui:error></liferay-ui:error>
+	
+	<%
+	boolean editionsWithoutRestrictions = GetterUtil.getBoolean(renderRequest.getPreferences().getValue("showEditionsWithoutRestrictions", StringPool.FALSE),false);
+	%>
 	
 	<liferay-ui:search-container 
 		searchContainer="${searchContainer}"
@@ -50,6 +56,8 @@
 			
 			Group groupsel= GroupLocalServiceUtil.getGroup(course.getGroupCreatedId());
 			Layout initCourseLayout = LayoutLocalServiceUtil.fetchFirstLayout(course.getGroupCreatedId(), false, 0);
+			long countStudents = CourseLocalServiceUtil.getStudentsFromCourseCount(course.getCourseId());
+			String primKey = String.valueOf(course.getCourseId());
 			%>
 			<liferay-ui:search-container-column-text name="course" orderable="true" orderableProperty="title">
 				<c:choose>
@@ -104,11 +112,18 @@
 			</c:if>
 				
 			<liferay-ui:search-container-column-text name="course.editions-number">
-				<liferay-portlet:renderURL var="goToEditionsURL">
-					<liferay-portlet:param name="courseId" value="<%=String.valueOf(course.getCourseId()) %>"/>
-					<liferay-portlet:param name="view" value="editions"/>
-				</liferay-portlet:renderURL>
-				<a href="${goToEditionsURL}"><%=CourseLocalServiceUtil.countChildCourses(course.getCourseId()) %></a>
+			<c:choose>
+				<c:when test="<%=permissionChecker.hasPermission(themeDisplay.getScopeGroupId(),  Course.class.getName(),primKey,ActionKeys.UPDATE) && ! course.isClosed() && course.getGroupCreatedId() != themeDisplay.getScopeGroupId() && course.getParentCourseId()<=0 && (countStudents<=0 || editionsWithoutRestrictions)%>">
+					<liferay-portlet:renderURL var="goToEditionsURL">
+						<liferay-portlet:param name="courseId" value="<%=String.valueOf(course.getCourseId()) %>"/>
+						<liferay-portlet:param name="view" value="editions"/>
+					</liferay-portlet:renderURL>
+					<a href="${goToEditionsURL}"><%=CourseLocalServiceUtil.countChildCourses(course.getCourseId()) %></a>
+				</c:when>
+				<c:otherwise>
+					<p><%=CourseLocalServiceUtil.countChildCourses(course.getCourseId()) %></p>
+				</c:otherwise>
+			</c:choose>
 			</liferay-ui:search-container-column-text>
 			
 			<c:if test="${renderRequest.preferences.getValue('showRegistrationType', 'false')}">		

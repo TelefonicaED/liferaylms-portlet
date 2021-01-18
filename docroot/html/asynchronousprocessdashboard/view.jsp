@@ -30,10 +30,12 @@ String timeTodoRefresh = (String) renderRequest.getAttribute("refreshPageEachXSe
 <script>
 var timeTodoRefreshInseg = <%=timeTodoRefresh%> * 1000;
 
-if(timeTodoRefreshInseg < 10000){
+if(timeTodoRefreshInseg > 0 && timeTodoRefreshInseg < 10000){
 	timeTodoRefreshInseg = 10000;
 }
-setTimeout(function() { <portlet:namespace />refresh(); }, timeTodoRefreshInseg);
+if(timeTodoRefreshInseg > 0) {
+	setTimeout(function() { <portlet:namespace />refresh(); }, timeTodoRefreshInseg);
+}
  
 function <portlet:namespace />refresh(){
 	AUI( ).use( 'aui-io-request', function( A ) {

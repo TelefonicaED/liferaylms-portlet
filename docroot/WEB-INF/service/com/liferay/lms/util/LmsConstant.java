@@ -22,7 +22,9 @@ public class LmsConstant {
 	
 	public static String DOCUMENTLIBRARY_PORTLET_KEY = "lms.document.library.viewer.portlet";
 	public static String DOCUMENTLIBRARY_PAGE_KEY = "lms.document.library.viewer.page";
-
+	
+	public static String SHOW_COMPLETED_OPEN_COURSES_INPROGRESS = "lms.course.showCompletedOpenCoursesInProgress";
+	public static String ALLOW_WEIGHTLESS_MANDATORY_ACTIVITIES = "lms.course.allowWeightlessMandatoryActivities";
 	public static String RESOURCE_INTERNAL_DOCUMENT_LINKED = "lms.resource.internal.linked";
 	public static String SHOW_MODULE_CLASSIFICATION = "showModuleClassification";
 	public static String SHOW_ACTIVITY_CLASSIFICATION = "showActivityClassification";
