@@ -9,6 +9,7 @@ El formato estÃ¡ basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 
 - #194691 Se añade una configuración en el portlet de activitiesList para mostrar modulos específicos.
 - #178357 Se muestra el sumatorio de las ponderaciones en el portlet para configurar el método de evaluación ponderado
+- #173313 Se añade la posibilidad de enviar adjunto un evento de calendario con la fecha de inicio del curso en el mail de bienvenida.
 
 ### Fixed
 

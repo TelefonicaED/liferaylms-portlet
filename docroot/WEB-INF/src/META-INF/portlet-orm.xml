@@ -165,6 +165,7 @@
 			<basic name="welcome" />
 			<basic name="welcomeMsg" />
 			<basic name="welcomeSubject" />
+			<basic name="welcomeAddToCalendar" />
 			<basic name="deniedInscription" />
 			<basic name="deniedInscriptionMsg" />
 			<basic name="deniedInscriptionSubject" />
