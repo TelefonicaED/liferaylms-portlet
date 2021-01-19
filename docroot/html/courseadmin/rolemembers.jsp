@@ -140,6 +140,6 @@ function <portlet:namespace />deleteUser(cur,userId,screenName,firstName,lastNam
 </script>
 
 
-
+<%@ include file="/html/courseadmin/popups/importUsers.jsp" %>
 
 
