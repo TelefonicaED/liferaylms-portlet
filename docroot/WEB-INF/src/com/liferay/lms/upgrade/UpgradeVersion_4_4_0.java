@@ -27,13 +27,14 @@ import com.liferay.portal.util.PortalUtil;
 public class UpgradeVersion_4_4_0 extends UpgradeProcess {
 	private static Log log = LogFactoryUtil.getLog(UpgradeVersion_4_4_0.class);
 	
-	
 	public int getThreshold() {
 		return 440;
 	}
 	
 	protected void doUpgrade() throws Exception {
-		log.info("Actualizando version a 4.4.0");		DB db = DBFactoryUtil.getDB();	
+		log.info("Actualizando version a 4.4.0");		
+		
+		DB db = DBFactoryUtil.getDB();	
 		
 		String updateCourse = "ALTER TABLE `lms_course` ADD COLUMN `welcomeAddToCalendar` TINYINT(4) NULL DEFAULT NULL AFTER `welcome`;";
 			
@@ -42,7 +43,9 @@ public class UpgradeVersion_4_4_0 extends UpgradeProcess {
 			db.runSQL(updateCourse);
 		} catch (IOException | SQLException e) {
 			e.printStackTrace();
-		} 		String updateLearningActivity = "ALTER TABLE `lms_coursetype` ADD COLUMN `classNameId` BIGINT(20) NULL AFTER `iconId`;";
+		} 		
+		
+		String updateLearningActivity = "ALTER TABLE `lms_coursetype` ADD COLUMN `classNameId` BIGINT(20) NULL AFTER `iconId`;";
 		
 		log.info("Alter table lms_coursetype -->> Add classNameId");
 		try {
@@ -65,11 +68,11 @@ public class UpgradeVersion_4_4_0 extends UpgradeProcess {
 				"`courseTypeRelationId` BIGINT(20) NOT NULL,"+
 				"`courseTypeId` BIGINT(20) NULL DEFAULT NULL,"+
 				"`classNameId` BIGINT(20) NULL DEFAULT NULL,"+
-				"`classNamePK` BIGINT(20) NULL DEFAULT NULL,"+
+				"`classPK` BIGINT(20) NULL DEFAULT NULL,"+
 				"PRIMARY KEY (`courseTypeRelationId`),"+
 				"INDEX `IX_120D96C8` (`courseTypeId`),"+
 				"INDEX `IX_BF34A786` (`courseTypeId`,`classNameId`),"+
-				"UNIQUE INDEX `IX_DCE1431D` (`courseTypeId`,`classNameId`,`classNamePK`)"+
+				"UNIQUE INDEX `IX_DCE1431D` (`courseTypeId`,`classNameId`,`classPK`)"+
 				")"+
 				"COLLATE='utf8_general_ci' ENGINE=InnoDB ;";
 		
@@ -103,8 +106,8 @@ public class UpgradeVersion_4_4_0 extends UpgradeProcess {
 			}
 		}
 		
-		String insert = "INSERT INTO lms_coursetyperelation (courseTypeId, classNameId, classNamePK) "
-				+ "SELECT courseTypeId, " + PortalUtil.getClassNameId(CalificationType.class)+", calificationType FROM lms_coursetypecalificationtype;";
+		String insert = "INSERT INTO lms_coursetyperelation (courseTypeId, classNameId, classPK) "
+				+ "SELECT DISTINCT courseTypeId, " + PortalUtil.getClassNameId(CalificationType.class)+", calificationType FROM lms_coursetypecalificationtype;";
 		
 		log.info("Insert table lms_coursetyperelation -->> lms_coursetypecalificationtype");
 		try {
@@ -113,8 +116,8 @@ public class UpgradeVersion_4_4_0 extends UpgradeProcess {
 			e.printStackTrace();
 		} 
 		
-		insert = "INSERT INTO lms_coursetyperelation (courseTypeId, classNameId, classNamePK) "
-				+ "SELECT courseTypeId, " + PortalUtil.getClassNameId(CourseEval.class)+", courseEvalId FROM lms_coursetypecourseeval;";
+		insert = "INSERT INTO lms_coursetyperelation (courseTypeId, classNameId, classPK) "
+				+ "SELECT DISTINCT courseTypeId, " + PortalUtil.getClassNameId(CourseEval.class)+", courseEvalId FROM lms_coursetypecourseeval;";
 		
 		log.info("Insert table lms_coursetyperelation -->> lms_coursetypecourseeval");
 		try {
@@ -123,8 +126,8 @@ public class UpgradeVersion_4_4_0 extends UpgradeProcess {
 			e.printStackTrace();
 		} 
 		
-		insert = "INSERT INTO lms_coursetyperelation (courseTypeId, classNameId, classNamePK) "
-				+ "SELECT courseTypeId, " + PortalUtil.getClassNameId(InscriptionType.class)+", inscriptionType FROM lms_coursetypeinscriptiontype;";
+		insert = "INSERT INTO lms_coursetyperelation (courseTypeId, classNameId, classPK) "
+				+ "SELECT DISTINCT courseTypeId, " + PortalUtil.getClassNameId(InscriptionType.class)+", inscriptionType FROM lms_coursetypeinscriptiontype;";
 		
 		log.info("Insert table lms_coursetyperelation -->> lms_coursetypeinscriptiontype");
 		try {
@@ -133,8 +136,8 @@ public class UpgradeVersion_4_4_0 extends UpgradeProcess {
 			e.printStackTrace();
 		} 
 		
-		insert = "INSERT INTO lms_coursetyperelation (courseTypeId, classNameId, classNamePK) "
-				+ "SELECT courseTypeId, " + PortalUtil.getClassNameId(LearningActivityType.class)+", learningActivityTypeId FROM lms_coursetypelearningactivity;";
+		insert = "INSERT INTO lms_coursetyperelation (courseTypeId, classNameId, classPK) "
+				+ "SELECT DISTINCT courseTypeId, " + PortalUtil.getClassNameId(LearningActivityType.class)+", learningActivityTypeId FROM lms_coursetypelearningactivity;";
 		
 		log.info("Insert table lms_coursetyperelation -->> lms_coursetypelearningactivity");
 		try {
@@ -143,8 +146,8 @@ public class UpgradeVersion_4_4_0 extends UpgradeProcess {
 			e.printStackTrace();
 		} 
 		
-		insert = "INSERT INTO lms_coursetyperelation (courseTypeId, classNameId, classNamePK) "
-				+ "SELECT courseTypeId, " + PortalUtil.getClassNameId(LayoutSetPrototype.class)+", templateId FROM lms_coursetypetemplate;";
+		insert = "INSERT INTO lms_coursetyperelation (courseTypeId, classNameId, classPK) "
+				+ "SELECT DISTINCT courseTypeId, " + PortalUtil.getClassNameId(LayoutSetPrototype.class)+", templateId FROM lms_coursetypetemplate;";
 		
 		
 		
@@ -157,7 +160,7 @@ public class UpgradeVersion_4_4_0 extends UpgradeProcess {
 		
 		String update = "UPDATE counter SET currentId = "
 				+ "(SELECT MAX(lms_coursetyperelation.courseTypeRelationId)+1 "
-				+ "FROM lms_coursetypecalificationtype) "
+				+ "FROM lms_coursetyperelation) "
 				+ "WHERE NAME='" + CourseTypeRelation.class.getName() + "';";
 		
 		log.info("Update table counter");
