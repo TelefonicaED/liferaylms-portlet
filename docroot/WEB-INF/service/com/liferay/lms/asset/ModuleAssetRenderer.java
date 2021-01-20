@@ -139,6 +139,41 @@ public class ModuleAssetRenderer extends BaseAssetRenderer {
 		
 		return gotoModuleURL.toString();
 	}
+	
+	
+	public PortletURL getURLViewInContext(long plid, LiferayPortletRequest liferayPortletRequest,
+				LiferayPortletResponse liferayPortletResponse) throws Exception {
+			
+		ThemeDisplay themeDisplay = (ThemeDisplay)liferayPortletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
+		
+		Layout layoutActivityViewer = null;
+
+		if(plid > 0){
+			layoutActivityViewer = LayoutLocalServiceUtil.getLayout(plid);
+		}else{
+			layoutActivityViewer = ModuleAssetRendererFactory.getLayoutActivityViewer(themeDisplay.getLayout(), _module.getGroupId());
+		}
+		
+		if (layoutActivityViewer == null) {
+			throw new NoSuchLayoutException();
+		}
+		
+		LiferayPortletURL  gotoModuleURL = PortletURLFactoryUtil.create(liferayPortletRequest,
+				PortalUtil.getJsSafePortletId(LmsConstant.ACTIVITY_VIEWER_PORTLET_ID), 
+				layoutActivityViewer.getPlid(), PortletRequest.RENDER_PHASE);	
+		gotoModuleURL.removePublicRenderParameter("actionEditingActivity");
+		gotoModuleURL.removePublicRenderParameter("actionEditingModule");
+		gotoModuleURL.removePublicRenderParameter("actionCalifications");
+		gotoModuleURL.removePublicRenderParameter("actionEditingDetails");
+		gotoModuleURL.removePublicRenderParameter("actId");
+		gotoModuleURL.setWindowState(WindowState.NORMAL);
+		gotoModuleURL.setParameter("moduleId", Long.toString(_module.getModuleId()));
+		gotoModuleURL.setPlid(layoutActivityViewer.getPlid());
+		gotoModuleURL.setPortletId(LmsConstant.ACTIVITY_VIEWER_PORTLET_ID);
+		
+		return gotoModuleURL;
+	}
 		
 	@Override
 	public boolean hasViewPermission(PermissionChecker permissionChecker)

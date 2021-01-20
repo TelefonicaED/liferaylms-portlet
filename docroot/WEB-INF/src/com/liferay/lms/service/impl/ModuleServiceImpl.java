@@ -17,7 +17,12 @@ package com.liferay.lms.service.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.portlet.PortletURL;
+import javax.portlet.WindowState;
+
+import com.liferay.lms.asset.ModuleAssetRenderer;
 import com.liferay.lms.model.Course;
+import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.model.Module;
 import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.lms.service.base.ModuleServiceBaseImpl;
@@ -26,10 +31,14 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.jsonwebservice.JSONWebService;
 import com.liferay.portal.kernel.jsonwebservice.JSONWebServiceMode;
+import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
+import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.model.User;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceContextThreadLocal;
 import com.liferay.portal.service.UserLocalServiceUtil;
+import com.liferay.portlet.asset.AssetRendererFactoryRegistryUtil;
+import com.liferay.portlet.asset.model.AssetRendererFactory;
 
 /**
  * The implementation of the module remote service.
@@ -103,5 +112,12 @@ public class ModuleServiceImpl extends ModuleServiceBaseImpl {
 		}
 		return false;
 	
+	}
+	
+	public PortletURL getURLModule(Module module, long plid, LiferayPortletRequest liferayPortletRequest, LiferayPortletResponse liferayPortletResponse) throws PortalException, SystemException, Exception{
+		
+		ModuleAssetRenderer moduleAssetRenderer = new ModuleAssetRenderer(module);
+
+		return moduleAssetRenderer.getURLViewInContext(plid, liferayPortletRequest, liferayPortletResponse);
 	}
 }

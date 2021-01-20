@@ -83,7 +83,8 @@ Liferay.Service.registerClass(
 		findAllInCourse: true,
 		isLocked: true,
 		PassedByMe: true,
-		isUserPassed: true
+		isUserPassed: true,
+		getURLModule: true
 	}
 );
 

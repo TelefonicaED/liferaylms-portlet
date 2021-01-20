@@ -335,6 +335,38 @@ public abstract class LearningActivityBaseAssetRenderer extends BaseAssetRendere
 		prepareRuntimePortlet(portletURL);
 		return portletURL.toString();
 	}
+	
+	public PortletURL getURLViewInContext(long plid,
+			LiferayPortletRequest liferayPortletRequest,
+			LiferayPortletResponse liferayPortletResponse) throws Exception {
+		
+		ThemeDisplay themeDisplay = (ThemeDisplay) liferayPortletRequest.getAttribute(WebKeys.THEME_DISPLAY);
+		
+		if(plid == 0){
+			prepareLayout(themeDisplay.getLayout());
+			plid = _layout.getPlid();
+		}else{
+			_layout = LayoutLocalServiceUtil.getLayout(plid);
+		}
+	
+		PortletURL portletURL = liferayPortletResponse.createLiferayPortletURL(plid, _portletId, PortletRequest.RENDER_PHASE);
+		portletURL.setParameter("actId",Long.toString( _learningactivity.getActId()));
+		portletURL.setParameter("moduleId",Long.toString( _learningactivity.getModuleId()));
+		portletURL.setParameter("actionEditingActivity", StringPool.FALSE);
+		portletURL.setParameter("actionEditingDetails", StringPool.FALSE);
+		portletURL.setParameter("actionEditingModule", StringPool.FALSE);
+		portletURL.setParameter("actionCalifications", StringPool.FALSE);
+		portletURL.setParameter("activityStarted", StringPool.TRUE);	
+		portletURL.setParameter("view", StringPool.BLANK);
+		
+		String mvcPath = getMvcPathView(themeDisplay.getUserId(),liferayPortletResponse,liferayPortletRequest.getWindowState());
+		if(Validator.isNotNull(mvcPath)){
+			portletURL.setParameter("mvcPath",mvcPath);
+		}
+		
+		prepareRuntimePortlet(portletURL);
+		return portletURL;
+	}
 
 	@Override
 	public String getViewInContextMessage() {
