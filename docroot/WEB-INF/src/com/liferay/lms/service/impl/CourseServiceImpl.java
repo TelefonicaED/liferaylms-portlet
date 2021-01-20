@@ -27,6 +27,7 @@ import com.liferay.lms.model.LmsPrefs;
 import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.lms.service.LmsPrefsLocalServiceUtil;
 import com.liferay.lms.service.base.CourseServiceBaseImpl;
+import com.liferay.lms.util.LmsConstant;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.ProjectionFactoryUtil;
@@ -625,7 +626,7 @@ public class CourseServiceImpl extends CourseServiceBaseImpl {
 		List<Layout> layouts = layoutService.getLayouts(groupId, false);
 		while(plid == 0 && i < layouts.size()){
 			
-			if(layouts.get(i).getTypeSettings().contains(LearningActivityBaseAssetRenderer.ACTIVITY_VIEWER_PORTLET_ID)){
+			if(layouts.get(i).getTypeSettings().contains(LmsConstant.ACTIVITY_VIEWER_PORTLET_ID)){
 				plid = layouts.get(i).getPlid();
 			}
 			i++;
@@ -641,7 +642,7 @@ public class CourseServiceImpl extends CourseServiceBaseImpl {
 		List<Layout> layouts = layoutService.getLayouts(groupId, false);
 		while(Validator.isNull(friendlyURL) && i < layouts.size()){
 			
-			if(layouts.get(i).getTypeSettings().contains(LearningActivityBaseAssetRenderer.TEACHERS_PORTLET_ID)){
+			if(layouts.get(i).getTypeSettings().contains(LmsConstant.TEACHERS_PORTLET_ID)){
 				friendlyURL = layouts.get(i).getFriendlyURL();
 			}
 			i++;

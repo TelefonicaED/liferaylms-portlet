@@ -33,7 +33,10 @@ AUI().ready(
 <h1><liferay-ui:message key="content"></liferay-ui:message> </h1>
 <%
 	Course course=CourseLocalServiceUtil.fetchByGroupCreatedId(themeDisplay.getScopeGroupId());
-	long courseTypeId = AssetEntryLocalServiceUtil.getEntry(Course.class.getName(),course.getCourseId()).getClassTypeId();
+	long courseTypeId = 0;
+	if(course != null){
+		courseTypeId = AssetEntryLocalServiceUtil.getEntry(Course.class.getName(),course.getCourseId()).getClassTypeId();
+	}
 	List<Long> listLearningActivityTypes = null;
 	if(courseTypeId>0){
 		CourseType courseType = CourseTypeLocalServiceUtil.getCourseType(courseTypeId);

@@ -708,20 +708,4 @@ public class ModuleLocalServiceImpl extends ModuleLocalServiceBaseImpl {
 		return modulePersistence.findByCompanyId(companyId);
 	}
 	
-	public LiferayPortletURL getURLModule(long moduleId, long layoutPlid, HttpServletRequest httpServletRequest) throws WindowStateException{
-		LiferayPortletURL  gotoModuleURL = PortletURLFactoryUtil.create(httpServletRequest,
-				PortalUtil.getJsSafePortletId(LearningActivityBaseAssetRenderer.ACTIVITY_VIEWER_PORTLET_ID), 
-				layoutPlid, PortletRequest.RENDER_PHASE);	
-		gotoModuleURL.removePublicRenderParameter("actionEditingActivity");
-		gotoModuleURL.removePublicRenderParameter("actionEditingModule");
-		gotoModuleURL.removePublicRenderParameter("actionCalifications");
-		gotoModuleURL.removePublicRenderParameter("actionEditingDetails");
-		gotoModuleURL.removePublicRenderParameter("actId");
-		gotoModuleURL.setWindowState(WindowState.NORMAL);
-		gotoModuleURL.setParameter("moduleId", Long.toString(moduleId));
-		gotoModuleURL.setPlid(layoutPlid);
-		gotoModuleURL.setPortletId(LearningActivityBaseAssetRenderer.ACTIVITY_VIEWER_PORTLET_ID);
-		
-		return gotoModuleURL;
-	}
 }

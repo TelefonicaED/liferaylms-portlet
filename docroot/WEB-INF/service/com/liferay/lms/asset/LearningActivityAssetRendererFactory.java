@@ -12,19 +12,25 @@ import java.util.ResourceBundle;
 import javax.portlet.PortletPreferences;
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletURL;
+import javax.portlet.WindowState;
 
 import com.liferay.lms.learningactivity.LearningActivityType;
 import com.liferay.lms.learningactivity.LearningActivityTypeRegistry;
 import com.liferay.lms.model.Course;
 import com.liferay.lms.model.LearningActivity;
+import com.liferay.lms.model.Module;
 import com.liferay.lms.service.ClpSerializer;
 import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.lms.service.CourseServiceUtil;
 import com.liferay.lms.service.LearningActivityLocalServiceUtil;
 import com.liferay.lms.service.LmsPrefsLocalServiceUtil;
+import com.liferay.lms.util.LmsConstant;
+import com.liferay.portal.NoSuchLayoutException;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.PortletBagPool;
@@ -37,6 +43,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.model.Layout;
+import com.liferay.portal.model.LayoutConstants;
 import com.liferay.portal.model.PortletConstants;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.service.LayoutLocalServiceUtil;
@@ -49,11 +56,15 @@ import com.liferay.portlet.asset.model.BaseAssetRendererFactory;
 
 public class LearningActivityAssetRendererFactory extends BaseAssetRendererFactory
  {
+	private static Log log = LogFactoryUtil.getLog(LearningActivityAssetRendererFactory.class);
+	
 	private static final String LEARNING_ACTIVITY_EXEC_ACTIVITY = LearningActivityAssetRendererFactory.class.getName()+"_execActivity";
 	public static final String CLASS_NAME = LearningActivity.class.getName();
 	public static final String TYPE = "learningactivity";
 	private static final String PORTLET_ID =  PortalUtil.getJsSafePortletId("lmsactivitieslist"+PortletConstants.WAR_SEPARATOR+ClpSerializer.getServletContextName());
 	private volatile Method getGroupIds;
+	public static final String ACTIVITY_VIEWER_PORTLET_ID =  LmsConstant.ACTIVITY_VIEWER_PORTLET_ID;
+	
 	
 	public LearningActivityAssetRendererFactory() throws SystemException {
 		try {
@@ -131,6 +142,10 @@ public class LearningActivityAssetRendererFactory extends BaseAssetRendererFacto
 
 		return plid;
 	}
+	
+	public LearningActivityBaseAssetRenderer getLearningActivityBaseAssetRenderer(LearningActivity activity) throws SystemException, PortalException{
+		LearningActivityType learningActivityType=new LearningActivityTypeRegistry().getLearningActivityType(activity.getTypeId());
+		return (LearningActivityBaseAssetRenderer) learningActivityType.getAssetRenderer(activity);}
 
 	public AssetRenderer getAssetRenderer(long classPK, int type)throws PortalException, SystemException {
 		LearningActivity learningactivity = LearningActivityLocalServiceUtil.getLearningActivity(classPK);
@@ -233,6 +248,36 @@ public class LearningActivityAssetRendererFactory extends BaseAssetRendererFacto
 		}
     }
 	
+	public PortletURL getURLCreateActivity(LiferayPortletRequest liferayPortletRequest,
+			LiferayPortletResponse liferayPortletResponse, Module module) throws Exception {
+		PortletURL portletURL = null;
+		if(module!=null){
+			ThemeDisplay themeDisplay = (ThemeDisplay)liferayPortletRequest.getAttribute(
+					WebKeys.THEME_DISPLAY);
+			
+			Layout layoutActivityViewer = getLayoutActivityViewer(themeDisplay.getLayout(), module.getGroupId());	
+
+			if (layoutActivityViewer == null) {
+				throw new NoSuchLayoutException();
+			}
+			
+			portletURL = liferayPortletResponse.createLiferayPortletURL(layoutActivityViewer.getPlid(), 
+					LmsConstant.LMS_EDITACTIVITY_PORTLET_ID, PortletRequest.RENDER_PHASE);
+			portletURL.setWindowState(WindowState.NORMAL);
+			portletURL.setParameter("actionEditingActivity", StringPool.TRUE);
+			portletURL.setParameter("actionEditingDetails", StringPool.FALSE);
+			portletURL.setParameter("mvcPath", "/html/lmsactivitieslist/newactivity.jsp");
+			portletURL.setParameter("resModuleId",Long.toString(module.getModuleId())); 	
+			portletURL.setParameter("actId",Long.toString(0)); 
+			portletURL.setParameter("resId",Long.toString(0)); 
+			portletURL.setParameter("p_o_p_id",ACTIVITY_VIEWER_PORTLET_ID);
+			
+			log.debug(" getURLCreateActivity: "+portletURL);
+		}
+		
+		return portletURL;		
+	}
+	
 	@Override
 	public boolean hasPermission(PermissionChecker permissionChecker,
 			long classPK, String actionId) throws Exception {
@@ -257,7 +302,22 @@ public class LearningActivityAssetRendererFactory extends BaseAssetRendererFacto
 		return true;
 	}
 	
-
+	public static Layout getLayoutActivityViewer(Layout actualLayout, long groupId) throws PortalException, SystemException{
+		Layout layoutActivityViewer = null;
+		
+		if(groupId == actualLayout.getGroupId() && actualLayout.getTypeSettings().contains(ACTIVITY_VIEWER_PORTLET_ID)){
+			layoutActivityViewer = actualLayout;
+		}
+		
+		if(layoutActivityViewer == null){
+			long plid = CourseServiceUtil.getPlidActivityViewer(groupId);
+			if(plid > 0){
+				layoutActivityViewer = LayoutLocalServiceUtil.getLayout(plid);
+			}
+		}
+		
+		return layoutActivityViewer;
+	}
 
 
 }

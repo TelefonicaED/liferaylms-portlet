@@ -1,3 +1,5 @@
+<%@page import="com.liferay.portlet.asset.model.BaseAssetRenderer"%>
+<%@page import="com.liferay.lms.asset.LearningActivityAssetRendererFactory"%>
 <%@page import="com.liferay.lms.LmsActivitiesList"%>
 <%@page import="com.liferay.portal.kernel.util.Validator"%>
 <%@page import="javax.portlet.PortletURL"%>
@@ -29,14 +31,17 @@
 LearningActivity myActivity = activity;
 
 String name = LearningActivity.class.getName();
-String primKey = String.valueOf(myActivity.getActId());%>
+String primKey = String.valueOf(myActivity.getActId());
+LearningActivityAssetRendererFactory learningActivityAssetRendererFactory = new LearningActivityAssetRendererFactory();
+LearningActivityBaseAssetRenderer assetRenderer = learningActivityAssetRendererFactory.getLearningActivityBaseAssetRenderer(myActivity);
+%>
 				
 <c:if test="<%= hasPermissionUpdate %>">							
 		<%
 		liferayPortletRequest.setAttribute(LearningActivityBaseAssetRenderer.EDIT_DETAILS, true);
-		//PortletURL urlEditDetails = assetRendererFactory.getAssetRenderer(myActivity.getActId()).getURLEdit(liferayPortletRequest,liferayPortletResponse);
-
-		PortletURL urlEditDetails = LmsActivitiesList.getURLEditActivity(liferayPortletRequest, liferayPortletResponse, myActivity);
+		
+		PortletURL urlEditDetails = assetRenderer.
+				getURLEditActivity(liferayPortletRequest, liferayPortletResponse);
 
 		if(Validator.isNotNull(urlEditDetails)){
 	
@@ -224,7 +229,7 @@ String primKey = String.valueOf(myActivity.getActId());%>
 <c:if test="<%=visibleCalifications && hasPermissionViewResults%>">
 	
 	<%
-	PortletURL urlCalifications = LmsActivitiesList.getURLCalifications(liferayPortletRequest, liferayPortletResponse, myActivity);
+	PortletURL urlCalifications = assetRenderer.getURLCalifications(liferayPortletRequest, liferayPortletResponse);
 	if(Validator.isNotNull(urlCalifications)){
 			
 		%>

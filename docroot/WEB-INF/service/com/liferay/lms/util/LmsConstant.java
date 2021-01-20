@@ -1,5 +1,9 @@
 package com.liferay.lms.util;
 
+import com.liferay.lms.service.ClpSerializer;
+import com.liferay.portal.model.PortletConstants;
+import com.liferay.portal.util.PortalUtil;
+
 public class LmsConstant {
 	
 	public final static int STATUS_NOT_STARTED = 0;
@@ -51,4 +55,11 @@ public class LmsConstant {
 	public final static String PREFS_USERS_EXTENDED_DATA = "users.view.extended.data";
 	public final static boolean PREFS_USERS_EXTENDED_DATA_DEFAULT = false;
 	public final static String ACTION_VIEW_USER_EXTENDED = "VIEW_USER_EXTENDED";
+
+	public static final String ACTIVITY_VIEWER_PORTLET_ID =  PortalUtil.getJsSafePortletId("activityViewer"+PortletConstants.WAR_SEPARATOR+ClpSerializer.getServletContextName());
+	public static final String LMS_EDITACTIVITY_PORTLET_ID =  PortalUtil.getJsSafePortletId("editactivity"+PortletConstants.WAR_SEPARATOR+ClpSerializer.getServletContextName());
+	public static final String LMS_EDITMODULE_PORTLET_ID =  PortalUtil.getJsSafePortletId("editmodule"+PortletConstants.WAR_SEPARATOR+ClpSerializer.getServletContextName());
+	public static final String TEACHERS_PORTLET_ID = PortalUtil.getJsSafePortletId("courseteachers"+PortletConstants.WAR_SEPARATOR+ClpSerializer.getServletContextName());
+	
+
 }

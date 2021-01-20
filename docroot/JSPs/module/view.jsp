@@ -1,3 +1,4 @@
+<%@page import="com.liferay.lms.asset.ModuleAssetRendererFactory"%>
 <%@page import="com.liferay.lms.LmsActivitiesList"%>
 <%@page import="com.liferay.lms.model.Course"%>
 <%@page import="com.liferay.portal.kernel.util.StringPool"%>
@@ -105,7 +106,8 @@
 	</script>
 	
 	<%
-	PortletURL urlCreateModule = LmsActivitiesList.getURLCreateModule(liferayPortletRequest, liferayPortletResponse, themeDisplay);
+	ModuleAssetRendererFactory moduleAssetRendererFactory = new ModuleAssetRendererFactory();
+	PortletURL urlCreateModule = moduleAssetRendererFactory.getURLCreateModule(liferayPortletRequest, liferayPortletResponse, themeDisplay);
 	%>
 	
 	<div class="<%=(themeDisplay.getLayout().getFriendlyURL().equals("/reto"))?"newitem":"newitem2" %>">

@@ -32,6 +32,8 @@ import com.liferay.lms.service.ModuleLocalServiceUtil;
 import com.liferay.lms.service.ScheduleLocalServiceUtil;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
+import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.Team;
 import com.liferay.portal.model.User;
@@ -40,6 +42,8 @@ import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.security.permission.PermissionCheckerFactoryUtil;
 import com.liferay.portal.service.TeamLocalServiceUtil;
 import com.liferay.portal.service.UserLocalServiceUtil;
+import com.liferay.portlet.asset.AssetRendererFactoryRegistryUtil;
+import com.liferay.portlet.asset.model.AssetRendererFactory;
 import com.tls.lms.util.LiferaylmsUtil;
 
 /**
@@ -314,5 +318,13 @@ public class LearningActivityImpl extends LearningActivityBaseImpl {
 			e.printStackTrace();
 			return null;
 		}
+	}
+	
+	public String getURLView(LiferayPortletRequest liferayPortletRequest,
+			LiferayPortletResponse liferayPortletResponse) throws PortalException, SystemException, Exception{
+		AssetRendererFactory assetRendererFactory = AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(LearningActivity.class.getName());
+		
+		return assetRendererFactory.getAssetRenderer(getActId()).getURLViewInContext(liferayPortletRequest, liferayPortletResponse, "");
+		
 	}
 }
