@@ -29,19 +29,20 @@
 <%
 Boolean isTablet = ParamUtil.getBoolean(renderRequest, "isTablet", false);
 
+Course course = CourseLocalServiceUtil.fetchByGroupCreatedId(themeDisplay.getScopeGroupId());
+boolean hasPermissionAccessCourseFinished = LiferaylmsUtil.hasPermissionAccessCourseFinished(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(), course.getCourseId(), themeDisplay.getUserId());
+
 LearningActivity learningActivity=(LearningActivity)request.getAttribute("learningActivity");
 if(learningActivity==null){
 	learningActivity=LearningActivityLocalServiceUtil.getLearningActivity(ParamUtil.getLong(request,"actId" ));	
 }
 
 LearningActivityResult lar = LearningActivityResultLocalServiceUtil.getByActIdAndUserId(learningActivity.getActId(), themeDisplay.getUserId());
-boolean showPopUpFinishedResult = ParamUtil.getBoolean(renderRequest, "showPopUpFinishedResult");
+boolean showPopUpFinishedResult = (Boolean)request.getAttribute( "showPopUpFinishedResult");
 
 boolean isTeacher=permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), "com.liferay.lms.model",themeDisplay.getScopeGroupId(), "VIEW_RESULTS");
 
 if(isTeacher){
-	Course course = CourseLocalServiceUtil.getCourseByGroupCreatedId(themeDisplay.getScopeGroupId());
-
 	String popupcorrection="javascript:"+renderResponse.getNamespace() + "showPopupGetReport();";
 %>
 	<portlet:renderURL var="goToCorrection" >
@@ -53,7 +54,7 @@ if(isTeacher){
 	
 <%}	
 
-if(showPopUpFinishedResult){%>
+if(!hasPermissionAccessCourseFinished && showPopUpFinishedResult){%>
 	<portlet:actionURL name="finishedResult" var="finishedResultURL">
 		<portlet:param name="actId" value="<%=Long.toString(learningActivity.getActId() ) %>" />
 	</portlet:actionURL>
@@ -97,9 +98,7 @@ if(showPopUpFinishedResult){%>
 
 <div class="container-activity isFeedback">
 	<%	
-	Course course = CourseLocalServiceUtil.fetchByGroupCreatedId(themeDisplay.getScopeGroupId());
 	boolean hasFreeQuestion = false;
-	boolean hasPermissionAccessCourseFinished = LiferaylmsUtil.hasPermissionAccessCourseFinished(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(), course.getCourseId(), themeDisplay.getUserId());
 
 	LearningActivity bankActivity = learningActivity;
 	boolean useBank = StringPool.TRUE.equals(LearningActivityLocalServiceUtil.getExtraContentValue(learningActivity.getActId(), "isBank"));
@@ -307,11 +306,10 @@ if(showPopUpFinishedResult){%>
 			}
 		}else{
 			if(score<100){
-				String improveStr = LearningActivityLocalServiceUtil.getExtraContentValue(ParamUtil.getLong(request,"actId"), "improve");
-				if(improveStr.equals("true")){
+				if(learningActivity.isImprove()){
 					if(tries>0){
 	%>
-						<p class="negrita"><liferay-ui:message key="execativity.test.try.count" arguments="<%=new Object[]{userTries,tries} %>" /></p>
+						<p class="negrita"><liferay-ui:message key="execativity.test.try.improve" arguments="<%=new Object[]{tries} %>" />&nbsp;<liferay-ui:message key="execativity.test.try.count" arguments="<%=new Object[]{userTries,tries} %>" /></p>
 						<p class="color_tercero textcenter negrita"><liferay-ui:message key="execativity.test.try.confirmation.again" /></p>
 	<%
 					}

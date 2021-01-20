@@ -34,7 +34,7 @@ import java.util.Date;
 public class CourseCacheModel implements CacheModel<Course>, Serializable {
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(77);
+		StringBundler sb = new StringBundler(79);
 
 		sb.append("{uuid=");
 		sb.append(uuid);
@@ -94,6 +94,8 @@ public class CourseCacheModel implements CacheModel<Course>, Serializable {
 		sb.append(welcomeMsg);
 		sb.append(", welcomeSubject=");
 		sb.append(welcomeSubject);
+		sb.append(", welcomeAddToCalendar=");
+		sb.append(welcomeAddToCalendar);
 		sb.append(", deniedInscription=");
 		sb.append(deniedInscription);
 		sb.append(", deniedInscriptionMsg=");
@@ -238,6 +240,7 @@ public class CourseCacheModel implements CacheModel<Course>, Serializable {
 			courseImpl.setWelcomeSubject(welcomeSubject);
 		}
 
+		courseImpl.setWelcomeAddToCalendar(welcomeAddToCalendar);
 		courseImpl.setDeniedInscription(deniedInscription);
 
 		if (deniedInscriptionMsg == null) {
@@ -320,6 +323,7 @@ public class CourseCacheModel implements CacheModel<Course>, Serializable {
 	public boolean welcome;
 	public String welcomeMsg;
 	public String welcomeSubject;
+	public boolean welcomeAddToCalendar;
 	public boolean deniedInscription;
 	public String deniedInscriptionMsg;
 	public String deniedInscriptionSubject;

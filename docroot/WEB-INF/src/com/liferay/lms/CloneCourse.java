@@ -1,5 +1,6 @@
 package com.liferay.lms;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -7,12 +8,14 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import com.liferay.counter.service.CounterLocalServiceUtil;
 import com.liferay.lms.course.diploma.CourseDiploma;
 import com.liferay.lms.course.diploma.CourseDiplomaRegistry;
 import com.liferay.lms.learningactivity.LearningActivityType;
 import com.liferay.lms.learningactivity.LearningActivityTypeRegistry;
+import com.liferay.lms.learningactivity.courseeval.PonderatedCourseEval;
 import com.liferay.lms.model.AsynchronousProcessAudit;
 import com.liferay.lms.model.Course;
 import com.liferay.lms.model.CourseCompetence;
@@ -33,6 +36,8 @@ import com.liferay.lms.util.LmsConstant;
 import com.liferay.portal.DuplicateGroupException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
+import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -41,6 +46,7 @@ import com.liferay.portal.kernel.messaging.MessageBusUtil;
 import com.liferay.portal.kernel.messaging.MessageListener;
 import com.liferay.portal.kernel.messaging.MessageListenerException;
 import com.liferay.portal.kernel.repository.model.FileEntry;
+import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.DocumentException;
@@ -79,7 +85,7 @@ import com.liferay.util.CourseCopyUtil;
 
 public class CloneCourse extends CourseCopyUtil implements MessageListener {
 	private static Log log = LogFactoryUtil.getLog(CloneCourse.class);
-
+	static String evalclassName="com.liferay.lms.learningactivity.courseeval.PonderatedCourseEval";
 
 	long groupId;
 	
@@ -101,9 +107,10 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 	boolean cloneDocuments;
 	boolean cloneModuleClassification;
 	boolean cloneActivityClassificationTypes;
+	boolean clonePonderation;
 	
 	public CloneCourse(long groupId, String newCourseName, ThemeDisplay themeDisplay, Date startDate, Date endDate, boolean cloneForum, boolean cloneDocuments,
-			boolean cloneModuleClassification, boolean cloneActivityClassificationTypes, ServiceContext serviceContext) {
+			boolean cloneModuleClassification, boolean cloneActivityClassificationTypes, boolean clonePonderation, ServiceContext serviceContext) {
 		super();
 		this.groupId = groupId;
 		this.newCourseName = newCourseName;
@@ -114,6 +121,7 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 		this.cloneDocuments = cloneDocuments;
 		this.cloneModuleClassification = cloneModuleClassification;
 		this.cloneActivityClassificationTypes = cloneActivityClassificationTypes;
+		this.clonePonderation = clonePonderation;
 		this.serviceContext = serviceContext;
 	}
 	
@@ -147,6 +155,7 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 			this.cloneDocuments = message.getBoolean("cloneDocuments");
 			this.cloneModuleClassification = message.getBoolean("cloneModuleClassification");
 			this.cloneActivityClassificationTypes = message.getBoolean("cloneActivityClassificationTypes");
+			this.clonePonderation = message.getBoolean("clonePonderation");
 			Role adminRole = RoleLocalServiceUtil.getRole(themeDisplay.getCompanyId(),"Administrator");
 			List<User> adminUsers = UserLocalServiceUtil.getRoleUsers(adminRole.getRoleId());
 			 
@@ -206,6 +215,8 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 		
 		//when lmsprefs has more than one lmstemplate selected the addcourse above throws an error.
 		
+		Map<Long,Float> weights=PonderatedCourseEval.getActivitiesWeight(course);
+		Map<Long, Float> ponderationValues = new HashMap<Long, Float>();
 		
 		int typeSite = GroupLocalServiceUtil.getGroup(course.getGroupCreatedId()).getType();
 		Course newCourse = null;  
@@ -230,6 +241,33 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 			newCourse.setExecutionStartDate(startDate);
 			newCourse.setExecutionEndDate(endDate);
 			
+			StringBuilder extraContent = new StringBuilder();
+			
+            Course parentcourse = null;
+            try {
+                parentcourse = course.getParentCourse();
+            } catch (SystemException | PortalException e) {
+                log.debug("Parent course not found");
+            }
+			
+			if(Validator.isNotNull(parentcourse) ) {
+			    extraContent.append(LanguageUtil.get(themeDisplay.getLocale(), "course-admin.parent-course"))
+	            .append(StringPool.COLON).append(StringPool.SPACE)
+	            .append(course.getParentCourse().getTitle(themeDisplay.getLocale())).append("<br>");
+			}
+			
+            extraContent.append(LanguageUtil.get(themeDisplay.getLocale(), "course.label"))
+                .append(StringPool.COLON).append(StringPool.SPACE)
+                .append(course.getTitle(themeDisplay.getLocale()));     
+            
+            extraContent.append("<br>").append(LanguageUtil.get(themeDisplay.getLocale(), "new-course"))
+                .append(StringPool.COLON).append(StringPool.SPACE)
+                .append(newCourse.getTitle(themeDisplay.getLocale()));
+			
+            JSONObject json =JSONFactoryUtil.createJSONObject();            
+            json.put("data", extraContent.toString());
+            
+            process.setExtraContent(json.toString());
 			process.setClassPK(newCourse.getCourseId());
 			process = AsynchronousProcessAuditLocalServiceUtil.updateAsynchronousProcessAudit(process);
 		} catch(DuplicateGroupException e){
@@ -461,6 +499,11 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 					nuevaLarn.setExpandoBridgeAttributes(larnServiceContext);
 					nuevaLarn.getExpandoBridge().setAttributes(activity.getExpandoBridge().getAttributes());
 
+					if(weights.containsKey(activity.getActId())){
+
+						ponderationValues.put(nuevaLarn.getActId(), weights.get(activity.getActId()));
+					}
+					
 					if(log.isDebugEnabled()){
 						log.debug("      Learning Activity : " + activity.getTitle(Locale.getDefault())+ " ("+activity.getActId()+", " + LanguageUtil.get(Locale.getDefault(),learningActivityTypeRegistry.getLearningActivityType(activity.getTypeId()).getName())+")");
 						log.debug("      + Learning Activity : " + nuevaLarn.getTitle(Locale.getDefault())+ " ("+nuevaLarn.getActId()+", " + LanguageUtil.get(Locale.getDefault(),learningActivityTypeRegistry.getLearningActivityType(nuevaLarn.getTypeId()).getName())+")");
@@ -537,6 +580,9 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 			
 		}	
 		
+		if(this.clonePonderation){
+			savePonderation(course, newCourse, ponderationValues); 
+		}
 		
 		//Dependencias de modulos
 		log.debug("modulesDependencesList "+modulesDependencesList.keySet());
@@ -1033,6 +1079,40 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 			log.error(e.getMessage());
 			return null;
 		}
+	}
+	
+	
+	public void savePonderation(Course originCourse, Course course, Map<Long, Float> ponderationValues)  throws SystemException, IOException 
+	{
+		if(Validator.isNotNull(ponderationValues)&&ponderationValues.size()>0){
+		}
+
+		Document document = SAXReaderUtil.createDocument();
+		Element rootElement = document.addElement("eval");
+		long score=0;
+		try {
+			score = PonderatedCourseEval.getScore(originCourse);
+		} catch (PortalException e) {
+			e.printStackTrace();
+		} catch (DocumentException e) {
+			e.printStackTrace();
+		}
+		Element passElement=rootElement.addElement("score");
+		passElement.addAttribute("value", Long.toString(score));
+		
+		rootElement.addElement("courseEval").setText(evalclassName);		
+	
+		for (Map.Entry<Long, Float> entry : ponderationValues.entrySet()) {
+			Element weight=rootElement.addElement("weight");
+			weight.addAttribute("actId", Long.toString(entry.getKey()));
+			weight.addAttribute("ponderation",Float.toString(entry.getValue()));
+
+		    //System.out.println("clave=" + entry.getKey() + ", valor=" + entry.getValue());
+		}
+				
+		course.setCourseExtraData(document.formattedString());
+		CourseLocalServiceUtil.updateCourse(course);
+		
 	}
 
 }

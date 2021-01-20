@@ -18,8 +18,7 @@ import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBFactoryUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.upgrade.UpgradeProcess;
-import com.liferay.portal.kernel.util.PrefsPropsUtil;
+import com.liferay.portal.kernel.upgrade.UpgradeProcess;import com.liferay.portal.kernel.util.PrefsPropsUtil;
 import com.liferay.portal.model.Company;
 import com.liferay.portal.model.LayoutSetPrototype;
 import com.liferay.portal.service.CompanyLocalServiceUtil;
@@ -34,11 +33,16 @@ public class UpgradeVersion_4_4_0 extends UpgradeProcess {
 	}
 	
 	protected void doUpgrade() throws Exception {
-		log.info("Actualizando version a 4.4.0");
+		log.info("Actualizando version a 4.4.0");		DB db = DBFactoryUtil.getDB();	
 		
-		DB db = DBFactoryUtil.getDB();	
-		
-		String updateLearningActivity = "ALTER TABLE `lms_coursetype` ADD COLUMN `classNameId` BIGINT(20) NULL AFTER `iconId`;";
+		String updateCourse = "ALTER TABLE `lms_course` ADD COLUMN `welcomeAddToCalendar` TINYINT(4) NULL DEFAULT NULL AFTER `welcome`;";
+			
+		log.info("Alter table lms_course -->> Add welcomeAddToCalendar");
+		try {
+			db.runSQL(updateCourse);
+		} catch (IOException | SQLException e) {
+			e.printStackTrace();
+		} 		String updateLearningActivity = "ALTER TABLE `lms_coursetype` ADD COLUMN `classNameId` BIGINT(20) NULL AFTER `iconId`;";
 		
 		log.info("Alter table lms_coursetype -->> Add classNameId");
 		try {

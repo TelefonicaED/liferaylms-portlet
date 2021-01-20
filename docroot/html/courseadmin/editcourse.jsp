@@ -1062,7 +1062,9 @@ if(isCourseChild){
 				<aui:input type="checkbox" name="welcome" label="enabled" value='<%=active %>' onChange='<%= renderResponse.getNamespace()+"changeWelcome()" %>'/>
 				
 				<div id="containerWelcomeMsg" style='display:<%=active?"block":"none"%>'>
-				
+				<% boolean welcomeAddToCalendar =(course!=null&&course.getWelcomeAddToCalendar()?true:false); %>
+					<aui:input type="checkbox" name="welcomeAddToCalendar" label="welcome-add-to-calendar" value='<%=welcomeAddToCalendar %>' />
+					
 					<aui:input name="welcomeSubject" size="100"  type="text" label="welcome-subject" value="<%=welcomeSubject%>">
 						<aui:validator name="maxLength">75</aui:validator>
 					</aui:input>

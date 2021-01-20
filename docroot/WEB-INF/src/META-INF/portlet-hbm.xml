@@ -131,6 +131,7 @@
 		<property name="welcome" type="com.liferay.portal.dao.orm.hibernate.BooleanType" />
 		<property name="welcomeMsg" type="com.liferay.portal.dao.orm.hibernate.StringType" />
 		<property name="welcomeSubject" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="welcomeAddToCalendar" type="com.liferay.portal.dao.orm.hibernate.BooleanType" />
 		<property name="deniedInscription" type="com.liferay.portal.dao.orm.hibernate.BooleanType" />
 		<property name="deniedInscriptionMsg" type="com.liferay.portal.dao.orm.hibernate.StringType" />
 		<property name="deniedInscriptionSubject" type="com.liferay.portal.dao.orm.hibernate.StringType" />

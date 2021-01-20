@@ -107,6 +107,7 @@
 			<hint name="max-length">500000</hint>
 		</field>
 		<field name="welcomeSubject" type="String" />
+		<field name="welcomeAddToCalendar" type="boolean" />
 		<field name="deniedInscription" type="boolean" />
 		<field name="deniedInscriptionMsg" type="String">
 			<hint name="display-width">1024</hint>

@@ -14,6 +14,15 @@
 
 package com.liferay.lms.model.impl;
 
+
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.model.User;
+import com.liferay.portal.service.UserLocalServiceUtil;
+
 /**
  * The extended model implementation for the AsynchronousProcessAudit service. Represents a row in the &quot;Lms_AsynchronousProcessAudit&quot; database table, with each column mapped to a property of this class.
  *
@@ -32,4 +41,27 @@ public class AsynchronousProcessAuditImpl
 	 */
 	public AsynchronousProcessAuditImpl() {
 	}
+	
+    /**
+     * Devuelve el screenName del usuario que realizo la accion
+     * 
+     * @return screenname del usuario o string vacia
+     */
+    public String getUserScreenName()
+    {
+        String screenName = StringPool.BLANK;
+
+        try {
+            User user = UserLocalServiceUtil.getUser(this.getUserId());
+            screenName = user.getScreenName();
+        } catch (PortalException e) {
+            _log.debug("User not found. UserId = " + this.getUserId());
+        } catch (SystemException e) {
+            _log.error(e, e);
+        }
+
+        return screenName;
+    }
+	
+	private static Log _log = LogFactoryUtil.getLog(AsynchronousProcessAuditImpl.class);
 }

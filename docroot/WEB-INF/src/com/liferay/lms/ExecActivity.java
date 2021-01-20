@@ -220,6 +220,11 @@ public class ExecActivity extends QuestionsAdmin {
 				&& PrefsPropsUtil.getBoolean(themeDisplay.getCompanyId(), LmsConstant.PREFS_SHOW_OPTION_TEST, false) 
 				&& activity.isImprove();
 		
+		if (showPopUpFinishedResult && lar.getResult() ==100) {
+		    showPopUpFinishedResult = false;
+		    finishActivity(lar, lat);
+		}
+				
 		renderRequest.setAttribute("learningActivity",activity);
 		renderRequest.setAttribute("larntry",lat);
 		renderRequest.setAttribute("actId",activity.getActId());
@@ -233,16 +238,10 @@ public class ExecActivity extends QuestionsAdmin {
 		
 		long actId = ParamUtil.getLong(actionRequest, "actId");
 		
-		LearningActivityResult lar = LearningActivityResultLocalServiceUtil.getByActIdAndUserId(actId, themeDisplay.getUserId());
-		
+		LearningActivityResult lar = LearningActivityResultLocalServiceUtil.getByActIdAndUserId(actId, themeDisplay.getUserId());		
 		LearningActivityTry lat = LearningActivityTryLocalServiceUtil.getLastLearningActivityTryByActivityAndUser(actId, themeDisplay.getUserId());
 		
-		lar.setEndDate(lat.getEndDate());
-		
-		LearningActivityResultLocalServiceUtil.updateLearningActivityResult(lar);
-		
-		//Recalculamos
-		ModuleResultLocalServiceUtil.update(lar);
+		finishActivity(lar, lat);
 		
 		actionResponse.setRenderParameter("view", "results");
 		actionResponse.setRenderParameter("actId", String.valueOf(actId));
@@ -561,6 +560,15 @@ public class ExecActivity extends QuestionsAdmin {
 		response.setRenderParameter("courseId", String.valueOf(course.getCourseId()));
 	}
 	
+    private void finishActivity(LearningActivityResult lar, LearningActivityTry lat) throws SystemException,
+        PortalException
+    {
+        lar.setEndDate(lat.getEndDate());
+        LearningActivityResultLocalServiceUtil.updateLearningActivityResult(lar);
+
+        // Recalculamos
+        ModuleResultLocalServiceUtil.update(lar);
+    }
 	
 	private void updateLearningActivityTryAndResult(
 			LearningActivityTry learningActivityTry) throws PortalException,
