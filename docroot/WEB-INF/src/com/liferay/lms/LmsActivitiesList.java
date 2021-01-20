@@ -3,8 +3,7 @@ package com.liferay.lms;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
@@ -19,20 +18,21 @@ import javax.portlet.ActionResponse;
 import javax.portlet.EventRequest;
 import javax.portlet.EventResponse;
 import javax.portlet.PortletException;
-import javax.portlet.PortletRequest;
-import javax.portlet.PortletURL;
+import javax.portlet.PortletMode;
+import javax.portlet.PortletPreferences;
 import javax.portlet.ProcessEvent;
+import javax.portlet.ReadOnlyException;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
+import javax.portlet.ValidatorException;
 import javax.portlet.WindowState;
 import javax.xml.namespace.QName;
 
 import org.apache.commons.lang.StringUtils;
 
 import com.liferay.lms.asset.LearningActivityAssetRendererFactory;
-import com.liferay.lms.asset.LearningActivityBaseAssetRenderer;
 import com.liferay.lms.auditing.AuditConstants;
 import com.liferay.lms.auditing.AuditingLogFactory;
 import com.liferay.lms.events.ThemeIdEvent;
@@ -54,8 +54,6 @@ import com.liferay.lms.service.LearningActivityTryLocalServiceUtil;
 import com.liferay.lms.service.ModuleLocalServiceUtil;
 import com.liferay.lms.service.P2pActivityCorrectionsLocalServiceUtil;
 import com.liferay.lms.service.P2pActivityLocalServiceUtil;
-import com.liferay.portal.NoSuchLayoutException;
-import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
@@ -70,20 +68,15 @@ import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.upload.UploadPortletRequest;
-import com.liferay.portal.kernel.upload.UploadRequest;
-import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PrefsPropsUtil;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.xml.DocumentException;
-import com.liferay.portal.model.Layout;
-import com.liferay.portal.model.LayoutConstants;
 import com.liferay.portal.model.Portlet;
 import com.liferay.portal.model.PortletConstants;
 import com.liferay.portal.model.PublicRenderParameter;
@@ -92,10 +85,9 @@ import com.liferay.portal.model.Role;
 import com.liferay.portal.model.RoleConstants;
 import com.liferay.portal.model.Team;
 import com.liferay.portal.model.User;
-import com.liferay.portal.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.security.permission.PermissionChecker;
-import com.liferay.portal.service.LayoutLocalServiceUtil;
+import com.liferay.portal.service.PortalPreferencesLocalServiceUtil;
 import com.liferay.portal.service.PortletLocalServiceUtil;
 import com.liferay.portal.service.ResourcePermissionLocalServiceUtil;
 import com.liferay.portal.service.RoleLocalServiceUtil;
@@ -1137,4 +1129,50 @@ public class LmsActivitiesList extends MVCPortlet {
 		SessionMessages.add(actionRequest, "activity-modified-successfully");
 	}
 
+	public void saveEditPreference(ActionRequest actionRequest, ActionResponse actionResponse) throws PortletException, IOException {
+		try{
+			ThemeDisplay themeDisplay = (ThemeDisplay) actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
+			String portletId = PortalUtil.getPortletId(actionRequest);
+			String layoutId = String.valueOf(themeDisplay.getPlid());
+			PortletPreferences prefs= PortalPreferencesLocalServiceUtil.getPreferences(themeDisplay.getCompanyId(), themeDisplay.getCompanyId(), 1);
+			
+			
+			String key = layoutId+"_"+portletId+"_lmsActivitiesList";
+			String[] empty = {};
+			String[] modules = ParamUtil.getParameterValues(actionRequest,"modulesCheckbox", empty);
+
+			String modulesListStr = Arrays.toString(modules);
+			modulesListStr = modulesListStr.substring(1, modulesListStr.length()-1).replace(" ","");
+			
+			
+			if(!"".equals(key)&&!prefs.isReadOnly(key))
+			{
+				try {
+					prefs.setValue(key, modulesListStr);
+				} catch (ReadOnlyException e) {
+					e.printStackTrace();
+					SessionErrors.add(actionRequest, "problem");
+				}
+				try {
+					prefs.store();
+				} catch (ValidatorException e) {
+					e.printStackTrace();
+					SessionErrors.add(actionRequest, "problem");
+				} catch (IOException e) {
+					e.printStackTrace();
+					SessionErrors.add(actionRequest, "problem");
+				}
+			}
+			else
+			{
+				SessionErrors.add(actionRequest, "read-only");
+			}
+
+		}catch(Exception e){
+			log.error("Error guardando la preferencia",e);
+		}
+		
+		
+		actionResponse.setPortletMode(PortletMode.VIEW);// send response to View
+	}
 }

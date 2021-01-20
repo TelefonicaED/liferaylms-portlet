@@ -16,10 +16,15 @@
 			<name>add-process-action-success-action</name>
 			<value>false</value>
 		</init-param>
+		<init-param>
+			<name>edit-jsp</name>
+			<value>/html/lmsactivitieslist/edit.jsp</value>
+		</init-param>
 		<expiration-cache>0</expiration-cache>
 		<supports>
 			<mime-type>text/html</mime-type>
 			<portlet-mode>view</portlet-mode>
+			<portlet-mode>edit</portlet-mode>
 		</supports>
 		<resource-bundle>content/lmsactivitieslist/Language</resource-bundle>
 		<portlet-info>
