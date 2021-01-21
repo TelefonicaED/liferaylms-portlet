@@ -1,5 +1,6 @@
 package com.liferay.lms.learningactivity.courseeval;
 
+import java.util.HashMap;
 import java.util.List;
 
 import javax.portlet.PortletResponse;
@@ -70,5 +71,11 @@ public abstract class BaseCourseEval implements CourseEval {
 			}
 		}
 	}
+	
+    @Override    
+    public void cloneCourseEval(Course course, Course newCourse, HashMap<Long, Long> correlationModules,
+        HashMap<Long, Long> correlationActivities) throws SystemException
+    {
+    }
 
 }
