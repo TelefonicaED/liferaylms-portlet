@@ -1,6 +1,7 @@
 package com.liferay.lms.learningactivity.courseeval;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
@@ -358,6 +359,41 @@ public class CourseEvalClp implements CourseEval {
 
 		return ((Number)returnObj).longValue();		
 	}
+	
+	@Override
+    @SuppressWarnings({"rawtypes", "unchecked", "deprecation"})    
+    public void cloneCourseEval(Course course, Course newCourse, HashMap<Long,Long> correlationModules, HashMap<Long,Long> correlationActivities) throws SystemException {
+        try {
+            ClassLoader classLoader = clp.getClassLoader();
+
+            Class courseClass = Class.forName(Course.class.getName(),true, classLoader);
+            
+            MethodKey updateCourseMethod = new MethodKey(clp.getClassName(), "cloneCourseEval",courseClass,courseClass, HashMap.class, HashMap.class);
+            Object courseObj = translateCourse(course);
+            Object newCourseObj = translateCourse(newCourse);
+            clp.invoke(new MethodHandler(updateCourseMethod, courseObj, newCourseObj, correlationModules, correlationActivities));
+            ClassLoaderProxy courseClassLoaderProxy = new ClassLoaderProxy(courseObj, clp.getClassLoader());
+            course.setModelAttributes((Map<String, Object>) courseClassLoaderProxy.invoke("getModelAttributes", new Object[]{}));
+            ClassLoaderProxy newCourseClassLoaderProxy = new ClassLoaderProxy(newCourseObj, clp.getClassLoader());
+            newCourse.setModelAttributes((Map<String, Object>) newCourseClassLoaderProxy.invoke("getModelAttributes", new Object[]{}));
+        }
+        catch (Throwable t) {
+            t = ClpSerializer.translateThrowable(t);
+                        
+            if (t instanceof com.liferay.portal.kernel.exception.SystemException) {
+                throw (com.liferay.portal.kernel.exception.SystemException)t;
+            }
+
+            if (t instanceof RuntimeException) {
+                throw (RuntimeException)t;
+            }
+            else {
+                throw new RuntimeException(t.getClass().getName() +
+                    " is not a valid exception");
+            }
+        }
+        
+    }
 
 	@Override
 	@SuppressWarnings("deprecation")

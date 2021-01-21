@@ -1090,7 +1090,6 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 	
 		String newCourseName  = ParamUtil.getString(actionRequest, "newCourseName", "New course cloned");
 		boolean cloneForum = ParamUtil.getBoolean(actionRequest, "cloneForum");
-		boolean clonePonderation = ParamUtil.getBoolean(actionRequest, "clonePonderation");
 		boolean cloneDocuments = ParamUtil.getBoolean(actionRequest, "cloneDocuments");
 		boolean cloneModuleClassification = ParamUtil.getBoolean(actionRequest, "cloneModuleClassification");
 		boolean cloneActivityClassificationTypes = ParamUtil.getBoolean(actionRequest, "cloneActivityClassificationTypes");
@@ -1157,7 +1156,6 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 				message.put("serviceContext",serviceContext);
 				message.put("visible",visible);
 				message.put("cloneForum", cloneForum);
-				message.put("clonePonderation", clonePonderation);
 				message.put("cloneDocuments", cloneDocuments);
 				message.put("cloneModuleClassification", cloneModuleClassification);
 				message.put("cloneActivityClassificationTypes", cloneActivityClassificationTypes);

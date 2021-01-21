@@ -12,6 +12,7 @@ import com.liferay.lms.model.CourseResult;
 import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.model.LearningActivityResult;
 import com.liferay.lms.model.ModuleResult;
+import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.lms.service.CourseResultLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityResultLocalServiceUtil;
@@ -23,7 +24,10 @@ import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.PrefsPropsUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.DocumentException;
 import com.liferay.portal.kernel.xml.Element;
@@ -290,6 +294,84 @@ public class PonderatedCourseEval extends BaseCourseEval {
         rootElement.addElement("courseEval").setText(PonderatedCourseEval.class.getName());     
         course.setCourseExtraData(document.formattedString());
     }
+    
+    @Override
+    public void cloneCourseEval(Course course, Course newCourse, HashMap<Long, Long> correlationModules,
+        HashMap<Long, Long> correlationActivities) throws SystemException
+    {
+        _log.debug("cloneCourseEval");
+        
+        try {            
+            Map<Long, Float> ponderationValues = _getNewCoursePonderation(course, correlationActivities);
+            
+            if (Validator.isNotNull(ponderationValues) && ponderationValues.size() > 0) {
+                String extraData = _getCourseExtraData(course, newCourse, ponderationValues);                
+                newCourse.setCourseExtraData(extraData);
+                CourseLocalServiceUtil.updateCourse(newCourse);
+            }
+        } catch (PortalException | DocumentException | IOException e) {
+            _log.error(e.getMessage());
+        }
+    }
 
+    /**
+     * Obtiene un map con los pesos de las actividades del nuevo curso cuando se clonan cursos
+     * 
+     * @param course curso del que se va a clonar la ponderacion
+     * @param correlationActivities relacion de los ids de las actividades del curso antiguo con las del nuevo
+     * @return map con los pesos de las actividades para el nuevo curso
+     * @throws PortalException
+     * @throws SystemException
+     * @throws DocumentException
+     */
+    private Map<Long, Float> _getNewCoursePonderation(Course course, HashMap<Long, Long> correlationActivities)
+        throws PortalException, SystemException, DocumentException
+    {
+        Map<Long, Float> ponderationValues = new HashMap<Long, Float>();
+        Map<Long, Float> weights = getActivitiesWeight(course);
+        for (long activityWeight : correlationActivities.keySet()) {
+            if (weights.containsKey(activityWeight)) {
+                ponderationValues.put(correlationActivities.get(activityWeight), weights.get(activityWeight));
+            }
+        }
+        return ponderationValues;
+    }
 
+    /**
+     * Devuelve el extradata del nuevo curso con la ponderacion de las actividades
+     * 
+     * @param course curso que se va a clonar
+     * @param newCourse nuevo curso
+     * @param ponderationValues pesos de las actividades para el nuevo curso
+     * @return extradata del nuevo curso
+     * @throws SystemException
+     * @throws IOException
+     */
+    private String _getCourseExtraData(Course course, Course newCourse, Map<Long, Float> ponderationValues)
+        throws SystemException, IOException
+    {
+        Document document = SAXReaderUtil.createDocument();
+        Element rootElement = document.addElement("eval");
+        long score = 0;
+        try {
+            score = PonderatedCourseEval.getScore(course);
+        } catch (PortalException | DocumentException e) {
+            _log.warn(e.getMessage());
+        }
+        Element passElement = rootElement.addElement("score");
+        passElement.addAttribute("value", Long.toString(score));
+
+        rootElement.addElement("courseEval").setText(PonderatedCourseEval.class.getName());
+
+        for (Map.Entry<Long, Float> entry : ponderationValues.entrySet()) {
+            Element weight = rootElement.addElement("weight");
+            weight.addAttribute("actId", Long.toString(entry.getKey()));
+            weight.addAttribute("ponderation", Float.toString(entry.getValue()));
+        }
+
+        return document.formattedString();
+        
+    }
+    
+    private static Log _log = LogFactoryUtil.getLog(PonderatedCourseEval.class);
 }

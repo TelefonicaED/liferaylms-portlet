@@ -1,7 +1,9 @@
 package com.liferay.lms.learningactivity.courseeval;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 import javax.portlet.PortletResponse;
 
@@ -28,6 +30,18 @@ public interface CourseEval
 	public boolean getFailOnCourseCloseAndNotQualificated();
 	public boolean getNeedPassPuntuation();
 	public long getPassPuntuation(Course course) throws DocumentException;
+    /**
+     * Copia los datos propios de la evaluacion de un curso a otro
+     * 
+     * @param course curso del que se van a copiar los datos
+     * @param newCourse nuevo curso
+     * @param correlationModules map con la asociacion de los ids de los modulos del curso origen con los del nuevo
+     *            curso
+     * @param correlationActivities map con la asociacion de los ids de las actividades del curso origen con las del
+     *            nuevo curso
+     * @throws SystemException
+     */
+	public void cloneCourseEval(Course course, Course newCourse, HashMap<Long,Long> correlationModules, HashMap<Long,Long> correlationActivities) throws SystemException;
 
 	public String getExpecificContentPage();
 	public void setExtraContent(Course course, String actionId, ServiceContext serviceContext) 
