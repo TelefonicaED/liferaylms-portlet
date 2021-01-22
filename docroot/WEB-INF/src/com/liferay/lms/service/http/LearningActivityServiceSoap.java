@@ -65,6 +65,64 @@ import java.rmi.RemoteException;
  * @generated
  */
 public class LearningActivityServiceSoap {
+	public static int countLearningActivityMandatory(long groupId)
+		throws RemoteException {
+		try {
+			int returnValue = LearningActivityServiceUtil.countLearningActivityMandatory(groupId);
+
+			return returnValue;
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	public static int countLearningActivity(long groupId)
+		throws RemoteException {
+		try {
+			int returnValue = LearningActivityServiceUtil.countLearningActivity(groupId);
+
+			return returnValue;
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	public static int countLearningActivityMandatoryPassed(long groupId,
+		long userId) throws RemoteException {
+		try {
+			int returnValue = LearningActivityServiceUtil.countLearningActivityMandatoryPassed(groupId,
+					userId);
+
+			return returnValue;
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	public static int countLearningActivityPassed(long groupId, long userId)
+		throws RemoteException {
+		try {
+			int returnValue = LearningActivityServiceUtil.countLearningActivityPassed(groupId,
+					userId);
+
+			return returnValue;
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
 	public static com.liferay.lms.model.LearningActivitySoap[] getLearningActivitiesOfGroup(
 		long groupId) throws RemoteException {
 		try {

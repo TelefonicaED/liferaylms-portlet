@@ -14,13 +14,18 @@
 
 package com.liferay.lms.service.impl;
 
+import java.util.List;
+
 import javax.portlet.PortletURL;
+
 import com.liferay.lms.asset.LearningActivityAssetRendererFactory;
 import com.liferay.lms.asset.LearningActivityBaseAssetRenderer;
 import com.liferay.lms.auditing.AuditConstants;
 import com.liferay.lms.auditing.AuditingLogFactory;
 import com.liferay.lms.model.Course;
 import com.liferay.lms.model.LearningActivity;
+import com.liferay.lms.model.LearningActivityResult;
+import com.liferay.lms.service.LearningActivityResultLocalServiceUtil;
 import com.liferay.lms.service.base.LearningActivityServiceBaseImpl;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
@@ -55,10 +60,42 @@ import com.liferay.portlet.social.service.SocialActivityLocalServiceUtil;
 @JSONWebService(mode = JSONWebServiceMode.MANUAL)
 public class LearningActivityServiceImpl extends LearningActivityServiceBaseImpl 
 {
+	public int countLearningActivityMandatory(long groupId) throws SystemException{
+		return learningActivityPersistence.filterCountByg_m(groupId, 1);
+	}
+	
+	public int countLearningActivity(long groupId) throws SystemException{
+		return learningActivityPersistence.filterCountByg(groupId);
+	}
+	
+	public int countLearningActivityMandatoryPassed(long groupId, long userId) throws SystemException{
+		List<LearningActivity> activities =  learningActivityPersistence.filterFindByg_m(groupId, 1);
+		int count = 0;
+		LearningActivityResult lar = null;
+		for(LearningActivity activity: activities){
+			lar = LearningActivityResultLocalServiceUtil.getByActIdAndUserId(activity.getActId(), userId);
+			if(lar.isPassed())count++;
+		}
+		return count;
+		
+	}
+	
+	public int countLearningActivityPassed(long groupId, long userId) throws SystemException{
+		List<LearningActivity> activities =  learningActivityPersistence.filterFindByg(groupId);
+		int count = 0;
+		LearningActivityResult lar = null;
+		for(LearningActivity activity: activities){
+			lar = LearningActivityResultLocalServiceUtil.getByActIdAndUserId(activity.getActId(), userId);
+			if(lar.isPassed())count++;
+		}
+		return count;
+	}
+	
 	public java.util.List<LearningActivity> getLearningActivitiesOfGroup(long groupId) throws SystemException
 	{
 		return learningActivityPersistence.filterFindByg(groupId);
 	}
+	
 	@JSONWebService
 	public java.util.List<LearningActivity> getLearningActivitiesOfModule(long moduleId) throws SystemException
 	{

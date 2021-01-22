@@ -44,6 +44,10 @@ Liferay.Service.registerClass(
 Liferay.Service.registerClass(
 	Liferay.Service.Lms, "LearningActivity",
 	{
+		countLearningActivityMandatory: true,
+		countLearningActivity: true,
+		countLearningActivityMandatoryPassed: true,
+		countLearningActivityPassed: true,
 		getLearningActivitiesOfGroup: true,
 		getLearningActivitiesOfModule: true,
 		deleteLearningactivity: true,

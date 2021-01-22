@@ -84,6 +84,7 @@ public class ModuleServiceImpl extends ModuleServiceBaseImpl {
 		List<Module> list = (List<Module>) modulePersistence.filterFindByGroupId(course.getGroupCreatedId());
 		return list;
 	}
+	
 	@JSONWebService
 	public boolean isLocked(long moduleId) throws Exception
 	{
