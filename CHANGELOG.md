@@ -14,6 +14,7 @@ El formato estÃ¡ basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 
 - #192412 Se comprueba si el LearningActivityResult es nulo a la hora de obtener la puntuación del usuario en la vista de resultados de la actividad de tipo test
 - #194142 Valores mayores que 100. Corregido que cuando el tiempo del player es mayor que la duración deje el valor 100.
+- #182977 Se clona el campo improve de las actividades cuado se clona un curso
 
 ### Updated
 
