@@ -101,6 +101,7 @@ public class CourseModelImpl extends BaseModelImpl<Course>
 			{ "welcome", Types.BOOLEAN },
 			{ "welcomeMsg", Types.VARCHAR },
 			{ "welcomeSubject", Types.VARCHAR },
+			{ "welcomeAddToCalendar", Types.BOOLEAN },
 			{ "deniedInscription", Types.BOOLEAN },
 			{ "deniedInscriptionMsg", Types.VARCHAR },
 			{ "deniedInscriptionSubject", Types.VARCHAR },
@@ -111,7 +112,7 @@ public class CourseModelImpl extends BaseModelImpl<Course>
 			{ "executionStartDate", Types.TIMESTAMP },
 			{ "executionEndDate", Types.TIMESTAMP }
 		};
-	public static final String TABLE_SQL_CREATE = "create table Lms_Course (uuid_ VARCHAR(75) null,courseId LONG not null primary key,parentCourseId LONG,companyId LONG,groupId LONG,userId LONG,userName VARCHAR(75) null,groupCreatedId LONG,createDate DATE null,modifiedDate DATE null,status INTEGER,statusByUserId LONG,statusByUserName VARCHAR(75) null,statusDate DATE null,title STRING null,description STRING null,friendlyURL VARCHAR(100) null,startDate DATE null,endDate DATE null,icon LONG,CourseEvalId LONG,CourseExtraData TEXT null,closed BOOLEAN,maxusers LONG,calificationType LONG,inscriptionType LONG,welcome BOOLEAN,welcomeMsg TEXT null,welcomeSubject VARCHAR(75) null,deniedInscription BOOLEAN,deniedInscriptionMsg TEXT null,deniedInscriptionSubject VARCHAR(75) null,goodbye BOOLEAN,goodbyeMsg TEXT null,goodbyeSubject VARCHAR(75) null,isLinked BOOLEAN,executionStartDate DATE null,executionEndDate DATE null)";
+	public static final String TABLE_SQL_CREATE = "create table Lms_Course (uuid_ VARCHAR(75) null,courseId LONG not null primary key,parentCourseId LONG,companyId LONG,groupId LONG,userId LONG,userName VARCHAR(75) null,groupCreatedId LONG,createDate DATE null,modifiedDate DATE null,status INTEGER,statusByUserId LONG,statusByUserName VARCHAR(75) null,statusDate DATE null,title STRING null,description STRING null,friendlyURL VARCHAR(100) null,startDate DATE null,endDate DATE null,icon LONG,CourseEvalId LONG,CourseExtraData TEXT null,closed BOOLEAN,maxusers LONG,calificationType LONG,inscriptionType LONG,welcome BOOLEAN,welcomeMsg TEXT null,welcomeSubject VARCHAR(75) null,welcomeAddToCalendar BOOLEAN,deniedInscription BOOLEAN,deniedInscriptionMsg TEXT null,deniedInscriptionSubject VARCHAR(75) null,goodbye BOOLEAN,goodbyeMsg TEXT null,goodbyeSubject VARCHAR(75) null,isLinked BOOLEAN,executionStartDate DATE null,executionEndDate DATE null)";
 	public static final String TABLE_SQL_DROP = "drop table Lms_Course";
 	public static final String ORDER_BY_JPQL = " ORDER BY course.courseId ASC";
 	public static final String ORDER_BY_SQL = " ORDER BY Lms_Course.courseId ASC";
@@ -178,6 +179,7 @@ public class CourseModelImpl extends BaseModelImpl<Course>
 		model.setWelcome(soapModel.getWelcome());
 		model.setWelcomeMsg(soapModel.getWelcomeMsg());
 		model.setWelcomeSubject(soapModel.getWelcomeSubject());
+		model.setWelcomeAddToCalendar(soapModel.getWelcomeAddToCalendar());
 		model.setDeniedInscription(soapModel.getDeniedInscription());
 		model.setDeniedInscriptionMsg(soapModel.getDeniedInscriptionMsg());
 		model.setDeniedInscriptionSubject(soapModel.getDeniedInscriptionSubject());
@@ -274,6 +276,7 @@ public class CourseModelImpl extends BaseModelImpl<Course>
 		attributes.put("welcome", getWelcome());
 		attributes.put("welcomeMsg", getWelcomeMsg());
 		attributes.put("welcomeSubject", getWelcomeSubject());
+		attributes.put("welcomeAddToCalendar", getWelcomeAddToCalendar());
 		attributes.put("deniedInscription", getDeniedInscription());
 		attributes.put("deniedInscriptionMsg", getDeniedInscriptionMsg());
 		attributes.put("deniedInscriptionSubject", getDeniedInscriptionSubject());
@@ -461,6 +464,13 @@ public class CourseModelImpl extends BaseModelImpl<Course>
 
 		if (welcomeSubject != null) {
 			setWelcomeSubject(welcomeSubject);
+		}
+
+		Boolean welcomeAddToCalendar = (Boolean)attributes.get(
+				"welcomeAddToCalendar");
+
+		if (welcomeAddToCalendar != null) {
+			setWelcomeAddToCalendar(welcomeAddToCalendar);
 		}
 
 		Boolean deniedInscription = (Boolean)attributes.get("deniedInscription");
@@ -1069,6 +1079,18 @@ public class CourseModelImpl extends BaseModelImpl<Course>
 		_welcomeSubject = welcomeSubject;
 	}
 
+	public boolean getWelcomeAddToCalendar() {
+		return _welcomeAddToCalendar;
+	}
+
+	public boolean isWelcomeAddToCalendar() {
+		return _welcomeAddToCalendar;
+	}
+
+	public void setWelcomeAddToCalendar(boolean welcomeAddToCalendar) {
+		_welcomeAddToCalendar = welcomeAddToCalendar;
+	}
+
 	public boolean getDeniedInscription() {
 		return _deniedInscription;
 	}
@@ -1323,6 +1345,7 @@ public class CourseModelImpl extends BaseModelImpl<Course>
 		courseImpl.setWelcome(getWelcome());
 		courseImpl.setWelcomeMsg(getWelcomeMsg());
 		courseImpl.setWelcomeSubject(getWelcomeSubject());
+		courseImpl.setWelcomeAddToCalendar(getWelcomeAddToCalendar());
 		courseImpl.setDeniedInscription(getDeniedInscription());
 		courseImpl.setDeniedInscriptionMsg(getDeniedInscriptionMsg());
 		courseImpl.setDeniedInscriptionSubject(getDeniedInscriptionSubject());
@@ -1574,6 +1597,8 @@ public class CourseModelImpl extends BaseModelImpl<Course>
 			courseCacheModel.welcomeSubject = null;
 		}
 
+		courseCacheModel.welcomeAddToCalendar = getWelcomeAddToCalendar();
+
 		courseCacheModel.deniedInscription = getDeniedInscription();
 
 		courseCacheModel.deniedInscriptionMsg = getDeniedInscriptionMsg();
@@ -1637,7 +1662,7 @@ public class CourseModelImpl extends BaseModelImpl<Course>
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(77);
+		StringBundler sb = new StringBundler(79);
 
 		sb.append("{uuid=");
 		sb.append(getUuid());
@@ -1697,6 +1722,8 @@ public class CourseModelImpl extends BaseModelImpl<Course>
 		sb.append(getWelcomeMsg());
 		sb.append(", welcomeSubject=");
 		sb.append(getWelcomeSubject());
+		sb.append(", welcomeAddToCalendar=");
+		sb.append(getWelcomeAddToCalendar());
 		sb.append(", deniedInscription=");
 		sb.append(getDeniedInscription());
 		sb.append(", deniedInscriptionMsg=");
@@ -1721,7 +1748,7 @@ public class CourseModelImpl extends BaseModelImpl<Course>
 	}
 
 	public String toXmlString() {
-		StringBundler sb = new StringBundler(118);
+		StringBundler sb = new StringBundler(121);
 
 		sb.append("<model><model-name>");
 		sb.append("com.liferay.lms.model.Course");
@@ -1844,6 +1871,10 @@ public class CourseModelImpl extends BaseModelImpl<Course>
 		sb.append(getWelcomeSubject());
 		sb.append("]]></column-value></column>");
 		sb.append(
+			"<column><column-name>welcomeAddToCalendar</column-name><column-value><![CDATA[");
+		sb.append(getWelcomeAddToCalendar());
+		sb.append("]]></column-value></column>");
+		sb.append(
 			"<column><column-name>deniedInscription</column-name><column-value><![CDATA[");
 		sb.append(getDeniedInscription());
 		sb.append("]]></column-value></column>");
@@ -1936,6 +1967,7 @@ public class CourseModelImpl extends BaseModelImpl<Course>
 	private boolean _welcome;
 	private String _welcomeMsg;
 	private String _welcomeSubject;
+	private boolean _welcomeAddToCalendar;
 	private boolean _deniedInscription;
 	private String _deniedInscriptionMsg;
 	private String _deniedInscriptionSubject;
