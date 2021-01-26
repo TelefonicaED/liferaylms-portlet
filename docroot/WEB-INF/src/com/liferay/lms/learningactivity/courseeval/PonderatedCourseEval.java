@@ -301,16 +301,49 @@ public class PonderatedCourseEval extends BaseCourseEval {
     {
         _log.debug("cloneCourseEval");
         
-        try {            
-            Map<Long, Float> ponderationValues = _getNewCoursePonderation(course, correlationActivities);
+        Document document = SAXReaderUtil.createDocument();
+        Element rootElement = document.addElement("eval");
             
+        try {            
+            Map<Long, Float> ponderationValues = _getNewCoursePonderation(course, correlationActivities);            
             if (Validator.isNotNull(ponderationValues) && ponderationValues.size() > 0) {
-                String extraData = _getCourseExtraData(course, newCourse, ponderationValues);                
-                newCourse.setCourseExtraData(extraData);
-                CourseLocalServiceUtil.updateCourse(newCourse);
-            }
+                _addPonderation(course, rootElement, ponderationValues);              
+            }            
+            
+            _addRequired(course, rootElement, correlationActivities);
+            
+            newCourse.setCourseExtraData(document.formattedString());
+            CourseLocalServiceUtil.updateCourse(newCourse);
+            
         } catch (PortalException | DocumentException | IOException e) {
             _log.error(e.getMessage());
+        }
+    }
+
+    /**
+     * Anade los nodos con la con las actividades obligatorias al nodo principal del xml extradata de un curso 
+     * 
+     * @param course curso que se va a clonar
+     * @param rootElement nodo al que anadir las actividades requeridas
+     * @param correlationActivities relacion de las actividades nuevas con las antiguas
+     * @throws SystemException
+     * @throws IOException
+     */ 
+    private void _addRequired(Course course, Element rootElement, HashMap<Long, Long> correlationActivities)
+        throws DocumentException, PortalException, SystemException
+    {
+        _log.debug("copiamos actividades requeridas");
+        
+        List<Long> required = PonderatedCourseEval.getRequiredActivities(course);
+        if (Validator.isNotNull(required) && required.size() > 0) {              
+            for (long actId : correlationActivities.keySet()) {
+                _log.debug("actId" + actId);
+                _log.debug("correlationActivity" + correlationActivities.get(actId));
+                if (required.contains(actId)) {
+                    Element requi=rootElement.addElement("required");
+                    requi.addAttribute("actId", Long.toString(correlationActivities.get(actId)));
+                }
+            }
         }
     }
 
@@ -338,20 +371,19 @@ public class PonderatedCourseEval extends BaseCourseEval {
     }
 
     /**
-     * Devuelve el extradata del nuevo curso con la ponderacion de las actividades
+     * Anade los nodos con la ponderacion al nodo principal del xml extradata de un curso 
      * 
      * @param course curso que se va a clonar
-     * @param newCourse nuevo curso
+     * @param rootElement nodo al que anadir la ponderacion
      * @param ponderationValues pesos de las actividades para el nuevo curso
-     * @return extradata del nuevo curso
      * @throws SystemException
      * @throws IOException
      */
-    private String _getCourseExtraData(Course course, Course newCourse, Map<Long, Float> ponderationValues)
+    private void _addPonderation(Course course, Element rootElement, Map<Long, Float> ponderationValues)
         throws SystemException, IOException
     {
-        Document document = SAXReaderUtil.createDocument();
-        Element rootElement = document.addElement("eval");
+        _log.debug("copiamos la ponderacion");
+        
         long score = 0;
         try {
             score = PonderatedCourseEval.getScore(course);
@@ -368,9 +400,6 @@ public class PonderatedCourseEval extends BaseCourseEval {
             weight.addAttribute("actId", Long.toString(entry.getKey()));
             weight.addAttribute("ponderation", Float.toString(entry.getValue()));
         }
-
-        return document.formattedString();
-        
     }
     
     private static Log _log = LogFactoryUtil.getLog(PonderatedCourseEval.class);

@@ -402,7 +402,11 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 				newModule = ModuleLocalServiceUtil.addmodule(newModule);
 				
 				correlationModules.put(module.getModuleId(), newModule.getModuleId());
-				newModule.setDescription(descriptionFilesClone(module.getDescription(),newCourse.getGroupCreatedId(), newModule.getModuleId(),themeDisplay.getUserId()));
+				
+                if (Validator.isNotNull(module.getDescription())) {
+                    newModule.setDescription(descriptionFilesClone(module.getDescription(),
+                        newCourse.getGroupCreatedId(), newModule.getModuleId(), themeDisplay.getUserId()));
+                }
 				newModule.setOrdern(newModule.getModuleId());
 				newModule.setUuid(module.getUuid());
 				ModuleLocalServiceUtil.updateModule(newModule);
@@ -446,6 +450,8 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 					newLearnActivity.setTries(activity.getTries());
 					newLearnActivity.setPasspuntuation(activity.getPasspuntuation());
 					newLearnActivity.setPriority(newLearnActivity.getActId());
+					log.debug("improve" + activity.getImprove());
+					newLearnActivity.setImprove(activity.getImprove());
 					
 					boolean actPending = false;
 					if(activity.getPrecedence()>0){
@@ -464,7 +470,9 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 					newLearnActivity.setStartdate(startDate);
 					newLearnActivity.setEnddate(endDate);
 					
-					newLearnActivity.setDescription(descriptionFilesClone(activity.getDescription(),newModule.getGroupId(), newLearnActivity.getActId(),themeDisplay.getUserId()));
+					if(Validator.isNotNull(activity.getDescription())) {
+					    newLearnActivity.setDescription(descriptionFilesClone(activity.getDescription(),newModule.getGroupId(), newLearnActivity.getActId(),themeDisplay.getUserId()));
+					}
 					ServiceContext larnServiceContext = serviceContext;
 
 					//Eliminar las categorias y los tags del curso del serviceContext antes de crear la nueva actividad
@@ -481,8 +489,7 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 							if(log.isDebugEnabled())
 								log.debug(":::Clone activity classification types::: Activity " + activity.getActId());
 						}
-          }	
-
+					}	
 					
 					nuevaLarn=LearningActivityLocalServiceUtil.addLearningActivity(newLearnActivity,larnServiceContext);
 					nuevaLarn.setExpandoBridgeAttributes(larnServiceContext);
