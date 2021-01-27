@@ -1401,39 +1401,28 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 		try{
 			
 			String fileName = uploadRequest.getFileName("fileName");
-			if (fileName != null && !"".equals(fileName)){
 				
-				log.debug("importUsersCourse 2 - fileName: " + fileName);		
-				
-				String idHilo = UUID.randomUUID().toString();
-				log.debug("idHilo: " + idHilo);				
-				InputStream csvFile = uploadRequest.getFileAsStream("fileName");
-				File file =uploadRequest.getFile("fileName");
-				
-				PortletPreferences preferences;
-				String portletResource = ParamUtil.getString(request, "portletResource");
-				if (Validator.isNotNull(portletResource)) {
-					preferences = PortletPreferencesFactoryUtil.getPortletSetup(request, portletResource);
-				}else{
-					preferences = request.getPreferences();
-				}
-				
-				ImportUsersCourseThread hilo = new ImportUsersCourseThread(themeDisplay, idHilo, getPortletConfig(), fileName, file, serviceContext, csvFile, preferences, request);
-				ImportUsersCourseThreadMapper.addThread(idHilo, hilo);
-				response.setRenderParameter("UUID", idHilo);				
-				response.setRenderParameter("courseId", String.valueOf(courseId));
-				response.setRenderParameter("roleId", String.valueOf(roleId));
-				//response.setRenderParameter("view", "role-members-tab");
-				response.setRenderParameter("view", "import-users");
-				
+			log.debug("importUsersCourse 2 - fileName: " + fileName);		
+			
+			String idHilo = UUID.randomUUID().toString();
+			log.debug("idHilo: " + idHilo);				
+			InputStream csvFile = uploadRequest.getFileAsStream("fileName");
+			File file =uploadRequest.getFile("fileName");
+			
+			PortletPreferences preferences;
+			String portletResource = ParamUtil.getString(request, "portletResource");
+			if (Validator.isNotNull(portletResource)) {
+				preferences = PortletPreferencesFactoryUtil.getPortletSetup(request, portletResource);
 			}else{
-				log.debug("Debe seleccionar un fichero");
-				SessionErrors.add(request, "courseadmin.importuserrole.csv.fileRequired");
-				response.setRenderParameter("courseId", String.valueOf(courseId));
-				response.setRenderParameter("roleId", String.valueOf(roleId));
-				//response.setRenderParameter("view", "role-members-tab");
-				response.setRenderParameter("view", "import-users");
-			}	
+				preferences = request.getPreferences();
+			}
+			
+			ImportUsersCourseThread hilo = new ImportUsersCourseThread(themeDisplay, idHilo, getPortletConfig(), fileName, file, serviceContext, csvFile, preferences, request);
+			ImportUsersCourseThreadMapper.addThread(idHilo, hilo);
+			response.setRenderParameter("UUID", idHilo);				
+			response.setRenderParameter("courseId", String.valueOf(courseId));
+			response.setRenderParameter("roleId", String.valueOf(roleId));
+			response.setRenderParameter("view", "import-users");
 		} catch (Exception e) {
 			log.error(e);
 		}
@@ -1518,6 +1507,15 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 							result += "<BR>Líneas procesadas: " + ImportUsersCourseThreadMapper.getThreadLines(uuid) +"<BR>";
 							result += "Usuarios inscritos: " + ImportUsersCourseThreadMapper.getUsersInscripted(uuid) +"<BR>";	
 							oreturned.put("result", result);
+							
+							String sErrors = "";
+							List<String> lErrors = ImportUsersCourseThreadMapper.getThreadErrors(uuid);
+							if (lErrors != null && lErrors.size() > 0){
+								for (String sError : lErrors){
+									sErrors += sError +"<BR>";
+								}
+							}					
+							oreturned.put("errors", sErrors);
 							
 							ImportUsersCourseThreadMapper.unlinkThread(uuid);
 						}else{

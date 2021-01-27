@@ -20,8 +20,6 @@
 <%@page import="java.util.List"%>
 <%@page import="java.io.FileNotFoundException"%>
 
-<%--@ include file="/init.jsp" --%>
-
 <%
 	PortletPreferences preferences = null;
 	String portletResource = ParamUtil.getString(request, "portletResource");
@@ -64,11 +62,6 @@
 
 <div class="generic-pop-up aui-helper-hidden" id="${renderResponse.getNamespace()}divImportUsersCourse">
  	<div class="pop-up-content">
- 	
- 	<liferay-ui:error key="courseadmin.importuserrole.csv.fileRequired" message="courseadmin.importuserrole.csv.fileRequired" />
-	<liferay-ui:error key="courseadmin.importuserrole.csv.badFormat" message="courseadmin.importuserrole.csv.badFormat" />
-	<liferay-ui:error key="courseadmin.importuserrole.csv.badFormat.size" message="courseadmin.importuserrole.csv.badFormat.size" />
-	<liferay-ui:success key="courseadmin.importuserrole.csv.saved" message="courseadmin.importuserrole.csv.saved"/>
  	
 		<span class="close" ></span>
 		<p>
@@ -119,7 +112,7 @@
 			</progress>
 		</div>	
 		<div id="${renderResponse.getNamespace()}importUsersCourseResultsReport" class="aui-helper-hidden"></div>
-		
+		<div id="${renderResponse.getNamespace()}errors" class="aui-helper-hidden"></div>
 		
 	</div>
 </div>
@@ -144,7 +137,9 @@
 	}
 	function <portlet:namespace />downloadReport(url){
 		location.href = url;
-		<portlet:namespace />showImportUsersCourse()
+		//<portlet:namespace />showImportUsersCourse();
+		Liferay.Portlet.refresh(AUI().one('#p_p_id<portlet:namespace />'),{'p_t_lifecycle':0, 'view':'role-members-tab','courseId':'${course.courseId }'});
+		
 	}
 </script>	
 
@@ -177,16 +172,20 @@
 				    	}else{	
 				    		console.log("readThreadState 2 - data.fileReport: " + data.fileReport);
 				    		
-				    		$('#<portlet:namespace />importUsersCourseProgressBar').val(100);
-				    		$('#<portlet:namespace />importUsersCourseResultsReport').empty();
-							$('#<portlet:namespace />importUsersCourseResultsReport').append('<div><a onClick="javascript:<portlet:namespace />downloadReport(\'${importUsersCourseReportURL}&fileReport=' + data.fileReport + '&contentType=' + data.contentType + '&UUID=' + data.UUID + '&action='+data.action+'\'); "><liferay-ui:message key="courseadmin.importuserrole.download-report-result"/></a></div>');
-							$('#<portlet:namespace />result').append('<b><liferay-ui:message key="courseadmin.importuserrole.result"/></b> '+data.result);
-							
-					   		if(data.result){
-					   			$('#<portlet:namespace />importUsersCourseResultsReport').append('<div class="portlet-msg-success"><liferay-ui:message key="courseadmin.importuserrole.csv.saved"/></div>');	    			
+					   		if (data.errors){
+					   			$('#<portlet:namespace />errors').append('<div class="portlet-msg-error">'+data.errors+'</div>');
+					    		$('#<portlet:namespace />errors').removeClass("aui-helper-hidden");
+					    		$('#<portlet:namespace />divImportUsersCourseProgress').addClass("aui-helper-hidden");
 					   		}else{
-					   			$('#<portlet:namespace />importUsersCourseResultsReport').append('<div class="portlet-msg-error"><liferay-ui:message key="courseadmin.importuserrole.csv.errors"/></div>');	    			
+					   			if(data.result){
+					   				$('#<portlet:namespace />importUsersCourseProgressBar').val(100);
+						    		$('#<portlet:namespace />importUsersCourseResultsReport').empty();
+									$('#<portlet:namespace />importUsersCourseResultsReport').append('<div><a onClick="javascript:<portlet:namespace />downloadReport(\'${importUsersCourseReportURL}&fileReport=' + data.fileReport + '&contentType=' + data.contentType + '&UUID=' + data.UUID + '&action='+data.action+'\'); "><liferay-ui:message key="courseadmin.importuserrole.download-report-result"/></a></div>');
+									$('#<portlet:namespace />result').append('<b><liferay-ui:message key="courseadmin.importuserrole.result"/></b> '+data.result);
+						   			$('#<portlet:namespace />importUsersCourseResultsReport').append('<div class="portlet-msg-success"><liferay-ui:message key="courseadmin.importuserrole.csv.saved"/></div>');
+						   		}
 					   		}
+					   		
 							$('#<portlet:namespace />importUsersCourseResultsReport').removeClass("aui-helper-hidden");
 				    	}
 					}else{					
