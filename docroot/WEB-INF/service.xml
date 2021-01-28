@@ -867,6 +867,11 @@
 			<finder-column name="companyId"/>
 			<finder-column name="active"/>
 		</finder>
+		<finder name="CompanyIdClassNameIdActive" return-type="Collection">
+			<finder-column name="companyId"/>
+			<finder-column name="classNameId"/>
+			<finder-column name="active"/>
+		</finder>
 	</entity>
 	<entity name="CourseTypeRelation"  local-service="true" remote-service="true" json-enabled="false">
 		<!-- PK fields -->

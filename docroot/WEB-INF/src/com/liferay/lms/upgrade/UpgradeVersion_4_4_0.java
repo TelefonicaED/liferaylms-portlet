@@ -54,7 +54,7 @@ public class UpgradeVersion_4_4_0 extends UpgradeProcess {
 			e.printStackTrace();
 		} 
 		
-		updateLearningActivity = "ALTER TABLE `lms_coursetype` ADD COLUMN `active_` TINYINT(4) NULL DEFAULT FALSE AFTER `classNameId`;";
+		updateLearningActivity = "ALTER TABLE `lms_coursetype` ADD COLUMN `active_` TINYINT(4) NULL DEFAULT TRUE AFTER `classNameId`;";
 		
 		log.info("Alter table lms_coursetype -->> Add active");
 		try {
@@ -101,7 +101,11 @@ public class UpgradeVersion_4_4_0 extends UpgradeProcess {
 			for(CourseType courseType: courseTypes){
 				templateIds = PrefsPropsUtil.getStringArray(company.getCompanyId(), LmsConstant.EDITION_TEMPLATE_IDS + "." + courseType.getCourseTypeId(), ",");
 				for(String templateId: templateIds){
-					CourseTypeRelationLocalServiceUtil.addCourseTypeRelation(courseType.getCourseTypeId(), classNameId, Long.valueOf(templateId));
+					try{
+						CourseTypeRelationLocalServiceUtil.addCourseTypeRelation(courseType.getCourseTypeId(), classNameId, Long.valueOf(templateId));	
+					}catch(Exception e){
+						e.printStackTrace();
+					}
 				}
 			}
 		}

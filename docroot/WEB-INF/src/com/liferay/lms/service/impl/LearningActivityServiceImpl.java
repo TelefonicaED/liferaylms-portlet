@@ -34,6 +34,7 @@ import com.liferay.portal.kernel.jsonwebservice.JSONWebServiceMode;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.model.User;
+import com.liferay.portal.security.auth.PrincipalException;
 import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portlet.social.service.SocialActivityLocalServiceUtil;
@@ -68,25 +69,25 @@ public class LearningActivityServiceImpl extends LearningActivityServiceBaseImpl
 		return learningActivityPersistence.filterCountByg(groupId);
 	}
 	
-	public int countLearningActivityMandatoryPassed(long groupId, long userId) throws SystemException{
+	public int countLearningActivityMandatoryPassed(long groupId) throws SystemException, PrincipalException{
 		List<LearningActivity> activities =  learningActivityPersistence.filterFindByg_m(groupId, 1);
 		int count = 0;
 		LearningActivityResult lar = null;
 		for(LearningActivity activity: activities){
-			lar = LearningActivityResultLocalServiceUtil.getByActIdAndUserId(activity.getActId(), userId);
-			if(lar.isPassed())count++;
+			lar = LearningActivityResultLocalServiceUtil.getByActIdAndUserId(activity.getActId(), getUserId());
+			if(lar != null && lar.isPassed())count++;
 		}
 		return count;
 		
 	}
 	
-	public int countLearningActivityPassed(long groupId, long userId) throws SystemException{
+	public int countLearningActivityPassed(long groupId) throws SystemException, PrincipalException{
 		List<LearningActivity> activities =  learningActivityPersistence.filterFindByg(groupId);
 		int count = 0;
 		LearningActivityResult lar = null;
 		for(LearningActivity activity: activities){
-			lar = LearningActivityResultLocalServiceUtil.getByActIdAndUserId(activity.getActId(), userId);
-			if(lar.isPassed())count++;
+			lar = LearningActivityResultLocalServiceUtil.getByActIdAndUserId(activity.getActId(), getUserId());
+			if(lar != null && lar.isPassed())count++;
 		}
 		return count;
 	}

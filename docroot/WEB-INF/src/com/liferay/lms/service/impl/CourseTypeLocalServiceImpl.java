@@ -276,4 +276,8 @@ public class CourseTypeLocalServiceImpl extends CourseTypeLocalServiceBaseImpl {
 		}
 		return courseType;
 	}
+	
+	public List<CourseType> getCourseTypeByClassNameId(long companyId, long classNameId, boolean active) throws SystemException{
+		return courseTypePersistence.findByCompanyIdClassNameIdActive(companyId, classNameId, active);
+	}
 }

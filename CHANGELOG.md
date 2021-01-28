@@ -4,18 +4,22 @@ Todos los cambios de este proyecto estarán documentados en este archivo.
 El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 
 ## [4.4.0](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v4.4.0)
+
 ### Added
 
 - #194691 Se añade una configuración en el portlet de activitiesList para mostrar modulos específicos.
 - #178357 Se muestra el sumatorio de las ponderaciones en el portlet para configurar el método de evaluación ponderado
 - #173313 Se añade la posibilidad de enviar adjunto un evento de calendario con la fecha de inicio del curso en el mail de bienvenida.
-- #194593: Se devuelve un informe de resultados en la inscripción masiva de usuarios a un curso.
+- #194593 Se devuelve un informe de resultados en la inscripción masiva de usuarios a un curso.
+- #194984 Tipos de cursos fijos
+
 ### Fixed
 
 - #192412 Se comprueba si el LearningActivityResult es nulo a la hora de obtener la puntuación del usuario en la vista de resultados de la actividad de tipo test
 - #194142 Valores mayores que 100. Corregido que cuando el tiempo del player es mayor que la duración deje el valor 100.
 - #192412 Se comprueba si el LearningActivityResult es nulo a la hora de obtener la puntuación del usuario en la vista de resultados de la actividad de tipo test
 - #194142 Valores mayores que 100. Corregido que cuando el tiempo del player es mayor que la duración deje el valor 100.
+
 ### Updated
 
 - #191383 Se modifica el texto que se muestra a los usuarios en la actividad de tipo test

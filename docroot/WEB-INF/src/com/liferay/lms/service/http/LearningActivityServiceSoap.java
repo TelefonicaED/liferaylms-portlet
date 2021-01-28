@@ -93,11 +93,10 @@ public class LearningActivityServiceSoap {
 		}
 	}
 
-	public static int countLearningActivityMandatoryPassed(long groupId,
-		long userId) throws RemoteException {
+	public static int countLearningActivityMandatoryPassed(long groupId)
+		throws RemoteException {
 		try {
-			int returnValue = LearningActivityServiceUtil.countLearningActivityMandatoryPassed(groupId,
-					userId);
+			int returnValue = LearningActivityServiceUtil.countLearningActivityMandatoryPassed(groupId);
 
 			return returnValue;
 		}
@@ -108,11 +107,10 @@ public class LearningActivityServiceSoap {
 		}
 	}
 
-	public static int countLearningActivityPassed(long groupId, long userId)
+	public static int countLearningActivityPassed(long groupId)
 		throws RemoteException {
 		try {
-			int returnValue = LearningActivityServiceUtil.countLearningActivityPassed(groupId,
-					userId);
+			int returnValue = LearningActivityServiceUtil.countLearningActivityPassed(groupId);
 
 			return returnValue;
 		}

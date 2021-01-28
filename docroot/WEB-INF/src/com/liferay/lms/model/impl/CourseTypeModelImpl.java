@@ -99,7 +99,8 @@ public class CourseTypeModelImpl extends BaseModelImpl<CourseType>
 				"value.object.column.bitmask.enabled.com.liferay.lms.model.CourseType"),
 			true);
 	public static long ACTIVE_COLUMN_BITMASK = 1L;
-	public static long COMPANYID_COLUMN_BITMASK = 2L;
+	public static long CLASSNAMEID_COLUMN_BITMASK = 2L;
+	public static long COMPANYID_COLUMN_BITMASK = 4L;
 
 	/**
 	 * Converts the soap model instance into a normal model instance.
@@ -568,7 +569,19 @@ public class CourseTypeModelImpl extends BaseModelImpl<CourseType>
 	}
 
 	public void setClassNameId(long classNameId) {
+		_columnBitmask |= CLASSNAMEID_COLUMN_BITMASK;
+
+		if (!_setOriginalClassNameId) {
+			_setOriginalClassNameId = true;
+
+			_originalClassNameId = _classNameId;
+		}
+
 		_classNameId = classNameId;
+	}
+
+	public long getOriginalClassNameId() {
+		return _originalClassNameId;
 	}
 
 	public boolean getActive() {
@@ -705,6 +718,10 @@ public class CourseTypeModelImpl extends BaseModelImpl<CourseType>
 		courseTypeModelImpl._originalCompanyId = courseTypeModelImpl._companyId;
 
 		courseTypeModelImpl._setOriginalCompanyId = false;
+
+		courseTypeModelImpl._originalClassNameId = courseTypeModelImpl._classNameId;
+
+		courseTypeModelImpl._setOriginalClassNameId = false;
 
 		courseTypeModelImpl._originalActive = courseTypeModelImpl._active;
 
@@ -890,6 +907,8 @@ public class CourseTypeModelImpl extends BaseModelImpl<CourseType>
 	private String _descriptionCurrentLanguageId;
 	private long _iconId;
 	private long _classNameId;
+	private long _originalClassNameId;
+	private boolean _setOriginalClassNameId;
 	private boolean _active;
 	private boolean _originalActive;
 	private boolean _setOriginalActive;
