@@ -3,7 +3,7 @@ Todos los cambios de este proyecto estarÃ¡n documentados en este archivo.
 
 El formato estÃ¡ basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 
-## [UNRELEASED]
+## [4.4.0](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v4.4.0)
 
 ### Added
 
