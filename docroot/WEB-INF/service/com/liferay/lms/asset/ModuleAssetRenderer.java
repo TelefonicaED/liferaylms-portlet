@@ -186,7 +186,4 @@ public class ModuleAssetRenderer extends BaseAssetRenderer {
 			throws PortalException, SystemException {
 		return permissionChecker.hasPermission(_module.getGroupId(), Module.class.getName(), _module.getModuleId(), ActionKeys.UPDATE);
 	}
-	
-	
-
 }
