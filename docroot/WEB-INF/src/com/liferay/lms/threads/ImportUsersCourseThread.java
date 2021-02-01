@@ -158,7 +158,8 @@ public class ImportUsersCourseThread extends Thread {
 		List<Long> users = new ArrayList<Long>();
 
 		if(fileName==null || StringPool.BLANK.equals(fileName)){
-			SessionErrors.add(request, "courseadmin.importuserrole.csv.fileRequired");
+			//SessionErrors.add(request, "courseadmin.importuserrole.csv.fileRequired");
+			errors.add(LanguageUtil.get(portletConfig, themeDisplay.getLocale(),"courseadmin.importuserrole.csv.fileRequired"));
 		}
 		//Comprobar que el size del fichero no sea mayor de 2mb.
 		else if(file.length()> 2 * 1024 * 1024){
@@ -205,19 +206,19 @@ public class ImportUsersCourseThread extends Thread {
 							//Comprobamos errores
 							if(Validator.isNull(currLine[0])){
 								if (CompanyConstants.AUTH_TYPE_SN.equalsIgnoreCase(authType)) {
-									errors.add(LanguageUtil.format(
+									warnings.add(LanguageUtil.format(
 											portletConfig,
 											themeDisplay.getLocale(),
 											"courseadmin.importuserrole.csvError.user-name-bad-format", //Importaci�n por screenName
 											new Object[] { line }, false));
 								}else if(CompanyConstants.AUTH_TYPE_EA.equalsIgnoreCase(authType)){
-									errors.add(LanguageUtil.format(
+									warnings.add(LanguageUtil.format(
 											portletConfig,
 											themeDisplay.getLocale(),
 											"courseadmin.importuserrole.csvError.email-address-bad-format", //Importaci�n por screenName
 											new Object[] { line }, false));
 								}else{
-									errors.add(LanguageUtil.format(
+									warnings.add(LanguageUtil.format(
 											portletConfig,
 											themeDisplay.getLocale(),
 											"courseadmin.importuserrole.csvError.user-id-bad-format", //Importaci�n por screenName
@@ -252,7 +253,7 @@ public class ImportUsersCourseThread extends Thread {
 												log.debug("despues de addUserGroups");
 											}else{
 												log.debug("ya esta inscrito en el curso");
-												errors.add(LanguageUtil.format(portletConfig,themeDisplay.getLocale(),"courseadmin.importuserrole.user-is-registered",
+												warnings.add(LanguageUtil.format(portletConfig,themeDisplay.getLocale(),"courseadmin.importuserrole.user-is-registered",
 														new Object[] { line, userIdStr.trim() }, false));
 											}
 											
@@ -266,7 +267,12 @@ public class ImportUsersCourseThread extends Thread {
 												try{
 													cal.setTime(sdf.parse(allowStartDateStr));
 												}catch(ParseException e){
-													cal.setTime(sdf2.parse(allowStartDateStr));
+													try{
+														cal.setTime(sdf2.parse(allowStartDateStr));
+													}catch(ParseException e1){
+														warnings.add(LanguageUtil.format(portletConfig,themeDisplay.getLocale(),"courseadmin.importuserrole.date-bad-format",
+															new Object[] { line, userIdStr.trim() }, false));
+													}
 												}
 												int startMonth = cal.get(Calendar.MONTH);
 												int startYear = cal.get(Calendar.YEAR);
@@ -278,8 +284,13 @@ public class ImportUsersCourseThread extends Thread {
 											if(allowEndDateStr.trim().length() >0){
 												try{
 													cal.setTime(sdf.parse(allowEndDateStr));
-												}catch(ParseException e){
-													cal.setTime(sdf2.parse(allowEndDateStr));
+												}catch(ParseException e){													
+													try{
+														cal.setTime(sdf2.parse(allowEndDateStr));
+													}catch(ParseException e1){
+														warnings.add(LanguageUtil.format(portletConfig,themeDisplay.getLocale(),"courseadmin.importuserrole.date-bad-format",
+															new Object[] { line, userIdStr.trim() }, false));
+													}
 												}
 												int stopMonth = cal.get(Calendar.MONTH);
 												int stopYear = cal.get(Calendar.YEAR);
@@ -306,20 +317,20 @@ public class ImportUsersCourseThread extends Thread {
 											
 										}else{
 											log.debug("Usuario no encontrado");
-											errors.add(LanguageUtil.format(portletConfig,themeDisplay.getLocale(),"courseadmin.importuserrole.csvError.user-id-not-found",
+											warnings.add(LanguageUtil.format(portletConfig,themeDisplay.getLocale(),"courseadmin.importuserrole.csvError.user-id-not-found",
 													new Object[] { line, userIdStr.trim() }, false));
 										}
 									} catch (NumberFormatException e) {
 										log.debug("NumberFormatException");
-										errors.add(LanguageUtil.format(portletConfig,themeDisplay.getLocale(),"courseadmin.importuserrole.csvError.user-id-bad-format", new Object[] { line }, false));
+										warnings.add(LanguageUtil.format(portletConfig,themeDisplay.getLocale(),"courseadmin.importuserrole.csvError.user-id-bad-format", new Object[] { line }, false));
 									} catch (PortalException e) {
 										log.debug("PortalException");
-										errors.add(LanguageUtil.format(portletConfig,themeDisplay.getLocale(),"courseadmin.importuserrole.csvError.user-id-not-found",
+										warnings.add(LanguageUtil.format(portletConfig,themeDisplay.getLocale(),"courseadmin.importuserrole.csvError.user-id-not-found",
 												new Object[] { line, userIdStr.trim() }, false));
 									} catch (Exception e){
 										log.debug("Exception");
 										e.printStackTrace();
-										errors.add(LanguageUtil.get(portletConfig, themeDisplay.getLocale(),"courseadmin.importuserrole.csvError"));
+										warnings.add(LanguageUtil.get(portletConfig, themeDisplay.getLocale(),"courseadmin.importuserrole.csvError"));
 									}
 								}
 							}
@@ -344,6 +355,7 @@ public class ImportUsersCourseThread extends Thread {
 				}
 				log.debug("totalLines: " + totalLines);
 				log.debug("errors.size(): " + errors.size());
+				log.debug("warnings.size(): " + warnings.size());
 				log.debug("usersInscripted: " + usersInscripted);
 
 			}	

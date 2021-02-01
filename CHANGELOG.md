@@ -17,9 +17,7 @@ El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 
 - #192412 Se comprueba si el LearningActivityResult es nulo a la hora de obtener la puntuación del usuario en la vista de resultados de la actividad de tipo test
 - #194142 Valores mayores que 100. Corregido que cuando el tiempo del player es mayor que la duración deje el valor 100.
-- #192412 Se comprueba si el LearningActivityResult es nulo a la hora de obtener la puntuación del usuario en la vista de resultados de la actividad de tipo test
-- #194142 Valores mayores que 100. Corregido que cuando el tiempo del player es mayor que la duración deje el valor 100.
-
+- #182977 Se clona el campo improve de las actividades cuado se clona un curso
 ### Updated
 
 - #191383 Se modifica el texto que se muestra a los usuarios en la actividad de tipo test
@@ -35,7 +33,8 @@ El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 - #194392 Se permiten actividades obligatorias con peso 0 en el método de evaluación ponderado dependiendo de una configuración del lms
 - #178357 Se añaden validaciones javacript a la configuración del método de evaluación ponderado para controlar que la suma de las ponderaciones es 100
 - #178357 Se pueden ponderar con números decimales hasta dos dígitos
-- #178357 Se añade la opción de copiar la ponderación cuando se clona un curso
+- #178357 Se copia la ponderación  de las actividades cuando se clona un curso con método de evaluación ponderado
+- #178357 Se clona el check de requerido cuando se clona un curso con el método de evaluación ponderado
 
 ## [4.3.3](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v4.3.3)
 

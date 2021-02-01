@@ -176,6 +176,7 @@ public class LearningActivityLocalServiceImpl extends LearningActivityLocalServi
 		retorno.setPrecedence(learningActivity.getPrecedence());
 		retorno.setPriority(learningActivity.getPriority());
 		retorno.setWeightinmodule(learningActivity.getWeightinmodule());
+		retorno.setImprove(learningActivity.getImprove());
 		learningActivityPersistence.update(retorno, true);
 
 		boolean isNotificationActivated = PrefsPropsUtil.getBoolean(retorno.getCompanyId(), "lms.notifications.active");

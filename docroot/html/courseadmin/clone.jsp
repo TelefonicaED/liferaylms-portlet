@@ -80,7 +80,6 @@
     <aui:input type="checkbox"  name="cloneDocuments" label="courseadmin.clone.clone-documents" helpMessage="courseadmin.clone.clone-documents.help" />
     <aui:input type="checkbox"  name="cloneModuleClassification" label="courseadmin.clone.clone-module-classification" helpMessage="courseadmin.clone.clone-module-classification.help" />
     <aui:input type="checkbox"  name="cloneActivityClassificationTypes" label="courseadmin.clone.clone-activity-classification-types" helpMessage="courseadmin.clone.clone-activity-classification-types.help" />
-    <aui:input type="checkbox"  name="clonePonderation" label="courseadmin.clone.clone-ponderation" helpMessage="courseadmin.clone.clone-ponderation.help" />
         
 <div id="datesbox" style="visibility: visible">				
 	<aui:field-wrapper label="start-course-date">

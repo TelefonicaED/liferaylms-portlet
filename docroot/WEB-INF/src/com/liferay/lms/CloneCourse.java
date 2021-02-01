@@ -1,6 +1,5 @@
 package com.liferay.lms;
 
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -8,14 +7,14 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 import com.liferay.counter.service.CounterLocalServiceUtil;
 import com.liferay.lms.course.diploma.CourseDiploma;
 import com.liferay.lms.course.diploma.CourseDiplomaRegistry;
 import com.liferay.lms.learningactivity.LearningActivityType;
 import com.liferay.lms.learningactivity.LearningActivityTypeRegistry;
-import com.liferay.lms.learningactivity.courseeval.PonderatedCourseEval;
+import com.liferay.lms.learningactivity.courseeval.CourseEval;
+import com.liferay.lms.learningactivity.courseeval.CourseEvalRegistry;
 import com.liferay.lms.model.AsynchronousProcessAudit;
 import com.liferay.lms.model.Course;
 import com.liferay.lms.model.CourseCompetence;
@@ -108,10 +107,9 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 	boolean cloneDocuments;
 	boolean cloneModuleClassification;
 	boolean cloneActivityClassificationTypes;
-	boolean clonePonderation;
 	
 	public CloneCourse(long groupId, String newCourseName, ThemeDisplay themeDisplay, Date startDate, Date endDate, boolean cloneForum, boolean cloneDocuments,
-			boolean cloneModuleClassification, boolean cloneActivityClassificationTypes, boolean clonePonderation, ServiceContext serviceContext) {
+			boolean cloneModuleClassification, boolean cloneActivityClassificationTypes, ServiceContext serviceContext) {
 		super();
 		this.groupId = groupId;
 		this.newCourseName = newCourseName;
@@ -122,7 +120,6 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 		this.cloneDocuments = cloneDocuments;
 		this.cloneModuleClassification = cloneModuleClassification;
 		this.cloneActivityClassificationTypes = cloneActivityClassificationTypes;
-		this.clonePonderation = clonePonderation;
 		this.serviceContext = serviceContext;
 	}
 	
@@ -156,7 +153,6 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 			this.cloneDocuments = message.getBoolean("cloneDocuments");
 			this.cloneModuleClassification = message.getBoolean("cloneModuleClassification");
 			this.cloneActivityClassificationTypes = message.getBoolean("cloneActivityClassificationTypes");
-			this.clonePonderation = message.getBoolean("clonePonderation");
 			Role adminRole = RoleLocalServiceUtil.getRole(themeDisplay.getCompanyId(),"Administrator");
 			List<User> adminUsers = UserLocalServiceUtil.getRoleUsers(adminRole.getRoleId());
 			 
@@ -215,10 +211,7 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 		//Course newCourse = CourseLocalServiceUtil.addCourse(newCourseName, course.getDescription(), "", themeDisplay.getLocale() , today, startDate, endDate, serviceContext, course.getCalificationType());
 		
 		//when lmsprefs has more than one lmstemplate selected the addcourse above throws an error.
-		
-		Map<Long,Float> weights=PonderatedCourseEval.getActivitiesWeight(course);
-		Map<Long, Float> ponderationValues = new HashMap<Long, Float>();
-		
+				
 		int typeSite = GroupLocalServiceUtil.getGroup(course.getGroupCreatedId()).getType();
 		Course newCourse = null;  
 		String summary = null;
@@ -393,7 +386,6 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 		LearningActivity nuevaLarn = null;
 		Module newModule=null;
 		for(Module module:modules){
-			
 
 			try {
 				newModule = new ModuleImpl();
@@ -414,7 +406,11 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 				newModule = ModuleLocalServiceUtil.addmodule(newModule);
 				
 				correlationModules.put(module.getModuleId(), newModule.getModuleId());
-				newModule.setDescription(descriptionFilesClone(module.getDescription(),newCourse.getGroupCreatedId(), newModule.getModuleId(),themeDisplay.getUserId()));
+				
+                if (Validator.isNotNull(module.getDescription())) {
+                    newModule.setDescription(descriptionFilesClone(module.getDescription(),
+                        newCourse.getGroupCreatedId(), newModule.getModuleId(), themeDisplay.getUserId()));
+                }
 				newModule.setOrdern(newModule.getModuleId());
 				newModule.setUuid(module.getUuid());
 				ModuleLocalServiceUtil.updateModule(newModule);
@@ -458,6 +454,8 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 					newLearnActivity.setTries(activity.getTries());
 					newLearnActivity.setPasspuntuation(activity.getPasspuntuation());
 					newLearnActivity.setPriority(newLearnActivity.getActId());
+					log.debug("improve" + activity.getImprove());
+					newLearnActivity.setImprove(activity.getImprove());
 					
 					boolean actPending = false;
 					if(activity.getPrecedence()>0){
@@ -476,7 +474,9 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 					newLearnActivity.setStartdate(startDate);
 					newLearnActivity.setEnddate(endDate);
 					
-					newLearnActivity.setDescription(descriptionFilesClone(activity.getDescription(),newModule.getGroupId(), newLearnActivity.getActId(),themeDisplay.getUserId()));
+					if(Validator.isNotNull(activity.getDescription())) {
+					    newLearnActivity.setDescription(descriptionFilesClone(activity.getDescription(),newModule.getGroupId(), newLearnActivity.getActId(),themeDisplay.getUserId()));
+					}
 					ServiceContext larnServiceContext = serviceContext;
 
 					//Eliminar las categorias y los tags del curso del serviceContext antes de crear la nueva actividad
@@ -493,17 +493,11 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 							if(log.isDebugEnabled())
 								log.debug(":::Clone activity classification types::: Activity " + activity.getActId());
 						}
-          }	
-
+					}	
 					
 					nuevaLarn=LearningActivityLocalServiceUtil.addLearningActivity(newLearnActivity,larnServiceContext);
 					nuevaLarn.setExpandoBridgeAttributes(larnServiceContext);
 					nuevaLarn.getExpandoBridge().setAttributes(activity.getExpandoBridge().getAttributes());
-
-					if(weights.containsKey(activity.getActId())){
-
-						ponderationValues.put(nuevaLarn.getActId(), weights.get(activity.getActId()));
-					}
 					
 					if(log.isDebugEnabled()){
 						log.debug("      Learning Activity : " + activity.getTitle(Locale.getDefault())+ " ("+activity.getActId()+", " + LanguageUtil.get(Locale.getDefault(),learningActivityTypeRegistry.getLearningActivityType(activity.getTypeId()).getName())+")");
@@ -581,9 +575,9 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 			
 		}	
 		
-		if(this.clonePonderation){
-			savePonderation(course, newCourse, ponderationValues); 
-		}
+		CourseEvalRegistry registry = new CourseEvalRegistry();
+		CourseEval courseEval = registry.getCourseEval(course.getCourseEvalId());
+		courseEval.cloneCourseEval(course, newCourse, correlationModules, correlationActivities);
 		
 		//Dependencias de modulos
 		log.debug("modulesDependencesList "+modulesDependencesList.keySet());
@@ -1090,39 +1084,4 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 			return null;
 		}
 	}
-	
-	
-	public void savePonderation(Course originCourse, Course course, Map<Long, Float> ponderationValues)  throws SystemException, IOException 
-	{
-		if(Validator.isNotNull(ponderationValues)&&ponderationValues.size()>0){
-		}
-
-		Document document = SAXReaderUtil.createDocument();
-		Element rootElement = document.addElement("eval");
-		long score=0;
-		try {
-			score = PonderatedCourseEval.getScore(originCourse);
-		} catch (PortalException e) {
-			e.printStackTrace();
-		} catch (DocumentException e) {
-			e.printStackTrace();
-		}
-		Element passElement=rootElement.addElement("score");
-		passElement.addAttribute("value", Long.toString(score));
-		
-		rootElement.addElement("courseEval").setText(evalclassName);		
-	
-		for (Map.Entry<Long, Float> entry : ponderationValues.entrySet()) {
-			Element weight=rootElement.addElement("weight");
-			weight.addAttribute("actId", Long.toString(entry.getKey()));
-			weight.addAttribute("ponderation",Float.toString(entry.getValue()));
-
-		    //System.out.println("clave=" + entry.getKey() + ", valor=" + entry.getValue());
-		}
-				
-		course.setCourseExtraData(document.formattedString());
-		CourseLocalServiceUtil.updateCourse(course);
-		
-	}
-
 }
