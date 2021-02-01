@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
-import com.liferay.lms.learningactivity.calificationtype.CalificationTypeClp;
 import com.liferay.lms.service.ClpSerializer;
 import com.liferay.portal.kernel.portlet.PortletClassLoaderUtil;
 import com.liferay.portal.kernel.util.AutoResetThreadLocal;

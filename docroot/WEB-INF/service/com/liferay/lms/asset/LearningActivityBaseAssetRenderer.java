@@ -348,8 +348,7 @@ public abstract class LearningActivityBaseAssetRenderer extends BaseAssetRendere
 		}else{
 			_layout = LayoutLocalServiceUtil.getLayout(plid);
 		}
-	
-		PortletURL portletURL = liferayPortletResponse.createLiferayPortletURL(plid, _portletId, PortletRequest.RENDER_PHASE);
+		PortletURL portletURL = liferayPortletResponse.createLiferayPortletURL(plid, LmsConstant.LMS_EDITACTIVITY_PORTLET_ID, PortletRequest.RENDER_PHASE);
 		portletURL.setParameter("actId",Long.toString( _learningactivity.getActId()));
 		portletURL.setParameter("moduleId",Long.toString( _learningactivity.getModuleId()));
 		portletURL.setParameter("actionEditingActivity", StringPool.FALSE);
