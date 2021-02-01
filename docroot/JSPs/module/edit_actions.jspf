@@ -1,3 +1,5 @@
+<%@page import="com.liferay.lms.asset.ModuleAssetRendererFactory"%>
+<%@page import="com.liferay.lms.asset.LearningActivityBaseAssetRenderer"%>
 <%@page import="com.liferay.portal.kernel.language.LanguageUtil"%>
 <%@page import="com.liferay.portal.kernel.util.Validator"%>
 <%@page import="javax.portlet.PortletURL"%>
@@ -27,7 +29,9 @@
 
 	<%if(permissionChecker.hasPermission(groupId, name, primKey, ActionKeys.UPDATE)){
 		
-		PortletURL urlEditModule = LmsActivitiesList.getURLEditModule(liferayPortletRequest, liferayPortletResponse, theModule);
+		PortletURL urlEditModule = (new ModuleAssetRendererFactory())
+				.getAssetRenderer(theModule.getModuleId())
+				.getURLEdit(liferayPortletRequest, liferayPortletResponse);
 
 		if(Validator.isNotNull(urlEditModule)){
 		

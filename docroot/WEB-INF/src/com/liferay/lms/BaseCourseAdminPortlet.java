@@ -636,6 +636,7 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 		String summary = ParamUtil.getString(uploadRequest, "summary", StringPool.BLANK);
 		boolean visible = ParamUtil.getBoolean(uploadRequest, "visible", false);
 		boolean welcome = ParamUtil.getBoolean(uploadRequest, "welcome", false);
+		boolean welcomeAddToCalendar = ParamUtil.getBoolean(uploadRequest, "welcomeAddToCalendar", false);
 		String welcomeSubject = ParamUtil.getString(uploadRequest, "welcomeSubject",StringPool.BLANK);
 		String welcomeMsg = ParamUtil.getString(uploadRequest, "welcomeMsg",StringPool.BLANK);
 		boolean goodbye = ParamUtil.getBoolean(uploadRequest, "goodbye", false);
@@ -980,6 +981,7 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 
 			course.setCourseEvalId(courseEvalId);
 			course.setWelcome(welcome);
+			course.setWelcomeAddToCalendar(welcomeAddToCalendar);
 			course.setWelcomeSubject(welcomeSubject);
 			course.setWelcomeMsg(welcomeMsg);
 			course.setDeniedInscription(activeDeniedInscriptionMessage);

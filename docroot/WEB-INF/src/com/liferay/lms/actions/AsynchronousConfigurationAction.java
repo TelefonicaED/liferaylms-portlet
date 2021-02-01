@@ -55,6 +55,9 @@ public class AsynchronousConfigurationAction implements ConfigurationAction {
 		String onlyForUserOwner = ParamUtil.getString(actionRequest,"preferences--onlyForUserOwner--", "");
 		portletPreferences.setValue("preferences--onlyForUserOwner--", onlyForUserOwner);
 		
+		String showScreenName = ParamUtil.getString(actionRequest,"preferences--showScreenName--", "");
+        portletPreferences.setValue("preferences--showScreenName--", showScreenName);
+		
 		String showExtraContent = ParamUtil.getString(actionRequest,"preferences--showExtraContent--", "");
 		portletPreferences.setValue("preferences--showExtraContent--", showExtraContent);
 

@@ -35,20 +35,27 @@ Liferay.Service.registerClass(
 		getCoursesParents: true,
 		getChildCourses: true,
 		getStudentsFromCourseCount: true,
-		getPublicCoursesByCompanyId: true
+		getPublicCoursesByCompanyId: true,
+		getPlidActivityViewer: true,
+		getFriendlyURLTeachers: true
 	}
 );
 
 Liferay.Service.registerClass(
 	Liferay.Service.Lms, "LearningActivity",
 	{
+		countLearningActivityMandatory: true,
+		countLearningActivity: true,
+		countLearningActivityMandatoryPassed: true,
+		countLearningActivityPassed: true,
 		getLearningActivitiesOfGroup: true,
 		getLearningActivitiesOfModule: true,
 		deleteLearningactivity: true,
 		getLearningActivity: true,
 		addLearningActivity: true,
 		modLearningActivity: true,
-		isLocked: true
+		isLocked: true,
+		getURLActivity: true
 	}
 );
 
@@ -80,7 +87,8 @@ Liferay.Service.registerClass(
 		findAllInCourse: true,
 		isLocked: true,
 		PassedByMe: true,
-		isUserPassed: true
+		isUserPassed: true,
+		getURLModule: true
 	}
 );
 

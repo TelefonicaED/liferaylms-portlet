@@ -1,6 +1,27 @@
 package com.liferay.lms.listeners;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+
 import javax.mail.internet.InternetAddress;
+
+import net.fortuna.ical4j.data.CalendarOutputter;
+import net.fortuna.ical4j.model.TimeZoneRegistry;
+import net.fortuna.ical4j.model.TimeZoneRegistryFactory;
+import net.fortuna.ical4j.model.component.VEvent;
+import net.fortuna.ical4j.model.property.CalScale;
+import net.fortuna.ical4j.model.property.Description;
+import net.fortuna.ical4j.model.property.DtEnd;
+import net.fortuna.ical4j.model.property.DtStart;
+import net.fortuna.ical4j.model.property.Method;
+import net.fortuna.ical4j.model.property.ProdId;
+import net.fortuna.ical4j.model.property.Summary;
+import net.fortuna.ical4j.model.property.Version;
+import net.fortuna.ical4j.util.UidGenerator;
 
 import com.liferay.lms.auditing.AuditConstants;
 import com.liferay.lms.auditing.AuditingLogFactory;
@@ -19,7 +40,9 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.messaging.Message;
 import com.liferay.portal.kernel.messaging.MessageBusException;
 import com.liferay.portal.kernel.messaging.MessageBusUtil;
+import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.PrefsPropsUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.StringPool;
@@ -144,6 +167,7 @@ public class GroupListener extends BaseModelListener<Group> {
 								log.debug(body);
 							}
 							
+													
 							//Envio auditoria
 							Message messageAudit=new Message();
 							messageAudit.put("auditing", "TRUE");
@@ -174,6 +198,111 @@ public class GroupListener extends BaseModelListener<Group> {
 							message.put("url", 		url);
 							message.put("urlcourse",urlcourse);		
 
+							
+							if(course.getWelcomeAddToCalendar()){
+								String courseTitle = course.getTitle(user.getLocale());
+								
+								courseTitle = "<a href='"+urlcourse+"'  target='_blank'>" + courseTitle + "</a>" ;
+								
+								log.debug("::::courseTitle::: " + courseTitle);
+								
+								String name = LanguageUtil.get(user.getLocale(), "calendar.course-start") + StringPool.COLON + StringPool.NBSP + courseTitle;
+								
+								
+								SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+								format.setTimeZone(user.getTimeZone());
+								String time = format.format(course.getExecutionStartDate());
+									
+								
+									
+								Date startDate =course.getExecutionStartDate();
+								try {
+									startDate = format.parse(time);
+								} catch (ParseException e1) {
+										// TODO Auto-generated catch block
+										e1.printStackTrace();
+									}
+								
+								log.debug("START DATE "+startDate);
+								Calendar calendar = Calendar.getInstance(user.getTimeZone());
+								calendar.setTime(course.getExecutionStartDate());
+								calendar.add(Calendar.HOUR_OF_DAY,1);
+								Date endDate = calendar.getTime();
+								
+								
+								
+								
+					
+								
+								// initialise as an all-day event..
+								VEvent courseEvent = new VEvent();
+								
+								
+								DtStart start = new DtStart(new net.fortuna.ical4j.model.DateTime(startDate));
+								DtEnd end = new DtEnd(new net.fortuna.ical4j.model.DateTime(endDate));
+								courseEvent.getProperties().add(start);
+								courseEvent.getProperties().add(end);
+								courseEvent.getProperties().add(new Summary(course.getTitle(user.getLocale())));								
+								courseEvent.getProperties().add(new Description(HtmlUtil.extractText(name)));
+								UidGenerator ug = new UidGenerator("1");
+								courseEvent.getProperties().add(ug.generateUid());
+				
+						
+								// Generacion Ical
+								net.fortuna.ical4j.model.Calendar iCal = new net.fortuna.ical4j.model.Calendar();
+								iCal.getProperties().add(new ProdId("-//Liferay Inc//Liferay Portal 6.1.1//EN"));
+								iCal.getProperties().add(Version.VERSION_2_0);
+								iCal.getProperties().add(CalScale.GREGORIAN);
+								iCal.getProperties().add(Method.PUBLISH);
+								TimeZoneRegistry registry = TimeZoneRegistryFactory.getInstance().createRegistry();
+								
+								net.fortuna.ical4j.model.TimeZone timeZone = registry.getTimeZone(user.getTimeZone().getID());
+								iCal.getComponents().add(timeZone.getVTimeZone());
+								
+								iCal.getComponents().add(courseEvent);
+								
+								
+								log.debug("EVENT "+courseEvent.toString());
+								
+								// Descargar el fichero
+								FileOutputStream writer;
+								try {
+									File[] attachments = new File[1];
+									String[] attachmentNames = new String[1];
+									
+									
+									String fileName = LanguageUtil.get(user.getLocale(), "course")+".ics";
+
+									File file = FileUtil.createTempFile("ics");
+									
+									writer = new FileOutputStream(file);
+									
+							
+									
+									try {
+										final CalendarOutputter outputter=new CalendarOutputter();
+										outputter.output(iCal,writer);
+									} catch (Exception e) {
+										e.printStackTrace();
+									}
+
+									writer.flush();
+									writer.close();
+									attachments[0] =  file;
+									attachmentNames[0] = fileName;
+									log.debug("ADDING ATTACHMENT "+attachments.length);
+									message.put("attachments", attachments);
+									message.put("attachmentNames", attachmentNames);
+								}catch (Exception e){
+									e.printStackTrace();
+								}
+								
+								
+								
+								
+								
+								
+							}
 							MessageBusUtil.sendMessage("lms/mailing", message);
 							
 						}
@@ -305,6 +434,12 @@ public class GroupListener extends BaseModelListener<Group> {
 							message.put("url", 		url);
 							message.put("urlcourse",urlcourse);		
 
+							
+							
+							
+
+							
+							
 							MessageBusUtil.sendMessage("lms/mailing", message);
 						}
 						catch(Exception ex)

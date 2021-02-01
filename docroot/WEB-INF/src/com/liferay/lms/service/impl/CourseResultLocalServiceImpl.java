@@ -577,6 +577,10 @@ public class CourseResultLocalServiceImpl
 		}
 	}
 	
+	public List<CourseResult> getCourseResultByCourseParentId(long courseParentId, long userId){
+		return courseResultFinder.findCourseResultByParentCourseId(courseParentId, userId);
+	}
+	
 	public void softInitializeByGroupIdAndUserId(long groupId, long userId) throws SystemException {
 		Course course = courseLocalService.getCourseByGroupCreatedId(groupId);
 		if (course != null && courseResultLocalService.getByUserAndCourse(course.getCourseId(), userId) == null) {
@@ -721,4 +725,5 @@ public class CourseResultLocalServiceImpl
 	public CourseResult getByUserAndCourse(long courseId,long userId) throws SystemException{
 		return courseResultPersistence.fetchByuc(userId, courseId);
 	}
+	
 }

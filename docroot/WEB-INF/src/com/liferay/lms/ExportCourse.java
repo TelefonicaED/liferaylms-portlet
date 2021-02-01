@@ -11,6 +11,11 @@ import com.liferay.lms.service.AsynchronousProcessAuditLocalServiceUtil;
 import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.lms.util.LmsConstant;
 import com.liferay.portal.kernel.cache.MultiVMPoolUtil;
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
+import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.lar.PortletDataHandlerKeys;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -18,8 +23,9 @@ import com.liferay.portal.kernel.messaging.Message;
 import com.liferay.portal.kernel.messaging.MessageListener;
 import com.liferay.portal.kernel.messaging.MessageListenerException;
 import com.liferay.portal.kernel.util.FileUtil;
-import com.liferay.portal.kernel.util.MapUtil;
+import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.SystemProperties;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.Role;
 import com.liferay.portal.model.User;
 import com.liferay.portal.security.auth.PrincipalThreadLocal;
@@ -67,22 +73,49 @@ public class ExportCourse implements MessageListener {
 			
 			long processId = message.getLong("asynchronousProcessAuditId");
 			
+			this.groupId = message.getLong("groupId");
+            this.fileName = message.getString("fileName");
+            this.key = message.getString(key);
+            this.serviceContext = (ServiceContext)message.get("serviceContext");
+            this.themeDisplay = (ThemeDisplay)message.get("themeDisplay");
+			
 			process = AsynchronousProcessAuditLocalServiceUtil.fetchAsynchronousProcessAudit(processId);
 			process = AsynchronousProcessAuditLocalServiceUtil.updateProcessStatus(process, null, LmsConstant.STATUS_IN_PROGRESS, "");
 			statusMessage ="";
 			error = false;
 			Course course = CourseLocalServiceUtil.fetchByGroupCreatedId(groupId);
 			if(course!=null){
+                StringBuilder extraContent = new StringBuilder();
+                
+                Course parentcourse = null;
+                try {
+                    parentcourse = course.getParentCourse();
+                } catch (SystemException | PortalException e) {
+                    log.debug("Parent course not found");
+                }
+                
+                if(Validator.isNotNull(parentcourse) ) {
+                    extraContent.append(LanguageUtil.get(themeDisplay.getLocale(), "course-admin.parent-course"))
+                    .append(StringPool.COLON).append(StringPool.SPACE)
+                    .append(course.getParentCourse().getTitle(themeDisplay.getLocale())).append("<br>");
+                }
+                
+                extraContent.append(LanguageUtil.get(themeDisplay.getLocale(), "course.label"))
+                    .append(StringPool.COLON).append(StringPool.SPACE)
+                    .append(course.getTitle(themeDisplay.getLocale()));
+
+                extraContent.append("<br>").append(LanguageUtil.get(themeDisplay.getLocale(), "courseadmin.importuserrole.file"))
+                    .append(StringPool.COLON).append(StringPool.SPACE)
+                    .append(fileName);
+			    
+                JSONObject json =JSONFactoryUtil.createJSONObject();            
+                json.put("data", extraContent.toString());
+                
+                process.setExtraContent(json.toString());
 				process.setClassPK(course.getCourseId());
 				process = AsynchronousProcessAuditLocalServiceUtil.updateAsynchronousProcessAudit(process);
 			}
 			
-			this.groupId	= message.getLong("groupId");
-			this.fileName = message.getString("fileName");
-			this.key = message.getString(key);
-			this.serviceContext = (ServiceContext)message.get("serviceContext");
-			this.themeDisplay = (ThemeDisplay)message.get("themeDisplay");
-		
 			Role adminRole = RoleLocalServiceUtil.getRole(themeDisplay.getCompanyId(),"Administrator");
 			List<User> adminUsers = UserLocalServiceUtil.getRoleUsers(adminRole.getRoleId());
 			 

@@ -324,6 +324,22 @@ public class CourseTypeAdmin extends MVCPortlet {
 		}
 	}
 	
+	public void saveCourseTypeActive(ActionRequest request, ActionResponse response) {
+		if(log.isDebugEnabled())
+			log.debug(" ::saveCourseTypeActive:: ");
+		
+		long courseTypeId = ParamUtil.getLong(request, "courseTypeId", 0);
+		boolean active = ParamUtil.getBoolean(request, "active");
+		
+		try {
+			CourseTypeLocalServiceUtil.updateActive(courseTypeId, active);
+			SessionMessages.add(request, "coursetypeadmin.success.update-coursetype-active");
+		} catch (SystemException e) {
+			e.printStackTrace();
+			SessionErrors.add(request, "coursetypeadmin.error.update-coursetype-active");
+		}
+	}
+	
 	public void deleteCourseType(ActionRequest request, ActionResponse response) throws IOException, PortletException{
 
 		long courseTypeId = ParamUtil.getLong(request, "courseTypeId", 0);

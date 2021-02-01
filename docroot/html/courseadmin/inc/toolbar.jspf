@@ -40,6 +40,7 @@
 	<portlet:param name="view" value="import-users" /> 
 </portlet:renderURL>
 
+
 <aui:fieldset>
 	<div class="bt_newuser">	
 		<portlet:renderURL var="adduserURL">
@@ -80,14 +81,22 @@
 			method="get" 
 			url="<%=exportURL%>" />
 	</div>
-	<div>
+	<%--<div>
 		<liferay-ui:icon
 			image="add"
 			label="<%= true %>"
 			message="courseadmin.importuserrole"
 			url='<%="javascript:"+renderResponse.getNamespace() + "showPopupImportUsers();" %>'
 		/>
-	</div>
+	</div>--%>
+	
+	<c:set var="actionURL" value="javascript:${renderResponse.getNamespace()}showImportUsersCourse();" />
+			<liferay-ui:icon
+				message="courseadmin.importuserrole"
+				image="add_instance"
+				url="${actionURL  }" />
+	
+	
 </liferay-ui:icon-menu>
 </aui:fieldset>
 
@@ -138,3 +147,5 @@
     
 //-->
 </script>
+
+

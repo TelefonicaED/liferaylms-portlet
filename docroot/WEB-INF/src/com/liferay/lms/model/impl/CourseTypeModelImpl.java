@@ -80,9 +80,11 @@ public class CourseTypeModelImpl extends BaseModelImpl<CourseType>
 			{ "modifiedDate", Types.TIMESTAMP },
 			{ "name", Types.VARCHAR },
 			{ "description", Types.VARCHAR },
-			{ "iconId", Types.BIGINT }
+			{ "iconId", Types.BIGINT },
+			{ "classNameId", Types.BIGINT },
+			{ "active_", Types.BOOLEAN }
 		};
-	public static final String TABLE_SQL_CREATE = "create table Lms_CourseType (courseTypeId LONG not null primary key,companyId LONG,userId LONG,groupId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,name STRING null,description STRING null,iconId LONG)";
+	public static final String TABLE_SQL_CREATE = "create table Lms_CourseType (courseTypeId LONG not null primary key,companyId LONG,userId LONG,groupId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,name STRING null,description STRING null,iconId LONG,classNameId LONG,active_ BOOLEAN)";
 	public static final String TABLE_SQL_DROP = "drop table Lms_CourseType";
 	public static final String DATA_SOURCE = "liferayDataSource";
 	public static final String SESSION_FACTORY = "liferaySessionFactory";
@@ -96,8 +98,9 @@ public class CourseTypeModelImpl extends BaseModelImpl<CourseType>
 	public static final boolean COLUMN_BITMASK_ENABLED = GetterUtil.getBoolean(com.liferay.util.service.ServiceProps.get(
 				"value.object.column.bitmask.enabled.com.liferay.lms.model.CourseType"),
 			true);
-	public static long COMPANYID_COLUMN_BITMASK = 1L;
-	public static long COURSETYPEID_COLUMN_BITMASK = 2L;
+	public static long ACTIVE_COLUMN_BITMASK = 1L;
+	public static long CLASSNAMEID_COLUMN_BITMASK = 2L;
+	public static long COMPANYID_COLUMN_BITMASK = 4L;
 
 	/**
 	 * Converts the soap model instance into a normal model instance.
@@ -122,6 +125,8 @@ public class CourseTypeModelImpl extends BaseModelImpl<CourseType>
 		model.setName(soapModel.getName());
 		model.setDescription(soapModel.getDescription());
 		model.setIconId(soapModel.getIconId());
+		model.setClassNameId(soapModel.getClassNameId());
+		model.setActive(soapModel.getActive());
 
 		return model;
 	}
@@ -190,6 +195,8 @@ public class CourseTypeModelImpl extends BaseModelImpl<CourseType>
 		attributes.put("name", getName());
 		attributes.put("description", getDescription());
 		attributes.put("iconId", getIconId());
+		attributes.put("classNameId", getClassNameId());
+		attributes.put("active", getActive());
 
 		return attributes;
 	}
@@ -255,6 +262,18 @@ public class CourseTypeModelImpl extends BaseModelImpl<CourseType>
 		if (iconId != null) {
 			setIconId(iconId);
 		}
+
+		Long classNameId = (Long)attributes.get("classNameId");
+
+		if (classNameId != null) {
+			setClassNameId(classNameId);
+		}
+
+		Boolean active = (Boolean)attributes.get("active");
+
+		if (active != null) {
+			setActive(active);
+		}
 	}
 
 	public long getCourseTypeId() {
@@ -262,19 +281,7 @@ public class CourseTypeModelImpl extends BaseModelImpl<CourseType>
 	}
 
 	public void setCourseTypeId(long courseTypeId) {
-		_columnBitmask |= COURSETYPEID_COLUMN_BITMASK;
-
-		if (!_setOriginalCourseTypeId) {
-			_setOriginalCourseTypeId = true;
-
-			_originalCourseTypeId = _courseTypeId;
-		}
-
 		_courseTypeId = courseTypeId;
-	}
-
-	public long getOriginalCourseTypeId() {
-		return _originalCourseTypeId;
 	}
 
 	public long getCompanyId() {
@@ -539,6 +546,68 @@ public class CourseTypeModelImpl extends BaseModelImpl<CourseType>
 		_iconId = iconId;
 	}
 
+	public String getClassName() {
+		if (getClassNameId() <= 0) {
+			return StringPool.BLANK;
+		}
+
+		return PortalUtil.getClassName(getClassNameId());
+	}
+
+	public void setClassName(String className) {
+		long classNameId = 0;
+
+		if (Validator.isNotNull(className)) {
+			classNameId = PortalUtil.getClassNameId(className);
+		}
+
+		setClassNameId(classNameId);
+	}
+
+	public long getClassNameId() {
+		return _classNameId;
+	}
+
+	public void setClassNameId(long classNameId) {
+		_columnBitmask |= CLASSNAMEID_COLUMN_BITMASK;
+
+		if (!_setOriginalClassNameId) {
+			_setOriginalClassNameId = true;
+
+			_originalClassNameId = _classNameId;
+		}
+
+		_classNameId = classNameId;
+	}
+
+	public long getOriginalClassNameId() {
+		return _originalClassNameId;
+	}
+
+	public boolean getActive() {
+		return _active;
+	}
+
+	public boolean isActive() {
+		return _active;
+	}
+
+	public void setActive(boolean active) {
+		_columnBitmask |= ACTIVE_COLUMN_BITMASK;
+
+		if (!_setOriginalActive) {
+			_setOriginalActive = true;
+
+			_originalActive = _active;
+		}
+
+		_active = active;
+	}
+
+	public boolean getOriginalActive() {
+		return _originalActive;
+	}
+
 	public long getColumnBitmask() {
 		return _columnBitmask;
 	}
@@ -590,6 +659,8 @@ public class CourseTypeModelImpl extends BaseModelImpl<CourseType>
 		courseTypeImpl.setName(getName());
 		courseTypeImpl.setDescription(getDescription());
 		courseTypeImpl.setIconId(getIconId());
+		courseTypeImpl.setClassNameId(getClassNameId());
+		courseTypeImpl.setActive(getActive());
 
 		courseTypeImpl.resetOriginalValues();
 
@@ -644,13 +715,17 @@ public class CourseTypeModelImpl extends BaseModelImpl<CourseType>
 	public void resetOriginalValues() {
 		CourseTypeModelImpl courseTypeModelImpl = this;
 
-		courseTypeModelImpl._originalCourseTypeId = courseTypeModelImpl._courseTypeId;
-
-		courseTypeModelImpl._setOriginalCourseTypeId = false;
-
 		courseTypeModelImpl._originalCompanyId = courseTypeModelImpl._companyId;
 
 		courseTypeModelImpl._setOriginalCompanyId = false;
+
+		courseTypeModelImpl._originalClassNameId = courseTypeModelImpl._classNameId;
+
+		courseTypeModelImpl._setOriginalClassNameId = false;
+
+		courseTypeModelImpl._originalActive = courseTypeModelImpl._active;
+
+		courseTypeModelImpl._setOriginalActive = false;
 
 		courseTypeModelImpl._columnBitmask = 0;
 	}
@@ -711,12 +786,16 @@ public class CourseTypeModelImpl extends BaseModelImpl<CourseType>
 
 		courseTypeCacheModel.iconId = getIconId();
 
+		courseTypeCacheModel.classNameId = getClassNameId();
+
+		courseTypeCacheModel.active = getActive();
+
 		return courseTypeCacheModel;
 	}
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(21);
+		StringBundler sb = new StringBundler(25);
 
 		sb.append("{courseTypeId=");
 		sb.append(getCourseTypeId());
@@ -738,13 +817,17 @@ public class CourseTypeModelImpl extends BaseModelImpl<CourseType>
 		sb.append(getDescription());
 		sb.append(", iconId=");
 		sb.append(getIconId());
+		sb.append(", classNameId=");
+		sb.append(getClassNameId());
+		sb.append(", active=");
+		sb.append(getActive());
 		sb.append("}");
 
 		return sb.toString();
 	}
 
 	public String toXmlString() {
-		StringBundler sb = new StringBundler(34);
+		StringBundler sb = new StringBundler(40);
 
 		sb.append("<model><model-name>");
 		sb.append("com.liferay.lms.model.CourseType");
@@ -790,6 +873,14 @@ public class CourseTypeModelImpl extends BaseModelImpl<CourseType>
 			"<column><column-name>iconId</column-name><column-value><![CDATA[");
 		sb.append(getIconId());
 		sb.append("]]></column-value></column>");
+		sb.append(
+			"<column><column-name>classNameId</column-name><column-value><![CDATA[");
+		sb.append(getClassNameId());
+		sb.append("]]></column-value></column>");
+		sb.append(
+			"<column><column-name>active</column-name><column-value><![CDATA[");
+		sb.append(getActive());
+		sb.append("]]></column-value></column>");
 
 		sb.append("</model>");
 
@@ -801,8 +892,6 @@ public class CourseTypeModelImpl extends BaseModelImpl<CourseType>
 			CourseType.class
 		};
 	private long _courseTypeId;
-	private long _originalCourseTypeId;
-	private boolean _setOriginalCourseTypeId;
 	private long _companyId;
 	private long _originalCompanyId;
 	private boolean _setOriginalCompanyId;
@@ -817,6 +906,12 @@ public class CourseTypeModelImpl extends BaseModelImpl<CourseType>
 	private String _description;
 	private String _descriptionCurrentLanguageId;
 	private long _iconId;
+	private long _classNameId;
+	private long _originalClassNameId;
+	private boolean _setOriginalClassNameId;
+	private boolean _active;
+	private boolean _originalActive;
+	private boolean _setOriginalActive;
 	private long _columnBitmask;
 	private CourseType _escapedModelProxy;
 }

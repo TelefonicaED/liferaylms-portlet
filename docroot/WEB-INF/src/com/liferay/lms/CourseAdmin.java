@@ -1,7 +1,12 @@
 package com.liferay.lms;
 
+import java.io.DataInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -16,6 +21,7 @@ import java.util.UUID;
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
 import javax.portlet.PortletException;
+import javax.portlet.PortletPreferences;
 import javax.portlet.PortletSession;
 import javax.portlet.PortletURL;
 import javax.portlet.RenderRequest;
@@ -24,6 +30,7 @@ import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
 import javax.portlet.ResourceURL;
 
+import com.liferay.lms.auditing.AuditingLogFactory;
 import com.liferay.lms.course.adminaction.AdminActionTypeRegistry;
 import com.liferay.lms.model.AsynchronousProcessAudit;
 import com.liferay.lms.model.Course;
@@ -35,6 +42,8 @@ import com.liferay.lms.service.CourseServiceUtil;
 import com.liferay.lms.service.CourseTypeLocalServiceUtil;
 import com.liferay.lms.service.LmsPrefsLocalServiceUtil;
 import com.liferay.lms.threads.ImportEditionsThread;
+import com.liferay.lms.threads.ImportUsersCourseThread;
+import com.liferay.lms.threads.ImportUsersCourseThreadMapper;
 import com.liferay.lms.threads.ReportThreadMapper;
 import com.liferay.lms.util.CourseParams;
 import com.liferay.portal.LARFileException;
@@ -44,12 +53,15 @@ import com.liferay.portal.NoSuchGroupException;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
+import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.lar.PortletDataHandlerKeys;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.messaging.Message;
 import com.liferay.portal.kernel.messaging.MessageBusUtil;
+import com.liferay.portal.kernel.servlet.HttpHeaders;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.upload.UploadPortletRequest;
@@ -80,7 +92,9 @@ import com.liferay.portal.service.ServiceContextFactory;
 import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
+import com.liferay.portlet.PortletPreferencesFactoryUtil;
 import com.liferay.portlet.announcements.EntryDisplayDateException;
+import com.liferay.portlet.asset.model.AssetCategory;
 import com.liferay.portlet.asset.model.AssetEntry;
 import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
 import com.liferay.portlet.asset.service.AssetTagLocalServiceUtil;
@@ -106,12 +120,14 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 	private String configLmsPrefsJSP = null;
 	private String editionsJSP = null;
 	private String newEditionJSP = null;
+	private String roleMembersJSP = null;
 	
 	public void init() throws PortletException {	
 		viewJSP = getInitParameter("view-template");
 		editCourseJSP =  getInitParameter("edit-course-template");
 		courseTypesJSP = getInitParameter("course-types-template");
 		roleMembersTabJSP =  getInitParameter("role-members-tab-template");
+		roleMembersJSP =  "/html/courseadmin/rolemembers.jsp";
 		exportJSP =  getInitParameter("export-template");
 		importJSP =  getInitParameter("import-template");
 		cloneJSP =  getInitParameter("clone-template");
@@ -545,10 +561,50 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 	}
 	
 	private void showViewImport(RenderRequest renderRequest,RenderResponse renderResponse) throws IOException, PortletException{
+			
+		include(this.importJSP, renderRequest, renderResponse);
+		
+	}
+	
+	protected void showViewImportUsers(RenderRequest renderRequest,RenderResponse renderResponse) throws IOException, PortletException{
+		
+		//include(this.importUsersJSP, renderRequest, renderResponse);
+		
 		
 		ThemeDisplay themeDisplay = (ThemeDisplay)renderRequest.getAttribute(WebKeys.THEME_DISPLAY);
 		
-		include(this.importJSP, renderRequest, renderResponse);
+		if(log.isDebugEnabled())log.debug("---- showViewImportUsers ---");
+		
+		
+				
+		PortletURL backURL = renderResponse.createRenderURL();
+		renderRequest.setAttribute("backURL", backURL);
+		
+		long courseId = ParamUtil.getLong(renderRequest, "courseId");
+		String roleId = ParamUtil.getString(renderRequest, "roleId",null);
+		log.debug("courseId: " + courseId);
+		log.debug("roleId: " + roleId);
+		
+		renderRequest.setAttribute("view", "import-users");
+		//renderRequest.setAttribute("view", "role-members-tab");
+		renderRequest.setAttribute("courseId", courseId);
+		renderRequest.setAttribute("roleId", roleId);
+		
+		ResourceURL importUsersCourseReportURL = renderResponse.createResourceURL();
+		importUsersCourseReportURL.setResourceID("importUsersCourseReport");
+		//renderRequest.setAttribute("action", "importUsersCourse");
+		renderRequest.setAttribute("importUsersCourseReportURL", importUsersCourseReportURL.toString());
+		
+		String uuid = ParamUtil.getString(renderRequest, "UUID",null);
+		renderRequest.setAttribute("UUID" ,uuid);
+		if(log.isDebugEnabled())
+			log.debug(" ::showViewImportUsers:: UUID :: " + uuid);
+		
+		showViewRoleMembersTab(renderRequest, renderResponse);
+		
+		//include(this.importUsersJSP, renderRequest, renderResponse);
+		//include(this.roleMembersJSP, renderRequest, renderResponse);
+		//include(this.roleMembersTabJSP, renderRequest, renderResponse);
 	}
 	
 	private void showViewClone(RenderRequest renderRequest,RenderResponse renderResponse) throws IOException, PortletException{
@@ -1329,21 +1385,156 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 		response.setRenderParameter("view", "editions");
 	}
 	
+	
+	
+	public void importUsersCourse(ActionRequest request, ActionResponse response)throws Exception {
+		
+		ServiceContext serviceContext = ServiceContextFactory.getInstance(Course.class.getName(), request);
+		ThemeDisplay themeDisplay = (ThemeDisplay) request.getAttribute(WebKeys.THEME_DISPLAY);
+		log.debug("importUsersCourse 1");
+		
+		UploadPortletRequest uploadRequest = PortalUtil.getUploadPortletRequest(request);
+		
+		long courseId = ParamUtil.getLong(uploadRequest, "courseId", 0);
+		long roleId = ParamUtil.getLong(uploadRequest, "roleId", 0);
+		
+		try{
+			
+			String fileName = uploadRequest.getFileName("fileName");
+				
+			log.debug("importUsersCourse 2 - fileName: " + fileName);		
+			
+			String idHilo = UUID.randomUUID().toString();
+			log.debug("idHilo: " + idHilo);				
+			InputStream csvFile = uploadRequest.getFileAsStream("fileName");
+			File file =uploadRequest.getFile("fileName");
+			
+			PortletPreferences preferences;
+			String portletResource = ParamUtil.getString(request, "portletResource");
+			if (Validator.isNotNull(portletResource)) {
+				preferences = PortletPreferencesFactoryUtil.getPortletSetup(request, portletResource);
+			}else{
+				preferences = request.getPreferences();
+			}
+			
+			ImportUsersCourseThread hilo = new ImportUsersCourseThread(themeDisplay, idHilo, getPortletConfig(), fileName, file, serviceContext, csvFile, preferences, request);
+			ImportUsersCourseThreadMapper.addThread(idHilo, hilo);
+			response.setRenderParameter("UUID", idHilo);				
+			response.setRenderParameter("courseId", String.valueOf(courseId));
+			response.setRenderParameter("roleId", String.valueOf(roleId));
+			response.setRenderParameter("view", "import-users");
+		} catch (Exception e) {
+			log.error(e);
+		}
+	}
+	
+	
 	//---Resource
 	@Override
 	public void serveResource(ResourceRequest request, ResourceResponse response) throws IOException, PortletException {
-		
-		ThemeDisplay themeDisplay = (ThemeDisplay) request.getAttribute(WebKeys.THEME_DISPLAY);
-		
-		if(request.getResourceID() != null && request.getResourceID().equals("importEditionsResultsReport")){
-			EditionsImportExport.generateImportReport(request, response);
-		}else if(request.getResourceID() != null && request.getResourceID().equals("exportEditions")){
-			EditionsImportExport.generateReportEditions(request, response, themeDisplay);
-		} else if (request.getResourceID() != null && request.getResourceID().equals("importEditionsExample")){
-			EditionsImportExport.generateEditionsExampleFile(request, response, themeDisplay);
+		log.debug("serveResource");
+		if(request.getResourceID() != null){
+			log.debug("request.getResourceID(): " + request.getResourceID());
 		}
 		
-		super.serveResource(request, response);
+		String action = ParamUtil.getString(request, "action");
+		String uuid = ParamUtil.getString(request, "UUID");
+		log.debug("action: "+action);
+		log.debug("uuid "+uuid);
+		
+		String fileReport = ParamUtil.getString(request, "fileReport", null);
+		if (fileReport != null){
+			File file = new File(fileReport);
+			String exportFileReport = "report-importUsersCourse.csv";	
+			int length   = 0;			 
+			response.setContentType(ParamUtil.getString(request, "contentType"));
+			response.setContentLength((int)file.length());
+			response.addProperty(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + exportFileReport);
+			
+			OutputStream out = response.getPortletOutputStream();
+			
+			byte[] byteBuffer = new byte[4096];
+	        DataInputStream in = new DataInputStream(new FileInputStream(file));
+	        
+	        // reads the file's bytes and writes them to the response stream
+	        while ((in != null) && ((length = in.read(byteBuffer)) != -1)){
+	        	out.write(byteBuffer,0,length);
+	        }		
+			
+			out.flush();
+			out.close();
+			in.close();
+		}else{
+		
+			ThemeDisplay themeDisplay = (ThemeDisplay) request.getAttribute(WebKeys.THEME_DISPLAY);
+			
+			if(request.getResourceID() != null && request.getResourceID().equals("importEditionsResultsReport")){
+				EditionsImportExport.generateImportReport(request, response);
+			}else if(request.getResourceID() != null && request.getResourceID().equals("exportEditions")){
+				EditionsImportExport.generateReportEditions(request, response, themeDisplay);
+			} else if (request.getResourceID() != null && request.getResourceID().equals("importEditionsExample")){
+				EditionsImportExport.generateEditionsExampleFile(request, response, themeDisplay);
+			}else if (request.getResourceID() != null && request.getResourceID().equals("importUsersCourseReport")){
+				
+				log.debug("serveResource - else - action: " + action);
+				
+				if(Validator.isNotNull(uuid) && action!=null && action.equals("importUsersCourseReport")){
+					
+					String courseId = ParamUtil.getString(request, "courseId");
+					String roleId = ParamUtil.getString(request, "roleId");
+					log.debug("courseId: "+courseId);
+					log.debug("roleId: "+roleId);
+					
+					
+					response.setContentType("application/json");
+					JSONObject oreturned = JSONFactoryUtil.createJSONObject();
+					
+					log.debug(":::importUsersCourseReport:::uuid::"+uuid);
+					if(uuid!=null){
+						boolean finished = ImportUsersCourseThreadMapper.threadFinished(uuid);
+						oreturned.put("finished", finished);
+						log.debug(":::importUsersCourseReport:::not finished");
+						if(finished){
+							log.debug(":::importUsersCourseReport:::FINISHED["+uuid+"]");
+							oreturned.put("fileReport", ImportUsersCourseThreadMapper.getThreadFileReport(uuid));
+							oreturned.put("contentType", "application/csv");
+							oreturned.put("action", action);
+							oreturned.put("UUID", uuid);
+							oreturned.put("courseId", courseId);
+							oreturned.put("roleId", roleId);
+							
+							String result = "";
+							result += "<BR>Líneas procesadas: " + ImportUsersCourseThreadMapper.getThreadLines(uuid) +"<BR>";
+							result += "Usuarios inscritos: " + ImportUsersCourseThreadMapper.getUsersInscripted(uuid) +"<BR>";	
+							oreturned.put("result", result);
+							
+							String sErrors = "";
+							List<String> lErrors = ImportUsersCourseThreadMapper.getThreadErrors(uuid);
+							if (lErrors != null && lErrors.size() > 0){
+								for (String sError : lErrors){
+									sErrors += sError +"<BR>";
+								}
+							}					
+							oreturned.put("errors", sErrors);
+							
+							ImportUsersCourseThreadMapper.unlinkThread(uuid);
+						}else{
+							oreturned.put("progress", ImportUsersCourseThreadMapper.getProgress(uuid));
+						}
+					}
+					try {
+						PrintWriter out = response.getWriter();
+						out.print(oreturned.toString());
+						out.flush();
+						out.close();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+			
+			super.serveResource(request, response);
+		}
 	}
 	
 	

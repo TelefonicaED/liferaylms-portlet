@@ -33,11 +33,15 @@ if(prefs!=null){
 	Role editor=RoleLocalServiceUtil.getRole(editorRoleId);
 	long teacherRoleId=prefs.getTeacherRole();
 	Role teacher=RoleLocalServiceUtil.getRole(teacherRoleId);
+	boolean showCompletedOpenCoursesInProgress = false;
+	boolean allowWeightlessMandatoryActivities = false;
 	boolean linkResources = false;
 	boolean checkExecutionDate = false;
 	boolean showOptionTest = false;
 	try {
-		linkResources = PrefsPropsUtil.getBoolean(themeDisplay.getCompanyId(), LmsConstant.RESOURCE_INTERNAL_DOCUMENT_LINKED);
+	    showCompletedOpenCoursesInProgress = PrefsPropsUtil.getBoolean(themeDisplay.getCompanyId(), LmsConstant.SHOW_COMPLETED_OPEN_COURSES_INPROGRESS);
+	    allowWeightlessMandatoryActivities = PrefsPropsUtil.getBoolean(themeDisplay.getCompanyId(), LmsConstant.ALLOW_WEIGHTLESS_MANDATORY_ACTIVITIES); 
+	    linkResources = PrefsPropsUtil.getBoolean(themeDisplay.getCompanyId(), LmsConstant.RESOURCE_INTERNAL_DOCUMENT_LINKED);
 		checkExecutionDate = PrefsPropsUtil.getBoolean(themeDisplay.getCompanyId(), LmsConstant.CHECK_EXECUTION_DATE);
 		showOptionTest = PrefsPropsUtil.getBoolean(themeDisplay.getCompanyId(), LmsConstant.PREFS_SHOW_OPTION_TEST);
 	} catch (SystemException e) {
@@ -252,6 +256,11 @@ if(prefs!=null){
 				<aui:input id="viewCoursesFinishedPassed" name="viewCourseFinishedType" value="<%=LmsConstant.VIEW_COURSE_FINISHED_TYPE_PASSED %>" 
 					type="radio" label="view-courses-finished.passed" checked="<%=LmsConstant.VIEW_COURSE_FINISHED_TYPE_PASSED == prefs.getViewCoursesFinishedType() %>"/>
 			</div>
+		<aui:input type="checkbox" name="showCompletedOpenCoursesInProgress"
+			label="lms-prefs.show-completed-openCourses-inProgress" checked="<%= showCompletedOpenCoursesInProgress %>" />
+		<aui:input type="checkbox" name="allowWeightlessMandatoryActivities"
+		 	label="lms-prefs.allow-weightless-mandatory-activities" checked="<%= allowWeightlessMandatoryActivities %>" 
+		 	helpMessage="lms-prefs.allow-weightless-mandatory-activities.help"/>
 		<aui:input type="checkbox" name="linkResources"
 			label="link-internal-resources" checked="<%=linkResources%>" value="<%=linkResources%>" />
 		<aui:input type="checkbox" name="sendMailToEditors"	label="lms-prefs.send-mail-to-editors" checked="<%= sendMailToEditors %>" />

@@ -3,8 +3,7 @@ package com.liferay.lms;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
@@ -19,13 +18,15 @@ import javax.portlet.ActionResponse;
 import javax.portlet.EventRequest;
 import javax.portlet.EventResponse;
 import javax.portlet.PortletException;
-import javax.portlet.PortletRequest;
-import javax.portlet.PortletURL;
+import javax.portlet.PortletMode;
+import javax.portlet.PortletPreferences;
 import javax.portlet.ProcessEvent;
+import javax.portlet.ReadOnlyException;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
+import javax.portlet.ValidatorException;
 import javax.portlet.WindowState;
 import javax.xml.namespace.QName;
 
@@ -53,8 +54,6 @@ import com.liferay.lms.service.LearningActivityTryLocalServiceUtil;
 import com.liferay.lms.service.ModuleLocalServiceUtil;
 import com.liferay.lms.service.P2pActivityCorrectionsLocalServiceUtil;
 import com.liferay.lms.service.P2pActivityLocalServiceUtil;
-import com.liferay.portal.NoSuchLayoutException;
-import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
@@ -69,20 +68,15 @@ import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.upload.UploadPortletRequest;
-import com.liferay.portal.kernel.upload.UploadRequest;
-import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PrefsPropsUtil;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.xml.DocumentException;
-import com.liferay.portal.model.Layout;
-import com.liferay.portal.model.LayoutConstants;
 import com.liferay.portal.model.Portlet;
 import com.liferay.portal.model.PortletConstants;
 import com.liferay.portal.model.PublicRenderParameter;
@@ -91,10 +85,9 @@ import com.liferay.portal.model.Role;
 import com.liferay.portal.model.RoleConstants;
 import com.liferay.portal.model.Team;
 import com.liferay.portal.model.User;
-import com.liferay.portal.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.security.permission.PermissionChecker;
-import com.liferay.portal.service.LayoutLocalServiceUtil;
+import com.liferay.portal.service.PortalPreferencesLocalServiceUtil;
 import com.liferay.portal.service.PortletLocalServiceUtil;
 import com.liferay.portal.service.ResourcePermissionLocalServiceUtil;
 import com.liferay.portal.service.RoleLocalServiceUtil;
@@ -121,7 +114,6 @@ public class LmsActivitiesList extends MVCPortlet {
 	private static Log log = LogFactoryUtil.getLog(LmsActivitiesList.class);
 	
 	public static final String LMS_EDITACTIVITY_PORTLET_ID =  PortalUtil.getJsSafePortletId("editactivity"+PortletConstants.WAR_SEPARATOR+ClpSerializer.getServletContextName());
-	public static final String ACTIVITY_VIEWER_PORTLET_ID =  PortalUtil.getJsSafePortletId("activityViewer"+PortletConstants.WAR_SEPARATOR+ClpSerializer.getServletContextName());
 	public static final String LMS_EDITMODULE_PORTLET_ID =  PortalUtil.getJsSafePortletId("editmodule"+PortletConstants.WAR_SEPARATOR+ClpSerializer.getServletContextName());
 	public static final String LMS_ACTIVITIES_LIST_PORTLET_ID =  PortalUtil.getJsSafePortletId("lmsactivitieslist"+PortletConstants.WAR_SEPARATOR+ClpSerializer.getServletContextName());
 	
@@ -1136,186 +1128,51 @@ public class LmsActivitiesList extends MVCPortlet {
 		editactivity(actionRequest, actionResponse);
 		SessionMessages.add(actionRequest, "activity-modified-successfully");
 	}
-	
-		
-	
-	public static final PortletURL getURLCalifications(LiferayPortletRequest liferayPortletRequest,
-			LiferayPortletResponse liferayPortletResponse, LearningActivity activity) throws Exception {
-		
-		long plid = PortalUtil.getPlidFromPortletId(activity.getGroupId(), ACTIVITY_VIEWER_PORTLET_ID);
-	     
-		log.debug("PLID: "+plid);
-		
-		if (plid == LayoutConstants.DEFAULT_PLID) {
-			throw new NoSuchLayoutException();
-		}		
 
-		PortletURL portletURL = liferayPortletResponse.createLiferayPortletURL(plid, LMS_EDITACTIVITY_PORTLET_ID, PortletRequest.RENDER_PHASE);
-		portletURL.setWindowState(WindowState.NORMAL);
-		
-		portletURL.setParameter("actionEditingDetails", StringPool.FALSE);
-		portletURL.setParameter("actionEditingActivity", StringPool.FALSE);
-		portletURL.setParameter("actionEditingModule", StringPool.FALSE);
-		portletURL.setParameter("actionCalifications", StringPool.TRUE);
-		portletURL.setParameter("actId",Long.toString( activity.getActId()));
-		
-		long userId = PrincipalThreadLocal.getUserId();
-		
-		if(Validator.isNotNull(userId)) {			
-			//portletURL.setParameter("mvcPath", "/html/editactivity/editactivity.jsp");
-			portletURL.setParameter("califications", StringPool.TRUE);
-			portletURL.setParameter("editing", StringPool.FALSE);
-			portletURL.setParameter("resId",Long.toString( activity.getActId()));
-			portletURL.setParameter("resModuleId",Long.toString( activity.getModuleId())); 
-		}
-		
-		portletURL.setParameter("p_o_p_id",ACTIVITY_VIEWER_PORTLET_ID);
-		
-		//log.debug(" getURLCalifications: "+portletURL);
-		
-		return portletURL;		
-	}
-	
+	public void saveEditPreference(ActionRequest actionRequest, ActionResponse actionResponse) throws PortletException, IOException {
+		try{
+			ThemeDisplay themeDisplay = (ThemeDisplay) actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
+			String portletId = PortalUtil.getPortletId(actionRequest);
+			String layoutId = String.valueOf(themeDisplay.getPlid());
+			PortletPreferences prefs= PortalPreferencesLocalServiceUtil.getPreferences(themeDisplay.getCompanyId(), themeDisplay.getCompanyId(), 1);
+			
+			
+			String key = layoutId+"_"+portletId+"_lmsActivitiesList";
+			String[] empty = {};
+			String[] modules = ParamUtil.getParameterValues(actionRequest,"modulesCheckbox", empty);
 
-	public static final PortletURL getURLEditActivity(LiferayPortletRequest liferayPortletRequest,
-			LiferayPortletResponse liferayPortletResponse, LearningActivity activity) throws Exception {
-		PortletURL portletURL = null;
-		if(activity!=null){
-			long plid = PortalUtil.getPlidFromPortletId(activity.getGroupId(), ACTIVITY_VIEWER_PORTLET_ID);
-		     
-			
-			log.debug("PLID: "+plid);
-			
-			if (plid == LayoutConstants.DEFAULT_PLID) {
-				throw new NoSuchLayoutException();
-			}		
-
-			portletURL = liferayPortletResponse.createLiferayPortletURL(plid, LMS_EDITACTIVITY_PORTLET_ID, PortletRequest.RENDER_PHASE);
-			portletURL.setWindowState(WindowState.NORMAL);
-			portletURL.setParameter("actId",Long.toString( activity.getActId()));
-			portletURL.setParameter("moduleId",Long.toString( activity.getModuleId()));
-			portletURL.setParameter("actionEditingActivity", StringPool.TRUE);
-			portletURL.setParameter("actionCalifications", StringPool.FALSE);
-			portletURL.setParameter("actionEditingModule", StringPool.FALSE);
-			portletURL.setParameter("actionEditingDetails", StringPool.FALSE);
+			String modulesListStr = Arrays.toString(modules);
+			modulesListStr = modulesListStr.substring(1, modulesListStr.length()-1).replace(" ","");
 			
 			
-			long userId = PrincipalThreadLocal.getUserId();
-			
-			if(Validator.isNotNull(userId)) {			
-				portletURL.setParameter("mvcPath", "/html/editactivity/editactivity.jsp");
-				portletURL.setParameter("editing", StringPool.TRUE);
-				portletURL.setParameter("resId",Long.toString( activity.getActId()));
-				portletURL.setParameter("resModuleId",Long.toString( activity.getModuleId())); 
+			if(!"".equals(key)&&!prefs.isReadOnly(key))
+			{
+				try {
+					prefs.setValue(key, modulesListStr);
+				} catch (ReadOnlyException e) {
+					e.printStackTrace();
+					SessionErrors.add(actionRequest, "problem");
+				}
+				try {
+					prefs.store();
+				} catch (ValidatorException e) {
+					e.printStackTrace();
+					SessionErrors.add(actionRequest, "problem");
+				} catch (IOException e) {
+					e.printStackTrace();
+					SessionErrors.add(actionRequest, "problem");
+				}
 			}
-			
-			portletURL.setParameter("p_o_p_id",ACTIVITY_VIEWER_PORTLET_ID);
-			
-			//log.debug(" getURLEditActivity: "+portletURL);
-					
-		}
-		return portletURL;
-		
-	}
-	
-	public static final PortletURL getURLCreateActivity(LiferayPortletRequest liferayPortletRequest,
-			LiferayPortletResponse liferayPortletResponse, Module module) throws Exception {
-		PortletURL portletURL = null;
-		if(module!=null){
-			long plid = PortalUtil.getPlidFromPortletId(module.getGroupId(), ACTIVITY_VIEWER_PORTLET_ID);
-		     
-			log.debug("PLID: "+plid);
-			
-			if (plid == LayoutConstants.DEFAULT_PLID) {
-				throw new NoSuchLayoutException();
-			}		
-
-			portletURL = liferayPortletResponse.createLiferayPortletURL(plid, LMS_EDITACTIVITY_PORTLET_ID, PortletRequest.RENDER_PHASE);
-			portletURL.setWindowState(WindowState.NORMAL);
-			portletURL.setParameter("actionEditingActivity", StringPool.TRUE);
-			portletURL.setParameter("actionEditingDetails", StringPool.FALSE);
-			portletURL.setParameter("mvcPath", "/html/lmsactivitieslist/newactivity.jsp");
-			portletURL.setParameter("resModuleId",Long.toString(module.getModuleId())); 	
-			portletURL.setParameter("actId",Long.toString(0)); 
-			portletURL.setParameter("resId",Long.toString(0)); 
-			portletURL.setParameter("p_o_p_id",ACTIVITY_VIEWER_PORTLET_ID);
-			
-			log.debug(" getURLCreateActivity: "+portletURL);
-			
-		}
-		
-		return portletURL;		
-	}
-	
-	public static final PortletURL getURLEditModule(LiferayPortletRequest liferayPortletRequest,
-			LiferayPortletResponse liferayPortletResponse, Module module) throws Exception {
-		
-		PortletURL portletURL = null;
-		if(module!=null){
-			long plid = PortalUtil.getPlidFromPortletId(module.getGroupId(), ACTIVITY_VIEWER_PORTLET_ID);
-		     
-			log.debug("PLID: "+plid);
-			
-			if (plid == LayoutConstants.DEFAULT_PLID) {
-				throw new NoSuchLayoutException();
+			else
+			{
+				SessionErrors.add(actionRequest, "read-only");
 			}
 
-			portletURL = liferayPortletResponse.createLiferayPortletURL(plid, LMS_EDITMODULE_PORTLET_ID, PortletRequest.RENDER_PHASE);
-			portletURL.setWindowState(WindowState.NORMAL);
-			portletURL.setParameter("actionEditingModule", StringPool.TRUE);
-			portletURL.setParameter("actionEditingActivity", StringPool.FALSE);
-			portletURL.setParameter("actionEditingDetails", StringPool.FALSE);
-			portletURL.setParameter("actionCalifications", StringPool.FALSE);
-			portletURL.setParameter("view", "editmodule");
-			portletURL.setParameter("moduleId",Long.toString(module.getModuleId()));
-			portletURL.setParameter("actId","");
-			portletURL.setParameter("resourcePrimKey",Long.toString(module.getModuleId()));		
-			portletURL.setParameter("editType","edit");		
-			portletURL.setParameter("p_o_p_id",ACTIVITY_VIEWER_PORTLET_ID);
-			
-			//log.debug(" getURLEditModule: "+portletURL);
+		}catch(Exception e){
+			log.error("Error guardando la preferencia",e);
 		}
 		
 		
-		return portletURL;		
+		actionResponse.setPortletMode(PortletMode.VIEW);// send response to View
 	}
-	
-	public static final PortletURL getURLCreateModule(LiferayPortletRequest liferayPortletRequest,
-			LiferayPortletResponse liferayPortletResponse, ThemeDisplay themeDisplay) throws Exception {
-		
-		Layout layout = null;		
-		
-		@SuppressWarnings("unchecked")
-		List<Layout> layouts = LayoutLocalServiceUtil.dynamicQuery(LayoutLocalServiceUtil.dynamicQuery().
-				add(PropertyFactoryUtil.forName("privateLayout").eq(false)).
-				add(PropertyFactoryUtil.forName("type").eq(LayoutConstants.TYPE_PORTLET)).
-				add(PropertyFactoryUtil.forName("companyId").eq(themeDisplay.getCompanyId())).
-				add(PropertyFactoryUtil.forName("groupId").eq(themeDisplay.getScopeGroupId())).
-				add(PropertyFactoryUtil.forName("friendlyURL").eq("/reto")), 0, 1);
-
-		if(layouts.isEmpty()) {
-			throw new NoSuchLayoutException();			
-		}
-			
-		layout = layouts.get(0);		
-		
-
-		PortletURL portletURL = liferayPortletResponse.createLiferayPortletURL(layout.getPlid(), LMS_EDITMODULE_PORTLET_ID, PortletRequest.RENDER_PHASE);
-		portletURL.setWindowState(WindowState.NORMAL);
-		portletURL.setParameter("actionEditingModule", StringPool.TRUE);
-		portletURL.setParameter("actionEditingActivity", StringPool.FALSE);
-		portletURL.setParameter("actionEditingDetails", StringPool.FALSE);
-		portletURL.setParameter("actionCalifications", StringPool.FALSE);
-		portletURL.setParameter("view", "editmodule");
-		portletURL.setParameter("moduleId",Long.toString(0));
-		portletURL.setParameter("actId","");
-		portletURL.setParameter("resourcePrimKey",Long.toString(0));		
-		portletURL.setParameter("editType","add");		
-		portletURL.setParameter("p_o_p_id",ACTIVITY_VIEWER_PORTLET_ID);
-		
-		//log.debug(" getURLCreateModule: "+portletURL);
-		
-		return portletURL;		
-	}
-	
 }

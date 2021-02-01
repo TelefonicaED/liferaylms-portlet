@@ -15,6 +15,20 @@
 			[$WHERECOURSEOREDITIONS$]
 		]]>
 	</sql>
+	<sql id="com.liferay.lms.service.persistence.CourseResultFinder.findCourseResultByParentCourseId">
+		<![CDATA[
+			SELECT 
+				lms_courseresult.*
+			FROM 
+				lms_courseresult
+			INNER JOIN 
+				lms_course 
+					ON lms_courseresult.courseId = lms_course.courseId
+			WHERE 
+				lms_course.parentCourseId = ? 
+				AND lms_courseresult.userId = ?;
+		]]>
+	</sql>
 	<sql id="com.liferay.lms.service.persistence.CourseResultFinder.whereCourseId">
 		<![CDATA[ 
 			WHERE co.courseId = ?

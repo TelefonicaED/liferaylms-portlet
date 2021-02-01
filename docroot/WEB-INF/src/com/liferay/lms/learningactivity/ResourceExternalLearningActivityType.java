@@ -96,7 +96,6 @@ public class ResourceExternalLearningActivityType extends QuestionLearningActivi
 		return getClass().getName();
 	}
 
-
 	@Override
 	public AssetRenderer getAssetRenderer(LearningActivity learningactivity) throws SystemException, PortalException {
 		

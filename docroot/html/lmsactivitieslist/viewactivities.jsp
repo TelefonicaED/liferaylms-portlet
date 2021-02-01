@@ -1,3 +1,4 @@
+<%@page import="javax.portlet.WindowState"%>
 <%@page import="com.liferay.lms.learningactivity.LearningActivityType"%>
 <%@page import="com.liferay.lms.model.LearningActivity"%>
 <%@page import="com.liferay.lms.model.LearningActivityResult"%>
@@ -22,15 +23,16 @@ String activityEnd = "desactivado";
 if ((actionEditing && hasPermissionAddLact) ||
 		(moduleId==0 
 		&& permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), "com.liferay.lms.learningactivitymodel", themeDisplay.getScopeGroupId(), "ADD_ACTIVITY"))) {
+	LearningActivityAssetRendererFactory learningActivityAssetRendererFactory = new LearningActivityAssetRendererFactory();
 	
-	PortletURL urlCreateActivity = LmsActivitiesList.getURLCreateActivity(liferayPortletRequest, liferayPortletResponse, currentModule);
+	PortletURL urlCreateActivity = learningActivityAssetRendererFactory.getURLCreateActivity(liferayPortletRequest, liferayPortletResponse, currentModule);
 	if(Validator.isNotNull(urlCreateActivity)){
-		
 		%>
 		<liferay-ui:icon image="add" message="activity.creation" label="true" cssClass="newactivity" url="<%=urlCreateActivity.toString()%>"/>
 		<%
 	}
 }
+
 %>
 <liferay-ui:error></liferay-ui:error>
 
@@ -47,6 +49,7 @@ if ((actionEditing && hasPermissionAddLact) ||
 	boolean courseLocked = course.isLocked(themeDisplay.getUser(), themeDisplay.getPermissionChecker());
 	
 	for (LearningActivity activity : activities) {
+		
 		title = activity.getTitle(themeDisplay.getLocale());				
 		type= String.valueOf(activity.getTypeId());
 		
@@ -92,7 +95,7 @@ if ((actionEditing && hasPermissionAddLact) ||
 					<span class="type_<%=type%>"></span>
 							
 					<a href="<%=assetRendererFactory.getAssetRenderer(activity.getActId()).
-							getURLView(liferayPortletResponse, WindowState.NORMAL).toString()%>"  ><%=title%></a>
+							getURLViewInContext(liferayPortletRequest, liferayPortletResponse, "").toString()%>"  ><%=title%></a>
 					
 			<%} else{ %>
 				<li class="learningActivity <%=activityEnd%> <%=editing %> <%=status%> locked"  <%=(status=="passed"||status=="failed" )?"title =\""+LanguageUtil.format(pageContext, "activity.result",new Object[]{resultNumberFormat.format(result)})+"\"":StringPool.BLANK %> 
