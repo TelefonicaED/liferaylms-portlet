@@ -19,8 +19,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import com.liferay.lms.CourseTypeFactoryRegistry;
 import com.liferay.lms.course.inscriptiontype.InscriptionType;
 import com.liferay.lms.course.inscriptiontype.InscriptionTypeRegistry;
@@ -35,15 +33,12 @@ import com.liferay.lms.model.CourseTypeFactory;
 import com.liferay.lms.model.CourseTypeRelation;
 import com.liferay.lms.service.CourseTypeLocalServiceUtil;
 import com.liferay.lms.service.CourseTypeRelationLocalServiceUtil;
-import com.liferay.lms.util.LmsConstant;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
-import com.liferay.portal.kernel.util.ArrayUtil;
-import com.liferay.portal.kernel.util.PrefsPropsUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.LayoutSetPrototype;
@@ -80,7 +75,7 @@ public class CourseTypeImpl extends CourseTypeBaseImpl {
 	}
 	
 	public CourseTypeFactory getCourseTypeFactory(){
-		if(courseTypeFactory == null){
+		if(courseTypeFactory == null && getClassNameId() > 0){
 			CourseTypeFactoryRegistry courseTypeFactoryRegistry = new CourseTypeFactoryRegistry();
 			courseTypeFactory = courseTypeFactoryRegistry.getCourseTypeFactory(getClassNameId());
 		}

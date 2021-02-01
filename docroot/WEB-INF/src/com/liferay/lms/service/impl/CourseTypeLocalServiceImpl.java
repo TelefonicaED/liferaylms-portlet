@@ -176,11 +176,6 @@ public class CourseTypeLocalServiceImpl extends CourseTypeLocalServiceBaseImpl {
 			//Audit field
 			courseType.setModifiedDate(new Date());
 			
-			if(courseType.getClassNameId() == 0){
-			
-				//Description fields
-				courseType.setNameMap(nameMap);
-				courseType.setDescriptionMap(descriptionMap);
 				
 				//Las plantillas, métodos de evaluación, tipos de actividad, de inscripción y stmas de calificación
 				//existentes no se borran, se pueden añadir nuevos pero los que tenga no se van a borrar
@@ -241,6 +236,12 @@ public class CourseTypeLocalServiceImpl extends CourseTypeLocalServiceBaseImpl {
 					}
 				}
 			}
+		
+		if(courseType.getClassNameId() == 0){
+			
+			//Description fields
+			courseType.setNameMap(nameMap);
+			courseType.setDescriptionMap(descriptionMap);
 			
 			//Se comprueba si se quiere eliminar el icono
 			if(deleteIcon)

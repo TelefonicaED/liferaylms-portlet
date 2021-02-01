@@ -29,6 +29,7 @@ import com.liferay.lms.model.impl.ModuleImpl;
 import com.liferay.lms.service.AsynchronousProcessAuditLocalServiceUtil;
 import com.liferay.lms.service.CourseCompetenceLocalServiceUtil;
 import com.liferay.lms.service.CourseLocalServiceUtil;
+import com.liferay.lms.service.CourseTypeLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityLocalServiceUtil;
 import com.liferay.lms.service.LmsPrefsLocalServiceUtil;
 import com.liferay.lms.service.ModuleLocalServiceUtil;
@@ -601,10 +602,19 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 		
 		CourseTypeFactoryRegistry courseTypeFactoryRegistry = new CourseTypeFactoryRegistry();
 		AssetEntry entry=AssetEntryLocalServiceUtil.getEntry(Course.class.getName(),newCourse.getCourseId());
-		CourseTypeFactory courseTypeFactory = courseTypeFactoryRegistry.getCourseTypeFactory(entry.getClassTypeId());
-		CourseTypeI courseType = courseTypeFactory.getCourseType(newCourse);
+		if(entry.getClassTypeId() > 0){
+			CourseType courseType = CourseTypeLocalServiceUtil.getCourseType(entry.getClassTypeId());
+			if(courseType.getClassNameId() > 0){
+				CourseTypeFactory courseTypeFactory = courseTypeFactoryRegistry.getCourseTypeFactory(courseType.getClassNameId());
+				if(courseTypeFactory != null){
+					CourseTypeI courseTypeI = courseTypeFactory.getCourseType(newCourse);
+					
+					courseTypeI.copyCourse(course, serviceContext);
+				}
+			}
+		}
 		
-		courseType.copyCourse(course, serviceContext);
+		
 		
 		if(this.cloneForum){
 			//-------------------------------------------

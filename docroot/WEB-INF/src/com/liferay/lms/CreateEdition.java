@@ -13,6 +13,7 @@ import com.liferay.lms.learningactivity.LearningActivityType;
 import com.liferay.lms.learningactivity.LearningActivityTypeRegistry;
 import com.liferay.lms.model.AsynchronousProcessAudit;
 import com.liferay.lms.model.Course;
+import com.liferay.lms.model.CourseType;
 import com.liferay.lms.model.CourseTypeFactory;
 import com.liferay.lms.model.CourseTypeI;
 import com.liferay.lms.model.LearningActivity;
@@ -20,6 +21,7 @@ import com.liferay.lms.model.Module;
 import com.liferay.lms.model.impl.ModuleImpl;
 import com.liferay.lms.service.AsynchronousProcessAuditLocalServiceUtil;
 import com.liferay.lms.service.CourseLocalServiceUtil;
+import com.liferay.lms.service.CourseTypeLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityLocalServiceUtil;
 import com.liferay.lms.service.ModuleLocalServiceUtil;
 import com.liferay.lms.util.LmsConstant;
@@ -280,10 +282,17 @@ public class CreateEdition extends CourseCopyUtil implements MessageListener {
 		
 		CourseTypeFactoryRegistry courseTypeFactoryRegistry = new CourseTypeFactoryRegistry();
 		AssetEntry entry=AssetEntryLocalServiceUtil.getEntry(Course.class.getName(),newCourse.getCourseId());
-		CourseTypeFactory courseTypeFactory = courseTypeFactoryRegistry.getCourseTypeFactory(entry.getClassTypeId());
-		CourseTypeI courseType = courseTypeFactory.getCourseType(newCourse);
-		
-		courseType.copyCourse(course, serviceContext);
+		if(entry.getClassTypeId() > 0){
+			CourseType courseType = CourseTypeLocalServiceUtil.getCourseType(entry.getClassTypeId());
+			if(courseType.getClassNameId() > 0){
+				CourseTypeFactory courseTypeFactory = courseTypeFactoryRegistry.getCourseTypeFactory(courseType.getClassNameId());
+				if(courseTypeFactory != null){
+					CourseTypeI courseTypeI = courseTypeFactory.getCourseType(newCourse);
+					
+					courseTypeI.copyCourse(course, serviceContext);
+				}
+			}
+		}
 		
 		Date endDate = new Date();
 		if(!error){

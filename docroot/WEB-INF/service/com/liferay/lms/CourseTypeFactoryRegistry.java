@@ -25,7 +25,7 @@ public class CourseTypeFactoryRegistry {
 	private static HashMap<Long,CourseTypeFactory> _migrationTypeFactories = null;
 		
 	private static HashMap<Long,CourseTypeFactory> _getCourseTypeFactories(){
-		Properties properties = PropsUtil.getProperties("company.migration.class.name", true);
+		Properties properties = PropsUtil.getProperties("lms.course.type.class.name", true);
 		HashMap<Long, CourseTypeFactory> migrationTypeFactories = new HashMap<Long, CourseTypeFactory>();
 		String className = null;
 		CourseTypeFactory migrationTypeFactory = null;
