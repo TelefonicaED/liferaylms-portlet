@@ -330,7 +330,7 @@ public class LiferaylmsUtil {
 	public static boolean hasPermissionAccessCoursesExecution(Course course){
 		Date now = new Date();
 		try {
-			return course.getExecutionStartDate().before(now) && course.getExecutionEndDate().after(now) && PrefsPropsUtil.getBoolean(course.getCompanyId(), LmsConstant.PREFS_ACCESS_COURSE_EXECUTION_DATES, false);
+			return (course.getExecutionStartDate() == null || course.getExecutionStartDate().before(now)) && (course.getExecutionEndDate() == null || course.getExecutionEndDate().after(now)) && PrefsPropsUtil.getBoolean(course.getCompanyId(), LmsConstant.PREFS_ACCESS_COURSE_EXECUTION_DATES, false);
 		} catch (SystemException e) {
 			e.printStackTrace();
 			return false;
