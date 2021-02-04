@@ -271,7 +271,7 @@ public class GroupListener extends BaseModelListener<Group> {
 									String[] attachmentNames = new String[1];
 									
 									
-									String fileName = LanguageUtil.get(user.getLocale(), "course")+".ics";
+									String fileName = LanguageUtil.get(user.getLocale(), "course.invite-outlook")+".ics";
 
 									File file = FileUtil.createTempFile("ics");
 									

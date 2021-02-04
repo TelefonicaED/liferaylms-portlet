@@ -190,14 +190,13 @@ public class CourseTypeLocalServiceImpl extends CourseTypeLocalServiceBaseImpl {
 				}
 				
 				if(Validator.isNotNull(editionTemplateIds)  && editionTemplateIds.length>0){
-					String[] oldTemplateIds = PrefsPropsUtil.getStringArray(courseType.getCompanyId(), LmsConstant.EDITION_TEMPLATE_IDS + "." + courseTypeId, ",");
+					List<Long> oldTemplateIds = courseType.getEditionTemplateIds();
 					List<Long> listEditionTemplateIds = ListUtil.toList(editionTemplateIds);
-					for(String oldTemplateId: oldTemplateIds){
-						if(!listEditionTemplateIds.contains(Long.parseLong(oldTemplateId))){
+					for(Long oldTemplateId: oldTemplateIds){
+						if(!listEditionTemplateIds.contains(oldTemplateId)){
 							courseTypeRelationLocalService.addCourseTypeRelation(courseType.getCourseTypeId(), PortalUtil.getClassNameId(Course.class), Long.valueOf(oldTemplateId));
 						}
 					}
-					
 				}
 				
 				//Métodos de evaluación
