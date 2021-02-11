@@ -172,9 +172,6 @@ if(moduleEditing) idModuleUl = "myModule";
 					    URL goToModuleRelativeURL = new URL(gotoModuleURL.toString());%>
 					    
 						<a href="<%="?"+goToModuleRelativeURL.getQuery()%>" >
-						
-							
-							
 							<%= (numerateModules)?
 									LanguageUtil.format(pageContext, "moduleTitle.chapter", new Object[]{themeId,theModule.getTitle(themeDisplay.getLocale())}):
 										theModule.getTitle(themeDisplay.getLocale()) %>

@@ -27,6 +27,7 @@ import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.model.LearningActivityResult;
 import com.liferay.lms.service.LearningActivityResultLocalServiceUtil;
 import com.liferay.lms.service.base.LearningActivityServiceBaseImpl;
+import com.liferay.portal.kernel.bean.PortletBeanLocatorUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.jsonwebservice.JSONWebService;
@@ -222,7 +223,7 @@ public class LearningActivityServiceImpl extends LearningActivityServiceBaseImpl
 				AuditingLogFactory.audit(lernact.getCompanyId(), lernact.getGroupId(), Course.class.getName(), lernact.getPrimaryKey(), serviceContext.getUserId(), AuditConstants.UPDATE, null);
 				SocialActivityLocalServiceUtil.addActivity(serviceContext.getUserId(), lernact.getGroupId(), LearningActivity.class.getName(), lernact.getActId(), com.liferay.lms.social.LearningActivityKeys.UPDATE_ENTRY, "", lernact.getUserId());
 			}
-		
+			
 			return lernact;
 		}
 		else

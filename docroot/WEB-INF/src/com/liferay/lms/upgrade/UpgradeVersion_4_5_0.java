@@ -4,17 +4,13 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
-import com.liferay.counter.service.CounterLocalServiceUtil;
 import com.liferay.lms.course.inscriptiontype.InscriptionType;
 import com.liferay.lms.learningactivity.LearningActivityType;
 import com.liferay.lms.learningactivity.calificationtype.CalificationType;
 import com.liferay.lms.learningactivity.courseeval.CourseEval;
 import com.liferay.lms.model.Course;
-import com.liferay.lms.model.CourseResult;
 import com.liferay.lms.model.CourseType;
 import com.liferay.lms.model.CourseTypeRelation;
-import com.liferay.lms.service.CourseLocalServiceUtil;
-import com.liferay.lms.service.CourseResultLocalServiceUtil;
 import com.liferay.lms.service.CourseTypeLocalServiceUtil;
 import com.liferay.lms.service.CourseTypeRelationLocalServiceUtil;
 import com.liferay.lms.util.LmsConstant;
@@ -25,9 +21,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;import com.liferay.portal.kernel.util.PrefsPropsUtil;
 import com.liferay.portal.model.Company;
 import com.liferay.portal.model.LayoutSetPrototype;
-import com.liferay.portal.model.User;
 import com.liferay.portal.service.CompanyLocalServiceUtil;
-import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.util.PortalUtil;
 
 public class UpgradeVersion_4_5_0 extends UpgradeProcess {
