@@ -132,7 +132,7 @@ public class CourseTypeLocalServiceImpl extends CourseTypeLocalServiceBaseImpl {
 		//Añadir plantillas de site
 		if(Validator.isNotNull(templateIds)  && templateIds.length>0)
 			courseTypeRelationLocalService.addCourseTypeRelations(courseType.getCourseTypeId(), PortalUtil.getClassNameId(LayoutSetPrototype.class),templateIds);
-		if(Validator.isNotNull(templateIds)  && templateIds.length>0){
+		if(Validator.isNotNull(editionTemplateIds)  && editionTemplateIds.length>0){
 			courseTypeRelationLocalService.addCourseTypeRelations(courseType.getCourseTypeId(), PortalUtil.getClassNameId(Course.class),editionTemplateIds);
 		}
 		//Añadir métodos de evaluación
