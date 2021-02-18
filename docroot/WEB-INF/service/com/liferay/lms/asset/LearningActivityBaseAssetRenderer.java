@@ -314,10 +314,18 @@ public abstract class LearningActivityBaseAssetRenderer extends BaseAssetRendere
 			String noSuchEntryRedirect) throws Exception {
 		
 		ThemeDisplay themeDisplay = (ThemeDisplay) liferayPortletRequest.getAttribute(WebKeys.THEME_DISPLAY);
-		
+		liferayPortletResponse.setProperty("clear-request-parameters", StringPool.TRUE);
 		prepareLayout(themeDisplay.getLayout());
 	
-		PortletURL portletURL = liferayPortletResponse.createLiferayPortletURL(_layout.getPlid(), _portletId, PortletRequest.RENDER_PHASE);
+		String portletId;
+		
+		if(_isRuntimePortlet){
+			portletId = LearningActivityAssetRendererFactory.ACTIVITY_VIEWER_PORTLET_ID;
+		}else{
+			portletId = _portletId;
+		}
+		
+		PortletURL portletURL = liferayPortletResponse.createLiferayPortletURL(_layout.getPlid(), portletId, PortletRequest.RENDER_PHASE);
 		portletURL.setParameter("actId",Long.toString( _learningactivity.getActId()));
 		portletURL.setParameter("moduleId",Long.toString( _learningactivity.getModuleId()));
 		portletURL.setParameter("actionEditingActivity", StringPool.FALSE);

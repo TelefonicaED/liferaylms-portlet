@@ -3,6 +3,12 @@ Todos los cambios de este proyecto estarán documentados en este archivo.
 
 El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 
+## [4.5.0](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v4.5.0)
+
+### Fixed
+
+- #195910 Corrección sobre el assetRender de las actividades para evitar pantalla en blanco al ir a enlace después de editar la actividad.
+
 ## [4.4.0](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v4.4.0)
 
 ### Added
