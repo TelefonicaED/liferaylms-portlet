@@ -20,6 +20,7 @@ import com.liferay.lms.service.LearningActivityResultLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityTryLocalServiceUtil;
 import com.liferay.lms.service.ModuleResultLocalServiceUtil;
 import com.liferay.lms.service.TestQuestionLocalServiceUtil;
+import com.liferay.lms.util.LmsConstant;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
@@ -30,6 +31,7 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.PrefsPropsUtil;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
@@ -414,7 +416,7 @@ public class TestLearningActivityType extends QuestionLearningActivityType
 		if(learningActivityResult.getEndDate() != null){
 			log.debug("result tiene fecha fin");
 			finished = true;
-		}else if(learningActivityResult.isPassed() && !learningActivity.isImprove()){
+		}else if(learningActivityResult.isPassed() &&  (!PrefsPropsUtil.getBoolean(learningActivity.getCompanyId(), LmsConstant.PREFS_SHOW_OPTION_TEST, false) || !learningActivity.isImprove())){
 			log.debug("está aprobado y no está marcado el check de mejorar nota");
 			finished = true;
 		}else {

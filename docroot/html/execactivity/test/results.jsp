@@ -38,7 +38,13 @@ if(learningActivity==null){
 }
 
 LearningActivityResult lar = LearningActivityResultLocalServiceUtil.getByActIdAndUserId(learningActivity.getActId(), themeDisplay.getUserId());
-boolean showPopUpFinishedResult = (Boolean)request.getAttribute( "showPopUpFinishedResult");
+boolean showPopUpFinishedResult =  false;
+try{
+	showPopUpFinishedResult =  GetterUtil.get(request.getAttribute( "showPopUpFinishedResult"), false);
+}catch(Exception e){
+	e.printStackTrace();
+}
+
 
 boolean isTeacher=permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), "com.liferay.lms.model",themeDisplay.getScopeGroupId(), "VIEW_RESULTS");
 
