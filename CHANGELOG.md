@@ -3,6 +3,14 @@ Todos los cambios de este proyecto estarán documentados en este archivo.
 
 El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 
+## [4.6.0](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v4.6.0)
+
+### Fixed
+
+- #198695: Cambiado el metodo de softInitializeCourseResult para que lo de iniciado en actividades scorm, mpc y xapi. Anteriormente
+  se daba por iniciada la actividad pero no el curso.
+
+
 ## [4.5.0](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v4.5.0)
 
 ### Fixed
