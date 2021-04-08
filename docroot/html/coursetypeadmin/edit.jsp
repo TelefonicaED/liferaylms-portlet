@@ -15,7 +15,7 @@
 				formName="savecoursetypefm"
 		 		name="courseTypeName"
 		 		xml="${courseType.name }"
-		 		required="true" disabled="${not empty courseType && courseType.classNameId > 0 }">
+		 		required="true" >
 		 	</liferay-ui:input-localized> 
 	 </div>
 	 
@@ -24,19 +24,32 @@
 			<liferay-ui:input-localized
 				formName="savecoursetypefm"
 		 		name="courseTypeDescription"
-		 		xml="${courseType.description }" disabled="${not empty courseType && courseType.classNameId > 0 }">
+		 		xml="${courseType.description }">
 		 	</liferay-ui:input-localized> 
 	 </div>
 	 
 	 <div>
+	 	
+	 	<aui:select label="course-course-type" name="typeId" >
+			<aui:option value="0"></aui:option>
+			<c:forEach items="${listTypes }" var="type">S
+			
+				<aui:option 
+					value="${type.classNameId }" 
+					selected="${type.classNameId eq courseType.classNameId}">
+						${type.getTitle(themeDisplay.locale) }
+				</aui:option>
+			</c:forEach>
+		</aui:select>
+	 
+	 
 		 <aui:select label="course-template" name="templateIds" multiple="true" 
 		 	helpMessage="${not empty courseType.courseTemplateIds ? 'coursetypeadmin.coursetype-has-templates.only-add' : ''}" 
 		 	ignoreRequestValue="true" >
 			<c:forEach items="${listTemplates }" var="template">
 				<aui:option 
 					value="${template.layoutSetPrototypeId }" 
-					selected="${not empty courseType.courseTemplateIds and courseType.courseTemplateIds.contains(template.layoutSetPrototypeId ) }"
-					disabled="${not empty courseType.courseTemplateIds and courseType.courseTemplateIds.contains(template.layoutSetPrototypeId ) }">
+					selected="${not empty courseType.courseTemplateIds and courseType.courseTemplateIds.contains(template.layoutSetPrototypeId ) }">
 						${template.getName(themeDisplay.locale) }
 				</aui:option>
 			</c:forEach>
@@ -57,8 +70,7 @@
 			<c:forEach items="${listCourseEvals }" var="courseEval">
 				<aui:option
 					value="${courseEval.typeId }"
-					selected="${not empty courseType.courseEvalTypeIds and courseType.courseEvalTypeIds.contains(courseEval.typeId ) }"
-					disabled="${not empty courseType.courseEvalTypeIds and courseType.courseEvalTypeIds.contains(courseEval.typeId ) }">
+					selected="${not empty courseType.courseEvalTypeIds and courseType.courseEvalTypeIds.contains(courseEval.typeId ) }">
 						<liferay-ui:message key="${courseEval.name }" />
 				</aui:option>
 			</c:forEach>
@@ -70,8 +82,7 @@
 			<c:forEach items="${listLearningActivityTypes }" var="activityType">
 				<aui:option
 					value="${activityType.typeId }"
-					selected="${not empty courseType.learningActivityTypeIds and courseType.learningActivityTypeIds.contains(activityType.typeId ) }"
-					disabled="${not empty courseType.learningActivityTypeIds and courseType.learningActivityTypeIds.contains(activityType.typeId ) }">
+					selected="${not empty courseType.learningActivityTypeIds and courseType.learningActivityTypeIds.contains(activityType.typeId ) }">
 						<liferay-ui:message key="${activityType.name }" />
 				</aui:option>
 			</c:forEach>
@@ -83,8 +94,7 @@
 			<c:forEach items="${listInscriptionTypes }" var="inscriptionType">
 				<aui:option
 					value="${inscriptionType.typeId }"
-					selected="${not empty courseType.inscriptionTypeIds and courseType.inscriptionTypeIds.contains(inscriptionType.typeId ) }"
-					disabled="${not empty courseType.inscriptionTypeIds and courseType.inscriptionTypeIds.contains(inscriptionType.typeId ) }">
+					selected="${not empty courseType.inscriptionTypeIds and courseType.inscriptionTypeIds.contains(inscriptionType.typeId ) }">
 						${inscriptionType.getTitle(themeDisplay.locale) }
 				</aui:option>
 			</c:forEach>
@@ -96,8 +106,7 @@
 			<c:forEach items="${listCalificationTypes }" var="calificationType">
 				<aui:option
 					value="${calificationType.typeId }"
-					selected="${not empty courseType.calificationTypeIds and courseType.calificationTypeIds.contains(calificationType.typeId ) }"
-					disabled="${not empty courseType.calificationTypeIds and courseType.calificationTypeIds.contains(calificationType.typeId ) }">
+					selected="${not empty courseType.calificationTypeIds and courseType.calificationTypeIds.contains(calificationType.typeId ) }">
 						<liferay-ui:message key="${calificationType.getTitle(themeDisplay.locale) }"/>
 				</aui:option>
 			</c:forEach>
