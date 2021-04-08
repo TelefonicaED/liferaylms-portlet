@@ -30,7 +30,6 @@ import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
 import javax.portlet.ResourceURL;
 
-import com.liferay.lms.auditing.AuditingLogFactory;
 import com.liferay.lms.course.adminaction.AdminActionTypeRegistry;
 import com.liferay.lms.model.AsynchronousProcessAudit;
 import com.liferay.lms.model.Course;
@@ -94,7 +93,6 @@ import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portlet.PortletPreferencesFactoryUtil;
 import com.liferay.portlet.announcements.EntryDisplayDateException;
-import com.liferay.portlet.asset.model.AssetCategory;
 import com.liferay.portlet.asset.model.AssetEntry;
 import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
 import com.liferay.portlet.asset.service.AssetTagLocalServiceUtil;
@@ -103,6 +101,7 @@ import com.liferay.portlet.expando.model.ExpandoTableConstants;
 import com.liferay.portlet.expando.service.ExpandoColumnLocalServiceUtil;
 import com.liferay.util.EditionsImportExport;
 import com.tls.lms.util.CourseOrderByCreationDate;
+import com.tls.lms.util.CourseOrderByDate;
 import com.tls.lms.util.CourseOrderByTitle;
 import com.tls.lms.util.LiferaylmsUtil;
 
@@ -919,7 +918,15 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 		if(Validator.isNotNull(orderByCol) && orderByCol.equals("title")){
 			obc = new CourseOrderByTitle(themeDisplay, orderByType.equals("asc"));
 		}else if(Validator.isNotNull(orderByCol) && orderByCol.equals("createDate")){
-			obc = new CourseOrderByCreationDate(orderByType.equals("asc"));
+			obc = new CourseOrderByDate(orderByType.equals("asc"),"createDate");
+		}else if(Validator.isNotNull(orderByCol) && orderByCol.equals("startDate")){
+			obc = new CourseOrderByDate(orderByType.equals("asc"),"startDate");
+		}else if(Validator.isNotNull(orderByCol) && orderByCol.equals("endDate")){
+			obc = new CourseOrderByDate(orderByType.equals("asc"),"endDate");
+		}else if(Validator.isNotNull(orderByCol) && orderByCol.equals("executionStartDate")){
+			obc = new CourseOrderByDate(orderByType.equals("asc"),"executionStartDate");
+		}else if(Validator.isNotNull(orderByCol) && orderByCol.equals("executionEndDate")){
+			obc = new CourseOrderByDate(orderByType.equals("asc"),"executionEndDate");
 		}
 		
 		searchContainer.setOrderByCol(orderByCol);

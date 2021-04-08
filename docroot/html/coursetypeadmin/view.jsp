@@ -1,3 +1,4 @@
+<%@page import="com.liferay.lms.CourseTypeFactoryRegistry"%>
 <%@ include file="/init.jsp" %>
 
 
@@ -29,7 +30,18 @@
 		<liferay-ui:search-container-column-text name="name">
 			${courseType.getName(themeDisplay.locale) }
 		</liferay-ui:search-container-column-text>
-		
+		<liferay-ui:search-container-column-text name="type">
+			<%
+			CourseTypeFactoryRegistry registry = new CourseTypeFactoryRegistry();
+			if(registry.getCourseTypeFactory(courseType.getClassNameId())!=null){
+				%>
+				<%= registry.getCourseTypeFactory(courseType.getClassNameId()).getTitle(locale)%>
+				<% 	
+			}else{
+				
+			}%>
+			
+		</liferay-ui:search-container-column-text>
 		<liferay-ui:search-container-column-text name="">
 			<liferay-ui:icon-menu showExpanded="false" showWhenSingleIcon="true">
 				<c:set var="actionURL" value="javascript:${renderResponse.getNamespace()}editCourseType('${courseType.courseTypeId }');"/>
