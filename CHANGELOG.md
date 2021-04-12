@@ -20,6 +20,8 @@ El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
   
 - #199064: Corregido el problema con la importación, estaba dando el rol 0, ahora se establece el rol correctamente.
 
+- #195809: Corrección para poder importar usuarios desde la ficha del curso. Se ha unificado la parte back de los portlets coursedetail (ficha) y courseadmin (administración).
+
 
 ## [4.5.0](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v4.5.0)
 

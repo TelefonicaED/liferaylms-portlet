@@ -120,6 +120,7 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 	private String editionsJSP = null;
 	private String newEditionJSP = null;
 	private String roleMembersJSP = null;
+	private static String PORTLET_DETAIL_NAME = "coursedetail";
 	
 	public void init() throws PortletException {	
 		viewJSP = getInitParameter("view-template");
@@ -137,6 +138,7 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 		configLmsPrefsJSP = getInitParameter("config-lms-prefs");
 		editionsJSP = getInitParameter("editions-template");
 		newEditionJSP = getInitParameter("new-edition-template");
+	
 	}
 
 	public static String DOCUMENTLIBRARY_MAINFOLDER = "ResourceUploads"; 
@@ -156,13 +158,17 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 		} catch (SystemException e1) {
 			e1.printStackTrace();
 		}
-		
 		if(lmsPrefs != null){		
 			String jsp = renderRequest.getParameter("view");
 			if(log.isDebugEnabled())log.debug("VIEW "+jsp);
 			try {
 				if(jsp == null || "".equals(jsp)){
-					showViewDefault(renderRequest, renderResponse);
+					if(themeDisplay.getPortletDisplay().getPortletName().equalsIgnoreCase(PORTLET_DETAIL_NAME)){
+						showViewEditCourse(renderRequest, renderResponse);
+					}else{
+						showViewDefault(renderRequest, renderResponse);
+					}
+					
 				}else if("course-types".equals(jsp)){
 					showViewCourseTypes(renderRequest, renderResponse);
 				}else if("edit-course".equals(jsp)){
@@ -228,16 +234,36 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 		include(this.courseTypesJSP, renderRequest, renderResponse);
 	}
 	
-	private void showViewEditCourse(RenderRequest renderRequest,RenderResponse renderResponse) throws IOException, PortletException{
+	public void showViewEditCourse(RenderRequest renderRequest,RenderResponse renderResponse) throws IOException, PortletException{
 		
 		ThemeDisplay themeDisplay = (ThemeDisplay)renderRequest.getAttribute(WebKeys.THEME_DISPLAY);
-		
-		AdminActionTypeRegistry registry =  new AdminActionTypeRegistry();
-		renderRequest.setAttribute("adminActionTypes", registry.getAdminActionTypes());
-		
-		PortletURL backURL = renderResponse.createRenderURL();
-		renderRequest.setAttribute("backURL", backURL);
-		
+		if(themeDisplay.getPortletDisplay().getPortletName().equalsIgnoreCase(PORTLET_DETAIL_NAME)){
+			long groupId = themeDisplay.getScopeGroupId();
+			
+			Course course = null;
+			try {
+				course = CourseLocalServiceUtil.fetchByGroupCreatedId(groupId);
+			} catch (SystemException e) {
+				log.error("No se ha encontrado ningún curso con el groupCreatedId=" + groupId, e);
+			}
+			
+			if (Validator.isNotNull(course)) {
+				AdminActionTypeRegistry registry =  new AdminActionTypeRegistry();
+				renderRequest.setAttribute("adminActionTypes", registry.getAdminActionTypes());
+				
+				renderRequest.setAttribute("course", course);
+			}
+			
+			
+		}else{
+			AdminActionTypeRegistry registry =  new AdminActionTypeRegistry();
+			renderRequest.setAttribute("adminActionTypes", registry.getAdminActionTypes());
+			
+			PortletURL backURL = renderResponse.createRenderURL();
+			renderRequest.setAttribute("backURL", backURL);
+			
+			
+		}
 		include(this.editCourseJSP, renderRequest, renderResponse);
 	}
 	
