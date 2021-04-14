@@ -102,7 +102,7 @@ public class LearningActivityTryLocalServiceImpl
 	public LearningActivityTry updateLearningActivityTry(
 			LearningActivityTry learningActivityTry) throws SystemException {
 		
-		return updateLearningActivityTry(learningActivityTry,false);
+		return updateLearningActivityTry(learningActivityTry,true);
 	}
 	public long getLearningActivityTryByActUserCount(long actId,long userId) throws SystemException
 	{
