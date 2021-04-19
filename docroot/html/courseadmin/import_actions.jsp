@@ -4,11 +4,15 @@
 <%@page import="com.liferay.portal.service.RoleLocalServiceUtil"%>
 <%@page import="com.liferay.portal.model.RoleConstants"%>
 
-<liferay-ui:icon-menu message="courseadmin.import">
+<%--  --%>
 
 <%
-	if(permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), "com.liferay.lms.model.Course",themeDisplay.getScopeGroupId(),"ASSIGN_MEMBERS")){
-		
+	if(permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), "com.liferay.lms.model.Course", themeDisplay.getScopeGroupId(), "ASSIGN_MEMBERS")){
+%>
+		<portlet:resourceURL var="importUsersFromCsvExampleURL" id="importUsersFromCsvExample"/>
+		<portlet:resourceURL var="importUsersFromCsvURL" id="importUsersFromCsv"/>
+		<portlet:actionURL var="readImportFromCsvURL" name="readImportFromCsv"/>
+<%		
 		LmsPrefs prefs = LmsPrefsLocalServiceUtil.getLmsPrefs(themeDisplay.getCompanyId());
 		long editorRoleId  = prefs.getEditorRole();
 		long teacherRoleId = prefs.getTeacherRole();
@@ -16,24 +20,22 @@
 		Role teacherRole = RoleLocalServiceUtil.fetchRole(teacherRoleId);
 		Role studentRole = RoleLocalServiceUtil.getRole(themeDisplay.getCompanyId(), RoleConstants.SITE_MEMBER) ;
 %>	
+	<liferay-ui:icon-menu message="courseadmin.import">
 		<liferay-ui:icon 
-			image="assign"
-			label="<%=true %>"
-			message="courseadmin.import.csv.assign-users"
-			url="javascript:${renderResponse.getNamespace() }openImportUsersCsvPopUp('assignUsers');" 
-		/>
+ 			image="assign"
+ 			label="<%=true %>"
+ 			message="courseadmin.import.csv.assign-users"
+ 			url="javascript:${renderResponse.getNamespace() }openImportUsersCsvPopUp('assignUsers');"
+ 		/>
 		
 		<liferay-ui:icon 
-			image="unassign_user"
-			label="<%=true %>"
-			message="courseadmin.import.csv.unassign-users"
-			url="javascript:${renderResponse.getNamespace() }openImportUsersCsvPopUp('unassignUsers');" 
-		/>
+ 			image="unassign_user"
+ 			label="<%=true %>"
+ 			message="courseadmin.import.csv.unassign-users"
+ 			url="javascript:${renderResponse.getNamespace() }openImportUsersCsvPopUp('unassignUsers');"
+ 		/> 
+ 	</liferay-ui:icon-menu>
 		
-		<portlet:resourceURL var="importUsersFromCsvExampleURL" id="importUsersFromCsvExample"/>
-		<portlet:resourceURL var="importUsersFromCsvURL" id="importUsersFromCsv"/>
-		<portlet:actionURL var="readImportFromCsvURL" name="readImportFromCsv"/>
-
 		<div id="${renderResponse.getNamespace() }importUsersDivId" class="generic-pop-up aui-helper-hidden">
 			
 			<div class="pop-up-content">
@@ -58,7 +60,8 @@
 				
 				<div id="${renderResponse.getNamespace() }importUsersFromCsvDivId">
 				
-					<aui:form name="importUsersFromCsvForm" action="${readImportFromCsvURL }" method="POST" enctype="multipart/form-data">
+					<aui:form name="importUsersFromCsvForm" action="${readImportFromCsvURL }" method="POST" enctype="multipart/form-data" 
+							onSubmit="javascript:${renderResponse.getNamespace() }submitImportUsersCsv();">
 						
 						<aui:input type="hidden" name="importType" value="" />
 						
@@ -75,7 +78,7 @@
 					    </aui:input>
 					    
 				    	<aui:button-row>
-							<aui:button type="button" value="import" onClick="javascript:${renderResponse.getNamespace() }submitImportUsersCsv;"/>
+							<aui:button type="submit" value="import"/>
 						</aui:button-row>
 					
 					</aui:form>
@@ -92,7 +95,6 @@
 
 		<script>
 			function <portlet:namespace />openImportUsersCsvPopUp(importType){
-				console.log(importType);
 				if(importType === 'assignUsers' || importType === 'unassignUsers'){
 					var divTitle = $('#<portlet:namespace />importCsvTitle');
 					if(importType === 'assignUsers'){
@@ -100,7 +102,7 @@
 					} else {
 						divTitle.text(Liferay.Language.get('courseadmin.import.csv.unassign-users'));
 					}
-					$('form[name="<portlet:namespace />importUsersFromCsvForm"] select[name="<portlet:namespace />importType"]').val(importType);
+					$('form[name="<portlet:namespace />importUsersFromCsvForm"] input[name="<portlet:namespace />importType"]').val(importType);
 					$('#<portlet:namespace />importUsersDivId').removeClass('aui-helper-hidden');
 				} else {
 					console.log(":::ERROR:::: Tipo de importación?? asignar usuarios/eliminar usuarios?? ");
@@ -185,4 +187,3 @@
 <%		} 
 	}
 %>
-</liferay-ui:icon-menu>

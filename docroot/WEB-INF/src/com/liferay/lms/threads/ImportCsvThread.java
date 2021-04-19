@@ -35,6 +35,7 @@ public abstract class ImportCsvThread extends Thread {
 	protected ThemeDisplay themeDisplay;
 		
 	public ImportCsvThread(InputStream csvFile, String idThread, ThemeDisplay themeDisplay){
+		this.themeDisplay = themeDisplay;
 		this.idThread = idThread;
 		this.csvFile = csvFile;
 	}
@@ -59,7 +60,8 @@ public abstract class ImportCsvThread extends Thread {
 			
 		} catch (IOException e){
 			e.printStackTrace();
-			ImportCsvThreadMapper.unlinkThread(getIdThread());
+			isFinished = true;
+			progress = 100;
 		}
 		
 		if(totalLines>0)
@@ -88,7 +90,7 @@ public abstract class ImportCsvThread extends Thread {
 					+ StringPool.NEW_LINE);
 			
 			bw.append(LanguageUtil.get(themeDisplay.getLocale(),
-					"courseadmin..import.csv.correct-lines")
+					"courseadmin.import.csv.correct-lines")
 					+ StringPool.COLON + StringPool.SPACE + numCorrectLines 
 					+ StringPool.NEW_LINE);
 			

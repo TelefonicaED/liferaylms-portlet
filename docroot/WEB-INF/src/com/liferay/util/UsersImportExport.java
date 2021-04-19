@@ -56,12 +56,14 @@ public class UsersImportExport {
 		byte b[] = {(byte) 0xEF, (byte) 0xBB, (byte) 0xBF };
 		
 		try(FileOutputStream bw = new FileOutputStream(file);){
-		
+			
 			bw.write(b);
 			bw.write("sep=;\n".getBytes());
 			
-			try(CSVWriter writer = new CSVWriter(new OutputStreamWriter(bw, StringPool.UTF8), CharPool.SEMICOLON);){
-			
+			try(CSVWriter writer = new CSVWriter(new OutputStreamWriter(bw, StringPool.UTF8), CharPool.SEMICOLON)){
+		
+				_log.debug("::Init CSVWriter::");
+				
 				String [] headers = new String[2];
 				
 				User user = themeDisplay.getUser();
@@ -82,11 +84,16 @@ public class UsersImportExport {
 				headers[0] = userHeader;
 				headers[1] = LanguageUtil.get(themeDisplay.getLocale(), "courseadmin.import.csv.courseId");
 				
+				_log.debug("::headers:: " + headers[0] + " - " + headers[1]);
+				
 				writer.writeNext(headers);
 				
 				String [] values = new String[headers.length];
 				values[0] = userColumn;
 				values[1] = String.valueOf(0);
+				
+				_log.debug("::values:: " + values[0] + " - " + values[1]);
+				
 				writer.writeNext(values);
 				
 		        InputStream in = new FileInputStream(file);
@@ -94,7 +101,7 @@ public class UsersImportExport {
 		        HttpServletRequest httpReq = PortalUtil.getHttpServletRequest(resourceRequest);
 		        ServletResponseUtil.sendFile(httpReq,httpRes, LanguageUtil.get(themeDisplay.getLocale(), "example") + ".csv", in, ContentTypes.TEXT_CSV_UTF8);
 		        in.close();
-			
+		        
 			}catch (IOException e) {
 				e.printStackTrace();
 			}
