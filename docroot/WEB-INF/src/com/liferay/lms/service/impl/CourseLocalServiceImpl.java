@@ -359,8 +359,8 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 			course.setModifiedDate(createDate);
 			course.setStartDate(startDate);
 			course.setEndDate(endDate);
-			course.setExecutionStartDate(executionStartDate);
-			course.setExecutionEndDate(executionEndDate);
+			course.setExecutionStartDate(Validator.isNotNull(executionStartDate)?executionStartDate:startDate);
+			course.setExecutionEndDate(Validator.isNotNull(executionEndDate)?executionEndDate:endDate);
 			course.setStatus(WorkflowConstants.STATUS_APPROVED);
 			course.setExpandoBridgeAttributes(serviceContext);
 			course.setCourseEvalId(CourseEvalId);
