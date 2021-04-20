@@ -82,7 +82,9 @@ public class LearningActivityResultLocalServiceImpl	extends LearningActivityResu
 			learningActivityResult.setActId(actId);
 			learningActivityResult.setUserId(userId);
 			learningActivityResult.setPassed(false);
+			learningActivityResult = learningActivityResultPersistence.update(learningActivityResult, false);
 			recalculateActivity = true;
+			
 		}
 		log.debug("****END DATE "+learningActivityTry.getEndDate());
 		if(learningActivityTry.getEndDate()!=null){
@@ -122,7 +124,7 @@ public class LearningActivityResultLocalServiceImpl	extends LearningActivityResu
 		
 		log.debug("****Recalculate "+recalculateActivity);
 		if(recalculateActivity){
-			learningActivityResultPersistence.update(learningActivityResult, false);
+			learningActivityResult = learningActivityResultPersistence.update(learningActivityResult, true);
 			moduleResultLocalService.update(learningActivityResult);
 			
 			//auditing
