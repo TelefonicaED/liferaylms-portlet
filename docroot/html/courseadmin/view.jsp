@@ -32,12 +32,17 @@
 		<%
 	}
 	
-	
+	if(permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), "com.liferay.lms.model.Course",themeDisplay.getScopeGroupId(),"ASSIGN_MEMBERS")){
+	%>		
+		<div><%@ include file="/html/courseadmin/import_actions.jsp" %></div>
+	<%
+	}
 	%>
+	
 	<liferay-ui:success key="courseadmin.clone.confirmation.success" message="courseadmin.clone.confirmation.success" />
 	<liferay-ui:success key="import-course-ok" message="courseadmin.import-course-ok" />
 	<liferay-ui:error></liferay-ui:error>
-	
+
 	<%
 	boolean editionsWithoutRestrictions = GetterUtil.getBoolean(renderRequest.getPreferences().getValue("showEditionsWithoutRestrictions", StringPool.FALSE),false);
 	%>
