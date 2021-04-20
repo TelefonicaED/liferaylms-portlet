@@ -13,6 +13,9 @@ El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 
 - #198251: tipos de cursos, se tienen en cuenta los inactivos, se modifica para establecer el tipo de tipo de curso en la creación y en la edición.
 
+- #196585 Se añaden traducciones en PT, EN, IT y CA indicadas en el excel
+
+
 ### Fixed
 
 - #198695: Cambiado el metodo de softInitializeCourseResult para que lo de iniciado en actividades scorm, mpc y xapi. Anteriormente
