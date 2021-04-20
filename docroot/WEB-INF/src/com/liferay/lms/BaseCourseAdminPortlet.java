@@ -38,6 +38,7 @@ import au.com.bytecode.opencsv.CSVWriter;
 import com.liferay.counter.service.CounterLocalServiceUtil;
 import com.liferay.lms.auditing.AuditConstants;
 import com.liferay.lms.auditing.AuditingLogFactory;
+import com.liferay.lms.course.adminaction.AdminActionTypeRegistry;
 import com.liferay.lms.course.diploma.CourseDiploma;
 import com.liferay.lms.course.diploma.CourseDiplomaRegistry;
 import com.liferay.lms.course.inscriptiontype.InscriptionType;
@@ -281,6 +282,7 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 		
 		include(this.roleMembersTabJSP, renderRequest, renderResponse);
 	}
+	
 	
 	protected void showViewCompetenceTab(RenderRequest renderRequest,RenderResponse renderResponse) throws IOException, PortletException{
 		

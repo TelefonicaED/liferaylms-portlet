@@ -15,26 +15,28 @@
 		</a>
 	</li>
 	<c:forEach items="${listCourseTypes }" var="courseType">
-		<portlet:renderURL var="newCourseURL">
-			<portlet:param name="view" value="edit-course"></portlet:param>
-			<portlet:param name="redirect" value="<%= currentURL %>"></portlet:param>
-			<portlet:param name="courseTypeId" value="${courseType.courseTypeId }"></portlet:param>
-		</portlet:renderURL>
-		<li>
-			<c:if test="${not empty courseType.getDescription(themeDisplay.locale) }">
-				<liferay-ui:icon-help message="${courseType.getDescription(themeDisplay.locale) }"  />
-			</c:if>
-			<a href="${newCourseURL }" class="${empty courseType.getIconCourseTypeURL(themeDisplay) ? 'default-course-type-image' : ''}">
-				${courseType.getName(themeDisplay.locale) }
-				<c:if test="${not empty courseType.getIconCourseTypeURL(themeDisplay) }">
-					<img src="${courseType.getIconCourseTypeURL(themeDisplay) }"/>
+	 <c:if test="${courseType.active}">
+			<portlet:renderURL var="newCourseURL">
+				<portlet:param name="view" value="edit-course"></portlet:param>
+				<portlet:param name="redirect" value="<%= currentURL %>"></portlet:param>
+				<portlet:param name="courseTypeId" value="${courseType.courseTypeId }"></portlet:param>
+			</portlet:renderURL>
+			<li>
+				<c:if test="${not empty courseType.getDescription(themeDisplay.locale) }">
+					<liferay-ui:icon-help message="${courseType.getDescription(themeDisplay.locale) }"  />
 				</c:if>
-			</a>
-			<span class="tooltip-button"></span>
-			<div class="tooltip-text" id="wkps">
-				<liferay-ui:message key="${courseType.getInfo(themeDisplay.locale) }"/>
-			</div>
-		</li>
+				<a href="${newCourseURL }" class="${empty courseType.getIconCourseTypeURL(themeDisplay) ? 'default-course-type-image' : ''}">
+					${courseType.getName(themeDisplay.locale) }
+					<c:if test="${not empty courseType.getIconCourseTypeURL(themeDisplay) }">
+						<img src="${courseType.getIconCourseTypeURL(themeDisplay) }"/>
+					</c:if>
+				</a>
+				<span class="tooltip-button"></span>
+				<div class="tooltip-text" id="wkps">
+					<liferay-ui:message key="${courseType.getInfo(themeDisplay.locale) }"/>
+				</div>
+			</li>
+		</c:if>
 	</c:forEach>
 </ul>
 

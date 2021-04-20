@@ -18,6 +18,7 @@ import javax.portlet.PortletURL;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 
+import com.liferay.lms.CourseTypeFactoryRegistry;
 import com.liferay.lms.course.inscriptiontype.InscriptionType;
 import com.liferay.lms.course.inscriptiontype.InscriptionTypeRegistry;
 import com.liferay.lms.learningactivity.LearningActivityType;
@@ -27,6 +28,7 @@ import com.liferay.lms.learningactivity.calificationtype.CalificationTypeRegistr
 import com.liferay.lms.learningactivity.courseeval.CourseEval;
 import com.liferay.lms.learningactivity.courseeval.CourseEvalRegistry;
 import com.liferay.lms.model.CourseType;
+import com.liferay.lms.model.CourseTypeFactory;
 import com.liferay.lms.service.CourseTypeLocalServiceUtil;
 import com.liferay.lms.service.LmsPrefsLocalServiceUtil;
 import com.liferay.lms.util.DLFolderUtil;
@@ -47,6 +49,7 @@ import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.portal.model.ClassName;
 import com.liferay.portal.model.LayoutSetPrototype;
 import com.liferay.portal.service.LayoutSetPrototypeLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
@@ -145,6 +148,12 @@ public class CourseTypeAdmin extends MVCPortlet {
 			}
 		}
 		
+		
+		CourseTypeFactoryRegistry registry = new CourseTypeFactoryRegistry();
+		List<CourseTypeFactory> types = registry.getCourseTypeFactoriesList();
+		
+		request.setAttribute("listTypes", types);
+		
 		//Plantillas de site
 		List<LayoutSetPrototype> listTemplates = new ArrayList<LayoutSetPrototype>();
 		try {
@@ -217,7 +226,7 @@ public class CourseTypeAdmin extends MVCPortlet {
 		UploadPortletRequest uploadRequest = PortalUtil.getUploadPortletRequest(request);
 		
 		long courseTypeId = ParamUtil.getLong(uploadRequest, "courseTypeId", 0);
-		
+		long classNameId = ParamUtil.getLong(uploadRequest, "typeId");
 		Locale[] locales = LanguageUtil.getAvailableLocales();
 		String courseTypeNameLocale = StringPool.BLANK;
 		Map<Locale,String> courseTypeName = new HashMap<Locale, String>();
@@ -289,7 +298,7 @@ public class CourseTypeAdmin extends MVCPortlet {
 				try {
 					CourseTypeLocalServiceUtil.addCourseType(themeDisplay.getCompanyId(), themeDisplay.getUserId(), themeDisplay.getScopeGroupId(), 
 							courseTypeName, courseTypeDescription, templateIds, editionTemplateIds, courseEvalTypeIds, learningActivityTypeIds, 
-							inscriptionTypeIds, calificationTypeIds, iconImageId);
+							inscriptionTypeIds, calificationTypeIds, iconImageId, classNameId);
 				} catch (SystemException e) {
 					saveOk = Boolean.FALSE;
 					e.printStackTrace();
@@ -304,7 +313,7 @@ public class CourseTypeAdmin extends MVCPortlet {
 				//Actualizar tipo de curso ya existente
 				try {
 					CourseTypeLocalServiceUtil.updateCourseType(courseTypeId, courseTypeName, courseTypeDescription, 
-							templateIds, editionTemplateIds, courseEvalTypeIds, learningActivityTypeIds, inscriptionTypeIds, calificationTypeIds, iconImageId, deleteIcon);
+							templateIds, editionTemplateIds, courseEvalTypeIds, learningActivityTypeIds, inscriptionTypeIds, calificationTypeIds, iconImageId, deleteIcon, classNameId);
 				} catch (SystemException e) {
 					saveOk = Boolean.FALSE;
 					e.printStackTrace();
