@@ -2,6 +2,11 @@
 Todos los cambios de este proyecto estarán documentados en este archivo.
 
 El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
+## [4.5.2](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v4.5.2)
+
+### Updated
+
+- Cambios en el registry de las actividades para mejorar rendimiento, establecidas las variables a estáticas para evitar que se lean en cada acceso.
 
 ## [4.5.0](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v4.5.0)
 
