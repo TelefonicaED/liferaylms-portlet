@@ -56,9 +56,8 @@
 <portlet:actionURL name="importUsersCourse" var="importUsersCourseURL" >
 	<portlet:param name="javax.portlet.action" value="importUsersCourseReport" /> 
 	<portlet:param name="courseId" value="<%=ParamUtil.getString(renderRequest, \"courseId\") %>" /> 
-	<portlet:param name="roleId" value="<%=ParamUtil.getString(renderRequest, \"roleId\") %>" /> 
+	<portlet:param name="roleId" value="<%=ParamUtil.getString(request, \"roleId\") %>" /> 
 </portlet:actionURL>
-
 
 <div class="generic-pop-up aui-helper-hidden" id="${renderResponse.getNamespace()}divImportUsersCourse">
  	<div class="pop-up-content">

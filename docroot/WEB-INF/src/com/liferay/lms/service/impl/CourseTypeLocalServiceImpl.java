@@ -14,6 +14,7 @@
 
 package com.liferay.lms.service.impl;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -26,13 +27,11 @@ import com.liferay.lms.learningactivity.calificationtype.CalificationType;
 import com.liferay.lms.learningactivity.courseeval.CourseEval;
 import com.liferay.lms.model.Course;
 import com.liferay.lms.model.CourseType;
+import com.liferay.lms.model.CourseTypeRelation;
 import com.liferay.lms.service.base.CourseTypeLocalServiceBaseImpl;
-import com.liferay.lms.util.LmsConstant;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.util.ListUtil;
-import com.liferay.portal.kernel.util.PrefsPropsUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.LayoutSetPrototype;
@@ -90,9 +89,16 @@ public class CourseTypeLocalServiceImpl extends CourseTypeLocalServiceBaseImpl {
 		return courseTypePersistence.findByPrimaryKey(courseTypeId);
 	}
 	
+	
 	public CourseType addCourseType(long companyId, long userId, long groupId, Map<Locale, String> nameMap, Map<Locale, String> descriptionMap, long[] templateIds,
 			long[] editionTemplateIds, long[] courseEvalTypeIds, long[] learningActivityTypeIds, long[] inscriptionTypeIds, long[] calificationTypeIds, 
 			long iconImageId) throws SystemException {
+		return addCourseType(companyId, userId, groupId, nameMap, descriptionMap, templateIds, editionTemplateIds, courseEvalTypeIds, learningActivityTypeIds, inscriptionTypeIds, calificationTypeIds, iconImageId,0);
+	}
+	
+	public CourseType addCourseType(long companyId, long userId, long groupId, Map<Locale, String> nameMap, Map<Locale, String> descriptionMap, long[] templateIds,
+			long[] editionTemplateIds, long[] courseEvalTypeIds, long[] learningActivityTypeIds, long[] inscriptionTypeIds, long[] calificationTypeIds, 
+			long iconImageId, long classNameId) throws SystemException {
 		
 		if(log.isDebugEnabled()){
 			log.debug("::addCourseType:: companyId :: " + companyId);
@@ -123,6 +129,7 @@ public class CourseTypeLocalServiceImpl extends CourseTypeLocalServiceBaseImpl {
 		courseType.setNameMap(nameMap);
 		courseType.setDescriptionMap(descriptionMap);
 		courseType.setActive(true);
+		courseType.setClassNameId(classNameId);
 		//El icono se setea sólo si se sube imagen (no es un campo obligatorio)
 		if(Validator.isNotNull(iconImageId) && iconImageId > 0)
 			courseType.setIconId(iconImageId);
@@ -153,6 +160,13 @@ public class CourseTypeLocalServiceImpl extends CourseTypeLocalServiceBaseImpl {
 	public CourseType updateCourseType(long courseTypeId, Map<Locale, String> nameMap, Map<Locale, String> descriptionMap, long[] templateIds,
 			long[] editionTemplateIds, long[] courseEvalTypeIds, long[] learningActivityTypeIds, long[] inscriptionTypeIds, long[] calificationTypeIds, 
 			long iconImageId, boolean deleteIcon) throws SystemException{
+			return updateCourseType(courseTypeId, nameMap, descriptionMap, templateIds, editionTemplateIds, courseEvalTypeIds, learningActivityTypeIds, inscriptionTypeIds, calificationTypeIds, iconImageId, deleteIcon);
+	}
+	
+	
+	public CourseType updateCourseType(long courseTypeId, Map<Locale, String> nameMap, Map<Locale, String> descriptionMap, long[] templateIds,
+			long[] editionTemplateIds, long[] courseEvalTypeIds, long[] learningActivityTypeIds, long[] inscriptionTypeIds, long[] calificationTypeIds, 
+			long iconImageId, boolean deleteIcon, long classNameId) throws SystemException{
 		
 		if(log.isDebugEnabled()){
 			log.debug("::updateCourseType:: courseTypeId :: " + courseTypeId);
@@ -177,67 +191,77 @@ public class CourseTypeLocalServiceImpl extends CourseTypeLocalServiceBaseImpl {
 			courseType.setModifiedDate(new Date());
 			
 				
-				//Las plantillas, métodos de evaluación, tipos de actividad, de inscripción y stmas de calificación
-				//existentes no se borran, se pueden añadir nuevos pero los que tenga no se van a borrar
+			//Se borran todas las relaciones anteriores
+			List<CourseTypeRelation> oldRelations = new ArrayList<CourseTypeRelation>();
 				
-				//Plantillas de site
-				if(Validator.isNotNull(templateIds) && templateIds.length>0){
-					List<Long> listTemplatesIdsOfCourseType = courseType.getCourseTemplateIds();
-					for(int i=0; i<templateIds.length ; i++){
-						if(!listTemplatesIdsOfCourseType.contains(templateIds[i]))
-							courseTypeRelationLocalService.addCourseTypeRelation(courseType.getCourseTypeId(), PortalUtil.getClassNameId(LayoutSetPrototype.class), templateIds[i]);
-					}
-				}
-				
-				if(Validator.isNotNull(editionTemplateIds)  && editionTemplateIds.length>0){
-					List<Long> oldTemplateIds = courseType.getEditionTemplateIds();
-					List<Long> listEditionTemplateIds = ListUtil.toList(editionTemplateIds);
-					for(Long oldTemplateId: oldTemplateIds){
-						if(!listEditionTemplateIds.contains(oldTemplateId)){
-							courseTypeRelationLocalService.addCourseTypeRelation(courseType.getCourseTypeId(), PortalUtil.getClassNameId(Course.class), Long.valueOf(oldTemplateId));
-						}
-					}
-				}
-				
-				//Métodos de evaluación
-				if(Validator.isNotNull(courseEvalTypeIds)  && courseEvalTypeIds.length>0){
-					List<Long> listEvalTypesIdsOfCourseType = courseType.getCourseEvalTypeIds();
-					for(int i=0; i<courseEvalTypeIds.length; i++){
-						if(!listEvalTypesIdsOfCourseType.contains(courseEvalTypeIds[i]))
-							courseTypeRelationLocalService.addCourseTypeRelation(courseType.getCourseTypeId(), PortalUtil.getClassNameId(CourseEval.class), courseEvalTypeIds[i]);
-					}
-				}
+			//Plantillas
+			 oldRelations.addAll(courseTypeRelationLocalService.getCourseTypeRelations(courseType.getCourseTypeId(), PortalUtil.getClassNameId(LayoutSetPrototype.class)));
+			
+			//Plantillas de edicion
+			 oldRelations.addAll(courseTypeRelationLocalService.getCourseTypeRelations(courseType.getCourseTypeId(), PortalUtil.getClassNameId(Course.class)));
+			     
+			 //Metodos de evaluacion
+			 oldRelations.addAll(courseTypeRelationLocalService.getCourseTypeRelations(courseType.getCourseTypeId(), PortalUtil.getClassNameId(CourseEval.class)));
 					
-				//Tipos de actividad
-				if(Validator.isNotNull(learningActivityTypeIds)  && learningActivityTypeIds.length>0){
-					List<Long> listLearningActivityTypeIdsOfCourseType = courseType.getLearningActivityTypeIds();
-					for(int i=0; i<learningActivityTypeIds.length; i++){
-						if(!listLearningActivityTypeIdsOfCourseType.contains(learningActivityTypeIds[i]))
-							courseTypeRelationLocalService.addCourseTypeRelation(courseType.getCourseTypeId(), PortalUtil.getClassNameId(LearningActivityType.class), learningActivityTypeIds[i]);
-					}
-				}
+			 //Inscripciones
+			 oldRelations.addAll(courseTypeRelationLocalService.getCourseTypeRelations(courseType.getCourseTypeId(), PortalUtil.getClassNameId(InscriptionType.class)));
 					
-				//Tipos de inscripción
-				if(Validator.isNotNull(inscriptionTypeIds)  && inscriptionTypeIds.length>0){
-					List<Long> listInscriptionTypesIdsOfCourseType = courseType.getInscriptionTypeIds();
-					for(int i=0; i<inscriptionTypeIds.length; i++){
-						if(!listInscriptionTypesIdsOfCourseType.contains(inscriptionTypeIds[i]))
-							courseTypeRelationLocalService.addCourseTypeRelation(courseType.getCourseTypeId(), PortalUtil.getClassNameId(InscriptionType.class), inscriptionTypeIds[i]);
-					}
-				}
+			 //Actividades
+			 oldRelations.addAll(courseTypeRelationLocalService.getCourseTypeRelations(courseType.getCourseTypeId(), PortalUtil.getClassNameId(LearningActivityType.class)));
 					
-				//Stmas de calificación
-				if(Validator.isNotNull(calificationTypeIds)  && calificationTypeIds.length>0){
-					List<Long> listCalificationTypesIdsOfCourseType = courseType.getCalificationTypeIds();
-					for(int i=0; i<calificationTypeIds.length; i++){
-						if(!listCalificationTypesIdsOfCourseType.contains(calificationTypeIds[i]))
-							courseTypeRelationLocalService.addCourseTypeRelation(courseType.getCourseTypeId(), PortalUtil.getClassNameId(CalificationType.class), calificationTypeIds[i]);
-					}
+			  //Calificacion
+			 oldRelations.addAll(courseTypeRelationLocalService.getCourseTypeRelations(courseType.getCourseTypeId(), PortalUtil.getClassNameId(CalificationType.class)));
+					
+			 
+			 
+			 for(CourseTypeRelation oldRelation: oldRelations){
+				 courseTypeRelationLocalService.deleteCourseTypeRelation(oldRelation);
+			 }
+			 
+			//Plantillas de site
+			if(Validator.isNotNull(templateIds) && templateIds.length>0){
+				for(int i=0; i<templateIds.length ; i++){
+					courseTypeRelationLocalService.addCourseTypeRelation(courseType.getCourseTypeId(), PortalUtil.getClassNameId(LayoutSetPrototype.class), templateIds[i]);
 				}
 			}
-		
-		if(courseType.getClassNameId() == 0){
 			
+			if(Validator.isNotNull(editionTemplateIds)  && editionTemplateIds.length>0){
+				for(int i=0; i<editionTemplateIds.length ; i++){
+					courseTypeRelationLocalService.addCourseTypeRelation(courseType.getCourseTypeId(), PortalUtil.getClassNameId(Course.class), editionTemplateIds[i]);
+				}
+			}
+			
+			//Métodos de evaluación
+			if(Validator.isNotNull(courseEvalTypeIds)  && courseEvalTypeIds.length>0){
+				for(int i=0; i<courseEvalTypeIds.length; i++){
+					courseTypeRelationLocalService.addCourseTypeRelation(courseType.getCourseTypeId(), PortalUtil.getClassNameId(CourseEval.class), courseEvalTypeIds[i]);
+				}
+			}
+				
+			//Tipos de actividad
+			if(Validator.isNotNull(learningActivityTypeIds)  && learningActivityTypeIds.length>0){
+				for(int i=0; i<learningActivityTypeIds.length; i++){
+					courseTypeRelationLocalService.addCourseTypeRelation(courseType.getCourseTypeId(), PortalUtil.getClassNameId(LearningActivityType.class), learningActivityTypeIds[i]);
+				}
+			}
+				
+			//Tipos de inscripción
+			if(Validator.isNotNull(inscriptionTypeIds)  && inscriptionTypeIds.length>0){
+				for(int i=0; i<inscriptionTypeIds.length; i++){
+					courseTypeRelationLocalService.addCourseTypeRelation(courseType.getCourseTypeId(), PortalUtil.getClassNameId(InscriptionType.class), inscriptionTypeIds[i]);
+				}
+			}
+				
+			//Stmas de calificación
+			if(Validator.isNotNull(calificationTypeIds)  && calificationTypeIds.length>0){
+				for(int i=0; i<calificationTypeIds.length; i++){
+					courseTypeRelationLocalService.addCourseTypeRelation(courseType.getCourseTypeId(), PortalUtil.getClassNameId(CalificationType.class), calificationTypeIds[i]);
+				}
+			}
+		}
+		
+	
+			courseType.setClassNameId(classNameId);
 			//Description fields
 			courseType.setNameMap(nameMap);
 			courseType.setDescriptionMap(descriptionMap);
@@ -250,7 +274,7 @@ public class CourseTypeLocalServiceImpl extends CourseTypeLocalServiceBaseImpl {
 				courseType.setIconId(iconImageId);
 				
 			courseTypePersistence.update(courseType, Boolean.TRUE);
-		}
+		
 		return courseType;
 	}
 	

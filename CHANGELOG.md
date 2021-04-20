@@ -8,6 +8,26 @@ El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 
 - Cambios en el registry de las actividades para mejorar rendimiento, establecidas las variables a estáticas para evitar que se lean en cada acceso.
 
+## [4.6.0](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v4.6.0)
+
+### Added
+
+- #198292: Añadida la posibilidad de ordenar las ediciones de un curso
+
+### Updated
+
+- #198251: tipos de cursos, se tienen en cuenta los inactivos, se modifica para establecer el tipo de tipo de curso en la creación y en la edición.
+
+### Fixed
+
+- #198695: Cambiado el metodo de softInitializeCourseResult para que lo de iniciado en actividades scorm, mpc y xapi. Anteriormente
+  se daba por iniciada la actividad pero no el curso
+  
+- #199064: Corregido el problema con la importación, estaba dando el rol 0, ahora se establece el rol correctamente.
+
+- #195809: Corrección para poder importar usuarios desde la ficha del curso. Se ha unificado la parte back de los portlets coursedetail (ficha) y courseadmin (administración).
+
+
 ## [4.5.0](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v4.5.0)
 
 ### Fixed
