@@ -98,9 +98,9 @@
 				if(importType === 'assignUsers' || importType === 'unassignUsers'){
 					var divTitle = $('#<portlet:namespace />importCsvTitle');
 					if(importType === 'assignUsers'){
-						divTitle.text(Liferay.Language.get('courseadmin.import.csv.assign-users'));
+						divTitle.text('<liferay-ui:message key="courseadmin.import.csv.assign-users"/>');
 					} else {
-						divTitle.text(Liferay.Language.get('courseadmin.import.csv.unassign-users'));
+						divTitle.text('<liferay-ui:message key="courseadmin.import.csv.unassign-users"/>');
 					}
 					$('form[name="<portlet:namespace />importUsersFromCsvForm"] input[name="<portlet:namespace />importType"]').val(importType);
 					$('#<portlet:namespace />importUsersDivId').removeClass('aui-helper-hidden');
@@ -139,6 +139,7 @@
 					<portlet:namespace />readThreadStateImportUsers('<%=UUID%>', '<%=importType%>');
 				});
 				function <portlet:namespace />readThreadStateImportUsers(uuid, importType){
+					console.log("::Read thread state:: " + uuid);
 					$.ajax({
 						dataType: 'json',
 						url: '${importUsersFromCsvURL }',
@@ -171,7 +172,7 @@
 									downloadReportDiv.removeClass('aui-helper-hidden');
 								}
 								
-								<portlet:namespace />openImportUsersCsvPopUp(data.importType);
+								<portlet:namespace />openImportUsersCsvPopUp(importType);
 								
 							} else {
 								console.log("ERROR IMPORT CSV USERS -- No data response")

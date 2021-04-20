@@ -6,12 +6,14 @@ import java.io.InputStreamReader;
 
 import au.com.bytecode.opencsv.CSVReader;
 
+import com.liferay.lms.NoSuchCourseException;
 import com.liferay.lms.auditing.AuditConstants;
 import com.liferay.lms.auditing.AuditingLogFactory;
 import com.liferay.lms.model.Course;
 import com.liferay.lms.model.LmsPrefs;
 import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.lms.service.LmsPrefsLocalServiceUtil;
+import com.liferay.portal.NoSuchUserException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.language.LanguageUtil;
@@ -62,38 +64,59 @@ public class ImportCsvAssignUsersThread extends ImportCsvThread {
 	protected void readAndProcessCsv() {
 		
 		if(teacherRoleId>-1 && editorRoleId>-1){
-		
-			try(InputStreamReader fstream = new InputStreamReader(csvFile, StringPool.UTF8);
-					CSVReader reader = new CSVReader(fstream,CharPool.SEMICOLON);){
+			
+			CSVReader reader = null;
+			
+			try{
+			
+				InputStreamReader fstream = new InputStreamReader(csvFile, StringPool.UTF8);
+				reader = new CSVReader(fstream,CharPool.SEMICOLON);
+				totalLines = getTotalLines(reader);
+				_log.debug(":::totalLines::: " + totalLines);
 				
-				String[] strLine = null;
-				line = 0;
-				boolean isFirstLine = Boolean.TRUE;
-				boolean isCorrect = Boolean.TRUE;
-				boolean isCorrectLine = Boolean.TRUE;
+				if(totalLines < 1){
+					errors.add(LanguageUtil.get(themeDisplay.getLocale(), "courseadmin.import.csv.error.no-lines"));
+					_log.error(":: IMPORT DATA :: EMPTY FILE ::");
+				} else {
+					csvFile.reset();
+					reader = new CSVReader(fstream,CharPool.SEMICOLON);
 				
-				while ((strLine = reader.readNext()) != null && isCorrect) {
-					_log.debug("::::: line ::: " + line);
+					String[] strLine = null;
+					line = 0;
+					boolean isFirstLine = Boolean.TRUE;
+					boolean isCorrect = Boolean.TRUE;
+					boolean isCorrectLine = Boolean.TRUE;
 					
-					if (!isFirstLine) {
-						isCorrectLine = processLine(strLine);
-						if(isCorrectLine)
-							numCorrectLines++;
-					}else{
-						isFirstLine = Boolean.FALSE;
-						//Compruebo la cabecera
-						headerLength = getHeaderLength(strLine);
-						_log.debug("::headerLength::: " + headerLength);
-						isCorrect = checkHead(headerLength, HEADER_LENGTH);
+					while (Validator.isNotNull(reader) && (strLine = reader.readNext()) != null && isCorrect) {
+						_log.debug("::::: line ::: " + line);
+						
+						if (!isFirstLine) {
+							isCorrectLine = processLine(strLine);
+							if(isCorrectLine)
+								numCorrectLines++;
+						}else{
+							isFirstLine = Boolean.FALSE;
+							//Compruebo la cabecera
+							headerLength = getHeaderLength(strLine);
+							_log.debug("::headerLength::: " + headerLength);
+							isCorrect = checkHead(headerLength, HEADER_LENGTH);
+						}
+						
+						line++;
+						progress = ((line - 1) * 100) / totalLines;
 					}
-					
-					line++;
-					progress = ((line - 1) * 100) / totalLines;
 				}
 				
-			} catch (IOException e){
+			} catch (Exception e){
 				e.printStackTrace();
-				ImportCsvThreadMapper.unlinkThread(getIdThread());
+			} finally {
+				if(Validator.isNotNull(reader)){
+					try {
+						reader.close();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
 			}
 		
 		} else {
@@ -132,7 +155,15 @@ public class ImportCsvAssignUsersThread extends ImportCsvThread {
 							user = UserLocalServiceUtil.getUser(Long.parseLong(userData.trim()));
 							break;
 					}
-			
+					
+				} catch(NoSuchUserException e){
+					
+					_log.error("::No such user exception:: " + e.getMessage());
+					errors.add(LanguageUtil.format(themeDisplay.getLocale(),
+							"courseadmin.importuserrole.csvError.user-id-not-found", 
+							new Object[] { line, userData }) + StringPool.NEW_LINE);
+					result = Boolean.FALSE;
+					
 				} catch(NumberFormatException e){
 					
 					_log.error(":: USER :: NUMBER FORMAT EXCEPTION :: LINE - " + line);
@@ -144,11 +175,19 @@ public class ImportCsvAssignUsersThread extends ImportCsvThread {
 					
 					e.printStackTrace();
 					errors.add(LanguageUtil.format(themeDisplay.getLocale(),
-							"courseadmin.importuserrole.csvError.user-id-not-found", line) + StringPool.NEW_LINE);
+							"courseadmin.importuserrole.csvError.user-id-not-found",
+							new Object[] { line, userData }) + StringPool.NEW_LINE);
 					result = Boolean.FALSE;
-				}
 				
-				result = result && Validator.isNotNull(user);
+				} catch(Exception e){
+					
+					e.printStackTrace();
+					errors.add(LanguageUtil.format(themeDisplay.getLocale(),
+							"courseadmin.importuserrole.csvError.user-id-not-found",
+							new Object[] { line, userData }) + StringPool.NEW_LINE);
+					result = Boolean.FALSE;
+					
+				}
 				
 				if(result){
 					
@@ -163,7 +202,8 @@ public class ImportCsvAssignUsersThread extends ImportCsvThread {
 						
 						_log.error(":: COURSE :: NUMBER FORMAT EXCEPTION :: LINE - " + line);
 						errors.add(LanguageUtil.format(themeDisplay.getLocale(),
-								"courseadmin.import.csv.error.course-id-bad-format", line) + StringPool.NEW_LINE);
+								"courseadmin.import.csv.error.course-id-bad-format", 
+								new Object[] { line, courseId }) + StringPool.NEW_LINE);
 						result = Boolean.FALSE;
 					}
 					
@@ -173,24 +213,36 @@ public class ImportCsvAssignUsersThread extends ImportCsvThread {
 						
 						try {
 							course = CourseLocalServiceUtil.getCourse(courseId);
-						
+							
+						} catch (NoSuchCourseException e){
+							
+							_log.error("::No such course exception :: " + e.getMessage());
+							errors.add(LanguageUtil.format(themeDisplay.getLocale(),
+									"courseadmin.import.csv.error.course-id-not-found",
+									new Object[] { line, courseId }) + StringPool.NEW_LINE);
+							result = Boolean.FALSE;
+					
 						} catch (PortalException | SystemException e) {
+							
 							e.printStackTrace();
 							errors.add(LanguageUtil.format(themeDisplay.getLocale(),
-									"courseadmin.import.csv.error.course-id-not-found", line) + StringPool.NEW_LINE);
+									"courseadmin.import.csv.error.course-id-not-found", 
+									new Object[] { line, courseId }) + StringPool.NEW_LINE);
+							result = Boolean.FALSE;
+						
+						} catch (Exception e){
+							
+							e.printStackTrace();
+							errors.add(LanguageUtil.format(themeDisplay.getLocale(),
+									"courseadmin.import.csv.error.course-id-not-found",
+									new Object[] { line, courseId }) + StringPool.NEW_LINE);
 							result = Boolean.FALSE;
 						}
-						
-						result = result && Validator.isNotNull(course);
-						
+					
 						if(result)
 							result = assignUser(userId, course);
 					}
 					
-				} else {
-					_log.error(":: USER NOT FOUND :: LINE - " + line);
-					errors.add(LanguageUtil.format(themeDisplay.getLocale(),
-							"courseadmin.importuserrole.csvError.user-id-not-found", line) + StringPool.NEW_LINE);
 				}
 			
 			} else {
@@ -214,6 +266,7 @@ public class ImportCsvAssignUsersThread extends ImportCsvThread {
 								"courseadmin.importuserrole.csvError.user-id-bad-format", line) + StringPool.NEW_LINE);
 						break;
 				}
+				result = Boolean.FALSE;
 			}
 		}
 		
@@ -224,21 +277,38 @@ public class ImportCsvAssignUsersThread extends ImportCsvThread {
 		
 		boolean result = Boolean.TRUE;
 		
-		try {
-			UserGroupRoleLocalServiceUtil.addUserGroupRoles(new long[] { userId }, course.getGroupCreatedId(), roleId);
+		long courseId = course.getCourseId();
+		long courseGroupId = course.getGroupCreatedId();
 		
-			if (!GroupLocalServiceUtil.hasUserGroup(userId, course.getGroupCreatedId())) {
-				GroupLocalServiceUtil.addUserGroups(userId,	new long[] { course.getGroupCreatedId() });
-			}
+		try {
 			
-			//Se audita
-			if(roleId == teacherRoleId){
-				AuditingLogFactory.audit(course.getCompanyId(), course.getGroupCreatedId(), Course.class.getName(), 
-						course.getCourseId(),userId, AuditConstants.REGISTER, "COURSE_TUTOR_ADD");
+			boolean userIsInGroup = GroupLocalServiceUtil.hasUserGroup(userId, courseGroupId);
 			
-			} else if(roleId == editorRoleId){
-				AuditingLogFactory.audit(course.getCompanyId(), course.getGroupCreatedId(), Course.class.getName(), 
-						course.getCourseId(),userId, AuditConstants.REGISTER, "COURSE_EDITOR_ADD");
+			if(userIsInGroup && UserGroupRoleLocalServiceUtil.hasUserGroupRole(userId, courseGroupId, roleId)){
+				
+				_log.error("::User " + userId + " is already in course " + courseId + " and has roleId " + roleId);
+				errors.add(LanguageUtil.format(themeDisplay.getLocale(),
+						"courseadmin.import.csv.assign-users.error.user-is-already-in-this-course-and-has-roleId",
+						new Object[] { line, userId, courseId, roleId }) + StringPool.NEW_LINE);
+				result = Boolean.FALSE;
+				
+			} else {
+			
+				UserGroupRoleLocalServiceUtil.addUserGroupRoles(new long[] { userId }, courseGroupId, roleId);
+			
+				if (!userIsInGroup) {
+					GroupLocalServiceUtil.addUserGroups(userId,	new long[] { courseGroupId });
+				}
+				
+				//Se audita
+				if(roleId == teacherRoleId){
+					AuditingLogFactory.audit(course.getCompanyId(), courseGroupId, Course.class.getName(), 
+							courseId,userId, AuditConstants.REGISTER, "COURSE_TUTOR_ADD");
+				
+				} else if(roleId == editorRoleId){
+					AuditingLogFactory.audit(course.getCompanyId(), courseGroupId, Course.class.getName(), 
+							courseId,userId, AuditConstants.REGISTER, "COURSE_EDITOR_ADD");
+				}
 			}
 			
 		} catch (PortalException | SystemException e) {

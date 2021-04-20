@@ -1517,6 +1517,7 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 	//---Resource
 	@Override
 	public void serveResource(ResourceRequest request, ResourceResponse response) throws IOException, PortletException {
+
 		log.debug("serveResource");
 		if(request.getResourceID() != null){
 			log.debug("request.getResourceID(): " + request.getResourceID());
@@ -1554,7 +1555,7 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 			ThemeDisplay themeDisplay = (ThemeDisplay) request.getAttribute(WebKeys.THEME_DISPLAY);
 			
 			if(Validator.isNotNull(request.getResourceID()) && request.getResourceID().equals("importUsersFromCsvExample")){
-				log.debug("::Unassign Users From CSV Example::");
+				log.debug("::Import Users From CSV Example::");
 				UsersImportExport.importUsersFromCsvExample(request, response);
 			} else if(Validator.isNotNull(request.getResourceID()) && request.getResourceID().equals("importUsersFromCsv")){
 				log.debug("::Import Users From CSV::");

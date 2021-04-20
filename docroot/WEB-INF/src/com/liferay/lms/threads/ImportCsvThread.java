@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +14,6 @@ import au.com.bytecode.opencsv.CSVReader;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.theme.ThemeDisplay;
@@ -45,30 +43,11 @@ public abstract class ImportCsvThread extends Thread {
 		isFinished = false;
 		progress = 1;
 		filePath = null;
-		
-		try(InputStreamReader fstream = new InputStreamReader(csvFile, StringPool.UTF8);
-				CSVReader reader = new CSVReader(fstream,CharPool.SEMICOLON);){
-			
-			this.totalLines = getTotalLines(reader);
-			_log.debug(":: Total lines :: " + totalLines);
-			
-			if(totalLines<1){
-				errors.add(LanguageUtil.get(themeDisplay.getLocale(), "courseadmin.import.csv.error.no-lines"));
-				_log.error(":: IMPORT DATA :: EMPTY FILE ::");
-			} else
-				csvFile.reset();
-			
-		} catch (IOException e){
-			e.printStackTrace();
-			isFinished = true;
-			progress = 100;
-		}
-		
-		if(totalLines>0)
-			readAndProcessCsv();
-		
-		createCSVImportReport();
-				
+		_log.info("::Start reading import file :: uuid " + idThread);
+		readAndProcessCsv();
+		_log.info("::Finish reading import file :: uuid " + idThread);
+		filePath = createCSVImportReport();
+		_log.info("::Report File Path :: [uuid =" + idThread + "] " + filePath);
 		isFinished = true;
 		progress = 100;
 		_log.info("::Finish thread:: uuid = " + idThread);
@@ -76,7 +55,9 @@ public abstract class ImportCsvThread extends Thread {
 	
 	protected abstract void readAndProcessCsv();
 	
-	private void createCSVImportReport(){
+	private String createCSVImportReport(){
+		
+		_log.info("::Create report import :: uuid " + idThread);
 		
 		File file = FileUtil.createTempFile("csv");
 		
@@ -105,7 +86,7 @@ public abstract class ImportCsvThread extends Thread {
 			e.printStackTrace();
 		}
 
-		filePath = file.getAbsolutePath();
+		return file.getAbsolutePath();
 	}
 
 	public void setIsFinished(boolean isFinished){
@@ -175,7 +156,7 @@ public abstract class ImportCsvThread extends Thread {
 		return isCorrect;
 	}
 	
-	private int getTotalLines(CSVReader reader){
+	public int getTotalLines(CSVReader reader){
 		int lines = -1;
 		try {
 			while (reader.readNext() != null) {
