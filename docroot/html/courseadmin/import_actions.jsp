@@ -161,7 +161,7 @@
 									formDiv.addClass("aui-helper-hidden");
 									progressBarDiv.removeClass("aui-helper-hidden");
 									progressBarDiv.val(data.progress);
-						    		setTimeout(<portlet:namespace />readThreadStateImportUsers(data.uuid, data.importType),1000);
+						    		setTimeout(<portlet:namespace />readThreadStateImportUsers(data.UUID, data.importType),1000);
 								
 								} else {
 									
