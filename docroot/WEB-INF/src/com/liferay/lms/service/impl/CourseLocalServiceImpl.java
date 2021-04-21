@@ -26,7 +26,6 @@ import java.util.Map.Entry;
 
 import javax.portlet.PortletPreferences;
 
-import com.liferay.lms.asset.LearningActivityBaseAssetRenderer;
 import com.liferay.lms.auditing.AuditConstants;
 import com.liferay.lms.auditing.AuditingLogFactory;
 import com.liferay.lms.learningactivity.courseeval.CourseEval;
@@ -81,7 +80,6 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.GroupConstants;
-import com.liferay.portal.model.Layout;
 import com.liferay.portal.model.LayoutSet;
 import com.liferay.portal.model.LayoutSetPrototype;
 import com.liferay.portal.model.MembershipRequestConstants;
@@ -98,7 +96,6 @@ import com.liferay.portal.security.permission.PermissionCheckerFactoryUtil;
 import com.liferay.portal.service.ClassNameLocalServiceUtil;
 import com.liferay.portal.service.CompanyLocalServiceUtil;
 import com.liferay.portal.service.GroupLocalServiceUtil;
-import com.liferay.portal.service.LayoutServiceUtil;
 import com.liferay.portal.service.LayoutSetPrototypeLocalServiceUtil;
 import com.liferay.portal.service.MembershipRequestLocalServiceUtil;
 import com.liferay.portal.service.PortalPreferencesLocalServiceUtil;
@@ -301,6 +298,50 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 			long courseTypeId)
 			throws SystemException, PortalException {
 		
+		Map<Locale, String> descriptionMap = new HashMap<Locale, String>();
+		descriptionMap.put(locale, description);
+		Map<Locale, String> summaryMap = new HashMap<Locale, String>();
+		summaryMap.put(locale, summary);
+		
+		return addCourse(titleMap, descriptionMap, summaryMap, friendlyURL, locale, createDate, startDate, endDate,
+				executionStartDate, executionEndDate, layoutSetPrototypeId, typesite, CourseEvalId, calificationType,
+				maxUsers, serviceContext, isfromClone, 0);
+	}
+	
+	public Course addCourse (Map<Locale,String> titleMap, String description,String summary,String friendlyURL, Locale locale,
+			Date createDate,Date startDate,Date endDate, Date executionStartDate, Date executionEndDate, long layoutSetPrototypeId,int typesite, 
+			long CourseEvalId, long calificationType, int maxUsers,ServiceContext serviceContext,boolean isfromClone,
+			long courseTypeId, boolean assetIsVisible)
+			throws SystemException, PortalException {
+		
+		Map<Locale, String> descriptionMap = new HashMap<Locale, String>();
+		descriptionMap.put(locale, description);
+		Map<Locale, String> summaryMap = new HashMap<Locale, String>();
+		summaryMap.put(locale, summary);
+		
+		return addCourse(titleMap, descriptionMap, summaryMap, friendlyURL, locale, createDate, startDate, endDate,
+				executionStartDate, executionEndDate, layoutSetPrototypeId, typesite, CourseEvalId, calificationType,
+				maxUsers, serviceContext, isfromClone, 0, assetIsVisible);
+	}
+	
+	public Course addCourse (Map<Locale,String> titleMap, Map<Locale,String> descriptionMap, Map<Locale,String> summaryMap,String friendlyURL, Locale locale,
+			Date createDate,Date startDate,Date endDate, Date executionStartDate, Date executionEndDate, long layoutSetPrototypeId,int typesite, 
+			long CourseEvalId, long calificationType, int maxUsers,ServiceContext serviceContext,boolean isfromClone,
+			long courseTypeId)
+			throws SystemException, PortalException {
+		
+		return addCourse(titleMap, descriptionMap, summaryMap, friendlyURL, locale, createDate, startDate, endDate,
+				executionStartDate, executionEndDate, layoutSetPrototypeId, typesite, CourseEvalId, calificationType,
+				maxUsers, serviceContext, isfromClone, 0, true);
+		
+	}
+	
+	public Course addCourse (Map<Locale,String> titleMap, Map<Locale,String> descriptionMap, Map<Locale,String> summaryMap,String friendlyURL, Locale locale,
+			Date createDate,Date startDate,Date endDate, Date executionStartDate, Date executionEndDate, long layoutSetPrototypeId,int typesite, 
+			long CourseEvalId, long calificationType, int maxUsers,ServiceContext serviceContext,boolean isfromClone,
+			long courseTypeId, boolean assetIsVisible)
+			throws SystemException, PortalException {
+		
 		log.debug("courseTypeId:: " + courseTypeId);
 		
 		LmsPrefs lmsPrefs=lmsPrefsLocalService.getLmsPrefsIni(serviceContext.getCompanyId());
@@ -353,7 +394,7 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 			course.setUserId(userId);
 			course.setUserName(userLocalService.getUser(userId).getFullName());
 			course.setFriendlyURL(friendlyURL);
-			course.setDescription(description,locale, locale);
+			course.setDescriptionMap(descriptionMap);
 			course.setTitleMap(titleMap);
 			course.setCreateDate(createDate);
 			course.setModifiedDate(createDate);
@@ -389,7 +430,7 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 			log.debug("groupName: " + groupName);
 			
 			Group group = groupLocalService.addGroup(userLocalService.getDefaultUser(serviceContext.getCompanyId()).getUserId(),
-					null, 0, groupName,summary,typesite,friendlyURL,true,true,serviceContext);
+					null, 0, groupName, summaryMap.get(locale),typesite,friendlyURL,true,true,serviceContext);
 			course.setGroupCreatedId(group.getGroupId());
 			course.setFriendlyURL(group.getFriendlyURL());
 			course.setIsLinked(false);
@@ -399,8 +440,12 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 			resourceLocalService.addResources(serviceContext.getCompanyId(), serviceContext.getScopeGroupId(), userId,Course.class.getName(), course.getPrimaryKey(), false,true, true);
 			AssetEntry assetEntry=assetEntryLocalService.updateEntry(userId, course.getGroupId(), Course.class.getName(),
 					course.getCourseId(), course.getUuid(),courseTypeId, serviceContext.getAssetCategoryIds(),
-					serviceContext.getAssetTagNames(), true, executionStartDate, executionEndDate,new java.util.Date(System.currentTimeMillis()), null,
-					ContentTypes.TEXT_HTML, course.getTitle(), course.getDescription(locale), summary, null, null, 0, 0,null, false);
+					serviceContext.getAssetTagNames(), assetIsVisible, executionStartDate, executionEndDate,new java.util.Date(System.currentTimeMillis()), null,
+					ContentTypes.TEXT_HTML, course.getTitle(), course.getDescription(locale), summaryMap.get(locale), null, null, 0, 0,null, false);
+			assetEntry.setTitleMap(course.getTitleMap());
+			assetEntry.setDescriptionMap(course.getDescriptionMap());
+			assetEntry.setSummaryMap(summaryMap);
+			assetEntry = assetEntryLocalService.updateAssetEntry(assetEntry);
 			
 			assetLinkLocalService.updateLinks(
 					userId, assetEntry.getEntryId(), serviceContext.getAssetLinkEntryIds(),
