@@ -264,18 +264,41 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 		return null;
 	}
 
+	
 
-	public Course addCourse (String title, String description,String summary,String friendlyURL, Locale locale,
+	public Course addCourse (Map<Locale,String> titleMap, Map<Locale,String> descriptionMap,Map<Locale,String> summaryMap,String friendlyURL, Locale locale,
 		Date createDate,Date startDate,Date endDate,long layoutSetPrototypeId,int typesite, long CourseEvalId, long calificationType, int maxUsers,ServiceContext serviceContext,boolean isfromClone)
 		throws SystemException, PortalException {
 		
-		Course course = addCourse (title, description,summary,friendlyURL, locale,
+		Course course = addCourse (titleMap, descriptionMap,summaryMap,friendlyURL, locale,
 				createDate,startDate,endDate,null,null,layoutSetPrototypeId,typesite, CourseEvalId, calificationType, maxUsers,
-				 serviceContext, isfromClone);
-
+				 serviceContext, isfromClone, 0);
 		
 		return course;
 	}
+	
+	public Course addCourse (Map<Locale,String> titleMap, Map<Locale,String> descriptionMap,Map<Locale,String> summaryMap,String friendlyURL, Locale locale,
+			Date createDate,Date startDate,Date endDate,long layoutSetPrototypeId,int typesite, long CourseEvalId, long calificationType, int maxUsers,ServiceContext serviceContext,
+			boolean isfromClone, boolean assetVisible)
+			throws SystemException, PortalException {
+			
+			Course course = addCourse (titleMap, descriptionMap,summaryMap,friendlyURL, locale,
+					createDate,startDate,endDate,null,null,layoutSetPrototypeId,typesite, CourseEvalId, calificationType, maxUsers,
+					 serviceContext, isfromClone, 0, assetVisible);
+			
+			return course;
+	}
+	
+	public Course addCourse (String title, String description,String summary,String friendlyURL, Locale locale,
+			Date createDate,Date startDate,Date endDate,long layoutSetPrototypeId,int typesite, long CourseEvalId, long calificationType, int maxUsers,ServiceContext serviceContext,boolean isfromClone)
+			throws SystemException, PortalException {
+			
+			Course course = addCourse (title, description,summary,friendlyURL, locale,
+					createDate,startDate,endDate,null,null,layoutSetPrototypeId,typesite, CourseEvalId, calificationType, maxUsers,
+					 serviceContext, isfromClone);
+			
+			return course;
+		}
 	
 	public Course addCourse (String title, String description,String summary,String friendlyURL, Locale locale,
 			Date createDate,Date startDate,Date endDate, Date executionStartDate, Date executionEndDate, long layoutSetPrototypeId,int typesite, long CourseEvalId, long calificationType, int maxUsers,ServiceContext serviceContext,boolean isfromClone)
@@ -289,7 +312,8 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 	public Course addCourse (Map<Locale,String> titleMap, String description,String summary,String friendlyURL, Locale locale,
 			Date createDate,Date startDate,Date endDate, Date executionStartDate, Date executionEndDate, long layoutSetPrototypeId,int typesite, long CourseEvalId, long calificationType, int maxUsers,ServiceContext serviceContext,boolean isfromClone)
 			throws SystemException, PortalException {
-		return addCourse(titleMap, description, summary, friendlyURL, locale, createDate, startDate, endDate, executionStartDate, executionEndDate, layoutSetPrototypeId, typesite, CourseEvalId, calificationType, maxUsers, serviceContext, isfromClone, 0);
+		return addCourse(titleMap, description, summary, friendlyURL, locale, createDate, startDate, endDate, executionStartDate, executionEndDate, layoutSetPrototypeId,
+				typesite, CourseEvalId, calificationType, maxUsers, serviceContext, isfromClone, 0);
 	}
 
 	public Course addCourse (Map<Locale,String> titleMap, String description,String summary,String friendlyURL, Locale locale,
@@ -305,7 +329,7 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 		
 		return addCourse(titleMap, descriptionMap, summaryMap, friendlyURL, locale, createDate, startDate, endDate,
 				executionStartDate, executionEndDate, layoutSetPrototypeId, typesite, CourseEvalId, calificationType,
-				maxUsers, serviceContext, isfromClone, 0);
+				maxUsers, serviceContext, isfromClone, courseTypeId);
 	}
 	
 	public Course addCourse (Map<Locale,String> titleMap, String description,String summary,String friendlyURL, Locale locale,
@@ -321,7 +345,7 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 		
 		return addCourse(titleMap, descriptionMap, summaryMap, friendlyURL, locale, createDate, startDate, endDate,
 				executionStartDate, executionEndDate, layoutSetPrototypeId, typesite, CourseEvalId, calificationType,
-				maxUsers, serviceContext, isfromClone, 0, assetIsVisible);
+				maxUsers, serviceContext, isfromClone, courseTypeId, assetIsVisible);
 	}
 	
 	public Course addCourse (Map<Locale,String> titleMap, Map<Locale,String> descriptionMap, Map<Locale,String> summaryMap,String friendlyURL, Locale locale,
@@ -332,7 +356,7 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 		
 		return addCourse(titleMap, descriptionMap, summaryMap, friendlyURL, locale, createDate, startDate, endDate,
 				executionStartDate, executionEndDate, layoutSetPrototypeId, typesite, CourseEvalId, calificationType,
-				maxUsers, serviceContext, isfromClone, 0, true);
+				maxUsers, serviceContext, isfromClone, courseTypeId, true);
 		
 	}
 	
