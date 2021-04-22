@@ -410,6 +410,12 @@ public class ModuleLocalServiceImpl extends ModuleLocalServiceBaseImpl {
 	}
 	@Indexable(type=IndexableType.REINDEX)
 	public Module addModule(Long companyId, Long groupId, Long userId, 
+			Map<Locale, String> titleMap, Map<Locale, String> descriptionMap,
+			Date startDate, Date endDate, Long ordern) throws SystemException, PortalException{
+		return addModule(companyId, groupId, userId, titleMap, descriptionMap, startDate, endDate, ordern, null);
+	}
+	@Indexable(type=IndexableType.REINDEX)
+	public Module addModule(Long companyId, Long groupId, Long userId, 
 			String title, String description,
 			Date startDate, Date endDate, Long ordern, ServiceContext serviceContext) throws SystemException, PortalException {
 	
@@ -444,7 +450,6 @@ public class ModuleLocalServiceImpl extends ModuleLocalServiceBaseImpl {
 	    fileobj.setTitleMap(titleMap);
 	    fileobj.setDescriptionMap(descriptionMap);
 	    fileobj.setOrdern(ordern != null ? ordern : fileobj.getModuleId());
-	    fileobj.setExpandoBridgeAttributes(serviceContext);
 	    
 	    try {
 	    	
