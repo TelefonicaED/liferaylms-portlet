@@ -71,7 +71,7 @@ public class LearningActivityResultLocalServiceImpl	extends LearningActivityResu
 		long actId=learningActivityTry.getActId();
 		long userId=learningActivityTry.getUserId();
 		LearningActivityResult learningActivityResult=getByActIdAndUserId(actId, userId);
-		LearningActivity learningActivity=learningActivityLocalService.getLearningActivity(actId);
+		
 		boolean recalculateActivity = recalculateRequired;
 		log.debug("****LAR "+learningActivityResult);
 		if(learningActivityResult==null){	
@@ -94,7 +94,7 @@ public class LearningActivityResultLocalServiceImpl	extends LearningActivityResu
 				recalculateActivity= true;
 				log.debug("****Recalculamos 1");
 			}
-
+			LearningActivity learningActivity=learningActivityLocalService.getLearningActivity(actId);
 			if(!learningActivityResult.getPassed()){
 				LearningActivityTypeRegistry registry = new LearningActivityTypeRegistry();
 				LearningActivityType learningActivityType = registry.getLearningActivityType(learningActivity.getTypeId());
