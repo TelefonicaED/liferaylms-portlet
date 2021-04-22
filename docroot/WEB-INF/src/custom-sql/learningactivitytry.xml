@@ -23,7 +23,7 @@
 	</sql>
 	<sql id="com.liferay.lms.service.persistence.LearningActivityTryFinder.findLastLearningActivityTryFinishedByUserAndActId">
 		<![CDATA[   			
-			SELECT findLastLearningActivityTryCreateByUsersAndActId
+			SELECT 
 				lat.*
 			FROM 
 				lms_learningactivitytry AS lat
