@@ -57,6 +57,7 @@ else
 {
 
 	LearningActivity learnact=LearningActivityLocalServiceUtil.getLearningActivity(ParamUtil.getLong(request,"actId"));
+	boolean showDoneInfo = false;
 	
 	%>
 		<h2 class="description-title"><%=learnact.getTitle(themeDisplay.getLocale())%></h2>
@@ -96,6 +97,24 @@ else
 				}
 			}
 			if(learnact.getExtracontent()!=null &&!learnact.getExtracontent().trim().equals("") ){
+				showDoneInfo = GetterUtil.getBoolean(LearningActivityLocalServiceUtil.getExtraContentValue(learnact.getActId(), "show-done-info"), false);				
+				pageContext.setAttribute("showDoneInfo", showDoneInfo);
+				
+				if(showDoneInfo){
+					
+					LearningActivityTry lat = LearningActivityTryLocalServiceUtil.getLastLearningActivityTryByActivityAndUser(learnact.getActId(),themeDisplay.getUserId());
+					
+					if(Validator.isNotNull(lat)){
+				%>
+						<div class="description"><liferay-ui:message key="resourceinternalactivity.activitydone.message"/></div>
+				<%						
+					}else{						
+				%>
+						<div class="description"><liferay-ui:message key="resourceinternalactivity.activitynotdone.message"/></div>
+				<%						
+					}
+				}
+				
 				long entryId = GetterUtil.getLong(LearningActivityLocalServiceUtil.getExtraContentValue(learnact.getActId(),"assetEntry"),0);
 				
 				if(entryId!=0){

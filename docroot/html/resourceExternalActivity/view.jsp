@@ -23,6 +23,10 @@ if(isLinkTabletResourceExternal){
 
 <div class="description">${activity.getDescriptionFiltered(themeDisplay.locale,true)}</div>
 
+<c:if test="${showScoreInfo && not empty oldScore && oldScore > 0}">
+	<div class="description"><liferay-ui:message key="resourceexternalactivity.scoreinfo.message"/> ${oldScore}%</div>
+</c:if>
+
  <portlet:resourceURL var="finishTryURL" id="finishTry" />
 
 <c:choose>
