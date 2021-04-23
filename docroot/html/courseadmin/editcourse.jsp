@@ -1,3 +1,4 @@
+<%@page import="com.liferay.portal.kernel.util.DateUtil"%>
 <%@page import="com.liferay.lms.service.CourseTypeLocalServiceUtil"%>
 <%@page import="com.liferay.lms.course.inscriptiontype.InscriptionType"%>
 <%@page import="com.liferay.lms.course.inscriptiontype.InscriptionTypeRegistry"%>
@@ -1165,6 +1166,18 @@ if(isCourseChild){
 							</dt>
 							<dd>
 								<liferay-ui:message key="course-admin.welcome-message.user" />
+							</dd>
+							<dt>
+								[$START_DATE$]
+							</dt>
+							<dd>
+								<%= (course!=null?course.getExecutionStartDate():DateUtil.ISO_8601_PATTERN)  %>
+							</dd>
+							<dt>
+								[$END_DATE$]
+							</dt>
+							<dd>
+								<%= (course!=null?course.getExecutionEndDate():DateUtil.ISO_8601_PATTERN)  %>
 							</dd>
 						</dl>
 					</div>
