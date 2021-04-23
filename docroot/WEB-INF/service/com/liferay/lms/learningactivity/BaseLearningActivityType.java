@@ -316,8 +316,7 @@ public abstract class BaseLearningActivityType implements LearningActivityType, 
 		}else if(learningActivityResult.isPassed()){
 			finished = true;
 		}else{
-			long cuantosTryLlevo=LearningActivityTryLocalServiceUtil.getTriesCountByActivityAndUser(learningActivityResult.getActId(), learningActivityResult.getUserId());
-			finished = learningActivity.getTries()>0&&cuantosTryLlevo>=learningActivity.getTries();
+			finished = learningActivity.getTries()>0&&LearningActivityTryLocalServiceUtil.getTriesCountByActivityAndUser(learningActivityResult.getActId(), learningActivityResult.getUserId())>=learningActivity.getTries();
 		}
 		return finished;
 	}
