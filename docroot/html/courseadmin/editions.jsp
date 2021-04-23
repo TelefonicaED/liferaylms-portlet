@@ -94,7 +94,7 @@ if( permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), "com.liferay
 		Group groupsel= GroupLocalServiceUtil.getGroup(course.getGroupCreatedId());
 		Layout initCourseLayout = LayoutLocalServiceUtil.fetchFirstLayout(course.getGroupCreatedId(), false, 0);
 		%>
-		<liferay-ui:search-container-column-text name="edition">
+		<liferay-ui:search-container-column-text name="edition" orderable="true" orderableProperty="title">
 
 		<c:choose>
 		
@@ -151,22 +151,22 @@ if( permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), "com.liferay
 			</liferay-ui:search-container-column-text>
 		</c:if>
 		<c:if test="${showInscriptionDate}">
-			<liferay-ui:search-container-column-text name="course-admin.start-inscription-date">
+			<liferay-ui:search-container-column-text name="course-admin.start-inscription-date" orderable="true" orderableProperty="startDate">
 				<%=dateFormatDateTime.format(course.getStartDate()) %>
 			</liferay-ui:search-container-column-text>
-			<liferay-ui:search-container-column-text name="course-admin.end-inscription-date">
+			<liferay-ui:search-container-column-text name="course-admin.end-inscription-date" orderable="true" orderableProperty="endDate">
 				<%=dateFormatDateTime.format(course.getEndDate()) %>
 			</liferay-ui:search-container-column-text>
 		</c:if>
 		<c:if test="${showExecutionDate}">
-			<liferay-ui:search-container-column-text name="course-admin.start-execution-date">
+			<liferay-ui:search-container-column-text name="course-admin.start-execution-date" orderable="true" orderableProperty="executionStartDate">
 				<% if(course.getExecutionStartDate()!=null){%>
 						<%= dateFormatDateTime.format(course.getExecutionStartDate())%>
 					<% }else{%>
 						<%= "-"%>
 					<%}%>
 			</liferay-ui:search-container-column-text>
-			<liferay-ui:search-container-column-text name="course-admin.end-execution-date">
+			<liferay-ui:search-container-column-text name="course-admin.end-execution-date" orderable="true" orderableProperty="executionEndDate">
 				<% if(course.getExecutionEndDate()!=null){%>
 						<%= dateFormatDateTime.format(course.getExecutionEndDate())%>
 					<% }else{%>

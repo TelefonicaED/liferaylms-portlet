@@ -650,8 +650,14 @@ if(isCourseChild){
 	
 		<%
 		List<Long> courseEvalIds = new ArrayList<Long>();
-		if(courseType!=null){
+		if(courseType!=null && courseType.getCourseEvalTypeIds()!=null && courseType.getCourseEvalTypeIds().size()>0){
 			courseEvalIds = courseType.getCourseEvalTypeIds();
+			
+			if((course!=null)&&(!courseEvalIds.contains(course.getCourseEvalId()))) {
+				courseEvalIds.add(course.getCourseEvalId());
+			}
+			
+			
 		}else{
 			courseEvalIds = ListUtil.toList(StringUtil.split(LmsPrefsLocalServiceUtil.getLmsPrefsIni(themeDisplay.getCompanyId()).getCourseevals(),",",0L));
 		}
@@ -750,7 +756,7 @@ if(isCourseChild){
 			</liferay-util:include>
 		</div>
 	<%	
-		if(courseType==null){
+		if(courseType==null || courseType.getTemplates() == null || courseType.getTemplates().size()<=0){
 			String[] layusprsel=null;
 			if(renderRequest.getPreferences().getValue("courseTemplates", null)!=null&&renderRequest.getPreferences().getValue("courseTemplates", null).length()>0)
 			{
@@ -787,7 +793,15 @@ if(isCourseChild){
 			%>
 			<aui:select name="courseTemplate" label="course-template" disabled="<%=(course==null)?false:true %>">
 			<%
-			for(LayoutSetPrototype template:courseType.getTemplates()){
+			List<LayoutSetPrototype> courseTypeTemplates = courseType.getTemplates();
+			if(templateParent>0){
+				LayoutSetPrototype courseTemplate = LayoutSetPrototypeLocalServiceUtil.fetchLayoutSetPrototype(templateParent);
+				if(courseTemplate!=null && !courseTypeTemplates.contains(courseTemplate)){
+					courseTypeTemplates.add(courseTemplate);
+				}
+			}
+			
+			for(LayoutSetPrototype template:courseTypeTemplates){
 				%>
 				<aui:option value="<%=template.getLayoutSetPrototypeId() %>" selected="<%=templateParent == template.getLayoutSetPrototypeId() %>"><%=template.getName(themeDisplay.getLocale()) %></aui:option>
 				<%
@@ -811,8 +825,11 @@ if(isCourseChild){
 		<%}
 		
 		List <Long> califications = new ArrayList<Long>();
-		if(courseType!=null){
+		if(courseType!=null && courseType.getCalificationTypeIds()!=null && courseType.getCalificationTypeIds().size()>0){
 			califications = courseType.getCalificationTypeIds();
+			if((course!=null)&&(!califications.contains(course.getCalificationType()))) {
+				califications.add(course.getCalificationType());
+			}
 		}else{
 			califications = ListUtil.toList(StringUtil.split(LmsPrefsLocalServiceUtil.getLmsPrefsIni(themeDisplay.getCompanyId()).getScoretranslators(),",",0L));
 		}
@@ -901,8 +918,11 @@ if(isCourseChild){
    	  <liferay-ui:panel title="lms-inscription-configuration" collapsible="true" defaultState="closed" cssClass="<%=(showInscriptionDate||showMaxUsers)?StringPool.BLANK:\"aui-helper-hidden\" %>">
    	  		<%
    	  	List <Long> inscriptions = new ArrayList<Long>();
-   	  	if(courseType != null){
+   	  	if(courseType != null && courseType.getInscriptionTypeIds()!=null && courseType.getInscriptionTypeIds().size()>0){
    	  		inscriptions = courseType.getInscriptionTypeIds();
+	   	  	if((course!=null)&&(!inscriptions.contains(course.getInscriptionType()))) {
+	   	  		inscriptions.add(course.getInscriptionType());
+			}
    	  	} else {
    	  		inscriptions = ListUtil.toList(StringUtil.split(LmsPrefsLocalServiceUtil.getLmsPrefsIni(themeDisplay.getCompanyId()).getInscriptionTypes(),",",0L));
    	  	}

@@ -30,7 +30,6 @@ import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
 import javax.portlet.ResourceURL;
 
-import com.liferay.lms.auditing.AuditingLogFactory;
 import com.liferay.lms.course.adminaction.AdminActionTypeRegistry;
 import com.liferay.lms.model.AsynchronousProcessAudit;
 import com.liferay.lms.model.Course;
@@ -41,6 +40,10 @@ import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.lms.service.CourseServiceUtil;
 import com.liferay.lms.service.CourseTypeLocalServiceUtil;
 import com.liferay.lms.service.LmsPrefsLocalServiceUtil;
+import com.liferay.lms.threads.ImportCsvAssignUsersThread;
+import com.liferay.lms.threads.ImportCsvThread;
+import com.liferay.lms.threads.ImportCsvThreadMapper;
+import com.liferay.lms.threads.ImportCsvUnassignUsersThread;
 import com.liferay.lms.threads.ImportEditionsThread;
 import com.liferay.lms.threads.ImportUsersCourseThread;
 import com.liferay.lms.threads.ImportUsersCourseThreadMapper;
@@ -71,6 +74,7 @@ import com.liferay.portal.kernel.util.FriendlyURLNormalizerUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
@@ -94,7 +98,6 @@ import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portlet.PortletPreferencesFactoryUtil;
 import com.liferay.portlet.announcements.EntryDisplayDateException;
-import com.liferay.portlet.asset.model.AssetCategory;
 import com.liferay.portlet.asset.model.AssetEntry;
 import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
 import com.liferay.portlet.asset.service.AssetTagLocalServiceUtil;
@@ -102,7 +105,9 @@ import com.liferay.portlet.expando.model.ExpandoColumn;
 import com.liferay.portlet.expando.model.ExpandoTableConstants;
 import com.liferay.portlet.expando.service.ExpandoColumnLocalServiceUtil;
 import com.liferay.util.EditionsImportExport;
+import com.liferay.util.UsersImportExport;
 import com.tls.lms.util.CourseOrderByCreationDate;
+import com.tls.lms.util.CourseOrderByDate;
 import com.tls.lms.util.CourseOrderByTitle;
 import com.tls.lms.util.LiferaylmsUtil;
 
@@ -121,6 +126,7 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 	private String editionsJSP = null;
 	private String newEditionJSP = null;
 	private String roleMembersJSP = null;
+	private static String PORTLET_DETAIL_NAME = "coursedetail";
 	
 	public void init() throws PortletException {	
 		viewJSP = getInitParameter("view-template");
@@ -138,6 +144,7 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 		configLmsPrefsJSP = getInitParameter("config-lms-prefs");
 		editionsJSP = getInitParameter("editions-template");
 		newEditionJSP = getInitParameter("new-edition-template");
+	
 	}
 
 	public static String DOCUMENTLIBRARY_MAINFOLDER = "ResourceUploads"; 
@@ -157,13 +164,17 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 		} catch (SystemException e1) {
 			e1.printStackTrace();
 		}
-		
 		if(lmsPrefs != null){		
 			String jsp = renderRequest.getParameter("view");
 			if(log.isDebugEnabled())log.debug("VIEW "+jsp);
 			try {
 				if(jsp == null || "".equals(jsp)){
-					showViewDefault(renderRequest, renderResponse);
+					if(themeDisplay.getPortletDisplay().getPortletName().equalsIgnoreCase(PORTLET_DETAIL_NAME)){
+						showViewEditCourse(renderRequest, renderResponse);
+					}else{
+						showViewDefault(renderRequest, renderResponse);
+					}
+					
 				}else if("course-types".equals(jsp)){
 					showViewCourseTypes(renderRequest, renderResponse);
 				}else if("edit-course".equals(jsp)){
@@ -229,16 +240,36 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 		include(this.courseTypesJSP, renderRequest, renderResponse);
 	}
 	
-	private void showViewEditCourse(RenderRequest renderRequest,RenderResponse renderResponse) throws IOException, PortletException{
+	public void showViewEditCourse(RenderRequest renderRequest,RenderResponse renderResponse) throws IOException, PortletException{
 		
 		ThemeDisplay themeDisplay = (ThemeDisplay)renderRequest.getAttribute(WebKeys.THEME_DISPLAY);
-		
-		AdminActionTypeRegistry registry =  new AdminActionTypeRegistry();
-		renderRequest.setAttribute("adminActionTypes", registry.getAdminActionTypes());
-		
-		PortletURL backURL = renderResponse.createRenderURL();
-		renderRequest.setAttribute("backURL", backURL);
-		
+		if(themeDisplay.getPortletDisplay().getPortletName().equalsIgnoreCase(PORTLET_DETAIL_NAME)){
+			long groupId = themeDisplay.getScopeGroupId();
+			
+			Course course = null;
+			try {
+				course = CourseLocalServiceUtil.fetchByGroupCreatedId(groupId);
+			} catch (SystemException e) {
+				log.error("No se ha encontrado ningún curso con el groupCreatedId=" + groupId, e);
+			}
+			
+			if (Validator.isNotNull(course)) {
+				AdminActionTypeRegistry registry =  new AdminActionTypeRegistry();
+				renderRequest.setAttribute("adminActionTypes", registry.getAdminActionTypes());
+				
+				renderRequest.setAttribute("course", course);
+			}
+			
+			
+		}else{
+			AdminActionTypeRegistry registry =  new AdminActionTypeRegistry();
+			renderRequest.setAttribute("adminActionTypes", registry.getAdminActionTypes());
+			
+			PortletURL backURL = renderResponse.createRenderURL();
+			renderRequest.setAttribute("backURL", backURL);
+			
+			
+		}
 		include(this.editCourseJSP, renderRequest, renderResponse);
 	}
 	
@@ -919,7 +950,15 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 		if(Validator.isNotNull(orderByCol) && orderByCol.equals("title")){
 			obc = new CourseOrderByTitle(themeDisplay, orderByType.equals("asc"));
 		}else if(Validator.isNotNull(orderByCol) && orderByCol.equals("createDate")){
-			obc = new CourseOrderByCreationDate(orderByType.equals("asc"));
+			obc = new CourseOrderByDate(orderByType.equals("asc"),"createDate");
+		}else if(Validator.isNotNull(orderByCol) && orderByCol.equals("startDate")){
+			obc = new CourseOrderByDate(orderByType.equals("asc"),"startDate");
+		}else if(Validator.isNotNull(orderByCol) && orderByCol.equals("endDate")){
+			obc = new CourseOrderByDate(orderByType.equals("asc"),"endDate");
+		}else if(Validator.isNotNull(orderByCol) && orderByCol.equals("executionStartDate")){
+			obc = new CourseOrderByDate(orderByType.equals("asc"),"executionStartDate");
+		}else if(Validator.isNotNull(orderByCol) && orderByCol.equals("executionEndDate")){
+			obc = new CourseOrderByDate(orderByType.equals("asc"),"executionEndDate");
 		}
 		
 		searchContainer.setOrderByCol(orderByCol);
@@ -1429,9 +1468,92 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 	}
 	
 	
+	//Importacion de usuarios en csv
+	public void readImportFromCsv(ActionRequest actionRequest, ActionResponse actionResponse){
+		
+		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
+		
+		log.debug("::Import Users From Csv::");
+		
+		UploadPortletRequest uploadPortletRequest = PortalUtil.getUploadPortletRequest(actionRequest);
+		
+		String fileName = uploadPortletRequest.getFileName("fileName");
+		String importType = ParamUtil.getString(uploadPortletRequest, "importType", StringPool.BLANK);
+		long roleId = ParamUtil.getLong(uploadPortletRequest, "importAssignUsersRole", -1);
+		String authType = PropsUtil.get(PropsKeys.COMPANY_SECURITY_AUTH_TYPE);
+		
+		if(log.isDebugEnabled()){
+			log.debug("::readFile::fileName: "+ fileName);
+			log.debug("::readFile::importType: "+ importType);
+			log.debug("::readFile::roleId: "+ roleId);
+			log.debug("::readFile::authType: "+ authType);
+		}
+		
+		if(roleId==-1){
+			
+			SessionErrors.add(actionRequest, "import.csv.users.role-required");
+			log.error("::Role required::");
+			
+		} else if(Validator.isNull(fileName)) {
+			
+			SessionErrors.add(actionRequest, "import.csv.users.file-required");
+			log.error("::File required::");
+			
+		} else if(Validator.isNull(importType) || StringPool.BLANK.equals(importType)){
+				
+				SessionErrors.add(actionRequest,  "import.csv.users.error");
+				log.error(":: ImportType ?? ::");
+		
+		} else {
+				
+			String idThread = UUID.randomUUID().toString();
+			log.debug("idThread: " + idThread);		
+			
+			InputStream file = null;
+			try {
+				file = uploadPortletRequest.getFileAsStream("fileName");
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			
+			if(uploadPortletRequest.getFile("fileName").length()> 2 * 1024 * 1024){
+				
+				SessionErrors.add(actionRequest, "import.csv.users.bad-format.size");
+			
+			} else 	if (!fileName.endsWith(".csv")) { 
+				
+				SessionErrors.add(actionRequest, "import.csv.users.bad-format");	
+			
+			} else {
+			
+				ImportCsvThread thread = null;
+				
+				switch (importType) {
+				
+					case "assignUsers":
+						thread = new ImportCsvAssignUsersThread(roleId, authType, file, idThread, themeDisplay);
+						break;
+					
+					case "unassignUsers":
+						thread = new ImportCsvUnassignUsersThread(roleId, authType, file, idThread, themeDisplay);
+						break;
+		
+					default:
+						break;
+				}
+				
+				ImportCsvThreadMapper.addThread(idThread, thread);
+				actionResponse.setRenderParameter("UUID", idThread);
+				actionResponse.setRenderParameter("importType", importType);
+			}
+		}
+	}
+	
+	
 	//---Resource
 	@Override
 	public void serveResource(ResourceRequest request, ResourceResponse response) throws IOException, PortletException {
+
 		log.debug("serveResource");
 		if(request.getResourceID() != null){
 			log.debug("request.getResourceID(): " + request.getResourceID());
@@ -1468,7 +1590,13 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 		
 			ThemeDisplay themeDisplay = (ThemeDisplay) request.getAttribute(WebKeys.THEME_DISPLAY);
 			
-			if(request.getResourceID() != null && request.getResourceID().equals("importEditionsResultsReport")){
+			if(Validator.isNotNull(request.getResourceID()) && request.getResourceID().equals("importUsersFromCsvExample")){
+				log.debug("::Import Users From CSV Example::");
+				UsersImportExport.importUsersFromCsvExample(request, response);
+			} else if(Validator.isNotNull(request.getResourceID()) && request.getResourceID().equals("importUsersFromCsv")){
+				log.debug("::Import Users From CSV::");
+				UsersImportExport.importUsersFromCsv(request, response);
+			} else if(request.getResourceID() != null && request.getResourceID().equals("importEditionsResultsReport")){
 				EditionsImportExport.generateImportReport(request, response);
 			}else if(request.getResourceID() != null && request.getResourceID().equals("exportEditions")){
 				EditionsImportExport.generateReportEditions(request, response, themeDisplay);
@@ -1536,8 +1664,6 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 			super.serveResource(request, response);
 		}
 	}
-	
-	
 
 }
 
