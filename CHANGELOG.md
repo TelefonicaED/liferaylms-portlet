@@ -3,6 +3,7 @@ Todos los cambios de este proyecto estarán documentados en este archivo.
 
 El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 
+
 ## [4.6.0](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v4.6.0)
 
 ### Added
@@ -18,7 +19,21 @@ El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 - #198695: Cambiado el metodo de softInitializeCourseResult para que lo de iniciado en actividades scorm, mpc y xapi. Anteriormente
   se daba por iniciada la actividad pero no el curso
   
-- #199064: Corregido el problema con la importación, estaba dando el rol 0, ahora se establece el rol correctamente.
+- #199064: Corregido el problema con la importación, estaba dando el rol 0, ahora se establece el rol correctamente
+
+
+## [4.5.3](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v4.5.3)
+
+### Updated
+
+- #200139: Cambios en los metodos de obtencion de los intentos para un mejor rendimiento. Se cambiand DynamicQuerys por CustomQuerys que devuelven un unico resultado cuando solo se necesita el primero.
+
+
+## [4.5.2](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v4.5.2)
+
+### Updated
+
+- Cambios en el registry de las actividades para mejorar rendimiento, establecidas las variables a estáticas para evitar que se lean en cada acceso.
 
 
 ## [4.5.0](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v4.5.0)

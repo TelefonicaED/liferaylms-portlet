@@ -217,51 +217,43 @@ public class LearningActivityTryLocalServiceImpl
 	
 	@SuppressWarnings("unchecked")
 	public LearningActivityTry getLastLearningActivityTryByActivityAndUser(long actId,long userId) throws SystemException, PortalException
-	{ 			
-		DynamicQuery consulta = DynamicQueryFactoryUtil.forClass(LearningActivityTry.class, (ClassLoader)PortletBeanLocatorUtil.locate(ClpSerializer.getServletContextName(),
-				"portletClassLoader"))
-					.add(PropertyFactoryUtil.forName("actId").eq(new Long(actId)))
-					.add(PropertyFactoryUtil.forName("userId").eq(new Long(userId)))
-					.addOrder(PropertyFactoryUtil.forName("endDate").desc());
-					
-		List<LearningActivityTry> activities = (List<LearningActivityTry>)learningActivityTryPersistence.findWithDynamicQuery(consulta);
-
-		for(LearningActivityTry activity:activities){
-			//Necesitamos la primera, que est� ordenada por la �ltima realizada.
-			return activity;
-		}
-		return null;		
+	{ 		
+		return learningActivityTryFinder.findLastLearningActivityTryFinishedByUserAndActId(actId, userId);
+		
 	}
 	@SuppressWarnings("unchecked")	
 	public LearningActivityTry createOrDuplicateLast(long actId,ServiceContext serviceContext) throws SystemException, PortalException
 	{ 	
-		DynamicQuery consulta = DynamicQueryFactoryUtil.forClass(LearningActivityTry.class, (ClassLoader)PortletBeanLocatorUtil.locate(ClpSerializer.getServletContextName(),
-				"portletClassLoader"))
-					.add(PropertyFactoryUtil.forName("actId").eq(new Long(actId)))
-					.add(PropertyFactoryUtil.forName("userId").eq(new Long(serviceContext.getUserId())))
-					.addOrder(PropertyFactoryUtil.forName("startDate").desc());
-					
-		List<LearningActivityTry> activities = (List<LearningActivityTry>)learningActivityTryPersistence.findWithDynamicQuery(consulta);
-				
-		LearningActivityTry  lastTry=null;
-		if(activities!=null && activities.size()>0){
-		   lastTry=activities.get(0);
-			for(LearningActivityTry lat:activities){
-				if(lat.getEndDate() == null){
-					lat.setEndDate(lat.getStartDate());
-					super.updateLearningActivityTry(lat, false);
-				}
-			}
-		}
 		
+		
+		LearningActivityTry  lastTry= learningActivityTryFinder.findLastLearningActivityTryCreateByUsersAndActId(actId, serviceContext.getUserId());
 		if(lastTry==null){
 			return createLearningActivityTry(actId, serviceContext);
 		}else{
+			
+			//Completamos la fechafin de los abiertos
+			List<LearningActivityTry> activities = learningActivityTryFinder.findLearningActivityTryNotFinishedByUsersAndActId(actId, serviceContext.getUserId());
+			if(activities!=null && activities.size()>0){
+				for(LearningActivityTry lat:activities){
+					if(lat.getEndDate() == null){
+						lat.setEndDate(lat.getStartDate());
+						super.updateLearningActivityTry(lat, false);
+					}
+				}
+			}
+			
+			
+			
+			//Creamos el nuevo try 
 			LearningActivityTry newTry=createLearningActivityTry(actId, serviceContext);
 			newTry.setResult(lastTry.getResult());
 			newTry.setTryData(lastTry.getTryData());
 			newTry.setTryResultData(lastTry.getTryResultData());
 			updateLearningActivityTry(newTry);
+			
+			
+			
+			
 			return newTry;
 		}
 		
@@ -269,20 +261,8 @@ public class LearningActivityTryLocalServiceImpl
 	@SuppressWarnings("unchecked")
 	public LearningActivityTry getLearningActivityTryNotFinishedByActUser(long actId,long userId) throws SystemException, PortalException
 	{ 			
-		DynamicQuery consulta = DynamicQueryFactoryUtil.forClass(LearningActivityTry.class, (ClassLoader)PortletBeanLocatorUtil.locate(ClpSerializer.getServletContextName(),
-				"portletClassLoader"))
-					.add(PropertyFactoryUtil.forName("actId").eq(new Long(actId)))
-					.add(PropertyFactoryUtil.forName("userId").eq(new Long(userId)))
-					.add(PropertyFactoryUtil.forName("endDate").isNull())
-					.addOrder(PropertyFactoryUtil.forName("startDate").desc());
-					
-		List<LearningActivityTry> activities = (List<LearningActivityTry>)learningActivityTryPersistence.findWithDynamicQuery(consulta);
-
-		for(LearningActivityTry activity:activities){
-			//Necesitamos la primera, que est� ordenada por la �ltima realizada.
-			return activity;
-		}
-		return null;		
+		return learningActivityTryFinder.findLastLearningActivityTryNotFinishedByUsersAndActId(actId, userId);
+		
 	}
 	
 	public int getTriesCountByActivityAndUser(long actId,long userId) throws SystemException, PortalException

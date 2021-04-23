@@ -2546,9 +2546,7 @@
 	<portlet>
 		<portlet-name>coursedetail</portlet-name>
 		<display-name>Course Detail Portlet</display-name>
-		<portlet-class>
-			com.liferay.lms.CourseDetailPortlet
-		</portlet-class>
+		<portlet-class>com.liferay.lms.CourseAdmin</portlet-class>
 		<init-param>
 			<name>view-template</name>
 			<value>/html/coursedetail/view.jsp</value>

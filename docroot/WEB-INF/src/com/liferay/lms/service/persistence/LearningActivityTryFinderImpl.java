@@ -3,6 +3,7 @@ package com.liferay.lms.service.persistence;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import com.liferay.lms.model.LearningActivityTry;
@@ -36,6 +37,15 @@ public class LearningActivityTryFinderImpl extends BasePersistenceImpl<LearningA
 	public static final String FIND_LAST_LEARNING_ACTIVITY_TRY_CREATE_BY_USER_AND_ACT =
 			LearningActivityTryFinder.class.getName() +
 		        ".findLastLearningActivityTryCreateByUsersAndActId";
+	public static final String FIND_LAST_LEARNING_ACTIVITY_TRY_FINISHED_BY_USER_AND_ACT =
+			LearningActivityTryFinder.class.getName() +
+		        ".findLastLearningActivityTryFinishedByUserAndActId";
+	public static final String FIND_LAST_LEARNING_ACTIVITY_TRY_NOT_FINISHED_BY_USER_AND_ACT =
+			LearningActivityTryFinder.class.getName() +
+		        ".findLastLearningActivityTryNotFinishedByUsersAndActId";
+	public static final String FIND_LEARNING_ACTIVITY_TRY_NOT_FINISHED_BY_USER_AND_ACT =
+			LearningActivityTryFinder.class.getName() +
+		        ".findLearningActivityTryNotFinishedByUsersAndActId";
 	
 	public long triesPerUserOnlyStudents(long actId, long companyId, long courseGropupCreatedId, List<User> _students, long teamId) throws SystemException {
 		Session session = null;
@@ -130,9 +140,129 @@ public class LearningActivityTryFinderImpl extends BasePersistenceImpl<LearningA
 			qPos.add(actId);
 			qPos.add(userId);
 			
-			List<LearningActivityTry> latList = (List<LearningActivityTry>) QueryUtil.list(q, getDialect(), 0, 1);
-			if (!latList.isEmpty()) {
-				learningActivityTry = latList.get(0);
+			Iterator<LearningActivityTry> itr = q.iterate();
+
+			if (itr.hasNext()) {
+				learningActivityTry = itr.next();
+
+				if (learningActivityTry != null) {
+					return learningActivityTry;
+				}
+			}
+			
+		} catch (Exception e) {
+	       e.printStackTrace();
+	    } finally {
+	        closeSession(session);
+	    }
+	
+	    return learningActivityTry;
+	}
+	
+	
+	
+	
+	
+	public List<LearningActivityTry> findLearningActivityTryNotFinishedByUsersAndActId(long actId, long userId){
+		List<LearningActivityTry> latList = new ArrayList<LearningActivityTry>();
+		Session session = null;
+		try{
+			
+			String sql = CustomSQLUtil.get(FIND_LEARNING_ACTIVITY_TRY_NOT_FINISHED_BY_USER_AND_ACT);
+			
+			session = openSession();			
+			
+			log.debug("sql: " + sql);
+			
+			SQLQuery q = session.createSQLQuery(sql);
+			q.addEntity("lat", LearningActivityTryImpl.class);
+
+			QueryPos qPos = QueryPos.getInstance(q);
+			qPos.add(actId);
+			qPos.add(userId);
+			
+			latList = (List<LearningActivityTry>) q.list();
+			
+			
+		} catch (Exception e) {
+	       e.printStackTrace();
+	    } finally {
+	        closeSession(session);
+	    }
+	
+	    return latList;
+	}
+	
+	
+	
+	
+	public LearningActivityTry findLastLearningActivityTryNotFinishedByUsersAndActId(long actId, long userId){
+		LearningActivityTry learningActivityTry = null;
+		Session session = null;
+		try{
+			
+			String sql = CustomSQLUtil.get(FIND_LAST_LEARNING_ACTIVITY_TRY_NOT_FINISHED_BY_USER_AND_ACT);
+			
+			session = openSession();			
+			
+			log.debug("sql: " + sql);
+			
+			SQLQuery q = session.createSQLQuery(sql);
+			q.addEntity("lms_learningactivitytry", LearningActivityTryImpl.class);
+
+			QueryPos qPos = QueryPos.getInstance(q);
+			qPos.add(actId);
+			qPos.add(userId);
+			
+			Iterator<LearningActivityTry> itr = q.iterate();
+
+			if (itr.hasNext()) {
+				learningActivityTry = itr.next();
+
+				if (learningActivityTry != null) {
+					return learningActivityTry;
+				}
+			}
+			
+			
+			
+		} catch (Exception e) {
+	       e.printStackTrace();
+	    } finally {
+	        closeSession(session);
+	    }
+	
+	    return learningActivityTry;
+	}
+	
+	
+	
+	public LearningActivityTry findLastLearningActivityTryFinishedByUserAndActId(long actId, long userId){
+		LearningActivityTry learningActivityTry = null;
+		Session session = null;
+		try{
+			
+			String sql = CustomSQLUtil.get(FIND_LAST_LEARNING_ACTIVITY_TRY_FINISHED_BY_USER_AND_ACT);
+			
+			session = openSession();			
+			
+			log.debug("sql: " + sql);
+			
+			SQLQuery q = session.createSQLQuery(sql);
+			q.addEntity("lat", LearningActivityTryImpl.class);
+
+			QueryPos qPos = QueryPos.getInstance(q);
+			qPos.add(actId);
+			qPos.add(userId);
+			
+			Iterator<LearningActivityTry> itr = q.iterate();
+
+			if (itr.hasNext()) {
+				learningActivityTry = itr.next();
+
+				if (learningActivityTry != null) {
+					return learningActivityTry;
+				}
 			}
 			
 		} catch (Exception e) {
