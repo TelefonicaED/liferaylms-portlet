@@ -7,6 +7,7 @@ El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- #175577: Añadidos campos de fecha de inicio y final al email de bienvenida del curso.
 - #198292: Añadida la posibilidad de ordenar las ediciones de un curso
 
 ### Updated
