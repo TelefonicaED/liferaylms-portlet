@@ -1,10 +1,13 @@
 <%@page import="java.util.Locale"%>
 <%@page import="com.liferay.portal.kernel.util.ArrayUtil"%>
 <%@page import="com.liferay.portlet.asset.service.AssetCategoryLocalServiceUtil"%>
+<%@page import="com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil"%>
+<%@page import="com.liferay.portlet.asset.model.AssetEntry"%>
 <%@page import="com.liferay.portlet.asset.model.AssetCategory"%>
 <%@page import="com.liferay.lms.service.CourseLocalServiceUtil"%>
 <%@page import="com.liferay.lms.model.Course"%>
 <%@page import="com.liferay.lms.service.CourseTypeLocalServiceUtil"%>
+
 <%@ include file="/init.jsp" %>
 
 <div class="portlet-toolbar search-form">
@@ -53,7 +56,6 @@
 	
 		<liferay-ui:search-container-row className="com.liferay.lms.model.Course" keyProperty="courseId" modelVar="course">
 			<%
-			
 			Group groupsel= GroupLocalServiceUtil.getGroup(course.getGroupCreatedId());
 			Layout initCourseLayout = LayoutLocalServiceUtil.fetchFirstLayout(course.getGroupCreatedId(), false, 0);
 			long countStudents = CourseLocalServiceUtil.getStudentsFromCourseCount(course.getCourseId());
@@ -139,6 +141,27 @@
 					</c:if>     			
 				</liferay-ui:search-container-column-text>
 			</c:if>
+							
+			<liferay-ui:search-container-column-text name ="course-admin.is-published">
+			<% 
+			 AssetEntry entry=null;
+			 boolean visibleencatalogo=false;
+			 long assetEntryId=0;
+			 
+			entry = AssetEntryLocalServiceUtil.getEntry(Course.class.getName(),course.getCourseId());
+			assetEntryId=entry.getEntryId();
+			visibleencatalogo=entry.getVisible();		
+			%>		
+				<c:choose>
+					<c:when test="<%= visibleencatalogo %>">
+						<liferay-ui:message key="course-admin.is-published.yes"/>
+					</c:when>
+					<c:otherwise>
+						<liferay-ui:message key="course-admin.is-published.no"/>
+					</c:otherwise>
+				</c:choose>
+			</liferay-ui:search-container-column-text>
+				
 			<c:if test="${renderRequest.preferences.getValue('createDateColumn', 'false')}">
 				<liferay-ui:search-container-column-text name="create-date" orderable="true" orderableProperty="createDate">
 					<%=dateFormatDateTime.format(course.getCreateDate()) %>

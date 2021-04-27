@@ -580,7 +580,7 @@ if(isCourseChild){
 	
 	<%
 	 boolean showCatalog = GetterUtil.getBoolean(renderRequest.getPreferences().getValues("showcatalog", new String[]{StringPool.TRUE})[0],true);
-	 boolean showCatalogForEdition = GetterUtil.getBoolean(renderRequest.getPreferences().getValue("showCourseCatalogForEditions", StringPool.FALSE),false);
+	 boolean showCatalogForEdition = GetterUtil.getBoolean(renderRequest.getPreferences().getValue("showCourseCatalogForEditions", StringPool.TRUE),true);
 	%>
 	
 	<c:if test="<%=((permissionChecker.hasPermission(themeDisplay.getScopeGroupId(),  Course.class.getName(),0,publishPermission)) &&
