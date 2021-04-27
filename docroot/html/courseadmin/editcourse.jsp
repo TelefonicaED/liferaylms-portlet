@@ -1,3 +1,4 @@
+<%@page import="java.util.TreeMap"%>
 <%@page import="com.liferay.portal.kernel.util.DateUtil"%>
 <%@page import="com.liferay.lms.service.CourseTypeLocalServiceUtil"%>
 <%@page import="com.liferay.lms.course.inscriptiontype.InscriptionType"%>
@@ -664,7 +665,14 @@ if(isCourseChild){
 		}
 		CourseEvalRegistry cer=new CourseEvalRegistry();
 		CourseEval courseEval = null;
-		if(courseEvalIds.size()>1){%>
+		if(courseEvalIds.size()>1){
+		Map<String, Long> mapCourseEvalType = new TreeMap<String, Long>();
+		for(Long ce:courseEvalIds)
+		{
+			CourseEval cel = cer.getCourseEval(ce);
+			mapCourseEvalType.put(cel.getName(locale),ce);
+		}
+		courseEvalIds = new ArrayList(mapCourseEvalType.values());%>
 			<aui:select name="courseEvalId" label="course-correction-method" helpMessage="<%=LanguageUtil.get(pageContext,\"course-correction-method-help\")%>" 
 						onChange="<%=\"javascript:\"+renderResponse.getNamespace()+\"changeEvaluationMethod(this.value);AUI().use('aui-io-request','aui-parse-content','querystring',function(A){ \"+
 								\"	var courseCombo = document.getElementById('\"+renderResponse.getNamespace()+\"courseEvalId'), \"+

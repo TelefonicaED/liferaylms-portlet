@@ -13,6 +13,7 @@ El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 ### Updated
 
 - #198251: tipos de cursos, se tienen en cuenta los inactivos, se modifica para establecer el tipo de tipo de curso en la creación y en la edición.
+- #180398: Ahora los métodos de evaluación aparecen en orden alfabético en el desplegable, sin importar el idioma seleccionado.
 
 ### Fixed
 
