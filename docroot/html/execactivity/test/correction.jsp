@@ -203,6 +203,8 @@ userSearchContainer.setTotal(totalUsers);
 		</div>
 	</aui:form>
 
+<p hidden><%= userSearchContainer.getResults().retainAll(CourseLocalServiceUtil.getStudentsFromCourse(course)) %></p>
+
 	<liferay-ui:search-container 
 		searchContainer="<%=userSearchContainer %>" 
 		iteratorURL="<%=userSearchContainer.getIteratorURL() %>"
@@ -210,7 +212,7 @@ userSearchContainer.setTotal(totalUsers);
 		>
 					
 				<liferay-ui:search-container-results 
-					total="<%=userSearchContainer.getTotal() %>" 
+					total="<%=userSearchContainer.getResults().size() %>" 
 					results="<%=userSearchContainer.getResults() %>"
 				/>
 
