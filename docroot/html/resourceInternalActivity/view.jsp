@@ -1,3 +1,4 @@
+<%@page import="com.liferay.lms.model.LearningActivityResult"%>
 <%@page import="com.liferay.lms.util.LmsConstant"%>
 <%@page import="com.liferay.portal.kernel.util.StringBundler"%>
 <%@page import="com.tls.lms.util.LiferaylmsUtil"%>
@@ -102,9 +103,9 @@ else
 				
 				if(showDoneInfo){
 					
-					LearningActivityTry lat = LearningActivityTryLocalServiceUtil.getLastLearningActivityTryByActivityAndUser(learnact.getActId(),themeDisplay.getUserId());
+					LearningActivityResult lar = LearningActivityResultLocalServiceUtil.getByActIdAndUserId(learnact.getActId(),themeDisplay.getUserId());
 					
-					if(Validator.isNotNull(lat)){
+					if(Validator.isNotNull(lar) && lar.getPassed()){
 				%>
 						<div class="description"><liferay-ui:message key="resourceinternalactivity.activitydone.message"/></div>
 				<%						
