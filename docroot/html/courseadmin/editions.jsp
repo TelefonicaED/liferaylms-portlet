@@ -192,8 +192,9 @@ if( permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), "com.liferay
 			<%=	CourseLocalServiceUtil.getStudentsFromCourseCount(course.getCourseId()) %>
 		</liferay-ui:search-container-column-text>
 		
-		<liferay-ui:search-container-column-text name ="course-admin.is-published">		
-<% 
+			<c:if test="${renderRequest.preferences.getValue('showVisibleInCatalog', 'false')}">
+			<liferay-ui:search-container-column-text name ="course-admin.is-published">
+			<% 
 			 AssetEntry entry=null;
 			 boolean visibleencatalogo=false;
 			 long assetEntryId=0;
@@ -204,14 +205,15 @@ if( permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), "com.liferay
 			%>		
 				<c:choose>
 					<c:when test="<%= visibleencatalogo %>">
-						<liferay-ui:message key="course-admin.is-published.yes"/>
+						<liferay-ui:message key="yes"/>
 					</c:when>
 					<c:otherwise>
-						<liferay-ui:message key="course-admin.is-published.no"/>
+						<liferay-ui:message key="no"/>
 					</c:otherwise>
 				</c:choose>
-		</liferay-ui:search-container-column-text>
-		
+			</liferay-ui:search-container-column-text>
+			</c:if>
+					
 		<%
 		if( permissionChecker.hasPermission(course.getGroupId(), Course.class.getName(), course.getCourseId(), ActionKeys.UPDATE)
 			||permissionChecker.hasPermission(course.getGroupId(), Course.class.getName(), course.getCourseId(), ActionKeys.DELETE)

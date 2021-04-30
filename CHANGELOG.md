@@ -9,7 +9,7 @@ El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 
 - #198292: Añadida la posibilidad de ordenar las ediciones de un curso
 
-- #166531: Añadida una columna en la tabla configurable de cursos que indica si el curso padre o la edición está publicada o no en el catálogo. Ahora también se permite publicar o no las ediciones en el catálogo. 
+- #166531: Añadida una columna en la tabla configurable de cursos que indica si el curso padre o la edición está publicada o no en el catálogo.  
 
 ### Updated
 

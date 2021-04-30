@@ -101,6 +101,8 @@ public class CourseAdminConfigurationAction implements ConfigurationAction {
 		portletPreferences.setValue("showExpandos", Boolean.toString(ParamUtil.getBoolean(actionRequest, "showExpandos", false)));
 		portletPreferences.setValue("showExpandosEdition", Boolean.toString(ParamUtil.getBoolean(actionRequest, "showExpandosEdition", false)));
 		
+		portletPreferences.setValue("showVisibleInCatalog", Boolean.toString(ParamUtil.getBoolean(actionRequest, "showVisibleInCatalog", false)));
+
 		//Mostrar acciones din�micas
 		try{
 			AdminActionTypeRegistry registry =  new AdminActionTypeRegistry();

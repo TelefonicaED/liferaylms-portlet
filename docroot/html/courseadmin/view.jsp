@@ -141,7 +141,8 @@
 					</c:if>     			
 				</liferay-ui:search-container-column-text>
 			</c:if>
-							
+			
+			<c:if test="${renderRequest.preferences.getValue('showVisibleInCatalog', 'false')}">
 			<liferay-ui:search-container-column-text name ="course-admin.is-published">
 			<% 
 			 AssetEntry entry=null;
@@ -154,13 +155,14 @@
 			%>		
 				<c:choose>
 					<c:when test="<%= visibleencatalogo %>">
-						<liferay-ui:message key="course-admin.is-published.yes"/>
+						<liferay-ui:message key="yes"/>
 					</c:when>
 					<c:otherwise>
-						<liferay-ui:message key="course-admin.is-published.no"/>
+						<liferay-ui:message key="no"/>
 					</c:otherwise>
 				</c:choose>
 			</liferay-ui:search-container-column-text>
+			</c:if>
 				
 			<c:if test="${renderRequest.preferences.getValue('createDateColumn', 'false')}">
 				<liferay-ui:search-container-column-text name="create-date" orderable="true" orderableProperty="createDate">
