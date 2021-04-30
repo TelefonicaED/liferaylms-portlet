@@ -8,6 +8,7 @@ El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 ### Added
 
 - #188000: Añadida nueva etiqueta del nombre de pila del usuario en los mailings del mensaje bienvenida y de baja de cursos
+- #191542: Al duplicar una edición o curso hay que configurar las fechas de ejecucion además de las de inscripción
 
 ## [4.5.0](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v4.5.0)
 

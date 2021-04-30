@@ -73,6 +73,7 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
@@ -611,6 +612,141 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 		
 		ThemeDisplay themeDisplay = (ThemeDisplay)renderRequest.getAttribute(WebKeys.THEME_DISPLAY);
 		
+TimeZone timeZone = themeDisplay.getTimeZone();
+		
+		long groupId = ParamUtil.getLong(renderRequest, "groupId", 0);
+		
+		try{
+			Group groupObj = GroupLocalServiceUtil.getGroup(groupId);
+			Course course = CourseLocalServiceUtil.getCourseByGroupCreatedId(groupId);
+			
+			boolean isCourseChild = false;
+			String courseTitle = "course";
+			if(course!=null){
+				if(course.getParentCourseId()>0){
+					isCourseChild=true;
+				}
+				
+				courseTitle = course.getTitle(themeDisplay.getLocale());	
+				String newCourseName = groupObj.getName()+"_"+Time.getShortTimestamp();
+				renderRequest.setAttribute("isCourseChild", isCourseChild);
+				renderRequest.setAttribute("courseTitle", courseTitle);
+				renderRequest.setAttribute("groupId", groupId);
+				renderRequest.setAttribute("newCourseName", newCourseName);
+				
+				String[] layusprsel=null;
+				if(renderRequest.getPreferences().getValue("courseTemplates", null)!=null&&renderRequest.getPreferences().getValue("courseTemplates", null).length()>0)
+				{
+						layusprsel=renderRequest.getPreferences().getValue("courseTemplates", "").split(",");
+				}
+				String[] lspList=LmsPrefsLocalServiceUtil.getLmsPrefsIni(themeDisplay.getCompanyId()).getLmsTemplates().split(",");
+				if(layusprsel!=null && layusprsel.length>0)
+				{
+					lspList=layusprsel;
+				}
+								
+				if(lspList.length>1){
+					List<LayoutSetPrototype> prototypeList = new ArrayList<LayoutSetPrototype>();
+					for(String lspId: lspList){
+						prototypeList.add(LayoutSetPrototypeLocalServiceUtil.getLayoutSetPrototype(Long.parseLong(lspId)));						
+					}
+
+					renderRequest.setAttribute("lspList", prototypeList);
+					renderRequest.setAttribute("viewTemplateSelector", true);
+				}else{
+					LayoutSetPrototype lsp=LayoutSetPrototypeLocalServiceUtil.getLayoutSetPrototype(Long.parseLong(lspList[0]));
+					renderRequest.setAttribute("lspId", lsp.getLayoutSetPrototypeId());
+					renderRequest.setAttribute("viewTemplateSelector", false);
+				}
+								
+						
+				SimpleDateFormat formatDay = new SimpleDateFormat("dd");
+				formatDay.setTimeZone(timeZone);
+				SimpleDateFormat formatMonth = new SimpleDateFormat("MM");
+				formatMonth.setTimeZone(timeZone);
+				SimpleDateFormat formatYear = new SimpleDateFormat("yyyy");
+				formatYear.setTimeZone(timeZone);
+				SimpleDateFormat formatHour = new SimpleDateFormat("HH");
+				formatHour.setTimeZone(timeZone);
+				SimpleDateFormat formatMin = new SimpleDateFormat("mm");
+				formatMin.setTimeZone(timeZone);
+				Date today=course.getStartDate();
+				if(Validator.isNull(today)){
+					today = new Date();
+				}
+				int startDay=Integer.parseInt(formatDay.format(today));
+				int startMonth=Integer.parseInt(formatMonth.format(today))-1;
+				int startYear=Integer.parseInt(formatYear.format(today));
+				int startHour=Integer.parseInt(formatHour.format(today));
+				int startMin=Integer.parseInt(formatMin.format(today));
+				
+				today = course.getEndDate();
+				if(Validator.isNull(today)){
+					today = new Date();
+				}
+				
+				int endDay=Integer.parseInt(formatDay.format(today));
+				int endMonth=Integer.parseInt(formatMonth.format(today))-1;
+				int endYear=Integer.parseInt(formatYear.format(today));
+				int endHour=Integer.parseInt(formatHour.format(today));
+				int endMin=Integer.parseInt(formatMin.format(today));
+				//Inscription Date
+				renderRequest.setAttribute("startDay", startDay);
+				renderRequest.setAttribute("startMonth", startMonth);
+				renderRequest.setAttribute("startYear", startYear);
+				renderRequest.setAttribute("startHour", startHour);
+				renderRequest.setAttribute("startMin", startMin);
+				renderRequest.setAttribute("defaultStartYear", LiferaylmsUtil.defaultStartYear);
+				renderRequest.setAttribute("defaultEndYear", LiferaylmsUtil.defaultEndYear);
+				renderRequest.setAttribute("endDay", endDay);
+				renderRequest.setAttribute("endMonth", endMonth);
+				renderRequest.setAttribute("endYear", endYear);
+				renderRequest.setAttribute("endHour", endHour);
+				renderRequest.setAttribute("endMin", endMin);
+				
+				
+				today = course.getExecutionStartDate();
+				
+				if(Validator.isNull(today)){
+					today = new Date();
+				}
+				startDay=Integer.parseInt(formatDay.format(today));
+				startMonth=Integer.parseInt(formatMonth.format(today))-1;
+				startYear=Integer.parseInt(formatYear.format(today));
+				startHour=Integer.parseInt(formatHour.format(today));
+				startMin=Integer.parseInt(formatMin.format(today));
+				
+				today = course.getExecutionEndDate();
+				
+				if(Validator.isNull(today)){
+					today = new Date();
+				}
+				endDay=Integer.parseInt(formatDay.format(today));
+				endMonth=Integer.parseInt(formatMonth.format(today))-1;
+				endYear=Integer.parseInt(formatYear.format(today));
+				endHour=Integer.parseInt(formatHour.format(today));
+				endMin=Integer.parseInt(formatMin.format(today));
+				
+				//Execution Date
+				renderRequest.setAttribute("startExecutionDay", startDay);
+				renderRequest.setAttribute("startExecutionMonth", startMonth);
+				renderRequest.setAttribute("startExecutionYear", startYear);
+				renderRequest.setAttribute("startExecutionHour", startHour);
+				renderRequest.setAttribute("startExecutionMin", startMin);
+				renderRequest.setAttribute("defaultStartYear", LiferaylmsUtil.defaultStartYear);
+				renderRequest.setAttribute("defaultEndYear", LiferaylmsUtil.defaultEndYear);
+				renderRequest.setAttribute("endExecutionDay", endDay);
+				renderRequest.setAttribute("endExecutionMonth", endMonth);
+				renderRequest.setAttribute("endExecutionYear", endYear);
+				renderRequest.setAttribute("endExecutionHour", endHour);
+				renderRequest.setAttribute("endExecutionMin", endMin);
+				
+			}
+		}catch(Exception e){
+			e.printStackTrace();
+		}	
+		
+		
 		include(this.cloneJSP, renderRequest, renderResponse);
 	}
 	
@@ -1081,7 +1217,7 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 		}
 	}
 
-	public void cloneCourse(ActionRequest actionRequest, ActionResponse actionResponse) throws Exception {
+public void cloneCourse(ActionRequest actionRequest, ActionResponse actionResponse) throws Exception {
 		
 		ThemeDisplay themeDisplay = (ThemeDisplay) actionRequest.getAttribute(WebKeys.THEME_DISPLAY);	
 		ServiceContext serviceContext = ServiceContextFactory.getInstance(Course.class.getName(), actionRequest);
@@ -1093,6 +1229,8 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 		boolean cloneDocuments = ParamUtil.getBoolean(actionRequest, "cloneDocuments");
 		boolean cloneModuleClassification = ParamUtil.getBoolean(actionRequest, "cloneModuleClassification");
 		boolean cloneActivityClassificationTypes = ParamUtil.getBoolean(actionRequest, "cloneActivityClassificationTypes");
+		
+		/*
 		int startMonth = 	ParamUtil.getInteger(actionRequest, "startMon");
 		int startYear = 	ParamUtil.getInteger(actionRequest, "startYear");
 		int startDay = 		ParamUtil.getInteger(actionRequest, "startDay");
@@ -1114,6 +1252,54 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 			stopHour += 12;
 		}
 		Date endDate = PortalUtil.getDate(stopMonth, stopDay, stopYear, stopHour, stopMinute, themeDisplay.getTimeZone(), EntryDisplayDateException.class);
+		*/
+		
+		//Inscription Date
+		int startMonth = 	ParamUtil.getInteger(actionRequest, "startMon");
+		int startYear = 	ParamUtil.getInteger(actionRequest, "startYear");
+		int startDay = 		ParamUtil.getInteger(actionRequest, "startDay");
+		int startHour = 	ParamUtil.getInteger(actionRequest, "startHour");
+		int startMinute = 	ParamUtil.getInteger(actionRequest, "startMin");
+		int startAMPM = 	ParamUtil.getInteger(actionRequest, "startAMPM");
+		if (startAMPM > 0) {
+			startHour += 12;
+		}
+		Date startDate = PortalUtil.getDate(startMonth, startDay, startYear, startHour, startMinute, themeDisplay.getTimeZone(), EntryDisplayDateException.class);
+		
+		int stopMonth = 	ParamUtil.getInteger(actionRequest, "stopMon");
+		int stopYear = 		ParamUtil.getInteger(actionRequest, "stopYear");
+		int stopDay = 		ParamUtil.getInteger(actionRequest, "stopDay");
+		int stopHour = 		ParamUtil.getInteger(actionRequest, "stopHour");
+		int stopMinute = 	ParamUtil.getInteger(actionRequest, "stopMin");
+		int stopAMPM = 		ParamUtil.getInteger(actionRequest, "stopAMPM");
+		if (stopAMPM > 0) {
+			stopHour += 12;
+		}
+		Date endDate = PortalUtil.getDate(stopMonth, stopDay, stopYear, stopHour, stopMinute, themeDisplay.getTimeZone(), EntryDisplayDateException.class);
+		
+		startMonth = 	ParamUtil.getInteger(actionRequest, "startExecutionMon");
+		startYear = 	ParamUtil.getInteger(actionRequest, "startExecutionYear");
+		startDay = 		ParamUtil.getInteger(actionRequest, "startExecutionDay");
+		startHour = 	ParamUtil.getInteger(actionRequest, "startExecutionHour");
+		startMinute = 	ParamUtil.getInteger(actionRequest, "startExecutionMin");
+		startAMPM = 	ParamUtil.getInteger(actionRequest, "startExecutionAMPM");
+		if(startAMPM > 0) {
+			startHour += 12;
+		}
+		Date startExecutionDate = PortalUtil.getDate(startMonth, startDay, startYear, startHour, startMinute, themeDisplay.getTimeZone(), EntryDisplayDateException.class);
+		
+		stopMonth = 	ParamUtil.getInteger(actionRequest, "stopExecutionMon");
+		stopYear = 		ParamUtil.getInteger(actionRequest, "stopExecutionYear");
+		stopDay = 		ParamUtil.getInteger(actionRequest, "stopExecutionDay");
+		stopHour = 		ParamUtil.getInteger(actionRequest, "stopExecutionHour");
+		stopMinute = 	ParamUtil.getInteger(actionRequest, "stopExecutionMin");
+		stopAMPM = 		ParamUtil.getInteger(actionRequest, "stopExecutionAMPM");
+		if (stopAMPM > 0) {
+			stopHour += 12;
+		}
+		Date endExecutionDate = PortalUtil.getDate(stopMonth, stopDay, stopYear, stopHour, stopMinute, themeDisplay.getTimeZone(), EntryDisplayDateException.class);
+		
+		
 		
 		//CloneCourseThread cloneThread = new CloneCourseThread(groupId, newCourseName, themeDisplay, startDate, endDate, serviceContext);
 		//Thread thread = new Thread(cloneThread);
@@ -1151,8 +1337,12 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 				message.put("groupId",groupId);
 				message.put("newCourseName",newCourseName);
 				message.put("themeDisplay",themeDisplay);
+				/*message.put("startDate",startDate);
+				message.put("endDate",endDate);*/
 				message.put("startDate",startDate);
 				message.put("endDate",endDate);
+				message.put("startExecutionDate",startExecutionDate);
+				message.put("endExecutionDate",endExecutionDate);
 				message.put("serviceContext",serviceContext);
 				message.put("visible",visible);
 				message.put("cloneForum", cloneForum);
