@@ -652,6 +652,7 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 		long courseId = ParamUtil.getLong(renderRequest, "courseId", 0);
 		String search = ParamUtil.getString(renderRequest, "search","");
 		String freetext = ParamUtil.getString(renderRequest, "freetext","");
+		boolean findInEditions = ParamUtil.getBoolean(renderRequest, "findInEditions", false);
 		String tags = ParamUtil.getString(renderRequest, "tags","");
 		int state = ParamUtil.getInteger(renderRequest, "state",WorkflowConstants.STATUS_APPROVED);
 		long selectedGroupId = ParamUtil.get(renderRequest,"selectedGroupId",-1);
@@ -750,6 +751,7 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 		}
 		if(ParamUtil.getString(renderRequest, "search").equals("search")){
 			portletSession.setAttribute(prefix+"freetext", freetext);
+			portletSession.setAttribute(prefix + "findInEditions", Boolean.valueOf(findInEditions));
 			portletSession.setAttribute(prefix+"state", state);
 			portletSession.setAttribute(prefix+"assetCategoryIds", assetCategoryIds);
 			portletSession.setAttribute(prefix+"assetTagIds", tagsSelIds);
@@ -774,6 +776,11 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 			}catch(Exception e){
 				log.debug(e);
 			}
+			try {
+		        findInEditions = GetterUtil.getBoolean(portletSession.getAttribute(prefix + "findInEditions"), false);
+		      } catch (Exception e) {
+		        log.debug(e);
+		      } 
 			try{
 				ArrayList<Long> assetCategoryIdsTemp = (ArrayList<Long>)portletSession.getAttribute(prefix+"assetCategoryIds");
 				if(assetCategoryIdsTemp!=null){
@@ -825,6 +832,7 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 		PortletURL portletURL = renderResponse.createRenderURL();
 		portletURL.setParameter("javax.portlet.action","doView");
 		portletURL.setParameter("freetext",freetext);
+		portletURL.setParameter("findInEditions", String.valueOf(findInEditions));
 		portletURL.setParameter("selectedGroupId", String.valueOf(selectedGroupId));
 		portletURL.setParameter("state",String.valueOf(state));
 		
@@ -899,6 +907,7 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 				null, emptyResultsMessage);
 		
 		log.debug("freetext: " + freetext);
+		log.debug("findInEditions: " + findInEditions);
 		log.debug("closed: " + closed);
 		log.debug("categoryIds: " + categoryIds);
 		log.debug("tagsSelIds: " + tagsSelIds);
@@ -911,6 +920,7 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 		log.debug("isAdmin: " + isAdmin);
 		
 		LinkedHashMap<String, Object> params = new LinkedHashMap<String, Object>();
+		params.put(CourseParams.PARAM_FIND_IN_EDITIONS, Boolean.valueOf(findInEditions));
 		if(categoryIds != null && categoryIds.length > 0){
 			params.put(CourseParams.PARAM_AND_CATEGORIES, categoryIds);
 		}
@@ -975,6 +985,7 @@ public class CourseAdmin extends BaseCourseAdminPortlet {
 		renderRequest.setAttribute("catId", catId);
 		renderRequest.setAttribute("search", search);
 		renderRequest.setAttribute("freetext", freetext);
+		renderRequest.setAttribute("findInEditions", Boolean.valueOf(findInEditions));
 		renderRequest.setAttribute("tags", tags);
 		renderRequest.setAttribute("state", state);
 		renderRequest.setAttribute("catIdsText", catIdsText);

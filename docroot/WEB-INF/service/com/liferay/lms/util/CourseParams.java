@@ -59,6 +59,10 @@ public class CourseParams {
 	 * Filtrar por la fecha de fin de ejecución del curso
 	 */
 	public static final String PARAM_EXECUTION_END_DATE = "executionEndDate";
+	/**
+     * Filtrar para buscar en ediciones
+     */
+	public static final String PARAM_FIND_IN_EDITIONS = "findInEditions";
 	
 	public static final int STUDENTS_TYPE_ALL = 0;
 	

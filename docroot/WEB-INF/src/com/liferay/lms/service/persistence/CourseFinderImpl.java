@@ -67,6 +67,8 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 	public static final String COUNT_C_T_D_S_PC_G =
 		    CourseFinder.class.getName() +
 		        ".countC_T_D_S_PC_G";
+	public static final String JOIN_BY_CHILDCOURSE = CourseFinder.class
+	    .getName() + ".joinC_ChildCourse";
 	public static final String JOIN_BY_ASSET_ENTRY =
 		    CourseFinder.class.getName() +
 		        ".joinC_ByAssetEntry";
@@ -116,6 +118,8 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			CourseFinder.class.getName() + ".whereType";
 	public static final String WHERE_TITLE_DESCRIPTION = 
 			CourseFinder.class.getName() + ".whereTitleDescription";
+    public static final String WHERE_CHILD_TITLE_DESCRIPTION = CourseFinder.class.getName()
+        + ".whereChildTitleDescription";
 	public static final String WHERE_GROUP_ID = 
 			CourseFinder.class.getName() + ".whereGroupId";
 	public static final String WHERE_STATUS = 
@@ -466,8 +470,9 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 					join = StringUtil.replace(join, "[$CATEGORYIDS$]", String.valueOf(categories[i]));
 				}
 			}
-		}
-		else if (value instanceof CustomSQLParam) {
+		}else if (key.equals(CourseParams.PARAM_FIND_IN_EDITIONS) && ((Boolean)value).booleanValue()) {
+		      join = join + CustomSQLUtil.get(JOIN_BY_CHILDCOURSE);
+	    } else if (value instanceof CustomSQLParam) {
 			CustomSQLParam customSQLParam = (CustomSQLParam)value;
 
 			join = customSQLParam.getSQL();
@@ -492,7 +497,9 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 		StringBundler sb = new StringBundler(params.size());
 
 		Iterator<Map.Entry<String, Object>> itr = params.entrySet().iterator();
-
+        boolean findInEditions =
+            (params.containsKey(CourseParams.PARAM_FIND_IN_EDITIONS) && ((Boolean) params
+                .get(CourseParams.PARAM_FIND_IN_EDITIONS)).booleanValue());
 		while (itr.hasNext()) {
 			Map.Entry<String, Object> entry = itr.next();
 
@@ -500,7 +507,7 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 
 			Object value = entry.getValue();
 
-			sb.append(getWhere(key, value, languageId));
+			sb.append(getWhere(key, value, findInEditions, languageId));
 		}
 
 		
@@ -509,7 +516,7 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 		return sb.toString();
 	}
 
-	protected String getWhere(String key, Object value, String languageId) {
+	protected String getWhere(String key, Object value, boolean findInEditions, String languageId) {
 		String join = StringPool.BLANK;
 		
 		log.debug("where: " + key + " - " + value);
@@ -570,6 +577,13 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 		else if (key.equals(PARAM_TITLE_DESCRIPTION)) {
 			join = CustomSQLUtil.get(WHERE_TITLE_DESCRIPTION);
 			join = StringUtil.replace(join, "[$LANGUAGE$]", languageId);
+            if (findInEditions) {
+                String edition = CustomSQLUtil.get(WHERE_CHILD_TITLE_DESCRIPTION);
+                edition = StringUtil.replace(edition, "[$LANGUAGE$]", languageId);
+                join = StringUtil.replace(join, "[$FINDINEDITIONS$]", edition);
+            } else {
+                join = StringUtil.replace(join, "[$FINDINEDITIONS$]", "false");
+            }
 		}
 		else if (key.equals(PARAM_GROUP_ID)) {
 			join = CustomSQLUtil.get(WHERE_GROUP_ID);
@@ -653,20 +667,27 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 				log.debug("*****QPOS****** Parent Course Id: " + valueLong);
 			}else if(key.equals(PARAM_TITLE_DESCRIPTION)){
 				String[] valueArray = (String[])value;
-				
+				boolean findInEditions =
+		            (params.containsKey(CourseParams.PARAM_FIND_IN_EDITIONS) && ((Boolean) params
+		                .get(CourseParams.PARAM_FIND_IN_EDITIONS)).booleanValue());
 				for (String element : valueArray) {
 					if (Validator.isNotNull(element)) {
 						qPos.add(element);
 						qPos.add(element);
 						log.debug("*****QPOS****** " + key + ": " + element);
 						log.debug("*****QPOS****** " + key + ": " + element);
+                        if (findInEditions) {
+                            qPos.add(element);
+                            qPos.add(element);
+                            this.log.debug("*****QPOS****** findInEditions: " + element);
+                            this.log.debug("*****QPOS****** findInEditions: " + element);
+                        }
 					}
 				}
-			
 			}else if(!key.equals(CourseParams.PARAM_CATEGORIES) && !key.equals(CourseParams.PARAM_TAGS) &&
 					!key.equals(CourseParams.PARAM_AND_TAGS) && !key.equals(CourseParams.PARAM_AND_CATEGORIES) &&
 					!key.equals(CourseParams.PARAM_PERMISSIONS_ADMIN) && !key.equals(CourseParams.PARAM_SEARCH_PARENT_AND_CHILD_COURSES)
-					&& !key.equals(CourseParams.PARAM_PERMISSIONS_VIEW)){
+					&& !key.equals(CourseParams.PARAM_PERMISSIONS_VIEW) && !key.equals(CourseParams.PARAM_FIND_IN_EDITIONS)){
 				if (value instanceof Long) {
 					Long valueLong = (Long)value;
 	
