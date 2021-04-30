@@ -447,6 +447,33 @@
 	top: 0;
 	right: 0; 
 }
+.generic-pop-up .pop-up-content .close {
+  position: absolute;
+  right: 12px;
+  top: 12px;
+  width: 22px;
+  height: 22px;
+  opacity: 0.3;
+  cursor: pointer;
+}
+.generic-pop-up .pop-up-content .close:hover {
+  opacity: 1; 
+}
+.generic-pop-up .pop-up-content .close:before,
+.generic-pop-up .pop-up-content .close:after {
+  position: absolute;
+  left: 15px;
+  content: ' ';
+  height: 23px;
+  width: 2px;
+  background-color: #333; 
+}
+.generic-pop-up .pop-up-content .close:before {
+  transform: rotate(45deg); 
+}
+.generic-pop-up .pop-up-content .close:after {
+  transform: rotate(-45deg); 
+}
 
 .lmsactivitieslist-portlet .lms-desplegable {
   width: 100%;
