@@ -74,6 +74,9 @@ if(catIds!=null&&catIds.length>0)
 			<aui:input inlineField="true" name="freetext" type="text" value="${freetext}" >
 				<aui:validator name="maxLength">150</aui:validator>
 			</aui:input>
+			<c:if test="${empty courseId }">
+			<aui:input inlineField="true" name="findInEditions" label="course-admin.findInEditions" type="checkbox" value="${findInEditions}" helpMessage="help.course-admin.findInEditions" />
+			</c:if>
 			<aui:select inlineField="true" name="state">
 				<aui:option label="active" selected="${state == STATUS_APPROVED}" value="${STATUS_APPROVED}" />
 				<aui:option label="inactive" selected="${state == STATUS_INACTIVE}" value="${STATUS_INACTIVE}" />

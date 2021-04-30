@@ -161,9 +161,18 @@
 	<sql id="com.liferay.lms.service.persistence.CourseFinder.whereTitleDescription">
 		WHERE 
 		(
+			(
 			(IF (ExtractValue(Lms_Course.title, '//Title[@language-id=\"[$LANGUAGE$]\"]' )='', ExtractValue(Lms_Course.title, '//root[@default-locale]//Title'), ExtractValue(Lms_Course.title, '//Title[@language-id=\"[$LANGUAGE$]\"]' )) LIKE ? [$AND_OR_NULL_CHECK$]) [$AND_OR_CONNECTOR$]
 			(IF (ExtractValue(Lms_Course.description, '//Description[@language-id=\"[$LANGUAGE$]\"]' )='', ExtractValue(Lms_Course.description, '//root[@default-locale]//Description' ), ExtractValue(Lms_Course.description, '//Description[@language-id=\"[$LANGUAGE$]\"]' )) LIKE ? [$AND_OR_NULL_CHECK$])
+			) OR
+			(
+				[$FINDINEDITIONS$]
+			)
 		) 
+	</sql>
+	<sql id="com.liferay.lms.service.persistence.CourseFinder.whereChildTitleDescription">	 
+			(IF (ExtractValue(childcourse.title, '//Title[@language-id=\"[$LANGUAGE$]\"]' )='', ExtractValue(childcourse.title, '//root[@default-locale]//Title'), ExtractValue(childcourse.title, '//Title[@language-id=\"[$LANGUAGE$]\"]' )) LIKE ? [$AND_OR_NULL_CHECK$]) [$AND_OR_CONNECTOR$]
+			(IF (ExtractValue(childcourse.description, '//Description[@language-id=\"[$LANGUAGE$]\"]' )='', ExtractValue(childcourse.description, '//root[@default-locale]//Description' ), ExtractValue(childcourse.description, '//Description[@language-id=\"[$LANGUAGE$]\"]' )) LIKE ? [$AND_OR_NULL_CHECK$])	
 	</sql>
 	<sql id="com.liferay.lms.service.persistence.CourseFinder.whereGroupId">
 		<![CDATA[
@@ -194,6 +203,13 @@
 		<![CDATA[
 			WHERE
 				(Lms_Course.parentCourseId = ? OR (0 = ? AND Lms_Course.parentCourseId IS NULL))
+		]]>
+	</sql>
+	<sql id="com.liferay.lms.service.persistence.CourseFinder.joinC_ChildCourse">
+		<![CDATA[
+			LEFT JOIN 
+				Lms_Course childcourse 
+					ON childcourse.parentCourseId = Lms_Course.courseId
 		]]>
 	</sql>
 	<sql id="com.liferay.lms.service.persistence.CourseFinder.joinC_ByAssetEntry">
