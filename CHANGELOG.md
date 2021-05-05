@@ -21,6 +21,8 @@ El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
   
 - #199064: Corregido el problema con la importación, estaba dando el rol 0, ahora se establece el rol correctamente
 
+- #177715: Corregido "Cuando cierras un curso y después se reabre, lo pone como publicado en catálogo" actualizando solo si está cerrado o abierto el curso, y no su visibilidad
+
 
 ## [4.5.3](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v4.5.3)
 
