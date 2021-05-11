@@ -1,3 +1,6 @@
+<%@page import="com.liferay.portal.kernel.xml.Element"%>
+<%@page import="com.liferay.portal.kernel.xml.SAXReaderUtil"%>
+<%@page import="com.liferay.portal.kernel.xml.Document"%>
 <%@page import="com.liferay.lms.service.LearningActivityTryLocalServiceUtil"%>
 <%@page import="com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil"%>
 <%@page import="com.liferay.portal.kernel.dao.orm.Criterion"%>
@@ -21,6 +24,7 @@ long resModuleId = ParamUtil.getLong(request, "resModuleId");
 long assetId=ParamUtil.getLong(request, "assertId");
 String assetTitle=StringPool.BLANK;
 String disabled = "disabled=\"disabled\"";
+boolean showDoneInfo = false;
 
 
 
@@ -38,6 +42,14 @@ LearningActivity learningActivity=(LearningActivity)request.getAttribute("activi
 if(learningActivity!=null) {	
 	if ((learningActivity.getExtracontent()!=null)&&(learningActivity.getExtracontent().trim().length()!=0)) {
 		try{
+			Document document = SAXReaderUtil.read(learningActivity.getExtracontent());
+			Element root=document.getRootElement();
+			Element doneInfoElement=root.element("show-done-info");
+			if(Validator.isNotNull(doneInfoElement)){
+				
+				showDoneInfo = Boolean.parseBoolean(doneInfoElement.getText());
+			}
+			
 			if(assetId==0){
 				AssetEntry entry=AssetEntryLocalServiceUtil.getEntry(
 					GetterUtil.getLong(LearningActivityLocalServiceUtil.getExtraContentValue(learningActivity.getActId(),"assetEntry")));
@@ -79,6 +91,8 @@ if(LearningActivityLocalServiceUtil.canBeEdited(learningActivity, user.getUserId
 <div id="<portlet:namespace/>backButton" style="display:none;">
 	<liferay-ui:icon image="back" message="back" url="<%=\"javascript:\"+renderResponse.getNamespace()+\"back();\" %>" label="true"  />
 </div>
+
+<aui:input type="checkbox" label="resourceinternalactivity.showdoneinfo.message" name="showDoneInfo"  value="<%= showDoneInfo %>" />
 
 <script type="text/javascript">
 

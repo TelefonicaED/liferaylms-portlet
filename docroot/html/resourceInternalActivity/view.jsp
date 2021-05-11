@@ -1,3 +1,4 @@
+<%@page import="com.liferay.lms.model.LearningActivityResult"%>
 <%@page import="com.liferay.lms.util.LmsConstant"%>
 <%@page import="com.liferay.portal.kernel.util.StringBundler"%>
 <%@page import="com.tls.lms.util.LiferaylmsUtil"%>
@@ -57,6 +58,7 @@ else
 {
 
 	LearningActivity learnact=LearningActivityLocalServiceUtil.getLearningActivity(ParamUtil.getLong(request,"actId"));
+	boolean showDoneInfo = false;
 	
 	%>
 		<h2 class="description-title"><%=learnact.getTitle(themeDisplay.getLocale())%></h2>
@@ -96,6 +98,24 @@ else
 				}
 			}
 			if(learnact.getExtracontent()!=null &&!learnact.getExtracontent().trim().equals("") ){
+				showDoneInfo = GetterUtil.getBoolean(LearningActivityLocalServiceUtil.getExtraContentValue(learnact.getActId(), "show-done-info"), false);				
+				pageContext.setAttribute("showDoneInfo", showDoneInfo);
+				
+				if(showDoneInfo){
+					
+					LearningActivityResult lar = LearningActivityResultLocalServiceUtil.getByActIdAndUserId(learnact.getActId(),themeDisplay.getUserId());
+					
+					if(Validator.isNotNull(lar) && lar.getPassed()){
+				%>
+						<div class="description"><liferay-ui:message key="resourceinternalactivity.activitydone.message"/></div>
+				<%						
+					}else{						
+				%>
+						<div class="description"><liferay-ui:message key="resourceinternalactivity.activitynotdone.message"/></div>
+				<%						
+					}
+				}
+				
 				long entryId = GetterUtil.getLong(LearningActivityLocalServiceUtil.getExtraContentValue(learnact.getActId(),"assetEntry"),0);
 				
 				if(entryId!=0){

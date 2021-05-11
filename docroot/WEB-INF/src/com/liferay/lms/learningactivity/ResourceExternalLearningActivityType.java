@@ -28,6 +28,7 @@ import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.DocumentException;
@@ -124,6 +125,7 @@ public class ResourceExternalLearningActivityType extends QuestionLearningActivi
 		
 		String youtubecode=ParamUtil.getString(uploadRequest,"youtubecode");
 		boolean videoControlEnabled=ParamUtil.getBoolean(uploadRequest,"videoControl");
+		boolean showScoreInfo=ParamUtil.getBoolean(uploadRequest,"showScoreInfo");
 		String team = ParamUtil.getString(uploadRequest, "team","0");
 		long teamId = 0;
 		if(!team.equalsIgnoreCase("0")&&!team.isEmpty()){
@@ -193,7 +195,18 @@ public class ResourceExternalLearningActivityType extends QuestionLearningActivi
 			
 			videoControl = SAXReaderUtil.createElement("video-control");
 			videoControl.setText(String.valueOf(videoControlEnabled));		
-			rootElement.add(videoControl);				
+			rootElement.add(videoControl);
+			
+			Element showScoreInfoElement = rootElement.element("show-score-info");
+			if(Validator.isNotNull(showScoreInfoElement))
+			{
+				showScoreInfoElement.detach();
+				rootElement.remove(showScoreInfoElement);
+			}
+			
+			showScoreInfoElement = SAXReaderUtil.createElement("show-score-info");
+			showScoreInfoElement.setText(String.valueOf(showScoreInfo));		
+			rootElement.add(showScoreInfoElement);	
 			
 			if(files.size()>0){
 				boolean changes = false;
