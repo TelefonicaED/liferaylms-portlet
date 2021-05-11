@@ -207,8 +207,15 @@ public class ResourceExternalActivity extends QuestionsAdmin {
 									if(videoControl!=null){
 										videoControlDisabled = Boolean.parseBoolean(videoControl.getText());
 									}
-									
 									renderRequest.setAttribute("controls", videoControlDisabled && !userPassed ? "": "controls");
+									
+									boolean showScoreInfo = false;
+									Element showScoreInfoElement = root.element("show-score-info");
+									if(Validator.isNotNull(showScoreInfoElement)){
+										showScoreInfo = Boolean.parseBoolean(showScoreInfoElement.getText());
+									}									
+									renderRequest.setAttribute("showScoreInfo", showScoreInfo);
+									
 									
 									int seekTo = 0;
 									if (videoPosition > 0 && oldScore<100){
