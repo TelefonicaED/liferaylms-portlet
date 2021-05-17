@@ -20,6 +20,7 @@ import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PrefsPropsUtil;
 import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.DocumentException;
@@ -107,6 +108,8 @@ public class ResourceInternalLearningActivityType extends BaseLearningActivityTy
 		String assetId = ParamUtil.getString(uploadRequest,"assetEntryId","0");
 		String team = ParamUtil.getString(uploadRequest, "team","0");
 		long teamId = 0;
+		boolean showDoneInfo=ParamUtil.getBoolean(uploadRequest,"showDoneInfo");
+		
 		ThemeDisplay themeDisplay = (ThemeDisplay) uploadRequest.getAttribute(WebKeys.THEME_DISPLAY);
 		if(!team.equalsIgnoreCase("0")){
 			teamId = Long.parseLong(team);
@@ -204,6 +207,16 @@ public class ResourceInternalLearningActivityType extends BaseLearningActivityTy
 				rootElement.add(teamElement);
 			}
 		}
+		
+		Element doneInfoElement=rootElement.element("show-done-info");
+		if(Validator.isNotNull(doneInfoElement))
+		{
+			doneInfoElement.detach();
+			rootElement.remove(doneInfoElement);
+		}
+		doneInfoElement = SAXReaderUtil.createElement("show-done-info");
+		doneInfoElement.setText(String.valueOf(showDoneInfo));		
+		rootElement.add(doneInfoElement);		
 		
 		learningActivity.setExtracontent(document.formattedString());
 		
