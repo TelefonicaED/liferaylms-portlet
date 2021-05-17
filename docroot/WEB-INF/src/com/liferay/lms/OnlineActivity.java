@@ -333,6 +333,7 @@ public class OnlineActivity extends MVCPortlet {
 			if(Validator.isNotNull(result) && Validator.isNull(result.getEndDate())){
 				//Si hay resultado sin corregir se actualiza el último try
 				learningActivityTry = LearningActivityTryLocalServiceUtil.getLastLearningActivityTryByActivityAndUser(actId, user.getUserId());
+				learningActivityTry.setStartDate(new Date());
 				//Si no se ha subido un archivo nuevo vuelvo a guardar el archivo que estaba guardado previamente
 				if(isSetFichero && Validator.isNull(fileName)){
 					Iterator<Node> nodeItr = SAXReaderUtil.read(learningActivityTry.getTryResultData()).getRootElement().nodeIterator();	

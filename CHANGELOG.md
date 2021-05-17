@@ -13,6 +13,7 @@ El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 ### Updated
 
 - #198251: tipos de cursos, se tienen en cuenta los inactivos, se modifica para establecer el tipo de tipo de curso en la creación y en la edición.
+- #191847: La fecha de entrega de una actividad de desarrollo se actualiza con la del último intento.
 
 ### Fixed
 
