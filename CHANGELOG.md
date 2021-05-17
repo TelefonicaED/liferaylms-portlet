@@ -13,6 +13,7 @@ El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 ### Updated
 
 - #198251: tipos de cursos, se tienen en cuenta los inactivos, se modifica para establecer el tipo de tipo de curso en la creación y en la edición.
+- #172078: Comentarios de gradebook muestran los efectos visuales de ckeditor
 
 ### Fixed
 
