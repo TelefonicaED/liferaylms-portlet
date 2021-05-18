@@ -35,6 +35,7 @@
 
 <% 
 	boolean defaultValueCheckBox=false;
+	boolean defaultShowScoreInfo = false;
 	Integer maxfile = ResourceExternalLearningActivityType.DEFAULT_FILENUMBER;
 	PortletSession psession= renderRequest.getPortletSession();
 
@@ -86,6 +87,11 @@
 			Element video=root.element("video");
 			
 			if(video!=null) youtubecode=video.getText();
+			Element showScoreInfo = root.element("show-score-info");
+			if(Validator.isNotNull(showScoreInfo)){
+				
+				defaultShowScoreInfo = Boolean.parseBoolean(showScoreInfo.getText());
+			}
 			
 			Element videoControlEnabled = root.element("video-control");
 			if(videoControlEnabled!=null) defaultValueCheckBox= Boolean.parseBoolean(videoControlEnabled.getText());
@@ -166,6 +172,8 @@
 	<% if (readonly) { %>
 		<input name="<portlet:namespace />passpuntuation" type="hidden" value="<%=score %>" />
 	<% } %>
+	
+	<aui:input type="checkbox" label="resourceexternalactivity.showscoreinfo.message" name="showScoreInfo"  value="<%= defaultShowScoreInfo %>" />
 	
 	<div id="<portlet:namespace />passpuntuationError" class="<%=((SessionErrors.contains(renderRequest, "editActivity.passpuntuation.required"))||
 														      (SessionErrors.contains(renderRequest, "editActivity.passpuntuation.number"))||
