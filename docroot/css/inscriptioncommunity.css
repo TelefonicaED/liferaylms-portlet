@@ -1,0 +1,37 @@
+.inscriptioncommunity-portlet .caja_inscripcion h2 {
+    margin: 0;
+    margin-bottom: 15px;
+    font: 22px "source_bold", sans-serif;
+}
+.inscriptioncommunity-portlet .inscription-edition {
+    padding: 20px;
+    padding-bottom: 25px;
+    margin: 0 -20px;
+    border-bottom: 1px solid #d3d8da;
+}
+.inscriptioncommunity-portlet .inscription-edition:nth-child(2) {
+    border-top: 1px solid #d3d8da;
+}
+.inscriptioncommunity-portlet .inscription-edition .aui-field-content {
+    margin: 0;
+    margin-bottom: 15px;
+}
+.inscriptioncommunity-portlet .inscription-edition .aui-field-content input[type=radio] {
+    margin: 4px;
+    margin-right: 10px;
+}
+.inscriptioncommunity-portlet .inscription-edition .aui-field-content .aui-choice-label {
+    font: 300 17px "source", sans-serif;
+}
+.inscriptioncommunity-portlet .inscription-edition .edition-dates {
+    margin-left: 25px;
+    display: flex;
+    flex-direction: column; 
+}
+.inscriptioncommunity-portlet .inscription-edition .edition-dates span:first-child {
+    font-family: "source_semibold";
+    margin-right: 5px;
+}
+.inscriptioncommunity-portlet .boton_inscibirse {
+    margin-top: 20px;
+}
