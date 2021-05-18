@@ -1161,6 +1161,12 @@ if(isCourseChild){
 								<liferay-ui:message key="the-user-screen-name" />
 							</dd>
 							<dt>
+								[$TO_FIRSTNAME$]
+							</dt>
+							<dd>
+								<liferay-ui:message key="course-admin.the-user-first-name" />
+							</dd>
+							<dt>
 								[$ROLE$]
 							</dt>
 							<dd>
