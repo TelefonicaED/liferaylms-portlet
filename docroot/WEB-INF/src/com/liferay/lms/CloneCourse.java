@@ -96,6 +96,8 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 	
 	Date startDate;
 	Date endDate;
+	Date startExecutionDate;
+	Date endExecutionDate;
 	
 	boolean visible;
 	boolean includeTeacher;
@@ -116,6 +118,8 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 		this.themeDisplay = themeDisplay;
 		this.startDate = startDate;
 		this.endDate = endDate;
+		this.startExecutionDate = startExecutionDate;
+		this.endExecutionDate = endExecutionDate;
 		this.cloneForum = cloneForum;
 		this.cloneDocuments = cloneDocuments;
 		this.cloneModuleClassification = cloneModuleClassification;
@@ -145,6 +149,8 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 			this.newCourseName = message.getString("newCourseName");
 			this.startDate 	= (Date)message.get("startDate");
 			this.endDate 	= (Date)message.get("endDate");
+			this.startExecutionDate = (Date) message.get("startExecutionDate");
+			this.endExecutionDate = (Date) message.get("endExecutionDate");
 			this.serviceContext = (ServiceContext)message.get("serviceContext");
 			this.themeDisplay = (ThemeDisplay)message.get("themeDisplay");
 			this.visible = message.getBoolean("visible");
@@ -232,8 +238,10 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 			newCourse.setGoodbyeMsg(course.getGoodbyeMsg());
 			newCourse.setGoodbyeSubject(course.getGoodbyeSubject());
 			newCourse.setCourseEvalId(course.getCourseEvalId());
-			newCourse.setExecutionStartDate(startDate);
-			newCourse.setExecutionEndDate(endDate);
+			newCourse.setStartDate(startDate);
+			newCourse.setEndDate(endDate);
+			newCourse.setExecutionStartDate(startExecutionDate);
+			newCourse.setExecutionEndDate(endExecutionDate);
 			
 			StringBuilder extraContent = new StringBuilder();
 			
@@ -401,8 +409,8 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 				
 				newModule.setAllowedTime(module.getAllowedTime());
 				newModule.setIcon(module.getIcon());
-				newModule.setStartDate(startDate);
-				newModule.setEndDate(endDate);
+				newModule.setStartDate(startExecutionDate);
+				newModule.setEndDate(endExecutionDate);
 				newModule = ModuleLocalServiceUtil.addmodule(newModule);
 				
 				correlationModules.put(module.getModuleId(), newModule.getModuleId());
@@ -471,8 +479,8 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 					newLearnActivity.setGroupId(newModule.getGroupId());
 					newLearnActivity.setModuleId(newModule.getModuleId());
 					
-					newLearnActivity.setStartdate(startDate);
-					newLearnActivity.setEnddate(endDate);
+					newLearnActivity.setStartdate(startExecutionDate);
+					newLearnActivity.setEnddate(endExecutionDate);
 					
 					if(Validator.isNotNull(activity.getDescription())) {
 					    newLearnActivity.setDescription(descriptionFilesClone(activity.getDescription(),newModule.getGroupId(), newLearnActivity.getActId(),themeDisplay.getUserId()));
