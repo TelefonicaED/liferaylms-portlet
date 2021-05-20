@@ -222,13 +222,13 @@ Liferay.provide(
 </script>
 
 <!-- Start PopUp confirmation -->
-<div id="<%= renderResponse.getNamespace() %>p2pconfirmation" style="display:none;">
+<div id="<%= renderResponse.getNamespace() %>p2pconfirmation" style="display:none;" class="popup-p2p">
 	<div class="contDesc">
-	<p><span class="label"><liferay-ui:message key="p2ptask-file-name" />:</span></p> <p><span id="contentFile"></span></p>
+		<p><span class="bold"><liferay-ui:message key="p2ptask-file-name" />:</span></p> <p><span id="contentFile"></span></p>
 	</div>
 	<br />
 	<div class="contDesc">
-		<p><span class="label"><liferay-ui:message key="p2ptask-description-task" />:</span></p> <p><span id="contentDescription"></span></p>
+		<p><span class="bold"><liferay-ui:message key="p2ptask-description-task" />:</span></p> <p><span id="contentDescription"></span></p>
 	</div>
 	<br /><br />
 	<p><liferay-ui:message key="p2ptask-description-task-confirmation-message" /></p>
@@ -240,8 +240,8 @@ Liferay.provide(
 </div>
 <!-- End PopUp confrimation -->
 
-<div id="<%= renderResponse.getNamespace() %>p2puploaded" style="display:none">
-	<h1><liferay-ui:message key="p2ptaskactivity.inc.p2puploaded.title" /></h1>
+<div id="<%= renderResponse.getNamespace() %>p2puploaded" style="display:none" class="popup-p2p">
+	<p><strong><liferay-ui:message key="p2ptaskactivity.inc.p2puploaded.title" /></strong></p>
 	<div class="desc color_tercero"><liferay-ui:message key="p2ptaskactivity.inc.p2puploaded.subtitle" /></div>
 	<br />
 	<div class="contDesc bg-icon-check">

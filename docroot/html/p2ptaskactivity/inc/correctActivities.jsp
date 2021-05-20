@@ -378,7 +378,7 @@ if(activity.getEnddate() == null){
 <!-- Start PopUp confirmation -->
 
 <div id="<portlet:namespace />p2pconfrmCorrec" style="display:none">
-	<h1><liferay-ui:message key="p2ptask-uploadcorrect-confirmation" /></h1>
+	<h1 style="color: #000000;"><liferay-ui:message key="p2ptask-uploadcorrect-confirmation" /></h1>
 	<div class="desc color_tercero"><liferay-ui:message key="p2ptask-uploadcorrect-description" /></div>
 	<br />
 	<div class="contDesc description">
@@ -391,15 +391,15 @@ if(activity.getEnddate() == null){
 					}
 		%>
 				
-				<p><span class="label"><%=des %>: </span><span id="contentDescriptionCorrec_<%=i%>"></span></p>
+				<p><span class="bold"><%=des %>: </span><span id="contentDescriptionCorrec_<%=i%>"></span></p>
 		<%		}else{
 					break;			
 				}
 			}
 		%>
-		<p><span class="label"><liferay-ui:message key="p2ptask-file-name" />: </span> <span id="contentFileCorrec"></span></p>
+		<p><span class="bold"><liferay-ui:message key="p2ptask-file-name" />: </span> <span id="contentFileCorrec"></span></p>
 		<c:if test="<%=result %>">
-			<p><span class="label"><liferay-ui:message key="p2ptask-file-result" />: </span> <span id="contentResult"></span></p>
+			<p><span class="bold"><liferay-ui:message key="p2ptask-file-result" />: </span> <span id="contentResult"></span></p>
 		</c:if>
 		<p class="message"><liferay-ui:message key="p2ptask-uploadcorrect-task-message" /></p>
 	</div>
@@ -514,7 +514,7 @@ if(!p2pActList.isEmpty()){
 		//Si no estamos en el usuario actual.
 		if(myP2PActivity.getUserId()!=userId){
 			
-			//Si la fecha de corrección es null, es que no se ha corregido la tarea.
+			//Si la fecha de correcciï¿½n es null, es que no se ha corregido la tarea.
 			if(myP2PActiCor.getDate() == null)
 			{
 				
@@ -786,7 +786,7 @@ if(!p2pActList.isEmpty()){
 				<%
 			}
 		}
-		//Mostrar sólo el numero de correcciones que debe corregir.
+		//Mostrar sï¿½lo el numero de correcciones que debe corregir.
 		contaValidations++;
 	}
 }
