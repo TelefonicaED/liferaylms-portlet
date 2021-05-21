@@ -18,7 +18,48 @@
 				lat.actId = ? 
 				AND lat.userId = ?
 			ORDER BY
-				lat.startDate DESC
+				lat.startDate DESC LIMIT 1;
+		]]>
+	</sql>
+	<sql id="com.liferay.lms.service.persistence.LearningActivityTryFinder.findLastLearningActivityTryFinishedByUserAndActId">
+		<![CDATA[   			
+			SELECT 
+				lat.*
+			FROM 
+				lms_learningactivitytry AS lat
+			WHERE 
+				lat.actId = ? 
+				AND lat.userId = ?
+			ORDER BY
+				lat.endDate DESC LIMIT 1;
+		]]>
+	</sql>
+	<sql id="com.liferay.lms.service.persistence.LearningActivityTryFinder.findLastLearningActivityTryNotFinishedByUsersAndActId">
+		<![CDATA[   			
+			SELECT 
+				lms_learningactivitytry.*
+			FROM 
+				lms_learningactivitytry 
+			WHERE 
+				lms_learningactivitytry.actId = ? 
+				AND lms_learningactivitytry.userId = ?
+				AND lms_learningactivitytry.endDate is NULL
+			ORDER BY
+				 lms_learningactivitytry.startDate DESC LIMIT 1;
+		]]>
+	</sql>
+	<sql id="com.liferay.lms.service.persistence.LearningActivityTryFinder.findLearningActivityTryNotFinishedByUsersAndActId">
+		<![CDATA[   			
+			SELECT 
+				lat.*
+			FROM 
+				lms_learningactivitytry AS lat
+			WHERE 
+				lat.actId = ? 
+				AND lat.userId = ?
+				AND lat.endDate is NULL
+			ORDER BY
+				lat.startDate DESC;
 		]]>
 	</sql>
 </custom-sql>

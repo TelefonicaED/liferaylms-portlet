@@ -7,6 +7,8 @@ El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- #188000: Añadida nueva etiqueta del nombre de pila del usuario en los mailings del mensaje bienvenida y de baja de cursos
+- #191542: Al duplicar una edición o curso hay que configurar las fechas de ejecucion además de las de inscripción
 - #198292: Añadida la posibilidad de ordenar las ediciones de un curso
 
 ### Updated
@@ -18,10 +20,21 @@ El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 - #198695: Cambiado el metodo de softInitializeCourseResult para que lo de iniciado en actividades scorm, mpc y xapi. Anteriormente
   se daba por iniciada la actividad pero no el curso
   
-- #199064: Corregido el problema con la importación, estaba dando el rol 0, ahora se establece el rol correctamente.
+- #199064: Corregido el problema con la importación, estaba dando el rol 0, ahora se establece el rol correctamente
 
-- #195809: Corrección para poder importar usuarios desde la ficha del curso. Se ha unificado la parte back de los portlets coursedetail (ficha) y courseadmin (administración).
 
+## [4.5.3](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v4.5.3)
+
+### Updated
+
+- #200139: Cambios en los metodos de obtencion de los intentos para un mejor rendimiento. Se cambiand DynamicQuerys por CustomQuerys que devuelven un unico resultado cuando solo se necesita el primero.
+
+
+## [4.5.2](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v4.5.2)
+
+### Updated
+
+- Cambios en el registry de las actividades para mejorar rendimiento, establecidas las variables a estáticas para evitar que se lean en cada acceso.
 
 ## [4.5.0](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v4.5.0)
 

@@ -16,7 +16,10 @@ package com.liferay.lms.service.impl;
 
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.PortletRequest;
@@ -50,6 +53,7 @@ import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletURL;
@@ -59,6 +63,7 @@ import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -407,7 +412,27 @@ public class ModuleLocalServiceImpl extends ModuleLocalServiceBaseImpl {
 	}
 	@Indexable(type=IndexableType.REINDEX)
 	public Module addModule(Long companyId, Long groupId, Long userId, 
+			Map<Locale, String> titleMap, Map<Locale, String> descriptionMap,
+			Date startDate, Date endDate, Long ordern) throws SystemException, PortalException{
+		return addModule(companyId, groupId, userId, titleMap, descriptionMap, startDate, endDate, ordern, null);
+	}
+	@Indexable(type=IndexableType.REINDEX)
+	public Module addModule(Long companyId, Long groupId, Long userId, 
 			String title, String description,
+			Date startDate, Date endDate, Long ordern, ServiceContext serviceContext) throws SystemException, PortalException {
+	
+		Map<Locale, String> titleMap = new HashMap<Locale, String>();
+		Locale locale = serviceContext != null ? serviceContext.getLocale(): LocaleUtil.getDefault();
+		titleMap.put(locale, title);
+		
+		Map<Locale, String> descriptionMap = new HashMap<Locale, String>();
+		descriptionMap.put(locale, description);
+		
+		return addModule(companyId, groupId, userId, titleMap, descriptionMap, startDate, endDate, ordern, serviceContext);
+	}
+	@Indexable(type=IndexableType.REINDEX)
+	public Module addModule(Long companyId, Long groupId, Long userId, 
+			Map<Locale,String> titleMap, Map<Locale,String> descriptionMap,
 			Date startDate, Date endDate, Long ordern, ServiceContext serviceContext) throws SystemException, PortalException {
 		Module fileobj = modulePersistence.create(CounterLocalServiceUtil.increment(Module.class.getName()));
 
@@ -425,8 +450,8 @@ public class ModuleLocalServiceImpl extends ModuleLocalServiceBaseImpl {
 	    fileobj.setModifiedDate(new java.util.Date(System.currentTimeMillis()));
 	    fileobj.setStartDate(startDate);
 	    fileobj.setEndDate(endDate);
-	    fileobj.setTitle(title);
-	    fileobj.setDescription(description);
+	    fileobj.setTitleMap(titleMap);
+	    fileobj.setDescriptionMap(descriptionMap);
 	    fileobj.setOrdern(ordern != null ? ordern : fileobj.getModuleId());
 	    
 	    try {

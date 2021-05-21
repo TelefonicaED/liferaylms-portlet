@@ -8,6 +8,7 @@ import javax.portlet.PortletPreferences;
 import javax.portlet.ReadOnlyException;
 import javax.portlet.ValidatorException;
 
+import com.liferay.lms.learningactivity.LearningActivityTypeRegistry;
 import com.liferay.lms.model.LmsPrefs;
 import com.liferay.lms.service.LmsPrefsLocalServiceUtil;
 import com.liferay.lms.util.LmsConstant;
@@ -25,7 +26,7 @@ import com.liferay.util.bridges.mvc.MVCPortlet;
  */
 public class LmsConfig extends MVCPortlet {
 	
-	public void changeSettings(ActionRequest request , ActionResponse response) throws Exception{
+	public void changeSettings(ActionRequest request , ActionResponse response) throws Exception{		
 		
 		String redirect = ParamUtil.get(request, "redirect", "");
 		
@@ -79,10 +80,11 @@ public class LmsConfig extends MVCPortlet {
 		savePreference(LmsConstant.PREFS_SHOW_OPTION_TEST, String.valueOf(showOptionTest), themeDisplay.getCompanyId());
 		savePreference(LmsConstant.PREFS_ACCESS_COURSE_EXECUTION_DATES, String.valueOf(accessCoursesExecutionDate), themeDisplay.getCompanyId());
 		
+		LearningActivityTypeRegistry.resetLearningActivityTypes();
+		
 		if (Validator.isNotNull(redirect)) {
 			response.sendRedirect(redirect);
 		}
-
 	}
 	
 	
