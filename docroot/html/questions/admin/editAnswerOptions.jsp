@@ -39,7 +39,10 @@
 			String titleAnswer = HtmlUtil.extractText(testanswer.getAnswer());
 			if(titleAnswer.length() > 50) titleAnswer = titleAnswer.substring(0, 50) + " ...";
 			i++;
-			String isCorrect = (testanswer.getIsCorrect())?" <img alt=\"correct\" src=\""+themeDisplay.getPathThemeImages()+"/common/checked.png\" style=\"width: 16px; height: 16px;\" /> ":" <img alt=\"incorrect\" src=\""+themeDisplay.getPathThemeImages()+"/common/close.png\" style=\"width: 16px; height: 16px;\" /> ";
+			boolean tic = testanswer.getIsCorrect();
+			String isCorrect = tic ? 
+					" <img alt=\"correct\" src=\""+themeDisplay.getPathThemeImages()+"/common/checked.png\" style=\"width: 16px; height: 16px;\" /> " :
+					" <img alt=\"incorrect\" src=\""+themeDisplay.getPathThemeImages()+"/common/close.png\" style=\"width: 16px; height: 16px;\" /> ";
 %>
 			<div id="testAnswer_<%=testanswer.getAnswerId() %>" >
 				<div id="<portlet:namespace />answerError_<%=testanswer.getAnswerId() %>" class="aui-helper-hidden portlet-msg-error">
@@ -58,7 +61,7 @@
 						<%}else{
 							index = index +1;
 						%>
-						<aui:input type="radio" name="correct_new" label="correct" value="<%=index%>" checked="<%=testanswer.getIsCorrect() %>"></aui:input>
+						<aui:input type="radio" name="correct_new" label="correct" value="<%=index%>" checked="<%=tic%>"></aui:input>
 						<%}%>
 						
 						

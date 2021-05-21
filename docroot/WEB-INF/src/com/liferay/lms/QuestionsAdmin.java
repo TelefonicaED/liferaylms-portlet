@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -345,13 +346,30 @@ public class QuestionsAdmin extends MVCPortlet{
 				//Recorro todas las respuestas y las actualizo o las creo en funcion de si son nuevas o modificaciones y si son modificaciones guardo sus ids en un array para despues borrar las que no existan.
 				String[] newAnswersIds = ParamUtil.getParameterValues(actionRequest, "answerId", null);
 				List<Long> editingAnswersIds = new ArrayList<Long>();
+				
+				//Se crea una lista conjunta respuestas antiguas (aunque se vayan a borrar después) junto a las respuestas nuevas, para realizar la edición correctamente.
+				List<String> ambasListas = new ArrayList<String>();
+				for(Long union:existingAnswersIds){
+					ambasListas.add(union.toString());
+				}
+				for(String union:newAnswersIds){
+					if(!ambasListas.contains(union)){
+						ambasListas.add(union);
+					}
+				}
+				int respuestaBorrada = -1;
+				if(!existingAnswersIds.isEmpty()){
+					Long ultimoAntiguo = existingAnswersIds.get(existingAnswersIds.size() - 1);
+					respuestaBorrada = existingAnswersIds.size() - (Arrays.asList(newAnswersIds).indexOf(ultimoAntiguo.toString())+1);
+				}
+				
 				if(newAnswersIds != null){
 					int counter = 1;
 					int trueCounter = 0;
 					if(question.getQuestionType()==2){
 						trueCounter=1;
 					}
-					for(String newAnswerId:newAnswersIds){
+					for(String newAnswerId:ambasListas){
 						String answer = ParamUtil.get(actionRequest, "answer_"+newAnswerId, "");
 						if(Validator.isNotNull(answer)){
 							boolean correct = false;
@@ -399,6 +417,10 @@ public class QuestionsAdmin extends MVCPortlet{
 								Validator.isNotNull(ParamUtil.getString(actionRequest, "feedbackNoCorrect_"+newAnswerId, "")) ||
 								ParamUtil.getBoolean(actionRequest, "correct_"+newAnswerId)==true)
 							SessionErrors.add(actionRequest, "answer-test-required");
+						else if(respuestaBorrada > 0 && trueCounter == 0){
+							counter++;
+							respuestaBorrada--;
+						}
 					}
 					if(trueCounter==0){
 						SessionErrors.add(actionRequest, "execativity.test.error");
@@ -427,7 +449,7 @@ public class QuestionsAdmin extends MVCPortlet{
 		log.debug("questionType: " + questionType);
 
 		if(SessionErrors.size(actionRequest)==0) SessionMessages.add(actionRequest, "question-modified-successfully");
-		actionResponse.getRenderParameterMap().putAll(actionRequest.getParameterMap());
+		//actionResponse.getRenderParameterMap().putAll(actionRequest.getParameterMap());
 		actionResponse.setRenderParameter("questionId", Long.toString(questionId));
 		actionResponse.setRenderParameter("actionEditingDetails", StringPool.TRUE);
 		actionResponse.setRenderParameter("resId", Long.toString(actid));

@@ -3,6 +3,12 @@ Todos los cambios de este proyecto estarán documentados en este archivo.
 
 El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 
+## [4.7.1](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v4.7.1)
+
+### Fixed
+
+- #151287: Ahora las preguntas tipo test no se guardan si no se ha seleccionado una respuesta correcta. Además, se ha corregido un problema detectado, fallaban los índices a la hora de eliminar una respuesta anterior a la correcta, que seleccionaba como nueva respuesta correcta a la siguiente de la marcada previamente, es decir, la eliminación no funcionaba correctamente.
+
 ## [4.6.0](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v4.6.0)
 
 ### Added
