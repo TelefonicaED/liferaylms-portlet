@@ -53,6 +53,7 @@ import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletURL;
@@ -62,6 +63,7 @@ import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -420,10 +422,11 @@ public class ModuleLocalServiceImpl extends ModuleLocalServiceBaseImpl {
 			Date startDate, Date endDate, Long ordern, ServiceContext serviceContext) throws SystemException, PortalException {
 	
 		Map<Locale, String> titleMap = new HashMap<Locale, String>();
-		titleMap.put(serviceContext.getLocale(), title);
+		Locale locale = serviceContext != null ? serviceContext.getLocale(): LocaleUtil.getDefault();
+		titleMap.put(locale, title);
 		
 		Map<Locale, String> descriptionMap = new HashMap<Locale, String>();
-		descriptionMap.put(serviceContext.getLocale(), description);
+		descriptionMap.put(locale, description);
 		
 		return addModule(companyId, groupId, userId, titleMap, descriptionMap, startDate, endDate, ordern, serviceContext);
 	}
