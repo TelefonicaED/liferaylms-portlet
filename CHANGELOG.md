@@ -14,6 +14,7 @@ El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 ### Updated
 
 - #198251: tipos de cursos, se tienen en cuenta los inactivos, se modifica para establecer el tipo de tipo de curso en la creación y en la edición.
+- #172078: Comentarios de gradebook muestran los efectos visuales de ckeditor
 
 ### Fixed
 
@@ -21,6 +22,8 @@ El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
   se daba por iniciada la actividad pero no el curso
   
 - #199064: Corregido el problema con la importación, estaba dando el rol 0, ahora se establece el rol correctamente
+
+- #177715: Corregido "Cuando cierras un curso y después se reabre, lo pone como publicado en catálogo" actualizando solo si está cerrado o abierto el curso, y no su visibilidad
 
 
 ## [4.5.3](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v4.5.3)

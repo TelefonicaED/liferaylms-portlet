@@ -832,9 +832,9 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 			courseGroup.setActive(false);
 			GroupLocalServiceUtil.updateGroup(courseGroup);
 			course = coursePersistence.update(course, true);		
-			AssetEntry courseAsset=AssetEntryLocalServiceUtil.getEntry(Course.class.getName(), course.getCourseId());
-			courseAsset.setVisible(false);
-			AssetEntryLocalServiceUtil.updateAssetEntry(courseAsset);
+//			AssetEntry courseAsset=AssetEntryLocalServiceUtil.getEntry(Course.class.getName(), course.getCourseId());
+//			courseAsset.setVisible(false);
+//			AssetEntryLocalServiceUtil.updateAssetEntry(courseAsset);
 
 			CourseEval courseEval=new CourseEvalRegistry().getCourseEval(course.getCourseEvalId());
 			if(Validator.isNotNull(courseEval)) {
@@ -863,9 +863,9 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 			courseGroup.setActive(true);
 			groupLocalService.updateGroup(courseGroup);
 			course = coursePersistence.update(course, true);	
-			AssetEntry courseAsset=assetEntryLocalService.getEntry(Course.class.getName(), course.getCourseId());
-			courseAsset.setVisible(true);
-			assetEntryLocalService.updateAssetEntry(courseAsset);
+//			AssetEntry courseAsset=assetEntryLocalService.getEntry(Course.class.getName(), course.getCourseId());
+//			courseAsset.setVisible(true);
+//			assetEntryLocalService.updateAssetEntry(courseAsset);
 
 			CourseEval courseEval=new CourseEvalRegistry().getCourseEval(course.getCourseEvalId());
 			if(Validator.isNotNull(courseEval)) {
