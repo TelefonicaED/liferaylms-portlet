@@ -550,7 +550,6 @@
   opacity: 0.7;
 }
 .lmsactivitieslist-portlet ul .option-none span.locked {
-  background: transparent url(/wecorp-v2-theme/images/custom/icons/locked.png) no-repeat -1% 40%;
   cursor: default;
   margin-top: -3px;
 }
@@ -1103,27 +1102,19 @@ ul.activity-list li a {
 .learningActivity.desactivado.not-started:after {
   background: transparent;
 }
-.learningActivity.desactivado.not-started a {
-  font: 1em "source_light";
-}
+
 .learningActivity.desactivado.started:after {
   background: #f5be17;
 }
-.learningActivity.desactivado.started a {
-  font: 1em "source_light";
-}
+
 .learningActivity.passed:after {
   background: #36af47;
 }
-.learningActivity.passed a {
-  font: 300 1em "source_light";
-}
+
 .learningActivity.failed:after {
   background: #B70000;
 }
-.learningActivity.failed a {
-  font: 300 1em "source_light";
-}
+
 .learningActivity.locked {
   background: transparent url(/wecorp-v2-theme/images/custom/icons/locked.png) no-repeat 1px 40%;
   opacity: 0.35;
@@ -1132,9 +1123,7 @@ ul.activity-list li a {
 .learningActivity.locked:before, .learningActivity.locked:after {
   display: none;
 }
-.learningActivity.locked a {
-  font: 300 1em "source_light";
-}
+
 .learningActivity.editing:before {
   top: 10px;
 }
