@@ -160,6 +160,7 @@
 		<aui:input type="checkbox"  label="courseadmin.config.show-friendly-url-column" name="showFriendlyUrlColumn" value="<%=preferences.getValue(\"showFriendlyUrlColumn\", StringPool.FALSE) %>" ignoreRequestValue="true"/>
 		<aui:input type="checkbox"  label="courseadmin.config.show-course-id-column" name="showCourseIdColumn" value="<%=preferences.getValue(\"showCourseIdColumn\", StringPool.FALSE) %>" ignoreRequestValue="true"/>
 		<aui:input type="checkbox"  label="courseadmin.config.show-parent-course-id-column" name="showParentCourseIdColumn" value="<%=preferences.getValue(\"showParentCourseIdColumn\", StringPool.FALSE) %>" ignoreRequestValue="true"/>
+		<aui:input type="checkbox"  label="courseadmin.config.show-visible-in-catalog" name="showVisibleInCatalog" value="<%=preferences.getValue(\"showVisibleInCatalog\", StringPool.FALSE) %>" ignoreRequestValue="true"/>
 	
 	<%
 		try{

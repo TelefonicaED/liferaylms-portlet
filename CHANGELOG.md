@@ -10,10 +10,15 @@ El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 - #188000: Añadida nueva etiqueta del nombre de pila del usuario en los mailings del mensaje bienvenida y de baja de cursos
 - #191542: Al duplicar una edición o curso hay que configurar las fechas de ejecucion además de las de inscripción
 - #198292: Añadida la posibilidad de ordenar las ediciones de un curso
+- #166531: Añadida una columna en la tabla configurable de cursos que indica si el curso padre o la edición está publicada o no en el catálogo.
+- #167478: Añadido un botón que permite exportar las preguntas realizadas en la actividad test, visible solo para los que tengan permiso VIEW_RESULTS de actividad.   
 
 ### Updated
 
 - #198251: tipos de cursos, se tienen en cuenta los inactivos, se modifica para establecer el tipo de tipo de curso en la creación y en la edición.
+
+- #196585 Se añaden traducciones en PT, EN, IT y CA indicadas en el excel
+
 
 ### Fixed
 

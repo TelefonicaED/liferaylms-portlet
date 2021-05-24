@@ -2,6 +2,8 @@
 <%@page import="com.liferay.portal.kernel.util.ArrayUtil"%>
 <%@page import="com.liferay.portlet.asset.service.AssetCategoryLocalServiceUtil"%>
 <%@page import="com.liferay.portlet.asset.model.AssetCategory"%>
+<%@page import="com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil"%>
+<%@page import="com.liferay.portlet.asset.model.AssetEntry"%>
 <%@page import="com.liferay.lms.service.CourseLocalServiceUtil"%>
 <%@page import="com.liferay.lms.model.Course"%>
 <%@ include file="/init.jsp" %>
@@ -136,7 +138,7 @@ if( permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), "com.liferay
 				<%=course.getCourseId() %>
 			</liferay-ui:search-container-column-text>
 		</c:if>
-		
+
 		<c:if test="${renderRequest.preferences.getValue('showRegistrationType', 'false')}">		
 			<liferay-ui:search-container-column-text name="registration-type">
 			    <c:if test="<%=groupsel.getType() == GroupConstants.TYPE_SITE_OPEN  %>">
@@ -189,6 +191,29 @@ if( permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), "com.liferay
 		<liferay-ui:search-container-column-text name="course-admin.number-of-members">
 			<%=	CourseLocalServiceUtil.getStudentsFromCourseCount(course.getCourseId()) %>
 		</liferay-ui:search-container-column-text>
+		
+			<c:if test="${renderRequest.preferences.getValue('showVisibleInCatalog', 'false')}">
+			<liferay-ui:search-container-column-text name ="course-admin.is-published">
+			<% 
+			 AssetEntry entry=null;
+			 boolean visibleencatalogo=false;
+			 long assetEntryId=0;
+			 
+			entry = AssetEntryLocalServiceUtil.getEntry(Course.class.getName(),course.getCourseId());
+			assetEntryId=entry.getEntryId();
+			visibleencatalogo=entry.getVisible();		
+			%>		
+				<c:choose>
+					<c:when test="<%= visibleencatalogo %>">
+						<liferay-ui:message key="yes"/>
+					</c:when>
+					<c:otherwise>
+						<liferay-ui:message key="no"/>
+					</c:otherwise>
+				</c:choose>
+			</liferay-ui:search-container-column-text>
+			</c:if>
+					
 		<%
 		if( permissionChecker.hasPermission(course.getGroupId(), Course.class.getName(), course.getCourseId(), ActionKeys.UPDATE)
 			||permissionChecker.hasPermission(course.getGroupId(), Course.class.getName(), course.getCourseId(), ActionKeys.DELETE)
@@ -204,6 +229,8 @@ if( permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), "com.liferay
 	<liferay-ui:search-iterator />
 
 </liferay-ui:search-container>
+
+
 </div>
 
 <%@ include file="/html/courseadmin/editionsimportexport.jsp" %>
