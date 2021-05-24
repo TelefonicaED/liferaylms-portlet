@@ -11,7 +11,6 @@ import com.liferay.portal.kernel.exception.NestableException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.PortletClassLoaderUtil;
-import com.liferay.portal.kernel.util.AutoResetThreadLocal;
 import com.liferay.portal.kernel.util.ClassLoaderProxy;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
@@ -143,6 +142,11 @@ public class LearningActivityTypeRegistry {
 	
 	public static List<LearningActivityType> getLearningActivityTypesForCreating() {
 		return _learningActivityTypesForCreating;
+	}
+	
+	public static void resetLearningActivityTypes(){
+		
+		_learningActivityTypes = null;
 	}
 	
 	private static  List<LearningActivityType> _learningActivityTypes = null;

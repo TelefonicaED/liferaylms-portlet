@@ -3,11 +3,12 @@ Todos los cambios de este proyecto estarán documentados en este archivo.
 
 El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 
-
 ## [4.6.0](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v4.6.0)
 
 ### Added
 
+- #188000: Añadida nueva etiqueta del nombre de pila del usuario en los mailings del mensaje bienvenida y de baja de cursos
+- #191542: Al duplicar una edición o curso hay que configurar las fechas de ejecucion además de las de inscripción
 - #198292: Añadida la posibilidad de ordenar las ediciones de un curso
 
 - #166531: Añadida una columna en la tabla configurable de cursos que indica si el curso padre o la edición está publicada o no en el catálogo.  
@@ -39,7 +40,6 @@ El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 ### Updated
 
 - Cambios en el registry de las actividades para mejorar rendimiento, establecidas las variables a estáticas para evitar que se lean en cada acceso.
-
 
 ## [4.5.0](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v4.5.0)
 

@@ -154,11 +154,13 @@ if(moduleEditing) idModuleUl = "myModule";
 
 			if (modulesList.isEmpty()){%>
 				<liferay-ui:message key="com.liferay.lms.activitieslist.notselectedmodules"/>			
-			<%}else{			
+			<%}else{
+				
+				long firstModuleId = Long.parseLong(modulesList.get(0));
+				moduleId = firstModuleId;				
 				for(Module theModule:theModules){
 						
-					if (modulesList.contains(String.valueOf(theModule.getModuleId()))){
-						
+					if (modulesList.contains(String.valueOf(theModule.getModuleId()))){					
 					
 						themeId++;
 						numActivities = LearningActivityLocalServiceUtil.countLearningActivitiesOfModule(theModule.getModuleId());
