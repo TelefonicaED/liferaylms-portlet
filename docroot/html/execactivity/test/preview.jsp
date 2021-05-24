@@ -69,9 +69,31 @@
 	<aui:button name="importButton" type="button" value="action.CORRECT"
 		last="true" href="<%=goToCorrection.toString()%>"></aui:button>
 
-	<%}
+	<%} %>
+	
+	<c:if test="${permissionChecker.hasPermission(themeDisplay.scopeGroupId, 'com.liferay.lms.model', themeDisplay.scopeGroupId, 'VIEW_RESULTS')}">
+		<liferay-ui:icon-menu direction="down" extended="false" showWhenSingleIcon="false" cssClass='bt_importexport' message="export" showArrow="true">																		
+			<liferay-portlet:resourceURL var="exportResultsCsvURL" >
+				<portlet:param name="action" value="exportResultsCsv"/>
+				<portlet:param name="resId" value="<%=Long.toString(activity.getActId()) %>"/>
+			</liferay-portlet:resourceURL>
+		<liferay-ui:icon image="export" label="<%= true %>" message="execativity.editquestions.exportcsv" method="get" url="<%=exportResultsCsvURL%>" />
+		
+			<liferay-portlet:resourceURL var="exportXmlURL" >
+				<portlet:param name="action" value="exportXml"/>
+				<portlet:param name="resId" value="<%=Long.toString(activity.getActId()) %>"/>
+			</liferay-portlet:resourceURL>
+		<liferay-ui:icon image="export" label="<%= true %>" message="execativity.editquestions.exportXml" method="get" url="<%=exportXmlURL%>" />	
+										
+			<liferay-portlet:resourceURL var="exportExcelURL" >
+				<portlet:param name="action" value="exportExcel"/>
+				<portlet:param name="resId" value="<%=Long.toString(activity.getActId()) %>"/>
+			</liferay-portlet:resourceURL>
+		<liferay-ui:icon image="export" label="<%= true %>" message="execativity.editquestions.exportExcel" method="get" url="${exportExcelURL }" />
+		</liferay-ui:icon-menu>
+	</c:if>
 				
-				int tries = LearningActivityTryLocalServiceUtil.getTriesCountByActivityAndUser(actId, themeDisplay.getUserId());
+<%				int tries = LearningActivityTryLocalServiceUtil.getTriesCountByActivityAndUser(actId, themeDisplay.getUserId());
 				Object  [] arguments =  new Object[]{tries,activity.getTries()};
 				Object  [] arguments2 =  new Object[]{activity.getPasspuntuation()};
 %>
