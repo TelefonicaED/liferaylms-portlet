@@ -391,15 +391,15 @@ if(activity.getEnddate() == null){
 					}
 		%>
 				
-				<p><span class="label"><%=des %>: </span><span id="contentDescriptionCorrec_<%=i%>"></span></p>
+				<p><span class="bold"><%=des %>: </span><span id="contentDescriptionCorrec_<%=i%>"></span></p>
 		<%		}else{
 					break;			
 				}
 			}
 		%>
-		<p><span class="label"><liferay-ui:message key="p2ptask-file-name" />: </span> <span id="contentFileCorrec"></span></p>
+		<p><span class="bold"><liferay-ui:message key="p2ptask-file-name" />: </span> <span id="contentFileCorrec"></span></p>
 		<c:if test="<%=result %>">
-			<p><span class="label"><liferay-ui:message key="p2ptask-file-result" />: </span> <span id="contentResult"></span></p>
+			<p><span class="bold"><liferay-ui:message key="p2ptask-file-result" />: </span> <span id="contentResult"></span></p>
 		</c:if>
 		<p class="message"><liferay-ui:message key="p2ptask-uploadcorrect-task-message" /></p>
 	</div>

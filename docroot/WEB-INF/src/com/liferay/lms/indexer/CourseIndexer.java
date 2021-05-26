@@ -203,22 +203,24 @@ public class CourseIndexer extends BaseIndexer {
 			Course parent = CourseLocalServiceUtil.getCourse(entry.getParentCourseId());
 			doReindex(parent);
 		}else{
-			List<Course> editions = CourseLocalServiceUtil.getChildCourses(entry.getCourseId());
+			List<Course> editions = CourseLocalServiceUtil.getOpenOrRestrictedChildCourses(entry.getCourseId());
 			Date executionEditionStartDate = null;
 			Date executionEditionEndDate = null;
-			for(Course edition: editions){
-				if(!edition.isClosed()){
-					if(executionEditionStartDate == null || executionEditionStartDate.after(edition.getExecutionStartDate())){
-						executionEditionStartDate = edition.getExecutionStartDate();
-					}
-					if(executionEditionEndDate == null || executionEditionEndDate.before(edition.getExecutionEndDate())){
-						executionEditionEndDate = edition.getExecutionEndDate();
+			Date now  = new Date();
+			if(editions!=null && editions.size() >0){
+				for(Course edition: editions){
+					if(!edition.isClosed() && now.before(edition.getExecutionEndDate())){
+						if(executionEditionStartDate == null || executionEditionStartDate.after(edition.getExecutionStartDate())){
+							executionEditionStartDate = edition.getExecutionStartDate();
+						}
+						if(executionEditionEndDate == null || executionEditionEndDate.before(edition.getExecutionEndDate())){
+							executionEditionEndDate = edition.getExecutionEndDate();
+						}
 					}
 				}
+				document.addDate("executionEditionStartDate", executionEditionStartDate);
+				document.addDate("executionEditionEndDate", executionEditionEndDate);
 			}
-			
-			document.addDate("executionEditionStartDate", executionEditionStartDate);
-			document.addDate("executionEditionEndDate", executionEditionEndDate);
 		}
 		
 		Locale[] locales = LanguageUtil.getAvailableLocales();
