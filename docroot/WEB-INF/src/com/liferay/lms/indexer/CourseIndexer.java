@@ -141,6 +141,7 @@ public class CourseIndexer extends BaseIndexer {
 		Date executionStartDate = entry.getExecutionStartDate();
 		Date executionEndDate = entry.getExecutionEndDate();
 		long parentCourseId = entry.getParentCourseId();
+
 		
 		AssetEntry assetEntry= null;
 		try{
@@ -196,6 +197,31 @@ public class CourseIndexer extends BaseIndexer {
 		document.addKeyword(Field.ENTRY_CLASS_NAME, Course.class.getName());
 		document.addKeyword(Field.ENTRY_CLASS_PK, entryId);
 		document.addKeyword(Field.STATUS, entry.getClosed() ? WorkflowConstants.STATUS_INACTIVE : WorkflowConstants.STATUS_APPROVED);
+		
+		//Si es curso padre actualizo las fechas de las ediciones, si no actualizo el padre
+		if(entry.getParentCourseId() > 0){
+			Course parent = CourseLocalServiceUtil.getCourse(entry.getParentCourseId());
+			doReindex(parent);
+		}else{
+			List<Course> editions = CourseLocalServiceUtil.getOpenOrRestrictedChildCourses(entry.getCourseId());
+			Date executionEditionStartDate = null;
+			Date executionEditionEndDate = null;
+			Date now  = new Date();
+			if(editions!=null && editions.size() >0){
+				for(Course edition: editions){
+					if(!edition.isClosed() && now.before(edition.getExecutionEndDate())){
+						if(executionEditionStartDate == null || executionEditionStartDate.after(edition.getExecutionStartDate())){
+							executionEditionStartDate = edition.getExecutionStartDate();
+						}
+						if(executionEditionEndDate == null || executionEditionEndDate.before(edition.getExecutionEndDate())){
+							executionEditionEndDate = edition.getExecutionEndDate();
+						}
+					}
+				}
+				document.addDate("executionEditionStartDate", executionEditionStartDate);
+				document.addDate("executionEditionEndDate", executionEditionEndDate);
+			}
+		}
 		
 		Locale[] locales = LanguageUtil.getAvailableLocales();
 		String[] assetCategoryTitles = null;

@@ -1180,4 +1180,14 @@ ul ul .learningActivity {
     width: 70%;
     margin: 0 auto;
   }
+  .asynchronous-process-dashboard-portlet form .aui-field-content{
+	  margin: 0;
+	}
+	.asynchronous-process-dashboard-portlet form .aui-datepicker-select-wrapper select,
+	.asynchronous-process-dashboard-portlet form .aui-datepicker-button-wrapper{
+	  margin: 0;
+	}
+	.asynchronous-process-dashboard-portlet .taglib-search-iterator{
+	  position: relative;
+	}
 }
