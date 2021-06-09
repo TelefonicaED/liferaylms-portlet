@@ -187,6 +187,9 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 	public static final String INNER_JOIN_CUSTOM_ATTRIBUTE =
 			CourseFinder.class.getName() + ".innerCustomAttribute";
 	
+	public static final String FIND_NEXT_EDITION_OPEN =
+			CourseFinder.class.getName() + ".findNextEditionOpen";
+	
 	public List<Course> findByKeywords(long companyId, String freeText, String languageId, int status, long parentCourseId, long groupId, LinkedHashMap<String, Object> params, 
 			int start, int end, OrderByComparator obc){
 		return findByC_T_D_S_PC_G(companyId, freeText, freeText, languageId, status, parentCourseId, groupId, params, false, start, end, obc);
@@ -923,6 +926,44 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 	    }
 	
 	    return new ArrayList<User>();
+	}
+	
+	public Date findNextEditionOpen(long courseId){
+		Session session = null;
+		try{
+			
+			if(log.isDebugEnabled()){
+				log.debug("courseId:"+courseId);
+			}
+			
+			session = openSession();
+			String sql = CustomSQLUtil.get(FIND_NEXT_EDITION_OPEN);
+			
+			if(log.isDebugEnabled()) log.debug("sql: " + sql);
+			
+			SQLQuery q = session.createSQLQuery(sql);
+			q.addScalar("executionStartDate", Type.DATE);
+			
+			QueryPos qPos = QueryPos.getInstance(q);
+			qPos.add(courseId);
+			
+			Iterator<Date> itr = q.iterate();
+
+			if (itr.hasNext()) {
+				Date executionStartDate = itr.next();
+
+				if (executionStartDate != null) {
+					return executionStartDate;
+				}
+			}
+			
+		} catch (Exception e) {
+	       e.printStackTrace();
+	    } finally {
+	    	closeSession(session);
+	    }
+	
+	    return null;
 	}
 	
 	public int countStudents(long courseId, long companyId, String screenName, String firstName, String lastName, String emailAddress, 

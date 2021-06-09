@@ -2218,4 +2218,8 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 		return courseFinder.findChildRegistredUser(parentCourseId, userId);
 	}
 	
+	public Date getNextEditionOpen(long parentCourseId){
+		return courseFinder.findNextEditionOpen(parentCourseId);
+	}
+	
 }
