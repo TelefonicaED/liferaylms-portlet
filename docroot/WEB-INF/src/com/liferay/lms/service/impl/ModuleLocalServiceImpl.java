@@ -473,7 +473,7 @@ public class ModuleLocalServiceImpl extends ModuleLocalServiceBaseImpl {
 	    fileobj = LmsLocaleUtil.checkDefaultLocale(Module.class, fileobj, "title");
 	    fileobj = LmsLocaleUtil.checkDefaultLocale(Module.class, fileobj, "description");
 	    
-	    if(serviceContext != null && serviceContext.getExpandoBridgeAttributes() != null)
+	    if(serviceContext != null)
 	    	fileobj.setExpandoBridgeAttributes(serviceContext);
 		
 	    Module module = modulePersistence.update(fileobj, false);

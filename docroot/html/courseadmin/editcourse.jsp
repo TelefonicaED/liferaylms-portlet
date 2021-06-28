@@ -295,7 +295,7 @@ if(isCourseChild){
 	%>
 	<h1 class="header-title"><%=subTitle %></h1>
 	<%
-}System.out.println("isCourseChild: " + isCourseChild);
+}
 %>
 <portlet:resourceURL var="searchGroupTypesURL" id="searchGroupTypes"/>
 <c:if test="<%=course != null%>">
