@@ -112,6 +112,14 @@ long templateParent = 0;
 boolean showMessageDenied = false;
 if(request.getAttribute("course")!=null){
 	course=(Course)request.getAttribute("course");
+	parentCourseId = course.getParentCourseId();
+	if(parentCourseId>0){
+		isCourseChild=true;
+		parentCourse = CourseLocalServiceUtil.fetchCourse(parentCourseId);
+		if(parentCourse!=null){
+			parentCourseTitle = parentCourse.getTitle(themeDisplay.getLocale());
+		}
+	}
 }
 else{
 	if(courseId>0){
@@ -284,10 +292,10 @@ if(courseType != null){
 <%
 if(isCourseChild){
 	String subTitle = LanguageUtil.get(themeDisplay.getLocale(), "course-admin.parent-course") + ": " + parentCourseTitle;
-%>
-<h1 class="header-title"><%=subTitle %></h1>
-<%
-}
+	%>
+	<h1 class="header-title"><%=subTitle %></h1>
+	<%
+}System.out.println("isCourseChild: " + isCourseChild);
 %>
 <portlet:resourceURL var="searchGroupTypesURL" id="searchGroupTypes"/>
 <c:if test="<%=course != null%>">
@@ -298,8 +306,11 @@ if(isCourseChild){
 					!course.isClosed() && ( PortalUtil.isOmniadmin(themeDisplay.getUserId()) || UserLocalServiceUtil.hasGroupUser(course.getGroupCreatedId(), themeDisplay.getUserId())) && !isInCourse) {%>
 				<liferay-ui:icon image="submit" message="courseadmin.adminactions.gotocourse" target="_top" url="<%=themeDisplay.getPortalURL() +\"/\"+ response.getLocale().getLanguage() +\"/web\"+ groupsel.getFriendlyURL()%>" />
 			<%}%>
+			<%if(isCourseChild && !parentCourse.isClosed()){ %>
+				<liferay-ui:icon image="submit" message="courseadmin.adminactions.gotocourseparent" target="_top" url="<%=themeDisplay.getPortalURL() +\"/\"+ response.getLocale().getLanguage() +\"/web\"+ parentCourse.getGroup().getFriendlyURL()%>" />
+			<%} %>
 			<%-- Editar curso padre --%>
-			<%if(isCourseChild && permissionChecker.hasPermission(themeDisplay.getScopeGroupId(),  Course.class.getName(), parentCourseId, ActionKeys.UPDATE)&& !parentCourse.isClosed()){%>
+			<%if(isCourseChild && !isCourseChild && permissionChecker.hasPermission(themeDisplay.getScopeGroupId(),  Course.class.getName(), parentCourseId, ActionKeys.UPDATE)&& !parentCourse.isClosed()){%>
 				<portlet:renderURL var="editParentCourseURL">
 					<portlet:param name="courseId" value="<%=String.valueOf(parentCourseId) %>" />
 					<portlet:param name="backToEdit" value="<%=StringPool.TRUE %>" />
