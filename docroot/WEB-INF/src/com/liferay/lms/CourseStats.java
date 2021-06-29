@@ -392,24 +392,37 @@ public class CourseStats extends MVCPortlet {
 			CSVWriter writer = initCsv(resourceResponse);
 			 
 			//Cabecera del curso
-			int numCols = 6;  
+			int numCols = 11;  
 			String[] cabeceras = new String[numCols];
+			
 			cabeceras[0]=LanguageUtil.get(themeDisplay.getLocale(),"title");
-			cabeceras[1]=LanguageUtil.get(themeDisplay.getLocale(),"coursestats.registered");
-			cabeceras[2]=LanguageUtil.get(themeDisplay.getLocale(),"coursestats.start.student");
-			cabeceras[3]=LanguageUtil.get(themeDisplay.getLocale(),"coursestats.end.student");
-			cabeceras[4]=LanguageUtil.get(themeDisplay.getLocale(),"coursestats.passed");
-			cabeceras[5]=LanguageUtil.get(themeDisplay.getLocale(),"coursestats.failed");
+			cabeceras[1]=LanguageUtil.get(themeDisplay.getLocale(),"coursestats.startdate");
+			cabeceras[2]=LanguageUtil.get(themeDisplay.getLocale(),"coursestats.enddate");
+			cabeceras[3]=LanguageUtil.get(themeDisplay.getLocale(),"coursestats.registered");
+			cabeceras[4]=LanguageUtil.get(themeDisplay.getLocale(),"coursestats.start.student");
+			cabeceras[5]=LanguageUtil.get(themeDisplay.getLocale(),"coursestats.end.student");
+			cabeceras[6]=LanguageUtil.get(themeDisplay.getLocale(),"coursestats.passed");
+			cabeceras[7]=LanguageUtil.get(themeDisplay.getLocale(),"coursestats.failed");
+			cabeceras[8]=LanguageUtil.get(themeDisplay.getLocale(),"coursestats.male");
+			cabeceras[9]=LanguageUtil.get(themeDisplay.getLocale(),"coursestats.female");
+			cabeceras[10]=LanguageUtil.get(themeDisplay.getLocale(),"coursestats.avgvaloration");
 			writer.writeNext(cabeceras);
 			
 			//Resultados del curso
 			String[] resultados = new String[numCols];
+			
 			resultados[0]=courseView.getCourseTitle();
-	    	resultados[1]=Long.toString(courseView.getRegistered());
-	    	resultados[2]=Long.toString(courseView.getStarted());
-	    	resultados[3]=Long.toString(courseView.getFinished());
-	    	resultados[4]=Long.toString(courseView.getPassed());
-	    	resultados[5]=Long.toString(courseView.getFailed());	
+			resultados[1]=courseView.getStartDateStr();
+			resultados[2]=courseView.getEndDateStr();
+	    	resultados[3]=Long.toString(courseView.getRegistered());
+	    	resultados[4]=Long.toString(courseView.getStarted());
+	    	resultados[5]=Long.toString(courseView.getFinished());
+	    	resultados[6]=Long.toString(courseView.getPassed());
+	    	resultados[7]=Long.toString(courseView.getFailed());
+	    	resultados[8]=Long.toString(courseView.getMale());
+	    	resultados[9]=Long.toString(courseView.getFemale());
+	    	resultados[10]=courseView.getAvgValoration();
+	    	
 	      	writer.writeNext(resultados);
 			
 	      	//Cabecera del modulo
