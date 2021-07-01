@@ -40,17 +40,23 @@
 				 	${courseStats.courseTitle}
 				</liferay-ui:search-container-column-text>
 				
-				<liferay-ui:search-container-column-text name="coursestats.start.date"  title="coursestats.start.date" orderable="false">
-				 	${courseStats.startDateStr}
-				</liferay-ui:search-container-column-text>
+				<c:if test="${renderRequest.preferences.getValue('showCourseStartDate', 'true') }">
+					<liferay-ui:search-container-column-text name="coursestats.start.date"  title="coursestats.start.date" orderable="false">
+					 	${courseStats.startDateStr}
+					</liferay-ui:search-container-column-text>
+				</c:if>
 
-				<liferay-ui:search-container-column-text name="coursestats.end.date"  title="coursestats.end.date" orderable="false">
-				 	${courseStats.endDateStr}
-				</liferay-ui:search-container-column-text>
+				<c:if test="${renderRequest.preferences.getValue('showCourseEndDate', 'true') }">
+					<liferay-ui:search-container-column-text name="coursestats.end.date"  title="coursestats.end.date" orderable="false">
+					 	${courseStats.endDateStr}
+					</liferay-ui:search-container-column-text>
+				</c:if>
 
-				<liferay-ui:search-container-column-text name="coursestats.activitiescounter"  title="coursestats.activitiescounter" orderable="false">
-				 	${courseStats.activities}
-				</liferay-ui:search-container-column-text>	
+				<c:if test="${renderRequest.preferences.getValue('showCourseNumActity', 'true') }">
+					<liferay-ui:search-container-column-text name="coursestats.activitiescounter"  title="coursestats.activitiescounter" orderable="false">
+					 	${courseStats.activities}
+					</liferay-ui:search-container-column-text>	
+				</c:if>
 										
 				<liferay-ui:search-container-column-text name="coursestats.registered"  title="coursestats.registered" orderable="false">
 				 	${courseStats.registered}
@@ -67,15 +73,25 @@
 				<liferay-ui:search-container-column-text name="coursestats.failed"  title="coursestats.modulestats.notpass" orderable="false">
 				 	${courseStats.failed}
 				</liferay-ui:search-container-column-text>
-				<liferay-ui:search-container-column-text name="coursestats.male"  title="coursestats.male" orderable="false">
-				 	${courseStats.male}
-				</liferay-ui:search-container-column-text>
-				<liferay-ui:search-container-column-text name="coursestats.female"  title="coursestats.female" orderable="false">
-				 	${courseStats.female}
-				</liferay-ui:search-container-column-text>
-				<liferay-ui:search-container-column-text name="coursestats.avgvaloration"  title="coursestats.avgvaloration" orderable="false">
-				 	${courseStats.avgValoration}
-				</liferay-ui:search-container-column-text>
+				
+				<c:if test="${renderRequest.preferences.getValue('showCourseNumMale', 'true') }">
+					<liferay-ui:search-container-column-text name="coursestats.male"  title="coursestats.male" orderable="false">
+					 	${courseStats.male}
+					</liferay-ui:search-container-column-text>
+				</c:if>
+				
+				<c:if test="${renderRequest.preferences.getValue('showCourseNumFemale', 'true') }">
+					<liferay-ui:search-container-column-text name="coursestats.female"  title="coursestats.female" orderable="false">
+					 	${courseStats.female}
+					</liferay-ui:search-container-column-text>
+				</c:if>
+				
+				<c:if test="${renderRequest.preferences.getValue('showCourseAvgValoration', 'true') }">
+					<liferay-ui:search-container-column-text name="coursestats.avgvaloration"  title="coursestats.avgvaloration" orderable="false">
+					 	${courseStats.avgValoration}
+					</liferay-ui:search-container-column-text>
+				</c:if>
+				
 			</liferay-ui:search-container-row>		
 			<liferay-ui:search-iterator />
 	</liferay-ui:search-container>
