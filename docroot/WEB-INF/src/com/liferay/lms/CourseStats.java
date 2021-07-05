@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
-
 import javax.portlet.PortletException;
 import javax.portlet.PortletRequestDispatcher;
 import javax.portlet.PortletURL;
@@ -365,7 +364,8 @@ public class CourseStats extends MVCPortlet {
 		
 		if("export".equals(action)){
 			long courseId = ParamUtil.getLong(resourceRequest, "courseId",0);
-			exportCourse(resourceResponse, courseId, teamId, themeDisplay);
+			
+			exportCourse(resourceResponse,resourceRequest, courseId, teamId, themeDisplay);
 		} else if("exportModule".equals(action)){
 			long moduleId = ParamUtil.getLong(resourceRequest, "moduleId",0);
 			exportModule(resourceResponse, moduleId, teamId, themeDisplay, resourceRequest);
@@ -373,7 +373,7 @@ public class CourseStats extends MVCPortlet {
 	}
 	
 	
-	private void exportCourse(ResourceResponse resourceResponse, long courseId,
+	private void exportCourse(ResourceResponse resourceResponse, ResourceRequest resourceRequest , long courseId,
 							  long teamId, ThemeDisplay themeDisplay) 
 									  throws IOException, UnsupportedEncodingException {
 		try {
@@ -392,37 +392,112 @@ public class CourseStats extends MVCPortlet {
 			CSVWriter writer = initCsv(resourceResponse);
 			 
 			//Cabecera del curso
-			int numCols = 11;  
+			int numCols = 6;  
+			if ( resourceRequest.getPreferences().getValue("showCourseStartDate", "true").equals ("true") )
+				numCols++;
+			if ( resourceRequest.getPreferences().getValue("showCourseEndDate", "true").equals ("true") )
+				numCols++;
+			
+			if ( resourceRequest.getPreferences().getValue("showCourseNumActity", "true").equals ("true") )
+				numCols++;
+			
+			if ( resourceRequest.getPreferences().getValue("showCourseNumMale", "true").equals ("true") )
+				numCols++;
+			if ( resourceRequest.getPreferences().getValue("showCourseNumFemale", "true").equals ("true") )
+				numCols++;
+			if ( resourceRequest.getPreferences().getValue("showCourseAvgValoration", "true").equals ("true") )
+				numCols++;
+			
 			String[] cabeceras = new String[numCols];
 			
-			cabeceras[0]=LanguageUtil.get(themeDisplay.getLocale(),"title");
-			cabeceras[1]=LanguageUtil.get(themeDisplay.getLocale(),"coursestats.startdate");
-			cabeceras[2]=LanguageUtil.get(themeDisplay.getLocale(),"coursestats.enddate");
-			cabeceras[3]=LanguageUtil.get(themeDisplay.getLocale(),"coursestats.registered");
-			cabeceras[4]=LanguageUtil.get(themeDisplay.getLocale(),"coursestats.start.student");
-			cabeceras[5]=LanguageUtil.get(themeDisplay.getLocale(),"coursestats.end.student");
-			cabeceras[6]=LanguageUtil.get(themeDisplay.getLocale(),"coursestats.passed");
-			cabeceras[7]=LanguageUtil.get(themeDisplay.getLocale(),"coursestats.failed");
-			cabeceras[8]=LanguageUtil.get(themeDisplay.getLocale(),"coursestats.male");
-			cabeceras[9]=LanguageUtil.get(themeDisplay.getLocale(),"coursestats.female");
-			cabeceras[10]=LanguageUtil.get(themeDisplay.getLocale(),"coursestats.avgvaloration");
+			int nContCabecera = 0;
+			
+			cabeceras[nContCabecera]=LanguageUtil.get(themeDisplay.getLocale(),"title");
+					
+			if ( resourceRequest.getPreferences().getValue("showCourseStartDate", "true").equals ("true") ){
+				nContCabecera++;
+				cabeceras[nContCabecera]=LanguageUtil.get(themeDisplay.getLocale(),"coursestats.start.date");
+			}			
+			if ( resourceRequest.getPreferences().getValue("showCourseEndDate", "true").equals ("true") ){
+				nContCabecera++;
+				cabeceras[nContCabecera]=LanguageUtil.get(themeDisplay.getLocale(),"coursestats.end.date");
+			}
+			
+			if ( resourceRequest.getPreferences().getValue("showCourseNumActity", "true").equals ("true") ){
+				nContCabecera++;
+				cabeceras[nContCabecera]=LanguageUtil.get(themeDisplay.getLocale(),"coursestats.activitiescounter");
+			}
+			
+			nContCabecera++;
+			cabeceras[nContCabecera]=LanguageUtil.get(themeDisplay.getLocale(),"coursestats.registered");
+			nContCabecera++;
+			cabeceras[nContCabecera]=LanguageUtil.get(themeDisplay.getLocale(),"coursestats.start.student");
+			nContCabecera++;
+			cabeceras[nContCabecera]=LanguageUtil.get(themeDisplay.getLocale(),"coursestats.end.student");
+			nContCabecera++;
+			cabeceras[nContCabecera]=LanguageUtil.get(themeDisplay.getLocale(),"coursestats.passed");
+			nContCabecera++;
+			cabeceras[nContCabecera]=LanguageUtil.get(themeDisplay.getLocale(),"coursestats.failed");
+			
+			if ( resourceRequest.getPreferences().getValue("showCourseNumMale", "true").equals ("true") ){
+				nContCabecera++;
+				cabeceras[nContCabecera]=LanguageUtil.get(themeDisplay.getLocale(),"coursestats.male");
+			}
+			if ( resourceRequest.getPreferences().getValue("showCourseNumFemale", "true").equals ("true") ){
+				nContCabecera++;
+				cabeceras[nContCabecera]=LanguageUtil.get(themeDisplay.getLocale(),"coursestats.female");
+			}
+			
+			if ( resourceRequest.getPreferences().getValue("showCourseAvgValoration", "true").equals ("true") ){
+				nContCabecera++;
+				cabeceras[nContCabecera]=LanguageUtil.get(themeDisplay.getLocale(),"coursestats.avgvaloration");
+			}
 			writer.writeNext(cabeceras);
 			
 			//Resultados del curso
 			String[] resultados = new String[numCols];
+			nContCabecera = 0;
 			
-			resultados[0]=courseView.getCourseTitle();
-			resultados[1]=courseView.getStartDateStr();
-			resultados[2]=courseView.getEndDateStr();
-	    	resultados[3]=Long.toString(courseView.getRegistered());
-	    	resultados[4]=Long.toString(courseView.getStarted());
-	    	resultados[5]=Long.toString(courseView.getFinished());
-	    	resultados[6]=Long.toString(courseView.getPassed());
-	    	resultados[7]=Long.toString(courseView.getFailed());
-	    	resultados[8]=Long.toString(courseView.getMale());
-	    	resultados[9]=Long.toString(courseView.getFemale());
-	    	resultados[10]=courseView.getAvgValoration();
+			resultados[nContCabecera]=courseView.getCourseTitle();
+			
+			if ( resourceRequest.getPreferences().getValue("showCourseStartDate", "true").equals ("true") ){
+				nContCabecera++;
+				resultados[nContCabecera]=courseView.getStartDateStr();
+			}
+			
+			if ( resourceRequest.getPreferences().getValue("showCourseEndDate", "true").equals ("true") ) {
+				nContCabecera++;
+				resultados[nContCabecera]=courseView.getEndDateStr();
+			}
+			
+			if ( resourceRequest.getPreferences().getValue("showCourseNumActity", "true").equals ("true") ) {
+				nContCabecera++;
+				resultados[nContCabecera]=Long.toString(courseView.getActivities());
+			}
+			
+			nContCabecera++;
+	    	resultados[nContCabecera]=Long.toString(courseView.getRegistered());
+	    	nContCabecera++;
+	    	resultados[nContCabecera]=Long.toString(courseView.getStarted());
+	    	nContCabecera++;
+	    	resultados[nContCabecera]=Long.toString(courseView.getFinished());
+	    	nContCabecera++;
+	    	resultados[nContCabecera]=Long.toString(courseView.getPassed());
+	    	nContCabecera++;
+	    	resultados[nContCabecera]=Long.toString(courseView.getFailed());
 	    	
+	    	if ( resourceRequest.getPreferences().getValue("showCourseNumMale", "true").equals ("true") ) {
+	    		nContCabecera++;
+	    		resultados[nContCabecera]=Long.toString(courseView.getMale());
+	    	}
+	    	if ( resourceRequest.getPreferences().getValue("showCourseNumFemale", "true").equals ("true") ) {
+	    		nContCabecera++;
+	    		resultados[nContCabecera]=Long.toString(courseView.getFemale());
+	    	}
+	    	if ( resourceRequest.getPreferences().getValue("showCourseAvgValoration", "true").equals ("true") ) {
+	    		nContCabecera++;
+	    		resultados[nContCabecera]=courseView.getAvgValoration();
+	    	}
 	      	writer.writeNext(resultados);
 			
 	      	//Cabecera del modulo
