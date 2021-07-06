@@ -310,7 +310,7 @@ if(isCourseChild){
 				<liferay-ui:icon image="submit" message="courseadmin.adminactions.gotocourseparent" target="_top" url="<%=themeDisplay.getPortalURL() +\"/\"+ response.getLocale().getLanguage() +\"/web\"+ parentCourse.getGroup().getFriendlyURL()%>" />
 			<%} %>
 			<%-- Editar curso padre --%>
-			<%if(isCourseChild && !isCourseChild && permissionChecker.hasPermission(themeDisplay.getScopeGroupId(),  Course.class.getName(), parentCourseId, ActionKeys.UPDATE)&& !parentCourse.isClosed()){%>
+			<%if(isCourseChild && permissionChecker.hasPermission(themeDisplay.getScopeGroupId(),  Course.class.getName(), parentCourseId, ActionKeys.UPDATE)&& !parentCourse.isClosed()){%>
 				<portlet:renderURL var="editParentCourseURL">
 					<portlet:param name="courseId" value="<%=String.valueOf(parentCourseId) %>" />
 					<portlet:param name="backToEdit" value="<%=StringPool.TRUE %>" />
@@ -320,7 +320,7 @@ if(isCourseChild){
 				<liferay-ui:icon image="edit" message="course-admin.edit-parent-course" url='${editParentCourseURL }' />
 			<%}%>
 			<%-- Asignar miembros --%>
-			<%if(permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), Course.class.getName(), courseId, "ASSIGN_MEMBERS") && ! course.isClosed() && showMembers && (!isCourseChild || editionsWithoutRestrictions)){%>
+			<%if(permissionChecker.hasPermission(themeDisplay.getScopeGroupId(), Course.class.getName(), courseId, "ASSIGN_MEMBERS") && ! course.isClosed() && showMembers){%>
 				<portlet:renderURL var="memebersURL">
 					<portlet:param name="courseId" value="<%=String.valueOf(courseId) %>" />
 					<portlet:param name="backToEdit" value="<%=StringPool.TRUE %>" />
