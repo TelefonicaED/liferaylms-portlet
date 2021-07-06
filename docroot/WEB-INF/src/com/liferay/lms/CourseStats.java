@@ -393,19 +393,19 @@ public class CourseStats extends MVCPortlet {
 			 
 			//Cabecera del curso
 			int numCols = 6;  
-			if ( resourceRequest.getPreferences().getValue("showCourseStartDate", "true").equals ("true") )
+			if ( resourceRequest.getPreferences().getValue("showCourseStartDate", "false").equals ("true") )
 				numCols++;
-			if ( resourceRequest.getPreferences().getValue("showCourseEndDate", "true").equals ("true") )
-				numCols++;
-			
-			if ( resourceRequest.getPreferences().getValue("showCourseNumActity", "true").equals ("true") )
+			if ( resourceRequest.getPreferences().getValue("showCourseEndDate", "false").equals ("true") )
 				numCols++;
 			
-			if ( resourceRequest.getPreferences().getValue("showCourseNumMale", "true").equals ("true") )
+			if ( resourceRequest.getPreferences().getValue("showCourseNumActity", "false").equals ("true") )
 				numCols++;
-			if ( resourceRequest.getPreferences().getValue("showCourseNumFemale", "true").equals ("true") )
+			
+			if ( resourceRequest.getPreferences().getValue("showCourseNumMale", "false").equals ("true") )
 				numCols++;
-			if ( resourceRequest.getPreferences().getValue("showCourseAvgValoration", "true").equals ("true") )
+			if ( resourceRequest.getPreferences().getValue("showCourseNumFemale", "false").equals ("true") )
+				numCols++;
+			if ( resourceRequest.getPreferences().getValue("showCourseAvgValoration", "false").equals ("true") )
 				numCols++;
 			
 			String[] cabeceras = new String[numCols];
@@ -414,16 +414,16 @@ public class CourseStats extends MVCPortlet {
 			
 			cabeceras[nContCabecera]=LanguageUtil.get(themeDisplay.getLocale(),"title");
 					
-			if ( resourceRequest.getPreferences().getValue("showCourseStartDate", "true").equals ("true") ){
+			if ( resourceRequest.getPreferences().getValue("showCourseStartDate", "false").equals ("true") ){
 				nContCabecera++;
 				cabeceras[nContCabecera]=LanguageUtil.get(themeDisplay.getLocale(),"coursestats.start.date");
 			}			
-			if ( resourceRequest.getPreferences().getValue("showCourseEndDate", "true").equals ("true") ){
+			if ( resourceRequest.getPreferences().getValue("showCourseEndDate", "false").equals ("true") ){
 				nContCabecera++;
 				cabeceras[nContCabecera]=LanguageUtil.get(themeDisplay.getLocale(),"coursestats.end.date");
 			}
 			
-			if ( resourceRequest.getPreferences().getValue("showCourseNumActity", "true").equals ("true") ){
+			if ( resourceRequest.getPreferences().getValue("showCourseNumActity", "false").equals ("true") ){
 				nContCabecera++;
 				cabeceras[nContCabecera]=LanguageUtil.get(themeDisplay.getLocale(),"coursestats.activitiescounter");
 			}
@@ -439,16 +439,16 @@ public class CourseStats extends MVCPortlet {
 			nContCabecera++;
 			cabeceras[nContCabecera]=LanguageUtil.get(themeDisplay.getLocale(),"coursestats.failed");
 			
-			if ( resourceRequest.getPreferences().getValue("showCourseNumMale", "true").equals ("true") ){
+			if ( resourceRequest.getPreferences().getValue("showCourseNumMale", "false").equals ("true") ){
 				nContCabecera++;
 				cabeceras[nContCabecera]=LanguageUtil.get(themeDisplay.getLocale(),"coursestats.male");
 			}
-			if ( resourceRequest.getPreferences().getValue("showCourseNumFemale", "true").equals ("true") ){
+			if ( resourceRequest.getPreferences().getValue("showCourseNumFemale", "false").equals ("true") ){
 				nContCabecera++;
 				cabeceras[nContCabecera]=LanguageUtil.get(themeDisplay.getLocale(),"coursestats.female");
 			}
 			
-			if ( resourceRequest.getPreferences().getValue("showCourseAvgValoration", "true").equals ("true") ){
+			if ( resourceRequest.getPreferences().getValue("showCourseAvgValoration", "false").equals ("true") ){
 				nContCabecera++;
 				cabeceras[nContCabecera]=LanguageUtil.get(themeDisplay.getLocale(),"coursestats.avgvaloration");
 			}
@@ -460,17 +460,17 @@ public class CourseStats extends MVCPortlet {
 			
 			resultados[nContCabecera]=courseView.getCourseTitle();
 			
-			if ( resourceRequest.getPreferences().getValue("showCourseStartDate", "true").equals ("true") ){
+			if ( resourceRequest.getPreferences().getValue("showCourseStartDate", "false").equals ("true") ){
 				nContCabecera++;
 				resultados[nContCabecera]=courseView.getStartDateStr();
 			}
 			
-			if ( resourceRequest.getPreferences().getValue("showCourseEndDate", "true").equals ("true") ) {
+			if ( resourceRequest.getPreferences().getValue("showCourseEndDate", "false").equals ("true") ) {
 				nContCabecera++;
 				resultados[nContCabecera]=courseView.getEndDateStr();
 			}
 			
-			if ( resourceRequest.getPreferences().getValue("showCourseNumActity", "true").equals ("true") ) {
+			if ( resourceRequest.getPreferences().getValue("showCourseNumActity", "false").equals ("true") ) {
 				nContCabecera++;
 				resultados[nContCabecera]=Long.toString(courseView.getActivities());
 			}
@@ -486,15 +486,15 @@ public class CourseStats extends MVCPortlet {
 	    	nContCabecera++;
 	    	resultados[nContCabecera]=Long.toString(courseView.getFailed());
 	    	
-	    	if ( resourceRequest.getPreferences().getValue("showCourseNumMale", "true").equals ("true") ) {
+	    	if ( resourceRequest.getPreferences().getValue("showCourseNumMale", "false").equals ("true") ) {
 	    		nContCabecera++;
 	    		resultados[nContCabecera]=Long.toString(courseView.getMale());
 	    	}
-	    	if ( resourceRequest.getPreferences().getValue("showCourseNumFemale", "true").equals ("true") ) {
+	    	if ( resourceRequest.getPreferences().getValue("showCourseNumFemale", "false").equals ("true") ) {
 	    		nContCabecera++;
 	    		resultados[nContCabecera]=Long.toString(courseView.getFemale());
 	    	}
-	    	if ( resourceRequest.getPreferences().getValue("showCourseAvgValoration", "true").equals ("true") ) {
+	    	if ( resourceRequest.getPreferences().getValue("showCourseAvgValoration", "false").equals ("true") ) {
 	    		nContCabecera++;
 	    		resultados[nContCabecera]=courseView.getAvgValoration();
 	    	}
