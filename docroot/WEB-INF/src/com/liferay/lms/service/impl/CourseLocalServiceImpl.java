@@ -56,6 +56,7 @@ import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.jsonwebservice.JSONWebService;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.lar.PortletDataHandlerKeys;
 import com.liferay.portal.kernel.lar.UserIdStrategy;
@@ -113,6 +114,8 @@ import com.liferay.portlet.asset.model.AssetEntry;
 import com.liferay.portlet.asset.model.AssetLinkConstants;
 import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
 import com.liferay.portlet.asset.service.persistence.AssetEntryQuery;
+import com.liferay.portlet.ratings.model.RatingsStats;
+import com.liferay.portlet.ratings.service.RatingsStatsLocalServiceUtil;
 import com.liferay.portlet.social.model.SocialActivityCounterDefinition;
 import com.liferay.portlet.social.model.SocialActivityDefinition;
 import com.liferay.portlet.social.model.SocialActivitySetting;
@@ -1447,6 +1450,22 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 	}
 	
 	
+	public double avgValorationFromCourse( long courseId , long parentCourseId ) 
+	{
+		double avg = 0.0;
+	    try {
+			RatingsStats stats = RatingsStatsLocalServiceUtil.getStats("com.liferay.lms.model.Course",courseId);
+			avg = stats.getAverageScore();
+		} catch (SystemException e) {
+			avg = 0.0;
+			log.error(e);
+		}
+	    
+	  
+		
+		return avg;
+	}
+	
 	/**
 	 * Service that validates the course inscription as it is validated in web.
 	 * 
@@ -1813,6 +1832,7 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 	/*******************************************************************************************************************************/
 	/*******************************************************************************************************************************/
 	
+	
 	/**
 	 * Usar este método para la búsqueda de estudiantes de un curso
 	 * @param courseId id del curso
@@ -1851,6 +1871,12 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 			int status, long[] teamIds, boolean andOperator, boolean includeEditions, int type){
 		return courseFinder.countStudents(courseId, companyId, screenName, firstName, lastName, emailAddress, status, teamIds, andOperator, includeEditions, type);
 	}
+	
+	public int countStudentsFromCourse(long courseId, long companyId, String screenName, String firstName, String lastName, String emailAddress, 
+			int status, long[] teamIds, boolean andOperator, boolean includeEditions, int type, int genere){
+		return courseFinder.countStudents(courseId, companyId, screenName, firstName, lastName, emailAddress, status, teamIds, andOperator, includeEditions, type, genere);
+	}
+	
 	
 	/**
 	 * Usar este método para contar los estudiantes de un curso
@@ -1897,7 +1923,6 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 	}
 	
 	public List<User> getStudentsFromCourse(long companyId, long courseGroupCreatedId, long teamId){
-		
 		return getStudentsFromCourse(companyId, courseGroupCreatedId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, teamId, null, null, null, null, true);
 
 	}

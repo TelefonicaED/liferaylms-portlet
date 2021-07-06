@@ -70,4 +70,8 @@ public class CourseParams {
 	
 	public static final int STUDENTS_TYPE_FAILED = 4;
 	
+	public static final int  STUDENTS_GENERE_MALE = 1;
+	
+	public static final int  STUDENTS_GENERE_FEMALE = 0;
+	
 }

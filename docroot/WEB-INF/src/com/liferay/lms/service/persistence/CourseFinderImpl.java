@@ -94,6 +94,10 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 	public static final String COUNT_STUDENTS = 
 			CourseFinder.class.getName() +
 				".countStudents";
+	
+	public static final String COUNT_STUDENTS_BY_GENERE = 
+			CourseFinder.class.getName() +
+				".countStudentsByGenere";
 	public static final String FIND_TEACHERS = 
 			CourseFinder.class.getName() +
 				".findTeachers";
@@ -164,9 +168,16 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 				".coursesFinished";
 	public static final String INNER_JOIN_TEAM = 
 			CourseFinder.class.getName() + ".innerJoinTeam";
+	
+	public static final String INNER_JOIN_CONTACT = 
+			CourseFinder.class.getName() + ".innerJoinContact";
 	public static final String HAS_USER_TRIES =
 			 CourseFinder.class.getName() +
-				".hasUserTries";	
+				".hasUserTries";
+	
+	public static final String AVG_VALORATION_COURSE =
+			 CourseFinder.class.getName() +
+				".avgValorationCourse";
 	public static final String MY_COURSES =
 			 CourseFinder.class.getName() +
 				".myCourses";
@@ -985,6 +996,77 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			sql = replaceCourseResultType(sql, type);
 			sql = replaceCourseOrEditions(sql, includeEditions);
 			sql = replaceJoinWhereUser(sql, screenName, firstName, lastName, emailAddress, status, teamIds, andOperator);
+			
+			sql = CustomSQLUtil.replaceAndOperator(sql, andOperator);
+			
+			log.debug("sql: " + sql);
+			
+			SQLQuery q = session.createSQLQuery(sql);
+			q.addScalar(COUNT_COLUMN_NAME, Type.LONG);
+			
+			//Obtenemos el rol de editor del curso y profesor
+			LmsPrefs prefs=LmsPrefsLocalServiceUtil.getLmsPrefs(companyId);
+			long teacherRoleId = prefs.getTeacherRole();
+			long editorRoleId = prefs.getEditorRole();
+			
+			QueryPos qPos = QueryPos.getInstance(q);
+			qPos.add(teacherRoleId);
+			qPos.add(editorRoleId);
+			qPos.add(courseId);
+			if(includeEditions){
+				qPos.add(courseId);
+			}
+			if(status != WorkflowConstants.STATUS_ANY){
+				qPos.add(status);
+			}
+			
+			qPos = replaceQPosJoinWhereUser(qPos, screenName, firstName, lastName, emailAddress);
+			
+			Iterator<Long> itr = q.iterate();
+
+			if (itr.hasNext()) {
+				Long count = itr.next();
+
+				if (count != null) {
+					return count.intValue();
+				}
+			}
+			
+		} catch (Exception e) {
+	       e.printStackTrace();
+	    } finally {
+	    	closeSessionLiferay(session);
+	    }
+	
+	    return 0;
+	}
+	
+	
+	public int countStudents(long courseId, long companyId, String screenName, String firstName, String lastName, String emailAddress, 
+			int status, long[] teamIds, boolean andOperator, boolean includeEditions, int type, int genere){
+		Session session = null;
+		try{
+			
+			if(log.isDebugEnabled()){
+				log.debug("ScreenName:"+screenName);
+				log.debug("firstName:"+firstName);
+				log.debug("lastName:"+lastName);
+				log.debug("emailAddress:"+emailAddress);
+				log.debug("genere:"+genere);
+			}
+						
+			session = openSessionLiferay();
+			
+			String sql = CustomSQLUtil.get(COUNT_STUDENTS_BY_GENERE);
+			
+			sql = replaceCourseResultType(sql, type);
+			sql = replaceCourseOrEditions(sql, includeEditions);
+			sql = replaceJoinWhereUser(sql, screenName, firstName, lastName, emailAddress, status, teamIds, andOperator);
+			
+			
+			sql = StringUtil.replace(sql, "[$JOINCONTACT$]", CustomSQLUtil.get(INNER_JOIN_CONTACT));
+			sql = StringUtil.replace(sql, "[$GENERE$]", String.valueOf( genere ));
+			
 			
 			sql = CustomSQLUtil.replaceAndOperator(sql, andOperator);
 			
