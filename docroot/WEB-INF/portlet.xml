@@ -926,6 +926,10 @@
 			<value>/html/courseadmin/clone.jsp</value>
 		</init-param>
 		<init-param>
+			<name>copy-parent-to-editions-template</name>
+			<value>/html/courseadmin/copyparenttoeditions.jsp</value>
+		</init-param>
+		<init-param>
 			<name>competence-tab-template</name>
 			<value>/html/courseadmin/competencetab.jsp</value>
 		</init-param>

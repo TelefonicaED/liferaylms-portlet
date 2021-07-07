@@ -41,6 +41,7 @@ import com.liferay.portal.kernel.xml.DocumentException;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
 import com.liferay.portal.model.PortletConstants;
+import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portlet.asset.model.AssetRenderer;
@@ -442,5 +443,17 @@ public class TestLearningActivityType extends QuestionLearningActivityType
 				}
 			}
 		}
+	}
+	
+	@Override
+	public void copyActivity(LearningActivity oldActivity, LearningActivity newActivity, ServiceContext serviceContext){
+		newActivity.setExtracontent(oldActivity.getExtracontent());
+		try {
+			newActivity = LearningActivityLocalServiceUtil.updateLearningActivity(newActivity);
+		} catch (SystemException e) {
+			e.printStackTrace();
+		}
+		
+		super.copyActivity(oldActivity, newActivity, serviceContext);
 	}
 }

@@ -27,6 +27,7 @@ import com.liferay.lms.model.TestQuestion;
 import com.liferay.lms.model.impl.TestQuestionImpl;
 import com.liferay.lms.service.ClpSerializer;
 import com.liferay.lms.service.LearningActivityLocalServiceUtil;
+import com.liferay.lms.service.TestAnswerLocalServiceUtil;
 import com.liferay.lms.service.base.TestQuestionLocalServiceBaseImpl;
 import com.liferay.portal.kernel.bean.PortletBeanLocatorUtil;
 import com.liferay.portal.kernel.dao.orm.Criterion;
@@ -69,6 +70,10 @@ public class TestQuestionLocalServiceImpl extends TestQuestionLocalServiceBaseIm
 	
 	private final String CATEGORY_TYPE = "category";
 	private final long CATEGORY = -999;
+	
+	public TestQuestion getTestQuestion(String uuid, long actId) throws SystemException{
+		return testQuestionPersistence.fetchByUuid_ActId(uuid, actId);
+	}
 	
 	public void importXML(long actId, Document document) throws DocumentException, SystemException, PortalException
 	{
@@ -375,6 +380,14 @@ public class TestQuestionLocalServiceImpl extends TestQuestionLocalServiceBaseIm
 			return false;
 		}
 		return true;
+	}
+	
+	public void deleteTestQuestionByActId(long actId) throws SystemException{
+		List<TestQuestion> questions = testQuestionPersistence.findByac(actId);
+		for(TestQuestion question: questions){
+			TestAnswerLocalServiceUtil.deleteTestAnswerByQuestionId(question.getQuestionId());
+			testQuestionPersistence.remove(question);
+		}
 	}
 	
 }

@@ -1,13 +1,13 @@
 package com.liferay.lms.learningactivity;
 
 import java.io.File;
-
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
 
 import com.liferay.lms.asset.TaskOnlineAssetRenderer;
 import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.service.ClpSerializer;
+import com.liferay.lms.service.LearningActivityLocalServiceUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
@@ -28,7 +28,9 @@ import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceContextFactory;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
+import com.liferay.portlet.asset.model.AssetEntry;
 import com.liferay.portlet.asset.model.AssetRenderer;
+import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.NoSuchFileEntryException;
 import com.liferay.portlet.documentlibrary.NoSuchFolderException;
 import com.liferay.portlet.documentlibrary.model.DLFileEntry;
@@ -36,6 +38,7 @@ import com.liferay.portlet.documentlibrary.model.DLFolder;
 import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
 import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.service.DLFolderLocalServiceUtil;
+import com.liferay.util.CourseCopyUtil;
 
 public class TaskOnlineLearningActivityType extends BaseLearningActivityType {
 
@@ -231,5 +234,35 @@ public class TaskOnlineLearningActivityType extends BaseLearningActivityType {
 	
 	public String getSpecificResultsPage(){
 		return "/html/gradebook/popups/onlineResult.jsp";
+	}
+	
+	@Override
+	public void copyActivity(LearningActivity oldActivity, LearningActivity newActivity, ServiceContext serviceContext){
+		super.copyActivity(oldActivity, newActivity, serviceContext);
+		
+		try{
+			String entryIdStr = "";
+			long additionalFileId = GetterUtil.getLong(LearningActivityLocalServiceUtil.getExtraContentValue(oldActivity.getActId(),"additionalFile"), 0);
+			if(additionalFileId>0){
+				AssetEntry assetEntry = AssetEntryLocalServiceUtil.getEntry(DLFileEntry.class.getName(), additionalFileId);
+				entryIdStr = String.valueOf(assetEntry.getEntryId());
+			}
+			
+			if(!entryIdStr.equals("")){
+				
+				AssetEntry docAsset = AssetEntryLocalServiceUtil.getAssetEntry(Long.valueOf(entryIdStr));
+				long entryId = 0;
+				if(docAsset.getUrl()!=null && docAsset.getUrl().trim().length()>0){
+					entryId = Long.valueOf(entryIdStr);
+				}else{
+					entryId = CourseCopyUtil.cloneFile(Long.valueOf(entryIdStr), newActivity, serviceContext.getUserId(), serviceContext);
+				}
+				
+				AssetEntry entry =  AssetEntryLocalServiceUtil.getAssetEntry(entryId);
+				LearningActivityLocalServiceUtil.setExtraContentValue(newActivity.getActId(), "additionalFile", String.valueOf(entry.getClassPK()));
+			}
+		} catch(SystemException | PortalException e){
+			e.printStackTrace();
+		}
 	}
 }

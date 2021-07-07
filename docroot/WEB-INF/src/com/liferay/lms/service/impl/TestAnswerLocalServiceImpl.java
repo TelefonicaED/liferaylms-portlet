@@ -14,6 +14,8 @@
 
 package com.liferay.lms.service.impl;
 
+import java.util.List;
+
 import com.liferay.lms.model.TestAnswer;
 import com.liferay.lms.model.TestQuestion;
 import com.liferay.lms.service.TestQuestionLocalServiceUtil;
@@ -41,7 +43,12 @@ import com.liferay.portal.kernel.exception.SystemException;
  * @see com.liferay.lms.service.TestAnswerLocalServiceUtil
  */
 public class TestAnswerLocalServiceImpl extends TestAnswerLocalServiceBaseImpl {
-	public java.util.List<TestAnswer> getTestAnswersByQuestionId(long questionId) throws SystemException
+	
+	public TestAnswer getTestAnswer(String uuid, long actId) throws SystemException{
+		return testAnswerPersistence.fetchByUuid_ActId(uuid, actId);
+	}
+	
+	public List<TestAnswer> getTestAnswersByQuestionId(long questionId) throws SystemException
 	{
 		return testAnswerPersistence.findByq(questionId);
 	}
@@ -58,5 +65,9 @@ public class TestAnswerLocalServiceImpl extends TestAnswerLocalServiceBaseImpl {
 		testanswer.setFeedbacknocorrect(feedbacknocorrect);
 		testAnswerPersistence.update(testanswer, true);
 		return testanswer;
+	}
+	
+	public void deleteTestAnswerByQuestionId(long questionId) throws SystemException{
+		testAnswerPersistence.removeByq(questionId);
 	}
 }

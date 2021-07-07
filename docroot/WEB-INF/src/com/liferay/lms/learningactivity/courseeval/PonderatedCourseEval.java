@@ -319,6 +319,31 @@ public class PonderatedCourseEval extends BaseCourseEval {
             _log.error(e.getMessage());
         }
     }
+    
+    @Override
+    public void cloneCourseEval(Course course, Course newCourse) throws SystemException
+    {
+        _log.debug("cloneCourseEval");
+        
+        Document document = SAXReaderUtil.createDocument();
+        Element rootElement = document.addElement("eval");
+            
+        try {            
+            Map<Long, Float> ponderationValues = _getNewCoursePonderation(course, newCourse);            
+            if (Validator.isNotNull(ponderationValues) && ponderationValues.size() > 0) {
+                _addPonderation(course, rootElement, ponderationValues);              
+            }            
+            
+            _addRequired(course, rootElement, newCourse);
+            
+            newCourse.setCourseExtraData(document.formattedString());
+            CourseLocalServiceUtil.updateCourse(newCourse);
+            
+        } catch (PortalException | DocumentException | IOException e) {
+            _log.error(e.getMessage());
+        }
+    }
+
 
     /**
      * Anade los nodos con la con las actividades obligatorias al nodo principal del xml extradata de un curso 
@@ -346,6 +371,31 @@ public class PonderatedCourseEval extends BaseCourseEval {
             }
         }
     }
+    
+    private void _addRequired(Course course, Element rootElement, Course newCourse)
+        throws DocumentException, PortalException, SystemException
+    {
+        _log.debug("copiamos actividades requeridas");
+        LearningActivity oldActivity = null;
+        LearningActivity newActivity = null;
+        List<Long> required = PonderatedCourseEval.getRequiredActivities(course);
+        if (Validator.isNotNull(required) && required.size() > 0) {              
+            for (long actId : required) {
+            	oldActivity = LearningActivityLocalServiceUtil.getLearningActivity(actId);
+            	if(oldActivity != null){
+            		try{
+	    	        	newActivity = LearningActivityLocalServiceUtil.getLearningActivityByUuidAndGroupId(oldActivity.getUuid(), newCourse.getGroupCreatedId());
+	    	        	if(newActivity != null){
+		                    Element requi=rootElement.addElement("required");
+		                    requi.addAttribute("actId", String.valueOf(newActivity.getActId()));
+	    	        	}
+            		}catch(PortalException e){
+            			if(_log.isDebugEnabled())e.printStackTrace();
+            		}
+                }
+            }
+        }
+    }
 
     /**
      * Obtiene un map con los pesos de las actividades del nuevo curso cuando se clonan cursos
@@ -366,6 +416,29 @@ public class PonderatedCourseEval extends BaseCourseEval {
             if (weights.containsKey(activityWeight)) {
                 ponderationValues.put(correlationActivities.get(activityWeight), weights.get(activityWeight));
             }
+        }
+        return ponderationValues;
+    }
+    
+    
+    private Map<Long, Float> _getNewCoursePonderation(Course course, Course newCourse) throws PortalException, SystemException, DocumentException
+    {
+        Map<Long, Float> ponderationValues = new HashMap<Long, Float>();
+        Map<Long, Float> weights = getActivitiesWeight(course);
+        LearningActivity oldActivity = null;
+        LearningActivity newActivity = null;
+        for (long activityId : weights.keySet()) {
+        	oldActivity = LearningActivityLocalServiceUtil.getLearningActivity(activityId);
+        	if(oldActivity != null){
+        		try{
+        			newActivity = LearningActivityLocalServiceUtil.getLearningActivityByUuidAndGroupId(oldActivity.getUuid(), newCourse.getGroupCreatedId());
+        		}catch(PortalException e){
+        			if(_log.isDebugEnabled())e.printStackTrace();
+        		}
+        		if(newActivity != null){
+	            	ponderationValues.put(newActivity.getActId(), weights.get(activityId));
+	            }
+        	}
         }
         return ponderationValues;
     }

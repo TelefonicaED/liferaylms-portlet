@@ -1,13 +1,19 @@
 package com.liferay.lms.learningactivity;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
 
+import org.apache.commons.io.IOUtils;
+
+import com.liferay.counter.model.Counter;
+import com.liferay.counter.service.CounterLocalServiceUtil;
 import com.liferay.lms.asset.ResourceExternalAssetRenderer;
 import com.liferay.lms.learningactivity.questiontype.QuestionType;
 import com.liferay.lms.learningactivity.questiontype.QuestionTypeRegistry;
@@ -35,10 +41,17 @@ import com.liferay.portal.kernel.xml.DocumentException;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
 import com.liferay.portal.model.PortletConstants;
+import com.liferay.portal.model.ResourceConstants;
+import com.liferay.portal.model.Role;
+import com.liferay.portal.model.RoleConstants;
+import com.liferay.portal.security.permission.ActionKeys;
+import com.liferay.portal.service.ResourcePermissionLocalServiceUtil;
+import com.liferay.portal.service.RoleLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceContextFactory;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
+import com.liferay.portlet.asset.NoSuchEntryException;
 import com.liferay.portlet.asset.model.AssetEntry;
 import com.liferay.portlet.asset.model.AssetRenderer;
 import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
@@ -48,6 +61,7 @@ import com.liferay.portlet.documentlibrary.model.DLFileEntry;
 import com.liferay.portlet.documentlibrary.model.DLFolder;
 import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
 import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
+import com.liferay.portlet.documentlibrary.service.DLFileEntryLocalServiceUtil;
 
 public class ResourceExternalLearningActivityType extends QuestionLearningActivityType  
 {
@@ -677,6 +691,146 @@ public class ResourceExternalLearningActivityType extends QuestionLearningActivi
 	@Override
 	public void copyActivity(LearningActivity oldActivity, LearningActivity newActivity, ServiceContext serviceContext){
 		log.debug("--->COPY ACTIVITY");
+		
+		if(Validator.isNull(newActivity.getExtracontent())){
+			newActivity.setExtracontent(oldActivity.getExtracontent());
+			try {
+				newActivity = LearningActivityLocalServiceUtil.updateLearningActivity(newActivity);
+			} catch (SystemException e) {
+				e.printStackTrace();
+			}
+			
+			try {
+				String entryIdStr = LearningActivityLocalServiceUtil.getExtraContentValue(oldActivity.getActId(), "document");
+				if(!entryIdStr.equals("")){
+					AssetEntry docAsset = AssetEntryLocalServiceUtil.getAssetEntry(Long.valueOf(entryIdStr));
+					if(Validator.isNull(docAsset.getUrl())){
+						try{
+							HashMap<String, String> map = LearningActivityLocalServiceUtil.convertXMLExtraContentToHashMap(newActivity.getActId());
+							Iterator <String> keysString =  map.keySet().iterator();
+							String key = null;
+							AssetEntry docAssetOLD = null;
+							DLFileEntry oldFile = null;
+							InputStream inputStream = null;
+							byte[] byteArray = null;
+							//int index = 0;
+							Folder dlFolderMain = null;
+							long repositoryId = 0;
+							long dlMainFolderId = 0;
+							boolean dlMainFolderFound = false;
+							Folder newDocumentMainFolder =null;
+							String ficheroExtStr= null;
+							String extension[] = null;
+							FileEntry newFile = null;
+							Role siteMemberRole = null;
+							while (keysString.hasNext()){
+								key = keysString.next();
+								if(!key.equals("video") && key.indexOf("document")!=-1){
+									//index++;
+									long assetEntryIdOld =  Long.parseLong(map.get(key));
+									docAssetOLD= AssetEntryLocalServiceUtil.getAssetEntry(assetEntryIdOld);
+									oldFile=DLFileEntryLocalServiceUtil.getDLFileEntry(docAssetOLD.getClassPK());
+									inputStream = DLFileEntryLocalServiceUtil.getFileAsStream(serviceContext.getUserId(), oldFile.getFileVersion().getFileEntryId(), oldFile.getFileVersion().getVersion());
+									try {
+										byteArray = IOUtils.toByteArray(inputStream);
+									} catch (IOException e) {
+										// TODO Auto-generated catch block
+										e.printStackTrace();
+									}
+									repositoryId = DLFolderConstants.getDataRepositoryId(newActivity.getGroupId(), DLFolderConstants.DEFAULT_PARENT_FOLDER_ID);
+									dlMainFolderId = 0;
+									dlMainFolderFound = false;
+									//Get main folder
+									 try {
+										 //Get main folder
+									     dlFolderMain = DLAppLocalServiceUtil.getFolder(repositoryId,DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,DOCUMENTLIBRARY_MAINFOLDER+newActivity.getActId());
+									     dlMainFolderId = dlFolderMain.getFolderId();
+									     dlMainFolderFound = true;
+									     //Get portlet folder
+									  } catch (Exception ex){
+										  if(log.isDebugEnabled()){
+											  ex.printStackTrace();
+										  }
+									  }
+									        
+									//Damos permisos al archivo para usuarios de comunidad.
+									serviceContext.setAddGroupPermissions(true);
+									        
+									 //Create main folder if not exist
+									 if(!dlMainFolderFound){
+										 newDocumentMainFolder = DLAppLocalServiceUtil.addFolder(serviceContext.getUserId(), repositoryId,DLFolderConstants.DEFAULT_PARENT_FOLDER_ID, DOCUMENTLIBRARY_MAINFOLDER+newActivity.getActId(), DOCUMENTLIBRARY_MAINFOLDER+newActivity.getActId(), serviceContext);
+									     dlMainFolderFound = true;
+									     dlMainFolderId = newDocumentMainFolder.getFolderId();
+									 }
+										
+									 ficheroExtStr = "";
+									extension = oldFile.getTitle().split("\\.");
+									if(extension.length > 0){
+											ficheroExtStr = "."+extension[extension.length-1];
+										}
+									
+										newFile = DLAppLocalServiceUtil.addFileEntry(
+												serviceContext.getUserId(), repositoryId , dlMainFolderId , oldFile.getTitle()+ficheroExtStr, oldFile.getMimeType(), 
+											oldFile.getTitle(), StringPool.BLANK, StringPool.BLANK, byteArray , serviceContext ) ;
+
+																		
+										map.put(key, String.valueOf(AssetEntryLocalServiceUtil.getEntry(DLFileEntry.class.getName(), newFile.getPrimaryKey()).getEntryId()));
+										
+									
+										
+										siteMemberRole = RoleLocalServiceUtil.getRole(serviceContext.getCompanyId(), RoleConstants.SITE_MEMBER);
+										ResourcePermissionLocalServiceUtil.setResourcePermissions(serviceContext.getCompanyId(), LearningActivity.class.getName(), 
+												ResourceConstants.SCOPE_INDIVIDUAL,	Long.toString(newActivity.getActId()),siteMemberRole.getRoleId(), new String[] {ActionKeys.VIEW});
+
+								}
+								LearningActivityLocalServiceUtil.saveHashMapToXMLExtraContent(newActivity.getActId(), map);
+							}
+						} catch (NoSuchEntryException nsee) {
+							log.error(" asset not exits ");
+						} catch (Exception e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} finally {
+							serviceContext.setAddGroupPermissions(serviceContext.isAddGroupPermissions());
+						}
+					}
+				}
+			} catch (SystemException | NumberFormatException | PortalException e1) {
+				e1.printStackTrace();
+			}
+			
+		}else{
+			
+
+			try {
+				Document destinationDocument = SAXReaderUtil.read(newActivity.getExtracontent());
+				Element destinationRootElement = destinationDocument.getRootElement();
+				Document originDocument = SAXReaderUtil.read(oldActivity.getExtracontent());
+				Element originRootElement = originDocument.getRootElement();; 
+				
+				destinationRootElement = copyExtraContentElement(destinationRootElement, originRootElement, "video");
+				destinationRootElement = copyExtraContentElement(destinationRootElement, originRootElement, "video-control");
+				destinationRootElement = copyExtraContentElement(destinationRootElement, originRootElement, "show-score-info");
+				destinationRootElement = copyExtraContentElement(destinationRootElement, originRootElement, "correctMode");
+				destinationRootElement = copyExtraContentElement(destinationRootElement, originRootElement, "finalFeedback");
+				destinationRootElement = copyExtraContentElement(destinationRootElement, originRootElement, "questionFeedback");
+
+				//Eliminamos los segundos de las preguntas
+				List<TestQuestion> questions = TestQuestionLocalServiceUtil.getQuestions(newActivity.getActId());
+				for(TestQuestion question: questions){
+					destinationRootElement = deleteExtraContentElement(destinationRootElement, "question_" + question.getQuestionId());
+				}
+				
+				newActivity.setExtracontent(destinationRootElement.formattedString());
+				newActivity = LearningActivityLocalServiceUtil.updateLearningActivity(newActivity);
+			} catch (DocumentException | IOException | SystemException e) {
+				if(log.isDebugEnabled())e.printStackTrace();
+				if(log.isErrorEnabled())log.error(e.getMessage());
+			}
+		}
+
+		super.copyActivity(oldActivity, newActivity, serviceContext);
+		
 		try {
 			List<TestQuestion> oldQuestions = TestQuestionLocalServiceUtil.getQuestions(oldActivity.getActId());
 			List<TestQuestion> newQuestions = TestQuestionLocalServiceUtil.getQuestions(newActivity.getActId());
@@ -714,8 +868,6 @@ public class ResourceExternalLearningActivityType extends QuestionLearningActivi
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
-		
 		
 	}
 	

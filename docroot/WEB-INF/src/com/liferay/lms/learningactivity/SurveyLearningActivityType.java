@@ -5,6 +5,7 @@ import javax.portlet.PortletResponse;
 import com.liferay.lms.asset.SurveyAssetRenderer;
 import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.service.ClpSerializer;
+import com.liferay.lms.service.LearningActivityLocalServiceUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.upload.UploadRequest;
@@ -14,6 +15,7 @@ import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
 import com.liferay.portal.model.PortletConstants;
+import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portlet.asset.model.AssetRenderer;
@@ -127,5 +129,17 @@ public class SurveyLearningActivityType extends QuestionLearningActivityType {
 	
 	public boolean canExportUserAnswers(){
 		return false;
+	}
+	
+	@Override
+	public void copyActivity(LearningActivity oldActivity, LearningActivity newActivity, ServiceContext serviceContext){
+		newActivity.setExtracontent(oldActivity.getExtracontent());
+		try {
+			newActivity = LearningActivityLocalServiceUtil.updateLearningActivity(newActivity);
+		} catch (SystemException e) {
+			e.printStackTrace();
+		}
+		
+		super.copyActivity(oldActivity, newActivity, serviceContext);
 	}
 }

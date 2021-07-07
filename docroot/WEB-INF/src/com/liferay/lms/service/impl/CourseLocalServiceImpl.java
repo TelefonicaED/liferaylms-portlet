@@ -28,6 +28,8 @@ import javax.portlet.PortletPreferences;
 
 import com.liferay.lms.auditing.AuditConstants;
 import com.liferay.lms.auditing.AuditingLogFactory;
+import com.liferay.lms.learningactivity.LearningActivityType;
+import com.liferay.lms.learningactivity.LearningActivityTypeRegistry;
 import com.liferay.lms.learningactivity.courseeval.CourseEval;
 import com.liferay.lms.learningactivity.courseeval.CourseEvalRegistry;
 import com.liferay.lms.model.Course;
@@ -41,6 +43,7 @@ import com.liferay.lms.model.UserCompetence;
 import com.liferay.lms.service.CourseCompetenceLocalServiceUtil;
 import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.lms.service.CourseResultLocalServiceUtil;
+import com.liferay.lms.service.LearningActivityLocalServiceUtil;
 import com.liferay.lms.service.LmsPrefsLocalServiceUtil;
 import com.liferay.lms.service.ModuleLocalServiceUtil;
 import com.liferay.lms.service.UserCompetenceLocalServiceUtil;
@@ -113,12 +116,18 @@ import com.liferay.portlet.asset.model.AssetEntry;
 import com.liferay.portlet.asset.model.AssetLinkConstants;
 import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
 import com.liferay.portlet.asset.service.persistence.AssetEntryQuery;
+import com.liferay.portlet.expando.model.ExpandoTable;
+import com.liferay.portlet.expando.model.ExpandoTableConstants;
+import com.liferay.portlet.expando.model.ExpandoValue;
+import com.liferay.portlet.expando.service.ExpandoTableLocalServiceUtil;
+import com.liferay.portlet.expando.service.ExpandoValueLocalServiceUtil;
 import com.liferay.portlet.social.model.SocialActivityCounterDefinition;
 import com.liferay.portlet.social.model.SocialActivityDefinition;
 import com.liferay.portlet.social.model.SocialActivitySetting;
 import com.liferay.portlet.social.service.SocialActivityLocalServiceUtil;
 import com.liferay.portlet.social.service.SocialActivitySettingLocalServiceUtil;
 import com.liferay.portlet.social.service.SocialActivitySettingServiceUtil;
+import com.liferay.util.CourseCopyUtil;
 import com.liferay.util.LmsLocaleUtil;
 
 
@@ -2220,6 +2229,146 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 	
 	public Date getNextEditionOpen(long parentCourseId){
 		return courseFinder.findNextEditionOpen(parentCourseId);
+	}
+	
+	public void copyParentToEditions(long userId, Course course, boolean description,
+			boolean summary, boolean courseEvalId, boolean calificationType,
+			boolean registrationType, List<Long> columnIds, boolean activities,
+			long[] editionIds, ServiceContext serviceContext) throws SystemException, PortalException {
+		Course edition = null;
+		Group groupEdition = null;
+		Group groupCourse = GroupLocalServiceUtil.getGroup(course.getGroupCreatedId());
+		AssetEntry assetEntryCourse = AssetEntryLocalServiceUtil.getEntry(Course.class.getName(), course.getCourseId());
+		AssetEntry assetEntryEdition = null;
+		ExpandoValue expandoValueCourse = null;
+		ExpandoValue expandoValueEdition = null;
+		ExpandoTable table = ExpandoTableLocalServiceUtil.getTable(course.getCompanyId(), Course.class.getName(), ExpandoTableConstants.DEFAULT_TABLE_NAME);
+		long classNameId = PortalUtil.getClassNameId(Course.class);
+		
+		for(long editionId: editionIds){
+			edition = coursePersistence.fetchByPrimaryKey(editionId);
+			if(description){
+				edition.setDescription(course.getDescription());
+			}
+			if(summary){
+				try {
+					groupEdition = GroupLocalServiceUtil.getGroup(edition.getGroupCreatedId());
+					groupEdition.setDescription(groupCourse.getDescription());
+					GroupLocalServiceUtil.updateGroup(groupEdition);
+					
+					assetEntryEdition = AssetEntryLocalServiceUtil.getEntry(Course.class.getName(), edition.getCourseId());
+
+					assetEntryLocalService.updateEntry(
+							userId, course.getGroupId(), Course.class.getName(),
+							course.getCourseId(), course.getUuid(),assetEntryEdition.getClassTypeId(), 
+							assetEntryEdition.getCategoryIds(),
+							assetEntryEdition.getTagNames(), assetEntryEdition.isVisible(), null, null,
+							new java.util.Date(System.currentTimeMillis()), null,
+							ContentTypes.TEXT_HTML, assetEntryEdition.getTitle(), 
+							assetEntryEdition.getDescription(), 
+							assetEntryCourse.getSummary(), null, null, 0, 0,null, false);
+				} catch (PortalException e) {
+					e.printStackTrace();
+				}
+			}
+			if(courseEvalId){
+				edition.setCourseEvalId(course.getCourseEvalId());
+				CourseEvalRegistry registry = new CourseEvalRegistry();
+				CourseEval courseEval = registry.getCourseEval(course.getCourseEvalId());
+				courseEval.cloneCourseEval(course, edition);
+			}
+			if(calificationType){
+				edition.setCalificationType(course.getCalificationType());
+			}
+			CourseLocalServiceUtil.updateCourse(edition);
+			if(registrationType){
+				try {
+					groupEdition = GroupLocalServiceUtil.getGroup(edition.getGroupCreatedId());
+					groupEdition.setType(groupCourse.getType());
+					GroupLocalServiceUtil.updateGroup(groupEdition);
+				} catch (PortalException e) {
+					e.printStackTrace();
+				}
+			}
+			for(long columnId: columnIds){
+				expandoValueCourse = ExpandoValueLocalServiceUtil.getValue(table.getTableId(), columnId, course.getCourseId());
+				expandoValueEdition = ExpandoValueLocalServiceUtil.getValue(table.getTableId(), columnId, edition.getCourseId());
+				if(expandoValueCourse != null){
+					if(expandoValueEdition == null){
+						try {
+							ExpandoValueLocalServiceUtil.addValue(classNameId, 
+									table.getTableId(), columnId, edition.getCourseId(), expandoValueCourse.getData());
+						} catch (PortalException e) {
+							e.printStackTrace();
+						}
+					}else{
+						expandoValueEdition.setData(expandoValueCourse.getData());
+						ExpandoValueLocalServiceUtil.updateExpandoValue(expandoValueEdition);
+					}
+				}else if(expandoValueEdition != null){
+					ExpandoValueLocalServiceUtil.deleteExpandoValue(expandoValueEdition);
+				}
+			}
+			
+			if(activities){
+				copyModulesAndActivities(userId, course, edition, true, true, serviceContext);
+				CourseEvalRegistry registry = new CourseEvalRegistry();
+				CourseEval courseEval = registry.getCourseEval(course.getCourseEvalId());
+				courseEval.cloneCourseEval(course, edition);
+			}
+		}
+	}
+	
+	public void copyModulesAndActivities(long userId, Course orginCourse, Course destinationCourse, 
+			boolean copyModuleClassification, boolean copyExpandos, ServiceContext serviceContext) throws PortalException, SystemException{
+		List<Module> modules = ModuleLocalServiceUtil.findAllInGroup(orginCourse.getGroupCreatedId());
+		HashMap<Long,Long> correlationActivities = new HashMap<Long, Long>();
+		
+		for(Module originModule:modules){
+			ModuleLocalServiceUtil.copyModule(userId, destinationCourse, originModule, copyModuleClassification, copyExpandos,serviceContext);
+		}	
+		
+		//Obtenemos la relación de modulos mediante los uuid
+		HashMap<Long,Long> correlationModules = new HashMap<Long, Long>();
+		
+		CourseEvalRegistry registry = new CourseEvalRegistry();
+		CourseEval courseEval = registry.getCourseEval(orginCourse.getCourseEvalId());
+		courseEval.cloneCourseEval(orginCourse, destinationCourse, correlationModules, correlationActivities);
+		
+		//Dependencias de modulos
+		Module modulePredecesorIdOld = null;
+		Module modulePredecesorIdNew = null;
+		Module moduleNew = null;
+		for(Module module:modules){
+			if(module.getPrecedence() > 0){
+				moduleNew = ModuleLocalServiceUtil.getModuleByUuidAndGroupId(module.getUuid(), destinationCourse.getGroupCreatedId());
+				modulePredecesorIdOld = ModuleLocalServiceUtil.getModule(module.getPrecedence());
+				modulePredecesorIdNew = ModuleLocalServiceUtil.getModuleByUuidAndGroupId(modulePredecesorIdOld.getUuid(), destinationCourse.getGroupCreatedId());
+				if(moduleNew != null && modulePredecesorIdOld != null && modulePredecesorIdNew != null){
+					moduleNew.setPrecedence(modulePredecesorIdNew.getModuleId());
+					ModuleLocalServiceUtil.updateModule(moduleNew);
+				}
+			}
+		}
+		
+
+		List<LearningActivity> destinationActivities = LearningActivityLocalServiceUtil.getLearningActivitiesOfGroup(destinationCourse.getGroupCreatedId());
+		
+		LearningActivityType lat = null;
+		LearningActivity originActivity = null;
+		LearningActivityTypeRegistry learningActivityTypeRegistry = new LearningActivityTypeRegistry();
+		
+		for(LearningActivity activity: destinationActivities){
+			try{
+				originActivity = LearningActivityLocalServiceUtil.getLearningActivityByUuidAndGroupId(activity.getUuid(), orginCourse.getGroupCreatedId());
+				if(originActivity != null){
+					lat = learningActivityTypeRegistry.getLearningActivityType(activity.getTypeId());
+					lat.copyActivityFinish(originActivity, activity, serviceContext);
+				}
+			} catch (PortalException | SystemException e) {
+				if(log.isDebugEnabled())e.printStackTrace();
+			}
+		}
 	}
 	
 }

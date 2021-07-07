@@ -432,12 +432,6 @@ public class GroupListener extends BaseModelListener<Group> {
 							message.put("url", 		url);
 							message.put("urlcourse",urlcourse);		
 
-							
-							
-							
-
-							
-							
 							MessageBusUtil.sendMessage("lms/mailing", message);
 						}
 						catch(Exception ex)
