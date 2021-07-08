@@ -1,6 +1,7 @@
 package com.liferay.lms.learningactivity;
 
 import java.io.IOException;
+
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
 import javax.portlet.PortletRequest;
@@ -281,26 +282,63 @@ public class ResourceInternalLearningActivityType extends BaseLearningActivityTy
 	
 	@Override
 	public void copyActivity(LearningActivity oldActivity, LearningActivity newActivity, ServiceContext serviceContext){
-		super.copyActivity(oldActivity, newActivity, serviceContext);
-		try {
+		if(Validator.isNull(newActivity.getExtracontent())){
+			super.copyActivity(oldActivity, newActivity, serviceContext);
+			try {
+		
+				String entryIdStr = LearningActivityLocalServiceUtil.getExtraContentValue(oldActivity.getActId(), "assetEntry");
 	
-			String entryIdStr = LearningActivityLocalServiceUtil.getExtraContentValue(oldActivity.getActId(), "assetEntry");
-
-			if(!entryIdStr.equals("")){
-				
-				AssetEntry docAsset = AssetEntryLocalServiceUtil.getAssetEntry(Long.valueOf(entryIdStr));
-				long entryId = 0;
-				if(docAsset.getUrl()!=null && docAsset.getUrl().trim().length()>0){
-					entryId = Long.valueOf(entryIdStr);
-				}else{
-					entryId = CourseCopyUtil.cloneFile(Long.valueOf(entryIdStr), newActivity, serviceContext.getUserId(), serviceContext);
+				if(!entryIdStr.equals("")){
+					
+					AssetEntry docAsset = AssetEntryLocalServiceUtil.getAssetEntry(Long.valueOf(entryIdStr));
+					long entryId = 0;
+					if(docAsset.getUrl()!=null && docAsset.getUrl().trim().length()>0){
+						entryId = Long.valueOf(entryIdStr);
+					}else{
+						entryId = CourseCopyUtil.cloneFile(Long.valueOf(entryIdStr), newActivity, serviceContext.getUserId(), serviceContext);
+					}
+	
+					LearningActivityLocalServiceUtil.setExtraContentValue(newActivity.getActId(), "assetEntry", String.valueOf(entryId));
 				}
-
-				LearningActivityLocalServiceUtil.setExtraContentValue(newActivity.getActId(), "assetEntry", String.valueOf(entryId));
+				
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
-			
-		} catch (Exception e) {
-			e.printStackTrace();
+		}else{
+			//miramos si es distinto
+			try {
+				String oldEntryIdStr = LearningActivityLocalServiceUtil.getExtraContentValue(oldActivity.getActId(), "assetEntry");
+				String newEntryIdStr = LearningActivityLocalServiceUtil.getExtraContentValue(newActivity.getActId(), "assetEntry");
+				if(Validator.isNotNull(oldEntryIdStr) && Validator.isNull(newEntryIdStr)){
+					AssetEntry docAsset = AssetEntryLocalServiceUtil.getAssetEntry(Long.valueOf(oldEntryIdStr));
+					long entryId = 0;
+					if(docAsset.getUrl()!=null && docAsset.getUrl().trim().length()>0){
+						entryId = Long.valueOf(oldEntryIdStr);
+					}else{
+						entryId = CourseCopyUtil.cloneFile(Long.valueOf(oldEntryIdStr), newActivity, serviceContext.getUserId(), serviceContext);
+					}
+	
+					LearningActivityLocalServiceUtil.setExtraContentValue(newActivity.getActId(), "assetEntry", String.valueOf(entryId));
+				}else if(Validator.isNotNull(oldEntryIdStr) && Validator.isNotNull(newEntryIdStr)){
+					AssetEntry oldDocAsset = AssetEntryLocalServiceUtil.getAssetEntry(Long.valueOf(oldEntryIdStr));
+					AssetEntry newDocAsset = AssetEntryLocalServiceUtil.getAssetEntry(Long.valueOf(newEntryIdStr));
+					if(oldDocAsset.getCreateDate().after(newDocAsset.getCreateDate())){
+						//Actualizamos el documento
+						long entryId = 0;
+						if(oldDocAsset.getUrl()!=null && oldDocAsset.getUrl().trim().length()>0){
+							entryId = Long.valueOf(oldEntryIdStr);
+						}else{
+							entryId = CourseCopyUtil.cloneFile(Long.valueOf(oldEntryIdStr), newActivity, serviceContext.getUserId(), serviceContext);
+						}
+						LearningActivityLocalServiceUtil.setExtraContentValue(newActivity.getActId(), "assetEntry", String.valueOf(entryId));
+					}
+				}else{
+					LearningActivityLocalServiceUtil.setExtraContentValue(newActivity.getActId(), "assetEntry", "");
+				}
+			} catch (SystemException | NumberFormatException | PortalException e) {
+				e.printStackTrace();
+			}
+					
 		}
 	}
 }

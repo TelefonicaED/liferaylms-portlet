@@ -348,7 +348,7 @@ public class CourseCopyUtil {
 					serviceContext.getUserId(), repositoryId , dlFolder.getFolderId() , ficheroStr, docfile.getMimeType(), 
 					docfile.getTitle(), StringPool.BLANK, StringPool.BLANK, is, docfile.getSize() , serviceContext ) ;
 			
-			
+
 			AssetEntry asset = AssetEntryLocalServiceUtil.getEntry(DLFileEntry.class.getName(), newFile.getPrimaryKey());
 			
 			if(log.isDebugEnabled()){log.debug(" asset : " + asset.getEntryId());};
