@@ -59,6 +59,36 @@
 				[$WHERESEARCH$]
 		]]>
 	</sql>
+	
+		<sql id="com.liferay.lms.service.persistence.CourseFinder.countStudentsByGenere">
+		<![CDATA[   			
+			SELECT 
+				COUNT(DISTINCT u.userId) AS COUNT_VALUE
+			FROM 
+				user_ u
+			INNER JOIN 
+				users_groups ug 
+					ON u.userId = ug.userId
+			INNER JOIN 
+				lms_course co 
+					ON co.groupCreatedId = ug.groupId
+			LEFT JOIN 
+				usergrouprole ur 
+					ON ug.userId = ur.userId AND ur.groupId = ug.groupId AND ur.roleId= ?
+			LEFT JOIN 
+				usergrouprole urE 
+					ON ug.userId = urE.userId AND urE.groupId = ug.groupId AND urE.roleId = ?
+			[$JOINCOURSERESULT$]
+			[$JOINTEAM$]
+			[$JOINCONTACT$]
+			WHERE 
+				ur.userId IS NULL AND urE.userId IS NULL 
+				[$WHERECOURSEOREDITIONS$]
+				[$WHERESTATUS$]
+				[$WHERESEARCH$]
+		]]>
+	</sql>
+	
 	<sql id="com.liferay.lms.service.persistence.CourseFinder.whereCourseId">
 		<![CDATA[ 
 			AND co.courseId = ?
@@ -125,6 +155,11 @@
 	<sql id="com.liferay.lms.service.persistence.CourseFinder.innerJoinTeam">
 		<![CDATA[
 			INNER JOIN users_teams ON users_teams.userId = u.userId AND users_teams.teamId IN ([$TEAMIDS$])
+		]]>
+	</sql>
+	<sql id="com.liferay.lms.service.persistence.CourseFinder.innerJoinContact">
+		<![CDATA[
+			INNER JOIN contact_ ON contact_.contactId  = u.contactId AND contact_.male = [$GENERE$]
 		]]>
 	</sql>
 </custom-sql>

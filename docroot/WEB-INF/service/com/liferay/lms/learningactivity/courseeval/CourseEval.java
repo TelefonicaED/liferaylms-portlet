@@ -42,6 +42,7 @@ public interface CourseEval
      * @throws SystemException
      */
 	public void cloneCourseEval(Course course, Course newCourse, HashMap<Long,Long> correlationModules, HashMap<Long,Long> correlationActivities) throws SystemException;
+	public void cloneCourseEval(Course course, Course newCourse) throws SystemException;
 
 	public String getExpecificContentPage();
 	public void setExtraContent(Course course, String actionId, ServiceContext serviceContext) 

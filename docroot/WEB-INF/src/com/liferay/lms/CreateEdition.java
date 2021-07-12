@@ -11,6 +11,8 @@ import com.liferay.lms.course.diploma.CourseDiploma;
 import com.liferay.lms.course.diploma.CourseDiplomaRegistry;
 import com.liferay.lms.learningactivity.LearningActivityType;
 import com.liferay.lms.learningactivity.LearningActivityTypeRegistry;
+import com.liferay.lms.learningactivity.courseeval.CourseEval;
+import com.liferay.lms.learningactivity.courseeval.CourseEvalRegistry;
 import com.liferay.lms.model.AsynchronousProcessAudit;
 import com.liferay.lms.model.Course;
 import com.liferay.lms.model.CourseType;
@@ -236,7 +238,6 @@ public class CreateEdition extends CourseCopyUtil implements MessageListener {
 		Group newGroup = GroupLocalServiceUtil.getGroup(newCourse.getGroupCreatedId());
 		serviceContext.setScopeGroupId(newCourse.getGroupCreatedId());
 		      
-		Role siteMemberRole = RoleLocalServiceUtil.getRole(themeDisplay.getCompanyId(), RoleConstants.SITE_MEMBER);
 		newCourse.setIcon(course.getIcon());
 		
 		try{
@@ -278,7 +279,7 @@ public class CreateEdition extends CourseCopyUtil implements MessageListener {
 		/*********************************************************/
 		
 		//Create modules and activities
-		createModulesAndActivities(newCourse, siteMemberRole, group.getGroupId());
+		CourseLocalServiceUtil.copyModulesAndActivities(themeDisplay.getUserId(), course, newCourse, true, true, serviceContext);
 		
 		CourseTypeFactoryRegistry courseTypeFactoryRegistry = new CourseTypeFactoryRegistry();
 		AssetEntry entry=AssetEntryLocalServiceUtil.getEntry(Course.class.getName(),newCourse.getCourseId());
@@ -293,6 +294,10 @@ public class CreateEdition extends CourseCopyUtil implements MessageListener {
 				}
 			}
 		}
+		
+		CourseEvalRegistry registry = new CourseEvalRegistry();
+		CourseEval courseEval = registry.getCourseEval(course.getCourseEvalId());
+		courseEval.cloneCourseEval(course, newCourse);
 		
 		Date endDate = new Date();
 		if(!error){
@@ -310,236 +315,4 @@ public class CreateEdition extends CourseCopyUtil implements MessageListener {
 		MessageBusUtil.sendMessage("liferay/lms/createEditionPostAction", postActionMessage);					
 		log.debug(" ENDS!");
 	}
-	
-	
-	private void createModulesAndActivities(Course newCourse, Role siteMemberRole, long groupId) throws SystemException{
-		
-		LearningActivityTypeRegistry learningActivityTypeRegistry = new LearningActivityTypeRegistry();
-		List<Module> modules = ModuleLocalServiceUtil.findAllInGroup(groupId);
-		
-		HashMap<Long,Long> correlationModules = new HashMap<Long, Long>();
-		HashMap<Long,Long> modulesDependencesList = new  HashMap<Long, Long>();
-		Module newModule=null;
-		HashMap<Long, Long> pending = new HashMap<Long, Long>();
-		HashMap<Long,Long> correlationActivities = new HashMap<Long, Long>();
-		List<LearningActivity> activities =  new ArrayList<LearningActivity>();
-		LearningActivity newLearnActivity=null;
-		LearningActivity nuevaLarn = null;
-		List<Long> evaluations = new ArrayList<Long>(); 
-		
-		for(Module module:modules){
-			
-			try {
-				newModule = new ModuleImpl();
-				if(module.getPrecedence()!=0){
-					modulesDependencesList.put(module.getModuleId(),module.getPrecedence());
-				}
-				
-				newModule.setTitle(module.getTitle());
-				newModule.setDescription(module.getDescription());
-				newModule.setGroupId(newCourse.getGroupId());
-				newModule.setCompanyId(newCourse.getCompanyId());
-				newModule.setGroupId(newCourse.getGroupCreatedId());
-				newModule.setUserId(newCourse.getUserId());
-				
-				newModule.setAllowedTime(module.getAllowedTime());
-				newModule.setIcon(module.getIcon());
-				if(module.getStartDate() != null)
-					newModule.setStartDate(startExecutionDate);
-				if(module.getEndDate() != null)
-					newModule.setEndDate(endExecutionDate);
-				newModule = ModuleLocalServiceUtil.addmodule(newModule);
-				
-				correlationModules.put(module.getModuleId(), newModule.getModuleId());
-				newModule.setDescription(descriptionFilesClone(module.getDescription(),newCourse.getGroupCreatedId(), newModule.getModuleId(),themeDisplay.getUserId()));
-				newModule.setOrdern(newModule.getModuleId());
-				newModule.setUuid(module.getUuid());
-				ModuleLocalServiceUtil.updateModule(newModule);
-				if(log.isDebugEnabled()){
-					log.debug("\n    Module : " + module.getTitle(Locale.getDefault()) +"("+module.getModuleId()+")");
-					log.debug("    + Module : " + newModule.getTitle(Locale.getDefault()) +"("+newModule.getModuleId()+")" );
-					
-				}
-				
-				//Copiar la clasificaciÃ³n de los mÃ³dulos
-				AssetEntry entryModule = AssetEntryLocalServiceUtil.fetchEntry(Module.class.getName(), module.getModuleId());
-				if(Validator.isNotNull(entryModule))
-					AssetEntryLocalServiceUtil.updateEntry(newModule.getUserId(), newModule.getGroupId(), Module.class.getName(), 
-						newModule.getModuleId(), entryModule.getCategoryIds(), entryModule.getTagNames());
-				
-				createLearningActivities(module, newModule, siteMemberRole, learningActivityTypeRegistry, pending, correlationActivities, activities, newLearnActivity, nuevaLarn, evaluations);
-				
-				
-			} catch (Exception e) {
-				e.printStackTrace();
-				error=true;
-				statusMessage += e.getMessage() + "\n";
-				continue;
-			}
-			
-		}	
-		
-		
-		//Dependencias de modulos
-		log.debug("modulesDependencesList "+modulesDependencesList.keySet());
-		Long moduleToBePrecededNew = null;
-		Long modulePredecesorIdOld = null;
-		Long modulePredecesorIdNew = null;
-		for(Long id : modulesDependencesList.keySet()){
-			//id del modulo actual
-			moduleToBePrecededNew = correlationModules.get(id);
-			modulePredecesorIdOld =  modulesDependencesList.get(id);
-			modulePredecesorIdNew = correlationModules.get(modulePredecesorIdOld);
-			Module moduleNew = ModuleLocalServiceUtil.fetchModule(moduleToBePrecededNew);
-			if(moduleNew!=null){
-				moduleNew.setPrecedence(modulePredecesorIdNew);
-				ModuleLocalServiceUtil.updateModule(moduleNew);	
-			}
-		}
-	}
-	
-	
-	private void createLearningActivities(Module parentModule, Module newModule, Role siteMemberRole, LearningActivityTypeRegistry learningActivityTypeRegistry,
-			HashMap<Long, Long> pending, HashMap<Long,Long> correlationActivities, List<LearningActivity> activities, LearningActivity newLearnActivity, LearningActivity nuevaLarn, List<Long> evaluations) throws SystemException, PortalException{
-		
-		boolean canBeLinked = false;
-		activities = LearningActivityLocalServiceUtil.getLearningActivitiesOfModule(parentModule.getModuleId());
-		for(LearningActivity activity:activities){
-			try {				
-				canBeLinked = learningActivityTypeRegistry.getLearningActivityType(activity.getTypeId()).canBeLinked();
-				//Fill common columns
-				newLearnActivity = LearningActivityLocalServiceUtil.createLearningActivity(CounterLocalServiceUtil.increment(LearningActivity.class.getName()));
-				newLearnActivity.setUuid(activity.getUuid());
-				newLearnActivity.setTypeId(activity.getTypeId());
-				newLearnActivity.setFeedbackCorrect(activity.getFeedbackCorrect());
-				newLearnActivity.setFeedbackNoCorrect(activity.getFeedbackNoCorrect());
-				newLearnActivity.setPriority(newLearnActivity.getActId());
-				newLearnActivity.setWeightinmodule(activity.getWeightinmodule());
-				newLearnActivity.setGroupId(newModule.getGroupId());
-				newLearnActivity.setModuleId(newModule.getModuleId());
-				if(activity.getStartdate() != null)
-					newLearnActivity.setStartdate(startExecutionDate);
-				if(activity.getEnddate() != null)
-					newLearnActivity.setEnddate(endExecutionDate);
-				boolean actPending = false;
-				if(activity.getPrecedence()>0){
-					if(correlationActivities.get(activity.getPrecedence())==null){
-						actPending = true;
-					}else{
-						newLearnActivity.setPrecedence(correlationActivities.get(activity.getPrecedence()));
-					}
-				}
-				
-			
-				//TODO Cuando estÃ© preparado la parte de linkar no habrÃ¡ que copiar todo
-				//else{
-					newLearnActivity.setExtracontent(activity.getExtracontent());
-					newLearnActivity.setTitle(activity.getTitle());
-					newLearnActivity.setDescription(activity.getDescription());
-					newLearnActivity.setTries(activity.getTries());
-					newLearnActivity.setPasspuntuation(activity.getPasspuntuation());
-					newLearnActivity.setDescription(descriptionFilesClone(activity.getDescription(),newModule.getGroupId(), newLearnActivity.getActId(),themeDisplay.getUserId()));
-				//}
-				
-				ServiceContext larnServiceContext = serviceContext;
-	
-
-
-				AssetEntry entryActivity = AssetEntryLocalServiceUtil.fetchEntry(LearningActivity.class.getName(), activity.getActId());
-				if(Validator.isNotNull(entryActivity)){
-					
-					larnServiceContext.setAssetCategoryIds(entryActivity.getCategoryIds());
-					larnServiceContext.setAssetTagNames(entryActivity.getTagNames());
-					larnServiceContext.setExpandoBridgeAttributes(activity.getExpandoBridge().getAttributes());
-			
-				}
-				
-				nuevaLarn=LearningActivityLocalServiceUtil.addLearningActivity(newLearnActivity,larnServiceContext);
-				nuevaLarn.setExpandoBridgeAttributes(larnServiceContext);
-				nuevaLarn.getExpandoBridge().setAttributes(activity.getExpandoBridge().getAttributes());
-				
-				if(canBeLinked){
-					nuevaLarn.setLinkedActivityId(activity.getActId());
-				}
-				nuevaLarn.setUuid(activity.getUuid());
-				LearningActivityLocalServiceUtil.updateLearningActivity(nuevaLarn);
-				
-				log.debug("ACTIVITY EXTRA CONTENT BEFORE "+ newLearnActivity.getExtracontent());
-				
-				log.debug("Learning Activity : " + activity.getTitle(Locale.getDefault())+ " ("+activity.getActId()+", " + LanguageUtil.get(Locale.getDefault(),learningActivityTypeRegistry.getLearningActivityType(activity.getTypeId()).getName())+")");
-				log.debug("+Learning Activity : " + nuevaLarn.getTitle(Locale.getDefault())+ " ("+nuevaLarn.getActId()+", " + LanguageUtil.get(Locale.getDefault(),learningActivityTypeRegistry.getLearningActivityType(nuevaLarn.getTypeId()).getName())+") Can Be Linked: "+canBeLinked);
-				
-				
-
-				cloneActivityFile(activity, nuevaLarn, themeDisplay.getUserId(), serviceContext);
-				
-				
-				long actId = nuevaLarn.getActId();
-				correlationActivities.put(activity.getActId(), actId);
-				boolean visibleParent = ResourcePermissionLocalServiceUtil.hasResourcePermission(siteMemberRole.getCompanyId(), LearningActivity.class.getName(), 
-						ResourceConstants.SCOPE_INDIVIDUAL,	Long.toString(activity.getActId()),siteMemberRole.getRoleId(), ActionKeys.VIEW);			
-				
-				if(visibleParent){
-					ResourcePermissionLocalServiceUtil.setResourcePermissions(siteMemberRole.getCompanyId(), LearningActivity.class.getName(), 
-							ResourceConstants.SCOPE_INDIVIDUAL,	Long.toString(actId),siteMemberRole.getRoleId(), new String[] {ActionKeys.VIEW});
-					
-				}else{
-					ResourcePermissionLocalServiceUtil.removeResourcePermission(siteMemberRole.getCompanyId(), LearningActivity.class.getName(), 
-							ResourceConstants.SCOPE_INDIVIDUAL,	Long.toString(actId),siteMemberRole.getRoleId(), ActionKeys.VIEW);
-				}
-				
-				if(nuevaLarn.getTypeId() == 8){
-					evaluations.add(nuevaLarn.getActId());
-				}
-				
-				if(actPending){
-					pending.put(actId, activity.getPrecedence());
-				}
-				
-				
-				
-			} catch (Exception e) {
-				e.printStackTrace();
-				error=true;
-				statusMessage += e.getMessage() + "\n";
-				continue;
-			}
-
-			
-			//TODO Descomentar cuando estÃ© implementado las actividades linkadas.
-			//if(!canBeLinked){
-			createTestQuestionsAndAnswers(activity, nuevaLarn, newModule, themeDisplay.getUserId());
-		
-		
-			LearningActivityType lat = new LearningActivityTypeRegistry().getLearningActivityType(activity.getTypeId());
-			lat.copyActivity(activity, nuevaLarn, serviceContext);
-		}
-		
-	
-		 
-		
-		//Set the precedences
-		if(pending.size()>0){
-			for(Long id : pending.keySet()){
-				LearningActivity la = LearningActivityLocalServiceUtil.getLearningActivity(id);
-				
-				if(log.isDebugEnabled())log.debug(la);
-				if(la!=null){
-					Long idAsig = pending.get(id);
-
-					if(log.isDebugEnabled())log.debug(idAsig);
-					if(idAsig!=null){
-						Long other = correlationActivities.get(idAsig);
-						if(log.isDebugEnabled())log.debug(other);
-						la.setPrecedence(other);
-						
-						LearningActivityLocalServiceUtil.updateLearningActivity(la);
-					}
-				}
-			}
-		}
-		
-		//Extra Content de las evaluaciones
-		copyEvaluationExtraContent(evaluations, correlationActivities);
-	}	
 }

@@ -15,6 +15,7 @@
 package com.liferay.lms.service.impl;
 
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -31,10 +32,14 @@ import com.liferay.counter.service.CounterLocalServiceUtil;
 import com.liferay.lms.asset.LearningActivityBaseAssetRenderer;
 import com.liferay.lms.auditing.AuditConstants;
 import com.liferay.lms.auditing.AuditingLogFactory;
+import com.liferay.lms.learningactivity.LearningActivityType;
+import com.liferay.lms.learningactivity.LearningActivityTypeRegistry;
+import com.liferay.lms.model.Course;
 import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.model.LearningActivityTry;
 import com.liferay.lms.model.Module;
 import com.liferay.lms.model.ModuleResult;
+import com.liferay.lms.model.impl.ModuleImpl;
 import com.liferay.lms.service.ClpSerializer;
 import com.liferay.lms.service.LearningActivityLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityTryLocalServiceUtil;
@@ -73,6 +78,7 @@ import com.liferay.portal.model.PortletConstants;
 import com.liferay.portal.model.ResourceConstants;
 import com.liferay.portal.model.Role;
 import com.liferay.portal.model.RoleConstants;
+import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.LayoutLocalServiceUtil;
 import com.liferay.portal.service.LayoutServiceUtil;
@@ -82,6 +88,16 @@ import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portlet.PortletURLFactoryUtil;
 import com.liferay.portlet.asset.model.AssetEntry;
+import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
+import com.liferay.portlet.expando.model.ExpandoColumn;
+import com.liferay.portlet.expando.model.ExpandoTable;
+import com.liferay.portlet.expando.model.ExpandoTableConstants;
+import com.liferay.portlet.expando.model.ExpandoValue;
+import com.liferay.portlet.expando.service.ExpandoColumnLocalServiceUtil;
+import com.liferay.portlet.expando.service.ExpandoTableLocalServiceUtil;
+import com.liferay.portlet.expando.service.ExpandoValueLocalServiceUtil;
+import com.liferay.portlet.expando.util.ExpandoBridgeFactoryUtil;
+import com.liferay.util.CourseCopyUtil;
 import com.liferay.util.LmsLocaleUtil;
 
 /**
@@ -731,6 +747,93 @@ public class ModuleLocalServiceImpl extends ModuleLocalServiceBaseImpl {
 	
 	public List<Module> getModulesByCompanyId(long companyId) throws SystemException{
 		return modulePersistence.findByCompanyId(companyId);
+	}
+	
+	public Module copyModule(long userId, Course destinationCourse, Module originModule, boolean copyModuleClassification,
+			boolean copyExpandos, ServiceContext serviceContext) throws SystemException, PortalException{
+
+		//Comprobamos si existe el módulo ya en el curso de destino, si no existe lo creo y si existe lo actualizo
+		Module destinationModule = modulePersistence.fetchByUUID_G(originModule.getUuid(), destinationCourse.getGroupCreatedId());
+				
+		if(destinationModule == null){
+			destinationModule = addModule(destinationCourse.getCompanyId(), destinationCourse.getGroupCreatedId(), userId, 
+					originModule.getTitleMap(), originModule.getDescriptionMap(), null, 
+					null, originModule.getOrdern(), null);
+					modulePersistence.create(counterLocalService.increment(Module.class.getName()));
+			destinationModule.setUuid(originModule.getUuid());
+			destinationModule = modulePersistence.update(destinationModule, true);
+		}
+			
+		destinationModule.setTitle(originModule.getTitle());
+		destinationModule.setDescription(originModule.getDescription());
+		destinationModule.setUserId(destinationCourse.getUserId());
+		
+		destinationModule.setAllowedTime(originModule.getAllowedTime());
+		destinationModule.setIcon(originModule.getIcon());
+
+        if (Validator.isNotNull(originModule.getDescription())) {
+        	destinationModule.setDescription(CourseCopyUtil.descriptionFilesClone(originModule.getDescription(),
+        			destinationCourse.getGroupCreatedId(), userId));
+        }
+        destinationModule.setOrdern(originModule.getModuleId());
+		
+		destinationModule = modulePersistence.update(destinationModule, true);
+		
+		if(log.isDebugEnabled()){
+			log.debug("\n    Module : " + originModule.getTitle(Locale.getDefault()) +"("+originModule.getModuleId()+")");
+			log.debug("    + Module : " + destinationModule.getTitle(Locale.getDefault()) +"("+destinationModule.getModuleId()+")" );
+		}
+		
+		//Copiar clasificación del módulo
+		if(copyModuleClassification){
+			AssetEntry originAssetEntry = AssetEntryLocalServiceUtil.fetchEntry(Module.class.getName(), originModule.getModuleId());
+			AssetEntry destinationAssetEntry = AssetEntryLocalServiceUtil.fetchEntry(Module.class.getName(), destinationModule.getModuleId());
+			
+			if(log.isDebugEnabled()) log.debug(":::Clone module classification::: ");
+			
+			if(originAssetEntry != null && destinationAssetEntry != null){
+				AssetEntryLocalServiceUtil.updateEntry(userId, destinationModule.getGroupId(), Module.class.getName(), 
+						destinationModule.getModuleId(), originAssetEntry.getCategoryIds(), originAssetEntry.getTagNames());
+			}
+		}
+		
+		if(copyExpandos){
+			ExpandoTable table = ExpandoTableLocalServiceUtil.getTable(destinationCourse.getCompanyId(), PortalUtil.getClassNameId(Course.class), ExpandoTableConstants.DEFAULT_TABLE_NAME);
+			List<ExpandoColumn> columns = ExpandoColumnLocalServiceUtil.getColumns(table.getTableId());
+			
+			ExpandoValue originExpandoValue = null;
+			ExpandoValue destinationExpandoValue = null;
+			long classNameId = PortalUtil.getClassNameId(Module.class);
+			
+			for(ExpandoColumn column: columns){
+				originExpandoValue = ExpandoValueLocalServiceUtil.getValue(table.getTableId(), column.getColumnId(), originModule.getModuleId());
+				destinationExpandoValue = ExpandoValueLocalServiceUtil.getValue(table.getTableId(), column.getColumnId(), destinationModule.getModuleId());
+				
+				if(originExpandoValue != null){
+					if(destinationExpandoValue == null){
+						try {
+							ExpandoValueLocalServiceUtil.addValue(classNameId, 
+									table.getTableId(), column.getColumnId(), destinationModule.getModuleId(), originExpandoValue.getData());
+						} catch (PortalException e) {
+							e.printStackTrace();
+						}
+					}else{
+						destinationExpandoValue.setData(originExpandoValue.getData());
+						ExpandoValueLocalServiceUtil.updateExpandoValue(destinationExpandoValue);
+					}
+				}else if(destinationExpandoValue != null){
+					ExpandoValueLocalServiceUtil.deleteExpandoValue(destinationExpandoValue);
+				}
+			}
+		}
+		
+		List<LearningActivity> activities = LearningActivityLocalServiceUtil.getLearningActivitiesOfModule(originModule.getModuleId());
+		
+		for(LearningActivity activity:activities){
+			LearningActivityLocalServiceUtil.copyLearningActivity(userId, destinationModule, activity, true, true, serviceContext);
+		}
+		
+		return destinationModule;
 	}
 	
 }

@@ -12,6 +12,7 @@ import com.liferay.lms.lar.ExportUtil;
 import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.model.LearningActivityResult;
 import com.liferay.lms.model.LearningActivityTry;
+import com.liferay.lms.service.LearningActivityLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityResultLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityTryLocalServiceUtil;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -21,8 +22,11 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.upload.UploadRequest;
 import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.DocumentException;
 import com.liferay.portal.kernel.xml.Element;
+import com.liferay.portal.kernel.xml.SAXReaderUtil;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portlet.asset.model.AssetEntry;
 import com.liferay.portlet.asset.model.AssetRenderer;
@@ -301,7 +305,47 @@ public abstract class BaseLearningActivityType implements LearningActivityType, 
 	
 	@Override
 	public void copyActivity(LearningActivity oldActivity, LearningActivity newActivity, ServiceContext serviceContext){
-		
+		newActivity.setExtracontent(oldActivity.getExtracontent());
+		try {
+			if(Validator.isNotNull(newActivity.getExtracontent())){
+
+				try {
+					Document document = SAXReaderUtil.read(newActivity.getExtracontent());
+					Element	rootElement = document.getRootElement();
+					Element teamElement=rootElement.element("team");
+					
+					if(teamElement!=null){
+						teamElement.detach();
+						rootElement.remove(teamElement);
+					}
+					newActivity.setExtracontent(document.formattedString());
+				} catch (DocumentException | IOException e) {
+					e.printStackTrace();
+				}
+			}
+			newActivity = LearningActivityLocalServiceUtil.updateLearningActivity(newActivity);
+		} catch (SystemException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	@Override
+	public void copyActivityFinish(LearningActivity oldActivity, LearningActivity newActivity, ServiceContext serviceContext) throws SystemException{
+		if(oldActivity.getPrecedence() > 0){
+			LearningActivity originActivity = LearningActivityLocalServiceUtil.fetchLearningActivity(oldActivity.getPrecedence());
+			if(originActivity != null){
+				LearningActivity destinationActivity = null;
+				try {
+					destinationActivity = LearningActivityLocalServiceUtil.getLearningActivityByUuidAndGroupId(originActivity.getUuid(), newActivity.getGroupId());
+				} catch (PortalException | SystemException e) {
+					if(log.isDebugEnabled())e.printStackTrace();
+				}
+				if(destinationActivity != null){
+					newActivity.setPrecedence(destinationActivity.getActId());
+					newActivity = LearningActivityLocalServiceUtil.updateLearningActivity(newActivity);
+				}
+			}
+		}
 	}
 	
 	@Override
@@ -319,5 +363,40 @@ public abstract class BaseLearningActivityType implements LearningActivityType, 
 			finished = learningActivity.getTries()>0&&LearningActivityTryLocalServiceUtil.getTriesCountByActivityAndUser(learningActivityResult.getActId(), learningActivityResult.getUserId())>=learningActivity.getTries();
 		}
 		return finished;
+	}
+	
+	public Element copyExtraContentElement(Element destinationRootElement, Element originRootElement, String element){
+		
+		Element destinationElement=destinationRootElement.element(element);
+		Element originElement=originRootElement.element(element);
+		
+		if(originElement == null && destinationElement != null){
+			destinationElement.detach();
+			destinationRootElement.remove(destinationElement);
+		}else if(originElement != null && destinationElement == null){
+			destinationElement = SAXReaderUtil.createElement(element);
+			destinationElement.setText(originElement.getText());		
+			destinationRootElement.add(destinationElement);
+		}else if(originElement != null && destinationElement != null){
+			destinationElement.detach();
+			destinationRootElement.remove(destinationElement);
+			destinationElement = SAXReaderUtil.createElement(element);
+			destinationElement.setText(originElement.getText());		
+			destinationRootElement.add(destinationElement);
+		}
+		
+		return destinationRootElement;
+	}
+	
+	public Element deleteExtraContentElement(Element rootElement, String nameElement){
+		
+		Element element=rootElement.element(nameElement);
+		
+		if(element != null){
+			element.detach();
+			rootElement.remove(element);
+		}
+		
+		return rootElement;
 	}
 }

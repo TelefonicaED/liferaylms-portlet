@@ -26,13 +26,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.portlet.PortletRequest;
-import javax.portlet.PortletURL;
-import javax.portlet.WindowState;
-import javax.portlet.WindowStateException;
-import javax.servlet.http.HttpServletRequest;
-
-import com.liferay.lms.asset.LearningActivityBaseAssetRenderer;
 import com.liferay.lms.auditing.AuditConstants;
 import com.liferay.lms.auditing.AuditingLogFactory;
 import com.liferay.lms.learningactivity.LearningActivityType;
@@ -52,8 +45,6 @@ import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
-import com.liferay.portal.kernel.portlet.LiferayPortletURL;
 import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.util.ContentTypes;
@@ -79,16 +70,21 @@ import com.liferay.portal.service.RoleLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.util.PortalUtil;
-import com.liferay.portlet.PortletURLFactoryUtil;
 import com.liferay.portlet.announcements.model.AnnouncementsEntry;
 import com.liferay.portlet.announcements.model.AnnouncementsFlagConstants;
 import com.liferay.portlet.announcements.service.AnnouncementsEntryServiceUtil;
 import com.liferay.portlet.announcements.service.AnnouncementsFlagLocalServiceUtil;
-import com.liferay.portlet.asset.AssetRendererFactoryRegistryUtil;
 import com.liferay.portlet.asset.model.AssetEntry;
-import com.liferay.portlet.asset.model.AssetRendererFactory;
 import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
+import com.liferay.portlet.expando.model.ExpandoColumn;
+import com.liferay.portlet.expando.model.ExpandoTable;
+import com.liferay.portlet.expando.model.ExpandoTableConstants;
+import com.liferay.portlet.expando.model.ExpandoValue;
+import com.liferay.portlet.expando.service.ExpandoColumnLocalServiceUtil;
+import com.liferay.portlet.expando.service.ExpandoTableLocalServiceUtil;
+import com.liferay.portlet.expando.service.ExpandoValueLocalServiceUtil;
 import com.liferay.portlet.social.service.SocialActivityLocalServiceUtil;
+import com.liferay.util.CourseCopyUtil;
 import com.liferay.util.LmsLocaleUtil;
 
 /**
@@ -382,12 +378,12 @@ public class LearningActivityLocalServiceImpl extends LearningActivityLocalServi
 		learningActivity.setGroupId(groupId);
 		learningActivity.setUserId(user.getUserId());
 		learningActivity.setUserName(user.getFullName());
-		learningActivity.setCreateDate(serviceContext.getCreateDate(now));
-		learningActivity.setModifiedDate(serviceContext.getModifiedDate(now));
+		learningActivity.setCreateDate(now);
+		learningActivity.setModifiedDate(now);
 		learningActivity.setStatus(status);
 		learningActivity.setStatusByUserId(user.getUserId());
 		learningActivity.setStatusByUserName(user.getFullName());
-		learningActivity.setStatusDate(serviceContext.getModifiedDate(now));
+		learningActivity.setStatusDate(now);
 		learningActivity.setTitleMap(title, serviceContext.getLocale());
 		learningActivity.setDescriptionMap(description, serviceContext.getLocale());
 		learningActivity.setTypeId(typeId);
@@ -562,6 +558,76 @@ public class LearningActivityLocalServiceImpl extends LearningActivityLocalServi
 	
 		return larn;
 	}
+	
+	
+	public LearningActivity addLearningActivity(long userId, long groupId, 
+			Map<Locale, String> title, Map<Locale, String> description, 
+			int typeId, Date startdate, Date enddate, String extracontent,
+			long precedence, long tries, int passpuntuation, 
+			long moduleId, String feedbackCorrect, String feedbackNoCorrect, 
+			long weightinmodule, long[] categoryIds) throws PortalException, SystemException{
+		
+		User user = userLocalService.getUser(userId);
+		Date now = new Date();		
+		LearningActivity learningActivity = learningActivityPersistence.create(counterLocalService.increment(LearningActivity.class.getName()));
+		learningActivity.setCompanyId(user.getCompanyId());
+		learningActivity.setGroupId(groupId);
+		learningActivity.setUserId(user.getUserId());
+		learningActivity.setUserName(user.getFullName());
+		learningActivity.setCreateDate(now);
+		learningActivity.setModifiedDate(now);
+		learningActivity.setTitleMap(title);
+		learningActivity.setDescriptionMap(description);
+		learningActivity.setTypeId(typeId);
+		learningActivity.setStartdate(startdate);
+		learningActivity.setEnddate(enddate);
+		learningActivity.setPrecedence(precedence);
+		learningActivity.setTries(tries);
+		learningActivity.setPasspuntuation(passpuntuation);
+		learningActivity.setPriority(learningActivity.getActId());
+		learningActivity.setModuleId(moduleId);
+		learningActivity.setExtracontent(extracontent);
+		learningActivity.setFeedbackCorrect(feedbackCorrect);
+		learningActivity.setFeedbackNoCorrect(feedbackNoCorrect);
+		learningActivity.setWeightinmodule(weightinmodule);
+
+		learningActivity = learningActivityPersistence.update(learningActivity, true);
+		
+		resourceLocalService.addResources(
+				user.getCompanyId(), groupId, userId,
+				LearningActivity.class.getName(), learningActivity.getPrimaryKey(), 
+				false, true, false);
+		
+		assetEntryLocalService.updateEntry(
+				userId, learningActivity.getGroupId(), LearningActivity.class.getName(),
+				learningActivity.getActId(), learningActivity.getUuid(),typeId, categoryIds,
+				null, true, null, null, now, null, ContentTypes.TEXT_HTML, 
+				learningActivity.getTitle(),learningActivity.getDescription(), learningActivity.getDescription(Locale.getDefault()),null, null, 0, 0,
+						null, false);
+
+		socialActivityLocalService.addUniqueActivity(
+				learningActivity.getUserId(), learningActivity.getGroupId(),
+				LearningActivity.class.getName(), learningActivity.getActId(),
+				0, StringPool.BLANK, 0);
+
+		Role siteMemberRole = RoleLocalServiceUtil.getRole(user.getCompanyId(), RoleConstants.SITE_MEMBER);
+		
+		if((moduleId!=0)&&(GetterUtil.getBoolean(PrefsPropsUtil.getString("learningactivity.default.hidenewactivity", StringPool.FALSE)))){
+			resourcePermissionLocalService.removeResourcePermission(siteMemberRole.getCompanyId(), LearningActivity.class.getName(), 
+				ResourceConstants.SCOPE_INDIVIDUAL,	Long.toString(learningActivity.getActId()),siteMemberRole.getRoleId(), ActionKeys.VIEW);	
+		}
+		else { 
+			resourcePermissionLocalService.setResourcePermissions(siteMemberRole.getCompanyId(), LearningActivity.class.getName(), 
+					ResourceConstants.SCOPE_INDIVIDUAL,	Long.toString(learningActivity.getActId()),siteMemberRole.getRoleId(), new String[] {ActionKeys.VIEW});
+		}
+
+	
+		//auditing
+		AuditingLogFactory.audit(learningActivity.getCompanyId(), learningActivity.getGroupId(), LearningActivity.class.getName(), learningActivity.getPrimaryKey(), userId, AuditConstants.ADD, null);
+
+		return learningActivity;
+	}
+	
 	public LearningActivity modLearningActivity (LearningActivity larn, 
 			ServiceContext serviceContext)
 					throws SystemException, PortalException {
@@ -1238,4 +1304,111 @@ private void sendNotification(String title, String content, String url, String t
 	public LearningActivity getByPriority(int position, long moduleId, long companyId){
 		return LearningActivityFinderUtil.findByPriority(position, moduleId, companyId);
 	}
+	
+	public LearningActivity copyLearningActivity(long userId, Module moduleDestination, LearningActivity originActivity,
+			boolean copyClassification, boolean copyExpandos, ServiceContext serviceContext) throws PortalException, SystemException{
+		
+		LearningActivity destinationActivity = learningActivityPersistence.fetchByUUID_G(originActivity.getUuid(), moduleDestination.getGroupId());
+		
+		if(destinationActivity == null){
+			AssetEntry originAssetEntry = AssetEntryLocalServiceUtil.fetchEntry(LearningActivity.class.getName(), originActivity.getActId());
+			
+			destinationActivity = addLearningActivity(userId, moduleDestination.getGroupId(), originActivity.getTitleMap(), originActivity.getDescriptionMap(), 
+					originActivity.getTypeId(), null, null, null, 0, originActivity.getTries(), 
+					originActivity.getPasspuntuation(), moduleDestination.getModuleId(), originActivity.getFeedbackCorrect(), 
+					originActivity.getFeedbackNoCorrect(), originActivity.getWeightinmodule(), originAssetEntry.getCategoryIds());
+			destinationActivity.setUuid(originActivity.getUuid());
+		}
+
+		
+		destinationActivity.setTitle(originActivity.getTitle());
+		destinationActivity.setDescription(originActivity.getDescription());
+
+		destinationActivity.setFeedbackCorrect(originActivity.getFeedbackCorrect());
+		destinationActivity.setFeedbackNoCorrect(originActivity.getFeedbackNoCorrect());
+		destinationActivity.setTries(originActivity.getTries());
+		destinationActivity.setPasspuntuation(originActivity.getPasspuntuation());
+		destinationActivity.setImprove(originActivity.getImprove());
+		destinationActivity.setWeightinmodule(originActivity.getWeightinmodule());
+		destinationActivity.setModuleId(moduleDestination.getModuleId());
+		
+		if(Validator.isNotNull(originActivity.getDescription())) {
+			destinationActivity.setDescription(CourseCopyUtil.descriptionFilesClone(originActivity.getDescription(),moduleDestination.getGroupId(), userId));
+		}
+		
+		destinationActivity = learningActivityPersistence.update(destinationActivity, true);
+
+		//Eliminar las categorias y los tags del curso del serviceContext antes de crear la nueva actividad
+		if(copyClassification){
+			
+			AssetEntry originAssetEntry = AssetEntryLocalServiceUtil.fetchEntry(LearningActivity.class.getName(), originActivity.getActId());
+			AssetEntry destinationAssetEntry = AssetEntryLocalServiceUtil.fetchEntry(LearningActivity.class.getName(), destinationActivity.getActId());
+			
+			if(log.isDebugEnabled()) log.debug(":::Clone module classification::: ");
+			
+			if(originAssetEntry != null && destinationAssetEntry != null){
+				AssetEntryLocalServiceUtil.updateEntry(userId, destinationActivity.getGroupId(), LearningActivity.class.getName(), 
+						destinationActivity.getActId(), originAssetEntry.getCategoryIds(), originAssetEntry.getTagNames());
+			}
+		}else{
+			AssetEntryLocalServiceUtil.updateEntry(userId, destinationActivity.getGroupId(), LearningActivity.class.getName(), 
+					destinationActivity.getActId(), serviceContext.getAssetCategoryIds(), serviceContext.getAssetTagNames());
+		}
+		
+		Role siteMemberRole = RoleLocalServiceUtil.getRole(destinationActivity.getCompanyId(), RoleConstants.SITE_MEMBER);
+		
+		//Ponemos la misma visibilidad que la actividad desde donde se copia
+		boolean visible = ResourcePermissionLocalServiceUtil.hasResourcePermission(siteMemberRole.getCompanyId(), LearningActivity.class.getName(), 
+				ResourceConstants.SCOPE_INDIVIDUAL,	Long.toString(originActivity.getActId()),siteMemberRole.getRoleId(), ActionKeys.VIEW);
+		
+		if(visible) {
+			ResourcePermissionLocalServiceUtil.setResourcePermissions(destinationActivity.getCompanyId(), LearningActivity.class.getName(), 
+					ResourceConstants.SCOPE_INDIVIDUAL,	Long.toString(destinationActivity.getActId()),siteMemberRole.getRoleId(), new String[] {ActionKeys.VIEW});
+		}else{
+			ResourcePermissionLocalServiceUtil.removeResourcePermission(destinationActivity.getCompanyId(), LearningActivity.class.getName(), 
+					ResourceConstants.SCOPE_INDIVIDUAL,	Long.toString(destinationActivity.getActId()),siteMemberRole.getRoleId(), ActionKeys.VIEW);	
+		}
+		
+		if(copyExpandos){
+			ExpandoTable table = ExpandoTableLocalServiceUtil.fetchTable(destinationActivity.getCompanyId(), PortalUtil.getClassNameId(LearningActivity.class), ExpandoTableConstants.DEFAULT_TABLE_NAME);
+			if(table != null){
+				List<ExpandoColumn> columns = ExpandoColumnLocalServiceUtil.getColumns(table.getTableId());
+				
+				ExpandoValue originExpandoValue = null;
+				ExpandoValue destinationExpandoValue = null;
+				long classNameId = PortalUtil.getClassNameId(LearningActivity.class);
+				
+				for(ExpandoColumn column: columns){
+					originExpandoValue = ExpandoValueLocalServiceUtil.getValue(table.getTableId(), column.getColumnId(), 
+							originActivity.getActId());
+					destinationExpandoValue = ExpandoValueLocalServiceUtil.getValue(table.getTableId(), column.getColumnId(), 
+							destinationActivity.getActId());
+					
+					if(originExpandoValue != null){
+						if(destinationExpandoValue == null){
+							try {
+								ExpandoValueLocalServiceUtil.addValue(classNameId, table.getTableId(), 
+										column.getColumnId(), destinationActivity.getActId(), originExpandoValue.getData());
+							} catch (PortalException e) {
+								e.printStackTrace();
+							}
+						}else{
+							destinationExpandoValue.setData(originExpandoValue.getData());
+							ExpandoValueLocalServiceUtil.updateExpandoValue(destinationExpandoValue);
+						}
+					}else if(destinationExpandoValue != null){
+						ExpandoValueLocalServiceUtil.deleteExpandoValue(destinationExpandoValue);
+					}
+				}
+			}
+		}else{
+			destinationActivity.setExpandoBridgeAttributes(serviceContext);
+			destinationActivity = learningActivityPersistence.update(destinationActivity, true);
+		}
+
+		LearningActivityType lat = new LearningActivityTypeRegistry().getLearningActivityType(destinationActivity.getTypeId());
+		lat.copyActivity(originActivity, destinationActivity, serviceContext);
+
+		return destinationActivity;
+	}	
 }
