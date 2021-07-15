@@ -368,29 +368,36 @@ public class ModuleResultLocalServiceImpl extends ModuleResultLocalServiceBaseIm
 
 
 
-		public void update(LearningActivityResult lactr)
-					throws PortalException, SystemException {
+	public void update(LearningActivityResult lactr)
+				throws PortalException, SystemException {
 
-			ModuleResult moduleResult = null;
-			long actId = lactr.getActId();
-			long userId = lactr.getUserId();
-			LearningActivity learningActivity = learningActivityLocalService.getLearningActivity(actId);
-			// Si el Weight es mayor que cero (obligatoria) entonces calcula, sino
-			// no.
-			// Se elimina la restricci�n de calcular solo en las obligatorias, se
-			// calcula ent todas las que se terminen.
-			long moduleId = learningActivity.getModuleId();
-			
-			moduleResult= getAndCreateIfNotExists( userId,  moduleId,lactr.getStartDate());
-			log.debug("****Modulo "+learningActivity.getModuleId() );
-			log.debug("****Result End Date "+lactr.getEndDate());
-			if (learningActivity.getModuleId() > 0 && lactr.getEndDate()!=null) 
-			{
-				log.debug("****Recalculamos Modulo");
-				calculateModuleResult(moduleResult);
-			}
-			
+		update(lactr, false);
+		
+	}
+	
+	public void update(LearningActivityResult lactr, boolean recalculate)
+			throws PortalException, SystemException {
+	
+		ModuleResult moduleResult = null;
+		long actId = lactr.getActId();
+		long userId = lactr.getUserId();
+		LearningActivity learningActivity = learningActivityLocalService.getLearningActivity(actId);
+		// Si el Weight es mayor que cero (obligatoria) entonces calcula, sino
+		// no.
+		// Se elimina la restricci�n de calcular solo en las obligatorias, se
+		// calcula ent todas las que se terminen.
+		long moduleId = learningActivity.getModuleId();
+		
+		moduleResult= getAndCreateIfNotExists( userId,  moduleId,lactr.getStartDate());
+		log.debug("****Modulo "+learningActivity.getModuleId() );
+		log.debug("****Result End Date "+lactr.getEndDate());
+		if ((learningActivity.getModuleId() > 0 && lactr.getEndDate()!=null) || recalculate ) 
+		{
+			log.debug("****Recalculamos Modulo");
+			calculateModuleResult(moduleResult);
 		}
+		
+	}
 	
 	public int updateAllUsers(long groupId, long moduleId) throws PortalException, SystemException {
 		
@@ -658,6 +665,8 @@ public class ModuleResultLocalServiceImpl extends ModuleResultLocalServiceBaseIm
 				moduleResult.setPassed(passedModule);
 				if(finishModule && Validator.isNull(moduleResult.getPassedDate())){
 					moduleResult.setPassedDate(passedDate);
+				}else{
+					moduleResult.setPassedDate(null);
 				}
 			}
 			//Update en la bd.

@@ -104,7 +104,9 @@ public class MandatoryAvgCourseEval extends BaseCourseEval {
         courseResult.setResult(result);
         if((passed || isFailed) && courseResult.getPassedDate() == null) {
                courseResult.setPassedDate(new Date());
-        }
+        }else if(!courseResult.isPassed() && !passed && !isFailed){
+			courseResult.setPassedDate(null);
+		}
         CourseResultLocalServiceUtil.update(courseResult);
         return true;		
 		
