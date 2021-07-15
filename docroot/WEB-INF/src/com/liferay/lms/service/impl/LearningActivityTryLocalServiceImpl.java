@@ -21,12 +21,8 @@ import java.util.HashMap;
 import java.util.List;
 
 import com.liferay.lms.NoSuchLearningActivityException;
-import com.liferay.lms.NoSuchLearningActivityTryException;
 import com.liferay.lms.auditing.AuditConstants;
 import com.liferay.lms.auditing.AuditingLogFactory;
-import com.liferay.lms.learningactivity.LearningActivityType;
-import com.liferay.lms.learningactivity.LearningActivityTypeRegistry;
-import com.liferay.lms.learningactivity.questiontype.OptionsQuestionType;
 import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.model.LearningActivityResult;
 import com.liferay.lms.model.LearningActivityTry;
@@ -34,8 +30,6 @@ import com.liferay.lms.model.ModuleResult;
 import com.liferay.lms.service.ClpSerializer;
 import com.liferay.lms.service.LearningActivityLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityResultLocalServiceUtil;
-import com.liferay.lms.service.LearningActivityTryLocalServiceUtil;
-import com.liferay.lms.service.ModuleResultLocalServiceUtil;
 import com.liferay.lms.service.base.LearningActivityTryLocalServiceBaseImpl;
 import com.liferay.lms.service.persistence.LearningActivityTryFinderUtil;
 import com.liferay.portal.kernel.bean.PortletBeanLocatorUtil;
@@ -44,7 +38,6 @@ import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.jsonwebservice.JSONWebService;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -58,7 +51,6 @@ import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.security.permission.PermissionCheckerFactoryUtil;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceContextThreadLocal;
-import com.liferay.portal.service.UserLocalServiceUtil;
 
 /**
  * The implementation of the learning activity try local service.
@@ -209,23 +201,18 @@ public class LearningActivityTryLocalServiceImpl
 		return larnt;
 	}
 	
-	@SuppressWarnings("unchecked")
 	public List<User> getUsersByLearningActivity(long actId) throws SystemException, PortalException
 	{ 	
 		return LearningActivityTryFinderUtil.getUsersByActId(actId);	
 	}
 	
-	@SuppressWarnings("unchecked")
 	public LearningActivityTry getLastLearningActivityTryByActivityAndUser(long actId,long userId) throws SystemException, PortalException
 	{ 		
 		return learningActivityTryFinder.findLastLearningActivityTryFinishedByUserAndActId(actId, userId);
 		
 	}
-	@SuppressWarnings("unchecked")	
 	public LearningActivityTry createOrDuplicateLast(long actId,ServiceContext serviceContext) throws SystemException, PortalException
 	{ 	
-		
-		
 		LearningActivityTry  lastTry= learningActivityTryFinder.findLastLearningActivityTryCreateByUsersAndActId(actId, serviceContext.getUserId());
 		if(lastTry==null){
 			return createLearningActivityTry(actId, serviceContext);
@@ -258,7 +245,7 @@ public class LearningActivityTryLocalServiceImpl
 		}
 		
 	}
-	@SuppressWarnings("unchecked")
+	
 	public LearningActivityTry getLearningActivityTryNotFinishedByActUser(long actId,long userId) throws SystemException, PortalException
 	{ 			
 		return learningActivityTryFinder.findLastLearningActivityTryNotFinishedByUsersAndActId(actId, userId);
@@ -300,7 +287,6 @@ public class LearningActivityTryLocalServiceImpl
 		return answersMap;
 	}
 	
-	@SuppressWarnings("unchecked")
 	public boolean canUserDoANewTry(long actId,long userId) throws Exception{
 		
 		//Si ya ha pasado el test, no puede hacer m�s intentos.
@@ -337,7 +323,6 @@ public class LearningActivityTryLocalServiceImpl
 		return Long.valueOf(userTries-opened) < activityTries;
 	}
 	
-	@SuppressWarnings("unchecked")
 	public boolean areThereTriesNotFromEditors(LearningActivity activity) throws Exception
 	{ 		
 		boolean resp = false;

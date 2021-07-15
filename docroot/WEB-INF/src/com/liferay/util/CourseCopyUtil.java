@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 
 import com.liferay.lms.model.LearningActivity;
+import com.liferay.lms.service.CourseLocalServiceUtil;
+import com.liferay.lms.service.LearningActivityLocalServiceUtil;
 import com.liferay.lms.util.DLFolderUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
@@ -236,8 +238,10 @@ public class CourseCopyUtil {
 				}
 			}
 			
+			LearningActivity a; a.getUuid()
 			
-			
+			LearningActivityLocalServiceUtil.getLearningActivityByUuidAndGroupId(uuid, groupId)
+			CourseLocalServiceUtil.getChildCourses(courseId)
 		} catch (DocumentException de) {
 			
 		} catch (Exception e) {

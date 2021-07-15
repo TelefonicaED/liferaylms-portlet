@@ -188,7 +188,9 @@ public class PonderatedCourseEval extends BaseCourseEval {
             courseResult.setResult(result.longValue());
             if((passed || isFailed) && courseResult.getPassedDate() == null) {
                    courseResult.setPassedDate(new Date());
-            }
+            }else if(!courseResult.isPassed() && !passed && !isFailed){
+    			courseResult.setPassedDate(null);
+    		}
             CourseResultLocalServiceUtil.update(courseResult);
             return true;        
             

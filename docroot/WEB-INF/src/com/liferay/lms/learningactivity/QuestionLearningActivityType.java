@@ -66,6 +66,7 @@ public abstract class QuestionLearningActivityType extends BaseLearningActivityT
 							newAnswer = TestAnswerLocalServiceUtil.addTestAnswer(newQuestion.getQuestionId(), oldAnswer.getAnswer(), oldAnswer.getFeedbackCorrect(), oldAnswer.getFeedbacknocorrect(), oldAnswer.isIsCorrect());
 							newAnswer.setActId(newActivity.getActId());
 						}
+						newAnswer.setUuid(oldAnswer.getUuid());
 						newAnswer.setAnswer(CourseCopyUtil.descriptionFilesClone(oldAnswer.getAnswer(),newActivity.getGroupId(), serviceContext.getUserId()));
 						newAnswer.setFeedbackCorrect(oldAnswer.getFeedbackCorrect());
 						newAnswer.setFeedbacknocorrect(oldAnswer.getFeedbacknocorrect());
