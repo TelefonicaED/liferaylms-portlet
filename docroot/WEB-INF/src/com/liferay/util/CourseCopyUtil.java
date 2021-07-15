@@ -238,10 +238,6 @@ public class CourseCopyUtil {
 				}
 			}
 			
-			LearningActivity a; a.getUuid()
-			
-			LearningActivityLocalServiceUtil.getLearningActivityByUuidAndGroupId(uuid, groupId)
-			CourseLocalServiceUtil.getChildCourses(courseId)
 		} catch (DocumentException de) {
 			
 		} catch (Exception e) {
