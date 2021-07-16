@@ -1061,21 +1061,19 @@ if(isCourseChild){
 	</liferay-ui:panel> 
     
 	
-	<c:if test="<%=!isCourseChild || (isCourseChild && showCatalogForEdition)%>">
-		<liferay-ui:panel title="categorization" collapsible="true" defaultState="closed">
-		<liferay-ui:custom-attributes-available className="<%= Course.class.getName() %>">
-		<liferay-ui:custom-attribute-list 
-			className="<%=com.liferay.lms.model.Course.class.getName()%>" classPK="<%=courseId %>" editable="true" label="true"></liferay-ui:custom-attribute-list>
-		</liferay-ui:custom-attributes-available>
-		<aui:input name="tags" type="assetTags" />
-		<aui:input name="categories" type="assetCategories" />
-		<aui:fieldset label="related-assets">
-		<liferay-ui:input-asset-links
-						className="<%= Course.class.getName() %>"
-						classPK="<%= courseId %>" assetEntryId="<%=assetEntryId %>" 	/>
-		</aui:fieldset>
-		</liferay-ui:panel>
-	</c:if>
+	<liferay-ui:panel title="categorization" collapsible="true" defaultState="closed">
+	<liferay-ui:custom-attributes-available className="<%= Course.class.getName() %>">
+	<liferay-ui:custom-attribute-list 
+		className="<%=com.liferay.lms.model.Course.class.getName()%>" classPK="<%=courseId %>" editable="true" label="true"></liferay-ui:custom-attribute-list>
+	</liferay-ui:custom-attributes-available>
+	<aui:input name="tags" type="assetTags" />
+	<aui:input name="categories" type="assetCategories" />
+	<aui:fieldset label="related-assets">
+	<liferay-ui:input-asset-links
+					className="<%= Course.class.getName() %>"
+					classPK="<%= courseId %>" assetEntryId="<%=assetEntryId %>" 	/>
+	</aui:fieldset>
+	</liferay-ui:panel>
 	
 	<c:if test="<%=courseId==0 && showCoursePermission%>">
 		<liferay-ui:panel title="permissions" collapsible="true" defaultState="closed">
