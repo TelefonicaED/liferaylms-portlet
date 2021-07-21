@@ -59,7 +59,6 @@ import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.jsonwebservice.JSONWebService;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.lar.PortletDataHandlerKeys;
 import com.liferay.portal.kernel.lar.UserIdStrategy;
@@ -128,7 +127,6 @@ import com.liferay.portlet.social.model.SocialActivitySetting;
 import com.liferay.portlet.social.service.SocialActivityLocalServiceUtil;
 import com.liferay.portlet.social.service.SocialActivitySettingLocalServiceUtil;
 import com.liferay.portlet.social.service.SocialActivitySettingServiceUtil;
-import com.liferay.util.CourseCopyUtil;
 import com.liferay.util.LmsLocaleUtil;
 
 
@@ -2372,6 +2370,15 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 					ModuleLocalServiceUtil.updateModule(moduleNew);
 				}
 			}
+			if(module.getOrdern() > 0){
+				moduleNew = ModuleLocalServiceUtil.getModuleByUuidAndGroupId(module.getUuid(), destinationCourse.getGroupCreatedId());
+				modulePredecesorIdOld = ModuleLocalServiceUtil.getModule(module.getOrdern());
+				modulePredecesorIdNew = ModuleLocalServiceUtil.getModuleByUuidAndGroupId(modulePredecesorIdOld.getUuid(), destinationCourse.getGroupCreatedId());
+				if(moduleNew != null && modulePredecesorIdOld != null && modulePredecesorIdNew != null){
+					moduleNew.setOrdern(modulePredecesorIdNew.getModuleId());
+					ModuleLocalServiceUtil.updateModule(moduleNew);
+				}
+			}
 		}
 		
 
@@ -2379,6 +2386,8 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 		
 		LearningActivityType lat = null;
 		LearningActivity originActivity = null;
+		LearningActivity activityPredecesorIdOld = null;
+		LearningActivity activityPredecesorIdNew = null;
 		LearningActivityTypeRegistry learningActivityTypeRegistry = new LearningActivityTypeRegistry();
 		
 		for(LearningActivity activity: destinationActivities){
@@ -2387,6 +2396,22 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 				if(originActivity != null){
 					lat = learningActivityTypeRegistry.getLearningActivityType(activity.getTypeId());
 					lat.copyActivityFinish(originActivity, activity, serviceContext);
+				}
+				if(originActivity.getPrecedence() > 0){
+					activityPredecesorIdOld = LearningActivityLocalServiceUtil.getLearningActivity(originActivity.getPrecedence());
+					activityPredecesorIdNew = LearningActivityLocalServiceUtil.getLearningActivityByUuidAndGroupId(activityPredecesorIdOld.getUuid(), destinationCourse.getGroupCreatedId());
+					if(activity != null && activityPredecesorIdOld != null && activityPredecesorIdNew != null){
+						activity.setPrecedence(activityPredecesorIdNew.getActId());
+						LearningActivityLocalServiceUtil.updateLearningActivity(activity);
+					}
+				}
+				if(activity.getWeightinmodule() > 0){
+					activityPredecesorIdOld = LearningActivityLocalServiceUtil.getLearningActivity(originActivity.getPriority());
+					activityPredecesorIdNew = LearningActivityLocalServiceUtil.getLearningActivityByUuidAndGroupId(activityPredecesorIdOld.getUuid(), destinationCourse.getGroupCreatedId());
+					if(activity != null && activityPredecesorIdOld != null && activityPredecesorIdNew != null){
+						activity.setPriority(activityPredecesorIdNew.getActId());
+						LearningActivityLocalServiceUtil.updateLearningActivity(activity);
+					}
 				}
 			} catch (PortalException | SystemException e) {
 				if(log.isDebugEnabled())e.printStackTrace();
