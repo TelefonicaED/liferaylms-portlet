@@ -116,6 +116,10 @@
 		<finder name="ac" return-type="Collection">
 			<finder-column name="actId" />
 		</finder>
+		<finder name="Uuid_ActId" return-type="TestQuestion" unique="true">
+			<finder-column name="uuid" />
+			<finder-column name="actId" />
+		</finder>
 	</entity>
 	
 	<entity name="P2pActivity" uuid="true" local-service="true" remote-service="false" json-enabled="false">
@@ -195,6 +199,10 @@
 		</finder>
 		<finder name="q" return-type="Collection">
 			<finder-column name="questionId" />
+		</finder>
+		<finder name="Uuid_ActId" return-type="TestAnswer" unique="true">
+			<finder-column name="uuid" />
+			<finder-column name="actId" />
 		</finder>
 	</entity>
 	

@@ -1,14 +1,9 @@
 package com.liferay.lms.learningactivity;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import com.liferay.lms.asset.TaskEvaluationAssetRenderer;
-import com.liferay.lms.lar.LearningActivityImport;
 import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.service.ClpSerializer;
 import com.liferay.lms.service.LearningActivityLocalServiceUtil;
@@ -115,5 +110,90 @@ public class TaskEvaluationLearningActivityType extends BaseLearningActivityType
 
 
 		return extraContent;
+	}
+	
+	@Override
+	public void copyActivity(LearningActivity oldActivity, LearningActivity newActivity, ServiceContext serviceContext){
+		super.copyActivity(oldActivity, newActivity, serviceContext);
+	
+		try {
+			Document document = SAXReaderUtil.read(newActivity.getExtracontent());
+			
+			Element rootElement = document.getRootElement();
+
+			for(Element key:rootElement.elements()){
+
+				if(key.getName().contains("firedDate") || key.getName().contains("publishDate")){
+					rootElement.remove(key);
+				}
+			}
+
+			String extraContent = document.formattedString();
+			
+			log.debug("extracontent changed: " + extraContent);
+			
+			newActivity.setExtracontent(extraContent);
+			
+			LearningActivityLocalServiceUtil.updateLearningActivity(newActivity);
+		} catch (DocumentException | SystemException | IOException e) {
+			e.printStackTrace();
+		}
+
+	}
+	
+	@Override
+	public void copyActivityFinish(LearningActivity oldActivity, LearningActivity newActivity, ServiceContext serviceContext) throws SystemException{
+		super.copyActivityFinish(oldActivity, newActivity, serviceContext);
+		try{
+			Document document = null;
+			Element evaluationXML = null;
+			Iterator<Element> activitiesElementItr = null;
+			Element activity = null;
+			long newValue;
+			LearningActivity originActivity = null;
+			LearningActivity destinationActivity = null;
+			if((newActivity.getExtracontent()!=null)&&(newActivity.getExtracontent().length()!=0)) {	
+				//Element activitiesElement = SAXReaderUtil.read(evaluationActivity.getExtracontent()).getRootElement().element("activities");
+				document =SAXReaderUtil.read(newActivity.getExtracontent());
+				if(log.isDebugEnabled())log.debug(" --- OLD EXTRA CONTENT "+document.formattedString());
+				evaluationXML = document.getRootElement();
+				if(log.isDebugEnabled())log.debug("--- OLD Evaluation Element "+evaluationXML.asXML());
+				Element activitiesElement = evaluationXML.element("activities");
+				if(log.isDebugEnabled())log.debug("--- OLD Activities Element "+activitiesElement.asXML());
+				if(activitiesElement!=null){
+					activitiesElementItr = activitiesElement.elementIterator();
+					while(activitiesElementItr.hasNext()) {
+						activity =activitiesElementItr.next();
+						if(log.isDebugEnabled())log.debug("-- Activity "+ activity);
+						if(("activity".equals(activity.getName()))&&(activity.attribute("id")!=null)&&(activity.attribute("id").getValue().length()!=0)){
+							try{
+								long oldActId = Long.parseLong(activity.attribute("id").getValue());
+								originActivity = LearningActivityLocalServiceUtil.getLearningActivity(oldActId);
+								destinationActivity = LearningActivityLocalServiceUtil.getLearningActivityByUuidAndGroupId(originActivity.getUuid(), newActivity.getGroupId());
+								if(log.isDebugEnabled())log.debug("Old Value "+Long.parseLong(activity.attribute("id").getValue()));
+								newValue = destinationActivity.getActId();
+								if(log.isDebugEnabled())log.debug("New Value "+ newValue);
+								activity.attribute("id").setValue(String.valueOf(newValue));
+							}
+							catch(NumberFormatException | PortalException e){
+								if(log.isDebugEnabled())e.printStackTrace();
+							}
+						}
+						if(log.isDebugEnabled())log.debug("-- Activity Changed "+ activity.asXML());
+					}		
+					if(log.isDebugEnabled())log.debug("--- NEW Activities Element "+activitiesElement.asXML());
+				}
+
+				if(log.isDebugEnabled()){
+					log.debug("--- NEW Evaluation Element "+evaluationXML.asXML());
+					log.debug(" --- NEW EXTRA CONTENT "+document.formattedString());
+				}
+				newActivity.setExtracontent(document.formattedString());
+				LearningActivityLocalServiceUtil.updateLearningActivity(newActivity);
+				   
+			}
+		}catch(Exception e){
+			e.printStackTrace();
+		}	
 	}
 }

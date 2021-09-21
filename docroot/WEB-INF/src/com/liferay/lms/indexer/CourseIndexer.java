@@ -174,6 +174,7 @@ public class CourseIndexer extends BaseIndexer {
 		Document document = new DocumentImpl();
 
 		document.addUID(PORTLET_ID, entryId);
+		document.addDate(Field.CREATE_DATE, entry.getCreateDate());
 		document.addDate(Field.MODIFIED_DATE, displayDate);
 		document.addDate("startDate", startDate);
 		document.addDate("endDate", endDate);

@@ -186,6 +186,11 @@ if( permissionChecker.hasPermission(themeDisplay.getScopeGroupId(),  Course.clas
 		<liferay-portlet:param name="view" value="editions"/>
 	</liferay-portlet:renderURL>
 	<liferay-ui:icon image="tag" message="course-admin.editions" url="<%=editionsURL %>" />
+	<liferay-portlet:renderURL var="copyParentToEditionsURL">
+		<liferay-portlet:param name="courseId" value="<%=String.valueOf(myCourse.getCourseId()) %>"/>
+		<liferay-portlet:param name="view" value="copy-parent-to-editions"/>
+	</liferay-portlet:renderURL>
+	<liferay-ui:icon image="copy" message="course-admin.copy-parent-to-editions" url="<%=copyParentToEditionsURL %>" />
 </c:if>
 
 <c:forEach var="action" items="${adminActionTypes}">

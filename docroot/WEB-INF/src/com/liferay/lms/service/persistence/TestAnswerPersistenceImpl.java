@@ -133,6 +133,16 @@ public class TestAnswerPersistenceImpl extends BasePersistenceImpl<TestAnswer>
 			TestAnswerModelImpl.FINDER_CACHE_ENABLED, Long.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByq",
 			new String[] { Long.class.getName() });
+	public static final FinderPath FINDER_PATH_FETCH_BY_UUID_ACTID = new FinderPath(TestAnswerModelImpl.ENTITY_CACHE_ENABLED,
+			TestAnswerModelImpl.FINDER_CACHE_ENABLED, TestAnswerImpl.class,
+			FINDER_CLASS_NAME_ENTITY, "fetchByUuid_ActId",
+			new String[] { String.class.getName(), Long.class.getName() },
+			TestAnswerModelImpl.UUID_COLUMN_BITMASK |
+			TestAnswerModelImpl.ACTID_COLUMN_BITMASK);
+	public static final FinderPath FINDER_PATH_COUNT_BY_UUID_ACTID = new FinderPath(TestAnswerModelImpl.ENTITY_CACHE_ENABLED,
+			TestAnswerModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUuid_ActId",
+			new String[] { String.class.getName(), Long.class.getName() });
 	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_ALL = new FinderPath(TestAnswerModelImpl.ENTITY_CACHE_ENABLED,
 			TestAnswerModelImpl.FINDER_CACHE_ENABLED, TestAnswerImpl.class,
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findAll", new String[0]);
@@ -151,6 +161,11 @@ public class TestAnswerPersistenceImpl extends BasePersistenceImpl<TestAnswer>
 	public void cacheResult(TestAnswer testAnswer) {
 		EntityCacheUtil.putResult(TestAnswerModelImpl.ENTITY_CACHE_ENABLED,
 			TestAnswerImpl.class, testAnswer.getPrimaryKey(), testAnswer);
+
+		FinderCacheUtil.putResult(FINDER_PATH_FETCH_BY_UUID_ACTID,
+			new Object[] {
+				testAnswer.getUuid(), Long.valueOf(testAnswer.getActId())
+			}, testAnswer);
 
 		testAnswer.resetOriginalValues();
 	}
@@ -207,6 +222,8 @@ public class TestAnswerPersistenceImpl extends BasePersistenceImpl<TestAnswer>
 
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+
+		clearUniqueFindersCache(testAnswer);
 	}
 
 	@Override
@@ -217,7 +234,16 @@ public class TestAnswerPersistenceImpl extends BasePersistenceImpl<TestAnswer>
 		for (TestAnswer testAnswer : testAnswers) {
 			EntityCacheUtil.removeResult(TestAnswerModelImpl.ENTITY_CACHE_ENABLED,
 				TestAnswerImpl.class, testAnswer.getPrimaryKey());
+
+			clearUniqueFindersCache(testAnswer);
 		}
+	}
+
+	protected void clearUniqueFindersCache(TestAnswer testAnswer) {
+		FinderCacheUtil.removeResult(FINDER_PATH_FETCH_BY_UUID_ACTID,
+			new Object[] {
+				testAnswer.getUuid(), Long.valueOf(testAnswer.getActId())
+			});
 	}
 
 	/**
@@ -411,6 +437,34 @@ public class TestAnswerPersistenceImpl extends BasePersistenceImpl<TestAnswer>
 
 		EntityCacheUtil.putResult(TestAnswerModelImpl.ENTITY_CACHE_ENABLED,
 			TestAnswerImpl.class, testAnswer.getPrimaryKey(), testAnswer);
+
+		if (isNew) {
+			FinderCacheUtil.putResult(FINDER_PATH_FETCH_BY_UUID_ACTID,
+				new Object[] {
+					testAnswer.getUuid(), Long.valueOf(testAnswer.getActId())
+				}, testAnswer);
+		}
+		else {
+			if ((testAnswerModelImpl.getColumnBitmask() &
+					FINDER_PATH_FETCH_BY_UUID_ACTID.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] {
+						testAnswerModelImpl.getOriginalUuid(),
+						Long.valueOf(testAnswerModelImpl.getOriginalActId())
+					};
+
+				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_UUID_ACTID,
+					args);
+
+				FinderCacheUtil.removeResult(FINDER_PATH_FETCH_BY_UUID_ACTID,
+					args);
+
+				FinderCacheUtil.putResult(FINDER_PATH_FETCH_BY_UUID_ACTID,
+					new Object[] {
+						testAnswer.getUuid(),
+						Long.valueOf(testAnswer.getActId())
+					}, testAnswer);
+			}
+		}
 
 		return testAnswer;
 	}
@@ -1696,6 +1750,169 @@ public class TestAnswerPersistenceImpl extends BasePersistenceImpl<TestAnswer>
 	}
 
 	/**
+	 * Returns the test answer where uuid = &#63; and actId = &#63; or throws a {@link com.liferay.lms.NoSuchTestAnswerException} if it could not be found.
+	 *
+	 * @param uuid the uuid
+	 * @param actId the act ID
+	 * @return the matching test answer
+	 * @throws com.liferay.lms.NoSuchTestAnswerException if a matching test answer could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	public TestAnswer findByUuid_ActId(String uuid, long actId)
+		throws NoSuchTestAnswerException, SystemException {
+		TestAnswer testAnswer = fetchByUuid_ActId(uuid, actId);
+
+		if (testAnswer == null) {
+			StringBundler msg = new StringBundler(6);
+
+			msg.append(_NO_SUCH_ENTITY_WITH_KEY);
+
+			msg.append("uuid=");
+			msg.append(uuid);
+
+			msg.append(", actId=");
+			msg.append(actId);
+
+			msg.append(StringPool.CLOSE_CURLY_BRACE);
+
+			if (_log.isWarnEnabled()) {
+				_log.warn(msg.toString());
+			}
+
+			throw new NoSuchTestAnswerException(msg.toString());
+		}
+
+		return testAnswer;
+	}
+
+	/**
+	 * Returns the test answer where uuid = &#63; and actId = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
+	 *
+	 * @param uuid the uuid
+	 * @param actId the act ID
+	 * @return the matching test answer, or <code>null</code> if a matching test answer could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	public TestAnswer fetchByUuid_ActId(String uuid, long actId)
+		throws SystemException {
+		return fetchByUuid_ActId(uuid, actId, true);
+	}
+
+	/**
+	 * Returns the test answer where uuid = &#63; and actId = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
+	 *
+	 * @param uuid the uuid
+	 * @param actId the act ID
+	 * @param retrieveFromCache whether to use the finder cache
+	 * @return the matching test answer, or <code>null</code> if a matching test answer could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	public TestAnswer fetchByUuid_ActId(String uuid, long actId,
+		boolean retrieveFromCache) throws SystemException {
+		Object[] finderArgs = new Object[] { uuid, actId };
+
+		Object result = null;
+
+		if (retrieveFromCache) {
+			result = FinderCacheUtil.getResult(FINDER_PATH_FETCH_BY_UUID_ACTID,
+					finderArgs, this);
+		}
+
+		if (result instanceof TestAnswer) {
+			TestAnswer testAnswer = (TestAnswer)result;
+
+			if (!Validator.equals(uuid, testAnswer.getUuid()) ||
+					(actId != testAnswer.getActId())) {
+				result = null;
+			}
+		}
+
+		if (result == null) {
+			StringBundler query = new StringBundler(4);
+
+			query.append(_SQL_SELECT_TESTANSWER_WHERE);
+
+			if (uuid == null) {
+				query.append(_FINDER_COLUMN_UUID_ACTID_UUID_1);
+			}
+			else {
+				if (uuid.equals(StringPool.BLANK)) {
+					query.append(_FINDER_COLUMN_UUID_ACTID_UUID_3);
+				}
+				else {
+					query.append(_FINDER_COLUMN_UUID_ACTID_UUID_2);
+				}
+			}
+
+			query.append(_FINDER_COLUMN_UUID_ACTID_ACTID_2);
+
+			query.append(TestAnswerModelImpl.ORDER_BY_JPQL);
+
+			String sql = query.toString();
+
+			Session session = null;
+
+			try {
+				session = openSession();
+
+				Query q = session.createQuery(sql);
+
+				QueryPos qPos = QueryPos.getInstance(q);
+
+				if (uuid != null) {
+					qPos.add(uuid);
+				}
+
+				qPos.add(actId);
+
+				List<TestAnswer> list = q.list();
+
+				result = list;
+
+				TestAnswer testAnswer = null;
+
+				if (list.isEmpty()) {
+					FinderCacheUtil.putResult(FINDER_PATH_FETCH_BY_UUID_ACTID,
+						finderArgs, list);
+				}
+				else {
+					testAnswer = list.get(0);
+
+					cacheResult(testAnswer);
+
+					if ((testAnswer.getUuid() == null) ||
+							!testAnswer.getUuid().equals(uuid) ||
+							(testAnswer.getActId() != actId)) {
+						FinderCacheUtil.putResult(FINDER_PATH_FETCH_BY_UUID_ACTID,
+							finderArgs, testAnswer);
+					}
+				}
+
+				return testAnswer;
+			}
+			catch (Exception e) {
+				throw processException(e);
+			}
+			finally {
+				if (result == null) {
+					FinderCacheUtil.removeResult(FINDER_PATH_FETCH_BY_UUID_ACTID,
+						finderArgs);
+				}
+
+				closeSession(session);
+			}
+		}
+		else {
+			if (result instanceof List<?>) {
+				return null;
+			}
+			else {
+				return (TestAnswer)result;
+			}
+		}
+	}
+
+	/**
 	 * Returns all the test answers.
 	 *
 	 * @return the test answers
@@ -1844,6 +2061,21 @@ public class TestAnswerPersistenceImpl extends BasePersistenceImpl<TestAnswer>
 		for (TestAnswer testAnswer : findByq(questionId)) {
 			remove(testAnswer);
 		}
+	}
+
+	/**
+	 * Removes the test answer where uuid = &#63; and actId = &#63; from the database.
+	 *
+	 * @param uuid the uuid
+	 * @param actId the act ID
+	 * @return the test answer that was removed
+	 * @throws SystemException if a system exception occurred
+	 */
+	public TestAnswer removeByUuid_ActId(String uuid, long actId)
+		throws NoSuchTestAnswerException, SystemException {
+		TestAnswer testAnswer = findByUuid_ActId(uuid, actId);
+
+		return remove(testAnswer);
 	}
 
 	/**
@@ -2029,6 +2261,77 @@ public class TestAnswerPersistenceImpl extends BasePersistenceImpl<TestAnswer>
 	}
 
 	/**
+	 * Returns the number of test answers where uuid = &#63; and actId = &#63;.
+	 *
+	 * @param uuid the uuid
+	 * @param actId the act ID
+	 * @return the number of matching test answers
+	 * @throws SystemException if a system exception occurred
+	 */
+	public int countByUuid_ActId(String uuid, long actId)
+		throws SystemException {
+		Object[] finderArgs = new Object[] { uuid, actId };
+
+		Long count = (Long)FinderCacheUtil.getResult(FINDER_PATH_COUNT_BY_UUID_ACTID,
+				finderArgs, this);
+
+		if (count == null) {
+			StringBundler query = new StringBundler(3);
+
+			query.append(_SQL_COUNT_TESTANSWER_WHERE);
+
+			if (uuid == null) {
+				query.append(_FINDER_COLUMN_UUID_ACTID_UUID_1);
+			}
+			else {
+				if (uuid.equals(StringPool.BLANK)) {
+					query.append(_FINDER_COLUMN_UUID_ACTID_UUID_3);
+				}
+				else {
+					query.append(_FINDER_COLUMN_UUID_ACTID_UUID_2);
+				}
+			}
+
+			query.append(_FINDER_COLUMN_UUID_ACTID_ACTID_2);
+
+			String sql = query.toString();
+
+			Session session = null;
+
+			try {
+				session = openSession();
+
+				Query q = session.createQuery(sql);
+
+				QueryPos qPos = QueryPos.getInstance(q);
+
+				if (uuid != null) {
+					qPos.add(uuid);
+				}
+
+				qPos.add(actId);
+
+				count = (Long)q.uniqueResult();
+			}
+			catch (Exception e) {
+				throw processException(e);
+			}
+			finally {
+				if (count == null) {
+					count = Long.valueOf(0);
+				}
+
+				FinderCacheUtil.putResult(FINDER_PATH_COUNT_BY_UUID_ACTID,
+					finderArgs, count);
+
+				closeSession(session);
+			}
+		}
+
+		return count.intValue();
+	}
+
+	/**
 	 * Returns the number of test answers.
 	 *
 	 * @return the number of test answers
@@ -2158,6 +2461,10 @@ public class TestAnswerPersistenceImpl extends BasePersistenceImpl<TestAnswer>
 	private static final String _FINDER_COLUMN_UUID_UUID_3 = "(testAnswer.uuid IS NULL OR testAnswer.uuid = ?)";
 	private static final String _FINDER_COLUMN_AC_ACTID_2 = "testAnswer.actId = ?";
 	private static final String _FINDER_COLUMN_Q_QUESTIONID_2 = "testAnswer.questionId = ?";
+	private static final String _FINDER_COLUMN_UUID_ACTID_UUID_1 = "testAnswer.uuid IS NULL AND ";
+	private static final String _FINDER_COLUMN_UUID_ACTID_UUID_2 = "testAnswer.uuid = ? AND ";
+	private static final String _FINDER_COLUMN_UUID_ACTID_UUID_3 = "(testAnswer.uuid IS NULL OR testAnswer.uuid = ?) AND ";
+	private static final String _FINDER_COLUMN_UUID_ACTID_ACTID_2 = "testAnswer.actId = ?";
 	private static final String _ORDER_BY_ENTITY_ALIAS = "testAnswer.";
 	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY = "No TestAnswer exists with the primary key ";
 	private static final String _NO_SUCH_ENTITY_WITH_KEY = "No TestAnswer exists with the key {";

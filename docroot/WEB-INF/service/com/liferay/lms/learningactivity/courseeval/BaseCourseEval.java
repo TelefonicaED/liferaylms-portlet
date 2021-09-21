@@ -78,4 +78,8 @@ public abstract class BaseCourseEval implements CourseEval {
     {
     }
 
+    @Override    
+    public void cloneCourseEval(Course course, Course newCourse) throws SystemException
+    {
+    }
 }

@@ -69,6 +69,7 @@ public interface LearningActivityType extends InvokableService
 	public boolean isFinished(LearningActivity learningActivity, LearningActivityResult learningActivityResult) throws PortalException, SystemException;
 	public String getClassName();
 	public void copyActivity(LearningActivity oldActivity, LearningActivity newActivity, ServiceContext serviceContext);
+	public void copyActivityFinish(LearningActivity oldActivity, LearningActivity newActivity, ServiceContext serviceContext) throws SystemException;
 	
 	public void onCloseCourse(LearningActivity activity) throws SystemException, PortalException;
 }

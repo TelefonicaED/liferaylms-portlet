@@ -119,6 +119,15 @@ public class LearningActivityResultLocalServiceImpl	extends LearningActivityResu
 					recalculateActivity= true;
 					log.debug("****Recalculamos 4");
 				}
+			}else if(learningActivityResult.getEndDate() != null && !learningActivityResult.isPassed()){
+				LearningActivityTypeRegistry registry = new LearningActivityTypeRegistry();
+				LearningActivityType learningActivityType = registry.getLearningActivityType(learningActivity.getTypeId());
+				
+				if(!learningActivityType.isFinished(learningActivity, learningActivityResult)){
+					learningActivityResult.setEndDate(null);
+					recalculateActivity= true;
+					log.debug("****Recalculamos 4");
+				}
 			}
 		}
 		

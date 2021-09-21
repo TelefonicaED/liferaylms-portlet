@@ -41,9 +41,7 @@ public class CompleteModulesCourseEval extends BaseCourseEval {
 	@Override
 	public void updateCourse(Course course, ModuleResult mresult) throws SystemException 
 	{
-		
 		updateCourse(course, mresult.getUserId());	
-
 	}
 	
 	@Override
@@ -130,6 +128,8 @@ public class CompleteModulesCourseEval extends BaseCourseEval {
 		courseResult.setResult(result);
 		if((passed || isFailed) && courseResult.getPassedDate() == null) {
 			courseResult.setPassedDate(new Date());
+		}else if(!courseResult.isPassed() && !passed && !isFailed){
+			courseResult.setPassedDate(null);
 		}
 		log.debug("---Course Passed Date "+courseResult.getPassedDate());
 		CourseResultLocalServiceUtil.update(courseResult);

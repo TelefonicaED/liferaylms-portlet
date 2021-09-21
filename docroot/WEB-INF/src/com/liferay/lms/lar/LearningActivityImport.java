@@ -124,12 +124,12 @@ public class LearningActivityImport {
 			TestQuestion question=(TestQuestion)context.getZipEntryAsObject(pathq);
 			question.setActId(newLarn.getActId());
 			TestQuestion nuevaQuestion=TestQuestionLocalServiceUtil.addQuestion(question.getActId(), question.getText(), question.getQuestionType());
-			
+			nuevaQuestion.setUuid(question.getUuid());
 			if(question.getWeight() != question.getQuestionId()){
 				nuevaQuestion.setWeight(question.getWeight());
-				nuevaQuestion = TestQuestionLocalServiceUtil.updateTestQuestion(nuevaQuestion);
 				questionIdsMap.put(question.getQuestionId(), nuevaQuestion.getQuestionId());
 			}
+			nuevaQuestion = TestQuestionLocalServiceUtil.updateTestQuestion(nuevaQuestion);
 			
 			questionIdsMap.put(question.getQuestionId(), nuevaQuestion.getQuestionId());
 			log.info("      Test Question: " + nuevaQuestion.getQuestionId() /*Jsoup.parse(nuevaQuestion.getText()).text()*/);
