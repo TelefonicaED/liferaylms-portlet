@@ -138,7 +138,6 @@
 		location.href = url;
 		//<portlet:namespace />showImportUsersCourse();
 		Liferay.Portlet.refresh(AUI().one('#p_p_id<portlet:namespace />'),{'p_t_lifecycle':0, 'view':'role-members-tab','courseId':'${course.courseId }'});
-		
 	}
 </script>	
 
@@ -182,9 +181,17 @@
 									$('#<portlet:namespace />importUsersCourseResultsReport').append('<div><a onClick="javascript:<portlet:namespace />downloadReport(\'${importUsersCourseReportURL}&fileReport=' + data.fileReport + '&contentType=' + data.contentType + '&UUID=' + data.UUID + '&action='+data.action+'\'); "><liferay-ui:message key="courseadmin.importuserrole.download-report-result"/></a></div>');
 									$('#<portlet:namespace />result').append('<b><liferay-ui:message key="courseadmin.importuserrole.result"/></b> '+data.result);
 						   			$('#<portlet:namespace />importUsersCourseResultsReport').append('<div class="portlet-msg-success"><liferay-ui:message key="courseadmin.importuserrole.csv.saved"/></div>');
+						   			
+
+						   			$("#<portlet:namespace />divImportUsersCourse span.close").on( "click", function() {
+						   			  $("#<portlet:namespace />fm").submit();
+						   			});
+						   			
+						   			
 						   		}
 					   		}
-					   		
+					   	// Cerramos el panel con la ayuda para importar los usuarios
+					   		$('#importuserrole_help').addClass('lfr-collapsed'); 
 							$('#<portlet:namespace />importUsersCourseResultsReport').removeClass("aui-helper-hidden");
 				    	}
 					}else{					

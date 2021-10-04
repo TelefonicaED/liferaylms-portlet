@@ -25,8 +25,18 @@ else
 	
 <portlet:renderURL var="cancel" />
 <aui:form name="fm" action="<%=savePonderationURL%>"  role="form" method="post">
-	<aui:input size="5" name="passpuntuation" label="passpuntuation" type="text" value="<%=Long.toString(score) %>" >
-		<aui:validator name="digits"></aui:validator>
+	<aui:input size="5" name="passpuntuation" label="passpuntuation" xtype="number" value="<%=Long.toString(score) %>" >
+		<aui:validator name="required"/>
+		<aui:validator name="digits"/>
+		<aui:validator name="custom" errorMessage="ponderationevalconf.error.passpuntuation">
+					function(val,fieldNode,ruleValue){
+						var result = false;
+						if(val >= 0 && val <= 100){
+							result = true;
+						}
+						return result;
+					}
+		</aui:validator>
 	</aui:input>
 	<liferay-ui:panel-container >
 		<%
