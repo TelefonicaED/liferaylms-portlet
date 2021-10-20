@@ -233,13 +233,13 @@ public class CreateEdition extends CourseCopyUtil implements MessageListener {
 		newCourse.setExpandoBridgeAttributes(serviceContext);
 		if (newCourse.getExpandoBridge().hasAttribute("ENAIRE002"))
 		{
-			log.info("Actualizaci󮺢 + newCourse.getExpandoBridge().getAttribute("ENAIRE002"));
+			log.info("Actualizacion: " + newCourse.getExpandoBridge().getAttribute("ENAIRE002"));
 		}
 		
 		newCourse.getExpandoBridge().setAttributes(course.getExpandoBridge().getAttributes());
 		if (newCourse.getExpandoBridge().hasAttribute("ENAIRE002"))
 		{
-			log.info("Actualizaci󮠲:" + newCourse.getExpandoBridge().getAttribute("ENAIRE002"));
+			log.info("Actualizacion:" + newCourse.getExpandoBridge().getAttribute("ENAIRE002"));
 		}
 		newCourse.setParentCourseId(parentCourseId);
 		newCourse.setUserId(themeDisplay.getUserId());
@@ -253,7 +253,7 @@ public class CreateEdition extends CourseCopyUtil implements MessageListener {
 			newCourse = CourseLocalServiceUtil.modCourse(newCourse, courseTypeId, serviceContext);
 			if (newCourse.getExpandoBridge().hasAttribute("ENAIRE002"))
 			{
-				log.info("Actualizaci󮠍odCourse:" + newCourse.getExpandoBridge().getAttribute("ENAIRE002"));
+				log.info("Actualizacion ModCourse:" + newCourse.getExpandoBridge().getAttribute("ENAIRE002"));
 			}
 			AssetEntry newEntry = AssetEntryLocalServiceUtil.getEntry(Course.class.getName(),newCourse.getCourseId());
 			newEntry.setVisible(false);
