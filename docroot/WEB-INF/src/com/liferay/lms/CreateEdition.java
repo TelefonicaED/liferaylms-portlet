@@ -214,8 +214,33 @@ public class CreateEdition extends CourseCopyUtil implements MessageListener {
 			process = AsynchronousProcessAuditLocalServiceUtil.updateProcessStatus(process, new Date(), LmsConstant.STATUS_ERROR, e.getMessage());
 			throw new DuplicateGroupException();
 		}
+		log.info("Objeto themeDisplay:" + themeDisplay);
+		log.info("Objeto course:" + course);
+		log.info("Objeto newCourse:" + newCourse);
+		log.info("Objeto serviceContext" + serviceContext);
+		for (Map.Entry<String, Serializable> entry : serviceContext.getAttributes().entrySet()) {
+		    try{
+		    	log.info("clave=" + entry.getKey() + ", valor=" + entry.getValue());
+		    }catch(Exception ex){
+		    	log.error(ex.getMessage());
+		    }
+		}
+		if (newCourse.getExpandoBridge().hasAttribute("ENAIRE002"))
+		{
+			log.info("Valor Original: " + newCourse.getExpandoBridge().getAttribute("ENAIRE002"));
+		}
+		
 		newCourse.setExpandoBridgeAttributes(serviceContext);
+		if (newCourse.getExpandoBridge().hasAttribute("ENAIRE002"))
+		{
+			log.info("Actualizaci󮺢 + newCourse.getExpandoBridge().getAttribute("ENAIRE002"));
+		}
+		
 		newCourse.getExpandoBridge().setAttributes(course.getExpandoBridge().getAttributes());
+		if (newCourse.getExpandoBridge().hasAttribute("ENAIRE002"))
+		{
+			log.info("Actualizaci󮠲:" + newCourse.getExpandoBridge().getAttribute("ENAIRE002"));
+		}
 		newCourse.setParentCourseId(parentCourseId);
 		newCourse.setUserId(themeDisplay.getUserId());
 	
@@ -226,6 +251,10 @@ public class CreateEdition extends CourseCopyUtil implements MessageListener {
 		
 		try{
 			newCourse = CourseLocalServiceUtil.modCourse(newCourse, courseTypeId, serviceContext);
+			if (newCourse.getExpandoBridge().hasAttribute("ENAIRE002"))
+			{
+				log.info("Actualizaci󮠍odCourse:" + newCourse.getExpandoBridge().getAttribute("ENAIRE002"));
+			}
 			AssetEntry newEntry = AssetEntryLocalServiceUtil.getEntry(Course.class.getName(),newCourse.getCourseId());
 			newEntry.setVisible(false);
 			newEntry.setSummary(summary);
