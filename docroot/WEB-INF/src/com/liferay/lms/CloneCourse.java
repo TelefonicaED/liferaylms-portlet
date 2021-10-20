@@ -76,6 +76,8 @@ import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
 import com.liferay.portlet.messageboards.model.MBCategory;
 import com.liferay.portlet.messageboards.service.MBCategoryLocalServiceUtil;
 import com.liferay.util.CourseCopyUtil;
+import java.io.Serializable;
+import java.util.Map;
 
 public class CloneCourse extends CourseCopyUtil implements MessageListener {
 	private static Log log = LogFactoryUtil.getLog(CloneCourse.class);
