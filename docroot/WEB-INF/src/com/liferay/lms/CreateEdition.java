@@ -44,6 +44,8 @@ import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portlet.asset.model.AssetEntry;
 import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
 import com.liferay.util.CourseCopyUtil;
+import java.io.Serializable;
+import java.util.Map;
 
 
 public class CreateEdition extends CourseCopyUtil implements MessageListener {
