@@ -268,10 +268,31 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 			process = AsynchronousProcessAuditLocalServiceUtil.updateProcessStatus(process, new Date(), LmsConstant.STATUS_ERROR, e.getMessage());
 			throw new DuplicateGroupException();
 		}
-	
+		log.info("Objeto themeDisplay:" + themeDisplay);
+		log.info("Objeto course:" + course);
+		log.info("Objeto newCourse:" + newCourse);
+		log.info("Objeto serviceContext" + serviceContext);
+		for (Map.Entry<String, Serializable> entry : serviceContext.getAttributes().entrySet()) {
+		    try{
+		    	log.info("clave=" + entry.getKey() + ", valor=" + entry.getValue());
+		    }catch(Exception ex){
+		    	log.error(ex.getMessage());
+		    }
+		}
+		if (newCourse.getExpandoBridge().hasAttribute("ENAIRE002"))
+		{
+			log.info("Valor Original: " + newCourse.getExpandoBridge().getAttribute("ENAIRE002"));
+		}
 		newCourse.setExpandoBridgeAttributes(serviceContext);
-		
+		if (newCourse.getExpandoBridge().hasAttribute("ENAIRE002"))
+		{
+			log.info("Actualización:" + newCourse.getExpandoBridge().getAttribute("ENAIRE002"));
+		}
 		newCourse.getExpandoBridge().setAttributes(course.getExpandoBridge().getAttributes());
+		if (newCourse.getExpandoBridge().hasAttribute("ENAIRE002"))
+		{
+			log.info("Actualización 2:" + newCourse.getExpandoBridge().getAttribute("ENAIRE002"));
+		}
 	
 		List<CourseCompetence> courseCompetences= CourseCompetenceLocalServiceUtil.findBycourseId(course.getCourseId(), false);
 		for(CourseCompetence courseCompetence:courseCompetences)
@@ -310,7 +331,10 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 		
 		try{
 			newCourse = CourseLocalServiceUtil.modCourse(newCourse, summary, courseTypeId, serviceContext, visible);
-			
+			if (newCourse.getExpandoBridge().hasAttribute("ENAIRE002"))
+			{
+				log.info("Actualización ModCourse:" + newCourse.getExpandoBridge().getAttribute("ENAIRE002"));
+			}
 			AssetEntry newEntry = AssetEntryLocalServiceUtil.getEntry(Course.class.getName(),newCourse.getCourseId());
 			newEntry.setVisible(visible);
 			newEntry.setSummary(summary);
@@ -414,7 +438,7 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 		}
 		
 		if(this.cloneDocuments){
-			//-----Clonar la documentación del curso
+			//-----Clonar la documentaciÃ³n del curso
 			if(log.isDebugEnabled())
 				log.debug(":: Clone course :: Clone docs ::");
 			
