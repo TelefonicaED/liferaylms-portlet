@@ -25,7 +25,7 @@ else
 	
 <portlet:renderURL var="cancel" />
 <aui:form name="fm" action="<%=savePonderationURL%>"  role="form" method="post">
-	<aui:input size="5" name="passpuntuation" label="passpuntuation" xtype="number" value="<%=Long.toString(score) %>" >
+	<aui:input size="5" name="passpuntuation" label="passpuntuation" type="text" value="<%= ((score == 0) ? StringPool.BLANK : Long.toString(score)) %>" >
 		<aui:validator name="required"/>
 		<aui:validator name="digits"/>
 		<aui:validator name="custom" errorMessage="ponderationevalconf.error.passpuntuation">
