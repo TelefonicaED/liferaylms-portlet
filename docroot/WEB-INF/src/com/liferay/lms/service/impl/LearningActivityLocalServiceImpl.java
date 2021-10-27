@@ -1331,8 +1331,8 @@ private void sendNotification(String title, String content, String url, String t
 		destinationActivity.setImprove(originActivity.getImprove());
 		destinationActivity.setWeightinmodule(originActivity.getWeightinmodule());
 		destinationActivity.setModuleId(moduleDestination.getModuleId());
-		destinationActivity.setPriority(originActivity.getPriority());
-		
+		//destinationActivity.setPriority(originActivity.getPriority());
+		destinationActivity.setPriority(destinationActivity.getActId());
 		if(Validator.isNotNull(originActivity.getDescription())) {
 			destinationActivity.setDescription(CourseCopyUtil.descriptionFilesClone(originActivity.getDescription(),moduleDestination.getGroupId(), userId));
 		}
