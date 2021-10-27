@@ -2357,7 +2357,7 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 		courseEval.cloneCourseEval(orginCourse, destinationCourse, correlationModules, correlationActivities);
 		
 		//Dependencias de modulos
-		Module modulePredecesorIdOld = null;
+		/*Module modulePredecesorIdOld = null;
 		Module modulePredecesorIdNew = null;
 		Module moduleNew = null;
 		for(Module module:modules){
@@ -2365,7 +2365,9 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 				moduleNew = ModuleLocalServiceUtil.getModuleByUuidAndGroupId(module.getUuid(), destinationCourse.getGroupCreatedId());
 				modulePredecesorIdOld = ModuleLocalServiceUtil.getModule(module.getPrecedence());
 				modulePredecesorIdNew = ModuleLocalServiceUtil.getModuleByUuidAndGroupId(modulePredecesorIdOld.getUuid(), destinationCourse.getGroupCreatedId());
-				if(moduleNew != null && modulePredecesorIdOld != null && modulePredecesorIdNew != null){
+				
+				if(moduleNew != null && modulePredecesorIdOld != null && modulePredecesorIdNew != null)
+				{
 					moduleNew.setPrecedence(modulePredecesorIdNew.getModuleId());
 					ModuleLocalServiceUtil.updateModule(moduleNew);
 				}
@@ -2374,12 +2376,14 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 				moduleNew = ModuleLocalServiceUtil.getModuleByUuidAndGroupId(module.getUuid(), destinationCourse.getGroupCreatedId());
 				modulePredecesorIdOld = ModuleLocalServiceUtil.getModule(module.getOrdern());
 				modulePredecesorIdNew = ModuleLocalServiceUtil.getModuleByUuidAndGroupId(modulePredecesorIdOld.getUuid(), destinationCourse.getGroupCreatedId());
-				if(moduleNew != null && modulePredecesorIdOld != null && modulePredecesorIdNew != null){
+				
+				if(moduleNew != null && modulePredecesorIdOld != null && modulePredecesorIdNew != null)
+				{
 					moduleNew.setOrdern(modulePredecesorIdNew.getModuleId());
 					ModuleLocalServiceUtil.updateModule(moduleNew);
 				}
 			}
-		}
+		}*/
 		
 
 		List<LearningActivity> destinationActivities = LearningActivityLocalServiceUtil.getLearningActivitiesOfGroup(destinationCourse.getGroupCreatedId());
@@ -2405,14 +2409,14 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 						LearningActivityLocalServiceUtil.updateLearningActivity(activity);
 					}
 				}
-				if(activity.getWeightinmodule() > 0){
+				/*if(activity.getWeightinmodule() > 0){
 					activityPredecesorIdOld = LearningActivityLocalServiceUtil.getLearningActivity(originActivity.getPriority());
 					activityPredecesorIdNew = LearningActivityLocalServiceUtil.getLearningActivityByUuidAndGroupId(activityPredecesorIdOld.getUuid(), destinationCourse.getGroupCreatedId());
 					if(activity != null && activityPredecesorIdOld != null && activityPredecesorIdNew != null){
 						activity.setPriority(activityPredecesorIdNew.getActId());
 						LearningActivityLocalServiceUtil.updateLearningActivity(activity);
 					}
-				}
+				}*/
 			} catch (PortalException | SystemException e) {
 				if(log.isDebugEnabled())e.printStackTrace();
 			}

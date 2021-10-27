@@ -753,9 +753,12 @@ public class ModuleLocalServiceImpl extends ModuleLocalServiceBaseImpl {
         	destinationModule.setDescription(CourseCopyUtil.descriptionFilesClone(originModule.getDescription(),
         			destinationCourse.getGroupCreatedId(), userId));
         }
-        destinationModule.setOrdern(originModule.getModuleId());
+        //destinationModule.setOrdern(originModule.getModuleId());
+        destinationModule.setOrdern(destinationModule.getModuleId());
 		
 		destinationModule = modulePersistence.update(destinationModule, true);
+		
+		
 		
 		if(log.isDebugEnabled()){
 			log.debug("\n    Module : " + originModule.getTitle(Locale.getDefault()) +"("+originModule.getModuleId()+")");

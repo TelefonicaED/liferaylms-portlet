@@ -1,11 +1,13 @@
 package com.liferay.util;
 
 import java.io.InputStream;
+import java.io.Serializable;
 import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.liferay.lms.model.Course;
 import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityLocalServiceUtil;
@@ -40,6 +42,7 @@ import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
 import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.service.DLAppServiceUtil;
 import com.liferay.portlet.documentlibrary.service.DLFileEntryLocalServiceUtil;
+import com.liferay.portlet.expando.model.ExpandoBridge;
 
 public class CourseCopyUtil {
 	private static Log log = LogFactoryUtil.getLog(CourseCopyUtil.class);
@@ -366,6 +369,38 @@ public class CourseCopyUtil {
 		
 		return assetEntryId;
 	}
+	/**
+	 * copia los expandos del curso origen al curso final
+	 */
+	public static void copyExpandos ( Course courseFinal , Course courseOrigin, ServiceContext srvContext   ) {
+		
+		//newCourse.setExpandoBridgeAttributes(serviceContext);
+		//newCourse.getExpandoBridge().setAttributes(course.getExpandoBridge().getAttributes());
+		if (courseFinal == null)
+			return;
+		
+		try 
+		{
+			if ( srvContext != null && !srvContext.getAttributes().isEmpty() )
+				courseFinal.setExpandoBridgeAttributes(srvContext);
+			
+			if (courseOrigin == null )
+				return;
+			
+			ExpandoBridge crBridge = courseFinal.getExpandoBridge();
+			Map<String, Serializable> expandos = courseOrigin.getExpandoBridge().getAttributes();
+			
+			if ( expandos != null && !expandos.isEmpty()) {
+				for (Map.Entry<String, Serializable> expando : expandos.entrySet()) {
+					log.debug("Copiamos el expando [nombre=" + expando.getKey() + ",valor=" + expando.getValue().toString() +"] de "+courseOrigin.getCourseId()+" a "+courseFinal.getCourseId()+" ");
+					crBridge.setAttribute(expando.getKey(),expando.getValue());
+				}
+			}
+		}
+		catch (Exception e ) {
+			log.error(e);
+		}
+	}
 	
 	
 	/**
@@ -600,4 +635,6 @@ public class CourseCopyUtil {
 					primaryKey, roleIdsToActionIds);
 		}
 	}
+	
+	
 }

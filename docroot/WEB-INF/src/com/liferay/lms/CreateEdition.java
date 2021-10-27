@@ -1,8 +1,10 @@
 package com.liferay.lms;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import com.liferay.lms.course.diploma.CourseDiploma;
 import com.liferay.lms.course.diploma.CourseDiplomaRegistry;
@@ -23,6 +25,7 @@ import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.management.jmx.GetAttributesAction;
 import com.liferay.portal.kernel.messaging.Message;
 import com.liferay.portal.kernel.messaging.MessageBusUtil;
 import com.liferay.portal.kernel.messaging.MessageListener;
@@ -43,6 +46,7 @@ import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portlet.asset.model.AssetEntry;
 import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
+import com.liferay.portlet.expando.model.ExpandoBridge;
 import com.liferay.util.CourseCopyUtil;
 
 
@@ -210,12 +214,14 @@ public class CreateEdition extends CourseCopyUtil implements MessageListener {
 			process = AsynchronousProcessAuditLocalServiceUtil.updateAsynchronousProcessAudit(process);
 			
 		} catch(DuplicateGroupException e){
-			e.printStackTrace();
+			log.error(e);
+			//e.printStackTrace();
 			process = AsynchronousProcessAuditLocalServiceUtil.updateProcessStatus(process, new Date(), LmsConstant.STATUS_ERROR, e.getMessage());
 			throw new DuplicateGroupException();
 		}
-		newCourse.setExpandoBridgeAttributes(serviceContext);
-		newCourse.getExpandoBridge().setAttributes(course.getExpandoBridge().getAttributes());
+		
+		copyExpandos(newCourse, course , serviceContext);
+	
 		newCourse.setParentCourseId(parentCourseId);
 		newCourse.setUserId(themeDisplay.getUserId());
 	
@@ -299,4 +305,8 @@ public class CreateEdition extends CourseCopyUtil implements MessageListener {
 		MessageBusUtil.sendMessage("liferay/lms/createEditionPostAction", postActionMessage);					
 		log.debug(" ENDS!");
 	}
+	
+	
+	
+	
 }
