@@ -1,5 +1,6 @@
 package com.liferay.lms;
 
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -7,6 +8,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import com.liferay.counter.service.CounterLocalServiceUtil;
 import com.liferay.lms.course.diploma.CourseDiploma;
@@ -73,6 +75,7 @@ import com.liferay.portlet.announcements.service.AnnouncementsFlagLocalServiceUt
 import com.liferay.portlet.asset.model.AssetEntry;
 import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
+import com.liferay.portlet.expando.model.ExpandoBridge;
 import com.liferay.portlet.messageboards.model.MBCategory;
 import com.liferay.portlet.messageboards.service.MBCategoryLocalServiceUtil;
 import com.liferay.util.CourseCopyUtil;
@@ -268,11 +271,9 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 			process = AsynchronousProcessAuditLocalServiceUtil.updateProcessStatus(process, new Date(), LmsConstant.STATUS_ERROR, e.getMessage());
 			throw new DuplicateGroupException();
 		}
-	
-		newCourse.setExpandoBridgeAttributes(serviceContext);
 		
-		newCourse.getExpandoBridge().setAttributes(course.getExpandoBridge().getAttributes());
-	
+		copyExpandos (newCourse, course, serviceContext);
+		
 		List<CourseCompetence> courseCompetences= CourseCompetenceLocalServiceUtil.findBycourseId(course.getCourseId(), false);
 		for(CourseCompetence courseCompetence:courseCompetences)
 		{
@@ -451,6 +452,7 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 	}
 	
 	
+
 	private void sendNotification(String title, String content, String url, String type, int priority){
 		
 		//ThemeDisplay themeDisplay = (ThemeDisplay) actionRequest.getAttribute(WebKeys.THEME_DISPLAY);	
