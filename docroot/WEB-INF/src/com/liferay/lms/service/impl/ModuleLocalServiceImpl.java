@@ -779,31 +779,34 @@ public class ModuleLocalServiceImpl extends ModuleLocalServiceBaseImpl {
 		}
 		
 		if(copyExpandos){
-			ExpandoTable table = ExpandoTableLocalServiceUtil.getTable(destinationCourse.getCompanyId(), PortalUtil.getClassNameId(Course.class), ExpandoTableConstants.DEFAULT_TABLE_NAME);
-			List<ExpandoColumn> columns = ExpandoColumnLocalServiceUtil.getColumns(table.getTableId());
-			
-			ExpandoValue originExpandoValue = null;
-			ExpandoValue destinationExpandoValue = null;
-			long classNameId = PortalUtil.getClassNameId(Module.class);
-			
-			for(ExpandoColumn column: columns){
-				originExpandoValue = ExpandoValueLocalServiceUtil.getValue(table.getTableId(), column.getColumnId(), originModule.getModuleId());
-				destinationExpandoValue = ExpandoValueLocalServiceUtil.getValue(table.getTableId(), column.getColumnId(), destinationModule.getModuleId());
+			ExpandoTable table = ExpandoTableLocalServiceUtil.getTable(destinationCourse.getCompanyId(), PortalUtil.getClassNameId(Module.class), ExpandoTableConstants.DEFAULT_TABLE_NAME);
+			if (table != null ){
 				
-				if(originExpandoValue != null){
-					if(destinationExpandoValue == null){
-						try {
-							ExpandoValueLocalServiceUtil.addValue(classNameId, 
-									table.getTableId(), column.getColumnId(), destinationModule.getModuleId(), originExpandoValue.getData());
-						} catch (PortalException e) {
-							e.printStackTrace();
+				List<ExpandoColumn> columns = ExpandoColumnLocalServiceUtil.getColumns(table.getTableId());
+				
+				ExpandoValue originExpandoValue = null;
+				ExpandoValue destinationExpandoValue = null;
+				long classNameId = PortalUtil.getClassNameId(Module.class);
+				
+				for(ExpandoColumn column: columns){
+					originExpandoValue = ExpandoValueLocalServiceUtil.getValue(table.getTableId(), column.getColumnId(), originModule.getModuleId());
+					destinationExpandoValue = ExpandoValueLocalServiceUtil.getValue(table.getTableId(), column.getColumnId(), destinationModule.getModuleId());
+					
+					if(originExpandoValue != null){
+						if(destinationExpandoValue == null){
+							try {
+								ExpandoValueLocalServiceUtil.addValue(classNameId, 
+										table.getTableId(), column.getColumnId(), destinationModule.getModuleId(), originExpandoValue.getData());
+							} catch (PortalException e) {
+								log.error(e);
+							}
+						}else{
+							destinationExpandoValue.setData(originExpandoValue.getData());
+							ExpandoValueLocalServiceUtil.updateExpandoValue(destinationExpandoValue);
 						}
-					}else{
-						destinationExpandoValue.setData(originExpandoValue.getData());
-						ExpandoValueLocalServiceUtil.updateExpandoValue(destinationExpandoValue);
+					}else if(destinationExpandoValue != null){
+						ExpandoValueLocalServiceUtil.deleteExpandoValue(destinationExpandoValue);
 					}
-				}else if(destinationExpandoValue != null){
-					ExpandoValueLocalServiceUtil.deleteExpandoValue(destinationExpandoValue);
 				}
 			}
 		}
