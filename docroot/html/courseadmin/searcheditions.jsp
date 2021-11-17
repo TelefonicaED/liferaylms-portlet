@@ -102,23 +102,22 @@
       		
 <script type="text/javascript">
 	function <portlet:namespace />addAllEditions(){
+		var frm = $('#<portlet:namespace/>searchFm');
 		$.ajax({
 			dataType: 'json',
 			url: '${addAllEditionsURL }',
 		    cache:false,
-		    form: { 
-				id: '<portlet:namespace/>searchFm' 
-			},
+		    data: frm.serialize(),
 			success: function(data) {
 				if(data.editions.length>0){
 					$.each(data.editions, function() {		
-						<portlet:namespace />addEditionCopy(this.title, this.editionId);
+						<portlet:namespace />addEditionCopy(this.title, this.editionId.toString());
 					});		
 				}
 				
 				onLoadActions();
 			}
-		} );
+		});
 	}
 
 	function onLoadActions(){
