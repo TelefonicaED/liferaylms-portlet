@@ -152,6 +152,7 @@ if(!ownGrade){
 <aui:form  name="fn_grades" method="post" action="${updateGradesURL}" role="form">
 	<aui:fieldset>
 		<aui:input type="hidden" name="studentId" value='<%=renderRequest.getParameter("studentId") %>' />
+		<aui:input type="hidden" name="cur" value='<%=renderRequest.getParameter("cur") %>' />
 		<%
 		String resultValue = "";
 		if(result!=null && (result.getResult()>0 || result.getEndDate()!=null)){

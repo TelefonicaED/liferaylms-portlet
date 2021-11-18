@@ -3,6 +3,13 @@ Todos los cambios de este proyecto estarán documentados en este archivo.
 
 El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 
+## [4.10.1](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v4.10.1)
+
+### Fixed
+
+- #209440: Cuando se corrige una actividad de un alumno en una página, ahora se mantiene la página donde estabas.
+
+
 ## [4.6.0](https://github.com/TelefonicaED/liferaylms-portlet/releases/tag/v4.6.0)
 
 ### Added
