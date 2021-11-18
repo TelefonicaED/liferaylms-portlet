@@ -88,11 +88,14 @@ else
 			if (criteria == null) criteria = "";	
 			if (gradeFilter == null) gradeFilter = "";
 			
+			String cur = request.getParameter("cur");
+			
 			PortletURL portletURL = renderResponse.createRenderURL();
 			portletURL.setParameter("jspPage","/html/onlinetaskactivity/view.jsp");
 			portletURL.setParameter("criteria", criteria); 
 			portletURL.setParameter("gradeFilter", gradeFilter);
 			portletURL.setParameter("actId", String.valueOf(actId));
+			portletURL.setParameter("cur", (cur != null)? cur : "1");
 			
 			LearningActivityResult result = LearningActivityResultLocalServiceUtil.getByActIdAndUserId(actId, themeDisplay.getUserId());
 			
@@ -197,6 +200,7 @@ else
 					renderUrl.setParameter('isTablet', '<%=String.valueOf(isTablet) %>');
 					renderUrl.setParameter('gradeFilter', '<%=gradeFilter %>');
 					renderUrl.setParameter('criteria', '<%=criteria %>');
+					renderUrl.setParameter('cur', '<%=cur %>');
 					
 					<%if(isTeacher){%>
 						if(!selfGrade) {

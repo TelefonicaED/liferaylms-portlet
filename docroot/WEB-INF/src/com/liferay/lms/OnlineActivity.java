@@ -162,6 +162,11 @@ public class OnlineActivity extends MVCPortlet {
 		response.setRenderParameter("gradeFilter", gradeFilter);
 		response.setRenderParameter("criteria", criteria);
 		
+		
+		String cur = ParamUtil.getString(request, "cur");
+		log.debug("cur: "+cur);		
+		response.setRenderParameter("cur", cur);
+		
 		CalificationType ct = null;
 		double result=0;
 		try {
@@ -198,6 +203,10 @@ public class OnlineActivity extends MVCPortlet {
 				SessionErrors.add(request, "grades.bad-updating");
 			}
 		}
+		
+		
+		
+		
 	}
 	
 	
@@ -431,6 +440,9 @@ public class OnlineActivity extends MVCPortlet {
 	@Override
 	public void render(RenderRequest renderRequest, RenderResponse renderResponse)
 			throws PortletException, IOException {
+				
+		renderResponse.setProperty("cur", renderRequest.getParameter("cur"));
+		
 		ThemeDisplay themeDisplay  =(ThemeDisplay)renderRequest.getAttribute(WebKeys.THEME_DISPLAY);
 		long actId=0;
 		if(ParamUtil.getBoolean(renderRequest, "actionEditingDetails", false)){
