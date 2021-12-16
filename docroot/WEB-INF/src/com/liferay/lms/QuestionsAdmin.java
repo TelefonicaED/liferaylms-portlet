@@ -644,15 +644,8 @@ public class QuestionsAdmin extends MVCPortlet{
 	private String formatString(String str) {
 
 		String res = "";
-
 		//Jsoup elimina todas la etiquetas html del string que se le pasa, devolviendo �nicamente el texto plano.
 		res = Jsoup.parse(str).text();
-
-		//Si el texto es muy largo, lo recortamos para que sea m�s legible.
-		if(res.length() > 50){
-			res = res.substring(0, 50);
-		}
-
 		return res;
 	}
 
