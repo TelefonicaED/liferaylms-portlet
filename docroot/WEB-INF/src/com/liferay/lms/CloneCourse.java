@@ -1,5 +1,6 @@
 package com.liferay.lms;
 
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -7,6 +8,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import com.liferay.counter.service.CounterLocalServiceUtil;
 import com.liferay.lms.course.diploma.CourseDiploma;
@@ -45,13 +47,8 @@ import com.liferay.portal.kernel.messaging.Message;
 import com.liferay.portal.kernel.messaging.MessageBusUtil;
 import com.liferay.portal.kernel.messaging.MessageListener;
 import com.liferay.portal.kernel.messaging.MessageListenerException;
-import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.kernel.xml.Document;
-import com.liferay.portal.kernel.xml.DocumentException;
-import com.liferay.portal.kernel.xml.Element;
-import com.liferay.portal.kernel.xml.SAXReaderUtil;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.ResourceConstants;
 import com.liferay.portal.model.ResourcePermission;
@@ -78,13 +75,10 @@ import com.liferay.portlet.announcements.service.AnnouncementsFlagLocalServiceUt
 import com.liferay.portlet.asset.model.AssetEntry;
 import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
-import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
+import com.liferay.portlet.expando.model.ExpandoBridge;
 import com.liferay.portlet.messageboards.model.MBCategory;
 import com.liferay.portlet.messageboards.service.MBCategoryLocalServiceUtil;
 import com.liferay.util.CourseCopyUtil;
-import com.tls.liferaylms.mail.model.MailJob;
-import com.tls.liferaylms.mail.service.MailJobLocalServiceUtil;
-import com.tls.liferaylms.util.MailConstants;
 
 public class CloneCourse extends CourseCopyUtil implements MessageListener {
 	private static Log log = LogFactoryUtil.getLog(CloneCourse.class);
@@ -121,8 +115,6 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 		this.themeDisplay = themeDisplay;
 		this.startDate = startDate;
 		this.endDate = endDate;
-		this.startExecutionDate = startExecutionDate;
-		this.endExecutionDate = endExecutionDate;
 		this.cloneForum = cloneForum;
 		this.cloneDocuments = cloneDocuments;
 		this.cloneModuleClassification = cloneModuleClassification;
@@ -178,7 +170,6 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 		}
 	}
 	
-	@SuppressWarnings("unchecked")
 	public void doCloneCourse() throws Exception {
 		log.debug("Course to clone\n........................." + groupId);
 		Group group = GroupLocalServiceUtil.fetchGroup(groupId);
@@ -251,7 +242,7 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
             Course parentcourse = null;
             try {
                 parentcourse = course.getParentCourse();
-            } catch (Exception e) {
+            } catch (SystemException | PortalException e) {
                 log.debug("Parent course not found");
             }
 			
@@ -280,11 +271,9 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 			process = AsynchronousProcessAuditLocalServiceUtil.updateProcessStatus(process, new Date(), LmsConstant.STATUS_ERROR, e.getMessage());
 			throw new DuplicateGroupException();
 		}
-	
-		newCourse.setExpandoBridgeAttributes(serviceContext);
 		
-		newCourse.getExpandoBridge().setAttributes(course.getExpandoBridge().getAttributes());
-	
+		copyExpandos (newCourse, course, serviceContext);
+		
 		List<CourseCompetence> courseCompetences= CourseCompetenceLocalServiceUtil.findBycourseId(course.getCourseId(), false);
 		for(CourseCompetence courseCompetence:courseCompetences)
 		{
@@ -379,231 +368,12 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 		
 		
 		/*********************************************************/
-		
-		
-		/*long days = 0;
-		boolean isFirstModule = true;*/
-		
-		LearningActivityTypeRegistry learningActivityTypeRegistry = new LearningActivityTypeRegistry();
-		List<Module> modules = ModuleLocalServiceUtil.findAllInGroup(groupId);
-		HashMap<Long,Long> correlationActivities = new HashMap<Long, Long>();
-		HashMap<Long,Long> correlationModules = new HashMap<Long, Long>();
-		HashMap<Long,Long> modulesDependencesList = new  HashMap<Long, Long>();
-		
-		List<LearningActivity> activities = new ArrayList<LearningActivity>();
-		HashMap<Long, Long> pending = null;
-		List<Long> evaluations = new ArrayList<Long>(); 
-		LearningActivity newLearnActivity=null;
-		LearningActivity nuevaLarn = null;
-		Module newModule=null;
-		for(Module module:modules){
 
-			try {
-				newModule = new ModuleImpl();
-				if(module.getPrecedence()!=0){
-					modulesDependencesList.put(module.getModuleId(),module.getPrecedence());
-				}
-				newModule.setTitle(module.getTitle());
-				newModule.setDescription(module.getDescription());
-				newModule.setGroupId(newCourse.getGroupId());
-				newModule.setCompanyId(newCourse.getCompanyId());
-				newModule.setGroupId(newCourse.getGroupCreatedId());
-				newModule.setUserId(newCourse.getUserId());
-				
-				newModule.setAllowedTime(module.getAllowedTime());
-				newModule.setIcon(module.getIcon());
-				newModule.setStartDate(startExecutionDate);
-				newModule.setEndDate(endExecutionDate);
-				newModule = ModuleLocalServiceUtil.addmodule(newModule);
-				
-				correlationModules.put(module.getModuleId(), newModule.getModuleId());
-				
-                if (Validator.isNotNull(module.getDescription())) {
-                    newModule.setDescription(descriptionFilesClone(module.getDescription(),
-                        newCourse.getGroupCreatedId(), newModule.getModuleId(), themeDisplay.getUserId()));
-                }
-				newModule.setOrdern(newModule.getModuleId());
-				newModule.setUuid(module.getUuid());
-				ModuleLocalServiceUtil.updateModule(newModule);
-				if(log.isDebugEnabled()){
-					log.debug("\n    Module : " + module.getTitle(Locale.getDefault()) +"("+module.getModuleId()+")");
-					log.debug("    + Module : " + newModule.getTitle(Locale.getDefault()) +"("+newModule.getModuleId()+")" );
-				}
-				
-				//Copiar clasificación del módulo
-				if(this.cloneModuleClassification){
-					AssetEntry assetEntryModule = AssetEntryLocalServiceUtil.fetchEntry(Module.class.getName(), module.getModuleId());
-					if(log.isDebugEnabled())
-						log.debug(":::Clone module classification::: ");
-					if(Validator.isNotNull(assetEntryModule))
-						AssetEntryLocalServiceUtil.updateEntry(newModule.getUserId(), newModule.getGroupId(), Module.class.getName(), 
-							newModule.getModuleId(), assetEntryModule.getCategoryIds(), assetEntryModule.getTagNames());
-				}
-				
-			} catch (Exception e) {
-				e.printStackTrace();
-				error=true;
-				statusMessage += e.getMessage() + "\n";
-				continue;
-			}
-			
-			activities = LearningActivityLocalServiceUtil.getLearningActivitiesOfModule(module.getModuleId());
-			pending = new HashMap<Long, Long>();
-			evaluations = new ArrayList<Long>(); 
-			for(LearningActivity activity:activities){
-				nuevaLarn = null;
-				try {
-					newLearnActivity = LearningActivityLocalServiceUtil.createLearningActivity(CounterLocalServiceUtil.increment(LearningActivity.class.getName()));
-					
-					newLearnActivity.setTitle(activity.getTitle());
-					newLearnActivity.setDescription(activity.getDescription());
-					newLearnActivity.setTypeId(activity.getTypeId());
-					//Cuando es tipo Evaluación no hay que llevarse el extracontent
-					newLearnActivity.setExtracontent(activity.getExtracontent());
-					newLearnActivity.setFeedbackCorrect(activity.getFeedbackCorrect());
-					newLearnActivity.setFeedbackNoCorrect(activity.getFeedbackNoCorrect());
-					newLearnActivity.setTries(activity.getTries());
-					newLearnActivity.setPasspuntuation(activity.getPasspuntuation());
-					newLearnActivity.setPriority(newLearnActivity.getActId());
-					log.debug("improve" + activity.getImprove());
-					newLearnActivity.setImprove(activity.getImprove());
-					
-					boolean actPending = false;
-					if(activity.getPrecedence()>0){
-						if(correlationActivities.get(activity.getPrecedence())==null){
-							actPending = true;
-						}else{
-							newLearnActivity.setPrecedence(correlationActivities.get(activity.getPrecedence()));
-						}
-					}
-					
-					newLearnActivity.setWeightinmodule(activity.getWeightinmodule());
-					
-					newLearnActivity.setGroupId(newModule.getGroupId());
-					newLearnActivity.setModuleId(newModule.getModuleId());
-					
-					newLearnActivity.setStartdate(startExecutionDate);
-					newLearnActivity.setEnddate(endExecutionDate);
-					
-					if(Validator.isNotNull(activity.getDescription())) {
-					    newLearnActivity.setDescription(descriptionFilesClone(activity.getDescription(),newModule.getGroupId(), newLearnActivity.getActId(),themeDisplay.getUserId()));
-					}
-					ServiceContext larnServiceContext = serviceContext;
-
-					//Eliminar las categorias y los tags del curso del serviceContext antes de crear la nueva actividad
-					if(this.cloneActivityClassificationTypes){
-						
-						AssetEntry entryActivity = AssetEntryLocalServiceUtil.fetchEntry(LearningActivity.class.getName(), activity.getActId());
-						if(Validator.isNotNull(entryActivity)){
-							
-							larnServiceContext.setAssetCategoryIds(entryActivity.getCategoryIds());
-							larnServiceContext.setAssetTagNames(entryActivity.getTagNames());
-							larnServiceContext.setExpandoBridgeAttributes(activity.getExpandoBridge().getAttributes());
-					
-							//---Clonar la clasificación de la actividad
-							if(log.isDebugEnabled())
-								log.debug(":::Clone activity classification types::: Activity " + activity.getActId());
-						}
-					}	
-					
-					nuevaLarn=LearningActivityLocalServiceUtil.addLearningActivity(newLearnActivity,larnServiceContext);
-					nuevaLarn.setExpandoBridgeAttributes(larnServiceContext);
-					nuevaLarn.getExpandoBridge().setAttributes(activity.getExpandoBridge().getAttributes());
-					
-					if(log.isDebugEnabled()){
-						log.debug("      Learning Activity : " + activity.getTitle(Locale.getDefault())+ " ("+activity.getActId()+", " + LanguageUtil.get(Locale.getDefault(),learningActivityTypeRegistry.getLearningActivityType(activity.getTypeId()).getName())+")");
-						log.debug("      + Learning Activity : " + nuevaLarn.getTitle(Locale.getDefault())+ " ("+nuevaLarn.getActId()+", " + LanguageUtil.get(Locale.getDefault(),learningActivityTypeRegistry.getLearningActivityType(nuevaLarn.getTypeId()).getName())+")");
-					}
-					
-					cloneActivityFile(activity, nuevaLarn, themeDisplay.getUserId(), serviceContext);
-					
-					long actId = nuevaLarn.getActId();
-					correlationActivities.put(activity.getActId(), actId);
-					
-					boolean visible = ResourcePermissionLocalServiceUtil.hasResourcePermission(siteMemberRole.getCompanyId(), LearningActivity.class.getName(), 
-							ResourceConstants.SCOPE_INDIVIDUAL,	Long.toString(actId),siteMemberRole.getRoleId(), ActionKeys.VIEW);
-					
-					if(!visible) {
-						ResourcePermissionLocalServiceUtil.setResourcePermissions(siteMemberRole.getCompanyId(), LearningActivity.class.getName(), 
-								ResourceConstants.SCOPE_INDIVIDUAL,	Long.toString(actId),siteMemberRole.getRoleId(), new String[] {ActionKeys.VIEW});
-					}
-					
-					if(nuevaLarn.getTypeId() == 8){
-						evaluations.add(nuevaLarn.getActId());
-					}
-					
-					
-					if(actPending){
-						pending.put(actId, activity.getPrecedence());
-					}
-					
-					if(this.cloneActivityClassificationTypes){
-						AssetEntry entryActivity = AssetEntryLocalServiceUtil.fetchEntry(LearningActivity.class.getName(), activity.getActId());
-						if(Validator.isNotNull(entryActivity)){
-							//---Clonar la clasificación de la actividad
-							if(log.isDebugEnabled())
-								log.debug(":::Clone activity classification types::: Activity " + activity.getActId());
-							AssetEntryLocalServiceUtil.updateEntry(nuevaLarn.getUserId(), nuevaLarn.getGroupId(), LearningActivity.class.getName(), 
-										nuevaLarn.getActId(), entryActivity.getCategoryIds(), entryActivity.getTagNames());
-						}
-					}
-				} catch (Exception e) {
-					e.printStackTrace();
-					error=true;
-					statusMessage += e.getMessage() + "\n";
-					continue;
-				}
-
-				createTestQuestionsAndAnswers(activity, nuevaLarn, newModule, themeDisplay.getUserId());
-				
-				LearningActivityType lat = new LearningActivityTypeRegistry().getLearningActivityType(activity.getTypeId());
-				lat.copyActivity(activity, nuevaLarn, serviceContext);
-				
-			}
-			LearningActivity la =null;
-			Long other = null;
-			Long idAsig = null;
-			if(pending.size()>0){
-				for(Long id : pending.keySet()){
-					la = LearningActivityLocalServiceUtil.getLearningActivity(id);
-					
-					if(log.isDebugEnabled())log.debug(la);
-					if(la!=null){
-						idAsig = pending.get(id);
-						if(log.isDebugEnabled())log.debug(idAsig);
-						if(idAsig!=null){
-							other = correlationActivities.get(idAsig);
-							if(log.isDebugEnabled())log.debug(other);
-							la.setPrecedence(other);
-							LearningActivityLocalServiceUtil.updateLearningActivity(la);
-						}
-					}
-				}
-			}
-			
-			//Extra Content de las evaluaciones
-			copyEvaluationExtraContent(evaluations, correlationActivities);
-			
-		}	
+		CourseLocalServiceUtil.copyModulesAndActivities(themeDisplay.getUserId(), course, newCourse, this.cloneActivityClassificationTypes, true, serviceContext);
 		
 		CourseEvalRegistry registry = new CourseEvalRegistry();
 		CourseEval courseEval = registry.getCourseEval(course.getCourseEvalId());
-		courseEval.cloneCourseEval(course, newCourse, correlationModules, correlationActivities);
-		
-		//Dependencias de modulos
-		log.debug("modulesDependencesList "+modulesDependencesList.keySet());
-		Long moduleToBePrecededNew = null;
-		Long modulePredecesorIdOld = null;
-		Long modulePredecesorIdNew = null;
-		for(Long id : modulesDependencesList.keySet()){
-			//id del modulo actual
-			moduleToBePrecededNew = correlationModules.get(id);
-			modulePredecesorIdOld =  modulesDependencesList.get(id);
-			modulePredecesorIdNew = correlationModules.get(modulePredecesorIdOld);
-			Module moduleNew = ModuleLocalServiceUtil.getModule(moduleToBePrecededNew);
-			moduleNew.setPrecedence(modulePredecesorIdNew);
-			ModuleLocalServiceUtil.updateModule(moduleNew);
-		}
+		courseEval.cloneCourseEval(course, newCourse);
 		
 		CourseTypeFactoryRegistry courseTypeFactoryRegistry = new CourseTypeFactoryRegistry();
 		AssetEntry entry=AssetEntryLocalServiceUtil.getEntry(Course.class.getName(),newCourse.getCourseId());
@@ -655,54 +425,7 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 			duplicateFoldersAndFileEntriesInsideFolder(Boolean.TRUE, themeDisplay.getUserId(), typeSite, themeDisplay.getCompanyId(), DLFolderConstants.DEFAULT_PARENT_FOLDER_ID, repositoryId, newCourseGroupId, DLFolderConstants.DEFAULT_PARENT_FOLDER_ID, newRepositoryId, serviceContext);
 			
 		}
-		//SE COPIAN LOS MAILS PROGRAMADOS
-		try {
-			List<MailJob> mailjobs = MailJobLocalServiceUtil.getMailJobsInGroupId(course.getGroupCreatedId(), -1, -1);
-			for (MailJob mj : mailjobs){
-				try {
-					log.info("mail "+mj.getGroupId());
-					long classpk = 0;
-					long referenceclasspk=0;
-					if (mj.getConditionClassPK()> 0){
-						LearningActivity act = LearningActivityLocalServiceUtil.fetchLearningActivity(mj.getConditionClassPK());
-						List<LearningActivity> listactivities = LearningActivityLocalServiceUtil.getLearningActivitiesOfGroupAndType(newCourse.getGroupCreatedId(), act.getTypeId());
-						for (LearningActivity la: listactivities){
-							if (act.getTitle().equals(la.getTitle())){
-								classpk= la.getActId();
-								break;
-							}
-						}
-					}
-					if (mj.getDateClassPK()> 0){
-						LearningActivity actref = LearningActivityLocalServiceUtil.fetchLearningActivity(mj.getDateClassPK());
-						List<LearningActivity> listactivities = LearningActivityLocalServiceUtil.getLearningActivitiesOfGroupAndType(newCourse.getGroupCreatedId(), actref.getTypeId());
-						for (LearningActivity la: listactivities){
-							if (actref.getTitle().equals(la.getTitle())){
-								classpk= la.getActId();
-								break;
-							}
-						}
-					}
-					MailJob mailJob = MailJobLocalServiceUtil.addMailJob(mj.getIdTemplate(), mj.getConditionClassName(), classpk, mj.getConditionStatus(), mj.getDateClassName(), referenceclasspk, mj.getDateShift(), mj.getDateToSend(), mj.getDateReferenceDate(), serviceContext);
-					log.info("Creado mail "+mailJob.getUuid());
-					JSONObject extraOrig = mj.getExtraDataJSON();
-					JSONObject extraData = JSONFactoryUtil.createJSONObject();
-					extraData.put(MailConstants.EXTRA_DATA_SEND_COPY, extraOrig.getBoolean(MailConstants.EXTRA_DATA_SEND_COPY));
-					extraData.put(MailConstants.EXTRA_DATA_RELATION_ARRAY, extraOrig.getJSONArray(MailConstants.EXTRA_DATA_RELATION_ARRAY));
-					mailJob.setExtraData(extraData.toString());
-					MailJobLocalServiceUtil.updateMailJob(mailJob);
-				
-				} catch (PortalException e1) {
-					e1.printStackTrace();
-					log.error(e1.getMessage());
-				} catch (SystemException e2) {
-					e2.printStackTrace();
-					log.error(e2.getMessage());
-				}
-			}
-		}catch(Exception e){
-			log.error("NO SE PUDO COPIAR LOS EMAILS PROGRAMADOS");
-		}
+		
 		if(log.isDebugEnabled()){
 			log.debug(" ENDS!");
 		}
@@ -728,232 +451,8 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 	
 	}
 	
-	public String descriptionFilesClone(String description, long groupId, long actId, long userId){
-
-		String newDescription = description;
-		
-		try {
-			
-			Document document = SAXReaderUtil.read(description.replace("&lt;","<").replace("&nbsp;",""));
-			
-			Element rootElement = document.getRootElement();
-			String []srcInfo =null;
-			String fileUuid = null, fileGroupId = null;
-			String src = null;
-			String uuid = null;
-			String []uuidInfo = null;
-			FileEntry file =null;
-			String href = null;
-			ServiceContext serviceContext = null;
-			FileEntry newFile = null;
-			String []hrefInfo = null;
-			if(rootElement.elements("Description").size()!=0){
-				for (Element entryElement : rootElement.elements("Description")) {
-					for (Element entryElementP : entryElement.elements("p")) {
-						//Para las imagenes
-						for (Element entryElementImg : entryElementP.elements("img")) {
-							
-							src = entryElementImg.attributeValue("src");
-							
-							srcInfo = src.split("/");
-							fileUuid = "";
-							fileGroupId ="";
-							
-							if(srcInfo.length >= 6  && srcInfo[1].compareTo("documents") == 0){
-								fileUuid = srcInfo[srcInfo.length-1];
-								fileGroupId = srcInfo[2];
-								
-								uuidInfo = fileUuid.split("\\?");
-								uuid="";
-								if(srcInfo.length > 0){
-									uuid=uuidInfo[0];
-								}
-								
-								
-								try {
-									file = DLAppLocalServiceUtil.getFileEntryByUuidAndGroupId(uuid, Long.parseLong(fileGroupId));
-									
-									serviceContext = new ServiceContext();
-									serviceContext.setScopeGroupId(groupId);
-									serviceContext.setUserId(userId);
-									serviceContext.setCompanyId(file.getCompanyId());
-									serviceContext.setAddGroupPermissions(true);
-									
-									newFile = CourseCopyUtil.cloneFileDescription(file, actId, file.getUserId(), serviceContext);
-									
-									newDescription = descriptionCloneFile(newDescription, file, newFile);
-									if(log.isDebugEnabled()){
-										log.debug("     + Description file image : " + file.getTitle() +" ("+file.getMimeType()+")");
-									}
-								} catch (Exception e) {
-									// TODO Auto-generated catch block
-									//e.printStackTrace();
-									log.error("* ERROR! Description file image : " + e.getMessage());
-								}
-							}
-						}
-						
-						//Para los enlaces
-						for (Element entryElementLink : entryElementP.elements("a")) {
-							
-							href = entryElementLink.attributeValue("href");
-							
-							hrefInfo = href.split("/");
-							fileUuid = "";
-							fileGroupId ="";
-							
-							if(hrefInfo.length >= 6 && hrefInfo[1].compareTo("documents") == 0){
-								fileUuid = hrefInfo[hrefInfo.length-1];
-								fileGroupId = hrefInfo[2];
-								
-								uuidInfo = fileUuid.split("\\?");
-								uuid="";
-								if(hrefInfo.length > 0){
-									uuid=uuidInfo[0];
-								}
-								
-								try {
-									file = DLAppLocalServiceUtil.getFileEntryByUuidAndGroupId(uuid, Long.parseLong(fileGroupId));
-																			
-									serviceContext = new ServiceContext();
-									serviceContext.setScopeGroupId(groupId);
-									serviceContext.setUserId(userId);
-									serviceContext.setCompanyId(file.getCompanyId());
-									serviceContext.setAddGroupPermissions(true);
-									
-									newFile = CourseCopyUtil.cloneFileDescription(file, actId, file.getUserId(), serviceContext);
-									
-									newDescription = descriptionCloneFile(newDescription, file, newFile);
-									
-									log.debug("   + Description file pdf : " + file.getTitle() +" "+file.getFileEntryId() );
-									
-								} catch (Exception e) {
-									// TODO Auto-generated catch block
-									//e.printStackTrace();
-									log.error("* ERROR! Description file pdf : " + e.getMessage());
-								}
-							}
-							
-							//Si en los enlaces tienen una imagen para hacer click.
-							/*for (Element entryElementLinkImage : entryElementLink.elements("img")) {
-								;//parseImage(entryElementLinkImage, element, context, moduleId);
-							}*/
-							
-						}
-					}
-				}
-			}else{
-				if (rootElement.getQName().getName().equals("p")) {
-					
-					//Para las imagenes
-					for (Element entryElementImg : rootElement.elements("img")) {
-						
-						src = entryElementImg.attributeValue("src");
-						
-						srcInfo = src.split("/");
-						fileUuid = "";
-						fileGroupId ="";
-						
-						if(srcInfo.length >= 6  && srcInfo[1].compareTo("documents") == 0){
-							fileUuid = srcInfo[srcInfo.length-1];
-							fileGroupId = srcInfo[2];
-							
-							uuidInfo = fileUuid.split("\\?");
-							uuid="";
-							if(srcInfo.length > 0){
-								uuid=uuidInfo[0];
-							}
-							
-							try{
-								file = DLAppLocalServiceUtil.getFileEntryByUuidAndGroupId(uuid, Long.parseLong(fileGroupId));
-								
-								serviceContext = new ServiceContext();
-								serviceContext.setScopeGroupId(groupId);
-								serviceContext.setUserId(userId);
-								serviceContext.setCompanyId(file.getCompanyId());
-								serviceContext.setAddGroupPermissions(true);
-								
-								newFile = CourseCopyUtil.cloneFileDescription(file, actId, file.getUserId(), serviceContext);
-								
-								newDescription = descriptionCloneFile(newDescription, file, newFile);
-								if(log.isDebugEnabled()){
-									log.debug("     + Description file image : " + file.getTitle() +" ("+file.getMimeType()+")");
-								}
-							} catch (Exception e) {
-								// TODO Auto-generated catch block
-								//e.printStackTrace();
-								log.error("* ERROR! Description file image : " + e.getMessage());
-							}
-						}
-					}
-					
-					//Para los enlaces
-					for (Element entryElementLink : rootElement.elements("a")) {
-						
-						href = entryElementLink.attributeValue("href");
-						
-						hrefInfo = href.split("/");
-						fileUuid = "";
-						fileGroupId ="";
-						
-						if(hrefInfo.length >= 6 && hrefInfo[1].compareTo("documents") == 0){
-							fileUuid = hrefInfo[hrefInfo.length-1];
-							fileGroupId = hrefInfo[2];
-							
-							uuidInfo = fileUuid.split("\\?");
-							uuid="";
-							if(hrefInfo.length > 0){
-								uuid=uuidInfo[0];
-							}
-							
-							try {
-								file = DLAppLocalServiceUtil.getFileEntryByUuidAndGroupId(uuid, Long.parseLong(fileGroupId));
-								serviceContext = new ServiceContext();
-								serviceContext.setScopeGroupId(groupId);
-								serviceContext.setUserId(userId);
-								serviceContext.setCompanyId(file.getCompanyId());
-								serviceContext.setAddGroupPermissions(true);
-								
-								newFile = CourseCopyUtil.cloneFileDescription(file, actId, file.getUserId(), serviceContext);
-								newDescription = descriptionCloneFile(newDescription, file, newFile);
-								
-								if(log.isDebugEnabled()){
-									log.debug("   + Description file pdf : " + file.getTitle() +" "+file.getFileEntryId() );
-								}
-							} catch (Exception e) {
-								// TODO Auto-generated catch block
-								//e.printStackTrace();
-								log.error("* ERROR! Description file pdf : " + e.getMessage());
-							}
-						}
-						
-						//Si en los enlaces tienen una imagen para hacer click.
-						/*for (Element entryElementLinkImage : entryElementLink.elements("img")) {
-							;//parseImage(entryElementLinkImage, element, context, moduleId);
-						}*/
-						
-					}
-				}
-			}
-			
-			
-			
-		} catch (DocumentException de) {
-			if(log.isDebugEnabled()){
-				de.printStackTrace();
-			}
-			
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			//e.printStackTrace();
-			log.error("* ERROR! Document Exception : " + e.getMessage());
-		}
-
-		return newDescription;
-		
-	}
 	
-	
+
 	private void sendNotification(String title, String content, String url, String type, int priority){
 		
 		//ThemeDisplay themeDisplay = (ThemeDisplay) actionRequest.getAttribute(WebKeys.THEME_DISPLAY);	
