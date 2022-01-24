@@ -361,6 +361,12 @@ public class CourseServiceImpl extends CourseServiceBaseImpl {
 		
 			User user = UserLocalServiceUtil.getUserByScreenName(serviceContext.getCompanyId(), login);
 			GroupLocalServiceUtil.unsetUserGroups(user.getUserId(),new long[] { course.getGroupCreatedId() });
+			
+			CourseResult courseResult=courseResultLocalService.getCourseResultByCourseAndUser(courseId, user.getUserId());
+			if(courseResult !=null ){	
+				courseResult.setUnRegistrationDate(new Date());
+				courseResultLocalService.updateCourseResult(courseResult);
+			}
 
 			//auditing
 			AuditingLogFactory.audit(course.getCompanyId(), course.getGroupId(), Course.class.getName(), course.getCourseId(), serviceContext.getUserId(), AuditConstants.UNREGISTER, null);

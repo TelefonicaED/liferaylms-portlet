@@ -162,6 +162,7 @@
 		<property name="userId" type="com.liferay.portal.dao.orm.hibernate.LongType" />
 		<property name="passed" type="com.liferay.portal.dao.orm.hibernate.BooleanType" />
 		<property name="registrationDate" type="org.hibernate.type.TimestampType" />
+		<property name="unRegistrationDate" type="org.hibernate.type.TimestampType" />
 		<property name="startDate" type="org.hibernate.type.TimestampType" />
 		<property name="passedDate" type="org.hibernate.type.TimestampType" />
 		<property name="allowStartDate" type="org.hibernate.type.TimestampType" />
