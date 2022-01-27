@@ -624,6 +624,7 @@
 		<column name="userId" type="long" primary="false"></column>
 		<column name="passed" type="boolean"></column>
 		<column name="registrationDate" type="Date" />
+		<column name="unRegistrationDate" type="Date" />
 		<column name="startDate" type="Date" />
 		<column name="passedDate" type="Date" convert-null="true"/>
 		<column name="allowStartDate" type="Date"/>

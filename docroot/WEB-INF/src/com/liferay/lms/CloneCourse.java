@@ -69,9 +69,9 @@ import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
 import com.liferay.portlet.messageboards.model.MBCategory;
 import com.liferay.portlet.messageboards.service.MBCategoryLocalServiceUtil;
 import com.liferay.util.CourseCopyUtil;
-import com.tls.liferaylms.mail.model.MailJob;
+/*import com.tls.liferaylms.mail.model.MailJob;
 import com.tls.liferaylms.mail.service.MailJobLocalServiceUtil;
-import com.tls.liferaylms.util.MailConstants;
+import com.tls.liferaylms.util.MailConstants;*/
 
 public class CloneCourse extends CourseCopyUtil implements MessageListener {
 	private static Log log = LogFactoryUtil.getLog(CloneCourse.class);
@@ -419,7 +419,7 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 			
 		}
 		//SE COPIAN LOS MAILS PROGRAMADOS
-		try {
+		/*try {
 			List<MailJob> mailjobs = MailJobLocalServiceUtil.getMailJobsInGroupId(course.getGroupCreatedId(), -1, -1);
 			for (MailJob mj : mailjobs){
 				try {
@@ -468,7 +468,7 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 		}
 		if(log.isDebugEnabled()){
 			log.debug(" ENDS!");
-		}
+		}*/
 		
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd kk:mm:ss");
 		dateFormat.setTimeZone(themeDisplay.getTimeZone());

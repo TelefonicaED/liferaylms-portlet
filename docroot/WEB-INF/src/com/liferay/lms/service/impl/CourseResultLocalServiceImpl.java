@@ -111,6 +111,7 @@ public class CourseResultLocalServiceImpl
 		courseResult.setUserId(studentId);
 		courseResult.setResult(0);
 		courseResult.setRegistrationDate(new Date());
+		courseResult.setUnRegistrationDate(null);
 		courseResult.setPassed(false);
 		courseResult.setAllowStartDate(allowStartDate);
 		courseResult.setAllowFinishDate(allowEndDate);
