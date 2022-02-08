@@ -26,10 +26,12 @@ import net.fortuna.ical4j.util.UidGenerator;
 import com.liferay.lms.auditing.AuditConstants;
 import com.liferay.lms.auditing.AuditingLogFactory;
 import com.liferay.lms.model.Course;
+import com.liferay.lms.model.CourseResult;
 import com.liferay.lms.model.LmsPrefs;
 import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.lms.service.CourseResultLocalServiceUtil;
 import com.liferay.lms.service.LmsPrefsLocalServiceUtil;
+import com.liferay.lms.service.persistence.CourseResultUtil;
 import com.liferay.lms.util.LmsConstant;
 import com.liferay.portal.ModelListenerException;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -98,10 +100,19 @@ public class GroupListener extends BaseModelListener<Group> {
 				if(log.isDebugEnabled())log.debug("preferencia editorRole: " + PrefsPropsUtil.getBoolean(course.getCompanyId(), LmsConstant.SEND_MAIL_TO_EDITORS, true));
 				
 				//Si no es tutor o editor, es alumno, así que creamos el courseresult
-				if(CourseResultLocalServiceUtil.getCourseResultByCourseAndUser(course.getCourseId(), userId) == null) {
-					CourseResultLocalServiceUtil.addCourseResult(PrincipalThreadLocal.getUserId(), course.getCourseId(), userId);
+				if ( !tutorRole && !editorRole ) {
+					if(CourseResultLocalServiceUtil.getCourseResultByCourseAndUser(course.getCourseId(), userId) == null) {
+						CourseResultLocalServiceUtil.addCourseResult(PrincipalThreadLocal.getUserId(), course.getCourseId(), userId);
+					}
+					else 
+					{
+						// Si existe el courseResult actualizamos los datos de inscripcion
+						CourseResult cr = CourseResultLocalServiceUtil.getCourseResultByCourseAndUser(course.getCourseId(), userId);
+						cr.setRegistrationDate(new Date());
+						cr.setUnRegistrationDate(null);
+						CourseResultLocalServiceUtil.update(cr);
+					}
 				}
-				
 				if(course!=null&&course.isWelcome()&&course.getWelcomeMsg()!=null&&!StringPool.BLANK.equals(course.getWelcomeMsg())){
 					
 					User user = null;
@@ -332,6 +343,13 @@ public class GroupListener extends BaseModelListener<Group> {
 				AuditingLogFactory.audit(course.getCompanyId(), course.getGroupCreatedId(), Course.class.getName(), 
 						course.getCourseId(), userId, PrincipalThreadLocal.getUserId(), AuditConstants.UNREGISTER, null);
 				
+				// Ponemos la fecha de desinscripcion del curso.
+				CourseResult cr = CourseResultLocalServiceUtil.getCourseResultByCourseAndUser(course.getCourseId(), userId);
+				if(cr!= null) {
+					cr.setUnRegistrationDate(new Date());
+					CourseResultUtil.update(cr, false);
+				}
+
 				if(course!=null&&course.isGoodbye()&&course.getGoodbyeMsg()!=null&&!StringPool.BLANK.equals(course.getGoodbyeMsg())){
 					if(log.isDebugEnabled())log.debug("course.courseId: " + course.getCourseId());
 					if(log.isDebugEnabled())log.debug("course.isGoodbye(): " + course.isGoodbye());
@@ -362,6 +380,7 @@ public class GroupListener extends BaseModelListener<Group> {
 					if(log.isDebugEnabled())log.debug("preferencia tutorRole: " + PrefsPropsUtil.getBoolean(company.getCompanyId(), LmsConstant.SEND_MAIL_TO_TUTORS, true));
 					if(log.isDebugEnabled())log.debug("preferencia editorRole: " + PrefsPropsUtil.getBoolean(company.getCompanyId(), LmsConstant.SEND_MAIL_TO_EDITORS, true));
 					
+				
 					
 					if(user!=null&&company!=null && ((!tutorRole && !editorRole) 
 							|| (tutorRole && PrefsPropsUtil.getBoolean(company.getCompanyId(), LmsConstant.SEND_MAIL_TO_TUTORS, true)

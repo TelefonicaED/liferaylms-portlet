@@ -217,6 +217,9 @@
 			<basic name="registrationDate">
 				<temporal>TIMESTAMP</temporal>
 			</basic>
+			<basic name="unRegistrationDate">
+				<temporal>TIMESTAMP</temporal>
+			</basic>
 			<basic name="startDate">
 				<temporal>TIMESTAMP</temporal>
 			</basic>

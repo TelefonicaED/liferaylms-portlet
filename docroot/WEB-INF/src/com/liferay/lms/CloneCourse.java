@@ -1,20 +1,15 @@
 package com.liferay.lms;
 
-import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 import com.liferay.counter.service.CounterLocalServiceUtil;
 import com.liferay.lms.course.diploma.CourseDiploma;
 import com.liferay.lms.course.diploma.CourseDiplomaRegistry;
-import com.liferay.lms.learningactivity.LearningActivityType;
-import com.liferay.lms.learningactivity.LearningActivityTypeRegistry;
 import com.liferay.lms.learningactivity.courseeval.CourseEval;
 import com.liferay.lms.learningactivity.courseeval.CourseEvalRegistry;
 import com.liferay.lms.model.AsynchronousProcessAudit;
@@ -25,15 +20,12 @@ import com.liferay.lms.model.CourseTypeFactory;
 import com.liferay.lms.model.CourseTypeI;
 import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.model.LmsPrefs;
-import com.liferay.lms.model.Module;
-import com.liferay.lms.model.impl.ModuleImpl;
 import com.liferay.lms.service.AsynchronousProcessAuditLocalServiceUtil;
 import com.liferay.lms.service.CourseCompetenceLocalServiceUtil;
 import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.lms.service.CourseTypeLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityLocalServiceUtil;
 import com.liferay.lms.service.LmsPrefsLocalServiceUtil;
-import com.liferay.lms.service.ModuleLocalServiceUtil;
 import com.liferay.lms.util.LmsConstant;
 import com.liferay.portal.DuplicateGroupException;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -56,7 +48,6 @@ import com.liferay.portal.model.Role;
 import com.liferay.portal.model.RoleConstants;
 import com.liferay.portal.model.User;
 import com.liferay.portal.security.auth.PrincipalThreadLocal;
-import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.security.permission.PermissionCheckerFactoryUtil;
 import com.liferay.portal.security.permission.PermissionThreadLocal;
@@ -75,10 +66,12 @@ import com.liferay.portlet.announcements.service.AnnouncementsFlagLocalServiceUt
 import com.liferay.portlet.asset.model.AssetEntry;
 import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
-import com.liferay.portlet.expando.model.ExpandoBridge;
 import com.liferay.portlet.messageboards.model.MBCategory;
 import com.liferay.portlet.messageboards.service.MBCategoryLocalServiceUtil;
 import com.liferay.util.CourseCopyUtil;
+/*import com.tls.liferaylms.mail.model.MailJob;
+import com.tls.liferaylms.mail.service.MailJobLocalServiceUtil;
+import com.tls.liferaylms.util.MailConstants;*/
 
 public class CloneCourse extends CourseCopyUtil implements MessageListener {
 	private static Log log = LogFactoryUtil.getLog(CloneCourse.class);
@@ -425,10 +418,57 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 			duplicateFoldersAndFileEntriesInsideFolder(Boolean.TRUE, themeDisplay.getUserId(), typeSite, themeDisplay.getCompanyId(), DLFolderConstants.DEFAULT_PARENT_FOLDER_ID, repositoryId, newCourseGroupId, DLFolderConstants.DEFAULT_PARENT_FOLDER_ID, newRepositoryId, serviceContext);
 			
 		}
-		
+		//SE COPIAN LOS MAILS PROGRAMADOS
+		/*try {
+			List<MailJob> mailjobs = MailJobLocalServiceUtil.getMailJobsInGroupId(course.getGroupCreatedId(), -1, -1);
+			for (MailJob mj : mailjobs){
+				try {
+					log.info("mail "+mj.getGroupId());
+					long classpk = 0;
+					long referenceclasspk=0;
+					if (mj.getConditionClassPK()> 0){
+						LearningActivity act = LearningActivityLocalServiceUtil.fetchLearningActivity(mj.getConditionClassPK());
+						List<LearningActivity> listactivities = LearningActivityLocalServiceUtil.getLearningActivitiesOfGroupAndType(newCourse.getGroupCreatedId(), act.getTypeId());
+						for (LearningActivity la: listactivities){
+							if (act.getTitle().equals(la.getTitle())){
+								classpk= la.getActId();
+								break;
+							}
+						}
+					}
+					if (mj.getDateClassPK()> 0){
+						LearningActivity actref = LearningActivityLocalServiceUtil.fetchLearningActivity(mj.getDateClassPK());
+						List<LearningActivity> listactivities = LearningActivityLocalServiceUtil.getLearningActivitiesOfGroupAndType(newCourse.getGroupCreatedId(), actref.getTypeId());
+						for (LearningActivity la: listactivities){
+							if (actref.getTitle().equals(la.getTitle())){
+								classpk= la.getActId();
+								break;
+							}
+						}
+					}
+					MailJob mailJob = MailJobLocalServiceUtil.addMailJob(mj.getIdTemplate(), mj.getConditionClassName(), classpk, mj.getConditionStatus(), mj.getDateClassName(), referenceclasspk, mj.getDateShift(), mj.getDateToSend(), mj.getDateReferenceDate(), serviceContext);
+					log.info("Creado mail "+mailJob.getUuid());
+					JSONObject extraOrig = mj.getExtraDataJSON();
+					JSONObject extraData = JSONFactoryUtil.createJSONObject();
+					extraData.put(MailConstants.EXTRA_DATA_SEND_COPY, extraOrig.getBoolean(MailConstants.EXTRA_DATA_SEND_COPY));
+					extraData.put(MailConstants.EXTRA_DATA_RELATION_ARRAY, extraOrig.getJSONArray(MailConstants.EXTRA_DATA_RELATION_ARRAY));
+					mailJob.setExtraData(extraData.toString());
+					MailJobLocalServiceUtil.updateMailJob(mailJob);
+				
+				} catch (PortalException e1) {
+					e1.printStackTrace();
+					log.error(e1.getMessage());
+				} catch (SystemException e2) {
+					e2.printStackTrace();
+					log.error(e2.getMessage());
+				}
+			}
+		}catch(Exception e){
+			log.error("NO SE PUDO COPIAR LOS EMAILS PROGRAMADOS");
+		}
 		if(log.isDebugEnabled()){
 			log.debug(" ENDS!");
-		}
+		}*/
 		
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd kk:mm:ss");
 		dateFormat.setTimeZone(themeDisplay.getTimeZone());

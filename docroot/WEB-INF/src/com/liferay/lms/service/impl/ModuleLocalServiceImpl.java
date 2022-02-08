@@ -15,6 +15,7 @@
 package com.liferay.lms.service.impl;
 
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -779,10 +780,22 @@ public class ModuleLocalServiceImpl extends ModuleLocalServiceBaseImpl {
 		}
 		
 		if(copyExpandos){
-			ExpandoTable table = ExpandoTableLocalServiceUtil.getTable(destinationCourse.getCompanyId(), PortalUtil.getClassNameId(Module.class), ExpandoTableConstants.DEFAULT_TABLE_NAME);
+			ExpandoTable table = null;
+			try {
+				table = ExpandoTableLocalServiceUtil.getTable(destinationCourse.getCompanyId(), PortalUtil.getClassNameId(Module.class), ExpandoTableConstants.DEFAULT_TABLE_NAME);
+			}
+			catch (Exception e ) {
+				table = null;
+			}
 			if (table != null ){
 				
-				List<ExpandoColumn> columns = ExpandoColumnLocalServiceUtil.getColumns(table.getTableId());
+				List<ExpandoColumn> columns = new ArrayList<ExpandoColumn>();
+				try {
+					columns = ExpandoColumnLocalServiceUtil.getColumns(table.getTableId());
+				}
+				catch (Exception e ) {
+					columns = new ArrayList<ExpandoColumn>();
+				}
 				
 				ExpandoValue originExpandoValue = null;
 				ExpandoValue destinationExpandoValue = null;
