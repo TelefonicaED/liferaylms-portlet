@@ -73,6 +73,17 @@ public class AsynchronousProcessAuditLocalServiceImpl
 		}
 		return asynchronousProcessAudits;
 	}
+	
+	public List<AsynchronousProcessAudit> getByCompanyIdClassNameIdClassPKStatus(long companyId, long classNameId, long classPK, int status, int start, int end){
+		List<AsynchronousProcessAudit> asynchronousProcessAudits = new ArrayList<AsynchronousProcessAudit>();
+		try{
+			asynchronousProcessAudits = asynchronousProcessAuditPersistence.findByCompanyIdClassNameIdClassPKStatus(companyId, classNameId, classPK, status, start, end);
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		return asynchronousProcessAudits;
+	}
+	
 	public int countActiveByCompanyIdClassNameIdClassPK(long companyId, long classNameId, long classPK){
 		int asynchronousProcessAudits = 0;
 		try{
@@ -82,7 +93,6 @@ public class AsynchronousProcessAuditLocalServiceImpl
 		}
 		return asynchronousProcessAudits;
 	}
-	
 	
 	public int countByCompanyIdClassNameIdCreateDate(long companyId, String type, long userId, Date startDate, Date endDate){
 		int asynchronousProcessAudits = 0;
