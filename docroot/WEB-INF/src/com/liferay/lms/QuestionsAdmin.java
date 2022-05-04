@@ -10,9 +10,11 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -115,7 +117,7 @@ public class QuestionsAdmin extends MVCPortlet{
 
 		ThemeDisplay themeDisplay = (ThemeDisplay) actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
 		PermissionChecker permissionChecker=themeDisplay.getPermissionChecker();
-
+		
 		long questionId = ParamUtil.getLong(actionRequest, "pageId"),
 				prevQuestionId = ParamUtil.getLong(actionRequest, "prevPageId"),
 				nextQuestionId = ParamUtil.getLong(actionRequest, "nextPageId");
@@ -548,7 +550,9 @@ public class QuestionsAdmin extends MVCPortlet{
 								resultados[1] = String.valueOf(user.getUserId());
 							}
 							
-							resultados[2] = String.valueOf(activity.getEndDate());
+							
+							//resultados[2] = String.valueOf(activity.getEndDate());
+							resultados[2] = String.valueOf(formatUtcDate(activity.getEndDate() , themeDisplay.getTimeZone() ));
 							
 							int numAnswer = 0;
 
@@ -639,6 +643,16 @@ public class QuestionsAdmin extends MVCPortlet{
 			response.getPortletOutputStream().flush();
 			response.getPortletOutputStream().close();
 		}
+	}
+
+	private String formatUtcDate(Date endDate, TimeZone timeZone) {
+		java.text.SimpleDateFormat sdf=new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm");
+		sdf.setTimeZone(timeZone);
+		String fecha ="-";
+		if ( endDate !=null){
+			fecha = sdf.format(endDate);
+		}
+		return fecha;
 	}
 
 	private String formatString(String str) {
