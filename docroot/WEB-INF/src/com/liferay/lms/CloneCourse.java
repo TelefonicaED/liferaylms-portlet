@@ -252,7 +252,11 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
             extraContent.append("<br>").append(LanguageUtil.get(themeDisplay.getLocale(), "new-course"))
                 .append(StringPool.COLON).append(StringPool.SPACE)
                 .append(newCourse.getTitle(themeDisplay.getLocale()));
-			
+
+            extraContent.append("<br>courseId")
+            .append(StringPool.COLON).append(StringPool.SPACE)
+            .append(course.getCourseId());
+            
             JSONObject json =JSONFactoryUtil.createJSONObject();            
             json.put("data", extraContent.toString());
             
@@ -418,57 +422,6 @@ public class CloneCourse extends CourseCopyUtil implements MessageListener {
 			duplicateFoldersAndFileEntriesInsideFolder(Boolean.TRUE, themeDisplay.getUserId(), typeSite, themeDisplay.getCompanyId(), DLFolderConstants.DEFAULT_PARENT_FOLDER_ID, repositoryId, newCourseGroupId, DLFolderConstants.DEFAULT_PARENT_FOLDER_ID, newRepositoryId, serviceContext);
 			
 		}
-		//SE COPIAN LOS MAILS PROGRAMADOS
-		/*try {
-			List<MailJob> mailjobs = MailJobLocalServiceUtil.getMailJobsInGroupId(course.getGroupCreatedId(), -1, -1);
-			for (MailJob mj : mailjobs){
-				try {
-					log.info("mail "+mj.getGroupId());
-					long classpk = 0;
-					long referenceclasspk=0;
-					if (mj.getConditionClassPK()> 0){
-						LearningActivity act = LearningActivityLocalServiceUtil.fetchLearningActivity(mj.getConditionClassPK());
-						List<LearningActivity> listactivities = LearningActivityLocalServiceUtil.getLearningActivitiesOfGroupAndType(newCourse.getGroupCreatedId(), act.getTypeId());
-						for (LearningActivity la: listactivities){
-							if (act.getTitle().equals(la.getTitle())){
-								classpk= la.getActId();
-								break;
-							}
-						}
-					}
-					if (mj.getDateClassPK()> 0){
-						LearningActivity actref = LearningActivityLocalServiceUtil.fetchLearningActivity(mj.getDateClassPK());
-						List<LearningActivity> listactivities = LearningActivityLocalServiceUtil.getLearningActivitiesOfGroupAndType(newCourse.getGroupCreatedId(), actref.getTypeId());
-						for (LearningActivity la: listactivities){
-							if (actref.getTitle().equals(la.getTitle())){
-								classpk= la.getActId();
-								break;
-							}
-						}
-					}
-					MailJob mailJob = MailJobLocalServiceUtil.addMailJob(mj.getIdTemplate(), mj.getConditionClassName(), classpk, mj.getConditionStatus(), mj.getDateClassName(), referenceclasspk, mj.getDateShift(), mj.getDateToSend(), mj.getDateReferenceDate(), serviceContext);
-					log.info("Creado mail "+mailJob.getUuid());
-					JSONObject extraOrig = mj.getExtraDataJSON();
-					JSONObject extraData = JSONFactoryUtil.createJSONObject();
-					extraData.put(MailConstants.EXTRA_DATA_SEND_COPY, extraOrig.getBoolean(MailConstants.EXTRA_DATA_SEND_COPY));
-					extraData.put(MailConstants.EXTRA_DATA_RELATION_ARRAY, extraOrig.getJSONArray(MailConstants.EXTRA_DATA_RELATION_ARRAY));
-					mailJob.setExtraData(extraData.toString());
-					MailJobLocalServiceUtil.updateMailJob(mailJob);
-				
-				} catch (PortalException e1) {
-					e1.printStackTrace();
-					log.error(e1.getMessage());
-				} catch (SystemException e2) {
-					e2.printStackTrace();
-					log.error(e2.getMessage());
-				}
-			}
-		}catch(Exception e){
-			log.error("NO SE PUDO COPIAR LOS EMAILS PROGRAMADOS");
-		}
-		if(log.isDebugEnabled()){
-			log.debug(" ENDS!");
-		}*/
 		
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd kk:mm:ss");
 		dateFormat.setTimeZone(themeDisplay.getTimeZone());
