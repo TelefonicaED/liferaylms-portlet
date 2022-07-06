@@ -370,7 +370,7 @@ public class GradeBook extends MVCPortlet {
 		        //Títulos de los módulos
 		        String[] moduleTitles = new String[headerSize];
 		        List<LearningActivity> listLearningActivitiesOfModule = new ArrayList<LearningActivity>();
-		        int column = 3;
+		        int column = 4;
 		        for(Module module:listModules){
 		        	listLearningActivitiesOfModule = LearningActivityLocalServiceUtil.getLearningActivitiesOfModule(module.getModuleId());
 		        	if(Validator.isNotNull(listLearningActivitiesOfModule) && listLearningActivitiesOfModule.size()>0){
