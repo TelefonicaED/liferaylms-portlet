@@ -273,7 +273,9 @@
 		<field name="userName" type="String" />
 		<field name="createDate" type="Date" />
 		<field name="modifiedDate" type="Date" />
-		<field name="title" type="String" localized="true" />
+		<field name="title" type="String" localized="true" >
+			<hint name="max-length">256</hint>
+		</field>
 		<field name="description" type="String" localized="true" />
 		<field name="ordern" type="long" />
 		<field name="startDate" type="Date" />
