@@ -6,8 +6,12 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 import javax.mail.internet.InternetAddress;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.filefilter.TrueFileFilter;
 
 import net.fortuna.ical4j.data.CalendarOutputter;
 import net.fortuna.ical4j.model.TimeZoneRegistry;
@@ -47,6 +51,7 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.PrefsPropsUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -57,10 +62,16 @@ import com.liferay.portal.model.Role;
 import com.liferay.portal.model.User;
 import com.liferay.portal.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.service.CompanyLocalServiceUtil;
+import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.RoleLocalServiceUtil;
 import com.liferay.portal.service.UserGroupRoleLocalServiceUtil;
 import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.util.PortalUtil;
+import com.tls.liferaylms.mail.model.MailJob;
+import com.tls.liferaylms.mail.model.MailTemplate;
+import com.tls.liferaylms.mail.service.MailJobLocalServiceUtil;
+import com.tls.liferaylms.mail.service.MailTemplateLocalServiceUtil;
+//import com.tls.liferaylms.util.MailUtil;
 
 public class GroupListener extends BaseModelListener<Group> {
 	Log log = LogFactoryUtil.getLog(GroupListener.class);
@@ -99,7 +110,7 @@ public class GroupListener extends BaseModelListener<Group> {
 				if(log.isDebugEnabled())log.debug("preferencia tutorRole: " + PrefsPropsUtil.getBoolean(course.getCompanyId(), LmsConstant.SEND_MAIL_TO_TUTORS, true));
 				if(log.isDebugEnabled())log.debug("preferencia editorRole: " + PrefsPropsUtil.getBoolean(course.getCompanyId(), LmsConstant.SEND_MAIL_TO_EDITORS, true));
 				
-				//Si no es tutor o editor, es alumno, así que creamos el courseresult
+				//Si no es tutor o editor, es alumno, asÃ­ que creamos el courseresult
 				if ( !tutorRole && !editorRole ) {
 					if(CourseResultLocalServiceUtil.getCourseResultByCourseAndUser(course.getCourseId(), userId) == null) {
 						CourseResultLocalServiceUtil.addCourseResult(PrincipalThreadLocal.getUserId(), course.getCourseId(), userId);
@@ -192,6 +203,8 @@ public class GroupListener extends BaseModelListener<Group> {
 									log.debug(e.getMessage());
 							}
 							
+							log.debug("Envio email auditoria");
+							
 							//Envio el correo
 							Message message=new Message();
 
@@ -207,6 +220,7 @@ public class GroupListener extends BaseModelListener<Group> {
 							message.put("url", 		url);
 							message.put("urlcourse",urlcourse);		
 
+							log.debug("Envio email bienvenida usuario");
 							
 							if(course.getWelcomeAddToCalendar()){
 								String courseTitle = course.getTitle(user.getLocale());
@@ -321,6 +335,107 @@ public class GroupListener extends BaseModelListener<Group> {
 					}
 				}
 			}
+			
+			
+			//GroupListener lmsmailing-portlet
+			log.debug("Empiezo codigo lmsmailing-portlet");
+			List<MailJob> mailjobs = MailJobLocalServiceUtil.getMailJobsInGroupId(groupId, -1, -1);			
+			for (MailJob mj : mailjobs){
+				if (mj.getConditionClassName().equals("InscriptionCondition")){
+					try{
+						log.debug("HAY QUE MANDAR MAIL DE INSCRIPCION");
+						Message message=new Message();
+
+						User user = UserLocalServiceUtil.fetchUser(userId);
+						MailTemplate mailTemplate = null;
+						try {
+							mailTemplate = MailTemplateLocalServiceUtil.getMailTemplate(mj.getIdTemplate());
+						} catch (PortalException e) {
+							e.printStackTrace();
+						} catch (SystemException e) {
+							e.printStackTrace();
+						}
+						String tutors = "";
+						Group group = null;
+						try {
+							group = GroupLocalServiceUtil.getGroup(groupId);
+						} catch (PortalException e) {
+							e.printStackTrace();
+						} catch (SystemException e) {
+							e.printStackTrace();
+						}
+						if(group!=null){
+							tutors = getTutors(group.getGroupId());
+					    }
+						Company company = null;
+						String companyName = StringPool.BLANK;
+						try {
+							company = CompanyLocalServiceUtil.getCompanyById(mj.getCompanyId());
+							companyName = company.getName();
+						} catch (PortalException e) {
+							e.printStackTrace();
+						} catch (SystemException e) {
+							e.printStackTrace();
+						}
+
+						Course oCourse=null;
+						try {
+							oCourse = CourseLocalServiceUtil.fetchByGroupCreatedId(group.getGroupId());
+						} catch (SystemException e1) {
+							e1.printStackTrace();
+						}
+						message.put("templateId",mailTemplate.getIdTemplate());
+
+						message.put("to", user.getEmailAddress());
+						message.put("tutors", tutors);
+						message.put("subject", 	mailTemplate.getSubject());
+						message.put("body", 	mailTemplate.getBody());
+						message.put("groupId", 	mj.getGroupId());
+						message.put("userId",  	mj.getUserId());
+						message.put("testing", 	StringPool.FALSE);
+
+						message.put("portal", 	companyName);
+						
+						if(oCourse!=null){
+							message.put("community",oCourse.getTitle(user.getLocale()));
+						}else{
+							message.put("community",group.getName());
+						}
+						
+
+						String portalUrl = PortalUtil.getPortalURL(company.getVirtualHostname(), 80, false);
+				    	//QUITANDO PUERTOS
+						String[] urls = portalUrl.split(":");
+						portalUrl = urls[0] + ":" +urls[1];  // http:prueba.es:8080		
+						log.debug("url: " + portalUrl);
+						
+						File atachDir = new File (PropsUtil.get("liferay.home")+"/data/mailtemplate/"+mailTemplate.getIdTemplate());
+						if (atachDir.exists()){
+							log.debug("HAY ATTACH");
+							List<File> files = (List<File>) FileUtils.listFiles(atachDir, TrueFileFilter.INSTANCE, TrueFileFilter.INSTANCE);
+							File[] copyAttachments = new File[files.size()];
+							String[] attachmentNames = new String[files.size()];
+							for(int i=0;i<files.size();i++){
+								File tempFile = FileUtil.createTempFile();
+								FileUtil.copyFile(files.get(i), tempFile);
+								copyAttachments[i] = tempFile;
+								attachmentNames[i]= files.get(i).getName();
+							}
+								
+							message.put("attachments", copyAttachments);
+							message.put("attachmentNames", attachmentNames);
+						}
+						message.put("url", 		portalUrl);
+						message.put("urlcourse",portalUrl+PortalUtil.getPathFriendlyURLPublic()+group.getFriendlyURL());
+
+						MessageBusUtil.sendMessage("lms/mailing", message);
+					
+					}catch(Exception e){
+						e.printStackTrace();
+					}
+				}
+			}
+			
 			
 		} catch (SystemException e) {
 			throw new ModelListenerException(e);
@@ -464,5 +579,37 @@ public class GroupListener extends BaseModelListener<Group> {
 		} catch (SystemException e) {
 			throw new ModelListenerException(e);
 		}
+	}
+	
+	
+	public String getTutors(long courseGroupCreatedId) {
+		long courseId=0;
+		Course course=null;
+		List<User> courseTutors = null;
+		String tutors = "";
+		
+		try{
+			course=CourseLocalServiceUtil.getCourseByGroupCreatedId( courseGroupCreatedId );
+			if(course!=null){
+				courseId=course.getCourseId();
+				courseTutors = CourseLocalServiceUtil.getTeachersFromCourse(courseId);
+				if(courseTutors!=null && courseTutors.size()>0){
+					int numTutors = courseTutors.size();
+					tutors = courseTutors.get(0).getFullName();
+					if(numTutors>1)
+					{
+						for(int idx=1; idx<=numTutors; idx++)
+							tutors = tutors.concat(StringPool.COMMA_AND_SPACE)
+										.concat(courseTutors.get(idx).getFullName());
+					}
+				}
+				else
+					if(log.isDebugEnabled())log.debug("There are no course tutors.  CourseId: " + courseId );
+			}
+			else
+				if(log.isDebugEnabled())log.debug("NULL course for groupCreatedId: " + courseGroupCreatedId);
+		}catch(Exception e){}
+		
+		return tutors;
 	}
 }
