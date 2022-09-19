@@ -394,6 +394,7 @@
 			<id name="companyId" />
 			<basic name="teacherRole" />
 			<basic name="editorRole" />
+			<basic name="inspectorRole" />
 			<basic name="lmsTemplates" />
 			<basic name="activities" />
 			<basic name="courseevals" />

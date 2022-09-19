@@ -181,6 +181,11 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 	public static final String MY_COURSES =
 			 CourseFinder.class.getName() +
 				".myCourses";
+	
+	public static final String COURSES_INSPECTOR =
+			 CourseFinder.class.getName() +
+				".coursesInspector";
+	
 	public static final String COUNT_MY_COURSES =
 			 CourseFinder.class.getName() +
 				".countMyCourses";
@@ -200,6 +205,10 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 	
 	public static final String FIND_NEXT_EDITION_OPEN =
 			CourseFinder.class.getName() + ".findNextEditionOpen";
+	
+	public static final String COUNT_INSPECTOR_COURSES =
+			 CourseFinder.class.getName() +
+				".countInspectorCourses";
 	
 	public List<Course> findByKeywords(long companyId, String freeText, String languageId, int status, long parentCourseId, long groupId, LinkedHashMap<String, Object> params, 
 			int start, int end, OrderByComparator obc){
@@ -1148,6 +1157,24 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 		return findTeachersEditors(courseId, companyId, screenName, firstName, lastName, emailAddress, status, teamIds, roleId, andOperator, start, end, obc);
 	}
 	
+	public List<User> findInspectors(long courseId, long companyId, String screenName, String firstName, String lastName, String emailAddress, int status, long[] teamIds,boolean andOperator, 
+			int start, int end,OrderByComparator obc){
+		//Obtenemos el rol de editor del curso y profesor
+		long roleId = 0;
+		try {
+			LmsPrefs prefs = LmsPrefsLocalServiceUtil.getLmsPrefs(companyId);
+			roleId = prefs.getInspectorRole();
+		} catch (PortalException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SystemException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return findTeachersEditors(courseId, companyId, screenName, firstName, lastName, emailAddress, status, teamIds, roleId, andOperator, start, end, obc);
+	}
+	
 	private List<User> findTeachersEditors(long courseId, long companyId, String screenName, String firstName, String lastName, String emailAddress, int status, long[] teamIds,
 			long roleId, boolean andOperator, int start, int end,OrderByComparator obc){
 		Session session = null;
@@ -1213,6 +1240,23 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 	    }
 	
 	    return new ArrayList<User>();
+	}
+	
+	public int countInspectors(long courseId, long companyId, String screenName, String firstName, String lastName, String emailAddress, int status, long[] teamIds,boolean andOperator){
+		//Obtenemos el rol de editor del curso y profesor
+		long roleId = 0;
+		try {
+			LmsPrefs prefs = LmsPrefsLocalServiceUtil.getLmsPrefs(companyId);
+			roleId = prefs.getInspectorRole();
+		} catch (PortalException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SystemException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return countTeachersEditors(courseId, companyId, screenName, firstName, lastName, emailAddress, status, teamIds, roleId, andOperator);
 	}
 	
 	public int countTeachers(long courseId, long companyId, String screenName, String firstName, String lastName, String emailAddress, int status, long[] teamIds,boolean andOperator){
@@ -1479,6 +1523,143 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 	
 		return false;
 	}
+
+	public List<CourseResultView> getCoursesInspector(long groupId, long userId, 
+			LinkedHashMap<String, Object> params, ThemeDisplay themeDisplay, String orderByColumn, String orderByType, int start, int end){
+		
+			Session session = null;
+			List<CourseResultView> listMyCourses = new ArrayList<CourseResultView>();
+			
+			long roleId = 0;
+			try {
+				roleId = LmsPrefsLocalServiceUtil.getLmsPrefs(themeDisplay.getCompanyId()).getInspectorRole();
+			} catch (PortalException e1) {
+				
+			} catch (SystemException e1) {
+			
+			}
+		
+		
+			try{
+				
+				session = openSession();
+				
+				String sql = CustomSQLUtil.get(COURSES_INSPECTOR);
+				
+				StringBundler sb = new StringBundler();
+	
+				sb.append(StringPool.OPEN_PARENTHESIS);
+				sb.append(replaceJoinAndWhere(sql, params, themeDisplay.getLanguageId(), themeDisplay.getCompanyId()));
+				sb.append(StringPool.CLOSE_PARENTHESIS);
+				
+				sql = sb.toString();
+				
+				sql = replaceLanguage(sql, themeDisplay.getLanguageId());
+						
+				SimpleDateFormat parseDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+				String date = parseDate.format(new Date());
+				
+				sql = sql.replace("[$DATENOW$]", date);
+				
+				if(Validator.isNull(orderByColumn)){
+					orderByColumn = "Lms_Course.courseId";
+				}
+				
+				if(Validator.isNull(orderByType))
+					orderByType = "";
+				
+				if(Validator.isNotNull(orderByColumn)){
+					if(orderByColumn.startsWith("c.")){
+						orderByColumn = StringUtil.replaceFirst(orderByColumn, "c.", "Lms_Course.");
+					}
+					if(orderByColumn.contains(" c.")){
+						orderByColumn = StringUtil.replaceFirst(orderByColumn, " c.", " Lms_Course.");
+					}
+					if(orderByColumn.contains("(c.")){
+						orderByColumn = StringUtil.replaceFirst(orderByColumn, "(c.", "(Lms_Course.");
+					}
+					if(orderByColumn.contains(",c.")){
+						orderByColumn = StringUtil.replaceFirst(orderByColumn, ",c.", ",Lms_Course.");
+					}
+					sql += " ORDER BY " + orderByColumn + " " + orderByType;
+				}
+				
+				if(start >= 0 && end >= 0){
+					sql += " LIMIT " + start + "," + (end-start);
+				}
+			
+				if(log.isDebugEnabled()){
+					log.debug("sql: " + sql);
+					log.debug("groupId: " + groupId);
+					log.debug("userId: " + userId);
+				}
+				
+				SQLQuery q = session.createSQLQuery(sql);
+				
+				QueryPos qPos = QueryPos.getInstance(q);
+				qPos.add(roleId);
+				qPos.add(userId);
+				
+				setJoin(qPos, params);
+				
+				qPos.add(groupId);
+				qPos.add(groupId);
+				
+				Iterator<Object[]> itr =  q.iterate();
+								
+				Object[] myCourse = null;
+				CourseResultView courseResultView = null;
+				CourseView courseView = null;
+				long result = 0;
+				int statusUser = 0;
+				String url = null;
+				Date passedDate = null;
+				
+				while (itr.hasNext()) {
+					myCourse = itr.next();
+	
+					courseView = new CourseView(((BigInteger)myCourse[0]).longValue(), (String)myCourse[2], ((BigInteger)myCourse[6]).longValue(), (String)myCourse[10]);
+					if(Validator.isNotNull(myCourse[5])){
+						try{
+							FileEntry fileEntry = DLAppLocalServiceUtil.getFileEntry(((BigInteger)myCourse[5]).longValue());
+							courseView.setLogoURL(DLUtil.getPreviewURL(fileEntry, fileEntry.getFileVersion(), themeDisplay, StringPool.BLANK) );
+						}catch(Exception e){}
+					}else{
+						Group groupCourse= GroupLocalServiceUtil.getGroup(((BigInteger)myCourse[6]).longValue());
+						if(groupCourse.getPublicLayoutSet().getLogo()){
+							log.debug("Lo tiene el group");
+							courseView.setLogoURL("/image/layout_set_logo?img_id=" + groupCourse.getPublicLayoutSet().getLogoId());
+						}	
+					}
+					
+					url = themeDisplay.getPortalURL()+"/"+themeDisplay.getLocale().getLanguage()+"/web" + (String)myCourse[7];
+				     
+				    if(themeDisplay.isImpersonated()){
+				    	String doAsUserId = "?doAsUserId=".concat(URLEncoder.encode(themeDisplay.getDoAsUserId(),"UTF-8"));
+				    	url+=doAsUserId; 
+				    }
+				    courseView.setUrl(url);
+				    courseView.setExecutionStartDate((Date)myCourse[8]);
+				    courseView.setExecutionEndDate((Date)myCourse[9]);
+					result = ((BigInteger)myCourse[4]).longValue();
+					statusUser = Integer.parseInt((String)myCourse[3]);
+					passedDate = (Date)myCourse[11];
+					courseResultView = new CourseResultView(courseView, result, statusUser, passedDate, userId);
+					
+					listMyCourses.add(courseResultView);
+				}
+				
+				
+				
+			} catch (Exception e) {
+		       e.printStackTrace();
+		    } finally {
+		        closeSession(session);
+		    
+		}
+	
+		return listMyCourses;
+	}
 	
 	public List<CourseResultView> getMyCourses(long groupId, long userId, boolean coursesInProgress, boolean coursesCompleted, boolean coursesExpired, 
 			LinkedHashMap<String, Object> params, ThemeDisplay themeDisplay, String orderByColumn, String orderByType, int start, int end){
@@ -1696,6 +1877,84 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			Iterator<Long> itr = q.iterate();
 
 			
+			if (itr.hasNext()) {
+				Object count = itr.next();
+				
+				if (count != null) {
+					if(count instanceof Long){
+						countValue = ((Long)count).intValue();
+					}else if(count instanceof BigInteger){
+						countValue = ((BigInteger)count).intValue();
+					}else if(count instanceof Integer){
+						countValue = (Integer)count;
+					}
+					
+				}
+			}
+			
+		} catch (Exception e) {
+	       e.printStackTrace();
+	    } finally {
+	        closeSession(session);
+	    }
+	
+		return countValue;
+	}
+	
+	public int countInspectorCourses(long groupId, long userId, long companyId , LinkedHashMap<String, Object> params){
+		
+		Session session = null;
+		int countValue = 0;
+		try{
+			
+			session = openSession();
+			
+			String sql = CustomSQLUtil.get(COUNT_INSPECTOR_COURSES);
+			
+			long roleId = 0;
+			try {
+				roleId = LmsPrefsLocalServiceUtil.getLmsPrefs(companyId).getInspectorRole();
+			} catch (PortalException e1) {
+				
+			} catch (SystemException e1) {
+			
+			}
+			
+			StringBundler sb = new StringBundler();
+
+			sb.append(StringPool.OPEN_PARENTHESIS);
+			sb.append(replaceJoinAndWhere(sql, params, null, 0));
+			sb.append(StringPool.CLOSE_PARENTHESIS);
+			
+			sql = sb.toString();
+			
+			String filterCourses = StringPool.BLANK;
+			
+			sql = sql.replace("[$FILTER_COURSES$]", filterCourses);
+			
+			SimpleDateFormat parseDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			String date = parseDate.format(new Date());
+			
+			sql = sql.replace("[$DATENOW$]", date);
+		
+			if(log.isDebugEnabled()){
+				log.debug("sql: " + sql);
+				log.debug("groupId: " + groupId);
+				log.debug("userId: " + userId);
+				log.debug("roleId:" + roleId);
+			}
+			
+			SQLQuery q = session.createSQLQuery(sql);
+			
+			QueryPos qPos = QueryPos.getInstance(q);
+			qPos.add(roleId);
+			qPos.add(userId);			
+			setJoin(qPos, params);			
+			qPos.add(groupId);
+			qPos.add(groupId);
+			
+			Iterator<Long> itr = q.iterate();
+
 			if (itr.hasNext()) {
 				Object count = itr.next();
 				

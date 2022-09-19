@@ -54,6 +54,47 @@
 				Lms_Course.courseId
 		]]>
 	</sql>
+		<sql id="com.liferay.lms.service.persistence.CourseFinder.coursesInspector">
+		<![CDATA[   		
+			  SELECT 
+				Lms_Course.courseId, 
+				u.userId, 
+				IF(EXTRACTVALUE(Lms_Course.title, '//Title[@language-id=\"[$LANGUAGE$]\"]') != ''
+                , EXTRACTVALUE(Lms_Course.title, '//Title[@language-id=\"[$LANGUAGE$]\"]')
+                , IF(EXTRACTVALUE(Lms_Course.title, '//root[@default-locale]//Title') != ''
+                , EXTRACTVALUE(Lms_Course.title, '//root[@default-locale]//Title'), Lms_Course.title )
+                ) AS courseTitle,
+				CASE WHEN r.crId IS NULL THEN '0' WHEN r.passedDate IS NULL THEN '1' WHEN r.passedDate IS NOT NULL AND r.passed = 0 THEN '2' WHEN r.passed = 1 AND r.passedDate IS NOT NULL THEN '3' ELSE '0' END AS statusUser,
+				CASE WHEN r.crId IS NULL THEN 0 ELSE r.result END AS result
+                , Lms_Course.icon, Lms_Course.groupCreatedId
+                , Lms_Course.friendlyURL,
+				Lms_Course.executionStartDate
+                , Lms_Course.executionEndDate
+                , asset.summary
+                , r.passedDate
+                , r.registrationDate
+			FROM Lms_course
+					INNER JOIN classname_ classname ON classname.value='com.liferay.lms.model.Course'
+					INNER JOIN assetentry asset ON asset.classPK = Lms_Course.courseId AND classname.classNameId = asset.classNameId
+					INNER JOIN users_groups u on u.groupId = lms_course.groupCreatedId
+					INNER JOIN user_ ug on ug.userId = u.userId 
+					INNER JOIN usergrouprole urE ON u.userId = urE.userId AND urE.groupId = u.groupId
+					LEFT OUTER JOIN Lms_courseresult r ON Lms_Course.courseId = r.courseId AND r.userId = u.userId
+			WHERE  roleId =? and u.userId = ? and (Lms_Course.groupId = ? OR ? <= 0)
+			GROUP By 
+				Lms_Course.courseId
+		]]>
+	</sql>
+		<sql id="com.liferay.lms.service.persistence.CourseFinder.countInspectorCourses">
+		<![CDATA[   		
+			  SELECT count(*) as Total
+  				FROM lms_course 
+			    INNER JOIN users_groups u on u.groupId = lms_course.groupCreatedId
+			    INNER JOIN user_ ug on ug.userId = u.userId 
+				INNER JOIN usergrouprole urE ON u.userId = urE.userId AND urE.groupId = u.groupId
+  			  WHERE  roleId =? and ug.userId = ? and (Lms_Course.groupId = ? OR ? <= 0)
+		]]>
+	</sql>
 	<sql id="com.liferay.lms.service.persistence.CourseFinder.countMyCourses">
 		<![CDATA[   		
 			SELECT 

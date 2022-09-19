@@ -55,6 +55,7 @@ public class StartupAction extends SimpleAction {
 
 	public Role courseTeacher;
 	public Role courseEditor;
+	public Role courseInspector;
 	public Role courseCreator;
 	public LayoutSetPrototype layoutSetPrototype;
 	private Log _log = LogFactoryUtil.getLog(StartupAction.class); 
@@ -99,6 +100,7 @@ public class StartupAction extends SimpleAction {
 		LmsPrefs lmsPrefs=LmsPrefsLocalServiceUtil.createLmsPrefs(companyId);
 		lmsPrefs.setTeacherRole(courseTeacher.getRoleId());
 		lmsPrefs.setEditorRole(courseEditor.getRoleId());
+		lmsPrefs.setInspectorRole( courseInspector.getRoleId() );
 		lmsPrefs.setLmsTemplates(Long.toString(layoutSetPrototype.getLayoutSetPrototypeId()));
 		try {
 			LmsPrefsLocalServiceUtil.updateLmsPrefs(lmsPrefs);
@@ -238,6 +240,13 @@ public class StartupAction extends SimpleAction {
 			for(ResourceAction raction:actions)
 				ResourcePermissionLocalServiceUtil.addResourcePermission(companyId,MBCategory.class.getName(),scope, Long.toString(companyId),courseTeacher.getRoleId(),raction.getActionId());
 			ResourcePermissionLocalServiceUtil.addResourcePermission(companyId,LearningActivity.class.getName(),scope, Long.toString(companyId),courseTeacher.getRoleId(),"CORRECT");
+		}
+		
+		courseInspector = RoleLocalServiceUtil.fetchRole(companyId, "courseInspector");
+		if(courseInspector == null){
+			descriptionMap.put(LocaleUtil.getDefault(), "Inspector del curso");
+			titleMap.put(LocaleUtil.getDefault(), "Course Inspector.");
+			courseInspector= RoleLocalServiceUtil.addRole(defaultUserId, companyId, "courseInspector" ,titleMap, descriptionMap, RoleConstants.TYPE_SITE);
 		}
 
 	}

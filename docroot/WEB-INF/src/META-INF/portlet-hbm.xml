@@ -267,6 +267,7 @@
 		</id>
 		<property name="teacherRole" type="com.liferay.portal.dao.orm.hibernate.LongType" />
 		<property name="editorRole" type="com.liferay.portal.dao.orm.hibernate.LongType" />
+		<property name="inspectorRole" type="com.liferay.portal.dao.orm.hibernate.LongType" />
 		<property name="lmsTemplates" type="com.liferay.portal.dao.orm.hibernate.StringType" />
 		<property name="activities" type="com.liferay.portal.dao.orm.hibernate.StringType" />
 		<property name="courseevals" type="com.liferay.portal.dao.orm.hibernate.StringType" />

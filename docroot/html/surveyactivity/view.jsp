@@ -1,3 +1,4 @@
+<%@page import="com.tls.lms.util.LiferaylmsUtil"%>
 <%@page import="com.liferay.portal.kernel.xml.DocumentException"%>
 <%@page import="com.liferay.portal.kernel.util.PropsUtil"%>
 <%@page import="com.liferay.portal.kernel.xml.Document"%>
@@ -95,7 +96,10 @@ textarea {
 					}
 					
 					boolean userPassed = LearningActivityResultLocalServiceUtil.userPassed(actId,themeDisplay.getUserId());
-					
+					Course cr = CourseLocalServiceUtil.getCourseByGroupCreatedId(activity.getGroupId());
+					boolean isInRunningPeriod =  LiferaylmsUtil.isCourseInRunnigPeriod(cr);
+					boolean canBeAccesOnEndExecution = LiferaylmsUtil.hasPermissionAccessQualitySurveyCoursesExecution(cr);
+
 					if(userPassed){
 					%>
 					<p class="color_tercero negrita"><liferay-ui:message key="surveyactivity.survey.done" /></p>
@@ -320,12 +324,14 @@ textarea {
 							
 						}
 						
-						if(questions.size() > 0 && !userPassed){
-						%>
-							<aui:button-row>
-							<aui:button type="submit"  onClick='<%= "return  "+renderResponse.getNamespace() + "formValidation(event);" %>' ></aui:button>
-							</aui:button-row>
-						<%}%>
+					if( (isInRunningPeriod || canBeAccesOnEndExecution ) && ( questions.size() > 0 && !userPassed )  ){
+					%>
+						<aui:button-row>
+						<aui:button type="submit"  onClick='<%= "return  "+renderResponse.getNamespace() + "formValidation(event);" %>' ></aui:button>
+						</aui:button-row>
+					<%
+					}
+					%>
 						</aui:form>
 						<%
 						}
