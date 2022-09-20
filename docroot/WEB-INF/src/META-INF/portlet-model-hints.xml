@@ -253,6 +253,7 @@
 		<field name="companyId" type="long" />
 		<field name="teacherRole" type="long" />
 		<field name="editorRole" type="long" />
+		<field name="inspectorRole" type="long" />
 		<field name="lmsTemplates" type="String" />
 		<field name="activities" type="String" />
 		<field name="courseevals" type="String" />
@@ -273,7 +274,7 @@
 		<field name="userName" type="String" />
 		<field name="createDate" type="Date" />
 		<field name="modifiedDate" type="Date" />
-		<field name="title" type="String" localized="true" >
+		<field name="title" type="String" localized="true">
 			<hint name="max-length">256</hint>
 		</field>
 		<field name="description" type="String" localized="true" />

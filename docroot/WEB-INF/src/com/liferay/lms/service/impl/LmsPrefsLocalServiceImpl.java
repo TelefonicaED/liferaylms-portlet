@@ -71,6 +71,7 @@ public class LmsPrefsLocalServiceImpl extends LmsPrefsLocalServiceBaseImpl
 				lmsPrefs=lmsPrefsPersistence.create(companyId);
 				lmsPrefs.setTeacherRole(stAction.courseTeacher.getRoleId());
 				lmsPrefs.setEditorRole(stAction.courseEditor.getRoleId());
+				lmsPrefs.setInspectorRole(stAction.courseInspector.getRoleId());
 				lmsPrefs.setLmsTemplates(Long.toString(stAction.layoutSetPrototype.getLayoutSetPrototypeId()));
 				lmsPrefs.setUsersResults(1000);
 				lmsPrefsPersistence.update(lmsPrefs, true);

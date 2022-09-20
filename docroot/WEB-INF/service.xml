@@ -716,7 +716,8 @@
     <entity name="LmsPrefs" local-service="true" remote-service="false" json-enabled="false">
         <column name="companyId" type="long" primary="true"></column>
         <column name="teacherRole" type="long"></column>
-    	<column name="editorRole" type="long"></column>     
+    	<column name="editorRole" type="long"></column>   
+    	<column name="inspectorRole" type="long"></column>      
         <column name="lmsTemplates" type="String"></column>
         <column name="activities" type="String"></column>
         <column name="courseevals" type="String"></column>

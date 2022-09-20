@@ -368,6 +368,36 @@ public class UserDisplayTerms extends DisplayTerms{
 		
 		return numEditors;
 	}
+	
+	public List<User> getInspectors(long courseId, int start, int end){
+		List<User> listInspector = null;
+		
+		if(isAdvancedSearch()){				
+			listInspector = CourseLocalServiceUtil.getInspectorsFromCourse(courseId, companyId, getScreenName(), getFirstName(), getLastName(), getEmailAddress(), 
+					status, getTeamIds(), isAndOperator(), start, end, getOrderByComparator());
+		}else{
+			listInspector = CourseLocalServiceUtil.getInspectorsFromCourse(courseId, companyId, getKeywords(), getKeywords(), getKeywords(), getKeywords(), 
+					status, getTeamIds(), isAndOperator(), start, end, getOrderByComparator());
+			
+		}
+		return listInspector;
+	}
+	
+	public int countInspectors(long courseId){
+		int numInspector= 0;
+		
+		
+		if(isAdvancedSearch()){			
+
+			numInspector = CourseLocalServiceUtil.countInspectorsFromCourse(courseId, companyId, getScreenName(), getFirstName(), getLastName(), getEmailAddress(), 
+					status,	getTeamIds(), isAndOperator());
+		}else{
+			numInspector = CourseLocalServiceUtil.countInspectorsFromCourse(courseId, companyId, getKeywords(), getKeywords(), getKeywords(), getKeywords(),
+					status, getTeamIds(), isAndOperator());
+		}
+		
+		return numInspector;
+	}
 
 	public boolean isShowUserName() {
 		return showUserName;
