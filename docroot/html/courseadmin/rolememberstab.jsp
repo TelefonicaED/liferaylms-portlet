@@ -30,6 +30,8 @@ String redirectOfEdit = ParamUtil.getString(request, "redirectOfEdit");
 LmsPrefs prefs=LmsPrefsLocalServiceUtil.getLmsPrefs(themeDisplay.getCompanyId());
 String teacherName=RoleLocalServiceUtil.getRole(prefs.getTeacherRole()).getTitle(locale);
 String editorName=RoleLocalServiceUtil.getRole(prefs.getEditorRole()).getTitle(locale);
+String inspectorName=RoleLocalServiceUtil.getRole(prefs.getInspectorRole()).getTitle(locale);
+
 Role commmanager=RoleLocalServiceUtil.getRole(themeDisplay.getCompanyId(), RoleConstants.SITE_MEMBER) ;
 
 if(Validator.isNotNull(roleId)){
@@ -37,8 +39,11 @@ if(Validator.isNotNull(roleId)){
 		tabs1 = LanguageUtil.get(pageContext,"courseadmin.adminactions.students");
 	}else if(roleId==prefs.getEditorRole()){
 		tabs1 = editorName;
-	}else{
+	}else if(roleId==prefs.getTeacherRole()){
 		tabs1 = teacherName;
+	}
+	else {
+		tabs1 = inspectorName;
 	}
 }
 
@@ -73,6 +78,9 @@ if(!backToEdit){
 	menu.append(editorName);
 	menu.append(",");
 	menu.append(teacherName);
+	menu.append(",");
+	menu.append(inspectorName);
+
 %>
 
 <portlet:renderURL var="memebersURL">
@@ -116,5 +124,16 @@ if(!backToEdit){
 	</c:if>
 	<liferay-util:param value="<%=Long.toString(prefs.getTeacherRole()) %>" name="roleId"/>
 	<liferay-util:param value="3" name="tab"/>
+  </liferay-util:include>
+</c:if>
+<c:if test='<%= tabs1.equals(inspectorName) %>'>
+  <liferay-util:include page="/html/courseadmin/rolemembers.jsp" servletContext="<%=this.getServletContext() %>">
+	<liferay-util:param value="<%=String.valueOf(primKey) %>" name="courseId"/>
+	<liferay-util:param value="<%=Boolean.toString(backToEdit) %>" name="backToEdit" />
+	<c:if test="<%=backToEdit %>">
+		<liferay-util:param value='<%=redirectOfEdit %>' name="redirectOfEdit"/>
+	</c:if>
+	<liferay-util:param value="<%=Long.toString(prefs.getInspectorRole()) %>" name="roleId"/>
+	<liferay-util:param value="4" name="tab"/>
   </liferay-util:include>
 </c:if>

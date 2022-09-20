@@ -1712,6 +1712,28 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 		return courseFinder.countEditors(courseId, companyId, screenName, firstName, lastName, emailAddress, status, teamIds, andOperator);
 	}
 	
+	public List<User> getInspectorsFromCourse(long courseId, long companyId, String screenName, String firstName, String lastName, String emailAddress, int status, long[] teamIds, boolean andOperator, 
+			int start, int end, OrderByComparator obc){
+			return courseFinder.findInspectors(courseId, companyId, screenName, firstName, lastName, emailAddress, status, teamIds, andOperator, start, end, obc);
+}
+
+/**
+* Usar este método para contar los inspectores de un curso
+* @param courseId id del curso
+* @param companyId id de company
+* @param screenName nombre de usuario
+* @param firstName nombre
+* @param lastName apellido
+* @param emailAddress direccion de correo
+* @param status estado del usuario (WorkflowConstants)
+* @param teamIds array de long con los ids de los equipos
+* @param andOperator true si queremos que coincidan screenname, firstname, lastname y emailaddress, false en caso contrario
+* @return
+*/
+public int countInspectorsFromCourse(long courseId, long companyId, String screenName, String firstName, String lastName, String emailAddress, int status, long[] teamIds, boolean andOperator){
+return courseFinder.countInspectors(courseId, companyId, screenName, firstName, lastName, emailAddress, status, teamIds, andOperator);
+}
+	
 	/*******************************************************************************************************************************/
 	/*******************************************************************************************************************************/
 	/*******************************************************************************************************************************/
@@ -2159,6 +2181,38 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
 		return courseFinder.countMyCourses(groupId, userId, false, true, true, null);
 	}
 	
+	  /**
+     * Cuenta los cursos que tiene un inspector
+     * 
+     * @param groupId groupId del site en el que se encuentra el curso
+     * @param userId id del usuario
+     * @return numero de cursos
+     */
+	public int countInspectorCourses(long groupId, long userId,long companyId){
+		return courseFinder.countInspectorCourses(groupId, userId, companyId, null);
+	}
+	
+	
+	  /**
+     * Devuelve los cursos del usuario inspector
+     * 
+     * @param groupId groupId del site en el que se encuentra el curso
+     * @param userId id del usuario
+     * @param params filtros para los resultados
+     * @param themeDisplay themeDisplay
+     * @param orderByColumn parametro de ordenacion
+     * @param orderByType parametro de ordenacion
+     * @param start parametro de paginacion
+     * @param end parametro de paginacion
+     * @return listado de cursos
+     */
+    public List<CourseResultView> getCoursesInspector(long groupId, long userId,
+        LinkedHashMap<String, Object> params, ThemeDisplay themeDisplay, String orderByColumn, String orderByType,
+        int start, int end)
+    {
+        return courseFinder.getCoursesInspector(groupId, userId, params, themeDisplay, orderByColumn,orderByType, start, end);
+    }
+	
     /**
      * Devuelve los cursos del usuario que hayan finalizado o que hayan sido completados por el
      * 
@@ -2166,7 +2220,7 @@ public class CourseLocalServiceImpl extends CourseLocalServiceBaseImpl {
      * @param userId id del usuario
      * @param themeDisplay themeDisplay
      * @param orderByColumn parametro de ordenacion
-     * @param orderByType parametro de ordenacion
+     * @param orderByType parametro de ordenacionR
      * @param start parametro de paginacion
      * @param end parametro de paginacion
      * @return listado de cursos

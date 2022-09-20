@@ -1,3 +1,4 @@
+
 <%@page import="com.liferay.lms.course.inscriptiontype.InscriptionType"%>
 <%@page import="com.liferay.lms.course.inscriptiontype.InscriptionTypeRegistry"%>
 <%@page import="com.liferay.portal.kernel.exception.SystemException"%>
@@ -31,6 +32,8 @@ LmsPrefs prefs=LmsPrefsLocalServiceUtil.getLmsPrefsIni(themeDisplay.getCompanyId
 if(prefs!=null){
 	long editorRoleId=prefs.getEditorRole();
 	Role editor=RoleLocalServiceUtil.getRole(editorRoleId);
+	long inspectorRoleId=prefs.getInspectorRole();
+	Role inspector=RoleLocalServiceUtil.getRole(inspectorRoleId);
 	long teacherRoleId=prefs.getTeacherRole();
 	Role teacher=RoleLocalServiceUtil.getRole(teacherRoleId);
 	boolean showCompletedOpenCoursesInProgress = false;
@@ -240,12 +243,15 @@ if(prefs!=null){
 			e.printStackTrace();
 		}
 		boolean accessCoursesExecutionDate = PrefsPropsUtil.getBoolean(themeDisplay.getCompanyId(), LmsConstant.PREFS_ACCESS_COURSE_EXECUTION_DATES, false);
+		boolean accessQualitySurveyExecutionDate = PrefsPropsUtil.getBoolean(themeDisplay.getCompanyId(), LmsConstant.PREFS_ACCESS_QUALITY_SURVEY_EXECUTION_DATES, false);
 		
 		%>
 	
 		<aui:input type="checkbox" name="accessCoursesExecutionDate" label="lms-prefs.access-courses-execution-date" 
 			checked="<%= accessCoursesExecutionDate %>" helpMessage="lms-prefs.access-courses-execution-date.help-message"/>
 	
+		<aui:input type="checkbox" name="accessQualitySurveyExecutionDate" label="lms-prefs.access-qualitysurvey-execution-date" 
+			checked="<%= accessQualitySurveyExecutionDate %>" helpMessage="lms-prefs.access-qualitysurvey-execution-date.help-message"/>
 	
 		<aui:input type="checkbox" name="viewCoursesFinished"
 			label="view-courses-finished" checked="<%=prefs.getViewCoursesFinished()%>" value="<%=prefs.getViewCoursesFinished()%>" 

@@ -61,6 +61,7 @@ public class LmsPrefsModelImpl extends BaseModelImpl<LmsPrefs>
 			{ "companyId", Types.BIGINT },
 			{ "teacherRole", Types.BIGINT },
 			{ "editorRole", Types.BIGINT },
+			{ "inspectorRole", Types.BIGINT },
 			{ "lmsTemplates", Types.VARCHAR },
 			{ "activities", Types.VARCHAR },
 			{ "courseevals", Types.VARCHAR },
@@ -72,7 +73,7 @@ public class LmsPrefsModelImpl extends BaseModelImpl<LmsPrefs>
 			{ "showHideActivity", Types.BOOLEAN },
 			{ "viewCoursesFinished", Types.BOOLEAN }
 		};
-	public static final String TABLE_SQL_CREATE = "create table Lms_LmsPrefs (companyId LONG not null primary key,teacherRole LONG,editorRole LONG,lmsTemplates VARCHAR(75) null,activities VARCHAR(75) null,courseevals VARCHAR(75) null,scoretranslators VARCHAR(75) null,inscriptionTypes VARCHAR(75) null,usersResults LONG,debugScorm BOOLEAN,hasAPILicence BOOLEAN,showHideActivity BOOLEAN,viewCoursesFinished BOOLEAN)";
+	public static final String TABLE_SQL_CREATE = "create table Lms_LmsPrefs (companyId LONG not null primary key,teacherRole LONG,editorRole LONG,inspectorRole LONG,lmsTemplates VARCHAR(75) null,activities VARCHAR(75) null,courseevals VARCHAR(75) null,scoretranslators VARCHAR(75) null,inscriptionTypes VARCHAR(75) null,usersResults LONG,debugScorm BOOLEAN,hasAPILicence BOOLEAN,showHideActivity BOOLEAN,viewCoursesFinished BOOLEAN)";
 	public static final String TABLE_SQL_DROP = "drop table Lms_LmsPrefs";
 	public static final String DATA_SOURCE = "liferayDataSource";
 	public static final String SESSION_FACTORY = "liferaySessionFactory";
@@ -121,6 +122,7 @@ public class LmsPrefsModelImpl extends BaseModelImpl<LmsPrefs>
 		attributes.put("companyId", getCompanyId());
 		attributes.put("teacherRole", getTeacherRole());
 		attributes.put("editorRole", getEditorRole());
+		attributes.put("inspectorRole", getInspectorRole());
 		attributes.put("lmsTemplates", getLmsTemplates());
 		attributes.put("activities", getActivities());
 		attributes.put("courseevals", getCourseevals());
@@ -153,6 +155,12 @@ public class LmsPrefsModelImpl extends BaseModelImpl<LmsPrefs>
 
 		if (editorRole != null) {
 			setEditorRole(editorRole);
+		}
+
+		Long inspectorRole = (Long)attributes.get("inspectorRole");
+
+		if (inspectorRole != null) {
+			setInspectorRole(inspectorRole);
 		}
 
 		String lmsTemplates = (String)attributes.get("lmsTemplates");
@@ -239,6 +247,14 @@ public class LmsPrefsModelImpl extends BaseModelImpl<LmsPrefs>
 
 	public void setEditorRole(long editorRole) {
 		_editorRole = editorRole;
+	}
+
+	public long getInspectorRole() {
+		return _inspectorRole;
+	}
+
+	public void setInspectorRole(long inspectorRole) {
+		_inspectorRole = inspectorRole;
 	}
 
 	public String getLmsTemplates() {
@@ -393,6 +409,7 @@ public class LmsPrefsModelImpl extends BaseModelImpl<LmsPrefs>
 		lmsPrefsImpl.setCompanyId(getCompanyId());
 		lmsPrefsImpl.setTeacherRole(getTeacherRole());
 		lmsPrefsImpl.setEditorRole(getEditorRole());
+		lmsPrefsImpl.setInspectorRole(getInspectorRole());
 		lmsPrefsImpl.setLmsTemplates(getLmsTemplates());
 		lmsPrefsImpl.setActivities(getActivities());
 		lmsPrefsImpl.setCourseevals(getCourseevals());
@@ -467,6 +484,8 @@ public class LmsPrefsModelImpl extends BaseModelImpl<LmsPrefs>
 
 		lmsPrefsCacheModel.editorRole = getEditorRole();
 
+		lmsPrefsCacheModel.inspectorRole = getInspectorRole();
+
 		lmsPrefsCacheModel.lmsTemplates = getLmsTemplates();
 
 		String lmsTemplates = lmsPrefsCacheModel.lmsTemplates;
@@ -522,7 +541,7 @@ public class LmsPrefsModelImpl extends BaseModelImpl<LmsPrefs>
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(27);
+		StringBundler sb = new StringBundler(29);
 
 		sb.append("{companyId=");
 		sb.append(getCompanyId());
@@ -530,6 +549,8 @@ public class LmsPrefsModelImpl extends BaseModelImpl<LmsPrefs>
 		sb.append(getTeacherRole());
 		sb.append(", editorRole=");
 		sb.append(getEditorRole());
+		sb.append(", inspectorRole=");
+		sb.append(getInspectorRole());
 		sb.append(", lmsTemplates=");
 		sb.append(getLmsTemplates());
 		sb.append(", activities=");
@@ -556,7 +577,7 @@ public class LmsPrefsModelImpl extends BaseModelImpl<LmsPrefs>
 	}
 
 	public String toXmlString() {
-		StringBundler sb = new StringBundler(43);
+		StringBundler sb = new StringBundler(46);
 
 		sb.append("<model><model-name>");
 		sb.append("com.liferay.lms.model.LmsPrefs");
@@ -573,6 +594,10 @@ public class LmsPrefsModelImpl extends BaseModelImpl<LmsPrefs>
 		sb.append(
 			"<column><column-name>editorRole</column-name><column-value><![CDATA[");
 		sb.append(getEditorRole());
+		sb.append("]]></column-value></column>");
+		sb.append(
+			"<column><column-name>inspectorRole</column-name><column-value><![CDATA[");
+		sb.append(getInspectorRole());
 		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>lmsTemplates</column-name><column-value><![CDATA[");
@@ -627,6 +652,7 @@ public class LmsPrefsModelImpl extends BaseModelImpl<LmsPrefs>
 	private long _companyId;
 	private long _teacherRole;
 	private long _editorRole;
+	private long _inspectorRole;
 	private String _lmsTemplates;
 	private String _activities;
 	private String _courseevals;
