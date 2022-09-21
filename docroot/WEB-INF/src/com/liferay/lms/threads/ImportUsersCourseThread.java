@@ -260,8 +260,16 @@ public class ImportUsersCourseThread extends Thread {
 		
 											users.add(user.getUserId());
 											
-											String allowStartDateStr = currLine[posDate];
-											String allowEndDateStr = currLine[posDate+1];
+											String allowStartDateStr = "";
+											String allowEndDateStr = "";
+											try{
+												allowStartDateStr = currLine[posDate];
+												allowEndDateStr = currLine[posDate+1];
+											}catch (ArrayIndexOutOfBoundsException ex){
+												log.debug("ArrayIndexOutOfBoundsException");
+												allowStartDateStr = "";
+												allowEndDateStr = "";												
+											}
 											
 											if(allowStartDateStr.trim().length() >0){
 												try{
