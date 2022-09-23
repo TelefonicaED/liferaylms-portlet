@@ -3,7 +3,7 @@
 		<video width="600" height="338" id="playervideo" ${controls }
 			preload="none" src="${video}" type="${mimeType }"></video>
 	</div>
-	
+
 	<c:forEach items="${listQuestions }" var="question">
 		<c:set var="questionType" value="${question.testQuestionType }" />
 		<div class="aui-helper-hidden questionVideo"
@@ -35,9 +35,9 @@
 <script
 	src="https://cdn.jsdelivr.net/npm/mediaelement@4.2.9/build/mediaelement-and-player.min.js"></script>
 <script
-	src="https://cdn.jsdelivr.net/npm/mediaelement@4.2.9/build/dailymotion.min.js"></script>
+	src="https://cdn.jsdelivr.net/npm/mediaelement@4.2.9/build/renderers/dailymotion.min.js"></script>
 <script
-	src="https://cdn.jsdelivr.net/npm/mediaelement@4.2.9/build/facebook.min.js"></script>
+	src="https://cdn.jsdelivr.net/npm/mediaelement@4.2.9/build/renderers/facebook.min.js"></script>
 <script
 	src="https://cdn.jsdelivr.net/npm/mediaelement@4.2.9/build/renderers/soundcloud.min.js"></script>
 <script
@@ -48,70 +48,72 @@
 <portlet:resourceURL var="saveQuestionURL" id="saveQuestion" />
 
 <script>
- 	
+
  	var player;
- 
+
      document.addEventListener('DOMContentLoaded', function() {
-    	 
-    	 
+
+
     	var answerQuestion = true;
   	 	var plays = 0;
   	 	var finished = false;
 
-  	 	
+
   	 	if('${isVimeoIframe}' == 'true' && '${controls}' == ''){
   	 		console.log("SIN CONTROLES");
   	 		$('#playervideo').mediaelementplayer({
   	     	    features: ['playpause','volume'], //Adding the feature 'markers' enables this plugin
   	     		pluginPath: '/liferaylms-portlet/js/mediaelement/',
   	     	    success: function (media) {
+					media.setMuted(false);
   	     	    	player = media;
+
   	     	    }
-  	     	}); 
+  	     	});
   	 	}else{
   	 		console.log("CON CONTROLES");
   	 		player = new MediaElement("playervideo", {
   		 		pluginPath: '/liferaylms-portlet/js/mediaelement/',
   		        shimScriptAccess: 'always',
   		        success: function (media, node) {
-  		        	
+
   		        }
-  		    });	
+  		    });
   	 	}
-	 	
-	
+
+
 	    var currentTime = parseInt('${currentTime}');
 		if(currentTime > 0){
 			player.setCurrentTime(currentTime);
 		}
-		
+
 		player.addEventListener('play', function () {
 			if(!$('#<portlet:namespace/>videoQuestionFeedback').hasClass("aui-helper-hidden")){
 				$('#<portlet:namespace/>videoQuestionFeedback').addClass("aui-helper-hidden")
-			}	
+			}
 			$('#<portlet:namespace/>videoQuestionFeedback').html("");
 			finished = false;
 			if(plays > 0){
 				if($('[id^=<portlet:namespace/>question_div_]')!=null){
-					$('[id^=<portlet:namespace/>question_div_]').addClass("aui-helper-hidden");	
+					$('[id^=<portlet:namespace/>question_div_]').addClass("aui-helper-hidden");
 				}
 			}
 			plays++;
-			
-			
-			
-		});	
-		
+
+
+
+		});
+
 		if('${!hasPermissionAccessCourseFinished}' == 'true'){
-				
+
 			player.addEventListener('ended',function() {
-				
+
 				var duration = player.getDuration();
-				
-				<portlet:namespace/>finishTry(100,duration,plays);	
-	
+
+				<portlet:namespace/>finishTry(100,duration,plays);
+
 				// Process Success - A LearningActivityResult returned
-				finished = true;	
+				finished = true;
 				setTimeout(function(){ Liferay.Portlet.refresh('#p_p_id_activityNavigator_WAR_liferaylmsportlet_'); }, 1000);
 				setTimeout(function(){Liferay.Portlet.refresh('#p_p_id_lmsactivitieslist_WAR_liferaylmsportlet_'); }, 1000);
 				player.setControls(true);
@@ -123,12 +125,12 @@
 						document.getElementById("playervideo_vimeo_iframe").src = src;
 					}
 				}
-				
-				
+
+
 			});
-		
+
 		}
-		
+
 		//Creamos el array para las preguntas
 		var questions = [];
 		<c:forEach items="${timeQuestions }" var="question">
@@ -136,16 +138,16 @@
 			if(parseInt("${question.value}") >= currentTime){
 				questions.push(question);
 			}
-			
+
 		</c:forEach>
-		
+
 		questions.sort(function(a, b){return a[1]-b[1]});
-		
+
 		if(questions.length > 0){
 			var indexQuestion = 0;
 			var maxQuestions = questions.length;
 			var nextQuestion = questions[indexQuestion];
-			
+
 			player.addEventListener('timeupdate', function() {
 				if(indexQuestion < maxQuestions && nextQuestion[1] < player.currentTime && (nextQuestion[1] > (player.currentTime - 2))){
 					player.pause();
@@ -160,35 +162,35 @@
 				}
 			});
 		}
-			
+
 		if('${!hasPermissionAccessCourseFinished}' == 'true'){
-			
+
 			var unloadEvent = function (e) {
-				//console.log("unload event vimeo");  
+				//console.log("unload event vimeo");
 				if(!finished){
 					var duration = player.getDuration();
 					currentTime = player.getCurrentTime();
-						
+
 					var isDefaultScore = '${isDefaultScore}' == 'true';
 					var positionToSave = parseFloat('${videoPosition}');
 					var oldScore = parseInt('${oldScore}');
 					if (currentTime > positionToSave)
 						positionToSave = currentTime;
-					var score = 100;														
+					var score = 100;
 					if (!isDefaultScore) score = Math.round((currentTime/duration)*100);
 					//debugger;
 					if(score>100){
 					score=100;
 					}
-					<portlet:namespace/>finishTry(score, positionToSave,plays);													
-				  
+					<portlet:namespace/>finishTry(score, positionToSave,plays);
+
 				}
 			};
-			
+
 			window.addEventListener("beforeunload", unloadEvent);
 		}
 	});
-     
+
  	function <portlet:namespace/>answerQuestion(questionId){
  		//Cogemos la respuesta
  		//console.log("guardamos respuesta");
@@ -206,32 +208,32 @@
  				url: '${saveQuestionURL}',
  			    cache:false,
  				data: $("#<portlet:namespace />questionform_" + questionId).serialize(),
- 				success: function(data){			
+ 				success: function(data){
  					if(data){
  						if(data.correct){
  							$('#<portlet:namespace />question_div_'+questionId).remove();
  							if(data.questionFeedback){
  								$('#<portlet:namespace />feedback_'+questionId).removeClass("aui-helper-hidden");
- 	 							$('#<portlet:namespace />feedback_content_'+questionId).html(data.feedback);	
+ 	 							$('#<portlet:namespace />feedback_content_'+questionId).html(data.feedback);
  							}else{
  								$('#<portlet:namespace />feedback_'+questionId).remove();
  								player.play();
  							}
- 							
-							
- 						}	
+
+
+ 						}
  					}
  				},
  				error: function(){
- 					
+
  				}
  			});
  		}else{
  			//Mostramos los mensajes que sean
  		}
  	}
- 	
- 	
+
+
  	function <portlet:namespace/>continueQuestion(questionId){
  		//Cogemos la respuesta
  		$('#<portlet:namespace />feedback_'+questionId).remove();
