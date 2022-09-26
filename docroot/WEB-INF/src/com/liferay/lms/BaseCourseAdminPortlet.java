@@ -38,7 +38,6 @@ import au.com.bytecode.opencsv.CSVWriter;
 import com.liferay.counter.service.CounterLocalServiceUtil;
 import com.liferay.lms.auditing.AuditConstants;
 import com.liferay.lms.auditing.AuditingLogFactory;
-import com.liferay.lms.course.adminaction.AdminActionTypeRegistry;
 import com.liferay.lms.course.diploma.CourseDiploma;
 import com.liferay.lms.course.diploma.CourseDiplomaRegistry;
 import com.liferay.lms.course.inscriptiontype.InscriptionType;
@@ -179,12 +178,13 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 			
 			String redirectOfEdit = ParamUtil.getString(renderRequest, "redirectOfEdit");
 			
-			List<User> users = null; 
+			List<User> users = new ArrayList<User>(); 
 			int total = 0;		
 			
 			LmsPrefs prefs=LmsPrefsLocalServiceUtil.getLmsPrefs(themeDisplay.getCompanyId());
 			String teacherName=RoleLocalServiceUtil.getRole(prefs.getTeacherRole()).getTitle(themeDisplay.getLocale());
 			String editorName=RoleLocalServiceUtil.getRole(prefs.getEditorRole()).getTitle(themeDisplay.getLocale());
+			String inspectorName=RoleLocalServiceUtil.getRole(prefs.getInspectorRole()).getTitle(themeDisplay.getLocale());
 			String tab=StringPool.BLANK;
 			
 			Role commmanager=RoleLocalServiceUtil.getRole(themeDisplay.getCompanyId(), RoleConstants.SITE_MEMBER);
@@ -195,17 +195,27 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 					tabs1 = LanguageUtil.get(themeDisplay.getLocale(),"courseadmin.adminactions.students");
 				}else if(roleId==prefs.getEditorRole()){
 					tabs1 = editorName;
-				}else{
+				}else if(roleId==prefs.getTeacherRole()){
 					tabs1 = teacherName;
 				}
+				else if(roleId==prefs.getInspectorRole()){
+					tabs1 = inspectorName;
+				}
+				else {
+					tabs1 = LanguageUtil.get(themeDisplay.getLocale(),"courseadmin.adminactions.students");
+				}
 			}
+			
 			if(tabs1.equals(students)){
 				roleId=commmanager.getRoleId();
 			}else if(tabs1.equals(editorName)){
 				roleId=prefs.getEditorRole();
 			}else if(tabs1.equals(teacherName)){
 				roleId=prefs.getTeacherRole();
+			}else if(tabs1.equals(inspectorName)){
+				roleId=prefs.getInspectorRole();
 			}
+			
 			long createdGroupId=course.getGroupCreatedId();
 			if(log.isDebugEnabled()){
 				log.debug("START "+searchContainer.getStart());
@@ -224,22 +234,33 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 			}else if(roleId == prefs.getEditorRole()){
 				users = displayTerms.getEditors(courseId, searchContainer.getStart(), searchContainer.getEnd());
 				total = displayTerms.countEditors(courseId);
+			}else if(roleId == prefs.getInspectorRole()){
+				users = displayTerms.getInspectors(courseId, searchContainer.getStart(), searchContainer.getEnd());
+				total = displayTerms.countInspectors(courseId);
 			}
+			
 			if(log.isDebugEnabled()){
 				log.debug("Users "+users.size() );
 				log.debug("TOTAL "+total);
 			}
 			searchContainer.setResults(users);
 			searchContainer.setTotal(total);
+			
 			boolean commManagerRole = false;
+			
 			if(roleId==commmanager.getRoleId()){
 				tab =  LanguageUtil.get(themeDisplay.getLocale(),"courseadmin.adminactions.students");
 				commManagerRole=true;
-			}else if(roleId==prefs.getEditorRole()){
-				tab = editorName;
-			}else{
+			}else if(roleId==prefs.getTeacherRole()){
 				tab = teacherName;
 			}
+			else if(roleId==prefs.getInspectorRole()){
+				tab = inspectorName;
+			}
+			else {
+				tab = LanguageUtil.get(themeDisplay.getLocale(),"courseadmin.adminactions.students");
+			}
+			
 			PortletPreferences preferences = renderRequest.getPreferences();
 			boolean showCalendar = GetterUtil.getBoolean(preferences.getValue("showCalendar", StringPool.FALSE));
 			boolean backToEdit = ParamUtil.getBoolean(renderRequest, "backToEdit");
@@ -275,14 +296,14 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 		        		themeDisplay.getPermissionChecker(), LmsConstant.ACTION_VIEW_USER_EXTENDED));
 		
 		}catch(SystemException e){
-			e.printStackTrace();
+			log.error (e);
+			
 		}catch(PortalException e){
-			e.printStackTrace();
+			log.error (e);
 		}
 		
 		include(this.roleMembersTabJSP, renderRequest, renderResponse);
 	}
-	
 	
 	protected void showViewCompetenceTab(RenderRequest renderRequest,RenderResponse renderResponse) throws IOException, PortletException{
 		
@@ -330,13 +351,16 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 			Role commmanager=RoleLocalServiceUtil.getRole(themeDisplay.getCompanyId(), RoleConstants.SITE_MEMBER) ;
 			String teacherName=RoleLocalServiceUtil.getRole(prefs.getTeacherRole()).getTitle(themeDisplay.getLocale());
 			String editorName=RoleLocalServiceUtil.getRole(prefs.getEditorRole()).getTitle(themeDisplay.getLocale());
+			String inspectorName=RoleLocalServiceUtil.getRole(prefs.getInspectorRole()).getTitle(themeDisplay.getLocale());
 			
 			if(roleId==commmanager.getRoleId()){
 				tab =  LanguageUtil.get(themeDisplay.getLocale(),"courseadmin.adminactions.students");
 			}else if(roleId==prefs.getEditorRole()){
 				tab = editorName;
-			}else{
+			}else if(roleId==prefs.getTeacherRole()){
 				tab = teacherName;
+			}else if(roleId == prefs.getInspectorRole()){
+				tab = inspectorName;
 			}
 			
 			log.debug("TAB "+tab);
@@ -1664,6 +1688,8 @@ public class BaseCourseAdminPortlet extends MVCPortlet {
 					users = displayTerms.getTeachers(courseId, QueryUtil.ALL_POS, QueryUtil.ALL_POS);
 				}else if(roleId == prefs.getEditorRole()){
 					users = displayTerms.getEditors(courseId, QueryUtil.ALL_POS, QueryUtil.ALL_POS);
+				}else if(roleId == prefs.getInspectorRole()){
+					users = displayTerms.getInspectors(courseId, QueryUtil.ALL_POS, QueryUtil.ALL_POS);
 				}
 				
 				response.setCharacterEncoding("UTF-8");
