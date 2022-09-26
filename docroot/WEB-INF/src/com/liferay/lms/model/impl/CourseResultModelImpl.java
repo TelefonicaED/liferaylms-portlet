@@ -71,6 +71,7 @@ public class CourseResultModelImpl extends BaseModelImpl<CourseResult>
 			{ "userId", Types.BIGINT },
 			{ "passed", Types.BOOLEAN },
 			{ "registrationDate", Types.TIMESTAMP },
+			{ "unRegistrationDate", Types.TIMESTAMP },
 			{ "startDate", Types.TIMESTAMP },
 			{ "passedDate", Types.TIMESTAMP },
 			{ "allowStartDate", Types.TIMESTAMP },
@@ -79,7 +80,7 @@ public class CourseResultModelImpl extends BaseModelImpl<CourseResult>
 			{ "companyId", Types.BIGINT },
 			{ "userModifiedId", Types.BIGINT }
 		};
-	public static final String TABLE_SQL_CREATE = "create table Lms_CourseResult (crId LONG not null primary key,courseId LONG,result LONG,comments TEXT null,userId LONG,passed BOOLEAN,registrationDate DATE null,startDate DATE null,passedDate DATE null,allowStartDate DATE null,allowFinishDate DATE null,extraData TEXT null,companyId LONG,userModifiedId LONG)";
+	public static final String TABLE_SQL_CREATE = "create table Lms_CourseResult (crId LONG not null primary key,courseId LONG,result LONG,comments TEXT null,userId LONG,passed BOOLEAN,registrationDate DATE null,unRegistrationDate DATE null,startDate DATE null,passedDate DATE null,allowStartDate DATE null,allowFinishDate DATE null,extraData TEXT null,companyId LONG,userModifiedId LONG)";
 	public static final String TABLE_SQL_DROP = "drop table Lms_CourseResult";
 	public static final String DATA_SOURCE = "liferayDataSource";
 	public static final String SESSION_FACTORY = "liferaySessionFactory";
@@ -118,6 +119,7 @@ public class CourseResultModelImpl extends BaseModelImpl<CourseResult>
 		model.setUserId(soapModel.getUserId());
 		model.setPassed(soapModel.getPassed());
 		model.setRegistrationDate(soapModel.getRegistrationDate());
+		model.setUnRegistrationDate(soapModel.getUnRegistrationDate());
 		model.setStartDate(soapModel.getStartDate());
 		model.setPassedDate(soapModel.getPassedDate());
 		model.setAllowStartDate(soapModel.getAllowStartDate());
@@ -190,6 +192,7 @@ public class CourseResultModelImpl extends BaseModelImpl<CourseResult>
 		attributes.put("userId", getUserId());
 		attributes.put("passed", getPassed());
 		attributes.put("registrationDate", getRegistrationDate());
+		attributes.put("unRegistrationDate", getUnRegistrationDate());
 		attributes.put("startDate", getStartDate());
 		attributes.put("passedDate", getPassedDate());
 		attributes.put("allowStartDate", getAllowStartDate());
@@ -243,6 +246,12 @@ public class CourseResultModelImpl extends BaseModelImpl<CourseResult>
 
 		if (registrationDate != null) {
 			setRegistrationDate(registrationDate);
+		}
+
+		Date unRegistrationDate = (Date)attributes.get("unRegistrationDate");
+
+		if (unRegistrationDate != null) {
+			setUnRegistrationDate(unRegistrationDate);
 		}
 
 		Date startDate = (Date)attributes.get("startDate");
@@ -397,6 +406,14 @@ public class CourseResultModelImpl extends BaseModelImpl<CourseResult>
 		_registrationDate = registrationDate;
 	}
 
+	public Date getUnRegistrationDate() {
+		return _unRegistrationDate;
+	}
+
+	public void setUnRegistrationDate(Date unRegistrationDate) {
+		_unRegistrationDate = unRegistrationDate;
+	}
+
 	public Date getStartDate() {
 		return _startDate;
 	}
@@ -507,6 +524,7 @@ public class CourseResultModelImpl extends BaseModelImpl<CourseResult>
 		courseResultImpl.setUserId(getUserId());
 		courseResultImpl.setPassed(getPassed());
 		courseResultImpl.setRegistrationDate(getRegistrationDate());
+		courseResultImpl.setUnRegistrationDate(getUnRegistrationDate());
 		courseResultImpl.setStartDate(getStartDate());
 		courseResultImpl.setPassedDate(getPassedDate());
 		courseResultImpl.setAllowStartDate(getAllowStartDate());
@@ -616,6 +634,15 @@ public class CourseResultModelImpl extends BaseModelImpl<CourseResult>
 			courseResultCacheModel.registrationDate = Long.MIN_VALUE;
 		}
 
+		Date unRegistrationDate = getUnRegistrationDate();
+
+		if (unRegistrationDate != null) {
+			courseResultCacheModel.unRegistrationDate = unRegistrationDate.getTime();
+		}
+		else {
+			courseResultCacheModel.unRegistrationDate = Long.MIN_VALUE;
+		}
+
 		Date startDate = getStartDate();
 
 		if (startDate != null) {
@@ -669,7 +696,7 @@ public class CourseResultModelImpl extends BaseModelImpl<CourseResult>
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(29);
+		StringBundler sb = new StringBundler(31);
 
 		sb.append("{crId=");
 		sb.append(getCrId());
@@ -685,6 +712,8 @@ public class CourseResultModelImpl extends BaseModelImpl<CourseResult>
 		sb.append(getPassed());
 		sb.append(", registrationDate=");
 		sb.append(getRegistrationDate());
+		sb.append(", unRegistrationDate=");
+		sb.append(getUnRegistrationDate());
 		sb.append(", startDate=");
 		sb.append(getStartDate());
 		sb.append(", passedDate=");
@@ -705,7 +734,7 @@ public class CourseResultModelImpl extends BaseModelImpl<CourseResult>
 	}
 
 	public String toXmlString() {
-		StringBundler sb = new StringBundler(46);
+		StringBundler sb = new StringBundler(49);
 
 		sb.append("<model><model-name>");
 		sb.append("com.liferay.lms.model.CourseResult");
@@ -738,6 +767,10 @@ public class CourseResultModelImpl extends BaseModelImpl<CourseResult>
 		sb.append(
 			"<column><column-name>registrationDate</column-name><column-value><![CDATA[");
 		sb.append(getRegistrationDate());
+		sb.append("]]></column-value></column>");
+		sb.append(
+			"<column><column-name>unRegistrationDate</column-name><column-value><![CDATA[");
+		sb.append(getUnRegistrationDate());
 		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>startDate</column-name><column-value><![CDATA[");
@@ -791,6 +824,7 @@ public class CourseResultModelImpl extends BaseModelImpl<CourseResult>
 	private boolean _originalPassed;
 	private boolean _setOriginalPassed;
 	private Date _registrationDate;
+	private Date _unRegistrationDate;
 	private Date _startDate;
 	private Date _passedDate;
 	private Date _originalPassedDate;
