@@ -242,9 +242,10 @@ if(prefs!=null){
 		} catch (SystemException e) {
 			e.printStackTrace();
 		}
-		boolean accessCoursesExecutionDate = PrefsPropsUtil.getBoolean(themeDisplay.getCompanyId(), LmsConstant.PREFS_ACCESS_COURSE_EXECUTION_DATES, false);
-		boolean accessQualitySurveyExecutionDate = PrefsPropsUtil.getBoolean(themeDisplay.getCompanyId(), LmsConstant.PREFS_ACCESS_QUALITY_SURVEY_EXECUTION_DATES, false);
 		
+		boolean accessCoursesExecutionDate = PrefsPropsUtil.getBoolean(themeDisplay.getCompanyId(), LmsConstant.PREFS_ACCESS_COURSE_EXECUTION_DATES, false);
+		boolean accessQualitySurveyExecutionDate = PrefsPropsUtil.getBoolean(themeDisplay.getCompanyId(), LmsConstant.PREFS_ACCESS_QUALITY_SURVEY_EXECUTION_DATES, false);		
+		boolean showInspectorRole = PrefsPropsUtil.getBoolean(themeDisplay.getCompanyId(), LmsConstant.PREFS_SHOW_INSPECTOR_ROLE, false);
 		%>
 	
 		<aui:input type="checkbox" name="accessCoursesExecutionDate" label="lms-prefs.access-courses-execution-date" 
@@ -252,6 +253,9 @@ if(prefs!=null){
 	
 		<aui:input type="checkbox" name="accessQualitySurveyExecutionDate" label="lms-prefs.access-qualitysurvey-execution-date" 
 			checked="<%= accessQualitySurveyExecutionDate %>" helpMessage="lms-prefs.access-qualitysurvey-execution-date.help-message"/>
+			
+		<aui:input type="checkbox" name="showInspectorRole" label="lms-prefs.show-inspector-role" 
+				checked="<%= showInspectorRole %>" helpMessage="lms-prefs.show-inspector-role.help-message"/>
 	
 		<aui:input type="checkbox" name="viewCoursesFinished"
 			label="view-courses-finished" checked="<%=prefs.getViewCoursesFinished()%>" value="<%=prefs.getViewCoursesFinished()%>" 
