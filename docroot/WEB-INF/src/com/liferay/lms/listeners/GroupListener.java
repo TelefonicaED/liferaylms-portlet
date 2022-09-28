@@ -391,7 +391,7 @@ public class GroupListener extends BaseModelListener<Group> {
 						message.put("subject", 	mailTemplate.getSubject());
 						message.put("body", 	mailTemplate.getBody());
 						message.put("groupId", 	mj.getGroupId());
-						message.put("userId",  	mj.getUserId());
+						message.put("userId",  	mailTemplate.getUserId());
 						message.put("testing", 	StringPool.FALSE);
 
 						message.put("portal", 	companyName);
