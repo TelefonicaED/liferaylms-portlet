@@ -19,6 +19,8 @@
 <%@page import="com.liferay.portal.service.UserGroupRoleLocalServiceUtil"%>
 <%@page import="com.liferay.portal.service.RoleLocalServiceUtil"%>
 <%@page import="com.liferay.portal.model.RoleConstants"%>
+<%@page import="com.liferay.lms.util.LmsConstant" %>
+<%@page import="com.liferay.portal.kernel.util.PrefsPropsUtil"%>
 <%@ include file="/init.jsp" %>
 
 <%
@@ -78,8 +80,10 @@ if(!backToEdit){
 	menu.append(editorName);
 	menu.append(",");
 	menu.append(teacherName);
-	menu.append(",");
-	menu.append(inspectorName);
+	if ( PrefsPropsUtil.getBoolean(course.getCompanyId(), LmsConstant.PREFS_SHOW_INSPECTOR_ROLE, false) ){
+		menu.append(",");
+		menu.append(inspectorName);
+	}
 
 %>
 

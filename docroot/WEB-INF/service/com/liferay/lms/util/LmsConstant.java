@@ -54,6 +54,7 @@ public class LmsConstant {
 	
 	public final static String PREFS_ACCESS_COURSE_EXECUTION_DATES = "lms.course.access.execution.dates";
 	public final static String PREFS_ACCESS_QUALITY_SURVEY_EXECUTION_DATES = "lms.qualitysurvey.access.execution.dates";
+	public final static String PREFS_SHOW_INSPECTOR_ROLE = "lms.show.inspector.role";
 	
 	public final static String PREFS_USERS_EXTENDED_DATA = "users.view.extended.data";
 	public final static boolean PREFS_USERS_EXTENDED_DATA_DEFAULT = false;
