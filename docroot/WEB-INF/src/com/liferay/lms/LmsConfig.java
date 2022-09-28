@@ -55,6 +55,8 @@ public class LmsConfig extends MVCPortlet {
 		boolean showButtonUnsubscribeAll = ParamUtil.getBoolean(request, "showButtonUnsubscribeAll", true);
 		boolean showOptionTest = ParamUtil.getBoolean(request, "showOptionTest", false);
 		boolean accessCoursesExecutionDate = ParamUtil.getBoolean(request, "accessCoursesExecutionDate", true);
+		boolean accessQualitySurveyExecutionDate = ParamUtil.getBoolean(request, "accessQualitySurveyExecutionDate", true);
+		boolean showInspectorRole = ParamUtil.getBoolean(request, "accessQualitySurveyExecutionDate", true);
 		
 		LmsPrefs prefs=LmsPrefsLocalServiceUtil.getLmsPrefsIni(themeDisplay.getCompanyId());
 		prefs.setLmsTemplates(sitetemplates);
@@ -79,6 +81,8 @@ public class LmsConfig extends MVCPortlet {
 		savePreference(LmsConstant.PREFS_VIEW_COURSE_FINISHED_TYPE, String.valueOf(viewCourseFinishedType), themeDisplay.getCompanyId());
 		savePreference(LmsConstant.PREFS_SHOW_OPTION_TEST, String.valueOf(showOptionTest), themeDisplay.getCompanyId());
 		savePreference(LmsConstant.PREFS_ACCESS_COURSE_EXECUTION_DATES, String.valueOf(accessCoursesExecutionDate), themeDisplay.getCompanyId());
+		savePreference(LmsConstant.PREFS_ACCESS_QUALITY_SURVEY_EXECUTION_DATES, String.valueOf(accessQualitySurveyExecutionDate), themeDisplay.getCompanyId());
+		savePreference(LmsConstant.PREFS_SHOW_INSPECTOR_ROLE, String.valueOf(showInspectorRole), themeDisplay.getCompanyId());
 		
 		LearningActivityTypeRegistry.resetLearningActivityTypes();
 		
