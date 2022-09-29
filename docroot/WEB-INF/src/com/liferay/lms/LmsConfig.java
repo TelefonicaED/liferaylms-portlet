@@ -56,7 +56,8 @@ public class LmsConfig extends MVCPortlet {
 		boolean showOptionTest = ParamUtil.getBoolean(request, "showOptionTest", false);
 		boolean accessCoursesExecutionDate = ParamUtil.getBoolean(request, "accessCoursesExecutionDate", true);
 		boolean accessQualitySurveyExecutionDate = ParamUtil.getBoolean(request, "accessQualitySurveyExecutionDate", true);
-		boolean showInspectorRole = ParamUtil.getBoolean(request, "accessQualitySurveyExecutionDate", true);
+		boolean showInspectorRole = ParamUtil.getBoolean(request, "showInspectorRole", true);
+		
 		
 		LmsPrefs prefs=LmsPrefsLocalServiceUtil.getLmsPrefsIni(themeDisplay.getCompanyId());
 		prefs.setLmsTemplates(sitetemplates);
