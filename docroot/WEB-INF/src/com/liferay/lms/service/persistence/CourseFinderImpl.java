@@ -910,10 +910,12 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			LmsPrefs prefs=LmsPrefsLocalServiceUtil.getLmsPrefs(companyId);
 			long teacherRoleId = prefs.getTeacherRole();
 			long editorRoleId = prefs.getEditorRole();
+			long inspectorRoleId = prefs.getInspectorRole();
 			
 			QueryPos qPos = QueryPos.getInstance(q);
 			qPos.add(teacherRoleId);
 			qPos.add(editorRoleId);
+			qPos.add(inspectorRoleId);
 			qPos.add(courseId);
 			if(includeEditions){
 				qPos.add(courseId);
@@ -1017,10 +1019,12 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			LmsPrefs prefs=LmsPrefsLocalServiceUtil.getLmsPrefs(companyId);
 			long teacherRoleId = prefs.getTeacherRole();
 			long editorRoleId = prefs.getEditorRole();
+			long inspectorRoleId = prefs.getInspectorRole();
 			
 			QueryPos qPos = QueryPos.getInstance(q);
 			qPos.add(teacherRoleId);
 			qPos.add(editorRoleId);
+			qPos.add(inspectorRoleId);
 			qPos.add(courseId);
 			if(includeEditions){
 				qPos.add(courseId);
@@ -1088,10 +1092,12 @@ public class CourseFinderImpl extends BasePersistenceImpl<Course> implements Cou
 			LmsPrefs prefs=LmsPrefsLocalServiceUtil.getLmsPrefs(companyId);
 			long teacherRoleId = prefs.getTeacherRole();
 			long editorRoleId = prefs.getEditorRole();
-			
+			long inspectorRoleId = prefs.getInspectorRole();
+		
 			QueryPos qPos = QueryPos.getInstance(q);
 			qPos.add(teacherRoleId);
 			qPos.add(editorRoleId);
+			qPos.add(inspectorRoleId);
 			qPos.add(courseId);
 			if(includeEditions){
 				qPos.add(courseId);

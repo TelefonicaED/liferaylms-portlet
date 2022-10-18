@@ -17,10 +17,13 @@
 			LEFT JOIN 
 				usergrouprole urE 
 					ON ug.userId = urE.userId AND urE.groupId = ug.groupId AND urE.roleId = ?
+			LEFT JOIN 
+				usergrouprole urI
+					ON ug.userId = urI.userId AND urI.groupId = ug.groupId AND urI.roleId = ?					
 			[$JOINCOURSERESULT$]
 			[$JOINTEAM$]
 			WHERE 
-				ur.userId IS NULL AND urE.userId IS NULL 
+				ur.userId IS NULL AND urE.userId IS NULL AND urI.userId IS NULL 
 				[$WHERECOURSEOREDITIONS$]
 				[$WHERESTATUS$]
 				[$WHERESEARCH$]
@@ -50,10 +53,13 @@
 			LEFT JOIN 
 				usergrouprole urE 
 					ON ug.userId = urE.userId AND urE.groupId = ug.groupId AND urE.roleId = ?
+			LEFT JOIN 
+				usergrouprole urI
+					ON ug.userId = urI.userId AND urI.groupId = ug.groupId AND urI.roleId = ?	
 			[$JOINCOURSERESULT$]
 			[$JOINTEAM$]
 			WHERE 
-				ur.userId IS NULL AND urE.userId IS NULL 
+				ur.userId IS NULL AND urE.userId IS NULL AND urI.userId IS NULL
 				[$WHERECOURSEOREDITIONS$]
 				[$WHERESTATUS$]
 				[$WHERESEARCH$]
@@ -78,11 +84,14 @@
 			LEFT JOIN 
 				usergrouprole urE 
 					ON ug.userId = urE.userId AND urE.groupId = ug.groupId AND urE.roleId = ?
+			LEFT JOIN 
+				usergrouprole urI
+					ON ug.userId = urI.userId AND urI.groupId = ug.groupId AND urI.roleId = ?
 			[$JOINCOURSERESULT$]
 			[$JOINTEAM$]
 			[$JOINCONTACT$]
 			WHERE 
-				ur.userId IS NULL AND urE.userId IS NULL 
+				ur.userId IS NULL AND urE.userId IS NULL  AND urI.userId IS NULL
 				[$WHERECOURSEOREDITIONS$]
 				[$WHERESTATUS$]
 				[$WHERESEARCH$]
