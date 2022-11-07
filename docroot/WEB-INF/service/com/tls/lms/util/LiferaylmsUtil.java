@@ -346,7 +346,7 @@ public class LiferaylmsUtil {
 	public static boolean hasPermissionAccessQualitySurveyCoursesExecution(Course course){
 		Date now = new Date();
 		try {
-			return (course.getExecutionStartDate() == null || course.getExecutionStartDate().before(now)) && (course.getExecutionEndDate() == null || course.getExecutionEndDate().after(now)) && PrefsPropsUtil.getBoolean(course.getCompanyId(), LmsConstant.PREFS_ACCESS_QUALITY_SURVEY_EXECUTION_DATES, false);
+			return (course.getExecutionStartDate() == null || course.getExecutionStartDate().before(now)) && (course.getExecutionEndDate() == null || course.getExecutionEndDate().before(now)) && PrefsPropsUtil.getBoolean(course.getCompanyId(), LmsConstant.PREFS_ACCESS_QUALITY_SURVEY_EXECUTION_DATES, false);
 		} catch (SystemException e) {
 			e.printStackTrace();
 			return false;
